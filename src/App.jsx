@@ -36,7 +36,7 @@ const items = [
 ];
 
 const Option1Page = () => <div>Option 1 Content</div>;
-const BillPage = () => <div>Bill is a cat.</div>;
+// const BillPage = () => <div>Bill is a cat.</div>;
 // Diğer sayfa bileşenlerinizi burada tanımlayın...
 
 const App = () => {
