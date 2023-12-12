@@ -16,23 +16,30 @@ function getItem(label, key, icon, children, isClickable = true) {
 }
 
 const items = [
-  getItem("Option 1", "option1", <PieChartOutlined />),
-  getItem("Option 2", "option2", <DesktopOutlined />),
+  // getItem("Option 1", "option1", <PieChartOutlined />),
+  // getItem("Option 2", "option2", <DesktopOutlined />),
   getItem(
     "Bakım ve Arıza Yönetimi",
     "bakim&ariza",
     <UserOutlined />,
-    [getItem("Tom", "tom", true), getItem("İş Emri", "isemri", true), getItem("Alex", "alex", true)],
+    [
+      // getItem("Tom", "tom", true),
+      getItem("İş Emri", "isemri", true),
+      // getItem("Alex", "alex", true)
+    ],
     false
   ),
   getItem(
-    "Team",
-    "team",
+    "Makine & Ekipman Yönetimi",
+    "makine&ekipman",
     <TeamOutlined />,
-    [getItem("Team 1", "team1", true), getItem("Team 2", "team2", true)],
+    [
+      getItem("Makine Tanım", "makine", true),
+      // getItem("Team 2", "team2", true)
+    ],
     false
   ),
-  getItem("Files", "files", <FileOutlined />),
+  // getItem("Files", "files", <FileOutlined />),
 ];
 
 const Option1Page = () => <div>Option 1 Content</div>;
