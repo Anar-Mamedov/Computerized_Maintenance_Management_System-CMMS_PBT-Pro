@@ -72,7 +72,9 @@ const App = () => {
               </Routes>
             </div>
           </Content>
-          <Footer style={{ textAlign: "center" }}>Ant Design ©2023 Created by Ant UED</Footer>
+          <Footer style={{ textAlign: "center" }}>
+            Orjin {new Date().getFullYear()} - Design & Develop by Orjin Team
+          </Footer>
         </Layout>
       </Layout>
     </Router>
