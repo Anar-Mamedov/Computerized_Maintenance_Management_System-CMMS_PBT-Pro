@@ -77,7 +77,7 @@ export default function WorkOrderTypeInsert() {
             <PlusOutlined />
             Ekle
           </Button>
-          <Modal title="İş Emri Tipi Ekle" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+          <Modal title="İş Emri Tipi Ekle" open={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "20px 0 20px 0" }}>
               <Text>İş Emri Tipi Adı</Text>
               <Controller

@@ -182,7 +182,7 @@ export default function CalendarTable() {
             centered
             width="1200px"
             title="Takvim Tanımları"
-            visible={isModalVisible}
+            open={isModalVisible}
             onOk={handleModalOk}
             onCancel={handleModalCancel}>
             <StyledTable

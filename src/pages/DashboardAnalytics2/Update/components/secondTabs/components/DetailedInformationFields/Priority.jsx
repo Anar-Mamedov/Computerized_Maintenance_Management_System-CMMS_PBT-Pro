@@ -158,7 +158,7 @@ export default function Priority() {
             centered
             width="1200px"
             title="Servis Öncelik Tanımları"
-            visible={isModalVisible}
+            open={isModalVisible}
             onOk={handleModalOk}
             onCancel={handleModalCancel}>
             <StyledTable

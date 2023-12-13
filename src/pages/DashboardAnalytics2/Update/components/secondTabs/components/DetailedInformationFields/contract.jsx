@@ -222,7 +222,7 @@ export default function Contract() {
             centered
             width="1200px"
             title="Sözleşmeler"
-            visible={isModalVisible}
+            open={isModalVisible}
             onOk={handleModalOk}
             onCancel={handleModalCancel}>
             <StyledTable

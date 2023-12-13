@@ -459,7 +459,7 @@ export default function Project() {
             centered
             width="1200px"
             title="Proje Tanımları"
-            visible={isModalVisible}
+            open={isModalVisible}
             onOk={handleModalOk}
             onCancel={handleModalCancel}>
             <StyledTable

@@ -506,7 +506,7 @@ export default function PersonnelDefinitions() {
           centered
           width="875px"
           title="Edit Record"
-          visible={isEditModalOpen}
+          open={isEditModalOpen}
           onOk={handleEditOk} // Use the handleEditOk function here
           onCancel={() => setIsEditModalOpen(false)}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>

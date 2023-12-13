@@ -237,7 +237,7 @@ export default function CostCenter({ onSubmit }) {
           centered
           width="1200px"
           title="Masraf Merkezi"
-          visible={isModalVisible}
+          open={isModalVisible}
           onOk={handleModalOk}
           onCancel={handleModalCancel}>
           <StyledTable

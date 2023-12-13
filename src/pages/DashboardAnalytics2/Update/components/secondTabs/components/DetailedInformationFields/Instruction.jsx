@@ -345,7 +345,7 @@ export default function Instruction() {
             centered
             width="1200px"
             title="Talimat Tanımları"
-            visible={isModalVisible}
+            open={isModalVisible}
             onOk={handleModalOk}
             onCancel={handleModalCancel}>
             <StyledTable

@@ -158,7 +158,7 @@ export default function Workshop({ workshopSelectedId, currentValue, onSubmit })
             centered
             width="1200px"
             title="Atölye Tanımları"
-            visible={isModalVisible}
+            open={isModalVisible}
             onOk={handleModalOk}
             onCancel={handleModalCancel}>
             <StyledTable

@@ -436,7 +436,7 @@ export default function WorkOrderType() {
               <Modal
                 width="1200px"
                 title="İş Emri Tipi"
-                visible={isModalVisible}
+                open={isModalVisible}
                 onOk={handleModalOk}
                 onCancel={handleModalCancel}>
                 <div style={{ display: "flex", padding: "10px", gap: "10px" }}>

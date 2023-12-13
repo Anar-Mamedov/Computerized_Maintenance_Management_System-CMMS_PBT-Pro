@@ -265,17 +265,17 @@ export default function Machine({
               key: index.toString(),
               code: item.MKN_KOD,
               definition: item.MKN_TANIM,
-              location: item.MAKINE_LOKASYON,
-              machinelocationid: item.MAKINE_LOKASYON_ID,
-              fullLocation: item.MAKINE_TUM_LOKASYON,
-              machine_type: item.MAKINE_TIP,
-              category: item.MAKINE_KATEGORI,
-              brand: item.MAKINE_MARKA,
-              model: item.MAKINE_MODEL,
-              serial_no: item.MAKINE_SERI_NO,
+              location: item.MKN_LOKASYON,
+              machinelocationid: item.MKN_LOKASYON_ID,
+              fullLocation: item.MKN_LOKASYON_TUM_YOL,
+              machine_type: item.MKN_TIP,
+              category: item.MKN_KATEGORI,
+              brand: item.MKN_MARKA,
+              model: item.MKN_MODEL,
+              serial_no: item.MKN_SERI_NO,
               tb_makine_id: item.TB_MAKINE_ID,
-              machine_warranty: dayjs(item.MAKINE_GARANTI_BITIS).format("DD.MM.YYYY"),
-              machine_warranty_status: item.MAKINE_GARANTI_KAPSAMINDA,
+              machine_warranty: dayjs(item.MKN_GARANTI_BITIS).format("DD.MM.YYYY"),
+              machine_warranty_status: item.MKN_GARANTI_KAPSAMINDA,
             };
           });
           setCurrentPage(page); //reset the cruent page when i search or filtered any thing
@@ -452,7 +452,7 @@ export default function Machine({
           <Modal
             width="1200px"
             title="Makine Listesi"
-            visible={isModalVisible}
+            open={isModalVisible}
             onOk={handleModalOk}
             onCancel={handleModalCancel}>
             <div

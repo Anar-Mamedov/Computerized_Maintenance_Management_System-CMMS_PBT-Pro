@@ -228,7 +228,7 @@ export default function Personel({ personelSelectedId, personelCurrentValue, onS
             centered
             width="1200px"
             title="Personel Listesi"
-            visible={isModalVisible}
+            open={isModalVisible}
             onOk={handleModalOk}
             onCancel={handleModalCancel}>
             <StyledTable

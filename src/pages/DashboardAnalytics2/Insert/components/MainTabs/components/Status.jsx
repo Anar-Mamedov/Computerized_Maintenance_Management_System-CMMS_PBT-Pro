@@ -213,7 +213,7 @@ export default function Status() {
           <Input value={inputValue} onChange={(e) => setInputValue(e.target.value)} disabled />
           <Button onClick={handlePlusClick}> + </Button>
           {/* <Button onClick={handleMinusClick}> - </Button> */}
-          <Modal width="500px" title="Durum" visible={isModalVisible} onOk={handleModalOk} onCancel={handleModalCancel}>
+          <Modal width="500px" title="Durum" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalCancel}>
             <div style={{ display: "flex", gap: "10px", flexDirection: "column" }}>
               <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
                 <Controller
