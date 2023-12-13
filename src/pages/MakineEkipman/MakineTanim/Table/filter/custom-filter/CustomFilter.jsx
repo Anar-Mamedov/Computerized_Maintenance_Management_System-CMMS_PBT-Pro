@@ -185,254 +185,36 @@ export default function CustomFilter({ onSubmit }) {
                   filterOption={(input, option) => (option?.label || "").toLowerCase().includes(input.toLowerCase())}
                   options={[
                     {
-                      value: "ISM_ISEMRI_NO",
-                      label: "İş Emri No",
-                    },
-
-                    {
-                      value: "ISM_DISARIDAKI_NOT",
-                      label: "Not",
-                    },
-                    {
-                      value: "ISM_DUZENLEME_TARIH",
-                      label: "Düzenleme Tarihi",
-                    },
-                    {
-                      value: "ISM_DUZENLEME_SAAT",
-                      label: "Düzenleme Saati",
-                    },
-                    {
-                      value: "ISM_KONU",
-                      label: "Konu",
-                    },
-
-                    {
-                      value: "ISM_PLAN_BASLAMA_TARIH",
-                      label: "Planlanan Başlama Tarihi",
-                    },
-                    {
-                      value: "ISM_PLAN_BASLAMA_SAAT",
-                      label: "Planlanan Başlama Saati",
-                    },
-                    {
-                      value: "ISM_PLAN_BITIS_TARIH",
-                      label: "Planlanan Bitiş Tarihi",
-                    },
-                    {
-                      value: "ISM_PLAN_BITIS_SAAT",
-                      label: "Planlanan Bitiş Saati",
-                    },
-                    {
-                      value: "ISM_BASLAMA_TARIH",
-                      label: "Başlama Tarihi",
-                    },
-                    {
-                      value: "ISM_BASLAMA_SAAT",
-                      label: "Başlama Saati",
-                    },
-                    {
-                      value: "ISM_BITIS_TARIH",
-                      label: "Bitiş Tarihi",
-                    },
-                    {
-                      value: "ISM_BITIS_SAAT",
-                      label: "Bitiş Saati",
-                    },
-                    {
-                      value: "ISM_IS_SURESI",
-                      label: "İş Süresi",
-                    },
-                    {
-                      value: "ISM_TAMAMLANMA",
-                      label: "Tamamlama %",
-                    },
-                    {
-                      value: "ISM_GARANTI",
-                      label: "Garanti",
-                    },
-                    {
-                      value: "ISM_MAKINE_KODU",
+                      value: "MKN_KOD",
                       label: "Makine Kodu",
                     },
                     {
-                      value: "ISM_MAKINE_TANIMI",
+                      value: "MKN_TANIM",
                       label: "Makine Tanımı",
                     },
                     {
-                      value: "ISM_MAKINE_PLAKA",
-                      label: "Makine Plaka",
+                      value: "MKN_LOKASYON",
+                      label: "Lokasyon",
                     },
                     {
-                      value: "ISM_MAKINE_DURUM",
-                      label: "Makine Durum",
+                      value: "MKN_TIP",
+                      label: "Makine Tipi",
                     },
                     {
-                      value: "ISM_MAKINE_TIP",
-                      label: "Makine Tip",
+                      value: "MKN_KATEGORI",
+                      label: "Kategori",
                     },
                     {
-                      value: "ISM_EKIPMAN",
-                      label: "Ekipman",
+                      value: "MKN_MARKA",
+                      label: "Marka",
                     },
                     {
-                      value: "ISM_IS_TIPI",
-                      label: "İş Tipi",
+                      value: "MKN_MODEL",
+                      label: "Model",
                     },
                     {
-                      value: "ISM_IS_NEDENI",
-                      label: "İş Nedeni",
-                    },
-                    {
-                      value: "ISM_ATOLYE",
-                      label: "Atölye",
-                    },
-                    {
-                      value: "ISM_TALIMAT",
-                      label: "Talimat",
-                    },
-                    {
-                      value: "ISM_ONCELIK",
-                      label: "Öncelik",
-                    },
-                    {
-                      value: "ISM_KAPANIS_TARIHI",
-                      label: "Kapanış Tarihi",
-                    },
-                    {
-                      value: "ISM_KAPANIS_SAATI",
-                      label: "Kapanış Saati",
-                    },
-                    {
-                      value: "ISM_TAKVIM",
-                      label: "Takvim",
-                    },
-                    {
-                      value: "ISM_MASRAF_MERKEZI",
-                      label: "Masraf Merkezi",
-                    },
-                    {
-                      value: "ISM_FIRMA",
-                      label: "Firma",
-                    },
-                    {
-                      value: "ISM_IS_TALEP_KOD",
-                      label: "İş Talep Kodu",
-                    },
-                    {
-                      value: "ISM_IS_TALEP_EDEN",
-                      label: "İş Talep Eden",
-                    },
-                    {
-                      value: "ISM_IS_TALEP_TARIH",
-                      label: "İş Talep Tarihi",
-                    },
-                    {
-                      value: "ISM_OZEL_ALAN_1",
-                      label: "Özel Alan 1",
-                    },
-                    {
-                      value: "ISM_OZEL_ALAN_2",
-                      label: "Özel Alan 2",
-                    },
-                    {
-                      value: "ISM_OZEL_ALAN_3",
-                      label: "Özel Alan 3",
-                    },
-                    {
-                      value: "ISM_OZEL_ALAN_4",
-                      label: "Özel Alan 4",
-                    },
-                    {
-                      value: "ISM_OZEL_ALAN_5",
-                      label: "Özel Alan 5",
-                    },
-                    {
-                      value: "ISM_OZEL_ALAN_6",
-                      label: "Özel Alan 6",
-                    },
-                    {
-                      value: "ISM_OZEL_ALAN_7",
-                      label: "Özel Alan 7",
-                    },
-                    {
-                      value: "ISM_OZEL_ALAN_8",
-                      label: "Özel Alan 8",
-                    },
-                    {
-                      value: "ISM_OZEL_ALAN_9",
-                      label: "Özel Alan 9",
-                    },
-                    {
-                      value: "ISM_OZEL_ALAN_10",
-                      label: "Özel Alan 10",
-                    },
-                    {
-                      value: "ISM_OZEL_ALAN_11",
-                      label: "Özel Alan 11",
-                    },
-                    {
-                      value: "ISM_OZEL_ALAN_12",
-                      label: "Özel Alan 12",
-                    },
-                    {
-                      value: "ISM_OZEL_ALAN_13",
-                      label: "Özel Alan 13",
-                    },
-                    {
-                      value: "ISM_OZEL_ALAN_14",
-                      label: "Özel Alan 14",
-                    },
-                    {
-                      value: "ISM_OZEL_ALAN_15",
-                      label: "Özel Alan 15",
-                    },
-                    {
-                      value: "ISM_OZEL_ALAN_16",
-                      label: "Özel Alan 16",
-                    },
-                    {
-                      value: "ISM_OZEL_ALAN_17",
-                      label: "Özel Alan 17",
-                    },
-                    {
-                      value: "ISM_OZEL_ALAN_18",
-                      label: "Özel Alan 18",
-                    },
-                    {
-                      value: "ISM_OZEL_ALAN_19",
-                      label: "Özel Alan 19",
-                    },
-                    {
-                      value: "ISM_OZEL_ALAN_20",
-                      label: "Özel Alan 20",
-                    },
-                    {
-                      value: "ISM_BILDIRILEN_KAT",
-                      label: "Bildirilen Kat",
-                    },
-                    {
-                      value: "ISM_BILDIRILEN_BINA",
-                      label: "Bildirilen Bina",
-                    },
-                    {
-                      value: "ISM_PERSONEL_ADI",
-                      label: "Personel Adı",
-                    },
-                    {
-                      value: "ISM_TAM_LOKASYON",
-                      label: "Tam Lokasyon",
-                    },
-                    {
-                      value: "ISM_GUNCEL_SAYAC_DEGER",
-                      label: "Sayaç Değeri",
-                    },
-                    {
-                      value: "ISM_ICERDEKI_NOT",
-                      label: "Notlar",
-                    },
-                    {
-                      value: "test",
-                      label: "Açıklama",
+                      value: "MKN_SERI_NO",
+                      label: "Seri No",
                     },
                   ]}
                 />
