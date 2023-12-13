@@ -117,6 +117,139 @@ export default function useColumns(props) {
       render: (status) => <input type="checkbox" checked={status} disabled />,
       sorter: (a, b) => (a.MKN_AKTIF === b.MKN_AKTIF ? 0 : a.MKN_AKTIF ? -1 : 1),
     },
+    {
+      title: "Makine Durumu",
+      className: "center-aligned",
+      dataIndex: "MKN_DURUM",
+      key: "MKN_DURUM",
+      width: 100,
+      description: "Makine Durumu",
+      ellipsis: true, // Enable ellipsis for overflowed content
+      modalTitle: "Makine Durumu",
+      sorter: (a, b) => {
+        if (a.MKN_DURUM && b.MKN_DURUM) {
+          return a.MKN_DURUM.localeCompare(b.MKN_DURUM);
+        }
+        if (!a.MKN_DURUM && !b.MKN_DURUM) {
+          return 0; // Both are null or undefined, consider them equal
+        }
+        return a.MKN_DURUM ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+      },
+    },
+    {
+      title: "Araç Tipi",
+      dataIndex: "MKN_ARAC_TIP",
+      key: "MKN_ARAC_TIP",
+      description: "Araç Tipi",
+      modalTitle: "Araç Tipi",
+      className: "center-aligned",
+      ellipsis: true, // Enable ellipsis for overflowed content
+      width: 100,
+      sorter: (a, b) => {
+        if (a.MKN_ARAC_TIP && b.MKN_ARAC_TIP) {
+          return a.MKN_ARAC_TIP.localeCompare(b.MKN_ARAC_TIP);
+        }
+        if (!a.MKN_ARAC_TIP && !b.MKN_ARAC_TIP) {
+          return 0; // Both are null or undefined, consider them equal
+        }
+        return a.MKN_ARAC_TIP ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+      },
+    },
+    {
+      title: "Lokasyon",
+      dataIndex: "MKN_LOKASYON",
+      key: "MKN_LOKASYON",
+      description: "Lokasyon",
+      modalTitle: "Lokasyon",
+      className: "center-aligned",
+      ellipsis: true, // Enable ellipsis for overflowed content
+      width: 100,
+      sorter: (a, b) => {
+        if (a.MKN_LOKASYON && b.MKN_LOKASYON) {
+          return a.MKN_LOKASYON.localeCompare(b.MKN_LOKASYON);
+        }
+        if (!a.MKN_LOKASYON && !b.MKN_LOKASYON) {
+          return 0; // Both are null or undefined, consider them equal
+        }
+        return a.MKN_LOKASYON ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+      },
+    },
+    {
+      title: "Makine Tipi",
+      dataIndex: "MKN_TIP",
+      key: "MKN_TIP",
+      description: "Makine Tipi",
+      modalTitle: "Makine Tipi",
+      className: "center-aligned",
+      ellipsis: true, // Enable ellipsis for overflowed content
+      width: 100,
+      sorter: (a, b) => {
+        if (a.MKN_TIP && b.MKN_TIP) {
+          return a.MKN_TIP.localeCompare(b.MKN_TIP);
+        }
+        if (!a.MKN_TIP && !b.MKN_TIP) {
+          return 0; // Both are null or undefined, consider them equal
+        }
+        return a.MKN_TIP ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+      },
+    },
+    {
+      title: "Kategori",
+      dataIndex: "MKN_KATEGORI",
+      key: "MKN_KATEGORI",
+      description: "Kategori",
+      modalTitle: "Kategori",
+      className: "center-aligned",
+      ellipsis: true, // Enable ellipsis for overflowed content
+      width: 100,
+      sorter: (a, b) => {
+        if (a.MKN_KATEGORI && b.MKN_KATEGORI) {
+          return a.MKN_KATEGORI.localeCompare(b.MKN_KATEGORI);
+        }
+        if (!a.MKN_KATEGORI && !b.MKN_KATEGORI) {
+          return 0; // Both are null or undefined, consider them equal
+        }
+        return a.MKN_KATEGORI ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+      },
+    },
+    {
+      title: "Marka",
+      dataIndex: "MKN_MARKA",
+      key: "MKN_MARKA",
+      description: "Marka",
+      modalTitle: "Marka",
+      className: "center-aligned",
+      ellipsis: true, // Enable ellipsis for overflowed content
+      width: 100,
+      sorter: (a, b) => {
+        if (a.MKN_MARKA && b.MKN_MARKA) {
+          return a.MKN_MARKA.localeCompare(b.MKN_MARKA);
+        }
+        if (!a.MKN_MARKA && !b.MKN_MARKA) {
+          return 0; // Both are null or undefined, consider them equal
+        }
+        return a.MKN_MARKA ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+      },
+    },
+    {
+      title: "Model",
+      dataIndex: "MKN_MODEL",
+      key: "MKN_MODEL",
+      description: "Model",
+      modalTitle: "Model",
+      className: "center-aligned",
+      ellipsis: true, // Enable ellipsis for overflowed content
+      width: 100,
+      sorter: (a, b) => {
+        if (a.MKN_MODEL && b.MKN_MODEL) {
+          return a.MKN_MODEL.localeCompare(b.MKN_MODEL);
+        }
+        if (!a.MKN_MODEL && !b.MKN_MODEL) {
+          return 0; // Both are null or undefined, consider them equal
+        }
+        return a.MKN_MODEL ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+      },
+    },
   ];
 
   return columns;
