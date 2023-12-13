@@ -16,23 +16,16 @@ import { useState } from "react";
 
 // Define an array of default visible column keys
 export const DEFAULT_VISIBLE_COLUMNS = [
-  "open",
-  "number",
-  "editDate",
-  "subject",
-  "type",
-  "status",
-  "location",
-  "machine",
-  "machineDescription",
-  "jobTime",
-  "completion",
-  "jobType",
-  "jobReason",
-  "workshop",
-  "closingDate",
-  "closingTime",
-  "personelName",
+  "MKN_KOD",
+  "MKN_TANIM",
+  "MKN_AKTIF",
+  "MKN_DURUM",
+  "MKN_ARAC_TIP",
+  "MKN_LOKASYON",
+  "MKN_TIP",
+  "MKN_KATEGORI",
+  "MKN_MARKA",
+  "MKN_MODEL",
 ]; // Replace with your desired default columns
 
 export default function useColumns(props) {
