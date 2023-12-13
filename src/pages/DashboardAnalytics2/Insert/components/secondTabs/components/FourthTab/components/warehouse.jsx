@@ -211,7 +211,7 @@ export default function Warehouse() {
             centered
             width="1200px"
             title="Depo Tanımları"
-            visible={isModalVisible}
+            open={isModalVisible}
             onOk={handleModalOk}
             onCancel={handleModalCancel}>
             <StyledTable

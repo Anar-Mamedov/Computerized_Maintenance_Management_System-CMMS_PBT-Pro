@@ -183,7 +183,7 @@ export default function Procedure() {
             centered
             width="1200px"
             title="Arıza Prosedürleri"
-            visible={isModalVisible}
+            open={isModalVisible}
             onOk={handleModalOk}
             onCancel={handleModalCancel}>
             <StyledTable

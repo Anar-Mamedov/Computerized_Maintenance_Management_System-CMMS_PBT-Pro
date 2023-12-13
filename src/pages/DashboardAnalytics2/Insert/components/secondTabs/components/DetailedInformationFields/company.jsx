@@ -251,7 +251,7 @@ export default function Company({ companySelectedId, companyCurrentValue, onSubm
           centered
           width="1200px"
           title="Firmalar"
-          visible={isModalVisible}
+          open={isModalVisible}
           onOk={handleModalOk}
           onCancel={handleModalCancel}>
           <Input

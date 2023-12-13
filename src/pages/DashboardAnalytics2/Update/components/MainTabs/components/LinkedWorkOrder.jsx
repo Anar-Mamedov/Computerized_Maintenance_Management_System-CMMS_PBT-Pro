@@ -5,6 +5,7 @@ import SearchField from "../../../../Table/SearchField";
 import Filters from "./LinkedWorkOrder/filter/Filters";
 import styled from "styled-components";
 import { useFormContext, Controller } from "react-hook-form";
+import dayjs from "dayjs";
 
 const { Text, Link } = Typography;
 
@@ -444,7 +445,7 @@ export default function LinkedWorkOrder({}) {
           return {
             key: item.TB_ISEMRI_ID,
             code: item.ISEMRI_NO,
-            editDate: moment(item.DUZENLEME_TARIH).format("DD-MM-YYYY"),
+            editDate: dayjs(item.DUZENLEME_TARIH).format("DD-MM-YYYY"),
             subject: item.KONU,
             type: item.ISEMRI_TIP,
             status: item.DURUM,
@@ -456,7 +457,7 @@ export default function LinkedWorkOrder({}) {
             jobType: item.IS_TIPI,
             jobReason: item.IS_NEDENI,
             workshop: item.ATOLYE,
-            closingDate: moment(item.KAPANIS_TARIHI).format("DD-MM-YYYY"),
+            closingDate: dayjs(item.KAPANIS_TARIHI).format("DD-MM-YYYY"),
             closingTime: item.KAPANIS_SAATI,
             personelName: item.PERSONEL_ADI,
           };
@@ -610,7 +611,7 @@ export default function LinkedWorkOrder({}) {
           <Modal
             width="1200px"
             title="İş Emri Listesi"
-            visible={isModalVisible}
+            open={isModalVisible}
             onOk={handleModalOk}
             onCancel={handleModalCancel}>
             <div

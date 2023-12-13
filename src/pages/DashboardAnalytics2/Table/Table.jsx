@@ -350,7 +350,7 @@ export default function Table() {
             {columnSelectionVisible && (
               <Modal
                 title="Gösterilecek sütunları seçin"
-                visible={columnSelectionVisible}
+                open={columnSelectionVisible}
                 onCancel={() => setColumnSelectionVisible(false)}
                 footer={null}
                 width="770px">
@@ -443,7 +443,7 @@ export default function Table() {
           // onContextMenu: (e) => handleContextMenu(e, record), // right click handler
         })}
       />
-      <Modal title="Not" visible={isModalVisible} onCancel={handleModalClose} footer={null}>
+      <Modal title="Not" open={isModalVisible} onCancel={handleModalClose} footer={null}>
         <Input.TextArea
           value={noteText} // Bind the value to the state variable
           onChange={handleNoteChange} // Update the state when the TextArea value changes

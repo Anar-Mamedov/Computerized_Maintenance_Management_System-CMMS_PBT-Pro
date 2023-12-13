@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import { DesktopOutlined, FileOutlined, PieChartOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
 import { Breadcrumb, Layout, Menu, theme } from "antd";
 import Isemri from "./pages/DashboardAnalytics2/Isemri";
+import MakineTanim from "./pages/MakineEkipman/MakineTanim/MakineTanim";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -42,7 +43,7 @@ const items = [
   // getItem("Files", "files", <FileOutlined />),
 ];
 
-const Option1Page = () => <div>Option 1 Content</div>;
+// const Option1Page = () => <div>Option 1 Content</div>;
 // const BillPage = () => <div>Bill is a cat.</div>;
 // Diğer sayfa bileşenlerinizi burada tanımlayın...
 
@@ -66,7 +67,7 @@ const App = () => {
             <div style={{ padding: 24, minHeight: 360, background: colorBgContainer }}>
               <Routes>
                 <Route path="/isemri" element={<Isemri />} />
-                <Route path="/option1" element={<Option1Page />} />
+                <Route path="/makine" element={<MakineTanim />} />
                 {/* Diğer Route'lar */}
               </Routes>
             </div>

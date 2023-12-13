@@ -749,7 +749,7 @@ export default function FourthTab() {
   return (
     <>
       <div className="Anar" style={{ display: "flex", justifyContent: "end" }}>
-        <Dropdown overlay={dropdownMenu} trigger={["click"]}>
+        <Dropdown menu={dropdownMenu} trigger={["click"]}>
           <a onClick={handleDropdownClick}>
             <Space>
               <PlusOutlined />
@@ -778,7 +778,7 @@ export default function FourthTab() {
         centered
         width="auto"
         title="Malzeme Giriş"
-        visible={isOutOfStockModalOpen}
+        open={isOutOfStockModalOpen}
         onOk={handleOutOfStockOk}
         onCancel={handleOutOfStockCancel}>
         {/* Modal Content */}
@@ -1064,7 +1064,7 @@ export default function FourthTab() {
           centered
           width="875px"
           title="Edit Record"
-          visible={isEditModalOpen}
+          open={isEditModalOpen}
           onOk={handleEditOk} // Use the handleEditOk function here
           onCancel={() => setIsEditModalOpen(false)}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>

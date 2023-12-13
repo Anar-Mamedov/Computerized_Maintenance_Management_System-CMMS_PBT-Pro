@@ -331,7 +331,7 @@ export default function MaterialCode({ materialCodeSelectedId, materialCodeCurre
             centered
             width="1200px"
             title="Malzeme Tanımları"
-            visible={isModalVisible}
+            open={isModalVisible}
             onOk={handleModalOk}
             onCancel={handleModalCancel}>
             <StyledTable
