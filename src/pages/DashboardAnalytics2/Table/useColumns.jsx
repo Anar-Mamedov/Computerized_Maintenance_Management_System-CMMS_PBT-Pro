@@ -171,8 +171,7 @@ export default function useColumns(props) {
       dataIndex: "editDate",
       sorter: (a, b) => a.editDate.localeCompare(b.editDate),
       render: (text) => {
-        const date = dayjs(text);
-        return date.isValid() ? date.format("DD-MM-YYYY") : "";
+        return text || "";
       },
 
       width: 100, // Set the width to 'auto' for automatic adjustment
@@ -185,11 +184,9 @@ export default function useColumns(props) {
       dataIndex: "editTime",
       sorter: (a, b) => a.editTime.localeCompare(b.editTime),
       render: (editTime) => {
-        // Check if editTime is not null and is a valid time
-        return editTime && dayjs(editTime, "HH:mm:ss").isValid()
-          ? dayjs(editTime, "HH:mm:ss").format("HH:mm") // Format the time
-          : null;
+        return editTime || "";
       },
+
       width: 70, // Set the width to 'auto' for automatic adjustment
       ellipsis: true, // Enable ellipsis for overflowed content
       modalTitle: "Saat",

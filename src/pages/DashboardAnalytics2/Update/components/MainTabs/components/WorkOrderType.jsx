@@ -411,7 +411,7 @@ export default function WorkOrderType() {
                     onChange={(value) => {
                       const selectedItem = items.find((item) => item.TB_ISEMRI_TIP_ID === value);
                       const label = selectedItem ? selectedItem.IMT_TANIM : null;
-                      field.onChange({ value, label });
+                      field.onChange(value); // Sadece value değerini kullanın
                     }}
                     showSearch
                     allowClear

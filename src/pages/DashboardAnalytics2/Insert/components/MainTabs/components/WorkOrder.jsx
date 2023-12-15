@@ -154,7 +154,7 @@ const WorkOrder = ({ onDrawerClose, drawerVisible, selectedRow }) => {
                     onChange={(time) => {
                       field.onChange(time); // Update form's field value
                     }}
-                    format="HH:mm"
+                    format="HH:mm:ss"
                     placeholder="saat seçiniz"
                   />
                 )}

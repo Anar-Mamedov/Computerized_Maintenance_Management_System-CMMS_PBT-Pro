@@ -214,7 +214,7 @@ export default function CreateDrawer({ onRefresh }) {
       ISM_BITIS_TARIH: formatDateWithDayjs(data.FinishedDate),
       ISM_BITIS_SAAT: formatTimeWithDayjs(data.FinishedTime),
       ISM_SURE_CALISMA: data.WorkingTimeHours * 60 + data.WorkingTimeMinutes,
-      ISM_MASRAF_MERKEZI_ID: data.costcenterSelectedIdDetailsTab,
+      ISM_MASRAF_MERKEZ_ID: data.costcenterSelectedIdDetailsTab,
       ISM_PROJE_ID: data.project,
       ISM_REFERANS_NO: data.ReferansNo,
       ISM_TAMAMLANMA_ORAN: data.Tamamlama === "" ? 0 : data.Tamamlama,

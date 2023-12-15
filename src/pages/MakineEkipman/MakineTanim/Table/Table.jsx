@@ -215,7 +215,7 @@ export default function Table() {
 
   useEffect(() => {
     fetch({ filters: body.filters, keyword: body.keyword });
-    console.log("Body: ", body);
+    // console.log("Body: ", body);
   }, [body, fetch]);
 
   const handleBodyChange = useCallback((type, newBody) => {
