@@ -21,6 +21,16 @@ const customLocale = {
   cancelSort: "Sıralamayı iptal et",
 };
 
+function formatValidDate(dateString) {
+  const date = dayjs(dateString);
+  return date.isValid() ? date.format("DD-MM-YYYY") : "";
+}
+
+function formatValidTime(timeString) {
+  const time = dayjs(timeString, "HH:mm:ss");
+  return time.isValid() ? time.format("HH:mm:ss") : "";
+}
+
 export default function Table() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [noteText, setNoteText] = useState("");
@@ -125,6 +135,7 @@ export default function Table() {
     setLoading(true); // Set loading to true before making the API call
     // page = page || 1;
     AxiosInstance.post(`getIsEmriFullList?id=11&parametre=${keyword}&pagingDeger=${page}`, filters).then((response) => {
+      console.log(response);
       // Alborz total page sehifesini qaytarmalidi
       // {
       //   page: number,
@@ -145,8 +156,8 @@ export default function Table() {
         personnel: el.PERSONEL,
         durus: el.DURUS,
         not: el.OUTER_NOT,
-        editDate: dayjs(el.DUZENLEME_TARIH).format("DD-MM-YYYY"),
-        editTime: dayjs(el.DUZENLEME_SAAT, "HH:mm:ss").format("HH:mm:ss"),
+        editDate: formatValidDate(el.DUZENLEME_TARIH),
+        editTime: formatValidTime(el.DUZENLEME_SAAT),
         subject: el.KONU,
         type: el.ISEMRI_TIP,
         status: el.DURUM,
@@ -158,14 +169,14 @@ export default function Table() {
         procedureSelectedId: el.ISM_REF_ID,
         linked_work_orderID: el.ISM_BAGLI_ISEMRI_ID,
         linked_work_order: el.ISM_BAGLI_ISEMRI_NO,
-        plannedStartDate: dayjs(el.PLAN_BASLAMA_TARIH).format("DD-MM-YYYY"),
-        plannedStartTime: dayjs(el.PLAN_BASLAMA_SAAT, "HH:mm:ss").format("HH:mm:ss"),
-        plannedEndDate: dayjs(el.PLAN_BITIS_TARIH).format("DD-MM-YYYY"),
-        plannedEndTime: dayjs(el.PLAN_BITIS_SAAT, "HH:mm:ss").format("HH:mm:ss"),
-        startdate: dayjs(el.BASLAMA_TARIH).format("DD-MM-YYYY"),
-        startTime: dayjs(el.BASLAMA_SAAT, "HH:mm:ss").format("HH:mm:ss"),
-        enddate: dayjs(el.ISM_BITIS_TARIH).format("DD-MM-YYYY"),
-        endTime: dayjs(el.ISM_BITIS_SAAT, "HH:mm:ss").format("HH:mm:ss"),
+        plannedStartDate: formatValidDate(el.PLAN_BASLAMA_TARIH),
+        plannedStartTime: formatValidTime(el.PLAN_BASLAMA_SAAT),
+        plannedEndDate: formatValidDate(el.PLAN_BITIS_TARIH),
+        plannedEndTime: formatValidTime(el.PLAN_BITIS_SAAT),
+        startdate: formatValidDate(el.BASLAMA_TARIH),
+        startTime: formatValidTime(el.BASLAMA_SAAT),
+        enddate: formatValidDate(el.ISM_BITIS_TARIH),
+        endTime: formatValidTime(el.ISM_BITIS_SAAT),
         jobTime: el.IS_SURESI,
         completion: el.TAMAMLANMA,
         warranty: el.GARANTI,
@@ -188,8 +199,8 @@ export default function Table() {
         instructionID: el.ISM_TALIMAT_ID,
         priority: el.ONCELIK,
         ISM_TAKVIM_ID: el.ISM_TAKVIM_ID,
-        closingDate: dayjs(el.KAPANIS_TARIHI).format("DD-MM-YYYY"),
-        closingTime: dayjs(el.KAPANIS_SAATI, "HH:mm:ss").format("HH:mm:ss"),
+        closingDate: formatValidDate(el.KAPANIS_TARIHI),
+        closingTime: formatValidTime(el.KAPANIS_SAATI),
         calendar: el.TAKVIM,
         spending: el.MASRAF_MERKEZI,
         ISM_MASRAF_MERKEZ_ID: el.ISM_MASRAF_MERKEZ_ID,
@@ -203,8 +214,8 @@ export default function Table() {
         ISM_EVRAK_NO: el.ISM_EVRAK_NO,
         jobDemandCode: el.IS_TALEP_NO, //yok
         jobDemanding: el.IS_TALEP_EDEN,
-        jobDemandDate: dayjs(el.IS_TALEP_TARIH).format("DD-MM-YYYY"),
-        ISM_EVRAK_TARIHI: dayjs(el.ISM_EVRAK_TARIHI).format("DD-MM-YYYY"),
+        jobDemandDate: formatValidDate(el.IS_TALEP_TARIH),
+        ISM_EVRAK_TARIHI: formatValidDate(el.ISM_EVRAK_TARIHI),
         // süre bilgileri tabı
         logisticsDuration: el.ISM_SURE_MUDAHALE_LOJISTIK,
         travellingDuration: el.ISM_SURE_MUDAHALE_SEYAHAT,
