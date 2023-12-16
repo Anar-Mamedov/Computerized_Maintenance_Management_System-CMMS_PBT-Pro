@@ -407,7 +407,7 @@ export default function Table() {
           zIndex: "1",
         }}>
         <Input
-          type="number"
+          type="text"
           placeholder="Sayfa Gir"
           value={pageNumberInput}
           onChange={(e) => {

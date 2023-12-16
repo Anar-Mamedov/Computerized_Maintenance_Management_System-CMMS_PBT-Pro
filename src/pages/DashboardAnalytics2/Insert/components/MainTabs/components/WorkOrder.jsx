@@ -105,20 +105,6 @@ const WorkOrder = ({ onDrawerClose, drawerVisible, selectedRow }) => {
       });
   }, [setValue]);
 
-  const handleDrawerOpen = () => {
-    const now = new Date();
-    console.log("Setting date and time:", now);
-    setValue("date", now); // Set current date
-    setValue("time", now); // Set current time
-  };
-
-  React.useEffect(() => {
-    console.log("Drawer visibility changed:", drawerVisible);
-    if (drawerVisible) {
-      handleDrawerOpen();
-    }
-  }, [drawerVisible, setValue]);
-
   return (
     <Row style={{ display: "flex", gap: "20px", marginTop: "5px" }}>
       <Col
@@ -148,26 +134,13 @@ const WorkOrder = ({ onDrawerClose, drawerVisible, selectedRow }) => {
                 name="date"
                 control={control}
                 render={({ field }) => (
-                  <DatePicker
-                    {...field}
-                    format="DD-MM-YYYY"
-                    onChange={(date) => field.onChange(date)}
-                    style={{ width: "168px" }}
-                    placeholder="Tarih seçiniz"
-                  />
+                  <DatePicker {...field} format="DD-MM-YYYY" style={{ width: "168px" }} placeholder="Tarih seçiniz" />
                 )}
               />
               <Controller
                 name="time"
                 control={control}
-                render={({ field }) => (
-                  <TimePicker
-                    {...field}
-                    onChange={(time) => field.onChange(time)}
-                    format="HH:mm"
-                    placeholder="Saat seçiniz"
-                  />
-                )}
+                render={({ field }) => <TimePicker {...field} format="HH:mm" placeholder="Saat seçiniz" />}
               />
             </div>
           </Col>

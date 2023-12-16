@@ -376,6 +376,10 @@ export default function CreateDrawer({ onRefresh }) {
   // İş Emri No değerini her drawer açıldığında güncellemek için
   useEffect(() => {
     if (open) {
+      const now = dayjs(); // Use dayjs for date and time
+      setValue("date", now); // Set current date
+      setValue("time", now); // Set current time
+
       AxiosInstance.get("IsEmriKodGetir") // Replace with your actual API endpoint
         .then((response) => {
           // Assuming the response contains the new work order number in 'response.Tanim'
