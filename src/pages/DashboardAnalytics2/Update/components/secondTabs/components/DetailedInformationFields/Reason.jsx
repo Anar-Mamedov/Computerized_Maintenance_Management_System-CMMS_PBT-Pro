@@ -103,7 +103,7 @@ export default function Reason() {
             showSearch
             allowClear
             labelInValue // label ve value değerlerini aynı anda almak için
-            placeholder="Select a reason"
+            placeholder="Seçim Yapın"
             optionFilterProp="children"
             onDropdownVisibleChange={(open) => {
               if (open) {

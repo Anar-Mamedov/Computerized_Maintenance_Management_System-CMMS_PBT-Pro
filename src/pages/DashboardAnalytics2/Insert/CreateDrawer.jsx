@@ -171,7 +171,7 @@ export default function CreateDrawer({ onRefresh }) {
 
   const formatTimeWithDayjs = (timeObj) => {
     const formattedTime = dayjs(timeObj);
-    return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
+    return formattedTime.isValid() ? formattedTime.format("HH:mm") : "";
   };
 
   const { setValue, reset } = methods;

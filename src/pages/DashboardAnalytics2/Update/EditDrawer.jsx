@@ -185,7 +185,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   const formatTimeWithDayjs = (timeObj) => {
     const formattedTime = dayjs(timeObj);
-    return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
+    return formattedTime.isValid() ? formattedTime.format("HH:mm") : "";
   };
 
   const { setValue, reset } = methods;
@@ -413,12 +413,15 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         setValue("work_order_no", selectedRow.number);
         setValue(
           "date",
-          selectedRow.editDate && dayjs(selectedRow.editDate).isValid() ? dayjs(selectedRow.editDate) : ""
+          selectedRow.editDate && dayjs(selectedRow.editDate, "DD-MM-YYYY").isValid()
+            ? dayjs(selectedRow.editDate, "DD-MM-YYYY").toDate() // Convert to a native JavaScript Date object
+            : null,
+          { shouldValidate: true }
         );
         setValue(
           "time",
-          selectedRow.editTime && dayjs(selectedRow.editTime, "HH:mm:ss").isValid()
-            ? dayjs(selectedRow.editTime, "HH:mm:ss")
+          selectedRow.editTime && dayjs(selectedRow.editTime, "HH:mm").isValid()
+            ? dayjs(selectedRow.editTime, "HH:mm")
             : null
         );
 
@@ -483,55 +486,68 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
         setValue(
           "EvrakTarihi",
-          selectedRow.ISM_EVRAK_TARIHI && dayjs(selectedRow.ISM_EVRAK_TARIHI).isValid()
-            ? dayjs(selectedRow.ISM_EVRAK_TARIHI)
-            : ""
+          selectedRow.ISM_EVRAK_TARIHI && dayjs(selectedRow.ISM_EVRAK_TARIHI, "DD-MM-YYYY").isValid()
+            ? dayjs(selectedRow.ISM_EVRAK_TARIHI, "DD-MM-YYYY").toDate() // Convert to a native JavaScript Date object
+            : null,
+          { shouldValidate: true }
         );
+
         setValue(
           "PlannedCommencementDate",
-          selectedRow.plannedStartDate && dayjs(selectedRow.plannedStartDate).isValid()
-            ? dayjs(selectedRow.plannedStartDate)
-            : ""
+          selectedRow.plannedStartDate && dayjs(selectedRow.plannedStartDate, "DD-MM-YYYY").isValid()
+            ? dayjs(selectedRow.plannedStartDate, "DD-MM-YYYY").toDate() // Convert to a native JavaScript Date object
+            : null,
+          { shouldValidate: true }
         );
         setValue(
           "PlannedCommencementTime",
-          selectedRow.plannedStartTime && dayjs(selectedRow.plannedStartTime, "HH:mm:ss").isValid()
-            ? dayjs(selectedRow.plannedStartTime, "HH:mm:ss")
+          selectedRow.plannedStartTime && dayjs(selectedRow.plannedStartTime, "HH:mm").isValid()
+            ? dayjs(selectedRow.plannedStartTime, "HH:mm")
             : null
         );
 
         setValue(
           "PlannedCompletionDate",
-          selectedRow.plannedEndDate && dayjs(selectedRow.plannedEndDate).isValid()
-            ? dayjs(selectedRow.plannedEndDate)
-            : ""
+          selectedRow.plannedEndDate && dayjs(selectedRow.plannedEndDate, "DD-MM-YYYY").isValid()
+            ? dayjs(selectedRow.plannedEndDate, "DD-MM-YYYY").toDate() // Convert to a native JavaScript Date object
+            : null,
+          { shouldValidate: true }
         );
 
         setValue(
           "PlannedCompletionTime",
-          selectedRow.plannedEndTime && dayjs(selectedRow.plannedEndTime, "HH:mm:ss").isValid()
-            ? dayjs(selectedRow.plannedEndTime, "HH:mm:ss")
+          selectedRow.plannedEndTime && dayjs(selectedRow.plannedEndTime, "HH:mm").isValid()
+            ? dayjs(selectedRow.plannedEndTime, "HH:mm")
             : null
         );
 
         setValue(
           "StartedDate",
-          selectedRow.startdate && dayjs(selectedRow.startdate).isValid() ? dayjs(selectedRow.startdate) : ""
+          selectedRow.startdate && dayjs(selectedRow.startdate, "DD-MM-YYYY").isValid()
+            ? dayjs(selectedRow.startdate, "DD-MM-YYYY").toDate() // Convert to a native JavaScript Date object
+            : null,
+          { shouldValidate: true }
         );
+
         setValue(
           "StartedTime",
-          selectedRow.startTime && dayjs(selectedRow.startTime, "HH:mm:ss").isValid()
-            ? dayjs(selectedRow.startTime, "HH:mm:ss")
+          selectedRow.startTime && dayjs(selectedRow.startTime, "HH:mm").isValid()
+            ? dayjs(selectedRow.startTime, "HH:mm")
             : null
         );
+
         setValue(
           "FinishedDate",
-          selectedRow.enddate && dayjs(selectedRow.enddate).isValid() ? dayjs(selectedRow.enddate) : ""
+          selectedRow.enddate && dayjs(selectedRow.enddate, "DD-MM-YYYY").isValid()
+            ? dayjs(selectedRow.enddate, "DD-MM-YYYY").toDate() // Convert to a native JavaScript Date object
+            : null,
+          { shouldValidate: true }
         );
+
         setValue(
           "FinishedTime",
-          selectedRow.endTime && dayjs(selectedRow.endTime, "HH:mm:ss").isValid()
-            ? dayjs(selectedRow.endTime, "HH:mm:ss")
+          selectedRow.endTime && dayjs(selectedRow.endTime, "HH:mm").isValid()
+            ? dayjs(selectedRow.endTime, "HH:mm")
             : null
         );
         // API'den gelen jobTime değerini varsayalım

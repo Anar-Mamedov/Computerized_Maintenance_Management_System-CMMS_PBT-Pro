@@ -12,6 +12,7 @@ import AxiosInstance from "../../../../../../api/http";
 import LinkedWorkOrder from "./LinkedWorkOrder";
 import Status from "./Status";
 import WorkOrderType from "./WorkOrderType";
+import dayjs from "dayjs";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 
@@ -133,14 +134,22 @@ const WorkOrder = ({ onDrawerClose, drawerVisible, selectedRow }) => {
               <Controller
                 name="date"
                 control={control}
-                render={({ field }) => (
-                  <DatePicker {...field} style={{ width: "168px" }} format="DD-MM-YYYY" placeholder="Tarih seçiniz" />
+                render={({ field: { onChange, value, ...restField } }) => (
+                  <DatePicker
+                    {...restField}
+                    style={{ width: "168px" }}
+                    format="DD-MM-YYYY"
+                    placeholder="Tarih seçiniz"
+                    value={value ? dayjs(value) : null} // Ensure value is converted properly
+                    onChange={(date) => onChange(date ? date.toDate() : null)}
+                  />
                 )}
               />
+
               <Controller
                 name="time"
                 control={control}
-                render={({ field }) => <TimePicker {...field} format="HH:mm:ss" placeholder="saat seçiniz" />}
+                render={({ field }) => <TimePicker {...field} format="HH:mm" placeholder="saat seçiniz" />}
               />
             </div>
           </Col>
