@@ -102,7 +102,7 @@ export default function Type() {
             style={{ width: "300px" }}
             showSearch
             allowClear
-            placeholder="Select a reason"
+            placeholder="Seçim Yapın"
             optionFilterProp="children"
             onDropdownVisibleChange={(open) => {
               if (open) {

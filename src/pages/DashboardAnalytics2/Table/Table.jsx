@@ -27,8 +27,8 @@ function formatValidDate(dateString) {
 }
 
 function formatValidTime(timeString) {
-  const time = dayjs(timeString, "HH:mm:ss");
-  return time.isValid() ? time.format("HH:mm:ss") : "";
+  const time = dayjs(timeString, "HH:mm");
+  return time.isValid() ? time.format("HH:mm") : "";
 }
 
 export default function Table() {

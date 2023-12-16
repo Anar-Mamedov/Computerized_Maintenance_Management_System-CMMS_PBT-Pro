@@ -52,19 +52,24 @@ const FinancialDetailsTable = () => {
     const endTime = watch("FinishedTime");
 
     if (startDate && startTime && endDate && endTime) {
+      const startDayJs = dayjs(startDate); // Convert to dayjs
+      const endDayJs = dayjs(endDate); // Convert to dayjs
+
       if (
-        dayjs(startDate).format("DD") === dayjs(endDate).format("DD") &&
-        dayjs(startDate).format("MM") === dayjs(endDate).format("MM") &&
-        dayjs(startDate).format("YYYY") === dayjs(endDate).format("YYYY")
+        startDayJs.format("DD") === endDayJs.format("DD") &&
+        startDayJs.format("MM") === endDayJs.format("MM") &&
+        startDayJs.format("YYYY") === endDayJs.format("YYYY")
       ) {
         const startDateTime = dayjs(
-          `${startDate.format("DD-MM-YYYY")} ${startTime.format("HH:mm")}`,
+          `${startDayJs.format("DD-MM-YYYY")} ${dayjs(startTime).format("HH:mm")}`,
           "DD-MM-YYYY HH:mm"
         );
-        const endDateTime = dayjs(`${endDate.format("DD-MM-YYYY")} ${endTime.format("HH:mm")}`, "DD-MM-YYYY HH:mm");
+        const endDateTime = dayjs(
+          `${endDayJs.format("DD-MM-YYYY")} ${dayjs(endTime).format("HH:mm")}`,
+          "DD-MM-YYYY HH:mm"
+        );
 
         const diffInMinutes = endDateTime.diff(startDateTime, "minute");
-
         const hours = Math.floor(diffInMinutes / 60);
         const minutes = diffInMinutes % 60;
 
@@ -381,8 +386,15 @@ const FinancialDetailsTable = () => {
               <Controller
                 name="PlannedCommencementDate"
                 control={control}
-                render={({ field }) => (
-                  <DatePicker {...field} style={{ width: "168px" }} format="DD-MM-YYYY" placeholder="Tarih seçiniz" />
+                render={({ field: { onChange, value, ...restField } }) => (
+                  <DatePicker
+                    {...restField}
+                    style={{ width: "168px" }}
+                    format="DD-MM-YYYY"
+                    placeholder="Tarih seçiniz"
+                    value={value ? dayjs(value) : null} // Ensure value is converted properly
+                    onChange={(date) => onChange(date ? date.toDate() : null)}
+                  />
                 )}
               />
               <Controller
@@ -406,8 +418,15 @@ const FinancialDetailsTable = () => {
               <Controller
                 name="PlannedCompletionDate"
                 control={control}
-                render={({ field }) => (
-                  <DatePicker {...field} format="DD-MM-YYYY" style={{ width: "168px" }} placeholder="Tarih seçiniz" />
+                render={({ field: { onChange, value, ...restField } }) => (
+                  <DatePicker
+                    {...restField}
+                    style={{ width: "168px" }}
+                    format="DD-MM-YYYY"
+                    placeholder="Tarih seçiniz"
+                    value={value ? dayjs(value) : null} // Ensure value is converted properly
+                    onChange={(date) => onChange(date ? date.toDate() : null)}
+                  />
                 )}
               />
               <Controller
@@ -431,19 +450,22 @@ const FinancialDetailsTable = () => {
               <Controller
                 name="StartedDate"
                 control={control}
-                render={({ field }) => (
+                render={({ field: { onChange, value, ...restField } }) => (
                   <DatePicker
-                    {...field}
+                    {...restField}
                     style={{ width: "168px" }}
-                    placeholder="Tarih seçiniz"
                     format="DD-MM-YYYY"
-                    onChange={(date, dateString) => {
-                      field.onChange(date);
-                      calculateTimeDifference();
+                    placeholder="Tarih seçiniz"
+                    value={value ? dayjs(value) : null} // Convert to dayjs object or null
+                    onChange={(date) => {
+                      const newValue = date ? date.toDate() : null; // Convert to Date object or null
+                      onChange(newValue); // Update the form state
+                      calculateTimeDifference(); // Call your function here
                     }}
                   />
                 )}
               />
+
               <Controller
                 name="StartedTime"
                 control={control}
@@ -475,15 +497,17 @@ const FinancialDetailsTable = () => {
               <Controller
                 name="FinishedDate"
                 control={control}
-                render={({ field }) => (
+                render={({ field: { onChange, value, ...restField } }) => (
                   <DatePicker
-                    {...field}
+                    {...restField}
                     style={{ width: "168px" }}
-                    placeholder="Tarih seçiniz"
                     format="DD-MM-YYYY"
-                    onChange={(date, dateString) => {
-                      field.onChange(date);
-                      calculateTimeDifference();
+                    placeholder="Tarih seçiniz"
+                    value={value ? dayjs(value) : null} // Convert to dayjs object or null
+                    onChange={(date) => {
+                      const newValue = date ? date.toDate() : null; // Convert to Date object or null
+                      onChange(newValue); // Update the form state
+                      calculateTimeDifference(); // Call your function here
                     }}
                   />
                 )}
@@ -608,8 +632,15 @@ const FinancialDetailsTable = () => {
               <Controller
                 name="EvrakTarihi"
                 control={control}
-                render={({ field }) => (
-                  <DatePicker {...field} style={{ width: "168px" }} format="DD-MM-YYYY" placeholder="Tarih seçiniz" />
+                render={({ field: { onChange, value, ...restField } }) => (
+                  <DatePicker
+                    {...restField}
+                    style={{ width: "168px" }}
+                    format="DD-MM-YYYY"
+                    placeholder="Tarih seçiniz"
+                    value={value ? dayjs(value) : null} // Ensure value is converted properly
+                    onChange={(date) => onChange(date ? date.toDate() : null)}
+                  />
                 )}
               />
             </div>
