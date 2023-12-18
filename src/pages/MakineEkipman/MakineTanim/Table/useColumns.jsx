@@ -33,13 +33,12 @@ export default function useColumns(props) {
   const columns = [
     {
       title: "#",
-      className: "center-aligned",
       dataIndex: "key",
       key: "key",
+      align: "right",
       sorter: (a, b) => a.key - b.key,
       width: 50,
       description: "Sıra",
-
       ellipsis: true, // Enable ellipsis for overflowed content
       modalTitle: "#",
     },
@@ -78,7 +77,6 @@ export default function useColumns(props) {
     },
     {
       title: "Makine Kodu",
-      className: "center-aligned",
       dataIndex: "MKN_KOD",
       key: "MKN_KOD",
       sorter: (a, b) => a.MKN_KOD.length - b.MKN_KOD.length,
@@ -89,7 +87,6 @@ export default function useColumns(props) {
     },
     {
       title: "Makine Tanımı",
-      className: "center-aligned",
       dataIndex: "MKN_TANIM",
       key: "MKN_TANIM",
       sorter: (a, b) => a.MKN_TANIM.length - b.MKN_TANIM.length,
@@ -112,7 +109,6 @@ export default function useColumns(props) {
     },
     {
       title: "Makine Durumu",
-      className: "center-aligned",
       dataIndex: "MKN_DURUM",
       key: "MKN_DURUM",
       width: 100,
@@ -135,7 +131,6 @@ export default function useColumns(props) {
       key: "MKN_ARAC_TIP",
       description: "Araç Tipi",
       modalTitle: "Araç Tipi",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
@@ -154,7 +149,6 @@ export default function useColumns(props) {
       key: "MKN_LOKASYON",
       description: "Lokasyon",
       modalTitle: "Lokasyon",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
@@ -173,7 +167,6 @@ export default function useColumns(props) {
       key: "MKN_TIP",
       description: "Makine Tipi",
       modalTitle: "Makine Tipi",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
@@ -192,7 +185,6 @@ export default function useColumns(props) {
       key: "MKN_KATEGORI",
       description: "Kategori",
       modalTitle: "Kategori",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
@@ -211,7 +203,6 @@ export default function useColumns(props) {
       key: "MKN_MARKA",
       description: "Marka",
       modalTitle: "Marka",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
@@ -230,7 +221,6 @@ export default function useColumns(props) {
       key: "MKN_MODEL",
       description: "Model",
       modalTitle: "Model",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
@@ -244,12 +234,11 @@ export default function useColumns(props) {
       },
     },
     {
-      title: "Master Makine Tanimi",
+      title: "Master Makine Tanımı",
       dataIndex: "MKN_MASTER_MAKINE_TANIM",
       key: "MKN_MASTER_MAKINE_TANIM",
       description: "Master Makine Tanimi",
       modalTitle: "Master Makine Tanimi",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
@@ -268,7 +257,6 @@ export default function useColumns(props) {
       key: "MKN_MASTER_MAKINE_KOD",
       description: "Master Makine Kod",
       modalTitle: "Master Makine Kod",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
@@ -287,7 +275,6 @@ export default function useColumns(props) {
       key: "MKN_TAKVIM",
       description: "Çalışma Takvimi",
       modalTitle: "Çalışma Takvimi",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
@@ -306,7 +293,7 @@ export default function useColumns(props) {
       key: "MKN_URETIM_YILI",
       description: "Üretim Yılı",
       modalTitle: "Üretim Yılı",
-      className: "center-aligned",
+      align: "right",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
@@ -325,7 +312,6 @@ export default function useColumns(props) {
       key: "MKN_MASRAF_MERKEZ",
       description: "Masraf Merkezi",
       modalTitle: "Masraf Merkezi",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
@@ -344,7 +330,6 @@ export default function useColumns(props) {
       key: "MKN_ATOLYE",
       description: "Sorumlu Atölye",
       modalTitle: "Sorumlu Atölye",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
@@ -363,7 +348,6 @@ export default function useColumns(props) {
       key: "MKN_BAKIM_GRUP",
       description: "Bakım Grubu",
       modalTitle: "Bakım Grubu",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
@@ -382,7 +366,6 @@ export default function useColumns(props) {
       key: "MKN_ARIZA_GRUP",
       description: "Arıza Grubu",
       modalTitle: "Arıza Grubu",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
@@ -401,7 +384,6 @@ export default function useColumns(props) {
       key: "MKN_ONCELIK",
       description: "Öncelik",
       modalTitle: "Öncelik",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
@@ -420,7 +402,7 @@ export default function useColumns(props) {
       key: "ARIZA_SIKLIGI",
       description: "Arıza Sıklığı (Gün)",
       modalTitle: "Arıza Sıklığı (Gün)",
-      className: "center-aligned",
+      align: "right",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
@@ -439,7 +421,7 @@ export default function useColumns(props) {
       key: "ARIZA_SAYISI",
       description: "Arıza Sayısı",
       modalTitle: "Arıza Sayısı",
-      className: "center-aligned",
+      align: "right",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
@@ -458,7 +440,6 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_1",
       description: "ÖZEL ALAN 1",
       modalTitle: "ÖZEL ALAN 1",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
@@ -477,7 +458,6 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_2",
       description: "ÖZEL ALAN 2",
       modalTitle: "ÖZEL ALAN 2",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
@@ -496,7 +476,6 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_3",
       description: "ÖZEL ALAN 3",
       modalTitle: "ÖZEL ALAN 3",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
@@ -515,7 +494,6 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_4",
       description: "ÖZEL ALAN 4",
       modalTitle: "ÖZEL ALAN 4",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
@@ -534,7 +512,6 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_5",
       description: "ÖZEL ALAN 5",
       modalTitle: "ÖZEL ALAN 5",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
@@ -553,7 +530,6 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_6",
       description: "ÖZEL ALAN 6",
       modalTitle: "ÖZEL ALAN 6",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
@@ -572,7 +548,6 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_7",
       description: "ÖZEL ALAN 7",
       modalTitle: "ÖZEL ALAN 7",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
@@ -591,7 +566,6 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_8",
       description: "ÖZEL ALAN 8",
       modalTitle: "ÖZEL ALAN 8",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
@@ -610,7 +584,6 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_9",
       description: "ÖZEL ALAN 9",
       modalTitle: "ÖZEL ALAN 9",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
@@ -629,7 +602,6 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_10",
       description: "ÖZEL ALAN 10",
       modalTitle: "ÖZEL ALAN 10",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
@@ -648,7 +620,6 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_11_KOD_ID",
       description: "ÖZEL ALAN 11",
       modalTitle: "ÖZEL ALAN 11",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
@@ -667,7 +638,6 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_12_KOD_ID",
       description: "ÖZEL ALAN 12",
       modalTitle: "ÖZEL ALAN 12",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
@@ -686,7 +656,6 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_13_KOD_ID",
       description: "ÖZEL ALAN 13",
       modalTitle: "ÖZEL ALAN 13",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
@@ -705,7 +674,6 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_14_KOD_ID",
       description: "ÖZEL ALAN 14",
       modalTitle: "ÖZEL ALAN 14",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
@@ -724,7 +692,6 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_15_KOD_ID",
       description: "ÖZEL ALAN 15",
       modalTitle: "ÖZEL ALAN 15",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
@@ -743,7 +710,6 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_16",
       description: "ÖZEL ALAN 16",
       modalTitle: "ÖZEL ALAN 16",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
@@ -762,7 +728,6 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_17",
       description: "ÖZEL ALAN 17",
       modalTitle: "ÖZEL ALAN 17",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
@@ -781,7 +746,6 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_18",
       description: "ÖZEL ALAN 18",
       modalTitle: "ÖZEL ALAN 18",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
@@ -800,7 +764,6 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_19",
       description: "ÖZEL ALAN 19",
       modalTitle: "ÖZEL ALAN 19",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
@@ -819,7 +782,6 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_20",
       description: "ÖZEL ALAN 20",
       modalTitle: "ÖZEL ALAN 20",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
@@ -838,7 +800,6 @@ export default function useColumns(props) {
       key: "MKN_LOKASYON_TUM_YOL",
       description: "Tam Lokasyon",
       modalTitle: "Tam Lokasyon",
-      className: "center-aligned",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 200,
       sorter: (a, b) => {
@@ -857,7 +818,7 @@ export default function useColumns(props) {
       key: "MKN_SERI_NO",
       description: "Seri No",
       modalTitle: "Seri No",
-      className: "center-aligned",
+      align: "right",
       ellipsis: true, // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
