@@ -102,7 +102,6 @@ export default function Company({ companySelectedId, companyCurrentValue, onSubm
         <div
           style={{
             lineHeight: "20px",
-            lineHeight: "20px",
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -167,6 +166,7 @@ export default function Company({ companySelectedId, companyCurrentValue, onSubm
     setInputValue("");
     setSelectedRowKeys([]);
     setValue("company", ""); // Set the value in React Hook Form
+    setValue("companyID", ""); // Set the value in React Hook Form
   };
 
   const handleModalOk = () => {
@@ -174,6 +174,7 @@ export default function Company({ companySelectedId, companyCurrentValue, onSubm
     if (selectedData) {
       setInputValue(selectedData.subject);
       // setValue("company", selectedData.key); // Set the value in React Hook Form
+      setValue("companyID", selectedData.key); // Set the value in React Hook Form
       onSubmit && onSubmit(selectedData);
     }
     setIsModalVisible(false);
@@ -225,6 +226,10 @@ export default function Company({ companySelectedId, companyCurrentValue, onSubm
 
   // tablodaki search kısmı için son
 
+  useEffect(() => {
+    setValue("company", inputValue);
+  }, [inputValue, setValue]);
+
   return (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
       <Text style={{ fontSize: "14px" }}>Firma:</Text>
@@ -236,12 +241,23 @@ export default function Company({ companySelectedId, companyCurrentValue, onSubm
           render={({ field }) => (
             <Input
               {...field}
-              value={inputValue}
+              // value={inputValue}
               onChange={(e) => {
                 setInputValue(e.target.value);
                 field.onChange(e.target.value);
               }}
               disabled
+            />
+          )}
+        />
+        <Controller
+          name="companyID"
+          control={control}
+          render={({ field }) => (
+            <Input
+              {...field}
+              type="text" // Set the type to "text" for name input
+              style={{ display: "none" }}
             />
           )}
         />

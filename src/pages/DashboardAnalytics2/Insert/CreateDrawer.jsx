@@ -218,7 +218,7 @@ export default function CreateDrawer({ onRefresh }) {
       ISM_PROJE_ID: data.project,
       ISM_REFERANS_NO: data.ReferansNo,
       ISM_TAMAMLANMA_ORAN: data.Tamamlama === "" ? 0 : data.Tamamlama,
-      ISM_FIRMA_ID: data.company,
+      ISM_FIRMA_ID: data.companyID,
       ISM_FIRMA_SOZLESME_ID: data.contractId,
       ISM_EVRAK_NO: data.EvrakNo,
       ISM_EVRAK_TARIHI: formatDateWithDayjs(data.EvrakTarihi),
