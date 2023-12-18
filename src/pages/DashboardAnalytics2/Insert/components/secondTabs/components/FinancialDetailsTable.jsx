@@ -25,6 +25,7 @@ const onChangeCheck = (e) => {};
 const FinancialDetailsTable = () => {
   const { control, watch, setValue } = useFormContext();
   const [sliderInputValue, setSliderInputValue] = useState(0);
+  const [editingRecord, setEditingRecord] = useState(null);
   const startDate = watch("StartedDate");
   const startTime = watch("StartedTime");
   const endDate = watch("FinishedDate");
@@ -160,7 +161,14 @@ const FinancialDetailsTable = () => {
                 justifyContent: "space-between",
                 width: "380px",
               }}>
-              <Workshop />
+              <Workshop
+                currentValue={editingRecord?.workshop}
+                workshopSelectedId={editingRecord?.workshopSelectedId}
+                onSubmit={(selectedData) => {
+                  setValue("workshop", selectedData.code);
+                  setValue("workshopSelectedId", selectedData.key);
+                }}
+              />
             </div>
             <div
               style={{
@@ -561,7 +569,12 @@ const FinancialDetailsTable = () => {
               justifyContent: "space-between",
               marginBottom: "5px",
             }}>
-            <Company />
+            <Company
+              onSubmit={(selectedData) => {
+                setValue("companyDetailsTab", selectedData.subject);
+                setValue("companySelectedIdDetailsTab", selectedData.key);
+              }}
+            />
           </div>
           <div
             style={{
