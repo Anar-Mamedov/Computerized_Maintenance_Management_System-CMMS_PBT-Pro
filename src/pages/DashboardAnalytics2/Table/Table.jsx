@@ -135,7 +135,7 @@ export default function Table() {
     setLoading(true); // Set loading to true before making the API call
     // page = page || 1;
     AxiosInstance.post(`getIsEmriFullList?id=11&parametre=${keyword}&pagingDeger=${page}`, filters).then((response) => {
-      console.log(response);
+      // console.log(response);
       // Alborz total page sehifesini qaytarmalidi
       // {
       //   page: number,

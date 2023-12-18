@@ -327,35 +327,12 @@ export default function Table() {
         <CreateDrawer onRefresh={refreshTableData} />
       </div>
       {/* quick jump for page input field */}
-      <div
-        style={{
-          position: "relative",
-          width: "110px",
-          display: "flex",
-          justifyContent: "space-between",
-          marginInlineStart: "auto",
-          marginBottom: "-44px",
-          zIndex: "1",
-        }}>
-        <Input
-          type="number"
-          placeholder="Sayfa Gir"
-          value={pageNumberInput}
-          onChange={(e) => {
-            // Remove special characters using a regular expression
-            const sanitizedValue = e.target.value.replace(/[^0-9]/g, "");
-            setPageNumberInput(sanitizedValue);
-          }} // Update the input value directly
-          onKeyDown={handlePageNumberInputChange} // Listen for Enter key press
-          style={{ width: "44px" }}
-        />
-        <Button onClick={handlePageNumberNavigation}>Git</Button>
-      </div>
+
       <AntdTable
         className="custom-table"
         size="small"
         pagination={{
-          position: ["topRight"],
+          position: ["bottomRight"],
           pageSize: 10,
           showSizeChanger: false,
           current: currentPage,
@@ -377,7 +354,7 @@ export default function Table() {
         rowSelection={true}
         scroll={{
           // x: "auto",
-          y: "650px",
+          y: "calc(100vh - 360px)",
         }}
         onRow={(record) => ({
           // pass onRow prop to Table
@@ -385,6 +362,30 @@ export default function Table() {
           // onContextMenu: (e) => handleContextMenu(e, record), // right click handler
         })}
       />
+      <div
+        style={{
+          position: "relative",
+          width: "110px",
+          display: "flex",
+          justifyContent: "space-between",
+          marginInlineStart: "auto",
+          marginTop: "-44px",
+          zIndex: "1",
+        }}>
+        <Input
+          type="text"
+          placeholder="Sayfa Gir"
+          value={pageNumberInput}
+          onChange={(e) => {
+            // Remove special characters using a regular expression
+            const sanitizedValue = e.target.value.replace(/[^0-9]/g, "");
+            setPageNumberInput(sanitizedValue);
+          }} // Update the input value directly
+          onKeyDown={handlePageNumberInputChange} // Listen for Enter key press
+          style={{ width: "44px" }}
+        />
+        <Button onClick={handlePageNumberNavigation}>Git</Button>
+      </div>
       <Modal title="Not" open={isModalVisible} onCancel={handleModalClose} footer={null}>
         <Input.TextArea
           value={noteText} // Bind the value to the state variable
