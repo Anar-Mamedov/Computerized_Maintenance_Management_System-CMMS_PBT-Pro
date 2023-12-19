@@ -5,6 +5,7 @@ import Location from "./components/Location";
 import MakineTipi from "./components/MakineTipi";
 import Kategori from "./components/Kategori";
 import MarkaSelect from "./components/MarkaSelect";
+import ModelSelect from "./components/ModelSelect";
 
 const { Text, Link } = Typography;
 
@@ -57,6 +58,7 @@ export default function MainTabs() {
         <MakineTipi />
         <Kategori />
         <MarkaSelect />
+        <ModelSelect />
       </div>
     </div>
   );

@@ -6,17 +6,22 @@ import AxiosInstance from "../../../../../../../api/http";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function MarkaSelect() {
-  const { control, setValue } = useFormContext();
+export default function ModelSelect() {
+  const { control, setValue, watch } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const selectedMarkaID = watch("MakineMarkaID");
+
   const fetchData = async () => {
+    if (!selectedMarkaID) return; // Eğer marka ID yoksa, istek yapma
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("GetMakineMarks");
-      if (response && response.Makine_Marka_List) {
-        setOptions(response.Makine_Marka_List);
+      // Template literals kullanarak URL'i düzgün bir şekilde oluştur
+      const response = await AxiosInstance.get(`GetMakineModelByMarkaId?markaId=${selectedMarkaID}`);
+      if (response && response.Makine_Model_List) {
+        console.log(response);
+        setOptions(response.Makine_Model_List);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -25,11 +30,17 @@ export default function MarkaSelect() {
     }
   };
 
+  useEffect(() => {
+    fetchData();
+    setValue("MakineModel", null); // Marka değiştiğinde modeli sıfırla
+    setValue("MakineModelID", null); // Marka değiştiğinde model ID'sini sıfırla
+  }, [selectedMarkaID]); // selectedMarkaID değiştiğinde fetchData fonksiyonunu çalıştır
+
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between", width: "100%" }}>
-      <Text style={{ fontSize: "14px" }}>Marka:</Text>
+      <Text style={{ fontSize: "14px" }}>Model:</Text>
       <Controller
-        name="MakineMarka"
+        name="MakineModel"
         control={control}
         render={({ field }) => (
           <Select
@@ -46,19 +57,19 @@ export default function MarkaSelect() {
             }}
             dropdownRender={(menu) => <Spin spinning={loading}>{menu}</Spin>}
             options={options.map((item) => ({
-              value: item.TB_MARKA_ID, // Use the ID as the value
-              label: item.MRK_MARKA, // Display the name in the dropdown
+              value: item.TB_MODEL_ID, // Use the ID as the value
+              label: item.MDL_MODEL, // Display the name in the dropdown
             }))}
             onChange={(value) => {
               // Seçilen değerin ID'sini NedeniID alanına set et
-              setValue("MakineMarkaID", value);
+              setValue("MakineModelID", value);
               field.onChange(value);
             }}
           />
         )}
       />
       <Controller
-        name="MakineMarkaID"
+        name="MakineModelID"
         control={control}
         render={({ field }) => (
           <Input
