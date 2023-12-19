@@ -3,11 +3,11 @@ import { PlusOutlined } from "@ant-design/icons";
 import { Button, Drawer, Space, ConfigProvider, Modal } from "antd";
 import React, { useEffect, useState } from "react";
 import MainTabs from "./components/MainTabs/MainTabs";
-import secondTabs from "./components/secondTabs/secondTabs";
 import { useForm, Controller, useFormContext, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
 import AxiosInstance from "../../../../api/http";
 import Footer from "../Footer";
+import SecondTabs from "./components/secondTabs/secondTabs";
 
 export default function CreateDrawer({ onRefresh }) {
   const [open, setOpen] = useState(false);
@@ -405,7 +405,7 @@ export default function CreateDrawer({ onRefresh }) {
           </Button>
           <Drawer
             width="1660px"
-            title="Yeni iş emri ekle"
+            title="Yeni Kayıt Ekle"
             placement={"right"}
             onClose={onClose}
             open={open}
@@ -425,8 +425,9 @@ export default function CreateDrawer({ onRefresh }) {
               </Space>
             }>
             <MainTabs />
+            <SecondTabs />
+
             <Footer />
-            {/* <secondTabs /> */}
           </Drawer>
         </ConfigProvider>
       </form>

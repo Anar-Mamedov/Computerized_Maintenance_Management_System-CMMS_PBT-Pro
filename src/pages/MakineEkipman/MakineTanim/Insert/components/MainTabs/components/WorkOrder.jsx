@@ -23,7 +23,6 @@ import "./styles.css";
 
 // import required modules
 import { Pagination } from "swiper/modules";
-import SecondTabs from "../../secondTabs/secondTabs";
 import Machine from "./Machine";
 import Location from "./Location";
 import MachineStatus from "./MachineStatus";
@@ -320,7 +319,6 @@ const WorkOrder = ({ onDrawerClose, drawerVisible, selectedRow }) => {
           )}
         />
       </Col>
-      <SecondTabs />
     </Row>
   );
 };
