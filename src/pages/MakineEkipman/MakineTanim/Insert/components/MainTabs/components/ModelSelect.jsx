@@ -20,7 +20,6 @@ export default function ModelSelect() {
       // Template literals kullanarak URL'i düzgün bir şekilde oluştur
       const response = await AxiosInstance.get(`GetMakineModelByMarkaId?markaId=${selectedMarkaID}`);
       if (response && response.Makine_Model_List) {
-        console.log(response);
         setOptions(response.Makine_Model_List);
       }
     } catch (error) {
