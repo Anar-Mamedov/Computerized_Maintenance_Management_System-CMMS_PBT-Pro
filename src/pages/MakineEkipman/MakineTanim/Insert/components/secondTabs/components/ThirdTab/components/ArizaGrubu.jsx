@@ -7,7 +7,7 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function BakimGrubu() {
+export default function ArizaGrubu() {
   const { control, setValue } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -23,7 +23,7 @@ export default function BakimGrubu() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32441");
+      const response = await AxiosInstance.get("KodList?grup=32402");
       if (response && response) {
         setOptions(response);
       }
@@ -51,7 +51,7 @@ export default function BakimGrubu() {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32441`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32402`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
@@ -90,9 +90,9 @@ export default function BakimGrubu() {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between", width: "100%" }}>
       {contextHolder}
-      <Text style={{ fontSize: "14px" }}>Bakım Grubu:</Text>
+      <Text style={{ fontSize: "14px" }}>Ariza Grubu:</Text>
       <Controller
-        name="makineBakimGrubu"
+        name="makineArizaGrubu"
         control={control}
         render={({ field }) => (
           <Select
@@ -133,14 +133,14 @@ export default function BakimGrubu() {
             }))}
             onChange={(value) => {
               // Seçilen değerin ID'sini NedeniID alanına set et
-              setValue("makineBakimGrubuID", value);
+              setValue("makineArizaGrubuID", value);
               field.onChange(value);
             }}
           />
         )}
       />
       <Controller
-        name="makineBakimGrubuID"
+        name="makineArizaGrubuID"
         control={control}
         render={({ field }) => (
           <Input
