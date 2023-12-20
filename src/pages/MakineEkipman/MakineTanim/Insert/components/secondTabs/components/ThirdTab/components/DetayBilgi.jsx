@@ -1,30 +1,28 @@
 import React from "react";
 import { Drawer, Typography, Button, Input, Select, DatePicker, TimePicker, Row, Col, Checkbox } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
-import Location from "./components/Location";
-import MakineTipi from "./components/MakineTipi";
-import Kategori from "./components/Kategori";
-import MarkaSelect from "./components/MarkaSelect";
-import ModelSelect from "./components/ModelSelect";
-import MakineDurum from "./components/MakineDurum";
-import MasterMakineTablo from "./components/MasterMakineTablo";
-import MakineTakvimtablo from "./components/MakineTakvimtablo";
+import MasrafMerkeziTablo from "./MasrafMerkeziTablo";
+import MakineAtolyeTablo from "./MakineAtolyeTablo";
+import BakimGrubu from "./BakimGrubu";
 
 const { Text, Link } = Typography;
 
-export default function MainTabs() {
+export default function DetayBilgi() {
   const { control, watch, setValue } = useFormContext();
 
   const handleMinusClick = () => {
-    setValue("masterMakineTanimi", "");
-    setValue("masterMakineID", "");
+    setValue("makineMasrafMerkeziTanim", "");
+    setValue("makineMasrafMerkeziID", "");
+  };
+  const handleAtolyeMinusClick = () => {
+    setValue("makineAtolyeTanim", "");
+    setValue("makineAtolyeID", "");
   };
 
   const handleTakvimMinusClick = () => {
     setValue("makineTakvimTanimi", "");
     setValue("makineTakvimID", "");
   };
-
   return (
     <div
       style={{
@@ -53,12 +51,46 @@ export default function MainTabs() {
             justifyContent: "space-between",
             width: "100%",
           }}>
-          <Text style={{ fontSize: "14px" }}>Makine Kodu:</Text>
-          <Controller
-            name="makineKodu"
-            control={control}
-            render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
-          />
+          <Text style={{ fontSize: "14px" }}>Masraf Merkezi:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "300px",
+            }}>
+            <Controller
+              name="makineMasrafMerkeziTanim"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="text" // Set the type to "text" for name input
+                  style={{ width: "215px" }}
+                  disabled
+                />
+              )}
+            />
+            <Controller
+              name="makineMasrafMerkeziID"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="text" // Set the type to "text" for name input
+                  style={{ display: "none" }}
+                />
+              )}
+            />
+            <MasrafMerkeziTablo
+              onSubmit={(selectedData) => {
+                setValue("makineMasrafMerkeziTanim", selectedData.age);
+                setValue("makineMasrafMerkeziID", selectedData.key);
+              }}
+            />
+            <Button onClick={handleMinusClick}> - </Button>
+          </div>
         </div>
         <div
           style={{
@@ -68,18 +100,63 @@ export default function MainTabs() {
             justifyContent: "space-between",
             width: "100%",
           }}>
-          <Text style={{ fontSize: "14px" }}>Makine Tanımı:</Text>
+          <Text style={{ fontSize: "14px" }}>Sorumlu Atölye:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "300px",
+            }}>
+            <Controller
+              name="makineAtolyeTanim"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="text" // Set the type to "text" for name input
+                  style={{ width: "215px" }}
+                  disabled
+                />
+              )}
+            />
+            <Controller
+              name="makineAtolyeID"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="text" // Set the type to "text" for name input
+                  style={{ display: "none" }}
+                />
+              )}
+            />
+            <MakineAtolyeTablo
+              onSubmit={(selectedData) => {
+                setValue("makineAtolyeTanim", selectedData.subject);
+                setValue("makineAtolyeID", selectedData.key);
+              }}
+            />
+            <Button onClick={handleAtolyeMinusClick}> - </Button>
+          </div>
+        </div>
+        <BakimGrubu />
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Risk Puanı:</Text>
           <Controller
-            name="makineTanimi"
+            name="makineRiskPuani"
             control={control}
             render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
           />
         </div>
-        <Location />
-        <MakineTipi />
-        <Kategori />
-        <MarkaSelect />
-        <ModelSelect />
       </div>
       <div
         style={{
@@ -93,7 +170,6 @@ export default function MainTabs() {
           alignContent: "flex-start",
           height: "fit-content",
         }}>
-        <MakineDurum />
         <div
           style={{
             display: "flex",
@@ -149,12 +225,7 @@ export default function MainTabs() {
                 />
               )}
             />
-            <MasterMakineTablo
-              onSubmit={(selectedData) => {
-                setValue("masterMakineTanimi", selectedData.definition);
-                setValue("masterMakineID", selectedData.key);
-              }}
-            />
+
             <Button onClick={handleMinusClick}> - </Button>
           </div>
         </div>
@@ -198,12 +269,7 @@ export default function MainTabs() {
                 />
               )}
             />
-            <MakineTakvimtablo
-              onSubmit={(selectedData) => {
-                setValue("makineTakvimTanimi", selectedData.subject);
-                setValue("makineTakvimID", selectedData.key);
-              }}
-            />
+
             <Button onClick={handleTakvimMinusClick}> - </Button>
           </div>
         </div>
@@ -303,78 +369,7 @@ export default function MainTabs() {
           gap: "15px",
           alignContent: "flex-start",
           height: "fit-content",
-        }}>
-        <Controller
-          name="makineAktif"
-          control={control}
-          defaultValue={true} // or true if you want it checked by default
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Aktif
-            </Checkbox>
-          )}
-        />
-        <Controller
-          name="makineKalibrasyon"
-          control={control}
-          defaultValue={false} // or true if you want it checked by default
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Kalibrasyon Var
-            </Checkbox>
-          )}
-        />
-        <Controller
-          name="kritikMakine"
-          control={control}
-          defaultValue={false} // or true if you want it checked by default
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Kritik Makine
-            </Checkbox>
-          )}
-        />
-        <Controller
-          name="makineGucKaynagi"
-          control={control}
-          defaultValue={false} // or true if you want it checked by default
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Güç Kaynağı
-            </Checkbox>
-          )}
-        />
-        <Controller
-          name="makineIsBildirimi"
-          control={control}
-          defaultValue={false} // or true if you want it checked by default
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              İş Bildirimi
-            </Checkbox>
-          )}
-        />
-        <Controller
-          name="makineYakitKullanim"
-          control={control}
-          defaultValue={false} // or true if you want it checked by default
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Yakıt Kullanım
-            </Checkbox>
-          )}
-        />
-        <Controller
-          name="makineOtonomBakim"
-          control={control}
-          defaultValue={false} // or true if you want it checked by default
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Otonom Bakım
-            </Checkbox>
-          )}
-        />
-      </div>
+        }}></div>
     </div>
   );
 }

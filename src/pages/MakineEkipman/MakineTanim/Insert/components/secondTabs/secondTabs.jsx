@@ -92,7 +92,7 @@ export default function SecondTabs() {
             <RequisiteTable />
           </div>
         </TabPane>
-        <TabPane tab="Personel" key="3">
+        <TabPane tab="Detay Bilgi" key="3">
           <div
             style={{
               // display: "flex",
