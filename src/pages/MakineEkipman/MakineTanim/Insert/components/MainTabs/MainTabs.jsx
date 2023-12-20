@@ -8,7 +8,7 @@ import MarkaSelect from "./components/MarkaSelect";
 import ModelSelect from "./components/ModelSelect";
 import MakineDurum from "./components/MakineDurum";
 import MasterMakineTablo from "./components/MasterMakineTablo";
-import MakineTakvimtablo from "./components/MakineTakvimtablo";
+import MakineTakvimTablo from "./components/MakineTakvimTablo";
 
 const { Text, Link } = Typography;
 
@@ -198,7 +198,7 @@ export default function MainTabs() {
                 />
               )}
             />
-            <MakineTakvimtablo
+            <MakineTakvimTablo
               onSubmit={(selectedData) => {
                 setValue("makineTakvimTanimi", selectedData.subject);
                 setValue("makineTakvimID", selectedData.key);
