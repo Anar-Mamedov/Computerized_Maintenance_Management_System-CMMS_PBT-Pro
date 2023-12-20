@@ -4,6 +4,12 @@ import { Controller, useFormContext } from "react-hook-form";
 import MasrafMerkeziTablo from "./MasrafMerkeziTablo";
 import MakineAtolyeTablo from "./MakineAtolyeTablo";
 import BakimGrubu from "./BakimGrubu";
+import ArizaGrubu from "./ArizaGrubu";
+import ServisSaglayici from "./ServisSaglayici";
+import ServisSekli from "./ServisSekli";
+import TeknikSeviyesi from "./TeknikSeviyesi";
+import FizikselDurumu from "./FizikselDurumu";
+import MakineOncelikTablo from "./MakineOncelikTablo";
 
 const { Text, Link } = Typography;
 
@@ -19,6 +25,11 @@ export default function DetayBilgi() {
     setValue("makineAtolyeID", "");
   };
 
+  const handleOncelikMinusClick = () => {
+    setValue("makineOncelik", "");
+    setValue("makineOncelikID", "");
+  };
+
   const handleTakvimMinusClick = () => {
     setValue("makineTakvimTanimi", "");
     setValue("makineTakvimID", "");
@@ -29,7 +40,7 @@ export default function DetayBilgi() {
         display: "flex",
         flexWrap: "wrap",
         columnGap: "10px",
-        marginBottom: "20px",
+        marginBottom: "40px",
       }}>
       <div
         style={{
@@ -142,6 +153,60 @@ export default function DetayBilgi() {
           </div>
         </div>
         <BakimGrubu />
+        <ArizaGrubu />
+        <ServisSaglayici />
+        <ServisSekli />
+        <TeknikSeviyesi />
+        <FizikselDurumu />
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Öncelik:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "300px",
+            }}>
+            <Controller
+              name="makineOncelik"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="text" // Set the type to "text" for name input
+                  style={{ width: "215px" }}
+                  disabled
+                />
+              )}
+            />
+            <Controller
+              name="makineOncelikID"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="text" // Set the type to "text" for name input
+                  style={{ display: "none" }}
+                />
+              )}
+            />
+            <MakineOncelikTablo
+              onSubmit={(selectedData) => {
+                setValue("makineOncelik", selectedData.subject);
+                setValue("makineOncelikID", selectedData.key);
+              }}
+            />
+            <Button onClick={handleOncelikMinusClick}> - </Button>
+          </div>
+        </div>
         <div
           style={{
             display: "flex",
