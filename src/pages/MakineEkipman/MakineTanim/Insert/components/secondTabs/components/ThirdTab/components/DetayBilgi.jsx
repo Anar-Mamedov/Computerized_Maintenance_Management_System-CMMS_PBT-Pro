@@ -12,6 +12,11 @@ import FizikselDurumu from "./FizikselDurumu";
 import MakineOncelikTablo from "./MakineOncelikTablo";
 import IsletimSistemi from "./IsletimSistemi";
 import Agirlik from "./Agirlik";
+import Hacim from "./MakineHacim";
+import Kapasite from "./MakineKapasite";
+import ElektrikTuketim from "./ElektrikTuketim";
+import ValfTipi from "./ValfTipi";
+import ValfBoyutu from "./ValfBoyutu";
 
 const { Text, Link } = Typography;
 
@@ -271,6 +276,10 @@ export default function DetayBilgi() {
           />
         </div>
         <Agirlik />
+        <Hacim />
+        <Kapasite />
+        <ElektrikTuketim />
+
         <div
           style={{
             display: "flex",
@@ -279,84 +288,18 @@ export default function DetayBilgi() {
             justifyContent: "space-between",
             width: "100%",
           }}>
-          <Text style={{ fontSize: "14px" }}>Master Makine:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "300px",
-            }}>
+          <Text style={{ fontSize: "14px" }}>Voltaj/Güç (Amper)</Text>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
             <Controller
-              name="masterMakineTanimi"
+              name="makineVoltaj"
               control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ width: "215px" }}
-                  disabled
-                />
-              )}
+              render={({ field }) => <Input {...field} style={{ width: "145px" }} />}
             />
             <Controller
-              name="masterMakineID"
+              name="makineGuc"
               control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ display: "none" }}
-                />
-              )}
+              render={({ field }) => <Input {...field} style={{ width: "145px" }} />}
             />
-
-            <Button onClick={handleMinusClick}> - </Button>
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Çalışma Takvimi:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "300px",
-            }}>
-            <Controller
-              name="makineTakvimTanimi"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ width: "215px" }}
-                  disabled
-                />
-              )}
-            />
-            <Controller
-              name="makineTakvimID"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ display: "none" }}
-                />
-              )}
-            />
-
-            <Button onClick={handleTakvimMinusClick}> - </Button>
           </div>
         </div>
 
@@ -368,64 +311,29 @@ export default function DetayBilgi() {
             justifyContent: "space-between",
             width: "100%",
           }}>
-          <Text style={{ fontSize: "14px" }}>Üretim Yılı:</Text>
+          <Text style={{ fontSize: "14px" }}>Faz:</Text>
           <Controller
-            name="uretimYili"
+            name="makineFaz"
             control={control}
             render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
           />
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Duruş Birim Maliyeti:</Text>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", alignItems: "center", width: "200px" }}>
-            <Controller
-              name="makineDurusBirimMaliyeti"
-              control={control}
-              render={({ field }) => <Input {...field} style={{ width: "150px" }} />}
-            />
-            <Text style={{ fontSize: "12px" }}>(tl/saat)</Text>
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Plan. Çalışma Süresi:</Text>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", alignItems: "center", width: "200px" }}>
-            <Controller
-              name="makinePlanCalismaSuresi"
-              control={control}
-              render={({ field }) => <Input {...field} style={{ width: "140px" }} />}
-            />
-            <Text style={{ fontSize: "12px" }}>(saat/yıl)</Text>
-          </div>
         </div>
       </div>
       <div
         style={{
           display: "flex",
           flexWrap: "wrap",
-          flexDirection: "column",
           border: "1px solid #80808068",
-          width: "fit-content",
+          width: "430px",
           padding: "5px",
-          justifyContent: "flex-start",
-          gap: "15px",
+          justifyContent: "center",
+          gap: "5px",
           alignContent: "flex-start",
           height: "fit-content",
-        }}></div>
+        }}>
+        <ValfTipi />
+        <ValfBoyutu />
+      </div>
     </div>
   );
 }
