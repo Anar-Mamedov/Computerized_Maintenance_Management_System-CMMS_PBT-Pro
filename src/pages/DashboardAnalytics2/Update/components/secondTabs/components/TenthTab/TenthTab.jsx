@@ -39,7 +39,7 @@ export default function TenthTab() {
   const [editingRecord, setEditingRecord] = useState(null);
   const [isDisabled, setIsDisabled] = useState(true); // State to manage the disabled state of the fields
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, replace, remove } = useFieldArray({
     control,
     name: "IsEmriAracGerecList", // This should match the name used in setValue
   });
@@ -324,7 +324,7 @@ export default function TenthTab() {
             workdays: item.ARG_TIP_TANIM, //?
             description: item.ARG_YER_TANIM, //?
           }));
-          append(fetchedData);
+          replace(fetchedData);
         })
         .catch((error) => console.error("Error fetching data:", error))
         .finally(() => setLoading(false));

@@ -11,7 +11,7 @@ const { Text } = Typography;
 export default function NinthTab() {
   const [loading, setLoading] = useState(false);
   const { control, handleSubmit, reset, setValue, getValues, watch } = useFormContext();
-  const { fields, append, update, remove } = useFieldArray({
+  const { fields, append, replace, update, remove } = useFieldArray({
     control,
     name: "IsEmriOlcumDegeriList",
   });
@@ -274,7 +274,7 @@ export default function NinthTab() {
             olcumMinValue: item.IDO_MIN_DEGER,
             // Add other fields similarly
           }));
-          append(fetchedData);
+          replace(fetchedData);
         })
         .catch((error) => console.error("Error fetching data:", error))
         .finally(() => setLoading(false));

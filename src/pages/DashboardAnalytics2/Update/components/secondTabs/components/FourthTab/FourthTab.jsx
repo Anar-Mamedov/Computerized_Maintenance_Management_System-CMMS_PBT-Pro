@@ -489,7 +489,7 @@ export default function FourthTab() {
             STK_MARKA_KOD_ID: item.IDM_MARKA_KOD_ID,
             STK_MODEL_KOD_ID: item.IDM_MODEL_KOD_ID,
           }));
-          append(fetchedData);
+          replace(fetchedData);
         })
         .catch((error) => console.error("Error fetching data:", error))
         .finally(() => setLoading(false));
@@ -543,36 +543,36 @@ export default function FourthTab() {
     fetch(); // Call fetch when the component mounts or warehouseId changes
   }, [fetch]);
 
-  const selectedId = watch("procedureSelectedId");
+  // const selectedId = watch("procedureSelectedId");
 
-  useEffect(() => {
-    if (selectedId) {
-      setLoading(true);
-      AxiosInstance.get(`IsTanimMazleme?isTanimID=${selectedId}`)
-        .then((response) => {
-          // Assuming the API returns an array of objects compatible with your table structure
-          const formattedData = response.map((item) => ({
-            key: item.TB_ISEMRI_MLZ_ID,
-            // stok: item.IDM_STOK_TANIM,
-            // G: item.IDM_STOK_TIP,
-            // code: item.IDM_STOK_TANIM,
-            materialDescription: item.IDM_STOK_TANIM,
-            // warehouseTable: item.IDM_STOK_DEPO,
-            workingtime: item.IDM_MIKTAR,
-            description: item.IDM_BIRIM,
-            unitPrice: item.IDM_BIRIM_FIYAT,
-            cost: item.IDM_TUTAR,
-          }));
-          replace(formattedData); // Update the selectedRecords state
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  }, [selectedId, replace, setLoading, AxiosInstance]);
+  // useEffect(() => {
+  //   if (selectedId) {
+  //     setLoading(true);
+  //     AxiosInstance.get(`IsTanimMazleme?isTanimID=${selectedId}`)
+  //       .then((response) => {
+  //         // Assuming the API returns an array of objects compatible with your table structure
+  //         const formattedData = response.map((item) => ({
+  //           key: item.TB_ISEMRI_MLZ_ID,
+  //           // stok: item.IDM_STOK_TANIM,
+  //           // G: item.IDM_STOK_TIP,
+  //           // code: item.IDM_STOK_TANIM,
+  //           materialDescription: item.IDM_STOK_TANIM,
+  //           // warehouseTable: item.IDM_STOK_DEPO,
+  //           workingtime: item.IDM_MIKTAR,
+  //           description: item.IDM_BIRIM,
+  //           unitPrice: item.IDM_BIRIM_FIYAT,
+  //           cost: item.IDM_TUTAR,
+  //         }));
+  //         replace(formattedData); // Update the selectedRecords state
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error fetching data:", error);
+  //       })
+  //       .finally(() => {
+  //         setLoading(false);
+  //       });
+  //   }
+  // }, [selectedId, replace, setLoading, AxiosInstance]);
 
   // Function to fetch data from the API
   // const fetchData = useCallback(() => {

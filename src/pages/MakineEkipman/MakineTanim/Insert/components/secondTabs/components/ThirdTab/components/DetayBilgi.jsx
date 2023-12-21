@@ -11,6 +11,7 @@ import TeknikSeviyesi from "./TeknikSeviyesi";
 import FizikselDurumu from "./FizikselDurumu";
 import MakineOncelikTablo from "./MakineOncelikTablo";
 import IsletimSistemi from "./IsletimSistemi";
+import Agirlik from "./Agirlik";
 
 const { Text, Link } = Typography;
 
@@ -262,6 +263,22 @@ export default function DetayBilgi() {
             justifyContent: "space-between",
             width: "100%",
           }}>
+          <Text style={{ fontSize: "14px" }}>IP No:</Text>
+          <Controller
+            name="makineIPNo"
+            control={control}
+            render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
+          />
+        </div>
+        <Agirlik />
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          }}>
           <Text style={{ fontSize: "14px" }}>Master Makine:</Text>
           <div
             style={{
@@ -342,21 +359,7 @@ export default function DetayBilgi() {
             <Button onClick={handleTakvimMinusClick}> - </Button>
           </div>
         </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Üretici:</Text>
-          <Controller
-            name="uretici"
-            control={control}
-            render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
-          />
-        </div>
+
         <div
           style={{
             display: "flex",

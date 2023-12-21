@@ -1,6 +1,6 @@
 import { CheckOutlined, CloseOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Input, Modal, Table, Typography, DatePicker, TimePicker, Checkbox, Select } from "antd";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useFormContext, Controller, useFieldArray } from "react-hook-form";
 import AxiosInstance from "../../../../../../api/http";
 import dayjs from "dayjs";
@@ -141,10 +141,14 @@ export default function RequisiteTable() {
     fetchOptions();
   }, []);
 
+  const fetchedRef = useRef(new Set());
+
   const isEmriId = watch("isEmriSelectedId");
 
   useEffect(() => {
-    if (isEmriId) {
+    console.log("useEffect triggered for isEmriId:", isEmriId);
+    if (isEmriId && !fetchedRef.current.has(isEmriId)) {
+      fetchedRef.current.add(isEmriId);
       setLoading(true);
       AxiosInstance.get(`FetchIsEmriKontrolList?isemriID=${isEmriId}`)
         .then((response) => {
@@ -157,48 +161,6 @@ export default function RequisiteTable() {
             // startDate: dayjs(item.ATOLYE_TANIM).format("DD-MM-YYYY"),
             // endDate: dayjs(item.LOKASYON_TANIM).format("DD-MM-YYYY"),
             description: item.DKN_ACIKLAMA,
-            // personel: item.PERSONEL_ISIM,
-            // done: item.ISK_YAPILDI,
-            // cost: item.ISK_MALIYET,
-            // ISK_DEGISTIREN_ID: item.ISK_DEGISTIREN_ID,
-          }));
-          append(fetchedData);
-          fetchedData.forEach((item, index) => {
-            setValue(`IsEmriKontrolList[${index}].duration`, item.duration || "");
-            setValue(`IsEmriKontrolList[${index}].startDate`, item.startDate || "");
-            setValue(`IsEmriKontrolList[${index}].endDate`, item.endDate || "");
-            setValue(`IsEmriKontrolList[${index}].startTime`, item.startTime || "");
-            setValue(`IsEmriKontrolList[${index}].endTime`, item.endTime || "");
-            setValue(`IsEmriKontrolList[${index}].shift`, item.shift || "");
-            setValue(`IsEmriKontrolList[${index}].shiftId`, item.shiftId || "");
-            setValue(`IsEmriKontrolList[${index}].workshop`, item.workshop || "");
-            setValue(`IsEmriKontrolList[${index}].workshopSelectedId`, item.workshopSelectedId || "");
-            setValue(`IsEmriKontrolList[${index}].personel`, item.personel || "");
-            setValue(`IsEmriKontrolList[${index}].personelSelectedId`, item.personelSelectedId || "");
-            setValue(`IsEmriKontrolList[${index}].done`, item.done || false);
-            // Set other fields similarly
-          });
-        })
-        .catch((error) => console.error("Error fetching data:", error))
-        .finally(() => setLoading(false));
-    }
-  }, [isEmriId, append, setLoading, AxiosInstance]);
-
-  const selectedId = watch("procedureSelectedId");
-
-  useEffect(() => {
-    if (selectedId) {
-      setLoading(true);
-      AxiosInstance.get(`IsTanimKontrolList?isTanimID=${selectedId}`)
-        .then((response) => {
-          const fetchedData = response.map((item, index) => ({
-            key: item.TB_IS_TANIM_KONROLLIST_ID,
-            sequence: index + 1,
-            // subject: item.DEP_TANIM,
-            type: item.ISK_TANIM,
-            // startDate: dayjs(item.ATOLYE_TANIM).format("DD-MM-YYYY"),
-            // endDate: dayjs(item.LOKASYON_TANIM).format("DD-MM-YYYY"),
-            description: item.ISK_ACIKLAMA,
             // personel: item.PERSONEL_ISIM,
             // done: item.ISK_YAPILDI,
             // cost: item.ISK_MALIYET,
@@ -224,7 +186,49 @@ export default function RequisiteTable() {
         .catch((error) => console.error("Error fetching data:", error))
         .finally(() => setLoading(false));
     }
-  }, [selectedId, replace, setLoading, AxiosInstance]);
+  }, [isEmriId, append, setLoading, AxiosInstance]);
+
+  // const selectedId = watch("procedureSelectedId");
+
+  // useEffect(() => {
+  //   if (selectedId) {
+  //     setLoading(true);
+  //     AxiosInstance.get(`IsTanimKontrolList?isTanimID=${selectedId}`)
+  //       .then((response) => {
+  //         const fetchedData = response.map((item, index) => ({
+  //           key: item.TB_IS_TANIM_KONROLLIST_ID,
+  //           sequence: index + 1,
+  //           // subject: item.DEP_TANIM,
+  //           type: item.ISK_TANIM,
+  //           // startDate: dayjs(item.ATOLYE_TANIM).format("DD-MM-YYYY"),
+  //           // endDate: dayjs(item.LOKASYON_TANIM).format("DD-MM-YYYY"),
+  //           description: item.ISK_ACIKLAMA,
+  //           // personel: item.PERSONEL_ISIM,
+  //           // done: item.ISK_YAPILDI,
+  //           // cost: item.ISK_MALIYET,
+  //           // ISK_DEGISTIREN_ID: item.ISK_DEGISTIREN_ID,
+  //         }));
+  //         replace(fetchedData);
+  //         fetchedData.forEach((item, index) => {
+  //           setValue(`IsEmriKontrolList[${index}].duration`, item.duration || "");
+  //           setValue(`IsEmriKontrolList[${index}].startDate`, item.startDate || "");
+  //           setValue(`IsEmriKontrolList[${index}].endDate`, item.endDate || "");
+  //           setValue(`IsEmriKontrolList[${index}].startTime`, item.startTime || "");
+  //           setValue(`IsEmriKontrolList[${index}].endTime`, item.endTime || "");
+  //           setValue(`IsEmriKontrolList[${index}].shift`, item.shift || "");
+  //           setValue(`IsEmriKontrolList[${index}].shiftId`, item.shiftId || "");
+  //           setValue(`IsEmriKontrolList[${index}].workshop`, item.workshop || "");
+  //           setValue(`IsEmriKontrolList[${index}].workshopSelectedId`, item.workshopSelectedId || "");
+  //           setValue(`IsEmriKontrolList[${index}].personel`, item.personel || "");
+  //           setValue(`IsEmriKontrolList[${index}].personelSelectedId`, item.personelSelectedId || "");
+  //           setValue(`IsEmriKontrolList[${index}].done`, item.done || false);
+  //           // Set other fields similarly
+  //         });
+  //       })
+  //       .catch((error) => console.error("Error fetching data:", error))
+  //       .finally(() => setLoading(false));
+  //   }
+  // }, [selectedId, replace, setLoading, AxiosInstance]);
 
   // const fetch = useCallback(() => {
   //   setLoading(true);

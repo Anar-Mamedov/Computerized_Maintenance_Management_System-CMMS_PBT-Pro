@@ -329,7 +329,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         IDO_REF_ID: -1,
       })),
 
-      IsEmriKontrolListesi: data.IsEmriKontrolList.map((item) => ({
+      IsEmriKontrolList: data.IsEmriKontrolList.map((item) => ({
+        TB_ISEMRI_KONTROLLIST_ID: item.key,
         DKN_SIRANO: item.sequence,
         DKN_YAPILDI: item.done,
         DKN_TANIM: item.type,
