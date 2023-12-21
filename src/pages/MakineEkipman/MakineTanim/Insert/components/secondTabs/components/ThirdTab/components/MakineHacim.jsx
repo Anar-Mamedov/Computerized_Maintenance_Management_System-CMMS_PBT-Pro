@@ -7,7 +7,7 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function Agirlik() {
+export default function Hacim() {
   const { control, setValue } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -90,10 +90,10 @@ export default function Agirlik() {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between", width: "100%" }}>
       {contextHolder}
-      <Text style={{ fontSize: "14px" }}>Ağırlık:</Text>
+      <Text style={{ fontSize: "14px" }}>Hacim:</Text>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
         <Controller
-          name="MakineAgirlik"
+          name="MakineHacim"
           control={control}
           render={({ field }) => (
             <Input
@@ -104,7 +104,7 @@ export default function Agirlik() {
           )}
         />
         <Controller
-          name="MakineAgirlikBirim"
+          name="MakineHacimBirim"
           control={control}
           render={({ field }) => (
             <Select
@@ -145,14 +145,14 @@ export default function Agirlik() {
               }))}
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
-                setValue("MakineAgirlikBirimID", value);
+                setValue("MakineHacimBirimID", value);
                 field.onChange(value);
               }}
             />
           )}
         />
         <Controller
-          name="MakineAgirlikBirimID"
+          name="MakineHacimBirimID"
           control={control}
           render={({ field }) => (
             <Input

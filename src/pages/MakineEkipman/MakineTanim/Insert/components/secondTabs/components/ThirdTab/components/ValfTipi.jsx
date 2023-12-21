@@ -7,7 +7,7 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function Agirlik() {
+export default function ValfTipi() {
   const { control, setValue } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -23,7 +23,7 @@ export default function Agirlik() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32001");
+      const response = await AxiosInstance.get("KodList?grup=32514");
       if (response && response) {
         setOptions(response);
       }
@@ -51,7 +51,7 @@ export default function Agirlik() {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32001`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32514`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
@@ -90,79 +90,66 @@ export default function Agirlik() {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between", width: "100%" }}>
       {contextHolder}
-      <Text style={{ fontSize: "14px" }}>Ağırlık:</Text>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
-        <Controller
-          name="MakineAgirlik"
-          control={control}
-          render={({ field }) => (
-            <Input
-              {...field}
-              type="number" // Set the type to "text" for name input
-              style={{ width: "90px" }}
-            />
-          )}
-        />
-        <Controller
-          name="MakineAgirlikBirim"
-          control={control}
-          render={({ field }) => (
-            <Select
-              {...field}
-              key={selectKey}
-              style={{ width: "205px" }}
-              showSearch
-              allowClear
-              placeholder="Seçim Yapınız"
-              optionFilterProp="children"
-              onDropdownVisibleChange={(open) => {
-                if (open) {
-                  fetchData(); // Fetch data when the dropdown is opened
-                }
-              }}
-              dropdownRender={(menu) => (
-                <Spin spinning={loading}>
-                  {menu}
-                  <Divider
-                    style={{
-                      margin: "8px 0",
-                    }}
-                  />
-                  <Space
-                    style={{
-                      padding: "0 8px 4px",
-                    }}>
-                    <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
-                    <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
-                      Ekle
-                    </Button>
-                  </Space>
-                </Spin>
-              )}
-              options={options.map((item) => ({
-                value: item.TB_KOD_ID, // Use the ID as the value
-                label: item.KOD_TANIM, // Display the name in the dropdown
-              }))}
-              onChange={(value) => {
-                // Seçilen değerin ID'sini NedeniID alanına set et
-                setValue("MakineAgirlikBirimID", value);
-                field.onChange(value);
-              }}
-            />
-          )}
-        />
-        <Controller
-          name="MakineAgirlikBirimID"
-          control={control}
-          render={({ field }) => (
-            <Input
-              {...field}
-              type="text" // Set the type to "text" for name input
-              style={{ display: "none" }}
-            />
-          )}
-        />
-      </div>
+      <Text style={{ fontSize: "14px" }}>Valf Tipi:</Text>
+      <Controller
+        name="makineValfTipi"
+        control={control}
+        render={({ field }) => (
+          <Select
+            {...field}
+            key={selectKey}
+            style={{ width: "300px" }}
+            showSearch
+            allowClear
+            placeholder="Seçim Yapınız"
+            optionFilterProp="children"
+            onDropdownVisibleChange={(open) => {
+              if (open) {
+                fetchData(); // Fetch data when the dropdown is opened
+              }
+            }}
+            dropdownRender={(menu) => (
+              <Spin spinning={loading}>
+                {menu}
+                <Divider
+                  style={{
+                    margin: "8px 0",
+                  }}
+                />
+                <Space
+                  style={{
+                    padding: "0 8px 4px",
+                  }}>
+                  <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
+                  <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
+                    Ekle
+                  </Button>
+                </Space>
+              </Spin>
+            )}
+            options={options.map((item) => ({
+              value: item.TB_KOD_ID, // Use the ID as the value
+              label: item.KOD_TANIM, // Display the name in the dropdown
+            }))}
+            onChange={(value) => {
+              // Seçilen değerin ID'sini NedeniID alanına set et
+              setValue("makineValfTipiID", value);
+              field.onChange(value);
+            }}
+          />
+        )}
+      />
+      <Controller
+        name="makineValfTipiID"
+        control={control}
+        render={({ field }) => (
+          <Input
+            {...field}
+            type="text" // Set the type to "text" for name input
+            style={{ display: "none" }}
+          />
+        )}
+      />
     </div>
   );
 }
