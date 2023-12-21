@@ -16,10 +16,20 @@ export default function FifthTab() {
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
   const { control, setValue, watch, getValues, reset, handleSubmit } = useFormContext();
-  const { fields, append, remove, update } = useFieldArray({
+  const { fields, append, remove, replace, update } = useFieldArray({
     control,
     name: "IsEmriDurusList",
   });
+
+  function formatValidDate(dateString) {
+    const date = dayjs(dateString);
+    return date.isValid() ? date.format("DD-MM-YYYY") : "";
+  }
+
+  function formatValidTime(timeString) {
+    const time = dayjs(timeString, "HH:mm");
+    return time.isValid() ? time.format("HH:mm") : "";
+  }
 
   const showModalToAdd = () => {
     setEditingIndex(null);
@@ -47,10 +57,36 @@ export default function FifthTab() {
     setValue("machineDescription", record.machineDescription);
     setValue("statusLocation", record.statusLocation);
     // Assuming 'durusStartedDate', 'durusStartedTime', etc., are the correct field names
-    setValue("durusStartedDate", record.durusStartedDate);
-    setValue("durusStartedTime", record.durusStartedTime);
-    setValue("durusFinishedDate", record.durusFinishedDate);
-    setValue("durusFinishedTime", record.durusFinishedTime);
+    // setValue("durusStartedDate", record.durusStartedDate);
+    setValue(
+      "durusStartedDate",
+      record.durusStartedDate && dayjs(record.durusStartedDate, "DD-MM-YYYY").isValid()
+        ? dayjs(record.durusStartedDate, "DD-MM-YYYY").toDate() // Convert to a native JavaScript Date object
+        : null,
+      { shouldValidate: true }
+    );
+    // setValue("durusStartedTime", record.durusStartedTime);
+    setValue(
+      "durusStartedTime",
+      record.durusStartedTime && dayjs(record.durusStartedTime, "HH:mm").isValid()
+        ? dayjs(record.durusStartedTime, "HH:mm")
+        : null
+    );
+    // setValue("durusFinishedDate", record.durusFinishedDate);
+    setValue(
+      "durusFinishedDate",
+      record.durusFinishedDate && dayjs(record.durusFinishedDate, "DD-MM-YYYY").isValid()
+        ? dayjs(record.durusFinishedDate, "DD-MM-YYYY").toDate() // Convert to a native JavaScript Date object
+        : null,
+      { shouldValidate: true }
+    );
+    // setValue("durusFinishedTime", record.durusFinishedTime);
+    setValue(
+      "durusFinishedTime",
+      record.durusFinishedTime && dayjs(record.durusFinishedTime, "HH:mm").isValid()
+        ? dayjs(record.durusFinishedTime, "HH:mm")
+        : null
+    );
     setValue("durusWorkingTimeHours", record.durusWorkingTimeHours);
     setValue("durusWorkingTimeMinutes", record.durusWorkingTimeMinutes);
     setValue("downtimeCost", record.downtimeCost);
@@ -133,25 +169,33 @@ export default function FifthTab() {
       title: "Başlama Tarihi",
       dataIndex: "durusStartedDate",
       key: "durusStartedDate",
-      render: (text) => (text ? dayjs(text).format("DD-MM-YYYY") : ""),
+      render: (text) => {
+        return text || "";
+      },
     },
     {
       title: "Başlama Saati",
       dataIndex: "durusStartedTime",
       key: "durusStartedTime",
-      render: (text) => (text ? dayjs(text).format("HH:mm") : ""),
+      render: (text) => {
+        return text || "";
+      },
     },
     {
       title: "Bitiş Tarihi",
       dataIndex: "durusFinishedDate",
       key: "durusFinishedDate",
-      render: (text) => (text ? dayjs(text).format("DD-MM-YYYY") : ""),
+      render: (text) => {
+        return text || "";
+      },
     },
     {
       title: "Bitiş Saati",
       dataIndex: "durusFinishedTime",
       key: "durusFinishedTime",
-      render: (text) => (text ? dayjs(text).format("HH:mm") : ""),
+      render: (text) => {
+        return text || "";
+      },
     },
     {
       title: "Süre (Saat)",
@@ -202,10 +246,10 @@ export default function FifthTab() {
             DurusNedeni: item.MKD_NEDEN,
             DurusNedeniID: item.MKD_NEDEN_KOD_ID,
             plannedDowntime: item.MKD_PLANLI,
-            durusStartedDate: dayjs(item.MKD_BASLAMA_TARIH).format("DD-MM-YYYY"),
-            durusStartedTime: dayjs(item.MKD_BASLAMA_SAAT, "HH:mm:ss").format("HH:mm:ss"),
-            durusFinishedDate: dayjs(item.MKD_BITIS_TARIH).format("DD-MM-YYYY"),
-            durusFinishedTime: dayjs(item.MKD_BITIS_SAAT, "HH:mm:ss").format("HH:mm:ss"),
+            durusStartedDate: formatValidDate(item.MKD_BASLAMA_TARIH),
+            durusStartedTime: formatValidTime(item.MKD_BASLAMA_SAAT),
+            durusFinishedDate: formatValidDate(item.MKD_BITIS_TARIH),
+            durusFinishedTime: formatValidTime(item.MKD_BITIS_SAAT),
             durusWorkingTimeHours: item.MKD_SURE,
             durusWorkingTimeMinutes: item.MKD_SURE,
             durusTotalCost: item.MKD_TOPLAM_MALIYET,
@@ -213,7 +257,7 @@ export default function FifthTab() {
 
             // Add other fields similarly
           }));
-          append(fetchedData);
+          replace(fetchedData);
         })
         .catch((error) => console.error("Error fetching data:", error))
         .finally(() => setLoading(false));
@@ -302,15 +346,17 @@ export default function FifthTab() {
                     <Controller
                       name="durusStartedDate"
                       control={control}
-                      rules={{ required: true }} // Add validation rules as needed
-                      render={({ field }) => (
+                      render={({ field: { onChange, value, ...restField } }) => (
                         <DatePicker
-                          {...field}
+                          {...restField}
                           style={{ width: "100%" }}
                           format="DD-MM-YYYY"
+                          placeholder="Tarih seçiniz"
+                          value={value ? dayjs(value) : null} // Convert to dayjs object or null
                           onChange={(date) => {
-                            field.onChange(date);
-                            calculateTimeDifference();
+                            const newValue = date ? date.toDate() : null; // Convert to Date object or null
+                            onChange(newValue); // Update the form state
+                            calculateTimeDifference(); // Call your function here
                           }}
                         />
                       )}
@@ -318,13 +364,13 @@ export default function FifthTab() {
                     <Controller
                       name="durusStartedTime"
                       control={control}
-                      rules={{ required: true }} // Add validation rules as needed
                       render={({ field }) => (
                         <TimePicker
                           {...field}
                           format="HH:mm"
-                          onChange={(time) => {
-                            field.onChange(time);
+                          placeholder="saat seçiniz"
+                          onChange={(date, dateString) => {
+                            field.onChange(date);
                             calculateTimeDifference();
                           }}
                         />
@@ -338,15 +384,17 @@ export default function FifthTab() {
                     <Controller
                       name="durusFinishedDate"
                       control={control}
-                      render={({ field }) => (
+                      render={({ field: { onChange, value, ...restField } }) => (
                         <DatePicker
-                          {...field}
-                          style={{ width: "168px" }}
-                          placeholder="Tarih seçiniz"
+                          {...restField}
+                          style={{ width: "100%" }}
                           format="DD-MM-YYYY"
-                          onChange={(date, dateString) => {
-                            field.onChange(date);
-                            calculateTimeDifference();
+                          placeholder="Tarih seçiniz"
+                          value={value ? dayjs(value) : null} // Convert to dayjs object or null
+                          onChange={(date) => {
+                            const newValue = date ? date.toDate() : null; // Convert to Date object or null
+                            onChange(newValue); // Update the form state
+                            calculateTimeDifference(); // Call your function here
                           }}
                         />
                       )}

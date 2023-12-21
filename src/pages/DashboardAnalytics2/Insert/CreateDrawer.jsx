@@ -314,7 +314,7 @@ export default function CreateDrawer({ onRefresh }) {
         IDO_REF_ID: -1,
       })),
 
-      IsEmriKontrolListesi: data.IsEmriKontrolList.map((item) => ({
+      IsEmriKontrolList: data.IsEmriKontrolList.map((item) => ({
         DKN_SIRANO: item.sequence,
         DKN_YAPILDI: item.done,
         DKN_TANIM: item.type,
@@ -338,12 +338,12 @@ export default function CreateDrawer({ onRefresh }) {
         IDM_STOK_ID: item.key,
         IDM_DEPO_ID: item.warehouseId,
         IDM_BIRIM_KOD_ID: item.STK_BIRIM_KOD_ID,
-        IDM_STOK_TIP_KOD_ID: "37",
-        IDM_STOK_DUS: false,
+        IDM_STOK_TIP_KOD_ID: item.materialType,
+        IDM_STOK_DUS: item.stockMaterialCheckbox,
         IDM_STOK_TANIM: item.subject,
         IDM_BIRIM_FIYAT: item.unitPrice,
-        IDM_MIKTAR: "5",
-        IDM_TUTAR: "10",
+        IDM_MIKTAR: item.workingtime,
+        IDM_TUTAR: item.cost,
         IDM_OLUSTURAN_ID: "24",
         IDM_REF_ID: "-1",
         IDM_STOK_KULLANIM_SEKLI: "0",

@@ -42,7 +42,7 @@ export default function PersonnelDefinitions() {
   const [isDisabled, setIsDisabled] = useState(true); // State to manage the disabled state of the fields
   const [selectOptions, setSelectOptions] = useState([]);
 
-  const { fields, append, remove, update } = useFieldArray({
+  const { fields, append, replace, remove, update } = useFieldArray({
     control,
     name: "IsEmriPersonelList",
   });
@@ -403,7 +403,7 @@ export default function PersonnelDefinitions() {
             customdescription: item.IDK_ACIKLAMA,
             // Add other fields similarly
           }));
-          append(fetchedData);
+          replace(fetchedData);
         })
         .catch((error) => console.error("Error fetching data:", error))
         .finally(() => setLoading(false));
