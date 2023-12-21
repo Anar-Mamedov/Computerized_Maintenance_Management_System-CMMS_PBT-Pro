@@ -7,8 +7,6 @@ const { Text } = Typography;
 
 export default function Location() {
   const { control, setValue, watch } = useFormContext();
-  // api call
-
   const [treeData, setTreeData] = useState([]);
   const [selectedValue, setSelectedValue] = useState(undefined); // Track selected value
   const [isLoading, setIsLoading] = useState(false);

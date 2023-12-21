@@ -10,6 +10,7 @@ import ServisSekli from "./ServisSekli";
 import TeknikSeviyesi from "./TeknikSeviyesi";
 import FizikselDurumu from "./FizikselDurumu";
 import MakineOncelikTablo from "./MakineOncelikTablo";
+import IsletimSistemi from "./IsletimSistemi";
 
 const { Text, Link } = Typography;
 
@@ -243,13 +244,16 @@ export default function DetayBilgi() {
             justifyContent: "space-between",
             width: "100%",
           }}>
-          <Text style={{ fontSize: "14px" }}>Seri No #:</Text>
+          <Text style={{ fontSize: "14px" }}>Kurulum Tarihi:</Text>
           <Controller
-            name="makineSeriNO"
+            name="makineKurulumTarihi"
             control={control}
-            render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
+            render={({ field }) => (
+              <DatePicker {...field} style={{ width: "200px" }} format="DD-MM-YYYY" placeholder="Tarih seçiniz" />
+            )}
           />
         </div>
+        <IsletimSistemi />
         <div
           style={{
             display: "flex",
@@ -368,23 +372,7 @@ export default function DetayBilgi() {
             render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
           />
         </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Garanti Bitiş Tarihi:</Text>
-          <Controller
-            name="makineGarantiBitisTarihi"
-            control={control}
-            render={({ field }) => (
-              <DatePicker {...field} style={{ width: "200px" }} format="DD-MM-YYYY" placeholder="Tarih seçiniz" />
-            )}
-          />
-        </div>
+
         <div
           style={{
             display: "flex",
