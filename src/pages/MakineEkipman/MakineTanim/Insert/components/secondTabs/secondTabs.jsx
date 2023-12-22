@@ -5,7 +5,7 @@ import FinancialDetailsTable from "./components/FinancialDetailsTable";
 import RequisiteTable from "./components/RequisiteTable";
 import DetailsTable from "./components/DetailsTable";
 import DeliveryTable from "./components/DeliveryTable";
-import CustomFields from "./components/CustomFields";
+import CustomFields from "./components/OzelAlanlar/CustomFields";
 import Notes from "./components/Notes";
 import ThirdTab from "../../components/secondTabs/components/ThirdTab/ThirdTab";
 import FifthTab from "./components/FifthTab/FifthTab";
@@ -71,6 +71,7 @@ export default function SecondTabs() {
       <StyledTabs
         style={{
           maxWidth: "100%",
+          marginBottom:"40px"
         }}>
         <TabPane tab="Detay Bilgiler" key="1">
           <div

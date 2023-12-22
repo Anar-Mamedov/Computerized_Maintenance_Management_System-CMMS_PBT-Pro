@@ -93,7 +93,6 @@ export default function Contract() {
         <div
           style={{
             lineHeight: "20px",
-            lineHeight: "20px",
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
