@@ -17,6 +17,11 @@ import Kapasite from "./MakineKapasite";
 import ElektrikTuketim from "./ElektrikTuketim";
 import ValfTipi from "./ValfTipi";
 import ValfBoyutu from "./ValfBoyutu";
+import GirisBoyutu from "./GirisBoyutu.jsx";
+import CikisBoyutu from "./CikisBoyutu.jsx";
+import Konnektor from "./Konnektor.jsx";
+import MakineBasinc from "./MakineBasinc.jsx";
+import BasincMiktar from "./BasincMiktar.jsx";
 
 const { Text, Link } = Typography;
 
@@ -47,7 +52,6 @@ export default function DetayBilgi() {
         display: "flex",
         flexWrap: "wrap",
         columnGap: "10px",
-        marginBottom: "40px",
       }}>
       <div
         style={{
@@ -333,6 +337,56 @@ export default function DetayBilgi() {
         }}>
         <ValfTipi />
         <ValfBoyutu />
+        <GirisBoyutu />
+        <CikisBoyutu />
+        <Konnektor />
+        <MakineBasinc />
+        <BasincMiktar />
+        <div
+          style={{
+          display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Devir Sayısı:</Text>
+          <Controller
+            name="makineDevirSayisi"
+            control={control}
+            render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
+          />
+        </div>
+        <div
+          style={{
+          display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Motor Gücü (bg):</Text>
+          <Controller
+            name="makineMotorGucu"
+            control={control}
+            render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
+          />
+        </div>
+        <div
+          style={{
+          display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Silindir Sayısı:</Text>
+          <Controller
+            name="makineSilindirSayisi"
+            control={control}
+            render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
+          />
+        </div>
       </div>
     </div>
   );

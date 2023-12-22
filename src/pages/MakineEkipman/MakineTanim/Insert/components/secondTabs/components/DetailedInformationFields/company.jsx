@@ -102,7 +102,6 @@ export default function Company({ companySelectedId, companyCurrentValue, onSubm
         <div
           style={{
             lineHeight: "20px",
-            lineHeight: "20px",
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
