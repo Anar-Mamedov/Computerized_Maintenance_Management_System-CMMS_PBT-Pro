@@ -115,7 +115,32 @@ export default function FourthTab() {
               justifyContent: "space-between",
               width: "100%",
             }}>
-            <Text style={{ fontSize: "14px" }}>Yakıt Depo Hacmi:</Text>
+            <Text style={{ fontSize: "14px" }}>Kira Tutarı:</Text>
+            <Controller
+              name="ozelAlan_16"
+              control={control}
+              render={({ field: { onChange, ...restField } }) => (
+                <Input
+                  {...restField}
+                  style={{ width: "300px" }}
+                  onChange={(e) => {
+                    // Allow only numeric input
+                    const numericValue = e.target.value.replace(/[^0-9]/g, "");
+                    onChange(numericValue);
+                  }}
+                />
+              )}
+            />
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+            }}>
+            <Text style={{ fontSize: "14px" }}>Açıklama:</Text>
             <Controller
               name="YakitDepoHacmi"
               control={control}
