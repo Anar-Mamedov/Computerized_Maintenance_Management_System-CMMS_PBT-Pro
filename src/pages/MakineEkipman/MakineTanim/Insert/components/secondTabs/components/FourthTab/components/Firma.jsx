@@ -8,7 +8,6 @@ export default function Firma({ workshopSelectedId, onSubmit }) {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
-
   // tablodaki search kısmı için
   const [searchValue, setSearchValue] = useState("");
   // 1. Add a state variable for searchTimeout
@@ -142,16 +141,20 @@ export default function Firma({ workshopSelectedId, onSubmit }) {
 
   const handleModalToggle = () => {
     setIsModalVisible((prev) => !prev);
+    // Bu fonksiyon sadece modalın açılıp kapatılmasını kontrol eder.
+  };
+
+  useEffect(() => {
     if (isModalVisible) {
-      // Modal kapatıldığında çalışacak kodlar
+      // Modal açıldığında çalışacak kodlar
+      fetch(); // Verileri yeniden yükle
+    } else {
+      // Modal kapandığında çalışacak kodlar
       setSearchValue(""); // Arama değerini sıfırla
       setCurrentPage(1); // Sayfa numarasını başlangıç değerine sıfırla
       setSelectedRowKeys([]); // Seçili satır anahtarlarını sıfırla
-    } else {
-      // Modal açıldığında çalışacak kodlar
-      fetch(); // Verileri yeniden yükle
     }
-  };
+  }, [isModalVisible]); // isModalVisible değiştiğinde useEffect tetiklenir
 
   const handleModalOk = () => {
     const selectedData = data.find((item) => item.key === selectedRowKeys[0]);
@@ -199,7 +202,7 @@ export default function Firma({ workshopSelectedId, onSubmit }) {
       <Modal
         width="1200px"
         centered
-        title="Atölye Tanımları"
+        title="Firma Tanımları"
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}>
