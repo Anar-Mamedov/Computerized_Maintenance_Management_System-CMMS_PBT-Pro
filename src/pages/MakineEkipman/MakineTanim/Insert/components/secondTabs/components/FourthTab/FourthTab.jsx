@@ -1,9 +1,10 @@
 import React from "react";
-import { Button, Checkbox, Input, Typography } from "antd";
+import { Button, Checkbox, DatePicker, Input, Typography } from "antd";
 import { useFormContext, Controller, useFieldArray } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../api/http";
 import YakitTipi from "../TenthTab/components/YakitTipi";
 import Firma from "./components/Firma";
+import KiraSuresi from "./components/KiraSuresi";
 
 const { Text, Link } = Typography;
 
@@ -115,13 +116,61 @@ export default function FourthTab() {
               justifyContent: "space-between",
               width: "100%",
             }}>
+            <Text style={{ fontSize: "14px" }}>Baş. Tarihi:</Text>
+            <Controller
+              name="makineKiraBaslangicTarihi"
+              control={control}
+              render={({ field }) => (
+                <DatePicker
+                  {...field}
+                  disabled={!makineKiralik}
+                  style={{ width: "300px" }}
+                  format="DD-MM-YYYY"
+                  placeholder="Tarih seçiniz"
+                />
+              )}
+            />
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+            }}>
+            <Text style={{ fontSize: "14px" }}>Bitiş Tarihi:</Text>
+            <Controller
+              name="makineKiraBitisTarihi"
+              control={control}
+              render={({ field }) => (
+                <DatePicker
+                  {...field}
+                  disabled={!makineKiralik}
+                  style={{ width: "300px" }}
+                  format="DD-MM-YYYY"
+                  placeholder="Tarih seçiniz"
+                />
+              )}
+            />
+          </div>
+          <KiraSuresi />
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+            }}>
             <Text style={{ fontSize: "14px" }}>Kira Tutarı:</Text>
             <Controller
-              name="ozelAlan_16"
+              name="kiraTutari"
               control={control}
               render={({ field: { onChange, ...restField } }) => (
                 <Input
                   {...restField}
+                  disabled={!makineKiralik}
                   style={{ width: "300px" }}
                   onChange={(e) => {
                     // Allow only numeric input
@@ -142,7 +191,7 @@ export default function FourthTab() {
             }}>
             <Text style={{ fontSize: "14px" }}>Açıklama:</Text>
             <Controller
-              name="YakitDepoHacmi"
+              name="kiraAciklama"
               control={control}
               render={({ field }) => <Input {...field} disabled={!makineKiralik} style={{ width: "300px" }} />}
             />
