@@ -1,5 +1,6 @@
-import { Space, Tabs } from "antd";
-import React, { useEffect } from "react";
+import { Checkbox, Space, Tabs } from "antd";
+import React, { useEffect, useState } from "react";
+import { useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import FinancialDetailsTable from "./components/FinancialDetailsTable";
 import RequisiteTable from "./components/RequisiteTable";
@@ -58,6 +59,9 @@ const { TabPane } = Tabs;
 // Tab end
 
 export default function SecondTabs() {
+  const { watch } = useFormContext();
+  const showYakitTab = watch("makineYakitKullanim");
+
   return (
     <Space
       style={{
@@ -71,7 +75,7 @@ export default function SecondTabs() {
       <StyledTabs
         style={{
           maxWidth: "100%",
-          marginBottom:"40px"
+          marginBottom: "40px",
         }}>
         <TabPane tab="Detay Bilgiler" key="1">
           <div
@@ -161,16 +165,18 @@ export default function SecondTabs() {
             <NinthTab />
           </div>
         </TabPane>
-        <TabPane tab="Araç & Gereçler" key="10">
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
-            <TenthTab />
-          </div>
-        </TabPane>
+        {showYakitTab && (
+          <TabPane tab="Yakıt Bilgileri" key="10">
+            <div
+              style={{
+                // display: "flex",
+                // flexFlow: "row wrap",
+                gap: "15px",
+              }}>
+              <TenthTab />
+            </div>
+          </TabPane>
+        )}
         <TabPane tab="Özel Alanlar" key="11">
           <div
             style={{
