@@ -107,7 +107,7 @@ export default function SecondTabs() {
             <ThirdTab />
           </div>
         </TabPane>
-        <TabPane tab="Malzemeler" key="4">
+        <TabPane tab="Finansal Bilgiler" key="4">
           <div
             style={{
               // display: "flex",
