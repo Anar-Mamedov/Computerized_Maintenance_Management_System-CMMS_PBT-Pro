@@ -199,112 +199,105 @@ export default function FourthTab() {
         </div>
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          border: "1px solid #80808068",
-          width: "430px",
-          padding: "5px",
-          justifyContent: "center",
-          gap: "5px",
-          alignContent: "flex-start",
-          height: "fit-content",
-        }}>
+      <div>
         <div
           style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
+            width: "fit-content",
+            position: "relative",
+            marginBottom: "-11px",
+            marginLeft: "10px",
+            backgroundColor: "white",
+            zIndex: "1",
           }}>
-          <Text style={{ fontSize: "14px" }}>Öngörülen (min):</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-              alignItems: "center",
-              width: "300px",
-            }}>
-            <Controller
-              name="ongorulenMin"
-              control={control}
-              render={({ field: { onChange, ...restField } }) => (
-                <Input
-                  {...restField}
-                  style={{ width: "255px" }}
-                  onChange={(e) => {
-                    // Allow only numeric input
-                    const numericValue = e.target.value.replace(/[^0-9]/g, "");
-                    onChange(numericValue);
-                  }}
-                />
-              )}
-            />
-            <Text style={{ fontSize: "14px" }}>lt/100</Text>
-          </div>
+          <Controller
+            name="makineSatıldı"
+            control={control}
+            defaultValue={false} // or true if you want it checked by default
+            render={({ field }) => (
+              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                Satıldı
+              </Checkbox>
+            )}
+          />
         </div>
+
         <div
           style={{
             display: "flex",
             flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
+            border: "1px solid #80808068",
+            width: "430px",
+            padding: "15px 5px 5px 5px",
+            justifyContent: "center",
+            gap: "5px",
+            alignContent: "flex-start",
+            height: "fit-content",
           }}>
-          <Text style={{ fontSize: "14px" }}>Öngörülen (max):</Text>
           <div
             style={{
               display: "flex",
               flexWrap: "wrap",
-              justifyContent: "space-between",
               alignItems: "center",
-              width: "300px",
+              justifyContent: "space-between",
+              width: "100%",
             }}>
+            <Text style={{ fontSize: "14px" }}>Satış Nedeni:</Text>
+
             <Controller
-              name="ongorulenMax"
+              name="makineSatisNedeni"
               control={control}
-              render={({ field: { onChange, ...restField } }) => (
-                <Input
-                  {...restField}
-                  style={{ width: "255px" }}
-                  onChange={(e) => {
-                    // Allow only numeric input
-                    const numericValue = e.target.value.replace(/[^0-9]/g, "");
-                    onChange(numericValue);
-                  }}
-                />
-              )}
+              render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
             />
-            <Text style={{ fontSize: "14px" }}>lt/1</Text>
           </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Gerçekleşen:</Text>
           <div
             style={{
               display: "flex",
               flexWrap: "wrap",
-              justifyContent: "space-between",
               alignItems: "center",
-              width: "300px",
+              justifyContent: "space-between",
+              width: "100%",
             }}>
+            <Text style={{ fontSize: "14px" }}>Satış Tarihi:</Text>
             <Controller
-              name="gerceklesen"
+              name="makineSatisTarihi"
+              control={control}
+              render={({ field }) => (
+                <DatePicker {...field} style={{ width: "300px" }} format="DD-MM-YYYY" placeholder="Tarih seçiniz" />
+              )}
+            />
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+            }}>
+            <Text style={{ fontSize: "14px" }}>Satış Yeri:</Text>
+
+            <Controller
+              name="makineSatisYeri"
+              control={control}
+              render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
+            />
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+            }}>
+            <Text style={{ fontSize: "14px" }}>Satış Tutarı:</Text>
+            <Controller
+              name="satisTutari"
               control={control}
               render={({ field: { onChange, ...restField } }) => (
                 <Input
                   {...restField}
-                  style={{ width: "255px" }}
+                  style={{ width: "300px" }}
                   onChange={(e) => {
                     // Allow only numeric input
                     const numericValue = e.target.value.replace(/[^0-9]/g, "");
@@ -313,7 +306,22 @@ export default function FourthTab() {
                 />
               )}
             />
-            <Text style={{ fontSize: "14px" }}>lt/1</Text>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+            }}>
+            <Text style={{ fontSize: "14px" }}>Açıklama:</Text>
+
+            <Controller
+              name="makineSatisAciklama"
+              control={control}
+              render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
+            />
           </div>
         </div>
       </div>
