@@ -1,6 +1,7 @@
 import React from "react";
 import { Tabs } from "antd";
 import SatinalmaKrediBilgileri from "./SatinalmaKrediBilgileri";
+import AmortismanBilgileri from "./AmortismanBilgileri";
 
 const items = [
   {
@@ -11,7 +12,7 @@ const items = [
   {
     key: "2",
     label: "Amortisman Bilgileri",
-    children: "Content of Tab Pane 2",
+    children: <AmortismanBilgileri />,
   },
 ];
 
