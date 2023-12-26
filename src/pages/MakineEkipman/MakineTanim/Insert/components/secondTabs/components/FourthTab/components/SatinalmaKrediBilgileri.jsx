@@ -130,7 +130,7 @@ export default function SatinalmaKrediBilgileri() {
               />
             </div>
           </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", width: "230px", alignContent: "flex-start" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", width: "250px", alignContent: "flex-start" }}>
             <div
               style={{
                 display: "flex",
@@ -142,6 +142,38 @@ export default function SatinalmaKrediBilgileri() {
               <Text style={{ fontSize: "14px" }}>Fatura No:</Text>
               <Controller
                 name="satinalmaFaturaNo"
+                control={control}
+                render={({ field }) => <Input {...field} style={{ width: "150px" }} />}
+              />
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+              }}>
+              <Text style={{ fontSize: "14px" }}>Fatura Tarihi:</Text>
+              <Controller
+                name="makineSatinalmaFaturaTarihi"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker {...field} style={{ width: "150px" }} format="DD-MM-YYYY" placeholder="Tarih seçiniz" />
+                )}
+              />
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+              }}>
+              <Text style={{ fontSize: "14px" }}>Fatura Tutarı:</Text>
+              <Controller
+                name="satinalmaFaturaTutar"
                 control={control}
                 render={({ field: { onChange, ...restField } }) => (
                   <Input
@@ -177,13 +209,99 @@ export default function SatinalmaKrediBilgileri() {
             display: "flex",
             flexWrap: "wrap",
             border: "1px solid #80808068",
-            width: "430px",
             padding: "15px 5px 5px 5px",
-            gap: "5px",
+            gap: "15px",
             alignContent: "flex-start",
             height: "fit-content",
           }}>
-          yusuf
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", width: "360px", alignContent: "flex-start" }}>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+              }}>
+              <Text style={{ fontSize: "14px" }}>Kredi Miktarı:</Text>
+              <Controller
+                name="makineKrediKrediMiktari"
+                control={control}
+                render={({ field: { onChange, ...restField } }) => (
+                  <Input
+                    {...restField}
+                    style={{ width: "200px" }}
+                    onChange={(e) => {
+                      // Allow only numeric input
+                      const numericValue = e.target.value.replace(/[^0-9]/g, "");
+                      onChange(numericValue);
+                    }}
+                  />
+                )}
+              />
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+              }}>
+              <Text style={{ fontSize: "14px" }}>Kredi Oranı (% Ay):</Text>
+              <Controller
+                name="makineKrediKrediOrani"
+                control={control}
+                render={({ field: { onChange, ...restField } }) => (
+                  <Input
+                    {...restField}
+                    style={{ width: "200px" }}
+                    onChange={(e) => {
+                      // Allow only numeric input
+                      const numericValue = e.target.value.replace(/[^0-9]/g, "");
+                      onChange(numericValue);
+                    }}
+                  />
+                )}
+              />
+            </div>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", width: "260px", alignContent: "flex-start" }}>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+              }}>
+              <Text style={{ fontSize: "14px" }}>Başlama Tarihi:</Text>
+              <Controller
+                name="makineKrediBaslamaTarihi"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker {...field} style={{ width: "150px" }} format="DD-MM-YYYY" placeholder="Tarih seçiniz" />
+                )}
+              />
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+              }}>
+              <Text style={{ fontSize: "14px" }}>Bitiş Tarihi:</Text>
+              <Controller
+                name="makineKrediBitisTarihi"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker {...field} style={{ width: "150px" }} format="DD-MM-YYYY" placeholder="Tarih seçiniz" />
+                )}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
