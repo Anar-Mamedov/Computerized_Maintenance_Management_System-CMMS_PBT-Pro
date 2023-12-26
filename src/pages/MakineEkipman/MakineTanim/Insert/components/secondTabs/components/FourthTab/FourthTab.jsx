@@ -246,16 +246,23 @@ export default function FourthTab() {
             <Controller
               name="makineSatisNedeni"
               control={control}
-              render={({ field: { onChange, ...restField } }) => (
-                <Input
-                  {...restField}
-                  style={{ width: "300px" }}
-                  onChange={(e) => {
-                    // Allow only numeric input
-                    const numericValue = e.target.value.replace(/[^0-9]/g, "");
-                    onChange(numericValue);
-                  }}
-                />
+              render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
+            />
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+            }}>
+            <Text style={{ fontSize: "14px" }}>Satış Tarihi:</Text>
+            <Controller
+              name="makineSatisTarihi"
+              control={control}
+              render={({ field }) => (
+                <DatePicker {...field} style={{ width: "300px" }} format="DD-MM-YYYY" placeholder="Tarih seçiniz" />
               )}
             />
           </div>
@@ -272,17 +279,7 @@ export default function FourthTab() {
             <Controller
               name="makineSatisYeri"
               control={control}
-              render={({ field: { onChange, ...restField } }) => (
-                <Input
-                  {...restField}
-                  style={{ width: "300px" }}
-                  onChange={(e) => {
-                    // Allow only numeric input
-                    const numericValue = e.target.value.replace(/[^0-9]/g, "");
-                    onChange(numericValue);
-                  }}
-                />
-              )}
+              render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
             />
           </div>
           <div
@@ -308,6 +305,22 @@ export default function FourthTab() {
                   }}
                 />
               )}
+            />
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+            }}>
+            <Text style={{ fontSize: "14px" }}>Açıklama:</Text>
+
+            <Controller
+              name="makineSatisAciklama"
+              control={control}
+              render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
             />
           </div>
         </div>
