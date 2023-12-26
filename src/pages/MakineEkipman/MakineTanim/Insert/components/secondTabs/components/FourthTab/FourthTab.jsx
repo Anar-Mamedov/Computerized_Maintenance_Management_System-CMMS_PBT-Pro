@@ -2,7 +2,6 @@ import React from "react";
 import { Button, Checkbox, DatePicker, Input, Typography } from "antd";
 import { useFormContext, Controller, useFieldArray } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../api/http";
-import YakitTipi from "../TenthTab/components/YakitTipi";
 import Firma from "./components/Firma";
 import KiraSuresi from "./components/KiraSuresi";
 import SatinalmaSekme from "./components/SatinalmaSekme";
