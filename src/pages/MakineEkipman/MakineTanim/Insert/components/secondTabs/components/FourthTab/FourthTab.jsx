@@ -5,6 +5,7 @@ import AxiosInstance from "../../../../../../../../api/http";
 import YakitTipi from "../TenthTab/components/YakitTipi";
 import Firma from "./components/Firma";
 import KiraSuresi from "./components/KiraSuresi";
+import SatinalmaSekme from "./components/SatinalmaSekme";
 
 const { Text, Link } = Typography;
 
@@ -26,6 +27,9 @@ export default function FourthTab() {
         columnGap: "10px",
         marginBottom: "20px",
       }}>
+      <div style={{ display: "flex", flexWrap: "wrap" }}>
+        <SatinalmaSekme />
+      </div>
       <div>
         <div
           style={{

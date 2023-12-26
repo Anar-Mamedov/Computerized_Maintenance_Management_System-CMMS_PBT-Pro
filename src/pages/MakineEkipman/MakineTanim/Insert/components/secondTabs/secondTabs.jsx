@@ -16,21 +16,22 @@ import TenthTab from "./components/TenthTab/TenthTab";
 
 //styled components
 const StyledTabs = styled(Tabs)`
-  //border-radius: 20px;
+  ${"" /* border-radius: 20px; */}
   .ant-tabs-nav-list {
-    border-top-right-radius: 10px;
+    ${"" /* border-top-right-radius: 10px; */}
     background-color: rgba(230, 230, 230, 0.3);
     overflow: hidden;
   }
   .ant-tabs-tab {
     /* background-color: rgba(230, 230, 230, 0.3); */
     margin: 0 !important;
-    width: 133px;
+    width: fit-content;
+    padding: 10px 15px;
     justify-content: center;
   }
 
   .ant-tabs-nav-wrap {
-    border-radius: 10px 10px 0 0;
+    ${"" /* border-radius: 10px 10px 0 0; */}
   }
 
   .ant-tabs-tab-active {
