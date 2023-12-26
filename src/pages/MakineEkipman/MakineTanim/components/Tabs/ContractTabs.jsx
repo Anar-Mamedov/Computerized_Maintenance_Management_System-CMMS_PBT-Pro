@@ -19,7 +19,8 @@ const StyledTabs = styled(Tabs)`
   .ant-tabs-tab {
     /* background-color: rgba(230, 230, 230, 0.3); */
     margin: 0 !important;
-    width: 133px;
+    width: fit-content;
+    padding: 10px 15px;
     justify-content: center;
   }
 
