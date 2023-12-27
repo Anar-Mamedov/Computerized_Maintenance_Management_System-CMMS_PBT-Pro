@@ -9,6 +9,7 @@ import ModelSelect from "./components/ModelSelect";
 import MakineDurum from "./components/MakineDurum";
 import MasterMakineTablo from "./components/MasterMakineTablo";
 import MakineTakvimTablo from "./components/MakineTakvimTablo";
+import OperatorSelect from "./components/OperatorSelect";
 
 const { Text, Link } = Typography;
 
@@ -80,6 +81,7 @@ export default function MainTabs() {
         <Kategori />
         <MarkaSelect />
         <ModelSelect />
+        <OperatorSelect />
       </div>
       <div
         style={{
