@@ -1,4 +1,4 @@
-import { Col, Input, Spin, TreeSelect, Typography } from "antd";
+import { Input, Spin, TreeSelect, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../api/http";
@@ -6,44 +6,36 @@ import AxiosInstance from "../../../../../../../api/http";
 const { Text } = Typography;
 
 export default function Location() {
-  const { control, setValue, watch } = useFormContext();
+  const { control, setValue } = useFormContext();
   const [treeData, setTreeData] = useState([]);
-  const [selectedValue, setSelectedValue] = useState(undefined); // Track selected value
   const [isLoading, setIsLoading] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Track dropdown state
-  const [selectedYol, setSelectedYol] = useState(""); // Input value for LOK_TUM_YOL
-  const [lastSelectedForInput, setLastSelectedForInput] = useState();
-  const [lastSelectedForTreeSelect, setLastSelectedForTreeSelect] = useState();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // API'den gelen verileri TreeSelect için uygun formata dönüştüren fonksiyon
+  const constructTree = (locations, parentId = 0) => {
+    const tree = [];
+    locations.forEach((location) => {
+      if (location.LOK_ANA_LOKASYON_ID === parentId) {
+        const children = constructTree(locations, location.TB_LOKASYON_ID);
+        const node = {
+          value: location.TB_LOKASYON_ID,
+          title: location.LOK_TANIM,
+          yol: location.LOK_TUM_YOL, // Add yol property
+        };
+        if (children.length > 0) {
+          node.children = children;
+        }
+        tree.push(node);
+      }
+    });
+    return tree;
+  };
 
   const fetchData = () => {
     setIsLoading(true);
     AxiosInstance.get("Lokasyon?ID=30")
       .then((response) => {
-        // Convert API response to treeData format
-        const data = response; // Access the data property of the response
-
-        const constructTree = (locations, parentId = 0) => {
-          const tree = [];
-          locations.forEach((location) => {
-            if (location.LOK_ANA_LOKASYON_ID === parentId) {
-              const children = constructTree(locations, location.TB_LOKASYON_ID);
-              const node = {
-                value: location.TB_LOKASYON_ID,
-                title: location.LOK_TANIM,
-                yol: location.LOK_TUM_YOL, // Add yol property
-              };
-              if (children.length > 0) {
-                node.children = children;
-              }
-              tree.push(node);
-            }
-          });
-          return tree;
-        };
-
-        const tree = constructTree(data);
-
-        setTreeData(tree);
+        setTreeData(constructTree(response)); // API'den gelen veriyi işle
         setIsLoading(false);
       })
       .catch((error) => {
@@ -53,68 +45,14 @@ export default function Location() {
   };
 
   useEffect(() => {
-    // Fetch data when the dropdown is opened
     if (isDropdownOpen) {
       fetchData();
     }
   }, [isDropdownOpen]);
 
-  // Handle TreeSelect value change
-  const handleTreeSelectChange = (newValue) => {
-    if (newValue === null || newValue === undefined) {
-      // Reset the location values
-      setSelectedValue(null);
-      setSelectedYol("");
-
-      // Reset the lastSelected values when allowClear is triggered
-      setLastSelectedForTreeSelect(null);
-      setLastSelectedForInput("");
-      return;
-    }
-    setSelectedValue(newValue); // Update selectedValue
-    // Find the selected yol (LOK_TUM_YOL) based on the newValue in treeData
-    const selectedNode = findNodeByValue(treeData, newValue);
-    if (selectedNode) {
-      setSelectedYol(selectedNode.yol || ""); // Update selectedYol with LOK_TUM_YOL
-    } else {
-      setSelectedYol("");
-    }
+  const handleTreeSelectChange = (value) => {
+    setValue("location", value); // TreeSelect'ten gelen değeri doğrudan set et
   };
-
-  // Helper function to find a node by its value
-  const findNodeByValue = (nodes, targetValue) => {
-    for (const node of nodes) {
-      if (node.value === targetValue) {
-        return node;
-      }
-      if (node.children) {
-        const foundInChildren = findNodeByValue(node.children, targetValue);
-        if (foundInChildren) {
-          return foundInChildren;
-        }
-      }
-    }
-    return null;
-  };
-
-  // api call end
-
-  useEffect(() => {
-    // For the Input:
-    if (selectedYol) {
-      setLastSelectedForInput(selectedYol);
-    }
-
-    // For the TreeSelect:
-    if (selectedValue) {
-      setLastSelectedForTreeSelect(selectedValue);
-    }
-  }, [selectedYol, selectedValue]);
-
-  useEffect(() => {
-    // Set the value of the field managed by TreeSelect when lastSelectedForTreeSelect changes
-    setValue("location", lastSelectedForTreeSelect);
-  }, [lastSelectedForTreeSelect, setValue]);
 
   return (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
@@ -125,7 +63,6 @@ export default function Location() {
         render={({ field }) => (
           <TreeSelect
             {...field}
-            value={lastSelectedForTreeSelect} // Bu satırı ekle
             style={{ width: "300px" }}
             onChange={(value) => {
               setValue("locationID", value);

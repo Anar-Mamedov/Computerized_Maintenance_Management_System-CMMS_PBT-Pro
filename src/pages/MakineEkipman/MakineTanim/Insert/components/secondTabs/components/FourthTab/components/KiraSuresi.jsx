@@ -119,6 +119,9 @@ export default function KiraSuresi() {
               allowClear
               placeholder="Seçim Yapınız"
               optionFilterProp="children"
+              filterOption={(input, option) =>
+                option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
+              }
               onDropdownVisibleChange={(open) => {
                 if (open) {
                   fetchData(); // Fetch data when the dropdown is opened

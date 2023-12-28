@@ -243,7 +243,7 @@ export default function CreateDrawer({ onRefresh }) {
       // :data.makineTakvimTanimi,
       MKN_TAKVIM_ID: data.makineTakvimID,
       MKN_URETICI: data.uretici,
-      MKN_URETIM_YILI: formatDateWithDayjs(data.uretimYili),
+      MKN_URETIM_YILI: data.uretimYili,
       MKN_GARANTI_BITIS: formatDateWithDayjs(data.makineGarantiBitisTarihi),
       MKN_DURUS_MALIYET: data.makineDurusBirimMaliyeti,
       MKN_YILLIK_PLANLANAN_CALISMA_SURESI: data.makinePlanCalismaSuresi,
@@ -393,7 +393,7 @@ export default function CreateDrawer({ onRefresh }) {
     AxiosInstance.post("AddMakine?ID=24", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
-        console.log("Data sent successfully:", response.data);
+        console.log("Data sent successfully:", response);
         setOpen(false);
         onRefresh();
         reset();
