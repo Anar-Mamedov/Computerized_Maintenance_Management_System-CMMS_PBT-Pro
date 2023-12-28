@@ -88,7 +88,7 @@ export default function SecondTabs() {
           maxWidth: "100%",
           marginBottom: "40px",
         }}>
-        <TabPane tab="Analiz" key="1" disabled>
+        {/* <TabPane tab="Analiz" key="1" disabled>
           <div
             style={{
               // display: "flex",
@@ -97,8 +97,8 @@ export default function SecondTabs() {
             }}>
             <FinancialDetailsTable />
           </div>
-        </TabPane>
-        <TabPane tab="Ekipman Ağacı" key="2" disabled>
+        </TabPane> */}
+        {/* <TabPane tab="Ekipman Ağacı" key="2" disabled>
           <div
             style={{
               // display: "flex",
@@ -107,7 +107,7 @@ export default function SecondTabs() {
             }}>
             <RequisiteTable />
           </div>
-        </TabPane>
+        </TabPane> */}
         <TabPane tab="Detay Bilgi" key="3">
           <div
             style={{
@@ -128,7 +128,7 @@ export default function SecondTabs() {
             <FourthTab />
           </div>
         </TabPane>
-        <TabPane tab="Sayaçlar" key="5" disabled>
+        {/* <TabPane tab="Sayaçlar" key="5" disabled>
           <div
             style={{
               // display: "flex",
@@ -137,8 +137,8 @@ export default function SecondTabs() {
             }}>
             <FifthTab />
           </div>
-        </TabPane>
-        <TabPane tab="Peryodik Bakımlar" key="6" disabled>
+        </TabPane> */}
+        {/* <TabPane tab="Peryodik Bakımlar" key="6" disabled>
           <div
             style={{
               // display: "flex",
@@ -147,8 +147,8 @@ export default function SecondTabs() {
             }}>
             <DetailsTable />
           </div>
-        </TabPane>
-        {showOtonomTab && (
+        </TabPane> */}
+        {/* {showOtonomTab && (
           <TabPane tab="Otonom Bakımlar" key="7" disabled>
             <div
               style={{
@@ -159,7 +159,7 @@ export default function SecondTabs() {
               <DeliveryTable />
             </div>
           </TabPane>
-        )}
+        )} */}
         {showYakitTab && (
           <TabPane tab="Yakıt Bilgileri" key="10">
             <div

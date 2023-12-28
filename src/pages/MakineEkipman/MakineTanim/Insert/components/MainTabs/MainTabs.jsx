@@ -371,7 +371,7 @@ export default function MainTabs() {
             </Checkbox>
           )}
         />
-        <Controller
+        {/* <Controller
           name="makineOtonomBakim"
           control={control}
           defaultValue={false} // or true if you want it checked by default
@@ -380,7 +380,7 @@ export default function MainTabs() {
               Otonom Bakım
             </Checkbox>
           )}
-        />
+        /> */}
       </div>
     </div>
   );
