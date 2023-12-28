@@ -1,7 +1,7 @@
 import tr_TR from "antd/es/locale/tr_TR";
 import { PlusOutlined } from "@ant-design/icons";
 import { Button, Drawer, Space, ConfigProvider, Modal } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import MainTabs from "./components/MainTabs/MainTabs";
 import secondTabs from "./components/secondTabs/secondTabs";
 import { useForm, Controller, useFormContext, FormProvider, set } from "react-hook-form";
@@ -10,6 +10,7 @@ import AxiosInstance from "../../../api/http";
 import Footer from "../Footer";
 
 export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
+  const [, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
   const showDrawer = () => {
     setOpen(true);
@@ -407,199 +408,201 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   useEffect(() => {
     if (drawerVisible && selectedRow) {
-      Object.keys(selectedRow).forEach((key) => {
-        // console.log(key, selectedRow[key]);
-        setValue(key, selectedRow[key]);
-        setValue("isEmriSelectedId", selectedRow.key);
-        setValue("work_order_no", selectedRow.number);
-        setValue(
-          "date",
-          selectedRow.editDate && dayjs(selectedRow.editDate, "DD-MM-YYYY").isValid()
-            ? dayjs(selectedRow.editDate, "DD-MM-YYYY").toDate() // Convert to a native JavaScript Date object
-            : null,
-          { shouldValidate: true }
-        );
-        setValue(
-          "time",
-          selectedRow.editTime && dayjs(selectedRow.editTime, "HH:mm").isValid()
-            ? dayjs(selectedRow.editTime, "HH:mm")
-            : null
-        );
+      // startTransition(() => {
+      // Object.keys(selectedRow).forEach((key) => {
+      //   console.log(key, selectedRow[key]);
+      //   setValue(key, selectedRow[key]);
+      setValue("isEmriSelectedId", selectedRow.key);
+      setValue("work_order_no", selectedRow.number);
+      setValue(
+        "date",
+        selectedRow.editDate && dayjs(selectedRow.editDate, "DD-MM-YYYY").isValid()
+          ? dayjs(selectedRow.editDate, "DD-MM-YYYY").toDate() // Convert to a native JavaScript Date object
+          : null,
+        { shouldValidate: true }
+      );
+      setValue(
+        "time",
+        selectedRow.editTime && dayjs(selectedRow.editTime, "HH:mm").isValid()
+          ? dayjs(selectedRow.editTime, "HH:mm")
+          : null
+      );
 
-        // setValue("work_order_type", selectedRow.type);
-        setValue("work_order_type", {
-          value: selectedRow.ISM_TIP_ID,
-          label: selectedRow.type,
-        });
-        setValue("statusInput", selectedRow.status);
-        setValue("linked_work_orderID", selectedRow.linked_work_orderID);
-        setValue("linked_work_order", selectedRow.linked_work_order);
-        setValue("statusID", selectedRow.statusID);
-        setValue("machine_type", selectedRow.machine_type);
-        setValue("category", selectedRow.category);
-        setValue("brand", selectedRow.brand);
-        setValue("location", selectedRow.location);
-        setValue("locationID", selectedRow.locationID);
-        setValue("equipmentID", selectedRow.equipmentID);
-        setValue("plkLocation", selectedRow.fullLocation);
-        setValue("machine", selectedRow.machine);
-        setValue("machineId", selectedRow.machineId);
-        setValue("machineDefinition", selectedRow.machineDescription);
-        setValue("equipment", selectedRow.equipment);
-        setValue("plkEquipment", selectedRow.equipment);
-        setValue("warranty_end", selectedRow.warranty_end);
-        setValue("machine_status", selectedRow.machineStatus);
-        setValue("machineStatusID", selectedRow.machineStatusID);
-        setValue("counter_value", selectedRow.currentCounterValue);
-        setValue("Konu", selectedRow.subject);
-        setValue("Tipi", selectedRow.jobType);
-        setValue("TipiID", selectedRow.TipiID);
-        setValue("procedure", selectedRow.procedure);
-        setValue("procedureSelectedId", selectedRow.procedureSelectedId);
-
-        setValue("Nedeni", {
-          value: selectedRow.jobReasonId,
-          label: selectedRow.jobReason,
-        });
-
-        // setValue("Nedeni", selectedRow.jobReason);
-        // setValue("NedeniID", selectedRow.jobReasonId);
-        setValue("priority", selectedRow.priorityIcon);
-        setValue("prioritySelectedId", selectedRow.prioritySelectedId);
-        setValue("workshop", selectedRow.workshop);
-        setValue("workshopSelectedId", selectedRow.workshopID);
-        setValue("calendarTable", selectedRow.calendar);
-        setValue("calendarTableSelectedId", selectedRow.ISM_TAKVIM_ID);
-        setValue("costcenter", selectedRow.spending);
-        setValue("costcenterSelectedIdDetailsTab", selectedRow.ISM_MASRAF_MERKEZ_ID);
-        setValue("companyDetailsTab", selectedRow.company);
-        setValue("companyID", selectedRow.companyID);
-        setValue("instruction", selectedRow.instruction);
-        setValue("instructionSelectedId", selectedRow.instructionID);
-        setValue("Tamamlama", selectedRow.completion);
-        setValue("MaliyetKapsaminda", selectedRow.warranty);
-        setValue("project", selectedRow.ISM_PROJE_KOD);
-        setValue("projectID", selectedRow.ISM_PROJE_ID);
-        setValue("contract", selectedRow.ISM_SOZLESME_TANIM);
-        setValue("contractId", selectedRow.ISM_FIRMA_SOZLESME_ID);
-        setValue("EvrakNo", selectedRow.ISM_EVRAK_NO);
-        setValue("ReferansNo", selectedRow.ISM_REFERANS_NO);
-
-        setValue(
-          "EvrakTarihi",
-          selectedRow.ISM_EVRAK_TARIHI && dayjs(selectedRow.ISM_EVRAK_TARIHI, "DD-MM-YYYY").isValid()
-            ? dayjs(selectedRow.ISM_EVRAK_TARIHI, "DD-MM-YYYY").toDate() // Convert to a native JavaScript Date object
-            : null,
-          { shouldValidate: true }
-        );
-
-        setValue(
-          "PlannedCommencementDate",
-          selectedRow.plannedStartDate && dayjs(selectedRow.plannedStartDate, "DD-MM-YYYY").isValid()
-            ? dayjs(selectedRow.plannedStartDate, "DD-MM-YYYY").toDate() // Convert to a native JavaScript Date object
-            : null,
-          { shouldValidate: true }
-        );
-        setValue(
-          "PlannedCommencementTime",
-          selectedRow.plannedStartTime && dayjs(selectedRow.plannedStartTime, "HH:mm").isValid()
-            ? dayjs(selectedRow.plannedStartTime, "HH:mm")
-            : null
-        );
-
-        setValue(
-          "PlannedCompletionDate",
-          selectedRow.plannedEndDate && dayjs(selectedRow.plannedEndDate, "DD-MM-YYYY").isValid()
-            ? dayjs(selectedRow.plannedEndDate, "DD-MM-YYYY").toDate() // Convert to a native JavaScript Date object
-            : null,
-          { shouldValidate: true }
-        );
-
-        setValue(
-          "PlannedCompletionTime",
-          selectedRow.plannedEndTime && dayjs(selectedRow.plannedEndTime, "HH:mm").isValid()
-            ? dayjs(selectedRow.plannedEndTime, "HH:mm")
-            : null
-        );
-
-        setValue(
-          "StartedDate",
-          selectedRow.startdate && dayjs(selectedRow.startdate, "DD-MM-YYYY").isValid()
-            ? dayjs(selectedRow.startdate, "DD-MM-YYYY").toDate() // Convert to a native JavaScript Date object
-            : null,
-          { shouldValidate: true }
-        );
-
-        setValue(
-          "StartedTime",
-          selectedRow.startTime && dayjs(selectedRow.startTime, "HH:mm").isValid()
-            ? dayjs(selectedRow.startTime, "HH:mm")
-            : null
-        );
-
-        setValue(
-          "FinishedDate",
-          selectedRow.enddate && dayjs(selectedRow.enddate, "DD-MM-YYYY").isValid()
-            ? dayjs(selectedRow.enddate, "DD-MM-YYYY").toDate() // Convert to a native JavaScript Date object
-            : null,
-          { shouldValidate: true }
-        );
-
-        setValue(
-          "FinishedTime",
-          selectedRow.endTime && dayjs(selectedRow.endTime, "HH:mm").isValid()
-            ? dayjs(selectedRow.endTime, "HH:mm")
-            : null
-        );
-        // API'den gelen jobTime değerini varsayalım
-        const jobTime = selectedRow.jobTime; // Örneğin, 862 dakika
-
-        // Saat ve dakikayı hesapla
-        const hours = Math.floor(jobTime / 60);
-        const minutes = jobTime % 60;
-
-        // React Hook Form'un setValue fonksiyonu ile değerleri ayarla
-        setValue("WorkingTimeHours", hours);
-        setValue("WorkingTimeMinutes", minutes);
-        //süre bilgileri tabı
-        setValue("logisticsDuration", selectedRow.logisticsDuration);
-        setValue("travellingDuration", selectedRow.travellingDuration);
-        setValue("approvalDuration", selectedRow.approvalDuration);
-        setValue("waitingDuration", selectedRow.waitingDuration);
-        setValue("otherDuration", selectedRow.otherDuration);
-        setValue("interventionDuration", selectedRow.interventionDuration);
-        setValue("workingDuration", selectedRow.workingDuration);
-        setValue("totalWorkTime", selectedRow.totalWorkTime);
-        // Maliyetler tabı
-        setValue("realisedMaterialCost", selectedRow.realisedMaterialCost);
-        setValue("realisedLabourCost", selectedRow.realisedLabourCost);
-        setValue("realisedExternalServiceCost", selectedRow.realisedExternalServiceCost);
-        setValue("realisedGeneralExpenses", selectedRow.realisedGeneralExpenses);
-        setValue("realisedDiscount", selectedRow.realisedDiscount);
-        setValue("realisedKDV", selectedRow.realisedKDV);
-        setValue("realisedTotalCost", selectedRow.realisedTotalCost);
-        // özel alanlar tabı
-        setValue("custom_field_1", selectedRow.temperature);
-        setValue("custom_field_2", selectedRow.weight);
-        setValue("custom_field_3", selectedRow.invoiceStatus1);
-        setValue("custom_field_4", selectedRow.specialArea4);
-        setValue("custom_field_5", selectedRow.specialArea5);
-        setValue("custom_field_6", selectedRow.specialArea6);
-        setValue("custom_field_7", selectedRow.specialArea7);
-        setValue("custom_field_8", selectedRow.specialArea8);
-        setValue("custom_field_9", selectedRow.specialArea9);
-        setValue("custom_field_10", selectedRow.specialArea10);
-        setValue("custom_field_11", selectedRow.invoiceStatus2);
-        setValue("custom_field_12", selectedRow.specialArea12);
-        setValue("custom_field_13", selectedRow.specialArea13);
-        setValue("custom_field_14", selectedRow.specialArea14);
-        setValue("custom_field_15", selectedRow.specialArea15);
-        setValue("custom_field_16", selectedRow.specialArea16);
-        setValue("custom_field_17", selectedRow.specialArea17);
-        setValue("custom_field_18", selectedRow.specialArea18);
-        setValue("custom_field_19", selectedRow.specialArea19);
-        setValue("custom_field_20", selectedRow.specialArea20);
+      // setValue("work_order_type", selectedRow.type);
+      setValue("work_order_type", {
+        value: selectedRow.ISM_TIP_ID,
+        label: selectedRow.type,
       });
+      setValue("statusInput", selectedRow.status);
+      setValue("linked_work_orderID", selectedRow.linked_work_orderID);
+      setValue("linked_work_order", selectedRow.linked_work_order);
+      setValue("statusID", selectedRow.statusID);
+      setValue("machine_type", selectedRow.machine_type);
+      setValue("category", selectedRow.category);
+      setValue("brand", selectedRow.brand);
+      setValue("location", selectedRow.location);
+      setValue("locationID", selectedRow.locationID);
+      setValue("equipmentID", selectedRow.equipmentID);
+      setValue("plkLocation", selectedRow.fullLocation);
+      setValue("machine", selectedRow.machine);
+      setValue("machineId", selectedRow.machineId);
+      setValue("machineDefinition", selectedRow.machineDescription);
+      setValue("equipment", selectedRow.equipment);
+      setValue("plkEquipment", selectedRow.equipment);
+      setValue("warranty_end", selectedRow.warranty_end);
+      setValue("machine_status", selectedRow.machineStatus);
+      setValue("machineStatusID", selectedRow.machineStatusID);
+      setValue("counter_value", selectedRow.currentCounterValue);
+      setValue("Konu", selectedRow.subject);
+      setValue("Tipi", selectedRow.jobType);
+      setValue("TipiID", selectedRow.TipiID);
+      setValue("procedure", selectedRow.procedure);
+      setValue("procedureSelectedId", selectedRow.procedureSelectedId);
+
+      setValue("Nedeni", {
+        value: selectedRow.jobReasonId,
+        label: selectedRow.jobReason,
+      });
+
+      // setValue("Nedeni", selectedRow.jobReason);
+      // setValue("NedeniID", selectedRow.jobReasonId);
+      setValue("priority", selectedRow.priorityIcon);
+      setValue("prioritySelectedId", selectedRow.prioritySelectedId);
+      setValue("workshop", selectedRow.workshop);
+      setValue("workshopSelectedId", selectedRow.workshopID);
+      setValue("calendarTable", selectedRow.calendar);
+      setValue("calendarTableSelectedId", selectedRow.ISM_TAKVIM_ID);
+      setValue("costcenter", selectedRow.spending);
+      setValue("costcenterSelectedIdDetailsTab", selectedRow.ISM_MASRAF_MERKEZ_ID);
+      setValue("companyDetailsTab", selectedRow.company);
+      setValue("companyID", selectedRow.companyID);
+      setValue("instruction", selectedRow.instruction);
+      setValue("instructionSelectedId", selectedRow.instructionID);
+      setValue("Tamamlama", selectedRow.completion);
+      setValue("MaliyetKapsaminda", selectedRow.warranty);
+      setValue("project", selectedRow.ISM_PROJE_KOD);
+      setValue("projectID", selectedRow.ISM_PROJE_ID);
+      setValue("contract", selectedRow.ISM_SOZLESME_TANIM);
+      setValue("contractId", selectedRow.ISM_FIRMA_SOZLESME_ID);
+      setValue("EvrakNo", selectedRow.ISM_EVRAK_NO);
+      setValue("ReferansNo", selectedRow.ISM_REFERANS_NO);
+
+      setValue(
+        "EvrakTarihi",
+        selectedRow.ISM_EVRAK_TARIHI && dayjs(selectedRow.ISM_EVRAK_TARIHI, "DD-MM-YYYY").isValid()
+          ? dayjs(selectedRow.ISM_EVRAK_TARIHI, "DD-MM-YYYY").toDate() // Convert to a native JavaScript Date object
+          : null,
+        { shouldValidate: true }
+      );
+
+      setValue(
+        "PlannedCommencementDate",
+        selectedRow.plannedStartDate && dayjs(selectedRow.plannedStartDate, "DD-MM-YYYY").isValid()
+          ? dayjs(selectedRow.plannedStartDate, "DD-MM-YYYY").toDate() // Convert to a native JavaScript Date object
+          : null,
+        { shouldValidate: true }
+      );
+      setValue(
+        "PlannedCommencementTime",
+        selectedRow.plannedStartTime && dayjs(selectedRow.plannedStartTime, "HH:mm").isValid()
+          ? dayjs(selectedRow.plannedStartTime, "HH:mm")
+          : null
+      );
+
+      setValue(
+        "PlannedCompletionDate",
+        selectedRow.plannedEndDate && dayjs(selectedRow.plannedEndDate, "DD-MM-YYYY").isValid()
+          ? dayjs(selectedRow.plannedEndDate, "DD-MM-YYYY").toDate() // Convert to a native JavaScript Date object
+          : null,
+        { shouldValidate: true }
+      );
+
+      setValue(
+        "PlannedCompletionTime",
+        selectedRow.plannedEndTime && dayjs(selectedRow.plannedEndTime, "HH:mm").isValid()
+          ? dayjs(selectedRow.plannedEndTime, "HH:mm")
+          : null
+      );
+
+      setValue(
+        "StartedDate",
+        selectedRow.startdate && dayjs(selectedRow.startdate, "DD-MM-YYYY").isValid()
+          ? dayjs(selectedRow.startdate, "DD-MM-YYYY").toDate() // Convert to a native JavaScript Date object
+          : null,
+        { shouldValidate: true }
+      );
+
+      setValue(
+        "StartedTime",
+        selectedRow.startTime && dayjs(selectedRow.startTime, "HH:mm").isValid()
+          ? dayjs(selectedRow.startTime, "HH:mm")
+          : null
+      );
+
+      setValue(
+        "FinishedDate",
+        selectedRow.enddate && dayjs(selectedRow.enddate, "DD-MM-YYYY").isValid()
+          ? dayjs(selectedRow.enddate, "DD-MM-YYYY").toDate() // Convert to a native JavaScript Date object
+          : null,
+        { shouldValidate: true }
+      );
+
+      setValue(
+        "FinishedTime",
+        selectedRow.endTime && dayjs(selectedRow.endTime, "HH:mm").isValid()
+          ? dayjs(selectedRow.endTime, "HH:mm")
+          : null
+      );
+      // API'den gelen jobTime değerini varsayalım
+      const jobTime = selectedRow.jobTime; // Örneğin, 862 dakika
+
+      // Saat ve dakikayı hesapla
+      const hours = Math.floor(jobTime / 60);
+      const minutes = jobTime % 60;
+
+      // React Hook Form'un setValue fonksiyonu ile değerleri ayarla
+      setValue("WorkingTimeHours", hours);
+      setValue("WorkingTimeMinutes", minutes);
+      //süre bilgileri tabı
+      setValue("logisticsDuration", selectedRow.logisticsDuration);
+      setValue("travellingDuration", selectedRow.travellingDuration);
+      setValue("approvalDuration", selectedRow.approvalDuration);
+      setValue("waitingDuration", selectedRow.waitingDuration);
+      setValue("otherDuration", selectedRow.otherDuration);
+      setValue("interventionDuration", selectedRow.interventionDuration);
+      setValue("workingDuration", selectedRow.workingDuration);
+      setValue("totalWorkTime", selectedRow.totalWorkTime);
+      // Maliyetler tabı
+      setValue("realisedMaterialCost", selectedRow.realisedMaterialCost);
+      setValue("realisedLabourCost", selectedRow.realisedLabourCost);
+      setValue("realisedExternalServiceCost", selectedRow.realisedExternalServiceCost);
+      setValue("realisedGeneralExpenses", selectedRow.realisedGeneralExpenses);
+      setValue("realisedDiscount", selectedRow.realisedDiscount);
+      setValue("realisedKDV", selectedRow.realisedKDV);
+      setValue("realisedTotalCost", selectedRow.realisedTotalCost);
+      // özel alanlar tabı
+      setValue("custom_field_1", selectedRow.temperature);
+      setValue("custom_field_2", selectedRow.weight);
+      setValue("custom_field_3", selectedRow.invoiceStatus1);
+      setValue("custom_field_4", selectedRow.specialArea4);
+      setValue("custom_field_5", selectedRow.specialArea5);
+      setValue("custom_field_6", selectedRow.specialArea6);
+      setValue("custom_field_7", selectedRow.specialArea7);
+      setValue("custom_field_8", selectedRow.specialArea8);
+      setValue("custom_field_9", selectedRow.specialArea9);
+      setValue("custom_field_10", selectedRow.specialArea10);
+      setValue("custom_field_11", selectedRow.invoiceStatus2);
+      setValue("custom_field_12", selectedRow.specialArea12);
+      setValue("custom_field_13", selectedRow.specialArea13);
+      setValue("custom_field_14", selectedRow.specialArea14);
+      setValue("custom_field_15", selectedRow.specialArea15);
+      setValue("custom_field_16", selectedRow.specialArea16);
+      setValue("custom_field_17", selectedRow.specialArea17);
+      setValue("custom_field_18", selectedRow.specialArea18);
+      setValue("custom_field_19", selectedRow.specialArea19);
+      setValue("custom_field_20", selectedRow.specialArea20);
+      // });
+      // });
     }
   }, [selectedRow, setValue, drawerVisible]);
 
