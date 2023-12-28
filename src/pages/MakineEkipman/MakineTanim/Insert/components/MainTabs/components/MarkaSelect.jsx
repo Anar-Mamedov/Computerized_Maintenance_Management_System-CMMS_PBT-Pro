@@ -26,7 +26,8 @@ export default function MarkaSelect() {
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between", width: "100%" }}>
+    <div
+      style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between", width: "380px" }}>
       <Text style={{ fontSize: "14px" }}>Marka:</Text>
       <Controller
         name="MakineMarka"
@@ -34,7 +35,7 @@ export default function MarkaSelect() {
         render={({ field }) => (
           <Select
             {...field}
-            style={{ width: "300px" }}
+            style={{ width: "250px" }}
             showSearch
             allowClear
             placeholder="Seçim Yapınız"
