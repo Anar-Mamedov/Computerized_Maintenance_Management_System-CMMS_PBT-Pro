@@ -251,7 +251,7 @@ export default function CreateDrawer({ onRefresh }) {
       MKN_KALIBRASYON_VAR: data.makineKalibrasyon,
       MKN_KRITIK_MAKINE: data.kritikMakine,
       MKN_GUC_KAYNAGI: data.makineGucKaynagi,
-      // :data.makineIsBildirimi, // ??
+      MKN_IS_TALEP: data.makineIsBildirimi, // ??
       MKN_YAKIT_KULLANIM: data.makineYakitKullanim,
       MKN_OTONOM_BAKIM: data.makineOtonomBakim,
       // detay bilgi sekmesi

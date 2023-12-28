@@ -361,7 +361,7 @@ export default function MainTabs() {
             </Checkbox>
           )}
         />
-        <Controller
+        {/* <Controller
           name="makineYakitKullanim"
           control={control}
           defaultValue={false} // or true if you want it checked by default
@@ -370,7 +370,7 @@ export default function MainTabs() {
               Yakıt Kullanım
             </Checkbox>
           )}
-        />
+        /> */}
         {/* <Controller
           name="makineOtonomBakim"
           control={control}

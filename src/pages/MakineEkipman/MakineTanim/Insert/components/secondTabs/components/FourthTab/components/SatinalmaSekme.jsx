@@ -9,11 +9,11 @@ const items = [
     label: "Satınalma ve Kredi Bilgileri",
     children: <SatinalmaKrediBilgileri />,
   },
-  {
-    key: "2",
-    label: "Amortisman Bilgileri",
-    children: <AmortismanBilgileri />,
-  },
+  // {
+  //   key: "2",
+  //   label: "Amortisman Bilgileri",
+  //   children: <AmortismanBilgileri />,
+  // },
 ];
 
 export default function SatinalmaSekme() {
