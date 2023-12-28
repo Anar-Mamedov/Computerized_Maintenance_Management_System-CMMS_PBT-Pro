@@ -160,7 +160,7 @@ export default function SecondTabs() {
             </div>
           </TabPane>
         )} */}
-        {showYakitTab && (
+        {/* {showYakitTab && (
           <TabPane tab="Yakıt Bilgileri" key="10">
             <div
               style={{
@@ -171,7 +171,7 @@ export default function SecondTabs() {
               <TenthTab />
             </div>
           </TabPane>
-        )}
+        )} */}
         <TabPane tab="Özel Alanlar" key="11">
           <div
             style={{
