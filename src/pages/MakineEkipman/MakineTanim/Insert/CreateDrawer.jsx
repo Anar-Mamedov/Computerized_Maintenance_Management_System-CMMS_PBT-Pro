@@ -458,7 +458,6 @@ export default function CreateDrawer({ onRefresh }) {
             }>
             <MainTabs />
             <SecondTabs />
-
             <Footer />
           </Drawer>
         </ConfigProvider>
