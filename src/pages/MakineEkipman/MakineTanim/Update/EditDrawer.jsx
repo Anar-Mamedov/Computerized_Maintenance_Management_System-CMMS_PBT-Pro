@@ -457,8 +457,10 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       setValue("uretici", selectedRow.MKN_URETICI);
       setValue("uretimYili", selectedRow.MKN_URETIM_YILI);
       setValue(
-        "date",
-        selectedRow.editDate && dayjs(selectedRow.editDate).isValid() ? dayjs(selectedRow.editDate) : ""
+        "makineGarantiBitisTarihi",
+        selectedRow.MKN_GARANTI_BITIS && dayjs(selectedRow.MKN_GARANTI_BITIS).isValid()
+          ? dayjs(selectedRow.MKN_GARANTI_BITIS)
+          : ""
       );
       setValue(
         "time",
@@ -466,6 +468,190 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           ? dayjs(selectedRow.editTime, "HH:mm:ss")
           : null
       );
+      setValue("makineDurusBirimMaliyeti", selectedRow.MKN_DURUS_MALIYET);
+      setValue("makinePlanCalismaSuresi", selectedRow.MKN_YILLIK_PLANLANAN_CALISMA_SURESI);
+      setValue("makineAktif", selectedRow.MKN_AKTIF);
+      setValue("makineKalibrasyon", selectedRow.MKN_KALIBRASYON_VAR);
+      setValue("kritikMakine", selectedRow.MKN_KRITIK_MAKINE);
+      setValue("makineGucKaynagi", selectedRow.MKN_GUC_KAYNAGI);
+      setValue("makineIsBildirimi", selectedRow.MKN_IS_TALEP);
+      setValue("makineYakitKullanim", selectedRow.MKN_YAKIT_KULLANIM);
+      setValue("makineOtonomBakim", selectedRow.MKN_OTONOM_BAKIM);
+      // detay bilgi sekmesi
+      setValue("makineMasrafMerkeziTanim", selectedRow.MKN_MASRAF_MERKEZ);
+      setValue("makineMasrafMerkeziID", selectedRow.MKN_MASRAF_MERKEZ_KOD_ID);
+      setValue("makineAtolyeTanim", selectedRow.MKN_ATOLYE);
+      setValue("makineAtolyeID", selectedRow.MKN_ATOLYE_ID);
+      setValue("makineBakimGrubu", selectedRow.MKN_BAKIM_GRUP);
+      setValue("makineBakimGrubuID", selectedRow.MKN_BAKIM_GRUP_ID);
+      setValue("makineArizaGrubu", selectedRow.MKN_ARIZA_GRUP);
+      setValue("makineArizaGrubuID", selectedRow.MKN_ARIZA_GRUP_ID);
+      setValue("makineServisSaglayici", selectedRow.MKN_SERVIS_SAGLAYICI);
+      setValue("makineServisSaglayiciID", selectedRow.MKN_SERVIS_SAGLAYICI_KOD_ID);
+      setValue("makineServisSekli", selectedRow.MKN_SERVIS_SEKLI);
+      setValue("makineServisSekliID", selectedRow.MKN_SERVIS_SEKLI_KOD_ID);
+      setValue("makineTeknikSeviyesi", selectedRow.MKN_TEKNIK_SERVIS);
+      setValue("makineTeknikSeviyesiID", selectedRow.MKN_TEKNIK_SERVIS_KOD_ID);
+      setValue("makineFizikselDurumu", selectedRow.MKN_FIZIKSEL_DURUM);
+      setValue("makineFizikselDurumuID", selectedRow.MKN_FIZIKSEL_DURUM_KOD_ID);
+      setValue("makineOncelik", selectedRow.MKN_ONCELIK);
+      setValue("makineOncelikID", selectedRow.MKN_ONCELIK_ID);
+      setValue("makineRiskPuani", selectedRow.MKN_RISK_PUAN);
+      setValue(
+        "makineKurulumTarihi",
+        selectedRow.MKN_KURULUM_TARIH && dayjs(selectedRow.MKN_KURULUM_TARIH).isValid()
+          ? dayjs(selectedRow.MKN_KURULUM_TARIH)
+          : ""
+      );
+      setValue("MakineIsletimSistemi", selectedRow.MKN_ISLETIM_SISTEMI);
+      setValue("MakineIsletimSistemiID", selectedRow.MKN_ISLETIM_SISTEMI_KOD_ID);
+      setValue("makineIPNo", selectedRow.MKN_IP_NO);
+      setValue("MakineAgirlik", selectedRow.MKN_AGIRLIK);
+      setValue("MakineAgirlikBirim", selectedRow.MKN_AGIRLIK_BIRIM);
+      setValue("MakineAgirlikBirimID", selectedRow.MKN_AGIRLIK_BIRIM_KOD_ID);
+      setValue("MakineHacim", selectedRow.MKN_HACIM);
+      setValue("MakineHacimBirim", selectedRow.MKN_HACIM_BIRIM);
+      setValue("MakineHacimBirimID", selectedRow.MKN_HACIM_BIRIM_KOD_ID);
+      setValue("MakineKapasite", selectedRow.MKN_KAPASITE);
+      setValue("MakineKapasiteBirim", selectedRow.MKN_KAPASITE_BIRIM);
+      setValue("MakineKapasiteBirimID", selectedRow.MKN_KAPASITE_BIRIM_KOD_ID);
+      setValue("MakineElektrikTuketim", selectedRow.MKN_ELEKTRIK_TUKETIM);
+      setValue("MakineElektrikTuketimBirim", selectedRow.MKN_ELEKTRIK_TUKETIM_BIRIM);
+      setValue("MakineElektrikTuketimBirimID", selectedRow.MKN_ELEKTRIK_TUKETIM_BIRIM_KOD_ID);
+      setValue("makineVoltaj", selectedRow.MKN_VOLTAJ);
+      setValue("makineGuc", selectedRow.MKN_GUC);
+      setValue("makineFaz", selectedRow.MKN_FAZ);
+      setValue("makineValfTipi", selectedRow.MKN_VALF_TIP);
+      setValue("makineValfTipiID", selectedRow.MKN_VALF_TIP_KOD_ID);
+      setValue("makineValfBoyutu", selectedRow.MKN_VALF_BOYUT);
+      setValue("makineValfBoyutuID", selectedRow.MKN_VALF_BOYUT_KOD_ID);
+      setValue("makineGirisBoyutu", selectedRow.MKN_GIRIS_BOYUT);
+      setValue("makineGirisBoyutuID", selectedRow.MKN_GIRIS_BOYUT_KOD_ID);
+      setValue("makineCikisBoyutu", selectedRow.MKN_CIKIS_BOYUT);
+      setValue("makineCikisBoyutuID", selectedRow.MKN_CIKIS_BOYUT_KOD_ID);
+      setValue("makineKonnektor", selectedRow.MKN_KONNEKTOR);
+      setValue("makineKonnektorID", selectedRow.MKN_KONNEKTOR_KOD_ID);
+      setValue("makineBasinc", selectedRow.MKN_BASINC);
+      setValue("makineBasincID", selectedRow.MKN_BASINC_KOD_ID);
+      setValue("MakineBasincMiktar", selectedRow.MKN_BASINC_MIKTAR);
+      setValue("MakineBasincMiktarBirim", selectedRow.MKN_BASINC_MIKTAR_BIRIM);
+      setValue("MakineBasincMiktarBirimID", selectedRow.MKN_BASINC_MIKTAR_BIRIM_KOD_ID);
+      setValue("makineDevirSayisi", selectedRow.MKN_DEVIR);
+      setValue("makineMotorGucu", selectedRow.MKN_TEKNIK_MOTOR_GUCU);
+      setValue("makineSilindirSayisi", selectedRow.MKN_TEKNIK_SILINDIR_SAYISI);
+      // finansal bilgiler sekmesi
+      setValue("makineSatinalmaFirma", selectedRow.MKN_ALIS_FIRMA);
+      setValue("makineSatinalmaFirmaID", selectedRow.MKN_ALIS_FIRMA_ID);
+      setValue(
+        "makineSatinalmaTarihi",
+        selectedRow.MKN_ALIS_TARIH && dayjs(selectedRow.MKN_ALIS_TARIH).isValid()
+          ? dayjs(selectedRow.MKN_ALIS_TARIH)
+          : ""
+      );
+      setValue("satinalmaFiyati", selectedRow.MKN_ALIS_FIYAT);
+      setValue("satinalmaFaturaNo", selectedRow.MKN_FATURA_NO);
+      setValue(
+        "makineSatinalmaFaturaTarihi",
+        selectedRow.MKN_FATURA_TARIH && dayjs(selectedRow.MKN_FATURA_TARIH).isValid()
+          ? dayjs(selectedRow.MKN_FATURA_TARIH)
+          : ""
+      );
+      setValue("satinalmaFaturaTutar", selectedRow.MKN_FATURA_TUTAR);
+      setValue("makineKrediKrediMiktari", selectedRow.MKN_KREDI_MIKTARI);
+      setValue("makineKrediKrediOrani", selectedRow.KREDI_ORANI);
+      setValue(
+        "makineKrediBaslamaTarihi",
+        selectedRow.MKN_KREDI_BASLAMA_TARIHI && dayjs(selectedRow.MKN_KREDI_BASLAMA_TARIHI).isValid()
+          ? dayjs(selectedRow.MKN_KREDI_BASLAMA_TARIHI)
+          : ""
+      );
+      setValue(
+        "makineKrediBitisTarihi",
+        selectedRow.MKN_KREDI_BITIS_TARIHI && dayjs(selectedRow.MKN_KREDI_BITIS_TARIHI).isValid()
+          ? dayjs(selectedRow.MKN_KREDI_BITIS_TARIHI)
+          : ""
+      );
+      // setValue(
+      //   "amortismanHesapTarihi",
+      //   selectedRow.MKN_AMORTISMAN_HESAP_TARIHI && dayjs(selectedRow.MKN_AMORTISMAN_HESAP_TARIHI).isValid()
+      //     ? dayjs(selectedRow.MKN_AMORTISMAN_HESAP_TARIHI)
+      //     : ""
+      // );
+      // setValue("amortismanDefterDegeri", selectedRow.MKN_AMORTISMAN_DEFTER_DEGERI);
+      // setValue("amortismanFaydaliOmur", selectedRow.MKN_AMORTISMAN_FAYDALI_OMUR);
+      // setValue("amortismanTutari", selectedRow.MKN_AMORTISMAN_TUTARI);
+      // setValue("amortismanNetAktifDegeri", selectedRow.MKN_AMORTISMAN_NET_AKTIF_DEGERI);
+      // setValue("amortismanKalanSure", selectedRow.MKN_AMORTISMAN_KALAN_SURE);
+      setValue("makineKiralik", selectedRow.MKN_KIRA);
+      setValue("makineFirma", selectedRow.MKN_KIRA_FIRMA);
+      setValue("makineFirmaID", selectedRow.MKN_KIRA_FIRMA_ID);
+      setValue(
+        "makineKiraBaslangicTarihi",
+        selectedRow.MKN_KIRA_BASLANGIC_TARIH && dayjs(selectedRow.MKN_KIRA_BASLANGIC_TARIH).isValid()
+          ? dayjs(selectedRow.MKN_KIRA_BASLANGIC_TARIH)
+          : ""
+      );
+      setValue(
+        "makineKiraBitisTarihi",
+        selectedRow.MKN_KIRA_BITIS_TARIH && dayjs(selectedRow.MKN_KIRA_BITIS_TARIH).isValid()
+          ? dayjs(selectedRow.MKN_KIRA_BITIS_TARIH)
+          : ""
+      );
+      setValue("MakineKiraSuresi", selectedRow.MKN_KIRA_SURE);
+      setValue("MakineKiraSuresiBirim", selectedRow.MKN_KIRA_SURE_BIRIM);
+      setValue("MakineKiraSuresiBirimID", selectedRow.MKN_KIRA_SURE_BIRIM_KOD_ID);
+      setValue("kiraTutari", selectedRow.MKN_KIRA_TUTAR);
+      setValue("kiraAciklama", selectedRow.MKN_KIRA_ACIKLAMA);
+      setValue("makineSatıldı", selectedRow.MKN_SATIS);
+      setValue("makineSatisNedeni", selectedRow.MKN_SATIS_NEDEN);
+      setValue(
+        "makineSatisTarihi",
+        selectedRow.MKN_SATIS_TARIH && dayjs(selectedRow.MKN_SATIS_TARIH).isValid()
+          ? dayjs(selectedRow.MKN_SATIS_TARIH)
+          : ""
+      );
+      setValue("makineSatisYeri", selectedRow.MKN_SATIS_YER);
+      setValue("satisTutari", selectedRow.MKN_SATIS_FIYAT);
+      setValue("makineSatisAciklama", selectedRow.MKN_SATIS_ACIKLAMA);
+      // Yakit Bilgileri sekmesi
+      // setValue("makineYakitTipi", selectedRow.MKN_YAKIT_TIP);
+      // setValue("makineYakitTipiID", selectedRow.MKN_YAKIT_TIP_ID);
+      // setValue("YakitDepoHacmi", selectedRow.MKN_YAKIT_DEPO_HACMI);
+      // setValue("makineYakitSayacTakibi", selectedRow.MKN_YAKIT_SAYAC_TAKIP);
+      // setValue("makineYakitSayacGuncellemesi", selectedRow.MKN_YAKIT_SAYAC_GUNCELLE);
+      // setValue("ongorulenMin", selectedRow.MKN_YAKIT_ONGORULEN_MIN);
+      // setValue("ongorulenMax", selectedRow.MKN_YAKIT_ONGORULEN_MAX);
+      // setValue("gerceklesen", selectedRow.MKN_YAKIT_GERCEKLESEN);
+      // Özel Alanlar sekmesi
+      setValue("ozelAlan_1", selectedRow.MKN_OZEL_ALAN_1);
+      setValue("ozelAlan_2", selectedRow.MKN_OZEL_ALAN_2);
+      setValue("ozelAlan_3", selectedRow.MKN_OZEL_ALAN_3);
+      setValue("ozelAlan_4", selectedRow.MKN_OZEL_ALAN_4);
+      setValue("ozelAlan_5", selectedRow.MKN_OZEL_ALAN_5);
+      setValue("ozelAlan_6", selectedRow.MKN_OZEL_ALAN_6);
+      setValue("ozelAlan_7", selectedRow.MKN_OZEL_ALAN_7);
+      setValue("ozelAlan_8", selectedRow.MKN_OZEL_ALAN_8);
+      setValue("ozelAlan_9", selectedRow.MKN_OZEL_ALAN_9);
+      setValue("ozelAlan_10", selectedRow.MKN_OZEL_ALAN_10);
+      setValue("ozelAlan_11", selectedRow.MKN_OZEL_ALAN_11);
+      setValue("ozelAlan_11_ID", selectedRow.MKN_OZEL_ALAN_11_KOD_ID);
+      setValue("ozelAlan_12", selectedRow.MKN_OZEL_ALAN_12);
+      setValue("ozelAlan_12_ID", selectedRow.MKN_OZEL_ALAN_12_KOD_ID);
+      setValue("ozelAlan_13", selectedRow.MKN_OZEL_ALAN_13);
+      setValue("ozelAlan_13_ID", selectedRow.MKN_OZEL_ALAN_13_KOD_ID);
+      setValue("ozelAlan_14", selectedRow.MKN_OZEL_ALAN_14);
+      setValue("ozelAlan_14_ID", selectedRow.MKN_OZEL_ALAN_14_KOD_ID);
+      setValue("ozelAlan_15", selectedRow.MKN_OZEL_ALAN_15);
+      setValue("ozelAlan_15_ID", selectedRow.MKN_OZEL_ALAN_15_KOD_ID);
+      setValue("ozelAlan_16", selectedRow.MKN_OZEL_ALAN_16);
+      setValue("ozelAlan_17", selectedRow.MKN_OZEL_ALAN_17);
+      setValue("ozelAlan_18", selectedRow.MKN_OZEL_ALAN_18);
+      setValue("ozelAlan_19", selectedRow.MKN_OZEL_ALAN_19);
+      setValue("ozelAlan_20", selectedRow.MKN_OZEL_ALAN_20);
+      // Notlar sekmesi
+      setValue("makineGenelNot", selectedRow.MKN_GUVENLIK_NOT);
+      setValue("makineGuvenlikNotu", selectedRow.MKN_GUVENLIK_NOTU);
+      // add more fields as needed
       // Cleanup function to clear timeout if the component unmounts
       return () => clearTimeout(timeoutId);
       // });
