@@ -1,10 +1,10 @@
 import React from "react";
-import PersonnelDefinitions from "./components/PersonnelDefinitions";
+import DetayBilgi from "./components/DetayBilgi";
 
 export default function ThirdTab() {
   return (
     <div>
-      <PersonnelDefinitions />
+      <DetayBilgi />
     </div>
   );
 }

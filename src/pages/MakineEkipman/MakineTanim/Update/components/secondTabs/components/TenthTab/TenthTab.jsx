@@ -1,388 +1,250 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Button, Input, Modal, Typography, Checkbox, DatePicker, TimePicker, Select, Table } from "antd";
-import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
+import React from "react";
+import { Button, Checkbox, Input, Typography } from "antd";
+
 import AxiosInstance from "../../../../../../../../api/http";
-import styled from "styled-components";
 import { useFormContext, Controller, useFieldArray } from "react-hook-form";
-import "../../../../../workOrder.css";
-
-const { Text, Link } = Typography;
-const { TextArea } = Input;
-
-const StyledTable = styled(Table)`
-  .ant-pagination {
-    margin-right: 0px !important;
-    background-color: #f5f5f5;
-    padding: 10px;
-    border-radius: 5px;
-  }
-  &.custom-table .ant-table-thead > tr > th {
-    height: 10px; // Adjust this value to your desired height
-    line-height: 2px; // Adjust this value to vertically center the text
-  }
-`;
-
-const onChange = (value) => {};
-const onSearch = (value) => {};
-
-// Filter `option.label` match the user type `input`
-const filterOption = (input, option) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+import YakitTipi from "./components/YakitTipi";
+const { Text } = Typography;
 
 export default function TenthTab() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const { control, setValue, watch } = useFormContext();
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [selectedRecords, setSelectedRecords] = useState([]);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingRecord, setEditingRecord] = useState(null);
-  const [isDisabled, setIsDisabled] = useState(true); // State to manage the disabled state of the fields
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "IsEmriAracGerecList", // This should match the name used in setValue
-  });
-
-  const onCheckboxChange = (e) => {
-    if (editingRecord) {
-      setEditingRecord((prevRecord) => ({
-        ...prevRecord,
-        overtime: e.target.checked,
-      }));
-      setIsDisabled(!e.target.checked);
-    }
+  const handleYakitMinusClick = () => {
+    setValue("makineYakitTipi", "");
+    setValue("makineYakitTipiID", "");
   };
-
-  const columns = [
-    {
-      title: "Kodu",
-      dataIndex: "code",
-      key: "code",
-      width: "150px",
-      render: (text) => (
-        <div
-          style={{
-            lineHeight: "20px",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
-    },
-    {
-      title: "Tanımı",
-      dataIndex: "subject",
-      key: "subject",
-      width: "150px",
-
-      render: (text) => (
-        <div
-          style={{
-            lineHeight: "20px",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
-    },
-    {
-      title: "Tipi",
-      dataIndex: "workdays",
-      key: "workdays",
-      width: "150px",
-      render: (text) => (
-        <div
-          style={{
-            lineHeight: "20px",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
-    },
-    {
-      title: "Bulunduğu Yer",
-      dataIndex: "description",
-      key: "description",
-      width: "150px",
-      render: (text) => (
-        <div
-          style={{
-            lineHeight: "20px",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
-    },
-
-    {
-      title: "Seri No",
-      dataIndex: "fifthcolumn",
-      key: "fifthcolumn",
-      width: "150px",
-      render: (text) => (
-        <div
-          style={{
-            lineHeight: "20px",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
-    },
-  ];
-
-  const selectedColumns = [
-    {
-      title: "Kodu",
-      dataIndex: "code",
-      key: "uniqueKey", // use the uniqueKey for the key property
-      render: (text) => (
-        <div
-          style={{
-            lineHeight: "20px",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
-    },
-    {
-      title: "Tanımı",
-      dataIndex: "subject",
-      key: "subject",
-      render: (text) => (
-        <div
-          style={{
-            lineHeight: "20px",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
-    },
-    {
-      title: "Tipi",
-      dataIndex: "workdays",
-      key: "workdays",
-      render: (text) => (
-        <div
-          style={{
-            lineHeight: "20px",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
-    },
-    {
-      title: "Bulunduğu Yer",
-      dataIndex: "description",
-      key: "description",
-      render: (text) => (
-        <div
-          style={{
-            lineHeight: "20px",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
-    },
-
-    {
-      title: "",
-      key: "action",
-      render: (_, field, index) => (
-        <Button
-          danger
-          onClick={(e) => {
-            e.stopPropagation(); // Stop event propagation
-            handleDelete(index);
-          }}
-          icon={<DeleteOutlined />}>
-          Sil
-        </Button>
-      ),
-    },
-
-    // Add more columns as needed
-  ];
-
-  const fetch = useCallback(() => {
-    setLoading(true);
-    AxiosInstance.get(`GetAracGerec`)
-      .then((response) => {
-        const fetchedData = response.ARAC_GEREC_LISTE.map((item) => {
-          return {
-            key: item.TB_ARAC_GEREC_ID,
-            code: item.ARG_KOD,
-            subject: item.ARG_TANIM,
-            workdays: item.ARG_TIP_TANIM, //?
-            description: item.ARG_YER_TANIM, //?
-            fifthcolumn: item.ARG_SERI_NO,
-            // sixthcolumn: item.PRS_LOKASYON,
-          };
-        });
-        setData(fetchedData);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  }, []);
-
-  const showModal = () => {
-    setIsModalOpen(true);
-    fetch();
-  };
-
-  const handleOk = () => {
-    // Seçili kayıtları alıp `fields` listesine ekleyin
-    selectedRowKeys.forEach((key) => {
-      const record = data.find((item) => item.key === key);
-      // Eğer bu kayıt zaten eklenmemişse, listeye ekle
-      if (!fields.some((field) => field.id === record.key)) {
-        append({ ...record, id: record.key });
-      }
-    });
-
-    // Modalı kapat
-    setIsModalOpen(false);
-
-    // Seçili kayıtları temizle
-    setSelectedRowKeys([]);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleDelete = (index) => {
-    remove(index); // Belirtilen index'teki öğeyi kaldır
-  };
-
-  const rowSelection = {
-    selectedRowKeys,
-    getCheckboxProps: (record) => ({
-      disabled: selectedRecords.some((r) => r.key === record.key), // Disable checkbox if record is already added
-    }),
-    onChange: (selectedKeys) => {
-      setSelectedRowKeys(selectedKeys);
-    },
-  };
-
-  const rowClassName = (record) => {
-    return selectedRecords.some((r) => r.key === record.key) ? "added-record" : "";
-  };
-
-  const handleEditOk = () => {
-    setSelectedRecords((prevRecords) =>
-      prevRecords.map((record) => (record.uniqueKey === editingRecord.uniqueKey ? editingRecord : record))
-    );
-    setEditingRecord(null);
-    setIsEditModalOpen(false);
-  };
-
-  // tabloyu sağa sola kaydıra bilme özelliği eklemek için
-  const totalTableWidth = columns.reduce((acc, column) => acc + (parseInt(column.width, 10) || 0), 0);
-  // tabloyu sağa sola kaydıra bilme özelliği eklemek için son
-
-  const isEmriId = watch("isEmriSelectedId");
-
-  useEffect(() => {
-    if (isEmriId) {
-      setLoading(true);
-      AxiosInstance.get(`FetchIsEmriAracGerec?isemriID=${isEmriId}`)
-        .then((response) => {
-          console.log("response", response.ARAC_GEREC_LISTE);
-          const fetchedData = response.ARAC_GEREC_LISTE.map((item, index) => ({
-            key: item.TB_ARAC_GEREC_ID,
-            sequence: index + 1,
-            code: item.ARG_KOD,
-            subject: item.ARG_TANIM,
-            workdays: item.ARG_TIP_TANIM, //?
-            description: item.ARG_YER_TANIM, //?
-          }));
-          append(fetchedData);
-        })
-        .catch((error) => console.error("Error fetching data:", error))
-        .finally(() => setLoading(false));
-    }
-  }, [isEmriId, append, setLoading, AxiosInstance]);
 
   return (
-    <>
-      <Button
-        type="link"
-        onClick={showModal}
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        columnGap: "10px",
+        marginBottom: "20px",
+      }}>
+      <div
         style={{
           display: "flex",
-          alignItems: "center",
+          flexWrap: "wrap",
+          border: "1px solid #80808068",
+          width: "430px",
+          padding: "5px",
           justifyContent: "center",
-          marginLeft: "auto",
-          marginTop: "-10px",
-          marginBottom: "10px",
+          gap: "5px",
+          alignContent: "flex-start",
+          height: "fit-content",
         }}>
-        <PlusOutlined />
-        Yeni Kayıt
-      </Button>
-      <Modal
-        centered
-        width="1200px"
-        title="Personel Listesi"
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}>
-        <StyledTable
-          rowClassName={rowClassName}
-          className="custom-table"
-          rowSelection={rowSelection}
-          columns={columns}
-          dataSource={data}
-          loading={loading}
-          scroll={{
-            x: totalTableWidth,
-            y: "500px",
-          }}
-        />
-      </Modal>
-      <div style={{ marginTop: "20px" }}>
-        <StyledTable
-          columns={selectedColumns}
-          dataSource={fields}
-          pagination={false}
-          onRow={(record) => {
-            return {
-              onClick: () => {
-                setEditingRecord(record);
-                setIsDisabled(!record.overtime);
-                setIsEditModalOpen(true);
-              },
-            };
-          }}
-        />
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Yakıt Tipi:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "300px",
+            }}>
+            <Controller
+              name="makineYakitTipi"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="text" // Set the type to "text" for name input
+                  style={{ width: "215px" }}
+                  disabled
+                />
+              )}
+            />
+            <Controller
+              name="makineYakitTipiID"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="text" // Set the type to "text" for name input
+                  style={{ display: "none" }}
+                />
+              )}
+            />
+            <YakitTipi
+              onSubmit={(selectedData) => {
+                setValue("makineYakitTipi", selectedData.subject);
+                setValue("makineYakitTipiID", selectedData.key);
+              }}
+            />
+            <Button onClick={handleYakitMinusClick}> - </Button>
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Yakıt Depo Hacmi:</Text>
+          <Controller
+            name="YakitDepoHacmi"
+            control={control}
+            render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
+          />
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "flex-end", width: "100%" }}>
+          <div style={{ width: "300px" }}>
+            <Controller
+              name="makineYakitSayacTakibi"
+              control={control}
+              defaultValue={false} // or true if you want it checked by default
+              render={({ field }) => (
+                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                  Yakıt girişinde sayaç takibi zorunlu
+                </Checkbox>
+              )}
+            />
+          </div>
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "flex-end", width: "100%" }}>
+          <div style={{ width: "300px" }}>
+            <Controller
+              name="makineYakitSayacGuncellemesi"
+              control={control}
+              defaultValue={false} // or true if you want it checked by default
+              render={({ field }) => (
+                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                  Yakıt girişinde sayaç güncellemesi yap
+                </Checkbox>
+              )}
+            />
+          </div>
+        </div>
       </div>
-    </>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          border: "1px solid #80808068",
+          width: "430px",
+          padding: "5px",
+          justifyContent: "center",
+          gap: "5px",
+          alignContent: "flex-start",
+          height: "fit-content",
+        }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Öngörülen (min):</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "space-between",
+              alignItems: "center",
+              width: "300px",
+            }}>
+            <Controller
+              name="ongorulenMin"
+              control={control}
+              render={({ field: { onChange, ...restField } }) => (
+                <Input
+                  {...restField}
+                  style={{ width: "255px" }}
+                  onChange={(e) => {
+                    // Allow only numeric input
+                    const numericValue = e.target.value.replace(/[^0-9]/g, "");
+                    onChange(numericValue);
+                  }}
+                />
+              )}
+            />
+            <Text style={{ fontSize: "14px" }}>lt/100</Text>
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Öngörülen (max):</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "space-between",
+              alignItems: "center",
+              width: "300px",
+            }}>
+            <Controller
+              name="ongorulenMax"
+              control={control}
+              render={({ field: { onChange, ...restField } }) => (
+                <Input
+                  {...restField}
+                  style={{ width: "255px" }}
+                  onChange={(e) => {
+                    // Allow only numeric input
+                    const numericValue = e.target.value.replace(/[^0-9]/g, "");
+                    onChange(numericValue);
+                  }}
+                />
+              )}
+            />
+            <Text style={{ fontSize: "14px" }}>lt/1</Text>
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Gerçekleşen:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "space-between",
+              alignItems: "center",
+              width: "300px",
+            }}>
+            <Controller
+              name="gerceklesen"
+              control={control}
+              render={({ field: { onChange, ...restField } }) => (
+                <Input
+                  {...restField}
+                  style={{ width: "255px" }}
+                  onChange={(e) => {
+                    // Allow only numeric input
+                    const numericValue = e.target.value.replace(/[^0-9]/g, "");
+                    onChange(numericValue);
+                  }}
+                />
+              )}
+            />
+            <Text style={{ fontSize: "14px" }}>lt/1</Text>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
