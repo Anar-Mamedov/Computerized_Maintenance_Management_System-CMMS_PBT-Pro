@@ -291,7 +291,7 @@ export default function CreateDrawer({ onRefresh }) {
       // :data.MakineElektrikTuketimBirim,
       MKN_ELEKTRIK_TUKETIM_BIRIM_KOD_ID: data.MakineElektrikTuketimBirimID,
       MKN_VOLTAJ: data.makineVoltaj,
-      // :data.makineGuc, // ??
+      MKN_GUC: data.makineGuc, // ??
       MKN_FAZ: data.makineFaz,
       // :data.makineValfTipi,
       MKN_VALF_TIP_KOD_ID: data.makineValfTipiID,
