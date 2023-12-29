@@ -11,6 +11,7 @@ import MasterMakineTablo from "./components/MasterMakineTablo";
 import MakineTakvimTablo from "./components/MakineTakvimTablo";
 import OperatorSelect from "./components/OperatorSelect";
 import MarkaEkle from "./components/MarkaEkle";
+import ModelEkle from "./components/ModelEkle";
 
 const { Text, Link } = Typography;
 
@@ -85,7 +86,10 @@ export default function MainTabs() {
           <MarkaEkle />
         </div>
 
-        <ModelSelect />
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", width: "100%" }}>
+          <ModelSelect />
+          <ModelEkle />
+        </div>
         <OperatorSelect />
       </div>
       <div

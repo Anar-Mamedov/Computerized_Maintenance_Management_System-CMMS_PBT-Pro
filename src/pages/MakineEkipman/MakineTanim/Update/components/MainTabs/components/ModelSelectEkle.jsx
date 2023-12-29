@@ -6,7 +6,7 @@ import AxiosInstance from "../../../../../../../api/http";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function OperatorSelect() {
+export default function ModelSelectEkle() {
   const { control, setValue } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -14,9 +14,9 @@ export default function OperatorSelect() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("GetMakineOperators");
-      if (response && response.Makine_Operator_List) {
-        setOptions(response.Makine_Operator_List);
+      const response = await AxiosInstance.get("GetMakineMarks");
+      if (response && response.Makine_Marka_List) {
+        setOptions(response.Makine_Marka_List);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -26,15 +26,16 @@ export default function OperatorSelect() {
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between", width: "100%" }}>
-      <Text style={{ fontSize: "14px" }}>Operatör:</Text>
+    <div
+      style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between", width: "380px" }}>
+      <Text style={{ fontSize: "14px" }}>Marka:</Text>
       <Controller
-        name="makineOperator"
+        name="MakineMarkaModelEkle"
         control={control}
         render={({ field }) => (
           <Select
             {...field}
-            style={{ width: "300px" }}
+            style={{ width: "250px" }}
             showSearch
             allowClear
             placeholder="Seçim Yapınız"
@@ -49,19 +50,19 @@ export default function OperatorSelect() {
             }}
             dropdownRender={(menu) => <Spin spinning={loading}>{menu}</Spin>}
             options={options.map((item) => ({
-              value: item.TB_MAKINE_OPERATOR_ID, // Use the ID as the value
-              label: item.MKO_HEDEF_OPERATOR_KOD, // Display the name in the dropdown
+              value: item.TB_MARKA_ID, // Use the ID as the value
+              label: item.MRK_MARKA, // Display the name in the dropdown
             }))}
             onChange={(value) => {
               // Seçilen değerin ID'sini NedeniID alanına set et
-              setValue("makineOperatorID", value);
+              setValue("MakineMarkaModelEkleID", value);
               field.onChange(value);
             }}
           />
         )}
       />
       <Controller
-        name="makineOperatorID"
+        name="MakineMarkaModelEkleID"
         control={control}
         render={({ field }) => (
           <Input

@@ -36,7 +36,8 @@ export default function ModelSelect() {
   }, [selectedMarkaID]); // selectedMarkaID değiştiğinde fetchData fonksiyonunu çalıştır
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between", width: "100%" }}>
+    <div
+      style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between", width: "380px" }}>
       <Text style={{ fontSize: "14px" }}>Model:</Text>
       <Controller
         name="MakineModel"
@@ -44,7 +45,7 @@ export default function ModelSelect() {
         render={({ field }) => (
           <Select
             {...field}
-            style={{ width: "300px" }}
+            style={{ width: "250px" }}
             showSearch
             allowClear
             placeholder="Seçim Yapınız"

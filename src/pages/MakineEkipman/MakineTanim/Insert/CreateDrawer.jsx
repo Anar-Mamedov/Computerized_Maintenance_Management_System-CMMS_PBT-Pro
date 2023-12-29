@@ -408,10 +408,10 @@ export default function CreateDrawer({ onRefresh }) {
   // İş Emri No değerini her drawer açıldığında güncellemek için
   useEffect(() => {
     if (open) {
-      AxiosInstance.get("IsEmriKodGetir") // Replace with your actual API endpoint
+      AxiosInstance.get("MakineKodGetir") // Replace with your actual API endpoint
         .then((response) => {
           // Assuming the response contains the new work order number in 'response.Tanim'
-          setValue("work_order_no", response.Tanim);
+          setValue("makineKodu", response);
         })
         .catch((error) => {
           console.error("Error fetching new work order number:", error);
