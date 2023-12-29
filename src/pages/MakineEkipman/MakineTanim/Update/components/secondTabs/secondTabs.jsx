@@ -98,7 +98,7 @@ export default function SecondTabs() {
             <FinancialDetailsTable />
           </div>
         </TabPane> */}
-        {/* <TabPane tab="Ekipman Ağacı" key="2" disabled>
+        <TabPane tab="Ekipman Ağacı" key="2">
           <div
             style={{
               // display: "flex",
@@ -107,7 +107,7 @@ export default function SecondTabs() {
             }}>
             <RequisiteTable />
           </div>
-        </TabPane> */}
+        </TabPane>
         <TabPane tab="Detay Bilgi" key="3">
           <div
             style={{
@@ -128,7 +128,7 @@ export default function SecondTabs() {
             <FourthTab />
           </div>
         </TabPane>
-        {/* <TabPane tab="Sayaçlar" key="5" disabled>
+        <TabPane tab="Sayaçlar" key="5">
           <div
             style={{
               // display: "flex",
@@ -137,8 +137,8 @@ export default function SecondTabs() {
             }}>
             <FifthTab />
           </div>
-        </TabPane> */}
-        {/* <TabPane tab="Peryodik Bakımlar" key="6" disabled>
+        </TabPane>
+        <TabPane tab="Peryodik Bakımlar" key="6">
           <div
             style={{
               // display: "flex",
@@ -147,9 +147,9 @@ export default function SecondTabs() {
             }}>
             <DetailsTable />
           </div>
-        </TabPane> */}
-        {/* {showOtonomTab && (
-          <TabPane tab="Otonom Bakımlar" key="7" disabled>
+        </TabPane>
+        {showOtonomTab && (
+          <TabPane tab="Otonom Bakımlar" key="7">
             <div
               style={{
                 // display: "flex",
@@ -159,7 +159,7 @@ export default function SecondTabs() {
               <DeliveryTable />
             </div>
           </TabPane>
-        )} */}
+        )}
         {/* {showYakitTab && (
           <TabPane tab="Yakıt Bilgileri" key="10">
             <div
