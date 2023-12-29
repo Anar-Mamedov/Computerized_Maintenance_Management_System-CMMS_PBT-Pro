@@ -441,8 +441,10 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       setValue("KategoriID", selectedRow.MKN_KATEGORI_KOD_ID);
       setValue("MakineMarka", selectedRow.MKN_MARKA);
       setValue("MakineMarkaID", selectedRow.MKN_MARKA_KOD_ID);
-      setValue("MakineModel", selectedRow.MKN_MODEL);
-      setValue("MakineModelID", selectedRow.MKN_MODEL_KOD_ID);
+      const timeoutId = setTimeout(() => {
+        setValue("MakineModel", selectedRow.MKN_MODEL);
+        setValue("MakineModelID", selectedRow.MKN_MODEL_KOD_ID);
+      }, 500); // Delay of 500 milliseconds
       setValue("makineOperator", selectedRow.MKN_OPERATOR);
       setValue("makineOperatorID", selectedRow.MKN_OPERATOR_PERSONEL_ID);
       setValue("MakineDurum", selectedRow.MKN_DURUM);
@@ -464,7 +466,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           ? dayjs(selectedRow.editTime, "HH:mm:ss")
           : null
       );
-
+      // Cleanup function to clear timeout if the component unmounts
+      return () => clearTimeout(timeoutId);
       // });
       // });
     }
