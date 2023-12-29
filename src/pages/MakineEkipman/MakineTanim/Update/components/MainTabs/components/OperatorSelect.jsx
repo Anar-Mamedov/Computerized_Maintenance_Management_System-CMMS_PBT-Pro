@@ -15,8 +15,9 @@ export default function OperatorSelect() {
     setLoading(true);
     try {
       const response = await AxiosInstance.get("GetMakineOperators");
-      if (response && response.Makine_Marka_List) {
-        setOptions(response.Makine_Marka_List);
+      if (response && response.Makine_Operator_List) {
+        console.log({ response });
+        setOptions(response.Makine_Operator_List);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -49,8 +50,8 @@ export default function OperatorSelect() {
             }}
             dropdownRender={(menu) => <Spin spinning={loading}>{menu}</Spin>}
             options={options.map((item) => ({
-              value: item.TB_MARKA_ID, // Use the ID as the value
-              label: item.MRK_MARKA, // Display the name in the dropdown
+              value: item.TB_MAKINE_OPERATOR_ID, // Use the ID as the value
+              label: item.MKO_HEDEF_OPERATOR_KOD, // Display the name in the dropdown
             }))}
             onChange={(value) => {
               // Seçilen değerin ID'sini NedeniID alanına set et
