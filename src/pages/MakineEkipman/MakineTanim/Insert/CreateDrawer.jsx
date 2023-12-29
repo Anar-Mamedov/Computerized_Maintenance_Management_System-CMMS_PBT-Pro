@@ -335,8 +335,8 @@ export default function CreateDrawer({ onRefresh }) {
       MKN_KIRA_BASLANGIC_TARIH: formatDateWithDayjs(data.makineKiraBaslangicTarihi),
       MKN_KIRA_BITIS_TARIH: formatDateWithDayjs(data.makineKiraBitisTarihi),
       MKN_KIRA_SURE: data.MakineKiraSuresi,
-      // :data.MakineKiraSuresiBirim,
-      // :data.MakineKiraSuresiBirimID, // ??
+      // :data.MakineKiraSuresiBirim.label, // ??
+      // :data.MakineKiraSuresiBirimID,
       MKN_KIRA_TUTAR: data.kiraTutari,
       MKN_KIRA_ACIKLAMA: data.kiraAciklama,
       MKN_SATIS: data.makineSatıldı,

@@ -113,47 +113,49 @@ export default function KiraSuresi() {
             <Select
               {...field}
               disabled={!makineKiralik}
-              key={selectKey}
               style={{ width: "205px" }}
               showSearch
               allowClear
               placeholder="Seçim Yapınız"
               optionFilterProp="children"
-              filterOption={(input, option) =>
-                option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
+              filterOption={(input, option) => (option?.label ?? "").includes(input)}
+              filterSort={(optionA, optionB) =>
+                (optionA?.label ?? "").toLowerCase().localeCompare((optionB?.label ?? "").toLowerCase())
               }
-              onDropdownVisibleChange={(open) => {
-                if (open) {
-                  fetchData(); // Fetch data when the dropdown is opened
-                }
-              }}
-              dropdownRender={(menu) => (
-                <Spin spinning={loading}>
-                  {menu}
-                  <Divider
-                    style={{
-                      margin: "8px 0",
-                    }}
-                  />
-                  <Space
-                    style={{
-                      padding: "0 8px 4px",
-                    }}>
-                    <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
-                    <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
-                      Ekle
-                    </Button>
-                  </Space>
-                </Spin>
-              )}
-              options={options.map((item) => ({
-                value: item.TB_KOD_ID, // Use the ID as the value
-                label: item.KOD_TANIM, // Display the name in the dropdown
-              }))}
-              onChange={(value) => {
+              options={[
+                {
+                  value: "1",
+                  label: "Yıl",
+                },
+                {
+                  value: "2",
+                  label: "Ay",
+                },
+                {
+                  value: "3",
+                  label: "Hafta",
+                },
+                {
+                  value: "4",
+                  label: "Gün",
+                },
+                {
+                  value: "5",
+                  label: "Saat",
+                },
+                {
+                  value: "6",
+                  label: "Km",
+                },
+                {
+                  value: "7",
+                  label: "Adet",
+                },
+              ]}
+              onChange={(value, label) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
                 setValue("MakineKiraSuresiBirimID", value);
-                field.onChange(value);
+                field.onChange(label);
               }}
             />
           )}
