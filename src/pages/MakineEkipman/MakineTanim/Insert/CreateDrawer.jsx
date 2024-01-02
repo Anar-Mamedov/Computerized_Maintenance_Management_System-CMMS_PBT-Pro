@@ -155,7 +155,7 @@ export default function CreateDrawer({ onRefresh }) {
       makineKiraBaslangicTarihi: "",
       makineKiraBitisTarihi: "",
       MakineKiraSuresi: "",
-      MakineKiraSuresiBirim: null,
+      MakineKiraSuresiBirim: "",
       MakineKiraSuresiBirimID: "",
       kiraTutari: "",
       kiraAciklama: "",
@@ -335,7 +335,7 @@ export default function CreateDrawer({ onRefresh }) {
       MKN_KIRA_BASLANGIC_TARIH: formatDateWithDayjs(data.makineKiraBaslangicTarihi),
       MKN_KIRA_BITIS_TARIH: formatDateWithDayjs(data.makineKiraBitisTarihi),
       MKN_KIRA_SURE: data.MakineKiraSuresi,
-      // :data.MakineKiraSuresiBirim.label, // ??
+      MKN_KIRA_PERIYOD: data.MakineKiraSuresiBirim.label, // ??
       // :data.MakineKiraSuresiBirimID,
       MKN_KIRA_TUTAR: data.kiraTutari,
       MKN_KIRA_ACIKLAMA: data.kiraAciklama,
@@ -382,7 +382,7 @@ export default function CreateDrawer({ onRefresh }) {
       MKN_OZEL_ALAN_20: data.ozelAlan_20,
       // Notlar sekmesi
       MKN_GUVENLIK_NOT: data.makineGenelNot,
-      MKN_GUVENLIK_NOTU: data.makineGuvenlikNotu,
+      MKN_GENEL_NOT: data.makineGuvenlikNotu,
       // add more fields as needed
     };
 

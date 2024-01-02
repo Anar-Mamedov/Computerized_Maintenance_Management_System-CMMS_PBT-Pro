@@ -62,6 +62,17 @@ export default function MainTabs() {
             control={control}
             render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
           />
+          <Controller
+            name="secilenMakineID"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="text" // Set the type to "text" for name input
+                style={{ display: "none" }}
+              />
+            )}
+          />
         </div>
         <div
           style={{
