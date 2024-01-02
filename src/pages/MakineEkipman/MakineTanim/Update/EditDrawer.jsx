@@ -159,7 +159,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       makineKiraBaslangicTarihi: "",
       makineKiraBitisTarihi: "",
       MakineKiraSuresi: "",
-      MakineKiraSuresiBirim: "",
+      MakineKiraSuresiBirim: null,
       MakineKiraSuresiBirimID: "",
       kiraTutari: "",
       kiraAciklama: "",
@@ -340,7 +340,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       MKN_KIRA_BASLANGIC_TARIH: formatDateWithDayjs(data.makineKiraBaslangicTarihi),
       MKN_KIRA_BITIS_TARIH: formatDateWithDayjs(data.makineKiraBitisTarihi),
       MKN_KIRA_SURE: data.MakineKiraSuresi,
-      MKN_KIRA_PERIYOD: data.MakineKiraSuresiBirim.label, // ??
+      MKN_KIRA_PERIYOD: data.MakineKiraSuresiBirim ? data.MakineKiraSuresiBirim.label : null, // ??
       // :data.MakineKiraSuresiBirimID,
       MKN_KIRA_TUTAR: data.kiraTutari,
       MKN_KIRA_ACIKLAMA: data.kiraAciklama,
@@ -399,7 +399,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);
-        setOpen(false);
+        onDrawerClose(); // Close the drawer
         onRefresh();
         reset();
       })
