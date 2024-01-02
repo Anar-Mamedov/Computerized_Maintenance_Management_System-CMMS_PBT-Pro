@@ -522,7 +522,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       setValue("makineVoltaj", selectedRow.MKN_VOLTAJ);
       setValue("makineGuc", selectedRow.MKN_GUC);
       setValue("makineFaz", selectedRow.MKN_FAZ);
-      setValue("makineValfTipi", selectedRow.MKN_VALF_TIP);
+      setValue("makineValfTipi", selectedRow.MKN_VALF_TIPI);
       setValue("makineValfTipiID", selectedRow.MKN_VALF_TIP_KOD_ID);
       setValue("makineValfBoyutu", selectedRow.MKN_VALF_BOYUT);
       setValue("makineValfBoyutuID", selectedRow.MKN_VALF_BOYUT_KOD_ID);
@@ -535,8 +535,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       setValue("makineBasinc", selectedRow.MKN_BASINC);
       setValue("makineBasincID", selectedRow.MKN_BASINC_KOD_ID);
       setValue("MakineBasincMiktar", selectedRow.MKN_BASINC_MIKTAR);
-      setValue("MakineBasincMiktarBirim", selectedRow.MKN_BASINC_MIKTAR_BIRIM);
-      setValue("MakineBasincMiktarBirimID", selectedRow.MKN_BASINC_MIKTAR_BIRIM_KOD_ID);
+      setValue("MakineBasincMiktarBirim", selectedRow.MKN_BASINC_BIRIM);
+      setValue("MakineBasincMiktarBirimID", selectedRow.MKN_BASINC_BIRIM_KOD_ID);
       setValue("makineDevirSayisi", selectedRow.MKN_DEVIR);
       setValue("makineMotorGucu", selectedRow.MKN_TEKNIK_MOTOR_GUCU);
       setValue("makineSilindirSayisi", selectedRow.MKN_TEKNIK_SILINDIR_SAYISI);
