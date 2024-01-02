@@ -153,9 +153,12 @@ export default function KiraSuresi() {
                 },
               ]}
               onChange={(value, label) => {
-                // Seçilen değerin ID'sini NedeniID alanına set et
                 setValue("MakineKiraSuresiBirimID", value);
-                field.onChange(label);
+                if (value === undefined || value === null) {
+                  field.onChange(null); // Eğer değer temizlenirse, onChange metoduna null gönder
+                } else {
+                  field.onChange(label);
+                }
               }}
             />
           )}
