@@ -426,6 +426,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   useEffect(() => {
     if (drawerVisible && selectedRow) {
+      // console.log("selectedRow", selectedRow);
       // startTransition(() => {
       // Object.keys(selectedRow).forEach((key) => {
       //   console.log(key, selectedRow[key]);
