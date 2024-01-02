@@ -44,6 +44,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   //* export
   const methods = useForm({
     defaultValues: {
+      secilenMakineID: "",
       makineKodu: "",
       makineTanimi: "",
       location: null,
@@ -158,7 +159,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       makineKiraBaslangicTarihi: "",
       makineKiraBitisTarihi: "",
       MakineKiraSuresi: "",
-      MakineKiraSuresiBirim: null,
+      MakineKiraSuresiBirim: "",
       MakineKiraSuresiBirimID: "",
       kiraTutari: "",
       kiraAciklama: "",
@@ -224,6 +225,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   //* export
   const onSubmit = (data) => {
     const Body = {
+      TB_MAKINE_ID: data.secilenMakineID, // ??
       MKN_KOD: data.makineKodu,
       MKN_TANIM: data.makineTanimi,
       // :data.location,
@@ -338,8 +340,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       MKN_KIRA_BASLANGIC_TARIH: formatDateWithDayjs(data.makineKiraBaslangicTarihi),
       MKN_KIRA_BITIS_TARIH: formatDateWithDayjs(data.makineKiraBitisTarihi),
       MKN_KIRA_SURE: data.MakineKiraSuresi,
-      // :data.MakineKiraSuresiBirim,
-      // :data.MakineKiraSuresiBirimID, // ??
+      MKN_KIRA_PERIYOD: data.MakineKiraSuresiBirim.label, // ??
+      // :data.MakineKiraSuresiBirimID,
       MKN_KIRA_TUTAR: data.kiraTutari,
       MKN_KIRA_ACIKLAMA: data.kiraAciklama,
       MKN_SATIS: data.makineSatıldı,
@@ -385,7 +387,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       MKN_OZEL_ALAN_20: data.ozelAlan_20,
       // Notlar sekmesi
       MKN_GUVENLIK_NOT: data.makineGenelNot,
-      MKN_GUVENLIK_NOTU: data.makineGuvenlikNotu,
+      MKN_GENEL_NOT: data.makineGuvenlikNotu,
       // add more fields as needed
     };
 
@@ -393,7 +395,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     // handle response
     // });
 
-    AxiosInstance.post("AddMakine?ID=24", Body)
+    AxiosInstance.post("UpdateMakine?ID=24", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);
@@ -426,12 +428,12 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   useEffect(() => {
     if (drawerVisible && selectedRow) {
-      // console.log("selectedRow", selectedRow);
+      console.log("selectedRow", selectedRow);
       // startTransition(() => {
       // Object.keys(selectedRow).forEach((key) => {
       //   console.log(key, selectedRow[key]);
       //   setValue(key, selectedRow[key]);
-      // setValue("isEmriSelectedId", selectedRow.key);
+      setValue("secilenMakineID", selectedRow.key);
       setValue("makineKodu", selectedRow.MKN_KOD);
       setValue("makineTanimi", selectedRow.MKN_TANIM);
       setValue("location", selectedRow.MKN_LOKASYON);
@@ -599,7 +601,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           : ""
       );
       setValue("MakineKiraSuresi", selectedRow.MKN_KIRA_SURE);
-      setValue("MakineKiraSuresiBirim", selectedRow.MKN_KIRA_SURE_BIRIM);
+      setValue("MakineKiraSuresiBirim", selectedRow.MKN_KIRA_PERIYOD);
       setValue("MakineKiraSuresiBirimID", selectedRow.MKN_KIRA_SURE_BIRIM_KOD_ID);
       setValue("kiraTutari", selectedRow.MKN_KIRA_TUTAR);
       setValue("kiraAciklama", selectedRow.MKN_KIRA_ACIKLAMA);
@@ -651,7 +653,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       setValue("ozelAlan_20", selectedRow.MKN_OZEL_ALAN_20);
       // Notlar sekmesi
       setValue("makineGenelNot", selectedRow.MKN_GUVENLIK_NOT);
-      setValue("makineGuvenlikNotu", selectedRow.MKN_GUVENLIK_NOTU);
+      setValue("makineGuvenlikNotu", selectedRow.MKN_GENEL_NOT);
       // add more fields as needed
       // Cleanup function to clear timeout if the component unmounts
       return () => clearTimeout(timeoutId);
