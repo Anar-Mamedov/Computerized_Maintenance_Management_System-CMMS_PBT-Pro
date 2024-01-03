@@ -10,7 +10,9 @@ export default function RequisiteTable() {
   const selectedMakineID = watch("secilenMakineID");
 
   useEffect(() => {
-    fetchEquipmentData();
+    if (selectedMakineID) {
+      fetchEquipmentData();
+    }
   }, [selectedMakineID]);
 
   const fetchEquipmentData = async () => {
