@@ -93,6 +93,7 @@ export default function RequisiteTable() {
   };
 
   const rowSelection = {
+    type: "radio", // Radio tipi seçim kutuları kullan
     selectedRowKeys,
     onChange: onSelectChange,
     // You can add more configuration here if needed
