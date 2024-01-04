@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useFormContext, useFieldArray } from "react-hook-form";
+import { useFormContext, useFieldArray, Controller } from "react-hook-form";
 import { Table } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
 
 export default function RequisiteTable() {
-  const { watch, control } = useFormContext();
+  const { watch, control, setValue } = useFormContext();
   const { fields, append, replace } = useFieldArray({
     control,
     name: "equipment", // Name of the field array
@@ -90,6 +90,12 @@ export default function RequisiteTable() {
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
+    // Seçilen satırın ID'sini formun bir alanına yazdır
+    if (newSelectedRowKeys.length > 0) {
+      setValue("selectedEquipmentId", newSelectedRowKeys[0]);
+    } else {
+      setValue("selectedEquipmentId", null);
+    }
   };
 
   const rowSelection = {
@@ -99,5 +105,9 @@ export default function RequisiteTable() {
     // You can add more configuration here if needed
   };
 
-  return <Table rowSelection={rowSelection} columns={columns} dataSource={fields} />;
+  return (
+    <div>
+      <Table rowSelection={rowSelection} columns={columns} dataSource={fields} />
+    </div>
+  );
 }
