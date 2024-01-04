@@ -1,13 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { useFormContext } from "react-hook-form";
+import React, { useEffect, useState } from "react";
+import { useFormContext, useFieldArray } from "react-hook-form";
 import { Table } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
 
 export default function RequisiteTable() {
-  const { watch } = useFormContext();
-  const [tableData, setTableData] = useState([]);
+  const { watch, control } = useFormContext();
+  const { fields, append, replace } = useFieldArray({
+    control,
+    name: "equipment", // Name of the field array
+  });
 
   const selectedMakineID = watch("secilenMakineID");
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   useEffect(() => {
     if (selectedMakineID) {
@@ -18,14 +22,14 @@ export default function RequisiteTable() {
   const fetchEquipmentData = async () => {
     try {
       const response = await AxiosInstance.get(`Ekipman?MakineID=${selectedMakineID}`);
-      if (response && response) {
+      if (response) {
         const formattedData = formatDataForTable(response);
-        setTableData(formattedData);
+        replace(formattedData); // Populate the field array
       } else {
-        console.error("API yanıtı beklenen formatta değil");
+        console.error("API response is not in expected format");
       }
     } catch (error) {
-      console.error("API isteğinde hata oluştu:", error);
+      console.error("Error in API request:", error);
     }
   };
 
@@ -65,20 +69,34 @@ export default function RequisiteTable() {
   };
 
   const columns = [
+    // {
+    //   title: "",
+    //   key: "key",
+    //   dataIndex: "key",
+    //   width: 150,
+    //   render: (text, record) => <div style={{ marginTop: "6px" }}>{record.key}</div>,
+    // },
     {
       title: "",
       key: "ekipmanBilgisi",
       render: (text, record) => (
-        <div
-          style={{
-            marginTop: "6px",
-          }}>
+        <div style={{ marginTop: "6px" }}>
           {record.EKP_KOD} - {record.EKP_TANIM}
         </div>
       ),
     },
-    // Diğer sütunlarınız...
+    // Other columns...
   ];
 
-  return <Table columns={columns} dataSource={tableData} />;
+  const onSelectChange = (newSelectedRowKeys) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+    // You can add more configuration here if needed
+  };
+
+  return <Table rowSelection={rowSelection} columns={columns} dataSource={fields} />;
 }
