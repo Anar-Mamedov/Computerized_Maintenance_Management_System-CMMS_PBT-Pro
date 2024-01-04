@@ -33,7 +33,6 @@ export default function DetailsTable() {
     try {
       const response = await AxiosInstance.get(`PeriyodikBakimByMakine?MakineID=${selectedMakineID}`);
       const apiData = response;
-      console.log("apiData", apiData);
       replace(
         apiData.map((item) => ({
           key: item.TB_PERIYODIK_BAKIM_ID,
