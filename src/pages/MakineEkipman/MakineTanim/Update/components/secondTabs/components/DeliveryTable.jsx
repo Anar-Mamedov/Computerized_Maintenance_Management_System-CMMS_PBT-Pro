@@ -14,24 +14,24 @@ export default function DeliveryTable() {
 
   const fetchSayacData = useCallback(async () => {
     try {
-      const response = await AxiosInstance.get(`Sayac?MakineID=${selectedMakineID}`);
-      const apiData = response;
+      const response = await AxiosInstance.get(`makinebakim/GetByMakine?MakineID=${selectedMakineID}&kllId=24`);
+      const apiData = response; // Assuming 'data' contains the array
       replace(
-        apiData.map((item) => ({
-          key: item.TB_SAYAC_ID,
-          sayacTanim: item.MES_TANIM,
-          sayacBirimi: item.MES_SAYAC_BIRIM,
-          sayacTipi: item.MES_SAYAC_TIP,
-          baslangicTarihi: item.TB_SAYAC_BASLANGIC_TARIHI,
-          sanalSayac: item.MES_SANAL_SAYAC,
-          sayacDeger: item.MES_GUNCEL_DEGER,
-          artisDeger: item.MES_TAHMINI_ARTIS_DEGER,
-          aciklama: item.MES_ACIKLAMA,
-          sayacBaslangicDeger: item.MES_BASLANGIC_DEGER,
-          ekipmanKodu: item.TB_SAYAC_EKIPMAN_KODU,
-          ekipmanTanim: item.TB_SAYAC_EKIPMAN_TANIM,
-          // Diğer alanlar
-        }))
+        apiData.map((item) => {
+          // Extracting the nested MAB_IS_TANIM object
+          const isTanim = item.MAB_IS_TANIM;
+          return {
+            key: isTanim ? isTanim.TB_IS_TANIM_ID : undefined,
+            bakimKodu: isTanim ? isTanim.IST_KOD : "",
+            bakimTanim: isTanim ? isTanim.IST_TANIM : "",
+            bakimTipi: isTanim ? isTanim.IST_TIP : "",
+            bakimGrubu: isTanim ? isTanim.IST_GRUP : "",
+            sonUygulamaTarihi: item.TB_IS_TANIM_SON_UYGULAMA_TARIHI, // ? name bulamadim
+            maddeSayisi: isTanim ? isTanim.IST_KONTROL_SAYI : 0,
+            sonUygulayan: item.TB_IS_TANIM_SON_UYGULAYAN, // ? name bulamadim
+            // Diğer alanlar
+          };
+        })
       );
     } catch (error) {
       console.error("API isteği sırasında bir hata oluştu:", error);
@@ -47,101 +47,57 @@ export default function DeliveryTable() {
 
   const columns = [
     {
-      title: <div style={{ textAlign: "center" }}>Sayaç Tanım </div>,
-      dataIndex: "sayacTanim",
-      key: "sayacTanim",
+      title: <div style={{ textAlign: "center" }}>Bakım Kodu</div>,
+      dataIndex: "bakimKodu",
+      key: "bakimKodu",
       ellipsis: true,
       width: 250,
     },
     {
-      title: <div style={{ textAlign: "center" }}>Sayaç Birimi </div>,
-      dataIndex: "sayacBirimi",
-      key: "sayacBirimi",
+      title: <div style={{ textAlign: "center" }}>Bakım Tanım</div>,
+      dataIndex: "bakimTanim",
+      key: "bakimTanim",
       ellipsis: true,
       width: 150,
     },
     {
-      title: <div style={{ textAlign: "center" }}>Sayaç Tipi </div>,
-      dataIndex: "sayacTipi",
-      key: "sayacTipi",
+      title: <div style={{ textAlign: "center" }}>Bakım Tipi</div>,
+      dataIndex: "bakimTipi",
+      key: "bakimTipi",
       ellipsis: true,
       width: 150,
     },
     {
-      title: <div style={{ textAlign: "center" }}>Başlangıç Tarihi </div>,
-      dataIndex: "baslangicTarihi",
-      key: "baslangicTarihi",
+      title: <div style={{ textAlign: "center" }}>Bakım Grubu</div>,
+      dataIndex: "bakimGrubu",
+      key: "bakimGrubu",
+      ellipsis: true,
+      width: 150,
+    },
+    {
+      title: <div style={{ textAlign: "center" }}>Son Uygulama Tarihi</div>,
+      dataIndex: "sonUygulamaTarihi",
+      key: "sonUygulamaTarihi",
       align: "center",
       ellipsis: true,
       width: 150,
     },
     {
-      title: <div style={{ textAlign: "center" }}>Sanal Sayaç </div>,
-      dataIndex: "sanalSayac",
-      key: "sanalSayac",
+      title: <div style={{ textAlign: "center" }}>Madde Sayısı</div>,
+      dataIndex: "maddeSayisi",
+      key: "maddeSayisi",
       align: "center",
       ellipsis: true,
       width: 110,
-      render: (text, record) => <Checkbox checked={record.sanalSayac} disabled />,
     },
     {
-      title: <div style={{ textAlign: "center" }}>Sayaç Değeri </div>,
-      dataIndex: "sayacDeger",
-      key: "sayacDeger",
+      title: <div style={{ textAlign: "center" }}>Son Uygulayan</div>,
+      dataIndex: "sonUygulayan",
+      key: "sonUygulayan",
       align: "right",
       ellipsis: true,
       width: 120,
     },
-
-    {
-      title: <div style={{ textAlign: "center" }}>Artış Değer </div>,
-      dataIndex: "artisDeger",
-      key: "artisDeger",
-      align: "right",
-      ellipsis: true,
-      width: 120,
-    },
-    {
-      title: <div style={{ textAlign: "center" }}>Açıklama </div>,
-      dataIndex: "aciklama",
-      key: "aciklama",
-      ellipsis: true,
-      width: 300,
-    },
-    {
-      title: (
-        <div style={{ textAlign: "center" }}>
-          Sayaç <br />
-          Başlangıç <br />
-          Değeri
-        </div>
-      ),
-      dataIndex: "sayacBaslangicDeger",
-      key: "sayacBaslangicDeger",
-      align: "right",
-      ellipsis: true,
-      width: 120,
-    },
-    {
-      title: <div style={{ textAlign: "center" }}>Ekipman Kodu</div>,
-      dataIndex: "ekipmanKodu",
-      key: "ekipmanKodu",
-      align: "right",
-      ellipsis: true,
-      width: 120,
-    },
-    {
-      title: (
-        <div style={{ textAlign: "center" }}>
-          Ekipman <br /> Tanımı
-        </div>
-      ),
-      dataIndex: "ekipmanTanim",
-      key: "ekipmanTanim",
-      ellipsis: true,
-      width: 120,
-    },
-
     // Diğer sütunlar
   ];
 
