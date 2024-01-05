@@ -684,7 +684,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           </Button> */}
           <Drawer
             width="1660px"
-            title="Düzenleme İş Emri"
+            title="Kayıdı Güncelle"
             placement={"right"}
             onClose={onDrawerClose}
             open={drawerVisible}

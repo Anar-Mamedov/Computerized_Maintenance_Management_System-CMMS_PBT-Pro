@@ -5,6 +5,7 @@ import AxiosInstance from "../../../../../../../../api/http";
 import Firma from "./components/Firma";
 import KiraSuresi from "./components/KiraSuresi";
 import SatinalmaSekme from "./components/SatinalmaSekme";
+import SatinalmaKrediBilgileri from "./components/SatinalmaKrediBilgileri";
 
 const { Text, Link } = Typography;
 
@@ -17,6 +18,7 @@ export default function FourthTab() {
   };
 
   const makineKiralik = watch("makineKiralik");
+  const makineSatildi = watch("makineSatıldı");
 
   return (
     <div
@@ -27,7 +29,8 @@ export default function FourthTab() {
         marginBottom: "20px",
       }}>
       <div style={{ display: "flex", flexWrap: "wrap" }}>
-        <SatinalmaSekme />
+        {/* <SatinalmaSekme /> */}
+        <SatinalmaKrediBilgileri />
       </div>
       <div>
         <div
@@ -249,7 +252,7 @@ export default function FourthTab() {
             <Controller
               name="makineSatisNedeni"
               control={control}
-              render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
+              render={({ field }) => <Input {...field} disabled={!makineSatildi} style={{ width: "300px" }} />}
             />
           </div>
           <div
@@ -265,7 +268,13 @@ export default function FourthTab() {
               name="makineSatisTarihi"
               control={control}
               render={({ field }) => (
-                <DatePicker {...field} style={{ width: "300px" }} format="DD-MM-YYYY" placeholder="Tarih seçiniz" />
+                <DatePicker
+                  {...field}
+                  disabled={!makineSatildi}
+                  style={{ width: "300px" }}
+                  format="DD-MM-YYYY"
+                  placeholder="Tarih seçiniz"
+                />
               )}
             />
           </div>
@@ -282,7 +291,7 @@ export default function FourthTab() {
             <Controller
               name="makineSatisYeri"
               control={control}
-              render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
+              render={({ field }) => <Input {...field} disabled={!makineSatildi} style={{ width: "300px" }} />}
             />
           </div>
           <div
@@ -300,6 +309,7 @@ export default function FourthTab() {
               render={({ field: { onChange, ...restField } }) => (
                 <Input
                   {...restField}
+                  disabled={!makineSatildi}
                   style={{ width: "300px" }}
                   onChange={(e) => {
                     // Allow only numeric input
@@ -323,7 +333,7 @@ export default function FourthTab() {
             <Controller
               name="makineSatisAciklama"
               control={control}
-              render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
+              render={({ field }) => <Input {...field} disabled={!makineSatildi} style={{ width: "300px" }} />}
             />
           </div>
         </div>

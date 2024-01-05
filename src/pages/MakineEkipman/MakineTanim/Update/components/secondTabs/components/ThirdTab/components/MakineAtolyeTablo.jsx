@@ -61,7 +61,13 @@ export default function MakineAtolyeTablo({ workshopSelectedId, onSubmit }) {
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
-      <Modal title="Atölye Tanımları" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
+      <Modal
+        width={1200}
+        centered
+        title="Atölye Tanımları"
+        open={isModalVisible}
+        onOk={handleModalOk}
+        onCancel={handleModalToggle}>
         <Table
           rowSelection={{
             type: "radio",

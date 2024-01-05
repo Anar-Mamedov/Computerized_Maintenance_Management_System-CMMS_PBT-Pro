@@ -115,12 +115,7 @@ export default function MakineTakvimtablo({ workshopSelectedId, onSubmit }) {
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
-      <Modal
-        width="1200px"
-        title="Atölye Tanımları"
-        open={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={handleModalToggle}>
+      <Modal width="1200px" title="Takvim" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <Table
           rowSelection={{
             type: "radio",

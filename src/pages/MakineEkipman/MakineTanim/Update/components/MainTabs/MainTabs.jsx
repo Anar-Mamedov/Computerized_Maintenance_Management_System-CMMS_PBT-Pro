@@ -256,7 +256,17 @@ export default function MainTabs() {
           <Controller
             name="uretimYili"
             control={control}
-            render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
+            render={({ field: { onChange, ...restField } }) => (
+              <Input
+                {...restField}
+                style={{ width: "300px" }}
+                onChange={(e) => {
+                  // Sadece sayısal girişe izin ver ve maksimum 4 karakter sınırlaması koy
+                  const numericValue = e.target.value.replace(/[^0-9]/g, "").slice(0, 4);
+                  onChange(numericValue);
+                }}
+              />
+            )}
           />
         </div>
         <div

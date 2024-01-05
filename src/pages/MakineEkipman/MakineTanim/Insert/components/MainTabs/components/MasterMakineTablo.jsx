@@ -304,7 +304,7 @@ export default function MasterMakineTablo({ workshopSelectedId, onSubmit }) {
       <Modal
         width="1200px"
         centered
-        title="Atölye Tanımları"
+        title="Makine Tanımları"
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}>
