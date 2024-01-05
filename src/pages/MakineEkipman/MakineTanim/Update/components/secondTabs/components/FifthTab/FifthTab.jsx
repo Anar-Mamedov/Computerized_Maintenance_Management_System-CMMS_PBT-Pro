@@ -25,7 +25,7 @@ export default function FifthTab() {
           baslangicTarihi: item.TB_SAYAC_BASLANGIC_TARIHI,
           sanalSayac: item.MES_SANAL_SAYAC,
           sayacDeger: item.MES_GUNCEL_DEGER,
-          artisDeger: item.MES_TAHMINI_ARTIS_DEGER,
+          artisDeger: item.MES_SANAL_SAYAC_ARTIS,
           aciklama: item.MES_ACIKLAMA,
           sayacBaslangicDeger: item.MES_BASLANGIC_DEGER,
           ekipmanKodu: item.TB_SAYAC_EKIPMAN_KODU,

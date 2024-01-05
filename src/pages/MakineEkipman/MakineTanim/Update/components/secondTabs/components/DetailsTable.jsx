@@ -14,19 +14,20 @@ export default function DetailsTable() {
   const selectedMakineID = watch("secilenMakineID");
 
   const calculateRemainingTime = (targetDate) => {
+    if (!dayjs(targetDate).isValid()) {
+      return ""; // Eğer geçerli bir tarih değilse, boş bir string döndür
+    }
+
     const now = dayjs();
     const target = dayjs(targetDate);
-    const difference = target.diff(now, "minute"); // Difference in minutes
+    const difference = target.diff(now, "day"); // Difference in days
 
     // Check if the difference is negative
     if (difference < 0) {
-      return ""; // Return an empty string for past dates
+      return ""; // Return an empty string for past dates or invalid dates
     }
 
-    const hours = Math.floor(difference / 60);
-    const minutes = difference % 60;
-
-    return `${hours}h ${minutes}m`;
+    return `${difference} gün`; // Return the difference in days
   };
 
   const fetchSayacData = useCallback(async () => {
@@ -42,13 +43,16 @@ export default function DetailsTable() {
           sonUygulama: item.PBK_SON_UYGULAMA_TARIH,
           hedefTarih: item.PBK_HEDEF_UYGULAMA_TARIH,
           kalanSure: calculateRemainingTime(item.PBK_HEDEF_UYGULAMA_TARIH),
-          sayac: item.TB_PERIYODIK_BAKIM_SAYAC, //? name bulamadim
-          guncelSayac: item.PBK_GUNCEL_SAYAC_DEGERI,
-          sonUygulanan: item.PBK_SON_UYGULAMA_TARIH, //? name bulamadim
+          sayac: item.PBK_SAYAC_TANIM,
+          guncelSayac: item.PBK_GUNCEL_SAYAC,
+          sonUygulanan: item.PBK_SON_UYGULAMA_SAYAC,
           hedefSayac: item.PBK_HEDEF_SAYAC,
-          kalanSayac: item.PBK_HEDEF_SAYAC - item.PBK_GUNCEL_SAYAC_DEGERI, // yukarıdaki iki alanın farkı
-          kalanSayacYuzde: item.PBK_HEDEF_SAYAC - item.PBK_GUNCEL_SAYAC_DEGERI, // yukarıdaki iki alanın farkı yüzde olarak
-          hatirlatmaSure: item.TB_PERIYODIK_BAKIM_HATIRLATMA_SURE, //? name bulamadim
+          kalanSayac:
+            item.PBK_HEDEF_SAYAC - item.PBK_GUNCEL_SAYAC >= 0 ? item.PBK_HEDEF_SAYAC - item.PBK_GUNCEL_SAYAC : "", // yukarıdaki iki alanın farkı
+          kalanSayacYuzde:
+            item.PBK_HEDEF_SAYAC > 0 ? Math.round((item.PBK_GUNCEL_SAYAC / item.PBK_HEDEF_SAYAC) * 100) : "", // Hedef sayaç sıfırdan büyükse yüzde hesapla, değilse boş string döndür
+
+          hatirlatmaSure: item.PBM_HATIRLAT_SAYAC, //? name bulamadim
           // Diğer alanlar
         }))
       );
@@ -94,7 +98,8 @@ export default function DetailsTable() {
       ellipsis: true,
       width: 150,
       render: (text) => {
-        return dayjs(text).format("DD-MM-YYYY"); // Formats the date as "Day/Month/Year"
+        // Eğer text null veya boş değilse formatla, aksi takdirde boş bir string dön
+        return text ? dayjs(text).format("DD-MM-YYYY") : "";
       },
     },
     {
@@ -105,7 +110,8 @@ export default function DetailsTable() {
       ellipsis: true,
       width: 120,
       render: (text) => {
-        return dayjs(text).format("DD-MM-YYYY"); // Formats the date as "Day/Month/Year"
+        // Eğer text null veya boş değilse formatla, aksi takdirde boş bir string dön
+        return text ? dayjs(text).format("DD-MM-YYYY") : "";
       },
     },
     {
@@ -168,6 +174,10 @@ export default function DetailsTable() {
       key: "kalanSayacYuzde",
       ellipsis: true,
       width: 120,
+      render: (value) => {
+        // Eğer value null, undefined veya boş string ise "0 %", değilse değeri yüzde formatında göster
+        return value || value === 0 ? `${value} %` : "0 %";
+      },
     },
     {
       title: <div style={{ textAlign: "center" }}>Hatırlatma Süre</div>,
