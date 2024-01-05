@@ -13,20 +13,34 @@ export default function DetailsTable() {
 
   const selectedMakineID = watch("secilenMakineID");
 
+  // Kalan Süre (Gün) hesaplama fonksiyonu
+
   const calculateRemainingTime = (targetDate) => {
+    if (!dayjs(targetDate).isValid()) {
+      return ""; // Eğer geçerli bir tarih değilse, boş bir string döndür
+    }
+
     const now = dayjs();
     const target = dayjs(targetDate);
-    const difference = target.diff(now, "minute"); // Difference in minutes
+    const difference = target.diff(now, "day"); // Difference in days
 
     // Check if the difference is negative
     if (difference < 0) {
-      return ""; // Return an empty string for past dates
+      return ""; // Return an empty string for past dates or invalid dates
     }
 
-    const hours = Math.floor(difference / 60);
-    const minutes = difference % 60;
+    return `${difference} gün`; // Return the difference in days
+  };
 
-    return `${hours}h ${minutes}m`;
+  // Kalan Süre % hesaplama fonksiyonu
+
+  const calculatePercentageOfTimeRemaining = (sonUygulama, hedefTarih, kalanGun) => {
+    const totalDays = dayjs(hedefTarih).diff(dayjs(sonUygulama), "day");
+    if (totalDays <= 0 || !kalanGun) {
+      return 0; // Total days 0 veya negatifse ya da kalan gün yoksa, 0% dön
+    }
+    const percentage = (kalanGun / totalDays) * 100;
+    return Math.round(percentage); // Yüzdeyi hesapla ve yuvarla
   };
 
   const fetchSayacData = useCallback(async () => {
@@ -34,23 +48,35 @@ export default function DetailsTable() {
       const response = await AxiosInstance.get(`PeriyodikBakimByMakine?MakineID=${selectedMakineID}`);
       const apiData = response;
       replace(
-        apiData.map((item) => ({
-          key: item.TB_PERIYODIK_BAKIM_ID,
-          peryodikBakimKodu: item.PBK_KOD,
-          peryodikBakim: item.PBK_TANIM,
-          isEmriNo: item.PBK_ISEMRI_NO,
-          sonUygulama: item.PBK_SON_UYGULAMA_TARIH,
-          hedefTarih: item.PBK_HEDEF_UYGULAMA_TARIH,
-          kalanSure: calculateRemainingTime(item.PBK_HEDEF_UYGULAMA_TARIH),
-          sayac: item.TB_PERIYODIK_BAKIM_SAYAC, //? name bulamadim
-          guncelSayac: item.PBK_GUNCEL_SAYAC_DEGERI,
-          sonUygulanan: item.PBK_SON_UYGULAMA_TARIH, //? name bulamadim
-          hedefSayac: item.PBK_HEDEF_SAYAC,
-          kalanSayac: item.PBK_HEDEF_SAYAC - item.PBK_GUNCEL_SAYAC_DEGERI, // yukarıdaki iki alanın farkı
-          kalanSayacYuzde: item.PBK_HEDEF_SAYAC - item.PBK_GUNCEL_SAYAC_DEGERI, // yukarıdaki iki alanın farkı yüzde olarak
-          hatirlatmaSure: item.TB_PERIYODIK_BAKIM_HATIRLATMA_SURE, //? name bulamadim
-          // Diğer alanlar
-        }))
+        apiData.map((item) => {
+          const kalanGun = calculateRemainingTime(item.PBK_HEDEF_UYGULAMA_TARIH); // Kalan günü hesapla
+          const kalanSureYuzde = calculatePercentageOfTimeRemaining(
+            item.PBK_SON_UYGULAMA_TARIH,
+            item.PBK_HEDEF_UYGULAMA_TARIH,
+            kalanGun
+          );
+
+          return {
+            key: item.TB_PERIYODIK_BAKIM_ID,
+            peryodikBakimKodu: item.PBK_KOD,
+            peryodikBakim: item.PBK_TANIM,
+            isEmriNo: item.PBK_ISEMRI_NO,
+            sonUygulama: item.PBK_SON_UYGULAMA_TARIH,
+            hedefTarih: item.PBK_HEDEF_UYGULAMA_TARIH,
+            sayac: item.PBK_SAYAC_TANIM,
+            guncelSayac: item.PBK_GUNCEL_SAYAC,
+            sonUygulanan: item.PBK_SON_UYGULAMA_SAYAC,
+            hedefSayac: item.PBK_HEDEF_SAYAC,
+            kalanSayac:
+              item.PBK_HEDEF_SAYAC - item.PBK_GUNCEL_SAYAC >= 0 ? item.PBK_HEDEF_SAYAC - item.PBK_GUNCEL_SAYAC : "", // yukarıdaki iki alanın farkı
+            kalanSayacYuzde:
+              item.PBK_HEDEF_SAYAC > 0 ? Math.round((item.PBK_GUNCEL_SAYAC / item.PBK_HEDEF_SAYAC) * 100) : "", // Hedef sayaç sıfırdan büyükse yüzde hesapla, değilse boş string döndür
+
+            hatirlatmaSure: item.PBM_HATIRLAT_SAYAC, //? name bulamadim
+            kalanSure: kalanGun,
+            kalanSureYuzde, // Hesaplanan yüzde değerini kullan
+          };
+        })
       );
     } catch (error) {
       console.error("API isteği sırasında bir hata oluştu:", error);
@@ -87,14 +113,15 @@ export default function DetailsTable() {
       width: 150,
     },
     {
-      title: <div style={{ textAlign: "center" }}>Son Uygulama</div>,
+      title: <div style={{ textAlign: "center" }}>Son Uygulama Tarihi</div>,
       dataIndex: "sonUygulama",
       key: "sonUygulama",
       align: "center",
       ellipsis: true,
       width: 150,
       render: (text) => {
-        return dayjs(text).format("DD-MM-YYYY"); // Formats the date as "Day/Month/Year"
+        // Eğer text null veya boş değilse formatla, aksi takdirde boş bir string dön
+        return text ? dayjs(text).format("DD-MM-YYYY") : "";
       },
     },
     {
@@ -105,11 +132,17 @@ export default function DetailsTable() {
       ellipsis: true,
       width: 120,
       render: (text) => {
-        return dayjs(text).format("DD-MM-YYYY"); // Formats the date as "Day/Month/Year"
+        // Eğer text null veya boş değilse formatla, aksi takdirde boş bir string dön
+        return text ? dayjs(text).format("DD-MM-YYYY") : "";
       },
     },
     {
-      title: <div style={{ textAlign: "center" }}>Kalan Süre</div>,
+      title: (
+        <div style={{ textAlign: "center" }}>
+          Kalan Süre <br />
+          (Gün)
+        </div>
+      ),
       dataIndex: "kalanSure",
       key: "kalanSure",
       align: "right",
@@ -124,6 +157,10 @@ export default function DetailsTable() {
       align: "right",
       ellipsis: true,
       width: 120,
+      render: (value) => {
+        // Eğer value null, undefined veya boş string ise "0 %", değilse değeri yüzde formatında göster
+        return `${value} %`;
+      },
     },
     {
       title: <div style={{ textAlign: "center" }}>Sayaç</div>,
@@ -168,6 +205,10 @@ export default function DetailsTable() {
       key: "kalanSayacYuzde",
       ellipsis: true,
       width: 120,
+      render: (value) => {
+        // Eğer value null, undefined veya boş string ise "0 %", değilse değeri yüzde formatında göster
+        return value || value === 0 ? `${value} %` : "0 %";
+      },
     },
     {
       title: <div style={{ textAlign: "center" }}>Hatırlatma Süre</div>,
