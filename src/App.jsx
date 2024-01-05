@@ -1,9 +1,17 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
-import { DesktopOutlined, FileOutlined, PieChartOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  DesktopOutlined,
+  FileOutlined,
+  PieChartOutlined,
+  TeamOutlined,
+  UserOutlined,
+  KeyOutlined,
+} from "@ant-design/icons";
 import { Breadcrumb, Layout, Menu, theme } from "antd";
 import Isemri from "./pages/DashboardAnalytics2/Isemri";
 import MakineTanim from "./pages/MakineEkipman/MakineTanim/MakineTanim";
+import LokasyonTanim from "./pages/Yonetim/LokasyonTanimlari/LokasyonTanimlari";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -40,6 +48,16 @@ const items = [
     ],
     false
   ),
+  getItem(
+    "Yönetim",
+    "yonetim",
+    <KeyOutlined />,
+    [
+      getItem("Lokasyon Tanımları", "lokasyon", true),
+      // getItem("Team 2", "team2", true)
+    ],
+    false
+  ),
   // getItem("Files", "files", <FileOutlined />),
 ];
 
@@ -68,6 +86,7 @@ const App = () => {
               <Routes>
                 <Route path="/isemri" element={<Isemri />} />
                 <Route path="/makine" element={<MakineTanim />} />
+                <Route path="/lokasyon" element={<LokasyonTanim />} />
                 {/* Diğer Route'lar */}
               </Routes>
             </div>
