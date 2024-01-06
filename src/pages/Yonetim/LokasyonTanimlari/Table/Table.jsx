@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useFormContext, useFieldArray, Controller } from "react-hook-form";
-import { Input, Table } from "antd";
+import { Input, Table, Spin } from "antd";
 import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import { SearchOutlined } from "@ant-design/icons";
@@ -13,6 +13,7 @@ export default function MainTable() {
   });
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // arama işlevi için
 
@@ -91,15 +92,18 @@ export default function MainTable() {
 
   const fetchEquipmentData = async () => {
     try {
+      setLoading(true); // Yükleme başladığında
       const response = await AxiosInstance.get("Lokasyon?ID=30");
       if (response) {
         const formattedData = formatDataForTable(response);
         replace(formattedData); // Populate the field array
+        setLoading(false); // Yükleme bittiğinde
       } else {
         console.error("API response is not in expected format");
       }
     } catch (error) {
       console.error("Error in API request:", error);
+      setLoading(false); // Hata durumunda da yükleme bitti
     }
   };
 
@@ -183,16 +187,17 @@ export default function MainTable() {
         />
         <CreateDrawer />
       </div>
-
-      <Table
-        rowSelection={rowSelection}
-        columns={columns}
-        dataSource={debouncedSearchTerm ? filteredData : fields}
-        pagination={false}
-        scroll={{ y: "calc(100vh - 300px)" }}
-        expandedRowKeys={expandedRowKeys}
-        onExpand={onTableRowExpand} // Elle genişletme/küçültme işlemlerini takip et
-      />
+      <Spin spinning={loading}>
+        <Table
+          rowSelection={rowSelection}
+          columns={columns}
+          dataSource={debouncedSearchTerm ? filteredData : fields}
+          pagination={false}
+          scroll={{ y: "calc(100vh - 300px)" }}
+          expandedRowKeys={expandedRowKeys}
+          onExpand={onTableRowExpand} // Elle genişletme/küçültme işlemlerini takip et
+        />
+      </Spin>
     </div>
   );
 }

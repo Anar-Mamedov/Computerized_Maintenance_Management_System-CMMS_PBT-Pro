@@ -67,16 +67,33 @@ const items = [
 
 const App = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [openKeys, setOpenKeys] = useState([]);
   const {
     token: { colorBgContainer },
   } = theme.useToken();
+
+  const onOpenChange = (keys) => {
+    const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);
+    if (items.map((item) => item.key).indexOf(latestOpenKey) === -1) {
+      setOpenKeys(keys);
+    } else {
+      setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
+    }
+  };
 
   return (
     <Router>
       <Layout style={{ minHeight: "100vh" }}>
         <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
           <div className="demo-logo-vertical" />
-          <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline" items={items} />
+          <Menu
+            theme="dark"
+            defaultSelectedKeys={["1"]}
+            mode="inline"
+            items={items}
+            openKeys={openKeys}
+            onOpenChange={onOpenChange}
+          />
         </Sider>
         <Layout>
           <Header style={{ padding: 0, background: colorBgContainer }} />
