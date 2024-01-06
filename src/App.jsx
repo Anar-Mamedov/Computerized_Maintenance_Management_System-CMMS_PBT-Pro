@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Route, Routes, Link, useLocation } from "react-router-dom";
 import {
   DesktopOutlined,
   FileOutlined,
@@ -65,12 +65,19 @@ const items = [
 // const BillPage = () => <div>Bill is a cat.</div>;
 // Diğer sayfa bileşenlerinizi burada tanımlayın...
 
-const App = () => {
-  const [collapsed, setCollapsed] = useState(false);
+// diğer menüyü açtığımda diğer menüyü kapatıyor ve sayfa yüklendiğinde açık olan menüyü açık bırakıyor
+
+const MenuWrapper = () => {
+  const location = useLocation();
   const [openKeys, setOpenKeys] = useState([]);
-  const {
-    token: { colorBgContainer },
-  } = theme.useToken();
+
+  useEffect(() => {
+    const currentPath = location.pathname.split("/")[1];
+    const openKey = items.find((item) => item.children?.some((child) => `/${child.key}` === `/${currentPath}`))?.key;
+    if (openKey) {
+      setOpenKeys([openKey]);
+    }
+  }, [location]);
 
   const onOpenChange = (keys) => {
     const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);
@@ -82,18 +89,31 @@ const App = () => {
   };
 
   return (
+    <Menu
+      theme="dark"
+      defaultSelectedKeys={[location.pathname.split("/")[1]]}
+      mode="inline"
+      items={items}
+      openKeys={openKeys}
+      onOpenChange={onOpenChange}
+    />
+  );
+};
+
+// diğer menüyü açtığımda diğer menüyü kapatıyor ve sayfa yüklendiğinde açık olan menüyü açık bırakıyor sonu
+
+const App = () => {
+  const [collapsed, setCollapsed] = useState(false);
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
+
+  return (
     <Router>
       <Layout style={{ minHeight: "100vh" }}>
         <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
           <div className="demo-logo-vertical" />
-          <Menu
-            theme="dark"
-            defaultSelectedKeys={["1"]}
-            mode="inline"
-            items={items}
-            openKeys={openKeys}
-            onOpenChange={onOpenChange}
-          />
+          <MenuWrapper />
         </Sider>
         <Layout>
           <Header style={{ padding: 0, background: colorBgContainer }} />
