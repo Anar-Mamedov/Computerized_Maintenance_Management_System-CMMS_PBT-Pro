@@ -28,6 +28,7 @@ export default function MainTabs() {
           alignItems: "center",
           justifyContent: "space-between",
           maxWidth: "650px",
+          gap: "10px",
         }}>
         <Text style={{ fontSize: "14px" }}>Lokasyon Tanımı:</Text>
         <div
@@ -38,7 +39,7 @@ export default function MainTabs() {
             maxWidth: "500px",
             minWidth: "300px",
             gap: "10px",
-            width: "-webkit-fill-available",
+            width: "100%",
           }}>
           <Controller
             name="lokasyonTanimi"

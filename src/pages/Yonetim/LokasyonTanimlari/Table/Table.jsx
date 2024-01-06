@@ -176,7 +176,15 @@ export default function MainTable() {
 
   return (
     <div>
-      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", marginBottom: "20px" }}>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+          marginBottom: "20px",
+          gap: "10px",
+          padding: "0 5px",
+        }}>
         <Input
           style={{ width: "250px" }}
           type="text"
