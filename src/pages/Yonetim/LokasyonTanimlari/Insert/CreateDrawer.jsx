@@ -9,7 +9,7 @@ import AxiosInstance from "../../../../api/http";
 import Footer from "../Footer";
 import SecondTabs from "./components/secondTabs/secondTabs";
 
-export default function CreateDrawer({ onRefresh }) {
+export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
   const [open, setOpen] = useState(false);
   const showDrawer = () => {
     setOpen(true);
@@ -41,6 +41,7 @@ export default function CreateDrawer({ onRefresh }) {
   //* export
   const methods = useForm({
     defaultValues: {
+      selectedLokasyonId: "",
       makineKodu: "",
       makineTanimi: "",
       location: null,
@@ -67,7 +68,7 @@ export default function CreateDrawer({ onRefresh }) {
       makineGarantiBitisTarihi: "",
       makineDurusBirimMaliyeti: "",
       makinePlanCalismaSuresi: "",
-      makineAktif: "true",
+      lokasyonAktif: "true",
       makineKalibrasyon: "",
       kritikMakine: "",
       makineGucKaynagi: "",
@@ -405,21 +406,15 @@ export default function CreateDrawer({ onRefresh }) {
     console.log({ Body });
   };
 
-  // İş Emri No değerini her drawer açıldığında güncellemek için
   useEffect(() => {
-    if (open) {
-      AxiosInstance.get("MakineKodGetir") // Replace with your actual API endpoint
-        .then((response) => {
-          // Assuming the response contains the new work order number in 'response.Tanim'
-          setValue("makineKodu", response);
-        })
-        .catch((error) => {
-          console.error("Error fetching new work order number:", error);
-        });
+    // Eğer selectedLokasyonId varsa ve geçerli bir değerse, formun default değerini güncelle
+    if (selectedLokasyonId !== undefined && selectedLokasyonId !== null) {
+      methods.reset({
+        ...methods.getValues(),
+        selectedLokasyonId: selectedLokasyonId,
+      });
     }
-  }, [open, setValue]);
-
-  // İş Emri No değerini her drawer açıldığında güncellemek için son
+  }, [selectedLokasyonId, methods]);
 
   return (
     <FormProvider {...methods}>

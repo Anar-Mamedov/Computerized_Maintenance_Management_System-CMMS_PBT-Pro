@@ -185,7 +185,7 @@ export default function MainTable() {
           onChange={(e) => setSearchTerm(e.target.value)}
           prefix={<SearchOutlined style={{ color: "#0091ff" }} />} // Arama ikonunu ekle
         />
-        <CreateDrawer />
+        <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} />
       </div>
       <Spin spinning={loading}>
         <Table
