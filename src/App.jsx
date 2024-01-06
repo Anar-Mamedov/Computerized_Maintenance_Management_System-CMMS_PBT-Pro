@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Routes, Link, useLocation } from "react-router-dom";
+import { Breadcrumb, Layout, Menu, theme, ConfigProvider } from "antd";
 import {
   DesktopOutlined,
   FileOutlined,
@@ -8,10 +9,10 @@ import {
   UserOutlined,
   KeyOutlined,
 } from "@ant-design/icons";
-import { Breadcrumb, Layout, Menu, theme } from "antd";
 import Isemri from "./pages/DashboardAnalytics2/Isemri";
 import MakineTanim from "./pages/MakineEkipman/MakineTanim/MakineTanim";
 import LokasyonTanim from "./pages/Yonetim/LokasyonTanimlari/LokasyonTanimlari";
+import trTR from "antd/es/locale/tr_TR";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -109,31 +110,33 @@ const App = () => {
   } = theme.useToken();
 
   return (
-    <Router>
-      <Layout style={{ minHeight: "100vh" }}>
-        <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
-          <div className="demo-logo-vertical" />
-          <MenuWrapper />
-        </Sider>
-        <Layout>
-          <Header style={{ padding: 0, background: colorBgContainer }} />
-          <Content style={{ margin: "0 16px" }}>
-            <Breadcrumb style={{ margin: "16px 0" }}>{/* Breadcrumb içeriği */}</Breadcrumb>
-            <div style={{ padding: 24, minHeight: 360, background: colorBgContainer }}>
-              <Routes>
-                <Route path="/isemri" element={<Isemri />} />
-                <Route path="/makine" element={<MakineTanim />} />
-                <Route path="/lokasyon" element={<LokasyonTanim />} />
-                {/* Diğer Route'lar */}
-              </Routes>
-            </div>
-          </Content>
-          <Footer style={{ textAlign: "center" }}>
-            Orjin {new Date().getFullYear()} - Design & Develop by Orjin Team
-          </Footer>
+    <ConfigProvider locale={trTR}>
+      <Router>
+        <Layout style={{ minHeight: "100vh" }}>
+          <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
+            <div className="demo-logo-vertical" />
+            <MenuWrapper />
+          </Sider>
+          <Layout>
+            <Header style={{ padding: 0, background: colorBgContainer }} />
+            <Content style={{ margin: "0 16px" }}>
+              <Breadcrumb style={{ margin: "16px 0" }}>{/* Breadcrumb içeriği */}</Breadcrumb>
+              <div style={{ padding: 24, minHeight: 360, background: colorBgContainer }}>
+                <Routes>
+                  <Route path="/isemri" element={<Isemri />} />
+                  <Route path="/makine" element={<MakineTanim />} />
+                  <Route path="/lokasyon" element={<LokasyonTanim />} />
+                  {/* Diğer Route'lar */}
+                </Routes>
+              </div>
+            </Content>
+            <Footer style={{ textAlign: "center" }}>
+              Orjin {new Date().getFullYear()} - Design & Develop by Orjin Team
+            </Footer>
+          </Layout>
         </Layout>
-      </Layout>
-    </Router>
+      </Router>
+    </ConfigProvider>
   );
 };
 
