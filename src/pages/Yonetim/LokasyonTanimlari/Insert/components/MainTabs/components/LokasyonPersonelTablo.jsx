@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table } from "antd";
-import AxiosInstance from "../../../../../../../../../api/http";
+import AxiosInstance from "../../../../../../../api/http";
 
-export default function YakitTipi({ workshopSelectedId, onSubmit }) {
+export default function LokasyonPersonelTablo({ workshopSelectedId, onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
@@ -10,78 +10,25 @@ export default function YakitTipi({ workshopSelectedId, onSubmit }) {
 
   const columns = [
     {
-      title: "Yıl",
+      title: "Atölye Kodu",
       dataIndex: "code",
       key: "code",
-      width: 100,
-      render: (text) => (
-        <div
-          style={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
     },
     {
-      title: "Takvim Tanım",
+      title: "Atölye Tanımı",
       dataIndex: "subject",
       key: "subject",
-      render: (text) => (
-        <div
-          style={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
-    },
-    {
-      title: "Çalışma Günleri",
-      dataIndex: "workdays",
-      key: "workdays",
-      render: (text) => (
-        <div
-          style={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
-    },
-    {
-      title: "Açıklama",
-      dataIndex: "description",
-      key: "description",
-      render: (text) => (
-        <div
-          style={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
     },
   ];
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`GetTakvimList`)
+    AxiosInstance.get(`AtolyeList?kulID=24`)
       .then((response) => {
-        const fetchedData = response.Takvim_Liste.map((item) => ({
-          key: item.TB_TAKVIM_ID,
-          code: item.TKV_YIL,
-          subject: item.TKV_TANIM,
-          workdays: item.TKV_HAFTA_CALISMA_GUN,
-          description: item.TKV_ACIKLAMA,
+        const fetchedData = response.map((item) => ({
+          key: item.TB_ATOLYE_ID,
+          code: item.ATL_KOD,
+          subject: item.ATL_TANIM,
         }));
         setData(fetchedData);
       })
@@ -111,13 +58,13 @@ export default function YakitTipi({ workshopSelectedId, onSubmit }) {
   const onRowSelectChange = (selectedKeys) => {
     setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
   };
-
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
       <Modal
-        width="1200px"
-        title="Yakıt Tanımları"
+        width={1200}
+        centered
+        title="Personel"
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}>

@@ -5,27 +5,56 @@ import LokasyonTipi from "./components/LokasyonTipi";
 import LokasyonBina from "./components/LokasyonBina";
 import MasrafMerkeziTablo from "./components/MasrafMerkeziTablo";
 import LokasyonKat from "./components/LokasyonKat";
+import LokasyonPersonelTablo from "./components/LokasyonPersonelTablo";
+import LokasyonDepoTablo from "./components/LokasyonDepoTablo";
+import styled from "styled-components";
 
 const { Text, Link } = Typography;
+const { TextArea } = Input;
+
+const StyledInput = styled(Input)`
+  @media (min-width: 600px) {
+    max-width: 720px;
+  }
+  @media (max-width: 600px) {
+    max-width: 300px;
+  }
+`;
+
+const StyledDiv = styled.div`
+  @media (min-width: 600px) {
+    width: 100%;
+    max-width: 720px;
+  }
+  @media (max-width: 600px) {
+    width: 100%;
+    max-width: 300px;
+  }
+`;
 
 export default function MainTabs() {
   const { control, watch, setValue } = useFormContext();
 
   const handleMinusClick = () => {
-    setValue("masterMakineTanimi", "");
-    setValue("masterMakineID", "");
+    setValue("lokasyonMasrafMerkeziTanim", "");
+    setValue("lokasyonMasrafMerkeziID", "");
   };
 
-  const handleTakvimMinusClick = () => {
-    setValue("makineTakvimTanimi", "");
-    setValue("makineTakvimID", "");
+  const handleYoneticiMinusClick = () => {
+    setValue("lokasyonYoneticiTanim", "");
+    setValue("lokasyonYoneticiID", "");
+  };
+
+  const handleDepoMinusClick = () => {
+    setValue("lokasyonDepoTanim", "");
+    setValue("lokasyonDepoID", "");
   };
 
   const selectedLokasyonId = watch("selectedLokasyonId");
 
   return (
     <>
-      <div style={{ display: "flex", marginBottom: "15px", flexDirection: "column", gap: "10px", maxWidth: "800px" }}>
+      <div style={{ display: "flex", marginBottom: "15px", flexDirection: "column", gap: "10px", maxWidth: "870px" }}>
         <div
           style={{
             display: "flex",
@@ -42,7 +71,7 @@ export default function MainTabs() {
               display: "flex",
               flexWrap: "wrap",
               alignItems: "center",
-              maxWidth: "650px",
+              maxWidth: "720px",
               minWidth: "300px",
               gap: "10px",
               width: "100%",
@@ -92,7 +121,7 @@ export default function MainTabs() {
               display: "flex",
               flexWrap: "wrap",
               alignItems: "center",
-              maxWidth: "340px",
+              maxWidth: "410px",
               gap: "10px",
               width: "100%",
             }}>
@@ -119,7 +148,7 @@ export default function MainTabs() {
                 width: "300px",
               }}>
               <Controller
-                name="makineMasrafMerkeziTanim"
+                name="lokasyonMasrafMerkeziTanim"
                 control={control}
                 render={({ field }) => (
                   <Input
@@ -131,7 +160,7 @@ export default function MainTabs() {
                 )}
               />
               <Controller
-                name="makineMasrafMerkeziID"
+                name="lokasyonMasrafMerkeziID"
                 control={control}
                 render={({ field }) => (
                   <Input
@@ -143,8 +172,8 @@ export default function MainTabs() {
               />
               <MasrafMerkeziTablo
                 onSubmit={(selectedData) => {
-                  setValue("makineMasrafMerkeziTanim", selectedData.age);
-                  setValue("makineMasrafMerkeziID", selectedData.key);
+                  setValue("lokasyonMasrafMerkeziTanim", selectedData.age);
+                  setValue("lokasyonMasrafMerkeziID", selectedData.key);
                 }}
               />
               <Button onClick={handleMinusClick}> - </Button>
@@ -155,12 +184,156 @@ export default function MainTabs() {
               display: "flex",
               flexWrap: "wrap",
               alignItems: "center",
-              maxWidth: "340px",
+              maxWidth: "410px",
               gap: "10px",
               width: "100%",
             }}>
             <LokasyonKat />
           </div>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+              maxWidth: "450px",
+            }}>
+            <Text style={{ fontSize: "14px" }}>Yönetici:</Text>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "300px",
+              }}>
+              <Controller
+                name="lokasyonYoneticiTanim"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="text" // Set the type to "text" for name input
+                    style={{ width: "215px" }}
+                    disabled
+                  />
+                )}
+              />
+              <Controller
+                name="lokasyonYoneticiID"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="text" // Set the type to "text" for name input
+                    style={{ display: "none" }}
+                  />
+                )}
+              />
+              <LokasyonPersonelTablo
+                onSubmit={(selectedData) => {
+                  setValue("lokasyonYoneticiTanim", selectedData.subject);
+                  setValue("lokasyonYoneticiID", selectedData.key);
+                }}
+              />
+              <Button onClick={handleYoneticiMinusClick}> - </Button>
+            </div>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+              maxWidth: "410px",
+            }}>
+            <Text style={{ fontSize: "14px" }}>Malzeme Depo:</Text>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "300px",
+              }}>
+              <Controller
+                name="lokasyonDepoTanim"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="text" // Set the type to "text" for name input
+                    style={{ width: "215px" }}
+                    disabled
+                  />
+                )}
+              />
+              <Controller
+                name="lokasyonDepoID"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="text" // Set the type to "text" for name input
+                    style={{ display: "none" }}
+                  />
+                )}
+              />
+              <LokasyonDepoTablo
+                onSubmit={(selectedData) => {
+                  setValue("lokasyonDepoTanim", selectedData.subject);
+                  setValue("lokasyonDepoID", selectedData.key);
+                }}
+              />
+              <Button onClick={handleDepoMinusClick}> - </Button>
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          }}>
+          <Text style={{ fontSize: "14px" }}>E-Mail:</Text>
+          <Controller
+            name="lokasyonEmail"
+            control={control}
+            render={({ field }) => (
+              <StyledInput
+                {...field}
+                type="text" // Set the type to "text" for name input
+              />
+            )}
+          />
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            width: "100%",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Açıklama:</Text>
+          <StyledDiv>
+            <Controller
+              name="lokasyonAciklama"
+              control={control}
+              render={({ field }) => (
+                <TextArea
+                  {...field}
+                  type="text" // Set the type to "text" for name input
+                />
+              )}
+            />
+          </StyledDiv>
         </div>
       </div>
     </>
