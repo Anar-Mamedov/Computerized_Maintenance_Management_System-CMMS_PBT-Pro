@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table } from "antd";
-import AxiosInstance from "../../../../../../../../../api/http";
+import AxiosInstance from "../../../../../../../api/http";
 
-export default function MakineOncelikTablo({ workshopSelectedId, onSubmit }) {
+export default function LokasyonDepoTablo({ workshopSelectedId, onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
@@ -10,52 +10,25 @@ export default function MakineOncelikTablo({ workshopSelectedId, onSubmit }) {
 
   const columns = [
     {
-      title: "Öncelik Kodu",
+      title: "Atölye Kodu",
       dataIndex: "code",
       key: "code",
-      render: (text) => (
-        <div
-          style={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
     },
     {
-      title: "Tanım",
+      title: "Atölye Tanımı",
       dataIndex: "subject",
       key: "subject",
-      render: (text) => (
-        <div
-          style={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
-    },
-    {
-      title: "Varsayılan",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => <input type="checkbox" checked={status} disabled />,
     },
   ];
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`OncelikList`)
+    AxiosInstance.get(`AtolyeList?kulID=24`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
-          key: item.TB_SERVIS_ONCELIK_ID,
-          code: item.SOC_KOD,
-          subject: item.SOC_TANIM,
-          status: item.SOC_VARSAYILAN,
+          key: item.TB_ATOLYE_ID,
+          code: item.ATL_KOD,
+          subject: item.ATL_TANIM,
         }));
         setData(fetchedData);
       })
@@ -88,7 +61,7 @@ export default function MakineOncelikTablo({ workshopSelectedId, onSubmit }) {
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
-      <Modal width="1200px" title="Öncelik" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
+      <Modal width={1200} centered title="Depo" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <Table
           rowSelection={{
             type: "radio",
