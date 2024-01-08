@@ -14,30 +14,35 @@ export default function LokasyonDepoTablo({ workshopSelectedId, onSubmit }) {
       dataIndex: "code",
       key: "code",
       width: 200,
+      ellipsis: true,
     },
     {
       title: "Depo Tanımı",
       dataIndex: "subject",
       key: "subject",
       width: 300,
+      ellipsis: true,
     },
     {
       title: "Sorumlu Personel",
       dataIndex: "type",
       key: "type",
       width: 200,
+      ellipsis: true,
     },
     {
       title: "Atölye",
       dataIndex: "startDate",
       key: "startDate",
       width: 200,
+      ellipsis: true,
     },
     {
       title: "Lokasyon",
       dataIndex: "endDate",
       key: "endDate",
       width: 200,
+      ellipsis: true,
     },
   ];
 
@@ -94,6 +99,10 @@ export default function LokasyonDepoTablo({ workshopSelectedId, onSubmit }) {
           columns={columns}
           dataSource={data}
           loading={loading}
+          scroll={{
+            // x: "auto",
+            y: "calc(100vh - 360px)",
+          }}
         />
       </Modal>
     </div>
