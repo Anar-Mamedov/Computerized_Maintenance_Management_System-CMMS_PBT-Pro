@@ -1,69 +1,97 @@
 import React from "react";
 import { Drawer, Typography, Button, Input, Select, DatePicker, TimePicker, Row, Col, Checkbox } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
-import Location from "./components/Location";
-import MakineTipi from "./components/MakineTipi";
-import Kategori from "./components/Kategori";
-import MarkaSelect from "./components/MarkaSelect";
-import ModelSelect from "./components/ModelSelect";
-import MakineDurum from "./components/MakineDurum";
-import MasterMakineTablo from "./components/MasterMakineTablo";
-import MakineTakvimTablo from "./components/MakineTakvimTablo";
-import OperatorSelect from "./components/OperatorSelect";
-import MarkaEkle from "./components/MarkaEkle";
-import ModelEkle from "./components/ModelEkle";
+import LokasyonTipi from "./components/LokasyonTipi";
+import LokasyonBina from "./components/LokasyonBina";
+import MasrafMerkeziTablo from "./components/MasrafMerkeziTablo";
+import LokasyonKat from "./components/LokasyonKat";
+import LokasyonPersonelTablo from "./components/LokasyonPersonelTablo";
+import LokasyonDepoTablo from "./components/LokasyonDepoTablo";
+import styled from "styled-components";
 
 const { Text, Link } = Typography;
+const { TextArea } = Input;
+
+const StyledInput = styled(Input)`
+  @media (min-width: 600px) {
+    max-width: 720px;
+  }
+  @media (max-width: 600px) {
+    max-width: 300px;
+  }
+`;
+
+const StyledDiv = styled.div`
+  @media (min-width: 600px) {
+    width: 100%;
+    max-width: 720px;
+  }
+  @media (max-width: 600px) {
+    width: 100%;
+    max-width: 300px;
+  }
+`;
+
+const StyledDivBottomLine = styled.div`
+  @media (min-width: 600px) {
+    alignitems: "center";
+  }
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+`;
 
 export default function MainTabs() {
   const { control, watch, setValue } = useFormContext();
 
   const handleMinusClick = () => {
-    setValue("masterMakineTanimi", "");
-    setValue("masterMakineID", "");
+    setValue("lokasyonMasrafMerkeziTanim", "");
+    setValue("lokasyonMasrafMerkeziID", "");
   };
 
-  const handleTakvimMinusClick = () => {
-    setValue("makineTakvimTanimi", "");
-    setValue("makineTakvimID", "");
+  const handleYoneticiMinusClick = () => {
+    setValue("lokasyonYoneticiTanim", "");
+    setValue("lokasyonYoneticiID", "");
   };
+
+  const handleDepoMinusClick = () => {
+    setValue("lokasyonDepoTanim", "");
+    setValue("lokasyonDepoID", "");
+  };
+
+  const selectedLokasyonId = watch("selectedLokasyonId");
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        columnGap: "10px",
-        marginBottom: "20px",
-      }}>
+    <div style={{ display: "flex", marginBottom: "15px", flexDirection: "column", gap: "10px", maxWidth: "870px" }}>
       <div
         style={{
           display: "flex",
           flexWrap: "wrap",
-          border: "1px solid #80808068",
-          width: "430px",
-          padding: "5px",
-          justifyContent: "center",
-          gap: "5px",
-          alignContent: "flex-start",
-          height: "fit-content",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+          gap: "10px",
+          rowGap: "0px",
         }}>
+        <Text style={{ fontSize: "14px" }}>Lokasyon Tanımı:</Text>
         <div
           style={{
             display: "flex",
             flexWrap: "wrap",
             alignItems: "center",
-            justifyContent: "space-between",
+            maxWidth: "720px",
+            minWidth: "300px",
+            gap: "10px",
             width: "100%",
           }}>
-          <Text style={{ fontSize: "14px" }}>Makine Kodu:</Text>
           <Controller
-            name="makineKodu"
+            name="lokasyonTanimi"
             control={control}
-            render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
+            render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
           />
           <Controller
-            name="secilenMakineID"
+            name="selectedLokasyonId"
             control={control}
             render={({ field }) => (
               <Input
@@ -73,73 +101,53 @@ export default function MainTabs() {
               />
             )}
           />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Makine Tanımı:</Text>
           <Controller
-            name="makineTanimi"
+            name="lokasyonAktif"
             control={control}
-            render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
+            defaultValue={true} // or true if you want it checked by default
+            render={({ field }) => (
+              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                Aktif
+              </Checkbox>
+            )}
           />
         </div>
-        <Location />
-        <MakineTipi />
-        <Kategori />
-        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", width: "100%" }}>
-          <MarkaSelect />
-          <MarkaEkle />
-        </div>
-
-        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", width: "100%" }}>
-          <ModelSelect />
-          <ModelEkle />
-        </div>
-        <OperatorSelect />
       </div>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          border: "1px solid #80808068",
-          width: "430px",
-          padding: "5px",
-          justifyContent: "center",
-          gap: "5px",
-          alignContent: "flex-start",
-          height: "fit-content",
-        }}>
-        <MakineDurum />
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
         <div
           style={{
             display: "flex",
             flexWrap: "wrap",
             alignItems: "center",
-            justifyContent: "space-between",
+            maxWidth: "450px",
+            gap: "10px",
             width: "100%",
           }}>
-          <Text style={{ fontSize: "14px" }}>Seri No #:</Text>
-          <Controller
-            name="makineSeriNO"
-            control={control}
-            render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
-          />
+          <LokasyonTipi />
         </div>
         <div
           style={{
             display: "flex",
             flexWrap: "wrap",
             alignItems: "center",
-            justifyContent: "space-between",
+            maxWidth: "410px",
+            gap: "10px",
             width: "100%",
           }}>
-          <Text style={{ fontSize: "14px" }}>Master Makine:</Text>
+          <LokasyonBina />
+        </div>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: "450px",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Masraf Merkezi:</Text>
           <div
             style={{
               display: "flex",
@@ -149,7 +157,7 @@ export default function MainTabs() {
               width: "300px",
             }}>
             <Controller
-              name="masterMakineTanimi"
+              name="lokasyonMasrafMerkeziTanim"
               control={control}
               render={({ field }) => (
                 <Input
@@ -161,7 +169,7 @@ export default function MainTabs() {
               )}
             />
             <Controller
-              name="masterMakineID"
+              name="lokasyonMasrafMerkeziID"
               control={control}
               render={({ field }) => (
                 <Input
@@ -171,10 +179,10 @@ export default function MainTabs() {
                 />
               )}
             />
-            <MasterMakineTablo
+            <MasrafMerkeziTablo
               onSubmit={(selectedData) => {
-                setValue("masterMakineTanimi", selectedData.definition);
-                setValue("masterMakineID", selectedData.key);
+                setValue("lokasyonMasrafMerkeziTanim", selectedData.age);
+                setValue("lokasyonMasrafMerkeziID", selectedData.key);
               }}
             />
             <Button onClick={handleMinusClick}> - </Button>
@@ -185,10 +193,23 @@ export default function MainTabs() {
             display: "flex",
             flexWrap: "wrap",
             alignItems: "center",
-            justifyContent: "space-between",
+            maxWidth: "410px",
+            gap: "10px",
             width: "100%",
           }}>
-          <Text style={{ fontSize: "14px" }}>Çalışma Takvimi:</Text>
+          <LokasyonKat />
+        </div>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+        <StyledDivBottomLine
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: "450px",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Yönetici:</Text>
           <div
             style={{
               display: "flex",
@@ -198,7 +219,7 @@ export default function MainTabs() {
               width: "300px",
             }}>
             <Controller
-              name="makineTakvimTanimi"
+              name="lokasyonYoneticiTanim"
               control={control}
               render={({ field }) => (
                 <Input
@@ -210,7 +231,7 @@ export default function MainTabs() {
               )}
             />
             <Controller
-              name="makineTakvimID"
+              name="lokasyonYoneticiID"
               control={control}
               render={({ field }) => (
                 <Input
@@ -220,15 +241,15 @@ export default function MainTabs() {
                 />
               )}
             />
-            <MakineTakvimTablo
+            <LokasyonPersonelTablo
               onSubmit={(selectedData) => {
-                setValue("makineTakvimTanimi", selectedData.subject);
-                setValue("makineTakvimID", selectedData.key);
+                setValue("lokasyonYoneticiTanim", selectedData.subject);
+                setValue("lokasyonYoneticiID", selectedData.key);
               }}
             />
-            <Button onClick={handleTakvimMinusClick}> - </Button>
+            <Button onClick={handleYoneticiMinusClick}> - </Button>
           </div>
-        </div>
+        </StyledDivBottomLine>
         <div
           style={{
             display: "flex",
@@ -236,177 +257,92 @@ export default function MainTabs() {
             alignItems: "center",
             justifyContent: "space-between",
             width: "100%",
+            maxWidth: "410px",
           }}>
-          <Text style={{ fontSize: "14px" }}>Üretici:</Text>
-          <Controller
-            name="uretici"
-            control={control}
-            render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Üretim Yılı:</Text>
-          <Controller
-            name="uretimYili"
-            control={control}
-            render={({ field: { onChange, ...restField } }) => (
-              <Input
-                {...restField}
-                style={{ width: "300px" }}
-                onChange={(e) => {
-                  // Sadece sayısal girişe izin ver ve maksimum 4 karakter sınırlaması koy
-                  const numericValue = e.target.value.replace(/[^0-9]/g, "").slice(0, 4);
-                  onChange(numericValue);
-                }}
-              />
-            )}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Garanti Bitiş Tarihi:</Text>
-          <Controller
-            name="makineGarantiBitisTarihi"
-            control={control}
-            render={({ field }) => (
-              <DatePicker {...field} style={{ width: "200px" }} format="DD-MM-YYYY" placeholder="Tarih seçiniz" />
-            )}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Duruş Birim Maliyeti:</Text>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", alignItems: "center", width: "200px" }}>
+          <Text style={{ fontSize: "14px" }}>Malzeme Depo:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "300px",
+            }}>
             <Controller
-              name="makineDurusBirimMaliyeti"
+              name="lokasyonDepoTanim"
               control={control}
-              render={({ field }) => <Input {...field} style={{ width: "150px" }} />}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="text" // Set the type to "text" for name input
+                  style={{ width: "215px" }}
+                  disabled
+                />
+              )}
             />
-            <Text style={{ fontSize: "12px" }}>(tl/saat)</Text>
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Plan. Çalışma Süresi:</Text>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", alignItems: "center", width: "200px" }}>
             <Controller
-              name="makinePlanCalismaSuresi"
+              name="lokasyonDepoID"
               control={control}
-              render={({ field }) => <Input {...field} style={{ width: "140px" }} />}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="text" // Set the type to "text" for name input
+                  style={{ display: "none" }}
+                />
+              )}
             />
-            <Text style={{ fontSize: "12px" }}>(saat/yıl)</Text>
+            <LokasyonDepoTablo
+              onSubmit={(selectedData) => {
+                setValue("lokasyonDepoTanim", selectedData.subject);
+                setValue("lokasyonDepoID", selectedData.key);
+              }}
+            />
+            <Button onClick={handleDepoMinusClick}> - </Button>
           </div>
         </div>
       </div>
-      <div
+      <StyledDivBottomLine
         style={{
           display: "flex",
           flexWrap: "wrap",
-          flexDirection: "column",
-          border: "1px solid #80808068",
-          width: "fit-content",
-          padding: "5px",
-          justifyContent: "flex-start",
-          gap: "15px",
-          alignContent: "flex-start",
-          height: "fit-content",
+
+          justifyContent: "space-between",
+          width: "100%",
         }}>
+        <Text style={{ fontSize: "14px" }}>E-Mail:</Text>
         <Controller
-          name="makineAktif"
+          name="lokasyonEmail"
           control={control}
-          defaultValue={true} // or true if you want it checked by default
           render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Aktif
-            </Checkbox>
+            <StyledInput
+              {...field}
+              type="text" // Set the type to "text" for name input
+            />
           )}
         />
-        <Controller
-          name="makineKalibrasyon"
-          control={control}
-          defaultValue={false} // or true if you want it checked by default
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Kalibrasyon Var
-            </Checkbox>
-          )}
-        />
-        <Controller
-          name="kritikMakine"
-          control={control}
-          defaultValue={false} // or true if you want it checked by default
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Kritik Makine
-            </Checkbox>
-          )}
-        />
-        <Controller
-          name="makineGucKaynagi"
-          control={control}
-          defaultValue={false} // or true if you want it checked by default
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Güç Kaynağı
-            </Checkbox>
-          )}
-        />
-        <Controller
-          name="makineIsBildirimi"
-          control={control}
-          defaultValue={false} // or true if you want it checked by default
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              İş Bildirimi
-            </Checkbox>
-          )}
-        />
-        {/* <Controller
-          name="makineYakitKullanim"
-          control={control}
-          defaultValue={false} // or true if you want it checked by default
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Yakıt Kullanım
-            </Checkbox>
-          )}
-        /> */}
-        <Controller
-          name="makineOtonomBakim"
-          control={control}
-          defaultValue={false} // or true if you want it checked by default
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Otonom Bakım
-            </Checkbox>
-          )}
-        />
-      </div>
+      </StyledDivBottomLine>
+      <StyledDivBottomLine
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+          width: "100%",
+        }}>
+        <Text style={{ fontSize: "14px" }}>Açıklama:</Text>
+        <StyledDiv>
+          <Controller
+            name="lokasyonAciklama"
+            control={control}
+            render={({ field }) => (
+              <TextArea
+                {...field}
+                type="text" // Set the type to "text" for name input
+              />
+            )}
+          />
+        </StyledDiv>
+      </StyledDivBottomLine>
     </div>
   );
 }

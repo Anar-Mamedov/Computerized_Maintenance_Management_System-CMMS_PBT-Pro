@@ -1,18 +1,12 @@
-import { Checkbox, Space, Tabs } from "antd";
-import React, { useEffect, useState } from "react";
-import { useFormContext } from "react-hook-form";
+import React from "react";
+import { Tabs } from "antd";
 import styled from "styled-components";
-import FinancialDetailsTable from "./components/FinancialDetailsTable";
-import RequisiteTable from "./components/RequisiteTable";
-import DetailsTable from "./components/DetailsTable";
-import DeliveryTable from "./components/DeliveryTable";
-import CustomFields from "./components/OzelAlanlar/CustomFields";
-import Notes from "./components/Notes";
-import ThirdTab from "../../components/secondTabs/components/ThirdTab/ThirdTab";
-import FifthTab from "./components/FifthTab/FifthTab";
-import NinthTab from "./components/NinthTab/NinthTab";
-import FourthTab from "./components/FourthTab/FourthTab";
-import TenthTab from "./components/TenthTab/TenthTab";
+import { useFormContext } from "react-hook-form";
+import MainTabs from "../MainTabs/MainTabs";
+
+const onChange = (key) => {
+  console.log(key);
+};
 
 //styled components
 const StyledTabs = styled(Tabs)`
@@ -62,158 +56,40 @@ const StyledTabs = styled(Tabs)`
 
 //styled components end
 
-// tab
-const { TabPane } = Tabs;
-
-// Tab end
+const items = [
+  {
+    key: "1",
+    label: "Lokasyon Bilgileri",
+    children: <MainTabs />,
+  },
+  {
+    key: "2",
+    label: "Makineler",
+    children: "Content of Tab Pane 2",
+  },
+  {
+    key: "3",
+    label: "Personeller",
+    children: "Content of Tab Pane 3",
+  },
+  {
+    key: "4",
+    label: "Ekli Belgeler",
+    children: "Content of Tab Pane 4",
+  },
+  {
+    key: "5",
+    label: "Resimler",
+    children: "Content of Tab Pane 5",
+  },
+];
 
 export default function SecondTabs() {
   const { watch } = useFormContext();
-  const showYakitTab = watch("makineYakitKullanim");
-  const showOtonomTab = watch("makineOtonomBakim");
 
   return (
-    <Space
-      style={{
-        display: "block",
-        // flexDirection: "column",
-        alignItems: "flex-start",
-        width: "100%",
-      }}>
-      {/* tab */}
-
-      <StyledTabs
-        defaultActiveKey="3"
-        style={{
-          maxWidth: "100%",
-          marginBottom: "40px",
-        }}>
-        {/* <TabPane tab="Analiz" key="1" disabled>
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
-            <FinancialDetailsTable />
-          </div>
-        </TabPane> */}
-        <TabPane tab="Ekipman Ağacı" key="2">
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
-            <RequisiteTable />
-          </div>
-        </TabPane>
-        <TabPane tab="Detay Bilgi" key="3">
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
-            <ThirdTab />
-          </div>
-        </TabPane>
-        <TabPane tab="Finansal Bilgiler" key="4">
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
-            <FourthTab />
-          </div>
-        </TabPane>
-        <TabPane tab="Sayaçlar" key="5">
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
-            <FifthTab />
-          </div>
-        </TabPane>
-        <TabPane tab="Peryodik Bakımlar" key="6">
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
-            <DetailsTable />
-          </div>
-        </TabPane>
-        {showOtonomTab && (
-          <TabPane tab="Otonom Bakımlar" key="7">
-            <div
-              style={{
-                // display: "flex",
-                // flexFlow: "row wrap",
-                gap: "15px",
-              }}>
-              <DeliveryTable />
-            </div>
-          </TabPane>
-        )}
-        {/* {showYakitTab && (
-          <TabPane tab="Yakıt Bilgileri" key="10">
-            <div
-              style={{
-                // display: "flex",
-                // flexFlow: "row wrap",
-                gap: "15px",
-              }}>
-              <TenthTab />
-            </div>
-          </TabPane>
-        )} */}
-        <TabPane tab="Özel Alanlar" key="11">
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
-            <CustomFields />
-          </div>
-        </TabPane>
-        <TabPane tab="Notlar" key="12">
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
-            <Notes />
-          </div>
-        </TabPane>
-        <TabPane tab="Ekli Belgeler" key="9">
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
-            <NinthTab />
-          </div>
-        </TabPane>
-        <TabPane tab="Resimler" key="13">
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
-            {/* <NinthTab /> */}
-          </div>
-        </TabPane>
-      </StyledTabs>
-      {/* <Tabs defaultActiveKey="1" items={items} onChangeTab={onChangeTab} /> */}
-    </Space>
+    <div>
+      <StyledTabs defaultActiveKey="1" items={items} onChange={onChange} />
+    </div>
   );
 }

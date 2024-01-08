@@ -4,7 +4,7 @@ import AxiosInstance from "../../../../../../../api/http";
 import { Controller, useForm } from "react-hook-form";
 import { DeleteOutlined } from "@ant-design/icons";
 
-export default function MarkaEkle({ workshopSelectedId, onSubmit }) {
+export default function LokasyonTipiEkle({ workshopSelectedId, onSubmit }) {
   // useFormContext is replaced with useForm for local form state management
   const { control, reset, getValues } = useForm({
     defaultValues: {

@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table } from "antd";
-import AxiosInstance from "../../../../../../../../../api/http";
+import AxiosInstance from "../../../../../../../api/http";
 
-export default function MakineOncelikTablo({ workshopSelectedId, onSubmit }) {
+export default function LokasyonDepoTablo({ workshopSelectedId, onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
@@ -10,52 +10,53 @@ export default function MakineOncelikTablo({ workshopSelectedId, onSubmit }) {
 
   const columns = [
     {
-      title: "Öncelik Kodu",
+      title: "Depo Kodu",
       dataIndex: "code",
       key: "code",
-      render: (text) => (
-        <div
-          style={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
+      width: 200,
+      ellipsis: true,
     },
     {
-      title: "Tanım",
+      title: "Depo Tanımı",
       dataIndex: "subject",
       key: "subject",
-      render: (text) => (
-        <div
-          style={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
+      width: 300,
+      ellipsis: true,
     },
     {
-      title: "Varsayılan",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => <input type="checkbox" checked={status} disabled />,
+      title: "Sorumlu Personel",
+      dataIndex: "type",
+      key: "type",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Atölye",
+      dataIndex: "startDate",
+      key: "startDate",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Lokasyon",
+      dataIndex: "endDate",
+      key: "endDate",
+      width: 200,
+      ellipsis: true,
     },
   ];
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`OncelikList`)
+    AxiosInstance.get(`GetDepo?ID=24&DEP_MODUL_NO=1`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
-          key: item.TB_SERVIS_ONCELIK_ID,
-          code: item.SOC_KOD,
-          subject: item.SOC_TANIM,
-          status: item.SOC_VARSAYILAN,
+          key: item.TB_DEPO_ID,
+          code: item.DEP_KOD,
+          subject: item.DEP_TANIM,
+          type: item.SORUMLU_PERSONEL,
+          startDate: item.ATOLYE_TANIM,
+          endDate: item.LOKASYON_TANIM,
         }));
         setData(fetchedData);
       })
@@ -88,7 +89,7 @@ export default function MakineOncelikTablo({ workshopSelectedId, onSubmit }) {
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
-      <Modal width="1200px" title="Öncelik" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
+      <Modal width={1200} centered title="Depo" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <Table
           rowSelection={{
             type: "radio",
@@ -98,6 +99,10 @@ export default function MakineOncelikTablo({ workshopSelectedId, onSubmit }) {
           columns={columns}
           dataSource={data}
           loading={loading}
+          scroll={{
+            // x: "auto",
+            y: "calc(100vh - 360px)",
+          }}
         />
       </Modal>
     </div>
