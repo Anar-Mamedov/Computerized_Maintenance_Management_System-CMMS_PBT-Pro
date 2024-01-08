@@ -15,6 +15,14 @@ export default function MasrafMerkeziTablo({ workshopSelectedId, onSubmit }) {
       key: "name",
       width: 300,
       ellipsis: true,
+      render: (text) => (
+        <div
+          style={{
+            marginTop: "6px",
+          }}>
+          {text}
+        </div>
+      ),
     },
     {
       title: "Masraf Tanımı",
@@ -22,6 +30,14 @@ export default function MasrafMerkeziTablo({ workshopSelectedId, onSubmit }) {
       key: "age",
       width: 300,
       ellipsis: true,
+      render: (text) => (
+        <div
+          style={{
+            marginTop: "6px",
+          }}>
+          {text}
+        </div>
+      ),
     },
     {
       title: "Masraf Tipi",
@@ -29,6 +45,14 @@ export default function MasrafMerkeziTablo({ workshopSelectedId, onSubmit }) {
       key: "workdays",
       width: 300,
       ellipsis: true,
+      render: (text) => (
+        <div
+          style={{
+            marginTop: "6px",
+          }}>
+          {text}
+        </div>
+      ),
     },
     {
       title: "Lokasyon",
@@ -36,6 +60,14 @@ export default function MasrafMerkeziTablo({ workshopSelectedId, onSubmit }) {
       key: "description",
       width: 300,
       ellipsis: true,
+      render: (text) => (
+        <div
+          style={{
+            marginTop: "6px",
+          }}>
+          {text}
+        </div>
+      ),
     },
     {
       title: "Proje",
@@ -43,6 +75,14 @@ export default function MasrafMerkeziTablo({ workshopSelectedId, onSubmit }) {
       key: "fifthColumn",
       width: 300,
       ellipsis: true,
+      render: (text) => (
+        <div
+          style={{
+            marginTop: "6px",
+          }}>
+          {text}
+        </div>
+      ),
     },
   ];
 

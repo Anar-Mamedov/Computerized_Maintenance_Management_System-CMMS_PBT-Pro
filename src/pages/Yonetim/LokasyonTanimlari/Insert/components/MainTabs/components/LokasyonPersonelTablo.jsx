@@ -14,24 +14,28 @@ export default function LokasyonPersonelTablo({ workshopSelectedId, onSubmit }) 
       dataIndex: "code",
       key: "code",
       width: "150px",
+      ellipsis: true,
     },
     {
       title: "Personel Adı",
       dataIndex: "subject",
       key: "subject",
       width: "150px",
+      ellipsis: true,
     },
     {
       title: "Ünvan",
       dataIndex: "workdays",
       key: "workdays",
       width: "150px",
+      ellipsis: true,
     },
     {
       title: "Personel Tipi",
       dataIndex: "description",
       key: "description",
       width: "150px",
+      ellipsis: true,
     },
 
     {
@@ -39,12 +43,14 @@ export default function LokasyonPersonelTablo({ workshopSelectedId, onSubmit }) 
       dataIndex: "fifthcolumn",
       key: "fifthcolumn",
       width: "150px",
+      ellipsis: true,
     },
     {
       title: "Lokasyon",
       dataIndex: "sixthcolumn",
       key: "sixthcolumn",
       width: "150px",
+      ellipsis: true,
     },
   ];
 
@@ -108,6 +114,10 @@ export default function LokasyonPersonelTablo({ workshopSelectedId, onSubmit }) 
           columns={columns}
           dataSource={data}
           loading={loading}
+          scroll={{
+            // x: "auto",
+            y: "calc(100vh - 360px)",
+          }}
         />
       </Modal>
     </div>
