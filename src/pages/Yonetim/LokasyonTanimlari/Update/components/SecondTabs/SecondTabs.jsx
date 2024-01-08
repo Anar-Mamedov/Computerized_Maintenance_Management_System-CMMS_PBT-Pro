@@ -48,6 +48,7 @@ const StyledTabs = styled(Tabs)`
   .ant-tabs-tab:not(:first-child) {
     border-left: 1px solid #80808024;
   }
+
   .ant-tabs-ink-bar {
     background-color: #2bc770;
   }
