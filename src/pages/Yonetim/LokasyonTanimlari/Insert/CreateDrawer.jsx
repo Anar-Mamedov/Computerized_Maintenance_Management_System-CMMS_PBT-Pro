@@ -75,7 +75,18 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
   //* export
   const onSubmit = (data) => {
     const Body = {
-      // selectedLokasyonId: data.selectedLokasyonId,
+      LOK_TANIM: data.lokasyonTanimi,
+      LOK_ANA_LOKASYON_ID: data.selectedLokasyonId,
+      LOK_TIP_ID: data.lokasyonTipiID,
+      LOK_MASRAF_MERKEZ_KOD_ID: data.LokasyonMasrafMerkeziID,
+      LOK_PERSONEL_ID: data.lokasyonYoneticiID,
+      LOK_EMAIL: data.lokasyonEmail,
+      LOK_ACIKLAMA: data.lokasyonAciklama,
+      LOK_BINA_KOD_ID: data.lokasyonBina,
+      LOK_KAT_KOD_ID: data.lokasyonKatID,
+      LOK_AKTIF: data.lokasyonAktif,
+      LOK_MALZEME_DEPO_ID: data.lokasyonDepoID,
+      LOK_OLUSTURAN_ID: 24,
       // add more fields as needed
     };
 
@@ -83,7 +94,7 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
     // handle response
     // });
 
-    AxiosInstance.post("AddMakine?ID=24", Body)
+    AxiosInstance.post("addLokasyon", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);

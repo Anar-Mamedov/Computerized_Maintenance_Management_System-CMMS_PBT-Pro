@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useFormContext, useFieldArray, Controller } from "react-hook-form";
 import { Input, Table, Spin } from "antd";
 import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import { SearchOutlined } from "@ant-design/icons";
+import EditDrawer from "../Update/EditDrawer";
 
 export default function MainTable() {
   const { watch, control, setValue } = useFormContext();
@@ -14,6 +15,13 @@ export default function MainTable() {
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // edit drawer için
+  const [drawer, setDrawer] = useState({
+    visible: false,
+    data: null,
+  });
+  // edit drawer için son
 
   // arama işlevi için
 
@@ -93,7 +101,7 @@ export default function MainTable() {
   const fetchEquipmentData = async () => {
     try {
       setLoading(true); // Yükleme başladığında
-      const response = await AxiosInstance.get("Lokasyon?ID=30");
+      const response = await AxiosInstance.get("GetLokasyonList?ID=30");
       if (response) {
         const formattedData = formatDataForTable(response);
         replace(formattedData); // Populate the field array
@@ -174,6 +182,22 @@ export default function MainTable() {
     // You can add more configuration here if needed
   };
 
+  const onRowClick = (record) => {
+    return {
+      onClick: () => {
+        setDrawer({ visible: true, data: record });
+      },
+    };
+  };
+
+  // kaydet düğmesine basıldıktan sonra apiye tekrardan istek atmasını sağlamak
+  const refreshTableData = useCallback(() => {
+    // Assuming `fetch` is your function to fetch table data
+    fetchEquipmentData();
+  }, [fetchEquipmentData]);
+
+  // kaydet düğmesine basıldıktan sonra apiye tekrardan istek atmasını sağlamak son
+
   return (
     <div>
       <div
@@ -193,7 +217,7 @@ export default function MainTable() {
           onChange={(e) => setSearchTerm(e.target.value)}
           prefix={<SearchOutlined style={{ color: "#0091ff" }} />} // Arama ikonunu ekle
         />
-        <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} />
+        <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
       </div>
       <Spin spinning={loading}>
         <Table
@@ -201,11 +225,18 @@ export default function MainTable() {
           columns={columns}
           dataSource={debouncedSearchTerm ? filteredData : fields}
           pagination={false}
+          onRow={onRowClick}
           scroll={{ y: "calc(100vh - 300px)" }}
           expandedRowKeys={expandedRowKeys}
           onExpand={onTableRowExpand} // Elle genişletme/küçültme işlemlerini takip et
         />
       </Spin>
+      <EditDrawer
+        selectedRow={drawer.data}
+        onDrawerClose={() => setDrawer({ ...drawer, visible: false })}
+        drawerVisible={drawer.visible}
+        onRefresh={refreshTableData}
+      />
     </div>
   );
 }

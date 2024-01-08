@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table } from "antd";
-import AxiosInstance from "../../../../../../../../../api/http";
+import AxiosInstance from "../../../../../../../api/http";
 
-export default function YakitTipi({ workshopSelectedId, onSubmit }) {
+export default function LokasyonPersonelTablo({ workshopSelectedId, onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
@@ -10,78 +10,62 @@ export default function YakitTipi({ workshopSelectedId, onSubmit }) {
 
   const columns = [
     {
-      title: "Yıl",
+      title: "Personel Kodu",
       dataIndex: "code",
       key: "code",
-      width: 100,
-      render: (text) => (
-        <div
-          style={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
+      width: "150px",
+      ellipsis: true,
     },
     {
-      title: "Takvim Tanım",
+      title: "Personel Adı",
       dataIndex: "subject",
       key: "subject",
-      render: (text) => (
-        <div
-          style={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
+      width: "150px",
+      ellipsis: true,
     },
     {
-      title: "Çalışma Günleri",
+      title: "Ünvan",
       dataIndex: "workdays",
       key: "workdays",
-      render: (text) => (
-        <div
-          style={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
+      width: "150px",
+      ellipsis: true,
     },
     {
-      title: "Açıklama",
+      title: "Personel Tipi",
       dataIndex: "description",
       key: "description",
-      render: (text) => (
-        <div
-          style={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
+      width: "150px",
+      ellipsis: true,
+    },
+
+    {
+      title: "Departman",
+      dataIndex: "fifthcolumn",
+      key: "fifthcolumn",
+      width: "150px",
+      ellipsis: true,
+    },
+    {
+      title: "Lokasyon",
+      dataIndex: "sixthcolumn",
+      key: "sixthcolumn",
+      width: "150px",
+      ellipsis: true,
     },
   ];
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`GetTakvimList`)
+    AxiosInstance.get(`Personel`)
       .then((response) => {
-        const fetchedData = response.Takvim_Liste.map((item) => ({
-          key: item.TB_TAKVIM_ID,
-          code: item.TKV_YIL,
-          subject: item.TKV_TANIM,
-          workdays: item.TKV_HAFTA_CALISMA_GUN,
-          description: item.TKV_ACIKLAMA,
+        const fetchedData = response.map((item) => ({
+          key: item.TB_PERSONEL_ID,
+          code: item.PRS_PERSONEL_KOD,
+          subject: item.PRS_ISIM,
+          workdays: item.PRS_UNVAN,
+          description: item.PRS_TIP,
+          fifthcolumn: item.PRS_DEPARTMAN,
+          sixthcolumn: item.PRS_LOKASYON,
         }));
         setData(fetchedData);
       })
@@ -111,13 +95,13 @@ export default function YakitTipi({ workshopSelectedId, onSubmit }) {
   const onRowSelectChange = (selectedKeys) => {
     setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
   };
-
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
       <Modal
-        width="1200px"
-        title="Yakıt Tanımları"
+        width={1200}
+        centered
+        title="Personel"
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}>
@@ -130,6 +114,10 @@ export default function YakitTipi({ workshopSelectedId, onSubmit }) {
           columns={columns}
           dataSource={data}
           loading={loading}
+          scroll={{
+            // x: "auto",
+            y: "calc(100vh - 360px)",
+          }}
         />
       </Modal>
     </div>

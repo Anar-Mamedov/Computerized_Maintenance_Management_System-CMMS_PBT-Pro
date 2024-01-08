@@ -1,13 +1,33 @@
 import React, { useState, createRef, useEffect } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import { Select, Typography, Divider, Spin, Button, Input, message, Space } from "antd";
-import AxiosInstance from "../../../../../../../../../api/http";
+import AxiosInstance from "../../../../../../../api/http";
 import { PlusOutlined } from "@ant-design/icons";
+import styled from "styled-components";
 
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function OzelAlan_11() {
+const StyledSelect = styled(Select)`
+  @media (min-width: 600px) {
+    width: 300px;
+  }
+  @media (max-width: 600px) {
+    width: 300px;
+  }
+`;
+
+const StyledDiv = styled.div`
+  @media (min-width: 600px) {
+    alignitems: "center";
+  }
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+`;
+
+export default function LokasyonKat() {
   const { control, setValue } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -23,7 +43,7 @@ export default function OzelAlan_11() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32530");
+      const response = await AxiosInstance.get("KodList?grup=32441");
       if (response && response) {
         setOptions(response);
       }
@@ -51,7 +71,7 @@ export default function OzelAlan_11() {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32530`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32441`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
@@ -88,17 +108,25 @@ export default function OzelAlan_11() {
 
   // add new status to selectbox end
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between", width: "100%" }}>
+    <StyledDiv
+      style={{
+        display: "flex",
+        gap: "10px",
+        justifyContent: "space-between",
+        width: "100%",
+        flexWrap: "wrap",
+        rowGap: "0px",
+      }}>
       {contextHolder}
-      <Text style={{ fontSize: "14px" }}>Özel Alan 11</Text>
+      <Text style={{ fontSize: "14px", minWidth: "40px" }}>Kat:</Text>
       <Controller
-        name="ozelAlan_11"
+        name="LokasyonKat"
         control={control}
         render={({ field }) => (
-          <Select
+          <StyledSelect
             {...field}
             key={selectKey}
-            style={{ width: "300px" }}
+            // style={{ maxWidth: "300px", width: "100%" }}
             showSearch
             allowClear
             placeholder="Seçim Yapınız"
@@ -136,14 +164,14 @@ export default function OzelAlan_11() {
             }))}
             onChange={(value) => {
               // Seçilen değerin ID'sini NedeniID alanına set et
-              setValue("ozelAlan_11_ID", value);
+              setValue("LokasyonKatID", value);
               field.onChange(value);
             }}
           />
         )}
       />
       <Controller
-        name="ozelAlan_11_ID"
+        name="LokasyonKatID"
         control={control}
         render={({ field }) => (
           <Input
@@ -153,6 +181,6 @@ export default function OzelAlan_11() {
           />
         )}
       />
-    </div>
+    </StyledDiv>
   );
 }

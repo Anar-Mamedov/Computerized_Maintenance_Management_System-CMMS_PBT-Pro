@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table } from "antd";
-import AxiosInstance from "../../../../../../../../../api/http";
+import AxiosInstance from "../../../../../../../api/http";
 
 export default function MasrafMerkeziTablo({ workshopSelectedId, onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -13,14 +13,12 @@ export default function MasrafMerkeziTablo({ workshopSelectedId, onSubmit }) {
       title: "Masraf Yolu",
       dataIndex: "name",
       key: "name",
-      width: 200,
+      width: 300,
+      ellipsis: true,
       render: (text) => (
         <div
           style={{
             marginTop: "6px",
-            whiteSpace: "nowrap",
-
-            textOverflow: "ellipsis",
           }}>
           {text}
         </div>
@@ -30,12 +28,12 @@ export default function MasrafMerkeziTablo({ workshopSelectedId, onSubmit }) {
       title: "Masraf Tanımı",
       dataIndex: "age",
       key: "age",
+      width: 300,
+      ellipsis: true,
       render: (text) => (
         <div
           style={{
-            whiteSpace: "nowrap",
-
-            textOverflow: "ellipsis",
+            marginTop: "6px",
           }}>
           {text}
         </div>
@@ -45,12 +43,12 @@ export default function MasrafMerkeziTablo({ workshopSelectedId, onSubmit }) {
       title: "Masraf Tipi",
       dataIndex: "workdays",
       key: "workdays",
+      width: 300,
+      ellipsis: true,
       render: (text) => (
         <div
           style={{
-            whiteSpace: "nowrap",
-
-            textOverflow: "ellipsis",
+            marginTop: "6px",
           }}>
           {text}
         </div>
@@ -60,12 +58,12 @@ export default function MasrafMerkeziTablo({ workshopSelectedId, onSubmit }) {
       title: "Lokasyon",
       dataIndex: "description",
       key: "description",
+      width: 300,
+      ellipsis: true,
       render: (text) => (
         <div
           style={{
-            whiteSpace: "nowrap",
-
-            textOverflow: "ellipsis",
+            marginTop: "6px",
           }}>
           {text}
         </div>
@@ -75,12 +73,12 @@ export default function MasrafMerkeziTablo({ workshopSelectedId, onSubmit }) {
       title: "Proje",
       dataIndex: "fifthColumn",
       key: "fifthColumn",
+      width: 300,
+      ellipsis: true,
       render: (text) => (
         <div
           style={{
-            whiteSpace: "nowrap",
-
-            textOverflow: "ellipsis",
+            marginTop: "6px",
           }}>
           {text}
         </div>
@@ -175,7 +173,16 @@ export default function MasrafMerkeziTablo({ workshopSelectedId, onSubmit }) {
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}>
-        <Table rowSelection={rowSelection} columns={columns} dataSource={treeData} loading={loading} />
+        <Table
+          rowSelection={rowSelection}
+          columns={columns}
+          dataSource={treeData}
+          loading={loading}
+          scroll={{
+            // x: "auto",
+            y: "calc(100vh - 360px)",
+          }}
+        />
       </Modal>
     </div>
   );
