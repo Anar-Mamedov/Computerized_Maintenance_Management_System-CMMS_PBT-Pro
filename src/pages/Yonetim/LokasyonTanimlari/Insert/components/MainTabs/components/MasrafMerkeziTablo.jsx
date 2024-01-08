@@ -13,78 +13,36 @@ export default function MasrafMerkeziTablo({ workshopSelectedId, onSubmit }) {
       title: "Masraf Yolu",
       dataIndex: "name",
       key: "name",
-      width: 200,
-      render: (text) => (
-        <div
-          style={{
-            marginTop: "6px",
-            whiteSpace: "nowrap",
-
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
+      width: 300,
+      ellipsis: true,
     },
     {
       title: "Masraf Tanımı",
       dataIndex: "age",
       key: "age",
-      render: (text) => (
-        <div
-          style={{
-            whiteSpace: "nowrap",
-
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
+      width: 300,
+      ellipsis: true,
     },
     {
       title: "Masraf Tipi",
       dataIndex: "workdays",
       key: "workdays",
-      render: (text) => (
-        <div
-          style={{
-            whiteSpace: "nowrap",
-
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
+      width: 300,
+      ellipsis: true,
     },
     {
       title: "Lokasyon",
       dataIndex: "description",
       key: "description",
-      render: (text) => (
-        <div
-          style={{
-            whiteSpace: "nowrap",
-
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
+      width: 300,
+      ellipsis: true,
     },
     {
       title: "Proje",
       dataIndex: "fifthColumn",
       key: "fifthColumn",
-      render: (text) => (
-        <div
-          style={{
-            whiteSpace: "nowrap",
-
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
+      width: 300,
+      ellipsis: true,
     },
   ];
 
@@ -175,7 +133,16 @@ export default function MasrafMerkeziTablo({ workshopSelectedId, onSubmit }) {
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}>
-        <Table rowSelection={rowSelection} columns={columns} dataSource={treeData} loading={loading} />
+        <Table
+          rowSelection={rowSelection}
+          columns={columns}
+          dataSource={treeData}
+          loading={loading}
+          scroll={{
+            // x: "auto",
+            y: "calc(100vh - 360px)",
+          }}
+        />
       </Modal>
     </div>
   );
