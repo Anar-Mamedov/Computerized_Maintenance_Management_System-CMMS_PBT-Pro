@@ -43,7 +43,7 @@ export default function LokasyonBina() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32441");
+      const response = await AxiosInstance.get("KodList?grup=32954");
       if (response && response) {
         setOptions(response);
       }
@@ -71,7 +71,7 @@ export default function LokasyonBina() {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32441`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32954`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
