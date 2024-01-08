@@ -3,12 +3,12 @@ import { PlusOutlined } from "@ant-design/icons";
 import { Button, Drawer, Space, ConfigProvider, Modal } from "antd";
 import React, { useEffect, useState, useTransition } from "react";
 import MainTabs from "./components/MainTabs/MainTabs";
-import secondTabs from "./components/secondTabs/SecondTabs";
+import secondTabs from "./components/SecondTabs/SecondTabs";
 import { useForm, Controller, useFormContext, FormProvider, set } from "react-hook-form";
 import dayjs from "dayjs";
 import AxiosInstance from "../../../../api/http";
 import Footer from "../Footer";
-import SecondTabs from "./components/secondTabs/SecondTabs";
+import SecondTabs from "./components/SecondTabs/SecondTabs";
 
 export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
   const [, startTransition] = useTransition();
