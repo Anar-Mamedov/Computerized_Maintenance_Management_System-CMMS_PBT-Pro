@@ -10,25 +10,48 @@ export default function LokasyonDepoTablo({ workshopSelectedId, onSubmit }) {
 
   const columns = [
     {
-      title: "Atölye Kodu",
+      title: "Depo Kodu",
       dataIndex: "code",
       key: "code",
+      width: 200,
     },
     {
-      title: "Atölye Tanımı",
+      title: "Depo Tanımı",
       dataIndex: "subject",
       key: "subject",
+      width: 300,
+    },
+    {
+      title: "Sorumlu Personel",
+      dataIndex: "type",
+      key: "type",
+      width: 200,
+    },
+    {
+      title: "Atölye",
+      dataIndex: "startDate",
+      key: "startDate",
+      width: 200,
+    },
+    {
+      title: "Lokasyon",
+      dataIndex: "endDate",
+      key: "endDate",
+      width: 200,
     },
   ];
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`AtolyeList?kulID=24`)
+    AxiosInstance.get(`GetDepo?ID=24&DEP_MODUL_NO=1`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
-          key: item.TB_ATOLYE_ID,
-          code: item.ATL_KOD,
-          subject: item.ATL_TANIM,
+          key: item.TB_DEPO_ID,
+          code: item.DEP_KOD,
+          subject: item.DEP_TANIM,
+          type: item.SORUMLU_PERSONEL,
+          startDate: item.ATOLYE_TANIM,
+          endDate: item.LOKASYON_TANIM,
         }));
         setData(fetchedData);
       })
