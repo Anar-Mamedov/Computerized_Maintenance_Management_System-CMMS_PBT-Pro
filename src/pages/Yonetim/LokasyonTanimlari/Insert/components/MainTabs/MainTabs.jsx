@@ -32,6 +32,16 @@ const StyledDiv = styled.div`
   }
 `;
 
+const StyledDivBottomLine = styled.div`
+  @media (min-width: 600px) {
+    alignitems: "center";
+  }
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+`;
+
 export default function MainTabs() {
   const { control, watch, setValue } = useFormContext();
 
@@ -191,11 +201,10 @@ export default function MainTabs() {
         </div>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-        <div
+        <StyledDivBottomLine
           style={{
             display: "flex",
             flexWrap: "wrap",
-            alignItems: "center",
             justifyContent: "space-between",
             width: "100%",
             maxWidth: "450px",
@@ -240,7 +249,7 @@ export default function MainTabs() {
             />
             <Button onClick={handleYoneticiMinusClick}> - </Button>
           </div>
-        </div>
+        </StyledDivBottomLine>
         <div
           style={{
             display: "flex",
@@ -292,11 +301,11 @@ export default function MainTabs() {
           </div>
         </div>
       </div>
-      <div
+      <StyledDivBottomLine
         style={{
           display: "flex",
           flexWrap: "wrap",
-          alignItems: "center",
+
           justifyContent: "space-between",
           width: "100%",
         }}>
@@ -311,8 +320,8 @@ export default function MainTabs() {
             />
           )}
         />
-      </div>
-      <div
+      </StyledDivBottomLine>
+      <StyledDivBottomLine
         style={{
           display: "flex",
           flexWrap: "wrap",
@@ -333,7 +342,7 @@ export default function MainTabs() {
             )}
           />
         </StyledDiv>
-      </div>
+      </StyledDivBottomLine>
     </div>
   );
 }
