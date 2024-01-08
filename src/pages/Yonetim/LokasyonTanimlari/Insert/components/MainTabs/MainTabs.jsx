@@ -77,56 +77,6 @@ export default function MainTabs() {
           alignItems: "center",
           justifyContent: "space-between",
           width: "100%",
-          maxWidth: "450px",
-        }}>
-        <Text style={{ fontSize: "14px" }}>Ana Lokasyon:</Text>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "300px",
-          }}>
-          <Controller
-            name="anaLokasyonTanim"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ width: "215px" }}
-                disabled
-              />
-            )}
-          />
-          <Controller
-            name="anaLokasyonID"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ display: "none" }}
-              />
-            )}
-          />
-          <LokasyonTablo
-            onSubmit={(selectedData) => {
-              setValue("anaLokasyonTanim", selectedData.LOK_TANIM);
-              setValue("anaLokasyonID", selectedData.key);
-            }}
-          />
-          <Button onClick={handleAnaLokasyonMinusClick}> - </Button>
-        </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          width: "100%",
           gap: "10px",
           rowGap: "0px",
         }}>
@@ -355,6 +305,58 @@ export default function MainTabs() {
             />
             <Button onClick={handleDepoMinusClick}> - </Button>
           </div>
+        </div>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+          maxWidth: "870px",
+        }}>
+        <Text style={{ fontSize: "14px" }}>Ana Lokasyon:</Text>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            minWidth: "300px",
+            width: "100%",
+            maxWidth: "720px",
+          }}>
+          <Controller
+            name="anaLokasyonTanim"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="text" // Set the type to "text" for name input
+                style={{ width: "100%", maxWidth: "630px" }}
+                disabled
+              />
+            )}
+          />
+          <Controller
+            name="anaLokasyonID"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="text" // Set the type to "text" for name input
+                style={{ display: "none" }}
+              />
+            )}
+          />
+          <LokasyonTablo
+            onSubmit={(selectedData) => {
+              setValue("anaLokasyonTanim", selectedData.LOK_TANIM);
+              setValue("anaLokasyonID", selectedData.key);
+            }}
+          />
+          <Button onClick={handleAnaLokasyonMinusClick}> - </Button>
         </div>
       </div>
       <StyledDivBottomLine
