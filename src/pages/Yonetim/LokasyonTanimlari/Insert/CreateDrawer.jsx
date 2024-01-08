@@ -41,6 +41,8 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
   //* export
   const methods = useForm({
     defaultValues: {
+      anaLokasyonTanim: "",
+      anaLokasyonID: 0,
       selectedLokasyonId: "",
       lokasyonTanimi: "",
       lokasyonAktif: true,
@@ -76,7 +78,7 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
   const onSubmit = (data) => {
     const Body = {
       LOK_TANIM: data.lokasyonTanimi,
-      LOK_ANA_LOKASYON_ID: data.selectedLokasyonId,
+      LOK_ANA_LOKASYON_ID: data.anaLokasyonID,
       LOK_TIP_ID: data.lokasyonTipiID,
       LOK_MASRAF_MERKEZ_KOD_ID: data.LokasyonMasrafMerkeziID,
       LOK_PERSONEL_ID: data.lokasyonYoneticiID,
