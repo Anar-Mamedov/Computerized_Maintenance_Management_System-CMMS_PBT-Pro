@@ -8,6 +8,7 @@ import LokasyonKat from "./components/LokasyonKat";
 import LokasyonPersonelTablo from "./components/LokasyonPersonelTablo";
 import LokasyonDepoTablo from "./components/LokasyonDepoTablo";
 import styled from "styled-components";
+import LokasyonTablo from "./components/LokasyonTablo";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -60,10 +61,65 @@ export default function MainTabs() {
     setValue("lokasyonDepoID", "");
   };
 
+  const handleAnaLokasyonMinusClick = () => {
+    setValue("anaLokasyonTanim", "");
+    setValue("anaLokasyonID", "");
+  };
+
   const selectedLokasyonId = watch("selectedLokasyonId");
 
   return (
     <div style={{ display: "flex", marginBottom: "15px", flexDirection: "column", gap: "10px", maxWidth: "870px" }}>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+          maxWidth: "450px",
+        }}>
+        <Text style={{ fontSize: "14px" }}>Ana Lokasyon:</Text>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "300px",
+          }}>
+          <Controller
+            name="anaLokasyonTanim"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="text" // Set the type to "text" for name input
+                style={{ width: "215px" }}
+                disabled
+              />
+            )}
+          />
+          <Controller
+            name="anaLokasyonID"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="text" // Set the type to "text" for name input
+                style={{ display: "none" }}
+              />
+            )}
+          />
+          <LokasyonTablo
+            onSubmit={(selectedData) => {
+              setValue("anaLokasyonTanim", selectedData.LOK_TANIM);
+              setValue("anaLokasyonID", selectedData.key);
+            }}
+          />
+          <Button onClick={handleAnaLokasyonMinusClick}> - </Button>
+        </div>
+      </div>
       <div
         style={{
           display: "flex",
