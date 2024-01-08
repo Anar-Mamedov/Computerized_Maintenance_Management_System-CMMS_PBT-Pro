@@ -17,6 +17,16 @@ const StyledSelect = styled(Select)`
   }
 `;
 
+const StyledDiv = styled.div`
+  @media (min-width: 600px) {
+    alignitems: "center";
+  }
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+`;
+
 export default function LokasyonKat() {
   const { control, setValue } = useFormContext();
   const [options, setOptions] = useState([]);
@@ -98,10 +108,9 @@ export default function LokasyonKat() {
 
   // add new status to selectbox end
   return (
-    <div
+    <StyledDiv
       style={{
         display: "flex",
-        alignItems: "center",
         gap: "10px",
         justifyContent: "space-between",
         width: "100%",
@@ -172,6 +181,6 @@ export default function LokasyonKat() {
           />
         )}
       />
-    </div>
+    </StyledDiv>
   );
 }
