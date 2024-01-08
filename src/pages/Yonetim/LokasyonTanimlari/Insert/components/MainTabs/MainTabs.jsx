@@ -53,8 +53,81 @@ export default function MainTabs() {
   const selectedLokasyonId = watch("selectedLokasyonId");
 
   return (
-    <>
-      <div style={{ display: "flex", marginBottom: "15px", flexDirection: "column", gap: "10px", maxWidth: "870px" }}>
+    <div style={{ display: "flex", marginBottom: "15px", flexDirection: "column", gap: "10px", maxWidth: "870px" }}>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+          gap: "10px",
+          rowGap: "0px",
+        }}>
+        <Text style={{ fontSize: "14px" }}>Lokasyon Tanımı:</Text>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            maxWidth: "720px",
+            minWidth: "300px",
+            gap: "10px",
+            width: "100%",
+          }}>
+          <Controller
+            name="lokasyonTanimi"
+            control={control}
+            render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+          />
+          <Controller
+            name="selectedLokasyonId"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="text" // Set the type to "text" for name input
+                style={{ display: "none" }}
+              />
+            )}
+          />
+          <Controller
+            name="lokasyonAktif"
+            control={control}
+            defaultValue={true} // or true if you want it checked by default
+            render={({ field }) => (
+              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                Aktif
+              </Checkbox>
+            )}
+          />
+        </div>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            maxWidth: "450px",
+            gap: "10px",
+            width: "100%",
+          }}>
+          <LokasyonTipi />
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            maxWidth: "410px",
+            gap: "10px",
+            width: "100%",
+          }}>
+          <LokasyonBina />
+        </div>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
         <div
           style={{
             display: "flex",
@@ -62,27 +135,31 @@ export default function MainTabs() {
             alignItems: "center",
             justifyContent: "space-between",
             width: "100%",
-            gap: "10px",
-            rowGap: "0px",
+            maxWidth: "450px",
           }}>
-          <Text style={{ fontSize: "14px" }}>Lokasyon Tanımı:</Text>
+          <Text style={{ fontSize: "14px" }}>Masraf Merkezi:</Text>
           <div
             style={{
               display: "flex",
               flexWrap: "wrap",
               alignItems: "center",
-              maxWidth: "720px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
+              justifyContent: "space-between",
+              width: "300px",
             }}>
             <Controller
-              name="lokasyonTanimi"
+              name="lokasyonMasrafMerkeziTanim"
               control={control}
-              render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="text" // Set the type to "text" for name input
+                  style={{ width: "215px" }}
+                  disabled
+                />
+              )}
             />
             <Controller
-              name="selectedLokasyonId"
+              name="lokasyonMasrafMerkeziID"
               control={control}
               render={({ field }) => (
                 <Input
@@ -92,205 +169,76 @@ export default function MainTabs() {
                 />
               )}
             />
+            <MasrafMerkeziTablo
+              onSubmit={(selectedData) => {
+                setValue("lokasyonMasrafMerkeziTanim", selectedData.age);
+                setValue("lokasyonMasrafMerkeziID", selectedData.key);
+              }}
+            />
+            <Button onClick={handleMinusClick}> - </Button>
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            maxWidth: "410px",
+            gap: "10px",
+            width: "100%",
+          }}>
+          <LokasyonKat />
+        </div>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: "450px",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Yönetici:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "300px",
+            }}>
             <Controller
-              name="lokasyonAktif"
+              name="lokasyonYoneticiTanim"
               control={control}
-              defaultValue={true} // or true if you want it checked by default
               render={({ field }) => (
-                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-                  Aktif
-                </Checkbox>
+                <Input
+                  {...field}
+                  type="text" // Set the type to "text" for name input
+                  style={{ width: "215px" }}
+                  disabled
+                />
               )}
             />
-          </div>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "450px",
-              gap: "10px",
-              width: "100%",
-            }}>
-            <LokasyonTipi />
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "410px",
-              gap: "10px",
-              width: "100%",
-            }}>
-            <LokasyonBina />
-          </div>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "450px",
-            }}>
-            <Text style={{ fontSize: "14px" }}>Masraf Merkezi:</Text>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "300px",
-              }}>
-              <Controller
-                name="lokasyonMasrafMerkeziTanim"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text" // Set the type to "text" for name input
-                    style={{ width: "215px" }}
-                    disabled
-                  />
-                )}
-              />
-              <Controller
-                name="lokasyonMasrafMerkeziID"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text" // Set the type to "text" for name input
-                    style={{ display: "none" }}
-                  />
-                )}
-              />
-              <MasrafMerkeziTablo
-                onSubmit={(selectedData) => {
-                  setValue("lokasyonMasrafMerkeziTanim", selectedData.age);
-                  setValue("lokasyonMasrafMerkeziID", selectedData.key);
-                }}
-              />
-              <Button onClick={handleMinusClick}> - </Button>
-            </div>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "410px",
-              gap: "10px",
-              width: "100%",
-            }}>
-            <LokasyonKat />
-          </div>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "450px",
-            }}>
-            <Text style={{ fontSize: "14px" }}>Yönetici:</Text>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "300px",
-              }}>
-              <Controller
-                name="lokasyonYoneticiTanim"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text" // Set the type to "text" for name input
-                    style={{ width: "215px" }}
-                    disabled
-                  />
-                )}
-              />
-              <Controller
-                name="lokasyonYoneticiID"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text" // Set the type to "text" for name input
-                    style={{ display: "none" }}
-                  />
-                )}
-              />
-              <LokasyonPersonelTablo
-                onSubmit={(selectedData) => {
-                  setValue("lokasyonYoneticiTanim", selectedData.subject);
-                  setValue("lokasyonYoneticiID", selectedData.key);
-                }}
-              />
-              <Button onClick={handleYoneticiMinusClick}> - </Button>
-            </div>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "410px",
-            }}>
-            <Text style={{ fontSize: "14px" }}>Malzeme Depo:</Text>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "300px",
-              }}>
-              <Controller
-                name="lokasyonDepoTanim"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text" // Set the type to "text" for name input
-                    style={{ width: "215px" }}
-                    disabled
-                  />
-                )}
-              />
-              <Controller
-                name="lokasyonDepoID"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text" // Set the type to "text" for name input
-                    style={{ display: "none" }}
-                  />
-                )}
-              />
-              <LokasyonDepoTablo
-                onSubmit={(selectedData) => {
-                  setValue("lokasyonDepoTanim", selectedData.subject);
-                  setValue("lokasyonDepoID", selectedData.key);
-                }}
-              />
-              <Button onClick={handleDepoMinusClick}> - </Button>
-            </div>
+            <Controller
+              name="lokasyonYoneticiID"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="text" // Set the type to "text" for name input
+                  style={{ display: "none" }}
+                />
+              )}
+            />
+            <LokasyonPersonelTablo
+              onSubmit={(selectedData) => {
+                setValue("lokasyonYoneticiTanim", selectedData.subject);
+                setValue("lokasyonYoneticiID", selectedData.key);
+              }}
+            />
+            <Button onClick={handleYoneticiMinusClick}> - </Button>
           </div>
         </div>
         <div
@@ -300,42 +248,92 @@ export default function MainTabs() {
             alignItems: "center",
             justifyContent: "space-between",
             width: "100%",
+            maxWidth: "410px",
           }}>
-          <Text style={{ fontSize: "14px" }}>E-Mail:</Text>
+          <Text style={{ fontSize: "14px" }}>Malzeme Depo:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "300px",
+            }}>
+            <Controller
+              name="lokasyonDepoTanim"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="text" // Set the type to "text" for name input
+                  style={{ width: "215px" }}
+                  disabled
+                />
+              )}
+            />
+            <Controller
+              name="lokasyonDepoID"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="text" // Set the type to "text" for name input
+                  style={{ display: "none" }}
+                />
+              )}
+            />
+            <LokasyonDepoTablo
+              onSubmit={(selectedData) => {
+                setValue("lokasyonDepoTanim", selectedData.subject);
+                setValue("lokasyonDepoID", selectedData.key);
+              }}
+            />
+            <Button onClick={handleDepoMinusClick}> - </Button>
+          </div>
+        </div>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+        }}>
+        <Text style={{ fontSize: "14px" }}>E-Mail:</Text>
+        <Controller
+          name="lokasyonEmail"
+          control={control}
+          render={({ field }) => (
+            <StyledInput
+              {...field}
+              type="text" // Set the type to "text" for name input
+            />
+          )}
+        />
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+          width: "100%",
+        }}>
+        <Text style={{ fontSize: "14px" }}>Açıklama:</Text>
+        <StyledDiv>
           <Controller
-            name="lokasyonEmail"
+            name="lokasyonAciklama"
             control={control}
             render={({ field }) => (
-              <StyledInput
+              <TextArea
                 {...field}
                 type="text" // Set the type to "text" for name input
               />
             )}
           />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "flex-start",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Açıklama:</Text>
-          <StyledDiv>
-            <Controller
-              name="lokasyonAciklama"
-              control={control}
-              render={({ field }) => (
-                <TextArea
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                />
-              )}
-            />
-          </StyledDiv>
-        </div>
+        </StyledDiv>
       </div>
-    </>
+    </div>
   );
 }

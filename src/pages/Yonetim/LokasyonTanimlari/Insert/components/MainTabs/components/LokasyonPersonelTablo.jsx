@@ -10,25 +10,56 @@ export default function LokasyonPersonelTablo({ workshopSelectedId, onSubmit }) 
 
   const columns = [
     {
-      title: "Atölye Kodu",
+      title: "Personel Kodu",
       dataIndex: "code",
       key: "code",
+      width: "150px",
     },
     {
-      title: "Atölye Tanımı",
+      title: "Personel Adı",
       dataIndex: "subject",
       key: "subject",
+      width: "150px",
+    },
+    {
+      title: "Ünvan",
+      dataIndex: "workdays",
+      key: "workdays",
+      width: "150px",
+    },
+    {
+      title: "Personel Tipi",
+      dataIndex: "description",
+      key: "description",
+      width: "150px",
+    },
+
+    {
+      title: "Departman",
+      dataIndex: "fifthcolumn",
+      key: "fifthcolumn",
+      width: "150px",
+    },
+    {
+      title: "Lokasyon",
+      dataIndex: "sixthcolumn",
+      key: "sixthcolumn",
+      width: "150px",
     },
   ];
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`AtolyeList?kulID=24`)
+    AxiosInstance.get(`Personel`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
-          key: item.TB_ATOLYE_ID,
-          code: item.ATL_KOD,
-          subject: item.ATL_TANIM,
+          key: item.TB_PERSONEL_ID,
+          code: item.PRS_PERSONEL_KOD,
+          subject: item.PRS_ISIM,
+          workdays: item.PRS_UNVAN,
+          description: item.PRS_TIP,
+          fifthcolumn: item.PRS_DEPARTMAN,
+          sixthcolumn: item.PRS_LOKASYON,
         }));
         setData(fetchedData);
       })
