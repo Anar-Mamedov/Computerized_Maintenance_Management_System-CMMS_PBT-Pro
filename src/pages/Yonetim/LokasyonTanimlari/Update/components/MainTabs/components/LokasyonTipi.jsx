@@ -15,9 +15,9 @@ export default function LokasyonTipi() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("GetMakineMarks");
-      if (response && response.Makine_Marka_List) {
-        setOptions(response.Makine_Marka_List);
+      const response = await AxiosInstance.get("GetLokasyonTipleri");
+      if (response && response) {
+        setOptions(response);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -60,8 +60,8 @@ export default function LokasyonTipi() {
               }}
               dropdownRender={(menu) => <Spin spinning={loading}>{menu}</Spin>}
               options={options.map((item) => ({
-                value: item.TB_MARKA_ID, // Use the ID as the value
-                label: item.MRK_MARKA, // Display the name in the dropdown
+                value: item.TB_LOKASYON_TIP_ID, // Use the ID as the value
+                label: item.LOT_TANIM, // Display the name in the dropdown
               }))}
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
