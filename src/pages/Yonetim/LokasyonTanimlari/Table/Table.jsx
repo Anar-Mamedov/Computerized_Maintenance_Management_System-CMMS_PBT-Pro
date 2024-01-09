@@ -124,6 +124,24 @@ export default function MainTable() {
       nodes[item.TB_LOKASYON_ID] = {
         ...item,
         key: item.TB_LOKASYON_ID,
+        LOK_TANIM: item.LOK_TANIM,
+        LOK_TIP_ID: item.LOK_TIP_ID,
+        LOK_TIP: item.LOK_TIP,
+        LOK_BINA_KOD_ID: item.LOK_BINA_KOD_ID,
+        LOK_BINA: item.LOK_BINA,
+        LOK_MASRAF_MERKEZ_KOD_ID: item.LOK_MASRAF_MERKEZ_KOD_ID,
+        LOK_MASRAF_MERKEZ: item.LOK_MASRAF_MERKEZ,
+        LOK_KAT_KOD_ID: item.LOK_KAT_KOD_ID,
+        LOK_KAT: item.LOK_KAT,
+        LOK_PERSONEL_ID: item.LOK_PERSONEL_ID,
+        LOK_PERSONEL: item.LOK_PERSONEL,
+        LOK_MALZEME_DEPO_ID: item.LOK_MALZEME_DEPO_ID,
+        LOK_DEPO: item.LOK_DEPO,
+        LOK_ANA_LOKASYON_ID: item.LOK_ANA_LOKASYON_ID,
+        LOK_ANA_LOKASYON: item.LOK_ANA_LOKASYON,
+        LOK_EMAIL: item.LOK_EMAIL,
+        LOK_ACIKLAMA: item.LOK_ACIKLAMA,
+
         children: [],
       };
     });
@@ -158,9 +176,19 @@ export default function MainTable() {
     //   render: (text, record) => <div style={{ marginTop: "6px" }}>{record.key}</div>,
     // },
     {
-      title: "",
+      title: "Lokasyon Tanımı",
       key: "lokasyonBilgisi",
       render: (text, record) => <div style={{ marginTop: "6px" }}>{record.LOK_TANIM}</div>,
+    },
+    {
+      title: "Lokasyon Tipi",
+      key: "LOK_TIP",
+      render: (text, record) => <div>{record.LOK_TIP}</div>,
+    },
+    {
+      title: "Yönetici",
+      key: "LOK_PERSONEL",
+      render: (text, record) => <div>{record.LOK_PERSONEL}</div>,
     },
     // Other columns...
   ];
