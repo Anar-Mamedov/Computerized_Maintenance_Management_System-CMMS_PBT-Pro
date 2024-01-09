@@ -8,6 +8,7 @@ import LokasyonKat from "./components/LokasyonKat";
 import LokasyonPersonelTablo from "./components/LokasyonPersonelTablo";
 import LokasyonDepoTablo from "./components/LokasyonDepoTablo";
 import styled from "styled-components";
+import LokasyonTablo from "./components/LokasyonTablo";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -42,6 +43,19 @@ const StyledDivBottomLine = styled.div`
   }
 `;
 
+const StyledDivMedia = styled.div`
+  .anar {
+    @media (min-width: 600px) {
+      max-width: 720px;
+      width: 100%;
+    }
+    @media (max-width: 600px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+`;
+
 export default function MainTabs() {
   const { control, watch, setValue } = useFormContext();
 
@@ -58,6 +72,11 @@ export default function MainTabs() {
   const handleDepoMinusClick = () => {
     setValue("lokasyonDepoTanim", "");
     setValue("lokasyonDepoID", "");
+  };
+
+  const handleAnaLokasyonMinusClick = () => {
+    setValue("anaLokasyonTanim", "");
+    setValue("anaLokasyonID", "");
   };
 
   const selectedLokasyonId = watch("selectedLokasyonId");
@@ -301,6 +320,58 @@ export default function MainTabs() {
           </div>
         </div>
       </div>
+      <StyledDivMedia
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+          maxWidth: "870px",
+        }}>
+        <Text style={{ fontSize: "14px" }}>Ana Lokasyon:</Text>
+        <div
+          className="anar"
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            minWidth: "300px",
+            gap: "3px",
+          }}>
+          <Controller
+            name="anaLokasyonTanim"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="text" // Set the type to "text" for name input
+                style={{ width: "100%", maxWidth: "630px" }}
+                disabled
+              />
+            )}
+          />
+          <Controller
+            name="anaLokasyonID"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="text" // Set the type to "text" for name input
+                style={{ display: "none" }}
+              />
+            )}
+          />
+          <LokasyonTablo
+            onSubmit={(selectedData) => {
+              setValue("anaLokasyonTanim", selectedData.LOK_TANIM);
+              setValue("anaLokasyonID", selectedData.key);
+            }}
+          />
+          <Button onClick={handleAnaLokasyonMinusClick}> - </Button>
+        </div>
+      </StyledDivMedia>
       <StyledDivBottomLine
         style={{
           display: "flex",
