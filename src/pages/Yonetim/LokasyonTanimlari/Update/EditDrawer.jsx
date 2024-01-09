@@ -60,14 +60,14 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       selectedLokasyonId: "",
       lokasyonTanimi: "",
       lokasyonAktif: true,
-      lokasyonTipi: "",
-      lokasyonTipiID: "",
+      LokasyonTipi: null,
+      LokasyonTipiID: "",
       lokasyonBina: null,
       LokasyonBinaID: "",
       lokasyonMasrafMerkezi: "",
-      LokasyonMasrafMerkeziID: "",
-      lokasyonKat: null,
-      lokasyonKatID: "",
+      lokasyonMasrafMerkeziID: "",
+      LokasyonKat: null,
+      LokasyonKatID: "",
       lokasyonYoneticiTanim: "",
       lokasyonYoneticiID: "",
       lokasyonDepoTanim: "",
@@ -92,16 +92,16 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   //* export
   const onSubmit = (data) => {
     const Body = {
-      selectedLokasyonId: data.selectedLokasyonId,
+      TB_LOKASYON_ID: data.selectedLokasyonId,
       LOK_TANIM: data.lokasyonTanimi,
       LOK_ANA_LOKASYON_ID: data.anaLokasyonID,
-      LOK_TIP_ID: data.lokasyonTipiID,
-      LOK_MASRAF_MERKEZ_KOD_ID: data.LokasyonMasrafMerkeziID,
+      LOK_TIP_ID: data.LokasyonTipiID,
+      LOK_MASRAF_MERKEZ_KOD_ID: data.lokasyonMasrafMerkeziID,
       LOK_PERSONEL_ID: data.lokasyonYoneticiID,
       LOK_EMAIL: data.lokasyonEmail,
       LOK_ACIKLAMA: data.lokasyonAciklama,
-      LOK_BINA_KOD_ID: data.lokasyonBina,
-      LOK_KAT_KOD_ID: data.lokasyonKatID,
+      LOK_BINA_KOD_ID: data.LokasyonBinaID,
+      LOK_KAT_KOD_ID: data.LokasyonKatID,
       LOK_AKTIF: data.lokasyonAktif,
       LOK_MALZEME_DEPO_ID: data.lokasyonDepoID,
       LOK_OLUSTURAN_ID: 24,
@@ -137,14 +137,14 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       setValue("selectedLokasyonId", selectedRow.key);
       setValue("lokasyonTanimi", selectedRow.LOK_TANIM);
       setValue("lokasyonAktif", selectedRow.LOK_AKTIF);
-      setValue("lokasyonTipi", selectedRow.LOK_TIP);
-      setValue("lokasyonTipiID", selectedRow.LOK_TIP_ID);
-      setValue("lokasyonBina", selectedRow.LOK_BINA);
+      setValue("LokasyonTipi", selectedRow.LOK_TIP);
+      setValue("LokasyonTipiID", selectedRow.LOK_TIP_ID);
+      setValue("LokasyonBina", selectedRow.LOK_BINA);
       setValue("LokasyonBinaID", selectedRow.LOK_BINA_KOD_ID);
       setValue("lokasyonMasrafMerkeziTanim", selectedRow.LOK_MASRAF_MERKEZ);
-      setValue("LokasyonMasrafMerkeziID", selectedRow.LOK_MASRAF_MERKEZ_KOD_ID);
-      setValue("lokasyonKat", selectedRow.LOK_KAT);
-      setValue("lokasyonKatID", selectedRow.LOK_KAT_KOD_ID);
+      setValue("lokasyonMasrafMerkeziID", selectedRow.LOK_MASRAF_MERKEZ_KOD_ID);
+      setValue("LokasyonKat", selectedRow.LOK_KAT);
+      setValue("LokasyonKatID", selectedRow.LOK_KAT_KOD_ID);
       setValue("lokasyonYoneticiTanim", selectedRow.LOK_PERSONEL);
       setValue("lokasyonYoneticiID", selectedRow.LOK_PERSONEL_ID);
       setValue("lokasyonDepoTanim", selectedRow.LOK_DEPO);
