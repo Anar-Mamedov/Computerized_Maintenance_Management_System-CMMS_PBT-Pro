@@ -10,39 +10,24 @@ const onChange = (key) => {
 
 //styled components
 const StyledTabs = styled(Tabs)`
-  ${"" /* border-radius: 20px; */}
-  .ant-tabs-nav-list {
-    ${"" /* border-top-right-radius: 10px; */}
-    background-color: rgba(230, 230, 230, 0.3);
-    overflow: hidden;
-  }
   .ant-tabs-tab {
-    /* background-color: rgba(230, 230, 230, 0.3); */
     margin: 0 !important;
     width: fit-content;
     padding: 10px 15px;
     justify-content: center;
-  }
-
-  .ant-tabs-nav-wrap {
-    ${"" /* border-radius: 10px 10px 0 0; */}
+    background-color: rgba(230, 230, 230, 0.3);
   }
 
   .ant-tabs-tab-active {
     background-color: #2bc77135;
-    color: rgba(0, 0, 0, 0.88) !important;
   }
 
   .ant-tabs-nav .ant-tabs-tab-active .ant-tabs-tab-btn {
     color: rgba(0, 0, 0, 0.88) !important;
   }
+
   .ant-tabs-tab:hover .ant-tabs-tab-btn {
     color: rgba(0, 0, 0, 0.88) !important;
-  }
-
-  .ant-tabs-tab-disabled,
-  .ant-tabs-tab-disabled:hover .ant-tabs-tab-btn {
-    color: grey !important;
   }
 
   .ant-tabs-tab:not(:first-child) {
@@ -50,7 +35,7 @@ const StyledTabs = styled(Tabs)`
   }
 
   .ant-tabs-ink-bar {
-    background-color: #2bc770;
+    background: #2bc770;
   }
 `;
 
