@@ -5,7 +5,7 @@ import { useFormContext } from "react-hook-form";
 import MainTabs from "../MainTabs/MainTabs";
 
 const onChange = (key) => {
-  console.log(key);
+  // console.log(key);
 };
 
 //styled components
@@ -74,13 +74,18 @@ const items = [
   },
   {
     key: "4",
-    label: "Ekli Belgeler",
+    label: "Projeler",
     children: "Content of Tab Pane 4",
   },
   {
     key: "5",
-    label: "Resimler",
+    label: "Ekli Belgeler",
     children: "Content of Tab Pane 5",
+  },
+  {
+    key: "6",
+    label: "Resimler",
+    children: "Content of Tab Pane 6",
   },
 ];
 
