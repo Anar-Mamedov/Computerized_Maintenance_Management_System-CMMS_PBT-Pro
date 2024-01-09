@@ -43,6 +43,19 @@ const StyledDivBottomLine = styled.div`
   }
 `;
 
+const StyledDivMedia = styled.div`
+  .anar {
+    @media (min-width: 600px) {
+      max-width: 720px;
+      width: 100%;
+    }
+    @media (max-width: 600px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+`;
+
 export default function MainTabs() {
   const { control, watch, setValue } = useFormContext();
 
@@ -307,7 +320,7 @@ export default function MainTabs() {
           </div>
         </div>
       </div>
-      <div
+      <StyledDivMedia
         style={{
           display: "flex",
           flexWrap: "wrap",
@@ -318,14 +331,14 @@ export default function MainTabs() {
         }}>
         <Text style={{ fontSize: "14px" }}>Ana Lokasyon:</Text>
         <div
+          className="anar"
           style={{
             display: "flex",
-            flexWrap: "wrap",
+            flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
             minWidth: "300px",
-            width: "100%",
-            maxWidth: "720px",
+            gap: "3px",
           }}>
           <Controller
             name="anaLokasyonTanim"
@@ -358,7 +371,7 @@ export default function MainTabs() {
           />
           <Button onClick={handleAnaLokasyonMinusClick}> - </Button>
         </div>
-      </div>
+      </StyledDivMedia>
       <StyledDivBottomLine
         style={{
           display: "flex",
