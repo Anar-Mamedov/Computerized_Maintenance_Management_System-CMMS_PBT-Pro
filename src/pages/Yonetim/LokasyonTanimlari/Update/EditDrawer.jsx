@@ -55,12 +55,15 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   //* export
   const methods = useForm({
     defaultValues: {
+      anaLokasyonTanim: "",
+      anaLokasyonID: 0,
       selectedLokasyonId: "",
       lokasyonTanimi: "",
       lokasyonAktif: true,
       lokasyonTipi: "",
       lokasyonTipiID: "",
       lokasyonBina: null,
+      LokasyonBinaID: "",
       lokasyonMasrafMerkezi: "",
       LokasyonMasrafMerkeziID: "",
       lokasyonKat: null,
@@ -89,7 +92,19 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   //* export
   const onSubmit = (data) => {
     const Body = {
-      // selectedLokasyonId: data.selectedLokasyonId,
+      selectedLokasyonId: data.selectedLokasyonId,
+      LOK_TANIM: data.lokasyonTanimi,
+      LOK_ANA_LOKASYON_ID: data.anaLokasyonID,
+      LOK_TIP_ID: data.lokasyonTipiID,
+      LOK_MASRAF_MERKEZ_KOD_ID: data.LokasyonMasrafMerkeziID,
+      LOK_PERSONEL_ID: data.lokasyonYoneticiID,
+      LOK_EMAIL: data.lokasyonEmail,
+      LOK_ACIKLAMA: data.lokasyonAciklama,
+      LOK_BINA_KOD_ID: data.lokasyonBina,
+      LOK_KAT_KOD_ID: data.lokasyonKatID,
+      LOK_AKTIF: data.lokasyonAktif,
+      LOK_MALZEME_DEPO_ID: data.lokasyonDepoID,
+      LOK_OLUSTURAN_ID: 24,
       // add more fields as needed
     };
 
@@ -97,7 +112,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     // handle response
     // });
 
-    AxiosInstance.post("UpdateMakine?ID=24", Body)
+    AxiosInstance.post("UpdateLokasyon", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);
@@ -119,20 +134,25 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       // Object.keys(selectedRow).forEach((key) => {
       //   console.log(key, selectedRow[key]);
       //   setValue(key, selectedRow[key]);
-      setValue("secilenMakineID", selectedRow.key);
-
-      setValue(
-        "makineGarantiBitisTarihi",
-        selectedRow.MKN_GARANTI_BITIS && dayjs(selectedRow.MKN_GARANTI_BITIS).isValid()
-          ? dayjs(selectedRow.MKN_GARANTI_BITIS)
-          : ""
-      );
-      setValue(
-        "time",
-        selectedRow.editTime && dayjs(selectedRow.editTime, "HH:mm:ss").isValid()
-          ? dayjs(selectedRow.editTime, "HH:mm:ss")
-          : null
-      );
+      setValue("selectedLokasyonId", selectedRow.key);
+      setValue("lokasyonTanimi", selectedRow.LOK_TANIM);
+      setValue("lokasyonAktif", selectedRow.LOK_AKTIF);
+      setValue("lokasyonTipi", selectedRow.LOK_TIP);
+      setValue("lokasyonTipiID", selectedRow.LOK_TIP_ID);
+      setValue("lokasyonBina", selectedRow.LOK_BINA);
+      setValue("LokasyonBinaID", selectedRow.LOK_BINA_KOD_ID);
+      setValue("lokasyonMasrafMerkeziTanim", selectedRow.LOK_MASRAF_MERKEZ);
+      setValue("LokasyonMasrafMerkeziID", selectedRow.LOK_MASRAF_MERKEZ_KOD_ID);
+      setValue("lokasyonKat", selectedRow.LOK_KAT);
+      setValue("lokasyonKatID", selectedRow.LOK_KAT_KOD_ID);
+      setValue("lokasyonYoneticiTanim", selectedRow.LOK_PERSONEL);
+      setValue("lokasyonYoneticiID", selectedRow.LOK_PERSONEL_ID);
+      setValue("lokasyonDepoTanim", selectedRow.LOK_DEPO);
+      setValue("lokasyonDepoID", selectedRow.LOK_MALZEME_DEPO_ID);
+      setValue("anaLokasyonTanim", selectedRow.LOK_ANA_LOKASYON); // ? Ana lokasyonun adı lazim
+      setValue("anaLokasyonID", selectedRow.LOK_ANA_LOKASYON_ID);
+      setValue("lokasyonEmail", selectedRow.LOK_EMAIL);
+      setValue("lokasyonAciklama", selectedRow.LOK_ACIKLAMA);
 
       // add more fields as needed
 

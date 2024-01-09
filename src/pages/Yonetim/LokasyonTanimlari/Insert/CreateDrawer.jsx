@@ -49,6 +49,7 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
       lokasyonTipi: "",
       lokasyonTipiID: "",
       lokasyonBina: null,
+      LokasyonBinaID: "",
       lokasyonMasrafMerkezi: "",
       LokasyonMasrafMerkeziID: "",
       lokasyonKat: null,

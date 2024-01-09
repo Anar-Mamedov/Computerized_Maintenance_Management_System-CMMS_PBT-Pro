@@ -138,7 +138,7 @@ export default function MainTable() {
         LOK_MALZEME_DEPO_ID: item.LOK_MALZEME_DEPO_ID,
         LOK_DEPO: item.LOK_DEPO,
         LOK_ANA_LOKASYON_ID: item.LOK_ANA_LOKASYON_ID,
-        LOK_ANA_LOKASYON: item.LOK_ANA_LOKASYON,
+        LOK_ANA_LOKASYON: item.LOK_ANA_LOKASYON, // ? Ana lokasyonun adı lazim
         LOK_EMAIL: item.LOK_EMAIL,
         LOK_ACIKLAMA: item.LOK_ACIKLAMA,
 
@@ -178,16 +178,22 @@ export default function MainTable() {
     {
       title: "Lokasyon Tanımı",
       key: "lokasyonBilgisi",
+      width: 300,
+      ellipsis: true,
       render: (text, record) => <div style={{ marginTop: "6px" }}>{record.LOK_TANIM}</div>,
     },
     {
       title: "Lokasyon Tipi",
       key: "LOK_TIP",
+      width: 150,
+      ellipsis: true,
       render: (text, record) => <div>{record.LOK_TIP}</div>,
     },
     {
       title: "Yönetici",
       key: "LOK_PERSONEL",
+      width: 150,
+      ellipsis: true,
       render: (text, record) => <div>{record.LOK_PERSONEL}</div>,
     },
     // Other columns...
