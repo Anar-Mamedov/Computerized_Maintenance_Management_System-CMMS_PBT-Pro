@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
+import dayjs from "dayjs";
 
-export default function LokasyonPersonelTablo({ workshopSelectedId, onSubmit }) {
+export default function ProjeTablo({ workshopSelectedId, onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
@@ -10,62 +11,62 @@ export default function LokasyonPersonelTablo({ workshopSelectedId, onSubmit }) 
 
   const columns = [
     {
-      title: "Personel Kodu",
+      title: "Proje Kodu",
       dataIndex: "code",
       key: "code",
       width: "150px",
       ellipsis: true,
     },
     {
-      title: "Personel Adı",
+      title: "Proje Tanımı",
       dataIndex: "subject",
       key: "subject",
       width: "150px",
       ellipsis: true,
     },
     {
-      title: "Ünvan",
+      title: "Proje Tipi",
       dataIndex: "workdays",
       key: "workdays",
       width: "150px",
       ellipsis: true,
     },
     {
-      title: "Personel Tipi",
+      title: "Başlama Tarihi",
       dataIndex: "description",
       key: "description",
       width: "150px",
       ellipsis: true,
+      render: (text) => {
+        // Eğer text null veya boş değilse formatla, aksi takdirde boş bir string dön
+        return text ? dayjs(text).format("DD-MM-YYYY") : "";
+      },
     },
 
     {
-      title: "Departman",
+      title: "Bitiş Tarihi",
       dataIndex: "fifthcolumn",
       key: "fifthcolumn",
       width: "150px",
       ellipsis: true,
-    },
-    {
-      title: "Lokasyon",
-      dataIndex: "sixthcolumn",
-      key: "sixthcolumn",
-      width: "150px",
-      ellipsis: true,
+      render: (text) => {
+        // Eğer text null veya boş değilse formatla, aksi takdirde boş bir string dön
+        return text ? dayjs(text).format("DD-MM-YYYY") : "";
+      },
     },
   ];
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`Personel`)
+    AxiosInstance.get(`GetProjeList`)
       .then((response) => {
-        const fetchedData = response.map((item) => ({
-          key: item.TB_PERSONEL_ID,
-          code: item.PRS_PERSONEL_KOD,
-          subject: item.PRS_ISIM,
-          workdays: item.PRS_UNVAN,
-          description: item.PRS_TIP,
-          fifthcolumn: item.PRS_DEPARTMAN,
-          sixthcolumn: item.PRS_LOKASYON,
+        const fetchedData = response.Proje_Liste.map((item) => ({
+          key: item.TB_PROJE_ID,
+          code: item.PRJ_KOD,
+          subject: item.PRJ_TANIM,
+          workdays: item.PRJ_TIP,
+          description: item.PRJ_BASLAMA_TARIH,
+          fifthcolumn: item.PRJ_BITIS_TARIH,
         }));
         setData(fetchedData);
       })
@@ -101,7 +102,7 @@ export default function LokasyonPersonelTablo({ workshopSelectedId, onSubmit }) 
       <Modal
         width={1200}
         centered
-        title="Personel"
+        title="Projeler"
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}>

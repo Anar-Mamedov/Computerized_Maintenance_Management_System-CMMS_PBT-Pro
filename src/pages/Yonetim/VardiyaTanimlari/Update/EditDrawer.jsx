@@ -3,12 +3,11 @@ import { PlusOutlined } from "@ant-design/icons";
 import { Button, Drawer, Space, ConfigProvider, Modal } from "antd";
 import React, { useEffect, useState, useTransition } from "react";
 import MainTabs from "./components/MainTabs/MainTabs";
-import secondTabs from "./components/SecondTabs/SecondTabs";
 import { useForm, Controller, useFormContext, FormProvider, set } from "react-hook-form";
 import dayjs from "dayjs";
 import AxiosInstance from "../../../../api/http";
 import Footer from "../Footer";
-import SecondTabs from "./components/SecondTabs/SecondTabs";
+// import SecondTabs from "./components/SecondTabs/SecondTabs";
 
 export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
   const [, startTransition] = useTransition();
@@ -55,25 +54,19 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   //* export
   const methods = useForm({
     defaultValues: {
-      anaLokasyonTanim: "",
-      anaLokasyonID: 0,
-      selectedLokasyonId: "",
-      lokasyonTanimi: "",
-      lokasyonAktif: true,
-      LokasyonTipi: null,
-      LokasyonTipiID: "",
-      lokasyonBina: null,
-      LokasyonBinaID: "",
-      lokasyonMasrafMerkezi: "",
-      lokasyonMasrafMerkeziID: "",
-      LokasyonKat: null,
-      LokasyonKatID: "",
-      lokasyonYoneticiTanim: "",
-      lokasyonYoneticiID: "",
-      lokasyonDepoTanim: "",
-      lokasyonDepoID: "",
-      lokasyonEmail: "",
-      lokasyonAciklama: "",
+      vardiyaTanimi: "",
+      secilenVardiyaID: "",
+      vardiyaBaslangicSaati: dayjs("08:00", "HH:mm"),
+      vardiyaBitisSaati: dayjs("18:00", "HH:mm"),
+      vardiyaTipi: null,
+      vardiyaTipiID: "",
+      lokasyonTanim: "",
+      lokasyonID: "",
+      vardiyaProjeTanim: "",
+      vardiyaProjeID: "",
+      varsayilanVardiya: false,
+      gosterimRengi: "#ffae00",
+      vardiyaAciklama: "",
     },
   });
 
@@ -134,7 +127,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       // Object.keys(selectedRow).forEach((key) => {
       //   console.log(key, selectedRow[key]);
       //   setValue(key, selectedRow[key]);
-      setValue("selectedLokasyonId", selectedRow.key);
+      setValue("secilenVardiyaID", selectedRow.key);
       setValue("lokasyonTanimi", selectedRow.LOK_TANIM);
       setValue("lokasyonAktif", selectedRow.LOK_AKTIF);
       setValue("LokasyonTipi", selectedRow.LOK_TIP);
@@ -182,7 +175,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             Ekle
           </Button> */}
           <Drawer
-            width="950px"
+            width="550px"
             title="Kayıdı Güncelle"
             placement={"right"}
             onClose={handleDrawerClose}
@@ -202,8 +195,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
                 </Button>
               </Space>
             }>
-            {/* <MainTabs /> */}
-            <SecondTabs />
+            <MainTabs />
+            {/* <SecondTabs /> */}
             <Footer />
           </Drawer>
         </ConfigProvider>
