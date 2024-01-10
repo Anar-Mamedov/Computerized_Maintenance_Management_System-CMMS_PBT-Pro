@@ -15,6 +15,7 @@ import Isemri from "./pages/DashboardAnalytics2/Isemri";
 import MakineTanim from "./pages/MakineEkipman/MakineTanim/MakineTanim";
 import LokasyonTanim from "./pages/Yonetim/LokasyonTanimlari/LokasyonTanimlari";
 import trTR from "antd/es/locale/tr_TR";
+import VardiyaTanim from "./pages/Yonetim/VardiyaTanimlari/VardiyaTanimlari";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -57,6 +58,7 @@ const items = [
     <KeyOutlined />,
     [
       getItem("Lokasyon Tanımları", "lokasyon", true),
+      getItem("Vardiya Tanımları", "vardiyalar", true),
       // getItem("Team 2", "team2", true)
     ],
     false
@@ -172,6 +174,7 @@ const App = () => {
                     <Route path="/isemri" element={<Isemri />} />
                     <Route path="/makine" element={<MakineTanim />} />
                     <Route path="/lokasyon" element={<LokasyonTanim />} />
+                    <Route path="/vardiyalar" element={<VardiyaTanim />} />
                     {/* Diğer Route'lar */}
                   </Routes>
                 </div>
@@ -184,6 +187,7 @@ const App = () => {
                     <Route path="/isemri" element={<Isemri />} />
                     <Route path="/makine" element={<MakineTanim />} />
                     <Route path="/lokasyon" element={<LokasyonTanim />} />
+                    <Route path="/vardiyalar" element={<VardiyaTanim />} />
                     {/* Diğer Route'lar */}
                   </Routes>
                 </div>
