@@ -16,6 +16,7 @@ import MakineTanim from "./pages/MakineEkipman/MakineTanim/MakineTanim";
 import LokasyonTanim from "./pages/Yonetim/LokasyonTanimlari/LokasyonTanimlari";
 import trTR from "antd/es/locale/tr_TR";
 import VardiyaTanim from "./pages/Yonetim/VardiyaTanimlari/VardiyaTanimlari";
+import Dashboard from "./pages/Dashboard/Dashboard";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -29,6 +30,7 @@ function getItem(label, key, icon, children, isClickable = true) {
 }
 
 const items = [
+  getItem("Ana Sayfa", "", <PieChartOutlined />),
   // getItem("Option 1", "option1", <PieChartOutlined />),
   // getItem("Option 2", "option2", <DesktopOutlined />),
   getItem(
@@ -171,6 +173,7 @@ const App = () => {
                 <Breadcrumb style={{ margin: "16px 0" }}>{/* Breadcrumb içeriği */}</Breadcrumb>
                 <div style={{ padding: "24px 0px", minHeight: 360, background: colorBgContainer }}>
                   <Routes>
+                    <Route path="/" element={<Dashboard />} />
                     <Route path="/isemri" element={<Isemri />} />
                     <Route path="/makine" element={<MakineTanim />} />
                     <Route path="/lokasyon" element={<LokasyonTanim />} />
@@ -184,6 +187,7 @@ const App = () => {
                 <Breadcrumb style={{ margin: "16px 0" }}>{/* Breadcrumb içeriği */}</Breadcrumb>
                 <div style={{ padding: 24, minHeight: 360, background: colorBgContainer }}>
                   <Routes>
+                    <Route path="/" element={<Dashboard />} />
                     <Route path="/isemri" element={<Isemri />} />
                     <Route path="/makine" element={<MakineTanim />} />
                     <Route path="/lokasyon" element={<LokasyonTanim />} />
