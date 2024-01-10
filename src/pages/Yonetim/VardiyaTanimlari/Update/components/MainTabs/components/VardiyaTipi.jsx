@@ -19,7 +19,7 @@ const StyledSelect = styled(Select)`
 
 const StyledDiv = styled.div`
   @media (min-width: 600px) {
-    alignitems: "center";
+    align-items: center;
   }
   @media (max-width: 600px) {
     flex-direction: column;
@@ -27,7 +27,7 @@ const StyledDiv = styled.div`
   }
 `;
 
-export default function LokasyonBina() {
+export default function VardiyaTipi() {
   const { control, setValue } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -43,7 +43,7 @@ export default function LokasyonBina() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32954");
+      const response = await AxiosInstance.get("KodList?grup=32955");
       if (response && response) {
         setOptions(response);
       }
@@ -71,7 +71,7 @@ export default function LokasyonBina() {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32954`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32955`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
@@ -118,9 +118,9 @@ export default function LokasyonBina() {
         rowGap: "0px",
       }}>
       {contextHolder}
-      <Text style={{ fontSize: "14px", minWidth: "40px" }}>Bina:</Text>
+      <Text style={{ fontSize: "14px", minWidth: "40px" }}>Vardiya Tipi:</Text>
       <Controller
-        name="LokasyonBina"
+        name="vardiyaTipi"
         control={control}
         render={({ field }) => (
           <StyledSelect
@@ -164,14 +164,14 @@ export default function LokasyonBina() {
             }))}
             onChange={(value) => {
               // Seçilen değerin ID'sini NedeniID alanına set et
-              setValue("LokasyonBinaID", value);
+              setValue("vardiyaTipiID", value);
               field.onChange(value);
             }}
           />
         )}
       />
       <Controller
-        name="LokasyonBinaID"
+        name="vardiyaTipiID"
         control={control}
         render={({ field }) => (
           <Input

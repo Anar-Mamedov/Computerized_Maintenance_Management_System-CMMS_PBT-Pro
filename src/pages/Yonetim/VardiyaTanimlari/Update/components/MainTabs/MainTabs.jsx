@@ -1,21 +1,33 @@
 import React from "react";
-import { Drawer, Typography, Button, Input, Select, DatePicker, TimePicker, Row, Col, Checkbox } from "antd";
+import {
+  Drawer,
+  Typography,
+  Button,
+  Input,
+  Select,
+  DatePicker,
+  TimePicker,
+  Row,
+  Col,
+  Checkbox,
+  ColorPicker,
+} from "antd";
 import { Controller, useFormContext } from "react-hook-form";
-import LokasyonTipi from "./components/LokasyonTipi";
-import LokasyonBina from "./components/LokasyonBina";
-import MasrafMerkeziTablo from "./components/MasrafMerkeziTablo";
-import LokasyonKat from "./components/LokasyonKat";
-import LokasyonPersonelTablo from "./components/LokasyonPersonelTablo";
-import LokasyonDepoTablo from "./components/LokasyonDepoTablo";
+import VardiyaTipi from "./components/VardiyaTipi";
 import styled from "styled-components";
 import LokasyonTablo from "./components/LokasyonTablo";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import ProjeTablo from "./components/ProjeTablo";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
 
+dayjs.extend(customParseFormat);
+
 const StyledInput = styled(Input)`
   @media (min-width: 600px) {
-    max-width: 720px;
+    max-width: 300px;
   }
   @media (max-width: 600px) {
     max-width: 300px;
@@ -25,7 +37,7 @@ const StyledInput = styled(Input)`
 const StyledDiv = styled.div`
   @media (min-width: 600px) {
     width: 100%;
-    max-width: 720px;
+    max-width: 300px;
   }
   @media (max-width: 600px) {
     width: 100%;
@@ -35,7 +47,7 @@ const StyledDiv = styled.div`
 
 const StyledDivBottomLine = styled.div`
   @media (min-width: 600px) {
-    alignitems: "center";
+    align-items: center;
   }
   @media (max-width: 600px) {
     flex-direction: column;
@@ -46,7 +58,7 @@ const StyledDivBottomLine = styled.div`
 const StyledDivMedia = styled.div`
   .anar {
     @media (min-width: 600px) {
-      max-width: 720px;
+      max-width: 300px;
       width: 100%;
     }
     @media (max-width: 600px) {
@@ -64,9 +76,9 @@ export default function MainTabs() {
     setValue("lokasyonMasrafMerkeziID", "");
   };
 
-  const handleYoneticiMinusClick = () => {
-    setValue("lokasyonYoneticiTanim", "");
-    setValue("lokasyonYoneticiID", "");
+  const handleProjeMinusClick = () => {
+    setValue("vardiyaProjeTanim", "");
+    setValue("vardiyaProjeID", "");
   };
 
   const handleDepoMinusClick = () => {
@@ -74,15 +86,13 @@ export default function MainTabs() {
     setValue("lokasyonDepoID", "");
   };
 
-  const handleAnaLokasyonMinusClick = () => {
-    setValue("anaLokasyonTanim", "");
-    setValue("anaLokasyonID", "");
+  const handleLokasyonMinusClick = () => {
+    setValue("lokasyonTanim", "");
+    setValue("lokasyonID", "");
   };
 
-  const selectedLokasyonId = watch("selectedLokasyonId");
-
   return (
-    <div style={{ display: "flex", marginBottom: "15px", flexDirection: "column", gap: "10px", maxWidth: "870px" }}>
+    <div style={{ display: "flex", marginBottom: "15px", flexDirection: "column", gap: "10px", maxWidth: "450px" }}>
       <div
         style={{
           display: "flex",
@@ -93,24 +103,24 @@ export default function MainTabs() {
           gap: "10px",
           rowGap: "0px",
         }}>
-        <Text style={{ fontSize: "14px" }}>Lokasyon Tanımı:</Text>
+        <Text style={{ fontSize: "14px" }}>Vardiya Tanımı:</Text>
         <div
           style={{
             display: "flex",
             flexWrap: "wrap",
             alignItems: "center",
-            maxWidth: "720px",
+            maxWidth: "300px",
             minWidth: "300px",
             gap: "10px",
             width: "100%",
           }}>
           <Controller
-            name="lokasyonTanimi"
+            name="vardiyaTanimi"
             control={control}
             render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
           />
           <Controller
-            name="selectedLokasyonId"
+            name="secilenVardiyaID"
             control={control}
             render={({ field }) => (
               <Input
@@ -120,205 +130,42 @@ export default function MainTabs() {
               />
             )}
           />
+        </div>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          maxWidth: "450px",
+          gap: "10px",
+          width: "100%",
+          justifyContent: "space-between",
+        }}>
+        <Text style={{ fontSize: "14px" }}>Çalışma Saatleri:</Text>
+        <div style={{ display: "flex", justifyContent: "space-between", width: "300px" }}>
           <Controller
-            name="lokasyonAktif"
+            name="vardiyaBaslangicSaati"
             control={control}
-            defaultValue={true} // or true if you want it checked by default
-            render={({ field }) => (
-              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-                Aktif
-              </Checkbox>
-            )}
+            render={({ field }) => <TimePicker {...field} style={{ width: "145px" }} format="HH:mm" />}
+          />
+          <Controller
+            name="vardiyaBitisSaati"
+            control={control}
+            render={({ field }) => <TimePicker {...field} style={{ width: "145px" }} format="HH:mm" />}
           />
         </div>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-          }}>
-          <LokasyonTipi />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "410px",
-            gap: "10px",
-            width: "100%",
-          }}>
-          <LokasyonBina />
-        </div>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Masraf Merkezi:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "300px",
-            }}>
-            <Controller
-              name="lokasyonMasrafMerkeziTanim"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ width: "215px" }}
-                  disabled
-                />
-              )}
-            />
-            <Controller
-              name="lokasyonMasrafMerkeziID"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ display: "none" }}
-                />
-              )}
-            />
-            <MasrafMerkeziTablo
-              onSubmit={(selectedData) => {
-                setValue("lokasyonMasrafMerkeziTanim", selectedData.age);
-                setValue("lokasyonMasrafMerkeziID", selectedData.key);
-              }}
-            />
-            <Button onClick={handleMinusClick}> - </Button>
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "410px",
-            gap: "10px",
-            width: "100%",
-          }}>
-          <LokasyonKat />
-        </div>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-        <StyledDivBottomLine
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Yönetici:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "300px",
-            }}>
-            <Controller
-              name="lokasyonYoneticiTanim"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ width: "215px" }}
-                  disabled
-                />
-              )}
-            />
-            <Controller
-              name="lokasyonYoneticiID"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ display: "none" }}
-                />
-              )}
-            />
-            <LokasyonPersonelTablo
-              onSubmit={(selectedData) => {
-                setValue("lokasyonYoneticiTanim", selectedData.subject);
-                setValue("lokasyonYoneticiID", selectedData.key);
-              }}
-            />
-            <Button onClick={handleYoneticiMinusClick}> - </Button>
-          </div>
-        </StyledDivBottomLine>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "410px",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Malzeme Depo:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "300px",
-            }}>
-            <Controller
-              name="lokasyonDepoTanim"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ width: "215px" }}
-                  disabled
-                />
-              )}
-            />
-            <Controller
-              name="lokasyonDepoID"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ display: "none" }}
-                />
-              )}
-            />
-            <LokasyonDepoTablo
-              onSubmit={(selectedData) => {
-                setValue("lokasyonDepoTanim", selectedData.subject);
-                setValue("lokasyonDepoID", selectedData.key);
-              }}
-            />
-            <Button onClick={handleDepoMinusClick}> - </Button>
-          </div>
-        </div>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          maxWidth: "450px",
+          gap: "10px",
+          width: "100%",
+        }}>
+        <VardiyaTipi />
       </div>
       <StyledDivMedia
         style={{
@@ -327,9 +174,9 @@ export default function MainTabs() {
           alignItems: "center",
           justifyContent: "space-between",
           width: "100%",
-          maxWidth: "870px",
+          maxWidth: "450px",
         }}>
-        <Text style={{ fontSize: "14px" }}>Ana Lokasyon:</Text>
+        <Text style={{ fontSize: "14px" }}>Lokasyon Bilgisi:</Text>
         <div
           className="anar"
           style={{
@@ -341,7 +188,7 @@ export default function MainTabs() {
             gap: "3px",
           }}>
           <Controller
-            name="anaLokasyonTanim"
+            name="lokasyonTanim"
             control={control}
             render={({ field }) => (
               <Input
@@ -353,7 +200,7 @@ export default function MainTabs() {
             )}
           />
           <Controller
-            name="anaLokasyonID"
+            name="lokasyonID"
             control={control}
             render={({ field }) => (
               <Input
@@ -365,30 +212,95 @@ export default function MainTabs() {
           />
           <LokasyonTablo
             onSubmit={(selectedData) => {
-              setValue("anaLokasyonTanim", selectedData.LOK_TANIM);
-              setValue("anaLokasyonID", selectedData.key);
+              setValue("lokasyonTanim", selectedData.LOK_TANIM);
+              setValue("lokasyonID", selectedData.key);
             }}
           />
-          <Button onClick={handleAnaLokasyonMinusClick}> - </Button>
+          <Button onClick={handleLokasyonMinusClick}> - </Button>
         </div>
       </StyledDivMedia>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+        <StyledDivBottomLine
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: "450px",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Proje Bilgisi:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "300px",
+            }}>
+            <Controller
+              name="vardiyaProjeTanim"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="text" // Set the type to "text" for name input
+                  style={{ width: "215px" }}
+                  disabled
+                />
+              )}
+            />
+            <Controller
+              name="vardiyaProjeID"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="text" // Set the type to "text" for name input
+                  style={{ display: "none" }}
+                />
+              )}
+            />
+            <ProjeTablo
+              onSubmit={(selectedData) => {
+                setValue("vardiyaProjeTanim", selectedData.subject);
+                setValue("vardiyaProjeID", selectedData.key);
+              }}
+            />
+            <Button onClick={handleProjeMinusClick}> - </Button>
+          </div>
+        </StyledDivBottomLine>
+      </div>
       <StyledDivBottomLine
         style={{
           display: "flex",
           flexWrap: "wrap",
-
           justifyContent: "space-between",
           width: "100%",
         }}>
-        <Text style={{ fontSize: "14px" }}>E-Mail:</Text>
+        <Text style={{ fontSize: "14px" }}>Varsayılan Vardiya:</Text>
+
         <Controller
-          name="lokasyonEmail"
+          name="varsayilanVardiya"
           control={control}
           render={({ field }) => (
-            <StyledInput
-              {...field}
-              type="text" // Set the type to "text" for name input
-            />
+            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}></Checkbox>
+          )}
+        />
+      </StyledDivBottomLine>
+
+      <StyledDivBottomLine
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+          width: "100%",
+        }}>
+        <Text style={{ fontSize: "14px" }}>Gösterim Rengi:</Text>
+        <Controller
+          name="gosterimRengi"
+          control={control}
+          render={({ field: { ref, ...rest } }) => (
+            <ColorPicker {...rest} showText={(color) => <span>Renk Seçimi Yapın ({color.toHexString()})</span>} />
           )}
         />
       </StyledDivBottomLine>
@@ -403,7 +315,7 @@ export default function MainTabs() {
         <Text style={{ fontSize: "14px" }}>Açıklama:</Text>
         <StyledDiv>
           <Controller
-            name="lokasyonAciklama"
+            name="vardiyaAciklama"
             control={control}
             render={({ field }) => (
               <TextArea
