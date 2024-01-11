@@ -25,11 +25,11 @@ export default function LokasyonTipiEkle({ workshopSelectedId, onSubmit }) {
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get("GetMakineMarks")
+    AxiosInstance.get("GetLokasyonTipleri")
       .then((response) => {
-        const fetchedData = response.Makine_Marka_List.map((item) => ({
-          key: item.TB_MARKA_ID,
-          subject: item.MRK_MARKA,
+        const fetchedData = response.map((item) => ({
+          key: item.TB_LOKASYON_TIP_ID,
+          subject: item.LOT_TANIM,
         }));
         setData(fetchedData);
       })
@@ -73,14 +73,17 @@ export default function LokasyonTipiEkle({ workshopSelectedId, onSubmit }) {
 
   const onSubmited = (data) => {
     const Body = {
-      MRK_MARKA: data.markaEkle,
-      MRK_OLUSTURAN_ID: 24,
+      LOT_TANIM: data.markaEkle,
+      LOT_VARSAYILAN: false,
+      LOT_ICON_ID: 0,
+      LOT_OLUSTURAN_ID: 24,
     };
 
-    AxiosInstance.post("AddMakineMarka", Body)
+    AxiosInstance.post("AddLokasyonTip", Body)
       .then((response) => {
         console.log("Data sent successfully:", response.data);
         reset();
+        fetch();
       })
       .catch((error) => {
         console.error("Error sending data:", error);
@@ -99,7 +102,7 @@ export default function LokasyonTipiEkle({ workshopSelectedId, onSubmit }) {
       <Modal
         width="1200px"
         centered
-        title="Marka Ekle"
+        title="Lokasyon Tip Ekle"
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}>
@@ -113,7 +116,7 @@ export default function LokasyonTipiEkle({ workshopSelectedId, onSubmit }) {
           }}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
             <Button type="primary" onClick={handleMarkaEkleModalToggle}>
-              + Marka Ekle
+              + Ekle
             </Button>
             <Button type="primary" danger>
               <DeleteOutlined />
@@ -122,7 +125,7 @@ export default function LokasyonTipiEkle({ workshopSelectedId, onSubmit }) {
           </div>
 
           <Modal
-            title="Marka Ekle"
+            title="Lokasyon Tip Ekle"
             centered
             open={isMarkaEkleModalVisible}
             onOk={handleMarkaEkleModalOk}
