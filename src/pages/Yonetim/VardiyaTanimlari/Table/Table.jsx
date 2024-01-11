@@ -1,20 +1,21 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useFormContext, useFieldArray, Controller } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { Input, Table, Spin } from "antd";
+import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import { SearchOutlined } from "@ant-design/icons";
 import EditDrawer from "../Update/EditDrawer";
+import dayjs from "dayjs";
 
 export default function MainTable() {
-  const { watch, control, setValue } = useFormContext();
-  const { fields, append, replace } = useFieldArray({
-    control,
-    name: "lokasyon", // Name of the field array
-  });
+  const { setValue } = useFormContext();
 
+  const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredData, setFilteredData] = useState([]);
 
   // edit drawer için
   const [drawer, setDrawer] = useState({
@@ -23,185 +24,63 @@ export default function MainTable() {
   });
   // edit drawer için son
 
-  // arama işlevi için
-
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [filteredData, setFilteredData] = useState([]);
-  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
-
-  useEffect(() => {
-    const timerId = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
-    }, 1000); // 1000 ms gecikme
-
-    return () => clearTimeout(timerId); // Kullanıcı yazmaya devam ederse timeout'u iptal et
-  }, [searchTerm]);
-
-  const toLowerTurkish = (str) => {
-    return str.replace(/İ/g, "i").replace(/I/g, "ı").toLowerCase();
-  };
-
-  const filterTree = (nodeList, searchTerm, path = []) => {
-    let isMatchFound = false;
-    let expandedKeys = [];
-
-    const lowerSearchTerm = toLowerTurkish(searchTerm);
-
-    const filtered = nodeList
-      .map((node) => {
-        let nodeMatch = toLowerTurkish(node.LOK_TANIM).includes(lowerSearchTerm);
-        let childrenMatch = false;
-        let filteredChildren = [];
-
-        if (node.children) {
-          const result = filterTree(node.children, lowerSearchTerm, path.concat(node.key));
-          childrenMatch = result.isMatch;
-          filteredChildren = result.filtered;
-          expandedKeys = expandedKeys.concat(result.expandedKeys);
-        }
-
-        if (nodeMatch || childrenMatch) {
-          isMatchFound = true;
-          expandedKeys = expandedKeys.concat(path);
-          // Eğer düğüm eşleşirse, tüm çocuklarını da dahil et
-          return { ...node, children: childrenMatch ? filteredChildren : node.children };
-        }
-
-        return null;
-      })
-      .filter((node) => node !== null);
-
-    return { filtered, isMatch: isMatchFound, expandedKeys };
-  };
-
-  useEffect(() => {
-    if (debouncedSearchTerm) {
-      const result = filterTree(fields, debouncedSearchTerm);
-      setFilteredData(result.filtered);
-      setExpandedRowKeys([...new Set(result.expandedKeys)]);
-    } else {
-      setFilteredData(fields);
-      setExpandedRowKeys([]);
-    }
-  }, [debouncedSearchTerm, fields]);
-
-  const onTableRowExpand = (expanded, record) => {
-    const keys = expanded ? [...expandedRowKeys, record.key] : expandedRowKeys.filter((k) => k !== record.key);
-
-    setExpandedRowKeys(keys);
-  };
-
-  // arama işlevi için son
-
   useEffect(() => {
     fetchEquipmentData();
   }, []);
 
   const fetchEquipmentData = async () => {
     try {
-      setLoading(true); // Yükleme başladığında
-      const response = await AxiosInstance.get("GetLokasyonList?ID=30");
+      setLoading(true);
+      const response = await AxiosInstance.get("GetVardiyaList");
       if (response) {
-        const formattedData = formatDataForTable(response);
-        replace(formattedData); // Populate the field array
-        setLoading(false); // Yükleme bittiğinde
+        const formattedData = response.VARDIYA_LISTE.map((item) => {
+          return {
+            ...item,
+            key: item.TB_VARDIYA_ID,
+            VAR_TANIM: item.VAR_TANIM,
+            VAR_LOKASYON_ID: item.VAR_LOKASYON_ID,
+            VAR_LOKASYON: item.VAR_LOKASYON,
+            VAR_PROJE_ID: item.VAR_PROJE_ID,
+            VAR_PROJE: item.VAR_PROJE,
+            VAR_ACIKLAMA: item.VAR_ACIKLAMA,
+            VAR_BASLAMA_SAATI: item.VAR_BASLAMA_SAATI,
+            VAR_BITIS_SAATI: item.VAR_BITIS_SAATI,
+            VAR_MOLA_SURESI: item.VAR_MOLA_SURESI,
+            VAR_VARDIYA_TIPI_KOD_ID: item.VAR_VARDIYA_TIPI_KOD_ID,
+            VAR_VARDIYA_TIPI: item.VAR_VARDIYA_TIPI,
+            VAR_VARSAYILAN: item.VAR_VARSAYILAN,
+            VAR_RENK: item.VAR_RENK,
+            VAR_OLUSTURAN_ID: item.VAR_OLUSTURAN_ID,
+            VAR_OLUSTURMA_TARIH: item.VAR_OLUSTURMA_TARIH,
+            VAR_DEGISTIREN_ID: item.VAR_DEGISTIREN_ID,
+            VAR_DEGISTIRME_TARIH: item.VAR_DEGISTIRME_TARIH,
+          };
+        });
+        setData(formattedData); // Directly set the data
+        setLoading(false);
       } else {
         console.error("API response is not in expected format");
       }
     } catch (error) {
       console.error("Error in API request:", error);
-      setLoading(false); // Hata durumunda da yükleme bitti
+      setLoading(false);
     }
   };
 
-  const formatDataForTable = (data) => {
-    let nodes = {};
-    let tree = [];
-
-    // Her bir lokasyonu bir node olarak hazırlayın
-    data.forEach((item) => {
-      nodes[item.TB_LOKASYON_ID] = {
-        ...item,
-        key: item.TB_LOKASYON_ID,
-        LOK_TANIM: item.LOK_TANIM,
-        LOK_TIP_ID: item.LOK_TIP_ID,
-        LOK_TIP: item.LOK_TIP,
-        LOK_BINA_KOD_ID: item.LOK_BINA_KOD_ID,
-        LOK_BINA: item.LOK_BINA,
-        LOK_MASRAF_MERKEZ_KOD_ID: item.LOK_MASRAF_MERKEZ_KOD_ID,
-        LOK_MASRAF_MERKEZ: item.LOK_MASRAF_MERKEZ,
-        LOK_KAT_KOD_ID: item.LOK_KAT_KOD_ID,
-        LOK_KAT: item.LOK_KAT,
-        LOK_PERSONEL_ID: item.LOK_PERSONEL_ID,
-        LOK_PERSONEL: item.LOK_PERSONEL,
-        LOK_MALZEME_DEPO_ID: item.LOK_MALZEME_DEPO_ID,
-        LOK_DEPO: item.LOK_DEPO,
-        LOK_ANA_LOKASYON_ID: item.LOK_ANA_LOKASYON_ID,
-        LOK_ANA_LOKASYON: item.LOK_ANA_LOKASYON, // ? Ana lokasyonun adı lazim
-        LOK_EMAIL: item.LOK_EMAIL,
-        LOK_ACIKLAMA: item.LOK_ACIKLAMA,
-
-        children: [],
-      };
-    });
-
-    // Lokasyonlar arasındaki ilişkileri kurun
-    data.forEach((item) => {
-      if (item.LOK_ANA_LOKASYON_ID && nodes[item.LOK_ANA_LOKASYON_ID]) {
-        // Çocuk düğümleri burada oluşturun
-        nodes[item.LOK_ANA_LOKASYON_ID].children.push(nodes[item.TB_LOKASYON_ID]);
-      } else {
-        // Eğer üst düzey bir lokasyon ise, ağacın köküne ekleyin
-        tree.push(nodes[item.TB_LOKASYON_ID]);
-      }
-    });
-
-    // Çocukları olmayan düğümlerde children alanını silin
-    Object.values(nodes).forEach((node) => {
-      if (node.children.length === 0) {
-        delete node.children;
-      }
-    });
-
-    return tree;
+  const normalizeString = (str) => {
+    return str
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
   };
 
-  const columns = [
-    // {
-    //   title: "",
-    //   key: "key",
-    //   dataIndex: "key",
-    //   width: 150,
-    //   render: (text, record) => <div style={{ marginTop: "6px" }}>{record.key}</div>,
-    // },
-    {
-      title: "Lokasyon Tanımı",
-      key: "lokasyonBilgisi",
-      width: 300,
-      ellipsis: true,
-      render: (text, record) => <div style={{ marginTop: "6px" }}>{record.LOK_TANIM}</div>,
-    },
-    {
-      title: "Lokasyon Tipi",
-      key: "LOK_TIP",
-      width: 150,
-      ellipsis: true,
-      render: (text, record) => <div>{record.LOK_TIP}</div>,
-    },
-    {
-      title: "Yönetici",
-      key: "LOK_PERSONEL",
-      width: 150,
-      ellipsis: true,
-      render: (text, record) => <div>{record.LOK_PERSONEL}</div>,
-    },
-    // Other columns...
-  ];
+  useEffect(() => {
+    const filtered = data.filter((item) => normalizeString(item.VAR_TANIM).includes(normalizeString(searchTerm)));
+    setFilteredData(filtered);
+  }, [searchTerm, data]);
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
-    // Seçilen satırın ID'sini formun bir alanına yazdır
     if (newSelectedRowKeys.length > 0) {
       setValue("selectedLokasyonId", newSelectedRowKeys[0]);
     } else {
@@ -210,30 +89,113 @@ export default function MainTable() {
   };
 
   const rowSelection = {
-    type: "radio", // Radio tipi seçim kutuları kullan
+    type: "radio",
     selectedRowKeys,
     onChange: onSelectChange,
-    // You can add more configuration here if needed
   };
 
   const onRowClick = (record) => {
     return {
       onClick: () => {
+        // Handle row click event
         setDrawer({ visible: true, data: record });
       },
     };
   };
 
-  // kaydet düğmesine basıldıktan sonra apiye tekrardan istek atmasını sağlamak
   const refreshTableData = useCallback(() => {
-    // Assuming `fetch` is your function to fetch table data
     fetchEquipmentData();
-  }, [fetchEquipmentData]);
+  }, []);
 
-  // kaydet düğmesine basıldıktan sonra apiye tekrardan istek atmasını sağlamak son
+  const columns = [
+    {
+      title: "Vardiya Tanımı",
+      dataIndex: "VAR_TANIM",
+      key: "VAR_TANIM",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Başlangıç Saati",
+      dataIndex: "VAR_BASLAMA_SAATI",
+      key: "VAR_BASLAMA_SAATI",
+      width: 200,
+      ellipsis: true,
+      render: (time) => {
+        // Prepend a default date. Here I use '1970-01-01' as an example.
+        const dateTime = `1970-01-01 ${time}`;
+        return dayjs(dateTime).format("HH:mm");
+      },
+    },
+    {
+      title: "Bitiş Saati",
+      dataIndex: "VAR_BITIS_SAATI",
+      key: "VAR_BITIS_SAATI",
+      width: 200,
+      ellipsis: true,
+      render: (time) => {
+        // Prepend a default date. Here I use '1970-01-01' as an example.
+        const dateTime = `1970-01-01 ${time}`;
+        return dayjs(dateTime).format("HH:mm");
+      },
+    },
+    {
+      title: "Mola Süresi (dk)",
+      dataIndex: "VAR_MOLA_SURESI",
+      key: "VAR_MOLA_SURESI",
+      width: 200,
+      ellipsis: true,
+      align: "center",
+      render: (text) => {
+        return <div style={{ textAlign: "right" }}>{text}</div>;
+      },
+    },
+    {
+      title: "Lokasyon Bilgisi",
+      dataIndex: "VAR_LOKASYON",
+      key: "VAR_LOKASYON",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Proje Bilgisi",
+      dataIndex: "VAR_PROJE",
+      key: "VAR_PROJE",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Vardiya Tipi",
+      dataIndex: "VAR_VARDIYA_TIPI",
+      key: "VAR_VARDIYA_TIPI",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Varsayılan",
+      dataIndex: "VAR_VARSAYILAN",
+      key: "VAR_VARSAYILAN",
+      width: 200,
+      ellipsis: true,
+      render: (text, record) => {
+        return record.VAR_VARSAYILAN ? (
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <CheckOutlined style={{ color: "green" }} />
+          </div>
+        ) : (
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <CloseOutlined style={{ color: "red" }} />
+          </div>
+        );
+      },
+    },
+
+    // Other columns...
+  ];
 
   return (
     <div>
+      {/* Search input and create drawer */}
       <div
         style={{
           display: "flex",
@@ -249,7 +211,7 @@ export default function MainTable() {
           placeholder="Arama yap..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          prefix={<SearchOutlined style={{ color: "#0091ff" }} />} // Arama ikonunu ekle
+          prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
         />
         <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
       </div>
@@ -257,12 +219,15 @@ export default function MainTable() {
         <Table
           rowSelection={rowSelection}
           columns={columns}
-          dataSource={debouncedSearchTerm ? filteredData : fields}
-          pagination={false}
+          dataSource={searchTerm ? filteredData : data}
+          pagination={{
+            defaultPageSize: 10,
+            showSizeChanger: false,
+            // pageSizeOptions: ["10", "20", "50", "100"],
+            position: ["bottomRight"],
+          }}
           onRow={onRowClick}
-          scroll={{ y: "calc(100vh - 300px)" }}
-          expandedRowKeys={expandedRowKeys}
-          onExpand={onTableRowExpand} // Elle genişletme/küçültme işlemlerini takip et
+          scroll={{ y: "calc(100vh - 380px)" }}
         />
       </Spin>
       <EditDrawer
