@@ -4,6 +4,8 @@ import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import MainTabs from "../MainTabs/MainTabs";
 import MakineTablo from "./components/MakineTablo";
+import PersonelTablo from "./components/PersonelTablo";
+import ProjeTablo from "./components/ProjeTablo";
 
 const onChange = (key) => {
   // console.log(key);
@@ -57,12 +59,12 @@ export default function SecondTabs({ refreshKey }) {
     {
       key: "3",
       label: "Personeller",
-      children: "Content of Tab Pane 3",
+      children: <PersonelTablo />,
     },
     {
       key: "4",
       label: "Projeler",
-      children: "Content of Tab Pane 4",
+      children: <ProjeTablo />,
     },
     {
       key: "5",
