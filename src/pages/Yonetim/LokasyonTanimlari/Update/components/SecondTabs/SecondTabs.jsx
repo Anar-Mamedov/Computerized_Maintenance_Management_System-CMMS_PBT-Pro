@@ -3,6 +3,7 @@ import { Tabs } from "antd";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import MainTabs from "../MainTabs/MainTabs";
+import MakineTablo from "./components/MakineTablo";
 
 const onChange = (key) => {
   // console.log(key);
@@ -41,40 +42,39 @@ const StyledTabs = styled(Tabs)`
 
 //styled components end
 
-const items = [
-  {
-    key: "1",
-    label: "Lokasyon Bilgileri",
-    children: <MainTabs />,
-  },
-  {
-    key: "2",
-    label: "Makineler",
-    children: "Content of Tab Pane 2",
-  },
-  {
-    key: "3",
-    label: "Personeller",
-    children: "Content of Tab Pane 3",
-  },
-  {
-    key: "4",
-    label: "Projeler",
-    children: "Content of Tab Pane 4",
-  },
-  {
-    key: "5",
-    label: "Ekli Belgeler",
-    children: "Content of Tab Pane 5",
-  },
-  {
-    key: "6",
-    label: "Resimler",
-    children: "Content of Tab Pane 6",
-  },
-];
-
-export default function SecondTabs() {
+export default function SecondTabs({ refreshKey }) {
+  const items = [
+    {
+      key: "1",
+      label: "Lokasyon Bilgileri",
+      children: <MainTabs />,
+    },
+    {
+      key: "2",
+      label: "Makineler",
+      children: <MakineTablo key={refreshKey} />,
+    },
+    {
+      key: "3",
+      label: "Personeller",
+      children: "Content of Tab Pane 3",
+    },
+    {
+      key: "4",
+      label: "Projeler",
+      children: "Content of Tab Pane 4",
+    },
+    {
+      key: "5",
+      label: "Ekli Belgeler",
+      children: "Content of Tab Pane 5",
+    },
+    {
+      key: "6",
+      label: "Resimler",
+      children: "Content of Tab Pane 6",
+    },
+  ];
   const { watch } = useFormContext();
 
   return (

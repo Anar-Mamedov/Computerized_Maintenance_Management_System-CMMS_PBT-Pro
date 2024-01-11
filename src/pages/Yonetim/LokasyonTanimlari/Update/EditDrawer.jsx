@@ -16,6 +16,13 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   const showDrawer = () => {
     setOpen(true);
   };
+  const [drawerKey, setDrawerKey] = useState(0);
+
+  useEffect(() => {
+    if (drawerVisible) {
+      setDrawerKey((prevKey) => prevKey + 1); // Drawer her açıldığında anahtarı artır
+    }
+  }, [drawerVisible]);
 
   const showConfirmationModal = () => {
     Modal.confirm({
@@ -182,6 +189,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             Ekle
           </Button> */}
           <Drawer
+            key={drawerKey}
             width="950px"
             title="Kayıdı Güncelle"
             placement={"right"}
@@ -203,7 +211,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
               </Space>
             }>
             {/* <MainTabs /> */}
-            <SecondTabs />
+            <SecondTabs refreshKey={drawerKey} />
             <Footer />
           </Drawer>
         </ConfigProvider>
