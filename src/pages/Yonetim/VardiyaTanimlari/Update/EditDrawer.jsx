@@ -85,19 +85,18 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   //* export
   const onSubmit = (data) => {
     const Body = {
-      TB_LOKASYON_ID: data.selectedLokasyonId,
-      LOK_TANIM: data.lokasyonTanimi,
-      LOK_ANA_LOKASYON_ID: data.anaLokasyonID,
-      LOK_TIP_ID: data.LokasyonTipiID,
-      LOK_MASRAF_MERKEZ_KOD_ID: data.lokasyonMasrafMerkeziID,
-      LOK_PERSONEL_ID: data.lokasyonYoneticiID,
-      LOK_EMAIL: data.lokasyonEmail,
-      LOK_ACIKLAMA: data.lokasyonAciklama,
-      LOK_BINA_KOD_ID: data.LokasyonBinaID,
-      LOK_KAT_KOD_ID: data.LokasyonKatID,
-      LOK_AKTIF: data.lokasyonAktif,
-      LOK_MALZEME_DEPO_ID: data.lokasyonDepoID,
-      LOK_OLUSTURAN_ID: 24,
+      TB_VARDIYA_ID: data.secilenVardiyaID,
+      VAR_TANIM: data.vardiyaTanimi,
+      VAR_VARDIYA_TIPI_KOD_ID: data.vardiyaTipiID,
+      VAR_LOKASYON_ID: data.lokasyonID,
+      VAR_PROJE_ID: data.vardiyaProjeID,
+      VAR_VARSAYILAN: data.varsayilanVardiya,
+      // VAR_RENK: data.gosterimRengi,
+      VAR_ACIKLAMA: data.vardiyaAciklama,
+      VAR_BASLAMA_SAATI: formatTimeWithDayjs(data.vardiyaBaslangicSaati),
+      VAR_BITIS_SAATI: formatTimeWithDayjs(data.vardiyaBitisSaati),
+      VAR_DEGISTIREN_ID: 24,
+
       // add more fields as needed
     };
 
@@ -105,7 +104,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     // handle response
     // });
 
-    AxiosInstance.post("UpdateLokasyon", Body)
+    AxiosInstance.post("UpdateVardiya", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);
@@ -128,25 +127,18 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       //   console.log(key, selectedRow[key]);
       //   setValue(key, selectedRow[key]);
       setValue("secilenVardiyaID", selectedRow.key);
-      setValue("lokasyonTanimi", selectedRow.LOK_TANIM);
-      setValue("lokasyonAktif", selectedRow.LOK_AKTIF);
-      setValue("LokasyonTipi", selectedRow.LOK_TIP);
-      setValue("LokasyonTipiID", selectedRow.LOK_TIP_ID);
-      setValue("LokasyonBina", selectedRow.LOK_BINA);
-      setValue("LokasyonBinaID", selectedRow.LOK_BINA_KOD_ID);
-      setValue("lokasyonMasrafMerkeziTanim", selectedRow.LOK_MASRAF_MERKEZ);
-      setValue("lokasyonMasrafMerkeziID", selectedRow.LOK_MASRAF_MERKEZ_KOD_ID);
-      setValue("LokasyonKat", selectedRow.LOK_KAT);
-      setValue("LokasyonKatID", selectedRow.LOK_KAT_KOD_ID);
-      setValue("lokasyonYoneticiTanim", selectedRow.LOK_PERSONEL);
-      setValue("lokasyonYoneticiID", selectedRow.LOK_PERSONEL_ID);
-      setValue("lokasyonDepoTanim", selectedRow.LOK_DEPO);
-      setValue("lokasyonDepoID", selectedRow.LOK_MALZEME_DEPO_ID);
-      setValue("anaLokasyonTanim", selectedRow.LOK_ANA_LOKASYON); // ? Ana lokasyonun adı lazim
-      setValue("anaLokasyonID", selectedRow.LOK_ANA_LOKASYON_ID);
-      setValue("lokasyonEmail", selectedRow.LOK_EMAIL);
-      setValue("lokasyonAciklama", selectedRow.LOK_ACIKLAMA);
-
+      setValue("vardiyaTanimi", selectedRow.VAR_TANIM);
+      setValue("vardiyaBaslangicSaati", dayjs(`1970-01-01T${selectedRow.VAR_BASLAMA_SAATI}`));
+      setValue("vardiyaBitisSaati", dayjs(`1970-01-01T${selectedRow.VAR_BITIS_SAATI}`));
+      setValue("vardiyaTipi", selectedRow.VAR_VARDIYA_TIPI);
+      setValue("vardiyaTipiID", selectedRow.VAR_VARDIYA_TIPI_KOD_ID);
+      setValue("lokasyonTanim", selectedRow.VAR_LOKASYON);
+      setValue("lokasyonID", selectedRow.VAR_LOKASYON_ID);
+      setValue("vardiyaProjeTanim", selectedRow.VAR_PROJE);
+      setValue("vardiyaProjeID", selectedRow.VAR_PROJE_ID);
+      setValue("varsayilanVardiya", selectedRow.VAR_VARSAYILAN);
+      setValue("gosterimRengi", selectedRow.VAR_RENK);
+      setValue("vardiyaAciklama", selectedRow.VAR_ACIKLAMA);
       // add more fields as needed
 
       // });

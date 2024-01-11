@@ -72,18 +72,18 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
   //* export
   const onSubmit = (data) => {
     const Body = {
-      LOK_TANIM: data.lokasyonTanimi,
-      LOK_ANA_LOKASYON_ID: data.anaLokasyonID,
-      LOK_TIP_ID: data.LokasyonTipiID,
-      LOK_MASRAF_MERKEZ_KOD_ID: data.lokasyonMasrafMerkeziID,
-      LOK_PERSONEL_ID: data.lokasyonYoneticiID,
-      LOK_EMAIL: data.lokasyonEmail,
-      LOK_ACIKLAMA: data.lokasyonAciklama,
-      LOK_BINA_KOD_ID: data.LokasyonBinaID,
-      LOK_KAT_KOD_ID: data.LokasyonKatID,
-      LOK_AKTIF: data.lokasyonAktif,
-      LOK_MALZEME_DEPO_ID: data.lokasyonDepoID,
-      LOK_OLUSTURAN_ID: 24,
+      VAR_TANIM: data.vardiyaTanimi,
+      VAR_VARDIYA_TIPI_KOD_ID: data.vardiyaTipiID,
+      VAR_LOKASYON_ID: data.lokasyonID,
+      VAR_PROJE_ID: data.vardiyaProjeID,
+      VAR_VARSAYILAN: data.varsayilanVardiya ? 1 : 0,
+      VAR_MOLA_SURESI: 1,
+      // VAR_RENK: data.gosterimRengi,
+      VAR_ACIKLAMA: data.vardiyaAciklama,
+      VAR_BASLAMA_SAATI: formatTimeWithDayjs(data.vardiyaBaslangicSaati),
+      VAR_BITIS_SAATI: formatTimeWithDayjs(data.vardiyaBitisSaati),
+      VAR_OLUSTURAN_ID: 24,
+
       // add more fields as needed
     };
 
@@ -91,7 +91,7 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
     // handle response
     // });
 
-    AxiosInstance.post("addLokasyon", Body)
+    AxiosInstance.post("AddVardiya", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);
