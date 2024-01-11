@@ -16,6 +16,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   const showDrawer = () => {
     setOpen(true);
   };
+  // drawer kapanıp tekrar açıldığında içerisindeki bulunan tab lardaki api lere tekrardan istek atmasını sağlamak için
   const [drawerKey, setDrawerKey] = useState(0);
 
   useEffect(() => {
@@ -23,6 +24,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       setDrawerKey((prevKey) => prevKey + 1); // Drawer her açıldığında anahtarı artır
     }
   }, [drawerVisible]);
+
+  // drawer kapanıp tekrar açıldığında içerisindeki bulunan tab lardaki api lere tekrardan istek atmasını sağlamak için son
 
   const showConfirmationModal = () => {
     Modal.confirm({
@@ -156,7 +159,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       setValue("lokasyonYoneticiID", selectedRow.LOK_PERSONEL_ID);
       setValue("lokasyonDepoTanim", selectedRow.LOK_DEPO);
       setValue("lokasyonDepoID", selectedRow.LOK_MALZEME_DEPO_ID);
-      setValue("anaLokasyonTanim", selectedRow.LOK_ANA_LOKASYON); // ? Ana lokasyonun adı lazim
+      setValue("anaLokasyonTanim", selectedRow.ANA_LOK_TANIM);
       setValue("anaLokasyonID", selectedRow.LOK_ANA_LOKASYON_ID);
       setValue("lokasyonEmail", selectedRow.LOK_EMAIL);
       setValue("lokasyonAciklama", selectedRow.LOK_ACIKLAMA);
