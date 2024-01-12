@@ -27,7 +27,7 @@ const StyledDiv = styled.div`
   }
 `;
 
-export default function VardiyaTipi() {
+export default function BakimTipi() {
   const { control, setValue } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -118,9 +118,9 @@ export default function VardiyaTipi() {
         rowGap: "0px",
       }}>
       {contextHolder}
-      <Text style={{ fontSize: "14px", minWidth: "40px" }}>Vardiya Tipi:</Text>
+      <Text style={{ fontSize: "14px", minWidth: "40px" }}>Bakım Tipi:</Text>
       <Controller
-        name="vardiyaTipi"
+        name="bakimTipi"
         control={control}
         render={({ field }) => (
           <StyledSelect
@@ -164,14 +164,14 @@ export default function VardiyaTipi() {
             }))}
             onChange={(value) => {
               // Seçilen değerin ID'sini NedeniID alanına set et
-              setValue("vardiyaTipiID", value);
+              setValue("bakimTipiID", value);
               field.onChange(value);
             }}
           />
         )}
       />
       <Controller
-        name="vardiyaTipiID"
+        name="bakimTipiID"
         control={control}
         render={({ field }) => (
           <Input
