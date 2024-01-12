@@ -132,7 +132,7 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
           </Button>
           <Drawer
             width="550px"
-            title="Yeni Kayıt Ekle"
+            title="Bakım Tanımı Ekle"
             placement={"right"}
             onClose={onClose}
             open={open}
