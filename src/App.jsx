@@ -17,6 +17,7 @@ import LokasyonTanim from "./pages/Yonetim/LokasyonTanimlari/LokasyonTanimlari";
 import trTR from "antd/es/locale/tr_TR";
 import VardiyaTanim from "./pages/Yonetim/VardiyaTanimlari/VardiyaTanimlari";
 import Dashboard from "./pages/Dashboard/Dashboard";
+import BakimTanimlari from "./pages/BakımVeArizaYonetimi/BakimTanimlari/BakimTanimlari";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -39,6 +40,7 @@ const items = [
     <UserOutlined />,
     [
       // getItem("Tom", "tom", true),
+      getItem("Bakım Tanımları", "bakimTanimlari", true),
       getItem("İş Emri", "isemri", true),
       // getItem("Alex", "alex", true)
     ],
@@ -178,6 +180,7 @@ const App = () => {
                     <Route path="/makine" element={<MakineTanim />} />
                     <Route path="/lokasyon" element={<LokasyonTanim />} />
                     <Route path="/vardiyalar" element={<VardiyaTanim />} />
+                    <Route path="bakimTanimlari" element={<BakimTanimlari />} />
                     {/* Diğer Route'lar */}
                   </Routes>
                 </div>
@@ -192,6 +195,7 @@ const App = () => {
                     <Route path="/makine" element={<MakineTanim />} />
                     <Route path="/lokasyon" element={<LokasyonTanim />} />
                     <Route path="/vardiyalar" element={<VardiyaTanim />} />
+                    <Route path="bakimTanimlari" element={<BakimTanimlari />} />
                     {/* Diğer Route'lar */}
                   </Routes>
                 </div>
