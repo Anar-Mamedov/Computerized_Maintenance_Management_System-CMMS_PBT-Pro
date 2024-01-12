@@ -139,17 +139,17 @@ export default function MainTable() {
         return dayjs(dateTime).format("HH:mm");
       },
     },
-    {
-      title: "Mola Süresi (dk)",
-      dataIndex: "VAR_MOLA_SURESI",
-      key: "VAR_MOLA_SURESI",
-      width: 200,
-      ellipsis: true,
-      align: "center",
-      render: (text) => {
-        return <div style={{ textAlign: "right" }}>{text}</div>;
-      },
-    },
+    // {
+    //   title: "Mola Süresi (dk)",
+    //   dataIndex: "VAR_MOLA_SURESI",
+    //   key: "VAR_MOLA_SURESI",
+    //   width: 200,
+    //   ellipsis: true,
+    //   align: "center",
+    //   render: (text) => {
+    //     return <div style={{ textAlign: "right" }}>{text}</div>;
+    //   },
+    // },
     {
       title: "Lokasyon Bilgisi",
       dataIndex: "VAR_LOKASYON",
