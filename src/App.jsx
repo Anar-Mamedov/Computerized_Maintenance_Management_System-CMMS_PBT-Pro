@@ -180,7 +180,7 @@ const App = () => {
                     <Route path="/makine" element={<MakineTanim />} />
                     <Route path="/lokasyon" element={<LokasyonTanim />} />
                     <Route path="/vardiyalar" element={<VardiyaTanim />} />
-                    <Route path="bakimTanimlari" element={<BakimTanimlari />} />
+                    <Route path="/bakimTanimlari" element={<BakimTanimlari />} />
                     {/* Diğer Route'lar */}
                   </Routes>
                 </div>
@@ -195,7 +195,7 @@ const App = () => {
                     <Route path="/makine" element={<MakineTanim />} />
                     <Route path="/lokasyon" element={<LokasyonTanim />} />
                     <Route path="/vardiyalar" element={<VardiyaTanim />} />
-                    <Route path="bakimTanimlari" element={<BakimTanimlari />} />
+                    <Route path="/bakimTanimlari" element={<BakimTanimlari />} />
                     {/* Diğer Route'lar */}
                   </Routes>
                 </div>

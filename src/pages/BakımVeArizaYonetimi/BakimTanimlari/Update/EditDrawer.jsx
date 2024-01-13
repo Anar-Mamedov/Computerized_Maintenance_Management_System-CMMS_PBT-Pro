@@ -168,7 +168,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           </Button> */}
           <Drawer
             width="550px"
-            title="Kayıdı Güncelle"
+            title="Bakim Tanımını Güncelle"
             placement={"right"}
             onClose={handleDrawerClose}
             open={drawerVisible}

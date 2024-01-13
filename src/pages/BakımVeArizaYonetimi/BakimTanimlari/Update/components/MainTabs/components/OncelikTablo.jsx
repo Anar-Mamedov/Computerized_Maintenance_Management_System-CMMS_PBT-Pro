@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
-import dayjs from "dayjs";
 
-export default function ProjeTablo({ workshopSelectedId, onSubmit }) {
+export default function OncelikTablo({ workshopSelectedId, onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
@@ -11,62 +10,52 @@ export default function ProjeTablo({ workshopSelectedId, onSubmit }) {
 
   const columns = [
     {
-      title: "Proje Kodu",
+      title: "Öncelik Kodu",
       dataIndex: "code",
       key: "code",
-      width: "150px",
-      ellipsis: true,
+      render: (text) => (
+        <div
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}>
+          {text}
+        </div>
+      ),
     },
     {
-      title: "Proje Tanımı",
+      title: "Tanım",
       dataIndex: "subject",
       key: "subject",
-      width: "150px",
-      ellipsis: true,
+      render: (text) => (
+        <div
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}>
+          {text}
+        </div>
+      ),
     },
     {
-      title: "Proje Tipi",
-      dataIndex: "workdays",
-      key: "workdays",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Başlama Tarihi",
-      dataIndex: "description",
-      key: "description",
-      width: "150px",
-      ellipsis: true,
-      render: (text) => {
-        // Eğer text null veya boş değilse formatla, aksi takdirde boş bir string dön
-        return text ? dayjs(text).format("DD-MM-YYYY") : "";
-      },
-    },
-
-    {
-      title: "Bitiş Tarihi",
-      dataIndex: "fifthcolumn",
-      key: "fifthcolumn",
-      width: "150px",
-      ellipsis: true,
-      render: (text) => {
-        // Eğer text null veya boş değilse formatla, aksi takdirde boş bir string dön
-        return text ? dayjs(text).format("DD-MM-YYYY") : "";
-      },
+      title: "Varsayılan",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => <input type="checkbox" checked={status} disabled />,
     },
   ];
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`GetProjeList`)
+    AxiosInstance.get(`OncelikList`)
       .then((response) => {
-        const fetchedData = response.Proje_Liste.map((item) => ({
-          key: item.TB_PROJE_ID,
-          code: item.PRJ_KOD,
-          subject: item.PRJ_TANIM,
-          workdays: item.PRJ_TIP,
-          description: item.PRJ_BASLAMA_TARIH,
-          fifthcolumn: item.PRJ_BITIS_TARIH,
+        const fetchedData = response.map((item) => ({
+          key: item.TB_SERVIS_ONCELIK_ID,
+          code: item.SOC_KOD,
+          subject: item.SOC_TANIM,
+          status: item.SOC_VARSAYILAN,
         }));
         setData(fetchedData);
       })
@@ -99,13 +88,7 @@ export default function ProjeTablo({ workshopSelectedId, onSubmit }) {
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
-      <Modal
-        width={1200}
-        centered
-        title="Projeler"
-        open={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={handleModalToggle}>
+      <Modal width="1200px" title="Öncelik" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <Table
           rowSelection={{
             type: "radio",
@@ -115,10 +98,6 @@ export default function ProjeTablo({ workshopSelectedId, onSubmit }) {
           columns={columns}
           dataSource={data}
           loading={loading}
-          scroll={{
-            // x: "auto",
-            y: "calc(100vh - 360px)",
-          }}
         />
       </Modal>
     </div>
