@@ -6,8 +6,8 @@ import MainTabs from "./components/MainTabs/MainTabs";
 import { useForm, Controller, useFormContext, FormProvider, set } from "react-hook-form";
 import dayjs from "dayjs";
 import AxiosInstance from "../../../../api/http";
-import Footer from "../Footer";
-// import SecondTabs from "./components/SecondTabs/SecondTabs";
+import Footer from "./components/Footer";
+import SecondTabs from "./components/SecondTabs/SecondTabs";
 
 export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
   const [, startTransition] = useTransition();
@@ -167,7 +167,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             Ekle
           </Button> */}
           <Drawer
-            width="550px"
+            width="1460px"
             title="Bakim Tanımını Güncelle"
             placement={"right"}
             onClose={handleDrawerClose}
@@ -188,7 +188,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
               </Space>
             }>
             <MainTabs />
-            {/* <SecondTabs /> */}
+            <SecondTabs />
             <Footer />
           </Drawer>
         </ConfigProvider>
