@@ -1,15 +1,18 @@
 import React, { useCallback, useEffect, useState } from "react";
-import KontrolListesiEkle from "./KontrolListesiEkle";
+import KontrolListesiEkle from "./Insert/CreateModal";
 import { Button, Modal, Table } from "antd";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../api/http";
 import dayjs from "dayjs";
+import EditModal from "./Update/EditModal";
 
 export default function KontrolListesiTablo() {
   const [loading, setLoading] = useState(false);
   const { control, watch, setValue } = useFormContext();
   const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
 
   const columns = [
     {
@@ -76,6 +79,11 @@ export default function KontrolListesiTablo() {
     setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
   };
 
+  const onRowClick = (record) => {
+    setSelectedRow(record);
+    setIsModalVisible(true);
+  };
+
   const refreshTable = useCallback(() => {
     fetch(); // fetch fonksiyonu tabloyu yeniler
   }, [fetch]);
@@ -89,6 +97,9 @@ export default function KontrolListesiTablo() {
           selectedRowKeys,
           onChange: onRowSelectChange,
         }}
+        onRow={(record) => ({
+          onClick: () => onRowClick(record),
+        })}
         columns={columns}
         dataSource={data}
         loading={loading}
@@ -97,6 +108,17 @@ export default function KontrolListesiTablo() {
           y: "calc(100vh - 360px)",
         }}
       />
+      {isModalVisible && (
+        <EditModal
+          selectedRow={selectedRow}
+          isModalVisible={isModalVisible}
+          onModalClose={() => {
+            setIsModalVisible(false);
+            setSelectedRow(null);
+          }}
+          onRefresh={refreshTable}
+        />
+      )}
     </div>
   );
 }

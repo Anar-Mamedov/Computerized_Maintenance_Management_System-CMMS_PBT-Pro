@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Input, Typography, Tabs } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import AxiosInstance from "../../../../../../../../api/http";
+import AxiosInstance from "../../../../../../../../../api/http";
 import { Controller, useForm } from "react-hook-form";
 import styled from "styled-components";
 
@@ -45,7 +45,7 @@ const StyledTabs = styled(Tabs)`
 
 //styled components end
 
-export default function KontrolListesiEkle({ workshopSelectedId, onSubmit, onRefresh }) {
+export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { control, reset, getValues } = useForm({
     defaultValues: {
