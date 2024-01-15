@@ -84,8 +84,8 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
     <FormProvider {...methods}>
       <div>
         <Modal
-          width="1200px"
-          title="Kontrol Listesi Ekle"
+          width="800px"
+          title="Kontrol Listesi Güncelle"
           open={isModalVisible}
           onOk={handleModalOk}
           onCancel={onModalClose}>

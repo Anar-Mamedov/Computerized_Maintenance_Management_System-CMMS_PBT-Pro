@@ -65,8 +65,8 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh })
         </div>
 
         <Modal
-          width="1200px"
-          title="Kontrol Listesi Ekle"
+          width="800px"
+          title="Malzeme Ekle"
           open={isModalVisible}
           onOk={handleModalOk}
           onCancel={handleModalToggle}>
