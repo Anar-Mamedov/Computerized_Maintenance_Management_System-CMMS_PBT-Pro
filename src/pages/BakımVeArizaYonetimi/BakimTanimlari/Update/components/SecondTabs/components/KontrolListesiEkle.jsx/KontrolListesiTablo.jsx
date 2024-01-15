@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
-import KontrolListesiEkle from "./Insert/CreateModal";
 import { Button, Modal, Table } from "antd";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../api/http";
 import dayjs from "dayjs";
+import CreateModal from "./Insert/CreateModal";
 import EditModal from "./Update/EditModal";
 
 export default function KontrolListesiTablo() {
@@ -90,7 +90,7 @@ export default function KontrolListesiTablo() {
 
   return (
     <div>
-      <KontrolListesiEkle onRefresh={refreshTable} />
+      <CreateModal onRefresh={refreshTable} />
       <Table
         rowSelection={{
           type: "radio",

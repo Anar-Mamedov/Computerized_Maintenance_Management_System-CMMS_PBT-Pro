@@ -49,7 +49,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
 
   useEffect(() => {
     if (isModalVisible && selectedRow) {
-      console.log("selectedRow", selectedRow);
+      // console.log("selectedRow", selectedRow);
       // startTransition(() => {
       // Object.keys(selectedRow).forEach((key) => {
       //   console.log(key, selectedRow[key]);
