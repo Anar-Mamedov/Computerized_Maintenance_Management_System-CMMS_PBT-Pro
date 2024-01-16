@@ -5,6 +5,7 @@ import { useFormContext } from "react-hook-form";
 import KontrolListesiTablo from "./components/KontrolListesiEkle/KontrolListesiTablo";
 import Tablo from "./components/Malzemeler/Tablo";
 import Maliyetler from "./components/Maliyetler/Maliyetler";
+import Olcumler from "./components/Olcumler/Tablo";
 
 const onChange = (key) => {
   // console.log(key);
@@ -63,7 +64,7 @@ export default function SecondTabs({ refreshKey }) {
     {
       key: "4",
       label: "Ölçümler",
-      children: "Content of Tab Pane 5",
+      children: <Olcumler />,
     },
     {
       key: "5",

@@ -1,0 +1,376 @@
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Button, Modal, Input, Typography, Tabs } from "antd";
+import { Controller, useFormContext } from "react-hook-form";
+import styled from "styled-components";
+import MalzemeTablo from "./components/MalzemeTablo";
+import MalzemeTipi from "./components/MalzemeTipi";
+import Birim from "./components/Birim";
+
+const { Text, Link } = Typography;
+const { TextArea } = Input;
+
+const onChange = (key) => {
+  // console.log(key);
+};
+
+const StyledDivBottomLine = styled.div`
+  @media (min-width: 600px) {
+    align-items: center !important;
+  }
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+`;
+
+export default function MainTabs() {
+  const { control, watch, setValue } = useFormContext();
+  const ondalikSayi = watch("ondalikSayi");
+  const [focusedField, setFocusedField] = useState(null);
+
+  // input alanları için ref'ler
+  const hedefDegerRef = useRef(null);
+  const olcumLimitRef = useRef(null);
+  // ... Diğer ref'ler ...
+
+  const formatDecimal = (value, decimalPlaces) => {
+    // ... formatDecimal fonksiyonunun içeriği ...
+  };
+
+  useEffect(() => {
+    const decimalPlaces = parseInt(ondalikSayi, 10) || 0;
+
+    // Sadece odaklanılmamış alanları güncelle
+    if (focusedField !== "hedefDeger" && hedefDegerRef.current) {
+      setValue("hedefDeger", formatDecimal(watch("hedefDeger"), decimalPlaces), { shouldValidate: true });
+    }
+    // ... Diğer alanlar için benzer koşullar ...
+  }, [ondalikSayi, setValue, watch, focusedField]);
+
+  const onFocus = (name) => {
+    setFocusedField(name);
+  };
+
+  const onBlur = (name) => {
+    setFocusedField(null);
+    // Burada da gerekli formatlama yapılabilir
+  };
+  return (
+    <div>
+      <Controller
+        name="secilenID"
+        control={control}
+        render={({ field }) => (
+          <Input
+            {...field}
+            type="text" // Set the type to "text" for name input
+            style={{ display: "none" }}
+          />
+        )}
+      />
+      <div>
+        <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
+          <StyledDivBottomLine
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              width: "100%",
+            }}>
+            <Text style={{ fontSize: "14px" }}>Sira No</Text>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                maxWidth: "300px",
+                minWidth: "300px",
+                gap: "10px",
+                width: "100%",
+              }}>
+              <Controller
+                name="olcumSiraNo"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    style={{ flex: 1 }}
+                    onKeyPress={(e) => {
+                      // Sadece rakam girişine izin ver
+                      if (!/[0-9]/.test(e.key)) {
+                        e.preventDefault();
+                      }
+                    }}
+                  />
+                )}
+              />
+            </div>
+          </StyledDivBottomLine>
+        </div>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+          gap: "10px",
+          rowGap: "0px",
+          marginBottom: "10px",
+        }}>
+        <Text style={{ fontSize: "14px" }}>Tanım:</Text>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            maxWidth: "602px",
+            minWidth: "300px",
+            gap: "10px",
+            width: "100%",
+          }}>
+          <Controller
+            name="olcumTanim"
+            control={control}
+            render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+          />
+        </div>
+      </div>
+      <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
+        <StyledDivBottomLine
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            width: "100%",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Birim:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              maxWidth: "300px",
+              minWidth: "300px",
+              gap: "10px",
+              width: "100%",
+            }}>
+            <Birim />
+          </div>
+        </StyledDivBottomLine>
+      </div>
+      <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
+        <StyledDivBottomLine
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            width: "100%",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Ondalık Sayı:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              maxWidth: "200px",
+              minWidth: "200px",
+              gap: "10px",
+              width: "100%",
+            }}>
+            <Controller
+              name="ondalikSayi"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="number"
+                  style={{ flex: 1 }}
+                  onKeyPress={(e) => {
+                    const value = field.value;
+                    // Rakam veya bir virgül olup olmadığını kontrol et
+                    if (!/[0-9]/.test(e.key) && (e.key !== "," || value.includes(","))) {
+                      e.preventDefault();
+                    }
+                  }}
+                />
+              )}
+            />
+          </div>
+        </StyledDivBottomLine>
+      </div>
+      <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
+        <StyledDivBottomLine
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            width: "100%",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Hedef Değer:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              maxWidth: "300px",
+              minWidth: "300px",
+              gap: "10px",
+              width: "100%",
+            }}>
+            <Controller
+              name="hedefDeger"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  style={{ flex: 1 }}
+                  ref={hedefDegerRef}
+                  onFocus={() => onFocus("hedefDeger")}
+                  onBlur={() => onBlur("hedefDeger")}
+                  onKeyPress={(e) => {
+                    const value = field.value;
+                    // Rakam veya bir virgül olup olmadığını kontrol et
+                    if (!/[0-9]/.test(e.key) && (e.key !== "," || value.includes(","))) {
+                      e.preventDefault();
+                    }
+                  }}
+                />
+              )}
+            />
+          </div>
+        </StyledDivBottomLine>
+      </div>
+      <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
+        <StyledDivBottomLine
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            width: "100%",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Limit (+)(-):</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              maxWidth: "300px",
+              minWidth: "300px",
+              gap: "10px",
+              width: "100%",
+            }}>
+            <Controller
+              name="olcumLimit"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  style={{ flex: 1 }}
+                  onBlur={() => handleBlur("olcumLimit")}
+                  onKeyPress={(e) => {
+                    const value = field.value;
+                    // Rakam veya bir virgül olup olmadığını kontrol et
+                    if (!/[0-9]/.test(e.key) && (e.key !== "," || value.includes(","))) {
+                      e.preventDefault();
+                    }
+                  }}
+                />
+              )}
+            />
+          </div>
+        </StyledDivBottomLine>
+      </div>
+      <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
+        <StyledDivBottomLine
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            width: "100%",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Minimum Değer:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              maxWidth: "300px",
+              minWidth: "300px",
+              gap: "10px",
+              width: "100%",
+            }}>
+            <Controller
+              name="minimumDeger"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  disabled
+                  style={{ flex: 1 }}
+                  onBlur={() => handleBlur("minimumDeger")}
+                  onKeyPress={(e) => {
+                    const value = field.value;
+                    // Rakam veya bir virgül olup olmadığını kontrol et
+                    if (!/[0-9]/.test(e.key) && (e.key !== "," || value.includes(","))) {
+                      e.preventDefault();
+                    }
+                  }}
+                />
+              )}
+            />
+          </div>
+        </StyledDivBottomLine>
+      </div>
+      <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
+        <StyledDivBottomLine
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            width: "100%",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Maximum Değer:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              maxWidth: "300px",
+              minWidth: "300px",
+              gap: "10px",
+              width: "100%",
+            }}>
+            <Controller
+              name="maximumDeger"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  disabled
+                  style={{ flex: 1 }}
+                  onBlur={() => handleBlur("maximumDeger")}
+                  onKeyPress={(e) => {
+                    const value = field.value;
+                    // Rakam veya bir virgül olup olmadığını kontrol et
+                    if (!/[0-9]/.test(e.key) && (e.key !== "," || value.includes(","))) {
+                      e.preventDefault();
+                    }
+                  }}
+                />
+              )}
+            />
+          </div>
+        </StyledDivBottomLine>
+      </div>
+    </div>
+  );
+}
