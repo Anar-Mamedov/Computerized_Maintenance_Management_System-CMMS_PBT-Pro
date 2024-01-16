@@ -26,26 +26,48 @@ const StyledDivBottomLine = styled.div`
 export default function MainTabs() {
   const { control, watch, setValue } = useFormContext();
   const ondalikSayi = watch("ondalikSayi");
+  const hedefDeger = watch("hedefDeger");
+  const olcumLimit = watch("olcumLimit");
   const [focusedField, setFocusedField] = useState(null);
 
   // input alanları için ref'ler
   const hedefDegerRef = useRef(null);
   const olcumLimitRef = useRef(null);
+  const minimumDegerRef = useRef(null);
+  const maximumDegerRef = useRef(null);
   // ... Diğer ref'ler ...
 
   const formatDecimal = (value, decimalPlaces) => {
-    // ... formatDecimal fonksiyonunun içeriği ...
+    if (!value && value !== 0) return value;
+
+    // Nokta ile ayrılmış ondalık ve tam sayı kısımlarını al
+    let [integer, decimal] = value.toString().replace(",", ".").split(".");
+
+    if (!decimal) decimal = "";
+
+    // toFixed ile yuvarlama yap ve sonucu string olarak al
+    const rounded = parseFloat(`${integer}.${decimal}`).toFixed(decimalPlaces);
+
+    // Sonucu virgül ile ayrılmış formata çevir
+    return rounded.replace(".", ",");
   };
 
   useEffect(() => {
     const decimalPlaces = parseInt(ondalikSayi, 10) || 0;
 
-    // Sadece odaklanılmamış alanları güncelle
-    if (focusedField !== "hedefDeger" && hedefDegerRef.current) {
-      setValue("hedefDeger", formatDecimal(watch("hedefDeger"), decimalPlaces), { shouldValidate: true });
-    }
-    // ... Diğer alanlar için benzer koşullar ...
-  }, [ondalikSayi, setValue, watch, focusedField]);
+    // Hedef Değer ve Ölçüm Limiti hesapla
+    const hesaplaVeGuncelle = () => {
+      if (focusedField !== "hedefDeger" && focusedField !== "olcumLimit") {
+        const maxDeger = parseFloat(hedefDeger || 0) + parseFloat(olcumLimit || 0);
+        setValue("maximumDeger", maxDeger.toFixed(decimalPlaces).replace(".", ","), { shouldValidate: true });
+
+        const minDeger = parseFloat(hedefDeger || 0) - parseFloat(olcumLimit || 0);
+        setValue("minimumDeger", minDeger.toFixed(decimalPlaces).replace(".", ","), { shouldValidate: true });
+      }
+    };
+
+    hesaplaVeGuncelle();
+  }, [hedefDeger, olcumLimit, ondalikSayi, setValue, focusedField]);
 
   const onFocus = (name) => {
     setFocusedField(name);
@@ -53,8 +75,10 @@ export default function MainTabs() {
 
   const onBlur = (name) => {
     setFocusedField(null);
-    // Burada da gerekli formatlama yapılabilir
+    const decimalPlaces = parseInt(ondalikSayi, 10) || 0;
+    setValue(name, formatDecimal(watch(name), decimalPlaces), { shouldValidate: true });
   };
+
   return (
     <div>
       <Controller
@@ -190,10 +214,22 @@ export default function MainTabs() {
                   {...field}
                   type="number"
                   style={{ flex: 1 }}
+                  min={0}
+                  max={20}
+                  onChange={(e) => {
+                    let value = parseInt(e.target.value, 10);
+                    if (isNaN(value)) {
+                      value = 0; // Sayı değilse 0'a ayarla
+                    } else if (value < 0) {
+                      value = 0; // Eksi değerse 0'a ayarla
+                    } else if (value > 20) {
+                      value = 20; // 20'den büyükse 20'ye ayarla
+                    }
+                    field.onChange(value); // Değeri güncelle
+                  }}
                   onKeyPress={(e) => {
-                    const value = field.value;
                     // Rakam veya bir virgül olup olmadığını kontrol et
-                    if (!/[0-9]/.test(e.key) && (e.key !== "," || value.includes(","))) {
+                    if (!/[0-9]/.test(e.key) && (e.key !== "," || field.value.includes(","))) {
                       e.preventDefault();
                     }
                   }}
@@ -273,7 +309,9 @@ export default function MainTabs() {
                 <Input
                   {...field}
                   style={{ flex: 1 }}
-                  onBlur={() => handleBlur("olcumLimit")}
+                  ref={olcumLimitRef}
+                  onFocus={() => onFocus("olcumLimit")}
+                  onBlur={() => onBlur("olcumLimit")}
                   onKeyPress={(e) => {
                     const value = field.value;
                     // Rakam veya bir virgül olup olmadığını kontrol et
@@ -315,7 +353,9 @@ export default function MainTabs() {
                   {...field}
                   disabled
                   style={{ flex: 1 }}
-                  onBlur={() => handleBlur("minimumDeger")}
+                  ref={minimumDegerRef}
+                  onFocus={() => onFocus("minimumDeger")}
+                  onBlur={() => onBlur("minimumDeger")}
                   onKeyPress={(e) => {
                     const value = field.value;
                     // Rakam veya bir virgül olup olmadığını kontrol et
@@ -357,7 +397,9 @@ export default function MainTabs() {
                   {...field}
                   disabled
                   style={{ flex: 1 }}
-                  onBlur={() => handleBlur("maximumDeger")}
+                  ref={maximumDegerRef}
+                  onFocus={() => onFocus("maximumDeger")}
+                  onBlur={() => onBlur("maximumDeger")}
                   onKeyPress={(e) => {
                     const value = field.value;
                     // Rakam veya bir virgül olup olmadığını kontrol et
