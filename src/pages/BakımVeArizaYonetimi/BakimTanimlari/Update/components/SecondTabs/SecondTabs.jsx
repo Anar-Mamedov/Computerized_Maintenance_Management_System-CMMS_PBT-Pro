@@ -2,7 +2,10 @@ import React from "react";
 import { Tabs } from "antd";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
-import KontrolListesiTablo from "./components/KontrolListesiEkle.jsx/KontrolListesiTablo";
+import KontrolListesiTablo from "./components/KontrolListesiEkle/KontrolListesiTablo";
+import Tablo from "./components/Malzemeler/Tablo";
+import Maliyetler from "./components/Maliyetler/Maliyetler";
+import Olcumler from "./components/Olcumler/Tablo";
 
 const onChange = (key) => {
   // console.log(key);
@@ -51,17 +54,17 @@ export default function SecondTabs({ refreshKey }) {
     {
       key: "2",
       label: "Malzemeler",
-      children: "test",
+      children: <Tablo />,
     },
     {
       key: "3",
       label: "Maliyetler",
-      children: "test",
+      children: <Maliyetler />,
     },
     {
       key: "4",
       label: "Ölçümler",
-      children: "Content of Tab Pane 5",
+      children: <Olcumler />,
     },
     {
       key: "5",
