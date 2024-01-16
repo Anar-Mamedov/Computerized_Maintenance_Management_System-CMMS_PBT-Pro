@@ -14,6 +14,18 @@ const onChange = (key) => {
 };
 
 const StyledDivBottomLine = styled.div`
+  ${"" /* number input okları kaldırma */}
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox */
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
   @media (min-width: 600px) {
     align-items: center !important;
   }
@@ -55,13 +67,31 @@ export default function MainTabs() {
   useEffect(() => {
     const decimalPlaces = parseInt(ondalikSayi, 10) || 0;
 
+    // Sadece odaklanılmamış alanları güncelle
+    if (focusedField !== "hedefDeger" && hedefDegerRef.current) {
+      setValue("hedefDeger", formatDecimal(watch("hedefDeger"), decimalPlaces), { shouldValidate: true });
+    }
+    if (focusedField !== "olcumLimit" && olcumLimitRef.current) {
+      setValue("olcumLimit", formatDecimal(watch("olcumLimit"), decimalPlaces), { shouldValidate: true });
+    }
+    if (focusedField !== "minimumDeger" && minimumDegerRef.current) {
+      setValue("minimumDeger", formatDecimal(watch("minimumDeger"), decimalPlaces), { shouldValidate: true });
+    }
+    if (focusedField !== "maximumDeger" && maximumDegerRef.current) {
+      setValue("maximumDeger", formatDecimal(watch("maximumDeger"), decimalPlaces), { shouldValidate: true });
+    }
+    // ... Diğer alanlar için benzer koşullar ...
+
     // Hedef Değer ve Ölçüm Limiti hesapla
     const hesaplaVeGuncelle = () => {
       if (focusedField !== "hedefDeger" && focusedField !== "olcumLimit") {
-        const maxDeger = parseFloat(hedefDeger || 0) + parseFloat(olcumLimit || 0);
+        // String'i sayıya çevirirken virgülü noktaya dönüştür
+        const maxDeger =
+          parseFloat((hedefDeger || "0").replace(",", ".")) + parseFloat((olcumLimit || "0").replace(",", "."));
         setValue("maximumDeger", maxDeger.toFixed(decimalPlaces).replace(".", ","), { shouldValidate: true });
 
-        const minDeger = parseFloat(hedefDeger || 0) - parseFloat(olcumLimit || 0);
+        const minDeger =
+          parseFloat((hedefDeger || "0").replace(",", ".")) - parseFloat((olcumLimit || "0").replace(",", "."));
         setValue("minimumDeger", minDeger.toFixed(decimalPlaces).replace(".", ","), { shouldValidate: true });
       }
     };
