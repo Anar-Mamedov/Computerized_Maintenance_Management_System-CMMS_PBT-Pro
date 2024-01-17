@@ -7,6 +7,8 @@ import Tablo from "./components/Malzemeler/Tablo";
 import Maliyetler from "./components/Maliyetler/Maliyetler";
 import Olcumler from "./components/Olcumler/Tablo";
 import SureBilgileri from "./components/SureBilgileri/SureBilgileri";
+import OzelAlanlar from "./components/OzelAlanlar/OzelAlanlar";
+import UygulamaBilgileri from "./components/UygulamaBilgileri/UygulamaBilgileri";
 
 const onChange = (key) => {
   // console.log(key);
@@ -46,6 +48,8 @@ const StyledTabs = styled(Tabs)`
 //styled components end
 
 export default function SecondTabs({ refreshKey }) {
+  const { watch } = useFormContext();
+
   const items = [
     {
       key: "1",
@@ -75,12 +79,12 @@ export default function SecondTabs({ refreshKey }) {
     {
       key: "6",
       label: "Özel Alanlar",
-      children: "Content of Tab Pane 6",
+      children: <OzelAlanlar />,
     },
     {
       key: "7",
       label: "Uygulama Bilgileri",
-      children: "Content of Tab Pane 6",
+      children: <UygulamaBilgileri />,
     },
     {
       key: "8",
@@ -98,7 +102,6 @@ export default function SecondTabs({ refreshKey }) {
       children: "Content of Tab Pane 6",
     },
   ];
-  const { watch } = useFormContext();
 
   return (
     <div>
