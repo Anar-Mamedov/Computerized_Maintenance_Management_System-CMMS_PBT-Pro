@@ -18,6 +18,7 @@ import trTR from "antd/es/locale/tr_TR";
 import VardiyaTanim from "./pages/Yonetim/VardiyaTanimlari/VardiyaTanimlari";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import BakimTanimlari from "./pages/BakımVeArizaYonetimi/BakimTanimlari/BakimTanimlari";
+import AtolyeTanimlari from "./pages/PersonelYonetimi/AtolyeTanimlari/AtolyeTanimlari";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -52,6 +53,16 @@ const items = [
     <TeamOutlined />,
     [
       getItem("Makine Tanım", "makine", true),
+      // getItem("Team 2", "team2", true)
+    ],
+    false
+  ),
+  getItem(
+    "Personel Yönetimi",
+    "personelYonetimi",
+    <UserOutlined />,
+    [
+      getItem("Atölye Tanımları", "atolye", true),
       // getItem("Team 2", "team2", true)
     ],
     false
@@ -181,6 +192,7 @@ const App = () => {
                     <Route path="/lokasyon" element={<LokasyonTanim />} />
                     <Route path="/vardiyalar" element={<VardiyaTanim />} />
                     <Route path="/bakimTanimlari" element={<BakimTanimlari />} />
+                    <Route path="/atolye" element={<AtolyeTanimlari />} />
                     {/* Diğer Route'lar */}
                   </Routes>
                 </div>
@@ -196,6 +208,7 @@ const App = () => {
                     <Route path="/lokasyon" element={<LokasyonTanim />} />
                     <Route path="/vardiyalar" element={<VardiyaTanim />} />
                     <Route path="/bakimTanimlari" element={<BakimTanimlari />} />
+                    <Route path="/atolye" element={<AtolyeTanimlari />} />
                     {/* Diğer Route'lar */}
                   </Routes>
                 </div>
