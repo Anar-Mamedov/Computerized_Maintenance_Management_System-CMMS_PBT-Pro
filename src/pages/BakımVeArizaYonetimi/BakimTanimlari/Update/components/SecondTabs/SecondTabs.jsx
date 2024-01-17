@@ -9,6 +9,7 @@ import Olcumler from "./components/Olcumler/Tablo";
 import SureBilgileri from "./components/SureBilgileri/SureBilgileri";
 import OzelAlanlar from "./components/OzelAlanlar/OzelAlanlar";
 import UygulamaBilgileri from "./components/UygulamaBilgileri/UygulamaBilgileri";
+import Aciklama from "./components/Aciklama/Aciklama";
 
 const onChange = (key) => {
   // console.log(key);
@@ -99,7 +100,7 @@ export default function SecondTabs({ refreshKey }) {
     {
       key: "10",
       label: "Açıklama",
-      children: "Content of Tab Pane 6",
+      children: <Aciklama />,
     },
   ];
 
