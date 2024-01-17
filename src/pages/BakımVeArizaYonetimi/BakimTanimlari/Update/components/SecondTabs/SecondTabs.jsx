@@ -6,6 +6,7 @@ import KontrolListesiTablo from "./components/KontrolListesiEkle/KontrolListesiT
 import Tablo from "./components/Malzemeler/Tablo";
 import Maliyetler from "./components/Maliyetler/Maliyetler";
 import Olcumler from "./components/Olcumler/Tablo";
+import SureBilgileri from "./components/SureBilgileri/SureBilgileri";
 
 const onChange = (key) => {
   // console.log(key);
@@ -69,7 +70,7 @@ export default function SecondTabs({ refreshKey }) {
     {
       key: "5",
       label: "Süre Bilgileri",
-      children: "Content of Tab Pane 6",
+      children: <SureBilgileri />,
     },
     {
       key: "6",

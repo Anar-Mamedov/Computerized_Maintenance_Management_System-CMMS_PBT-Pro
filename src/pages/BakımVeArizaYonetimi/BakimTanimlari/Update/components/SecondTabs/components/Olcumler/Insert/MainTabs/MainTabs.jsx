@@ -26,6 +26,7 @@ const StyledDivBottomLine = styled.div`
   input[type="number"] {
     -moz-appearance: textfield;
   }
+
   @media (min-width: 600px) {
     align-items: center !important;
   }
