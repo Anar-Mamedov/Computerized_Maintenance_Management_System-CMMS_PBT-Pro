@@ -7,7 +7,7 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function MiktarBirim() {
+export default function Birim() {
   const { control, setValue } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -92,13 +92,13 @@ export default function MiktarBirim() {
       {contextHolder}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
         <Controller
-          name="miktarBirim"
+          name="birim"
           control={control}
           render={({ field }) => (
             <Select
               {...field}
               key={selectKey}
-              style={{ width: "200px" }}
+              style={{ width: "300px" }}
               showSearch
               allowClear
               placeholder="Seçim Yapınız"
@@ -136,14 +136,14 @@ export default function MiktarBirim() {
               }))}
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
-                setValue("miktarBirimID", value);
+                setValue("birimID", value);
                 field.onChange(value);
               }}
             />
           )}
         />
         <Controller
-          name="miktarBirimID"
+          name="birimID"
           control={control}
           render={({ field }) => (
             <Input
