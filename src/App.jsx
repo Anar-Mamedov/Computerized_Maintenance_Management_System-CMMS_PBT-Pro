@@ -19,6 +19,7 @@ import VardiyaTanim from "./pages/Yonetim/VardiyaTanimlari/VardiyaTanimlari";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import BakimTanimlari from "./pages/BakımVeArizaYonetimi/BakimTanimlari/BakimTanimlari";
 import AtolyeTanimlari from "./pages/PersonelYonetimi/AtolyeTanimlari/AtolyeTanimlari";
+import PersonelTanimlari from "./pages/PersonelYonetimi/PersonelTanimlari/PersonelTanimlari";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -63,6 +64,7 @@ const items = [
     <UserOutlined />,
     [
       getItem("Atölye Tanımları", "atolye", true),
+      getItem("Personel Tanımları", "personeltanimlari", true),
       // getItem("Team 2", "team2", true)
     ],
     false
@@ -193,6 +195,7 @@ const App = () => {
                     <Route path="/vardiyalar" element={<VardiyaTanim />} />
                     <Route path="/bakimTanimlari" element={<BakimTanimlari />} />
                     <Route path="/atolye" element={<AtolyeTanimlari />} />
+                    <Route path="/personeltanimlari" element={<PersonelTanimlari />} />
                     {/* Diğer Route'lar */}
                   </Routes>
                 </div>
@@ -209,6 +212,8 @@ const App = () => {
                     <Route path="/vardiyalar" element={<VardiyaTanim />} />
                     <Route path="/bakimTanimlari" element={<BakimTanimlari />} />
                     <Route path="/atolye" element={<AtolyeTanimlari />} />
+                    <Route path="/personeltanimlari" element={<PersonelTanimlari />} />
+
                     {/* Diğer Route'lar */}
                   </Routes>
                 </div>
