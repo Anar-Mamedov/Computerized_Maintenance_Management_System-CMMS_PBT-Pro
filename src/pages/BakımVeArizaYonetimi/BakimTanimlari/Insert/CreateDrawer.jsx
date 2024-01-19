@@ -41,19 +41,32 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
   //* export
   const methods = useForm({
     defaultValues: {
-      vardiyaTanimi: "",
-      secilenVardiyaID: "",
-      vardiyaBaslangicSaati: dayjs("08:00", "HH:mm"),
-      vardiyaBitisSaati: dayjs("18:00", "HH:mm"),
-      vardiyaTipi: null,
-      vardiyaTipiID: "",
+      bakimKodu: "",
+      secilenBakimID: "",
+      bakimTanimi: "",
+      bakimAktif: true,
+      bakimTipi: null,
+      bakimTipiID: "",
+      bakimGrubu: null,
+      bakimGrubuID: "",
+      bakimNedeni: null,
+      bakimNedeniID: "",
+      oncelikTanim: "",
+      oncelikID: "",
+      talimatTanim: "",
+      talimatID: "",
+      atolyeTanim: "",
+      atolyeID: "",
+      firmaTanim: "",
+      firmaID: "",
       lokasyonTanim: "",
       lokasyonID: "",
-      vardiyaProjeTanim: "",
-      vardiyaProjeID: "",
-      varsayilanVardiya: false,
-      gosterimRengi: "#ffae00",
-      vardiyaAciklama: "",
+      calismaSuresi: "",
+      durusSuresi: "",
+      personelSayisi: "",
+      otonomBakim: false,
+      periyot: "",
+      periyotSiklik: "",
     },
   });
 
@@ -72,18 +85,23 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
   //* export
   const onSubmit = (data) => {
     const Body = {
-      VAR_TANIM: data.vardiyaTanimi,
-      VAR_VARDIYA_TIPI_KOD_ID: data.vardiyaTipiID,
-      VAR_LOKASYON_ID: data.lokasyonID,
-      VAR_PROJE_ID: data.vardiyaProjeID,
-      VAR_VARSAYILAN: data.varsayilanVardiya ? 1 : 0,
-      VAR_MOLA_SURESI: 1,
-      // VAR_RENK: data.gosterimRengi,
-      VAR_ACIKLAMA: data.vardiyaAciklama,
-      VAR_BASLAMA_SAATI: formatTimeWithDayjs(data.vardiyaBaslangicSaati),
-      VAR_BITIS_SAATI: formatTimeWithDayjs(data.vardiyaBitisSaati),
-      VAR_OLUSTURAN_ID: 24,
-
+      IST_KOD: data.bakimKodu,
+      IST_TANIM: data.bakimTanimi,
+      IST_TIP_KOD_ID: data.bakimTipiID,
+      IST_GRUP_KOD_ID: data.bakimGrubuID,
+      IST_NEDEN_KOD_ID: data.bakimNedeniID,
+      IST_ONCELIK_ID: data.oncelikID,
+      IST_TALIMAT_ID: data.talimatID,
+      IST_ATOLYE_ID: data.atolyeID,
+      IST_FIRMA_ID: data.firmaID,
+      IST_LOKASYON_ID: data.lokasyonID,
+      IST_CALISMA_SURE: data.calismaSuresi,
+      IST_DURUS_SURE: data.durusSuresi,
+      IST_PERSONEL_SAYI: data.personelSayisi,
+      IST_OTONOM_BAKIM: data.otonomBakim,
+      IST_UYARI_SIKLIGI: data.periyotSiklik,
+      IST_UYARI_PERIYOT: data.periyot,
+      IST_AKTIF: data.bakimAktif,
       // add more fields as needed
     };
 
@@ -91,7 +109,7 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
     // handle response
     // });
 
-    AxiosInstance.post("AddVardiya", Body)
+    AxiosInstance.post("AddBakim", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);
