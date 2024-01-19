@@ -27,7 +27,7 @@ const StyledDiv = styled.div`
   }
 `;
 
-export default function BakimGrubu() {
+export default function Gorevi() {
   const { control, setValue } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -118,9 +118,9 @@ export default function BakimGrubu() {
         rowGap: "0px",
       }}>
       {contextHolder}
-      <Text style={{ fontSize: "14px", minWidth: "40px" }}>Bakım Grubu:</Text>
+      <Text style={{ fontSize: "14px", minWidth: "40px" }}>Görevi:</Text>
       <Controller
-        name="bakimGrubu"
+        name="gorevi"
         control={control}
         render={({ field }) => (
           <StyledSelect
@@ -164,14 +164,14 @@ export default function BakimGrubu() {
             }))}
             onChange={(value) => {
               // Seçilen değerin ID'sini NedeniID alanına set et
-              setValue("bakimGrubuID", value);
+              setValue("goreviID", value);
               field.onChange(value);
             }}
           />
         )}
       />
       <Controller
-        name="bakimGrubuID"
+        name="goreviID"
         control={control}
         render={({ field }) => (
           <Input

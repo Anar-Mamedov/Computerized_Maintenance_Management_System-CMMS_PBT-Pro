@@ -24,7 +24,6 @@ import TaseronTablo from "./components/TaseronTablo";
 import PersonelHesabiTablo from "./components/PersonelHesabiTablo";
 import AtolyeTablo from "./components/AtolyeTablo";
 import IdariAmiriTablo from "./components/IdariAmiriTablo";
-import Periyot from "./components/Periyot";
 import MasrafMerkeziTablo from "./components/MasrafMerkeziTablo";
 
 const { Text, Link } = Typography;
