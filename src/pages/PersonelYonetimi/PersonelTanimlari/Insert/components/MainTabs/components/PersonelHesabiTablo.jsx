@@ -3,7 +3,7 @@ import { Button, Modal, Table } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
 import dayjs from "dayjs";
 
-export default function TalimatTablo({ workshopSelectedId, onSubmit }) {
+export default function PersonelHesabiTablo({ workshopSelectedId, onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
@@ -90,7 +90,12 @@ export default function TalimatTablo({ workshopSelectedId, onSubmit }) {
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
-      <Modal width="1200px" title="Talimat" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
+      <Modal
+        width="1200px"
+        title="Personel Hesabı"
+        open={isModalVisible}
+        onOk={handleModalOk}
+        onCancel={handleModalToggle}>
         <Table
           rowSelection={{
             type: "radio",
