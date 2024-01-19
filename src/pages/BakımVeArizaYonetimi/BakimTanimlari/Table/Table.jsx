@@ -29,29 +29,63 @@ export default function MainTable() {
   const fetchEquipmentData = async () => {
     try {
       setLoading(true);
-      const response = await AxiosInstance.get("GetVardiyaList");
+      const response = await AxiosInstance.get("BakimGetir");
       if (response) {
-        const formattedData = response.VARDIYA_LISTE.map((item) => {
+        const formattedData = response.map((item) => {
           return {
             ...item,
-            key: item.TB_VARDIYA_ID,
-            VAR_TANIM: item.VAR_TANIM,
-            VAR_LOKASYON_ID: item.VAR_LOKASYON_ID,
-            VAR_LOKASYON: item.VAR_LOKASYON,
-            VAR_PROJE_ID: item.VAR_PROJE_ID,
-            VAR_PROJE: item.VAR_PROJE,
-            VAR_ACIKLAMA: item.VAR_ACIKLAMA,
-            VAR_BASLAMA_SAATI: item.VAR_BASLAMA_SAATI,
-            VAR_BITIS_SAATI: item.VAR_BITIS_SAATI,
-            VAR_MOLA_SURESI: item.VAR_MOLA_SURESI,
-            VAR_VARDIYA_TIPI_KOD_ID: item.VAR_VARDIYA_TIPI_KOD_ID,
-            VAR_VARDIYA_TIPI: item.VAR_VARDIYA_TIPI,
-            VAR_VARSAYILAN: item.VAR_VARSAYILAN,
-            VAR_RENK: item.VAR_RENK,
-            VAR_OLUSTURAN_ID: item.VAR_OLUSTURAN_ID,
-            VAR_OLUSTURMA_TARIH: item.VAR_OLUSTURMA_TARIH,
-            VAR_DEGISTIREN_ID: item.VAR_DEGISTIREN_ID,
-            VAR_DEGISTIRME_TARIH: item.VAR_DEGISTIRME_TARIH,
+            key: item.TB_IS_TANIM_ID,
+            IST_KOD: item.IST_KOD,
+            IST_TANIM: item.IST_TANIM,
+            IST_DURUM: item.IST_DURUM,
+            IST_AKTIF: item.IST_AKTIF,
+            IST_TIP_KOD_ID: item.IST_TIP_KOD_ID,
+            IST_TIP: item.IST_TIP,
+            IST_GRUP_KOD_ID: item.IST_GRUP_KOD_ID,
+            IST_GRUP: item.IST_GRUP,
+            IST_ATOLYE_ID: item.IST_ATOLYE_ID,
+            IST_ATOLYE: item.IST_ATOLYE,
+            IST_CALISMA_SURE: item.IST_CALISMA_SURE,
+            IST_DURUS_SURE: item.IST_DURUS_SURE,
+            IST_PERSONEL_SAYI: item.IST_PERSONEL_SAYI,
+            IST_ONCELIK_ID: item.IST_ONCELIK_ID,
+            IST_ONCELIK: item.IST_ONCELIK,
+            IST_TALIMAT_ID: item.IST_TALIMAT_ID,
+            IST_TALIMAT: item.IST_TALIMAT,
+            IST_ACIKLAMA: item.IST_ACIKLAMA,
+            IST_OLUSTURAN_ID: item.IST_OLUSTURAN_ID,
+            IST_OLUSTURMA_TARIH: item.IST_OLUSTURMA_TARIH,
+            IST_DEGISTIREN_ID: item.IST_DEGISTIREN_ID,
+            IST_DEGISTIRME_TARIH: item.IST_DEGISTIRME_TARIH,
+            IST_MALZEME_MALIYET: item.IST_MALZEME_MALIYET,
+            IST_ISCILIK_MALIYET: item.IST_ISCILIK_MALIYET,
+            IST_GENEL_GIDER_MALIYET: item.IST_GENEL_GIDER_MALIYET,
+            IST_TOPLAM_MALIYET: item.IST_TOPLAM_MALIYET,
+            IST_NEDEN_KOD_ID: item.IST_NEDEN_KOD_ID,
+            IST_FIRMA_ID: item.IST_FIRMA_ID,
+            IST_IS_TALEPTE_GORUNSUN: item.IST_IS_TALEPTE_GORUNSUN,
+            IST_MASRAF_MERKEZ_ID: item.IST_MASRAF_MERKEZ_ID,
+            IST_SURE_LOJISTIK: item.IST_SURE_LOJISTIK,
+            IST_SURE_SEYAHAT: item.IST_SURE_SEYAHAT,
+            IST_SURE_ONAY: item.IST_SURE_ONAY,
+            IST_SURE_BEKLEME: item.IST_SURE_BEKLEME,
+            IST_SURE_DIGER: item.IST_SURE_DIGER,
+            IST_OZEL_ALAN_1: item.IST_OZEL_ALAN_1,
+            IST_OZEL_ALAN_2: item.IST_OZEL_ALAN_2,
+            IST_OZEL_ALAN_3: item.IST_OZEL_ALAN_3,
+            IST_OZEL_ALAN_4: item.IST_OZEL_ALAN_4,
+            IST_OZEL_ALAN_5: item.IST_OZEL_ALAN_5,
+            IST_OZEL_ALAN_7_KOD_ID: item.IST_OZEL_ALAN_7_KOD_ID,
+            IST_OZEL_ALAN_9: item.IST_OZEL_ALAN_9,
+            IST_OZEL_ALAN_10: item.IST_OZEL_ALAN_10,
+            IST_OZEL_ALAN_6_KOD_ID: item.IST_OZEL_ALAN_6_KOD_ID,
+            IST_OZEL_ALAN_8_KOD_ID: item.IST_OZEL_ALAN_8_KOD_ID,
+            IST_UYAR: item.IST_UYAR,
+            IST_UYARI_SIKLIGI: item.IST_UYARI_SIKLIGI,
+            IST_LOKASYON_ID: item.IST_LOKASYON_ID,
+            IST_LOKASYON: item.IST_LOKASYON,
+            IST_OTONOM_BAKIM: item.IST_OTONOM_BAKIM,
+            IST_KONTROL_SAYI: item.IST_KONTROL_SAYI,
           };
         });
         setData(formattedData); // Directly set the data
@@ -73,7 +107,7 @@ export default function MainTable() {
   };
 
   useEffect(() => {
-    const filtered = data.filter((item) => normalizeString(item.VAR_TANIM).includes(normalizeString(searchTerm)));
+    const filtered = data.filter((item) => normalizeString(item.IST_TANIM).includes(normalizeString(searchTerm)));
     setFilteredData(filtered);
   }, [searchTerm, data]);
 
@@ -107,87 +141,100 @@ export default function MainTable() {
 
   const columns = [
     {
-      title: "Vardiya Tanımı",
-      dataIndex: "VAR_TANIM",
-      key: "VAR_TANIM",
+      title: "Bakım Kod",
+      dataIndex: "IST_KOD",
+      key: "IST_KOD",
+      width: 150,
+      ellipsis: true,
+    },
+    {
+      title: "Bakım Tanım",
+      dataIndex: "IST_TANIM",
+      key: "IST_TANIM",
       width: 200,
       ellipsis: true,
     },
     {
-      title: "Başlangıç Saati",
-      dataIndex: "VAR_BASLAMA_SAATI",
-      key: "VAR_BASLAMA_SAATI",
-      width: 200,
+      title: "Aktif",
+      dataIndex: "IST_AKTIF",
+      key: "IST_AKTIF",
+      width: 100,
       ellipsis: true,
-      render: (time) => {
-        // Prepend a default date. Here I use '1970-01-01' as an example.
-        const dateTime = `1970-01-01 ${time}`;
-        return dayjs(dateTime).format("HH:mm");
-      },
-    },
-    {
-      title: "Bitiş Saati",
-      dataIndex: "VAR_BITIS_SAATI",
-      key: "VAR_BITIS_SAATI",
-      width: 200,
-      ellipsis: true,
-      render: (time) => {
-        // Prepend a default date. Here I use '1970-01-01' as an example.
-        const dateTime = `1970-01-01 ${time}`;
-        return dayjs(dateTime).format("HH:mm");
-      },
-    },
-    // {
-    //   title: "Mola Süresi (dk)",
-    //   dataIndex: "VAR_MOLA_SURESI",
-    //   key: "VAR_MOLA_SURESI",
-    //   width: 200,
-    //   ellipsis: true,
-    //   align: "center",
-    //   render: (text) => {
-    //     return <div style={{ textAlign: "right" }}>{text}</div>;
-    //   },
-    // },
-    {
-      title: "Lokasyon Bilgisi",
-      dataIndex: "VAR_LOKASYON",
-      key: "VAR_LOKASYON",
-      width: 200,
-      ellipsis: true,
-    },
-    {
-      title: "Proje Bilgisi",
-      dataIndex: "VAR_PROJE",
-      key: "VAR_PROJE",
-      width: 200,
-      ellipsis: true,
-    },
-    {
-      title: "Vardiya Tipi",
-      dataIndex: "VAR_VARDIYA_TIPI",
-      key: "VAR_VARDIYA_TIPI",
-      width: 200,
-      ellipsis: true,
-    },
-    {
-      title: "Varsayılan",
-      dataIndex: "VAR_VARSAYILAN",
-      key: "VAR_VARSAYILAN",
-      width: 200,
-      ellipsis: true,
-      render: (text, record) => {
-        return record.VAR_VARSAYILAN ? (
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <CheckOutlined style={{ color: "green" }} />
-          </div>
-        ) : (
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <CloseOutlined style={{ color: "red" }} />
-          </div>
-        );
-      },
+      align: "center",
+      render: (text) => (
+        <div style={{ textAlign: "center" }}>
+          {text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}
+        </div>
+      ),
     },
 
+    {
+      title: "Bakım Tip",
+      dataIndex: "IST_TIP",
+      key: "IST_TIP",
+      width: 250,
+      ellipsis: true,
+    },
+    {
+      title: "Bakım Grup",
+      dataIndex: "IST_GRUP",
+      key: "IST_GRUP",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Atölye",
+      dataIndex: "IST_ATOLYE",
+      key: "IST_ATOLYE",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Lokasyon",
+      dataIndex: "IST_LOKASYON",
+      key: "IST_LOKASYON",
+      width: 200,
+      ellipsis: true,
+      render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
+    },
+    {
+      title: "Öncelik",
+      dataIndex: "IST_ONCELIK",
+      key: "IST_ONCELIK",
+      width: 150,
+      ellipsis: true,
+    },
+    {
+      title: "Talimat",
+      dataIndex: "IST_TALIMAT",
+      key: "IST_TALIMAT",
+      width: 150,
+      ellipsis: true,
+    },
+    {
+      title: "İş Süresi (dk.)",
+      dataIndex: "IST_CALISMA_SURE",
+      key: "IST_CALISMA_SURE",
+      width: 150,
+      ellipsis: true,
+      render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
+    },
+    {
+      title: "Duruş Süresi (dk.)",
+      dataIndex: "IST_DURUS_SURE",
+      key: "IST_DURUS_SURE",
+      width: 170,
+      ellipsis: true,
+      render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
+    },
+    {
+      title: "Personel Sayısı (kişi)",
+      dataIndex: "IST_PERSONEL_SAYI",
+      key: "IST_PERSONEL_SAYI",
+      width: 170,
+      ellipsis: true,
+      render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
+    },
     // Other columns...
   ];
 

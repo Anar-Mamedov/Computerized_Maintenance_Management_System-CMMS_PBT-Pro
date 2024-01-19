@@ -3,7 +3,7 @@ import { Button, Input, Modal, Table } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
 import dayjs from "dayjs";
 
-export default function FirmaTablo({ workshopSelectedId, onSubmit }) {
+export default function IdariAmiriTablo({ workshopSelectedId, onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -202,7 +202,7 @@ export default function FirmaTablo({ workshopSelectedId, onSubmit }) {
       <Modal
         width="1200px"
         centered
-        title="Firma Tanımları"
+        title="İdari Amiri"
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}>

@@ -27,7 +27,7 @@ const StyledDiv = styled.div`
   }
 `;
 
-export default function BakimNedeni() {
+export default function Departman() {
   const { control, setValue } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -118,9 +118,9 @@ export default function BakimNedeni() {
         rowGap: "0px",
       }}>
       {contextHolder}
-      <Text style={{ fontSize: "14px", minWidth: "40px" }}>Bakım Nedeni:</Text>
+      <Text style={{ fontSize: "14px", minWidth: "40px" }}>Departman:</Text>
       <Controller
-        name="bakimNedeni"
+        name="departman"
         control={control}
         render={({ field }) => (
           <StyledSelect
@@ -164,14 +164,14 @@ export default function BakimNedeni() {
             }))}
             onChange={(value) => {
               // Seçilen değerin ID'sini NedeniID alanına set et
-              setValue("bakimNedeniID", value);
+              setValue("departmanID", value);
               field.onChange(value);
             }}
           />
         )}
       />
       <Controller
-        name="bakimNedeniID"
+        name="departmanID"
         control={control}
         render={({ field }) => (
           <Input

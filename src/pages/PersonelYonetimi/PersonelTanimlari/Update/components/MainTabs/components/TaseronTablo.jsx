@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
 
-export default function OncelikTablo({ workshopSelectedId, onSubmit }) {
+export default function TaseronTablo({ workshopSelectedId, onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
@@ -88,7 +88,7 @@ export default function OncelikTablo({ workshopSelectedId, onSubmit }) {
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
-      <Modal width="1200px" title="Öncelik" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
+      <Modal width="1200px" title="Taşeron" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <Table
           rowSelection={{
             type: "radio",
