@@ -5,14 +5,21 @@ import AxiosInstance from "../../../../../../../../../api/http";
 import { Controller, useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
 
-export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh }) {
+export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenBakimID }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const methods = useForm({
     defaultValues: {
-      siraNo: "",
       secilenID: "",
-      isTanimi: "",
-      aciklama: "",
+      malzemeKoduTanim: "",
+      malzemeKoduID: "",
+      malzemeTanimi: "",
+      malzemeTipi: null,
+      malzemeTipiID: "",
+      mazemeMiktari: "",
+      miktarBirim: null,
+      miktarBirimID: "",
+      mazemeFiyati: "",
+      mazemeMaliyeti: "",
       // Add other default values here
     },
   });
@@ -23,15 +30,24 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh })
 
   const onSubmited = (data) => {
     const Body = {
-      MRK_MARKA: data.siraNo,
-      MRK_TANIM: data.isTanimi,
-      MKR_ACIKLAMA: data.aciklama,
+      ISK_IS_TANIM_ID: secilenBakimID,
+      ISM_STOK_KOD: data.malzemeKoduTanim,
+      ISM_STOK_ID: data.malzemeKoduID,
+      ISM_STOK_TANIM: data.malzemeTanimi,
+      ISM_STOK_TIP: data.malzemeTipi,
+      ISM_STOK_TIP_KOD_ID: data.malzemeTipiID,
+      ISM_MIKTAR: data.mazemeMiktari,
+      ISM_BIRIM: data.miktarBirim,
+      ISM_BIRIM_KOD_ID: data.miktarBirimID,
+      ISM_BIRIM_FIYAT: data.mazemeFiyati,
+      ISM_TUTAR: data.mazemeMaliyeti,
     };
 
-    AxiosInstance.post("AddMakineMarkaTest", Body)
+    AxiosInstance.post("AddIsTanimMalzeme", Body)
       .then((response) => {
         console.log("Data sent successfully:", response.data);
         reset();
+        onRefresh(); // Tabloyu yenile
       })
       .catch((error) => {
         console.error("Error sending data:", error);

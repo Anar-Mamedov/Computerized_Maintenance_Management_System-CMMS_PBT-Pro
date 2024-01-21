@@ -16,64 +16,107 @@ export default function Tablo() {
 
   const columns = [
     {
-      title: "Proje Kodu",
-      dataIndex: "code",
-      key: "code",
+      title: "Malzeme Kodu",
+      dataIndex: "ISM_STOK_KOD",
+      key: "ISM_STOK_KOD",
       width: 200,
       ellipsis: true,
+      align: "center",
+      render: (text) => <div style={{ textAlign: "left" }}>{text}</div>,
     },
     {
-      title: "Proje Tanımı",
-      dataIndex: "subject",
-      key: "subject",
-      width: 300,
-      ellipsis: true,
-    },
-    {
-      title: "Proje Tipi",
-      dataIndex: "type",
-      key: "type",
+      title: "Malzeme Tanımı",
+      dataIndex: "ISM_STOK_TANIM",
+      key: "ISM_STOK_TANIM",
       width: 200,
       ellipsis: true,
+      align: "center",
+      render: (text) => <div style={{ textAlign: "left" }}>{text}</div>,
     },
     {
-      title: "Başlama Tarihi",
-      dataIndex: "startDate",
-      key: "startDate",
+      title: "Miktar",
+      dataIndex: "ISM_MIKTAR",
+      key: "ISM_MIKTAR",
       width: 200,
       ellipsis: true,
+      align: "center",
+      render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
     },
     {
-      title: "Bitiş Tarihi",
-      dataIndex: "endDate",
-      key: "endDate",
+      title: "Birim",
+      dataIndex: "ISM_BIRIM",
+      key: "ISM_BIRIM",
       width: 200,
       ellipsis: true,
+      align: "center",
+      render: (text) => <div style={{ textAlign: "left" }}>{text}</div>,
+    },
+    {
+      title: "Birim Fiyat",
+      dataIndex: "ISM_BIRIM_FIYAT",
+      key: "ISM_BIRIM_FIYAT",
+      width: 200,
+      ellipsis: true,
+      align: "center",
+      render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
+    },
+    {
+      title: "Maliyet",
+      dataIndex: "ISM_TUTAR",
+      key: "ISM_TUTAR",
+      width: 200,
+      ellipsis: true,
+      align: "center",
+      render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
+    },
+    {
+      title: "Açıklama",
+      dataIndex: "ISM_ACIKLAMA",
+      key: "ISM_ACIKLAMA",
+      width: 200,
+      ellipsis: true,
+      align: "center",
+      render: (text) => <div style={{ textAlign: "left" }}>{text}</div>,
     },
   ];
 
-  const lokasyonId = watch("selectedLokasyonId");
+  const secilenBakimID = watch("secilenBakimID");
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`GetProjeList?lokasyonId=${lokasyonId}`)
+    AxiosInstance.get(`GetIsTanimMazleme?isTanimID=${secilenBakimID}`)
       .then((response) => {
-        const fetchedData = response.Proje_Liste.map((item) => ({
-          key: item.TB_PROJE_ID,
-          code: item.PRJ_KOD,
-          subject: item.PRJ_TANIM,
-          type: item.PRJ_TIP,
-          startDate: dayjs(item.PRJ_BASLAMA_TARIH).format("DD-MM-YYYY"),
-          endDate: dayjs(item.PRJ_BITIS_TARIH).format("DD-MM-YYYY"),
+        const fetchedData = response.map((item) => ({
+          key: item.TB_IS_TANIM_MLZ_ID,
+          ISM_STOK_ID: item.ISM_STOK_ID,
+          ISM_IS_TANIM_ID: item.ISM_IS_TANIM_ID,
+          ISM_DEPO_ID: item.ISM_DEPO_ID,
+          ISM_STOK_KOD: item.ISM_STOK_KOD,
+          ISM_STOK_TANIM: item.ISM_STOK_TANIM,
+          ISM_STOK_TIP_KOD_ID: item.ISM_STOK_TIP_KOD_ID,
+          ISM_STOK_TIP: item.ISM_STOK_TIP,
+          ISM_MIKTAR: item.ISM_MIKTAR,
+          ISM_TUTAR: item.ISM_TUTAR,
+          ISM_BIRIM_FIYAT: item.ISM_BIRIM_FIYAT,
+          ISM_BIRIM_KOD_ID: item.ISM_BIRIM_KOD_ID,
+          ISM_BIRIM: item.ISM_BIRIM,
+          ISM_OLUSTURMA_TARIH: item.ISM_OLUSTURMA_TARIH,
+          ISM_DEGISTIRME_TARIH: item.ISM_DEGISTIRME_TARIH,
+          ISM_OLUSTURAN_ID: item.ISM_OLUSTURAN_ID,
+          ISM_DEGISTIREN_ID: item.ISM_DEGISTIREN_ID,
+          ISM_ACIKLAMA: item.ISM_ACIKLAMA,
         }));
         setData(fetchedData);
       })
       .finally(() => setLoading(false));
-  }, [lokasyonId]);
+  }, [secilenBakimID]);
 
   useEffect(() => {
-    fetch();
-  }, [fetch]);
+    if (secilenBakimID) {
+      // secilenBakimID'nin varlığını ve geçerliliğini kontrol edin
+      fetch(); // fetch fonksiyonunu çağırın
+    }
+  }, [secilenBakimID, fetch]); // secilenBakimID veya fetch fonksiyonu değiştiğinde useEffect'i tetikle
 
   const onRowSelectChange = (selectedKeys) => {
     setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
@@ -90,7 +133,7 @@ export default function Tablo() {
 
   return (
     <div>
-      <CreateModal onRefresh={refreshTable} />
+      <CreateModal onRefresh={refreshTable} secilenBakimID={secilenBakimID} />
       <Table
         rowSelection={{
           type: "radio",

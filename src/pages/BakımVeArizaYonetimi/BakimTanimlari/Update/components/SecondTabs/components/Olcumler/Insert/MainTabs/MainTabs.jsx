@@ -53,16 +53,9 @@ export default function MainTabs() {
   const formatDecimal = (value, decimalPlaces) => {
     if (!value && value !== 0) return value;
 
-    // Nokta ile ayrılmış ondalık ve tam sayı kısımlarını al
-    let [integer, decimal] = value.toString().replace(",", ".").split(".");
-
-    if (!decimal) decimal = "";
-
-    // toFixed ile yuvarlama yap ve sonucu string olarak al
-    const rounded = parseFloat(`${integer}.${decimal}`).toFixed(decimalPlaces);
-
-    // Sonucu virgül ile ayrılmış formata çevir
-    return rounded.replace(".", ",");
+    // Virgülü noktaya çevir ve toFixed ile yuvarla
+    value = value.toString().replace(",", ".");
+    return parseFloat(value).toFixed(decimalPlaces);
   };
 
   useEffect(() => {
@@ -75,29 +68,27 @@ export default function MainTabs() {
     if (focusedField !== "olcumLimit" && olcumLimitRef.current) {
       setValue("olcumLimit", formatDecimal(watch("olcumLimit"), decimalPlaces), { shouldValidate: true });
     }
-    if (focusedField !== "minimumDeger" && minimumDegerRef.current) {
-      setValue("minimumDeger", formatDecimal(watch("minimumDeger"), decimalPlaces), { shouldValidate: true });
-    }
-    if (focusedField !== "maximumDeger" && maximumDegerRef.current) {
-      setValue("maximumDeger", formatDecimal(watch("maximumDeger"), decimalPlaces), { shouldValidate: true });
-    }
-    // ... Diğer alanlar için benzer koşullar ...
 
     // Hedef Değer ve Ölçüm Limiti hesapla
     const hesaplaVeGuncelle = () => {
       if (focusedField !== "hedefDeger" && focusedField !== "olcumLimit") {
-        // String'i sayıya çevirirken virgülü noktaya dönüştür
-        const maxDeger =
-          parseFloat((hedefDeger || "0").replace(",", ".")) + parseFloat((olcumLimit || "0").replace(",", "."));
-        setValue("maximumDeger", maxDeger.toFixed(decimalPlaces).replace(".", ","), { shouldValidate: true });
+        // Değerleri sayısal formata çevir
+        const hedefDegerFloat = parseFloat((watch("hedefDeger") || "0").replace(",", "."));
+        const olcumLimitFloat = parseFloat((watch("olcumLimit") || "0").replace(",", "."));
 
-        const minDeger =
-          parseFloat((hedefDeger || "0").replace(",", ".")) - parseFloat((olcumLimit || "0").replace(",", "."));
-        setValue("minimumDeger", minDeger.toFixed(decimalPlaces).replace(".", ","), { shouldValidate: true });
+        // Maksimum ve minimum değerleri hesapla
+        const maxDeger = hedefDegerFloat + olcumLimitFloat;
+        const minDeger = hedefDegerFloat - olcumLimitFloat;
+
+        // Değerleri ayarla
+        setValue("maximumDeger", maxDeger.toFixed(decimalPlaces)); // Virgülü kaldırdık
+        setValue("minimumDeger", minDeger.toFixed(decimalPlaces)); // Virgülü kaldırdık
       }
     };
 
     hesaplaVeGuncelle();
+
+    // ... Diğer alanlar için benzer koşullar ...
   }, [hedefDeger, olcumLimit, ondalikSayi, setValue, focusedField]);
 
   const onFocus = (name) => {
@@ -299,7 +290,12 @@ export default function MainTabs() {
                   style={{ flex: 1 }}
                   ref={hedefDegerRef}
                   onFocus={() => onFocus("hedefDeger")}
-                  onBlur={() => onBlur("hedefDeger")}
+                  onBlur={(e) => {
+                    onBlur("hedefDeger");
+                    const decimalPlaces = parseInt(ondalikSayi, 10) || 0;
+                    const formattedValue = formatDecimal(e.target.value, decimalPlaces);
+                    field.onChange(formattedValue);
+                  }}
                   onKeyPress={(e) => {
                     const value = field.value;
                     // Rakam veya bir virgül olup olmadığını kontrol et
@@ -342,7 +338,12 @@ export default function MainTabs() {
                   style={{ flex: 1 }}
                   ref={olcumLimitRef}
                   onFocus={() => onFocus("olcumLimit")}
-                  onBlur={() => onBlur("olcumLimit")}
+                  onBlur={(e) => {
+                    onBlur("olcumLimit");
+                    const decimalPlaces = parseInt(ondalikSayi, 10) || 0;
+                    const formattedValue = formatDecimal(e.target.value, decimalPlaces);
+                    field.onChange(formattedValue);
+                  }}
                   onKeyPress={(e) => {
                     const value = field.value;
                     // Rakam veya bir virgül olup olmadığını kontrol et

@@ -5,14 +5,20 @@ import AxiosInstance from "../../../../../../../../../api/http";
 import { Controller, useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
 
-export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh }) {
+export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenBakimID }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const methods = useForm({
     defaultValues: {
-      siraNo: "",
       secilenID: "",
-      isTanimi: "",
-      aciklama: "",
+      olcumSiraNo: "",
+      olcumTanim: "",
+      birim: null,
+      birimID: "",
+      ondalikSayi: "",
+      hedefDeger: "",
+      olcumLimit: "",
+      minimumDeger: "",
+      maximumDeger: "",
       // Add other default values here
     },
   });
@@ -23,15 +29,23 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh })
 
   const onSubmited = (data) => {
     const Body = {
-      MRK_MARKA: data.siraNo,
-      MRK_TANIM: data.isTanimi,
-      MKR_ACIKLAMA: data.aciklama,
+      IOC_IS_TANIM_ID: secilenBakimID,
+      IOC_SIRA_NO: data.olcumSiraNo,
+      IOC_TANIM: data.olcumTanim,
+      // IOC_BIRIM: data.birim,
+      IOC_BIRIM_KOD_ID: data.birimID,
+      IOC_FORMAT: data.ondalikSayi,
+      IOC_HEDEF_DEGER: data.hedefDeger,
+      IOC_MIN_MAX_DEGER: data.olcumLimit,
+      IOC_MIN_DEGER: data.minimumDeger,
+      IOC_MAX_DEGER: data.maximumDeger,
     };
 
-    AxiosInstance.post("AddMakineMarkaTest", Body)
+    AxiosInstance.post("AddIsTanimOlcum", Body)
       .then((response) => {
         console.log("Data sent successfully:", response.data);
         reset();
+        onRefresh(); // Tabloyu yenile
       })
       .catch((error) => {
         console.error("Error sending data:", error);
@@ -64,12 +78,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh })
           </Button>
         </div>
 
-        <Modal
-          width="800px"
-          title="Malzeme Ekle"
-          open={isModalVisible}
-          onOk={handleModalOk}
-          onCancel={handleModalToggle}>
+        <Modal width="800px" title="Ölçüm Ekle" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
           <MainTabs />
         </Modal>
       </div>

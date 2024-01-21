@@ -29,7 +29,28 @@ export default function MainTabs() {
   const handleMalzemeMinusClick = () => {
     setValue("malzemeKoduTanim", "");
     setValue("malzemeKoduID", "");
+    setValue("malzemeTanimi", "");
+    setValue("malzemeTipi", null);
+    setValue("malzemeTipiID", "");
+    setValue("mazemeFiyati", "");
+    setValue("miktarBirim", null);
+    setValue("miktarBirimID", "");
   };
+
+  const mazemeMiktari = watch("mazemeMiktari");
+  const mazemeFiyati = watch("mazemeFiyati");
+
+  useEffect(() => {
+    // mazemeMiktari ve mazemeFiyati'nin sayısal değerler olduğundan emin olun
+    const miktari = parseFloat(mazemeMiktari) || 1;
+    const fiyati = parseFloat(mazemeFiyati) || 0;
+
+    // Maliyeti hesaplayın
+    const mazemeMaliyeti = miktari * fiyati;
+
+    // Hesaplanan maliyeti bir form alanına ayarlayın
+    setValue("mazemeMaliyeti", mazemeMaliyeti);
+  }, [mazemeMiktari, mazemeFiyati, setValue]);
 
   return (
     <div>
@@ -87,8 +108,14 @@ export default function MainTabs() {
             />
             <MalzemeTablo
               onSubmit={(selectedData) => {
-                setValue("malzemeKoduTanim", selectedData.subject);
+                setValue("malzemeKoduTanim", selectedData.code);
                 setValue("malzemeKoduID", selectedData.key);
+                setValue("malzemeTanimi", selectedData.subject);
+                setValue("malzemeTipi", selectedData.workdays);
+                setValue("malzemeTipiID", selectedData.workdaysID);
+                setValue("mazemeFiyati", selectedData.unitPrice);
+                setValue("miktarBirim", selectedData.description);
+                setValue("miktarBirimID", selectedData.descriptionID);
               }}
             />
             <Button onClick={handleMalzemeMinusClick}> - </Button>

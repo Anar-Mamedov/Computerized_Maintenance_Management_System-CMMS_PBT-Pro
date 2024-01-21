@@ -16,64 +16,104 @@ export default function Tablo() {
 
   const columns = [
     {
-      title: "Proje Kodu",
-      dataIndex: "code",
-      key: "code",
+      title: "Sira No",
+      dataIndex: "IOC_SIRA_NO",
+      key: "IOC_SIRA_NO",
       width: 200,
       ellipsis: true,
+      align: "center",
+      render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
     },
     {
-      title: "Proje Tanımı",
-      dataIndex: "subject",
-      key: "subject",
-      width: 300,
-      ellipsis: true,
-    },
-    {
-      title: "Proje Tipi",
-      dataIndex: "type",
-      key: "type",
+      title: "Tanım",
+      dataIndex: "IOC_TANIM",
+      key: "IOC_TANIM",
       width: 200,
       ellipsis: true,
+      align: "center",
+      render: (text) => <div style={{ textAlign: "left" }}>{text}</div>,
     },
     {
-      title: "Başlama Tarihi",
-      dataIndex: "startDate",
-      key: "startDate",
+      title: "Hedef Değer",
+      dataIndex: "IOC_HEDEF_DEGER",
+      key: "IOC_HEDEF_DEGER",
       width: 200,
       ellipsis: true,
+      align: "center",
+      render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
     },
     {
-      title: "Bitiş Tarihi",
-      dataIndex: "endDate",
-      key: "endDate",
+      title: "Ondalık",
+      dataIndex: "IOC_FORMAT",
+      key: "IOC_FORMAT",
       width: 200,
       ellipsis: true,
+      align: "center",
+      render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
+    },
+    {
+      title: "Limit",
+      dataIndex: "IOC_MIN_MAX_DEGER",
+      key: "IOC_MIN_MAX_DEGER",
+      width: 200,
+      ellipsis: true,
+      align: "center",
+      render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
+    },
+    {
+      title: "Min Değer",
+      dataIndex: "IOC_MIN_DEGER",
+      key: "IOC_MIN_DEGER",
+      width: 200,
+      ellipsis: true,
+      align: "center",
+      render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
+    },
+    {
+      title: "Max Değer",
+      dataIndex: "IOC_MAX_DEGER",
+      key: "IOC_MAX_DEGER",
+      width: 200,
+      ellipsis: true,
+      align: "center",
+      render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
     },
   ];
 
-  const lokasyonId = watch("selectedLokasyonId");
+  const secilenBakimID = watch("secilenBakimID");
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`GetProjeList?lokasyonId=${lokasyonId}`)
+    AxiosInstance.get(`GetIsTanimOlcum?isTanimID=${secilenBakimID}`)
       .then((response) => {
-        const fetchedData = response.Proje_Liste.map((item) => ({
-          key: item.TB_PROJE_ID,
-          code: item.PRJ_KOD,
-          subject: item.PRJ_TANIM,
-          type: item.PRJ_TIP,
-          startDate: dayjs(item.PRJ_BASLAMA_TARIH).format("DD-MM-YYYY"),
-          endDate: dayjs(item.PRJ_BITIS_TARIH).format("DD-MM-YYYY"),
+        const fetchedData = response.map((item) => ({
+          key: item.TB_IS_TANIM_OLCUM_PARAMETRE_ID,
+          IOC_IS_TANIM_ID: item.IOC_IS_TANIM_ID,
+          IOC_SIRA_NO: item.IOC_SIRA_NO,
+          IOC_TANIM: item.IOC_TANIM,
+          IOC_BIRIM_KOD_ID: item.IOC_BIRIM_KOD_ID,
+          IOC_BIRIM: item.IOC_BIRIM,
+          IOC_HEDEF_DEGER: item.IOC_HEDEF_DEGER,
+          IOC_MIN_MAX_DEGER: item.IOC_MIN_MAX_DEGER,
+          IOC_MIN_DEGER: item.IOC_MIN_DEGER,
+          IOC_MAX_DEGER: item.IOC_MAX_DEGER,
+          IOC_FORMAT: item.IOC_FORMAT,
+          IOC_OLUSTURAN_ID: item.IOC_OLUSTURAN_ID,
+          IOC_OLUSTURMA_TARIH: item.IOC_OLUSTURMA_TARIH,
+          IOC_DEGISTIREN_ID: item.IOC_DEGISTIREN_ID,
+          IOC_DEGISTIRME_TARIH: item.IOC_DEGISTIRME_TARIH,
         }));
         setData(fetchedData);
       })
       .finally(() => setLoading(false));
-  }, [lokasyonId]);
+  }, [secilenBakimID]);
 
   useEffect(() => {
-    fetch();
-  }, [fetch]);
+    if (secilenBakimID) {
+      // secilenBakimID'nin varlığını ve geçerliliğini kontrol edin
+      fetch(); // fetch fonksiyonunu çağırın
+    }
+  }, [secilenBakimID, fetch]); // secilenBakimID veya fetch fonksiyonu değiştiğinde useEffect'i tetikle
 
   const onRowSelectChange = (selectedKeys) => {
     setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
@@ -90,7 +130,7 @@ export default function Tablo() {
 
   return (
     <div>
-      <CreateModal onRefresh={refreshTable} />
+      <CreateModal onRefresh={refreshTable} secilenBakimID={secilenBakimID} />
       <Table
         rowSelection={{
           type: "radio",

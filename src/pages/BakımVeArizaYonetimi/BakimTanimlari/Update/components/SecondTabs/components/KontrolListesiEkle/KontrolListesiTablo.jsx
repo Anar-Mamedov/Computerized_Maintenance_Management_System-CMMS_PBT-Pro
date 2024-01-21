@@ -16,64 +16,55 @@ export default function KontrolListesiTablo() {
 
   const columns = [
     {
-      title: "Proje Kodu",
-      dataIndex: "code",
-      key: "code",
+      title: "Sıra No",
+      dataIndex: "ISK_SIRANO",
+      key: "ISK_SIRANO",
+      width: 40,
+      ellipsis: true,
+    },
+    {
+      title: "Tanım",
+      dataIndex: "ISK_TANIM",
+      key: "ISK_TANIM",
       width: 200,
       ellipsis: true,
     },
     {
-      title: "Proje Tanımı",
-      dataIndex: "subject",
-      key: "subject",
-      width: 300,
-      ellipsis: true,
-    },
-    {
-      title: "Proje Tipi",
-      dataIndex: "type",
-      key: "type",
-      width: 200,
-      ellipsis: true,
-    },
-    {
-      title: "Başlama Tarihi",
-      dataIndex: "startDate",
-      key: "startDate",
-      width: 200,
-      ellipsis: true,
-    },
-    {
-      title: "Bitiş Tarihi",
-      dataIndex: "endDate",
-      key: "endDate",
+      title: "Açıklama",
+      dataIndex: "ISK_ACIKLAMA",
+      key: "ISK_ACIKLAMA",
       width: 200,
       ellipsis: true,
     },
   ];
 
-  const lokasyonId = watch("selectedLokasyonId");
+  const secilenBakimID = watch("secilenBakimID");
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`GetProjeList?lokasyonId=${lokasyonId}`)
+    AxiosInstance.get(`IsTanimKontrolList?isTanimID=${secilenBakimID}`)
       .then((response) => {
-        const fetchedData = response.Proje_Liste.map((item) => ({
-          key: item.TB_PROJE_ID,
-          code: item.PRJ_KOD,
-          subject: item.PRJ_TANIM,
-          type: item.PRJ_TIP,
-          startDate: dayjs(item.PRJ_BASLAMA_TARIH).format("DD-MM-YYYY"),
-          endDate: dayjs(item.PRJ_BITIS_TARIH).format("DD-MM-YYYY"),
+        const fetchedData = response.map((item) => ({
+          key: item.TB_IS_TANIM_KONROLLIST_ID,
+          ISK_SIRANO: item.ISK_SIRANO,
+          ISK_TANIM: item.ISK_TANIM,
+          ISK_ACIKLAMA: item.ISK_ACIKLAMA,
         }));
         setData(fetchedData);
       })
+      .catch((error) => {
+        // Hata işleme
+        console.error("API isteği sırasında hata oluştu:", error);
+      })
       .finally(() => setLoading(false));
-  }, [lokasyonId]);
+  }, [secilenBakimID]); // secilenBakimID değiştiğinde fetch fonksiyonunu güncelle
 
   useEffect(() => {
-    fetch();
-  }, [fetch]);
+    if (secilenBakimID) {
+      // secilenBakimID'nin varlığını ve geçerliliğini kontrol edin
+      fetch(); // fetch fonksiyonunu çağırın
+    }
+  }, [secilenBakimID, fetch]); // secilenBakimID veya fetch fonksiyonu değiştiğinde useEffect'i tetikle
 
   const onRowSelectChange = (selectedKeys) => {
     setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
@@ -90,7 +81,7 @@ export default function KontrolListesiTablo() {
 
   return (
     <div>
-      <CreateModal onRefresh={refreshTable} />
+      <CreateModal onRefresh={refreshTable} secilenBakimID={secilenBakimID} />
       <Table
         rowSelection={{
           type: "radio",
