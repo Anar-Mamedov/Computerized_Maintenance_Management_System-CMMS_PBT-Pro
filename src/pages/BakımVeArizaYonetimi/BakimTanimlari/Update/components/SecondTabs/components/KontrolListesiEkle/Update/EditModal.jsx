@@ -22,15 +22,18 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
 
   const onSubmited = (data) => {
     const Body = {
-      MRK_MARKA: data.siraNo,
-      MRK_TANIM: data.isTanimi,
-      MKR_ACIKLAMA: data.aciklama,
+      TB_IS_TANIM_KONROLLIST_ID: data.secilenID,
+      ISK_SIRANO: data.siraNo,
+      ISK_TANIM: data.isTanimi,
+      ISK_ACIKLAMA: data.aciklama,
     };
 
-    AxiosInstance.post("AddMakineMarkaTest", Body)
+    AxiosInstance.post("UpdateIsTanimKontrolList", Body)
       .then((response) => {
         console.log("Data sent successfully:", response.data);
         reset();
+        onModalClose(); // Modal'ı kapat
+        onRefresh(); // Tabloyu yenile
       })
       .catch((error) => {
         console.error("Error sending data:", error);
@@ -55,18 +58,9 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       //   console.log(key, selectedRow[key]);
       //   setValue(key, selectedRow[key]);
       setValue("secilenID", selectedRow.key);
-      setValue("isTanimi", selectedRow.code);
-      setValue("vardiyaBaslangicSaati", dayjs(`1970-01-01T${selectedRow.VAR_BASLAMA_SAATI}`));
-      setValue("vardiyaBitisSaati", dayjs(`1970-01-01T${selectedRow.VAR_BITIS_SAATI}`));
-      setValue("vardiyaTipi", selectedRow.VAR_VARDIYA_TIPI);
-      setValue("vardiyaTipiID", selectedRow.VAR_VARDIYA_TIPI_KOD_ID);
-      setValue("lokasyonTanim", selectedRow.VAR_LOKASYON);
-      setValue("lokasyonID", selectedRow.VAR_LOKASYON_ID);
-      setValue("vardiyaProjeTanim", selectedRow.VAR_PROJE);
-      setValue("vardiyaProjeID", selectedRow.VAR_PROJE_ID);
-      setValue("varsayilanVardiya", selectedRow.VAR_VARSAYILAN);
-      setValue("gosterimRengi", selectedRow.VAR_RENK);
-      setValue("vardiyaAciklama", selectedRow.VAR_ACIKLAMA);
+      setValue("siraNo", selectedRow.ISK_SIRANO);
+      setValue("isTanimi", selectedRow.ISK_TANIM);
+      setValue("aciklama", selectedRow.ISK_ACIKLAMA);
       // add more fields as needed
 
       // });

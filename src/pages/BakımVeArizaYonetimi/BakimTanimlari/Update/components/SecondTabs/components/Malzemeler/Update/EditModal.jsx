@@ -8,10 +8,17 @@ import MainTabs from "./MainTabs/MainTabs";
 export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh }) {
   const methods = useForm({
     defaultValues: {
-      siraNo: "",
       secilenID: "",
-      isTanimi: "",
-      aciklama: "",
+      malzemeKoduTanim: "",
+      malzemeKoduID: "",
+      malzemeTanimi: "",
+      malzemeTipi: null,
+      malzemeTipiID: "",
+      mazemeMiktari: "",
+      miktarBirim: null,
+      miktarBirimID: "",
+      mazemeFiyati: "",
+      mazemeMaliyeti: "",
       // Add other default values here
     },
   });
@@ -22,15 +29,25 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
 
   const onSubmited = (data) => {
     const Body = {
-      MRK_MARKA: data.siraNo,
-      MRK_TANIM: data.isTanimi,
-      MKR_ACIKLAMA: data.aciklama,
+      TB_IS_TANIM_MLZ_ID: data.secilenID,
+      ISM_STOK_KOD: data.malzemeKoduTanim,
+      ISM_STOK_ID: data.malzemeKoduID,
+      ISM_STOK_TANIM: data.malzemeTanimi,
+      ISM_STOK_TIP: data.malzemeTipi,
+      ISM_STOK_TIP_KOD_ID: data.malzemeTipiID,
+      ISM_MIKTAR: data.mazemeMiktari,
+      ISM_BIRIM: data.miktarBirim,
+      ISM_BIRIM_KOD_ID: data.miktarBirimID,
+      ISM_BIRIM_FIYAT: data.mazemeFiyati,
+      ISM_TUTAR: data.mazemeMaliyeti,
     };
 
-    AxiosInstance.post("AddMakineMarkaTest", Body)
+    AxiosInstance.post("UpdateIsTanimMalzeme", Body)
       .then((response) => {
         console.log("Data sent successfully:", response.data);
         reset();
+        onModalClose(); // Modal'ı kapat
+        onRefresh(); // Tabloyu yenile
       })
       .catch((error) => {
         console.error("Error sending data:", error);
@@ -55,18 +72,16 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       //   console.log(key, selectedRow[key]);
       //   setValue(key, selectedRow[key]);
       setValue("secilenID", selectedRow.key);
-      setValue("isTanimi", selectedRow.code);
-      setValue("vardiyaBaslangicSaati", dayjs(`1970-01-01T${selectedRow.VAR_BASLAMA_SAATI}`));
-      setValue("vardiyaBitisSaati", dayjs(`1970-01-01T${selectedRow.VAR_BITIS_SAATI}`));
-      setValue("vardiyaTipi", selectedRow.VAR_VARDIYA_TIPI);
-      setValue("vardiyaTipiID", selectedRow.VAR_VARDIYA_TIPI_KOD_ID);
-      setValue("lokasyonTanim", selectedRow.VAR_LOKASYON);
-      setValue("lokasyonID", selectedRow.VAR_LOKASYON_ID);
-      setValue("vardiyaProjeTanim", selectedRow.VAR_PROJE);
-      setValue("vardiyaProjeID", selectedRow.VAR_PROJE_ID);
-      setValue("varsayilanVardiya", selectedRow.VAR_VARSAYILAN);
-      setValue("gosterimRengi", selectedRow.VAR_RENK);
-      setValue("vardiyaAciklama", selectedRow.VAR_ACIKLAMA);
+      setValue("malzemeKoduTanim", selectedRow.ISM_STOK_KOD);
+      setValue("malzemeKoduID", selectedRow.ISM_STOK_ID);
+      setValue("malzemeTanimi", selectedRow.ISM_STOK_TANIM);
+      setValue("malzemeTipi", selectedRow.ISM_STOK_TIP);
+      setValue("malzemeTipiID", selectedRow.ISM_STOK_TIP_KOD_ID);
+      setValue("mazemeMiktari", selectedRow.ISM_MIKTAR);
+      setValue("miktarBirim", selectedRow.ISM_BIRIM);
+      setValue("miktarBirimID", selectedRow.ISM_BIRIM_KOD_ID);
+      setValue("mazemeFiyati", selectedRow.ISM_BIRIM_FIYAT);
+      setValue("mazemeMaliyeti", selectedRow.ISM_TUTAR);
       // add more fields as needed
 
       // });

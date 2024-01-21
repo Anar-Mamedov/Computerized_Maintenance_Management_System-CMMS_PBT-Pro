@@ -100,6 +100,7 @@ export default function MalzemeTablo({ workshopSelectedId, onSubmit }) {
           subject: item.STK_TANIM,
           workdays: item.STK_TIP,
           description: item.STK_BIRIM,
+          descriptionID: item.STK_BIRIM_KOD_ID,
           fifthcolumn: item.STK_GRUP,
           sixthcolumn: item.STK_LOKASYON,
           seventhcolumn: item.STK_ATOLYE,

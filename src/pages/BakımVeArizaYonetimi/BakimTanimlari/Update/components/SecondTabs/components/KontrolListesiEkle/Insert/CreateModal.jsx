@@ -5,7 +5,7 @@ import AxiosInstance from "../../../../../../../../../api/http";
 import { Controller, useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
 
-export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh }) {
+export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenBakimID }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const methods = useForm({
     defaultValues: {
@@ -23,12 +23,13 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh })
 
   const onSubmited = (data) => {
     const Body = {
-      MRK_MARKA: data.siraNo,
-      MRK_TANIM: data.isTanimi,
-      MKR_ACIKLAMA: data.aciklama,
+      ISK_IS_TANIM_ID: secilenBakimID,
+      ISK_SIRANO: data.siraNo,
+      ISK_TANIM: data.isTanimi,
+      ISK_ACIKLAMA: data.aciklama,
     };
 
-    AxiosInstance.post("AddMakineMarkaTest", Body)
+    AxiosInstance.post("AddIsTanimKontrolList", Body)
       .then((response) => {
         console.log("Data sent successfully:", response.data);
         reset();
