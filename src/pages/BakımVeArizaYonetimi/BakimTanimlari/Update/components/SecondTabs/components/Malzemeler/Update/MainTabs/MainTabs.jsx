@@ -26,6 +26,8 @@ const StyledDivBottomLine = styled.div`
 export default function MainTabs() {
   const { control, watch, setValue } = useFormContext();
 
+  const malzemeKoduTanim = watch("malzemeKoduTanim");
+
   const handleMalzemeMinusClick = () => {
     setValue("malzemeKoduTanim", "");
     setValue("malzemeKoduID", "");
@@ -112,7 +114,7 @@ export default function MainTabs() {
                 setValue("malzemeKoduID", selectedData.key);
                 setValue("malzemeTanimi", selectedData.subject);
                 setValue("malzemeTipi", selectedData.workdays);
-                setValue("malzemeTipiID", selectedData.workdaysID);
+                setValue("malzemeTipiID", selectedData.STK_TIP_KOD_ID);
                 setValue("mazemeFiyati", selectedData.unitPrice);
                 setValue("miktarBirim", selectedData.description);
                 setValue("miktarBirimID", selectedData.descriptionID);
@@ -148,7 +150,13 @@ export default function MainTabs() {
           <Controller
             name="malzemeTanimi"
             control={control}
-            render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+            render={({ field }) => (
+              <Input
+                {...field}
+                style={{ flex: 1 }}
+                disabled={!!malzemeKoduTanim} // malzemeKoduTanim varsa malzemeTanimi'ni devre dışı bırak
+              />
+            )}
           />
         </div>
       </div>

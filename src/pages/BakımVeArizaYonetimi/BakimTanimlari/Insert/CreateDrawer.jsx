@@ -66,6 +66,8 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
       personelSayisi: "",
       otonomBakim: false,
       periyot: "",
+      periyotID: "",
+      periyotLabel: "",
       periyotSiklik: "",
     },
   });
@@ -100,7 +102,7 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
       IST_PERSONEL_SAYI: data.personelSayisi,
       IST_OTONOM_BAKIM: data.otonomBakim,
       IST_UYARI_SIKLIGI: data.periyotSiklik,
-      IST_UYARI_PERIYOT: data.periyot,
+      IST_UYARI_PERIYOT: data.periyotID,
       IST_AKTIF: data.bakimAktif,
       // add more fields as needed
     };

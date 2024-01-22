@@ -112,6 +112,7 @@ export default function MalzemeTablo({ workshopSelectedId, onSubmit }) {
           unitPrice: item.STK_GIRIS_FIYAT_DEGERI,
           cost: item.STK_MALIYET,
           warehouseTable: item.STK_DEPO,
+          STK_TIP_KOD_ID: item.STK_TIP_KOD_ID,
         }));
         setData(fetchedData);
       })
