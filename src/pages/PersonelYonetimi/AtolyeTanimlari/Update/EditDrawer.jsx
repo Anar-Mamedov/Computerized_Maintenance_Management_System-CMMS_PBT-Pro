@@ -54,19 +54,16 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   //* export
   const methods = useForm({
     defaultValues: {
-      vardiyaTanimi: "",
-      secilenVardiyaID: "",
-      vardiyaBaslangicSaati: dayjs("08:00", "HH:mm"),
-      vardiyaBitisSaati: dayjs("18:00", "HH:mm"),
-      vardiyaTipi: null,
-      vardiyaTipiID: "",
-      lokasyonTanim: "",
-      lokasyonID: "",
-      vardiyaProjeTanim: "",
-      vardiyaProjeID: "",
-      varsayilanVardiya: false,
-      gosterimRengi: "#ffae00",
-      vardiyaAciklama: "",
+      atolyeKodu: "",
+      secilenID: "",
+      atolyeAktif: true,
+      atolyeTanimi: "",
+      atolyeGrubu: null,
+      atolyeGrubuID: "",
+      atolyeTelefon: "",
+      yetkili: "",
+      yetkiliEmail: "",
+      aciklama: "",
     },
   });
 
@@ -85,18 +82,14 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   //* export
   const onSubmit = (data) => {
     const Body = {
-      TB_VARDIYA_ID: data.secilenVardiyaID,
-      VAR_TANIM: data.vardiyaTanimi,
-      VAR_VARDIYA_TIPI_KOD_ID: data.vardiyaTipiID,
-      VAR_LOKASYON_ID: data.lokasyonID,
-      VAR_PROJE_ID: data.vardiyaProjeID,
-      VAR_VARSAYILAN: data.varsayilanVardiya,
-      // VAR_RENK: data.gosterimRengi,
-      VAR_ACIKLAMA: data.vardiyaAciklama,
-      VAR_BASLAMA_SAATI: formatTimeWithDayjs(data.vardiyaBaslangicSaati),
-      VAR_BITIS_SAATI: formatTimeWithDayjs(data.vardiyaBitisSaati),
-      VAR_DEGISTIREN_ID: 24,
-
+      ATL_KOD: data.atolyeKodu,
+      ATL_TANIM: data.atolyeTanimi,
+      ATL_ATOLYE_GRUP_ID: data.atolyeGrubuID,
+      ATL_TEL: data.atolyeTelefon,
+      ATL_AKTIF: data.atolyeAktif,
+      ATL_YETKILI: data.yetkili,
+      ATL_YETKILI_MAIL: data.yetkiliEmail,
+      ATL_ACIKLAMA: data.aciklama,
       // add more fields as needed
     };
 
@@ -104,7 +97,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     // handle response
     // });
 
-    AxiosInstance.post("UpdateVardiya", Body)
+    AxiosInstance.post("UpdateAtolye", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);
@@ -126,19 +119,15 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       // Object.keys(selectedRow).forEach((key) => {
       //   console.log(key, selectedRow[key]);
       //   setValue(key, selectedRow[key]);
-      setValue("secilenVardiyaID", selectedRow.key);
-      setValue("vardiyaTanimi", selectedRow.VAR_TANIM);
-      setValue("vardiyaBaslangicSaati", dayjs(`1970-01-01T${selectedRow.VAR_BASLAMA_SAATI}`));
-      setValue("vardiyaBitisSaati", dayjs(`1970-01-01T${selectedRow.VAR_BITIS_SAATI}`));
-      setValue("vardiyaTipi", selectedRow.VAR_VARDIYA_TIPI);
-      setValue("vardiyaTipiID", selectedRow.VAR_VARDIYA_TIPI_KOD_ID);
-      setValue("lokasyonTanim", selectedRow.VAR_LOKASYON);
-      setValue("lokasyonID", selectedRow.VAR_LOKASYON_ID);
-      setValue("vardiyaProjeTanim", selectedRow.VAR_PROJE);
-      setValue("vardiyaProjeID", selectedRow.VAR_PROJE_ID);
-      setValue("varsayilanVardiya", selectedRow.VAR_VARSAYILAN);
-      setValue("gosterimRengi", selectedRow.VAR_RENK);
-      setValue("vardiyaAciklama", selectedRow.VAR_ACIKLAMA);
+      setValue("secilenID", selectedRow.key);
+      setValue("atolyeKodu", selectedRow.ATL_KOD);
+      setValue("atolyeTanimi", selectedRow.ATL_TANIM);
+      setValue("atolyeGrubu", selectedRow.ALT_GRUP_TANIM);
+      setValue("atolyeGrubuID", selectedRow.ATL_ATOLYE_GRUP_ID);
+      setValue("atolyeTelefon", selectedRow.ATL_TEL);
+      setValue("atolyeAktif", selectedRow.ATL_AKTIF);
+      setValue("yetkili", selectedRow.ATL_YETKILI);
+      setValue("yetkiliEmail", selectedRow.ATL_YETKILI_MAIL);
       // add more fields as needed
 
       // });

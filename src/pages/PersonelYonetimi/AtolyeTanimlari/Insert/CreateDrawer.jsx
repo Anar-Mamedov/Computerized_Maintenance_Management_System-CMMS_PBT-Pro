@@ -41,19 +41,15 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
   //* export
   const methods = useForm({
     defaultValues: {
-      vardiyaTanimi: "",
-      secilenVardiyaID: "",
-      vardiyaBaslangicSaati: dayjs("08:00", "HH:mm"),
-      vardiyaBitisSaati: dayjs("18:00", "HH:mm"),
-      vardiyaTipi: null,
-      vardiyaTipiID: "",
-      lokasyonTanim: "",
-      lokasyonID: "",
-      vardiyaProjeTanim: "",
-      vardiyaProjeID: "",
-      varsayilanVardiya: false,
-      gosterimRengi: "#ffae00",
-      vardiyaAciklama: "",
+      atolyeKodu: "",
+      secilenID: "",
+      atolyeAktif: true,
+      atolyeTanimi: "",
+      atolyeGrubu: null,
+      atolyeGrubuID: "",
+      atolyeTelefon: "",
+      yetkili: "",
+      yetkiliEmail: "",
     },
   });
 
@@ -72,17 +68,13 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
   //* export
   const onSubmit = (data) => {
     const Body = {
-      VAR_TANIM: data.vardiyaTanimi,
-      VAR_VARDIYA_TIPI_KOD_ID: data.vardiyaTipiID,
-      VAR_LOKASYON_ID: data.lokasyonID,
-      VAR_PROJE_ID: data.vardiyaProjeID,
-      VAR_VARSAYILAN: data.varsayilanVardiya ? 1 : 0,
-      VAR_MOLA_SURESI: 1,
-      // VAR_RENK: data.gosterimRengi,
-      VAR_ACIKLAMA: data.vardiyaAciklama,
-      VAR_BASLAMA_SAATI: formatTimeWithDayjs(data.vardiyaBaslangicSaati),
-      VAR_BITIS_SAATI: formatTimeWithDayjs(data.vardiyaBitisSaati),
-      VAR_OLUSTURAN_ID: 24,
+      ATL_KOD: data.atolyeKodu,
+      ATL_TANIM: data.atolyeTanimi,
+      ATL_ATOLYE_GRUP_ID: data.atolyeGrubuID,
+      ATL_TEL: data.atolyeTelefon,
+      ATL_AKTIF: data.atolyeAktif,
+      ATL_YETKILI: data.yetkili,
+      ATL_YETKILI_MAIL: data.yetkiliEmail,
 
       // add more fields as needed
     };
@@ -91,7 +83,7 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
     // handle response
     // });
 
-    AxiosInstance.post("AddVardiya", Body)
+    AxiosInstance.post("AddAtolye", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);

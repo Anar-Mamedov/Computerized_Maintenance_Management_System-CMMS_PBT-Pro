@@ -80,6 +80,30 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       otonomBakim: false,
       periyot: "",
       periyotSiklik: "",
+      maliyetlerMalzeme: "",
+      maliyetlerIscilik: "",
+      maliyetlerGenelGider: "",
+      maliyetlerToplam: "",
+      lojistikSuresi: "",
+      seyahetSuresi: "",
+      onaySuresi: "",
+      beklemeSuresi: "",
+      digerSuresi: "",
+      ozelAlan1: "",
+      ozelAlan2: "",
+      ozelAlan3: "",
+      ozelAlan4: "",
+      ozelAlan5: "",
+      ozelAlan6: null,
+      ozelAlan6ID: "",
+      ozelAlan7: null,
+      ozelAlan7ID: "",
+      ozelAlan8: null,
+      ozelAlan8ID: "",
+      ozelAlan9: "",
+      ozelAlan10: "",
+      aciklama: "",
+      // add more fields as needed
     },
   });
 
@@ -116,6 +140,29 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       IST_UYARI_SIKLIGI: data.periyotSiklik,
       IST_UYARI_PERIYOT: data.periyot,
       IST_AKTIF: data.bakimAktif,
+      IST_MALZEME_MALIYET: data.maliyetlerMalzeme,
+      IST_ISCILIK_MALIYET: data.maliyetlerIscilik,
+      IST_GENEL_GIDER_MALIYET: data.maliyetlerGenelGider,
+      IST_TOPLAM_MALIYET: data.maliyetlerToplam,
+      IST_SURE_LOJISTIK: data.lojistikSuresi,
+      IST_SURE_SEYAHAT: data.seyahetSuresi,
+      IST_SURE_ONAY: data.onaySuresi,
+      IST_SURE_BEKLEME: data.beklemeSuresi,
+      IST_SURE_DIGER: data.digerSuresi,
+      IST_OZEL_ALAN_1: data.ozelAlan1,
+      IST_OZEL_ALAN_2: data.ozelAlan2,
+      IST_OZEL_ALAN_3: data.ozelAlan3,
+      IST_OZEL_ALAN_4: data.ozelAlan4,
+      IST_OZEL_ALAN_5: data.ozelAlan5,
+      IST_OZEL_ALAN_6: data.ozelAlan6,
+      IST_OZEL_ALAN_6_KOD_ID: data.ozelAlan6ID,
+      IST_OZEL_ALAN_7: data.ozelAlan7,
+      IST_OZEL_ALAN_7_KOD_ID: data.ozelAlan7ID,
+      IST_OZEL_ALAN_8: data.ozelAlan8,
+      IST_OZEL_ALAN_8_KOD_ID: data.ozelAlan8ID,
+      IST_OZEL_ALAN_9: data.ozelAlan9,
+      IST_OZEL_ALAN_10: data.ozelAlan10,
+      IST_ACIKLAMA: data.aciklama,
       // add more fields as needed
     };
 
@@ -171,6 +218,29 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       setValue("otonomBakim", selectedRow.IST_OTONOM_BAKIM);
       setValue("periyot", selectedRow.IST_UYARI_PERIYOT);
       setValue("periyotSiklik", selectedRow.IST_UYARI_SIKLIGI);
+      setValue("maliyetlerMalzeme", selectedRow.IST_MALZEME_MALIYET);
+      setValue("maliyetlerIscilik", selectedRow.IST_ISCILIK_MALIYET);
+      setValue("maliyetlerGenelGider", selectedRow.IST_GENEL_GIDER_MALIYET);
+      setValue("maliyetlerToplam", selectedRow.IST_TOPLAM_MALIYET);
+      setValue("lojistikSuresi", selectedRow.IST_SURE_LOJISTIK);
+      setValue("seyahetSuresi", selectedRow.IST_SURE_SEYAHAT);
+      setValue("onaySuresi", selectedRow.IST_SURE_ONAY);
+      setValue("beklemeSuresi", selectedRow.IST_SURE_BEKLEME);
+      setValue("digerSuresi", selectedRow.IST_SURE_DIGER);
+      setValue("ozelAlan1", selectedRow.IST_OZEL_ALAN_1);
+      setValue("ozelAlan2", selectedRow.IST_OZEL_ALAN_2);
+      setValue("ozelAlan3", selectedRow.IST_OZEL_ALAN_3);
+      setValue("ozelAlan4", selectedRow.IST_OZEL_ALAN_4);
+      setValue("ozelAlan5", selectedRow.IST_OZEL_ALAN_5);
+      setValue("ozelAlan6", selectedRow.IST_OZEL_ALAN_6);
+      setValue("ozelAlan6ID", selectedRow.IST_OZEL_ALAN_6_KOD_ID);
+      setValue("ozelAlan7", selectedRow.IST_OZEL_ALAN_7);
+      setValue("ozelAlan7ID", selectedRow.IST_OZEL_ALAN_7_KOD_ID);
+      setValue("ozelAlan8", selectedRow.IST_OZEL_ALAN_8);
+      setValue("ozelAlan8ID", selectedRow.IST_OZEL_ALAN_8_KOD_ID);
+      setValue("ozelAlan9", selectedRow.IST_OZEL_ALAN_9);
+      setValue("ozelAlan10", selectedRow.IST_OZEL_ALAN_10);
+      setValue("aciklama", selectedRow.IST_ACIKLAMA);
 
       // add more fields as needed
 

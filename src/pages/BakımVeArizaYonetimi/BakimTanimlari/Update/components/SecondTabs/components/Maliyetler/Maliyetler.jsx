@@ -26,12 +26,11 @@ export default function Maliyetler() {
   const iscilik = watch("maliyetlerIscilik");
   const genelGider = watch("maliyetlerGenelGider");
 
-  const calculateTotal = () => {
-    // Replace commas with dots and parse to float
-    const parseValue = (value) => parseFloat((value || "0").replace(",", "."));
+  const parseValue = (value) => parseFloat(String(value || "0").replace(",", "."));
 
+  const calculateTotal = () => {
     const total = parseValue(malzeme) + parseValue(iscilik) + parseValue(genelGider);
-    setValue("maliyetlerToplam", total.toString().replace(".", ",")); // Convert to string and replace dot with comma
+    setValue("maliyetlerToplam", total); // Sayısal değeri olduğu gibi atama
   };
 
   useEffect(() => {
@@ -40,6 +39,20 @@ export default function Maliyetler() {
 
   return (
     <div style={{ paddingBottom: "25px" }}>
+      {/* number input okları kaldırma */}
+      <style>
+        {`
+      input[type='number']::-webkit-inner-spin-button,
+      input[type='number']::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      input[type='number'] {
+        -moz-appearance: textfield;
+      }
+    `}
+      </style>
       <div style={{ width: "100%", maxWidth: "450px", borderBottom: "1px solid #004fff", marginBottom: "15px" }}>
         <Text style={{ fontSize: "14px", color: "#004fff" }}>Maliyetler</Text>
       </div>
@@ -70,14 +83,8 @@ export default function Maliyetler() {
               render={({ field }) => (
                 <Input
                   {...field}
+                  type="number" // Tipi "number" olarak ayarla
                   style={{ flex: 1 }}
-                  onKeyPress={(e) => {
-                    const value = field.value;
-                    // Rakam veya bir virgül olup olmadığını kontrol et
-                    if (!/[0-9]/.test(e.key) && (e.key !== "," || value.includes(","))) {
-                      e.preventDefault();
-                    }
-                  }}
                 />
               )}
             />
@@ -110,14 +117,8 @@ export default function Maliyetler() {
               render={({ field }) => (
                 <Input
                   {...field}
+                  type="number" // Tipi "number" olarak ayarla
                   style={{ flex: 1 }}
-                  onKeyPress={(e) => {
-                    const value = field.value;
-                    // Rakam veya bir virgül olup olmadığını kontrol et
-                    if (!/[0-9]/.test(e.key) && (e.key !== "," || value.includes(","))) {
-                      e.preventDefault();
-                    }
-                  }}
                 />
               )}
             />
@@ -150,14 +151,8 @@ export default function Maliyetler() {
               render={({ field }) => (
                 <Input
                   {...field}
+                  type="number" // Tipi "number" olarak ayarla
                   style={{ flex: 1 }}
-                  onKeyPress={(e) => {
-                    const value = field.value;
-                    // Rakam veya bir virgül olup olmadığını kontrol et
-                    if (!/[0-9]/.test(e.key) && (e.key !== "," || value.includes(","))) {
-                      e.preventDefault();
-                    }
-                  }}
                 />
               )}
             />
@@ -190,14 +185,8 @@ export default function Maliyetler() {
               render={({ field }) => (
                 <Input
                   {...field}
+                  type="number" // Tipi "number" olarak ayarla
                   style={{ flex: 1 }}
-                  onKeyPress={(e) => {
-                    const value = field.value;
-                    // Rakam veya bir virgül olup olmadığını kontrol et
-                    if (!/[0-9]/.test(e.key) && (e.key !== "," || value.includes(","))) {
-                      e.preventDefault();
-                    }
-                  }}
                 />
               )}
             />

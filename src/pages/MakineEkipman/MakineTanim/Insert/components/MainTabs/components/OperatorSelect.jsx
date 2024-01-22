@@ -14,7 +14,7 @@ export default function OperatorSelect() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("GetMakineOperators");
+      const response = await AxiosInstance.get("Personel?personelRol=3");
       if (response && response.Makine_Operator_List) {
         setOptions(response.Makine_Operator_List);
       }

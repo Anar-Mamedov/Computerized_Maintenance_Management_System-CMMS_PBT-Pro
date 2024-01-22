@@ -8,10 +8,16 @@ import MainTabs from "./MainTabs/MainTabs";
 export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh }) {
   const methods = useForm({
     defaultValues: {
-      siraNo: "",
       secilenID: "",
-      isTanimi: "",
-      aciklama: "",
+      olcumSiraNo: "",
+      olcumTanim: "",
+      birim: null,
+      birimID: "",
+      ondalikSayi: "",
+      hedefDeger: "",
+      olcumLimit: "",
+      minimumDeger: "",
+      maximumDeger: "",
       // Add other default values here
     },
   });
@@ -22,15 +28,24 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
 
   const onSubmited = (data) => {
     const Body = {
-      MRK_MARKA: data.siraNo,
-      MRK_TANIM: data.isTanimi,
-      MKR_ACIKLAMA: data.aciklama,
+      TB_IS_TANIM_OLCUM_PARAMETRE_ID: data.secilenID,
+      IOC_SIRA_NO: data.olcumSiraNo,
+      IOC_TANIM: data.olcumTanim,
+      // IOC_BIRIM: data.birim,
+      IOC_BIRIM_KOD_ID: data.birimID,
+      IOC_FORMAT: data.ondalikSayi,
+      IOC_HEDEF_DEGER: data.hedefDeger,
+      IOC_MIN_MAX_DEGER: data.olcumLimit,
+      IOC_MIN_DEGER: data.minimumDeger,
+      IOC_MAX_DEGER: data.maximumDeger,
     };
 
-    AxiosInstance.post("AddMakineMarkaTest", Body)
+    AxiosInstance.post("UpdateIsTanimOlcum", Body)
       .then((response) => {
         console.log("Data sent successfully:", response.data);
         reset();
+        onModalClose(); // Modal'ı kapat
+        onRefresh(); // Tabloyu yenile
       })
       .catch((error) => {
         console.error("Error sending data:", error);
@@ -55,18 +70,15 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       //   console.log(key, selectedRow[key]);
       //   setValue(key, selectedRow[key]);
       setValue("secilenID", selectedRow.key);
-      setValue("isTanimi", selectedRow.code);
-      setValue("vardiyaBaslangicSaati", dayjs(`1970-01-01T${selectedRow.VAR_BASLAMA_SAATI}`));
-      setValue("vardiyaBitisSaati", dayjs(`1970-01-01T${selectedRow.VAR_BITIS_SAATI}`));
-      setValue("vardiyaTipi", selectedRow.VAR_VARDIYA_TIPI);
-      setValue("vardiyaTipiID", selectedRow.VAR_VARDIYA_TIPI_KOD_ID);
-      setValue("lokasyonTanim", selectedRow.VAR_LOKASYON);
-      setValue("lokasyonID", selectedRow.VAR_LOKASYON_ID);
-      setValue("vardiyaProjeTanim", selectedRow.VAR_PROJE);
-      setValue("vardiyaProjeID", selectedRow.VAR_PROJE_ID);
-      setValue("varsayilanVardiya", selectedRow.VAR_VARSAYILAN);
-      setValue("gosterimRengi", selectedRow.VAR_RENK);
-      setValue("vardiyaAciklama", selectedRow.VAR_ACIKLAMA);
+      setValue("olcumSiraNo", selectedRow.IOC_SIRA_NO);
+      setValue("olcumTanim", selectedRow.IOC_TANIM);
+      setValue("birim", selectedRow.IOC_BIRIM);
+      setValue("birimID", selectedRow.IOC_BIRIM_KOD_ID);
+      setValue("ondalikSayi", selectedRow.IOC_FORMAT);
+      setValue("hedefDeger", selectedRow.IOC_HEDEF_DEGER);
+      setValue("olcumLimit", selectedRow.IOC_MIN_MAX_DEGER);
+      setValue("minimumDeger", selectedRow.IOC_MIN_DEGER);
+      setValue("maximumDeger", selectedRow.IOC_MAX_DEGER);
       // add more fields as needed
 
       // });
@@ -83,12 +95,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   return (
     <FormProvider {...methods}>
       <div>
-        <Modal
-          width="800px"
-          title="Malzeme Güncelle"
-          open={isModalVisible}
-          onOk={handleModalOk}
-          onCancel={onModalClose}>
+        <Modal width="800px" title="Ölçüm Güncelle" open={isModalVisible} onOk={handleModalOk} onCancel={onModalClose}>
           <MainTabs />
         </Modal>
       </div>

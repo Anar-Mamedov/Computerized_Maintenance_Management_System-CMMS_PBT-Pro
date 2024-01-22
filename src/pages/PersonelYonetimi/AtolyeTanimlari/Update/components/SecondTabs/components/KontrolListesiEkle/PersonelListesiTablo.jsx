@@ -60,11 +60,12 @@ export default function PersonelListesiTablo() {
     },
   ];
 
-  const lokasyonId = watch("selectedLokasyonId");
+  const secilenID = watch("secilenID");
+  console.log(secilenID);
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`Personel?lokasyonId=${lokasyonId}`)
+    AxiosInstance.get(`Personel?atolyeId=${secilenID}`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
           key: item.TB_PERSONEL_ID,
@@ -78,7 +79,7 @@ export default function PersonelListesiTablo() {
         setData(fetchedData);
       })
       .finally(() => setLoading(false));
-  }, [lokasyonId]);
+  }, [secilenID]);
 
   useEffect(() => {
     fetch();
@@ -99,7 +100,7 @@ export default function PersonelListesiTablo() {
 
   return (
     <div>
-      <CreateModal onRefresh={refreshTable} />
+      {/* <CreateModal onRefresh={refreshTable} /> */}
       <Table
         rowSelection={{
           type: "radio",
@@ -117,7 +118,7 @@ export default function PersonelListesiTablo() {
           y: "calc(100vh - 520px)",
         }}
       />
-      {isModalVisible && (
+      {/* {isModalVisible && (
         <EditModal
           selectedRow={selectedRow}
           isModalVisible={isModalVisible}
@@ -127,7 +128,7 @@ export default function PersonelListesiTablo() {
           }}
           onRefresh={refreshTable}
         />
-      )}
+      )} */}
     </div>
   );
 }
