@@ -23,7 +23,7 @@ export default function OzelAlan8() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32001");
+      const response = await AxiosInstance.get("KodList?grup=32449");
       if (response && response) {
         setOptions(response);
       }
@@ -51,7 +51,7 @@ export default function OzelAlan8() {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32001`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32449`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
@@ -92,7 +92,7 @@ export default function OzelAlan8() {
       {contextHolder}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
         <Controller
-          name="birim"
+          name="ozelAlan8"
           control={control}
           render={({ field }) => (
             <Select
@@ -136,14 +136,14 @@ export default function OzelAlan8() {
               }))}
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
-                setValue("birimID", value);
+                setValue("ozelAlan8ID", value);
                 field.onChange(value);
               }}
             />
           )}
         />
         <Controller
-          name="birimID"
+          name="ozelAlan8ID"
           control={control}
           render={({ field }) => (
             <Input

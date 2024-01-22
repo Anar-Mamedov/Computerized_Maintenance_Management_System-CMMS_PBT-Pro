@@ -103,6 +103,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       ozelAlan9: "",
       ozelAlan10: "",
       aciklama: "",
+      periyotID: "",
+      periyotLabel: "",
       // add more fields as needed
     },
   });
@@ -154,11 +156,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       IST_OZEL_ALAN_3: data.ozelAlan3,
       IST_OZEL_ALAN_4: data.ozelAlan4,
       IST_OZEL_ALAN_5: data.ozelAlan5,
-      IST_OZEL_ALAN_6: data.ozelAlan6,
       IST_OZEL_ALAN_6_KOD_ID: data.ozelAlan6ID,
-      IST_OZEL_ALAN_7: data.ozelAlan7,
       IST_OZEL_ALAN_7_KOD_ID: data.ozelAlan7ID,
-      IST_OZEL_ALAN_8: data.ozelAlan8,
       IST_OZEL_ALAN_8_KOD_ID: data.ozelAlan8ID,
       IST_OZEL_ALAN_9: data.ozelAlan9,
       IST_OZEL_ALAN_10: data.ozelAlan10,
@@ -170,7 +169,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     // handle response
     // });
 
-    AxiosInstance.post("UpdateVardiya", Body)
+    AxiosInstance.post("UpdateBakim", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);
@@ -196,27 +195,27 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       setValue("bakimKodu", selectedRow.IST_KOD);
       setValue("bakimTanimi", selectedRow.IST_TANIM);
       setValue("bakimAktif", selectedRow.IST_AKTIF);
-      setValue("bakimTipi", selectedRow.IST_TIP_KOD_TANIM);
+      setValue("bakimTipi", selectedRow.IST_TIP);
       setValue("bakimTipiID", selectedRow.IST_TIP_KOD_ID);
-      setValue("bakimGrubu", selectedRow.IST_GRUP_KOD_TANIM);
+      setValue("bakimGrubu", selectedRow.IST_GRUP);
       setValue("bakimGrubuID", selectedRow.IST_GRUP_KOD_ID);
-      setValue("bakimNedeni", selectedRow.IST_NEDEN_KOD_TANIM);
+      setValue("bakimNedeni", selectedRow.IST_NEDEN);
       setValue("bakimNedeniID", selectedRow.IST_NEDEN_KOD_ID);
-      setValue("oncelikTanim", selectedRow.IST_ONCELIK_TANIM);
+      setValue("oncelikTanim", selectedRow.IST_ONCELIK);
       setValue("oncelikID", selectedRow.IST_ONCELIK_ID);
-      setValue("talimatTanim", selectedRow.IST_TALIMAT_TANIM);
+      setValue("talimatTanim", selectedRow.IST_TALIMAT);
       setValue("talimatID", selectedRow.IST_TALIMAT_ID);
-      setValue("atolyeTanim", selectedRow.IST_ATOLYE_TANIM);
+      setValue("atolyeTanim", selectedRow.IST_ATOLYE);
       setValue("atolyeID", selectedRow.IST_ATOLYE_ID);
-      setValue("firmaTanim", selectedRow.IST_FIRMA_TANIM);
+      setValue("firmaTanim", selectedRow.IST_FIRMA);
       setValue("firmaID", selectedRow.IST_FIRMA_ID);
-      setValue("lokasyonTanim", selectedRow.IST_LOKASYON_TANIM);
+      setValue("lokasyonTanim", selectedRow.IST_LOKASYON);
       setValue("lokasyonID", selectedRow.IST_LOKASYON_ID);
       setValue("calismaSuresi", selectedRow.IST_CALISMA_SURE);
       setValue("durusSuresi", selectedRow.IST_DURUS_SURE);
       setValue("personelSayisi", selectedRow.IST_PERSONEL_SAYI);
       setValue("otonomBakim", selectedRow.IST_OTONOM_BAKIM);
-      setValue("periyot", selectedRow.IST_UYARI_PERIYOT);
+      setValue("periyotID", selectedRow.IST_UYARI_PERIYOT);
       setValue("periyotSiklik", selectedRow.IST_UYARI_SIKLIGI);
       setValue("maliyetlerMalzeme", selectedRow.IST_MALZEME_MALIYET);
       setValue("maliyetlerIscilik", selectedRow.IST_ISCILIK_MALIYET);

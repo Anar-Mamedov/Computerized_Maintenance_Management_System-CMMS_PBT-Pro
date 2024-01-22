@@ -82,8 +82,11 @@ export default function PersonelListesiTablo() {
   }, [secilenID]);
 
   useEffect(() => {
-    fetch();
-  }, [fetch]);
+    if (secilenID) {
+      // secilenBakimID'nin varlığını ve geçerliliğini kontrol edin
+      fetch(); // fetch fonksiyonunu çağırın
+    }
+  }, [secilenID, fetch]); // secilenBakimID veya fetch fonksiyonu değiştiğinde useEffect'i tetikle
 
   const onRowSelectChange = (selectedKeys) => {
     setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);

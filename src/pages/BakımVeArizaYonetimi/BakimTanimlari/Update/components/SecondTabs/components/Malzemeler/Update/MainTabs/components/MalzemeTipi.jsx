@@ -28,7 +28,7 @@ const StyledDiv = styled.div`
 `;
 
 export default function MalzemeTipi() {
-  const { control, setValue } = useFormContext();
+  const { control, setValue, watch } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const inputRef = createRef();
@@ -39,6 +39,8 @@ export default function MalzemeTipi() {
   const [messageApi, contextHolder] = message.useMessage();
 
   // message end
+
+  const malzemeKoduTanim = watch("malzemeKoduTanim");
 
   const fetchData = async () => {
     setLoading(true);
@@ -129,6 +131,7 @@ export default function MalzemeTipi() {
             // style={{ maxWidth: "300px", width: "100%" }}
             showSearch
             allowClear
+            disabled={!!malzemeKoduTanim} // malzemeKoduTanim varsa malzemeTanimi'ni devre dışı bırak
             placeholder="Seçim Yapınız"
             optionFilterProp="children"
             filterOption={(input, option) =>

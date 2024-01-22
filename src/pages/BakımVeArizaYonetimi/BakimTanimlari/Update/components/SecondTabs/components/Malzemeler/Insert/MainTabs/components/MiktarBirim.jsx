@@ -8,7 +8,7 @@ const { Text, Link } = Typography;
 const { Option } = Select;
 
 export default function MiktarBirim() {
-  const { control, setValue } = useFormContext();
+  const { control, setValue, watch } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const inputRef = createRef();
@@ -19,6 +19,8 @@ export default function MiktarBirim() {
   const [messageApi, contextHolder] = message.useMessage();
 
   // message end
+
+  const malzemeKoduTanim = watch("malzemeKoduTanim");
 
   const fetchData = async () => {
     setLoading(true);
@@ -101,6 +103,7 @@ export default function MiktarBirim() {
               style={{ width: "200px" }}
               showSearch
               allowClear
+              disabled={!!malzemeKoduTanim} // malzemeKoduTanim varsa malzemeTanimi'ni devre dışı bırak
               placeholder="Seçim Yapınız"
               optionFilterProp="children"
               filterOption={(input, option) =>

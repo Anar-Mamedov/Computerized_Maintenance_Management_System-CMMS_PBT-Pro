@@ -30,13 +30,13 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   const onSubmited = (data) => {
     const Body = {
       TB_IS_TANIM_MLZ_ID: data.secilenID,
-      ISM_STOK_KOD: data.malzemeKoduTanim,
+      // ISM_STOK_KOD: data.malzemeKoduTanim,
       ISM_STOK_ID: data.malzemeKoduID,
       ISM_STOK_TANIM: data.malzemeTanimi,
-      ISM_STOK_TIP: data.malzemeTipi,
+      // ISM_STOK_TIP: data.malzemeTipi,
       ISM_STOK_TIP_KOD_ID: data.malzemeTipiID,
       ISM_MIKTAR: data.mazemeMiktari,
-      ISM_BIRIM: data.miktarBirim,
+      // ISM_BIRIM: data.miktarBirim,
       ISM_BIRIM_KOD_ID: data.miktarBirimID,
       ISM_BIRIM_FIYAT: data.mazemeFiyati,
       ISM_TUTAR: data.mazemeMaliyeti,

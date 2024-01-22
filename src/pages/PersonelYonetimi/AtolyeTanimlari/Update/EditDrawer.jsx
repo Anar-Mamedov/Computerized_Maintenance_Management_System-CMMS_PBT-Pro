@@ -82,6 +82,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   //* export
   const onSubmit = (data) => {
     const Body = {
+      TB_ATOLYE_ID: data.secilenID,
       ATL_KOD: data.atolyeKodu,
       ATL_TANIM: data.atolyeTanimi,
       ATL_ATOLYE_GRUP_ID: data.atolyeGrubuID,
@@ -128,6 +129,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       setValue("atolyeAktif", selectedRow.ATL_AKTIF);
       setValue("yetkili", selectedRow.ATL_YETKILI);
       setValue("yetkiliEmail", selectedRow.ATL_YETKILI_MAIL);
+      setValue("aciklama", selectedRow.ATL_ACIKLAMA);
       // add more fields as needed
 
       // });
