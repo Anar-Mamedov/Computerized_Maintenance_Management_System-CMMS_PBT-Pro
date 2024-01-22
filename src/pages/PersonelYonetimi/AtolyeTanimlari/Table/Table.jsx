@@ -35,8 +35,21 @@ export default function MainTable() {
           return {
             ...item,
             key: item.TB_ATOLYE_ID,
-            code: item.ATL_KOD,
-            subject: item.ATL_TANIM,
+            ATL_KOD: item.ATL_KOD,
+            ATL_TANIM: item.ATL_TANIM,
+            ATL_TEL: item.ATL_TEL,
+            ATL_YETKILI: item.ATL_YETKILI,
+            ATL_DEGISTIRME_TARIH: item.ATL_DEGISTIRME_TARIH,
+            ATL_DEGISTIREN_ID: item.ATL_DEGISTIREN_ID,
+            ATL_OLUSTURMA_TARIH: item.ATL_OLUSTURMA_TARIH,
+            ATL_OLUSTURAN_ID: item.ATL_OLUSTURAN_ID,
+            ATL_ACIKLAMA: item.ATL_ACIKLAMA,
+            ATL_AKTIF: item.ATL_AKTIF,
+            ATL_ATOLYE_GRUP_ID: item.ATL_ATOLYE_GRUP_ID,
+            ATL_YETKILI_MAIL: item.ATL_YETKILI_MAIL,
+            ALT_GRUP_TANIM: item.ALT_GRUP_TANIM,
+            ATL_RESIM: item.ATL_RESIM,
+            ALT_BELGE: item.ALT_BELGE,
           };
         });
         setData(formattedData); // Directly set the data
@@ -58,7 +71,7 @@ export default function MainTable() {
   };
 
   useEffect(() => {
-    const filtered = data.filter((item) => normalizeString(item.subject).includes(normalizeString(searchTerm)));
+    const filtered = data.filter((item) => normalizeString(item.ATL_TANIM).includes(normalizeString(searchTerm)));
     setFilteredData(filtered);
   }, [searchTerm, data]);
 
@@ -93,13 +106,34 @@ export default function MainTable() {
   const columns = [
     {
       title: "Atölye Kodu",
-      dataIndex: "code",
-      key: "code",
+      dataIndex: "ATL_KOD",
+      key: "ATL_KOD",
     },
     {
       title: "Atölye Tanımı",
-      dataIndex: "subject",
-      key: "subject",
+      dataIndex: "ATL_TANIM",
+      key: "ATL_TANIM",
+    },
+    {
+      title: "Atölye Grup Tanımı",
+      dataIndex: "ALT_GRUP_TANIM",
+      key: "ALT_GRUP_TANIM",
+    },
+    {
+      title: "Yetkili",
+      dataIndex: "ATL_YETKILI",
+      key: "ATL_YETKILI",
+    },
+    {
+      title: "Telefon",
+      dataIndex: "ATL_TEL",
+      key: "ATL_TEL",
+    },
+
+    {
+      title: "Açıklama",
+      dataIndex: "ATL_ACIKLAMA",
+      key: "ATL_ACIKLAMA",
     },
   ];
 
