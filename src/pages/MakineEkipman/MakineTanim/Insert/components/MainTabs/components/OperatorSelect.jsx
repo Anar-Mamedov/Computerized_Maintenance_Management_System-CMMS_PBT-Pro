@@ -15,8 +15,8 @@ export default function OperatorSelect() {
     setLoading(true);
     try {
       const response = await AxiosInstance.get("Personel?personelRol=3");
-      if (response && response.Makine_Operator_List) {
-        setOptions(response.Makine_Operator_List);
+      if (response && response) {
+        setOptions(response);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -49,8 +49,8 @@ export default function OperatorSelect() {
             }}
             dropdownRender={(menu) => <Spin spinning={loading}>{menu}</Spin>}
             options={options.map((item) => ({
-              value: item.TB_MAKINE_OPERATOR_ID, // Use the ID as the value
-              label: item.MKO_HEDEF_OPERATOR_KOD, // Display the name in the dropdown
+              value: item.TB_PERSONEL_ID, // Use the ID as the value
+              label: item.PRS_ISIM, // Display the name in the dropdown
             }))}
             onChange={(value) => {
               // Seçilen değerin ID'sini NedeniID alanına set et
