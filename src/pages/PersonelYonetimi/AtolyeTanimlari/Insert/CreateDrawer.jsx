@@ -108,6 +108,22 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
     }
   }, [selectedLokasyonId, methods]);
 
+  // otonom sayaç için
+  useEffect(() => {
+    if (open) {
+      AxiosInstance.get("AtolyeKodGetir") // Replace with your actual API endpoint
+        .then((response) => {
+          // Assuming the response contains the new work order number in 'response.Tanim'
+          setValue("atolyeKodu", response);
+        })
+        .catch((error) => {
+          console.error("Error fetching new work order number:", error);
+        });
+    }
+  }, [open, setValue]);
+
+  // otonom sayaç için son
+
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)}>
