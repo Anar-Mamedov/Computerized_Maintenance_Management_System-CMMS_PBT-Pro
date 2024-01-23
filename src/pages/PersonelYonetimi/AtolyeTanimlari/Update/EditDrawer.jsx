@@ -123,7 +123,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       setValue("secilenID", selectedRow.key);
       setValue("atolyeKodu", selectedRow.ATL_KOD);
       setValue("atolyeTanimi", selectedRow.ATL_TANIM);
-      setValue("atolyeGrubu", selectedRow.ALT_GRUP_TANIM);
+      setValue("atolyeGrubu", selectedRow.ATL_GRUP_TANIM);
       setValue("atolyeGrubuID", selectedRow.ATL_ATOLYE_GRUP_ID);
       setValue("atolyeTelefon", selectedRow.ATL_TEL);
       setValue("atolyeAktif", selectedRow.ATL_AKTIF);

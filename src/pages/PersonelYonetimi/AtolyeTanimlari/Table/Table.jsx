@@ -47,7 +47,7 @@ export default function MainTable() {
             ATL_AKTIF: item.ATL_AKTIF,
             ATL_ATOLYE_GRUP_ID: item.ATL_ATOLYE_GRUP_ID,
             ATL_YETKILI_MAIL: item.ATL_YETKILI_MAIL,
-            ALT_GRUP_TANIM: item.ALT_GRUP_TANIM,
+            ATL_GRUP_TANIM: item.ATL_GRUP_TANIM,
             ATL_RESIM: item.ATL_RESIM,
             ALT_BELGE: item.ALT_BELGE,
           };
@@ -116,8 +116,8 @@ export default function MainTable() {
     },
     {
       title: "Atölye Grup Tanımı",
-      dataIndex: "ALT_GRUP_TANIM",
-      key: "ALT_GRUP_TANIM",
+      dataIndex: "ATL_GRUP_TANIM",
+      key: "ATL_GRUP_TANIM",
     },
     {
       title: "Yetkili",
