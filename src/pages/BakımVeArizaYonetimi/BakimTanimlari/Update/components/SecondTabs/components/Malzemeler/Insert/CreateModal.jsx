@@ -15,7 +15,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       malzemeTanimi: "",
       malzemeTipi: null,
       malzemeTipiID: "",
-      mazemeMiktari: "",
+      mazemeMiktari: "1",
       miktarBirim: null,
       miktarBirimID: "",
       mazemeFiyati: "",
