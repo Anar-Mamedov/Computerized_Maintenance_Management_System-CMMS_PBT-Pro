@@ -2,7 +2,7 @@ import React from "react";
 import { Tabs } from "antd";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
-import KontrolListesiTablo from "./components/KontrolListesiEkle/KontrolListesiTablo";
+import IletisimBilgileri from "./components/IletisimBilgileri/IletisimBilgileri";
 import Tablo from "./components/Malzemeler/Tablo";
 import Maliyetler from "./components/Maliyetler/Maliyetler";
 import Olcumler from "./components/Olcumler/Tablo";
@@ -54,8 +54,8 @@ export default function SecondTabs({ refreshKey }) {
   const items = [
     {
       key: "1",
-      label: "Kontrol Listesi",
-      children: <KontrolListesiTablo />,
+      label: "İletişim Bilgileri",
+      children: <IletisimBilgileri />,
     },
     {
       key: "2",
