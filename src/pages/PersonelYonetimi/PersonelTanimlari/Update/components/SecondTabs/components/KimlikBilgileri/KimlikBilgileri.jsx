@@ -2,10 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Input, Typography, Tabs, DatePicker } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
-import UcretTipi from "./components/UcretTipi";
-import Dili from "./components/Dili";
-import Uyruk from "./components/Uyruk";
-import Cinsiyet from "./components/Cinsiyet";
+import MedeniHali from "./components/MedeniHali";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -20,7 +17,7 @@ const StyledDivBottomLine = styled.div`
   }
 `;
 
-export default function KisiselBilgiler() {
+export default function KimlikBilgileri() {
   const { control, watch, setValue } = useFormContext();
 
   return (
@@ -51,76 +48,7 @@ export default function KisiselBilgiler() {
                   justifyContent: "space-between",
                   width: "100%",
                 }}>
-                <Text style={{ fontSize: "14px" }}>Dili:</Text>
-                <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    maxWidth: "300px",
-                    gap: "10px",
-                    width: "100%",
-                  }}>
-                  <Dili />
-                </div>
-              </StyledDivBottomLine>
-            </div>
-            <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
-              <StyledDivBottomLine
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                  width: "100%",
-                }}>
-                <Text style={{ fontSize: "14px" }}>Uyruğu:</Text>
-                <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    maxWidth: "300px",
-                    gap: "10px",
-                    width: "100%",
-                  }}>
-                  <Uyruk />
-                </div>
-              </StyledDivBottomLine>
-            </div>
-            <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
-              <StyledDivBottomLine
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                  width: "100%",
-                }}>
-                <Text style={{ fontSize: "14px" }}>Cinsiyet:</Text>
-                <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    maxWidth: "300px",
-                    gap: "10px",
-                    width: "100%",
-                  }}>
-                  <Cinsiyet />
-                </div>
-              </StyledDivBottomLine>
-            </div>
-            <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
-              <StyledDivBottomLine
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                  width: "100%",
-                }}>
-                <Text style={{ fontSize: "14px" }}>Kan Grubu:</Text>
+                <Text style={{ fontSize: "14px" }}>T.C. Kimlik No:</Text>
                 <div
                   style={{
                     display: "flex",
@@ -132,7 +60,35 @@ export default function KisiselBilgiler() {
                     width: "100%",
                   }}>
                   <Controller
-                    name="kanGrubu"
+                    name="tcKimlikNo"
+                    control={control}
+                    render={({ field }) => <Input {...field} type="number" style={{ flex: 1 }} />}
+                  />
+                </div>
+              </StyledDivBottomLine>
+            </div>
+            <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
+              <StyledDivBottomLine
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}>
+                <Text style={{ fontSize: "14px" }}>Seri No:</Text>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    maxWidth: "300px",
+                    minWidth: "300px",
+                    gap: "10px",
+                    width: "100%",
+                  }}>
+                  <Controller
+                    name="seriNo"
                     control={control}
                     render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
                   />
@@ -148,7 +104,7 @@ export default function KisiselBilgiler() {
                   justifyContent: "space-between",
                   width: "100%",
                 }}>
-                <Text style={{ fontSize: "14px" }}>SGK No:</Text>
+                <Text style={{ fontSize: "14px" }}>Baba Adı:</Text>
                 <div
                   style={{
                     display: "flex",
@@ -160,7 +116,7 @@ export default function KisiselBilgiler() {
                     width: "100%",
                   }}>
                   <Controller
-                    name="sgkNo"
+                    name="babaAdi"
                     control={control}
                     render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
                   />
@@ -176,7 +132,7 @@ export default function KisiselBilgiler() {
                   justifyContent: "space-between",
                   width: "100%",
                 }}>
-                <Text style={{ fontSize: "14px" }}>Vergi No:</Text>
+                <Text style={{ fontSize: "14px" }}>Ana Adı:</Text>
                 <div
                   style={{
                     display: "flex",
@@ -188,7 +144,7 @@ export default function KisiselBilgiler() {
                     width: "100%",
                   }}>
                   <Controller
-                    name="vergiNo"
+                    name="anaAdi"
                     control={control}
                     render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
                   />
@@ -204,7 +160,7 @@ export default function KisiselBilgiler() {
                   justifyContent: "space-between",
                   width: "100%",
                 }}>
-                <Text style={{ fontSize: "14px" }}>Eğitim Durumu:</Text>
+                <Text style={{ fontSize: "14px" }}>Doğum Yeri:</Text>
                 <div
                   style={{
                     display: "flex",
@@ -216,7 +172,7 @@ export default function KisiselBilgiler() {
                     width: "100%",
                   }}>
                   <Controller
-                    name="egitimDurumu"
+                    name="dogumYeri"
                     control={control}
                     render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
                   />
@@ -232,7 +188,7 @@ export default function KisiselBilgiler() {
                   justifyContent: "space-between",
                   width: "100%",
                 }}>
-                <Text style={{ fontSize: "14px" }}>Mezun Olduğu Okul:</Text>
+                <Text style={{ fontSize: "14px" }}>Dini:</Text>
                 <div
                   style={{
                     display: "flex",
@@ -244,7 +200,7 @@ export default function KisiselBilgiler() {
                     width: "100%",
                   }}>
                   <Controller
-                    name="mezunOkul"
+                    name="dini"
                     control={control}
                     render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
                   />
@@ -260,7 +216,7 @@ export default function KisiselBilgiler() {
                   justifyContent: "space-between",
                   width: "100%",
                 }}>
-                <Text style={{ fontSize: "14px" }}>Mezun Olduğu Bölüm:</Text>
+                <Text style={{ fontSize: "14px" }}>Kayıt No:</Text>
                 <div
                   style={{
                     display: "flex",
@@ -272,7 +228,7 @@ export default function KisiselBilgiler() {
                     width: "100%",
                   }}>
                   <Controller
-                    name="mezunBolum"
+                    name="kayitNo"
                     control={control}
                     render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
                   />
@@ -311,6 +267,30 @@ export default function KisiselBilgiler() {
                       />
                     )}
                   />
+                </div>
+              </StyledDivBottomLine>
+            </div>
+            <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
+              <StyledDivBottomLine
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}>
+                <Text style={{ fontSize: "14px" }}>Medeni Hali:</Text>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    maxWidth: "300px",
+                    minWidth: "300px",
+                    gap: "10px",
+                    width: "100%",
+                  }}>
+                  <MedeniHali />
                 </div>
               </StyledDivBottomLine>
             </div>
@@ -383,30 +363,6 @@ export default function KisiselBilgiler() {
                       />
                     )}
                   />
-                </div>
-              </StyledDivBottomLine>
-            </div>
-            <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
-              <StyledDivBottomLine
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                  width: "100%",
-                }}>
-                <Text style={{ fontSize: "14px" }}>Ücret Tipi:</Text>
-                <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    maxWidth: "300px",
-                    minWidth: "300px",
-                    gap: "10px",
-                    width: "100%",
-                  }}>
-                  <UcretTipi />
                 </div>
               </StyledDivBottomLine>
             </div>

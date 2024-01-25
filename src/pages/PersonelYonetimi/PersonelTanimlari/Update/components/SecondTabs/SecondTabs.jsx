@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import IletisimBilgileri from "./components/IletisimBilgileri/IletisimBilgileri";
 import KisiselBilgiler from "./components/KisiselBilgiler/KisiselBilgiler";
-import Maliyetler from "./components/Maliyetler/Maliyetler";
+import KimlikBilgileri from "./components/KimlikBilgileri/KimlikBilgileri";
 import Olcumler from "./components/Olcumler/Tablo";
 import SureBilgileri from "./components/SureBilgileri/SureBilgileri";
 import OzelAlanlar from "./components/OzelAlanlar/OzelAlanlar";
@@ -64,8 +64,8 @@ export default function SecondTabs({ refreshKey }) {
     },
     {
       key: "3",
-      label: "Maliyetler",
-      children: <Maliyetler />,
+      label: "Kimlik Bilgileri",
+      children: <KimlikBilgileri />,
     },
     {
       key: "4",
