@@ -7,7 +7,7 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function SertifikaTipi() {
+export default function AyrilmaNedeni() {
   const { control, setValue } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -100,7 +100,7 @@ export default function SertifikaTipi() {
       {contextHolder}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", width: "100%" }}>
         <Controller
-          name="sertifikaTipi"
+          name="ayrilmaNedeni"
           control={control}
           render={({ field }) => (
             <Select
@@ -147,14 +147,14 @@ export default function SertifikaTipi() {
               }))}
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
-                setValue("sertifikaTipiID", value);
+                setValue("ayrilmaNedeniID", value);
                 field.onChange(value);
               }}
             />
           )}
         />
         <Controller
-          name="sertifikaTipiID"
+          name="ayrilmaNedeniID"
           control={control}
           render={({ field }) => (
             <Input

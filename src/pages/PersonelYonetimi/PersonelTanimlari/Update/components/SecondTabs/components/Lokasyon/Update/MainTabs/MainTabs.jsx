@@ -1,12 +1,35 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import AxiosInstance from "../../../../../../../../../../api/http";
-import { Controller, useForm, useFormContext } from "react-hook-form";
+import { Button, Modal, Input, Typography, Tabs, DatePicker } from "antd";
+import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
+import AyrilmaNedeni from "./components/AyrilmaNedeni";
+import LokasyonTablo from "./components/LokasyonTablo";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
+
+const StyledDivBottomLine = styled.div`
+  @media (min-width: 600px) {
+    align-items: center !important;
+  }
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+`;
+
+const StyledDivMedia = styled.div`
+  .anar {
+    @media (min-width: 600px) {
+      max-width: 300px;
+      width: 100%;
+    }
+    @media (max-width: 600px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+`;
 
 const onChange = (key) => {
   // console.log(key);
@@ -44,9 +67,13 @@ const StyledTabs = styled(Tabs)`
 `;
 
 //styled components end
-
 export default function MainTabs() {
   const { control, watch, setValue } = useFormContext();
+
+  const handleLokasyonMinusClick = () => {
+    setValue("lokasyonTanim", "");
+    setValue("lokasyonID", "");
+  };
 
   const items = [
     {
@@ -56,44 +83,45 @@ export default function MainTabs() {
         <Controller name="aciklama" control={control} render={({ field }) => <TextArea {...field} rows={4} />} />
       ),
     },
-    {
-      key: "2",
-      label: "Resimler",
-      children: "test",
-    },
   ];
+
   return (
     <div>
-      <div
+      <StyledDivMedia
         style={{
           display: "flex",
           flexWrap: "wrap",
           alignItems: "center",
           justifyContent: "space-between",
           width: "100%",
-          maxWidth: "400px",
-          gap: "10px",
-          rowGap: "0px",
+          maxWidth: "420px",
           marginBottom: "10px",
         }}>
-        <Text style={{ fontSize: "14px" }}>Sira no:</Text>
+        <Text style={{ fontSize: "14px" }}>Lokasyon:</Text>
         <div
+          className="anar"
           style={{
             display: "flex",
-            flexWrap: "wrap",
+            flexDirection: "row",
             alignItems: "center",
-            maxWidth: "300px",
+            justifyContent: "space-between",
             minWidth: "300px",
-            gap: "10px",
-            width: "100%",
+            gap: "3px",
           }}>
           <Controller
-            name="siraNo"
+            name="lokasyonTanim"
             control={control}
-            render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="text" // Set the type to "text" for name input
+                style={{ width: "100%", maxWidth: "630px" }}
+                disabled
+              />
+            )}
           />
           <Controller
-            name="secilenID"
+            name="lokasyonID"
             control={control}
             render={({ field }) => (
               <Input
@@ -103,8 +131,16 @@ export default function MainTabs() {
               />
             )}
           />
+          <LokasyonTablo
+            onSubmit={(selectedData) => {
+              setValue("lokasyonTanim", selectedData.LOK_TANIM);
+              setValue("lokasyonID", selectedData.key);
+            }}
+          />
+          <Button onClick={handleLokasyonMinusClick}> - </Button>
         </div>
-      </div>
+      </StyledDivMedia>
+
       <div
         style={{
           display: "flex",
@@ -112,12 +148,12 @@ export default function MainTabs() {
           alignItems: "center",
           justifyContent: "space-between",
           width: "100%",
-          maxWidth: "400px",
+          maxWidth: "420px",
           gap: "10px",
           rowGap: "0px",
           marginBottom: "10px",
         }}>
-        <Text style={{ fontSize: "14px" }}>İş Tanımı:</Text>
+        <Text style={{ fontSize: "14px" }}>Ayrılma Nedeni:</Text>
         <div
           style={{
             display: "flex",
@@ -128,11 +164,7 @@ export default function MainTabs() {
             gap: "10px",
             width: "100%",
           }}>
-          <Controller
-            name="isTanimi"
-            control={control}
-            render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
-          />
+          <AyrilmaNedeni />
         </div>
       </div>
       <StyledTabs defaultActiveKey="1" items={items} onChange={onChange} />
