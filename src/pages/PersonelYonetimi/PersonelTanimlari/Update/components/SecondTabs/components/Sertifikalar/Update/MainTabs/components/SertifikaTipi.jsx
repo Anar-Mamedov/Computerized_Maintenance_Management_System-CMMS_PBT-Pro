@@ -1,13 +1,13 @@
 import React, { useState, createRef, useEffect } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import { Select, Typography, Divider, Spin, Button, Input, message, Space } from "antd";
-import AxiosInstance from "../../../../../../../../../api/http";
+import AxiosInstance from "../../../../../../../../../../../api/http";
 import { PlusOutlined } from "@ant-design/icons";
 
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function OzelAlan8() {
+export default function SertifikaTipi() {
   const { control, setValue } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -23,7 +23,7 @@ export default function OzelAlan8() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32449");
+      const response = await AxiosInstance.get("KodList?grup=32001");
       if (response && response) {
         setOptions(response);
       }
@@ -51,7 +51,7 @@ export default function OzelAlan8() {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32449`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32001`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
@@ -88,17 +88,25 @@ export default function OzelAlan8() {
 
   // add new status to selectbox end
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between" }}>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
+        justifyContent: "space-between",
+        maxWidth: "300px",
+        width: "100%",
+      }}>
       {contextHolder}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", width: "100%" }}>
         <Controller
-          name="ozelAlan8"
+          name="sertifikaTipi"
           control={control}
           render={({ field }) => (
             <Select
               {...field}
               key={selectKey}
-              style={{ width: "300px" }}
+              style={{ width: "100%" }}
               showSearch
               allowClear
               placeholder="Seçim Yapınız"
@@ -121,6 +129,9 @@ export default function OzelAlan8() {
                   />
                   <Space
                     style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      justifyContent: "center",
                       padding: "0 8px 4px",
                     }}>
                     <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
@@ -136,14 +147,14 @@ export default function OzelAlan8() {
               }))}
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
-                setValue("ozelAlan8ID", value);
+                setValue("sertifikaTipiID", value);
                 field.onChange(value);
               }}
             />
           )}
         />
         <Controller
-          name="ozelAlan8ID"
+          name="sertifikaTipiID"
           control={control}
           render={({ field }) => (
             <Input
