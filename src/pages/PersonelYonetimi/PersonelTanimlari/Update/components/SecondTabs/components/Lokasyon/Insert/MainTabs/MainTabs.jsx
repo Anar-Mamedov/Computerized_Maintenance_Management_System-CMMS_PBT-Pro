@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Input, Typography, Tabs, DatePicker } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
-import SertifikaTipi from "./components/SertifikaTipi";
+import AyrilmaNedeni from "./components/AyrilmaNedeni";
 import LokasyonTablo from "./components/LokasyonTablo";
 
 const { Text, Link } = Typography;
@@ -94,7 +94,7 @@ export default function MainTabs() {
           alignItems: "center",
           justifyContent: "space-between",
           width: "100%",
-          maxWidth: "400px",
+          maxWidth: "420px",
           marginBottom: "10px",
         }}>
         <Text style={{ fontSize: "14px" }}>Lokasyon:</Text>
@@ -140,6 +140,7 @@ export default function MainTabs() {
           <Button onClick={handleLokasyonMinusClick}> - </Button>
         </div>
       </StyledDivMedia>
+
       <div
         style={{
           display: "flex",
@@ -147,12 +148,12 @@ export default function MainTabs() {
           alignItems: "center",
           justifyContent: "space-between",
           width: "100%",
-          maxWidth: "400px",
+          maxWidth: "420px",
           gap: "10px",
           rowGap: "0px",
           marginBottom: "10px",
         }}>
-        <Text style={{ fontSize: "14px" }}>Belge no:</Text>
+        <Text style={{ fontSize: "14px" }}>Ayrılma Nedeni:</Text>
         <div
           style={{
             display: "flex",
@@ -163,109 +164,8 @@ export default function MainTabs() {
             gap: "10px",
             width: "100%",
           }}>
-          <Controller
-            name="belgeNo"
-            control={control}
-            render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
-          />
-          <Controller
-            name="secilenID"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ display: "none" }}
-              />
-            )}
-          />
+          <AyrilmaNedeni />
         </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          width: "100%",
-          maxWidth: "400px",
-          gap: "10px",
-          rowGap: "0px",
-          marginBottom: "10px",
-        }}>
-        <Text style={{ fontSize: "14px" }}>Sertifika Tipi:</Text>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "300px",
-            minWidth: "300px",
-            gap: "10px",
-            width: "100%",
-          }}>
-          <SertifikaTipi />
-        </div>
-      </div>
-      <div style={{ width: "100%", maxWidth: "400px", marginBottom: "10px" }}>
-        <StyledDivBottomLine
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "flex-start",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Veriliş Tarihi:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}>
-            <Controller
-              name="verilisTarihi"
-              control={control}
-              render={({ field }) => (
-                <DatePicker {...field} style={{ width: "200px" }} format="DD-MM-YYYY" placeholder="Tarih seçiniz" />
-              )}
-            />
-          </div>
-        </StyledDivBottomLine>
-      </div>
-      <div style={{ width: "100%", maxWidth: "400px", marginBottom: "10px" }}>
-        <StyledDivBottomLine
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "flex-start",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Bitiş Tarihi:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}>
-            <Controller
-              name="bitisTarihi"
-              control={control}
-              render={({ field }) => (
-                <DatePicker {...field} style={{ width: "200px" }} format="DD-MM-YYYY" placeholder="Tarih seçiniz" />
-              )}
-            />
-          </div>
-        </StyledDivBottomLine>
       </div>
       <StyledTabs defaultActiveKey="1" items={items} onChange={onChange} />
     </div>

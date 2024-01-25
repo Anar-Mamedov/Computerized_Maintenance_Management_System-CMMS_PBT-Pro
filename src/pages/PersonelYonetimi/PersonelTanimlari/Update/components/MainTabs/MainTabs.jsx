@@ -598,60 +598,72 @@ export default function MainTabs() {
           width: "100%",
           maxWidth: "450px",
         }}>
-        <Controller
-          name="teknisyen"
-          control={control}
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Teknisyen
-            </Checkbox>
-          )}
-        />
-        <Controller
-          name="operator"
-          control={control}
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Operatör
-            </Checkbox>
-          )}
-        />
-        <Controller
-          name="bakim"
-          control={control}
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Bakım
-            </Checkbox>
-          )}
-        />
-        <Controller
-          name="santiye"
-          control={control}
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Şantiye
-            </Checkbox>
-          )}
-        />
-        <Controller
-          name="surucu"
-          control={control}
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Sürücü
-            </Checkbox>
-          )}
-        />
-        <Controller
-          name="diger"
-          control={control}
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Diğer
-            </Checkbox>
-          )}
-        />
+        <div>
+          <Controller
+            name="teknisyen"
+            control={control}
+            render={({ field }) => (
+              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                Teknisyen
+              </Checkbox>
+            )}
+          />
+        </div>
+        <div>
+          <Controller
+            name="operator"
+            control={control}
+            render={({ field }) => (
+              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                Operatör
+              </Checkbox>
+            )}
+          />
+        </div>
+        <div>
+          <Controller
+            name="bakim"
+            control={control}
+            render={({ field }) => (
+              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                Bakım
+              </Checkbox>
+            )}
+          />
+        </div>
+        <div>
+          <Controller
+            name="santiye"
+            control={control}
+            render={({ field }) => (
+              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                Şantiye
+              </Checkbox>
+            )}
+          />
+        </div>
+        <div>
+          <Controller
+            name="surucu"
+            control={control}
+            render={({ field }) => (
+              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                Sürücü
+              </Checkbox>
+            )}
+          />
+        </div>
+        <div>
+          <Controller
+            name="diger"
+            control={control}
+            render={({ field }) => (
+              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                Diğer
+              </Checkbox>
+            )}
+          />
+        </div>
       </div>
     </div>
   );
