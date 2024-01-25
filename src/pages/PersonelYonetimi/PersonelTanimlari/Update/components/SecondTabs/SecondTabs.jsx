@@ -3,7 +3,7 @@ import { Tabs } from "antd";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import IletisimBilgileri from "./components/IletisimBilgileri/IletisimBilgileri";
-import Tablo from "./components/Malzemeler/Tablo";
+import KisiselBilgiler from "./components/KisiselBilgiler/KisiselBilgiler";
 import Maliyetler from "./components/Maliyetler/Maliyetler";
 import Olcumler from "./components/Olcumler/Tablo";
 import SureBilgileri from "./components/SureBilgileri/SureBilgileri";
@@ -59,8 +59,8 @@ export default function SecondTabs({ refreshKey }) {
     },
     {
       key: "2",
-      label: "Malzemeler",
-      children: <Tablo />,
+      label: "Kişisel Bilgiler",
+      children: <KisiselBilgiler />,
     },
     {
       key: "3",
