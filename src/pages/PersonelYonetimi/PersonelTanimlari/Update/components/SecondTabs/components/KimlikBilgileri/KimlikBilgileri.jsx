@@ -305,7 +305,7 @@ export default function KimlikBilgileri() {
                   justifyContent: "space-between",
                   width: "100%",
                 }}>
-                <Text style={{ fontSize: "14px" }}>İşe Başlama Tarihi:</Text>
+                <Text style={{ fontSize: "14px" }}>Kayıtlı Olduğı İl:</Text>
                 <div
                   style={{
                     display: "flex",
@@ -317,7 +317,231 @@ export default function KimlikBilgileri() {
                     width: "100%",
                   }}>
                   <Controller
-                    name="iseBaslamaTarihi"
+                    name="kayitliOlduguIl"
+                    control={control}
+                    render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+                  />
+                </div>
+              </StyledDivBottomLine>
+            </div>
+            <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
+              <StyledDivBottomLine
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}>
+                <Text style={{ fontSize: "14px" }}>Kayıtlı Olduğu İlçe:</Text>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    maxWidth: "300px",
+                    minWidth: "300px",
+                    gap: "10px",
+                    width: "100%",
+                  }}>
+                  <Controller
+                    name="kayitliOlduguIlce"
+                    control={control}
+                    render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+                  />
+                </div>
+              </StyledDivBottomLine>
+            </div>
+            <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
+              <StyledDivBottomLine
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}>
+                <Text style={{ fontSize: "14px" }}>Mahalle / Köy:</Text>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    maxWidth: "300px",
+                    minWidth: "300px",
+                    gap: "10px",
+                    width: "100%",
+                  }}>
+                  <Controller
+                    name="mahalleKoy"
+                    control={control}
+                    render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+                  />
+                </div>
+              </StyledDivBottomLine>
+            </div>
+            <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
+              <StyledDivBottomLine
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}>
+                <Text style={{ fontSize: "14px" }}>Cilt No:</Text>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    maxWidth: "300px",
+                    minWidth: "300px",
+                    gap: "10px",
+                    width: "100%",
+                  }}>
+                  <Controller
+                    name="ciltNo"
+                    control={control}
+                    render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+                  />
+                </div>
+              </StyledDivBottomLine>
+            </div>
+            <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
+              <StyledDivBottomLine
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}>
+                <Text style={{ fontSize: "14px" }}>Aile Sıra No:</Text>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    maxWidth: "300px",
+                    minWidth: "300px",
+                    gap: "10px",
+                    width: "100%",
+                  }}>
+                  <Controller
+                    name="aileSiraNo"
+                    control={control}
+                    render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+                  />
+                </div>
+              </StyledDivBottomLine>
+            </div>
+            <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
+              <StyledDivBottomLine
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}>
+                <Text style={{ fontSize: "14px" }}>Sıra No:</Text>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    maxWidth: "300px",
+                    minWidth: "300px",
+                    gap: "10px",
+                    width: "100%",
+                  }}>
+                  <Controller
+                    name="siraNo"
+                    control={control}
+                    render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+                  />
+                </div>
+              </StyledDivBottomLine>
+            </div>
+            <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
+              <StyledDivBottomLine
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}>
+                <Text style={{ fontSize: "14px" }}>Verildiği Yer:</Text>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    maxWidth: "300px",
+                    minWidth: "300px",
+                    gap: "10px",
+                    width: "100%",
+                  }}>
+                  <Controller
+                    name="verildigiYer"
+                    control={control}
+                    render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+                  />
+                </div>
+              </StyledDivBottomLine>
+            </div>
+            <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
+              <StyledDivBottomLine
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}>
+                <Text style={{ fontSize: "14px" }}>Veriliş Nedeni:</Text>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    maxWidth: "300px",
+                    minWidth: "300px",
+                    gap: "10px",
+                    width: "100%",
+                  }}>
+                  <Controller
+                    name="verilisNedeni"
+                    control={control}
+                    render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+                  />
+                </div>
+              </StyledDivBottomLine>
+            </div>
+            <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
+              <StyledDivBottomLine
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}>
+                <Text style={{ fontSize: "14px" }}>Veriliş Tarihi:</Text>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    maxWidth: "300px",
+                    minWidth: "300px",
+                    gap: "10px",
+                    width: "100%",
+                  }}>
+                  <Controller
+                    name="verilisTarihi"
                     control={control}
                     render={({ field }) => (
                       <DatePicker
@@ -327,97 +551,6 @@ export default function KimlikBilgileri() {
                         placeholder="Tarih seçiniz"
                       />
                     )}
-                  />
-                </div>
-              </StyledDivBottomLine>
-            </div>
-            <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
-              <StyledDivBottomLine
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                  width: "100%",
-                }}>
-                <Text style={{ fontSize: "14px" }}>İşten Ayrılma Tarihi:</Text>
-                <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    maxWidth: "300px",
-                    minWidth: "300px",
-                    gap: "10px",
-                    width: "100%",
-                  }}>
-                  <Controller
-                    name="istenAyrilmaTarihi"
-                    control={control}
-                    render={({ field }) => (
-                      <DatePicker
-                        {...field}
-                        style={{ width: "200px" }}
-                        format="DD-MM-YYYY"
-                        placeholder="Tarih seçiniz"
-                      />
-                    )}
-                  />
-                </div>
-              </StyledDivBottomLine>
-            </div>
-            <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
-              <StyledDivBottomLine
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                  width: "100%",
-                }}>
-                <Text style={{ fontSize: "14px" }}>İşçilik Ücreti:</Text>
-                <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    maxWidth: "300px",
-                    minWidth: "300px",
-                    gap: "10px",
-                    width: "100%",
-                  }}>
-                  <Controller
-                    name="iscilikUcreti"
-                    control={control}
-                    render={({ field }) => <Input {...field} type="number" style={{ flex: 1 }} />}
-                  />
-                </div>
-              </StyledDivBottomLine>
-            </div>
-            <div style={{ width: "100%", maxWidth: "450px", marginBottom: "10px" }}>
-              <StyledDivBottomLine
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                  width: "100%",
-                }}>
-                <Text style={{ fontSize: "14px" }}>Fazla Mesai Ücreti:</Text>
-                <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    maxWidth: "300px",
-                    minWidth: "300px",
-                    gap: "10px",
-                    width: "100%",
-                  }}>
-                  <Controller
-                    name="fazlaMesaiUcreti"
-                    control={control}
-                    render={({ field }) => <Input {...field} type="number" style={{ flex: 1 }} />}
                   />
                 </div>
               </StyledDivBottomLine>

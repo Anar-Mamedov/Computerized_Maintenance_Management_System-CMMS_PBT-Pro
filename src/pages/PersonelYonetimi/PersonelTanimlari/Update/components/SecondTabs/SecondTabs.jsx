@@ -5,11 +5,11 @@ import { useFormContext } from "react-hook-form";
 import IletisimBilgileri from "./components/IletisimBilgileri/IletisimBilgileri";
 import KisiselBilgiler from "./components/KisiselBilgiler/KisiselBilgiler";
 import KimlikBilgileri from "./components/KimlikBilgileri/KimlikBilgileri";
-import Olcumler from "./components/Olcumler/Tablo";
-import SureBilgileri from "./components/SureBilgileri/SureBilgileri";
+import EhliyetBilgileri from "./components/EhliyetBilgileri/EhliyetBilgileri";
 import OzelAlanlar from "./components/OzelAlanlar/OzelAlanlar";
-import UygulamaBilgileri from "./components/UygulamaBilgileri/UygulamaBilgileri";
 import Aciklama from "./components/Aciklama/Aciklama";
+import SertifikalarTablo from "./components/Sertifikalar/SertifikalarTablo";
+import LokasyonTablo from "./components/Lokasyon/LokasyonTablo";
 
 const onChange = (key) => {
   // console.log(key);
@@ -69,23 +69,23 @@ export default function SecondTabs({ refreshKey }) {
     },
     {
       key: "4",
-      label: "Ölçümler",
-      children: <Olcumler />,
+      label: "Ehliyet Bilgileri",
+      children: <EhliyetBilgileri />,
     },
     {
       key: "5",
-      label: "Süre Bilgileri",
-      children: <SureBilgileri />,
+      label: "Sertifikalar",
+      children: <SertifikalarTablo />,
     },
     {
       key: "6",
-      label: "Özel Alanlar",
-      children: <OzelAlanlar />,
+      label: "Lokasyonlar",
+      children: <LokasyonTablo />,
     },
     {
       key: "7",
-      label: "Uygulama Bilgileri",
-      children: <UygulamaBilgileri />,
+      label: "Özel Alanlar",
+      children: <OzelAlanlar />,
     },
     {
       key: "8",

@@ -7,7 +7,7 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function Birim() {
+export default function SertifikaTipi() {
   const { control, setValue } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -88,17 +88,25 @@ export default function Birim() {
 
   // add new status to selectbox end
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between" }}>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
+        justifyContent: "space-between",
+        maxWidth: "300px",
+        width: "100%",
+      }}>
       {contextHolder}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", width: "100%" }}>
         <Controller
-          name="birim"
+          name="sertifikaTipi"
           control={control}
           render={({ field }) => (
             <Select
               {...field}
               key={selectKey}
-              style={{ width: "300px" }}
+              style={{ width: "100%" }}
               showSearch
               allowClear
               placeholder="Seçim Yapınız"
@@ -121,6 +129,9 @@ export default function Birim() {
                   />
                   <Space
                     style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      justifyContent: "center",
                       padding: "0 8px 4px",
                     }}>
                     <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
@@ -136,14 +147,14 @@ export default function Birim() {
               }))}
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
-                setValue("birimID", value);
+                setValue("sertifikaTipiID", value);
                 field.onChange(value);
               }}
             />
           )}
         />
         <Controller
-          name="birimID"
+          name="sertifikaTipiID"
           control={control}
           render={({ field }) => (
             <Input
