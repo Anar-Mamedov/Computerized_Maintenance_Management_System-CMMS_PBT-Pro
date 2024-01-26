@@ -41,19 +41,33 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
   //* export
   const methods = useForm({
     defaultValues: {
-      vardiyaTanimi: "",
-      secilenVardiyaID: "",
-      vardiyaBaslangicSaati: dayjs("08:00", "HH:mm"),
-      vardiyaBitisSaati: dayjs("18:00", "HH:mm"),
-      vardiyaTipi: null,
-      vardiyaTipiID: "",
+      personelKodu: "",
+      secilenPersonelID: "",
+      personelAktif: true,
+      personelAdi: "",
+      personelTipi: null,
+      personelTipiID: "",
+      departman: null,
+      departmanID: "",
+      atolyeTanim: "",
+      atolyeID: "",
       lokasyonTanim: "",
       lokasyonID: "",
-      vardiyaProjeTanim: "",
-      vardiyaProjeID: "",
-      varsayilanVardiya: false,
-      gosterimRengi: "#ffae00",
-      vardiyaAciklama: "",
+      unvan: "",
+      gorevi: null,
+      goreviID: "",
+      taseronTanim: "",
+      taseronID: "",
+      idariAmiriTanim: "",
+      idariAmiriID: "",
+      masrafMerkeziTanim: "",
+      masrafMerkeziID: "",
+      teknisyen: "",
+      operator: "",
+      bakim: "",
+      santiye: "",
+      surucu: "",
+      diger: "",
     },
   });
 
@@ -72,18 +86,24 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
   //* export
   const onSubmit = (data) => {
     const Body = {
-      VAR_TANIM: data.vardiyaTanimi,
-      VAR_VARDIYA_TIPI_KOD_ID: data.vardiyaTipiID,
-      VAR_LOKASYON_ID: data.lokasyonID,
-      VAR_PROJE_ID: data.vardiyaProjeID,
-      VAR_VARSAYILAN: data.varsayilanVardiya ? 1 : 0,
-      VAR_MOLA_SURESI: 1,
-      // VAR_RENK: data.gosterimRengi,
-      VAR_ACIKLAMA: data.vardiyaAciklama,
-      VAR_BASLAMA_SAATI: formatTimeWithDayjs(data.vardiyaBaslangicSaati),
-      VAR_BITIS_SAATI: formatTimeWithDayjs(data.vardiyaBitisSaati),
-      VAR_OLUSTURAN_ID: 24,
-
+      PRS_PERSONEL_KOD: data.personelKodu,
+      PRS_ISIM: data.personelAdi,
+      PRS_PERSONEL_TIP_KOD_ID: data.personelTipiID,
+      PRS_DEPARTMAN_ID: data.departmanID,
+      PRS_LOKASYON_ID: data.lokasyonID,
+      PRS_ATOLYE_ID: data.atolyeID,
+      PRS_UNVAN: data.unvan,
+      PRS_GOREV_KOD_ID: data.goreviID,
+      PRS_FIRMA_ID: data.taseronID,
+      PRS_IDARI_PERSONEL_ID: data.idariAmiriID,
+      PRS_MASRAF_MERKEZI_ID: data.masrafMerkeziID,
+      PRS_AKTIF: data.personelAktif,
+      PRS_TEKNISYEN: data.teknisyen,
+      PRS_SURUCU: data.surucu,
+      PRS_OPERATOR: data.operator,
+      PRS_BAKIM: data.bakim,
+      PRS_DIGER: data.diger,
+      PRS_SANTIYE: data.santiye,
       // add more fields as needed
     };
 
@@ -91,7 +111,7 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
     // handle response
     // });
 
-    AxiosInstance.post("AddVardiya", Body)
+    AxiosInstance.post("AddPersonel", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);

@@ -21,7 +21,6 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import Departman from "./components/Departman";
 import Gorevi from "./components/Gorevi";
 import TaseronTablo from "./components/TaseronTablo";
-import PersonelHesabiTablo from "./components/PersonelHesabiTablo";
 import AtolyeTablo from "./components/AtolyeTablo";
 import IdariAmiriTablo from "./components/IdariAmiriTablo";
 import MasrafMerkeziTablo from "./components/MasrafMerkeziTablo";
@@ -430,57 +429,6 @@ export default function MainTabs() {
                 }}
               />
               <Button onClick={handleTaseronMinusClick}> - </Button>
-            </div>
-          </StyledDivBottomLine>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-          <StyledDivBottomLine
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "450px",
-            }}>
-            <Text style={{ fontSize: "14px" }}>Personel Hesabı:</Text>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "300px",
-              }}>
-              <Controller
-                name="personelHesabiTanim"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text" // Set the type to "text" for name input
-                    style={{ width: "215px" }}
-                    disabled
-                  />
-                )}
-              />
-              <Controller
-                name="personelHesabiID"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text" // Set the type to "text" for name input
-                    style={{ display: "none" }}
-                  />
-                )}
-              />
-              <PersonelHesabiTablo
-                onSubmit={(selectedData) => {
-                  setValue("personelHesabiTanim", selectedData.subject);
-                  setValue("personelHesabiID", selectedData.key);
-                }}
-              />
-              <Button onClick={handlePersonelHesabiMinusClick}> - </Button>
             </div>
           </StyledDivBottomLine>
         </div>

@@ -43,7 +43,7 @@ export default function Gorevi() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32759");
+      const response = await AxiosInstance.get("KodList?grup=32753");
       if (response && response) {
         setOptions(response);
       }
@@ -71,7 +71,7 @@ export default function Gorevi() {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32759`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32753`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
