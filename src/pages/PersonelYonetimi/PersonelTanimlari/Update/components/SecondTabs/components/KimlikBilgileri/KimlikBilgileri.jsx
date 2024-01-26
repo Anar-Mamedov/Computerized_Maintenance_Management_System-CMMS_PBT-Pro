@@ -244,7 +244,7 @@ export default function KimlikBilgileri() {
                   justifyContent: "space-between",
                   width: "100%",
                 }}>
-                <Text style={{ fontSize: "14px" }}>Mezuniyet Tarihi:</Text>
+                <Text style={{ fontSize: "14px" }}>Doğum Tarihi:</Text>
                 <div
                   style={{
                     display: "flex",
@@ -256,7 +256,7 @@ export default function KimlikBilgileri() {
                     width: "100%",
                   }}>
                   <Controller
-                    name="mezuniyetTarihi"
+                    name="dogumTarihi"
                     control={control}
                     render={({ field }) => (
                       <DatePicker
