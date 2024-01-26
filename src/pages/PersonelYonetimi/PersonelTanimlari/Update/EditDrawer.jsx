@@ -54,19 +54,33 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   //* export
   const methods = useForm({
     defaultValues: {
-      vardiyaTanimi: "",
-      secilenVardiyaID: "",
-      vardiyaBaslangicSaati: dayjs("08:00", "HH:mm"),
-      vardiyaBitisSaati: dayjs("18:00", "HH:mm"),
-      vardiyaTipi: null,
-      vardiyaTipiID: "",
+      personelKodu: "",
+      secilenPersonelID: "",
+      personelAktif: true,
+      personelAdi: "",
+      personelTipi: null,
+      personelTipiID: "",
+      departman: null,
+      departmanID: "",
+      atolyeTanim: "",
+      atolyeID: "",
       lokasyonTanim: "",
       lokasyonID: "",
-      vardiyaProjeTanim: "",
-      vardiyaProjeID: "",
-      varsayilanVardiya: false,
-      gosterimRengi: "#ffae00",
-      vardiyaAciklama: "",
+      unvan: "",
+      gorevi: null,
+      goreviID: "",
+      taseronTanim: "",
+      taseronID: "",
+      idariAmiriTanim: "",
+      idariAmiriID: "",
+      masrafMerkeziTanim: "",
+      masrafMerkeziID: "",
+      teknisyen: "",
+      operator: "",
+      bakim: "",
+      santiye: "",
+      surucu: "",
+      diger: "",
     },
   });
 
@@ -85,18 +99,25 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   //* export
   const onSubmit = (data) => {
     const Body = {
-      TB_VARDIYA_ID: data.secilenVardiyaID,
-      VAR_TANIM: data.vardiyaTanimi,
-      VAR_VARDIYA_TIPI_KOD_ID: data.vardiyaTipiID,
-      VAR_LOKASYON_ID: data.lokasyonID,
-      VAR_PROJE_ID: data.vardiyaProjeID,
-      VAR_VARSAYILAN: data.varsayilanVardiya,
-      // VAR_RENK: data.gosterimRengi,
-      VAR_ACIKLAMA: data.vardiyaAciklama,
-      VAR_BASLAMA_SAATI: formatTimeWithDayjs(data.vardiyaBaslangicSaati),
-      VAR_BITIS_SAATI: formatTimeWithDayjs(data.vardiyaBitisSaati),
-      VAR_DEGISTIREN_ID: 24,
-
+      TB_PERSONEL_ID: data.secilenPersonelID,
+      PRS_PERSONEL_KOD: data.personelKodu,
+      PRS_ISIM: data.personelAdi,
+      PRS_PERSONEL_TIP_KOD_ID: data.personelTipiID,
+      PRS_DEPARTMAN_ID: data.departmanID,
+      PRS_LOKASYON_ID: data.lokasyonID,
+      PRS_ATOLYE_ID: data.atolyeID,
+      PRS_UNVAN: data.unvan,
+      PRS_GOREV_KOD_ID: data.goreviID,
+      PRS_FIRMA_ID: data.taseronID,
+      PRS_IDARI_PERSONEL_ID: data.idariAmiriID,
+      PRS_MASRAF_MERKEZI_ID: data.masrafMerkeziID,
+      PRS_AKTIF: data.personelAktif,
+      PRS_TEKNISYEN: data.teknisyen,
+      PRS_SURUCU: data.surucu,
+      PRS_OPERATOR: data.operator,
+      PRS_BAKIM: data.bakim,
+      PRS_DIGER: data.diger,
+      PRS_SANTIYE: data.santiye,
       // add more fields as needed
     };
 
@@ -126,19 +147,34 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       // Object.keys(selectedRow).forEach((key) => {
       //   console.log(key, selectedRow[key]);
       //   setValue(key, selectedRow[key]);
-      setValue("secilenVardiyaID", selectedRow.key);
-      setValue("vardiyaTanimi", selectedRow.VAR_TANIM);
-      setValue("vardiyaBaslangicSaati", dayjs(`1970-01-01T${selectedRow.VAR_BASLAMA_SAATI}`));
-      setValue("vardiyaBitisSaati", dayjs(`1970-01-01T${selectedRow.VAR_BITIS_SAATI}`));
-      setValue("vardiyaTipi", selectedRow.VAR_VARDIYA_TIPI);
-      setValue("vardiyaTipiID", selectedRow.VAR_VARDIYA_TIPI_KOD_ID);
-      setValue("lokasyonTanim", selectedRow.VAR_LOKASYON);
-      setValue("lokasyonID", selectedRow.VAR_LOKASYON_ID);
-      setValue("vardiyaProjeTanim", selectedRow.VAR_PROJE);
-      setValue("vardiyaProjeID", selectedRow.VAR_PROJE_ID);
-      setValue("varsayilanVardiya", selectedRow.VAR_VARSAYILAN);
-      setValue("gosterimRengi", selectedRow.VAR_RENK);
-      setValue("vardiyaAciklama", selectedRow.VAR_ACIKLAMA);
+      setValue("secilenPersonelID", selectedRow.key);
+      setValue("personelKodu", selectedRow.PRS_PERSONEL_KOD);
+      setValue("personelAktif", selectedRow.PRS_AKTIF);
+      setValue("personelAdi", selectedRow.PRS_ISIM);
+      setValue("personelTipi", selectedRow.PRS_TIP);
+      setValue("personelTipiID", selectedRow.PRS_PERSONEL_TIP_KOD_ID);
+      setValue("departman", selectedRow.PRS_DEPARTMAN);
+      setValue("departmanID", selectedRow.PRS_DEPARTMAN_ID);
+      setValue("atolyeTanim", selectedRow.PRS_ATOLYE);
+      setValue("atolyeID", selectedRow.PRS_ATOLYE_ID);
+      setValue("lokasyonTanim", selectedRow.PRS_LOKASYON);
+      setValue("lokasyonID", selectedRow.PRS_LOKASYON_ID);
+      setValue("unvan", selectedRow.PRS_UNVAN);
+      setValue("gorevi", selectedRow.PRS_GOREV);
+      setValue("goreviID", selectedRow.PRS_GOREV_KOD_ID);
+      setValue("taseronTanim", selectedRow.PRS_FIRMA);
+      setValue("taseronID", selectedRow.PRS_FIRMA_ID);
+      setValue("idariAmiriTanim", selectedRow.PRS_IDARI_PERSONEL);
+      setValue("idariAmiriID", selectedRow.PRS_IDARI_PERSONEL_ID);
+      setValue("masrafMerkeziTanim", selectedRow.PRS_MASRAF_MERKEZI);
+      setValue("masrafMerkeziID", selectedRow.PRS_MASRAF_MERKEZI_ID);
+      setValue("teknisyen", selectedRow.PRS_TEKNISYEN);
+      setValue("operator", selectedRow.PRS_OPERATOR);
+      setValue("bakim", selectedRow.PRS_BAKIM);
+      setValue("santiye", selectedRow.PRS_SANTIYE);
+      setValue("surucu", selectedRow.PRS_SURUCU);
+      setValue("diger", selectedRow.PRS_DIGER);
+
       // add more fields as needed
 
       // });
