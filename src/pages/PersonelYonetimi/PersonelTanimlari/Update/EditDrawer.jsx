@@ -164,7 +164,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       setValue("goreviID", selectedRow.PRS_GOREV_KOD_ID);
       setValue("taseronTanim", selectedRow.PRS_FIRMA);
       setValue("taseronID", selectedRow.PRS_FIRMA_ID);
-      setValue("idariAmiriTanim", selectedRow.PRS_IDARI_PERSONEL);
+      setValue("idariAmiriTanim", selectedRow.PRS_IDARI_PERSONEL_YAZI);
       setValue("idariAmiriID", selectedRow.PRS_IDARI_PERSONEL_ID);
       setValue("masrafMerkeziTanim", selectedRow.PRS_MASRAF_MERKEZI);
       setValue("masrafMerkeziID", selectedRow.PRS_MASRAF_MERKEZI_ID);

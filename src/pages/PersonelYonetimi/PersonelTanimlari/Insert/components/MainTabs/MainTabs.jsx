@@ -144,7 +144,7 @@ export default function MainTabs() {
           <div
             style={{
               display: "flex",
-              flexWrap: "wrap",
+              // flexWrap: "wrap",
               alignItems: "center",
               maxWidth: "300px",
               minWidth: "300px",
@@ -154,7 +154,13 @@ export default function MainTabs() {
             <Controller
               name="personelKodu"
               control={control}
-              render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+              rules={{ required: "Alan Boş Bırakılamaz!" }}
+              render={({ field, fieldState: { error } }) => (
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+                  <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
+                  {error && <div style={{ color: "red" }}>{error.message}</div>}
+                </div>
+              )}
             />
             <Controller
               name="secilenPersonelID"
@@ -203,7 +209,13 @@ export default function MainTabs() {
             <Controller
               name="personelAdi"
               control={control}
-              render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+              rules={{ required: "Alan Boş Bırakılamaz!" }}
+              render={({ field, fieldState: { error } }) => (
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+                  <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
+                  {error && <div style={{ color: "red" }}>{error.message}</div>}
+                </div>
+              )}
             />
           </div>
         </div>
