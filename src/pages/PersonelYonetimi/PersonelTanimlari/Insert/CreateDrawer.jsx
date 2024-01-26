@@ -43,8 +43,6 @@ export default function CreateDrawer({ onRefresh }) {
   });
 
   const onSubmit = (data) => {
-    console.log("Form data:", data);
-
     // Form verilerini API'nin beklediği formata dönüştür
     const Body = {
       PRS_PERSONEL_KOD: data.personelKodu,
@@ -79,6 +77,7 @@ export default function CreateDrawer({ onRefresh }) {
       .catch((error) => {
         console.error("Error sending data:", error);
       });
+    console.log({ Body });
   };
 
   const showDrawer = () => setOpen(true);
