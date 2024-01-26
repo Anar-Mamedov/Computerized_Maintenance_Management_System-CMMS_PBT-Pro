@@ -140,12 +140,12 @@ export default function MainTabs() {
             gap: "10px",
             rowGap: "0px",
           }}>
-          <Text style={{ fontSize: "14px" }}>Personel Kodu:</Text>
+          <Text style={{ fontSize: "14px", fontWeight: "600" }}>Personel Kodu:</Text>
           <div
             style={{
               display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
+              // flexWrap: "wrap",
+              alignItems: "flex-start",
               maxWidth: "300px",
               minWidth: "300px",
               gap: "10px",
@@ -154,7 +154,13 @@ export default function MainTabs() {
             <Controller
               name="personelKodu"
               control={control}
-              render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+              rules={{ required: "Alan Boş Bırakılamaz!" }}
+              render={({ field, fieldState: { error } }) => (
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+                  <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
+                  {error && <div style={{ color: "red" }}>{error.message}</div>}
+                </div>
+              )}
             />
             <Controller
               name="secilenPersonelID"
@@ -172,7 +178,10 @@ export default function MainTabs() {
               control={control}
               defaultValue={true} // or true if you want it checked by default
               render={({ field }) => (
-                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                <Checkbox
+                  style={{ marginTop: "5px" }}
+                  checked={field.value}
+                  onChange={(e) => field.onChange(e.target.checked)}>
                   Aktif
                 </Checkbox>
               )}
@@ -189,7 +198,7 @@ export default function MainTabs() {
             width: "100%",
             justifyContent: "space-between",
           }}>
-          <Text style={{ fontSize: "14px" }}>Personel Adı:</Text>
+          <Text style={{ fontSize: "14px", fontWeight: "600" }}>Personel Adı:</Text>
           <div
             style={{
               display: "flex",
@@ -203,7 +212,13 @@ export default function MainTabs() {
             <Controller
               name="personelAdi"
               control={control}
-              render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+              rules={{ required: "Alan Boş Bırakılamaz!" }}
+              render={({ field, fieldState: { error } }) => (
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+                  <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
+                  {error && <div style={{ color: "red" }}>{error.message}</div>}
+                </div>
+              )}
             />
           </div>
         </div>
