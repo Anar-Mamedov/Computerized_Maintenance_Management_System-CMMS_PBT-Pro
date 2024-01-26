@@ -5,46 +5,46 @@ import { Controller, useFormContext } from "react-hook-form";
 export default function MedeniHali() {
   const { control, watch, setValue } = useFormContext();
 
-  const ucretTipiID = watch("ucretTipiID");
+  const medeniHalID = watch("medeniHalID");
 
   const options = [
     { value: "1", label: "EVLİ" },
     { value: "2", label: "BEKAR" },
   ];
 
-  // ucretTipiID değiştiğinde bu fonksiyon çalışır
+  // medeniHalID değiştiğinde bu fonksiyon çalışır
   useEffect(() => {
-    const ucretTipiIDString = String(ucretTipiID);
-    const selectedOption = options.find((option) => option.value === ucretTipiIDString);
+    const medeniHalIDString = String(medeniHalID);
+    const selectedOption = options.find((option) => option.value === medeniHalIDString);
     if (selectedOption) {
-      setValue("ucretTipi", selectedOption.value, { shouldValidate: true });
-      setValue("ucretTipiLabel", selectedOption.label);
+      setValue("medeniHal", selectedOption.value, { shouldValidate: true });
+      setValue("medeniHalLabel", selectedOption.label);
     }
-  }, [ucretTipiID, setValue]);
+  }, [medeniHalID, setValue]);
 
   const handleChange = (value) => {
-    setValue("ucretTipi", value);
+    setValue("medeniHal", value);
     const selectedOption = options.find((option) => option.value === value);
     if (selectedOption) {
-      setValue("ucretTipiID", selectedOption.value);
-      setValue("ucretTipiLabel", selectedOption.label);
+      setValue("medeniHalID", selectedOption.value);
+      setValue("medeniHalLabel", selectedOption.label);
     } else {
-      setValue("ucretTipiID", "");
-      setValue("ucretTipiLabel", "");
+      setValue("medeniHalID", "");
+      setValue("medeniHalLabel", "");
     }
   };
 
   return (
     <div style={{ width: "100%", maxWidth: "300px" }}>
       <Controller
-        name="ucretTipi"
+        name="medeniHal"
         control={control}
         render={({ field }) => (
           <Select {...field} allowClear style={{ width: "100%" }} onChange={handleChange} options={options} />
         )}
       />
       <Controller
-        name="ucretTipiID"
+        name="medeniHalID"
         control={control}
         render={({ field }) => (
           <Input
@@ -55,7 +55,7 @@ export default function MedeniHali() {
         )}
       />
       <Controller
-        name="ucretTipiLabel"
+        name="medeniHalLabel"
         control={control}
         render={({ field }) => (
           <Input
