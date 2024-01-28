@@ -192,7 +192,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       setValue("tcKimlikNo", selectedRow.PRS_TCKIMLIK_NO);
       setValue("seriNo", selectedRow.PRS_KIMLIK_SERINO);
       setValue("babaAdi", selectedRow.PRS_BABA_ADI);
-      setValue("anaAdi", selectedRow.PRS_ANNE_ADI);
+      setValue("anaAdi", selectedRow.PRS_ANA_ADI);
       setValue("dogumYeri", selectedRow.PRS_DOGUM_YERI);
       setValue("dini", selectedRow.PRS_DINI);
       setValue("kayitNo", selectedRow.PRS_KIMLIK_KAYIT_NO);
@@ -289,7 +289,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       PRS_DIL_KOD_ID: data.diliID,
       PRS_CINSIYET: data.cinsiyetID,
       PRS_KAN_GRUP: data.kanGrubu,
-      PRS_SSK_NO: data.sgKNO,
+      PRS_SSK_NO: data.sgkNo,
       PRS_VERGI_NO: data.vergiNo,
       PRS_EGITIM_DURUMU: data.egitimDurumu,
       PRS_MEZUN_OLDUGU_OKUL: data.mezunOkul,
@@ -304,7 +304,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       PRS_TCKIMLIK_NO: data.tcKimlikNo,
       PRS_KIMLIK_SERINO: data.seriNo,
       PRS_BABA_ADI: data.babaAdi,
-      // PRS_ANNE_ADI: data.anaAdi,
+      PRS_ANA_ADI: data.anaAdi,
       PRS_DOGUM_YERI: data.dogumYeri,
       PRS_DINI: data.dini,
       PRS_KIMLIK_KAYIT_NO: data.kayitNo,
@@ -334,9 +334,9 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       PRS_OZEL_ALAN_3: data.ozelAlan3,
       PRS_OZEL_ALAN_4: data.ozelAlan4,
       PRS_OZEL_ALAN_5: data.ozelAlan5,
-      PRS_OZEL_ALAN_6_KOD_ID: data.ozelAlan6ID,
-      PRS_OZEL_ALAN_7_KOD_ID: data.ozelAlan7ID,
-      PRS_OZEL_ALAN_8_KOD_ID: data.ozelAlan8ID,
+      // PRS_OZEL_ALAN_6_KOD_ID: data.ozelAlan6ID,
+      // PRS_OZEL_ALAN_7_KOD_ID: data.ozelAlan7ID,
+      // PRS_OZEL_ALAN_8_KOD_ID: data.ozelAlan8ID,
       PRS_OZEL_ALAN_9: data.ozelAlan9,
       PRS_OZEL_ALAN_10: data.ozelAlan10,
       // Açıklama sekmesi
