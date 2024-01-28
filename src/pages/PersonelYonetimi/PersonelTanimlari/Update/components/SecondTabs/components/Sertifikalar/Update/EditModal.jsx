@@ -8,9 +8,12 @@ import MainTabs from "./MainTabs/MainTabs";
 export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh }) {
   const methods = useForm({
     defaultValues: {
-      siraNo: "",
+      belgeNo: "",
       secilenID: "",
-      isTanimi: "",
+      sertifikaTipi: null,
+      sertifikaTipiID: "",
+      verilisTarihi: "",
+      bitisTarihi: "",
       aciklama: "",
       // Add other default values here
     },
@@ -18,19 +21,50 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
 
   const { setValue, reset, handleSubmit } = methods;
 
+  useEffect(() => {
+    if (isModalVisible && selectedRow) {
+      setValue("secilenID", selectedRow.key);
+      setValue("belgeNo", selectedRow.PSE_BELGE_NO);
+      setValue("sertifikaTipi", selectedRow.PSE_SERTIFIKA_TIP);
+      setValue("sertifikaTipiID", selectedRow.PSE_SERTIFIKA_TIP_KOD_ID);
+      setValue("verilisTarihi", dayjs(selectedRow.PSE_VERILIS_TARIH));
+      setValue("bitisTarihi", dayjs(selectedRow.PSE_BITIS_TARIH));
+      setValue("aciklama", selectedRow.PSE_ACIKLAMA);
+    }
+  }, [selectedRow, isModalVisible, setValue]);
+
+  useEffect(() => {
+    if (!isModalVisible) {
+      reset();
+    }
+  }, [isModalVisible, reset]);
+
+  const formatDateWithDayjs = (dateString) => {
+    const formattedDate = dayjs(dateString);
+    return formattedDate.isValid() ? formattedDate.format("YYYY-MM-DD") : "";
+  };
+
+  const formatTimeWithDayjs = (timeObj) => {
+    const formattedTime = dayjs(timeObj);
+    return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
+  };
+
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi
 
   const onSubmited = (data) => {
     const Body = {
-      TB_IS_TANIM_KONROLLIST_ID: data.secilenID,
-      ISK_SIRANO: data.siraNo,
-      ISK_TANIM: data.isTanimi,
-      ISK_ACIKLAMA: data.aciklama,
+      TB_PERSONEL_SERTIFIKA_ID: data.secilenID,
+      PSE_BELGE_NO: data.belgeNo,
+      PSE_SERTIFIKA_TIP_KOD_ID: data.sertifikaTipiID,
+      PSE_VERILIS_TARIH: formatDateWithDayjs(data.verilisTarihi),
+      PSE_BITIS_TARIH: formatDateWithDayjs(data.bitisTarihi),
+      PSE_ACIKLAMA: data.aciklama,
+      PSE_OLUSTURAN_ID: 24,
     };
 
-    AxiosInstance.post("UpdateIsTanimKontrolList", Body)
+    AxiosInstance.post("UpdatePersonelSertifika", Body)
       .then((response) => {
-        console.log("Data sent successfully:", response.data);
+        console.log("Data sent successfully:", response);
         reset();
         onModalClose(); // Modal'ı kapat
         onRefresh(); // Tabloyu yenile
@@ -42,37 +76,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
     console.log({ Body });
   };
 
-  const handleModalOk = () => {
-    handleSubmit(onSubmited)();
-    onModalClose();
-    onRefresh();
-  };
-
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi sonu
-
-  useEffect(() => {
-    if (isModalVisible && selectedRow) {
-      // console.log("selectedRow", selectedRow);
-      // startTransition(() => {
-      // Object.keys(selectedRow).forEach((key) => {
-      //   console.log(key, selectedRow[key]);
-      //   setValue(key, selectedRow[key]);
-      setValue("secilenID", selectedRow.key);
-      setValue("siraNo", selectedRow.ISK_SIRANO);
-      setValue("isTanimi", selectedRow.ISK_TANIM);
-      setValue("aciklama", selectedRow.ISK_ACIKLAMA);
-      // add more fields as needed
-
-      // });
-      // });
-    }
-  }, [selectedRow, isModalVisible, setValue]);
-
-  useEffect(() => {
-    if (!isModalVisible) {
-      reset();
-    }
-  }, [isModalVisible, reset]);
 
   return (
     <FormProvider {...methods}>
@@ -81,9 +85,11 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
           width="800px"
           title="Kontrol Listesi Güncelle"
           open={isModalVisible}
-          onOk={handleModalOk}
+          onOk={methods.handleSubmit(onSubmited)}
           onCancel={onModalClose}>
-          <MainTabs />
+          <form onSubmit={methods.handleSubmit(onSubmited)}>
+            <MainTabs />
+          </form>
         </Modal>
       </div>
     </FormProvider>

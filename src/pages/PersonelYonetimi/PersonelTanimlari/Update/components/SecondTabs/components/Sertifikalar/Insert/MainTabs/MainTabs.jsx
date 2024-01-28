@@ -80,7 +80,7 @@ export default function MainTabs() {
           rowGap: "0px",
           marginBottom: "10px",
         }}>
-        <Text style={{ fontSize: "14px" }}>Belge no:</Text>
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Belge no:</Text>
         <div
           style={{
             display: "flex",
@@ -94,7 +94,13 @@ export default function MainTabs() {
           <Controller
             name="belgeNo"
             control={control}
-            render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+            rules={{ required: "Alan Boş Bırakılamaz!" }}
+            render={({ field, fieldState: { error } }) => (
+              <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+                <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
+                {error && <div style={{ color: "red" }}>{error.message}</div>}
+              </div>
+            )}
           />
           <Controller
             name="secilenID"
