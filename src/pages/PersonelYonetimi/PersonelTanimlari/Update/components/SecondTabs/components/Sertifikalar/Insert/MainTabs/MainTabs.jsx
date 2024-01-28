@@ -54,6 +54,7 @@ const StyledTabs = styled(Tabs)`
 
 //styled components end
 export default function MainTabs() {
+  const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const { control, watch, setValue } = useFormContext();
 
   const items = [
@@ -65,6 +66,20 @@ export default function MainTabs() {
       ),
     },
   ];
+
+  // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın
+
+  useEffect(() => {
+    // Kullanıcının yerel tarih formatını almak için Intl.DateTimeFormat kullanın
+    const formatter = new Intl.DateTimeFormat(navigator.language);
+    const sampleDate = new Date(2021, 10, 21);
+    const formattedSample = formatter.format(sampleDate);
+
+    // Kullanıcının yerel formatını DD/MM/YYYY formatına dönüştürün
+    setLocaleDateFormat(formattedSample.replace("2021", "YYYY").replace("21", "DD").replace("11", "MM"));
+  }, []);
+
+  // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın sonu
 
   return (
     <div>
@@ -127,7 +142,7 @@ export default function MainTabs() {
           rowGap: "0px",
           marginBottom: "10px",
         }}>
-        <Text style={{ fontSize: "14px" }}>Sertifika Tipi:</Text>
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Sertifika Tipi:</Text>
         <div
           style={{
             display: "flex",
@@ -165,7 +180,12 @@ export default function MainTabs() {
               name="verilisTarihi"
               control={control}
               render={({ field }) => (
-                <DatePicker {...field} style={{ width: "200px" }} format="DD-MM-YYYY" placeholder="Tarih seçiniz" />
+                <DatePicker
+                  {...field}
+                  style={{ width: "200px" }}
+                  format={localeDateFormat}
+                  placeholder="Tarih seçiniz"
+                />
               )}
             />
           </div>
@@ -195,7 +215,12 @@ export default function MainTabs() {
               name="bitisTarihi"
               control={control}
               render={({ field }) => (
-                <DatePicker {...field} style={{ width: "200px" }} format="DD-MM-YYYY" placeholder="Tarih seçiniz" />
+                <DatePicker
+                  {...field}
+                  style={{ width: "200px" }}
+                  format={localeDateFormat}
+                  placeholder="Tarih seçiniz"
+                />
               )}
             />
           </div>
