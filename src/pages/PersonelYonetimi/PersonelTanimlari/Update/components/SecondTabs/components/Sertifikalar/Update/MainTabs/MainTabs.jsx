@@ -67,6 +67,8 @@ export default function MainTabs() {
     },
   ];
 
+  // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın
+
   useEffect(() => {
     // Kullanıcının yerel tarih formatını almak için Intl.DateTimeFormat kullanın
     const formatter = new Intl.DateTimeFormat(navigator.language);
@@ -76,6 +78,8 @@ export default function MainTabs() {
     // Kullanıcının yerel formatını DD/MM/YYYY formatına dönüştürün
     setLocaleDateFormat(formattedSample.replace("2021", "YYYY").replace("21", "DD").replace("11", "MM"));
   }, []);
+
+  // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın sonu
 
   return (
     <div>
@@ -138,7 +142,7 @@ export default function MainTabs() {
           rowGap: "0px",
           marginBottom: "10px",
         }}>
-        <Text style={{ fontSize: "14px" }}>Sertifika Tipi:</Text>
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Sertifika Tipi:</Text>
         <div
           style={{
             display: "flex",

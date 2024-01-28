@@ -102,55 +102,60 @@ export default function SertifikaTipi() {
         <Controller
           name="sertifikaTipi"
           control={control}
-          render={({ field }) => (
-            <Select
-              {...field}
-              key={selectKey}
-              style={{ width: "100%" }}
-              showSearch
-              allowClear
-              placeholder="Seçim Yapınız"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
-              }
-              onDropdownVisibleChange={(open) => {
-                if (open) {
-                  fetchData(); // Fetch data when the dropdown is opened
+          rules={{ required: "Alan Boş Bırakılamaz!" }}
+          render={({ field, fieldState: { error } }) => (
+            <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+              <Select
+                {...field}
+                status={error ? "error" : ""}
+                key={selectKey}
+                style={{ width: "100%" }}
+                showSearch
+                allowClear
+                placeholder="Seçim Yapınız"
+                optionFilterProp="children"
+                filterOption={(input, option) =>
+                  option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
                 }
-              }}
-              dropdownRender={(menu) => (
-                <Spin spinning={loading}>
-                  {menu}
-                  <Divider
-                    style={{
-                      margin: "8px 0",
-                    }}
-                  />
-                  <Space
-                    style={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      justifyContent: "center",
-                      padding: "0 8px 4px",
-                    }}>
-                    <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
-                    <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
-                      Ekle
-                    </Button>
-                  </Space>
-                </Spin>
-              )}
-              options={options.map((item) => ({
-                value: item.TB_KOD_ID, // Use the ID as the value
-                label: item.KOD_TANIM, // Display the name in the dropdown
-              }))}
-              onChange={(value) => {
-                // Seçilen değerin ID'sini NedeniID alanına set et
-                setValue("sertifikaTipiID", value);
-                field.onChange(value);
-              }}
-            />
+                onDropdownVisibleChange={(open) => {
+                  if (open) {
+                    fetchData(); // Fetch data when the dropdown is opened
+                  }
+                }}
+                dropdownRender={(menu) => (
+                  <Spin spinning={loading}>
+                    {menu}
+                    <Divider
+                      style={{
+                        margin: "8px 0",
+                      }}
+                    />
+                    <Space
+                      style={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        justifyContent: "center",
+                        padding: "0 8px 4px",
+                      }}>
+                      <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
+                      <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
+                        Ekle
+                      </Button>
+                    </Space>
+                  </Spin>
+                )}
+                options={options.map((item) => ({
+                  value: item.TB_KOD_ID, // Use the ID as the value
+                  label: item.KOD_TANIM, // Display the name in the dropdown
+                }))}
+                onChange={(value) => {
+                  // Seçilen değerin ID'sini NedeniID alanına set et
+                  setValue("sertifikaTipiID", value);
+                  field.onChange(value);
+                }}
+              />
+              {error && <div style={{ color: "red" }}>{error.message}</div>}
+            </div>
           )}
         />
         <Controller
