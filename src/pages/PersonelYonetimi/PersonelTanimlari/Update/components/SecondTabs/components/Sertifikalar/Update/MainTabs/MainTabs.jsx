@@ -54,6 +54,7 @@ const StyledTabs = styled(Tabs)`
 
 //styled components end
 export default function MainTabs() {
+  const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const { control, watch, setValue } = useFormContext();
 
   const items = [
@@ -65,6 +66,16 @@ export default function MainTabs() {
       ),
     },
   ];
+
+  useEffect(() => {
+    // Kullanıcının yerel tarih formatını almak için Intl.DateTimeFormat kullanın
+    const formatter = new Intl.DateTimeFormat(navigator.language);
+    const sampleDate = new Date(2021, 10, 21);
+    const formattedSample = formatter.format(sampleDate);
+
+    // Kullanıcının yerel formatını DD/MM/YYYY formatına dönüştürün
+    setLocaleDateFormat(formattedSample.replace("2021", "YYYY").replace("21", "DD").replace("11", "MM"));
+  }, []);
 
   return (
     <div>
@@ -80,7 +91,7 @@ export default function MainTabs() {
           rowGap: "0px",
           marginBottom: "10px",
         }}>
-        <Text style={{ fontSize: "14px" }}>Belge no:</Text>
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Belge no:</Text>
         <div
           style={{
             display: "flex",
@@ -94,7 +105,13 @@ export default function MainTabs() {
           <Controller
             name="belgeNo"
             control={control}
-            render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+            rules={{ required: "Alan Boş Bırakılamaz!" }}
+            render={({ field, fieldState: { error } }) => (
+              <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+                <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
+                {error && <div style={{ color: "red" }}>{error.message}</div>}
+              </div>
+            )}
           />
           <Controller
             name="secilenID"
@@ -159,7 +176,12 @@ export default function MainTabs() {
               name="verilisTarihi"
               control={control}
               render={({ field }) => (
-                <DatePicker {...field} style={{ width: "200px" }} format="DD-MM-YYYY" placeholder="Tarih seçiniz" />
+                <DatePicker
+                  {...field}
+                  style={{ width: "200px" }}
+                  format={localeDateFormat}
+                  placeholder="Tarih seçiniz"
+                />
               )}
             />
           </div>
@@ -189,7 +211,12 @@ export default function MainTabs() {
               name="bitisTarihi"
               control={control}
               render={({ field }) => (
-                <DatePicker {...field} style={{ width: "200px" }} format="DD-MM-YYYY" placeholder="Tarih seçiniz" />
+                <DatePicker
+                  {...field}
+                  style={{ width: "200px" }}
+                  format={localeDateFormat}
+                  placeholder="Tarih seçiniz"
+                />
               )}
             />
           </div>
