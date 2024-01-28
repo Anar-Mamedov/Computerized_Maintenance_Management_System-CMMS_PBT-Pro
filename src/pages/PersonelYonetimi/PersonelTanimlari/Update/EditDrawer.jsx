@@ -95,6 +95,33 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       verildigiYer: "",
       verilisNedeni: "",
       verilisTarihi: "",
+      // Ehliyet Bilgileri sekmesi
+      ehliyet: null,
+      ehliyetID: "",
+      ehliyetLabel: "",
+      sinifi: "",
+      ehliyetVerildigiIlIlce: "",
+      belgeNo: "",
+      belgeTarihi: "",
+      ehliyetSeriNo: "",
+      kullandigiCihazProtezler: "",
+      cezaPuani: "",
+      // Özel Alanlar sekmesi
+      ozelAlan1: "",
+      ozelAlan2: "",
+      ozelAlan3: "",
+      ozelAlan4: "",
+      ozelAlan5: "",
+      ozelAlan6: null,
+      ozelAlan6ID: "",
+      ozelAlan7: null,
+      ozelAlan7ID: "",
+      ozelAlan8: null,
+      ozelAlan8ID: "",
+      ozelAlan9: "",
+      ozelAlan10: "",
+      // Açıklama Sekmesi
+      aciklama: "",
       // ... Tüm default değerleriniz
     },
   });
@@ -155,12 +182,62 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       setValue("egitimDurumu", selectedRow.PRS_EGITIM_DURUMU);
       setValue("mezunOkul", selectedRow.PRS_MEZUN_OLDUGU_OKUL);
       setValue("mezunBolum", selectedRow.PRS_MEZUN_OLDUGU_BOLUM);
-      setValue("mezuniyetTarihi", dayjs(selectedRow.PRS_MEZUNIYET_TARIH));
-      setValue("iseBaslamaTarihi", dayjs(selectedRow.PRS_ISE_BASLAMA));
-      setValue("istenAyrilmaTarihi", dayjs(selectedRow.PRS_AYRILMATARIH));
+      setValue("mezuniyetTarihi", selectedRow.PRS_MEZUNIYET_TARIH ? dayjs(selectedRow.PRS_MEZUNIYET_TARIH) : null);
+      setValue("iseBaslamaTarihi", selectedRow.PRS_ISE_BASLAMA ? dayjs(selectedRow.PRS_ISE_BASLAMA) : null);
+      setValue("istenAyrilmaTarihi", selectedRow.PRS_AYRILMATARIH ? dayjs(selectedRow.PRS_AYRILMATARIH) : null);
       setValue("ucretTipiID", selectedRow.PRS_UCRET_TIPI);
       setValue("iscilikUcreti", selectedRow.PRS_BIRIM_UCRET);
       setValue("fazlaMesaiUcreti", selectedRow.PRS_FAZLA_MESAI);
+      // kimlik bilgileri sekmesi
+      setValue("tcKimlikNo", selectedRow.PRS_TCKIMLIK_NO);
+      setValue("seriNo", selectedRow.PRS_KIMLIK_SERINO);
+      setValue("babaAdi", selectedRow.PRS_BABA_ADI);
+      setValue("anaAdi", selectedRow.PRS_ANNE_ADI);
+      setValue("dogumYeri", selectedRow.PRS_DOGUM_YERI);
+      setValue("dini", selectedRow.PRS_DINI);
+      setValue("kayitNo", selectedRow.PRS_KIMLIK_KAYIT_NO);
+      setValue("dogumTarihi", selectedRow.PRS_DOGUM_TARIH ? dayjs(selectedRow.PRS_DOGUM_TARIH) : null);
+      setValue("medeniHalID", selectedRow.PRS_MEDENI_HALI);
+      setValue("kayitliOlduguIl", selectedRow.PRS_KAYITLI_OLDUGU_IL);
+      setValue("kayitliOlduguIlce", selectedRow.PRS_KAYITLI_OLDUGU_ILCE);
+      setValue("mahalleKoy", selectedRow.PRS_MAHALLE_KOY);
+      setValue("ciltNo", selectedRow.PRS_KIMLIK_CILT_NO);
+      setValue("aileSiraNo", selectedRow.PRS_KIMLIK_AILE_SIRA_NO);
+      setValue("siraNo", selectedRow.PRS_KIMLIK_SIRA_NO);
+      setValue("verildigiYer", selectedRow.PRS_KIMLIK_VERILDIGI_YER);
+      setValue("verilisNedeni", selectedRow.PRS_KIMLIK_VERILIS_NEDENI);
+      setValue(
+        "verilisTarihi",
+        selectedRow.PRS_KIMLIK_VERILIS_TARIH ? dayjs(selectedRow.PRS_KIMLIK_VERILIS_TARIH) : null
+      );
+      // Ehliyet Bilgileri sekmesi
+      setValue("ehliyetID", selectedRow.PRS_EHLIYET);
+      setValue("sinifi", selectedRow.PRS_EHLIYET_SINIF);
+      setValue("ehliyetVerildigiIlIlce", selectedRow.PRS_EHLIYET_VERILDIGI_IL_ILCE);
+      setValue("belgeNo", selectedRow.PRS_EHLIYETNO);
+      setValue(
+        "belgeTarihi",
+        selectedRow.PRS_EHLIYET_BELGE_TARIHI ? dayjs(selectedRow.PRS_EHLIYET_BELGE_TARIHI) : null
+      );
+      setValue("ehliyetSeriNo", selectedRow.PRS_EHLIYET_SERI_NO);
+      setValue("kullandigiCihazProtezler", selectedRow.PRS_EHLIYET_KULLANDIGI_CIHAZ_PROTEZ);
+      setValue("cezaPuani", selectedRow.PRS_CEZAPUAN);
+      // Özel Alanlar sekmesi
+      setValue("ozelAlan1", selectedRow.PRS_OZEL_ALAN_1);
+      setValue("ozelAlan2", selectedRow.PRS_OZEL_ALAN_2);
+      setValue("ozelAlan3", selectedRow.PRS_OZEL_ALAN_3);
+      setValue("ozelAlan4", selectedRow.PRS_OZEL_ALAN_4);
+      setValue("ozelAlan5", selectedRow.PRS_OZEL_ALAN_5);
+      setValue("ozelAlan6", selectedRow.PRS_OZEL_ALAN_6);
+      setValue("ozelAlan6ID", selectedRow.PRS_OZEL_ALAN_6_KOD_ID);
+      setValue("ozelAlan7", selectedRow.PRS_OZEL_ALAN_7);
+      setValue("ozelAlan7ID", selectedRow.PRS_OZEL_ALAN_7_KOD_ID);
+      setValue("ozelAlan8", selectedRow.PRS_OZEL_ALAN_8);
+      setValue("ozelAlan8ID", selectedRow.PRS_OZEL_ALAN_8_KOD_ID);
+      setValue("ozelAlan9", selectedRow.PRS_OZEL_ALAN_9);
+      setValue("ozelAlan10", selectedRow.PRS_OZEL_ALAN_10);
+      // Açıklama Sekmesi
+      setValue("aciklama", selectedRow.PRS_ACIKLAMA);
     }
   }, [selectedRow, setValue, drawerVisible]);
 
@@ -227,7 +304,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       PRS_TCKIMLIK_NO: data.tcKimlikNo,
       PRS_KIMLIK_SERINO: data.seriNo,
       PRS_BABA_ADI: data.babaAdi,
-      PRS_ANNE_ADI: data.anaAdi,
+      // PRS_ANNE_ADI: data.anaAdi,
       PRS_DOGUM_YERI: data.dogumYeri,
       PRS_DINI: data.dini,
       PRS_KIMLIK_KAYIT_NO: data.kayitNo,
@@ -242,6 +319,28 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       PRS_KIMLIK_VERILDIGI_YER: data.verildigiYer,
       PRS_KIMLIK_VERILIS_NEDENI: data.verilisNedeni,
       PRS_KIMLIK_VERILIS_TARIH: formatDateWithDayjs(data.verilisTarihi),
+      // Ehliyet bilgileri sekmesi
+      PRS_EHLIYET: data.ehliyetID,
+      PRS_EHLIYET_SINIF: data.sinifi,
+      PRS_EHLIYET_VERILDIGI_IL_ILCE: data.ehliyetVerildigiIlIlce,
+      PRS_EHLIYETNO: data.belgeNo,
+      PRS_EHLIYET_BELGE_TARIHI: formatDateWithDayjs(data.belgeTarihi),
+      PRS_EHLIYET_SERI_NO: data.ehliyetSeriNo,
+      PRS_EHLIYET_KULLANDIGI_CIHAZ_PROTEZ: data.kullandigiCihazProtezler,
+      PRS_CEZAPUAN: data.cezaPuani,
+      // Özel Alanlar sekmesi
+      PRS_OZEL_ALAN_1: data.ozelAlan1,
+      PRS_OZEL_ALAN_2: data.ozelAlan2,
+      PRS_OZEL_ALAN_3: data.ozelAlan3,
+      PRS_OZEL_ALAN_4: data.ozelAlan4,
+      PRS_OZEL_ALAN_5: data.ozelAlan5,
+      PRS_OZEL_ALAN_6_KOD_ID: data.ozelAlan6ID,
+      PRS_OZEL_ALAN_7_KOD_ID: data.ozelAlan7ID,
+      PRS_OZEL_ALAN_8_KOD_ID: data.ozelAlan8ID,
+      PRS_OZEL_ALAN_9: data.ozelAlan9,
+      PRS_OZEL_ALAN_10: data.ozelAlan10,
+      // Açıklama sekmesi
+      PRS_ACIKLAMA: data.aciklama,
       // Diğer alanlarınız...
     };
 
