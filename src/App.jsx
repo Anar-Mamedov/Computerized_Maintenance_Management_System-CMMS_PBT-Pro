@@ -18,6 +18,7 @@ import trTR from "antd/es/locale/tr_TR";
 import VardiyaTanim from "./pages/Yonetim/VardiyaTanimlari/VardiyaTanimlari";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import BakimTanimlari from "./pages/BakımVeArizaYonetimi/BakimTanimlari/BakimTanimlari";
+import ArizaTanimlari from "./pages/BakımVeArizaYonetimi/ArizaTanimlari/ArizaTanimlari";
 import AtolyeTanimlari from "./pages/PersonelYonetimi/AtolyeTanimlari/AtolyeTanimlari";
 import PersonelTanimlari from "./pages/PersonelYonetimi/PersonelTanimlari/PersonelTanimlari";
 
@@ -43,6 +44,7 @@ const items = [
     [
       // getItem("Tom", "tom", true),
       getItem("Bakım Tanımları", "bakimTanimlari", true),
+      getItem("Arıza Tanımları", "arizaTanimlari", true),
       getItem("İş Emri", "isemri", true),
       // getItem("Alex", "alex", true)
     ],
@@ -194,6 +196,7 @@ const App = () => {
                     <Route path="/lokasyon" element={<LokasyonTanim />} />
                     <Route path="/vardiyalar" element={<VardiyaTanim />} />
                     <Route path="/bakimTanimlari" element={<BakimTanimlari />} />
+                    <Route path="/arizaTanimlari" element={<BakimTanimlari />} />
                     <Route path="/atolye" element={<AtolyeTanimlari />} />
                     <Route path="/personeltanimlari" element={<PersonelTanimlari />} />
                     {/* Diğer Route'lar */}
@@ -211,9 +214,9 @@ const App = () => {
                     <Route path="/lokasyon" element={<LokasyonTanim />} />
                     <Route path="/vardiyalar" element={<VardiyaTanim />} />
                     <Route path="/bakimTanimlari" element={<BakimTanimlari />} />
+                    <Route path="/arizaTanimlari" element={<BakimTanimlari />} />
                     <Route path="/atolye" element={<AtolyeTanimlari />} />
                     <Route path="/personeltanimlari" element={<PersonelTanimlari />} />
-
                     {/* Diğer Route'lar */}
                   </Routes>
                 </div>
