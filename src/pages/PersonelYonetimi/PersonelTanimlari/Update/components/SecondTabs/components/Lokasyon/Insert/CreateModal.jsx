@@ -77,7 +77,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
 
         <Modal
           width="800px"
-          title="Personel Şantiye Ekleme"
+          title="Şantiye Ekleme"
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
           onCancel={handleModalToggle}>

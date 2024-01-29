@@ -80,7 +80,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
 
         <Modal
           width="800px"
-          title="Sertifika Tanımı"
+          title="Sertifika Ekle"
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
           onCancel={handleModalToggle}>
