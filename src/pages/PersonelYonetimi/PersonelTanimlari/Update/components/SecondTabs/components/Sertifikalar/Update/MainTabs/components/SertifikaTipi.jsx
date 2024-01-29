@@ -23,7 +23,7 @@ export default function SertifikaTipi() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32001");
+      const response = await AxiosInstance.get("KodList?grup=32772");
       if (response && response) {
         setOptions(response);
       }
@@ -51,7 +51,7 @@ export default function SertifikaTipi() {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32001`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32772`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
