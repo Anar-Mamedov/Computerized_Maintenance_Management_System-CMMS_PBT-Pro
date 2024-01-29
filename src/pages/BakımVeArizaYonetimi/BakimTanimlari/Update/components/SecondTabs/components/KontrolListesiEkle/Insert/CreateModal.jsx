@@ -33,6 +33,8 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       .then((response) => {
         console.log("Data sent successfully:", response.data);
         reset();
+        setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
+        onRefresh();
       })
       .catch((error) => {
         console.error("Error sending data:", error);
