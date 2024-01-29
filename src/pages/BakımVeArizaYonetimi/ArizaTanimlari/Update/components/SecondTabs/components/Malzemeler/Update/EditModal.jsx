@@ -25,6 +25,38 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
 
   const { setValue, reset, handleSubmit } = methods;
 
+  useEffect(() => {
+    if (isModalVisible && selectedRow) {
+      setValue("secilenID", selectedRow.key);
+      setValue("malzemeKoduTanim", selectedRow.ISM_STOK_KOD);
+      setValue("malzemeKoduID", selectedRow.ISM_STOK_ID);
+      setValue("malzemeTanimi", selectedRow.ISM_STOK_TANIM);
+      setValue("malzemeTipi", selectedRow.ISM_STOK_TIP);
+      setValue("malzemeTipiID", selectedRow.ISM_STOK_TIP_KOD_ID);
+      setValue("mazemeMiktari", selectedRow.ISM_MIKTAR);
+      setValue("miktarBirim", selectedRow.ISM_BIRIM);
+      setValue("miktarBirimID", selectedRow.ISM_BIRIM_KOD_ID);
+      setValue("mazemeFiyati", selectedRow.ISM_BIRIM_FIYAT);
+      setValue("mazemeMaliyeti", selectedRow.ISM_TUTAR);
+    }
+  }, [selectedRow, isModalVisible, setValue]);
+
+  useEffect(() => {
+    if (!isModalVisible) {
+      reset();
+    }
+  }, [isModalVisible, reset]);
+
+  const formatDateWithDayjs = (dateString) => {
+    const formattedDate = dayjs(dateString);
+    return formattedDate.isValid() ? formattedDate.format("YYYY-MM-DD") : "";
+  };
+
+  const formatTimeWithDayjs = (timeObj) => {
+    const formattedTime = dayjs(timeObj);
+    return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
+  };
+
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi
 
   const onSubmited = (data) => {
@@ -44,7 +76,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
 
     AxiosInstance.post("UpdateIsTanimMalzeme", Body)
       .then((response) => {
-        console.log("Data sent successfully:", response.data);
+        console.log("Data sent successfully:", response);
         reset();
         onModalClose(); // Modal'ı kapat
         onRefresh(); // Tabloyu yenile
@@ -56,44 +88,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
     console.log({ Body });
   };
 
-  const handleModalOk = () => {
-    handleSubmit(onSubmited)();
-    onModalClose();
-    onRefresh();
-  };
-
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi sonu
-
-  useEffect(() => {
-    if (isModalVisible && selectedRow) {
-      // console.log("selectedRow", selectedRow);
-      // startTransition(() => {
-      // Object.keys(selectedRow).forEach((key) => {
-      //   console.log(key, selectedRow[key]);
-      //   setValue(key, selectedRow[key]);
-      setValue("secilenID", selectedRow.key);
-      setValue("malzemeKoduTanim", selectedRow.ISM_STOK_KOD);
-      setValue("malzemeKoduID", selectedRow.ISM_STOK_ID);
-      setValue("malzemeTanimi", selectedRow.ISM_STOK_TANIM);
-      setValue("malzemeTipi", selectedRow.ISM_STOK_TIP);
-      setValue("malzemeTipiID", selectedRow.ISM_STOK_TIP_KOD_ID);
-      setValue("mazemeMiktari", selectedRow.ISM_MIKTAR);
-      setValue("miktarBirim", selectedRow.ISM_BIRIM);
-      setValue("miktarBirimID", selectedRow.ISM_BIRIM_KOD_ID);
-      setValue("mazemeFiyati", selectedRow.ISM_BIRIM_FIYAT);
-      setValue("mazemeMaliyeti", selectedRow.ISM_TUTAR);
-      // add more fields as needed
-
-      // });
-      // });
-    }
-  }, [selectedRow, isModalVisible, setValue]);
-
-  useEffect(() => {
-    if (!isModalVisible) {
-      reset();
-    }
-  }, [isModalVisible, reset]);
 
   return (
     <FormProvider {...methods}>
@@ -102,9 +97,11 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
           width="800px"
           title="Malzeme Güncelle"
           open={isModalVisible}
-          onOk={handleModalOk}
+          onOk={methods.handleSubmit(onSubmited)}
           onCancel={onModalClose}>
-          <MainTabs />
+          <form onSubmit={methods.handleSubmit(onSubmited)}>
+            <MainTabs />
+          </form>
         </Modal>
       </div>
     </FormProvider>

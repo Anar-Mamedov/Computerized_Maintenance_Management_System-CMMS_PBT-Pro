@@ -4,6 +4,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../../api/http";
 import { Controller, useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
+import dayjs from "dayjs";
 
 export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenBakimID }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -26,6 +27,16 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
 
   const { setValue, reset, handleSubmit } = methods;
 
+  const formatDateWithDayjs = (dateString) => {
+    const formattedDate = dayjs(dateString);
+    return formattedDate.isValid() ? formattedDate.format("YYYY-MM-DD") : "";
+  };
+
+  const formatTimeWithDayjs = (timeObj) => {
+    const formattedTime = dayjs(timeObj);
+    return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
+  };
+
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi
 
   const onSubmited = (data) => {
@@ -45,9 +56,10 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
 
     AxiosInstance.post("AddIsTanimMalzeme", Body)
       .then((response) => {
-        console.log("Data sent successfully:", response.data);
+        console.log("Data sent successfully:", response);
         reset();
-        onRefresh(); // Tabloyu yenile
+        setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
+        onRefresh();
       })
       .catch((error) => {
         console.error("Error sending data:", error);
@@ -61,12 +73,6 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     if (!isModalVisible) {
       reset();
     }
-  };
-
-  const handleModalOk = () => {
-    handleSubmit(onSubmited)();
-    setIsModalVisible(false);
-    onRefresh();
   };
 
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi sonu
@@ -84,9 +90,11 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
           width="800px"
           title="Malzeme Ekle"
           open={isModalVisible}
-          onOk={handleModalOk}
+          onOk={methods.handleSubmit(onSubmited)}
           onCancel={handleModalToggle}>
-          <MainTabs />
+          <form onSubmit={methods.handleSubmit(onSubmited)}>
+            <MainTabs />
+          </form>
         </Modal>
       </div>
     </FormProvider>

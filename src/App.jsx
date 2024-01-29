@@ -196,7 +196,7 @@ const App = () => {
                     <Route path="/lokasyon" element={<LokasyonTanim />} />
                     <Route path="/vardiyalar" element={<VardiyaTanim />} />
                     <Route path="/bakimTanimlari" element={<BakimTanimlari />} />
-                    <Route path="/arizaTanimlari" element={<BakimTanimlari />} />
+                    <Route path="/arizaTanimlari" element={<ArizaTanimlari />} />
                     <Route path="/atolye" element={<AtolyeTanimlari />} />
                     <Route path="/personeltanimlari" element={<PersonelTanimlari />} />
                     {/* Diğer Route'lar */}
@@ -214,7 +214,7 @@ const App = () => {
                     <Route path="/lokasyon" element={<LokasyonTanim />} />
                     <Route path="/vardiyalar" element={<VardiyaTanim />} />
                     <Route path="/bakimTanimlari" element={<BakimTanimlari />} />
-                    <Route path="/arizaTanimlari" element={<BakimTanimlari />} />
+                    <Route path="/arizaTanimlari" element={<ArizaTanimlari />} />
                     <Route path="/atolye" element={<AtolyeTanimlari />} />
                     <Route path="/personeltanimlari" element={<PersonelTanimlari />} />
                     {/* Diğer Route'lar */}

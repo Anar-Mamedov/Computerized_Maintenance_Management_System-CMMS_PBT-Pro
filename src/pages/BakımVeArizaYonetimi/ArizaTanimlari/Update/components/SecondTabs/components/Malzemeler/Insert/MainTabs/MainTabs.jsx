@@ -136,7 +136,7 @@ export default function MainTabs() {
           rowGap: "0px",
           marginBottom: "10px",
         }}>
-        <Text style={{ fontSize: "14px" }}>Malzeme Tanımı:</Text>
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Malzeme Tanımı:</Text>
         <div
           style={{
             display: "flex",
@@ -150,12 +150,17 @@ export default function MainTabs() {
           <Controller
             name="malzemeTanimi"
             control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                style={{ flex: 1 }}
-                disabled={!!malzemeKoduTanim} // malzemeKoduTanim varsa malzemeTanimi'ni devre dışı bırak
-              />
+            rules={{ required: "Alan Boş Bırakılamaz!" }}
+            render={({ field, fieldState: { error } }) => (
+              <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+                <Input
+                  {...field}
+                  status={error ? "error" : ""}
+                  style={{ flex: 1 }}
+                  disabled={!!malzemeKoduTanim} // malzemeKoduTanim varsa malzemeTanimi'ni devre dışı bırak
+                />
+                {error && <div style={{ color: "red" }}>{error.message}</div>}
+              </div>
             )}
           />
         </div>
@@ -172,7 +177,7 @@ export default function MainTabs() {
             justifyContent: "space-between",
             width: "100%",
           }}>
-          <Text style={{ fontSize: "14px" }}>Miktar:</Text>
+          <Text style={{ fontSize: "14px", fontWeight: "600" }}>Miktar:</Text>
           <div
             style={{
               display: "flex",
@@ -186,21 +191,29 @@ export default function MainTabs() {
             <Controller
               name="mazemeMiktari"
               control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  style={{ flex: 1 }}
-                  onKeyPress={(e) => {
-                    const value = field.value;
-                    // Rakam veya bir virgül olup olmadığını kontrol et
-                    if (!/[0-9]/.test(e.key) && (e.key !== "," || value.includes(","))) {
-                      e.preventDefault();
-                    }
-                  }}
-                />
+              rules={{ required: "Alan Boş Bırakılamaz!" }}
+              render={({ field, fieldState: { error } }) => (
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    <Input
+                      {...field}
+                      status={error ? "error" : ""}
+                      style={{ flex: 1 }}
+                      onKeyPress={(e) => {
+                        const value = field.value;
+                        // Rakam veya bir virgül olup olmadığını kontrol et
+                        if (!/[0-9]/.test(e.key) && (e.key !== "," || value.includes(","))) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
+                    <MiktarBirim />
+                  </div>
+
+                  {error && <div style={{ color: "red" }}>{error.message}</div>}
+                </div>
               )}
             />
-            <MiktarBirim />
           </div>
         </StyledDivBottomLine>
       </div>
