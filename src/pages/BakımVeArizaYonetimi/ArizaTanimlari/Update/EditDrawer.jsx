@@ -104,7 +104,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       setValue("maliyetlerGenelGider", selectedRow.IST_GENEL_GIDER_MALIYET);
       setTimeout(() => {
         setValue("maliyetlerToplam", selectedRow.IST_TOPLAM_MALIYET);
-      }, 100);
+      }, 500);
       setValue("lojistikSuresi", selectedRow.IST_SURE_LOJISTIK);
       setValue("seyahetSuresi", selectedRow.IST_SURE_SEYAHAT);
       setValue("onaySuresi", selectedRow.IST_SURE_ONAY);
