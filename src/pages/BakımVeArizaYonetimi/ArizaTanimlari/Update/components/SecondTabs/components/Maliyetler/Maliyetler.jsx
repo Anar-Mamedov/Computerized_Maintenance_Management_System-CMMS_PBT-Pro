@@ -187,6 +187,7 @@ export default function Maliyetler() {
                   {...field}
                   type="number" // Tipi "number" olarak ayarla
                   style={{ flex: 1 }}
+                  disabled
                 />
               )}
             />
