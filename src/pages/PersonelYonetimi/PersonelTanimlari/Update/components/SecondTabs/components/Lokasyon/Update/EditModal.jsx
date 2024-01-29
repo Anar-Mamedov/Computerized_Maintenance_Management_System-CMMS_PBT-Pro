@@ -8,9 +8,11 @@ import MainTabs from "./MainTabs/MainTabs";
 export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh }) {
   const methods = useForm({
     defaultValues: {
-      siraNo: "",
       secilenID: "",
-      isTanimi: "",
+      lokasyonTanim: "",
+      lokasyonID: "",
+      ayrilmaNedeni: "",
+      ayrilmaNedeniID: "",
       aciklama: "",
       // Add other default values here
     },
@@ -18,19 +20,47 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
 
   const { setValue, reset, handleSubmit } = methods;
 
+  useEffect(() => {
+    if (isModalVisible && selectedRow) {
+      setValue("secilenID", selectedRow.key);
+      setValue("lokasyonTanim", selectedRow.SANTIYE);
+      setValue("lokasyonID", selectedRow.PSS_SANTIYE_ID);
+      setValue("ayrilmaNedeni", selectedRow.PSS_AYRILMA_NEDEN);
+      setValue("ayrilmaNedeniID", selectedRow.PSS_AYRILMA_NEDEN_KOD_ID);
+      setValue("aciklama", selectedRow.PSS_ACIKLAMA);
+    }
+  }, [selectedRow, isModalVisible, setValue]);
+
+  useEffect(() => {
+    if (!isModalVisible) {
+      reset();
+    }
+  }, [isModalVisible, reset]);
+
+  const formatDateWithDayjs = (dateString) => {
+    const formattedDate = dayjs(dateString);
+    return formattedDate.isValid() ? formattedDate.format("YYYY-MM-DD") : "";
+  };
+
+  const formatTimeWithDayjs = (timeObj) => {
+    const formattedTime = dayjs(timeObj);
+    return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
+  };
+
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi
 
   const onSubmited = (data) => {
     const Body = {
-      TB_IS_TANIM_KONROLLIST_ID: data.secilenID,
-      ISK_SIRANO: data.siraNo,
-      ISK_TANIM: data.isTanimi,
-      ISK_ACIKLAMA: data.aciklama,
+      TB_PERSONEL_SANTIYE_ID: data.secilenID,
+      PSS_SANTIYE_ID: data.lokasyonID,
+      PSS_AYRILMA_NEDEN_KOD_ID: data.ayrilmaNedeniID,
+      PSS_ACIKLAMA: data.aciklama,
+      PSS_OLUSTURAN_ID: 24,
     };
 
-    AxiosInstance.post("UpdateIsTanimKontrolList", Body)
+    AxiosInstance.post("UpdatePersonelSantiye", Body)
       .then((response) => {
-        console.log("Data sent successfully:", response.data);
+        console.log("Data sent successfully:", response);
         reset();
         onModalClose(); // Modal'ı kapat
         onRefresh(); // Tabloyu yenile
@@ -42,48 +72,20 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
     console.log({ Body });
   };
 
-  const handleModalOk = () => {
-    handleSubmit(onSubmited)();
-    onModalClose();
-    onRefresh();
-  };
-
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi sonu
-
-  useEffect(() => {
-    if (isModalVisible && selectedRow) {
-      // console.log("selectedRow", selectedRow);
-      // startTransition(() => {
-      // Object.keys(selectedRow).forEach((key) => {
-      //   console.log(key, selectedRow[key]);
-      //   setValue(key, selectedRow[key]);
-      setValue("secilenID", selectedRow.key);
-      setValue("siraNo", selectedRow.ISK_SIRANO);
-      setValue("isTanimi", selectedRow.ISK_TANIM);
-      setValue("aciklama", selectedRow.ISK_ACIKLAMA);
-      // add more fields as needed
-
-      // });
-      // });
-    }
-  }, [selectedRow, isModalVisible, setValue]);
-
-  useEffect(() => {
-    if (!isModalVisible) {
-      reset();
-    }
-  }, [isModalVisible, reset]);
 
   return (
     <FormProvider {...methods}>
       <div>
         <Modal
           width="800px"
-          title="Kontrol Listesi Güncelle"
+          title="Şantiye Güncelleme"
           open={isModalVisible}
-          onOk={handleModalOk}
+          onOk={methods.handleSubmit(onSubmited)}
           onCancel={onModalClose}>
-          <MainTabs />
+          <form onSubmit={methods.handleSubmit(onSubmited)}>
+            <MainTabs />
+          </form>
         </Modal>
       </div>
     </FormProvider>
