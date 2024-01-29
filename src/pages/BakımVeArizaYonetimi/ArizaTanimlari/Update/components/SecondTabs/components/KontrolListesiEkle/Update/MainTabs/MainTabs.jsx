@@ -1,8 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Input, Typography, Tabs } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import AxiosInstance from "../../../../../../../../../../api/http";
-import { Controller, useForm, useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 
 const { Text, Link } = Typography;
@@ -44,7 +42,6 @@ const StyledTabs = styled(Tabs)`
 `;
 
 //styled components end
-
 export default function MainTabs() {
   const { control, watch, setValue } = useFormContext();
 
@@ -62,6 +59,7 @@ export default function MainTabs() {
       children: "test",
     },
   ];
+
   return (
     <div>
       <div
@@ -117,7 +115,7 @@ export default function MainTabs() {
           rowGap: "0px",
           marginBottom: "10px",
         }}>
-        <Text style={{ fontSize: "14px" }}>İş Tanımı:</Text>
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>İş Tanımı:</Text>
         <div
           style={{
             display: "flex",
@@ -131,7 +129,13 @@ export default function MainTabs() {
           <Controller
             name="isTanimi"
             control={control}
-            render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+            rules={{ required: "Alan Boş Bırakılamaz!" }}
+            render={({ field, fieldState: { error } }) => (
+              <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+                <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
+                {error && <div style={{ color: "red" }}>{error.message}</div>}
+              </div>
+            )}
           />
         </div>
       </div>

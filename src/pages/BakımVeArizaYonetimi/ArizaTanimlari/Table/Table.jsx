@@ -29,7 +29,7 @@ export default function MainTable() {
   const fetchEquipmentData = async () => {
     try {
       setLoading(true);
-      const response = await AxiosInstance.get("BakimGetir");
+      const response = await AxiosInstance.get("ArizaGetir");
       if (response) {
         const formattedData = response.map((item) => {
           return {
@@ -141,14 +141,14 @@ export default function MainTable() {
 
   const columns = [
     {
-      title: "Bakım Kod",
+      title: "Arıza Kod",
       dataIndex: "IST_KOD",
       key: "IST_KOD",
       width: 150,
       ellipsis: true,
     },
     {
-      title: "Bakım Tanım",
+      title: "Arıza Tanım",
       dataIndex: "IST_TANIM",
       key: "IST_TANIM",
       width: 200,
@@ -169,14 +169,14 @@ export default function MainTable() {
     },
 
     {
-      title: "Bakım Tip",
+      title: "Arıza Tip",
       dataIndex: "IST_TIP",
       key: "IST_TIP",
       width: 250,
       ellipsis: true,
     },
     {
-      title: "Bakım Grup",
+      title: "Arıza Grup",
       dataIndex: "IST_GRUP",
       key: "IST_GRUP",
       width: 200,

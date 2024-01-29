@@ -67,11 +67,11 @@ export default function SecondTabs({ refreshKey }) {
       label: "Maliyetler",
       children: <Maliyetler />,
     },
-    {
-      key: "4",
-      label: "Ölçümler",
-      children: <Olcumler />,
-    },
+    // {
+    //   key: "4",
+    //   label: "Ölçümler",
+    //   children: <Olcumler />,
+    // },
     {
       key: "5",
       label: "Süre Bilgileri",

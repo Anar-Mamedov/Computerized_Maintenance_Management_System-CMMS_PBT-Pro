@@ -43,7 +43,7 @@ export default function BakimNedeni() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32452");
+      const response = await AxiosInstance.get("KodList?grup=32413");
       if (response && response) {
         setOptions(response);
       }
@@ -71,7 +71,7 @@ export default function BakimNedeni() {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32452`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32413`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
@@ -118,7 +118,7 @@ export default function BakimNedeni() {
         rowGap: "0px",
       }}>
       {contextHolder}
-      <Text style={{ fontSize: "14px", minWidth: "40px" }}>Bakım Nedeni:</Text>
+      <Text style={{ fontSize: "14px", minWidth: "40px" }}>Arıza Nedeni:</Text>
       <Controller
         name="bakimNedeni"
         control={control}
