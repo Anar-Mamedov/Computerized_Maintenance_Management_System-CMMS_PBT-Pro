@@ -14,27 +14,58 @@ export default function LokasyonTablo() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
+  // Intl.DateTimeFormat kullanarak tarih formatlama
+  const formatDate = (date) => {
+    if (!date) return "";
+
+    // Örnek bir tarih formatla ve ay formatını belirle
+    const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
+
+    let monthFormat;
+    if (sampleFormatted.includes("January")) {
+      monthFormat = "long"; // Tam ad ("January")
+    } else if (sampleFormatted.includes("Jan")) {
+      monthFormat = "short"; // Üç harfli kısaltma ("Jan")
+    } else {
+      monthFormat = "2-digit"; // Sayısal gösterim ("01")
+    }
+
+    // Kullanıcı için tarihi formatla
+    const formatter = new Intl.DateTimeFormat(navigator.language, {
+      year: "numeric",
+      month: monthFormat,
+      day: "2-digit",
+    });
+    return formatter.format(new Date(date));
+  };
+
+  // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
+
   const columns = [
     {
-      title: "Lokasyonlar",
-      dataIndex: "ISK_SIRANO",
-      key: "ISK_SIRANO",
-      width: 40,
+      title: <div style={{ textAlign: "center" }}>Lokasyonlar</div>,
+      dataIndex: "SANTIYE",
+      key: "SANTIYE",
+      // width: 40,
       ellipsis: true,
+      render: (text) => <div style={{ textAlign: "left" }}>{text}</div>,
     },
   ];
 
-  const secilenBakimID = watch("secilenBakimID");
+  const secilenPersonelID = watch("secilenPersonelID");
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`IsTanimKontrolList?isTanimID=${secilenBakimID}`)
+    AxiosInstance.get(`PersonelSantiyeList?personelId=${secilenPersonelID}`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
-          key: item.TB_IS_TANIM_KONROLLIST_ID,
-          ISK_SIRANO: item.ISK_SIRANO,
-          ISK_TANIM: item.ISK_TANIM,
-          ISK_ACIKLAMA: item.ISK_ACIKLAMA,
+          key: item.TB_PERSONEL_SANTIYE_ID,
+          SANTIYE: item.SANTIYE,
+          PSS_SANTIYE_ID: item.PSS_SANTIYE_ID,
+          PSS_AYRILMA_NEDEN: item.PSS_AYRILMA_NEDEN,
+          PSS_AYRILMA_NEDEN_KOD_ID: item.PSS_AYRILMA_NEDEN_KOD_ID,
+          PSS_ACIKLAMA: item.PSS_ACIKLAMA,
         }));
         setData(fetchedData);
       })
@@ -43,14 +74,14 @@ export default function LokasyonTablo() {
         console.error("API isteği sırasında hata oluştu:", error);
       })
       .finally(() => setLoading(false));
-  }, [secilenBakimID]); // secilenBakimID değiştiğinde fetch fonksiyonunu güncelle
+  }, [secilenPersonelID]); // secilenPersonelID değiştiğinde fetch fonksiyonunu güncelle
 
   useEffect(() => {
-    if (secilenBakimID) {
-      // secilenBakimID'nin varlığını ve geçerliliğini kontrol edin
+    if (secilenPersonelID) {
+      // secilenPersonelID'nin varlığını ve geçerliliğini kontrol edin
       fetch(); // fetch fonksiyonunu çağırın
     }
-  }, [secilenBakimID, fetch]); // secilenBakimID veya fetch fonksiyonu değiştiğinde useEffect'i tetikle
+  }, [secilenPersonelID, fetch]); // secilenPersonelID veya fetch fonksiyonu değiştiğinde useEffect'i tetikle
 
   const onRowSelectChange = (selectedKeys) => {
     setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
@@ -67,7 +98,7 @@ export default function LokasyonTablo() {
 
   return (
     <div>
-      <CreateModal onRefresh={refreshTable} secilenBakimID={secilenBakimID} />
+      <CreateModal onRefresh={refreshTable} secilenPersonelID={secilenPersonelID} />
       <Table
         rowSelection={{
           type: "radio",

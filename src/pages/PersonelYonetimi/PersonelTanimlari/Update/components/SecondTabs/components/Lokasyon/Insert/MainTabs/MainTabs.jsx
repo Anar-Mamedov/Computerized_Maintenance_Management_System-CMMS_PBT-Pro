@@ -97,13 +97,13 @@ export default function MainTabs() {
           maxWidth: "420px",
           marginBottom: "10px",
         }}>
-        <Text style={{ fontSize: "14px" }}>Lokasyon:</Text>
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Lokasyon:</Text>
         <div
           className="anar"
           style={{
             display: "flex",
             flexDirection: "row",
-            alignItems: "center",
+            // alignItems: "center",
             justifyContent: "space-between",
             minWidth: "300px",
             gap: "3px",
@@ -111,13 +111,18 @@ export default function MainTabs() {
           <Controller
             name="lokasyonTanim"
             control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ width: "100%", maxWidth: "630px" }}
-                disabled
-              />
+            rules={{ required: "Alan Boş Bırakılamaz!" }}
+            render={({ field, fieldState: { error } }) => (
+              <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+                <Input
+                  {...field}
+                  status={error ? "error" : ""}
+                  type="text" // Set the type to "text" for name input
+                  style={{ width: "100%", maxWidth: "630px" }}
+                  disabled
+                />
+                {error && <div style={{ color: "red" }}>{error.message}</div>}
+              </div>
             )}
           />
           <Controller
@@ -139,6 +144,17 @@ export default function MainTabs() {
           />
           <Button onClick={handleLokasyonMinusClick}> - </Button>
         </div>
+        <Controller
+          name="secilenID"
+          control={control}
+          render={({ field }) => (
+            <Input
+              {...field}
+              type="text" // Set the type to "text" for name input
+              style={{ display: "none" }}
+            />
+          )}
+        />
       </StyledDivMedia>
 
       <div
