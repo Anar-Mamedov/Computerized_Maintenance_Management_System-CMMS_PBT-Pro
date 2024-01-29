@@ -157,7 +157,7 @@ export default function MainTabs() {
         />
       </StyledDivMedia>
 
-      <div
+      {/* <div
         style={{
           display: "flex",
           flexWrap: "wrap",
@@ -182,7 +182,7 @@ export default function MainTabs() {
           }}>
           <AyrilmaNedeni />
         </div>
-      </div>
+      </div> */}
       <StyledTabs defaultActiveKey="1" items={items} onChange={onChange} />
     </div>
   );

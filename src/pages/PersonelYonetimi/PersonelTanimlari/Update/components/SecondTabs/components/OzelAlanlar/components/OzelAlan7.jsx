@@ -23,7 +23,7 @@ export default function OzelAlan7() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32448");
+      const response = await AxiosInstance.get("KodList?grup=32774");
       if (response && response) {
         setOptions(response);
       }
@@ -51,7 +51,7 @@ export default function OzelAlan7() {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32448`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32774`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response

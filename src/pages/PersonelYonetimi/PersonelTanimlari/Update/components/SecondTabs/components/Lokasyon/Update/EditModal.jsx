@@ -79,7 +79,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       <div>
         <Modal
           width="800px"
-          title="Şantiye Güncelleme"
+          title="Lokasyon Güncelleme"
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
           onCancel={onModalClose}>
