@@ -21,6 +21,7 @@ import BakimTanimlari from "./pages/BakımVeArizaYonetimi/BakimTanimlari/BakimTa
 import ArizaTanimlari from "./pages/BakımVeArizaYonetimi/ArizaTanimlari/ArizaTanimlari";
 import AtolyeTanimlari from "./pages/PersonelYonetimi/AtolyeTanimlari/AtolyeTanimlari";
 import PersonelTanimlari from "./pages/PersonelYonetimi/PersonelTanimlari/PersonelTanimlari";
+import IsTalepleri from "./pages/YardimMasasi/IsTalepleri/IsTalepleri";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -67,6 +68,16 @@ const items = [
     [
       getItem("Atölye Tanımları", "atolye", true),
       getItem("Personel Tanımları", "personeltanimlari", true),
+      // getItem("Team 2", "team2", true)
+    ],
+    false
+  ),
+  getItem(
+    "Yardım Masası",
+    "yardimMasasi",
+    <KeyOutlined />,
+    [
+      getItem("İş Talepleri", "isTalepleri", true),
       // getItem("Team 2", "team2", true)
     ],
     false
@@ -199,6 +210,7 @@ const App = () => {
                     <Route path="/arizaTanimlari" element={<ArizaTanimlari />} />
                     <Route path="/atolye" element={<AtolyeTanimlari />} />
                     <Route path="/personeltanimlari" element={<PersonelTanimlari />} />
+                    <Route path="/isTalepleri" element={<IsTalepleri />} />
                     {/* Diğer Route'lar */}
                   </Routes>
                 </div>
@@ -217,6 +229,7 @@ const App = () => {
                     <Route path="/arizaTanimlari" element={<ArizaTanimlari />} />
                     <Route path="/atolye" element={<AtolyeTanimlari />} />
                     <Route path="/personeltanimlari" element={<PersonelTanimlari />} />
+                    <Route path="/isTalepleri" element={<IsTalepleri />} />
                     {/* Diğer Route'lar */}
                   </Routes>
                 </div>
