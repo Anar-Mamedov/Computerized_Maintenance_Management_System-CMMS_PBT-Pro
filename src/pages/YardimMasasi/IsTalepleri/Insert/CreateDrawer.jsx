@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { Button, Drawer, Space, ConfigProvider, Modal } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
@@ -9,6 +9,13 @@ import Footer from "../Footer";
 
 export default function CreateDrawer({ onRefresh }) {
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      // Çekmece açıldığında gerekli işlemi yap
+      // Örneğin, MainTabs'a bir prop olarak geçir
+    }
+  }, [open]);
 
   const methods = useForm({
     defaultValues: {
@@ -104,7 +111,7 @@ export default function CreateDrawer({ onRefresh }) {
         </Button>
         <Drawer
           width="550px"
-          title="Personel Tanımı Ekle"
+          title="İş Talebi Ekle"
           placement="right"
           onClose={onClose}
           open={open}
@@ -120,7 +127,7 @@ export default function CreateDrawer({ onRefresh }) {
             </Space>
           }>
           <form onSubmit={methods.handleSubmit(onSubmit)}>
-            <MainTabs />
+            <MainTabs drawerOpen={open} />
             <Footer />
           </form>
         </Drawer>

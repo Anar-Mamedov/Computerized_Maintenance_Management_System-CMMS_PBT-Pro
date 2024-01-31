@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Input, Table, Spin } from "antd";
-import { CheckOutlined, CloseOutlined, SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
-import dayjs from "dayjs";
+import Filters from "./filter/Filters";
 
 export default function MainTable() {
   const { setValue } = useFormContext();
@@ -13,7 +13,66 @@ export default function MainTable() {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredData, setFilteredData] = useState([]);
+  const [searchTimeout, setSearchTimeout] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0); // Toplam sayfa sayısı için state
+
+  // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
+
+  // Intl.DateTimeFormat kullanarak tarih formatlama
+  const formatDate = (date) => {
+    if (!date) return "";
+
+    // Örnek bir tarih formatla ve ay formatını belirle
+    const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
+
+    let monthFormat;
+    if (sampleFormatted.includes("January")) {
+      monthFormat = "long"; // Tam ad ("January")
+    } else if (sampleFormatted.includes("Jan")) {
+      monthFormat = "short"; // Üç harfli kısaltma ("Jan")
+    } else {
+      monthFormat = "2-digit"; // Sayısal gösterim ("01")
+    }
+
+    // Kullanıcı için tarihi formatla
+    const formatter = new Intl.DateTimeFormat(navigator.language, {
+      year: "numeric",
+      month: monthFormat,
+      day: "2-digit",
+    });
+    return formatter.format(new Date(date));
+  };
+
+  const formatTime = (time) => {
+    if (!time) return "";
+
+    try {
+      // Saati ve dakikayı parçalara ayır (varsayılan olarak "HH:MM:SS" veya "HH:MM" formatında beklenir)
+      const [hours, minutes] = time.split(":");
+
+      // Geçerli tarih ile birlikte bir Date nesnesi oluştur ve sadece saat ve dakika bilgilerini ayarla
+      const date = new Date();
+      date.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0);
+
+      // Kullanıcının lokal ayarlarına uygun olarak saat ve dakikayı formatla
+      // `hour12` seçeneğini belirtmeyerek Intl.DateTimeFormat'ın kullanıcının yerel ayarlarına göre otomatik seçim yapmasına izin ver
+      const formatter = new Intl.DateTimeFormat(navigator.language, {
+        hour: "numeric",
+        minute: "2-digit",
+        // hour12 seçeneği burada belirtilmiyor; böylece otomatik olarak kullanıcının sistem ayarlarına göre belirleniyor
+      });
+
+      // Formatlanmış saati döndür
+      return formatter.format(date);
+    } catch (error) {
+      console.error("Error formatting time:", error);
+      return ""; // Hata durumunda boş bir string döndür
+    }
+  };
+
+  // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
   // edit drawer için
   const [drawer, setDrawer] = useState({
@@ -22,31 +81,172 @@ export default function MainTable() {
   });
   // edit drawer için son
 
-  useEffect(() => {
-    fetchEquipmentData();
-  }, []);
+  const [body, setBody] = useState({
+    keyword: "",
+    filters: {},
+  });
 
-  const fetchEquipmentData = async () => {
+  // ana tablo api isteği için kullanılan useEffect
+
+  useEffect(() => {
+    fetchEquipmentData(body, currentPage);
+  }, [body, currentPage]);
+
+  // ana tablo api isteği için kullanılan useEffect son
+
+  // arama işlemi için kullanılan useEffect
+  useEffect(() => {
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    // Arama terimi değiştiğinde ve boş olduğunda API isteğini tetikle
+    const timeout = setTimeout(() => {
+      if (searchTerm !== body.keyword) {
+        handleBodyChange("keyword", searchTerm);
+        setCurrentPage(1); // Arama yapıldığında veya arama sıfırlandığında sayfa numarasını 1'e ayarla
+      }
+    }, 2000);
+
+    setSearchTimeout(timeout);
+
+    return () => clearTimeout(timeout);
+  }, [searchTerm]);
+
+  // arama işlemi için kullanılan useEffect son
+
+  const fetchEquipmentData = async (body, page) => {
+    const { keyword, filters = {} } = body || {};
     try {
       setLoading(true);
-      const response = await AxiosInstance.get("Personel");
+      const response = await AxiosInstance.post(`GetIsTalepFullList?parametre=${keyword}&pagingDeger=${page}`, filters);
       if (response) {
-        const formattedData = response.map((item) => {
-          return {
-            ...item,
-            key: item.TB_PERSONEL_ID,
-            code: item.PRS_PERSONEL_KOD,
-            subject: item.PRS_ISIM,
-            workdays: item.PRS_UNVAN,
-            description: item.PRS_TIP,
-            fifthcolumn: item.PRS_DEPARTMAN,
-            sixthcolumn: item.PRS_LOKASYON,
-          };
-        });
-        setData(formattedData); // Directly set the data
+        setTotalPages(response.page); // Toplam sayfa sayısını ayarla
+        const formattedData = response.is_talep_listesi.map((item) => ({
+          ...item,
+          key: item.TB_IS_TALEP_ID,
+          IST_KOD: item.IST_KOD,
+          IST_ACILIS_TARIHI: item.IST_ACILIS_TARIHI,
+          IST_ACILIS_SAATI: item.IST_ACILIS_SAATI,
+          IST_GUNCELLEME_TARIHI: item.IST_GUNCELLEME_TARIHI,
+          IST_GUNCELLEME_SAATI: item.IST_GUNCELLEME_SAATI,
+          IST_GUNCELEYEN_ID: item.IST_GUNCELEYEN_ID,
+          IST_KAPAMA_TARIHI: item.IST_KAPAMA_TARIHI,
+          IST_KAPAMA_SAATI: item.IST_KAPAMA_SAATI,
+          IST_TALEP_EDEN_ID: item.IST_TALEP_EDEN_ID,
+          IST_IS_TAKIPCISI_ID: item.IST_IS_TAKIPCISI_ID,
+          IST_ATOLYE_GRUP_ID: item.IST_ATOLYE_GRUP_ID,
+          IST_TIP_KOD_ID: item.IST_TIP_KOD_ID,
+          IST_KOTEGORI_KODI_ID: item.IST_KOTEGORI_KODI_ID,
+          IST_SERVIS_NEDENI_KOD_ID: item.IST_SERVIS_NEDENI_KOD_ID,
+          IST_IRTIBAT_KOD_KOD_ID: item.IST_IRTIBAT_KOD_KOD_ID,
+          IST_BILDIRILEN_BINA: item.IST_BILDIRILEN_BINA,
+          IST_BILDIRILEN_KAT: item.IST_BILDIRILEN_KAT,
+          IST_TANIMI: item.IST_TANIMI,
+          IST_KONU: item.IST_KONU,
+          IST_NOT: item.IST_NOT,
+          IST_DURUM_ID: item.IST_DURUM_ID,
+          IST_ONCELIK_ID: item.IST_ONCELIK_ID,
+          IST_PLANLANAN_BASLAMA_TARIHI: item.IST_PLANLANAN_BASLAMA_TARIHI,
+          IST_PLANLANAN_BASLAMA_SAATI: item.IST_PLANLANAN_BASLAMA_SAATI,
+          IST_PLANLANAN_BITIS_TARIHI: item.IST_PLANLANAN_BITIS_TARIHI,
+          IST_PLANLANAN_BITIS_SAATI: item.IST_PLANLANAN_BITIS_SAATI,
+          IST_BILDIREN_LOKASYON_ID: item.IST_BILDIREN_LOKASYON_ID,
+          IST_IRTIBAT_TELEFON: item.IST_IRTIBAT_TELEFON,
+          IST_MAIL_ADRES: item.IST_MAIL_ADRES,
+          IST_BASLAMA_TARIHI: item.IST_BASLAMA_TARIHI,
+          IST_BASLAMA_SAATI: item.IST_BASLAMA_SAATI,
+          IST_BITIS_TARIHI: item.IST_BITIS_TARIHI,
+          IST_BITIS_SAATI: item.IST_BITIS_SAATI,
+          IST_IPTAL_NEDEN: item.IST_IPTAL_NEDEN,
+          IST_IPTAL_TARIH: item.IST_IPTAL_TARIH,
+          IST_IPTAL_SAAT: item.IST_IPTAL_SAAT,
+          IST_MAKINE_ID: item.IST_MAKINE_ID,
+          IST_EKIPMAN_ID: item.IST_EKIPMAN_ID,
+          IST_ISEMRI_ID: item.IST_ISEMRI_ID,
+          IST_ACIKLAMA: item.IST_ACIKLAMA,
+          IST_SONUC: item.IST_SONUC,
+          IST_AKTIF: item.IST_AKTIF,
+          IST_BIRLESIM_ID: item.IST_BIRLESIM_ID,
+          IST_ACILIS_NEDEN: item.IST_ACILIS_NEDEN,
+          IST_SABLON_ID: item.IST_SABLON_ID,
+          IST_ARIZA_ID: item.IST_ARIZA_ID,
+          IST_MAKINE_DURUM_KOD_ID: item.IST_MAKINE_DURUM_KOD_ID,
+          IST_ARIZA_TANIM_KOD_ID: item.IST_ARIZA_TANIM_KOD_ID,
+          IST_OKUNDU: item.IST_OKUNDU,
+          IST_ISEMRI_TIP_ID: item.IST_ISEMRI_TIP_ID,
+          IST_OZEL_ALAN_1: item.IST_OZEL_ALAN_1,
+          IST_OZEL_ALAN_2: item.IST_OZEL_ALAN_2,
+          IST_OZEL_ALAN_3: item.IST_OZEL_ALAN_3,
+          IST_OZEL_ALAN_4: item.IST_OZEL_ALAN_4,
+          IST_OZEL_ALAN_5: item.IST_OZEL_ALAN_5,
+          IST_OZEL_ALAN_6: item.IST_OZEL_ALAN_6,
+          IST_OZEL_ALAN_7: item.IST_OZEL_ALAN_7,
+          IST_OZEL_ALAN_8: item.IST_OZEL_ALAN_8,
+          IST_OZEL_ALAN_9: item.IST_OZEL_ALAN_9,
+          IST_OZEL_ALAN_10: item.IST_OZEL_ALAN_10,
+          IST_OZEL_ALAN_11: item.IST_OZEL_ALAN_11,
+          IST_OZEL_ALAN_12: item.IST_OZEL_ALAN_12,
+          IST_OZEL_ALAN_13: item.IST_OZEL_ALAN_13,
+          IST_OZEL_ALAN_14: item.IST_OZEL_ALAN_14,
+          IST_OZEL_ALAN_15: item.IST_OZEL_ALAN_15,
+          IST_OZEL_ALAN_16: item.IST_OZEL_ALAN_16,
+          IST_OZEL_ALAN_17: item.IST_OZEL_ALAN_17,
+          IST_OZEL_ALAN_18: item.IST_OZEL_ALAN_18,
+          IST_OZEL_ALAN_19: item.IST_OZEL_ALAN_19,
+          IST_OZEL_ALAN_20: item.IST_OZEL_ALAN_20,
+          IST_OLUSTURAN_ID: item.IST_OLUSTURAN_ID,
+          IST_OLUSTURMA_TARIH: item.IST_OLUSTURMA_TARIH,
+          IST_DEGISTIREN_ID: item.IST_DEGISTIREN_ID,
+          IST_DEGISTIRME_TARIH: item.IST_DEGISTIRME_TARIH,
+          IST_ON_DEGERLENDIRME: item.IST_ON_DEGERLENDIRME,
+          IST_IS_DEVAM_DURUM_ID: item.IST_IS_DEVAM_DURUM_ID,
+          IST_DEGERLENDIRME_PUAN: item.IST_DEGERLENDIRME_PUAN,
+          IST_DEGERLENDIRME_ACIKLAMA: item.IST_DEGERLENDIRME_ACIKLAMA,
+          IST_DEPARTMAN_ID: item.IST_DEPARTMAN_ID,
+          IST_ILGILI_ATOLYE_ID: item.IST_ILGILI_ATOLYE_ID,
+          IST_TALEP_EDEN_ADI: item.IST_TALEP_EDEN_ADI,
+          IST_TAKIP_EDEN_ADI: item.IST_TAKIP_EDEN_ADI,
+          IST_ATOLYE_GRUBU_TANIMI: item.IST_ATOLYE_GRUBU_TANIMI,
+          IST_TIP_TANIM: item.IST_TIP_TANIM,
+          IST_KATEGORI_TANIMI: item.IST_KATEGORI_TANIMI,
+          IST_SERVIS_NEDENI: item.IST_SERVIS_NEDENI,
+          IST_IRTIBAT: item.IST_IRTIBAT,
+          IST_ONCELIK: item.IST_ONCELIK,
+          IST_ONCELIK_IKON_INDEX: item.IST_ONCELIK_IKON_INDEX,
+          IST_BILDIREN_LOKASYON: item.IST_BILDIREN_LOKASYON,
+          IST_NOT_ICON: item.IST_NOT_ICON,
+          IST_TEKNISYEN_ID: item.IST_TEKNISYEN_ID,
+          IST_TEKNISYEN_TANIM: item.IST_TEKNISYEN_TANIM,
+          IST_ISEMRI_NO: item.IST_ISEMRI_NO,
+          IST_BELGE: item.IST_BELGE,
+          IST_RESIM: item.IST_RESIM,
+          IST_BIRLESIM: item.IST_BIRLESIM,
+          IST_MAKINE_KOD: item.IST_MAKINE_KOD,
+          IST_MAKINE_TANIM: item.IST_MAKINE_TANIM,
+          IST_MAKINE_PLAKA: item.IST_MAKINE_PLAKA,
+          IST_EKIPMAN_KOD: item.IST_EKIPMAN_KOD,
+          IST_EKIPMAN_TANIM: item.IST_EKIPMAN_TANIM,
+          IST_KAT: item.IST_KAT,
+          IST_BINA: item.IST_BINA,
+          IST_DURUM_ADI: item.IST_DURUM_ADI,
+          IST_DURUM_ADI2: item.IST_DURUM_ADI2,
+          IST_KULLANICI_DEPARTMAN_ID: item.IST_KULLANICI_DEPARTMAN_ID,
+          IST_MAKINE_DURUM: item.IST_MAKINE_DURUM,
+          IST_ARIZA_TANIM_KOD: item.IST_ARIZA_TANIM_KOD,
+          ISEMRI_TIPI: item.ISEMRI_TIPI,
+          IST_BILDIREN_LOKASYON_TUM: item.IST_BILDIREN_LOKASYON_TUM,
+          ISLEM_SURE: item.ISLEM_SURE,
+          ResimVarsayilanID: item.ResimVarsayilanID,
+          ResimIDleri: item.ResimIDleri,
+          IST_TALEPEDEN_LOKASYON_ID: item.IST_TALEPEDEN_LOKASYON_ID,
+          USER_ID: item.USER_ID,
+        }));
+        setData(formattedData);
         setLoading(false);
       } else {
         console.error("API response is not in expected format");
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error in API request:", error);
@@ -54,17 +254,21 @@ export default function MainTable() {
     }
   };
 
-  const normalizeString = (str) => {
-    return str
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase();
-  };
+  // filtreleme işlemi için kullanılan useEffect
+  const handleBodyChange = useCallback((type, newBody) => {
+    setBody((state) => ({
+      ...state,
+      [type]: newBody,
+    }));
+    setCurrentPage(1); // Filtreleme yapıldığında sayfa numarasını 1'e ayarla
+  }, []);
+  // filtreleme işlemi için kullanılan useEffect son
 
-  useEffect(() => {
-    const filtered = data.filter((item) => normalizeString(item.subject).includes(normalizeString(searchTerm)));
-    setFilteredData(filtered);
-  }, [searchTerm, data]);
+  // sayfalama için kullanılan useEffect
+  const handleTableChange = (pagination) => {
+    setCurrentPage(pagination.current);
+  };
+  // sayfalama için kullanılan useEffect son
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -84,7 +288,6 @@ export default function MainTable() {
   const onRowClick = (record) => {
     return {
       onClick: () => {
-        // Handle row click event
         setDrawer({ visible: true, data: record });
       },
     };
@@ -96,45 +299,225 @@ export default function MainTable() {
 
   const columns = [
     {
-      title: "Personel Kodu",
-      dataIndex: "code",
-      key: "code",
+      title: "Iş Talep Kodu",
+      dataIndex: "IST_KOD",
+      key: "IST_KOD",
       width: "150px",
       ellipsis: true,
     },
     {
-      title: "Personel Adı",
-      dataIndex: "subject",
-      key: "subject",
+      title: "Konu",
+      dataIndex: "IST_KONU",
+      key: "IST_KONU",
       width: "150px",
       ellipsis: true,
     },
     {
-      title: "Ünvan",
-      dataIndex: "workdays",
-      key: "workdays",
+      title: "Makine Tanım",
+      dataIndex: "IST_MAKINE_TANIM",
+      key: "IST_MAKINE_TANIM",
       width: "150px",
       ellipsis: true,
     },
     {
-      title: "Personel Tipi",
-      dataIndex: "description",
-      key: "description",
+      title: "Tarih",
+      dataIndex: "IST_ACILIS_TARIHI",
+      key: "IST_ACILIS_TARIHI",
+      width: "150px",
+      ellipsis: true,
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Saat",
+      dataIndex: "IST_ACILIS_SAATI",
+      key: "IST_ACILIS_SAATI",
+      width: "150px",
+      ellipsis: true,
+      render: (text) => formatTime(text),
+    },
+    {
+      title: "Talep Eden",
+      dataIndex: "IST_TALEP_EDEN_ADI",
+      key: "IST_TALEP_EDEN_ADI",
       width: "150px",
       ellipsis: true,
     },
-
     {
-      title: "Departman",
-      dataIndex: "fifthcolumn",
-      key: "fifthcolumn",
+      title: "İş Kategorisi",
+      dataIndex: "IST_KATEGORI_TANIMI",
+      key: "IST_KATEGORI_TANIMI",
+      width: "150px",
+      ellipsis: true,
+    },
+    {
+      title: "Öncelik",
+      dataIndex: "IST_ONCELIK",
+      key: "IST_ONCELIK",
       width: "150px",
       ellipsis: true,
     },
     {
       title: "Lokasyon",
-      dataIndex: "sixthcolumn",
-      key: "sixthcolumn",
+      dataIndex: "IST_BILDIREN_LOKASYON",
+      key: "IST_BILDIREN_LOKASYON",
+      width: "150px",
+      ellipsis: true,
+    },
+    {
+      title: "Durum",
+      dataIndex: "IST_DURUM_ID",
+      key: "IST_DURUM_ID",
+      width: "150px",
+      ellipsis: true,
+      render: (text, record) => {
+        switch (record.IST_DURUM_ID) {
+          case 0:
+            return (
+              <div
+                style={{
+                  color: "white",
+                  backgroundColor: "blue",
+                  textAlign: "center",
+                  borderRadius: "10px",
+                  padding: "6px",
+                }}>
+                Açık
+              </div>
+            );
+          case 1:
+            return (
+              <div
+                style={{
+                  color: "white",
+                  backgroundColor: "#ff5e00",
+                  textAlign: "center",
+                  borderRadius: "10px",
+                  padding: "6px",
+                }}>
+                Bekliyor
+              </div>
+            );
+          case 2:
+            return (
+              <div
+                style={{
+                  color: "white",
+                  backgroundColor: "#ffe600",
+                  textAlign: "center",
+                  borderRadius: "10px",
+                  padding: "6px",
+                }}>
+                Planlandı
+              </div>
+            );
+          case 3:
+            return (
+              <div
+                style={{
+                  color: "white",
+                  backgroundColor: "#00d300",
+                  textAlign: "center",
+                  borderRadius: "10px",
+                  padding: "6px",
+                }}>
+                Devam Ediyor
+              </div>
+            );
+          case 4:
+            return (
+              <div
+                style={{
+                  color: "white",
+                  backgroundColor: "#575757",
+                  textAlign: "center",
+                  borderRadius: "10px",
+                  padding: "6px",
+                }}>
+                Kapandı
+              </div>
+            );
+          case 5:
+            return (
+              <div
+                style={{
+                  color: "white",
+                  backgroundColor: "#d10000",
+                  textAlign: "center",
+                  borderRadius: "10px",
+                  padding: "6px",
+                }}>
+                İptal Edildi
+              </div>
+            );
+          default:
+            return ""; // Eğer farklı bir değer gelirse
+        }
+      },
+    },
+    {
+      title: "İşlem Süresi",
+      dataIndex: "ISLEM_SURE",
+      key: "ISLEM_SURE",
+      width: "150px",
+      ellipsis: true,
+    },
+    {
+      title: "Planlanan Başlama Tarihi",
+      dataIndex: "IST_PLANLANAN_BASLAMA_TARIHI",
+      key: "IST_PLANLANAN_BASLAMA_TARIHI",
+      width: "150px",
+      ellipsis: true,
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Planlanan Başlama Saati",
+      dataIndex: "IST_PLANLANAN_BASLAMA_SAATI",
+      key: "IST_PLANLANAN_BASLAMA_SAATI",
+      width: "150px",
+      ellipsis: true,
+      render: (text) => formatTime(text),
+    },
+    {
+      title: "Planlanan Bitiş Tarihi",
+      dataIndex: "IST_PLANLANAN_BITIS_TARIHI",
+      key: "IST_PLANLANAN_BITIS_TARIHI",
+      width: "150px",
+      ellipsis: true,
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Planlanan Bitiş Saati",
+      dataIndex: "IST_PLANLANAN_BITIS_SAATI",
+      key: "IST_PLANLANAN_BITIS_SAATI",
+      width: "150px",
+      ellipsis: true,
+      render: (text) => formatTime(text),
+    },
+    {
+      title: "iş Emri No",
+      dataIndex: "IST_ISEMRI_NO",
+      key: "IST_ISEMRI_NO",
+      width: "150px",
+      ellipsis: true,
+    },
+    {
+      title: "Teknisyen",
+      dataIndex: "IST_TEKNISYEN_TANIM",
+      key: "IST_TEKNISYEN_TANIM",
+      width: "150px",
+      ellipsis: true,
+    },
+    {
+      title: "Ayölye",
+      dataIndex: "IST_ATOLYE_GRUBU_TANIMI",
+      key: "IST_ATOLYE_GRUBU_TANIMI",
+      width: "150px",
+      ellipsis: true,
+    },
+    {
+      title: "Makine Kodu",
+      dataIndex: "IST_MAKINE_KOD",
+      key: "IST_MAKINE_KOD",
       width: "150px",
       ellipsis: true,
     },
@@ -142,7 +525,6 @@ export default function MainTable() {
 
   return (
     <div>
-      {/* Search input and create drawer */}
       <div
         style={{
           display: "flex",
@@ -152,29 +534,35 @@ export default function MainTable() {
           gap: "10px",
           padding: "0 5px",
         }}>
-        <Input
-          style={{ width: "250px" }}
-          type="text"
-          placeholder="Arama yap..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
-        />
+        <div style={{ display: "flex", gap: "10px" }}>
+          <Input
+            style={{ width: "250px" }}
+            type="text"
+            placeholder="Arama yap..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
+          />
+          <Filters onChange={handleBodyChange} />
+        </div>
+
         <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
       </div>
       <Spin spinning={loading}>
         <Table
           rowSelection={rowSelection}
           columns={columns}
-          dataSource={searchTerm ? filteredData : data}
+          dataSource={data}
           pagination={{
+            current: currentPage,
+            total: totalPages * 10, // Toplam kayıt sayısı (sayfa başına kayıt sayısı ile çarpılır)
             defaultPageSize: 10,
             showSizeChanger: false,
-            // pageSizeOptions: ["10", "20", "50", "100"],
-            position: ["bottomRight"],
+            onChange: handleTableChange,
           }}
           onRow={onRowClick}
           scroll={{ y: "calc(100vh - 380px)" }}
+          onChange={handleTableChange}
         />
       </Spin>
       <EditDrawer

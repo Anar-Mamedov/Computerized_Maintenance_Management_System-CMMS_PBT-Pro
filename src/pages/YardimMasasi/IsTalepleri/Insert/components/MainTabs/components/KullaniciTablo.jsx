@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
 
-export default function AtolyeTablo({ workshopSelectedId, onSubmit }) {
+export default function KullaniciTablo({ workshopSelectedId, onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
@@ -64,7 +64,7 @@ export default function AtolyeTablo({ workshopSelectedId, onSubmit }) {
       <Modal
         width={1200}
         centered
-        title="Atölye Tanımları"
+        title="Kullanici Listesi"
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}>
