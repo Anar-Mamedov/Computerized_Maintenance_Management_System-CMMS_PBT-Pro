@@ -18,13 +18,15 @@ import LokasyonTablo from "./components/LokasyonTablo";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import Departman from "./components/Departman";
-import Gorevi from "./components/Gorevi";
-import TaseronTablo from "./components/TaseronTablo";
 import KullaniciTablo from "./components/KullaniciTablo";
-import IdariAmiriTablo from "./components/IdariAmiriTablo";
-import MasrafMerkeziTablo from "./components/MasrafMerkeziTablo";
+import IlgiliKisiTablo from "./components/IlgiliKisiTablo";
 import IletisimSekli from "./components/IletisimSekli";
 import TalepTipi from "./components/TalepTipi";
+import IsKategorisi from "./components/IsKategorisi";
+import ServisNedeni from "./components/ServisNedeni";
+import BildirilenBina from "./components/BildirilenBina";
+import BildirilenKat from "./components/BildirilenKat";
+import OncelikTablo from "./components/OncelikTablo";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -86,34 +88,19 @@ export default function MainTabs({ drawerOpen }) {
 
   const otonomBakimValue = watch("otonomBakim");
 
-  const handleMinusClick = () => {
-    setValue("lokasyonMasrafMerkeziTanim", "");
-    setValue("lokasyonMasrafMerkeziID", "");
-  };
-
-  const handleTaseronMinusClick = () => {
-    setValue("taseronTanim", "");
-    setValue("taseronID", "");
-  };
-
-  const handlePersonelHesabiMinusClick = () => {
-    setValue("personelHesabiTanim", "");
-    setValue("personelHesabiID", "");
-  };
-
   const handleTalepteBulunanMinusClick = () => {
     setValue("talepteBulunan", "");
     setValue("talepteBulunanID", "");
   };
 
-  const handleIdariAmiriMinusClick = () => {
+  const handleIlgiliKisiMinusClick = () => {
     setValue("idariAmiriTanim", "");
     setValue("idariAmiriID", "");
   };
 
-  const handleMasrafMerkeziMinusClick = () => {
-    setValue("masrafMerkeziTanim", "");
-    setValue("masrafMerkeziID", "");
+  const handleOncelikMinusClick = () => {
+    setValue("oncelikTanim", "");
+    setValue("oncelikID", "");
   };
 
   const handleLokasyonMinusClick = () => {
@@ -504,7 +491,7 @@ export default function MainTabs({ drawerOpen }) {
               justifyContent: "space-between",
               width: "100%",
             }}>
-            <Text style={{ fontSize: "14px" }}>İşetişim Şekli:</Text>
+            <Text style={{ fontSize: "14px" }}>İletişim Şekli:</Text>
             <IletisimSekli />
           </StyledDivBottomLine>
         </div>
@@ -521,6 +508,32 @@ export default function MainTabs({ drawerOpen }) {
             <TalepTipi />
           </StyledDivBottomLine>
         </div>
+        <div style={{ width: "100%", maxWidth: "450px" }}>
+          <StyledDivBottomLine
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              width: "100%",
+            }}>
+            <Text style={{ fontSize: "14px" }}>İş Kategorisi:</Text>
+            <IsKategorisi />
+          </StyledDivBottomLine>
+        </div>
+        <div style={{ width: "100%", maxWidth: "450px" }}>
+          <StyledDivBottomLine
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              width: "100%",
+            }}>
+            <Text style={{ fontSize: "14px" }}>Servis Nedeni:</Text>
+            <ServisNedeni />
+          </StyledDivBottomLine>
+        </div>
         <div
           style={{
             display: "flex",
@@ -531,7 +544,7 @@ export default function MainTabs({ drawerOpen }) {
             width: "100%",
             justifyContent: "space-between",
           }}>
-          <Text style={{ fontSize: "14px" }}>Ünvan:</Text>
+          <Text style={{ fontSize: "14px" }}>Atölye:</Text>
           <div
             style={{
               display: "flex",
@@ -543,23 +556,22 @@ export default function MainTabs({ drawerOpen }) {
               width: "100%",
             }}>
             <Controller
-              name="unvan"
+              name="atolye"
               control={control}
-              render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+              render={({ field }) => <Input {...field} disabled style={{ flex: 1 }} />}
             />
           </div>
         </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-          }}>
-          <Gorevi />
-        </div>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          marginBottom: "15px",
+          flexDirection: "column",
+          gap: "10px",
+          width: "100%",
+          maxWidth: "450px",
+        }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
           <StyledDivBottomLine
             style={{
@@ -569,7 +581,7 @@ export default function MainTabs({ drawerOpen }) {
               width: "100%",
               maxWidth: "450px",
             }}>
-            <Text style={{ fontSize: "14px" }}>Taşeron:</Text>
+            <Text style={{ fontSize: "14px" }}>Öncelik:</Text>
             <div
               style={{
                 display: "flex",
@@ -579,7 +591,7 @@ export default function MainTabs({ drawerOpen }) {
                 width: "300px",
               }}>
               <Controller
-                name="taseronTanim"
+                name="oncelikTanim"
                 control={control}
                 render={({ field }) => (
                   <Input
@@ -591,7 +603,7 @@ export default function MainTabs({ drawerOpen }) {
                 )}
               />
               <Controller
-                name="taseronID"
+                name="oncelikID"
                 control={control}
                 render={({ field }) => (
                   <Input
@@ -601,67 +613,43 @@ export default function MainTabs({ drawerOpen }) {
                   />
                 )}
               />
-              <TaseronTablo
+              <OncelikTablo
                 onSubmit={(selectedData) => {
-                  setValue("taseronTanim", selectedData.subject);
-                  setValue("taseronID", selectedData.key);
+                  setValue("oncelikTanim", selectedData.subject);
+                  setValue("oncelikID", selectedData.key);
                 }}
               />
-              <Button onClick={handleTaseronMinusClick}> - </Button>
+              <Button onClick={handleOncelikMinusClick}> - </Button>
             </div>
           </StyledDivBottomLine>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+        <div style={{ width: "100%", maxWidth: "450px" }}>
           <StyledDivBottomLine
             style={{
               display: "flex",
               flexWrap: "wrap",
+              alignItems: "flex-start",
               justifyContent: "space-between",
               width: "100%",
-              maxWidth: "450px",
             }}>
-            <Text style={{ fontSize: "14px" }}>İdari Amiri:</Text>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "300px",
-              }}>
-              <Controller
-                name="idariAmiriTanim"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text" // Set the type to "text" for name input
-                    style={{ width: "215px" }}
-                    disabled
-                  />
-                )}
-              />
-              <Controller
-                name="idariAmiriID"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text" // Set the type to "text" for name input
-                    style={{ display: "none" }}
-                  />
-                )}
-              />
-              <IdariAmiriTablo
-                onSubmit={(selectedData) => {
-                  setValue("idariAmiriTanim", selectedData.subject);
-                  setValue("idariAmiriID", selectedData.key);
-                }}
-              />
-              <Button onClick={handleIdariAmiriMinusClick}> - </Button>
-            </div>
+            <Text style={{ fontSize: "14px" }}>Bildirilen Bina:</Text>
+            <BildirilenBina />
           </StyledDivBottomLine>
         </div>
+        <div style={{ width: "100%", maxWidth: "450px" }}>
+          <StyledDivBottomLine
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              width: "100%",
+            }}>
+            <Text style={{ fontSize: "14px" }}>Bildirilen Kat:</Text>
+            <BildirilenKat />
+          </StyledDivBottomLine>
+        </div>
+
         <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
           <StyledDivBottomLine
             style={{
@@ -671,7 +659,7 @@ export default function MainTabs({ drawerOpen }) {
               width: "100%",
               maxWidth: "450px",
             }}>
-            <Text style={{ fontSize: "14px" }}>Masraf Merkezi:</Text>
+            <Text style={{ fontSize: "14px" }}>İlgili Kişi:</Text>
             <div
               style={{
                 display: "flex",
@@ -681,7 +669,7 @@ export default function MainTabs({ drawerOpen }) {
                 width: "300px",
               }}>
               <Controller
-                name="masrafMerkeziTanim"
+                name="ilgiliKisi"
                 control={control}
                 render={({ field }) => (
                   <Input
@@ -693,7 +681,7 @@ export default function MainTabs({ drawerOpen }) {
                 )}
               />
               <Controller
-                name="masrafMerkeziID"
+                name="ilgiliKisiID"
                 control={control}
                 render={({ field }) => (
                   <Input
@@ -703,18 +691,17 @@ export default function MainTabs({ drawerOpen }) {
                   />
                 )}
               />
-              <MasrafMerkeziTablo
+              <IlgiliKisiTablo
                 onSubmit={(selectedData) => {
-                  setValue("masrafMerkeziTanim", selectedData.age);
-                  setValue("masrafMerkeziID", selectedData.key);
+                  setValue("ilgiliKisi", selectedData.subject);
+                  setValue("ilgiliKisiID", selectedData.key);
                 }}
               />
-              <Button onClick={handleMasrafMerkeziMinusClick}> - </Button>
+              <Button onClick={handleIlgiliKisiMinusClick}> - </Button>
             </div>
           </StyledDivBottomLine>
         </div>
       </div>
-
       <div
         style={{
           display: "flex",
