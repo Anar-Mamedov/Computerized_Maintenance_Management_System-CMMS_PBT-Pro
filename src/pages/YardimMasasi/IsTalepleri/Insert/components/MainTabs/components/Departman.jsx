@@ -3,29 +3,9 @@ import { useFormContext, Controller } from "react-hook-form";
 import { Select, Typography, Divider, Spin, Button, Input, message, Space } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
 import { PlusOutlined } from "@ant-design/icons";
-import styled from "styled-components";
 
 const { Text, Link } = Typography;
 const { Option } = Select;
-
-const StyledSelect = styled(Select)`
-  @media (min-width: 600px) {
-    width: 300px;
-  }
-  @media (max-width: 600px) {
-    width: 300px;
-  }
-`;
-
-const StyledDiv = styled.div`
-  @media (min-width: 600px) {
-    align-items: center;
-  }
-  @media (max-width: 600px) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-`;
 
 export default function Departman() {
   const { control, setValue } = useFormContext();
@@ -108,79 +88,72 @@ export default function Departman() {
 
   // add new status to selectbox end
   return (
-    <StyledDiv
-      style={{
-        display: "flex",
-        gap: "10px",
-        justifyContent: "space-between",
-        width: "100%",
-        flexWrap: "wrap",
-        rowGap: "0px",
-      }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between" }}>
       {contextHolder}
-      <Text style={{ fontSize: "14px", minWidth: "40px" }}>Departman:</Text>
-      <Controller
-        name="departman"
-        control={control}
-        render={({ field }) => (
-          <StyledSelect
-            {...field}
-            key={selectKey}
-            // style={{ maxWidth: "300px", width: "100%" }}
-            showSearch
-            allowClear
-            placeholder="Seçim Yapınız"
-            optionFilterProp="children"
-            filterOption={(input, option) =>
-              option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
-            }
-            onDropdownVisibleChange={(open) => {
-              if (open) {
-                fetchData(); // Fetch data when the dropdown is opened
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+        <Controller
+          name="departman"
+          control={control}
+          render={({ field }) => (
+            <Select
+              {...field}
+              key={selectKey}
+              style={{ width: "300px" }}
+              showSearch
+              allowClear
+              placeholder="Seçim Yapınız"
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
               }
-            }}
-            dropdownRender={(menu) => (
-              <Spin spinning={loading}>
-                {menu}
-                <Divider
-                  style={{
-                    margin: "8px 0",
-                  }}
-                />
-                <Space
-                  style={{
-                    padding: "0 8px 4px",
-                  }}>
-                  <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
-                  <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
-                    Ekle
-                  </Button>
-                </Space>
-              </Spin>
-            )}
-            options={options.map((item) => ({
-              value: item.TB_KOD_ID, // Use the ID as the value
-              label: item.KOD_TANIM, // Display the name in the dropdown
-            }))}
-            onChange={(value) => {
-              // Seçilen değerin ID'sini NedeniID alanına set et
-              setValue("departmanID", value);
-              field.onChange(value);
-            }}
-          />
-        )}
-      />
-      <Controller
-        name="departmanID"
-        control={control}
-        render={({ field }) => (
-          <Input
-            {...field}
-            type="text" // Set the type to "text" for name input
-            style={{ display: "none" }}
-          />
-        )}
-      />
-    </StyledDiv>
+              onDropdownVisibleChange={(open) => {
+                if (open) {
+                  fetchData(); // Fetch data when the dropdown is opened
+                }
+              }}
+              dropdownRender={(menu) => (
+                <Spin spinning={loading}>
+                  {menu}
+                  <Divider
+                    style={{
+                      margin: "8px 0",
+                    }}
+                  />
+                  <Space
+                    style={{
+                      padding: "0 8px 4px",
+                    }}>
+                    <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
+                    <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
+                      Ekle
+                    </Button>
+                  </Space>
+                </Spin>
+              )}
+              options={options.map((item) => ({
+                value: item.TB_KOD_ID, // Use the ID as the value
+                label: item.KOD_TANIM, // Display the name in the dropdown
+              }))}
+              onChange={(value) => {
+                // Seçilen değerin ID'sini NedeniID alanına set et
+                setValue("departmanID", value);
+                field.onChange(value);
+              }}
+            />
+          )}
+        />
+        <Controller
+          name="departmanID"
+          control={control}
+          render={({ field }) => (
+            <Input
+              {...field}
+              type="text" // Set the type to "text" for name input
+              style={{ display: "none" }}
+            />
+          )}
+        />
+      </div>
+    </div>
   );
 }
