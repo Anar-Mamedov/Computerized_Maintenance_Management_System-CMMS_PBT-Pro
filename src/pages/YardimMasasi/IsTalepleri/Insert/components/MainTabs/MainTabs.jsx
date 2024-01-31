@@ -13,7 +13,6 @@ import {
   ColorPicker,
 } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
-import PersonelTipi from "./components/PersonelTipi";
 import styled from "styled-components";
 import LokasyonTablo from "./components/LokasyonTablo";
 import dayjs from "dayjs";
@@ -24,6 +23,8 @@ import TaseronTablo from "./components/TaseronTablo";
 import KullaniciTablo from "./components/KullaniciTablo";
 import IdariAmiriTablo from "./components/IdariAmiriTablo";
 import MasrafMerkeziTablo from "./components/MasrafMerkeziTablo";
+import IletisimSekli from "./components/IletisimSekli";
+import TalepTipi from "./components/TalepTipi";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -438,7 +439,7 @@ export default function MainTabs({ drawerOpen }) {
             width: "100%",
             justifyContent: "space-between",
           }}>
-          <Text style={{ fontSize: "14px" }}>Personel Adı:</Text>
+          <Text style={{ fontSize: "14px" }}>İrtibat Telefonu:</Text>
           <div
             style={{
               display: "flex",
@@ -450,9 +451,8 @@ export default function MainTabs({ drawerOpen }) {
               width: "100%",
             }}>
             <Controller
-              name="personelAdi"
+              name="irtibatTelefonu"
               control={control}
-              rules={{ required: "Alan Boş Bırakılamaz!" }}
               render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
             />
           </div>
@@ -465,19 +465,25 @@ export default function MainTabs({ drawerOpen }) {
             maxWidth: "450px",
             gap: "10px",
             width: "100%",
+            justifyContent: "space-between",
           }}>
-          <PersonelTipi />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-          }}>
-          <Departman />
+          <Text style={{ fontSize: "14px" }}>E-Mail:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              maxWidth: "300px",
+              minWidth: "300px",
+              gap: "10px",
+              width: "100%",
+            }}>
+            <Controller
+              name="email"
+              control={control}
+              render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+            />
+          </div>
         </div>
       </div>
       <div
@@ -489,6 +495,32 @@ export default function MainTabs({ drawerOpen }) {
           width: "100%",
           maxWidth: "450px",
         }}>
+        <div style={{ width: "100%", maxWidth: "450px" }}>
+          <StyledDivBottomLine
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              width: "100%",
+            }}>
+            <Text style={{ fontSize: "14px" }}>İşetişim Şekli:</Text>
+            <IletisimSekli />
+          </StyledDivBottomLine>
+        </div>
+        <div style={{ width: "100%", maxWidth: "450px" }}>
+          <StyledDivBottomLine
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              width: "100%",
+            }}>
+            <Text style={{ fontSize: "14px" }}>Talep Tipi:</Text>
+            <TalepTipi />
+          </StyledDivBottomLine>
+        </div>
         <div
           style={{
             display: "flex",
