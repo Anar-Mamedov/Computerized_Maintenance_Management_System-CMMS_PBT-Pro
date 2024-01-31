@@ -52,7 +52,7 @@ const StyledDiv = styled.div`
 
 const StyledDivBottomLine = styled.div`
   @media (min-width: 600px) {
-    align-items: center;
+    align-items: center !important;
   }
   @media (max-width: 600px) {
     flex-direction: column;
@@ -415,6 +415,19 @@ export default function MainTabs({ drawerOpen }) {
             <Button onClick={handleLokasyonMinusClick}> - </Button>
           </div>
         </StyledDivMedia>
+        <div style={{ width: "100%", maxWidth: "450px" }}>
+          <StyledDivBottomLine
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              width: "100%",
+            }}>
+            <Text style={{ fontSize: "14px" }}>Departman:</Text>
+            <Departman />
+          </StyledDivBottomLine>
+        </div>
         <div
           style={{
             display: "flex",
