@@ -5,6 +5,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import tr_TR from "antd/es/locale/tr_TR";
 import AxiosInstance from "../../../../api/http";
 import MainTabs from "./components/MainTabs/MainTabs";
+import SecondTabs from "./components/SecondTabs/SecondTabs";
 import Footer from "../Footer";
 
 export default function CreateDrawer({ onRefresh }) {
@@ -74,7 +75,7 @@ export default function CreateDrawer({ onRefresh }) {
     };
 
     // API'ye POST isteği gönder
-    AxiosInstance.post("AddPersonel", Body)
+    AxiosInstance.post("AddIsTalep", Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
         setOpen(false);
@@ -144,6 +145,7 @@ export default function CreateDrawer({ onRefresh }) {
           }>
           <form onSubmit={methods.handleSubmit(onSubmit)}>
             <MainTabs drawerOpen={open} />
+            <SecondTabs />
             <Footer />
           </form>
         </Drawer>
