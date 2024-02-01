@@ -19,7 +19,6 @@ import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import Departman from "./components/Departman";
 import KullaniciTablo from "./components/KullaniciTablo";
-import IlgiliKisiTablo from "./components/IlgiliKisiTablo";
 import IletisimSekli from "./components/IletisimSekli";
 import TalepTipi from "./components/TalepTipi";
 import IsKategorisi from "./components/IsKategorisi";
@@ -151,16 +150,9 @@ export default function MainTabs({ drawerOpen }) {
         flexWrap: "wrap",
         marginBottom: "15px",
         gap: "20px",
+        rowGap: "10px",
       }}>
-      <div
-        style={{
-          display: "flex",
-          marginBottom: "15px",
-          flexDirection: "column",
-          gap: "10px",
-          width: "100%",
-          maxWidth: "450px",
-        }}>
+      <div style={{ display: "flex", width: "100%", gap: "20px" }}>
         <div
           style={{
             display: "flex",
@@ -168,6 +160,7 @@ export default function MainTabs({ drawerOpen }) {
             alignItems: "center",
             justifyContent: "space-between",
             width: "100%",
+            maxWidth: "450px",
             gap: "10px",
             rowGap: "0px",
           }}>
@@ -295,40 +288,113 @@ export default function MainTabs({ drawerOpen }) {
             />
           </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-          <StyledDivBottomLine
+      </div>
+      <div style={{ display: "flex", gap: "20px", width: "100%" }}>
+        <div
+          style={{
+            display: "flex",
+            marginBottom: "15px",
+            flexDirection: "column",
+            gap: "10px",
+            width: "100%",
+            maxWidth: "450px",
+          }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "450px",
+              }}>
+              <Text style={{ fontSize: "14px", fontWeight: "600" }}>Talepte Bulunan:</Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  width: "300px",
+                }}>
+                <Controller
+                  name="talepteBulunan"
+                  control={control}
+                  rules={{ required: "Alan Boş Bırakılamaz!" }}
+                  render={({ field, fieldState: { error } }) => (
+                    <Input
+                      {...field}
+                      status={errors.talepteBulunan ? "error" : ""}
+                      type="text" // Set the type to "text" for name input
+                      style={{ width: "215px" }}
+                      disabled
+                    />
+                  )}
+                />
+                <Controller
+                  name="talepteBulunanID"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      type="text" // Set the type to "text" for name input
+                      style={{ display: "none" }}
+                    />
+                  )}
+                />
+                <KullaniciTablo
+                  onSubmit={(selectedData) => {
+                    setValue("talepteBulunan", selectedData.ISK_ISIM);
+                    setValue("talepteBulunanID", selectedData.key);
+                    setValue("lokasyonTanim", selectedData.ISK_LOKASYON);
+                    setValue("lokasyonID", selectedData.ISK_LOKASYON_ID);
+                    setValue("departmanTanim", selectedData.DEPARTMAN);
+                    setValue("departmanID", selectedData.ISK_DEPARTMAN_ID);
+                    setValue("irtibatTelefonu", selectedData.ISK_TELEFON_1);
+                    setValue("email", selectedData.ISK_MAIL);
+                  }}
+                />
+                <Button onClick={handleTalepteBulunanMinusClick}> - </Button>
+                {errors.talepteBulunan && (
+                  <div style={{ color: "red", marginTop: "5px" }}>{errors.talepteBulunan.message}</div>
+                )}
+              </div>
+            </StyledDivBottomLine>
+          </div>
+          <StyledDivMedia
             style={{
               display: "flex",
               flexWrap: "wrap",
+              alignItems: "center",
               justifyContent: "space-between",
               width: "100%",
               maxWidth: "450px",
             }}>
-            <Text style={{ fontSize: "14px", fontWeight: "600" }}>Talepte Bulunan:</Text>
+            <Text style={{ fontSize: "14px" }}>Lokasyon:</Text>
             <div
+              className="anar"
               style={{
                 display: "flex",
-                flexWrap: "wrap",
+                flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "space-between",
-                width: "300px",
+                minWidth: "300px",
+                gap: "3px",
               }}>
               <Controller
-                name="talepteBulunan"
+                name="lokasyonTanim"
                 control={control}
-                rules={{ required: "Alan Boş Bırakılamaz!" }}
-                render={({ field, fieldState: { error } }) => (
+                render={({ field }) => (
                   <Input
                     {...field}
-                    status={errors.talepteBulunan ? "error" : ""}
                     type="text" // Set the type to "text" for name input
-                    style={{ width: "215px" }}
+                    style={{ width: "100%", maxWidth: "630px" }}
                     disabled
                   />
                 )}
               />
               <Controller
-                name="talepteBulunanID"
+                name="lokasyonID"
                 control={control}
                 render={({ field }) => (
                   <Input
@@ -338,445 +404,313 @@ export default function MainTabs({ drawerOpen }) {
                   />
                 )}
               />
-              <KullaniciTablo
+              <LokasyonTablo
                 onSubmit={(selectedData) => {
-                  setValue("talepteBulunan", selectedData.subject);
-                  setValue("talepteBulunanID", selectedData.key);
+                  setValue("lokasyonTanim", selectedData.LOK_TANIM);
+                  setValue("lokasyonID", selectedData.key);
                 }}
               />
-              <Button onClick={handleTalepteBulunanMinusClick}> - </Button>
-              {errors.talepteBulunan && (
-                <div style={{ color: "red", marginTop: "5px" }}>{errors.talepteBulunan.message}</div>
-              )}
+              <Button onClick={handleLokasyonMinusClick}> - </Button>
             </div>
-          </StyledDivBottomLine>
-        </div>
-        <StyledDivMedia
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Lokasyon:</Text>
-          <div
-            className="anar"
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              minWidth: "300px",
-              gap: "3px",
-            }}>
-            <Controller
-              name="lokasyonTanim"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ width: "100%", maxWidth: "630px" }}
-                  disabled
-                />
-              )}
-            />
-            <Controller
-              name="lokasyonID"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ display: "none" }}
-                />
-              )}
-            />
-            <LokasyonTablo
-              onSubmit={(selectedData) => {
-                setValue("lokasyonTanim", selectedData.LOK_TANIM);
-                setValue("lokasyonID", selectedData.key);
-              }}
-            />
-            <Button onClick={handleLokasyonMinusClick}> - </Button>
+          </StyledDivMedia>
+          <div style={{ width: "100%", maxWidth: "450px" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                width: "100%",
+              }}>
+              <Text style={{ fontSize: "14px" }}>Departman:</Text>
+              <Departman />
+            </StyledDivBottomLine>
           </div>
-        </StyledDivMedia>
-        <div style={{ width: "100%", maxWidth: "450px" }}>
-          <StyledDivBottomLine
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-              width: "100%",
-            }}>
-            <Text style={{ fontSize: "14px" }}>Departman:</Text>
-            <Departman />
-          </StyledDivBottomLine>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-            justifyContent: "space-between",
-          }}>
-          <Text style={{ fontSize: "14px" }}>İrtibat Telefonu:</Text>
           <div
             style={{
               display: "flex",
               flexWrap: "wrap",
               alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}>
-            <Controller
-              name="irtibatTelefonu"
-              control={control}
-              render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
-            />
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-            justifyContent: "space-between",
-          }}>
-          <Text style={{ fontSize: "14px" }}>E-Mail:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}>
-            <Controller
-              name="email"
-              control={control}
-              render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
-            />
-          </div>
-        </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          marginBottom: "15px",
-          flexDirection: "column",
-          gap: "10px",
-          width: "100%",
-          maxWidth: "450px",
-        }}>
-        <div style={{ width: "100%", maxWidth: "450px" }}>
-          <StyledDivBottomLine
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-              width: "100%",
-            }}>
-            <Text style={{ fontSize: "14px" }}>İletişim Şekli:</Text>
-            <IletisimSekli />
-          </StyledDivBottomLine>
-        </div>
-        <div style={{ width: "100%", maxWidth: "450px" }}>
-          <StyledDivBottomLine
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-              width: "100%",
-            }}>
-            <Text style={{ fontSize: "14px" }}>Talep Tipi:</Text>
-            <TalepTipi />
-          </StyledDivBottomLine>
-        </div>
-        <div style={{ width: "100%", maxWidth: "450px" }}>
-          <StyledDivBottomLine
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-              width: "100%",
-            }}>
-            <Text style={{ fontSize: "14px" }}>İş Kategorisi:</Text>
-            <IsKategorisi />
-          </StyledDivBottomLine>
-        </div>
-        <div style={{ width: "100%", maxWidth: "450px" }}>
-          <StyledDivBottomLine
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-              width: "100%",
-            }}>
-            <Text style={{ fontSize: "14px" }}>Servis Nedeni:</Text>
-            <ServisNedeni />
-          </StyledDivBottomLine>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-            justifyContent: "space-between",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Atölye:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}>
-            <Controller
-              name="atolye"
-              control={control}
-              render={({ field }) => <Input {...field} disabled style={{ flex: 1 }} />}
-            />
-          </div>
-        </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          marginBottom: "15px",
-          flexDirection: "column",
-          gap: "10px",
-          width: "100%",
-          maxWidth: "450px",
-        }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-          <StyledDivBottomLine
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-              width: "100%",
               maxWidth: "450px",
+              gap: "10px",
+              width: "100%",
+              justifyContent: "space-between",
             }}>
-            <Text style={{ fontSize: "14px" }}>Öncelik:</Text>
+            <Text style={{ fontSize: "14px" }}>İrtibat Telefonu:</Text>
             <div
               style={{
                 display: "flex",
                 flexWrap: "wrap",
                 alignItems: "center",
-                justifyContent: "space-between",
-                width: "300px",
+                maxWidth: "300px",
+                minWidth: "300px",
+                gap: "10px",
+                width: "100%",
               }}>
               <Controller
-                name="oncelikTanim"
+                name="irtibatTelefonu"
                 control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text" // Set the type to "text" for name input
-                    style={{ width: "215px" }}
-                    disabled
-                  />
-                )}
+                render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
               />
-              <Controller
-                name="oncelikID"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text" // Set the type to "text" for name input
-                    style={{ display: "none" }}
-                  />
-                )}
-              />
-              <OncelikTablo
-                onSubmit={(selectedData) => {
-                  setValue("oncelikTanim", selectedData.subject);
-                  setValue("oncelikID", selectedData.key);
-                }}
-              />
-              <Button onClick={handleOncelikMinusClick}> - </Button>
             </div>
-          </StyledDivBottomLine>
-        </div>
-        <div style={{ width: "100%", maxWidth: "450px" }}>
-          <StyledDivBottomLine
+          </div>
+          <div
             style={{
               display: "flex",
               flexWrap: "wrap",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
+              alignItems: "center",
+              maxWidth: "450px",
+              gap: "10px",
               width: "100%",
+              justifyContent: "space-between",
             }}>
-            <Text style={{ fontSize: "14px" }}>Bildirilen Bina:</Text>
-            <BildirilenBina />
-          </StyledDivBottomLine>
+            <Text style={{ fontSize: "14px" }}>E-Mail:</Text>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                maxWidth: "300px",
+                minWidth: "300px",
+                gap: "10px",
+                width: "100%",
+              }}>
+              <Controller
+                name="email"
+                control={control}
+                render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+              />
+            </div>
+          </div>
         </div>
-        <div style={{ width: "100%", maxWidth: "450px" }}>
-          <StyledDivBottomLine
+        <div
+          style={{
+            display: "flex",
+            marginBottom: "15px",
+            flexDirection: "column",
+            gap: "10px",
+            width: "100%",
+            maxWidth: "450px",
+          }}>
+          <div style={{ width: "100%", maxWidth: "450px" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                width: "100%",
+              }}>
+              <Text style={{ fontSize: "14px" }}>İletişim Şekli:</Text>
+              <IletisimSekli />
+            </StyledDivBottomLine>
+          </div>
+          <div style={{ width: "100%", maxWidth: "450px" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                width: "100%",
+              }}>
+              <Text style={{ fontSize: "14px" }}>Talep Tipi:</Text>
+              <TalepTipi />
+            </StyledDivBottomLine>
+          </div>
+          <div style={{ width: "100%", maxWidth: "450px" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                width: "100%",
+              }}>
+              <Text style={{ fontSize: "14px" }}>İş Kategorisi:</Text>
+              <IsKategorisi />
+            </StyledDivBottomLine>
+          </div>
+          <div style={{ width: "100%", maxWidth: "450px" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                width: "100%",
+              }}>
+              <Text style={{ fontSize: "14px" }}>Servis Nedeni:</Text>
+              <ServisNedeni />
+            </StyledDivBottomLine>
+          </div>
+          <div
             style={{
               display: "flex",
               flexWrap: "wrap",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
+              alignItems: "center",
+              maxWidth: "450px",
+              gap: "10px",
               width: "100%",
+              justifyContent: "space-between",
             }}>
-            <Text style={{ fontSize: "14px" }}>Bildirilen Kat:</Text>
-            <BildirilenKat />
-          </StyledDivBottomLine>
+            <Text style={{ fontSize: "14px" }}>Atölye:</Text>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                maxWidth: "300px",
+                minWidth: "300px",
+                gap: "10px",
+                width: "100%",
+              }}>
+              <Controller
+                name="atolye"
+                control={control}
+                render={({ field }) => <Input {...field} disabled style={{ flex: 1 }} />}
+              />
+            </div>
+          </div>
         </div>
+        <div
+          style={{
+            display: "flex",
+            marginBottom: "15px",
+            flexDirection: "column",
+            gap: "10px",
+            width: "100%",
+            maxWidth: "450px",
+          }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "450px",
+              }}>
+              <Text style={{ fontSize: "14px" }}>Öncelik:</Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  width: "300px",
+                }}>
+                <Controller
+                  name="oncelikTanim"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      type="text" // Set the type to "text" for name input
+                      style={{ width: "215px" }}
+                      disabled
+                    />
+                  )}
+                />
+                <Controller
+                  name="oncelikID"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      type="text" // Set the type to "text" for name input
+                      style={{ display: "none" }}
+                    />
+                  )}
+                />
+                <OncelikTablo
+                  onSubmit={(selectedData) => {
+                    setValue("oncelikTanim", selectedData.subject);
+                    setValue("oncelikID", selectedData.key);
+                  }}
+                />
+                <Button onClick={handleOncelikMinusClick}> - </Button>
+              </div>
+            </StyledDivBottomLine>
+          </div>
+          <div style={{ width: "100%", maxWidth: "450px" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                width: "100%",
+              }}>
+              <Text style={{ fontSize: "14px" }}>Bildirilen Bina:</Text>
+              <BildirilenBina />
+            </StyledDivBottomLine>
+          </div>
+          <div style={{ width: "100%", maxWidth: "450px" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                width: "100%",
+              }}>
+              <Text style={{ fontSize: "14px" }}>Bildirilen Kat:</Text>
+              <BildirilenKat />
+            </StyledDivBottomLine>
+          </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-          <StyledDivBottomLine
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "450px",
-            }}>
-            <Text style={{ fontSize: "14px" }}>İlgili Kişi:</Text>
-            <div
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <StyledDivBottomLine
               style={{
                 display: "flex",
                 flexWrap: "wrap",
-                alignItems: "center",
                 justifyContent: "space-between",
-                width: "300px",
+                width: "100%",
+                maxWidth: "450px",
               }}>
-              <Controller
-                name="ilgiliKisi"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text" // Set the type to "text" for name input
-                    style={{ width: "215px" }}
-                    disabled
-                  />
-                )}
-              />
-              <Controller
-                name="ilgiliKisiID"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text" // Set the type to "text" for name input
-                    style={{ display: "none" }}
-                  />
-                )}
-              />
-              <IlgiliKisiTablo
-                onSubmit={(selectedData) => {
-                  setValue("ilgiliKisi", selectedData.subject);
-                  setValue("ilgiliKisiID", selectedData.key);
-                }}
-              />
-              <Button onClick={handleIlgiliKisiMinusClick}> - </Button>
-            </div>
-          </StyledDivBottomLine>
-        </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          // flexWrap: "wrap",
-          marginBottom: "15px",
-          flexDirection: "column",
-          gap: "10px",
-          width: "100%",
-          maxWidth: "450px",
-        }}>
-        <div>
-          <Controller
-            name="teknisyen"
-            control={control}
-            render={({ field }) => (
-              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-                Teknisyen
-              </Checkbox>
-            )}
-          />
-        </div>
-        <div>
-          <Controller
-            name="operator"
-            control={control}
-            render={({ field }) => (
-              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-                Operatör
-              </Checkbox>
-            )}
-          />
-        </div>
-        <div>
-          <Controller
-            name="bakim"
-            control={control}
-            render={({ field }) => (
-              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-                Bakım
-              </Checkbox>
-            )}
-          />
-        </div>
-        <div>
-          <Controller
-            name="santiye"
-            control={control}
-            render={({ field }) => (
-              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-                Şantiye
-              </Checkbox>
-            )}
-          />
-        </div>
-        <div>
-          <Controller
-            name="surucu"
-            control={control}
-            render={({ field }) => (
-              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-                Sürücü
-              </Checkbox>
-            )}
-          />
-        </div>
-        <div>
-          <Controller
-            name="diger"
-            control={control}
-            render={({ field }) => (
-              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-                Diğer
-              </Checkbox>
-            )}
-          />
+              <Text style={{ fontSize: "14px" }}>İlgili Kişi:</Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  width: "300px",
+                }}>
+                <Controller
+                  name="ilgiliKisi"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      type="text" // Set the type to "text" for name input
+                      style={{ width: "215px" }}
+                      disabled
+                    />
+                  )}
+                />
+                <Controller
+                  name="ilgiliKisiID"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      type="text" // Set the type to "text" for name input
+                      style={{ display: "none" }}
+                    />
+                  )}
+                />
+                <KullaniciTablo
+                  onSubmit={(selectedData) => {
+                    setValue("ilgiliKisi", selectedData.ISK_ISIM);
+                    setValue("ilgiliKisiID", selectedData.key);
+                  }}
+                />
+                <Button onClick={handleIlgiliKisiMinusClick}> - </Button>
+              </div>
+            </StyledDivBottomLine>
+          </div>
         </div>
       </div>
     </div>

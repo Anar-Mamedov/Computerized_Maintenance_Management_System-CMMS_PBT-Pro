@@ -110,8 +110,24 @@ export default function CreateDrawer({ onRefresh }) {
           Ekle
         </Button>
         <Drawer
-          width="550px"
-          title="İş Talebi Ekle"
+          width="1460px"
+          title={
+            <div style={{ display: "flex", gap: "30px", alignItems: "center" }}>
+              <div>İş Talebi Ekle</div>
+              <div
+                style={{
+                  color: "white",
+                  backgroundColor: "blue",
+                  textAlign: "center",
+                  borderRadius: "10px",
+                  padding: "4px 30px",
+                  fontWeight: "300",
+                  fontSize: "14px",
+                }}>
+                Açik
+              </div>
+            </div>
+          }
           placement="right"
           onClose={onClose}
           open={open}
