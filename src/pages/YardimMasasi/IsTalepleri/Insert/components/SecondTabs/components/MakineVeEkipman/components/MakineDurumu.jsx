@@ -100,7 +100,7 @@ export default function MakineDurumu() {
       {contextHolder}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", width: "100%" }}>
         <Controller
-          name="dili"
+          name="makineDurumu"
           control={control}
           render={({ field }) => (
             <Select
@@ -147,14 +147,14 @@ export default function MakineDurumu() {
               }))}
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
-                setValue("diliID", value);
+                setValue("makineDurumuID", value);
                 field.onChange(value);
               }}
             />
           )}
         />
         <Controller
-          name="diliID"
+          name="makineDurumuID"
           control={control}
           render={({ field }) => (
             <Input

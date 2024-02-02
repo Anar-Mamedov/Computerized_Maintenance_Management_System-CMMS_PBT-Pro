@@ -116,12 +116,22 @@ export default function MainTable() {
   // arama işlemi için kullanılan useEffect son
 
   const fetchEquipmentData = async (body, page) => {
-    const { keyword, filters = {} } = body || {};
+    // body'nin undefined olması durumunda varsayılan değerler atanıyor
+    const { keyword = "", filters = {} } = body || {};
+    // page'in undefined olması durumunda varsayılan değer olarak 1 atanıyor
+    const currentPage = page || 1;
+
     try {
       setLoading(true);
-      const response = await AxiosInstance.post(`GetIsTalepFullList?parametre=${keyword}&pagingDeger=${page}`, filters);
+      // API isteğinde keyword ve currentPage kullanılıyor
+      const response = await AxiosInstance.post(
+        `GetIsTalepFullList?parametre=${keyword}&pagingDeger=${currentPage}`,
+        filters
+      );
       if (response) {
-        setTotalPages(response.page); // Toplam sayfa sayısını ayarla
+        // Toplam sayfa sayısını ayarla
+        setTotalPages(response.page);
+        // Gelen veriyi formatla ve state'e ata
         const formattedData = response.is_talep_listesi.map((item) => ({
           ...item,
           key: item.TB_IS_TALEP_ID,
@@ -241,6 +251,7 @@ export default function MainTable() {
           ResimIDleri: item.ResimIDleri,
           IST_TALEPEDEN_LOKASYON_ID: item.IST_TALEPEDEN_LOKASYON_ID,
           USER_ID: item.USER_ID,
+          // Diğer alanlarınız...
         }));
         setData(formattedData);
         setLoading(false);
@@ -602,6 +613,13 @@ export default function MainTable() {
 
   return (
     <div>
+      <style>
+        {`
+          .boldRow {
+            font-weight: bold;
+          }
+        `}
+      </style>
       <div
         style={{
           display: "flex",
@@ -640,6 +658,7 @@ export default function MainTable() {
           onRow={onRowClick}
           scroll={{ y: "calc(100vh - 380px)" }}
           onChange={handleTableChange}
+          rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
         />
       </Spin>
       <EditDrawer
