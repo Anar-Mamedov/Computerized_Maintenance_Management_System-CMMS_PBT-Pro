@@ -62,63 +62,83 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   const { setValue, reset } = methods;
 
+  // aşağıdaki useEffect verileri form elemanlarına set etmeden önce durum güncellemesi yapıyor ondan sonra verileri set ediyor
+
   useEffect(() => {
-    setOpen(drawerVisible);
+    const handleDataFetchAndUpdate = async () => {
+      if (drawerVisible && selectedRow) {
+        let shouldFetchData = true;
 
-    const fetchPersonelData = async () => {
-      if (selectedRow && drawerVisible) {
-        setLoading(true); // Yükleme başladığında
-        try {
-          const response = await AxiosInstance.get(`GetIsTalepById?isTalepId=${selectedRow.key}`);
-          const data = response;
+        // Eğer IST_DURUM_ID 0 ise, önce durumu güncelle
+        if (selectedRow.IST_DURUM_ID === 0) {
+          try {
+            await AxiosInstance.post("UpdateIsTalep", {
+              TB_IS_TALEP_ID: selectedRow.key,
+              IST_DURUM_ID: 1, // IST_DURUM_ID'yi 1 yaparak güncelleme yap
+            });
+            console.log("Durum başarıyla güncellendi");
+            onRefresh();
+            methods.reset();
+          } catch (error) {
+            console.error("Durum güncellenirken hata oluştu:", error);
+            shouldFetchData = false; // Hata oluşursa, veri çekme işlemine geçme
+          }
+        }
 
-          // Dizi içindeki ilk nesneye erişim
-          const item = data[0]; // Veri dizisinin ilk elemanını al
+        // Durum güncellemesi başarılıysa veya IST_DURUM_ID zaten 0 değilse, veri çekme işlemine geç
+        if (shouldFetchData) {
+          setLoading(true); // Yükleme başladığında
+          try {
+            const response = await AxiosInstance.get(`GetIsTalepById?isTalepId=${selectedRow.key}`);
+            const data = response;
+            const item = data[0]; // Veri dizisinin ilk elemanını al
 
-          // Form alanlarını set et
-          setValue("secilenTalepID", item.TB_IS_TALEP_ID);
-          setValue("talepKodu", item.IST_KOD);
-          setValue("talepTarihi", dayjs(item.IST_ACILIS_TARIHI));
-          setValue("talepSaati", dayjs(item.IST_ACILIS_SAATI));
-          setValue("kapanmaTarihi", dayjs(item.IST_KAPANMA_TARIHI));
-          setValue("kapanmaSaati", dayjs(item.IST_KAPANMA_SAATI));
-          setValue("talepteBulunan", item.IST_TALEP_EDEN_ADI);
-          setValue("secilenTalepID", item.TB_IS_TALEP_ID);
-          setValue("lokasyonTanim", item.IST_BILDIREN_LOKASYON);
-          setValue("lokasyonID", item.IST_BILDIREN_LOKASYON_ID);
-          setValue("departman", item.IST_DEPARTMAN_ADI); // bu alan adi api'de yok
-          setValue("departmanID", item.IST_DEPARTMAN_ID);
-          setValue("irtibatTelefonu", item.IST_IRTIBAT_TELEFON);
-          setValue("email", item.IST_MAIL_ADRES);
-          setValue("iletisimSekli", item.IST_IRTIBAT);
-          setValue("iletisimSekliID", item.IST_IRTIBAT_KOD_KOD_ID);
-          setValue("talepTipi", item.IST_TIP_TANIM);
-          setValue("talepTipiID", item.IST_TIP_KOD_ID);
-          setValue("isKategorisi", item.IST_KATEGORI_TANIMI);
-          setValue("isKategorisiID", item.IST_KOTEGORI_KODI_ID);
-          setValue("servisNedeni", item.IST_SERVIS_NEDENI);
-          setValue("servisNedeniID", item.IST_SERVIS_NEDENI_KOD_ID);
-          setValue("atolye", item.IST_ATOLYE_GRUBU_TANIMI);
-          setValue("oncelikTanim", item.IST_ONCELIK);
-          setValue("oncelikID", item.IST_ONCELIK_ID);
-          setValue("bildirilenBina", item.IST_BINA);
-          setValue("bildirilenBinaID", item.IST_BILDIRILEN_BINA);
-          setValue("bildirilenKat", item.IST_KAT);
-          setValue("bildirilenKatID", item.IST_BILDIRILEN_KAT);
-          setValue("ilgiliKisi", item.IST_TAKIP_EDEN_ADI);
-          setValue("ilgiliKisiID", item.IST_IS_TAKIPCISI_ID);
+            // Form alanlarını set et
+            setValue("secilenTalepID", item.TB_IS_TALEP_ID);
+            setValue("talepKodu", item.IST_KOD);
+            setValue("talepTarihi", dayjs(item.IST_ACILIS_TARIHI));
+            setValue("talepSaati", dayjs(item.IST_ACILIS_SAATI));
+            setValue("kapanmaTarihi", dayjs(item.IST_KAPANMA_TARIHI));
+            setValue("kapanmaSaati", dayjs(item.IST_KAPANMA_SAATI));
+            setValue("talepteBulunan", item.IST_TALEP_EDEN_ADI);
+            setValue("secilenTalepID", item.TB_IS_TALEP_ID);
+            setValue("lokasyonTanim", item.IST_BILDIREN_LOKASYON);
+            setValue("lokasyonID", item.IST_BILDIREN_LOKASYON_ID);
+            setValue("departman", item.IST_DEPARTMAN_ADI); // bu alan adi api'de yok
+            setValue("departmanID", item.IST_DEPARTMAN_ID);
+            setValue("irtibatTelefonu", item.IST_IRTIBAT_TELEFON);
+            setValue("email", item.IST_MAIL_ADRES);
+            setValue("iletisimSekli", item.IST_IRTIBAT);
+            setValue("iletisimSekliID", item.IST_IRTIBAT_KOD_KOD_ID);
+            setValue("talepTipi", item.IST_TIP_TANIM);
+            setValue("talepTipiID", item.IST_TIP_KOD_ID);
+            setValue("isKategorisi", item.IST_KATEGORI_TANIMI);
+            setValue("isKategorisiID", item.IST_KOTEGORI_KODI_ID);
+            setValue("servisNedeni", item.IST_SERVIS_NEDENI);
+            setValue("servisNedeniID", item.IST_SERVIS_NEDENI_KOD_ID);
+            setValue("atolye", item.IST_ATOLYE_GRUBU_TANIMI);
+            setValue("oncelikTanim", item.IST_ONCELIK);
+            setValue("oncelikID", item.IST_ONCELIK_ID);
+            setValue("bildirilenBina", item.IST_BINA);
+            setValue("bildirilenBinaID", item.IST_BILDIRILEN_BINA);
+            setValue("bildirilenKat", item.IST_KAT);
+            setValue("bildirilenKatID", item.IST_BILDIRILEN_KAT);
+            setValue("ilgiliKisi", item.IST_TAKIP_EDEN_ADI);
+            setValue("ilgiliKisiID", item.IST_IS_TAKIPCISI_ID);
+            // ... Diğer setValue çağrıları
 
-          // ... set other values similarly
-          setLoading(false); // Yükleme tamamlandığında
-        } catch (error) {
-          console.error("Error fetching data:", error);
-          setLoading(false); // Hata oluştuğunda
+            setLoading(false); // Yükleme tamamlandığında
+            setOpen(true); // İşlemler tamamlandıktan sonra drawer'ı aç
+          } catch (error) {
+            console.error("Veri çekilirken hata oluştu:", error);
+            setLoading(false); // Hata oluştuğunda
+          }
         }
       }
     };
 
-    fetchPersonelData();
-  }, [selectedRow, drawerVisible, setValue]);
+    handleDataFetchAndUpdate();
+  }, [drawerVisible, selectedRow, setValue, onRefresh, methods.reset]);
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
@@ -170,30 +190,6 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       });
     console.log({ Body });
   };
-
-  // kayıdın okunup okunmadığını kontrol etmek için
-
-  useEffect(() => {
-    if (drawerVisible && selectedRow && selectedRow.IST_DURUM_ID === 0) {
-      // IST_DURUM_ID 0 ise otomatik olarak isteği yap
-      const Body = {
-        TB_IS_TALEP_ID: selectedRow.key,
-        // Diğer alanlar...
-      };
-
-      AxiosInstance.post("UpdateIsTalep", { IST_DURUM_ID: 1, ...Body }) // IST_DURUM_ID'yi 1 yaparak güncelleme yapabilirsiniz
-        .then((response) => {
-          console.log("Data sent successfully:", response);
-          onRefresh();
-          methods.reset();
-        })
-        .catch((error) => {
-          console.error("Error sending data:", error);
-        });
-    }
-  }, [drawerVisible, selectedRow]);
-
-  // kayıdın okunup okunmadığını kontrol etmek için son
 
   const onClose = () => {
     Modal.confirm({
