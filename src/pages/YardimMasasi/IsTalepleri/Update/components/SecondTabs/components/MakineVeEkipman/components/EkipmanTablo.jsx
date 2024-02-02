@@ -1,9 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table, Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-import AxiosInstance from "../../../../../../../../../../../api/http";
+import AxiosInstance from "../../../../../../../../../api/http";
+import styled from "styled-components";
+import { Controller, useFormContext } from "react-hook-form";
 
-export default function LokasyonTablo({ workshopSelectedId, onSubmit }) {
+export default function EkipmanTablo({ workshopSelectedId, onSubmit }) {
+  const { control, watch, setValue } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -23,8 +26,12 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit }) {
     // },
     {
       title: "",
-      key: "lokasyonBilgisi",
-      render: (text, record) => <div style={{ marginTop: "6px" }}>{record.LOK_TANIM}</div>,
+      key: "ekipmanBilgisi",
+      render: (text, record) => (
+        <div style={{ marginTop: "6px" }}>
+          {record.EKP_KOD} - {record.EKP_TANIM}
+        </div>
+      ),
     },
     // Other columns...
   ];
@@ -34,18 +41,18 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit }) {
     let tree = [];
 
     data.forEach((item) => {
-      nodes[item.TB_LOKASYON_ID] = {
+      nodes[item.TB_EKIPMAN_ID] = {
         ...item,
-        key: item.TB_LOKASYON_ID,
+        key: item.TB_EKIPMAN_ID,
         children: [],
       };
     });
 
     data.forEach((item) => {
-      if (item.LOK_ANA_LOKASYON_ID && nodes[item.LOK_ANA_LOKASYON_ID]) {
-        nodes[item.LOK_ANA_LOKASYON_ID].children.push(nodes[item.TB_LOKASYON_ID]);
+      if (item.EKP_REF_ID && nodes[item.EKP_REF_ID]) {
+        nodes[item.EKP_REF_ID].children.push(nodes[item.TB_EKIPMAN_ID]);
       } else {
-        tree.push(nodes[item.TB_LOKASYON_ID]);
+        tree.push(nodes[item.TB_EKIPMAN_ID]);
       }
     });
 
@@ -72,7 +79,7 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit }) {
 
     const filtered = nodeList
       .map((node) => {
-        let nodeMatch = toLowerTurkish(node.LOK_TANIM).includes(lowerSearchTerm);
+        let nodeMatch = toLowerTurkish(node.EKP_TANIM).includes(lowerSearchTerm);
         let childrenMatch = false;
         let filteredChildren = [];
 
@@ -123,19 +130,23 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit }) {
 
   // arama işlevi için son
 
-  const fetchData = () => {
-    setLoading(true);
-    AxiosInstance.get("GetLokasyonList?ID=30")
-      .then((response) => {
-        const tree = formatDataForTable(response.data || response);
-        setTreeData(tree);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("API Error:", error);
-        setLoading(false);
-      });
-  };
+  const fetchData = useCallback(() => {
+    const makineID = watch("makineID"); // useFormContext'ten gelen watch fonksiyonu ile makineID'yi izle
+    if (makineID) {
+      // makineID'nin varlığını kontrol et
+      setLoading(true);
+      AxiosInstance.get(`Ekipman?MakineID=${makineID}`) // Template literal kullanarak makineID'yi dinamik olarak ekle
+        .then((response) => {
+          const tree = formatDataForTable(response.data || response);
+          setTreeData(tree);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("API Error:", error);
+          setLoading(false);
+        });
+    }
+  }, [watch]); // Bağımlılıklar listesine watch fonksiyonunu ekle
 
   const findItemInTree = (key, tree) => {
     for (const item of tree) {
@@ -147,6 +158,10 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit }) {
     }
     return null;
   };
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]); // fetchData fonksiyonunu bağımlılıklar listesine ekle
 
   const handleModalToggle = () => {
     setIsModalVisible((prev) => !prev);
@@ -189,7 +204,12 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit }) {
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
-      <Modal width="1200px" title="Lokasyon" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
+      <Modal
+        width="1200px"
+        title="Ekipman Listesi"
+        open={isModalVisible}
+        onOk={handleModalOk}
+        onCancel={handleModalToggle}>
         <Input
           style={{ width: "250px", marginBottom: "10px" }}
           type="text"
