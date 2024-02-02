@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { Button, Drawer, Space, ConfigProvider, Modal } from "antd";
+import { Button, Drawer, Space, ConfigProvider, Modal, Spin } from "antd";
 import tr_TR from "antd/es/locale/tr_TR";
 import AxiosInstance from "../../../../api/http";
 import dayjs from "dayjs";
 import MainTabs from "./components/MainTabs/MainTabs";
 import Footer from "./components/Footer";
 import SecondTabs from "./components/SecondTabs/SecondTabs";
+import { format } from "prettier";
 
 export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(drawerVisible);
 
   const methods = useForm({
@@ -62,116 +64,61 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   useEffect(() => {
     setOpen(drawerVisible);
-    if (drawerVisible && selectedRow) {
-      setValue("secilenPersonelID", selectedRow.key);
-      setValue("personelKodu", selectedRow.PRS_PERSONEL_KOD);
-      setValue("personelAktif", selectedRow.PRS_AKTIF);
-      setValue("personelAdi", selectedRow.PRS_ISIM);
-      setValue("personelTipi", selectedRow.PRS_TIP);
-      setValue("personelTipiID", selectedRow.PRS_PERSONEL_TIP_KOD_ID);
-      setValue("departman", selectedRow.PRS_DEPARTMAN);
-      setValue("departmanID", selectedRow.PRS_DEPARTMAN_ID);
-      setValue("atolyeTanim", selectedRow.PRS_ATOLYE);
-      setValue("atolyeID", selectedRow.PRS_ATOLYE_ID);
-      setValue("lokasyonTanim", selectedRow.PRS_LOKASYON);
-      setValue("lokasyonID", selectedRow.PRS_LOKASYON_ID);
-      setValue("unvan", selectedRow.PRS_UNVAN);
-      setValue("gorevi", selectedRow.PRS_GOREV);
-      setValue("goreviID", selectedRow.PRS_GOREV_KOD_ID);
-      setValue("taseronTanim", selectedRow.PRS_FIRMA);
-      setValue("taseronID", selectedRow.PRS_FIRMA_ID);
-      setValue("idariAmiriTanim", selectedRow.PRS_IDARI_PERSONEL_YAZI);
-      setValue("idariAmiriID", selectedRow.PRS_IDARI_PERSONEL_ID);
-      setValue("masrafMerkeziTanim", selectedRow.PRS_MASRAF_MERKEZI);
-      setValue("masrafMerkeziID", selectedRow.PRS_MASRAF_MERKEZI_ID);
-      setValue("teknisyen", selectedRow.PRS_TEKNISYEN);
-      setValue("operator", selectedRow.PRS_OPERATOR);
-      setValue("bakim", selectedRow.PRS_BAKIM);
-      setValue("santiye", selectedRow.PRS_SANTIYE);
-      setValue("surucu", selectedRow.PRS_SURUCU);
-      setValue("diger", selectedRow.PRS_DIGER);
-      // iletisim Bilgileri sekmesi
-      setValue("adres", selectedRow.PRS_ADRES);
-      setValue("sehir", selectedRow.PRS_IL);
-      setValue("postaKodu", selectedRow.PRS_POSTA_KOD);
-      setValue("telefon1", selectedRow.PRS_TELEFON);
-      setValue("telefon2", selectedRow.PRS_TELEFON1);
-      setValue("dahili", selectedRow.PRS_DAHILI);
-      setValue("email", selectedRow.PRS_EMAIL);
-      setValue("ilce", selectedRow.PRS_ILCE);
-      setValue("ulke", selectedRow.PRS_ULKE);
-      setValue("fax", selectedRow.PRS_FAX);
-      setValue("gsm", selectedRow.PRS_GSM);
-      // kişisel bilgiler sekmesi
-      setValue("dili", selectedRow.PRS_DIL);
-      setValue("diliID", selectedRow.PRS_DIL_KOD_ID);
-      setValue("uyrugu", selectedRow.PRS_UYRUK);
-      setValue("uyruguID", selectedRow.PRS_UYRUK_KOD_ID);
-      setValue("cinsiyetID", selectedRow.PRS_CINSIYET);
-      setValue("kanGrubu", selectedRow.PRS_KAN_GRUP);
-      setValue("sgkNo", selectedRow.PRS_SSK_NO);
-      setValue("vergiNo", selectedRow.PRS_VERGI_NO);
-      setValue("egitimDurumu", selectedRow.PRS_EGITIM_DURUMU);
-      setValue("mezunOkul", selectedRow.PRS_MEZUN_OLDUGU_OKUL);
-      setValue("mezunBolum", selectedRow.PRS_MEZUN_OLDUGU_BOLUM);
-      setValue("mezuniyetTarihi", selectedRow.PRS_MEZUNIYET_TARIH ? dayjs(selectedRow.PRS_MEZUNIYET_TARIH) : null);
-      setValue("iseBaslamaTarihi", selectedRow.PRS_ISE_BASLAMA ? dayjs(selectedRow.PRS_ISE_BASLAMA) : null);
-      setValue("istenAyrilmaTarihi", selectedRow.PRS_AYRILMATARIH ? dayjs(selectedRow.PRS_AYRILMATARIH) : null);
-      setValue("ucretTipiID", selectedRow.PRS_UCRET_TIPI);
-      setValue("iscilikUcreti", selectedRow.PRS_BIRIM_UCRET);
-      setValue("fazlaMesaiUcreti", selectedRow.PRS_FAZLA_MESAI);
-      // kimlik bilgileri sekmesi
-      setValue("tcKimlikNo", selectedRow.PRS_TCKIMLIK_NO);
-      setValue("seriNo", selectedRow.PRS_KIMLIK_SERINO);
-      setValue("babaAdi", selectedRow.PRS_BABA_ADI);
-      setValue("anaAdi", selectedRow.PRS_ANA_ADI);
-      setValue("dogumYeri", selectedRow.PRS_DOGUM_YERI);
-      setValue("dini", selectedRow.PRS_DINI);
-      setValue("kayitNo", selectedRow.PRS_KIMLIK_KAYIT_NO);
-      setValue("dogumTarihi", selectedRow.PRS_DOGUM_TARIH ? dayjs(selectedRow.PRS_DOGUM_TARIH) : null);
-      setValue("medeniHalID", selectedRow.PRS_MEDENI_HALI);
-      setValue("kayitliOlduguIl", selectedRow.PRS_KAYITLI_OLDUGU_IL);
-      setValue("kayitliOlduguIlce", selectedRow.PRS_KAYITLI_OLDUGU_ILCE);
-      setValue("mahalleKoy", selectedRow.PRS_MAHALLE_KOY);
-      setValue("ciltNo", selectedRow.PRS_KIMLIK_CILT_NO);
-      setValue("aileSiraNo", selectedRow.PRS_KIMLIK_AILE_SIRA_NO);
-      setValue("siraNo", selectedRow.PRS_KIMLIK_SIRA_NO);
-      setValue("verildigiYer", selectedRow.PRS_KIMLIK_VERILDIGI_YER);
-      setValue("verilisNedeni", selectedRow.PRS_KIMLIK_VERILIS_NEDENI);
-      setValue(
-        "verilisTarihi",
-        selectedRow.PRS_KIMLIK_VERILIS_TARIH ? dayjs(selectedRow.PRS_KIMLIK_VERILIS_TARIH) : null
-      );
-      // Ehliyet Bilgileri sekmesi
-      setValue("ehliyetID", selectedRow.PRS_EHLIYET);
-      setValue("sinifi", selectedRow.PRS_EHLIYET_SINIF);
-      setValue("ehliyetVerildigiIlIlce", selectedRow.PRS_EHLIYET_VERILDIGI_IL_ILCE);
-      setValue("belgeNo", selectedRow.PRS_EHLIYETNO);
-      setValue(
-        "belgeTarihi",
-        selectedRow.PRS_EHLIYET_BELGE_TARIHI ? dayjs(selectedRow.PRS_EHLIYET_BELGE_TARIHI) : null
-      );
-      setValue("ehliyetSeriNo", selectedRow.PRS_EHLIYET_SERI_NO);
-      setValue("kullandigiCihazProtezler", selectedRow.PRS_EHLIYET_KULLANDIGI_CIHAZ_PROTEZ);
-      setValue("cezaPuani", selectedRow.PRS_CEZAPUAN);
-      // Özel Alanlar sekmesi
-      setValue("ozelAlan1", selectedRow.PRS_OZEL_ALAN_1);
-      setValue("ozelAlan2", selectedRow.PRS_OZEL_ALAN_2);
-      setValue("ozelAlan3", selectedRow.PRS_OZEL_ALAN_3);
-      setValue("ozelAlan4", selectedRow.PRS_OZEL_ALAN_4);
-      setValue("ozelAlan5", selectedRow.PRS_OZEL_ALAN_5);
-      setValue("ozelAlan6", selectedRow.PRS_OZEL_ALAN_6);
-      setValue("ozelAlan6ID", selectedRow.PRS_OZEL_ALAN_6_KOD_ID);
-      setValue("ozelAlan7", selectedRow.PRS_OZEL_ALAN_7);
-      setValue("ozelAlan7ID", selectedRow.PRS_OZEL_ALAN_7_KOD_ID);
-      setValue("ozelAlan8", selectedRow.PRS_OZEL_ALAN_8);
-      setValue("ozelAlan8ID", selectedRow.PRS_OZEL_ALAN_8_KOD_ID);
-      setValue("ozelAlan9", selectedRow.PRS_OZEL_ALAN_9);
-      setValue("ozelAlan10", selectedRow.PRS_OZEL_ALAN_10);
-      // Açıklama Sekmesi
-      setValue("aciklama", selectedRow.PRS_ACIKLAMA);
-    }
-  }, [selectedRow, setValue, drawerVisible]);
+
+    const fetchPersonelData = async () => {
+      if (selectedRow && drawerVisible) {
+        setLoading(true); // Yükleme başladığında
+        try {
+          const response = await AxiosInstance.get(`GetIsTalepById?isTalepId=${selectedRow.key}`);
+          const data = response;
+
+          // Dizi içindeki ilk nesneye erişim
+          const item = data[0]; // Veri dizisinin ilk elemanını al
+
+          // Form alanlarını set et
+          setValue("secilenTalepID", item.TB_IS_TALEP_ID);
+          setValue("talepKodu", item.IST_KOD);
+          setValue("talepTarihi", dayjs(item.IST_ACILIS_TARIHI));
+          setValue("talepSaati", dayjs(item.IST_ACILIS_SAATI));
+          setValue("kapanmaTarihi", dayjs(item.IST_KAPANMA_TARIHI));
+          setValue("kapanmaSaati", dayjs(item.IST_KAPANMA_SAATI));
+          setValue("talepteBulunan", item.IST_TALEP_EDEN_ADI);
+          setValue("secilenTalepID", item.TB_IS_TALEP_ID);
+          setValue("lokasyonTanim", item.IST_BILDIREN_LOKASYON);
+          setValue("lokasyonID", item.IST_BILDIREN_LOKASYON_ID);
+          setValue("departman", item.IST_DEPARTMAN_ADI); // bu alan adi api'de yok
+          setValue("departmanID", item.IST_DEPARTMAN_ID);
+          setValue("irtibatTelefonu", item.IST_IRTIBAT_TELEFON);
+          setValue("email", item.IST_MAIL_ADRES);
+          setValue("iletisimSekli", item.IST_IRTIBAT);
+          setValue("iletisimSekliID", item.IST_IRTIBAT_KOD_KOD_ID);
+          setValue("talepTipi", item.IST_TIP_TANIM);
+          setValue("talepTipiID", item.IST_TIP_KOD_ID);
+          setValue("isKategorisi", item.IST_KATEGORI_TANIMI);
+          setValue("isKategorisiID", item.IST_KOTEGORI_KODI_ID);
+          setValue("servisNedeni", item.IST_SERVIS_NEDENI);
+          setValue("servisNedeniID", item.IST_SERVIS_NEDENI_KOD_ID);
+          setValue("atolye", item.IST_ATOLYE_GRUBU_TANIMI);
+          setValue("oncelikTanim", item.IST_ONCELIK);
+          setValue("oncelikID", item.IST_ONCELIK_ID);
+          setValue("bildirilenBina", item.IST_BINA);
+          setValue("bildirilenBinaID", item.IST_BILDIRILEN_BINA);
+          setValue("bildirilenKat", item.IST_KAT);
+          setValue("bildirilenKatID", item.IST_BILDIRILEN_KAT);
+          setValue("ilgiliKisi", item.IST_TAKIP_EDEN_ADI);
+          setValue("ilgiliKisiID", item.IST_IS_TAKIPCISI_ID);
+
+          // ... set other values similarly
+          setLoading(false); // Yükleme tamamlandığında
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          setLoading(false); // Hata oluştuğunda
+        }
+      }
+    };
+
+    fetchPersonelData();
+  }, [selectedRow, drawerVisible, setValue]);
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
@@ -224,6 +171,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     console.log({ Body });
   };
 
+  // kayıdın okunup okunmadığını kontrol etmek için
+
   useEffect(() => {
     if (drawerVisible && selectedRow && selectedRow.IST_DURUM_ID === 0) {
       // IST_DURUM_ID 0 ise otomatik olarak isteği yap
@@ -244,6 +193,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     }
   }, [drawerVisible, selectedRow]);
 
+  // kayıdın okunup okunmadığını kontrol etmek için son
+
   const onClose = () => {
     Modal.confirm({
       title: "İptal etmek istediğinden emin misin?",
@@ -263,7 +214,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       <ConfigProvider locale={tr_TR}>
         <Drawer
           width="1460px"
-          title="Personel Tanımını Güncelle"
+          title="İş Talebi Güncelle"
           placement="right"
           onClose={onClose}
           open={open}
@@ -278,11 +229,20 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
               </Button>
             </Space>
           }>
-          <form onSubmit={methods.handleSubmit(onSubmit)}>
-            <MainTabs />
-            <SecondTabs />
-            <Footer />
-          </form>
+          {loading ? (
+            <Spin
+              spinning={loading}
+              size="large"
+              style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+              {/* İçerik yüklenirken gösterilecek alan */}
+            </Spin>
+          ) : (
+            <form onSubmit={methods.handleSubmit(onSubmit)}>
+              <MainTabs />
+              <SecondTabs />
+              <Footer />
+            </form>
+          )}
         </Drawer>
       </ConfigProvider>
     </FormProvider>
