@@ -3,10 +3,12 @@ import { useForm, FormProvider } from "react-hook-form";
 import { Button, Drawer, Space, ConfigProvider, Modal, Spin } from "antd";
 import tr_TR from "antd/es/locale/tr_TR";
 import AxiosInstance from "../../../../api/http";
-import dayjs from "dayjs";
 import MainTabs from "./components/MainTabs/MainTabs";
 import Footer from "./components/Footer";
 import SecondTabs from "./components/SecondTabs/SecondTabs";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+dayjs.extend(customParseFormat);
 
 export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
   const [loading, setLoading] = useState(false);
@@ -96,9 +98,9 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             setValue("secilenTalepID", item.TB_IS_TALEP_ID);
             setValue("talepKodu", item.IST_KOD);
             setValue("talepTarihi", dayjs(item.IST_ACILIS_TARIHI));
-            setValue("talepSaati", dayjs(item.IST_ACILIS_SAATI));
-            setValue("kapanmaTarihi", dayjs(item.IST_KAPANMA_TARIHI));
-            setValue("kapanmaSaati", dayjs(item.IST_KAPANMA_SAATI));
+            setValue("talepSaati", dayjs(item.IST_ACILIS_SAATI, "HH:mm:ss")); // Saat değerini doğru formatla set et
+            setValue("kapanmaTarihi", dayjs(item.IST_KAPAMA_TARIHI));
+            setValue("kapanmaSaati", dayjs(item.IST_KAPAMA_SAATI, "HH:mm:ss"));
             setValue("talepteBulunan", item.IST_TALEP_EDEN_ADI);
             setValue("secilenTalepID", item.TB_IS_TALEP_ID);
             setValue("lokasyonTanim", item.IST_BILDIREN_LOKASYON);
@@ -124,6 +126,16 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             setValue("bildirilenKatID", item.IST_BILDIRILEN_KAT);
             setValue("ilgiliKisi", item.IST_TAKIP_EDEN_ADI);
             setValue("ilgiliKisiID", item.IST_IS_TAKIPCISI_ID);
+            setValue("konu", item.IST_TANIMI);
+            setValue("aciklama", item.IST_ACIKLAMA);
+            setValue("makine", item.IST_MAKINE_KOD);
+            setValue("makineID", item.IST_MAKINE_ID);
+            setValue("makineTanim", item.IST_MAKINE_TANIMI);
+            setValue("ekipman", item.IST_EKIPMAN_KOD);
+            setValue("ekipmanID", item.IST_EKIPMAN_ID);
+            setValue("ekipmanTanim", item.IST_EKIPMAN_TANIMI);
+            setValue("makineDurumu", item.IST_MAKINE_DURUMU);
+            setValue("makineDurumuID", item.IST_MAKINE_DURUM_KOD_ID);
             // ... Diğer setValue çağrıları
 
             setLoading(false); // Yükleme tamamlandığında
@@ -204,12 +216,53 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     });
   };
 
+  const StatusTitle = ({ statusId }) => {
+    const getStatusProps = (statusId) => {
+      switch (statusId) {
+        case 0:
+          return { message: "Açık", backgroundColor: "blue" };
+        case 1:
+          return { message: "Bekliyor", backgroundColor: "#ff5e00" };
+        case 2:
+          return { message: "Planlandı", backgroundColor: "#ffe600" };
+        case 3:
+          return { message: "Devam Ediyor", backgroundColor: "#00d300" };
+        case 4:
+          return { message: "Kapandı", backgroundColor: "#575757" };
+        case 5:
+          return { message: "İptal Edildi", backgroundColor: "#d10000" };
+        default:
+          return { message: "Bilinmiyor", backgroundColor: "gray" };
+      }
+    };
+
+    const { message, backgroundColor } = getStatusProps(statusId);
+
+    return (
+      <div style={{ display: "flex", gap: "30px", alignItems: "center" }}>
+        <div>İş Talebi Güncelle</div>
+        <div
+          style={{
+            color: "white",
+            backgroundColor,
+            textAlign: "center",
+            borderRadius: "8px 8px 8px 8px",
+            padding: "4px 30px",
+            fontWeight: "300",
+            fontSize: "14px",
+          }}>
+          {message}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
         <Drawer
           width="1460px"
-          title="İş Talebi Güncelle"
+          title={<StatusTitle statusId={selectedRow ? selectedRow.IST_DURUM_ID : null} />}
           placement="right"
           onClose={onClose}
           open={open}

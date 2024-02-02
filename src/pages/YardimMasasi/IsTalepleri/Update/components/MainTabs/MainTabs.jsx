@@ -107,21 +107,6 @@ export default function MainTabs({ drawerOpen }) {
     setValue("lokasyonID", "");
   };
 
-  // sistemin o anki tarih ve saatini almak için
-
-  useEffect(() => {
-    if (drawerOpen) {
-      const currentDate = dayjs(); // Şu anki tarih için dayjs nesnesi
-      const currentTime = dayjs(); // Şu anki saat için dayjs nesnesi
-
-      // Tarih ve saat alanlarını güncelle
-      setValue("talepTarihi", currentDate);
-      setValue("talepSaati", currentTime);
-    }
-  }, [drawerOpen, setValue]);
-
-  // sistemin o anki tarih ve saatini almak sonu
-
   // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın
 
   useEffect(() => {
