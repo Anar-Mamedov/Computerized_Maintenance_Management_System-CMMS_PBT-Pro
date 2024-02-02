@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
 
-export default function OncelikTablo({ workshopSelectedId, onSubmit }) {
+export default function OncelikTablo({ workshopSelectedId, onSubmit, disabled }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
@@ -87,7 +87,10 @@ export default function OncelikTablo({ workshopSelectedId, onSubmit }) {
   };
   return (
     <div>
-      <Button onClick={handleModalToggle}> + </Button>
+      <Button disabled={disabled} onClick={handleModalToggle}>
+        {" "}
+        +{" "}
+      </Button>
       <Modal width="1200px" title="Öncelik" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <Table
           rowSelection={{

@@ -5,7 +5,7 @@ import AxiosInstance from "../../../../../../../../../api/http";
 import styled from "styled-components";
 import { Controller, useFormContext } from "react-hook-form";
 
-export default function EkipmanTablo({ workshopSelectedId, onSubmit }) {
+export default function EkipmanTablo({ workshopSelectedId, onSubmit, disabled }) {
   const { control, watch, setValue } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -203,7 +203,10 @@ export default function EkipmanTablo({ workshopSelectedId, onSubmit }) {
 
   return (
     <div>
-      <Button onClick={handleModalToggle}> + </Button>
+      <Button disabled={disabled} onClick={handleModalToggle}>
+        {" "}
+        +{" "}
+      </Button>
       <Modal
         width="1200px"
         title="Ekipman Listesi"

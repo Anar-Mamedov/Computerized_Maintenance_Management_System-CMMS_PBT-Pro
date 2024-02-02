@@ -19,7 +19,7 @@ const StyledDivBottomLine = styled.div`
   }
 `;
 
-export default function MakineVeEkipman() {
+export default function MakineVeEkipman({ disabled }) {
   const { control, watch, setValue } = useFormContext();
 
   const handleEkipmanMinusClick = () => {
@@ -99,13 +99,17 @@ export default function MakineVeEkipman() {
                       )}
                     />
                     <MakineTablo
+                      disabled={disabled}
                       onSubmit={(selectedData) => {
                         setValue("makine", selectedData.MKN_KOD);
                         setValue("makineID", selectedData.key);
                         setValue("makineTanim", selectedData.MKN_TANIM);
                       }}
                     />
-                    <Button onClick={handleMakineMinusClick}> - </Button>
+                    <Button disabled={disabled} onClick={handleMakineMinusClick}>
+                      {" "}
+                      -{" "}
+                    </Button>
                   </div>
                   <Controller
                     name="makineTanim"
@@ -165,13 +169,17 @@ export default function MakineVeEkipman() {
                       )}
                     />
                     <EkipmanTablo
+                      disabled={disabled}
                       onSubmit={(selectedData) => {
                         setValue("ekipman", selectedData.EKP_KOD);
                         setValue("ekipmanID", selectedData.key);
                         setValue("ekipmanTanim", selectedData.EKP_TANIM);
                       }}
                     />
-                    <Button onClick={handleEkipmanMinusClick}> - </Button>
+                    <Button disabled={disabled} onClick={handleEkipmanMinusClick}>
+                      {" "}
+                      -{" "}
+                    </Button>
                   </div>
                   <Controller
                     name="ekipmanTanim"
@@ -207,7 +215,7 @@ export default function MakineVeEkipman() {
                     gap: "10px",
                     width: "100%",
                   }}>
-                  <MakineDurumu />
+                  <MakineDurumu disabled={disabled} />
                 </div>
               </StyledDivBottomLine>
             </div>

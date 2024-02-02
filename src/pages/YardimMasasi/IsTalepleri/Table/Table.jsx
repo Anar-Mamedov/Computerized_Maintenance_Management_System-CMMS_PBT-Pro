@@ -347,34 +347,6 @@ export default function MainTable() {
       render: (text) => formatTime(text),
     },
     {
-      title: "Talep Eden",
-      dataIndex: "IST_TALEP_EDEN_ADI",
-      key: "IST_TALEP_EDEN_ADI",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "İş Kategorisi",
-      dataIndex: "IST_KATEGORI_TANIMI",
-      key: "IST_KATEGORI_TANIMI",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Öncelik",
-      dataIndex: "IST_ONCELIK",
-      key: "IST_ONCELIK",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Lokasyon",
-      dataIndex: "IST_BILDIREN_LOKASYON",
-      key: "IST_BILDIREN_LOKASYON",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
       title: "Durum",
       dataIndex: "IST_DURUM_ID",
       key: "IST_DURUM_ID",
@@ -465,6 +437,35 @@ export default function MainTable() {
         }
       },
     },
+    {
+      title: "Talep Eden",
+      dataIndex: "IST_TALEP_EDEN_ADI",
+      key: "IST_TALEP_EDEN_ADI",
+      width: "150px",
+      ellipsis: true,
+    },
+    {
+      title: "İş Kategorisi",
+      dataIndex: "IST_KATEGORI_TANIMI",
+      key: "IST_KATEGORI_TANIMI",
+      width: "150px",
+      ellipsis: true,
+    },
+    {
+      title: "Öncelik",
+      dataIndex: "IST_ONCELIK",
+      key: "IST_ONCELIK",
+      width: "150px",
+      ellipsis: true,
+    },
+    {
+      title: "Lokasyon",
+      dataIndex: "IST_BILDIREN_LOKASYON",
+      key: "IST_BILDIREN_LOKASYON",
+      width: "150px",
+      ellipsis: true,
+    },
+
     {
       title: "İşlem Süresi",
       dataIndex: "ISLEM_SURE",

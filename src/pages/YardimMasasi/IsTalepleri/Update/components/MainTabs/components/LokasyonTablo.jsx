@@ -4,7 +4,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../api/http";
 import styled from "styled-components";
 
-export default function LokasyonTablo({ workshopSelectedId, onSubmit }) {
+export default function LokasyonTablo({ workshopSelectedId, onSubmit, disabled }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -189,7 +189,10 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit }) {
 
   return (
     <div>
-      <Button onClick={handleModalToggle}> + </Button>
+      <Button disabled={disabled} onClick={handleModalToggle}>
+        {" "}
+        +{" "}
+      </Button>
       <Modal width="1200px" title="Lokasyon" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <Input
           style={{ width: "250px", marginBottom: "10px" }}

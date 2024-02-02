@@ -13,6 +13,7 @@ dayjs.extend(customParseFormat);
 export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(drawerVisible);
+  const [disabled, setDisabled] = useState(false);
 
   const methods = useForm({
     defaultValues: {
@@ -99,8 +100,23 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             setValue("talepKodu", item.IST_KOD);
             setValue("talepTarihi", dayjs(item.IST_ACILIS_TARIHI));
             setValue("talepSaati", dayjs(item.IST_ACILIS_SAATI, "HH:mm:ss")); // Saat değerini doğru formatla set et
-            setValue("kapanmaTarihi", dayjs(item.IST_KAPAMA_TARIHI));
-            setValue("kapanmaSaati", dayjs(item.IST_KAPAMA_SAATI, "HH:mm:ss"));
+            setValue(
+              "kapanmaTarihi",
+              item.IST_KAPAMA_TARIHI
+                ? dayjs(item.IST_KAPAMA_TARIHI).isValid()
+                  ? dayjs(item.IST_KAPAMA_TARIHI)
+                  : null
+                : null
+            );
+            setValue(
+              "kapanmaSaati",
+              item.IST_KAPAMA_SAATI
+                ? dayjs(item.IST_KAPAMA_SAATI, "HH:mm:ss").isValid()
+                  ? dayjs(item.IST_KAPAMA_SAATI, "HH:mm:ss")
+                  : null
+                : null
+            );
+
             setValue("talepteBulunan", item.IST_TALEP_EDEN_ADI);
             setValue("secilenTalepID", item.TB_IS_TALEP_ID);
             setValue("lokasyonTanim", item.IST_BILDIREN_LOKASYON);
@@ -164,6 +180,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   const onSubmit = (data) => {
     // Form verilerini API'nin beklediği formata dönüştür
     const Body = {
+      TB_IS_TALEP_ID: data.secilenTalepID,
       IST_KOD: data.talepKodu,
       IST_ACILIS_TARIHI: formatDateWithDayjs(data.talepTarihi),
       IST_ACILIS_SAATI: formatTimeWithDayjs(data.talepSaati),
@@ -216,6 +233,21 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     });
   };
 
+  // kayıdın durum id sine göre o o ekrana tıklandığında gözüken bütün form elemanlarını disablede edip etmeme işlemi
+
+  useEffect(() => {
+    // Örneğin, durum ID'si 4 (Kapandı) veya 5 (İptal Edildi) olduğunda formu disabled yap
+    if (selectedRow?.IST_DURUM_ID === 3 || selectedRow?.IST_DURUM_ID === 4 || selectedRow?.IST_DURUM_ID === 5) {
+      setDisabled(true);
+    } else {
+      setDisabled(false);
+    }
+  }, [selectedRow]);
+
+  // kayıdın durum id sine göre o o ekrana tıklandığında gözüken bütün form elemanlarını disablede edip etmeme işlemi sonu
+
+  // açılan kayıdın durumunu apiden gelen id ye göre drawerin yukarısında gösteriyor
+
   const StatusTitle = ({ statusId }) => {
     const getStatusProps = (statusId) => {
       switch (statusId) {
@@ -257,6 +289,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     );
   };
 
+  // açılan kayıdın durumunu apiden gelen id ye göre drawerin yukarısında gösteriyor sonu
+
   return (
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
@@ -270,6 +304,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             <Space>
               <Button onClick={onClose}>İptal</Button>
               <Button
+                disabled={disabled}
                 type="submit"
                 onClick={methods.handleSubmit(onSubmit)}
                 style={{ backgroundColor: "#2bc770", borderColor: "#2bc770", color: "#ffffff" }}>
@@ -286,8 +321,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             </Spin>
           ) : (
             <form onSubmit={methods.handleSubmit(onSubmit)}>
-              <MainTabs />
-              <SecondTabs />
+              <MainTabs disabled={disabled} />
+              <SecondTabs disabled={disabled} />
               <Footer />
             </form>
           )}
