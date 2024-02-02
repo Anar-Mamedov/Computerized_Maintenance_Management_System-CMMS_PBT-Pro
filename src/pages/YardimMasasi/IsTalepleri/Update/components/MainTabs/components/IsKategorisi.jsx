@@ -7,7 +7,7 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function Departman() {
+export default function IsKategorisi() {
   const { control, setValue } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -23,7 +23,7 @@ export default function Departman() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32751");
+      const response = await AxiosInstance.get("KodList?grup=32952");
       if (response && response) {
         setOptions(response);
       }
@@ -51,7 +51,7 @@ export default function Departman() {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32751`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32952`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
@@ -92,7 +92,7 @@ export default function Departman() {
       {contextHolder}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
         <Controller
-          name="departman"
+          name="isKategorisi"
           control={control}
           render={({ field }) => (
             <Select
@@ -136,14 +136,14 @@ export default function Departman() {
               }))}
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
-                setValue("departmanID", value);
+                setValue("isKategorisiID", value);
                 field.onChange(value);
               }}
             />
           )}
         />
         <Controller
-          name="departmanID"
+          name="isKategorisiID"
           control={control}
           render={({ field }) => (
             <Input

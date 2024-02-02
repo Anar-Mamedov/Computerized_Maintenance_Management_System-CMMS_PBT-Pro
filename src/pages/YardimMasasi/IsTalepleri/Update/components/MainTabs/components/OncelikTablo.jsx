@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
 
-export default function IdariAmiriTablo({ workshopSelectedId, onSubmit }) {
+export default function OncelikTablo({ workshopSelectedId, onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
@@ -10,62 +10,52 @@ export default function IdariAmiriTablo({ workshopSelectedId, onSubmit }) {
 
   const columns = [
     {
-      title: "Personel Kodu",
+      title: "Öncelik Kodu",
       dataIndex: "code",
       key: "code",
-      width: "150px",
-      ellipsis: true,
+      render: (text) => (
+        <div
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}>
+          {text}
+        </div>
+      ),
     },
     {
-      title: "Personel Adı",
+      title: "Tanım",
       dataIndex: "subject",
       key: "subject",
-      width: "150px",
-      ellipsis: true,
+      render: (text) => (
+        <div
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}>
+          {text}
+        </div>
+      ),
     },
     {
-      title: "Ünvan",
-      dataIndex: "workdays",
-      key: "workdays",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Personel Tipi",
-      dataIndex: "description",
-      key: "description",
-      width: "150px",
-      ellipsis: true,
-    },
-
-    {
-      title: "Departman",
-      dataIndex: "fifthcolumn",
-      key: "fifthcolumn",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Lokasyon",
-      dataIndex: "sixthcolumn",
-      key: "sixthcolumn",
-      width: "150px",
-      ellipsis: true,
+      title: "Varsayılan",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => <input type="checkbox" checked={status} disabled />,
     },
   ];
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`Personel`)
+    AxiosInstance.get(`OncelikList`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
-          key: item.TB_PERSONEL_ID,
-          code: item.PRS_PERSONEL_KOD,
-          subject: item.PRS_ISIM,
-          workdays: item.PRS_UNVAN,
-          description: item.PRS_TIP,
-          fifthcolumn: item.PRS_DEPARTMAN,
-          sixthcolumn: item.PRS_LOKASYON,
+          key: item.TB_SERVIS_ONCELIK_ID,
+          code: item.SOC_KOD,
+          subject: item.SOC_TANIM,
+          status: item.SOC_VARSAYILAN,
         }));
         setData(fetchedData);
       })
@@ -98,13 +88,7 @@ export default function IdariAmiriTablo({ workshopSelectedId, onSubmit }) {
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
-      <Modal
-        width={1200}
-        centered
-        title="Personel"
-        open={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={handleModalToggle}>
+      <Modal width="1200px" title="Öncelik" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <Table
           rowSelection={{
             type: "radio",
@@ -114,10 +98,6 @@ export default function IdariAmiriTablo({ workshopSelectedId, onSubmit }) {
           columns={columns}
           dataSource={data}
           loading={loading}
-          scroll={{
-            // x: "auto",
-            y: "calc(100vh - 360px)",
-          }}
         />
       </Modal>
     </div>
