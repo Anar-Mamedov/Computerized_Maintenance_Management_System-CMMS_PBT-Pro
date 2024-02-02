@@ -7,6 +7,7 @@ import AxiosInstance from "../../../../api/http";
 import MainTabs from "./components/MainTabs/MainTabs";
 import SecondTabs from "./components/SecondTabs/SecondTabs";
 import Footer from "../Footer";
+import dayjs from "dayjs";
 
 export default function CreateDrawer({ onRefresh }) {
   const [open, setOpen] = useState(false);
@@ -20,57 +21,85 @@ export default function CreateDrawer({ onRefresh }) {
 
   const methods = useForm({
     defaultValues: {
-      personelKodu: "",
-      secilenPersonelID: "",
-      personelAktif: true,
-      personelAdi: "",
-      personelTipi: null,
-      personelTipiID: "",
-      departman: null,
-      departmanID: "",
-      atolyeTanim: "",
-      atolyeID: "",
+      talepKodu: "",
+      secilenTalepID: "",
+      talepTarihi: "",
+      talepSaati: "",
+      kapanmaTarihi: "",
+      kapanmaSaati: "",
+      talepteBulunan: "",
+      talepteBulunanID: "",
       lokasyonTanim: "",
       lokasyonID: "",
-      unvan: "",
-      gorevi: null,
-      goreviID: "",
-      taseronTanim: "",
-      taseronID: "",
-      idariAmiriTanim: "",
-      idariAmiriID: "",
-      masrafMerkeziTanim: "",
-      masrafMerkeziID: "",
-      teknisyen: "",
-      operator: "",
-      bakim: "",
-      santiye: "",
-      surucu: "",
-      diger: "",
+      departman: null,
+      departmanID: "",
+      irtibatTelefonu: "",
+      email: "",
+      iletisimSekli: null,
+      iletisimSekliID: "",
+      talepTipi: null,
+      talepTipiID: "",
+      isKategorisi: null,
+      isKategorisiID: "",
+      servisNedeni: null,
+      servisNedeniID: "",
+      atolye: "",
+      oncelikTanim: "",
+      oncelikID: "",
+      bildirilenBina: null,
+      bildirilenBinaID: "",
+      bildirilenKat: null,
+      bildirilenKatID: "",
+      ilgiliKisi: "",
+      ilgiliKisiID: "",
+      konu: "",
+      aciklama: "",
+      makine: "",
+      makineID: "",
+      makineTanim: "",
+      ekipman: "",
+      ekipmanID: "",
+      ekipmanTanim: "",
+      makineDurumu: null,
+      makineDurumuID: "",
     },
   });
+
+  const formatDateWithDayjs = (dateString) => {
+    const formattedDate = dayjs(dateString);
+    return formattedDate.isValid() ? formattedDate.format("YYYY-MM-DD") : "";
+  };
+
+  const formatTimeWithDayjs = (timeObj) => {
+    const formattedTime = dayjs(timeObj);
+    return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
+  };
 
   const onSubmit = (data) => {
     // Form verilerini API'nin beklediği formata dönüştür
     const Body = {
-      PRS_PERSONEL_KOD: data.personelKodu,
-      PRS_ISIM: data.personelAdi,
-      PRS_PERSONEL_TIP_KOD_ID: data.personelTipiID,
-      PRS_DEPARTMAN_ID: data.departmanID,
-      PRS_LOKASYON_ID: data.lokasyonID,
-      PRS_ATOLYE_ID: data.atolyeID,
-      PRS_UNVAN: data.unvan,
-      PRS_GOREV_KOD_ID: data.goreviID,
-      PRS_FIRMA_ID: data.taseronID,
-      PRS_IDARI_PERSONEL_ID: data.idariAmiriID,
-      PRS_MASRAF_MERKEZI_ID: data.masrafMerkeziID,
-      PRS_AKTIF: data.personelAktif,
-      PRS_TEKNISYEN: data.teknisyen,
-      PRS_SURUCU: data.surucu,
-      PRS_OPERATOR: data.operator,
-      PRS_BAKIM: data.bakim,
-      PRS_DIGER: data.diger,
-      PRS_SANTIYE: data.santiye,
+      IST_KOD: data.talepKodu,
+      IST_ACILIS_TARIHI: formatDateWithDayjs(data.talepTarihi),
+      IST_ACILIS_SAATI: formatTimeWithDayjs(data.talepSaati),
+      IST_TALEP_EDEN_ID: data.talepteBulunanID,
+      IST_BILDIREN_LOKASYON_ID: data.lokasyonID,
+      IST_DEPARTMAN_ID: data.departmanID,
+      IST_IRTIBAT_TELEFON: data.irtibatTelefonu,
+      IST_MAIL_ADRES: data.email,
+      IST_IRTIBAT_KOD_KOD_ID: data.iletisimSekliID,
+      IST_TIP_KOD_ID: data.talepTipiID,
+      IST_KOTEGORI_KODI_ID: data.isKategorisiID,
+      IST_SERVIS_NEDENI_KOD_ID: data.servisNedeniID,
+      IST_ONCELIK_ID: data.oncelikID,
+      IST_BILDIRILEN_BINA: data.bildirilenBinaID,
+      IST_BILDIRILEN_KAT: data.bildirilenKatID,
+      IST_IS_TAKIPCISI_ID: data.ilgiliKisiID,
+      IST_TANIMI: data.konu,
+      IST_ACIKLAMA: data.aciklama,
+      IST_MAKINE_ID: data.makineID,
+      IST_EKIPMAN_ID: data.ekipmanID,
+      IST_MAKINE_DURUM_KOD_ID: data.makineDurumuID,
+      IST_DURUM_ID: 0,
       // Diğer alanlarınız...
     };
 

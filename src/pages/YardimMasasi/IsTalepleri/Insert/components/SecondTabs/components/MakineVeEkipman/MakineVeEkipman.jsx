@@ -2,12 +2,9 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Input, Typography, Tabs, DatePicker } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
-import UcretTipi from "./components/UcretTipi";
 import MakineDurumu from "./components/MakineDurumu";
 import EkipmanTablo from "./components/EkipmanTablo";
 import MakineTablo from "./components/MakineTablo";
-import Uyruk from "./components/Uyruk";
-import Cinsiyet from "./components/Cinsiyet";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
