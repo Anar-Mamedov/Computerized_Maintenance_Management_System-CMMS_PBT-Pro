@@ -42,19 +42,19 @@ const StyledTabs = styled(Tabs)`
 
 //styled components end
 
-export default function SecondTabs({ refreshKey }) {
+export default function SecondTabs({ refreshKey, disabled }) {
   const { watch } = useFormContext();
 
   const items = [
     {
       key: "1",
       label: "İş Takibi",
-      children: <IsTakibi />,
+      children: <IsTakibi disabled={disabled} />,
     },
     {
       key: "2",
       label: "Makine ve Ekipman",
-      children: <MakineVeEkipman />,
+      children: <MakineVeEkipman disabled={disabled} />,
     },
   ];
 

@@ -16,7 +16,7 @@ const StyledDivBottomLine = styled.div`
   }
 `;
 
-export default function IsTakibi() {
+export default function IsTakibi({ disabled }) {
   const { control, watch, setValue } = useFormContext();
 
   return (
@@ -59,7 +59,7 @@ export default function IsTakibi() {
               <Controller
                 name="konu"
                 control={control}
-                render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+                render={({ field }) => <Input {...field} disabled={disabled} style={{ flex: 1 }} />}
               />
             </div>
           </StyledDivBottomLine>
@@ -87,7 +87,7 @@ export default function IsTakibi() {
               <Controller
                 name="aciklama"
                 control={control}
-                render={({ field }) => <TextArea {...field} rows={4} style={{ flex: 1 }} />}
+                render={({ field }) => <TextArea {...field} disabled={disabled} rows={4} style={{ flex: 1 }} />}
               />
             </div>
           </div>

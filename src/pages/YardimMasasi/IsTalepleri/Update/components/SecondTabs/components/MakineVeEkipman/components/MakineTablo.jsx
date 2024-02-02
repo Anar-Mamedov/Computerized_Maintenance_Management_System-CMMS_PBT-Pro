@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import SearchField from "../../../../../../../../MakineEkipman/MakineTanim/Table/SearchField";
 import Filters from "./Machina/filter/Filters";
 
-export default function MakineTablo({ workshopSelectedId, onSubmit }) {
+export default function MakineTablo({ workshopSelectedId, onSubmit, disabled }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -301,7 +301,10 @@ export default function MakineTablo({ workshopSelectedId, onSubmit }) {
 
   return (
     <div>
-      <Button onClick={handleModalToggle}> + </Button>
+      <Button disabled={disabled} onClick={handleModalToggle}>
+        {" "}
+        +{" "}
+      </Button>
       <Modal
         width="1200px"
         centered

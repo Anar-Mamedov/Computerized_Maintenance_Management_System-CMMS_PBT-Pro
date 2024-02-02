@@ -75,7 +75,7 @@ const StyledDivMedia = styled.div`
   }
 `;
 
-export default function MainTabs({ drawerOpen }) {
+export default function MainTabs({ drawerOpen, disabled }) {
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const {
@@ -166,7 +166,7 @@ export default function MainTabs({ drawerOpen }) {
               rules={{ required: "Alan Boş Bırakılamaz!" }}
               render={({ field, fieldState: { error } }) => (
                 <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
-                  <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
+                  <Input {...field} disabled={disabled} status={error ? "error" : ""} style={{ flex: 1 }} />
                   {error && <div style={{ color: "red" }}>{error.message}</div>}
                 </div>
               )}
@@ -212,6 +212,7 @@ export default function MainTabs({ drawerOpen }) {
               render={({ field, fieldState: { error } }) => (
                 <DatePicker
                   {...field}
+                  disabled={disabled}
                   status={error ? "error" : ""}
                   style={{ width: "180px" }}
                   format={localeDateFormat}
@@ -226,6 +227,7 @@ export default function MainTabs({ drawerOpen }) {
               render={({ field, fieldState: { error } }) => (
                 <TimePicker
                   {...field}
+                  disabled={disabled}
                   status={errors.talepSaati ? "error" : ""}
                   style={{ width: "110px" }}
                   format={localeTimeFormat}
@@ -328,6 +330,7 @@ export default function MainTabs({ drawerOpen }) {
                   )}
                 />
                 <KullaniciTablo
+                  disabled={disabled}
                   onSubmit={(selectedData) => {
                     setValue("talepteBulunan", selectedData.ISK_ISIM);
                     setValue("talepteBulunanID", selectedData.key);
@@ -339,7 +342,10 @@ export default function MainTabs({ drawerOpen }) {
                     setValue("email", selectedData.ISK_MAIL);
                   }}
                 />
-                <Button onClick={handleTalepteBulunanMinusClick}> - </Button>
+                <Button disabled={disabled} onClick={handleTalepteBulunanMinusClick}>
+                  {" "}
+                  -{" "}
+                </Button>
                 {errors.talepteBulunan && (
                   <div style={{ color: "red", marginTop: "5px" }}>{errors.talepteBulunan.message}</div>
                 )}
@@ -390,12 +396,16 @@ export default function MainTabs({ drawerOpen }) {
                 )}
               />
               <LokasyonTablo
+                disabled={disabled}
                 onSubmit={(selectedData) => {
                   setValue("lokasyonTanim", selectedData.LOK_TANIM);
                   setValue("lokasyonID", selectedData.key);
                 }}
               />
-              <Button onClick={handleLokasyonMinusClick}> - </Button>
+              <Button disabled={disabled} onClick={handleLokasyonMinusClick}>
+                {" "}
+                -{" "}
+              </Button>
             </div>
           </StyledDivMedia>
           <div style={{ width: "100%", maxWidth: "450px" }}>
@@ -408,7 +418,7 @@ export default function MainTabs({ drawerOpen }) {
                 width: "100%",
               }}>
               <Text style={{ fontSize: "14px" }}>Departman:</Text>
-              <Departman />
+              <Departman disabled={disabled} />
             </StyledDivBottomLine>
           </div>
           <div
@@ -435,7 +445,7 @@ export default function MainTabs({ drawerOpen }) {
               <Controller
                 name="irtibatTelefonu"
                 control={control}
-                render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+                render={({ field }) => <Input {...field} disabled={disabled} style={{ flex: 1 }} />}
               />
             </div>
           </div>
@@ -463,7 +473,7 @@ export default function MainTabs({ drawerOpen }) {
               <Controller
                 name="email"
                 control={control}
-                render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+                render={({ field }) => <Input {...field} disabled={disabled} style={{ flex: 1 }} />}
               />
             </div>
           </div>
@@ -487,7 +497,7 @@ export default function MainTabs({ drawerOpen }) {
                 width: "100%",
               }}>
               <Text style={{ fontSize: "14px" }}>İletişim Şekli:</Text>
-              <IletisimSekli />
+              <IletisimSekli disabled={disabled} />
             </StyledDivBottomLine>
           </div>
           <div style={{ width: "100%", maxWidth: "450px" }}>
@@ -500,7 +510,7 @@ export default function MainTabs({ drawerOpen }) {
                 width: "100%",
               }}>
               <Text style={{ fontSize: "14px" }}>Talep Tipi:</Text>
-              <TalepTipi />
+              <TalepTipi disabled={disabled} />
             </StyledDivBottomLine>
           </div>
           <div style={{ width: "100%", maxWidth: "450px" }}>
@@ -513,7 +523,7 @@ export default function MainTabs({ drawerOpen }) {
                 width: "100%",
               }}>
               <Text style={{ fontSize: "14px" }}>İş Kategorisi:</Text>
-              <IsKategorisi />
+              <IsKategorisi disabled={disabled} />
             </StyledDivBottomLine>
           </div>
           <div style={{ width: "100%", maxWidth: "450px" }}>
@@ -526,7 +536,7 @@ export default function MainTabs({ drawerOpen }) {
                 width: "100%",
               }}>
               <Text style={{ fontSize: "14px" }}>Servis Nedeni:</Text>
-              <ServisNedeni />
+              <ServisNedeni disabled={disabled} />
             </StyledDivBottomLine>
           </div>
           <div
@@ -609,12 +619,16 @@ export default function MainTabs({ drawerOpen }) {
                   )}
                 />
                 <OncelikTablo
+                  disabled={disabled}
                   onSubmit={(selectedData) => {
                     setValue("oncelikTanim", selectedData.subject);
                     setValue("oncelikID", selectedData.key);
                   }}
                 />
-                <Button onClick={handleOncelikMinusClick}> - </Button>
+                <Button disabled={disabled} onClick={handleOncelikMinusClick}>
+                  {" "}
+                  -{" "}
+                </Button>
               </div>
             </StyledDivBottomLine>
           </div>
@@ -628,7 +642,7 @@ export default function MainTabs({ drawerOpen }) {
                 width: "100%",
               }}>
               <Text style={{ fontSize: "14px" }}>Bildirilen Bina:</Text>
-              <BildirilenBina />
+              <BildirilenBina disabled={disabled} />
             </StyledDivBottomLine>
           </div>
           <div style={{ width: "100%", maxWidth: "450px" }}>
@@ -641,7 +655,7 @@ export default function MainTabs({ drawerOpen }) {
                 width: "100%",
               }}>
               <Text style={{ fontSize: "14px" }}>Bildirilen Kat:</Text>
-              <BildirilenKat />
+              <BildirilenKat disabled={disabled} />
             </StyledDivBottomLine>
           </div>
 
@@ -687,12 +701,16 @@ export default function MainTabs({ drawerOpen }) {
                   )}
                 />
                 <KullaniciTablo
+                  disabled={disabled}
                   onSubmit={(selectedData) => {
                     setValue("ilgiliKisi", selectedData.ISK_ISIM);
                     setValue("ilgiliKisiID", selectedData.key);
                   }}
                 />
-                <Button onClick={handleIlgiliKisiMinusClick}> - </Button>
+                <Button disabled={disabled} onClick={handleIlgiliKisiMinusClick}>
+                  {" "}
+                  -{" "}
+                </Button>
               </div>
             </StyledDivBottomLine>
           </div>
