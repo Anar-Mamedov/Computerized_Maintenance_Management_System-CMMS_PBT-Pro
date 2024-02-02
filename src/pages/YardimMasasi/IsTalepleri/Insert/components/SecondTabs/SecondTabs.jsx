@@ -4,12 +4,6 @@ import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import IsTakibi from "./components/IsTakibi/IsTakibi";
 import MakineVeEkipman from "./components/MakineVeEkipman/MakineVeEkipman";
-import KimlikBilgileri from "./components/KimlikBilgileri/KimlikBilgileri";
-import EhliyetBilgileri from "./components/EhliyetBilgileri/EhliyetBilgileri";
-import OzelAlanlar from "./components/OzelAlanlar/OzelAlanlar";
-import Aciklama from "./components/Aciklama/Aciklama";
-import SertifikalarTablo from "./components/Sertifikalar/SertifikalarTablo";
-import LokasyonTablo from "./components/Lokasyon/LokasyonTablo";
 
 const onChange = (key) => {
   // console.log(key);
@@ -61,46 +55,6 @@ export default function SecondTabs({ refreshKey }) {
       key: "2",
       label: "Makine ve Ekipman",
       children: <MakineVeEkipman />,
-    },
-    {
-      key: "3",
-      label: "Kimlik Bilgileri",
-      children: <KimlikBilgileri />,
-    },
-    {
-      key: "4",
-      label: "Ehliyet Bilgileri",
-      children: <EhliyetBilgileri />,
-    },
-    {
-      key: "5",
-      label: "Sertifikalar",
-      children: <SertifikalarTablo />,
-    },
-    {
-      key: "6",
-      label: "Lokasyonlar",
-      children: <LokasyonTablo />,
-    },
-    {
-      key: "7",
-      label: "Özel Alanlar",
-      children: <OzelAlanlar />,
-    },
-    {
-      key: "8",
-      label: "Ekli Belgeler",
-      children: "Content of Tab Pane 6",
-    },
-    {
-      key: "9",
-      label: "Resimler",
-      children: "Content of Tab Pane 6",
-    },
-    {
-      key: "10",
-      label: "Açıklama",
-      children: <Aciklama />,
     },
   ];
 
