@@ -60,7 +60,7 @@ export default function SecondTabs({ refreshKey, disabled }) {
     {
       key: "4",
       label: "Planlama ve İş Emri",
-      children: <PlanlamaVeIsEmri />,
+      children: <PlanlamaVeIsEmri disabled={disabled} />,
     },
   ];
 
