@@ -313,7 +313,7 @@ export default function PlanlamaVeIsEmri({ disabled }) {
                   render={({ field }) => (
                     <DatePicker
                       {...field}
-                      disabled={disabled}
+                      disabled
                       style={{ width: "180px" }}
                       format={localeDateFormat}
                       placeholder="Tarih seçiniz"
@@ -326,7 +326,7 @@ export default function PlanlamaVeIsEmri({ disabled }) {
                   render={({ field }) => (
                     <TimePicker
                       {...field}
-                      disabled={disabled}
+                      disabled
                       style={{ width: "110px" }}
                       format={localeTimeFormat}
                       placeholder="Saat seçiniz"
@@ -363,7 +363,7 @@ export default function PlanlamaVeIsEmri({ disabled }) {
                   render={({ field }) => (
                     <DatePicker
                       {...field}
-                      disabled={disabled}
+                      disabled
                       style={{ width: "180px" }}
                       format={localeDateFormat}
                       placeholder="Tarih seçiniz"
@@ -376,7 +376,7 @@ export default function PlanlamaVeIsEmri({ disabled }) {
                   render={({ field }) => (
                     <TimePicker
                       {...field}
-                      disabled={disabled}
+                      disabled
                       style={{ width: "110px" }}
                       format={localeTimeFormat}
                       placeholder="Saat seçiniz"
