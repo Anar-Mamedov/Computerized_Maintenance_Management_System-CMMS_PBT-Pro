@@ -5,6 +5,9 @@ import { useFormContext } from "react-hook-form";
 import IsTakibi from "./components/IsTakibi/IsTakibi";
 import MakineVeEkipman from "./components/MakineVeEkipman/MakineVeEkipman";
 import PlanlamaVeIsEmri from "./components/PlanlamaVeIsEmri/PlanlamaVeIsEmri";
+import Not from "./components/Not/Not";
+import Sonuc from "./components/Sonuc/Sonuc";
+import Degerlendirme from "./components/Degerlendirme/Degerlendirme";
 
 const onChange = (key) => {
   // console.log(key);
@@ -61,6 +64,31 @@ export default function SecondTabs({ refreshKey, disabled }) {
       key: "4",
       label: "Planlama ve İş Emri",
       children: <PlanlamaVeIsEmri disabled={disabled} />,
+    },
+    {
+      key: "5",
+      label: "Not",
+      children: <Not disabled={disabled} />,
+    },
+    {
+      key: "6",
+      label: "Sonuç",
+      children: <Sonuc disabled={disabled} />,
+    },
+    {
+      key: "7",
+      label: "Ekli Belgeler",
+      children: "Ekli Belgeler",
+    },
+    {
+      key: "8",
+      label: "Resimler",
+      children: "Resimler",
+    },
+    {
+      key: "9",
+      label: "Ön Değerlendirme",
+      children: <Degerlendirme disabled={disabled} />,
     },
   ];
 
