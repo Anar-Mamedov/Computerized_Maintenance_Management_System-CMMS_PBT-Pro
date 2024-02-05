@@ -189,32 +189,24 @@ export default function CustomFilter({ onSubmit }) {
                       label: "Talep Eden",
                     },
                     {
-                      value: "MKN_TANIM",
-                      label: "Makine Tanımı",
+                      value: "IST_DEPARTMAN",
+                      label: "Departman",
                     },
                     {
-                      value: "MKN_LOKASYON",
+                      value: "IST_BILDIREN_LOKASYON",
                       label: "Lokasyon",
                     },
                     {
-                      value: "MKN_TIP",
-                      label: "Makine Tipi",
+                      value: "IST_TIP_TANIM",
+                      label: "Talep Tipi",
                     },
                     {
-                      value: "MKN_KATEGORI",
-                      label: "Kategori",
+                      value: "IST_MAKINE_KOD",
+                      label: "Makine Kodu",
                     },
                     {
-                      value: "MKN_MARKA",
-                      label: "Marka",
-                    },
-                    {
-                      value: "MKN_MODEL",
-                      label: "Model",
-                    },
-                    {
-                      value: "MKN_SERI_NO",
-                      label: "Seri No",
+                      value: "IST_MAKINE_TANIM",
+                      label: "Makine Tanımı",
                     },
                   ]}
                 />
