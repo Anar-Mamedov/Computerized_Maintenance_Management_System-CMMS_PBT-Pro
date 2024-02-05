@@ -8,6 +8,7 @@ import PlanlamaVeIsEmri from "./components/PlanlamaVeIsEmri/PlanlamaVeIsEmri";
 import Not from "./components/Not/Not";
 import Sonuc from "./components/Sonuc/Sonuc";
 import Degerlendirme from "./components/Degerlendirme/Degerlendirme";
+import TeknisyenListesi from "./components/TeknisyenListesi/TeknisyenListesi";
 
 const onChange = (key) => {
   // console.log(key);
@@ -59,6 +60,11 @@ export default function SecondTabs({ refreshKey, disabled }) {
       key: "2",
       label: "Makine ve Ekipman",
       children: <MakineVeEkipman disabled={disabled} />,
+    },
+    {
+      key: "3",
+      label: "Teknisyen Listesi",
+      children: <TeknisyenListesi disabled={disabled} />,
     },
     {
       key: "4",
