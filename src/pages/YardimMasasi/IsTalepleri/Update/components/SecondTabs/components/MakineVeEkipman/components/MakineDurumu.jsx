@@ -23,7 +23,7 @@ export default function MakineDurumu({ disabled }) {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32770");
+      const response = await AxiosInstance.get("KodList?grup=32505");
       if (response && response) {
         setOptions(response);
       }
@@ -51,7 +51,7 @@ export default function MakineDurumu({ disabled }) {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32770`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32505`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
@@ -148,9 +148,12 @@ export default function MakineDurumu({ disabled }) {
               }))}
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
-                setValue("makineDurumuID", value);
-                field.onChange(value);
+                // `null` veya `undefined` değerlerini ele al
+                setValue("makineDurumu", value ?? null);
+                setValue("makineDurumuID", value ?? null);
+                field.onChange(value ?? null);
               }}
+              value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
             />
           )}
         />

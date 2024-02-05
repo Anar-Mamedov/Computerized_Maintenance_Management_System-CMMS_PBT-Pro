@@ -107,11 +107,7 @@ export default function IletisimSekli({ disabled }) {
               filterOption={(input, option) =>
                 option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
               }
-              onDropdownVisibleChange={(open) => {
-                if (open) {
-                  fetchData(); // Fetch data when the dropdown is opened
-                }
-              }}
+              onDropdownVisibleChange={(open) => open && fetchData()} // Fetch data when the dropdown is opened
               dropdownRender={(menu) => (
                 <Spin spinning={loading}>
                   {menu}
@@ -137,12 +133,16 @@ export default function IletisimSekli({ disabled }) {
               }))}
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
-                setValue("iletisimSekliID", value);
-                field.onChange(value);
+                // `null` veya `undefined` değerlerini ele al
+                setValue("iletisimSekli", value ?? null);
+                setValue("iletisimSekliID", value ?? null);
+                field.onChange(value ?? null);
               }}
+              value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
             />
           )}
         />
+
         <Controller
           name="iletisimSekliID"
           control={control}

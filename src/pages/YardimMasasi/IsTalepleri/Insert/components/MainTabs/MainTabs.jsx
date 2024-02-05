@@ -93,8 +93,8 @@ export default function MainTabs({ drawerOpen }) {
   };
 
   const handleIlgiliKisiMinusClick = () => {
-    setValue("idariAmiriTanim", "");
-    setValue("idariAmiriID", "");
+    setValue("ilgiliKisi", "");
+    setValue("ilgiliKisiID", "");
   };
 
   const handleOncelikMinusClick = () => {
@@ -348,7 +348,7 @@ export default function MainTabs({ drawerOpen }) {
                     setValue("talepteBulunanID", selectedData.key);
                     setValue("lokasyonTanim", selectedData.ISK_LOKASYON);
                     setValue("lokasyonID", selectedData.ISK_LOKASYON_ID);
-                    setValue("departmanTanim", selectedData.DEPARTMAN);
+                    setValue("departman", selectedData.ISK_DEPARTMAN);
                     setValue("departmanID", selectedData.ISK_DEPARTMAN_ID);
                     setValue("irtibatTelefonu", selectedData.ISK_TELEFON_1);
                     setValue("email", selectedData.ISK_MAIL);

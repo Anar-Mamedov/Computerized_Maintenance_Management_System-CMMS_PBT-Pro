@@ -137,9 +137,12 @@ export default function Departman({ disabled }) {
               }))}
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
-                setValue("departmanID", value);
-                field.onChange(value);
+                // `null` veya `undefined` değerlerini ele al
+                setValue("departman", value ?? null);
+                setValue("departmanID", value ?? null);
+                field.onChange(value ?? null);
               }}
+              value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
             />
           )}
         />

@@ -137,9 +137,12 @@ export default function BildirilenKat({ disabled }) {
               }))}
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
-                setValue("bildirilenKatID", value);
-                field.onChange(value);
+                // `null` veya `undefined` değerlerini ele al
+                setValue("bildirilenKat", value ?? null);
+                setValue("bildirilenKatID", value ?? null);
+                field.onChange(value ?? null);
               }}
+              value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
             />
           )}
         />

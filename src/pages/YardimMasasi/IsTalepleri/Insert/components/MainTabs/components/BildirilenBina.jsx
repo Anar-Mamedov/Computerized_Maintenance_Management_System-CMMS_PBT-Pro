@@ -7,7 +7,7 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function BildirilenBina() {
+export default function BildirilenBina({ disabled }) {
   const { control, setValue } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -97,6 +97,7 @@ export default function BildirilenBina() {
           render={({ field }) => (
             <Select
               {...field}
+              disabled={disabled}
               key={selectKey}
               style={{ width: "300px" }}
               showSearch
@@ -136,9 +137,12 @@ export default function BildirilenBina() {
               }))}
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
-                setValue("bildirilenBinaID", value);
-                field.onChange(value);
+                // `null` veya `undefined` değerlerini ele al
+                setValue("bildirilenBina", value ?? null);
+                setValue("bildirilenBinaID", value ?? null);
+                field.onChange(value ?? null);
               }}
+              value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
             />
           )}
         />

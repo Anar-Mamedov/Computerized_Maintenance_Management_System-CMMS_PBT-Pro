@@ -58,6 +58,22 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       ekipmanTanim: "",
       makineDurumu: null,
       makineDurumuID: "",
+      isEmriTipi: null,
+      isEmriTipiID: "",
+      planlananBaslamaTarihi: "",
+      planlananBaslamaSaati: "",
+      planlananBitisTarihi: "",
+      planlananBitisSaati: "",
+      isEmriNo: "",
+      isEmriNoID: "",
+      baslamaTarihi: "",
+      baslamaSaati: "",
+      bitisTarihi: "",
+      bitisSaati: "",
+      not: "",
+      sonuc: "",
+      degerlendirme: "",
+
       // ... Tüm default değerleriniz
     },
   });
@@ -118,10 +134,11 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             );
 
             setValue("talepteBulunan", item.IST_TALEP_EDEN_ADI);
+            setValue("talepteBulunanID", item.IST_TALEP_EDEN_ID);
             setValue("secilenTalepID", item.TB_IS_TALEP_ID);
             setValue("lokasyonTanim", item.IST_BILDIREN_LOKASYON);
             setValue("lokasyonID", item.IST_BILDIREN_LOKASYON_ID);
-            setValue("departman", item.IST_DEPARTMAN_ADI); // bu alan adi api'de yok
+            setValue("departman", item.IST_DEPARTMAN); // bu alan adi api'de yok
             setValue("departmanID", item.IST_DEPARTMAN_ID);
             setValue("irtibatTelefonu", item.IST_IRTIBAT_TELEFON);
             setValue("email", item.IST_MAIL_ADRES);
@@ -146,12 +163,89 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             setValue("aciklama", item.IST_ACIKLAMA);
             setValue("makine", item.IST_MAKINE_KOD);
             setValue("makineID", item.IST_MAKINE_ID);
-            setValue("makineTanim", item.IST_MAKINE_TANIMI);
+            setValue("makineTanim", item.IST_MAKINE_TANIM);
             setValue("ekipman", item.IST_EKIPMAN_KOD);
             setValue("ekipmanID", item.IST_EKIPMAN_ID);
-            setValue("ekipmanTanim", item.IST_EKIPMAN_TANIMI);
-            setValue("makineDurumu", item.IST_MAKINE_DURUMU);
+            setValue("ekipmanTanim", item.IST_EKIPMAN_TANIM);
+            setValue("makineDurumu", item.IST_MAKINE_DURUM);
             setValue("makineDurumuID", item.IST_MAKINE_DURUM_KOD_ID);
+            setValue("isEmriTipi", item.ISEMRI_TIPI);
+            setValue("isEmriTipiID", item.IST_ISEMRI_TIP_ID);
+
+            setValue(
+              "planlananBaslamaTarihi",
+              item.IST_PLANLANAN_BASLAMA_TARIHI
+                ? dayjs(item.IST_PLANLANAN_BASLAMA_TARIHI).isValid()
+                  ? dayjs(item.IST_PLANLANAN_BASLAMA_TARIHI)
+                  : null
+                : null
+            );
+            setValue(
+              "planlananBaslamaSaati",
+              item.IST_PLANLANAN_BASLAMA_SAATI
+                ? dayjs(item.IST_PLANLANAN_BASLAMA_SAATI, "HH:mm:ss").isValid()
+                  ? dayjs(item.IST_PLANLANAN_BASLAMA_SAATI, "HH:mm:ss")
+                  : null
+                : null
+            );
+
+            setValue(
+              "planlananBitisTarihi",
+              item.IST_PLANLANAN_BITIS_TARIHI
+                ? dayjs(item.IST_PLANLANAN_BITIS_TARIHI).isValid()
+                  ? dayjs(item.IST_PLANLANAN_BITIS_TARIHI)
+                  : null
+                : null
+            );
+            setValue(
+              "planlananBitisSaati",
+              item.IST_PLANLANAN_BITIS_SAATI
+                ? dayjs(item.IST_PLANLANAN_BITIS_SAATI, "HH:mm:ss").isValid()
+                  ? dayjs(item.IST_PLANLANAN_BITIS_SAATI, "HH:mm:ss")
+                  : null
+                : null
+            );
+
+            setValue("isEmriNo", item.IST_ISEMRI_NO);
+            setValue("isEmriNoID", item.IST_ISEMRI_ID);
+
+            setValue(
+              "baslamaTarihi",
+              item.IST_BASLAMA_TARIHI
+                ? dayjs(item.IST_BASLAMA_TARIHI).isValid()
+                  ? dayjs(item.IST_BASLAMA_TARIHI)
+                  : null
+                : null
+            );
+            setValue(
+              "baslamaSaati",
+              item.IST_BASLAMA_SAATI
+                ? dayjs(item.IST_BASLAMA_SAATI, "HH:mm:ss").isValid()
+                  ? dayjs(item.IST_BASLAMA_SAATI, "HH:mm:ss")
+                  : null
+                : null
+            );
+
+            setValue(
+              "bitisTarihi",
+              item.IST_BITIS_TARIHI
+                ? dayjs(item.IST_BITIS_TARIHI).isValid()
+                  ? dayjs(item.IST_BITIS_TARIHI)
+                  : null
+                : null
+            );
+            setValue(
+              "bitisSaati",
+              item.IST_BITIS_SAATI
+                ? dayjs(item.IST_BITIS_SAATI, "HH:mm:ss").isValid()
+                  ? dayjs(item.IST_BITIS_SAATI, "HH:mm:ss")
+                  : null
+                : null
+            );
+
+            setValue("not", item.IST_NOT);
+            setValue("sonuc", item.IST_SONUC);
+            setValue("degerlendirme", item.IST_ON_DEGERLENDIRME);
             // ... Diğer setValue çağrıları
 
             setLoading(false); // Yükleme tamamlandığında
@@ -202,6 +296,19 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       IST_MAKINE_ID: data.makineID,
       IST_EKIPMAN_ID: data.ekipmanID,
       IST_MAKINE_DURUM_KOD_ID: data.makineDurumuID,
+      IST_ISEMRI_TIP_ID: data.isEmriTipiID,
+      IST_PLANLANAN_BASLAMA_TARIHI: formatDateWithDayjs(data.planlananBaslamaTarihi),
+      IST_PLANLANAN_BASLAMA_SAATI: formatTimeWithDayjs(data.planlananBaslamaSaati),
+      IST_PLANLANAN_BITIS_TARIHI: formatDateWithDayjs(data.planlananBitisTarihi),
+      IST_PLANLANAN_BITIS_SAATI: formatTimeWithDayjs(data.planlananBitisSaati),
+      IST_ISEMRI_ID: data.isEmriNoID,
+      IST_BASLAMA_TARIHI: formatDateWithDayjs(data.baslamaTarihi),
+      IST_BASLAMA_SAATI: formatTimeWithDayjs(data.baslamaSaati),
+      IST_BITIS_TARIHI: formatDateWithDayjs(data.bitisTarihi),
+      IST_BITIS_SAATI: formatTimeWithDayjs(data.bitisSaati),
+      IST_NOT: data.not,
+      IST_SONUC: data.sonuc,
+      IST_ON_DEGERLENDIRME: data.degerlendirme,
       // Diğer alanlarınız...
     };
 

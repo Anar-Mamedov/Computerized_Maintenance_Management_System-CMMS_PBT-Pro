@@ -7,7 +7,7 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function ServisNedeni() {
+export default function ServisNedeni({ disabled }) {
   const { control, setValue } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -97,6 +97,7 @@ export default function ServisNedeni() {
           render={({ field }) => (
             <Select
               {...field}
+              disabled={disabled}
               key={selectKey}
               style={{ width: "300px" }}
               showSearch
@@ -136,9 +137,12 @@ export default function ServisNedeni() {
               }))}
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
-                setValue("servisNedeniID", value);
-                field.onChange(value);
+                // `null` veya `undefined` değerlerini ele al
+                setValue("servisNedeni", value ?? null);
+                setValue("servisNedeniID", value ?? null);
+                field.onChange(value ?? null);
               }}
+              value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
             />
           )}
         />

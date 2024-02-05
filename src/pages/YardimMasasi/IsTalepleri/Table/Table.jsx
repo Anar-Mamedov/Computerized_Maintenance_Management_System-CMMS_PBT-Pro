@@ -593,7 +593,7 @@ export default function MainTable() {
       title: "Tam Lokasyon Adresi",
       dataIndex: "IST_BILDIREN_LOKASYON_TUM",
       key: "IST_BILDIREN_LOKASYON_TUM",
-      width: "150px",
+      width: "250px",
       ellipsis: true,
     },
     {

@@ -7,7 +7,7 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function IletisimSekli() {
+export default function IletisimSekli({ disabled }) {
   const { control, setValue } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -97,6 +97,7 @@ export default function IletisimSekli() {
           render={({ field }) => (
             <Select
               {...field}
+              disabled={disabled}
               key={selectKey}
               style={{ width: "300px" }}
               showSearch
@@ -106,11 +107,7 @@ export default function IletisimSekli() {
               filterOption={(input, option) =>
                 option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
               }
-              onDropdownVisibleChange={(open) => {
-                if (open) {
-                  fetchData(); // Fetch data when the dropdown is opened
-                }
-              }}
+              onDropdownVisibleChange={(open) => open && fetchData()} // Fetch data when the dropdown is opened
               dropdownRender={(menu) => (
                 <Spin spinning={loading}>
                   {menu}
@@ -136,12 +133,16 @@ export default function IletisimSekli() {
               }))}
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
-                setValue("iletisimSekliID", value);
-                field.onChange(value);
+                // `null` veya `undefined` değerlerini ele al
+                setValue("iletisimSekli", value ?? null);
+                setValue("iletisimSekliID", value ?? null);
+                field.onChange(value ?? null);
               }}
+              value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
             />
           )}
         />
+
         <Controller
           name="iletisimSekliID"
           control={control}
