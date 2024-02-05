@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
 
-export default function KullaniciTablo({ workshopSelectedId, onSubmit, disabled }) {
+export default function KullaniciTablo({ workshopSelectedId, onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
@@ -39,8 +39,8 @@ export default function KullaniciTablo({ workshopSelectedId, onSubmit, disabled 
     },
     {
       title: "Departman",
-      dataIndex: "ISK_DEPARTMAN_ID",
-      key: "ISK_DEPARTMAN_ID",
+      dataIndex: "ISK_DEPARTMAN",
+      key: "ISK_DEPARTMAN",
       width: "150px",
       ellipsis: true,
     },
@@ -98,6 +98,7 @@ export default function KullaniciTablo({ workshopSelectedId, onSubmit, disabled 
           ISK_KOD: item.ISK_KOD,
           ISK_ISIM: item.ISK_ISIM,
           ISK_DEPARTMAN_ID: item.ISK_DEPARTMAN_ID,
+          ISK_DEPARTMAN: item.ISK_DEPARTMAN,
           ISK_KULLANICI_TIP_KOD_ID: item.ISK_KULLANICI_TIP_KOD_ID,
           ISK_UNVAN: item.ISK_UNVAN,
           ISK_LOKASYON_ID: item.ISK_LOKASYON_ID,
@@ -156,10 +157,7 @@ export default function KullaniciTablo({ workshopSelectedId, onSubmit, disabled 
   };
   return (
     <div>
-      <Button disabled={disabled} onClick={handleModalToggle}>
-        {" "}
-        +{" "}
-      </Button>
+      <Button onClick={handleModalToggle}> + </Button>
       <Modal
         width={1200}
         centered

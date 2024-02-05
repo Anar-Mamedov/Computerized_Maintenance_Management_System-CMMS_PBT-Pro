@@ -39,8 +39,8 @@ export default function KullaniciTablo({ workshopSelectedId, onSubmit }) {
     },
     {
       title: "Departman",
-      dataIndex: "ISK_DEPARTMAN_ID",
-      key: "ISK_DEPARTMAN_ID",
+      dataIndex: "ISK_DEPARTMAN",
+      key: "ISK_DEPARTMAN",
       width: "150px",
       ellipsis: true,
     },
@@ -98,6 +98,7 @@ export default function KullaniciTablo({ workshopSelectedId, onSubmit }) {
           ISK_KOD: item.ISK_KOD,
           ISK_ISIM: item.ISK_ISIM,
           ISK_DEPARTMAN_ID: item.ISK_DEPARTMAN_ID,
+          ISK_DEPARTMAN: item.ISK_DEPARTMAN,
           ISK_KULLANICI_TIP_KOD_ID: item.ISK_KULLANICI_TIP_KOD_ID,
           ISK_UNVAN: item.ISK_UNVAN,
           ISK_LOKASYON_ID: item.ISK_LOKASYON_ID,
