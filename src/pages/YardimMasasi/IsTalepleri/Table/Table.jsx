@@ -291,7 +291,7 @@ export default function MainTable() {
   };
 
   const rowSelection = {
-    type: "radio",
+    type: "checkbox",
     selectedRowKeys,
     onChange: onSelectChange,
   };
