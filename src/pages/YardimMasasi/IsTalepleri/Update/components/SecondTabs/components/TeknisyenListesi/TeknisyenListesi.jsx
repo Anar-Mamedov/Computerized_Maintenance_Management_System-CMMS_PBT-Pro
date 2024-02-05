@@ -12,28 +12,28 @@ export default function TeknisyenListesi({ workshopSelectedId, onSubmit }) {
 
   const columns = [
     {
-      title: "Personel Kodu",
+      title: "Personel Adı",
       dataIndex: "code",
       key: "code",
       width: "150px",
       ellipsis: true,
     },
     {
-      title: "Personel Adı",
+      title: "Vardiya",
       dataIndex: "subject",
       key: "subject",
       width: "150px",
       ellipsis: true,
     },
     {
-      title: "Ünvan",
+      title: "Çalışma Süresi",
       dataIndex: "workdays",
       key: "workdays",
       width: "150px",
       ellipsis: true,
     },
     {
-      title: "Personel Tipi",
+      title: "Saat Ücreti",
       dataIndex: "description",
       key: "description",
       width: "150px",
@@ -41,14 +41,28 @@ export default function TeknisyenListesi({ workshopSelectedId, onSubmit }) {
     },
 
     {
-      title: "Departman",
+      title: "Fazla Mesai",
       dataIndex: "fifthcolumn",
       key: "fifthcolumn",
       width: "150px",
       ellipsis: true,
     },
     {
-      title: "Lokasyon",
+      title: "Mesai Süresi",
+      dataIndex: "sixthcolumn",
+      key: "sixthcolumn",
+      width: "150px",
+      ellipsis: true,
+    },
+    {
+      title: "Mesai Ücreti",
+      dataIndex: "sixthcolumn",
+      key: "sixthcolumn",
+      width: "150px",
+      ellipsis: true,
+    },
+    {
+      title: "Maliyet",
       dataIndex: "sixthcolumn",
       key: "sixthcolumn",
       width: "150px",
