@@ -1,38 +1,20 @@
 import React from "react";
-import { DownOutlined } from "@ant-design/icons";
-import { Button, Dropdown } from "antd";
+import { Button, Popover } from "antd";
 import Sil from "./components/Sil";
 
-export default function ContextMenu({ selectedRow }) {
-  const items = [
-    {
-      label: <Sil selectedRow={selectedRow} />,
-      key: "0",
-    },
-    {
-      label: <a href="https://www.aliyun.com">2nd menu item</a>,
-      key: "1",
-    },
-    {
-      type: "divider",
-    },
-    {
-      label: "3rd menu item",
-      key: "3",
-    },
-  ];
+export default function ContextMenu({ selectedRows, refreshTableData }) {
+  // Silme işlemi için disable durumunu kontrol et
+  const isDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 4);
+
+  const content = (
+    <div>
+      <Sil selectedRows={selectedRows} onRefresh={refreshTableData} disabled={isDisabled} />
+      <p>Content</p>
+    </div>
+  );
   return (
-    <Dropdown
-      menu={{
-        items,
-      }}
-      trigger={["click"]}>
-      <a onClick={(e) => e.preventDefault()}>
-        <Button>
-          İşlemler
-          <DownOutlined />
-        </Button>
-      </a>
-    </Dropdown>
+    <Popover placement="bottom" content={content} trigger="click">
+      <Button>İşlemler</Button>
+    </Popover>
   );
 }

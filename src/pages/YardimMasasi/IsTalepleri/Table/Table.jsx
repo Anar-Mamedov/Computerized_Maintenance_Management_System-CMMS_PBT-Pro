@@ -18,6 +18,8 @@ export default function MainTable() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0); // Toplam sayfa sayısı için state
 
+  const [selectedRows, setSelectedRows] = useState([]);
+
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 
   // Intl.DateTimeFormat kullanarak tarih formatlama
@@ -289,6 +291,9 @@ export default function MainTable() {
     } else {
       setValue("selectedLokasyonId", null);
     }
+    // Seçilen satırların verisini bul
+    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
+    setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
   };
 
   const rowSelection = {
@@ -641,7 +646,7 @@ export default function MainTable() {
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
           <Filters onChange={handleBodyChange} />
-          <ContextMenu selectedRow={drawer.data} />
+          <ContextMenu selectedRows={selectedRows} onRefresh={refreshTableData} />
         </div>
 
         <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
