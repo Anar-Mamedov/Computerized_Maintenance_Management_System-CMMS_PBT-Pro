@@ -646,7 +646,7 @@ export default function MainTable() {
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
           <Filters onChange={handleBodyChange} />
-          <ContextMenu selectedRows={selectedRows} onRefresh={refreshTableData} />
+          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
         </div>
 
         <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
