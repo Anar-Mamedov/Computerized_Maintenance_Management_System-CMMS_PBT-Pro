@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Select, Button, Dropdown, Menu } from "antd";
+import { Popover, Button, Select } from "antd";
 
 const { Option } = Select;
 
@@ -35,10 +35,14 @@ const ConditionFilter = ({ onSubmit }) => {
   }, []);
 
   const handleSubmit = () => {
-    // Sadece seçilen durumların key değerlerini bir dizi olarak oluştur
-    const selectedKeys = Object.keys(filters).map((key) => parseInt(key));
-    // Bu dizi şeklindeki key değerlerini onSubmit fonksiyonuna gönder
-    onSubmit(selectedKeys);
+    // Seçilen durumların key değerlerini bir obje olarak oluştur
+    let selectedKeysObj = {};
+    Object.keys(filters).forEach((key, index) => {
+      selectedKeysObj[`key${index}`] = key;
+    });
+
+    // Bu objeyi onSubmit fonksiyonuna gönder
+    onSubmit(selectedKeysObj);
 
     // Dropdown'ı gizle
     setVisible(false);
@@ -50,8 +54,8 @@ const ConditionFilter = ({ onSubmit }) => {
     onSubmit("");
   };
 
-  const menu = (
-    <Menu style={{ width: "300px" }}>
+  const content = (
+    <div style={{ width: "300px" }}>
       <div
         style={{ borderBottom: "1px solid #ccc", padding: "10px", display: "flex", justifyContent: "space-between" }}>
         <Button onClick={handleCancelClick}>İptal</Button>
@@ -66,8 +70,7 @@ const ConditionFilter = ({ onSubmit }) => {
           placeholder="Ara..."
           value={Object.values(filters)}
           onChange={handleChange}
-          allowClear
-          showArrow={false}>
+          allowClear>
           {options.map((option) => (
             <Option key={option.key} value={option.value}>
               {option.value}
@@ -75,19 +78,20 @@ const ConditionFilter = ({ onSubmit }) => {
           ))}
         </Select>
       </div>
-    </Menu>
+    </div>
   );
 
   return (
-    <Dropdown
-      overlay={menu}
-      placement="bottomLeft"
-      trigger={["click"]}
-      visible={visible}
-      onVisibleChange={(v) => setVisible(v)}>
+    <Popover
+      content={content}
+      trigger="click"
+      open={visible}
+      onOpenChange={setVisible}
+      placement="bottom" // Popover'ın açılacağı yön
+    >
       <Button style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
         Durum
-        <span
+        <div
           style={{
             marginLeft: "5px",
             background: "#006cb8",
@@ -100,9 +104,9 @@ const ConditionFilter = ({ onSubmit }) => {
             color: "white",
           }}>
           {Object.keys(filters).length}
-        </span>
+        </div>
       </Button>
-    </Dropdown>
+    </Popover>
   );
 };
 
