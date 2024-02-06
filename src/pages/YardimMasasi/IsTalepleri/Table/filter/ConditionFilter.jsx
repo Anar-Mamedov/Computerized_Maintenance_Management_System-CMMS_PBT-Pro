@@ -1,68 +1,52 @@
 import React, { useState } from "react";
 import { Select, Button, Dropdown, Menu } from "antd";
-import AxiosInstance from "../../../../../api/http";
 
 const { Option } = Select;
 
 const ConditionFilter = ({ onSubmit }) => {
   const [visible, setVisible] = useState(false);
-
-  // useeffect ile api den veri data cekip options a atayacagiz
   const [options, setOptions] = React.useState([]);
   const [filters, setFilters] = useState({});
 
   const handleChange = (value) => {
-    // Create a copy of the current selected items
     const selectedItemsCopy = { ...filters };
-
-    // Loop through all options
     options.forEach((option) => {
       const isSelected = selectedItemsCopy[option.key] !== undefined;
-
-      // If the option is already selected, and it's not in the new value, remove it
       if (isSelected && !value.includes(option.value)) {
         delete selectedItemsCopy[option.key];
-      }
-      // If the option is not selected and it's in the new value, add it
-      else if (!isSelected && value.includes(option.value)) {
+      } else if (!isSelected && value.includes(option.value)) {
         selectedItemsCopy[option.key] = option.value;
       }
     });
-
-    // Update the filters state with the updated selection
     setFilters(selectedItemsCopy);
   };
 
   React.useEffect(() => {
-    AxiosInstance.get("KodList?grup=32801")
-      .then((response) => {
-        const options = response.map((option, index) => ({ key: index, value: option.KOD_TANIM }));
-        setOptions(options);
-
-        const definitions = response.map((option, index) => ({ index: index, value: option.IMT_DEFINITION }));
-      })
-      .catch((error) => {
-        console.log("API Error:", error);
-      });
+    // Sabit verileri kullanarak options state'ini ayarlama
+    const hardcodedOptions = [
+      { key: 0, value: "Açık" },
+      { key: 1, value: "Bekliyor" },
+      { key: 2, value: "Planlandı" },
+      { key: 3, value: "Devam Ediyor" },
+      { key: 4, value: "Kapandı" },
+      { key: 5, value: "İptal Edildi" },
+    ];
+    setOptions(hardcodedOptions);
   }, []);
 
   const handleSubmit = () => {
-    // Seçilen öğeleri başka bir bileşene iletmek için prop olarak gelen işlevi çağırın
-    onSubmit(filters);
+    // Sadece seçilen durumların key değerlerini bir dizi olarak oluştur
+    const selectedKeys = Object.keys(filters).map((key) => parseInt(key));
+    // Bu dizi şeklindeki key değerlerini onSubmit fonksiyonuna gönder
+    onSubmit(selectedKeys);
 
-    // Seçilen öğeleri sıfırlayabiliriz
-    // setFilters({});
     // Dropdown'ı gizle
     setVisible(false);
   };
 
   const handleCancelClick = () => {
-    // Seçimleri iptal etmek için seçilen öğeleri sıfırlayın
     setFilters([]);
-    // Dropdown'ı gizle
     setVisible(false);
-
-    // onSubmit({})
     onSubmit("");
   };
 
@@ -84,7 +68,6 @@ const ConditionFilter = ({ onSubmit }) => {
           onChange={handleChange}
           allowClear
           showArrow={false}>
-          {/* Seçenekleri elle ekleyin */}
           {options.map((option) => (
             <Option key={option.key} value={option.value}>
               {option.value}
@@ -116,7 +99,7 @@ const ConditionFilter = ({ onSubmit }) => {
             alignItems: "center",
             color: "white",
           }}>
-          {Object.keys(filters).length}{" "}
+          {Object.keys(filters).length}
         </span>
       </Button>
     </Dropdown>
