@@ -6,6 +6,7 @@ import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import Filters from "./filter/Filters";
+import ContextMenu from "../ContextMenu/ContextMenu";
 
 export default function MainTable() {
   const { setValue } = useFormContext();
@@ -630,7 +631,7 @@ export default function MainTable() {
           gap: "10px",
           padding: "0 5px",
         }}>
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <Input
             style={{ width: "250px" }}
             type="text"
@@ -640,6 +641,7 @@ export default function MainTable() {
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
           <Filters onChange={handleBodyChange} />
+          <ContextMenu selectedRow={drawer.data} />
         </div>
 
         <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
