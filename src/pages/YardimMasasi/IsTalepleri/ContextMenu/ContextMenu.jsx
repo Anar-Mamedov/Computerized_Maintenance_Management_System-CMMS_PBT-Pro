@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, Popover } from "antd";
 import Sil from "./components/Sil";
+import Iptal from "./components/Iptal/Iptal";
 
 export default function ContextMenu({ selectedRows, refreshTableData }) {
   const [visible, setVisible] = useState(false);
@@ -14,6 +15,7 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
   };
   // Silme işlemi için disable durumunu kontrol et
   const isDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 4);
+  const iptalDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 0 || row.IST_DURUM_ID === 3);
 
   const content = (
     <div>
@@ -23,7 +25,7 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
         disabled={isDisabled}
         hidePopover={hidePopover}
       />
-      <p>Content</p>
+      <Iptal selectedRows={selectedRows} refreshTableData={refreshTableData} iptalDisabled={iptalDisabled} />
     </div>
   );
   return (
