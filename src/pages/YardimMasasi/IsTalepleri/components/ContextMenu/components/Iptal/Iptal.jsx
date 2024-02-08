@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Modal } from "antd";
 import Forms from "./components/Forms";
 import { Controller, useForm, FormProvider } from "react-hook-form";
-import AxiosInstance from "../../../../../../api/http";
+import AxiosInstance from "../../../../../../../api/http";
 import dayjs from "dayjs";
 
 export default function Iptal({ selectedRows, refreshTableData }) {
