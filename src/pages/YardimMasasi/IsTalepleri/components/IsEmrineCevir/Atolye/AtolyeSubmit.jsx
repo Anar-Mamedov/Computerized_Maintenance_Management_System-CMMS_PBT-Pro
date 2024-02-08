@@ -34,10 +34,10 @@ export default function AtolyeSubmit({ selectedRows, refreshTableData }) {
   // atolyeID veya selectedRows değiştiğinde butonun durumunu güncelle
   useEffect(() => {
     const tbIsTalepId = selectedRows.map((row) => row.key).join(",");
-    const isTalepDurum = selectedRows.some(
-      (row) => row.IST_DURUM_ID === 1 || row.IST_DURUM_ID === 2 || row.IST_DURUM_ID === 0
-    );
-    setIsButtonDisabled(!atolyeID || !tbIsTalepId || !isTalepDurum);
+    // Seçilen tüm kayıtların IST_DURUM_ID değerlerinin 0, 1 veya 2 olup olmadığını kontrol et
+    const isValidStatus = selectedRows.every((row) => [0, 1, 2].includes(row.IST_DURUM_ID));
+
+    setIsButtonDisabled(!atolyeID || !tbIsTalepId || !isValidStatus);
   }, [atolyeID, selectedRows]);
 
   const onSubmited = (data) => {
