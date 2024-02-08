@@ -317,24 +317,25 @@ export default function MainTable() {
 
   const refreshTableData = useCallback(() => {
     // Sayfa numarasını 1 yap
-    setCurrentPage(1);
+    // setCurrentPage(1);
 
     // `body` içerisindeki filtreleri ve arama terimini sıfırla
-    setBody({
-      keyword: "",
-      filters: {},
-    });
-    setSearchTerm("");
+    // setBody({
+    //   keyword: "",
+    //   filters: {},
+    // });
+    // setSearchTerm("");
 
     // Tablodan seçilen kayıtların checkbox işaretini kaldır
     setSelectedRowKeys([]);
     setSelectedRows([]);
 
     // Verileri yeniden çekmek için `fetchEquipmentData` fonksiyonunu çağır
+    fetchEquipmentData(body, currentPage);
     // Burada `body` ve `currentPage`'i güncellediğimiz için, bu değerlerin en güncel hallerini kullanarak veri çekme işlemi yapılır.
     // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
     // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
-  }, []); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
+  }, [body, currentPage]); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
 
   const columns = [
     {
