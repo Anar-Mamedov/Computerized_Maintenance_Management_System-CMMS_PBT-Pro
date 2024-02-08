@@ -6,7 +6,8 @@ import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import Filters from "./filter/Filters";
-import ContextMenu from "../ContextMenu/ContextMenu";
+import ContextMenu from "../components/ContextMenu/ContextMenu";
+import TeknisyenIsEmriCevir from "../components/IsEmrineCevir/Teknisyen/TeknisyenIsEmriCevir";
 
 export default function MainTable() {
   const { setValue } = useFormContext();
@@ -647,6 +648,7 @@ export default function MainTable() {
           />
           <Filters onChange={handleBodyChange} />
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
+          <TeknisyenIsEmriCevir />
         </div>
 
         <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
