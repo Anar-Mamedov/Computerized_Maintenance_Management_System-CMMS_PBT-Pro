@@ -68,7 +68,7 @@ export default function Iptal({ selectedRows, refreshTableData }) {
     <FormProvider {...methods}>
       <div>
         <Button style={{ paddingLeft: "0px" }} type="text" onClick={handleModalToggle}>
-          İptal
+          İptal Et
         </Button>
         <Modal
           title="İş Talebi İptal"
