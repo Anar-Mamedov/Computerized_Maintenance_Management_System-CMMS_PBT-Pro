@@ -44,14 +44,25 @@ export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
     // Tablodan seçilen kayıtların key değerlerini birleştir
     const tbIsTalepId = selectedRows.map((row) => row.key).join(","); // Eğer birden fazla ID varsa aralarına virgül koyarak birleştir
 
-    const Body = [data.personelID];
+    const teknisyenIds = watch("personelID")
+      .split(",")
+      .map((id) => parseInt(id.trim()));
+
+    const Body = selectedRows.map((row) => ({
+      TALEP_ID: row.key, // Her bir satırın key değeri, TALEP_ID'ye eşitlenir.
+      USER_ID: 24, // Sabit bir değer
+      TEKNISYEN_IDS: teknisyenIds, // Yukarıda oluşturulan teknisyen ID'leri dizisi
+    }));
 
     // Template literals kullanarak URL içerisinde dinamik değerleri kullan
-    AxiosInstance.post(`IsTalepToIsEmri?talepID=${tbIsTalepId}&userId=24&atolyeId=0`, Body)
+    AxiosInstance.post(`IsTalepToIsEmri`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
         reset(); // Formu sıfırla
-        refreshTableData(); // Tablo verilerini yenile
+        // API isteği başarılı olduktan sonra bir süre bekleyip tabloyu yenile
+        setTimeout(() => {
+          refreshTableData(); // Tablo verilerini yenile
+        }, 500); // 1000 milisaniye (1 saniye) bekler
       })
       .catch((error) => {
         console.error("Error sending data:", error);
