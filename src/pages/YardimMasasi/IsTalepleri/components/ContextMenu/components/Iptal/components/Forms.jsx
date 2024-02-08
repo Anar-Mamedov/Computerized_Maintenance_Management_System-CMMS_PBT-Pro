@@ -164,26 +164,18 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
           />
         </div>
       </div>
-      <div style={{ width: "100%", maxWidth: "422px", marginBottom: "10px" }}>
-        <StyledDivBottomLine
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "flex-start",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>İptal Nedeni:</Text>
-          <IptalNedeni />
-        </StyledDivBottomLine>
-      </div>
       <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between" }}>
-        <Text>Açıklama:</Text>
+        <Text>İptal Nedeni:</Text>
         <Controller
-          name="aciklama"
+          name="iptalNeden"
           control={control}
           render={({ field }) => (
-            <TextArea {...field} style={{ width: "100%", maxWidth: "350px" }} rows={4} placeholder="Açıklama" />
+            <TextArea
+              {...field}
+              style={{ width: "100%", maxWidth: "350px" }}
+              rows={4}
+              placeholder="İptal Nedeni Ekle"
+            />
           )}
         />
       </div>
