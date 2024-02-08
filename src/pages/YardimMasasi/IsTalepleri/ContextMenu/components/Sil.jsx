@@ -4,10 +4,10 @@ import { Button } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 
 export default function Sil({ selectedRows, refreshTableData, disabled, hidePopover }) {
-  selectedRows.forEach((row, index) => {
-    console.log(`Satır ${index + 1} ID: ${row.key}`);
-    // Eğer id değerleri farklı bir özellikte tutuluyorsa, row.key yerine o özelliği kullanın. Örneğin: row.id
-  });
+  // selectedRows.forEach((row, index) => {
+  //   console.log(`Satır ${index + 1} ID: ${row.key}`);
+  //   // Eğer id değerleri farklı bir özellikte tutuluyorsa, row.key yerine o özelliği kullanın. Örneğin: row.id
+  // });
 
   // Sil düğmesini gizlemek için koşullu stil
   const buttonStyle = disabled ? { display: "none" } : {};
