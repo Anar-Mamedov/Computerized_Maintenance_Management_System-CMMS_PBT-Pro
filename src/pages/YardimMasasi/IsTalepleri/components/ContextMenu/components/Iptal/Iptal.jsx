@@ -12,9 +12,7 @@ export default function Iptal({ selectedRows, refreshTableData, iptalDisabled })
       fisNo: "",
       iptalTarihi: "",
       iptalSaati: "",
-      iptalNedeni: "",
-      iptalNedeniID: "",
-      aciklama: "",
+      iptalNeden: "",
       // Add other default values here
     },
   });
@@ -34,18 +32,16 @@ export default function Iptal({ selectedRows, refreshTableData, iptalDisabled })
   };
 
   const onSubmited = (data) => {
-    // Tablodan seçilen kayıtların key ve IST_KOD değerlerini birleştir
-    const tbIsTalepId = selectedRows.map((row) => row.key).join(", ");
-    const istTalepNo = selectedRows.map((row) => row.IST_KOD).join(", ");
-    const Body = {
-      TB_IS_TALEP_ID: tbIsTalepId,
-      KLL_ID: 24,
-      IST_TALEP_NO: istTalepNo,
-      KLL_ADI: "Orjin",
-      IST_IPTAL_NEDEN: data.iptalNedeniID,
+    // Seçili satırlar için Body dizisini oluştur
+    const Body = selectedRows.map((row) => ({
+      TB_IS_TALEP_ID: row.key,
+      KLL_ID: 24, // Sabit bir değerse bu şekilde kalabilir, dinamikse değiştirilmelidir
+      IST_TALEP_NO: row.IST_KOD,
+      KLL_ADI: "Orjin", // Bu değer sabitse bu şekilde, dinamikse değiştirilmelidir
+      IST_IPTAL_NEDEN: data.iptalNeden,
       IST_IPTAL_TARIH: formatDateWithDayjs(data.iptalTarihi),
       IST_IPTAL_SAAT: formatTimeWithDayjs(data.iptalSaati),
-    };
+    }));
 
     AxiosInstance.post("IsTalepIptalEt", Body)
       .then((response) => {
