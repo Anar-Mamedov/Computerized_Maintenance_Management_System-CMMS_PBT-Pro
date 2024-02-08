@@ -5,7 +5,7 @@ import { Controller, useForm, FormProvider } from "react-hook-form";
 import AxiosInstance from "../../../../../../../api/http";
 import dayjs from "dayjs";
 
-export default function Iptal({ selectedRows, refreshTableData }) {
+export default function Iptal({ selectedRows, refreshTableData, iptalDisabled }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const methods = useForm({
     defaultValues: {
@@ -19,6 +19,9 @@ export default function Iptal({ selectedRows, refreshTableData }) {
     },
   });
   const { setValue, reset, handleSubmit } = methods;
+
+  // Sil düğmesini gizlemek için koşullu stil
+  const buttonStyle = iptalDisabled ? { display: "none" } : {};
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
@@ -66,7 +69,7 @@ export default function Iptal({ selectedRows, refreshTableData }) {
   };
   return (
     <FormProvider {...methods}>
-      <div>
+      <div style={buttonStyle}>
         <Button style={{ paddingLeft: "0px" }} type="text" onClick={handleModalToggle}>
           İptal Et
         </Button>

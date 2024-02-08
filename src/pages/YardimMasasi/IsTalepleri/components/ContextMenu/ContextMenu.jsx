@@ -15,7 +15,9 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
   };
   // Silme işlemi için disable durumunu kontrol et
   const isDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 4);
-  const iptalDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 0 || row.IST_DURUM_ID === 3);
+  const iptalDisabled = selectedRows.some(
+    (row) => row.IST_DURUM_ID === 1 || row.IST_DURUM_ID === 2 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5
+  );
 
   const content = (
     <div>

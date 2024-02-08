@@ -34,7 +34,10 @@ export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
   // personelID veya selectedRows değiştiğinde butonun durumunu güncelle
   useEffect(() => {
     const tbIsTalepId = selectedRows.map((row) => row.key).join(",");
-    setIsButtonDisabled(!personelID || !tbIsTalepId);
+    const isTalepDurum = selectedRows.some(
+      (row) => row.IST_DURUM_ID === 1 || row.IST_DURUM_ID === 2 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5
+    );
+    setIsButtonDisabled(!personelID || !tbIsTalepId || !isTalepDurum);
   }, [personelID, selectedRows]);
 
   const onSubmited = (data) => {
