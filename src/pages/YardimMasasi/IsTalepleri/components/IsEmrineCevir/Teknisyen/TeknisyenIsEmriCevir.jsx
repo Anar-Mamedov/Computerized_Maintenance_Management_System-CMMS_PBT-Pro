@@ -65,10 +65,11 @@ const StyledDivMedia = styled.div`
 export default function TeknisyenIsEmriCevir() {
   const { control, watch, setValue } = useFormContext();
 
-  const handleIdariAmiriMinusClick = () => {
-    setValue("idariAmiriTanim", "");
-    setValue("idariAmiriID", "");
+  const handlePersonelMinusClick = () => {
+    setValue("personelTanim", "");
+    setValue("personelID", "");
   };
+
   return (
     <div
       style={{
@@ -97,7 +98,7 @@ export default function TeknisyenIsEmriCevir() {
             width: "300px",
           }}>
           <Controller
-            name="idariAmiriTanim"
+            name="personelTanim"
             control={control}
             render={({ field }) => (
               <Input
@@ -109,7 +110,7 @@ export default function TeknisyenIsEmriCevir() {
             )}
           />
           <Controller
-            name="idariAmiriID"
+            name="personelID"
             control={control}
             render={({ field }) => (
               <Input
@@ -121,11 +122,15 @@ export default function TeknisyenIsEmriCevir() {
           />
           <PersonelTablo
             onSubmit={(selectedData) => {
-              setValue("idariAmiriTanim", selectedData.subject);
-              setValue("idariAmiriID", selectedData.key);
+              // Seçilen personellerin key ve subject değerlerini virgülle birleştir
+              const keys = selectedData.map((data) => data.key).join(", ");
+              const subjects = selectedData.map((data) => data.subject).join(", ");
+
+              setValue("personelTanim", subjects);
+              setValue("personelID", keys);
             }}
           />
-          <Button onClick={handleIdariAmiriMinusClick}> - </Button>
+          <Button onClick={handlePersonelMinusClick}> - </Button>
         </div>
       </StyledDivBottomLine>
     </div>
