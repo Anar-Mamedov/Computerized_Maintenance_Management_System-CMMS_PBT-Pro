@@ -7,7 +7,7 @@ import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import Filters from "./filter/Filters";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
-import TeknisyenIsEmriCevir from "../components/IsEmrineCevir/Teknisyen/TeknisyenIsEmriCevir";
+import TeknisyenSubmit from "../components/IsEmrineCevir/Teknisyen/TeknisyenSubmit";
 
 export default function MainTable() {
   const { setValue } = useFormContext();
@@ -648,7 +648,7 @@ export default function MainTable() {
           />
           <Filters onChange={handleBodyChange} />
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
-          <TeknisyenIsEmriCevir />
+          <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
         </div>
 
         <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
