@@ -4,15 +4,15 @@ import { CheckOutlined } from "@ant-design/icons";
 import { Controller, useForm, FormProvider } from "react-hook-form";
 import AxiosInstance from "../../../../../../api/http";
 import dayjs from "dayjs";
-import TeknisyenIsEmriCevir from "./TeknisyenIsEmriCevir";
+import AtolyeIsEmriCevir from "./AtolyeIsEmriCevir";
 
-export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
+export default function AtolyeSubmit({ selectedRows, refreshTableData }) {
   // Butonun disabled durumunu kontrol et
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const methods = useForm({
     defaultValues: {
-      personelTanim: "",
-      personelID: "",
+      atolyeTanim: "",
+      atolyeID: "",
       // Add other default values here
     },
   });
@@ -28,30 +28,26 @@ export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
     return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
   };
 
-  // personelID değerini izle
-  const personelID = watch("personelID");
+  // atolyeID değerini izle
+  const atolyeID = watch("atolyeID");
 
-  // personelID veya selectedRows değiştiğinde butonun durumunu güncelle
+  // atolyeID veya selectedRows değiştiğinde butonun durumunu güncelle
   useEffect(() => {
     const tbIsTalepId = selectedRows.map((row) => row.key).join(",");
     const isTalepDurum = selectedRows.some(
       (row) => row.IST_DURUM_ID === 1 || row.IST_DURUM_ID === 2 || row.IST_DURUM_ID === 0
     );
-    setIsButtonDisabled(!personelID || !tbIsTalepId || !isTalepDurum);
-  }, [personelID, selectedRows]);
+    setIsButtonDisabled(!atolyeID || !tbIsTalepId || !isTalepDurum);
+  }, [atolyeID, selectedRows]);
 
   const onSubmited = (data) => {
-    // Tablodan seçilen kayıtların key değerlerini birleştir
-    const tbIsTalepId = selectedRows.map((row) => row.key).join(","); // Eğer birden fazla ID varsa aralarına virgül koyarak birleştir
-
-    const teknisyenIds = watch("personelID")
-      .split(",")
-      .map((id) => parseInt(id.trim()));
+    // watch ile izlenen atolyeID değerini al
+    const atolyeIDValue = watch("atolyeID");
 
     const Body = selectedRows.map((row) => ({
       TALEP_ID: row.key, // Her bir satırın key değeri, TALEP_ID'ye eşitlenir.
       USER_ID: 24, // Sabit bir değer
-      TEKNISYEN_IDS: teknisyenIds, // Yukarıda oluşturulan teknisyen ID'leri dizisi
+      ATOLYE_ID: atolyeIDValue, // Yukarıda oluşturulan teknisyen ID'leri dizisi
     }));
 
     // Template literals kullanarak URL içerisinde dinamik değerleri kullan
@@ -62,7 +58,7 @@ export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
         // API isteği başarılı olduktan sonra bir süre bekleyip tabloyu yenile
         setTimeout(() => {
           refreshTableData(); // Tablo verilerini yenile
-        }, 500); // 1000 milisaniye (1 saniye) bekler
+        }, 700); // 1000 milisaniye (1 saniye) bekler
       })
       .catch((error) => {
         console.error("Error sending data:", error);
@@ -75,7 +71,7 @@ export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
     <FormProvider {...methods}>
       <div style={{ display: "flex", width: "100%", maxWidth: "430px" }}>
         <form style={{ width: "100%" }} onSubmit={methods.handleSubmit(onSubmited)}>
-          <TeknisyenIsEmriCevir selectedRows={selectedRows} />
+          <AtolyeIsEmriCevir selectedRows={selectedRows} />
         </form>
         <Button
           style={{ paddingLeft: "0px" }}
