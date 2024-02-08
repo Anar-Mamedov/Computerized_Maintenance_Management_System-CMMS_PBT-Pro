@@ -16,6 +16,14 @@ export default function CreateDrawer({ onRefresh }) {
     if (open) {
       // Çekmece açıldığında gerekli işlemi yap
       // Örneğin, MainTabs'a bir prop olarak geçir
+      AxiosInstance.get("ModulKoduGetir?modulKodu=IST_KOD") // Replace with your actual API endpoint
+        .then((response) => {
+          // Assuming the response contains the new work order number in 'response.Tanim'
+          setValue("talepKodu", response);
+        })
+        .catch((error) => {
+          console.error("Error fetching new work order number:", error);
+        });
     }
   }, [open]);
 
@@ -64,6 +72,8 @@ export default function CreateDrawer({ onRefresh }) {
       makineDurumuID: "",
     },
   });
+
+  const { setValue, reset } = methods;
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);

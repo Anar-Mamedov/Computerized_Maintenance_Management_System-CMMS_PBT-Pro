@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button, Popover } from "antd";
+import { MoreOutlined } from "@ant-design/icons";
 import Sil from "./components/Sil";
 import Iptal from "./components/Iptal/Iptal";
 
@@ -32,7 +33,19 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
   );
   return (
     <Popover placement="bottom" content={content} trigger="click" open={visible} onOpenChange={handleVisibleChange}>
-      <Button>İşlemler</Button>
+      <Button
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0px 0px",
+          backgroundColor: "#2BC770",
+          borderColor: "#2BC770",
+          width: "32px",
+          height: "32px",
+        }}>
+        <MoreOutlined style={{ color: "white", fontSize: "20px" }} />
+      </Button>
     </Popover>
   );
 }
