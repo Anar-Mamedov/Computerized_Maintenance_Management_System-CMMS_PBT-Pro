@@ -3,6 +3,7 @@ import { Button, Popover } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
 import Sil from "./components/Sil";
 import Iptal from "./components/Iptal/Iptal";
+import Parametreler from "./components/Parametreler/Parametreler";
 
 export default function ContextMenu({ selectedRows, refreshTableData }) {
   const [visible, setVisible] = useState(false);
@@ -29,6 +30,7 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
         hidePopover={hidePopover}
       />
       <Iptal selectedRows={selectedRows} refreshTableData={refreshTableData} iptalDisabled={iptalDisabled} />
+      <Parametreler />
     </div>
   );
   return (
