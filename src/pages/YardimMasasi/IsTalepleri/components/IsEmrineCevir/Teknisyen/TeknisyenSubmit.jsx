@@ -61,7 +61,7 @@ export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
         // API isteği başarılı olduktan sonra bir süre bekleyip tabloyu yenile
         setTimeout(() => {
           refreshTableData(); // Tablo verilerini yenile
-        }, 500); // 1000 milisaniye (1 saniye) bekler
+        }, 1000); // 1000 milisaniye (1 saniye) bekler
       })
       .catch((error) => {
         console.error("Error sending data:", error);
