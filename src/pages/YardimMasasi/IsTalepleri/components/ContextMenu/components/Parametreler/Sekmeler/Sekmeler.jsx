@@ -2,6 +2,8 @@ import React from "react";
 import { Tabs } from "antd";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
+import Ayarlar from "./components/Ayarlar/Ayarlar";
+import ZorunluAlanlar from "./components/ZorunluAlanlar/ZorunluAlanlar";
 
 const onChange = (key) => {
   // console.log(key);
@@ -46,8 +48,13 @@ export default function SecondTabs({ refreshKey, disabled }) {
   const items = [
     {
       key: "1",
-      label: "İş Takibi",
-      children: "Ekli Belgeler",
+      label: "Ayarlar",
+      children: <Ayarlar />,
+    },
+    {
+      key: "2",
+      label: "Zorunlu Alanlar",
+      children: <ZorunluAlanlar />,
     },
   ];
 

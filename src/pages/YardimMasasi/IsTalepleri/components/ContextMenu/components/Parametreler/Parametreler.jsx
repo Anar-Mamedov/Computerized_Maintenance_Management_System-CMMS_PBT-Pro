@@ -10,10 +10,10 @@ export default function Parametreler() {
 
   const methods = useForm({
     defaultValues: {
-      fisNo: "",
-      iptalTarihi: "",
-      iptalSaati: "",
-      iptalNeden: "",
+      talepKodu: true,
+      talepTarihi: true,
+      talepteBulunan: true,
+      lokasyon: "",
       // Add other default values here
     },
   });
@@ -98,6 +98,7 @@ export default function Parametreler() {
           Parametreler
         </Button>
         <Modal
+          width={1200}
           title="Parametreler"
           open={isModalOpen}
           onOk={methods.handleSubmit(onSubmited)}
