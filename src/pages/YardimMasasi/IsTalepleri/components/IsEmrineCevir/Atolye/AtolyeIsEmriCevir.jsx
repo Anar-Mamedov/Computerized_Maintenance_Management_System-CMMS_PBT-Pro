@@ -95,7 +95,7 @@ export default function AtolyeIsEmriCevir() {
             flexWrap: "wrap",
             alignItems: "center",
             justifyContent: "space-between",
-            width: "300px",
+            width: "285px",
           }}>
           <Controller
             name="atolyeTanim"
@@ -131,7 +131,19 @@ export default function AtolyeIsEmriCevir() {
             }}
           />
 
-          <Button onClick={handleAtolyeMinusClick}> - </Button>
+          <Button
+            style={{
+              padding: "0px 0px",
+              width: "32px",
+              height: "32px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onClick={handleAtolyeMinusClick}>
+            {" "}
+            -{" "}
+          </Button>
         </div>
       </StyledDivBottomLine>
     </div>

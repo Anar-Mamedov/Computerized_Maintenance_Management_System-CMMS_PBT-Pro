@@ -670,24 +670,13 @@ export default function MainTable() {
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
           <Filters onChange={handleBodyChange} />
+          <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
+          <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
         </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "10px",
-          alignItems: "center",
-          width: "100%",
-          marginBottom: "20px",
-          padding: "0 5px",
-        }}>
-        <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
-        <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
       </div>
       <Spin spinning={loading}>
         <Table
