@@ -95,7 +95,7 @@ export default function TeknisyenIsEmriCevir() {
             flexWrap: "wrap",
             alignItems: "center",
             justifyContent: "space-between",
-            width: "300px",
+            width: "285px",
           }}>
           <Controller
             name="personelTanim"
@@ -130,7 +130,19 @@ export default function TeknisyenIsEmriCevir() {
               setValue("personelID", keys);
             }}
           />
-          <Button onClick={handlePersonelMinusClick}> - </Button>
+          <Button
+            style={{
+              padding: "0px 0px",
+              width: "32px",
+              height: "32px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onClick={handlePersonelMinusClick}>
+            {" "}
+            -{" "}
+          </Button>
         </div>
       </StyledDivBottomLine>
     </div>
