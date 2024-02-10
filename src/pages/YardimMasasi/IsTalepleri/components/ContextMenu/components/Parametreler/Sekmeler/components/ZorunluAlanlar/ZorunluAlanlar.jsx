@@ -212,66 +212,243 @@ export default function Ayarlar() {
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <div>
             <Controller
-              name="makineTanimi"
+              name="iletisimSekli"
               control={control}
               render={({ field }) => (
                 <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-                  Makine Tanımı
+                  İletişim Şekli
                 </Checkbox>
               )}
             />
           </div>
           <div>
             <Controller
-              name="ekipmanTanimi"
+              name="isKategorisi"
               control={control}
               render={({ field }) => (
                 <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-                  Ekipman Tanımı
+                  İş Kategorisi
                 </Checkbox>
               )}
             />
           </div>
           <div>
             <Controller
-              name="makineDurumu"
+              name="servisNedeni"
               control={control}
               render={({ field }) => (
                 <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-                  Makine Durumu
+                  Servis Nedeni
                 </Checkbox>
               )}
             />
           </div>
           <div>
             <Controller
-              name="irtibatTelefonu"
+              name="isTakipcisi"
               control={control}
               render={({ field }) => (
                 <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-                  İrtibat Telefonu
+                  İş Takipçisi
                 </Checkbox>
               )}
             />
           </div>
           <div>
             <Controller
-              name="email"
+              name="konu"
               control={control}
               render={({ field }) => (
                 <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-                  E-Mail
+                  Konu
                 </Checkbox>
               )}
             />
           </div>
           <div>
             <Controller
-              name="departman"
+              name="aciklama"
               control={control}
               render={({ field }) => (
                 <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-                  Departman
+                  Açıklama
+                </Checkbox>
+              )}
+            />
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div>
+            <Controller
+              name="isEmriTipiCheck"
+              control={control}
+              render={({ field }) => (
+                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                  İş Emri Tipi
+                </Checkbox>
+              )}
+            />
+          </div>
+          <div>
+            <Controller
+              name="oncelik"
+              control={control}
+              render={({ field }) => (
+                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                  Öncelik
+                </Checkbox>
+              )}
+            />
+          </div>
+          <div>
+            <Controller
+              name="bildirimTipi"
+              control={control}
+              render={({ field }) => (
+                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                  Bildirim Tipi
+                </Checkbox>
+              )}
+            />
+          </div>
+          <div>
+            <Controller
+              name="planlananBaslamaTarihi"
+              control={control}
+              render={({ field }) => (
+                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                  Planlanan Başlama Tarihi
+                </Checkbox>
+              )}
+            />
+          </div>
+          <div>
+            <Controller
+              name="planlananBitisTarihi"
+              control={control}
+              render={({ field }) => (
+                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                  Planlanan Bitiş Tarihi
+                </Checkbox>
+              )}
+            />
+          </div>
+        </div>
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", flexDirection: "row", gap: "20px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div>
+            <Controller
+              name="ozelAlan1"
+              control={control}
+              render={({ field }) => (
+                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                  Özel Alan 1
+                </Checkbox>
+              )}
+            />
+          </div>
+          <div>
+            <Controller
+              name="ozelAlan2"
+              control={control}
+              render={({ field }) => (
+                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                  Özel Alan 2
+                </Checkbox>
+              )}
+            />
+          </div>
+          <div>
+            <Controller
+              name="ozelAlan3"
+              control={control}
+              render={({ field }) => (
+                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                  Özel Alan 3
+                </Checkbox>
+              )}
+            />
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div>
+            <Controller
+              name="ozelAlan4"
+              control={control}
+              render={({ field }) => (
+                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                  Özel Alan 4
+                </Checkbox>
+              )}
+            />
+          </div>
+          <div>
+            <Controller
+              name="ozelAlan5"
+              control={control}
+              render={({ field }) => (
+                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                  Özel Alan 5
+                </Checkbox>
+              )}
+            />
+          </div>
+          <div>
+            <Controller
+              name="ozelAlan6"
+              control={control}
+              render={({ field }) => (
+                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                  Özel Alan 6
+                </Checkbox>
+              )}
+            />
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div>
+            <Controller
+              name="ozelAlan7"
+              control={control}
+              render={({ field }) => (
+                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                  Özel Alan 7
+                </Checkbox>
+              )}
+            />
+          </div>
+          <div>
+            <Controller
+              name="ozelAlan8"
+              control={control}
+              render={({ field }) => (
+                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                  Özel Alan 8
+                </Checkbox>
+              )}
+            />
+          </div>
+          <div>
+            <Controller
+              name="ozelAlan9"
+              control={control}
+              render={({ field }) => (
+                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                  Özel Alan 9
+                </Checkbox>
+              )}
+            />
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div>
+            <Controller
+              name="ozelAlan10"
+              control={control}
+              render={({ field }) => (
+                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                  Özel Alan 10
                 </Checkbox>
               )}
             />

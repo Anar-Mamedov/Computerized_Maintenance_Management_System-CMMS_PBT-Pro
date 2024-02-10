@@ -72,12 +72,19 @@ export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
 
   return (
     <FormProvider {...methods}>
-      <div style={{ display: "flex", width: "100%", maxWidth: "430px" }}>
+      <div style={{ display: "flex", width: "100%", maxWidth: "394px" }}>
         <form style={{ width: "100%" }} onSubmit={methods.handleSubmit(onSubmited)}>
           <TeknisyenIsEmriCevir selectedRows={selectedRows} />
         </form>
         <Button
-          style={{ paddingLeft: "0px" }}
+          style={{
+            padding: "0px 0px",
+            width: "32px",
+            height: "32px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
           type="submit"
           onClick={methods.handleSubmit(onSubmited)}
           disabled={isButtonDisabled} // Butonun disabled durumunu ayarla

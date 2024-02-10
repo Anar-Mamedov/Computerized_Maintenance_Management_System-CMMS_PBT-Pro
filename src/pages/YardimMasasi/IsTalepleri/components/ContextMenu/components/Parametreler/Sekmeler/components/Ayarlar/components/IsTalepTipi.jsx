@@ -23,7 +23,7 @@ export default function IsTalepTipi({ disabled }) {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32950");
+      const response = await AxiosInstance.get("KodList?grup=32951");
       if (response && response) {
         setOptions(response);
       }
@@ -51,7 +51,7 @@ export default function IsTalepTipi({ disabled }) {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32950`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32951`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
