@@ -22,6 +22,7 @@ import ArizaTanimlari from "./pages/BakımVeArizaYonetimi/ArizaTanimlari/ArizaTa
 import AtolyeTanimlari from "./pages/PersonelYonetimi/AtolyeTanimlari/AtolyeTanimlari";
 import PersonelTanimlari from "./pages/PersonelYonetimi/PersonelTanimlari/PersonelTanimlari";
 import IsTalepleri from "./pages/YardimMasasi/IsTalepleri/IsTalepleri";
+import Hazirlaniyor from "./pages/Hazirlaniyor";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -47,6 +48,9 @@ const items = [
       getItem("Bakım Tanımları", "bakimTanimlari", true),
       getItem("Arıza Tanımları", "arizaTanimlari", true),
       getItem("İş Emri", "isemri", true),
+      getItem("Peryodik Bakımlar", "peryodikBakimlar", true),
+      getItem("Otomatik İş Emirleri", "otomatikIsEmirleri", true),
+      getItem("Planlama Takvimi", "planlamaTakvimi", true),
       // getItem("Alex", "alex", true)
     ],
     false
@@ -203,6 +207,9 @@ const App = () => {
                   <Routes>
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/isemri" element={<Isemri />} />
+                    <Route path="/peryodikBakimlar" element={<Hazirlaniyor />} />
+                    <Route path="/otomatikIsEmirleri" element={<Hazirlaniyor />} />
+                    <Route path="/planlamaTakvimi" element={<Hazirlaniyor />} />
                     <Route path="/makine" element={<MakineTanim />} />
                     <Route path="/lokasyon" element={<LokasyonTanim />} />
                     <Route path="/vardiyalar" element={<VardiyaTanim />} />
@@ -222,6 +229,9 @@ const App = () => {
                   <Routes>
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/isemri" element={<Isemri />} />
+                    <Route path="/peryodikBakimlar" element={<Hazirlaniyor />} />
+                    <Route path="/otomatikIsEmirleri" element={<Hazirlaniyor />} />
+                    <Route path="/planlamaTakvimi" element={<Hazirlaniyor />} />
                     <Route path="/makine" element={<MakineTanim />} />
                     <Route path="/lokasyon" element={<LokasyonTanim />} />
                     <Route path="/vardiyalar" element={<VardiyaTanim />} />
