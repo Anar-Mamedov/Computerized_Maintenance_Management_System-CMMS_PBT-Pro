@@ -69,12 +69,19 @@ export default function AtolyeSubmit({ selectedRows, refreshTableData }) {
 
   return (
     <FormProvider {...methods}>
-      <div style={{ display: "flex", width: "100%", maxWidth: "430px" }}>
+      <div style={{ display: "flex", width: "100%", maxWidth: "370px" }}>
         <form style={{ width: "100%" }} onSubmit={methods.handleSubmit(onSubmited)}>
           <AtolyeIsEmriCevir selectedRows={selectedRows} />
         </form>
         <Button
-          style={{ paddingLeft: "0px" }}
+          style={{
+            padding: "0px 0px",
+            width: "32px",
+            height: "32px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
           type="submit"
           onClick={methods.handleSubmit(onSubmited)}
           disabled={isButtonDisabled} // Butonun disabled durumunu ayarla
