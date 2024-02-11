@@ -1,7 +1,13 @@
 // Fotoğrafı içe aktarın
 import React from "react";
+import { Button, Form, Input, Space, Typography } from "antd";
+import { UserAddOutlined } from "@ant-design/icons";
 import backgroundImage from "../../assets/images/login.jpg";
 import LoginForm from "./components/LoginForm";
+import logo from "../../assets/images/logo.png";
+import RegistrationForm from "./components/RegistrationForm";
+
+const { Text, Link } = Typography;
 
 export default function Auth() {
   const [target, setTarget] = React.useState("login"); // login veya register
@@ -34,6 +40,11 @@ export default function Auth() {
     alignItems: "center",
   };
 
+  const logoStyle = {
+    width: "200px", // Genişliği sabit tutun
+    marginBottom: "20px", // Aşağıda 20 piksellik boşluk bırakın
+  };
+
   const toggleTarget = () => {
     setTarget(target === "login" ? "register" : "login");
   };
@@ -43,10 +54,35 @@ export default function Auth() {
       <div style={backgroundStyle}></div>
       {/* Beyaz alanı ekleyin */}
 
-      <div style={whiteAreaStyle}>{target === "login" ? <LoginForm /> : <div>kayit ol</div>}</div>
-      <button style={{ zIndex: "10" }} onClick={toggleTarget}>
-        {target === "login" ? "Kayıt Ol" : "Giriş Yap"}
-      </button>
+      <div style={whiteAreaStyle}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            width: "400px",
+            height: "700px",
+            flexDirection: "column",
+            alignItems: "center",
+          }}>
+          <img src={logo} alt="Logo" style={logoStyle} />
+          {target === "login" ? <LoginForm /> : <RegistrationForm />}
+          <Text type="secondary" style={{ fontSize: "14px", marginBottom: "20px" }}>
+            ve ya
+          </Text>
+          <Button
+            style={{
+              zIndex: "10",
+              width: "100%",
+              backgroundColor: "rgb(43, 199, 112)",
+              borderColor: "rgb(43, 199, 112)",
+              color: "white",
+            }}
+            onClick={toggleTarget}>
+            {target === "login" ? <UserAddOutlined /> : null}
+            {target === "login" ? "Kayıt Ol" : "Giriş Yap"}
+          </Button>
+        </div>
+      </div>
 
       {/* İçerik, beyaz alanın üzerine veya dışına gelebilir */}
     </div>

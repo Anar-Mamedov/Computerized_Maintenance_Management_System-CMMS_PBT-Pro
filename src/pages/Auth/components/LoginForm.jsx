@@ -1,7 +1,6 @@
 import React from "react";
 import { Button, Form, Input, Space, Typography } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
-import logo from "../../../assets/images/logo.png";
 import { useNavigate } from "react-router-dom";
 
 const { Text, Link } = Typography;
@@ -19,22 +18,15 @@ export default function LoginForm() {
     navigate("/");
   };
 
-  const logoStyle = {
-    width: "150px", // Genişliği sabit tutun
-    marginBottom: "20px", // Aşağıda 20 piksellik boşluk bırakın
-  };
-
   return (
     <div
       style={{
         display: "flex",
         justifyContent: "center",
         width: "400px",
-        height: "700px",
         flexDirection: "column",
         alignItems: "center",
       }}>
-      <img src={logo} alt="Logo" style={logoStyle} />
       <div style={{ width: "100%" }}>
         <Text style={{ fontSize: "20px" }}>Giriş Yap</Text>
         <Form
