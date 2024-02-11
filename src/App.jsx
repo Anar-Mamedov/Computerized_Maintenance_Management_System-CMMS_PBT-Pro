@@ -23,6 +23,7 @@ import PersonelTanimlari from "./pages/PersonelYonetimi/PersonelTanimlari/Person
 import IsTalepleri from "./pages/YardimMasasi/IsTalepleri/IsTalepleri";
 import Hazirlaniyor from "./pages/Hazirlaniyor";
 import Auth from "./pages/Auth/Auth";
+import logo from "../src/assets/images/logoBeyaz.png";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -200,6 +201,13 @@ const BaseLayout = () => {
     setMobileView(window.innerWidth < 768);
   });
 
+  const logoStyle = {
+    marginTop: "20px", // Yukarıda 20 piksellik boşluk bırakın
+    maxWidth: "100px", // Genişliği sabit tutun
+    width: "80%", // Genişliği sabit tutun
+    marginBottom: "20px", // Aşağıda 20 piksellik boşluk bırakın
+  };
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       {(mobileView && (
@@ -209,12 +217,23 @@ const BaseLayout = () => {
           onCollapse={setCollapsed}
           breakpoint="lg"
           collapsedWidth="0.0000000000001">
-          <div className="demo-logo-vertical" />
+          <div className="demo-logo-vertical" style={{ display: "flex", justifyContent: "center" }}>
+            <img src={logo} alt="Logo" style={logoStyle} />
+          </div>
           <MenuWrapper />
         </Sider>
       )) || (
-        <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
-          <div className="demo-logo-vertical" />
+        <Sider
+          collapsible
+          collapsed={collapsed}
+          onCollapse={setCollapsed}
+          width={250} // Genişletilmiş durumda Sider'ın genişliği
+          collapsedWidth={70} // Daraltılmış durumda Sider'ın genişliği
+          breakpoint="lg" // breakpoint="lg" olduğunda collapsedWidth değerini kullanır
+        >
+          <div className="demo-logo-vertical" style={{ display: "flex", justifyContent: "center" }}>
+            <img src={logo} alt="Logo" style={logoStyle} />
+          </div>
           <MenuWrapper />
         </Sider>
       )}
