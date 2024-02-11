@@ -61,6 +61,8 @@ const items = [
     <TeamOutlined />,
     [
       getItem("Makine Tanım", "makine", true),
+      getItem("Ekipman Veritabanı", "ekipmanVeritabani", true),
+      getItem("Sayaç Güncelleme", "sayacGuncelleme", true),
       // getItem("Team 2", "team2", true)
     ],
     false
@@ -72,6 +74,9 @@ const items = [
     [
       getItem("Atölye Tanımları", "atolye", true),
       getItem("Personel Tanımları", "personeltanimlari", true),
+      getItem("Personel İzinleri", "personelIzinleri", true),
+      getItem("Personel Nöbetleri", "personelNobetleri", true),
+      getItem("Personel Çalışma Planı", "personelCalismaPLani", true),
       // getItem("Team 2", "team2", true)
     ],
     false
@@ -82,6 +87,18 @@ const items = [
     <KeyOutlined />,
     [
       getItem("İş Talepleri", "isTalepleri", true),
+      getItem("İş Talebi Kullanıcıları", "isTalebiKullanicilari", true),
+      // getItem("Team 2", "team2", true)
+    ],
+    false
+  ),
+  getItem(
+    "Rapor & Formlar",
+    "rapor&formlar",
+    <KeyOutlined />,
+    [
+      getItem("Rapor Yönetimi", "raporYonetimi", true),
+      getItem("Form Yönetimi", "formYonetimi", true),
       // getItem("Team 2", "team2", true)
     ],
     false
@@ -93,6 +110,12 @@ const items = [
     [
       getItem("Lokasyon Tanımları", "lokasyon", true),
       getItem("Vardiya Tanımları", "vardiyalar", true),
+      getItem("Kod Yönetimi", "kodYonetimi", true),
+      getItem("Otomatik Kodlar", "otomatikKodlar", true),
+      getItem("Servis Öncelik Seviyeleri", "servisOncelikSeviyeleri", true),
+      getItem("İş Emri Tipleri", "isEmriTipleri", true),
+      getItem("Onaylayıcılar", "onaylayicilar", true),
+      getItem("Proje Tanımları", "projeTanimlari", true),
       // getItem("Team 2", "team2", true)
     ],
     false
@@ -211,6 +234,20 @@ const App = () => {
                     <Route path="/otomatikIsEmirleri" element={<Hazirlaniyor />} />
                     <Route path="/planlamaTakvimi" element={<Hazirlaniyor />} />
                     <Route path="/makine" element={<MakineTanim />} />
+                    <Route path="/ekipmanVeritabani" element={<Hazirlaniyor />} />
+                    <Route path="/sayacGuncelleme" element={<Hazirlaniyor />} />
+                    <Route path="/personelIzinleri" element={<Hazirlaniyor />} />
+                    <Route path="/personelNobetleri" element={<Hazirlaniyor />} />
+                    <Route path="/personelCalismaPLani" element={<Hazirlaniyor />} />
+                    <Route path="/isTalebiKullanicilari" element={<Hazirlaniyor />} />
+                    <Route path="/raporYonetimi" element={<Hazirlaniyor />} />
+                    <Route path="/formYonetimi" element={<Hazirlaniyor />} />
+                    <Route path="/kodYonetimi" element={<Hazirlaniyor />} />
+                    <Route path="/otomatikKodlar" element={<Hazirlaniyor />} />
+                    <Route path="/servisOncelikSeviyeleri" element={<Hazirlaniyor />} />
+                    <Route path="/isEmriTipleri" element={<Hazirlaniyor />} />
+                    <Route path="/onaylayicilar" element={<Hazirlaniyor />} />
+                    <Route path="/projeTanimlari" element={<Hazirlaniyor />} />
                     <Route path="/lokasyon" element={<LokasyonTanim />} />
                     <Route path="/vardiyalar" element={<VardiyaTanim />} />
                     <Route path="/bakimTanimlari" element={<BakimTanimlari />} />
@@ -233,6 +270,20 @@ const App = () => {
                     <Route path="/otomatikIsEmirleri" element={<Hazirlaniyor />} />
                     <Route path="/planlamaTakvimi" element={<Hazirlaniyor />} />
                     <Route path="/makine" element={<MakineTanim />} />
+                    <Route path="/ekipmanVeritabani" element={<Hazirlaniyor />} />
+                    <Route path="/sayacGuncelleme" element={<Hazirlaniyor />} />
+                    <Route path="/personelIzinleri" element={<Hazirlaniyor />} />
+                    <Route path="/personelNobetleri" element={<Hazirlaniyor />} />
+                    <Route path="/personelCalismaPLani" element={<Hazirlaniyor />} />
+                    <Route path="/isTalebiKullanicilari" element={<Hazirlaniyor />} />
+                    <Route path="/raporYonetimi" element={<Hazirlaniyor />} />
+                    <Route path="/formYonetimi" element={<Hazirlaniyor />} />
+                    <Route path="/kodYonetimi" element={<Hazirlaniyor />} />
+                    <Route path="/otomatikKodlar" element={<Hazirlaniyor />} />
+                    <Route path="/servisOncelikSeviyeleri" element={<Hazirlaniyor />} />
+                    <Route path="/isEmriTipleri" element={<Hazirlaniyor />} />
+                    <Route path="/onaylayicilar" element={<Hazirlaniyor />} />
+                    <Route path="/projeTanimlari" element={<Hazirlaniyor />} />
                     <Route path="/lokasyon" element={<LokasyonTanim />} />
                     <Route path="/vardiyalar" element={<VardiyaTanim />} />
                     <Route path="/bakimTanimlari" element={<BakimTanimlari />} />
