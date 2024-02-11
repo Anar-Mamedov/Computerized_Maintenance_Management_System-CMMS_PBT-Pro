@@ -14,6 +14,7 @@ export default function LoginForm() {
     // api sorgusu
     // successidse
     // localStorage.setItem("token", <apiden gelen token>);
+    sessionStorage.setItem("token", Math.random().toString(36).substring(2));
     // localStorage.setItem("userId", <apiden gelen user ID bilgisi>);
     navigate("/");
   };
