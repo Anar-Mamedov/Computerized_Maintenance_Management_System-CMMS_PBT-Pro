@@ -1,0 +1,50 @@
+import React from "react";
+import { Button, Form, Input, Space, Typography } from "antd";
+import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import logo from "../../../assets/images/logo.png";
+
+const { Text, Link } = Typography;
+
+export default function LoginForm() {
+  const onFinish = (values) => {
+    console.log("Received values of form: ", values);
+  };
+  const logoStyle = {
+    width: "150px", // Genişliği sabit tutun
+    marginBottom: "20px", // Aşağıda 20 piksellik boşluk bırakın
+  };
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        width: "400px",
+        height: "700px",
+        flexDirection: "column",
+        alignItems: "center",
+      }}>
+      <img src={logo} alt="Logo" style={logoStyle} />
+      <div style={{ width: "100%" }}>
+        <Text style={{ fontSize: "20px" }}>Giriş Yap</Text>
+        <Form
+          name="normal_login"
+          className="login-form"
+          initialValues={{ remember: true }}
+          onFinish={onFinish}
+          style={{ width: "100%", marginTop: "20px" }}>
+          <Form.Item name="email" rules={[{ required: true, message: "Lütfen e-posta adresinizi girin!" }]}>
+            <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="E-posta" />
+          </Form.Item>
+          <Form.Item name="password" rules={[{ required: true, message: "Lütfen şifrenizi girin!" }]}>
+            <Input prefix={<LockOutlined className="site-form-item-icon" />} type="password" placeholder="Şifre" />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" className="login-form-button" style={{ width: "100%" }}>
+              Giriş Yap
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
+    </div>
+  );
+}
