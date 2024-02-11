@@ -174,11 +174,12 @@ export default function App() {
 }
 
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem("token");
+  // const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
-  // if (!token) {
-  //   return <Navigate to={"/auth"} replace />;
-  // }
+  if (!token) {
+    return <Navigate to={"/auth"} replace />;
+  }
 
   return children;
 };
