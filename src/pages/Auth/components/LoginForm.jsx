@@ -2,17 +2,28 @@ import React from "react";
 import { Button, Form, Input, Space, Typography } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import logo from "../../../assets/images/logo.png";
+import { useNavigate } from "react-router-dom";
 
 const { Text, Link } = Typography;
 
 export default function LoginForm() {
-  const onFinish = (values) => {
+  const navigate = useNavigate();
+
+  const onSubmit = (values) => {
     console.log("Received values of form: ", values);
+
+    // api sorgusu
+    // successidse
+    // localStorage.setItem("token", <apiden gelen token>);
+    // localStorage.setItem("userId", <apiden gelen user ID bilgisi>);
+    navigate("/");
   };
+
   const logoStyle = {
     width: "150px", // Genişliği sabit tutun
     marginBottom: "20px", // Aşağıda 20 piksellik boşluk bırakın
   };
+
   return (
     <div
       style={{
@@ -30,7 +41,7 @@ export default function LoginForm() {
           name="normal_login"
           className="login-form"
           initialValues={{ remember: true }}
-          onFinish={onFinish}
+          onFinish={onSubmit}
           style={{ width: "100%", marginTop: "20px" }}>
           <Form.Item name="email" rules={[{ required: true, message: "Lütfen e-posta adresinizi girin!" }]}>
             <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="E-posta" />

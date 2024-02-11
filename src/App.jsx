@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Route, Routes, Link, useLocation } from "react-router-dom";
-import { Breadcrumb, Layout, Menu, theme, ConfigProvider, Button } from "antd";
+import { useEffect, useState } from "react";
+import { Route, Routes, Link, useLocation, Outlet, Navigate } from "react-router-dom";
+import { Breadcrumb, Layout, Menu, theme, Button } from "antd";
 import {
   DesktopOutlined,
   FileOutlined,
@@ -14,7 +14,6 @@ import {
 import Isemri from "./pages/DashboardAnalytics2/Isemri";
 import MakineTanim from "./pages/MakineEkipman/MakineTanim/MakineTanim";
 import LokasyonTanim from "./pages/Yonetim/LokasyonTanimlari/LokasyonTanimlari";
-import trTR from "antd/es/locale/tr_TR";
 import VardiyaTanim from "./pages/Yonetim/VardiyaTanimlari/VardiyaTanimlari";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import BakimTanimlari from "./pages/BakımVeArizaYonetimi/BakimTanimlari/BakimTanimlari";
@@ -23,6 +22,7 @@ import AtolyeTanimlari from "./pages/PersonelYonetimi/AtolyeTanimlari/AtolyeTani
 import PersonelTanimlari from "./pages/PersonelYonetimi/PersonelTanimlari/PersonelTanimlari";
 import IsTalepleri from "./pages/YardimMasasi/IsTalepleri/IsTalepleri";
 import Hazirlaniyor from "./pages/Hazirlaniyor";
+import Auth from "./pages/Auth/Auth";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -128,6 +128,132 @@ const items = [
 // Diğer sayfa bileşenlerinizi burada tanımlayın...
 
 // diğer menüyü açtığımda diğer menüyü kapatıyor ve sayfa yüklendiğinde açık olan menüyü açık bırakıyor
+// diğer menüyü açtığımda diğer menüyü kapatıyor ve sayfa yüklendiğinde açık olan menüyü açık bırakıyor sonu
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/auth" element={<Auth />} />
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <BaseLayout />
+          </ProtectedRoute>
+        }>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/isemri" element={<Isemri />} />
+        <Route path="/peryodikBakimlar" element={<Hazirlaniyor />} />
+        <Route path="/otomatikIsEmirleri" element={<Hazirlaniyor />} />
+        <Route path="/planlamaTakvimi" element={<Hazirlaniyor />} />
+        <Route path="/makine" element={<MakineTanim />} />
+        <Route path="/ekipmanVeritabani" element={<Hazirlaniyor />} />
+        <Route path="/sayacGuncelleme" element={<Hazirlaniyor />} />
+        <Route path="/personelIzinleri" element={<Hazirlaniyor />} />
+        <Route path="/personelNobetleri" element={<Hazirlaniyor />} />
+        <Route path="/personelCalismaPLani" element={<Hazirlaniyor />} />
+        <Route path="/isTalebiKullanicilari" element={<Hazirlaniyor />} />
+        <Route path="/raporYonetimi" element={<Hazirlaniyor />} />
+        <Route path="/formYonetimi" element={<Hazirlaniyor />} />
+        <Route path="/kodYonetimi" element={<Hazirlaniyor />} />
+        <Route path="/otomatikKodlar" element={<Hazirlaniyor />} />
+        <Route path="/servisOncelikSeviyeleri" element={<Hazirlaniyor />} />
+        <Route path="/isEmriTipleri" element={<Hazirlaniyor />} />
+        <Route path="/onaylayicilar" element={<Hazirlaniyor />} />
+        <Route path="/projeTanimlari" element={<Hazirlaniyor />} />
+        <Route path="/lokasyon" element={<LokasyonTanim />} />
+        <Route path="/vardiyalar" element={<VardiyaTanim />} />
+        <Route path="/bakimTanimlari" element={<BakimTanimlari />} />
+        <Route path="/arizaTanimlari" element={<ArizaTanimlari />} />
+        <Route path="/atolye" element={<AtolyeTanimlari />} />
+        <Route path="/personeltanimlari" element={<PersonelTanimlari />} />
+        <Route path="/isTalepleri" element={<IsTalepleri />} />
+      </Route>
+    </Routes>
+  );
+}
+
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem("token");
+
+  // if (!token) {
+  //   return <Navigate to={"/auth"} replace />;
+  // }
+
+  return children;
+};
+
+const BaseLayout = () => {
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileView, setMobileView] = useState(window.innerWidth < 768);
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
+
+  const toggleCollapsed = () => {
+    setCollapsed(!collapsed);
+  };
+
+  // Ekran boyutu değişikliklerini dinle
+  window.addEventListener("resize", () => {
+    setMobileView(window.innerWidth < 768);
+  });
+
+  return (
+    <Layout style={{ minHeight: "100vh" }}>
+      {(mobileView && (
+        <Sider
+          collapsible
+          collapsed={collapsed}
+          onCollapse={setCollapsed}
+          breakpoint="lg"
+          collapsedWidth="0.0000000000001">
+          <div className="demo-logo-vertical" />
+          <MenuWrapper />
+        </Sider>
+      )) || (
+        <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
+          <div className="demo-logo-vertical" />
+          <MenuWrapper />
+        </Sider>
+      )}
+
+      <Layout>
+        <Header style={{ padding: 0, background: colorBgContainer, display: "flex", alignItems: "center" }}>
+          {mobileView && (
+            <Button
+              onClick={toggleCollapsed}
+              style={{
+                padding: "0 24px",
+                width: "40px",
+                height: "40px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginLeft: "10px",
+              }}>
+              {collapsed ? (
+                <MenuUnfoldOutlined style={{ color: "#0066ff" }} />
+              ) : (
+                <MenuFoldOutlined style={{ color: "#0066ff" }} />
+              )}
+            </Button>
+          )}
+        </Header>
+        <Content style={{ margin: mobileView ? "0 0px" : "0 16px" }}>
+          <Breadcrumb style={{ margin: "16px 0" }}></Breadcrumb>
+          <div style={{ padding: mobileView ? "24px 0px" : 24, minHeight: 360, background: colorBgContainer }}>
+            <Outlet />
+          </div>
+        </Content>
+
+        <Footer style={{ textAlign: "center" }}>
+          Orjin {new Date().getFullYear()} - Design & Develop by Orjin Team
+        </Footer>
+      </Layout>
+    </Layout>
+  );
+};
 
 const MenuWrapper = () => {
   const location = useLocation();
@@ -161,150 +287,3 @@ const MenuWrapper = () => {
     />
   );
 };
-
-// diğer menüyü açtığımda diğer menüyü kapatıyor ve sayfa yüklendiğinde açık olan menüyü açık bırakıyor sonu
-
-const App = () => {
-  const [collapsed, setCollapsed] = useState(false);
-  const [mobileView, setMobileView] = useState(window.innerWidth < 768);
-  const {
-    token: { colorBgContainer },
-  } = theme.useToken();
-
-  const toggleCollapsed = () => {
-    setCollapsed(!collapsed);
-  };
-
-  // Ekran boyutu değişikliklerini dinle
-  window.addEventListener("resize", () => {
-    setMobileView(window.innerWidth < 768);
-  });
-
-  return (
-    <ConfigProvider locale={trTR}>
-      <Router>
-        <Layout style={{ minHeight: "100vh" }}>
-          {(mobileView && (
-            <Sider
-              collapsible
-              collapsed={collapsed}
-              onCollapse={setCollapsed}
-              breakpoint="lg"
-              collapsedWidth="0.0000000000001">
-              <div className="demo-logo-vertical" />
-              <MenuWrapper />
-            </Sider>
-          )) || (
-            <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
-              <div className="demo-logo-vertical" />
-              <MenuWrapper />
-            </Sider>
-          )}
-
-          <Layout>
-            <Header style={{ padding: 0, background: colorBgContainer, display: "flex", alignItems: "center" }}>
-              {mobileView && (
-                <Button
-                  onClick={toggleCollapsed}
-                  style={{
-                    padding: "0 24px",
-                    width: "40px",
-                    height: "40px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginLeft: "10px",
-                  }}>
-                  {collapsed ? (
-                    <MenuUnfoldOutlined style={{ color: "#0066ff" }} />
-                  ) : (
-                    <MenuFoldOutlined style={{ color: "#0066ff" }} />
-                  )}
-                </Button>
-              )}
-            </Header>
-            {(mobileView && (
-              <Content style={{ margin: "0 0px" }}>
-                <Breadcrumb style={{ margin: "16px 0" }}>{/* Breadcrumb içeriği */}</Breadcrumb>
-                <div style={{ padding: "24px 0px", minHeight: 360, background: colorBgContainer }}>
-                  <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/isemri" element={<Isemri />} />
-                    <Route path="/peryodikBakimlar" element={<Hazirlaniyor />} />
-                    <Route path="/otomatikIsEmirleri" element={<Hazirlaniyor />} />
-                    <Route path="/planlamaTakvimi" element={<Hazirlaniyor />} />
-                    <Route path="/makine" element={<MakineTanim />} />
-                    <Route path="/ekipmanVeritabani" element={<Hazirlaniyor />} />
-                    <Route path="/sayacGuncelleme" element={<Hazirlaniyor />} />
-                    <Route path="/personelIzinleri" element={<Hazirlaniyor />} />
-                    <Route path="/personelNobetleri" element={<Hazirlaniyor />} />
-                    <Route path="/personelCalismaPLani" element={<Hazirlaniyor />} />
-                    <Route path="/isTalebiKullanicilari" element={<Hazirlaniyor />} />
-                    <Route path="/raporYonetimi" element={<Hazirlaniyor />} />
-                    <Route path="/formYonetimi" element={<Hazirlaniyor />} />
-                    <Route path="/kodYonetimi" element={<Hazirlaniyor />} />
-                    <Route path="/otomatikKodlar" element={<Hazirlaniyor />} />
-                    <Route path="/servisOncelikSeviyeleri" element={<Hazirlaniyor />} />
-                    <Route path="/isEmriTipleri" element={<Hazirlaniyor />} />
-                    <Route path="/onaylayicilar" element={<Hazirlaniyor />} />
-                    <Route path="/projeTanimlari" element={<Hazirlaniyor />} />
-                    <Route path="/lokasyon" element={<LokasyonTanim />} />
-                    <Route path="/vardiyalar" element={<VardiyaTanim />} />
-                    <Route path="/bakimTanimlari" element={<BakimTanimlari />} />
-                    <Route path="/arizaTanimlari" element={<ArizaTanimlari />} />
-                    <Route path="/atolye" element={<AtolyeTanimlari />} />
-                    <Route path="/personeltanimlari" element={<PersonelTanimlari />} />
-                    <Route path="/isTalepleri" element={<IsTalepleri />} />
-                    {/* Diğer Route'lar */}
-                  </Routes>
-                </div>
-              </Content>
-            )) || (
-              <Content style={{ margin: "0 16px" }}>
-                <Breadcrumb style={{ margin: "16px 0" }}>{/* Breadcrumb içeriği */}</Breadcrumb>
-                <div style={{ padding: 24, minHeight: 360, background: colorBgContainer }}>
-                  <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/isemri" element={<Isemri />} />
-                    <Route path="/peryodikBakimlar" element={<Hazirlaniyor />} />
-                    <Route path="/otomatikIsEmirleri" element={<Hazirlaniyor />} />
-                    <Route path="/planlamaTakvimi" element={<Hazirlaniyor />} />
-                    <Route path="/makine" element={<MakineTanim />} />
-                    <Route path="/ekipmanVeritabani" element={<Hazirlaniyor />} />
-                    <Route path="/sayacGuncelleme" element={<Hazirlaniyor />} />
-                    <Route path="/personelIzinleri" element={<Hazirlaniyor />} />
-                    <Route path="/personelNobetleri" element={<Hazirlaniyor />} />
-                    <Route path="/personelCalismaPLani" element={<Hazirlaniyor />} />
-                    <Route path="/isTalebiKullanicilari" element={<Hazirlaniyor />} />
-                    <Route path="/raporYonetimi" element={<Hazirlaniyor />} />
-                    <Route path="/formYonetimi" element={<Hazirlaniyor />} />
-                    <Route path="/kodYonetimi" element={<Hazirlaniyor />} />
-                    <Route path="/otomatikKodlar" element={<Hazirlaniyor />} />
-                    <Route path="/servisOncelikSeviyeleri" element={<Hazirlaniyor />} />
-                    <Route path="/isEmriTipleri" element={<Hazirlaniyor />} />
-                    <Route path="/onaylayicilar" element={<Hazirlaniyor />} />
-                    <Route path="/projeTanimlari" element={<Hazirlaniyor />} />
-                    <Route path="/lokasyon" element={<LokasyonTanim />} />
-                    <Route path="/vardiyalar" element={<VardiyaTanim />} />
-                    <Route path="/bakimTanimlari" element={<BakimTanimlari />} />
-                    <Route path="/arizaTanimlari" element={<ArizaTanimlari />} />
-                    <Route path="/atolye" element={<AtolyeTanimlari />} />
-                    <Route path="/personeltanimlari" element={<PersonelTanimlari />} />
-                    <Route path="/isTalepleri" element={<IsTalepleri />} />
-                    {/* Diğer Route'lar */}
-                  </Routes>
-                </div>
-              </Content>
-            )}
-
-            <Footer style={{ textAlign: "center" }}>
-              Orjin {new Date().getFullYear()} - Design & Develop by Orjin Team
-            </Footer>
-          </Layout>
-        </Layout>
-      </Router>
-    </ConfigProvider>
-  );
-};
-
-export default App;

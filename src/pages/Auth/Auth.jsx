@@ -1,9 +1,11 @@
-import React from "react";
 // Fotoğrafı içe aktarın
+import React from "react";
 import backgroundImage from "../../assets/images/login.jpg";
 import LoginForm from "./components/LoginForm";
 
-export default function Login() {
+export default function Auth() {
+  const [target, setTarget] = React.useState("login"); // login veya register
+
   // JavaScript objesi olarak stil tanımlaması
   const backgroundStyle = {
     backgroundImage: `url(${backgroundImage})`,
@@ -32,13 +34,20 @@ export default function Login() {
     alignItems: "center",
   };
 
+  const toggleTarget = () => {
+    setTarget(target === "login" ? "register" : "login");
+  };
+
   return (
-    <div className="Login">
+    <div>
       <div style={backgroundStyle}></div>
       {/* Beyaz alanı ekleyin */}
-      <div style={whiteAreaStyle}>
-        <LoginForm />
-      </div>
+
+      <div style={whiteAreaStyle}>{target === "login" ? <LoginForm /> : <div>kayit ol</div>}</div>
+      <button style={{ zIndex: "10" }} onClick={toggleTarget}>
+        {target === "login" ? "Kayıt Ol" : "Giriş Yap"}
+      </button>
+
       {/* İçerik, beyaz alanın üzerine veya dışına gelebilir */}
     </div>
   );
