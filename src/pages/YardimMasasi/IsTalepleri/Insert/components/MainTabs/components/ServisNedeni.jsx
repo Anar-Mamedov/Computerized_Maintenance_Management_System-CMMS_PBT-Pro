@@ -7,8 +7,12 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function ServisNedeni({ disabled }) {
-  const { control, setValue } = useFormContext();
+export default function ServisNedeni({ disabled, fieldRequirements }) {
+  const {
+    control,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const inputRef = createRef();
@@ -90,13 +94,15 @@ export default function ServisNedeni({ disabled }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between" }}>
       {contextHolder}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", flexDirection: "column" }}>
         <Controller
           name="servisNedeni"
           control={control}
+          rules={{ required: fieldRequirements.servisNedeni ? "Alan Boş Bırakılamaz!" : false }}
           render={({ field }) => (
             <Select
               {...field}
+              status={errors.servisNedeni ? "error" : ""}
               disabled={disabled}
               key={selectKey}
               style={{ width: "300px" }}
@@ -157,6 +163,7 @@ export default function ServisNedeni({ disabled }) {
             />
           )}
         />
+        {errors.servisNedeni && <div style={{ color: "red", marginTop: "5px" }}>{errors.servisNedeni.message}</div>}
       </div>
     </div>
   );

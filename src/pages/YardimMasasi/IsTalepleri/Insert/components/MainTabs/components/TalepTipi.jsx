@@ -7,8 +7,12 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function TalepTipi({ disabled }) {
-  const { control, setValue } = useFormContext();
+export default function TalepTipi({ disabled, fieldRequirements }) {
+  const {
+    control,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const inputRef = createRef();
@@ -90,13 +94,15 @@ export default function TalepTipi({ disabled }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between" }}>
       {contextHolder}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", flexDirection: "column" }}>
         <Controller
           name="talepTipi"
           control={control}
+          rules={{ required: fieldRequirements.talepTipi ? "Alan Boş Bırakılamaz!" : false }}
           render={({ field }) => (
             <Select
               {...field}
+              status={errors.talepTipi ? "error" : ""}
               disabled={disabled}
               key={selectKey}
               style={{ width: "300px" }}
@@ -157,6 +163,7 @@ export default function TalepTipi({ disabled }) {
             />
           )}
         />
+        {errors.talepTipi && <div style={{ color: "red", marginTop: "5px" }}>{errors.talepTipi.message}</div>}
       </div>
     </div>
   );

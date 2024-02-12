@@ -11,6 +11,12 @@ import dayjs from "dayjs";
 
 export default function CreateDrawer({ onRefresh }) {
   const [open, setOpen] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
+  // API'den gelen zorunluluk bilgilerini simüle eden bir örnek
+  const [fieldRequirements, setFieldRequirements] = React.useState({
+    // Varsayılan olarak zorunlu değil
+    // Diğer alanlar için de benzer şekilde...
+  });
 
   useEffect(() => {
     if (open) {
@@ -74,6 +80,49 @@ export default function CreateDrawer({ onRefresh }) {
   });
 
   const { setValue, reset } = methods;
+
+  useEffect(() => {
+    const handleDataFetchAndUpdate = async () => {
+      if (open) {
+        try {
+          const response = await AxiosInstance.get(`IsTalepParametre`);
+          const data = response;
+          const item = data[0]; // Veri dizisinin ilk elemanını al
+
+          // Form alanlarını set et
+          setValue("oncelikTanim", item.ISP_ONCELIK_TEXT);
+          setValue("oncelikID", item.ISP_ONCELIK_ID);
+          setValue("talepTipi", item.ISP_VARSAYILAN_IS_TIPI_TEXT);
+          setValue("talepTipiID", item.ISP_VARSAYILAN_IS_TIPI);
+          setIsDisabled(item.ISP_DUZENLEME_TARIH_DEGISIMI);
+          setFieldRequirements({
+            lokasyonTanim: item.ISP_LOKASYON,
+            irtibatTelefonu: item.ISP_IRTIBAT_TEL,
+            email: item.ISP_MAIL,
+            departman: item.ISP_DEPARTMAN,
+            iletisimSekli: item.ISP_ILETISIM_SEKLI,
+            talepTipi: item.ISP_BILDIRIM_TIPI,
+            isKategorisi: item.ISP_IS_KATEGORI,
+            servisNedeni: item.ISP_SERVIS_NEDEN,
+            oncelikTanim: item.ISP_ONCELIK,
+            bildirilenBina: item.ISP_BINA,
+            bildirilenKat: item.ISP_KAT,
+            ilgiliKisi: item.ISP_IS_TAKIPCI,
+            konu: item.ISP_KONU,
+            aciklama: item.ISP_ACIKLAMA,
+            makine: item.ISP_MAKINE_KOD,
+            ekipman: item.ISP_EKIPMAN_KOD,
+            makineDurumu: item.ISP_ZOR_MAKINE_DURUM_KOD_ID,
+            // Diğer alanlar için de benzer şekilde...
+          });
+        } catch (error) {
+          console.error("Veri çekilirken hata oluştu:", error);
+        }
+      }
+    };
+
+    handleDataFetchAndUpdate();
+  }, [open, setValue, methods.reset]);
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
@@ -183,7 +232,7 @@ export default function CreateDrawer({ onRefresh }) {
             </Space>
           }>
           <form onSubmit={methods.handleSubmit(onSubmit)}>
-            <MainTabs drawerOpen={open} />
+            <MainTabs drawerOpen={open} isDisabled={isDisabled} fieldRequirements={fieldRequirements} />
             <SecondTabs />
             <Footer />
           </form>

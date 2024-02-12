@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal } from "antd";
-import { Controller, useForm, FormProvider } from "react-hook-form";
+import { Controller, useForm, FormProvider, set } from "react-hook-form";
 import AxiosInstance from "../../../../../../../api/http";
 import dayjs from "dayjs";
 import Sekmeler from "./Sekmeler/Sekmeler";
@@ -64,6 +64,9 @@ export default function Parametreler() {
           const item = data[0]; // Veri dizisinin ilk elemanını al
 
           // Form alanlarını set et
+          setValue("oncelikTanim", item.ISP_ONCELIK_TEXT);
+          setValue("isEmriTipi", item.ISP_ISEMRI_TIPI_TEXT);
+          setValue("isTalepTipi", item.ISP_VARSAYILAN_IS_TIPI_TEXT);
           setValue("email", item.ISP_MAIL);
           setValue("departman", item.ISP_DEPARTMAN);
           setValue("iletisimSekli", item.ISP_ILETISIM_SEKLI);
