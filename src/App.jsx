@@ -41,6 +41,18 @@ const items = [
   // getItem("Option 1", "option1", <PieChartOutlined />),
   // getItem("Option 2", "option2", <DesktopOutlined />),
   getItem(
+    "Makine & Ekipman Yönetimi",
+    "makine&ekipman",
+    <TeamOutlined />,
+    [
+      getItem("Makine Tanım", "makine", true),
+      getItem("Ekipman Veritabanı", "ekipmanVeritabani", true),
+      getItem("Sayaç Güncelleme", "sayacGuncelleme", true),
+      // getItem("Team 2", "team2", true)
+    ],
+    false
+  ),
+  getItem(
     "Bakım ve Arıza Yönetimi",
     "bakim&ariza",
     <UserOutlined />,
@@ -53,18 +65,6 @@ const items = [
       getItem("Otomatik İş Emirleri", "otomatikIsEmirleri", true),
       getItem("Planlama Takvimi", "planlamaTakvimi", true),
       // getItem("Alex", "alex", true)
-    ],
-    false
-  ),
-  getItem(
-    "Makine & Ekipman Yönetimi",
-    "makine&ekipman",
-    <TeamOutlined />,
-    [
-      getItem("Makine Tanım", "makine", true),
-      getItem("Ekipman Veritabanı", "ekipmanVeritabani", true),
-      getItem("Sayaç Güncelleme", "sayacGuncelleme", true),
-      // getItem("Team 2", "team2", true)
     ],
     false
   ),

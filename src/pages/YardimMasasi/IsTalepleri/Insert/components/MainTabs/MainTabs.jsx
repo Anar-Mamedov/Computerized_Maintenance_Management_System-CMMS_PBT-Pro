@@ -75,7 +75,7 @@ const StyledDivMedia = styled.div`
   }
 `;
 
-export default function MainTabs({ drawerOpen }) {
+export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) {
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const {
@@ -228,6 +228,7 @@ export default function MainTabs({ drawerOpen }) {
                 <DatePicker
                   {...field}
                   status={error ? "error" : ""}
+                  disabled={!isDisabled}
                   style={{ width: "180px" }}
                   format={localeDateFormat}
                   placeholder="Tarih seçiniz"
@@ -242,6 +243,7 @@ export default function MainTabs({ drawerOpen }) {
                 <TimePicker
                   {...field}
                   status={errors.talepSaati ? "error" : ""}
+                  disabled={!isDisabled}
                   style={{ width: "110px" }}
                   format={localeTimeFormat}
                   placeholder="Saat seçiniz"
@@ -370,47 +372,56 @@ export default function MainTabs({ drawerOpen }) {
               width: "100%",
               maxWidth: "450px",
             }}>
-            <Text style={{ fontSize: "14px" }}>Lokasyon:</Text>
-            <div
-              className="anar"
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                minWidth: "300px",
-                gap: "3px",
-              }}>
-              <Controller
-                name="lokasyonTanim"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text" // Set the type to "text" for name input
-                    style={{ width: "100%", maxWidth: "630px" }}
-                    disabled
-                  />
-                )}
-              />
-              <Controller
-                name="lokasyonID"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text" // Set the type to "text" for name input
-                    style={{ display: "none" }}
-                  />
-                )}
-              />
-              <LokasyonTablo
-                onSubmit={(selectedData) => {
-                  setValue("lokasyonTanim", selectedData.LOK_TANIM);
-                  setValue("lokasyonID", selectedData.key);
-                }}
-              />
-              <Button onClick={handleLokasyonMinusClick}> - </Button>
+            <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.lokasyonTanim ? "600" : "normal" }}>
+              Lokasyon:
+            </Text>
+            <div>
+              <div
+                className="anar"
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  minWidth: "300px",
+                  gap: "3px",
+                }}>
+                <Controller
+                  name="lokasyonTanim"
+                  control={control}
+                  rules={{ required: fieldRequirements.lokasyonTanim ? "Alan Boş Bırakılamaz!" : false }}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      status={errors.lokasyonTanim ? "error" : ""}
+                      type="text" // Set the type to "text" for name input
+                      style={{ width: "100%", maxWidth: "630px" }}
+                      disabled
+                    />
+                  )}
+                />
+                <Controller
+                  name="lokasyonID"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      type="text" // Set the type to "text" for name input
+                      style={{ display: "none" }}
+                    />
+                  )}
+                />
+                <LokasyonTablo
+                  onSubmit={(selectedData) => {
+                    setValue("lokasyonTanim", selectedData.LOK_TANIM);
+                    setValue("lokasyonID", selectedData.key);
+                  }}
+                />
+                <Button onClick={handleLokasyonMinusClick}> - </Button>
+              </div>
+              {errors.lokasyonTanim && (
+                <div style={{ color: "red", marginTop: "5px" }}>{errors.lokasyonTanim.message}</div>
+              )}
             </div>
           </StyledDivMedia>
           <div style={{ width: "100%", maxWidth: "450px" }}>
@@ -422,8 +433,10 @@ export default function MainTabs({ drawerOpen }) {
                 justifyContent: "space-between",
                 width: "100%",
               }}>
-              <Text style={{ fontSize: "14px" }}>Departman:</Text>
-              <Departman />
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.departman ? "600" : "normal" }}>
+                Departman:
+              </Text>
+              <Departman fieldRequirements={fieldRequirements} />
             </StyledDivBottomLine>
           </div>
           <div
@@ -436,22 +449,30 @@ export default function MainTabs({ drawerOpen }) {
               width: "100%",
               justifyContent: "space-between",
             }}>
-            <Text style={{ fontSize: "14px" }}>İrtibat Telefonu:</Text>
+            <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.irtibatTelefonu ? "600" : "normal" }}>
+              İrtibat Telefonu:
+            </Text>
             <div
               style={{
                 display: "flex",
                 flexWrap: "wrap",
-                alignItems: "center",
+                alignItems: "flex-start",
                 maxWidth: "300px",
                 minWidth: "300px",
-                gap: "10px",
                 width: "100%",
+                flexDirection: "column",
               }}>
               <Controller
                 name="irtibatTelefonu"
                 control={control}
-                render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+                rules={{ required: fieldRequirements.irtibatTelefonu ? "Alan Boş Bırakılamaz!" : false }}
+                render={({ field }) => (
+                  <Input {...field} status={errors.irtibatTelefonu ? "error" : ""} style={{ flex: 1 }} />
+                )}
               />
+              {errors.irtibatTelefonu && (
+                <div style={{ color: "red", marginTop: "5px" }}>{errors.irtibatTelefonu.message}</div>
+              )}
             </div>
           </div>
           <div
@@ -464,22 +485,24 @@ export default function MainTabs({ drawerOpen }) {
               width: "100%",
               justifyContent: "space-between",
             }}>
-            <Text style={{ fontSize: "14px" }}>E-Mail:</Text>
+            <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.email ? "600" : "normal" }}>E-Mail:</Text>
             <div
               style={{
                 display: "flex",
                 flexWrap: "wrap",
-                alignItems: "center",
+                alignItems: "flex-start",
                 maxWidth: "300px",
                 minWidth: "300px",
-                gap: "10px",
                 width: "100%",
+                flexDirection: "column",
               }}>
               <Controller
                 name="email"
                 control={control}
-                render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+                rules={{ required: fieldRequirements.email ? "Alan Boş Bırakılamaz!" : false }}
+                render={({ field }) => <Input {...field} status={errors.email ? "error" : ""} style={{ flex: 1 }} />}
               />
+              {errors.email && <div style={{ color: "red", marginTop: "5px" }}>{errors.email.message}</div>}
             </div>
           </div>
         </div>
@@ -501,8 +524,10 @@ export default function MainTabs({ drawerOpen }) {
                 justifyContent: "space-between",
                 width: "100%",
               }}>
-              <Text style={{ fontSize: "14px" }}>İletişim Şekli:</Text>
-              <IletisimSekli />
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.iletisimSekli ? "600" : "normal" }}>
+                İletişim Şekli:
+              </Text>
+              <IletisimSekli fieldRequirements={fieldRequirements} />
             </StyledDivBottomLine>
           </div>
           <div style={{ width: "100%", maxWidth: "450px" }}>
@@ -514,8 +539,10 @@ export default function MainTabs({ drawerOpen }) {
                 justifyContent: "space-between",
                 width: "100%",
               }}>
-              <Text style={{ fontSize: "14px" }}>Talep Tipi:</Text>
-              <TalepTipi />
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.talepTipi ? "600" : "normal" }}>
+                Talep Tipi:
+              </Text>
+              <TalepTipi fieldRequirements={fieldRequirements} />
             </StyledDivBottomLine>
           </div>
           <div style={{ width: "100%", maxWidth: "450px" }}>
@@ -527,8 +554,10 @@ export default function MainTabs({ drawerOpen }) {
                 justifyContent: "space-between",
                 width: "100%",
               }}>
-              <Text style={{ fontSize: "14px" }}>İş Kategorisi:</Text>
-              <IsKategorisi />
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.isKategorisi ? "600" : "normal" }}>
+                İş Kategorisi:
+              </Text>
+              <IsKategorisi fieldRequirements={fieldRequirements} />
             </StyledDivBottomLine>
           </div>
           <div style={{ width: "100%", maxWidth: "450px" }}>
@@ -540,8 +569,10 @@ export default function MainTabs({ drawerOpen }) {
                 justifyContent: "space-between",
                 width: "100%",
               }}>
-              <Text style={{ fontSize: "14px" }}>Servis Nedeni:</Text>
-              <ServisNedeni />
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.servisNedeni ? "600" : "normal" }}>
+                Servis Nedeni:
+              </Text>
+              <ServisNedeni fieldRequirements={fieldRequirements} />
             </StyledDivBottomLine>
           </div>
           <div
@@ -591,7 +622,9 @@ export default function MainTabs({ drawerOpen }) {
                 width: "100%",
                 maxWidth: "450px",
               }}>
-              <Text style={{ fontSize: "14px" }}>Öncelik:</Text>
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.oncelikTanim ? "600" : "normal" }}>
+                Öncelik:
+              </Text>
               <div
                 style={{
                   display: "flex",
@@ -603,9 +636,11 @@ export default function MainTabs({ drawerOpen }) {
                 <Controller
                   name="oncelikTanim"
                   control={control}
+                  rules={{ required: fieldRequirements.oncelikTanim ? "Alan Boş Bırakılamaz!" : false }}
                   render={({ field }) => (
                     <Input
                       {...field}
+                      status={errors.oncelikTanim ? "error" : ""}
                       type="text" // Set the type to "text" for name input
                       style={{ width: "215px" }}
                       disabled
@@ -630,6 +665,9 @@ export default function MainTabs({ drawerOpen }) {
                   }}
                 />
                 <Button onClick={handleOncelikMinusClick}> - </Button>
+                {errors.oncelikTanim && (
+                  <div style={{ color: "red", marginTop: "5px" }}>{errors.oncelikTanim.message}</div>
+                )}
               </div>
             </StyledDivBottomLine>
           </div>
@@ -642,8 +680,10 @@ export default function MainTabs({ drawerOpen }) {
                 justifyContent: "space-between",
                 width: "100%",
               }}>
-              <Text style={{ fontSize: "14px" }}>Bildirilen Bina:</Text>
-              <BildirilenBina />
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.bildirilenBina ? "600" : "normal" }}>
+                Bildirilen Bina:
+              </Text>
+              <BildirilenBina fieldRequirements={fieldRequirements} />
             </StyledDivBottomLine>
           </div>
           <div style={{ width: "100%", maxWidth: "450px" }}>
@@ -655,8 +695,10 @@ export default function MainTabs({ drawerOpen }) {
                 justifyContent: "space-between",
                 width: "100%",
               }}>
-              <Text style={{ fontSize: "14px" }}>Bildirilen Kat:</Text>
-              <BildirilenKat />
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.bildirilenKat ? "600" : "normal" }}>
+                Bildirilen Kat:
+              </Text>
+              <BildirilenKat fieldRequirements={fieldRequirements} />
             </StyledDivBottomLine>
           </div>
 
@@ -669,7 +711,9 @@ export default function MainTabs({ drawerOpen }) {
                 width: "100%",
                 maxWidth: "450px",
               }}>
-              <Text style={{ fontSize: "14px" }}>İlgili Kişi:</Text>
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.ilgiliKisi ? "600" : "normal" }}>
+                İlgili Kişi:
+              </Text>
               <div
                 style={{
                   display: "flex",
@@ -681,9 +725,11 @@ export default function MainTabs({ drawerOpen }) {
                 <Controller
                   name="ilgiliKisi"
                   control={control}
+                  rules={{ required: fieldRequirements.ilgiliKisi ? "Alan Boş Bırakılamaz!" : false }}
                   render={({ field }) => (
                     <Input
                       {...field}
+                      status={errors.ilgiliKisi ? "error" : ""}
                       type="text" // Set the type to "text" for name input
                       style={{ width: "215px" }}
                       disabled
@@ -708,6 +754,7 @@ export default function MainTabs({ drawerOpen }) {
                   }}
                 />
                 <Button onClick={handleIlgiliKisiMinusClick}> - </Button>
+                {errors.ilgiliKisi && <div style={{ color: "red", marginTop: "5px" }}>{errors.ilgiliKisi.message}</div>}
               </div>
             </StyledDivBottomLine>
           </div>
