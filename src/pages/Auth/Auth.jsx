@@ -4,7 +4,7 @@ import { Button, Form, Input, Space, Typography } from "antd";
 import { UserAddOutlined } from "@ant-design/icons";
 import backgroundImage from "../../assets/images/login.jpg";
 import LoginForm from "./components/LoginForm";
-import logo from "../../assets/images/logo.png";
+import logo from "../../assets/images/logo.svg";
 import RegistrationForm from "./components/RegistrationForm";
 
 const { Text, Link } = Typography;
@@ -42,7 +42,7 @@ export default function Auth() {
 
   const logoStyle = {
     width: "200px", // Genişliği sabit tutun
-    marginBottom: "20px", // Aşağıda 20 piksellik boşluk bırakın
+    marginBottom: "50px", // Aşağıda 20 piksellik boşluk bırakın
   };
 
   const toggleTarget = () => {
