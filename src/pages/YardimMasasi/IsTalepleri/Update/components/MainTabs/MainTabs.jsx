@@ -75,7 +75,7 @@ const StyledDivMedia = styled.div`
   }
 `;
 
-export default function MainTabs({ drawerOpen, disabled }) {
+export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequirements }) {
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const {

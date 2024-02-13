@@ -22,8 +22,13 @@ const StyledDivBottomLine = styled.div`
   }
 `;
 
-export default function PlanlamaVeIsEmri({ disabled }) {
-  const { control, watch, setValue } = useFormContext();
+export default function PlanlamaVeIsEmri({ disabled, fieldRequirements }) {
+  const {
+    control,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   // başka bir modülün güncelleme drawerini açmak için kullanılan state
@@ -98,8 +103,8 @@ export default function PlanlamaVeIsEmri({ disabled }) {
       </style>
       <div style={{ display: "flex", gap: "10px", flexDirection: "column" }}>
         <div style={{ display: "flex", width: "100%", gap: "10px" }}>
-          <div style={{ maxWidth: "475px", width: "100%" }}>
-            <div style={{ width: "100%", maxWidth: "475px", marginBottom: "10px" }}>
+          <div style={{ maxWidth: "485px", width: "100%" }}>
+            <div style={{ width: "100%", maxWidth: "485px", marginBottom: "10px" }}>
               <StyledDivBottomLine
                 style={{
                   display: "flex",
@@ -108,7 +113,9 @@ export default function PlanlamaVeIsEmri({ disabled }) {
                   justifyContent: "space-between",
                   width: "100%",
                 }}>
-                <Text style={{ fontSize: "14px" }}>İş Emri Tipi:</Text>
+                <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.isEmriTipi ? "600" : "normal" }}>
+                  İş Emri Tipi:
+                </Text>
                 <div
                   style={{
                     display: "flex",
@@ -118,7 +125,7 @@ export default function PlanlamaVeIsEmri({ disabled }) {
                     gap: "10px",
                     width: "100%",
                   }}>
-                  <IsEmriTipi disabled={disabled} />
+                  <IsEmriTipi disabled={disabled} fieldRequirements={fieldRequirements} />
                 </div>
               </StyledDivBottomLine>
             </div>
@@ -127,13 +134,16 @@ export default function PlanlamaVeIsEmri({ disabled }) {
                 display: "flex",
                 flexWrap: "wrap",
                 alignItems: "center",
-                maxWidth: "475px",
+                maxWidth: "485px",
                 gap: "10px",
                 width: "100%",
                 justifyContent: "space-between",
                 marginBottom: "10px",
               }}>
-              <Text style={{ fontSize: "14px" }}>Planlanan Başlama Tarihi:</Text>
+              <Text
+                style={{ fontSize: "14px", fontWeight: fieldRequirements.planlananBaslamaTarihi ? "600" : "normal" }}>
+                Planlanan Başlama Tarihi:
+              </Text>
               <div
                 style={{
                   display: "flex",
@@ -147,9 +157,11 @@ export default function PlanlamaVeIsEmri({ disabled }) {
                 <Controller
                   name="planlananBaslamaTarihi"
                   control={control}
+                  rules={{ required: fieldRequirements.planlananBaslamaTarihi ? "Alan Boş Bırakılamaz!" : false }}
                   render={({ field }) => (
                     <DatePicker
                       {...field}
+                      status={errors.planlananBaslamaTarihi ? "error" : ""}
                       disabled={disabled}
                       style={{ width: "180px" }}
                       format={localeDateFormat}
@@ -163,6 +175,7 @@ export default function PlanlamaVeIsEmri({ disabled }) {
                   render={({ field }) => (
                     <TimePicker
                       {...field}
+                      status={errors.planlananBaslamaTarihi ? "error" : ""}
                       disabled={disabled}
                       style={{ width: "110px" }}
                       format={localeTimeFormat}
@@ -170,6 +183,9 @@ export default function PlanlamaVeIsEmri({ disabled }) {
                     />
                   )}
                 />
+                {errors.planlananBaslamaTarihi && (
+                  <div style={{ color: "red", marginTop: "-5px" }}>{errors.planlananBaslamaTarihi.message}</div>
+                )}
               </div>
             </div>
             <div
@@ -177,13 +193,15 @@ export default function PlanlamaVeIsEmri({ disabled }) {
                 display: "flex",
                 flexWrap: "wrap",
                 alignItems: "center",
-                maxWidth: "475px",
+                maxWidth: "485px",
                 gap: "10px",
                 width: "100%",
                 justifyContent: "space-between",
                 marginBottom: "10px",
               }}>
-              <Text style={{ fontSize: "14px" }}>Planlanan Bitiş Tarihi:</Text>
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.planlananBitisTarihi ? "600" : "normal" }}>
+                Planlanan Bitiş Tarihi:
+              </Text>
               <div
                 style={{
                   display: "flex",
@@ -197,9 +215,11 @@ export default function PlanlamaVeIsEmri({ disabled }) {
                 <Controller
                   name="planlananBitisTarihi"
                   control={control}
+                  rules={{ required: fieldRequirements.planlananBitisTarihi ? "Alan Boş Bırakılamaz!" : false }}
                   render={({ field }) => (
                     <DatePicker
                       {...field}
+                      status={errors.planlananBitisTarihi ? "error" : ""}
                       disabled={disabled}
                       style={{ width: "180px" }}
                       format={localeDateFormat}
@@ -213,6 +233,7 @@ export default function PlanlamaVeIsEmri({ disabled }) {
                   render={({ field }) => (
                     <TimePicker
                       {...field}
+                      status={errors.planlananBitisTarihi ? "error" : ""}
                       disabled={disabled}
                       style={{ width: "110px" }}
                       format={localeTimeFormat}
@@ -220,6 +241,9 @@ export default function PlanlamaVeIsEmri({ disabled }) {
                     />
                   )}
                 />
+                {errors.planlananBitisTarihi && (
+                  <div style={{ color: "red", marginTop: "-5px" }}>{errors.planlananBitisTarihi.message}</div>
+                )}
               </div>
             </div>
           </div>

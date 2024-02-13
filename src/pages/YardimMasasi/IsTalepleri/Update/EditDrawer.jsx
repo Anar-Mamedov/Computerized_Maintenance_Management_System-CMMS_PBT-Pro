@@ -14,6 +14,12 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(drawerVisible);
   const [disabled, setDisabled] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
+  // API'den gelen zorunluluk bilgilerini simüle eden bir örnek
+  const [fieldRequirements, setFieldRequirements] = React.useState({
+    // Varsayılan olarak zorunlu değil
+    // Diğer alanlar için de benzer şekilde...
+  });
 
   const methods = useForm({
     defaultValues: {
@@ -79,6 +85,52 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   });
 
   const { setValue, reset } = methods;
+
+  useEffect(() => {
+    const handleDataFetchAndUpdate = async () => {
+      if (open) {
+        try {
+          const response = await AxiosInstance.get(`IsTalepParametre`);
+          const data = response;
+          const item = data[0]; // Veri dizisinin ilk elemanını al
+
+          // Form alanlarını set et
+          setValue("oncelikTanim", item.ISP_ONCELIK_TEXT);
+          setValue("oncelikID", item.ISP_ONCELIK_ID);
+          setValue("talepTipi", item.ISP_VARSAYILAN_IS_TIPI_TEXT);
+          setValue("talepTipiID", item.ISP_VARSAYILAN_IS_TIPI);
+          setIsDisabled(item.ISP_DUZENLEME_TARIH_DEGISIMI);
+          setFieldRequirements({
+            lokasyonTanim: item.ISP_LOKASYON,
+            irtibatTelefonu: item.ISP_IRTIBAT_TEL,
+            email: item.ISP_MAIL,
+            departman: item.ISP_DEPARTMAN,
+            iletisimSekli: item.ISP_ILETISIM_SEKLI,
+            talepTipi: item.ISP_BILDIRIM_TIPI,
+            isKategorisi: item.ISP_IS_KATEGORI,
+            servisNedeni: item.ISP_SERVIS_NEDEN,
+            oncelikTanim: item.ISP_ONCELIK,
+            bildirilenBina: item.ISP_BINA,
+            bildirilenKat: item.ISP_KAT,
+            ilgiliKisi: item.ISP_IS_TAKIPCI,
+            konu: item.ISP_KONU,
+            aciklama: item.ISP_ACIKLAMA,
+            makine: item.ISP_MAKINE_KOD,
+            ekipman: item.ISP_EKIPMAN_KOD,
+            makineDurumu: item.ISP_ZOR_MAKINE_DURUM_KOD_ID,
+            isEmriTipi: item.ISP_ZOR_ISEMRI_TIPI_ID,
+            planlananBaslamaTarihi: item.ISP_PLANLANAN_BASLAMA_TARIH,
+            planlananBitisTarihi: item.ISP_PLANLANAN_BITIS_TARIH,
+            // Diğer alanlar için de benzer şekilde...
+          });
+        } catch (error) {
+          console.error("Veri çekilirken hata oluştu:", error);
+        }
+      }
+    };
+
+    handleDataFetchAndUpdate();
+  }, [open, setValue, methods.reset]);
 
   // aşağıdaki useEffect verileri form elemanlarına set etmeden önce durum güncellemesi yapıyor ondan sonra verileri set ediyor
 
@@ -428,8 +480,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             </Spin>
           ) : (
             <form onSubmit={methods.handleSubmit(onSubmit)}>
-              <MainTabs disabled={disabled} />
-              <SecondTabs disabled={disabled} />
+              <MainTabs disabled={disabled} isDisabled={isDisabled} fieldRequirements={fieldRequirements} />
+              <SecondTabs disabled={disabled} fieldRequirements={fieldRequirements} />
               <Footer />
             </form>
           )}
