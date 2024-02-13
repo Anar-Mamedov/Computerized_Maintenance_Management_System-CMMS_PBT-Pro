@@ -233,7 +233,7 @@ export default function CreateDrawer({ onRefresh }) {
           }>
           <form onSubmit={methods.handleSubmit(onSubmit)}>
             <MainTabs drawerOpen={open} isDisabled={isDisabled} fieldRequirements={fieldRequirements} />
-            <SecondTabs />
+            <SecondTabs fieldRequirements={fieldRequirements} />
             <Footer />
           </form>
         </Drawer>
