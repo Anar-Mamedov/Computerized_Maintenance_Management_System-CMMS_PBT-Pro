@@ -16,8 +16,13 @@ const StyledDivBottomLine = styled.div`
   }
 `;
 
-export default function IsTakibi() {
-  const { control, watch, setValue } = useFormContext();
+export default function IsTakibi({ fieldRequirements }) {
+  const {
+    control,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
 
   return (
     <div style={{ paddingBottom: "25px" }}>
@@ -45,22 +50,23 @@ export default function IsTakibi() {
               justifyContent: "space-between",
               width: "100%",
             }}>
-            <Text style={{ fontSize: "14px" }}>Konu:</Text>
+            <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.konu ? "600" : "normal" }}>Konu:</Text>
             <div
               style={{
                 display: "flex",
                 flexWrap: "wrap",
-                alignItems: "center",
                 maxWidth: "760px",
                 minWidth: "300px",
-                gap: "10px",
                 width: "100%",
+                flexDirection: "column",
               }}>
               <Controller
                 name="konu"
                 control={control}
-                render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+                rules={{ required: fieldRequirements.konu ? "Alan Boş Bırakılamaz!" : false }}
+                render={({ field }) => <Input {...field} status={errors.konu ? "error" : ""} style={{ flex: 1 }} />}
               />
+              {errors.konu && <div style={{ color: "red", marginTop: "5px" }}>{errors.konu.message}</div>}
             </div>
           </StyledDivBottomLine>
         </div>
@@ -73,22 +79,27 @@ export default function IsTakibi() {
               justifyContent: "space-between",
               width: "100%",
             }}>
-            <Text style={{ fontSize: "14px" }}>Açıklama:</Text>
+            <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.aciklama ? "600" : "normal" }}>
+              Açıklama:
+            </Text>
             <div
               style={{
                 display: "flex",
                 flexWrap: "wrap",
-                alignItems: "center",
                 maxWidth: "760px",
                 minWidth: "300px",
-                gap: "10px",
                 width: "100%",
+                flexDirection: "column",
               }}>
               <Controller
                 name="aciklama"
                 control={control}
-                render={({ field }) => <TextArea {...field} rows={4} style={{ flex: 1 }} />}
+                rules={{ required: fieldRequirements.aciklama ? "Alan Boş Bırakılamaz!" : false }}
+                render={({ field }) => (
+                  <TextArea {...field} status={errors.aciklama ? "error" : ""} rows={4} style={{ flex: 1 }} />
+                )}
               />
+              {errors.aciklama && <div style={{ color: "red", marginTop: "5px" }}>{errors.aciklama.message}</div>}
             </div>
           </div>
         </div>
