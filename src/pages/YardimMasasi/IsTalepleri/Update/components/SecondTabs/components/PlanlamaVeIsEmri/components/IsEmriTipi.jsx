@@ -5,8 +5,13 @@ import AxiosInstance from "../../../../../../../../../api/http";
 
 const { Text, Link } = Typography;
 
-export default function IsEmriTipi({ disabled }) {
-  const { control, setValue } = useFormContext();
+export default function IsEmriTipi({ disabled, fieldRequirements }) {
+  const {
+    control,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -34,13 +39,15 @@ export default function IsEmriTipi({ disabled }) {
         maxWidth: "300px",
         width: "100%",
       }}>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", width: "100%" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", width: "100%" }}>
         <Controller
           name="isEmriTipi"
           control={control}
+          rules={{ required: fieldRequirements.isEmriTipi ? "Alan Boş Bırakılamaz!" : false }}
           render={({ field }) => (
             <Select
               {...field}
+              status={errors.isEmriTipi ? "error" : ""}
               disabled={disabled}
               style={{ width: "100%" }}
               showSearch
@@ -82,6 +89,7 @@ export default function IsEmriTipi({ disabled }) {
             />
           )}
         />
+        {errors.isEmriTipi && <div style={{ color: "red", marginTop: "5px" }}>{errors.isEmriTipi.message}</div>}
       </div>
     </div>
   );

@@ -81,7 +81,7 @@ export default function SecondTabs({ refreshKey }) {
 
   return (
     <div>
-      <StyledTabs defaultActiveKey="1" items={items} onChange={onChange} />
+      <StyledTabs tabPosition="right" defaultActiveKey="1" items={items} onChange={onChange} />
     </div>
   );
 }
