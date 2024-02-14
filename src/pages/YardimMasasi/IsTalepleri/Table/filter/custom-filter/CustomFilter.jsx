@@ -1,5 +1,5 @@
 import { CloseOutlined, FilterOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Col, Drawer, Row, Typography, Select, Space, Input } from "antd";
+import { Button, Col, Drawer, Row, Typography, Select, Space, Input, DatePicker } from "antd";
 import React, { useState } from "react";
 import styled from "styled-components";
 import "./style.css";
@@ -33,8 +33,14 @@ export default function CustomFilter({ onSubmit }) {
   const [filters, setFilters] = useState({});
   const [filterValues, setFilterValues] = useState({});
 
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
   // Create a state variable to store selected values for each row
   const [selectedValues, setSelectedValues] = useState({});
+
+  // Tarih seçimi yapıldığında veya filtreler eklenip kaldırıldığında düğmenin stilini değiştirmek için bir durum
+  const isFilterApplied = newObjectsAdded || filtersExist || startDate || endDate;
 
   const handleSelectChange = (value, rowId) => {
     setSelectedValues((prevSelectedValues) => ({
@@ -52,33 +58,27 @@ export default function CustomFilter({ onSubmit }) {
   };
 
   const handleSubmit = () => {
-    // Combine selected values and input values for each row
-    const rowData = rows.map((row) => ({
-      selectedValue: selectedValues[row.id] || "",
-      inputValue: inputValues[`input-${row.id}`] || "",
-    }));
+    // Combine selected values, input values for each row, and date range
+    const filterData = rows.reduce((acc, row) => {
+      const selectedValue = selectedValues[row.id] || "";
+      const inputValue = inputValues[`input-${row.id}`] || "";
+      if (selectedValue && inputValue) {
+        acc[selectedValue] = inputValue;
+      }
+      return acc;
+    }, {});
 
-    // Filter out rows where both selectedValue and inputValue are empty
-    const filteredData = rowData.filter(({ selectedValue, inputValue }) => {
-      return selectedValue !== "" || inputValue !== "";
-    });
-
-    if (filteredData.length > 0) {
-      // Convert the filteredData array to the desired JSON format
-      const json = filteredData.reduce((acc, { selectedValue, inputValue }) => {
-        return {
-          ...acc,
-          [selectedValue]: inputValue,
-        };
-      }, {});
-
-      console.log(json);
-      // You can now submit or process the json object as needed.
-      onSubmit(json);
-    } else {
-      // Handle the case where there are no non-empty filters (optional)
-      console.log("No filters to submit.");
+    // Add date range to the filterData object if dates are selected
+    if (startDate) {
+      filterData.startDate = startDate.format("YYYY-MM-DD");
     }
+    if (endDate) {
+      filterData.endDate = endDate.format("YYYY-MM-DD");
+    }
+
+    console.log(filterData);
+    // You can now submit or process the filterData object as needed.
+    onSubmit(filterData);
   };
 
   const handleCancelClick = (rowId) => {
@@ -127,12 +127,12 @@ export default function CustomFilter({ onSubmit }) {
         style={{
           display: "flex",
           alignItems: "center",
-          backgroundColor: newObjectsAdded || filtersExist ? "#EBF6FE" : "#ffffffff",
+          backgroundColor: isFilterApplied ? "#EBF6FE" : "#ffffffff",
         }}
-        className={newObjectsAdded ? "#ff0000-dot-button" : ""}>
+        className={isFilterApplied ? "#ff0000-dot-button" : ""}>
         <FilterOutlined />
         <span style={{ marginRight: "5px" }}>Filtreler</span>
-        {newObjectsAdded && <span className="blue-dot"></span>}
+        {isFilterApplied && <span className="blue-dot"></span>}
       </Button>
       <Drawer
         extra={
@@ -150,6 +150,22 @@ export default function CustomFilter({ onSubmit }) {
         placement="right"
         onClose={onClose}
         open={open}>
+        <div style={{ marginBottom: "20px", border: "1px solid #80808048", padding: "15px 10px", borderRadius: "8px" }}>
+          <div style={{ marginBottom: "10px" }}>
+            <Text style={{ fontSize: "14px" }}>Tarih Aralığı</Text>
+          </div>
+
+          <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
+            <DatePicker
+              style={{ width: "100%" }}
+              placeholder="Başlangıç Tarihi"
+              value={startDate}
+              onChange={setStartDate}
+            />
+            <Text style={{ fontSize: "14px" }}>-</Text>
+            <DatePicker style={{ width: "100%" }} placeholder="Bitiş Tarihi" value={endDate} onChange={setEndDate} />
+          </div>
+        </div>
         {rows.map((row) => (
           <Row
             key={row.id}
