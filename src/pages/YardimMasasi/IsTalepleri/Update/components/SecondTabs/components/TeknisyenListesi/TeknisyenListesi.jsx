@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table } from "antd";
+import { CloseOutlined, CheckOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../api/http";
 import { useFormContext } from "react-hook-form";
 
@@ -46,6 +47,23 @@ export default function TeknisyenListesi({ workshopSelectedId, onSubmit }) {
       key: "fifthcolumn",
       width: "150px",
       ellipsis: true,
+      render: (value) => {
+        if (value) {
+          // Değer true ise yeşil tik ikonu göster
+          return (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <CheckOutlined style={{ color: "green" }} />
+            </div>
+          );
+        } else {
+          // Değer false ise kırmızı çarpı ikonu göster
+          return (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <CloseOutlined style={{ color: "red" }} />
+            </div>
+          );
+        }
+      },
     },
     {
       title: "Mesai Süresi",
@@ -63,8 +81,8 @@ export default function TeknisyenListesi({ workshopSelectedId, onSubmit }) {
     },
     {
       title: "Maliyet",
-      dataIndex: "sixthcolumn",
-      key: "sixthcolumn",
+      dataIndex: "ITK_MALIYET",
+      key: "ITK_MALIYET",
       width: "150px",
       ellipsis: true,
     },
@@ -74,16 +92,18 @@ export default function TeknisyenListesi({ workshopSelectedId, onSubmit }) {
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`Personel?lokasyonId=${secilenTalepID}`)
+    AxiosInstance.get(`GetIsTalepTeknisyenList?isTalepId=${secilenTalepID}`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
-          key: item.TB_PERSONEL_ID,
-          code: item.PRS_PERSONEL_KOD,
-          subject: item.PRS_ISIM,
-          workdays: item.PRS_UNVAN,
-          description: item.PRS_TIP,
-          fifthcolumn: item.PRS_DEPARTMAN,
-          sixthcolumn: item.PRS_LOKASYON,
+          ...item,
+          key: item.TB_IS_TALEBI_TEKNISYEN_ID,
+          code: item.ITK_PERSONEL_ISIM,
+          subject: item.ITK_VARDIYA_TANIM,
+          workdays: item.ITK_SURE,
+          description: item.ITK_SAAT_UCRETI,
+          fifthcolumn: item.ITK_FAZLA_MESAI_VAR,
+          sixthcolumn: item.ITK_FAZLA_MESAI_SURE,
+          ITK_MALIYET: item.ITK_MALIYET,
         }));
         setData(fetchedData);
       })
