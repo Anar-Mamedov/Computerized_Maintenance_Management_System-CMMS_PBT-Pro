@@ -5,6 +5,7 @@ import Sil from "./components/Sil";
 import Iptal from "./components/Iptal/Iptal";
 import Kapat from "./components/Kapat/Kapat";
 import Parametreler from "./components/Parametreler/Parametreler";
+import TarihceTablo from "./components/TarihceTablo";
 
 export default function ContextMenu({ selectedRows, refreshTableData }) {
   const [visible, setVisible] = useState(false);
@@ -36,6 +37,7 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
       <Iptal selectedRows={selectedRows} refreshTableData={refreshTableData} iptalDisabled={iptalDisabled} />
       <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />
       <Parametreler />
+      {selectedRows.length === 1 && <TarihceTablo selectedRows={selectedRows} />}
     </div>
   );
   return (
