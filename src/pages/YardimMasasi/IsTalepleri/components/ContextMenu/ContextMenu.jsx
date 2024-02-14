@@ -3,6 +3,7 @@ import { Button, Popover } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
 import Sil from "./components/Sil";
 import Iptal from "./components/Iptal/Iptal";
+import Kapat from "./components/Kapat/Kapat";
 import Parametreler from "./components/Parametreler/Parametreler";
 
 export default function ContextMenu({ selectedRows, refreshTableData }) {
@@ -20,6 +21,9 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
   const iptalDisabled = selectedRows.some(
     (row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 2 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5
   );
+  const kapatDisabled = selectedRows.some(
+    (row) => row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5 || row.IST_DURUM_ID === 3
+  );
 
   const content = (
     <div>
@@ -30,6 +34,7 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
         hidePopover={hidePopover}
       />
       <Iptal selectedRows={selectedRows} refreshTableData={refreshTableData} iptalDisabled={iptalDisabled} />
+      <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />
       <Parametreler />
     </div>
   );
