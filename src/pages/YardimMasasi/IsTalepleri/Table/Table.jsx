@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { Table, Button, Modal, Checkbox, Input, Spin } from "antd";
 import { useFormContext } from "react-hook-form";
-import { Input, Table, Spin } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined, MenuOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
@@ -11,6 +11,7 @@ import TeknisyenSubmit from "../components/IsEmrineCevir/Teknisyen/TeknisyenSubm
 import AtolyeSubmit from "../components/IsEmrineCevir/Atolye/AtolyeSubmit";
 
 export default function MainTable() {
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
   const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -21,6 +22,359 @@ export default function MainTable() {
   const [totalPages, setTotalPages] = useState(0); // Toplam sayfa sayısı için state
 
   const [selectedRows, setSelectedRows] = useState([]);
+
+  // Örnek kolonlar ve başlangıçta hepsinin görünür olacağı varsayılıyor
+  const columns = [
+    {
+      title: "Iş Talep Kodu",
+      dataIndex: "IST_KOD",
+      key: "IST_KOD",
+      width: "150px",
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+    },
+    {
+      title: "Konu",
+      dataIndex: "IST_TANIMI",
+      key: "IST_TANIMI",
+      width: "150px",
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+    },
+    {
+      title: "Makine Tanım",
+      dataIndex: "IST_MAKINE_TANIM",
+      key: "IST_MAKINE_TANIM",
+      width: "150px",
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+    },
+    {
+      title: "Tarih",
+      dataIndex: "IST_ACILIS_TARIHI",
+      key: "IST_ACILIS_TARIHI",
+      width: "150px",
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Saat",
+      dataIndex: "IST_ACILIS_SAATI",
+      key: "IST_ACILIS_SAATI",
+      width: "150px",
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+      render: (text) => formatTime(text),
+    },
+    {
+      title: "Durum",
+      dataIndex: "IST_DURUM_ID",
+      key: "IST_DURUM_ID",
+      width: "150px",
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+      render: (text, record) => {
+        switch (record.IST_DURUM_ID) {
+          case 0:
+            return (
+              <div
+                style={{
+                  color: "white",
+                  backgroundColor: "blue",
+                  textAlign: "center",
+                  borderRadius: "10px",
+                  padding: "6px",
+                }}>
+                Açık
+              </div>
+            );
+          case 1:
+            return (
+              <div
+                style={{
+                  color: "white",
+                  backgroundColor: "#ff5e00",
+                  textAlign: "center",
+                  borderRadius: "10px",
+                  padding: "6px",
+                }}>
+                Bekliyor
+              </div>
+            );
+          case 2:
+            return (
+              <div
+                style={{
+                  color: "white",
+                  backgroundColor: "#ffe600",
+                  textAlign: "center",
+                  borderRadius: "10px",
+                  padding: "6px",
+                }}>
+                Planlandı
+              </div>
+            );
+          case 3:
+            return (
+              <div
+                style={{
+                  color: "white",
+                  backgroundColor: "#00d300",
+                  textAlign: "center",
+                  borderRadius: "10px",
+                  padding: "6px",
+                }}>
+                Devam Ediyor
+              </div>
+            );
+          case 4:
+            return (
+              <div
+                style={{
+                  color: "white",
+                  backgroundColor: "#575757",
+                  textAlign: "center",
+                  borderRadius: "10px",
+                  padding: "6px",
+                }}>
+                Kapandı
+              </div>
+            );
+          case 5:
+            return (
+              <div
+                style={{
+                  color: "white",
+                  backgroundColor: "#d10000",
+                  textAlign: "center",
+                  borderRadius: "10px",
+                  padding: "6px",
+                }}>
+                İptal Edildi
+              </div>
+            );
+          default:
+            return ""; // Eğer farklı bir değer gelirse
+        }
+      },
+    },
+    {
+      title: "Talep Eden",
+      dataIndex: "IST_TALEP_EDEN_ADI",
+      key: "IST_TALEP_EDEN_ADI",
+      width: "150px",
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+    },
+    {
+      title: "İş Kategorisi",
+      dataIndex: "IST_KATEGORI_TANIMI",
+      key: "IST_KATEGORI_TANIMI",
+      width: "150px",
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+    },
+    {
+      title: "Öncelik",
+      dataIndex: "IST_ONCELIK",
+      key: "IST_ONCELIK",
+      width: "150px",
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+    },
+    {
+      title: "Lokasyon",
+      dataIndex: "IST_BILDIREN_LOKASYON",
+      key: "IST_BILDIREN_LOKASYON",
+      width: "150px",
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+    },
+
+    {
+      title: "İşlem Süresi",
+      dataIndex: "ISLEM_SURE",
+      key: "ISLEM_SURE",
+      width: "150px",
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+    },
+    {
+      title: "Müdahele Gecikme Süresi",
+      dataIndex: "mudaheleGecikmeSuresi",
+      key: "mudaheleGecikmeSuresi",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Durum Açıklaması",
+      dataIndex: "durumAciklamasi",
+      key: "durumAciklamasi",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Planlanan Başlama Tarihi",
+      dataIndex: "IST_PLANLANAN_BASLAMA_TARIHI",
+      key: "IST_PLANLANAN_BASLAMA_TARIHI",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Planlanan Başlama Saati",
+      dataIndex: "IST_PLANLANAN_BASLAMA_SAATI",
+      key: "IST_PLANLANAN_BASLAMA_SAATI",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+      render: (text) => formatTime(text),
+    },
+    {
+      title: "Planlanan Bitiş Tarihi",
+      dataIndex: "IST_PLANLANAN_BITIS_TARIHI",
+      key: "IST_PLANLANAN_BITIS_TARIHI",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Planlanan Bitiş Saati",
+      dataIndex: "IST_PLANLANAN_BITIS_SAATI",
+      key: "IST_PLANLANAN_BITIS_SAATI",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+      render: (text) => formatTime(text),
+    },
+    {
+      title: "iş Emri No",
+      dataIndex: "IST_ISEMRI_NO",
+      key: "IST_ISEMRI_NO",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Teknisyen",
+      dataIndex: "IST_TEKNISYEN_TANIM",
+      key: "IST_TEKNISYEN_TANIM",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Ayölye",
+      dataIndex: "IST_ATOLYE_GRUBU_TANIMI",
+      key: "IST_ATOLYE_GRUBU_TANIMI",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Makine Kodu",
+      dataIndex: "IST_MAKINE_KOD",
+      key: "IST_MAKINE_KOD",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Makine Plaka",
+      dataIndex: "IST_MAKINE_PLAKA",
+      key: "IST_MAKINE_PLAKA",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Bildirim Tipi",
+      dataIndex: "IST_TIP_TANIM",
+      key: "IST_TIP_TANIM",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "İlgili Kişi",
+      dataIndex: "IST_TAKIP_EDEN_ADI",
+      key: "IST_TAKIP_EDEN_ADI",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Bildirilen Bina",
+      dataIndex: "IST_BINA",
+      key: "IST_BINA",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Bildirilen Kat",
+      dataIndex: "IST_KAT",
+      key: "IST_KAT",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Servis Nedeni",
+      dataIndex: "IST_SERVIS_NEDENI",
+      key: "IST_SERVIS_NEDENI",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Tam Lokasyon Adresi",
+      dataIndex: "IST_BILDIREN_LOKASYON_TUM",
+      key: "IST_BILDIREN_LOKASYON_TUM",
+      width: "250px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Talep Değerlendirme Puan",
+      dataIndex: "IST_DEGERLENDIRME_PUAN",
+      key: "IST_DEGERLENDIRME_PUAN",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Talep Değerlendirme Açıklama",
+      dataIndex: "IST_DEGERLENDIRME_ACIKLAMA",
+      key: "IST_DEGERLENDIRME_ACIKLAMA",
+      width: "250px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    // Diğer kolonlarınız...
+  ];
+
+  // Kullanıcının seçtiği kolonların key'lerini tutan state kolonlari göster/gizle butonu için
+
+  const [visibleColumnKeys, setVisibleColumnKeys] = useState(() => {
+    // 'visibleColumns' isimli anahtarla kaydedilmiş değeri oku
+    const savedVisibleColumns = JSON.parse(localStorage.getItem("visibleColumnsIsTalep"));
+
+    // Eğer localStorage'da bir değer varsa, bu değeri kullan
+    if (savedVisibleColumns) {
+      return savedVisibleColumns;
+    }
+
+    // Yoksa, varsayılan olarak görünür olacak kolonların key'lerini döndür
+    return columns.filter((col) => col.visible).map((col) => col.key);
+  });
+
+  // Kullanıcının seçtiği kolonların key'lerini tutan state kolonlari göster/gizle butonu için son
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 
@@ -338,309 +692,22 @@ export default function MainTable() {
     // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
   }, [body, currentPage]); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
 
-  const columns = [
-    {
-      title: "Iş Talep Kodu",
-      dataIndex: "IST_KOD",
-      key: "IST_KOD",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Konu",
-      dataIndex: "IST_TANIMI",
-      key: "IST_TANIMI",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Makine Tanım",
-      dataIndex: "IST_MAKINE_TANIM",
-      key: "IST_MAKINE_TANIM",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Tarih",
-      dataIndex: "IST_ACILIS_TARIHI",
-      key: "IST_ACILIS_TARIHI",
-      width: "150px",
-      ellipsis: true,
-      render: (text) => formatDate(text),
-    },
-    {
-      title: "Saat",
-      dataIndex: "IST_ACILIS_SAATI",
-      key: "IST_ACILIS_SAATI",
-      width: "150px",
-      ellipsis: true,
-      render: (text) => formatTime(text),
-    },
-    {
-      title: "Durum",
-      dataIndex: "IST_DURUM_ID",
-      key: "IST_DURUM_ID",
-      width: "150px",
-      ellipsis: true,
-      render: (text, record) => {
-        switch (record.IST_DURUM_ID) {
-          case 0:
-            return (
-              <div
-                style={{
-                  color: "white",
-                  backgroundColor: "blue",
-                  textAlign: "center",
-                  borderRadius: "10px",
-                  padding: "6px",
-                }}>
-                Açık
-              </div>
-            );
-          case 1:
-            return (
-              <div
-                style={{
-                  color: "white",
-                  backgroundColor: "#ff5e00",
-                  textAlign: "center",
-                  borderRadius: "10px",
-                  padding: "6px",
-                }}>
-                Bekliyor
-              </div>
-            );
-          case 2:
-            return (
-              <div
-                style={{
-                  color: "white",
-                  backgroundColor: "#ffe600",
-                  textAlign: "center",
-                  borderRadius: "10px",
-                  padding: "6px",
-                }}>
-                Planlandı
-              </div>
-            );
-          case 3:
-            return (
-              <div
-                style={{
-                  color: "white",
-                  backgroundColor: "#00d300",
-                  textAlign: "center",
-                  borderRadius: "10px",
-                  padding: "6px",
-                }}>
-                Devam Ediyor
-              </div>
-            );
-          case 4:
-            return (
-              <div
-                style={{
-                  color: "white",
-                  backgroundColor: "#575757",
-                  textAlign: "center",
-                  borderRadius: "10px",
-                  padding: "6px",
-                }}>
-                Kapandı
-              </div>
-            );
-          case 5:
-            return (
-              <div
-                style={{
-                  color: "white",
-                  backgroundColor: "#d10000",
-                  textAlign: "center",
-                  borderRadius: "10px",
-                  padding: "6px",
-                }}>
-                İptal Edildi
-              </div>
-            );
-          default:
-            return ""; // Eğer farklı bir değer gelirse
-        }
-      },
-    },
-    {
-      title: "Talep Eden",
-      dataIndex: "IST_TALEP_EDEN_ADI",
-      key: "IST_TALEP_EDEN_ADI",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "İş Kategorisi",
-      dataIndex: "IST_KATEGORI_TANIMI",
-      key: "IST_KATEGORI_TANIMI",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Öncelik",
-      dataIndex: "IST_ONCELIK",
-      key: "IST_ONCELIK",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Lokasyon",
-      dataIndex: "IST_BILDIREN_LOKASYON",
-      key: "IST_BILDIREN_LOKASYON",
-      width: "150px",
-      ellipsis: true,
-    },
+  // Kolon görünürlüğünü güncelleme fonksiyonu
+  const handleVisibilityChange = (checkedValues) => {
+    setVisibleColumnKeys(checkedValues);
+    // Yeni görünürlük durumunu localStorage'a kaydet
+    localStorage.setItem("visibleColumnsIsTalep", JSON.stringify(checkedValues));
+  };
 
-    {
-      title: "İşlem Süresi",
-      dataIndex: "ISLEM_SURE",
-      key: "ISLEM_SURE",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Müdahele Gecikme Süresi",
-      dataIndex: "",
-      key: "",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Durum Açıklaması",
-      dataIndex: "",
-      key: "",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Planlanan Başlama Tarihi",
-      dataIndex: "IST_PLANLANAN_BASLAMA_TARIHI",
-      key: "IST_PLANLANAN_BASLAMA_TARIHI",
-      width: "150px",
-      ellipsis: true,
-      render: (text) => formatDate(text),
-    },
-    {
-      title: "Planlanan Başlama Saati",
-      dataIndex: "IST_PLANLANAN_BASLAMA_SAATI",
-      key: "IST_PLANLANAN_BASLAMA_SAATI",
-      width: "150px",
-      ellipsis: true,
-      render: (text) => formatTime(text),
-    },
-    {
-      title: "Planlanan Bitiş Tarihi",
-      dataIndex: "IST_PLANLANAN_BITIS_TARIHI",
-      key: "IST_PLANLANAN_BITIS_TARIHI",
-      width: "150px",
-      ellipsis: true,
-      render: (text) => formatDate(text),
-    },
-    {
-      title: "Planlanan Bitiş Saati",
-      dataIndex: "IST_PLANLANAN_BITIS_SAATI",
-      key: "IST_PLANLANAN_BITIS_SAATI",
-      width: "150px",
-      ellipsis: true,
-      render: (text) => formatTime(text),
-    },
-    {
-      title: "iş Emri No",
-      dataIndex: "IST_ISEMRI_NO",
-      key: "IST_ISEMRI_NO",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Teknisyen",
-      dataIndex: "IST_TEKNISYEN_TANIM",
-      key: "IST_TEKNISYEN_TANIM",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Ayölye",
-      dataIndex: "IST_ATOLYE_GRUBU_TANIMI",
-      key: "IST_ATOLYE_GRUBU_TANIMI",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Makine Kodu",
-      dataIndex: "IST_MAKINE_KOD",
-      key: "IST_MAKINE_KOD",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Makine Plaka",
-      dataIndex: "IST_MAKINE_PLAKA",
-      key: "IST_MAKINE_PLAKA",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Bildirim Tipi",
-      dataIndex: "IST_TIP_TANIM",
-      key: "IST_TIP_TANIM",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "İlgili Kişi",
-      dataIndex: "IST_TAKIP_EDEN_ADI",
-      key: "IST_TAKIP_EDEN_ADI",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Bildirilen Bina",
-      dataIndex: "IST_BINA",
-      key: "IST_BINA",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Bildirilen Kat",
-      dataIndex: "IST_KAT",
-      key: "IST_KAT",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Servis Nedeni",
-      dataIndex: "IST_SERVIS_NEDENI",
-      key: "IST_SERVIS_NEDENI",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Tam Lokasyon Adresi",
-      dataIndex: "IST_BILDIREN_LOKASYON_TUM",
-      key: "IST_BILDIREN_LOKASYON_TUM",
-      width: "250px",
-      ellipsis: true,
-    },
-    {
-      title: "Talep Değerlendirme Puan",
-      dataIndex: "IST_DEGERLENDIRME_PUAN",
-      key: "IST_DEGERLENDIRME_PUAN",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Talep Değerlendirme Açıklama",
-      dataIndex: "IST_DEGERLENDIRME_ACIKLAMA",
-      key: "IST_DEGERLENDIRME_ACIKLAMA",
-      width: "250px",
-      ellipsis: true,
-    },
-  ];
+  // Modalı göster/gizle
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
+  };
+
+  // Görünür kolonları filtrele
+  const visibleColumns = columns.filter((col) => visibleColumnKeys.includes(col.key));
+
+  // Kolon görünürlüğünü güncelleme fonksiyonu son
 
   return (
     <div>
@@ -651,6 +718,19 @@ export default function MainTable() {
           }
         `}
       </style>
+
+      <Modal width={750} title="Kolonları Düzenle" open={isModalVisible} onOk={toggleModal} onCancel={toggleModal}>
+        <Checkbox.Group
+          style={{ width: "100%", display: "flex", gap: "10px", flexDirection: "column", height: "400px" }}
+          value={visibleColumnKeys}
+          onChange={handleVisibilityChange}>
+          {columns.map((col) => (
+            <Checkbox key={col.key} value={col.key}>
+              {col.title}
+            </Checkbox>
+          ))}
+        </Checkbox.Group>
+      </Modal>
       <div
         style={{
           display: "flex",
@@ -661,6 +741,18 @@ export default function MainTable() {
           padding: "0 5px",
         }}>
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <Button
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0px 8px",
+              // width: "32px",
+              height: "32px",
+            }}
+            onClick={toggleModal}>
+            <MenuOutlined />
+          </Button>
           <Input
             style={{ width: "250px" }}
             type="text"
@@ -680,8 +772,8 @@ export default function MainTable() {
       </div>
       <Spin spinning={loading}>
         <Table
+          columns={visibleColumns}
           rowSelection={rowSelection}
-          columns={columns}
           dataSource={data}
           pagination={{
             current: currentPage,
@@ -696,6 +788,7 @@ export default function MainTable() {
           rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
         />
       </Spin>
+
       <EditDrawer
         selectedRow={drawer.data}
         onDrawerClose={() => setDrawer({ ...drawer, visible: false })}
