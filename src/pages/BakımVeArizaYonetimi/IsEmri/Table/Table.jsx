@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Table, Button, Modal, Checkbox, Input, Spin } from "antd";
 import { useFormContext } from "react-hook-form";
-import { SearchOutlined, MenuOutlined } from "@ant-design/icons";
+import { SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
@@ -120,160 +120,185 @@ export default function MainTable() {
       render: (text) => formatTime(text),
     },
     {
-      title: "Müdahele Gecikme Süresi",
-      dataIndex: "mudaheleGecikmeSuresi",
-      key: "mudaheleGecikmeSuresi",
-      width: "150px",
-      ellipsis: true,
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "Durum Açıklaması",
-      dataIndex: "durumAciklamasi",
-      key: "durumAciklamasi",
-      width: "150px",
-      ellipsis: true,
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "Planlanan Başlama Tarihi",
-      dataIndex: "IST_PLANLANAN_BASLAMA_TARIHI",
-      key: "IST_PLANLANAN_BASLAMA_TARIHI",
-      width: "150px",
-      ellipsis: true,
-      visible: false, // Varsayılan olarak kapalı
-      // render: (text) => formatDate(text),
-    },
-    {
-      title: "Planlanan Başlama Saati",
-      dataIndex: "IST_PLANLANAN_BASLAMA_SAATI",
-      key: "IST_PLANLANAN_BASLAMA_SAATI",
-      width: "150px",
-      ellipsis: true,
-      visible: false, // Varsayılan olarak kapalı
-      // render: (text) => formatTime(text),
-    },
-    {
       title: "Planlanan Bitiş Tarihi",
-      dataIndex: "IST_PLANLANAN_BITIS_TARIHI",
-      key: "IST_PLANLANAN_BITIS_TARIHI",
+      dataIndex: "PLAN_BITIS_TARIH",
+      key: "PLAN_BITIS_TARIH",
       width: "150px",
       ellipsis: true,
       visible: false, // Varsayılan olarak kapalı
-      // render: (text) => formatDate(text),
+      render: (text) => formatDate(text),
     },
     {
       title: "Planlanan Bitiş Saati",
-      dataIndex: "IST_PLANLANAN_BITIS_SAATI",
-      key: "IST_PLANLANAN_BITIS_SAATI",
+      dataIndex: "PLAN_BITIS_SAAT",
+      key: "PLAN_BITIS_SAAT",
       width: "150px",
       ellipsis: true,
       visible: false, // Varsayılan olarak kapalı
-      // render: (text) => formatTime(text),
+      render: (text) => formatTime(text),
     },
     {
-      title: "iş Emri No",
-      dataIndex: "IST_ISEMRI_NO",
-      key: "IST_ISEMRI_NO",
+      title: "Başlama Tarihi",
+      dataIndex: "BASLAMA_TARIH",
+      key: "BASLAMA_TARIH",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Başlama Saati",
+      dataIndex: "BASLAMA_SAAT",
+      key: "BASLAMA_SAAT",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+      render: (text) => formatTime(text),
+    },
+    {
+      title: "Bitiş Tarihi",
+      dataIndex: "ISM_BITIS_TARIH",
+      key: "ISM_BITIS_TARIH",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Bitiş Saati",
+      dataIndex: "ISM_BITIS_SAAT",
+      key: "ISM_BITIS_SAAT",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+      render: (text) => formatTime(text),
+    },
+    {
+      title: "İş Süresi (dk.)",
+      dataIndex: "IS_SURESI",
+      key: "IS_SURESI",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+      render: (text) => (text > 0 ? text : null),
+    },
+    {
+      title: "Tamamlama (%)",
+      dataIndex: "TAMAMLANMA",
+      key: "TAMAMLANMA",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+      render: (text) => `${text}%`,
+    },
+    {
+      title: "Garanti",
+      dataIndex: "GARANTI",
+      key: "GARANTI",
+      width: "100px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+      render: (text, record) => {
+        return record.GARANTI ? (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <CheckOutlined style={{ color: "green" }} />
+          </div>
+        ) : (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <CloseOutlined style={{ color: "red" }} />
+          </div>
+        );
+      },
+    },
+    {
+      title: "Makine Durumu",
+      dataIndex: "MAKINE_DURUM",
+      key: "MAKINE_DURUM",
       width: "150px",
       ellipsis: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Teknisyen",
-      dataIndex: "IST_TEKNISYEN_TANIM",
-      key: "IST_TEKNISYEN_TANIM",
+      title: "Plaka",
+      dataIndex: "MAKINE_PLAKA",
+      key: "MAKINE_PLAKA",
       width: "150px",
       ellipsis: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Ayölye",
-      dataIndex: "IST_ATOLYE_GRUBU_TANIMI",
-      key: "IST_ATOLYE_GRUBU_TANIMI",
-      width: "150px",
-      ellipsis: true,
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "Makine Kodu",
-      dataIndex: "IST_MAKINE_KOD",
-      key: "IST_MAKINE_KOD",
-      width: "150px",
-      ellipsis: true,
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "Makine Plaka",
-      dataIndex: "IST_MAKINE_PLAKA",
-      key: "IST_MAKINE_PLAKA",
-      width: "150px",
-      ellipsis: true,
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "Bildirim Tipi",
-      dataIndex: "IST_TIP_TANIM",
-      key: "IST_TIP_TANIM",
-      width: "150px",
-      ellipsis: true,
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "İlgili Kişi",
-      dataIndex: "IST_TAKIP_EDEN_ADI",
-      key: "IST_TAKIP_EDEN_ADI",
-      width: "150px",
-      ellipsis: true,
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "Bildirilen Bina",
-      dataIndex: "IST_BINA",
-      key: "IST_BINA",
-      width: "150px",
-      ellipsis: true,
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "Bildirilen Kat",
-      dataIndex: "IST_KAT",
-      key: "IST_KAT",
-      width: "150px",
-      ellipsis: true,
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "Servis Nedeni",
-      dataIndex: "IST_SERVIS_NEDENI",
-      key: "IST_SERVIS_NEDENI",
-      width: "150px",
-      ellipsis: true,
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "Tam Lokasyon Adresi",
-      dataIndex: "IST_BILDIREN_LOKASYON_TUM",
-      key: "IST_BILDIREN_LOKASYON_TUM",
+      title: "Makine Tipi",
+      dataIndex: "MAKINE_TIP",
+      key: "MAKINE_TIP",
       width: "250px",
       ellipsis: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Talep Değerlendirme Puan",
-      dataIndex: "IST_DEGERLENDIRME_PUAN",
-      key: "IST_DEGERLENDIRME_PUAN",
+      title: "Ekipman",
+      dataIndex: "EKIPMAN",
+      key: "EKIPMAN",
       width: "150px",
       ellipsis: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Talep Değerlendirme Açıklama",
-      dataIndex: "IST_DEGERLENDIRME_ACIKLAMA",
-      key: "IST_DEGERLENDIRME_ACIKLAMA",
+      title: "İş Tipi",
+      dataIndex: "IS_TIPI",
+      key: "IS_TIPI",
       width: "250px",
       ellipsis: true,
       visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "İş Nedeni",
+      dataIndex: "IS_NEDENI",
+      key: "IS_NEDENI",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Atölye",
+      dataIndex: "ATOLYE",
+      key: "ATOLYE",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Talimat",
+      dataIndex: "TALIMAT",
+      key: "TALIMAT",
+      width: "250px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Öncelik",
+      dataIndex: "ONCELIK",
+      key: "ONCELIK",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Kapanış Tarihi",
+      dataIndex: "KAPANIS_TARIHI",
+      key: "KAPANIS_TARIHI",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Kapanış Saati",
+      dataIndex: "KAPANIS_SAATI",
+      key: "KAPANIS_SAATI",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+      render: (text) => formatTime(text),
     },
     // Diğer kolonlarınız...
   ];
