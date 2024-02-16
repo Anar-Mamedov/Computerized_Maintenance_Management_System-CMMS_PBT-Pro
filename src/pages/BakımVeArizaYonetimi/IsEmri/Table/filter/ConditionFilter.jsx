@@ -1,56 +1,51 @@
-import React, { useState } from "react";
-import { Popover, Button, Select } from "antd";
+import React, { useState, useEffect } from "react";
+import { Select, Button, Popover } from "antd";
+import AxiosInstance from "../../../../../api/http";
 
 const { Option } = Select;
 
 const ConditionFilter = ({ onSubmit }) => {
-  const [visible, setVisible] = useState(false);
-  const [options, setOptions] = React.useState([]);
-  const [filters, setFilters] = useState({});
+  const [open, setOpen] = useState(false);
+  const [options, setOptions] = useState([]);
+  // selectedValues artık seçilen TB_KOD_ID değerlerini saklayacak
+  const [selectedValues, setSelectedValues] = useState([]);
 
-  const handleChange = (value) => {
-    const selectedItemsCopy = { ...filters };
-    options.forEach((option) => {
-      const isSelected = selectedItemsCopy[option.key] !== undefined;
-      if (isSelected && !value.includes(option.value)) {
-        delete selectedItemsCopy[option.key];
-      } else if (!isSelected && value.includes(option.value)) {
-        selectedItemsCopy[option.key] = option.value;
-      }
-    });
-    setFilters(selectedItemsCopy);
+  const handleChange = (selectedOptionValues) => {
+    setSelectedValues(selectedOptionValues);
   };
 
-  React.useEffect(() => {
-    // Sabit verileri kullanarak options state'ini ayarlama
-    const hardcodedOptions = [
-      { key: 0, value: "Açık" },
-      { key: 1, value: "Bekliyor" },
-      { key: 2, value: "Planlandı" },
-      { key: 3, value: "Devam Ediyor" },
-      { key: 4, value: "Kapandı" },
-      { key: 5, value: "İptal Edildi" },
-    ];
-    setOptions(hardcodedOptions);
+  useEffect(() => {
+    AxiosInstance.get("KodList?grup=32801")
+      .then((response) => {
+        const options = response.map((option) => ({
+          key: option.TB_KOD_ID,
+          value: option.TB_KOD_ID, // value olarak TB_KOD_ID kullanılıyor
+          label: option.KOD_TANIM,
+        }));
+        setOptions(options);
+      })
+      .catch((error) => {
+        console.log("API Error:", error);
+      });
   }, []);
 
   const handleSubmit = () => {
-    // Seçilen durumların key değerlerini bir obje olarak oluştur
-    let selectedKeysObj = {};
-    Object.keys(filters).forEach((key, index) => {
-      selectedKeysObj[`key${index}`] = key;
-    });
+    // Seçilen TB_KOD_ID değerlerini kullanarak istenen objeyi oluştur
+    const selectedOptionsObj = selectedValues.reduce((acc, currentValue) => {
+      const option = options.find((option) => option.value === currentValue);
+      if (option) {
+        acc[option.value] = option.label;
+      }
+      return acc;
+    }, {});
 
-    // Bu objeyi onSubmit fonksiyonuna gönder
-    onSubmit(selectedKeysObj);
-
-    // Dropdown'ı gizle
-    setVisible(false);
+    onSubmit(selectedOptionsObj);
+    setOpen(false);
   };
 
   const handleCancelClick = () => {
-    setFilters([]);
-    setVisible(false);
+    setSelectedValues([]);
+    setOpen(false);
     onSubmit("");
   };
 
@@ -68,12 +63,12 @@ const ConditionFilter = ({ onSubmit }) => {
           mode="multiple"
           style={{ width: "100%" }}
           placeholder="Ara..."
-          value={Object.values(filters)}
+          value={selectedValues}
           onChange={handleChange}
           allowClear>
           {options.map((option) => (
             <Option key={option.key} value={option.value}>
-              {option.value}
+              {option.label}
             </Option>
           ))}
         </Select>
@@ -82,13 +77,7 @@ const ConditionFilter = ({ onSubmit }) => {
   );
 
   return (
-    <Popover
-      content={content}
-      trigger="click"
-      open={visible}
-      onOpenChange={setVisible}
-      placement="bottom" // Popover'ın açılacağı yön
-    >
+    <Popover content={content} trigger="click" open={open} onOpenChange={setOpen} placement="bottom">
       <Button style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
         Durum
         <div
@@ -103,7 +92,7 @@ const ConditionFilter = ({ onSubmit }) => {
             alignItems: "center",
             color: "white",
           }}>
-          {Object.keys(filters).length}
+          {selectedValues.length}
         </div>
       </Button>
     </Popover>
