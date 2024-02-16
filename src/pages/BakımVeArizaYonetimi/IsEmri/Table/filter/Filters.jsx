@@ -9,7 +9,7 @@ export default function Filters({ onChange }) {
     lokasyonlar: {},
     isemritipleri: {},
     durumlar: {},
-    customfilters: {},
+    customfilter: {},
   });
 
   React.useEffect(() => {
@@ -18,10 +18,10 @@ export default function Filters({ onChange }) {
 
   return (
     <>
-      {/* <TypeFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, isemritipleri: newFilters }))} /> */}
+      <TypeFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, isemritipleri: newFilters }))} />
       <ConditionFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, durumlar: newFilters }))} />
-      {/* <LocationFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, lokasyonlar: newFilters }))} /> */}
-      <CustomFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, customfilters: newFilters }))} />
+      <LocationFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, lokasyonlar: newFilters }))} />
+      <CustomFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, customfilter: newFilters }))} />
     </>
   );
 }

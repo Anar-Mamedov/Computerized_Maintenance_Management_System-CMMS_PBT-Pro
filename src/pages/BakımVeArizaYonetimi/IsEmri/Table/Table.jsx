@@ -300,6 +300,263 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
       render: (text) => formatTime(text),
     },
+    {
+      title: "Takvim",
+      dataIndex: "TAKVIM",
+      key: "TAKVIM",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Masraf Merkezi",
+      dataIndex: "MASRAF_MERKEZI",
+      key: "MASRAF_MERKEZI",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Firma",
+      dataIndex: "FRIMA",
+      key: "FRIMA",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "İş Talep Kodu",
+      dataIndex: "IS_TALEP_NO",
+      key: "IS_TALEP_NO",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "İş Talep Eden",
+      dataIndex: "IS_TALEP_EDEN",
+      key: "IS_TALEP_EDEN",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "İş Talep Tarihi",
+      dataIndex: "IS_TALEP_TARIH",
+      key: "IS_TALEP_TARIH",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Özel Alan 1",
+      dataIndex: "OZEL_ALAN_1",
+      key: "OZEL_ALAN_1",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Özel Alan 2",
+      dataIndex: "OZEL_ALAN_2",
+      key: "OZEL_ALAN_2",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Özel Alan 3",
+      dataIndex: "OZEL_ALAN_3",
+      key: "OZEL_ALAN_3",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Özel Alan 4",
+      dataIndex: "OZEL_ALAN_4",
+      key: "OZEL_ALAN_4",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Özel Alan 5",
+      dataIndex: "OZEL_ALAN_5",
+      key: "OZEL_ALAN_5",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Özel Alan 6",
+      dataIndex: "OZEL_ALAN_6",
+      key: "OZEL_ALAN_6",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Özel Alan 7",
+      dataIndex: "OZEL_ALAN_7",
+      key: "OZEL_ALAN_7",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Özel Alan 8",
+      dataIndex: "OZEL_ALAN_8",
+      key: "OZEL_ALAN_8",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Özel Alan 9",
+      dataIndex: "OZEL_ALAN_9",
+      key: "OZEL_ALAN_9",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Özel Alan 10",
+      dataIndex: "OZEL_ALAN_10",
+      key: "OZEL_ALAN_10",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Özel Alan 11",
+      dataIndex: "OZEL_ALAN_11",
+      key: "OZEL_ALAN_11",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Özel Alan 12",
+      dataIndex: "OZEL_ALAN_12",
+      key: "OZEL_ALAN_12",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Özel Alan 13",
+      dataIndex: "OZEL_ALAN_13",
+      key: "OZEL_ALAN_13",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Özel Alan 14",
+      dataIndex: "OZEL_ALAN_14",
+      key: "OZEL_ALAN_14",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Özel Alan 15",
+      dataIndex: "OZEL_ALAN_15",
+      key: "OZEL_ALAN_15",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Özel Alan 16",
+      dataIndex: "OZEL_ALAN_16",
+      key: "OZEL_ALAN_16",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Özel Alan 17",
+      dataIndex: "OZEL_ALAN_17",
+      key: "OZEL_ALAN_17",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Özel Alan 18",
+      dataIndex: "OZEL_ALAN_18",
+      key: "OZEL_ALAN_18",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Özel Alan 19",
+      dataIndex: "OZEL_ALAN_19",
+      key: "OZEL_ALAN_19",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Özel Alan 20",
+      dataIndex: "OZEL_ALAN_20",
+      key: "OZEL_ALAN_20",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Personel Adı",
+      dataIndex: "PERSONEL_ADI",
+      key: "PERSONEL_ADI",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Tam Lokasyon",
+      dataIndex: "TAM_LOKASYON",
+      key: "TAM_LOKASYON",
+      width: "250px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Bildirilen Kat",
+      dataIndex: "BILDIRILEN_KAT",
+      key: "BILDIRILEN_KAT",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Bildirilen Bina",
+      dataIndex: "BILDIRILEN_BINA",
+      key: "BILDIRILEN_BINA",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Sayaç Değeri",
+      dataIndex: "GUNCEL_SAYAC_DEGER",
+      key: "GUNCEL_SAYAC_DEGER",
+      width: "150px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Notlar",
+      dataIndex: "ICERDEKI_NOT",
+      key: "ICERDEKI_NOT",
+      width: "250px",
+      ellipsis: true,
+      visible: false, // Varsayılan olarak kapalı
+    },
     // Diğer kolonlarınız...
   ];
 
@@ -674,9 +931,9 @@ export default function MainTable() {
         `}
       </style>
 
-      <Modal width={750} title="Kolonları Düzenle" open={isModalVisible} onOk={toggleModal} onCancel={toggleModal}>
+      <Modal width={900} title="Kolonları Düzenle" open={isModalVisible} onOk={toggleModal} onCancel={toggleModal}>
         <Checkbox.Group
-          style={{ width: "100%", display: "flex", gap: "10px", flexDirection: "column", height: "400px" }}
+          style={{ width: "100%", display: "flex", gap: "10px", flexDirection: "column", height: "500px" }}
           value={visibleColumnKeys}
           onChange={handleVisibilityChange}>
           {columns.map((col) => (

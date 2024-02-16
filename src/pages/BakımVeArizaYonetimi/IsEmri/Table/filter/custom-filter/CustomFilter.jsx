@@ -201,28 +201,248 @@ export default function CustomFilter({ onSubmit }) {
                   filterOption={(input, option) => (option?.label || "").toLowerCase().includes(input.toLowerCase())}
                   options={[
                     {
-                      value: "IST_TALEP_EDEN_ADI",
-                      label: "Talep Eden",
+                      value: "ISEMRI_NO",
+                      label: "İş Emri No",
                     },
                     {
-                      value: "IST_DEPARTMAN",
-                      label: "Departman",
+                      value: "OUTER_NOT",
+                      label: "Not",
                     },
                     {
-                      value: "IST_BILDIREN_LOKASYON",
-                      label: "Lokasyon",
+                      value: "DUZENLEME_TARIH",
+                      label: "Düzenleme Tarihi",
                     },
                     {
-                      value: "IST_TIP_TANIM",
-                      label: "Talep Tipi",
+                      value: "DUZENLEME_SAAT",
+                      label: "Düzenleme Saati",
                     },
                     {
-                      value: "IST_MAKINE_KOD",
+                      value: "KONU",
+                      label: "Konu",
+                    },
+                    {
+                      value: "PLAN_BASLAMA_TARIH",
+                      label: "Planlanan Başlama Tarihi",
+                    },
+                    {
+                      value: "PLAN_BASLAMA_SAAT",
+                      label: "Planlanan Başlama Saati",
+                    },
+                    {
+                      value: "PLAN_BITIS_TARIH",
+                      label: "Planlanan Bitiş Tarihi",
+                    },
+                    {
+                      value: "PLAN_BITIS_SAAT",
+                      label: "Planlanan Bitiş Saati",
+                    },
+                    {
+                      value: "BASLAMA_TARIH",
+                      label: "Başlama Tarihi",
+                    },
+                    {
+                      value: "BASLAMA_SAAT",
+                      label: "Başlama Saati",
+                    },
+                    {
+                      value: "ISM_BITIS_TARIH", // Assuming this should be updated to match the formatted data keys
+                      label: "Bitiş Tarihi",
+                    },
+                    {
+                      value: "ISM_BITIS_SAAT", // Assuming this should be updated to match the formatted data keys
+                      label: "Bitiş Saati",
+                    },
+                    {
+                      value: "IS_SURESI",
+                      label: "İş Süresi",
+                    },
+                    {
+                      value: "TAMAMLANMA",
+                      label: "Tamamlama %",
+                    },
+                    {
+                      value: "GARANTI",
+                      label: "Garanti",
+                    },
+                    {
+                      value: "MAKINE_KODU",
                       label: "Makine Kodu",
                     },
                     {
-                      value: "IST_MAKINE_TANIM",
+                      value: "MAKINE_TANIMI",
                       label: "Makine Tanımı",
+                    },
+                    {
+                      value: "MAKINE_PLAKA",
+                      label: "Makine Plaka",
+                    },
+                    {
+                      value: "MAKINE_DURUM",
+                      label: "Makine Durum",
+                    },
+                    {
+                      value: "MAKINE_TIP",
+                      label: "Makine Tip",
+                    },
+                    {
+                      value: "EKIPMAN",
+                      label: "Ekipman",
+                    },
+                    {
+                      value: "IS_TIPI",
+                      label: "İş Tipi",
+                    },
+                    {
+                      value: "IS_NEDENI",
+                      label: "İş Nedeni",
+                    },
+                    {
+                      value: "ATOLYE",
+                      label: "Atölye",
+                    },
+                    {
+                      value: "TALIMAT",
+                      label: "Talimat",
+                    },
+                    {
+                      value: "ONCELIK",
+                      label: "Öncelik",
+                    },
+                    {
+                      value: "KAPANIS_TARIHI",
+                      label: "Kapanış Tarihi",
+                    },
+                    {
+                      value: "KAPANIS_SAATI",
+                      label: "Kapanış Saati",
+                    },
+                    {
+                      value: "TAKVIM",
+                      label: "Takvim",
+                    },
+                    {
+                      value: "MASRAF_MERKEZI",
+                      label: "Masraf Merkezi",
+                    },
+                    {
+                      value: "FRIMA",
+                      label: "Firma",
+                    },
+                    {
+                      value: "IS_TALEP_NO", // Assuming this should be "ISM_IS_TALEP_KOD" based on the pattern but keeping original as no exact match
+                      label: "İş Talep Kodu",
+                    },
+                    {
+                      value: "IS_TALEP_EDEN",
+                      label: "İş Talep Eden",
+                    },
+                    {
+                      value: "IS_TALEP_TARIH",
+                      label: "İş Talep Tarihi",
+                    },
+                    {
+                      value: "OZEL_ALAN_1",
+                      label: "Özel Alan 1",
+                    },
+                    {
+                      value: "OZEL_ALAN_2",
+                      label: "Özel Alan 2",
+                    },
+                    {
+                      value: "OZEL_ALAN_3",
+                      label: "Özel Alan 3",
+                    },
+                    {
+                      value: "OZEL_ALAN_4",
+                      label: "Özel Alan 4",
+                    },
+                    {
+                      value: "OZEL_ALAN_5",
+                      label: "Özel Alan 5",
+                    },
+                    {
+                      value: "OZEL_ALAN_6",
+                      label: "Özel Alan 6",
+                    },
+                    {
+                      value: "OZEL_ALAN_7",
+                      label: "Özel Alan 7",
+                    },
+                    {
+                      value: "OZEL_ALAN_8",
+                      label: "Özel Alan 8",
+                    },
+                    {
+                      value: "OZEL_ALAN_9",
+                      label: "Özel Alan 9",
+                    },
+                    {
+                      value: "OZEL_ALAN_10",
+                      label: "Özel Alan 10",
+                    },
+                    {
+                      value: "OZEL_ALAN_11",
+                      label: "Özel Alan 11",
+                    },
+                    {
+                      value: "OZEL_ALAN_12",
+                      label: "Özel Alan 12",
+                    },
+                    {
+                      value: "OZEL_ALAN_13",
+                      label: "Özel Alan 13",
+                    },
+                    {
+                      value: "OZEL_ALAN_14",
+                      label: "Özel Alan 14",
+                    },
+                    {
+                      value: "OZEL_ALAN_15",
+                      label: "Özel Alan 15",
+                    },
+                    {
+                      value: "OZEL_ALAN_16",
+                      label: "Özel Alan 16",
+                    },
+                    {
+                      value: "OZEL_ALAN_17",
+                      label: "Özel Alan 17",
+                    },
+                    {
+                      value: "OZEL_ALAN_18",
+                      label: "Özel Alan 18",
+                    },
+                    {
+                      value: "OZEL_ALAN_19",
+                      label: "Özel Alan 19",
+                    },
+                    {
+                      value: "OZEL_ALAN_20",
+                      label: "Özel Alan 20",
+                    },
+                    {
+                      value: "BILDIRILEN_KAT",
+                      label: "Bildirilen Kat",
+                    },
+                    {
+                      value: "BILDIRILEN_BINA",
+                      label: "Bildirilen Bina",
+                    },
+                    {
+                      value: "PERSONEL_ADI",
+                      label: "Personel Adı",
+                    },
+                    {
+                      value: "TAM_LOKASYON",
+                      label: "Tam Lokasyon",
+                    },
+                    {
+                      value: "GUNCEL_SAYAC_DEGER",
+                      label: "Sayaç Değeri",
+                    },
+                    {
+                      value: "ICERDEKI_NOT",
+                      label: "Notlar",
                     },
                   ]}
                 />
