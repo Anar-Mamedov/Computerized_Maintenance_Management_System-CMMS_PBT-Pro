@@ -15,19 +15,21 @@ const ConditionFilter = ({ onSubmit }) => {
   };
 
   useEffect(() => {
-    AxiosInstance.get("KodList?grup=32801")
-      .then((response) => {
-        const options = response.map((option) => ({
-          key: option.TB_KOD_ID,
-          value: option.TB_KOD_ID, // value olarak TB_KOD_ID kullanılıyor
-          label: option.KOD_TANIM,
-        }));
-        setOptions(options);
-      })
-      .catch((error) => {
-        console.log("API Error:", error);
-      });
-  }, []);
+    if (open) {
+      AxiosInstance.get("KodList?grup=32801")
+        .then((response) => {
+          const options = response.map((option) => ({
+            key: option.TB_KOD_ID,
+            value: option.TB_KOD_ID, // value olarak TB_KOD_ID kullanılıyor
+            label: option.KOD_TANIM,
+          }));
+          setOptions(options);
+        })
+        .catch((error) => {
+          console.log("API Error:", error);
+        });
+    }
+  }, [open]);
 
   const handleSubmit = () => {
     // Seçilen TB_KOD_ID değerlerini kullanarak istenen objeyi oluştur

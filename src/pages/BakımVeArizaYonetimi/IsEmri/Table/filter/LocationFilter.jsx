@@ -23,19 +23,21 @@ const LocationFilter = ({ onSubmit }) => {
   };
 
   useEffect(() => {
-    AxiosInstance.get("getLokasyonlar")
-      .then((response) => {
-        // API'den gelen veriye göre options dizisini oluştur
-        const options = response.map((option, index) => ({
-          key: index.toString(), // Benzersiz bir key olarak index kullan
-          value: option, // Gösterilecek değer
-        }));
-        setOptions(options);
-      })
-      .catch((error) => {
-        console.log("API Error:", error);
-      });
-  }, []);
+    if (open) {
+      AxiosInstance.get("getLokasyonlar")
+        .then((response) => {
+          // API'den gelen veriye göre options dizisini oluştur
+          const options = response.map((option, index) => ({
+            key: index.toString(), // Benzersiz bir key olarak index kullan
+            value: option, // Gösterilecek değer
+          }));
+          setOptions(options);
+        })
+        .catch((error) => {
+          console.log("API Error:", error);
+        });
+    }
+  }, [open]);
 
   const handleSubmit = () => {
     onSubmit(filters);

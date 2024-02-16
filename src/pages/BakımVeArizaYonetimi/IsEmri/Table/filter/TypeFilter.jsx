@@ -7,7 +7,6 @@ const { Option } = Select;
 const TypeFilter = ({ onSubmit }) => {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);
-  // selectedValues artık seçilen TB_KOD_ID değerlerini saklayacak
   const [selectedValues, setSelectedValues] = useState([]);
 
   const handleChange = (selectedOptionValues) => {
@@ -15,22 +14,24 @@ const TypeFilter = ({ onSubmit }) => {
   };
 
   useEffect(() => {
-    AxiosInstance.get("IsEmriTip")
-      .then((response) => {
-        const options = response.map((option) => ({
-          key: option.TB_ISEMRI_TIP_ID,
-          value: option.TB_ISEMRI_TIP_ID, // value olarak TB_KOD_ID kullanılıyor
-          label: option.IMT_TANIM,
-        }));
-        setOptions(options);
-      })
-      .catch((error) => {
-        console.log("API Error:", error);
-      });
-  }, []);
+    // Selectbox açık olduğunda API isteğini yap
+    if (open) {
+      AxiosInstance.get("IsEmriTip")
+        .then((response) => {
+          const options = response.map((option) => ({
+            key: option.TB_ISEMRI_TIP_ID,
+            value: option.TB_ISEMRI_TIP_ID,
+            label: option.IMT_TANIM,
+          }));
+          setOptions(options);
+        })
+        .catch((error) => {
+          console.log("API Error:", error);
+        });
+    }
+  }, [open]); // open state'i değiştiğinde useEffect hook'unu tetikle
 
   const handleSubmit = () => {
-    // Seçilen TB_KOD_ID değerlerini kullanarak istenen objeyi oluştur
     const selectedOptionsObj = selectedValues.reduce((acc, currentValue) => {
       const option = options.find((option) => option.value === currentValue);
       if (option) {
