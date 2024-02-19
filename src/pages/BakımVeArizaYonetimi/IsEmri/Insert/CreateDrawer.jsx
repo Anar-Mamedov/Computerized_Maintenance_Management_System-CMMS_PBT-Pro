@@ -22,7 +22,7 @@ export default function CreateDrawer({ onRefresh }) {
     if (open) {
       // Çekmece açıldığında gerekli işlemi yap
       // Örneğin, MainTabs'a bir prop olarak geçir
-      AxiosInstance.get("ModulKoduGetir?modulKodu=IST_KOD") // Replace with your actual API endpoint
+      AxiosInstance.get("ModulKoduGetir?modulKodu=ISM_ISEMRI_NO") // Replace with your actual API endpoint
         .then((response) => {
           // Assuming the response contains the new work order number in 'response.Tanim'
           setValue("talepKodu", response);
@@ -85,35 +85,30 @@ export default function CreateDrawer({ onRefresh }) {
     const handleDataFetchAndUpdate = async () => {
       if (open) {
         try {
-          const response = await AxiosInstance.get(`IsTalepParametre`);
-          const data = response;
-          const item = data[0]; // Veri dizisinin ilk elemanını al
-
-          // Form alanlarını set et
-          setValue("oncelikTanim", item.ISP_ONCELIK_TEXT);
-          setValue("oncelikID", item.ISP_ONCELIK_ID);
-          setValue("talepTipi", item.ISP_VARSAYILAN_IS_TIPI_TEXT);
-          setValue("talepTipiID", item.ISP_VARSAYILAN_IS_TIPI);
-          setIsDisabled(item.ISP_DUZENLEME_TARIH_DEGISIMI);
-          setFieldRequirements({
-            lokasyonTanim: item.ISP_LOKASYON,
-            irtibatTelefonu: item.ISP_IRTIBAT_TEL,
-            email: item.ISP_MAIL,
-            departman: item.ISP_DEPARTMAN,
-            iletisimSekli: item.ISP_ILETISIM_SEKLI,
-            talepTipi: item.ISP_BILDIRIM_TIPI,
-            isKategorisi: item.ISP_IS_KATEGORI,
-            servisNedeni: item.ISP_SERVIS_NEDEN,
-            oncelikTanim: item.ISP_ONCELIK,
-            bildirilenBina: item.ISP_BINA,
-            bildirilenKat: item.ISP_KAT,
-            ilgiliKisi: item.ISP_IS_TAKIPCI,
-            konu: item.ISP_KONU,
-            aciklama: item.ISP_ACIKLAMA,
-            makine: item.ISP_MAKINE_KOD,
-            ekipman: item.ISP_EKIPMAN_KOD,
-            makineDurumu: item.ISP_ZOR_MAKINE_DURUM_KOD_ID,
-            // Diğer alanlar için de benzer şekilde...
+          const response = await AxiosInstance.get(`IsEmriEkleVarsiylanlar`);
+          const data = response.is_emri_varsayilanlar; // API cevabındaki ilgili veriye erişim
+          // Veriyi işle ve form alanlarını güncelle
+          data.forEach((item) => {
+            switch (item.TABLO_TANIMI) {
+              case "IS_EMRI_DURUM_VARSAYILAN":
+                // Örneğin, sipariş durumu için
+                setValue("siparisTanim", item.TANIM);
+                setValue("siparisID", item.ID);
+                break;
+              case "IS_EMRI_TIP_VARSAYILAN":
+                // Örneğin, iş emri tipi için
+                setValue("talepTipi", item.TANIM);
+                setValue("talepTipiID", item.ID);
+                break;
+              case "SERVIS_ONCELIK":
+                // Örneğin, servis önceliği için
+                setValue("oncelikTanim", item.TANIM);
+                setValue("oncelikID", item.ID);
+                break;
+              default:
+                // Diğer durumlar için bir işlem yapılabilir veya loglanabilir
+                console.log("Tanımsız TABLO_TANIMI:", item.TABLO_TANIMI);
+            }
           });
         } catch (error) {
           console.error("Veri çekilirken hata oluştu:", error);
@@ -202,19 +197,7 @@ export default function CreateDrawer({ onRefresh }) {
           width="1460px"
           title={
             <div style={{ display: "flex", gap: "30px", alignItems: "center" }}>
-              <div>İş Talebi Ekle</div>
-              <div
-                style={{
-                  color: "white",
-                  backgroundColor: "blue",
-                  textAlign: "center",
-                  borderRadius: "10px",
-                  padding: "4px 30px",
-                  fontWeight: "300",
-                  fontSize: "14px",
-                }}>
-                Açik
-              </div>
+              <div>İş Emri Ekle</div>
             </div>
           }
           placement="right"

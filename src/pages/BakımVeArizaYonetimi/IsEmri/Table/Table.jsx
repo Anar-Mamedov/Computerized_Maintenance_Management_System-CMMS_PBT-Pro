@@ -23,6 +23,31 @@ export default function MainTable() {
 
   const [selectedRows, setSelectedRows] = useState([]);
 
+  function hexToRGBA(hex, opacity) {
+    // hex veya opacity null ise hata döndür
+    if (hex === null || opacity === null) {
+      console.error("hex veya opacity null olamaz!");
+      return; // veya uygun bir varsayılan değer döndürebilirsiniz
+    }
+
+    let r = 0,
+      g = 0,
+      b = 0;
+    // 3 karakterli hex kodunu kontrol et
+    if (hex.length === 4) {
+      r = parseInt(hex[1] + hex[1], 16);
+      g = parseInt(hex[2] + hex[2], 16);
+      b = parseInt(hex[3] + hex[3], 16);
+    }
+    // 6 karakterli hex kodunu kontrol et
+    else if (hex.length === 7) {
+      r = parseInt(hex[1] + hex[2], 16);
+      g = parseInt(hex[3] + hex[4], 16);
+      b = parseInt(hex[5] + hex[6], 16);
+    }
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+  }
+
   // Örnek kolonlar ve başlangıçta hepsinin görünür olacağı varsayılıyor
   const columns = [
     {
@@ -66,8 +91,23 @@ export default function MainTable() {
       width: "150px",
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
+      render: (text, record) => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: hexToRGBA(record.ISM_TIP_RENK, 0.2),
+            padding: "10px",
+            borderRadius: "5px",
+            border: `1.2px solid ${hexToRGBA(record.ISM_TIP_RENK, 0.7)}`,
+            color: record.ISM_TIP_RENK,
+            fontWeight: "500",
+          }}>
+          {text}
+        </div>
+      ),
     },
-
     {
       title: "Durum",
       dataIndex: "DURUM",
@@ -705,123 +745,6 @@ export default function MainTable() {
         const formattedData = response.list.map((item) => ({
           ...item,
           key: item.TB_ISEMRI_ID,
-          KAPALI: item.KAPALI,
-          ONCELIK: item.ONCELIK,
-          BELGE: item.BELGE,
-          RESIM: item.RESIM,
-          ISEMRI_NO: item.ISEMRI_NO,
-          MALZEME: item.MALZEME,
-          PERSONEL: item.PERSONEL,
-          DURUS: item.DURUS,
-          OUTER_NOT: item.OUTER_NOT,
-          DUZENLEME_TARIH: item.DUZENLEME_TARIH,
-          DUZENLEME_SAAT: item.DUZENLEME_SAAT,
-          KONU: item.KONU,
-          ISEMRI_TIP: item.ISEMRI_TIP,
-          DURUM: item.DURUM,
-          LOKASYON: item.LOKASYON,
-          PLAN_BASLAMA_TARIH: item.PLAN_BASLAMA_TARIH,
-          PLAN_BASLAMA_SAAT: item.PLAN_BASLAMA_SAAT,
-          PLAN_BITIS_TARIH: item.PLAN_BITIS_TARIH,
-          PLAN_BITIS_SAAT: item.PLAN_BITIS_SAAT,
-          BASLAMA_TARIH: item.BASLAMA_TARIH,
-          BASLAMA_SAAT: item.BASLAMA_SAAT,
-          ISM_BITIS_TARIH: item.ISM_BITIS_TARIH,
-          ISM_BITIS_SAAT: item.ISM_BITIS_SAAT,
-          IS_SURESI: item.IS_SURESI,
-          TAMAMLANMA: item.TAMAMLANMA,
-          GARANTI: item.GARANTI,
-          MAKINE_KODU: item.MAKINE_KODU,
-          MAKINE_TANIMI: item.MAKINE_TANIMI,
-          MAKINE_PLAKA: item.MAKINE_PLAKA,
-          MAKINE_DURUM: item.MAKINE_DURUM,
-          MAKINE_TIP: item.MAKINE_TIP,
-          EKIPMAN: item.EKIPMAN,
-          IS_TIPI: item.IS_TIPI,
-          IS_NEDENI: item.IS_NEDENI,
-          ATOLYE: item.ATOLYE,
-          TALIMAT: item.TALIMAT,
-          KAPANIS_TARIHI: item.KAPANIS_TARIHI,
-          KAPANIS_SAATI: item.KAPANIS_SAATI,
-          TAKVIM: item.TAKVIM,
-          MASRAF_MERKEZI: item.MASRAF_MERKEZI,
-          FRIMA: item.FRIMA,
-          IS_TALEP_NO: item.IS_TALEP_NO,
-          IS_TALEP_EDEN: item.IS_TALEP_EDEN,
-          IS_TALEP_TARIH: item.IS_TALEP_TARIH,
-          ISM_MALIYET_MLZ: item.ISM_MALIYET_MLZ,
-          ISM_MALIYET_PERSONEL: item.ISM_MALIYET_PERSONEL,
-          ISM_MALIYET_DISSERVIS: item.ISM_MALIYET_DISSERVIS,
-          ISM_MALIYET_DIGER: item.ISM_MALIYET_DIGER,
-          ISM_MALIYET_INDIRIM: item.ISM_MALIYET_INDIRIM,
-          ISM_MALIYET_KDV: item.ISM_MALIYET_KDV,
-          ISM_MALIYET_TOPLAM: item.ISM_MALIYET_TOPLAM,
-          ISM_SURE_MUDAHALE_LOJISTIK: item.ISM_SURE_MUDAHALE_LOJISTIK,
-          ISM_SURE_MUDAHALE_SEYAHAT: item.ISM_SURE_MUDAHALE_SEYAHAT,
-          ISM_SURE_MUDAHALE_ONAY: item.ISM_SURE_MUDAHALE_ONAY,
-          ISM_SURE_BEKLEME: item.ISM_SURE_BEKLEME,
-          ISM_SURE_MUDAHALE_DIGER: item.ISM_SURE_MUDAHALE_DIGER,
-          ISM_SURE_PLAN_MUDAHALE: item.ISM_SURE_PLAN_MUDAHALE,
-          ISM_SURE_PLAN_CALISMA: item.ISM_SURE_PLAN_CALISMA,
-          ISM_SURE_TOPLAM: item.ISM_SURE_TOPLAM,
-          ISM_TIP_ID: item.ISM_TIP_ID,
-          ISM_DURUM_KOD_ID: item.ISM_DURUM_KOD_ID,
-          ISM_BAGLI_ISEMRI_ID: item.ISM_BAGLI_ISEMRI_ID,
-          ISM_LOKASYON_ID: item.ISM_LOKASYON_ID,
-          ISM_MAKINE_ID: item.ISM_MAKINE_ID,
-          ISM_EKIPMAN_ID: item.ISM_EKIPMAN_ID,
-          ISM_MAKINE_DURUM_KOD_ID: item.ISM_MAKINE_DURUM_KOD_ID,
-          ISM_REF_ID: item.ISM_REF_ID,
-          ISM_TIP_KOD_ID: item.ISM_TIP_KOD_ID,
-          ISM_NEDEN_KOD_ID: item.ISM_NEDEN_KOD_ID,
-          ISM_ONCELIK_ID: item.ISM_ONCELIK_ID,
-          ISM_ATOLYE_ID: item.ISM_ATOLYE_ID,
-          ISM_TAKVIM_ID: item.ISM_TAKVIM_ID,
-          ISM_TALIMAT_ID: item.ISM_TALIMAT_ID,
-          ISM_MASRAF_MERKEZ_ID: item.ISM_MASRAF_MERKEZ_ID,
-          ISM_PROJE_ID: item.ISM_PROJE_ID,
-          ISM_FIRMA_ID: item.ISM_FIRMA_ID,
-          ISM_FIRMA_SOZLESME_ID: item.ISM_FIRMA_SOZLESME_ID,
-          ISM_OZEL_ALAN_11_KOD_ID: item.ISM_OZEL_ALAN_11_KOD_ID,
-          ISM_OZEL_ALAN_12_KOD_ID: item.ISM_OZEL_ALAN_12_KOD_ID,
-          ISM_OZEL_ALAN_13_KOD_ID: item.ISM_OZEL_ALAN_13_KOD_ID,
-          ISM_OZEL_ALAN_14_KOD_ID: item.ISM_OZEL_ALAN_14_KOD_ID,
-          ISM_OZEL_ALAN_15_KOD_ID: item.ISM_OZEL_ALAN_15_KOD_ID,
-          ISM_SOZLESME_TANIM: item.ISM_SOZLESME_TANIM,
-          ISM_PROJE_KOD: item.ISM_PROJE_KOD,
-          ISM_ATOLYE_KOD: item.ISM_ATOLYE_KOD,
-          ISM_PROSEDUR_KOD: item.ISM_PROSEDUR_KOD,
-          ISM_GARANTI_BITIS: item.ISM_GARANTI_BITIS,
-          ISM_BAGLI_ISEMRI_NO: item.ISM_BAGLI_ISEMRI_NO,
-          ISM_EVRAK_NO: item.ISM_EVRAK_NO,
-          ISM_EVRAK_TARIHI: item.ISM_EVRAK_TARIHI,
-          ISM_REFERANS_NO: item.ISM_REFERANS_NO,
-          OZEL_ALAN_1: item.OZEL_ALAN_1,
-          OZEL_ALAN_2: item.OZEL_ALAN_2,
-          OZEL_ALAN_3: item.OZEL_ALAN_3,
-          OZEL_ALAN_4: item.OZEL_ALAN_4,
-          OZEL_ALAN_5: item.OZEL_ALAN_5,
-          OZEL_ALAN_6: item.OZEL_ALAN_6,
-          OZEL_ALAN_7: item.OZEL_ALAN_7,
-          OZEL_ALAN_8: item.OZEL_ALAN_8,
-          OZEL_ALAN_9: item.OZEL_ALAN_9,
-          OZEL_ALAN_10: item.OZEL_ALAN_10,
-          OZEL_ALAN_11: item.OZEL_ALAN_11,
-          OZEL_ALAN_12: item.OZEL_ALAN_12,
-          OZEL_ALAN_13: item.OZEL_ALAN_13,
-          OZEL_ALAN_14: item.OZEL_ALAN_14,
-          OZEL_ALAN_15: item.OZEL_ALAN_15,
-          OZEL_ALAN_16: item.OZEL_ALAN_16,
-          OZEL_ALAN_17: item.OZEL_ALAN_17,
-          OZEL_ALAN_18: item.OZEL_ALAN_18,
-          OZEL_ALAN_19: item.OZEL_ALAN_19,
-          OZEL_ALAN_20: item.OZEL_ALAN_20,
-          BILDIRILEN_KAT: item.BILDIRILEN_KAT,
-          BILDIRILEN_BINA: item.BILDIRILEN_BINA,
-          PERSONEL_ADI: item.PERSONEL_ADI,
-          TAM_LOKASYON: item.TAM_LOKASYON,
-          GUNCEL_SAYAC_DEGER: item.GUNCEL_SAYAC_DEGER,
-          ICERDEKI_NOT: item.ICERDEKI_NOT,
           // Diğer alanlarınız...
         }));
         setData(formattedData);
