@@ -115,7 +115,7 @@ export default function Status() {
 
   const fetchItemsFromApi = () => {
     setIsLoading(true);
-    AxiosInstance.get("GetIsEmriDurum")
+    AxiosInstance.get("KodList?grup=32801")
       .then((response) => {
         const isEmriData = response.isEmriDurumlari || [];
         setItems(isEmriData);

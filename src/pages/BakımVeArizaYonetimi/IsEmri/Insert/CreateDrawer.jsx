@@ -92,13 +92,13 @@ export default function CreateDrawer({ onRefresh }) {
             switch (item.TABLO_TANIMI) {
               case "IS_EMRI_DURUM_VARSAYILAN":
                 // Örneğin, sipariş durumu için
-                setValue("siparisTanim", item.TANIM);
-                setValue("siparisID", item.ID);
+                setValue("isEmriDurum", item.TANIM);
+                setValue("isEmriDurumID", item.ID);
                 break;
               case "IS_EMRI_TIP_VARSAYILAN":
                 // Örneğin, iş emri tipi için
-                setValue("talepTipi", item.TANIM);
-                setValue("talepTipiID", item.ID);
+                setValue("isEmriTipi", item.TANIM);
+                setValue("isEmriTipiID", item.ID);
                 break;
               case "SERVIS_ONCELIK":
                 // Örneğin, servis önceliği için

@@ -18,9 +18,9 @@ import LokasyonTablo from "./components/LokasyonTablo";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import Departman from "./components/Departman";
-import KullaniciTablo from "./components/KullaniciTablo";
+import IsEmriDurumModal from "./components/IsEmriDurumModal";
 import IletisimSekli from "./components/IletisimSekli";
-import TalepTipi from "./components/TalepTipi";
+import IsEmriTipiSelect from "./components/IsEmriTipiSelect";
 import IsKategorisi from "./components/IsKategorisi";
 import ServisNedeni from "./components/ServisNedeni";
 import BildirilenBina from "./components/BildirilenBina";
@@ -87,9 +87,9 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
 
   const otonomBakimValue = watch("otonomBakim");
 
-  const handleTalepteBulunanMinusClick = () => {
-    setValue("talepteBulunan", "");
-    setValue("talepteBulunanID", "");
+  const handleIsEmriDurumMinusClick = () => {
+    setValue("isEmriDurum", "");
+    setValue("isEmriDurumID", "");
   };
 
   const handleIlgiliKisiMinusClick = () => {
@@ -115,8 +115,8 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
       const currentTime = dayjs(); // Şu anki saat için dayjs nesnesi
 
       // Tarih ve saat alanlarını güncelle
-      setValue("talepTarihi", currentDate);
-      setValue("talepSaati", currentTime);
+      setValue("duzenlenmeTarihi", currentDate);
+      setValue("duzenlenmeSaati", currentTime);
     }
   }, [drawerOpen, setValue]);
 
@@ -152,145 +152,6 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
         gap: "20px",
         rowGap: "10px",
       }}>
-      <div style={{ display: "flex", width: "100%", gap: "20px" }}>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            gap: "10px",
-            rowGap: "0px",
-          }}>
-          <Text style={{ fontSize: "14px", fontWeight: "600" }}>Talep Kodu:</Text>
-          <div
-            style={{
-              display: "flex",
-              // flexWrap: "wrap",
-              alignItems: "flex-start",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}>
-            <Controller
-              name="talepKodu"
-              control={control}
-              rules={{ required: "Alan Boş Bırakılamaz!" }}
-              render={({ field, fieldState: { error } }) => (
-                <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
-                  <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
-                  {error && <div style={{ color: "red" }}>{error.message}</div>}
-                </div>
-              )}
-            />
-            <Controller
-              name="secilenTalepID"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ display: "none" }}
-                />
-              )}
-            />
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-            justifyContent: "space-between",
-          }}>
-          <Text style={{ fontSize: "14px", fontWeight: "600" }}>Talep Tarihi:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}>
-            <Controller
-              name="talepTarihi"
-              control={control}
-              rules={{ required: "Alan Boş Bırakılamaz!" }}
-              render={({ field, fieldState: { error } }) => (
-                <DatePicker
-                  {...field}
-                  status={error ? "error" : ""}
-                  disabled={!isDisabled}
-                  style={{ width: "180px" }}
-                  format={localeDateFormat}
-                  placeholder="Tarih seçiniz"
-                />
-              )}
-            />
-            <Controller
-              name="talepSaati"
-              control={control}
-              rules={{ required: "Alan Boş Bırakılamaz!" }}
-              render={({ field, fieldState: { error } }) => (
-                <TimePicker
-                  {...field}
-                  status={errors.talepSaati ? "error" : ""}
-                  disabled={!isDisabled}
-                  style={{ width: "110px" }}
-                  format={localeTimeFormat}
-                  placeholder="Saat seçiniz"
-                />
-              )}
-            />
-            {errors.talepSaati && <div style={{ color: "red" }}>{errors.talepSaati.message}</div>}
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-            justifyContent: "space-between",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Kapanma Tarihi:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}>
-            <Controller
-              name="kapanmaTarihi"
-              control={control}
-              render={({ field }) => (
-                <DatePicker {...field} disabled style={{ width: "180px" }} format={localeDateFormat} placeholder="" />
-              )}
-            />
-            <Controller
-              name="kapanmaSaati"
-              control={control}
-              render={({ field }) => (
-                <TimePicker {...field} disabled style={{ width: "110px" }} format={localeTimeFormat} placeholder="" />
-              )}
-            />
-          </div>
-        </div>
-      </div>
       <div style={{ display: "flex", gap: "20px", width: "100%" }}>
         <div
           style={{
@@ -301,6 +162,121 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
             width: "100%",
             maxWidth: "450px",
           }}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+              maxWidth: "450px",
+              gap: "10px",
+              rowGap: "0px",
+            }}>
+            <Text style={{ fontSize: "14px", fontWeight: "600" }}>İş Emri No:</Text>
+            <div
+              style={{
+                display: "flex",
+                // flexWrap: "wrap",
+                alignItems: "flex-start",
+                maxWidth: "300px",
+                minWidth: "300px",
+                gap: "10px",
+                width: "100%",
+              }}>
+              <Controller
+                name="talepKodu"
+                control={control}
+                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                render={({ field, fieldState: { error } }) => (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+                    <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
+                    {error && <div style={{ color: "red" }}>{error.message}</div>}
+                  </div>
+                )}
+              />
+              <Controller
+                name="secilenTalepID"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="text" // Set the type to "text" for name input
+                    style={{ display: "none" }}
+                  />
+                )}
+              />
+            </div>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              maxWidth: "450px",
+              gap: "10px",
+              width: "100%",
+              justifyContent: "space-between",
+            }}>
+            <Text style={{ fontSize: "14px", fontWeight: "600" }}>Düzenlenme Tarihi:</Text>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                maxWidth: "300px",
+                minWidth: "300px",
+                gap: "10px",
+                width: "100%",
+              }}>
+              <Controller
+                name="duzenlenmeTarihi"
+                control={control}
+                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                render={({ field, fieldState: { error } }) => (
+                  <DatePicker
+                    {...field}
+                    status={error ? "error" : ""}
+                    // disabled={!isDisabled}
+                    style={{ width: "180px" }}
+                    format={localeDateFormat}
+                    placeholder="Tarih seçiniz"
+                  />
+                )}
+              />
+              <Controller
+                name="duzenlenmeSaati"
+                control={control}
+                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                render={({ field, fieldState: { error } }) => (
+                  <TimePicker
+                    {...field}
+                    status={errors.duzenlenmeSaati ? "error" : ""}
+                    // disabled={!isDisabled}
+                    style={{ width: "110px" }}
+                    format={localeTimeFormat}
+                    placeholder="Saat seçiniz"
+                  />
+                )}
+              />
+              {errors.duzenlenmeSaati && <div style={{ color: "red" }}>{errors.duzenlenmeSaati.message}</div>}
+            </div>
+          </div>
+          <div style={{ width: "100%", maxWidth: "450px" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                width: "100%",
+              }}>
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.isEmriTipi ? "600" : "normal" }}>
+                İş Emri Tipi:
+              </Text>
+              <IsEmriTipiSelect fieldRequirements={fieldRequirements} />
+            </StyledDivBottomLine>
+          </div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
             <StyledDivBottomLine
               style={{
@@ -310,7 +286,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 width: "100%",
                 maxWidth: "450px",
               }}>
-              <Text style={{ fontSize: "14px", fontWeight: "600" }}>Talepte Bulunan:</Text>
+              <Text style={{ fontSize: "14px", fontWeight: "600" }}>Durum:</Text>
               <div
                 style={{
                   display: "flex",
@@ -320,21 +296,21 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                   width: "300px",
                 }}>
                 <Controller
-                  name="talepteBulunan"
+                  name="isEmriDurum"
                   control={control}
                   rules={{ required: "Alan Boş Bırakılamaz!" }}
                   render={({ field, fieldState: { error } }) => (
                     <Input
                       {...field}
-                      status={errors.talepteBulunan ? "error" : ""}
+                      status={errors.isEmriDurum ? "error" : ""}
                       type="text" // Set the type to "text" for name input
-                      style={{ width: "215px" }}
+                      style={{ width: "255px" }}
                       disabled
                     />
                   )}
                 />
                 <Controller
-                  name="talepteBulunanID"
+                  name="isEmriDurumID"
                   control={control}
                   render={({ field }) => (
                     <Input
@@ -344,21 +320,15 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                     />
                   )}
                 />
-                <KullaniciTablo
+                <IsEmriDurumModal
+                  fieldRequirements={fieldRequirements}
                   onSubmit={(selectedData) => {
-                    setValue("talepteBulunan", selectedData.ISK_ISIM);
-                    setValue("talepteBulunanID", selectedData.key);
-                    setValue("lokasyonTanim", selectedData.ISK_LOKASYON);
-                    setValue("lokasyonID", selectedData.ISK_LOKASYON_ID);
-                    setValue("departman", selectedData.ISK_DEPARTMAN);
-                    setValue("departmanID", selectedData.ISK_DEPARTMAN_ID);
-                    setValue("irtibatTelefonu", selectedData.ISK_TELEFON_1);
-                    setValue("email", selectedData.ISK_MAIL);
+                    setValue("isEmriDurum", selectedData.ISK_ISIM);
+                    setValue("isEmriDurumID", selectedData.key);
                   }}
                 />
-                <Button onClick={handleTalepteBulunanMinusClick}> - </Button>
-                {errors.talepteBulunan && (
-                  <div style={{ color: "red", marginTop: "5px" }}>{errors.talepteBulunan.message}</div>
+                {errors.isEmriDurum && (
+                  <div style={{ color: "red", marginTop: "5px" }}>{errors.isEmriDurum.message}</div>
                 )}
               </div>
             </StyledDivBottomLine>
@@ -530,21 +500,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
               <IletisimSekli fieldRequirements={fieldRequirements} />
             </StyledDivBottomLine>
           </div>
-          <div style={{ width: "100%", maxWidth: "450px" }}>
-            <StyledDivBottomLine
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "flex-start",
-                justifyContent: "space-between",
-                width: "100%",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.talepTipi ? "600" : "normal" }}>
-                Talep Tipi:
-              </Text>
-              <TalepTipi fieldRequirements={fieldRequirements} />
-            </StyledDivBottomLine>
-          </div>
+
           <div style={{ width: "100%", maxWidth: "450px" }}>
             <StyledDivBottomLine
               style={{
@@ -747,7 +703,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                     />
                   )}
                 />
-                <KullaniciTablo
+                <IsEmriDurumModal
                   onSubmit={(selectedData) => {
                     setValue("ilgiliKisi", selectedData.ISK_ISIM);
                     setValue("ilgiliKisiID", selectedData.key);

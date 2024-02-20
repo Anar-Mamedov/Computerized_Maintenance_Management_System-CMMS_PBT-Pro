@@ -26,7 +26,7 @@ export default function MainTable() {
   function hexToRGBA(hex, opacity) {
     // hex veya opacity null ise hata döndür
     if (hex === null || opacity === null) {
-      console.error("hex veya opacity null olamaz!");
+      // console.error("hex veya opacity null olamaz!");
       return; // veya uygun bir varsayılan değer döndürebilirsiniz
     }
 
