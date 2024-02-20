@@ -7,7 +7,7 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function TalepTipi({ disabled, fieldRequirements }) {
+export default function DurumSelect({ disabled, fieldRequirements }) {
   const {
     control,
     setValue,
@@ -27,7 +27,7 @@ export default function TalepTipi({ disabled, fieldRequirements }) {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32951");
+      const response = await AxiosInstance.get("KodList?grup=32801");
       if (response && response) {
         setOptions(response);
       }
@@ -55,7 +55,7 @@ export default function TalepTipi({ disabled, fieldRequirements }) {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32951`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32801`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
@@ -96,13 +96,13 @@ export default function TalepTipi({ disabled, fieldRequirements }) {
       {contextHolder}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", flexDirection: "column" }}>
         <Controller
-          name="talepTipi"
+          name="isEmriDurum"
           control={control}
-          rules={{ required: fieldRequirements.talepTipi ? "Alan Boş Bırakılamaz!" : false }}
+          rules={{ required: fieldRequirements.isEmriDurum ? "Alan Boş Bırakılamaz!" : false }}
           render={({ field }) => (
             <Select
               {...field}
-              status={errors.talepTipi ? "error" : ""}
+              status={errors.isEmriDurum ? "error" : ""}
               disabled={disabled}
               key={selectKey}
               style={{ width: "300px" }}
@@ -142,18 +142,25 @@ export default function TalepTipi({ disabled, fieldRequirements }) {
                 label: item.KOD_TANIM, // Display the name in the dropdown
               }))}
               onChange={(value) => {
-                // Seçilen değerin ID'sini NedeniID alanına set et
-                // `null` veya `undefined` değerlerini ele al
-                setValue("talepTipi", value ?? null);
-                setValue("talepTipiID", value ?? null);
-                field.onChange(value ?? null);
+                // Seçilen değerin ID'sine göre options dizisinden ilgili öğeyi bul
+                const selectedOption = options.find((option) => option.TB_KOD_ID === value);
+
+                // Seçilen öğenin adını ve ID'sini form state'ine ayarla
+                setValue("isEmriDurum", selectedOption ? selectedOption.KOD_TANIM : null);
+                setValue("isEmriDurumID", value ?? null); // ID değeri doğrudan kullanılabilir
+                setValue("varsayilanDurum", selectedOption ? selectedOption.KOD_ISM_DURUM_VARSAYILAN : false); // KOD_ISM_DURUM_VARSAYILAN değerini set et
+
+                // Eğer field.onChange fonksiyonu varsa, seçilen değeri buraya da geçir
+                if (field.onChange) {
+                  field.onChange(selectedOption ? selectedOption.KOD_TANIM : null);
+                }
               }}
               value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
             />
           )}
         />
         <Controller
-          name="talepTipiID"
+          name="isEmriDurumID"
           control={control}
           render={({ field }) => (
             <Input
@@ -163,7 +170,7 @@ export default function TalepTipi({ disabled, fieldRequirements }) {
             />
           )}
         />
-        {errors.talepTipi && <div style={{ color: "red", marginTop: "5px" }}>{errors.talepTipi.message}</div>}
+        {errors.isEmriDurum && <div style={{ color: "red", marginTop: "5px" }}>{errors.isEmriDurum.message}</div>}
       </div>
     </div>
   );
