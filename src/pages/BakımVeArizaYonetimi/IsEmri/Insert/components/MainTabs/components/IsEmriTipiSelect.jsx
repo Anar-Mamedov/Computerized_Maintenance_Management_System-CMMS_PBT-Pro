@@ -49,11 +49,11 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
         <Controller
           name="isEmriTipi"
           control={control}
-          rules={{ required: fieldRequirements.isEmriTipi ? "Alan Boş Bırakılamaz!" : false }}
-          render={({ field }) => (
+          rules={{ required: "Alan Boş Bırakılamaz!" }}
+          render={({ field, fieldState: { error } }) => (
             <Select
               {...field}
-              status={errors.isEmriTipi ? "error" : ""}
+              status={error ? "error" : ""}
               disabled={disabled}
               key={selectKey}
               style={{ width: "300px" }}
