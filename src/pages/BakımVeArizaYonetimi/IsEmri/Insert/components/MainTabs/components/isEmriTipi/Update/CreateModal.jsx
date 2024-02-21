@@ -1,11 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Input, Typography, Tabs } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../../api/http";
 import { Controller, useForm, FormProvider } from "react-hook-form";
-import dayjs from "dayjs";
 import MainTabs from "./MainTabs/MainTabs";
+import EditTabs from "./SecondTabs/EditTabs";
+import dayjs from "dayjs";
 
-export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh }) {
+export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenPersonelID, selectedRow }) {
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const methods = useForm({
     defaultValues: {
       belgeNo: "",
@@ -53,7 +56,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
 
   const onSubmited = (data) => {
     const Body = {
-      TB_PERSONEL_SERTIFIKA_ID: data.secilenID,
+      PSE_PERSONEL_ID: secilenPersonelID,
       PSE_BELGE_NO: data.belgeNo,
       PSE_SERTIFIKA_TIP_KOD_ID: data.sertifikaTipiID,
       PSE_VERILIS_TARIH: formatDateWithDayjs(data.verilisTarihi),
@@ -62,12 +65,12 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       PSE_OLUSTURAN_ID: 24,
     };
 
-    AxiosInstance.post("UpdatePersonelSertifika", Body)
+    AxiosInstance.post("AddPersonelSertifika", Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
         reset();
-        onModalClose(); // Modal'ı kapat
-        onRefresh(); // Tabloyu yenile
+        setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
+        onRefresh();
       })
       .catch((error) => {
         console.error("Error sending data:", error);
@@ -76,20 +79,52 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
     console.log({ Body });
   };
 
+  const handleModalToggle = () => {
+    setIsModalVisible((prev) => !prev);
+    if (!isModalVisible) {
+      reset();
+    }
+  };
+
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi sonu
+
+  const handleSelectedRow = (selectedRowData) => {
+    // Burada, tıklanan satırın verisini işleyebilirsiniz.
+    // Örneğin, form alanlarını doldurmak veya başka bir işlem yapmak için kullanabilirsiniz.
+    console.log("Seçilen satır:", selectedRowData);
+    setValue("secilenID", selectedRowData.key);
+  };
 
   return (
     <FormProvider {...methods}>
       <div>
+        <div style={{ display: "flex", width: "100%", justifyContent: "flex-end" }}>
+          <Button
+            style={{
+              width: "32px",
+              height: "32px",
+              padding: "0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onClick={handleModalToggle}>
+            <PlusOutlined />
+          </Button>
+        </div>
+
         <Modal
           width="800px"
-          title="Sertifika Güncelle"
+          title="İş Emri Tipi"
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
-          onCancel={onModalClose}>
-          <form onSubmit={methods.handleSubmit(onSubmited)}>
-            <MainTabs />
-          </form>
+          onCancel={handleModalToggle}>
+          <div style={{ display: "flex" }}>
+            <MainTabs onSelectedRow={handleSelectedRow} />
+            <form onSubmit={methods.handleSubmit(onSubmited)}>
+              <EditTabs selectedRow={selectedRow} />
+            </form>
+          </div>
         </Modal>
       </div>
     </FormProvider>
