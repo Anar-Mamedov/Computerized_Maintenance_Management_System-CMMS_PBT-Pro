@@ -271,9 +271,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 justifyContent: "space-between",
                 width: "100%",
               }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.isEmriTipi ? "600" : "normal" }}>
-                İş Emri Tipi:
-              </Text>
+              <Text style={{ fontSize: "14px", fontWeight: "600" }}>İş Emri Tipi:</Text>
               <IsEmriTipiSelect fieldRequirements={fieldRequirements} />
             </StyledDivBottomLine>
           </div>
@@ -302,7 +300,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                   render={({ field, fieldState: { error } }) => (
                     <Input
                       {...field}
-                      status={errors.isEmriDurum ? "error" : ""}
+                      status={error ? "error" : ""}
                       type="text" // Set the type to "text" for name input
                       style={{ width: "255px" }}
                       disabled
