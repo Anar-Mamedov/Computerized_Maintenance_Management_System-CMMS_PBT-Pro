@@ -11,13 +11,12 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
   const [isModalVisible, setIsModalVisible] = useState(false);
   const methods = useForm({
     defaultValues: {
-      belgeNo: "",
+      isEmriTipiTanim: "",
       secilenID: "",
-      sertifikaTipi: null,
-      sertifikaTipiID: "",
-      verilisTarihi: "",
-      bitisTarihi: "",
-      aciklama: "",
+      varsayilanIsEmriTipi: false,
+      isEmriTipiRenk: "#1677ff",
+      aktifIsEmriTipi: false,
+      tipGroup: "",
       // Add other default values here
     },
   });
@@ -57,7 +56,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
   const onSubmited = (data) => {
     const Body = {
       PSE_PERSONEL_ID: secilenPersonelID,
-      PSE_BELGE_NO: data.belgeNo,
+      PSE_BELGE_NO: data.secilenID,
       PSE_SERTIFIKA_TIP_KOD_ID: data.sertifikaTipiID,
       PSE_VERILIS_TARIH: formatDateWithDayjs(data.verilisTarihi),
       PSE_BITIS_TARIH: formatDateWithDayjs(data.bitisTarihi),
@@ -93,6 +92,11 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     // Örneğin, form alanlarını doldurmak veya başka bir işlem yapmak için kullanabilirsiniz.
     console.log("Seçilen satır:", selectedRowData);
     setValue("secilenID", selectedRowData.key);
+    setValue("isEmriTipiTanim", selectedRowData.IMT_TANIM);
+    setValue("varsayilanIsEmriTipi", selectedRowData.IMT_VARSAYILAN);
+    setValue("isEmriTipiRenk", selectedRowData.IMT_RENK_WEB_VERSION);
+    setValue("aktifIsEmriTipi", selectedRowData.IMT_AKTIF);
+    setValue("tipGroup", selectedRowData.IMT_TIP_GRUP);
   };
 
   return (
@@ -114,12 +118,12 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
         </div>
 
         <Modal
-          width="800px"
+          width="1000px"
           title="İş Emri Tipi"
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
           onCancel={handleModalToggle}>
-          <div style={{ display: "flex" }}>
+          <div style={{ display: "flex", gap: "10px" }}>
             <MainTabs onSelectedRow={handleSelectedRow} />
             <form onSubmit={methods.handleSubmit(onSubmited)}>
               <EditTabs selectedRow={selectedRow} />
