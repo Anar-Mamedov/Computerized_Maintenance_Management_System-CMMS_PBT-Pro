@@ -45,7 +45,9 @@ const StyledTabs = styled(Tabs)`
 export default function SecondTabs({ refreshKey, disabled, fieldRequirements }) {
   const { watch } = useFormContext();
 
-  const items = [
+  const tipGroupValue = watch("tipGroup"); // "tipGroup" isimli radio grubunu izle
+
+  let items = [
     {
       key: "1",
       label: "Zorunlu Alanlar",
@@ -67,6 +69,11 @@ export default function SecondTabs({ refreshKey, disabled, fieldRequirements }) 
       children: "tets",
     },
   ];
+
+  // Eğer 5. seçenek seçili değilse, key'i 3 olan sekme hariç tüm sekmeleri göster
+  if (tipGroupValue !== 5) {
+    items = items.filter((item) => item.key !== "3");
+  }
 
   return (
     <div>

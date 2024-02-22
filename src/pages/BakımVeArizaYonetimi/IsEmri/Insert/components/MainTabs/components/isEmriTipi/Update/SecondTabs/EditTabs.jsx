@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs, DatePicker, Checkbox, ColorPicker, Radio } from "antd";
+import { Checkbox, ColorPicker, Input, Radio, Typography } from "antd";
+import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import SecondTabs from "./SecondTabs";

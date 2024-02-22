@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Input, Typography, Tabs } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../../api/http";
-import { Controller, useForm, FormProvider } from "react-hook-form";
+import { Controller, useForm, FormProvider, set } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
 import EditTabs from "./SecondTabs/EditTabs";
 import dayjs from "dayjs";
@@ -16,7 +16,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       varsayilanIsEmriTipi: false,
       isEmriTipiRenk: "#1677ff",
       aktifIsEmriTipi: false,
-      tipGroup: "",
+      tipGroup: 1,
       lokasyon: true,
       makine: false,
       ekipman: false,
@@ -40,9 +40,26 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       evrakNo: false,
       evrakTarihi: false,
       maliyet: false,
-      detayBilgiler: false,
-      kontrolListesi: false,
-      kontrolListesiZorunlu: false,
+      // sekmeleri göster ve zorunlu olanları belirle
+      detayBilgiler: true,
+      kontrolListesiTab: false,
+      kontrolListesiTabZorunlu: false,
+      personelTab: false,
+      personelTabZorunlu: false,
+      malzemelerTab: false,
+      malzemelerTabZorunlu: false,
+      duruslarTab: false,
+      duruslarTabZorunlu: false,
+      sureBilgileriTab: false,
+      maliyetlerTab: false,
+      maliyetlerTabZorunlu: false,
+      ekipmanIslemleriTab: false,
+      ekipmanIslemleriTabZorunlu: false,
+      olcumDegerleriTab: false,
+      olcumDegerleriTabZorunlu: false,
+      ozelAlanlarTab: false,
+      aracGereclerTab: false,
+      aracGereclerTabZorunlu: false,
       // Add other default values here
     },
   });
@@ -110,6 +127,26 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       IMT_EVRAK_NO: data.evrakNo,
       IMT_EVRAK_TARIHI: data.evrakTarihi,
       IMT_MALIYET: data.maliyet,
+      // sekmeleri göster ve zorunlu olanları belirle
+      IMT_DETAY_TAB: data.detayBilgiler,
+      IMT_KONTROL_TAB: data.kontrolListesiTab,
+      IMT_KONTROL_TAB_ZORUNLU: data.kontrolListesiTabZorunlu,
+      IMT_PERSONEL_TAB: data.personelTab,
+      IMT_PERSONEL_TAB_ZORUNLU: data.personelTabZorunlu,
+      IMT_MALZEME_TAB: data.malzemelerTab,
+      IMT_MALZEME_TAB_ZORUNLU: data.malzemelerTabZorunlu,
+      IMT_DURUS_TAB: data.duruslarTab,
+      IMT_DURUS_TAB_ZORUNLU: data.duruslarTabZorunlu,
+      IMT_SURE_TAB: data.sureBilgileriTab,
+      IMT_MALIYET_TAB: data.maliyetlerTab,
+      IMT_TOPLAM_MALIYET_ZORUNLU: data.maliyetlerTabZorunlu,
+      IMT_EKIPMAN_TAB: data.ekipmanIslemleriTab,
+      IMT_EKIPMAN_TAB_ZORUNLU: data.ekipmanIslemleriTabZorunlu,
+      IMT_OLCUM_TAB: data.olcumDegerleriTab,
+      IMT_OLCUM_TAB_ZORUNLU: data.olcumDegerleriTabZorunlu,
+      IMT_OZEL_ALAN_TAB: data.ozelAlanlarTab,
+      IMT_ARAC_GEREC_TAB: data.aracGereclerTab,
+      IMT_ARAC_GEREC_TAB_ZORUNLU: data.aracGereclerTabZorunlu,
     };
 
     AxiosInstance.post("UpdateIsEmriTipi", Body)
@@ -168,6 +205,26 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     setValue("evrakNo", selectedRowData.IMT_EVRAK_NO);
     setValue("evrakTarihi", selectedRowData.IMT_EVRAK_TARIHI);
     setValue("maliyet", selectedRowData.IMT_MALIYET);
+    // sekmeleri göster ve zorunlu olanları belirle
+    setValue("detayBilgiler", selectedRowData.IMT_DETAY_TAB);
+    setValue("kontrolListesiTab", selectedRowData.IMT_KONTROL_TAB);
+    setValue("kontrolListesiTabZorunlu", selectedRowData.IMT_KONTROL_TAB_ZORUNLU);
+    setValue("personelTab", selectedRowData.IMT_PERSONEL_TAB);
+    setValue("personelTabZorunlu", selectedRowData.IMT_PERSONEL_TAB_ZORUNLU);
+    setValue("malzemelerTab", selectedRowData.IMT_MALZEME_TAB);
+    setValue("malzemelerTabZorunlu", selectedRowData.IMT_MALZEME_TAB_ZORUNLU);
+    setValue("duruslarTab", selectedRowData.IMT_DURUS_TAB);
+    setValue("duruslarTabZorunlu", selectedRowData.IMT_DURUS_TAB_ZORUNLU);
+    setValue("sureBilgileriTab", selectedRowData.IMT_SURE_TAB);
+    setValue("maliyetlerTab", selectedRowData.IMT_MALIYET_TAB);
+    setValue("maliyetlerTabZorunlu", selectedRowData.IMT_TOPLAM_MALIYET_ZORUNLU);
+    setValue("ekipmanIslemleriTab", selectedRowData.IMT_EKIPMAN_TAB);
+    setValue("ekipmanIslemleriTabZorunlu", selectedRowData.IMT_EKIPMAN_TAB_ZORUNLU);
+    setValue("olcumDegerleriTab", selectedRowData.IMT_OLCUM_TAB);
+    setValue("olcumDegerleriTabZorunlu", selectedRowData.IMT_OLCUM_TAB_ZORUNLU);
+    setValue("ozelAlanlarTab", selectedRowData.IMT_OZEL_ALAN_TAB);
+    setValue("aracGereclerTab", selectedRowData.IMT_ARAC_GEREC_TAB);
+    setValue("aracGereclerTabZorunlu", selectedRowData.IMT_ARAC_GEREC_TAB_ZORUNLU);
   };
 
   return (
@@ -193,7 +250,8 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
           title="İş Emri Tipi"
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
-          onCancel={handleModalToggle}>
+          onCancel={handleModalToggle}
+          destroyOnClose>
           <div style={{ display: "flex", gap: "10px" }}>
             <MainTabs onSelectedRow={handleSelectedRow} />
             <form onSubmit={methods.handleSubmit(onSubmited)}>
