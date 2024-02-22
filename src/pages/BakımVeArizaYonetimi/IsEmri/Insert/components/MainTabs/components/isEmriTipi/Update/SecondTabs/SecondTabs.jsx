@@ -3,6 +3,7 @@ import { Tabs } from "antd";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import ZorunluAlanlar from "./components/ZorunluAlanlar";
+import GoruntelenecekSayfalar from "./components/GoruntelenecekSayfalar";
 
 const onChange = (key) => {
   // console.log(key);
@@ -53,7 +54,7 @@ export default function SecondTabs({ refreshKey, disabled, fieldRequirements }) 
     {
       key: "2",
       label: "Görüntülenecek Sayfalar",
-      children: "tets",
+      children: <GoruntelenecekSayfalar />,
     },
     {
       key: "3",

@@ -40,6 +40,9 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       evrakNo: false,
       evrakTarihi: false,
       maliyet: false,
+      detayBilgiler: false,
+      kontrolListesi: false,
+      kontrolListesiZorunlu: false,
       // Add other default values here
     },
   });
@@ -84,7 +87,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       IMT_RENK_WEB_VERSION: data.isEmriTipiRenk,
       IMT_AKTIF: data.aktifIsEmriTipi,
       IMT_TIP_GRUP: data.tipGroup,
-      IMT_LOKASYON: data.lokasyon,
+      IMT_LOKASYON: true,
       IMT_MAKINE: data.makine,
       IMT_EKIPMAN: data.ekipman,
       IMT_MAKINE_DURUM: data.makineDurum,
