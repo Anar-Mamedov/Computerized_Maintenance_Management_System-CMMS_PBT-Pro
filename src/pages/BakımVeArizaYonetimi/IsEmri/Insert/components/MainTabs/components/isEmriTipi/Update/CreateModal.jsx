@@ -1,14 +1,20 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs } from "antd";
+import { Button, Modal, Input, Typography, Tabs, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../../api/http";
 import { Controller, useForm, FormProvider, set } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
 import EditTabs from "./SecondTabs/EditTabs";
 import dayjs from "dayjs";
+import { useAppContext } from "../../../../../../../../../AppContext";
 
 export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenPersonelID, selectedRow }) {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const { isModalVisible, setIsModalVisible } = useAppContext();
+
+  // message
+  const [messageApi, contextHolder] = message.useMessage();
+  // message end
+
   const methods = useForm({
     defaultValues: {
       isEmriTipiTanim: "",
@@ -67,22 +73,10 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
   const { setValue, reset, handleSubmit } = methods;
 
   useEffect(() => {
-    if (isModalVisible && selectedRow) {
-      setValue("secilenID", selectedRow.key);
-      setValue("belgeNo", selectedRow.PSE_BELGE_NO);
-      setValue("sertifikaTipi", selectedRow.PSE_SERTIFIKA_TIP);
-      setValue("sertifikaTipiID", selectedRow.PSE_SERTIFIKA_TIP_KOD_ID);
-      setValue("verilisTarihi", dayjs(selectedRow.PSE_VERILIS_TARIH));
-      setValue("bitisTarihi", dayjs(selectedRow.PSE_BITIS_TARIH));
-      setValue("aciklama", selectedRow.PSE_ACIKLAMA);
-    }
-  }, [selectedRow, isModalVisible, setValue]);
-
-  useEffect(() => {
     if (!isModalVisible) {
-      reset();
+      methods.reset(); // `reset` doğrudan `methods` üzerinden çağrılıyor
     }
-  }, [isModalVisible, reset]);
+  }, [isModalVisible, methods]);
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
@@ -128,7 +122,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       IMT_EVRAK_TARIHI: data.evrakTarihi,
       IMT_MALIYET: data.maliyet,
       // sekmeleri göster ve zorunlu olanları belirle
-      IMT_DETAY_TAB: data.detayBilgiler,
+      IMT_DETAY_TAB: true,
       IMT_KONTROL_TAB: data.kontrolListesiTab,
       IMT_KONTROL_TAB_ZORUNLU: data.kontrolListesiTabZorunlu,
       IMT_PERSONEL_TAB: data.personelTab,
@@ -154,7 +148,23 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
         console.log("Data sent successfully:", response);
         reset();
         setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
-        onRefresh();
+        // onRefresh();
+        // İsteğin başarılı olduğunu kontrol et
+        if (response && response.status_code === 200) {
+          // Başarılı işlem mesajı veya başka bir işlem yap
+          messageApi.open({
+            type: "success",
+            content: "İşlem Başarılı!", // Using the success message from API response
+          });
+          console.log("İşlem başarılı.");
+        } else {
+          messageApi.open({
+            type: "error",
+            content: "İşlem Başarısız!", // Using the error message from API response
+          });
+          // Hata mesajı göster
+          console.error("Bir hata oluştu.");
+        }
       })
       .catch((error) => {
         console.error("Error sending data:", error);
@@ -229,6 +239,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
 
   return (
     <FormProvider {...methods}>
+      {contextHolder}
       <div>
         <div style={{ display: "flex", width: "100%", justifyContent: "flex-end" }}>
           <Button
