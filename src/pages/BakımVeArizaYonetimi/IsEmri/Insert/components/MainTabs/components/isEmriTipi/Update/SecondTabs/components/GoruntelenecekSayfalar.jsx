@@ -310,6 +310,23 @@ export default function ZorunluAlanlar() {
             )}
           />
         </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            width: "100%",
+          }}>
+          <Controller
+            name="notlarTab"
+            control={control}
+            render={({ field }) => (
+              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                Notlar
+              </Checkbox>
+            )}
+          />
+        </div>
       </div>
     </div>
   );

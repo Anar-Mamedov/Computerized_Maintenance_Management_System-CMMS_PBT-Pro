@@ -265,6 +265,17 @@ export default function ZorunluAlanlar() {
             )}
           />
         </div>
+        <div>
+          <Controller
+            name="notlar"
+            control={control}
+            render={({ field }) => (
+              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                Notlar
+              </Checkbox>
+            )}
+          />
+        </div>
       </div>
     </div>
   );
