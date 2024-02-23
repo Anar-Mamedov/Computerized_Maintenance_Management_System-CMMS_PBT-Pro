@@ -47,6 +47,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       evrakNo: false,
       evrakTarihi: false,
       maliyet: false,
+      notlar: false,
       // sekmeleri göster ve zorunlu olanları belirle
       detayBilgiler: true,
       kontrolListesiTab: false,
@@ -67,6 +68,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       ozelAlanlarTab: false,
       aracGereclerTab: false,
       aracGereclerTabZorunlu: false,
+      notlarTab: false,
       // kapama zorunlu alanları
       kapamaZamani: false,
       makineDurumuKapama: false,
@@ -106,6 +108,8 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       ozelAlan18Kapama: false,
       ozelAlan19Kapama: false,
       ozelAlan20Kapama: false,
+      aciklamaKapama: false,
+      notlarKapama: false,
       // Add other default values here
     },
   });
@@ -162,6 +166,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       IMT_EVRAK_NO: data.evrakNo,
       IMT_EVRAK_TARIHI: data.evrakTarihi,
       IMT_MALIYET: data.maliyet,
+      IMT_NOTLAR: data.notlar,
       // sekmeleri göster ve zorunlu olanları belirle
       IMT_DETAY_TAB: true,
       IMT_KONTROL_TAB: data.kontrolListesiTab,
@@ -182,6 +187,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       IMT_OZEL_ALAN_TAB: data.ozelAlanlarTab,
       IMT_ARAC_GEREC_TAB: data.aracGereclerTab,
       IMT_ARAC_GEREC_TAB_ZORUNLU: data.aracGereclerTabZorunlu,
+      IMT_NOTLAR_TAB: data.notlarTab,
       // kapama zorunlu alanları
       IMT_KAPANMA_ZAMANI: data.kapamaZamani,
       IMT_MAKINE_DURUM_KAPAT: data.makineDurumuKapama,
@@ -221,6 +227,8 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       IMT_OZEL_ALAN_18: data.ozelAlan18Kapama,
       IMT_OZEL_ALAN_19: data.ozelAlan19Kapama,
       IMT_OZEL_ALAN_20: data.ozelAlan20Kapama,
+      IMT_ACIKLAMA_KAPAT: data.aciklamaKapama,
+      IMT_NOTLAR_KAPAT: data.notlarKapama,
     };
     AxiosInstance.post("UpdateIsEmriTipi", Body)
       .then((response) => {

@@ -451,6 +451,28 @@ export default function IsEmriKapamaZorunlu() {
             )}
           />
         </div>
+        <div>
+          <Controller
+            name="aciklamaKapama"
+            control={control}
+            render={({ field }) => (
+              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                Açıklama
+              </Checkbox>
+            )}
+          />
+        </div>
+        <div>
+          <Controller
+            name="notlarKapama"
+            control={control}
+            render={({ field }) => (
+              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                Notlar
+              </Checkbox>
+            )}
+          />
+        </div>
       </div>
     </div>
   );
