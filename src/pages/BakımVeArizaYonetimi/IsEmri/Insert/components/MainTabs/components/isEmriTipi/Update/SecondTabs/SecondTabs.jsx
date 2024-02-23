@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import ZorunluAlanlar from "./components/ZorunluAlanlar";
 import GoruntelenecekSayfalar from "./components/GoruntelenecekSayfalar";
+import IsEmriKapamaZorunlu from "./components/IsEmriKapamaZorunlu";
 
 const onChange = (key) => {
   // console.log(key);
@@ -66,7 +67,7 @@ export default function SecondTabs({ refreshKey, disabled, fieldRequirements }) 
     {
       key: "4",
       label: "İş Emri Kapama",
-      children: "tets",
+      children: <IsEmriKapamaZorunlu />,
     },
   ];
 
