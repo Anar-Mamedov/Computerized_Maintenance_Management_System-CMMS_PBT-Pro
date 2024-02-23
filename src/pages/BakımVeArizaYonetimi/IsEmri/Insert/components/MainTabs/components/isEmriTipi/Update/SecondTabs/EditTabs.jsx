@@ -137,6 +137,9 @@ export default function EditTabs() {
             border: "1px solid #80808068",
             borderRadius: "5px",
             padding: "10px",
+            maxWidth: "460px",
+            display: "flex",
+            justifyContent: "center",
           }}>
           <Controller
             name="tipGroup"

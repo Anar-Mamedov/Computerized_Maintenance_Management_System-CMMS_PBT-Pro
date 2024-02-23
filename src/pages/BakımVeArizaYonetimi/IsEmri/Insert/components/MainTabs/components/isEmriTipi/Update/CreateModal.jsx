@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs, message } from "antd";
+import { Button, Modal, Input, Typography, Tabs, message, Spin } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../../api/http";
 import { Controller, useForm, FormProvider, set } from "react-hook-form";
@@ -10,6 +10,7 @@ import { useAppContext } from "../../../../../../../../../AppContext";
 
 export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenPersonelID, selectedRow }) {
   const { isModalVisible, setIsModalVisible } = useAppContext();
+  const [loading, setLoading] = useState(false);
 
   // message
   const [messageApi, contextHolder] = message.useMessage();
@@ -66,6 +67,45 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       ozelAlanlarTab: false,
       aracGereclerTab: false,
       aracGereclerTabZorunlu: false,
+      // kapama zorunlu alanları
+      kapamaZamani: false,
+      makineDurumuKapama: false,
+      bakimPuaniKapama: false,
+      personelCalismaSuresiKapama: false,
+      makineKapama: false,
+      ekipmanKapama: false,
+      sayacDegeriKapama: false,
+      prosedurKapama: false,
+      isTipiKapama: false,
+      okunanSayacKapama: false,
+      isNedeniKapama: false,
+      konuKapama: false,
+      oncelikKapama: false,
+      atolyeKapama: false,
+      firmaKapama: false,
+      sozlesmeKapama: false,
+      projeKapama: false,
+      referansNoKapama: false,
+      ozelAlan1Kapama: false,
+      ozelAlan2Kapama: false,
+      ozelAlan3Kapama: false,
+      ozelAlan4Kapama: false,
+      ozelAlan5Kapama: false,
+      ozelAlan6Kapama: false,
+      ozelAlan7Kapama: false,
+      ozelAlan8Kapama: false,
+      ozelAlan9Kapama: false,
+      ozelAlan10Kapama: false,
+      ozelAlan11Kapama: false,
+      ozelAlan12Kapama: false,
+      ozelAlan13Kapama: false,
+      ozelAlan14Kapama: false,
+      ozelAlan15Kapama: false,
+      ozelAlan16Kapama: false,
+      ozelAlan17Kapama: false,
+      ozelAlan18Kapama: false,
+      ozelAlan19Kapama: false,
+      ozelAlan20Kapama: false,
       // Add other default values here
     },
   });
@@ -91,6 +131,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi
 
   const onSubmited = (data) => {
+    setLoading(true);
     const Body = {
       IMT_TANIM: data.isEmriTipiTanim,
       TB_ISEMRI_TIP_ID: data.secilenID,
@@ -141,8 +182,46 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       IMT_OZEL_ALAN_TAB: data.ozelAlanlarTab,
       IMT_ARAC_GEREC_TAB: data.aracGereclerTab,
       IMT_ARAC_GEREC_TAB_ZORUNLU: data.aracGereclerTabZorunlu,
+      // kapama zorunlu alanları
+      IMT_KAPANMA_ZAMANI: data.kapamaZamani,
+      IMT_MAKINE_DURUM_KAPAT: data.makineDurumuKapama,
+      IMT_BAKIM_PUAN: data.bakimPuaniKapama,
+      IMT_PERSONEL_SURE: data.personelCalismaSuresiKapama,
+      IMT_MAKINE_KAPAT: data.makineKapama,
+      IMT_EKIPMAN_KAPAT: data.ekipmanKapama,
+      IMT_SAYAC_DEGER_KAPAT: data.sayacDegeriKapama,
+      IMT_PROSEDUR_KAPAT: data.prosedurKapama,
+      IMT_IS_TIPI_KAPAT: data.isTipiKapama,
+      IMT_OKUNAN_SAYAC: data.okunanSayacKapama,
+      IMT_IS_NEDENI_KAPAT: data.isNedeniKapama,
+      IMT_KONU_KAPAT: data.konuKapama,
+      IMT_ONCELIK_KAPAT: data.oncelikKapama,
+      IMT_ATOLYE_KAPAT: data.atolyeKapama,
+      IMT_FIRMA_KAPAT: data.firmaKapama,
+      IMT_SOZLESME_KAPAT: data.sozlesmeKapama,
+      IMT_PROJE_KAPAT: data.projeKapama,
+      IMT_REFNO_KAPAT: data.referansNoKapama,
+      IMT_OZEL_ALAN_1: data.ozelAlan1Kapama,
+      IMT_OZEL_ALAN_2: data.ozelAlan2Kapama,
+      IMT_OZEL_ALAN_3: data.ozelAlan3Kapama,
+      IMT_OZEL_ALAN_4: data.ozelAlan4Kapama,
+      IMT_OZEL_ALAN_5: data.ozelAlan5Kapama,
+      IMT_OZEL_ALAN_6: data.ozelAlan6Kapama,
+      IMT_OZEL_ALAN_7: data.ozelAlan7Kapama,
+      IMT_OZEL_ALAN_8: data.ozelAlan8Kapama,
+      IMT_OZEL_ALAN_9: data.ozelAlan9Kapama,
+      IMT_OZEL_ALAN_10: data.ozelAlan10Kapama,
+      IMT_OZEL_ALAN_11: data.ozelAlan11Kapama,
+      IMT_OZEL_ALAN_12: data.ozelAlan12Kapama,
+      IMT_OZEL_ALAN_13: data.ozelAlan13Kapama,
+      IMT_OZEL_ALAN_14: data.ozelAlan14Kapama,
+      IMT_OZEL_ALAN_15: data.ozelAlan15Kapama,
+      IMT_OZEL_ALAN_16: data.ozelAlan16Kapama,
+      IMT_OZEL_ALAN_17: data.ozelAlan17Kapama,
+      IMT_OZEL_ALAN_18: data.ozelAlan18Kapama,
+      IMT_OZEL_ALAN_19: data.ozelAlan19Kapama,
+      IMT_OZEL_ALAN_20: data.ozelAlan20Kapama,
     };
-
     AxiosInstance.post("UpdateIsEmriTipi", Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
@@ -157,6 +236,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
             content: "İşlem Başarılı!", // Using the success message from API response
           });
           console.log("İşlem başarılı.");
+          setLoading(false);
         } else {
           messageApi.open({
             type: "error",
@@ -164,10 +244,12 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
           });
           // Hata mesajı göster
           console.error("Bir hata oluştu.");
+          setLoading(false);
         }
       })
       .catch((error) => {
         console.error("Error sending data:", error);
+        setLoading(false);
       });
 
     console.log({ Body });
@@ -235,11 +317,51 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     setValue("ozelAlanlarTab", selectedRowData.IMT_OZEL_ALAN_TAB);
     setValue("aracGereclerTab", selectedRowData.IMT_ARAC_GEREC_TAB);
     setValue("aracGereclerTabZorunlu", selectedRowData.IMT_ARAC_GEREC_TAB_ZORUNLU);
+    // kapama zorunlu alanları
+    setValue("kapamaZamani", selectedRowData.IMT_KAPANMA_ZAMANI);
+    setValue("makineDurumuKapama", selectedRowData.IMT_MAKINE_DURUM_KAPAT);
+    setValue("bakimPuaniKapama", selectedRowData.IMT_BAKIM_PUAN);
+    setValue("personelCalismaSuresiKapama", selectedRowData.IMT_PERSONEL_SURE);
+    setValue("makineKapama", selectedRowData.IMT_MAKINE_KAPAT);
+    setValue("ekipmanKapama", selectedRowData.IMT_EKIPMAN_KAPAT);
+    setValue("sayacDegeriKapama", selectedRowData.IMT_SAYAC_DEGER_KAPAT);
+    setValue("prosedurKapama", selectedRowData.IMT_PROSEDUR_KAPAT);
+    setValue("isTipiKapama", selectedRowData.IMT_IS_TIPI_KAPAT);
+    setValue("okunanSayacKapama", selectedRowData.IMT_OKUNAN_SAYAC);
+    setValue("isNedeniKapama", selectedRowData.IMT_IS_NEDENI_KAPAT);
+    setValue("konuKapama", selectedRowData.IMT_KONU_KAPAT);
+    setValue("oncelikKapama", selectedRowData.IMT_ONCELIK_KAPAT);
+    setValue("atolyeKapama", selectedRowData.IMT_ATOLYE_KAPAT);
+    setValue("firmaKapama", selectedRowData.IMT_FIRMA_KAPAT);
+    setValue("sozlesmeKapama", selectedRowData.IMT_SOZLESME_KAPAT);
+    setValue("projeKapama", selectedRowData.IMT_PROJE_KAPAT);
+    setValue("referansNoKapama", selectedRowData.IMT_REFNO_KAPAT);
+    setValue("ozelAlan1Kapama", selectedRowData.IMT_OZEL_ALAN_1);
+    setValue("ozelAlan2Kapama", selectedRowData.IMT_OZEL_ALAN_2);
+    setValue("ozelAlan3Kapama", selectedRowData.IMT_OZEL_ALAN_3);
+    setValue("ozelAlan4Kapama", selectedRowData.IMT_OZEL_ALAN_4);
+    setValue("ozelAlan5Kapama", selectedRowData.IMT_OZEL_ALAN_5);
+    setValue("ozelAlan6Kapama", selectedRowData.IMT_OZEL_ALAN_6);
+    setValue("ozelAlan7Kapama", selectedRowData.IMT_OZEL_ALAN_7);
+    setValue("ozelAlan8Kapama", selectedRowData.IMT_OZEL_ALAN_8);
+    setValue("ozelAlan9Kapama", selectedRowData.IMT_OZEL_ALAN_9);
+    setValue("ozelAlan10Kapama", selectedRowData.IMT_OZEL_ALAN_10);
+    setValue("ozelAlan11Kapama", selectedRowData.IMT_OZEL_ALAN_11);
+    setValue("ozelAlan12Kapama", selectedRowData.IMT_OZEL_ALAN_12);
+    setValue("ozelAlan13Kapama", selectedRowData.IMT_OZEL_ALAN_13);
+    setValue("ozelAlan14Kapama", selectedRowData.IMT_OZEL_ALAN_14);
+    setValue("ozelAlan15Kapama", selectedRowData.IMT_OZEL_ALAN_15);
+    setValue("ozelAlan16Kapama", selectedRowData.IMT_OZEL_ALAN_16);
+    setValue("ozelAlan17Kapama", selectedRowData.IMT_OZEL_ALAN_17);
+    setValue("ozelAlan18Kapama", selectedRowData.IMT_OZEL_ALAN_18);
+    setValue("ozelAlan19Kapama", selectedRowData.IMT_OZEL_ALAN_19);
+    setValue("ozelAlan20Kapama", selectedRowData.IMT_OZEL_ALAN_20);
   };
 
   return (
     <FormProvider {...methods}>
       {contextHolder}
+
       <div>
         <div style={{ display: "flex", width: "100%", justifyContent: "flex-end" }}>
           <Button
@@ -257,18 +379,21 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
         </div>
 
         <Modal
+          centered
           width="1000px"
           title="İş Emri Tipi"
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
           onCancel={handleModalToggle}
           destroyOnClose>
-          <div style={{ display: "flex", gap: "10px" }}>
-            <MainTabs onSelectedRow={handleSelectedRow} />
-            <form onSubmit={methods.handleSubmit(onSubmited)}>
-              <EditTabs selectedRow={selectedRow} />
-            </form>
-          </div>
+          <Spin spinning={loading}>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <MainTabs onSelectedRow={handleSelectedRow} />
+              <form onSubmit={methods.handleSubmit(onSubmited)}>
+                <EditTabs selectedRow={selectedRow} />
+              </form>
+            </div>
+          </Spin>
         </Modal>
       </div>
     </FormProvider>
