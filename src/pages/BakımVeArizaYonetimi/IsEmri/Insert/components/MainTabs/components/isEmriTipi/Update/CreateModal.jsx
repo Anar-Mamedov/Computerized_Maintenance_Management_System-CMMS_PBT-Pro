@@ -110,6 +110,10 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       ozelAlan20Kapama: false,
       aciklamaKapama: false,
       notlarKapama: false,
+      // Çağrılacak Prosedür
+      cagrilacakProsedur: null,
+      cagrilacakProsedurID: "",
+      cagrilacakProsedurLabel: "",
       // Add other default values here
     },
   });
@@ -229,6 +233,8 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       IMT_OZEL_ALAN_20: data.ozelAlan20Kapama,
       IMT_ACIKLAMA_KAPAT: data.aciklamaKapama,
       IMT_NOTLAR_KAPAT: data.notlarKapama,
+      // Çağrılacak Prosedür
+      IMT_CAGRILACAK_PROSEDUR: data.cagrilacakProsedurID,
     };
     AxiosInstance.post("UpdateIsEmriTipi", Body)
       .then((response) => {
@@ -273,6 +279,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi sonu
 
   const handleSelectedRow = (selectedRowData) => {
+    methods.reset();
     // Burada, tıklanan satırın verisini işleyebilirsiniz.
     // Örneğin, form alanlarını doldurmak veya başka bir işlem yapmak için kullanabilirsiniz.
     console.log("Seçilen satır:", selectedRowData);
@@ -305,6 +312,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     setValue("evrakNo", selectedRowData.IMT_EVRAK_NO);
     setValue("evrakTarihi", selectedRowData.IMT_EVRAK_TARIHI);
     setValue("maliyet", selectedRowData.IMT_MALIYET);
+    setValue("notlar", selectedRowData.IMT_NOTLAR);
     // sekmeleri göster ve zorunlu olanları belirle
     setValue("detayBilgiler", selectedRowData.IMT_DETAY_TAB);
     setValue("kontrolListesiTab", selectedRowData.IMT_KONTROL_TAB);
@@ -325,6 +333,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     setValue("ozelAlanlarTab", selectedRowData.IMT_OZEL_ALAN_TAB);
     setValue("aracGereclerTab", selectedRowData.IMT_ARAC_GEREC_TAB);
     setValue("aracGereclerTabZorunlu", selectedRowData.IMT_ARAC_GEREC_TAB_ZORUNLU);
+    setValue("notlarTab", selectedRowData.IMT_NOTLAR_TAB);
     // kapama zorunlu alanları
     setValue("kapamaZamani", selectedRowData.IMT_KAPANMA_ZAMANI);
     setValue("makineDurumuKapama", selectedRowData.IMT_MAKINE_DURUM_KAPAT);
@@ -364,6 +373,10 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     setValue("ozelAlan18Kapama", selectedRowData.IMT_OZEL_ALAN_18);
     setValue("ozelAlan19Kapama", selectedRowData.IMT_OZEL_ALAN_19);
     setValue("ozelAlan20Kapama", selectedRowData.IMT_OZEL_ALAN_20);
+    setValue("aciklamaKapama", selectedRowData.IMT_ACIKLAMA_KAPAT);
+    setValue("notlarKapama", selectedRowData.IMT_NOTLAR_KAPAT);
+    // Çağrılacak Prosedür
+    setValue("cagrilacakProsedurID", selectedRowData.IMT_CAGRILACAK_PROSEDUR);
   };
 
   return (

@@ -2,6 +2,7 @@ import { Spin, Table } from "antd";
 import React, { useCallback, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../../../api/http";
+import TipEkle from "../../Insert/TipEkle";
 
 export default function MainTabs({ onSelectedRow }) {
   const { setValue } = useFormContext();
@@ -94,7 +95,7 @@ export default function MainTabs({ onSelectedRow }) {
   }, []); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
 
   return (
-    <div style={{ width: "200px" }}>
+    <div style={{ width: "200px", display: "flex", flexDirection: "column", alignItems: "center", gap: "15px" }}>
       <style>
         {`
           .boldRow {
@@ -112,6 +113,7 @@ export default function MainTabs({ onSelectedRow }) {
           scroll={{ y: "500px" }}
         />
       </Spin>
+      <TipEkle onRefresh={refreshTableData} />
     </div>
   );
 }
