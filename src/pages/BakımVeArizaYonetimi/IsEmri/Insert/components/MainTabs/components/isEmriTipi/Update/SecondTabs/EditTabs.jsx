@@ -111,9 +111,9 @@ export default function EditTabs() {
               control={control}
               render={({ field }) => (
                 <ColorPicker
+                  value={field.value} // Ensure the current value is set
+                  onChange={(color, hex) => field.onChange(hex)} // Use hex value directly
                   showText
-                  value={field.value} // Controller'dan gelen field.value ile ColorPicker'ın değerini ayarlayın
-                  onChange={(color) => field.onChange(color.hex)} // ColorPicker'dan gelen renk değişikliğini handle edin ve hex değerini kullanın
                 />
               )}
             />
