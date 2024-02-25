@@ -26,6 +26,7 @@ import ServisNedeni from "./components/ServisNedeni";
 import BildirilenBina from "./components/BildirilenBina";
 import BildirilenKat from "./components/BildirilenKat";
 import OncelikTablo from "./components/OncelikTablo";
+import BagliIsEmriTablo from "./components/BagliIsEmriTablo";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -100,6 +101,11 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
   const handleOncelikMinusClick = () => {
     setValue("oncelikTanim", "");
     setValue("oncelikID", "");
+  };
+
+  const handleBagliIsEmriMinusClick = () => {
+    setValue("bagliIsEmriTanim", "");
+    setValue("bagliIsEmriID", "");
   };
 
   const handleLokasyonMinusClick = () => {
@@ -327,6 +333,64 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 />
                 {errors.isEmriDurum && (
                   <div style={{ color: "red", marginTop: "10px" }}>{errors.isEmriDurum.message}</div>
+                )}
+              </div>
+            </StyledDivBottomLine>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "450px",
+              }}>
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.bagliIsEmriTanim ? "600" : "normal" }}>
+                Bağlı İş Emri:
+              </Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  width: "300px",
+                }}>
+                <Controller
+                  name="bagliIsEmriTanim"
+                  control={control}
+                  rules={{ required: fieldRequirements.bagliIsEmriTanim ? "Alan Boş Bırakılamaz!" : false }}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      status={errors.bagliIsEmriTanim ? "error" : ""}
+                      type="text" // Set the type to "text" for name input
+                      style={{ width: "215px" }}
+                      disabled
+                    />
+                  )}
+                />
+                <Controller
+                  name="bagliIsEmriID"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      type="text" // Set the type to "text" for name input
+                      style={{ display: "none" }}
+                    />
+                  )}
+                />
+                <BagliIsEmriTablo
+                  onSubmit={(selectedData) => {
+                    setValue("bagliIsEmriTanim", selectedData.ISEMRI_NO);
+                    setValue("bagliIsEmriID", selectedData.key);
+                  }}
+                />
+                <Button onClick={handleBagliIsEmriMinusClick}> - </Button>
+                {errors.bagliIsEmriTanim && (
+                  <div style={{ color: "red", marginTop: "5px" }}>{errors.bagliIsEmriTanim.message}</div>
                 )}
               </div>
             </StyledDivBottomLine>
