@@ -21,7 +21,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       isEmriTipiTanim: "",
       secilenID: "",
       varsayilanIsEmriTipi: false,
-      isEmriTipiRenk: "#1677ff",
+      isEmriTipiRenk: "#ffffff",
       aktifIsEmriTipi: false,
       tipGroup: 1,
       lokasyon: true,
