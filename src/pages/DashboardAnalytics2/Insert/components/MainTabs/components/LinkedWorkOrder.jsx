@@ -20,7 +20,7 @@ const StyledTable = styled(Table)`
   }
 `;
 
-export default function LinkedWorkOrder({}) {
+export default function LinkedWorkOrder() {
   const { control, setValue } = useFormContext();
   const [inputValue, setInputValue] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
