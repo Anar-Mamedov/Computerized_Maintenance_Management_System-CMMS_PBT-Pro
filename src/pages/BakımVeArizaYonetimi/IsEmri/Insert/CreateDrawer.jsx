@@ -81,6 +81,86 @@ export default function CreateDrawer({ onRefresh }) {
 
   const { setValue, reset } = methods;
 
+  // iş emri tipine göre zorunlu alanları belirleme
+
+  //  useEffect(() => {
+  //    const handleDefaultRequirementsFetch = async () => {
+  //      if (open) {
+  //        try {
+  //          const response = await AxiosInstance.get(`IsTalepParametre`);
+  //          const data = response;
+  //          const item = data[0]; // Veri dizisinin ilk elemanını al
+
+  //          // Form alanlarını set et
+  //          setValue("oncelikTanim", item.ISP_ONCELIK_TEXT);
+  //          setValue("oncelikID", item.ISP_ONCELIK_ID);
+  //          setValue("talepTipi", item.ISP_VARSAYILAN_IS_TIPI_TEXT);
+  //          setValue("talepTipiID", item.ISP_VARSAYILAN_IS_TIPI);
+  //          setIsDisabled(item.ISP_DUZENLEME_TARIH_DEGISIMI);
+  //          setFieldRequirements({
+  //            lokasyonTanim: item.ISP_LOKASYON,
+  //            irtibatTelefonu: item.ISP_IRTIBAT_TEL,
+  //            email: item.ISP_MAIL,
+  //            departman: item.ISP_DEPARTMAN,
+  //            iletisimSekli: item.ISP_ILETISIM_SEKLI,
+  //            talepTipi: item.ISP_BILDIRIM_TIPI,
+  //            isKategorisi: item.ISP_IS_KATEGORI,
+  //            servisNedeni: item.ISP_SERVIS_NEDEN,
+  //            oncelikTanim: item.ISP_ONCELIK,
+  //            bildirilenBina: item.ISP_BINA,
+  //            bildirilenKat: item.ISP_KAT,
+  //            ilgiliKisi: item.ISP_IS_TAKIPCI,
+  //            konu: item.ISP_KONU,
+  //            aciklama: item.ISP_ACIKLAMA,
+  //            makine: item.ISP_MAKINE_KOD,
+  //            ekipman: item.ISP_EKIPMAN_KOD,
+  //            makineDurumu: item.ISP_ZOR_MAKINE_DURUM_KOD_ID,
+  //            // Diğer alanlar için de benzer şekilde...
+  //          });
+  //        } catch (error) {
+  //          console.error("Veri çekilirken hata oluştu:", error);
+  //        }
+  //      }
+  //    };
+
+  //    handleDefaultRequirementsFetch();
+  //  }, [open, setValue, methods.reset]);
+
+  useEffect(() => {
+    const handleDefaultRequirementsFetch = async () => {
+      if (open) {
+        try {
+          const response = await AxiosInstance.get(`IsEmriTip`);
+          const data = response; // API'den gelen veriyi al
+
+          // "IMT_VARSAYILAN": true olan objeyi bul
+          const defaultItem = data.find((item) => item.IMT_VARSAYILAN === true);
+
+          console.log("defaultItem", defaultItem);
+
+          if (defaultItem) {
+            // Eğer varsayılan obje bulunursa, form alanlarını set et
+            setFieldRequirements({
+              lokasyonTanim: defaultItem.IMT_LOKASYON,
+              // Burada defaultItem içerisindeki diğer alanlar için de benzer şekilde atama yapılabilir
+              // Örneğin:
+              // irtibatTelefonu: defaultItem.ISP_IRTIBAT_TEL,
+              // email: defaultItem.ISP_MAIL,
+              // Not: Yukarıdaki örnekteki alan isimleri API cevabınızda mevcut değil,
+              // bu yüzden gerçek alan isimlerinizi kullanmanız gerekecek.
+            });
+          }
+        } catch (error) {
+          console.error("Veri çekilirken hata oluştu:", error);
+        }
+      }
+    };
+
+    handleDefaultRequirementsFetch();
+  }, [open, setValue, methods.reset]);
+
+  // iş emri tipine göre zorunlu alanları belirleme son
+
   useEffect(() => {
     const handleDataFetchAndUpdate = async () => {
       if (open) {

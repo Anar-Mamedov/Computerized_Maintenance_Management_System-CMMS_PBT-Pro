@@ -300,7 +300,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                   render={({ field, fieldState: { error } }) => (
                     <Input
                       {...field}
-                      status={error ? "error" : ""}
+                      status={errors.isEmriDurum ? "error" : ""}
                       type="text" // Set the type to "text" for name input
                       style={{ width: "255px" }}
                       disabled
@@ -326,7 +326,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                   }}
                 />
                 {errors.isEmriDurum && (
-                  <div style={{ color: "red", marginTop: "5px" }}>{errors.isEmriDurum.message}</div>
+                  <div style={{ color: "red", marginTop: "10px" }}>{errors.isEmriDurum.message}</div>
                 )}
               </div>
             </StyledDivBottomLine>
