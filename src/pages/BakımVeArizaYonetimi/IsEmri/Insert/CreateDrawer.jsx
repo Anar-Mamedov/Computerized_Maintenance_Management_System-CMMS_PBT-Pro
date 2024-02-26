@@ -83,9 +83,9 @@ export default function CreateDrawer({ onRefresh }) {
 
   // iş emri tipine göre zorunlu alanları belirleme
 
-  const selectedOption = watch("selectedOption"); // `selectedOption` form alanını izle
+  // iş emri tipi selectboxundaki seçeneklere göre zorunlu alanları belirleme
 
-  console.log("Anar", selectedOption);
+  const selectedOption = watch("selectedOption"); // `selectedOption` form alanını izle
 
   useEffect(() => {
     if (selectedOption) {
@@ -101,6 +101,8 @@ export default function CreateDrawer({ onRefresh }) {
     }
   }, [selectedOption, setFieldRequirements]);
 
+  // iş emri tipi selectboxundaki seçeneklere göre zorunlu alanları belirleme son.
+
   useEffect(() => {
     const handleDefaultRequirementsFetch = async () => {
       if (open) {
@@ -110,8 +112,6 @@ export default function CreateDrawer({ onRefresh }) {
 
           // "IMT_VARSAYILAN": true olan objeyi bul
           const defaultItem = data.find((item) => item.IMT_VARSAYILAN === true);
-
-          console.log("defaultItem", defaultItem);
 
           if (defaultItem) {
             // Eğer varsayılan obje bulunursa, form alanlarını set et
