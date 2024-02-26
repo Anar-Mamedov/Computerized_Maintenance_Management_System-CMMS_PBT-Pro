@@ -87,9 +87,18 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
                   const selectedOption = options.find((option) => option.TB_ISEMRI_TIP_ID === value);
 
                   if (selectedOption) {
-                    // Seçilen objenin tüm alanlarını ayarla
                     Object.keys(selectedOption).forEach((key) => {
-                      setValue(`selectedOption.${key}`, selectedOption[key]);
+                      // shouldDirty ve shouldValidate ayarlarını kullanarak formun yeniden render edilmesini sağla
+                      setValue(`selectedOption.${key}`, selectedOption[key], {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      });
+                    });
+                  } else {
+                    // Eğer bir seçim yapılmazsa veya seçim kaldırılırsa, alanları temizle
+                    // Bu kısım, seçilen değerin sıfırlanması veya temizlenmesi durumlarında kullanılabilir
+                    Object.keys(fieldRequirements).forEach((key) => {
+                      setValue(`selectedOption.${key}`, "", { shouldDirty: true, shouldValidate: true });
                     });
                   }
                 }}
