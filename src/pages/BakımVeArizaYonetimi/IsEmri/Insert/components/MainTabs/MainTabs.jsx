@@ -613,9 +613,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 width: "100%",
                 maxWidth: "755px",
               }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.makine ? "600" : "normal" }}>
-                Makine Kodu:
-              </Text>
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.makine ? "600" : "normal" }}>Makine:</Text>
               <div style={{ display: "flex", flexWrap: "wrap", flexDirection: "column" }}>
                 <div style={{ display: "flex", gap: "5px" }}>
                   <div
@@ -745,7 +743,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 maxWidth: "755px",
               }}>
               <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.ekipman ? "600" : "normal" }}>
-                Ekipman Kodu:
+                Ekipman:
               </Text>
               <div style={{ display: "flex", flexWrap: "wrap", flexDirection: "column" }}>
                 <div style={{ display: "flex", gap: "5px" }}>
@@ -808,7 +806,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
               </div>
             </StyledDivBottomLine>
           </div>
-          <div style={{ width: "100%", maxWidth: "450px" }}>
+          <div style={{ display: "flex", width: "100%", maxWidth: "755px", gap: "5px" }}>
             <StyledDivBottomLine
               style={{
                 display: "flex",
@@ -830,356 +828,41 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                   width: "100%",
                 }}>
                 <MakineDurumu fieldRequirements={fieldRequirements} />
-                <StyledDivBottomLine
+              </div>
+            </StyledDivBottomLine>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "300px",
+              }}>
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.sayac ? "600" : "normal" }}>Sayaç:</Text>
+              <div style={{ display: "flex", flexWrap: "wrap", flexDirection: "column" }}>
+                <div
                   style={{
                     display: "flex",
                     flexWrap: "wrap",
+                    alignItems: "center",
                     justifyContent: "space-between",
-                    width: "100%",
-                    maxWidth: "300px",
                   }}>
-                  <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.ekipman ? "600" : "normal" }}>
-                    Sayaç:
-                  </Text>
-                  <div style={{ display: "flex", flexWrap: "wrap", flexDirection: "column" }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}>
-                      <Controller
-                        name="ekipman"
-                        control={control}
-                        rules={{ required: fieldRequirements.ekipman ? "Alan Boş Bırakılamaz!" : false }}
-                        render={({ field }) => (
-                          <Input
-                            {...field}
-                            status={errors.ekipman ? "error" : ""}
-                            type="text" // Set the type to "text" for name input
-                            style={{ width: "200px" }}
-                            disabled
-                          />
-                        )}
+                  <Controller
+                    name="sayac"
+                    control={control}
+                    rules={{ required: fieldRequirements.sayac ? "Alan Boş Bırakılamaz!" : false }}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        status={errors.sayac ? "error" : ""}
+                        type="number" // Set the type to "text" for name input
+                        style={{ width: "225px" }}
                       />
-                    </div>
+                    )}
+                  />
+                </div>
 
-                    {errors.ekipman && <div style={{ color: "red", marginTop: "5px" }}>{errors.ekipman.message}</div>}
-                  </div>
-                </StyledDivBottomLine>
-              </div>
-            </StyledDivBottomLine>
-          </div>
-          <div style={{ width: "100%", maxWidth: "450px" }}>
-            <StyledDivBottomLine
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "flex-start",
-                justifyContent: "space-between",
-                width: "100%",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.departman ? "600" : "normal" }}>
-                Departman:
-              </Text>
-              <Departman fieldRequirements={fieldRequirements} />
-            </StyledDivBottomLine>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "450px",
-              gap: "10px",
-              width: "100%",
-              justifyContent: "space-between",
-            }}>
-            <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.irtibatTelefonu ? "600" : "normal" }}>
-              İrtibat Telefonu:
-            </Text>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "flex-start",
-                maxWidth: "300px",
-                minWidth: "300px",
-                width: "100%",
-                flexDirection: "column",
-              }}>
-              <Controller
-                name="irtibatTelefonu"
-                control={control}
-                rules={{ required: fieldRequirements.irtibatTelefonu ? "Alan Boş Bırakılamaz!" : false }}
-                render={({ field }) => (
-                  <Input {...field} status={errors.irtibatTelefonu ? "error" : ""} style={{ flex: 1 }} />
-                )}
-              />
-              {errors.irtibatTelefonu && (
-                <div style={{ color: "red", marginTop: "5px" }}>{errors.irtibatTelefonu.message}</div>
-              )}
-            </div>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "450px",
-              gap: "10px",
-              width: "100%",
-              justifyContent: "space-between",
-            }}>
-            <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.email ? "600" : "normal" }}>E-Mail:</Text>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "flex-start",
-                maxWidth: "300px",
-                minWidth: "300px",
-                width: "100%",
-                flexDirection: "column",
-              }}>
-              <Controller
-                name="email"
-                control={control}
-                rules={{ required: fieldRequirements.email ? "Alan Boş Bırakılamaz!" : false }}
-                render={({ field }) => <Input {...field} status={errors.email ? "error" : ""} style={{ flex: 1 }} />}
-              />
-              {errors.email && <div style={{ color: "red", marginTop: "5px" }}>{errors.email.message}</div>}
-            </div>
-          </div>
-
-          <div style={{ width: "100%", maxWidth: "450px" }}>
-            <StyledDivBottomLine
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "flex-start",
-                justifyContent: "space-between",
-                width: "100%",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.iletisimSekli ? "600" : "normal" }}>
-                İletişim Şekli:
-              </Text>
-              <IletisimSekli fieldRequirements={fieldRequirements} />
-            </StyledDivBottomLine>
-          </div>
-
-          <div style={{ width: "100%", maxWidth: "450px" }}>
-            <StyledDivBottomLine
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "flex-start",
-                justifyContent: "space-between",
-                width: "100%",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.isKategorisi ? "600" : "normal" }}>
-                İş Kategorisi:
-              </Text>
-              <IsKategorisi fieldRequirements={fieldRequirements} />
-            </StyledDivBottomLine>
-          </div>
-          <div style={{ width: "100%", maxWidth: "450px" }}>
-            <StyledDivBottomLine
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "flex-start",
-                justifyContent: "space-between",
-                width: "100%",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.servisNedeni ? "600" : "normal" }}>
-                Servis Nedeni:
-              </Text>
-              <ServisNedeni fieldRequirements={fieldRequirements} />
-            </StyledDivBottomLine>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "450px",
-              gap: "10px",
-              width: "100%",
-              justifyContent: "space-between",
-            }}>
-            <Text style={{ fontSize: "14px" }}>Atölye:</Text>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "center",
-                maxWidth: "300px",
-                minWidth: "300px",
-                gap: "10px",
-                width: "100%",
-              }}>
-              <Controller
-                name="atolye"
-                control={control}
-                render={({ field }) => <Input {...field} disabled style={{ flex: 1 }} />}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            marginBottom: "15px",
-            flexDirection: "column",
-            gap: "10px",
-            width: "100%",
-            maxWidth: "450px",
-          }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-            <StyledDivBottomLine
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                justifyContent: "space-between",
-                width: "100%",
-                maxWidth: "450px",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.oncelikTanim ? "600" : "normal" }}>
-                Öncelik:
-              </Text>
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  width: "300px",
-                }}>
-                <Controller
-                  name="oncelikTanim"
-                  control={control}
-                  rules={{ required: fieldRequirements.oncelikTanim ? "Alan Boş Bırakılamaz!" : false }}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      status={errors.oncelikTanim ? "error" : ""}
-                      type="text" // Set the type to "text" for name input
-                      style={{ width: "215px" }}
-                      disabled
-                    />
-                  )}
-                />
-                <Controller
-                  name="oncelikID"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      type="text" // Set the type to "text" for name input
-                      style={{ display: "none" }}
-                    />
-                  )}
-                />
-                <OncelikTablo
-                  onSubmit={(selectedData) => {
-                    setValue("oncelikTanim", selectedData.subject);
-                    setValue("oncelikID", selectedData.key);
-                  }}
-                />
-                <Button onClick={handleOncelikMinusClick}> - </Button>
-                {errors.oncelikTanim && (
-                  <div style={{ color: "red", marginTop: "5px" }}>{errors.oncelikTanim.message}</div>
-                )}
-              </div>
-            </StyledDivBottomLine>
-          </div>
-          <div style={{ width: "100%", maxWidth: "450px" }}>
-            <StyledDivBottomLine
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "flex-start",
-                justifyContent: "space-between",
-                width: "100%",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.bildirilenBina ? "600" : "normal" }}>
-                Bildirilen Bina:
-              </Text>
-              <BildirilenBina fieldRequirements={fieldRequirements} />
-            </StyledDivBottomLine>
-          </div>
-          <div style={{ width: "100%", maxWidth: "450px" }}>
-            <StyledDivBottomLine
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "flex-start",
-                justifyContent: "space-between",
-                width: "100%",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.bildirilenKat ? "600" : "normal" }}>
-                Bildirilen Kat:
-              </Text>
-              <BildirilenKat fieldRequirements={fieldRequirements} />
-            </StyledDivBottomLine>
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-            <StyledDivBottomLine
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                justifyContent: "space-between",
-                width: "100%",
-                maxWidth: "450px",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.ilgiliKisi ? "600" : "normal" }}>
-                İlgili Kişi:
-              </Text>
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  width: "300px",
-                }}>
-                <Controller
-                  name="ilgiliKisi"
-                  control={control}
-                  rules={{ required: fieldRequirements.ilgiliKisi ? "Alan Boş Bırakılamaz!" : false }}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      status={errors.ilgiliKisi ? "error" : ""}
-                      type="text" // Set the type to "text" for name input
-                      style={{ width: "215px" }}
-                      disabled
-                    />
-                  )}
-                />
-                <Controller
-                  name="ilgiliKisiID"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      type="text" // Set the type to "text" for name input
-                      style={{ display: "none" }}
-                    />
-                  )}
-                />
-                <IsEmriDurumModal
-                  onSubmit={(selectedData) => {
-                    setValue("ilgiliKisi", selectedData.ISK_ISIM);
-                    setValue("ilgiliKisiID", selectedData.key);
-                  }}
-                />
-                <Button onClick={handleIlgiliKisiMinusClick}> - </Button>
-                {errors.ilgiliKisi && <div style={{ color: "red", marginTop: "5px" }}>{errors.ilgiliKisi.message}</div>}
+                {errors.sayac && <div style={{ color: "red", marginTop: "5px" }}>{errors.sayac.message}</div>}
               </div>
             </StyledDivBottomLine>
           </div>

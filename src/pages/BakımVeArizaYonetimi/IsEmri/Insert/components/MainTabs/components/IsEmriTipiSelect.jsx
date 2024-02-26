@@ -82,6 +82,16 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
                   setValue("isEmriTipi", value ?? null);
                   setValue("isEmriTipiID", value ?? null);
                   field.onChange(value ?? null);
+
+                  // Seçilen değerin ID'sine göre objeyi bul
+                  const selectedOption = options.find((option) => option.TB_ISEMRI_TIP_ID === value);
+
+                  if (selectedOption) {
+                    // Seçilen objenin tüm alanlarını ayarla
+                    Object.keys(selectedOption).forEach((key) => {
+                      setValue(`selectedOption.${key}`, selectedOption[key]);
+                    });
+                  }
                 }}
                 value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
               />

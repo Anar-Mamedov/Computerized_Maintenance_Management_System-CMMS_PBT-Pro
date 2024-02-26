@@ -79,52 +79,27 @@ export default function CreateDrawer({ onRefresh }) {
     },
   });
 
-  const { setValue, reset } = methods;
+  const { setValue, reset, watch } = methods;
 
   // iş emri tipine göre zorunlu alanları belirleme
 
-  //  useEffect(() => {
-  //    const handleDefaultRequirementsFetch = async () => {
-  //      if (open) {
-  //        try {
-  //          const response = await AxiosInstance.get(`IsTalepParametre`);
-  //          const data = response;
-  //          const item = data[0]; // Veri dizisinin ilk elemanını al
+  const selectedOption = watch("selectedOption"); // `selectedOption` form alanını izle
 
-  //          // Form alanlarını set et
-  //          setValue("oncelikTanim", item.ISP_ONCELIK_TEXT);
-  //          setValue("oncelikID", item.ISP_ONCELIK_ID);
-  //          setValue("talepTipi", item.ISP_VARSAYILAN_IS_TIPI_TEXT);
-  //          setValue("talepTipiID", item.ISP_VARSAYILAN_IS_TIPI);
-  //          setIsDisabled(item.ISP_DUZENLEME_TARIH_DEGISIMI);
-  //          setFieldRequirements({
-  //            lokasyonTanim: item.ISP_LOKASYON,
-  //            irtibatTelefonu: item.ISP_IRTIBAT_TEL,
-  //            email: item.ISP_MAIL,
-  //            departman: item.ISP_DEPARTMAN,
-  //            iletisimSekli: item.ISP_ILETISIM_SEKLI,
-  //            talepTipi: item.ISP_BILDIRIM_TIPI,
-  //            isKategorisi: item.ISP_IS_KATEGORI,
-  //            servisNedeni: item.ISP_SERVIS_NEDEN,
-  //            oncelikTanim: item.ISP_ONCELIK,
-  //            bildirilenBina: item.ISP_BINA,
-  //            bildirilenKat: item.ISP_KAT,
-  //            ilgiliKisi: item.ISP_IS_TAKIPCI,
-  //            konu: item.ISP_KONU,
-  //            aciklama: item.ISP_ACIKLAMA,
-  //            makine: item.ISP_MAKINE_KOD,
-  //            ekipman: item.ISP_EKIPMAN_KOD,
-  //            makineDurumu: item.ISP_ZOR_MAKINE_DURUM_KOD_ID,
-  //            // Diğer alanlar için de benzer şekilde...
-  //          });
-  //        } catch (error) {
-  //          console.error("Veri çekilirken hata oluştu:", error);
-  //        }
-  //      }
-  //    };
+  console.log("Anar", selectedOption);
 
-  //    handleDefaultRequirementsFetch();
-  //  }, [open, setValue, methods.reset]);
+  useEffect(() => {
+    if (selectedOption) {
+      // `selectedOption` içindeki değerleri `fieldRequirements` durumuna aktar
+      setFieldRequirements({
+        lokasyonTanim: selectedOption.IMT_LOKASYON,
+        makine: selectedOption.IMT_MAKINE,
+        ekipman: selectedOption.IMT_EKIPMAN,
+        makineDurumu: selectedOption.IMT_MAKINE_DURUM,
+        sayac: selectedOption.IMT_SAYAC_DEGERI,
+        // Diğer alanlar...
+      });
+    }
+  }, [selectedOption, setFieldRequirements]);
 
   useEffect(() => {
     const handleDefaultRequirementsFetch = async () => {
@@ -142,6 +117,10 @@ export default function CreateDrawer({ onRefresh }) {
             // Eğer varsayılan obje bulunursa, form alanlarını set et
             setFieldRequirements({
               lokasyonTanim: defaultItem.IMT_LOKASYON,
+              makine: defaultItem.IMT_MAKINE,
+              ekipman: defaultItem.IMT_EKIPMAN,
+              makineDurumu: defaultItem.IMT_MAKINE_DURUM,
+              sayac: defaultItem.IMT_SAYAC_DEGERI,
               // Burada defaultItem içerisindeki diğer alanlar için de benzer şekilde atama yapılabilir
               // Örneğin:
               // irtibatTelefonu: defaultItem.ISP_IRTIBAT_TEL,
