@@ -43,6 +43,46 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
     setName(e.target.value);
   };
 
+  // iş emrindeki zorunlu alanları dinamik olarak kontrol etmek için selectboxtaki seçenekleri seçtiğimizde o seçeneğe göre zorunlu alanların değişmesi için.
+
+  // Öncelikle, `options` state'ini ve `setValue` fonksiyonunu kullanarak `selectedOption`'ı güncelleyeceğiz.
+  // Bu örnekte, `selectedOption`'ı komple yeni bir obje ile güncelleyerek, bu değişikliğin React tarafından algılanmasını sağlayacağız.
+
+  const onOptionChange = (value) => {
+    // Seçilen değerin ID'sine göre objeyi bul
+    const selectedOption = options.find((option) => option.TB_ISEMRI_TIP_ID === value) ?? null;
+
+    if (selectedOption) {
+      // selectedOption için komple yeni bir obje oluştur
+      const updatedSelectedOption = {
+        IMT_LOKASYON: selectedOption.IMT_LOKASYON,
+        IMT_MAKINE: selectedOption.IMT_MAKINE,
+        IMT_EKIPMAN: selectedOption.IMT_EKIPMAN,
+        IMT_MAKINE_DURUM: selectedOption.IMT_MAKINE_DURUM,
+        IMT_SAYAC_DEGERI: selectedOption.IMT_SAYAC_DEGERI,
+        // Diğer gerekli alanlar da benzer şekilde eklenmeli
+      };
+
+      // `selectedOption`'ı tek bir işlemde güncelle
+      setValue("selectedOption", updatedSelectedOption, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    } else {
+      // Eğer bir seçim yapılmazsa veya seçim kaldırılırsa, `selectedOption`'ı temizle
+      setValue("selectedOption", null, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
+
+    // `isEmriTipi` ve `isEmriTipiID` alanlarını da güncelle
+    setValue("isEmriTipi", value ?? null);
+    setValue("isEmriTipiID", value ?? null);
+  };
+
+  // iş emrindeki zorunlu alanları dinamik olarak kontrol etmek için selectboxtaki seçenekleri seçtiğimizde o seçeneğe göre zorunlu alanların değişmesi için son.
+
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between" }}>
       {contextHolder}
@@ -76,32 +116,7 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
                   value: item.TB_ISEMRI_TIP_ID, // Use the ID as the value
                   label: item.IMT_TANIM, // Display the name in the dropdown
                 }))}
-                onChange={(value) => {
-                  // Seçilen değerin ID'sini NedeniID alanına set et
-                  // `null` veya `undefined` değerlerini ele al
-                  setValue("isEmriTipi", value ?? null);
-                  setValue("isEmriTipiID", value ?? null);
-                  field.onChange(value ?? null);
-
-                  // Seçilen değerin ID'sine göre objeyi bul
-                  const selectedOption = options.find((option) => option.TB_ISEMRI_TIP_ID === value);
-
-                  if (selectedOption) {
-                    Object.keys(selectedOption).forEach((key) => {
-                      // shouldDirty ve shouldValidate ayarlarını kullanarak formun yeniden render edilmesini sağla
-                      setValue(`selectedOption.${key}`, selectedOption[key], {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      });
-                    });
-                  } else {
-                    // Eğer bir seçim yapılmazsa veya seçim kaldırılırsa, alanları temizle
-                    // Bu kısım, seçilen değerin sıfırlanması veya temizlenmesi durumlarında kullanılabilir
-                    Object.keys(fieldRequirements).forEach((key) => {
-                      setValue(`selectedOption.${key}`, "", { shouldDirty: true, shouldValidate: true });
-                    });
-                  }
-                }}
+                onChange={onOptionChange}
                 value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
               />
             )}
