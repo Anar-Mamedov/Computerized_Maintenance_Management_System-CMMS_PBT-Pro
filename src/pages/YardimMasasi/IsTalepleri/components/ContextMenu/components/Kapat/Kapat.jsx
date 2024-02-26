@@ -39,8 +39,8 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
       IST_TALEP_NO: row.IST_KOD,
       KLL_ADI: "Orjin", // Bu değer sabitse bu şekilde, dinamikse değiştirilmelidir
       IST_SONUC: data.iptalNeden,
-      IST_IPTAL_TARIH: formatDateWithDayjs(data.iptalTarihi),
-      IST_IPTAL_SAAT: formatTimeWithDayjs(data.iptalSaati),
+      IST_KAPAMA_TARIHI: formatDateWithDayjs(data.iptalTarihi),
+      IST_KAPAMA_SAATI: formatTimeWithDayjs(data.iptalSaati),
       ITL_ISLEM_ID: 4, // Sabit bir değerse bu şekilde kalabilir, dinamikse değiştirilmelidir
       ITL_ISLEM: "Kapandi",
       ITL_ISLEM_DURUM: "KAPANDI",
