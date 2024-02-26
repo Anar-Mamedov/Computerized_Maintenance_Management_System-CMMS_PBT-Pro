@@ -88,7 +88,7 @@ export default function MainTable() {
       title: "İş Emri Tipi",
       dataIndex: "ISEMRI_TIP",
       key: "ISEMRI_TIP",
-      width: "150px",
+      width: "200px",
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
       render: (text, record) => (

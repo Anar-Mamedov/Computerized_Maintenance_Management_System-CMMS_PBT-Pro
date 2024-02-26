@@ -27,6 +27,9 @@ import BildirilenBina from "./components/BildirilenBina";
 import BildirilenKat from "./components/BildirilenKat";
 import OncelikTablo from "./components/OncelikTablo";
 import BagliIsEmriTablo from "./components/BagliIsEmriTablo";
+import MakineDurumu from "./components/MakineDurumu";
+import MakineTablo from "./components/MakineTablo";
+import EkipmanTablo from "./components/EkipmanTablo";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -86,6 +89,30 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
     formState: { errors },
   } = useFormContext();
 
+  // garanti bitiş tarihi alanını izleme ve ona göre yazı yazdırma
+  const garantiBitis = watch("garantiBitis"); // garantiBitis alanını izle
+  const [garantiDurumu, setGarantiDurumu] = useState(""); // Garanti durum metnini tutacak state
+
+  useEffect(() => {
+    // garantiBitis değeri kontrol ediliyor
+    if (garantiBitis) {
+      const today = new Date();
+      const bitisTarihi = new Date(garantiBitis);
+      if (bitisTarihi < today) {
+        // Garanti süresi dolduysa
+        setGarantiDurumu("Garanti süresi doldu.");
+      } else {
+        // Garanti süresi devam ediyorsa
+        setGarantiDurumu("Garanti süresi devam etmektedir.");
+      }
+    } else {
+      // garantiBitis değeri boşsa, garanti durumu metnini temizle
+      setGarantiDurumu("");
+    }
+  }, [garantiBitis]); // garantiBitis değiştiğinde useEffect tetiklenecek
+
+  // garanti bitiş tarihi alanını izleme ve ona göre yazı yazdırma sonu
+
   const otonomBakimValue = watch("otonomBakim");
 
   const handleIsEmriDurumMinusClick = () => {
@@ -111,6 +138,34 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
   const handleLokasyonMinusClick = () => {
     setValue("lokasyonTanim", "");
     setValue("lokasyonID", "");
+    setValue("tamLokasyonTanim", "");
+    setValue("makine", "");
+    setValue("makineID", "");
+    setValue("makineTanim", "");
+    setValue("ekipman", "");
+    setValue("ekipmanID", "");
+    setValue("ekipmanTanim", "");
+    setValue("makineDurumu", "");
+    setValue("makineDurumuID", "");
+    setValue("garantiBitis", "");
+  };
+
+  const handleEkipmanMinusClick = () => {
+    setValue("ekipman", "");
+    setValue("ekipmanID", "");
+    setValue("ekipmanTanim", "");
+  };
+
+  const handleMakineMinusClick = () => {
+    setValue("makine", "");
+    setValue("makineID", "");
+    setValue("makineTanim", "");
+    setValue("ekipman", "");
+    setValue("ekipmanID", "");
+    setValue("ekipmanTanim", "");
+    setValue("makineDurumu", "");
+    setValue("makineDurumuID", "");
+    setValue("garantiBitis", "");
   };
 
   // sistemin o anki tarih ve saatini almak için
@@ -127,6 +182,73 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
   }, [drawerOpen, setValue]);
 
   // sistemin o anki tarih ve saatini almak sonu
+
+  // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
+
+  // Intl.DateTimeFormat kullanarak tarih formatlama
+  const formatDate = (date) => {
+    if (!date) return "";
+
+    // Örnek bir tarih formatla ve ay formatını belirle
+    const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
+
+    let monthFormat;
+    if (sampleFormatted.includes("January")) {
+      monthFormat = "long"; // Tam ad ("January")
+    } else if (sampleFormatted.includes("Jan")) {
+      monthFormat = "short"; // Üç harfli kısaltma ("Jan")
+    } else {
+      monthFormat = "2-digit"; // Sayısal gösterim ("01")
+    }
+
+    // Kullanıcı için tarihi formatla
+    const formatter = new Intl.DateTimeFormat(navigator.language, {
+      year: "numeric",
+      month: monthFormat,
+      day: "2-digit",
+    });
+    return formatter.format(new Date(date));
+  };
+
+  const formatTime = (time) => {
+    if (!time || time.trim() === "") return ""; // `trim` metodu ile baştaki ve sondaki boşlukları temizle
+
+    try {
+      // Saati ve dakikayı parçalara ayır, boşlukları temizle
+      const [hours, minutes] = time
+        .trim()
+        .split(":")
+        .map((part) => part.trim());
+
+      // Saat ve dakika değerlerinin geçerliliğini kontrol et
+      const hoursInt = parseInt(hours, 10);
+      const minutesInt = parseInt(minutes, 10);
+      if (isNaN(hoursInt) || isNaN(minutesInt) || hoursInt < 0 || hoursInt > 23 || minutesInt < 0 || minutesInt > 59) {
+        throw new Error("Invalid time format");
+      }
+
+      // Geçerli tarih ile birlikte bir Date nesnesi oluştur ve sadece saat ve dakika bilgilerini ayarla
+      const date = new Date();
+      date.setHours(hoursInt, minutesInt, 0);
+
+      // Kullanıcının lokal ayarlarına uygun olarak saat ve dakikayı formatla
+      // `hour12` seçeneğini belirtmeyerek Intl.DateTimeFormat'ın kullanıcının yerel ayarlarına göre otomatik seçim yapmasına izin ver
+      const formatter = new Intl.DateTimeFormat(navigator.language, {
+        hour: "numeric",
+        minute: "2-digit",
+        // hour12 seçeneği burada belirtilmiyor; böylece otomatik olarak kullanıcının sistem ayarlarına göre belirleniyor
+      });
+
+      // Formatlanmış saati döndür
+      return formatter.format(date);
+    } catch (error) {
+      console.error("Error formatting time:", error);
+      return ""; // Hata durumunda boş bir string döndür
+    }
+  };
+
+  // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
   // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın
 
@@ -158,7 +280,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
         gap: "20px",
         rowGap: "10px",
       }}>
-      <div style={{ display: "flex", gap: "20px", width: "100%" }}>
+      <div style={{ display: "flex", gap: "20px", width: "100%", flexWrap: "wrap" }}>
         <div
           style={{
             display: "flex",
@@ -395,6 +517,16 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
               </div>
             </StyledDivBottomLine>
           </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            marginBottom: "15px",
+            flexDirection: "column",
+            gap: "10px",
+            width: "100%",
+            maxWidth: "755px",
+          }}>
           <StyledDivMedia
             style={{
               display: "flex",
@@ -402,60 +534,343 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
               alignItems: "center",
               justifyContent: "space-between",
               width: "100%",
-              maxWidth: "450px",
+              maxWidth: "755px",
             }}>
             <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.lokasyonTanim ? "600" : "normal" }}>
               Lokasyon:
             </Text>
             <div>
-              <div
-                className="anar"
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  minWidth: "300px",
-                  gap: "3px",
-                }}>
+              <div style={{ display: "flex", gap: "5px" }}>
+                <div
+                  className="anar"
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    minWidth: "300px",
+                    gap: "3px",
+                  }}>
+                  <Controller
+                    name="lokasyonTanim"
+                    control={control}
+                    rules={{ required: fieldRequirements.lokasyonTanim ? "Alan Boş Bırakılamaz!" : false }}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        status={errors.lokasyonTanim ? "error" : ""}
+                        type="text" // Set the type to "text" for name input
+                        style={{ width: "100%", maxWidth: "630px" }}
+                        disabled
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="lokasyonID"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        type="text" // Set the type to "text" for name input
+                        style={{ display: "none" }}
+                      />
+                    )}
+                  />
+                  <LokasyonTablo
+                    onSubmit={(selectedData) => {
+                      setValue("lokasyonTanim", selectedData.LOK_TANIM);
+                      setValue("lokasyonID", selectedData.key);
+                      setValue("tamLokasyonTanim", selectedData.LOK_TUM_YOL);
+                    }}
+                  />
+                  <Button onClick={handleLokasyonMinusClick}> - </Button>
+                </div>
                 <Controller
-                  name="lokasyonTanim"
+                  name="tamLokasyonTanim"
                   control={control}
-                  rules={{ required: fieldRequirements.lokasyonTanim ? "Alan Boş Bırakılamaz!" : false }}
                   render={({ field }) => (
                     <Input
                       {...field}
-                      status={errors.lokasyonTanim ? "error" : ""}
-                      type="text" // Set the type to "text" for name input
-                      style={{ width: "100%", maxWidth: "630px" }}
+                      style={{ width: "300px" }}
                       disabled
-                    />
-                  )}
-                />
-                <Controller
-                  name="lokasyonID"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
                       type="text" // Set the type to "text" for name input
-                      style={{ display: "none" }}
                     />
                   )}
                 />
-                <LokasyonTablo
-                  onSubmit={(selectedData) => {
-                    setValue("lokasyonTanim", selectedData.LOK_TANIM);
-                    setValue("lokasyonID", selectedData.key);
-                  }}
-                />
-                <Button onClick={handleLokasyonMinusClick}> - </Button>
               </div>
+
               {errors.lokasyonTanim && (
                 <div style={{ color: "red", marginTop: "5px" }}>{errors.lokasyonTanim.message}</div>
               )}
             </div>
           </StyledDivMedia>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "755px",
+              }}>
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.makine ? "600" : "normal" }}>
+                Makine Kodu:
+              </Text>
+              <div style={{ display: "flex", flexWrap: "wrap", flexDirection: "column" }}>
+                <div style={{ display: "flex", gap: "5px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "300px",
+                    }}>
+                    <Controller
+                      name="makine"
+                      control={control}
+                      rules={{ required: fieldRequirements.makine ? "Alan Boş Bırakılamaz!" : false }}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          status={errors.makine ? "error" : ""}
+                          type="text" // Set the type to "text" for name input
+                          style={{ width: "215px" }}
+                          disabled
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="makineID"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          type="text" // Set the type to "text" for name input
+                          style={{ display: "none" }}
+                        />
+                      )}
+                    />
+                    <MakineTablo
+                      onSubmit={(selectedData) => {
+                        setValue("makine", selectedData.MKN_KOD);
+                        setValue("makineID", selectedData.key);
+                        setValue("makineTanim", selectedData.MKN_TANIM);
+                        setValue("lokasyonID", selectedData.MKN_LOKASYON_ID);
+                        setValue("lokasyonTanim", selectedData.MKN_LOKASYON);
+                        setValue("tamLokasyonTanim", selectedData.MKN_LOKASYON_TUM_YOL);
+                        setValue("makineDurumu", selectedData.MKN_DURUM);
+                        setValue("makineDurumuID", selectedData.MKN_DURUM_KOD_ID);
+                        setValue("garantiBitis", formatDate(selectedData.MKN_GARANTI_BITIS));
+                      }}
+                    />
+                    <Button onClick={handleMakineMinusClick}> - </Button>
+                  </div>
+                  <Controller
+                    name="makineTanim"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        type="text" // Set the type to "text" for name input
+                        style={{ width: "300px" }}
+                        disabled
+                      />
+                    )}
+                  />
+                </div>
+                {errors.makine && <div style={{ color: "red", marginTop: "5px" }}>{errors.makine.message}</div>}
+              </div>
+            </StyledDivBottomLine>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "755px",
+              }}>
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.garantiBitis ? "600" : "normal" }}>
+                Garanti Bitiş:
+              </Text>
+              <div style={{ display: "flex", flexWrap: "wrap", flexDirection: "column" }}>
+                <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "300px",
+                    }}>
+                    <Controller
+                      name="garantiBitis"
+                      control={control}
+                      rules={{ required: fieldRequirements.garantiBitis ? "Alan Boş Bırakılamaz!" : false }}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          status={errors.garantiBitis ? "error" : ""}
+                          type="text" // Set the type to "text" for name input
+                          style={{ width: "300px" }}
+                          disabled
+                        />
+                      )}
+                    />
+                  </div>
+                  <Text
+                    style={{
+                      fontSize: "14px",
+                      width: "300px",
+                      color: garantiDurumu === "Garanti süresi doldu." ? "red" : "green",
+                    }}>
+                    {garantiDurumu}
+                  </Text>
+                </div>
+                {errors.garantiBitis && (
+                  <div style={{ color: "red", marginTop: "5px" }}>{errors.garantiBitis.message}</div>
+                )}
+              </div>
+            </StyledDivBottomLine>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "755px",
+              }}>
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.ekipman ? "600" : "normal" }}>
+                Ekipman Kodu:
+              </Text>
+              <div style={{ display: "flex", flexWrap: "wrap", flexDirection: "column" }}>
+                <div style={{ display: "flex", gap: "5px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "300px",
+                    }}>
+                    <Controller
+                      name="ekipman"
+                      control={control}
+                      rules={{ required: fieldRequirements.ekipman ? "Alan Boş Bırakılamaz!" : false }}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          status={errors.ekipman ? "error" : ""}
+                          type="text" // Set the type to "text" for name input
+                          style={{ width: "215px" }}
+                          disabled
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="ekipmanID"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          type="text" // Set the type to "text" for name input
+                          style={{ display: "none" }}
+                        />
+                      )}
+                    />
+                    <EkipmanTablo
+                      onSubmit={(selectedData) => {
+                        setValue("ekipman", selectedData.EKP_KOD);
+                        setValue("ekipmanID", selectedData.key);
+                        setValue("ekipmanTanim", selectedData.EKP_TANIM);
+                      }}
+                    />
+                    <Button onClick={handleEkipmanMinusClick}> - </Button>
+                  </div>
+                  <Controller
+                    name="ekipmanTanim"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        type="text" // Set the type to "text" for name input
+                        style={{ width: "300px" }}
+                        disabled
+                      />
+                    )}
+                  />
+                </div>
+                {errors.ekipman && <div style={{ color: "red", marginTop: "5px" }}>{errors.ekipman.message}</div>}
+              </div>
+            </StyledDivBottomLine>
+          </div>
+          <div style={{ width: "100%", maxWidth: "450px" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                width: "100%",
+              }}>
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.makineDurumu ? "600" : "normal" }}>
+                Makine Durumu:
+              </Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  maxWidth: "300px",
+                  gap: "10px",
+                  width: "100%",
+                }}>
+                <MakineDurumu fieldRequirements={fieldRequirements} />
+                <StyledDivBottomLine
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    maxWidth: "300px",
+                  }}>
+                  <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.ekipman ? "600" : "normal" }}>
+                    Sayaç:
+                  </Text>
+                  <div style={{ display: "flex", flexWrap: "wrap", flexDirection: "column" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}>
+                      <Controller
+                        name="ekipman"
+                        control={control}
+                        rules={{ required: fieldRequirements.ekipman ? "Alan Boş Bırakılamaz!" : false }}
+                        render={({ field }) => (
+                          <Input
+                            {...field}
+                            status={errors.ekipman ? "error" : ""}
+                            type="text" // Set the type to "text" for name input
+                            style={{ width: "200px" }}
+                            disabled
+                          />
+                        )}
+                      />
+                    </div>
+
+                    {errors.ekipman && <div style={{ color: "red", marginTop: "5px" }}>{errors.ekipman.message}</div>}
+                  </div>
+                </StyledDivBottomLine>
+              </div>
+            </StyledDivBottomLine>
+          </div>
           <div style={{ width: "100%", maxWidth: "450px" }}>
             <StyledDivBottomLine
               style={{
@@ -537,16 +952,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
               {errors.email && <div style={{ color: "red", marginTop: "5px" }}>{errors.email.message}</div>}
             </div>
           </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            marginBottom: "15px",
-            flexDirection: "column",
-            gap: "10px",
-            width: "100%",
-            maxWidth: "450px",
-          }}>
+
           <div style={{ width: "100%", maxWidth: "450px" }}>
             <StyledDivBottomLine
               style={{
@@ -622,6 +1028,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
             </div>
           </div>
         </div>
+
         <div
           style={{
             display: "flex",
