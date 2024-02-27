@@ -90,6 +90,7 @@ export default function CreateDrawer({ onRefresh }) {
   useEffect(() => {
     if (selectedOption) {
       // `selectedOption` içindeki değerleri `fieldRequirements` durumuna aktar
+      setValue("prosedurTab", selectedOption.IMT_CAGRILACAK_PROSEDUR);
       setFieldRequirements({
         lokasyonTanim: selectedOption.IMT_LOKASYON,
         makine: selectedOption.IMT_MAKINE,
@@ -114,6 +115,7 @@ export default function CreateDrawer({ onRefresh }) {
           const defaultItem = data.find((item) => item.IMT_VARSAYILAN === true);
 
           if (defaultItem) {
+            setValue("prosedurTab", defaultItem.IMT_CAGRILACAK_PROSEDUR);
             // Eğer varsayılan obje bulunursa, form alanlarını set et
             setFieldRequirements({
               lokasyonTanim: defaultItem.IMT_LOKASYON,
