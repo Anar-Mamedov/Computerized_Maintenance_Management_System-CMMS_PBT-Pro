@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Input, Typography, Tabs } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
+import ProsedurTablo from "./components/ProsedurTablo";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -16,13 +17,18 @@ const StyledDivBottomLine = styled.div`
   }
 `;
 
-export default function IsTakibi({ fieldRequirements }) {
+export default function DetayBilgiler({ fieldRequirements }) {
   const {
     control,
     watch,
     setValue,
     formState: { errors },
   } = useFormContext();
+
+  const handleProsedurMinusClick = () => {
+    setValue("prosedur", "");
+    setValue("prosedurID", "");
+  };
 
   return (
     <div style={{ paddingBottom: "25px" }}>
@@ -41,6 +47,62 @@ export default function IsTakibi({ fieldRequirements }) {
     `}
       </style>
       <div style={{ display: "flex", gap: "10px", flexDirection: "column" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          <StyledDivBottomLine
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "space-between",
+              width: "100%",
+              maxWidth: "450px",
+            }}>
+            <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.prosedur ? "600" : "normal" }}>
+              Prosedür:
+            </Text>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "300px",
+              }}>
+              <Controller
+                name="prosedur"
+                control={control}
+                rules={{ required: fieldRequirements.prosedur ? "Alan Boş Bırakılamaz!" : false }}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    status={errors.prosedur ? "error" : ""}
+                    type="text" // Set the type to "text" for name input
+                    style={{ width: "215px" }}
+                    disabled
+                  />
+                )}
+              />
+              <Controller
+                name="prosedurID"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="text" // Set the type to "text" for name input
+                    style={{ display: "none" }}
+                  />
+                )}
+              />
+              <ProsedurTablo
+                onSubmit={(selectedData) => {
+                  setValue("prosedur", selectedData.IST_KOD);
+                  setValue("prosedurID", selectedData.key);
+                }}
+              />
+              <Button onClick={handleProsedurMinusClick}> - </Button>
+              {errors.prosedur && <div style={{ color: "red", marginTop: "5px" }}>{errors.prosedur.message}</div>}
+            </div>
+          </StyledDivBottomLine>
+        </div>
         <div style={{ width: "100%", maxWidth: "910px" }}>
           <StyledDivBottomLine
             style={{

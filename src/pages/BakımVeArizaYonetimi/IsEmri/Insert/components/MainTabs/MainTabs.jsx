@@ -290,6 +290,9 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
             width: "100%",
             maxWidth: "450px",
           }}>
+          <div style={{ borderBottom: "1px solid #e8e8e8", marginBottom: "5px", paddingBottom: "5px", width: "100%" }}>
+            <Text style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}>Genel Bilgiler</Text>
+          </div>
           <div
             style={{
               display: "flex",
@@ -527,6 +530,9 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
             width: "100%",
             maxWidth: "755px",
           }}>
+          <div style={{ borderBottom: "1px solid #e8e8e8", marginBottom: "5px", paddingBottom: "5px", width: "100%" }}>
+            <Text style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}>Makine / Lokasyon Bilgileri</Text>
+          </div>
           <StyledDivMedia
             style={{
               display: "flex",
