@@ -60,6 +60,7 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
         IMT_EKIPMAN: selectedOption.IMT_EKIPMAN,
         IMT_MAKINE_DURUM: selectedOption.IMT_MAKINE_DURUM,
         IMT_SAYAC_DEGERI: selectedOption.IMT_SAYAC_DEGERI,
+        IMT_CAGRILACAK_PROSEDUR: selectedOption.IMT_CAGRILACAK_PROSEDUR,
         // Diğer gerekli alanlar da benzer şekilde eklenmeli
       };
 

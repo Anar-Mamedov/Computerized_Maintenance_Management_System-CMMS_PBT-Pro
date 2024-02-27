@@ -140,6 +140,35 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
 
   const onSubmited = (data) => {
     setLoading(true);
+    // Başlangıçta kullanıcı tarafından seçilen cagrilacakProsedurID değerini al
+    let cagrilacakProsedurID = data.cagrilacakProsedurID;
+
+    // tipGroup değerine göre cagrilacakProsedurID'yi ayarlama
+    switch (data.tipGroup) {
+      case 1:
+        cagrilacakProsedurID = 1;
+        break;
+      case 2:
+        cagrilacakProsedurID = 2;
+        break;
+      case 3: // tipGroup 3 için de cagrilacakProsedurID 2 olacak
+        cagrilacakProsedurID = 2;
+        break;
+      case 4: // tipGroup 4 ise cagrilacakProsedurID'yi 0 olarak ayarla
+        cagrilacakProsedurID = 0;
+        break;
+      case 5:
+        // tipGroup 5 ve cagrilacakProsedurID boş veya tanımsız ise, 0 olarak ayarla
+        if (!cagrilacakProsedurID) {
+          cagrilacakProsedurID = 0;
+        }
+        break;
+      default:
+        // Diğer durumlar için özel bir işlem yapılmasına gerek yok
+        break;
+    }
+
+    // Body nesnesi içinde cagrilacakProsedurID'yi kullanma
     const Body = {
       IMT_TANIM: data.isEmriTipiTanim,
       TB_ISEMRI_TIP_ID: data.secilenID,
@@ -147,6 +176,9 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       IMT_RENK_WEB_VERSION: data.isEmriTipiRenk,
       IMT_AKTIF: data.aktifIsEmriTipi,
       IMT_TIP_GRUP: data.tipGroup,
+      // Çağrılacak Prosedür
+      IMT_CAGRILACAK_PROSEDUR: cagrilacakProsedurID,
+      // Çağrılacak Prosedür son
       IMT_LOKASYON: true,
       IMT_MAKINE: data.makine,
       IMT_EKIPMAN: data.ekipman,
@@ -233,8 +265,6 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       IMT_OZEL_ALAN_20: data.ozelAlan20Kapama,
       IMT_ACIKLAMA_KAPAT: data.aciklamaKapama,
       IMT_NOTLAR_KAPAT: data.notlarKapama,
-      // Çağrılacak Prosedür
-      IMT_CAGRILACAK_PROSEDUR: data.cagrilacakProsedurID,
     };
     AxiosInstance.post("UpdateIsEmriTipi", Body)
       .then((response) => {

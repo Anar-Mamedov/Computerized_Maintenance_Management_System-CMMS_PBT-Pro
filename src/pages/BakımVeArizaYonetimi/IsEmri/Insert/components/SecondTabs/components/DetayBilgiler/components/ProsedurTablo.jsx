@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table, Tabs } from "antd";
+import { useFormContext, Controller } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../../api/http";
 import styled from "styled-components";
 
@@ -37,12 +38,16 @@ const StyledTabs = styled(Tabs)`
 //styled components end
 
 export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
+  const { control, setValue, watch } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys1, setSelectedRowKeys1] = useState([]);
   const [selectedRowKeys2, setSelectedRowKeys2] = useState([]);
   const [data1, setData1] = useState([]);
   const [data2, setData2] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const prosedurTab = watch("prosedurTab");
+  console.log("prosedurTab", prosedurTab);
 
   const columns1 = [
     {
@@ -204,6 +209,18 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
 
   // sekmelerin içerisindeki tablo bileşenleri sonu
 
+  // Filter tab items based on prosedurTab value
+  const visibleTabItems = tabItems.filter((tabItem) => {
+    // prosedurTab değeri '0' veya 0 ise, her iki sekme de gösterilmeli.
+    // Bu koşul direkt olarak true döndürerek her iki sekmeyi de dahil eder.
+    if (prosedurTab === 0 || prosedurTab === "0") {
+      return true;
+    } else {
+      // prosedurTab değeri '1' veya '2' ise, ilgili sekme gösterilmeli.
+      return tabItem.key === prosedurTab.toString();
+    }
+  });
+
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
@@ -214,7 +231,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}>
-        <StyledTabs defaultActiveKey="1" items={tabItems} />
+        <StyledTabs defaultActiveKey="1" items={visibleTabItems} />
       </Modal>
     </div>
   );
