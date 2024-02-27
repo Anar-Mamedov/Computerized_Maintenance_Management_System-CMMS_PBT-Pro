@@ -145,7 +145,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
     setValue("ekipman", "");
     setValue("ekipmanID", "");
     setValue("ekipmanTanim", "");
-    setValue("makineDurumu", "");
+    setValue("makineDurumu", null);
     setValue("makineDurumuID", "");
     setValue("garantiBitis", "");
   };
@@ -163,7 +163,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
     setValue("ekipman", "");
     setValue("ekipmanID", "");
     setValue("ekipmanTanim", "");
-    setValue("makineDurumu", "");
+    setValue("makineDurumu", null);
     setValue("makineDurumuID", "");
     setValue("garantiBitis", "");
   };
