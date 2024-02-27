@@ -217,7 +217,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
       return true;
     } else {
       // prosedurTab değeri '1' veya '2' ise, ilgili sekme gösterilmeli.
-      return tabItem.key === prosedurTab.toString();
+      return tabItem.key === prosedurTab;
     }
   });
 
