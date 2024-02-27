@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin } from "antd";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography } from "antd";
 import { useFormContext } from "react-hook-form";
 import { SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../api/http";
@@ -9,6 +9,9 @@ import Filters from "./filter/Filters";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import TeknisyenSubmit from "../components/IsEmrineCevir/Teknisyen/TeknisyenSubmit";
 import AtolyeSubmit from "../components/IsEmrineCevir/Atolye/AtolyeSubmit";
+
+const { Text, Link } = Typography;
+const { TextArea } = Input;
 
 export default function MainTable() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -98,7 +101,7 @@ export default function MainTable() {
             alignItems: "center",
             justifyContent: "center",
             backgroundColor: hexToRGBA(record.ISM_TIP_RENK, 0.2),
-            padding: "10px",
+            padding: "3px 5px",
             borderRadius: "5px",
             border: `1.2px solid ${hexToRGBA(record.ISM_TIP_RENK, 0.7)}`,
             color: record.ISM_TIP_RENK,
