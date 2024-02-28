@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography } from "antd";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag } from "antd";
 import { useFormContext } from "react-hook-form";
 import { SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../api/http";
@@ -100,14 +100,15 @@ export default function MainTable() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: hexToRGBA(record.ISM_TIP_RENK, 0.2),
-            padding: "3px 5px",
-            borderRadius: "5px",
-            border: `1.2px solid ${hexToRGBA(record.ISM_TIP_RENK, 0.7)}`,
-            color: record.ISM_TIP_RENK,
-            fontWeight: "500",
           }}>
-          {text}
+          <Tag
+            style={{
+              backgroundColor: hexToRGBA(record.ISM_TIP_RENK, 0.2),
+              border: `1.2px solid ${hexToRGBA(record.ISM_TIP_RENK, 0.7)}`,
+              color: record.ISM_TIP_RENK,
+            }}>
+            {text}
+          </Tag>
         </div>
       ),
     },
