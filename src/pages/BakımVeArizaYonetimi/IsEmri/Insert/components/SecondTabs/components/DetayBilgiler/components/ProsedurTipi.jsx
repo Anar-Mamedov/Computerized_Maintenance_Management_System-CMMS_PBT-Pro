@@ -58,7 +58,7 @@ export default function ProsedurTipi({ disabled, fieldRequirements }) {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32440`)
+      AxiosInstance.post(`AddIsTip?entity=${name}&isTanimId=${prosedurTab}`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
