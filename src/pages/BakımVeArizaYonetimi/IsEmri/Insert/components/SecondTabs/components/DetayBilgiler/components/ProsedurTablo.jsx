@@ -65,7 +65,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
       ellipsis: true,
     },
     {
-      title: "Arıza Tanımı",
+      title: "Arıza Tipi",
       dataIndex: "IST_TIP",
       key: "IST_TIP",
       width: "150px",
@@ -89,7 +89,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
       ellipsis: true,
     },
     {
-      title: "Bakım Tanımı",
+      title: "Bakım Tipi",
       dataIndex: "IST_TIP",
       key: "IST_TIP",
       width: "150px",
@@ -164,7 +164,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
 
   const tabItems = [
     {
-      label: "Arıza",
+      label: "Arıza Prosedürleri",
       key: "1",
       children: (
         <div>
@@ -185,7 +185,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
       ),
     },
     {
-      label: "Bakım",
+      label: "Bakım Prosedürleri",
       key: "2",
       children: (
         <div>
@@ -224,13 +224,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
-      <Modal
-        width={1200}
-        centered
-        title="Prosedür Listesi"
-        open={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={handleModalToggle}>
+      <Modal width={1200} centered title="" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <StyledTabs defaultActiveKey="1" items={visibleTabItems} />
       </Modal>
     </div>

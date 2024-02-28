@@ -3,6 +3,8 @@ import { Button, Modal, Input, Typography, Tabs } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import ProsedurTablo from "./components/ProsedurTablo";
+import ProsedurTipi from "./components/ProsedurTipi";
+import ProsedurNedeni from "./components/ProsedurNedeni";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -28,6 +30,11 @@ export default function DetayBilgiler({ fieldRequirements }) {
   const handleProsedurMinusClick = () => {
     setValue("prosedur", "");
     setValue("prosedurID", "");
+    setValue("konu", "");
+    setValue("prosedurTipi", null);
+    setValue("prosedurTipiID", "");
+    setValue("prosedurNedeni", null);
+    setValue("prosedurNedeniID", "");
   };
 
   return (
@@ -96,6 +103,11 @@ export default function DetayBilgiler({ fieldRequirements }) {
                 onSubmit={(selectedData) => {
                   setValue("prosedur", selectedData.IST_KOD);
                   setValue("prosedurID", selectedData.key);
+                  setValue("konu", selectedData.IST_TANIM);
+                  setValue("prosedurTipi", selectedData.IST_TIP);
+                  setValue("prosedurTipiID", selectedData.IST_TIP_KOD_ID);
+                  setValue("prosedurNedeni", selectedData.IST_NEDEN);
+                  setValue("prosedurNedeniID", selectedData.IST_NEDEN_KOD_ID);
                 }}
               />
               <Button onClick={handleProsedurMinusClick}> - </Button>
@@ -103,7 +115,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
             </div>
           </StyledDivBottomLine>
         </div>
-        <div style={{ width: "100%", maxWidth: "910px" }}>
+        <div style={{ width: "100%", maxWidth: "450px" }}>
           <StyledDivBottomLine
             style={{
               display: "flex",
@@ -117,8 +129,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
               style={{
                 display: "flex",
                 flexWrap: "wrap",
-                maxWidth: "760px",
-                minWidth: "300px",
+                maxWidth: "300px",
                 width: "100%",
                 flexDirection: "column",
               }}>
@@ -130,6 +141,36 @@ export default function DetayBilgiler({ fieldRequirements }) {
               />
               {errors.konu && <div style={{ color: "red", marginTop: "5px" }}>{errors.konu.message}</div>}
             </div>
+          </StyledDivBottomLine>
+        </div>
+        <div style={{ width: "100%", maxWidth: "450px" }}>
+          <StyledDivBottomLine
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              width: "100%",
+            }}>
+            <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.prosedurTipi ? "600" : "normal" }}>
+              Tipi:
+            </Text>
+            <ProsedurTipi fieldRequirements={fieldRequirements} />
+          </StyledDivBottomLine>
+        </div>
+        <div style={{ width: "100%", maxWidth: "450px" }}>
+          <StyledDivBottomLine
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              width: "100%",
+            }}>
+            <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.prosedurNedeni ? "600" : "normal" }}>
+              Nedeni:
+            </Text>
+            <ProsedurNedeni fieldRequirements={fieldRequirements} />
           </StyledDivBottomLine>
         </div>
         <div style={{ width: "100%", maxWidth: "910px" }}>
