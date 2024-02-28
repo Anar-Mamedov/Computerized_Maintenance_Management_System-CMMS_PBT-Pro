@@ -97,6 +97,9 @@ export default function CreateDrawer({ onRefresh }) {
         ekipman: selectedOption.IMT_EKIPMAN,
         makineDurumu: selectedOption.IMT_MAKINE_DURUM,
         sayac: selectedOption.IMT_SAYAC_DEGERI,
+        prosedur: selectedOption.IMT_PROSEDUR,
+        prosedurTipi: selectedOption.IMT_IS_TIP,
+        prosedurNedeni: selectedOption.IMT_IS_NEDEN,
         // Diğer alanlar...
       });
     }
@@ -123,6 +126,7 @@ export default function CreateDrawer({ onRefresh }) {
               ekipman: defaultItem.IMT_EKIPMAN,
               makineDurumu: defaultItem.IMT_MAKINE_DURUM,
               sayac: defaultItem.IMT_SAYAC_DEGERI,
+              prosedur: defaultItem.IMT_PROSEDUR,
               // Burada defaultItem içerisindeki diğer alanlar için de benzer şekilde atama yapılabilir
               // Örneğin:
               // irtibatTelefonu: defaultItem.ISP_IRTIBAT_TEL,
