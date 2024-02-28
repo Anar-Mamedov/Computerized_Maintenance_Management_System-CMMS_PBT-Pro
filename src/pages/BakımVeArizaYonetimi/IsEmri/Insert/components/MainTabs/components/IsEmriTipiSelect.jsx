@@ -53,14 +53,35 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
     const selectedOption = options.find((option) => option.TB_ISEMRI_TIP_ID === value) ?? null;
 
     if (selectedOption) {
+      console.log("selectedOption", selectedOption);
       // selectedOption için komple yeni bir obje oluştur
       const updatedSelectedOption = {
+        ...selectedOption,
         IMT_LOKASYON: selectedOption.IMT_LOKASYON,
         IMT_MAKINE: selectedOption.IMT_MAKINE,
         IMT_EKIPMAN: selectedOption.IMT_EKIPMAN,
         IMT_MAKINE_DURUM: selectedOption.IMT_MAKINE_DURUM,
         IMT_SAYAC_DEGERI: selectedOption.IMT_SAYAC_DEGERI,
         IMT_CAGRILACAK_PROSEDUR: selectedOption.IMT_CAGRILACAK_PROSEDUR,
+        IMT_PROSEDUR: selectedOption.IMT_PROSEDUR,
+        IMT_IS_TIP: selectedOption.IMT_IS_TIP,
+        IMT_IS_NEDEN: selectedOption.IMT_IS_NEDEN,
+        IMT_ATOLYE: selectedOption.IMT_ATOLYE,
+        IMT_TAKVIM: selectedOption.IMT_TAKVIM,
+        IMT_TALIMAT: selectedOption.IMT_TALIMAT,
+        IMT_PLAN_TARIH: selectedOption.IMT_PLAN_TARIH,
+        IMT_MASRAF_MERKEZI: selectedOption.IMT_MASRAF_MERKEZI,
+        IMT_PROJE: selectedOption.IMT_PROJE,
+        IMT_ONCELIK: selectedOption.IMT_ONCELIK,
+        IMT_FIRMA: selectedOption.IMT_FIRMA,
+        IMT_SOZLESME: selectedOption.IMT_SOZLESME,
+        IMT_KONUM: selectedOption.IMT_KONUM,
+        IMT_PLAN_BITIS: selectedOption.IMT_PLAN_BITIS,
+        IMT_REFERANS_NO: selectedOption.IMT_REFERANS_NO,
+        IMT_EVRAK_NO: selectedOption.IMT_EVRAK_NO,
+        IMT_EVRAK_TARIHI: selectedOption.IMT_EVRAK_TARIHI,
+        IMT_MALIYET: selectedOption.IMT_MALIYET,
+        IMT_NOTLAR: selectedOption.IMT_NOTLAR,
         // Diğer gerekli alanlar da benzer şekilde eklenmeli
       };
 

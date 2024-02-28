@@ -27,6 +27,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
     formState: { errors },
   } = useFormContext();
 
+  const prosedurTab = watch("prosedurTab");
+
   const handleProsedurMinusClick = () => {
     setValue("prosedur", "");
     setValue("prosedurID", "");
@@ -36,6 +38,11 @@ export default function DetayBilgiler({ fieldRequirements }) {
     setValue("prosedurNedeni", null);
     setValue("prosedurNedeniID", "");
   };
+
+  // prosedurTab değişikliğini izleyin ve değişiklik olduğunda handleProsedurMinusClick fonksiyonunu çalıştırın.
+  useEffect(() => {
+    handleProsedurMinusClick();
+  }, [prosedurTab]); // prosedurTab'ı dependency array'e ekleyin.
 
   return (
     <div style={{ paddingBottom: "25px" }}>
