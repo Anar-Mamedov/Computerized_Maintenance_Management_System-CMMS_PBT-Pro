@@ -8,7 +8,7 @@ export default function CagrilacakProsedurSelect() {
   const cagrilacakProsedurID = watch("cagrilacakProsedurID");
 
   const options = [
-    { value: "0", label: "Her İkiside" },
+    { value: "0", label: "Her İkisi de" },
     { value: "1", label: "Arıza Prosedürü" },
     { value: "2", label: "Bakım Prosedürü" },
   ];

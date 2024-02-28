@@ -135,6 +135,10 @@ export default function CreateDrawer({ onRefresh }) {
               prosedurTipi: defaultItem.IMT_IS_TIP,
               prosedurNedeni: defaultItem.IMT_IS_NEDEN,
               konu: defaultItem.IMT_KONU,
+              oncelikTanim: defaultItem.IMT_ONCELIK,
+              atolyeTanim: defaultItem.IMT_ATOLYE,
+              takvimTanim: defaultItem.IMT_TAKVIM,
+              talimatTanim: defaultItem.IMT_TALIMAT,
               // Burada defaultItem içerisindeki diğer alanlar için de benzer şekilde atama yapılabilir
               // Örneğin:
               // irtibatTelefonu: defaultItem.ISP_IRTIBAT_TEL,
