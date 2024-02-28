@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table } from "antd";
-import AxiosInstance from "../../../../../../../api/http";
+import AxiosInstance from "../../../../../../../../../api/http";
+import dayjs from "dayjs";
 
-export default function OncelikTablo({ workshopSelectedId, onSubmit, disabled }) {
+export default function TalimatTablo({ workshopSelectedId, onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
@@ -10,52 +11,53 @@ export default function OncelikTablo({ workshopSelectedId, onSubmit, disabled })
 
   const columns = [
     {
-      title: "Öncelik Kodu",
+      title: "Talimat Kodu",
       dataIndex: "code",
       key: "code",
-      render: (text) => (
-        <div
-          style={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
+      width: "150px",
+      ellipsis: true,
     },
     {
-      title: "Tanım",
+      title: "Talımat Tanım",
       dataIndex: "subject",
       key: "subject",
-      render: (text) => (
-        <div
-          style={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
+      width: "350px",
+      ellipsis: true,
     },
     {
-      title: "Varsayılan",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => <input type="checkbox" checked={status} disabled />,
+      title: "Talimat Tipi",
+      dataIndex: "workdays",
+      key: "workdays",
+      width: "150px",
+      ellipsis: true,
+    },
+    {
+      title: "Sorumlu",
+      dataIndex: "fifthcolumn",
+      key: "fifthcolumn",
+      width: "150px",
+      ellipsis: true,
     },
   ];
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`OncelikList`)
+    AxiosInstance.get(`GetTalimatList`)
       .then((response) => {
-        const fetchedData = response.map((item) => ({
-          key: item.TB_SERVIS_ONCELIK_ID,
-          code: item.SOC_KOD,
-          subject: item.SOC_TANIM,
-          status: item.SOC_VARSAYILAN,
+        const fetchedData = response.Talimat_Liste.map((item) => ({
+          key: item.TB_TALIMAT_ID,
+          code: item.TLM_KOD,
+          subject: item.TLM_TANIM,
+          workdays: item.TLM_TIP,
+          description: item.TLM_ACIKLAMA, // ?
+          fifthcolumn: item.TLM_SORUMLU, // ?
+          sixthcolumn: dayjs(item.TLM_YURURLUK_TARIH).format("DD-MM-YYYY"),
+          seventhcolumn: item.TLM_REFERANS,
+          eighthcolumn: item.TLM_DAGITIM,
+          ninthcolumn: dayjs(item.TLM_REV_TARIH).format("DD-MM-YYYY"),
+          tenthcolumn: item.TLM_REV_NO,
+          eleventhcolumn: item.TLM_REV_NEDEN,
+          twelfthcolumn: item.TLM_REVIZE_EDEN, // ?
         }));
         setData(fetchedData);
       })
@@ -87,11 +89,14 @@ export default function OncelikTablo({ workshopSelectedId, onSubmit, disabled })
   };
   return (
     <div>
-      <Button disabled={disabled} onClick={handleModalToggle}>
-        {" "}
-        +{" "}
-      </Button>
-      <Modal width="1200px" title="Öncelik" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
+      <Button onClick={handleModalToggle}> + </Button>
+      <Modal
+        centered
+        width="1200px"
+        title="Talimat"
+        open={isModalVisible}
+        onOk={handleModalOk}
+        onCancel={handleModalToggle}>
         <Table
           rowSelection={{
             type: "radio",

@@ -100,6 +100,11 @@ export default function CreateDrawer({ onRefresh }) {
         prosedur: selectedOption.IMT_PROSEDUR,
         prosedurTipi: selectedOption.IMT_IS_TIP,
         prosedurNedeni: selectedOption.IMT_IS_NEDEN,
+        konu: selectedOption.IMT_KONU,
+        oncelikTanim: selectedOption.IMT_ONCELIK,
+        atolyeTanim: selectedOption.IMT_ATOLYE,
+        takvimTanim: selectedOption.IMT_TAKVIM,
+        talimatTanim: selectedOption.IMT_TALIMAT,
         // Diğer alanlar...
       });
     }
@@ -127,6 +132,9 @@ export default function CreateDrawer({ onRefresh }) {
               makineDurumu: defaultItem.IMT_MAKINE_DURUM,
               sayac: defaultItem.IMT_SAYAC_DEGERI,
               prosedur: defaultItem.IMT_PROSEDUR,
+              prosedurTipi: defaultItem.IMT_IS_TIP,
+              prosedurNedeni: defaultItem.IMT_IS_NEDEN,
+              konu: defaultItem.IMT_KONU,
               // Burada defaultItem içerisindeki diğer alanlar için de benzer şekilde atama yapılabilir
               // Örneğin:
               // irtibatTelefonu: defaultItem.ISP_IRTIBAT_TEL,

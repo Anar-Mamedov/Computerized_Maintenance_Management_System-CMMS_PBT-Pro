@@ -25,7 +25,6 @@ import IsKategorisi from "./components/IsKategorisi";
 import ServisNedeni from "./components/ServisNedeni";
 import BildirilenBina from "./components/BildirilenBina";
 import BildirilenKat from "./components/BildirilenKat";
-import OncelikTablo from "./components/OncelikTablo";
 import BagliIsEmriTablo from "./components/BagliIsEmriTablo";
 import MakineDurumu from "./components/MakineDurumu";
 import MakineTablo from "./components/MakineTablo";
