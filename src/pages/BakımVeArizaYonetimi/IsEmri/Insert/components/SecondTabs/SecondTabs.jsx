@@ -51,11 +51,6 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
       label: "Detay Bilgiler",
       children: <DetayBilgiler fieldRequirements={fieldRequirements} />,
     },
-    {
-      key: "2",
-      label: "Makine ve Ekipman",
-      children: <MakineVeEkipman fieldRequirements={fieldRequirements} />,
-    },
   ];
 
   return (

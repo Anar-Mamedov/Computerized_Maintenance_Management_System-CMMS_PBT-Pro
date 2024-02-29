@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs, DatePicker, TimePicker } from "antd";
+import { Button, Modal, Input, Typography, Tabs, DatePicker, TimePicker, Slider, InputNumber, Checkbox } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
+import dayjs from "dayjs";
 import ProsedurTablo from "./components/ProsedurTablo";
 import ProsedurTipi from "./components/ProsedurTipi";
 import ProsedurNedeni from "./components/ProsedurNedeni";
@@ -9,6 +10,10 @@ import OncelikTablo from "./components/OncelikTablo";
 import AtolyeTablo from "./components/AtolyeTablo";
 import TalimatTablo from "./components/TalimatTablo";
 import TakvimTablo from "./components/TakvimTablo";
+import MasrafMerkeziTablo from "./components/MasrafMerkeziTablo";
+import ProjeTablo from "./components/ProjeTablo";
+import FirmaTablo from "./components/FirmaTablo";
+import SozlesmeTablo from "./components/SozlesmeTablo";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -28,6 +33,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
     control,
     watch,
     setValue,
+    getValues,
     formState: { errors },
   } = useFormContext();
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
@@ -70,6 +76,25 @@ export default function DetayBilgiler({ fieldRequirements }) {
     setValue("takvimID", "");
   };
 
+  const handleMasrafMerkeziMinusClick = () => {
+    setValue("masrafMerkezi", "");
+    setValue("masrafMerkeziID", "");
+  };
+  const handleProjeMinusClick = () => {
+    setValue("proje", "");
+    setValue("projeID", "");
+  };
+
+  const handleFirmaMinusClick = () => {
+    setValue("firma", "");
+    setValue("firmaID", "");
+  };
+
+  const handleSozlesmeMinusClick = () => {
+    setValue("sozlesme", "");
+    setValue("sozlesmeID", "");
+  };
+
   // date picker için tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
   // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın
@@ -93,8 +118,35 @@ export default function DetayBilgiler({ fieldRequirements }) {
 
   // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın sonu
 
+  //! Başlama Tarihi ve saati ile Bitiş Tarihi ve saati arasındaki farkı hesaplama
+
+  // Watch for changes in the relevant fields
+  const watchFields = watch(["baslamaZamani", "baslamaZamaniSaati", "bitisZamani", "bitisZamaniSaati"]);
+
+  React.useEffect(() => {
+    const { baslamaZamani, baslamaZamaniSaati, bitisZamani, bitisZamaniSaati } = getValues();
+    if (baslamaZamani && baslamaZamaniSaati && bitisZamani && bitisZamaniSaati) {
+      // Başlangıç ve bitiş tarih/saatini birleştir
+      const startDateTime = dayjs(baslamaZamani).hour(baslamaZamaniSaati.hour()).minute(baslamaZamaniSaati.minute());
+      const endDateTime = dayjs(bitisZamani).hour(bitisZamaniSaati.hour()).minute(bitisZamaniSaati.minute());
+
+      // İki tarih/saat arasındaki farkı milisaniye cinsinden hesapla
+      const diff = endDateTime.diff(startDateTime);
+
+      // Farkı saat ve dakikaya dönüştür
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+      // Hesaplanan saat ve dakikaları form alanlarına yaz
+      setValue("calismaSaat", hours);
+      setValue("calismaDakika", minutes);
+    }
+  }, [watchFields, setValue, getValues]);
+
+  //! Başlama Tarihi ve saati ile Bitiş Tarihi ve saati arasındaki farkı hesaplama sonu
+
   return (
-    <div style={{ paddingBottom: "25px" }}>
+    <div style={{ paddingBottom: "35px" }}>
       {/* number input okları kaldırma */}
       <style>
         {`
@@ -109,8 +161,15 @@ export default function DetayBilgiler({ fieldRequirements }) {
       }
     `}
       </style>
-      <div style={{ display: "flex", gap: "10px", flexDirection: "column" }}>
-        <div style={{ display: "flex", gap: "10px", flexDirection: "column", width: "100%", maxWidth: "850px" }}>
+      <div style={{ display: "flex", gap: "10px" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            flexDirection: "column",
+            width: "100%",
+            maxWidth: "875px",
+          }}>
           <div>
             <div
               style={{ borderBottom: "1px solid #e8e8e8", marginBottom: "15px", paddingBottom: "5px", width: "100%" }}>
@@ -244,7 +303,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   </StyledDivBottomLine>
                 </div>
               </div>
-              <div style={{ display: "flex", gap: "10px", flexDirection: "column", width: "100%", maxWidth: "390px" }}>
+              <div style={{ display: "flex", gap: "10px", flexDirection: "column", width: "100%", maxWidth: "415px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
                   <StyledDivBottomLine
                     style={{
@@ -649,10 +708,124 @@ export default function DetayBilgiler({ fieldRequirements }) {
                 </div>
               </div>
             </div>
-            <div style={{ display: "flex", gap: "10px", flexDirection: "column", width: "100%", maxWidth: "390px" }}>
+            <div style={{ display: "flex", gap: "10px", flexDirection: "column", width: "100%", maxWidth: "415px" }}>
               <div
                 style={{ borderBottom: "1px solid #e8e8e8", marginBottom: "5px", paddingBottom: "5px", width: "100%" }}>
                 <Text style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}>Detay Bilgiler</Text>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                <StyledDivBottomLine
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    maxWidth: "450px",
+                  }}>
+                  <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.masrafMerkezi ? "600" : "normal" }}>
+                    Masraf Merkezi:
+                  </Text>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "300px",
+                    }}>
+                    <Controller
+                      name="masrafMerkezi"
+                      control={control}
+                      rules={{ required: fieldRequirements.masrafMerkezi ? "Alan Boş Bırakılamaz!" : false }}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          status={errors.masrafMerkezi ? "error" : ""}
+                          type="text" // Set the type to "text" for name input
+                          style={{ width: "215px" }}
+                          disabled
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="masrafMerkeziID"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          type="text" // Set the type to "text" for name input
+                          style={{ display: "none" }}
+                        />
+                      )}
+                    />
+                    <MasrafMerkeziTablo
+                      onSubmit={(selectedData) => {
+                        setValue("masrafMerkezi", selectedData.age);
+                        setValue("masrafMerkeziID", selectedData.key);
+                      }}
+                    />
+                    <Button onClick={handleMasrafMerkeziMinusClick}> - </Button>
+                    {errors.masrafMerkezi && (
+                      <div style={{ color: "red", marginTop: "5px" }}>{errors.masrafMerkezi.message}</div>
+                    )}
+                  </div>
+                </StyledDivBottomLine>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                <StyledDivBottomLine
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    maxWidth: "450px",
+                  }}>
+                  <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.proje ? "600" : "normal" }}>
+                    Proje:
+                  </Text>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "300px",
+                    }}>
+                    <Controller
+                      name="proje"
+                      control={control}
+                      rules={{ required: fieldRequirements.proje ? "Alan Boş Bırakılamaz!" : false }}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          status={errors.proje ? "error" : ""}
+                          type="text" // Set the type to "text" for name input
+                          style={{ width: "215px" }}
+                          disabled
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="projeID"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          type="text" // Set the type to "text" for name input
+                          style={{ display: "none" }}
+                        />
+                      )}
+                    />
+                    <ProjeTablo
+                      onSubmit={(selectedData) => {
+                        setValue("proje", selectedData.subject);
+                        setValue("projeID", selectedData.key);
+                      }}
+                    />
+                    <Button onClick={handleProjeMinusClick}> - </Button>
+                    {errors.proje && <div style={{ color: "red", marginTop: "5px" }}>{errors.proje.message}</div>}
+                  </div>
+                </StyledDivBottomLine>
               </div>
               <div style={{ width: "100%", maxWidth: "450px" }}>
                 <StyledDivBottomLine
@@ -688,6 +861,590 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   </div>
                 </StyledDivBottomLine>
               </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                <StyledDivBottomLine
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    maxWidth: "450px",
+                  }}>
+                  <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.tamamlanmaOranı ? "600" : "normal" }}>
+                    Tamamlanma %:
+                  </Text>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "300px",
+                    }}>
+                    <Controller
+                      name="tamamlanmaOranı"
+                      control={control}
+                      rules={{ required: fieldRequirements.tamamlanmaOranı ? "Alan Boş Bırakılamaz!" : false }}
+                      render={({ field }) => (
+                        <InputNumber
+                          {...field}
+                          min={0}
+                          max={100}
+                          status={errors.tamamlanmaOranı ? "error" : ""}
+                          style={{ width: "60px" }}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="tamamlanmaOranı"
+                      control={control}
+                      render={({ field }) => <Slider {...field} style={{ width: "220px" }} />}
+                    />
+                    {errors.tamamlanmaOranı && (
+                      <div style={{ color: "red", marginTop: "5px" }}>{errors.tamamlanmaOranı.message}</div>
+                    )}
+                  </div>
+                </StyledDivBottomLine>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "15px",
+            width: "100%",
+            maxWidth: "480px",
+          }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+              flexDirection: "column",
+              width: "100%",
+              maxWidth: "480px",
+            }}>
+            <div
+              style={{ borderBottom: "1px solid #e8e8e8", marginBottom: "5px", paddingBottom: "5px", width: "100%" }}>
+              <Text style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}>Çalışma Süresi</Text>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                maxWidth: "480px",
+                gap: "10px",
+                width: "100%",
+                justifyContent: "space-between",
+              }}>
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.planlananBaslama ? "600" : "normal" }}>
+                Planlanan Başlama:
+              </Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  maxWidth: "300px",
+                  minWidth: "300px",
+                  gap: "10px",
+                  width: "100%",
+                }}>
+                <Controller
+                  name="planlananBaslama"
+                  control={control}
+                  rules={{ required: fieldRequirements.planlananBaslama ? "Alan Boş Bırakılamaz!" : false }}
+                  render={({ field, fieldState: { error } }) => (
+                    <DatePicker
+                      {...field}
+                      status={errors.planlananBaslama ? "error" : ""}
+                      // disabled={!isDisabled}
+                      style={{ width: "180px" }}
+                      format={localeDateFormat}
+                      placeholder="Tarih seçiniz"
+                    />
+                  )}
+                />
+                <Controller
+                  name="planlananBaslamaSaati"
+                  control={control}
+                  rules={{ required: fieldRequirements.planlananBaslamaSaati ? "Alan Boş Bırakılamaz!" : false }}
+                  render={({ field, fieldState: { error } }) => (
+                    <TimePicker
+                      {...field}
+                      status={errors.planlananBaslamaSaati ? "error" : ""}
+                      // disabled={!isDisabled}
+                      style={{ width: "110px" }}
+                      format={localeTimeFormat}
+                      placeholder="Saat seçiniz"
+                    />
+                  )}
+                />
+                {errors.planlananBaslamaSaati && (
+                  <div style={{ color: "red", marginTop: "5px" }}>{errors.planlananBaslamaSaati.message}</div>
+                )}
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                maxWidth: "480px",
+                gap: "10px",
+                width: "100%",
+                justifyContent: "space-between",
+              }}>
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.planlananBitis ? "600" : "normal" }}>
+                Planlanan Bitiş:
+              </Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  maxWidth: "300px",
+                  minWidth: "300px",
+                  gap: "10px",
+                  width: "100%",
+                }}>
+                <Controller
+                  name="planlananBitis"
+                  control={control}
+                  rules={{ required: fieldRequirements.planlananBitis ? "Alan Boş Bırakılamaz!" : false }}
+                  render={({ field, fieldState: { error } }) => (
+                    <DatePicker
+                      {...field}
+                      status={errors.planlananBitis ? "error" : ""}
+                      // disabled={!isDisabled}
+                      style={{ width: "180px" }}
+                      format={localeDateFormat}
+                      placeholder="Tarih seçiniz"
+                    />
+                  )}
+                />
+                <Controller
+                  name="planlananBitisSaati"
+                  control={control}
+                  rules={{ required: fieldRequirements.planlananBitisSaati ? "Alan Boş Bırakılamaz!" : false }}
+                  render={({ field, fieldState: { error } }) => (
+                    <TimePicker
+                      {...field}
+                      status={errors.planlananBitisSaati ? "error" : ""}
+                      // disabled={!isDisabled}
+                      style={{ width: "110px" }}
+                      format={localeTimeFormat}
+                      placeholder="Saat seçiniz"
+                    />
+                  )}
+                />
+                {errors.planlananBitisSaati && (
+                  <div style={{ color: "red", marginTop: "5px" }}>{errors.planlananBitisSaati.message}</div>
+                )}
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                maxWidth: "480px",
+                gap: "10px",
+                width: "100%",
+                justifyContent: "space-between",
+              }}>
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.baslamaZamani ? "600" : "normal" }}>
+                Başlama Zamanı:
+              </Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  maxWidth: "300px",
+                  minWidth: "300px",
+                  gap: "10px",
+                  width: "100%",
+                }}>
+                <Controller
+                  name="baslamaZamani"
+                  control={control}
+                  rules={{ required: fieldRequirements.baslamaZamani ? "Alan Boş Bırakılamaz!" : false }}
+                  render={({ field, fieldState: { error } }) => (
+                    <DatePicker
+                      {...field}
+                      status={errors.baslamaZamani ? "error" : ""}
+                      // disabled={!isDisabled}
+                      style={{ width: "180px" }}
+                      format={localeDateFormat}
+                      placeholder="Tarih seçiniz"
+                    />
+                  )}
+                />
+                <Controller
+                  name="baslamaZamaniSaati"
+                  control={control}
+                  rules={{ required: fieldRequirements.baslamaZamaniSaati ? "Alan Boş Bırakılamaz!" : false }}
+                  render={({ field, fieldState: { error } }) => (
+                    <TimePicker
+                      {...field}
+                      status={errors.baslamaZamaniSaati ? "error" : ""}
+                      // disabled={!isDisabled}
+                      style={{ width: "110px" }}
+                      format={localeTimeFormat}
+                      placeholder="Saat seçiniz"
+                    />
+                  )}
+                />
+                {errors.baslamaZamaniSaati && (
+                  <div style={{ color: "red", marginTop: "5px" }}>{errors.baslamaZamaniSaati.message}</div>
+                )}
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                maxWidth: "480px",
+                gap: "10px",
+                width: "100%",
+                justifyContent: "space-between",
+              }}>
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.bitisZamani ? "600" : "normal" }}>
+                Bitiş Zamanı:
+              </Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  maxWidth: "300px",
+                  minWidth: "300px",
+                  gap: "10px",
+                  width: "100%",
+                }}>
+                <Controller
+                  name="bitisZamani"
+                  control={control}
+                  rules={{ required: fieldRequirements.bitisZamani ? "Alan Boş Bırakılamaz!" : false }}
+                  render={({ field, fieldState: { error } }) => (
+                    <DatePicker
+                      {...field}
+                      status={errors.bitisZamani ? "error" : ""}
+                      // disabled={!isDisabled}
+                      style={{ width: "180px" }}
+                      format={localeDateFormat}
+                      placeholder="Tarih seçiniz"
+                    />
+                  )}
+                />
+                <Controller
+                  name="bitisZamaniSaati"
+                  control={control}
+                  rules={{ required: fieldRequirements.bitisZamaniSaati ? "Alan Boş Bırakılamaz!" : false }}
+                  render={({ field, fieldState: { error } }) => (
+                    <TimePicker
+                      {...field}
+                      status={errors.bitisZamaniSaati ? "error" : ""}
+                      // disabled={!isDisabled}
+                      style={{ width: "110px" }}
+                      format={localeTimeFormat}
+                      placeholder="Saat seçiniz"
+                    />
+                  )}
+                />
+                {errors.bitisZamaniSaati && (
+                  <div style={{ color: "red", marginTop: "5px" }}>{errors.bitisZamaniSaati.message}</div>
+                )}
+              </div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+              <StyledDivBottomLine
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  maxWidth: "480px",
+                }}>
+                <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.calismaSuresi ? "600" : "normal" }}>
+                  Çalışma Süresi (Saat - dk):
+                </Text>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    width: "300px",
+                  }}>
+                  <Controller
+                    name="calismaSaat"
+                    control={control}
+                    rules={{ required: fieldRequirements.calismaSuresi ? "Alan Boş Bırakılamaz!" : false }}
+                    render={({ field }) => (
+                      <InputNumber
+                        {...field}
+                        min={0}
+                        // max={24}
+                        status={errors.calismaSuresi ? "error" : ""}
+                        style={{ width: "145px" }}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="calismaDakika"
+                    control={control}
+                    rules={{ required: fieldRequirements.calismaDakika ? "Alan Boş Bırakılamaz!" : false }}
+                    render={({ field }) => (
+                      <InputNumber
+                        {...field}
+                        min={0}
+                        max={59}
+                        status={errors.calismaDakika ? "error" : ""}
+                        style={{ width: "145px" }}
+                      />
+                    )}
+                  />
+                  {errors.calismaDakika && (
+                    <div style={{ color: "red", marginTop: "5px" }}>{errors.calismaDakika.message}</div>
+                  )}
+                </div>
+              </StyledDivBottomLine>
+            </div>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+              flexDirection: "column",
+              width: "100%",
+              maxWidth: "480px",
+            }}>
+            <div
+              style={{ borderBottom: "1px solid #e8e8e8", marginBottom: "5px", paddingBottom: "5px", width: "100%" }}>
+              <Text style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}>Diş Servis</Text>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+              <StyledDivBottomLine
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  maxWidth: "480px",
+                }}>
+                <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.firma ? "600" : "normal" }}>Firma:</Text>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    width: "300px",
+                  }}>
+                  <Controller
+                    name="firma"
+                    control={control}
+                    rules={{ required: fieldRequirements.firma ? "Alan Boş Bırakılamaz!" : false }}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        status={errors.firma ? "error" : ""}
+                        type="text" // Set the type to "text" for name input
+                        style={{ width: "215px" }}
+                        disabled
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="firmaID"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        type="text" // Set the type to "text" for name input
+                        style={{ display: "none" }}
+                      />
+                    )}
+                  />
+                  <FirmaTablo
+                    onSubmit={(selectedData) => {
+                      setValue("firma", selectedData.subject);
+                      setValue("firmaID", selectedData.key);
+                    }}
+                  />
+                  <Button onClick={handleFirmaMinusClick}> - </Button>
+                  {errors.firma && <div style={{ color: "red", marginTop: "5px" }}>{errors.firma.message}</div>}
+                </div>
+              </StyledDivBottomLine>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+              <StyledDivBottomLine
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  maxWidth: "480px",
+                }}>
+                <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.sozlesme ? "600" : "normal" }}>
+                  Sözleşme:
+                </Text>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    width: "300px",
+                  }}>
+                  <Controller
+                    name="sozlesme"
+                    control={control}
+                    rules={{ required: fieldRequirements.sozlesme ? "Alan Boş Bırakılamaz!" : false }}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        status={errors.sozlesme ? "error" : ""}
+                        type="text" // Set the type to "text" for name input
+                        style={{ width: "215px" }}
+                        disabled
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="sozlesmeID"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        type="text" // Set the type to "text" for name input
+                        style={{ display: "none" }}
+                      />
+                    )}
+                  />
+                  <SozlesmeTablo
+                    onSubmit={(selectedData) => {
+                      setValue("sozlesme", selectedData.CAS_TANIM);
+                      setValue("sozlesmeID", selectedData.key);
+                    }}
+                  />
+                  <Button onClick={handleSozlesmeMinusClick}> - </Button>
+                  {errors.sozlesme && <div style={{ color: "red", marginTop: "5px" }}>{errors.sozlesme.message}</div>}
+                </div>
+              </StyledDivBottomLine>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                maxWidth: "480px",
+                gap: "10px",
+                width: "100%",
+                justifyContent: "space-between",
+              }}>
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.evrakNo ? "600" : "normal" }}>
+                Evrak No/Tarihi:
+              </Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  maxWidth: "300px",
+                  minWidth: "300px",
+                  gap: "10px",
+                  width: "100%",
+                }}>
+                <Controller
+                  name="evrakNo"
+                  control={control}
+                  rules={{ required: fieldRequirements.evrakNo ? "Alan Boş Bırakılamaz!" : false }}
+                  render={({ field }) => (
+                    <InputNumber
+                      {...field}
+                      min={0}
+                      // max={59}
+                      status={errors.evrakNo ? "error" : ""}
+                      style={{ width: "145px" }}
+                    />
+                  )}
+                />
+                <Controller
+                  name="evrakTarihi"
+                  control={control}
+                  rules={{ required: fieldRequirements.evrakTarihi ? "Alan Boş Bırakılamaz!" : false }}
+                  render={({ field, fieldState: { error } }) => (
+                    <DatePicker
+                      {...field}
+                      status={errors.evrakTarihi ? "error" : ""}
+                      // disabled={!isDisabled}
+                      style={{ width: "145px" }}
+                      format={localeDateFormat}
+                      placeholder="Tarih seçiniz"
+                    />
+                  )}
+                />
+                {errors.evrakTarihi && (
+                  <div style={{ color: "red", marginTop: "5px" }}>{errors.evrakTarihi.message}</div>
+                )}
+              </div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+              <StyledDivBottomLine
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  maxWidth: "480px",
+                }}>
+                <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.maliyet ? "600" : "normal" }}>
+                  Maliyet:
+                </Text>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    width: "300px",
+                    gap: "10px",
+                  }}>
+                  <Controller
+                    name="maliyet"
+                    control={control}
+                    rules={{ required: fieldRequirements.maliyet ? "Alan Boş Bırakılamaz!" : false }}
+                    render={({ field }) => (
+                      <InputNumber
+                        {...field}
+                        min={0}
+                        // max={24}
+                        status={errors.maliyet ? "error" : ""}
+                        style={{ width: "125px" }}
+                      />
+                    )}
+                  />
+                  <div>
+                    <Controller
+                      name="garantiKapsami"
+                      control={control}
+                      render={({ field }) => (
+                        <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                          Garanti Kapsamında
+                        </Checkbox>
+                      )}
+                    />
+                  </div>
+                  {errors.maliyet && <div style={{ color: "red", marginTop: "5px" }}>{errors.maliyet.message}</div>}
+                </div>
+              </StyledDivBottomLine>
             </div>
           </div>
         </div>
