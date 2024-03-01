@@ -173,14 +173,14 @@ export default function MainTable() {
     //   key: "key",
     //   dataIndex: "key",
     //   width: 150,
-    //   render: (text, record) => <div style={{ marginTop: "6px" }}>{record.key}</div>,
+    //   render: (text, record) => <div >{record.key}</div>,
     // },
     {
       title: "Lokasyon Tanımı",
       key: "lokasyonBilgisi",
       width: 300,
       ellipsis: true,
-      render: (text, record) => <div style={{ marginTop: "6px" }}>{record.LOK_TANIM}</div>,
+      render: (text, record) => <div>{record.LOK_TANIM}</div>,
     },
     {
       title: "Lokasyon Tipi",

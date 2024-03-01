@@ -74,13 +74,13 @@ export default function RequisiteTable() {
     //   key: "key",
     //   dataIndex: "key",
     //   width: 150,
-    //   render: (text, record) => <div style={{ marginTop: "6px" }}>{record.key}</div>,
+    //   render: (text, record) => <div >{record.key}</div>,
     // },
     {
       title: "",
       key: "ekipmanBilgisi",
       render: (text, record) => (
-        <div style={{ marginTop: "6px" }}>
+        <div>
           {record.EKP_KOD} - {record.EKP_TANIM}
         </div>
       ),

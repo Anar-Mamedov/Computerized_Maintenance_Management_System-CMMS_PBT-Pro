@@ -20,12 +20,12 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit }) {
     //   key: "key",
     //   dataIndex: "key",
     //   width: 150,
-    //   render: (text, record) => <div style={{ marginTop: "6px" }}>{record.key}</div>,
+    //   render: (text, record) => <div >{record.key}</div>,
     // },
     {
       title: "",
       key: "lokasyonBilgisi",
-      render: (text, record) => <div style={{ marginTop: "6px" }}>{record.LOK_TANIM}</div>,
+      render: (text, record) => <div>{record.LOK_TANIM}</div>,
     },
     // Other columns...
   ];
