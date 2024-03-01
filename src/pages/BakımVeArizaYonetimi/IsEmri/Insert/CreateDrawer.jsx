@@ -25,7 +25,7 @@ export default function CreateDrawer({ onRefresh }) {
       AxiosInstance.get("ModulKoduGetir?modulKodu=ISM_ISEMRI_NO") // Replace with your actual API endpoint
         .then((response) => {
           // Assuming the response contains the new work order number in 'response.Tanim'
-          setValue("talepKodu", response);
+          setValue("isEmriNo", response);
         })
         .catch((error) => {
           console.error("Error fetching new work order number:", error);
@@ -35,47 +35,74 @@ export default function CreateDrawer({ onRefresh }) {
 
   const methods = useForm({
     defaultValues: {
-      talepKodu: "",
-      secilenTalepID: "",
-      talepTarihi: "",
-      talepSaati: "",
-      kapanmaTarihi: "",
-      kapanmaSaati: "",
-      talepteBulunan: "",
-      talepteBulunanID: "",
+      isEmriNo: "",
+      secilenIsEmriID: "",
+      duzenlenmeTarihi: "",
+      duzenlenmeSaati: "",
+      isEmriDurum: "",
+      isEmriDurumID: "",
+      bagliIsEmriTanim: "",
+      bagliIsEmriID: "",
       lokasyonTanim: "",
       lokasyonID: "",
-      departman: null,
-      departmanID: "",
-      irtibatTelefonu: "",
-      email: "",
-      iletisimSekli: null,
-      iletisimSekliID: "",
-      talepTipi: null,
-      talepTipiID: "",
-      isKategorisi: null,
-      isKategorisiID: "",
-      servisNedeni: null,
-      servisNedeniID: "",
-      atolye: "",
-      oncelikTanim: "",
-      oncelikID: "",
-      bildirilenBina: null,
-      bildirilenBinaID: "",
-      bildirilenKat: null,
-      bildirilenKatID: "",
-      ilgiliKisi: "",
-      ilgiliKisiID: "",
-      konu: "",
-      aciklama: "",
+      tamLokasyonTanim: "",
       makine: "",
       makineID: "",
       makineTanim: "",
+      garantiBitis: "",
       ekipman: "",
       ekipmanID: "",
       ekipmanTanim: "",
+      sayac: "",
+      isEmriTipi: null,
+      isEmriTipiID: "",
       makineDurumu: null,
       makineDurumuID: "",
+      // Detay Bilgiler
+      prosedur: "",
+      prosedurID: "",
+      konu: "",
+      oncelikTanim: "",
+      oncelikID: "",
+      atolyeTanim: "",
+      atolyeID: "",
+      takvimTanim: "",
+      takvimID: "",
+      talimatTanim: "",
+      talimatID: "",
+      isTalebiKodu: "",
+      talepEden: "",
+      isTalebiTarihi: "",
+      isTalebiSaati: "",
+      aciklama: "",
+      masrafMerkezi: "",
+      masrafMerkeziID: "",
+      proje: "",
+      projeID: "",
+      referansNo: "",
+      tamamlanmaOranı: "",
+      planlananBaslama: "",
+      planlananBaslamaSaati: "",
+      planlananBitis: "",
+      planlananBitisSaati: "",
+      baslamaZamani: "",
+      baslamaZamaniSaati: "",
+      bitisZamani: "",
+      bitisZamaniSaati: "",
+      calismaSaat: "",
+      calismaDakika: "",
+      firma: "",
+      firmaID: "",
+      sozlesme: "",
+      sozlesmeID: "",
+      evrakNo: "",
+      evrakTarihi: "",
+      maliyet: "",
+      garantiKapsami: "",
+      prosedurTipi: null,
+      prosedurTipiID: "",
+      prosedurNedeni: null,
+      prosedurNedeniID: "",
     },
   });
 
@@ -105,6 +132,16 @@ export default function CreateDrawer({ onRefresh }) {
         atolyeTanim: selectedOption.IMT_ATOLYE,
         takvimTanim: selectedOption.IMT_TAKVIM,
         talimatTanim: selectedOption.IMT_TALIMAT,
+        masrafMerkezi: selectedOption.IMT_MASRAF_MERKEZ,
+        proje: selectedOption.IMT_PROJE,
+        referansNo: selectedOption.IMT_REFERANS_NO,
+        planlananBaslama: selectedOption.IMT_PLAN_TARIH,
+        planlananBitis: selectedOption.IMT_PLAN_BITIS,
+        firma: selectedOption.IMT_FIRMA,
+        sozlesme: selectedOption.IMT_SOZLESME,
+        evrakNo: selectedOption.IMT_EVRAK_NO,
+        evrakTarihi: selectedOption.IMT_EVRAK_TARIHI,
+        maliyet: selectedOption.IMT_MALIYET,
         // Diğer alanlar...
       });
     }
@@ -139,6 +176,16 @@ export default function CreateDrawer({ onRefresh }) {
               atolyeTanim: defaultItem.IMT_ATOLYE,
               takvimTanim: defaultItem.IMT_TAKVIM,
               talimatTanim: defaultItem.IMT_TALIMAT,
+              masrafMerkezi: defaultItem.IMT_MASRAF_MERKEZ,
+              proje: defaultItem.IMT_PROJE,
+              referansNo: defaultItem.IMT_REFERANS_NO,
+              planlananBaslama: defaultItem.IMT_PLAN_TARIH,
+              planlananBitis: defaultItem.IMT_PLAN_BITIS,
+              firma: defaultItem.IMT_FIRMA,
+              sozlesme: defaultItem.IMT_SOZLESME,
+              evrakNo: defaultItem.IMT_EVRAK_NO,
+              evrakTarihi: defaultItem.IMT_EVRAK_TARIHI,
+              maliyet: defaultItem.IMT_MALIYET,
               // Burada defaultItem içerisindeki diğer alanlar için de benzer şekilde atama yapılabilir
               // Örneğin:
               // irtibatTelefonu: defaultItem.ISP_IRTIBAT_TEL,
@@ -157,6 +204,8 @@ export default function CreateDrawer({ onRefresh }) {
   }, [open, setValue, methods.reset]);
 
   // iş emri tipine göre zorunlu alanları belirleme son
+
+  // API'den varsayılan değerleri çekip set etme
 
   useEffect(() => {
     const handleDataFetchAndUpdate = async () => {
@@ -196,6 +245,8 @@ export default function CreateDrawer({ onRefresh }) {
     handleDataFetchAndUpdate();
   }, [open, setValue, methods.reset]);
 
+  // API'den varsayılan değerleri çekip set etme son
+
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
     return formattedDate.isValid() ? formattedDate.format("YYYY-MM-DD") : "";
@@ -209,33 +260,51 @@ export default function CreateDrawer({ onRefresh }) {
   const onSubmit = (data) => {
     // Form verilerini API'nin beklediği formata dönüştür
     const Body = {
-      IST_KOD: data.talepKodu,
-      IST_ACILIS_TARIHI: formatDateWithDayjs(data.talepTarihi),
-      IST_ACILIS_SAATI: formatTimeWithDayjs(data.talepSaati),
-      IST_TALEP_EDEN_ID: data.talepteBulunanID,
-      IST_BILDIREN_LOKASYON_ID: data.lokasyonID,
-      IST_DEPARTMAN_ID: data.departmanID,
-      IST_IRTIBAT_TELEFON: data.irtibatTelefonu,
-      IST_MAIL_ADRES: data.email,
-      IST_IRTIBAT_KOD_KOD_ID: data.iletisimSekliID,
-      IST_TIP_KOD_ID: data.talepTipiID,
-      IST_KOTEGORI_KODI_ID: data.isKategorisiID,
-      IST_SERVIS_NEDENI_KOD_ID: data.servisNedeniID,
-      IST_ONCELIK_ID: data.oncelikID,
-      IST_BILDIRILEN_BINA: data.bildirilenBinaID,
-      IST_BILDIRILEN_KAT: data.bildirilenKatID,
-      IST_IS_TAKIPCISI_ID: data.ilgiliKisiID,
-      IST_TANIMI: data.konu,
-      IST_ACIKLAMA: data.aciklama,
-      IST_MAKINE_ID: data.makineID,
-      IST_EKIPMAN_ID: data.ekipmanID,
-      IST_MAKINE_DURUM_KOD_ID: data.makineDurumuID,
-      IST_DURUM_ID: 0,
+      ISM_ISEMRI_NO: data.isEmriNo,
+      ISM_DUZENLEME_TARIH: formatDateWithDayjs(data.duzenlenmeTarihi),
+      ISM_DUZENLEME_SAAT: formatTimeWithDayjs(data.duzenlenmeSaati),
+      ISM_TIP_ID: data.isEmriTipiID,
+      ISM_DURUM_KOD_ID: data.isEmriDurumID,
+      ISM_BAGLI_ISEMRI_ID: data.bagliIsEmriID,
+      ISM_LOKASYON_ID: data.lokasyonID,
+      ISM_MAKINE_ID: data.makineID,
+      ISM_EKIPMAN_ID: data.ekipmanID,
+      ISM_MAKINE_DURUM_KOD_ID: data.makineDurumuID,
+      ISM_SAYAC_DEGER: data.sayac,
+      // Detay Bilgiler alanlari
+      ISM_REF_ID: data.prosedurID,
+      ISM_KONU: data.konu,
+      ISM_TIP_KOD_ID: data.prosedurTipiID,
+      ISM_NEDEN_KOD_ID: data.prosedurNedeniID,
+      ISM_ONCELIK_ID: data.oncelikID,
+      ISM_ATOLYE_ID: data.atolyeID,
+      ISM_TAKVIM_ID: data.takvimID,
+      ISM_TALIMAT_ID: data.talimatID,
+      ISM_IS_SONUC: data.aciklama,
+      ISM_MASRAF_MERKEZ_ID: data.masrafMerkeziID,
+      ISM_PROJE_ID: data.projeID,
+      ISM_REFERANS_NO: data.referansNo,
+      ISM_TAMAMLANMA_ORAN: data.tamamlanmaOranı === "" ? 0 : data.tamamlanmaOranı,
+      ISM_PLAN_BASLAMA_TARIH: formatDateWithDayjs(data.planlananBaslama),
+      ISM_PLAN_BASLAMA_SAAT: formatTimeWithDayjs(data.planlananBaslamaSaati),
+      ISM_PLAN_BITIS_TARIH: formatDateWithDayjs(data.planlananBitis),
+      ISM_PLAN_BITIS_SAAT: formatTimeWithDayjs(data.planlananBitisSaati),
+      ISM_BASLAMA_TARIH: formatDateWithDayjs(data.baslamaZamani),
+      ISM_BASLAMA_SAAT: formatTimeWithDayjs(data.baslamaZamaniSaati),
+      ISM_BITIS_TARIH: formatDateWithDayjs(data.bitisZamani),
+      ISM_BITIS_SAAT: formatTimeWithDayjs(data.bitisZamaniSaati),
+      ISM_SURE_CALISMA: data.calismaSaat * 60 + data.calismaDakika,
+      ISM_FIRMA_ID: data.firmaID,
+      ISM_FIRMA_SOZLESME_ID: data.sozlesmeID,
+      ISM_EVRAK_NO: data.evrakNo,
+      ISM_EVRAK_TARIHI: formatDateWithDayjs(data.evrakTarihi),
+      ISM_MALIYET_KDV: data.maliyet,
+      ISM_GARANTI_KAPSAMINDA: data.garantiKapsami,
       // Diğer alanlarınız...
     };
 
     // API'ye POST isteği gönder
-    AxiosInstance.post("AddIsTalep", Body)
+    AxiosInstance.post("IsEmri?ID=2&isWeb=true", Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
         setOpen(false);

@@ -190,8 +190,7 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit, disabled }
   return (
     <div>
       <Button disabled={disabled} onClick={handleModalToggle}>
-        {" "}
-        +{" "}
+        +
       </Button>
       <Modal width="1200px" title="Lokasyon" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <Input

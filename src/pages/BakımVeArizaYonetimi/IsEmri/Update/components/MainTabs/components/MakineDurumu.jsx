@@ -7,7 +7,7 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function ServisNedeni({ disabled, fieldRequirements }) {
+export default function MakineDurumu({ disabled, fieldRequirements }) {
   const {
     control,
     setValue,
@@ -27,7 +27,7 @@ export default function ServisNedeni({ disabled, fieldRequirements }) {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32953");
+      const response = await AxiosInstance.get("KodList?grup=32505");
       if (response && response) {
         setOptions(response);
       }
@@ -55,7 +55,7 @@ export default function ServisNedeni({ disabled, fieldRequirements }) {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32953`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32505`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
@@ -92,20 +92,28 @@ export default function ServisNedeni({ disabled, fieldRequirements }) {
 
   // add new status to selectbox end
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between" }}>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
+        justifyContent: "space-between",
+        maxWidth: "300px",
+        width: "100%",
+      }}>
       {contextHolder}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", flexDirection: "column" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", width: "100%" }}>
         <Controller
-          name="servisNedeni"
+          name="makineDurumu"
           control={control}
-          rules={{ required: fieldRequirements.servisNedeni ? "Alan Boş Bırakılamaz!" : false }}
+          rules={{ required: fieldRequirements.makineDurumu ? "Alan Boş Bırakılamaz!" : false }}
           render={({ field }) => (
             <Select
               {...field}
-              status={errors.servisNedeni ? "error" : ""}
+              status={errors.makineDurumu ? "error" : ""}
               disabled={disabled}
               key={selectKey}
-              style={{ width: "300px" }}
+              style={{ width: "100%" }}
               showSearch
               allowClear
               placeholder="Seçim Yapınız"
@@ -128,6 +136,9 @@ export default function ServisNedeni({ disabled, fieldRequirements }) {
                   />
                   <Space
                     style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      justifyContent: "center",
                       padding: "0 8px 4px",
                     }}>
                     <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
@@ -144,8 +155,8 @@ export default function ServisNedeni({ disabled, fieldRequirements }) {
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
                 // `null` veya `undefined` değerlerini ele al
-                setValue("servisNedeni", value ?? null);
-                setValue("servisNedeniID", value ?? null);
+                setValue("makineDurumu", value ?? null);
+                setValue("makineDurumuID", value ?? null);
                 field.onChange(value ?? null);
               }}
               value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
@@ -153,7 +164,7 @@ export default function ServisNedeni({ disabled, fieldRequirements }) {
           )}
         />
         <Controller
-          name="servisNedeniID"
+          name="makineDurumuID"
           control={control}
           render={({ field }) => (
             <Input
@@ -163,7 +174,7 @@ export default function ServisNedeni({ disabled, fieldRequirements }) {
             />
           )}
         />
-        {errors.servisNedeni && <div style={{ color: "red", marginTop: "5px" }}>{errors.servisNedeni.message}</div>}
+        {errors.makineDurumu && <div style={{ color: "red", marginTop: "5px" }}>{errors.makineDurumu.message}</div>}
       </div>
     </div>
   );

@@ -23,289 +23,239 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   const methods = useForm({
     defaultValues: {
-      talepKodu: "",
-      secilenTalepID: "",
-      talepTarihi: "",
-      talepSaati: "",
-      kapanmaTarihi: "",
-      kapanmaSaati: "",
-      talepteBulunan: "",
-      talepteBulunanID: "",
+      isEmriNo: "",
+      secilenIsEmriID: "",
+      duzenlenmeTarihi: "",
+      duzenlenmeSaati: "",
+      isEmriDurum: "",
+      isEmriDurumID: "",
+      bagliIsEmriTanim: "",
+      bagliIsEmriID: "",
       lokasyonTanim: "",
       lokasyonID: "",
-      departman: null,
-      departmanID: "",
-      irtibatTelefonu: "",
-      email: "",
-      iletisimSekli: null,
-      iletisimSekliID: "",
-      talepTipi: null,
-      talepTipiID: "",
-      isKategorisi: null,
-      isKategorisiID: "",
-      servisNedeni: null,
-      servisNedeniID: "",
-      atolye: "",
-      oncelikTanim: "",
-      oncelikID: "",
-      bildirilenBina: null,
-      bildirilenBinaID: "",
-      bildirilenKat: null,
-      bildirilenKatID: "",
-      ilgiliKisi: "",
-      ilgiliKisiID: "",
-      konu: "",
-      aciklama: "",
+      tamLokasyonTanim: "",
       makine: "",
       makineID: "",
       makineTanim: "",
+      garantiBitis: "",
       ekipman: "",
       ekipmanID: "",
       ekipmanTanim: "",
-      makineDurumu: null,
-      makineDurumuID: "",
+      sayac: "",
       isEmriTipi: null,
       isEmriTipiID: "",
-      planlananBaslamaTarihi: "",
+      makineDurumu: null,
+      makineDurumuID: "",
+      // Detay Bilgiler
+      prosedur: "",
+      prosedurID: "",
+      konu: "",
+      oncelikTanim: "",
+      oncelikID: "",
+      atolyeTanim: "",
+      atolyeID: "",
+      takvimTanim: "",
+      takvimID: "",
+      talimatTanim: "",
+      talimatID: "",
+      isTalebiKodu: "",
+      talepEden: "",
+      isTalebiTarihi: "",
+      isTalebiSaati: "",
+      aciklama: "",
+      masrafMerkezi: "",
+      masrafMerkeziID: "",
+      proje: "",
+      projeID: "",
+      referansNo: "",
+      tamamlanmaOranı: "",
+      planlananBaslama: "",
       planlananBaslamaSaati: "",
-      planlananBitisTarihi: "",
+      planlananBitis: "",
       planlananBitisSaati: "",
-      isEmriNo: "",
-      isEmriNoID: "",
-      baslamaTarihi: "",
-      baslamaSaati: "",
-      bitisTarihi: "",
-      bitisSaati: "",
-      not: "",
-      sonuc: "",
-      degerlendirme: "",
-
+      baslamaZamani: "",
+      baslamaZamaniSaati: "",
+      bitisZamani: "",
+      bitisZamaniSaati: "",
+      calismaSaat: "",
+      calismaDakika: "",
+      firma: "",
+      firmaID: "",
+      sozlesme: "",
+      sozlesmeID: "",
+      evrakNo: "",
+      evrakTarihi: "",
+      maliyet: "",
+      garantiKapsami: "",
+      prosedurTipi: null,
+      prosedurTipiID: "",
+      prosedurNedeni: null,
+      prosedurNedeniID: "",
       // ... Tüm default değerleriniz
     },
   });
 
-  const { setValue, reset } = methods;
+  const { setValue, reset, watch } = methods;
+
+  // iş emri tipine göre zorunlu alanları belirleme
+
+  // iş emri tipi selectboxundaki seçeneklere göre zorunlu alanları belirleme
+
+  const selectedOption = watch("selectedOption"); // `selectedOption` form alanını izle
 
   useEffect(() => {
-    const handleDataFetchAndUpdate = async () => {
+    if (selectedOption) {
+      // `selectedOption` içindeki değerleri `fieldRequirements` durumuna aktar
+      setValue("prosedurTab", selectedOption.IMT_CAGRILACAK_PROSEDUR);
+      setFieldRequirements({
+        lokasyonTanim: selectedOption.IMT_LOKASYON,
+        makine: selectedOption.IMT_MAKINE,
+        ekipman: selectedOption.IMT_EKIPMAN,
+        makineDurumu: selectedOption.IMT_MAKINE_DURUM,
+        sayac: selectedOption.IMT_SAYAC_DEGERI,
+        prosedur: selectedOption.IMT_PROSEDUR,
+        prosedurTipi: selectedOption.IMT_IS_TIP,
+        prosedurNedeni: selectedOption.IMT_IS_NEDEN,
+        konu: selectedOption.IMT_KONU,
+        oncelikTanim: selectedOption.IMT_ONCELIK,
+        atolyeTanim: selectedOption.IMT_ATOLYE,
+        takvimTanim: selectedOption.IMT_TAKVIM,
+        talimatTanim: selectedOption.IMT_TALIMAT,
+        masrafMerkezi: selectedOption.IMT_MASRAF_MERKEZ,
+        proje: selectedOption.IMT_PROJE,
+        referansNo: selectedOption.IMT_REFERANS_NO,
+        planlananBaslama: selectedOption.IMT_PLAN_TARIH,
+        planlananBitis: selectedOption.IMT_PLAN_BITIS,
+        firma: selectedOption.IMT_FIRMA,
+        sozlesme: selectedOption.IMT_SOZLESME,
+        evrakNo: selectedOption.IMT_EVRAK_NO,
+        evrakTarihi: selectedOption.IMT_EVRAK_TARIHI,
+        maliyet: selectedOption.IMT_MALIYET,
+        // Diğer alanlar...
+      });
+    }
+  }, [selectedOption, setFieldRequirements]);
+
+  // iş emri tipi selectboxundaki seçeneklere göre zorunlu alanları belirleme son.
+
+  const varsayilanIsEmriTipID = watch("isEmriTipiID");
+
+  useEffect(() => {
+    const handleDefaultRequirementsFetch = async () => {
       if (open) {
         try {
-          const response = await AxiosInstance.get(`IsTalepParametre`);
-          const data = response;
-          const item = data[0]; // Veri dizisinin ilk elemanını al
+          const response = await AxiosInstance.get(`IsEmriTip`);
+          const data = response; // API'den gelen veriyi al
 
-          // Form alanlarını set et
-          setValue("oncelikTanim", item.ISP_ONCELIK_TEXT);
-          setValue("oncelikID", item.ISP_ONCELIK_ID);
-          setValue("talepTipi", item.ISP_VARSAYILAN_IS_TIPI_TEXT);
-          setValue("talepTipiID", item.ISP_VARSAYILAN_IS_TIPI);
-          setIsDisabled(item.ISP_DUZENLEME_TARIH_DEGISIMI);
-          setFieldRequirements({
-            lokasyonTanim: item.ISP_LOKASYON,
-            irtibatTelefonu: item.ISP_IRTIBAT_TEL,
-            email: item.ISP_MAIL,
-            departman: item.ISP_DEPARTMAN,
-            iletisimSekli: item.ISP_ILETISIM_SEKLI,
-            talepTipi: item.ISP_BILDIRIM_TIPI,
-            isKategorisi: item.ISP_IS_KATEGORI,
-            servisNedeni: item.ISP_SERVIS_NEDEN,
-            oncelikTanim: item.ISP_ONCELIK,
-            bildirilenBina: item.ISP_BINA,
-            bildirilenKat: item.ISP_KAT,
-            ilgiliKisi: item.ISP_IS_TAKIPCI,
-            konu: item.ISP_KONU,
-            aciklama: item.ISP_ACIKLAMA,
-            makine: item.ISP_MAKINE_KOD,
-            ekipman: item.ISP_EKIPMAN_KOD,
-            makineDurumu: item.ISP_ZOR_MAKINE_DURUM_KOD_ID,
-            isEmriTipi: item.ISP_ZOR_ISEMRI_TIPI_ID,
-            planlananBaslamaTarihi: item.ISP_PLANLANAN_BASLAMA_TARIH,
-            planlananBitisTarihi: item.ISP_PLANLANAN_BITIS_TARIH,
-            // Diğer alanlar için de benzer şekilde...
-          });
+          // "IMT_VARSAYILAN": true olan objeyi bul
+          const defaultItem = data.find((item) => item.TB_ISEMRI_TIP_ID === varsayilanIsEmriTipID);
+
+          if (defaultItem) {
+            setValue("prosedurTab", defaultItem.IMT_CAGRILACAK_PROSEDUR);
+            // Eğer varsayılan obje bulunursa, form alanlarını set et
+            setFieldRequirements({
+              lokasyonTanim: defaultItem.IMT_LOKASYON,
+              makine: defaultItem.IMT_MAKINE,
+              ekipman: defaultItem.IMT_EKIPMAN,
+              makineDurumu: defaultItem.IMT_MAKINE_DURUM,
+              sayac: defaultItem.IMT_SAYAC_DEGERI,
+              prosedur: defaultItem.IMT_PROSEDUR,
+              prosedurTipi: defaultItem.IMT_IS_TIP,
+              prosedurNedeni: defaultItem.IMT_IS_NEDEN,
+              konu: defaultItem.IMT_KONU,
+              oncelikTanim: defaultItem.IMT_ONCELIK,
+              atolyeTanim: defaultItem.IMT_ATOLYE,
+              takvimTanim: defaultItem.IMT_TAKVIM,
+              talimatTanim: defaultItem.IMT_TALIMAT,
+              masrafMerkezi: defaultItem.IMT_MASRAF_MERKEZ,
+              proje: defaultItem.IMT_PROJE,
+              referansNo: defaultItem.IMT_REFERANS_NO,
+              planlananBaslama: defaultItem.IMT_PLAN_TARIH,
+              planlananBitis: defaultItem.IMT_PLAN_BITIS,
+              firma: defaultItem.IMT_FIRMA,
+              sozlesme: defaultItem.IMT_SOZLESME,
+              evrakNo: defaultItem.IMT_EVRAK_NO,
+              evrakTarihi: defaultItem.IMT_EVRAK_TARIHI,
+              maliyet: defaultItem.IMT_MALIYET,
+              // Burada defaultItem içerisindeki diğer alanlar için de benzer şekilde atama yapılabilir
+              // Örneğin:
+              // irtibatTelefonu: defaultItem.ISP_IRTIBAT_TEL,
+              // email: defaultItem.ISP_MAIL,
+              // Not: Yukarıdaki örnekteki alan isimleri API cevabınızda mevcut değil,
+              // bu yüzden gerçek alan isimlerinizi kullanmanız gerekecek.
+            });
+          }
         } catch (error) {
           console.error("Veri çekilirken hata oluştu:", error);
         }
       }
     };
 
-    handleDataFetchAndUpdate();
-  }, [open, setValue, methods.reset]);
+    handleDefaultRequirementsFetch();
+  }, [open, setValue, methods.reset, varsayilanIsEmriTipID]);
+
+  // iş emri tipine göre zorunlu alanları belirleme son
 
   // aşağıdaki useEffect verileri form elemanlarına set etmeden önce durum güncellemesi yapıyor ondan sonra verileri set ediyor
 
   useEffect(() => {
     const handleDataFetchAndUpdate = async () => {
       if (drawerVisible && selectedRow) {
-        let shouldFetchData = true;
-
-        // Eğer IST_DURUM_ID 0 ise, önce durumu güncelle
-        if (selectedRow.IST_DURUM_ID === 0) {
-          try {
-            await AxiosInstance.post("UpdateIsTalep", {
-              TB_IS_TALEP_ID: selectedRow.key,
-              IST_DURUM_ID: 1, // IST_DURUM_ID'yi 1 yaparak güncelleme yap
-            });
-            console.log("Durum başarıyla güncellendi");
-            onRefresh();
-            methods.reset();
-          } catch (error) {
-            console.error("Durum güncellenirken hata oluştu:", error);
-            shouldFetchData = false; // Hata oluşursa, veri çekme işlemine geçme
-          }
-        }
-
-        // Durum güncellemesi başarılıysa veya IST_DURUM_ID zaten 0 değilse, veri çekme işlemine geç
-        if (shouldFetchData) {
-          setLoading(true); // Yükleme başladığında
-          try {
-            const response = await AxiosInstance.get(`GetIsTalepById?isTalepId=${selectedRow.key}`);
-            const data = response;
-            const item = data[0]; // Veri dizisinin ilk elemanını al
-
-            // Form alanlarını set et
-            setValue("secilenTalepID", item.TB_IS_TALEP_ID);
-            setValue("talepKodu", item.IST_KOD);
-            setValue("talepTarihi", dayjs(item.IST_ACILIS_TARIHI));
-            setValue("talepSaati", dayjs(item.IST_ACILIS_SAATI, "HH:mm:ss")); // Saat değerini doğru formatla set et
-            setValue(
-              "kapanmaTarihi",
-              item.IST_KAPAMA_TARIHI
-                ? dayjs(item.IST_KAPAMA_TARIHI).isValid()
-                  ? dayjs(item.IST_KAPAMA_TARIHI)
-                  : null
+        setOpen(true); // İşlemler tamamlandıktan sonra drawer'ı aç
+        setLoading(true); // Yükleme başladığında
+        try {
+          const response = await AxiosInstance.get(`GetIsEmriById?isEmriId=${selectedRow.key}`);
+          const data = response;
+          const item = data[0]; // Veri dizisinin ilk elemanını al
+          console.log(item);
+          // Form alanlarını set et
+          setValue("secilenIsEmriID", item.TB_ISEMRI_ID);
+          setValue("isEmriNo", item.ISEMRI_NO);
+          setValue(
+            "duzenlenmeTarihi",
+            item.DUZENLEME_TARIH ? (dayjs(item.DUZENLEME_TARIH).isValid() ? dayjs(item.DUZENLEME_TARIH) : null) : null
+          );
+          setValue(
+            "duzenlenmeSaati",
+            item.DUZENLEME_SAAT
+              ? dayjs(item.DUZENLEME_SAAT, "HH:mm:ss").isValid()
+                ? dayjs(item.DUZENLEME_SAAT, "HH:mm:ss")
                 : null
-            );
-            setValue(
-              "kapanmaSaati",
-              item.IST_KAPAMA_SAATI
-                ? dayjs(item.IST_KAPAMA_SAATI, "HH:mm:ss").isValid()
-                  ? dayjs(item.IST_KAPAMA_SAATI, "HH:mm:ss")
-                  : null
-                : null
-            );
+              : null
+          );
+          setValue("isEmriTipi", item.ISEMRI_TIP);
+          setValue("isEmriTipiID", item.ISM_TIP_ID);
+          setValue("isEmriDurum", item.DURUM);
+          setValue("isEmriDurumID", item.ISM_DURUM_KOD_ID);
+          setValue("bagliIsEmriTanim", item.ISM_BAGLI_ISEMRI_NO);
+          setValue("bagliIsEmriID", item.ISM_BAGLI_ISEMRI_ID);
+          setValue("lokasyonTanim", item.LOKASYON);
+          setValue("lokasyonID", item.LOKASYON_ID);
+          setValue("tamLokasyonTanim", item.TAM_LOKASYON);
+          setValue("makine", item.MAKINE_KODU);
+          setValue("makineID", item.ISM_MAKINE_ID);
+          setValue("makineTanim", item.MAKINE_TANIMI);
+          setValue("garantiBitis", item.ISM_GARANTI_BITIS);
+          setValue("ekipman", item.EKIP);
+          setValue("ekipmanID", item.ISM_EKIPMAN_ID);
+          setValue("ekipmanTanim", item.EKIPMAN);
+          setValue("makineDurumu", item.MAKINE_DURUM);
+          setValue("makineDurumuID", item.ISM_MAKINE_DURUM_KOD_ID);
+          setValue("sayac", item.GUNCEL_SAYAC_DEGER);
+          setValue("prosedur", item.ISM_PROSEDUR_KOD);
+          setValue("prosedurID", item.ISM_REF_ID);
+          setValue("konu", item.KONU);
+          setValue("prosedurTipi", item.IS_TIPI);
+          setValue("prosedurTipiID", item.ISM_TIP_KOD_ID);
+          setValue("prosedurNedeni", item.IS_NEDENI);
+          setValue("prosedurNedeniID", item.ISM_NEDEN_KOD_ID);
 
-            setValue("talepteBulunan", item.IST_TALEP_EDEN_ADI);
-            setValue("talepteBulunanID", item.IST_TALEP_EDEN_ID);
-            setValue("secilenTalepID", item.TB_IS_TALEP_ID);
-            setValue("lokasyonTanim", item.IST_BILDIREN_LOKASYON);
-            setValue("lokasyonID", item.IST_BILDIREN_LOKASYON_ID);
-            setValue("departman", item.IST_DEPARTMAN); // bu alan adi api'de yok
-            setValue("departmanID", item.IST_DEPARTMAN_ID);
-            setValue("irtibatTelefonu", item.IST_IRTIBAT_TELEFON);
-            setValue("email", item.IST_MAIL_ADRES);
-            setValue("iletisimSekli", item.IST_IRTIBAT);
-            setValue("iletisimSekliID", item.IST_IRTIBAT_KOD_KOD_ID);
-            setValue("talepTipi", item.IST_TIP_TANIM);
-            setValue("talepTipiID", item.IST_TIP_KOD_ID);
-            setValue("isKategorisi", item.IST_KATEGORI_TANIMI);
-            setValue("isKategorisiID", item.IST_KOTEGORI_KODI_ID);
-            setValue("servisNedeni", item.IST_SERVIS_NEDENI);
-            setValue("servisNedeniID", item.IST_SERVIS_NEDENI_KOD_ID);
-            setValue("atolye", item.IST_ATOLYE_GRUBU_TANIMI);
-            setValue("oncelikTanim", item.IST_ONCELIK);
-            setValue("oncelikID", item.IST_ONCELIK_ID);
-            setValue("bildirilenBina", item.IST_BINA);
-            setValue("bildirilenBinaID", item.IST_BILDIRILEN_BINA);
-            setValue("bildirilenKat", item.IST_KAT);
-            setValue("bildirilenKatID", item.IST_BILDIRILEN_KAT);
-            setValue("ilgiliKisi", item.IST_TAKIP_EDEN_ADI);
-            setValue("ilgiliKisiID", item.IST_IS_TAKIPCISI_ID);
-            setValue("konu", item.IST_TANIMI);
-            setValue("aciklama", item.IST_ACIKLAMA);
-            setValue("makine", item.IST_MAKINE_KOD);
-            setValue("makineID", item.IST_MAKINE_ID);
-            setValue("makineTanim", item.IST_MAKINE_TANIM);
-            setValue("ekipman", item.IST_EKIPMAN_KOD);
-            setValue("ekipmanID", item.IST_EKIPMAN_ID);
-            setValue("ekipmanTanim", item.IST_EKIPMAN_TANIM);
-            setValue("makineDurumu", item.IST_MAKINE_DURUM);
-            setValue("makineDurumuID", item.IST_MAKINE_DURUM_KOD_ID);
-            setValue("isEmriTipi", item.ISEMRI_TIPI);
-            setValue("isEmriTipiID", item.IST_ISEMRI_TIP_ID);
+          // ... Diğer setValue çağrıları
 
-            setValue(
-              "planlananBaslamaTarihi",
-              item.IST_PLANLANAN_BASLAMA_TARIHI
-                ? dayjs(item.IST_PLANLANAN_BASLAMA_TARIHI).isValid()
-                  ? dayjs(item.IST_PLANLANAN_BASLAMA_TARIHI)
-                  : null
-                : null
-            );
-            setValue(
-              "planlananBaslamaSaati",
-              item.IST_PLANLANAN_BASLAMA_SAATI
-                ? dayjs(item.IST_PLANLANAN_BASLAMA_SAATI, "HH:mm:ss").isValid()
-                  ? dayjs(item.IST_PLANLANAN_BASLAMA_SAATI, "HH:mm:ss")
-                  : null
-                : null
-            );
-
-            setValue(
-              "planlananBitisTarihi",
-              item.IST_PLANLANAN_BITIS_TARIHI
-                ? dayjs(item.IST_PLANLANAN_BITIS_TARIHI).isValid()
-                  ? dayjs(item.IST_PLANLANAN_BITIS_TARIHI)
-                  : null
-                : null
-            );
-            setValue(
-              "planlananBitisSaati",
-              item.IST_PLANLANAN_BITIS_SAATI
-                ? dayjs(item.IST_PLANLANAN_BITIS_SAATI, "HH:mm:ss").isValid()
-                  ? dayjs(item.IST_PLANLANAN_BITIS_SAATI, "HH:mm:ss")
-                  : null
-                : null
-            );
-
-            setValue("isEmriNo", item.IST_ISEMRI_NO);
-            setValue("isEmriNoID", item.IST_ISEMRI_ID);
-
-            setValue(
-              "baslamaTarihi",
-              item.IST_BASLAMA_TARIHI
-                ? dayjs(item.IST_BASLAMA_TARIHI).isValid()
-                  ? dayjs(item.IST_BASLAMA_TARIHI)
-                  : null
-                : null
-            );
-            setValue(
-              "baslamaSaati",
-              item.IST_BASLAMA_SAATI
-                ? dayjs(item.IST_BASLAMA_SAATI, "HH:mm:ss").isValid()
-                  ? dayjs(item.IST_BASLAMA_SAATI, "HH:mm:ss")
-                  : null
-                : null
-            );
-
-            setValue(
-              "bitisTarihi",
-              item.IST_BITIS_TARIHI
-                ? dayjs(item.IST_BITIS_TARIHI).isValid()
-                  ? dayjs(item.IST_BITIS_TARIHI)
-                  : null
-                : null
-            );
-            setValue(
-              "bitisSaati",
-              item.IST_BITIS_SAATI
-                ? dayjs(item.IST_BITIS_SAATI, "HH:mm:ss").isValid()
-                  ? dayjs(item.IST_BITIS_SAATI, "HH:mm:ss")
-                  : null
-                : null
-            );
-
-            setValue("not", item.IST_NOT);
-            setValue("sonuc", item.IST_SONUC);
-            setValue("degerlendirme", item.IST_ON_DEGERLENDIRME);
-            // ... Diğer setValue çağrıları
-
-            setLoading(false); // Yükleme tamamlandığında
-            setOpen(true); // İşlemler tamamlandıktan sonra drawer'ı aç
-          } catch (error) {
-            console.error("Veri çekilirken hata oluştu:", error);
-            setLoading(false); // Hata oluştuğunda
-          }
+          setLoading(false); // Yükleme tamamlandığında
+        } catch (error) {
+          console.error("Veri çekilirken hata oluştu:", error);
+          setLoading(false); // Hata oluştuğunda
         }
       }
     };
@@ -392,70 +342,16 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     });
   };
 
-  // kayıdın durum id sine göre o o ekrana tıklandığında gözüken bütün form elemanlarını disablede edip etmeme işlemi
-
-  useEffect(() => {
-    // Örneğin, durum ID'si 4 (Kapandı) veya 5 (İptal Edildi) olduğunda formu disabled yap
-    if (selectedRow?.IST_DURUM_ID === 3 || selectedRow?.IST_DURUM_ID === 4 || selectedRow?.IST_DURUM_ID === 5) {
-      setDisabled(true);
-    } else {
-      setDisabled(false);
-    }
-  }, [selectedRow]);
-
-  // kayıdın durum id sine göre o o ekrana tıklandığında gözüken bütün form elemanlarını disablede edip etmeme işlemi sonu
-
-  // açılan kayıdın durumunu apiden gelen id ye göre drawerin yukarısında gösteriyor
-
-  const StatusTitle = ({ statusId }) => {
-    const getStatusProps = (statusId) => {
-      switch (statusId) {
-        case 0:
-          return { message: "Açık", backgroundColor: "blue" };
-        case 1:
-          return { message: "Bekliyor", backgroundColor: "#ff5e00" };
-        case 2:
-          return { message: "Planlandı", backgroundColor: "#ffe600" };
-        case 3:
-          return { message: "Devam Ediyor", backgroundColor: "#00d300" };
-        case 4:
-          return { message: "Kapandı", backgroundColor: "#575757" };
-        case 5:
-          return { message: "İptal Edildi", backgroundColor: "#d10000" };
-        default:
-          return { message: "Bilinmiyor", backgroundColor: "gray" };
-      }
-    };
-
-    const { message, backgroundColor } = getStatusProps(statusId);
-
-    return (
-      <div style={{ display: "flex", gap: "30px", alignItems: "center" }}>
-        <div>İş Talebi Güncelle</div>
-        <div
-          style={{
-            color: "white",
-            backgroundColor,
-            textAlign: "center",
-            borderRadius: "8px 8px 8px 8px",
-            padding: "4px 30px",
-            fontWeight: "300",
-            fontSize: "14px",
-          }}>
-          {message}
-        </div>
-      </div>
-    );
-  };
-
-  // açılan kayıdın durumunu apiden gelen id ye göre drawerin yukarısında gösteriyor sonu
-
   return (
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
         <Drawer
           width="1460px"
-          title={<StatusTitle statusId={selectedRow ? selectedRow.IST_DURUM_ID : null} />}
+          title={
+            <div style={{ display: "flex", gap: "30px", alignItems: "center" }}>
+              <div>İş Emri Güncelle</div>
+            </div>
+          }
           placement="right"
           onClose={onClose}
           open={open}

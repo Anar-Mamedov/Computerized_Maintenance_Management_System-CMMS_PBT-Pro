@@ -7,8 +7,12 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function IletisimSekli({ disabled }) {
-  const { control, setValue } = useFormContext();
+export default function IletisimSekli({ disabled, fieldRequirements }) {
+  const {
+    control,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const inputRef = createRef();
@@ -90,13 +94,15 @@ export default function IletisimSekli({ disabled }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between" }}>
       {contextHolder}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", flexDirection: "column" }}>
         <Controller
           name="iletisimSekli"
           control={control}
+          rules={{ required: fieldRequirements.iletisimSekli ? "Alan Boş Bırakılamaz!" : false }}
           render={({ field }) => (
             <Select
               {...field}
+              status={errors.iletisimSekli ? "error" : ""}
               disabled={disabled}
               key={selectKey}
               style={{ width: "300px" }}
@@ -154,6 +160,7 @@ export default function IletisimSekli({ disabled }) {
             />
           )}
         />
+        {errors.iletisimSekli && <div style={{ color: "red", marginTop: "5px" }}>{errors.iletisimSekli.message}</div>}
       </div>
     </div>
   );

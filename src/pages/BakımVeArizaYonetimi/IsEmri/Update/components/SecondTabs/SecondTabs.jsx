@@ -2,13 +2,8 @@ import React from "react";
 import { Tabs } from "antd";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
-import IsTakibi from "./components/IsTakibi/IsTakibi";
+import DetayBilgiler from "./components/DetayBilgiler/DetayBilgiler";
 import MakineVeEkipman from "./components/MakineVeEkipman/MakineVeEkipman";
-import PlanlamaVeIsEmri from "./components/PlanlamaVeIsEmri/PlanlamaVeIsEmri";
-import Not from "./components/Not/Not";
-import Sonuc from "./components/Sonuc/Sonuc";
-import Degerlendirme from "./components/Degerlendirme/Degerlendirme";
-import TeknisyenListesi from "./components/TeknisyenListesi/TeknisyenListesi";
 
 const onChange = (key) => {
   // console.log(key);
@@ -47,54 +42,14 @@ const StyledTabs = styled(Tabs)`
 
 //styled components end
 
-export default function SecondTabs({ refreshKey, disabled, fieldRequirements }) {
+export default function SecondTabs({ refreshKey, fieldRequirements }) {
   const { watch } = useFormContext();
 
   const items = [
     {
       key: "1",
-      label: "İş Takibi",
-      children: <IsTakibi disabled={disabled} />,
-    },
-    {
-      key: "2",
-      label: "Makine ve Ekipman",
-      children: <MakineVeEkipman disabled={disabled} />,
-    },
-    {
-      key: "3",
-      label: "Teknisyen Listesi",
-      children: <TeknisyenListesi disabled={disabled} />,
-    },
-    {
-      key: "4",
-      label: "Planlama ve İş Emri",
-      children: <PlanlamaVeIsEmri disabled={disabled} fieldRequirements={fieldRequirements} />,
-    },
-    {
-      key: "5",
-      label: "Not",
-      children: <Not disabled={disabled} />,
-    },
-    {
-      key: "6",
-      label: "Sonuç",
-      children: <Sonuc disabled={disabled} />,
-    },
-    {
-      key: "7",
-      label: "Ekli Belgeler",
-      children: "Ekli Belgeler",
-    },
-    {
-      key: "8",
-      label: "Resimler",
-      children: "Resimler",
-    },
-    {
-      key: "9",
-      label: "Ön Değerlendirme",
-      children: <Degerlendirme disabled={disabled} />,
+      label: "Detay Bilgiler",
+      children: <DetayBilgiler fieldRequirements={fieldRequirements} />,
     },
   ];
 
