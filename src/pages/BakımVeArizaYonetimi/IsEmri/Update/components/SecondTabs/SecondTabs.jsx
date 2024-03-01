@@ -3,7 +3,6 @@ import { Tabs } from "antd";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import DetayBilgiler from "./components/DetayBilgiler/DetayBilgiler";
-import MakineVeEkipman from "./components/MakineVeEkipman/MakineVeEkipman";
 
 const onChange = (key) => {
   // console.log(key);
