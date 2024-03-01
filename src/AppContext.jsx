@@ -8,6 +8,7 @@ export const useAppContext = () => useContext(AppContext);
 export const AppProvider = ({ children }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(null); // Yeni durum
 
   // Paylaşılacak değerler
   const value = {
@@ -15,6 +16,8 @@ export const AppProvider = ({ children }) => {
     setIsModalVisible,
     isLoading,
     setIsLoading,
+    selectedOption, // Eklenen yeni durum
+    setSelectedOption, // Yeni durumu güncelleyecek fonksiyon
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -315,7 +315,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 width: "100%",
               }}>
               <Controller
-                name="talepKodu"
+                name="isEmriNo"
                 control={control}
                 rules={{ required: "Alan Boş Bırakılamaz!" }}
                 render={({ field, fieldState: { error } }) => (
@@ -326,7 +326,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 )}
               />
               <Controller
-                name="secilenTalepID"
+                name="secilenIsEmriID"
                 control={control}
                 render={({ field }) => (
                   <Input

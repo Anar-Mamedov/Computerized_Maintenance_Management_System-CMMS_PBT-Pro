@@ -1,16 +1,17 @@
 import React, { useState, createRef, useEffect } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import { Select, Typography, Divider, Spin, Button, Input, message, Space } from "antd";
-import AxiosInstance from "../../../../../../../api/http";
+import AxiosInstance from "../../../../../../../../../api/http";
 import { PlusOutlined } from "@ant-design/icons";
 
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function ServisNedeni({ disabled, fieldRequirements }) {
+export default function ProsedurNedeni({ disabled, fieldRequirements }) {
   const {
     control,
     setValue,
+    watch,
     formState: { errors },
   } = useFormContext();
   const [options, setOptions] = useState([]);
@@ -24,10 +25,12 @@ export default function ServisNedeni({ disabled, fieldRequirements }) {
 
   // message end
 
+  const prosedurTab = watch("prosedurTab");
+
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32953");
+      const response = await AxiosInstance.get(`GetIsNeden?isTanimId=${prosedurTab}`);
       if (response && response) {
         setOptions(response);
       }
@@ -55,7 +58,7 @@ export default function ServisNedeni({ disabled, fieldRequirements }) {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32953`)
+      AxiosInstance.post(`AddIsNeden?entity=${name}&isTanimId=${prosedurTab}`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
@@ -96,13 +99,13 @@ export default function ServisNedeni({ disabled, fieldRequirements }) {
       {contextHolder}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", flexDirection: "column" }}>
         <Controller
-          name="servisNedeni"
+          name="prosedurNedeni"
           control={control}
-          rules={{ required: fieldRequirements.servisNedeni ? "Alan Boş Bırakılamaz!" : false }}
+          rules={{ required: fieldRequirements.prosedurNedeni ? "Alan Boş Bırakılamaz!" : false }}
           render={({ field }) => (
             <Select
               {...field}
-              status={errors.servisNedeni ? "error" : ""}
+              status={errors.prosedurNedeni ? "error" : ""}
               disabled={disabled}
               key={selectKey}
               style={{ width: "300px" }}
@@ -144,8 +147,8 @@ export default function ServisNedeni({ disabled, fieldRequirements }) {
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
                 // `null` veya `undefined` değerlerini ele al
-                setValue("servisNedeni", value ?? null);
-                setValue("servisNedeniID", value ?? null);
+                setValue("prosedurNedeni", value ?? null);
+                setValue("prosedurNedeniID", value ?? null);
                 field.onChange(value ?? null);
               }}
               value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
@@ -153,7 +156,7 @@ export default function ServisNedeni({ disabled, fieldRequirements }) {
           )}
         />
         <Controller
-          name="servisNedeniID"
+          name="prosedurNedeniID"
           control={control}
           render={({ field }) => (
             <Input
@@ -163,7 +166,7 @@ export default function ServisNedeni({ disabled, fieldRequirements }) {
             />
           )}
         />
-        {errors.servisNedeni && <div style={{ color: "red", marginTop: "5px" }}>{errors.servisNedeni.message}</div>}
+        {errors.prosedurNedeni && <div style={{ color: "red", marginTop: "5px" }}>{errors.prosedurNedeni.message}</div>}
       </div>
     </div>
   );

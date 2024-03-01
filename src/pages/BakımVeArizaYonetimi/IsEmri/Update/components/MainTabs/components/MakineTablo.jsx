@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table } from "antd";
-import AxiosInstance from "../../../../../../../../../api/http";
+import AxiosInstance from "../../../../../../../api/http";
 import dayjs from "dayjs";
-import SearchField from "../../../../../../../../MakineEkipman/MakineTanim/Table/SearchField";
+import SearchField from "../../../../../../MakineEkipman/MakineTanim/Table/SearchField";
 import Filters from "./Machina/filter/Filters";
+import { Controller, useFormContext } from "react-hook-form";
 
 export default function MakineTablo({ workshopSelectedId, onSubmit }) {
+  const { control, watch, setValue } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -218,39 +220,44 @@ export default function MakineTablo({ workshopSelectedId, onSubmit }) {
     },
   ];
 
-  const fetch = useCallback(({ keyword, filters, page = 1 }) => {
-    setLoading(true);
-    AxiosInstance.post(`GetMakineFullList?pagingDeger=${page}&lokasyonId=${""}&parametre=${keyword}`, filters)
-      .then((response) => {
-        const fetchedData = response.makine_listesi.map((item, index) => {
-          return {
-            ...item,
-            key: item.TB_MAKINE_ID,
-            code: item.MKN_KOD,
-            definition: item.MKN_TANIM,
-            location: item.MKN_LOKASYON,
-            machinelocationid: item.MKN_LOKASYON_ID,
-            fullLocation: item.MKN_LOKASYON_TUM_YOL,
-            machine_type: item.MKN_TIP,
-            category: item.MKN_KATEGORI,
-            brand: item.MKN_MARKA,
-            model: item.MKN_MODEL,
-            serial_no: item.MKN_SERI_NO,
-            // tb_makine_id: item.TB_MAKINE_ID,
-            machine_warranty: dayjs(item.MKN_GARANTI_BITIS).format("DD.MM.YYYY"),
-            machine_warranty_status: item.MKN_GARANTI_KAPSAMINDA,
-          };
-        });
-        setCurrentPage(page); //reset the cruent page when i search or filtered any thing
-        setTable({
-          data: fetchedData,
-          page: response.page,
-          // page: 1,
-        });
-        setLoading(false); // Set loading to false when data arrives
-      })
-      .finally(() => setLoading(false));
-  }, []);
+  const lokasyonID = watch("lokasyonID");
+
+  const fetch = useCallback(
+    ({ keyword, filters, page = 1 }) => {
+      setLoading(true);
+      AxiosInstance.post(`GetMakineFullList?pagingDeger=${page}&lokasyonId=${lokasyonID}&parametre=${keyword}`, filters)
+        .then((response) => {
+          const fetchedData = response.makine_listesi.map((item, index) => {
+            return {
+              ...item,
+              key: item.TB_MAKINE_ID,
+              code: item.MKN_KOD,
+              definition: item.MKN_TANIM,
+              location: item.MKN_LOKASYON,
+              machinelocationid: item.MKN_LOKASYON_ID,
+              fullLocation: item.MKN_LOKASYON_TUM_YOL,
+              machine_type: item.MKN_TIP,
+              category: item.MKN_KATEGORI,
+              brand: item.MKN_MARKA,
+              model: item.MKN_MODEL,
+              serial_no: item.MKN_SERI_NO,
+              // tb_makine_id: item.TB_MAKINE_ID,
+              machine_warranty: dayjs(item.MKN_GARANTI_BITIS).format("DD.MM.YYYY"),
+              machine_warranty_status: item.MKN_GARANTI_KAPSAMINDA,
+            };
+          });
+          setCurrentPage(page); //reset the cruent page when i search or filtered any thing
+          setTable({
+            data: fetchedData,
+            page: response.page,
+            // page: 1,
+          });
+          setLoading(false); // Set loading to false when data arrives
+        })
+        .finally(() => setLoading(false));
+    },
+    [lokasyonID]
+  );
 
   // for search field
   const handleBodyChange = useCallback((type, newBody) => {

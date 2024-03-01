@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Modal, Input, Typography, Tabs, DatePicker, TimePicker, Slider, InputNumber, Checkbox } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import dayjs from "dayjs";
+import { useAppContext } from "../../../../../../../../AppContext"; // Context hook'unu import edin
 import ProsedurTablo from "./components/ProsedurTablo";
 import ProsedurTipi from "./components/ProsedurTipi";
 import ProsedurNedeni from "./components/ProsedurNedeni";
@@ -28,6 +29,19 @@ const StyledDivBottomLine = styled.div`
   }
 `;
 
+// iş emri selectboxu sayfa ilk defa render olduğunda prosedür ve sonraki 3 fieldin değerlerini sıfırlamasın diye ilk renderdeki durumu tutması için
+
+// Önceki değeri tutmak için bir hook
+function usePrevious(value) {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  }, [value]); // value değiştiğinde çalış
+  return ref.current;
+}
+
+// iş emri selectboxu sayfa ilk defa render olduğunda prosedür ve sonraki 3 fieldin değerlerini sıfırlamasın diye ilk renderdeki durumu tutması için son
+
 export default function DetayBilgiler({ fieldRequirements }) {
   const {
     control,
@@ -36,8 +50,20 @@ export default function DetayBilgiler({ fieldRequirements }) {
     getValues,
     formState: { errors },
   } = useFormContext();
+  const { selectedOption } = useAppContext(); // Context'ten seçilen opsiyonu al iş emri tipi selectboxu değiştiğinde prosedürü sıfırlaması için
+  const previousSelectedOption = usePrevious(selectedOption); // Önceki seçilen opsiyonu al iş emri tipi selectboxu değiştiğinde prosedürü sıfırlaması için
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
+
+  // iş emri tipi selectboxu değiştiğinde prosedür ve ondan sonraki 3 fieldin değerlerini sıfırlamak için Context API kullanarak
+  useEffect(() => {
+    if (previousSelectedOption !== undefined && previousSelectedOption !== selectedOption) {
+      // İlk render'da değil ve selectedOption değiştiğinde çalışacak kod
+      handleProsedurMinusClick();
+    }
+  }, [selectedOption, previousSelectedOption]); // Bağımlılıklara previousSelectedOption ekleyin
+
+  // iş emri tipi selectboxu değiştiğinde prosedür ve ondan sonraki 3 fieldin değerlerini sıfırlamak için son
 
   const prosedurTab = watch("prosedurTab");
 
@@ -50,11 +76,6 @@ export default function DetayBilgiler({ fieldRequirements }) {
     setValue("prosedurNedeni", null);
     setValue("prosedurNedeniID", "");
   };
-
-  // prosedurTab değişikliğini izleyin ve değişiklik olduğunda handleProsedurMinusClick fonksiyonunu çalıştırın.
-  useEffect(() => {
-    handleProsedurMinusClick();
-  }, [prosedurTab]); // prosedurTab'ı dependency array'e ekleyin.
 
   const handleOncelikMinusClick = () => {
     setValue("oncelikTanim", "");

@@ -7,8 +7,12 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function MakineDurumu({ disabled }) {
-  const { control, setValue } = useFormContext();
+export default function MakineDurumu({ disabled, fieldRequirements }) {
+  const {
+    control,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const inputRef = createRef();
@@ -98,13 +102,15 @@ export default function MakineDurumu({ disabled }) {
         width: "100%",
       }}>
       {contextHolder}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", width: "100%" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", width: "100%" }}>
         <Controller
           name="makineDurumu"
           control={control}
+          rules={{ required: fieldRequirements.makineDurumu ? "Alan Boş Bırakılamaz!" : false }}
           render={({ field }) => (
             <Select
               {...field}
+              status={errors.makineDurumu ? "error" : ""}
               disabled={disabled}
               key={selectKey}
               style={{ width: "100%" }}
@@ -168,6 +174,7 @@ export default function MakineDurumu({ disabled }) {
             />
           )}
         />
+        {errors.makineDurumu && <div style={{ color: "red", marginTop: "5px" }}>{errors.makineDurumu.message}</div>}
       </div>
     </div>
   );
