@@ -7,8 +7,6 @@ import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import Filters from "./filter/Filters";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
-import TeknisyenSubmit from "../components/IsEmrineCevir/Teknisyen/TeknisyenSubmit";
-import AtolyeSubmit from "../components/IsEmrineCevir/Atolye/AtolyeSubmit";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
