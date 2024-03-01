@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Route, Routes, Link, useLocation, Outlet, Navigate } from "react-router-dom";
-import { Breadcrumb, Layout, Menu, theme, Button } from "antd";
+import { Breadcrumb, Layout, Menu, theme, Button, Typography, Input } from "antd";
 import {
   DesktopOutlined,
   FileOutlined,
@@ -25,6 +25,9 @@ import IsTalepleri from "./pages/YardimMasasi/IsTalepleri/IsTalepleri";
 import Hazirlaniyor from "./pages/Hazirlaniyor";
 import Auth from "./pages/Auth/Auth";
 import logo from "../src/assets/images/logoBeyaz.png";
+
+const { Text } = Typography;
+const { TextArea } = Input;
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -220,8 +223,11 @@ const BaseLayout = () => {
           onCollapse={setCollapsed}
           breakpoint="lg"
           collapsedWidth="0.0000000000001">
-          <div className="demo-logo-vertical" style={{ display: "flex", justifyContent: "center" }}>
+          <div
+            className="demo-logo-vertical"
+            style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
             <img src={logo} alt="Logo" style={logoStyle} />
+            <Text style={{ color: "white", marginTop: "11px", marginLeft: "5px" }}>v. 0.8.5</Text>
           </div>
           <MenuWrapper />
         </Sider>
@@ -234,8 +240,11 @@ const BaseLayout = () => {
           collapsedWidth={70} // Daraltılmış durumda Sider'ın genişliği
           breakpoint="lg" // breakpoint="lg" olduğunda collapsedWidth değerini kullanır
         >
-          <div className="demo-logo-vertical" style={{ display: "flex", justifyContent: "center" }}>
+          <div
+            className="demo-logo-vertical"
+            style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
             <img src={logo} alt="Logo" style={logoStyle} />
+            <Text style={{ color: "white", marginTop: "11px", marginLeft: "5px" }}>v. 0.8.5</Text>
           </div>
           <MenuWrapper />
         </Sider>
