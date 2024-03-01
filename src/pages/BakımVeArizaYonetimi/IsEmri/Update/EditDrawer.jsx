@@ -230,7 +230,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("bagliIsEmriTanim", item.ISM_BAGLI_ISEMRI_NO);
           setValue("bagliIsEmriID", item.ISM_BAGLI_ISEMRI_ID);
           setValue("lokasyonTanim", item.LOKASYON);
-          setValue("lokasyonID", item.LOKASYON_ID);
+          setValue("lokasyonID", item.ISM_LOKASYON_ID);
           setValue("tamLokasyonTanim", item.TAM_LOKASYON);
           setValue("makine", item.MAKINE_KODU);
           setValue("makineID", item.ISM_MAKINE_ID);
@@ -242,6 +242,9 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("makineDurumu", item.MAKINE_DURUM);
           setValue("makineDurumuID", item.ISM_MAKINE_DURUM_KOD_ID);
           setValue("sayac", item.GUNCEL_SAYAC_DEGER);
+
+          // detay Bilgiler alanları
+
           setValue("prosedur", item.ISM_PROSEDUR_KOD);
           setValue("prosedurID", item.ISM_REF_ID);
           setValue("konu", item.KONU);
@@ -249,6 +252,116 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("prosedurTipiID", item.ISM_TIP_KOD_ID);
           setValue("prosedurNedeni", item.IS_NEDENI);
           setValue("prosedurNedeniID", item.ISM_NEDEN_KOD_ID);
+          setValue("oncelikTanim", item.ONCELIK);
+          setValue("oncelikID", item.ISM_ONCELIK_ID);
+          setValue("atolyeTanim", item.ATOLYE);
+          setValue("atolyeID", item.ISM_ATOLYE_ID);
+          setValue("takvimTanim", item.TAKVIM);
+          setValue("takvimID", item.ISM_TAKVIM_ID);
+          setValue("talimatTanim", item.TALIMAT);
+          setValue("talimatID", item.ISM_TALIMAT_ID);
+          setValue("isTalebiKodu", item.TB_IS_TALEP_ID);
+          setValue("talepEden", item.TALEP_EDEN);
+          setValue(
+            "isTalebiTarihi",
+            item.TALEP_TARIH ? (dayjs(item.TALEP_TARIH).isValid() ? dayjs(item.TALEP_TARIH) : null) : null
+          );
+          setValue(
+            "isTalebiSaati",
+            item.TALEP_SAAT
+              ? dayjs(item.TALEP_SAAT, "HH:mm:ss").isValid()
+                ? dayjs(item.TALEP_SAAT, "HH:mm:ss")
+                : null
+              : null
+          );
+          setValue("aciklama", item.ISM_IS_SONUC);
+          setValue("masrafMerkezi", item.MASRAF_MERKEZI);
+          setValue("masrafMerkeziID", item.ISM_MASRAF_MERKEZ_ID);
+          setValue("proje", item.PROJE);
+          setValue("projeID", item.ISM_PROJE_ID);
+          setValue("referansNo", item.ISM_REFERANS_NO);
+          setValue("tamamlanmaOranı", item.TAMAMLANMA);
+          setValue(
+            "planlananBaslama",
+            item.PLAN_BASLAMA_TARIH
+              ? dayjs(item.PLAN_BASLAMA_TARIH).isValid()
+                ? dayjs(item.PLAN_BASLAMA_TARIH)
+                : null
+              : null
+          );
+          setValue(
+            "planlananBaslamaSaati",
+            item.PLAN_BASLAMA_SAAT
+              ? dayjs(item.PLAN_BASLAMA_SAAT, "HH:mm:ss").isValid()
+                ? dayjs(item.PLAN_BASLAMA_SAAT, "HH:mm:ss")
+                : null
+              : null
+          );
+          setValue(
+            "planlananBitis",
+            item.PLAN_BITIS_TARIH
+              ? dayjs(item.PLAN_BITIS_TARIH).isValid()
+                ? dayjs(item.PLAN_BITIS_TARIH)
+                : null
+              : null
+          );
+          setValue(
+            "planlananBitisSaati",
+            item.PLAN_BITIS_SAAT
+              ? dayjs(item.PLAN_BITIS_SAAT, "HH:mm:ss").isValid()
+                ? dayjs(item.PLAN_BITIS_SAAT, "HH:mm:ss")
+                : null
+              : null
+          );
+          setValue(
+            "baslamaZamani",
+            item.BASLAMA_TARIH ? (dayjs(item.BASLAMA_TARIH).isValid() ? dayjs(item.BASLAMA_TARIH) : null) : null
+          );
+          setValue(
+            "baslamaZamaniSaati",
+            item.BASLAMA_SAAT
+              ? dayjs(item.BASLAMA_SAAT, "HH:mm:ss").isValid()
+                ? dayjs(item.BASLAMA_SAAT, "HH:mm:ss")
+                : null
+              : null
+          );
+          setValue(
+            "bitisZamani",
+            item.ISM_BITIS_TARIH ? (dayjs(item.ISM_BITIS_TARIH).isValid() ? dayjs(item.ISM_BITIS_TARIH) : null) : null
+          );
+          setValue(
+            "bitisZamaniSaati",
+            item.ISM_BITIS_SAAT
+              ? dayjs(item.ISM_BITIS_SAAT, "HH:mm:ss").isValid()
+                ? dayjs(item.ISM_BITIS_SAAT, "HH:mm:ss")
+                : null
+              : null
+          );
+
+          // IS_SURESI'ni saat ve dakikaya çevirme
+          const totalMinutes = item.IS_SURESI;
+          const hours = Math.floor(totalMinutes / 60);
+          const minutes = totalMinutes % 60;
+
+          // Saat ve dakika değerlerini form alanlarına set etme
+          setValue("calismaSaat", hours);
+          setValue("calismaDakika", minutes);
+
+          setValue("firma", item.FRIMA);
+          setValue("firmaID", item.ISM_FIRMA_ID);
+          setValue("sozlesme", item.ISM_SOZLESME_TANIM);
+          setValue("sozlesmeID", item.ISM_FIRMA_SOZLESME_ID);
+          setValue("evrakNo", item.ISM_EVRAK_NO);
+          setValue(
+            "evrakTarihi",
+            item.ISM_EVRAK_TARIHI
+              ? dayjs(item.ISM_EVRAK_TARIHI).isValid()
+                ? dayjs(item.ISM_EVRAK_TARIHI)
+                : null
+              : null
+          );
+          setValue("maliyet", item.ISM_MALIYET_KDV);
+          setValue("garantiKapsami", item.GARANTI);
 
           // ... Diğer setValue çağrıları
 
@@ -276,46 +389,52 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   const onSubmit = (data) => {
     // Form verilerini API'nin beklediği formata dönüştür
     const Body = {
-      TB_IS_TALEP_ID: data.secilenTalepID,
-      IST_KOD: data.talepKodu,
-      IST_ACILIS_TARIHI: formatDateWithDayjs(data.talepTarihi),
-      IST_ACILIS_SAATI: formatTimeWithDayjs(data.talepSaati),
-      IST_TALEP_EDEN_ID: data.talepteBulunanID,
-      IST_BILDIREN_LOKASYON_ID: data.lokasyonID,
-      IST_DEPARTMAN_ID: data.departmanID,
-      IST_IRTIBAT_TELEFON: data.irtibatTelefonu,
-      IST_MAIL_ADRES: data.email,
-      IST_IRTIBAT_KOD_KOD_ID: data.iletisimSekliID,
-      IST_TIP_KOD_ID: data.talepTipiID,
-      IST_KOTEGORI_KODI_ID: data.isKategorisiID,
-      IST_SERVIS_NEDENI_KOD_ID: data.servisNedeniID,
-      IST_ONCELIK_ID: data.oncelikID,
-      IST_BILDIRILEN_BINA: data.bildirilenBinaID,
-      IST_BILDIRILEN_KAT: data.bildirilenKatID,
-      IST_IS_TAKIPCISI_ID: data.ilgiliKisiID,
-      IST_TANIMI: data.konu,
-      IST_ACIKLAMA: data.aciklama,
-      IST_MAKINE_ID: data.makineID,
-      IST_EKIPMAN_ID: data.ekipmanID,
-      IST_MAKINE_DURUM_KOD_ID: data.makineDurumuID,
-      IST_ISEMRI_TIP_ID: data.isEmriTipiID,
-      IST_PLANLANAN_BASLAMA_TARIHI: formatDateWithDayjs(data.planlananBaslamaTarihi),
-      IST_PLANLANAN_BASLAMA_SAATI: formatTimeWithDayjs(data.planlananBaslamaSaati),
-      IST_PLANLANAN_BITIS_TARIHI: formatDateWithDayjs(data.planlananBitisTarihi),
-      IST_PLANLANAN_BITIS_SAATI: formatTimeWithDayjs(data.planlananBitisSaati),
-      IST_ISEMRI_ID: data.isEmriNoID,
-      IST_BASLAMA_TARIHI: formatDateWithDayjs(data.baslamaTarihi),
-      IST_BASLAMA_SAATI: formatTimeWithDayjs(data.baslamaSaati),
-      IST_BITIS_TARIHI: formatDateWithDayjs(data.bitisTarihi),
-      IST_BITIS_SAATI: formatTimeWithDayjs(data.bitisSaati),
-      IST_NOT: data.not,
-      IST_SONUC: data.sonuc,
-      IST_ON_DEGERLENDIRME: data.degerlendirme,
+      TB_ISEMRI_ID: data.secilenIsEmriID,
+      ISM_ISEMRI_NO: data.isEmriNo,
+      ISM_DUZENLEME_TARIH: formatDateWithDayjs(data.duzenlenmeTarihi),
+      ISM_DUZENLEME_SAAT: formatTimeWithDayjs(data.duzenlenmeSaati),
+      ISM_TIP_ID: data.isEmriTipiID,
+      ISM_DURUM_KOD_ID: data.isEmriDurumID,
+      ISM_BAGLI_ISEMRI_ID: data.bagliIsEmriID,
+      ISM_LOKASYON_ID: data.lokasyonID,
+      ISM_MAKINE_ID: data.makineID,
+      ISM_EKIPMAN_ID: data.ekipmanID,
+      ISM_MAKINE_DURUM_KOD_ID: data.makineDurumuID,
+      ISM_SAYAC_DEGER: data.sayac,
+      // Detay Bilgiler alanlari
+      ISM_REF_ID: data.prosedurID,
+      ISM_KONU: data.konu,
+      ISM_TIP_KOD_ID: data.prosedurTipiID,
+      ISM_NEDEN_KOD_ID: data.prosedurNedeniID,
+      ISM_ONCELIK_ID: data.oncelikID,
+      ISM_ATOLYE_ID: data.atolyeID,
+      ISM_TAKVIM_ID: data.takvimID,
+      ISM_TALIMAT_ID: data.talimatID,
+      ISM_IS_SONUC: data.aciklama,
+      ISM_MASRAF_MERKEZ_ID: data.masrafMerkeziID,
+      ISM_PROJE_ID: data.projeID,
+      ISM_REFERANS_NO: data.referansNo,
+      ISM_TAMAMLANMA_ORAN: data.tamamlanmaOranı === "" ? 0 : data.tamamlanmaOranı,
+      ISM_PLAN_BASLAMA_TARIH: formatDateWithDayjs(data.planlananBaslama),
+      ISM_PLAN_BASLAMA_SAAT: formatTimeWithDayjs(data.planlananBaslamaSaati),
+      ISM_PLAN_BITIS_TARIH: formatDateWithDayjs(data.planlananBitis),
+      ISM_PLAN_BITIS_SAAT: formatTimeWithDayjs(data.planlananBitisSaati),
+      ISM_BASLAMA_TARIH: formatDateWithDayjs(data.baslamaZamani),
+      ISM_BASLAMA_SAAT: formatTimeWithDayjs(data.baslamaZamaniSaati),
+      ISM_BITIS_TARIH: formatDateWithDayjs(data.bitisZamani),
+      ISM_BITIS_SAAT: formatTimeWithDayjs(data.bitisZamaniSaati),
+      ISM_SURE_CALISMA: data.calismaSaat * 60 + data.calismaDakika,
+      ISM_FIRMA_ID: data.firmaID,
+      ISM_FIRMA_SOZLESME_ID: data.sozlesmeID,
+      ISM_EVRAK_NO: data.evrakNo,
+      ISM_EVRAK_TARIHI: formatDateWithDayjs(data.evrakTarihi),
+      ISM_MALIYET_KDV: data.maliyet,
+      ISM_GARANTI_KAPSAMINDA: data.garantiKapsami,
       // Diğer alanlarınız...
     };
 
     // API'ye POST isteği gönder
-    AxiosInstance.post("UpdateIsTalep", Body)
+    AxiosInstance.post("UpdateIsEmri", Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
         setOpen(false);
