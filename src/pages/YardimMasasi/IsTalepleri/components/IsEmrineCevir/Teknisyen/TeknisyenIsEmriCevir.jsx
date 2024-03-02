@@ -92,10 +92,12 @@ export default function TeknisyenIsEmriCevir() {
         <div
           style={{
             display: "flex",
-            flexWrap: "wrap",
+            // flexWrap: "wrap",
             alignItems: "center",
             justifyContent: "space-between",
-            width: "285px",
+            width: "100%",
+            maxWidth: "225px",
+            gap: "5px",
           }}>
           <Controller
             name="personelTanim"
@@ -134,14 +136,15 @@ export default function TeknisyenIsEmriCevir() {
             style={{
               padding: "0px 0px",
               width: "32px",
+              maxWidth: "32px",
+              minWidth: "32px",
               height: "32px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
             onClick={handlePersonelMinusClick}>
-            {" "}
-            -{" "}
+            -
           </Button>
         </div>
       </StyledDivBottomLine>

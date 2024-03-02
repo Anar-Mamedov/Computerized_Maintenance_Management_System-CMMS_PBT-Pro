@@ -92,10 +92,11 @@ export default function AtolyeIsEmriCevir() {
         <div
           style={{
             display: "flex",
-            flexWrap: "wrap",
+            // flexWrap: "wrap",
             alignItems: "center",
             justifyContent: "space-between",
-            width: "285px",
+            width: "225px",
+            gap: "5px",
           }}>
           <Controller
             name="atolyeTanim"
@@ -135,6 +136,8 @@ export default function AtolyeIsEmriCevir() {
             style={{
               padding: "0px 0px",
               width: "32px",
+              maxWidth: "32px",
+              minWidth: "32px",
               height: "32px",
               display: "flex",
               alignItems: "center",

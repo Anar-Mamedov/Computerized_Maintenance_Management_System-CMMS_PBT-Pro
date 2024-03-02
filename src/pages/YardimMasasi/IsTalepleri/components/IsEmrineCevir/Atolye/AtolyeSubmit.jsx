@@ -69,7 +69,7 @@ export default function AtolyeSubmit({ selectedRows, refreshTableData }) {
 
   return (
     <FormProvider {...methods}>
-      <div style={{ display: "flex", width: "100%", maxWidth: "370px" }}>
+      <div style={{ display: "flex", width: "100%", maxWidth: "315px" }}>
         <form style={{ width: "100%" }} onSubmit={methods.handleSubmit(onSubmited)}>
           <AtolyeIsEmriCevir selectedRows={selectedRows} />
         </form>
