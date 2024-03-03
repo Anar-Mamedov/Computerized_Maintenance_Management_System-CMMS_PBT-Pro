@@ -161,21 +161,6 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
     setValue("garantiBitis", "");
   };
 
-  // sistemin o anki tarih ve saatini almak için
-
-  useEffect(() => {
-    if (drawerOpen) {
-      const currentDate = dayjs(); // Şu anki tarih için dayjs nesnesi
-      const currentTime = dayjs(); // Şu anki saat için dayjs nesnesi
-
-      // Tarih ve saat alanlarını güncelle
-      setValue("duzenlenmeTarihi", currentDate);
-      setValue("duzenlenmeSaati", currentTime);
-    }
-  }, [drawerOpen, setValue]);
-
-  // sistemin o anki tarih ve saatini almak sonu
-
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 
   // Intl.DateTimeFormat kullanarak tarih formatlama
