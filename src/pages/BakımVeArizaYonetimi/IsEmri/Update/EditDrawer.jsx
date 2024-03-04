@@ -236,7 +236,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("makineID", item.ISM_MAKINE_ID);
           setValue("makineTanim", item.MAKINE_TANIMI);
           setValue("garantiBitis", item.ISM_GARANTI_BITIS);
-          setValue("ekipman", item.EKIP);
+          setValue("ekipman", item.ISM_EKIPMAN_KOD);
           setValue("ekipmanID", item.ISM_EKIPMAN_ID);
           setValue("ekipmanTanim", item.EKIPMAN);
           setValue("makineDurumu", item.MAKINE_DURUM);
@@ -277,7 +277,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("aciklama", item.ISM_IS_SONUC);
           setValue("masrafMerkezi", item.MASRAF_MERKEZI);
           setValue("masrafMerkeziID", item.ISM_MASRAF_MERKEZ_ID);
-          setValue("proje", item.PROJE);
+          setValue("proje", item.ISM_PROJE);
           setValue("projeID", item.ISM_PROJE_ID);
           setValue("referansNo", item.ISM_REFERANS_NO);
           setValue("tamamlanmaOranı", item.TAMAMLANMA);
