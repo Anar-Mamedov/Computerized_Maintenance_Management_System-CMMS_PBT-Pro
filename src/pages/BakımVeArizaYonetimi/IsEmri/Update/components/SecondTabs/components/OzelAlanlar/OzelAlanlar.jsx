@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Input, InputNumber } from "antd";
+import AxiosInstance from "../../../../../../../../api/http";
 import OzelAlan1 from "./components/OzelAlan1";
 import OzelAlan2 from "./components/OzelAlan2";
 import OzelAlan3 from "./components/OzelAlan3";
@@ -24,9 +25,31 @@ import OzelAlan20 from "./components/OzelAlan20";
 
 export default function OzelAlanlar() {
   const { control, watch, setValue } = useFormContext();
+  const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
+
+  useEffect(() => {
+    // API'den veri çekme işlemi
+    const fetchData = async () => {
+      try {
+        const response = await AxiosInstance.get("OzelAlan?form=ISEMRI"); // API URL'niz
+        setLabel(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
+      } catch (error) {
+        console.error("API isteğinde hata oluştu:", error);
+        setLabel("Hata! Veri yüklenemedi."); // Hata durumunda kullanıcıya bilgi verme
+      }
+    };
+
+    fetchData();
+  }, [refreshTrigger]); // Depend on refreshTrigger
+
+  // Function to trigger refresh
+  const triggerRefresh = () => {
+    setRefreshTrigger((prev) => !prev); // Toggle to trigger useEffect
+  };
 
   return (
-    <div style={{ display: "flex" }}>
+    <div style={{ display: "flex", marginBottom: "20px" }}>
       <div>
         <div
           style={{
@@ -37,7 +60,7 @@ export default function OzelAlanlar() {
             maxWidth: "450px",
             marginBottom: "10px",
           }}>
-          <OzelAlan1 />
+          <OzelAlan1 label={label} onModalClose={triggerRefresh} />
           <Controller
             name="ozelAlan1"
             control={control}
@@ -59,7 +82,7 @@ export default function OzelAlanlar() {
             maxWidth: "450px",
             marginBottom: "10px",
           }}>
-          <OzelAlan2 />
+          <OzelAlan2 label={label} onModalClose={triggerRefresh} />
           <Controller
             name="ozelAlan2"
             control={control}
@@ -81,7 +104,7 @@ export default function OzelAlanlar() {
             maxWidth: "450px",
             marginBottom: "10px",
           }}>
-          <OzelAlan3 />
+          <OzelAlan3 label={label} onModalClose={triggerRefresh} />
           <Controller
             name="ozelAlan3"
             control={control}
@@ -103,7 +126,7 @@ export default function OzelAlanlar() {
             maxWidth: "450px",
             marginBottom: "10px",
           }}>
-          <OzelAlan4 />
+          <OzelAlan4 label={label} onModalClose={triggerRefresh} />
           <Controller
             name="ozelAlan4"
             control={control}
@@ -125,7 +148,7 @@ export default function OzelAlanlar() {
             maxWidth: "450px",
             marginBottom: "10px",
           }}>
-          <OzelAlan5 />
+          <OzelAlan5 label={label} onModalClose={triggerRefresh} />
           <Controller
             name="ozelAlan5"
             control={control}
@@ -147,7 +170,7 @@ export default function OzelAlanlar() {
             maxWidth: "450px",
             marginBottom: "10px",
           }}>
-          <OzelAlan6 />
+          <OzelAlan6 label={label} onModalClose={triggerRefresh} />
           <Controller
             name="ozelAlan6"
             control={control}
@@ -169,7 +192,7 @@ export default function OzelAlanlar() {
             maxWidth: "450px",
             marginBottom: "10px",
           }}>
-          <OzelAlan7 />
+          <OzelAlan7 label={label} onModalClose={triggerRefresh} />
           <Controller
             name="ozelAlan7"
             control={control}
@@ -192,7 +215,7 @@ export default function OzelAlanlar() {
             maxWidth: "450px",
             marginBottom: "10px",
           }}>
-          <OzelAlan8 />
+          <OzelAlan8 label={label} onModalClose={triggerRefresh} />
           <Controller
             name="ozelAlan8"
             control={control}
@@ -214,7 +237,7 @@ export default function OzelAlanlar() {
             maxWidth: "450px",
             marginBottom: "10px",
           }}>
-          <OzelAlan9 />
+          <OzelAlan9 label={label} onModalClose={triggerRefresh} />
           <Controller
             name="ozelAlan9"
             control={control}
@@ -236,7 +259,7 @@ export default function OzelAlanlar() {
             maxWidth: "450px",
             marginBottom: "10px",
           }}>
-          <OzelAlan10 />
+          <OzelAlan10 label={label} onModalClose={triggerRefresh} />
           <Controller
             name="ozelAlan10"
             control={control}
@@ -260,7 +283,7 @@ export default function OzelAlanlar() {
             maxWidth: "450px",
             marginBottom: "10px",
           }}>
-          <OzelAlan11 />
+          <OzelAlan11 label={label} onModalClose={triggerRefresh} />
           <Controller
             name="ozelAlan11"
             control={control}
@@ -282,7 +305,7 @@ export default function OzelAlanlar() {
             maxWidth: "450px",
             marginBottom: "10px",
           }}>
-          <OzelAlan12 />
+          <OzelAlan12 label={label} onModalClose={triggerRefresh} />
           <Controller
             name="ozelAlan12"
             control={control}
@@ -304,7 +327,7 @@ export default function OzelAlanlar() {
             maxWidth: "450px",
             marginBottom: "10px",
           }}>
-          <OzelAlan13 />
+          <OzelAlan13 label={label} onModalClose={triggerRefresh} />
           <Controller
             name="ozelAlan13"
             control={control}
@@ -326,7 +349,7 @@ export default function OzelAlanlar() {
             maxWidth: "450px",
             marginBottom: "10px",
           }}>
-          <OzelAlan14 />
+          <OzelAlan14 label={label} onModalClose={triggerRefresh} />
           <Controller
             name="ozelAlan14"
             control={control}
@@ -348,7 +371,7 @@ export default function OzelAlanlar() {
             maxWidth: "450px",
             marginBottom: "10px",
           }}>
-          <OzelAlan15 />
+          <OzelAlan15 label={label} onModalClose={triggerRefresh} />
           <Controller
             name="ozelAlan15"
             control={control}
@@ -370,7 +393,7 @@ export default function OzelAlanlar() {
             maxWidth: "450px",
             marginBottom: "10px",
           }}>
-          <OzelAlan16 />
+          <OzelAlan16 label={label} onModalClose={triggerRefresh} />
           <Controller
             name="ozelAlan16"
             control={control}
@@ -392,7 +415,7 @@ export default function OzelAlanlar() {
             maxWidth: "450px",
             marginBottom: "10px",
           }}>
-          <OzelAlan17 />
+          <OzelAlan17 label={label} onModalClose={triggerRefresh} />
           <Controller
             name="ozelAlan17"
             control={control}
@@ -414,7 +437,7 @@ export default function OzelAlanlar() {
             maxWidth: "450px",
             marginBottom: "10px",
           }}>
-          <OzelAlan18 />
+          <OzelAlan18 label={label} onModalClose={triggerRefresh} />
           <Controller
             name="ozelAlan18"
             control={control}
@@ -436,7 +459,7 @@ export default function OzelAlanlar() {
             maxWidth: "450px",
             marginBottom: "10px",
           }}>
-          <OzelAlan19 />
+          <OzelAlan19 label={label} onModalClose={triggerRefresh} />
           <Controller
             name="ozelAlan19"
             control={control}
@@ -458,7 +481,7 @@ export default function OzelAlanlar() {
             maxWidth: "450px",
             marginBottom: "10px",
           }}>
-          <OzelAlan20 />
+          <OzelAlan20 label={label} onModalClose={triggerRefresh} />
           <Controller
             name="ozelAlan20"
             control={control}
