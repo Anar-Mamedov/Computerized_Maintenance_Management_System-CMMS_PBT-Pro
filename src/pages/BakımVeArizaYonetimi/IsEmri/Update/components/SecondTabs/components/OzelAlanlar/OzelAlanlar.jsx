@@ -22,6 +22,11 @@ import OzelAlan17 from "./components/OzelAlan17";
 import OzelAlan18 from "./components/OzelAlan18";
 import OzelAlan19 from "./components/OzelAlan19";
 import OzelAlan20 from "./components/OzelAlan20";
+import OzelAlanSelect11 from "./components/OzelAlanSelect11";
+import OzelAlanSelect12 from "./components/OzelAlanSelect12";
+import OzelAlanSelect13 from "./components/OzelAlanSelect13";
+import OzelAlanSelect14 from "./components/OzelAlanSelect14";
+import OzelAlanSelect15 from "./components/OzelAlanSelect15";
 
 export default function OzelAlanlar() {
   const { control, watch, setValue } = useFormContext();
@@ -284,17 +289,7 @@ export default function OzelAlanlar() {
             marginBottom: "10px",
           }}>
           <OzelAlan11 label={label} onModalClose={triggerRefresh} />
-          <Controller
-            name="ozelAlan11"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ width: "250px" }}
-              />
-            )}
-          />
+          <OzelAlanSelect11 />
         </div>
         <div
           style={{
@@ -306,17 +301,7 @@ export default function OzelAlanlar() {
             marginBottom: "10px",
           }}>
           <OzelAlan12 label={label} onModalClose={triggerRefresh} />
-          <Controller
-            name="ozelAlan12"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ width: "250px" }}
-              />
-            )}
-          />
+          <OzelAlanSelect12 />
         </div>
         <div
           style={{
@@ -328,17 +313,7 @@ export default function OzelAlanlar() {
             marginBottom: "10px",
           }}>
           <OzelAlan13 label={label} onModalClose={triggerRefresh} />
-          <Controller
-            name="ozelAlan13"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ width: "250px" }}
-              />
-            )}
-          />
+          <OzelAlanSelect13 />
         </div>
         <div
           style={{
@@ -350,17 +325,7 @@ export default function OzelAlanlar() {
             marginBottom: "10px",
           }}>
           <OzelAlan14 label={label} onModalClose={triggerRefresh} />
-          <Controller
-            name="ozelAlan14"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ width: "250px" }}
-              />
-            )}
-          />
+          <OzelAlanSelect14 />
         </div>
         <div
           style={{
@@ -372,17 +337,7 @@ export default function OzelAlanlar() {
             marginBottom: "10px",
           }}>
           <OzelAlan15 label={label} onModalClose={triggerRefresh} />
-          <Controller
-            name="ozelAlan15"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ width: "250px" }}
-              />
-            )}
-          />
+          <OzelAlanSelect15 />
         </div>
         <div
           style={{

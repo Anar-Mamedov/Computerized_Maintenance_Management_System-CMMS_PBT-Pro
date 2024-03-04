@@ -1,16 +1,17 @@
 import React, { useState, createRef, useEffect } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import { Select, Typography, Divider, Spin, Button, Input, message, Space } from "antd";
-import AxiosInstance from "../../../../../../../api/http";
+import AxiosInstance from "../../../../../../../../../api/http";
 import { PlusOutlined } from "@ant-design/icons";
 
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function DurumSelect({ disabled, fieldRequirements }) {
+export default function OzelAlanSelect15({ disabled, fieldRequirements }) {
   const {
     control,
     setValue,
+    watch,
     formState: { errors },
   } = useFormContext();
   const [options, setOptions] = useState([]);
@@ -24,10 +25,12 @@ export default function DurumSelect({ disabled, fieldRequirements }) {
 
   // message end
 
+  const prosedurTab = watch("prosedurTab");
+
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32801");
+      const response = await AxiosInstance.get(`GetIsNeden?isTanimId=${prosedurTab}`);
       if (response && response) {
         setOptions(response);
       }
@@ -55,7 +58,7 @@ export default function DurumSelect({ disabled, fieldRequirements }) {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32801`)
+      AxiosInstance.post(`AddIsNeden?entity=${name}&isTanimId=${prosedurTab}`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
@@ -96,16 +99,13 @@ export default function DurumSelect({ disabled, fieldRequirements }) {
       {contextHolder}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", flexDirection: "column" }}>
         <Controller
-          name="isEmriDurum1"
+          name="ozelAlan15"
           control={control}
-          rules={{ required: fieldRequirements.isEmriDurum ? "Alan Boş Bırakılamaz!" : false }}
           render={({ field }) => (
             <Select
               {...field}
-              status={errors.isEmriDurum ? "error" : ""}
-              disabled={disabled}
               key={selectKey}
-              style={{ width: "300px" }}
+              style={{ width: "250px" }}
               showSearch
               allowClear
               placeholder="Seçim Yapınız"
@@ -142,25 +142,18 @@ export default function DurumSelect({ disabled, fieldRequirements }) {
                 label: item.KOD_TANIM, // Display the name in the dropdown
               }))}
               onChange={(value) => {
-                // Seçilen değerin ID'sine göre options dizisinden ilgili öğeyi bul
-                const selectedOption = options.find((option) => option.TB_KOD_ID === value);
-
-                // Seçilen öğenin adını ve ID'sini form state'ine ayarla
-                setValue("isEmriDurum1", selectedOption ? selectedOption.KOD_TANIM : null);
-                setValue("isEmriDurum1ID", value ?? null); // ID değeri doğrudan kullanılabilir
-                setValue("varsayilanDurum", selectedOption ? selectedOption.KOD_ISM_DURUM_VARSAYILAN : false); // KOD_ISM_DURUM_VARSAYILAN değerini set et
-
-                // Eğer field.onChange fonksiyonu varsa, seçilen değeri buraya da geçir
-                if (field.onChange) {
-                  field.onChange(selectedOption ? selectedOption.KOD_TANIM : null);
-                }
+                // Seçilen değerin ID'sini NedeniID alanına set et
+                // `null` veya `undefined` değerlerini ele al
+                setValue("ozelAlan15", value ?? null);
+                setValue("ozelAlan15ID", value ?? null);
+                field.onChange(value ?? null);
               }}
               value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
             />
           )}
         />
         <Controller
-          name="isEmriDurum1ID"
+          name="ozelAlan15ID"
           control={control}
           render={({ field }) => (
             <Input
@@ -170,7 +163,6 @@ export default function DurumSelect({ disabled, fieldRequirements }) {
             />
           )}
         />
-        {errors.isEmriDurum && <div style={{ color: "red", marginTop: "5px" }}>{errors.isEmriDurum.message}</div>}
       </div>
     </div>
   );
