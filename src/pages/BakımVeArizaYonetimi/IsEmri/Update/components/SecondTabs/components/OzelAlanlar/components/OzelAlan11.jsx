@@ -6,9 +6,9 @@ import { Controller, useForm, FormProvider } from "react-hook-form";
 const { Text, Link } = Typography;
 const { TextArea } = Input;
 
-export default function OzelAlan11() {
+export default function OzelAlan11({ label, onModalClose }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
+
   const [refreshData, setRefreshData] = useState(false);
   const methods = useForm({
     defaultValues: {
@@ -29,7 +29,7 @@ export default function OzelAlan11() {
       .then((response) => {
         console.log("Data sent successfully:", response);
         reset();
-        setRefreshData((prev) => !prev); // refreshData değerini değiştirerek useEffect'i tetikle
+        onModalClose(); // Add this line to trigger the refresh in parent
         setIsModalOpen(false); // Sadece başarılı olursa modalı kapat
       })
       .catch((error) => {
@@ -45,21 +45,6 @@ export default function OzelAlan11() {
       reset();
     }
   };
-
-  useEffect(() => {
-    // API'den veri çekme işlemi
-    const fetchData = async () => {
-      try {
-        const response = await AxiosInstance.get("OzelAlan?form=ISEMRI"); // API URL'niz
-        setLabel(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
-      } catch (error) {
-        console.error("API isteğinde hata oluştu:", error);
-        setLabel("Hata! Veri yüklenemedi."); // Hata durumunda kullanıcıya bilgi verme
-      }
-    };
-
-    fetchData();
-  }, [refreshData]); // refreshData değiştiğinde useEffect'i yeniden çalıştır
 
   return (
     <FormProvider {...methods}>
