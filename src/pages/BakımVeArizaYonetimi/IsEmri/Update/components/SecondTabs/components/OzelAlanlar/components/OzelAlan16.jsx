@@ -6,7 +6,7 @@ import { Controller, useForm, FormProvider } from "react-hook-form";
 const { Text, Link } = Typography;
 const { TextArea } = Input;
 
-export default function OzelAlan1() {
+export default function OzelAlan16() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
   const [refreshData, setRefreshData] = useState(false);
@@ -20,7 +20,7 @@ export default function OzelAlan1() {
 
   const onSubmited = (data) => {
     const Body = {
-      OZL_OZEL_ALAN_1: data.ozelAlan,
+      OZL_OZEL_ALAN_16: data.ozelAlan,
       OZL_FORM: "ISEMRI",
       // TB_OZEL_ALAN_ID: 1,
     };
@@ -64,7 +64,7 @@ export default function OzelAlan1() {
   return (
     <FormProvider {...methods}>
       <Button type="submit" onClick={handleModalToggle}>
-        {label.OZL_OZEL_ALAN_1}
+        {label.OZL_OZEL_ALAN_16}
       </Button>
       <Modal
         title="Özel Alan İsmi Güncelle"
