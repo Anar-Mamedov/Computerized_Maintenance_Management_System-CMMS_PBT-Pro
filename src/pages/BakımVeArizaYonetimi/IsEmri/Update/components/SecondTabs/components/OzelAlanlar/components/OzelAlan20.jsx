@@ -10,7 +10,6 @@ export default function OzelAlan20({ label, onModalClose }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   // message
   const [messageApi, contextHolder] = message.useMessage();
-
   // message end
 
   const methods = useForm({

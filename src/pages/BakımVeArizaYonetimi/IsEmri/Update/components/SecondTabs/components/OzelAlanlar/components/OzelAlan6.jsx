@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Input, Modal, Typography } from "antd";
+import { Button, Input, Modal, Typography, message } from "antd";
 import AxiosInstance from "../../../../../../../../../api/http";
 import { Controller, useForm, FormProvider } from "react-hook-form";
 
@@ -8,6 +8,9 @@ const { TextArea } = Input;
 
 export default function OzelAlan6({ label, onModalClose }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // message
+  const [messageApi, contextHolder] = message.useMessage();
+  // message end
 
   const methods = useForm({
     defaultValues: {
@@ -30,9 +33,26 @@ export default function OzelAlan6({ label, onModalClose }) {
         reset();
         onModalClose(); // Add this line to trigger the refresh in parent
         setIsModalOpen(false); // Sadece başarılı olursa modalı kapat
+        if (response.status_code === 200) {
+          // Success handling
+          messageApi.open({
+            type: "success",
+            content: "Ekleme Başarılı",
+          });
+        } else {
+          // Error handling
+          messageApi.open({
+            type: "error",
+            content: "An error occurred", // Adjust the error message as needed
+          });
+        }
       })
       .catch((error) => {
         console.error("Error sending data:", error);
+        messageApi.open({
+          type: "error",
+          content: "An error occurred while adding the item.",
+        });
       });
 
     console.log({ Body });
@@ -47,6 +67,7 @@ export default function OzelAlan6({ label, onModalClose }) {
 
   return (
     <FormProvider {...methods}>
+      {contextHolder}
       <Button type="submit" onClick={handleModalToggle}>
         {label.OZL_OZEL_ALAN_6}
       </Button>
