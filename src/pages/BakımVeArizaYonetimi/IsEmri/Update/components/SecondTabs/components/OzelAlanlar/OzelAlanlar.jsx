@@ -377,7 +377,7 @@ export default function OzelAlanlar() {
             render={({ field }) => (
               <InputNumber
                 {...field}
-                type="text" // Set the type to "text" for name inputNumber
+                type="text" // Set the type to "text" for name InputNumber
                 style={{ width: "250px" }}
               />
             )}
@@ -399,7 +399,7 @@ export default function OzelAlanlar() {
             render={({ field }) => (
               <InputNumber
                 {...field}
-                type="text" // Set the type to "text" for name inputNumber
+                type="text" // Set the type to "text" for name InputNumber
                 style={{ width: "250px" }}
               />
             )}
@@ -421,7 +421,7 @@ export default function OzelAlanlar() {
             render={({ field }) => (
               <InputNumber
                 {...field}
-                type="text" // Set the type to "text" for name inputNumber
+                type="text" // Set the type to "text" for name InputNumber
                 style={{ width: "250px" }}
               />
             )}
@@ -443,7 +443,7 @@ export default function OzelAlanlar() {
             render={({ field }) => (
               <InputNumber
                 {...field}
-                type="text" // Set the type to "text" for name inputNumber
+                type="text" // Set the type to "text" for name InputNumber
                 style={{ width: "250px" }}
               />
             )}
@@ -465,7 +465,7 @@ export default function OzelAlanlar() {
             render={({ field }) => (
               <InputNumber
                 {...field}
-                type="text" // Set the type to "text" for name inputNumber
+                type="text" // Set the type to "text" for name InputNumber
                 style={{ width: "250px" }}
               />
             )}

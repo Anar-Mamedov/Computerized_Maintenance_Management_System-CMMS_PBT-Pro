@@ -91,6 +91,27 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       prosedurTipiID: "",
       prosedurNedeni: null,
       prosedurNedeniID: "",
+      // Özel alanlar
+      ozelAlan1: "",
+      ozelAlan2: "",
+      ozelAlan3: "",
+      ozelAlan4: "",
+      ozelAlan5: "",
+      ozelAlan6: "",
+      ozelAlan7: "",
+      ozelAlan8: "",
+      ozelAlan9: "",
+      ozelAlan10: "",
+      ozelAlan11: "",
+      ozelAlan12: "",
+      ozelAlan13: "",
+      ozelAlan14: "",
+      ozelAlan15: "",
+      ozelAlan16: "",
+      ozelAlan17: "",
+      ozelAlan18: "",
+      ozelAlan19: "",
+      ozelAlan20: "",
       // ... Tüm default değerleriniz
     },
   });
@@ -465,6 +486,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
         <Drawer
+          destroyOnClose
           width="1460px"
           title={
             <div style={{ display: "flex", gap: "30px", alignItems: "center" }}>

@@ -21,6 +21,14 @@ export default function MainTable() {
   const [searchTimeout, setSearchTimeout] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0); // Toplam sayfa sayısı için state
+  const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
+
+  // edit drawer için
+  const [drawer, setDrawer] = useState({
+    visible: false,
+    data: null,
+  });
+  // edit drawer için son
 
   const [selectedRows, setSelectedRows] = useState([]);
 
@@ -48,6 +56,25 @@ export default function MainTable() {
     }
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   }
+
+  // Özel Alanların nameleri backend çekmek için api isteği
+
+  useEffect(() => {
+    // API'den veri çekme işlemi
+    const fetchData = async () => {
+      try {
+        const response = await AxiosInstance.get("OzelAlan?form=ISEMRI"); // API URL'niz
+        setLabel(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
+      } catch (error) {
+        console.error("API isteğinde hata oluştu:", error);
+        setLabel("Hata! Veri yüklenemedi."); // Hata durumunda kullanıcıya bilgi verme
+      }
+    };
+
+    fetchData();
+  }, [drawer.visible]);
+
+  // Özel Alanların nameleri backend çekmek için api isteği sonu
 
   // Örnek kolonlar ve başlangıçta hepsinin görünür olacağı varsayılıyor
   const columns = [
@@ -392,7 +419,7 @@ export default function MainTable() {
       render: (text) => formatDate(text),
     },
     {
-      title: "Özel Alan 1",
+      title: <div>{label.OZL_OZEL_ALAN_1}</div>,
       dataIndex: "OZEL_ALAN_1",
       key: "OZEL_ALAN_1",
       width: "150px",
@@ -400,7 +427,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Özel Alan 2",
+      title: <div>{label.OZL_OZEL_ALAN_2}</div>,
       dataIndex: "OZEL_ALAN_2",
       key: "OZEL_ALAN_2",
       width: "150px",
@@ -408,7 +435,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Özel Alan 3",
+      title: <div>{label.OZL_OZEL_ALAN_3}</div>,
       dataIndex: "OZEL_ALAN_3",
       key: "OZEL_ALAN_3",
       width: "150px",
@@ -416,7 +443,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Özel Alan 4",
+      title: <div>{label.OZL_OZEL_ALAN_4}</div>,
       dataIndex: "OZEL_ALAN_4",
       key: "OZEL_ALAN_4",
       width: "150px",
@@ -424,7 +451,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Özel Alan 5",
+      title: <div>{label.OZL_OZEL_ALAN_5}</div>,
       dataIndex: "OZEL_ALAN_5",
       key: "OZEL_ALAN_5",
       width: "150px",
@@ -432,7 +459,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Özel Alan 6",
+      title: <div>{label.OZL_OZEL_ALAN_6}</div>,
       dataIndex: "OZEL_ALAN_6",
       key: "OZEL_ALAN_6",
       width: "150px",
@@ -440,7 +467,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Özel Alan 7",
+      title: <div>{label.OZL_OZEL_ALAN_7}</div>,
       dataIndex: "OZEL_ALAN_7",
       key: "OZEL_ALAN_7",
       width: "150px",
@@ -448,7 +475,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Özel Alan 8",
+      title: <div>{label.OZL_OZEL_ALAN_8}</div>,
       dataIndex: "OZEL_ALAN_8",
       key: "OZEL_ALAN_8",
       width: "150px",
@@ -456,7 +483,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Özel Alan 9",
+      title: <div>{label.OZL_OZEL_ALAN_9}</div>,
       dataIndex: "OZEL_ALAN_9",
       key: "OZEL_ALAN_9",
       width: "150px",
@@ -464,7 +491,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Özel Alan 10",
+      title: <div>{label.OZL_OZEL_ALAN_10}</div>,
       dataIndex: "OZEL_ALAN_10",
       key: "OZEL_ALAN_10",
       width: "150px",
@@ -472,7 +499,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Özel Alan 11",
+      title: <div>{label.OZL_OZEL_ALAN_11}</div>,
       dataIndex: "OZEL_ALAN_11",
       key: "OZEL_ALAN_11",
       width: "150px",
@@ -480,7 +507,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Özel Alan 12",
+      title: <div>{label.OZL_OZEL_ALAN_12}</div>,
       dataIndex: "OZEL_ALAN_12",
       key: "OZEL_ALAN_12",
       width: "150px",
@@ -488,7 +515,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Özel Alan 13",
+      title: <div>{label.OZL_OZEL_ALAN_13}</div>,
       dataIndex: "OZEL_ALAN_13",
       key: "OZEL_ALAN_13",
       width: "150px",
@@ -496,7 +523,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Özel Alan 14",
+      title: <div>{label.OZL_OZEL_ALAN_14}</div>,
       dataIndex: "OZEL_ALAN_14",
       key: "OZEL_ALAN_14",
       width: "150px",
@@ -504,7 +531,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Özel Alan 15",
+      title: <div>{label.OZL_OZEL_ALAN_15}</div>,
       dataIndex: "OZEL_ALAN_15",
       key: "OZEL_ALAN_15",
       width: "150px",
@@ -512,7 +539,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Özel Alan 16",
+      title: <div>{label.OZL_OZEL_ALAN_16}</div>,
       dataIndex: "OZEL_ALAN_16",
       key: "OZEL_ALAN_16",
       width: "150px",
@@ -520,7 +547,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Özel Alan 17",
+      title: <div>{label.OZL_OZEL_ALAN_17}</div>,
       dataIndex: "OZEL_ALAN_17",
       key: "OZEL_ALAN_17",
       width: "150px",
@@ -528,7 +555,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Özel Alan 18",
+      title: <div>{label.OZL_OZEL_ALAN_18}</div>,
       dataIndex: "OZEL_ALAN_18",
       key: "OZEL_ALAN_18",
       width: "150px",
@@ -536,7 +563,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Özel Alan 19",
+      title: <div>{label.OZL_OZEL_ALAN_19}</div>,
       dataIndex: "OZEL_ALAN_19",
       key: "OZEL_ALAN_19",
       width: "150px",
@@ -544,7 +571,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Özel Alan 20",
+      title: <div>{label.OZL_OZEL_ALAN_20}</div>,
       dataIndex: "OZEL_ALAN_20",
       key: "OZEL_ALAN_20",
       width: "150px",
@@ -685,13 +712,6 @@ export default function MainTable() {
   };
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
-
-  // edit drawer için
-  const [drawer, setDrawer] = useState({
-    visible: false,
-    data: null,
-  });
-  // edit drawer için son
 
   const [body, setBody] = useState({
     keyword: "",
