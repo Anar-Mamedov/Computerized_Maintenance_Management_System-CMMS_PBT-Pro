@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import DetayBilgiler from "./components/DetayBilgiler/DetayBilgiler";
 import KontrolListesiTablo from "./components/KontrolListesi/KontrolListesiTablo";
+import OzelAlanlar from "./components/OzelAlanlar/OzelAlanlar";
 
 const onChange = (key) => {
   // console.log(key);
@@ -55,6 +56,11 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
       key: "2",
       label: "Kontrol Listesi",
       children: <KontrolListesiTablo fieldRequirements={fieldRequirements} />,
+    },
+    {
+      key: "10",
+      label: "Özel Alanlar",
+      children: <OzelAlanlar fieldRequirements={fieldRequirements} />,
     },
   ];
 
