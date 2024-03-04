@@ -485,13 +485,7 @@ export default function OzelAlanlar() {
           <Controller
             name="ozelAlan20"
             control={control}
-            render={({ field }) => (
-              <InputNumber
-                {...field}
-                type="text" // Set the type to "text" for name InputNumber
-                style={{ width: "250px" }}
-              />
-            )}
+            render={({ field }) => <InputNumber {...field} changeOnWheel={false} style={{ width: "250px" }} />}
           />
         </div>
       </div>

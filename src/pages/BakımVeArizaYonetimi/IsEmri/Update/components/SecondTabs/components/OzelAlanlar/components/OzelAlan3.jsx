@@ -9,7 +9,6 @@ const { TextArea } = Input;
 export default function OzelAlan3({ label, onModalClose }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [refreshData, setRefreshData] = useState(false);
   const methods = useForm({
     defaultValues: {
       ozelAlan: "",
