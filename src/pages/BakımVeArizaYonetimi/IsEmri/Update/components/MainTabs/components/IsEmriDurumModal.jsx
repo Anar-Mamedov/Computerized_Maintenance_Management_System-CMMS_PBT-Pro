@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Table, Checkbox, message } from "antd";
+import { Button, Modal, Table, Checkbox, message, Input } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
-import { Controller, useFormContext } from "react-hook-form";
+import { Controller, set, useFormContext } from "react-hook-form";
 import DurumSelect from "./DurumSelect";
+
+const { TextArea } = Input;
 
 export default function IsEmriDurumModal({ workshopSelectedId, onSubmit, fieldRequirements }) {
   const { control, watch, setValue } = useFormContext();
@@ -35,14 +37,69 @@ export default function IsEmriDurumModal({ workshopSelectedId, onSubmit, fieldRe
     if (!isModalVisible) {
       fetch();
       setSelectedRowKeys([]);
+      setValue("isEmriDurum1ID", "");
+      setValue("isEmriDurum1", null);
+      setValue("varsayilanDurum", false);
+      setValue("isEmriDurumAciklama", "");
     }
   };
+  const isEmriDurum1 = watch("isEmriDurum1");
+  const isEmriDurum1ID = watch("isEmriDurum1ID");
 
-  const handleModalOk = () => {
+  const handleModalOk = async () => {
+    // isEmriDurum1 ve isEmriDurum1ID değerlerinin kontrolü
+    if (!isEmriDurum1 || !isEmriDurum1ID) {
+      // Eğer bu değerlerden herhangi biri geçersiz ise, kullanıcıya bir uyarı mesajı göster
+      messageApi.open({
+        type: "error",
+        content: "Durum boş bırakılamaz!",
+      });
+      // Modalın kapanmasını engelle
+      return;
+    }
+
+    // API'ye gönderilecek veri
+    const payload = {
+      isEmriDurum1: isEmriDurum1,
+      isEmriDurum1ID: isEmriDurum1ID,
+      varsayilanDurum: watch("varsayilanDurum"),
+      isEmriDurumAciklama: watch("isEmriDurumAciklama"),
+    };
+
+    try {
+      // API'ye POST isteği gönder
+      const response = await AxiosInstance.post("/your-api-endpoint", payload);
+      if (response.status === 200) {
+        // Başarılı bildirimi
+        messageApi.open({
+          type: "success",
+          content: "Veriler başarıyla gönderildi!",
+        });
+        setIsModalVisible(false); // Modalı kapat
+      } else {
+        // Hata bildirimi
+        messageApi.open({
+          type: "error",
+          content: "Veriler gönderilirken bir sorun oluştu.",
+        });
+      }
+    } catch (error) {
+      console.error("API isteği sırasında bir hata oluştu:", error);
+      messageApi.open({
+        type: "error",
+        content: "Veriler gönderilirken bir hata oluştu!",
+      });
+    }
+
+    // Değerler geçerli ise, seçilen veriyi işle
+    setValue("isEmriDurumID", isEmriDurum1ID);
+    setValue("isEmriDurum", isEmriDurum1);
+
     const selectedData = data.find((item) => item.key === selectedRowKeys[0]);
     if (selectedData) {
       onSubmit && onSubmit(selectedData);
     }
+    // Modalı kapat
     setIsModalVisible(false);
   };
 
@@ -56,14 +113,11 @@ export default function IsEmriDurumModal({ workshopSelectedId, onSubmit, fieldRe
 
   // Checkbox değiştiğinde yapılacak işlem
   const handleCheckboxChange = async (isChecked) => {
-    // React Hook Form'dan isEmriDurumID değerini izle
-    const isEmriDurumID = watch("isEmriDurumID");
-
-    if (isEmriDurumID) {
+    if (isEmriDurum1ID) {
       try {
         // API isteğini yap
         const response = await AxiosInstance.get(
-          `IsEmriDurumVarsayilanYap?kodId=${isEmriDurumID}&isVarsayilan=${isChecked}`
+          `IsEmriDurumVarsayilanYap?kodId=${isEmriDurum1ID}&isVarsayilan=${isChecked}`
         );
         // İsteğin başarılı olduğunu kontrol et
         if (response && response.status_code === 200) {
@@ -102,6 +156,7 @@ export default function IsEmriDurumModal({ workshopSelectedId, onSubmit, fieldRe
             justifyContent: "space-between",
             width: "100%",
             maxWidth: "430px",
+            marginBottom: "10px",
           }}>
           <DurumSelect fieldRequirements={fieldRequirements} />
           <div>
@@ -122,6 +177,11 @@ export default function IsEmriDurumModal({ workshopSelectedId, onSubmit, fieldRe
             />
           </div>
         </div>
+        <Controller
+          name="isEmriDurumAciklama"
+          control={control}
+          render={({ field }) => <TextArea {...field} rows={4} />}
+        />
       </Modal>
     </div>
   );
