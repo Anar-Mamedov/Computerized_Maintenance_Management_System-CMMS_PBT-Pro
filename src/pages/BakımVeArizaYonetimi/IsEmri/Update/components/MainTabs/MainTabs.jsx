@@ -694,6 +694,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                       render={({ field }) => (
                         <Input
                           {...field}
+                          value={formatDate(field.value)}
                           status={errors.garantiBitis ? "error" : ""}
                           type="text" // Set the type to "text" for name input
                           style={{ width: "300px" }}
