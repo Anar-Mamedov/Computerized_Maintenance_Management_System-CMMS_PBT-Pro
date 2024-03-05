@@ -6,16 +6,25 @@ import { Controller, useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
 import dayjs from "dayjs";
 
-export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenPersonelID }) {
+export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const methods = useForm({
     defaultValues: {
-      belgeNo: "",
+      siraNo: "",
       secilenID: "",
-      sertifikaTipi: null,
-      sertifikaTipiID: "",
-      verilisTarihi: "",
+      isTanimi: "",
+      yapildi: false,
+      atolyeTanim: "",
+      atolyeID: "",
+      personelTanim: "",
+      personelID: "",
+      baslangicTarihi: "",
+      baslangicSaati: "",
+      vardiya: "",
+      vardiyaID: "",
       bitisTarihi: "",
+      bitisSaati: "",
+      sure: "",
       aciklama: "",
       // Add other default values here
     },
@@ -37,16 +46,26 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
 
   const onSubmited = (data) => {
     const Body = {
-      PSE_PERSONEL_ID: secilenPersonelID,
-      PSE_BELGE_NO: data.belgeNo,
-      PSE_SERTIFIKA_TIP_KOD_ID: data.sertifikaTipiID,
-      PSE_VERILIS_TARIH: formatDateWithDayjs(data.verilisTarihi),
-      PSE_BITIS_TARIH: formatDateWithDayjs(data.bitisTarihi),
-      PSE_ACIKLAMA: data.aciklama,
-      PSE_OLUSTURAN_ID: 24,
+      TB_ISEMRI_KONTROLLIST_ID: 0,
+      DKN_SIRANO: data.siraNo,
+      DKN_YAPILDI: data.yapildi,
+      DKN_TANIM: data.isTanimi,
+      DKN_OLUSTURAN_ID: 24,
+      // DKN_MALIYET: data.maliyet, // Maliyet diye bir alan yok frontda
+      DKN_YAPILDI_PERSONEL_ID: data.personelID,
+      DKN_YAPILDI_ATOLYE_ID: data.atolyeID,
+      DKN_YAPILDI_SURE: data.sure,
+      DKN_ACIKLAMA: data.aciklama,
+      DKN_YAPILDI_KOD_ID: -1,
+      DKN_REF_ID: -1,
+      DKN_YAPILDI_TARIH: formatDateWithDayjs(data.baslangicTarihi),
+      DKN_YAPILDI_SAAT: formatTimeWithDayjs(data.baslangicSaati),
+      DKN_BITIS_TARIH: formatDateWithDayjs(data.bitisTarihi),
+      DKN_BITIS_SAAT: formatTimeWithDayjs(data.bitisSaati),
+      DKN_YAPILDI_MESAI_KOD_ID: data.vardiyaID,
     };
 
-    AxiosInstance.post("AddPersonelSertifika", Body)
+    AxiosInstance.post(`AddUpdateIsEmriKontrolList?isEmriId=${secilenIsEmriID}`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
         reset();

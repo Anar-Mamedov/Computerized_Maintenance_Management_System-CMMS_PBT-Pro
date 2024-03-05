@@ -60,16 +60,19 @@ export default function IsEmriDurumModal({ workshopSelectedId, onSubmit, fieldRe
 
     // API'ye gönderilecek veri
     const payload = {
-      isEmriDurum1: isEmriDurum1,
-      isEmriDurum1ID: isEmriDurum1ID,
-      varsayilanDurum: watch("varsayilanDurum"),
-      isEmriDurumAciklama: watch("isEmriDurumAciklama"),
+      ISL_ISEMRI_ID: watch("secilenIsEmriID"),
+      ISL_DURUM_ESKI_KOD_ID: watch("isEmriDurumID"),
+      ISL_DURUM_YENI_KOD_ID: isEmriDurum1ID,
+      ISL_ACIKLAMA: watch("isEmriDurumAciklama"),
+      ISL_ISLEM: "İş emri durum bilgisi değişti.",
+      ISL_OLUSTURAN_ID: 24,
+      ISL_KULLANICI_ID: 24,
     };
 
     try {
       // API'ye POST isteği gönder
-      const response = await AxiosInstance.post("/your-api-endpoint", payload);
-      if (response.status === 200) {
+      const response = await AxiosInstance.post("AddIsEmriDurumDegisikligi", payload);
+      if (response.status_code === 200) {
         // Başarılı bildirimi
         messageApi.open({
           type: "success",
