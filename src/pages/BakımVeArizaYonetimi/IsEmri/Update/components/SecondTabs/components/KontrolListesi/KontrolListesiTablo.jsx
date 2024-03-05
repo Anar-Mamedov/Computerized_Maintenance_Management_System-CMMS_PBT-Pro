@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table } from "antd";
+import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../api/http";
 import CreateModal from "./Insert/CreateModal";
@@ -46,65 +47,75 @@ export default function KontrolListesiTablo() {
   const columns = [
     {
       title: "S.N.",
-      dataIndex: "PSE_SERTIFIKA_TIP",
-      key: "PSE_SERTIFIKA_TIP",
+      dataIndex: "DKN_SIRANO",
+      key: "DKN_SIRANO",
       width: 120,
       ellipsis: true,
     },
     {
+      title: "Yapıldı",
+      dataIndex: "DKN_YAPILDI",
+      key: "DKN_YAPILDI",
+      width: 100,
+      ellipsis: true,
+      render: (text, record) => {
+        return record.DKN_YAPILDI ? (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <CheckOutlined style={{ color: "green" }} />
+          </div>
+        ) : (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <CloseOutlined style={{ color: "red" }} />
+          </div>
+        );
+      },
+    },
+    {
       title: "İş Tanımı",
-      dataIndex: "PSE_BELGE_NO",
-      key: "PSE_BELGE_NO",
+      dataIndex: "DKN_TANIM",
+      key: "DKN_TANIM",
       width: 200,
       ellipsis: true,
     },
     {
       title: "Personel",
-      dataIndex: "PSE_VERILIS_TARIH",
-      key: "PSE_VERILIS_TARIH",
+      dataIndex: "DKN_PERSONEL_ISIM",
+      key: "DKN_PERSONEL_ISIM",
       width: 200,
       ellipsis: true,
-      render: (text) => formatDate(text),
     },
     {
       title: "Maliyet",
-      dataIndex: "PSE_BITIS_TARIH",
-      key: "PSE_BITIS_TARIH",
+      dataIndex: "DKN_MALIYET",
+      key: "DKN_MALIYET",
       width: 200,
       ellipsis: true,
-      render: (text) => formatDate(text),
     },
     {
       title: "Süre",
-      dataIndex: "PSE_ACIKLAMA",
-      key: "PSE_ACIKLAMA",
+      dataIndex: "DKN_YAPILDI_SURE",
+      key: "DKN_YAPILDI_SURE",
       width: 200,
       ellipsis: true,
     },
     {
       title: "Açıklama",
-      dataIndex: "PSE_ACIKLAMA",
-      key: "PSE_ACIKLAMA",
+      dataIndex: "DKN_ACIKLAMA",
+      key: "DKN_ACIKLAMA",
       width: 200,
       ellipsis: true,
     },
   ];
 
-  const secilenPersonelID = watch("secilenPersonelID");
+  const secilenIsEmriID = watch("secilenIsEmriID");
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`PersonelSertifikaList?personelId=${secilenPersonelID}`)
+    AxiosInstance.get(`FetchIsEmriKontrolList?isemriID=${secilenIsEmriID}`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
           ...item,
-          key: item.TB_PERSONEL_SERTIFIKA_ID,
-          PSE_SERTIFIKA_TIP: item.PSE_SERTIFIKA_TIP,
-          PSE_SERTIFIKA_TIP_KOD_ID: item.PSE_SERTIFIKA_TIP_KOD_ID,
-          PSE_BELGE_NO: item.PSE_BELGE_NO,
-          PSE_VERILIS_TARIH: item.PSE_VERILIS_TARIH,
-          PSE_BITIS_TARIH: item.PSE_BITIS_TARIH,
-          PSE_ACIKLAMA: item.PSE_ACIKLAMA,
+          key: item.TB_ISEMRI_KONTROLLIST_ID,
         }));
         setData(fetchedData);
       })
@@ -113,14 +124,14 @@ export default function KontrolListesiTablo() {
         console.error("API isteği sırasında hata oluştu:", error);
       })
       .finally(() => setLoading(false));
-  }, [secilenPersonelID]); // secilenPersonelID değiştiğinde fetch fonksiyonunu güncelle
+  }, [secilenIsEmriID]); // secilenIsEmriID değiştiğinde fetch fonksiyonunu güncelle
 
   useEffect(() => {
-    if (secilenPersonelID) {
-      // secilenPersonelID'nin varlığını ve geçerliliğini kontrol edin
+    if (secilenIsEmriID) {
+      // secilenIsEmriID'nin varlığını ve geçerliliğini kontrol edin
       fetch(); // fetch fonksiyonunu çağırın
     }
-  }, [secilenPersonelID, fetch]); // secilenPersonelID veya fetch fonksiyonu değiştiğinde useEffect'i tetikle
+  }, [secilenIsEmriID, fetch]); // secilenIsEmriID veya fetch fonksiyonu değiştiğinde useEffect'i tetikle
 
   const onRowSelectChange = (selectedKeys) => {
     setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
@@ -137,7 +148,7 @@ export default function KontrolListesiTablo() {
 
   return (
     <div>
-      <CreateModal onRefresh={refreshTable} secilenPersonelID={secilenPersonelID} />
+      <CreateModal onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />
       <Table
         rowSelection={{
           type: "radio",
@@ -164,6 +175,7 @@ export default function KontrolListesiTablo() {
             setSelectedRow(null);
           }}
           onRefresh={refreshTable}
+          secilenIsEmriID={secilenIsEmriID}
         />
       )}
     </div>

@@ -5,15 +5,24 @@ import { Controller, useForm, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
 import MainTabs from "./MainTabs/MainTabs";
 
-export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh }) {
+export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh, secilenIsEmriID }) {
   const methods = useForm({
     defaultValues: {
-      belgeNo: "",
+      siraNo: "",
       secilenID: "",
-      sertifikaTipi: null,
-      sertifikaTipiID: "",
-      verilisTarihi: "",
+      isTanimi: "",
+      yapildi: false,
+      atolyeTanim: "",
+      atolyeID: "",
+      personelTanim: "",
+      personelID: "",
+      baslangicTarihi: "",
+      baslangicSaati: "",
+      vardiya: "",
+      vardiyaID: "",
       bitisTarihi: "",
+      bitisSaati: "",
+      sure: "",
       aciklama: "",
       // Add other default values here
     },
@@ -24,12 +33,50 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   useEffect(() => {
     if (isModalVisible && selectedRow) {
       setValue("secilenID", selectedRow.key);
-      setValue("belgeNo", selectedRow.PSE_BELGE_NO);
-      setValue("sertifikaTipi", selectedRow.PSE_SERTIFIKA_TIP);
-      setValue("sertifikaTipiID", selectedRow.PSE_SERTIFIKA_TIP_KOD_ID);
-      setValue("verilisTarihi", dayjs(selectedRow.PSE_VERILIS_TARIH));
-      setValue("bitisTarihi", dayjs(selectedRow.PSE_BITIS_TARIH));
-      setValue("aciklama", selectedRow.PSE_ACIKLAMA);
+      setValue("siraNo", selectedRow.DKN_SIRANO);
+      setValue("isTanimi", selectedRow.DKN_TANIM);
+      setValue("yapildi", selectedRow.DKN_YAPILDI);
+      setValue("atolyeTanim", selectedRow.DKN_YAPILDI_ATOLYE_TANIM);
+      setValue("atolyeID", selectedRow.DKN_YAPILDI_ATOLYE_ID);
+      setValue("personelTanim", selectedRow.DKN_PERSONEL_ISIM);
+      setValue("personelID", selectedRow.DKN_YAPILDI_PERSONEL_ID);
+      setValue(
+        "baslangicTarihi",
+        selectedRow.DKN_YAPILDI_TARIH
+          ? dayjs(selectedRow.DKN_YAPILDI_TARIH).isValid()
+            ? dayjs(selectedRow.DKN_YAPILDI_TARIH)
+            : null
+          : null
+      );
+      setValue(
+        "baslangicSaati",
+        selectedRow.DKN_YAPILDI_SAAT
+          ? dayjs(selectedRow.DKN_YAPILDI_SAAT, "HH:mm:ss").isValid()
+            ? dayjs(selectedRow.DKN_YAPILDI_SAAT, "HH:mm:ss")
+            : null
+          : null
+      );
+
+      setValue("vardiya", selectedRow.DKN_YAPILDI_MESAI_KOD_TANIM);
+      setValue("vardiyaID", selectedRow.DKN_YAPILDI_MESAI_KOD_ID);
+      setValue(
+        "bitisTarihi",
+        selectedRow.DKN_BITIS_TARIH
+          ? dayjs(selectedRow.DKN_BITIS_TARIH).isValid()
+            ? dayjs(selectedRow.DKN_BITIS_TARIH)
+            : null
+          : null
+      );
+      setValue(
+        "bitisSaati",
+        selectedRow.DKN_BITIS_SAAT
+          ? dayjs(selectedRow.DKN_BITIS_SAAT, "HH:mm:ss").isValid()
+            ? dayjs(selectedRow.DKN_BITIS_SAAT, "HH:mm:ss")
+            : null
+          : null
+      );
+      setValue("sure", selectedRow.DKN_YAPILDI_SURE);
+      setValue("aciklama", selectedRow.DKN_ACIKLAMA);
     }
   }, [selectedRow, isModalVisible, setValue]);
 
@@ -53,16 +100,26 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
 
   const onSubmited = (data) => {
     const Body = {
-      TB_PERSONEL_SERTIFIKA_ID: data.secilenID,
-      PSE_BELGE_NO: data.belgeNo,
-      PSE_SERTIFIKA_TIP_KOD_ID: data.sertifikaTipiID,
-      PSE_VERILIS_TARIH: formatDateWithDayjs(data.verilisTarihi),
-      PSE_BITIS_TARIH: formatDateWithDayjs(data.bitisTarihi),
-      PSE_ACIKLAMA: data.aciklama,
-      PSE_OLUSTURAN_ID: 24,
+      TB_ISEMRI_KONTROLLIST_ID: data.secilenID,
+      DKN_SIRANO: data.siraNo,
+      DKN_YAPILDI: data.yapildi,
+      DKN_TANIM: data.isTanimi,
+      DKN_OLUSTURAN_ID: 24,
+      // DKN_MALIYET: data.maliyet, // Maliyet diye bir alan yok frontda
+      DKN_YAPILDI_PERSONEL_ID: data.personelID,
+      DKN_YAPILDI_ATOLYE_ID: data.atolyeID,
+      DKN_YAPILDI_SURE: data.sure,
+      DKN_ACIKLAMA: data.aciklama,
+      DKN_YAPILDI_KOD_ID: -1,
+      DKN_REF_ID: -1,
+      DKN_YAPILDI_TARIH: formatDateWithDayjs(data.baslangicTarihi),
+      DKN_YAPILDI_SAAT: formatTimeWithDayjs(data.baslangicSaati),
+      DKN_BITIS_TARIH: formatDateWithDayjs(data.bitisTarihi),
+      DKN_BITIS_SAAT: formatTimeWithDayjs(data.bitisSaati),
+      DKN_YAPILDI_MESAI_KOD_ID: data.vardiyaID,
     };
 
-    AxiosInstance.post("UpdatePersonelSertifika", Body)
+    AxiosInstance.post(`AddUpdateIsEmriKontrolList?isEmriId=${secilenIsEmriID}`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
         reset();
@@ -83,7 +140,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       <div>
         <Modal
           width="800px"
-          title="Sertifika Güncelle"
+          title="Kontrol Listesi Güncelle"
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
           onCancel={onModalClose}>
