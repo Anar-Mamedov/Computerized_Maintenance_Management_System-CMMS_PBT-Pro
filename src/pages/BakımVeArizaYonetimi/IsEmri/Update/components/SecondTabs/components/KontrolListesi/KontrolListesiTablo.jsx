@@ -147,7 +147,7 @@ export default function KontrolListesiTablo() {
   }, [fetch]);
 
   return (
-    <div>
+    <div style={{ marginBottom: "25px" }}>
       <CreateModal onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />
       <Table
         rowSelection={{

@@ -168,7 +168,7 @@ export default function PersonelListesiTablo() {
   }, [fetch]);
 
   return (
-    <div>
+    <div style={{ marginBottom: "25px" }}>
       <CreateModal onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />
       <Table
         rowSelection={{
