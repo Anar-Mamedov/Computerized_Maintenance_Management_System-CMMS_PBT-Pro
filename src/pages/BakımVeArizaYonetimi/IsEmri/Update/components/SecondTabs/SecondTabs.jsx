@@ -7,6 +7,9 @@ import KontrolListesiTablo from "./components/KontrolListesi/KontrolListesiTablo
 import OzelAlanlar from "./components/OzelAlanlar/OzelAlanlar";
 import PersonelListesiTablo from "./components/Personel/PersonelListesiTablo";
 import MalzemeListesiTablo from "./components/Malzeme/MalzemeListesiTablo";
+import DuruslarListesiTablo from "./components/Duruslar/DuruslarListesiTablo";
+import OlcumDegerleriListesiTablo from "./components/OlcumDegerleri/OlcumDegerleriListesiTablo";
+import AracGereclerListesiTablo from "./components/AracGerecler/AracGereclerListesiTablo";
 
 const onChange = (key) => {
   // console.log(key);
@@ -68,6 +71,21 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
       key: "4",
       label: "Malzeme",
       children: <MalzemeListesiTablo fieldRequirements={fieldRequirements} />,
+    },
+    {
+      key: "5",
+      label: "Duruşlar",
+      children: <DuruslarListesiTablo fieldRequirements={fieldRequirements} />,
+    },
+    {
+      key: "8",
+      label: "Ölçüm Değerleri",
+      children: <OlcumDegerleriListesiTablo fieldRequirements={fieldRequirements} />,
+    },
+    {
+      key: "9",
+      label: "Araç & Gereçler",
+      children: <AracGereclerListesiTablo fieldRequirements={fieldRequirements} />,
     },
     {
       key: "10",
