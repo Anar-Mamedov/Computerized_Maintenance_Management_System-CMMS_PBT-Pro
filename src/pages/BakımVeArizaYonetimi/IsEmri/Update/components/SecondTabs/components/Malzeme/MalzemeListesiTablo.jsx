@@ -6,7 +6,7 @@ import AxiosInstance from "../../../../../../../../api/http";
 import CreateModal from "./Insert/CreateModal";
 import EditModal from "./Update/EditModal";
 
-export default function PersonelListesiTablo() {
+export default function MalzemeListesiTablo() {
   const [loading, setLoading] = useState(false);
   const { control, watch, setValue } = useFormContext();
   const [data, setData] = useState([]);
@@ -46,84 +46,77 @@ export default function PersonelListesiTablo() {
 
   const columns = [
     {
-      title: "Personel Adı",
-      dataIndex: "IDK_ISIM",
-      key: "IDK_ISIM",
-      width: 200,
-      ellipsis: true,
-    },
-    {
-      title: "Vardiya",
-      dataIndex: "IDK_VARDIYA_TANIM",
-      key: "IDK_VARDIYA_TANIM",
-      width: 200,
-      ellipsis: true,
-    },
-    {
-      title: "Çalışma Süresi (dk.)",
-      dataIndex: "IDK_SURE",
-      key: "IDK_SURE",
-      width: 200,
-      ellipsis: true,
-    },
-    {
-      title: "Saat Ücreti",
-      dataIndex: "IDK_SAAT_UCRETI",
-      key: "IDK_SAAT_UCRETI",
-      width: 200,
-      ellipsis: true,
-    },
-    {
-      title: "Fazla Mesai",
-      dataIndex: "IDK_FAZLA_MESAI_VAR",
-      key: "IDK_FAZLA_MESAI_VAR",
-      width: 200,
+      title: "Stok",
+      dataIndex: "IDM_STOKSUZ",
+      key: "IDM_STOKSUZ",
+      width: 120,
       ellipsis: true,
       render: (text, record) => {
-        return record.IDK_FAZLA_MESAI_VAR ? (
+        return record.IDM_STOKSUZ ? (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <CheckOutlined style={{ color: "green" }} />
+            <CloseOutlined style={{ color: "red" }} />
           </div>
         ) : (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <CloseOutlined style={{ color: "red" }} />
+            <CheckOutlined style={{ color: "green" }} />
           </div>
         );
       },
     },
     {
-      title: "Mesai Süresi (dk.)",
-      dataIndex: "IDK_FAZLA_MESAI_SURE",
-      key: "IDK_FAZLA_MESAI_SURE",
+      title: "G",
+      dataIndex: "DKN_YAPILDI",
+      key: "DKN_YAPILDI",
+      width: 100,
+      ellipsis: true,
+    },
+    {
+      title: "Malzeme Kodu",
+      dataIndex: "IDM_STOK_KOD",
+      key: "IDM_STOK_KOD",
       width: 200,
       ellipsis: true,
     },
     {
-      title: "Mesai Ücreti",
-      dataIndex: "IDK_FAZLA_MESAI_SAAT_UCRETI",
-      key: "IDK_FAZLA_MESAI_SAAT_UCRETI",
+      title: "Malzeme Tanımı",
+      dataIndex: "IDM_STOK_TANIM",
+      key: "IDM_STOK_TANIM",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Depo",
+      dataIndex: "IDM_DEPO",
+      key: "IDM_DEPO",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Miktar",
+      dataIndex: "IDM_MIKTAR",
+      key: "IDM_MIKTAR",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Birim",
+      dataIndex: "IDM_BIRIM",
+      key: "IDM_BIRIM",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Birim Fiyat",
+      dataIndex: "IDM_BIRIM_FIYAT",
+      key: "IDM_BIRIM_FIYAT",
       width: 200,
       ellipsis: true,
     },
     {
       title: "Maliyet",
-      dataIndex: "IDK_MALIYET",
-      key: "IDK_MALIYET",
+      dataIndex: "DKN_ACIKLAMA",
+      key: "DKN_ACIKLAMA",
       width: 200,
-      ellipsis: true,
-    },
-    {
-      title: "Masraf Merkezi",
-      dataIndex: "IDK_MASRAF_MERKEZI",
-      key: "IDK_MASRAF_MERKEZI",
-      width: 200,
-      ellipsis: true,
-    },
-    {
-      title: "Açıklama",
-      dataIndex: "IDK_ACIKLAMA",
-      key: "IDK_ACIKLAMA",
-      width: 300,
       ellipsis: true,
     },
   ];
@@ -132,11 +125,11 @@ export default function PersonelListesiTablo() {
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`IsEmriPersonelList?isemriID=${secilenIsEmriID}`)
+    AxiosInstance.get(`IsEmriMalzemeList?isemriID=${secilenIsEmriID}`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
           ...item,
-          key: item.TB_ISEMRI_KAYNAK_ID,
+          key: item.TB_ISEMRI_MLZ_ID,
         }));
         setData(fetchedData);
       })
