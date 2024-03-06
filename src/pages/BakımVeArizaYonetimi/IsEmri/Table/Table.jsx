@@ -897,7 +897,15 @@ export default function MainTable() {
           gap: "10px",
           padding: "0 5px",
         }}>
-        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "780px",
+            flexWrap: "wrap",
+          }}>
           <Button
             style={{
               display: "flex",
