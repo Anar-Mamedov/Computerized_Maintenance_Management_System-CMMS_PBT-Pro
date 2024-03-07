@@ -194,8 +194,10 @@ export default function MainTabs() {
   const mesaiSuresi = watch("mesaiSuresi");
   const mesaiUcreti = watch("mesaiUcreti");
 
-  const maliyet = calismaSuresi * (saatUcreti / 60) + mesaiSuresi * (mesaiUcreti / 60);
-  setValue("maliyet", maliyet > 0 ? maliyet : 0);
+  useEffect(() => {
+    const maliyet = calismaSuresi * (saatUcreti / 60) + mesaiSuresi * (mesaiUcreti / 60);
+    setValue("maliyet", maliyet > 0 ? maliyet : 0);
+  }, [calismaSuresi, saatUcreti, mesaiSuresi, mesaiUcreti, setValue]);
 
   return (
     <div>
