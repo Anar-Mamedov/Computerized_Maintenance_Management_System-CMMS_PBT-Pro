@@ -10,21 +10,19 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
   const [isModalVisible, setIsModalVisible] = useState(false);
   const methods = useForm({
     defaultValues: {
-      siraNo: "",
       secilenID: "",
-      isTanimi: "",
-      yapildi: false,
-      atolyeTanim: "",
-      atolyeID: "",
       personelTanim: "",
       personelID: "",
-      baslangicTarihi: "",
-      baslangicSaati: "",
-      vardiya: "",
+      calismaSuresi: "",
+      saatUcreti: "",
+      maliyet: "",
+      fazlaMesai: false,
+      mesaiSuresi: "",
+      mesaiUcreti: "",
+      masrafMerkezi: "",
+      masrafMerkeziID: "",
+      vardiya: null,
       vardiyaID: "",
-      bitisTarihi: "",
-      bitisSaati: "",
-      sure: "",
       aciklama: "",
       // Add other default values here
     },
@@ -46,26 +44,20 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
 
   const onSubmited = (data) => {
     const Body = {
-      TB_ISEMRI_KONTROLLIST_ID: 0,
-      DKN_SIRANO: data.siraNo,
-      DKN_YAPILDI: data.yapildi,
-      DKN_TANIM: data.isTanimi,
-      DKN_OLUSTURAN_ID: 24,
-      // DKN_MALIYET: data.maliyet, // Maliyet diye bir alan yok frontda
-      DKN_YAPILDI_PERSONEL_ID: data.personelID,
-      DKN_YAPILDI_ATOLYE_ID: data.atolyeID,
-      DKN_YAPILDI_SURE: data.sure,
-      DKN_ACIKLAMA: data.aciklama,
-      DKN_YAPILDI_KOD_ID: -1,
-      DKN_REF_ID: -1,
-      DKN_YAPILDI_TARIH: formatDateWithDayjs(data.baslangicTarihi),
-      DKN_YAPILDI_SAAT: formatTimeWithDayjs(data.baslangicSaati),
-      DKN_BITIS_TARIH: formatDateWithDayjs(data.bitisTarihi),
-      DKN_BITIS_SAAT: formatTimeWithDayjs(data.bitisSaati),
-      DKN_YAPILDI_MESAI_KOD_ID: data.vardiyaID,
+      TB_ISEMRI_KAYNAK_ID: 0,
+      IDK_PERSONEL_ID: data.personelID,
+      IDK_SURE: data.calismaSuresi,
+      IDK_SAAT_UCRETI: data.saatUcreti,
+      IDK_MALIYET: data.maliyet,
+      IDK_FAZLA_MESAI_VAR: data.fazlaMesai,
+      IDK_FAZLA_MESAI_SURE: data.mesaiSuresi,
+      IDK_FAZLA_MESAI_SAAT_UCRETI: data.mesaiUcreti,
+      IDK_MASRAF_MERKEZI_ID: data.masrafMerkeziID,
+      IDK_VARDIYA: data.vardiyaID,
+      IDK_ACIKLAMA: data.aciklama,
     };
 
-    AxiosInstance.post(`AddUpdateIsEmriKontrolList?isEmriId=${secilenIsEmriID}`, Body)
+    AxiosInstance.post(`AddUpdateIsEmriPersonel?isEmriId=${secilenIsEmriID}`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
         reset();
@@ -98,8 +90,9 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
         </div>
 
         <Modal
-          width="800px"
-          title="Kontrol Ekle"
+          width="985px"
+          title="Personel Ekle"
+          destroyOnClose
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
           onCancel={handleModalToggle}>

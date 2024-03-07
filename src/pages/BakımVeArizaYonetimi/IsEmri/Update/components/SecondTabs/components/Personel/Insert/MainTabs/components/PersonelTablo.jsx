@@ -97,10 +97,7 @@ export default function PersonelTablo({ workshopSelectedId, onSubmit }) {
   };
   return (
     <div>
-      <Button disabled onClick={handleModalToggle}>
-        {" "}
-        +{" "}
-      </Button>
+      <Button onClick={handleModalToggle}> + </Button>
       <Modal
         width={1200}
         centered
