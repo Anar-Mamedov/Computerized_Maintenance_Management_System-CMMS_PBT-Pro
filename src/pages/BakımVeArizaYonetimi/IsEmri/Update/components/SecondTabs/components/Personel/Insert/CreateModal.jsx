@@ -93,6 +93,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
           width="985px"
           title="Personel Ekle"
           destroyOnClose
+          centered
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
           onCancel={handleModalToggle}>
