@@ -119,9 +119,11 @@ export default function MalzemeTablo({ workshopSelectedId, onSubmit }) {
     },
   ];
 
+  const depoID = watch("depoID");
+
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`GetDepoStok?depoID=0&stoklu=false`)
+    AxiosInstance.get(`GetDepoStok?depoID=${depoID}&stoklu=false`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
           ...item,
@@ -147,7 +149,11 @@ export default function MalzemeTablo({ workshopSelectedId, onSubmit }) {
         setData(fetchedData);
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [depoID]);
+
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
 
   const handleModalToggle = () => {
     setIsModalVisible((prev) => !prev);
