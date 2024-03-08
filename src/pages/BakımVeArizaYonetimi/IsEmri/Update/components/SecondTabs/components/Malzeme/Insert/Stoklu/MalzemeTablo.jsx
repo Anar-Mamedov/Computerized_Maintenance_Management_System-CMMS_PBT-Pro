@@ -1,15 +1,42 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Table } from "antd";
+import { Button, Modal, Table, Typography, Input } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../../../api/http";
 import dayjs from "dayjs";
 import DepoTablo from "./DepoTablo";
+import { Controller, useFormContext } from "react-hook-form";
+import styled from "styled-components";
+
+const { Text, Link } = Typography;
+const { TextArea } = Input;
+
+const StyledDivBottomLine = styled.div`
+  @media (min-width: 600px) {
+    align-items: center !important;
+  }
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+`;
 
 export default function MalzemeTablo({ workshopSelectedId, onSubmit }) {
+  const {
+    control,
+    watch,
+    setValue,
+    getValues,
+    formState: { errors },
+  } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const handleDepoMinusClick = () => {
+    setValue("depo", "");
+    setValue("depoID", "");
+  };
 
   const columns = [
     {
@@ -157,7 +184,57 @@ export default function MalzemeTablo({ workshopSelectedId, onSubmit }) {
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}>
-        <DepoTablo />
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", marginBottom: "10px" }}>
+          <StyledDivBottomLine
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "space-between",
+              width: "100%",
+              maxWidth: "360px",
+            }}>
+            <Text style={{ fontSize: "14px" }}>Depo:</Text>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "300px",
+              }}>
+              <Controller
+                name="depo"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="text" // Set the type to "text" for name input
+                    style={{ width: "215px" }}
+                    disabled
+                  />
+                )}
+              />
+              <Controller
+                name="depoID"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="text" // Set the type to "text" for name input
+                    style={{ display: "none" }}
+                  />
+                )}
+              />
+              <DepoTablo
+                onSubmit={(selectedData) => {
+                  setValue("depo", selectedData.DEP_TANIM);
+                  setValue("depoID", selectedData.key);
+                }}
+              />
+              <Button onClick={handleDepoMinusClick}> - </Button>
+            </div>
+          </StyledDivBottomLine>
+        </div>
         <Table
           rowSelection={{
             type: "radio",

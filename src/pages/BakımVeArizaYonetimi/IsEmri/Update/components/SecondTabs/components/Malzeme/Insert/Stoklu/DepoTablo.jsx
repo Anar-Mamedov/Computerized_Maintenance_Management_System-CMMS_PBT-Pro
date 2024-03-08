@@ -87,9 +87,7 @@ export default function DepoTablo({ workshopSelectedId, onSubmit }) {
   };
   return (
     <div>
-      <Button type="link" onClick={handleModalToggle}>
-        <PlusOutlined /> Stoklu
-      </Button>
+      <Button onClick={handleModalToggle}> + </Button>
       <Modal
         width={1200}
         centered
