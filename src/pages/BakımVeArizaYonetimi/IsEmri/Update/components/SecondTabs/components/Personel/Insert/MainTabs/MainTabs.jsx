@@ -3,8 +3,6 @@ import { Button, Modal, Input, Typography, Tabs, DatePicker, TimePicker, InputNu
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import dayjs from "dayjs";
-import SertifikaTipi from "./components/SertifikaTipi";
-import AtolyeTablo from "./components/AtolyeTablo";
 import PersonelTablo from "./components/PersonelTablo";
 import VardiyaSelect from "./components/VardiyaSelect";
 import MasrafMerkeziTablo from "./components/MasrafMerkeziTablo";

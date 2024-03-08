@@ -36,7 +36,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       setValue("siraNo", selectedRow.DKN_SIRANO);
       setValue("isTanimi", selectedRow.DKN_TANIM);
       setValue("yapildi", selectedRow.DKN_YAPILDI);
-      setValue("atolyeTanim", selectedRow.DKN_YAPILDI_ATOLYE_TANIM);
+      setValue("atolyeTanim", selectedRow.DKN_ATOLYE_TANIM);
       setValue("atolyeID", selectedRow.DKN_YAPILDI_ATOLYE_ID);
       setValue("personelTanim", selectedRow.DKN_PERSONEL_ISIM);
       setValue("personelID", selectedRow.DKN_YAPILDI_PERSONEL_ID);

@@ -98,8 +98,8 @@ export default function OlcumDegerleriListesiTablo() {
     },
     {
       title: "Birimi",
-      dataIndex: "MKD_BASLAMA_TARIH",
-      key: "MKD_BASLAMA_TARIH",
+      dataIndex: "IDO_BIRIM",
+      key: "IDO_BIRIM",
       width: 150,
       ellipsis: true,
     },
