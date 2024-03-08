@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import PersonelTablo from "./components/PersonelTablo";
 import VardiyaSelect from "./components/VardiyaSelect";
 import MasrafMerkeziTablo from "./components/MasrafMerkeziTablo";
+import AxiosInstance from "../../../../../../../../../../api/http";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -196,6 +197,29 @@ export default function MainTabs() {
     const maliyet = calismaSuresi * (saatUcreti / 60) + mesaiSuresi * (mesaiUcreti / 60);
     setValue("maliyet", maliyet > 0 ? maliyet : 0);
   }, [calismaSuresi, saatUcreti, mesaiSuresi, mesaiUcreti, setValue]);
+
+  const [imageUrl, setImageUrl] = useState("");
+
+  useEffect(() => {
+    AxiosInstance.get(`/ResimGetirById?id=37`, { responseType: "blob" }) // "responseType: 'blob'" önemli!
+      .then((response) => {
+        const blob = response;
+        const url = URL.createObjectURL(blob); // Create an object URL for the blob
+        setImageUrl(url); // Set the object URL as the image source
+
+        return () => {
+          URL.revokeObjectURL(url); // Clean up the object URL
+        };
+      })
+      .catch((error) => console.error("Error fetching image:", error));
+
+    // Clean up function to revoke the object URL when the component unmounts or the image changes
+    return () => {
+      if (imageUrl) {
+        URL.revokeObjectURL(imageUrl);
+      }
+    };
+  }, []); // Depend array boş çünkü bu efekt sadece component mount edildiğinde çalışmalı
 
   return (
     <div>
@@ -443,7 +467,7 @@ export default function MainTabs() {
           </div>
         </div>
         <div style={{ border: "1px solid #ececec", display: "flex", alignItems: "center" }}>
-          <Image width={200} src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png" />
+          {imageUrl ? <img style={{ width: "200px" }} src={imageUrl} alt="Photo" /> : <p>Loading...</p>}
         </div>
       </div>
 

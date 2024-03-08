@@ -123,7 +123,7 @@ export default function MalzemeTablo({ workshopSelectedId, onSubmit }) {
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`GetDepoStok?depoID=${depoID}&stoklu=false`)
+    AxiosInstance.get(`GetDepoStok?depoID=${depoID}&stoklu=true`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
           ...item,
