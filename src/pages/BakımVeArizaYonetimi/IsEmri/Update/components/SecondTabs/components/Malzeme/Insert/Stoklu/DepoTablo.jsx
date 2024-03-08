@@ -91,7 +91,7 @@ export default function DepoTablo({ workshopSelectedId, onSubmit }) {
       <Modal
         width={1200}
         centered
-        title="Malzemeler"
+        title="Depolar"
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}>

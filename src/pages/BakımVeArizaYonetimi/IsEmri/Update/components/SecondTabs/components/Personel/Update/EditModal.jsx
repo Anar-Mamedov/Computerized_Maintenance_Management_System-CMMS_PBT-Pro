@@ -101,7 +101,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       <div>
         <Modal
           width="985px"
-          title="Kontrol Listesi Güncelle"
+          title="Personel Güncelle"
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
           onCancel={onModalClose}>
