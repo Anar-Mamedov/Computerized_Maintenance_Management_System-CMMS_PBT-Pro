@@ -5,6 +5,7 @@ import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../api/http";
 import CreateModal from "./Insert/CreateModal";
 import EditModal from "./Update/EditModal";
+import ContextMenu from "./components/ContextMenu";
 
 export default function MalzemeListesiTablo() {
   const [loading, setLoading] = useState(false);
@@ -47,18 +48,18 @@ export default function MalzemeListesiTablo() {
   const columns = [
     {
       title: "Stok",
-      dataIndex: "IDM_STOKSUZ",
-      key: "IDM_STOKSUZ",
+      dataIndex: "IDM_STOK_DUS",
+      key: "IDM_STOK_DUS",
       width: 120,
       ellipsis: true,
       render: (text, record) => {
-        return record.IDM_STOKSUZ ? (
+        return record.IDM_STOK_DUS ? (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <CloseOutlined style={{ color: "red" }} />
+            <CheckOutlined style={{ color: "green" }} />
           </div>
         ) : (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <CheckOutlined style={{ color: "green" }} />
+            <CloseOutlined style={{ color: "red" }} />
           </div>
         );
       },
@@ -114,8 +115,8 @@ export default function MalzemeListesiTablo() {
     },
     {
       title: "Maliyet",
-      dataIndex: "DKN_ACIKLAMA",
-      key: "DKN_ACIKLAMA",
+      dataIndex: "IDM_TUTAR",
+      key: "IDM_TUTAR",
       width: 200,
       ellipsis: true,
     },
@@ -162,7 +163,9 @@ export default function MalzemeListesiTablo() {
 
   return (
     <div style={{ marginBottom: "25px" }}>
-      <CreateModal onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "10px" }}>
+        <ContextMenu onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />
+      </div>
       <Table
         rowSelection={{
           type: "radio",

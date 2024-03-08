@@ -91,9 +91,9 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
   return (
     <FormProvider {...methods}>
       <div>
-        <div style={{ display: "flex", width: "100%", justifyContent: "flex-end", marginBottom: "10px" }}>
+        <div style={{ display: "flex", width: "100%", justifyContent: "flex-end" }}>
           <Button type="link" onClick={handleModalToggle}>
-            <PlusOutlined /> Yeni Kayıt
+            <PlusOutlined /> Stoksuz
           </Button>
         </div>
 
