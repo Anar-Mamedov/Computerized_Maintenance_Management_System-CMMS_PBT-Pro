@@ -45,7 +45,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
   const onSubmited = (data) => {
     const Body = {
       TB_ISEMRI_KAYNAK_ID: 0,
-      IDK_PERSONEL_ID: data.personelID,
+      IDK_REF_ID: data.personelID,
       IDK_SURE: data.calismaSuresi,
       IDK_SAAT_UCRETI: data.saatUcreti,
       IDK_MALIYET: data.maliyet,

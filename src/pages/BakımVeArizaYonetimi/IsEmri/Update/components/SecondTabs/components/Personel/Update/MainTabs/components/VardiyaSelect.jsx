@@ -99,9 +99,8 @@ export default function VardiyaSelect({ disabled }) {
           render={({ field }) => (
             <Select
               {...field}
-              disabled={!yapildi}
               key={selectKey}
-              style={{ width: "200px" }}
+              style={{ width: "300px" }}
               showSearch
               allowClear
               placeholder="Seçim Yapınız"
