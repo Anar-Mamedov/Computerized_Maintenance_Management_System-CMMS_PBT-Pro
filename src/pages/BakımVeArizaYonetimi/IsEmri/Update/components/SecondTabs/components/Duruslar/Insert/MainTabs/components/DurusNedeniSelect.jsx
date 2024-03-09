@@ -7,15 +7,13 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function VardiyaSelect({ disabled }) {
+export default function DurusNedeniSelect({ disabled }) {
   const { control, setValue, watch } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const inputRef = createRef();
   const [name, setName] = useState("");
   const [selectKey, setSelectKey] = useState(0);
-
-  const yapildi = watch("yapildi");
 
   // message
   const [messageApi, contextHolder] = message.useMessage();
@@ -25,7 +23,7 @@ export default function VardiyaSelect({ disabled }) {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32759");
+      const response = await AxiosInstance.get("KodList?grup=32300");
       if (response && response) {
         setOptions(response);
       }
@@ -53,7 +51,7 @@ export default function VardiyaSelect({ disabled }) {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32759`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32300`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
@@ -94,62 +92,66 @@ export default function VardiyaSelect({ disabled }) {
       {contextHolder}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
         <Controller
-          name="vardiya"
+          name="durusNedeni"
           control={control}
-          render={({ field }) => (
-            <Select
-              {...field}
-              disabled={!yapildi}
-              key={selectKey}
-              style={{ width: "200px" }}
-              showSearch
-              allowClear
-              placeholder="Seçim Yapınız"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
-              }
-              onDropdownVisibleChange={(open) => {
-                if (open) {
-                  fetchData(); // Fetch data when the dropdown is opened
+          rules={{ required: "Alan Boş Bırakılamaz!" }}
+          render={({ field, fieldState: { error } }) => (
+            <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+              <Select
+                {...field}
+                status={error ? "error" : ""}
+                key={selectKey}
+                style={{ width: "300px" }}
+                showSearch
+                allowClear
+                placeholder="Seçim Yapınız"
+                optionFilterProp="children"
+                filterOption={(input, option) =>
+                  option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
                 }
-              }}
-              dropdownRender={(menu) => (
-                <Spin spinning={loading}>
-                  {menu}
-                  <Divider
-                    style={{
-                      margin: "8px 0",
-                    }}
-                  />
-                  <Space
-                    style={{
-                      padding: "0 8px 4px",
-                    }}>
-                    <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
-                    <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
-                      Ekle
-                    </Button>
-                  </Space>
-                </Spin>
-              )}
-              options={options.map((item) => ({
-                value: item.TB_KOD_ID, // Use the ID as the value
-                label: item.KOD_TANIM, // Display the name in the dropdown
-              }))}
-              onChange={(value) => {
-                // Seçilen değerin ID'sini NedeniID alanına set et
-                // `null` veya `undefined` değerlerini ele al
-                setValue("vardiya", value ?? null);
-                setValue("vardiyaID", value ?? null);
-                field.onChange(value ?? null);
-              }}
-              value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
-            />
+                onDropdownVisibleChange={(open) => {
+                  if (open) {
+                    fetchData(); // Fetch data when the dropdown is opened
+                  }
+                }}
+                dropdownRender={(menu) => (
+                  <Spin spinning={loading}>
+                    {menu}
+                    <Divider
+                      style={{
+                        margin: "8px 0",
+                      }}
+                    />
+                    <Space
+                      style={{
+                        padding: "0 8px 4px",
+                      }}>
+                      <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
+                      <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
+                        Ekle
+                      </Button>
+                    </Space>
+                  </Spin>
+                )}
+                options={options.map((item) => ({
+                  value: item.TB_KOD_ID, // Use the ID as the value
+                  label: item.KOD_TANIM, // Display the name in the dropdown
+                }))}
+                onChange={(value) => {
+                  // Seçilen değerin ID'sini NedeniID alanına set et
+                  // `null` veya `undefined` değerlerini ele al
+                  setValue("durusNedeni", value ?? null);
+                  setValue("durusNedeniID", value ?? null);
+                  field.onChange(value ?? null);
+                }}
+                value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
+              />
+              {error && <div style={{ color: "red" }}>{error.message}</div>}
+            </div>
           )}
         />
         <Controller
-          name="vardiyaID"
+          name="durusNedeniID"
           control={control}
           render={({ field }) => (
             <Input

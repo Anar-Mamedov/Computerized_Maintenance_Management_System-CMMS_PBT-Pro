@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs } from "antd";
+import { Button, Modal, Input, Typography, Tabs, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../../api/http";
 import { Controller, useForm, FormProvider } from "react-hook-form";
@@ -15,6 +15,9 @@ export default function CreateModal({
   lokasyon,
 }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  // message
+  const [messageApi, contextHolder] = message.useMessage();
+  // message end
   const methods = useForm({
     defaultValues: {
       secilenID: "",
@@ -28,7 +31,7 @@ export default function CreateModal({
       personelID: "",
       baslangicTarihi: "",
       baslangicSaati: "",
-      vardiya: "",
+      vardiya: null,
       vardiyaID: "",
       bitisTarihi: "",
       bitisSaati: "",
@@ -79,9 +82,25 @@ export default function CreateModal({
         reset();
         setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
         onRefresh();
+        if (response.status_code === 201) {
+          messageApi.open({
+            type: "success",
+            content: "Ekleme Başarılı",
+          });
+        } else {
+          // Error handling
+          messageApi.open({
+            type: "error",
+            content: "An error occurred", // Adjust the error message as needed
+          });
+        }
       })
       .catch((error) => {
         console.error("Error sending data:", error);
+        messageApi.open({
+          type: "error",
+          content: "An error occurred while adding the item.",
+        });
       });
 
     console.log({ Body });
@@ -103,6 +122,7 @@ export default function CreateModal({
 
   return (
     <FormProvider {...methods}>
+      {contextHolder}
       <div>
         <div style={{ display: "flex", width: "100%", justifyContent: "flex-end", marginBottom: "10px" }}>
           <Button type="link" onClick={handleModalToggle}>
