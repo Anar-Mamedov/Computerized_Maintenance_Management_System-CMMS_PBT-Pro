@@ -195,7 +195,9 @@ export default function DuruslarListesiTablo() {
   }, [fetch]);
 
   const lokasyon = watch("lokasyonTanim");
+  const lokasyonID = watch("lokasyonID");
   const makineTanim = watch("makineTanim");
+  const makineID = watch("makineID");
 
   return (
     <div style={{ marginBottom: "25px" }}>
@@ -204,6 +206,8 @@ export default function DuruslarListesiTablo() {
         secilenIsEmriID={secilenIsEmriID}
         lokasyon={lokasyon}
         makineTanim={makineTanim}
+        lokasyonID={lokasyonID}
+        makineID={makineID}
       />
       <Table
         rowSelection={{

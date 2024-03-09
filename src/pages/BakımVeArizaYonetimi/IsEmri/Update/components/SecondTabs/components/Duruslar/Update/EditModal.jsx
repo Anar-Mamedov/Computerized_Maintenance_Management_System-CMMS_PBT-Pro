@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs } from "antd";
+import { Button, Modal, Input, Typography, Tabs, message } from "antd";
 import AxiosInstance from "../../../../../../../../../api/http";
 import { Controller, useForm, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
@@ -8,22 +8,24 @@ import MainTabs from "./MainTabs/MainTabs";
 export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh, secilenIsEmriID }) {
   const methods = useForm({
     defaultValues: {
-      siraNo: "",
+      aciklama: "",
       secilenID: "",
-      isTanimi: "",
-      yapildi: false,
-      atolyeTanim: "",
-      atolyeID: "",
-      personelTanim: "",
-      personelID: "",
+      makineTanimi: "",
+      makineID: "",
+      lokasyon: "",
+      lokasyonID: "",
+      proje: "",
+      projeID: "",
       baslangicTarihi: "",
       baslangicSaati: "",
-      vardiya: "",
-      vardiyaID: "",
       bitisTarihi: "",
       bitisSaati: "",
       sure: "",
-      aciklama: "",
+      DurusMaliyeti: "",
+      toplamMaliyet: "",
+      planliDurus: false,
+      durusNedeni: null,
+      durusNedeniID: "",
       // Add other default values here
     },
   });
@@ -33,50 +35,51 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   useEffect(() => {
     if (isModalVisible && selectedRow) {
       setValue("secilenID", selectedRow.key);
-      setValue("siraNo", selectedRow.DKN_SIRANO);
-      setValue("isTanimi", selectedRow.DKN_TANIM);
-      setValue("yapildi", selectedRow.DKN_YAPILDI);
-      setValue("atolyeTanim", selectedRow.DKN_YAPILDI_ATOLYE_TANIM);
-      setValue("atolyeID", selectedRow.DKN_YAPILDI_ATOLYE_ID);
-      setValue("personelTanim", selectedRow.DKN_PERSONEL_ISIM);
-      setValue("personelID", selectedRow.DKN_YAPILDI_PERSONEL_ID);
+      setValue("makineTanimi", selectedRow.MKD_MAKINE?.MKN_TANIM ?? "");
+      setValue("makineID", selectedRow.MKD_MAKINE_ID);
+      setValue("lokasyon", selectedRow.MKD_LOKASYON?.LOK_TANIM ?? "");
+      setValue("lokasyonID", selectedRow.MKD_LOKASYON_ID);
+      setValue("proje", selectedRow.MKD_PROJE?.PRJ_TANIM ?? "");
+      setValue("projeID", selectedRow.MKD_PROJE?.TB_PROJE_ID ?? "");
+      setValue("durusNedeni", selectedRow.MKD_NEDEN);
+      setValue("durusNedeniID", selectedRow.MKD_NEDEN_KOD_ID);
       setValue(
         "baslangicTarihi",
-        selectedRow.DKN_YAPILDI_TARIH
-          ? dayjs(selectedRow.DKN_YAPILDI_TARIH).isValid()
-            ? dayjs(selectedRow.DKN_YAPILDI_TARIH)
+        selectedRow.MKD_BASLAMA_TARIH
+          ? dayjs(selectedRow.MKD_BASLAMA_TARIH).isValid()
+            ? dayjs(selectedRow.MKD_BASLAMA_TARIH)
             : null
           : null
       );
       setValue(
         "baslangicSaati",
-        selectedRow.DKN_YAPILDI_SAAT
-          ? dayjs(selectedRow.DKN_YAPILDI_SAAT, "HH:mm:ss").isValid()
-            ? dayjs(selectedRow.DKN_YAPILDI_SAAT, "HH:mm:ss")
+        selectedRow.MKD_BASLAMA_SAAT
+          ? dayjs(selectedRow.MKD_BASLAMA_SAAT, "HH:mm:ss").isValid()
+            ? dayjs(selectedRow.MKD_BASLAMA_SAAT, "HH:mm:ss")
             : null
           : null
       );
-
-      setValue("vardiya", selectedRow.DKN_YAPILDI_MESAI_KOD_TANIM);
-      setValue("vardiyaID", selectedRow.DKN_YAPILDI_MESAI_KOD_ID);
       setValue(
         "bitisTarihi",
-        selectedRow.DKN_BITIS_TARIH
-          ? dayjs(selectedRow.DKN_BITIS_TARIH).isValid()
-            ? dayjs(selectedRow.DKN_BITIS_TARIH)
+        selectedRow.MKD_BITIS_TARIH
+          ? dayjs(selectedRow.MKD_BITIS_TARIH).isValid()
+            ? dayjs(selectedRow.MKD_BITIS_TARIH)
             : null
           : null
       );
       setValue(
         "bitisSaati",
-        selectedRow.DKN_BITIS_SAAT
-          ? dayjs(selectedRow.DKN_BITIS_SAAT, "HH:mm:ss").isValid()
-            ? dayjs(selectedRow.DKN_BITIS_SAAT, "HH:mm:ss")
+        selectedRow.MKD_BITIS_SAAT
+          ? dayjs(selectedRow.MKD_BITIS_SAAT, "HH:mm:ss").isValid()
+            ? dayjs(selectedRow.MKD_BITIS_SAAT, "HH:mm:ss")
             : null
           : null
       );
-      setValue("sure", selectedRow.DKN_YAPILDI_SURE);
-      setValue("aciklama", selectedRow.DKN_ACIKLAMA);
+      setValue("sure", selectedRow.MKD_SURE);
+      setValue("DurusMaliyeti", selectedRow.MKD_SAAT_MALIYET);
+      setValue("toplamMaliyet", selectedRow.MKD_TOPLAM_MALIYET);
+      setValue("aciklama", selectedRow.MKD_ACIKLAMA);
+      setValue("planliDurus", selectedRow.MKD_PLANLI);
     }
   }, [selectedRow, isModalVisible, setValue]);
 
@@ -100,23 +103,20 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
 
   const onSubmited = (data) => {
     const Body = {
-      TB_ISEMRI_KONTROLLIST_ID: data.secilenID,
-      DKN_SIRANO: data.siraNo,
-      DKN_YAPILDI: data.yapildi,
-      DKN_TANIM: data.isTanimi,
-      DKN_OLUSTURAN_ID: 24,
-      // DKN_MALIYET: data.maliyet, // Maliyet diye bir alan yok frontda
-      DKN_YAPILDI_PERSONEL_ID: data.personelID,
-      DKN_YAPILDI_ATOLYE_ID: data.atolyeID,
-      DKN_YAPILDI_SURE: data.sure,
-      DKN_ACIKLAMA: data.aciklama,
-      DKN_YAPILDI_KOD_ID: -1,
-      DKN_REF_ID: -1,
-      DKN_YAPILDI_TARIH: formatDateWithDayjs(data.baslangicTarihi),
-      DKN_YAPILDI_SAAT: formatTimeWithDayjs(data.baslangicSaati),
-      DKN_BITIS_TARIH: formatDateWithDayjs(data.bitisTarihi),
-      DKN_BITIS_SAAT: formatTimeWithDayjs(data.bitisSaati),
-      DKN_YAPILDI_MESAI_KOD_ID: data.vardiyaID,
+      TB_MAKINE_DURUS_ID: data.secilenID,
+      MKD_MAKINE_ID: data.makineID,
+      MKD_LOKASYON_ID: data.lokasyonID,
+      MKD_PROJE_ID: data.projeID,
+      MKD_NEDEN_KOD_ID: data.durusNedeniID,
+      MKD_BASLAMA_TARIH: formatDateWithDayjs(data.baslangicTarihi),
+      MKD_BASLAMA_SAAT: formatTimeWithDayjs(data.baslangicSaati),
+      MKD_BITIS_TARIH: formatDateWithDayjs(data.bitisTarihi),
+      MKD_BITIS_SAAT: formatTimeWithDayjs(data.bitisSaati),
+      MKD_SURE: data.sure,
+      MKD_SAAT_MALIYET: data.DurusMaliyeti,
+      MKD_TOPLAM_MALIYET: data.toplamMaliyet,
+      MKD_ACIKLAMA: data.aciklama,
+      MKD_PLANLI: data.planliDurus,
     };
 
     AxiosInstance.post(`AddUpdateIsEmriKontrolList?isEmriId=${secilenIsEmriID}`, Body)
@@ -125,9 +125,15 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
         reset();
         onModalClose(); // Modal'ı kapat
         onRefresh(); // Tabloyu yenile
+        if (response.status_code === 200) {
+          message.success("Güncelleme Başarılı.");
+        } else {
+          message.error("Güncelleme Başarısız.");
+        }
       })
       .catch((error) => {
         console.error("Error sending data:", error);
+        message.error("Başarısız Olundu.");
       });
 
     console.log({ Body });
@@ -139,8 +145,8 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
     <FormProvider {...methods}>
       <div>
         <Modal
-          width="800px"
-          title="Kontrol Listesi Güncelle"
+          width="830px"
+          title="Duruş Nedeni Güncelle"
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
           onCancel={onModalClose}>

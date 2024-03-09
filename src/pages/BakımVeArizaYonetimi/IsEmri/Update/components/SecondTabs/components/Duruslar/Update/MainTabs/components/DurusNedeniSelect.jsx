@@ -7,8 +7,8 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function SertifikaTipi() {
-  const { control, setValue } = useFormContext();
+export default function DurusNedeniSelect({ disabled }) {
+  const { control, setValue, watch } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const inputRef = createRef();
@@ -23,7 +23,7 @@ export default function SertifikaTipi() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32772");
+      const response = await AxiosInstance.get("KodList?grup=32300");
       if (response && response) {
         setOptions(response);
       }
@@ -51,7 +51,7 @@ export default function SertifikaTipi() {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32772`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32300`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
@@ -88,19 +88,11 @@ export default function SertifikaTipi() {
 
   // add new status to selectbox end
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "10px",
-        justifyContent: "space-between",
-        maxWidth: "300px",
-        width: "100%",
-      }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between" }}>
       {contextHolder}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", width: "100%" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
         <Controller
-          name="sertifikaTipi"
+          name="durusNedeni"
           control={control}
           rules={{ required: "Alan Boş Bırakılamaz!" }}
           render={({ field, fieldState: { error } }) => (
@@ -109,7 +101,7 @@ export default function SertifikaTipi() {
                 {...field}
                 status={error ? "error" : ""}
                 key={selectKey}
-                style={{ width: "100%" }}
+                style={{ width: "300px" }}
                 showSearch
                 allowClear
                 placeholder="Seçim Yapınız"
@@ -132,9 +124,6 @@ export default function SertifikaTipi() {
                     />
                     <Space
                       style={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        justifyContent: "center",
                         padding: "0 8px 4px",
                       }}>
                       <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
@@ -150,16 +139,19 @@ export default function SertifikaTipi() {
                 }))}
                 onChange={(value) => {
                   // Seçilen değerin ID'sini NedeniID alanına set et
-                  setValue("sertifikaTipiID", value);
-                  field.onChange(value);
+                  // `null` veya `undefined` değerlerini ele al
+                  setValue("durusNedeni", value ?? null);
+                  setValue("durusNedeniID", value ?? null);
+                  field.onChange(value ?? null);
                 }}
+                value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
               />
               {error && <div style={{ color: "red" }}>{error.message}</div>}
             </div>
           )}
         />
         <Controller
-          name="sertifikaTipiID"
+          name="durusNedeniID"
           control={control}
           render={({ field }) => (
             <Input
