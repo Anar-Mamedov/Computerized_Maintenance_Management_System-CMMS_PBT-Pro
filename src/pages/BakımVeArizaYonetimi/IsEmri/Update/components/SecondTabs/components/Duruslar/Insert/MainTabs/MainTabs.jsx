@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Input, Typography, Tabs, DatePicker, TimePicker, InputNumber, Checkbox } from "antd";
-import { Controller, useFormContext } from "react-hook-form";
+import { Controller, set, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import dayjs from "dayjs";
 import SertifikaTipi from "./components/SertifikaTipi";
@@ -215,6 +215,17 @@ export default function MainTabs() {
 
   return (
     <div>
+      <Controller
+        name="secilenID"
+        control={control}
+        render={({ field }) => (
+          <Input
+            {...field}
+            type="text" // Set the type to "text" for name input
+            style={{ display: "none" }}
+          />
+        )}
+      />
       <div
         style={{
           display: "flex",
@@ -227,7 +238,7 @@ export default function MainTabs() {
           rowGap: "0px",
           marginBottom: "10px",
         }}>
-        <Text style={{ fontSize: "14px" }}>Sıra no:</Text>
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Makine Tanımı:</Text>
         <div
           style={{
             display: "flex",
@@ -239,23 +250,14 @@ export default function MainTabs() {
             width: "100%",
           }}>
           <Controller
-            name="siraNo"
+            name="makineTanimi"
             control={control}
-            render={({ field }) => (
+            rules={{ required: "Alan Boş Bırakılamaz!" }}
+            render={({ field, fieldState: { error } }) => (
               <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
-                <InputNumber {...field} min={1} style={{ flex: 1 }} />
+                <Input {...field} status={error ? "error" : ""} disabled style={{ flex: 1 }} />
+                {error && <div style={{ color: "red" }}>{error.message}</div>}
               </div>
-            )}
-          />
-          <Controller
-            name="secilenID"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ display: "none" }}
-              />
             )}
           />
         </div>
@@ -272,7 +274,7 @@ export default function MainTabs() {
           rowGap: "0px",
           marginBottom: "10px",
         }}>
-        <Text style={{ fontSize: "14px", fontWeight: "600" }}>İş Tanımı:</Text>
+        <Text style={{ fontSize: "14px" }}>Lokasyon:</Text>
         <div
           style={{
             display: "flex",
@@ -284,13 +286,11 @@ export default function MainTabs() {
             width: "100%",
           }}>
           <Controller
-            name="isTanimi"
+            name="lokasyon"
             control={control}
-            rules={{ required: "Alan Boş Bırakılamaz!" }}
-            render={({ field, fieldState: { error } }) => (
+            render={({ field }) => (
               <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
-                <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
-                {error && <div style={{ color: "red" }}>{error.message}</div>}
+                <Input {...field} disabled style={{ flex: 1 }} />
               </div>
             )}
           />

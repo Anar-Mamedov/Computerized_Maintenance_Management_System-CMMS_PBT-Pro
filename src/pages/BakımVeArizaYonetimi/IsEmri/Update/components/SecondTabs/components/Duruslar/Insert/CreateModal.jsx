@@ -6,12 +6,20 @@ import { Controller, useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
 import dayjs from "dayjs";
 
-export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID }) {
+export default function CreateModal({
+  workshopSelectedId,
+  onSubmit,
+  onRefresh,
+  secilenIsEmriID,
+  makineTanim,
+  lokasyon,
+}) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const methods = useForm({
     defaultValues: {
-      siraNo: "",
       secilenID: "",
+      makineTanimi: "",
+      lokasyon: "",
       isTanimi: "",
       yapildi: false,
       atolyeTanim: "",
@@ -30,7 +38,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     },
   });
 
-  const { setValue, reset, handleSubmit } = methods;
+  const { setValue, reset, handleSubmit, watch } = methods;
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
@@ -88,6 +96,11 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
 
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi sonu
 
+  useEffect(() => {
+    setValue("makineTanimi", makineTanim);
+    setValue("lokasyon", lokasyon);
+  });
+
   return (
     <FormProvider {...methods}>
       <div>
@@ -99,12 +112,12 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
 
         <Modal
           width="800px"
-          title="Kontrol Ekle"
+          title="Duruş Bilgisi"
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
           onCancel={handleModalToggle}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
-            <MainTabs />
+            <MainTabs lokasyon={lokasyon} makineTanim={makineTanim} />
           </form>
         </Modal>
       </div>
