@@ -13,6 +13,8 @@ export default function CreateModal({
   secilenIsEmriID,
   makineTanim,
   lokasyon,
+  lokasyonID,
+  makineID,
 }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   // message
@@ -20,23 +22,24 @@ export default function CreateModal({
   // message end
   const methods = useForm({
     defaultValues: {
+      aciklama: "",
       secilenID: "",
       makineTanimi: "",
+      makineID: "",
       lokasyon: "",
-      isTanimi: "",
-      yapildi: false,
-      atolyeTanim: "",
-      atolyeID: "",
-      personelTanim: "",
-      personelID: "",
+      lokasyonID: "",
+      proje: "",
+      projeID: "",
       baslangicTarihi: "",
       baslangicSaati: "",
-      vardiya: null,
-      vardiyaID: "",
       bitisTarihi: "",
       bitisSaati: "",
       sure: "",
-      aciklama: "",
+      DurusMaliyeti: "",
+      toplamMaliyet: "",
+      planliDurus: false,
+      durusNedeni: null,
+      durusNedeniID: "",
       // Add other default values here
     },
   });
@@ -57,32 +60,29 @@ export default function CreateModal({
 
   const onSubmited = (data) => {
     const Body = {
-      TB_ISEMRI_KONTROLLIST_ID: 0,
-      DKN_SIRANO: data.siraNo,
-      DKN_YAPILDI: data.yapildi,
-      DKN_TANIM: data.isTanimi,
-      DKN_OLUSTURAN_ID: 24,
-      // DKN_MALIYET: data.maliyet, // Maliyet diye bir alan yok frontda
-      DKN_YAPILDI_PERSONEL_ID: data.personelID,
-      DKN_YAPILDI_ATOLYE_ID: data.atolyeID,
-      DKN_YAPILDI_SURE: data.sure,
-      DKN_ACIKLAMA: data.aciklama,
-      DKN_YAPILDI_KOD_ID: -1,
-      DKN_REF_ID: -1,
-      DKN_YAPILDI_TARIH: formatDateWithDayjs(data.baslangicTarihi),
-      DKN_YAPILDI_SAAT: formatTimeWithDayjs(data.baslangicSaati),
-      DKN_BITIS_TARIH: formatDateWithDayjs(data.bitisTarihi),
-      DKN_BITIS_SAAT: formatTimeWithDayjs(data.bitisSaati),
-      DKN_YAPILDI_MESAI_KOD_ID: data.vardiyaID,
+      TB_MAKINE_DURUS_ID: 0,
+      MKD_MAKINE_ID: data.makineID,
+      MKD_LOKASYON_ID: data.lokasyonID,
+      MKD_PROJE_ID: data.projeID,
+      MKD_NEDEN_KOD_ID: data.durusNedeniID,
+      MKD_BASLAMA_TARIH: formatDateWithDayjs(data.baslangicTarihi),
+      MKD_BASLAMA_SAAT: formatTimeWithDayjs(data.baslangicSaati),
+      MKD_BITIS_TARIH: formatDateWithDayjs(data.bitisTarihi),
+      MKD_BITIS_SAAT: formatTimeWithDayjs(data.bitisSaati),
+      MKD_SURE: data.sure,
+      MKD_SAAT_MALIYET: data.DurusMaliyeti,
+      MKD_TOPLAM_MALIYET: data.toplamMaliyet,
+      MKD_ACIKLAMA: data.aciklama,
+      MKD_PLANLI: data.planliDurus,
     };
 
-    AxiosInstance.post(`AddUpdateIsEmriKontrolList?isEmriId=${secilenIsEmriID}`, Body)
+    AxiosInstance.post(`AddUpdateIsEmriDurus?isEmriId=${secilenIsEmriID}`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
         reset();
         setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
         onRefresh();
-        if (response.status_code === 201) {
+        if (response.status_code === 200) {
           messageApi.open({
             type: "success",
             content: "Ekleme Başarılı",
@@ -118,6 +118,8 @@ export default function CreateModal({
   useEffect(() => {
     setValue("makineTanimi", makineTanim);
     setValue("lokasyon", lokasyon);
+    setValue("lokasyonID", lokasyonID);
+    setValue("makineID", makineID);
   });
 
   return (
@@ -131,7 +133,7 @@ export default function CreateModal({
         </div>
 
         <Modal
-          width="800px"
+          width="830px"
           title="Duruş Bilgisi"
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
