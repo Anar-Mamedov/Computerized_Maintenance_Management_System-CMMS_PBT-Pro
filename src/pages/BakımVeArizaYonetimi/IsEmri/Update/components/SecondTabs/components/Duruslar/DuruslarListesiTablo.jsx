@@ -194,9 +194,17 @@ export default function DuruslarListesiTablo() {
     fetch(); // fetch fonksiyonu tabloyu yeniler
   }, [fetch]);
 
+  const lokasyon = watch("lokasyonTanim");
+  const makineTanim = watch("makineTanim");
+
   return (
     <div style={{ marginBottom: "25px" }}>
-      <CreateModal onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />
+      <CreateModal
+        onRefresh={refreshTable}
+        secilenIsEmriID={secilenIsEmriID}
+        lokasyon={lokasyon}
+        makineTanim={makineTanim}
+      />
       <Table
         rowSelection={{
           type: "radio",
