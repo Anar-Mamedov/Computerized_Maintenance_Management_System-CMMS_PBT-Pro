@@ -184,329 +184,337 @@ export default function MainTabs() {
   // geçerli geçersiz yazdırmak için sonu
 
   return (
-    <div>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          maxWidth: "450px",
-          width: "100%",
-          justifyContent: "space-between",
-          marginBottom: "10px",
-        }}>
-        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Tarih:</Text>
+    <div style={{ display: "flex", gap: "10px" }}>
+      <div>
         <div
           style={{
             display: "flex",
             flexWrap: "wrap",
             alignItems: "center",
-            maxWidth: "300px",
-            minWidth: "300px",
-            gap: "5px",
+            maxWidth: "450px",
             width: "100%",
+            justifyContent: "space-between",
+            marginBottom: "10px",
           }}>
+          <Text style={{ fontSize: "14px", fontWeight: "600" }}>Tarih:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              maxWidth: "200px",
+              gap: "5px",
+              width: "100%",
+            }}>
+            <Controller
+              name="tarih"
+              control={control}
+              rules={{ required: "Alan Boş Bırakılamaz!" }}
+              render={({ field }) => (
+                <DatePicker
+                  {...field}
+                  status={errors.tarih ? "error" : ""}
+                  // disabled={!isDisabled}
+                  style={{ width: "100%" }}
+                  format={localeDateFormat}
+                  placeholder="Tarih seçiniz"
+                />
+              )}
+            />
+            {errors.tarih && <div style={{ color: "red" }}>{errors.tarih.message}</div>}
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            maxWidth: "450px",
+            gap: "10px",
+            width: "100%",
+            justifyContent: "space-between",
+            marginBottom: "10px",
+          }}>
+          <Text style={{ fontSize: "14px", fontWeight: "600" }}>Saat:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              maxWidth: "200px",
+              gap: "5px",
+              width: "100%",
+            }}>
+            <Controller
+              name="saat"
+              control={control}
+              rules={{ required: "Alan Boş Bırakılamaz!" }}
+              render={({ field }) => (
+                <TimePicker
+                  {...field}
+                  status={errors.saat ? "error" : ""}
+                  // disabled={!isDisabled}
+                  style={{ width: "100%" }}
+                  format={localeTimeFormat}
+                  placeholder="Saat seçiniz"
+                />
+              )}
+            />
+            {errors.saat && <div style={{ color: "red" }}>{errors.saat.message}</div>}
+          </div>
+        </div>
+        <div
+          style={{
+            display: "none",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: "450px",
+            gap: "10px",
+            rowGap: "0px",
+            marginBottom: "10px",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Sıra no:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              maxWidth: "300px",
+              minWidth: "300px",
+              gap: "10px",
+              width: "100%",
+            }}>
+            <Controller
+              name="siraNo"
+              control={control}
+              render={({ field }) => (
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+                  <InputNumber {...field} min={1} style={{ flex: 1 }} />
+                </div>
+              )}
+            />
+            <Controller
+              name="secilenID"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="text" // Set the type to "text" for name input
+                  style={{ display: "none" }}
+                />
+              )}
+            />
+          </div>
+        </div>
+        <div
+          style={{
+            display: "none",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: "450px",
+            gap: "10px",
+            rowGap: "0px",
+            marginBottom: "10px",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Tanım:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              maxWidth: "300px",
+              minWidth: "300px",
+              gap: "10px",
+              width: "100%",
+            }}>
+            <Controller
+              name="tanim"
+              control={control}
+              render={({ field }) => (
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+                  <Input {...field} style={{ flex: 1 }} />
+                </div>
+              )}
+            />
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "10px",
+            width: "100%",
+            maxWidth: "450px",
+            marginBottom: "10px",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Birim:</Text>
+          <Birim />
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "10px",
+            width: "100%",
+            maxWidth: "350px",
+            marginBottom: "10px",
+          }}>
+          <Text style={{ fontSize: "14px", fontWeight: "600" }}>Ölçüm Değeri:</Text>
           <Controller
-            name="tarih"
+            name="olcumDegeri"
             control={control}
             rules={{ required: "Alan Boş Bırakılamaz!" }}
             render={({ field, fieldState: { error } }) => (
-              <DatePicker
-                {...field}
-                status={errors.tarih ? "error" : ""}
-                // disabled={!isDisabled}
-                style={{ width: "180px" }}
-                format={localeDateFormat}
-                placeholder="Tarih seçiniz"
-              />
-            )}
-          />
-          {errors.tarih && <div style={{ color: "red" }}>{errors.tarih.message}</div>}
-        </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          maxWidth: "450px",
-          gap: "10px",
-          width: "100%",
-          justifyContent: "space-between",
-          marginBottom: "10px",
-        }}>
-        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Saat:</Text>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "300px",
-            minWidth: "300px",
-            gap: "5px",
-            width: "100%",
-          }}>
-          <Controller
-            name="saat"
-            control={control}
-            rules={{ required: "Alan Boş Bırakılamaz!" }}
-            render={({ field, fieldState: { error } }) => (
-              <TimePicker
-                {...field}
-                status={errors.saat ? "error" : ""}
-                // disabled={!isDisabled}
-                style={{ width: "180px" }}
-                format={localeTimeFormat}
-                placeholder="Saat seçiniz"
-              />
-            )}
-          />
-          {errors.saat && <div style={{ color: "red" }}>{errors.saat.message}</div>}
-        </div>
-      </div>
-      <div
-        style={{
-          display: "none",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          width: "100%",
-          maxWidth: "450px",
-          gap: "10px",
-          rowGap: "0px",
-          marginBottom: "10px",
-        }}>
-        <Text style={{ fontSize: "14px" }}>Sıra no:</Text>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "300px",
-            minWidth: "300px",
-            gap: "10px",
-            width: "100%",
-          }}>
-          <Controller
-            name="siraNo"
-            control={control}
-            render={({ field }) => (
-              <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
-                <InputNumber {...field} min={1} style={{ flex: 1 }} />
-              </div>
-            )}
-          />
-          <Controller
-            name="secilenID"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ display: "none" }}
-              />
-            )}
-          />
-        </div>
-      </div>
-      <div
-        style={{
-          display: "none",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          width: "100%",
-          maxWidth: "450px",
-          gap: "10px",
-          rowGap: "0px",
-          marginBottom: "10px",
-        }}>
-        <Text style={{ fontSize: "14px" }}>Tanım:</Text>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "300px",
-            minWidth: "300px",
-            gap: "10px",
-            width: "100%",
-          }}>
-          <Controller
-            name="tanim"
-            control={control}
-            render={({ field, fieldState: { error } }) => (
-              <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
-                <Input {...field} style={{ flex: 1 }} />
+              <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%", maxWidth: "200px" }}>
+                <InputNumber
+                  {...field}
+                  status={error ? "error" : ""}
+                  min={0}
+                  style={{ width: "200px" }}
+                  precision={ondalikSayi}
+                />
+                {error && <div style={{ color: "red" }}>{error.message}</div>}
               </div>
             )}
           />
         </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "10px",
+            width: "100%",
+            maxWidth: "350px",
+            marginBottom: "10px",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Fark:</Text>
+          <Controller
+            name="fark"
+            control={control}
+            render={({ field }) => <InputNumber {...field} style={{ width: "200px" }} precision={ondalikSayi} />}
+          />
+        </div>
+        <div
+          style={{
+            display: "none",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "10px",
+            width: "100%",
+            maxWidth: "250px",
+            marginBottom: "10px",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Ondalık Sayı:</Text>
+          <Controller
+            name="ondalikSayi"
+            control={control}
+            render={({ field }) => <InputNumber {...field} min={0} style={{ width: "100px" }} />}
+          />
+        </div>
       </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: "10px",
-          width: "100%",
-          maxWidth: "450px",
-          marginBottom: "10px",
-        }}>
-        <Text style={{ fontSize: "14px" }}>Birim:</Text>
-        <Birim />
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: "10px",
-          width: "100%",
-          maxWidth: "350px",
-          marginBottom: "10px",
-        }}>
-        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Ölçüm Değeri:</Text>
-        <Controller
-          name="olcumDegeri"
-          control={control}
-          rules={{ required: "Alan Boş Bırakılamaz!" }}
-          render={({ field, fieldState: { error } }) => (
-            <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%", maxWidth: "200px" }}>
-              <InputNumber
-                {...field}
-                status={error ? "error" : ""}
-                min={0}
-                style={{ width: "200px" }}
-                precision={ondalikSayi}
-              />
-              {error && <div style={{ color: "red" }}>{error.message}</div>}
-            </div>
-          )}
-        />
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: "10px",
-          width: "100%",
-          maxWidth: "350px",
-          marginBottom: "10px",
-        }}>
-        <Text style={{ fontSize: "14px" }}>Fark:</Text>
-        <Controller
-          name="fark"
-          control={control}
-          render={({ field }) => <InputNumber {...field} style={{ width: "200px" }} precision={ondalikSayi} />}
-        />
-      </div>
-      <div
-        style={{
-          display: "none",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: "10px",
-          width: "100%",
-          maxWidth: "250px",
-          marginBottom: "10px",
-        }}>
-        <Text style={{ fontSize: "14px" }}>Ondalık Sayı:</Text>
-        <Controller
-          name="ondalikSayi"
-          control={control}
-          render={({ field }) => <InputNumber {...field} min={0} style={{ width: "100px" }} />}
-        />
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: "10px",
-          width: "100%",
-          maxWidth: "350px",
-          marginBottom: "10px",
-        }}>
-        <Text style={{ fontSize: "14px" }}>Hedef Değer:</Text>
-        <Controller
-          name="hedefDeger"
-          control={control}
-          render={({ field }) => (
-            <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%", maxWidth: "200px" }}>
-              <InputNumber {...field} min={0} disabled style={{ width: "200px" }} precision={ondalikSayi} />
-            </div>
-          )}
-        />
-      </div>
-      <div
-        style={{
-          display: "none",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: "10px",
-          width: "100%",
-          maxWidth: "350px",
-          marginBottom: "10px",
-        }}>
-        <Text style={{ fontSize: "14px" }}>Limit (+)(-):</Text>
-        <Controller
-          name="limit"
-          control={control}
-          render={({ field }) => <InputNumber {...field} min={0} style={{ width: "200px" }} precision={ondalikSayi} />}
-        />
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: "10px",
-          width: "100%",
-          maxWidth: "350px",
-          marginBottom: "10px",
-        }}>
-        <Text style={{ fontSize: "14px" }}>Minumum Değer:</Text>
-        <Controller
-          name="minDeger"
-          control={control}
-          render={({ field }) => <InputNumber {...field} disabled style={{ width: "200px" }} precision={ondalikSayi} />}
-        />
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: "10px",
-          width: "100%",
-          maxWidth: "350px",
-          marginBottom: "10px",
-        }}>
-        <Text style={{ fontSize: "14px" }}>Maximum Değer:</Text>
-        <Controller
-          name="maxDeger"
-          control={control}
-          render={({ field }) => <InputNumber {...field} disabled style={{ width: "200px" }} precision={ondalikSayi} />}
-        />
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: "10px",
-          width: "100%",
-          maxWidth: "350px",
-          marginBottom: "10px",
-        }}>
-        <Text style={{ fontSize: "14px" }}>Durum:</Text>
-        <Controller
-          name="durum"
-          control={control}
-          render={({ field }) => <Input {...field} disabled style={{ width: "200px" }} />}
-        />
+      <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "10px",
+            width: "100%",
+            maxWidth: "350px",
+            marginBottom: "10px",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Hedef Değer:</Text>
+          <Controller
+            name="hedefDeger"
+            control={control}
+            render={({ field }) => (
+              <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%", maxWidth: "200px" }}>
+                <InputNumber {...field} min={0} disabled style={{ width: "200px" }} precision={ondalikSayi} />
+              </div>
+            )}
+          />
+        </div>
+        <div
+          style={{
+            display: "none",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "10px",
+            width: "100%",
+            maxWidth: "350px",
+            marginBottom: "10px",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Limit (+)(-):</Text>
+          <Controller
+            name="limit"
+            control={control}
+            render={({ field }) => (
+              <InputNumber {...field} min={0} style={{ width: "200px" }} precision={ondalikSayi} />
+            )}
+          />
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "10px",
+            width: "100%",
+            maxWidth: "350px",
+            marginBottom: "10px",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Minumum Değer:</Text>
+          <Controller
+            name="minDeger"
+            control={control}
+            render={({ field }) => (
+              <InputNumber {...field} disabled style={{ width: "200px" }} precision={ondalikSayi} />
+            )}
+          />
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "10px",
+            width: "100%",
+            maxWidth: "350px",
+            marginBottom: "10px",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Maximum Değer:</Text>
+          <Controller
+            name="maxDeger"
+            control={control}
+            render={({ field }) => (
+              <InputNumber {...field} disabled style={{ width: "200px" }} precision={ondalikSayi} />
+            )}
+          />
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "10px",
+            width: "100%",
+            maxWidth: "350px",
+            marginBottom: "10px",
+          }}>
+          <Text style={{ fontSize: "14px" }}>Durum:</Text>
+          <Controller
+            name="durum"
+            control={control}
+            render={({ field }) => <Input {...field} disabled style={{ width: "200px" }} />}
+          />
+        </div>
       </div>
     </div>
   );

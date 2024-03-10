@@ -5,6 +5,7 @@ import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../api/http";
 import CreateModal from "./Insert/CreateModal";
 import EditModal from "./Update/EditModal";
+import CreateAracGerecTablo from "./Insert/CreateAracGerecTablo";
 
 export default function AracGereclerListesiTablo() {
   const [loading, setLoading] = useState(false);
@@ -153,7 +154,7 @@ export default function AracGereclerListesiTablo() {
 
   return (
     <div style={{ marginBottom: "25px" }}>
-      <CreateModal onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />
+      <CreateAracGerecTablo onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />
       <Table
         rowSelection={{
           type: "radio",
