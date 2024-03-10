@@ -98,7 +98,7 @@ export default function Birim() {
             <Select
               {...field}
               key={selectKey}
-              style={{ width: "300px" }}
+              style={{ width: "200px" }}
               showSearch
               allowClear
               placeholder="Seçim Yapınız"
