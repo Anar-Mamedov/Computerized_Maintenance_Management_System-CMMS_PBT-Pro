@@ -6,26 +6,27 @@ import { Controller, useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
 import dayjs from "dayjs";
 
-export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID }) {
+export default function CreateModal({
+  workshopSelectedId,
+  onSubmit,
+  onRefresh,
+  secilenIsEmriID,
+  duzenlenmeTarihi,
+  duzenlenmeSaati,
+}) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const methods = useForm({
     defaultValues: {
       siraNo: "",
       secilenID: "",
-      isTanimi: "",
-      yapildi: false,
-      atolyeTanim: "",
-      atolyeID: "",
-      personelTanim: "",
-      personelID: "",
-      baslangicTarihi: "",
-      baslangicSaati: "",
-      vardiya: "",
-      vardiyaID: "",
-      bitisTarihi: "",
-      bitisSaati: "",
-      sure: "",
-      aciklama: "",
+      tanim: "",
+      birim: null,
+      birimID: "",
+      ondalikSayi: 0,
+      hedefDeger: 0,
+      limit: 0,
+      minDeger: 0,
+      maxDeger: 0,
       // Add other default values here
     },
   });
@@ -46,26 +47,20 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
 
   const onSubmited = (data) => {
     const Body = {
-      TB_ISEMRI_KONTROLLIST_ID: 0,
-      DKN_SIRANO: data.siraNo,
-      DKN_YAPILDI: data.yapildi,
-      DKN_TANIM: data.isTanimi,
-      DKN_OLUSTURAN_ID: 24,
-      // DKN_MALIYET: data.maliyet, // Maliyet diye bir alan yok frontda
-      DKN_YAPILDI_PERSONEL_ID: data.personelID,
-      DKN_YAPILDI_ATOLYE_ID: data.atolyeID,
-      DKN_YAPILDI_SURE: data.sure,
-      DKN_ACIKLAMA: data.aciklama,
-      DKN_YAPILDI_KOD_ID: -1,
-      DKN_REF_ID: -1,
-      DKN_YAPILDI_TARIH: formatDateWithDayjs(data.baslangicTarihi),
-      DKN_YAPILDI_SAAT: formatTimeWithDayjs(data.baslangicSaati),
-      DKN_BITIS_TARIH: formatDateWithDayjs(data.bitisTarihi),
-      DKN_BITIS_SAAT: formatTimeWithDayjs(data.bitisSaati),
-      DKN_YAPILDI_MESAI_KOD_ID: data.vardiyaID,
+      TB_ISEMRI_OLCUM_ID: 0,
+      IDO_SIRANO: data.siraNo,
+      IDO_TANIM: data.tanim,
+      IDO_BIRIM_KOD_ID: data.birimID,
+      IDO_FORMAT: data.ondalikSayi,
+      IDO_HEDEF_DEGER: data.hedefDeger,
+      IDO_MIN_MAX_DEGER: data.limit,
+      IDO_MIN_DEGER: data.minDeger,
+      IDO_MAX_DEGER: data.maxDeger,
+      IDO_TARIH: formatDateWithDayjs(duzenlenmeTarihi),
+      IDO_SAAT: formatTimeWithDayjs(duzenlenmeSaati),
     };
 
-    AxiosInstance.post(`AddUpdateIsEmriKontrolList?isEmriId=${secilenIsEmriID}`, Body)
+    AxiosInstance.post(`AddUpdateIsEmriOlcumDegeri?isEmriId=${secilenIsEmriID}`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
         reset();
@@ -99,7 +94,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
 
         <Modal
           width="800px"
-          title="Kontrol Ekle"
+          title="Ölçüm Parametreleri Ekleme Ekranı"
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
           onCancel={handleModalToggle}>

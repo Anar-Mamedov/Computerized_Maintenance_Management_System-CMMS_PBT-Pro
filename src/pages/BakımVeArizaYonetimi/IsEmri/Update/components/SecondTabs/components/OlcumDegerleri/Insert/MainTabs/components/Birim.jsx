@@ -7,7 +7,7 @@ import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function SertifikaTipi() {
+export default function Birim() {
   const { control, setValue } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -23,7 +23,7 @@ export default function SertifikaTipi() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32772");
+      const response = await AxiosInstance.get("KodList?grup=32001");
       if (response && response) {
         setOptions(response);
       }
@@ -51,7 +51,7 @@ export default function SertifikaTipi() {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32772`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32001`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
@@ -88,78 +88,62 @@ export default function SertifikaTipi() {
 
   // add new status to selectbox end
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "10px",
-        justifyContent: "space-between",
-        maxWidth: "300px",
-        width: "100%",
-      }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between" }}>
       {contextHolder}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", width: "100%" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
         <Controller
-          name="sertifikaTipi"
+          name="birim"
           control={control}
-          rules={{ required: "Alan Boş Bırakılamaz!" }}
-          render={({ field, fieldState: { error } }) => (
-            <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
-              <Select
-                {...field}
-                status={error ? "error" : ""}
-                key={selectKey}
-                style={{ width: "100%" }}
-                showSearch
-                allowClear
-                placeholder="Seçim Yapınız"
-                optionFilterProp="children"
-                filterOption={(input, option) =>
-                  option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
+          render={({ field }) => (
+            <Select
+              {...field}
+              key={selectKey}
+              style={{ width: "300px" }}
+              showSearch
+              allowClear
+              placeholder="Seçim Yapınız"
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
+              }
+              onDropdownVisibleChange={(open) => {
+                if (open) {
+                  fetchData(); // Fetch data when the dropdown is opened
                 }
-                onDropdownVisibleChange={(open) => {
-                  if (open) {
-                    fetchData(); // Fetch data when the dropdown is opened
-                  }
-                }}
-                dropdownRender={(menu) => (
-                  <Spin spinning={loading}>
-                    {menu}
-                    <Divider
-                      style={{
-                        margin: "8px 0",
-                      }}
-                    />
-                    <Space
-                      style={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        justifyContent: "center",
-                        padding: "0 8px 4px",
-                      }}>
-                      <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
-                      <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
-                        Ekle
-                      </Button>
-                    </Space>
-                  </Spin>
-                )}
-                options={options.map((item) => ({
-                  value: item.TB_KOD_ID, // Use the ID as the value
-                  label: item.KOD_TANIM, // Display the name in the dropdown
-                }))}
-                onChange={(value) => {
-                  // Seçilen değerin ID'sini NedeniID alanına set et
-                  setValue("sertifikaTipiID", value);
-                  field.onChange(value);
-                }}
-              />
-              {error && <div style={{ color: "red" }}>{error.message}</div>}
-            </div>
+              }}
+              dropdownRender={(menu) => (
+                <Spin spinning={loading}>
+                  {menu}
+                  <Divider
+                    style={{
+                      margin: "8px 0",
+                    }}
+                  />
+                  <Space
+                    style={{
+                      padding: "0 8px 4px",
+                    }}>
+                    <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
+                    <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
+                      Ekle
+                    </Button>
+                  </Space>
+                </Spin>
+              )}
+              options={options.map((item) => ({
+                value: item.TB_KOD_ID, // Use the ID as the value
+                label: item.KOD_TANIM, // Display the name in the dropdown
+              }))}
+              onChange={(value) => {
+                // Seçilen değerin ID'sini NedeniID alanına set et
+                setValue("birimID", value);
+                field.onChange(value);
+              }}
+            />
           )}
         />
         <Controller
-          name="sertifikaTipiID"
+          name="birimID"
           control={control}
           render={({ field }) => (
             <Input
