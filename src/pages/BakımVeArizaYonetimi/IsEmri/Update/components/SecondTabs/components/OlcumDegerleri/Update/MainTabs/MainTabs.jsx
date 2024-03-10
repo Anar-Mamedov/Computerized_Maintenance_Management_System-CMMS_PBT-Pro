@@ -123,6 +123,11 @@ export default function MainTabs() {
   const ondalikSayi = watch("ondalikSayi");
   const hedefDeger = watch("hedefDeger");
   const limit = watch("limit");
+  const olcumDegeri = watch("olcumDegeri");
+  const maxDeger = watch("maxDeger");
+  const fark = watch("fark");
+
+  // ondalık ondalık sayısını belirlemek için başka inputa girilen rakama göre diğer alanların ondalık basamak sayısını belirleme
 
   const formatDecimal = (value, decimalPlaces) => {
     // Doğrudan parseFloat kullanarak noktayla ondalık ayrımını gerçekleştiririz
@@ -134,14 +139,49 @@ export default function MainTabs() {
     // Hedef Değer ve Ölçüm Limiti dahil olmak üzere tüm ilgili alanları güncelle
     setValue("hedefDeger", formatDecimal(hedefDeger, decimalPlaces), { shouldValidate: true });
     setValue("limit", formatDecimal(limit, decimalPlaces), { shouldValidate: true });
+    setValue("olcumDegeri", formatDecimal(olcumDegeri, decimalPlaces), { shouldValidate: true });
+    setValue("fark", formatDecimal(fark, decimalPlaces), { shouldValidate: true });
 
     // Maximum ve minimum değer hesaplama
-    const maxDeger = parseFloat(hedefDeger) + parseFloat(limit);
-    const minDeger = parseFloat(hedefDeger) - parseFloat(limit);
+    // const maxDeger = parseFloat(hedefDeger) + parseFloat(limit);
+    // const minDeger = parseFloat(hedefDeger) - parseFloat(limit);
 
-    setValue("maxDeger", formatDecimal(maxDeger, decimalPlaces));
-    setValue("minDeger", formatDecimal(minDeger, decimalPlaces));
-  }, [hedefDeger, limit, ondalikSayi, setValue]);
+    // setValue("maxDeger", formatDecimal(maxDeger, decimalPlaces));
+    // setValue("minDeger", formatDecimal(minDeger, decimalPlaces));
+  }, [hedefDeger, limit, ondalikSayi, olcumDegeri, fark, setValue]);
+
+  // ondalık ondalık sayısını belirlemek için başka inputa girilen rakama göre diğer alanların ondalık basamak sayısını belirleme son
+
+  useEffect(() => {
+    const numericHedefDeger = parseFloat(hedefDeger) || 0;
+    const numericOlcumDegeri = parseFloat(olcumDegeri) || 0;
+    const yeniFark = numericOlcumDegeri - numericHedefDeger;
+
+    // Sadece fark değeri önceki değerden farklıysa güncelle
+    const oncekiFark = parseFloat(fark) || 0;
+    if (yeniFark !== oncekiFark) {
+      setValue("fark", formatDecimal(yeniFark, parseInt(ondalikSayi, 10) || 0), { shouldValidate: true });
+    }
+  }, [hedefDeger, olcumDegeri, ondalikSayi, fark, setValue]);
+
+  // geçerli geçersiz yazdırmak için
+
+  useEffect(() => {
+    // parseFloat kullanarak olası string değerleri sayıya çevirme
+    const numericOlcumDegeri = parseFloat(olcumDegeri);
+    const numericMaxDeger = parseFloat(maxDeger);
+
+    // olcumDegeri'nin maxDeger'den büyük olup olmadığını kontrol etme
+    if (numericOlcumDegeri > numericMaxDeger) {
+      // olcumDegeri maxDeger'den büyükse, durum alanını "Geçersiz" olarak ayarla
+      setValue("durum", "Geçersiz", { shouldValidate: true });
+    } else {
+      // Aksi takdirde, "Geçerli" olarak ayarla
+      setValue("durum", "Geçerli", { shouldValidate: true });
+    }
+  }, [olcumDegeri, maxDeger, setValue]); // Bağımlılıkları dikkate al
+
+  // geçerli geçersiz yazdırmak için sonu
 
   return (
     <div>
@@ -151,11 +191,11 @@ export default function MainTabs() {
           flexWrap: "wrap",
           alignItems: "center",
           maxWidth: "450px",
-          gap: "10px",
           width: "100%",
           justifyContent: "space-between",
+          marginBottom: "10px",
         }}>
-        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Düzenlenme Tarihi:</Text>
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Tarih:</Text>
         <div
           style={{
             display: "flex",
@@ -163,17 +203,17 @@ export default function MainTabs() {
             alignItems: "center",
             maxWidth: "300px",
             minWidth: "300px",
-            gap: "10px",
+            gap: "5px",
             width: "100%",
           }}>
           <Controller
-            name="duzenlenmeTarihi"
+            name="tarih"
             control={control}
             rules={{ required: "Alan Boş Bırakılamaz!" }}
             render={({ field, fieldState: { error } }) => (
               <DatePicker
                 {...field}
-                status={errors.duzenlenmeTarihi ? "error" : ""}
+                status={errors.tarih ? "error" : ""}
                 // disabled={!isDisabled}
                 style={{ width: "180px" }}
                 format={localeDateFormat}
@@ -181,7 +221,7 @@ export default function MainTabs() {
               />
             )}
           />
-          {errors.duzenlenmeTarihi && <div style={{ color: "red" }}>{errors.duzenlenmeTarihi.message}</div>}
+          {errors.tarih && <div style={{ color: "red" }}>{errors.tarih.message}</div>}
         </div>
       </div>
       <div
@@ -193,8 +233,9 @@ export default function MainTabs() {
           gap: "10px",
           width: "100%",
           justifyContent: "space-between",
+          marginBottom: "10px",
         }}>
-        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Düzenlenme Tarihi:</Text>
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Saat:</Text>
         <div
           style={{
             display: "flex",
@@ -202,30 +243,30 @@ export default function MainTabs() {
             alignItems: "center",
             maxWidth: "300px",
             minWidth: "300px",
-            gap: "10px",
+            gap: "5px",
             width: "100%",
           }}>
           <Controller
-            name="duzenlenmeSaati"
+            name="saat"
             control={control}
             rules={{ required: "Alan Boş Bırakılamaz!" }}
             render={({ field, fieldState: { error } }) => (
               <TimePicker
                 {...field}
-                status={errors.duzenlenmeSaati ? "error" : ""}
+                status={errors.saat ? "error" : ""}
                 // disabled={!isDisabled}
-                style={{ width: "110px" }}
+                style={{ width: "180px" }}
                 format={localeTimeFormat}
                 placeholder="Saat seçiniz"
               />
             )}
           />
-          {errors.duzenlenmeSaati && <div style={{ color: "red" }}>{errors.duzenlenmeSaati.message}</div>}
+          {errors.saat && <div style={{ color: "red" }}>{errors.saat.message}</div>}
         </div>
       </div>
       <div
         style={{
-          display: "flex",
+          display: "none",
           flexWrap: "wrap",
           alignItems: "center",
           justifyContent: "space-between",
@@ -270,7 +311,7 @@ export default function MainTabs() {
       </div>
       <div
         style={{
-          display: "flex",
+          display: "none",
           flexWrap: "wrap",
           alignItems: "center",
           justifyContent: "space-between",
@@ -280,7 +321,7 @@ export default function MainTabs() {
           rowGap: "0px",
           marginBottom: "10px",
         }}>
-        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Tanım:</Text>
+        <Text style={{ fontSize: "14px" }}>Tanım:</Text>
         <div
           style={{
             display: "flex",
@@ -294,11 +335,9 @@ export default function MainTabs() {
           <Controller
             name="tanim"
             control={control}
-            rules={{ required: "Alan Boş Bırakılamaz!" }}
             render={({ field, fieldState: { error } }) => (
               <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
-                <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
-                {error && <div style={{ color: "red" }}>{error.message}</div>}
+                <Input {...field} style={{ flex: 1 }} />
               </div>
             )}
           />
@@ -324,6 +363,52 @@ export default function MainTabs() {
           alignItems: "center",
           gap: "10px",
           width: "100%",
+          maxWidth: "350px",
+          marginBottom: "10px",
+        }}>
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Ölçüm Değeri:</Text>
+        <Controller
+          name="olcumDegeri"
+          control={control}
+          rules={{ required: "Alan Boş Bırakılamaz!" }}
+          render={({ field, fieldState: { error } }) => (
+            <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%", maxWidth: "200px" }}>
+              <InputNumber
+                {...field}
+                status={error ? "error" : ""}
+                min={0}
+                style={{ width: "200px" }}
+                precision={ondalikSayi}
+              />
+              {error && <div style={{ color: "red" }}>{error.message}</div>}
+            </div>
+          )}
+        />
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "10px",
+          width: "100%",
+          maxWidth: "350px",
+          marginBottom: "10px",
+        }}>
+        <Text style={{ fontSize: "14px" }}>Fark:</Text>
+        <Controller
+          name="fark"
+          control={control}
+          render={({ field }) => <InputNumber {...field} style={{ width: "200px" }} precision={ondalikSayi} />}
+        />
+      </div>
+      <div
+        style={{
+          display: "none",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "10px",
+          width: "100%",
           maxWidth: "250px",
           marginBottom: "10px",
         }}>
@@ -344,28 +429,20 @@ export default function MainTabs() {
           maxWidth: "350px",
           marginBottom: "10px",
         }}>
-        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Hedef Değer:</Text>
+        <Text style={{ fontSize: "14px" }}>Hedef Değer:</Text>
         <Controller
           name="hedefDeger"
           control={control}
-          rules={{ required: "Alan Boş Bırakılamaz!" }}
-          render={({ field, fieldState: { error } }) => (
+          render={({ field }) => (
             <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%", maxWidth: "200px" }}>
-              <InputNumber
-                {...field}
-                status={error ? "error" : ""}
-                min={0}
-                style={{ width: "200px" }}
-                precision={ondalikSayi}
-              />
-              {error && <div style={{ color: "red" }}>{error.message}</div>}
+              <InputNumber {...field} min={0} disabled style={{ width: "200px" }} precision={ondalikSayi} />
             </div>
           )}
         />
       </div>
       <div
         style={{
-          display: "flex",
+          display: "none",
           justifyContent: "space-between",
           alignItems: "center",
           gap: "10px",
@@ -412,6 +489,23 @@ export default function MainTabs() {
           name="maxDeger"
           control={control}
           render={({ field }) => <InputNumber {...field} disabled style={{ width: "200px" }} precision={ondalikSayi} />}
+        />
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "10px",
+          width: "100%",
+          maxWidth: "350px",
+          marginBottom: "10px",
+        }}>
+        <Text style={{ fontSize: "14px" }}>Durum:</Text>
+        <Controller
+          name="durum"
+          control={control}
+          render={({ field }) => <Input {...field} disabled style={{ width: "200px" }} />}
         />
       </div>
     </div>

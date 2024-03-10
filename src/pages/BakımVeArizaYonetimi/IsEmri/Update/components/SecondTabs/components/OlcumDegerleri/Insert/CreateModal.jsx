@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs } from "antd";
+import { Button, Modal, Input, Typography, Tabs, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../../api/http";
 import { Controller, useForm, FormProvider } from "react-hook-form";
@@ -66,9 +66,15 @@ export default function CreateModal({
         reset();
         setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
         onRefresh();
+        if (response.status_code === 200) {
+          message.success("Ekleme Başarılı.");
+        } else {
+          message.error("Ekleme Başarısız.");
+        }
       })
       .catch((error) => {
         console.error("Error sending data:", error);
+        message.error("Başarısız Olundu.");
       });
 
     console.log({ Body });

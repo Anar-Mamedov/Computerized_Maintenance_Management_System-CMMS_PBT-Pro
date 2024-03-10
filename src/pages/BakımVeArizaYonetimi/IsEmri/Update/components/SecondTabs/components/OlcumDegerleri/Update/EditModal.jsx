@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs } from "antd";
+import { Button, Modal, Input, Typography, Tabs, message } from "antd";
 import AxiosInstance from "../../../../../../../../../api/http";
 import { Controller, useForm, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
@@ -8,22 +8,21 @@ import MainTabs from "./MainTabs/MainTabs";
 export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh, secilenIsEmriID }) {
   const methods = useForm({
     defaultValues: {
+      birim: null,
+      birimID: "",
+      tarih: "",
+      saat: "",
       siraNo: "",
       secilenID: "",
-      isTanimi: "",
-      yapildi: false,
-      atolyeTanim: "",
-      atolyeID: "",
-      personelTanim: "",
-      personelID: "",
-      baslangicTarihi: "",
-      baslangicSaati: "",
-      vardiya: "",
-      vardiyaID: "",
-      bitisTarihi: "",
-      bitisSaati: "",
-      sure: "",
-      aciklama: "",
+      tanim: "",
+      olcumDegeri: 0,
+      fark: 0,
+      ondalikSayi: 0,
+      hedefDeger: 0,
+      limit: 0,
+      minDeger: 0,
+      maxDeger: 0,
+      durum: "",
       // Add other default values here
     },
   });
@@ -33,50 +32,30 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   useEffect(() => {
     if (isModalVisible && selectedRow) {
       setValue("secilenID", selectedRow.key);
-      setValue("siraNo", selectedRow.DKN_SIRANO);
-      setValue("isTanimi", selectedRow.DKN_TANIM);
-      setValue("yapildi", selectedRow.DKN_YAPILDI);
-      setValue("atolyeTanim", selectedRow.DKN_YAPILDI_ATOLYE_TANIM);
-      setValue("atolyeID", selectedRow.DKN_YAPILDI_ATOLYE_ID);
-      setValue("personelTanim", selectedRow.DKN_PERSONEL_ISIM);
-      setValue("personelID", selectedRow.DKN_YAPILDI_PERSONEL_ID);
+      setValue("siraNo", selectedRow.IDO_SIRANO);
       setValue(
-        "baslangicTarihi",
-        selectedRow.DKN_YAPILDI_TARIH
-          ? dayjs(selectedRow.DKN_YAPILDI_TARIH).isValid()
-            ? dayjs(selectedRow.DKN_YAPILDI_TARIH)
+        "tarih",
+        selectedRow.IDO_TARIH ? (dayjs(selectedRow.IDO_TARIH).isValid() ? dayjs(selectedRow.IDO_TARIH) : null) : null
+      );
+      setValue(
+        "saat",
+        selectedRow.IDO_SAAT
+          ? dayjs(selectedRow.IDO_SAAT, "HH:mm:ss").isValid()
+            ? dayjs(selectedRow.IDO_SAAT, "HH:mm:ss")
             : null
           : null
       );
-      setValue(
-        "baslangicSaati",
-        selectedRow.DKN_YAPILDI_SAAT
-          ? dayjs(selectedRow.DKN_YAPILDI_SAAT, "HH:mm:ss").isValid()
-            ? dayjs(selectedRow.DKN_YAPILDI_SAAT, "HH:mm:ss")
-            : null
-          : null
-      );
-
-      setValue("vardiya", selectedRow.DKN_YAPILDI_MESAI_KOD_TANIM);
-      setValue("vardiyaID", selectedRow.DKN_YAPILDI_MESAI_KOD_ID);
-      setValue(
-        "bitisTarihi",
-        selectedRow.DKN_BITIS_TARIH
-          ? dayjs(selectedRow.DKN_BITIS_TARIH).isValid()
-            ? dayjs(selectedRow.DKN_BITIS_TARIH)
-            : null
-          : null
-      );
-      setValue(
-        "bitisSaati",
-        selectedRow.DKN_BITIS_SAAT
-          ? dayjs(selectedRow.DKN_BITIS_SAAT, "HH:mm:ss").isValid()
-            ? dayjs(selectedRow.DKN_BITIS_SAAT, "HH:mm:ss")
-            : null
-          : null
-      );
-      setValue("sure", selectedRow.DKN_YAPILDI_SURE);
-      setValue("aciklama", selectedRow.DKN_ACIKLAMA);
+      setValue("tanim", selectedRow.IDO_TANIM);
+      setValue("birim", selectedRow.IDO_BIRIM);
+      setValue("birimID", selectedRow.IDO_BIRIM_KOD_ID);
+      setValue("olcumDegeri", selectedRow.IDO_OLCUM_DEGER);
+      setValue("fark", selectedRow.IDO_FARK);
+      setValue("ondalikSayi", selectedRow.IDO_FORMAT);
+      setValue("hedefDeger", selectedRow.IDO_HEDEF_DEGER);
+      setValue("limit", selectedRow.IDO_MIN_MAX_DEGER);
+      setValue("minDeger", selectedRow.IDO_MIN_DEGER);
+      setValue("maxDeger", selectedRow.IDO_MAX_DEGER);
+      setValue("durum", selectedRow.IDO_DURUM);
     }
   }, [selectedRow, isModalVisible, setValue]);
 
@@ -100,34 +79,37 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
 
   const onSubmited = (data) => {
     const Body = {
-      TB_ISEMRI_KONTROLLIST_ID: data.secilenID,
-      DKN_SIRANO: data.siraNo,
-      DKN_YAPILDI: data.yapildi,
-      DKN_TANIM: data.isTanimi,
-      DKN_OLUSTURAN_ID: 24,
-      // DKN_MALIYET: data.maliyet, // Maliyet diye bir alan yok frontda
-      DKN_YAPILDI_PERSONEL_ID: data.personelID,
-      DKN_YAPILDI_ATOLYE_ID: data.atolyeID,
-      DKN_YAPILDI_SURE: data.sure,
-      DKN_ACIKLAMA: data.aciklama,
-      DKN_YAPILDI_KOD_ID: -1,
-      DKN_REF_ID: -1,
-      DKN_YAPILDI_TARIH: formatDateWithDayjs(data.baslangicTarihi),
-      DKN_YAPILDI_SAAT: formatTimeWithDayjs(data.baslangicSaati),
-      DKN_BITIS_TARIH: formatDateWithDayjs(data.bitisTarihi),
-      DKN_BITIS_SAAT: formatTimeWithDayjs(data.bitisSaati),
-      DKN_YAPILDI_MESAI_KOD_ID: data.vardiyaID,
+      TB_ISEMRI_OLCUM_ID: data.secilenID,
+      IDO_TARIH: formatDateWithDayjs(data.tarih),
+      IDO_SAAT: formatTimeWithDayjs(data.saat),
+      IDO_SIRANO: data.siraNo,
+      IDO_TANIM: data.tanim,
+      IDO_FORMAT: data.ondalikSayi,
+      IDO_HEDEF_DEGER: data.hedefDeger,
+      IDO_MIN_MAX_DEGER: data.limit,
+      IDO_MIN_DEGER: data.minDeger,
+      IDO_MAX_DEGER: data.maxDeger,
+      IDO_BIRIM_KOD_ID: data.birimID,
+      IDO_OLCUM_DEGER: data.olcumDegeri,
+      IDO_FARK: data.fark,
+      IDO_DURUM: data.durum,
     };
 
-    AxiosInstance.post(`AddUpdateIsEmriKontrolList?isEmriId=${secilenIsEmriID}`, Body)
+    AxiosInstance.post(`AddUpdateIsEmriOlcumDegeri?isEmriId=${secilenIsEmriID}`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
         reset();
         onModalClose(); // Modal'ı kapat
         onRefresh(); // Tabloyu yenile
+        if (response.status_code === 200) {
+          message.success("Güncelleme Başarılı.");
+        } else {
+          message.error("Güncelleme Başarısız.");
+        }
       })
       .catch((error) => {
         console.error("Error sending data:", error);
+        message.error("Başarısız Olundu.");
       });
 
     console.log({ Body });
