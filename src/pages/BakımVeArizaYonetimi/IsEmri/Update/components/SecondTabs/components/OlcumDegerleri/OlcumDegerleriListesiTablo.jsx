@@ -13,6 +13,8 @@ export default function OlcumDegerleriListesiTablo() {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
+  const duzenlenmeTarihi = watch("duzenlenmeTarihi");
+  const duzenlenmeSaati = watch("duzenlenmeSaati");
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 
@@ -190,7 +192,12 @@ export default function OlcumDegerleriListesiTablo() {
 
   return (
     <div style={{ marginBottom: "25px" }}>
-      <CreateModal onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />
+      <CreateModal
+        onRefresh={refreshTable}
+        secilenIsEmriID={secilenIsEmriID}
+        duzenlenmeTarihi={duzenlenmeTarihi}
+        duzenlenmeSaati={duzenlenmeSaati}
+      />
       <Table
         rowSelection={{
           type: "radio",
