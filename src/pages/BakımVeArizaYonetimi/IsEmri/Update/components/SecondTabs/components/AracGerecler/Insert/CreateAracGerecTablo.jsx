@@ -1,13 +1,17 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Table } from "antd";
+import { Button, Modal, Table, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../../api/http";
+import { Controller, useFormContext } from "react-hook-form";
 
-export default function CreateAracGerecTablo({ workshopSelectedId, onSubmit }) {
+export default function CreateAracGerecTablo({ workshopSelectedId, onSubmit, onRefresh }) {
+  const { control, watch, setValue } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const secilenIsEmriID = watch("secilenIsEmriID");
 
   const columns = [
     {
@@ -69,12 +73,36 @@ export default function CreateAracGerecTablo({ workshopSelectedId, onSubmit }) {
     }
   };
 
-  const handleModalOk = () => {
+  const handleModalOk = async () => {
+    // Her bir seçilen için payload oluştur
+    const payloads = selectedRowKeys.map((id) => ({
+      IAG_ARAC_GEREC_ID: id,
+      ISL_OLUSTURAN_ID: 24,
+    }));
+
+    try {
+      // API'ye POST isteği gönder (Array olarak)
+      const response = await AxiosInstance.post(`AddUpdateIsEmriAracGerec?isEmriId=${secilenIsEmriID}`, payloads);
+      if (response.status_code === 200) {
+        // Başarılı bildirimi
+        message.success("Ekleme Başarılı.");
+        setIsModalVisible(false); // Modalı kapat
+        onRefresh(); // Verileri yenile
+      } else {
+        // Hata bildirimi
+        message.error("Ekleme Başarısız.");
+      }
+    } catch (error) {
+      console.error("API isteği sırasında bir hata oluştu:", error);
+      message.error("Başarısız Olundu.");
+    }
+
+    // Seçilen verileri işle
     const selectedData = data.filter((item) => selectedRowKeys.includes(item.key));
     if (selectedData.length > 0) {
       onSubmit && onSubmit(selectedData);
     }
-    setIsModalVisible(false);
+    setIsModalVisible(false); // Modalı her durumda kapat
   };
 
   useEffect(() => {
