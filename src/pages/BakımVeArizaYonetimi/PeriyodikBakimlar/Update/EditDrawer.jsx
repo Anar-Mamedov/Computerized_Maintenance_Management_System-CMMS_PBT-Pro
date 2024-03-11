@@ -1,6 +1,6 @@
 import tr_TR from "antd/es/locale/tr_TR";
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Drawer, Space, ConfigProvider, Modal, message } from "antd";
+import { Button, Drawer, Space, ConfigProvider, Modal, message, Tabs } from "antd";
 import React, { useEffect, useState, useTransition } from "react";
 import MainTabs from "./components/MainTabs/MainTabs";
 import { useForm, Controller, useFormContext, FormProvider, set } from "react-hook-form";
@@ -8,6 +8,38 @@ import dayjs from "dayjs";
 import AxiosInstance from "../../../../api/http";
 import Footer from "./components/Footer";
 import SecondTabs from "./components/SecondTabs/SecondTabs";
+import styled from "styled-components";
+import BakimPeriyotBilgiler from "./components/BakimPeriyotBilgileri/BakimPeriyotBilgiler";
+
+const StyledTabs = styled(Tabs)`
+  .ant-tabs-tab {
+    margin: 0 !important;
+    width: fit-content;
+    padding: 10px 15px;
+    justify-content: center;
+    background-color: rgba(230, 230, 230, 0.3);
+  }
+
+  .ant-tabs-tab-active {
+    background-color: #2bc77135;
+  }
+
+  .ant-tabs-nav .ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: rgba(0, 0, 0, 0.88) !important;
+  }
+
+  .ant-tabs-tab:hover .ant-tabs-tab-btn {
+    color: rgba(0, 0, 0, 0.88) !important;
+  }
+
+  .ant-tabs-tab:not(:first-child) {
+    border-left: 1px solid #80808024;
+  }
+
+  .ant-tabs-ink-bar {
+    background: #2bc770;
+  }
+`;
 
 export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
   const [, startTransition] = useTransition();
@@ -176,7 +208,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         onDrawerClose(); // Close the drawer
         onRefresh();
         reset();
-        
+
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("Güncelleme Başarılı.");
         } else {
@@ -260,6 +292,31 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     }
   }, [drawerVisible, reset]);
 
+  const items = [
+    {
+      key: "1",
+      label: "Bakım Bilgileri",
+      children: <>
+        <MainTabs />
+        <SecondTabs />
+      </>,
+    },
+    {
+      key: "2",
+      label: "Bakım Periyot Bilgileri",
+      children: <BakimPeriyotBilgiler />,
+    },
+    {
+      key: "3",
+      label: "Tanımlı Makineler",
+      // children: <Maliyetler />,
+    }
+  ];
+
+  const onChange = (key) => {
+    // console.log(key);
+  };
+
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)}>
@@ -274,9 +331,10 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             <PlusOutlined />
             Ekle
           </Button> */}
+
           <Drawer
             width="1460px"
-            title="Bakim Tanımını Güncelle"
+            title="Bakım Tanımını Güncelle"
             placement={"right"}
             onClose={handleDrawerClose}
             open={drawerVisible}
@@ -295,8 +353,9 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
                 </Button>
               </Space>
             }>
-            <MainTabs />
-            <SecondTabs />
+            <StyledTabs defaultActiveKey="1" items={items} onChange={onChange} />
+
+
             <Footer />
           </Drawer>
         </ConfigProvider>

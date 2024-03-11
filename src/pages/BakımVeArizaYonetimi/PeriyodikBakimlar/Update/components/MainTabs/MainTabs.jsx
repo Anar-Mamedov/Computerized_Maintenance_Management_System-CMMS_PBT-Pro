@@ -25,6 +25,7 @@ import TalimatTablo from "./components/TalimatTablo";
 import AtolyeTablo from "./components/AtolyeTablo";
 import FirmaTablo from "./components/FirmaTablo";
 import Periyot from "./components/Periyot";
+import TakvimTablo from "../../../Insert/components/MainTabs/components/TakvimTablo";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -122,20 +123,6 @@ export default function MainTabs() {
         marginBottom: "15px",
         gap: "20px",
       }}>
-      {/* number input okları kaldırma */}
-      <style>
-        {`
-      input[type='number']::-webkit-inner-spin-button,
-      input[type='number']::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-      }
-
-      input[type='number'] {
-        -moz-appearance: textfield;
-      }
-    `}
-      </style>
       <div
         style={{
           display: "flex",
@@ -155,12 +142,12 @@ export default function MainTabs() {
             gap: "10px",
             rowGap: "0px",
           }}>
-          <Text style={{ fontSize: "14px", fontWeight: "600" }}>Arıza Kodu:</Text>
+          <Text style={{ fontSize: "14px" }}>Bakım Kodu:</Text>
           <div
             style={{
               display: "flex",
-              // flexWrap: "wrap",
-              alignItems: "flex-start",
+              flexWrap: "wrap",
+              alignItems: "center",
               maxWidth: "300px",
               minWidth: "300px",
               gap: "10px",
@@ -169,13 +156,7 @@ export default function MainTabs() {
             <Controller
               name="bakimKodu"
               control={control}
-              rules={{ required: "Alan Boş Bırakılamaz!" }}
-              render={({ field, fieldState: { error } }) => (
-                <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
-                  <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
-                  {error && <div style={{ color: "red" }}>{error.message}</div>}
-                </div>
-              )}
+              render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
             />
             <Controller
               name="secilenBakimID"
@@ -193,10 +174,7 @@ export default function MainTabs() {
               control={control}
               defaultValue={true} // or true if you want it checked by default
               render={({ field }) => (
-                <Checkbox
-                  style={{ marginTop: "5px" }}
-                  checked={field.value}
-                  onChange={(e) => field.onChange(e.target.checked)}>
+                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
                   Aktif
                 </Checkbox>
               )}
@@ -213,7 +191,7 @@ export default function MainTabs() {
             width: "100%",
             justifyContent: "space-between",
           }}>
-          <Text style={{ fontSize: "14px", fontWeight: "600" }}>Arıza Tanımı:</Text>
+          <Text style={{ fontSize: "14px" }}>Bakım Tanımı:</Text>
           <div
             style={{
               display: "flex",
@@ -227,13 +205,7 @@ export default function MainTabs() {
             <Controller
               name="bakimTanimi"
               control={control}
-              rules={{ required: "Alan Boş Bırakılamaz!" }}
-              render={({ field, fieldState: { error } }) => (
-                <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
-                  <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
-                  {error && <div style={{ color: "red" }}>{error.message}</div>}
-                </div>
-              )}
+              render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
             />
           </div>
         </div>
@@ -259,27 +231,6 @@ export default function MainTabs() {
           }}>
           <BakimGrubu />
         </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-          }}>
-          <BakimNedeni />
-        </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          marginBottom: "15px",
-          flexDirection: "column",
-          gap: "10px",
-          width: "100%",
-          maxWidth: "450px",
-        }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
           <StyledDivBottomLine
             style={{
@@ -331,7 +282,17 @@ export default function MainTabs() {
             </div>
           </StyledDivBottomLine>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>handleTalimatMinusClick
+      </div>
+      <div
+        style={{
+          display: "flex",
+          marginBottom: "15px",
+          flexDirection: "column",
+          gap: "10px",
+          width: "100%",
+          maxWidth: "450px",
+        }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
           <StyledDivBottomLine
             style={{
               display: "flex",
@@ -478,6 +439,57 @@ export default function MainTabs() {
                 onSubmit={(selectedData) => {
                   setValue("firmaTanim", selectedData.subject);
                   setValue("firmaID", selectedData.key);
+                }}
+              />
+              <Button onClick={handleFirmaMinusClick}> - </Button>
+            </div>
+          </StyledDivBottomLine>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          <StyledDivBottomLine
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "space-between",
+              width: "100%",
+              maxWidth: "450px",
+            }}>
+            <Text style={{ fontSize: "14px" }}>Çalışma Takvimi:</Text>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "300px",
+              }}>
+              <Controller
+                name="calismaTakvim"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="text" // Set the type to "text" for name input
+                    style={{ width: "215px" }}
+                    disabled
+                  />
+                )}
+              />
+              <Controller
+                name="calismaTakvimID"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="text" // Set the type to "text" for name input
+                    style={{ display: "none" }}
+                  />
+                )}
+              />
+              <TakvimTablo
+                onSubmit={(selectedData) => {
+                  setValue("calismaTakvim", selectedData.subject);
+                  setValue("calismaTakvimID", selectedData.key);
                 }}
               />
               <Button onClick={handleFirmaMinusClick}> - </Button>
@@ -662,52 +674,6 @@ export default function MainTabs() {
             />
           </div>
         </StyledDivBottomLine>
-        <StyledDivBottomLine
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Uyarı:</Text>
-
-          <Controller
-            name="otonomBakim"
-            control={control}
-            render={({ field }) => (
-              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}></Checkbox>
-            )}
-          />
-        </StyledDivBottomLine>
-        {otonomBakimValue && (
-          <StyledDivBottomLine
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-              width: "100%",
-            }}>
-            <Text style={{ fontSize: "14px" }}>Uyarı Sıklığı:</Text>
-            <div
-              style={{
-                display: "flex",
-                width: "100%",
-                maxWidth: "300px",
-                alignItems: "center",
-                flexDirection: "row",
-                gap: "10px",
-              }}>
-              {/* <Periyot />
-              <Text style={{ fontSize: "14px" }}>Sıklık:</Text> */}
-              <Controller
-                name="periyotSiklik"
-                control={control}
-                render={({ field }) => <Input {...field} type="number" style={{ flex: 1 }} />}
-              />
-              <Text style={{ fontSize: "14px" }}>(Gün)</Text>
-            </div>
-          </StyledDivBottomLine>
-        )}
       </div>
     </div>
   );

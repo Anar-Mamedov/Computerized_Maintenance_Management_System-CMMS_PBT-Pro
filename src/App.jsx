@@ -25,6 +25,7 @@ import IsTalepleri from "./pages/YardimMasasi/IsTalepleri/IsTalepleri";
 import Hazirlaniyor from "./pages/Hazirlaniyor";
 import Auth from "./pages/Auth/Auth";
 import logo from "../src/assets/images/logoBeyaz.png";
+import PeriyodikBakimlar from "./pages/BakımVeArizaYonetimi/PeriyodikBakimlar/PeriyodikBakimlar";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -150,7 +151,7 @@ export default function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/isemri" element={<Isemri />} />
         <Route path="/isEmri1" element={<IsEmri />} />
-        <Route path="/peryodikBakimlar" element={<Hazirlaniyor />} />
+        <Route path="/peryodikBakimlar" element={<PeriyodikBakimlar />} />
         <Route path="/otomatikIsEmirleri" element={<Hazirlaniyor />} />
         <Route path="/planlamaTakvimi" element={<Hazirlaniyor />} />
         <Route path="/makine" element={<MakineTanim />} />
