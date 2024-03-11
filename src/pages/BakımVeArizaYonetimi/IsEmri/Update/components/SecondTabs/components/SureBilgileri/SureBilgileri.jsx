@@ -103,7 +103,7 @@ export default function SureBilgileri({ fieldRequirements }) {
       }
     `}
       </style>
-      <div style={{ display: "flex", gap: "10px" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
         <div
           style={{
             display: "flex",
