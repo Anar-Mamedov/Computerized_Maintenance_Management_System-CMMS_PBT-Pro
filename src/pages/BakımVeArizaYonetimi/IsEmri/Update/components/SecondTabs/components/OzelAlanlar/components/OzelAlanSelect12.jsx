@@ -30,7 +30,7 @@ export default function OzelAlanSelect12({ disabled, fieldRequirements }) {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get(`GetIsNeden?isTanimId=${prosedurTab}`);
+      const response = await AxiosInstance.get(`KodList?grup=50011`);
       if (response && response) {
         setOptions(response);
       }
@@ -58,7 +58,7 @@ export default function OzelAlanSelect12({ disabled, fieldRequirements }) {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddIsNeden?entity=${name}&isTanimId=${prosedurTab}`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=50011`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
