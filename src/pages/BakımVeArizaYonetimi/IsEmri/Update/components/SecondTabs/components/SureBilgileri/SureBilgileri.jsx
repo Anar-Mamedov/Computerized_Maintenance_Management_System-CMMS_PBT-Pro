@@ -378,7 +378,7 @@ export default function SureBilgileri({ fieldRequirements }) {
               width: "100%",
               justifyContent: "space-between",
             }}>
-            <Text style={{ fontSize: "14px" }}>Toplam İş Süresi:</Text>
+            <Text style={{ fontSize: "14px", fontWeight: "600" }}>Toplam İş Süresi:</Text>
             <div
               style={{
                 display: "flex",
@@ -391,14 +391,19 @@ export default function SureBilgileri({ fieldRequirements }) {
               <Controller
                 name="toplamIsSuresi"
                 control={control}
-                render={({ field }) => (
-                  <InputNumber
-                    {...field}
-                    min={0}
-                    disabled
-                    // max={59}
-                    style={{ width: "145px" }}
-                  />
+                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                render={({ field, fieldState: { error } }) => (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+                    <InputNumber
+                      {...field}
+                      status={error ? "error" : ""}
+                      min={0}
+                      disabled
+                      // max={59}
+                      style={{ width: "145px" }}
+                    />
+                    {error && <div style={{ color: "red" }}>{error.message}</div>}
+                  </div>
                 )}
               />
             </div>
