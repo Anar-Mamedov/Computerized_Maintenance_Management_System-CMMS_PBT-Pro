@@ -67,25 +67,37 @@ export default function Maliyetler({ fieldRequirements }) {
 
   // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın sonu
 
-  const lojistikSuresi = watch("lojistikSuresi");
-  const seyahatSuresi = watch("seyahatSuresi");
-  const onaySuresi = watch("onaySuresi");
-  const beklemeSuresi = watch("beklemeSuresi");
-  const digerSuresi = watch("digerSuresi");
-  const mudahaleSuresi = watch("mudahaleSuresi");
-  const calismaSuresi = watch("calismaSuresi");
+  const malzemeMaliyetiGercek = watch("malzemeMaliyetiGercek");
+  const iscilikMaliyetiGercek = watch("iscilikMaliyetiGercek");
+  const maliyet = watch("maliyet");
+  const genelGiderlerGercek = watch("genelGiderlerGercek");
+  const indirimGercek = watch("indirimGercek");
+  const kdvGercek = watch("kdvGercek");
   const toplamIsSuresi = watch("toplamIsSuresi");
 
   useEffect(() => {
-    if (lojistikSuresi || seyahatSuresi || onaySuresi || beklemeSuresi || digerSuresi) {
-      const mudahaleSuresi1 = lojistikSuresi + seyahatSuresi + onaySuresi + beklemeSuresi + digerSuresi;
-      setValue("mudahaleSuresi", mudahaleSuresi1);
+    if (
+      malzemeMaliyetiGercek ||
+      iscilikMaliyetiGercek ||
+      maliyet ||
+      genelGiderlerGercek ||
+      indirimGercek ||
+      kdvGercek
+    ) {
+      const toplamMaliyetGercek1 =
+        malzemeMaliyetiGercek + iscilikMaliyetiGercek + maliyet + genelGiderlerGercek + kdvGercek;
+      setValue("toplamMaliyetGercek", toplamMaliyetGercek1 - indirimGercek);
     }
-    if (mudahaleSuresi || calismaSuresi) {
-      const toplamIsSuresi1 = mudahaleSuresi + calismaSuresi;
-      setValue("toplamIsSuresi", toplamIsSuresi1);
-    }
-  }, [lojistikSuresi, seyahatSuresi, onaySuresi, beklemeSuresi, digerSuresi, mudahaleSuresi, calismaSuresi, setValue]);
+  }, [
+    malzemeMaliyetiGercek,
+    iscilikMaliyetiGercek,
+    maliyet,
+    genelGiderlerGercek,
+    indirimGercek,
+    kdvGercek,
+    toplamIsSuresi,
+    setValue,
+  ]);
 
   return (
     <div style={{ paddingBottom: "35px" }}>
