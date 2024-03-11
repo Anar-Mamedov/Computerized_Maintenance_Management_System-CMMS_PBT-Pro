@@ -54,7 +54,7 @@ export default function CreateAracGerecTablo({ workshopSelectedId, onSubmit, onR
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`GetAracGerec`)
+    AxiosInstance.get(`GetAracGerec?isEmrId=${secilenIsEmriID}`)
       .then((response) => {
         const fetchedData = response.ARAC_GEREC_LISTE.map((item) => ({
           ...item,
@@ -63,7 +63,7 @@ export default function CreateAracGerecTablo({ workshopSelectedId, onSubmit, onR
         setData(fetchedData);
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [secilenIsEmriID]);
 
   const handleModalToggle = () => {
     setIsModalVisible((prev) => !prev);
