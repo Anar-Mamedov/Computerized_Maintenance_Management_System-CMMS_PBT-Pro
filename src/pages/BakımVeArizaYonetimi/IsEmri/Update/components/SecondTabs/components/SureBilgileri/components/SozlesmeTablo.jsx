@@ -1,19 +1,20 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table } from "antd";
-import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
-import { useFormContext } from "react-hook-form";
-import AxiosInstance from "../../../../../../../../api/http";
-import CreateModal from "./Insert/CreateModal";
-import EditModal from "./Update/EditModal";
-import CreateAracGerecTablo from "./Insert/CreateAracGerecTablo";
+import { Controller, useFormContext } from "react-hook-form";
+import AxiosInstance from "../../../../../../../../../api/http";
 
-export default function AracGereclerListesiTablo() {
-  const [loading, setLoading] = useState(false);
-  const { control, watch, setValue } = useFormContext();
-  const [data, setData] = useState([]);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+export default function SozlesmeTablo({ workshopSelectedId, onSubmit }) {
+  const {
+    control,
+    watch,
+    setValue,
+    getValues,
+    formState: { errors },
+  } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 
@@ -84,106 +85,103 @@ export default function AracGereclerListesiTablo() {
 
   const columns = [
     {
-      title: "Kodu",
-      dataIndex: "ARG_KOD",
-      key: "ARG_KOD",
-      width: 200,
+      title: "Sözleşme No",
+      dataIndex: "CAS_SOZLESME_NO",
+      key: "CAS_SOZLESME_NO",
+      width: "150px",
       ellipsis: true,
     },
     {
-      title: "Tanım",
-      dataIndex: "ARG_TANIM",
-      key: "ARG_TANIM",
-      width: 300,
+      title: "Sözleşme Tanımı",
+      dataIndex: "CAS_TANIM",
+      key: "CAS_TANIM",
+      width: "250px",
       ellipsis: true,
     },
     {
-      title: "Tipi",
-      dataIndex: "ARG_TIP_TANIM",
-      key: "ARG_TIP_TANIM",
-      width: 200,
+      title: "Başlama Tarihi",
+      dataIndex: "CAS_BASLANGIC_TARIH",
+      key: "CAS_BASLANGIC_TARIH",
+      width: "150px",
+      ellipsis: true,
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Kalan Gün",
+      dataIndex: "CAS_KALAN_GUN",
+      key: "CAS_KALAN_GUN",
+      width: "150px",
       ellipsis: true,
     },
     {
-      title: "Bulunduğu Yer",
-      dataIndex: "ARG_YER_TANIM",
-      key: "ARG_YER_TANIM",
-      width: 200,
+      title: "Bitiş Tarihi",
+      dataIndex: "CAS_BITIS_TARIH",
+      key: "CAS_BITIS_TARIH",
+      width: "150px",
       ellipsis: true,
+      render: (text) => formatDate(text),
     },
   ];
 
-  const secilenIsEmriID = watch("secilenIsEmriID");
+  const firmaID = watch("firmaID") || 0;
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`FetchIsEmriAracGerec?isemriID=${secilenIsEmriID}`)
+    AxiosInstance.get(`GetSozlesmeler?firmaId=${firmaID}`)
       .then((response) => {
-        const fetchedData = response.ARAC_GEREC_LISTE.map((item) => ({
+        const fetchedData = response.Sozlesme_Liste.map((item) => ({
           ...item,
-          key: item.TB_ARAC_GEREC_ID,
+          key: item.TB_CARI_SOZLESME_ID,
         }));
         setData(fetchedData);
       })
-      .catch((error) => {
-        // Hata işleme
-        console.error("API isteği sırasında hata oluştu:", error);
-      })
       .finally(() => setLoading(false));
-  }, [secilenIsEmriID]); // secilenIsEmriID değiştiğinde fetch fonksiyonunu güncelle
+  }, [firmaID]);
+
+  const handleModalToggle = () => {
+    setIsModalVisible((prev) => !prev);
+    if (!isModalVisible) {
+      fetch();
+      setSelectedRowKeys([]);
+    }
+  };
+
+  const handleModalOk = () => {
+    const selectedData = data.find((item) => item.key === selectedRowKeys[0]);
+    if (selectedData) {
+      onSubmit && onSubmit(selectedData);
+    }
+    setIsModalVisible(false);
+  };
 
   useEffect(() => {
-    if (secilenIsEmriID) {
-      // secilenIsEmriID'nin varlığını ve geçerliliğini kontrol edin
-      fetch(); // fetch fonksiyonunu çağırın
-    }
-  }, [secilenIsEmriID, fetch]); // secilenIsEmriID veya fetch fonksiyonu değiştiğinde useEffect'i tetikle
+    setSelectedRowKeys(workshopSelectedId ? [workshopSelectedId] : []);
+  }, [workshopSelectedId]);
 
   const onRowSelectChange = (selectedKeys) => {
     setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
   };
-
-  const onRowClick = (record) => {
-    setSelectedRow(record);
-    setIsModalVisible(true);
-  };
-
-  const refreshTable = useCallback(() => {
-    fetch(); // fetch fonksiyonu tabloyu yeniler
-  }, [fetch]);
-
   return (
-    <div style={{ marginBottom: "25px" }}>
-      <CreateAracGerecTablo onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />
-      <Table
-        rowSelection={{
-          type: "radio",
-          selectedRowKeys,
-          onChange: onRowSelectChange,
-        }}
-        onRow={(record) => ({
-          onClick: () => onRowClick(record),
-        })}
-        columns={columns}
-        dataSource={data}
-        loading={loading}
-        scroll={{
-          // x: "auto",
-          y: "calc(100vh - 360px)",
-        }}
-      />
-      {/* {isModalVisible && (
-        <EditModal
-          selectedRow={selectedRow}
-          isModalVisible={isModalVisible}
-          onModalClose={() => {
-            setIsModalVisible(false);
-            setSelectedRow(null);
+    <div>
+      <Button onClick={handleModalToggle}> + </Button>
+      <Modal
+        width={1200}
+        centered
+        title="Atölye Tanımları"
+        open={isModalVisible}
+        onOk={handleModalOk}
+        onCancel={handleModalToggle}>
+        <Table
+          rowSelection={{
+            type: "radio",
+            selectedRowKeys,
+            onChange: onRowSelectChange,
           }}
-          onRefresh={refreshTable}
-          secilenIsEmriID={secilenIsEmriID}
+          columns={columns}
+          dataSource={data}
+          loading={loading}
         />
-      )} */}
+      </Modal>
     </div>
   );
 }
