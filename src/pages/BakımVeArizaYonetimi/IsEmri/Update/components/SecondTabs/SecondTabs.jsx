@@ -12,6 +12,8 @@ import OlcumDegerleriListesiTablo from "./components/OlcumDegerleri/OlcumDegerle
 import AracGereclerListesiTablo from "./components/AracGerecler/AracGereclerListesiTablo";
 import SureBilgileri from "./components/SureBilgileri/SureBilgileri";
 import Maliyetler from "./components/Maliyetler/Maliyetler";
+import Notlar from "./components/Notlar/Notlar";
+import Aciklama from "./components/Aciklama/Aciklama";
 
 const onChange = (key) => {
   // console.log(key);
@@ -103,6 +105,16 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
       key: "10",
       label: "Özel Alanlar",
       children: <OzelAlanlar fieldRequirements={fieldRequirements} />,
+    },
+    {
+      key: "11",
+      label: "Notlar",
+      children: <Notlar fieldRequirements={fieldRequirements} />,
+    },
+    {
+      key: "12",
+      label: "Açıklama",
+      children: <Aciklama fieldRequirements={fieldRequirements} />,
     },
   ];
 
