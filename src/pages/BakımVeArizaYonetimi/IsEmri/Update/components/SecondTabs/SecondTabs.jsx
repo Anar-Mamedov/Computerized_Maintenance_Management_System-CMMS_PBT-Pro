@@ -10,6 +10,7 @@ import MalzemeListesiTablo from "./components/Malzeme/MalzemeListesiTablo";
 import DuruslarListesiTablo from "./components/Duruslar/DuruslarListesiTablo";
 import OlcumDegerleriListesiTablo from "./components/OlcumDegerleri/OlcumDegerleriListesiTablo";
 import AracGereclerListesiTablo from "./components/AracGerecler/AracGereclerListesiTablo";
+import SureBilgileri from "./components/SureBilgileri/SureBilgileri";
 
 const onChange = (key) => {
   // console.log(key);
@@ -76,6 +77,11 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
       key: "5",
       label: "Duruşlar",
       children: <DuruslarListesiTablo fieldRequirements={fieldRequirements} />,
+    },
+    {
+      key: "6",
+      label: "Süre Bilgileri",
+      children: <SureBilgileri fieldRequirements={fieldRequirements} />,
     },
     {
       key: "8",
