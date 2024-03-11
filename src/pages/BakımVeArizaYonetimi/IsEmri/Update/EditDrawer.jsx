@@ -100,6 +100,20 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       mudahaleSuresi: 0,
       calismaSuresi: 0,
       toplamIsSuresi: 0,
+      // Maliyetler tabı
+      malzemeMaliyetiGercek: 0,
+      malzemeMaliyetiOngorulen: 0,
+      iscilikMaliyetiGercek: 0,
+      iscilikMaliyetiOngorulen: 0,
+      disServisMaliyetiOngorulen: 0,
+      genelGiderlerGercek: 0,
+      genelGiderlerOngorulen: 0,
+      indirimGercek: 0,
+      indirimOngorulen: 0,
+      kdvGercek: 0,
+      kdvOngorulen: 0,
+      toplamMaliyetGercek: 0,
+      toplamMaliyetOngorulen: 0,
       // Özel alanlar
       ozelAlan1: "",
       ozelAlan2: "",
@@ -121,6 +135,10 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       ozelAlan18: "",
       ozelAlan19: "",
       ozelAlan20: "",
+      // Notlar
+      notlar: "",
+      //Açıklama
+      isEmriAciklama: "",
       // ... Tüm default değerleriniz
     },
   });
@@ -389,7 +407,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
                 : null
               : null
           );
-          setValue("maliyet", item.ISM_MALIYET_KDV);
+          setValue("maliyet", item.ISM_MALIYET_DISSERVIS);
           setValue("garantiKapsami", item.GARANTI);
 
           // ... Diğer setValue çağrıları
@@ -457,8 +475,50 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       ISM_FIRMA_SOZLESME_ID: data.sozlesmeID,
       ISM_EVRAK_NO: data.evrakNo,
       ISM_EVRAK_TARIHI: formatDateWithDayjs(data.evrakTarihi),
-      ISM_MALIYET_KDV: data.maliyet,
+      // ISM_MALIYET_DISSERVIS: data.maliyet,
       ISM_GARANTI_KAPSAMINDA: data.garantiKapsami,
+      // Süre Bilgileri tabı
+      ISM_SURE_MUDAHALE_LOJISTIK: data.lojistikSuresi,
+      ISM_SURE_MUDAHALE_SEYAHAT: data.seyahatSuresi,
+      ISM_SURE_MUDAHALE_ONAY: data.onaySuresi,
+      ISM_SURE_BEKLEME: data.beklemeSuresi,
+      ISM_SURE_MUDAHALE_DIGER: data.digerSuresi,
+      ISM_SURE_PLAN_MUDAHALE: data.mudahaleSuresi,
+      ISM_SURE_PLAN_CALISMA: data.calismaSuresi,
+      ISM_SURE_TOPLAM: data.toplamIsSuresi,
+      // Maliyetler tabı
+      ISM_MALIYET_MLZ: data.malzemeMaliyetiGercek,
+      ISM_MALIYET_PERSONEL: data.iscilikMaliyetiGercek,
+      ISM_MALIYET_DISSERVIS: data.maliyet,
+      ISM_MALIYET_DIGER: data.genelGiderlerGercek,
+      ISM_MALIYET_INDIRIM: data.indirimGercek,
+      ISM_MALIYET_KDV: data.kdvGercek,
+      ISM_MALIYET_TOPLAM: data.toplamMaliyetGercek,
+      // Özel alanlar
+      OZEL_ALAN_1: data.ozelAlan1,
+      OZEL_ALAN_2: data.ozelAlan2,
+      OZEL_ALAN_3: data.ozelAlan3,
+      OZEL_ALAN_4: data.ozelAlan4,
+      OZEL_ALAN_5: data.ozelAlan5,
+      OZEL_ALAN_6: data.ozelAlan6,
+      OZEL_ALAN_7: data.ozelAlan7,
+      OZEL_ALAN_8: data.ozelAlan8,
+      OZEL_ALAN_9: data.ozelAlan9,
+      OZEL_ALAN_10: data.ozelAlan10,
+      ISM_OZEL_ALAN_11_KOD_ID: data.ozelAlan11ID,
+      ISM_OZEL_ALAN_12_KOD_ID: data.ozelAlan12ID,
+      ISM_OZEL_ALAN_13_KOD_ID: data.ozelAlan13ID,
+      ISM_OZEL_ALAN_14_KOD_ID: data.ozelAlan14ID,
+      ISM_OZEL_ALAN_15_KOD_ID: data.ozelAlan15ID,
+      OZEL_ALAN_16: data.ozelAlan16,
+      OZEL_ALAN_17: data.ozelAlan17,
+      OZEL_ALAN_18: data.ozelAlan18,
+      OZEL_ALAN_19: data.ozelAlan19,
+      OZEL_ALAN_20: data.ozelAlan20,
+      // Notlar
+      ICERDEKI_NOT: data.notlar,
+      //Açıklama
+      ISM_ACIKLAMA: data.isEmriAciklama,
       // Diğer alanlarınız...
     };
 
