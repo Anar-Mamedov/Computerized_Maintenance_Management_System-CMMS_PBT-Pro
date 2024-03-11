@@ -198,28 +198,28 @@ export default function MainTabs() {
     setValue("maliyet", maliyet > 0 ? maliyet : 0);
   }, [calismaSuresi, saatUcreti, mesaiSuresi, mesaiUcreti, setValue]);
 
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageUrl, setImageUrl] = useState(null);
 
   useEffect(() => {
-    AxiosInstance.get(`/ResimGetirById?id=37`, { responseType: "blob" }) // "responseType: 'blob'" önemli!
+    // responseType olarak 'blob' seçilir.
+    AxiosInstance.get(`ResimGetirById?id=37`, { responseType: "blob" })
       .then((response) => {
-        const blob = response;
-        const url = URL.createObjectURL(blob); // Create an object URL for the blob
-        setImageUrl(url); // Set the object URL as the image source
-
-        return () => {
-          URL.revokeObjectURL(url); // Clean up the object URL
-        };
+        // Yanıttaki blob verisi bir URL'ye dönüştürülür.
+        const imageBlob = response;
+        const imageObjectURL = URL.createObjectURL(imageBlob);
+        setImageUrl(imageObjectURL);
       })
-      .catch((error) => console.error("Error fetching image:", error));
+      .catch((error) => {
+        console.error("Error fetching image:", error);
+      });
 
-    // Clean up function to revoke the object URL when the component unmounts or the image changes
+    // Component unmount olduğunda veya resim değiştiğinde oluşturulan URL iptal edilir.
     return () => {
       if (imageUrl) {
         URL.revokeObjectURL(imageUrl);
       }
     };
-  }, []); // Depend array boş çünkü bu efekt sadece component mount edildiğinde çalışmalı
+  }, []); // Dependency array'e imageUrl eklenir.
 
   return (
     <div>
