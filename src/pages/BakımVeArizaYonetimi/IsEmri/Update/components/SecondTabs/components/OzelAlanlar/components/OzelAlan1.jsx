@@ -65,8 +65,6 @@ export default function OzelAlan1({ label, onModalClose }) {
     }
   };
 
-  console.log("label", label);
-
   return (
     <FormProvider {...methods}>
       {contextHolder}

@@ -4,17 +4,6 @@ import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import dayjs from "dayjs";
 import { useAppContext } from "../../../../../../../../AppContext"; // Context hook'unu import edin
-import ProsedurTablo from "./components/ProsedurTablo";
-import ProsedurTipi from "./components/ProsedurTipi";
-import ProsedurNedeni from "./components/ProsedurNedeni";
-import OncelikTablo from "./components/OncelikTablo";
-import AtolyeTablo from "./components/AtolyeTablo";
-import TalimatTablo from "./components/TalimatTablo";
-import TakvimTablo from "./components/TakvimTablo";
-import MasrafMerkeziTablo from "./components/MasrafMerkeziTablo";
-import ProjeTablo from "./components/ProjeTablo";
-import FirmaTablo from "./components/FirmaTablo";
-import SozlesmeTablo from "./components/SozlesmeTablo";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -55,67 +44,6 @@ export default function SureBilgileri({ fieldRequirements }) {
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
 
-  // iş emri tipi selectboxu değiştiğinde prosedür ve ondan sonraki 3 fieldin değerlerini sıfırlamak için Context API kullanarak
-  useEffect(() => {
-    if (previousSelectedOption !== undefined && previousSelectedOption !== selectedOption) {
-      // İlk render'da değil ve selectedOption değiştiğinde çalışacak kod
-      handleProsedurMinusClick();
-    }
-  }, [selectedOption, previousSelectedOption]); // Bağımlılıklara previousSelectedOption ekleyin
-
-  // iş emri tipi selectboxu değiştiğinde prosedür ve ondan sonraki 3 fieldin değerlerini sıfırlamak için son
-
-  const prosedurTab = watch("prosedurTab");
-
-  const handleProsedurMinusClick = () => {
-    setValue("prosedur", "");
-    setValue("prosedurID", "");
-    setValue("konu", "");
-    setValue("prosedurTipi", null);
-    setValue("prosedurTipiID", "");
-    setValue("prosedurNedeni", null);
-    setValue("prosedurNedeniID", "");
-  };
-
-  const handleOncelikMinusClick = () => {
-    setValue("oncelikTanim", "");
-    setValue("oncelikID", "");
-  };
-
-  const handleAtolyeMinusClick = () => {
-    setValue("atolyeTanim", "");
-    setValue("atolyeID", "");
-  };
-
-  const handleTalimatMinusClick = () => {
-    setValue("talimatTanim", "");
-    setValue("talimatID", "");
-  };
-
-  const handleTakvimMinusClick = () => {
-    setValue("takvimTanim", "");
-    setValue("takvimID", "");
-  };
-
-  const handleMasrafMerkeziMinusClick = () => {
-    setValue("masrafMerkezi", "");
-    setValue("masrafMerkeziID", "");
-  };
-  const handleProjeMinusClick = () => {
-    setValue("proje", "");
-    setValue("projeID", "");
-  };
-
-  const handleFirmaMinusClick = () => {
-    setValue("firma", "");
-    setValue("firmaID", "");
-  };
-
-  const handleSozlesmeMinusClick = () => {
-    setValue("sozlesme", "");
-    setValue("sozlesmeID", "");
-  };
-
   // date picker için tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
   // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın
@@ -138,33 +66,6 @@ export default function SureBilgileri({ fieldRequirements }) {
   }, []);
 
   // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın sonu
-
-  //! Başlama Tarihi ve saati ile Bitiş Tarihi ve saati arasındaki farkı hesaplama
-
-  // Watch for changes in the relevant fields
-  const watchFields = watch(["baslamaZamani", "baslamaZamaniSaati", "bitisZamani", "bitisZamaniSaati"]);
-
-  React.useEffect(() => {
-    const { baslamaZamani, baslamaZamaniSaati, bitisZamani, bitisZamaniSaati } = getValues();
-    if (baslamaZamani && baslamaZamaniSaati && bitisZamani && bitisZamaniSaati) {
-      // Başlangıç ve bitiş tarih/saatini birleştir
-      const startDateTime = dayjs(baslamaZamani).hour(baslamaZamaniSaati.hour()).minute(baslamaZamaniSaati.minute());
-      const endDateTime = dayjs(bitisZamani).hour(bitisZamaniSaati.hour()).minute(bitisZamaniSaati.minute());
-
-      // İki tarih/saat arasındaki farkı milisaniye cinsinden hesapla
-      const diff = endDateTime.diff(startDateTime);
-
-      // Farkı saat ve dakikaya dönüştür
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-      // Hesaplanan saat ve dakikaları form alanlarına yaz
-      setValue("calismaSaat", hours);
-      setValue("calismaDakika", minutes);
-    }
-  }, [watchFields, setValue, getValues]);
-
-  //! Başlama Tarihi ve saati ile Bitiş Tarihi ve saati arasındaki farkı hesaplama sonu
 
   const lojistikSuresi = watch("lojistikSuresi");
   const seyahatSuresi = watch("seyahatSuresi");

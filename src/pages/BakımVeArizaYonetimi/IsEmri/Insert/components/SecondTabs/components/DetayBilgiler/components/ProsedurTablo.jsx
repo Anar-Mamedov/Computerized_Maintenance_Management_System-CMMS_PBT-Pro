@@ -47,7 +47,6 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
   const [loading, setLoading] = useState(false);
 
   const prosedurTab = watch("prosedurTab");
-  console.log("prosedurTab", prosedurTab);
 
   const columns1 = [
     {
