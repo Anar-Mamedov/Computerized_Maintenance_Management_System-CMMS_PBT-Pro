@@ -331,7 +331,7 @@ export default function MainTabs() {
             </div>
           </StyledDivBottomLine>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>handleTalimatMinusClick
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
           <StyledDivBottomLine
             style={{
               display: "flex",
