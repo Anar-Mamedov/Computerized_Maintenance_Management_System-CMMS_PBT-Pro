@@ -127,7 +127,12 @@ export default function Maliyetler({ fieldRequirements }) {
           <div style={{ borderBottom: "1px solid #e8e8e8", marginBottom: "5px", paddingBottom: "5px", width: "100%" }}>
             <Text style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}>Maliyetler</Text>
           </div>
-
+          <div style={{ width: "100%", maxWidth: "450px" }}>
+            <div style={{ width: "300px", display: "flex", justifyContent: "space-between", float: "inline-end" }}>
+              <Text style={{ fontSize: "14px" }}>Gerçekleşen</Text>
+              <Text style={{ fontSize: "14px", width: "145px" }}>Öngörülen</Text>
+            </div>
+          </div>
           <div
             style={{
               display: "flex",

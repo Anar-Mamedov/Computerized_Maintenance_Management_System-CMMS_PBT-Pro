@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { Button, Drawer, Space, ConfigProvider, Modal } from "antd";
+import { Button, Drawer, Space, ConfigProvider, Modal, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import tr_TR from "antd/es/locale/tr_TR";
 import AxiosInstance from "../../../../api/http";
@@ -310,9 +310,15 @@ export default function CreateDrawer({ onRefresh }) {
         setOpen(false);
         onRefresh();
         methods.reset();
+        if (response.status_code === 200 || response.status_code === 201) {
+          message.success("Ekleme Başarılı.");
+        } else {
+          message.error("Ekleme Başarısız.");
+        }
       })
       .catch((error) => {
         console.error("Error sending data:", error);
+        message.error("Başarısız Olundu.");
       });
     console.log({ Body });
   };
