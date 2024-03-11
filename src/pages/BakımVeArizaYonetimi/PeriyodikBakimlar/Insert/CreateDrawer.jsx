@@ -1,6 +1,6 @@
 import tr_TR from "antd/es/locale/tr_TR";
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Drawer, Space, ConfigProvider, Modal, message } from "antd";
+import { Button, Drawer, Space, ConfigProvider, Modal } from "antd";
 import React, { useEffect, useState } from "react";
 import MainTabs from "./components/MainTabs/MainTabs";
 import { useForm, Controller, useFormContext, FormProvider } from "react-hook-form";
@@ -41,34 +41,15 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
   //* export
   const methods = useForm({
     defaultValues: {
-      bakimKodu: "",
-      secilenBakimID: "",
-      bakimTanimi: "",
-      bakimAktif: true,
-      bakimTipi: null,
-      bakimTipiID: "",
-      bakimGrubu: null,
-      bakimGrubuID: "",
-      bakimNedeni: null,
-      bakimNedeniID: "",
-      oncelikTanim: "",
-      oncelikID: "",
-      talimatTanim: "",
-      talimatID: "",
-      atolyeTanim: "",
-      atolyeID: "",
-      firmaTanim: "",
-      firmaID: "",
-      lokasyonTanim: "",
-      lokasyonID: "",
-      calismaSuresi: "",
-      durusSuresi: "",
-      personelSayisi: "",
-      otonomBakim: false,
-      periyot: "",
-      periyotID: "",
-      periyotLabel: "",
-      periyotSiklik: "",
+      atolyeKodu: "",
+      secilenID: "",
+      atolyeAktif: true,
+      atolyeTanimi: "",
+      atolyeGrubu: null,
+      atolyeGrubuID: "",
+      atolyeTelefon: "",
+      yetkili: "",
+      yetkiliEmail: "",
     },
   });
 
@@ -87,23 +68,14 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
   //* export
   const onSubmit = (data) => {
     const Body = {
-      IST_KOD: data.bakimKodu,
-      IST_TANIM: data.bakimTanimi,
-      IST_TIP_KOD_ID: data.bakimTipiID,
-      IST_GRUP_KOD_ID: data.bakimGrubuID,
-      IST_NEDEN_KOD_ID: data.bakimNedeniID,
-      IST_ONCELIK_ID: data.oncelikID,
-      IST_TALIMAT_ID: data.talimatID,
-      IST_ATOLYE_ID: data.atolyeID,
-      IST_FIRMA_ID: data.firmaID,
-      IST_LOKASYON_ID: data.lokasyonID,
-      IST_CALISMA_SURE: data.calismaSuresi,
-      IST_DURUS_SURE: data.durusSuresi,
-      IST_PERSONEL_SAYI: data.personelSayisi,
-      IST_OTONOM_BAKIM: data.otonomBakim,
-      IST_UYARI_SIKLIGI: data.periyotSiklik,
-      IST_UYARI_PERIYOT: data.periyotID,
-      IST_AKTIF: data.bakimAktif,
+      ATL_KOD: data.atolyeKodu,
+      ATL_TANIM: data.atolyeTanimi,
+      ATL_ATOLYE_GRUP_ID: data.atolyeGrubuID,
+      ATL_TEL: data.atolyeTelefon,
+      ATL_AKTIF: data.atolyeAktif,
+      ATL_YETKILI: data.yetkili,
+      ATL_YETKILI_MAIL: data.yetkiliEmail,
+
       // add more fields as needed
     };
 
@@ -111,24 +83,17 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
     // handle response
     // });
 
-    AxiosInstance.post("AddBakim", Body)
+    AxiosInstance.post("AddAtolye", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);
         setOpen(false);
         onRefresh();
         reset();
-
-        if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Güncelleme Başarılı.");
-        } else {
-          message.error("Güncelleme Başarısız.");
-        }
       })
       .catch((error) => {
         // Handle errors here, e.g.:
         console.error("Error sending data:", error);
-        message.error("Başarısız Olundu.");
       });
     console.log({ Body });
   };
@@ -142,6 +107,22 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
       });
     }
   }, [selectedLokasyonId, methods]);
+
+  // otonom sayaç için
+  useEffect(() => {
+    if (open) {
+      AxiosInstance.get("AtolyeKodGetir") // Replace with your actual API endpoint
+        .then((response) => {
+          // Assuming the response contains the new work order number in 'response.Tanim'
+          setValue("atolyeKodu", response);
+        })
+        .catch((error) => {
+          console.error("Error fetching new work order number:", error);
+        });
+    }
+  }, [open, setValue]);
+
+  // otonom sayaç için son
 
   return (
     <FormProvider {...methods}>
