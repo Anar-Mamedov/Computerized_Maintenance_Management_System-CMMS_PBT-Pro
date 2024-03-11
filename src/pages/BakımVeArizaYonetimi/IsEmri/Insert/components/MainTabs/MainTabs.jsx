@@ -539,7 +539,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
               Lokasyon:
             </Text>
             <div>
-              <div style={{ display: "flex", gap: "5px" }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
                 <div
                   className="anar"
                   style={{
@@ -614,7 +614,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
               }}>
               <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.makine ? "600" : "normal" }}>Makine:</Text>
               <div style={{ display: "flex", flexWrap: "wrap", flexDirection: "column" }}>
-                <div style={{ display: "flex", gap: "5px" }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
                   <div
                     style={{
                       display: "flex",
@@ -693,7 +693,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 Garanti Bitiş:
               </Text>
               <div style={{ display: "flex", flexWrap: "wrap", flexDirection: "column" }}>
-                <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", alignItems: "center" }}>
                   <div
                     style={{
                       display: "flex",
@@ -745,7 +745,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 Ekipman:
               </Text>
               <div style={{ display: "flex", flexWrap: "wrap", flexDirection: "column" }}>
-                <div style={{ display: "flex", gap: "5px" }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
                   <div
                     style={{
                       display: "flex",
