@@ -410,6 +410,57 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("maliyet", item.ISM_MALIYET_DISSERVIS);
           setValue("garantiKapsami", item.GARANTI);
 
+          // Süre Bilgileri tabı
+          setValue("lojistikSuresi", item.ISM_SURE_MUDAHALE_LOJISTIK);
+          setValue("seyahatSuresi", item.ISM_SURE_MUDAHALE_SEYAHAT);
+          setValue("onaySuresi", item.ISM_SURE_MUDAHALE_ONAY);
+          setValue("beklemeSuresi", item.ISM_SURE_BEKLEME);
+          setValue("digerSuresi", item.ISM_SURE_MUDAHALE_DIGER);
+          setValue("mudahaleSuresi", item.ISM_SURE_PLAN_MUDAHALE);
+          setValue("calismaSuresi", item.ISM_SURE_PLAN_CALISMA);
+          setValue("toplamIsSuresi", item.ISM_SURE_TOPLAM);
+
+          // Maliyetler tabı
+          setValue("malzemeMaliyetiGercek", item.ISM_MALIYET_MLZ);
+          setValue("malzemeMaliyetiOngorulen", item.ISM_MALIYET_MLZ_O);
+          setValue("iscilikMaliyetiGercek", item.ISM_MALIYET_ISC);
+          setValue("iscilikMaliyetiOngorulen", item.ISM_MALIYET_ISC_O);
+          setValue("disServisMaliyetiOngorulen", item.ISM_MALIYET_DISSERVIS_O);
+          setValue("genelGiderlerGercek", item.ISM_MALIYET_GENELGIDER);
+          setValue("genelGiderlerOngorulen", item.ISM_MALIYET_GENELGIDER_O);
+          setValue("indirimGercek", item.ISM_MALIYET_INDIRIM);
+          setValue("indirimOngorulen", item.ISM_MALIYET_INDIRIM_O);
+          setValue("kdvGercek", item.ISM_MALIYET_KDV);
+          setValue("kdvOngorulen", item.ISM_MALIYET_KDV_O);
+          setValue("toplamMaliyetGercek", item.ISM_MALIYET_TOPLAM);
+          setValue("toplamMaliyetOngorulen", item.ISM_MALIYET_TOPLAM_O);
+
+          // Özel alanlar
+          setValue("ozelAlan1", item.OZEL_ALAN_1);
+          setValue("ozelAlan2", item.OZEL_ALAN_2);
+          setValue("ozelAlan3", item.OZEL_ALAN_3);
+          setValue("ozelAlan4", item.OZEL_ALAN_4);
+          setValue("ozelAlan5", item.OZEL_ALAN_5);
+          setValue("ozelAlan6", item.OZEL_ALAN_6);
+          setValue("ozelAlan7", item.OZEL_ALAN_7);
+          setValue("ozelAlan8", item.OZEL_ALAN_8);
+          setValue("ozelAlan9", item.OZEL_ALAN_9);
+          setValue("ozelAlan10", item.OZEL_ALAN_10);
+          setValue("ozelAlan11", item.OZEL_ALAN_11);
+          setValue("ozelAlan11", item.ISM_OZEL_ALAN_11_KOD_ID);
+          setValue("ozelAlan12", item.OZEL_ALAN_12);
+          setValue("ozelAlan12", item.ISM_OZEL_ALAN_12_KOD_ID);
+          setValue("ozelAlan13", item.OZEL_ALAN_13);
+          setValue("ozelAlan13", item.ISM_OZEL_ALAN_13_KOD_ID);
+          setValue("ozelAlan14", item.OZEL_ALAN_14);
+          setValue("ozelAlan14", item.ISM_OZEL_ALAN_14_KOD_ID);
+          setValue("ozelAlan15", item.OZEL_ALAN_15);
+          setValue("ozelAlan15", item.ISM_OZEL_ALAN_15_KOD_ID);
+          setValue("ozelAlan16", item.OZEL_ALAN_16);
+          setValue("ozelAlan17", item.OZEL_ALAN_17);
+          setValue("ozelAlan18", item.OZEL_ALAN_18);
+          setValue("ozelAlan19", item.OZEL_ALAN_19);
+          setValue("ozelAlan20", item.OZEL_ALAN_20);
           // ... Diğer setValue çağrıları
 
           setLoading(false); // Yükleme tamamlandığında
