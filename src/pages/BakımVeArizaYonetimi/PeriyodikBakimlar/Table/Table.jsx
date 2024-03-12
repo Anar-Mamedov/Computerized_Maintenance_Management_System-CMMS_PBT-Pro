@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { Input, Table, Spin } from "antd";
-import { CheckOutlined, CloseOutlined, SearchOutlined } from "@ant-design/icons";
+import { Input, Table, Spin, Button, Modal, Checkbox } from "antd";
+import { CheckOutlined, CloseOutlined, SearchOutlined, MenuOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import dayjs from "dayjs";
+import Filters from "./filter/Filters";
 
 export default function MainTable() {
   const { setValue } = useFormContext();
@@ -14,6 +15,8 @@ export default function MainTable() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
 
   // edit drawer için
   const [drawer, setDrawer] = useState({
@@ -209,7 +212,7 @@ export default function MainTable() {
       key: "IST_LOKASYON",
       width: 200,
       ellipsis: true,
-      render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
+      render: (text) => <div>{text}</div>,
     },
     {
       title: "Öncelik",
@@ -231,7 +234,7 @@ export default function MainTable() {
       key: "IST_CALISMA_SURE",
       width: 150,
       ellipsis: true,
-      render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
+      // render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
     },
     {
       title: "Duruş Süresi (dk.)",
@@ -239,7 +242,7 @@ export default function MainTable() {
       key: "IST_DURUS_SURE",
       width: 170,
       ellipsis: true,
-      render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
+      // render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
     },
     {
       title: "Personel Sayısı (kişi)",
@@ -247,7 +250,7 @@ export default function MainTable() {
       key: "IST_PERSONEL_SAYI",
       width: 170,
       ellipsis: true,
-      render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
+      // render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
     },
     {
       title: "Tekrarlanma Adeti",
@@ -329,9 +332,60 @@ export default function MainTable() {
     // Other columns...
   ];
 
+  const [visibleColumnKeys, setVisibleColumnKeys] = useState(() => {
+    // 'visibleColumns' isimli anahtarla kaydedilmiş değeri oku
+    const savedVisibleColumns = JSON.parse(localStorage.getItem("visibleColumnsPeriyodikBakikmlar"));
+
+    // Eğer localStorage'da bir değer varsa, bu değeri kullan
+    if (savedVisibleColumns) {
+      return savedVisibleColumns;
+    }
+
+    // Yoksa, varsayılan olarak görünür olacak kolonların key'lerini döndür
+    return columns.filter((col) => col.visible).map((col) => col.key);
+  });
+
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
+  };
+
+  const handleVisibilityChange = (checkedValues) => {
+    setVisibleColumnKeys(checkedValues);
+    // Yeni görünürlük durumunu localStorage'a kaydet
+    localStorage.setItem("visibleColumnsPeriyodikBakikmlar", JSON.stringify(checkedValues));
+  };
+
+  const [body, setBody] = useState({
+    keyword: "",
+    filters: {},
+  });
+
+  const handleBodyChange = useCallback((type, newBody) => {
+    setBody((state) => ({
+      ...state,
+      [type]: newBody,
+    }));
+    setCurrentPage(1); // Filtreleme yapıldığında sayfa numarasını 1'e ayarla
+  }, []);
+
+  const visibleColumns = columns.filter((col) => visibleColumnKeys.includes(col.key));
+
   return (
     <div>
       {/* Search input and create drawer */}
+
+      <Modal width={900} title="Kolonları Düzenle" open={isModalVisible} onOk={toggleModal} onCancel={toggleModal}>
+        <Checkbox.Group
+          style={{ width: "100%", display: "flex", gap: "10px", flexDirection: "column", height: "500px" }}
+          value={visibleColumnKeys}
+          onChange={handleVisibilityChange}>
+          {columns.map((col) => (
+            <Checkbox key={col.key} value={col.key}>
+              {col.title}
+            </Checkbox>
+          ))}
+        </Checkbox.Group>
+      </Modal>
       <div
         style={{
           display: "flex",
@@ -341,20 +395,44 @@ export default function MainTable() {
           gap: "10px",
           padding: "0 5px",
         }}>
-        <Input
-          style={{ width: "250px" }}
-          type="text"
-          placeholder="Arama yap..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
-        />
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            marginBottom: "20px",
+            gap: "10px",
+            padding: "0 5px",
+          }}>
+          <Button
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0px 8px",
+              // width: "32px",
+              height: "32px",
+            }}
+            onClick={toggleModal}>
+            <MenuOutlined />
+          </Button>
+          <Input
+            style={{ width: "250px" }}
+            type="text"
+            placeholder="Arama yap..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
+          />
+          <Filters onChange={handleBodyChange} />
+        </div>
         <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
       </div>
+
       <Spin spinning={loading}>
         <Table
           rowSelection={rowSelection}
-          columns={columns}
+          columns={visibleColumns}
           dataSource={searchTerm ? filteredData : data}
           pagination={{
             defaultPageSize: 10,

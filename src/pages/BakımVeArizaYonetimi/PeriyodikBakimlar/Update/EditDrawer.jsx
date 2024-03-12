@@ -10,6 +10,7 @@ import Footer from "./components/Footer";
 import SecondTabs from "./components/SecondTabs/SecondTabs";
 import styled from "styled-components";
 import BakimPeriyotBilgiler from "./components/BakimPeriyotBilgileri/BakimPeriyotBilgiler";
+import TanimliMakineler from "./components/TanimliMakineler/TanimliMakineler";
 
 const StyledTabs = styled(Tabs)`
   .ant-tabs-tab {
@@ -309,7 +310,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     {
       key: "3",
       label: "Tanımlı Makineler",
-      // children: <Maliyetler />,
+      children: <TanimliMakineler />,
     }
   ];
 
@@ -353,7 +354,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
                 </Button>
               </Space>
             }>
-            <StyledTabs defaultActiveKey="1" items={items} onChange={onChange} />
+            <StyledTabs defaultActiveKey="1" items={items} onChange={onChange} style={{marginBottom: 20}}/>
 
 
             <Footer />
