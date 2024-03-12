@@ -16,7 +16,7 @@ const TypeFilter = ({ onSubmit }) => {
   useEffect(() => {
     // Selectbox açık olduğunda API isteğini yap
     if (open) {
-      AxiosInstance.get("IsEmriTip")
+      AxiosInstance.get("BakimTip")
         .then((response) => {
           const options = response.map((option) => ({
             key: option.TB_ISEMRI_TIP_ID,
@@ -80,7 +80,7 @@ const TypeFilter = ({ onSubmit }) => {
   return (
     <Popover content={content} trigger="click" open={open} onOpenChange={setOpen} placement="bottom">
       <Button style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-        İş Emri Tipi
+        Bakım Tipi
         <div
           style={{
             marginLeft: "5px",
