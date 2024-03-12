@@ -409,7 +409,6 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           );
           setValue("maliyet", item.ISM_MALIYET_DISSERVIS);
           setValue("garantiKapsami", item.GARANTI);
-          setValue("prosedurTipi", item.ISM_TIP_KOD_ID);
 
           // ... Diğer setValue çağrıları
 
