@@ -417,16 +417,16 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("beklemeSuresi", item.ISM_SURE_BEKLEME);
           setValue("digerSuresi", item.ISM_SURE_MUDAHALE_DIGER);
           setValue("mudahaleSuresi", item.ISM_SURE_PLAN_MUDAHALE);
-          setValue("calismaSuresi", item.ISM_SURE_PLAN_CALISMA);
+          setValue("calismaSuresi", item.IS_SURESI);
           setValue("toplamIsSuresi", item.ISM_SURE_TOPLAM);
 
           // Maliyetler tabı
           setValue("malzemeMaliyetiGercek", item.ISM_MALIYET_MLZ);
           setValue("malzemeMaliyetiOngorulen", item.ISM_MALIYET_MLZ_O);
-          setValue("iscilikMaliyetiGercek", item.ISM_MALIYET_ISC);
+          setValue("iscilikMaliyetiGercek", item.ISM_MALIYET_PERSONEL);
           setValue("iscilikMaliyetiOngorulen", item.ISM_MALIYET_ISC_O);
           setValue("disServisMaliyetiOngorulen", item.ISM_MALIYET_DISSERVIS_O);
-          setValue("genelGiderlerGercek", item.ISM_MALIYET_GENELGIDER);
+          setValue("genelGiderlerGercek", item.ISM_MALIYET_DIGER);
           setValue("genelGiderlerOngorulen", item.ISM_MALIYET_GENELGIDER_O);
           setValue("indirimGercek", item.ISM_MALIYET_INDIRIM);
           setValue("indirimOngorulen", item.ISM_MALIYET_INDIRIM_O);
@@ -447,15 +447,15 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("ozelAlan9", item.OZEL_ALAN_9);
           setValue("ozelAlan10", item.OZEL_ALAN_10);
           setValue("ozelAlan11", item.OZEL_ALAN_11);
-          setValue("ozelAlan11", item.ISM_OZEL_ALAN_11_KOD_ID);
+          setValue("ozelAlan11ID", item.ISM_OZEL_ALAN_11_KOD_ID);
           setValue("ozelAlan12", item.OZEL_ALAN_12);
-          setValue("ozelAlan12", item.ISM_OZEL_ALAN_12_KOD_ID);
+          setValue("ozelAlan12ID", item.ISM_OZEL_ALAN_12_KOD_ID);
           setValue("ozelAlan13", item.OZEL_ALAN_13);
-          setValue("ozelAlan13", item.ISM_OZEL_ALAN_13_KOD_ID);
+          setValue("ozelAlan13ID", item.ISM_OZEL_ALAN_13_KOD_ID);
           setValue("ozelAlan14", item.OZEL_ALAN_14);
-          setValue("ozelAlan14", item.ISM_OZEL_ALAN_14_KOD_ID);
+          setValue("ozelAlan14ID", item.ISM_OZEL_ALAN_14_KOD_ID);
           setValue("ozelAlan15", item.OZEL_ALAN_15);
-          setValue("ozelAlan15", item.ISM_OZEL_ALAN_15_KOD_ID);
+          setValue("ozelAlan15ID", item.ISM_OZEL_ALAN_15_KOD_ID);
           setValue("ozelAlan16", item.OZEL_ALAN_16);
           setValue("ozelAlan17", item.OZEL_ALAN_17);
           setValue("ozelAlan18", item.OZEL_ALAN_18);
@@ -463,7 +463,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("ozelAlan20", item.OZEL_ALAN_20);
 
           // Notlar
-          setValue("notlar", item.ISM_NOT);
+          setValue("notlar", item.ICERDEKI_NOT);
 
           // Açıklama
           setValue("isEmriAciklama", item.ISM_ACIKLAMA);
@@ -542,7 +542,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       ISM_SURE_BEKLEME: data.beklemeSuresi,
       ISM_SURE_MUDAHALE_DIGER: data.digerSuresi,
       ISM_SURE_PLAN_MUDAHALE: data.mudahaleSuresi,
-      ISM_SURE_PLAN_CALISMA: data.calismaSuresi,
+      // IS_SURESI: data.calismaSuresi,
       ISM_SURE_TOPLAM: data.toplamIsSuresi,
       // Maliyetler tabı
       ISM_MALIYET_MLZ: data.malzemeMaliyetiGercek,
@@ -553,26 +553,26 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       ISM_MALIYET_KDV: data.kdvGercek,
       ISM_MALIYET_TOPLAM: data.toplamMaliyetGercek,
       // Özel alanlar
-      OZEL_ALAN_1: data.ozelAlan1,
-      OZEL_ALAN_2: data.ozelAlan2,
-      OZEL_ALAN_3: data.ozelAlan3,
-      OZEL_ALAN_4: data.ozelAlan4,
-      OZEL_ALAN_5: data.ozelAlan5,
-      OZEL_ALAN_6: data.ozelAlan6,
-      OZEL_ALAN_7: data.ozelAlan7,
-      OZEL_ALAN_8: data.ozelAlan8,
-      OZEL_ALAN_9: data.ozelAlan9,
-      OZEL_ALAN_10: data.ozelAlan10,
+      ISM_OZEL_ALAN_1: data.ozelAlan1,
+      ISM_OZEL_ALAN_2: data.ozelAlan2,
+      ISM_OZEL_ALAN_3: data.ozelAlan3,
+      ISM_OZEL_ALAN_4: data.ozelAlan4,
+      ISM_OZEL_ALAN_5: data.ozelAlan5,
+      ISM_OZEL_ALAN_6: data.ozelAlan6,
+      ISM_OZEL_ALAN_7: data.ozelAlan7,
+      ISM_OZEL_ALAN_8: data.ozelAlan8,
+      ISM_OZEL_ALAN_9: data.ozelAlan9,
+      ISM_OZEL_ALAN_10: data.ozelAlan10,
       ISM_OZEL_ALAN_11_KOD_ID: data.ozelAlan11ID,
       ISM_OZEL_ALAN_12_KOD_ID: data.ozelAlan12ID,
       ISM_OZEL_ALAN_13_KOD_ID: data.ozelAlan13ID,
       ISM_OZEL_ALAN_14_KOD_ID: data.ozelAlan14ID,
       ISM_OZEL_ALAN_15_KOD_ID: data.ozelAlan15ID,
-      OZEL_ALAN_16: data.ozelAlan16,
-      OZEL_ALAN_17: data.ozelAlan17,
-      OZEL_ALAN_18: data.ozelAlan18,
-      OZEL_ALAN_19: data.ozelAlan19,
-      OZEL_ALAN_20: data.ozelAlan20,
+      ISM_OZEL_ALAN_16: data.ozelAlan16,
+      ISM_OZEL_ALAN_17: data.ozelAlan17,
+      ISM_OZEL_ALAN_18: data.ozelAlan18,
+      ISM_OZEL_ALAN_19: data.ozelAlan19,
+      ISM_OZEL_ALAN_20: data.ozelAlan20,
       // Notlar
       ICERDEKI_NOT: data.notlar,
       //Açıklama

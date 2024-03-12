@@ -73,7 +73,8 @@ export default function SureBilgileri({ fieldRequirements }) {
   const beklemeSuresi = watch("beklemeSuresi");
   const digerSuresi = watch("digerSuresi");
   const mudahaleSuresi = watch("mudahaleSuresi");
-  const calismaSuresi = watch("calismaSuresi");
+  const calismaSaat = watch("calismaSaat");
+  const calismaDakika = watch("calismaDakika");
   const toplamIsSuresi = watch("toplamIsSuresi");
 
   useEffect(() => {
@@ -81,11 +82,22 @@ export default function SureBilgileri({ fieldRequirements }) {
       const mudahaleSuresi1 = lojistikSuresi + seyahatSuresi + onaySuresi + beklemeSuresi + digerSuresi;
       setValue("mudahaleSuresi", mudahaleSuresi1);
     }
+    const calismaSuresi = calismaSaat * 60 + calismaDakika;
     if (mudahaleSuresi || calismaSuresi) {
       const toplamIsSuresi1 = mudahaleSuresi + calismaSuresi;
       setValue("toplamIsSuresi", toplamIsSuresi1);
     }
-  }, [lojistikSuresi, seyahatSuresi, onaySuresi, beklemeSuresi, digerSuresi, mudahaleSuresi, calismaSuresi, setValue]);
+  }, [
+    lojistikSuresi,
+    seyahatSuresi,
+    onaySuresi,
+    beklemeSuresi,
+    digerSuresi,
+    mudahaleSuresi,
+    calismaSaat,
+    calismaDakika,
+    setValue,
+  ]);
 
   return (
     <div style={{ paddingBottom: "35px" }}>
@@ -293,7 +305,7 @@ export default function SureBilgileri({ fieldRequirements }) {
             gap: "10px",
             flexDirection: "column",
             width: "100%",
-            maxWidth: "300px",
+            maxWidth: "485px",
           }}>
           <div style={{ borderBottom: "1px solid #e8e8e8", marginBottom: "5px", paddingBottom: "5px", width: "100%" }}>
             <Text style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}>Toplam İş Süresi</Text>
@@ -304,7 +316,7 @@ export default function SureBilgileri({ fieldRequirements }) {
               display: "flex",
               flexWrap: "wrap",
               alignItems: "center",
-              maxWidth: "480px",
+              maxWidth: "330px",
               gap: "10px",
               width: "100%",
               justifyContent: "space-between",
@@ -339,32 +351,36 @@ export default function SureBilgileri({ fieldRequirements }) {
               display: "flex",
               flexWrap: "wrap",
               alignItems: "center",
-              maxWidth: "480px",
+              maxWidth: "485px",
               gap: "10px",
               width: "100%",
               justifyContent: "space-between",
             }}>
-            <Text style={{ fontSize: "14px" }}>Çalışma Sürei (dk.):</Text>
+            <Text style={{ fontSize: "14px" }}>Çalışma Süresi (Saat - dk):</Text>
             <div
               style={{
                 display: "flex",
                 flexWrap: "wrap",
                 alignItems: "center",
-                maxWidth: "145px",
-                gap: "10px",
-                width: "100%",
+                justifyContent: "space-between",
+                width: "300px",
               }}>
               <Controller
-                name="calismaSuresi"
+                name="calismaSaat"
                 control={control}
                 render={({ field }) => (
                   <InputNumber
                     {...field}
                     min={0}
-                    // max={59}
+                    // max={24}
                     style={{ width: "145px" }}
                   />
                 )}
+              />
+              <Controller
+                name="calismaDakika"
+                control={control}
+                render={({ field }) => <InputNumber {...field} min={0} max={59} style={{ width: "145px" }} />}
               />
             </div>
           </div>
@@ -373,7 +389,7 @@ export default function SureBilgileri({ fieldRequirements }) {
               display: "flex",
               flexWrap: "wrap",
               alignItems: "center",
-              maxWidth: "480px",
+              maxWidth: "330px",
               gap: "10px",
               width: "100%",
               justifyContent: "space-between",
