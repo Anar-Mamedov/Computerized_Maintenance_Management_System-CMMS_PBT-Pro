@@ -334,7 +334,7 @@ export default function MainTable() {
 
   const [visibleColumnKeys, setVisibleColumnKeys] = useState(() => {
     // 'visibleColumns' isimli anahtarla kaydedilmiş değeri oku
-    const savedVisibleColumns = JSON.parse(localStorage.getItem("visibleColumnsPeriyodikBakikmlar"));
+    const savedVisibleColumns = JSON.parse(localStorage.getItem("visibleColumnsPeriyodikBakimlar"));
 
     // Eğer localStorage'da bir değer varsa, bu değeri kullan
     if (savedVisibleColumns) {
@@ -352,7 +352,7 @@ export default function MainTable() {
   const handleVisibilityChange = (checkedValues) => {
     setVisibleColumnKeys(checkedValues);
     // Yeni görünürlük durumunu localStorage'a kaydet
-    localStorage.setItem("visibleColumnsPeriyodikBakikmlar", JSON.stringify(checkedValues));
+    localStorage.setItem("visibleColumnsPeriyodikBakimlar", JSON.stringify(checkedValues));
   };
 
   const [body, setBody] = useState({
