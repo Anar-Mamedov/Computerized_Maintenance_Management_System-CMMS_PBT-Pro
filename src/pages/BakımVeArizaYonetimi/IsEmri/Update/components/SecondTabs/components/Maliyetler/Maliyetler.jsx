@@ -419,7 +419,9 @@ export default function Maliyetler({ fieldRequirements }) {
               width: "100%",
               justifyContent: "space-between",
             }}>
-            <Text style={{ fontSize: "14px" }}>Toplam Maliyet:</Text>
+            <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.toplamMaliyetGercek ? "600" : "normal" }}>
+              Toplam Maliyet:
+            </Text>
             <div
               style={{
                 display: "flex",
@@ -431,9 +433,11 @@ export default function Maliyetler({ fieldRequirements }) {
               <Controller
                 name="toplamMaliyetGercek"
                 control={control}
+                rules={{ required: fieldRequirements.toplamMaliyetGercek ? "Alan Boş Bırakılamaz!" : false }}
                 render={({ field }) => (
                   <InputNumber
                     {...field}
+                    status={errors.toplamMaliyetGercek ? "error" : ""}
                     min={0}
                     disabled
                     // max={59}
@@ -454,6 +458,9 @@ export default function Maliyetler({ fieldRequirements }) {
                   />
                 )}
               />
+              {errors.toplamMaliyetGercek && (
+                <div style={{ color: "red", marginTop: "5px" }}>{errors.toplamMaliyetGercek.message}</div>
+              )}
             </div>
           </div>
         </div>

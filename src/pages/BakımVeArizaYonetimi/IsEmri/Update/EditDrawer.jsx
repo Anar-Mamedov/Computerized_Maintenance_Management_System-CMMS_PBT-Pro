@@ -179,6 +179,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         evrakNo: selectedOption.IMT_EVRAK_NO,
         evrakTarihi: selectedOption.IMT_EVRAK_TARIHI,
         maliyet: selectedOption.IMT_MALIYET,
+        toplamMaliyetGercek: selectedOption.IMT_TOPLAM_MALIYET_ZORUNLU,
         // Diğer alanlar...
       });
     }
@@ -225,6 +226,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
               evrakNo: defaultItem.IMT_EVRAK_NO,
               evrakTarihi: defaultItem.IMT_EVRAK_TARIHI,
               maliyet: defaultItem.IMT_MALIYET,
+              toplamMaliyetGercek: defaultItem.IMT_TOPLAM_MALIYET_ZORUNLU,
               // Burada defaultItem içerisindeki diğer alanlar için de benzer şekilde atama yapılabilir
               // Örneğin:
               // irtibatTelefonu: defaultItem.ISP_IRTIBAT_TEL,
