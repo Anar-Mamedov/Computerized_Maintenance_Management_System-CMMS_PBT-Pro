@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Tabs } from "antd";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
@@ -118,9 +118,41 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
     },
   ];
 
+  // Filter the items based on the fieldRequirements prop
+  const filteredItems = items.filter((item) => {
+    switch (item.key) {
+      case "1":
+        return fieldRequirements?.IMT_DETAY_TAB || true;
+      case "2":
+        return fieldRequirements?.IMT_KONTROL_TAB;
+      case "3":
+        return fieldRequirements?.IMT_PERSONEL_TAB;
+      case "4":
+        return fieldRequirements?.IMT_MALZEME_TAB;
+      case "5":
+        return fieldRequirements?.IMT_DURUS_TAB;
+      case "6":
+        return fieldRequirements?.IMT_SURE_TAB;
+      case "7":
+        return fieldRequirements?.IMT_MALIYET_TAB;
+      case "8":
+        return fieldRequirements?.IMT_OLCUM_TAB;
+      case "9":
+        return fieldRequirements?.IMT_ARAC_GEREC_TAB;
+      case "10":
+        return fieldRequirements?.IMT_OZEL_ALAN_TAB;
+      case "11":
+        return fieldRequirements?.IMT_NOTLAR_TAB;
+      case "12":
+        return fieldRequirements?.IMT_ACIKLAMA_USTTAB || true; // This tab's visibility is dependent on a specific condition, with a fallback to false if undefined.
+      default:
+        return false; // Default case to handle any unforeseen keys
+    }
+  });
+
   return (
     <div>
-      <StyledTabs defaultActiveKey="1" items={items} onChange={onChange} />
+      <StyledTabs defaultActiveKey={filteredItems} items={filteredItems} onChange={onChange} />
     </div>
   );
 }

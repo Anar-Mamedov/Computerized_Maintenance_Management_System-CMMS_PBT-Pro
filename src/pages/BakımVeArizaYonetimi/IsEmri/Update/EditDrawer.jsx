@@ -180,6 +180,18 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         evrakTarihi: selectedOption.IMT_EVRAK_TARIHI,
         maliyet: selectedOption.IMT_MALIYET,
         toplamMaliyetGercek: selectedOption.IMT_TOPLAM_MALIYET_ZORUNLU,
+        // Tab gösterim durumları
+        IMT_DETAY_TAB: selectedOption.IMT_DETAY_TAB,
+        IMT_KONTROL_TAB: selectedOption.IMT_KONTROL_TAB,
+        IMT_PERSONEL_TAB: selectedOption.IMT_PERSONEL_TAB,
+        IMT_MALZEME_TAB: selectedOption.IMT_MALZEME_TAB,
+        IMT_DURUS_TAB: selectedOption.IMT_DURUS_TAB,
+        IMT_SURE_TAB: selectedOption.IMT_SURE_TAB,
+        IMT_MALIYET_TAB: selectedOption.IMT_MALIYET_TAB,
+        IMT_OLCUM_TAB: selectedOption.IMT_OLCUM_TAB,
+        IMT_ARAC_GEREC_TAB: selectedOption.IMT_ARAC_GEREC_TAB,
+        IMT_OZEL_ALAN_TAB: selectedOption.IMT_OZEL_ALAN_TAB,
+        IMT_NOTLAR_TAB: selectedOption.IMT_NOTLAR_TAB,
         // Diğer alanlar...
       });
     }
@@ -227,6 +239,18 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
               evrakTarihi: defaultItem.IMT_EVRAK_TARIHI,
               maliyet: defaultItem.IMT_MALIYET,
               toplamMaliyetGercek: defaultItem.IMT_TOPLAM_MALIYET_ZORUNLU,
+              // Tab gösterim durumları
+              IMT_DETAY_TAB: defaultItem.IMT_DETAY_TAB,
+              IMT_KONTROL_TAB: defaultItem.IMT_KONTROL_TAB,
+              IMT_PERSONEL_TAB: defaultItem.IMT_PERSONEL_TAB,
+              IMT_MALZEME_TAB: defaultItem.IMT_MALZEME_TAB,
+              IMT_DURUS_TAB: defaultItem.IMT_DURUS_TAB,
+              IMT_SURE_TAB: defaultItem.IMT_SURE_TAB,
+              IMT_MALIYET_TAB: defaultItem.IMT_MALIYET_TAB,
+              IMT_OLCUM_TAB: defaultItem.IMT_OLCUM_TAB,
+              IMT_ARAC_GEREC_TAB: defaultItem.IMT_ARAC_GEREC_TAB,
+              IMT_OZEL_ALAN_TAB: defaultItem.IMT_OZEL_ALAN_TAB,
+              IMT_NOTLAR_TAB: defaultItem.IMT_NOTLAR_TAB,
               // Burada defaultItem içerisindeki diğer alanlar için de benzer şekilde atama yapılabilir
               // Örneğin:
               // irtibatTelefonu: defaultItem.ISP_IRTIBAT_TEL,
