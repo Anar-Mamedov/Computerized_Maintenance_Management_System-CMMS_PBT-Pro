@@ -461,6 +461,13 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("ozelAlan18", item.OZEL_ALAN_18);
           setValue("ozelAlan19", item.OZEL_ALAN_19);
           setValue("ozelAlan20", item.OZEL_ALAN_20);
+
+          // Notlar
+          setValue("notlar", item.ISM_NOT);
+
+          // Açıklama
+          setValue("isEmriAciklama", item.ISM_ACIKLAMA);
+
           // ... Diğer setValue çağrıları
 
           setLoading(false); // Yükleme tamamlandığında
