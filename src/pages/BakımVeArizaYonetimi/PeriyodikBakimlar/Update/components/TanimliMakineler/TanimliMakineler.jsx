@@ -1,4 +1,8 @@
-import { Divider, Table } from 'antd';
+import { Button, Table, Modal } from 'antd';
+import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import { useCallback, useEffect, useState } from 'react';
+import LocationFilter from '../../../Table/filter/LocationFilter';
+
 const columns = [
     {
         title: 'Makine Kodu',
@@ -83,15 +87,100 @@ const data = [
 ];
 
 export default function TanimliMakineler() {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [filters, setFilters] = useState({
+        lokasyonlar: {},
+        bakimtipleri: {},
+        bakimgruplar: {},
+        atolyeler: {},
+    });
+    const [body, setBody] = useState({
+        keyword: "",
+        filters: {},
+    });
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const handleBodyChange = useCallback((type, newBody) => {
+        setBody((state) => ({
+            ...state,
+            [type]: newBody,
+        }));
+        setCurrentPage(1); // Filtreleme yapıldığında sayfa numarasını 1'e ayarla
+    }, []);
+
+    useEffect(() => {
+        handleBodyChange("filters", filters);
+    }, [filters, handleBodyChange]);
+
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleOk = () => {
+        setIsModalOpen(false);
+    };
+
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
+
     return (
-        <Table
-            columns={columns}
-            dataSource={data}
-            size="small"
-            scroll={{
-                x: 2000,
-                // y: 500,
-            }}
-        />
+        <>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
+                <Button
+                    type="primary"
+                    onClick={showModal}
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                    }}>
+                    <PlusOutlined />
+                    Ekle
+                </Button>
+
+                <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
+                        <div>
+                            <LocationFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, lokasyonlar: newFilters }))} />
+                        </div>
+                        <div>
+                            <Button
+                                // type="primary"
+                                // onClick={showModal}
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                }}>
+                                <SearchOutlined />
+                                Ara
+                            </Button>
+                        </div>
+
+                    </div>
+
+                    <Table
+                        columns={columns}
+                        dataSource={data}
+                        size="small"
+                        scroll={{
+                            x: 2000,
+                            // y: 500,
+                        }}
+                    />
+
+
+                </Modal>
+            </div>
+            <Table
+                columns={columns}
+                dataSource={data}
+                size="small"
+                scroll={{
+                    x: 2000,
+                    // y: 500,
+                }}
+            />
+        </>
+
     )
 }
