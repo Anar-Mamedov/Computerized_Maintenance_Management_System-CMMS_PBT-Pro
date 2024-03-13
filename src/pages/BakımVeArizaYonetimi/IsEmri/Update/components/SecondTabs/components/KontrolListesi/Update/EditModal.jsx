@@ -57,7 +57,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
           : null
       );
 
-      setValue("vardiya", selectedRow.DKN_YAPILDI_MESAI_KOD_TANIM);
+      setValue("vardiya", selectedRow.DKN_VARDIYA_TANIM);
       setValue("vardiyaID", selectedRow.DKN_YAPILDI_MESAI_KOD_ID);
       setValue(
         "bitisTarihi",
