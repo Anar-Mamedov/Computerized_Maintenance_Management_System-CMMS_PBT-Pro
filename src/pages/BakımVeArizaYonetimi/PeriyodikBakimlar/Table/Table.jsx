@@ -16,7 +16,7 @@ export default function MainTable() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // edit drawer için
   const [drawer, setDrawer] = useState({
@@ -355,6 +355,16 @@ export default function MainTable() {
     localStorage.setItem("visibleColumnsPeriyodikBakimlar", JSON.stringify(checkedValues));
   };
 
+  useEffect(() => {
+    const savedColumns = JSON.parse(localStorage.getItem("visibleColumnsPeriyodikBakimlar"))
+    const defaultColumns = ["IST_KOD", "IST_TANIM", "IST_TIP", "IST_GRUP", "IST_Tanimli_Makineler", "IST_ATOLYE","IST_LOKASYON", "IST_ONCELIK"];
+
+    if (!savedColumns) {
+      localStorage.setItem("visibleColumnsPeriyodikBakimlar", JSON.stringify(defaultColumns));
+      setVisibleColumnKeys(defaultColumns)
+    }
+  }, [])
+
   const [body, setBody] = useState({
     keyword: "",
     filters: {},
@@ -369,7 +379,7 @@ export default function MainTable() {
   }, []);
 
   const visibleColumns = columns.filter((col) => visibleColumnKeys.includes(col.key));
-
+  console.log(searchTerm)
   return (
     <div>
       {/* Search input and create drawer */}
