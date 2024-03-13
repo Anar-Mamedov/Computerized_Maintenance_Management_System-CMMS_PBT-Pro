@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Table, Tabs } from "antd";
+import { Button, Modal, Table, Tabs, message } from "antd";
 import { useFormContext, Controller } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../../api/http";
 import styled from "styled-components";
@@ -131,13 +131,36 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
     }
   };
 
-  const handleModalOk = () => {
+  const prosedurID = watch("prosedurID");
+  const secilenIsEmriID = watch("secilenIsEmriID");
+
+  const handleModalOk = async () => {
     let selectedData;
     // Assuming only one set of row keys will be selected at a time.
     if (selectedRowKeys1.length) {
       selectedData = data1.find((item) => item.key === selectedRowKeys1[0]);
     } else if (selectedRowKeys2.length) {
       selectedData = data2.find((item) => item.key === selectedRowKeys2[0]);
+    }
+
+    try {
+      // API isteğini yap
+      const response = await AxiosInstance.get(
+        `AddProsedurPropertyToIsEmri?yeniIsTanimId=${selectedData.key}&isEmriId=${secilenIsEmriID}&eskiIsTanimId=${prosedurID}`
+      );
+      // İsteğin başarılı olduğunu kontrol et
+      if ((response && response.status_code === 200) || response.status_code === 201) {
+        // Başarılı işlem mesajı veya başka bir işlem yap
+        message.success("İşlem Başarılı!");
+        console.log("İşlem başarılı.");
+      } else {
+        message.error("İşlem Başarısız!");
+        // Hata mesajı göster
+        console.error("Bir hata oluştu.");
+      }
+    } catch (error) {
+      // Hata yakalama
+      console.error("API isteği sırasında bir hata oluştu:", error);
     }
 
     if (selectedData) {

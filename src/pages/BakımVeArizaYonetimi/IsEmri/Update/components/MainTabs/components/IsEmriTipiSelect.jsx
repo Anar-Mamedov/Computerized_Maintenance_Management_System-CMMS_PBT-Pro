@@ -13,6 +13,7 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
   const {
     control,
     setValue,
+    watch,
     formState: { errors },
   } = useFormContext();
   const { setSelectedOption } = useAppContext(); // Context'ten gerekli fonksiyonu al
@@ -60,9 +61,33 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
 
   // Popconfirm onaylandığında yapılacak işlemler
 
-  const handleConfirm = () => {
+  const prosedurID = watch("prosedurID");
+  const secilenIsEmriID = watch("secilenIsEmriID");
+
+  const handleConfirm = async () => {
     // Apply the pending value change here, using the previously defined logic
     setSelectedOption(pendingValue); // Selectbox'ta seçim değiştiğinde, context'teki durumu güncelle
+
+    try {
+      // API isteğini yap
+      const response = await AxiosInstance.get(
+        `ChangeIsEmriTipiProperty?isEmriTipId=${pendingValue}&isTanimId=${prosedurID}&isEmriId=${secilenIsEmriID}`
+      );
+      // İsteğin başarılı olduğunu kontrol et
+      if ((response && response.status_code === 200) || response.status_code === 201) {
+        // Başarılı işlem mesajı veya başka bir işlem yap
+        message.success("İşlem Başarılı!");
+        console.log("İşlem başarılı.");
+      } else {
+        message.error("İşlem Başarısız!");
+
+        // Hata mesajı göster
+        console.error("Bir hata oluştu.");
+      }
+    } catch (error) {
+      // Hata yakalama
+      console.error("API isteği sırasında bir hata oluştu:", error);
+    }
 
     // iş emrindeki zorunlu alanları dinamik olarak kontrol etmek için selectboxtaki seçenekleri seçtiğimizde o seçeneğe göre zorunlu alanların değişmesi için.
 
@@ -163,12 +188,12 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
               description={
                 <div>
                   <p style={{ width: "100%", maxWidth: "300px" }}>
-                    Bu işlem Prosedür ve prosedüre bağlı olan Kontrol Listesi, Malzeme ve Duruş tablolarını silecektir.
-                    BU İŞLEM GERİ ALINAMAZ!
+                    Bu işlem `Prosedür` ve prosedüre bağlı olan `Kontrol Listesi`, `Malzeme` ve `Duruş` tablolarını
+                    silecektir. BU İŞLEM GERİ ALINAMAZ!
                   </p>
                 </div>
               }
-              open={confirmVisible} // Replace 'visible' with 'open'
+              open={confirmVisible}
               onConfirm={() => {
                 handleConfirm(); // Apply the change
               }}

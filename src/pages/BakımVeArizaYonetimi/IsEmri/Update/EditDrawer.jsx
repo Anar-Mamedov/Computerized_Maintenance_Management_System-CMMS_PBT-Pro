@@ -489,7 +489,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("ozelAlan20", item.OZEL_ALAN_20);
 
           // Notlar
-          setValue("notlar", item.ICERDEKI_NOT);
+          setValue("notlar", item.ISM_NOT);
 
           // Açıklama
           setValue("isEmriAciklama", item.ISM_ACIKLAMA);
@@ -600,7 +600,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       ISM_OZEL_ALAN_19: data.ozelAlan19,
       ISM_OZEL_ALAN_20: data.ozelAlan20,
       // Notlar
-      ICERDEKI_NOT: data.notlar,
+      ISM_NOT: data.notlar,
       //Açıklama
       ISM_ACIKLAMA: data.isEmriAciklama,
       // Diğer alanlarınız...
