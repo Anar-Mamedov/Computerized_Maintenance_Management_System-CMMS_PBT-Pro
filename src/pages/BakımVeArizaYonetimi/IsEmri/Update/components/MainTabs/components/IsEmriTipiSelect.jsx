@@ -1,6 +1,6 @@
 import React, { useState, createRef, useEffect } from "react";
 import { useFormContext, Controller } from "react-hook-form";
-import { Select, Typography, Divider, Spin, Button, Input, message, Space } from "antd";
+import { Select, Typography, Divider, Spin, Button, Input, message, Space, Popconfirm } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
 import { useAppContext } from "../../../../../../../AppContext"; // Context hook'unu import edin
 import { PlusOutlined } from "@ant-design/icons";
@@ -21,6 +21,8 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
   const inputRef = createRef();
   const [name, setName] = useState("");
   const [selectKey, setSelectKey] = useState(0);
+  const [confirmVisible, setConfirmVisible] = useState(false);
+  const [pendingValue, setPendingValue] = useState(null);
 
   // message
   const [messageApi, contextHolder] = message.useMessage();
@@ -45,15 +47,27 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
     setName(e.target.value);
   };
 
-  // iş emrindeki zorunlu alanları dinamik olarak kontrol etmek için selectboxtaki seçenekleri seçtiğimizde o seçeneğe göre zorunlu alanların değişmesi için.
-
   // Öncelikle, `options` state'ini ve `setValue` fonksiyonunu kullanarak `selectedOption`'ı güncelleyeceğiz.
   // Bu örnekte, `selectedOption`'ı komple yeni bir obje ile güncelleyerek, bu değişikliğin React tarafından algılanmasını sağlayacağız.
 
+  // Select değeri değiştiğinde popconfirm göstermek için `onOptionChange` fonksiyonunu
   const onOptionChange = (value) => {
-    setSelectedOption(value); // Selectbox'ta seçim değiştiğinde, context'teki durumu güncelle
+    // Show confirmation and set pending value
+    setPendingValue(value);
+    setConfirmVisible(true);
+  };
+  // Select değeri değiştiğinde popconfirm göstermek için `onOptionChange` fonksiyonunu sonu
+
+  // Popconfirm onaylandığında yapılacak işlemler
+
+  const handleConfirm = () => {
+    // Apply the pending value change here, using the previously defined logic
+    setSelectedOption(pendingValue); // Selectbox'ta seçim değiştiğinde, context'teki durumu güncelle
+
+    // iş emrindeki zorunlu alanları dinamik olarak kontrol etmek için selectboxtaki seçenekleri seçtiğimizde o seçeneğe göre zorunlu alanların değişmesi için.
+
     // Seçilen değerin ID'sine göre objeyi bul
-    const selectedOption = options.find((option) => option.TB_ISEMRI_TIP_ID === value) ?? null;
+    const selectedOption = options.find((option) => option.TB_ISEMRI_TIP_ID === pendingValue) ?? null;
 
     if (selectedOption) {
       // selectedOption için komple yeni bir obje oluştur
@@ -83,12 +97,24 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
       });
     }
 
+    // iş emrindeki zorunlu alanları dinamik olarak kontrol etmek için selectboxtaki seçenekleri seçtiğimizde o seçeneğe göre zorunlu alanların değişmesi için son.
+
     // `isEmriTipi` ve `isEmriTipiID` alanlarını da güncelle
-    setValue("isEmriTipi", value ?? null);
-    setValue("isEmriTipiID", value ?? null);
+    setValue("isEmriTipi", pendingValue ?? null);
+    setValue("isEmriTipiID", pendingValue ?? null);
+
+    setConfirmVisible(false); // Close the confirmation dialog
   };
 
-  // iş emrindeki zorunlu alanları dinamik olarak kontrol etmek için selectboxtaki seçenekleri seçtiğimizde o seçeneğe göre zorunlu alanların değişmesi için son.
+  // Popconfirm onaylandığında yapılacak işlemler sonu
+
+  // Popconfirm iptal edildiğinde yapılacak işlemler
+
+  const handleCancel = () => {
+    setConfirmVisible(false); // Simply hide the confirmation without changing the selection
+  };
+
+  // Popconfirm iptal edildiğinde yapılacak işlemler sonu
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between" }}>
@@ -114,7 +140,7 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
                   option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
                 }
                 onDropdownVisibleChange={(open) => {
-                  if (open) {
+                  if (open && !confirmVisible) {
                     fetchData(); // Fetch data when the dropdown is opened
                   }
                 }}
@@ -123,11 +149,35 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
                   value: item.TB_ISEMRI_TIP_ID, // Use the ID as the value
                   label: item.IMT_TANIM, // Display the name in the dropdown
                 }))}
-                onChange={onOptionChange}
+                onChange={(value) => {
+                  onOptionChange(value); // This sets pendingValue and shows Popconfirm
+                }}
                 value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
               />
             )}
           />
+          {confirmVisible && (
+            <Popconfirm
+              placement="bottom"
+              title="DİKKAT: Onaylamadan Önce Okuyunuz!"
+              description={
+                <div>
+                  <p style={{ width: "100%", maxWidth: "300px" }}>
+                    Bu işlem Prosedür ve prosedüre bağlı olan Kontrol Listesi, Malzeme ve Duruş tablolarını silecektir.
+                    BU İŞLEM GERİ ALINAMAZ!
+                  </p>
+                </div>
+              }
+              open={confirmVisible} // Replace 'visible' with 'open'
+              onConfirm={() => {
+                handleConfirm(); // Apply the change
+              }}
+              onCancel={() => {
+                handleCancel(); // Revert or ignore the change
+              }}>
+              {/* This button or similar trigger isn't directly necessary since we're programmatically controlling Popconfirm visibility */}
+            </Popconfirm>
+          )}
           <Controller
             name="isEmriTipiID"
             control={control}
