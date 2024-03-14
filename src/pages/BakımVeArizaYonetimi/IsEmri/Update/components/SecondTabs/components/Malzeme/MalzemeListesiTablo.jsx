@@ -7,7 +7,7 @@ import CreateModal from "./Insert/CreateModal";
 import EditModal from "./Update/EditModal";
 import ContextMenu from "./components/ContextMenu";
 
-export default function MalzemeListesiTablo() {
+export default function MalzemeListesiTablo({ isActive }) {
   const [loading, setLoading] = useState(false);
   const { control, watch, setValue } = useFormContext();
   const [data, setData] = useState([]);
@@ -125,21 +125,23 @@ export default function MalzemeListesiTablo() {
   const secilenIsEmriID = watch("secilenIsEmriID");
 
   const fetch = useCallback(() => {
-    setLoading(true);
-    AxiosInstance.get(`IsEmriMalzemeList?isemriID=${secilenIsEmriID}`)
-      .then((response) => {
-        const fetchedData = response.map((item) => ({
-          ...item,
-          key: item.TB_ISEMRI_MLZ_ID,
-        }));
-        setData(fetchedData);
-      })
-      .catch((error) => {
-        // Hata işleme
-        console.error("API isteği sırasında hata oluştu:", error);
-      })
-      .finally(() => setLoading(false));
-  }, [secilenIsEmriID]); // secilenIsEmriID değiştiğinde fetch fonksiyonunu güncelle
+    if (isActive) {
+      setLoading(true);
+      AxiosInstance.get(`IsEmriMalzemeList?isemriID=${secilenIsEmriID}`)
+        .then((response) => {
+          const fetchedData = response.map((item) => ({
+            ...item,
+            key: item.TB_ISEMRI_MLZ_ID,
+          }));
+          setData(fetchedData);
+        })
+        .catch((error) => {
+          // Hata işleme
+          console.error("API isteği sırasında hata oluştu:", error);
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [secilenIsEmriID, isActive]); // secilenIsEmriID değiştiğinde fetch fonksiyonunu güncelle
 
   useEffect(() => {
     if (secilenIsEmriID) {

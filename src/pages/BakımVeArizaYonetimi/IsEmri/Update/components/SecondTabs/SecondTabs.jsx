@@ -15,10 +15,6 @@ import Maliyetler from "./components/Maliyetler/Maliyetler";
 import Notlar from "./components/Notlar/Notlar";
 import Aciklama from "./components/Aciklama/Aciklama";
 
-const onChange = (key) => {
-  // console.log(key);
-};
-
 //styled components
 const StyledTabs = styled(Tabs)`
   .ant-tabs-tab {
@@ -54,6 +50,12 @@ const StyledTabs = styled(Tabs)`
 
 export default function SecondTabs({ refreshKey, fieldRequirements }) {
   const { watch } = useFormContext();
+  const [activeTabKey, setActiveTabKey] = useState("1"); // Default to the first tab
+
+  // Modify the onChange handler to update the active tab state
+  const onChange = (key) => {
+    setActiveTabKey(key);
+  };
 
   const items = [
     {
@@ -64,22 +66,22 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
     {
       key: "2",
       label: "Kontrol Listesi",
-      children: <KontrolListesiTablo fieldRequirements={fieldRequirements} />,
+      children: <KontrolListesiTablo isActive={activeTabKey === "2"} fieldRequirements={fieldRequirements} />,
     },
     {
       key: "3",
       label: "Personel",
-      children: <PersonelListesiTablo fieldRequirements={fieldRequirements} />,
+      children: <PersonelListesiTablo isActive={activeTabKey === "3"} fieldRequirements={fieldRequirements} />,
     },
     {
       key: "4",
       label: "Malzeme",
-      children: <MalzemeListesiTablo fieldRequirements={fieldRequirements} />,
+      children: <MalzemeListesiTablo isActive={activeTabKey === "4"} fieldRequirements={fieldRequirements} />,
     },
     {
       key: "5",
       label: "Duruşlar",
-      children: <DuruslarListesiTablo fieldRequirements={fieldRequirements} />,
+      children: <DuruslarListesiTablo isActive={activeTabKey === "5"} fieldRequirements={fieldRequirements} />,
     },
     {
       key: "6",
@@ -94,12 +96,12 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
     {
       key: "8",
       label: "Ölçüm Değerleri",
-      children: <OlcumDegerleriListesiTablo fieldRequirements={fieldRequirements} />,
+      children: <OlcumDegerleriListesiTablo isActive={activeTabKey === "8"} fieldRequirements={fieldRequirements} />,
     },
     {
       key: "9",
       label: "Araç & Gereçler",
-      children: <AracGereclerListesiTablo fieldRequirements={fieldRequirements} />,
+      children: <AracGereclerListesiTablo isActive={activeTabKey === "9"} fieldRequirements={fieldRequirements} />,
     },
     {
       key: "10",
