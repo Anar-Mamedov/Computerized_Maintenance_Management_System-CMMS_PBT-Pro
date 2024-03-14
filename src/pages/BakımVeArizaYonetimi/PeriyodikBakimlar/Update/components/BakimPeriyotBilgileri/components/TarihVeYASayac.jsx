@@ -2,7 +2,6 @@ import { Tabs } from 'antd';
 import Sayac from './components/Sayac';
 
 export default function TarihVeYASayac({ items }) {
-    console.log(items.find(item => item.key === 5) === undefined)
     return (
         <div className='inner-tabs'>
             <style>

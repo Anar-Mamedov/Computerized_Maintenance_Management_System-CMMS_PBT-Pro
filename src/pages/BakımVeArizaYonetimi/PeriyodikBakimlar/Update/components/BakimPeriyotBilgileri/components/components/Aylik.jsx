@@ -113,7 +113,7 @@ export default function Aylik() {
                     control={control}
                     render={({ field }) => (
                         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                            <InputNumber {...field} min={0} defaultValue={0} onChange={onChangeInputNum} disabled={tipGroupValue !== 1} style={{ height: "40px" }} />
+                            <InputNumber {...field} min={0} placeholder='0' onChange={onChangeInputNum} disabled={tipGroupValue !== 1} style={{ height: "40px" }} />
                             <span>günde bir</span>
                         </div>
                     )}
@@ -144,7 +144,7 @@ export default function Aylik() {
                         control={control}
                         render={({ field }) => (
                             <>
-                                <InputNumber {...field} min={0} defaultValue={0} onChange={onChangeInputNum} disabled={tipGroupValue !== 2} style={{ height: "40px" }} />
+                                <InputNumber {...field} min={0} placeholder='0' onChange={onChangeInputNum} disabled={tipGroupValue !== 2} style={{ height: "40px" }} />
                                 <span>ayda bir</span>
                             </>
                         )}
@@ -194,7 +194,7 @@ export default function Aylik() {
                         control={control}
                         render={({ field }) => (
                             <>
-                                <InputNumber {...field} min={0} defaultValue={0} onChange={onChangeInputNum} disabled={tipGroupValue !== 3} style={{ height: "40px" }} />
+                                <InputNumber {...field} min={0} placeholder='0' onChange={onChangeInputNum} disabled={tipGroupValue !== 3} style={{ height: "40px" }} />
                                 <span>ayda bir</span>
                             </>
                         )}
