@@ -11,7 +11,7 @@ export default function Gunluk() {
     return (
         <div>
             <Text>
-                Her <InputNumber min={0} defaultValue={0} onChange={onChange} /> günde bir
+                Her <InputNumber min={0} placeholder='0' onChange={onChange} /> günde bir
             </Text>
         </div>
     )

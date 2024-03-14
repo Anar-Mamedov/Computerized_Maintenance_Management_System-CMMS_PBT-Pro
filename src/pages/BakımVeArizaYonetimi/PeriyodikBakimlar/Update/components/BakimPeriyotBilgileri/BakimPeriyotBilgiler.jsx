@@ -10,6 +10,7 @@ import Haftalik from "./components/components/Haftalik";
 import Aylik from "./components/components/Aylik";
 import Yillik from "./components/components/Yillik";
 import Sayac from "./components/components/Sayac";
+import FixTarihler from "./components/components/FixTarihler";
 
 const { Text } = Typography;
 
@@ -72,7 +73,7 @@ const items1 = [
     {
         key: 4,
         label: 'Fix Tarihler',
-        children: "Fix content"
+        children: <FixTarihler />
     },
     {
         key: 5,
@@ -105,7 +106,7 @@ const items2 = [
     {
         key: 4,
         label: 'Fix Tarihler',
-        children: "Fix content"
+        children: <FixTarihler />
     }
 ]
 
@@ -114,12 +115,12 @@ export default function BakimPeriyotBilgiler() {
         {
             key: "1",
             label: "Tarih 've ya' sayaç bazlı bakım",
-            children: <TarihVeYASayac items={items1}/>,
+            children: <TarihVeYASayac items={items1} />,
         },
         {
             key: "2",
             label: "Tarih 've' sayaç bazlı bakım",
-            children: <TarihVeYASayac items={items2}/>,
+            children: <TarihVeYASayac items={items2} />,
         },
     ];
 

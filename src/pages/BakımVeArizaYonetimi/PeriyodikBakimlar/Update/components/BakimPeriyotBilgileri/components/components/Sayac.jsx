@@ -58,7 +58,7 @@ export default function Sayac() {
                     render={({ field }) => (
                         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                             <span>Her</span>
-                            <InputNumber {...field} min={0} defaultValue={0}  style={{ height: "40px" }} />
+                            <InputNumber {...field} min={0} placeholder='0' style={{ height: "40px" }} />
                         </div>
                     )}
                 />

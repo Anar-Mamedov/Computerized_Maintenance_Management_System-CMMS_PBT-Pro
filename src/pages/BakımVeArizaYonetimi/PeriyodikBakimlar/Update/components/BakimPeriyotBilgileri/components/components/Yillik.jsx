@@ -107,7 +107,7 @@ export default function Yillik() {
                     control={control}
                     render={({ field }) => (
                         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                            <InputNumber {...field} min={0} defaultValue={0} onChange={onChangeInputNum} disabled={tipGroupValue !== 1} style={{ height: "40px" }} />
+                            <InputNumber {...field} min={0} placeholder='0' onChange={onChangeInputNum} disabled={tipGroupValue !== 1} style={{ height: "40px" }} />
                             <span>yılda bir</span>
                         </div>
                     )}
@@ -158,7 +158,7 @@ export default function Yillik() {
                         control={control}
                         render={({ field }) => (
                             <>
-                                <InputNumber {...field} min={0} defaultValue={0} onChange={onChangeInputNum} disabled={tipGroupValue !== 2} style={{ height: "40px" }} />
+                                <InputNumber {...field} min={0} placeholder='0' onChange={onChangeInputNum} disabled={tipGroupValue !== 2} style={{ height: "40px" }} />
                                 <span>ayda bir</span>
                             </>
                         )}

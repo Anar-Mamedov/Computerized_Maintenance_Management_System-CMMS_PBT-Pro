@@ -117,14 +117,14 @@ export default function BaslangicBitis() {
                     name="day"
                     control={control}
                     render={({ field }) => (
-                        <InputNumber {...field} min={0} defaultValue={0} onChange={onChangeInputNum} disabled={startEnd !== 2} style={{ height: "40px" }} />
+                        <InputNumber {...field} min={0} placeholder='0' onChange={onChangeInputNum} disabled={startEnd !== 2} style={{ height: "40px" }} />
                     )}
                 />
                 <Controller
                     name="month"
                     control={control}
                     render={({ field }) => (
-                        <InputNumber {...field} min={0} defaultValue={0} onChange={onChangeInputNum} disabled={startEnd !== 3} style={{ height: "40px" }} />
+                        <InputNumber {...field} min={0} placeholder='0' onChange={onChangeInputNum} disabled={startEnd !== 3} style={{ height: "40px" }} />
                     )}
                 />
                 <Controller
@@ -132,7 +132,7 @@ export default function BaslangicBitis() {
                     control={control}
                     render={({ field }) => (
                         <>
-                            <InputNumber {...field} min={0} defaultValue={0} onChange={onChangeInputNum} disabled={startEnd !== 4} style={{ height: "40px" }} />
+                            <InputNumber {...field} min={0} placeholder='0' onChange={onChangeInputNum} disabled={startEnd !== 4} style={{ height: "40px" }} />
                         </>
                     )}
                 />
