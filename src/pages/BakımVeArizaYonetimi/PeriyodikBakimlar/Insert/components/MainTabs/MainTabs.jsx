@@ -1,19 +1,10 @@
-import React from "react";
 import {
-  Drawer,
   Typography,
   Button,
   Input,
-  Select,
-  DatePicker,
-  TimePicker,
-  Row,
-  Col,
   Checkbox,
-  ColorPicker,
 } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
-import BakimGrubu from "./components/BakimGrubu";
 import styled from "styled-components";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
@@ -23,9 +14,9 @@ import AtolyeTablo from "./components/AtolyeTablo";
 import FirmaTablo from "./components/FirmaTablo";
 import LokasyonTablo from "./components/LokasyonTablo";
 import TakvimTablo from "./components/TakvimTablo";
+import BakimGrubu from "./components/BakimGrubu";
 
-const { Text, Link } = Typography;
-const { TextArea } = Input;
+const { Text } = Typography;
 
 dayjs.extend(customParseFormat);
 
@@ -99,7 +90,6 @@ export default function MainTabs() {
     setValue("calismaTakvimi", "");
     setValue("calismaTakvimiId", "");
   };
-
 
   const handleLokasyonMinusClick = () => {
     setValue("lokasyonTanim", "");
@@ -273,7 +263,7 @@ export default function MainTabs() {
               render={({ field }) => (
                 <Input
                   {...field}
-                  type="text" // Set the type to "text" for name input
+                  type="text"
                   style={{ width: "215px" }}
                   disabled
                 />
@@ -285,7 +275,7 @@ export default function MainTabs() {
               render={({ field }) => (
                 <Input
                   {...field}
-                  type="text" // Set the type to "text" for name input
+                  type="text"
                   style={{ display: "none" }}
                 />
               )}
@@ -323,7 +313,7 @@ export default function MainTabs() {
                 render={({ field }) => (
                   <Input
                     {...field}
-                    type="text" // Set the type to "text" for name input
+                    type="text"
                     style={{ width: "215px" }}
                     disabled
                   />
@@ -335,7 +325,7 @@ export default function MainTabs() {
                 render={({ field }) => (
                   <Input
                     {...field}
-                    type="text" // Set the type to "text" for name input
+                    type="text"
                     style={{ display: "none" }}
                   />
                 )}
@@ -374,7 +364,7 @@ export default function MainTabs() {
                 render={({ field }) => (
                   <Input
                     {...field}
-                    type="text" // Set the type to "text" for name input
+                    type="text"
                     style={{ width: "215px" }}
                     disabled
                   />
@@ -386,7 +376,7 @@ export default function MainTabs() {
                 render={({ field }) => (
                   <Input
                     {...field}
-                    type="text" // Set the type to "text" for name input
+                    type="text"
                     style={{ display: "none" }}
                   />
                 )}
@@ -425,7 +415,7 @@ export default function MainTabs() {
                 render={({ field }) => (
                   <Input
                     {...field}
-                    type="text" // Set the type to "text" for name input
+                    type="text"
                     style={{ width: "215px" }}
                     disabled
                   />
@@ -437,7 +427,7 @@ export default function MainTabs() {
                 render={({ field }) => (
                   <Input
                     {...field}
-                    type="text" // Set the type to "text" for name input
+                    type="text"
                     style={{ display: "none" }}
                   />
                 )}
@@ -477,7 +467,7 @@ export default function MainTabs() {
                 render={({ field }) => (
                   <Input
                     {...field}
-                    type="text" // Set the type to "text" for name input
+                    type="text"
                     style={{ width: "215px" }}
                     disabled
                   />
@@ -489,7 +479,7 @@ export default function MainTabs() {
                 render={({ field }) => (
                   <Input
                     {...field}
-                    type="text" // Set the type to "text" for name input
+                    type="text"
                     style={{ display: "none" }}
                   />
                 )}
@@ -531,7 +521,7 @@ export default function MainTabs() {
               render={({ field }) => (
                 <Input
                   {...field}
-                  type="text" // Set the type to "text" for name input
+                  type="text"
                   style={{ width: "100%", maxWidth: "630px" }}
                   disabled
                 />
@@ -543,7 +533,7 @@ export default function MainTabs() {
               render={({ field }) => (
                 <Input
                   {...field}
-                  type="text" // Set the type to "text" for name input
+                  type="text"
                   style={{ display: "none" }}
                 />
               )}
@@ -568,7 +558,7 @@ export default function MainTabs() {
             width: "100%",
             justifyContent: "space-between",
           }}>
-          <Text style={{ fontSize: "14px" }}>Çalışma Süresis (dk.):</Text>
+          <Text style={{ fontSize: "14px" }}>Çalışma Süresi (dk.):</Text>
           <div
             style={{
               display: "flex",
@@ -588,7 +578,6 @@ export default function MainTabs() {
                   style={{ flex: 1 }}
                   onKeyPress={(e) => {
                     const value = field.value;
-                    // Rakam veya bir virgül olup olmadığını kontrol et
                     if (!/[0-9]/.test(e.key) && (e.key !== "," || value.includes(","))) {
                       e.preventDefault();
                     }
@@ -606,7 +595,7 @@ export default function MainTabs() {
             justifyContent: "space-between",
             width: "100%",
           }}>
-          <Text style={{ fontSize: "14px" }}>Duruş Süresis (dk.):</Text>
+          <Text style={{ fontSize: "14px" }}>Duruş Süresi (dk.):</Text>
           <div
             style={{
               display: "flex",
@@ -626,7 +615,6 @@ export default function MainTabs() {
                   style={{ flex: 1 }}
                   onKeyPress={(e) => {
                     const value = field.value;
-                    // Rakam veya bir virgül olup olmadığını kontrol et
                     if (!/[0-9]/.test(e.key) && (e.key !== "," || value.includes(","))) {
                       e.preventDefault();
                     }
@@ -663,7 +651,6 @@ export default function MainTabs() {
                   {...field}
                   style={{ flex: 1 }}
                   onKeyPress={(e) => {
-                    // Sadece rakam girişine izin ver
                     if (!/[0-9]/.test(e.key)) {
                       e.preventDefault();
                     }

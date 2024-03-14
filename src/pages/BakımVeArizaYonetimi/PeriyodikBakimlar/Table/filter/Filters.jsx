@@ -20,9 +20,10 @@ export default function Filters({ onChange }) {
   return (
     <>
       <TypeFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, bakimtipleri: newFilters }))} />
-      <TanimFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, bakimtipleri: newFilters }))} />
-      <AtolyeFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, bakimtipleri: newFilters }))} />
+      <TanimFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, bakimtanimlari: newFilters }))} />
+      <AtolyeFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, atolyeler: newFilters }))} />
       <LocationFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, lokasyonlar: newFilters }))} />
+      <CustomFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, customfilter: newFilters }))} />
     </>
   );
 }

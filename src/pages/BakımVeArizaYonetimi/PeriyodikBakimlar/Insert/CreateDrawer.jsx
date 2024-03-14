@@ -1,13 +1,12 @@
 import tr_TR from "antd/es/locale/tr_TR";
 import { PlusOutlined } from "@ant-design/icons";
 import { Button, Drawer, Space, ConfigProvider, Modal } from "antd";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import MainTabs from "./components/MainTabs/MainTabs";
-import { useForm, Controller, useFormContext, FormProvider } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
 import AxiosInstance from "../../../../api/http";
 import Footer from "../Footer";
-// import SecondTabs from "./components/secondTabs/secondTabs";
 
 export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
   const [open, setOpen] = useState(false);
@@ -41,15 +40,12 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
   //* export
   const methods = useForm({
     defaultValues: {
-      atolyeKodu: "",
-      secilenID: "",
-      atolyeAktif: true,
-      atolyeTanimi: "",
-      atolyeGrubu: null,
-      atolyeGrubuID: "",
-      atolyeTelefon: "",
-      yetkili: "",
-      yetkiliEmail: "",
+      bakimKodu: "",
+      bakimTanimi: "",
+      bakimAktif: true,
+      bakimTipi: "",
+      bakimGrubu: null,
+      bakimGrubuID: "",
     },
   });
 
@@ -68,15 +64,12 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
   //* export
   const onSubmit = (data) => {
     const Body = {
-      ATL_KOD: data.atolyeKodu,
-      ATL_TANIM: data.atolyeTanimi,
-      ATL_ATOLYE_GRUP_ID: data.atolyeGrubuID,
-      ATL_TEL: data.atolyeTelefon,
-      ATL_AKTIF: data.atolyeAktif,
-      ATL_YETKILI: data.yetkili,
-      ATL_YETKILI_MAIL: data.yetkiliEmail,
-
-      // add more fields as needed
+      BAKIM_KOD: data.bakimKodu,
+      BAKIM_TANIM: data.bakimTanimi,
+      BAKIM_TIP: data.bakimTipi,
+      BAKIM_GRUP_ID: data.bakimGrubuID,
+      BAKIM_AKTIF: data.bakimAktif,
+      ONCELIK: data
     };
 
     // AxiosInstance.post("/api/endpoint", { Body }).then((response) => {
@@ -108,12 +101,10 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
     }
   }, [selectedLokasyonId, methods]);
 
-  // otonom sayaç için
   useEffect(() => {
     if (open) {
-      AxiosInstance.get("AtolyeKodGetir") // Replace with your actual API endpoint
+      AxiosInstance.get("AtolyeKodGetir")
         .then((response) => {
-          // Assuming the response contains the new work order number in 'response.Tanim'
           setValue("atolyeKodu", response);
         })
         .catch((error) => {
@@ -122,7 +113,6 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
     }
   }, [open, setValue]);
 
-  // otonom sayaç için son
 
   return (
     <FormProvider {...methods}>
@@ -160,7 +150,6 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
               </Space>
             }>
             <MainTabs />
-            {/* <SecondTabs /> */}
             <Footer />
           </Drawer>
         </ConfigProvider>

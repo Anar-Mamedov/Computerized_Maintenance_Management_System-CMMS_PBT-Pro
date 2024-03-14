@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Select, Button, Popover } from "antd";
 import AxiosInstance from "../../../../../api/http";
 
@@ -16,7 +16,7 @@ const TypeFilter = ({ onSubmit }) => {
   useEffect(() => {
     // Selectbox açık olduğunda API isteğini yap
     if (open) {
-      AxiosInstance.get("BakimTip")
+      AxiosInstance.get("")
         .then((response) => {
           const options = response.map((option) => ({
             key: option.TB_ISEMRI_TIP_ID,
@@ -29,7 +29,7 @@ const TypeFilter = ({ onSubmit }) => {
           console.log("API Error:", error);
         });
     }
-  }, [open]); // open state'i değiştiğinde useEffect hook'unu tetikle
+  }, [open]);
 
   const handleSubmit = () => {
     const selectedOptionsObj = selectedValues.reduce((acc, currentValue) => {

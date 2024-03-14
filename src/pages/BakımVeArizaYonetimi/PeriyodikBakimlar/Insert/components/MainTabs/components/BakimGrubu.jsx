@@ -1,12 +1,11 @@
-import React, { useState, createRef, useEffect } from "react";
+import { useState, createRef } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import { Select, Typography, Divider, Spin, Button, Input, message, Space } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
 import { PlusOutlined } from "@ant-design/icons";
 import styled from "styled-components";
 
-const { Text, Link } = Typography;
-const { Option } = Select;
+const { Text } = Typography;
 
 const StyledSelect = styled(Select)`
   @media (min-width: 600px) {
@@ -34,11 +33,7 @@ export default function BakimGrubu() {
   const inputRef = createRef();
   const [name, setName] = useState("");
   const [selectKey, setSelectKey] = useState(0);
-
-  // message
   const [messageApi, contextHolder] = message.useMessage();
-
-  // message end
 
   const fetchData = async () => {
     setLoading(true);
@@ -58,8 +53,6 @@ export default function BakimGrubu() {
     setName(e.target.value);
   };
 
-  // add new status to selectbox
-
   const addItem = () => {
     if (name.trim() !== "") {
       if (options.some((option) => option.KOD_TANIM === name)) {
@@ -74,8 +67,7 @@ export default function BakimGrubu() {
       AxiosInstance.post(`AddKodList?entity=${name}&grup=32760`)
         .then((response) => {
           if (response.status_code === 201) {
-            // Assuming 'id' is directly in the response
-            const newId = response.id; // Adjust this line based on your actual response structure
+            const newId = response.id;
 
             messageApi.open({
               type: "success",
@@ -85,15 +77,13 @@ export default function BakimGrubu() {
             setSelectKey((prevKey) => prevKey + 1);
             setName("");
           } else {
-            // Error handling
             messageApi.open({
               type: "error",
-              content: "An error occurred", // Adjust the error message as needed
+              content: "An error occurred", 
             });
           }
         })
         .catch((error) => {
-          // Handle Axios errors
           console.error("Error adding item to API:", error);
           messageApi.open({
             type: "error",
@@ -106,7 +96,6 @@ export default function BakimGrubu() {
     }
   };
 
-  // add new status to selectbox end
   return (
     <StyledDiv
       style={{
@@ -126,7 +115,6 @@ export default function BakimGrubu() {
           <StyledSelect
             {...field}
             key={selectKey}
-            // style={{ maxWidth: "300px", width: "100%" }}
             showSearch
             allowClear
             placeholder="Seçim Yapınız"
@@ -136,7 +124,7 @@ export default function BakimGrubu() {
             }
             onDropdownVisibleChange={(open) => {
               if (open) {
-                fetchData(); // Fetch data when the dropdown is opened
+                fetchData();
               }
             }}
             dropdownRender={(menu) => (
@@ -159,11 +147,10 @@ export default function BakimGrubu() {
               </Spin>
             )}
             options={options.map((item) => ({
-              value: item.TB_KOD_ID, // Use the ID as the value
-              label: item.KOD_TANIM, // Display the name in the dropdown
+              value: item.TB_KOD_ID,
+              label: item.KOD_TANIM,
             }))}
             onChange={(value) => {
-              // Seçilen değerin ID'sini NedeniID alanına set et
               setValue("bakimGrubuID", value);
               field.onChange(value);
             }}
@@ -176,7 +163,7 @@ export default function BakimGrubu() {
         render={({ field }) => (
           <Input
             {...field}
-            type="text" // Set the type to "text" for name input
+            type="text"
             style={{ display: "none" }}
           />
         )}

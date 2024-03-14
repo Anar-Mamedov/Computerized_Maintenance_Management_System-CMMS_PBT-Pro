@@ -77,6 +77,7 @@ const columns = [
         dataIndex: 'hatirlatma_sure',
     },
 ];
+
 const data = [
     {
         key: '1',

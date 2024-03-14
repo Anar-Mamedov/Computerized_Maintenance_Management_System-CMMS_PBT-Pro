@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button, Popover } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
 import Sil from "./components/Sil";

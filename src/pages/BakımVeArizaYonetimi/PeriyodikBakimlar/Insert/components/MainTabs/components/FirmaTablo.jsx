@@ -1,25 +1,18 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button, Input, Modal, Table } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
-import dayjs from "dayjs";
+// import dayjs from "dayjs";
 
 export default function FirmaTablo({ workshopSelectedId, onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
-  // tablodaki search kısmı için
   const [searchValue, setSearchValue] = useState("");
-  // 1. Add a state variable for searchTimeout
   const [searchTimeout, setSearchTimeout] = useState(null);
-  // tablodaki search kısmı için son
-  // sayfalama için
-  const [currentPage, setCurrentPage] = useState(1); // Initial page
-  const [pageSize, setPageSize] = useState(0); // Default to 0
-  // sayfalama için son
-  // sayfa değiştiğinde apiye istek hemen gitsin filtrelemede bulunan gecikmeden etkilenmesin diye
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(0); 
   const [changeSource, setChangeSource] = useState(null);
-  // sayfa değiştiğinde apiye istek hemen gitsin filtrelemede bulunan gecikmeden etkilenmesin diye son
 
   const columns = [
     {
@@ -137,24 +130,21 @@ export default function FirmaTablo({ workshopSelectedId, onSubmit }) {
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
-  }, [searchValue, currentPage]); // Added currentPage as a dependency
+  }, [searchValue, currentPage]); 
 
   const handleModalToggle = () => {
     setIsModalVisible((prev) => !prev);
-    // Bu fonksiyon sadece modalın açılıp kapatılmasını kontrol eder.
   };
 
   useEffect(() => {
     if (isModalVisible) {
-      // Modal açıldığında çalışacak kodlar
-      fetch(); // Verileri yeniden yükle
+      fetch(); 
     } else {
-      // Modal kapandığında çalışacak kodlar
-      setSearchValue(""); // Arama değerini sıfırla
-      setCurrentPage(1); // Sayfa numarasını başlangıç değerine sıfırla
-      setSelectedRowKeys([]); // Seçili satır anahtarlarını sıfırla
+      setSearchValue("");
+      setCurrentPage(1); 
+      setSelectedRowKeys([]);
     }
-  }, [isModalVisible]); // isModalVisible değiştiğinde useEffect tetiklenir
+  }, [isModalVisible]); 
 
   const handleModalOk = () => {
     const selectedData = data.find((item) => item.key === selectedRowKeys[0]);
@@ -172,29 +162,25 @@ export default function FirmaTablo({ workshopSelectedId, onSubmit }) {
     setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
   };
 
-  // tablodaki search kısmı için
   useEffect(() => {
     if (changeSource === "searchValue") {
       if (searchTimeout) {
-        clearTimeout(searchTimeout); // Clear any existing timeout
+        clearTimeout(searchTimeout);
       }
       const timeout = setTimeout(() => {
         fetch();
-        setChangeSource(null); // Reset the change source after fetching
-      }, 2000); // 2000 milliseconds delay
-      setSearchTimeout(timeout); // Store the timeout ID
+        setChangeSource(null);
+      }, 2000); 
+      setSearchTimeout(timeout); 
 
-      // Cleanup function to clear the timeout when the component is unmounted
       return () => {
         clearTimeout(timeout);
       };
     } else if (changeSource === "currentPage") {
       fetch();
-      setChangeSource(null); // Reset the change source after fetching
+      setChangeSource(null); 
     }
-  }, [searchValue, currentPage, fetch]); // Added fetch as a dependency
-
-  // tablodaki search kısmı için son
+  }, [searchValue, currentPage, fetch]); 
 
   return (
     <div>
@@ -211,8 +197,8 @@ export default function FirmaTablo({ workshopSelectedId, onSubmit }) {
           value={searchValue}
           onChange={(e) => {
             setSearchValue(e.target.value);
-            setCurrentPage(1); // Reset to page 1 when the search value changes
-            setChangeSource("searchValue"); // Set the change source
+            setCurrentPage(1);
+            setChangeSource("searchValue");
           }}
           style={{ marginBottom: "20px", width: "250px" }}
         />
@@ -236,7 +222,7 @@ export default function FirmaTablo({ workshopSelectedId, onSubmit }) {
             total: pageSize * 10,
             onChange: (page) => {
               setCurrentPage(page);
-              setChangeSource("currentPage"); // Set the change source
+              setChangeSource("currentPage");
             },
           }}
         />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Select, Button, Popover } from "antd";
 import AxiosInstance from "../../../../../api/http";
 
@@ -26,10 +26,9 @@ const LocationFilter = ({ onSubmit }) => {
     if (open) {
       AxiosInstance.get("getLokasyonlar")
         .then((response) => {
-          // API'den gelen veriye göre options dizisini oluştur
           const options = response.map((option, index) => ({
-            key: index.toString(), // Benzersiz bir key olarak index kullan
-            value: option, // Gösterilecek değer
+            key: index.toString(), 
+            value: option,
           }));
           setOptions(options);
         })
