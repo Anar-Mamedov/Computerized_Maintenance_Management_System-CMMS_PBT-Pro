@@ -1,9 +1,22 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs, DatePicker, TimePicker, Slider, InputNumber, Checkbox } from "antd";
+import {
+  Button,
+  Modal,
+  Input,
+  Typography,
+  Tabs,
+  DatePicker,
+  TimePicker,
+  Slider,
+  InputNumber,
+  Checkbox,
+  message,
+} from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import dayjs from "dayjs";
 import { useAppContext } from "../../../../../../../../AppContext"; // Context hook'unu import edin
+import AxiosInstance from "../../../../../../../../api/http";
 import ProsedurTablo from "./components/ProsedurTablo";
 import ProsedurTipi from "./components/ProsedurTipi";
 import ProsedurNedeni from "./components/ProsedurNedeni";
@@ -66,8 +79,30 @@ export default function DetayBilgiler({ fieldRequirements }) {
   // iş emri tipi selectboxu değiştiğinde prosedür ve ondan sonraki 3 fieldin değerlerini sıfırlamak için son
 
   const prosedurTab = watch("prosedurTab");
+  const prosedurID = watch("prosedurID");
+  const secilenIsEmriID = watch("secilenIsEmriID");
 
-  const handleProsedurMinusClick = () => {
+  const handleProsedurMinusClick = async () => {
+    try {
+      // API isteğini yap
+      const response = await AxiosInstance.get(
+        `RevmoveProsedurFromIsEmri?isEmriId=${secilenIsEmriID}&isTanimId=${prosedurID}`
+      );
+      // İsteğin başarılı olduğunu kontrol et
+      if ((response && response.status_code === 200) || response.status_code === 201) {
+        // Başarılı işlem mesajı veya başka bir işlem yap
+        message.success("İşlem Başarılı!");
+        console.log("İşlem başarılı.");
+      } else {
+        message.error("İşlem Başarısız!");
+        // Hata mesajı göster
+        console.error("Bir hata oluştu.");
+      }
+    } catch (error) {
+      // Hata yakalama
+      console.error("API isteği sırasında bir hata oluştu:", error);
+    }
+
     setValue("prosedur", "");
     setValue("prosedurID", "");
     setValue("konu", "");

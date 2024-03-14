@@ -7,7 +7,7 @@ import CreateModal from "./Insert/CreateModal";
 import EditModal from "./Update/EditModal";
 import CreateAracGerecTablo from "./Insert/CreateAracGerecTablo";
 
-export default function AracGereclerListesiTablo() {
+export default function AracGereclerListesiTablo({ isActive }) {
   const [loading, setLoading] = useState(false);
   const { control, watch, setValue } = useFormContext();
   const [data, setData] = useState([]);
@@ -116,21 +116,23 @@ export default function AracGereclerListesiTablo() {
   const secilenIsEmriID = watch("secilenIsEmriID");
 
   const fetch = useCallback(() => {
-    setLoading(true);
-    AxiosInstance.get(`FetchIsEmriAracGerec?isemriID=${secilenIsEmriID}`)
-      .then((response) => {
-        const fetchedData = response.ARAC_GEREC_LISTE.map((item) => ({
-          ...item,
-          key: item.TB_ARAC_GEREC_ID,
-        }));
-        setData(fetchedData);
-      })
-      .catch((error) => {
-        // Hata işleme
-        console.error("API isteği sırasında hata oluştu:", error);
-      })
-      .finally(() => setLoading(false));
-  }, [secilenIsEmriID]); // secilenIsEmriID değiştiğinde fetch fonksiyonunu güncelle
+    if (isActive) {
+      setLoading(true);
+      AxiosInstance.get(`FetchIsEmriAracGerec?isemriID=${secilenIsEmriID}`)
+        .then((response) => {
+          const fetchedData = response.ARAC_GEREC_LISTE.map((item) => ({
+            ...item,
+            key: item.TB_ARAC_GEREC_ID,
+          }));
+          setData(fetchedData);
+        })
+        .catch((error) => {
+          // Hata işleme
+          console.error("API isteği sırasında hata oluştu:", error);
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [secilenIsEmriID, isActive]); // secilenIsEmriID değiştiğinde fetch fonksiyonunu güncelle
 
   useEffect(() => {
     if (secilenIsEmriID) {
