@@ -1,4 +1,3 @@
-import React from "react";
 import { Tabs } from "antd";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";

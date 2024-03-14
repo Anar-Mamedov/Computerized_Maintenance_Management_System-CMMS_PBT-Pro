@@ -1,4 +1,4 @@
-import React, { useState, createRef, useEffect } from "react";
+import { useState, createRef } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import { Select, Typography, Divider, Spin, Button, Input, message, Space } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
@@ -6,7 +6,6 @@ import { PlusOutlined } from "@ant-design/icons";
 import styled from "styled-components";
 
 const { Text, Link } = Typography;
-const { Option } = Select;
 
 const StyledSelect = styled(Select)`
   @media (min-width: 600px) {

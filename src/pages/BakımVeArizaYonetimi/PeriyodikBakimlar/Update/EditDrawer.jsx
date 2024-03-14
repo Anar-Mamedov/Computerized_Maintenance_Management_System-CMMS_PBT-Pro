@@ -1,14 +1,14 @@
-import tr_TR from "antd/es/locale/tr_TR";
-import { PlusOutlined } from "@ant-design/icons";
-import { Button, Drawer, Space, ConfigProvider, Modal, message, Tabs } from "antd";
-import React, { useEffect, useState, useTransition } from "react";
-import MainTabs from "./components/MainTabs/MainTabs";
-import { useForm, Controller, useFormContext, FormProvider, set } from "react-hook-form";
+import { useEffect, useState, useTransition } from "react";
+import { useForm, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
+import { Button, Drawer, Space, ConfigProvider, Modal, message, Tabs } from "antd";
+import tr_TR from "antd/es/locale/tr_TR";
+import styled from "styled-components";
+
 import AxiosInstance from "../../../../api/http";
 import Footer from "./components/Footer";
+import MainTabs from "./components/MainTabs/MainTabs";
 import SecondTabs from "./components/SecondTabs/SecondTabs";
-import styled from "styled-components";
 import BakimPeriyotBilgiler from "./components/BakimPeriyotBilgileri/BakimPeriyotBilgiler";
 import TanimliMakineler from "./components/TanimliMakineler/TanimliMakineler";
 
@@ -43,11 +43,7 @@ const StyledTabs = styled(Tabs)`
 `;
 
 export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
-  const [, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
-  const showDrawer = () => {
-    setOpen(true);
-  };
 
   const showConfirmationModal = () => {
     Modal.confirm({
@@ -56,7 +52,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       okText: "Evet",
       cancelText: "Hayır",
       onOk: () => {
-        onDrawerClose(); // Close the drawer
+        onDrawerClose();
         onRefresh();
         reset();
       },
@@ -67,7 +63,6 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   };
 
   const onClose = () => {
-    // Kullanıcı "İptal" düğmesine tıkladığında Modal'ı göster
     showConfirmationModal();
   };
 
@@ -202,11 +197,10 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     // handle response
     // });
 
-    AxiosInstance.post("UpdateBakim", Body)
+    AxiosInstance.post("", Body)
       .then((response) => {
-        // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);
-        onDrawerClose(); // Close the drawer
+        onDrawerClose(); 
         onRefresh();
         reset();
 
@@ -289,7 +283,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   useEffect(() => {
     if (!drawerVisible) {
-      reset(); // Drawer kapandığında formu sıfırla
+      reset(); 
     }
   }, [drawerVisible, reset]);
 
@@ -322,17 +316,6 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)}>
         <ConfigProvider locale={tr_TR}>
-          {/* <Button
-            type="primary"
-            onClick={showDrawer}
-            style={{
-              display: "flex",
-              alignItems: "center",
-            }}>
-            <PlusOutlined />
-            Ekle
-          </Button> */}
-
           <Drawer
             width="1460px"
             title="Bakım Tanımını Güncelle"
@@ -355,8 +338,6 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
               </Space>
             }>
             <StyledTabs defaultActiveKey="1" items={items} onChange={onChange} style={{marginBottom: 20}}/>
-
-
             <Footer />
           </Drawer>
         </ConfigProvider>

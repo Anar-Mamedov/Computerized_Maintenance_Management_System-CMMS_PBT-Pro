@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Modal, Table, Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../api/http";
-import styled from "styled-components";
 
 export default function LokasyonTablo({ workshopSelectedId, onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -154,17 +153,17 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit }) {
     if (!isModalVisible) {
       fetchData();
       setSelectedRowKeys([]);
-      setSearchTerm(""); // Modal kapandığında arama alanını sıfırla
-      setDebouncedSearchTerm(""); // Debounced arama terimini de sıfırla
-      setFilteredData(treeData); // Filtrelenmiş veriyi orijinal ağaç verisine döndür
-      setExpandedRowKeys([]); // Genişletilmiş satırları sıfırla
+      setSearchTerm("");
+      setDebouncedSearchTerm(""); 
+      setFilteredData(treeData); 
+      setExpandedRowKeys([]);
     }
   };
 
   const handleModalOk = () => {
     const selectedData = findItemInTree(selectedRowKeys[0], treeData);
     if (selectedData) {
-      onSubmit && onSubmit(selectedData); // This should handle both parents and children
+      onSubmit && onSubmit(selectedData);
     }
     setIsModalVisible(false);
   };
@@ -177,15 +176,11 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit }) {
     setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
   };
 
-  // parentler seçilemesin diye
-
   const rowSelection = {
     type: "radio",
     selectedRowKeys,
     onChange: onRowSelectChange,
   };
-
-  // parentler seçilemesin diye end
 
   return (
     <div>
@@ -197,7 +192,7 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit }) {
           placeholder="Arama yap..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          prefix={<SearchOutlined style={{ color: "#0091ff" }} />} // Arama ikonunu ekle
+          prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
         />
         <Table
           rowSelection={rowSelection}

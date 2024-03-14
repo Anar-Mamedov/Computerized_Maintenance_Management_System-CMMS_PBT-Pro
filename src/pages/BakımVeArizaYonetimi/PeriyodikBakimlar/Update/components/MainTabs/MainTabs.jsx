@@ -1,16 +1,8 @@
-import React from "react";
 import {
-  Drawer,
   Typography,
   Button,
   Input,
-  Select,
-  DatePicker,
-  TimePicker,
-  Row,
-  Col,
   Checkbox,
-  ColorPicker,
 } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import BakimTipi from "./components/BakimTipi";
@@ -19,16 +11,13 @@ import LokasyonTablo from "./components/LokasyonTablo";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import BakimGrubu from "./components/BakimGrubu";
-import BakimNedeni from "./components/BakimNedeni";
 import OncelikTablo from "./components/OncelikTablo";
 import TalimatTablo from "./components/TalimatTablo";
 import AtolyeTablo from "./components/AtolyeTablo";
 import FirmaTablo from "./components/FirmaTablo";
-import Periyot from "./components/Periyot";
 import TakvimTablo from "../../../Insert/components/MainTabs/components/TakvimTablo";
 
 const { Text, Link } = Typography;
-const { TextArea } = Input;
 
 dayjs.extend(customParseFormat);
 
@@ -78,13 +67,6 @@ const StyledDivMedia = styled.div`
 export default function MainTabs() {
   const { control, watch, setValue } = useFormContext();
 
-  const otonomBakimValue = watch("otonomBakim");
-
-  const handleMinusClick = () => {
-    setValue("lokasyonMasrafMerkeziTanim", "");
-    setValue("lokasyonMasrafMerkeziID", "");
-  };
-
   const handleOncelikMinusClick = () => {
     setValue("oncelikTanim", "");
     setValue("oncelikID", "");
@@ -103,11 +85,6 @@ export default function MainTabs() {
   const handleFirmaMinusClick = () => {
     setValue("firmaTanim", "");
     setValue("firmaID", "");
-  };
-
-  const handleDepoMinusClick = () => {
-    setValue("lokasyonDepoTanim", "");
-    setValue("lokasyonDepoID", "");
   };
 
   const handleLokasyonMinusClick = () => {
@@ -569,7 +546,7 @@ export default function MainTabs() {
             width: "100%",
             justifyContent: "space-between",
           }}>
-          <Text style={{ fontSize: "14px" }}>Çalışma Süresis (dk.):</Text>
+          <Text style={{ fontSize: "14px" }}>Çalışma Süresi (dk.):</Text>
           <div
             style={{
               display: "flex",
@@ -607,7 +584,7 @@ export default function MainTabs() {
             justifyContent: "space-between",
             width: "100%",
           }}>
-          <Text style={{ fontSize: "14px" }}>Duruş Süresis (dk.):</Text>
+          <Text style={{ fontSize: "14px" }}>Duruş Süresi (dk.):</Text>
           <div
             style={{
               display: "flex",

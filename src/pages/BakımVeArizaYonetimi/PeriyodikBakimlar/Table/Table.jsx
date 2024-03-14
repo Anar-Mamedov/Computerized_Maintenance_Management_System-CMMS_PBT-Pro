@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Input, Table, Spin, Button, Modal, Checkbox } from "antd";
 import { CheckOutlined, CloseOutlined, SearchOutlined, MenuOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
-import dayjs from "dayjs";
 import Filters from "./filter/Filters";
 
 export default function MainTable() {
@@ -91,7 +90,7 @@ export default function MainTable() {
             IST_KONTROL_SAYI: item.IST_KONTROL_SAYI,
           };
         });
-        setData(formattedData); // Directly set the data
+        setData(formattedData);
         setLoading(false);
       } else {
         console.error("API response is not in expected format");
@@ -109,6 +108,7 @@ export default function MainTable() {
       .toLowerCase();
   };
 
+  // search filter
   useEffect(() => {
     const filtered = data.filter((item) => normalizeString(item.IST_TANIM).includes(normalizeString(searchTerm)));
     setFilteredData(filtered);
@@ -132,7 +132,6 @@ export default function MainTable() {
   const onRowClick = (record) => {
     return {
       onClick: () => {
-        // Handle row click event
         setDrawer({ visible: true, data: record });
       },
     };
@@ -333,15 +332,12 @@ export default function MainTable() {
   ];
 
   const [visibleColumnKeys, setVisibleColumnKeys] = useState(() => {
-    // 'visibleColumns' isimli anahtarla kaydedilmiş değeri oku
     const savedVisibleColumns = JSON.parse(localStorage.getItem("visibleColumnsPeriyodikBakimlar"));
 
-    // Eğer localStorage'da bir değer varsa, bu değeri kullan
     if (savedVisibleColumns) {
       return savedVisibleColumns;
     }
 
-    // Yoksa, varsayılan olarak görünür olacak kolonların key'lerini döndür
     return columns.filter((col) => col.visible).map((col) => col.key);
   });
 
@@ -375,15 +371,13 @@ export default function MainTable() {
       ...state,
       [type]: newBody,
     }));
-    setCurrentPage(1); // Filtreleme yapıldığında sayfa numarasını 1'e ayarla
+    setCurrentPage(1);
   }, []);
 
   const visibleColumns = columns.filter((col) => visibleColumnKeys.includes(col.key));
   console.log(searchTerm)
   return (
     <div>
-      {/* Search input and create drawer */}
-
       <Modal width={900} title="Kolonları Düzenle" open={isModalVisible} onOk={toggleModal} onCancel={toggleModal}>
         <Checkbox.Group
           style={{ width: "100%", display: "flex", gap: "10px", flexDirection: "column", height: "500px" }}
