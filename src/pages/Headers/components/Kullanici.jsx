@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Avatar, Space, Button, Popover, Typography } from "antd";
 import { UserOutlined, LogoutOutlined, EditOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const { Text, Link } = Typography;
 
@@ -10,11 +11,13 @@ export default function Header() {
   const handleOpenChange = (newOpen) => {
     setOpen(newOpen);
   };
+  const navigate = useNavigate(); // useNavigate hook'unu kullanarak `navigate` fonksiyonunu al
 
   // Çıkış işlevini tanımla
   const handleLogout = () => {
     localStorage.removeItem("token"); // localStorage'dan token'i sil
-    window.location.reload(); // Sayfayı yenile
+    navigate("/login"); // `/login` sayfasına yönlendir
+    // window.location.reload(); // Sayfayı yenile
   };
 
   const content = (
