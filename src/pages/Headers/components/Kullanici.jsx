@@ -16,7 +16,7 @@ export default function Header() {
   // Çıkış işlevini tanımla
   const handleLogout = () => {
     localStorage.removeItem("token"); // localStorage'dan token'i sil
-    navigate("/login"); // `/login` sayfasına yönlendir
+    navigate("/auth"); // `/login` sayfasına yönlendir
     // window.location.reload(); // Sayfayı yenile
   };
 
