@@ -12,7 +12,6 @@ export default function Dashboard() {
         alignItems: "flex-start",
       }}>
       <div>Grafikler</div>
-      <Hatirlatici />
     </div>
   );
 }

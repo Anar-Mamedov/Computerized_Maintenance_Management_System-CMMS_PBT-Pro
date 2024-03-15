@@ -254,7 +254,6 @@ const BaseLayout = () => {
 
       <Layout>
         <Header style={{ padding: 0, background: colorBgContainer, display: "flex", alignItems: "center" }}>
-          <Headers />
           {mobileView && (
             <Button
               onClick={toggleCollapsed}
@@ -274,6 +273,7 @@ const BaseLayout = () => {
               )}
             </Button>
           )}
+          <Headers />
         </Header>
         <Content style={{ margin: mobileView ? "0 0px" : "0 16px" }}>
           <Breadcrumb style={{ margin: "16px 0" }}></Breadcrumb>

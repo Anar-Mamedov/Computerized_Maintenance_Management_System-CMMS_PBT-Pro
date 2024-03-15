@@ -20,31 +20,20 @@ export default function Hatirlatici() {
     <div
       style={{
         display: "flex",
-        height: "calc(100vh - 190px)",
+        height: "calc(100vh - 100px)",
         maxWidth: "350px",
         width: "100%",
         flexDirection: "column",
         gap: "5px",
-        border: "1px solid rgba(128, 128, 128, 0.27)",
-        borderRadius: "10px",
-        marginTop: "-20px",
-        marginRight: "-20px",
-        paddingTop: "45px",
       }}>
       <div
         style={{
           display: "flex",
-          position: "fixed",
           alignItems: "center",
           justifyContent: "center",
-          background: "rgb(230, 230, 230)",
-          width: "100%",
-          maxWidth: "348px",
-          height: "40px",
-          borderTopLeftRadius: "9px",
-          borderTopRightRadius: "9px",
-          marginTop: "-45px",
-          fontWeight: 500,
+          backgroundColor: "#80808051",
+          borderRadius: "5px",
+          padding: "10px 0",
         }}>
         Hatırlatıcı
       </div>
