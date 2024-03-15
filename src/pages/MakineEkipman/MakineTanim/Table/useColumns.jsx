@@ -41,6 +41,13 @@ export default function useColumns(props) {
       description: "Sıra",
       ellipsis: true, // Enable ellipsis for overflowed content
       modalTitle: "#",
+      // satır yüksekliğini ayarlamak için kullanılır
+      onCell: () => ({
+        style: {
+          height: "55px", // Hücre yüksekliği
+          // padding: "10px", // Varsayılan padding değerini değiştirebilirsiniz
+        },
+      }),
     },
     {
       title: "📎",
