@@ -26,7 +26,7 @@ import Hazirlaniyor from "./pages/Hazirlaniyor";
 import Auth from "./pages/Auth/Auth";
 import logo from "../src/assets/images/logoBeyaz.png";
 import PeriyodikBakimlar from "./pages/BakımVeArizaYonetimi/PeriyodikBakimlar/PeriyodikBakimlar";
-import Kullanici from "./pages/Kullanici/Kullanici";
+import Headers from "./pages/Headers/Headers";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -183,8 +183,8 @@ export default function App() {
 }
 
 const ProtectedRoute = ({ children }) => {
-  // const token = localStorage.getItem("token");
-  const token = sessionStorage.getItem("token");
+  const token = localStorage.getItem("token");
+  // const token = sessionStorage.getItem("token");
 
   if (!token) {
     return <Navigate to={"/auth"} replace />;
@@ -254,7 +254,7 @@ const BaseLayout = () => {
 
       <Layout>
         <Header style={{ padding: 0, background: colorBgContainer, display: "flex", alignItems: "center" }}>
-          <Kullanici />
+          <Headers />
           {mobileView && (
             <Button
               onClick={toggleCollapsed}

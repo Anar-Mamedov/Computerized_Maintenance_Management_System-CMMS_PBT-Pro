@@ -84,12 +84,15 @@ export default function Table() {
   };
 
   const onChange = (pagination, filters, sorter, extra) => {
-    // Check if filters or keyword are applied and the current page is not already 1
-    if ((filters || body.keyword) && pagination.current !== 1) {
-      // If filters or keyword are applied and not on the first page, reset to page 1
-      fetch({ filters: body.filters, keyword: body.keyword, page: 1 });
-    } else if (pagination.current !== currentPage) {
-      // Only fetch data if the page number has changed
+    // Sayfa numarasını güncelle ve verileri yeniden çek
+    setCurrentPage(pagination.current);
+
+    // Filtre veya anahtar kelime uygulandıysa ve mevcut sayfa 1 değilse,
+    // filtreler veya anahtar kelime ile verileri yeniden çek
+    if ((filters || body.keyword) && pagination.current !== currentPage) {
+      fetch({ filters: body.filters, keyword: body.keyword, page: pagination.current });
+    } else {
+      // Sadece sayfa numarası değiştiğinde verileri çek
       fetch({ filters: body.filters, keyword: body.keyword, page: pagination.current });
     }
   };
@@ -422,6 +425,7 @@ export default function Table() {
         className="custom-table"
         size="small"
         pagination={{
+          showQuickJumper: true,
           position: ["bottomRight"],
           pageSize: 10,
           showSizeChanger: false,
@@ -452,7 +456,7 @@ export default function Table() {
           // onContextMenu: (e) => handleContextMenu(e, record), // right click handler
         })}
       />
-      <div
+      {/* <div
         style={{
           position: "relative",
           width: "110px",
@@ -475,7 +479,7 @@ export default function Table() {
           style={{ width: "44px" }}
         />
         <Button onClick={handlePageNumberNavigation}>Git</Button>
-      </div>
+      </div> */}
       <Modal title="Not" open={isModalVisible} onCancel={handleModalClose} footer={null}>
         <Input.TextArea
           value={noteText} // Bind the value to the state variable
