@@ -26,6 +26,7 @@ import Hazirlaniyor from "./pages/Hazirlaniyor";
 import Auth from "./pages/Auth/Auth";
 import logo from "../src/assets/images/logoBeyaz.png";
 import PeriyodikBakimlar from "./pages/BakımVeArizaYonetimi/PeriyodikBakimlar/PeriyodikBakimlar";
+import Kullanici from "./pages/Kullanici/Kullanici";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -253,6 +254,7 @@ const BaseLayout = () => {
 
       <Layout>
         <Header style={{ padding: 0, background: colorBgContainer, display: "flex", alignItems: "center" }}>
+          <Kullanici />
           {mobileView && (
             <Button
               onClick={toggleCollapsed}
