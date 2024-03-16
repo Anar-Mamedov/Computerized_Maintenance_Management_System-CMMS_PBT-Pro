@@ -243,7 +243,7 @@ const BaseLayout = () => {
             className="demo-logo-vertical"
             style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
             <img src={logo} alt="Logo" style={logoStyle} />
-            <Text style={{ color: "white", marginTop: "11px", marginLeft: "5px" }}>v. 0.8.5</Text>
+            <Text style={{ color: "white", marginTop: "11px", marginLeft: "5px" }}>v. 0.9.0</Text>
           </div>
           <MenuWrapper />
         </Sider>
@@ -260,7 +260,7 @@ const BaseLayout = () => {
             className="demo-logo-vertical"
             style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
             <img src={logo} alt="Logo" style={logoStyle} />
-            <Text style={{ color: "white", marginTop: "11px", marginLeft: "5px" }}>v. 0.8.5</Text>
+            <Text style={{ color: "white", marginTop: "11px", marginLeft: "5px" }}>v. 0.9.0</Text>
           </div>
           <MenuWrapper />
         </Sider>
