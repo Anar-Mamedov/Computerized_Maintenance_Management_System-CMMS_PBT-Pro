@@ -1,23 +1,44 @@
 import React from "react";
-import { Button, Form, Input, Space, Typography } from "antd";
+import { Button, Form, Input, Space, Typography, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import AxiosInstance from "../../../api/http";
 
 const { Text, Link } = Typography;
 
 export default function LoginForm() {
   const navigate = useNavigate();
 
-  const onSubmit = (values) => {
+  const onSubmit = async (values) => {
     console.log("Received values of form: ", values);
 
-    // api sorgusu
-    // successidse
-    // localStorage.setItem("token", <apiden gelen token>);
-    // sessionStorage.setItem("token", Math.random().toString(36).substring(2));
-    localStorage.setItem("token", Math.random().toString(36).substring(2));
-    // localStorage.setItem("userId", <apiden gelen user ID bilgisi>);
-    navigate("/");
+    try {
+      // Constructing payload with the structure { KLL_KOD: "", KLL_SIFRE: "" }
+      const payload = {
+        KLL_KOD: values.email,
+        KLL_SIFRE: values.password ?? "",
+      };
+
+      // Sending the login request
+      const response = await AxiosInstance.post("/login", payload);
+
+      // Assuming the token is in the response data with the key 'token'
+      if (response && response.AUTH_TOKEN) {
+        localStorage.setItem("token", response.AUTH_TOKEN);
+        message.success("Giriş başarılı!");
+        // Optional: Store user ID if available in response
+        // localStorage.setItem("userId", response.data.userId);
+
+        navigate("/");
+      } else {
+        message.error("Giriş başarısız!");
+        // Handle case where token is not in response
+        console.error("Token not received from API");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      // Handle login error (e.g., show an error message)
+    }
   };
 
   return (
@@ -40,7 +61,10 @@ export default function LoginForm() {
           <Form.Item name="email" rules={[{ required: true, message: "Lütfen e-posta adresinizi girin!" }]}>
             <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="E-posta" />
           </Form.Item>
-          <Form.Item name="password" rules={[{ required: true, message: "Lütfen şifrenizi girin!" }]}>
+          <Form.Item
+            name="password"
+            // rules={[{ required: true, message: "Lütfen şifrenizi girin!" }]}
+          >
             <Input prefix={<LockOutlined className="site-form-item-icon" />} type="password" placeholder="Şifre" />
           </Form.Item>
           <Form.Item>
