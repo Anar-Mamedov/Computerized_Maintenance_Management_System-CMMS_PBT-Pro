@@ -1,17 +1,22 @@
-import React from "react";
-import { Button, Form, Input, Space, Typography, message } from "antd";
+import React, { useState } from "react";
+import { Button, Form, Input, Space, Typography, message, Spin } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import AxiosInstance from "../../../api/http";
+import { useSetRecoilState } from "recoil";
+import { userState, authTokenState } from "../../../state/userState";
 
 const { Text, Link } = Typography;
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const setUser = useSetRecoilState(userState);
+  // const setAuthToken = useSetRecoilState(authTokenState);
+  const [loading, setLoading] = useState(false); // Yükleme durumunu takip eden durum değişkeni
 
   const onSubmit = async (values) => {
     console.log("Received values of form: ", values);
-
+    setLoading(true); // API isteği başladığında yükleme durumunu true yap
     try {
       // Constructing payload with the structure { KLL_KOD: "", KLL_SIFRE: "" }
       const payload = {
@@ -24,7 +29,17 @@ export default function LoginForm() {
 
       // Assuming the token is in the response data with the key 'token'
       if (response && response.AUTH_TOKEN) {
+        // setAuthToken(response.data.AUTH_TOKEN); // Auth token'ı Recoil state'ine kaydet
+        setUser({ userId: response.TB_KULLANICI_ID, userName: response.KLL_TANIM, userResimID: response.resimId }); // Kullanıcı bilgilerini Recoil state'ine kaydet
         localStorage.setItem("token", response.AUTH_TOKEN);
+        // Kullanıcı bilgilerini localStorage'a kaydet
+        const userInfo = {
+          userId: response.TB_KULLANICI_ID,
+          userName: response.KLL_TANIM,
+          userResimID: response.resimId,
+        };
+        localStorage.setItem("user", JSON.stringify(userInfo));
+        // Recoil durumunu güncelleme işlemini App bileşeninde yapabilirsiniz
         message.success("Giriş başarılı!");
         // Optional: Store user ID if available in response
         // localStorage.setItem("userId", response.data.userId);
@@ -37,7 +52,10 @@ export default function LoginForm() {
       }
     } catch (error) {
       console.error("Login error:", error);
+      message.error("Giriş işlemi sırasında bir hata oluştu.");
       // Handle login error (e.g., show an error message)
+    } finally {
+      setLoading(false); // İşlem bittiğinde yükleme durumunu false yap
     }
   };
 
@@ -68,8 +86,13 @@ export default function LoginForm() {
             <Input prefix={<LockOutlined className="site-form-item-icon" />} type="password" placeholder="Şifre" />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" className="login-form-button" style={{ width: "100%" }}>
-              Giriş Yap
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="login-form-button"
+              style={{ width: "100%" }}
+              disabled={loading}>
+              {loading ? <Spin /> : "Giriş Yap"}
             </Button>
           </Form.Item>
         </Form>

@@ -27,6 +27,8 @@ import Auth from "./pages/Auth/Auth";
 import logo from "../src/assets/images/logoBeyaz.png";
 import PeriyodikBakimlar from "./pages/BakımVeArizaYonetimi/PeriyodikBakimlar/PeriyodikBakimlar";
 import Headers from "./pages/Headers/Headers";
+import { useRecoilState } from "recoil";
+import { userState } from "./state/userState";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -139,6 +141,18 @@ const items = [
 // diğer menüyü açtığımda diğer menüyü kapatıyor ve sayfa yüklendiğinde açık olan menüyü açık bırakıyor sonu
 
 export default function App() {
+  const [user, setUser] = useRecoilState(userState);
+
+  // localStorage'dan kullanıcı bilgilerini oku
+  useEffect(() => {
+    // Sayfa yüklendiğinde, kullanıcı bilgilerini localStorage'dan oku
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser)); // Recoil durumunu güncelle
+    }
+  }, [setUser]);
+  // localStorage'dan kullanıcı bilgilerini oku son
+
   return (
     <Routes>
       <Route path="/auth" element={<Auth />} />
