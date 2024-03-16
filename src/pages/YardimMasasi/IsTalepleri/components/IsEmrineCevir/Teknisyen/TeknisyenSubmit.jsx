@@ -49,7 +49,6 @@ export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
 
     const Body = selectedRows.map((row) => ({
       TALEP_ID: row.key, // Her bir satırın key değeri, TALEP_ID'ye eşitlenir.
-      USER_ID: 24, // Sabit bir değer
       TEKNISYEN_IDS: teknisyenIds, // Yukarıda oluşturulan teknisyen ID'leri dizisi
     }));
 

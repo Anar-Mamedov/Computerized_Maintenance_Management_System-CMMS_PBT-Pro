@@ -40,7 +40,6 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       PSS_SANTIYE_ID: data.lokasyonID,
       PSS_AYRILMA_NEDEN_KOD_ID: data.ayrilmaNedeniID,
       PSS_ACIKLAMA: data.aciklama,
-      PSS_OLUSTURAN_ID: 24,
     };
 
     AxiosInstance.post("AddPersonelSantiye", Body)

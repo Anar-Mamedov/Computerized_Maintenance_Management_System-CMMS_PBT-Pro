@@ -35,7 +35,6 @@ export default function Iptal({ selectedRows, refreshTableData, iptalDisabled })
     // Seçili satırlar için Body dizisini oluştur
     const Body = selectedRows.map((row) => ({
       TB_IS_TALEP_ID: row.key,
-      KLL_ID: 24, // Sabit bir değerse bu şekilde kalabilir, dinamikse değiştirilmelidir
       IST_TALEP_NO: row.IST_KOD,
       KLL_ADI: "Orjin", // Bu değer sabitse bu şekilde, dinamikse değiştirilmelidir
       IST_IPTAL_NEDEN: data.iptalNeden,

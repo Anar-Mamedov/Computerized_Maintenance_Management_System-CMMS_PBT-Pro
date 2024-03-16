@@ -59,7 +59,6 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       PSE_VERILIS_TARIH: formatDateWithDayjs(data.verilisTarihi),
       PSE_BITIS_TARIH: formatDateWithDayjs(data.bitisTarihi),
       PSE_ACIKLAMA: data.aciklama,
-      PSE_OLUSTURAN_ID: 24,
     };
 
     AxiosInstance.post("UpdatePersonelSertifika", Body)

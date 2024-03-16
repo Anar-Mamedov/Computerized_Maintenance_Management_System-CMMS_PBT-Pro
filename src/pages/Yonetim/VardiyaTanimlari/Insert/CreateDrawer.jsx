@@ -82,7 +82,6 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
       VAR_ACIKLAMA: data.vardiyaAciklama,
       VAR_BASLAMA_SAATI: formatTimeWithDayjs(data.vardiyaBaslangicSaati),
       VAR_BITIS_SAATI: formatTimeWithDayjs(data.vardiyaBitisSaati),
-      VAR_OLUSTURAN_ID: 24,
 
       // add more fields as needed
     };

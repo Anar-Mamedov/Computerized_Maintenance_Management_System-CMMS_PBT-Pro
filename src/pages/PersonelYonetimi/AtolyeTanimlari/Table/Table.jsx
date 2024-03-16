@@ -29,7 +29,7 @@ export default function MainTable() {
   const fetchEquipmentData = async () => {
     try {
       setLoading(true);
-      const response = await AxiosInstance.get("AtolyeList?kulID=24");
+      const response = await AxiosInstance.get("AtolyeList");
       if (response) {
         const formattedData = response.map((item) => {
           return {

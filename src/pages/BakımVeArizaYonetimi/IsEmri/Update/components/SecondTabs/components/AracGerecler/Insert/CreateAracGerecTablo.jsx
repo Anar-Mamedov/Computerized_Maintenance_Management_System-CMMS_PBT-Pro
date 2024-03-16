@@ -77,7 +77,6 @@ export default function CreateAracGerecTablo({ workshopSelectedId, onSubmit, onR
     // Her bir seçilen için payload oluştur
     const payloads = selectedRowKeys.map((id) => ({
       IAG_ARAC_GEREC_ID: id,
-      ISL_OLUSTURAN_ID: 24,
     }));
 
     try {

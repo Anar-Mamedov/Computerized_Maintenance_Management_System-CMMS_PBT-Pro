@@ -95,7 +95,6 @@ export default function ModelEkle({ workshopSelectedId, onSubmit }) {
     const Body = {
       MDL_MARKA_ID: selectedMarkaModelEkleID,
       MDL_MODEL: data.modelEkle,
-      MRK_OLUSTURAN_ID: 24,
     };
 
     AxiosInstance.post("AddMakineModel", Body)

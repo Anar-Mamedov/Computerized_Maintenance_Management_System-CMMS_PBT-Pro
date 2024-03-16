@@ -395,7 +395,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     // handle response
     // });
 
-    AxiosInstance.post("UpdateMakine?ID=24", Body)
+    AxiosInstance.post("UpdateMakine", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);

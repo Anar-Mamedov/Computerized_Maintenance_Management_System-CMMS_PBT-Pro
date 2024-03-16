@@ -122,7 +122,7 @@ export default function Warehouse() {
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`GetDepo?ID=24&DEP_MODUL_NO=1`)
+    AxiosInstance.get(`GetDepo?DEP_MODUL_NO=1`)
       .then((response) => {
         const fetchedData = response.map((item) => {
           return {

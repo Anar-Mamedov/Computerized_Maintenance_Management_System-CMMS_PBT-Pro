@@ -2,7 +2,7 @@ import { atom } from "recoil";
 
 export const userState = atom({
   key: "userState", // Benzersiz bir key
-  default: { userId: null, userName: null, userResimID: null }, // Başlangıç değeri
+  default: { userId: null, userName: null, userResimID: null, userUnvan: null }, // Başlangıç değeri
 });
 
 export const authTokenState = atom({

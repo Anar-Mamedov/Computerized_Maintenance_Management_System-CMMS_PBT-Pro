@@ -89,7 +89,6 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
       LOK_KAT_KOD_ID: data.LokasyonKatID,
       LOK_AKTIF: data.lokasyonAktif,
       LOK_MALZEME_DEPO_ID: data.lokasyonDepoID,
-      LOK_OLUSTURAN_ID: 24,
       // add more fields as needed
     };
 

@@ -58,7 +58,7 @@ export default function Workshop({ workshopSelectedId, currentValue, onSubmit })
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`AtolyeList?kulID=24`)
+    AxiosInstance.get(`AtolyeList`)
       .then((response) => {
         const fetchedData = response.map((item) => {
           return {

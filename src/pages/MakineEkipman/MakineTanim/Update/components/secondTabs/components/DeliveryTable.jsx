@@ -14,7 +14,7 @@ export default function DeliveryTable() {
 
   const fetchSayacData = useCallback(async () => {
     try {
-      const response = await AxiosInstance.get(`makinebakim/GetByMakine?MakineID=${selectedMakineID}&kllId=24`);
+      const response = await AxiosInstance.get(`makinebakim/GetByMakine?MakineID=${selectedMakineID}`);
       const apiData = response; // Assuming 'data' contains the array
       replace(
         apiData.map((item) => {
