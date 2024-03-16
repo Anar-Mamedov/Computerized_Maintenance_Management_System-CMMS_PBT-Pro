@@ -390,7 +390,7 @@ export default function CreateDrawer({ onRefresh }) {
     // handle response
     // });
 
-    AxiosInstance.post("AddMakine?ID=24", Body)
+    AxiosInstance.post("AddMakine", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);

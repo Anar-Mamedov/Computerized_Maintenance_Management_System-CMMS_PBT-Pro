@@ -30,13 +30,19 @@ export default function LoginForm() {
       // Assuming the token is in the response data with the key 'token'
       if (response && response.AUTH_TOKEN) {
         // setAuthToken(response.data.AUTH_TOKEN); // Auth token'ı Recoil state'ine kaydet
-        setUser({ userId: response.TB_KULLANICI_ID, userName: response.KLL_TANIM, userResimID: response.resimId }); // Kullanıcı bilgilerini Recoil state'ine kaydet
+        setUser({
+          userId: response.TB_KULLANICI_ID,
+          userName: response.KLL_TANIM,
+          userResimID: response.resimId,
+          userUnvan: response.KLL_UNVAN,
+        }); // Kullanıcı bilgilerini Recoil state'ine kaydet
         localStorage.setItem("token", response.AUTH_TOKEN);
         // Kullanıcı bilgilerini localStorage'a kaydet
         const userInfo = {
           userId: response.TB_KULLANICI_ID,
           userName: response.KLL_TANIM,
           userResimID: response.resimId,
+          userUnvan: response.KLL_UNVAN,
         };
         localStorage.setItem("user", JSON.stringify(userInfo));
         // Recoil durumunu güncelleme işlemini App bileşeninde yapabilirsiniz

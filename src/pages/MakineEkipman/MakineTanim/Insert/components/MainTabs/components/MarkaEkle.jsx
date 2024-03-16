@@ -74,7 +74,6 @@ export default function MarkaEkle({ workshopSelectedId, onSubmit }) {
   const onSubmited = (data) => {
     const Body = {
       MRK_MARKA: data.markaEkle,
-      MRK_OLUSTURAN_ID: 24,
     };
 
     AxiosInstance.post("AddMakineMarka", Body)

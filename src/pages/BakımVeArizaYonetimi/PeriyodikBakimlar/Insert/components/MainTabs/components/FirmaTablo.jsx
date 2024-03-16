@@ -11,7 +11,7 @@ export default function FirmaTablo({ workshopSelectedId, onSubmit }) {
   const [searchValue, setSearchValue] = useState("");
   const [searchTimeout, setSearchTimeout] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(0); 
+  const [pageSize, setPageSize] = useState(0);
   const [changeSource, setChangeSource] = useState(null);
 
   const columns = [
@@ -106,7 +106,7 @@ export default function FirmaTablo({ workshopSelectedId, onSubmit }) {
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`GetFirmaList?userId=24&pagingDeger=${currentPage}&search=${searchValue}`)
+    AxiosInstance.get(`GetFirmaList?pagingDeger=${currentPage}&search=${searchValue}`)
       .then((response) => {
         // sayfalama için
         // Set the total pages based on the pageSize from the API response
@@ -130,7 +130,7 @@ export default function FirmaTablo({ workshopSelectedId, onSubmit }) {
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
-  }, [searchValue, currentPage]); 
+  }, [searchValue, currentPage]);
 
   const handleModalToggle = () => {
     setIsModalVisible((prev) => !prev);
@@ -138,13 +138,13 @@ export default function FirmaTablo({ workshopSelectedId, onSubmit }) {
 
   useEffect(() => {
     if (isModalVisible) {
-      fetch(); 
+      fetch();
     } else {
       setSearchValue("");
-      setCurrentPage(1); 
+      setCurrentPage(1);
       setSelectedRowKeys([]);
     }
-  }, [isModalVisible]); 
+  }, [isModalVisible]);
 
   const handleModalOk = () => {
     const selectedData = data.find((item) => item.key === selectedRowKeys[0]);
@@ -170,17 +170,17 @@ export default function FirmaTablo({ workshopSelectedId, onSubmit }) {
       const timeout = setTimeout(() => {
         fetch();
         setChangeSource(null);
-      }, 2000); 
-      setSearchTimeout(timeout); 
+      }, 2000);
+      setSearchTimeout(timeout);
 
       return () => {
         clearTimeout(timeout);
       };
     } else if (changeSource === "currentPage") {
       fetch();
-      setChangeSource(null); 
+      setChangeSource(null);
     }
-  }, [searchValue, currentPage, fetch]); 
+  }, [searchValue, currentPage, fetch]);
 
   return (
     <div>

@@ -76,7 +76,6 @@ export default function LokasyonTipiEkle({ workshopSelectedId, onSubmit }) {
       LOT_TANIM: data.markaEkle,
       LOT_VARSAYILAN: false,
       LOT_ICON_ID: 0,
-      LOT_OLUSTURAN_ID: 24,
     };
 
     AxiosInstance.post("AddLokasyonTip", Body)

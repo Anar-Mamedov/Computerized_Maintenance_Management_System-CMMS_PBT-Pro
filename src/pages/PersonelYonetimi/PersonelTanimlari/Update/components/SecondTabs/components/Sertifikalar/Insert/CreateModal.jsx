@@ -43,7 +43,6 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       PSE_VERILIS_TARIH: formatDateWithDayjs(data.verilisTarihi),
       PSE_BITIS_TARIH: formatDateWithDayjs(data.bitisTarihi),
       PSE_ACIKLAMA: data.aciklama,
-      PSE_OLUSTURAN_ID: 24,
     };
 
     AxiosInstance.post("AddPersonelSertifika", Body)

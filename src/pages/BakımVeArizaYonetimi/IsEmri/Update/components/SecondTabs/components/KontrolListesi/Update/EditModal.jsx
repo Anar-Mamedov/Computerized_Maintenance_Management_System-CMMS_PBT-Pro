@@ -104,7 +104,6 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       DKN_SIRANO: data.siraNo,
       DKN_YAPILDI: data.yapildi,
       DKN_TANIM: data.isTanimi,
-      DKN_OLUSTURAN_ID: 24,
       // DKN_MALIYET: data.maliyet, // Maliyet diye bir alan yok frontda
       DKN_YAPILDI_PERSONEL_ID: data.personelID,
       DKN_YAPILDI_ATOLYE_ID: data.atolyeID,

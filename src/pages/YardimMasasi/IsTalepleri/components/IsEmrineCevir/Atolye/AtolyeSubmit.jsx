@@ -46,7 +46,6 @@ export default function AtolyeSubmit({ selectedRows, refreshTableData }) {
 
     const Body = selectedRows.map((row) => ({
       TALEP_ID: row.key, // Her bir satırın key değeri, TALEP_ID'ye eşitlenir.
-      USER_ID: 24, // Sabit bir değer
       ATOLYE_ID: atolyeIDValue, // Yukarıda oluşturulan teknisyen ID'leri dizisi
     }));
 

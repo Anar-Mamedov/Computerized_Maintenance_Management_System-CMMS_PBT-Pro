@@ -113,7 +113,7 @@ export default function TaseronTablo({ workshopSelectedId, onSubmit }) {
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`GetFirmaList?userId=24&pagingDeger=${currentPage}&search=${searchValue}`)
+    AxiosInstance.get(`GetFirmaList?pagingDeger=${currentPage}&search=${searchValue}`)
       .then((response) => {
         // sayfalama için
         // Set the total pages based on the pageSize from the API response

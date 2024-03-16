@@ -65,8 +65,6 @@ export default function IsEmriDurumModal({ workshopSelectedId, onSubmit, fieldRe
       ISL_DURUM_YENI_KOD_ID: isEmriDurum1ID,
       ISL_ACIKLAMA: watch("isEmriDurumAciklama"),
       ISL_ISLEM: "İş emri durum bilgisi değişti.",
-      ISL_OLUSTURAN_ID: 24,
-      ISL_KULLANICI_ID: 24,
     };
 
     try {

@@ -124,7 +124,7 @@ export default function RequisiteTable() {
     // Function to fetch options
     const fetchOptions = async () => {
       try {
-        const response = await AxiosInstance.get("Vardiyalar?userId=24"); // Replace with your API endpoint
+        const response = await AxiosInstance.get("Vardiyalar"); // Replace with your API endpoint
         const options = response.map((item) => ({
           label: `${item.TB_VARDIYA_ID}. ${item.VAR_TANIM} (${dayjs("1970-01-01 " + item.VAR_BASLAMA_SAATI).format(
             "HH:mm"

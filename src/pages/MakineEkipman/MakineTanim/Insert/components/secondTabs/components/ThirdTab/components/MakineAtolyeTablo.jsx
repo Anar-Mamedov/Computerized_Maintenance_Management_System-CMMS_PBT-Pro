@@ -23,7 +23,7 @@ export default function MakineAtolyeTablo({ workshopSelectedId, onSubmit }) {
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`AtolyeList?kulID=24`)
+    AxiosInstance.get(`AtolyeList`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
           key: item.TB_ATOLYE_ID,
