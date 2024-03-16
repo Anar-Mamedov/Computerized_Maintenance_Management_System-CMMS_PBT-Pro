@@ -30,7 +30,8 @@ export default function Auth() {
   const whiteAreaStyle = {
     backgroundColor: "white",
     height: "100vh",
-    width: "800px",
+    width: "100vw", // Genişlik ve yükseklik 100vw ve 100vh olacak
+    maxWidth: "800px",
     position: "fixed", // Sabit pozisyon, içerik kaydırılsa bile sol tarafta sabit kalır
     left: 0,
     top: 0,
