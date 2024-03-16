@@ -11,7 +11,7 @@ import {
   UserOutlined,
   KeyOutlined,
 } from "@ant-design/icons";
-import Isemri from "./pages/DashboardAnalytics2/Isemri";
+// import Isemri from "./pages/DashboardAnalytics2/Isemri";
 import IsEmri from "./pages/BakımVeArizaYonetimi/IsEmri/IsEmri";
 import MakineTanim from "./pages/MakineEkipman/MakineTanim/MakineTanim";
 import LokasyonTanim from "./pages/Yonetim/LokasyonTanimlari/LokasyonTanimlari";
@@ -68,7 +68,7 @@ const items = [
       // getItem("Tom", "tom", true),
       getItem("Bakım Tanımları", "bakimTanimlari", true),
       getItem("Arıza Tanımları", "arizaTanimlari", true),
-      getItem("İş Emri", "isemri", true),
+      // getItem("İş Emri", "isemri", true),
       getItem("İş Emri (yeni)", "isEmri1", true),
       getItem("Peryodik Bakımlar", "peryodikBakimlar", true),
       getItem("Otomatik İş Emirleri", "otomatikIsEmirleri", true),
@@ -164,7 +164,7 @@ export default function App() {
           </ProtectedRoute>
         }>
         <Route path="/" element={<Dashboard />} />
-        <Route path="/isemri" element={<Isemri />} />
+        {/* <Route path="/isemri" element={<Isemri />} /> */}
         <Route path="/isEmri1" element={<IsEmri />} />
         <Route path="/peryodikBakimlar" element={<PeriyodikBakimlar />} />
         <Route path="/otomatikIsEmirleri" element={<Hazirlaniyor />} />
