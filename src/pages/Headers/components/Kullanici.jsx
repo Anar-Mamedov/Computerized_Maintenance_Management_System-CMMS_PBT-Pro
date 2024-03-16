@@ -2,11 +2,14 @@ import React, { useState } from "react";
 import { Avatar, Space, Button, Popover, Typography } from "antd";
 import { UserOutlined, LogoutOutlined, EditOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { useRecoilValue } from "recoil"; // useRecoilValue import edin
+import { userState, authTokenState } from "../../../state/userState"; // Atomlarınızın yolunu güncelleyin
 
 const { Text, Link } = Typography;
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const userData = useRecoilValue(userState); // userState atomunun değerini oku
 
   const handleOpenChange = (newOpen) => {
     setOpen(newOpen);
@@ -16,6 +19,7 @@ export default function Header() {
   // Çıkış işlevini tanımla
   const handleLogout = () => {
     localStorage.removeItem("token"); // localStorage'dan token'i sil
+    localStorage.removeItem("user"); // localStorage'dan kullanıcıyı sil
     navigate("/auth"); // `/login` sayfasına yönlendir
     // window.location.reload(); // Sayfayı yenile
   };
@@ -41,7 +45,7 @@ export default function Header() {
     <Popover placement="bottom" content={content} trigger="click" open={open} onOpenChange={handleOpenChange}>
       <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-          <Text style={{ fontWeight: "500" }}>Anar Mamedov</Text>
+          <Text style={{ fontWeight: "500" }}>{userData.userName || "Anonim"}</Text>
           <Text type="secondary">Mühendis</Text>
         </div>
         <Avatar size="large" icon={<UserOutlined />} />

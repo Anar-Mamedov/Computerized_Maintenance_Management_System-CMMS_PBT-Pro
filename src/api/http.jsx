@@ -23,6 +23,7 @@ AxiosInstance.interceptors.response.use(
     // response.code === 401 ->
     if (error.response && error.response.status === 401) {
       localStorage.removeItem("token");
+      localStorage.removeItem("user");
       // localStorage.removeItem("userId");
       navigate("/auth"); // `/login` sayfasına yönlendir
     }
