@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Avatar, Space, Button, Popover, Typography } from "antd";
+import { Avatar, Space, Button, Popover, Typography, Spin } from "antd";
 import { UserOutlined, LogoutOutlined, EditOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil"; // useRecoilValue import edin
@@ -12,6 +12,7 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const userData = useRecoilValue(userState); // userState atomunun değerini oku
   const [imageUrl, setImageUrl] = useState(null); // Resim URL'sini saklamak için state tanımlayın
+  const [loadingImage, setLoadingImage] = useState(false); // Yükleme durumu için yeni bir state
 
   const handleOpenChange = (newOpen) => {
     setOpen(newOpen);
@@ -27,25 +28,36 @@ export default function Header() {
   };
 
   useEffect(() => {
-    // responseType olarak 'blob' seçilir.
-    AxiosInstance.get(`ResimGetirById?id=${userData.userResimID}`, { responseType: "blob" })
-      .then((response) => {
-        // Yanıttaki blob verisi bir URL'ye dönüştürülür.
-        const imageBlob = response;
-        const imageObjectURL = URL.createObjectURL(imageBlob);
-        setImageUrl(imageObjectURL);
-      })
-      .catch((error) => {
-        console.error("Error fetching image:", error);
-      });
+    // userData.userResimID değeri gelene kadar bekler
+    if (userData.userResimID) {
+      const fetchImage = async () => {
+        try {
+          setLoadingImage(true); // Resim yüklenmeye başladığında loadingImage'i true yap
+          // responseType olarak 'blob' seçilir.
+          const response = await AxiosInstance.get(`ResimGetirById?id=${userData.userResimID}`, {
+            responseType: "blob",
+          });
+          // Yanıttaki blob verisi bir URL'ye dönüştürülür.
+          const imageBlob = response;
+          const imageObjectURL = URL.createObjectURL(imageBlob);
+          setImageUrl(imageObjectURL);
+        } catch (error) {
+          console.error("Error fetching image:", error);
+        } finally {
+          setLoadingImage(false); // Resim yüklendikten sonra veya hata durumunda loadingImage'i false yap
+        }
+      };
 
-    // Component unmount olduğunda veya resim değiştiğinde oluşturulan URL iptal edilir.
-    return () => {
-      if (imageUrl) {
-        URL.revokeObjectURL(imageUrl);
-      }
-    };
-  }, []); // Dependency array'e imageUrl eklenir.
+      fetchImage();
+
+      // Component unmount olduğunda veya resim değiştiğinde oluşturulan URL iptal edilir.
+      return () => {
+        if (imageUrl) {
+          URL.revokeObjectURL(imageUrl);
+        }
+      };
+    }
+  }, [userData.userResimID]); // Dependency array'e imageUrl eklenir.
 
   const content = (
     <div>
@@ -73,9 +85,12 @@ export default function Header() {
         </div>
         <Avatar
           size="large"
-          src={imageUrl} // imageUrl state'ini Avatar'ın src propu olarak kullan
-          icon={!imageUrl && <UserOutlined />} // Eğer imageUrl yoksa, UserOutlined ikonunu kullan
-        />
+          src={imageUrl}
+          icon={!imageUrl && !loadingImage && <UserOutlined />} // Yükleme olmadığı ve imageUrl yoksa ikonu göster
+        >
+          {loadingImage && <Spin />}
+          {/* Resim yüklenirken Spin göster */}
+        </Avatar>
       </div>
     </Popover>
   );

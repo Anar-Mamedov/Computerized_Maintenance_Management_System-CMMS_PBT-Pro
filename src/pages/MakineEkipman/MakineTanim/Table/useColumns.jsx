@@ -81,6 +81,13 @@ export default function useColumns(props) {
       description: "Peryodik Bakım",
       ellipsis: true, // Enable ellipsis for overflowed content
       modalTitle: "Periyodik Bakım",
+      // satır yüksekliğini ayarlamak için kullanılır
+      onCell: () => ({
+        style: {
+          height: "55px", // Hücre yüksekliği
+          // padding: "10px", // Varsayılan padding değerini değiştirebilirsiniz
+        },
+      }),
     },
     {
       title: "Makine Kodu",
@@ -91,6 +98,13 @@ export default function useColumns(props) {
       description: "Makine Kodu",
       ellipsis: true, // Enable ellipsis for overflowed content
       modalTitle: "Makine Kodu",
+      // satır yüksekliğini ayarlamak için kullanılır
+      onCell: () => ({
+        style: {
+          height: "55px", // Hücre yüksekliği
+          // padding: "10px", // Varsayılan padding değerini değiştirebilirsiniz
+        },
+      }),
     },
     {
       title: "Makine Tanımı",
@@ -101,6 +115,13 @@ export default function useColumns(props) {
       description: "Makine Tanımı",
       ellipsis: true, // Enable ellipsis for overflowed content
       modalTitle: "Makine Tanımı",
+      // satır yüksekliğini ayarlamak için kullanılır
+      onCell: () => ({
+        style: {
+          height: "55px", // Hücre yüksekliği
+          // padding: "10px", // Varsayılan padding değerini değiştirebilirsiniz
+        },
+      }),
     },
     {
       title: "Aktif",
@@ -131,6 +152,13 @@ export default function useColumns(props) {
         }
         return a.MKN_DURUM ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
       },
+      // satır yüksekliğini ayarlamak için kullanılır
+      onCell: () => ({
+        style: {
+          height: "55px", // Hücre yüksekliği
+          // padding: "10px", // Varsayılan padding değerini değiştirebilirsiniz
+        },
+      }),
     },
     {
       title: "Araç Tipi",
@@ -149,6 +177,13 @@ export default function useColumns(props) {
         }
         return a.MKN_ARAC_TIP ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
       },
+      // satır yüksekliğini ayarlamak için kullanılır
+      onCell: () => ({
+        style: {
+          height: "55px", // Hücre yüksekliği
+          // padding: "10px", // Varsayılan padding değerini değiştirebilirsiniz
+        },
+      }),
     },
     {
       title: "Lokasyon",
@@ -167,6 +202,13 @@ export default function useColumns(props) {
         }
         return a.MKN_LOKASYON ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
       },
+      // satır yüksekliğini ayarlamak için kullanılır
+      onCell: () => ({
+        style: {
+          height: "55px", // Hücre yüksekliği
+          // padding: "10px", // Varsayılan padding değerini değiştirebilirsiniz
+        },
+      }),
     },
     {
       title: "Makine Tipi",
@@ -185,6 +227,13 @@ export default function useColumns(props) {
         }
         return a.MKN_TIP ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
       },
+      // satır yüksekliğini ayarlamak için kullanılır
+      onCell: () => ({
+        style: {
+          height: "55px", // Hücre yüksekliği
+          // padding: "10px", // Varsayılan padding değerini değiştirebilirsiniz
+        },
+      }),
     },
     {
       title: "Kategori",
