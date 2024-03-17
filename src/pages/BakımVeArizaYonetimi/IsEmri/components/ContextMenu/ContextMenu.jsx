@@ -39,7 +39,7 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
       <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />
       <Parametreler />
       {selectedRows.length === 1 && <TarihceTablo selectedRows={selectedRows} />}
-      <Form selectedRows={selectedRows} />
+      {/* <Form selectedRows={selectedRows} /> */}
     </div>
   );
   return (
