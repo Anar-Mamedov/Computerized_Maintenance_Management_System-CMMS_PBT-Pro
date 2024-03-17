@@ -6,7 +6,7 @@ import Iptal from "./components/Iptal/Iptal";
 import Kapat from "./components/Kapat/Kapat";
 import Parametreler from "./components/Parametreler/Parametreler";
 import TarihceTablo from "./components/TarihceTablo";
-import Form from "./components/Form/Form";
+// import Form from "./components/Form/Form";
 
 export default function ContextMenu({ selectedRows, refreshTableData }) {
   const [visible, setVisible] = useState(false);
