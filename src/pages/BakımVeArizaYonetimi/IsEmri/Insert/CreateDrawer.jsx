@@ -312,6 +312,8 @@ export default function CreateDrawer({ onRefresh }) {
         methods.reset();
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("Ekleme Başarılı.");
+        } else if (response.status_code === 401) {
+          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
           message.error("Ekleme Başarısız.");
         }

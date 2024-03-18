@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { Button, Drawer, Space, ConfigProvider, Modal } from "antd";
+import { Button, Drawer, Space, ConfigProvider, Modal, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import tr_TR from "antd/es/locale/tr_TR";
 import AxiosInstance from "../../../../api/http";
@@ -70,12 +70,21 @@ export default function CreateDrawer({ onRefresh }) {
     AxiosInstance.post("AddPersonel", Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
-        setOpen(false);
-        onRefresh();
-        methods.reset();
+        if (response.status_code === 200 || response.status_code === 201) {
+          message.success("Ekleme Başarılı.");
+          setOpen(false);
+          onRefresh();
+          methods.reset();
+        } else if (response.status_code === 401) {
+          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+        } else {
+          message.error("Ekleme Başarısız.");
+        }
       })
       .catch((error) => {
+        // Handle errors here, e.g.:
         console.error("Error sending data:", error);
+        message.error("Başarısız Olundu.");
       });
     console.log({ Body });
   };

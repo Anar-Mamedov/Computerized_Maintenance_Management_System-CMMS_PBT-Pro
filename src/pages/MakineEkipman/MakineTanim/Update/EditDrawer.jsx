@@ -1,6 +1,6 @@
 import tr_TR from "antd/es/locale/tr_TR";
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Drawer, Space, ConfigProvider, Modal } from "antd";
+import { Button, Drawer, Space, ConfigProvider, Modal, message } from "antd";
 import React, { useEffect, useState, useTransition } from "react";
 import MainTabs from "./components/MainTabs/MainTabs";
 import secondTabs from "./components/secondTabs/secondTabs";
@@ -399,13 +399,21 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);
-        onDrawerClose(); // Close the drawer
-        onRefresh();
-        reset();
+        if (response.status_code === 200 || response.status_code === 201) {
+          message.success("Ekleme Başarılı.");
+          onDrawerClose(); // Close the drawer
+          onRefresh();
+          reset();
+        } else if (response.status_code === 401) {
+          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+        } else {
+          message.error("Ekleme Başarısız.");
+        }
       })
       .catch((error) => {
         // Handle errors here, e.g.:
         console.error("Error sending data:", error);
+        message.error("Başarısız Olundu.");
       });
     console.log({ Body });
   };
