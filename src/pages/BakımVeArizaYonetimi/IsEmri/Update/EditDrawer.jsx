@@ -615,6 +615,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         methods.reset();
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("Güncelleme Başarılı.");
+        } else if (response.status_code === 401) {
+          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
           message.error("Güncelleme Başarısız.");
         }
