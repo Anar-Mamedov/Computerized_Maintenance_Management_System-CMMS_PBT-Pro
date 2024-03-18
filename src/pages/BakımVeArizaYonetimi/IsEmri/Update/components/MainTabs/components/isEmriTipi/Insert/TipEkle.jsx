@@ -1,5 +1,5 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Input, Modal, Typography } from "antd";
+import { Button, Input, Modal, Typography, message } from "antd";
 import React, { useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../../api/http";
@@ -29,9 +29,18 @@ export default function TipEkle({ workshopSelectedId, onSubmit, onRefresh, secil
         reset();
         setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
         onRefresh();
+        if (response.status_code === 200 || response.status_code === 201) {
+          message.success("Ekleme Başarılı.");
+        } else if (response.status_code === 401) {
+          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+        } else {
+          message.error("Ekleme Başarısız.");
+        }
       })
       .catch((error) => {
+        // Handle errors here, e.g.:
         console.error("Error sending data:", error);
+        message.error("Başarısız Olundu.");
       });
   };
 
