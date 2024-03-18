@@ -307,11 +307,11 @@ export default function CreateDrawer({ onRefresh }) {
     AxiosInstance.post("IsEmri?ID=2&isWeb=true", Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
-        setOpen(false);
-        onRefresh();
-        methods.reset();
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("Ekleme Başarılı.");
+          setOpen(false);
+          onRefresh();
+          methods.reset();
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
@@ -319,6 +319,7 @@ export default function CreateDrawer({ onRefresh }) {
         }
       })
       .catch((error) => {
+        // Handle errors here, e.g.:
         console.error("Error sending data:", error);
         message.error("Başarısız Olundu.");
       });

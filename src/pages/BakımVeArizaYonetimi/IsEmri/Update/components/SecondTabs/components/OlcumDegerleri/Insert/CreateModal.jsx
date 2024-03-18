@@ -63,16 +63,20 @@ export default function CreateModal({
     AxiosInstance.post(`AddUpdateIsEmriOlcumDegeri?isEmriId=${secilenIsEmriID}`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
-        reset();
-        setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
-        onRefresh();
-        if (response.status_code === 200) {
+
+        if (response.status_code === 200 || response.status_code === 201) {
+          reset();
+          setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
+          onRefresh();
           message.success("Ekleme Başarılı.");
+        } else if (response.status_code === 401) {
+          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
           message.error("Ekleme Başarısız.");
         }
       })
       .catch((error) => {
+        // Handle errors here, e.g.:
         console.error("Error sending data:", error);
         message.error("Başarısız Olundu.");
       });
