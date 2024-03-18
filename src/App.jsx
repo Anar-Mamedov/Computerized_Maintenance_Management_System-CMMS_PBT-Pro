@@ -29,6 +29,8 @@ import PeriyodikBakimlar from "./pages/BakımVeArizaYonetimi/PeriyodikBakimlar/P
 import Headers from "./pages/Headers/Headers";
 import { useRecoilState } from "recoil";
 import { userState } from "./state/userState";
+import PlanlamaTakvimi from "./pages/BakımVeArizaYonetimi/PlanlamaTakvimi/PlanlamaTakvimi";
+import OtomatikIsEmri from "./pages/BakımVeArizaYonetimi/OtomatikIsEmri/OtomatikIsEmri";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -167,8 +169,8 @@ export default function App() {
         {/* <Route path="/isemri" element={<Isemri />} /> */}
         <Route path="/isEmri1" element={<IsEmri />} />
         <Route path="/peryodikBakimlar" element={<PeriyodikBakimlar />} />
-        <Route path="/otomatikIsEmirleri" element={<Hazirlaniyor />} />
-        <Route path="/planlamaTakvimi" element={<Hazirlaniyor />} />
+        <Route path="/otomatikIsEmirleri" element={<OtomatikIsEmri />} />
+        <Route path="/planlamaTakvimi" element={<PlanlamaTakvimi />} />
         <Route path="/makine" element={<MakineTanim />} />
         <Route path="/ekipmanVeritabani" element={<Hazirlaniyor />} />
         <Route path="/sayacGuncelleme" element={<Hazirlaniyor />} />
