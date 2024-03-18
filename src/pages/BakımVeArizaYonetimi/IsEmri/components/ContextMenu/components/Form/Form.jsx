@@ -1,69 +1,61 @@
-import React from "react";
-import { Button } from "antd";
-import { PDFDocument, rgb } from "pdf-lib";
+import React, { useState } from "react";
+import { Button, message } from "antd";
 import { saveAs } from "file-saver";
+import * as Docxtemplater from "docxtemplater";
 
-export default function Form({ selectedRows }) {
-  const loadTemplateAndFillPDF = async (rowData) => {
+const Form = ({ selectedRows }) => {
+  // Function to handle button click
+  const downloadWordFile = async () => {
+    if (!selectedRows.length) {
+      message.error("Please select rows to download.");
+      return;
+    }
+
     try {
-      // Cache-busting query string ekleyerek PDF şablonunun URL'ini hazırla
-      const url = `./template.pdf?${new Date().getTime()}`; // PDF şablonunun URL'ini buraya girin
+      // Load the template
+      const templateUrl = "./template.docx"; // Replace with actual path
+      console.log("Fetching template:", templateUrl);
+      const template = await fetch(templateUrl).then((response) => response.blob());
+      console.log("Fetched template:", template);
 
-      const response = await fetch(url);
-      console.log(response); // Yanıtı kontrol et
+      // Prepare data for template
+      const processedData = selectedRows.map((row) => ({
+        email: row.email, // Replace with actual property names
+        userName: row.userName,
+        machineCode: row.machineCode,
+      }));
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
+      // Populate template using docxtemplater
+      const variables = { ...processedData };
+      const doc = new Docxtemplater(); // No need to pass the template here
+      console.log("Loading template...");
+      await doc.load(template);
+      console.log("Template loaded.");
+      doc.render(variables);
 
-      const existingPdfBytes = await response.arrayBuffer();
-
-      // PDF şablonunu yükle ve PDFDocument nesnesi oluştur
-      const pdfDoc = await PDFDocument.load(existingPdfBytes);
-
-      // PDF'de yazı ekleme veya düzenleme işlemleri
-      const pages = pdfDoc.getPages();
-      const firstPage = pages[0];
-      const { width, height } = firstPage.getSize();
-
-      // Örnek: ilk sayfaya metin ekleme
-      firstPage.drawText(`E-Posta Adresi: ${rowData.email}`, {
-        x: 50,
-        y: height - 100,
-        size: 12,
-        color: rgb(0, 0, 0),
-      });
-      firstPage.drawText(`Kullanıcı İsmi: ${rowData.userName}`, {
-        x: 50,
-        y: height - 120,
-        size: 12,
-        color: rgb(0, 0, 0),
-      });
-      firstPage.drawText(`Makine Kodu: ${rowData.makineKodu}`, {
-        x: 50,
-        y: height - 140,
-        size: 12,
-        color: rgb(0, 0, 0),
+      // Create a Blob object from the populated template
+      const populatedTemplate = new Blob([doc.docx], {
+        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       });
 
-      // PDF'i Uint8Array olarak al ve Blob'a dönüştür
-      const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([pdfBytes], { type: "application/pdf" });
-
-      // Blob'u kullanarak PDF dosyasını kaydet
-      saveAs(blob, "filled-template.pdf");
+      // Trigger download using FileSaver.js
+      saveAs(populatedTemplate, "your_filename.docx");
     } catch (error) {
-      console.error("Error processing PDF template:", error);
+      console.error("Error downloading Word file:", error);
+      message.error("An error occurred while downloading the Word file.");
     }
   };
 
+  // ... rest of your component
+
   return (
     <div>
-      {selectedRows.map((row, index) => (
-        <Button key={index} type="primary" onClick={() => loadTemplateAndFillPDF(row)}>
-          {`Download PDF for ${row.userName}`}
-        </Button>
-      ))}
+      {/* Your table or data selection component */}
+      <Button type="primary" onClick={downloadWordFile}>
+        Download Word File
+      </Button>
     </div>
   );
-}
+};
+
+export default Form;
