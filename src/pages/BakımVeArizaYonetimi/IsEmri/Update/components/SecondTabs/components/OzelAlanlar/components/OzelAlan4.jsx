@@ -33,28 +33,19 @@ export default function OzelAlan4({ label, onModalClose }) {
         reset();
         onModalClose(); // Add this line to trigger the refresh in parent
         setIsModalOpen(false); // Sadece başarılı olursa modalı kapat
-        if (response.status_code === 200) {
-          // Success handling
-          messageApi.open({
-            type: "success",
-            content: "Ekleme Başarılı",
-          });
+        if (response.status_code === 200 || response.status_code === 201) {
+          message.success("Ekleme Başarılı.");
+        } else if (response.status_code === 401) {
+          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
-          // Error handling
-          messageApi.open({
-            type: "error",
-            content: "An error occurred", // Adjust the error message as needed
-          });
+          message.error("Ekleme Başarısız.");
         }
       })
       .catch((error) => {
+        // Handle errors here, e.g.:
         console.error("Error sending data:", error);
-        messageApi.open({
-          type: "error",
-          content: "An error occurred while adding the item.",
-        });
+        message.error("Başarısız Olundu.");
       });
-
     console.log({ Body });
   };
 

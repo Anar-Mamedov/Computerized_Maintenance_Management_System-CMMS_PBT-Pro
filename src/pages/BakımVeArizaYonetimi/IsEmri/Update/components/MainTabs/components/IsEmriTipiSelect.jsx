@@ -78,6 +78,8 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
         // Başarılı işlem mesajı veya başka bir işlem yap
         message.success("İşlem Başarılı!");
         console.log("İşlem başarılı.");
+      } else if (response.status_code === 401) {
+        message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
       } else {
         message.error("İşlem Başarısız!");
 
@@ -87,6 +89,7 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
     } catch (error) {
       // Hata yakalama
       console.error("API isteği sırasında bir hata oluştu:", error);
+      message.error("Başarısız Olundu.");
     }
 
     // iş emrindeki zorunlu alanları dinamik olarak kontrol etmek için selectboxtaki seçenekleri seçtiğimizde o seçeneğe göre zorunlu alanların değişmesi için.

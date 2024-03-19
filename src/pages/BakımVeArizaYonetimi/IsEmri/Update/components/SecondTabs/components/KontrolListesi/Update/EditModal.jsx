@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs } from "antd";
+import { Button, Modal, Input, Typography, Tabs, message } from "antd";
 import AxiosInstance from "../../../../../../../../../api/http";
 import { Controller, useForm, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
@@ -121,14 +121,23 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
     AxiosInstance.post(`AddUpdateIsEmriKontrolList?isEmriId=${secilenIsEmriID}`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
-        reset();
-        onModalClose(); // Modal'ı kapat
-        onRefresh(); // Tabloyu yenile
+
+        if (response.status_code === 200 || response.status_code === 201) {
+          message.success("Ekleme Başarılı.");
+          reset();
+          onModalClose(); // Modal'ı kapat
+          onRefresh(); // Tabloyu yenile
+        } else if (response.status_code === 401) {
+          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+        } else {
+          message.error("Ekleme Başarısız.");
+        }
       })
       .catch((error) => {
+        // Handle errors here, e.g.:
         console.error("Error sending data:", error);
+        message.error("Başarısız Olundu.");
       });
-
     console.log({ Body });
   };
 

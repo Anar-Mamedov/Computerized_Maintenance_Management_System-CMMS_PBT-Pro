@@ -271,28 +271,21 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
         console.log("Data sent successfully:", response);
         reset();
         setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
+        setLoading(false);
         // onRefresh();
         // İsteğin başarılı olduğunu kontrol et
-        if (response && response.status_code === 200) {
-          // Başarılı işlem mesajı veya başka bir işlem yap
-          messageApi.open({
-            type: "success",
-            content: "İşlem Başarılı!", // Using the success message from API response
-          });
-          console.log("İşlem başarılı.");
-          setLoading(false);
+        if (response.status_code === 200 || response.status_code === 201) {
+          message.success("Ekleme Başarılı.");
+        } else if (response.status_code === 401) {
+          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
-          messageApi.open({
-            type: "error",
-            content: "İşlem Başarısız!", // Using the error message from API response
-          });
-          // Hata mesajı göster
-          console.error("Bir hata oluştu.");
-          setLoading(false);
+          message.error("Ekleme Başarısız.");
         }
       })
       .catch((error) => {
+        // Handle errors here, e.g.:
         console.error("Error sending data:", error);
+        message.error("Başarısız Olundu.");
         setLoading(false);
       });
 

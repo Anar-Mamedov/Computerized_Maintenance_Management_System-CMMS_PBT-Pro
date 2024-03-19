@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal } from "antd";
+import { Button, Modal, message } from "antd";
 import { Controller, useForm, FormProvider, set } from "react-hook-form";
 import AxiosInstance from "../../../../../../../api/http";
 import dayjs from "dayjs";
@@ -185,11 +185,21 @@ export default function Parametreler() {
     AxiosInstance.post("UpdateIsTalepParametre", Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
-        reset();
-        setIsModalOpen(false); // Sadece başarılı olursa modalı kapat
+
+        if (response.status_code === 200 || response.status_code === 201) {
+          message.success("Ekleme Başarılı.");
+          reset();
+          setIsModalOpen(false); // Sadece başarılı olursa modalı kapat
+        } else if (response.status_code === 401) {
+          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+        } else {
+          message.error("Ekleme Başarısız.");
+        }
       })
       .catch((error) => {
+        // Handle errors here, e.g.:
         console.error("Error sending data:", error);
+        message.error("Başarısız Olundu.");
       });
 
     console.log({ Body });
