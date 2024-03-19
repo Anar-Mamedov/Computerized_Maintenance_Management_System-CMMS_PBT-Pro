@@ -19,7 +19,7 @@ export default function Location({ setLocationId, locationValue, machineLocation
 
   const fetchData = () => {
     setIsLoading(true);
-    AxiosInstance.get("Lokasyon?ID=30")
+    AxiosInstance.get("Lokasyon")
       .then((response) => {
         // Convert API response to treeData format
         const data = response; // Access the data property of the response

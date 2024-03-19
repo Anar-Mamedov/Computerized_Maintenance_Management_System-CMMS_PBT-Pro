@@ -304,7 +304,7 @@ export default function CreateDrawer({ onRefresh }) {
     };
 
     // API'ye POST isteği gönder
-    AxiosInstance.post("IsEmri?ID=2&isWeb=true", Body)
+    AxiosInstance.post("IsEmri?isWeb=true", Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
         if (response.status_code === 200 || response.status_code === 201) {

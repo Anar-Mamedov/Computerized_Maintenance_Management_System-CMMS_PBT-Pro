@@ -354,7 +354,7 @@ export default function CreateDrawer({ onRefresh }) {
     // handle response
     // });
 
-    AxiosInstance.post("IsEmri?ID=2&isWeb=true", Body)
+    AxiosInstance.post("IsEmri?isWeb=true", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response.data);

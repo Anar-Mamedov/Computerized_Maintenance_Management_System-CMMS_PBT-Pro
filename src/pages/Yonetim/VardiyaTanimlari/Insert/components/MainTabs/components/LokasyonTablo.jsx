@@ -126,7 +126,7 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit }) {
 
   const fetchData = () => {
     setLoading(true);
-    AxiosInstance.get("GetLokasyonList?ID=30")
+    AxiosInstance.get("GetLokasyonList")
       .then((response) => {
         const tree = formatDataForTable(response.data || response);
         setTreeData(tree);

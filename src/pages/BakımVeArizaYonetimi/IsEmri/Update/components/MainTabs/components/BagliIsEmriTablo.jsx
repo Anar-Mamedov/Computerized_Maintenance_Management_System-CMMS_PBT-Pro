@@ -261,7 +261,7 @@ export default function BagliIsEmriTablo({ workshopSelectedId, onSubmit }) {
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.post(`getIsEmriFullList?id=11&parametre=${searchValue}&pagingDeger=${currentPage}`)
+    AxiosInstance.post(`getIsEmriFullList?parametre=${searchValue}&pagingDeger=${currentPage}`)
       .then((response) => {
         // sayfalama için
         // Set the total pages based on the pageSize from the API response

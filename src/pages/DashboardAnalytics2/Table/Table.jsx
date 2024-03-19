@@ -134,7 +134,7 @@ export default function Table() {
   const fetch = useCallback(({ keyword, filters, page = 1 }) => {
     setLoading(true); // Set loading to true before making the API call
     // page = page || 1;
-    AxiosInstance.post(`getIsEmriFullList?id=11&parametre=${keyword}&pagingDeger=${page}`, filters).then((response) => {
+    AxiosInstance.post(`getIsEmriFullList?parametre=${keyword}&pagingDeger=${page}`, filters).then((response) => {
       // console.log(response);
       // Alborz total page sehifesini qaytarmalidi
       // {
