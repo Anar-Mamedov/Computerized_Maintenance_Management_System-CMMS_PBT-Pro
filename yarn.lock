@@ -734,11 +734,6 @@
     "@types/babel__core" "^7.20.5"
     react-refresh "^0.14.0"
 
-"@xmldom/xmldom@^0.8.10":
-  version "0.8.10"
-  resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.8.10.tgz#a1337ca426aa61cef9fe15b5b28e340a72f6fa99"
-  integrity sha512-2WALfTl4xo2SkGCYRt6rDTFfk9R1czmBvUQy12gK2KuRKIpWEhcbbzy8EZXtz/jkRqHX8bFEc6FC1HjX4TUWYw==
-
 acorn-jsx@^5.3.2:
   version "5.3.2"
   resolved "https://registry.npmjs.org/acorn-jsx/-/acorn-jsx-5.3.2.tgz"
@@ -1171,13 +1166,6 @@ doctrine@^3.0.0:
   dependencies:
     esutils "^2.0.2"
 
-docxtemplater@^3.46.0:
-  version "3.46.0"
-  resolved "https://registry.yarnpkg.com/docxtemplater/-/docxtemplater-3.46.0.tgz#d8e94841c63318cb1b763afb55ecdeb3e9822469"
-  integrity sha512-KZEy3icAm+Y+EtcAxomDXrjZq2HzzQdHVu+g0VQUttt0c7cMmTztNGJoWLmCTssCjOtGFePzRVwMQp8bewL0TQ==
-  dependencies:
-    "@xmldom/xmldom" "^0.8.10"
-
 electron-to-chromium@^1.4.601:
   version "1.4.616"
   resolved "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.4.616.tgz"
@@ -1484,11 +1472,6 @@ file-entry-cache@^6.0.1:
   integrity sha512-7Gps/XWymbLk2QLYK4NzpMOrYjMhdIxXuIvy2QBsLE6ljuodKvdkWs/cpyJJ3CVIVpH0Oi1Hvg1ovbMzLdFBBg==
   dependencies:
     flat-cache "^3.0.4"
-
-file-saver@^2.0.5:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/file-saver/-/file-saver-2.0.5.tgz#d61cfe2ce059f414d899e9dd6d4107ee25670c38"
-  integrity sha512-P9bmyZ3h/PRG+Nzga+rbdI4OEpNDzAVyy74uVO9ATgzLK6VtAsYybF/+TOCvrc0MO793d6+42lLyZTw7/ArVzA==
 
 find-up@^5.0.0:
   version "5.0.0"
