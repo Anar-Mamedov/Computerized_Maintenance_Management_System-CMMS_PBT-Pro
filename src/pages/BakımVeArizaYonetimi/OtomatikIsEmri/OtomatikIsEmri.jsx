@@ -1,5 +1,6 @@
-import MainTable from "./Table/Table";
+
 import { FormProvider, useForm } from "react-hook-form";
+import MainTable from "./Table/Table";
 
 export default function OtomatikIsEmri() {
   const formMethods = useForm();
