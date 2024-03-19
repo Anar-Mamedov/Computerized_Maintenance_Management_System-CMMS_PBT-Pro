@@ -33,7 +33,7 @@ export default function Location() {
 
   const fetchData = () => {
     setIsLoading(true);
-    AxiosInstance.get("Lokasyon?ID=30")
+    AxiosInstance.get("Lokasyon")
       .then((response) => {
         setTreeData(constructTree(response)); // API'den gelen veriyi işle
         setIsLoading(false);

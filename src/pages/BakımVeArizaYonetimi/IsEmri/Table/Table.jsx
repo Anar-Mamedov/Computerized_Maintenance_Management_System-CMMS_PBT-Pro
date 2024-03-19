@@ -757,7 +757,7 @@ export default function MainTable() {
       setLoading(true);
       // API isteğinde keyword ve currentPage kullanılıyor
       const response = await AxiosInstance.post(
-        `getIsEmriFullList?id=11&parametre=${keyword}&pagingDeger=${currentPage}`,
+        `getIsEmriFullList?parametre=${keyword}&pagingDeger=${currentPage}`,
         filters
       );
       if (response) {

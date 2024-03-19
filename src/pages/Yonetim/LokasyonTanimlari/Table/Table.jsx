@@ -101,7 +101,7 @@ export default function MainTable() {
   const fetchEquipmentData = async () => {
     try {
       setLoading(true); // Yükleme başladığında
-      const response = await AxiosInstance.get("GetLokasyonList?ID=30");
+      const response = await AxiosInstance.get("GetLokasyonList");
       if (response) {
         const formattedData = formatDataForTable(response);
         replace(formattedData); // Populate the field array

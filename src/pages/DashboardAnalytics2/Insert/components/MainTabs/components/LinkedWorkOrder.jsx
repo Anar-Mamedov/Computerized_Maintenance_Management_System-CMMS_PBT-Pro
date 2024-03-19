@@ -439,7 +439,7 @@ export default function LinkedWorkOrder() {
   const fetch = useCallback(({ keyword, filters, page = 1 }) => {
     setLoading(true); // Set loading to true before making the API call
     // Fetch data from the API
-    AxiosInstance.post(`getIsEmriFullList?id=11&parametre=${keyword}&pagingDeger=${page}`, filters)
+    AxiosInstance.post(`getIsEmriFullList?parametre=${keyword}&pagingDeger=${page}`, filters)
       .then((response) => {
         const fetchedData = response.list.map((item, index) => {
           return {
