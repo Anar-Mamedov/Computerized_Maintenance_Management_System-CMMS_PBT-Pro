@@ -1,47 +1,19 @@
+import React, { useEffect, useState } from "react";
+import { useForm, FormProvider } from "react-hook-form";
+import { Button, Drawer, Space, ConfigProvider, Modal, Spin, message } from "antd";
 import tr_TR from "antd/es/locale/tr_TR";
-import { PlusOutlined } from "@ant-design/icons";
-import { Button, Drawer, Space, ConfigProvider, Modal, message } from "antd";
-import React, { useEffect, useState, useTransition } from "react";
-import MainTabs from "./components/MainTabs/MainTabs";
-import secondTabs from "./components/secondTabs/secondTabs";
-import { useForm, Controller, useFormContext, FormProvider, set } from "react-hook-form";
-import dayjs from "dayjs";
 import AxiosInstance from "../../../../api/http";
-import Footer from "../Footer";
+import MainTabs from "./components/MainTabs/MainTabs";
+import Footer from "./components/Footer";
 import SecondTabs from "./components/secondTabs/secondTabs";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+dayjs.extend(customParseFormat);
 
 export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
-  const [, startTransition] = useTransition();
-  const [open, setOpen] = useState(false);
-  const showDrawer = () => {
-    setOpen(true);
-  };
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(drawerVisible);
 
-  const onClose = () => {
-    Modal.confirm({
-      title: "İptal etmek istediğinden emin misin?",
-      content: "Kaydedilmemiş değişiklikler kaybolacaktır.",
-      okText: "Evet",
-      cancelText: "Hayır",
-      onOk: () => {
-        onDrawerClose(); // Close the drawer
-        onRefresh();
-        reset();
-      },
-      onCancel: () => {
-        // Do nothing, continue from where the user left off
-      },
-    });
-  };
-
-  // back-end'e gönderilecek veriler
-
-  const handleClick = () => {
-    const values = methods.getValues();
-    console.log(onSubmit(values));
-  };
-
-  //* export
   const methods = useForm({
     defaultValues: {
       secilenMakineID: "",
@@ -210,6 +182,246 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     },
   });
 
+  const { setValue, reset, watch } = methods;
+
+  // aşağıdaki useEffect verileri form elemanlarına set etmeden önce durum güncellemesi yapıyor ondan sonra verileri set ediyor
+
+  useEffect(() => {
+    const handleDataFetchAndUpdate = async () => {
+      if (drawerVisible && selectedRow) {
+        setOpen(true); // İşlemler tamamlandıktan sonra drawer'ı aç
+        setLoading(true); // Yükleme başladığında
+        try {
+          const response = await AxiosInstance.get(`GetMakineById?makineId=${selectedRow.key}`);
+          const data = response;
+          const item = data[0]; // Veri dizisinin ilk elemanını al
+          // Form alanlarını set et
+          setValue("secilenMakineID", item.TB_MAKINE_ID);
+          setValue("makineKodu", item.MKN_KOD);
+          setValue("makineTanimi", item.MKN_TANIM);
+          setValue("location", item.MKN_LOKASYON);
+          setValue("locationID", item.MKN_LOKASYON_ID);
+          setValue("MakineTipi", item.MKN_TIP);
+          setValue("MakineTipiID", item.MKN_TIP_KOD_ID);
+          setValue("Kategori", item.MKN_KATEGORI);
+          setValue("KategoriID", item.MKN_KATEGORI_KOD_ID);
+          setValue("MakineMarka", item.MKN_MARKA);
+          setValue("MakineMarkaID", item.MKN_MARKA_KOD_ID);
+          const timeoutId = setTimeout(() => {
+            setValue("MakineModel", item.MKN_MODEL);
+            setValue("MakineModelID", item.MKN_MODEL_KOD_ID);
+          }, 500); // Delay of 500 milliseconds
+          setValue("makineOperator", item.MKN_OPERATOR);
+          setValue("makineOperatorID", item.MKN_OPERATOR_PERSONEL_ID);
+          setValue("MakineDurum", item.MKN_DURUM);
+          setValue("MakineDurumID", item.MKN_DURUM_KOD_ID);
+          setValue("makineSeriNO", item.MKN_SERI_NO);
+          setValue("masterMakineTanimi", item.MKN_MASTER_MAKINE_TANIM);
+          setValue("masterMakineID", item.MKN_MASTER_ID);
+          setValue("makineTakvimTanimi", item.MKN_TAKVIM);
+          setValue("makineTakvimID", item.MKN_TAKVIM_ID);
+          setValue("uretici", item.MKN_URETICI);
+          setValue("uretimYili", item.MKN_URETIM_YILI);
+          setValue(
+            "makineGarantiBitisTarihi",
+            item.MKN_GARANTI_BITIS && dayjs(item.MKN_GARANTI_BITIS).isValid() ? dayjs(item.MKN_GARANTI_BITIS) : ""
+          );
+          setValue(
+            "time",
+            item.editTime && dayjs(item.editTime, "HH:mm:ss").isValid() ? dayjs(item.editTime, "HH:mm:ss") : null
+          );
+          setValue("makineDurusBirimMaliyeti", item.MKN_DURUS_MALIYET);
+          setValue("makinePlanCalismaSuresi", item.MKN_YILLIK_PLANLANAN_CALISMA_SURESI);
+          setValue("makineAktif", item.MKN_AKTIF);
+          setValue("makineKalibrasyon", item.MKN_KALIBRASYON_VAR);
+          setValue("kritikMakine", item.MKN_KRITIK_MAKINE);
+          setValue("makineGucKaynagi", item.MKN_GUC_KAYNAGI);
+          setValue("makineIsBildirimi", item.MKN_IS_TALEP);
+          setValue("makineYakitKullanim", item.MKN_YAKIT_KULLANIM);
+          setValue("makineOtonomBakim", item.MKN_OTONOM_BAKIM);
+          // detay bilgi sekmesi
+          setValue("makineMasrafMerkeziTanim", item.MKN_MASRAF_MERKEZ);
+          setValue("makineMasrafMerkeziID", item.MKN_MASRAF_MERKEZ_KOD_ID);
+          setValue("makineAtolyeTanim", item.MKN_ATOLYE);
+          setValue("makineAtolyeID", item.MKN_ATOLYE_ID);
+          setValue("makineBakimGrubu", item.MKN_BAKIM_GRUP);
+          setValue("makineBakimGrubuID", item.MKN_BAKIM_GRUP_ID);
+          setValue("makineArizaGrubu", item.MKN_ARIZA_GRUP);
+          setValue("makineArizaGrubuID", item.MKN_ARIZA_GRUP_ID);
+          setValue("makineServisSaglayici", item.MKN_SERVIS_SAGLAYICI);
+          setValue("makineServisSaglayiciID", item.MKN_SERVIS_SAGLAYICI_KOD_ID);
+          setValue("makineServisSekli", item.MKN_SERVIS_SEKLI);
+          setValue("makineServisSekliID", item.MKN_SERVIS_SEKLI_KOD_ID);
+          setValue("makineTeknikSeviyesi", item.MKN_TEKNIK_SERVIS);
+          setValue("makineTeknikSeviyesiID", item.MKN_TEKNIK_SERVIS_KOD_ID);
+          setValue("makineFizikselDurumu", item.MKN_FIZIKSEL_DURUM);
+          setValue("makineFizikselDurumuID", item.MKN_FIZIKSEL_DURUM_KOD_ID);
+          setValue("makineOncelik", item.MKN_ONCELIK);
+          setValue("makineOncelikID", item.MKN_ONCELIK_ID);
+          setValue("makineRiskPuani", item.MKN_RISK_PUAN);
+          setValue(
+            "makineKurulumTarihi",
+            item.MKN_KURULUM_TARIH && dayjs(item.MKN_KURULUM_TARIH).isValid() ? dayjs(item.MKN_KURULUM_TARIH) : ""
+          );
+          setValue("MakineIsletimSistemi", item.MKN_ISLETIM_SISTEMI);
+          setValue("MakineIsletimSistemiID", item.MKN_ISLETIM_SISTEMI_KOD_ID);
+          setValue("makineIPNo", item.MKN_IP_NO);
+          setValue("MakineAgirlik", item.MKN_AGIRLIK);
+          setValue("MakineAgirlikBirim", item.MKN_AGIRLIK_BIRIM);
+          setValue("MakineAgirlikBirimID", item.MKN_AGIRLIK_BIRIM_KOD_ID);
+          setValue("MakineHacim", item.MKN_HACIM);
+          setValue("MakineHacimBirim", item.MKN_HACIM_BIRIM);
+          setValue("MakineHacimBirimID", item.MKN_HACIM_BIRIM_KOD_ID);
+          setValue("MakineKapasite", item.MKN_KAPASITE);
+          setValue("MakineKapasiteBirim", item.MKN_KAPASITE_BIRIM);
+          setValue("MakineKapasiteBirimID", item.MKN_KAPASITE_BIRIM_KOD_ID);
+          setValue("MakineElektrikTuketim", item.MKN_ELEKTRIK_TUKETIM);
+          setValue("MakineElektrikTuketimBirim", item.MKN_ELEKTRIK_TUKETIM_BIRIM);
+          setValue("MakineElektrikTuketimBirimID", item.MKN_ELEKTRIK_TUKETIM_BIRIM_KOD_ID);
+          setValue("makineVoltaj", item.MKN_VOLTAJ);
+          setValue("makineGuc", item.MKN_GUC);
+          setValue("makineFaz", item.MKN_FAZ);
+          setValue("makineValfTipi", item.MKN_VALF_TIPI);
+          setValue("makineValfTipiID", item.MKN_VALF_TIP_KOD_ID);
+          setValue("makineValfBoyutu", item.MKN_VALF_BOYUT);
+          setValue("makineValfBoyutuID", item.MKN_VALF_BOYUT_KOD_ID);
+          setValue("makineGirisBoyutu", item.MKN_GIRIS_BOYUT);
+          setValue("makineGirisBoyutuID", item.MKN_GIRIS_BOYUT_KOD_ID);
+          setValue("makineCikisBoyutu", item.MKN_CIKIS_BOYUT);
+          setValue("makineCikisBoyutuID", item.MKN_CIKIS_BOYUT_KOD_ID);
+          setValue("makineKonnektor", item.MKN_KONNEKTOR);
+          setValue("makineKonnektorID", item.MKN_KONNEKTOR_KOD_ID);
+          setValue("makineBasinc", item.MKN_BASINC);
+          setValue("makineBasincID", item.MKN_BASINC_KOD_ID);
+          setValue("MakineBasincMiktar", item.MKN_BASINC_MIKTAR);
+          setValue("MakineBasincMiktarBirim", item.MKN_BASINC_BIRIM);
+          setValue("MakineBasincMiktarBirimID", item.MKN_BASINC_BIRIM_KOD_ID);
+          setValue("makineDevirSayisi", item.MKN_DEVIR);
+          setValue("makineMotorGucu", item.MKN_TEKNIK_MOTOR_GUCU);
+          setValue("makineSilindirSayisi", item.MKN_TEKNIK_SILINDIR_SAYISI);
+          // finansal bilgiler sekmesi
+          setValue("makineSatinalmaFirma", item.MKN_ALIS_FIRMA);
+          setValue("makineSatinalmaFirmaID", item.MKN_ALIS_FIRMA_ID);
+          setValue(
+            "makineSatinalmaTarihi",
+            item.MKN_ALIS_TARIH && dayjs(item.MKN_ALIS_TARIH).isValid() ? dayjs(item.MKN_ALIS_TARIH) : ""
+          );
+          setValue("satinalmaFiyati", item.MKN_ALIS_FIYAT);
+          setValue("satinalmaFaturaNo", item.MKN_FATURA_NO);
+          setValue(
+            "makineSatinalmaFaturaTarihi",
+            item.MKN_FATURA_TARIH && dayjs(item.MKN_FATURA_TARIH).isValid() ? dayjs(item.MKN_FATURA_TARIH) : ""
+          );
+          setValue("satinalmaFaturaTutar", item.MKN_FATURA_TUTAR);
+          setValue("makineKrediKrediMiktari", item.MKN_KREDI_MIKTARI);
+          setValue("makineKrediKrediOrani", item.KREDI_ORANI);
+          setValue(
+            "makineKrediBaslamaTarihi",
+            item.MKN_KREDI_BASLAMA_TARIHI && dayjs(item.MKN_KREDI_BASLAMA_TARIHI).isValid()
+              ? dayjs(item.MKN_KREDI_BASLAMA_TARIHI)
+              : ""
+          );
+          setValue(
+            "makineKrediBitisTarihi",
+            item.MKN_KREDI_BITIS_TARIHI && dayjs(item.MKN_KREDI_BITIS_TARIHI).isValid()
+              ? dayjs(item.MKN_KREDI_BITIS_TARIHI)
+              : ""
+          );
+          // setValue(
+          //   "amortismanHesapTarihi",
+          //   item.MKN_AMORTISMAN_HESAP_TARIHI && dayjs(item.MKN_AMORTISMAN_HESAP_TARIHI).isValid()
+          //     ? dayjs(item.MKN_AMORTISMAN_HESAP_TARIHI)
+          //     : ""
+          // );
+          // setValue("amortismanDefterDegeri", item.MKN_AMORTISMAN_DEFTER_DEGERI);
+          // setValue("amortismanFaydaliOmur", item.MKN_AMORTISMAN_FAYDALI_OMUR);
+          // setValue("amortismanTutari", item.MKN_AMORTISMAN_TUTARI);
+          // setValue("amortismanNetAktifDegeri", item.MKN_AMORTISMAN_NET_AKTIF_DEGERI);
+          // setValue("amortismanKalanSure", item.MKN_AMORTISMAN_KALAN_SURE);
+          setValue("makineKiralik", item.MKN_KIRA);
+          setValue("makineFirma", item.MKN_KIRA_FIRMA);
+          setValue("makineFirmaID", item.MKN_KIRA_FIRMA_ID);
+          setValue(
+            "makineKiraBaslangicTarihi",
+            item.MKN_KIRA_BASLANGIC_TARIH && dayjs(item.MKN_KIRA_BASLANGIC_TARIH).isValid()
+              ? dayjs(item.MKN_KIRA_BASLANGIC_TARIH)
+              : ""
+          );
+          setValue(
+            "makineKiraBitisTarihi",
+            item.MKN_KIRA_BITIS_TARIH && dayjs(item.MKN_KIRA_BITIS_TARIH).isValid()
+              ? dayjs(item.MKN_KIRA_BITIS_TARIH)
+              : ""
+          );
+          setValue("MakineKiraSuresi", item.MKN_KIRA_SURE);
+          setValue("MakineKiraSuresiBirim", item.MKN_KIRA_PERIYOD);
+          setValue("MakineKiraSuresiBirimID", item.MKN_KIRA_SURE_BIRIM_KOD_ID);
+          setValue("kiraTutari", item.MKN_KIRA_TUTAR);
+          setValue("kiraAciklama", item.MKN_KIRA_ACIKLAMA);
+          setValue("makineSatıldı", item.MKN_SATIS);
+          setValue("makineSatisNedeni", item.MKN_SATIS_NEDEN);
+          setValue(
+            "makineSatisTarihi",
+            item.MKN_SATIS_TARIH && dayjs(item.MKN_SATIS_TARIH).isValid() ? dayjs(item.MKN_SATIS_TARIH) : ""
+          );
+          setValue("makineSatisYeri", item.MKN_SATIS_YER);
+          setValue("satisTutari", item.MKN_SATIS_FIYAT);
+          setValue("makineSatisAciklama", item.MKN_SATIS_ACIKLAMA);
+          // Yakit Bilgileri sekmesi
+          // setValue("makineYakitTipi", item.MKN_YAKIT_TIP);
+          // setValue("makineYakitTipiID", item.MKN_YAKIT_TIP_ID);
+          // setValue("YakitDepoHacmi", item.MKN_YAKIT_DEPO_HACMI);
+          // setValue("makineYakitSayacTakibi", item.MKN_YAKIT_SAYAC_TAKIP);
+          // setValue("makineYakitSayacGuncellemesi", item.MKN_YAKIT_SAYAC_GUNCELLE);
+          // setValue("ongorulenMin", item.MKN_YAKIT_ONGORULEN_MIN);
+          // setValue("ongorulenMax", item.MKN_YAKIT_ONGORULEN_MAX);
+          // setValue("gerceklesen", item.MKN_YAKIT_GERCEKLESEN);
+          // Özel Alanlar sekmesi
+          setValue("ozelAlan_1", item.MKN_OZEL_ALAN_1);
+          setValue("ozelAlan_2", item.MKN_OZEL_ALAN_2);
+          setValue("ozelAlan_3", item.MKN_OZEL_ALAN_3);
+          setValue("ozelAlan_4", item.MKN_OZEL_ALAN_4);
+          setValue("ozelAlan_5", item.MKN_OZEL_ALAN_5);
+          setValue("ozelAlan_6", item.MKN_OZEL_ALAN_6);
+          setValue("ozelAlan_7", item.MKN_OZEL_ALAN_7);
+          setValue("ozelAlan_8", item.MKN_OZEL_ALAN_8);
+          setValue("ozelAlan_9", item.MKN_OZEL_ALAN_9);
+          setValue("ozelAlan_10", item.MKN_OZEL_ALAN_10);
+          setValue("ozelAlan_11", item.MKN_OZEL_ALAN_11);
+          setValue("ozelAlan_11_ID", item.MKN_OZEL_ALAN_11_KOD_ID);
+          setValue("ozelAlan_12", item.MKN_OZEL_ALAN_12);
+          setValue("ozelAlan_12_ID", item.MKN_OZEL_ALAN_12_KOD_ID);
+          setValue("ozelAlan_13", item.MKN_OZEL_ALAN_13);
+          setValue("ozelAlan_13_ID", item.MKN_OZEL_ALAN_13_KOD_ID);
+          setValue("ozelAlan_14", item.MKN_OZEL_ALAN_14);
+          setValue("ozelAlan_14_ID", item.MKN_OZEL_ALAN_14_KOD_ID);
+          setValue("ozelAlan_15", item.MKN_OZEL_ALAN_15);
+          setValue("ozelAlan_15_ID", item.MKN_OZEL_ALAN_15_KOD_ID);
+          setValue("ozelAlan_16", item.MKN_OZEL_ALAN_16);
+          setValue("ozelAlan_17", item.MKN_OZEL_ALAN_17);
+          setValue("ozelAlan_18", item.MKN_OZEL_ALAN_18);
+          setValue("ozelAlan_19", item.MKN_OZEL_ALAN_19);
+          setValue("ozelAlan_20", item.MKN_OZEL_ALAN_20);
+          // Notlar sekmesi
+          setValue("makineGenelNot", item.MKN_GUVENLIK_NOT);
+          setValue("makineGuvenlikNotu", item.MKN_GENEL_NOT);
+          // add more fields as needed
+          // Cleanup function to clear timeout if the component unmounts
+          setLoading(false); // Yükleme tamamlandığında
+
+          return () => clearTimeout(timeoutId);
+
+          // ... Diğer setValue çağrıları
+        } catch (error) {
+          console.error("Veri çekilirken hata oluştu:", error);
+          setLoading(false); // Hata oluştuğunda
+        }
+      }
+    };
+
+    handleDataFetchAndUpdate();
+  }, [drawerVisible, selectedRow, setValue, onRefresh, methods.reset]);
+
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
     return formattedDate.isValid() ? formattedDate.format("YYYY-MM-DD") : "";
@@ -220,10 +432,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
   };
 
-  const { setValue, reset } = methods;
-
-  //* export
   const onSubmit = (data) => {
+    // Form verilerini API'nin beklediği formata dönüştür
     const Body = {
       TB_MAKINE_ID: data.secilenMakineID, // ??
       MKN_KOD: data.makineKodu,
@@ -388,22 +598,18 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       // Notlar sekmesi
       MKN_GUVENLIK_NOT: data.makineGenelNot,
       MKN_GENEL_NOT: data.makineGuvenlikNotu,
-      // add more fields as needed
+      // Diğer alanlarınız...
     };
 
-    // AxiosInstance.post("/api/endpoint", { Body }).then((response) => {
-    // handle response
-    // });
-
+    // API'ye POST isteği gönder
     AxiosInstance.post("UpdateMakine", Body)
       .then((response) => {
-        // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("Ekleme Başarılı.");
-          onDrawerClose(); // Close the drawer
+          setOpen(false);
           onRefresh();
-          reset();
+          methods.reset();
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
@@ -418,305 +624,61 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     console.log({ Body });
   };
 
-  // İş Emri No değerini her drawer açıldığında güncellemek için
-  // useEffect(() => {
-  //   if (open) {
-  //     AxiosInstance.get("IsEmriKodGetir") // Replace with your actual API endpoint
-  //       .then((response) => {
-  //         // Assuming the response contains the new work order number in 'response.Tanim'
-  //         setValue("work_order_no", response.Tanim);
-  //       })
-  //       .catch((error) => {
-  //         console.error("Error fetching new work order number:", error);
-  //       });
-  //   }
-  // }, [open, setValue]);
-
-  // İş Emri No değerini her drawer açıldığında güncellemek için son
-
-  useEffect(() => {
-    if (drawerVisible && selectedRow) {
-      // console.log("selectedRow", selectedRow);
-      // startTransition(() => {
-      // Object.keys(selectedRow).forEach((key) => {
-      //   console.log(key, selectedRow[key]);
-      //   setValue(key, selectedRow[key]);
-      setValue("secilenMakineID", selectedRow.key);
-      setValue("makineKodu", selectedRow.MKN_KOD);
-      setValue("makineTanimi", selectedRow.MKN_TANIM);
-      setValue("location", selectedRow.MKN_LOKASYON);
-      setValue("locationID", selectedRow.MKN_LOKASYON_ID);
-      setValue("MakineTipi", selectedRow.MKN_TIP);
-      setValue("MakineTipiID", selectedRow.MKN_TIP_KOD_ID);
-      setValue("Kategori", selectedRow.MKN_KATEGORI);
-      setValue("KategoriID", selectedRow.MKN_KATEGORI_KOD_ID);
-      setValue("MakineMarka", selectedRow.MKN_MARKA);
-      setValue("MakineMarkaID", selectedRow.MKN_MARKA_KOD_ID);
-      const timeoutId = setTimeout(() => {
-        setValue("MakineModel", selectedRow.MKN_MODEL);
-        setValue("MakineModelID", selectedRow.MKN_MODEL_KOD_ID);
-      }, 500); // Delay of 500 milliseconds
-      setValue("makineOperator", selectedRow.MKN_OPERATOR);
-      setValue("makineOperatorID", selectedRow.MKN_OPERATOR_PERSONEL_ID);
-      setValue("MakineDurum", selectedRow.MKN_DURUM);
-      setValue("MakineDurumID", selectedRow.MKN_DURUM_KOD_ID);
-      setValue("makineSeriNO", selectedRow.MKN_SERI_NO);
-      setValue("masterMakineTanimi", selectedRow.MKN_MASTER_MAKINE_TANIM);
-      setValue("masterMakineID", selectedRow.MKN_MASTER_ID);
-      setValue("makineTakvimTanimi", selectedRow.MKN_TAKVIM);
-      setValue("makineTakvimID", selectedRow.MKN_TAKVIM_ID);
-      setValue("uretici", selectedRow.MKN_URETICI);
-      setValue("uretimYili", selectedRow.MKN_URETIM_YILI);
-      setValue(
-        "makineGarantiBitisTarihi",
-        selectedRow.MKN_GARANTI_BITIS && dayjs(selectedRow.MKN_GARANTI_BITIS).isValid()
-          ? dayjs(selectedRow.MKN_GARANTI_BITIS)
-          : ""
-      );
-      setValue(
-        "time",
-        selectedRow.editTime && dayjs(selectedRow.editTime, "HH:mm:ss").isValid()
-          ? dayjs(selectedRow.editTime, "HH:mm:ss")
-          : null
-      );
-      setValue("makineDurusBirimMaliyeti", selectedRow.MKN_DURUS_MALIYET);
-      setValue("makinePlanCalismaSuresi", selectedRow.MKN_YILLIK_PLANLANAN_CALISMA_SURESI);
-      setValue("makineAktif", selectedRow.MKN_AKTIF);
-      setValue("makineKalibrasyon", selectedRow.MKN_KALIBRASYON_VAR);
-      setValue("kritikMakine", selectedRow.MKN_KRITIK_MAKINE);
-      setValue("makineGucKaynagi", selectedRow.MKN_GUC_KAYNAGI);
-      setValue("makineIsBildirimi", selectedRow.MKN_IS_TALEP);
-      setValue("makineYakitKullanim", selectedRow.MKN_YAKIT_KULLANIM);
-      setValue("makineOtonomBakim", selectedRow.MKN_OTONOM_BAKIM);
-      // detay bilgi sekmesi
-      setValue("makineMasrafMerkeziTanim", selectedRow.MKN_MASRAF_MERKEZ);
-      setValue("makineMasrafMerkeziID", selectedRow.MKN_MASRAF_MERKEZ_KOD_ID);
-      setValue("makineAtolyeTanim", selectedRow.MKN_ATOLYE);
-      setValue("makineAtolyeID", selectedRow.MKN_ATOLYE_ID);
-      setValue("makineBakimGrubu", selectedRow.MKN_BAKIM_GRUP);
-      setValue("makineBakimGrubuID", selectedRow.MKN_BAKIM_GRUP_ID);
-      setValue("makineArizaGrubu", selectedRow.MKN_ARIZA_GRUP);
-      setValue("makineArizaGrubuID", selectedRow.MKN_ARIZA_GRUP_ID);
-      setValue("makineServisSaglayici", selectedRow.MKN_SERVIS_SAGLAYICI);
-      setValue("makineServisSaglayiciID", selectedRow.MKN_SERVIS_SAGLAYICI_KOD_ID);
-      setValue("makineServisSekli", selectedRow.MKN_SERVIS_SEKLI);
-      setValue("makineServisSekliID", selectedRow.MKN_SERVIS_SEKLI_KOD_ID);
-      setValue("makineTeknikSeviyesi", selectedRow.MKN_TEKNIK_SERVIS);
-      setValue("makineTeknikSeviyesiID", selectedRow.MKN_TEKNIK_SERVIS_KOD_ID);
-      setValue("makineFizikselDurumu", selectedRow.MKN_FIZIKSEL_DURUM);
-      setValue("makineFizikselDurumuID", selectedRow.MKN_FIZIKSEL_DURUM_KOD_ID);
-      setValue("makineOncelik", selectedRow.MKN_ONCELIK);
-      setValue("makineOncelikID", selectedRow.MKN_ONCELIK_ID);
-      setValue("makineRiskPuani", selectedRow.MKN_RISK_PUAN);
-      setValue(
-        "makineKurulumTarihi",
-        selectedRow.MKN_KURULUM_TARIH && dayjs(selectedRow.MKN_KURULUM_TARIH).isValid()
-          ? dayjs(selectedRow.MKN_KURULUM_TARIH)
-          : ""
-      );
-      setValue("MakineIsletimSistemi", selectedRow.MKN_ISLETIM_SISTEMI);
-      setValue("MakineIsletimSistemiID", selectedRow.MKN_ISLETIM_SISTEMI_KOD_ID);
-      setValue("makineIPNo", selectedRow.MKN_IP_NO);
-      setValue("MakineAgirlik", selectedRow.MKN_AGIRLIK);
-      setValue("MakineAgirlikBirim", selectedRow.MKN_AGIRLIK_BIRIM);
-      setValue("MakineAgirlikBirimID", selectedRow.MKN_AGIRLIK_BIRIM_KOD_ID);
-      setValue("MakineHacim", selectedRow.MKN_HACIM);
-      setValue("MakineHacimBirim", selectedRow.MKN_HACIM_BIRIM);
-      setValue("MakineHacimBirimID", selectedRow.MKN_HACIM_BIRIM_KOD_ID);
-      setValue("MakineKapasite", selectedRow.MKN_KAPASITE);
-      setValue("MakineKapasiteBirim", selectedRow.MKN_KAPASITE_BIRIM);
-      setValue("MakineKapasiteBirimID", selectedRow.MKN_KAPASITE_BIRIM_KOD_ID);
-      setValue("MakineElektrikTuketim", selectedRow.MKN_ELEKTRIK_TUKETIM);
-      setValue("MakineElektrikTuketimBirim", selectedRow.MKN_ELEKTRIK_TUKETIM_BIRIM);
-      setValue("MakineElektrikTuketimBirimID", selectedRow.MKN_ELEKTRIK_TUKETIM_BIRIM_KOD_ID);
-      setValue("makineVoltaj", selectedRow.MKN_VOLTAJ);
-      setValue("makineGuc", selectedRow.MKN_GUC);
-      setValue("makineFaz", selectedRow.MKN_FAZ);
-      setValue("makineValfTipi", selectedRow.MKN_VALF_TIPI);
-      setValue("makineValfTipiID", selectedRow.MKN_VALF_TIP_KOD_ID);
-      setValue("makineValfBoyutu", selectedRow.MKN_VALF_BOYUT);
-      setValue("makineValfBoyutuID", selectedRow.MKN_VALF_BOYUT_KOD_ID);
-      setValue("makineGirisBoyutu", selectedRow.MKN_GIRIS_BOYUT);
-      setValue("makineGirisBoyutuID", selectedRow.MKN_GIRIS_BOYUT_KOD_ID);
-      setValue("makineCikisBoyutu", selectedRow.MKN_CIKIS_BOYUT);
-      setValue("makineCikisBoyutuID", selectedRow.MKN_CIKIS_BOYUT_KOD_ID);
-      setValue("makineKonnektor", selectedRow.MKN_KONNEKTOR);
-      setValue("makineKonnektorID", selectedRow.MKN_KONNEKTOR_KOD_ID);
-      setValue("makineBasinc", selectedRow.MKN_BASINC);
-      setValue("makineBasincID", selectedRow.MKN_BASINC_KOD_ID);
-      setValue("MakineBasincMiktar", selectedRow.MKN_BASINC_MIKTAR);
-      setValue("MakineBasincMiktarBirim", selectedRow.MKN_BASINC_BIRIM);
-      setValue("MakineBasincMiktarBirimID", selectedRow.MKN_BASINC_BIRIM_KOD_ID);
-      setValue("makineDevirSayisi", selectedRow.MKN_DEVIR);
-      setValue("makineMotorGucu", selectedRow.MKN_TEKNIK_MOTOR_GUCU);
-      setValue("makineSilindirSayisi", selectedRow.MKN_TEKNIK_SILINDIR_SAYISI);
-      // finansal bilgiler sekmesi
-      setValue("makineSatinalmaFirma", selectedRow.MKN_ALIS_FIRMA);
-      setValue("makineSatinalmaFirmaID", selectedRow.MKN_ALIS_FIRMA_ID);
-      setValue(
-        "makineSatinalmaTarihi",
-        selectedRow.MKN_ALIS_TARIH && dayjs(selectedRow.MKN_ALIS_TARIH).isValid()
-          ? dayjs(selectedRow.MKN_ALIS_TARIH)
-          : ""
-      );
-      setValue("satinalmaFiyati", selectedRow.MKN_ALIS_FIYAT);
-      setValue("satinalmaFaturaNo", selectedRow.MKN_FATURA_NO);
-      setValue(
-        "makineSatinalmaFaturaTarihi",
-        selectedRow.MKN_FATURA_TARIH && dayjs(selectedRow.MKN_FATURA_TARIH).isValid()
-          ? dayjs(selectedRow.MKN_FATURA_TARIH)
-          : ""
-      );
-      setValue("satinalmaFaturaTutar", selectedRow.MKN_FATURA_TUTAR);
-      setValue("makineKrediKrediMiktari", selectedRow.MKN_KREDI_MIKTARI);
-      setValue("makineKrediKrediOrani", selectedRow.KREDI_ORANI);
-      setValue(
-        "makineKrediBaslamaTarihi",
-        selectedRow.MKN_KREDI_BASLAMA_TARIHI && dayjs(selectedRow.MKN_KREDI_BASLAMA_TARIHI).isValid()
-          ? dayjs(selectedRow.MKN_KREDI_BASLAMA_TARIHI)
-          : ""
-      );
-      setValue(
-        "makineKrediBitisTarihi",
-        selectedRow.MKN_KREDI_BITIS_TARIHI && dayjs(selectedRow.MKN_KREDI_BITIS_TARIHI).isValid()
-          ? dayjs(selectedRow.MKN_KREDI_BITIS_TARIHI)
-          : ""
-      );
-      // setValue(
-      //   "amortismanHesapTarihi",
-      //   selectedRow.MKN_AMORTISMAN_HESAP_TARIHI && dayjs(selectedRow.MKN_AMORTISMAN_HESAP_TARIHI).isValid()
-      //     ? dayjs(selectedRow.MKN_AMORTISMAN_HESAP_TARIHI)
-      //     : ""
-      // );
-      // setValue("amortismanDefterDegeri", selectedRow.MKN_AMORTISMAN_DEFTER_DEGERI);
-      // setValue("amortismanFaydaliOmur", selectedRow.MKN_AMORTISMAN_FAYDALI_OMUR);
-      // setValue("amortismanTutari", selectedRow.MKN_AMORTISMAN_TUTARI);
-      // setValue("amortismanNetAktifDegeri", selectedRow.MKN_AMORTISMAN_NET_AKTIF_DEGERI);
-      // setValue("amortismanKalanSure", selectedRow.MKN_AMORTISMAN_KALAN_SURE);
-      setValue("makineKiralik", selectedRow.MKN_KIRA);
-      setValue("makineFirma", selectedRow.MKN_KIRA_FIRMA);
-      setValue("makineFirmaID", selectedRow.MKN_KIRA_FIRMA_ID);
-      setValue(
-        "makineKiraBaslangicTarihi",
-        selectedRow.MKN_KIRA_BASLANGIC_TARIH && dayjs(selectedRow.MKN_KIRA_BASLANGIC_TARIH).isValid()
-          ? dayjs(selectedRow.MKN_KIRA_BASLANGIC_TARIH)
-          : ""
-      );
-      setValue(
-        "makineKiraBitisTarihi",
-        selectedRow.MKN_KIRA_BITIS_TARIH && dayjs(selectedRow.MKN_KIRA_BITIS_TARIH).isValid()
-          ? dayjs(selectedRow.MKN_KIRA_BITIS_TARIH)
-          : ""
-      );
-      setValue("MakineKiraSuresi", selectedRow.MKN_KIRA_SURE);
-      setValue("MakineKiraSuresiBirim", selectedRow.MKN_KIRA_PERIYOD);
-      setValue("MakineKiraSuresiBirimID", selectedRow.MKN_KIRA_SURE_BIRIM_KOD_ID);
-      setValue("kiraTutari", selectedRow.MKN_KIRA_TUTAR);
-      setValue("kiraAciklama", selectedRow.MKN_KIRA_ACIKLAMA);
-      setValue("makineSatıldı", selectedRow.MKN_SATIS);
-      setValue("makineSatisNedeni", selectedRow.MKN_SATIS_NEDEN);
-      setValue(
-        "makineSatisTarihi",
-        selectedRow.MKN_SATIS_TARIH && dayjs(selectedRow.MKN_SATIS_TARIH).isValid()
-          ? dayjs(selectedRow.MKN_SATIS_TARIH)
-          : ""
-      );
-      setValue("makineSatisYeri", selectedRow.MKN_SATIS_YER);
-      setValue("satisTutari", selectedRow.MKN_SATIS_FIYAT);
-      setValue("makineSatisAciklama", selectedRow.MKN_SATIS_ACIKLAMA);
-      // Yakit Bilgileri sekmesi
-      // setValue("makineYakitTipi", selectedRow.MKN_YAKIT_TIP);
-      // setValue("makineYakitTipiID", selectedRow.MKN_YAKIT_TIP_ID);
-      // setValue("YakitDepoHacmi", selectedRow.MKN_YAKIT_DEPO_HACMI);
-      // setValue("makineYakitSayacTakibi", selectedRow.MKN_YAKIT_SAYAC_TAKIP);
-      // setValue("makineYakitSayacGuncellemesi", selectedRow.MKN_YAKIT_SAYAC_GUNCELLE);
-      // setValue("ongorulenMin", selectedRow.MKN_YAKIT_ONGORULEN_MIN);
-      // setValue("ongorulenMax", selectedRow.MKN_YAKIT_ONGORULEN_MAX);
-      // setValue("gerceklesen", selectedRow.MKN_YAKIT_GERCEKLESEN);
-      // Özel Alanlar sekmesi
-      setValue("ozelAlan_1", selectedRow.MKN_OZEL_ALAN_1);
-      setValue("ozelAlan_2", selectedRow.MKN_OZEL_ALAN_2);
-      setValue("ozelAlan_3", selectedRow.MKN_OZEL_ALAN_3);
-      setValue("ozelAlan_4", selectedRow.MKN_OZEL_ALAN_4);
-      setValue("ozelAlan_5", selectedRow.MKN_OZEL_ALAN_5);
-      setValue("ozelAlan_6", selectedRow.MKN_OZEL_ALAN_6);
-      setValue("ozelAlan_7", selectedRow.MKN_OZEL_ALAN_7);
-      setValue("ozelAlan_8", selectedRow.MKN_OZEL_ALAN_8);
-      setValue("ozelAlan_9", selectedRow.MKN_OZEL_ALAN_9);
-      setValue("ozelAlan_10", selectedRow.MKN_OZEL_ALAN_10);
-      setValue("ozelAlan_11", selectedRow.MKN_OZEL_ALAN_11);
-      setValue("ozelAlan_11_ID", selectedRow.MKN_OZEL_ALAN_11_KOD_ID);
-      setValue("ozelAlan_12", selectedRow.MKN_OZEL_ALAN_12);
-      setValue("ozelAlan_12_ID", selectedRow.MKN_OZEL_ALAN_12_KOD_ID);
-      setValue("ozelAlan_13", selectedRow.MKN_OZEL_ALAN_13);
-      setValue("ozelAlan_13_ID", selectedRow.MKN_OZEL_ALAN_13_KOD_ID);
-      setValue("ozelAlan_14", selectedRow.MKN_OZEL_ALAN_14);
-      setValue("ozelAlan_14_ID", selectedRow.MKN_OZEL_ALAN_14_KOD_ID);
-      setValue("ozelAlan_15", selectedRow.MKN_OZEL_ALAN_15);
-      setValue("ozelAlan_15_ID", selectedRow.MKN_OZEL_ALAN_15_KOD_ID);
-      setValue("ozelAlan_16", selectedRow.MKN_OZEL_ALAN_16);
-      setValue("ozelAlan_17", selectedRow.MKN_OZEL_ALAN_17);
-      setValue("ozelAlan_18", selectedRow.MKN_OZEL_ALAN_18);
-      setValue("ozelAlan_19", selectedRow.MKN_OZEL_ALAN_19);
-      setValue("ozelAlan_20", selectedRow.MKN_OZEL_ALAN_20);
-      // Notlar sekmesi
-      setValue("makineGenelNot", selectedRow.MKN_GUVENLIK_NOT);
-      setValue("makineGuvenlikNotu", selectedRow.MKN_GENEL_NOT);
-      // add more fields as needed
-      // Cleanup function to clear timeout if the component unmounts
-      return () => clearTimeout(timeoutId);
-      // });
-      // });
-    }
-  }, [selectedRow, setValue, drawerVisible]);
-
-  useEffect(() => {
-    if (!drawerVisible) {
-      reset(); // Drawer kapandığında formu sıfırla
-    }
-  }, [drawerVisible, reset]);
+  const onClose = () => {
+    Modal.confirm({
+      title: "İptal etmek istediğinden emin misin?",
+      content: "Kaydedilmemiş değişiklikler kaybolacaktır.",
+      okText: "Evet",
+      cancelText: "Hayır",
+      onOk: () => {
+        setOpen(false);
+        reset();
+        onDrawerClose();
+      },
+    });
+  };
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)}>
-        <ConfigProvider locale={tr_TR}>
-          {/* <Button
-            type="primary"
-            onClick={showDrawer}
-            style={{
-              display: "flex",
-              alignItems: "center",
-            }}>
-            <PlusOutlined />
-            Ekle
-          </Button> */}
-          <Drawer
-            width="1660px"
-            title="Kayıdı Güncelle"
-            placement={"right"}
-            onClose={onDrawerClose}
-            open={drawerVisible}
-            extra={
-              <Space>
-                <Button onClick={onClose}>İptal</Button>
-                <Button
-                  type="submit"
-                  onClick={handleClick}
-                  style={{
-                    backgroundColor: "#2bc770",
-                    borderColor: "#2bc770",
-                    color: "#ffffff",
-                  }}>
-                  Güncelle
-                </Button>
-              </Space>
-            }>
-            <MainTabs />
-            <SecondTabs />
-            <Footer />
-          </Drawer>
-        </ConfigProvider>
-      </form>
+      <ConfigProvider locale={tr_TR}>
+        <Drawer
+          destroyOnClose
+          width="1660px"
+          title={
+            <div style={{ display: "flex", gap: "30px", alignItems: "center" }}>
+              <div>Makine Güncelle</div>
+            </div>
+          }
+          placement="right"
+          onClose={onClose}
+          open={open}
+          extra={
+            <Space>
+              <Button onClick={onClose}>İptal</Button>
+              <Button
+                type="submit"
+                onClick={methods.handleSubmit(onSubmit)}
+                style={{ backgroundColor: "#2bc770", borderColor: "#2bc770", color: "#ffffff" }}>
+                Güncelle
+              </Button>
+            </Space>
+          }>
+          {loading ? (
+            <Spin
+              spinning={loading}
+              size="large"
+              style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+              {/* İçerik yüklenirken gösterilecek alan */}
+            </Spin>
+          ) : (
+            <form onSubmit={methods.handleSubmit(onSubmit)}>
+              <MainTabs />
+              <SecondTabs />
+              <Footer />
+            </form>
+          )}
+        </Drawer>
+      </ConfigProvider>
     </FormProvider>
   );
 }
