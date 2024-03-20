@@ -229,7 +229,7 @@ const BaseLayout = () => {
     marginTop: "20px", // Yukarıda 20 piksellik boşluk bırakın
     maxWidth: "100px", // Genişliği sabit tutun
     width: "80%", // Genişliği sabit tutun
-    marginBottom: "20px", // Aşağıda 20 piksellik boşluk bırakın
+    // marginBottom: "20px", // Aşağıda 20 piksellik boşluk bırakın
   };
 
   return (
@@ -243,9 +243,16 @@ const BaseLayout = () => {
           collapsedWidth="0.0000000000001">
           <div
             className="demo-logo-vertical"
-            style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              alignItems: "flex-end",
+              marginBottom: "20px",
+              columnGap: "5px",
+            }}>
             <img src={logo} alt="Logo" style={logoStyle} />
-            <Text style={{ color: "white", marginTop: "11px", marginLeft: "5px" }}>v. 0.9.0</Text>
+            <Text style={{ color: "white", marginTop: "11px" }}>v. 0.9.0</Text>
           </div>
           <MenuWrapper />
         </Sider>
@@ -260,9 +267,16 @@ const BaseLayout = () => {
         >
           <div
             className="demo-logo-vertical"
-            style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              alignItems: "flex-end",
+              marginBottom: "20px",
+              columnGap: "5px",
+            }}>
             <img src={logo} alt="Logo" style={logoStyle} />
-            <Text style={{ color: "white", marginTop: "11px", marginLeft: "5px" }}>v. 0.9.0</Text>
+            <Text style={{ color: "white", marginTop: "11px" }}>v. 0.9.0</Text>
           </div>
           <MenuWrapper />
         </Sider>

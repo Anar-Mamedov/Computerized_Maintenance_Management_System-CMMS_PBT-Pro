@@ -6,7 +6,7 @@ import styled from "styled-components";
 import IsEmriTipi from "./components/IsEmriTipi";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import EditDrawer from "../../../../../../../DashboardAnalytics2/Update/EditDrawer";
+import EditDrawer from "../../../../../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer";
 dayjs.extend(customParseFormat);
 
 const { Text, Link } = Typography;

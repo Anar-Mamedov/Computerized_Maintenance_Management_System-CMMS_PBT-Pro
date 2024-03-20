@@ -6,7 +6,7 @@ import trTR from "antd/es/locale/tr_TR";
 import { BrowserRouter as Router } from "react-router-dom";
 import { AppProvider } from "./AppContext"; // Yolu güncelleyin
 import { RecoilRoot } from "recoil";
-// import './index.css'
+import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
