@@ -4,7 +4,7 @@ import { InboxOutlined, UserOutlined } from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../api/http";
 
-const ResimUploadDragDrop = () => {
+const ResimUpload = () => {
   const { watch } = useFormContext(); // useFormContext'ten gerekli fonksiyonları al
   const [imageUrls, setImageUrls] = useState([]); // Çoklu resim URL'lerini saklamak için state güncellemesi
   const [loadingImages, setLoadingImages] = useState(false); // Çoklu resim yükleme durumu için state
@@ -51,7 +51,7 @@ const ResimUploadDragDrop = () => {
               const response = await AxiosInstance.get(`ResimGetirById?id=${id}`, {
                 responseType: "blob",
               });
-              return URL.createObjectURL(response.data); // Blob'dan URL oluştur
+              return URL.createObjectURL(response); // Blob'dan URL oluştur
             })
           );
           setImageUrls(urls);
@@ -100,4 +100,4 @@ const ResimUploadDragDrop = () => {
   );
 };
 
-export default ResimUploadDragDrop;
+export default ResimUpload;
