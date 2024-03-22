@@ -1,12 +1,15 @@
-import React from "react";
-import { Upload, message } from "antd";
-import { InboxOutlined } from "@ant-design/icons";
+import React, { useEffect, useState } from "react";
+import { Image, Spin, Upload, message } from "antd";
+import { InboxOutlined, UserOutlined } from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../api/http";
 
 const ResimUploadDragDrop = () => {
   const { watch } = useFormContext(); // useFormContext'ten gerekli fonksiyonları al
+  const [imageUrls, setImageUrls] = useState([]); // Çoklu resim URL'lerini saklamak için state güncellemesi
+  const [loadingImages, setLoadingImages] = useState(false); // Çoklu resim yükleme durumu için state
   const secilenIsEmriID = watch("secilenIsEmriID"); // Formdan seçilen iş emri ID'sini izle
+  const resimIDler = watch("resimID"); // Formdan çoklu resim ID'lerini izle
 
   // Dragger için prop'lar
   const draggerProps = {
@@ -38,17 +41,62 @@ const ResimUploadDragDrop = () => {
     },
   };
 
+  useEffect(() => {
+    if (resimIDler && resimIDler.length) {
+      setLoadingImages(true);
+      const fetchImages = async () => {
+        try {
+          const urls = await Promise.all(
+            resimIDler.map(async (id) => {
+              const response = await AxiosInstance.get(`ResimGetirById?id=${id}`, {
+                responseType: "blob",
+              });
+              return URL.createObjectURL(response.data); // Blob'dan URL oluştur
+            })
+          );
+          setImageUrls(urls);
+        } catch (error) {
+          console.error("Error fetching images:", error);
+          message.error("Resimler yüklenirken bir hata oluştu.");
+        } finally {
+          setLoadingImages(false);
+        }
+      };
+
+      fetchImages();
+
+      return () => {
+        // Oluşturulan her URL'yi iptal edin
+        imageUrls.forEach((url) => URL.revokeObjectURL(url));
+      };
+    }
+  }, [resimIDler]);
+
   return (
-    <Upload.Dragger {...draggerProps}>
-      <p className="ant-upload-drag-icon">
-        <InboxOutlined />
-      </p>
-      <p className="ant-upload-text">Tıklayın veya bu alana dosya sürükleyin</p>
-      <p className="ant-upload-hint">
-        Tek seferde bir veya birden fazla dosya yüklemeyi destekler. Şirket verileri veya diğer yasaklı dosyaların
-        yüklenmesi kesinlikle yasaktır.
-      </p>
-    </Upload.Dragger>
+    <div>
+      {loadingImages ? (
+        <Spin />
+      ) : (
+        imageUrls.map((url, index) => (
+          <Image
+            key={index}
+            width={200}
+            src={url}
+            fallback={<UserOutlined />} // Resim yüklenemediğinde gösterilecek ikon
+          />
+        ))
+      )}
+      <Upload.Dragger {...draggerProps}>
+        <p className="ant-upload-drag-icon">
+          <InboxOutlined />
+        </p>
+        <p className="ant-upload-text">Tıklayın veya bu alana dosya sürükleyin</p>
+        <p className="ant-upload-hint">
+          Tek seferde bir veya birden fazla dosya yüklemeyi destekler. Şirket verileri veya diğer yasaklı dosyaların
+          yüklenmesi kesinlikle yasaktır.
+        </p>
+      </Upload.Dragger>
+    </div>
   );
 };
 
