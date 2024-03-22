@@ -14,6 +14,7 @@ import SureBilgileri from "./components/SureBilgileri/SureBilgileri";
 import Maliyetler from "./components/Maliyetler/Maliyetler";
 import Notlar from "./components/Notlar/Notlar";
 import Aciklama from "./components/Aciklama/Aciklama";
+import ResimUpload from "./components/Resim/ResimUpload";
 
 //styled components
 const StyledTabs = styled(Tabs)`
@@ -118,6 +119,11 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
       label: "Açıklama",
       children: <Aciklama fieldRequirements={fieldRequirements} />,
     },
+    {
+      key: "14",
+      label: "Resimler",
+      children: <ResimUpload fieldRequirements={fieldRequirements} />,
+    },
   ];
 
   // Filter the items based on the fieldRequirements prop
@@ -147,6 +153,8 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
         return fieldRequirements?.IMT_NOTLAR_TAB;
       case "12":
         return fieldRequirements?.IMT_ACIKLAMA_USTTAB || true; // This tab's visibility is dependent on a specific condition, with a fallback to false if undefined.
+      case "14":
+        return fieldRequirements?.IMT_RESIM_USTTAB || true; // This tab's visibility is dependent on a specific condition, with a fallback to false if undefined.
       default:
         return false; // Default case to handle any unforeseen keys
     }
