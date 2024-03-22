@@ -77,13 +77,13 @@
   height: calc(100% - 80px) !important;
 }
 
-.ant-modal-content {
+/* .ant-modal-content {
   height: calc(100vh - 120px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   overflow: auto;
-}
+} */
 .chart-container div[data-chart-source-type] {
   width: 100% !important;
   height: 100% !important;
