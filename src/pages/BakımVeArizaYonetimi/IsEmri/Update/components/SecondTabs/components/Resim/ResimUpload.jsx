@@ -41,6 +41,8 @@ const ResimUpload = () => {
     },
   };
 
+  // Yüklü resimlerin URL'lerini almak için useEffect kullanımı
+
   useEffect(() => {
     if (resimIDler && resimIDler.length) {
       setLoadingImages(true);
@@ -71,6 +73,8 @@ const ResimUpload = () => {
       };
     }
   }, [resimIDler]);
+
+  // Yüklü resimlerin URL'lerini almak için useEffect kullanımı sonu
 
   return (
     <div>
