@@ -5,22 +5,47 @@ import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../api/http";
 
 const ResimUpload = () => {
-  const { watch } = useFormContext(); // useFormContext'ten gerekli fonksiyonları al
-  const [imageUrls, setImageUrls] = useState([]); // Çoklu resim URL'lerini saklamak için state güncellemesi
-  const [loadingImages, setLoadingImages] = useState(false); // Çoklu resim yükleme durumu için state
-  const secilenIsEmriID = watch("secilenIsEmriID"); // Formdan seçilen iş emri ID'sini izle
-  const resimIDler = watch("resimID"); // Formdan çoklu resim ID'lerini izle
+  const { watch } = useFormContext();
+  const [imageUrls, setImageUrls] = useState([]);
+  const [loadingImages, setLoadingImages] = useState(false);
+  const [refreshImages, setRefreshImages] = useState(false); // Resim listesini yenilemek için kullanılacak
+  const secilenIsEmriID = watch("secilenIsEmriID");
 
-  // Dragger için prop'lar
+  const fetchResimIds = async () => {
+    try {
+      setLoadingImages(true);
+      const response = await AxiosInstance.get(`GetResimIds?RefId=${secilenIsEmriID}&RefGrup=ISEMRI`);
+      const resimIDler = response; // Axios response objesinden data alınır
+      const urls = await Promise.all(
+        resimIDler.map(async (id) => {
+          const resimResponse = await AxiosInstance.get(`ResimGetirById?id=${id}`, {
+            responseType: "blob",
+          });
+          return URL.createObjectURL(resimResponse); // Axios response objesinden blob data alınır
+        })
+      );
+      setImageUrls(urls);
+    } catch (error) {
+      console.error("Resim ID'leri alınırken bir hata oluştu:", error);
+      message.error("Resimler yüklenirken bir hata oluştu.");
+    } finally {
+      setLoadingImages(false);
+    }
+  };
+
+  useEffect(() => {
+    if (secilenIsEmriID) {
+      fetchResimIds();
+    }
+  }, [secilenIsEmriID, refreshImages]); // refreshImages değişikliklerini de takip eder
+
   const draggerProps = {
     name: "file",
     multiple: true,
-    showUploadList: false, // Yükleme listesini gösterme
+    showUploadList: false,
     beforeUpload: (file) => {
       const formData = new FormData();
       formData.append("file", file);
-
-      // Dinamik endpoint ile Axios üzerinden yükleme işlemi
       AxiosInstance.post(`UploadPhoto?refid=${secilenIsEmriID}&refgrup=ISEMRI`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -28,65 +53,32 @@ const ResimUpload = () => {
       })
         .then(() => {
           message.success(`${file.name} başarıyla yüklendi.`);
+          setRefreshImages((prev) => !prev); // Başarılı yüklemeden sonra resim listesini yenile
         })
         .catch(() => {
           message.error(`${file.name} yükleme sırasında bir hata oluştu.`);
         });
 
-      // Dosya yükleme işleminin varsayılan davranışını engelleyin
-      return false;
+      return false; // Yükleme işleminin varsayılan davranışını engeller
     },
     onDrop: (e) => {
       console.log("Dropped files", e.dataTransfer.files);
     },
   };
 
-  // Yüklü resimlerin URL'lerini almak için useEffect kullanımı
-
-  useEffect(() => {
-    if (resimIDler && resimIDler.length) {
-      setLoadingImages(true);
-      const fetchImages = async () => {
-        try {
-          const urls = await Promise.all(
-            resimIDler.map(async (id) => {
-              const response = await AxiosInstance.get(`ResimGetirById?id=${id}`, {
-                responseType: "blob",
-              });
-              return URL.createObjectURL(response); // Blob'dan URL oluştur
-            })
-          );
-          setImageUrls(urls);
-        } catch (error) {
-          console.error("Error fetching images:", error);
-          message.error("Resimler yüklenirken bir hata oluştu.");
-        } finally {
-          setLoadingImages(false);
-        }
-      };
-
-      fetchImages();
-
-      return () => {
-        // Oluşturulan her URL'yi iptal edin
-        imageUrls.forEach((url) => URL.revokeObjectURL(url));
-      };
-    }
-  }, [resimIDler]);
-
-  // Yüklü resimlerin URL'lerini almak için useEffect kullanımı sonu
-
   return (
     <div>
       {loadingImages ? (
-        <Spin />
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "10px" }}>
+          <Spin />
+        </div>
       ) : (
         imageUrls.map((url, index) => (
           <Image
+            style={{ margin: "10px", height: "150px", width: "150px", objectFit: "cover" }}
             key={index}
-            width={200}
             src={url}
-            fallback={<UserOutlined />} // Resim yüklenemediğinde gösterilecek ikon
+            fallback={<UserOutlined />}
           />
         ))
       )}
