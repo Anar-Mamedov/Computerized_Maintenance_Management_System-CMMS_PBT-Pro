@@ -3,8 +3,16 @@ import { Carousel, Image, Spin, message, Typography, Button } from "antd";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../api/http";
+import styled from "styled-components";
 
 const { Text } = Typography;
+
+const CenteredDiv = styled.div`
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  height: 260px !important;
+`;
 
 const ResimCarousel = () => {
   const { watch } = useFormContext();
@@ -72,13 +80,13 @@ const ResimCarousel = () => {
         {imageUrls.length > 0 ? (
           imageUrls.map((url, index) => (
             <div key={index}>
-              <Image src={url} alt={`Resim ${index}`} style={{ width: "100%", height: "260px", objectFit: "cover" }} />
+              <Image src={url} alt={`Resim ${index}`} style={{ width: "250px", height: "260px", objectFit: "cover" }} />
             </div>
           ))
         ) : (
-          <div>
+          <CenteredDiv>
             <Text>Resim bulunamadı.</Text>
-          </div>
+          </CenteredDiv>
         )}
       </Carousel>
       <Button
