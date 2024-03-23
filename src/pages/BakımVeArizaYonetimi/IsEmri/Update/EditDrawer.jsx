@@ -648,7 +648,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       <ConfigProvider locale={tr_TR}>
         <Drawer
           destroyOnClose
-          width="1460px"
+          width="1560px"
           title={
             <div style={{ display: "flex", gap: "30px", alignItems: "center" }}>
               <div>İş Emri Güncelle</div>

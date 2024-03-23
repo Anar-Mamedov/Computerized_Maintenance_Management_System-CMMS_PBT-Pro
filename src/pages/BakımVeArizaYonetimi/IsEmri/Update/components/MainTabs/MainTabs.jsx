@@ -23,6 +23,7 @@ import BagliIsEmriTablo from "./components/BagliIsEmriTablo";
 import MakineDurumu from "./components/MakineDurumu";
 import MakineTablo from "./components/MakineTablo";
 import EkipmanTablo from "./components/EkipmanTablo";
+import ResimCarousel from "./components/ResimCarousel";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -851,6 +852,11 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
               </div>
             </StyledDivBottomLine>
           </div>
+        </div>
+
+        <div
+          style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "250px", height: "260px" }}>
+          <ResimCarousel />
         </div>
       </div>
     </div>
