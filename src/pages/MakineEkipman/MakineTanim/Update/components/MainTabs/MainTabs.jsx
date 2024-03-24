@@ -12,6 +12,7 @@ import MakineTakvimTablo from "./components/MakineTakvimTablo";
 import OperatorSelect from "./components/OperatorSelect";
 import MarkaEkle from "./components/MarkaEkle";
 import ModelEkle from "./components/ModelEkle";
+import ResimCarousel from "./components/ResimCarousel";
 
 const { Text, Link } = Typography;
 
@@ -406,6 +407,9 @@ export default function MainTabs() {
             </Checkbox>
           )}
         />
+      </div>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "250px", height: "260px" }}>
+        <ResimCarousel />
       </div>
     </div>
   );
