@@ -13,6 +13,7 @@ import FifthTab from "./components/FifthTab/FifthTab";
 import NinthTab from "./components/NinthTab/NinthTab";
 import FourthTab from "./components/FourthTab/FourthTab";
 import TenthTab from "./components/TenthTab/TenthTab";
+import ResimUpload from "./components/Resim/ResimUpload";
 
 //styled components
 const StyledTabs = styled(Tabs)`
@@ -209,7 +210,7 @@ export default function SecondTabs() {
               // flexFlow: "row wrap",
               gap: "15px",
             }}>
-            {/* <NinthTab /> */}
+            <ResimUpload />
           </div>
         </TabPane>
       </StyledTabs>
