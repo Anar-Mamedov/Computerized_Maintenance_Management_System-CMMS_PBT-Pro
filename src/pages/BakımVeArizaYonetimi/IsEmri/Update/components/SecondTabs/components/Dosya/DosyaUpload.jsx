@@ -6,78 +6,81 @@ import AxiosInstance from "../../../../../../../../api/http";
 
 const DosyaUpload = () => {
   const { watch } = useFormContext();
-  const [files, setFiles] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [shouldRefresh, setShouldRefresh] = useState(false);
+  const [dosyalar, setDosyalar] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [refresh, setRefresh] = useState(false);
+  // Dosya listesini yenilemek için kullanılacak
+  const secilenIsEmriID = watch("secilenIsEmriID");
 
-  const selectedJobOrderId = watch("secilenIsEmriID");
-
-  const fetchFileIds = async () => {
+  const fetchDosyaIds = async () => {
     try {
-      setIsLoading(true);
-      const response = await AxiosInstance.get(`GetFileIds?RefId=${selectedJobOrderId}&RefGrup=ISEMRI`);
-      const fileIds = response;
-
-      const fileUrls = await Promise.all(
-        fileIds.map(async (id) => {
-          const fileResponse = await AxiosInstance.get(`GetFileByID?id=${id}`, {
-            responseType: "blob",
-          });
-          return URL.createObjectURL(fileResponse);
+      setLoading(true);
+      const response = await AxiosInstance.get(`GetFileIds?RefId=${secilenIsEmriID}&RefGrup=ISEMRI`);
+      const dosyaIDler = response;
+      // Varsayılan olarak response kullanılır
+      const dosyaUrls = await Promise.all(
+        dosyaIDler.map(async (id) => {
+          const dosyaResponse = await AxiosInstance.get(`GetFileByID?id=${id}`, { responseType: "blob" });
+          return URL.createObjectURL(dosyaResponse);
+          // Blob'dan URL oluştur
         })
       );
-
-      setFiles(fileUrls);
+      setDosyalar(dosyaUrls);
     } catch (error) {
-      console.error("An error occurred while fetching file IDs:", error);
-      message.error("An error occurred while loading files.");
+      console.error("Dosya ID'leri alınırken bir hata oluştu:", error);
+      message.error("Dosyalar yüklenirken bir hata oluştu.");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (selectedJobOrderId) {
-      fetchFileIds();
+    if (secilenIsEmriID) {
+      fetchDosyaIds();
     }
-  }, [selectedJobOrderId, shouldRefresh]);
+  }, [secilenIsEmriID, refresh]);
 
-  const handleUpload = (file) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    // formData.append("name", file.name);
-    console.log(file.name);
-    console.log(file);
-
-    AxiosInstance.post(`UploadFile?refid=${selectedJobOrderId}&refgrup=ISEMRI`, formData, {})
-      .then(() => {
-        message.success(`${file.name} was uploaded successfully.`);
-        setShouldRefresh((prev) => !prev);
-      })
-      .catch((error) => {
-        console.error("An error occurred while uploading the file:", error);
-        message.error(`An error occurred while uploading ${file.name}.`);
-      });
-  };
+  // refresh değişikliklerini de takip eder
 
   const draggerProps = {
     name: "file",
     multiple: true,
     showUploadList: false,
-    beforeUpload: handleUpload,
+    beforeUpload: (file) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      // formData.append("name", file.name);
+      console.log(file.name);
+      console.log(file);
+
+      AxiosInstance.post(`UploadFile?refid=${secilenIsEmriID}&refgrup=ISEMRI`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+        .then(() => {
+          message.success(`${file.name} başarıyla yüklendi.`);
+          setRefresh((prev) => !prev);
+          // Başarılı yüklemeden sonra dosya listesini yenile
+        })
+        .catch((error) => {
+          console.error("Dosya yükleme sırasında bir hata oluştu:", error);
+          message.error(`${file.name} yükleme sırasında bir hata oluştu.`);
+        });
+      return false;
+      // Yükleme işleminin varsayılan davranışını engeller
+    },
   };
 
   return (
     <div style={{ marginBottom: "35px" }}>
-      {isLoading ? (
+      {loading ? (
         <Spin />
       ) : (
         <List
-          dataSource={files}
+          dataSource={dosyalar}
           renderItem={(url, index) => (
             <List.Item key={index}>
-              <a href={url} target="_blank" rel="noopener noreferrer">
-                Download File
+              <a href={url} target="\_blank" rel="noopener noreferrer">
+                Dosyayı İndir
               </a>
             </List.Item>
           )}
@@ -87,11 +90,10 @@ const DosyaUpload = () => {
         <p className="ant-upload-drag-icon">
           <UploadOutlined />
         </p>
-        <p className="ant-upload-text">Click or drag file to this area to upload</p>
-        <p className="ant-upload-hint">Support for uploading one or multiple files at a time.</p>
+        <p className="ant-upload-text">Tıklayın veya bu alana dosya sürükleyin</p>
+        <p className="ant-upload-hint">Tek seferde bir veya birden fazla dosya yüklemeyi destekler.</p>
       </Upload.Dragger>
     </div>
   );
 };
-
 export default DosyaUpload;
