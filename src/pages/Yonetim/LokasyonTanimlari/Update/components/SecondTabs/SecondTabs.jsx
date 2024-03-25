@@ -6,6 +6,7 @@ import MainTabs from "../MainTabs/MainTabs";
 import MakineTablo from "./components/MakineTablo";
 import PersonelTablo from "./components/PersonelTablo";
 import ProjeTablo from "./components/ProjeTablo";
+import ResimUpload from "./components/ResimUpload";
 
 const onChange = (key) => {
   // console.log(key);
@@ -74,7 +75,7 @@ export default function SecondTabs({ refreshKey }) {
     {
       key: "6",
       label: "Resimler",
-      children: "Content of Tab Pane 6",
+      children: <ResimUpload />,
     },
   ];
   const { watch } = useFormContext();
