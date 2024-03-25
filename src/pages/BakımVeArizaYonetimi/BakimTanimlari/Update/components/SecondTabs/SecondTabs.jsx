@@ -10,6 +10,7 @@ import SureBilgileri from "./components/SureBilgileri/SureBilgileri";
 import OzelAlanlar from "./components/OzelAlanlar/OzelAlanlar";
 import UygulamaBilgileri from "./components/UygulamaBilgileri/UygulamaBilgileri";
 import Aciklama from "./components/Aciklama/Aciklama";
+import ResimUpload from "./components/Resim/ResimUpload";
 
 const onChange = (key) => {
   // console.log(key);
@@ -95,7 +96,7 @@ export default function SecondTabs({ refreshKey }) {
     {
       key: "9",
       label: "Resimler",
-      children: "Content of Tab Pane 6",
+      children: <ResimUpload />,
     },
     {
       key: "10",
