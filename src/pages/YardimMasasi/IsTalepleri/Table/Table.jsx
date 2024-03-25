@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin } from "antd";
+import { Table, Button, Modal, Checkbox, Input, Spin, Tag } from "antd";
 import { useFormContext } from "react-hook-form";
 import { SearchOutlined, MenuOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../api/http";
@@ -22,6 +22,35 @@ export default function MainTable() {
   const [totalPages, setTotalPages] = useState(0); // Toplam sayfa sayısı için state
 
   const [selectedRows, setSelectedRows] = useState([]);
+
+  const statusTag = (statusId) => {
+    switch (statusId) {
+      case 0:
+        return { color: "blue", text: "Açık" };
+      case 1:
+        return { color: "#ff5e00", text: "Bekliyor" };
+      case 2:
+        return { color: "#ffe600", text: "Planlandı" };
+      case 3:
+        return { color: "#00d300", text: "Devam Ediyor" };
+      case 4:
+        return { color: "#575757", text: "Kapandı" };
+      case 5:
+        return { color: "#d10000", text: "İptal Edildi" };
+      default:
+        return { color: "default", text: "" }; // Eğer farklı bir değer gelirse
+    }
+  };
+
+  const hexToRGBA = (hex, opacity) => {
+    // Hex kodunu R, G, B değerlerine dönüştür
+    let r = parseInt(hex.slice(1, 3), 16),
+      g = parseInt(hex.slice(3, 5), 16),
+      b = parseInt(hex.slice(5, 7), 16);
+
+    // RGBA formatında string döndür
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+  };
 
   // Örnek kolonlar ve başlangıçta hepsinin görünür olacağı varsayılıyor
   const columns = [
@@ -74,91 +103,120 @@ export default function MainTable() {
       width: "150px",
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
-      render: (text, record) => {
-        switch (record.IST_DURUM_ID) {
-          case 0:
-            return (
-              <div
-                style={{
-                  color: "white",
-                  backgroundColor: "blue",
-                  textAlign: "center",
-                  borderRadius: "10px",
-                  padding: "6px",
-                }}>
-                Açık
-              </div>
-            );
-          case 1:
-            return (
-              <div
-                style={{
-                  color: "white",
-                  backgroundColor: "#ff5e00",
-                  textAlign: "center",
-                  borderRadius: "10px",
-                  padding: "6px",
-                }}>
-                Bekliyor
-              </div>
-            );
-          case 2:
-            return (
-              <div
-                style={{
-                  color: "white",
-                  backgroundColor: "#ffe600",
-                  textAlign: "center",
-                  borderRadius: "10px",
-                  padding: "6px",
-                }}>
-                Planlandı
-              </div>
-            );
-          case 3:
-            return (
-              <div
-                style={{
-                  color: "white",
-                  backgroundColor: "#00d300",
-                  textAlign: "center",
-                  borderRadius: "10px",
-                  padding: "6px",
-                }}>
-                Devam Ediyor
-              </div>
-            );
-          case 4:
-            return (
-              <div
-                style={{
-                  color: "white",
-                  backgroundColor: "#575757",
-                  textAlign: "center",
-                  borderRadius: "10px",
-                  padding: "6px",
-                }}>
-                Kapandı
-              </div>
-            );
-          case 5:
-            return (
-              <div
-                style={{
-                  color: "white",
-                  backgroundColor: "#d10000",
-                  textAlign: "center",
-                  borderRadius: "10px",
-                  padding: "6px",
-                }}>
-                İptal Edildi
-              </div>
-            );
-          default:
-            return ""; // Eğer farklı bir değer gelirse
-        }
+      render: (_, record) => {
+        const { color, text } = statusTag(record.IST_DURUM_ID);
+        return (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}>
+            <Tag
+              style={{
+                textAlign: "center",
+                backgroundColor: hexToRGBA(color, 0.2),
+                border: `1.2px solid ${hexToRGBA(color, 0.7)}`,
+                color: color,
+              }}>
+              {text}
+            </Tag>
+          </div>
+        );
       },
     },
+    // {
+    //   title: "Durum",
+    //   dataIndex: "IST_DURUM_ID",
+    //   key: "IST_DURUM_ID",
+    //   width: "150px",
+    //   ellipsis: true,
+    //   visible: true, // Varsayılan olarak açık
+    //   render: (text, record) => {
+    //     switch (record.IST_DURUM_ID) {
+    //       case 0:
+    //         return (
+    //           <div
+    //             style={{
+    //               color: "white",
+    //               backgroundColor: "blue",
+    //               textAlign: "center",
+    //               borderRadius: "10px",
+    //               padding: "6px",
+    //             }}>
+    //             Açık
+    //           </div>
+    //         );
+    //       case 1:
+    //         return (
+    //           <div
+    //             style={{
+    //               color: "white",
+    //               backgroundColor: "#ff5e00",
+    //               textAlign: "center",
+    //               borderRadius: "10px",
+    //               padding: "6px",
+    //             }}>
+    //             Bekliyor
+    //           </div>
+    //         );
+    //       case 2:
+    //         return (
+    //           <div
+    //             style={{
+    //               color: "white",
+    //               backgroundColor: "#ffe600",
+    //               textAlign: "center",
+    //               borderRadius: "10px",
+    //               padding: "6px",
+    //             }}>
+    //             Planlandı
+    //           </div>
+    //         );
+    //       case 3:
+    //         return (
+    //           <div
+    //             style={{
+    //               color: "white",
+    //               backgroundColor: "#00d300",
+    //               textAlign: "center",
+    //               borderRadius: "10px",
+    //               padding: "6px",
+    //             }}>
+    //             Devam Ediyor
+    //           </div>
+    //         );
+    //       case 4:
+    //         return (
+    //           <div
+    //             style={{
+    //               color: "white",
+    //               backgroundColor: "#575757",
+    //               textAlign: "center",
+    //               borderRadius: "10px",
+    //               padding: "6px",
+    //             }}>
+    //             Kapandı
+    //           </div>
+    //         );
+    //       case 5:
+    //         return (
+    //           <div
+    //             style={{
+    //               color: "white",
+    //               backgroundColor: "#d10000",
+    //               textAlign: "center",
+    //               borderRadius: "10px",
+    //               padding: "6px",
+    //             }}>
+    //             İptal Edildi
+    //           </div>
+    //         );
+    //       default:
+    //         return ""; // Eğer farklı bir değer gelirse
+    //     }
+    //   },
+    // },
     {
       title: "Talep Eden",
       dataIndex: "IST_TALEP_EDEN_ADI",
