@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Upload, Button, Table, Spin, message, Modal } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import { UploadOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../api/http";
+import EditModal from "./Update/EditModal";
 
 const DosyaUpload = () => {
   const { watch } = useFormContext();
@@ -45,9 +46,45 @@ const DosyaUpload = () => {
 
   const columns = [
     {
+      title: "Belge Tanımı",
+      dataIndex: "belgeTanimi",
+      key: "belgeTanimi",
+    },
+    {
+      title: "Belge Tipi",
+      dataIndex: "belgeTipi",
+      key: "belgeTipi",
+    },
+    {
       title: "Dosya Adı",
       dataIndex: "name",
       key: "name",
+    },
+    {
+      title: "Boyutu",
+      dataIndex: "boyutu",
+      key: "boyutu",
+    },
+    {
+      title: "Süreli",
+      dataIndex: "sureli",
+      key: "sureli",
+      render: (text, record) => {
+        return record.DKN_YAPILDI ? (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <CheckOutlined style={{ color: "green" }} />
+          </div>
+        ) : (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <CloseOutlined style={{ color: "red" }} />
+          </div>
+        );
+      },
+    },
+    {
+      title: "Bitiş Tarihi",
+      dataIndex: "bitisTarihi",
+      key: "bitisTarihi",
     },
     {
       title: "İşlem",
@@ -112,13 +149,12 @@ const DosyaUpload = () => {
         <p className="ant-upload-hint">Tek seferde bir veya birden fazla dosya yüklemeyi destekler.</p>
       </Upload.Dragger>
 
-      <Modal title="Dosya Detayları" open={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
-        {/* Here you can display selected file details or any other information */}
-        <p>{selectedFile ? selectedFile.name : ""}</p>
-        <a href={selectedFile ? selectedFile.url : "#"} target="_blank" rel="noopener noreferrer">
-          Dosyayı İndir
-        </a>
-      </Modal>
+      <EditModal
+        visible={isModalVisible}
+        onOk={() => setIsModalVisible(false)}
+        onCancel={() => setIsModalVisible(false)}
+        selectedFile={selectedFile}
+      />
     </div>
   );
 };
