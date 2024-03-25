@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Upload, Button, List, Spin, message } from "antd";
+import { Upload, Button, Table, Spin, message, Modal } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../api/http";
@@ -9,20 +9,23 @@ const DosyaUpload = () => {
   const [dosyalar, setDosyalar] = useState([]);
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
-  // Dosya listesini yenilemek için kullanılacak
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const secilenIsEmriID = watch("secilenIsEmriID");
 
   const fetchDosyaIds = async () => {
     try {
       setLoading(true);
       const response = await AxiosInstance.get(`GetFileIds?RefId=${secilenIsEmriID}&RefGrup=ISEMRI`);
-      const dosyaIDler = response;
-      // Varsayılan olarak response kullanılır
+      const dosyaIDler = response; // Adjust according to the actual response structure
       const dosyaUrls = await Promise.all(
         dosyaIDler.map(async (id) => {
           const dosyaResponse = await AxiosInstance.get(`GetFileByID?id=${id}`, { responseType: "blob" });
-          return URL.createObjectURL(dosyaResponse);
-          // Blob'dan URL oluştur
+          return {
+            key: id,
+            url: URL.createObjectURL(dosyaResponse),
+            name: `Dosya ${id}`, // Assuming file naming or retrieval logic here
+          };
         })
       );
       setDosyalar(dosyaUrls);
@@ -40,7 +43,39 @@ const DosyaUpload = () => {
     }
   }, [secilenIsEmriID, refresh]);
 
-  // refresh değişikliklerini de takip eder
+  const columns = [
+    {
+      title: "Dosya Adı",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "İşlem",
+      key: "action",
+      render: (_, record) => (
+        <a href={record.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+          Dosyayı İndir
+        </a>
+      ),
+    },
+  ];
+
+  const onRowClick = (record) => {
+    return {
+      onClick: () => {
+        setSelectedFile(record); // Set the selected file state
+        setIsModalVisible(true); // Open the modal
+      },
+    };
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
 
   const draggerProps = {
     name: "file",
@@ -50,8 +85,6 @@ const DosyaUpload = () => {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("name", file.name);
-      console.log(file.name);
-      console.log(file);
 
       AxiosInstance.post(`UploadFile?refid=${secilenIsEmriID}&refgrup=ISEMRI`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -59,33 +92,18 @@ const DosyaUpload = () => {
         .then(() => {
           message.success(`${file.name} başarıyla yüklendi.`);
           setRefresh((prev) => !prev);
-          // Başarılı yüklemeden sonra dosya listesini yenile
         })
         .catch((error) => {
           console.error("Dosya yükleme sırasında bir hata oluştu:", error);
           message.error(`${file.name} yükleme sırasında bir hata oluştu.`);
         });
-      return false;
-      // Yükleme işleminin varsayılan davranışını engeller
+      return false; // Prevent default upload behavior
     },
   };
 
   return (
     <div style={{ marginBottom: "35px" }}>
-      {loading ? (
-        <Spin />
-      ) : (
-        <List
-          dataSource={dosyalar}
-          renderItem={(url, index) => (
-            <List.Item key={index}>
-              <a href={url} target="\_blank" rel="noopener noreferrer">
-                Dosyayı İndir
-              </a>
-            </List.Item>
-          )}
-        />
-      )}
+      {loading ? <Spin /> : <Table dataSource={dosyalar} columns={columns} pagination={false} onRow={onRowClick} />}
       <Upload.Dragger {...draggerProps}>
         <p className="ant-upload-drag-icon">
           <UploadOutlined />
@@ -93,7 +111,16 @@ const DosyaUpload = () => {
         <p className="ant-upload-text">Tıklayın veya bu alana dosya sürükleyin</p>
         <p className="ant-upload-hint">Tek seferde bir veya birden fazla dosya yüklemeyi destekler.</p>
       </Upload.Dragger>
+
+      <Modal title="Dosya Detayları" open={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+        {/* Here you can display selected file details or any other information */}
+        <p>{selectedFile ? selectedFile.name : ""}</p>
+        <a href={selectedFile ? selectedFile.url : "#"} target="_blank" rel="noopener noreferrer">
+          Dosyayı İndir
+        </a>
+      </Modal>
     </div>
   );
 };
+
 export default DosyaUpload;
