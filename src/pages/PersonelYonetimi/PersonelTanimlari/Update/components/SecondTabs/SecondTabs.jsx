@@ -10,6 +10,7 @@ import OzelAlanlar from "./components/OzelAlanlar/OzelAlanlar";
 import Aciklama from "./components/Aciklama/Aciklama";
 import SertifikalarTablo from "./components/Sertifikalar/SertifikalarTablo";
 import LokasyonTablo from "./components/Lokasyon/LokasyonTablo";
+import ResimUpload from "./components/Resim/ResimUpload";
 
 const onChange = (key) => {
   // console.log(key);
@@ -95,7 +96,7 @@ export default function SecondTabs({ refreshKey }) {
     {
       key: "9",
       label: "Resimler",
-      children: "Content of Tab Pane 6",
+      children: <ResimUpload />,
     },
     {
       key: "10",

@@ -24,6 +24,7 @@ import TaseronTablo from "./components/TaseronTablo";
 import AtolyeTablo from "./components/AtolyeTablo";
 import IdariAmiriTablo from "./components/IdariAmiriTablo";
 import MasrafMerkeziTablo from "./components/MasrafMerkeziTablo";
+import ResimCarousel from "./components/ResimCarousel";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -559,7 +560,7 @@ export default function MainTabs() {
           flexDirection: "column",
           gap: "10px",
           width: "100%",
-          maxWidth: "450px",
+          maxWidth: "120px",
         }}>
         <div>
           <Controller
@@ -627,6 +628,9 @@ export default function MainTabs() {
             )}
           />
         </div>
+      </div>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "250px", height: "260px" }}>
+        <ResimCarousel />
       </div>
     </div>
   );
