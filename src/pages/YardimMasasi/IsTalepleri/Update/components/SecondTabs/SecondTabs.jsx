@@ -9,6 +9,7 @@ import Not from "./components/Not/Not";
 import Sonuc from "./components/Sonuc/Sonuc";
 import Degerlendirme from "./components/Degerlendirme/Degerlendirme";
 import TeknisyenListesi from "./components/TeknisyenListesi/TeknisyenListesi";
+import ResimUpload from "./components/Resim/ResimUpload";
 
 const onChange = (key) => {
   // console.log(key);
@@ -89,7 +90,7 @@ export default function SecondTabs({ refreshKey, disabled, fieldRequirements }) 
     {
       key: "8",
       label: "Resimler",
-      children: "Resimler",
+      children: <ResimUpload />,
     },
     {
       key: "9",

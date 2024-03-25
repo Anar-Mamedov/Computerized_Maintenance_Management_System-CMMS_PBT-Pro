@@ -15,6 +15,7 @@ import Maliyetler from "./components/Maliyetler/Maliyetler";
 import Notlar from "./components/Notlar/Notlar";
 import Aciklama from "./components/Aciklama/Aciklama";
 import ResimUpload from "./components/Resim/ResimUpload";
+import DosyaUpload from "./components/Dosya/DosyaUpload";
 
 //styled components
 const StyledTabs = styled(Tabs)`
@@ -120,6 +121,11 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
       children: <Aciklama fieldRequirements={fieldRequirements} />,
     },
     {
+      key: "13",
+      label: "Dosyalar",
+      children: <DosyaUpload fieldRequirements={fieldRequirements} />,
+    },
+    {
       key: "14",
       label: "Resimler",
       children: <ResimUpload fieldRequirements={fieldRequirements} />,
@@ -153,6 +159,8 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
         return fieldRequirements?.IMT_NOTLAR_TAB;
       case "12":
         return fieldRequirements?.IMT_ACIKLAMA_USTTAB || true; // This tab's visibility is dependent on a specific condition, with a fallback to false if undefined.
+      case "13":
+        return fieldRequirements?.IMT_DOSYA_USTTAB || true; // This tab's visibility is dependent on a specific condition, with a fallback to false if undefined.
       case "14":
         return fieldRequirements?.IMT_RESIM_USTTAB || true; // This tab's visibility is dependent on a specific condition, with a fallback to false if undefined.
       default:

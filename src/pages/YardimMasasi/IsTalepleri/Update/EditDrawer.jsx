@@ -463,7 +463,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
         <Drawer
-          width="1460px"
+          width="1600px"
           title={<StatusTitle statusId={selectedRow ? selectedRow.IST_DURUM_ID : null} />}
           placement="right"
           onClose={onClose}
