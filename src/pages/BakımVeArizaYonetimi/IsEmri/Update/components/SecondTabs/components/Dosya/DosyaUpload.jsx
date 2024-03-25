@@ -49,7 +49,7 @@ const DosyaUpload = () => {
     beforeUpload: (file) => {
       const formData = new FormData();
       formData.append("file", file);
-      // formData.append("name", file.name);
+      formData.append("name", file.name);
       console.log(file.name);
       console.log(file);
 
