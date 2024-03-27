@@ -90,7 +90,12 @@ const DosyaUpload = () => {
       title: "İşlem",
       key: "action",
       render: (_, record) => (
-        <a href={record.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+        <a
+          href={record.url}
+          download={record.name}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}>
           Dosyayı İndir
         </a>
       ),
@@ -114,33 +119,54 @@ const DosyaUpload = () => {
     setIsModalVisible(false);
   };
 
+  // Step 1: Define a new function for handling file uploads and refreshing the table data.
+  const handleFileUpload = (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("name", file.name);
+
+    AxiosInstance.post(`UploadFile?refid=${secilenIsEmriID}&refgrup=ISEMRI`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+      .then(() => {
+        message.success(`${file.name} başarıyla yüklendi.`);
+        fetchDosyaIds(); // Refresh the table data by calling fetchDosyaIds directly after successful upload.
+      })
+      .catch((error) => {
+        console.error("Dosya yükleme sırasında bir hata oluştu:", error);
+        message.error(`${file.name} yükleme sırasında bir hata oluştu.`);
+      });
+
+    return false; // Prevent default upload behavior
+  };
+
+  // Step 2: Update the beforeUpload callback in draggerProps to use the new handleFileUpload function.
   const draggerProps = {
     name: "file",
     multiple: true,
     showUploadList: false,
     beforeUpload: (file) => {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("name", file.name);
-
-      AxiosInstance.post(`UploadFile?refid=${secilenIsEmriID}&refgrup=ISEMRI`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      })
-        .then(() => {
-          message.success(`${file.name} başarıyla yüklendi.`);
-          setRefresh((prev) => !prev);
-        })
-        .catch((error) => {
-          console.error("Dosya yükleme sırasında bir hata oluştu:", error);
-          message.error(`${file.name} yükleme sırasında bir hata oluştu.`);
-        });
+      handleFileUpload(file); // Use the new function to handle file upload and refresh logic.
       return false; // Prevent default upload behavior
     },
   };
 
   return (
     <div style={{ marginBottom: "35px" }}>
-      {loading ? <Spin /> : <Table dataSource={dosyalar} columns={columns} pagination={false} onRow={onRowClick} />}
+      {loading ? (
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom: "20px",
+          }}>
+          <Spin />
+        </div>
+      ) : (
+        <Table dataSource={dosyalar} columns={columns} pagination={false} onRow={onRowClick} />
+      )}
       <Upload.Dragger {...draggerProps}>
         <p className="ant-upload-drag-icon">
           <UploadOutlined />

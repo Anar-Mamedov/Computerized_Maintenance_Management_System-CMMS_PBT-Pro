@@ -154,7 +154,7 @@ export default function EditModal({
       <div>
         <Modal
           width="800px"
-          title="Kontrol Listesi Güncelle"
+          title="Belge Bilgileri Güncelle"
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
           onCancel={onModalClose}>
