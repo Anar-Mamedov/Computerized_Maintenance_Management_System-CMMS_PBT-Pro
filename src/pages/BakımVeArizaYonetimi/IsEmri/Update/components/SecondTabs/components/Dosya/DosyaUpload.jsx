@@ -111,14 +111,6 @@ const DosyaUpload = () => {
     };
   };
 
-  const handleOk = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
-
   // Step 1: Define a new function for handling file uploads and refreshing the table data.
   const handleFileUpload = (file) => {
     const formData = new FormData();
