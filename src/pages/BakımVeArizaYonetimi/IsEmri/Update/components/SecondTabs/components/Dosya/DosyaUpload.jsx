@@ -150,9 +150,11 @@ const DosyaUpload = () => {
       </Upload.Dragger>
 
       <EditModal
-        visible={isModalVisible}
-        onOk={() => setIsModalVisible(false)}
-        onCancel={() => setIsModalVisible(false)}
+        isModalVisible={isModalVisible}
+        onModalClose={() => {
+          setIsModalVisible(false);
+          setSelectedFile(null);
+        }}
         selectedFile={selectedFile}
       />
     </div>
