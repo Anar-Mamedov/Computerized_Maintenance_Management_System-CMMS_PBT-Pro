@@ -17,19 +17,32 @@ const DosyaUpload = () => {
   const fetchDosyaIds = async () => {
     try {
       setLoading(true);
-      const response = await AxiosInstance.get(`GetFileIds?RefId=${secilenIsEmriID}&RefGrup=ISEMRI`);
-      const dosyaIDler = response; // Adjust according to the actual response structure
-      const dosyaUrls = await Promise.all(
-        dosyaIDler.map(async (id) => {
-          const dosyaResponse = await AxiosInstance.get(`GetFileByID?id=${id}`, { responseType: "blob" });
-          return {
-            key: id,
-            url: URL.createObjectURL(dosyaResponse),
-            name: `Dosya ${id}`, // Assuming file naming or retrieval logic here
-          };
+      const response = await AxiosInstance.get(`GetDosyaList?refId=${secilenIsEmriID}&refGrup=ISEMRI`);
+      const fetchedData = await Promise.all(
+        response.map(async (item) => {
+          try {
+            // Assuming `TB_DOSYA_ID` is your file ID
+            const fileId = item.TB_DOSYA_ID;
+            // Fetching the file blob from `GetFileByID`
+            const fileResponse = await AxiosInstance.get(`GetFileByID?id=${fileId}`, { responseType: "blob" });
+            // Creating a URL for the file blob
+            const fileURL = URL.createObjectURL(fileResponse);
+            return {
+              ...item,
+              key: fileId,
+              downloadURL: fileURL, // Adding the download URL to your item
+            };
+          } catch (error) {
+            console.error(`Error fetching file ${item.TB_DOSYA_ID}:`, error);
+            return {
+              ...item,
+              key: item.TB_DOSYA_ID,
+              downloadURL: "", // In case of error, provide an empty string or handle appropriately
+            };
+          }
         })
       );
-      setDosyalar(dosyaUrls);
+      setDosyalar(fetchedData);
     } catch (error) {
       console.error("Dosya ID'leri alınırken bir hata oluştu:", error);
       message.error("Dosyalar yüklenirken bir hata oluştu.");
@@ -47,8 +60,8 @@ const DosyaUpload = () => {
   const columns = [
     {
       title: "Belge Tanımı",
-      dataIndex: "belgeTanimi",
-      key: "belgeTanimi",
+      dataIndex: "DSY_TANIM",
+      key: "DSY_TANIM",
     },
     {
       title: "Belge Tipi",
@@ -57,20 +70,20 @@ const DosyaUpload = () => {
     },
     {
       title: "Dosya Adı",
-      dataIndex: "name",
-      key: "name",
+      dataIndex: "DSY_DOSYA_AD",
+      key: "DSY_DOSYA_AD",
     },
     {
       title: "Boyutu",
-      dataIndex: "boyutu",
-      key: "boyutu",
+      dataIndex: "DSY_DOSYA_BOYUT",
+      key: "DSY_DOSYA_BOYUT",
     },
     {
       title: "Süreli",
-      dataIndex: "sureli",
-      key: "sureli",
+      dataIndex: "DSY_SURELI",
+      key: "DSY_SURELI",
       render: (text, record) => {
-        return record.DKN_YAPILDI ? (
+        return record.DSY_SURELI ? (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
             <CheckOutlined style={{ color: "green" }} />
           </div>
@@ -83,22 +96,25 @@ const DosyaUpload = () => {
     },
     {
       title: "Bitiş Tarihi",
-      dataIndex: "bitisTarihi",
-      key: "bitisTarihi",
+      dataIndex: "DSY_BITIS_TARIH",
+      key: "DSY_BITIS_TARIH",
     },
     {
       title: "İşlem",
       key: "action",
-      render: (_, record) => (
-        <a
-          href={record.url}
-          download={record.name}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}>
-          Dosyayı İndir
-        </a>
-      ),
+      render: (_, record) =>
+        record.downloadURL ? (
+          <a
+            href={record.downloadURL}
+            download={record.DSY_DOSYA_AD}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}>
+            Dosyayı İndir
+          </a>
+        ) : (
+          <span>Dosya bulunamadı</span> // Or any other fallback content
+        ),
     },
   ];
 
