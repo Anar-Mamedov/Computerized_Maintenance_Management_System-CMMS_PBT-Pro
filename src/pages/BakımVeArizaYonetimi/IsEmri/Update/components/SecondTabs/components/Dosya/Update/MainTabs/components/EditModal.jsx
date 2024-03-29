@@ -1,25 +1,15 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Input, Typography, Tabs, message } from "antd";
-import AxiosInstance from "../../../../../../../../../api/http";
+import AxiosInstance from "../../../../../../../../../../../api/http";
 import { Controller, useForm, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
-import MainTabs from "./MainTabs/MainTabs";
+import MainTabs from "./MainTabs";
 
 export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh, secilenIsEmriID }) {
   const methods = useForm({
     defaultValues: {
-      secilenID: "",
-      isTanimi: "",
-      tarih: null,
-      aktifBelge: false,
-      belgeTipi: null,
-      belgeTipiID: "",
-      sureliBelge: false,
-      bitisTarih: null,
-      hatirlat: false,
-      hatirlatTarih: null,
-      aciklama: "",
-      etiketler: "",
+      tipTanim: "",
+      tipAciklama: "",
       // Add other default values here
     },
   });
@@ -29,34 +19,8 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   useEffect(() => {
     if (isModalVisible && selectedRow) {
       setValue("secilenID", selectedRow.key);
-      setValue("isTanimi", selectedRow.DSY_TANIM);
-      setValue(
-        "tarih",
-        selectedRow.DSY_TARIH ? (dayjs(selectedRow.DSY_TARIH).isValid() ? dayjs(selectedRow.DSY_TARIH) : null) : null
-      );
-      setValue("aktifBelge", selectedRow.DSY_AKTIF);
-      setValue("belgeTipi", selectedRow.DSY_DOSYA_TIP);
-      setValue("belgeTipiID", selectedRow.DSY_DOSYA_TIP_ID);
-      setValue("sureliBelge", selectedRow.DSY_SURELI);
-      setValue(
-        "bitisTarih",
-        selectedRow.DSY_BITIS_TARIH
-          ? dayjs(selectedRow.DSY_BITIS_TARIH).isValid()
-            ? dayjs(selectedRow.DSY_BITIS_TARIH)
-            : null
-          : null
-      );
-      setValue("hatirlat", selectedRow.DSY_HATIRLAT);
-      setValue(
-        "hatirlatTarih",
-        selectedRow.DSY_HATIRLAT_TARIH
-          ? dayjs(selectedRow.DSY_HATIRLAT_TARIH).isValid()
-            ? dayjs(selectedRow.DSY_HATIRLAT_TARIH)
-            : null
-          : null
-      );
-      setValue("aciklama", selectedRow.DSY_ACIKLAMA);
-      setValue("etiketler", selectedRow.DYS_ETIKET);
+      setValue("tipTanim", selectedRow.DST_TANIM);
+      setValue("tipAciklama", selectedRow.DST_ACIKLAMA);
     }
   }, [selectedRow, isModalVisible, setValue]);
 
@@ -80,20 +44,12 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
 
   const onSubmited = (data) => {
     const Body = {
-      TB_DOSYA_ID: data.secilenID,
-      DSY_TANIM: data.isTanimi,
-      DSY_TARIH: formatDateWithDayjs(data.tarih),
-      DSY_AKTIF: data.aktifBelge,
-      DSY_DOSYA_TIP_ID: data.belgeTipiID,
-      DSY_SURELI: data.sureliBelge,
-      DSY_BITIS_TARIH: formatDateWithDayjs(data.bitisTarih),
-      DSY_HATIRLAT: data.hatirlat,
-      DSY_HATIRLAT_TARIH: formatDateWithDayjs(data.hatirlatTarih),
-      DSY_ACIKLAMA: data.aciklama,
-      DYS_ETIKET: data.etiketler,
+      TB_DOSYA_TIP_ID: data.secilenID,
+      DST_TANIM: data.tipTanim,
+      DST_ACIKLAMA: data.tipAciklama,
     };
 
-    AxiosInstance.post(`UpdateDosyaById`, Body)
+    AxiosInstance.post(`UpdateDosyaTip`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
 
@@ -109,11 +65,10 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
         }
       })
       .catch((error) => {
-        // Handle errors here, e.g.:
+        // Hataları yakala
         console.error("Error sending data:", error);
         message.error("Başarısız Olundu.");
       });
-    console.log({ Body });
   };
 
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi sonu
@@ -122,9 +77,8 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
     <FormProvider {...methods}>
       <div>
         <Modal
-          width="800px"
           centered
-          title="Belge Bilgilerini Güncelle"
+          title="Tip Güncelle"
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
           onCancel={onModalClose}>
