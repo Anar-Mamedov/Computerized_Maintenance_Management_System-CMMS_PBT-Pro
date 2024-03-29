@@ -12,6 +12,7 @@ const DosyaUpload = () => {
   const [refresh, setRefresh] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const secilenIsEmriID = watch("secilenIsEmriID");
 
   const fetchDosyaIds = async () => {
@@ -159,6 +160,10 @@ const DosyaUpload = () => {
     },
   };
 
+  const onRowSelectChange = (selectedKeys) => {
+    setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
+  };
+
   return (
     <div style={{ marginBottom: "35px" }}>
       {loading ? (
@@ -173,7 +178,17 @@ const DosyaUpload = () => {
           <Spin />
         </div>
       ) : (
-        <Table dataSource={dosyalar} columns={columns} pagination={false} onRow={onRowClick} />
+        <Table
+          rowSelection={{
+            type: "radio",
+            selectedRowKeys,
+            onChange: onRowSelectChange,
+          }}
+          dataSource={dosyalar}
+          columns={columns}
+          pagination={false}
+          onRow={onRowClick}
+        />
       )}
       <Upload.Dragger {...draggerProps}>
         <p className="ant-upload-drag-icon">
