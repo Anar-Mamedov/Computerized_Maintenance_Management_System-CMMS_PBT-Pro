@@ -11,7 +11,7 @@ const DosyaUpload = () => {
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedRow, setSelectedRow] = useState(null);
   const secilenIsEmriID = watch("secilenIsEmriID");
 
   const fetchDosyaIds = async () => {
@@ -121,7 +121,7 @@ const DosyaUpload = () => {
   const onRowClick = (record) => {
     return {
       onClick: () => {
-        setSelectedFile(record); // Set the selected file state
+        setSelectedRow(record); // Set the selected file state
         setIsModalVisible(true); // Open the modal
       },
     };
@@ -184,12 +184,13 @@ const DosyaUpload = () => {
       </Upload.Dragger>
 
       <EditModal
+        onRefresh={() => setRefresh(!refresh)}
         isModalVisible={isModalVisible}
         onModalClose={() => {
           setIsModalVisible(false);
-          setSelectedFile(null);
+          setSelectedRow(null);
         }}
-        selectedFile={selectedFile}
+        selectedRow={selectedRow}
       />
     </div>
   );
