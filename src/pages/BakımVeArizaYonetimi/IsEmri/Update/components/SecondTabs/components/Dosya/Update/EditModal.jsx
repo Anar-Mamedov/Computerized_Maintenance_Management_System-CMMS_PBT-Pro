@@ -17,7 +17,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       sureliBelge: false,
       bitisTarih: null,
       hatirlat: false,
-      hatirlatTarih: null,
+      hatirlatmaTarih: null,
       aciklama: "",
       etiketler: "",
       // Add other default values here
@@ -48,7 +48,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       );
       setValue("hatirlat", selectedRow.DSY_HATIRLAT);
       setValue(
-        "hatirlatTarih",
+        "hatirlatmaTarih",
         selectedRow.DSY_HATIRLAT_TARIH
           ? dayjs(selectedRow.DSY_HATIRLAT_TARIH).isValid()
             ? dayjs(selectedRow.DSY_HATIRLAT_TARIH)
@@ -88,7 +88,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       DSY_SURELI: data.sureliBelge,
       DSY_BITIS_TARIH: formatDateWithDayjs(data.bitisTarih),
       DSY_HATIRLAT: data.hatirlat,
-      DSY_HATIRLAT_TARIH: formatDateWithDayjs(data.hatirlatTarih),
+      DSY_HATIRLAT_TARIH: formatDateWithDayjs(data.hatirlatmaTarih),
       DSY_ACIKLAMA: data.aciklama,
       DYS_ETIKET: data.etiketler,
     };
@@ -124,6 +124,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
         <Modal
           width="800px"
           centered
+          destroyOnClose
           title="Belge Bilgilerini Güncelle"
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
