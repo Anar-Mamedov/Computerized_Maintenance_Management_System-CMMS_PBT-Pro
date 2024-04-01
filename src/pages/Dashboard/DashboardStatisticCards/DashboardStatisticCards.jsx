@@ -1,6 +1,6 @@
 import { ClockCircleOutlined, FormOutlined, FallOutlined, HistoryOutlined } from "@ant-design/icons";
 import { Spin } from "antd";
-import useFetch from "../../hooks/useFetch";
+import useFetch from "../../../hooks/useFetch";
 import bg from "../../../assets/images/bg-card.png";
 import "../dashboard.css";
 
