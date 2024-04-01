@@ -1,29 +1,29 @@
-import useFetch from '../../../hooks/useFetch'
-import { Pie } from '@ant-design/charts';
-import { Spin, Select } from 'antd';
-import { Ayarlar } from '../components/Ayarlar';
+import useFetch from "../../../../hooks/useFetch";
+import { Pie } from "@ant-design/charts";
+import { Spin, Select } from "antd";
+import { Ayarlar } from "../components/Ayarlar";
 
 const IsTalepDurum = ({ handleChange }) => {
-  const [data, isLoading] = useFetch("GetIsTalepDurumEnvanter?ID=2")
+  const [data, isLoading] = useFetch("GetIsTalepDurumEnvanter?ID=2");
 
   let formattedData = [];
 
   if (data) {
-    formattedData = data.map(item => ({
+    formattedData = data.map((item) => ({
       ...item,
       "İş talep sayısı": item.IS_TALEP_SAYISI,
-      "İş talep durumu": item.IS_TALEP_SAYISI
+      "İş talep durumu": item.IS_TALEP_SAYISI,
     }));
   }
 
   const config = {
     data: formattedData,
-    angleField: 'İş talep sayısı',
-    colorField: 'IST_DURUM_ID',
-    radius: .6,
+    angleField: "İş talep sayısı",
+    colorField: "IST_DURUM_ID",
+    radius: 0.6,
     label: {
       text: "İş talep sayısı",
-      position: 'outside',
+      position: "outside",
     },
     // legend: {
     //   color: {
@@ -36,26 +36,26 @@ const IsTalepDurum = ({ handleChange }) => {
     legend: {
       color: {
         title: false,
-        position: 'top',
+        position: "top",
         rowPadding: 1,
       },
     },
     annotations: [
       {
-        type: 'text',
+        type: "text",
         style: {
-          text: '',
-          x: '50%',
-          y: '50%',
-          textAlign: 'center',
+          text: "",
+          x: "50%",
+          y: "50%",
+          textAlign: "center",
           fontSize: 40,
-          fontStyle: 'bold',
+          fontStyle: "bold",
         },
       },
-    ]
+    ],
   };
 
-  const modalConfig = { ...config, radius: 1 }
+  const modalConfig = { ...config, radius: 1 };
 
   return (
     <>
@@ -66,30 +66,30 @@ const IsTalepDurum = ({ handleChange }) => {
             defaultValue="İş Talebi Durumu"
             style={{
               width: 130,
-              marginRight: 10
+              marginRight: 10,
             }}
             onChange={handleChange}
             options={[
               {
                 value: 1,
-                label: 'İş Talebi Tipi',
+                label: "İş Talebi Tipi",
               },
               {
                 value: 2,
-                label: 'İş Talebi Durumu',
+                label: "İş Talebi Durumu",
               },
               {
                 value: 3,
-                label: 'Lokasyon',
-              }
+                label: "Lokasyon",
+              },
             ]}
           />
-          <Ayarlar chart={<Pie {...modalConfig} />} title={'İş Talebi Durumları'} />
+          <Ayarlar chart={<Pie {...modalConfig} />} title={"İş Talebi Durumları"} />
         </div>
       </div>
       {isLoading ? <Spin size="large" /> : <Pie {...config} />}
     </>
   );
-}
+};
 
 export default IsTalepDurum;
