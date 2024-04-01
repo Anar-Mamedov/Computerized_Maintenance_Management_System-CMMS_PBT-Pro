@@ -11,6 +11,7 @@ import Aciklama from "./components/Aciklama/Aciklama";
 import SertifikalarTablo from "./components/Sertifikalar/SertifikalarTablo";
 import LokasyonTablo from "./components/Lokasyon/LokasyonTablo";
 import ResimUpload from "./components/Resim/ResimUpload";
+import DosyaUpload from "./components/Dosya/DosyaUpload";
 
 const onChange = (key) => {
   // console.log(key);
@@ -91,7 +92,7 @@ export default function SecondTabs({ refreshKey }) {
     {
       key: "8",
       label: "Ekli Belgeler",
-      children: "Content of Tab Pane 6",
+      children: <DosyaUpload />,
     },
     {
       key: "9",

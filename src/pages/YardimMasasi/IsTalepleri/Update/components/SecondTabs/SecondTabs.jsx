@@ -10,6 +10,7 @@ import Sonuc from "./components/Sonuc/Sonuc";
 import Degerlendirme from "./components/Degerlendirme/Degerlendirme";
 import TeknisyenListesi from "./components/TeknisyenListesi/TeknisyenListesi";
 import ResimUpload from "./components/Resim/ResimUpload";
+import DosyaUpload from "./components/Dosya/DosyaUpload";
 
 const onChange = (key) => {
   // console.log(key);
@@ -85,7 +86,7 @@ export default function SecondTabs({ refreshKey, disabled, fieldRequirements }) 
     {
       key: "7",
       label: "Ekli Belgeler",
-      children: "Ekli Belgeler",
+      children: <DosyaUpload />,
     },
     {
       key: "8",
