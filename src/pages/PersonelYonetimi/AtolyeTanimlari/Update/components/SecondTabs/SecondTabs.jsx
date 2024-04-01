@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import PersonelListesiTablo from "./components/KontrolListesiEkle/PersonelListesiTablo";
 import Aciklama from "./components/Aciklama/Aciklama";
+import DosyaUpload from "./components/Dosya/DosyaUpload";
 
 const onChange = (key) => {
   // console.log(key);
@@ -54,7 +55,7 @@ export default function SecondTabs({ refreshKey }) {
     {
       key: "8",
       label: "Ekli Belgeler",
-      children: "Content of Tab Pane 6",
+      children: <DosyaUpload />,
     },
     {
       key: "10",

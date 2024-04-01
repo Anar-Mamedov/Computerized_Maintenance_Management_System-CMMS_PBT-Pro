@@ -7,6 +7,7 @@ import MakineTablo from "./components/MakineTablo";
 import PersonelTablo from "./components/PersonelTablo";
 import ProjeTablo from "./components/ProjeTablo";
 import ResimUpload from "./components/ResimUpload";
+import DosyaUpload from "./components/Dosya/DosyaUpload";
 
 const onChange = (key) => {
   // console.log(key);
@@ -70,7 +71,7 @@ export default function SecondTabs({ refreshKey }) {
     {
       key: "5",
       label: "Ekli Belgeler",
-      children: "Content of Tab Pane 5",
+      children: <DosyaUpload />,
     },
     {
       key: "6",

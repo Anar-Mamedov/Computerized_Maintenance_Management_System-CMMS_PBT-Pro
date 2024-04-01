@@ -14,6 +14,7 @@ import NinthTab from "./components/NinthTab/NinthTab";
 import FourthTab from "./components/FourthTab/FourthTab";
 import TenthTab from "./components/TenthTab/TenthTab";
 import ResimUpload from "./components/Resim/ResimUpload";
+import DosyaUpload from "./components/Dosya/DosyaUpload";
 
 //styled components
 const StyledTabs = styled(Tabs)`
@@ -200,7 +201,7 @@ export default function SecondTabs() {
               // flexFlow: "row wrap",
               gap: "15px",
             }}>
-            <NinthTab />
+            <DosyaUpload />
           </div>
         </TabPane>
         <TabPane tab="Resimler" key="13">
