@@ -1,9 +1,10 @@
 import { Table as AntdTable, Checkbox, Button, Modal, Row, Input } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import EditDrawer from "../Update/EditDrawer";
+import { useForm, FormProvider } from "react-hook-form";
 import { MenuUnfoldOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../api/http";
-import ContextMenu from "../components/ContextMenu";
+import ContextMenu from "../components/ContextMenu/ContextMenu";
 import "../components/styled.css";
 import dayjs from "dayjs";
 import useColumns, { DEFAULT_VISIBLE_COLUMNS } from "./useColumns";
@@ -24,6 +25,10 @@ const customLocale = {
 export default function Table() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [noteText, setNoteText] = useState("");
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [data, setData] = useState([]);
+  const methods = useForm();
 
   const handleNoteClick = (note) => {
     setNoteText(note);
@@ -138,6 +143,7 @@ export default function Table() {
         // response.list.map(....)
         // console.log("Response: ", response);
         const formattedData = response.makine_listesi.map((el, index) => ({
+          ...el,
           key: el.TB_MAKINE_ID,
           MKN_BELGE: el.MKN_BELGE,
           MKN_BELGE_VAR: el.MKN_BELGE_VAR,
@@ -290,6 +296,7 @@ export default function Table() {
         }));
 
         setCurrentPage(page); //reset the cruent page when i search or filtered any thing
+        setData(formattedData);
 
         setTable({
           data: formattedData,
@@ -363,6 +370,20 @@ export default function Table() {
 
   // kaydet düğmesine basıldıktan sonra apiye tekrardan istek atmasını sağlamak son
 
+  const onSelectChange = (newSelectedRowKeys) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+
+    // Seçilen satırların verisini bul
+    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
+    setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
+  };
+
+  const rowSelection = {
+    type: "checkbox",
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+
   return (
     <>
       <div
@@ -414,10 +435,14 @@ export default function Table() {
 
           <SearchField onChange={handleBodyChange} />
           <Filters onChange={handleBodyChange} />
-          <ContextMenu />
         </div>
 
-        <CreateDrawer onRefresh={refreshTableData} />
+        <div style={{ display: "flex", gap: "10px" }}>
+          <FormProvider {...methods}>
+            <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
+          </FormProvider>
+          <CreateDrawer onRefresh={refreshTableData} />
+        </div>
       </div>
       {/* quick jump for page input field */}
 
@@ -445,7 +470,7 @@ export default function Table() {
         locale={customLocale}
         onChange={onChange}
         dataSource={table.data}
-        rowSelection={true}
+        rowSelection={rowSelection}
         scroll={{
           // x: "auto",
           y: "calc(100vh - 360px)",
