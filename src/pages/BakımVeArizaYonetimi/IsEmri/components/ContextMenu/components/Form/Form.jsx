@@ -19,7 +19,7 @@ const Form = ({ selectedRows }) => {
         style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
         type="submit"
         onClick={downloadPdf}>
-        Rapor İndir
+        Formu İndir
       </Button>
     </div>
   );
