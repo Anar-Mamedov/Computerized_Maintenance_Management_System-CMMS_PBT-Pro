@@ -23,9 +23,7 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
   const iptalDisabled = selectedRows.some(
     (row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 2 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5
   );
-  const kapatDisabled = selectedRows.some(
-    (row) => row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5 || row.IST_DURUM_ID === 3
-  );
+  const kapatDisabled = selectedRows.length > 1;
 
   const content = (
     <div>
