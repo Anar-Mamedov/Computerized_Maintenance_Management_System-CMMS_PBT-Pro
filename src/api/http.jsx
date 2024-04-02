@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: `${import.meta.env.VITE_API_BASE_URL}/api/`,
   // headers: {
   //   Authorization: import.meta.env.VITE_API_AUTHORIZATION,
   // },
@@ -27,5 +27,36 @@ AxiosInstance.interceptors.request.use(function (request) {
   // request.headers["User-Id"] = localStorage.getItem("userId");
   return request;
 });
+
+// burdan sonrasini sil
+const PdfAxiosInstance = axios.create({
+  baseURL: `${import.meta.env.VITE_API_BASE_URL}/FormRapor/`,
+  // headers: {
+  //   Authorization: import.meta.env.VITE_API_AUTHORIZATION,
+  // },
+});
+
+PdfAxiosInstance.interceptors.response.use(
+  function (response) {
+    return response.data;
+  },
+  function (error) {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      // localStorage.removeItem("userId");
+      window.location.href = "/auth"; // `/auth` sayfasına yönlendir
+    }
+    return Promise.reject(error);
+  }
+);
+
+PdfAxiosInstance.interceptors.request.use(function (request) {
+  request.headers.Authorization = `Bearer ${localStorage.getItem("token")}`;
+  // request.headers["User-Id"] = localStorage.getItem("userId");
+  return request;
+});
+export { PdfAxiosInstance };
+// burdan qeder sil
 
 export default AxiosInstance;
