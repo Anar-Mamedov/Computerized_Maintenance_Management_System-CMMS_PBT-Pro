@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Button, Modal, Input, Typography, Tabs, DatePicker, TimePicker } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
-import IptalNedeni from "./IptalNedeni";
 import dayjs from "dayjs";
+import Sekmeler from "./Sekmeler";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
 
@@ -164,7 +164,7 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
           />
         </div>
       </div>
-      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between" }}>
+      {/* <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between" }}>
         <Text>Sonuç:</Text>
         <Controller
           name="iptalNeden"
@@ -173,7 +173,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
             <TextArea {...field} style={{ width: "100%", maxWidth: "350px" }} rows={4} placeholder="Sonuç Ekle" />
           )}
         />
-      </div>
+      </div> */}
+      <Sekmeler />
     </div>
   );
 }
