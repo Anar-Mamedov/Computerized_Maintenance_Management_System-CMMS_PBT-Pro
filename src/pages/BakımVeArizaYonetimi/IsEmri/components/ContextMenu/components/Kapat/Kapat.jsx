@@ -47,7 +47,7 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
       ITL_ACIKLAMA: "Tamamlandı",
     }));
 
-    AxiosInstance.post("IsTalepIptalEtKapat", Body)
+    AxiosInstance.post("IsEmriKapat", Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
 
@@ -84,7 +84,8 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
           Kapat
         </Button>
         <Modal
-          title="İş Talebi Kapatma"
+          title="İş Emri Kapatma"
+          width={900}
           open={isModalOpen}
           onOk={methods.handleSubmit(onSubmited)}
           onCancel={handleModalToggle}>
