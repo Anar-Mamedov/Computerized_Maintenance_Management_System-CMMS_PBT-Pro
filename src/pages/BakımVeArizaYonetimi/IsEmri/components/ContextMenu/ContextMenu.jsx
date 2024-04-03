@@ -34,12 +34,13 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
         hidePopover={hidePopover}
       /> */}
       {/* <Iptal selectedRows={selectedRows} refreshTableData={refreshTableData} iptalDisabled={iptalDisabled} /> */}
-      {selectedRows.length === 1 && (
+      {selectedRows.length >= 1 && (
         <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />
       )}
+
       {/* <Parametreler />
       {selectedRows.length === 1 && <TarihceTablo selectedRows={selectedRows} />} */}
-      {selectedRows.length === 1 && <Form selectedRows={selectedRows} />}
+      {selectedRows.length >= 1 && <Form selectedRows={selectedRows} />}
     </div>
   );
   return (
