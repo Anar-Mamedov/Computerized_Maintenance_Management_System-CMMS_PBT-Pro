@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Modal, message } from "antd";
 import Forms from "./components/Forms";
 import { Controller, useForm, FormProvider } from "react-hook-form";
@@ -9,14 +9,67 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
   const [isModalOpen, setIsModalOpen] = useState(false);
   const methods = useForm({
     defaultValues: {
-      fisNo: "",
-      iptalTarihi: "",
-      iptalSaati: "",
-      iptalNeden: "",
+      baslamaTarihi: null,
+      baslamaSaati: null,
+      bitisTarihi: null,
+      bitisSaati: null,
+      calismaSaat: "",
+      calismaDakika: "",
+      sonuc: null,
+      sonucID: "",
+      kapatmaTarihi: null,
+      kapatmaSaati: null,
+      bakimPuani: "",
+      makineDurumu: null,
+      makineDurumuID: "",
+      aciklama: "",
+
       // Add other default values here
     },
   });
   const { setValue, reset, handleSubmit } = methods;
+
+  useEffect(() => {
+    if (isModalOpen && selectedRows.length === 1) {
+      const row = selectedRows[0]; // Assuming you want to use the first selected row
+
+      setValue(
+        "baslamaTarihi",
+        row.BASLAMA_TARIH ? (dayjs(row.BASLAMA_TARIH).isValid() ? dayjs(row.BASLAMA_TARIH) : null) : null
+      );
+      setValue(
+        "baslamaSaati",
+        row.BASLAMA_SAAT
+          ? dayjs(row.BASLAMA_SAAT.trim(), "HH:mm").isValid()
+            ? dayjs(row.BASLAMA_SAAT.trim(), "HH:mm")
+            : null
+          : null
+      );
+
+      setValue(
+        "bitisTarihi",
+        row.ISM_BITIS_TARIH ? (dayjs(row.ISM_BITIS_TARIH).isValid() ? dayjs(row.ISM_BITIS_TARIH) : null) : null
+      );
+      setValue(
+        "bitisSaati",
+        row.ISM_BITIS_SAAT
+          ? dayjs(row.ISM_BITIS_SAAT.trim(), "HH:mm").isValid()
+            ? dayjs(row.ISM_BITIS_SAAT.trim(), "HH:mm")
+            : null
+          : null
+      );
+      // IS_SURESI'ni saat ve dakikaya çevirme
+      const totalMinutes = row.IS_SURESI;
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
+
+      // Saat ve dakika değerlerini form alanlarına set etme
+      setValue("calismaSaat", hours);
+      setValue("calismaDakika", minutes);
+
+      // Set other values here
+    }
+  }, [selectedRows, setValue, isModalOpen]);
 
   // Sil düğmesini gizlemek için koşullu stil
   const buttonStyle = kapatDisabled ? { display: "none" } : {};
@@ -31,44 +84,138 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
     return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
   };
 
+  // Rakamları kelimelere çevirecek eşleme yapısı
+  const idToWordMap = {
+    1: "Prosedur",
+    2: "Makine",
+    3: "Konu",
+    4: "Tipi",
+    5: "Proje",
+    6: "Öncelik",
+    7: "Atölye",
+    8: "Sayaç",
+    9: "Açıklama",
+    10: "Sözleşme",
+    11: "Kapatma Makine Durumu",
+    12: "Firma",
+    13: "Puan",
+    14: "Ekipman",
+    15: "Nedeni",
+    16: "Referans No",
+    17: "Makine Durumu",
+  };
+
   const onSubmited = (data) => {
-    // Seçili satırlar için Body dizisini oluştur
-    const Body = selectedRows.map((row) => ({
-      TB_IS_TALEP_ID: row.key,
-      IST_TALEP_NO: row.IST_KOD,
-      KLL_ADI: "Orjin", // Bu değer sabitse bu şekilde, dinamikse değiştirilmelidir
-      IST_SONUC: data.iptalNeden,
-      IST_IPTAL_TARIH: formatDateWithDayjs(data.iptalTarihi),
-      IST_IPTAL_SAAT: formatTimeWithDayjs(data.iptalSaati),
-      ITL_ISLEM_ID: 4, // Sabit bir değerse bu şekilde kalabilir, dinamikse değiştirilmelidir
-      ITL_ISLEM: "Kapandi",
-      ITL_ISLEM_DURUM: "KAPANDI",
-      ITL_TALEP_ISLEM: "Kapandi",
-      ITL_ACIKLAMA: "Tamamlandı",
-    }));
+    if (selectedRows.length === 1) {
+      // Tek satır seçildiğinde yapılacak işlemler (Mevcut işlemler)
+      // Seçili satırlar için Body dizisini oluştur
+      const Body = selectedRows.map((row) => ({
+        TB_ISEMRI_ID: row.key,
+        ISM_BASLAMA_TARIH: formatDateWithDayjs(data.baslamaTarihi),
+        ISM_BASLAMA_SAAT: formatTimeWithDayjs(data.baslamaSaati),
+        ISM_BITIS_TARIH: formatDateWithDayjs(data.bitisTarihi),
+        ISM_BITIS_SAAT: formatTimeWithDayjs(data.bitisSaati),
+        ISM_SURE_CALISMA: data.calismaSaat * 60 + data.calismaDakika,
+        ISM_SONUC_KOD_ID: data.sonucID,
+        ISM_KAPANMA_YDK_TARIH: formatDateWithDayjs(data.kapatmaTarihi),
+        ISM_KAPANMA_YDK_SAAT: formatTimeWithDayjs(data.kapatmaSaati),
+        ISM_PUAN: data.bakimPuani,
+        ISM_KAPAT_MAKINE_DURUM_KOD_ID: data.makineDurumuID,
+        ISM_SONUC: data.aciklama,
+      }));
 
-    AxiosInstance.post("IsEmriKapat", Body)
-      .then((response) => {
-        console.log("Data sent successfully:", response);
+      AxiosInstance.get(`CheckIsmFieldsForClose?isEmriId=${selectedRows[0].key}`)
+        .then((response) => {
+          console.log("Data sent successfully:", response);
 
-        if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
-          reset();
-          setIsModalOpen(false); // Sadece başarılı olursa modalı kapat
-          refreshTableData();
-        } else if (response.status_code === 401) {
-          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
-        } else {
-          message.error("Ekleme Başarısız.");
-        }
-      })
-      .catch((error) => {
-        // Handle errors here, e.g.:
-        console.error("Error sending data:", error);
-        message.error("Başarısız Olundu.");
-      });
+          if (response.Durum === false) {
+            if (response.TextArray && response.TextArray.length > 0) {
+              message.error(`${response.TextArray.join(",\n")}, Bu özel alanların doldurulması lazım.`);
+            }
+            if (response.Idlist && response.Idlist.length > 0) {
+              // response.Idlist içindeki her bir ID için karşılık gelen kelimeyi bul
+              const words = response.Idlist.map((id) => idToWordMap[id] || "Bilinmeyen ID");
 
-    console.log({ Body });
+              // Bulunan kelimeleri birleştirerek mesajda göster
+              message.error(`${words.join(",\n")}, Bu alanların doldurulmazı lazım.`);
+            }
+            if (response.IsmIsNotPersonelTimeSet === true) {
+              message.error(`Personel Çalışma Süresi Girilmedi.`);
+            }
+            reset();
+            setIsModalOpen(false); // Sadece başarılı olursa modalı kapat
+            refreshTableData();
+          } else if (response.Durum === true) {
+            AxiosInstance.post("IsEmriKapat", Body)
+              .then((response) => {
+                console.log("Data sent successfully:", response);
+
+                if (response.status_code === 200 || response.status_code === 201) {
+                  message.success("İş Emri Kapandı.");
+                  reset();
+                  setIsModalOpen(false); // Sadece başarılı olursa modalı kapat
+                  refreshTableData();
+                } else if (response.status_code === 401) {
+                  message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+                } else {
+                  message.error("işlem Başarısız.");
+                }
+              })
+              .catch((error) => {
+                // Handle errors here, e.g.:
+                console.error("Error sending data:", error);
+                message.error("Başarısız Olundu.");
+              });
+            console.log({ Body });
+          } else {
+            message.error("Ekleme Başarısız.");
+          }
+        })
+        .catch((error) => {
+          // Handle errors here, e.g.:
+          console.error("Error sending data:", error);
+          message.error("Başarısız Olundu.");
+        });
+      console.log({ Body });
+    } else if (selectedRows.length > 1) {
+      // Birden fazla satır seçildiğinde yapılacak işlemler
+      const Body = selectedRows.map((row) => ({
+        TB_ISEMRI_ID: row.key,
+        ISM_BASLAMA_TARIH: formatDateWithDayjs(data.baslamaTarihi),
+        ISM_BASLAMA_SAAT: formatTimeWithDayjs(data.baslamaSaati),
+        ISM_BITIS_TARIH: formatDateWithDayjs(data.bitisTarihi),
+        ISM_BITIS_SAAT: formatTimeWithDayjs(data.bitisSaati),
+        ISM_SURE_CALISMA: data.calismaSaat * 60 + data.calismaDakika,
+        ISM_SONUC_KOD_ID: data.sonucID,
+        ISM_KAPANMA_YDK_TARIH: formatDateWithDayjs(data.kapatmaTarihi),
+        ISM_KAPANMA_YDK_SAAT: formatTimeWithDayjs(data.kapatmaSaati),
+        ISM_PUAN: data.bakimPuani,
+        ISM_KAPAT_MAKINE_DURUM_KOD_ID: data.makineDurumuID,
+        ISM_SONUC: data.aciklama,
+      }));
+
+      AxiosInstance.post("IsEmriKapat", Body)
+        .then((response) => {
+          console.log("Data sent successfully:", response);
+
+          if (response.status_code === 200 || response.status_code === 201) {
+            message.success("Ekleme Başarılı.");
+            reset();
+            setIsModalOpen(false); // Sadece başarılı olursa modalı kapat
+            refreshTableData();
+          } else if (response.status_code === 401) {
+            message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+          } else {
+            message.error("Ekleme Başarısız.");
+          }
+        })
+        .catch((error) => {
+          // Handle errors here, e.g.:
+          console.error("Error sending data:", error);
+          message.error("Başarısız Olundu.");
+        });
+      console.log({ Body });
+    }
   };
 
   const handleModalToggle = () => {
@@ -80,12 +227,17 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
   return (
     <FormProvider {...methods}>
       <div style={buttonStyle}>
-        <Button style={{ paddingLeft: "0px" }} type="text" onClick={handleModalToggle}>
+        <Button
+          style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
+          type="submit"
+          onClick={handleModalToggle}>
           Kapat
         </Button>
         <Modal
           title="İş Emri Kapatma"
-          width={900}
+          centered
+          destroyOnClose
+          width={1200}
           open={isModalOpen}
           onOk={methods.handleSubmit(onSubmited)}
           onCancel={handleModalToggle}>

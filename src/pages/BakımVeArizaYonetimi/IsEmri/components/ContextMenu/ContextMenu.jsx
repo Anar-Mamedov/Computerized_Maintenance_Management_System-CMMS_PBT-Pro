@@ -23,21 +23,23 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
   const iptalDisabled = selectedRows.some(
     (row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 2 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5
   );
-  const kapatDisabled = selectedRows.length > 1;
+  const kapatDisabled = selectedRows.some((row) => row.ISM_DURUM_KOD_ID === 3);
 
   const content = (
     <div>
-      <Sil
+      {/* <Sil
         selectedRows={selectedRows}
         refreshTableData={refreshTableData}
         disabled={isDisabled}
         hidePopover={hidePopover}
-      />
-      <Iptal selectedRows={selectedRows} refreshTableData={refreshTableData} iptalDisabled={iptalDisabled} />
-      <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />
-      <Parametreler />
-      {selectedRows.length === 1 && <TarihceTablo selectedRows={selectedRows} />}
-      <Form selectedRows={selectedRows} />
+      /> */}
+      {/* <Iptal selectedRows={selectedRows} refreshTableData={refreshTableData} iptalDisabled={iptalDisabled} /> */}
+      {selectedRows.length === 1 && (
+        <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />
+      )}
+      {/* <Parametreler />
+      {selectedRows.length === 1 && <TarihceTablo selectedRows={selectedRows} />} */}
+      {selectedRows.length === 1 && <Form selectedRows={selectedRows} />}
     </div>
   );
   return (
