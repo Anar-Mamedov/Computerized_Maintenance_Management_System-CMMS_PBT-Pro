@@ -6,6 +6,7 @@ import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import dayjs from "dayjs";
+import ContextMenu from "../components/ContextMenu/ContextMenu";
 
 export default function MainTable() {
   const { setValue } = useFormContext();
@@ -14,6 +15,8 @@ export default function MainTable() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
+
+  const [selectedRows, setSelectedRows] = useState([]);
 
   // edit drawer için
   const [drawer, setDrawer] = useState({
@@ -118,10 +121,14 @@ export default function MainTable() {
     } else {
       setValue("selectedLokasyonId", null);
     }
+
+    // Seçilen satırların verisini bul
+    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
+    setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
   };
 
   const rowSelection = {
-    type: "radio",
+    type: "checkbox",
     selectedRowKeys,
     onChange: onSelectChange,
   };
@@ -328,7 +335,10 @@ export default function MainTable() {
           onChange={(e) => setSearchTerm(e.target.value)}
           prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
         />
-        <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
+        <div style={{ display: "flex", gap: "10px" }}>
+          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
+          <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
+        </div>
       </div>
       <Spin spinning={loading}>
         <Table
