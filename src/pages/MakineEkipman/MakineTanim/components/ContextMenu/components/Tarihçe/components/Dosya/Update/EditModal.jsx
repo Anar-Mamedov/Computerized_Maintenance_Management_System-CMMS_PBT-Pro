@@ -127,7 +127,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
           destroyOnClose
           title="Belge Bilgilerini Güncelle"
           open={isModalVisible}
-          onOk={methods.handleSubmit(onSubmited)}
+          onOk={onModalClose}
           onCancel={onModalClose}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <MainTabs />
