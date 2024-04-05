@@ -177,6 +177,7 @@ export default function TarihceTablo({ workshopSelectedId, onSubmit, selectedRow
       <Modal
         width={1200}
         centered
+        destroyOnClose
         title="Makine Tarihçe"
         open={isModalVisible}
         onOk={handleModalOk}
