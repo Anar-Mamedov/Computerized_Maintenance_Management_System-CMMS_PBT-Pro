@@ -130,14 +130,14 @@ const DosyaUpload = ({ selectedRows }) => {
       title: "Belge Tanımı",
       dataIndex: "DSY_TANIM",
       key: "DSY_TANIM",
-      width: "300px",
+      width: "200px",
       ellipsis: true,
     },
     {
       title: "Belge Tipi",
       dataIndex: "DSY_DOSYA_TIP",
       key: "DSY_DOSYA_TIP",
-      width: "150px",
+      width: "100px",
       ellipsis: true,
     },
     {
@@ -151,14 +151,14 @@ const DosyaUpload = ({ selectedRows }) => {
       title: "Boyutu",
       dataIndex: "DSY_DOSYA_BOYUT",
       key: "DSY_DOSYA_BOYUT",
-      width: "150px",
+      width: "100px",
       ellipsis: true,
     },
     {
       title: "Süreli",
       dataIndex: "DSY_SURELI",
       key: "DSY_SURELI",
-      width: "150px",
+      width: "100px",
       render: (text, record) => {
         return record.DSY_SURELI ? (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -183,7 +183,7 @@ const DosyaUpload = ({ selectedRows }) => {
     {
       title: "İşlem",
       key: "action",
-      width: "200px",
+      width: "180px",
       render: (_, record) =>
         record.downloadURL ? (
           <a
