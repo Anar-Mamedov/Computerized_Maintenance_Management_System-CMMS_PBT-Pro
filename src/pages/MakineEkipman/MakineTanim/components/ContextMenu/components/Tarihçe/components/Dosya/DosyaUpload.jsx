@@ -133,13 +133,7 @@ const DosyaUpload = ({ selectedRows }) => {
       width: "200px",
       ellipsis: true,
     },
-    {
-      title: "Belge Tipi",
-      dataIndex: "DSY_DOSYA_TIP",
-      key: "DSY_DOSYA_TIP",
-      width: "100px",
-      ellipsis: true,
-    },
+
     {
       title: "Dosya Adı",
       dataIndex: "DSY_DOSYA_AD",
@@ -147,13 +141,7 @@ const DosyaUpload = ({ selectedRows }) => {
       width: "150px",
       ellipsis: true,
     },
-    {
-      title: "Boyutu",
-      dataIndex: "DSY_DOSYA_BOYUT",
-      key: "DSY_DOSYA_BOYUT",
-      width: "100px",
-      ellipsis: true,
-    },
+
     {
       title: "Süreli",
       dataIndex: "DSY_SURELI",
