@@ -439,7 +439,7 @@ export default function Table() {
 
         <div style={{ display: "flex", gap: "10px" }}>
           <FormProvider {...methods}>
-            {/* <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
+            <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
           </FormProvider>
           <CreateDrawer onRefresh={refreshTableData} />
         </div>

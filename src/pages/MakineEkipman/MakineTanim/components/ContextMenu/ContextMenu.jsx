@@ -5,7 +5,7 @@ import Sil from "./components/Sil";
 import Iptal from "./components/Iptal/Iptal";
 import Kapat from "./components/Kapat/Kapat";
 import Parametreler from "./components/Parametreler/Parametreler";
-import TarihceTablo from "./components/TarihceTablo";
+import Tarihce from "./components/Tarihçe/Tarihce";
 import Form from "./components/Form/Form";
 
 export default function ContextMenu({ selectedRows, refreshTableData }) {
@@ -29,7 +29,7 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
 
   const content = (
     <div>
-      <Sil
+      {/* <Sil
         selectedRows={selectedRows}
         refreshTableData={refreshTableData}
         disabled={isDisabled}
@@ -37,9 +37,9 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
       />
       <Iptal selectedRows={selectedRows} refreshTableData={refreshTableData} iptalDisabled={iptalDisabled} />
       <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />
-      <Parametreler />
-      {selectedRows.length === 1 && <TarihceTablo selectedRows={selectedRows} />}
-      {selectedRows.length >= 1 && <Form selectedRows={selectedRows} />}
+      <Parametreler /> */}
+      {selectedRows.length === 1 && <Tarihce selectedRows={selectedRows} />}
+      {/* {selectedRows.length >= 1 && <Form selectedRows={selectedRows} />} */}
     </div>
   );
   return (

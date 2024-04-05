@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table, Typography } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
-import AxiosInstance from "../../../../../../api/http";
+import AxiosInstance from "../../../../../../../api/http";
+import Sekmeler from "./components/Sekmeler";
 
 const { Text, Link } = Typography;
 
@@ -171,41 +172,19 @@ export default function TarihceTablo({ workshopSelectedId, onSubmit, selectedRow
         style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
         onClick={handleModalToggle}
         type="submit">
-        {" "}
-        Tarihçe{" "}
+        Tarihçe
       </Button>
       <Modal
         width={1200}
         centered
-        title="İş Talebi Tarihçesi"
+        title="Makine Tarihçe"
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}>
-        <div style={{ marginBottom: "10px" }}>
-          <Controller
-            name="fisNo"
-            control={control}
-            render={({ field }) => (
-              <Text {...field} style={{ fontSize: "14px", fontWeight: "600" }}>
-                İş Tanımı: {field.value}
-              </Text>
-            )}
-          />
+        <div>
+          <Sekmeler selectedRows={selectedRows} />
         </div>
-        <Table
-          rowSelection={{
-            type: "radio",
-            selectedRowKeys,
-            onChange: onRowSelectChange,
-          }}
-          columns={columns}
-          dataSource={data}
-          loading={loading}
-          scroll={{
-            // x: "auto",
-            y: "calc(100vh - 360px)",
-          }}
-        />
+        <div></div>
       </Modal>
     </div>
   );
