@@ -3,6 +3,8 @@ import { Tabs, Input, Typography, Tooltip } from "antd";
 import styled from "styled-components";
 import { useFormContext, Controller } from "react-hook-form";
 import ResimCarousel from "./ResimCarousel";
+import ResimUpload from "./Resim/ResimUpload";
+import DosyaUpload from "./Dosya/DosyaUpload";
 
 const { TextArea } = Input;
 const { Text, Link } = Typography;
@@ -178,12 +180,12 @@ export default function Sekmeler({ refreshKey, disabled, selectedRows }) {
     {
       key: "8",
       label: "Resimler",
-      children: "",
+      children: <ResimUpload selectedRows={selectedRows} />,
     },
     {
       key: "9",
       label: "Dokümanlar",
-      children: "",
+      children: <DosyaUpload selectedRows={selectedRows} />,
     },
   ];
 
