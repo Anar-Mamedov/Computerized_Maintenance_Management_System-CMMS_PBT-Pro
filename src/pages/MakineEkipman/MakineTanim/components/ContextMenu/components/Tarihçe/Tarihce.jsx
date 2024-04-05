@@ -113,7 +113,6 @@ export default function TarihceTablo({ workshopSelectedId, onSubmit, selectedRow
   const fetch = useCallback(() => {
     setLoading(true);
     const selectedKey = selectedRows.map((item) => item.key);
-    console.log("filterKey", selectedKey);
     AxiosInstance.get(`IsTalepTarihce?talepID=${selectedKey}`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
