@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Popover } from "antd";
+import { Button, Popover, Typography } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
 import Sil from "./components/Sil";
 import Iptal from "./components/Iptal/Iptal";
@@ -7,6 +7,8 @@ import Kapat from "./components/Kapat/Kapat";
 import Parametreler from "./components/Parametreler/Parametreler";
 import TarihceTablo from "./components/TarihceTablo";
 import Form from "./components/Form/Form";
+
+const { Text, Link } = Typography;
 
 export default function ContextMenu({ selectedRows, refreshTableData }) {
   const [visible, setVisible] = useState(false);
@@ -50,13 +52,13 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0px 0px",
+          padding: "0px 5px",
           backgroundColor: "#2BC770",
           borderColor: "#2BC770",
-          width: "32px",
           height: "32px",
         }}>
-        <MoreOutlined style={{ color: "white", fontSize: "20px" }} />
+        {selectedRows.length >= 1 && <Text style={{ color: "white", marginLeft: "3px" }}>{selectedRows.length}</Text>}
+        <MoreOutlined style={{ color: "white", fontSize: "20px", margin: "0" }} />
       </Button>
     </Popover>
   );
