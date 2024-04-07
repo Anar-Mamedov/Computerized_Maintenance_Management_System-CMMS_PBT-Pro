@@ -84,7 +84,9 @@ export default function MainTable() {
       key: "ISEMRI_NO",
       width: "150px",
       ellipsis: true,
+
       visible: true, // Varsayılan olarak açık
+      render: (text) => <a>{text}</a>,
     },
     {
       title: "Tarih",
@@ -92,6 +94,11 @@ export default function MainTable() {
       key: "DUZENLEME_TARIH",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: true, // Varsayılan olarak açık
       render: (text) => formatDate(text),
     },
@@ -101,6 +108,11 @@ export default function MainTable() {
       key: "DUZENLEME_SAAT",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: true, // Varsayılan olarak açık
       render: (text) => formatTime(text),
     },
@@ -110,7 +122,9 @@ export default function MainTable() {
       key: "KONU",
       width: "250px",
       ellipsis: true,
+
       visible: true, // Varsayılan olarak açık
+      render: (text) => <a>{text}</a>,
     },
     {
       title: "İş Emri Tipi",
@@ -118,6 +132,11 @@ export default function MainTable() {
       key: "ISEMRI_TIP",
       width: "200px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: true, // Varsayılan olarak açık
       render: (text, record) => (
         <div
@@ -143,6 +162,11 @@ export default function MainTable() {
       key: "DURUM",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: true, // Varsayılan olarak açık
     },
     {
@@ -151,6 +175,11 @@ export default function MainTable() {
       key: "LOKASYON",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: true, // Varsayılan olarak açık
     },
     {
@@ -159,6 +188,11 @@ export default function MainTable() {
       key: "MAKINE_KODU",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: true, // Varsayılan olarak açık
     },
     {
@@ -167,6 +201,11 @@ export default function MainTable() {
       key: "MAKINE_TANIMI",
       width: "250px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: true, // Varsayılan olarak açık
     },
     {
@@ -175,6 +214,11 @@ export default function MainTable() {
       key: "PLAN_BASLAMA_TARIH",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: true, // Varsayılan olarak açık
       render: (text) => formatDate(text),
     },
@@ -185,6 +229,11 @@ export default function MainTable() {
       key: "PLAN_BASLAMA_SAAT",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: true, // Varsayılan olarak açık
       render: (text) => formatTime(text),
     },
@@ -194,6 +243,11 @@ export default function MainTable() {
       key: "PLAN_BITIS_TARIH",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
       render: (text) => formatDate(text),
     },
@@ -203,6 +257,11 @@ export default function MainTable() {
       key: "PLAN_BITIS_SAAT",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
       render: (text) => formatTime(text),
     },
@@ -212,6 +271,11 @@ export default function MainTable() {
       key: "BASLAMA_TARIH",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
       render: (text) => formatDate(text),
     },
@@ -221,6 +285,11 @@ export default function MainTable() {
       key: "BASLAMA_SAAT",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
       render: (text) => formatTime(text),
     },
@@ -230,6 +299,11 @@ export default function MainTable() {
       key: "ISM_BITIS_TARIH",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
       render: (text) => formatDate(text),
     },
@@ -239,6 +313,11 @@ export default function MainTable() {
       key: "ISM_BITIS_SAAT",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
       render: (text) => formatTime(text),
     },
@@ -248,6 +327,11 @@ export default function MainTable() {
       key: "IS_SURESI",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
       render: (text) => (text > 0 ? text : null),
     },
@@ -257,6 +341,11 @@ export default function MainTable() {
       key: "TAMAMLANMA",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
       render: (text) => `${text}%`,
     },
@@ -266,6 +355,11 @@ export default function MainTable() {
       key: "GARANTI",
       width: "100px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
       render: (text, record) => {
         return record.GARANTI ? (
@@ -285,6 +379,11 @@ export default function MainTable() {
       key: "MAKINE_DURUM",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -293,6 +392,11 @@ export default function MainTable() {
       key: "MAKINE_PLAKA",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -301,6 +405,11 @@ export default function MainTable() {
       key: "MAKINE_TIP",
       width: "250px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -309,6 +418,11 @@ export default function MainTable() {
       key: "EKIPMAN",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -317,6 +431,11 @@ export default function MainTable() {
       key: "IS_TIPI",
       width: "250px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -325,6 +444,11 @@ export default function MainTable() {
       key: "IS_NEDENI",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -333,6 +457,11 @@ export default function MainTable() {
       key: "ATOLYE",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -341,6 +470,11 @@ export default function MainTable() {
       key: "TALIMAT",
       width: "250px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -349,6 +483,11 @@ export default function MainTable() {
       key: "ONCELIK",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -357,6 +496,11 @@ export default function MainTable() {
       key: "KAPANIS_TARIHI",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
       render: (text) => formatDate(text),
     },
@@ -366,6 +510,11 @@ export default function MainTable() {
       key: "KAPANIS_SAATI",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
       render: (text) => formatTime(text),
     },
@@ -375,6 +524,11 @@ export default function MainTable() {
       key: "TAKVIM",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -383,6 +537,11 @@ export default function MainTable() {
       key: "MASRAF_MERKEZI",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -391,6 +550,11 @@ export default function MainTable() {
       key: "FRIMA",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -399,6 +563,11 @@ export default function MainTable() {
       key: "IS_TALEP_NO",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -407,6 +576,11 @@ export default function MainTable() {
       key: "IS_TALEP_EDEN",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -415,6 +589,11 @@ export default function MainTable() {
       key: "IS_TALEP_TARIH",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
       render: (text) => formatDate(text),
     },
@@ -424,6 +603,11 @@ export default function MainTable() {
       key: "OZEL_ALAN_1",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -432,6 +616,11 @@ export default function MainTable() {
       key: "OZEL_ALAN_2",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -440,6 +629,11 @@ export default function MainTable() {
       key: "OZEL_ALAN_3",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -448,6 +642,11 @@ export default function MainTable() {
       key: "OZEL_ALAN_4",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -456,6 +655,11 @@ export default function MainTable() {
       key: "OZEL_ALAN_5",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -464,6 +668,11 @@ export default function MainTable() {
       key: "OZEL_ALAN_6",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -472,6 +681,11 @@ export default function MainTable() {
       key: "OZEL_ALAN_7",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -480,6 +694,11 @@ export default function MainTable() {
       key: "OZEL_ALAN_8",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -488,6 +707,11 @@ export default function MainTable() {
       key: "OZEL_ALAN_9",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -496,6 +720,11 @@ export default function MainTable() {
       key: "OZEL_ALAN_10",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -504,6 +733,11 @@ export default function MainTable() {
       key: "OZEL_ALAN_11",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -512,6 +746,11 @@ export default function MainTable() {
       key: "OZEL_ALAN_12",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -520,6 +759,11 @@ export default function MainTable() {
       key: "OZEL_ALAN_13",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -528,6 +772,11 @@ export default function MainTable() {
       key: "OZEL_ALAN_14",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -536,6 +785,11 @@ export default function MainTable() {
       key: "OZEL_ALAN_15",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -544,6 +798,11 @@ export default function MainTable() {
       key: "OZEL_ALAN_16",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -552,6 +811,11 @@ export default function MainTable() {
       key: "OZEL_ALAN_17",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -560,6 +824,11 @@ export default function MainTable() {
       key: "OZEL_ALAN_18",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -568,6 +837,11 @@ export default function MainTable() {
       key: "OZEL_ALAN_19",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -576,6 +850,11 @@ export default function MainTable() {
       key: "OZEL_ALAN_20",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -584,6 +863,11 @@ export default function MainTable() {
       key: "PERSONEL_ADI",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -592,6 +876,11 @@ export default function MainTable() {
       key: "TAM_LOKASYON",
       width: "250px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -600,6 +889,11 @@ export default function MainTable() {
       key: "BILDIRILEN_KAT",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -608,6 +902,11 @@ export default function MainTable() {
       key: "BILDIRILEN_BINA",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -616,6 +915,11 @@ export default function MainTable() {
       key: "GUNCEL_SAYAC_DEGER",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -624,6 +928,11 @@ export default function MainTable() {
       key: "ICERDEKI_NOT",
       width: "250px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       visible: false, // Varsayılan olarak kapalı
     },
     // Diğer kolonlarınız...
