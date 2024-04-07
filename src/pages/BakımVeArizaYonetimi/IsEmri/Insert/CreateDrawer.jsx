@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { Button, Drawer, Space, ConfigProvider, Modal, message } from "antd";
+import { Button, Drawer, Space, ConfigProvider, Modal, message, Alert } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import tr_TR from "antd/es/locale/tr_TR";
 import AxiosInstance from "../../../../api/http";
@@ -351,8 +351,15 @@ export default function CreateDrawer({ onRefresh }) {
         <Drawer
           width="1460px"
           title={
-            <div style={{ display: "flex", gap: "30px", alignItems: "center" }}>
+            <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
               <div>İş Emri Ekle</div>
+              <Alert
+                style={{ fontWeight: 500 }}
+                message="[Malzeme, Kontrol Listesi, Personel ve Diğer Detayları İş Emrini Kaydettikten Sonra Girebilirsiniz.]"
+                // description="This is some important information."
+                type="info"
+                showIcon
+              />
             </div>
           }
           placement="right"

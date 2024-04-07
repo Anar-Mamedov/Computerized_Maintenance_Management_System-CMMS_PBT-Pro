@@ -11,7 +11,6 @@ import {
   Col,
   Checkbox,
   ColorPicker,
-  Alert,
 } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
@@ -274,12 +273,6 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
         gap: "20px",
         rowGap: "10px",
       }}>
-      <Alert
-        message="[Malzeme, Kontrol Listesi, Personel ve Diğer Detayları İş Emrini Kaydettikten Sonra Girebilirsiniz.]"
-        // description="This is some important information."
-        type="info"
-        showIcon
-      />
       <div style={{ display: "flex", gap: "20px", width: "100%", flexWrap: "wrap" }}>
         <div
           style={{
