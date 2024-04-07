@@ -346,8 +346,8 @@ export default function MainTable() {
           dataSource={searchTerm ? filteredData : data}
           pagination={{
             defaultPageSize: 10,
-            showSizeChanger: false,
-            // pageSizeOptions: ["10", "20", "50", "100"],
+            showSizeChanger: true,
+            pageSizeOptions: ["10", "20", "50", "100"],
             position: ["bottomRight"],
           }}
           onRow={onRowClick}
