@@ -19,13 +19,12 @@ export default function MakineDurum() {
   const [messageApi, contextHolder] = message.useMessage();
 
   // message end
-
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("GetMakineDurum");
-      if (response && response.MAKINE_DURUM) {
-        setOptions(response.MAKINE_DURUM);
+      const response = await AxiosInstance.get("KodList?grup=32505");
+      if (response && response) {
+        setOptions(response);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -51,7 +50,7 @@ export default function MakineDurum() {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddMakineDurum?yeniDurum=${name}`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32505`)
         .then((response) => {
           if (response.success) {
             // Assuming 'id' is directly in the response
