@@ -39,10 +39,14 @@ export default function useColumns(props) {
       sorter: (a, b) => a.key - b.key,
       width: 50,
       description: "Sıra",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+
       modalTitle: "#",
       // satır yüksekliğini ayarlamak için kullanılır
       onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
         style: {
           height: "55px", // Hücre yüksekliği
           // padding: "10px", // Varsayılan padding değerini değiştirebilirsiniz
@@ -57,7 +61,12 @@ export default function useColumns(props) {
       sorter: (a, b) => (a.MKN_BELGE_VAR === b.MKN_BELGE_VAR ? 0 : a.MKN_BELGE_VAR ? -1 : 1),
       width: 100,
       description: "Belge",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       modalTitle: "Belge",
     },
     {
@@ -68,7 +77,12 @@ export default function useColumns(props) {
       sorter: (a, b) => (a.MKN_RESIM_VAR === b.MKN_RESIM_VAR ? 0 : a.MKN_RESIM_VAR ? -1 : 1),
       width: 100,
       description: "Resim",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       modalTitle: "Resim",
     },
     {
@@ -79,10 +93,14 @@ export default function useColumns(props) {
       sorter: (a, b) => (a.MKN_PERIYODIK_BAKIM === b.MKN_PERIYODIK_BAKIM ? 0 : a.MKN_PERIYODIK_BAKIM ? -1 : 1),
       width: 100,
       description: "Peryodik Bakım",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+
       modalTitle: "Periyodik Bakım",
       // satır yüksekliğini ayarlamak için kullanılır
       onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
         style: {
           height: "55px", // Hücre yüksekliği
           // padding: "10px", // Varsayılan padding değerini değiştirebilirsiniz
@@ -96,7 +114,8 @@ export default function useColumns(props) {
       sorter: (a, b) => a.MKN_KOD.length - b.MKN_KOD.length,
       width: 100,
       description: "Makine Kodu",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      render: (text) => <a>{text}</a>,
       modalTitle: "Makine Kodu",
       // satır yüksekliğini ayarlamak için kullanılır
       onCell: () => ({
@@ -113,7 +132,8 @@ export default function useColumns(props) {
       sorter: (a, b) => a.MKN_TANIM.length - b.MKN_TANIM.length,
       width: 100,
       description: "Makine Tanımı",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      render: (text) => <a>{text}</a>,
       modalTitle: "Makine Tanımı",
       // satır yüksekliğini ayarlamak için kullanılır
       onCell: () => ({
@@ -130,7 +150,12 @@ export default function useColumns(props) {
       key: "MKN_AKTIF",
       width: 100,
       description: "Aktif",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       modalTitle: "Aktif",
       render: (status) => <input type="checkbox" checked={status} disabled />,
       sorter: (a, b) => (a.MKN_AKTIF === b.MKN_AKTIF ? 0 : a.MKN_AKTIF ? -1 : 1),
@@ -141,7 +166,8 @@ export default function useColumns(props) {
       key: "MKN_DURUM",
       width: 100,
       description: "Makine Durumu",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+
       modalTitle: "Makine Durumu",
       sorter: (a, b) => {
         if (a.MKN_DURUM && b.MKN_DURUM) {
@@ -154,6 +180,9 @@ export default function useColumns(props) {
       },
       // satır yüksekliğini ayarlamak için kullanılır
       onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
         style: {
           height: "55px", // Hücre yüksekliği
           // padding: "10px", // Varsayılan padding değerini değiştirebilirsiniz
@@ -166,7 +195,8 @@ export default function useColumns(props) {
       key: "MKN_ARAC_TIP",
       description: "Araç Tipi",
       modalTitle: "Araç Tipi",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+
       width: 100,
       sorter: (a, b) => {
         if (a.MKN_ARAC_TIP && b.MKN_ARAC_TIP) {
@@ -179,6 +209,9 @@ export default function useColumns(props) {
       },
       // satır yüksekliğini ayarlamak için kullanılır
       onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
         style: {
           height: "55px", // Hücre yüksekliği
           // padding: "10px", // Varsayılan padding değerini değiştirebilirsiniz
@@ -191,7 +224,8 @@ export default function useColumns(props) {
       key: "MKN_LOKASYON",
       description: "Lokasyon",
       modalTitle: "Lokasyon",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+
       width: 100,
       sorter: (a, b) => {
         if (a.MKN_LOKASYON && b.MKN_LOKASYON) {
@@ -204,6 +238,9 @@ export default function useColumns(props) {
       },
       // satır yüksekliğini ayarlamak için kullanılır
       onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
         style: {
           height: "55px", // Hücre yüksekliği
           // padding: "10px", // Varsayılan padding değerini değiştirebilirsiniz
@@ -216,7 +253,8 @@ export default function useColumns(props) {
       key: "MKN_TIP",
       description: "Makine Tipi",
       modalTitle: "Makine Tipi",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+
       width: 100,
       sorter: (a, b) => {
         if (a.MKN_TIP && b.MKN_TIP) {
@@ -229,6 +267,9 @@ export default function useColumns(props) {
       },
       // satır yüksekliğini ayarlamak için kullanılır
       onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
         style: {
           height: "55px", // Hücre yüksekliği
           // padding: "10px", // Varsayılan padding değerini değiştirebilirsiniz
@@ -241,7 +282,8 @@ export default function useColumns(props) {
       key: "MKN_KATEGORI",
       description: "Kategori",
       modalTitle: "Kategori",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+
       width: 100,
       sorter: (a, b) => {
         if (a.MKN_KATEGORI && b.MKN_KATEGORI) {
@@ -259,7 +301,12 @@ export default function useColumns(props) {
       key: "MKN_MARKA",
       description: "Marka",
       modalTitle: "Marka",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
         if (a.MKN_MARKA && b.MKN_MARKA) {
@@ -277,7 +324,12 @@ export default function useColumns(props) {
       key: "MKN_MODEL",
       description: "Model",
       modalTitle: "Model",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
         if (a.MKN_MODEL && b.MKN_MODEL) {
@@ -295,7 +347,12 @@ export default function useColumns(props) {
       key: "MKN_MASTER_MAKINE_TANIM",
       description: "Master Makine Tanimi",
       modalTitle: "Master Makine Tanimi",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
         if (a.MKN_MASTER_MAKINE_TANIM && b.MKN_MASTER_MAKINE_TANIM) {
@@ -313,7 +370,12 @@ export default function useColumns(props) {
       key: "MKN_MASTER_MAKINE_KOD",
       description: "Master Makine Kod",
       modalTitle: "Master Makine Kod",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
         if (a.MKN_MASTER_MAKINE_KOD && b.MKN_MASTER_MAKINE_KOD) {
@@ -331,7 +393,12 @@ export default function useColumns(props) {
       key: "MKN_TAKVIM",
       description: "Çalışma Takvimi",
       modalTitle: "Çalışma Takvimi",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
         if (a.MKN_TAKVIM && b.MKN_TAKVIM) {
@@ -350,7 +417,12 @@ export default function useColumns(props) {
       description: "Üretim Yılı",
       modalTitle: "Üretim Yılı",
       align: "right",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
         if (a.MKN_URETIM_YILI && b.MKN_URETIM_YILI) {
@@ -368,7 +440,12 @@ export default function useColumns(props) {
       key: "MKN_MASRAF_MERKEZ",
       description: "Masraf Merkezi",
       modalTitle: "Masraf Merkezi",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
         if (a.MKN_MASRAF_MERKEZ && b.MKN_MASRAF_MERKEZ) {
@@ -386,7 +463,12 @@ export default function useColumns(props) {
       key: "MKN_ATOLYE",
       description: "Sorumlu Atölye",
       modalTitle: "Sorumlu Atölye",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
         if (a.MKN_ATOLYE && b.MKN_ATOLYE) {
@@ -404,7 +486,12 @@ export default function useColumns(props) {
       key: "MKN_BAKIM_GRUP",
       description: "Bakım Grubu",
       modalTitle: "Bakım Grubu",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
         if (a.MKN_BAKIM_GRUP && b.MKN_BAKIM_GRUP) {
@@ -422,7 +509,12 @@ export default function useColumns(props) {
       key: "MKN_ARIZA_GRUP",
       description: "Arıza Grubu",
       modalTitle: "Arıza Grubu",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
         if (a.MKN_ARIZA_GRUP && b.MKN_ARIZA_GRUP) {
@@ -440,7 +532,12 @@ export default function useColumns(props) {
       key: "MKN_ONCELIK",
       description: "Öncelik",
       modalTitle: "Öncelik",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
         if (a.MKN_ONCELIK && b.MKN_ONCELIK) {
@@ -459,7 +556,12 @@ export default function useColumns(props) {
       description: "Arıza Sıklığı (Gün)",
       modalTitle: "Arıza Sıklığı (Gün)",
       align: "right",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
         if (a.ARIZA_SIKLIGI && b.ARIZA_SIKLIGI) {
@@ -478,7 +580,12 @@ export default function useColumns(props) {
       description: "Arıza Sayısı",
       modalTitle: "Arıza Sayısı",
       align: "right",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
         if (a.ARIZA_SAYISI && b.ARIZA_SAYISI) {
@@ -496,7 +603,12 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_1",
       description: "ÖZEL ALAN 1",
       modalTitle: "ÖZEL ALAN 1",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_1 && b.MKN_OZEL_ALAN_1) {
@@ -514,7 +626,12 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_2",
       description: "ÖZEL ALAN 2",
       modalTitle: "ÖZEL ALAN 2",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_2 && b.MKN_OZEL_ALAN_2) {
@@ -532,7 +649,12 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_3",
       description: "ÖZEL ALAN 3",
       modalTitle: "ÖZEL ALAN 3",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_3 && b.MKN_OZEL_ALAN_3) {
@@ -550,7 +672,12 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_4",
       description: "ÖZEL ALAN 4",
       modalTitle: "ÖZEL ALAN 4",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_4 && b.MKN_OZEL_ALAN_4) {
@@ -568,7 +695,12 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_5",
       description: "ÖZEL ALAN 5",
       modalTitle: "ÖZEL ALAN 5",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_5 && b.MKN_OZEL_ALAN_5) {
@@ -586,7 +718,12 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_6",
       description: "ÖZEL ALAN 6",
       modalTitle: "ÖZEL ALAN 6",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_6 && b.MKN_OZEL_ALAN_6) {
@@ -604,7 +741,12 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_7",
       description: "ÖZEL ALAN 7",
       modalTitle: "ÖZEL ALAN 7",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_7 && b.MKN_OZEL_ALAN_7) {
@@ -622,7 +764,12 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_8",
       description: "ÖZEL ALAN 8",
       modalTitle: "ÖZEL ALAN 8",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_8 && b.MKN_OZEL_ALAN_8) {
@@ -640,7 +787,12 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_9",
       description: "ÖZEL ALAN 9",
       modalTitle: "ÖZEL ALAN 9",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_9 && b.MKN_OZEL_ALAN_9) {
@@ -658,7 +810,12 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_10",
       description: "ÖZEL ALAN 10",
       modalTitle: "ÖZEL ALAN 10",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_10 && b.MKN_OZEL_ALAN_10) {
@@ -676,7 +833,12 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_11_KOD_ID",
       description: "ÖZEL ALAN 11",
       modalTitle: "ÖZEL ALAN 11",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_11_KOD_ID && b.MKN_OZEL_ALAN_11_KOD_ID) {
@@ -694,7 +856,12 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_12_KOD_ID",
       description: "ÖZEL ALAN 12",
       modalTitle: "ÖZEL ALAN 12",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_12_KOD_ID && b.MKN_OZEL_ALAN_12_KOD_ID) {
@@ -712,7 +879,12 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_13_KOD_ID",
       description: "ÖZEL ALAN 13",
       modalTitle: "ÖZEL ALAN 13",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_13_KOD_ID && b.MKN_OZEL_ALAN_13_KOD_ID) {
@@ -730,7 +902,12 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_14_KOD_ID",
       description: "ÖZEL ALAN 14",
       modalTitle: "ÖZEL ALAN 14",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_14_KOD_ID && b.MKN_OZEL_ALAN_14_KOD_ID) {
@@ -748,7 +925,12 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_15_KOD_ID",
       description: "ÖZEL ALAN 15",
       modalTitle: "ÖZEL ALAN 15",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_15_KOD_ID && b.MKN_OZEL_ALAN_15_KOD_ID) {
@@ -766,7 +948,12 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_16",
       description: "ÖZEL ALAN 16",
       modalTitle: "ÖZEL ALAN 16",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_16 && b.MKN_OZEL_ALAN_16) {
@@ -784,7 +971,12 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_17",
       description: "ÖZEL ALAN 17",
       modalTitle: "ÖZEL ALAN 17",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_17 && b.MKN_OZEL_ALAN_17) {
@@ -802,7 +994,12 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_18",
       description: "ÖZEL ALAN 18",
       modalTitle: "ÖZEL ALAN 18",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_18 && b.MKN_OZEL_ALAN_18) {
@@ -820,7 +1017,12 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_19",
       description: "ÖZEL ALAN 19",
       modalTitle: "ÖZEL ALAN 19",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_19 && b.MKN_OZEL_ALAN_19) {
@@ -838,7 +1040,12 @@ export default function useColumns(props) {
       key: "MKN_OZEL_ALAN_20",
       description: "ÖZEL ALAN 20",
       modalTitle: "ÖZEL ALAN 20",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_20 && b.MKN_OZEL_ALAN_20) {
@@ -856,7 +1063,12 @@ export default function useColumns(props) {
       key: "MKN_LOKASYON_TUM_YOL",
       description: "Tam Lokasyon",
       modalTitle: "Tam Lokasyon",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 200,
       sorter: (a, b) => {
         if (a.MKN_LOKASYON_TUM_YOL && b.MKN_LOKASYON_TUM_YOL) {
@@ -875,7 +1087,12 @@ export default function useColumns(props) {
       description: "Seri No",
       modalTitle: "Seri No",
       align: "right",
-      ellipsis: true, // Enable ellipsis for overflowed content
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
         if (a.MKN_SERI_NO && b.MKN_SERI_NO) {
