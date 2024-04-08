@@ -464,6 +464,7 @@ export default function Table() {
           // showQuickJumper: {
           //   goButton: <CustomGoButton />, // Use a custom Go button
           // },
+          showTotal: (total, range) => `Toplam ${total}`,
         }}
         loading={loading} // Pass the loading state to the loading prop of AntdTable
         columns={columns.filter((column) => visibleColumns.includes(column.dataIndex))} //columns. after filter will return only columns that are visible

@@ -30,6 +30,11 @@ export const DEFAULT_VISIBLE_COLUMNS = [
 
 export default function useColumns(props) {
   const { handleNoteClick } = props;
+
+  const renderTitle = (title) => (
+    <div style={{ padding: "8px" }}>{title}</div> // Sadece padding
+  );
+
   const columns = [
     {
       title: "#",
@@ -108,7 +113,7 @@ export default function useColumns(props) {
       }),
     },
     {
-      title: "Makine Kodu",
+      title: renderTitle("Makine Kodu"),
       dataIndex: "MKN_KOD",
       key: "MKN_KOD",
       sorter: (a, b) => {
@@ -131,7 +136,7 @@ export default function useColumns(props) {
       }),
     },
     {
-      title: "Makine Tanımı",
+      title: renderTitle("Makine Tanımı"),
       dataIndex: "MKN_TANIM",
       key: "MKN_TANIM",
       sorter: (a, b) => {
