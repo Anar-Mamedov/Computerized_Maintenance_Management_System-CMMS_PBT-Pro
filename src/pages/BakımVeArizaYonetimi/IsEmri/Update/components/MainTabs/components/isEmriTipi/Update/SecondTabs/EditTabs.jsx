@@ -29,12 +29,12 @@ export default function EditTabs() {
           alignItems: "center",
           justifyContent: "space-between",
           width: "100%",
-          maxWidth: "500px",
+          maxWidth: "525px",
           gap: "10px",
           rowGap: "0px",
           marginBottom: "10px",
         }}>
-        <Text style={{ fontSize: "14px", fontWeight: "600" }}>İş Emri No:</Text>
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>İş Emri Tanımı:</Text>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <div
             style={{
@@ -89,7 +89,7 @@ export default function EditTabs() {
           alignItems: "center",
           justifyContent: "space-between",
           width: "100%",
-          maxWidth: "382px",
+          maxWidth: "408px",
           gap: "10px",
           rowGap: "0px",
           marginBottom: "10px",

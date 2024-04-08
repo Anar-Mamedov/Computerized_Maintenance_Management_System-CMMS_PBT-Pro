@@ -71,7 +71,7 @@ const items = [
       getItem("Bakım Tanımları", "bakimTanimlari", true),
       getItem("Arıza Tanımları", "arizaTanimlari", true),
       // getItem("İş Emri", "isemri", true),
-      getItem("İş Emri", "isEmri1", true),
+      getItem("İş Emirleri", "isEmri1", true),
       getItem("Peryodik Bakımlar", "peryodikBakimlar", true),
       getItem("Otomatik İş Emirleri", "otomatikIsEmirleri", true),
       getItem("Planlama Takvimi", "planlamaTakvimi", true),
