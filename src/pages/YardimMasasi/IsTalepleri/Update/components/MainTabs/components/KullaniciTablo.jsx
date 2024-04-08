@@ -1,12 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Table } from "antd";
+import { Button, Modal, Table, Input } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
 
-export default function KullaniciTablo({ workshopSelectedId, onSubmit, disabled }) {
+export default function KullaniciTablo({ workshopSelectedId, onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [filteredData, setFilteredData] = useState([]); // Filtrelenmiş veri için yeni state
+  const [searchTerm, setSearchTerm] = useState(""); // Arama terimi için state
 
   const columns = [
     {
@@ -128,6 +130,7 @@ export default function KullaniciTablo({ workshopSelectedId, onSubmit, disabled 
           ISK_PERSONEL_ISIM: item.ISK_PERSONEL_ISIM,
         }));
         setData(fetchedData);
+        setFilteredData(fetchedData); // filteredData'yı da aynı veriyle güncelle
       })
       .finally(() => setLoading(false));
   }, []);
@@ -155,12 +158,46 @@ export default function KullaniciTablo({ workshopSelectedId, onSubmit, disabled 
   const onRowSelectChange = (selectedKeys) => {
     setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
   };
+
+  // Arama terimindeki değişiklikleri işleyen fonksiyon
+  // Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
+  const normalizeText = (text) => {
+    return text
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/ğ/g, "g")
+      .replace(/Ğ/g, "G")
+      .replace(/ü/g, "u")
+      .replace(/Ü/g, "U")
+      .replace(/ş/g, "s")
+      .replace(/Ş/g, "S")
+      .replace(/ı/g, "i")
+      .replace(/İ/g, "I")
+      .replace(/ö/g, "o")
+      .replace(/Ö/g, "O")
+      .replace(/ç/g, "c")
+      .replace(/Ç/g, "C");
+  };
+
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    if (value) {
+      const normalizedSearchTerm = normalizeText(value); // Arama terimini normalize et
+      const filtered = data.filter((item) =>
+        Object.keys(item).some(
+          (key) =>
+            item[key] && normalizeText(item[key].toString()).toLowerCase().includes(normalizedSearchTerm.toLowerCase())
+        )
+      );
+      setFilteredData(filtered);
+    } else {
+      setFilteredData(data);
+    }
+  };
   return (
     <div>
-      <Button disabled={disabled} onClick={handleModalToggle}>
-        {" "}
-        +{" "}
-      </Button>
+      <Button onClick={handleModalToggle}> + </Button>
       <Modal
         width={1200}
         centered
@@ -168,6 +205,12 @@ export default function KullaniciTablo({ workshopSelectedId, onSubmit, disabled 
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}>
+        <Input
+          placeholder="Ara..."
+          value={searchTerm}
+          onChange={handleSearch}
+          style={{ marginBottom: "15px", width: "300px" }} // Arama kutusunun altındaki boşluk
+        />
         <Table
           rowSelection={{
             type: "radio",
@@ -175,7 +218,7 @@ export default function KullaniciTablo({ workshopSelectedId, onSubmit, disabled 
             onChange: onRowSelectChange,
           }}
           columns={columns}
-          dataSource={data}
+          dataSource={filteredData}
           loading={loading}
           scroll={{
             // x: "auto",
