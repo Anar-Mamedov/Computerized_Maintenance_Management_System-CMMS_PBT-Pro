@@ -58,14 +58,6 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
             : null
           : null
       );
-      // IS_SURESI'ni saat ve dakikaya çevirme
-      const totalMinutes = row.IS_SURESI;
-      const hours = Math.floor(totalMinutes / 60);
-      const minutes = totalMinutes % 60;
-
-      // Saat ve dakika değerlerini form alanlarına set etme
-      setValue("calismaSaat", hours);
-      setValue("calismaDakika", minutes);
 
       // Set other values here
     }

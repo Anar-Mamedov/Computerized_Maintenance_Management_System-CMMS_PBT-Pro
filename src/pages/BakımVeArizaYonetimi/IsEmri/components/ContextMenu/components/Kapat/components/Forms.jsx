@@ -62,6 +62,7 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
     control,
     watch,
     setValue,
+    getValues,
     formState: { errors },
   } = useFormContext();
 
@@ -107,6 +108,33 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
   }, []);
 
   // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın sonu
+
+  //! Başlama Tarihi ve saati ile Bitiş Tarihi ve saati arasındaki farkı hesaplama
+
+  // Watch for changes in the relevant fields
+  const watchFields = watch(["baslamaTarihi", "baslamaSaati", "bitisTarihi", "bitisSaati"]);
+
+  React.useEffect(() => {
+    const { baslamaTarihi, baslamaSaati, bitisTarihi, bitisSaati } = getValues();
+    if (baslamaTarihi && baslamaSaati && bitisTarihi && bitisSaati) {
+      // Başlangıç ve bitiş tarih/saatini birleştir
+      const startDateTime = dayjs(baslamaTarihi).hour(baslamaSaati.hour()).minute(baslamaSaati.minute());
+      const endDateTime = dayjs(bitisTarihi).hour(bitisSaati.hour()).minute(bitisSaati.minute());
+
+      // İki tarih/saat arasındaki farkı milisaniye cinsinden hesapla
+      const diff = endDateTime.diff(startDateTime);
+
+      // Farkı saat ve dakikaya dönüştür
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+      // Hesaplanan saat ve dakikaları form alanlarına yaz
+      setValue("calismaSaat", hours);
+      setValue("calismaDakika", minutes);
+    }
+  }, [watchFields, setValue, getValues]);
+
+  //! Başlama Tarihi ve saati ile Bitiş Tarihi ve saati arasındaki farkı hesaplama sonu
 
   return (
     <div style={buttonStyle}>
