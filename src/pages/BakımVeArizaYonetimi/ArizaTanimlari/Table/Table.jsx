@@ -349,6 +349,8 @@ export default function MainTable() {
             showSizeChanger: true,
             pageSizeOptions: ["10", "20", "50", "100"],
             position: ["bottomRight"],
+            showTotal: (total, range) => `Toplam ${total}`,
+            showQuickJumper: true,
           }}
           onRow={onRowClick}
           scroll={{ y: "calc(100vh - 380px)" }}
