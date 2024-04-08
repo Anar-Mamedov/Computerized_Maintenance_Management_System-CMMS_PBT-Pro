@@ -1,4 +1,4 @@
-import { Spin, Table } from "antd";
+import { Spin, Table, Input } from "antd";
 import React, { useCallback, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../../../api/http";
@@ -10,11 +10,13 @@ export default function MainTabs({ onSelectedRow }) {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [filteredData, setFilteredData] = useState([]); // Filtrelenmiş veri için yeni state
+  const [searchTerm, setSearchTerm] = useState(""); // Arama terimi için state
 
   // Örnek kolonlar ve başlangıçta hepsinin görünür olacağı varsayılıyor
   const columns = [
     {
-      title: "İş Emri Tipi",
+      title: "",
       dataIndex: "IMT_TANIM",
       key: "IMT_TANIM",
       width: "150px",
@@ -44,6 +46,7 @@ export default function MainTabs({ onSelectedRow }) {
           // Diğer alanlarınız...
         }));
         setData(formattedData);
+        setFilteredData(formattedData); // filteredData'yı da aynı veriyle güncelle
         setLoading(false);
       } else {
         console.error("API response is not in expected format");
@@ -94,6 +97,43 @@ export default function MainTabs({ onSelectedRow }) {
     fetchEquipmentData();
   }, []); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
 
+  // Arama terimindeki değişiklikleri işleyen fonksiyon
+  // Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
+  const normalizeText = (text) => {
+    return text
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/ğ/g, "g")
+      .replace(/Ğ/g, "G")
+      .replace(/ü/g, "u")
+      .replace(/Ü/g, "U")
+      .replace(/ş/g, "s")
+      .replace(/Ş/g, "S")
+      .replace(/ı/g, "i")
+      .replace(/İ/g, "I")
+      .replace(/ö/g, "o")
+      .replace(/Ö/g, "O")
+      .replace(/ç/g, "c")
+      .replace(/Ç/g, "C");
+  };
+
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    if (value) {
+      const normalizedSearchTerm = normalizeText(value); // Arama terimini normalize et
+      const filtered = data.filter((item) =>
+        Object.keys(item).some(
+          (key) =>
+            item[key] && normalizeText(item[key].toString()).toLowerCase().includes(normalizedSearchTerm.toLowerCase())
+        )
+      );
+      setFilteredData(filtered);
+    } else {
+      setFilteredData(data);
+    }
+  };
+
   return (
     <div style={{ width: "200px", display: "flex", flexDirection: "column", alignItems: "center", gap: "15px" }}>
       <style>
@@ -103,11 +143,17 @@ export default function MainTabs({ onSelectedRow }) {
           }
         `}
       </style>
+      <Input
+        placeholder="Ara..."
+        value={searchTerm}
+        onChange={handleSearch}
+        style={{ marginBottom: "-48px", zIndex: "2" }} // Arama kutusunun altındaki boşluk
+      />
       <Spin spinning={loading}>
         <Table
           columns={columns}
           // rowSelection={rowSelection}
-          dataSource={data}
+          dataSource={filteredData}
           pagination={false}
           onRow={onRowClick}
           scroll={{ y: "500px" }}
