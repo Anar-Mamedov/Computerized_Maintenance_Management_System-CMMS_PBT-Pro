@@ -84,9 +84,13 @@ export default function MainTable() {
       key: "ISEMRI_NO",
       width: "150px",
       ellipsis: true,
-
       visible: true, // Varsayılan olarak açık
       render: (text) => <a>{text}</a>,
+      sorter: (a, b) => {
+        if (a.ISEMRI_NO === null) return -1;
+        if (b.ISEMRI_NO === null) return 1;
+        return a.ISEMRI_NO.localeCompare(b.ISEMRI_NO);
+      },
     },
     {
       title: "Tarih",
@@ -94,6 +98,11 @@ export default function MainTable() {
       key: "DUZENLEME_TARIH",
       width: "150px",
       ellipsis: true,
+      sorter: (a, b) => {
+        if (a.DUZENLEME_TARIH === null) return -1;
+        if (b.DUZENLEME_TARIH === null) return 1;
+        return a.DUZENLEME_TARIH.localeCompare(b.DUZENLEME_TARIH);
+      },
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -108,6 +117,11 @@ export default function MainTable() {
       key: "DUZENLEME_SAAT",
       width: "150px",
       ellipsis: true,
+      sorter: (a, b) => {
+        if (a.DUZENLEME_SAAT === null) return -1;
+        if (b.DUZENLEME_SAAT === null) return 1;
+        return a.DUZENLEME_SAAT.localeCompare(b.DUZENLEME_SAAT);
+      },
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -122,7 +136,11 @@ export default function MainTable() {
       key: "KONU",
       width: "250px",
       ellipsis: true,
-
+      sorter: (a, b) => {
+        if (a.KONU === null) return -1;
+        if (b.KONU === null) return 1;
+        return a.KONU.localeCompare(b.KONU);
+      },
       visible: true, // Varsayılan olarak açık
       render: (text) => <a>{text}</a>,
     },
@@ -132,6 +150,11 @@ export default function MainTable() {
       key: "ISEMRI_TIP",
       width: "200px",
       ellipsis: true,
+      sorter: (a, b) => {
+        if (a.ISEMRI_TIP === null) return -1;
+        if (b.ISEMRI_TIP === null) return 1;
+        return a.ISEMRI_TIP.localeCompare(b.ISEMRI_TIP);
+      },
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -168,6 +191,12 @@ export default function MainTable() {
         },
       }),
       visible: true, // Varsayılan olarak açık
+      sorter: (a, b) => {
+        if (a.DURUM === null && b.DURUM === null) return 0;
+        if (a.DURUM === null) return -1;
+        if (b.DURUM === null) return 1;
+        return a.DURUM.localeCompare(b.DURUM);
+      },
     },
     {
       title: "Lokasyon",
@@ -181,12 +210,24 @@ export default function MainTable() {
         },
       }),
       visible: true, // Varsayılan olarak açık
+      sorter: (a, b) => {
+        if (a.LOKASYON === null && b.LOKASYON === null) return 0;
+        if (a.LOKASYON === null) return 1;
+        if (b.LOKASYON === null) return -1;
+        return a.LOKASYON.localeCompare(b.LOKASYON);
+      },
     },
     {
       title: "Makine Kodu",
       dataIndex: "MAKINE_KODU",
       key: "MAKINE_KODU",
       width: "150px",
+      sorter: (a, b) => {
+        if (a.MAKINE_KODU === null && b.MAKINE_KODU === null) return 0;
+        if (a.MAKINE_KODU === null) return 1;
+        if (b.MAKINE_KODU === null) return -1;
+        return a.MAKINE_KODU.localeCompare(b.MAKINE_KODU);
+      },
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -200,6 +241,12 @@ export default function MainTable() {
       dataIndex: "MAKINE_TANIMI",
       key: "MAKINE_TANIMI",
       width: "250px",
+      sorter: (a, b) => {
+        if (a.MAKINE_TANIMI === null && b.MAKINE_TANIMI === null) return 0;
+        if (a.MAKINE_TANIMI === null) return -1;
+        if (b.MAKINE_TANIMI === null) return 1;
+        return a.MAKINE_TANIMI.localeCompare(b.MAKINE_TANIMI);
+      },
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -213,6 +260,12 @@ export default function MainTable() {
       dataIndex: "PLAN_BASLAMA_TARIH",
       key: "PLAN_BASLAMA_TARIH",
       width: "150px",
+      sorter: (a, b) => {
+        if (a.PLAN_BASLAMA_TARIH === null && b.PLAN_BASLAMA_TARIH === null) return 0;
+        if (a.PLAN_BASLAMA_TARIH === null) return 1;
+        if (b.PLAN_BASLAMA_TARIH === null) return -1;
+        return a.PLAN_BASLAMA_TARIH.localeCompare(b.PLAN_BASLAMA_TARIH);
+      },
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -228,6 +281,12 @@ export default function MainTable() {
       dataIndex: "PLAN_BASLAMA_SAAT",
       key: "PLAN_BASLAMA_SAAT",
       width: "150px",
+      sorter: (a, b) => {
+        if (a.PLAN_BASLAMA_SAAT === null && b.PLAN_BASLAMA_SAAT === null) return 0;
+        if (a.PLAN_BASLAMA_SAAT === null) return 1;
+        if (b.PLAN_BASLAMA_SAAT === null) return -1;
+        return a.PLAN_BASLAMA_SAAT.localeCompare(b.PLAN_BASLAMA_SAAT);
+      },
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {

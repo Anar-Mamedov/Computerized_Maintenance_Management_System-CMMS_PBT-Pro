@@ -111,7 +111,12 @@ export default function useColumns(props) {
       title: "Makine Kodu",
       dataIndex: "MKN_KOD",
       key: "MKN_KOD",
-      sorter: (a, b) => a.MKN_KOD.length - b.MKN_KOD.length,
+      sorter: (a, b) => {
+        if (a.MKN_KOD === null && b.MKN_KOD === null) return 0;
+        if (a.MKN_KOD === null) return -1;
+        if (b.MKN_KOD === null) return 1;
+        return a.MKN_KOD.localeCompare(b.MKN_KOD);
+      },
       width: 150,
       description: "Makine Kodu",
       ellipsis: true,
@@ -129,7 +134,11 @@ export default function useColumns(props) {
       title: "Makine Tanımı",
       dataIndex: "MKN_TANIM",
       key: "MKN_TANIM",
-      sorter: (a, b) => a.MKN_TANIM.length - b.MKN_TANIM.length,
+      sorter: (a, b) => {
+        if (a.MKN_TANIM === null) return 1;
+        if (b.MKN_TANIM === null) return -1;
+        return a.MKN_TANIM.localeCompare(b.MKN_TANIM);
+      },
       width: 300,
       description: "Makine Tanımı",
       ellipsis: true,
@@ -149,6 +158,11 @@ export default function useColumns(props) {
       dataIndex: "MKN_AKTIF",
       key: "MKN_AKTIF",
       width: 100,
+      sorter: (a, b) => {
+        if (a.MKN_AKTIF === null) return -1;
+        if (b.MKN_AKTIF === null) return 1;
+        return a.MKN_AKTIF === b.MKN_AKTIF ? 0 : a.MKN_AKTIF ? -1 : 1;
+      },
       description: "Aktif",
       ellipsis: true,
       onCell: () => ({
@@ -158,7 +172,6 @@ export default function useColumns(props) {
       }), // Enable ellipsis for overflowed content
       modalTitle: "Aktif",
       render: (status) => <input type="checkbox" checked={status} disabled />,
-      sorter: (a, b) => (a.MKN_AKTIF === b.MKN_AKTIF ? 0 : a.MKN_AKTIF ? -1 : 1),
     },
     {
       title: "Makine Durumu",
@@ -170,13 +183,9 @@ export default function useColumns(props) {
 
       modalTitle: "Makine Durumu",
       sorter: (a, b) => {
-        if (a.MKN_DURUM && b.MKN_DURUM) {
-          return a.MKN_DURUM.localeCompare(b.MKN_DURUM);
-        }
-        if (!a.MKN_DURUM && !b.MKN_DURUM) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_DURUM ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        if (a.MKN_DURUM === null) return -1;
+        if (b.MKN_DURUM === null) return 1;
+        return a.MKN_DURUM.localeCompare(b.MKN_DURUM);
       },
       // satır yüksekliğini ayarlamak için kullanılır
       onCell: () => ({
@@ -199,13 +208,10 @@ export default function useColumns(props) {
 
       width: 100,
       sorter: (a, b) => {
-        if (a.MKN_ARAC_TIP && b.MKN_ARAC_TIP) {
-          return a.MKN_ARAC_TIP.localeCompare(b.MKN_ARAC_TIP);
-        }
-        if (!a.MKN_ARAC_TIP && !b.MKN_ARAC_TIP) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_ARAC_TIP ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        if (a.MKN_ARAC_TIP === null && b.MKN_ARAC_TIP === null) return 0;
+        if (a.MKN_ARAC_TIP === null) return 1;
+        if (b.MKN_ARAC_TIP === null) return -1;
+        return a.MKN_ARAC_TIP.localeCompare(b.MKN_ARAC_TIP);
       },
       // satır yüksekliğini ayarlamak için kullanılır
       onCell: () => ({
@@ -228,13 +234,10 @@ export default function useColumns(props) {
 
       width: 100,
       sorter: (a, b) => {
-        if (a.MKN_LOKASYON && b.MKN_LOKASYON) {
-          return a.MKN_LOKASYON.localeCompare(b.MKN_LOKASYON);
-        }
-        if (!a.MKN_LOKASYON && !b.MKN_LOKASYON) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_LOKASYON ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        if (a.MKN_LOKASYON === null && b.MKN_LOKASYON === null) return 0;
+        if (a.MKN_LOKASYON === null) return -1;
+        if (b.MKN_LOKASYON === null) return 1;
+        return a.MKN_LOKASYON.localeCompare(b.MKN_LOKASYON);
       },
       // satır yüksekliğini ayarlamak için kullanılır
       onCell: () => ({
@@ -257,13 +260,10 @@ export default function useColumns(props) {
 
       width: 100,
       sorter: (a, b) => {
-        if (a.MKN_TIP && b.MKN_TIP) {
-          return a.MKN_TIP.localeCompare(b.MKN_TIP);
-        }
-        if (!a.MKN_TIP && !b.MKN_TIP) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_TIP ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        if (a.MKN_TIP === null && b.MKN_TIP === null) return 0;
+        if (a.MKN_TIP === null) return -1;
+        if (b.MKN_TIP === null) return 1;
+        return a.MKN_TIP.localeCompare(b.MKN_TIP);
       },
       // satır yüksekliğini ayarlamak için kullanılır
       onCell: () => ({
@@ -283,16 +283,17 @@ export default function useColumns(props) {
       description: "Kategori",
       modalTitle: "Kategori",
       ellipsis: true,
-
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       width: 100,
       sorter: (a, b) => {
-        if (a.MKN_KATEGORI && b.MKN_KATEGORI) {
-          return a.MKN_KATEGORI.localeCompare(b.MKN_KATEGORI);
-        }
-        if (!a.MKN_KATEGORI && !b.MKN_KATEGORI) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_KATEGORI ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        if (a.MKN_KATEGORI === null && b.MKN_KATEGORI === null) return 0;
+        if (a.MKN_KATEGORI === null) return -1;
+        if (b.MKN_KATEGORI === null) return 1;
+        return a.MKN_KATEGORI.localeCompare(b.MKN_KATEGORI);
       },
     },
     {
@@ -309,13 +310,10 @@ export default function useColumns(props) {
       }), // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
-        if (a.MKN_MARKA && b.MKN_MARKA) {
-          return a.MKN_MARKA.localeCompare(b.MKN_MARKA);
-        }
-        if (!a.MKN_MARKA && !b.MKN_MARKA) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_MARKA ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        if (a.MKN_MARKA === null && b.MKN_MARKA === null) return 0;
+        if (a.MKN_MARKA === null) return -1;
+        if (b.MKN_MARKA === null) return 1;
+        return a.MKN_MARKA.localeCompare(b.MKN_MARKA);
       },
     },
     {
@@ -332,13 +330,10 @@ export default function useColumns(props) {
       }), // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
-        if (a.MKN_MODEL && b.MKN_MODEL) {
-          return a.MKN_MODEL.localeCompare(b.MKN_MODEL);
-        }
-        if (!a.MKN_MODEL && !b.MKN_MODEL) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_MODEL ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        if (a.MKN_MODEL === null && b.MKN_MODEL === null) return 0;
+        if (a.MKN_MODEL === null) return 1;
+        if (b.MKN_MODEL === null) return -1;
+        return a.MKN_MODEL.localeCompare(b.MKN_MODEL);
       },
     },
     {
@@ -355,13 +350,10 @@ export default function useColumns(props) {
       }), // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
-        if (a.MKN_MASTER_MAKINE_TANIM && b.MKN_MASTER_MAKINE_TANIM) {
-          return a.MKN_MASTER_MAKINE_TANIM.localeCompare(b.MKN_MASTER_MAKINE_TANIM);
-        }
-        if (!a.MKN_MASTER_MAKINE_TANIM && !b.MKN_MASTER_MAKINE_TANIM) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_MASTER_MAKINE_TANIM ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        if (a.MKN_MASTER_MAKINE_TANIM === null && b.MKN_MASTER_MAKINE_TANIM === null) return 0;
+        if (a.MKN_MASTER_MAKINE_TANIM === null) return 1;
+        if (b.MKN_MASTER_MAKINE_TANIM === null) return -1;
+        return a.MKN_MASTER_MAKINE_TANIM.localeCompare(b.MKN_MASTER_MAKINE_TANIM);
       },
     },
     {
@@ -378,13 +370,10 @@ export default function useColumns(props) {
       }), // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
-        if (a.MKN_MASTER_MAKINE_KOD && b.MKN_MASTER_MAKINE_KOD) {
-          return a.MKN_MASTER_MAKINE_KOD.localeCompare(b.MKN_MASTER_MAKINE_KOD);
-        }
-        if (!a.MKN_MASTER_MAKINE_KOD && !b.MKN_MASTER_MAKINE_KOD) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_MASTER_MAKINE_KOD ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        if (a.MKN_MASTER_MAKINE_KOD === null && b.MKN_MASTER_MAKINE_KOD === null) return 0;
+        if (a.MKN_MASTER_MAKINE_KOD === null) return 1;
+        if (b.MKN_MASTER_MAKINE_KOD === null) return -1;
+        return a.MKN_MASTER_MAKINE_KOD.localeCompare(b.MKN_MASTER_MAKINE_KOD);
       },
     },
     {
@@ -401,13 +390,10 @@ export default function useColumns(props) {
       }), // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
-        if (a.MKN_TAKVIM && b.MKN_TAKVIM) {
-          return a.MKN_TAKVIM.localeCompare(b.MKN_TAKVIM);
-        }
-        if (!a.MKN_TAKVIM && !b.MKN_TAKVIM) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_TAKVIM ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        if (a.MKN_TAKVIM === null && b.MKN_TAKVIM === null) return 0;
+        if (a.MKN_TAKVIM === null) return 1;
+        if (b.MKN_TAKVIM === null) return -1;
+        return a.MKN_TAKVIM.localeCompare(b.MKN_TAKVIM);
       },
     },
     {
@@ -425,13 +411,10 @@ export default function useColumns(props) {
       }), // Enable ellipsis for overflowed content
       width: 100,
       sorter: (a, b) => {
-        if (a.MKN_URETIM_YILI && b.MKN_URETIM_YILI) {
-          return a.MKN_URETIM_YILI.localeCompare(b.MKN_URETIM_YILI);
-        }
-        if (!a.MKN_URETIM_YILI && !b.MKN_URETIM_YILI) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_URETIM_YILI ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        if (a.MKN_URETIM_YILI === null && b.MKN_URETIM_YILI === null) return 0;
+        if (a.MKN_URETIM_YILI === null) return 1;
+        if (b.MKN_URETIM_YILI === null) return -1;
+        return a.MKN_URETIM_YILI.localeCompare(b.MKN_URETIM_YILI);
       },
     },
     {
