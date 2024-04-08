@@ -197,7 +197,23 @@ export default function MainTable() {
         if (b.DURUM === null) return 1;
         return a.DURUM.localeCompare(b.DURUM);
       },
+      render: (text, record) => {
+        const circleStyle = {
+          backgroundColor: record.KAPALI ? "red" : "green", // KAPALI true ise kırmızı, değilse yeşil
+          borderRadius: "50%",
+          display: "inline-block",
+          width: "10px",
+          height: "10px",
+        };
+        return (
+          <div>
+            <span style={circleStyle}></span>
+            <span style={{ marginLeft: "5px" }}>{text}</span>
+          </div>
+        );
+      },
     },
+
     {
       title: "Lokasyon",
       dataIndex: "LOKASYON",
