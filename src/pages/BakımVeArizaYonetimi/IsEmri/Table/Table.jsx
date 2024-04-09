@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag } from "antd";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress } from "antd";
 import { useFormContext } from "react-hook-form";
 import { SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../api/http";
@@ -426,7 +426,7 @@ export default function MainTable() {
         },
       }),
       visible: false, // Varsayılan olarak kapalı
-      render: (text) => `${text}%`,
+      render: (text) => <Progress percent={text} steps={5} />,
     },
     {
       title: "Garanti",
