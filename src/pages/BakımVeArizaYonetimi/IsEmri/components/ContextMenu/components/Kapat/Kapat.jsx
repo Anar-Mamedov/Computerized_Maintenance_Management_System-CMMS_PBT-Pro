@@ -63,6 +63,9 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
     }
   }, [selectedRows, setValue, isModalOpen]);
 
+  // Calculate modal title based on selectedRows
+  const modalTitle = `İş Emri Kapatma - (${selectedRows.map((row) => row.ISEMRI_NO).join(", ")})`;
+
   // Sil düğmesini gizlemek için koşullu stil
   const buttonStyle = kapatDisabled ? { display: "none" } : {};
 
@@ -226,10 +229,10 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
           Kapat
         </Button>
         <Modal
-          title="İş Emri Kapatma"
+          title={modalTitle}
           centered
           destroyOnClose
-          width={1200}
+          width={990}
           open={isModalOpen}
           onOk={methods.handleSubmit(onSubmited)}
           onCancel={handleModalToggle}>

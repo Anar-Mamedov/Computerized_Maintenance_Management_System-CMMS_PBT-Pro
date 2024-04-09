@@ -655,8 +655,8 @@ export default function MainTable() {
           setEditDrawer1Visible(true); // EditDrawer1'i aç
         },
       }),
-      visible: false, // Varsayılan olarak kapalı
       render: (text) => <a>{text}</a>,
+      visible: false, // Varsayılan olarak kapalı
     },
     {
       title: "İş Talep Eden",

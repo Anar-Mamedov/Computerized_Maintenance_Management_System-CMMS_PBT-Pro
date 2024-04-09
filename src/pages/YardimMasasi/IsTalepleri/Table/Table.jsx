@@ -9,6 +9,7 @@ import Filters from "./filter/Filters";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import TeknisyenSubmit from "../components/IsEmrineCevir/Teknisyen/TeknisyenSubmit";
 import AtolyeSubmit from "../components/IsEmrineCevir/Atolye/AtolyeSubmit";
+import EditDrawer1 from "../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer";
 
 export default function MainTable() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -20,6 +21,9 @@ export default function MainTable() {
   const [searchTimeout, setSearchTimeout] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0); // Toplam sayfa sayısı için state
+
+  const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
+  const [editDrawer1Data, setEditDrawer1Data] = useState(null);
 
   const [selectedRows, setSelectedRows] = useState([]);
 
@@ -395,11 +399,20 @@ export default function MainTable() {
       key: "IST_ISEMRI_NO",
       width: "150px",
       ellipsis: true,
-      onCell: () => ({
+      onCell: (record) => ({
         onClick: (event) => {
           event.stopPropagation();
+
+          // Burada, record objesini doğrudan kullanmak yerine,
+          // bir kopyasını oluşturup `key` değerini `ISM_DURUM_KOD_ID` ile güncelliyoruz.
+          const updatedRecord = { ...record, key: record.IST_ISEMRI_ID };
+          // const updatedRecord = { ...record, key: 378 };
+
+          setEditDrawer1Data(updatedRecord); // Güncellenmiş record'u EditDrawer1 için data olarak ayarla
+          setEditDrawer1Visible(true); // EditDrawer1'i aç
         },
       }),
+      render: (text) => <a>{text}</a>,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -999,6 +1012,17 @@ export default function MainTable() {
         drawerVisible={drawer.visible}
         onRefresh={refreshTableData}
       />
+
+      {editDrawer1Visible && (
+        <EditDrawer1
+          selectedRow={editDrawer1Data}
+          onDrawerClose={() => setEditDrawer1Visible(false)}
+          drawerVisible={editDrawer1Visible}
+          onRefresh={() => {
+            /* Veri yenileme işlemi */
+          }}
+        />
+      )}
     </div>
   );
 }

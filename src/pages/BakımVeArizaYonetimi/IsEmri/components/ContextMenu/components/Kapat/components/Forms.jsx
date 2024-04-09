@@ -325,7 +325,7 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
             </div>
           </StyledDivBottomLine>
         </div>
-        <div style={{ width: "100%", maxWidth: "490px" }}>
+        <div style={{ width: "100%", maxWidth: "440px" }}>
           <div
             style={{
               display: "flex",
