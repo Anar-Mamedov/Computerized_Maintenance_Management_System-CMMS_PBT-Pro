@@ -82,6 +82,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
   const prosedurID = watch("prosedurID");
   const secilenIsEmriID = watch("secilenIsEmriID");
 
+  // Watch the 'kapali' field from the form
+  const kapali = watch("kapali"); // Assuming 'kapali' is the name of the field in your form
+
   const handleProsedurMinusClick = async () => {
     try {
       // API isteğini yap
@@ -292,7 +295,10 @@ export default function DetayBilgiler({ fieldRequirements }) {
                           setValue("prosedurNedeniID", selectedData.IST_NEDEN_KOD_ID);
                         }}
                       />
-                      <Button onClick={handleProsedurMinusClick}> - </Button>
+                      <Button disabled={kapali} onClick={handleProsedurMinusClick}>
+                        {" "}
+                        -{" "}
+                      </Button>
                       {errors.prosedur && (
                         <div style={{ color: "red", marginTop: "5px" }}>{errors.prosedur.message}</div>
                       )}

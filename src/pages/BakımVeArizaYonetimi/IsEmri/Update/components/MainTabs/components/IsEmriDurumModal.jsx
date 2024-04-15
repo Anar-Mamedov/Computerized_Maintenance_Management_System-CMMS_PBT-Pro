@@ -14,6 +14,9 @@ export default function IsEmriDurumModal({ workshopSelectedId, onSubmit, fieldRe
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // Watch the 'kapali' field from the form
+  const kapali = watch("kapali"); // Assuming 'kapali' is the name of the field in your form
+
   // message
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -148,7 +151,12 @@ export default function IsEmriDurumModal({ workshopSelectedId, onSubmit, fieldRe
   return (
     <div>
       {contextHolder}
-      <Button onClick={handleModalToggle}> + </Button>
+      <Button
+        disabled={kapali} // Disable the select based on the kapali field or external props
+        onClick={handleModalToggle}>
+        {" "}
+        +{" "}
+      </Button>
       <Modal width={500} centered title="Durum" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <div
           style={{

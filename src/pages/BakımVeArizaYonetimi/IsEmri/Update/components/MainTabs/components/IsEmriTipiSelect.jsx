@@ -25,6 +25,9 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [pendingValue, setPendingValue] = useState(null);
 
+  // Watch the 'kapali' field from the form
+  const kapali = watch("kapali"); // Assuming 'kapali' is the name of the field in your form
+
   // message
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -157,7 +160,7 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
               <Select
                 {...field}
                 status={error ? "error" : ""}
-                disabled={disabled}
+                disabled={kapali || fieldRequirements.disabled} // Disable the select based on the kapali field or external props
                 key={selectKey}
                 style={{ width: "265px" }}
                 showSearch

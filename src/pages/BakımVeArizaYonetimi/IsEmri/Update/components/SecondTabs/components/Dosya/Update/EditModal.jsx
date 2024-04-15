@@ -5,7 +5,7 @@ import { Controller, useForm, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
 import MainTabs from "./MainTabs/MainTabs";
 
-export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh, secilenIsEmriID }) {
+export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh, secilenIsEmriID, kapali }) {
   const methods = useForm({
     defaultValues: {
       secilenID: "",
@@ -128,7 +128,8 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
           title="Belge Bilgilerini Güncelle"
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
-          onCancel={onModalClose}>
+          onCancel={onModalClose}
+          okButtonProps={{ disabled: kapali }}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <MainTabs />
           </form>

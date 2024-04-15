@@ -87,6 +87,9 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
   const garantiBitis = watch("garantiBitis"); // garantiBitis alanını izle
   const [garantiDurumu, setGarantiDurumu] = useState(""); // Garanti durum metnini tutacak state
 
+  // Watch the 'kapali' field from the form
+  const kapali = watch("kapali"); // Assuming 'kapali' is the name of the field in your form
+
   useEffect(() => {
     // garantiBitis değeri kontrol ediliyor
     if (garantiBitis) {

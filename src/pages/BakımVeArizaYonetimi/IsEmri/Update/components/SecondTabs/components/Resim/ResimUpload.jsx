@@ -11,6 +11,9 @@ const ResimUpload = () => {
   const [refreshImages, setRefreshImages] = useState(false); // Resim listesini yenilemek için kullanılacak
   const secilenIsEmriID = watch("secilenIsEmriID");
 
+  // Watch the 'kapali' field from the form
+  const kapali = watch("kapali"); // Assuming 'kapali' is the name of the field in your form
+
   const fetchResimIds = async () => {
     try {
       setLoadingImages(true);
@@ -82,7 +85,9 @@ const ResimUpload = () => {
           />
         ))
       )}
-      <Upload.Dragger {...draggerProps}>
+      <Upload.Dragger
+        disabled={kapali} // Disable the upload component based on the value of 'kapali'
+        {...draggerProps}>
         <p className="ant-upload-drag-icon">
           <InboxOutlined />
         </p>
