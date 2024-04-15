@@ -648,8 +648,8 @@ export default function MainTable() {
 
           // Burada, record objesini doğrudan kullanmak yerine,
           // bir kopyasını oluşturup `key` değerini `ISM_DURUM_KOD_ID` ile güncelliyoruz.
-          // const updatedRecord = { ...record, key: record.ISM_LOKASYON_ID };
-          const updatedRecord = { ...record, key: 378 };
+          const updatedRecord = { ...record, key: record.ISM_IS_TALEP_ID };
+          // const updatedRecord = { ...record, key: 378 };
 
           setEditDrawer1Data(updatedRecord); // Güncellenmiş record'u EditDrawer1 için data olarak ayarla
           setEditDrawer1Visible(true); // EditDrawer1'i aç

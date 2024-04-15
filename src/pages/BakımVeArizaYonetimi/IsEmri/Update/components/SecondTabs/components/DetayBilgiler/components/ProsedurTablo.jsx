@@ -72,6 +72,9 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
 
   const prosedurTab = watch("prosedurTab");
 
+  // Watch the 'kapali' field from the form
+  const kapali = watch("kapali"); // Assuming 'kapali' is the name of the field in your form
+
   const columns1 = [
     {
       title: "Arıza Kodu",
@@ -293,7 +296,11 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
 
   return (
     <div>
-      <Button onClick={handleModalToggle}> + </Button>
+      <Button
+        disabled={kapali} // Assuming 'kapali' is the name of the field in your form
+        onClick={handleModalToggle}>
+        +
+      </Button>
       <Modal width={1200} centered title="" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <StyledTabs defaultActiveKey="1" items={visibleTabItems} />
       </Modal>

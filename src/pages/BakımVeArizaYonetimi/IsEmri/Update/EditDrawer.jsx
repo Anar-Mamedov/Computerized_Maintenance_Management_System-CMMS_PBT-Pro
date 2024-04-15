@@ -23,6 +23,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   const methods = useForm({
     defaultValues: {
+      kapali: false,
       isEmriNo: "",
       secilenIsEmriID: "",
       duzenlenmeTarihi: "",
@@ -283,6 +284,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           const item = data[0]; // Veri dizisinin ilk elemanını al
           // Form alanlarını set et
           setValue("secilenIsEmriID", item.TB_ISEMRI_ID);
+          setValue("kapali", item.KAPALI);
+          setDisabled(item.KAPALI);
           setValue("isEmriNo", item.ISEMRI_NO);
           setValue(
             "duzenlenmeTarihi",
@@ -337,13 +340,13 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("talepEden", item.IS_TALEP_EDEN);
           setValue(
             "isTalebiTarihi",
-            item.IS_TALEP_TARIH ? (dayjs(item.IS_TALEP_TARIH).isValid() ? dayjs(item.IS_TALEP_TARIH) : null) : null
+            item.ISM_IS_TARIH ? (dayjs(item.ISM_IS_TARIH).isValid() ? dayjs(item.ISM_IS_TARIH) : null) : null
           );
           setValue(
             "isTalebiSaati",
-            item.TALEP_SAAT
-              ? dayjs(item.TALEP_SAAT, "HH:mm:ss").isValid()
-                ? dayjs(item.TALEP_SAAT, "HH:mm:ss")
+            item.ISM_IS_SAAT
+              ? dayjs(item.ISM_IS_SAAT, "HH:mm:ss").isValid()
+                ? dayjs(item.ISM_IS_SAAT, "HH:mm:ss")
                 : null
               : null
           );
@@ -505,7 +508,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     };
 
     handleDataFetchAndUpdate();
-  }, [drawerVisible, selectedRow, setValue, onRefresh, methods.reset]);
+  }, [drawerVisible, selectedRow, setValue, onRefresh, methods.reset, AxiosInstance, setDisabled]);
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
@@ -664,7 +667,11 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
                 disabled={disabled}
                 type="submit"
                 onClick={methods.handleSubmit(onSubmit)}
-                style={{ backgroundColor: "#2bc770", borderColor: "#2bc770", color: "#ffffff" }}>
+                style={{
+                  backgroundColor: disabled ? "#d9d9d9" : "#2bc770",
+                  borderColor: disabled ? "#d9d9d9" : "#2bc770",
+                  color: disabled ? "black" : "#ffffff",
+                }}>
                 Güncelle
               </Button>
             </Space>
