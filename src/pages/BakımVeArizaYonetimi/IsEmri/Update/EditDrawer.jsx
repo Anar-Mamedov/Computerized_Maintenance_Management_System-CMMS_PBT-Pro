@@ -333,11 +333,11 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("takvimID", item.ISM_TAKVIM_ID);
           setValue("talimatTanim", item.TALIMAT);
           setValue("talimatID", item.ISM_TALIMAT_ID);
-          setValue("isTalebiKodu", item.TB_IS_TALEP_ID);
-          setValue("talepEden", item.TALEP_EDEN);
+          setValue("isTalebiKodu", item.IS_TALEP_NO);
+          setValue("talepEden", item.IS_TALEP_EDEN);
           setValue(
             "isTalebiTarihi",
-            item.TALEP_TARIH ? (dayjs(item.TALEP_TARIH).isValid() ? dayjs(item.TALEP_TARIH) : null) : null
+            item.IS_TALEP_TARIH ? (dayjs(item.IS_TALEP_TARIH).isValid() ? dayjs(item.IS_TALEP_TARIH) : null) : null
           );
           setValue(
             "isTalebiSaati",
