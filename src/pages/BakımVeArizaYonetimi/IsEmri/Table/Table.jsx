@@ -23,6 +23,8 @@ export default function MainTable() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0); // Toplam sayfa sayısı için state
   const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
+  const [totalDataCount, setTotalDataCount] = useState(0); // Tüm veriyi tutan state
+  const [pageSize, setPageSize] = useState(10); // Başlangıçta sayfa başına 10 kayıt göster
 
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
@@ -1118,8 +1120,8 @@ export default function MainTable() {
   // ana tablo api isteği için kullanılan useEffect
 
   useEffect(() => {
-    fetchEquipmentData(body, currentPage);
-  }, [body, currentPage]);
+    fetchEquipmentData(body, currentPage, pageSize);
+  }, [body, currentPage, pageSize]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
@@ -1144,7 +1146,7 @@ export default function MainTable() {
 
   // arama işlemi için kullanılan useEffect son
 
-  const fetchEquipmentData = async (body, page) => {
+  const fetchEquipmentData = async (body, page, size) => {
     // body'nin undefined olması durumunda varsayılan değerler atanıyor
     const { keyword = "", filters = {} } = body || {};
     // page'in undefined olması durumunda varsayılan değer olarak 1 atanıyor
@@ -1154,12 +1156,14 @@ export default function MainTable() {
       setLoading(true);
       // API isteğinde keyword ve currentPage kullanılıyor
       const response = await AxiosInstance.post(
-        `getIsEmriFullList?parametre=${keyword}&pagingDeger=${currentPage}`,
+        `getIsEmriFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}`,
         filters
       );
       if (response) {
         // Toplam sayfa sayısını ayarla
         setTotalPages(response.page);
+        setTotalDataCount(response.kayit_sayisi);
+
         // Gelen veriyi formatla ve state'e ata
         const formattedData = response.list.map((item) => ({
           ...item,
@@ -1189,8 +1193,11 @@ export default function MainTable() {
   // filtreleme işlemi için kullanılan useEffect son
 
   // sayfalama için kullanılan useEffect
-  const handleTableChange = (pagination) => {
-    setCurrentPage(pagination.current);
+  const handleTableChange = (pagination, filters, sorter, extra) => {
+    if (pagination) {
+      setCurrentPage(pagination.current);
+      setPageSize(pagination.pageSize); // pageSize güncellemesi
+    }
   };
   // sayfalama için kullanılan useEffect son
 
@@ -1339,11 +1346,14 @@ export default function MainTable() {
           dataSource={data}
           pagination={{
             current: currentPage,
-            total: totalPages * 50, // Toplam kayıt sayısı (sayfa başına kayıt sayısı ile çarpılır)
-            pageSize: 50,
-            showSizeChanger: false,
+            total: totalDataCount, // Toplam kayıt sayısı (sayfa başına kayıt sayısı ile çarpılır)
+            pageSize: pageSize,
+            defaultPageSize: 10,
+            showSizeChanger: true,
+            pageSizeOptions: ["10", "20", "50", "100"],
+            position: ["bottomRight"],
             onChange: handleTableChange,
-            showTotal: (total, range) => `Toplam ${total}`,
+            showTotal: (total, range) => `Toplam ${total}`, // Burada 'total' parametresi doğru kayıt sayısını yansıtacaktır
             showQuickJumper: true,
           }}
           onRow={onRowClick}
