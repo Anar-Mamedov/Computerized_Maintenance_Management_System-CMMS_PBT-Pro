@@ -185,35 +185,35 @@ export default function CustomFilter({ onSubmit }) {
                   filterOption={(input, option) => (option?.label || "").toLowerCase().includes(input.toLowerCase())}
                   options={[
                     {
-                      value: "MKN_KOD",
+                      value: "mkn.MKN_KOD",
                       label: "Makine Kodu",
                     },
                     {
-                      value: "MKN_TANIM",
+                      value: "mkn.MKN_TANIM",
                       label: "Makine Tanımı",
                     },
                     {
-                      value: "MKN_LOKASYON",
+                      value: "lok.LOK_TANIM",
                       label: "Lokasyon",
                     },
                     {
-                      value: "MKN_TIP",
+                      value: "tip_kod.KOD_TANIM",
                       label: "Makine Tipi",
                     },
                     {
-                      value: "MKN_KATEGORI",
+                      value: "kategori_kod.KOD_TANIM",
                       label: "Kategori",
                     },
                     {
-                      value: "MKN_MARKA",
+                      value: "mrk.MKN_MARKA",
                       label: "Marka",
                     },
                     {
-                      value: "MKN_MODEL",
+                      value: "mdl.MKN_MODEL",
                       label: "Model",
                     },
                     {
-                      value: "MKN_SERI_NO",
+                      value: "mkn.MKN_SERI_NO",
                       label: "Seri No",
                     },
                   ]}
