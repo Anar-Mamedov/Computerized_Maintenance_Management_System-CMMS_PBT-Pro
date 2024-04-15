@@ -101,6 +101,7 @@ export default function MainTable() {
       key: "code",
       width: "150px",
       ellipsis: true,
+      render: (text) => <a>{text}</a>,
     },
     {
       title: "Personel Adı",
@@ -108,6 +109,11 @@ export default function MainTable() {
       key: "subject",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "Ünvan",
@@ -115,6 +121,11 @@ export default function MainTable() {
       key: "workdays",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "Personel Tipi",
@@ -122,6 +133,11 @@ export default function MainTable() {
       key: "description",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
 
     {
@@ -130,6 +146,11 @@ export default function MainTable() {
       key: "fifthcolumn",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "Lokasyon",
@@ -137,6 +158,11 @@ export default function MainTable() {
       key: "sixthcolumn",
       width: "150px",
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
   ];
 

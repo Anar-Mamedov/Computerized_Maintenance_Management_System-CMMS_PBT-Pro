@@ -153,6 +153,7 @@ export default function MainTable() {
       key: "IST_KOD",
       width: 150,
       ellipsis: true,
+      render: (text) => <a>{text}</a>,
     },
     {
       title: "Bakım Tanım",
@@ -160,6 +161,11 @@ export default function MainTable() {
       key: "IST_TANIM",
       width: 200,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "Aktif",
@@ -167,6 +173,11 @@ export default function MainTable() {
       key: "IST_AKTIF",
       width: 100,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       align: "center",
       render: (text) => (
         <div style={{ textAlign: "center" }}>
@@ -181,6 +192,11 @@ export default function MainTable() {
       key: "IST_TIP",
       width: 250,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "Bakım Grup",
@@ -188,6 +204,11 @@ export default function MainTable() {
       key: "IST_GRUP",
       width: 200,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "Atölye",
@@ -195,6 +216,11 @@ export default function MainTable() {
       key: "IST_ATOLYE",
       width: 200,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "Lokasyon",
@@ -202,6 +228,11 @@ export default function MainTable() {
       key: "IST_LOKASYON",
       width: 200,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
     },
     {
@@ -210,6 +241,11 @@ export default function MainTable() {
       key: "IST_ONCELIK",
       width: 150,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "Talimat",
@@ -217,6 +253,11 @@ export default function MainTable() {
       key: "IST_TALIMAT",
       width: 150,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "İş Süresi (dk.)",
@@ -224,6 +265,11 @@ export default function MainTable() {
       key: "IST_CALISMA_SURE",
       width: 150,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
     },
     {
@@ -232,6 +278,11 @@ export default function MainTable() {
       key: "IST_DURUS_SURE",
       width: 170,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
     },
     {
@@ -240,6 +291,11 @@ export default function MainTable() {
       key: "IST_PERSONEL_SAYI",
       width: 170,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
     },
     {
@@ -248,6 +304,11 @@ export default function MainTable() {
       key: "IST_OZEL_ALAN_1",
       width: 150,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "Özel Alan 2",
@@ -255,6 +316,11 @@ export default function MainTable() {
       key: "IST_OZEL_ALAN_2",
       width: 150,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "Özel Alan 3",
@@ -262,6 +328,11 @@ export default function MainTable() {
       key: "IST_OZEL_ALAN_3",
       width: 150,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "Özel Alan 4",
@@ -269,6 +340,11 @@ export default function MainTable() {
       key: "IST_OZEL_ALAN_4",
       width: 150,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "Özel Alan 5",
@@ -276,6 +352,11 @@ export default function MainTable() {
       key: "IST_OZEL_ALAN_5",
       width: 150,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "Özel Alan 6",
@@ -283,6 +364,11 @@ export default function MainTable() {
       key: "IST_OZEL_ALAN_6",
       width: 150,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "Özel Alan 7",
@@ -290,6 +376,11 @@ export default function MainTable() {
       key: "IST_OZEL_ALAN_7",
       width: 150,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "Özel Alan 8",
@@ -297,6 +388,11 @@ export default function MainTable() {
       key: "IST_OZEL_ALAN_8",
       width: 150,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "Özel Alan 9",
@@ -304,6 +400,11 @@ export default function MainTable() {
       key: "IST_OZEL_ALAN_9",
       width: 150,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "Özel Alan 10",
@@ -311,6 +412,11 @@ export default function MainTable() {
       key: "IST_OZEL_ALAN_10",
       width: 150,
       ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     // Other columns...
   ];
