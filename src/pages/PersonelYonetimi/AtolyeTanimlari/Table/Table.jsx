@@ -108,32 +108,58 @@ export default function MainTable() {
       title: "Atölye Kodu",
       dataIndex: "ATL_KOD",
       key: "ATL_KOD",
+      render: (text) => <a>{text}</a>,
     },
     {
       title: "Atölye Tanımı",
       dataIndex: "ATL_TANIM",
       key: "ATL_TANIM",
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "Atölye Grup Tanımı",
       dataIndex: "ATL_GRUP_TANIM",
       key: "ATL_GRUP_TANIM",
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "Yetkili",
       dataIndex: "ATL_YETKILI",
       key: "ATL_YETKILI",
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
     {
       title: "Telefon",
       dataIndex: "ATL_TEL",
       key: "ATL_TEL",
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
 
     {
       title: "Açıklama",
       dataIndex: "ATL_ACIKLAMA",
       key: "ATL_ACIKLAMA",
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
     },
   ];
 
