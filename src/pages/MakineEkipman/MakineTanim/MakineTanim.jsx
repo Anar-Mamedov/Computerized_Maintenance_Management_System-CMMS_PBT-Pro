@@ -1,10 +1,14 @@
 import React from "react";
-import Table from "./Table/Table";
+import MainTable from "./Table/Table";
+import { FormProvider, useForm } from "react-hook-form";
 
-export default function MakineTanim() {
+export default function PersonelTanimlari() {
+  const formMethods = useForm();
   return (
-    <div>
-      <Table />
-    </div>
+    <FormProvider {...formMethods}>
+      <div>
+        <MainTable />
+      </div>
+    </FormProvider>
   );
 }
