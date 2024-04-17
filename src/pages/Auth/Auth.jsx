@@ -1,18 +1,33 @@
-// Fotoğrafı içe aktarın
-import React from "react";
-import { Button, Form, Input, Space, Typography } from "antd";
+import React, { useState, useEffect } from "react";
+import { Button, Input, Form } from "antd";
 import { UserAddOutlined } from "@ant-design/icons";
 import backgroundImage from "../../assets/images/login.jpg";
 import LoginForm from "./components/LoginForm";
 import logo from "../../assets/images/logo.svg";
 import RegistrationForm from "./components/RegistrationForm";
 
-const { Text, Link } = Typography;
-
 export default function Auth() {
-  const [target, setTarget] = React.useState("login"); // login veya register
+  const [target, setTarget] = useState("login");
+  const [baseURL, setBaseURL] = useState("");
 
-  // JavaScript objesi olarak stil tanımlaması
+  // Sayfa yüklendiğinde localStorage kontrolü yapılıyor
+  useEffect(() => {
+    const storedBaseURL = localStorage.getItem("baseURL");
+    if (storedBaseURL) {
+      setBaseURL(storedBaseURL);
+      setTarget("login"); // Eğer baseURL kayıtlıysa, direkt login ekranı
+    } else {
+      setTarget("initial"); // Eğer kayıtlı değilse, baseURL kaydetme ekranı
+    }
+  }, []);
+
+  const saveBaseURL = () => {
+    localStorage.setItem("baseURL", baseURL);
+    window.location.reload();
+    // setTarget("login");
+    // baseURL kaydedildikten sonra login ekranına geçiş
+  };
+
   const backgroundStyle = {
     backgroundImage: `url(${backgroundImage})`,
     backgroundSize: "cover",
@@ -26,66 +41,37 @@ export default function Auth() {
     zIndex: -1,
   };
 
-  // Beyaz alan için stil tanımlaması
-  const whiteAreaStyle = {
-    backgroundColor: "white",
-    height: "100vh",
-    width: "100vw", // Genişlik ve yükseklik 100vw ve 100vh olacak
-    maxWidth: "800px",
-    position: "fixed", // Sabit pozisyon, içerik kaydırılsa bile sol tarafta sabit kalır
-    left: 0,
-    top: 0,
-    zIndex: 1, // İçerikle çakışmaması için arka plandan öne alır
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
+  const formStyle = {
+    position: "fixed",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "300px",
+    zIndex: 1000,
   };
 
-  const logoStyle = {
-    width: "200px", // Genişliği sabit tutun
-    marginBottom: "50px", // Aşağıda 20 piksellik boşluk bırakın
-  };
-
-  const toggleTarget = () => {
-    setTarget(target === "login" ? "register" : "login");
+  // Formun gösterilmesini yönetir
+  const renderForm = () => {
+    if (target === "initial") {
+      return (
+        <Form style={formStyle}>
+          <Input placeholder="Base URL girin" value={baseURL} onChange={(e) => setBaseURL(e.target.value)} />
+          <Button type="primary" onClick={saveBaseURL} style={{ marginTop: 20 }}>
+            Kaydet
+          </Button>
+        </Form>
+      );
+    } else if (target === "login") {
+      return <LoginForm />;
+    } else if (target === "register") {
+      return <RegistrationForm />;
+    }
   };
 
   return (
     <div>
       <div style={backgroundStyle}></div>
-      {/* Beyaz alanı ekleyin */}
-
-      <div style={whiteAreaStyle}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            width: "400px",
-            height: "700px",
-            flexDirection: "column",
-            alignItems: "center",
-          }}>
-          <img src={logo} alt="Logo" style={logoStyle} />
-          {target === "login" ? <LoginForm /> : <RegistrationForm />}
-          <Text type="secondary" style={{ fontSize: "14px", marginBottom: "20px" }}>
-            ve ya
-          </Text>
-          <Button
-            style={{
-              zIndex: "10",
-              width: "100%",
-              backgroundColor: "rgb(43, 199, 112)",
-              borderColor: "rgb(43, 199, 112)",
-              color: "white",
-            }}
-            onClick={toggleTarget}>
-            {target === "login" ? <UserAddOutlined /> : null}
-            {target === "login" ? "Kayıt Ol" : "Giriş Yap"}
-          </Button>
-        </div>
-      </div>
-
-      {/* İçerik, beyaz alanın üzerine veya dışına gelebilir */}
+      {renderForm()}
     </div>
   );
 }

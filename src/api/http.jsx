@@ -1,7 +1,10 @@
 import axios from "axios";
 
+// `localStorage`'dan baseURL alınıyor
+const baseURL = localStorage.getItem("baseURL") || import.meta.env.VITE_API_BASE_URL;
+
 const AxiosInstance = axios.create({
-  baseURL: `${import.meta.env.VITE_API_BASE_URL}/api/`,
+  baseURL: `${baseURL}/api/`, // baseURL artık dinamik
   // headers: {
   //   Authorization: import.meta.env.VITE_API_AUTHORIZATION,
   // },

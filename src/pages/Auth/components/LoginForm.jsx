@@ -65,6 +65,12 @@ export default function LoginForm() {
     }
   };
 
+  // baseURL kaydını sil ve sayfayı yenile
+  const handleClearBaseURL = () => {
+    localStorage.removeItem("baseURL");
+    window.location.reload(); // Sayfayı yenilemek için
+  };
+
   return (
     <div
       style={{
@@ -99,6 +105,11 @@ export default function LoginForm() {
               style={{ width: "100%" }}
               disabled={loading}>
               {loading ? <Spin /> : "Giriş Yap"}
+            </Button>
+          </Form.Item>
+          <Form.Item>
+            <Button danger onClick={handleClearBaseURL} style={{ width: "100%" }}>
+              URL Sil
             </Button>
           </Form.Item>
         </Form>
