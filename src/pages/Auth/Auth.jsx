@@ -11,6 +11,7 @@ const { Text, Link } = Typography;
 
 export default function Auth() {
   const [target, setTarget] = React.useState("login"); // login veya register
+  const [target1, setTarget1] = React.useState("login"); // login veya register
   const [baseURL, setBaseURL] = useState("");
 
   // Sayfa yüklendiğinde localStorage kontrolü yapılıyor
@@ -80,7 +81,7 @@ export default function Auth() {
   };
 
   const toggleTarget = () => {
-    setTarget(target === "login" ? "register" : "login");
+    setTarget1(target1 === "login" ? "register" : "login");
   };
 
   // Formun gösterilmesini yönetir
@@ -109,7 +110,7 @@ export default function Auth() {
               alignItems: "center",
             }}>
             <img src={logo} alt="Logo" style={logoStyle} />
-            {target === "login" ? <LoginForm /> : <RegistrationForm />}
+            {target1 === "login" ? <LoginForm /> : <RegistrationForm />}
             <Text type="secondary" style={{ fontSize: "14px", marginBottom: "20px" }}>
               ve ya
             </Text>
@@ -122,8 +123,8 @@ export default function Auth() {
                 color: "white",
               }}
               onClick={toggleTarget}>
-              {target === "login" ? <UserAddOutlined /> : null}
-              {target === "login" ? "Kayıt Ol" : "Giriş Yap"}
+              {target1 === "login" ? <UserAddOutlined /> : null}
+              {target1 === "login" ? "Kayıt Ol" : "Giriş Yap"}
             </Button>
           </div>
         </div>
