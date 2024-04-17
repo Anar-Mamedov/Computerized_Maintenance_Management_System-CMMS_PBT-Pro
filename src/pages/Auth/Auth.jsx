@@ -66,12 +66,17 @@ export default function Auth() {
   };
 
   const formStyle = {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
     position: "fixed",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "300px",
+    width: "100%",
+    height: "100%",
     zIndex: 1000,
+    backgroundColor: "#ffffffcc",
   };
 
   const toggleTarget = () => {
@@ -82,12 +87,14 @@ export default function Auth() {
   const renderForm = () => {
     if (target === "initial") {
       return (
-        <Form style={formStyle}>
-          <Input placeholder="Base URL girin" value={baseURL} onChange={(e) => setBaseURL(e.target.value)} />
-          <Button type="primary" onClick={saveBaseURL} style={{ marginTop: 20 }}>
-            Kaydet
-          </Button>
-        </Form>
+        <div style={formStyle}>
+          <Form style={{ width: "300px" }}>
+            <Input placeholder="Base URL girin" value={baseURL} onChange={(e) => setBaseURL(e.target.value)} />
+            <Button type="primary" onClick={saveBaseURL} style={{ marginTop: 20, width: "100%" }}>
+              Kaydet
+            </Button>
+          </Form>
+        </div>
       );
     } else if (target === "login") {
       return (
