@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Form, Input, Space, Typography } from "antd";
 import { UserAddOutlined } from "@ant-design/icons";
 import backgroundImage from "../../assets/images/login.jpg";
+import backgroundBaseURL from "../../assets/images/backgroundBaseURL.webp";
 import LoginForm from "./components/LoginForm";
 import logo from "../../assets/images/logo.svg";
 import RegistrationForm from "./components/RegistrationForm";
@@ -77,7 +78,16 @@ export default function Auth() {
     width: "100%",
     height: "100%",
     zIndex: 1000,
-    backgroundColor: "#ffffffcc",
+    backgroundColor: "rgba(255, 255, 255, 0.85)",
+  };
+
+  const formBackground = {
+    backgroundImage: `url(${backgroundBaseURL})`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    width: "100vw",
+    height: "100vh",
   };
 
   const toggleTarget = () => {
@@ -88,13 +98,15 @@ export default function Auth() {
   const renderForm = () => {
     if (target === "initial") {
       return (
-        <div style={formStyle}>
-          <Form style={{ width: "300px" }}>
-            <Input placeholder="Base URL girin" value={baseURL} onChange={(e) => setBaseURL(e.target.value)} />
-            <Button type="primary" onClick={saveBaseURL} style={{ marginTop: 20, width: "100%" }}>
-              Kaydet
-            </Button>
-          </Form>
+        <div style={formBackground}>
+          <div style={formStyle}>
+            <Form style={{ width: "300px" }}>
+              <Input placeholder="Base URL girin" value={baseURL} onChange={(e) => setBaseURL(e.target.value)} />
+              <Button type="primary" onClick={saveBaseURL} style={{ marginTop: 20, width: "100%" }}>
+                Kaydet
+              </Button>
+            </Form>
+          </div>
         </div>
       );
     } else if (target === "login") {
