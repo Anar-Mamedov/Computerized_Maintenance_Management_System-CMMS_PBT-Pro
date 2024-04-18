@@ -312,7 +312,7 @@ const BaseLayout = () => {
           </div>
         </Content>
 
-        <Footer style={{ textAlign: "center" }}>
+        <Footer style={{ textAlign: "center", padding: "10px 50px" }}>
           Orjin {new Date().getFullYear()} - Design & Develop by Orjin Team
         </Footer>
       </Layout>

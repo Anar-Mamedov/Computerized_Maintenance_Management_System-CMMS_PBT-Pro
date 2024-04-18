@@ -1,6 +1,47 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table, Input } from "antd";
 import AxiosInstance from "../../../../../../../../../api/http";
+import { Resizable } from "react-resizable";
+
+const ResizableTitle = (props) => {
+  const { onResize, width, ...restProps } = props;
+
+  // You may need to adjust the style to suit your exact needs
+  const handleStyle = {
+    position: "absolute",
+    bottom: 0,
+    right: "-5px",
+    width: "20%",
+    height: "100%", // this is the area that is draggable, you can adjust it
+    zIndex: 2, // ensure it's above other elements
+    cursor: "col-resize",
+    padding: "0px",
+    backgroundSize: "0px",
+  };
+  if (!width) {
+    return <th {...restProps} />;
+  }
+  return (
+    <Resizable
+      width={width}
+      height={0}
+      handle={
+        <span
+          className="react-resizable-handle"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          style={handleStyle}
+        />
+      }
+      onResize={onResize}
+      draggableOpts={{
+        enableUserSelectHack: false,
+      }}>
+      <th {...restProps} />
+    </Resizable>
+  );
+};
 
 // Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
 const normalizeText = (text) => {
@@ -30,18 +71,57 @@ export default function AtolyeTablo({ workshopSelectedId, onSubmit }) {
   const [searchTerm1, setSearchTerm1] = useState("");
   const [filteredData1, setFilteredData1] = useState([]);
 
-  const columns = [
-    {
-      title: "Atölye Kodu",
-      dataIndex: "code",
-      key: "code",
-    },
-    {
-      title: "Atölye Tanımı",
-      dataIndex: "subject",
-      key: "subject",
-    },
-  ];
+  const [columns, setColumns] = useState(() => {
+    const savedWidths = localStorage.getItem("tableColumnWidths");
+    const defaultColumns = [
+      {
+        title: "Atölye Kodu",
+        dataIndex: "code",
+        key: "code",
+        width: 150,
+        sorter: (a, b) => {
+          if (a.code === null) return -1;
+          if (b.code === null) return 1;
+          return a.code.localeCompare(b.code);
+        },
+      },
+      {
+        title: "Atölye Tanımı",
+        dataIndex: "subject",
+        key: "subject",
+        width: 350,
+      },
+    ];
+
+    if (!savedWidths) {
+      return defaultColumns;
+    }
+
+    const parsedWidths = JSON.parse(savedWidths);
+    return defaultColumns.map((col, index) => ({
+      ...col,
+      width: parsedWidths[index] || col.width,
+    }));
+  });
+
+  const handleResize =
+    (index) =>
+    (_, { size }) => {
+      const newColumns = [...columns];
+      newColumns[index] = {
+        ...newColumns[index],
+        width: size.width,
+      };
+      setColumns(newColumns);
+      localStorage.setItem("tableColumnWidths", JSON.stringify(newColumns.map((col) => col.width)));
+    };
+  const mergedColumns = columns.map((col, index) => ({
+    ...col,
+    onHeaderCell: (column) => ({
+      width: column.width,
+      onResize: handleResize(index),
+    }),
+  }));
 
   const fetch = useCallback(() => {
     setLoading(true);
@@ -120,7 +200,14 @@ export default function AtolyeTablo({ workshopSelectedId, onSubmit }) {
             selectedRowKeys,
             onChange: onRowSelectChange,
           }}
-          columns={columns}
+          bordered
+          components={{
+            header: {
+              cell: ResizableTitle,
+            },
+          }}
+          scroll={{ y: "calc(100vh - 380px)" }}
+          columns={mergedColumns}
           dataSource={filteredData1.length > 0 || searchTerm1 ? filteredData1 : data}
           loading={loading}
         />
