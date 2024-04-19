@@ -101,7 +101,11 @@ export default function Auth() {
         <div style={formBackground}>
           <div style={formStyle}>
             <Form style={{ width: "300px" }}>
-              <Input placeholder="Base URL girin" value={baseURL} onChange={(e) => setBaseURL(e.target.value)} />
+              <Input
+                placeholder="Bağlantı Anahtarını Girin"
+                value={baseURL}
+                onChange={(e) => setBaseURL(e.target.value)}
+              />
               <Button type="primary" onClick={saveBaseURL} style={{ marginTop: 20, width: "100%" }}>
                 Kaydet
               </Button>
@@ -123,7 +127,7 @@ export default function Auth() {
             }}>
             <img src={logo} alt="Logo" style={logoStyle} />
             {target1 === "login" ? <LoginForm /> : <RegistrationForm />}
-            <Text type="secondary" style={{ fontSize: "14px", marginBottom: "20px" }}>
+            {/* <Text type="secondary" style={{ fontSize: "14px", marginBottom: "20px" }}>
               ve ya
             </Text>
             <Button
@@ -137,7 +141,7 @@ export default function Auth() {
               onClick={toggleTarget}>
               {target1 === "login" ? <UserAddOutlined /> : null}
               {target1 === "login" ? "Kayıt Ol" : "Giriş Yap"}
-            </Button>
+            </Button> */}
           </div>
         </div>
       );

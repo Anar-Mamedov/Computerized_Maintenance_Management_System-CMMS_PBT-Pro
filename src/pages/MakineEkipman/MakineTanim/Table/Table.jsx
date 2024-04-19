@@ -190,7 +190,7 @@ export default function MainTable() {
           event.stopPropagation();
         },
       }),
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
       render: (text) => (
         <div style={{ textAlign: "center" }}>
           {text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}
@@ -214,32 +214,32 @@ export default function MainTable() {
         if (b.MKN_DURUM === null) return 1;
         return a.MKN_DURUM.localeCompare(b.MKN_DURUM);
       },
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
         },
       }),
     },
-    {
-      title: "Araç Tipi",
-      dataIndex: "MKN_ARAC_TIP",
-      key: "MKN_ARAC_TIP",
-      width: "100px",
-      sorter: (a, b) => {
-        if (a.MKN_ARAC_TIP === null && b.MKN_ARAC_TIP === null) return 0;
-        if (a.MKN_ARAC_TIP === null) return 1;
-        if (b.MKN_ARAC_TIP === null) return -1;
-        return a.MKN_ARAC_TIP.localeCompare(b.MKN_ARAC_TIP);
-      },
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true, // Varsayılan olarak açık
-    },
+    // {
+    //   title: "Araç Tipi",
+    //   dataIndex: "MKN_ARAC_TIP",
+    //   key: "MKN_ARAC_TIP",
+    //   width: "100px",
+    //   sorter: (a, b) => {
+    //     if (a.MKN_ARAC_TIP === null && b.MKN_ARAC_TIP === null) return 0;
+    //     if (a.MKN_ARAC_TIP === null) return 1;
+    //     if (b.MKN_ARAC_TIP === null) return -1;
+    //     return a.MKN_ARAC_TIP.localeCompare(b.MKN_ARAC_TIP);
+    //   },
+    //   ellipsis: true,
+    //   onCell: () => ({
+    //     onClick: (event) => {
+    //       event.stopPropagation();
+    //     },
+    //   }),
+    //   visible: false, // Varsayılan olarak açık
+    // },
     {
       title: "Lokasyon",
       dataIndex: "MKN_LOKASYON",
@@ -295,7 +295,7 @@ export default function MainTable() {
           event.stopPropagation();
         },
       }),
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
     },
     {
       title: "Marka",
@@ -535,6 +535,47 @@ export default function MainTable() {
         if (a.ARIZA_SAYISI === null) return 1;
         if (b.ARIZA_SAYISI === null) return -1;
         return a.ARIZA_SAYISI.localeCompare(b.ARIZA_SAYISI);
+      },
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak açık
+    },
+    {
+      title: "Tam Lokasyon",
+      dataIndex: "MKN_LOKASYON_TUM_YOL",
+      key: "MKN_LOKASYON_TUM_YOL",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
+      width: 200,
+      sorter: (a, b) => {
+        if (a.MKN_LOKASYON_TUM_YOL && b.MKN_LOKASYON_TUM_YOL) {
+          return a.MKN_LOKASYON_TUM_YOL.localeCompare(b.MKN_LOKASYON_TUM_YOL);
+        }
+        if (!a.MKN_LOKASYON_TUM_YOL && !b.MKN_LOKASYON_TUM_YOL) {
+          return 0; // Both are null or undefined, consider them equal
+        }
+        return a.MKN_LOKASYON_TUM_YOL ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+      },
+      visible: false, // Varsayılan olarak açık
+    },
+    {
+      title: "Seri No",
+      dataIndex: "MKN_SERI_NO",
+      key: "MKN_SERI_NO",
+      width: "150px",
+      sorter: (a, b) => {
+        if (a.MKN_SERI_NO === null && b.MKN_SERI_NO === null) return 0;
+        if (a.MKN_SERI_NO === null) return 1;
+        if (b.MKN_SERI_NO === null) return -1;
+        return a.MKN_SERI_NO.localeCompare(b.MKN_SERI_NO);
       },
       ellipsis: true,
       onCell: () => ({
@@ -988,47 +1029,7 @@ export default function MainTable() {
       },
       visible: false, // Varsayılan olarak açık
     },
-    {
-      title: "Tam Lokasyon",
-      dataIndex: "MKN_LOKASYON_TUM_YOL",
-      key: "MKN_LOKASYON_TUM_YOL",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 200,
-      sorter: (a, b) => {
-        if (a.MKN_LOKASYON_TUM_YOL && b.MKN_LOKASYON_TUM_YOL) {
-          return a.MKN_LOKASYON_TUM_YOL.localeCompare(b.MKN_LOKASYON_TUM_YOL);
-        }
-        if (!a.MKN_LOKASYON_TUM_YOL && !b.MKN_LOKASYON_TUM_YOL) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_LOKASYON_TUM_YOL ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: "Seri No",
-      dataIndex: "MKN_SERI_NO",
-      key: "MKN_SERI_NO",
-      width: "150px",
-      sorter: (a, b) => {
-        if (a.MKN_SERI_NO === null && b.MKN_SERI_NO === null) return 0;
-        if (a.MKN_SERI_NO === null) return 1;
-        if (b.MKN_SERI_NO === null) return -1;
-        return a.MKN_SERI_NO.localeCompare(b.MKN_SERI_NO);
-      },
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false, // Varsayılan olarak açık
-    },
+
     // Diğer kolonlarınız...
   ];
 

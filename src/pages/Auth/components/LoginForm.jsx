@@ -88,8 +88,8 @@ export default function LoginForm() {
           initialValues={{ remember: true }}
           onFinish={onSubmit}
           style={{ width: "100%", marginTop: "20px" }}>
-          <Form.Item name="email" rules={[{ required: true, message: "Lütfen e-posta adresinizi girin!" }]}>
-            <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="E-posta" />
+          <Form.Item name="email" rules={[{ required: true, message: "Lütfen kullanıcı kodunuzu girin!" }]}>
+            <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Kullanıcı Kodu" />
           </Form.Item>
           <Form.Item
             name="password"
@@ -109,7 +109,7 @@ export default function LoginForm() {
           </Form.Item>
           <Form.Item>
             <Button danger onClick={handleClearBaseURL} style={{ width: "100%" }}>
-              URL Sil
+              Anahtarı Değiştir
             </Button>
           </Form.Item>
         </Form>

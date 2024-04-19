@@ -8,54 +8,9 @@ import EditDrawer from "../Update/EditDrawer";
 import Filters from "./filter/Filters";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
-import { Resizable } from "react-resizable";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
-
-// kolonların genişliğini ayarlama
-
-const ResizableTitle = (props) => {
-  const { onResize, width, ...restProps } = props;
-
-  // You may need to adjust the style to suit your exact needs
-  const handleStyle = {
-    position: "absolute",
-    bottom: 0,
-    right: "-5px",
-    width: "20%",
-    height: "100%", // this is the area that is draggable, you can adjust it
-    zIndex: 2, // ensure it's above other elements
-    cursor: "col-resize",
-    padding: "0px",
-    backgroundSize: "0px",
-  };
-  if (!width) {
-    return <th {...restProps} />;
-  }
-  return (
-    <Resizable
-      width={+width}
-      height={0}
-      handle={
-        <span
-          className="react-resizable-handle"
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-          style={handleStyle}
-        />
-      }
-      onResize={onResize}
-      draggableOpts={{
-        enableUserSelectHack: false,
-      }}>
-      <th {...restProps} />
-    </Resizable>
-  );
-};
-
-// kolonların genişliğini ayarlama son
 
 export default function MainTable() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -70,8 +25,6 @@ export default function MainTable() {
   const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
   const [totalDataCount, setTotalDataCount] = useState(0); // Tüm veriyi tutan state
   const [pageSize, setPageSize] = useState(10); // Başlangıçta sayfa başına 10 kayıt göster
-
-  const [columns, setColumns] = useState([]);
 
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
@@ -130,988 +83,952 @@ export default function MainTable() {
   // Özel Alanların nameleri backend çekmek için api isteği sonu
 
   // Örnek kolonlar ve başlangıçta hepsinin görünür olacağı varsayılıyor
-  useEffect(() => {
-    const savedWidths = localStorage.getItem("isemriColumnWidths"); // Kolon genişliklerini local storage'dan al
-    const defaultColumns = [
-      {
-        title: "İş Emri No",
-        dataIndex: "ISEMRI_NO",
-        key: "ISEMRI_NO",
-        width: 150,
-        ellipsis: true,
-        visible: true, // Varsayılan olarak açık
-        render: (text) => <a>{text}</a>,
-        sorter: (a, b) => {
-          if (a.ISEMRI_NO === null) return -1;
-          if (b.ISEMRI_NO === null) return 1;
-          return a.ISEMRI_NO.localeCompare(b.ISEMRI_NO);
-        },
+  const columns = [
+    {
+      title: "İş Emri No",
+      dataIndex: "ISEMRI_NO",
+      key: "ISEMRI_NO",
+      width: "120px",
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+      render: (text) => <a>{text}</a>,
+      sorter: (a, b) => {
+        if (a.ISEMRI_NO === null) return -1;
+        if (b.ISEMRI_NO === null) return 1;
+        return a.ISEMRI_NO.localeCompare(b.ISEMRI_NO);
       },
-      {
-        title: "Tarih",
-        dataIndex: "DUZENLEME_TARIH",
-        key: "DUZENLEME_TARIH",
-        width: 150,
-        ellipsis: true,
-        sorter: (a, b) => {
-          if (a.DUZENLEME_TARIH === null) return -1;
-          if (b.DUZENLEME_TARIH === null) return 1;
-          return a.DUZENLEME_TARIH.localeCompare(b.DUZENLEME_TARIH);
-        },
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: true, // Varsayılan olarak açık
-        render: (text) => formatDate(text),
+    },
+    {
+      title: "Tarih",
+      dataIndex: "DUZENLEME_TARIH",
+      key: "DUZENLEME_TARIH",
+      width: "110px",
+      ellipsis: true,
+      sorter: (a, b) => {
+        if (a.DUZENLEME_TARIH === null) return -1;
+        if (b.DUZENLEME_TARIH === null) return 1;
+        return a.DUZENLEME_TARIH.localeCompare(b.DUZENLEME_TARIH);
       },
-      {
-        title: "Saat",
-        dataIndex: "DUZENLEME_SAAT",
-        key: "DUZENLEME_SAAT",
-        width: 150,
-        ellipsis: true,
-        sorter: (a, b) => {
-          if (a.DUZENLEME_SAAT === null) return -1;
-          if (b.DUZENLEME_SAAT === null) return 1;
-          return a.DUZENLEME_SAAT.localeCompare(b.DUZENLEME_SAAT);
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
         },
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: true, // Varsayılan olarak açık
-        render: (text) => formatTime(text),
+      }),
+      visible: true, // Varsayılan olarak açık
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Saat",
+      dataIndex: "DUZENLEME_SAAT",
+      key: "DUZENLEME_SAAT",
+      width: "90px",
+      ellipsis: true,
+      sorter: (a, b) => {
+        if (a.DUZENLEME_SAAT === null) return -1;
+        if (b.DUZENLEME_SAAT === null) return 1;
+        return a.DUZENLEME_SAAT.localeCompare(b.DUZENLEME_SAAT);
       },
-      {
-        title: "Konu",
-        dataIndex: "KONU",
-        key: "KONU",
-        width: 250,
-        ellipsis: true,
-        sorter: (a, b) => {
-          if (a.KONU === null) return -1;
-          if (b.KONU === null) return 1;
-          return a.KONU.localeCompare(b.KONU);
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
         },
-        visible: true, // Varsayılan olarak açık
-        render: (text) => <a>{text}</a>,
+      }),
+      visible: true, // Varsayılan olarak açık
+      render: (text) => formatTime(text),
+    },
+    {
+      title: "İş Emri Tipi",
+      dataIndex: "ISEMRI_TIP",
+      key: "ISEMRI_TIP",
+      width: "180px",
+      ellipsis: true,
+      sorter: (a, b) => {
+        if (a.ISEMRI_TIP === null) return -1;
+        if (b.ISEMRI_TIP === null) return 1;
+        return a.ISEMRI_TIP.localeCompare(b.ISEMRI_TIP);
       },
-      {
-        title: "İş Emri Tipi",
-        dataIndex: "ISEMRI_TIP",
-        key: "ISEMRI_TIP",
-        width: 200,
-        ellipsis: true,
-        sorter: (a, b) => {
-          if (a.ISEMRI_TIP === null) return -1;
-          if (b.ISEMRI_TIP === null) return 1;
-          return a.ISEMRI_TIP.localeCompare(b.ISEMRI_TIP);
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
         },
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: true, // Varsayılan olarak açık
-        render: (text, record) => (
-          <div
+      }),
+      visible: true, // Varsayılan olarak açık
+      render: (text, record) => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}>
+          <Tag
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              backgroundColor: hexToRGBA(record.ISM_TIP_RENK, 0.2),
+              border: `1.2px solid ${hexToRGBA(record.ISM_TIP_RENK, 0.7)}`,
+              color: record.ISM_TIP_RENK,
             }}>
-            <Tag
-              style={{
-                backgroundColor: hexToRGBA(record.ISM_TIP_RENK, 0.2),
-                border: `1.2px solid ${hexToRGBA(record.ISM_TIP_RENK, 0.7)}`,
-                color: record.ISM_TIP_RENK,
-              }}>
-              {text}
-            </Tag>
+            {text}
+          </Tag>
+        </div>
+      ),
+    },
+    {
+      title: "Konu",
+      dataIndex: "KONU",
+      key: "KONU",
+      width: "300px",
+      ellipsis: true,
+      sorter: (a, b) => {
+        if (a.KONU === null) return -1;
+        if (b.KONU === null) return 1;
+        return a.KONU.localeCompare(b.KONU);
+      },
+      visible: true, // Varsayılan olarak açık
+      render: (text) => <a>{text}</a>,
+    },
+
+    {
+      title: "Durum",
+      dataIndex: "DURUM",
+      key: "DURUM",
+      width: "120px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: true, // Varsayılan olarak açık
+      sorter: (a, b) => {
+        if (a.DURUM === null && b.DURUM === null) return 0;
+        if (a.DURUM === null) return -1;
+        if (b.DURUM === null) return 1;
+        return a.DURUM.localeCompare(b.DURUM);
+      },
+      render: (text, record) => {
+        const circleStyle = {
+          backgroundColor: record.KAPALI ? "red" : "green", // KAPALI true ise kırmızı, değilse yeşil
+          borderRadius: "50%",
+          display: "inline-block",
+          width: "10px",
+          height: "10px",
+        };
+        return (
+          <div>
+            <span style={circleStyle}></span>
+            <span style={{ marginLeft: "5px" }}>{text}</span>
           </div>
-        ),
+        );
       },
-      {
-        title: "Durum",
-        dataIndex: "DURUM",
-        key: "DURUM",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: true, // Varsayılan olarak açık
-        sorter: (a, b) => {
-          if (a.DURUM === null && b.DURUM === null) return 0;
-          if (a.DURUM === null) return -1;
-          if (b.DURUM === null) return 1;
-          return a.DURUM.localeCompare(b.DURUM);
-        },
-        render: (text, record) => {
-          const circleStyle = {
-            backgroundColor: record.KAPALI ? "red" : "green", // KAPALI true ise kırmızı, değilse yeşil
-            borderRadius: "50%",
-            display: "inline-block",
-            width: "10px",
-            height: "10px",
-          };
-          return (
-            <div>
-              <span style={circleStyle}></span>
-              <span style={{ marginLeft: "5px" }}>{text}</span>
-            </div>
-          );
-        },
-      },
+    },
 
-      {
-        title: "Lokasyon",
-        dataIndex: "LOKASYON",
-        key: "LOKASYON",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: true, // Varsayılan olarak açık
-        sorter: (a, b) => {
-          if (a.LOKASYON === null && b.LOKASYON === null) return 0;
-          if (a.LOKASYON === null) return 1;
-          if (b.LOKASYON === null) return -1;
-          return a.LOKASYON.localeCompare(b.LOKASYON);
+    {
+      title: "Lokasyon",
+      dataIndex: "LOKASYON",
+      key: "LOKASYON",
+      width: "200px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
         },
+      }),
+      visible: true, // Varsayılan olarak açık
+      sorter: (a, b) => {
+        if (a.LOKASYON === null && b.LOKASYON === null) return 0;
+        if (a.LOKASYON === null) return 1;
+        if (b.LOKASYON === null) return -1;
+        return a.LOKASYON.localeCompare(b.LOKASYON);
       },
-      {
-        title: "Makine Kodu",
-        dataIndex: "MAKINE_KODU",
-        key: "MAKINE_KODU",
-        width: 150,
-        sorter: (a, b) => {
-          if (a.MAKINE_KODU === null && b.MAKINE_KODU === null) return 0;
-          if (a.MAKINE_KODU === null) return 1;
-          if (b.MAKINE_KODU === null) return -1;
-          return a.MAKINE_KODU.localeCompare(b.MAKINE_KODU);
+    },
+    {
+      title: "Makine Kodu",
+      dataIndex: "MAKINE_KODU",
+      key: "MAKINE_KODU",
+      width: "150px",
+      sorter: (a, b) => {
+        if (a.MAKINE_KODU === null && b.MAKINE_KODU === null) return 0;
+        if (a.MAKINE_KODU === null) return 1;
+        if (b.MAKINE_KODU === null) return -1;
+        return a.MAKINE_KODU.localeCompare(b.MAKINE_KODU);
+      },
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
         },
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: true, // Varsayılan olarak açık
+      }),
+      visible: true, // Varsayılan olarak açık
+    },
+    {
+      title: "Makine Tanımı",
+      dataIndex: "MAKINE_TANIMI",
+      key: "MAKINE_TANIMI",
+      width: "300px",
+      sorter: (a, b) => {
+        if (a.MAKINE_TANIMI === null && b.MAKINE_TANIMI === null) return 0;
+        if (a.MAKINE_TANIMI === null) return -1;
+        if (b.MAKINE_TANIMI === null) return 1;
+        return a.MAKINE_TANIMI.localeCompare(b.MAKINE_TANIMI);
       },
-      {
-        title: "Makine Tanımı",
-        dataIndex: "MAKINE_TANIMI",
-        key: "MAKINE_TANIMI",
-        width: 250,
-        sorter: (a, b) => {
-          if (a.MAKINE_TANIMI === null && b.MAKINE_TANIMI === null) return 0;
-          if (a.MAKINE_TANIMI === null) return -1;
-          if (b.MAKINE_TANIMI === null) return 1;
-          return a.MAKINE_TANIMI.localeCompare(b.MAKINE_TANIMI);
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
         },
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: true, // Varsayılan olarak açık
+      }),
+      visible: true, // Varsayılan olarak açık
+    },
+    {
+      title: "Planlanan Başlama Tarihi",
+      dataIndex: "PLAN_BASLAMA_TARIH",
+      key: "PLAN_BASLAMA_TARIH",
+      width: "150px",
+      sorter: (a, b) => {
+        if (a.PLAN_BASLAMA_TARIH === null && b.PLAN_BASLAMA_TARIH === null) return 0;
+        if (a.PLAN_BASLAMA_TARIH === null) return 1;
+        if (b.PLAN_BASLAMA_TARIH === null) return -1;
+        return a.PLAN_BASLAMA_TARIH.localeCompare(b.PLAN_BASLAMA_TARIH);
       },
-      {
-        title: "Planlanan Başlama Tarihi",
-        dataIndex: "PLAN_BASLAMA_TARIH",
-        key: "PLAN_BASLAMA_TARIH",
-        width: 150,
-        sorter: (a, b) => {
-          if (a.PLAN_BASLAMA_TARIH === null && b.PLAN_BASLAMA_TARIH === null) return 0;
-          if (a.PLAN_BASLAMA_TARIH === null) return 1;
-          if (b.PLAN_BASLAMA_TARIH === null) return -1;
-          return a.PLAN_BASLAMA_TARIH.localeCompare(b.PLAN_BASLAMA_TARIH);
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
         },
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: true, // Varsayılan olarak açık
-        render: (text) => formatDate(text),
-      },
+      }),
+      visible: false, // Varsayılan olarak açık
+      render: (text) => formatDate(text),
+    },
 
-      {
-        title: "Planlanan Başlama Saati",
-        dataIndex: "PLAN_BASLAMA_SAAT",
-        key: "PLAN_BASLAMA_SAAT",
-        width: 150,
-        sorter: (a, b) => {
-          if (a.PLAN_BASLAMA_SAAT === null && b.PLAN_BASLAMA_SAAT === null) return 0;
-          if (a.PLAN_BASLAMA_SAAT === null) return 1;
-          if (b.PLAN_BASLAMA_SAAT === null) return -1;
-          return a.PLAN_BASLAMA_SAAT.localeCompare(b.PLAN_BASLAMA_SAAT);
+    {
+      title: "Planlanan Başlama Saati",
+      dataIndex: "PLAN_BASLAMA_SAAT",
+      key: "PLAN_BASLAMA_SAAT",
+      width: "150px",
+      sorter: (a, b) => {
+        if (a.PLAN_BASLAMA_SAAT === null && b.PLAN_BASLAMA_SAAT === null) return 0;
+        if (a.PLAN_BASLAMA_SAAT === null) return 1;
+        if (b.PLAN_BASLAMA_SAAT === null) return -1;
+        return a.PLAN_BASLAMA_SAAT.localeCompare(b.PLAN_BASLAMA_SAAT);
+      },
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
         },
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: true, // Varsayılan olarak açık
-        render: (text) => formatTime(text),
-      },
-      {
-        title: "Planlanan Bitiş Tarihi",
-        dataIndex: "PLAN_BITIS_TARIH",
-        key: "PLAN_BITIS_TARIH",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-        render: (text) => formatDate(text),
-      },
-      {
-        title: "Planlanan Bitiş Saati",
-        dataIndex: "PLAN_BITIS_SAAT",
-        key: "PLAN_BITIS_SAAT",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-        render: (text) => formatTime(text),
-      },
-      {
-        title: "Başlama Tarihi",
-        dataIndex: "BASLAMA_TARIH",
-        key: "BASLAMA_TARIH",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-        render: (text) => formatDate(text),
-      },
-      {
-        title: "Başlama Saati",
-        dataIndex: "BASLAMA_SAAT",
-        key: "BASLAMA_SAAT",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-        render: (text) => formatTime(text),
-      },
-      {
-        title: "Bitiş Tarihi",
-        dataIndex: "ISM_BITIS_TARIH",
-        key: "ISM_BITIS_TARIH",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-        render: (text) => formatDate(text),
-      },
-      {
-        title: "Bitiş Saati",
-        dataIndex: "ISM_BITIS_SAAT",
-        key: "ISM_BITIS_SAAT",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-        render: (text) => formatTime(text),
-      },
-      {
-        title: "İş Süresi (dk.)",
-        dataIndex: "IS_SURESI",
-        key: "IS_SURESI",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-        render: (text) => (text > 0 ? text : null),
-      },
-      {
-        title: "Tamamlama (%)",
-        dataIndex: "TAMAMLANMA",
-        key: "TAMAMLANMA",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-        render: (text) => <Progress percent={text} steps={5} />,
-      },
-      {
-        title: "Garanti",
-        dataIndex: "GARANTI",
-        key: "GARANTI",
-        width: "100px",
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-        render: (text, record) => {
-          return record.GARANTI ? (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <CheckOutlined style={{ color: "green" }} />
-            </div>
-          ) : (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <CloseOutlined style={{ color: "red" }} />
-            </div>
-          );
+      }),
+      visible: false, // Varsayılan olarak açık
+      render: (text) => formatTime(text),
+    },
+    {
+      title: "Planlanan Bitiş Tarihi",
+      dataIndex: "PLAN_BITIS_TARIH",
+      key: "PLAN_BITIS_TARIH",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
         },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Planlanan Bitiş Saati",
+      dataIndex: "PLAN_BITIS_SAAT",
+      key: "PLAN_BITIS_SAAT",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+      render: (text) => formatTime(text),
+    },
+    {
+      title: "Başlama Tarihi",
+      dataIndex: "BASLAMA_TARIH",
+      key: "BASLAMA_TARIH",
+      width: "110px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: true, // Varsayılan olarak kapalı
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Başlama Saati",
+      dataIndex: "BASLAMA_SAAT",
+      key: "BASLAMA_SAAT",
+      width: "90px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: true, // Varsayılan olarak kapalı
+      render: (text) => formatTime(text),
+    },
+    {
+      title: "Bitiş Tarihi",
+      dataIndex: "ISM_BITIS_TARIH",
+      key: "ISM_BITIS_TARIH",
+      width: "110px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: true, // Varsayılan olarak kapalı
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Bitiş Saati",
+      dataIndex: "ISM_BITIS_SAAT",
+      key: "ISM_BITIS_SAAT",
+      width: "90px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: true, // Varsayılan olarak kapalı
+      render: (text) => formatTime(text),
+    },
+    {
+      title: "İş Süresi (dk.)",
+      dataIndex: "IS_SURESI",
+      key: "IS_SURESI",
+      width: "110px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: true, // Varsayılan olarak kapalı
+      render: (text) => (text > 0 ? text : null),
+    },
+    {
+      title: "Tamamlama (%)",
+      dataIndex: "TAMAMLANMA",
+      key: "TAMAMLANMA",
+      width: "200px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: true, // Varsayılan olarak kapalı
+      render: (text) => <Progress percent={text} steps={8} />,
+    },
+    {
+      title: "Garanti",
+      dataIndex: "GARANTI",
+      key: "GARANTI",
+      width: "100px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+      render: (text, record) => {
+        return record.GARANTI ? (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <CheckOutlined style={{ color: "green" }} />
+          </div>
+        ) : (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <CloseOutlined style={{ color: "red" }} />
+          </div>
+        );
       },
-      {
-        title: "Makine Durumu",
-        dataIndex: "MAKINE_DURUM",
-        key: "MAKINE_DURUM",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: "Plaka",
-        dataIndex: "MAKINE_PLAKA",
-        key: "MAKINE_PLAKA",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: "Makine Tipi",
-        dataIndex: "MAKINE_TIP",
-        key: "MAKINE_TIP",
-        width: 250,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: "Ekipman",
-        dataIndex: "EKIPMAN",
-        key: "EKIPMAN",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: "İş Tipi",
-        dataIndex: "IS_TIPI",
-        key: "IS_TIPI",
-        width: 250,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: "İş Nedeni",
-        dataIndex: "IS_NEDENI",
-        key: "IS_NEDENI",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: "Atölye",
-        dataIndex: "ATOLYE",
-        key: "ATOLYE",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: "Talimat",
-        dataIndex: "TALIMAT",
-        key: "TALIMAT",
-        width: 250,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: "Öncelik",
-        dataIndex: "ONCELIK",
-        key: "ONCELIK",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: "Kapanış Tarihi",
-        dataIndex: "KAPANIS_TARIHI",
-        key: "KAPANIS_TARIHI",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-        render: (text) => formatDate(text),
-      },
-      {
-        title: "Kapanış Saati",
-        dataIndex: "KAPANIS_SAATI",
-        key: "KAPANIS_SAATI",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-        render: (text) => formatTime(text),
-      },
-      {
-        title: "Takvim",
-        dataIndex: "TAKVIM",
-        key: "TAKVIM",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: "Masraf Merkezi",
-        dataIndex: "MASRAF_MERKEZI",
-        key: "MASRAF_MERKEZI",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: "Firma",
-        dataIndex: "FRIMA",
-        key: "FRIMA",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: "İş Talep Kodu",
-        dataIndex: "IS_TALEP_NO",
-        key: "IS_TALEP_NO",
-        width: 150,
-        ellipsis: true,
-        onCell: (record) => ({
-          onClick: (event) => {
-            event.stopPropagation();
+    },
+    {
+      title: "Makine Durumu",
+      dataIndex: "MAKINE_DURUM",
+      key: "MAKINE_DURUM",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    // {
+    //   title: "Plaka",
+    //   dataIndex: "MAKINE_PLAKA",
+    //   key: "MAKINE_PLAKA",
+    //   width: "150px",
+    //   ellipsis: true,
+    //   onCell: () => ({
+    //     onClick: (event) => {
+    //       event.stopPropagation();
+    //     },
+    //   }),
+    //   visible: false, // Varsayılan olarak kapalı
+    // },
+    {
+      title: "Makine Tipi",
+      dataIndex: "MAKINE_TIP",
+      key: "MAKINE_TIP",
+      width: "250px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Ekipman",
+      dataIndex: "EKIPMAN",
+      key: "EKIPMAN",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "İş Tipi",
+      dataIndex: "IS_TIPI",
+      key: "IS_TIPI",
+      width: "250px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "İş Nedeni",
+      dataIndex: "IS_NEDENI",
+      key: "IS_NEDENI",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Atölye",
+      dataIndex: "ATOLYE",
+      key: "ATOLYE",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Talimat",
+      dataIndex: "TALIMAT",
+      key: "TALIMAT",
+      width: "250px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Öncelik",
+      dataIndex: "ONCELIK",
+      key: "ONCELIK",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Kapanış Tarihi",
+      dataIndex: "KAPANIS_TARIHI",
+      key: "KAPANIS_TARIHI",
+      width: "110px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: true, // Varsayılan olarak kapalı
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Kapanış Saati",
+      dataIndex: "KAPANIS_SAATI",
+      key: "KAPANIS_SAATI",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+      render: (text) => formatTime(text),
+    },
+    {
+      title: "Takvim",
+      dataIndex: "TAKVIM",
+      key: "TAKVIM",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Masraf Merkezi",
+      dataIndex: "MASRAF_MERKEZI",
+      key: "MASRAF_MERKEZI",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Firma",
+      dataIndex: "FRIMA",
+      key: "FRIMA",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "İş Talep Kodu",
+      dataIndex: "IS_TALEP_NO",
+      key: "IS_TALEP_NO",
+      width: "150px",
+      ellipsis: true,
+      onCell: (record) => ({
+        onClick: (event) => {
+          event.stopPropagation();
 
-            // Burada, record objesini doğrudan kullanmak yerine,
-            // bir kopyasını oluşturup `key` değerini `ISM_DURUM_KOD_ID` ile güncelliyoruz.
-            const updatedRecord = { ...record, key: record.ISM_IS_TALEP_ID };
-            // const updatedRecord = { ...record, key: 378 };
+          // Burada, record objesini doğrudan kullanmak yerine,
+          // bir kopyasını oluşturup `key` değerini `ISM_DURUM_KOD_ID` ile güncelliyoruz.
+          const updatedRecord = { ...record, key: record.ISM_IS_TALEP_ID };
+          // const updatedRecord = { ...record, key: 378 };
 
-            setEditDrawer1Data(updatedRecord); // Güncellenmiş record'u EditDrawer1 için data olarak ayarla
-            setEditDrawer1Visible(true); // EditDrawer1'i aç
-          },
-        }),
-        render: (text) => <a>{text}</a>,
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: "İş Talep Eden",
-        dataIndex: "IS_TALEP_EDEN",
-        key: "IS_TALEP_EDEN",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: "İş Talep Tarihi",
-        dataIndex: "IS_TALEP_TARIH",
-        key: "IS_TALEP_TARIH",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-        render: (text) => formatDate(text),
-      },
-      {
-        title: <div>{label.OZL_OZEL_ALAN_1}</div>,
-        dataIndex: "OZEL_ALAN_1",
-        key: "OZEL_ALAN_1",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: <div>{label.OZL_OZEL_ALAN_2}</div>,
-        dataIndex: "OZEL_ALAN_2",
-        key: "OZEL_ALAN_2",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: <div>{label.OZL_OZEL_ALAN_3}</div>,
-        dataIndex: "OZEL_ALAN_3",
-        key: "OZEL_ALAN_3",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: <div>{label.OZL_OZEL_ALAN_4}</div>,
-        dataIndex: "OZEL_ALAN_4",
-        key: "OZEL_ALAN_4",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: <div>{label.OZL_OZEL_ALAN_5}</div>,
-        dataIndex: "OZEL_ALAN_5",
-        key: "OZEL_ALAN_5",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: <div>{label.OZL_OZEL_ALAN_6}</div>,
-        dataIndex: "OZEL_ALAN_6",
-        key: "OZEL_ALAN_6",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: <div>{label.OZL_OZEL_ALAN_7}</div>,
-        dataIndex: "OZEL_ALAN_7",
-        key: "OZEL_ALAN_7",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: <div>{label.OZL_OZEL_ALAN_8}</div>,
-        dataIndex: "OZEL_ALAN_8",
-        key: "OZEL_ALAN_8",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: <div>{label.OZL_OZEL_ALAN_9}</div>,
-        dataIndex: "OZEL_ALAN_9",
-        key: "OZEL_ALAN_9",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: <div>{label.OZL_OZEL_ALAN_10}</div>,
-        dataIndex: "OZEL_ALAN_10",
-        key: "OZEL_ALAN_10",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: <div>{label.OZL_OZEL_ALAN_11}</div>,
-        dataIndex: "OZEL_ALAN_11",
-        key: "OZEL_ALAN_11",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: <div>{label.OZL_OZEL_ALAN_12}</div>,
-        dataIndex: "OZEL_ALAN_12",
-        key: "OZEL_ALAN_12",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: <div>{label.OZL_OZEL_ALAN_13}</div>,
-        dataIndex: "OZEL_ALAN_13",
-        key: "OZEL_ALAN_13",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: <div>{label.OZL_OZEL_ALAN_14}</div>,
-        dataIndex: "OZEL_ALAN_14",
-        key: "OZEL_ALAN_14",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: <div>{label.OZL_OZEL_ALAN_15}</div>,
-        dataIndex: "OZEL_ALAN_15",
-        key: "OZEL_ALAN_15",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: <div>{label.OZL_OZEL_ALAN_16}</div>,
-        dataIndex: "OZEL_ALAN_16",
-        key: "OZEL_ALAN_16",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: <div>{label.OZL_OZEL_ALAN_17}</div>,
-        dataIndex: "OZEL_ALAN_17",
-        key: "OZEL_ALAN_17",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: <div>{label.OZL_OZEL_ALAN_18}</div>,
-        dataIndex: "OZEL_ALAN_18",
-        key: "OZEL_ALAN_18",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: <div>{label.OZL_OZEL_ALAN_19}</div>,
-        dataIndex: "OZEL_ALAN_19",
-        key: "OZEL_ALAN_19",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: <div>{label.OZL_OZEL_ALAN_20}</div>,
-        dataIndex: "OZEL_ALAN_20",
-        key: "OZEL_ALAN_20",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: "Personel Adı",
-        dataIndex: "PERSONEL_ADI",
-        key: "PERSONEL_ADI",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: "Tam Lokasyon",
-        dataIndex: "TAM_LOKASYON",
-        key: "TAM_LOKASYON",
-        width: 250,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: "Bildirilen Kat",
-        dataIndex: "BILDIRILEN_KAT",
-        key: "BILDIRILEN_KAT",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: "Bildirilen Bina",
-        dataIndex: "BILDIRILEN_BINA",
-        key: "BILDIRILEN_BINA",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: "Sayaç Değeri",
-        dataIndex: "GUNCEL_SAYAC_DEGER",
-        key: "GUNCEL_SAYAC_DEGER",
-        width: 150,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      {
-        title: "Notlar",
-        dataIndex: "ICERDEKI_NOT",
-        key: "ICERDEKI_NOT",
-        width: 250,
-        ellipsis: true,
-        onCell: () => ({
-          onClick: (event) => {
-            event.stopPropagation();
-          },
-        }),
-        visible: false, // Varsayılan olarak kapalı
-      },
-      // Diğer kolonlarınız...
-    ];
+          setEditDrawer1Data(updatedRecord); // Güncellenmiş record'u EditDrawer1 için data olarak ayarla
+          setEditDrawer1Visible(true); // EditDrawer1'i aç
+        },
+      }),
+      render: (text) => <a>{text}</a>,
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "İş Talep Eden",
+      dataIndex: "IS_TALEP_EDEN",
+      key: "IS_TALEP_EDEN",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "İş Talep Tarihi",
+      dataIndex: "IS_TALEP_TARIH",
+      key: "IS_TALEP_TARIH",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Personel Adı",
+      dataIndex: "PERSONEL_ADI",
+      key: "PERSONEL_ADI",
+      width: "180px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: true, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Tam Lokasyon",
+      dataIndex: "TAM_LOKASYON",
+      key: "TAM_LOKASYON",
+      width: "250px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Bildirilen Kat",
+      dataIndex: "BILDIRILEN_KAT",
+      key: "BILDIRILEN_KAT",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Bildirilen Bina",
+      dataIndex: "BILDIRILEN_BINA",
+      key: "BILDIRILEN_BINA",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Sayaç Değeri",
+      dataIndex: "GUNCEL_SAYAC_DEGER",
+      key: "GUNCEL_SAYAC_DEGER",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Notlar",
+      dataIndex: "ICERDEKI_NOT",
+      key: "ICERDEKI_NOT",
+      width: "250px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{label.OZL_OZEL_ALAN_1}</div>,
+      dataIndex: "OZEL_ALAN_1",
+      key: "OZEL_ALAN_1",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{label.OZL_OZEL_ALAN_2}</div>,
+      dataIndex: "OZEL_ALAN_2",
+      key: "OZEL_ALAN_2",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{label.OZL_OZEL_ALAN_3}</div>,
+      dataIndex: "OZEL_ALAN_3",
+      key: "OZEL_ALAN_3",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{label.OZL_OZEL_ALAN_4}</div>,
+      dataIndex: "OZEL_ALAN_4",
+      key: "OZEL_ALAN_4",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{label.OZL_OZEL_ALAN_5}</div>,
+      dataIndex: "OZEL_ALAN_5",
+      key: "OZEL_ALAN_5",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{label.OZL_OZEL_ALAN_6}</div>,
+      dataIndex: "OZEL_ALAN_6",
+      key: "OZEL_ALAN_6",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{label.OZL_OZEL_ALAN_7}</div>,
+      dataIndex: "OZEL_ALAN_7",
+      key: "OZEL_ALAN_7",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{label.OZL_OZEL_ALAN_8}</div>,
+      dataIndex: "OZEL_ALAN_8",
+      key: "OZEL_ALAN_8",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{label.OZL_OZEL_ALAN_9}</div>,
+      dataIndex: "OZEL_ALAN_9",
+      key: "OZEL_ALAN_9",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{label.OZL_OZEL_ALAN_10}</div>,
+      dataIndex: "OZEL_ALAN_10",
+      key: "OZEL_ALAN_10",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{label.OZL_OZEL_ALAN_11}</div>,
+      dataIndex: "OZEL_ALAN_11",
+      key: "OZEL_ALAN_11",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{label.OZL_OZEL_ALAN_12}</div>,
+      dataIndex: "OZEL_ALAN_12",
+      key: "OZEL_ALAN_12",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{label.OZL_OZEL_ALAN_13}</div>,
+      dataIndex: "OZEL_ALAN_13",
+      key: "OZEL_ALAN_13",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{label.OZL_OZEL_ALAN_14}</div>,
+      dataIndex: "OZEL_ALAN_14",
+      key: "OZEL_ALAN_14",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{label.OZL_OZEL_ALAN_15}</div>,
+      dataIndex: "OZEL_ALAN_15",
+      key: "OZEL_ALAN_15",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{label.OZL_OZEL_ALAN_16}</div>,
+      dataIndex: "OZEL_ALAN_16",
+      key: "OZEL_ALAN_16",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{label.OZL_OZEL_ALAN_17}</div>,
+      dataIndex: "OZEL_ALAN_17",
+      key: "OZEL_ALAN_17",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{label.OZL_OZEL_ALAN_18}</div>,
+      dataIndex: "OZEL_ALAN_18",
+      key: "OZEL_ALAN_18",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{label.OZL_OZEL_ALAN_19}</div>,
+      dataIndex: "OZEL_ALAN_19",
+      key: "OZEL_ALAN_19",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{label.OZL_OZEL_ALAN_20}</div>,
+      dataIndex: "OZEL_ALAN_20",
+      key: "OZEL_ALAN_20",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak kapalı
+    },
 
-    // Kolonların genişliklerini ve sıralarını kaydeden ve yükleyen kodlar
-    if (!savedWidths) {
-      setColumns(defaultColumns);
-    } else {
-      const parsedWidths = JSON.parse(savedWidths);
-      const updatedColumns = defaultColumns.map((col, index) => ({
-        ...col,
-        width: parsedWidths[index] || col.width,
-      }));
-      setColumns(updatedColumns);
-    }
-
-    // Kolonların genişliklerini ve sıralarını kaydeden ve yükleyen kodlar son
-  }, [label]);
-
-  // Kolon genişliklerini kaydeden ve yükleyen kodlar
-  const handleResize =
-    (index) =>
-    (_, { size }) => {
-      const newColumns = [...columns];
-      newColumns[index] = {
-        ...newColumns[index],
-        width: size.width,
-      };
-      setColumns(newColumns);
-      localStorage.setItem("isemriColumnWidths", JSON.stringify(newColumns.map((col) => col.width)));
-    };
-  const mergedColumns = columns.map((col, index) => ({
-    ...col,
-    onHeaderCell: (column) => ({
-      width: column.width,
-      onResize: handleResize(index),
-    }),
-  }));
-  // Kolon genişliklerini kaydeden ve yükleyen kodlar son
+    // Diğer kolonlarınız...
+  ];
 
   // Kullanıcının seçtiği kolonların key'lerini tutan state kolonlari göster/gizle butonu için
 
@@ -1129,16 +1046,6 @@ export default function MainTable() {
   });
 
   // Kullanıcının seçtiği kolonların key'lerini tutan state kolonlari göster/gizle butonu için son
-
-  // Görünür kolonları ve onları resizable yapacak şekilde birleştiren fonksiyon
-  const getFilteredAndResizableColumns = () => {
-    return columns
-      .filter((col) => visibleColumnKeys.includes(col.key)) // Yalnızca görünür kolonları al
-      .map((col) => {
-        const columnIndex = columns.findIndex((c) => c.key === col.key);
-        return columnIndex !== -1 ? mergedColumns[columnIndex] : col;
-      });
-  };
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 
@@ -1418,7 +1325,7 @@ export default function MainTable() {
             <MenuOutlined />
           </Button>
           <Input
-            style={{ width: "251px" }}
+            style={{ width: "250px" }}
             type="text"
             placeholder="Arama yap..."
             value={searchTerm}
@@ -1436,13 +1343,7 @@ export default function MainTable() {
       </div>
       <Spin spinning={loading}>
         <Table
-          bordered
-          components={{
-            header: {
-              cell: ResizableTitle,
-            },
-          }}
-          columns={getFilteredAndResizableColumns()}
+          columns={visibleColumns}
           rowSelection={rowSelection}
           dataSource={data}
           pagination={{
@@ -1458,7 +1359,7 @@ export default function MainTable() {
             showQuickJumper: true,
           }}
           onRow={onRowClick}
-          scroll={{ y: "calc(100vh - 350px)" }}
+          scroll={{ y: "calc(100vh - 380px)" }}
           onChange={handleTableChange}
           rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
         />
