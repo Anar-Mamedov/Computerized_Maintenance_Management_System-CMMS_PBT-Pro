@@ -61,43 +61,20 @@ export default function MainTable() {
   // Örnek kolonlar ve başlangıçta hepsinin görünür olacağı varsayılıyor
   const columns = [
     {
-      title: "Iş Talep Kodu",
+      title: "Talep Kodu",
       dataIndex: "IST_KOD",
       key: "IST_KOD",
-      width: "150px",
+      width: "120px",
       ellipsis: true,
 
       visible: true, // Varsayılan olarak açık
       render: (text) => <a>{text}</a>,
-    },
-    {
-      title: "Konu",
-      dataIndex: "IST_TANIMI",
-      key: "IST_TANIMI",
-      width: "150px",
-      ellipsis: true,
-
-      visible: true, // Varsayılan olarak açık
-      render: (text) => <a>{text}</a>,
-    },
-    {
-      title: "Makine Tanım",
-      dataIndex: "IST_MAKINE_TANIM",
-      key: "IST_MAKINE_TANIM",
-      width: "150px",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true, // Varsayılan olarak açık
     },
     {
       title: "Tarih",
       dataIndex: "IST_ACILIS_TARIHI",
       key: "IST_ACILIS_TARIHI",
-      width: "150px",
+      width: "110px",
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -111,7 +88,7 @@ export default function MainTable() {
       title: "Saat",
       dataIndex: "IST_ACILIS_SAATI",
       key: "IST_ACILIS_SAATI",
-      width: "150px",
+      width: "90px",
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -120,6 +97,29 @@ export default function MainTable() {
       }),
       visible: true, // Varsayılan olarak açık
       render: (text) => formatTime(text),
+    },
+    {
+      title: "Konu",
+      dataIndex: "IST_TANIMI",
+      key: "IST_TANIMI",
+      width: "300px",
+      ellipsis: true,
+
+      visible: true, // Varsayılan olarak açık
+      render: (text) => <a>{text}</a>,
+    },
+    {
+      title: "Talep Eden",
+      dataIndex: "IST_TALEP_EDEN_ADI",
+      key: "IST_TALEP_EDEN_ADI",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: true, // Varsayılan olarak açık
     },
     {
       title: "Durum",
@@ -155,6 +155,20 @@ export default function MainTable() {
         );
       },
     },
+    {
+      title: "Makine Tanım",
+      dataIndex: "IST_MAKINE_TANIM",
+      key: "IST_MAKINE_TANIM",
+      width: "150px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: true, // Varsayılan olarak açık
+    },
+
     // {
     //   title: "Durum",
     //   dataIndex: "IST_DURUM_ID",
@@ -247,19 +261,7 @@ export default function MainTable() {
     //     }
     //   },
     // },
-    {
-      title: "Talep Eden",
-      dataIndex: "IST_TALEP_EDEN_ADI",
-      key: "IST_TALEP_EDEN_ADI",
-      width: "150px",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true, // Varsayılan olarak açık
-    },
+
     {
       title: "İş Kategorisi",
       dataIndex: "IST_KATEGORI_TANIMI",
@@ -271,7 +273,7 @@ export default function MainTable() {
           event.stopPropagation();
         },
       }),
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
     },
     {
       title: "Öncelik",
@@ -396,7 +398,7 @@ export default function MainTable() {
       render: (text) => formatTime(text),
     },
     {
-      title: "iş Emri No",
+      title: "İş Emri No",
       dataIndex: "IST_ISEMRI_NO",
       key: "IST_ISEMRI_NO",
       width: "150px",
@@ -415,7 +417,7 @@ export default function MainTable() {
         },
       }),
       render: (text) => <a>{text}</a>,
-      visible: false, // Varsayılan olarak kapalı
+      visible: true, // Varsayılan olarak kapalı
     },
     {
       title: "Teknisyen",
@@ -456,19 +458,19 @@ export default function MainTable() {
       }),
       visible: false, // Varsayılan olarak kapalı
     },
-    {
-      title: "Makine Plaka",
-      dataIndex: "IST_MAKINE_PLAKA",
-      key: "IST_MAKINE_PLAKA",
-      width: "150px",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false, // Varsayılan olarak kapalı
-    },
+    // {
+    //   title: "Makine Plaka",
+    //   dataIndex: "IST_MAKINE_PLAKA",
+    //   key: "IST_MAKINE_PLAKA",
+    //   width: "150px",
+    //   ellipsis: true,
+    //   onCell: () => ({
+    //     onClick: (event) => {
+    //       event.stopPropagation();
+    //     },
+    //   }),
+    //   visible: false, // Varsayılan olarak kapalı
+    // },
     {
       title: "Bildirim Tipi",
       dataIndex: "IST_TIP_TANIM",
@@ -535,7 +537,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Tam Lokasyon Adresi",
+      title: "Tam Lokasyon",
       dataIndex: "IST_BILDIREN_LOKASYON_TUM",
       key: "IST_BILDIREN_LOKASYON_TUM",
       width: "250px",
