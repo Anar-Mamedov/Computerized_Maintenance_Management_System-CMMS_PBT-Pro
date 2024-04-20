@@ -224,9 +224,10 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
       <div style={buttonStyle}>
         <Button
           style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
-          type="submit"
+          type="link"
+          danger
           onClick={handleModalToggle}>
-          Kapat
+          Seçili İş Emirlerini Kapat
         </Button>
         <Modal
           title={modalTitle}

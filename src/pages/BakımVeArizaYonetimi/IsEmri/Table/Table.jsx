@@ -705,7 +705,7 @@ export default function MainTable() {
       title: "Tam Lokasyon",
       dataIndex: "TAM_LOKASYON",
       key: "TAM_LOKASYON",
-      width: "250px",
+      width: 300,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -713,6 +713,35 @@ export default function MainTable() {
         },
       }),
       visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Ana Lokasyon",
+      dataIndex: "TAM_LOKASYON",
+      key: "ANA_LOKASYON",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
+      width: 300,
+      sorter: (a, b) => {
+        if (a.TAM_LOKASYON && b.TAM_LOKASYON) {
+          return a.TAM_LOKASYON.localeCompare(b.TAM_LOKASYON);
+        }
+        if (!a.TAM_LOKASYON && !b.TAM_LOKASYON) {
+          return 0; // Both are null or undefined, consider them equal
+        }
+        return a.TAM_LOKASYON ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+      },
+      render: (text) => {
+        if (text === null) {
+          return null;
+        }
+        const parts = text.split("/");
+        return parts.length > 1 ? parts[0] : text;
+      }, // Add this line
+      visible: false, // Varsayılan olarak açık
     },
     {
       title: "Bildirilen Kat",

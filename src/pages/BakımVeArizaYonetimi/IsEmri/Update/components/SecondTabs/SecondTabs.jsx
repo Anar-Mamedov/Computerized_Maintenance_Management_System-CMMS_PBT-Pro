@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Tabs } from "antd";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
@@ -16,6 +16,7 @@ import Notlar from "./components/Notlar/Notlar";
 import Aciklama from "./components/Aciklama/Aciklama";
 import ResimUpload from "./components/Resim/ResimUpload";
 import DosyaUpload from "./components/Dosya/DosyaUpload";
+import AxiosInstance from "../../../../../../api/http";
 
 //styled components
 const StyledTabs = styled(Tabs)`
@@ -53,11 +54,31 @@ const StyledTabs = styled(Tabs)`
 export default function SecondTabs({ refreshKey, fieldRequirements }) {
   const { watch } = useFormContext();
   const [activeTabKey, setActiveTabKey] = useState("1"); // Default to the first tab
+  const [dataCount, setDataCount] = useState([]);
 
   // Modify the onChange handler to update the active tab state
   const onChange = (key) => {
     setActiveTabKey(key);
   };
+
+  const secilenIsEmriID = watch("secilenIsEmriID");
+  console.log("Anar", secilenIsEmriID);
+
+  const fetchData = async () => {
+    try {
+      const response = await AxiosInstance.get(`GetIsEmriTabsCountById?isEmriId=${secilenIsEmriID}`); // API URL'niz
+      setDataCount(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
+    } catch (error) {
+      console.error("API isteğinde hata oluştu:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (secilenIsEmriID) {
+      // secilenIsEmriID'nin varlığını ve geçerliliğini kontrol edin
+      fetchData(); // fetch fonksiyonunu çağırın
+    }
+  }, [secilenIsEmriID]); // secilenIsEmriID veya fetch fonksiyonu değiştiğinde useEffect'i tetikle
 
   const items = [
     {
@@ -67,22 +88,25 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
     },
     {
       key: "2",
-      label: "Kontrol Listesi",
+      label:
+        dataCount.IsEmriKontrolListSayisi >= 1
+          ? `Kontrol Listesi (${dataCount.IsEmriKontrolListSayisi})`
+          : "Kontrol Listesi",
       children: <KontrolListesiTablo isActive={activeTabKey === "2"} fieldRequirements={fieldRequirements} />,
     },
     {
       key: "3",
-      label: "Personel",
+      label: dataCount.IsEmriPersonelListSayisi >= 1 ? `Personel (${dataCount.IsEmriPersonelListSayisi})` : "Personel",
       children: <PersonelListesiTablo isActive={activeTabKey === "3"} fieldRequirements={fieldRequirements} />,
     },
     {
       key: "4",
-      label: "Malzeme",
+      label: dataCount.IsEmriMalzemeListSayisi >= 1 ? `Malzeme (${dataCount.IsEmriMalzemeListSayisi})` : "Malzeme",
       children: <MalzemeListesiTablo isActive={activeTabKey === "4"} fieldRequirements={fieldRequirements} />,
     },
     {
       key: "5",
-      label: "Duruşlar",
+      label: dataCount.IsEmriDurusListSayisi >= 1 ? `Duruşlar (${dataCount.IsEmriDurusListSayisi})` : "Duruşlar",
       children: <DuruslarListesiTablo isActive={activeTabKey === "5"} fieldRequirements={fieldRequirements} />,
     },
     {
@@ -97,12 +121,18 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
     },
     {
       key: "8",
-      label: "Ölçüm Değerleri",
+      label:
+        dataCount.IsEmriOlcumListSayisi >= 1
+          ? `Ölçüm Değerleri (${dataCount.IsEmriOlcumListSayisi})`
+          : "Ölçüm Değerleri",
       children: <OlcumDegerleriListesiTablo isActive={activeTabKey === "8"} fieldRequirements={fieldRequirements} />,
     },
     {
       key: "9",
-      label: "Araç & Gereçler",
+      label:
+        dataCount.IsEmriAracGerevListSayisi >= 1
+          ? `Araç & Gereçler (${dataCount.IsEmriAracGerevListSayisi})`
+          : "Araç & Gereçler",
       children: <AracGereclerListesiTablo isActive={activeTabKey === "9"} fieldRequirements={fieldRequirements} />,
     },
     {
