@@ -6,7 +6,11 @@ import AxiosInstance from "../../../../../../../api/http";
 const { Text } = Typography;
 
 export default function Location() {
-  const { control, setValue } = useFormContext();
+  const {
+    control,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
   const [treeData, setTreeData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -56,30 +60,35 @@ export default function Location() {
 
   return (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-      <Text style={{ fontSize: "14px" }}>Lokasyon:</Text>
+      <Text style={{ fontSize: "14px", fontWeight: 600 }}>Lokasyon:</Text>
       <Controller
         name="location"
         control={control}
-        render={({ field }) => (
-          <TreeSelect
-            {...field}
-            style={{ width: "300px" }}
-            onChange={(value) => {
-              setValue("locationID", value);
-              handleTreeSelectChange(value);
-              field.onChange(value); // React Hook Form değerini güncelle
-            }}
-            treeData={treeData}
-            placeholder={isLoading ? "Yükleniyor..." : "Seçim Yapınız"}
-            onDropdownVisibleChange={(open) => setIsDropdownOpen(open)}
-            showSearch
-            loading={isLoading}
-            allowClear
-            treeLine="title"
-            filterTreeNode={(input, node) => node.title.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-            dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
-            dropdownRender={(menu) => <Spin spinning={isLoading}>{menu}</Spin>}
-          />
+        rules={{ required: "Alan Boş Bırakılamaz!" }}
+        render={({ field, fieldState: { error } }) => (
+          <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%", maxWidth: "300px" }}>
+            <TreeSelect
+              {...field}
+              status={error ? "error" : ""}
+              style={{ width: "300px" }}
+              onChange={(value) => {
+                setValue("locationID", value);
+                handleTreeSelectChange(value);
+                field.onChange(value); // React Hook Form değerini güncelle
+              }}
+              treeData={treeData}
+              placeholder={isLoading ? "Yükleniyor..." : "Seçim Yapınız"}
+              onDropdownVisibleChange={(open) => setIsDropdownOpen(open)}
+              showSearch
+              loading={isLoading}
+              allowClear
+              treeLine="title"
+              filterTreeNode={(input, node) => node.title.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+              dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
+              dropdownRender={(menu) => <Spin spinning={isLoading}>{menu}</Spin>}
+            />
+            {error && <div style={{ color: "red" }}>{error.message}</div>}
+          </div>
         )}
       />
       <Controller

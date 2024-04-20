@@ -16,7 +16,12 @@ import ModelEkle from "./components/ModelEkle";
 const { Text, Link } = Typography;
 
 export default function MainTabs() {
-  const { control, watch, setValue } = useFormContext();
+  const {
+    control,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
 
   const handleMinusClick = () => {
     setValue("masterMakineTanimi", "");
@@ -56,11 +61,17 @@ export default function MainTabs() {
             justifyContent: "space-between",
             width: "100%",
           }}>
-          <Text style={{ fontSize: "14px" }}>Makine Kodu:</Text>
+          <Text style={{ fontSize: "14px", fontWeight: 600 }}>Makine Kodu:</Text>
           <Controller
             name="makineKodu"
             control={control}
-            render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
+            rules={{ required: "Alan Boş Bırakılamaz!" }}
+            render={({ field, fieldState: { error } }) => (
+              <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%", maxWidth: "300px" }}>
+                <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
+                {error && <div style={{ color: "red" }}>{error.message}</div>}
+              </div>
+            )}
           />
         </div>
         <div
@@ -71,11 +82,17 @@ export default function MainTabs() {
             justifyContent: "space-between",
             width: "100%",
           }}>
-          <Text style={{ fontSize: "14px" }}>Makine Tanımı:</Text>
+          <Text style={{ fontSize: "14px", fontWeight: 600 }}>Makine Tanımı:</Text>
           <Controller
             name="makineTanimi"
             control={control}
-            render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
+            rules={{ required: "Alan Boş Bırakılamaz!" }}
+            render={({ field, fieldState: { error } }) => (
+              <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%", maxWidth: "300px" }}>
+                <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
+                {error && <div style={{ color: "red" }}>{error.message}</div>}
+              </div>
+            )}
           />
         </div>
         <Location />
