@@ -554,7 +554,7 @@ export default function MainTable() {
           event.stopPropagation();
         },
       }), // Enable ellipsis for overflowed content
-      width: 200,
+      width: 300,
       sorter: (a, b) => {
         if (a.MKN_LOKASYON_TUM_YOL && b.MKN_LOKASYON_TUM_YOL) {
           return a.MKN_LOKASYON_TUM_YOL.localeCompare(b.MKN_LOKASYON_TUM_YOL);
@@ -564,6 +564,35 @@ export default function MainTable() {
         }
         return a.MKN_LOKASYON_TUM_YOL ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
       },
+      visible: false, // Varsayılan olarak açık
+    },
+    {
+      title: "Ana Lokasyon",
+      dataIndex: "MKN_LOKASYON_TUM_YOL",
+      key: "ANA_LOKASYON",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
+      width: 300,
+      sorter: (a, b) => {
+        if (a.MKN_LOKASYON_TUM_YOL && b.MKN_LOKASYON_TUM_YOL) {
+          return a.MKN_LOKASYON_TUM_YOL.localeCompare(b.MKN_LOKASYON_TUM_YOL);
+        }
+        if (!a.MKN_LOKASYON_TUM_YOL && !b.MKN_LOKASYON_TUM_YOL) {
+          return 0; // Both are null or undefined, consider them equal
+        }
+        return a.MKN_LOKASYON_TUM_YOL ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+      },
+      render: (text) => {
+        if (text === null) {
+          return null;
+        }
+        const parts = text.split("/");
+        return parts.length > 1 ? parts[0] : text;
+      }, // Add this line
       visible: false, // Varsayılan olarak açık
     },
     {

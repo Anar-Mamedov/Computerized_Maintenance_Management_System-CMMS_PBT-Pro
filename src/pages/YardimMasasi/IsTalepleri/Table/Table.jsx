@@ -540,7 +540,7 @@ export default function MainTable() {
       title: "Tam Lokasyon",
       dataIndex: "IST_BILDIREN_LOKASYON_TUM",
       key: "IST_BILDIREN_LOKASYON_TUM",
-      width: "250px",
+      width: 300,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -548,6 +548,35 @@ export default function MainTable() {
         },
       }),
       visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Ana Lokasyon",
+      dataIndex: "IST_BILDIREN_LOKASYON_TUM",
+      key: "ANA_LOKASYON",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }), // Enable ellipsis for overflowed content
+      width: 300,
+      sorter: (a, b) => {
+        if (a.IST_BILDIREN_LOKASYON_TUM && b.IST_BILDIREN_LOKASYON_TUM) {
+          return a.IST_BILDIREN_LOKASYON_TUM.localeCompare(b.IST_BILDIREN_LOKASYON_TUM);
+        }
+        if (!a.IST_BILDIREN_LOKASYON_TUM && !b.IST_BILDIREN_LOKASYON_TUM) {
+          return 0; // Both are null or undefined, consider them equal
+        }
+        return a.IST_BILDIREN_LOKASYON_TUM ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+      },
+      render: (text) => {
+        if (text === null) {
+          return null;
+        }
+        const parts = text.split("/");
+        return parts.length > 1 ? parts[0] : text;
+      }, // Add this line
+      visible: false, // Varsayılan olarak açık
     },
     {
       title: "Talep Değerlendirme Puan",
