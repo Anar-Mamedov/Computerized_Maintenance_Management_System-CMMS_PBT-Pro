@@ -7,7 +7,6 @@ import backgroundBaseURL from "../../assets/images/backgroundBaseURL.webp";
 import LoginForm from "./components/LoginForm";
 import logo from "../../assets/images/logo.svg";
 import RegistrationForm from "./components/RegistrationForm";
-import axios from "axios";
 
 const { Text, Link } = Typography;
 
@@ -27,30 +26,12 @@ export default function Auth() {
     }
   }, []);
 
-  const saveBaseURL = async () => {
-    console.log("saveBaseURL function triggered");
-    console.log("baseURL:", baseURL);
-    try {
-      const response = await axios.get(baseURL);
-      console.log("response:", response);
-      if (response === 200) {
-        localStorage.setItem("baseURL", baseURL);
-        window.location.reload();
-      } else {
-        alert("Please enter a valid URL");
-      }
-    } catch (error) {
-      console.log("error:", error);
-      alert("Please enter a valid URL");
-    }
+  const saveBaseURL = () => {
+    localStorage.setItem("baseURL", baseURL);
+    window.location.reload();
+    // setTarget("login");
+    // baseURL kaydedildikten sonra login ekranına geçiş
   };
-
-  // const saveBaseURL = () => {
-  //   localStorage.setItem("baseURL", baseURL);
-  //   window.location.reload();
-  //   // setTarget("login");
-  //   // baseURL kaydedildikten sonra login ekranına geçiş
-  // };
 
   // JavaScript objesi olarak stil tanımlaması
   const backgroundStyle = {
