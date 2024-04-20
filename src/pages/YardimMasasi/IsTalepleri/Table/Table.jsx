@@ -433,7 +433,7 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Ayölye",
+      title: "Atölye",
       dataIndex: "IST_ATOLYE_GRUBU_TANIMI",
       key: "IST_ATOLYE_GRUBU_TANIMI",
       width: "150px",
