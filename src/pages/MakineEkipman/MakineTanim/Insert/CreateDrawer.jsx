@@ -33,11 +33,6 @@ export default function CreateDrawer({ onRefresh }) {
 
   // back-end'e gönderilecek veriler
 
-  const handleClick = () => {
-    const values = methods.getValues();
-    console.log(onSubmit(values));
-  };
-
   //* export
   const methods = useForm({
     defaultValues: {
@@ -431,45 +426,45 @@ export default function CreateDrawer({ onRefresh }) {
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)}>
-        <ConfigProvider locale={tr_TR}>
-          <Button
-            type="primary"
-            onClick={showDrawer}
-            style={{
-              display: "flex",
-              alignItems: "center",
-            }}>
-            <PlusOutlined />
-            Ekle
-          </Button>
-          <Drawer
-            width="1660px"
-            title="Yeni Kayıt Ekle"
-            placement={"right"}
-            onClose={onClose}
-            open={open}
-            extra={
-              <Space>
-                <Button onClick={onClose}>İptal</Button>
-                <Button
-                  type="submit"
-                  onClick={handleClick}
-                  style={{
-                    backgroundColor: "#2bc770",
-                    borderColor: "#2bc770",
-                    color: "#ffffff",
-                  }}>
-                  Kaydet
-                </Button>
-              </Space>
-            }>
+      <ConfigProvider locale={tr_TR}>
+        <Button
+          type="primary"
+          onClick={showDrawer}
+          style={{
+            display: "flex",
+            alignItems: "center",
+          }}>
+          <PlusOutlined />
+          Ekle
+        </Button>
+        <Drawer
+          width="1660px"
+          title="Yeni Kayıt Ekle"
+          placement={"right"}
+          onClose={onClose}
+          open={open}
+          extra={
+            <Space>
+              <Button onClick={onClose}>İptal</Button>
+              <Button
+                type="submit"
+                onClick={methods.handleSubmit(onSubmit)}
+                style={{
+                  backgroundColor: "#2bc770",
+                  borderColor: "#2bc770",
+                  color: "#ffffff",
+                }}>
+                Kaydet
+              </Button>
+            </Space>
+          }>
+          <form onSubmit={methods.handleSubmit(onSubmit)}>
             <MainTabs />
             <SecondTabs />
             <Footer />
-          </Drawer>
-        </ConfigProvider>
-      </form>
+          </form>
+        </Drawer>
+      </ConfigProvider>
     </FormProvider>
   );
 }
