@@ -3,8 +3,16 @@ import { Button, Col, Drawer, Row, Typography, Select, Space, Input, DatePicker 
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import "./style.css";
-import dayjs from "dayjs";
 import { Controller, useFormContext } from "react-hook-form";
+import dayjs from "dayjs";
+import "dayjs/locale/tr"; // For Turkish locale
+import weekOfYear from "dayjs/plugin/weekOfYear";
+import advancedFormat from "dayjs/plugin/advancedFormat";
+
+dayjs.extend(weekOfYear);
+dayjs.extend(advancedFormat);
+
+dayjs.locale("tr"); // use Turkish locale
 
 const { Text, Link } = Typography;
 
@@ -62,7 +70,9 @@ export default function CustomFilter({ onSubmit }) {
   }, [startDateSelected, endDateSelected]);
 
   useEffect(() => {
-    handleSubmit();
+    if ((startDate !== null && endDate !== null) || (startDate === null && endDate === null)) {
+      handleSubmit();
+    }
   }, [startDate, endDate]);
   // selectboxtan seçilen tarihlerin watch edilmesi ve set edilmesi sonu
 
@@ -192,9 +202,16 @@ export default function CustomFilter({ onSubmit }) {
               placeholder="Başlangıç Tarihi"
               value={startDate}
               onChange={setStartDate}
+              locale={dayjs.locale("tr")}
             />
             <Text style={{ fontSize: "14px" }}>-</Text>
-            <DatePicker style={{ width: "100%" }} placeholder="Bitiş Tarihi" value={endDate} onChange={setEndDate} />
+            <DatePicker
+              style={{ width: "100%" }}
+              placeholder="Bitiş Tarihi"
+              value={endDate}
+              onChange={setEndDate}
+              locale={dayjs.locale("tr")}
+            />
           </div>
         </div>
 
