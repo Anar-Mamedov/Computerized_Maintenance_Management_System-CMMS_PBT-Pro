@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import "./style.css";
 import dayjs from "dayjs";
+import { Controller, useFormContext } from "react-hook-form";
 
 const { Text, Link } = Typography;
 
@@ -26,6 +27,12 @@ const CloseButton = styled.div`
 `;
 
 export default function CustomFilter({ onSubmit }) {
+  const {
+    control,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState([]);
   const [newObjectsAdded, setNewObjectsAdded] = useState(false);
@@ -37,7 +44,27 @@ export default function CustomFilter({ onSubmit }) {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
-  const [selectedTimeRange, setSelectedTimeRange] = useState("all"); // Varsayılan olarak "Tümü" seçili
+  // selectboxtan seçilen tarihlerin watch edilmesi ve set edilmesi
+  const startDateSelected = watch("startDate");
+  const endDateSelected = watch("endDate");
+
+  useEffect(() => {
+    if (startDateSelected === null) {
+      setStartDate(null);
+    } else {
+      setStartDate(dayjs(startDateSelected));
+    }
+    if (endDateSelected === null) {
+      setEndDate(null);
+    } else {
+      setEndDate(dayjs(endDateSelected));
+    }
+  }, [startDateSelected, endDateSelected]);
+
+  useEffect(() => {
+    handleSubmit();
+  }, [startDate, endDate]);
+  // selectboxtan seçilen tarihlerin watch edilmesi ve set edilmesi sonu
 
   // Create a state variable to store selected values for each row
   const [selectedValues, setSelectedValues] = useState({});
@@ -82,6 +109,7 @@ export default function CustomFilter({ onSubmit }) {
     console.log(filterData);
     // You can now submit or process the filterData object as needed.
     onSubmit(filterData);
+    setOpen(false);
   };
 
   const handleCancelClick = (rowId) => {
@@ -121,58 +149,6 @@ export default function CustomFilter({ onSubmit }) {
 
   const onSearch = (value) => {
     console.log("search:", value);
-  };
-
-  useEffect(() => {
-    // Component yüklendiğinde "Tümü" için gerekli işlevi çalıştır
-    handleTimeRangeChange("all");
-  }, []);
-
-  const handleTimeRangeChange = (value) => {
-    let startDate;
-    let endDate;
-
-    switch (value) {
-      case "all":
-        startDate = null;
-        endDate = null;
-        break;
-      case "today":
-        startDate = dayjs().subtract(1, "day");
-        endDate = dayjs();
-        break;
-      case "thisWeek":
-        startDate = dayjs().subtract(1, "week");
-        endDate = dayjs();
-        break;
-      case "thisMonth":
-        startDate = dayjs().subtract(1, "month");
-        endDate = dayjs();
-        break;
-      case "thisYear":
-        startDate = dayjs().startOf("year");
-        endDate = dayjs();
-        break;
-      case "lastMonth":
-        startDate = dayjs().subtract(1, "month");
-        endDate = dayjs();
-        break;
-      case "last3Months":
-        startDate = dayjs().subtract(3, "months");
-        endDate = dayjs();
-        break;
-      case "last6Months":
-        startDate = dayjs().subtract(6, "months");
-        endDate = dayjs();
-        break;
-      default:
-        startDate = null;
-        endDate = null;
-    }
-
-    setStartDate(startDate);
-    setEndDate(endDate);
-    setSelectedTimeRange(value); // Seçili zaman aralığını güncelle
   };
 
   return (
@@ -221,25 +197,7 @@ export default function CustomFilter({ onSubmit }) {
             <DatePicker style={{ width: "100%" }} placeholder="Bitiş Tarihi" value={endDate} onChange={setEndDate} />
           </div>
         </div>
-        <div style={{ marginBottom: "20px" }}>
-          <Text style={{ fontSize: "14px" }}>Zaman Aralığı</Text>
-          <Select
-            style={{ width: "100%", marginTop: "10px" }}
-            value={selectedTimeRange} // Seçili değeri bu şekilde ayarlayın
-            placeholder="Seçim Yap"
-            onChange={handleTimeRangeChange}
-            options={[
-              { value: "all", label: "Tümü" },
-              { value: "today", label: "Bugün" },
-              { value: "thisWeek", label: "Bu Hafta" },
-              { value: "thisMonth", label: "Bu Ay" },
-              { value: "thisYear", label: "Bu Yıl" },
-              { value: "lastMonth", label: "Son 1 Ay" },
-              { value: "last3Months", label: "Son 3 Ay" },
-              { value: "last6Months", label: "Son 6 Ay" },
-            ]}
-          />
-        </div>
+
         {rows.map((row) => (
           <Row
             key={row.id}
