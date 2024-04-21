@@ -252,7 +252,7 @@ const BaseLayout = () => {
               columnGap: "5px",
             }}>
             <img src={logo} alt="Logo" style={logoStyle} />
-            <Text style={{ color: "white", marginTop: "11px" }}>v. 1.2.0</Text>
+            <Text style={{ color: "white", marginTop: "11px" }}>v. 1.5.0</Text>
           </div>
           <MenuWrapper />
         </Sider>
@@ -276,7 +276,7 @@ const BaseLayout = () => {
               columnGap: "5px",
             }}>
             <img src={logo} alt="Logo" style={logoStyle} />
-            <Text style={{ color: "white", marginTop: "11px" }}>v. 1.2.0</Text>
+            <Text style={{ color: "white", marginTop: "11px" }}>v. 1.5.0</Text>
           </div>
           <MenuWrapper />
         </Sider>
