@@ -62,7 +62,6 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
   };
 
   const secilenIsEmriID = watch("secilenIsEmriID");
-  console.log("Anar", secilenIsEmriID);
 
   const fetchData = async () => {
     try {
