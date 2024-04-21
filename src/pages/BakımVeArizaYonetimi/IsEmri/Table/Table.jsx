@@ -1,18 +1,98 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress } from "antd";
-import { useFormContext } from "react-hook-form";
-import { SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
+import { sortableKeyboardCoordinates, arrayMove, useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { Resizable } from "react-resizable";
+import "./ResizeStyle.css";
 import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import Filters from "./filter/Filters";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
+import { useFormContext } from "react-hook-form";
 
-const { Text, Link } = Typography;
-const { TextArea } = Input;
+const { Text } = Typography;
 
-export default function MainTable() {
+// Sütunların boyutlarını ayarlamak için kullanılan component
+
+const ResizableTitle = (props) => {
+  const { onResize, width, ...restProps } = props;
+
+  // tabloyu genişletmek için kullanılan alanın stil özellikleri
+  const handleStyle = {
+    position: "absolute",
+    bottom: 0,
+    right: "-5px",
+    width: "20%",
+    height: "100%", // this is the area that is draggable, you can adjust it
+    zIndex: 2, // ensure it's above other elements
+    cursor: "col-resize",
+    padding: "0px",
+    backgroundSize: "0px",
+  };
+
+  if (!width) {
+    return <th {...restProps} />;
+  }
+  return (
+    <Resizable
+      width={width}
+      height={0}
+      handle={
+        <span
+          className="react-resizable-handle"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          style={handleStyle}
+        />
+      }
+      onResize={onResize}
+      draggableOpts={{
+        enableUserSelectHack: false,
+      }}>
+      <th {...restProps} />
+    </Resizable>
+  );
+};
+// Sütunların boyutlarını ayarlamak için kullanılan component sonu
+
+// Sütunların sürüklenebilir olmasını sağlayan component
+
+const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onVisibilityChange, ...restProps }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const styleWithTransform = {
+    ...style,
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    backgroundColor: isDragging ? "#f0f0f0" : "",
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+  };
+
+  return (
+    <div ref={setNodeRef} style={styleWithTransform} {...restProps} {...attributes}>
+      {/* <Checkbox
+        checked={visible}
+        onChange={(e) => onVisibilityChange(index, e.target.checked)}
+        style={{ marginLeft: "auto" }}
+      /> */}
+      <div {...listeners} style={{ cursor: "grab", flexGrow: 1, display: "flex", alignItems: "center" }}>
+        <HolderOutlined style={{ marginRight: 8 }} />
+        {text}
+      </div>
+    </div>
+  );
+};
+
+// Sütunların sürüklenebilir olmasını sağlayan component sonu
+
+const MainTable = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
   const [data, setData] = useState([]);
@@ -25,7 +105,6 @@ export default function MainTable() {
   const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
   const [totalDataCount, setTotalDataCount] = useState(0); // Tüm veriyi tutan state
   const [pageSize, setPageSize] = useState(10); // Başlangıçta sayfa başına 10 kayıt göster
-
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
 
@@ -81,14 +160,12 @@ export default function MainTable() {
   }, [drawer.visible]);
 
   // Özel Alanların nameleri backend çekmek için api isteği sonu
-
-  // Örnek kolonlar ve başlangıçta hepsinin görünür olacağı varsayılıyor
-  const columns = [
+  const initialColumns = [
     {
       title: "İş Emri No",
       dataIndex: "ISEMRI_NO",
       key: "ISEMRI_NO",
-      width: "120px",
+      width: 120,
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
       render: (text) => <a>{text}</a>,
@@ -102,7 +179,7 @@ export default function MainTable() {
       title: "Tarih",
       dataIndex: "DUZENLEME_TARIH",
       key: "DUZENLEME_TARIH",
-      width: "110px",
+      width: 110,
       ellipsis: true,
       sorter: (a, b) => {
         if (a.DUZENLEME_TARIH === null) return -1;
@@ -121,7 +198,7 @@ export default function MainTable() {
       title: "Saat",
       dataIndex: "DUZENLEME_SAAT",
       key: "DUZENLEME_SAAT",
-      width: "90px",
+      width: 90,
       ellipsis: true,
       sorter: (a, b) => {
         if (a.DUZENLEME_SAAT === null) return -1;
@@ -140,7 +217,7 @@ export default function MainTable() {
       title: "İş Emri Tipi",
       dataIndex: "ISEMRI_TIP",
       key: "ISEMRI_TIP",
-      width: "180px",
+      width: 180,
       ellipsis: true,
       sorter: (a, b) => {
         if (a.ISEMRI_TIP === null) return -1;
@@ -175,7 +252,7 @@ export default function MainTable() {
       title: "Konu",
       dataIndex: "KONU",
       key: "KONU",
-      width: "300px",
+      width: 300,
       ellipsis: true,
       sorter: (a, b) => {
         if (a.KONU === null) return -1;
@@ -190,7 +267,7 @@ export default function MainTable() {
       title: "Durum",
       dataIndex: "DURUM",
       key: "DURUM",
-      width: "120px",
+      width: 120,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -225,7 +302,7 @@ export default function MainTable() {
       title: "Lokasyon",
       dataIndex: "LOKASYON",
       key: "LOKASYON",
-      width: "200px",
+      width: 200,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -244,7 +321,7 @@ export default function MainTable() {
       title: "Makine Kodu",
       dataIndex: "MAKINE_KODU",
       key: "MAKINE_KODU",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (a.MAKINE_KODU === null && b.MAKINE_KODU === null) return 0;
         if (a.MAKINE_KODU === null) return 1;
@@ -263,7 +340,7 @@ export default function MainTable() {
       title: "Makine Tanımı",
       dataIndex: "MAKINE_TANIMI",
       key: "MAKINE_TANIMI",
-      width: "300px",
+      width: 300,
       sorter: (a, b) => {
         if (a.MAKINE_TANIMI === null && b.MAKINE_TANIMI === null) return 0;
         if (a.MAKINE_TANIMI === null) return -1;
@@ -282,7 +359,7 @@ export default function MainTable() {
       title: "Planlanan Başlama Tarihi",
       dataIndex: "PLAN_BASLAMA_TARIH",
       key: "PLAN_BASLAMA_TARIH",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (a.PLAN_BASLAMA_TARIH === null && b.PLAN_BASLAMA_TARIH === null) return 0;
         if (a.PLAN_BASLAMA_TARIH === null) return 1;
@@ -303,7 +380,7 @@ export default function MainTable() {
       title: "Planlanan Başlama Saati",
       dataIndex: "PLAN_BASLAMA_SAAT",
       key: "PLAN_BASLAMA_SAAT",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (a.PLAN_BASLAMA_SAAT === null && b.PLAN_BASLAMA_SAAT === null) return 0;
         if (a.PLAN_BASLAMA_SAAT === null) return 1;
@@ -323,7 +400,7 @@ export default function MainTable() {
       title: "Planlanan Bitiş Tarihi",
       dataIndex: "PLAN_BITIS_TARIH",
       key: "PLAN_BITIS_TARIH",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -337,7 +414,7 @@ export default function MainTable() {
       title: "Planlanan Bitiş Saati",
       dataIndex: "PLAN_BITIS_SAAT",
       key: "PLAN_BITIS_SAAT",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -351,7 +428,7 @@ export default function MainTable() {
       title: "Başlama Tarihi",
       dataIndex: "BASLAMA_TARIH",
       key: "BASLAMA_TARIH",
-      width: "110px",
+      width: 110,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -365,7 +442,7 @@ export default function MainTable() {
       title: "Başlama Saati",
       dataIndex: "BASLAMA_SAAT",
       key: "BASLAMA_SAAT",
-      width: "90px",
+      width: 90,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -379,7 +456,7 @@ export default function MainTable() {
       title: "Bitiş Tarihi",
       dataIndex: "ISM_BITIS_TARIH",
       key: "ISM_BITIS_TARIH",
-      width: "110px",
+      width: 110,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -393,7 +470,7 @@ export default function MainTable() {
       title: "Bitiş Saati",
       dataIndex: "ISM_BITIS_SAAT",
       key: "ISM_BITIS_SAAT",
-      width: "90px",
+      width: 90,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -407,7 +484,7 @@ export default function MainTable() {
       title: "İş Süresi (dk.)",
       dataIndex: "IS_SURESI",
       key: "IS_SURESI",
-      width: "110px",
+      width: 110,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -421,7 +498,7 @@ export default function MainTable() {
       title: "Tamamlama (%)",
       dataIndex: "TAMAMLANMA",
       key: "TAMAMLANMA",
-      width: "200px",
+      width: 200,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -435,7 +512,7 @@ export default function MainTable() {
       title: "Garanti",
       dataIndex: "GARANTI",
       key: "GARANTI",
-      width: "100px",
+      width: 100,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -459,7 +536,7 @@ export default function MainTable() {
       title: "Makine Durumu",
       dataIndex: "MAKINE_DURUM",
       key: "MAKINE_DURUM",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -472,7 +549,7 @@ export default function MainTable() {
     //   title: "Plaka",
     //   dataIndex: "MAKINE_PLAKA",
     //   key: "MAKINE_PLAKA",
-    //   width: "150px",
+    //   width: 150,
     //   ellipsis: true,
     //   onCell: () => ({
     //     onClick: (event) => {
@@ -485,7 +562,7 @@ export default function MainTable() {
       title: "Makine Tipi",
       dataIndex: "MAKINE_TIP",
       key: "MAKINE_TIP",
-      width: "250px",
+      width: 250,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -498,7 +575,7 @@ export default function MainTable() {
       title: "Ekipman",
       dataIndex: "EKIPMAN",
       key: "EKIPMAN",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -511,7 +588,7 @@ export default function MainTable() {
       title: "İş Tipi",
       dataIndex: "IS_TIPI",
       key: "IS_TIPI",
-      width: "250px",
+      width: 250,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -524,7 +601,7 @@ export default function MainTable() {
       title: "İş Nedeni",
       dataIndex: "IS_NEDENI",
       key: "IS_NEDENI",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -537,7 +614,7 @@ export default function MainTable() {
       title: "Atölye",
       dataIndex: "ATOLYE",
       key: "ATOLYE",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -550,7 +627,7 @@ export default function MainTable() {
       title: "Talimat",
       dataIndex: "TALIMAT",
       key: "TALIMAT",
-      width: "250px",
+      width: 250,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -563,7 +640,7 @@ export default function MainTable() {
       title: "Öncelik",
       dataIndex: "ONCELIK",
       key: "ONCELIK",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -576,7 +653,7 @@ export default function MainTable() {
       title: "Kapanış Tarihi",
       dataIndex: "KAPANIS_TARIHI",
       key: "KAPANIS_TARIHI",
-      width: "110px",
+      width: 110,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -590,7 +667,7 @@ export default function MainTable() {
       title: "Kapanış Saati",
       dataIndex: "KAPANIS_SAATI",
       key: "KAPANIS_SAATI",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -604,7 +681,7 @@ export default function MainTable() {
       title: "Takvim",
       dataIndex: "TAKVIM",
       key: "TAKVIM",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -617,7 +694,7 @@ export default function MainTable() {
       title: "Masraf Merkezi",
       dataIndex: "MASRAF_MERKEZI",
       key: "MASRAF_MERKEZI",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -630,7 +707,7 @@ export default function MainTable() {
       title: "Firma",
       dataIndex: "FRIMA",
       key: "FRIMA",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -643,7 +720,7 @@ export default function MainTable() {
       title: "İş Talep Kodu",
       dataIndex: "IS_TALEP_NO",
       key: "IS_TALEP_NO",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: (record) => ({
         onClick: (event) => {
@@ -665,7 +742,7 @@ export default function MainTable() {
       title: "İş Talep Eden",
       dataIndex: "IS_TALEP_EDEN",
       key: "IS_TALEP_EDEN",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -678,7 +755,7 @@ export default function MainTable() {
       title: "İş Talep Tarihi",
       dataIndex: "IS_TALEP_TARIH",
       key: "IS_TALEP_TARIH",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -692,7 +769,7 @@ export default function MainTable() {
       title: "Personel Adı",
       dataIndex: "PERSONEL_ADI",
       key: "PERSONEL_ADI",
-      width: "180px",
+      width: 180,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -747,7 +824,7 @@ export default function MainTable() {
       title: "Bildirilen Kat",
       dataIndex: "BILDIRILEN_KAT",
       key: "BILDIRILEN_KAT",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -760,7 +837,7 @@ export default function MainTable() {
       title: "Bildirilen Bina",
       dataIndex: "BILDIRILEN_BINA",
       key: "BILDIRILEN_BINA",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -773,7 +850,7 @@ export default function MainTable() {
       title: "Sayaç Değeri",
       dataIndex: "GUNCEL_SAYAC_DEGER",
       key: "GUNCEL_SAYAC_DEGER",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -786,7 +863,7 @@ export default function MainTable() {
       title: "Notlar",
       dataIndex: "ICERDEKI_NOT",
       key: "ICERDEKI_NOT",
-      width: "250px",
+      width: 250,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -799,7 +876,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_1}</div>,
       dataIndex: "OZEL_ALAN_1",
       key: "OZEL_ALAN_1",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -812,7 +889,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_2}</div>,
       dataIndex: "OZEL_ALAN_2",
       key: "OZEL_ALAN_2",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -825,7 +902,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_3}</div>,
       dataIndex: "OZEL_ALAN_3",
       key: "OZEL_ALAN_3",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -838,7 +915,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_4}</div>,
       dataIndex: "OZEL_ALAN_4",
       key: "OZEL_ALAN_4",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -851,7 +928,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_5}</div>,
       dataIndex: "OZEL_ALAN_5",
       key: "OZEL_ALAN_5",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -864,7 +941,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_6}</div>,
       dataIndex: "OZEL_ALAN_6",
       key: "OZEL_ALAN_6",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -877,7 +954,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_7}</div>,
       dataIndex: "OZEL_ALAN_7",
       key: "OZEL_ALAN_7",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -890,7 +967,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_8}</div>,
       dataIndex: "OZEL_ALAN_8",
       key: "OZEL_ALAN_8",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -903,7 +980,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_9}</div>,
       dataIndex: "OZEL_ALAN_9",
       key: "OZEL_ALAN_9",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -916,7 +993,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_10}</div>,
       dataIndex: "OZEL_ALAN_10",
       key: "OZEL_ALAN_10",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -929,7 +1006,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_11}</div>,
       dataIndex: "OZEL_ALAN_11",
       key: "OZEL_ALAN_11",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -942,7 +1019,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_12}</div>,
       dataIndex: "OZEL_ALAN_12",
       key: "OZEL_ALAN_12",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -955,7 +1032,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_13}</div>,
       dataIndex: "OZEL_ALAN_13",
       key: "OZEL_ALAN_13",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -968,7 +1045,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_14}</div>,
       dataIndex: "OZEL_ALAN_14",
       key: "OZEL_ALAN_14",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -981,7 +1058,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_15}</div>,
       dataIndex: "OZEL_ALAN_15",
       key: "OZEL_ALAN_15",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -994,7 +1071,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_16}</div>,
       dataIndex: "OZEL_ALAN_16",
       key: "OZEL_ALAN_16",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -1007,7 +1084,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_17}</div>,
       dataIndex: "OZEL_ALAN_17",
       key: "OZEL_ALAN_17",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -1020,7 +1097,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_18}</div>,
       dataIndex: "OZEL_ALAN_18",
       key: "OZEL_ALAN_18",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -1033,7 +1110,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_19}</div>,
       dataIndex: "OZEL_ALAN_19",
       key: "OZEL_ALAN_19",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -1046,7 +1123,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_20}</div>,
       dataIndex: "OZEL_ALAN_20",
       key: "OZEL_ALAN_20",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -1058,23 +1135,6 @@ export default function MainTable() {
 
     // Diğer kolonlarınız...
   ];
-
-  // Kullanıcının seçtiği kolonların key'lerini tutan state kolonlari göster/gizle butonu için
-
-  const [visibleColumnKeys, setVisibleColumnKeys] = useState(() => {
-    // 'visibleColumns' isimli anahtarla kaydedilmiş değeri oku
-    const savedVisibleColumns = JSON.parse(localStorage.getItem("visibleColumnsIsEmri"));
-
-    // Eğer localStorage'da bir değer varsa, bu değeri kullan
-    if (savedVisibleColumns) {
-      return savedVisibleColumns;
-    }
-
-    // Yoksa, varsayılan olarak görünür olacak kolonların key'lerini döndür
-    return columns.filter((col) => col.visible).map((col) => col.key);
-  });
-
-  // Kullanıcının seçtiği kolonların key'lerini tutan state kolonlari göster/gizle butonu için son
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 
@@ -1258,10 +1318,6 @@ export default function MainTable() {
     };
   };
 
-  // const refreshTableData = useCallback(() => {
-  //   fetchEquipmentData();
-  // }, []);
-
   const refreshTableData = useCallback(() => {
     // Sayfa numarasını 1 yap
     // setCurrentPage(1);
@@ -1284,44 +1340,178 @@ export default function MainTable() {
     // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
   }, [body, currentPage]); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
 
-  // Kolon görünürlüğünü güncelleme fonksiyonu
-  const handleVisibilityChange = (checkedValues) => {
-    setVisibleColumnKeys(checkedValues);
-    // Yeni görünürlük durumunu localStorage'a kaydet
-    localStorage.setItem("visibleColumnsIsEmri", JSON.stringify(checkedValues));
+  // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
+  const [columns, setColumns] = useState(() => {
+    const savedOrder = localStorage.getItem("columnOrder");
+    const savedVisibility = localStorage.getItem("columnVisibility");
+    const savedWidths = localStorage.getItem("columnWidths");
+
+    let order = savedOrder ? JSON.parse(savedOrder) : [];
+    let visibility = savedVisibility ? JSON.parse(savedVisibility) : {};
+    let widths = savedWidths ? JSON.parse(savedWidths) : {};
+
+    initialColumns.forEach((col) => {
+      if (!order.includes(col.key)) {
+        order.push(col.key);
+      }
+      if (visibility[col.key] === undefined) {
+        visibility[col.key] = col.visible;
+      }
+      if (widths[col.key] === undefined) {
+        widths[col.key] = col.width;
+      }
+    });
+
+    localStorage.setItem("columnOrder", JSON.stringify(order));
+    localStorage.setItem("columnVisibility", JSON.stringify(visibility));
+    localStorage.setItem("columnWidths", JSON.stringify(widths));
+
+    return order.map((key) => {
+      const column = initialColumns.find((col) => col.key === key);
+      return { ...column, visible: visibility[key], width: widths[key] };
+    });
+  });
+  // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz sonu
+
+  // sütunları local storage'a kaydediyoruz
+  useEffect(() => {
+    localStorage.setItem("columnOrder", JSON.stringify(columns.map((col) => col.key)));
+    localStorage.setItem(
+      "columnVisibility",
+      JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.visible }), {}))
+    );
+    localStorage.setItem(
+      "columnWidths",
+      JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.width }), {}))
+    );
+  }, [columns]);
+  // sütunları local storage'a kaydediyoruz sonu
+
+  // sütunların boyutlarını ayarlamak için kullanılan fonksiyon
+  const handleResize =
+    (key) =>
+    (_, { size }) => {
+      setColumns((prev) => prev.map((col) => (col.key === key ? { ...col, width: size.width } : col)));
+    };
+
+  const components = {
+    header: {
+      cell: ResizableTitle,
+    },
   };
 
-  // Kolonları gösterip gizleme Modalını göster/gizle
-  const toggleModal = () => {
-    setIsModalVisible(!isModalVisible);
+  const mergedColumns = columns.map((col) => ({
+    ...col,
+    onHeaderCell: (column) => ({
+      width: column.width,
+      onResize: handleResize(column.key),
+    }),
+  }));
+
+  // fitrelenmiş sütunları birleştiriyoruz ve sadece görünür olanları alıyoruz ve tabloya gönderiyoruz
+
+  const filteredColumns = mergedColumns.filter((col) => col.visible);
+
+  // fitrelenmiş sütunları birleştiriyoruz ve sadece görünür olanları alıyoruz ve tabloya gönderiyoruz sonu
+
+  // sütunların sıralamasını değiştirmek için kullanılan fonksiyon
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      const oldIndex = columns.findIndex((column) => column.key === active.id);
+      const newIndex = columns.findIndex((column) => column.key === over.id);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        setColumns((columns) => arrayMove(columns, oldIndex, newIndex));
+      } else {
+        console.error(`Column with key ${active.id} or ${over.id} does not exist.`);
+      }
+    }
   };
 
-  // Görünür kolonları filtrele
-  const visibleColumns = columns.filter((col) => visibleColumnKeys.includes(col.key));
+  // sütunların sıralamasını değiştirmek için kullanılan fonksiyon sonu
 
-  // Kolon görünürlüğünü güncelleme fonksiyonu son
+  // sütunların görünürlüğünü değiştirmek için kullanılan fonksiyon
+
+  const toggleVisibility = (key, checked) => {
+    const index = columns.findIndex((col) => col.key === key);
+    if (index !== -1) {
+      const newColumns = [...columns];
+      newColumns[index].visible = checked;
+      setColumns(newColumns);
+    } else {
+      console.error(`Column with key ${key} does not exist.`);
+    }
+  };
+
+  // sütunların görünürlüğünü değiştirmek için kullanılan fonksiyon sonu
+
+  // sütunları sıfırlamak için kullanılan fonksiyon
+
+  function resetColumns() {
+    localStorage.removeItem("columnOrder");
+    localStorage.removeItem("columnVisibility");
+    localStorage.removeItem("columnWidths");
+    window.location.reload();
+  }
+  // sütunları sıfırlamak için kullanılan fonksiyon sonu
 
   return (
-    <div>
-      <style>
-        {`
-          .boldRow {
-            font-weight: bold;
-          }
-        `}
-      </style>
+    <>
+      <Modal
+        title="Sütunları Yönet"
+        centered
+        width={800}
+        open={isModalVisible}
+        onOk={() => setIsModalVisible(false)}
+        onCancel={() => setIsModalVisible(false)}>
+        <Text style={{ marginBottom: "15px" }}>
+          Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını Ayarlayabilirsiniz.
+        </Text>
+        <div style={{ display: "flex", width: "100%", justifyContent: "center", marginTop: "10px" }}>
+          <Button onClick={resetColumns} style={{ marginBottom: "15px" }}>
+            Sütunları Sıfırla
+          </Button>
+        </div>
 
-      <Modal width={900} title="Kolonları Düzenle" open={isModalVisible} onOk={toggleModal} onCancel={toggleModal}>
-        <Checkbox.Group
-          style={{ width: "100%", display: "flex", gap: "10px", flexDirection: "column", height: "500px" }}
-          value={visibleColumnKeys}
-          onChange={handleVisibilityChange}>
-          {columns.map((col) => (
-            <Checkbox key={col.key} value={col.key}>
-              {col.title}
-            </Checkbox>
-          ))}
-        </Checkbox.Group>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div style={{ width: "46%", border: "1px solid #8080806e", borderRadius: "8px", padding: "10px" }}>
+            <div style={{ marginBottom: "20px", borderBottom: "1px solid #80808051", padding: "8px 8px 12px 8px" }}>
+              <Text style={{ fontWeight: 600 }}>Sütunları Göster / Gizle</Text>
+            </div>
+            <div style={{ height: "400px", overflow: "auto" }}>
+              {initialColumns.map((col) => (
+                <div style={{ display: "flex", gap: "10px" }} key={col.key}>
+                  <Checkbox
+                    checked={columns.find((column) => column.key === col.key)?.visible || false}
+                    onChange={(e) => toggleVisibility(col.key, e.target.checked)}
+                  />
+                  {col.title}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <DndContext
+            onDragEnd={handleDragEnd}
+            sensors={useSensors(
+              useSensor(PointerSensor),
+              useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+            )}>
+            <div style={{ width: "46%", border: "1px solid #8080806e", borderRadius: "8px", padding: "10px" }}>
+              <div style={{ marginBottom: "20px", borderBottom: "1px solid #80808051", padding: "8px 8px 12px 8px" }}>
+                <Text style={{ fontWeight: 600 }}>Sütunların Sıralamasını Ayarla</Text>
+              </div>
+              <div style={{ height: "400px", overflow: "auto" }}>
+                {columns
+                  .filter((col) => col.visible)
+                  .map((col, index) => (
+                    <DraggableRow key={col.key} id={col.key} index={index} text={col.title} />
+                  ))}
+              </div>
+            </div>
+          </DndContext>
+        </div>
       </Modal>
       <div
         style={{
@@ -1350,7 +1540,7 @@ export default function MainTable() {
               // width: "32px",
               height: "32px",
             }}
-            onClick={toggleModal}>
+            onClick={() => setIsModalVisible(true)}>
             <MenuOutlined />
           </Button>
           <Input
@@ -1372,8 +1562,9 @@ export default function MainTable() {
       </div>
       <Spin spinning={loading}>
         <Table
-          columns={visibleColumns}
+          components={components}
           rowSelection={rowSelection}
+          columns={filteredColumns}
           dataSource={data}
           pagination={{
             current: currentPage,
@@ -1393,7 +1584,6 @@ export default function MainTable() {
           rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
         />
       </Spin>
-
       <EditDrawer
         selectedRow={drawer.data}
         onDrawerClose={() => setDrawer({ ...drawer, visible: false })}
@@ -1411,6 +1601,8 @@ export default function MainTable() {
           }}
         />
       )}
-    </div>
+    </>
   );
-}
+};
+
+export default MainTable;
