@@ -7,6 +7,7 @@ import backgroundBaseURL from "../../assets/images/backgroundBaseURL.webp";
 import LoginForm from "./components/LoginForm";
 import logo from "../../assets/images/logo.svg";
 import RegistrationForm from "./components/RegistrationForm";
+import axios from "axios";
 
 const { Text, Link } = Typography;
 
@@ -14,6 +15,7 @@ export default function Auth() {
   const [target, setTarget] = React.useState("login"); // login veya register
   const [target1, setTarget1] = React.useState("login"); // login veya register
   const [baseURL, setBaseURL] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   // Sayfa yüklendiğinde localStorage kontrolü yapılıyor
   useEffect(() => {
@@ -27,11 +29,28 @@ export default function Auth() {
   }, []);
 
   const saveBaseURL = () => {
-    localStorage.setItem("baseURL", baseURL);
-    window.location.reload();
-    // setTarget("login");
-    // baseURL kaydedildikten sonra login ekranına geçiş
+    axios
+      .get(`${baseURL}/api/VeritabaniBaglantiKontrol`)
+      .then((response) => {
+        if (response.data === true) {
+          localStorage.setItem("baseURL", baseURL);
+          window.location.reload();
+        } else {
+          console.error("URL is not valid or server is not responding correctly.");
+          setErrorMessage("Geçerli Bir Bağlantı Anahtarı Giriniz.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error occurred while trying to reach the URL:", error);
+      });
   };
+
+  // const saveBaseURL = () => {
+  //   localStorage.setItem("baseURL", baseURL);
+  //   window.location.reload();
+  //   // setTarget("login");
+  //   // baseURL kaydedildikten sonra login ekranına geçiş
+  // };
 
   // JavaScript objesi olarak stil tanımlaması
   const backgroundStyle = {
@@ -100,16 +119,33 @@ export default function Auth() {
       return (
         <div style={formBackground}>
           <div style={formStyle}>
-            <Form style={{ width: "300px" }}>
-              <Input
-                placeholder="Bağlantı Anahtarını Girin"
-                value={baseURL}
-                onChange={(e) => setBaseURL(e.target.value)}
-              />
-              <Button type="primary" onClick={saveBaseURL} style={{ marginTop: 20, width: "100%" }}>
-                Kaydet
-              </Button>
-            </Form>
+            <div
+              style={{
+                backgroundColor: "white",
+                padding: "70px 50px",
+                borderRadius: "16px",
+                boxShadow: "rgba(0, 0, 0, 0.2) 0px 0px 25px 3px",
+              }}>
+              <div style={{ width: "300px", marginBottom: "15px", display: "flex" }}>
+                <Text style={{ textAlign: "center" }}>
+                  Uygulamayı kullanmak için aşağıdaki alana veri tabanı bağlantı anahtarını girin.
+                </Text>
+              </div>
+
+              <Form style={{ width: "300px" }}>
+                <Input
+                  placeholder="Bağlantı Anahtarını Girin"
+                  value={baseURL}
+                  onChange={(e) => setBaseURL(e.target.value)}
+                />
+                {errorMessage && (
+                  <p style={{ color: "red", marginBottom: "-10px", marginTop: "5px" }}>{errorMessage}</p>
+                )}
+                <Button type="primary" onClick={saveBaseURL} style={{ marginTop: 20, width: "100%" }}>
+                  Kaydet
+                </Button>
+              </Form>
+            </div>
           </div>
         </div>
       );
