@@ -8,6 +8,7 @@ export default function MainTabs({ onSelectedRow }) {
   const { setValue } = useFormContext();
   const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectedRowKey, setSelectedRowKey] = useState(null); // Yeni state
   const [loading, setLoading] = useState(true);
   const [selectedRows, setSelectedRows] = useState([]);
   const [filteredData, setFilteredData] = useState([]); // Filtrelenmiş veri için yeni state
@@ -79,9 +80,14 @@ export default function MainTabs({ onSelectedRow }) {
   const onRowClick = (record) => {
     return {
       onClick: () => {
+        setSelectedRowKey(record.key); // Seçili satırın key'ini ayarla
         onSelectedRow(record); // Üst bileşene tıklanan satırın verisini aktar
       },
     };
+  };
+
+  const rowClassName = (record) => {
+    return record.key === selectedRowKey ? "selected-row" : ""; // Seçili satıra özel class
   };
 
   // const refreshTableData = useCallback(() => {
@@ -141,6 +147,9 @@ export default function MainTabs({ onSelectedRow }) {
           .boldRow {
             font-weight: bold;
           }
+          .selected-row {
+            background-color: #2bc77135;  // Açık yeşil arkaplan rengi
+          }
         `}
       </style>
       <Input
@@ -153,6 +162,7 @@ export default function MainTabs({ onSelectedRow }) {
         <Table
           columns={columns}
           // rowSelection={rowSelection}
+          rowClassName={rowClassName}
           dataSource={filteredData}
           pagination={false}
           onRow={onRowClick}

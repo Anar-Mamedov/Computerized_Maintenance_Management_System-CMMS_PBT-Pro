@@ -11,6 +11,7 @@ import { useAppContext } from "../../../../../../../../../AppContext";
 export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenPersonelID, selectedRow }) {
   const { isModalVisible, setIsModalVisible } = useAppContext();
   const [loading, setLoading] = useState(false);
+  const [selectedData, setSelectedData] = useState({});
 
   // message
   const [messageApi, contextHolder] = message.useMessage();
@@ -293,10 +294,14 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
   };
 
   const handleModalToggle = () => {
-    setIsModalVisible((prev) => !prev);
-    if (!isModalVisible) {
-      reset();
-    }
+    setIsModalVisible((prev) => {
+      if (prev) {
+        // Modal şu anda açık, kapatacağız
+        reset();
+        setSelectedData(null); // Modal kapanırken selectedData'yı null yap
+      }
+      return !prev;
+    });
   };
 
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi sonu
@@ -306,6 +311,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     // Burada, tıklanan satırın verisini işleyebilirsiniz.
     // Örneğin, form alanlarını doldurmak veya başka bir işlem yapmak için kullanabilirsiniz.
     console.log("Seçilen satır:", selectedRowData);
+    setSelectedData(selectedRowData);
     setValue("secilenID", selectedRowData.key);
     setValue("isEmriTipiTanim", selectedRowData.IMT_TANIM);
     setValue("varsayilanIsEmriTipi", selectedRowData.IMT_VARSAYILAN);
@@ -434,7 +440,8 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
             <div style={{ display: "flex", gap: "10px" }}>
               <MainTabs onSelectedRow={handleSelectedRow} />
               <form onSubmit={methods.handleSubmit(onSubmited)}>
-                <EditTabs selectedRow={selectedRow} />
+                {/* Koşullu renderlama burada yapılıyor */}
+                {selectedData && Object.keys(selectedData).length > 0 && <EditTabs selectedRow={selectedData} />}
               </form>
             </div>
           </Spin>
