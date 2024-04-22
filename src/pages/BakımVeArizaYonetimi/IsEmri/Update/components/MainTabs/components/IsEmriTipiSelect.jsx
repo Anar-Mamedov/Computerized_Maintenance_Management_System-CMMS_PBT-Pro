@@ -28,6 +28,8 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
   // Watch the 'kapali' field from the form
   const kapali = watch("kapali"); // Assuming 'kapali' is the name of the field in your form
 
+  const isEmriTipiID = watch("isEmriTipiID");
+
   // message
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -220,7 +222,7 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
               />
             )}
           />
-          <CreateModal />
+          <CreateModal isEmriTipiID={isEmriTipiID} />
         </div>
 
         {errors.isEmriTipi && <div style={{ color: "red", marginTop: "5px" }}>{errors.isEmriTipi.message}</div>}

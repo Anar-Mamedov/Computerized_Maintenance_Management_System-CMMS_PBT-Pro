@@ -250,27 +250,27 @@ export default function CustomFilter({ onSubmit }) {
                   filterOption={(input, option) => (option?.label || "").toLowerCase().includes(input.toLowerCase())}
                   options={[
                     {
-                      value: "IST_TALEP_EDEN_ADI",
+                      value: "isk.ISK_ISIM",
                       label: "Talep Eden",
                     },
                     {
-                      value: "IST_DEPARTMAN",
+                      value: "kod_departman.KOD_TANIM",
                       label: "Departman",
                     },
                     {
-                      value: "IST_BILDIREN_LOKASYON",
+                      value: "lok.LOK_TANIM",
                       label: "Lokasyon",
                     },
                     {
-                      value: "IST_TIP_TANIM",
+                      value: "kod_tip.KOD_TANIM",
                       label: "Talep Tipi",
                     },
                     {
-                      value: "IST_MAKINE_KOD",
+                      value: "mkn.MKN_KOD",
                       label: "Makine Kodu",
                     },
                     {
-                      value: "IST_MAKINE_TANIM",
+                      value: "mkn.MKN_TANIM",
                       label: "Makine Tanımı",
                     },
                   ]}

@@ -1528,7 +1528,7 @@ const MainTable = () => {
             gap: "10px",
             alignItems: "center",
             width: "100%",
-            maxWidth: "780px",
+            maxWidth: "935px",
             flexWrap: "wrap",
           }}>
           <Button
