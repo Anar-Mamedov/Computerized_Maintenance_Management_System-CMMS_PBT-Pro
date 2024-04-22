@@ -434,8 +434,8 @@ export default function MainTable() {
     },
     {
       title: "Atölye",
-      dataIndex: "IST_ATOLYE_GRUBU_TANIMI",
-      key: "IST_ATOLYE_GRUBU_TANIMI",
+      dataIndex: "IST_ATOLYE_TANIM",
+      key: "IST_ATOLYE_TANIM",
       width: "150px",
       ellipsis: true,
       onCell: () => ({

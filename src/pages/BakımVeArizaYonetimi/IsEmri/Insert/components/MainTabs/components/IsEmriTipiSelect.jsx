@@ -12,6 +12,7 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
   const {
     control,
     setValue,
+    watch,
     formState: { errors },
   } = useFormContext();
   const [options, setOptions] = useState([]);
@@ -19,6 +20,8 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
   const inputRef = createRef();
   const [name, setName] = useState("");
   const [selectKey, setSelectKey] = useState(0);
+
+  const isEmriTipiID = watch("isEmriTipiID");
 
   // message
   const [messageApi, contextHolder] = message.useMessage();
@@ -136,7 +139,7 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
               />
             )}
           />
-          <CreateModal />
+          <CreateModal isEmriTipiID={isEmriTipiID} />
         </div>
 
         {errors.isEmriTipi && <div style={{ color: "red", marginTop: "5px" }}>{errors.isEmriTipi.message}</div>}

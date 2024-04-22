@@ -8,7 +8,14 @@ import EditTabs from "./SecondTabs/EditTabs";
 import dayjs from "dayjs";
 import { useAppContext } from "../../../../../../../../../AppContext";
 
-export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenPersonelID, selectedRow }) {
+export default function CreateModal({
+  workshopSelectedId,
+  onSubmit,
+  onRefresh,
+  secilenPersonelID,
+  selectedRow,
+  isEmriTipiID,
+}) {
   const { isModalVisible, setIsModalVisible } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [selectedData, setSelectedData] = useState({});
@@ -16,7 +23,6 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
   // message
   const [messageApi, contextHolder] = message.useMessage();
   // message end
-
   const methods = useForm({
     defaultValues: {
       isEmriTipiTanim: "",
@@ -440,10 +446,11 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
           destroyOnClose>
           <Spin spinning={loading}>
             <div style={{ display: "flex", gap: "10px" }}>
-              <MainTabs onSelectedRow={handleSelectedRow} />
+              <MainTabs onSelectedRow={handleSelectedRow} isEmriTipiID={isEmriTipiID} />
               <form onSubmit={methods.handleSubmit(onSubmited)}>
                 {/* Koşullu renderlama burada yapılıyor */}
-                {selectedData && Object.keys(selectedData).length > 0 && <EditTabs selectedRow={selectedData} />}
+                {/* {selectedData && Object.keys(selectedData).length > 0 && <EditTabs selectedRow={selectedData} />} */}
+                <EditTabs selectedRow={selectedData} />
               </form>
             </div>
           </Spin>

@@ -4,7 +4,7 @@ import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../../../api/http";
 import TipEkle from "../../Insert/TipEkle";
 
-export default function MainTabs({ onSelectedRow }) {
+export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
   const { setValue } = useFormContext();
   const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -29,35 +29,48 @@ export default function MainTabs({ onSelectedRow }) {
 
   // ana tablo api isteği için kullanılan useEffect
 
-  useEffect(() => {
-    fetchEquipmentData();
-  }, []);
+  // useEffect(() => {
+  //   fetchEquipmentData();
+  // }, []);
 
   // ana tablo api isteği için kullanılan useEffect son
 
-  const fetchEquipmentData = async () => {
-    try {
-      setLoading(true);
-      const response = await AxiosInstance.get(`IsEmriTip`);
-      if (response) {
-        // Gelen veriyi formatla ve state'e ata
-        const formattedData = response.map((item) => ({
-          ...item,
-          key: item.TB_ISEMRI_TIP_ID,
-          // Diğer alanlarınız...
-        }));
-        setData(formattedData);
-        setFilteredData(formattedData); // filteredData'yı da aynı veriyle güncelle
-        setLoading(false);
-      } else {
-        console.error("API response is not in expected format");
+  useEffect(() => {
+    const fetchEquipmentData = async () => {
+      try {
+        setLoading(true);
+        const response = await AxiosInstance.get(`IsEmriTip`);
+        if (response) {
+          const formattedData = response.map((item) => ({
+            ...item,
+            key: item.TB_ISEMRI_TIP_ID,
+          }));
+          setData(formattedData);
+          setFilteredData(formattedData);
+          setLoading(false);
+
+          // Check if there's an ID to select initially
+          if (isEmriTipiID) {
+            const selectedRow = formattedData.find((row) => row.key === isEmriTipiID);
+            if (selectedRow) {
+              setSelectedRowKeys([selectedRow.key]);
+              setSelectedRows([selectedRow]);
+              setSelectedRowKey(selectedRow.key); // Set the selected row key
+              onSelectedRow(selectedRow); // Simulate the click event after data load
+            }
+          }
+        } else {
+          console.error("API response is not in expected format");
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("Error in API request:", error);
         setLoading(false);
       }
-    } catch (error) {
-      console.error("Error in API request:", error);
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchEquipmentData();
+  }, [isEmriTipiID]); // Dependency array to refetch when ID changes
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -100,7 +113,7 @@ export default function MainTabs({ onSelectedRow }) {
     setSelectedRows([]);
 
     // Verileri yeniden çekmek için `fetchEquipmentData` fonksiyonunu çağır
-    fetchEquipmentData();
+    // fetchEquipmentData();
   }, []); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
 
   // Arama terimindeki değişiklikleri işleyen fonksiyon
@@ -139,6 +152,16 @@ export default function MainTabs({ onSelectedRow }) {
       setFilteredData(data);
     }
   };
+
+  // useEffect(() => {
+  //   if (isEmriTipiID && data.length > 0) {
+  //     const selectedRow = data.find((row) => row.key === isEmriTipiID);
+  //     if (selectedRow) {
+  //       setSelectedRowKeys([selectedRow.key]);
+  //       setSelectedRows([selectedRow]);
+  //     }
+  //   }
+  // }, [isEmriTipiID, data]);
 
   return (
     <div style={{ width: "200px", display: "flex", flexDirection: "column", alignItems: "center", gap: "15px" }}>
