@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Tag } from "antd";
+import { Table, Button, Modal, Checkbox, Input, Spin, Tag, message } from "antd";
 import { useFormContext } from "react-hook-form";
 import { SearchOutlined, MenuOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../api/http";
@@ -871,6 +871,13 @@ export default function MainTable() {
     } catch (error) {
       console.error("Error in API request:", error);
       setLoading(false);
+      if (navigator.onLine) {
+        // İnternet bağlantısı var
+        message.error("Hata Mesajı: " + error.message);
+      } else {
+        // İnternet bağlantısı yok
+        message.error("Internet Bağlantısı Mevcut Değil.");
+      }
     }
   };
 

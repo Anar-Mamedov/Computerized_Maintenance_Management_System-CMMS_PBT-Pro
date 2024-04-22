@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Table, Input } from "antd";
+import { Button, Modal, Table, Input, message } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../api/http";
 import styled from "styled-components";
@@ -135,6 +135,13 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit, disabled }
       .catch((error) => {
         console.error("API Error:", error);
         setLoading(false);
+        if (navigator.onLine) {
+          // İnternet bağlantısı var
+          message.error("Hata Mesajı: " + error.message);
+        } else {
+          // İnternet bağlantısı yok
+          message.error("Internet Bağlantısı Mevcut Değil.");
+        }
       });
   };
 

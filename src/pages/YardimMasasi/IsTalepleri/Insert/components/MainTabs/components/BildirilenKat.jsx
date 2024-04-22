@@ -83,6 +83,13 @@ export default function BildirilenKat({ disabled, fieldRequirements }) {
             type: "error",
             content: "An error occurred while adding the item.",
           });
+          if (navigator.onLine) {
+            // İnternet bağlantısı var
+            message.error("Hata Mesajı: " + error.message);
+          } else {
+            // İnternet bağlantısı yok
+            message.error("Internet Bağlantısı Mevcut Değil.");
+          }
         })
         .finally(() => {
           setLoading(false);

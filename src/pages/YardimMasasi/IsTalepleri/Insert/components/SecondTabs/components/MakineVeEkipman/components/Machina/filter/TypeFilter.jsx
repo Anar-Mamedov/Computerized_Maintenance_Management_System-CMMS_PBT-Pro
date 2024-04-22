@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Select, Button, Dropdown, Menu } from "antd";
+import { Select, Button, Dropdown, Menu, message } from "antd";
 import AxiosInstance from "../../../../../../../../../../../api/http";
 
 const { Option } = Select;
@@ -43,6 +43,13 @@ const TypeFilter = ({ onSubmit }) => {
       })
       .catch((error) => {
         console.log("API Error:", error);
+        if (navigator.onLine) {
+          // İnternet bağlantısı var
+          message.error("Hata Mesajı: " + error.message);
+        } else {
+          // İnternet bağlantısı yok
+          message.error("Internet Bağlantısı Mevcut Değil.");
+        }
       });
   }, []);
 

@@ -99,7 +99,13 @@ export default function BelgeTipiEkle({ workshopSelectedId, onSubmit }) {
       .catch((error) => {
         // Handle errors here, e.g.:
         console.error("Error sending data:", error);
-        message.error("Başarısız Olundu.");
+        if (navigator.onLine) {
+          // İnternet bağlantısı var
+          message.error("Hata Mesajı: " + error.message);
+        } else {
+          // İnternet bağlantısı yok
+          message.error("Internet Bağlantısı Mevcut Değil.");
+        }
       });
 
     console.log({ Body });
