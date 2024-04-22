@@ -429,23 +429,23 @@ export default function CustomFilter({ onSubmit }) {
                       label: "Özel Alan 10",
                     },
                     {
-                      value: "OZEL_ALAN_11",
+                      value: "kod_ozel_11.KOD_TANIM",
                       label: "Özel Alan 11",
                     },
                     {
-                      value: "OZEL_ALAN_12",
+                      value: "kod_ozel_12.KOD_TANIM",
                       label: "Özel Alan 12",
                     },
                     {
-                      value: "OZEL_ALAN_13",
+                      value: "kod_ozel_13.KOD_TANIM",
                       label: "Özel Alan 13",
                     },
                     {
-                      value: "OZEL_ALAN_14",
+                      value: "kod_ozel_14.KOD_TANIM",
                       label: "Özel Alan 14",
                     },
                     {
-                      value: "OZEL_ALAN_15",
+                      value: "kod_ozel_15.KOD_TANIM",
                       label: "Özel Alan 15",
                     },
                     {
@@ -468,14 +468,14 @@ export default function CustomFilter({ onSubmit }) {
                       value: "ism.ISM_OZEL_ALAN_20",
                       label: "Özel Alan 20",
                     },
-                    // {
-                    //   value: "BILDIRILEN_KAT",
-                    //   label: "Bildirilen Kat",
-                    // },
-                    // {
-                    //   value: "BILDIRILEN_BINA",
-                    //   label: "Bildirilen Bina",
-                    // },
+                    {
+                      value: "kod_kat.KOD_TANIM",
+                      label: "Bildirilen Kat",
+                    },
+                    {
+                      value: "kod_bina.KOD_TANIM",
+                      label: "Bildirilen Bina",
+                    },
                     {
                       value: "prs.PRS_ISIM",
                       label: "Personel Adı",

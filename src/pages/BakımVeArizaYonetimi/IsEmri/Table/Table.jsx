@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress } from "antd";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable } from "@dnd-kit/sortable";
@@ -1270,6 +1270,13 @@ const MainTable = () => {
     } catch (error) {
       console.error("Error in API request:", error);
       setLoading(false);
+      if (navigator.onLine) {
+        // İnternet bağlantısı var
+        message.error("Hata Mesajı: " + error.message);
+      } else {
+        // İnternet bağlantısı yok
+        message.error("Internet Bağlantısı Mevcut Değil.");
+      }
     }
   };
 

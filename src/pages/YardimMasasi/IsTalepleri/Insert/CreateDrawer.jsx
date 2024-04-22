@@ -18,6 +18,16 @@ export default function CreateDrawer({ onRefresh }) {
     // Diğer alanlar için de benzer şekilde...
   });
 
+  // useEffect(() => {
+  //   if (navigator.onLine) {
+  //     // İnternet bağlantısı var
+  //     // message.success("internet bağlantısı var");
+  //   } else {
+  //     // İnternet bağlantısı yok
+  //     message.error("Internet Bağlantısı Mevcut Değil.");
+  //   }
+  // }, [open]);
+
   useEffect(() => {
     if (open) {
       // Çekmece açıldığında gerekli işlemi yap
@@ -29,6 +39,13 @@ export default function CreateDrawer({ onRefresh }) {
         })
         .catch((error) => {
           console.error("Error fetching new work order number:", error);
+          if (navigator.onLine) {
+            // İnternet bağlantısı var
+            message.error("Hata Mesajı: " + error.message);
+          } else {
+            // İnternet bağlantısı yok
+            message.error("Internet Bağlantısı Mevcut Değil.");
+          }
         });
     }
   }, [open]);
@@ -180,7 +197,13 @@ export default function CreateDrawer({ onRefresh }) {
       .catch((error) => {
         // Handle errors here, e.g.:
         console.error("Error sending data:", error);
-        message.error("Başarısız Olundu.");
+        if (navigator.onLine) {
+          // İnternet bağlantısı var
+          message.error("Hata Mesajı: " + error.message);
+        } else {
+          // İnternet bağlantısı yok
+          message.error("Internet Bağlantısı Mevcut Değil.");
+        }
       });
     console.log({ Body });
   };
