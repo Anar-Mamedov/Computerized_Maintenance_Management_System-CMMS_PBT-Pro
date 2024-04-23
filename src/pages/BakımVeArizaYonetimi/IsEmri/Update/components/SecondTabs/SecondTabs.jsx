@@ -141,19 +141,17 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
     },
     {
       key: "11",
-      label: "Notlar",
-      // label: dataCount.IsEmriNotVar === true ? `Notlar *` : "Notlar",
+      label: dataCount.IsEmriNotVar === true ? `Notlar *` : "Notlar",
       children: <Notlar fieldRequirements={fieldRequirements} />,
     },
     {
       key: "12",
-      label: dataCount.IsEmriNotVar === true ? `Açıklama *` : "Açıklama",
+      label: dataCount.IsEmriAciklamaVar === true ? `Açıklama *` : "Açıklama",
       children: <Aciklama fieldRequirements={fieldRequirements} />,
     },
     {
       key: "13",
-      label: "Dosyalar",
-      // label: dataCount.IsEmriResimSayisi >= 1 ? `Dosyalar (${dataCount.IsEmriResimSayisi})` : "Dosyalar",
+      label: dataCount.IsEmriDosyaSayisi >= 1 ? `Dosyalar (${dataCount.IsEmriDosyaSayisi})` : "Dosyalar",
       children: <DosyaUpload fieldRequirements={fieldRequirements} />,
     },
     {

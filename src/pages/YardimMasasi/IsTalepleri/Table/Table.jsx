@@ -10,6 +10,10 @@ import ContextMenu from "../components/ContextMenu/ContextMenu";
 import TeknisyenSubmit from "../components/IsEmrineCevir/Teknisyen/TeknisyenSubmit";
 import AtolyeSubmit from "../components/IsEmrineCevir/Atolye/AtolyeSubmit";
 import EditDrawer1 from "../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+
+dayjs.extend(customParseFormat);
 
 export default function MainTable() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -306,7 +310,7 @@ export default function MainTable() {
       title: "İşlem Süresi",
       dataIndex: "ISLEM_SURE",
       key: "ISLEM_SURE",
-      width: "150px",
+      width: 300,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -314,6 +318,39 @@ export default function MainTable() {
         },
       }),
       visible: true, // Varsayılan olarak açık
+      render: (text, record) => {
+        let baslangicTarihi, bitisTarihi;
+        // IST_ACILIS_TARIHI ve IST_ACILIS_SAATI'nin tarih ve saatini al
+        baslangicTarihi = dayjs(record.IST_ACILIS_TARIHI + "T" + record.IST_ACILIS_SAATI, "YYYY-MM-DDTHH:mm:ss");
+
+        // IST_DURUM_ID'nin değeri 4'ten farklıysa
+        if (record.IST_DURUM_ID !== 4) {
+          // Şimdiki zamanı al
+          bitisTarihi = dayjs();
+        } else {
+          // IST_KAPAMA_TARIHI ve IST_KAPAMA_SAATI değerleri null, undefined veya boş değilse
+          if (record.IST_KAPAMA_TARIHI && record.IST_KAPAMA_SAATI) {
+            // IST_KAPAMA_TARIHI ve IST_KAPAMA_SAATI'nin tarih ve saatini al
+            bitisTarihi = dayjs(record.IST_KAPAMA_TARIHI + "T" + record.IST_KAPAMA_SAATI, "YYYY-MM-DDTHH:mm:ss");
+          } else {
+            // IST_KAPAMA_TARIHI ve IST_KAPAMA_SAATI değerleri null, undefined veya boşsa, hesaplama yapma ve boş döndür
+            return "";
+          }
+        }
+
+        // İki zaman arasındaki farkı milisaniye cinsinden hesapla
+        const fark = bitisTarihi.diff(baslangicTarihi);
+        // Farkı saniye cinsine çevir
+        const farkSaniye = Math.floor(fark / 1000);
+        // Farkı dakika cinsine çevir
+        const farkDakika = Math.floor(farkSaniye / 60);
+        // Farkı saat cinsine çevir
+        const farkSaat = Math.floor(farkDakika / 60);
+        // Farkı gün cinsine çevir
+        const farkGun = Math.floor(farkSaat / 24);
+        // İşlem süresini formatla ve döndür
+        return `${farkGun} gün ${farkSaat % 24} saat ${farkDakika % 60} dakika ${farkSaniye % 60} saniye`;
+      },
     },
     {
       title: "Müdahele Gecikme Süresi",

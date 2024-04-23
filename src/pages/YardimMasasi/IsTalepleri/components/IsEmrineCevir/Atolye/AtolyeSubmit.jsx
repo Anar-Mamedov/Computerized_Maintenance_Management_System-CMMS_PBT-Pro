@@ -60,7 +60,8 @@ export default function AtolyeSubmit({ selectedRows, refreshTableData }) {
           refreshTableData(); // Tablo verilerini yenile
         }, 1000); // 1000 milisaniye (1 saniye) bekler
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          const aciklamaValues = response.isEmriNolari.map((item) => item.Aciklama).join(", ");
+          message.success(aciklamaValues + " Numaralı İş Emirleri Oluşturulmuştur.");
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
