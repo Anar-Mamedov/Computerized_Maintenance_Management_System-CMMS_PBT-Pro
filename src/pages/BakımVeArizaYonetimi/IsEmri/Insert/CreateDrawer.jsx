@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { Button, Drawer, Space, ConfigProvider, Modal, message, Alert } from "antd";
+import { Button, Drawer, Space, ConfigProvider, Modal, message, Alert, Spin } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import tr_TR from "antd/es/locale/tr_TR";
 import AxiosInstance from "../../../../api/http";
@@ -10,6 +10,7 @@ import Footer from "../Footer";
 import dayjs from "dayjs";
 
 export default function CreateDrawer({ onRefresh }) {
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   // API'den gelen zorunluluk bilgilerini simüle eden bir örnek
@@ -22,10 +23,14 @@ export default function CreateDrawer({ onRefresh }) {
     if (open) {
       // Çekmece açıldığında gerekli işlemi yap
       // Örneğin, MainTabs'a bir prop olarak geçir
+      setLoading(true);
       AxiosInstance.get("ModulKoduGetir?modulKodu=ISM_ISEMRI_NO") // Replace with your actual API endpoint
         .then((response) => {
           // Assuming the response contains the new work order number in 'response.Tanim'
           setValue("isEmriNo", response);
+          // setTimeout(() => {
+          //   setLoading(false);
+          // }, 100);
         })
         .catch((error) => {
           console.error("Error fetching new work order number:", error);
@@ -114,6 +119,15 @@ export default function CreateDrawer({ onRefresh }) {
   });
 
   const { setValue, reset, watch } = methods;
+
+  const isEmriNo = watch("isEmriNo");
+
+  // isEmriNo durumunu izleyen bir useEffect
+  useEffect(() => {
+    if (isEmriNo !== "") {
+      setLoading(false);
+    }
+  }, [isEmriNo]);
 
   // iş emri tipine göre zorunlu alanları belirleme
 
@@ -389,11 +403,20 @@ export default function CreateDrawer({ onRefresh }) {
               </Button>
             </Space>
           }>
-          <form onSubmit={methods.handleSubmit(onSubmit)}>
-            <MainTabs drawerOpen={open} isDisabled={isDisabled} fieldRequirements={fieldRequirements} />
-            <SecondTabs fieldRequirements={fieldRequirements} />
-            <Footer />
-          </form>
+          {loading ? (
+            <Spin
+              spinning={loading}
+              size="large"
+              style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+              {/* İçerik yüklenirken gösterilecek alan */}
+            </Spin>
+          ) : (
+            <form onSubmit={methods.handleSubmit(onSubmit)}>
+              <MainTabs drawerOpen={open} isDisabled={isDisabled} fieldRequirements={fieldRequirements} />
+              <SecondTabs fieldRequirements={fieldRequirements} />
+              <Footer />
+            </form>
+          )}
         </Drawer>
       </ConfigProvider>
     </FormProvider>
