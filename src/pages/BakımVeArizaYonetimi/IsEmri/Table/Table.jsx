@@ -1463,6 +1463,7 @@ const MainTable = () => {
     localStorage.removeItem("columnOrder");
     localStorage.removeItem("columnVisibility");
     localStorage.removeItem("columnWidths");
+    // localStorage.removeItem("ozelAlanlar");
     window.location.reload();
   }
   // sütunları sıfırlamak için kullanılan fonksiyon sonu
