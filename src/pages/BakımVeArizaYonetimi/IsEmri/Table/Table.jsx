@@ -149,6 +149,7 @@ const MainTable = () => {
     const fetchData = async () => {
       try {
         const response = await AxiosInstance.get("OzelAlan?form=ISEMRI"); // API URL'niz
+        // localStorage.setItem("ozelAlanlar", JSON.stringify(response));
         setLabel(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
       } catch (error) {
         console.error("API isteğinde hata oluştu:", error);
@@ -158,6 +159,9 @@ const MainTable = () => {
 
     fetchData();
   }, [drawer.visible]);
+
+  // const ozelAlanlar = JSON.parse(localStorage.getItem("ozelAlanlar"));
+  // console.log("ozelAlanlar", ozelAlanlar);
 
   // Özel Alanların nameleri backend çekmek için api isteği sonu
   const initialColumns = [
