@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs, message } from "antd";
+import { Button, Modal, Input, Typography, Tabs, message, Spin } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../../api/http";
 import { Controller, useForm, FormProvider } from "react-hook-form";
@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 
 export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const methods = useForm({
     defaultValues: {
       siraNo: "",
@@ -30,7 +31,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     },
   });
 
-  const { setValue, reset, handleSubmit } = methods;
+  const { setValue, reset, handleSubmit, watch } = methods;
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
@@ -92,10 +93,37 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     setIsModalVisible((prev) => !prev);
     if (!isModalVisible) {
       reset();
+      fetchData(); // Add this line
     }
   };
 
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi sonu
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await AxiosInstance.get(`GetIsEmriTabsCountById?isEmriId=${secilenIsEmriID}`); // API URL'niz
+      setValue("siraNo", response.IsEmriKontrolListSayisi + 1);
+    } catch (error) {
+      console.error("API isteğinde hata oluştu:", error);
+      if (navigator.onLine) {
+        // İnternet bağlantısı var
+        message.error("Hata Mesajı: " + error.message);
+      } else {
+        // İnternet bağlantısı yok
+        message.error("Internet Bağlantısı Mevcut Değil.");
+      }
+    }
+  };
+
+  const siraNo = watch("siraNo");
+
+  // siraNo durumunu izleyen bir useEffect
+  useEffect(() => {
+    if (siraNo !== "") {
+      setLoading(false);
+    }
+  }, [siraNo]);
 
   return (
     <FormProvider {...methods}>
@@ -112,9 +140,18 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
           onCancel={handleModalToggle}>
-          <form onSubmit={methods.handleSubmit(onSubmited)}>
-            <MainTabs />
-          </form>
+          {loading ? (
+            <Spin
+              spinning={loading}
+              size="large"
+              style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+              {/* İçerik yüklenirken gösterilecek alan */}
+            </Spin>
+          ) : (
+            <form onSubmit={methods.handleSubmit(onSubmited)}>
+              <MainTabs />
+            </form>
+          )}
         </Modal>
       </div>
     </FormProvider>
