@@ -321,7 +321,10 @@ export default function MainTable() {
       render: (text, record) => {
         let baslangicTarihi, bitisTarihi;
         // IST_ACILIS_TARIHI ve IST_ACILIS_SAATI'nin tarih ve saatini al
-        baslangicTarihi = dayjs(record.IST_ACILIS_TARIHI + "T" + record.IST_ACILIS_SAATI, "YYYY-MM-DDTHH:mm:ss");
+        baslangicTarihi = dayjs(
+          record.IST_ACILIS_TARIHI.split("T")[0] + "T" + record.IST_ACILIS_SAATI,
+          "YYYY-MM-DDTHH:mm:ss"
+        );
 
         // IST_DURUM_ID'nin değeri 4'ten farklıysa
         if (record.IST_DURUM_ID !== 4) {
@@ -331,7 +334,10 @@ export default function MainTable() {
           // IST_KAPAMA_TARIHI ve IST_KAPAMA_SAATI değerleri null, undefined veya boş değilse
           if (record.IST_KAPAMA_TARIHI && record.IST_KAPAMA_SAATI) {
             // IST_KAPAMA_TARIHI ve IST_KAPAMA_SAATI'nin tarih ve saatini al
-            bitisTarihi = dayjs(record.IST_KAPAMA_TARIHI + "T" + record.IST_KAPAMA_SAATI, "YYYY-MM-DDTHH:mm:ss");
+            bitisTarihi = dayjs(
+              record.IST_KAPAMA_TARIHI.split("T")[0] + "T" + record.IST_KAPAMA_SAATI,
+              "YYYY-MM-DDTHH:mm:ss"
+            );
           } else {
             // IST_KAPAMA_TARIHI ve IST_KAPAMA_SAATI değerleri null, undefined veya boşsa, hesaplama yapma ve boş döndür
             return "";
