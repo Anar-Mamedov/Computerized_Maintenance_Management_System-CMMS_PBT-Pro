@@ -214,11 +214,55 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
   };
 
   const handleModalToggle = () => {
-    setIsModalOpen((prev) => !prev);
-    if (!isModalOpen) {
-      reset();
-    }
+    AxiosInstance.get(`CheckIsmFieldsForClose?isEmriId=${selectedRows[0].key}`)
+      .then((response) => {
+        console.log("Data sent successfully:", response);
+
+        if (response.Durum === false) {
+          if (response.TextArray && response.TextArray.length > 0) {
+            message.error(`${response.TextArray.join(",\n")}, Bu özel alanların doldurulması lazım.`);
+          }
+          if (response.Idlist && response.Idlist.length > 0) {
+            // response.Idlist içindeki her bir ID için karşılık gelen kelimeyi bul
+            const words = response.Idlist.map((id) => idToWordMap[id] || "Bilinmeyen ID");
+
+            // Bulunan kelimeleri birleştirerek mesajda göster
+            message.error(`${words.join(",\n")}, Bu alanların doldurulması lazım.`);
+          }
+          if (response.IsmIsNotPersonelTimeSet === true) {
+            message.error(`Personel Çalışma Süresi Girilmedi.`);
+          }
+          reset();
+          setIsModalOpen(false); // Sadece başarılı olursa modalı kapat
+          refreshTableData();
+        } else if (response.Durum === true) {
+          setIsModalOpen((prev) => !prev);
+          if (!isModalOpen) {
+            reset();
+          }
+        } else {
+          message.error("İşlem Başarısız.");
+        }
+      })
+      .catch((error) => {
+        // Handle errors here, e.g.:
+        console.error("Error sending data:", error);
+        if (navigator.onLine) {
+          // İnternet bağlantısı var
+          message.error("Hata Mesajı: " + error.message);
+        } else {
+          // İnternet bağlantısı yok
+          message.error("Internet Bağlantısı Mevcut Değil.");
+        }
+      });
   };
+
+  // const handleModalToggle = () => {
+  //   setIsModalOpen((prev) => !prev);
+  //   if (!isModalOpen) {
+  //     reset();
+  //   }
+  // };
   return (
     <FormProvider {...methods}>
       <div style={buttonStyle}>
