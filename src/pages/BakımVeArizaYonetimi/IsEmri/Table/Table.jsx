@@ -149,7 +149,7 @@ const MainTable = () => {
     const fetchData = async () => {
       try {
         const response = await AxiosInstance.get("OzelAlan?form=ISEMRI"); // API URL'niz
-        // localStorage.setItem("ozelAlanlar", JSON.stringify(response));
+        localStorage.setItem("ozelAlanlar", JSON.stringify(response));
         setLabel(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
       } catch (error) {
         console.error("API isteğinde hata oluştu:", error);
@@ -160,8 +160,7 @@ const MainTable = () => {
     fetchData();
   }, [drawer.visible]);
 
-  // const ozelAlanlar = JSON.parse(localStorage.getItem("ozelAlanlar"));
-  // console.log("ozelAlanlar", ozelAlanlar);
+  const ozelAlanlar = JSON.parse(localStorage.getItem("ozelAlanlar"));
 
   // Özel Alanların nameleri backend çekmek için api isteği sonu
   const initialColumns = [
@@ -877,7 +876,11 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: <div>{label.OZL_OZEL_ALAN_1}</div>,
+      title: (
+        <div>
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_1 ? ozelAlanlar.OZL_OZEL_ALAN_1 : label && label.OZL_OZEL_ALAN_1}
+        </div>
+      ),
       dataIndex: "OZEL_ALAN_1",
       key: "OZEL_ALAN_1",
       width: 150,
@@ -890,7 +893,11 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: <div>{label.OZL_OZEL_ALAN_2}</div>,
+      title: (
+        <div>
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_2 ? ozelAlanlar.OZL_OZEL_ALAN_2 : label && label.OZL_OZEL_ALAN_2}
+        </div>
+      ),
       dataIndex: "OZEL_ALAN_2",
       key: "OZEL_ALAN_2",
       width: 150,
@@ -903,7 +910,11 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: <div>{label.OZL_OZEL_ALAN_3}</div>,
+      title: (
+        <div>
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_3 ? ozelAlanlar.OZL_OZEL_ALAN_3 : label && label.OZL_OZEL_ALAN_3}
+        </div>
+      ),
       dataIndex: "OZEL_ALAN_3",
       key: "OZEL_ALAN_3",
       width: 150,
@@ -916,7 +927,11 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: <div>{label.OZL_OZEL_ALAN_4}</div>,
+      title: (
+        <div>
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_4 ? ozelAlanlar.OZL_OZEL_ALAN_4 : label && label.OZL_OZEL_ALAN_4}
+        </div>
+      ),
       dataIndex: "OZEL_ALAN_4",
       key: "OZEL_ALAN_4",
       width: 150,
@@ -929,7 +944,11 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: <div>{label.OZL_OZEL_ALAN_5}</div>,
+      title: (
+        <div>
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_5 ? ozelAlanlar.OZL_OZEL_ALAN_5 : label && label.OZL_OZEL_ALAN_5}
+        </div>
+      ),
       dataIndex: "OZEL_ALAN_5",
       key: "OZEL_ALAN_5",
       width: 150,
@@ -942,7 +961,11 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: <div>{label.OZL_OZEL_ALAN_6}</div>,
+      title: (
+        <div>
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_6 ? ozelAlanlar.OZL_OZEL_ALAN_6 : label && label.OZL_OZEL_ALAN_6}
+        </div>
+      ),
       dataIndex: "OZEL_ALAN_6",
       key: "OZEL_ALAN_6",
       width: 150,
@@ -955,7 +978,11 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: <div>{label.OZL_OZEL_ALAN_7}</div>,
+      title: (
+        <div>
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_7 ? ozelAlanlar.OZL_OZEL_ALAN_7 : label && label.OZL_OZEL_ALAN_7}
+        </div>
+      ),
       dataIndex: "OZEL_ALAN_7",
       key: "OZEL_ALAN_7",
       width: 150,
@@ -968,7 +995,11 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: <div>{label.OZL_OZEL_ALAN_8}</div>,
+      title: (
+        <div>
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_8 ? ozelAlanlar.OZL_OZEL_ALAN_8 : label && label.OZL_OZEL_ALAN_8}
+        </div>
+      ),
       dataIndex: "OZEL_ALAN_8",
       key: "OZEL_ALAN_8",
       width: 150,
@@ -981,7 +1012,11 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: <div>{label.OZL_OZEL_ALAN_9}</div>,
+      title: (
+        <div>
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_9 ? ozelAlanlar.OZL_OZEL_ALAN_9 : label && label.OZL_OZEL_ALAN_9}
+        </div>
+      ),
       dataIndex: "OZEL_ALAN_9",
       key: "OZEL_ALAN_9",
       width: 150,
@@ -994,7 +1029,11 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: <div>{label.OZL_OZEL_ALAN_10}</div>,
+      title: (
+        <div>
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_10 ? ozelAlanlar.OZL_OZEL_ALAN_10 : label && label.OZL_OZEL_ALAN_10}
+        </div>
+      ),
       dataIndex: "OZEL_ALAN_10",
       key: "OZEL_ALAN_10",
       width: 150,
@@ -1007,7 +1046,11 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: <div>{label.OZL_OZEL_ALAN_11}</div>,
+      title: (
+        <div>
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_11 ? ozelAlanlar.OZL_OZEL_ALAN_11 : label && label.OZL_OZEL_ALAN_11}
+        </div>
+      ),
       dataIndex: "OZEL_ALAN_11",
       key: "OZEL_ALAN_11",
       width: 150,
@@ -1020,7 +1063,11 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: <div>{label.OZL_OZEL_ALAN_12}</div>,
+      title: (
+        <div>
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_12 ? ozelAlanlar.OZL_OZEL_ALAN_12 : label && label.OZL_OZEL_ALAN_12}
+        </div>
+      ),
       dataIndex: "OZEL_ALAN_12",
       key: "OZEL_ALAN_12",
       width: 150,
@@ -1033,7 +1080,11 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: <div>{label.OZL_OZEL_ALAN_13}</div>,
+      title: (
+        <div>
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_13 ? ozelAlanlar.OZL_OZEL_ALAN_13 : label && label.OZL_OZEL_ALAN_13}
+        </div>
+      ),
       dataIndex: "OZEL_ALAN_13",
       key: "OZEL_ALAN_13",
       width: 150,
@@ -1046,7 +1097,11 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: <div>{label.OZL_OZEL_ALAN_14}</div>,
+      title: (
+        <div>
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_14 ? ozelAlanlar.OZL_OZEL_ALAN_14 : label && label.OZL_OZEL_ALAN_14}
+        </div>
+      ),
       dataIndex: "OZEL_ALAN_14",
       key: "OZEL_ALAN_14",
       width: 150,
@@ -1059,7 +1114,11 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: <div>{label.OZL_OZEL_ALAN_15}</div>,
+      title: (
+        <div>
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_15 ? ozelAlanlar.OZL_OZEL_ALAN_15 : label && label.OZL_OZEL_ALAN_15}
+        </div>
+      ),
       dataIndex: "OZEL_ALAN_15",
       key: "OZEL_ALAN_15",
       width: 150,
@@ -1072,7 +1131,11 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: <div>{label.OZL_OZEL_ALAN_16}</div>,
+      title: (
+        <div>
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_16 ? ozelAlanlar.OZL_OZEL_ALAN_16 : label && label.OZL_OZEL_ALAN_16}
+        </div>
+      ),
       dataIndex: "OZEL_ALAN_16",
       key: "OZEL_ALAN_16",
       width: 150,
@@ -1085,7 +1148,11 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: <div>{label.OZL_OZEL_ALAN_17}</div>,
+      title: (
+        <div>
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_17 ? ozelAlanlar.OZL_OZEL_ALAN_17 : label && label.OZL_OZEL_ALAN_17}
+        </div>
+      ),
       dataIndex: "OZEL_ALAN_17",
       key: "OZEL_ALAN_17",
       width: 150,
@@ -1098,7 +1165,11 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: <div>{label.OZL_OZEL_ALAN_18}</div>,
+      title: (
+        <div>
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_18 ? ozelAlanlar.OZL_OZEL_ALAN_18 : label && label.OZL_OZEL_ALAN_18}
+        </div>
+      ),
       dataIndex: "OZEL_ALAN_18",
       key: "OZEL_ALAN_18",
       width: 150,
@@ -1111,7 +1182,11 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: <div>{label.OZL_OZEL_ALAN_19}</div>,
+      title: (
+        <div>
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_19 ? ozelAlanlar.OZL_OZEL_ALAN_19 : label && label.OZL_OZEL_ALAN_19}
+        </div>
+      ),
       dataIndex: "OZEL_ALAN_19",
       key: "OZEL_ALAN_19",
       width: 150,
@@ -1124,7 +1199,11 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: <div>{label.OZL_OZEL_ALAN_20}</div>,
+      title: (
+        <div>
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_20 ? ozelAlanlar.OZL_OZEL_ALAN_20 : label && label.OZL_OZEL_ALAN_20}
+        </div>
+      ),
       dataIndex: "OZEL_ALAN_20",
       key: "OZEL_ALAN_20",
       width: 150,
@@ -1463,7 +1542,7 @@ const MainTable = () => {
     localStorage.removeItem("columnOrder");
     localStorage.removeItem("columnVisibility");
     localStorage.removeItem("columnWidths");
-    // localStorage.removeItem("ozelAlanlar");
+    localStorage.removeItem("ozelAlanlar");
     window.location.reload();
   }
   // sütunları sıfırlamak için kullanılan fonksiyon sonu
