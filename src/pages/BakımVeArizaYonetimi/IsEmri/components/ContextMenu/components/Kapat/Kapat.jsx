@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, message } from "antd";
+import { Button, Modal, message, Typography, Alert } from "antd";
 import Forms from "./components/Forms";
 import { Controller, useForm, FormProvider } from "react-hook-form";
 import AxiosInstance from "../../../../../../../api/http";
 import dayjs from "dayjs";
 
+const { Text } = Typography;
+
 export default function Iptal({ selectedRows, refreshTableData, kapatDisabled }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [disabled, setDisabled] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessageShow, setErrorMessageShow] = useState(false);
   const methods = useForm({
     defaultValues: {
       baslamaTarihi: null,
@@ -159,7 +164,13 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
               .catch((error) => {
                 // Handle errors here, e.g.:
                 console.error("Error sending data:", error);
-                message.error("Başarısız Olundu.");
+                if (navigator.onLine) {
+                  // İnternet bağlantısı var
+                  message.error("Hata Mesajı: " + error.message);
+                } else {
+                  // İnternet bağlantısı yok
+                  message.error("Internet Bağlantısı Mevcut Değil.");
+                }
               });
             console.log({ Body });
           } else {
@@ -169,7 +180,13 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
         .catch((error) => {
           // Handle errors here, e.g.:
           console.error("Error sending data:", error);
-          message.error("Başarısız Olundu.");
+          if (navigator.onLine) {
+            // İnternet bağlantısı var
+            message.error("Hata Mesajı: " + error.message);
+          } else {
+            // İnternet bağlantısı yok
+            message.error("Internet Bağlantısı Mevcut Değil.");
+          }
         });
       console.log({ Body });
     } else if (selectedRows.length > 1) {
@@ -207,54 +224,69 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
         .catch((error) => {
           // Handle errors here, e.g.:
           console.error("Error sending data:", error);
-          message.error("Başarısız Olundu.");
+          if (navigator.onLine) {
+            // İnternet bağlantısı var
+            message.error("Hata Mesajı: " + error.message);
+          } else {
+            // İnternet bağlantısı yok
+            message.error("Internet Bağlantısı Mevcut Değil.");
+          }
         });
       console.log({ Body });
     }
   };
 
   const handleModalToggle = () => {
-    AxiosInstance.get(`CheckIsmFieldsForClose?isEmriId=${selectedRows[0].key}`)
-      .then((response) => {
-        console.log("Data sent successfully:", response);
+    if (!isModalOpen) {
+      reset();
+    }
+    if (selectedRows.length === 1) {
+      AxiosInstance.get(`CheckIsmFieldsForClose?isEmriId=${selectedRows[0].key}`)
+        .then((response) => {
+          console.log("Data sent successfully:", response);
 
-        if (response.Durum === false) {
-          if (response.TextArray && response.TextArray.length > 0) {
-            message.error(`${response.TextArray.join(",\n")}, Bu özel alanların doldurulması lazım.`);
+          if (response.Durum === false) {
+            setErrorMessageShow(true);
+            let errorMsg = "";
+            if (response.TextArray && response.TextArray.length > 0) {
+              errorMsg += `${response.TextArray.join(",\n")}, `;
+            }
+            if (response.Idlist && response.Idlist.length > 0) {
+              const words = response.Idlist.map((id) => idToWordMap[id] || "Bilinmeyen ID");
+              errorMsg += `${words.join(",\n")}, `;
+            }
+            if (response.IsmIsNotPersonelTimeSet === true) {
+              errorMsg += ``;
+            }
+            setErrorMessage(errorMsg);
+            setDisabled(true);
+          } else if (response.Durum === true) {
+            setErrorMessageShow(false);
+            setDisabled(false);
+            if (!isModalOpen) {
+              reset();
+            }
+          } else {
+            message.error("İşlem Başarısız.");
           }
-          if (response.Idlist && response.Idlist.length > 0) {
-            // response.Idlist içindeki her bir ID için karşılık gelen kelimeyi bul
-            const words = response.Idlist.map((id) => idToWordMap[id] || "Bilinmeyen ID");
-
-            // Bulunan kelimeleri birleştirerek mesajda göster
-            message.error(`${words.join(",\n")}, Bu alanların doldurulması lazım.`);
-          }
-          if (response.IsmIsNotPersonelTimeSet === true) {
-            message.error(`Personel Çalışma Süresi Girilmedi.`);
-          }
-          reset();
-          setIsModalOpen(false); // Sadece başarılı olursa modalı kapat
-          refreshTableData();
-        } else if (response.Durum === true) {
           setIsModalOpen((prev) => !prev);
-          if (!isModalOpen) {
-            reset();
+        })
+        .catch((error) => {
+          // Handle errors here, e.g.:
+          console.error("Error sending data:", error);
+          if (navigator.onLine) {
+            // İnternet bağlantısı var
+            message.error("Hata Mesajı: " + error.message);
+          } else {
+            // İnternet bağlantısı yok
+            message.error("Internet Bağlantısı Mevcut Değil.");
           }
-        } else {
-          message.error("İşlem Başarısız.");
-        }
-      })
-      .catch((error) => {
-        // Handle errors here, e.g.:
-        console.error("Error sending data:", error);
-        if (navigator.onLine) {
-          // İnternet bağlantısı var
-          message.error("Hata Mesajı: " + error.message);
-        } else {
-          // İnternet bağlantısı yok
-          message.error("Internet Bağlantısı Mevcut Değil.");
-        }
-      });
+        });
+    } else if (selectedRows.length > 1) {
+      setErrorMessageShow(false);
+      setDisabled(false);
+      setIsModalOpen((prev) => !prev);
+    }
   };
 
   // const handleModalToggle = () => {
@@ -263,6 +295,7 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
   //     reset();
   //   }
   // };
+
   return (
     <FormProvider {...methods}>
       <div style={buttonStyle}>
@@ -274,15 +307,48 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
           Seçili İş Emirlerini Kapat
         </Button>
         <Modal
+          key="modal"
           title={modalTitle}
           centered
           destroyOnClose
           width={990}
           open={isModalOpen}
           onOk={methods.handleSubmit(onSubmited)}
-          onCancel={handleModalToggle}>
+          onCancel={handleModalToggle}
+          okButtonProps={{ disabled }}
+          footer={[
+            <div key="footer" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+              <div style={{ width: "100%" }}>
+                {errorMessageShow ? (
+                  <Alert
+                    key="alert"
+                    style={{ fontWeight: 500, color: "red", textAlign: "left" }}
+                    message={"İş emrinde doldurulması gerekli zorunlu alanlar bulunmaktadır. (" + errorMessage + ")"}
+                    type="error"
+                    showIcon
+                  />
+                ) : null}
+              </div>
+              <div style={{ display: "flex", gap: "10px", marginLeft: "10px" }}>
+                <Button key="cancel" onClick={handleModalToggle}>
+                  İptal
+                </Button>
+                <Button key="submit" type="primary" disabled={disabled} onClick={methods.handleSubmit(onSubmited)}>
+                  Tamam
+                </Button>
+              </div>
+            </div>,
+          ]}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <Forms isModalOpen={isModalOpen} selectedRows={selectedRows} />
+            {/* <Text>{errorMessage}</Text> */}
+            {/* <Alert
+              style={{ fontWeight: 500, color: "red", marginTop: "10px", marginBottom: "10px" }}
+              message={errorMessage}
+              // description="This is some important information."
+              type="error"
+              showIcon
+            /> */}
           </form>
         </Modal>
       </div>

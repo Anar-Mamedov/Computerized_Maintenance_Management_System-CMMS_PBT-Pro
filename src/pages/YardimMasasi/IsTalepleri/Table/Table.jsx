@@ -349,7 +349,7 @@ export default function MainTable() {
         // Farkı gün cinsine çevir
         const farkGun = Math.floor(farkSaat / 24);
         // İşlem süresini formatla ve döndür
-        return `${farkGun} gün ${farkSaat % 24} saat ${farkDakika % 60} dakika ${farkSaniye % 60} saniye`;
+        return `${farkGun > 0 ? farkGun + " gün " : ""}${farkSaat % 24} saat ${farkDakika % 60} dakika `;
       },
     },
     {
