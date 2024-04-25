@@ -378,6 +378,7 @@ export default function CreateDrawer({ onRefresh }) {
       // Notlar sekmesi
       MKN_GUVENLIK_NOT: data.makineGenelNot,
       MKN_GENEL_NOT: data.makineGuvenlikNotu,
+      MKN_WEB: true,
       // add more fields as needed
     };
 

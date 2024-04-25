@@ -176,6 +176,7 @@ export default function CreateDrawer({ onRefresh }) {
       IST_EKIPMAN_ID: data.ekipmanID,
       IST_MAKINE_DURUM_KOD_ID: data.makineDurumuID,
       IST_DURUM_ID: 0,
+      IST_WEB: true,
       // Diğer alanlarınız...
     };
 
