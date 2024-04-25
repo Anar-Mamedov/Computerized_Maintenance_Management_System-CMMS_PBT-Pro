@@ -355,8 +355,67 @@ export default function MainTable() {
         // Farkı gün cinsine çevir
         const farkGun = Math.floor(farkSaat / 24);
         // İşlem süresini formatla ve döndür
-        return `${farkGun > 0 ? farkGun + " gün " : ""}${farkSaat % 24} saat ${farkDakika % 60} dakika `;
+        // return `${farkGun > 0 ? farkGun + " gün " : ""}${farkSaat % 24} saat ${farkDakika % 60} dakika `;
+        return `${farkGun > 0 ? farkGun + " gün " : ""}${farkSaat % 24 > 0 ? (farkSaat % 24) + " saat " : ""}${
+          farkDakika % 60 > 0 ? (farkDakika % 60) + " dakika " : ""
+        }`;
       },
+    },
+    {
+      title: "Kapanma Tarih",
+      dataIndex: "IST_KAPAMA_TARIHI",
+      key: "IST_KAPAMA_TARIHI",
+      width: "110px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak açık
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Kapanma Saat",
+      dataIndex: "IST_KAPAMA_SAATI",
+      key: "IST_KAPAMA_SAATI",
+      width: "90px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak açık
+      render: (text) => formatTime(text),
+    },
+    {
+      title: "İptal Tarih",
+      dataIndex: "IST_IPTAL_TARIH",
+      key: "IST_IPTAL_TARIH",
+      width: "110px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak açık
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "İptal Saat",
+      dataIndex: "IST_IPTAL_SAAT",
+      key: "IST_IPTAL_SAAT",
+      width: "90px",
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false, // Varsayılan olarak açık
+      render: (text) => formatTime(text),
     },
     {
       title: "Müdahele Gecikme Süresi",
