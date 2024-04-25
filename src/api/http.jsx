@@ -18,6 +18,7 @@ AxiosInstance.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      localStorage.removeItem("login");
       // localStorage.removeItem("userId");
       window.location.href = "/auth"; // `/auth` sayfasına yönlendir
     }
@@ -47,6 +48,7 @@ PdfAxiosInstance.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      localStorage.removeItem("login");
       // localStorage.removeItem("userId");
       window.location.href = "/auth"; // `/auth` sayfasına yönlendir
     }

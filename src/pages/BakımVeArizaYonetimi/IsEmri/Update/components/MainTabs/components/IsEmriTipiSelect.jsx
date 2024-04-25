@@ -166,7 +166,7 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
                 key={selectKey}
                 style={{ width: "265px" }}
                 showSearch
-                allowClear
+                // allowClear
                 placeholder="Seçim Yapınız"
                 optionFilterProp="children"
                 filterOption={(input, option) =>

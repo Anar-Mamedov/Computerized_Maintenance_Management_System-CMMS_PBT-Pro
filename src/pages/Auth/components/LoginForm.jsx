@@ -45,6 +45,39 @@ export default function LoginForm() {
           userUnvan: response.KLL_UNVAN,
         };
         localStorage.setItem("user", JSON.stringify(userInfo));
+        const login = {
+          "": true, // Ana Sayfa için her zaman true
+          Dashboard: true,
+          makine: true,
+          ekipmanVeritabani: true,
+          sayacGuncelleme: true,
+          bakimTanimlari: true,
+          arizaTanimlari: true,
+          isEmri1: true,
+          peryodikBakimlar: true,
+          otomatikIsEmirleri: true,
+          planlamaTakvimi: true,
+          atolye: true,
+          personeltanimlari: true,
+          personelIzinleri: true,
+          personelNobetleri: true,
+          personelCalismaPLani: true,
+          isTalepleri: response.KLL_ISTALEBI_KUL,
+          isTalebiKullanicilari: true,
+          raporYonetimi: true,
+          formYonetimi: true,
+          lokasyon: true,
+          vardiyalar: true,
+          kodYonetimi: true,
+          otomatikKodlar: true,
+          servisOncelikSeviyeleri: true,
+          isEmriTipleri: true,
+          onaylayicilar: true,
+          projeTanimlari: true,
+        };
+        localStorage.setItem("login", JSON.stringify(login));
+        const anar = localStorage.getItem("login");
+        console.log(anar);
         // Recoil durumunu güncelleme işlemini App bileşeninde yapabilirsiniz
         message.success("Giriş başarılı!");
         // Optional: Store user ID if available in response

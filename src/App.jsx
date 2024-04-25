@@ -37,6 +37,8 @@ const { TextArea } = Input;
 
 const { Header, Content, Footer, Sider } = Layout;
 
+const loginData = JSON.parse(localStorage.getItem("login"));
+
 function getItem(label, key, icon, children, isClickable = true) {
   return {
     key,
@@ -46,7 +48,26 @@ function getItem(label, key, icon, children, isClickable = true) {
   };
 }
 
-const items = [
+function filterItems(items) {
+  return items
+    .map((item) => {
+      // "Ana Sayfa" için özel durumu kontrol et
+      if (item.key === "" && item.label.props.children === "Ana Sayfa") {
+        return item; // "Ana Sayfa" her zaman görünür
+      }
+
+      const filteredChildren = item.children ? filterItems(item.children).filter((child) => loginData[child.key]) : [];
+      return {
+        ...item,
+        children: filteredChildren.length > 0 ? filteredChildren : undefined,
+      };
+    })
+    .filter(
+      (item) => item.children || loginData[item.key] || (item.key === "" && item.label.props.children === "Ana Sayfa")
+    );
+}
+
+const rawItems = [
   getItem("Ana Sayfa", "", <PieChartOutlined />),
   // getItem("Option 1", "option1", <PieChartOutlined />),
   // getItem("Option 2", "option2", <DesktopOutlined />),
@@ -165,7 +186,7 @@ export default function App() {
             <BaseLayout />
           </ProtectedRoute>
         }>
-        <Route path="/" element={<Dashboard />} />
+        {loginData.Dashboard && <Route path="/" element={<Dashboard />} />}
         {/* <Route path="/isemri" element={<Isemri />} /> */}
         <Route path="/isEmri1" element={<IsEmri />} />
         <Route path="/peryodikBakimlar" element={<PeriyodikBakimlar />} />
@@ -319,6 +340,8 @@ const BaseLayout = () => {
     </Layout>
   );
 };
+
+const items = filterItems(rawItems);
 
 const MenuWrapper = () => {
   const location = useLocation();

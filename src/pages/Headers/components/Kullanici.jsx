@@ -23,6 +23,7 @@ export default function Header() {
   const handleLogout = () => {
     localStorage.removeItem("token"); // localStorage'dan token'i sil
     localStorage.removeItem("user"); // localStorage'dan kullanıcıyı sil
+    localStorage.removeItem("login"); // localStorage'dan login'i sil
     navigate("/auth"); // `/login` sayfasına yönlendir
     // window.location.reload(); // Sayfayı yenile
   };
