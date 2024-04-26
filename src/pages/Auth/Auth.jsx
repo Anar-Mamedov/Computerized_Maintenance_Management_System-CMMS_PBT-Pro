@@ -1,6 +1,6 @@
 // Fotoğrafı içe aktarın
 import React, { useEffect, useState } from "react";
-import { Button, Form, Input, Space, Typography } from "antd";
+import { Button, Form, Input, Space, Spin, Typography } from "antd";
 import { UserAddOutlined } from "@ant-design/icons";
 import backgroundImage from "../../assets/images/login.jpg";
 import backgroundBaseURL from "../../assets/images/backgroundBaseURL.webp";
@@ -16,6 +16,7 @@ export default function Auth() {
   const [target1, setTarget1] = React.useState("login"); // login veya register
   const [baseURL, setBaseURL] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false); // Yükleme durumunu takip eden durum değişkeni
 
   // Sayfa yüklendiğinde localStorage kontrolü yapılıyor
   useEffect(() => {
@@ -29,6 +30,7 @@ export default function Auth() {
   }, []);
 
   const saveBaseURL = () => {
+    setLoading(true);
     axios
       .get(`${baseURL}/api/VeritabaniBaglantiKontrol`)
       .then((response) => {
@@ -43,6 +45,7 @@ export default function Auth() {
       .catch((error) => {
         console.error("Error occurred while trying to reach the URL:", error);
       });
+    setLoading(true);
   };
 
   // const saveBaseURL = () => {
@@ -141,8 +144,15 @@ export default function Auth() {
                 {errorMessage && (
                   <p style={{ color: "red", marginBottom: "-10px", marginTop: "5px" }}>{errorMessage}</p>
                 )}
-                <Button type="primary" onClick={saveBaseURL} style={{ marginTop: 20, width: "100%" }}>
+                {/* <Button type="primary" onClick={saveBaseURL} style={{ marginTop: 20, width: "100%" }}>
                   Kaydet
+                </Button> */}
+                <Button
+                  type="primary"
+                  onClick={saveBaseURL}
+                  style={{ marginTop: 20, width: "100%" }}
+                  disabled={loading}>
+                  {loading ? <Spin /> : "Kaydet"}
                 </Button>
               </Form>
             </div>

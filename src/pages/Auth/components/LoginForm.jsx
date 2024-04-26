@@ -48,7 +48,7 @@ export default function LoginForm() {
         const login = {
           "": true, // Ana Sayfa için her zaman true
           Dashboard: true,
-          makine: true,
+          makine: false,
           ekipmanVeritabani: true,
           sayacGuncelleme: true,
           bakimTanimlari: true,
@@ -82,8 +82,8 @@ export default function LoginForm() {
         message.success("Giriş başarılı!");
         // Optional: Store user ID if available in response
         // localStorage.setItem("userId", response.data.userId);
-
         navigate("/");
+        window.location.reload();
       } else {
         message.error("Giriş başarısız!");
         // Handle case where token is not in response
