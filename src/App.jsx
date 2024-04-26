@@ -37,7 +37,7 @@ const { TextArea } = Input;
 
 const { Header, Content, Footer, Sider } = Layout;
 
-const loginData = JSON.parse(localStorage.getItem("login"));
+const loginData = JSON.parse(localStorage.getItem("login")) || {};
 
 function getItem(label, key, icon, children, isClickable = true) {
   return {
@@ -49,6 +49,15 @@ function getItem(label, key, icon, children, isClickable = true) {
 }
 
 function filterItems(items) {
+  // LocalStorage'dan token kontrolü
+  const token = localStorage.getItem("token");
+
+  // Token yoksa, hiçbir filtreleme yapmadan tüm öğeleri döndür
+  if (!token) {
+    return items;
+  }
+
+  // Token varsa, filtreleme işlemini gerçekleştir
   return items
     .map((item) => {
       // "Ana Sayfa" için özel durumu kontrol et
@@ -186,7 +195,7 @@ export default function App() {
             <BaseLayout />
           </ProtectedRoute>
         }>
-        {loginData.Dashboard && <Route path="/" element={<Dashboard />} />}
+        {loginData?.Dashboard && <Route path="/" element={<Dashboard />} />}
         {/* <Route path="/isemri" element={<Isemri />} /> */}
         <Route path="/isEmri1" element={<IsEmri />} />
         <Route path="/peryodikBakimlar" element={<PeriyodikBakimlar />} />
