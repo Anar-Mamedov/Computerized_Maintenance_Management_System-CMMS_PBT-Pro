@@ -125,15 +125,20 @@ export default function Auth() {
           const responseLogo = await AxiosInstance.get(`ResimGetirById?id=1`, {
             responseType: "blob",
           });
+          const logoBlob = responseLogo;
+          setLogoUrl(URL.createObjectURL(logoBlob));
+        } catch (error) {
+          console.error("Error fetching logo image:", error);
+        }
+
+        try {
           const responseBackground = await AxiosInstance.get(`ResimGetirById?id=2`, {
             responseType: "blob",
           });
-          const logoBlob = responseLogo;
           const backgroundBlob = responseBackground;
-          setLogoUrl(URL.createObjectURL(logoBlob));
           setBackgroundImageUrl(URL.createObjectURL(backgroundBlob));
         } catch (error) {
-          console.error("Error fetching images:", error);
+          console.error("Error fetching background image:", error);
         } finally {
           setLoadingImage(false);
         }
