@@ -175,6 +175,8 @@ export default function Auth() {
                   placeholder="Bağlantı Anahtarını Girin"
                   value={baseURL}
                   onChange={(e) => setBaseURL(e.target.value)}
+                  name="baseURL"
+                  autoComplete="on"
                 />
                 {errorMessage && (
                   <p style={{ color: "red", marginBottom: "-10px", marginTop: "5px" }}>{errorMessage}</p>
