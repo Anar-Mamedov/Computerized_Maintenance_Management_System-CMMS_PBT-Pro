@@ -8,6 +8,7 @@ import LoginForm from "./components/LoginForm";
 import logo from "../../assets/images/logo.svg";
 import RegistrationForm from "./components/RegistrationForm";
 import axios from "axios";
+import AxiosInstance from "../../api/http";
 
 const { Text, Link } = Typography;
 
@@ -17,6 +18,9 @@ export default function Auth() {
   const [baseURL, setBaseURL] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false); // Yükleme durumunu takip eden durum değişkeni
+  const [loadingImage, setLoadingImage] = useState(false); // Yükleme durumu için yeni bir state
+  const [logoUrl, setLogoUrl] = useState(null); // logo URL'i için state
+  const [backgroundImageUrl, setBackgroundImageUrl] = useState(null); // Arka plan resmi URL'i için state
 
   // Sayfa yüklendiğinde localStorage kontrolü yapılıyor
   useEffect(() => {
@@ -44,8 +48,8 @@ export default function Auth() {
       })
       .catch((error) => {
         console.error("Error occurred while trying to reach the URL:", error);
-      });
-    setLoading(true);
+      })
+      .finally(() => setLoading(false));
   };
 
   // const saveBaseURL = () => {
@@ -57,7 +61,7 @@ export default function Auth() {
 
   // JavaScript objesi olarak stil tanımlaması
   const backgroundStyle = {
-    backgroundImage: `url(${backgroundImage})`,
+    backgroundImage: `url(${backgroundImageUrl})`,
     backgroundSize: "cover",
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
@@ -111,6 +115,32 @@ export default function Auth() {
     width: "100vw",
     height: "100vh",
   };
+
+  // Resimleri yüklemek için useEffect
+  useEffect(() => {
+    if (baseURL) {
+      setLoadingImage(true);
+      const fetchImages = async () => {
+        try {
+          const responseLogo = await AxiosInstance.get(`ResimGetirById?id=1`, {
+            responseType: "blob",
+          });
+          const responseBackground = await AxiosInstance.get(`ResimGetirById?id=2`, {
+            responseType: "blob",
+          });
+          const logoBlob = responseLogo;
+          const backgroundBlob = responseBackground;
+          setLogoUrl(URL.createObjectURL(logoBlob));
+          setBackgroundImageUrl(URL.createObjectURL(backgroundBlob));
+        } catch (error) {
+          console.error("Error fetching images:", error);
+        } finally {
+          setLoadingImage(false);
+        }
+      };
+      fetchImages();
+    }
+  }, [baseURL]);
 
   const toggleTarget = () => {
     setTarget1(target1 === "login" ? "register" : "login");
@@ -171,7 +201,10 @@ export default function Auth() {
               flexDirection: "column",
               alignItems: "center",
             }}>
-            <img src={logo} alt="Logo" style={logoStyle} />
+            <div>
+              {loadingImage && <Spin />}
+              <img src={logoUrl} alt="Logo" style={{ ...logoStyle, visibility: loadingImage ? "hidden" : "visible" }} />
+            </div>
             {target1 === "login" ? <LoginForm /> : <RegistrationForm />}
             {/* <Text type="secondary" style={{ fontSize: "14px", marginBottom: "20px" }}>
               ve ya
@@ -196,7 +229,11 @@ export default function Auth() {
 
   return (
     <div>
-      <div style={backgroundStyle}></div>
+      {loadingImage ? (
+        <Spin style={{ position: "fixed", right: "25%", top: "50%" }} />
+      ) : (
+        <div style={backgroundStyle}></div>
+      )}
       {/* Beyaz alanı ekleyin */}
 
       {renderForm()}
