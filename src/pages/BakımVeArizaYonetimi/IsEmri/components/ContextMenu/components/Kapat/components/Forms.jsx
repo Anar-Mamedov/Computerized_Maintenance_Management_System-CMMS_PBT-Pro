@@ -337,7 +337,7 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
               justifyContent: "space-between",
               marginBottom: "10px",
             }}>
-            <Text style={{ fontSize: "14px" }}>Kapatma Tarihi:</Text>
+            <Text style={{ fontSize: "14px", fontWeight: 600 }}>Kapatma Tarihi:</Text>
             <div
               style={{
                 display: "flex",
@@ -351,9 +351,11 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
               <Controller
                 name="kapatmaTarihi"
                 control={control}
-                render={({ field }) => (
+                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                render={({ field, fieldState: { error } }) => (
                   <DatePicker
                     {...field}
+                    status={errors.kapatmaTarihi ? "error" : ""}
                     style={{ width: "180px" }}
                     format={localeDateFormat}
                     placeholder="Tarih seçiniz"
@@ -363,15 +365,18 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
               <Controller
                 name="kapatmaSaati"
                 control={control}
-                render={({ field }) => (
+                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                render={({ field, fieldState: { error } }) => (
                   <TimePicker
                     {...field}
+                    status={errors.kapatmaSaati ? "error" : ""}
                     style={{ width: "110px" }}
                     format={localeTimeFormat}
                     placeholder="Saat seçiniz"
                   />
                 )}
               />
+              {errors.kapatmaTarihi && <div style={{ color: "red" }}>{errors.kapatmaTarihi.message}</div>}
             </div>
           </div>
           <StyledDivBottomLine
