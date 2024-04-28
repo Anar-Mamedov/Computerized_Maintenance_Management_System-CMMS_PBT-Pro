@@ -467,7 +467,7 @@ export default function MainTabs() {
           </div>
         </div>
         <div style={{ border: "1px solid #ececec", display: "flex", alignItems: "center" }}>
-          {imageUrl ? <img style={{ width: "200px" }} src={imageUrl} alt="Photo" /> : <p>Loading...</p>}
+          {/* {imageUrl ? <img style={{ width: "200px" }} src={imageUrl} alt="Photo" /> : <p>Loading...</p>} */}
         </div>
       </div>
 
