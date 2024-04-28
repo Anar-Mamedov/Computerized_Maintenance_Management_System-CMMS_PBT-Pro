@@ -443,7 +443,7 @@ export default function MainTabs() {
           </div>
         </div>
         <div style={{ border: "1px solid #ececec", display: "flex", alignItems: "center" }}>
-          <Image width={200} src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png" />
+          {/* <Image width={200} src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png" /> */}
         </div>
       </div>
 
