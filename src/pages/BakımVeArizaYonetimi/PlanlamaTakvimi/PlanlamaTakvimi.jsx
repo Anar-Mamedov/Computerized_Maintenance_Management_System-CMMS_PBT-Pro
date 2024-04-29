@@ -1,18 +1,14 @@
+import React from "react";
+import MainTable from "./Table/Table";
 import { FormProvider, useForm } from "react-hook-form";
-import PlanlamaTakvimiCalendar from "./Takvim/PlanlamaTakvimiCalendar";
-import Filters from "./Takvim/Filters";
 
-const PlanlamaTakvimi = () => {
-    const formMethods = useForm();
-
-    return (
-        <FormProvider {...formMethods}>
-            <div>
-                <Filters />
-                <PlanlamaTakvimiCalendar />
-            </div>
-        </FormProvider>
-    )
+export default function PersonelTanimlari() {
+  const formMethods = useForm();
+  return (
+    <FormProvider {...formMethods}>
+      <div>
+        <MainTable />
+      </div>
+    </FormProvider>
+  );
 }
-
-export default PlanlamaTakvimi
