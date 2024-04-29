@@ -13,7 +13,7 @@ export default function Filters({ onChange }) {
   });
 
   React.useEffect(() => {
-    onChange("filters", filters);
+    onChange("filters", filters.customfilter);
   }, [filters, onChange]);
 
   return (
