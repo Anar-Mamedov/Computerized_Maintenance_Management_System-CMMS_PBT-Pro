@@ -10,6 +10,12 @@ import weekOfYear from "dayjs/plugin/weekOfYear";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import LokasyonTablo from "./components/LokasyonTablo";
 import ZamanAraligi from "./components/ZamanAraligi";
+import MakineTablo from "./components/MakineTablo";
+import BakimTipi from "./components/BakimTipi";
+import BakimGrubu from "./components/BakimGrubu";
+import MakineTipi from "./components/MakineTipi";
+import AtolyeTablo from "./components/AtolyeTablo";
+import BakimTablo from "./components/BakimTablo";
 
 dayjs.extend(weekOfYear);
 dayjs.extend(advancedFormat);
@@ -49,6 +55,16 @@ const StyledDivMedia = styled.div`
   }
 `;
 
+const StyledDivBottomLine = styled.div`
+  @media (min-width: 600px) {
+    align-items: center !important;
+  }
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+`;
+
 export default function CustomFilter({ onSubmit, isEmpty }) {
   const {
     control,
@@ -72,6 +88,18 @@ export default function CustomFilter({ onSubmit, isEmpty }) {
     setOpen(false);
     setValue("lokasyonTanim", "");
     setValue("lokasyonID", "");
+    setValue("makine", "");
+    setValue("makineID", "");
+    setValue("makineTipiID", "");
+    setValue("makineTipi", null);
+    setValue("bakimGrubuID", "");
+    setValue("bakimGrubu", null);
+    setValue("bakimTipiID", "");
+    setValue("bakimTipi", null);
+    setValue("atolyeTanim", "");
+    setValue("atolyeID", "");
+    setValue("bakimTanim", "");
+    setValue("bakimID", "");
     setValue("timeRange", "all");
     setValue("startDate", null);
     setValue("endDate", null);
@@ -79,19 +107,22 @@ export default function CustomFilter({ onSubmit, isEmpty }) {
   };
 
   const handleSubmit = () => {
-    // Combine selected values, input values for each row, and date range
-    const filterData = {};
+    // Get values from watch
+    const { startDate, endDate, lokasyonID, makineID, makineTipiID, bakimGrubuID, bakimTipiID, atolyeID, bakimID } =
+      watch();
 
-    // Add date range to the filterData object if dates are selected
-    if (watch("startDate")) {
-      filterData.startDate = watch("startDate").format("YYYY-MM-DD");
-    }
-    if (watch("endDate")) {
-      filterData.endDate = watch("endDate").format("YYYY-MM-DD");
-    }
-    if (watch("lokasyonID")) {
-      filterData.lokasyonID = watch("lokasyonID");
-    }
+    // Combine selected values, input values for each row, and date range
+    const filterData = {
+      ...(startDate && { baslamaTarihi: startDate.format("YYYY-MM-DD") }),
+      ...(endDate && { bitisTarihi: endDate.format("YYYY-MM-DD") }),
+      ...(lokasyonID && { lokasyon: lokasyonID }),
+      ...(makineID && { makine: makineID }),
+      ...(makineTipiID && { makineTipi: makineTipiID }),
+      ...(bakimGrubuID && { bakimGrubu: bakimGrubuID }),
+      ...(bakimTipiID && { bakimTipi: bakimTipiID }),
+      ...(atolyeID && { atolye: atolyeID }),
+      ...(bakimID && { bakim: bakimID }),
+    };
 
     console.log(filterData);
     // You can now submit or process the filterData object as needed.
@@ -110,6 +141,19 @@ export default function CustomFilter({ onSubmit, isEmpty }) {
   const handleLokasyonMinusClick = () => {
     setValue("lokasyonTanim", "");
     setValue("lokasyonID", "");
+  };
+
+  const handleMakineMinusClick = () => {
+    setValue("makine", "");
+    setValue("makineID", "");
+  };
+  const handleAtolyeMinusClick = () => {
+    setValue("atolyeTanim", "");
+    setValue("atolyeID", "");
+  };
+  const handleBakimMinusClick = () => {
+    setValue("bakimTanim", "");
+    setValue("bakimID", "");
   };
 
   return (
@@ -140,7 +184,7 @@ export default function CustomFilter({ onSubmit, isEmpty }) {
             <FilterOutlined style={{ marginRight: "8px" }} /> Filtreler
           </span>
         }
-        width={430}
+        width={450}
         placement="right"
         onClose={onClose}
         onCancel={onCancle}
@@ -202,6 +246,198 @@ export default function CustomFilter({ onSubmit, isEmpty }) {
               </div>
             </div>
           </StyledDivMedia>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "755px",
+              }}>
+              <Text style={{ fontSize: "14px" }}>Makine:</Text>
+              <div style={{ display: "flex", flexWrap: "wrap", flexDirection: "column" }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "300px",
+                    }}>
+                    <Controller
+                      name="makine"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          type="text" // Set the type to "text" for name input
+                          style={{ width: "215px" }}
+                          disabled
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="makineID"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          type="text" // Set the type to "text" for name input
+                          style={{ display: "none" }}
+                        />
+                      )}
+                    />
+                    <MakineTablo
+                      onSubmit={(selectedData) => {
+                        setValue("makine", selectedData.MKN_KOD);
+                        setValue("makineID", selectedData.key);
+                      }}
+                    />
+                    <Button onClick={handleMakineMinusClick}> - </Button>
+                  </div>
+                </div>
+                {errors.makine && <div style={{ color: "red", marginTop: "5px" }}>{errors.makine.message}</div>}
+              </div>
+            </StyledDivBottomLine>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              maxWidth: "450px",
+              gap: "10px",
+              width: "100%",
+            }}>
+            <MakineTipi />
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "450px",
+              }}>
+              <Text style={{ fontSize: "14px" }}>Bakım:</Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  width: "300px",
+                }}>
+                <Controller
+                  name="bakimTanim"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      type="text" // Set the type to "text" for name input
+                      style={{ width: "215px" }}
+                      disabled
+                    />
+                  )}
+                />
+                <Controller
+                  name="bakimID"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      type="text" // Set the type to "text" for name input
+                      style={{ display: "none" }}
+                    />
+                  )}
+                />
+                <BakimTablo
+                  onSubmit={(selectedData) => {
+                    setValue("bakimTanim", selectedData.subject);
+                    setValue("bakimID", selectedData.key);
+                  }}
+                />
+                <Button onClick={handleBakimMinusClick}> - </Button>
+              </div>
+            </StyledDivBottomLine>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              maxWidth: "450px",
+              gap: "10px",
+              width: "100%",
+            }}>
+            <BakimTipi />
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              maxWidth: "450px",
+              gap: "10px",
+              width: "100%",
+            }}>
+            <BakimGrubu />
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "450px",
+              }}>
+              <Text style={{ fontSize: "14px" }}>Atölye:</Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  width: "300px",
+                }}>
+                <Controller
+                  name="atolyeTanim"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      status={errors.atolyeTanim ? "error" : ""}
+                      type="text" // Set the type to "text" for name input
+                      style={{ width: "215px" }}
+                      disabled
+                    />
+                  )}
+                />
+                <Controller
+                  name="atolyeID"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      type="text" // Set the type to "text" for name input
+                      style={{ display: "none" }}
+                    />
+                  )}
+                />
+                <AtolyeTablo
+                  onSubmit={(selectedData) => {
+                    setValue("atolyeTanim", selectedData.subject);
+                    setValue("atolyeID", selectedData.key);
+                  }}
+                />
+                <Button onClick={handleAtolyeMinusClick}> - </Button>
+              </div>
+            </StyledDivBottomLine>
+          </div>
           <ZamanAraligi />
           <div
             style={{ marginBottom: "20px", border: "1px solid #80808048", padding: "15px 10px", borderRadius: "8px" }}>
