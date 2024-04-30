@@ -22,7 +22,7 @@ export default function Filters({ onChange }) {
       <ConditionFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, durumlar: newFilters }))} />
       <LocationFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, lokasyonlar: newFilters }))} />
       <CustomFilter
-        onSubmit={(newFilters) => setFilters((state) => ({ ...state, customfilter: newFilters }))}
+        onSubmit1={(newFilters) => setFilters((state) => ({ ...state, customfilter: newFilters }))}
         isEmpty={!Object.keys(filters.customfilter).length}
       />
     </>
