@@ -2,7 +2,13 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
-import { sortableKeyboardCoordinates, arrayMove, useSortable } from "@dnd-kit/sortable";
+import {
+  sortableKeyboardCoordinates,
+  arrayMove,
+  useSortable,
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Resizable } from "react-resizable";
 import "./ResizeStyle.css";
@@ -1594,11 +1600,15 @@ const MainTable = () => {
                 <Text style={{ fontWeight: 600 }}>Sütunların Sıralamasını Ayarla</Text>
               </div>
               <div style={{ height: "400px", overflow: "auto" }}>
-                {columns
-                  .filter((col) => col.visible)
-                  .map((col, index) => (
-                    <DraggableRow key={col.key} id={col.key} index={index} text={col.title} />
-                  ))}
+                <SortableContext
+                  items={columns.filter((col) => col.visible).map((col) => col.key)}
+                  strategy={verticalListSortingStrategy}>
+                  {columns
+                    .filter((col) => col.visible)
+                    .map((col, index) => (
+                      <DraggableRow key={col.key} id={col.key} index={index} text={col.title} />
+                    ))}
+                </SortableContext>
               </div>
             </div>
           </DndContext>
