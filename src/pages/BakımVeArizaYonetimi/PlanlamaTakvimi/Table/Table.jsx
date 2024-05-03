@@ -84,56 +84,76 @@ const generateColumns = (startDate, endDate) => {
   return columns;
 };
 
-const MainTable = ({ data }) => {
+const MainTable = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
   const columns = startDate && endDate ? generateColumns(startDate, endDate) : [];
+
   const { setValue } = useFormContext();
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalDataCount, setTotalDataCount] = useState(0); // Tüm veriyi tutan state
-  const [pageSize, setPageSize] = useState(10); // Başlangıçta sayfa başına 10 kayıt göster
+  const [data, setData] = useState(); // Tabloda gösterilecek veri
 
   const [body, setBody] = useState({
     keyword: "",
     filters: {},
   });
 
+  console.log("data1", data);
+
   // ana tablo api isteği için kullanılan useEffect
 
   useEffect(() => {
-    fetchEquipmentData(body, currentPage, pageSize);
-  }, [body, currentPage, pageSize]);
+    fetchEquipmentData(body);
+  }, [body]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
   // arama işlemi için kullanılan useEffect son
 
-  const fetchEquipmentData = async (body, page, size) => {
+  const fetchEquipmentData = async (body) => {
     // body'nin undefined olması durumunda varsayılan değerler atanıyor
-    const { keyword = "", filters = {} } = body || {};
-    // page'in undefined olması durumunda varsayılan değer olarak 1 atanıyor
-    const currentPage = page || 1;
+    const { filters = {} } = body || {};
+
+    setLoading(true);
+
+    // filters objesi boşsa API isteği atma ve loading animasyonunu durdur
+    if (Object.keys(filters).length === 0) {
+      setLoading(false);
+      return;
+    }
 
     try {
-      setLoading(true);
       // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.post(
-        `getIsEmriFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}`,
-        filters
-      );
+      const response = await AxiosInstance.post(`PeriyodikBakimPlanlamaTakvimi`, filters);
       if (response) {
-        // Toplam sayfa sayısını ayarla
-        setTotalDataCount(response.kayit_sayisi);
-
+        const responseObject = JSON.parse(response);
         // Gelen veriyi formatla ve state'e ata
-        const formattedData = response.list.map((item) => ({
-          ...item,
-          key: item.TB_ISEMRI_ID,
-          // Diğer alanlarınız...
-        }));
-        // setData(formattedData);
+        const groupedData = responseObject.reduce((acc, item) => {
+          if (!acc[item.MAKINE_ID]) {
+            acc[item.MAKINE_ID] = {
+              key: item.MAKINE_ID, // Her bir satır için benzersiz bir key değeri atayın
+              machine: item.MAKINE_ID,
+              children: [],
+            };
+          }
+          let child = {
+            key: `${item.MAKINE_ID}-${item.PBAKIM_ID}`, // Her bir çocuk için benzersiz bir key değeri atayın
+            // PBAKIM_ID: item.PBAKIM_ID,
+            machine: item.PBAKIM_ID,
+          };
+          const startDateDayjs = dayjs(startDate);
+          const endDateDayjs = dayjs(endDate);
+          const daysDiff = endDateDayjs.diff(startDateDayjs, "day");
+
+          for (let i = 1; i <= daysDiff + 1; i++) {
+            const day = startDateDayjs.add(i - 1, "day").format("YYYY-MM-DD");
+            child[day] = item[i]; // günleri sayı olarak al
+          }
+          acc[item.MAKINE_ID].children.push(child);
+          return acc;
+        }, {});
+        setData(Object.values(groupedData));
         setLoading(false);
       } else {
         console.error("API response is not in expected format");
@@ -160,7 +180,6 @@ const MainTable = ({ data }) => {
       ...state,
       [type]: newBody,
     }));
-    setCurrentPage(1); // Filtreleme yapıldığında sayfa numarasını 1'e ayarla
   }, []);
   // filtreleme işlemi için kullanılan useEffect son
 
@@ -188,7 +207,7 @@ const MainTable = ({ data }) => {
         </div>
       </div>
       <Spin spinning={loading}>
-        <Table columns={columns} bordered dataSource={data} scroll={{ y: "calc(100vh - 380px)" }} />
+        <Table columns={columns} bordered dataSource={data} scroll={{ y: "calc(100vh - 460px)" }} />
       </Spin>
     </>
   );
