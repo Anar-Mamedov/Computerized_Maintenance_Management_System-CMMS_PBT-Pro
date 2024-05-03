@@ -18,9 +18,9 @@ export default function Filters({ onChange }) {
 
   return (
     <>
-      <TypeFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, isemritipleri: newFilters }))} />
+      {/* <TypeFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, isemritipleri: newFilters }))} />
       <ConditionFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, durumlar: newFilters }))} />
-      <LocationFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, lokasyonlar: newFilters }))} />
+      <LocationFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, lokasyonlar: newFilters }))} /> */}
       <CustomFilter
         onSubmit1={(newFilters) => setFilters((state) => ({ ...state, customfilter: newFilters }))}
         isEmpty={!Object.keys(filters.customfilter).length}
