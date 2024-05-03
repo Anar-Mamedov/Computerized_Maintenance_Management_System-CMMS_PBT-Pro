@@ -99,8 +99,6 @@ const MainTable = () => {
     filters: {},
   });
 
-  console.log("data1", data);
-
   // ana tablo api isteği için kullanılan useEffect
 
   useEffect(() => {
