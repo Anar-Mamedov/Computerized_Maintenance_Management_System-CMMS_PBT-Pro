@@ -7,6 +7,7 @@ import Kapat from "./components/Kapat/Kapat";
 import Parametreler from "./components/Parametreler/Parametreler";
 import TarihceTablo from "./components/TarihceTablo";
 import Form from "./components/Form/Form";
+import DownloadCSV from "./components/DownloadCSV/DownloadCSV";
 
 const { Text, Link } = Typography;
 
@@ -42,6 +43,7 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
       <Parametreler />
       {selectedRows.length === 1 && <TarihceTablo selectedRows={selectedRows} />} */}
       {selectedRows.length >= 1 && <Form selectedRows={selectedRows} />}
+      {selectedRows.length >= 1 && <DownloadCSV selectedRows={selectedRows} />}
     </div>
   );
   return (
