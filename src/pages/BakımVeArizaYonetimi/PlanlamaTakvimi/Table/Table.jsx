@@ -6,6 +6,7 @@ import { useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
 import "dayjs/locale/tr";
 import weekOfYear from "dayjs/plugin/weekOfYear";
+import { FcOk, FcLeave, FcHighPriority, FcExpired, FcCancel, FcFlashAuto, FcOvertime } from "react-icons/fc";
 
 dayjs.locale("tr");
 dayjs.extend(weekOfYear);
@@ -13,6 +14,29 @@ dayjs.extend(weekOfYear);
 const { Text } = Typography;
 
 const generateColumns = (startDate, endDate) => {
+  const getIconForValue = (value) => {
+    const style = { fontSize: "20px" }; // İkon boyutunu ayarla
+    switch (value) {
+      case "Planlanan":
+        return <FcOvertime style={style} />;
+      case "Yaklaşan":
+        return <FcHighPriority style={style} />;
+      case "Süresi Geçmiş":
+        return <FcExpired style={style} />;
+      case "Yapılmadı":
+        return <FcCancel style={style} />;
+      case "Devam Eden":
+        return <FcFlashAuto style={style} />;
+      case "Zamanında Yapılan":
+        return <FcOk style={style} />;
+      case "Gecikmeli Yapılan":
+        return <FcLeave style={style} />;
+      case "İptal Edilen":
+        return <FcCancel style={style} />;
+      default:
+        return value;
+    }
+  };
   const columns = [
     {
       title: "",
@@ -43,8 +67,13 @@ const generateColumns = (startDate, endDate) => {
                 title: day,
                 dataIndex: currentDay.format("YYYY-MM-DD"),
                 key: currentDay.format("YYYY-MM-DD"),
-                width: 70,
+                width: 45,
                 ellipsis: true,
+                render: (text) => (
+                  <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                    {getIconForValue(text)}
+                  </div>
+                ),
               },
             ],
           },
@@ -61,8 +90,13 @@ const generateColumns = (startDate, endDate) => {
               title: day,
               dataIndex: currentDay.format("YYYY-MM-DD"),
               key: currentDay.format("YYYY-MM-DD"),
-              width: 70,
+              width: 45,
               ellipsis: true,
+              render: (text) => (
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                  {getIconForValue(text)}
+                </div>
+              ),
             },
           ],
         });
@@ -72,8 +106,13 @@ const generateColumns = (startDate, endDate) => {
           title: day,
           dataIndex: currentDay.format("YYYY-MM-DD"),
           key: currentDay.format("YYYY-MM-DD"),
-          width: 70,
+          width: 45,
           ellipsis: true,
+          render: (text) => (
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+              {getIconForValue(text)}
+            </div>
+          ),
         });
       }
     }
@@ -93,6 +132,7 @@ const MainTable = () => {
   const { setValue } = useFormContext();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(); // Tabloda gösterilecek veri
+  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
 
   const [body, setBody] = useState({
     keyword: "",
@@ -151,7 +191,11 @@ const MainTable = () => {
           acc[item.MAKINE_ID].children.push(child);
           return acc;
         }, {});
-        setData(Object.values(groupedData));
+        const newData = Object.values(groupedData);
+        setData(newData);
+
+        // Set expanded rows: Assuming that each group's key is at item.MAKINE_ID
+        setExpandedRowKeys(newData.map((item) => item.key)); // Set all parent keys
         setLoading(false);
       } else {
         console.error("API response is not in expected format");
@@ -192,20 +236,21 @@ const MainTable = () => {
           gap: "10px",
           padding: "0 5px",
         }}>
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            alignItems: "center",
-            width: "100%",
-            maxWidth: "935px",
-            flexWrap: "wrap",
-          }}>
-          <Filters onChange={handleBodyChange} />
-        </div>
+        <Filters onChange={handleBodyChange} />
       </div>
       <Spin spinning={loading}>
-        <Table columns={columns} bordered dataSource={data} scroll={{ y: "calc(100vh - 460px)" }} />
+        <Table
+          size="small"
+          columns={columns}
+          bordered
+          dataSource={data}
+          expandable={{
+            expandedRowKeys, // Use this instead of defaultExpandedRowKeys to control dynamically
+            onExpandedRowsChange: setExpandedRowKeys,
+          }}
+          scroll={{ y: "calc(100vh - 460px)" }}
+          pagination={false}
+        />
       </Spin>
     </>
   );
