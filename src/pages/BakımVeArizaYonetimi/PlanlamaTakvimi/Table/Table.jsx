@@ -6,7 +6,16 @@ import { useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
 import "dayjs/locale/tr";
 import weekOfYear from "dayjs/plugin/weekOfYear";
-import { FcOk, FcLeave, FcHighPriority, FcExpired, FcCancel, FcFlashAuto, FcOvertime } from "react-icons/fc";
+import {
+  FcOk,
+  FcLeave,
+  FcHighPriority,
+  FcExpired,
+  FcCancel,
+  FcFlashAuto,
+  FcPlanner,
+  FcDisclaimer,
+} from "react-icons/fc";
 
 dayjs.locale("tr");
 dayjs.extend(weekOfYear);
@@ -18,11 +27,11 @@ const generateColumns = (startDate, endDate) => {
     const style = { fontSize: "20px" }; // İkon boyutunu ayarla
     switch (value) {
       case "Planlanan":
-        return <FcOvertime style={style} />;
+        return <FcPlanner style={style} />;
       case "Yaklaşan":
-        return <FcHighPriority style={style} />;
-      case "Süresi Geçmiş":
         return <FcExpired style={style} />;
+      case "Süresi Geçmiş":
+        return <FcHighPriority style={style} />;
       case "Yapılmadı":
         return <FcCancel style={style} />;
       case "Devam Eden":
@@ -32,7 +41,7 @@ const generateColumns = (startDate, endDate) => {
       case "Gecikmeli Yapılan":
         return <FcLeave style={style} />;
       case "İptal Edilen":
-        return <FcCancel style={style} />;
+        return <FcDisclaimer style={style} />;
       default:
         return value;
     }
@@ -171,14 +180,14 @@ const MainTable = () => {
           if (!acc[item.MAKINE_ID]) {
             acc[item.MAKINE_ID] = {
               key: item.MAKINE_ID, // Her bir satır için benzersiz bir key değeri atayın
-              machine: item.MAKINE_ID,
+              machine: item.MAKINE_TANIM,
               children: [],
             };
           }
           let child = {
             key: `${item.MAKINE_ID}-${item.PBAKIM_ID}`, // Her bir çocuk için benzersiz bir key değeri atayın
             // PBAKIM_ID: item.PBAKIM_ID,
-            machine: item.PBAKIM_ID,
+            machine: item.BAKIM_TANIM,
           };
           const startDateDayjs = dayjs(startDate);
           const endDateDayjs = dayjs(endDate);
@@ -225,6 +234,32 @@ const MainTable = () => {
   }, []);
   // filtreleme işlemi için kullanılan useEffect son
 
+  // rowSelection object indicates the need for row selection
+  const rowSelection = {
+    columnWidth: 50, // Checkbox sütununun genişliğini burada ayarlayın
+    selectedRowKeys: [],
+    onSelect: (record, selected, selectedRows, nativeEvent) => {
+      let newSelectedRowKeys = [];
+      if (record.children) {
+        newSelectedRowKeys = selected
+          ? [...rowSelection.selectedRowKeys, record.key, ...record.children.map((child) => child.key)]
+          : rowSelection.selectedRowKeys.filter(
+              (key) => ![record.key, ...record.children.map((child) => child.key)].includes(key)
+            );
+      } else {
+        newSelectedRowKeys = selected
+          ? [...rowSelection.selectedRowKeys, record.key]
+          : rowSelection.selectedRowKeys.filter((key) => key !== record.key);
+      }
+      rowSelection.selectedRowKeys = newSelectedRowKeys;
+      console.log(`selectedRowKeys: ${newSelectedRowKeys}`, "selectedRows: ", selectedRows);
+    },
+    getCheckboxProps: (record) => ({
+      disabled: record.name === "Disabled User", // Column configuration not to be checked
+      name: record.name,
+    }),
+  };
+
   return (
     <>
       <div
@@ -240,6 +275,7 @@ const MainTable = () => {
       </div>
       <Spin spinning={loading}>
         <Table
+          rowSelection={rowSelection}
           size="small"
           columns={columns}
           bordered
