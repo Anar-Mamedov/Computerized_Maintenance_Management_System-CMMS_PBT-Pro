@@ -3,6 +3,7 @@ import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress,
 import AxiosInstance from "../../../../api/http";
 import Filters from "./filter/Filters";
 import { useFormContext } from "react-hook-form";
+import ContextMenu from "../components/ContextMenu/ContextMenu";
 import dayjs from "dayjs";
 import "dayjs/locale/tr";
 import weekOfYear from "dayjs/plugin/weekOfYear";
@@ -135,6 +136,8 @@ const generateColumns = (startDate, endDate) => {
 const MainTable = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   const columns = startDate && endDate ? generateColumns(startDate, endDate) : [];
 
@@ -234,31 +237,139 @@ const MainTable = () => {
   }, []);
   // filtreleme işlemi için kullanılan useEffect son
 
+  // tablodaki verileri gruplara göre ve toplu olarak seçmek işlemi
+
   // rowSelection object indicates the need for row selection
+  const handleSelect = (record, selected, selectedRows) => {
+    const childKeys = record.children ? record.children.map((child) => child.key) : [];
+    const childRows = record.children || [];
+    if (selected) {
+      setSelectedRowKeys((prev) => Array.from(new Set([...prev, record.key, ...childKeys])));
+      setSelectedRows((prev) => Array.from(new Set([...prev, record, ...childRows])));
+    } else {
+      setSelectedRowKeys((prev) => prev.filter((key) => key !== record.key && !childKeys.includes(key)));
+      setSelectedRows((prev) =>
+        prev.filter((row) => row.key !== record.key && !childKeys.map((child) => child.key).includes(row.key))
+      );
+    }
+  };
+
+  const handleSelectAll = (selected, selectedRows, changeRows) => {
+    const allKeys = selectedRows.map((row) => row.key);
+    const allRows = selectedRows;
+    if (selected) {
+      setSelectedRowKeys(allKeys);
+      setSelectedRows(allRows);
+    } else {
+      setSelectedRowKeys([]);
+      setSelectedRows([]);
+    }
+  };
+
   const rowSelection = {
-    columnWidth: 50, // Checkbox sütununun genişliğini burada ayarlayın
-    selectedRowKeys: [],
-    onSelect: (record, selected, selectedRows, nativeEvent) => {
-      let newSelectedRowKeys = [];
-      if (record.children) {
-        newSelectedRowKeys = selected
-          ? [...rowSelection.selectedRowKeys, record.key, ...record.children.map((child) => child.key)]
-          : rowSelection.selectedRowKeys.filter(
-              (key) => ![record.key, ...record.children.map((child) => child.key)].includes(key)
-            );
-      } else {
-        newSelectedRowKeys = selected
-          ? [...rowSelection.selectedRowKeys, record.key]
-          : rowSelection.selectedRowKeys.filter((key) => key !== record.key);
-      }
-      rowSelection.selectedRowKeys = newSelectedRowKeys;
-      console.log(`selectedRowKeys: ${newSelectedRowKeys}`, "selectedRows: ", selectedRows);
-    },
+    columnWidth: 50,
+    selectedRowKeys,
+    onSelect: handleSelect,
+    onSelectAll: handleSelectAll,
     getCheckboxProps: (record) => ({
-      disabled: record.name === "Disabled User", // Column configuration not to be checked
+      disabled: record.name === "Disabled User", // Bu satır gerekliyse
       name: record.name,
     }),
   };
+
+  // tablodaki verileri gruplara göre ve toplu olarak seçmek işlemi son
+
+  const downloadCSV = () => {
+    if (selectedRows.length === 0) {
+      message.warning("İndirilecek veri yok.");
+      return;
+    }
+
+    let csvContent = "data:text/csv;charset=utf-8,";
+    const columnDelimiter = ",";
+    const lineDelimiter = "\n";
+    const headers = {};
+
+    // Initialize the headers with the static 'Machine' column
+    const initialHeader = [" "]; // The first header for the 'machine' data
+
+    // Safely retrieve and organize all unique headers for months, weeks, and days.
+    columns.forEach((col) => {
+      if (col.children) {
+        col.children.forEach((weekCol) => {
+          if (weekCol.children) {
+            weekCol.children.forEach((dayCol) => {
+              const month = col.title;
+              const week = weekCol.title;
+              const day = dayCol.title;
+
+              if (!headers[month]) {
+                headers[month] = {};
+              }
+              if (!headers[month][week]) {
+                headers[month][week] = [];
+              }
+              if (!headers[month][week].includes(day)) {
+                headers[month][week].push(day);
+              }
+            });
+          }
+        });
+      }
+    });
+
+    // Build the header rows for CSV
+    const monthRow = initialHeader; // Start with the 'Machine' column
+    const weekRow = [""]; // Keep the first cell empty under 'Machine'
+    const dayRow = [""]; // Keep the first cell empty under 'Machine'
+
+    Object.keys(headers).forEach((month) => {
+      const weeks = headers[month];
+      const monthSpan = Object.keys(weeks).reduce((acc, week) => acc + weeks[week].length, 0);
+      monthRow.push(`${month}${columnDelimiter.repeat(monthSpan - 1)}`);
+
+      Object.keys(weeks).forEach((week) => {
+        const dayCount = weeks[week].length;
+        weekRow.push(`${week}${columnDelimiter.repeat(dayCount - 1)}`);
+        dayRow.push(...weeks[week].map((day) => `"${day.replace(/"/g, '""')}"`));
+      });
+    });
+
+    // Append rows to CSV content
+    csvContent += monthRow.join(columnDelimiter) + lineDelimiter;
+    csvContent += weekRow.join(columnDelimiter) + lineDelimiter;
+    csvContent += dayRow.join(columnDelimiter) + lineDelimiter;
+
+    // Add data rows
+    selectedRows.forEach((row) => {
+      const rowData = [`"${row.machine.replace(/"/g, '""')}"`]; // Start each row with the machine name
+      columns.forEach((col) => {
+        if (col.children) {
+          col.children.forEach((weekCol) => {
+            if (weekCol.children) {
+              weekCol.children.forEach((dayCol) => {
+                const cellValue = row[dayCol.dataIndex] || "";
+                rowData.push(`"${cellValue.replace(/"/g, '""')}"`);
+              });
+            }
+          });
+        }
+      });
+      csvContent += rowData.join(columnDelimiter) + lineDelimiter;
+    });
+
+    // Create and Download CSV File
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "exported_data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  console.log("selectedRows", selectedRows);
 
   return (
     <>
@@ -272,6 +383,10 @@ const MainTable = () => {
           padding: "0 5px",
         }}>
         <Filters onChange={handleBodyChange} />
+        {/* <ContextMenu selectedRows={selectedRows} /> */}
+        <Button onClick={downloadCSV} type="primary" style={{ marginBottom: "10px" }}>
+          CSV İndir
+        </Button>
       </div>
       <Spin spinning={loading}>
         <Table
