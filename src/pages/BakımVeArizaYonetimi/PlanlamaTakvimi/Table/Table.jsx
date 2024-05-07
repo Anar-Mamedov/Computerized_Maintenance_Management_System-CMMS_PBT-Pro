@@ -136,8 +136,6 @@ const generateColumns = (startDate, endDate) => {
 const MainTable = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   const columns = startDate && endDate ? generateColumns(startDate, endDate) : [];
 
@@ -236,48 +234,6 @@ const MainTable = () => {
     }));
   }, []);
   // filtreleme işlemi için kullanılan useEffect son
-
-  // tablodaki verileri gruplara göre ve toplu olarak seçmek işlemi
-
-  // rowSelection object indicates the need for row selection
-  const handleSelect = (record, selected, selectedRows) => {
-    const childKeys = record.children ? record.children.map((child) => child.key) : [];
-    const childRows = record.children || [];
-    if (selected) {
-      setSelectedRowKeys((prev) => Array.from(new Set([...prev, record.key, ...childKeys])));
-      setSelectedRows((prev) => Array.from(new Set([...prev, record, ...childRows])));
-    } else {
-      setSelectedRowKeys((prev) => prev.filter((key) => key !== record.key && !childKeys.includes(key)));
-      setSelectedRows((prev) =>
-        prev.filter((row) => row.key !== record.key && !childKeys.map((child) => child.key).includes(row.key))
-      );
-    }
-  };
-
-  const handleSelectAll = (selected, selectedRows, changeRows) => {
-    const allKeys = selectedRows.map((row) => row.key);
-    const allRows = selectedRows;
-    if (selected) {
-      setSelectedRowKeys(allKeys);
-      setSelectedRows(allRows);
-    } else {
-      setSelectedRowKeys([]);
-      setSelectedRows([]);
-    }
-  };
-
-  const rowSelection = {
-    columnWidth: 50,
-    selectedRowKeys,
-    onSelect: handleSelect,
-    onSelectAll: handleSelectAll,
-    getCheckboxProps: (record) => ({
-      disabled: record.name === "Disabled User", // Bu satır gerekliyse
-      name: record.name,
-    }),
-  };
-
-  // tablodaki verileri gruplara göre ve toplu olarak seçmek işlemi son
 
   const downloadCSV = () => {
     if (!data || data.length === 0) {
@@ -390,8 +346,6 @@ const MainTable = () => {
     document.body.removeChild(link);
   };
 
-  console.log("selectedRows", selectedRows);
-
   return (
     <>
       <div
@@ -411,7 +365,6 @@ const MainTable = () => {
       </div>
       <Spin spinning={loading}>
         <Table
-          // rowSelection={rowSelection}
           size="small"
           columns={columns}
           bordered
