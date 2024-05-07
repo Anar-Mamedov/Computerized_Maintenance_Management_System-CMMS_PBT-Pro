@@ -280,7 +280,7 @@ const MainTable = () => {
   // tablodaki verileri gruplara göre ve toplu olarak seçmek işlemi son
 
   const downloadCSV = () => {
-    if (selectedRows.length === 0) {
+    if (!data || data.length === 0) {
       message.warning("İndirilecek veri yok.");
       return;
     }
@@ -291,7 +291,7 @@ const MainTable = () => {
     const headers = {};
 
     // Initialize the headers with the static 'Machine' column
-    const initialHeader = [" "]; // The first header for the 'machine' data
+    const initialHeader = []; // The first header for the 'machine' data
 
     // Safely retrieve and organize all unique headers for months, weeks, and days.
     columns.forEach((col) => {
@@ -341,21 +341,42 @@ const MainTable = () => {
     csvContent += dayRow.join(columnDelimiter) + lineDelimiter;
 
     // Add data rows
-    selectedRows.forEach((row) => {
-      const rowData = [`"${row.machine.replace(/"/g, '""')}"`]; // Start each row with the machine name
+    data.forEach((parentRow) => {
+      // For parent rows
+      const parentRowData = [`"${parentRow.machine.replace(/"/g, '""')}"`];
       columns.forEach((col) => {
         if (col.children) {
           col.children.forEach((weekCol) => {
             if (weekCol.children) {
               weekCol.children.forEach((dayCol) => {
-                const cellValue = row[dayCol.dataIndex] || "";
-                rowData.push(`"${cellValue.replace(/"/g, '""')}"`);
+                const cellValue = parentRow[dayCol.dataIndex] || "";
+                parentRowData.push(`"${cellValue.replace(/"/g, '""')}"`);
               });
             }
           });
         }
       });
-      csvContent += rowData.join(columnDelimiter) + lineDelimiter;
+      csvContent += parentRowData.join(columnDelimiter) + lineDelimiter;
+
+      // If there are child rows
+      if (parentRow.children && parentRow.children.length > 0) {
+        parentRow.children.forEach((childRow) => {
+          const childRowData = [`"${childRow.machine.replace(/"/g, '""')}"`];
+          columns.forEach((col) => {
+            if (col.children) {
+              col.children.forEach((weekCol) => {
+                if (weekCol.children) {
+                  weekCol.children.forEach((dayCol) => {
+                    const cellValue = childRow[dayCol.dataIndex] || "";
+                    childRowData.push(`"${cellValue.replace(/"/g, '""')}"`);
+                  });
+                }
+              });
+            }
+          });
+          csvContent += childRowData.join(columnDelimiter) + lineDelimiter;
+        });
+      }
     });
 
     // Create and Download CSV File
@@ -390,7 +411,7 @@ const MainTable = () => {
       </div>
       <Spin spinning={loading}>
         <Table
-          rowSelection={rowSelection}
+          // rowSelection={rowSelection}
           size="small"
           columns={columns}
           bordered
