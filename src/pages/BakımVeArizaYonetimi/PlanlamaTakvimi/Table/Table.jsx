@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message, Popover } from "antd";
 import AxiosInstance from "../../../../api/http";
 import Filters from "./filter/Filters";
 import { useFormContext } from "react-hook-form";
@@ -23,32 +23,57 @@ dayjs.extend(weekOfYear);
 
 const { Text } = Typography;
 
-const generateColumns = (startDate, endDate) => {
-  const getIconForValue = (value) => {
-    const style = { fontSize: "20px" }; // İkon boyutunu ayarla
-    switch (value) {
-      case "Planlanan":
-        return <FcPlanner style={style} />;
-      case "Yaklaşan":
-        return <FcExpired style={style} />;
-      case "Süresi Geçmiş":
-        return <FcHighPriority style={style} />;
-      case "Yapılmadı":
-        return <FcCancel style={style} />;
-      case "Devam Eden":
-        return <FcFlashAuto style={style} />;
-      case "Zamanında Yapılan":
-        return <FcOk style={style} />;
-      case "Gecikmeli Yapılan":
-        return <FcLeave style={style} />;
-      case "İptal Edilen":
-        return <FcDisclaimer style={style} />;
-      default:
-        return value;
-    }
+const generateColumns = (startDate, endDate, data) => {
+  const icons = {
+    Planlanan: <FcPlanner style={{ fontSize: "20px" }} />,
+    Yaklaşan: <FcExpired style={{ fontSize: "20px" }} />,
+    "Süresi Geçmiş": <FcHighPriority style={{ fontSize: "20px" }} />,
+    Yapılmadı: <FcCancel style={{ fontSize: "20px" }} />,
+    "Devam Eden": <FcFlashAuto style={{ fontSize: "20px" }} />,
+    "Zamanında Yapılan": <FcOk style={{ fontSize: "20px" }} />,
+    "Gecikmeli Yapılan": <FcLeave style={{ fontSize: "20px" }} />,
+    "İptal Edilen": <FcDisclaimer style={{ fontSize: "20px" }} />,
   };
-  const columns = [
-    {
+
+  const getIconForValue = (value) => {
+    return icons[value] || value;
+  };
+  const renderFunction = (text, record, column) => {
+    const keyPart = record.key.split("-").shift();
+
+    // keyPart değerine göre veriyi ara
+    const foundRecord = data.find((item) => item.key === keyPart);
+
+    // Eşleşen kaydın machine değerini al
+    const machineValue = foundRecord ? foundRecord.machine : "Kayıt bulunamadı";
+
+    // Sütunun veri indeksini al
+    const date = dayjs(column.dataIndex, "YYYY-MM-DD").format("DD.MM.YYYY");
+
+    return (
+      <Popover
+        content={
+          <div>
+            {`Makine: ${machineValue}`}
+            <br />
+            {`Bakım: ${record.machine}`}
+            <br />
+            {`Durum: ${text}`}
+            <br />
+            {`Tarih: ${date}`}
+          </div>
+        }
+        title="Hücre Detayı"
+        trigger="click">
+        <div style={{ cursor: "pointer", display: "flex", justifyContent: "center", alignItems: "center" }}>
+          {getIconForValue(text)}
+        </div>
+      </Popover>
+    );
+  };
+
+  const columnsObject = {
+    "": {
       title: "",
       dataIndex: "machine",
       key: "machine",
@@ -56,16 +81,18 @@ const generateColumns = (startDate, endDate) => {
       width: 300,
       ellipsis: true,
     },
-  ];
+  };
+
   let currentDay = dayjs(startDate);
 
   while (currentDay <= dayjs(endDate)) {
     const month = currentDay.format("MMMM YYYY");
     const week = `Hafta ${currentDay.week()}`;
     const day = currentDay.format("dddd");
+    const formattedDay = currentDay.format("YYYY-MM-DD");
 
-    if (!columns.some((column) => column.title === month)) {
-      columns.push({
+    if (!columnsObject[month]) {
+      columnsObject[month] = {
         title: month,
         ellipsis: true,
         children: [
@@ -75,22 +102,19 @@ const generateColumns = (startDate, endDate) => {
             children: [
               {
                 title: day,
-                dataIndex: currentDay.format("YYYY-MM-DD"),
-                key: currentDay.format("YYYY-MM-DD"),
+                dataIndex: formattedDay,
+                key: formattedDay,
                 width: 45,
                 ellipsis: true,
-                render: (text) => (
-                  <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                    {getIconForValue(text)}
-                  </div>
-                ),
+                render: (text, record, rowIndex) =>
+                  renderFunction(text, record, { dataIndex: formattedDay, key: formattedDay }),
               },
             ],
           },
         ],
-      });
+      };
     } else {
-      const monthColumn = columns.find((column) => column.title === month);
+      const monthColumn = columnsObject[month];
       if (!monthColumn.children.some((child) => child.title === week)) {
         monthColumn.children.push({
           title: week,
@@ -98,15 +122,12 @@ const generateColumns = (startDate, endDate) => {
           children: [
             {
               title: day,
-              dataIndex: currentDay.format("YYYY-MM-DD"),
-              key: currentDay.format("YYYY-MM-DD"),
+              dataIndex: formattedDay,
+              key: formattedDay,
               width: 45,
               ellipsis: true,
-              render: (text) => (
-                <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                  {getIconForValue(text)}
-                </div>
-              ),
+              render: (text, record, rowIndex) =>
+                renderFunction(text, record, { dataIndex: formattedDay, key: formattedDay }),
             },
           ],
         });
@@ -114,15 +135,12 @@ const generateColumns = (startDate, endDate) => {
         const weekColumn = monthColumn.children.find((child) => child.title === week);
         weekColumn.children.push({
           title: day,
-          dataIndex: currentDay.format("YYYY-MM-DD"),
-          key: currentDay.format("YYYY-MM-DD"),
+          dataIndex: formattedDay,
+          key: formattedDay,
           width: 45,
           ellipsis: true,
-          render: (text) => (
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-              {getIconForValue(text)}
-            </div>
-          ),
+          render: (text, record, rowIndex) =>
+            renderFunction(text, record, { dataIndex: formattedDay, key: formattedDay }),
         });
       }
     }
@@ -130,18 +148,19 @@ const generateColumns = (startDate, endDate) => {
     currentDay = currentDay.add(1, "day");
   }
 
-  return columns;
+  return Object.values(columnsObject);
 };
 
 const MainTable = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [data, setData] = useState(); // Tabloda gösterilecek veri
 
-  const columns = startDate && endDate ? generateColumns(startDate, endDate) : [];
+  const columns = startDate && endDate ? generateColumns(startDate, endDate, data) : [];
 
   const { setValue } = useFormContext();
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(); // Tabloda gösterilecek veri
+
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
 
   const [body, setBody] = useState({
@@ -194,9 +213,11 @@ const MainTable = () => {
           const endDateDayjs = dayjs(endDate);
           const daysDiff = endDateDayjs.diff(startDateDayjs, "day");
 
+          let currentDay = startDateDayjs;
           for (let i = 1; i <= daysDiff + 1; i++) {
-            const day = startDateDayjs.add(i - 1, "day").format("YYYY-MM-DD");
+            const day = currentDay.format("YYYY-MM-DD");
             child[day] = item[i]; // günleri sayı olarak al
+            currentDay = currentDay.add(1, "day");
           }
           acc[item.MAKINE_ID].children.push(child);
           return acc;
@@ -374,7 +395,7 @@ const MainTable = () => {
             onExpandedRowsChange: setExpandedRowKeys,
           }}
           scroll={{ y: "calc(100vh - 460px)" }}
-          pagination={false}
+          // pagination={false}
         />
       </Spin>
     </>
