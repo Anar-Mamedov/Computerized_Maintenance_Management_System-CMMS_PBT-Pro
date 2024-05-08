@@ -23,7 +23,7 @@ dayjs.extend(weekOfYear);
 
 const { Text } = Typography;
 
-const generateColumns = (startDate, endDate, data) => {
+const generateColumns = (startDate, endDate, data, checkedState, handleCheckboxChange) => {
   const icons = {
     Planlanan: <FcPlanner style={{ fontSize: "20px" }} />,
     Yaklaşan: <FcExpired style={{ fontSize: "20px" }} />,
@@ -50,6 +50,9 @@ const generateColumns = (startDate, endDate, data) => {
     // Sütunun veri indeksini al
     const date = dayjs(column.dataIndex, "YYYY-MM-DD").format("DD.MM.YYYY");
 
+    const key = `${record.key}-${column.dataIndex}`;
+    const isChecked = checkedState[key];
+
     return (
       <Popover
         content={
@@ -64,10 +67,29 @@ const generateColumns = (startDate, endDate, data) => {
           </div>
         }
         title="Hücre Detayı"
-        trigger="click">
-        <div style={{ cursor: "pointer", display: "flex", justifyContent: "center", alignItems: "center" }}>
-          {getIconForValue(text)}
-        </div>
+        trigger="hover">
+        {text && (
+          <div
+            style={{
+              position: "absolute",
+              cursor: "pointer",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: isChecked ? "#188fff1d" : "transparent",
+              border: isChecked ? "1px solid #1890ff" : "1px solid transparent",
+              width: "100%",
+              height: "100%",
+              top: 0,
+              left: 0,
+            }}
+            onClick={() => handleCheckboxChange(key, text, record, column)}>
+            <>
+              <Checkbox checked={isChecked} style={{ opacity: 0, position: "absolute" }} />
+              {getIconForValue(text)}
+            </>
+          </div>
+        )}
       </Popover>
     );
   };
@@ -156,7 +178,53 @@ const MainTable = () => {
   const [endDate, setEndDate] = useState(null);
   const [data, setData] = useState(); // Tabloda gösterilecek veri
 
-  const columns = startDate && endDate ? generateColumns(startDate, endDate, data) : [];
+  const [checkedState, setCheckedState] = useState({}); // State to keep track of checkboxes
+  const [selectedCells, setSelectedCells] = useState([]); // State to keep track of selected cell information
+
+  // Function to handle checkbox changes
+  const handleCheckboxChange = (key, text, record, column) => {
+    const makineID = record.key.split("-").shift();
+    const bakimID = record.key.split("-")[1];
+
+    // makineID değerine göre veriyi ara
+    const foundRecord = data.find((item) => item.key === makineID);
+
+    // Eşleşen kaydın machine değerini al
+    const machineValue = foundRecord ? foundRecord.machine : "Kayıt bulunamadı";
+
+    // Sütunun veri indeksini al
+    const date = dayjs(column.dataIndex, "YYYY-MM-DD").format("DD.MM.YYYY");
+
+    // Check if the cell is already selected
+    const isSelected = checkedState[key];
+
+    // Update the checked state
+    setCheckedState((prevState) => ({ ...prevState, [key]: !isSelected }));
+
+    // Get the cell information
+    const cellInfo = {
+      machineValue,
+      recordMachine: record.machine,
+      status: text,
+      date,
+      makineID,
+      bakimID,
+    };
+
+    // Update the selected cells
+    setSelectedCells((prevCells) => {
+      if (isSelected) {
+        // If the cell is already selected, remove it from the list
+        return prevCells.filter((cell) => cell.key !== key);
+      } else {
+        // If the cell is not selected, add it to the list
+        return [...prevCells, { key, ...cellInfo }];
+      }
+    });
+  };
+
+  const columns =
+    startDate && endDate ? generateColumns(startDate, endDate, data, checkedState, handleCheckboxChange) : [];
 
   const { setValue } = useFormContext();
   const [loading, setLoading] = useState(true);
