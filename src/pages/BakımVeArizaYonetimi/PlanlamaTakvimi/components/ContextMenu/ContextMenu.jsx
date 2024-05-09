@@ -8,10 +8,22 @@ import Parametreler from "./components/Parametreler/Parametreler";
 import TarihceTablo from "./components/TarihceTablo";
 import Form from "./components/Form/Form";
 import DownloadCSV from "./components/DownloadCSV/DownloadCSV";
+import IsEmriOlustur from "./components/IsEmriOlustur/IsEmriOlustur.jsx";
+import IleriTarihePlanla from "./components/IleriTarihePlanla/IleriTarihePlanla.jsx";
+import PeryodikBakimIptali from "./components/PeryodikBakimIptali/PeryodikBakimIptali.jsx";
+import MalzemeIhtiyaci from "./components/MalzemeIhtiyaci/MalzemeIhtiyaci.jsx";
+import PersonelIhtiyaci from "./components/PersonelIhtiyaci/PersonelIhtiyaci.jsx";
+import PeryodikBakimDetayi from "./components/PeryodikBakimDetayi/PeryodikBakimDetayi.jsx";
+import MakineDetayi from "./components/MakineDetayi/MakineDetayi.jsx";
+import IsEmriDetayi from "./components/IsEmriDetayi/IsEmriDetayi.jsx";
 
 const { Text, Link } = Typography;
 
-export default function ContextMenu({ selectedRows, refreshTableData, selectedCells }) {
+export default function ContextMenu({
+  selectedRows,
+  refreshTableData,
+  selectedCells,
+}) {
   const [visible, setVisible] = useState(false);
 
   const handleVisibleChange = (visible) => {
@@ -45,10 +57,28 @@ export default function ContextMenu({ selectedRows, refreshTableData, selectedCe
       {selectedRows.length === 1 && <TarihceTablo selectedRows={selectedRows} />} */}
       {/* {selectedRows.length >= 1 && <Form selectedRows={selectedRows} />}
       {selectedRows.length >= 1 && <DownloadCSV selectedRows={selectedRows} />} */}
+      {selectedCells.length >= 1 && (
+        <>
+          <IsEmriOlustur selectedCells={selectedCells} />
+          <IleriTarihePlanla selectedCells={selectedCells} />
+          <PeryodikBakimIptali selectedCells={selectedCells} />
+          <MalzemeIhtiyaci selectedCells={selectedCells} />
+          <PersonelIhtiyaci selectedCells={selectedCells} />
+          <PeryodikBakimDetayi selectedCells={selectedCells} />
+          <MakineDetayi selectedCells={selectedCells} />
+          <IsEmriDetayi selectedCells={selectedCells} />
+        </>
+      )}
     </div>
   );
   return (
-    <Popover placement="bottom" content={content} trigger="click" open={visible} onOpenChange={handleVisibleChange}>
+    <Popover
+      placement="bottom"
+      content={content}
+      trigger="click"
+      open={visible}
+      onOpenChange={handleVisibleChange}
+    >
       <Button
         style={{
           display: "flex",
@@ -58,9 +88,16 @@ export default function ContextMenu({ selectedRows, refreshTableData, selectedCe
           backgroundColor: "#2BC770",
           borderColor: "#2BC770",
           height: "32px",
-        }}>
-        {selectedCells.length >= 1 && <Text style={{ color: "white", marginLeft: "3px" }}>{selectedCells.length}</Text>}
-        <MoreOutlined style={{ color: "white", fontSize: "20px", margin: "0" }} />
+        }}
+      >
+        {selectedCells.length >= 1 && (
+          <Text style={{ color: "white", marginLeft: "3px" }}>
+            {selectedCells.length}
+          </Text>
+        )}
+        <MoreOutlined
+          style={{ color: "white", fontSize: "20px", margin: "0" }}
+        />
       </Button>
     </Popover>
   );
