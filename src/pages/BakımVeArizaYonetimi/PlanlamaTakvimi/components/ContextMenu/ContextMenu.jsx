@@ -11,7 +11,7 @@ import DownloadCSV from "./components/DownloadCSV/DownloadCSV";
 
 const { Text, Link } = Typography;
 
-export default function ContextMenu({ selectedRows, refreshTableData }) {
+export default function ContextMenu({ selectedRows, refreshTableData, selectedCells }) {
   const [visible, setVisible] = useState(false);
 
   const handleVisibleChange = (visible) => {
@@ -22,11 +22,11 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
     setVisible(false);
   };
   // Silme işlemi için disable durumunu kontrol et
-  const isDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 4);
-  const iptalDisabled = selectedRows.some(
-    (row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 2 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5
-  );
-  const kapatDisabled = selectedRows.some((row) => row.KAPALI === true);
+  // const isDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 4);
+  // const iptalDisabled = selectedRows.some(
+  //   (row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 2 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5
+  // );
+  // const kapatDisabled = selectedRows.some((row) => row.KAPALI === true);
 
   const content = (
     <div>
@@ -37,14 +37,14 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
         hidePopover={hidePopover}
       /> */}
       {/* <Iptal selectedRows={selectedRows} refreshTableData={refreshTableData} iptalDisabled={iptalDisabled} /> */}
-      {selectedRows.length >= 1 && (
+      {/* {selectedRows.length >= 1 && (
         <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />
-      )}
+      )} */}
 
       {/* <Parametreler />
       {selectedRows.length === 1 && <TarihceTablo selectedRows={selectedRows} />} */}
-      {selectedRows.length >= 1 && <Form selectedRows={selectedRows} />}
-      {selectedRows.length >= 1 && <DownloadCSV selectedRows={selectedRows} />}
+      {/* {selectedRows.length >= 1 && <Form selectedRows={selectedRows} />}
+      {selectedRows.length >= 1 && <DownloadCSV selectedRows={selectedRows} />} */}
     </div>
   );
   return (
@@ -59,7 +59,7 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
           borderColor: "#2BC770",
           height: "32px",
         }}>
-        {selectedRows.length >= 1 && <Text style={{ color: "white", marginLeft: "3px" }}>{selectedRows.length}</Text>}
+        {selectedCells.length >= 1 && <Text style={{ color: "white", marginLeft: "3px" }}>{selectedCells.length}</Text>}
         <MoreOutlined style={{ color: "white", fontSize: "20px", margin: "0" }} />
       </Button>
     </Popover>

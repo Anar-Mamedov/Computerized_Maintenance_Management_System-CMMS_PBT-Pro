@@ -447,10 +447,16 @@ const MainTable = () => {
           padding: "0 5px",
         }}>
         <Filters onChange={handleBodyChange} />
-        {/* <ContextMenu selectedRows={selectedRows} /> */}
-        <Button onClick={downloadCSV} type="primary" style={{ marginBottom: "10px" }}>
-          CSV İndir
-        </Button>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <ContextMenu selectedCells={selectedCells} />
+          <Button
+            onClick={downloadCSV}
+            type="primary"
+            style={{ marginBottom: "10px" }}
+            disabled={!data || data.length === 0}>
+            CSV İndir
+          </Button>
+        </div>
       </div>
       <Spin spinning={loading}>
         <Table
