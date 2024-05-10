@@ -1,6 +1,21 @@
 import { useEffect, useState } from "react";
-import { Route, Routes, Link, useLocation, Outlet, Navigate } from "react-router-dom";
-import { Breadcrumb, Layout, Menu, theme, Button, Typography, Input } from "antd";
+import {
+  Route,
+  Routes,
+  Link,
+  useLocation,
+  Outlet,
+  Navigate,
+} from "react-router-dom";
+import {
+  Breadcrumb,
+  Layout,
+  Menu,
+  theme,
+  Button,
+  Typography,
+  Input,
+} from "antd";
 import {
   DesktopOutlined,
   FileOutlined,
@@ -31,6 +46,7 @@ import { useRecoilState } from "recoil";
 import { userState } from "./state/userState";
 import PlanlamaTakvimi from "./pages/BakımVeArizaYonetimi/PlanlamaTakvimi/PlanlamaTakvimi";
 import OtomatikIsEmri from "./pages/BakımVeArizaYonetimi/OtomatikIsEmri/OtomatikIsEmri";
+import PeriyodikBakimlar1 from "./pages/BakımVeArizaYonetimi/PeriyodikBakimlar1/PeryodikBakimlar";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -65,14 +81,19 @@ function filterItems(items) {
         return item; // "Ana Sayfa" her zaman görünür
       }
 
-      const filteredChildren = item.children ? filterItems(item.children).filter((child) => loginData[child.key]) : [];
+      const filteredChildren = item.children
+        ? filterItems(item.children).filter((child) => loginData[child.key])
+        : [];
       return {
         ...item,
         children: filteredChildren.length > 0 ? filteredChildren : undefined,
       };
     })
     .filter(
-      (item) => item.children || loginData[item.key] || (item.key === "" && item.label.props.children === "Ana Sayfa")
+      (item) =>
+        item.children ||
+        loginData[item.key] ||
+        (item.key === "" && item.label.props.children === "Ana Sayfa")
     );
 }
 
@@ -102,6 +123,7 @@ const rawItems = [
       getItem("Arıza Tanımları", "arizaTanimlari", true),
       // getItem("İş Emri", "isemri", true),
       getItem("İş Emirleri", "isEmri1", true),
+      getItem("Periyodik Bakımlar1", "periyodikBakimlar1", true),
       getItem("Peryodik Bakımlar", "peryodikBakimlar", true),
       getItem("Otomatik İş Emirleri", "otomatikIsEmirleri", true),
       getItem("Planlama Takvimi", "planlamaTakvimi", true),
@@ -194,11 +216,13 @@ export default function App() {
           <ProtectedRoute>
             <BaseLayout />
           </ProtectedRoute>
-        }>
+        }
+      >
         {loginData?.Dashboard && <Route path="/" element={<Dashboard />} />}
         {/* <Route path="/isemri" element={<Isemri />} /> */}
         <Route path="/isEmri1" element={<IsEmri />} />
         <Route path="/peryodikBakimlar" element={<PeriyodikBakimlar />} />
+        <Route path="/periyodikBakimlar1" element={<PeriyodikBakimlar1 />} />
         <Route path="/otomatikIsEmirleri" element={<OtomatikIsEmri />} />
         <Route path="/planlamaTakvimi" element={<PlanlamaTakvimi />} />
         <Route path="/makine" element={<MakineTanim />} />
@@ -270,7 +294,8 @@ const BaseLayout = () => {
           collapsed={collapsed}
           onCollapse={setCollapsed}
           breakpoint="lg"
-          collapsedWidth="0.0000000000001">
+          collapsedWidth="0.0000000000001"
+        >
           <div
             className="demo-logo-vertical"
             style={{
@@ -280,7 +305,8 @@ const BaseLayout = () => {
               alignItems: "flex-end",
               marginBottom: "20px",
               columnGap: "5px",
-            }}>
+            }}
+          >
             <img src={logo} alt="Logo" style={logoStyle} />
             <Text style={{ color: "white", marginTop: "11px" }}>v. 1.5.0</Text>
           </div>
@@ -304,7 +330,8 @@ const BaseLayout = () => {
               alignItems: "flex-end",
               marginBottom: "20px",
               columnGap: "5px",
-            }}>
+            }}
+          >
             <img src={logo} alt="Logo" style={logoStyle} />
             <Text style={{ color: "white", marginTop: "11px" }}>v. 1.5.0</Text>
           </div>
@@ -313,7 +340,14 @@ const BaseLayout = () => {
       )}
 
       <Layout>
-        <Header style={{ padding: 0, background: colorBgContainer, display: "flex", alignItems: "center" }}>
+        <Header
+          style={{
+            padding: 0,
+            background: colorBgContainer,
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
           {mobileView && (
             <Button
               onClick={toggleCollapsed}
@@ -325,7 +359,8 @@ const BaseLayout = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 marginLeft: "10px",
-              }}>
+              }}
+            >
               {collapsed ? (
                 <MenuUnfoldOutlined style={{ color: "#0066ff" }} />
               ) : (
@@ -337,7 +372,13 @@ const BaseLayout = () => {
         </Header>
         <Content style={{ margin: mobileView ? "0 0px" : "0 16px" }}>
           <Breadcrumb style={{ margin: "16px 0" }}></Breadcrumb>
-          <div style={{ padding: mobileView ? "24px 0px" : 24, minHeight: 360, background: colorBgContainer }}>
+          <div
+            style={{
+              padding: mobileView ? "24px 0px" : 24,
+              minHeight: 360,
+              background: colorBgContainer,
+            }}
+          >
             <Outlet />
           </div>
         </Content>
@@ -358,7 +399,9 @@ const MenuWrapper = () => {
 
   useEffect(() => {
     const currentPath = location.pathname.split("/")[1];
-    const openKey = items.find((item) => item.children?.some((child) => `/${child.key}` === `/${currentPath}`))?.key;
+    const openKey = items.find((item) =>
+      item.children?.some((child) => `/${child.key}` === `/${currentPath}`)
+    )?.key;
     if (openKey) {
       setOpenKeys([openKey]);
     }
