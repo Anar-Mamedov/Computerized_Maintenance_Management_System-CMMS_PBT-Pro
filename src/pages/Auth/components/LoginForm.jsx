@@ -54,6 +54,7 @@ export default function LoginForm() {
           bakimTanimlari: response.KLL_WEB_BAKIM,
           arizaTanimlari: response.KLL_WEB_ARIZA,
           isEmri1: response.KLL_WEB_ISEMRI,
+          periyodikBakimlar1: response.KLL_WEB_PBAKIM,
           peryodikBakimlar: response.KLL_WEB_PBAKIM,
           otomatikIsEmirleri: response.KLL_WEB_OTOIS,
           planlamaTakvimi: response.KLL_WEB_PTAKVIM,
@@ -112,7 +113,8 @@ export default function LoginForm() {
         width: "400px",
         flexDirection: "column",
         alignItems: "center",
-      }}>
+      }}
+    >
       <div style={{ width: "100%" }}>
         <Text style={{ fontSize: "20px" }}>Giriş Yap</Text>
         <Form
@@ -120,15 +122,28 @@ export default function LoginForm() {
           className="login-form"
           initialValues={{ remember: true }}
           onFinish={onSubmit}
-          style={{ width: "100%", marginTop: "20px" }}>
-          <Form.Item name="email" rules={[{ required: true, message: "Lütfen kullanıcı kodunuzu girin!" }]}>
-            <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Kullanıcı Kodu" />
+          style={{ width: "100%", marginTop: "20px" }}
+        >
+          <Form.Item
+            name="email"
+            rules={[
+              { required: true, message: "Lütfen kullanıcı kodunuzu girin!" },
+            ]}
+          >
+            <Input
+              prefix={<UserOutlined className="site-form-item-icon" />}
+              placeholder="Kullanıcı Kodu"
+            />
           </Form.Item>
           <Form.Item
             name="password"
             // rules={[{ required: true, message: "Lütfen şifrenizi girin!" }]}
           >
-            <Input prefix={<LockOutlined className="site-form-item-icon" />} type="password" placeholder="Şifre" />
+            <Input
+              prefix={<LockOutlined className="site-form-item-icon" />}
+              type="password"
+              placeholder="Şifre"
+            />
           </Form.Item>
           <Form.Item>
             <Button
@@ -136,12 +151,17 @@ export default function LoginForm() {
               htmlType="submit"
               className="login-form-button"
               style={{ width: "100%" }}
-              disabled={loading}>
+              disabled={loading}
+            >
               {loading ? <Spin /> : "Giriş Yap"}
             </Button>
           </Form.Item>
           <Form.Item>
-            <Button danger onClick={handleClearBaseURL} style={{ width: "100%" }}>
+            <Button
+              danger
+              onClick={handleClearBaseURL}
+              style={{ width: "100%" }}
+            >
               Anahtarı Değiştir
             </Button>
           </Form.Item>
