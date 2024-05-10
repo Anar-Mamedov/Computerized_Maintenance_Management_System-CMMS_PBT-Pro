@@ -1,17 +1,37 @@
 import tr_TR from "antd/es/locale/tr_TR";
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Drawer, Space, ConfigProvider, Modal, message } from "antd";
+import {
+  Button,
+  Drawer,
+  Space,
+  ConfigProvider,
+  Modal,
+  message,
+  Spin,
+} from "antd";
 import React, { useEffect, useState, useTransition } from "react";
 import MainTabs from "./components/MainTabs/MainTabs";
-import { useForm, Controller, useFormContext, FormProvider, set } from "react-hook-form";
+import {
+  useForm,
+  Controller,
+  useFormContext,
+  FormProvider,
+  set,
+} from "react-hook-form";
 import dayjs from "dayjs";
 import AxiosInstance from "../../../../api/http";
 import Footer from "./components/Footer";
 import SecondTabs from "./components/SecondTabs/SecondTabs";
 
-export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
+export default function EditDrawer({
+  selectedRow,
+  onDrawerClose,
+  drawerVisible,
+  onRefresh,
+}) {
   const [, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const showDrawer = () => {
     setOpen(true);
   };
@@ -193,67 +213,86 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   };
 
   useEffect(() => {
-    if (drawerVisible && selectedRow) {
-      // console.log("selectedRow", selectedRow);
-      // startTransition(() => {
-      // Object.keys(selectedRow).forEach((key) => {
-      //   console.log(key, selectedRow[key]);
-      //   setValue(key, selectedRow[key]);
-      setValue("secilenBakimID", selectedRow.key);
-      setValue("bakimKodu", selectedRow.IST_KOD);
-      setValue("bakimTanimi", selectedRow.IST_TANIM);
-      setValue("bakimAktif", selectedRow.IST_AKTIF);
-      setValue("bakimTipi", selectedRow.IST_TIP);
-      setValue("bakimTipiID", selectedRow.IST_TIP_KOD_ID);
-      setValue("bakimGrubu", selectedRow.IST_GRUP);
-      setValue("bakimGrubuID", selectedRow.IST_GRUP_KOD_ID);
-      setValue("bakimNedeni", selectedRow.IST_NEDEN);
-      setValue("bakimNedeniID", selectedRow.IST_NEDEN_KOD_ID);
-      setValue("oncelikTanim", selectedRow.IST_ONCELIK);
-      setValue("oncelikID", selectedRow.IST_ONCELIK_ID);
-      setValue("talimatTanim", selectedRow.IST_TALIMAT);
-      setValue("talimatID", selectedRow.IST_TALIMAT_ID);
-      setValue("atolyeTanim", selectedRow.IST_ATOLYE);
-      setValue("atolyeID", selectedRow.IST_ATOLYE_ID);
-      setValue("firmaTanim", selectedRow.IST_FIRMA);
-      setValue("firmaID", selectedRow.IST_FIRMA_ID);
-      setValue("lokasyonTanim", selectedRow.IST_LOKASYON);
-      setValue("lokasyonID", selectedRow.IST_LOKASYON_ID);
-      setValue("calismaSuresi", selectedRow.IST_CALISMA_SURE);
-      setValue("durusSuresi", selectedRow.IST_DURUS_SURE);
-      setValue("personelSayisi", selectedRow.IST_PERSONEL_SAYI);
-      setValue("otonomBakim", selectedRow.IST_OTONOM_BAKIM);
-      setValue("periyotID", selectedRow.IST_UYARI_PERIYOT);
-      setValue("periyotSiklik", selectedRow.IST_UYARI_SIKLIGI);
-      setValue("maliyetlerMalzeme", selectedRow.IST_MALZEME_MALIYET);
-      setValue("maliyetlerIscilik", selectedRow.IST_ISCILIK_MALIYET);
-      setValue("maliyetlerGenelGider", selectedRow.IST_GENEL_GIDER_MALIYET);
-      setValue("maliyetlerToplam", selectedRow.IST_TOPLAM_MALIYET);
-      setValue("lojistikSuresi", selectedRow.IST_SURE_LOJISTIK);
-      setValue("seyahetSuresi", selectedRow.IST_SURE_SEYAHAT);
-      setValue("onaySuresi", selectedRow.IST_SURE_ONAY);
-      setValue("beklemeSuresi", selectedRow.IST_SURE_BEKLEME);
-      setValue("digerSuresi", selectedRow.IST_SURE_DIGER);
-      setValue("ozelAlan1", selectedRow.IST_OZEL_ALAN_1);
-      setValue("ozelAlan2", selectedRow.IST_OZEL_ALAN_2);
-      setValue("ozelAlan3", selectedRow.IST_OZEL_ALAN_3);
-      setValue("ozelAlan4", selectedRow.IST_OZEL_ALAN_4);
-      setValue("ozelAlan5", selectedRow.IST_OZEL_ALAN_5);
-      setValue("ozelAlan6", selectedRow.IST_OZEL_ALAN_6);
-      setValue("ozelAlan6ID", selectedRow.IST_OZEL_ALAN_6_KOD_ID);
-      setValue("ozelAlan7", selectedRow.IST_OZEL_ALAN_7);
-      setValue("ozelAlan7ID", selectedRow.IST_OZEL_ALAN_7_KOD_ID);
-      setValue("ozelAlan8", selectedRow.IST_OZEL_ALAN_8);
-      setValue("ozelAlan8ID", selectedRow.IST_OZEL_ALAN_8_KOD_ID);
-      setValue("ozelAlan9", selectedRow.IST_OZEL_ALAN_9);
-      setValue("ozelAlan10", selectedRow.IST_OZEL_ALAN_10);
-      setValue("aciklama", selectedRow.IST_ACIKLAMA);
+    const handleDataFetchAndUpdate = async () => {
+      if (drawerVisible && selectedRow) {
+        setOpen(true); // İşlemler tamamlandıktan sonra drawer'ı aç
+        setLoading(true); // Yükleme başladığında
+        try {
+          const response = await AxiosInstance.get(
+            `PeriyodikBakimDetayByBakim?BakimId=${selectedRow.key}`
+          );
+          const data = response;
+          const item = data[0]; // Veri dizisinin ilk elemanını al
+          // Form alanlarını set et
+          // console.log("selectedRow", selectedRow);
+          // startTransition(() => {
+          // Object.keys(selectedRow).forEach((key) => {
+          //   console.log(key, selectedRow[key]);
+          //   setValue(key, selectedRow[key]);
+          console.log;
+          setValue("secilenBakimID", item.key);
+          setValue("bakimKodu", item.PBK_KOD);
+          setValue("bakimTanimi", item.PBK_TANIM);
+          setValue("bakimAktif", item.PBK_AKTIF);
+          setValue("bakimTipi", item.PBK_TIP);
+          setValue("bakimTipiID", item.PBK_TIP_KOD_ID);
+          setValue("bakimGrubu", item.PBK_GRUP);
+          setValue("bakimGrubuID", item.PBK_GRUP_KOD_ID);
+          setValue("bakimNedeni", item.PBK_NEDEN);
+          setValue("bakimNedeniID", item.PBK_NEDEN_KOD_ID);
+          setValue("oncelikTanim", item.PBK_ONCELIK);
+          setValue("oncelikID", item.PBK_ONCELIK_ID);
+          setValue("talimatTanim", item.PBK_TALIMAT);
+          setValue("talimatID", item.PBK_TALIMAT_ID);
+          setValue("atolyeTanim", item.PBK_ATOLYE);
+          setValue("atolyeID", item.PBK_ATOLYE_ID);
+          setValue("firmaTanim", item.PBK_FIRMA);
+          setValue("firmaID", item.PBK_FIRMA_ID);
+          setValue("lokasyonTanim", item.PBK_LOKASYON);
+          setValue("lokasyonID", item.PBK_LOKASYON_ID);
+          setValue("calismaSuresi", item.PBK_CALISMA_SURE);
+          setValue("durusSuresi", item.PBK_DURUS_SURE);
+          setValue("personelSayisi", item.PBK_PERSONEL_SAYI);
+          setValue("otonomBakim", item.PBK_OTONOM_BAKIM);
+          setValue("periyotID", item.PBK_UYARI_PERIYOT);
+          setValue("periyotSiklik", item.PBK_UYARI_SIKLIGI);
+          setValue("maliyetlerMalzeme", item.PBK_MALZEME_MALIYET);
+          setValue("maliyetlerIscilik", item.PBK_ISCILIK_MALIYET);
+          setValue("maliyetlerGenelGider", item.PBK_GENEL_GIDER_MALIYET);
+          setValue("maliyetlerToplam", item.PBK_TOPLAM_MALIYET);
+          setValue("lojistikSuresi", item.PBK_SURE_LOJISTIK);
+          setValue("seyahetSuresi", item.PBK_SURE_SEYAHAT);
+          setValue("onaySuresi", item.PBK_SURE_ONAY);
+          setValue("beklemeSuresi", item.PBK_SURE_BEKLEME);
+          setValue("digerSuresi", item.PBK_SURE_DIGER);
+          setValue("ozelAlan1", item.PBK_OZEL_ALAN_1);
+          setValue("ozelAlan2", item.PBK_OZEL_ALAN_2);
+          setValue("ozelAlan3", item.PBK_OZEL_ALAN_3);
+          setValue("ozelAlan4", item.PBK_OZEL_ALAN_4);
+          setValue("ozelAlan5", item.PBK_OZEL_ALAN_5);
+          setValue("ozelAlan6", item.PBK_OZEL_ALAN_6);
+          setValue("ozelAlan6ID", item.PBK_OZEL_ALAN_6_KOD_ID);
+          setValue("ozelAlan7", item.PBK_OZEL_ALAN_7);
+          setValue("ozelAlan7ID", item.PBK_OZEL_ALAN_7_KOD_ID);
+          setValue("ozelAlan8", item.PBK_OZEL_ALAN_8);
+          setValue("ozelAlan8ID", item.PBK_OZEL_ALAN_8_KOD_ID);
+          setValue("ozelAlan9", item.PBK_OZEL_ALAN_9);
+          setValue("ozelAlan10", item.PBK_OZEL_ALAN_10);
+          setValue("aciklama", item.PBK_ACIKLAMA);
 
-      // add more fields as needed
+          // add more fields as needed
 
-      // });
-      // });
-    }
+          // });
+          // });
+          setLoading(false); // Yükleme tamamlandığında
+        } catch (error) {
+          console.error("Veri çekilirken hata oluştu:", error);
+          setLoading(false); // Hata oluştuğunda
+        }
+      }
+    };
+
+    handleDataFetchAndUpdate();
   }, [selectedRow, setValue, drawerVisible]);
 
   useEffect(() => {
@@ -264,9 +303,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)}>
-        <ConfigProvider locale={tr_TR}>
-          {/* <Button
+      <ConfigProvider locale={tr_TR}>
+        {/* <Button
             type="primary"
             onClick={showDrawer}
             style={{
@@ -276,33 +314,51 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             <PlusOutlined />
             Ekle
           </Button> */}
-          <Drawer
-            width="1460px"
-            title="Bakim Tanımını Güncelle"
-            placement={"right"}
-            onClose={handleDrawerClose}
-            open={drawerVisible}
-            extra={
-              <Space>
-                <Button onClick={onClose}>İptal</Button>
-                <Button
-                  type="submit"
-                  onClick={handleClick}
-                  style={{
-                    backgroundColor: "#2bc770",
-                    borderColor: "#2bc770",
-                    color: "#ffffff",
-                  }}>
-                  Güncelle
-                </Button>
-              </Space>
-            }>
-            <MainTabs />
-            <SecondTabs />
-            <Footer />
-          </Drawer>
-        </ConfigProvider>
-      </form>
+        <Drawer
+          width="1460px"
+          title="Bakim Tanımını Güncelle"
+          placement={"right"}
+          onClose={handleDrawerClose}
+          open={drawerVisible}
+          extra={
+            <Space>
+              <Button onClick={onClose}>İptal</Button>
+              <Button
+                type="submit"
+                onClick={handleClick}
+                style={{
+                  backgroundColor: "#2bc770",
+                  borderColor: "#2bc770",
+                  color: "#ffffff",
+                }}
+              >
+                Güncelle
+              </Button>
+            </Space>
+          }
+        >
+          {loading ? (
+            <Spin
+              spinning={loading}
+              size="large"
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: "100vh",
+              }}
+            >
+              {/* İçerik yüklenirken gösterilecek alan */}
+            </Spin>
+          ) : (
+            <form onSubmit={methods.handleSubmit(onSubmit)}>
+              <MainTabs />
+              <SecondTabs />
+              <Footer />
+            </form>
+          )}
+        </Drawer>
+      </ConfigProvider>
     </FormProvider>
   );
 }
