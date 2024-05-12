@@ -229,7 +229,6 @@ export default function EditDrawer({
           // Object.keys(selectedRow).forEach((key) => {
           //   console.log(key, selectedRow[key]);
           //   setValue(key, selectedRow[key]);
-          console.log;
           setValue("secilenBakimID", item.key);
           setValue("bakimKodu", item.PBK_KOD);
           setValue("bakimTanimi", item.PBK_TANIM);
