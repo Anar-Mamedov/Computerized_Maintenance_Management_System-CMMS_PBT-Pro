@@ -10,7 +10,6 @@ import {
   Spin,
 } from "antd";
 import React, { useEffect, useState, useTransition } from "react";
-import MainTabs from "./components/MainTabs/MainTabs";
 import {
   useForm,
   Controller,
@@ -22,6 +21,7 @@ import dayjs from "dayjs";
 import AxiosInstance from "../../../../api/http";
 import Footer from "./components/Footer";
 import SecondTabs from "./components/SecondTabs/SecondTabs";
+import MainTabs1 from "./components/MainTabs/MainTabs1";
 
 export default function EditDrawer({
   selectedRow,
@@ -125,6 +125,7 @@ export default function EditDrawer({
       aciklama: "",
       periyotID: "",
       periyotLabel: "",
+      tarihSayacBakim: "a",
       // add more fields as needed
     },
   });
@@ -351,7 +352,7 @@ export default function EditDrawer({
             </Spin>
           ) : (
             <form onSubmit={methods.handleSubmit(onSubmit)}>
-              <MainTabs />
+              <MainTabs1 />
               <SecondTabs />
               <Footer />
             </form>
