@@ -10,13 +10,7 @@ import {
   Spin,
 } from "antd";
 import React, { useEffect, useState, useTransition } from "react";
-import {
-  useForm,
-  Controller,
-  useFormContext,
-  FormProvider,
-  set,
-} from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
 import AxiosInstance from "../../../../api/http";
 import Footer from "./components/Footer";
@@ -66,12 +60,6 @@ export default function EditDrawer({
 
   // back-end'e gönderilecek veriler
 
-  const handleClick = () => {
-    const values = methods.getValues();
-    console.log(onSubmit(values));
-  };
-
-  //* export
   const methods = useForm({
     defaultValues: {
       bakimKodu: "",
@@ -126,6 +114,7 @@ export default function EditDrawer({
       periyotID: "",
       periyotLabel: "",
       tarihSayacBakim: "a",
+      activeTab: "HAFTA",
       // add more fields as needed
     },
   });
@@ -143,7 +132,7 @@ export default function EditDrawer({
   const { setValue, reset } = methods;
 
   //* export
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const Body = {
       TB_IS_TANIM_ID: data.secilenBakimID,
       IST_KOD: data.bakimKodu,
@@ -186,30 +175,25 @@ export default function EditDrawer({
       // add more fields as needed
     };
 
-    // AxiosInstance.post("/api/endpoint", { Body }).then((response) => {
-    // handle response
-    // });
-
-    AxiosInstance.post("UpdateBakim", Body)
-      .then((response) => {
-        // Handle successful response here, e.g.:
-        console.log("Data sent successfully:", response);
-        if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
-          onDrawerClose(); // Close the drawer
-          onRefresh();
-          methods.reset();
-        } else if (response.status_code === 401) {
-          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
-        } else {
-          message.error("Ekleme Başarısız.");
-        }
-      })
-      .catch((error) => {
-        // Handle errors here, e.g.:
-        console.error("Error sending data:", error);
-        message.error("Başarısız Olundu.");
-      });
+    try {
+      const response = await AxiosInstance.post("UpdateBakim", Body);
+      // Handle successful response here, e.g.:
+      console.log("Data sent successfully:", response);
+      if (response.status_code === 200 || response.status_code === 201) {
+        message.success("Ekleme Başarılı.");
+        onDrawerClose(); // Close the drawer
+        onRefresh();
+        methods.reset();
+      } else if (response.status_code === 401) {
+        message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+      } else {
+        message.error("Ekleme Başarısız.");
+      }
+    } catch (error) {
+      // Handle errors here, e.g.:
+      console.error("Error sending data:", error);
+      message.error("Başarısız Olundu.");
+    }
     console.log({ Body });
   };
 
@@ -325,7 +309,7 @@ export default function EditDrawer({
               <Button onClick={onClose}>İptal</Button>
               <Button
                 type="submit"
-                onClick={handleClick}
+                onClick={methods.handleSubmit(onSubmit)}
                 style={{
                   backgroundColor: "#2bc770",
                   borderColor: "#2bc770",

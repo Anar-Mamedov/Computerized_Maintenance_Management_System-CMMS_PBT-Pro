@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Tabs } from "antd";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 
 import Gun from "./components/Gun.jsx";
+import Haftalik from "./components/Haftalik.jsx";
+import Aylik from "./components/Aylik.jsx";
 
 const onChange = (key) => {
   // console.log(key);
@@ -44,7 +46,15 @@ const StyledTabs = styled(Tabs)`
 //styled components end
 
 export default function TarihVeYaSayac({ refreshKey }) {
-  const { watch } = useFormContext();
+  const { watch, setValue } = useFormContext();
+
+  // Backend'den gelen bilgiyi izlemek için bir form alanı oluşturun
+  const activeTab = watch("activeTab");
+
+  const onChange = (key) => {
+    // Kullanıcının seçtiği tab'ı form alanına atayın
+    setValue("activeTab", key);
+  };
 
   const items = [
     {
@@ -55,12 +65,12 @@ export default function TarihVeYaSayac({ refreshKey }) {
     {
       key: "HAFTA",
       label: "Haftalık",
-      children: <Gun />,
+      children: <Haftalik />,
     },
     {
       key: "AY123",
       label: "Aylık",
-      children: <Gun />,
+      children: <Aylik />,
     },
     {
       key: "YIL123",
@@ -83,7 +93,7 @@ export default function TarihVeYaSayac({ refreshKey }) {
     <div style={{ marginTop: "10px" }}>
       <StyledTabs
         tabPosition="left"
-        defaultActiveKey="1"
+        defaultActiveKey={activeTab}
         items={items}
         onChange={onChange}
       />
