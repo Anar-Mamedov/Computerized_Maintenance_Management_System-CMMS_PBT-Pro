@@ -17,14 +17,13 @@ function PeriyotBilgileri(props) {
         display: "flex",
         flexDirection: "row",
         gap: "10px",
-        height: "300px",
+        marginBottom: "10px",
       }}
     >
       <Text
         style={{
           writingMode: "vertical-lr",
           transform: "rotate(180deg)",
-          height: "100%",
           backgroundColor: "rgba(230,230,230,0.84)",
           textAlign: "center",
         }}
