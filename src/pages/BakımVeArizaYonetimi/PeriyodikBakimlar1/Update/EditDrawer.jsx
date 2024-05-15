@@ -1,5 +1,4 @@
 import tr_TR from "antd/es/locale/tr_TR";
-import { PlusOutlined } from "@ant-design/icons";
 import {
   Button,
   Drawer,
@@ -9,6 +8,7 @@ import {
   message,
   Spin,
 } from "antd";
+// eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState, useTransition } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
@@ -23,7 +23,7 @@ export default function EditDrawer({
   drawerVisible,
   onRefresh,
 }) {
-  const [, startTransition] = useTransition();
+  const [startTransition] = useTransition();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const showDrawer = () => {
@@ -115,6 +115,8 @@ export default function EditDrawer({
       periyotLabel: "",
       tarihSayacBakim: "a",
       activeTab: "HAFTA",
+      ayGroup: 1,
+      ayinGunleriSelect: [],
       // add more fields as needed
     },
   });
@@ -206,8 +208,7 @@ export default function EditDrawer({
           const response = await AxiosInstance.get(
             `PeriyodikBakimDetayByBakim?BakimId=${selectedRow.key}`
           );
-          const data = response;
-          const item = data[0]; // Veri dizisinin ilk elemanını al
+          const item = response[0]; // Veri dizisinin ilk elemanını al
           // Form alanlarını set et
           // console.log("selectedRow", selectedRow);
           // startTransition(() => {
@@ -288,16 +289,6 @@ export default function EditDrawer({
   return (
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
-        {/* <Button
-            type="primary"
-            onClick={showDrawer}
-            style={{
-              display: "flex",
-              alignItems: "center",
-            }}>
-            <PlusOutlined />
-            Ekle
-          </Button> */}
         <Drawer
           width="1460px"
           title="Bakim Tanımını Güncelle"
