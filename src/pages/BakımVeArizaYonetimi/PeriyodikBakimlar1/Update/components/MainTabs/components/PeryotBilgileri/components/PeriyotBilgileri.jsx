@@ -1,8 +1,9 @@
 import React from "react";
-import { Input, Typography, Radio } from "antd";
+import { Input, Radio, Typography } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import TarihVeYASayac from "./TarihVeYaSayac/TarihVeYaSayac.jsx";
 import TarihVeSayac from "./TarihVeSayac.jsx";
+
 const { Text, Link } = Typography;
 const { TextArea } = Input;
 

@@ -1,5 +1,16 @@
 import React from "react";
-import { Drawer, Typography, Button, Input, Select, DatePicker, TimePicker, Row, Col, Checkbox } from "antd";
+import {
+  Drawer,
+  Typography,
+  Button,
+  Input,
+  Select,
+  DatePicker,
+  TimePicker,
+  Row,
+  Col,
+  Checkbox,
+} from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import LokasyonTipi from "./components/LokasyonTipi";
 import LokasyonBina from "./components/LokasyonBina";
@@ -9,6 +20,7 @@ import LokasyonPersonelTablo from "./components/LokasyonPersonelTablo";
 import LokasyonDepoTablo from "./components/LokasyonDepoTablo";
 import styled from "styled-components";
 import LokasyonTablo from "./components/LokasyonTablo";
+import GoogleMaps from "./components/GoogleMaps.jsx";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -82,7 +94,15 @@ export default function MainTabs() {
   const selectedLokasyonId = watch("selectedLokasyonId");
 
   return (
-    <div style={{ display: "flex", marginBottom: "15px", flexDirection: "column", gap: "10px", maxWidth: "870px" }}>
+    <div
+      style={{
+        display: "flex",
+        marginBottom: "15px",
+        flexDirection: "column",
+        gap: "10px",
+        maxWidth: "870px",
+      }}
+    >
       <div
         style={{
           display: "flex",
@@ -92,7 +112,8 @@ export default function MainTabs() {
           width: "100%",
           gap: "10px",
           rowGap: "0px",
-        }}>
+        }}
+      >
         <Text style={{ fontSize: "14px" }}>Lokasyon Tanımı:</Text>
         <div
           style={{
@@ -103,7 +124,8 @@ export default function MainTabs() {
             minWidth: "300px",
             gap: "10px",
             width: "100%",
-          }}>
+          }}
+        >
           <Controller
             name="lokasyonTanimi"
             control={control}
@@ -125,14 +147,24 @@ export default function MainTabs() {
             control={control}
             defaultValue={true} // or true if you want it checked by default
             render={({ field }) => (
-              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+              <Checkbox
+                checked={field.value}
+                onChange={(e) => field.onChange(e.target.checked)}
+              >
                 Aktif
               </Checkbox>
             )}
           />
         </div>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          flexWrap: "wrap",
+        }}
+      >
         <div
           style={{
             display: "flex",
@@ -141,7 +173,8 @@ export default function MainTabs() {
             maxWidth: "450px",
             gap: "10px",
             width: "100%",
-          }}>
+          }}
+        >
           <LokasyonTipi />
         </div>
         <div
@@ -152,11 +185,19 @@ export default function MainTabs() {
             maxWidth: "410px",
             gap: "10px",
             width: "100%",
-          }}>
+          }}
+        >
           <LokasyonBina />
         </div>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          flexWrap: "wrap",
+        }}
+      >
         <div
           style={{
             display: "flex",
@@ -165,7 +206,8 @@ export default function MainTabs() {
             justifyContent: "space-between",
             width: "100%",
             maxWidth: "450px",
-          }}>
+          }}
+        >
           <Text style={{ fontSize: "14px" }}>Masraf Merkezi:</Text>
           <div
             style={{
@@ -174,7 +216,8 @@ export default function MainTabs() {
               alignItems: "center",
               justifyContent: "space-between",
               width: "300px",
-            }}>
+            }}
+          >
             <Controller
               name="lokasyonMasrafMerkeziTanim"
               control={control}
@@ -215,11 +258,19 @@ export default function MainTabs() {
             maxWidth: "410px",
             gap: "10px",
             width: "100%",
-          }}>
+          }}
+        >
           <LokasyonKat />
         </div>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          flexWrap: "wrap",
+        }}
+      >
         <StyledDivBottomLine
           style={{
             display: "flex",
@@ -227,7 +278,8 @@ export default function MainTabs() {
             justifyContent: "space-between",
             width: "100%",
             maxWidth: "450px",
-          }}>
+          }}
+        >
           <Text style={{ fontSize: "14px" }}>Yönetici:</Text>
           <div
             style={{
@@ -236,7 +288,8 @@ export default function MainTabs() {
               alignItems: "center",
               justifyContent: "space-between",
               width: "300px",
-            }}>
+            }}
+          >
             <Controller
               name="lokasyonYoneticiTanim"
               control={control}
@@ -277,7 +330,8 @@ export default function MainTabs() {
             justifyContent: "space-between",
             width: "100%",
             maxWidth: "410px",
-          }}>
+          }}
+        >
           <Text style={{ fontSize: "14px" }}>Malzeme Depo:</Text>
           <div
             style={{
@@ -286,7 +340,8 @@ export default function MainTabs() {
               alignItems: "center",
               justifyContent: "space-between",
               width: "300px",
-            }}>
+            }}
+          >
             <Controller
               name="lokasyonDepoTanim"
               control={control}
@@ -328,7 +383,8 @@ export default function MainTabs() {
           justifyContent: "space-between",
           width: "100%",
           maxWidth: "870px",
-        }}>
+        }}
+      >
         <Text style={{ fontSize: "14px" }}>Ana Lokasyon:</Text>
         <div
           className="anar"
@@ -339,7 +395,8 @@ export default function MainTabs() {
             justifyContent: "space-between",
             minWidth: "300px",
             gap: "3px",
-          }}>
+          }}
+        >
           <Controller
             name="anaLokasyonTanim"
             control={control}
@@ -379,7 +436,8 @@ export default function MainTabs() {
 
           justifyContent: "space-between",
           width: "100%",
-        }}>
+        }}
+      >
         <Text style={{ fontSize: "14px" }}>E-Mail:</Text>
         <Controller
           name="lokasyonEmail"
@@ -399,7 +457,8 @@ export default function MainTabs() {
           alignItems: "flex-start",
           justifyContent: "space-between",
           width: "100%",
-        }}>
+        }}
+      >
         <Text style={{ fontSize: "14px" }}>Açıklama:</Text>
         <StyledDiv>
           <Controller
@@ -414,6 +473,7 @@ export default function MainTabs() {
           />
         </StyledDiv>
       </StyledDivBottomLine>
+      <GoogleMaps />
     </div>
   );
 }
