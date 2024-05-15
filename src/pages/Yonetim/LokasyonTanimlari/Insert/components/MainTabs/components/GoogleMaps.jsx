@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { LoadScript, GoogleMap, Autocomplete } from "@react-google-maps/api";
 import { Input, message } from "antd";
+import { Controller, useFormContext } from "react-hook-form";
 
 const containerStyle = {
   width: "100%",
@@ -9,12 +10,17 @@ const containerStyle = {
 
 const libraries = ["places"];
 
-const MapComponent = () => {
+const GoogleMaps = () => {
   const [map, setMap] = useState(null);
   const [position, setPosition] = useState(null);
   const [autocomplete, setAutocomplete] = useState(null);
-  const [searchQuery, setSearchQuery] = useState(""); // Search query state
-  const [coordinates, setCoordinates] = useState(""); // Coordinates state
+
+  const {
+    control,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useFormContext(); // React Hook Form kontrol ve setValue fonksiyonlarını kullanıyoruz
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -25,139 +31,138 @@ const MapComponent = () => {
             lng: position.coords.longitude,
           };
           setPosition(userLocation);
-          setCoordinates(`${userLocation.lat}, ${userLocation.lng}`);
+          setValue("coordinates", `${userLocation.lat}, ${userLocation.lng}`);
           if (map) {
             map.setCenter(userLocation);
             const marker = new window.google.maps.Marker({
               position: userLocation,
               map: map,
             });
-            map.markers = [marker]; // Kullanıcının konumu için marker ekleme
+            map.markers = [marker];
 
-            // Kullanıcının adresini alma ve yazdırma
             const geocoder = new window.google.maps.Geocoder();
             geocoder.geocode({ location: userLocation }, (results, status) => {
               if (status === "OK" && results[0]) {
-                setSearchQuery(results[0].formatted_address);
+                setValue("searchQuery", results[0].formatted_address);
               } else {
-                setSearchQuery("Adres bulunamadı");
+                setValue("searchQuery", "Adres bulunamadı");
               }
             });
           }
         },
         () => {
-          // Kullanıcı konum iznini reddederse varsayılan konum
           const defaultPosition = { lat: -3.745, lng: -38.523 };
           setPosition(defaultPosition);
-          setCoordinates(`${defaultPosition.lat}, ${defaultPosition.lng}`);
+          setValue(
+            "coordinates",
+            `${defaultPosition.lat}, ${defaultPosition.lng}`
+          );
         }
       );
     } else {
-      // Geolocation API'si tarayıcıda desteklenmiyorsa varsayılan konum
       const defaultPosition = { lat: -3.745, lng: -38.523 };
       setPosition(defaultPosition);
-      setCoordinates(`${defaultPosition.lat}, ${defaultPosition.lng}`);
+      setValue("coordinates", `${defaultPosition.lat}, ${defaultPosition.lng}`);
     }
-  }, [map]);
+  }, [map, setValue]);
 
-  const onLoad = useCallback((map) => {
-    map.markers = []; // Markerları saklamak için dizi oluşturma
-    setMap(map);
-
-    // Konum düğmesini ekleme
-    const locationButton = document.createElement("button");
-    locationButton.textContent = "📍";
-    locationButton.classList.add("custom-map-control-button");
-    locationButton.style.position = "absolute";
-    locationButton.style.top = "10px";
-    locationButton.style.right = "10px";
-    locationButton.style.background = "#fff";
-    locationButton.style.border = "none";
-    locationButton.style.cursor = "pointer";
-    locationButton.style.fontSize = "24px";
-    locationButton.style.padding = "10px";
-    map.controls[window.google.maps.ControlPosition.TOP_RIGHT].push(
-      locationButton
-    );
-
-    locationButton.addEventListener("click", () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const userLocation = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-            };
-            setPosition(userLocation);
-            setCoordinates(`${userLocation.lat}, ${userLocation.lng}`);
-            map.setCenter(userLocation);
-
-            // Mevcut markerları temizle
-            map.markers.forEach((marker) => marker.setMap(null));
-            map.markers = [];
-
-            // Yeni marker ekle
-            const marker = new window.google.maps.Marker({
-              position: userLocation,
-              map: map,
-            });
-
-            // Marker'ı diziye ekle
-            map.markers.push(marker);
-
-            // Kullanıcının adresini alma ve yazdırma
-            const geocoder = new window.google.maps.Geocoder();
-            geocoder.geocode({ location: userLocation }, (results, status) => {
-              if (status === "OK" && results[0]) {
-                setSearchQuery(results[0].formatted_address);
-              } else {
-                setSearchQuery("Adres bulunamadı");
-              }
-            });
-          },
-          () => {
-            alert("Konum alınamadı.");
-          }
-        );
-      } else {
-        alert("Tarayıcınız konum bilgisi sağlamıyor.");
-      }
-    });
-
-    // Harita üzerinde tıklama olayını dinleme
-    map.addListener("click", (event) => {
-      const lat = event.latLng.lat();
-      const lng = event.latLng.lng();
-      const newPosition = { lat, lng };
-
-      setPosition(newPosition);
-      setCoordinates(`${lat}, ${lng}`);
-      map.setCenter(newPosition);
-
-      // Mevcut markerları temizle
-      map.markers.forEach((marker) => marker.setMap(null));
+  const onLoad = useCallback(
+    (map) => {
       map.markers = [];
+      setMap(map);
 
-      // Yeni marker ekle
-      const marker = new window.google.maps.Marker({
-        position: newPosition,
-        map: map,
-      });
+      const locationButton = document.createElement("button");
+      locationButton.textContent = "📍";
+      locationButton.classList.add("custom-map-control-button");
+      locationButton.style.position = "absolute";
+      locationButton.style.top = "10px";
+      locationButton.style.right = "10px";
+      locationButton.style.background = "#fff";
+      locationButton.style.border = "none";
+      locationButton.style.cursor = "pointer";
+      locationButton.style.fontSize = "24px";
+      locationButton.style.padding = "10px";
+      map.controls[window.google.maps.ControlPosition.TOP_RIGHT].push(
+        locationButton
+      );
 
-      // Marker'ı diziye ekle
-      map.markers.push(marker);
+      locationButton.addEventListener("click", () => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const userLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              };
+              setPosition(userLocation);
+              setValue(
+                "coordinates",
+                `${userLocation.lat}, ${userLocation.lng}`
+              );
+              map.setCenter(userLocation);
 
-      // Adresi güncelleme
-      const geocoder = new window.google.maps.Geocoder();
-      geocoder.geocode({ location: newPosition }, (results, status) => {
-        if (status === "OK" && results[0]) {
-          setSearchQuery(results[0].formatted_address);
+              map.markers.forEach((marker) => marker.setMap(null));
+              map.markers = [];
+
+              const marker = new window.google.maps.Marker({
+                position: userLocation,
+                map: map,
+              });
+
+              map.markers.push(marker);
+
+              const geocoder = new window.google.maps.Geocoder();
+              geocoder.geocode(
+                { location: userLocation },
+                (results, status) => {
+                  if (status === "OK" && results[0]) {
+                    setValue("searchQuery", results[0].formatted_address);
+                  } else {
+                    setValue("searchQuery", "Adres bulunamadı");
+                  }
+                }
+              );
+            },
+            () => {
+              alert("Konum alınamadı.");
+            }
+          );
         } else {
-          setSearchQuery("Adres bulunamadı");
+          alert("Tarayıcınız konum bilgisi sağlamıyor.");
         }
       });
-    });
-  }, []);
+
+      map.addListener("click", (event) => {
+        const lat = event.latLng.lat();
+        const lng = event.latLng.lng();
+        const newPosition = { lat, lng };
+
+        setPosition(newPosition);
+        setValue("coordinates", `${lat}, ${lng}`);
+        map.setCenter(newPosition);
+
+        map.markers.forEach((marker) => marker.setMap(null));
+        map.markers = [];
+
+        const marker = new window.google.maps.Marker({
+          position: newPosition,
+          map: map,
+        });
+
+        map.markers.push(marker);
+
+        const geocoder = new window.google.maps.Geocoder();
+        geocoder.geocode({ location: newPosition }, (results, status) => {
+          if (status === "OK" && results[0]) {
+            setValue("searchQuery", results[0].formatted_address);
+          } else {
+            setValue("searchQuery", "Adres bulunamadı");
+          }
+        });
+      });
+    },
+    [setValue]
+  );
 
   const onUnmount = useCallback(() => {
     setMap(null);
@@ -172,24 +177,20 @@ const MapComponent = () => {
           lng: place.geometry.location.lng(),
         };
         setPosition(newPosition);
-        setCoordinates(`${newPosition.lat}, ${newPosition.lng}`);
+        setValue("coordinates", `${newPosition.lat}, ${newPosition.lng}`);
         map.setCenter(newPosition);
 
-        // Mevcut markerları temizle
         map.markers.forEach((marker) => marker.setMap(null));
         map.markers = [];
 
-        // Yeni marker ekle
         const marker = new window.google.maps.Marker({
           position: newPosition,
           map: map,
         });
 
-        // Marker'ı diziye ekle
         map.markers.push(marker);
 
-        // Seçilen yeri input alanına yazma
-        setSearchQuery(place.formatted_address || place.name);
+        setValue("searchQuery", place.formatted_address || place.name);
       }
     } else {
       console.log("Autocomplete is not loaded yet!");
@@ -198,7 +199,7 @@ const MapComponent = () => {
 
   const handleCoordinatesChange = (e) => {
     const value = e.target.value;
-    setCoordinates(value);
+    setValue("coordinates", value);
 
     const [lat, lng] = value
       .split(",")
@@ -208,26 +209,22 @@ const MapComponent = () => {
       setPosition(newPosition);
       map.setCenter(newPosition);
 
-      // Mevcut markerları temizle
       map.markers.forEach((marker) => marker.setMap(null));
       map.markers = [];
 
-      // Yeni marker ekle
       const marker = new window.google.maps.Marker({
         position: newPosition,
         map: map,
       });
 
-      // Marker'ı diziye ekle
       map.markers.push(marker);
 
-      // Adresi güncelleme
       const geocoder = new window.google.maps.Geocoder();
       geocoder.geocode({ location: newPosition }, (results, status) => {
         if (status === "OK" && results[0]) {
-          setSearchQuery(results[0].formatted_address);
+          setValue("searchQuery", results[0].formatted_address);
         } else {
-          setSearchQuery("Adres bulunamadı");
+          setValue("searchQuery", "Adres bulunamadı");
         }
       });
     } else {
@@ -246,20 +243,34 @@ const MapComponent = () => {
             onLoad={setAutocomplete}
             onPlaceChanged={onPlaceChanged}
           >
-            <Input.Search
-              placeholder="Konum giriniz"
-              enterButton="Ara"
-              size="large"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ marginBottom: "10px" }}
+            <Controller
+              name="searchQuery"
+              control={control}
+              render={({ field }) => (
+                <Input.Search
+                  placeholder="Konum giriniz"
+                  enterButton="Ara"
+                  size="large"
+                  {...field}
+                  style={{ marginBottom: "10px" }}
+                />
+              )}
             />
           </Autocomplete>
-          <Input
-            placeholder="Koordinatlar giriniz (örneğin: 40.7128, -74.0060)"
-            value={coordinates}
-            onChange={handleCoordinatesChange}
-            style={{ marginBottom: "20px" }}
+          <Controller
+            name="coordinates"
+            control={control}
+            render={({ field }) => (
+              <Input
+                placeholder="Koordinatlar giriniz (örneğin: 40.7128, -74.0060)"
+                {...field}
+                onChange={(e) => {
+                  field.onChange(e);
+                  handleCoordinatesChange(e);
+                }}
+                style={{ marginBottom: "20px", display: "none" }}
+              />
+            )}
           />
           <GoogleMap
             mapContainerStyle={containerStyle}
@@ -274,4 +285,4 @@ const MapComponent = () => {
   );
 };
 
-export default MapComponent;
+export default GoogleMaps;
