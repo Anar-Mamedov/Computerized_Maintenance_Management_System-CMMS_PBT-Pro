@@ -2,57 +2,63 @@ import React from "react";
 import { Select, Space } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 
-const options = [
-  {
-    value: "Birinci",
-    label: "Birinci",
-  },
-  {
-    value: "İkinci",
-    label: "İkinci",
-  },
-  {
-    value: "Üçüncü",
-    label: "Üçüncü",
-  },
-  {
-    value: "Dördüncü",
-    label: "Dördüncü",
-  },
-  {
-    value: "Son",
-    label: "Son",
-  },
-];
+const options = [];
+for (let i = 1; i <= 31; i++) {
+  let value = i < 10 ? `0${i}` : `${i}`;
+  options.push({
+    label: value,
+    value: value,
+  });
+}
 
 const options1 = [
   {
-    value: "Pazartesi",
-    label: "Pazartesi",
+    value: "Ocak",
+    label: "Ocak",
   },
   {
-    value: "Salı",
-    label: "Salı",
+    value: "Şubat",
+    label: "Şubat",
   },
   {
-    value: "Çarşamba",
-    label: "Çarşamba",
+    value: "Mart",
+    label: "Mart",
   },
   {
-    value: "Perşembe",
-    label: "Perşembe",
+    value: "Nisan",
+    label: "Nisan",
   },
   {
-    value: "Cuma",
-    label: "Cuma",
+    value: "Mayıs",
+    label: "Mayıs",
   },
   {
-    value: "Cumartesi",
-    label: "Cumartesi",
+    value: "Haziran",
+    label: "Haziran",
   },
   {
-    value: "Pazar",
-    label: "Pazar",
+    value: "Temmuz",
+    label: "Temmuz",
+  },
+  {
+    value: "Ağustos",
+    label: "Ağustos",
+  },
+  {
+    value: "Eylül",
+    label: "Eylül",
+  },
+  {
+    value: "Ekim",
+    label: "Ekim",
+  },
+  {
+    value: "Kasım",
+    label: "Kasım",
+  },
+  {
+    value: "Aralık",
+    label: "Aralık",
   },
 ];
 
@@ -64,12 +70,12 @@ function AyinHaftalari(props) {
     formState: { errors },
   } = useFormContext();
 
-  const ayGroup = watch("ayGroup");
+  const yilGroup = watch("yilGroup");
 
   return (
     <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
       <Controller
-        name="ayinHaftalariSelect"
+        name="ayinGunleriSelect"
         control={control}
         render={({ field }) => (
           <Select
@@ -78,14 +84,14 @@ function AyinHaftalari(props) {
             style={{
               width: "100px",
             }}
-            placeholder="Kaçıncı Hafta"
+            placeholder="Günler"
             options={options}
-            disabled={ayGroup !== 3}
+            disabled={yilGroup !== 2}
           />
         )}
       />
       <Controller
-        name="ayinHaftalarininGunuSelect"
+        name="yilinAylariSelect"
         control={control}
         render={({ field }) => (
           <Select
@@ -94,9 +100,9 @@ function AyinHaftalari(props) {
             style={{
               width: "120px",
             }}
-            placeholder="Haftanın Günü"
+            placeholder="Aylar"
             options={options1}
-            disabled={ayGroup !== 3}
+            disabled={yilGroup !== 2}
           />
         )}
       />
