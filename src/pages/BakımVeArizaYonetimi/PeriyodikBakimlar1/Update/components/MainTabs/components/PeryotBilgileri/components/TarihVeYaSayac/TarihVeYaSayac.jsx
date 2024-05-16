@@ -6,6 +6,8 @@ import { useFormContext } from "react-hook-form";
 import Gun from "./components/Gun.jsx";
 import Haftalik from "./components/Haftalik.jsx";
 import Aylik from "./components/Aylik.jsx";
+import Yillik from "./components/Yillik.jsx";
+import Sayac from "./components/Sayac.jsx";
 
 const onChange = (key) => {
   // console.log(key);
@@ -15,7 +17,6 @@ const onChange = (key) => {
 const StyledTabs = styled(Tabs)`
   .ant-tabs-tab {
     margin: 0 !important;
-    width: fit-content;
     padding: 10px 15px;
     justify-content: center;
     background-color: rgba(230, 230, 230, 0.3);
@@ -75,7 +76,7 @@ export default function TarihVeYaSayac({ refreshKey }) {
     {
       key: "YIL123",
       label: "Yıllık",
-      children: <Gun />,
+      children: <Yillik />,
     },
     {
       key: "5",
@@ -85,7 +86,7 @@ export default function TarihVeYaSayac({ refreshKey }) {
     {
       key: "SAYAC",
       label: "Sayaç",
-      children: <Gun />,
+      children: <Sayac />,
     },
   ];
 
