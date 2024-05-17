@@ -8,6 +8,7 @@ import Haftalik from "./components/Haftalik.jsx";
 import Aylik from "./components/Aylik.jsx";
 import Yillik from "./components/Yillik.jsx";
 import Sayac from "./components/Sayac.jsx";
+import FixTarihler from "./components/FixTarihler.jsx";
 
 const onChange = (key) => {
   // console.log(key);
@@ -81,7 +82,7 @@ export default function TarihVeYaSayac({ refreshKey }) {
     {
       key: "5",
       label: "Fix Tarihler",
-      children: <Gun />,
+      children: <FixTarihler />,
     },
     {
       key: "SAYAC",
