@@ -47,6 +47,7 @@ import { userState } from "./state/userState";
 import PlanlamaTakvimi from "./pages/BakımVeArizaYonetimi/PlanlamaTakvimi/PlanlamaTakvimi";
 import OtomatikIsEmri from "./pages/BakımVeArizaYonetimi/OtomatikIsEmri/OtomatikIsEmri";
 import PeriyodikBakimlar1 from "./pages/BakımVeArizaYonetimi/PeriyodikBakimlar1/PeryodikBakimlar";
+import RaporYonetimi from "./pages/Rapor&Formlar/RaporYonetimi/RaporYonetimi.jsx";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -224,6 +225,7 @@ export default function App() {
         <Route path="/peryodikBakimlar" element={<PeriyodikBakimlar />} />
         <Route path="/periyodikBakimlar1" element={<PeriyodikBakimlar1 />} />
         <Route path="/otomatikIsEmirleri" element={<OtomatikIsEmri />} />
+        <Route path="/raporYonetimi" element={<RaporYonetimi />} />
         <Route path="/planlamaTakvimi" element={<PlanlamaTakvimi />} />
         <Route path="/makine" element={<MakineTanim />} />
         <Route path="/ekipmanVeritabani" element={<Hazirlaniyor />} />
