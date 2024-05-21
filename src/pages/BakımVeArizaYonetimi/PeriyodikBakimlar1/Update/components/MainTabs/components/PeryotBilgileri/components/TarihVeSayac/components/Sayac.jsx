@@ -22,7 +22,12 @@ function Sayac(props) {
       }}
     >
       <div
-        style={{ width: "138px", display: "flex", justifyContent: "center" }}
+        style={{
+          width: "119px",
+          display: "flex",
+          justifyContent: "center",
+          marginRight: "17px",
+        }}
       >
         <Text>Sayaç</Text>
       </div>
