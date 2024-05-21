@@ -1,8 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import AxiosInstance from "../../../../../../../../../../../../../../api/http";
-import { Controller, useForm, useFormContext } from "react-hook-form";
+import {
+  Button,
+  Modal,
+  Input,
+  Typography,
+  Tabs,
+  InputNumber,
+  Select,
+} from "antd";
+import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 
 const { Text, Link } = Typography;
@@ -45,6 +51,21 @@ const StyledTabs = styled(Tabs)`
 
 //styled components end
 
+const options = [
+  { label: "Ocak", value: "1" },
+  { label: "Şubat", value: "2" },
+  { label: "Mart", value: "3" },
+  { label: "Nisan", value: "4" },
+  { label: "Mayıs", value: "5" },
+  { label: "Haziran", value: "6" },
+  { label: "Temmuz", value: "7" },
+  { label: "Ağustos", value: "8" },
+  { label: "Eylül", value: "9" },
+  { label: "Ekim", value: "10" },
+  { label: "Kasım", value: "11" },
+  { label: "Aralık", value: "12" },
+];
+
 export default function MainTabs() {
   const { control, watch, setValue } = useFormContext();
 
@@ -66,84 +87,60 @@ export default function MainTabs() {
       children: "test",
     },
   ];
+
   return (
-    <div>
+    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+      <Text style={{ fontSize: "14px" }}>Gün:</Text>
       <div
         style={{
           display: "flex",
           flexWrap: "wrap",
           alignItems: "center",
-          justifyContent: "space-between",
-          width: "100%",
-          maxWidth: "400px",
+          maxWidth: "140px",
           gap: "10px",
-          rowGap: "0px",
-          marginBottom: "10px",
+          width: "100%",
         }}
       >
-        <Text style={{ fontSize: "14px" }}>Sira no:</Text>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "300px",
-            minWidth: "300px",
-            gap: "10px",
-            width: "100%",
-          }}
-        >
-          <Controller
-            name="siraNo"
-            control={control}
-            render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
-          />
-          <Controller
-            name="secilenID"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ display: "none" }}
-              />
-            )}
-          />
-        </div>
+        <Controller
+          name="gun"
+          control={control}
+          render={({ field }) => (
+            <InputNumber {...field} min={1} max={31} style={{ flex: 1 }} />
+          )}
+        />
+        <Controller
+          name="secilenID"
+          control={control}
+          render={({ field }) => (
+            <Input
+              {...field}
+              type="text" // Set the type to "text" for name input
+              style={{ display: "none" }}
+            />
+          )}
+        />
       </div>
+
+      <Text style={{ fontSize: "14px" }}>Ay:</Text>
       <div
         style={{
           display: "flex",
           flexWrap: "wrap",
           alignItems: "center",
-          justifyContent: "space-between",
-          width: "100%",
-          maxWidth: "400px",
+          maxWidth: "140px",
           gap: "10px",
-          rowGap: "0px",
-          marginBottom: "10px",
+          width: "100%",
         }}
       >
-        <Text style={{ fontSize: "14px" }}>İş Tanımı:</Text>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "300px",
-            minWidth: "300px",
-            gap: "10px",
-            width: "100%",
-          }}
-        >
-          <Controller
-            name="isTanimi"
-            control={control}
-            render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
-          />
-        </div>
+        <Controller
+          name="ay"
+          control={control}
+          render={({ field }) => (
+            <Select {...field} options={options} style={{ flex: 1 }} />
+          )}
+        />
       </div>
-      <StyledTabs defaultActiveKey="1" items={items} onChange={onChange} />
+      {/*<StyledTabs defaultActiveKey="1" items={items} onChange={onChange} />*/}
     </div>
   );
 }
