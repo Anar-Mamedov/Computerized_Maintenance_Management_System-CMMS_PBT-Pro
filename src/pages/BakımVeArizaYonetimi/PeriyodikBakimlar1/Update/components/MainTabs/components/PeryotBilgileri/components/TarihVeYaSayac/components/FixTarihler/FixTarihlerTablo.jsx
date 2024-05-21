@@ -20,7 +20,7 @@ export default function FixTarihlerTablo() {
       title: "",
       dataIndex: "PBF_FIX_GUN",
       key: "PBF_FIX_GUN",
-      width: 10,
+      width: 15,
       ellipsis: true,
     },
     {
@@ -58,7 +58,7 @@ export default function FixTarihlerTablo() {
           type="link"
           onClick={(event) => {
             event.stopPropagation(); // Tablo satırının tıklanmasını engelle
-            AxiosInstance.get(
+            AxiosInstance.post(
               `PeriyodikBakimFixTarihSil?FixTarihID=${record.key}`
             )
               .then((response) => {
@@ -150,6 +150,7 @@ export default function FixTarihlerTablo() {
             setSelectedRow(null);
           }}
           onRefresh={refreshTable}
+          secilenBakimID={secilenBakimID}
         />
       )}
     </div>

@@ -10,13 +10,13 @@ export default function EditModal({
   isModalVisible,
   onModalClose,
   onRefresh,
+  secilenBakimID,
 }) {
   const methods = useForm({
     defaultValues: {
-      siraNo: "",
+      gun: "",
       secilenID: "",
-      isTanimi: "",
-      aciklama: "",
+      ay: "",
       // Add other default values here
     },
   });
@@ -27,13 +27,13 @@ export default function EditModal({
 
   const onSubmited = (data) => {
     const Body = {
-      TB_IS_TANIM_KONROLLIST_ID: data.secilenID,
-      ISK_SIRANO: data.siraNo,
-      ISK_TANIM: data.isTanimi,
-      ISK_ACIKLAMA: data.aciklama,
+      PBF_PERIYODIK_BAKIM_ID: secilenBakimID,
+      PBF_FIX_GUN: data.gun,
+      PBF_FIX_AY: data.ay,
+      TB_PERIYODIK_BAKIM_FIX_DEGER_ID: data.secilenID,
     };
 
-    AxiosInstance.post("UpdateIsTanimKontrolList", Body)
+    AxiosInstance.post("PeriyodikBakimFixTarihKaydetGuncelle", Body)
       .then((response) => {
         console.log("Data sent successfully:", response.data);
 
@@ -73,9 +73,8 @@ export default function EditModal({
       //   console.log(key, selectedRow[key]);
       //   setValue(key, selectedRow[key]);
       setValue("secilenID", selectedRow.key);
-      setValue("siraNo", selectedRow.ISK_SIRANO);
-      setValue("isTanimi", selectedRow.ISK_TANIM);
-      setValue("aciklama", selectedRow.ISK_ACIKLAMA);
+      setValue("gun", selectedRow.PBF_FIX_GUN);
+      setValue("ay", selectedRow.PBF_FIX_AY.toString());
       // add more fields as needed
 
       // });
@@ -93,8 +92,7 @@ export default function EditModal({
     <FormProvider {...methods}>
       <div>
         <Modal
-          width="800px"
-          title="Kontrol Listesi Güncelle"
+          title="Fix Tarih Güncelleme"
           open={isModalVisible}
           onOk={handleModalOk}
           onCancel={onModalClose}
