@@ -13,51 +13,51 @@ for (let i = 1; i <= 31; i++) {
 
 const options1 = [
   {
-    value: "Ocak",
+    value: "01",
     label: "Ocak",
   },
   {
-    value: "Şubat",
+    value: "02",
     label: "Şubat",
   },
   {
-    value: "Mart",
+    value: "03",
     label: "Mart",
   },
   {
-    value: "Nisan",
+    value: "04",
     label: "Nisan",
   },
   {
-    value: "Mayıs",
+    value: "05",
     label: "Mayıs",
   },
   {
-    value: "Haziran",
+    value: "06",
     label: "Haziran",
   },
   {
-    value: "Temmuz",
+    value: "07",
     label: "Temmuz",
   },
   {
-    value: "Ağustos",
+    value: "08",
     label: "Ağustos",
   },
   {
-    value: "Eylül",
+    value: "09",
     label: "Eylül",
   },
   {
-    value: "Ekim",
+    value: "10",
     label: "Ekim",
   },
   {
-    value: "Kasım",
+    value: "11",
     label: "Kasım",
   },
   {
-    value: "Aralık",
+    value: "12",
     label: "Aralık",
   },
 ];

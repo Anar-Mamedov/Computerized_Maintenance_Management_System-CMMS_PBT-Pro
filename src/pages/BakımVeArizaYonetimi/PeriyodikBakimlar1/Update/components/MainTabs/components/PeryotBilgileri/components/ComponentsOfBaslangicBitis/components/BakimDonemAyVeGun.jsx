@@ -15,54 +15,18 @@ for (let i = 1; i <= 31; i++) {
 }
 
 const options1 = [
-  {
-    value: "Ocak",
-    label: "Ocak",
-  },
-  {
-    value: "Şubat",
-    label: "Şubat",
-  },
-  {
-    value: "Mart",
-    label: "Mart",
-  },
-  {
-    value: "Nisan",
-    label: "Nisan",
-  },
-  {
-    value: "Mayıs",
-    label: "Mayıs",
-  },
-  {
-    value: "Haziran",
-    label: "Haziran",
-  },
-  {
-    value: "Temmuz",
-    label: "Temmuz",
-  },
-  {
-    value: "Ağustos",
-    label: "Ağustos",
-  },
-  {
-    value: "Eylül",
-    label: "Eylül",
-  },
-  {
-    value: "Ekim",
-    label: "Ekim",
-  },
-  {
-    value: "Kasım",
-    label: "Kasım",
-  },
-  {
-    value: "Aralık",
-    label: "Aralık",
-  },
+  { label: "Ocak", value: "1" },
+  { label: "Şubat", value: "2" },
+  { label: "Mart", value: "3" },
+  { label: "Nisan", value: "4" },
+  { label: "Mayıs", value: "5" },
+  { label: "Haziran", value: "6" },
+  { label: "Temmuz", value: "7" },
+  { label: "Ağustos", value: "8" },
+  { label: "Eylül", value: "9" },
+  { label: "Ekim", value: "10" },
+  { label: "Kasım", value: "11" },
+  { label: "Aralık", value: "12" },
 ];
 
 function AyinHaftalari(props) {
