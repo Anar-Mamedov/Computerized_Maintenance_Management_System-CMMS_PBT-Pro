@@ -4,54 +4,54 @@ import { Controller, useFormContext } from "react-hook-form";
 
 const options = [
   {
-    value: "Birinci",
+    value: "1",
     label: "Birinci",
   },
   {
-    value: "İkinci",
+    value: "2",
     label: "İkinci",
   },
   {
-    value: "Üçüncü",
+    value: "3",
     label: "Üçüncü",
   },
   {
-    value: "Dördüncü",
+    value: "4",
     label: "Dördüncü",
   },
   {
-    value: "Son",
+    value: "5",
     label: "Son",
   },
 ];
 
 const options1 = [
   {
-    value: "Pazartesi",
+    value: "1",
     label: "Pazartesi",
   },
   {
-    value: "Salı",
+    value: "2",
     label: "Salı",
   },
   {
-    value: "Çarşamba",
+    value: "3",
     label: "Çarşamba",
   },
   {
-    value: "Perşembe",
+    value: "4",
     label: "Perşembe",
   },
   {
-    value: "Cuma",
+    value: "5",
     label: "Cuma",
   },
   {
-    value: "Cumartesi",
+    value: "6",
     label: "Cumartesi",
   },
   {
-    value: "Pazar",
+    value: "7",
     label: "Pazar",
   },
 ];

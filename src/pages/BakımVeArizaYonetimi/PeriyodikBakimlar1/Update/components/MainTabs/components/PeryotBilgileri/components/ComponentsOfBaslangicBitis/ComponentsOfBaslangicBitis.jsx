@@ -74,7 +74,7 @@ function ComponentsOfBaslangicBitis(props) {
       >
         <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
           <Controller
-            name="herAy"
+            name="tekrarlamaSayisi"
             control={control}
             render={({ field }) => (
               <InputNumber

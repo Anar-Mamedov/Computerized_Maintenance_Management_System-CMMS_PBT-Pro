@@ -80,7 +80,7 @@ export default function TarihVeYaSayac({ refreshKey }) {
       children: <Yillik />,
     },
     {
-      key: "5",
+      key: "FIX",
       label: "Fix Tarihler",
       children: <FixTarihlerTablo />,
     },

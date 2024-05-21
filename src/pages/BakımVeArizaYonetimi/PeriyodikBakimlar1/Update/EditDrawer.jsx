@@ -114,9 +114,10 @@ export default function EditDrawer({
       periyotID: "",
       periyotLabel: "",
       tarihSayacBakim: "a",
-      activeTab: "HAFTA",
+      activeTab: "GUN",
       ayGroup: 1,
       ayinGunleriSelect: [],
+      baslangicGroup: 1,
       // add more fields as needed
     },
   });
@@ -131,7 +132,7 @@ export default function EditDrawer({
     return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
   };
 
-  const { setValue, reset } = methods;
+  const { setValue, reset, watch } = methods;
 
   //* export
   const onSubmit = async (data) => {
@@ -264,6 +265,94 @@ export default function EditDrawer({
           setValue("ozelAlan9", item.PBK_OZEL_ALAN_9);
           setValue("ozelAlan10", item.PBK_OZEL_ALAN_10);
           setValue("aciklama", item.PBK_ACIKLAMA);
+          if (
+            item.PBK_TARIH_BAZLI_IZLE == true &&
+            item.PBK_SAYAC_BAZLI_IZLE == true
+          ) {
+            setValue("tarihSayacBakim", "b");
+          } else if (
+            item.PBK_TARIH_BAZLI_IZLE == true ||
+            item.PBK_SAYAC_BAZLI_IZLE == true
+          ) {
+            setValue("tarihSayacBakim", "a");
+            if (
+              item.PBK_TARIH_YINELEME_PERIYOT == "AY1" ||
+              item.PBK_TARIH_YINELEME_PERIYOT == "AY2" ||
+              item.PBK_TARIH_YINELEME_PERIYOT == "AY3"
+            ) {
+              setValue("activeTab", "AY123");
+              if (item.PBK_TARIH_YINELEME_PERIYOT == "AY1") {
+                setValue("ayGroup", 1);
+                setValue("herAy", item.PBK_TARIH_YINELEME_SIKLIK);
+              } else if (item.PBK_TARIH_YINELEME_PERIYOT == "AY2") {
+                setValue("ayGroup", 2);
+                setValue("ayinGunleriBir", item.PBK_TARIH_YINELEME_SIKLIK);
+                let ayinGunleri = item.PBK_TARIH_AY_GUNLER.match(/.{1,2}/g);
+                setValue("ayinGunleriSelect", ayinGunleri);
+              } else if (item.PBK_TARIH_YINELEME_PERIYOT == "AY3") {
+                setValue("ayGroup", 3);
+                setValue("ayinHafatlariBir", item.PBK_TARIH_YINELEME_SIKLIK);
+                let ayinGunleri = item.PBK_TARIH_AY_GUNLER.match(/.{1,2}/g);
+                setValue("ayinHaftalariSelect", ayinGunleri);
+                setValue(
+                  "ayinHaftalarininGunuSelect",
+                  item.PBK_TARIH_HAFTA_GUNLER
+                );
+              }
+            } else if (
+              item.PBK_TARIH_YINELEME_PERIYOT == "YIL1" ||
+              item.PBK_TARIH_YINELEME_PERIYOT == "YIL2"
+            ) {
+              setValue("activeTab", "YIL123");
+              if (item.PBK_TARIH_YINELEME_PERIYOT == "YIL1") {
+                setValue("yilGroup", 1);
+                setValue("herYil", item.PBK_TARIH_YINELEME_SIKLIK);
+              } else if (item.PBK_TARIH_YINELEME_PERIYOT == "YIL2") {
+                setValue("yilGroup", 2);
+                setValue("yillikTekrarSayisi", item.PBK_TARIH_YINELEME_SIKLIK);
+                let yilGunAy = item.PBK_TARIH_AY_GUNLER.toString();
+                setValue("yilinAylariSelect", yilGunAy.slice(-2));
+                setValue("ayinGunleriSelect", yilGunAy.slice(0, 2));
+              }
+            } else if (item.PBK_TARIH_YINELEME_PERIYOT == "GUN") {
+              setValue("activeTab", "GUN");
+              setValue("gunlukGun", item.PBK_TARIH_YINELEME_SIKLIK);
+            } else if (item.PBK_TARIH_YINELEME_PERIYOT == "HAFTA") {
+              setValue("activeTab", "HAFTA");
+              setValue("haftalik", item.PBK_TARIH_YINELEME_SIKLIK);
+            } else if (item.PBK_TARIH_YINELEME_PERIYOT == "SAYAC") {
+              setValue("activeTab", "SAYAC");
+              setValue("sayacSayisi", item.PBK_SAYAC_YINELEME_SIKLIK);
+              setValue("peryodikBakimBirim", item.PBK_SAYAC_BIRIM);
+              setValue("peryodikBakimBirimID", item.PBK_SAYAC_BIRIM_KOD_ID);
+            } else if (item.PBK_TARIH_YINELEME_PERIYOT == "FIX") {
+              setValue("activeTab", "FIX");
+            }
+          }
+          if (item.PBK_TARIH_BITIS_SEKLI == 0) {
+            setValue("baslangicGroup", 1);
+          } else if (item.PBK_TARIH_BITIS_SEKLI == 1) {
+            setValue("baslangicGroup", 2);
+            setValue("tekrarlamaSayisi", item.PBK_TEKRAR_SAYI);
+          } else if (item.PBK_TARIH_BITIS_SEKLI == 2) {
+            setValue("baslangicGroup", 3);
+            let donem = item.PBK_BITIS_DONEM1.toString();
+            setValue("donemBaslangicGunleriSelect", donem.slice(-2));
+            setValue("donemBaslangicAylariSelect", donem.slice(0, 2));
+            let bitisDonem = item.PBK_BITIS_DONEM2.toString();
+            setValue("donemBitisGunleriSelect", bitisDonem.slice(-2));
+            setValue("donemBitisAylariSelect", bitisDonem.slice(0, 2));
+          } else if (item.PBK_TARIH_BITIS_SEKLI == 3) {
+            setValue("baslangicGroup", 4);
+            setValue(
+              "bakimBitisTarihi",
+              item.PBK_TARIH_BITIS
+                ? dayjs(item.PBK_TARIH_BITIS).isValid()
+                  ? dayjs(item.PBK_TARIH_BITIS)
+                  : null
+                : null
+            );
+          }
 
           // add more fields as needed
 
