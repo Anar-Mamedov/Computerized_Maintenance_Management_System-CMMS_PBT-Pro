@@ -118,6 +118,7 @@ export default function EditDrawer({
       ayGroup: 1,
       ayinGunleriSelect: [],
       baslangicGroup: 1,
+      haftaninGunleri: [],
       // add more fields as needed
     },
   });
@@ -270,6 +271,58 @@ export default function EditDrawer({
             item.PBK_SAYAC_BAZLI_IZLE == true
           ) {
             setValue("tarihSayacBakim", "b");
+            setValue("sayacSayisi", item.PBK_SAYAC_YINELEME_SIKLIK);
+            setValue("peryodikBakimBirim", item.PBK_SAYAC_BIRIM);
+            setValue("peryodikBakimBirimID", item.PBK_SAYAC_BIRIM_KOD_ID);
+            if (
+              item.PBK_TARIH_YINELEME_PERIYOT == "AY1" ||
+              item.PBK_TARIH_YINELEME_PERIYOT == "AY2" ||
+              item.PBK_TARIH_YINELEME_PERIYOT == "AY3"
+            ) {
+              setValue("activeTab", "AY123");
+              if (item.PBK_TARIH_YINELEME_PERIYOT == "AY1") {
+                setValue("ayGroup", 1);
+                setValue("herAy", item.PBK_TARIH_YINELEME_SIKLIK);
+              } else if (item.PBK_TARIH_YINELEME_PERIYOT == "AY2") {
+                setValue("ayGroup", 2);
+                setValue("ayinGunleriBir", item.PBK_TARIH_YINELEME_SIKLIK);
+                let ayinGunleri = item.PBK_TARIH_AY_GUNLER.match(/.{1,2}/g);
+                setValue("ayinGunleriSelect", ayinGunleri);
+              } else if (item.PBK_TARIH_YINELEME_PERIYOT == "AY3") {
+                setValue("ayGroup", 3);
+                setValue("ayinHafatlariBir", item.PBK_TARIH_YINELEME_SIKLIK);
+                let ayinGunleri = item.PBK_TARIH_AY_GUNLER.match(/.{1,2}/g);
+                setValue("ayinHaftalariSelect", ayinGunleri);
+                setValue(
+                  "ayinHaftalarininGunuSelect",
+                  item.PBK_TARIH_HAFTA_GUNLER
+                );
+              }
+            } else if (
+              item.PBK_TARIH_YINELEME_PERIYOT == "YIL1" ||
+              item.PBK_TARIH_YINELEME_PERIYOT == "YIL2"
+            ) {
+              setValue("activeTab", "YIL123");
+              if (item.PBK_TARIH_YINELEME_PERIYOT == "YIL1") {
+                setValue("yilGroup", 1);
+                setValue("herYil", item.PBK_TARIH_YINELEME_SIKLIK);
+              } else if (item.PBK_TARIH_YINELEME_PERIYOT == "YIL2") {
+                setValue("yilGroup", 2);
+                setValue("yillikTekrarSayisi", item.PBK_TARIH_YINELEME_SIKLIK);
+                let yilGunAy = item.PBK_TARIH_AY_GUNLER.toString();
+                setValue("yilinAylariSelect", yilGunAy.slice(-2));
+                setValue("ayinGunleriSelect", yilGunAy.slice(0, 2));
+              }
+            } else if (item.PBK_TARIH_YINELEME_PERIYOT == "GUN") {
+              setValue("activeTab", "GUN");
+              setValue("gunlukGun", item.PBK_TARIH_YINELEME_SIKLIK);
+            } else if (item.PBK_TARIH_YINELEME_PERIYOT == "HAFTA") {
+              setValue("activeTab", "HAFTA");
+              setValue("haftalik", item.PBK_TARIH_YINELEME_SIKLIK);
+              setValue("haftaninGunleri", item.PBK_TARIH_HAFTA_GUNLER);
+            } else if (item.PBK_TARIH_YINELEME_PERIYOT == "FIX") {
+              setValue("activeTab", "FIX");
+            }
           } else if (
             item.PBK_TARIH_BAZLI_IZLE == true ||
             item.PBK_SAYAC_BAZLI_IZLE == true
@@ -320,6 +373,7 @@ export default function EditDrawer({
             } else if (item.PBK_TARIH_YINELEME_PERIYOT == "HAFTA") {
               setValue("activeTab", "HAFTA");
               setValue("haftalik", item.PBK_TARIH_YINELEME_SIKLIK);
+              setValue("haftaninGunleri", item.PBK_TARIH_HAFTA_GUNLER);
             } else if (item.PBK_TARIH_YINELEME_PERIYOT == "SAYAC") {
               setValue("activeTab", "SAYAC");
               setValue("sayacSayisi", item.PBK_SAYAC_YINELEME_SIKLIK);
@@ -329,6 +383,7 @@ export default function EditDrawer({
               setValue("activeTab", "FIX");
             }
           }
+
           if (item.PBK_TARIH_BITIS_SEKLI == 0) {
             setValue("baslangicGroup", 1);
           } else if (item.PBK_TARIH_BITIS_SEKLI == 1) {
