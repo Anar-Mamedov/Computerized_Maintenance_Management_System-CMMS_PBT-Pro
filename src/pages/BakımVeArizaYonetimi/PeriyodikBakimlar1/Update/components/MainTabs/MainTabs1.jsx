@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import MainTabs from "./MainTabs.jsx";
 import PeriotBilgileri from "./components/PeryotBilgileri/PeriotBilgileri.jsx";
-import TanimliMakineler from "./components/TanimliMakineler.jsx";
+import TanimliMakinelerTablo from "./components/TanimliMakineler/TanimliMakinelerTablo.jsx";
 
 const onChange = (key) => {
   // console.log(key);
@@ -60,7 +60,7 @@ export default function MainTabs1({ refreshKey }) {
     {
       key: "3",
       label: "Tanımlı Makineler",
-      children: <TanimliMakineler />,
+      children: <TanimliMakinelerTablo />,
     },
   ];
 
