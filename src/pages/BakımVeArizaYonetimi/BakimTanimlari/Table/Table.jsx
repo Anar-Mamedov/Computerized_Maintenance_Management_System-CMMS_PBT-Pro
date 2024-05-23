@@ -1,7 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Input, Table, Spin } from "antd";
-import { CheckOutlined, CloseOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  CheckOutlined,
+  CloseOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
@@ -110,7 +114,9 @@ export default function MainTable() {
   };
 
   useEffect(() => {
-    const filtered = data.filter((item) => normalizeString(item.IST_TANIM).includes(normalizeString(searchTerm)));
+    const filtered = data.filter((item) =>
+      normalizeString(item.IST_TANIM).includes(normalizeString(searchTerm))
+    );
     setFilteredData(filtered);
   }, [searchTerm, data]);
 
@@ -123,7 +129,9 @@ export default function MainTable() {
     }
 
     // Seçilen satırların verisini bul
-    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
+    const newSelectedRows = data.filter((row) =>
+      newSelectedRowKeys.includes(row.key)
+    );
     setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
   };
 
@@ -181,7 +189,11 @@ export default function MainTable() {
       align: "center",
       render: (text) => (
         <div style={{ textAlign: "center" }}>
-          {text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}
+          {text ? (
+            <CheckOutlined style={{ color: "green" }} />
+          ) : (
+            <CloseOutlined style={{ color: "red" }} />
+          )}
         </div>
       ),
     },
@@ -432,7 +444,8 @@ export default function MainTable() {
           marginBottom: "20px",
           gap: "10px",
           padding: "0 5px",
-        }}>
+        }}
+      >
         <Input
           style={{ width: "250px" }}
           type="text"
@@ -442,8 +455,14 @@ export default function MainTable() {
           prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
         />
         <div style={{ display: "flex", gap: "10px" }}>
-          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
-          <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
+          <ContextMenu
+            selectedRows={selectedRows}
+            refreshTableData={refreshTableData}
+          />
+          <CreateDrawer
+            selectedLokasyonId={selectedRowKeys[0]}
+            onRefresh={refreshTableData}
+          />
         </div>
       </div>
       <Spin spinning={loading}>
