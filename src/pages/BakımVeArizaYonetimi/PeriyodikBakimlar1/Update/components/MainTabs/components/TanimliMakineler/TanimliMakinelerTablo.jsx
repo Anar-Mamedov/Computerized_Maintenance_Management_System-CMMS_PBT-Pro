@@ -16,23 +16,135 @@ export default function TanimliMakinelerTablo() {
 
   const columns = [
     {
-      title: "Sıra No",
-      dataIndex: "ISK_SIRANO",
-      key: "ISK_SIRANO",
-      width: 40,
+      title: "Makine Kodu",
+      dataIndex: "MKN_KOD",
+      key: "MKN_KOD",
+      width: 150,
       ellipsis: true,
     },
     {
-      title: "Tanım",
-      dataIndex: "ISK_TANIM",
-      key: "ISK_TANIM",
+      title: "Makine Tanımı",
+      dataIndex: "MKN_TANIM",
+      key: "MKN_TANIM",
       width: 200,
       ellipsis: true,
     },
     {
-      title: "Açıklama",
-      dataIndex: "ISK_ACIKLAMA",
-      key: "ISK_ACIKLAMA",
+      title: "Son Uygulama Tarihi",
+      dataIndex: "PBM_SON_UYGULAMA_TARIH",
+      key: "PBM_SON_UYGULAMA_TARIH",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Hedef Tarih",
+      dataIndex: "PBM_HEDEF_TARIH",
+      key: "PBM_HEDEF_TARIH",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Kalan Süre",
+      dataIndex: "PBM_KALAN_SURE",
+      key: "PBM_KALAN_SURE",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Kalan Süre %",
+      dataIndex: "PBM_KALAN_SURE_ORAN",
+      key: "PBM_KALAN_SURE_ORAN",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Sayaç",
+      dataIndex: "eksik",
+      key: "eksik",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Güncel Sayaç Değeri",
+      dataIndex: "MES_GUNCEL_DEGER",
+      key: "MES_GUNCEL_DEGER",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Son Uygulanan",
+      dataIndex: "PBM_SON_UYGULAMA_SAYAC",
+      key: "PBM_SON_UYGULAMA_SAYAC",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Hedef Sayaç",
+      dataIndex: "PBM_HEDEF_SAYAC",
+      key: "PBM_HEDEF_SAYAC",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Kalan Sayaç",
+      dataIndex: "PBM_KALAN_SAYAC",
+      key: "PBM_KALAN_SAYAC",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Kalan Sayaç %",
+      dataIndex: "PBM_KALAN_SAYAC_ORAN",
+      key: "PBM_KALAN_SAYAC_ORAN",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Makine Tipi",
+      dataIndex: "MKN_TIP",
+      key: "MKN_TIP",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Lokasyon",
+      dataIndex: "PBM_LOKASYON",
+      key: "PBM_LOKASYON",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Makine Durumu",
+      dataIndex: "MKN_DURUM",
+      key: "MKN_DURUM",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Makine Kategori",
+      dataIndex: "eksik",
+      key: "eksik",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Makine Marka",
+      dataIndex: "MKN_MARKA",
+      key: "MKN_MARKA",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Makine Model",
+      dataIndex: "MKN_MODEL",
+      key: "MKN_MODEL",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Hartırlatma Süresi",
+      dataIndex: "PBM_HATIRLAT_SURE",
+      key: "PBM_HATIRLAT_SURE",
       width: 200,
       ellipsis: true,
     },
@@ -42,13 +154,11 @@ export default function TanimliMakinelerTablo() {
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`IsTanimKontrolList?isTanimID=${secilenBakimID}`)
+    AxiosInstance.get(`PeriyodikBakimGetMakineList?BakimID=${secilenBakimID}`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
-          key: item.TB_IS_TANIM_KONROLLIST_ID,
-          ISK_SIRANO: item.ISK_SIRANO,
-          ISK_TANIM: item.ISK_TANIM,
-          ISK_ACIKLAMA: item.ISK_ACIKLAMA,
+          ...item,
+          key: item.TB_PERIYODIK_BAKIM_MAKINE_ID,
         }));
         setData(fetchedData);
       })

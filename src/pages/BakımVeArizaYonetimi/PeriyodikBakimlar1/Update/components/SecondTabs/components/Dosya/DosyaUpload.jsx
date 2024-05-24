@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Upload, Button, Table, Spin, message, Modal } from "antd";
-import { UploadOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import {
+  UploadOutlined,
+  CheckOutlined,
+  CloseOutlined,
+} from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../api/http";
 import EditModal from "./Update/EditModal";
@@ -23,7 +27,9 @@ const DosyaUpload = () => {
 
     // Örnek bir tarih formatla ve ay formatını belirle
     const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
-    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(
+      sampleDate
+    );
 
     let monthFormat;
     if (sampleFormatted.includes("January")) {
@@ -56,7 +62,14 @@ const DosyaUpload = () => {
       // Saat ve dakika değerlerinin geçerliliğini kontrol et
       const hoursInt = parseInt(hours, 10);
       const minutesInt = parseInt(minutes, 10);
-      if (isNaN(hoursInt) || isNaN(minutesInt) || hoursInt < 0 || hoursInt > 23 || minutesInt < 0 || minutesInt > 59) {
+      if (
+        isNaN(hoursInt) ||
+        isNaN(minutesInt) ||
+        hoursInt < 0 ||
+        hoursInt > 23 ||
+        minutesInt < 0 ||
+        minutesInt > 59
+      ) {
         throw new Error("Invalid time format");
       }
 
@@ -85,14 +98,19 @@ const DosyaUpload = () => {
   const fetchDosyaIds = async () => {
     try {
       setLoading(true);
-      const response = await AxiosInstance.get(`GetDosyaList?refId=${secilenIsEmriID}&refGrup=BAKIM`);
+      const response = await AxiosInstance.get(
+        `GetDosyaList?refId=${secilenIsEmriID}&refGrup=BAKIM`
+      );
       const fetchedData = await Promise.all(
         response.map(async (item) => {
           try {
             // Assuming `TB_DOSYA_ID` is your file ID
             const fileId = item.TB_DOSYA_ID;
             // Fetching the file blob from `GetFileByID`
-            const fileResponse = await AxiosInstance.get(`GetFileByID?id=${fileId}`, { responseType: "blob" });
+            const fileResponse = await AxiosInstance.get(
+              `GetFileByID?id=${fileId}`,
+              { responseType: "blob" }
+            );
             // Creating a URL for the file blob
             const fileURL = URL.createObjectURL(fileResponse);
             return {
@@ -152,11 +170,23 @@ const DosyaUpload = () => {
       key: "DSY_SURELI",
       render: (text, record) => {
         return record.DSY_SURELI ? (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <CheckOutlined style={{ color: "green" }} />
           </div>
         ) : (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <CloseOutlined style={{ color: "red" }} />
           </div>
         );
@@ -178,7 +208,8 @@ const DosyaUpload = () => {
             download={record.DSY_DOSYA_AD}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}>
+            onClick={(e) => e.stopPropagation()}
+          >
             Dosyayı İndir
           </a>
         ) : (
@@ -202,9 +233,13 @@ const DosyaUpload = () => {
     formData.append("file", file);
     formData.append("name", file.name);
 
-    AxiosInstance.post(`UploadFile?refid=${secilenIsEmriID}&refgrup=BAKIM`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    })
+    AxiosInstance.post(
+      `UploadFile?refid=${secilenIsEmriID}&refgrup=BAKIM`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    )
       .then(() => {
         message.success(`${file.name} başarıyla yüklendi.`);
         fetchDosyaIds(); // Refresh the table data by calling fetchDosyaIds directly after successful upload.
@@ -242,7 +277,8 @@ const DosyaUpload = () => {
             justifyContent: "center",
             alignItems: "center",
             marginBottom: "20px",
-          }}>
+          }}
+        >
           <Spin />
         </div>
       ) : (
@@ -262,8 +298,12 @@ const DosyaUpload = () => {
         <p className="ant-upload-drag-icon">
           <UploadOutlined />
         </p>
-        <p className="ant-upload-text">Tıklayın veya bu alana dosya sürükleyin</p>
-        <p className="ant-upload-hint">Tek seferde bir veya birden fazla dosya yüklemeyi destekler.</p>
+        <p className="ant-upload-text">
+          Tıklayın veya bu alana dosya sürükleyin
+        </p>
+        <p className="ant-upload-hint">
+          Tek seferde bir veya birden fazla dosya yüklemeyi destekler.
+        </p>
       </Upload.Dragger>
 
       <EditModal

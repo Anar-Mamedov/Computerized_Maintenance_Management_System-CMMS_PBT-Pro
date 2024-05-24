@@ -25,6 +25,7 @@ import TalimatTablo from "./components/TalimatTablo";
 import AtolyeTablo from "./components/AtolyeTablo";
 import FirmaTablo from "./components/FirmaTablo";
 import Periyot from "./components/Periyot";
+import SecondTabs from "../SecondTabs/SecondTabs";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -121,7 +122,8 @@ export default function MainTabs() {
         flexWrap: "wrap",
         marginBottom: "15px",
         gap: "20px",
-      }}>
+      }}
+    >
       <div
         style={{
           display: "flex",
@@ -130,7 +132,8 @@ export default function MainTabs() {
           gap: "10px",
           width: "100%",
           maxWidth: "450px",
-        }}>
+        }}
+      >
         <div
           style={{
             display: "flex",
@@ -140,7 +143,8 @@ export default function MainTabs() {
             width: "100%",
             gap: "10px",
             rowGap: "0px",
-          }}>
+          }}
+        >
           <Text style={{ fontSize: "14px" }}>Bakım Kodu:</Text>
           <div
             style={{
@@ -151,7 +155,8 @@ export default function MainTabs() {
               minWidth: "300px",
               gap: "10px",
               width: "100%",
-            }}>
+            }}
+          >
             <Controller
               name="bakimKodu"
               control={control}
@@ -173,7 +178,10 @@ export default function MainTabs() {
               control={control}
               defaultValue={true} // or true if you want it checked by default
               render={({ field }) => (
-                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                <Checkbox
+                  checked={field.value}
+                  onChange={(e) => field.onChange(e.target.checked)}
+                >
                   Aktif
                 </Checkbox>
               )}
@@ -189,7 +197,8 @@ export default function MainTabs() {
             gap: "10px",
             width: "100%",
             justifyContent: "space-between",
-          }}>
+          }}
+        >
           <Text style={{ fontSize: "14px" }}>Bakım Tanımı:</Text>
           <div
             style={{
@@ -200,7 +209,8 @@ export default function MainTabs() {
               minWidth: "300px",
               gap: "10px",
               width: "100%",
-            }}>
+            }}
+          >
             <Controller
               name="bakimTanimi"
               control={control}
@@ -216,7 +226,8 @@ export default function MainTabs() {
             maxWidth: "450px",
             gap: "10px",
             width: "100%",
-          }}>
+          }}
+        >
           <BakimTipi />
         </div>
         <div
@@ -227,7 +238,8 @@ export default function MainTabs() {
             maxWidth: "450px",
             gap: "10px",
             width: "100%",
-          }}>
+          }}
+        >
           <BakimGrubu />
         </div>
         <div
@@ -238,7 +250,8 @@ export default function MainTabs() {
             maxWidth: "450px",
             gap: "10px",
             width: "100%",
-          }}>
+          }}
+        >
           <BakimNedeni />
         </div>
       </div>
@@ -250,8 +263,16 @@ export default function MainTabs() {
           gap: "10px",
           width: "100%",
           maxWidth: "450px",
-        }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            flexWrap: "wrap",
+          }}
+        >
           <StyledDivBottomLine
             style={{
               display: "flex",
@@ -259,7 +280,8 @@ export default function MainTabs() {
               justifyContent: "space-between",
               width: "100%",
               maxWidth: "450px",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px" }}>Öncelik:</Text>
             <div
               style={{
@@ -268,7 +290,8 @@ export default function MainTabs() {
                 alignItems: "center",
                 justifyContent: "space-between",
                 width: "300px",
-              }}>
+              }}
+            >
               <Controller
                 name="oncelikTanim"
                 control={control}
@@ -302,7 +325,14 @@ export default function MainTabs() {
             </div>
           </StyledDivBottomLine>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            flexWrap: "wrap",
+          }}
+        >
           <StyledDivBottomLine
             style={{
               display: "flex",
@@ -310,7 +340,8 @@ export default function MainTabs() {
               justifyContent: "space-between",
               width: "100%",
               maxWidth: "450px",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px" }}>Talimat:</Text>
             <div
               style={{
@@ -319,7 +350,8 @@ export default function MainTabs() {
                 alignItems: "center",
                 justifyContent: "space-between",
                 width: "300px",
-              }}>
+              }}
+            >
               <Controller
                 name="talimatTanim"
                 control={control}
@@ -353,7 +385,14 @@ export default function MainTabs() {
             </div>
           </StyledDivBottomLine>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            flexWrap: "wrap",
+          }}
+        >
           <StyledDivBottomLine
             style={{
               display: "flex",
@@ -361,7 +400,8 @@ export default function MainTabs() {
               justifyContent: "space-between",
               width: "100%",
               maxWidth: "450px",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px" }}>Atölye:</Text>
             <div
               style={{
@@ -370,7 +410,8 @@ export default function MainTabs() {
                 alignItems: "center",
                 justifyContent: "space-between",
                 width: "300px",
-              }}>
+              }}
+            >
               <Controller
                 name="atolyeTanim"
                 control={control}
@@ -404,7 +445,14 @@ export default function MainTabs() {
             </div>
           </StyledDivBottomLine>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            flexWrap: "wrap",
+          }}
+        >
           <StyledDivBottomLine
             style={{
               display: "flex",
@@ -412,7 +460,8 @@ export default function MainTabs() {
               justifyContent: "space-between",
               width: "100%",
               maxWidth: "450px",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px" }}>Firma:</Text>
             <div
               style={{
@@ -421,7 +470,8 @@ export default function MainTabs() {
                 alignItems: "center",
                 justifyContent: "space-between",
                 width: "300px",
-              }}>
+              }}
+            >
               <Controller
                 name="firmaTanim"
                 control={control}
@@ -463,7 +513,8 @@ export default function MainTabs() {
             justifyContent: "space-between",
             width: "100%",
             maxWidth: "450px",
-          }}>
+          }}
+        >
           <Text style={{ fontSize: "14px" }}>Lokasyon:</Text>
           <div
             className="anar"
@@ -474,7 +525,8 @@ export default function MainTabs() {
               justifyContent: "space-between",
               minWidth: "300px",
               gap: "3px",
-            }}>
+            }}
+          >
             <Controller
               name="lokasyonTanim"
               control={control}
@@ -517,7 +569,8 @@ export default function MainTabs() {
           gap: "10px",
           width: "100%",
           maxWidth: "450px",
-        }}>
+        }}
+      >
         <div
           style={{
             display: "flex",
@@ -527,7 +580,8 @@ export default function MainTabs() {
             gap: "10px",
             width: "100%",
             justifyContent: "space-between",
-          }}>
+          }}
+        >
           <Text style={{ fontSize: "14px" }}>Çalışma Süresis (dk.):</Text>
           <div
             style={{
@@ -538,7 +592,8 @@ export default function MainTabs() {
               minWidth: "300px",
               gap: "10px",
               width: "100%",
-            }}>
+            }}
+          >
             <Controller
               name="calismaSuresi"
               control={control}
@@ -549,7 +604,10 @@ export default function MainTabs() {
                   onKeyPress={(e) => {
                     const value = field.value;
                     // Rakam veya bir virgül olup olmadığını kontrol et
-                    if (!/[0-9]/.test(e.key) && (e.key !== "," || value.includes(","))) {
+                    if (
+                      !/[0-9]/.test(e.key) &&
+                      (e.key !== "," || value.includes(","))
+                    ) {
                       e.preventDefault();
                     }
                   }}
@@ -565,7 +623,8 @@ export default function MainTabs() {
             alignItems: "flex-start",
             justifyContent: "space-between",
             width: "100%",
-          }}>
+          }}
+        >
           <Text style={{ fontSize: "14px" }}>Duruş Süresis (dk.):</Text>
           <div
             style={{
@@ -576,7 +635,8 @@ export default function MainTabs() {
               minWidth: "300px",
               gap: "10px",
               width: "100%",
-            }}>
+            }}
+          >
             <Controller
               name="durusSuresi"
               control={control}
@@ -587,7 +647,10 @@ export default function MainTabs() {
                   onKeyPress={(e) => {
                     const value = field.value;
                     // Rakam veya bir virgül olup olmadığını kontrol et
-                    if (!/[0-9]/.test(e.key) && (e.key !== "," || value.includes(","))) {
+                    if (
+                      !/[0-9]/.test(e.key) &&
+                      (e.key !== "," || value.includes(","))
+                    ) {
                       e.preventDefault();
                     }
                   }}
@@ -603,7 +666,8 @@ export default function MainTabs() {
             alignItems: "flex-start",
             justifyContent: "space-between",
             width: "100%",
-          }}>
+          }}
+        >
           <Text style={{ fontSize: "14px" }}>Personel (kişi):</Text>
           <div
             style={{
@@ -614,7 +678,8 @@ export default function MainTabs() {
               minWidth: "300px",
               gap: "10px",
               width: "100%",
-            }}>
+            }}
+          >
             <Controller
               name="personelSayisi"
               control={control}
@@ -639,14 +704,18 @@ export default function MainTabs() {
             flexWrap: "wrap",
             justifyContent: "space-between",
             width: "100%",
-          }}>
+          }}
+        >
           <Text style={{ fontSize: "14px" }}>Otonom Bakım:</Text>
 
           <Controller
             name="otonomBakim"
             control={control}
             render={({ field }) => (
-              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}></Checkbox>
+              <Checkbox
+                checked={field.value}
+                onChange={(e) => field.onChange(e.target.checked)}
+              ></Checkbox>
             )}
           />
         </StyledDivBottomLine>
@@ -657,7 +726,8 @@ export default function MainTabs() {
               flexWrap: "wrap",
               justifyContent: "space-between",
               width: "100%",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px" }}>Periyot:</Text>
             <div
               style={{
@@ -667,7 +737,8 @@ export default function MainTabs() {
                 alignItems: "center",
                 flexDirection: "row",
                 gap: "10px",
-              }}>
+              }}
+            >
               <Periyot />
               <Text style={{ fontSize: "14px" }}>Sıklık:</Text>
               <Controller
@@ -690,6 +761,7 @@ export default function MainTabs() {
           </StyledDivBottomLine>
         )}
       </div>
+      <SecondTabs />
     </div>
   );
 }

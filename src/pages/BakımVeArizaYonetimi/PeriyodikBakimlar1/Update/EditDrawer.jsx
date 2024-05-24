@@ -472,7 +472,7 @@ export default function EditDrawer({
           ) : (
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <MainTabs1 />
-              <SecondTabs />
+              {/*<SecondTabs />*/}
               <Footer />
             </form>
           )}
