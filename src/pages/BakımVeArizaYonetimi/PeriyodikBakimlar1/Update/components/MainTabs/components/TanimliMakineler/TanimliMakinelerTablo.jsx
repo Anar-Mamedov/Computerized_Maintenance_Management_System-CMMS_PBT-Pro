@@ -59,8 +59,8 @@ export default function TanimliMakinelerTablo() {
     },
     {
       title: "Sayaç",
-      dataIndex: "eksik",
-      key: "eksik",
+      dataIndex: "MES_TANIM",
+      key: "MES_TANIM",
       width: 200,
       ellipsis: true,
     },
@@ -122,8 +122,8 @@ export default function TanimliMakinelerTablo() {
     },
     {
       title: "Makine Kategori",
-      dataIndex: "eksik",
-      key: "eksik",
+      dataIndex: "MKN_KATEGORI",
+      key: "MKN_KATEGORI",
       width: 200,
       ellipsis: true,
     },
