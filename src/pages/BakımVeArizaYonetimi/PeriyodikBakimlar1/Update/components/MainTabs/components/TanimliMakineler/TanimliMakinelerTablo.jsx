@@ -16,7 +16,7 @@ export default function TanimliMakinelerTablo() {
 
   const columns = [
     {
-      title: "Makine Kodu1",
+      title: "Makine Kodu",
       dataIndex: "MKN_KOD",
       key: "MKN_KOD",
       width: 150,
