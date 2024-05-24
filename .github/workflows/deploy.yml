@@ -45,12 +45,14 @@ jobs:
           lftp -u $FTP_USERNAME,$FTP_PASSWORD $FTP_HOST <<EOF
           set ssl:verify-certificate no
           cd /
-          # Deleting files in the dist directory on the server
-          for file in \$(ls dist); do
-            if [ -f "dist/\$file" ]; then
-              rm -f "/\$file"
+          # Deleting matching files in the dist directory on the server
+          for file in \$(find dist -type f -o -type d); do
+            file_name=\$(basename "\$file")
+            if [ -e "/\$file_name" ]; then
+              echo "Deleting /\$file_name on server"
+              rm -rf "/\$file_name"
             fi
           done
-          mirror -R --delete --verbose dist /
+          mirror -R --verbose dist /
           bye
           EOF
