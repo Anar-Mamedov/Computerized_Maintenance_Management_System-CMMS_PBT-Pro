@@ -25,7 +25,7 @@ jobs:
         run: npm run build
 
       - name: Check build directory
-        run: ls -al build
+        run: ls -al dist
 
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
@@ -38,6 +38,6 @@ jobs:
         run: |
           echo "Starting FTP deployment..."
           lftp -u $FTP_USERNAME,$FTP_PASSWORD $FTP_HOST <<EOF
-          mirror -R --delete --verbose build /
+          mirror -R --delete --verbose dist /
           bye
           EOF
