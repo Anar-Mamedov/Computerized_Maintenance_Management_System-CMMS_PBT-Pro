@@ -45,7 +45,12 @@ jobs:
           lftp -u $FTP_USERNAME,$FTP_PASSWORD $FTP_HOST <<EOF
           set ssl:verify-certificate no
           cd /
-          mput -E -O / dist/index.html dist/vite.svg dist/_redirects
-          mirror -R --only-newer --verbose dist/assets /assets
+          # Deleting files in the dist directory on the server
+          for file in \$(ls dist); do
+            if [ -f "dist/\$file" ]; then
+              rm -f "/\$file"
+            fi
+          done
+          mirror -R --delete --verbose dist /
           bye
           EOF
