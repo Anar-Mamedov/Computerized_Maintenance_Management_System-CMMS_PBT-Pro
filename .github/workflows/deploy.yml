@@ -44,6 +44,8 @@ jobs:
           echo "Starting FTP deployment..."
           lftp -u $FTP_USERNAME,$FTP_PASSWORD $FTP_HOST <<EOF
           set ssl:verify-certificate no
-          mirror -R --delete --verbose --only-newer --no-delete dist /
+          cd /
+          mput -E -O / dist/index.html dist/vite.svg dist/_redirects
+          mirror -R --only-newer --verbose dist/assets /assets
           bye
           EOF
