@@ -99,6 +99,7 @@ export default function TanimliMakinelerTablo() {
       width: 200,
       ellipsis: true,
     },
+
     {
       title: "Makine Tipi",
       dataIndex: "MKN_TIP",
