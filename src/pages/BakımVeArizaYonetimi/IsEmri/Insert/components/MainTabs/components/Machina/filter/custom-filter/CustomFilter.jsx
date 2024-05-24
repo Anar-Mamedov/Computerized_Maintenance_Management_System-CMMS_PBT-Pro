@@ -1,5 +1,14 @@
 import { CloseOutlined, FilterOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Col, Drawer, Row, Typography, Select, Space, Input } from "antd";
+import {
+  Button,
+  Col,
+  Drawer,
+  Row,
+  Typography,
+  Select,
+  Space,
+  Input,
+} from "antd";
 import React, { useState } from "react";
 import styled from "styled-components";
 import "./style.css";
@@ -122,9 +131,11 @@ export default function CustomFilter({ onSubmit }) {
         style={{
           display: "flex",
           alignItems: "center",
-          backgroundColor: newObjectsAdded || filtersExist ? "#EBF6FE" : "#ffffffff",
+          backgroundColor:
+            newObjectsAdded || filtersExist ? "#EBF6FE" : "#ffffffff",
         }}
-        className={newObjectsAdded ? "#ff0000-dot-button" : ""}>
+        className={newObjectsAdded ? "#ff0000-dot-button" : ""}
+      >
         <FilterOutlined />
         <span style={{ marginRight: "5px" }}>Filtreler</span>
         {newObjectsAdded && <span className="blue-dot"></span>}
@@ -144,7 +155,8 @@ export default function CustomFilter({ onSubmit }) {
         }
         placement="right"
         onClose={onClose}
-        open={open}>
+        open={open}
+      >
         {rows.map((row) => (
           <Row
             key={row.id}
@@ -153,7 +165,8 @@ export default function CustomFilter({ onSubmit }) {
               border: "1px solid #80808048",
               padding: "15px 10px",
               borderRadius: "8px",
-            }}>
+            }}
+          >
             <Col span={24}>
               <Col
                 span={24}
@@ -162,7 +175,8 @@ export default function CustomFilter({ onSubmit }) {
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
-                }}>
+                }}
+              >
                 <Text>Yeni Filtre</Text>
                 <CloseButton onClick={() => handleCancelClick(row.id)}>
                   <StyledCloseOutlined />
@@ -177,38 +191,42 @@ export default function CustomFilter({ onSubmit }) {
                   onChange={(value) => handleSelectChange(value, row.id)}
                   value={selectedValues[row.id] || undefined}
                   onSearch={onSearch}
-                  filterOption={(input, option) => (option?.label || "").toLowerCase().includes(input.toLowerCase())}
+                  filterOption={(input, option) =>
+                    (option?.label || "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
                   options={[
                     {
-                      value: "MKN_KOD",
+                      value: "mkn.MKN_KOD",
                       label: "Makine Kodu",
                     },
                     {
-                      value: "MKN_TANIM",
+                      value: "mkn.MKN_TANIM",
                       label: "Makine Tanımı",
                     },
                     {
-                      value: "MAKINE_LOKASYON",
+                      value: "lok.LOK_TANIM",
                       label: "Lokasyon",
                     },
                     {
-                      value: "MAKINE_TIP",
+                      value: "tip_kod.KOD_TANIM",
                       label: "Makine Tipi",
                     },
                     {
-                      value: "MAKINE_KATEGORI",
+                      value: "kategori_kod.KOD_TANIM",
                       label: "Kategori",
                     },
                     {
-                      value: "MAKINE_MARKA",
+                      value: "mrk.MKN_MARKA",
                       label: "Marka",
                     },
                     {
-                      value: "MAKINE_MODEL",
+                      value: "mdl.MKN_MODEL",
                       label: "Model",
                     },
                     {
-                      value: "MAKINE_SERI_NO",
+                      value: "mkn.MKN_SERI_NO",
                       label: "Seri No",
                     },
                   ]}
@@ -231,7 +249,8 @@ export default function CustomFilter({ onSubmit }) {
             alignItems: "center",
             width: "100%",
             justifyContent: "center",
-          }}>
+          }}
+        >
           <PlusOutlined />
           Filtre ekle
         </Button>
