@@ -29,129 +29,162 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey }
       title: "Makine Kodu",
       dataIndex: "code",
       key: "code",
-      width: 150,
-      ellipsis: true,
       sorter: (a, b) => {
-        if (a.code && b.code) {
-          return a.code.localeCompare(b.code);
-        }
-        if (!a.code && !b.code) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.code ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        const codeA = a.code || "";
+        const codeB = b.code || "";
+        return codeA.localeCompare(codeB);
       },
+      render: (text) => (
+        <div
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}>
+          {text}
+        </div>
+      ),
     },
     {
       title: "Makine Tanımı",
       dataIndex: "definition",
       key: "definition",
       sorter: (a, b) => {
-        if (a.definition && b.definition) {
-          return a.definition.localeCompare(b.definition);
-        }
-        if (!a.definition && !b.definition) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.definition ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        const definitionA = a.definition || "";
+        const definitionB = b.definition || "";
+        return definitionA.localeCompare(definitionB);
       },
-      width: 150,
-      ellipsis: true,
+      width: "200px",
+      render: (text) => (
+        <div
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}>
+          {text}
+        </div>
+      ),
     },
     {
       title: "Lokasyon",
       dataIndex: "location",
       key: "location",
       sorter: (a, b) => {
-        if (a.location && b.location) {
-          return a.location.localeCompare(b.location);
-        }
-        if (!a.location && !b.location) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.location ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        const locationA = a.location || "";
+        const locationB = b.location || "";
+        return locationA.localeCompare(locationB);
       },
-      width: 150,
-      ellipsis: true,
+      render: (text) => (
+        <div
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}>
+          {text}
+        </div>
+      ),
     },
     {
       title: "Makine Tipi",
       dataIndex: "machine_type",
       key: "machine_type",
       sorter: (a, b) => {
-        if (a.machine_type && b.machine_type) {
-          return a.momachine_typedel.localeCompare(b.machine_type);
-        }
-        if (!a.machine_type && !b.machine_type) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.machine_type ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        const machineTypeA = a.machine_type || "";
+        const machineTypeB = b.machine_type || "";
+        return machineTypeA.localeCompare(machineTypeB);
       },
-      width: 150,
-      ellipsis: true,
+      render: (text) => (
+        <div
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}>
+          {text}
+        </div>
+      ),
     },
     {
       title: "Kategori",
       dataIndex: "category",
       key: "category",
       sorter: (a, b) => {
-        if (a.category && b.category) {
-          return a.category.localeCompare(b.category);
-        }
-        if (!a.category && !b.category) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.category ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        const categoryA = a.category || "";
+        const categoryB = b.category || "";
+        return categoryA.localeCompare(categoryB);
       },
-      width: 150,
-      ellipsis: true,
+      render: (text) => (
+        <div
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}>
+          {text}
+        </div>
+      ),
     },
     {
       title: "Marka",
       dataIndex: "brand",
       key: "brand",
       sorter: (a, b) => {
-        if (a.brand && b.brand) {
-          return a.brand.localeCompare(b.brand);
-        }
-        if (!a.brand && !b.brand) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.brand ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        const brandA = a.brand || "";
+        const brandB = b.brand || "";
+        return brandA.localeCompare(brandB);
       },
-      width: 150,
-      ellipsis: true,
+      render: (text) => (
+        <div
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}>
+          {text}
+        </div>
+      ),
     },
     {
       title: "Model",
       dataIndex: "model",
       key: "model",
       sorter: (a, b) => {
-        if (a.model && b.model) {
-          return a.model.localeCompare(b.model);
-        }
-        if (!a.model && !b.model) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.model ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        const modelA = a.model || "";
+        const modelB = b.model || "";
+        return modelA.localeCompare(modelB);
       },
-      width: 150,
-      ellipsis: true,
+      render: (text) => (
+        <div
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}>
+          {text}
+        </div>
+      ),
     },
     {
       title: "Seri No",
       dataIndex: "serial_no",
       key: "serial_no",
       sorter: (a, b) => {
-        if (a.serial_no && b.serial_no) {
-          return a.serial_no.localeCompare(b.serial_no);
-        }
-        if (!a.serial_no && !b.serial_no) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.serial_no ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        const serialNoA = a.serial_no || "";
+        const serialNoB = b.serial_no || "";
+        return serialNoA.localeCompare(serialNoB);
       },
-      width: 150,
-      ellipsis: true,
+      render: (text) => (
+        <div
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}>
+          {text}
+        </div>
+      ),
     },
   ];
 
