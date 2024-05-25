@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table } from "antd";
 import AxiosInstance from "../../../../../api/http";
 import dayjs from "dayjs";
-import SearchField from "./SearchField"
+import SearchField from "./SearchField";
 // import Filters from "./filter/Filters"
 import { Controller, useFormContext } from "react-hook-form";
 
@@ -30,13 +30,9 @@ export default function MakineTablo({ workshopSelectedId, onSubmit }) {
       dataIndex: "code",
       key: "code",
       sorter: (a, b) => {
-        if (a.code && b.code) {
-          return a.code.localeCompare(b.code);
-        }
-        if (!a.code && !b.code) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.code ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        const codeA = a.code || "";
+        const codeB = b.code || "";
+        return codeA.localeCompare(codeB);
       },
       render: (text) => (
         <div
@@ -54,13 +50,9 @@ export default function MakineTablo({ workshopSelectedId, onSubmit }) {
       dataIndex: "definition",
       key: "definition",
       sorter: (a, b) => {
-        if (a.definition && b.definition) {
-          return a.definition.localeCompare(b.definition);
-        }
-        if (!a.definition && !b.definition) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.definition ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        const definitionA = a.definition || "";
+        const definitionB = b.definition || "";
+        return definitionA.localeCompare(definitionB);
       },
       width: "200px",
       render: (text) => (
@@ -79,13 +71,9 @@ export default function MakineTablo({ workshopSelectedId, onSubmit }) {
       dataIndex: "location",
       key: "location",
       sorter: (a, b) => {
-        if (a.location && b.location) {
-          return a.location.localeCompare(b.location);
-        }
-        if (!a.location && !b.location) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.location ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        const locationA = a.location || "";
+        const locationB = b.location || "";
+        return locationA.localeCompare(locationB);
       },
       render: (text) => (
         <div
@@ -103,13 +91,9 @@ export default function MakineTablo({ workshopSelectedId, onSubmit }) {
       dataIndex: "machine_type",
       key: "machine_type",
       sorter: (a, b) => {
-        if (a.machine_type && b.machine_type) {
-          return a.momachine_typedel.localeCompare(b.machine_type);
-        }
-        if (!a.machine_type && !b.machine_type) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.machine_type ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        const machineTypeA = a.machine_type || "";
+        const machineTypeB = b.machine_type || "";
+        return machineTypeA.localeCompare(machineTypeB);
       },
       render: (text) => (
         <div
@@ -127,13 +111,9 @@ export default function MakineTablo({ workshopSelectedId, onSubmit }) {
       dataIndex: "category",
       key: "category",
       sorter: (a, b) => {
-        if (a.category && b.category) {
-          return a.category.localeCompare(b.category);
-        }
-        if (!a.category && !b.category) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.category ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        const categoryA = a.category || "";
+        const categoryB = b.category || "";
+        return categoryA.localeCompare(categoryB);
       },
       render: (text) => (
         <div
@@ -151,13 +131,9 @@ export default function MakineTablo({ workshopSelectedId, onSubmit }) {
       dataIndex: "brand",
       key: "brand",
       sorter: (a, b) => {
-        if (a.brand && b.brand) {
-          return a.brand.localeCompare(b.brand);
-        }
-        if (!a.brand && !b.brand) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.brand ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        const brandA = a.brand || "";
+        const brandB = b.brand || "";
+        return brandA.localeCompare(brandB);
       },
       render: (text) => (
         <div
@@ -175,13 +151,9 @@ export default function MakineTablo({ workshopSelectedId, onSubmit }) {
       dataIndex: "model",
       key: "model",
       sorter: (a, b) => {
-        if (a.model && b.model) {
-          return a.model.localeCompare(b.model);
-        }
-        if (!a.model && !b.model) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.model ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        const modelA = a.model || "";
+        const modelB = b.model || "";
+        return modelA.localeCompare(modelB);
       },
       render: (text) => (
         <div
@@ -199,13 +171,9 @@ export default function MakineTablo({ workshopSelectedId, onSubmit }) {
       dataIndex: "serial_no",
       key: "serial_no",
       sorter: (a, b) => {
-        if (a.serial_no && b.serial_no) {
-          return a.serial_no.localeCompare(b.serial_no);
-        }
-        if (!a.serial_no && !b.serial_no) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.serial_no ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        const serialNoA = a.serial_no || "";
+        const serialNoB = b.serial_no || "";
+        return serialNoA.localeCompare(serialNoB);
       },
       render: (text) => (
         <div
