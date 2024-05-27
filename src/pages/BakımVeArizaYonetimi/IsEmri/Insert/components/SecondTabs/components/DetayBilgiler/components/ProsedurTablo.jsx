@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Table, Tabs, Input } from "antd";
+import { Button, Modal, Table, Tabs, Input, Spin } from "antd";
 import { useFormContext, Controller } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../../api/http";
 import styled from "styled-components";
@@ -63,7 +63,9 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
   const [selectedRowKeys2, setSelectedRowKeys2] = useState([]);
   const [data1, setData1] = useState([]);
   const [data2, setData2] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [loadingData1, setLoadingData1] = useState(true);
+  const [loadingData2, setLoadingData2] = useState(true);
 
   const [searchTerm1, setSearchTerm1] = useState("");
   const [searchTerm2, setSearchTerm2] = useState("");
@@ -123,6 +125,9 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
 
   const fetch = useCallback(() => {
     setLoading(true);
+    setLoadingData1(true);
+    setLoadingData2(true);
+
     // İlk tablo verilerini çeken API isteği
     AxiosInstance.get(`GetProsedur?tipId=1`)
       .then((response) => {
@@ -132,7 +137,8 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
         }));
         setData1(fetchedData);
       })
-      .finally(() => setLoading(false));
+      .catch((error) => console.error("API Error:", error))
+      .finally(() => setLoadingData1(false));
 
     // İkinci tablo verilerini çeken API isteği
     AxiosInstance.get(`GetProsedur?tipId=2`)
@@ -143,8 +149,15 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
         }));
         setData2(fetchedData);
       })
-      .finally(() => setLoading(false));
+      .catch((error) => console.error("API Error:", error))
+      .finally(() => setLoadingData2(false));
   }, []);
+
+  useEffect(() => {
+    if (!loadingData1 && !loadingData2) {
+      setLoading(false);
+    }
+  }, [loadingData1, loadingData2]);
 
   const handleModalToggle = () => {
     setIsModalVisible((prev) => !prev);
@@ -295,7 +308,9 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
     <div>
       <Button onClick={handleModalToggle}> + </Button>
       <Modal width={1200} centered title="" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
-        <StyledTabs defaultActiveKey="1" items={visibleTabItems} />
+        <Spin spinning={loading}>
+          <StyledTabs defaultActiveKey="1" items={visibleTabItems} />
+        </Spin>
       </Modal>
     </div>
   );
