@@ -205,7 +205,10 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
       const filtered = data1.filter((item) =>
         Object.keys(item).some(
           (key) =>
-            item[key] && normalizeText(item[key].toString()).toLowerCase().includes(normalizedSearchTerm.toLowerCase())
+            item[key] &&
+            normalizeText(item[key].toString())
+              .toLowerCase()
+              .includes(normalizedSearchTerm.toLowerCase())
         )
       );
       setFilteredData1(filtered);
@@ -222,7 +225,10 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
       const filtered = data2.filter((item) =>
         Object.keys(item).some(
           (key) =>
-            item[key] && normalizeText(item[key].toString()).toLowerCase().includes(normalizedSearchTerm.toLowerCase())
+            item[key] &&
+            normalizeText(item[key].toString())
+              .toLowerCase()
+              .includes(normalizedSearchTerm.toLowerCase())
         )
       );
       setFilteredData2(filtered);
@@ -252,7 +258,9 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
               onChange: onRowSelectChange1,
             }}
             columns={columns1}
-            dataSource={filteredData1.length > 0 || searchTerm1 ? filteredData1 : data1}
+            dataSource={
+              filteredData1.length > 0 || searchTerm1 ? filteredData1 : data1
+            }
             loading={loading}
             scroll={{
               y: "calc(100vh - 360px)",
@@ -279,7 +287,9 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
               onChange: onRowSelectChange2,
             }}
             columns={columns2}
-            dataSource={filteredData2.length > 0 || searchTerm2 ? filteredData2 : data2}
+            dataSource={
+              filteredData2.length > 0 || searchTerm2 ? filteredData2 : data2
+            }
             loading={loading}
             scroll={{
               y: "calc(100vh - 360px)",
@@ -307,7 +317,14 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
-      <Modal width={1200} centered title="" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
+      <Modal
+        width={1200}
+        centered
+        title=""
+        open={isModalVisible}
+        onOk={handleModalOk}
+        onCancel={handleModalToggle}
+      >
         <Spin spinning={loading}>
           <StyledTabs defaultActiveKey="1" items={visibleTabItems} />
         </Spin>
