@@ -35,7 +35,9 @@ export default function AtolyeSubmit({ selectedRows, refreshTableData }) {
   useEffect(() => {
     const tbIsTalepId = selectedRows.map((row) => row.key).join(",");
     // Seçilen tüm kayıtların IST_DURUM_ID değerlerinin 0, 1 veya 2 olup olmadığını kontrol et
-    const isValidStatus = selectedRows.every((row) => [0, 1, 2].includes(row.IST_DURUM_ID));
+    const isValidStatus = selectedRows.every((row) =>
+      [0, 1, 2].includes(row.IST_DURUM_ID)
+    );
 
     setIsButtonDisabled(!atolyeID || !tbIsTalepId || !isValidStatus);
   }, [atolyeID, selectedRows]);
@@ -47,6 +49,7 @@ export default function AtolyeSubmit({ selectedRows, refreshTableData }) {
     const Body = selectedRows.map((row) => ({
       TALEP_ID: row.key, // Her bir satırın key değeri, TALEP_ID'ye eşitlenir.
       ATOLYE_ID: atolyeIDValue, // Yukarıda oluşturulan teknisyen ID'leri dizisi
+      ISM_WEB: true,
       TEKNISYEN_IDS: [],
     }));
 
@@ -60,8 +63,12 @@ export default function AtolyeSubmit({ selectedRows, refreshTableData }) {
           refreshTableData(); // Tablo verilerini yenile
         }, 1000); // 1000 milisaniye (1 saniye) bekler
         if (response.status_code === 200 || response.status_code === 201) {
-          const aciklamaValues = response.isEmriNolari.map((item) => item.Aciklama).join(", ");
-          message.success(aciklamaValues + " Numaralı İş Emirleri Oluşturulmuştur.");
+          const aciklamaValues = response.isEmriNolari
+            .map((item) => item.Aciklama)
+            .join(", ");
+          message.success(
+            aciklamaValues + " Numaralı İş Emirleri Oluşturulmuştur."
+          );
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
@@ -86,7 +93,10 @@ export default function AtolyeSubmit({ selectedRows, refreshTableData }) {
   return (
     <FormProvider {...methods}>
       <div style={{ display: "flex", width: "100%", maxWidth: "315px" }}>
-        <form style={{ width: "100%" }} onSubmit={methods.handleSubmit(onSubmited)}>
+        <form
+          style={{ width: "100%" }}
+          onSubmit={methods.handleSubmit(onSubmited)}
+        >
           <AtolyeIsEmriCevir selectedRows={selectedRows} />
         </form>
         <Button

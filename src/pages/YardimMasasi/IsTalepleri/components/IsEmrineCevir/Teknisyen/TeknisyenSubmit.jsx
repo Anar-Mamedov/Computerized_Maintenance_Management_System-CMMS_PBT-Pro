@@ -34,7 +34,9 @@ export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
   // personelID veya selectedRows değiştiğinde butonun durumunu güncelle
   useEffect(() => {
     const tbIsTalepId = selectedRows.map((row) => row.key).join(",");
-    const isValidStatus = selectedRows.every((row) => [0, 1, 2].includes(row.IST_DURUM_ID));
+    const isValidStatus = selectedRows.every((row) =>
+      [0, 1, 2].includes(row.IST_DURUM_ID)
+    );
 
     setIsButtonDisabled(!personelID || !tbIsTalepId || !isValidStatus);
   }, [personelID, selectedRows]);
@@ -50,6 +52,7 @@ export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
     const Body = selectedRows.map((row) => ({
       TALEP_ID: row.key, // Her bir satırın key değeri, TALEP_ID'ye eşitlenir.
       TEKNISYEN_IDS: teknisyenIds, // Yukarıda oluşturulan teknisyen ID'leri dizisi
+      ISM_WEB: true,
     }));
 
     // Template literals kullanarak URL içerisinde dinamik değerleri kullan
@@ -62,8 +65,12 @@ export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
           refreshTableData(); // Tablo verilerini yenile
         }, 1000); // 1000 milisaniye (1 saniye) bekler
         if (response.status_code === 200 || response.status_code === 201) {
-          const aciklamaValues = response.isEmriNolari.map((item) => item.Aciklama).join(", ");
-          message.success(aciklamaValues + " Numaralı İş Emirleri Oluşturulmuştur.");
+          const aciklamaValues = response.isEmriNolari
+            .map((item) => item.Aciklama)
+            .join(", ");
+          message.success(
+            aciklamaValues + " Numaralı İş Emirleri Oluşturulmuştur."
+          );
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
@@ -88,7 +95,10 @@ export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
   return (
     <FormProvider {...methods}>
       <div style={{ display: "flex", width: "100%", maxWidth: "335px" }}>
-        <form style={{ width: "100%" }} onSubmit={methods.handleSubmit(onSubmited)}>
+        <form
+          style={{ width: "100%" }}
+          onSubmit={methods.handleSubmit(onSubmited)}
+        >
           <TeknisyenIsEmriCevir selectedRows={selectedRows} />
         </form>
         <Button
