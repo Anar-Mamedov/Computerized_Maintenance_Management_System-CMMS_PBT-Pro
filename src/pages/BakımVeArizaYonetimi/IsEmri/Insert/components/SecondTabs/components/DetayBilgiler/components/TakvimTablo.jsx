@@ -81,7 +81,7 @@ export default function TakvimTablo({ workshopSelectedId, onSubmit }) {
       <Modal
         width={1200}
         centered
-        title="Atölye Tanımları"
+        title="Takvim Tanımları"
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}>
