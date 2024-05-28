@@ -1,5 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Tag, message } from "antd";
+import {
+  Table,
+  Button,
+  Modal,
+  Checkbox,
+  Input,
+  Spin,
+  Tag,
+  message,
+} from "antd";
 import { useFormContext } from "react-hook-form";
 import { SearchOutlined, MenuOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../api/http";
@@ -145,14 +154,16 @@ export default function MainTable() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-            }}>
+            }}
+          >
             <Tag
               style={{
                 textAlign: "center",
                 backgroundColor: hexToRGBA(color, 0.2),
                 border: `1.2px solid ${hexToRGBA(color, 0.7)}`,
                 color: color,
-              }}>
+              }}
+            >
               {text}
             </Tag>
           </div>
@@ -322,7 +333,9 @@ export default function MainTable() {
         let baslangicTarihi, bitisTarihi;
         // IST_ACILIS_TARIHI ve IST_ACILIS_SAATI'nin tarih ve saatini al
         baslangicTarihi = dayjs(
-          record.IST_ACILIS_TARIHI.split("T")[0] + "T" + record.IST_ACILIS_SAATI,
+          record.IST_ACILIS_TARIHI.split("T")[0] +
+            "T" +
+            record.IST_ACILIS_SAATI,
           "YYYY-MM-DDTHH:mm:ss"
         );
 
@@ -335,7 +348,9 @@ export default function MainTable() {
           if (record.IST_KAPAMA_TARIHI && record.IST_KAPAMA_SAATI) {
             // IST_KAPAMA_TARIHI ve IST_KAPAMA_SAATI'nin tarih ve saatini al
             bitisTarihi = dayjs(
-              record.IST_KAPAMA_TARIHI.split("T")[0] + "T" + record.IST_KAPAMA_SAATI,
+              record.IST_KAPAMA_TARIHI.split("T")[0] +
+                "T" +
+                record.IST_KAPAMA_SAATI,
               "YYYY-MM-DDTHH:mm:ss"
             );
           } else {
@@ -356,9 +371,9 @@ export default function MainTable() {
         const farkGun = Math.floor(farkSaat / 24);
         // İşlem süresini formatla ve döndür
         // return `${farkGun > 0 ? farkGun + " gün " : ""}${farkSaat % 24} saat ${farkDakika % 60} dakika `;
-        return `${farkGun > 0 ? farkGun + " gün " : ""}${farkSaat % 24 > 0 ? (farkSaat % 24) + " saat " : ""}${
-          farkDakika % 60 > 0 ? (farkDakika % 60) + " dakika " : ""
-        }`;
+        return `${farkGun > 0 ? farkGun + " gün " : ""}${
+          farkSaat % 24 > 0 ? (farkSaat % 24) + " saat " : ""
+        }${farkDakika % 60 > 0 ? (farkDakika % 60) + " dakika " : ""}`;
       },
     },
     {
@@ -664,7 +679,9 @@ export default function MainTable() {
       width: 300,
       sorter: (a, b) => {
         if (a.IST_BILDIREN_LOKASYON_TUM && b.IST_BILDIREN_LOKASYON_TUM) {
-          return a.IST_BILDIREN_LOKASYON_TUM.localeCompare(b.IST_BILDIREN_LOKASYON_TUM);
+          return a.IST_BILDIREN_LOKASYON_TUM.localeCompare(
+            b.IST_BILDIREN_LOKASYON_TUM
+          );
         }
         if (!a.IST_BILDIREN_LOKASYON_TUM && !b.IST_BILDIREN_LOKASYON_TUM) {
           return 0; // Both are null or undefined, consider them equal
@@ -713,7 +730,9 @@ export default function MainTable() {
 
   const [visibleColumnKeys, setVisibleColumnKeys] = useState(() => {
     // 'visibleColumns' isimli anahtarla kaydedilmiş değeri oku
-    const savedVisibleColumns = JSON.parse(localStorage.getItem("visibleColumnsIsTalep"));
+    const savedVisibleColumns = JSON.parse(
+      localStorage.getItem("visibleColumnsIsTalep")
+    );
 
     // Eğer localStorage'da bir değer varsa, bu değeri kullan
     if (savedVisibleColumns) {
@@ -734,7 +753,9 @@ export default function MainTable() {
 
     // Örnek bir tarih formatla ve ay formatını belirle
     const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
-    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(
+      sampleDate
+    );
 
     let monthFormat;
     if (sampleFormatted.includes("January")) {
@@ -1010,7 +1031,9 @@ export default function MainTable() {
       setValue("selectedLokasyonId", null);
     }
     // Seçilen satırların verisini bul
-    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
+    const newSelectedRows = data.filter((row) =>
+      newSelectedRowKeys.includes(row.key)
+    );
     setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
   };
 
@@ -1058,7 +1081,10 @@ export default function MainTable() {
   const handleVisibilityChange = (checkedValues) => {
     setVisibleColumnKeys(checkedValues);
     // Yeni görünürlük durumunu localStorage'a kaydet
-    localStorage.setItem("visibleColumnsIsTalep", JSON.stringify(checkedValues));
+    localStorage.setItem(
+      "visibleColumnsIsTalep",
+      JSON.stringify(checkedValues)
+    );
   };
 
   // Modalı göster/gizle
@@ -1067,7 +1093,9 @@ export default function MainTable() {
   };
 
   // Görünür kolonları filtrele
-  const visibleColumns = columns.filter((col) => visibleColumnKeys.includes(col.key));
+  const visibleColumns = columns.filter((col) =>
+    visibleColumnKeys.includes(col.key)
+  );
 
   // Kolon görünürlüğünü güncelleme fonksiyonu son
 
@@ -1081,11 +1109,24 @@ export default function MainTable() {
         `}
       </style>
 
-      <Modal width={750} title="Kolonları Düzenle" open={isModalVisible} onOk={toggleModal} onCancel={toggleModal}>
+      <Modal
+        width={750}
+        title="Kolonları Düzenle"
+        open={isModalVisible}
+        onOk={toggleModal}
+        onCancel={toggleModal}
+      >
         <Checkbox.Group
-          style={{ width: "100%", display: "flex", gap: "10px", flexDirection: "column", height: "400px" }}
+          style={{
+            width: "100%",
+            display: "flex",
+            gap: "10px",
+            flexDirection: "column",
+            height: "400px",
+          }}
           value={visibleColumnKeys}
-          onChange={handleVisibilityChange}>
+          onChange={handleVisibilityChange}
+        >
           {columns.map((col) => (
             <Checkbox key={col.key} value={col.key}>
               {col.title}
@@ -1096,13 +1137,21 @@ export default function MainTable() {
       <div
         style={{
           display: "flex",
-          flexWrap: "wrap",
           justifyContent: "space-between",
           marginBottom: "20px",
           gap: "10px",
           padding: "0 5px",
-        }}>
-        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            alignItems: "center",
+            flexWrap: "wrap",
+            width: "100%",
+          }}
+        >
           <Button
             style={{
               display: "flex",
@@ -1112,7 +1161,8 @@ export default function MainTable() {
               // width: "32px",
               height: "32px",
             }}
-            onClick={toggleModal}>
+            onClick={toggleModal}
+          >
             <MenuOutlined />
           </Button>
           <Input
@@ -1124,12 +1174,24 @@ export default function MainTable() {
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
           <Filters onChange={handleBodyChange} />
-          <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
-          <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
+          <TeknisyenSubmit
+            selectedRows={selectedRows}
+            refreshTableData={refreshTableData}
+          />
+          <AtolyeSubmit
+            selectedRows={selectedRows}
+            refreshTableData={refreshTableData}
+          />
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
-          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
-          <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
+          <ContextMenu
+            selectedRows={selectedRows}
+            refreshTableData={refreshTableData}
+          />
+          <CreateDrawer
+            selectedLokasyonId={selectedRowKeys[0]}
+            onRefresh={refreshTableData}
+          />
         </div>
       </div>
       <Spin spinning={loading}>
@@ -1152,7 +1214,9 @@ export default function MainTable() {
           onRow={onRowClick}
           scroll={{ y: "calc(100vh - 380px)" }}
           onChange={handleTableChange}
-          rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
+          rowClassName={(record) =>
+            record.IST_DURUM_ID === 0 ? "boldRow" : ""
+          }
         />
       </Spin>
 

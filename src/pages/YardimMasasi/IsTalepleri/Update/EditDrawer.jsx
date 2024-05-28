@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { Button, Drawer, Space, ConfigProvider, Modal, Spin, message } from "antd";
+import {
+  Button,
+  Drawer,
+  Space,
+  ConfigProvider,
+  Modal,
+  Spin,
+  message,
+  Tag,
+} from "antd";
 import tr_TR from "antd/es/locale/tr_TR";
 import AxiosInstance from "../../../../api/http";
 import MainTabs from "./components/MainTabs/MainTabs";
@@ -8,9 +17,15 @@ import Footer from "./components/Footer";
 import SecondTabs from "./components/SecondTabs/SecondTabs";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+
 dayjs.extend(customParseFormat);
 
-export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
+export default function EditDrawer({
+  selectedRow,
+  onDrawerClose,
+  drawerVisible,
+  onRefresh,
+}) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(drawerVisible);
   const [disabled, setDisabled] = useState(false);
@@ -159,7 +174,9 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         if (shouldFetchData) {
           setLoading(true); // Yükleme başladığında
           try {
-            const response = await AxiosInstance.get(`GetIsTalepById?isTalepId=${selectedRow.key}`);
+            const response = await AxiosInstance.get(
+              `GetIsTalepById?isTalepId=${selectedRow.key}`
+            );
             const data = response;
             const item = data[0]; // Veri dizisinin ilk elemanını al
 
@@ -356,9 +373,15 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       IST_EKIPMAN_ID: data.ekipmanID,
       IST_MAKINE_DURUM_KOD_ID: data.makineDurumuID,
       IST_ISEMRI_TIP_ID: data.isEmriTipiID,
-      IST_PLANLANAN_BASLAMA_TARIHI: formatDateWithDayjs(data.planlananBaslamaTarihi),
-      IST_PLANLANAN_BASLAMA_SAATI: formatTimeWithDayjs(data.planlananBaslamaSaati),
-      IST_PLANLANAN_BITIS_TARIHI: formatDateWithDayjs(data.planlananBitisTarihi),
+      IST_PLANLANAN_BASLAMA_TARIHI: formatDateWithDayjs(
+        data.planlananBaslamaTarihi
+      ),
+      IST_PLANLANAN_BASLAMA_SAATI: formatTimeWithDayjs(
+        data.planlananBaslamaSaati
+      ),
+      IST_PLANLANAN_BITIS_TARIHI: formatDateWithDayjs(
+        data.planlananBitisTarihi
+      ),
       IST_PLANLANAN_BITIS_SAATI: formatTimeWithDayjs(data.planlananBitisSaati),
       IST_ISEMRI_ID: data.isEmriNoID,
       IST_BASLAMA_TARIHI: formatDateWithDayjs(data.baslamaTarihi),
@@ -419,7 +442,11 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   useEffect(() => {
     // Örneğin, durum ID'si 4 (Kapandı) veya 5 (İptal Edildi) olduğunda formu disabled yap
-    if (selectedRow?.IST_DURUM_ID === 3 || selectedRow?.IST_DURUM_ID === 4 || selectedRow?.IST_DURUM_ID === 5) {
+    if (
+      selectedRow?.IST_DURUM_ID === 3 ||
+      selectedRow?.IST_DURUM_ID === 4 ||
+      selectedRow?.IST_DURUM_ID === 5
+    ) {
       setDisabled(true);
     } else {
       setDisabled(false);
@@ -434,39 +461,47 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     const getStatusProps = (statusId) => {
       switch (statusId) {
         case 0:
-          return { message: "Açık", backgroundColor: "blue" };
+          return { message: "Açık", color: "#1890ff" }; // Ant Design 'blue'
         case 1:
-          return { message: "Bekliyor", backgroundColor: "#ff5e00" };
+          return { message: "Bekliyor", color: "#ff5e00" };
         case 2:
-          return { message: "Planlandı", backgroundColor: "#ffe600" };
+          return { message: "Planlandı", color: "#ffe600" };
         case 3:
-          return { message: "Devam Ediyor", backgroundColor: "#00d300" };
+          return { message: "Devam Ediyor", color: "#00d300" };
         case 4:
-          return { message: "Kapandı", backgroundColor: "#575757" };
+          return { message: "Kapandı", color: "#575757" };
         case 5:
-          return { message: "İptal Edildi", backgroundColor: "#d10000" };
+          return { message: "İptal Edildi", color: "#d10000" };
         default:
-          return { message: "Bilinmiyor", backgroundColor: "gray" };
+          return { message: "Bilinmiyor", color: "gray" };
       }
     };
 
-    const { message, backgroundColor } = getStatusProps(statusId);
+    const hexToRGBA = (hex, opacity) => {
+      // Hex kodunu R, G, B değerlerine dönüştür
+      let r = parseInt(hex.slice(1, 3), 16),
+        g = parseInt(hex.slice(3, 5), 16),
+        b = parseInt(hex.slice(5, 7), 16);
+
+      // RGBA formatında string döndür
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    };
+
+    const { message, color } = getStatusProps(statusId);
 
     return (
       <div style={{ display: "flex", gap: "30px", alignItems: "center" }}>
         <div>İş Talebi Güncelle</div>
-        <div
+        <Tag
           style={{
-            color: "white",
-            backgroundColor,
             textAlign: "center",
-            borderRadius: "8px 8px 8px 8px",
-            padding: "4px 30px",
-            fontWeight: "300",
-            fontSize: "14px",
-          }}>
+            backgroundColor: hexToRGBA(color, 0.1),
+            border: `1.2px solid ${hexToRGBA(color, 0.7)}`,
+            color: color,
+          }}
+        >
           {message}
-        </div>
+        </Tag>
       </div>
     );
   };
@@ -478,7 +513,11 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       <ConfigProvider locale={tr_TR}>
         <Drawer
           width="1600px"
-          title={<StatusTitle statusId={selectedRow ? selectedRow.IST_DURUM_ID : null} />}
+          title={
+            <StatusTitle
+              statusId={selectedRow ? selectedRow.IST_DURUM_ID : null}
+            />
+          }
           placement="right"
           onClose={onClose}
           open={open}
@@ -489,22 +528,41 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
                 disabled={disabled}
                 type="submit"
                 onClick={methods.handleSubmit(onSubmit)}
-                style={{ backgroundColor: "#2bc770", borderColor: "#2bc770", color: "#ffffff" }}>
+                style={{
+                  backgroundColor: "#2bc770",
+                  borderColor: "#2bc770",
+                  color: "#ffffff",
+                }}
+              >
                 Güncelle
               </Button>
             </Space>
-          }>
+          }
+        >
           {loading ? (
             <Spin
               spinning={loading}
               size="large"
-              style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: "100vh",
+              }}
+            >
               {/* İçerik yüklenirken gösterilecek alan */}
             </Spin>
           ) : (
             <form onSubmit={methods.handleSubmit(onSubmit)}>
-              <MainTabs disabled={disabled} isDisabled={isDisabled} fieldRequirements={fieldRequirements} />
-              <SecondTabs disabled={disabled} fieldRequirements={fieldRequirements} />
+              <MainTabs
+                disabled={disabled}
+                isDisabled={isDisabled}
+                fieldRequirements={fieldRequirements}
+              />
+              <SecondTabs
+                disabled={disabled}
+                fieldRequirements={fieldRequirements}
+              />
               <Footer />
             </form>
           )}
