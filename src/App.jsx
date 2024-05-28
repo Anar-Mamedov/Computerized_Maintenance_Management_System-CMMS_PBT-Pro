@@ -419,13 +419,15 @@ const MenuWrapper = () => {
   };
 
   return (
-    <Menu
-      theme="dark"
-      defaultSelectedKeys={[location.pathname.split("/")[1]]}
-      mode="inline"
-      items={items}
-      openKeys={openKeys}
-      onOpenChange={onOpenChange}
-    />
+    <div style={{ height: "calc(100vh - 115px)", overflow: "auto" }}>
+      <Menu
+        theme="dark"
+        defaultSelectedKeys={[location.pathname.split("/")[1]]}
+        mode="inline"
+        items={items}
+        openKeys={openKeys}
+        onOpenChange={onOpenChange}
+      />
+    </div>
   );
 };
