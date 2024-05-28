@@ -1,7 +1,8 @@
 import axios from "axios";
 
 // `localStorage`'dan baseURL alınıyor
-const baseURL = localStorage.getItem("baseURL") || import.meta.env.VITE_API_BASE_URL;
+const baseURL =
+  localStorage.getItem("baseURL") || import.meta.env.VITE_API_BASE_URL;
 
 const AxiosInstance = axios.create({
   baseURL: `${baseURL}/api/`, // baseURL artık dinamik
@@ -27,7 +28,12 @@ AxiosInstance.interceptors.response.use(
 );
 
 AxiosInstance.interceptors.request.use(function (request) {
+  const user = JSON.parse(localStorage.getItem("user"));
   request.headers.Authorization = `Bearer ${localStorage.getItem("token")}`;
+  if (user) {
+    // user objesi varsa
+    request.headers["User-Id"] = user.userId; // User-Id başlığını ekliyoruz
+  }
   // request.headers["User-Id"] = localStorage.getItem("userId");
   return request;
 });
@@ -57,7 +63,12 @@ PdfAxiosInstance.interceptors.response.use(
 );
 
 PdfAxiosInstance.interceptors.request.use(function (request) {
+  const user = JSON.parse(localStorage.getItem("user"));
   request.headers.Authorization = `Bearer ${localStorage.getItem("token")}`;
+  if (user) {
+    // user objesi varsa
+    request.headers["User-Id"] = user.userId; // User-Id başlığını ekliyoruz
+  }
   // request.headers["User-Id"] = localStorage.getItem("userId");
   return request;
 });
