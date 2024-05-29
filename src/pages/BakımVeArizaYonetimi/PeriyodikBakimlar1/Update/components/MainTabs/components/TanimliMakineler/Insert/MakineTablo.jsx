@@ -280,7 +280,7 @@ export default function MakineTablo({ workshopSelectedId, onSubmit }) {
       onSubmit && onSubmit(selectedData);
     }
     setIsModalVisible(false);
-    console.log("selectedData", selectedData);
+    // console.log("selectedData", selectedData);
   };
 
   useEffect(() => {
