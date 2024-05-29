@@ -5,6 +5,7 @@ import AxiosInstance from "../../../../../../../../api/http";
 import dayjs from "dayjs";
 import CreateModal from "./Insert/CreateModal";
 import EditModal from "./Update/EditModal";
+import MakineTablo from "./Insert/MakineTablo.jsx";
 
 export default function TanimliMakinelerTablo() {
   const [loading, setLoading] = useState(false);
@@ -270,7 +271,8 @@ export default function TanimliMakinelerTablo() {
 
   return (
     <div>
-      <CreateModal onRefresh={refreshTable} secilenBakimID={secilenBakimID} />
+      {/*<CreateModal onRefresh={refreshTable} secilenBakimID={secilenBakimID} />*/}
+      <MakineTablo />
       <Table
         rowSelection={{
           type: "radio",
