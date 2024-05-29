@@ -273,7 +273,7 @@ export default function TanimliMakinelerTablo() {
 
   const handleMakineTabloSubmit = (data) => {
     // Burada data ile istediğiniz işlemi yapabilirsiniz
-    console.log("Makine tablosundan gelen veri:", data);
+    // console.log("Makine tablosundan gelen veri:", data);
     if (data) {
       setModalData(data); // data'yı modalData state'ine kaydet
       setIsCreateModalVisible(true);
@@ -285,7 +285,9 @@ export default function TanimliMakinelerTablo() {
     setModalData((prevData) => {
       if (prevData.length > 1) {
         // Eğer daha fazla obje varsa, bir sonrakini al ve modalı tekrar aç
-        setIsCreateModalVisible(true);
+        setTimeout(() => {
+          setIsCreateModalVisible(true); // 1 saniye bekledikten sonra modalı aç
+        }, 300); // 1000 milisaniye = 1 saniye
         return prevData.slice(1); // İlk objeyi atla
       } else {
         // Eğer daha fazla obje yoksa, modalData'yı boş bir dizi yap
