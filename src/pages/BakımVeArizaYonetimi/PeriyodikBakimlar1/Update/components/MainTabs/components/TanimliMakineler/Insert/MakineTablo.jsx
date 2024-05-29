@@ -273,13 +273,14 @@ export default function MakineTablo({ workshopSelectedId, onSubmit }) {
   };
 
   const handleModalOk = () => {
-    const selectedData = table.data.find(
-      (item) => item.key === selectedRowKeys[0]
+    const selectedData = selectedRowKeys.map((key) =>
+      table.data.find((item) => item.key === key)
     );
-    if (selectedData) {
+    if (selectedData.length > 0) {
       onSubmit && onSubmit(selectedData);
     }
     setIsModalVisible(false);
+    console.log("selectedData", selectedData);
   };
 
   useEffect(() => {
@@ -287,7 +288,8 @@ export default function MakineTablo({ workshopSelectedId, onSubmit }) {
   }, [workshopSelectedId]);
 
   const onRowSelectChange = (selectedKeys) => {
-    setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
+    // setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
+    setSelectedRowKeys(selectedKeys); // Change this line
   };
 
   return (
@@ -333,7 +335,7 @@ export default function MakineTablo({ workshopSelectedId, onSubmit }) {
 
         <Table
           rowSelection={{
-            type: "radio",
+            type: "checkbox",
             selectedRowKeys,
             onChange: onRowSelectChange,
           }}
