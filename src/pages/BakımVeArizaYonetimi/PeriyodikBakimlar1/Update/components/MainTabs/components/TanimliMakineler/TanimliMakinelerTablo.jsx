@@ -14,6 +14,8 @@ export default function TanimliMakinelerTablo() {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
+  const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
+  const [modalData, setModalData] = useState([]);
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 
@@ -269,10 +271,37 @@ export default function TanimliMakinelerTablo() {
     fetch(); // fetch fonksiyonu tabloyu yeniler
   }, [fetch]);
 
+  const handleMakineTabloSubmit = (data) => {
+    // Burada data ile istediğiniz işlemi yapabilirsiniz
+    console.log("Makine tablosundan gelen veri:", data);
+    if (data) {
+      setModalData(data); // data'yı modalData state'ine kaydet
+      setIsCreateModalVisible(true);
+    }
+  };
+
+  const handleModalClose = () => {
+    setIsCreateModalVisible(false); // Modalı kapat
+    setModalData((prevData) => {
+      if (prevData.length > 1) {
+        // Eğer daha fazla obje varsa, bir sonrakini al ve modalı tekrar aç
+        setIsCreateModalVisible(true);
+        return prevData.slice(1); // İlk objeyi atla
+      } else {
+        // Eğer daha fazla obje yoksa, modalData'yı boş bir dizi yap
+        return [];
+      }
+    });
+  };
+
   return (
     <div>
-      {/*<CreateModal onRefresh={refreshTable} secilenBakimID={secilenBakimID} />*/}
-      <MakineTablo />
+      <CreateModal
+        visible={isCreateModalVisible}
+        onCancel={handleModalClose} // Modal kapatıldığında handleModalClose fonksiyonunu çağır
+        data={modalData[0]} // İlk objeyi CreateModal'a ver
+      />
+      <MakineTablo onSubmit={handleMakineTabloSubmit} />
       <Table
         rowSelection={{
           type: "radio",

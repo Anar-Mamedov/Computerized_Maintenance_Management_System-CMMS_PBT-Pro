@@ -4,8 +4,18 @@ import { PlusOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../../api/http";
 import { Controller, useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
+import PeryotBakimBilgileriEkle from "./MainTabs/PeryotBakimBilgileriEkle.jsx";
+import dayjs from "dayjs";
 
-export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenBakimID }) {
+export default function CreateModal({
+  workshopSelectedId,
+  onSubmit,
+  onRefresh,
+  secilenBakimID,
+  visible,
+  onCancel,
+  data,
+}) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const methods = useForm({
     defaultValues: {
@@ -18,6 +28,16 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
   });
 
   const { setValue, reset, handleSubmit } = methods;
+
+  useEffect(() => {
+    if (visible && data) {
+      setValue("makineID", data.TB_MAKINE_ID);
+      setValue("makineKodu", data.MKN_KOD);
+      setValue("makineTanimi", data.MKN_TANIM);
+      setValue("makineLokasyon", data.MKN_LOKASYON);
+      setValue("makineTipi", data.MKN_TIP);
+    }
+  }, [data, visible, setValue]);
 
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi
 
@@ -71,19 +91,32 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
   return (
     <FormProvider {...methods}>
       <div>
-        <div style={{ display: "flex", width: "100%", justifyContent: "flex-end", marginBottom: "10px" }}>
-          <Button type="link" onClick={handleModalToggle}>
+        <div
+          style={{
+            display: "flex",
+            width: "100%",
+            justifyContent: "flex-end",
+            marginBottom: "10px",
+          }}
+        >
+          <Button
+            style={{ display: "none" }}
+            type="link"
+            onClick={handleModalToggle}
+          >
             <PlusOutlined /> Yeni Kayıt
           </Button>
         </div>
 
         <Modal
-          width="800px"
-          title="Kontrol Listesi Ekle"
-          open={isModalVisible}
+          width="500px"
+          title="Peryodik Bakım Bilgileri Ekle"
+          open={visible}
+          onCancel={onCancel}
           onOk={handleModalOk}
-          onCancel={handleModalToggle}>
-          <MainTabs />
+        >
+          {/*<MainTabs />*/}
+          <PeryotBakimBilgileriEkle />
         </Modal>
       </div>
     </FormProvider>
