@@ -1,7 +1,30 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
-import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
-import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
+import {
+  Table,
+  Button,
+  Modal,
+  Checkbox,
+  Input,
+  Spin,
+  Typography,
+  Tag,
+  Progress,
+  message,
+} from "antd";
+import {
+  HolderOutlined,
+  SearchOutlined,
+  MenuOutlined,
+  CheckOutlined,
+  CloseOutlined,
+} from "@ant-design/icons";
+import {
+  DndContext,
+  useSensor,
+  useSensors,
+  PointerSensor,
+  KeyboardSensor,
+} from "@dnd-kit/core";
 import {
   sortableKeyboardCoordinates,
   arrayMove,
@@ -59,7 +82,8 @@ const ResizableTitle = (props) => {
       onResize={onResize}
       draggableOpts={{
         enableUserSelectHack: false,
-      }}>
+      }}
+    >
       <th {...restProps} />
     </Resizable>
   );
@@ -68,8 +92,25 @@ const ResizableTitle = (props) => {
 
 // Sütunların sürüklenebilir olmasını sağlayan component
 
-const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onVisibilityChange, ...restProps }) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+const DraggableRow = ({
+  id,
+  text,
+  index,
+  moveRow,
+  className,
+  style,
+  visible,
+  onVisibilityChange,
+  ...restProps
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
   const styleWithTransform = {
     ...style,
     transform: CSS.Transform.toString(transform),
@@ -82,13 +123,26 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
   };
 
   return (
-    <div ref={setNodeRef} style={styleWithTransform} {...restProps} {...attributes}>
+    <div
+      ref={setNodeRef}
+      style={styleWithTransform}
+      {...restProps}
+      {...attributes}
+    >
       {/* <Checkbox
         checked={visible}
         onChange={(e) => onVisibilityChange(index, e.target.checked)}
         style={{ marginLeft: "auto" }}
       /> */}
-      <div {...listeners} style={{ cursor: "grab", flexGrow: 1, display: "flex", alignItems: "center" }}>
+      <div
+        {...listeners}
+        style={{
+          cursor: "grab",
+          flexGrow: 1,
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
         <HolderOutlined style={{ marginRight: 8 }} />
         {text}
       </div>
@@ -245,13 +299,15 @@ const MainTable = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-          }}>
+          }}
+        >
           <Tag
             style={{
               backgroundColor: hexToRGBA(record.ISM_TIP_RENK, 0.2),
               border: `1.2px solid ${hexToRGBA(record.ISM_TIP_RENK, 0.7)}`,
               color: record.ISM_TIP_RENK,
-            }}>
+            }}
+          >
             {text}
           </Tag>
         </div>
@@ -370,7 +426,8 @@ const MainTable = () => {
       key: "PLAN_BASLAMA_TARIH",
       width: 150,
       sorter: (a, b) => {
-        if (a.PLAN_BASLAMA_TARIH === null && b.PLAN_BASLAMA_TARIH === null) return 0;
+        if (a.PLAN_BASLAMA_TARIH === null && b.PLAN_BASLAMA_TARIH === null)
+          return 0;
         if (a.PLAN_BASLAMA_TARIH === null) return 1;
         if (b.PLAN_BASLAMA_TARIH === null) return -1;
         return a.PLAN_BASLAMA_TARIH.localeCompare(b.PLAN_BASLAMA_TARIH);
@@ -391,7 +448,8 @@ const MainTable = () => {
       key: "PLAN_BASLAMA_SAAT",
       width: 150,
       sorter: (a, b) => {
-        if (a.PLAN_BASLAMA_SAAT === null && b.PLAN_BASLAMA_SAAT === null) return 0;
+        if (a.PLAN_BASLAMA_SAAT === null && b.PLAN_BASLAMA_SAAT === null)
+          return 0;
         if (a.PLAN_BASLAMA_SAAT === null) return 1;
         if (b.PLAN_BASLAMA_SAAT === null) return -1;
         return a.PLAN_BASLAMA_SAAT.localeCompare(b.PLAN_BASLAMA_SAAT);
@@ -531,11 +589,23 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
       render: (text, record) => {
         return record.GARANTI ? (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <CheckOutlined style={{ color: "green" }} />
           </div>
         ) : (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <CloseOutlined style={{ color: "red" }} />
           </div>
         );
@@ -884,7 +954,9 @@ const MainTable = () => {
     {
       title: (
         <div>
-          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_1 ? ozelAlanlar.OZL_OZEL_ALAN_1 : label && label.OZL_OZEL_ALAN_1}
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_1
+            ? ozelAlanlar.OZL_OZEL_ALAN_1
+            : label && label.OZL_OZEL_ALAN_1}
         </div>
       ),
       dataIndex: "OZEL_ALAN_1",
@@ -901,7 +973,9 @@ const MainTable = () => {
     {
       title: (
         <div>
-          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_2 ? ozelAlanlar.OZL_OZEL_ALAN_2 : label && label.OZL_OZEL_ALAN_2}
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_2
+            ? ozelAlanlar.OZL_OZEL_ALAN_2
+            : label && label.OZL_OZEL_ALAN_2}
         </div>
       ),
       dataIndex: "OZEL_ALAN_2",
@@ -918,7 +992,9 @@ const MainTable = () => {
     {
       title: (
         <div>
-          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_3 ? ozelAlanlar.OZL_OZEL_ALAN_3 : label && label.OZL_OZEL_ALAN_3}
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_3
+            ? ozelAlanlar.OZL_OZEL_ALAN_3
+            : label && label.OZL_OZEL_ALAN_3}
         </div>
       ),
       dataIndex: "OZEL_ALAN_3",
@@ -935,7 +1011,9 @@ const MainTable = () => {
     {
       title: (
         <div>
-          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_4 ? ozelAlanlar.OZL_OZEL_ALAN_4 : label && label.OZL_OZEL_ALAN_4}
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_4
+            ? ozelAlanlar.OZL_OZEL_ALAN_4
+            : label && label.OZL_OZEL_ALAN_4}
         </div>
       ),
       dataIndex: "OZEL_ALAN_4",
@@ -952,7 +1030,9 @@ const MainTable = () => {
     {
       title: (
         <div>
-          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_5 ? ozelAlanlar.OZL_OZEL_ALAN_5 : label && label.OZL_OZEL_ALAN_5}
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_5
+            ? ozelAlanlar.OZL_OZEL_ALAN_5
+            : label && label.OZL_OZEL_ALAN_5}
         </div>
       ),
       dataIndex: "OZEL_ALAN_5",
@@ -969,7 +1049,9 @@ const MainTable = () => {
     {
       title: (
         <div>
-          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_6 ? ozelAlanlar.OZL_OZEL_ALAN_6 : label && label.OZL_OZEL_ALAN_6}
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_6
+            ? ozelAlanlar.OZL_OZEL_ALAN_6
+            : label && label.OZL_OZEL_ALAN_6}
         </div>
       ),
       dataIndex: "OZEL_ALAN_6",
@@ -986,7 +1068,9 @@ const MainTable = () => {
     {
       title: (
         <div>
-          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_7 ? ozelAlanlar.OZL_OZEL_ALAN_7 : label && label.OZL_OZEL_ALAN_7}
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_7
+            ? ozelAlanlar.OZL_OZEL_ALAN_7
+            : label && label.OZL_OZEL_ALAN_7}
         </div>
       ),
       dataIndex: "OZEL_ALAN_7",
@@ -1003,7 +1087,9 @@ const MainTable = () => {
     {
       title: (
         <div>
-          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_8 ? ozelAlanlar.OZL_OZEL_ALAN_8 : label && label.OZL_OZEL_ALAN_8}
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_8
+            ? ozelAlanlar.OZL_OZEL_ALAN_8
+            : label && label.OZL_OZEL_ALAN_8}
         </div>
       ),
       dataIndex: "OZEL_ALAN_8",
@@ -1020,7 +1106,9 @@ const MainTable = () => {
     {
       title: (
         <div>
-          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_9 ? ozelAlanlar.OZL_OZEL_ALAN_9 : label && label.OZL_OZEL_ALAN_9}
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_9
+            ? ozelAlanlar.OZL_OZEL_ALAN_9
+            : label && label.OZL_OZEL_ALAN_9}
         </div>
       ),
       dataIndex: "OZEL_ALAN_9",
@@ -1037,7 +1125,9 @@ const MainTable = () => {
     {
       title: (
         <div>
-          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_10 ? ozelAlanlar.OZL_OZEL_ALAN_10 : label && label.OZL_OZEL_ALAN_10}
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_10
+            ? ozelAlanlar.OZL_OZEL_ALAN_10
+            : label && label.OZL_OZEL_ALAN_10}
         </div>
       ),
       dataIndex: "OZEL_ALAN_10",
@@ -1054,7 +1144,9 @@ const MainTable = () => {
     {
       title: (
         <div>
-          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_11 ? ozelAlanlar.OZL_OZEL_ALAN_11 : label && label.OZL_OZEL_ALAN_11}
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_11
+            ? ozelAlanlar.OZL_OZEL_ALAN_11
+            : label && label.OZL_OZEL_ALAN_11}
         </div>
       ),
       dataIndex: "OZEL_ALAN_11",
@@ -1071,7 +1163,9 @@ const MainTable = () => {
     {
       title: (
         <div>
-          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_12 ? ozelAlanlar.OZL_OZEL_ALAN_12 : label && label.OZL_OZEL_ALAN_12}
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_12
+            ? ozelAlanlar.OZL_OZEL_ALAN_12
+            : label && label.OZL_OZEL_ALAN_12}
         </div>
       ),
       dataIndex: "OZEL_ALAN_12",
@@ -1088,7 +1182,9 @@ const MainTable = () => {
     {
       title: (
         <div>
-          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_13 ? ozelAlanlar.OZL_OZEL_ALAN_13 : label && label.OZL_OZEL_ALAN_13}
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_13
+            ? ozelAlanlar.OZL_OZEL_ALAN_13
+            : label && label.OZL_OZEL_ALAN_13}
         </div>
       ),
       dataIndex: "OZEL_ALAN_13",
@@ -1105,7 +1201,9 @@ const MainTable = () => {
     {
       title: (
         <div>
-          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_14 ? ozelAlanlar.OZL_OZEL_ALAN_14 : label && label.OZL_OZEL_ALAN_14}
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_14
+            ? ozelAlanlar.OZL_OZEL_ALAN_14
+            : label && label.OZL_OZEL_ALAN_14}
         </div>
       ),
       dataIndex: "OZEL_ALAN_14",
@@ -1122,7 +1220,9 @@ const MainTable = () => {
     {
       title: (
         <div>
-          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_15 ? ozelAlanlar.OZL_OZEL_ALAN_15 : label && label.OZL_OZEL_ALAN_15}
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_15
+            ? ozelAlanlar.OZL_OZEL_ALAN_15
+            : label && label.OZL_OZEL_ALAN_15}
         </div>
       ),
       dataIndex: "OZEL_ALAN_15",
@@ -1139,7 +1239,9 @@ const MainTable = () => {
     {
       title: (
         <div>
-          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_16 ? ozelAlanlar.OZL_OZEL_ALAN_16 : label && label.OZL_OZEL_ALAN_16}
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_16
+            ? ozelAlanlar.OZL_OZEL_ALAN_16
+            : label && label.OZL_OZEL_ALAN_16}
         </div>
       ),
       dataIndex: "OZEL_ALAN_16",
@@ -1156,7 +1258,9 @@ const MainTable = () => {
     {
       title: (
         <div>
-          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_17 ? ozelAlanlar.OZL_OZEL_ALAN_17 : label && label.OZL_OZEL_ALAN_17}
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_17
+            ? ozelAlanlar.OZL_OZEL_ALAN_17
+            : label && label.OZL_OZEL_ALAN_17}
         </div>
       ),
       dataIndex: "OZEL_ALAN_17",
@@ -1173,7 +1277,9 @@ const MainTable = () => {
     {
       title: (
         <div>
-          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_18 ? ozelAlanlar.OZL_OZEL_ALAN_18 : label && label.OZL_OZEL_ALAN_18}
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_18
+            ? ozelAlanlar.OZL_OZEL_ALAN_18
+            : label && label.OZL_OZEL_ALAN_18}
         </div>
       ),
       dataIndex: "OZEL_ALAN_18",
@@ -1190,7 +1296,9 @@ const MainTable = () => {
     {
       title: (
         <div>
-          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_19 ? ozelAlanlar.OZL_OZEL_ALAN_19 : label && label.OZL_OZEL_ALAN_19}
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_19
+            ? ozelAlanlar.OZL_OZEL_ALAN_19
+            : label && label.OZL_OZEL_ALAN_19}
         </div>
       ),
       dataIndex: "OZEL_ALAN_19",
@@ -1207,7 +1315,9 @@ const MainTable = () => {
     {
       title: (
         <div>
-          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_20 ? ozelAlanlar.OZL_OZEL_ALAN_20 : label && label.OZL_OZEL_ALAN_20}
+          {ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_20
+            ? ozelAlanlar.OZL_OZEL_ALAN_20
+            : label && label.OZL_OZEL_ALAN_20}
         </div>
       ),
       dataIndex: "OZEL_ALAN_20",
@@ -1233,7 +1343,9 @@ const MainTable = () => {
 
     // Örnek bir tarih formatla ve ay formatını belirle
     const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
-    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(
+      sampleDate
+    );
 
     let monthFormat;
     if (sampleFormatted.includes("January")) {
@@ -1266,8 +1378,18 @@ const MainTable = () => {
       // Saat ve dakika değerlerinin geçerliliğini kontrol et
       const hoursInt = parseInt(hours, 10);
       const minutesInt = parseInt(minutes, 10);
-      if (isNaN(hoursInt) || isNaN(minutesInt) || hoursInt < 0 || hoursInt > 23 || minutesInt < 0 || minutesInt > 59) {
-        throw new Error("Invalid time format");
+      if (
+        isNaN(hoursInt) ||
+        isNaN(minutesInt) ||
+        hoursInt < 0 ||
+        hoursInt > 23 ||
+        minutesInt < 0 ||
+        minutesInt > 59
+      ) {
+        // throw new Error("Invalid time format"); // hata fırlatır ve uygulamanın çalışmasını durdurur
+        console.error("Invalid time format:", time);
+        // return time; // Hatalı formatı olduğu gibi döndür
+        return ""; // Hata durumunda boş bir string döndür
       }
 
       // Geçerli tarih ile birlikte bir Date nesnesi oluştur ve sadece saat ve dakika bilgilerini ayarla
@@ -1287,6 +1409,7 @@ const MainTable = () => {
     } catch (error) {
       console.error("Error formatting time:", error);
       return ""; // Hata durumunda boş bir string döndür
+      // return time; // Hatalı formatı olduğu gibi döndür
     }
   };
 
@@ -1396,7 +1519,9 @@ const MainTable = () => {
       setValue("selectedLokasyonId", null);
     }
     // Seçilen satırların verisini bul
-    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
+    const newSelectedRows = data.filter((row) =>
+      newSelectedRowKeys.includes(row.key)
+    );
     setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
   };
 
@@ -1471,14 +1596,21 @@ const MainTable = () => {
 
   // sütunları local storage'a kaydediyoruz
   useEffect(() => {
-    localStorage.setItem("columnOrder", JSON.stringify(columns.map((col) => col.key)));
+    localStorage.setItem(
+      "columnOrder",
+      JSON.stringify(columns.map((col) => col.key))
+    );
     localStorage.setItem(
       "columnVisibility",
-      JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.visible }), {}))
+      JSON.stringify(
+        columns.reduce((acc, col) => ({ ...acc, [col.key]: col.visible }), {})
+      )
     );
     localStorage.setItem(
       "columnWidths",
-      JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.width }), {}))
+      JSON.stringify(
+        columns.reduce((acc, col) => ({ ...acc, [col.key]: col.width }), {})
+      )
     );
   }, [columns]);
   // sütunları local storage'a kaydediyoruz sonu
@@ -1487,7 +1619,11 @@ const MainTable = () => {
   const handleResize =
     (key) =>
     (_, { size }) => {
-      setColumns((prev) => prev.map((col) => (col.key === key ? { ...col, width: size.width } : col)));
+      setColumns((prev) =>
+        prev.map((col) =>
+          col.key === key ? { ...col, width: size.width } : col
+        )
+      );
     };
 
   const components = {
@@ -1520,7 +1656,9 @@ const MainTable = () => {
       if (oldIndex !== -1 && newIndex !== -1) {
         setColumns((columns) => arrayMove(columns, oldIndex, newIndex));
       } else {
-        console.error(`Column with key ${active.id} or ${over.id} does not exist.`);
+        console.error(
+          `Column with key ${active.id} or ${over.id} does not exist.`
+        );
       }
     }
   };
@@ -1551,6 +1689,7 @@ const MainTable = () => {
     localStorage.removeItem("ozelAlanlar");
     window.location.reload();
   }
+
   // sütunları sıfırlamak için kullanılan fonksiyon sonu
 
   return (
@@ -1561,27 +1700,54 @@ const MainTable = () => {
         width={800}
         open={isModalVisible}
         onOk={() => setIsModalVisible(false)}
-        onCancel={() => setIsModalVisible(false)}>
+        onCancel={() => setIsModalVisible(false)}
+      >
         <Text style={{ marginBottom: "15px" }}>
-          Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını Ayarlayabilirsiniz.
+          Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını
+          Ayarlayabilirsiniz.
         </Text>
-        <div style={{ display: "flex", width: "100%", justifyContent: "center", marginTop: "10px" }}>
+        <div
+          style={{
+            display: "flex",
+            width: "100%",
+            justifyContent: "center",
+            marginTop: "10px",
+          }}
+        >
           <Button onClick={resetColumns} style={{ marginBottom: "15px" }}>
             Sütunları Sıfırla
           </Button>
         </div>
 
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div style={{ width: "46%", border: "1px solid #8080806e", borderRadius: "8px", padding: "10px" }}>
-            <div style={{ marginBottom: "20px", borderBottom: "1px solid #80808051", padding: "8px 8px 12px 8px" }}>
+          <div
+            style={{
+              width: "46%",
+              border: "1px solid #8080806e",
+              borderRadius: "8px",
+              padding: "10px",
+            }}
+          >
+            <div
+              style={{
+                marginBottom: "20px",
+                borderBottom: "1px solid #80808051",
+                padding: "8px 8px 12px 8px",
+              }}
+            >
               <Text style={{ fontWeight: 600 }}>Sütunları Göster / Gizle</Text>
             </div>
             <div style={{ height: "400px", overflow: "auto" }}>
               {initialColumns.map((col) => (
                 <div style={{ display: "flex", gap: "10px" }} key={col.key}>
                   <Checkbox
-                    checked={columns.find((column) => column.key === col.key)?.visible || false}
-                    onChange={(e) => toggleVisibility(col.key, e.target.checked)}
+                    checked={
+                      columns.find((column) => column.key === col.key)
+                        ?.visible || false
+                    }
+                    onChange={(e) =>
+                      toggleVisibility(col.key, e.target.checked)
+                    }
                   />
                   {col.title}
                 </div>
@@ -1593,20 +1759,46 @@ const MainTable = () => {
             onDragEnd={handleDragEnd}
             sensors={useSensors(
               useSensor(PointerSensor),
-              useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-            )}>
-            <div style={{ width: "46%", border: "1px solid #8080806e", borderRadius: "8px", padding: "10px" }}>
-              <div style={{ marginBottom: "20px", borderBottom: "1px solid #80808051", padding: "8px 8px 12px 8px" }}>
-                <Text style={{ fontWeight: 600 }}>Sütunların Sıralamasını Ayarla</Text>
+              useSensor(KeyboardSensor, {
+                coordinateGetter: sortableKeyboardCoordinates,
+              })
+            )}
+          >
+            <div
+              style={{
+                width: "46%",
+                border: "1px solid #8080806e",
+                borderRadius: "8px",
+                padding: "10px",
+              }}
+            >
+              <div
+                style={{
+                  marginBottom: "20px",
+                  borderBottom: "1px solid #80808051",
+                  padding: "8px 8px 12px 8px",
+                }}
+              >
+                <Text style={{ fontWeight: 600 }}>
+                  Sütunların Sıralamasını Ayarla
+                </Text>
               </div>
               <div style={{ height: "400px", overflow: "auto" }}>
                 <SortableContext
-                  items={columns.filter((col) => col.visible).map((col) => col.key)}
-                  strategy={verticalListSortingStrategy}>
+                  items={columns
+                    .filter((col) => col.visible)
+                    .map((col) => col.key)}
+                  strategy={verticalListSortingStrategy}
+                >
                   {columns
                     .filter((col) => col.visible)
                     .map((col, index) => (
-                      <DraggableRow key={col.key} id={col.key} index={index} text={col.title} />
+                      <DraggableRow
+                        key={col.key}
+                        id={col.key}
+                        index={index}
+                        text={col.title}
+                      />
                     ))}
                 </SortableContext>
               </div>
@@ -1622,7 +1814,8 @@ const MainTable = () => {
           marginBottom: "20px",
           gap: "10px",
           padding: "0 5px",
-        }}>
+        }}
+      >
         <div
           style={{
             display: "flex",
@@ -1631,7 +1824,8 @@ const MainTable = () => {
             width: "100%",
             maxWidth: "935px",
             flexWrap: "wrap",
-          }}>
+          }}
+        >
           <Button
             style={{
               display: "flex",
@@ -1641,7 +1835,8 @@ const MainTable = () => {
               // width: "32px",
               height: "32px",
             }}
-            onClick={() => setIsModalVisible(true)}>
+            onClick={() => setIsModalVisible(true)}
+          >
             <MenuOutlined />
           </Button>
           <Input
@@ -1657,8 +1852,14 @@ const MainTable = () => {
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
-          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
-          <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
+          <ContextMenu
+            selectedRows={selectedRows}
+            refreshTableData={refreshTableData}
+          />
+          <CreateDrawer
+            selectedLokasyonId={selectedRowKeys[0]}
+            onRefresh={refreshTableData}
+          />
         </div>
       </div>
       <Spin spinning={loading}>
@@ -1682,7 +1883,9 @@ const MainTable = () => {
           onRow={onRowClick}
           scroll={{ y: "calc(100vh - 380px)" }}
           onChange={handleTableChange}
-          rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
+          rowClassName={(record) =>
+            record.IST_DURUM_ID === 0 ? "boldRow" : ""
+          }
         />
       </Spin>
       <EditDrawer
