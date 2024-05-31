@@ -1,12 +1,34 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Table } from "antd";
+import { Button, Input, Modal, Table } from "antd";
 import AxiosInstance from "../../../../../../../../../../../api/http";
+
+// Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
+const normalizeText = (text) => {
+  return text
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ğ/g, "g")
+    .replace(/Ğ/g, "G")
+    .replace(/ü/g, "u")
+    .replace(/Ü/g, "U")
+    .replace(/ş/g, "s")
+    .replace(/Ş/g, "S")
+    .replace(/ı/g, "i")
+    .replace(/İ/g, "I")
+    .replace(/ö/g, "o")
+    .replace(/Ö/g, "O")
+    .replace(/ç/g, "c")
+    .replace(/Ç/g, "C");
+};
 
 export default function PersonelTablo({ workshopSelectedId, onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const [searchTerm1, setSearchTerm1] = useState("");
+  const [filteredData1, setFilteredData1] = useState([]);
 
   const columns = [
     {
@@ -95,12 +117,28 @@ export default function PersonelTablo({ workshopSelectedId, onSubmit }) {
   const onRowSelectChange = (selectedKeys) => {
     setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
   };
+
+  // Arama işlevselliği için handleSearch fonksiyonları
+  const handleSearch1 = (e) => {
+    const value = e.target.value;
+    setSearchTerm1(value);
+    const normalizedSearchTerm = normalizeText(value);
+    if (value) {
+      const filtered = data.filter((item) =>
+        Object.keys(item).some(
+          (key) =>
+            item[key] && normalizeText(item[key].toString()).toLowerCase().includes(normalizedSearchTerm.toLowerCase())
+        )
+      );
+      setFilteredData1(filtered);
+    } else {
+      setFilteredData1(data);
+    }
+  };
+
   return (
     <div>
-      <Button disabled onClick={handleModalToggle}>
-        {" "}
-        +{" "}
-      </Button>
+      <Button onClick={handleModalToggle}> + </Button>
       <Modal
         width={1200}
         centered
@@ -108,6 +146,12 @@ export default function PersonelTablo({ workshopSelectedId, onSubmit }) {
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}>
+        <Input
+          placeholder="Arama..."
+          value={searchTerm1}
+          onChange={handleSearch1}
+          style={{ width: "300px", marginBottom: "15px" }}
+        />
         <Table
           rowSelection={{
             type: "radio",
@@ -115,7 +159,7 @@ export default function PersonelTablo({ workshopSelectedId, onSubmit }) {
             onChange: onRowSelectChange,
           }}
           columns={columns}
-          dataSource={data}
+          dataSource={filteredData1.length > 0 || searchTerm1 ? filteredData1 : data}
           loading={loading}
           scroll={{
             // x: "auto",

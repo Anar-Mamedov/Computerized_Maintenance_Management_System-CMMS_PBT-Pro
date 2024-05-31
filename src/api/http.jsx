@@ -28,12 +28,12 @@ AxiosInstance.interceptors.response.use(
 );
 
 AxiosInstance.interceptors.request.use(function (request) {
-  const user = JSON.parse(localStorage.getItem("user"));
+  // const user = JSON.parse(localStorage.getItem("user"));
   request.headers.Authorization = `Bearer ${localStorage.getItem("token")}`;
-  if (user) {
-    // user objesi varsa
-    request.headers["User-Id"] = user.userId; // User-Id başlığını ekliyoruz
-  }
+  // if (user) {
+  //   // user objesi varsa
+  //   request.headers["User-Id"] = user.userId; // User-Id başlığını ekliyoruz
+  // }
   // request.headers["User-Id"] = localStorage.getItem("userId");
   return request;
 });
@@ -63,12 +63,12 @@ PdfAxiosInstance.interceptors.response.use(
 );
 
 PdfAxiosInstance.interceptors.request.use(function (request) {
-  const user = JSON.parse(localStorage.getItem("user"));
+  // const user = JSON.parse(localStorage.getItem("user"));
   request.headers.Authorization = `Bearer ${localStorage.getItem("token")}`;
-  if (user) {
-    // user objesi varsa
-    request.headers["User-Id"] = user.userId; // User-Id başlığını ekliyoruz
-  }
+  // if (user) {
+  //   // user objesi varsa
+  //   request.headers["User-Id"] = user.userId; // User-Id başlığını ekliyoruz
+  // }
   // request.headers["User-Id"] = localStorage.getItem("userId");
   return request;
 });
