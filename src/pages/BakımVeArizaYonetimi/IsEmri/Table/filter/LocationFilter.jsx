@@ -53,7 +53,13 @@ const LocationFilter = ({ onSubmit }) => {
   const content = (
     <div style={{ width: "300px" }}>
       <div
-        style={{ borderBottom: "1px solid #ccc", padding: "10px", display: "flex", justifyContent: "space-between" }}>
+        style={{
+          borderBottom: "1px solid #ccc",
+          padding: "10px",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
         <Button onClick={handleCancelClick}>İptal</Button>
         <Button type="primary" onClick={handleSubmit}>
           Uygula
@@ -66,7 +72,8 @@ const LocationFilter = ({ onSubmit }) => {
           placeholder="Ara..."
           value={Object.values(filters)}
           onChange={handleChange}
-          allowClear>
+          allowClear
+        >
           {options.map((option) => (
             <Option key={option.key} value={option.value}>
               {option.value}
@@ -78,8 +85,21 @@ const LocationFilter = ({ onSubmit }) => {
   );
 
   return (
-    <Popover content={content} trigger="click" open={open} onOpenChange={setOpen} placement="bottom">
-      <Button style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+    <Popover
+      content={content}
+      trigger="click"
+      open={open}
+      onOpenChange={setOpen}
+      placement="bottom"
+    >
+      <Button
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         Lokasyon
         <div
           style={{
@@ -92,7 +112,8 @@ const LocationFilter = ({ onSubmit }) => {
             justifyContent: "center",
             alignItems: "center",
             color: "white",
-          }}>
+          }}
+        >
           {Object.keys(filters).length}
         </div>
       </Button>

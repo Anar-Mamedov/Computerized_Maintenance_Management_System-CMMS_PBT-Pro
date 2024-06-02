@@ -104,7 +104,7 @@ export default function SonucSelect({ disabled, fieldRequirements }) {
       {contextHolder}
       <div style={{ display: "flex", flexWrap: "wrap", width: "100%" }}>
         <Controller
-          name="sonuc"
+          name="kapamaSonuc"
           control={control}
           rules={{ required: "Alan Boş Bırakılamaz!" }}
           render={({ field }) => (
@@ -164,7 +164,7 @@ export default function SonucSelect({ disabled, fieldRequirements }) {
           )}
         />
         <Controller
-          name="sonucID"
+          name="kapamaSonucID"
           control={control}
           render={({ field }) => (
             <Input
