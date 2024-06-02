@@ -16,6 +16,7 @@ import Sekmeler from "./Sekmeler";
 import MakineDurumu from "./MakineDurumu";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import SonucSelect from "./SonucSelect";
+
 dayjs.extend(customParseFormat);
 
 const { TextArea } = Input;

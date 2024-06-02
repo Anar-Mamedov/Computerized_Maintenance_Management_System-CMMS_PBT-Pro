@@ -48,6 +48,7 @@ import PlanlamaTakvimi from "./pages/BakımVeArizaYonetimi/PlanlamaTakvimi/Planl
 import OtomatikIsEmri from "./pages/BakımVeArizaYonetimi/OtomatikIsEmri/OtomatikIsEmri";
 import PeriyodikBakimlar1 from "./pages/BakımVeArizaYonetimi/PeriyodikBakimlar1/PeryodikBakimlar";
 import RaporYonetimi from "./pages/Rapor&Formlar/RaporYonetimi/RaporYonetimi.jsx";
+import ProfilEkrani from "./pages/Headers/components/ProfilEkrani/ProfilEkrani.jsx";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -222,6 +223,7 @@ export default function App() {
         {loginData?.Dashboard && <Route path="/" element={<Dashboard />} />}
         {/* <Route path="/isemri" element={<Isemri />} /> */}
         <Route path="/isEmri1" element={<IsEmri />} />
+        <Route path="/User" element={<ProfilEkrani />} />
         <Route path="/peryodikBakimlar" element={<PeriyodikBakimlar />} />
         <Route path="/periyodikBakimlar1" element={<PeriyodikBakimlar1 />} />
         <Route path="/otomatikIsEmirleri" element={<OtomatikIsEmri />} />
@@ -377,7 +379,9 @@ const BaseLayout = () => {
           <div
             style={{
               padding: mobileView ? "24px 0px" : 24,
+              borderRadius: "16px",
               minHeight: 360,
+              height: "calc(100vh - 129px)",
               background: colorBgContainer,
             }}
           >

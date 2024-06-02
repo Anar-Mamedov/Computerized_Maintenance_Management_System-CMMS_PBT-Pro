@@ -35,9 +35,12 @@ export default function Header() {
         try {
           setLoadingImage(true); // Resim yüklenmeye başladığında loadingImage'i true yap
           // responseType olarak 'blob' seçilir.
-          const response = await AxiosInstance.get(`ResimGetirById?id=${userData.userResimID}`, {
-            responseType: "blob",
-          });
+          const response = await AxiosInstance.get(
+            `ResimGetirById?id=${userData.userResimID}`,
+            {
+              responseType: "blob",
+            }
+          );
           // Yanıttaki blob verisi bir URL'ye dönüştürülür.
           const imageBlob = response;
           const imageObjectURL = URL.createObjectURL(imageBlob);
@@ -62,7 +65,10 @@ export default function Header() {
 
   const content = (
     <div>
-      <p style={{ display: "flex", gap: "5px" }}>
+      <p
+        style={{ display: "flex", gap: "5px" }}
+        onClick={() => navigate("/User")}
+      >
         <UserOutlined style={{ fontSize: "12px" }} />
         Profil
       </p>
@@ -71,17 +77,34 @@ export default function Header() {
         Hesabı Düzenle
       </p>
       {/* Çıkış düğmesine onClick olayı ekle */}
-      <div style={{ display: "flex", gap: "5px", cursor: "pointer" }} onClick={handleLogout}>
+      <div
+        style={{ display: "flex", gap: "5px", cursor: "pointer" }}
+        onClick={handleLogout}
+      >
         <LogoutOutlined style={{ fontSize: "12px" }} />
         Çıkış
       </div>
     </div>
   );
   return (
-    <Popover placement="bottom" content={content} trigger="click" open={open} onOpenChange={handleOpenChange}>
+    <Popover
+      placement="bottom"
+      content={content}
+      trigger="click"
+      open={open}
+      onOpenChange={handleOpenChange}
+    >
       <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-          <Text style={{ fontWeight: "500" }}>{userData.userName || "Anonim"}</Text>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
+          }}
+        >
+          <Text style={{ fontWeight: "500" }}>
+            {userData.userName || "Anonim"}
+          </Text>
           <Text type="secondary">{userData.userUnvan || ""}</Text>
         </div>
         <Avatar

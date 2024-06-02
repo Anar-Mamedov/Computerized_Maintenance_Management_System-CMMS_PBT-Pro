@@ -1,8 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, Modal, Checkbox, Typography } from "antd";
 import { HolderOutlined } from "@ant-design/icons";
-import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
-import { sortableKeyboardCoordinates, arrayMove, useSortable } from "@dnd-kit/sortable";
+import {
+  DndContext,
+  useSensor,
+  useSensors,
+  PointerSensor,
+  KeyboardSensor,
+} from "@dnd-kit/core";
+import {
+  sortableKeyboardCoordinates,
+  arrayMove,
+  useSortable,
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Resizable } from "react-resizable";
 import "../../../../ResizeStyle.css";
@@ -31,7 +41,8 @@ const ResizableTitle = (props) => {
       onResize={onResize}
       draggableOpts={{
         enableUserSelectHack: false,
-      }}>
+      }}
+    >
       <th {...restProps} />
     </Resizable>
   );
@@ -40,8 +51,25 @@ const ResizableTitle = (props) => {
 
 // Sütunların sürüklenebilir olmasını sağlayan component
 
-const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onVisibilityChange, ...restProps }) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+const DraggableRow = ({
+  id,
+  text,
+  index,
+  moveRow,
+  className,
+  style,
+  visible,
+  onVisibilityChange,
+  ...restProps
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
   const styleWithTransform = {
     ...style,
     transform: CSS.Transform.toString(transform),
@@ -54,13 +82,26 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
   };
 
   return (
-    <div ref={setNodeRef} style={styleWithTransform} {...restProps} {...attributes}>
+    <div
+      ref={setNodeRef}
+      style={styleWithTransform}
+      {...restProps}
+      {...attributes}
+    >
       {/* <Checkbox
         checked={visible}
         onChange={(e) => onVisibilityChange(index, e.target.checked)}
         style={{ marginLeft: "auto" }}
       /> */}
-      <div {...listeners} style={{ cursor: "grab", flexGrow: 1, display: "flex", alignItems: "center" }}>
+      <div
+        {...listeners}
+        style={{
+          cursor: "grab",
+          flexGrow: 1,
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
         <HolderOutlined style={{ marginRight: 8 }} />
         {text}
       </div>
@@ -73,17 +114,71 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
 const MainTable = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const initialColumns = [
-    { title: "Name", dataIndex: "name", key: "name", visible: true, width: 150 },
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      visible: true,
+      width: 150,
+    },
     { title: "Age", dataIndex: "age", key: "age", visible: true, width: 100 },
-    { title: "Address", dataIndex: "address", key: "address", visible: false, width: 200 },
-    { title: "Anar", dataIndex: "anar", key: "anar", visible: true, width: 200 },
-    { title: "Ebubekir", dataIndex: "ebubekir", key: "ebubekir", visible: true, width: 200 },
-    { title: "Alborz", dataIndex: "alborz", key: "alborz", visible: true, width: 200 },
-    { title: "Berke", dataIndex: "berke", key: "berke", visible: true, width: 200 },
+    {
+      title: "Address",
+      dataIndex: "address",
+      key: "address",
+      visible: false,
+      width: 200,
+    },
+    {
+      title: "Anar",
+      dataIndex: "anar",
+      key: "anar",
+      visible: true,
+      width: 200,
+    },
+    {
+      title: "Ebubekir",
+      dataIndex: "ebubekir",
+      key: "ebubekir",
+      visible: true,
+      width: 200,
+    },
+    {
+      title: "Alborz",
+      dataIndex: "alborz",
+      key: "alborz",
+      visible: true,
+      width: 200,
+    },
+    {
+      title: "Berke",
+      dataIndex: "berke",
+      key: "berke",
+      visible: true,
+      width: 200,
+    },
     { title: "Ali", dataIndex: "ali", key: "ali", visible: true, width: 200 },
-    { title: "Erhan", dataIndex: "erhan", key: "erhan", visible: true, width: 200 },
-    { title: "Almaz", dataIndex: "almaz", key: "almaz", visible: true, width: 200 },
-    { title: "Sevda", dataIndex: "sevda", key: "sevda", visible: true, width: 200 },
+    {
+      title: "Erhan",
+      dataIndex: "erhan",
+      key: "erhan",
+      visible: true,
+      width: 200,
+    },
+    {
+      title: "Almaz",
+      dataIndex: "almaz",
+      key: "almaz",
+      visible: true,
+      width: 200,
+    },
+    {
+      title: "Sevda",
+      dataIndex: "sevda",
+      key: "sevda",
+      visible: true,
+      width: 200,
+    },
   ];
 
   // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
@@ -121,14 +216,21 @@ const MainTable = () => {
 
   // sütunları local storage'a kaydediyoruz
   useEffect(() => {
-    localStorage.setItem("columnOrder", JSON.stringify(columns.map((col) => col.key)));
+    localStorage.setItem(
+      "columnOrder",
+      JSON.stringify(columns.map((col) => col.key))
+    );
     localStorage.setItem(
       "columnVisibility",
-      JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.visible }), {}))
+      JSON.stringify(
+        columns.reduce((acc, col) => ({ ...acc, [col.key]: col.visible }), {})
+      )
     );
     localStorage.setItem(
       "columnWidths",
-      JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.width }), {}))
+      JSON.stringify(
+        columns.reduce((acc, col) => ({ ...acc, [col.key]: col.width }), {})
+      )
     );
   }, [columns]);
   // sütunları local storage'a kaydediyoruz sonu
@@ -137,7 +239,11 @@ const MainTable = () => {
   const handleResize =
     (key) =>
     (_, { size }) => {
-      setColumns((prev) => prev.map((col) => (col.key === key ? { ...col, width: size.width } : col)));
+      setColumns((prev) =>
+        prev.map((col) =>
+          col.key === key ? { ...col, width: size.width } : col
+        )
+      );
     };
 
   const components = {
@@ -170,7 +276,9 @@ const MainTable = () => {
       if (oldIndex !== -1 && newIndex !== -1) {
         setColumns((columns) => arrayMove(columns, oldIndex, newIndex));
       } else {
-        console.error(`Column with key ${active.id} or ${over.id} does not exist.`);
+        console.error(
+          `Column with key ${active.id} or ${over.id} does not exist.`
+        );
       }
     }
   };
@@ -200,6 +308,7 @@ const MainTable = () => {
     localStorage.removeItem("columnWidths");
     window.location.reload();
   }
+
   // sütunları sıfırlamak için kullanılan fonksiyon sonu
 
   return (
@@ -210,27 +319,54 @@ const MainTable = () => {
         width={800}
         open={isModalVisible}
         onOk={() => setIsModalVisible(false)}
-        onCancel={() => setIsModalVisible(false)}>
+        onCancel={() => setIsModalVisible(false)}
+      >
         <Text style={{ marginBottom: "15px" }}>
-          Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını Ayarlayabilirsiniz.
+          Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını
+          Ayarlayabilirsiniz.
         </Text>
-        <div style={{ display: "flex", width: "100%", justifyContent: "center", marginTop: "10px" }}>
+        <div
+          style={{
+            display: "flex",
+            width: "100%",
+            justifyContent: "center",
+            marginTop: "10px",
+          }}
+        >
           <Button onClick={resetColumns} style={{ marginBottom: "15px" }}>
             Sütunları Sıfırla
           </Button>
         </div>
 
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div style={{ width: "46%", border: "1px solid #8080806e", borderRadius: "8px", padding: "10px" }}>
-            <div style={{ marginBottom: "20px", borderBottom: "1px solid #80808051", padding: "8px 8px 12px 8px" }}>
+          <div
+            style={{
+              width: "46%",
+              border: "1px solid #8080806e",
+              borderRadius: "8px",
+              padding: "10px",
+            }}
+          >
+            <div
+              style={{
+                marginBottom: "20px",
+                borderBottom: "1px solid #80808051",
+                padding: "8px 8px 12px 8px",
+              }}
+            >
               <Text style={{ fontWeight: 600 }}>Sütunları Göster / Gizle</Text>
             </div>
             <div style={{ height: "400px", overflow: "auto" }}>
               {initialColumns.map((col) => (
                 <div style={{ display: "flex", gap: "10px" }} key={col.key}>
                   <Checkbox
-                    checked={columns.find((column) => column.key === col.key)?.visible || false}
-                    onChange={(e) => toggleVisibility(col.key, e.target.checked)}
+                    checked={
+                      columns.find((column) => column.key === col.key)
+                        ?.visible || false
+                    }
+                    onChange={(e) =>
+                      toggleVisibility(col.key, e.target.checked)
+                    }
                   />
                   {col.title}
                 </div>
@@ -242,17 +378,40 @@ const MainTable = () => {
             onDragEnd={handleDragEnd}
             sensors={useSensors(
               useSensor(PointerSensor),
-              useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-            )}>
-            <div style={{ width: "46%", border: "1px solid #8080806e", borderRadius: "8px", padding: "10px" }}>
-              <div style={{ marginBottom: "20px", borderBottom: "1px solid #80808051", padding: "8px 8px 12px 8px" }}>
-                <Text style={{ fontWeight: 600 }}>Sütunların Sıralamasını Ayarla</Text>
+              useSensor(KeyboardSensor, {
+                coordinateGetter: sortableKeyboardCoordinates,
+              })
+            )}
+          >
+            <div
+              style={{
+                width: "46%",
+                border: "1px solid #8080806e",
+                borderRadius: "8px",
+                padding: "10px",
+              }}
+            >
+              <div
+                style={{
+                  marginBottom: "20px",
+                  borderBottom: "1px solid #80808051",
+                  padding: "8px 8px 12px 8px",
+                }}
+              >
+                <Text style={{ fontWeight: 600 }}>
+                  Sütunların Sıralamasını Ayarla
+                </Text>
               </div>
               <div style={{ height: "400px", overflow: "auto" }}>
                 {columns
                   .filter((col) => col.visible)
                   .map((col, index) => (
-                    <DraggableRow key={col.key} id={col.key} index={index} text={col.title} />
+                    <DraggableRow
+                      key={col.key}
+                      id={col.key}
+                      index={index}
+                      text={col.title}
+                    />
                   ))}
               </div>
             </div>
