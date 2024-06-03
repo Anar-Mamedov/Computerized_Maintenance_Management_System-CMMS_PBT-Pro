@@ -21,23 +21,37 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
     setVisible(false);
   };
   // Silme işlemi için disable durumunu kontrol et
-  const isDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 4);
+  const isDisabled = selectedRows.some(
+    (row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 4
+  );
   const iptalDisabled = selectedRows.some(
-    (row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 2 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5
+    (row) =>
+      row.IST_DURUM_ID === 3 ||
+      row.IST_DURUM_ID === 2 ||
+      row.IST_DURUM_ID === 4 ||
+      row.IST_DURUM_ID === 5
   );
   const kapatDisabled = selectedRows.some((row) => row.KAPALI === true);
 
   const content = (
     <div>
-      {/* <Sil
-        selectedRows={selectedRows}
-        refreshTableData={refreshTableData}
-        disabled={isDisabled}
-        hidePopover={hidePopover}
-      /> */}
+      {selectedRows.length >= 1 &&
+        selectedRows.every((row) => row.KAPALI === false) && (
+          <Sil
+            selectedRows={selectedRows}
+            refreshTableData={refreshTableData}
+            disabled={isDisabled}
+            hidePopover={hidePopover}
+          />
+        )}
+
       {/* <Iptal selectedRows={selectedRows} refreshTableData={refreshTableData} iptalDisabled={iptalDisabled} /> */}
       {selectedRows.length >= 1 && (
-        <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />
+        <Kapat
+          selectedRows={selectedRows}
+          refreshTableData={refreshTableData}
+          kapatDisabled={kapatDisabled}
+        />
       )}
 
       {/* <Parametreler />
@@ -46,7 +60,13 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
     </div>
   );
   return (
-    <Popover placement="bottom" content={content} trigger="click" open={visible} onOpenChange={handleVisibleChange}>
+    <Popover
+      placement="bottom"
+      content={content}
+      trigger="click"
+      open={visible}
+      onOpenChange={handleVisibleChange}
+    >
       <Button
         style={{
           display: "flex",
@@ -56,9 +76,16 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
           backgroundColor: "#2BC770",
           borderColor: "#2BC770",
           height: "32px",
-        }}>
-        {selectedRows.length >= 1 && <Text style={{ color: "white", marginLeft: "3px" }}>{selectedRows.length}</Text>}
-        <MoreOutlined style={{ color: "white", fontSize: "20px", margin: "0" }} />
+        }}
+      >
+        {selectedRows.length >= 1 && (
+          <Text style={{ color: "white", marginLeft: "3px" }}>
+            {selectedRows.length}
+          </Text>
+        )}
+        <MoreOutlined
+          style={{ color: "white", fontSize: "20px", margin: "0" }}
+        />
       </Button>
     </Popover>
   );

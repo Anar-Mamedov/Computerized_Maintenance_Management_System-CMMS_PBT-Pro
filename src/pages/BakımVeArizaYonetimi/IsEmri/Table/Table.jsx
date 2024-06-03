@@ -1881,7 +1881,7 @@ const MainTable = () => {
             showQuickJumper: true,
           }}
           onRow={onRowClick}
-          scroll={{ y: "calc(100vh - 380px)" }}
+          scroll={{ y: "calc(100vh - 370px)" }}
           onChange={handleTableChange}
           rowClassName={(record) =>
             record.IST_DURUM_ID === 0 ? "boldRow" : ""
