@@ -48,7 +48,7 @@ export default function Sil({
         // Silme API isteğini gönder
         const response = await AxiosInstance.post(`IsEmriSil`, {
           ID: row.key,
-          KulID: user.userId,
+          // KulID: user.userId,
         });
         console.log("Silme işlemi başarılı:", response);
         // Burada başarılı silme işlemi sonrası yapılacak işlemler bulunabilir.
