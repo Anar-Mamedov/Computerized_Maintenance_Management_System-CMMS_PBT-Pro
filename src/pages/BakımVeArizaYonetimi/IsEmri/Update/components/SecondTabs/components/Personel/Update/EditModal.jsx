@@ -5,7 +5,13 @@ import { Controller, useForm, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
 import MainTabs from "./MainTabs/MainTabs";
 
-export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh, secilenIsEmriID }) {
+export default function EditModal({
+  selectedRow,
+  isModalVisible,
+  onModalClose,
+  onRefresh,
+  secilenIsEmriID,
+}) {
   const methods = useForm({
     defaultValues: {
       secilenID: "",
@@ -22,6 +28,8 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       vardiya: null,
       vardiyaID: "",
       aciklama: "",
+      personelBaslamaSaati: "",
+      personelBaslamaZamani: "",
       // Add other default values here
     },
   });
@@ -44,6 +52,22 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       setValue("vardiya", selectedRow.IDK_VARDIYA_TANIM);
       setValue("vardiyaID", selectedRow.IDK_VARDIYA);
       setValue("aciklama", selectedRow.IDK_ACIKLAMA);
+      setValue(
+        "personelBaslamaZamani",
+        selectedRow.IDK_TARIH
+          ? dayjs(selectedRow.IDK_TARIH).isValid()
+            ? dayjs(selectedRow.IDK_TARIH)
+            : null
+          : null
+      );
+      setValue(
+        "personelBaslamaSaati",
+        selectedRow.IDK_SAAT
+          ? dayjs(selectedRow.IDK_SAAT, "HH:mm:ss").isValid()
+            ? dayjs(selectedRow.IDK_SAAT, "HH:mm:ss")
+            : null
+          : null
+      );
     }
   }, [selectedRow, isModalVisible, setValue]);
 
@@ -78,9 +102,14 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       IDK_MASRAF_MERKEZI_ID: data.masrafMerkeziID,
       IDK_VARDIYA: data.vardiyaID,
       IDK_ACIKLAMA: data.aciklama,
+      IDK_TARIH: formatDateWithDayjs(data.personelBaslamaZamani),
+      IDK_SAAT: formatTimeWithDayjs(data.personelBaslamaSaati),
     };
 
-    AxiosInstance.post(`AddUpdateIsEmriPersonel?isEmriId=${secilenIsEmriID}`, Body)
+    AxiosInstance.post(
+      `AddUpdateIsEmriPersonel?isEmriId=${secilenIsEmriID}`,
+      Body
+    )
       .then((response) => {
         console.log("Data sent successfully:", response);
 
@@ -114,7 +143,8 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
           title="Personel Güncelle"
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
-          onCancel={onModalClose}>
+          onCancel={onModalClose}
+        >
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <MainTabs />
           </form>

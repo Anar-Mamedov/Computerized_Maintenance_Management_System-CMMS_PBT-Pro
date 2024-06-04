@@ -7,6 +7,7 @@ import Kapat from "./components/Kapat/Kapat";
 import Parametreler from "./components/Parametreler/Parametreler";
 import TarihceTablo from "./components/TarihceTablo";
 import Form from "./components/Form/Form";
+import Ac from "./components/Ac";
 
 const { Text, Link } = Typography;
 
@@ -35,6 +36,16 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
 
   const content = (
     <div>
+      {selectedRows.length >= 1 &&
+        selectedRows.every((row) => row.KAPALI === true) && (
+          <Ac
+            selectedRows={selectedRows}
+            refreshTableData={refreshTableData}
+            disabled={isDisabled}
+            hidePopover={hidePopover}
+          />
+        )}
+
       {selectedRows.length >= 1 &&
         selectedRows.every((row) => row.KAPALI === false) && (
           <Sil

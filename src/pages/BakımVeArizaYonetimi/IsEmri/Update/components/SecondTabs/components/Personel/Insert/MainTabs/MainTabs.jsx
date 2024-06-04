@@ -1,5 +1,16 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs, DatePicker, TimePicker, InputNumber, Checkbox, Image } from "antd";
+import {
+  Button,
+  Modal,
+  Input,
+  Typography,
+  Tabs,
+  DatePicker,
+  TimePicker,
+  InputNumber,
+  Checkbox,
+  Image,
+} from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import dayjs from "dayjs";
@@ -95,7 +106,11 @@ export default function MainTabs() {
       key: "1",
       label: "Açıklama",
       children: (
-        <Controller name="aciklama" control={control} render={({ field }) => <TextArea {...field} rows={4} />} />
+        <Controller
+          name="aciklama"
+          control={control}
+          render={({ field }) => <TextArea {...field} rows={4} />}
+        />
       ),
     },
   ];
@@ -108,7 +123,9 @@ export default function MainTabs() {
 
     // Örnek bir tarih formatla ve ay formatını belirle
     const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
-    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(
+      sampleDate
+    );
 
     let monthFormat;
     if (sampleFormatted.includes("January")) {
@@ -141,7 +158,14 @@ export default function MainTabs() {
       // Saat ve dakika değerlerinin geçerliliğini kontrol et
       const hoursInt = parseInt(hours, 10);
       const minutesInt = parseInt(minutes, 10);
-      if (isNaN(hoursInt) || isNaN(minutesInt) || hoursInt < 0 || hoursInt > 23 || minutesInt < 0 || minutesInt > 59) {
+      if (
+        isNaN(hoursInt) ||
+        isNaN(minutesInt) ||
+        hoursInt < 0 ||
+        hoursInt > 23 ||
+        minutesInt < 0 ||
+        minutesInt > 59
+      ) {
         throw new Error("Invalid time format");
       }
 
@@ -174,10 +198,18 @@ export default function MainTabs() {
     const dateFormatter = new Intl.DateTimeFormat(navigator.language);
     const sampleDate = new Date(2021, 10, 21);
     const formattedSampleDate = dateFormatter.format(sampleDate);
-    setLocaleDateFormat(formattedSampleDate.replace("2021", "YYYY").replace("21", "DD").replace("11", "MM"));
+    setLocaleDateFormat(
+      formattedSampleDate
+        .replace("2021", "YYYY")
+        .replace("21", "DD")
+        .replace("11", "MM")
+    );
 
     // Format the time based on the user's locale
-    const timeFormatter = new Intl.DateTimeFormat(navigator.language, { hour: "numeric", minute: "numeric" });
+    const timeFormatter = new Intl.DateTimeFormat(navigator.language, {
+      hour: "numeric",
+      minute: "numeric",
+    });
     const sampleTime = new Date(2021, 10, 21, 13, 45); // Use a sample time, e.g., 13:45
     const formattedSampleTime = timeFormatter.format(sampleTime);
 
@@ -194,7 +226,8 @@ export default function MainTabs() {
   const mesaiUcreti = watch("mesaiUcreti");
 
   useEffect(() => {
-    const maliyet = calismaSuresi * (saatUcreti / 60) + mesaiSuresi * (mesaiUcreti / 60);
+    const maliyet =
+      calismaSuresi * (saatUcreti / 60) + mesaiSuresi * (mesaiUcreti / 60);
     setValue("maliyet", maliyet > 0 ? maliyet : 0);
   }, [calismaSuresi, saatUcreti, mesaiSuresi, mesaiUcreti, setValue]);
 
@@ -236,7 +269,15 @@ export default function MainTabs() {
       />
       <div style={{ display: "flex", gap: "20px" }}>
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", marginBottom: "20px" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              flexWrap: "wrap",
+              marginBottom: "20px",
+            }}
+          >
             <StyledDivBottomLine
               style={{
                 display: "flex",
@@ -244,8 +285,11 @@ export default function MainTabs() {
                 justifyContent: "space-between",
                 width: "100%",
                 maxWidth: "435px",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: "600" }}>Personel:</Text>
+              }}
+            >
+              <Text style={{ fontSize: "14px", fontWeight: "600" }}>
+                Personel:
+              </Text>
               <div
                 style={{
                   display: "flex",
@@ -253,7 +297,8 @@ export default function MainTabs() {
                   alignItems: "center",
                   justifyContent: "space-between",
                   width: "300px",
-                }}>
+                }}
+              >
                 <Controller
                   name="personelTanim"
                   control={control}
@@ -287,13 +332,22 @@ export default function MainTabs() {
                 />
                 <Button onClick={handlePersonelMinusClick}> - </Button>
                 {errors.personelTanim && (
-                  <div style={{ color: "red", marginTop: "10px" }}>{errors.personelTanim.message}</div>
+                  <div style={{ color: "red", marginTop: "10px" }}>
+                    {errors.personelTanim.message}
+                  </div>
                 )}
               </div>
             </StyledDivBottomLine>
           </div>
           <div style={{ display: "flex", alignItems: "flex-end" }}>
-            <div style={{ border: "1px solid #ececec", padding: "15px", width: "325px", marginBottom: "10px" }}>
+            <div
+              style={{
+                border: "1px solid #ececec",
+                padding: "15px",
+                width: "325px",
+                marginBottom: "10px",
+              }}
+            >
               <div
                 style={{
                   display: "flex",
@@ -304,7 +358,8 @@ export default function MainTabs() {
                   width: "100%",
                   justifyContent: "space-between",
                   marginBottom: "10px",
-                }}>
+                }}
+              >
                 <Text style={{ fontSize: "14px" }}>Çalışma Süresi (dk.):</Text>
                 <div
                   style={{
@@ -315,11 +370,14 @@ export default function MainTabs() {
                     minWidth: "180px",
                     gap: "10px",
                     width: "100%",
-                  }}>
+                  }}
+                >
                   <Controller
                     name="calismaSuresi"
                     control={control}
-                    render={({ field }) => <InputNumber {...field} style={{ width: "180px" }} />}
+                    render={({ field }) => (
+                      <InputNumber {...field} style={{ width: "180px" }} />
+                    )}
                   />
                 </div>
               </div>
@@ -333,7 +391,8 @@ export default function MainTabs() {
                   width: "100%",
                   justifyContent: "space-between",
                   marginBottom: "10px",
-                }}>
+                }}
+              >
                 <Text style={{ fontSize: "14px" }}>Saat Ücreti:</Text>
                 <div
                   style={{
@@ -344,11 +403,14 @@ export default function MainTabs() {
                     minWidth: "180px",
                     gap: "10px",
                     width: "100%",
-                  }}>
+                  }}
+                >
                   <Controller
                     name="saatUcreti"
                     control={control}
-                    render={({ field }) => <InputNumber {...field} style={{ width: "180px" }} />}
+                    render={({ field }) => (
+                      <InputNumber {...field} style={{ width: "180px" }} />
+                    )}
                   />
                 </div>
               </div>
@@ -361,7 +423,8 @@ export default function MainTabs() {
                   gap: "10px",
                   width: "100%",
                   justifyContent: "space-between",
-                }}>
+                }}
+              >
                 <Text style={{ fontSize: "14px" }}>Maliyet:</Text>
                 <div
                   style={{
@@ -372,11 +435,18 @@ export default function MainTabs() {
                     minWidth: "180px",
                     gap: "10px",
                     width: "100%",
-                  }}>
+                  }}
+                >
                   <Controller
                     name="maliyet"
                     control={control}
-                    render={({ field }) => <InputNumber {...field} min={0} style={{ width: "180px" }} />}
+                    render={({ field }) => (
+                      <InputNumber
+                        {...field}
+                        min={0}
+                        style={{ width: "180px" }}
+                      />
+                    )}
                   />
                 </div>
               </div>
@@ -389,18 +459,29 @@ export default function MainTabs() {
                   left: "10px",
                   background: "white",
                   width: "110px",
-                }}>
+                }}
+              >
                 <Controller
                   name="fazlaMesai"
                   control={control}
                   render={({ field }) => (
-                    <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                    <Checkbox
+                      checked={field.value}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                    >
                       Fazla Mesai
                     </Checkbox>
                   )}
                 />
               </div>
-              <div style={{ border: "1px solid #ececec", padding: "15px", width: "325px", marginBottom: "10px" }}>
+              <div
+                style={{
+                  border: "1px solid #ececec",
+                  padding: "15px",
+                  width: "325px",
+                  marginBottom: "10px",
+                }}
+              >
                 <div
                   style={{
                     display: "flex",
@@ -411,7 +492,8 @@ export default function MainTabs() {
                     width: "100%",
                     justifyContent: "space-between",
                     marginBottom: "10px",
-                  }}>
+                  }}
+                >
                   <Text style={{ fontSize: "14px" }}>Mesai Süresi (dk.):</Text>
                   <div
                     style={{
@@ -422,12 +504,17 @@ export default function MainTabs() {
                       minWidth: "180px",
                       gap: "10px",
                       width: "100%",
-                    }}>
+                    }}
+                  >
                     <Controller
                       name="mesaiSuresi"
                       control={control}
                       render={({ field }) => (
-                        <InputNumber {...field} disabled={!fazlaMesai} style={{ width: "180px" }} />
+                        <InputNumber
+                          {...field}
+                          disabled={!fazlaMesai}
+                          style={{ width: "180px" }}
+                        />
                       )}
                     />
                   </div>
@@ -441,7 +528,8 @@ export default function MainTabs() {
                     gap: "10px",
                     width: "100%",
                     justifyContent: "space-between",
-                  }}>
+                  }}
+                >
                   <Text style={{ fontSize: "14px" }}>Mesai Ücreti (Saat):</Text>
                   <div
                     style={{
@@ -452,12 +540,18 @@ export default function MainTabs() {
                       minWidth: "180px",
                       gap: "10px",
                       width: "100%",
-                    }}>
+                    }}
+                  >
                     <Controller
                       name="mesaiUcreti"
                       control={control}
                       render={({ field }) => (
-                        <InputNumber {...field} disabled={!fazlaMesai} min={0} style={{ width: "180px" }} />
+                        <InputNumber
+                          {...field}
+                          disabled={!fazlaMesai}
+                          min={0}
+                          style={{ width: "180px" }}
+                        />
                       )}
                     />
                   </div>
@@ -466,12 +560,26 @@ export default function MainTabs() {
             </div>
           </div>
         </div>
-        <div style={{ border: "1px solid #ececec", display: "flex", alignItems: "center" }}>
+        <div
+          style={{
+            border: "1px solid #ececec",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
           {/* {imageUrl ? <img style={{ width: "200px" }} src={imageUrl} alt="Photo" /> : <p>Loading...</p>} */}
         </div>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", marginBottom: "10px" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          flexWrap: "wrap",
+          marginBottom: "10px",
+        }}
+      >
         <StyledDivBottomLine
           style={{
             display: "flex",
@@ -479,7 +587,8 @@ export default function MainTabs() {
             justifyContent: "space-between",
             width: "100%",
             maxWidth: "435px",
-          }}>
+          }}
+        >
           <Text style={{ fontSize: "14px" }}>Masraf Merkezi:</Text>
           <div
             style={{
@@ -488,7 +597,8 @@ export default function MainTabs() {
               alignItems: "center",
               justifyContent: "space-between",
               width: "300px",
-            }}>
+            }}
+          >
             <Controller
               name="masrafMerkezi"
               control={control}
@@ -523,9 +633,72 @@ export default function MainTabs() {
           </div>
         </StyledDivBottomLine>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "85px" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "85px",
+          marginBottom: "10px",
+        }}
+      >
         <Text style={{ fontSize: "14px" }}>Vardiya:</Text>
         <VardiyaSelect />
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          maxWidth: "436px",
+          gap: "10px",
+          width: "100%",
+          justifyContent: "space-between",
+        }}
+      >
+        <Text style={{ fontSize: "14px" }}>Başlama Zamanı:</Text>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            maxWidth: "300px",
+            minWidth: "300px",
+            gap: "10px",
+            width: "100%",
+          }}
+        >
+          <Controller
+            name="personelBaslamaZamani"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <DatePicker
+                {...field}
+                // disabled={!isDisabled}
+                style={{ width: "180px" }}
+                format={localeDateFormat}
+                placeholder="Tarih seçiniz"
+              />
+            )}
+          />
+          <Controller
+            name="personelBaslamaSaati"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <TimePicker
+                {...field}
+                // disabled={!isDisabled}
+                style={{ width: "110px" }}
+                format={localeTimeFormat}
+                placeholder="Saat seçiniz"
+              />
+            )}
+          />
+          {errors.baslamaZamaniSaati && (
+            <div style={{ color: "red", marginTop: "5px" }}>
+              {errors.baslamaZamaniSaati.message}
+            </div>
+          )}
+        </div>
       </div>
       <StyledTabs defaultActiveKey="1" items={items} onChange={onChange} />
     </div>
