@@ -1,6 +1,15 @@
 import React, { useState, createRef, useEffect } from "react";
 import { useFormContext, Controller } from "react-hook-form";
-import { Select, Typography, Divider, Spin, Button, Input, message, Space } from "antd";
+import {
+  Select,
+  Typography,
+  Divider,
+  Spin,
+  Button,
+  Input,
+  message,
+  Space,
+} from "antd";
 import AxiosInstance from "../../../../../../../../api/http";
 import { PlusOutlined } from "@ant-design/icons";
 
@@ -65,7 +74,10 @@ export default function SonucSelect({ disabled, fieldRequirements }) {
               type: "success",
               content: "Ekleme Başarılı",
             });
-            setOptions((prevOptions) => [...prevOptions, { TB_KOD_ID: newId, KOD_TANIM: name }]);
+            setOptions((prevOptions) => [
+              ...prevOptions,
+              { TB_KOD_ID: newId, KOD_TANIM: name },
+            ]);
             setSelectKey((prevKey) => prevKey + 1);
             setName("");
           } else {
@@ -100,7 +112,8 @@ export default function SonucSelect({ disabled, fieldRequirements }) {
         justifyContent: "space-between",
         maxWidth: "300px",
         width: "100%",
-      }}>
+      }}
+    >
       {contextHolder}
       <div style={{ display: "flex", flexWrap: "wrap", width: "100%" }}>
         <Controller
@@ -119,7 +132,9 @@ export default function SonucSelect({ disabled, fieldRequirements }) {
               placeholder="Seçim Yapınız"
               optionFilterProp="children"
               filterOption={(input, option) =>
-                option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
+                option.label
+                  ? option.label.toLowerCase().includes(input.toLowerCase())
+                  : false
               }
               onDropdownVisibleChange={(open) => {
                 if (open) {
@@ -140,9 +155,19 @@ export default function SonucSelect({ disabled, fieldRequirements }) {
                       flexWrap: "wrap",
                       justifyContent: "center",
                       padding: "0 8px 4px",
-                    }}>
-                    <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
-                    <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
+                    }}
+                  >
+                    <Input
+                      placeholder=""
+                      ref={inputRef}
+                      value={name}
+                      onChange={onNameChange}
+                    />
+                    <Button
+                      type="text"
+                      icon={<PlusOutlined />}
+                      onClick={addItem}
+                    >
                       Ekle
                     </Button>
                   </Space>
@@ -155,8 +180,8 @@ export default function SonucSelect({ disabled, fieldRequirements }) {
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
                 // `null` veya `undefined` değerlerini ele al
-                setValue("sonuc", value ?? null);
-                setValue("sonucID", value ?? null);
+                setValue("kapamaSonuc", value ?? null);
+                setValue("kapamaSonucID", value ?? null);
                 field.onChange(value ?? null);
               }}
               value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
@@ -174,7 +199,11 @@ export default function SonucSelect({ disabled, fieldRequirements }) {
             />
           )}
         />
-        {errors.sonuc && <div style={{ color: "red", marginTop: "5px" }}>{errors.sonuc.message}</div>}
+        {errors.sonuc && (
+          <div style={{ color: "red", marginTop: "5px" }}>
+            {errors.sonuc.message}
+          </div>
+        )}
       </div>
     </div>
   );
