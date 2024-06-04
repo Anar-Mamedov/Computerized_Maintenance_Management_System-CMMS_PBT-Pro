@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { Button, Drawer, Space, ConfigProvider, Modal, Spin, message } from "antd";
+import {
+  Button,
+  Drawer,
+  Space,
+  ConfigProvider,
+  Modal,
+  Spin,
+  message,
+} from "antd";
 import tr_TR from "antd/es/locale/tr_TR";
 import AxiosInstance from "../../../../api/http";
 import MainTabs from "./components/MainTabs/MainTabs";
@@ -10,7 +18,12 @@ import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
 
-export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
+export default function EditDrawer({
+  selectedRow,
+  onDrawerClose,
+  drawerVisible,
+  onRefresh,
+}) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(drawerVisible);
   const [disabled, setDisabled] = useState(false);
@@ -210,7 +223,9 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           const data = response; // API'den gelen veriyi al
 
           // "IMT_VARSAYILAN": true olan objeyi bul
-          const defaultItem = data.find((item) => item.TB_ISEMRI_TIP_ID === varsayilanIsEmriTipID);
+          const defaultItem = data.find(
+            (item) => item.TB_ISEMRI_TIP_ID === varsayilanIsEmriTipID
+          );
 
           if (defaultItem) {
             setValue("prosedurTab", defaultItem.IMT_CAGRILACAK_PROSEDUR);
@@ -279,7 +294,9 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         setOpen(true); // İşlemler tamamlandıktan sonra drawer'ı aç
         setLoading(true); // Yükleme başladığında
         try {
-          const response = await AxiosInstance.get(`GetIsEmriById?isEmriId=${selectedRow.key}`);
+          const response = await AxiosInstance.get(
+            `GetIsEmriById?isEmriId=${selectedRow.key}`
+          );
           const data = response;
           const item = data[0]; // Veri dizisinin ilk elemanını al
           // Form alanlarını set et
@@ -289,7 +306,11 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("isEmriNo", item.ISEMRI_NO);
           setValue(
             "duzenlenmeTarihi",
-            item.DUZENLEME_TARIH ? (dayjs(item.DUZENLEME_TARIH).isValid() ? dayjs(item.DUZENLEME_TARIH) : null) : null
+            item.DUZENLEME_TARIH
+              ? dayjs(item.DUZENLEME_TARIH).isValid()
+                ? dayjs(item.DUZENLEME_TARIH)
+                : null
+              : null
           );
           setValue(
             "duzenlenmeSaati",
@@ -340,7 +361,11 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("talepEden", item.IS_TALEP_EDEN);
           setValue(
             "isTalebiTarihi",
-            item.ISM_IS_TARIH ? (dayjs(item.ISM_IS_TARIH).isValid() ? dayjs(item.ISM_IS_TARIH) : null) : null
+            item.ISM_IS_TARIH
+              ? dayjs(item.ISM_IS_TARIH).isValid()
+                ? dayjs(item.ISM_IS_TARIH)
+                : null
+              : null
           );
           setValue(
             "isTalebiSaati",
@@ -391,7 +416,11 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           );
           setValue(
             "baslamaZamani",
-            item.BASLAMA_TARIH ? (dayjs(item.BASLAMA_TARIH).isValid() ? dayjs(item.BASLAMA_TARIH) : null) : null
+            item.BASLAMA_TARIH
+              ? dayjs(item.BASLAMA_TARIH).isValid()
+                ? dayjs(item.BASLAMA_TARIH)
+                : null
+              : null
           );
           setValue(
             "baslamaZamaniSaati",
@@ -403,7 +432,11 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           );
           setValue(
             "bitisZamani",
-            item.ISM_BITIS_TARIH ? (dayjs(item.ISM_BITIS_TARIH).isValid() ? dayjs(item.ISM_BITIS_TARIH) : null) : null
+            item.ISM_BITIS_TARIH
+              ? dayjs(item.ISM_BITIS_TARIH).isValid()
+                ? dayjs(item.ISM_BITIS_TARIH)
+                : null
+              : null
           );
           setValue(
             "bitisZamaniSaati",
@@ -497,6 +530,62 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           // Açıklama
           setValue("isEmriAciklama", item.ISM_ACIKLAMA);
 
+          // kapalı iş emri kapama bilgileri
+          setValue("kapamaAciklama", item.ISM_SONUC);
+          setValue("kapamaSonucID", item.ISM_SONUC_KOD_ID);
+          setValue("kapamaMakineDurumuID", item.ISM_KAPAT_MAKINE_DURUM_KOD_ID);
+          setValue("kapamaMakineDurumu", item.ISM_KAPAT_MAKINE_DURUM);
+          setValue("kapamaBakimPuani", item.ISM_PUAN);
+          setValue(
+            "kapamaBitisTarihi",
+            item.ISM_BITIS_TARIH
+              ? dayjs(item.ISM_BITIS_TARIH).isValid()
+                ? dayjs(item.ISM_BITIS_TARIH)
+                : null
+              : null
+          );
+          setValue(
+            "kapamaBitisSaati",
+            item.ISM_BITIS_SAAT
+              ? dayjs(item.ISM_BITIS_SAAT, "HH:mm:ss").isValid()
+                ? dayjs(item.ISM_BITIS_SAAT, "HH:mm:ss")
+                : null
+              : null
+          );
+
+          setValue(
+            "kapamaBaslamaTarihi",
+            item.BASLAMA_TARIH
+              ? dayjs(item.BASLAMA_TARIH).isValid()
+                ? dayjs(item.BASLAMA_TARIH)
+                : null
+              : null
+          );
+          setValue(
+            "kapamaBaslamaSaati",
+            item.BASLAMA_SAAT
+              ? dayjs(item.BASLAMA_SAAT, "HH:mm:ss").isValid()
+                ? dayjs(item.BASLAMA_SAAT, "HH:mm:ss")
+                : null
+              : null
+          );
+
+          setValue(
+            "kapatmaTarihi",
+            item.KAPANIS_TARIHI
+              ? dayjs(item.KAPANIS_TARIHI).isValid()
+                ? dayjs(item.KAPANIS_TARIHI)
+                : null
+              : null
+          );
+          setValue(
+            "kapatmaSaati",
+            item.KAPANIS_SAATI
+              ? dayjs(item.KAPANIS_SAATI, "HH:mm:ss").isValid()
+                ? dayjs(item.KAPANIS_SAATI, "HH:mm:ss")
+                : null
+              : null
+          );
           // ... Diğer setValue çağrıları
 
           setLoading(false); // Yükleme tamamlandığında
@@ -508,7 +597,15 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     };
 
     handleDataFetchAndUpdate();
-  }, [drawerVisible, selectedRow, setValue, onRefresh, methods.reset, AxiosInstance, setDisabled]);
+  }, [
+    drawerVisible,
+    selectedRow,
+    setValue,
+    onRefresh,
+    methods.reset,
+    AxiosInstance,
+    setDisabled,
+  ]);
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
@@ -548,7 +645,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       ISM_MASRAF_MERKEZ_ID: data.masrafMerkeziID,
       ISM_PROJE_ID: data.projeID,
       ISM_REFERANS_NO: data.referansNo,
-      ISM_TAMAMLANMA_ORAN: data.tamamlanmaOranı === "" ? 0 : data.tamamlanmaOranı,
+      ISM_TAMAMLANMA_ORAN:
+        data.tamamlanmaOranı === "" ? 0 : data.tamamlanmaOranı,
       ISM_PLAN_BASLAMA_TARIH: formatDateWithDayjs(data.planlananBaslama),
       ISM_PLAN_BASLAMA_SAAT: formatTimeWithDayjs(data.planlananBaslamaSaati),
       ISM_PLAN_BITIS_TARIH: formatDateWithDayjs(data.planlananBitis),
@@ -677,22 +775,37 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
                   backgroundColor: disabled ? "#d9d9d9" : "#2bc770",
                   borderColor: disabled ? "#d9d9d9" : "#2bc770",
                   color: disabled ? "black" : "#ffffff",
-                }}>
+                }}
+              >
                 Güncelle
               </Button>
             </Space>
-          }>
+          }
+        >
           {loading ? (
             <Spin
               spinning={loading}
               size="large"
-              style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: "100vh",
+              }}
+            >
               {/* İçerik yüklenirken gösterilecek alan */}
             </Spin>
           ) : (
             <form onSubmit={methods.handleSubmit(onSubmit)}>
-              <MainTabs disabled={disabled} isDisabled={isDisabled} fieldRequirements={fieldRequirements} />
-              <SecondTabs disabled={disabled} fieldRequirements={fieldRequirements} />
+              <MainTabs
+                disabled={disabled}
+                isDisabled={isDisabled}
+                fieldRequirements={fieldRequirements}
+              />
+              <SecondTabs
+                disabled={disabled}
+                fieldRequirements={fieldRequirements}
+              />
               <Footer />
             </form>
           )}

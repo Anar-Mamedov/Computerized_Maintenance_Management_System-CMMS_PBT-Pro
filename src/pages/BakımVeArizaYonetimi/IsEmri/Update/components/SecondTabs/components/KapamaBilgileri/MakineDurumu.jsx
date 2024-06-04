@@ -179,8 +179,8 @@ export default function MakineDurumu({ disabled, fieldRequirements }) {
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
                 // `null` veya `undefined` değerlerini ele al
-                setValue("makineDurumu", value ?? null);
-                setValue("makineDurumuID", value ?? null);
+                setValue("kapamaMakineDurumu", value ?? null);
+                setValue("kapamaMakineDurumuID", value ?? null);
                 field.onChange(value ?? null);
               }}
               value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
