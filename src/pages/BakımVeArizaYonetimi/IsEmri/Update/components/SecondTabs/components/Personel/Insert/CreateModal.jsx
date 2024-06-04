@@ -6,7 +6,12 @@ import { Controller, useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
 import dayjs from "dayjs";
 
-export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID }) {
+export default function CreateModal({
+  workshopSelectedId,
+  onSubmit,
+  onRefresh,
+  secilenIsEmriID,
+}) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const methods = useForm({
     defaultValues: {
@@ -24,6 +29,8 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       vardiya: null,
       vardiyaID: "",
       aciklama: "",
+      personelBaslamaSaati: "",
+      personelBaslamaZamani: "",
       // Add other default values here
     },
   });
@@ -55,9 +62,14 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       IDK_MASRAF_MERKEZI_ID: data.masrafMerkeziID,
       IDK_VARDIYA: data.vardiyaID,
       IDK_ACIKLAMA: data.aciklama,
+      IDK_TARIH: formatDateWithDayjs(data.personelBaslamaZamani),
+      IDK_SAAT: formatTimeWithDayjs(data.personelBaslamaSaati),
     };
 
-    AxiosInstance.post(`AddUpdateIsEmriPersonel?isEmriId=${secilenIsEmriID}`, Body)
+    AxiosInstance.post(
+      `AddUpdateIsEmriPersonel?isEmriId=${secilenIsEmriID}`,
+      Body
+    )
       .then((response) => {
         console.log("Data sent successfully:", response);
 
@@ -93,7 +105,14 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
   return (
     <FormProvider {...methods}>
       <div>
-        <div style={{ display: "flex", width: "100%", justifyContent: "flex-end", marginBottom: "10px" }}>
+        <div
+          style={{
+            display: "flex",
+            width: "100%",
+            justifyContent: "flex-end",
+            marginBottom: "10px",
+          }}
+        >
           <Button type="link" onClick={handleModalToggle}>
             <PlusOutlined /> Yeni Kayıt
           </Button>
@@ -106,7 +125,8 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
           centered
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
-          onCancel={handleModalToggle}>
+          onCancel={handleModalToggle}
+        >
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <MainTabs />
           </form>

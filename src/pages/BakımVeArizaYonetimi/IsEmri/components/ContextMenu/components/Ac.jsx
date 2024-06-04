@@ -18,13 +18,46 @@ export default function Sil({
   const buttonStyle = disabled ? { display: "none" } : {};
 
   // Silme işlemini tetikleyecek fonksiyon
+  // const handleDelete = async () => {
+  //   let isError = false;
+  //   // Seçili satırlar üzerinde döngü yaparak her birini sil
+  //   for (const row of selectedRows) {
+  //     try {
+  //       // Silme API isteğini gönder
+  //       const response = await AxiosInstance.post(`IsEmriDelete?ID=${row.key}`);
+  //       console.log("Silme işlemi başarılı:", response);
+  //       if (response.status_code === 200 || response.status_code === 201) {
+  //         message.success("Ekleme Başarılı.");
+  //       } else if (response.status_code === 401) {
+  //         message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+  //       } else {
+  //         message.error("Ekleme Başarısız.");
+  //       }
+  //       // Burada başarılı silme işlemi sonrası yapılacak işlemler bulunabilir.
+  //     } catch (error) {
+  //       console.error("Silme işlemi sırasında hata oluştu:", error);
+  //     }
+  //   }
+  //   // Tüm silme işlemleri tamamlandıktan sonra ve hata oluşmamışsa refreshTableData'i çağır
+  //   if (!isError) {
+  //     refreshTableData();
+  //     hidePopover(); // Silme işlemi başarılı olursa Popover'ı kapat
+  //   }
+  // };
+
   const handleDelete = async () => {
     let isError = false;
+    // Local storage'dan userId değerini al
+    const user = JSON.parse(localStorage.getItem("user"));
     // Seçili satırlar üzerinde döngü yaparak her birini sil
     for (const row of selectedRows) {
       try {
         // Silme API isteğini gönder
-        const response = await AxiosInstance.post(`IsEmriDelete?ID=${row.key}`);
+        const response = await AxiosInstance.post(`IsEmriAc`, {
+          isemriID: row.key,
+          durumKodId: 2,
+          KulID: user.userId,
+        });
         console.log("Silme işlemi başarılı:", response);
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("Ekleme Başarılı.");
@@ -45,41 +78,14 @@ export default function Sil({
     }
   };
 
-  // const handleDelete = async () => {
-  //   let isError = false;
-  //   // Local storage'dan userId değerini al
-  //   const user = JSON.parse(localStorage.getItem("user"));
-  //   // Seçili satırlar üzerinde döngü yaparak her birini sil
-  //   for (const row of selectedRows) {
-  //     try {
-  //       // Silme API isteğini gönder
-  //       const response = await AxiosInstance.post(`IsEmriDelete`, {
-  //         ID: row.key,
-  //         // KulID: user.userId,
-  //       });
-  //       console.log("Silme işlemi başarılı:", response);
-  //       // Burada başarılı silme işlemi sonrası yapılacak işlemler bulunabilir.
-  //     } catch (error) {
-  //       console.error("Silme işlemi sırasında hata oluştu:", error);
-  //     }
-  //   }
-  //   // Tüm silme işlemleri tamamlandıktan sonra ve hata oluşmamışsa refreshTableData'i çağır
-  //   if (!isError) {
-  //     refreshTableData();
-  //     hidePopover(); // Silme işlemi başarılı olursa Popover'ı kapat
-  //   }
-  // };
-
   return (
     <div style={buttonStyle}>
       <Button
+        type="submit"
         style={{ paddingLeft: "0px" }}
-        type="link"
-        danger
-        icon={<DeleteOutlined />}
         onClick={handleDelete}
       >
-        Sil
+        İş Emrini Aç
       </Button>
     </div>
   );
