@@ -46,7 +46,7 @@ export default function Sil({
     for (const row of selectedRows) {
       try {
         // Silme API isteğini gönder
-        const response = await AxiosInstance.post(`IsEmriSil`, {
+        const response = await AxiosInstance.post(`IsEmriDelete`, {
           ID: row.key,
           // KulID: user.userId,
         });
