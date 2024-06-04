@@ -131,23 +131,32 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
 
   // Watch for changes in the relevant fields
   const watchFields = watch([
-    "baslamaTarihi",
-    "baslamaSaati",
-    "bitisTarihi",
-    "bitisSaati",
+    "kapamaBaslamaTarihi",
+    "kapamaBaslamaSaati",
+    "kapamaBitisTarihi",
+    "kapamaBitisSaati",
   ]);
 
   React.useEffect(() => {
-    const { baslamaTarihi, baslamaSaati, bitisTarihi, bitisSaati } =
-      getValues();
-    if (baslamaTarihi && baslamaSaati && bitisTarihi && bitisSaati) {
+    const {
+      kapamaBaslamaTarihi,
+      kapamaBaslamaSaati,
+      kapamaBitisTarihi,
+      kapamaBitisSaati,
+    } = getValues();
+    if (
+      kapamaBaslamaTarihi &&
+      kapamaBaslamaSaati &&
+      kapamaBitisTarihi &&
+      kapamaBitisSaati
+    ) {
       // Başlangıç ve bitiş tarih/saatini birleştir
-      const startDateTime = dayjs(baslamaTarihi)
-        .hour(baslamaSaati.hour())
-        .minute(baslamaSaati.minute());
-      const endDateTime = dayjs(bitisTarihi)
-        .hour(bitisSaati.hour())
-        .minute(bitisSaati.minute());
+      const startDateTime = dayjs(kapamaBaslamaTarihi)
+        .hour(kapamaBaslamaSaati.hour())
+        .minute(kapamaBaslamaSaati.minute());
+      const endDateTime = dayjs(kapamaBitisTarihi)
+        .hour(kapamaBitisSaati.hour())
+        .minute(kapamaBitisSaati.minute());
 
       // İki tarih/saat arasındaki farkı milisaniye cinsinden hesapla
       const diff = endDateTime.diff(startDateTime);
@@ -157,8 +166,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 
       // Hesaplanan saat ve dakikaları form alanlarına yaz
-      setValue("calismaSaat", hours);
-      setValue("calismaDakika", minutes);
+      setValue("kapamaCalismaSaat", hours);
+      setValue("kapamaCalismaDakika", minutes);
     }
   }, [watchFields, setValue, getValues]);
 
@@ -201,7 +210,7 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                 render={({ field, fieldState: { error } }) => (
                   <DatePicker
                     {...field}
-                    status={errors.baslamaTarihi ? "error" : ""}
+                    status={errors.kapamaBaslamaTarihi ? "error" : ""}
                     // disabled={!isDisabled}
                     style={{ width: "180px" }}
                     format={localeDateFormat}
@@ -216,7 +225,7 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                 render={({ field, fieldState: { error } }) => (
                   <TimePicker
                     {...field}
-                    status={errors.baslamaSaati ? "error" : ""}
+                    status={errors.kapamaBaslamaSaati ? "error" : ""}
                     // disabled={!isDisabled}
                     style={{ width: "110px" }}
                     format={localeTimeFormat}
@@ -224,9 +233,9 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                   />
                 )}
               />
-              {errors.baslamaTarihi && (
+              {errors.kapamaBaslamaTarihi && (
                 <div style={{ color: "red" }}>
-                  {errors.baslamaTarihi.message}
+                  {errors.kapamaBaslamaTarihi.message}
                 </div>
               )}
             </div>
@@ -264,7 +273,7 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                 render={({ field, fieldState: { error } }) => (
                   <DatePicker
                     {...field}
-                    status={errors.bitisTarihi ? "error" : ""}
+                    status={errors.kapamaBitisTarihi ? "error" : ""}
                     // disabled={!isDisabled}
                     style={{ width: "180px" }}
                     format={localeDateFormat}
@@ -279,7 +288,7 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                 render={({ field, fieldState: { error } }) => (
                   <TimePicker
                     {...field}
-                    status={errors.bitisSaati ? "error" : ""}
+                    status={errors.kapamaBitisSaati ? "error" : ""}
                     // disabled={!isDisabled}
                     style={{ width: "110px" }}
                     format={localeTimeFormat}
@@ -287,8 +296,10 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                   />
                 )}
               />
-              {errors.bitisTarihi && (
-                <div style={{ color: "red" }}>{errors.bitisTarihi.message}</div>
+              {errors.kapamaBitisTarihi && (
+                <div style={{ color: "red" }}>
+                  {errors.kapamaBitisTarihi.message}
+                </div>
               )}
             </div>
           </div>
