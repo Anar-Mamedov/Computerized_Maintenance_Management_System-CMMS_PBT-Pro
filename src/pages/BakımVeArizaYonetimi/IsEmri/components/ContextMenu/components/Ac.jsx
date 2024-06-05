@@ -1,92 +1,106 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { Button, Modal, Input, Typography, Tabs, message } from "antd";
 import AxiosInstance from "../../../../../../api/http";
-import { Button, message } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import { Controller, useForm, FormProvider } from "react-hook-form";
+import dayjs from "dayjs";
 
-export default function Sil({
+export default function IsEmriSilme({
   selectedRows,
   refreshTableData,
   disabled,
   hidePopover,
 }) {
-  // selectedRows.forEach((row, index) => {
-  //   console.log(`Satır ${index + 1} ID: ${row.key}`);
-  //   // Eğer id değerleri farklı bir özellikte tutuluyorsa, row.key yerine o özelliği kullanın. Örneğin: row.id
-  // });
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const methods = useForm({
+    defaultValues: {
+      secilenID: "",
+      personelTanim: "",
+      // Add other default values here
+    },
+  });
 
-  // Sil düğmesini gizlemek için koşullu stil
-  const buttonStyle = disabled ? { display: "none" } : {};
+  const { setValue, reset, handleSubmit } = methods;
 
-  // Silme işlemini tetikleyecek fonksiyon
-  // const handleDelete = async () => {
-  //   let isError = false;
-  //   // Seçili satırlar üzerinde döngü yaparak her birini sil
-  //   for (const row of selectedRows) {
-  //     try {
-  //       // Silme API isteğini gönder
-  //       const response = await AxiosInstance.post(`IsEmriDelete?ID=${row.key}`);
-  //       console.log("Silme işlemi başarılı:", response);
-  //       if (response.status_code === 200 || response.status_code === 201) {
-  //         message.success("Ekleme Başarılı.");
-  //       } else if (response.status_code === 401) {
-  //         message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
-  //       } else {
-  //         message.error("Ekleme Başarısız.");
-  //       }
-  //       // Burada başarılı silme işlemi sonrası yapılacak işlemler bulunabilir.
-  //     } catch (error) {
-  //       console.error("Silme işlemi sırasında hata oluştu:", error);
-  //     }
-  //   }
-  //   // Tüm silme işlemleri tamamlandıktan sonra ve hata oluşmamışsa refreshTableData'i çağır
-  //   if (!isError) {
-  //     refreshTableData();
-  //     hidePopover(); // Silme işlemi başarılı olursa Popover'ı kapat
-  //   }
-  // };
+  const formatDateWithDayjs = (dateString) => {
+    const formattedDate = dayjs(dateString);
+    return formattedDate.isValid() ? formattedDate.format("YYYY-MM-DD") : "";
+  };
 
-  const handleDelete = async () => {
-    let isError = false;
-    // Local storage'dan userId değerini al
-    const user = JSON.parse(localStorage.getItem("user"));
-    // Seçili satırlar üzerinde döngü yaparak her birini sil
-    for (const row of selectedRows) {
-      try {
-        // Silme API isteğini gönder
-        const response = await AxiosInstance.post(`IsEmriAc`, {
-          isemriID: row.key,
-          durumKodId: 2,
-          KulID: user.userId,
-        });
-        console.log("Silme işlemi başarılı:", response);
+  const formatTimeWithDayjs = (timeObj) => {
+    const formattedTime = dayjs(timeObj);
+    return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
+  };
+
+  // Modalı açma ve kapama işlevi
+  const handleModalToggle = () => {
+    setIsModalVisible((prev) => !prev);
+    if (!isModalVisible) {
+      reset();
+    }
+  };
+
+  // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi
+
+  const onSubmited = (data) => {
+    // If selectedRows contains only one row
+    const row = selectedRows[0];
+
+    const Body = {
+      isemriID: row.key,
+      durumKodId: 2,
+    };
+
+    AxiosInstance.post(`IsEmriAc`, Body)
+      .then((response) => {
+        console.log("Data sent successfully:", response);
+
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("Ekleme Başarılı.");
+          reset();
+          setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
+          refreshTableData();
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
           message.error("Ekleme Başarısız.");
         }
-        // Burada başarılı silme işlemi sonrası yapılacak işlemler bulunabilir.
-      } catch (error) {
-        console.error("Silme işlemi sırasında hata oluştu:", error);
-      }
-    }
-    // Tüm silme işlemleri tamamlandıktan sonra ve hata oluşmamışsa refreshTableData'i çağır
-    if (!isError) {
-      refreshTableData();
-      hidePopover(); // Silme işlemi başarılı olursa Popover'ı kapat
-    }
+      })
+      .catch((error) => {
+        // Handle errors here, e.g.:
+        console.error("Error sending data:", error);
+        message.error("Başarısız Olundu.");
+      });
+
+    console.log({ Body });
   };
 
+  // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi sonu
+
   return (
-    <div style={buttonStyle}>
-      <Button
-        type="submit"
-        style={{ paddingLeft: "0px" }}
-        onClick={handleDelete}
-      >
-        İş Emrini Aç
-      </Button>
-    </div>
+    <FormProvider {...methods}>
+      <div>
+        <Button
+          type="submit"
+          style={{ paddingLeft: "0px" }}
+          onClick={handleModalToggle}
+        >
+          İş Emrini Aç
+        </Button>
+
+        <Modal
+          width="500px"
+          title="Seçili İş Emrini Aç"
+          destroyOnClose
+          centered
+          open={isModalVisible}
+          onOk={methods.handleSubmit(onSubmited)}
+          onCancel={handleModalToggle}
+        >
+          <form onSubmit={methods.handleSubmit(onSubmited)}>
+            <p>İş emrini açmak istediğinize emin misiniz?</p>
+          </form>
+        </Modal>
+      </div>
+    </FormProvider>
   );
 }

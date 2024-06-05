@@ -36,7 +36,7 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
 
   const content = (
     <div>
-      {selectedRows.length >= 1 &&
+      {selectedRows.length === 1 &&
         selectedRows.every((row) => row.KAPALI === true) && (
           <Ac
             selectedRows={selectedRows}
