@@ -655,7 +655,7 @@ export default function MainTabs() {
           justifyContent: "space-between",
         }}
       >
-        <Text style={{ fontSize: "14px" }}>Başlama Zamanı:</Text>
+        <Text style={{ fontSize: "14px" }}>Çalışma Zamanı:</Text>
         <div
           style={{
             display: "flex",
