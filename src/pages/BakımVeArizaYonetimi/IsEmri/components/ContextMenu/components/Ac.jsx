@@ -3,6 +3,10 @@ import { Button, Modal, Input, Typography, Tabs, message } from "antd";
 import AxiosInstance from "../../../../../../api/http";
 import { Controller, useForm, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
+import AcilisNedeni from "./IsEmriAcma/AcilisNedeni.jsx";
+import DurumSelect from "./IsEmriAcma/DurumSelect.jsx";
+
+const { Text, Link } = Typography;
 
 export default function IsEmriSilme({
   selectedRows,
@@ -13,8 +17,11 @@ export default function IsEmriSilme({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const methods = useForm({
     defaultValues: {
-      secilenID: "",
+      acilisNedeniID: "",
+      acilisNedeni: null,
       personelTanim: "",
+      isEmriDurum1ID: "",
+      isEmriDurum1: null,
       // Add other default values here
     },
   });
@@ -46,11 +53,12 @@ export default function IsEmriSilme({
     const row = selectedRows[0];
 
     const Body = {
-      isemriID: row.key,
-      durumKodId: 2,
+      TB_ISEMRI_ID: row.key,
+      DURUM_KOD_ID: data.isEmriDurum1ID,
+      NEDEN_KOD_ID: data.acilisNedeniID,
     };
 
-    AxiosInstance.post(`IsEmriAc`, Body)
+    AxiosInstance.post(`IsEmriOpen`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
 
@@ -97,7 +105,28 @@ export default function IsEmriSilme({
           onCancel={handleModalToggle}
         >
           <form onSubmit={methods.handleSubmit(onSubmited)}>
-            <p>İş emrini açmak istediğinize emin misiniz?</p>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "10px",
+                justifyContent: "space-between",
+              }}
+            >
+              <Text style={{ fontSize: "14px" }}>Açılış Nedeni:</Text>
+              <AcilisNedeni />
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "10px",
+                justifyContent: "space-between",
+              }}
+            >
+              <Text style={{ fontSize: "14px" }}>Yeni Durum:</Text>
+              <DurumSelect />
+            </div>
           </form>
         </Modal>
       </div>
