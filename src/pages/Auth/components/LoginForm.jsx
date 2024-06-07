@@ -66,6 +66,7 @@ export default function LoginForm() {
           isTalepleri: response.KLL_ISTALEBI_KUL,
           isTalebiKullanicilari: response.KLL_WEB_ISTKUL,
           raporYonetimi: response.KLL_WEB_RAPOR,
+          analizler: response.KLL_WEB_RAPOR,
           formYonetimi: response.KLL_WEB_FORM,
           lokasyon: response.KLL_WEB_LOKASYON,
           vardiyalar: response.KLL_WEB_VARDIYA,
