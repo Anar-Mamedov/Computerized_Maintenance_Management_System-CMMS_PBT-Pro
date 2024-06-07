@@ -49,6 +49,7 @@ import OtomatikIsEmri from "./pages/BakımVeArizaYonetimi/OtomatikIsEmri/Otomati
 import PeriyodikBakimlar1 from "./pages/BakımVeArizaYonetimi/PeriyodikBakimlar1/PeryodikBakimlar";
 import RaporYonetimi from "./pages/Rapor&Formlar/RaporYonetimi/RaporYonetimi.jsx";
 import ProfilEkrani from "./pages/Headers/components/ProfilEkrani/ProfilEkrani.jsx";
+import Analizler from "./pages/Rapor&Formlar/Analizler/Analizler.jsx";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -164,6 +165,7 @@ const rawItems = [
     <KeyOutlined />,
     [
       getItem("Rapor Yönetimi", "raporYonetimi", true),
+      getItem("Analizler", "analizler", true),
       getItem("Form Yönetimi", "formYonetimi", true),
       // getItem("Team 2", "team2", true)
     ],
@@ -228,6 +230,7 @@ export default function App() {
         <Route path="/periyodikBakimlar1" element={<PeriyodikBakimlar1 />} />
         <Route path="/otomatikIsEmirleri" element={<OtomatikIsEmri />} />
         <Route path="/raporYonetimi" element={<RaporYonetimi />} />
+        <Route path="/analizler" element={<Analizler />} />
         <Route path="/planlamaTakvimi" element={<PlanlamaTakvimi />} />
         <Route path="/makine" element={<MakineTanim />} />
         <Route path="/ekipmanVeritabani" element={<Hazirlaniyor />} />
