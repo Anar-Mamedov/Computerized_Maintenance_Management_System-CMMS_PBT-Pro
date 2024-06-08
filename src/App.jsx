@@ -40,7 +40,6 @@ import IsTalepleri from "./pages/YardimMasasi/IsTalepleri/IsTalepleri";
 import Hazirlaniyor from "./pages/Hazirlaniyor";
 import Auth from "./pages/Auth/Auth";
 import logo from "../src/assets/images/logoBeyaz.png";
-import PeriyodikBakimlar from "./pages/BakımVeArizaYonetimi/PeriyodikBakimlar/PeriyodikBakimlar";
 import Headers from "./pages/Headers/Headers";
 import { useRecoilState } from "recoil";
 import { userState } from "./state/userState";
@@ -49,7 +48,7 @@ import OtomatikIsEmri from "./pages/BakımVeArizaYonetimi/OtomatikIsEmri/Otomati
 import PeriyodikBakimlar1 from "./pages/BakımVeArizaYonetimi/PeriyodikBakimlar1/PeryodikBakimlar";
 import RaporYonetimi from "./pages/Rapor&Formlar/RaporYonetimi/RaporYonetimi.jsx";
 import ProfilEkrani from "./pages/Headers/components/ProfilEkrani/ProfilEkrani.jsx";
-import Analizler from "./pages/Rapor&Formlar/Analizler/Analizler.jsx";
+import Analizler from "./pages/PersonelYonetimi/PersonelKPI/Analizler.jsx";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -126,8 +125,7 @@ const rawItems = [
       getItem("Arıza Tanımları", "arizaTanimlari", true),
       // getItem("İş Emri", "isemri", true),
       getItem("İş Emirleri", "isEmri1", true),
-      getItem("Periyodik Bakımlar1", "periyodikBakimlar1", true),
-      getItem("Peryodik Bakımlar", "peryodikBakimlar", true),
+      getItem("Periyodik Bakımlar", "periyodikBakimlar", true),
       getItem("Otomatik İş Emirleri", "otomatikIsEmirleri", true),
       getItem("Planlama Takvimi", "planlamaTakvimi", true),
       // getItem("Alex", "alex", true)
@@ -144,6 +142,8 @@ const rawItems = [
       getItem("Personel İzinleri", "personelIzinleri", true),
       getItem("Personel Nöbetleri", "personelNobetleri", true),
       getItem("Personel Çalışma Planı", "personelCalismaPLani", true),
+      getItem("Personel KPI", "analizler", true),
+
       // getItem("Team 2", "team2", true)
     ],
     false
@@ -165,7 +165,6 @@ const rawItems = [
     <KeyOutlined />,
     [
       getItem("Rapor Yönetimi", "raporYonetimi", true),
-      getItem("Analizler", "analizler", true),
       getItem("Form Yönetimi", "formYonetimi", true),
       // getItem("Team 2", "team2", true)
     ],
@@ -226,8 +225,7 @@ export default function App() {
         {/* <Route path="/isemri" element={<Isemri />} /> */}
         <Route path="/isEmri1" element={<IsEmri />} />
         <Route path="/User" element={<ProfilEkrani />} />
-        <Route path="/peryodikBakimlar" element={<PeriyodikBakimlar />} />
-        <Route path="/periyodikBakimlar1" element={<PeriyodikBakimlar1 />} />
+        <Route path="/periyodikBakimlar" element={<PeriyodikBakimlar1 />} />
         <Route path="/otomatikIsEmirleri" element={<OtomatikIsEmri />} />
         <Route path="/raporYonetimi" element={<RaporYonetimi />} />
         <Route path="/analizler" element={<Analizler />} />
