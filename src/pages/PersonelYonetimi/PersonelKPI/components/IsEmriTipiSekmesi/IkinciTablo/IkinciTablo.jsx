@@ -177,8 +177,6 @@ export default function IkinciTablo({
     },
   ];
 
-  console.log(selectedRowBirinciTablo);
-
   const fetchData = async () => {
     setLoading(true);
     try {

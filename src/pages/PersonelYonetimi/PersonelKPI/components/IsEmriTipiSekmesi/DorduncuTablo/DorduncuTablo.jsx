@@ -9,7 +9,7 @@ import {
 } from "react-hook-form";
 import dayjs from "dayjs";
 // import MainTabs from "./MainTabs/MainTabs";
-import EditModal from "../DorduncuTablo/DorduncuTablo.jsx";
+import EditModal from "./EditModal.jsx";
 
 // Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
 const normalizeText = (text) => {
@@ -30,9 +30,9 @@ const normalizeText = (text) => {
     .replace(/Ç/g, "C");
 };
 
-export default function UcuncuTablo({
-  selectedRowIkinciTablo,
-  isModalVisibleIkinciTablo,
+export default function DorduncuTablo({
+  selectedRowUcuncuTablo,
+  isModalVisibleUcuncuTablo,
   onModalClose,
   onRefresh,
   secilenIsEmriID,
@@ -155,6 +155,20 @@ export default function UcuncuTablo({
       ellipsis: true,
     },
     {
+      title: "Personel İsim",
+      dataIndex: "PRS_ISIM",
+      key: "PRS_ISIM",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Personel Unvan",
+      dataIndex: "PRS_UNVAN",
+      key: "PRS_UNVAN",
+      width: 200,
+      ellipsis: true,
+    },
+    {
       title: "Tip Tanımı",
       dataIndex: "IMT_TANIM",
       key: "IMT_TANIM",
@@ -188,11 +202,11 @@ export default function UcuncuTablo({
     setLoading(true);
     try {
       const response = await AxiosInstance.get(
-        `RaporGetİsTipiDetay?RaporIsTanimID=${selectedRowIkinciTablo.TB_IS_TANIM_ID}&RaporIsTipID=${selectedRowIkinciTablo.TB_ISEMRI_TIP_ID}`
+        `RaporGetIsTipIsEmri?IsEmriID=${selectedRowUcuncuTablo.TB_ISEMRI_ID}`
       );
       const fetchedData = response.map((item) => ({
         ...item,
-        key: item.TB_ISEMRI_ID,
+        key: Math.random(),
       }));
       setData(fetchedData);
     } catch (error) {
@@ -246,7 +260,7 @@ export default function UcuncuTablo({
         width="1200px"
         centered
         title="Personel Analizi"
-        open={isModalVisibleIkinciTablo}
+        open={isModalVisibleUcuncuTablo}
         onOk={handleChangeModalVisible}
         onCancel={onModalClose}
       >
@@ -285,18 +299,18 @@ export default function UcuncuTablo({
               y: "calc(100vh - 390px)",
             }}
           />
-          {isModalVisible && (
-            <EditModal
-              selectedRowUcuncuTablo={selectedRow}
-              isModalVisibleUcuncuTablo={isModalVisible}
-              onModalClose={() => {
-                setIsModalVisible(false);
-                setSelectedRow(null);
-              }}
-              onRefresh={refreshTable}
-              secilenIsEmriID={secilenIsEmriID}
-            />
-          )}
+          {/*{isModalVisible && (*/}
+          {/*  <EditModal*/}
+          {/*    selectedRow={selectedRow}*/}
+          {/*    isModalVisible={isModalVisible}*/}
+          {/*    onModalClose={() => {*/}
+          {/*      setIsModalVisible(false);*/}
+          {/*      setSelectedRow(null);*/}
+          {/*    }}*/}
+          {/*    onRefresh={refreshTable}*/}
+          {/*    secilenIsEmriID={secilenIsEmriID}*/}
+          {/*  />*/}
+          {/*)}*/}
         </div>
       </Modal>
     </div>
