@@ -3,6 +3,7 @@ import { Tabs, Typography } from "antd";
 import styled from "styled-components";
 import { useForm, FormProvider } from "react-hook-form";
 import HesapBilgilerim from "./components/HesapBilgilerim.jsx";
+import ChangePassword from "./components/ChangePassword.jsx";
 
 const { Text } = Typography;
 
@@ -92,7 +93,11 @@ export default function ProfilEkrani() {
           <div style={{ marginRight: "10px" }}>Güvenlik</div>
         </div>
       ),
-      children: <div>Test</div>,
+      children: (
+        <FormProvider {...methods}>
+          <ChangePassword />
+        </FormProvider>
+      ),
     },
   ];
 
