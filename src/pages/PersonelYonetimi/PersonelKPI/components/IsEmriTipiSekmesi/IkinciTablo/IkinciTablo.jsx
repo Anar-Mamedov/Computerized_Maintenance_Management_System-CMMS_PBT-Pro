@@ -41,6 +41,7 @@ export default function IkinciTablo({
   const { control, watch, setValue } = useFormContext();
   const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectedRowsData, setSelectedRowsData] = useState([]); // Seçilen satırların verilerini tutacak state
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
@@ -156,15 +157,8 @@ export default function IkinciTablo({
     },
     {
       title: "İş Emri Sayısı",
-      dataIndex: "IS_EMRI_SAYISI",
-      key: "IS_EMRI_SAYISI",
-      width: 200,
-      ellipsis: true,
-    },
-    {
-      title: "Toplam Maliyet",
-      dataIndex: "TOPLAM_MALIYET",
-      key: "TOPLAM_MALIYET",
+      dataIndex: "ISEMRI_SAYISI",
+      key: "ISEMRI_SAYISI",
       width: 200,
       ellipsis: true,
     },
@@ -172,6 +166,20 @@ export default function IkinciTablo({
       title: "Toplam Çalışma Süresi",
       dataIndex: "TOPLAM_CALISMA_SURESI",
       key: "TOPLAM_CALISMA_SURESI",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Ortalama Çalışma Süresi",
+      dataIndex: "ORTALAMA_CALISMA_SURESI",
+      key: "ORTALAMA_CALISMA_SURESI",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Toplam Maliyet",
+      dataIndex: "TOPLAM_MALIYET",
+      key: "TOPLAM_MALIYET",
       width: 200,
       ellipsis: true,
     },
@@ -186,6 +194,10 @@ export default function IkinciTablo({
       const fetchedData = response.map((item) => ({
         ...item,
         key: item.TB_IS_TANIM_ID,
+        ORTALAMA_CALISMA_SURESI:
+          item.TOPLAM_CALISMA_SURESI && item.ISEMRI_SAYISI
+            ? (item.TOPLAM_CALISMA_SURESI / item.ISEMRI_SAYISI).toFixed(2)
+            : "",
       }));
       setData(fetchedData);
     } catch (error) {
@@ -199,8 +211,9 @@ export default function IkinciTablo({
     fetchData();
   }, []); // Bağımlılık dizisi boş, bu yüzden useEffect yalnızca bileşen ilk render edildiğinde çalışır
 
-  const onRowSelectChange = (selectedKeys) => {
-    setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
+  const onRowSelectChange = (selectedKeys, selectedRows) => {
+    setSelectedRowKeys(selectedKeys);
+    setSelectedRowsData(selectedRows); // Seçilen satırların verilerini state'e ekler
   };
 
   const onRowClick = (record) => {
@@ -253,7 +266,7 @@ export default function IkinciTablo({
           />
           <Table
             rowSelection={{
-              type: "radio",
+              type: "checkbox",
               selectedRowKeys,
               onChange: onRowSelectChange,
             }}
