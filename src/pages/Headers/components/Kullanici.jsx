@@ -28,6 +28,18 @@ export default function Header() {
     // window.location.reload(); // Sayfayı yenile
   };
 
+  const userData1 = {
+    userName: "Mehmet",
+    KULLANICI_ID: 1,
+    userAd: "Mehmet",
+    userSoyad: "Kaya",
+    userMail: "test@test.com",
+    userTel: "5555555555",
+    userAdres: "İstanbul",
+    userUnvan: "Yazılım Uzmanı",
+    userResimID: 1,
+  };
+
   useEffect(() => {
     // userData.userResimID değeri gelene kadar bekler
     if (userData.userResimID) {

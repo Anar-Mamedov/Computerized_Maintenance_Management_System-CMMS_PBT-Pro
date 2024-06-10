@@ -118,9 +118,16 @@ export default function MainTable({ isActive }) {
 
   const columns = [
     {
-      title: "İş Emri Tipi",
-      dataIndex: "ISEMRI_TIPI",
-      key: "ISEMRI_TIPI",
+      title: "Personel İsim",
+      dataIndex: "PRS_ISIM",
+      key: "PRS_ISIM",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Personel Ünvan",
+      dataIndex: "PRS_UNVAN",
+      key: "PRS_UNVAN",
       width: 200,
       ellipsis: true,
     },
@@ -157,7 +164,7 @@ export default function MainTable({ isActive }) {
       );
       const fetchedData = response.map((item) => ({
         ...item,
-        key: item.TB_ISEMRI_TIP_ID,
+        key: item.TB_PERSONEL_ID,
       }));
       setData(fetchedData);
     } catch (error) {

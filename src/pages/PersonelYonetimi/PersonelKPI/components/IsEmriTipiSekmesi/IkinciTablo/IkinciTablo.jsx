@@ -1,10 +1,15 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Input, Modal, Table } from "antd";
-import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
-import { useFormContext } from "react-hook-form";
+import { Button, Modal, Input, Typography, Tabs, message, Table } from "antd";
 import AxiosInstance from "../../../../../../api/http.jsx";
-// import CreateModal from "./Insert/CreateModal";
-import EditModal from "../IkinciTablo/IkinciTablo.jsx";
+import {
+  Controller,
+  useForm,
+  FormProvider,
+  useFormContext,
+} from "react-hook-form";
+import dayjs from "dayjs";
+// import MainTabs from "./MainTabs/MainTabs";
+import EditModal from "./EditModal.jsx";
 
 // Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
 const normalizeText = (text) => {
@@ -25,7 +30,13 @@ const normalizeText = (text) => {
     .replace(/Ç/g, "C");
 };
 
-export default function MainTable({ isActive }) {
+export default function IkinciTablo({
+  selectedRowBirinciTablo,
+  isModalVisibleBirinciTablo,
+  onModalClose,
+  onRefresh,
+  secilenIsEmriID,
+}) {
   const [loading, setLoading] = useState(false);
   const { control, watch, setValue } = useFormContext();
   const [data, setData] = useState([]);
@@ -35,6 +46,11 @@ export default function MainTable({ isActive }) {
 
   const [searchTerm1, setSearchTerm1] = useState("");
   const [filteredData1, setFilteredData1] = useState([]);
+
+  const handleChangeModalVisible = () => {
+    onModalClose(); // Modal'ı kapat
+    onRefresh(); // Tabloyu yenile
+  };
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 
@@ -119,15 +135,29 @@ export default function MainTable({ isActive }) {
   const columns = [
     {
       title: "İş Emri Tipi",
-      dataIndex: "ISEMRI_TIPI",
-      key: "ISEMRI_TIPI",
+      dataIndex: "IMT_TANIM",
+      key: "IMT_TANIM",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Tip Kodu",
+      dataIndex: "IST_KOD",
+      key: "IST_KOD",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Tanımı",
+      dataIndex: "IST_TANIM",
+      key: "IST_TANIM",
       width: 200,
       ellipsis: true,
     },
     {
       title: "İş Emri Sayısı",
-      dataIndex: "ISEMRI_SAYISI",
-      key: "ISEMRI_SAYISI",
+      dataIndex: "IS_EMRI_SAYISI",
+      key: "IS_EMRI_SAYISI",
       width: 200,
       ellipsis: true,
     },
@@ -147,17 +177,17 @@ export default function MainTable({ isActive }) {
     },
   ];
 
-  const secilenIsEmriID = watch("secilenIsEmriID");
+  console.log(selectedRowBirinciTablo);
 
   const fetchData = async () => {
     setLoading(true);
     try {
       const response = await AxiosInstance.get(
-        `PersonelRaporGetTip?RaporTipID=0`
+        `RaporGetİsTipi?RaporIsTipID=${selectedRowBirinciTablo.key}`
       );
       const fetchedData = response.map((item) => ({
         ...item,
-        key: item.TB_ISEMRI_TIP_ID,
+        key: item.TB_IS_TANIM_ID,
       }));
       setData(fetchedData);
     } catch (error) {
@@ -206,53 +236,64 @@ export default function MainTable({ isActive }) {
   };
 
   return (
-    <div style={{ marginBottom: "25px" }}>
-      {/*<CreateModal onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />*/}
-      <Input
-        placeholder="Arama..."
-        value={searchTerm1}
-        onChange={handleSearch1}
-        style={{ width: "300px", marginBottom: "15px" }}
-      />
-      <Table
-        rowSelection={{
-          type: "radio",
-          selectedRowKeys,
-          onChange: onRowSelectChange,
-        }}
-        onRow={(record) => ({
-          onClick: () => onRowClick(record),
-        })}
-        pagination={{
-          defaultPageSize: 10,
-          showSizeChanger: true,
-          pageSizeOptions: ["10", "20", "50", "100"],
-          position: ["bottomRight"],
-          showTotal: (total, range) => `Toplam ${total}`,
-          showQuickJumper: true,
-        }}
-        columns={columns}
-        dataSource={
-          filteredData1.length > 0 || searchTerm1 ? filteredData1 : data
-        }
-        loading={loading}
-        scroll={{
-          // x: "auto",
-          y: "calc(100vh - 390px)",
-        }}
-      />
-      {isModalVisible && (
-        <EditModal
-          selectedRowBirinciTablo={selectedRow}
-          isModalVisibleBirinciTablo={isModalVisible}
-          onModalClose={() => {
-            setIsModalVisible(false);
-            setSelectedRow(null);
-          }}
-          onRefresh={refreshTable}
-          secilenIsEmriID={secilenIsEmriID}
-        />
-      )}
+    <div>
+      <Modal
+        width="1200px"
+        centered
+        title="Personel Analizi"
+        open={isModalVisibleBirinciTablo}
+        onOk={handleChangeModalVisible}
+        onCancel={onModalClose}
+      >
+        <div style={{ marginBottom: "25px" }}>
+          {/*<CreateModal onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />*/}
+          <Input
+            placeholder="Arama..."
+            value={searchTerm1}
+            onChange={handleSearch1}
+            style={{ width: "300px", marginBottom: "15px" }}
+          />
+          <Table
+            rowSelection={{
+              type: "radio",
+              selectedRowKeys,
+              onChange: onRowSelectChange,
+            }}
+            onRow={(record) => ({
+              onClick: () => onRowClick(record),
+            })}
+            pagination={{
+              defaultPageSize: 10,
+              showSizeChanger: true,
+              pageSizeOptions: ["10", "20", "50", "100"],
+              position: ["bottomRight"],
+              showTotal: (total, range) => `Toplam ${total}`,
+              showQuickJumper: true,
+            }}
+            columns={columns}
+            dataSource={
+              filteredData1.length > 0 || searchTerm1 ? filteredData1 : data
+            }
+            loading={loading}
+            scroll={{
+              // x: "auto",
+              y: "calc(100vh - 390px)",
+            }}
+          />
+          {isModalVisible && (
+            <EditModal
+              selectedRow={selectedRow}
+              isModalVisible={isModalVisible}
+              onModalClose={() => {
+                setIsModalVisible(false);
+                setSelectedRow(null);
+              }}
+              onRefresh={refreshTable}
+              secilenIsEmriID={secilenIsEmriID}
+            />
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }
