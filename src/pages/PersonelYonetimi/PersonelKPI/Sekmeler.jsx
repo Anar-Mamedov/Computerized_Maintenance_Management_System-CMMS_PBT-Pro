@@ -43,13 +43,13 @@ const onChange = (key) => {
 const items = [
   {
     key: "1",
-    label: "İş Emri Tipleri",
-    children: <MainTable />,
+    label: "Personeller",
+    children: <PersonelMainTable />,
   },
   {
     key: "2",
-    label: "Personeller",
-    children: <PersonelMainTable />,
+    label: "İş Emri Tipleri",
+    children: <MainTable />,
   },
 ];
 
