@@ -9,7 +9,7 @@ import {
 } from "react-hook-form";
 import dayjs from "dayjs";
 // import MainTabs from "./MainTabs/MainTabs";
-import EditModal from "../UcuncuTablo/UcuncuTablo.jsx";
+import EditModal from "./EditModal.jsx";
 
 // Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
 const normalizeText = (text) => {
@@ -30,9 +30,9 @@ const normalizeText = (text) => {
     .replace(/Ç/g, "C");
 };
 
-export default function IkinciTablo({
-  selectedRowBirinciTablo,
-  isModalVisibleBirinciTablo,
+export default function UcuncuTablo({
+  selectedRowIkinciTablo,
+  isModalVisibleIkinciTablo,
   onModalClose,
   onRefresh,
   secilenIsEmriID,
@@ -134,14 +134,14 @@ export default function IkinciTablo({
 
   const columns = [
     {
-      title: "İş Emri Tipi",
-      dataIndex: "IMT_TANIM",
-      key: "IMT_TANIM",
+      title: "İş Emri No",
+      dataIndex: "ISM_ISEMRI_NO",
+      key: "ISM_ISEMRI_NO",
       width: 200,
       ellipsis: true,
     },
     {
-      title: "Tip Kodu",
+      title: "Kodu",
       dataIndex: "IST_KOD",
       key: "IST_KOD",
       width: 200,
@@ -151,6 +151,13 @@ export default function IkinciTablo({
       title: "Tanımı",
       dataIndex: "IST_TANIM",
       key: "IST_TANIM",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Tip Tanımı",
+      dataIndex: "IMT_TANIM",
+      key: "IMT_TANIM",
       width: 200,
       ellipsis: true,
     },
@@ -177,17 +184,17 @@ export default function IkinciTablo({
     },
   ];
 
-  console.log(selectedRowBirinciTablo);
+  console.log(selectedRowIkinciTablo);
 
   const fetchData = async () => {
     setLoading(true);
     try {
       const response = await AxiosInstance.get(
-        `RaporGetİsTipi?RaporIsTipID=${selectedRowBirinciTablo.key}`
+        `RaporGetİsTipiDetay?RaporIsTanimID=${selectedRowIkinciTablo.TB_IS_TANIM_ID}&RaporIsTipID=${selectedRowIkinciTablo.TB_ISEMRI_TIP_ID}`
       );
       const fetchedData = response.map((item) => ({
         ...item,
-        key: item.TB_IS_TANIM_ID,
+        key: item.TB_ISEMRI_ID,
       }));
       setData(fetchedData);
     } catch (error) {
@@ -241,7 +248,7 @@ export default function IkinciTablo({
         width="1200px"
         centered
         title="Personel Analizi"
-        open={isModalVisibleBirinciTablo}
+        open={isModalVisibleIkinciTablo}
         onOk={handleChangeModalVisible}
         onCancel={onModalClose}
       >
@@ -282,8 +289,8 @@ export default function IkinciTablo({
           />
           {isModalVisible && (
             <EditModal
-              selectedRowIkinciTablo={selectedRow}
-              isModalVisibleIkinciTablo={isModalVisible}
+              selectedRow={selectedRow}
+              isModalVisible={isModalVisible}
               onModalClose={() => {
                 setIsModalVisible(false);
                 setSelectedRow(null);
