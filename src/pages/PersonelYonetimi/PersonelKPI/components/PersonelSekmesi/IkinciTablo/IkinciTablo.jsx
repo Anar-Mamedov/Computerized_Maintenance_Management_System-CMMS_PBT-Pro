@@ -193,7 +193,7 @@ export default function IkinciTablo({
       );
       const fetchedData = response.map((item) => ({
         ...item,
-        key: item.TB_IS_TANIM_ID,
+        key: item.TB_ISEMRI_TIP_ID,
         ORTALAMA_CALISMA_SURESI:
           item.TOPLAM_CALISMA_SURESI && item.ISEMRI_SAYISI
             ? (item.TOPLAM_CALISMA_SURESI / item.ISEMRI_SAYISI).toFixed(2)

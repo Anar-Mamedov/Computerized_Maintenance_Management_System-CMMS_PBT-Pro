@@ -135,13 +135,6 @@ export default function UcuncuTablo({
 
   const columns = [
     {
-      title: "İş Emri No",
-      dataIndex: "ISM_ISEMRI_NO",
-      key: "ISM_ISEMRI_NO",
-      width: 200,
-      ellipsis: true,
-    },
-    {
       title: "Kodu",
       dataIndex: "IST_KOD",
       key: "IST_KOD",
@@ -164,8 +157,8 @@ export default function UcuncuTablo({
     },
     {
       title: "İş Emri Sayısı",
-      dataIndex: "ISEMRI_SAYISI",
-      key: "ISEMRI_SAYISI",
+      dataIndex: "IS_EMRI_SAYISI",
+      key: "IS_EMRI_SAYISI",
       width: 200,
       ellipsis: true,
     },
@@ -200,10 +193,10 @@ export default function UcuncuTablo({
       );
       const fetchedData = response.map((item) => ({
         ...item,
-        key: item.TB_ISEMRI_ID,
+        key: Math.random(),
         ORTALAMA_CALISMA_SURESI:
-          item.TOPLAM_CALISMA_SURESI && item.ISEMRI_SAYISI
-            ? (item.TOPLAM_CALISMA_SURESI / item.ISEMRI_SAYISI).toFixed(2)
+          item.TOPLAM_CALISMA_SURESI && item.IS_EMRI_SAYISI
+            ? (item.TOPLAM_CALISMA_SURESI / item.IS_EMRI_SAYISI).toFixed(2)
             : "",
       }));
       setData(fetchedData);
