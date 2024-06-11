@@ -176,13 +176,7 @@ export default function DorduncuTablo({
       width: 200,
       ellipsis: true,
     },
-    {
-      title: "İş Emri Sayısı",
-      dataIndex: "ISEMRI_SAYISI",
-      key: "ISEMRI_SAYISI",
-      width: 200,
-      ellipsis: true,
-    },
+
     {
       title: "Toplam Çalışma Süresi",
       dataIndex: "TOPLAM_CALISMA_SURESI",
@@ -190,13 +184,7 @@ export default function DorduncuTablo({
       width: 200,
       ellipsis: true,
     },
-    {
-      title: "Ortalama Çalışma Süresi",
-      dataIndex: "ORTALAMA_CALISMA_SURESI",
-      key: "ORTALAMA_CALISMA_SURESI",
-      width: 200,
-      ellipsis: true,
-    },
+
     {
       title: "Toplam Maliyet",
       dataIndex: "TOPLAM_MALIYET",
@@ -210,11 +198,11 @@ export default function DorduncuTablo({
     setLoading(true);
     try {
       const response = await AxiosInstance.get(
-        `RaporGetIsTipIsEmri?IsEmriID=${selectedRowUcuncuTablo.TB_ISEMRI_ID}`
+        `RaporGetPersonelIsemri?PersonelID=${selectedRowUcuncuTablo.TB_PERSONEL_ID}&RaporIsTipID=${selectedRowUcuncuTablo.TB_ISEMRI_TIP_ID}&RaporIsTanimID=${selectedRowUcuncuTablo.TB_IS_TANIM_ID}`
       );
       const fetchedData = response.map((item) => ({
         ...item,
-        key: Math.random(),
+        key: item.TB_ISEMRI_ID,
         ORTALAMA_CALISMA_SURESI:
           item.TOPLAM_CALISMA_SURESI && item.ISEMRI_SAYISI
             ? (item.TOPLAM_CALISMA_SURESI / item.ISEMRI_SAYISI).toFixed(2)
