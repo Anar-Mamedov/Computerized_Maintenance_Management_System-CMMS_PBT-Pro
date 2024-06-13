@@ -40,7 +40,7 @@ AxiosInstance.interceptors.request.use(function (request) {
 
 // burdan sonrasini sil
 const PdfAxiosInstance = axios.create({
-  baseURL: `${import.meta.env.VITE_API_BASE_URL}/FormRapor/`,
+  baseURL: `baseURL/FormRapor/`,
   // headers: {
   //   Authorization: import.meta.env.VITE_API_AUTHORIZATION,
   // },

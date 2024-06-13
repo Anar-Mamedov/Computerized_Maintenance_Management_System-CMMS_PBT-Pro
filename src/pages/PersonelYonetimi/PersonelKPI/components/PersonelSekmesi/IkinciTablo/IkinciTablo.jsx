@@ -141,20 +141,7 @@ export default function IkinciTablo({
       width: 200,
       ellipsis: true,
     },
-    {
-      title: "Tip Kodu",
-      dataIndex: "IST_KOD",
-      key: "IST_KOD",
-      width: 200,
-      ellipsis: true,
-    },
-    {
-      title: "Tanımı",
-      dataIndex: "IST_TANIM",
-      key: "IST_TANIM",
-      width: 200,
-      ellipsis: true,
-    },
+
     {
       title: "İş Emri Sayısı",
       dataIndex: "ISEMRI_SAYISI",

@@ -148,13 +148,7 @@ export default function UcuncuTablo({
       width: 200,
       ellipsis: true,
     },
-    {
-      title: "Tip Tanımı",
-      dataIndex: "IMT_TANIM",
-      key: "IMT_TANIM",
-      width: 200,
-      ellipsis: true,
-    },
+
     {
       title: "İş Emri Sayısı",
       dataIndex: "IS_EMRI_SAYISI",
