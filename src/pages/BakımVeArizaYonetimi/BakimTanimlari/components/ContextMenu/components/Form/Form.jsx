@@ -5,8 +5,9 @@ import { PdfAxiosInstance } from "../../../../../../../api/http";
 const Form = ({ selectedRows }) => {
   const downloadPdf = async () => {
     try {
+      const baseURL = localStorage.getItem("baseURL");
       selectedRows.forEach(async (row) => {
-        window.open(`${import.meta.env.VITE_API_BASE_URL}/FormRapor/GetFormByType?id=${row.key}&tipId=3`, "_blank");
+        window.open(`${baseURL}/FormRapor/GetFormByType?id=${row.key}&tipId=3`, "_blank");
       });
     } catch (error) {
       console.error("PDF indirme hatası:", error);
