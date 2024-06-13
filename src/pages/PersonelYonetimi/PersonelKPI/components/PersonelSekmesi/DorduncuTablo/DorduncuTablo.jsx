@@ -10,6 +10,7 @@ import {
 import dayjs from "dayjs";
 // import MainTabs from "./MainTabs/MainTabs";
 import EditModal from "./EditModal.jsx";
+import EditDrawer1 from "../../../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer.jsx";
 
 // Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
 const normalizeText = (text) => {
@@ -47,6 +48,8 @@ export default function DorduncuTablo({
 
   const [searchTerm1, setSearchTerm1] = useState("");
   const [filteredData1, setFilteredData1] = useState([]);
+
+  const [editDrawer1Data, setEditDrawer1Data] = useState(null);
 
   const handleChangeModalVisible = () => {
     onModalClose(); // Modal'ı kapat
@@ -140,6 +143,20 @@ export default function DorduncuTablo({
       key: "ISM_ISEMRI_NO",
       width: 200,
       ellipsis: true,
+      onCell: (record) => ({
+        onClick: (event) => {
+          event.stopPropagation();
+
+          // Burada, record objesini doğrudan kullanmak yerine,
+          // bir kopyasını oluşturup `key` değerini `ISM_DURUM_KOD_ID` ile güncelliyoruz.
+          const updatedRecord = { ...record, key: record.TB_ISEMRI_ID };
+          // const updatedRecord = { ...record, key: 378 };
+
+          setEditDrawer1Data(updatedRecord); // Güncellenmiş record'u EditDrawer1 için data olarak ayarla
+          setIsModalVisible(true); // EditDrawer1'i aç
+        },
+      }),
+      render: (text) => <a>{text}</a>,
     },
     {
       title: "İş Emri Konusu",
@@ -266,9 +283,9 @@ export default function DorduncuTablo({
               selectedRowKeys,
               onChange: onRowSelectChange,
             }}
-            onRow={(record) => ({
-              onClick: () => onRowClick(record),
-            })}
+            // onRow={(record) => ({
+            //   onClick: () => onRowClick(record),
+            // })}
             pagination={{
               defaultPageSize: 10,
               showSizeChanger: true,
@@ -299,6 +316,16 @@ export default function DorduncuTablo({
           {/*    secilenIsEmriID={secilenIsEmriID}*/}
           {/*  />*/}
           {/*)}*/}
+          {isModalVisible && (
+            <EditDrawer1
+              selectedRow={editDrawer1Data}
+              onDrawerClose={() => setIsModalVisible(false)}
+              drawerVisible={isModalVisible}
+              onRefresh={() => {
+                /* Veri yenileme işlemi */
+              }}
+            />
+          )}
         </div>
       </Modal>
     </div>

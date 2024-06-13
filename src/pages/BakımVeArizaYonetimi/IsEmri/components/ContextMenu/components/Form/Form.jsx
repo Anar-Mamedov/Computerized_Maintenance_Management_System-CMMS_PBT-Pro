@@ -5,8 +5,12 @@ import { PdfAxiosInstance } from "../../../../../../../api/http";
 const Form = ({ selectedRows }) => {
   const downloadPdf = async () => {
     try {
+      const baseURL = localStorage.getItem("baseURL");
       selectedRows.forEach(async (row) => {
-        window.open(`${import.meta.env.VITE_API_BASE_URL}/FormRapor/GetFormByType?id=${row.key}&tipId=1`, "_blank");
+        window.open(
+          `${baseURL}/FormRapor/GetFormByType?id=${row.key}&tipId=1`,
+          "_blank"
+        );
       });
     } catch (error) {
       console.error("PDF indirme hatası:", error);
@@ -16,9 +20,15 @@ const Form = ({ selectedRows }) => {
   return (
     <div>
       <Button
-        style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
+        style={{
+          display: "flex",
+          padding: "0px 0px",
+          alignItems: "center",
+          justifyContent: "flex-start",
+        }}
         type="submit"
-        onClick={downloadPdf}>
+        onClick={downloadPdf}
+      >
         İş Emri Formu İndir
       </Button>
     </div>
