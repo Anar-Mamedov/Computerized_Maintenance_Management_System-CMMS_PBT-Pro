@@ -143,8 +143,8 @@ export default function DorduncuTablo({
     },
     {
       title: "İş Emri Konusu",
-      dataIndex: "IST_KOD",
-      key: "IST_KOD",
+      dataIndex: "ISM_ACIKLAMA",
+      key: "ISM_ACIKLAMA",
       width: 200,
       ellipsis: true,
     },

@@ -160,8 +160,8 @@ export default function UcuncuTablo({
     },
     {
       title: "İş Emri Konusu",
-      dataIndex: "IST_KOD",
-      key: "IST_KOD",
+      dataIndex: "ISM_ACIKLAMA",
+      key: "ISM_ACIKLAMA",
       width: 200,
       ellipsis: true,
     },
@@ -245,7 +245,7 @@ export default function UcuncuTablo({
       <Modal
         width="1200px"
         centered
-        title="Personel Analizi"
+        title={`İş Emirleri (${selectedRowIkinciTablo?.IST_TANIM})`}
         open={isModalVisibleIkinciTablo}
         onOk={handleChangeModalVisible}
         onCancel={onModalClose}

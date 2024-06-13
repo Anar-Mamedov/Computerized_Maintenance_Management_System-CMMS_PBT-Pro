@@ -160,8 +160,8 @@ export default function DorduncuTablo({
     },
     {
       title: "İş Emri Konusu",
-      dataIndex: "IST_KOD",
-      key: "IST_KOD",
+      dataIndex: "ISM_ACIKLAMA",
+      key: "ISM_ACIKLAMA",
       width: 200,
       ellipsis: true,
     },
@@ -264,7 +264,7 @@ export default function DorduncuTablo({
       <Modal
         width="1200px"
         centered
-        title="Personel Analizi"
+        title={`İş Emirleri (${selectedRowUcuncuTablo?.IST_TANIM})`}
         open={isModalVisibleUcuncuTablo}
         onOk={handleChangeModalVisible}
         onCancel={onModalClose}

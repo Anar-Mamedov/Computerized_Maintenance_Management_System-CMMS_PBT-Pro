@@ -238,7 +238,7 @@ export default function IkinciTablo({
       <Modal
         width="1200px"
         centered
-        title="Personel Analizi"
+        title={`Personel Analizi (${selectedRowBirinciTablo?.PRS_ISIM})`}
         open={isModalVisibleBirinciTablo}
         onOk={handleChangeModalVisible}
         onCancel={onModalClose}
