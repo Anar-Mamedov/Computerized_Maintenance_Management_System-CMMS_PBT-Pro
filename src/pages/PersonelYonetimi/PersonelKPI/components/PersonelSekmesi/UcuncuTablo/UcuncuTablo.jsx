@@ -245,7 +245,7 @@ export default function UcuncuTablo({
       <Modal
         width="1200px"
         centered
-        title="Personel Analizi"
+        title={`İş Analizi (${selectedRowIkinciTablo?.IMT_TANIM})`}
         open={isModalVisibleIkinciTablo}
         onOk={handleChangeModalVisible}
         onCancel={onModalClose}

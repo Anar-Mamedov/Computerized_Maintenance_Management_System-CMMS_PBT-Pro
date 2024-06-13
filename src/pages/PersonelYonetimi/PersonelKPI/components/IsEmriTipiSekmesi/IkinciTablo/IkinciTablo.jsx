@@ -245,7 +245,7 @@ export default function IkinciTablo({
       <Modal
         width="1200px"
         centered
-        title="Personel Analizi"
+        title={`İş Analizi (${selectedRowBirinciTablo?.ISEMRI_TIPI})`}
         open={isModalVisibleBirinciTablo}
         onOk={handleChangeModalVisible}
         onCancel={onModalClose}
