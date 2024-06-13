@@ -141,13 +141,7 @@ export default function IkinciTablo({
       width: 200,
       ellipsis: true,
     },
-    {
-      title: "Tip Kodu",
-      dataIndex: "IST_KOD",
-      key: "IST_KOD",
-      width: 200,
-      ellipsis: true,
-    },
+
     {
       title: "Tanımı",
       dataIndex: "IST_TANIM",
@@ -157,8 +151,8 @@ export default function IkinciTablo({
     },
     {
       title: "İş Emri Sayısı",
-      dataIndex: "ISEMRI_SAYISI",
-      key: "ISEMRI_SAYISI",
+      dataIndex: "IS_EMRI_SAYISI",
+      key: "IS_EMRI_SAYISI",
       width: 200,
       ellipsis: true,
     },
@@ -195,8 +189,8 @@ export default function IkinciTablo({
         ...item,
         key: item.TB_IS_TANIM_ID,
         ORTALAMA_CALISMA_SURESI:
-          item.TOPLAM_CALISMA_SURESI && item.ISEMRI_SAYISI
-            ? (item.TOPLAM_CALISMA_SURESI / item.ISEMRI_SAYISI).toFixed(2)
+          item.TOPLAM_CALISMA_SURESI && item.IS_EMRI_SAYISI
+            ? (item.TOPLAM_CALISMA_SURESI / item.IS_EMRI_SAYISI).toFixed(2)
             : "",
       }));
       setData(fetchedData);

@@ -142,19 +142,13 @@ export default function DorduncuTablo({
       ellipsis: true,
     },
     {
-      title: "Kodu",
+      title: "İş Emri Konusu",
       dataIndex: "IST_KOD",
       key: "IST_KOD",
       width: 200,
       ellipsis: true,
     },
-    {
-      title: "Tanımı",
-      dataIndex: "IST_TANIM",
-      key: "IST_TANIM",
-      width: 200,
-      ellipsis: true,
-    },
+
     {
       title: "Personel İsim",
       dataIndex: "PRS_ISIM",
@@ -163,16 +157,9 @@ export default function DorduncuTablo({
       ellipsis: true,
     },
     {
-      title: "Personel Unvan",
+      title: "Ünvan",
       dataIndex: "PRS_UNVAN",
       key: "PRS_UNVAN",
-      width: 200,
-      ellipsis: true,
-    },
-    {
-      title: "Tip Tanımı",
-      dataIndex: "IMT_TANIM",
-      key: "IMT_TANIM",
       width: 200,
       ellipsis: true,
     },

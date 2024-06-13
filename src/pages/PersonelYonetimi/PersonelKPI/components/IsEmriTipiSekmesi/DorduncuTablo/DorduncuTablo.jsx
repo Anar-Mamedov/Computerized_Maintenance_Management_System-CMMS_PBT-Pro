@@ -142,19 +142,13 @@ export default function DorduncuTablo({
       ellipsis: true,
     },
     {
-      title: "Kodu",
+      title: "İş Emri Konusu",
       dataIndex: "IST_KOD",
       key: "IST_KOD",
       width: 200,
       ellipsis: true,
     },
-    {
-      title: "Tanımı",
-      dataIndex: "IST_TANIM",
-      key: "IST_TANIM",
-      width: 200,
-      ellipsis: true,
-    },
+
     {
       title: "Personel İsim",
       dataIndex: "PRS_ISIM",
@@ -169,20 +163,7 @@ export default function DorduncuTablo({
       width: 200,
       ellipsis: true,
     },
-    {
-      title: "Tip Tanımı",
-      dataIndex: "IMT_TANIM",
-      key: "IMT_TANIM",
-      width: 200,
-      ellipsis: true,
-    },
-    {
-      title: "İş Emri Sayısı",
-      dataIndex: "ISEMRI_SAYISI",
-      key: "ISEMRI_SAYISI",
-      width: 200,
-      ellipsis: true,
-    },
+
     {
       title: "Toplam Çalışma Süresi",
       dataIndex: "TOPLAM_CALISMA_SURESI",
@@ -190,13 +171,7 @@ export default function DorduncuTablo({
       width: 200,
       ellipsis: true,
     },
-    {
-      title: "Ortalama Çalışma Süresi",
-      dataIndex: "ORTALAMA_CALISMA_SURESI",
-      key: "ORTALAMA_CALISMA_SURESI",
-      width: 200,
-      ellipsis: true,
-    },
+
     {
       title: "Toplam Maliyet",
       dataIndex: "TOPLAM_MALIYET",
@@ -215,10 +190,6 @@ export default function DorduncuTablo({
       const fetchedData = response.map((item) => ({
         ...item,
         key: Math.random(),
-        ORTALAMA_CALISMA_SURESI:
-          item.TOPLAM_CALISMA_SURESI && item.ISEMRI_SAYISI
-            ? (item.TOPLAM_CALISMA_SURESI / item.ISEMRI_SAYISI).toFixed(2)
-            : "",
       }));
       setData(fetchedData);
     } catch (error) {
