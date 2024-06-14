@@ -122,13 +122,15 @@ function ChangePassword(props) {
                   const hasUpperCase = /[A-Z]/.test(value);
                   const hasLowerCase = /[a-z]/.test(value);
                   const hasNumber = /\d/.test(value);
+                  const hasSpecialChar = /[!@&=},?,\\]/.test(value);
                   const hasMinLength = value.length >= 8;
                   return (
                     (hasUpperCase &&
                       hasLowerCase &&
                       hasNumber &&
+                      hasSpecialChar &&
                       hasMinLength) ||
-                    "Şifreniz en az 8 karakter uzunluğunda olmalı, büyük ve küçük harfler içermeli ve en az bir rakam içermelidir."
+                    "Şifreniz en az 8 karakter uzunluğunda olmalı, büyük ve küçük harfler, rakam ve özel karakterler (!,@,&=,},?,\\) içermelidir."
                   );
                 } else {
                   return true; // GUCLENDIRILMIS_SIFRE_KULLAN false ise, her türlü şifreyi kabul eder
