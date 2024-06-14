@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import AxiosInstance from "../../../api/http";
 import { useSetRecoilState } from "recoil";
 import { userState, authTokenState } from "../../../state/userState";
+import ReCAPTCHA from "react-google-recaptcha";
 
 const { Text, Link } = Typography;
 
@@ -13,10 +14,21 @@ export default function LoginForm() {
   const setUser = useSetRecoilState(userState);
   // const setAuthToken = useSetRecoilState(authTokenState);
   const [loading, setLoading] = useState(false); // Yükleme durumunu takip eden durum değişkeni
+  const [isVerified, setIsVerified] = useState(false);
+
+  const handleCaptchaResponseChange = (response) => {
+    if (response) {
+      setIsVerified(true);
+    }
+  };
 
   const onSubmit = async (values) => {
     console.log("Received values of form: ", values);
     setLoading(true); // API isteği başladığında yükleme durumunu true yap
+    if (!isVerified) {
+      message.error("Lütfen CAPTCHA'yı doğrulayın!");
+      return;
+    }
     try {
       // Constructing payload with the structure { KLL_KOD: "", KLL_SIFRE: "" }
       const payload = {
@@ -143,6 +155,12 @@ export default function LoginForm() {
               prefix={<LockOutlined className="site-form-item-icon" />}
               type="password"
               placeholder="Şifre"
+            />
+          </Form.Item>
+          <Form.Item>
+            <ReCAPTCHA
+              sitekey="6LezcPgpAAAAAODImLqwesg5LxeLdNb6oVWwKCto"
+              onChange={handleCaptchaResponseChange}
             />
           </Form.Item>
           <Form.Item>
