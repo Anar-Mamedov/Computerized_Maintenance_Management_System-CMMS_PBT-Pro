@@ -108,6 +108,10 @@ function ChangePassword(props) {
               />
             )}
           />
+          <Text style={{ fontSize: "14px", fontWeight: "400", color: "#888" }}>
+            Şifreniz en az 6 karakter uzunluğunda olmalı, büyük ve küçük harfler
+            içermeli ve en az bir rakam içermelidir.
+          </Text>
           {newPassword && (
             <Progress
               percent={passwordStrength}
