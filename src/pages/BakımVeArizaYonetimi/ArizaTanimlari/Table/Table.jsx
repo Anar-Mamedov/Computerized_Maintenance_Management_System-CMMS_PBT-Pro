@@ -1,7 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Input, Table, Spin } from "antd";
-import { CheckOutlined, CloseOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  CheckOutlined,
+  CloseOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
@@ -38,57 +42,6 @@ export default function MainTable() {
           return {
             ...item,
             key: item.TB_IS_TANIM_ID,
-            IST_KOD: item.IST_KOD,
-            IST_TANIM: item.IST_TANIM,
-            IST_DURUM: item.IST_DURUM,
-            IST_AKTIF: item.IST_AKTIF,
-            IST_TIP_KOD_ID: item.IST_TIP_KOD_ID,
-            IST_TIP: item.IST_TIP,
-            IST_GRUP_KOD_ID: item.IST_GRUP_KOD_ID,
-            IST_GRUP: item.IST_GRUP,
-            IST_ATOLYE_ID: item.IST_ATOLYE_ID,
-            IST_ATOLYE: item.IST_ATOLYE,
-            IST_CALISMA_SURE: item.IST_CALISMA_SURE,
-            IST_DURUS_SURE: item.IST_DURUS_SURE,
-            IST_PERSONEL_SAYI: item.IST_PERSONEL_SAYI,
-            IST_ONCELIK_ID: item.IST_ONCELIK_ID,
-            IST_ONCELIK: item.IST_ONCELIK,
-            IST_TALIMAT_ID: item.IST_TALIMAT_ID,
-            IST_TALIMAT: item.IST_TALIMAT,
-            IST_ACIKLAMA: item.IST_ACIKLAMA,
-            IST_OLUSTURAN_ID: item.IST_OLUSTURAN_ID,
-            IST_OLUSTURMA_TARIH: item.IST_OLUSTURMA_TARIH,
-            IST_DEGISTIREN_ID: item.IST_DEGISTIREN_ID,
-            IST_DEGISTIRME_TARIH: item.IST_DEGISTIRME_TARIH,
-            IST_MALZEME_MALIYET: item.IST_MALZEME_MALIYET,
-            IST_ISCILIK_MALIYET: item.IST_ISCILIK_MALIYET,
-            IST_GENEL_GIDER_MALIYET: item.IST_GENEL_GIDER_MALIYET,
-            IST_TOPLAM_MALIYET: item.IST_TOPLAM_MALIYET,
-            IST_NEDEN_KOD_ID: item.IST_NEDEN_KOD_ID,
-            IST_FIRMA_ID: item.IST_FIRMA_ID,
-            IST_IS_TALEPTE_GORUNSUN: item.IST_IS_TALEPTE_GORUNSUN,
-            IST_MASRAF_MERKEZ_ID: item.IST_MASRAF_MERKEZ_ID,
-            IST_SURE_LOJISTIK: item.IST_SURE_LOJISTIK,
-            IST_SURE_SEYAHAT: item.IST_SURE_SEYAHAT,
-            IST_SURE_ONAY: item.IST_SURE_ONAY,
-            IST_SURE_BEKLEME: item.IST_SURE_BEKLEME,
-            IST_SURE_DIGER: item.IST_SURE_DIGER,
-            IST_OZEL_ALAN_1: item.IST_OZEL_ALAN_1,
-            IST_OZEL_ALAN_2: item.IST_OZEL_ALAN_2,
-            IST_OZEL_ALAN_3: item.IST_OZEL_ALAN_3,
-            IST_OZEL_ALAN_4: item.IST_OZEL_ALAN_4,
-            IST_OZEL_ALAN_5: item.IST_OZEL_ALAN_5,
-            IST_OZEL_ALAN_6: item.IST_OZEL_ALAN_6,
-            IST_OZEL_ALAN_7: item.IST_OZEL_ALAN_7,
-            IST_OZEL_ALAN_8: item.IST_OZEL_ALAN_8,
-            IST_OZEL_ALAN_9: item.IST_OZEL_ALAN_9,
-            IST_OZEL_ALAN_10: item.IST_OZEL_ALAN_10,
-            IST_UYAR: item.IST_UYAR,
-            IST_UYARI_SIKLIGI: item.IST_UYARI_SIKLIGI,
-            IST_LOKASYON_ID: item.IST_LOKASYON_ID,
-            IST_LOKASYON: item.IST_LOKASYON,
-            IST_OTONOM_BAKIM: item.IST_OTONOM_BAKIM,
-            IST_KONTROL_SAYI: item.IST_KONTROL_SAYI,
           };
         });
         setData(formattedData); // Directly set the data
@@ -103,14 +56,25 @@ export default function MainTable() {
   };
 
   const normalizeString = (str) => {
+    if (str === null) {
+      return "";
+    }
     return str
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase();
+      .toLowerCase()
+      .replace(/ğ/gim, "g")
+      .replace(/ü/gim, "u")
+      .replace(/ş/gim, "s")
+      .replace(/ı/gim, "i")
+      .replace(/ö/gim, "o")
+      .replace(/ç/gim, "c");
   };
 
   useEffect(() => {
-    const filtered = data.filter((item) => normalizeString(item.IST_TANIM).includes(normalizeString(searchTerm)));
+    const filtered = data.filter((item) =>
+      normalizeString(item.IST_TANIM).includes(normalizeString(searchTerm))
+    );
     setFilteredData(filtered);
   }, [searchTerm, data]);
 
@@ -122,7 +86,9 @@ export default function MainTable() {
       setValue("selectedLokasyonId", null);
     }
     // Seçilen satırların verisini bul
-    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
+    const newSelectedRows = data.filter((row) =>
+      newSelectedRowKeys.includes(row.key)
+    );
     setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
   };
 
@@ -180,7 +146,11 @@ export default function MainTable() {
       align: "center",
       render: (text) => (
         <div style={{ textAlign: "center" }}>
-          {text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}
+          {text ? (
+            <CheckOutlined style={{ color: "green" }} />
+          ) : (
+            <CloseOutlined style={{ color: "red" }} />
+          )}
         </div>
       ),
     },
@@ -431,7 +401,8 @@ export default function MainTable() {
           marginBottom: "20px",
           gap: "10px",
           padding: "0 5px",
-        }}>
+        }}
+      >
         <Input
           style={{ width: "250px" }}
           type="text"
@@ -441,8 +412,14 @@ export default function MainTable() {
           prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
         />
         <div style={{ display: "flex", gap: "10px" }}>
-          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
-          <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
+          <ContextMenu
+            selectedRows={selectedRows}
+            refreshTableData={refreshTableData}
+          />
+          <CreateDrawer
+            selectedLokasyonId={selectedRowKeys[0]}
+            onRefresh={refreshTableData}
+          />
         </div>
       </div>
       <Spin spinning={loading}>
