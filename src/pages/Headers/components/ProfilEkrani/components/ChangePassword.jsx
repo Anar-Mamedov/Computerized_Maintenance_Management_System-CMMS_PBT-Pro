@@ -122,7 +122,8 @@ function ChangePassword(props) {
                   const hasUpperCase = /[A-Z]/.test(value);
                   const hasLowerCase = /[a-z]/.test(value);
                   const hasNumber = /\d/.test(value);
-                  const hasSpecialChar = /[!@&=},?,\\]/.test(value);
+                  const hasSpecialChar =
+                    /[ `!@#$%^&*()_+\-={};"|,.<>?~/':§]/.test(value);
                   const hasMinLength = value.length >= 8;
                   return (
                     (hasUpperCase &&
