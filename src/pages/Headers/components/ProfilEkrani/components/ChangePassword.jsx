@@ -13,6 +13,21 @@ function ChangePassword(props) {
     formState: { errors },
   } = useForm();
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [isStrongPasswordRequired, setIsStrongPasswordRequired] =
+    useState(true);
+
+  useEffect(() => {
+    const fetchPasswordPolicy = async () => {
+      try {
+        const response = await AxiosInstance.get("/password-policy-endpoint"); // API endpointinizi buraya girin
+        setIsStrongPasswordRequired(response.data.GUCLENDIRILMIS_SIFRE_KULLAN);
+      } catch (error) {
+        console.error("Error fetching password policy:", error);
+      }
+    };
+
+    fetchPasswordPolicy();
+  }, []);
 
   const calculatePasswordStrength = (password) => {
     let strength = 0;
@@ -76,43 +91,91 @@ function ChangePassword(props) {
             border: "1px solid #e1e1e1",
           }}
         >
-          <Controller
-            name="oldPassword"
-            control={control}
-            defaultValue=""
-            rules={{ required: true }}
-            render={({ field }) => (
-              <Input.Password {...field} placeholder="Eski Şifreniz" />
-            )}
-          />
+          <Form.Item
+            validateStatus={errors.oldPassword ? "error" : ""}
+            help={errors.oldPassword ? errors.oldPassword.message : ""}
+            style={{
+              marginBottom: errors.oldPassword ? "0px" : "0", // Hata olduğunda normal margin, aksi halde 0
+            }}
+          >
+            <Controller
+              name="oldPassword"
+              control={control}
+              defaultValue=""
+              rules={{ required: "Alan boş bırakılamaz" }}
+              render={({ field }) => (
+                <Input.Password {...field} placeholder="Eski Şifreniz" />
+              )}
+            />
+          </Form.Item>
+
           <Controller
             name="newPassword"
             control={control}
             defaultValue=""
-            rules={{ required: true }}
+            rules={{
+              required: isStrongPasswordRequired
+                ? "Alan boş bırakılamaz"
+                : "Alan boş bırakılamaz",
+              validate: (value) => {
+                if (isStrongPasswordRequired) {
+                  const hasUpperCase = /[A-Z]/.test(value);
+                  const hasLowerCase = /[a-z]/.test(value);
+                  const hasNumber = /\d/.test(value);
+                  const hasMinLength = value.length >= 8;
+                  return (
+                    (hasUpperCase &&
+                      hasLowerCase &&
+                      hasNumber &&
+                      hasMinLength) ||
+                    "Şifreniz en az 8 karakter uzunluğunda olmalı, büyük ve küçük harfler içermeli ve en az bir rakam içermelidir."
+                  );
+                } else {
+                  return true; // GUCLENDIRILMIS_SIFRE_KULLAN false ise, her türlü şifreyi kabul eder
+                }
+              },
+            }}
             render={({ field }) => (
               <>
-                <Input.Password {...field} placeholder="Yeni Şifreniz" />
+                <Form.Item
+                  validateStatus={errors.newPassword ? "error" : ""}
+                  help={errors.newPassword ? errors.newPassword.message : ""}
+                  style={{
+                    marginBottom: errors.newPassword ? "0px" : "0", // Hata olduğunda normal margin, aksi halde 0
+                  }}
+                >
+                  <Input.Password {...field} placeholder="Yeni Şifreniz" />
+                </Form.Item>
               </>
             )}
           />
-          <Controller
-            name="confirmPassword"
-            control={control}
-            defaultValue=""
-            rules={{ required: true }}
-            render={({ field }) => (
-              <Input.Password
-                {...field}
-                placeholder="Yeni Şifrenizi Onaylayın"
-              />
-            )}
-          />
-
-          <Text style={{ fontSize: "14px", fontWeight: "400", color: "#888" }}>
-            Şifreniz en az 6 karakter uzunluğunda olmalı, büyük ve küçük harfler
-            içermeli ve en az bir rakam içermelidir.
-          </Text>
+          <Form.Item
+            validateStatus={errors.confirmPassword ? "error" : ""}
+            help={errors.confirmPassword ? errors.confirmPassword.message : ""}
+            style={{
+              marginBottom: errors.confirmPassword ? "0px" : "0", // Hata olduğunda normal margin, aksi halde 0
+            }}
+          >
+            <Controller
+              name="confirmPassword"
+              control={control}
+              defaultValue=""
+              rules={{
+                required: "Alan boş bırakılamaz",
+                validate: (value) =>
+                  value === newPassword ||
+                  "Şifreler eşleşmiyor, lütfen kontrol edin.",
+              }}
+              render={({ field }) => (
+                <>
+                  <Input.Password
+                    {...field}
+                    placeholder="Yeni Şifrenizi Onaylayın"
+                  />
+                </>
+              )}
+            />
+          </Form.Item>
           {newPassword && (
             <Progress
               percent={passwordStrength}
