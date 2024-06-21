@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import AxiosInstance from "../../../../../../api/http";
 import { Button, message, Popconfirm } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 
 export default function Sil({
   selectedRows,
@@ -73,10 +73,18 @@ export default function Sil({
   return (
     <div style={buttonStyle}>
       <Popconfirm
-        title="Bu öğeyi silmek istediğinize emin misiniz?"
+        title="Silme İşlemi"
+        description="Bu öğeyi silmek istediğinize emin misiniz?"
         onConfirm={handleDelete}
         okText="Evet"
         cancelText="Hayır"
+        icon={
+          <QuestionCircleOutlined
+            style={{
+              color: "red",
+            }}
+          />
+        }
       >
         <Button
           style={{ paddingLeft: "0px" }}
