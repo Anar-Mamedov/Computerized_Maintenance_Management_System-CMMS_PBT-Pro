@@ -24,7 +24,9 @@ export default function SozlesmeTablo({ workshopSelectedId, onSubmit }) {
 
     // Örnek bir tarih formatla ve ay formatını belirle
     const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
-    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(
+      sampleDate
+    );
 
     let monthFormat;
     if (sampleFormatted.includes("January")) {
@@ -57,7 +59,14 @@ export default function SozlesmeTablo({ workshopSelectedId, onSubmit }) {
       // Saat ve dakika değerlerinin geçerliliğini kontrol et
       const hoursInt = parseInt(hours, 10);
       const minutesInt = parseInt(minutes, 10);
-      if (isNaN(hoursInt) || isNaN(minutesInt) || hoursInt < 0 || hoursInt > 23 || minutesInt < 0 || minutesInt > 59) {
+      if (
+        isNaN(hoursInt) ||
+        isNaN(minutesInt) ||
+        hoursInt < 0 ||
+        hoursInt > 23 ||
+        minutesInt < 0 ||
+        minutesInt > 59
+      ) {
         throw new Error("Invalid time format");
       }
 
@@ -167,10 +176,11 @@ export default function SozlesmeTablo({ workshopSelectedId, onSubmit }) {
       <Modal
         width={1200}
         centered
-        title="Atölye Tanımları"
+        title="Sözleşme Tanımları"
         open={isModalVisible}
         onOk={handleModalOk}
-        onCancel={handleModalToggle}>
+        onCancel={handleModalToggle}
+      >
         <Table
           rowSelection={{
             type: "radio",

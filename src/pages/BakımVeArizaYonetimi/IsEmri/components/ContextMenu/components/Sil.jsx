@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import AxiosInstance from "../../../../../../api/http";
-import { Button, message } from "antd";
+import { Button, message, Popconfirm } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 
 export default function Sil({
@@ -72,15 +72,21 @@ export default function Sil({
 
   return (
     <div style={buttonStyle}>
-      <Button
-        style={{ paddingLeft: "0px" }}
-        type="link"
-        danger
-        icon={<DeleteOutlined />}
-        onClick={handleDelete}
+      <Popconfirm
+        title="Bu öğeyi silmek istediğinize emin misiniz?"
+        onConfirm={handleDelete}
+        okText="Evet"
+        cancelText="Hayır"
       >
-        Sil
-      </Button>
+        <Button
+          style={{ paddingLeft: "0px" }}
+          type="link"
+          danger
+          icon={<DeleteOutlined />}
+        >
+          Sil
+        </Button>
+      </Popconfirm>
     </div>
   );
 }
