@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Avatar, Spin, Typography } from "antd";
+import { Avatar, Spin, Typography, Image, Button, Modal } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
-import { UserOutlined } from "@ant-design/icons";
+import { UserOutlined, EditOutlined, PictureOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../api/http.jsx";
 import { useRecoilValue } from "recoil";
 import { userState } from "../../../../../state/userState.jsx";
+import { useAppContext } from "../../../../../AppContext.jsx";
+import ResimUpload from "./Resim/ResimUpload.jsx"; // AppContext'i import edin
 const { Text } = Typography;
 
 function HesapBilgilerim(props) {
@@ -17,18 +19,23 @@ function HesapBilgilerim(props) {
   const userData = useRecoilValue(userState); // userState atomunun değerini oku
   const [imageUrl, setImageUrl] = useState(null); // Resim URL'sini saklamak için state tanımlayın
   const [loadingImage, setLoadingImage] = useState(false); // Yükleme durumu için yeni bir state
+  const { userData1 } = useAppContext(); // AppContext'ten userData1 değerini alın
+  const [isModalVisible, setIsModalVisible] = useState(false); // Modal'ın görünürlüğünü kontrol etmek için state
+  const [isModalVisible1, setIsModalVisible1] = useState(false); // Modal'ın görünürlüğünü kontrol etmek için state
 
   const userName = watch("userName");
 
+  console.log(userData1);
+
   useEffect(() => {
     // userData.userResimID değeri gelene kadar bekler
-    if (userData.userResimID) {
+    if (userData1?.PRS_RESIM_ID) {
       const fetchImage = async () => {
         try {
           setLoadingImage(true); // Resim yüklenmeye başladığında loadingImage'i true yap
           // responseType olarak 'blob' seçilir.
           const response = await AxiosInstance.get(
-            `ResimGetirById?id=${userData.userResimID}`,
+            `ResimGetirById?id=${userData1?.PRS_RESIM_ID}`,
             {
               responseType: "blob",
             }
@@ -53,15 +60,31 @@ function HesapBilgilerim(props) {
         }
       };
     }
-  }, [userData.userResimID]); // Dependency array'e imageUrl eklenir.
+  }, [userData1?.PRS_RESIM_ID]); // Dependency array'e imageUrl eklenir.
 
-  useEffect(() => {
-    setValue("userName", "Kullanıcı Adı");
-  }, []);
+  // useEffect(() => {
+  //   setValue("userName", "Kullanıcı Adı");
+  // }, []);
+  //
+  // useEffect(() => {
+  //   console.log(userName);
+  // }, [userName]);
 
-  useEffect(() => {
-    console.log(userName);
-  }, [userName]);
+  const showModal = () => {
+    setIsModalVisible(true); // Modal'ı göster
+  };
+
+  const uploadPhoto = () => {
+    setIsModalVisible1(true); // Modal'ı göster
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false); // Modal'ı kapat
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false); // Modal'ı kapat
+  };
 
   return (
     <div
@@ -83,25 +106,115 @@ function HesapBilgilerim(props) {
         }}
       >
         <div style={{ display: "flex", gap: "10px" }}>
-          <Avatar
-            style={{ minHeight: "64px", minWidth: "64px" }}
-            size={64}
-            src={imageUrl}
-            icon={!imageUrl && !loadingImage && <UserOutlined />} // Yükleme olmadığı ve imageUrl yoksa ikonu göster
+          <div style={{ position: "relative", width: "84px", height: "84px" }}>
+            {imageUrl ? (
+              <Image.PreviewGroup>
+                <Image
+                  width={84}
+                  height={84}
+                  src={imageUrl}
+                  placeholder={loadingImage ? <Spin /> : <UserOutlined />}
+                  style={{ borderRadius: "50%", minWidth: "84px" }} // Resmi yuvarlak yap
+                />
+              </Image.PreviewGroup>
+            ) : (
+              <Avatar
+                style={{ minHeight: "84px", minWidth: "84px" }}
+                size={84}
+                icon={!loadingImage && <UserOutlined />} // Yükleme olmadığı ve imageUrl yoksa ikonu göster
+              >
+                {loadingImage && <Spin />}
+                {/* Resim yüklenirken Spin göster */}
+              </Avatar>
+            )}
+            <Button
+              style={{
+                position: "absolute",
+                bottom: "0px",
+                right: "0px",
+              }}
+              size={"medium"}
+              shape="circle"
+              icon={<PictureOutlined />}
+              onClick={uploadPhoto}
+            />
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
           >
-            {loadingImage && <Spin />}
-            {/* Resim yüklenirken Spin göster */}
-          </Avatar>
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <Text style={{ fontWeight: "500", fontSize: "15px" }}>
-              {userData.userName || "Anonim"}
-            </Text>
-            <Text type="secondary">
-              {userData.userUnvan || "Takim Yöneticisi"}
-            </Text>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <Text style={{ fontWeight: "500", fontSize: "15px" }}>
+                {userData1?.KLL_TANIM || "Bilinmiyor"} (
+                {userData1?.KLL_KOD || ""})
+              </Text>
+              <Text type="secondary">{userData1?.PRS_UNVAN || ""}</Text>
+              <Text type="secondary">{userData1?.PRS_ADRES || ""}</Text>
+            </div>
+            <Button
+              shape="circle"
+              icon={<EditOutlined />}
+              onClick={showModal}
+            />
           </div>
         </div>
       </div>
+
+      <div
+        style={{
+          borderRadius: "16px",
+          border: "1px solid #e1e1e1",
+          padding: "10px",
+        }}
+      >
+        <div style={{ display: "flex", gap: "10px" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+          >
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <Text style={{ fontWeight: "500", fontSize: "15px" }}>
+                {userData1?.KLL_TANIM || "Bilinmiyor"} (
+                {userData1?.KLL_KOD || ""})
+              </Text>
+              <Text type="secondary">{userData1?.PRS_UNVAN || ""}</Text>
+              <Text type="secondary">{userData1?.PRS_ADRES || ""}</Text>
+            </div>
+            <Button
+              shape="circle"
+              icon={<EditOutlined />}
+              onClick={showModal}
+            />
+          </div>
+        </div>
+      </div>
+      <Modal
+        title="Modal Başlık"
+        centered
+        open={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <p>Modal içeriği...</p>
+      </Modal>
+
+      <Modal
+        title="Resim Yükle"
+        centered
+        open={isModalVisible1}
+        onOk={() => setIsModalVisible1(false)}
+        onCancel={() => setIsModalVisible1(false)}
+        width={800}
+      >
+        <ResimUpload />
+      </Modal>
     </div>
   );
 }
