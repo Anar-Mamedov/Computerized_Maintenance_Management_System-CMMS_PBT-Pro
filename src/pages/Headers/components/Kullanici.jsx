@@ -5,12 +5,15 @@ import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil"; // useRecoilValue import edin
 import { userState, authTokenState } from "../../../state/userState"; // Atomlarınızın yolunu güncelleyin
 import AxiosInstance from "../../../api/http";
+import { useAppContext } from "../../../AppContext"; // AppContext'ten useAppContext hook'unu alın
 
 const { Text, Link } = Typography;
 
 export default function Header() {
   const [open, setOpen] = useState(false);
   const userData = useRecoilValue(userState); // userState atomunun değerini oku
+  const { isButtonClicked, setIsButtonClicked } = useAppContext(); // AppContext'ten isButtonClicked ve setIsButtonClicked'i alın
+  const { userData1, setUserData1 } = useAppContext(); // AppContext'ten userData1 ve setUserData1'i alın
   const [imageUrl, setImageUrl] = useState(null); // Resim URL'sini saklamak için state tanımlayın
   const [loadingImage, setLoadingImage] = useState(false); // Yükleme durumu için yeni bir state
 
@@ -28,27 +31,36 @@ export default function Header() {
     // window.location.reload(); // Sayfayı yenile
   };
 
-  const userData1 = {
-    userName: "Mehmet",
-    KULLANICI_ID: 1,
-    userAd: "Mehmet",
-    userSoyad: "Kaya",
-    userMail: "test@test.com",
-    userTel: "5555555555",
-    userAdres: "İstanbul",
-    userUnvan: "Yazılım Uzmanı",
-    userResimID: 1,
+  const fetchUserData = async () => {
+    try {
+      const response = await AxiosInstance.get("GetKullaniciProfile");
+      setUserData1(response[0]); // API'den gelen veriyi setUserData1 ile güncelleyin
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
   };
 
   useEffect(() => {
+    // userData1 verisini API'den alın
+    fetchUserData();
+  }, [setUserData1]);
+
+  useEffect(() => {
+    if (isButtonClicked) {
+      fetchUserData();
+      setIsButtonClicked(false); // API çağrısı yapıldıktan sonra durumu resetleyin
+    }
+  }, [isButtonClicked, setIsButtonClicked]);
+
+  useEffect(() => {
     // userData.userResimID değeri gelene kadar bekler
-    if (userData.userResimID) {
+    if (userData1?.PRS_RESIM_ID) {
       const fetchImage = async () => {
         try {
           setLoadingImage(true); // Resim yüklenmeye başladığında loadingImage'i true yap
           // responseType olarak 'blob' seçilir.
           const response = await AxiosInstance.get(
-            `ResimGetirById?id=${userData.userResimID}`,
+            `ResimGetirById?id=${userData1?.PRS_RESIM_ID}`,
             {
               responseType: "blob",
             }
@@ -73,7 +85,7 @@ export default function Header() {
         }
       };
     }
-  }, [userData.userResimID]); // Dependency array'e imageUrl eklenir.
+  }, [userData1?.PRS_RESIM_ID]); // Dependency array'e imageUrl eklenir.
 
   const content = (
     <div>
@@ -115,9 +127,9 @@ export default function Header() {
           }}
         >
           <Text style={{ fontWeight: "500" }}>
-            {userData.userName || "Anonim"}
+            {userData1?.KLL_TANIM || "Bilinmiyor"}
           </Text>
-          <Text type="secondary">{userData.userUnvan || ""}</Text>
+          <Text type="secondary">{userData1?.PRS_UNVAN || ""}</Text>
         </div>
         <Avatar
           size="large"
