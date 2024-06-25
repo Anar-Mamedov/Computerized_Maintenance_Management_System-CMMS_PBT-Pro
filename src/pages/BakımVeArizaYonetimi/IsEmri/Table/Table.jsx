@@ -296,9 +296,7 @@ const MainTable = () => {
       render: (text, record) => (
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            textAlign: "center",
           }}
         >
           <Tag

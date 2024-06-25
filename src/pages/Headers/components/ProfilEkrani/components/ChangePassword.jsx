@@ -11,6 +11,7 @@ function ChangePassword(props) {
     handleSubmit,
     watch,
     formState: { errors },
+    reset,
   } = useForm();
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [isStrongPasswordRequired, setIsStrongPasswordRequired] =
@@ -54,13 +55,18 @@ function ChangePassword(props) {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
       console.log(user.userId);
-      const response = await AxiosInstance.post("/change-password", {
-        userID: user.userId,
-        oldPassword: data.oldPassword,
-        newPassword: data.newPassword,
-      });
-
-      message.success("Password changed successfully");
+      const response = await AxiosInstance.post(
+        `UpdateUserPass?oldPass=${data.oldPassword}&updatePass=${data.newPassword}`
+      );
+      console.log("Data sent successfully:", response);
+      if (response.status_code === 200 || response.status_code === 201) {
+        message.success("Şifre Güncellendi.");
+        reset(); // Reset form fields
+      } else if (response.status_code === 401) {
+        message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+      } else {
+        message.error("Eski Şifrenizi Yanlış Girdiniz.");
+      }
     } catch (error) {
       message.error("Error changing password");
     }
@@ -102,7 +108,6 @@ function ChangePassword(props) {
               name="oldPassword"
               control={control}
               defaultValue=""
-              rules={{ required: "Alan boş bırakılamaz" }}
               render={({ field }) => (
                 <Input.Password {...field} placeholder="Eski Şifreniz" />
               )}
@@ -118,20 +123,23 @@ function ChangePassword(props) {
                 ? "Alan boş bırakılamaz"
                 : "Alan boş bırakılamaz",
               validate: (value) => {
+                if (value === watch("oldPassword")) {
+                  return "Yeni şifre, eski şifreyle aynı olamaz.";
+                }
                 if (isStrongPasswordRequired) {
                   const hasUpperCase = /[A-Z]/.test(value);
                   const hasLowerCase = /[a-z]/.test(value);
                   const hasNumber = /\d/.test(value);
                   const hasSpecialChar =
-                    /[ `!@#$%^&*()_+\-={};"|,.<>?~/':§]/.test(value);
+                    /[^A-Za-z0-9 `!@$%^*()_+\-={};"|,.<>?~/':§]/.test(value);
                   const hasMinLength = value.length >= 8;
                   return (
                     (hasUpperCase &&
                       hasLowerCase &&
                       hasNumber &&
-                      hasSpecialChar &&
+                      !hasSpecialChar &&
                       hasMinLength) ||
-                    "Şifreniz en az 8 karakter uzunluğunda olmalı, büyük ve küçük harfler, rakam ve özel karakterler (!,@,&=,},?,\\) içermelidir."
+                    "Şifreniz en az 8 karakter uzunluğunda olmalı, büyük ve küçük harfler, rakam ve belirtilen özel karakterler ( `!@$%^*()_+\\-={};\"|,.<>?~/':§) dışında herhangi bir özel karakter içermemelidir."
                   );
                 } else {
                   return true; // GUCLENDIRILMIS_SIFRE_KULLAN false ise, her türlü şifreyi kabul eder
