@@ -5,7 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil"; // useRecoilValue import edin
 import { userState, authTokenState } from "../../../state/userState"; // Atomlarınızın yolunu güncelleyin
 import AxiosInstance from "../../../api/http";
-import { useAppContext } from "../../../AppContext"; // AppContext'ten useAppContext hook'unu alın
+import { useAppContext } from "../../../AppContext";
+import HesapBilgileriDuzenle from "./HesapBilgileriDuzenle.jsx"; // AppContext'ten useAppContext hook'unu alın
 
 const { Text, Link } = Typography;
 
@@ -16,6 +17,7 @@ export default function Header() {
   const { userData1, setUserData1 } = useAppContext(); // AppContext'ten userData1 ve setUserData1'i alın
   const [imageUrl, setImageUrl] = useState(null); // Resim URL'sini saklamak için state tanımlayın
   const [loadingImage, setLoadingImage] = useState(false); // Yükleme durumu için yeni bir state
+  const [isModalVisible, setIsModalVisible] = useState(false); // Modal'ın görünürlüğünü kontrol etmek için state
 
   const handleOpenChange = (newOpen) => {
     setOpen(newOpen);
@@ -87,6 +89,10 @@ export default function Header() {
     }
   }, [userData1?.PRS_RESIM_ID]); // Dependency array'e imageUrl eklenir.
 
+  const showModal = () => {
+    setIsModalVisible(true); // Modal'ı göster
+  };
+
   const content = (
     <div>
       <p
@@ -96,7 +102,10 @@ export default function Header() {
         <UserOutlined style={{ fontSize: "12px" }} />
         Profil
       </p>
-      <p style={{ display: "flex", gap: "5px", cursor: "pointer" }}>
+      <p
+        style={{ display: "flex", gap: "5px", cursor: "pointer" }}
+        onClick={showModal}
+      >
         <EditOutlined style={{ fontSize: "12px" }} />
         Hesabı Düzenle
       </p>
@@ -110,6 +119,7 @@ export default function Header() {
       </div>
     </div>
   );
+
   return (
     <Popover
       placement="bottom"
@@ -146,6 +156,13 @@ export default function Header() {
           {loadingImage && <Spin />}
           {/* Resim yüklenirken Spin göster */}
         </Avatar>
+
+        <HesapBilgileriDuzenle
+          accountEditModalOpen={isModalVisible}
+          accountEditModalClose={() => {
+            setIsModalVisible(false);
+          }}
+        />
       </div>
     </Popover>
   );

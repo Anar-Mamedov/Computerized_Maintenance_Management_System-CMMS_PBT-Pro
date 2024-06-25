@@ -6,6 +6,7 @@ import AxiosInstance from "../../../../../api/http.jsx";
 import { useRecoilValue } from "recoil";
 import { userState } from "../../../../../state/userState.jsx";
 import { useAppContext } from "../../../../../AppContext.jsx";
+import HesapBilgileriDuzenle from "../../HesapBilgileriDuzenle.jsx";
 import ResimUpload from "./Resim/ResimUpload.jsx"; // AppContext'i import edin
 const { Text } = Typography;
 
@@ -76,14 +77,6 @@ function HesapBilgilerim(props) {
 
   const uploadPhoto = () => {
     setIsModalVisible1(true); // Modal'ı göster
-  };
-
-  const handleOk = () => {
-    setIsModalVisible(false); // Modal'ı kapat
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false); // Modal'ı kapat
   };
 
   return (
@@ -167,7 +160,7 @@ function HesapBilgilerim(props) {
         style={{
           borderRadius: "16px",
           border: "1px solid #e1e1e1",
-          padding: "10px",
+          padding: "20px",
           display: "flex",
           flexDirection: "column",
         }}
@@ -228,15 +221,12 @@ function HesapBilgilerim(props) {
           </div>
         </div>
       </div>
-      <Modal
-        title="Modal Başlık"
-        centered
-        open={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <p>Modal içeriği...</p>
-      </Modal>
+      <HesapBilgileriDuzenle
+        accountEditModalOpen={isModalVisible}
+        accountEditModalClose={() => {
+          setIsModalVisible(false);
+        }}
+      />
 
       <Modal
         title="Resim Yükle"

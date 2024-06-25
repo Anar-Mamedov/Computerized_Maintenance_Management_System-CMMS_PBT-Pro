@@ -46,7 +46,11 @@ export default function DashboardStatisticCards() {
           </Spin>
         ) : (
           <div
-            style={{ display: "flex", justifyContent: "space-between" }}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              cursor: "pointer",
+            }}
             onClick={showModal}
           >
             <div>
