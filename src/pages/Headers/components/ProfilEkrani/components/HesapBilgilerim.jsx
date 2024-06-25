@@ -149,8 +149,7 @@ function HesapBilgilerim(props) {
           >
             <div style={{ display: "flex", flexDirection: "column" }}>
               <Text style={{ fontWeight: "500", fontSize: "15px" }}>
-                {userData1?.KLL_TANIM || "Bilinmiyor"} (
-                {userData1?.KLL_KOD || ""})
+                {userData1?.KLL_TANIM || "Bilinmiyor"}
               </Text>
               <Text type="secondary">{userData1?.PRS_UNVAN || ""}</Text>
               <Text type="secondary">{userData1?.PRS_ADRES || ""}</Text>
@@ -169,29 +168,63 @@ function HesapBilgilerim(props) {
           borderRadius: "16px",
           border: "1px solid #e1e1e1",
           padding: "10px",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        <div style={{ display: "flex", gap: "10px" }}>
-          <div
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            justifyContent: "space-between",
+          }}
+        >
+          <Text
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              width: "100%",
+              fontWeight: "500",
+              fontSize: "16px",
+              marginBottom: "10px",
             }}
           >
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <Text style={{ fontWeight: "500", fontSize: "15px" }}>
-                {userData1?.KLL_TANIM || "Bilinmiyor"} (
-                {userData1?.KLL_KOD || ""})
-              </Text>
-              <Text type="secondary">{userData1?.PRS_UNVAN || ""}</Text>
-              <Text type="secondary">{userData1?.PRS_ADRES || ""}</Text>
-            </div>
-            <Button
-              shape="circle"
-              icon={<EditOutlined />}
-              onClick={showModal}
-            />
+            Kişisel Bilgilerim
+          </Text>
+          <Button shape="circle" icon={<EditOutlined />} onClick={showModal} />
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gridGap: "10px",
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Text type="secondary">İsim Soyisim</Text>
+            <Text>{userData1?.PRS_ISIM || "Bilinmiyor"}</Text>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Text type="secondary">Kullanici Kodu</Text>
+            <Text>{userData1?.KLL_KOD || "Bilinmiyor"}</Text>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Text type="secondary">E-posta</Text>
+            <Text>{userData1?.PRS_EMAIL || "Bilinmiyor"}</Text>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Text type="secondary">Telefon</Text>
+            <Text>{userData1?.PRS_TELEFON || "Bilinmiyor"}</Text>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Text type="secondary">Dahili</Text>
+            <Text>{userData1?.PRS_DAHILI || "Bilinmiyor"}</Text>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Text type="secondary">Adres</Text>
+            <Text>{userData1?.PRS_ADRES || "Bilinmiyor"}</Text>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Text type="secondary">Açıklama</Text>
+            <Text>{userData1?.PRS_ACIKLAMA || "Bilinmiyor"}</Text>
           </div>
         </div>
       </div>
