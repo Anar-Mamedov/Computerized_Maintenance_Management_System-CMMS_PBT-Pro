@@ -90,13 +90,13 @@ export default function Header() {
   const content = (
     <div>
       <p
-        style={{ display: "flex", gap: "5px" }}
+        style={{ display: "flex", gap: "5px", cursor: "pointer" }}
         onClick={() => navigate("/User")}
       >
         <UserOutlined style={{ fontSize: "12px" }} />
         Profil
       </p>
-      <p style={{ display: "flex", gap: "5px" }}>
+      <p style={{ display: "flex", gap: "5px", cursor: "pointer" }}>
         <EditOutlined style={{ fontSize: "12px" }} />
         Hesabı Düzenle
       </p>
@@ -118,7 +118,14 @@ export default function Header() {
       open={open}
       onOpenChange={handleOpenChange}
     >
-      <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "10px",
+          alignItems: "flex-start",
+          cursor: "pointer",
+        }}
+      >
         <div
           style={{
             display: "flex",
