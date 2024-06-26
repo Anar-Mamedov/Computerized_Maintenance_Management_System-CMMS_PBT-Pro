@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { Button, Form, Input, Typography, message, Spin } from "antd";
-import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import {
+  UserOutlined,
+  LockOutlined,
+  EyeInvisibleOutlined,
+  EyeTwoTone,
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import AxiosInstance from "../../../api/http";
 import { useSetRecoilState } from "recoil";
@@ -13,6 +18,7 @@ export default function LoginForm() {
   const navigate = useNavigate();
   const setUser = useSetRecoilState(userState);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState(null); // reCAPTCHA token'ı için state
 
   const onSubmit = async (values) => {
@@ -79,6 +85,13 @@ export default function LoginForm() {
           projeTanimlari: response.KLL_WEB_PROJE,
         };
         localStorage.setItem("login", JSON.stringify(login));
+        const userPasswordCheck = {
+          newUser: response.KLL_NEW_USER,
+        };
+        localStorage.setItem(
+          "userPasswordCheck",
+          JSON.stringify(userPasswordCheck)
+        );
         const anar = localStorage.getItem("login");
         console.log(anar);
         message.success("Giriş başarılı!");
@@ -132,10 +145,13 @@ export default function LoginForm() {
             />
           </Form.Item>
           <Form.Item name="password">
-            <Input
+            <Input.Password
               prefix={<LockOutlined className="site-form-item-icon" />}
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Şifre"
+              iconRender={(visible) =>
+                visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+              }
             />
           </Form.Item>
           <Form.Item>

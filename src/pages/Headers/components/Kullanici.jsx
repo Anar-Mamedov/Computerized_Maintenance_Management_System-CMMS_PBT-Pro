@@ -29,6 +29,7 @@ export default function Header() {
     localStorage.removeItem("token"); // localStorage'dan token'i sil
     localStorage.removeItem("user"); // localStorage'dan kullanıcıyı sil
     localStorage.removeItem("login"); // localStorage'dan login'i sil
+    localStorage.removeItem("userPasswordCheck"); // localStorage'dan userPasswordCheck'i sil
     navigate("/auth"); // `/login` sayfasına yönlendir
     // window.location.reload(); // Sayfayı yenile
   };
@@ -37,6 +38,13 @@ export default function Header() {
     try {
       const response = await AxiosInstance.get("GetKullaniciProfile");
       setUserData1(response[0]); // API'den gelen veriyi setUserData1 ile güncelleyin
+      const userPasswordCheck = {
+        newUser: response[0].KLL_NEW_USER,
+      };
+      localStorage.setItem(
+        "userPasswordCheck",
+        JSON.stringify(userPasswordCheck)
+      );
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
