@@ -86,8 +86,14 @@ export default function Header() {
   }, [isButtonClicked, setIsButtonClicked]);
 
   useEffect(() => {
+    if (!userData1?.PRS_RESIM_ID) {
+      setImageUrl(null);
+    }
+  }, [userData1]);
+
+  useEffect(() => {
     // userData.userResimID değeri gelene kadar bekler
-    if (userData1?.PRS_RESIM_ID) {
+    if (userData1?.PRS_RESIM_ID !== undefined) {
       const fetchImage = async () => {
         try {
           setLoadingImage(true); // Resim yüklenmeye başladığında loadingImage'i true yap

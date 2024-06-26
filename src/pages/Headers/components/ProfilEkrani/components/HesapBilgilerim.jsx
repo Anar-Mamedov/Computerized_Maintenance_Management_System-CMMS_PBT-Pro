@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Avatar, Spin, Typography, Image, Button, Modal } from "antd";
+import { Avatar, Spin, Typography, Image, Button, Modal, message } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import { UserOutlined, EditOutlined, PictureOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../api/http.jsx";
@@ -8,6 +8,7 @@ import { userState } from "../../../../../state/userState.jsx";
 import { useAppContext } from "../../../../../AppContext.jsx";
 import HesapBilgileriDuzenle from "../../HesapBilgileriDuzenle.jsx";
 import ResimUpload from "./Resim/ResimUpload.jsx"; // AppContext'i import edin
+import { TiDelete } from "react-icons/ti";
 const { Text } = Typography;
 
 function HesapBilgilerim(props) {
@@ -23,12 +24,69 @@ function HesapBilgilerim(props) {
   const { userData1 } = useAppContext(); // AppContext'ten userData1 değerini alın
   const [isModalVisible, setIsModalVisible] = useState(false); // Modal'ın görünürlüğünü kontrol etmek için state
   const [isModalVisible1, setIsModalVisible1] = useState(false); // Modal'ın görünürlüğünü kontrol etmek için state
+  const { setIsButtonClicked } = useAppContext(); // AppContext'ten setIsButtonClicked fonksiyonunu alın
 
   const userName = watch("userName");
 
+  const Body = {
+    PRS_ISIM: userData1?.PRS_ISIM,
+    KLL_KOD: userData1?.KLL_KOD,
+    KLL_TANIM: userData1?.KLL_TANIM,
+    PRS_EMAIL: userData1?.PRS_EMAIL,
+    PRS_TELEFON: userData1?.PRS_TELEFON,
+    PRS_DAHILI: userData1?.PRS_DAHILI,
+    PRS_ADRES: userData1?.PRS_ADRES,
+    PRS_ACIKLAMA: userData1?.PRS_ACIKLAMA,
+    KLL_AKTIF: userData1?.KLL_AKTIF,
+    PRS_UNVAN: userData1?.PRS_UNVAN,
+    PRS_GSM: userData1?.PRS_GSM,
+    PRS_RESIM_ID: "",
+    KLL_PERSONEL_ID: userData1?.KLL_PERSONEL_ID,
+    KLL_NEW_USER: userData1?.KLL_NEW_USER,
+    KLL_DEGISTIRME_TARIH: userData1?.KLL_DEGISTIRME_TARIH,
+  };
+
+  const deletePicture = () => {
+    if (userData1?.PRS_RESIM_ID) {
+      AxiosInstance.post(`UpdateKullaniciProfile`, Body)
+        .then((response) => {
+          console.log("Data sent successfully:", response);
+          if (response.status_code === 200 || response.status_code === 201) {
+            message.success("Güncelleme Başarılı.");
+            setIsButtonClicked((prev) => !prev); // Başarılı yüklemeden sonra resim listesini yenile
+            setImageUrl(null);
+          } else if (response.status_code === 401) {
+            message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+          } else {
+            message.error("Güncelleme Başarısız Oldu.");
+          }
+        })
+        .catch((error) => {
+          // Handle errors here, e.g.:
+          console.error("Error sending data:", error);
+          message.error("Başarısız Olundu.");
+        });
+      console.log({ Body });
+    }
+  };
+
+  // const deletePicture1 = async () => {
+  //   if (userData1?.PRS_RESIM_ID) {
+  //     try {
+  //       const response = await AxiosInstance.get(
+  //         `ResimSil?resimID=${userData1?.PRS_RESIM_ID}`
+  //       );
+  //       setIsButtonClicked((prev) => !prev); // Başarılı yüklemeden sonra resim listesini yenile
+  //       setImageUrl(null);
+  //     } catch (error) {
+  //       console.error("Error fetching user data:", error);
+  //     }
+  //   }
+  // };
+
   useEffect(() => {
     // userData.userResimID değeri gelene kadar bekler
-    if (userData1?.PRS_RESIM_ID) {
+    if (userData1?.PRS_RESIM_ID !== undefined) {
       const fetchImage = async () => {
         try {
           setLoadingImage(true); // Resim yüklenmeye başladığında loadingImage'i true yap
@@ -128,6 +186,19 @@ function HesapBilgilerim(props) {
               shape="circle"
               icon={<PictureOutlined />}
               onClick={uploadPhoto}
+            />
+
+            <TiDelete
+              style={{
+                fontSize: "35px",
+                position: "absolute",
+                top: "-8px",
+                right: "-8px",
+                cursor: "pointer",
+                color: "red",
+                dropShadow: "2px 2px 5px rgba(0,0,0,0.9)",
+              }}
+              onClick={deletePicture}
             />
           </div>
 
