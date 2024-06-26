@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   Button,
   Form,
   Input,
@@ -35,6 +36,8 @@ const SifreDegistirme = ({ accountEditModalOpen, accountEditModalClose }) => {
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [isStrongPasswordRequired, setIsStrongPasswordRequired] =
     useState(true);
+  const [mesaj, setMesaj] = useState("");
+  const [errorMessageShow, setErrorMessageShow] = useState(false);
 
   useEffect(() => {
     const fetchPasswordPolicy = async () => {
@@ -102,6 +105,21 @@ const SifreDegistirme = ({ accountEditModalOpen, accountEditModalClose }) => {
     }
   }, [accountEditModalOpen, reset]);
 
+  useEffect(() => {
+    if (userData1?.KLL_NEW_USER === true) {
+      setErrorMessageShow(true);
+      setMesaj(
+        "İlk girişiniz olduğu için şifrenizi güncellemeniz gerekmektedir."
+      );
+    } else if (userData1?.KLL_NEW_USER === false) {
+      setErrorMessageShow(true);
+      setMesaj("Şifrenizin süresi dolmuştur lütfen şifrenizi güncelleyiniz");
+    } else {
+      setErrorMessageShow(false);
+      setMesaj("");
+    }
+  }, [userData1]);
+
   return (
     <Modal
       title={
@@ -132,6 +150,17 @@ const SifreDegistirme = ({ accountEditModalOpen, accountEditModalClose }) => {
             gap: "10px",
           }}
         >
+          <div style={{ width: "100%" }}>
+            {errorMessageShow ? (
+              <Alert
+                key="alert"
+                style={{ fontWeight: 500, color: "red", textAlign: "left" }}
+                message={mesaj}
+                type="error"
+                showIcon
+              />
+            ) : null}
+          </div>
           <Form.Item
             validateStatus={errors.oldPassword ? "error" : ""}
             help={errors.oldPassword ? errors.oldPassword.message : ""}
