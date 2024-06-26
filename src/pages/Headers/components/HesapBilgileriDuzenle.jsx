@@ -18,16 +18,24 @@ const HesapBilgileriDuzenle = ({
   accountEditModalClose,
 }) => {
   const { userData1 } = useAppContext(); // AppContext'ten userData1 değerini alın
+  const { setIsButtonClicked } = useAppContext(); // AppContext'ten setIsButtonClicked fonksiyonunu alın
   const methods = useForm({
     defaultValues: {
-      PRS_ISIM: "",
-      KLL_KOD: "",
       KLL_TANIM: "",
-      PRS_EMAIL: "",
-      PRS_TELEFON: "",
-      PRS_DAHILI: "",
-      PRS_ADRES: "",
+      KLL_KOD: "",
+      KLL_AKTIF: "",
+      PRS_ISIM: "",
+      PRS_UNVAN: "",
       PRS_ACIKLAMA: "",
+      PRS_TELEFON: "",
+      PRS_GSM: "",
+      PRS_DAHILI: "",
+      PRS_EMAIL: "",
+      PRS_RESIM_ID: "",
+      PRS_ADRES: "",
+      KLL_PERSONEL_ID: "",
+      KLL_NEW_USER: "",
+      KLL_DEGISTIRME_TARIH: "",
       // Add other default values here
     },
   });
@@ -44,6 +52,13 @@ const HesapBilgileriDuzenle = ({
       setValue("PRS_DAHILI", userData1?.PRS_DAHILI);
       setValue("PRS_ADRES", userData1?.PRS_ADRES);
       setValue("PRS_ACIKLAMA", userData1?.PRS_ACIKLAMA);
+      setValue("KLL_AKTIF", userData1?.KLL_AKTIF);
+      setValue("PRS_UNVAN", userData1?.PRS_UNVAN);
+      setValue("PRS_GSM", userData1?.PRS_GSM);
+      setValue("PRS_RESIM_ID", userData1?.PRS_RESIM_ID);
+      setValue("KLL_PERSONEL_ID", userData1?.KLL_PERSONEL_ID);
+      setValue("KLL_NEW_USER", userData1?.KLL_NEW_USER);
+      setValue("KLL_DEGISTIRME_TARIH", userData1?.KLL_DEGISTIRME_TARIH);
     }
   }, [userData1, accountEditModalOpen, setValue]);
 
@@ -63,20 +78,28 @@ const HesapBilgileriDuzenle = ({
       PRS_DAHILI: data.PRS_DAHILI,
       PRS_ADRES: data.PRS_ADRES,
       PRS_ACIKLAMA: data.PRS_ACIKLAMA,
+      KLL_AKTIF: data.KLL_AKTIF,
+      PRS_UNVAN: data.PRS_UNVAN,
+      PRS_GSM: data.PRS_GSM,
+      PRS_RESIM_ID: data.PRS_RESIM_ID,
+      KLL_PERSONEL_ID: data.KLL_PERSONEL_ID,
+      KLL_NEW_USER: data.KLL_NEW_USER,
+      KLL_DEGISTIRME_TARIH: data.KLL_DEGISTIRME_TARIH,
     };
 
-    AxiosInstance.post(`burayaGercekApiYaz`, Body)
+    AxiosInstance.post(`UpdateKullaniciProfile`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
 
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("Güncelleme Başarılı.");
           reset();
           accountEditModalClose(); // Modal'ı kapat
+          setIsButtonClicked((prev) => !prev); // Başarılı yüklemeden sonra resim listesini yenile
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
-          message.error("Ekleme Başarısız.");
+          message.error("Güncelleme Başarısız Oldu.");
         }
       })
       .catch((error) => {

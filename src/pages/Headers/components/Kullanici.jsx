@@ -133,13 +133,13 @@ export default function Header() {
         <UserOutlined style={{ fontSize: "12px" }} />
         Profil
       </p>
-      <p
-        style={{ display: "flex", gap: "5px", cursor: "pointer" }}
-        onClick={showModal}
-      >
-        <EditOutlined style={{ fontSize: "12px" }} />
-        Hesabı Düzenle
-      </p>
+      {/*<p*/}
+      {/*  style={{ display: "flex", gap: "5px", cursor: "pointer" }}*/}
+      {/*  onClick={showModal}*/}
+      {/*>*/}
+      {/*  <EditOutlined style={{ fontSize: "12px" }} />*/}
+      {/*  Hesabı Düzenle*/}
+      {/*</p>*/}
       {/* Çıkış düğmesine onClick olayı ekle */}
       <div
         style={{ display: "flex", gap: "5px", cursor: "pointer" }}
