@@ -26,8 +26,6 @@ function HesapBilgilerim(props) {
 
   const userName = watch("userName");
 
-  console.log(userData1);
-
   useEffect(() => {
     // userData.userResimID değeri gelene kadar bekler
     if (userData1?.PRS_RESIM_ID) {
