@@ -20,6 +20,7 @@ export default function Header() {
   const [loadingImage, setLoadingImage] = useState(false); // Yükleme durumu için yeni bir state
   const [isModalVisible, setIsModalVisible] = useState(false); // Modal'ın görünürlüğünü kontrol etmek için state
   const [isModalVisible2, setIsModalVisible2] = useState(false); // Modal'ın görünürlüğünü kontrol etmek için state
+  const [passwordExpiryTime, setPasswordExpiryTime] = useState(null); // Şifre değiştirme süresi için state tanımlayın
 
   const handleOpenChange = (newOpen) => {
     setOpen(newOpen);
@@ -46,11 +47,36 @@ export default function Header() {
       console.error("Error fetching user data:", error);
     }
   };
+  const fetchUserData1 = async () => {
+    try {
+      const response = await AxiosInstance.get("GetPassExTime");
+      setPasswordExpiryTime(response); // API'den gelen veriyi setUserData1 ile güncelleyin
+      if (passwordExpiryTime > 0) {
+        const changeDate = new Date(userData1?.KLL_DEGISTIRME_TARIH);
+        const now = new Date();
+        const timeDifference = now.getTime() - changeDate.getTime(); // milisaniye cinsinden süre farkı
+        const timeDifferenceInDays = timeDifference / (1000 * 60 * 60 * 24); // süre farkını gün cinsine çevir
+
+        const passwordExpiryTimeInDays = passwordExpiryTime * 30; // passwordExpiryTime'ı aydan güne çevir
+
+        if (timeDifferenceInDays >= passwordExpiryTimeInDays) {
+          setIsModalVisible2(true); // Kullanıcıya göre butonu göster
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
 
   useEffect(() => {
     // userData1 verisini API'den alın
     fetchUserData();
   }, [setUserData1]);
+
+  useEffect(() => {
+    // passwordExpiryTime verisini API'den alın
+    fetchUserData1();
+  }, [passwordExpiryTime]);
 
   useEffect(() => {
     if (isButtonClicked) {
@@ -170,7 +196,7 @@ export default function Header() {
             }}
           />
         </div>
-      </Popover>{" "}
+      </Popover>
       <SifreDegistirme
         accountEditModalOpen={isModalVisible2}
         accountEditModalClose={() => {
