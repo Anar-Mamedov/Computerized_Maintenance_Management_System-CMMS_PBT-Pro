@@ -6,7 +6,6 @@ import {
   useLocation,
   Outlet,
   Navigate,
-  useNavigate,
 } from "react-router-dom";
 import {
   Breadcrumb,
@@ -27,6 +26,7 @@ import {
   UserOutlined,
   KeyOutlined,
 } from "@ant-design/icons";
+// import Isemri from "./pages/DashboardAnalytics2/Isemri";
 import IsEmri from "./pages/BakımVeArizaYonetimi/IsEmri/IsEmri";
 import MakineTanim from "./pages/MakineEkipman/MakineTanim/MakineTanim";
 import LokasyonTanim from "./pages/Yonetim/LokasyonTanimlari/LokasyonTanimlari";
@@ -67,16 +67,20 @@ function getItem(label, key, icon, children, isClickable = true) {
 }
 
 function filterItems(items) {
+  // LocalStorage'dan token kontrolü
   const token = localStorage.getItem("token");
 
+  // Token yoksa, hiçbir filtreleme yapmadan tüm öğeleri döndür
   if (!token) {
     return items;
   }
 
+  // Token varsa, filtreleme işlemini gerçekleştir
   return items
     .map((item) => {
+      // "Ana Sayfa" için özel durumu kontrol et
       if (item.key === "" && item.label.props.children === "Ana Sayfa") {
-        return item;
+        return item; // "Ana Sayfa" her zaman görünür
       }
 
       const filteredChildren = item.children
@@ -97,6 +101,8 @@ function filterItems(items) {
 
 const rawItems = [
   getItem("Ana Sayfa", "", <PieChartOutlined />),
+  // getItem("Option 1", "option1", <PieChartOutlined />),
+  // getItem("Option 2", "option2", <DesktopOutlined />),
   getItem(
     "Makine & Ekipman Yönetimi",
     "makine&ekipman",
@@ -105,6 +111,7 @@ const rawItems = [
       getItem("Makine Tanım", "makine", true),
       getItem("Ekipman Veritabanı", "ekipmanVeritabani", true),
       getItem("Sayaç Güncelleme", "sayacGuncelleme", true),
+      // getItem("Team 2", "team2", true)
     ],
     false
   ),
@@ -113,12 +120,15 @@ const rawItems = [
     "bakim&ariza",
     <UserOutlined />,
     [
+      // getItem("Tom", "tom", true),
       getItem("Bakım Tanımları", "bakimTanimlari", true),
       getItem("Arıza Tanımları", "arizaTanimlari", true),
+      // getItem("İş Emri", "isemri", true),
       getItem("İş Emirleri", "isEmri1", true),
       getItem("Periyodik Bakımlar", "periyodikBakimlar", true),
       getItem("Otomatik İş Emirleri", "otomatikIsEmirleri", true),
       getItem("Planlama Takvimi", "planlamaTakvimi", true),
+      // getItem("Alex", "alex", true)
     ],
     false
   ),
@@ -133,6 +143,8 @@ const rawItems = [
       getItem("Personel Nöbetleri", "personelNobetleri", true),
       getItem("Personel Çalışma Planı", "personelCalismaPLani", true),
       getItem("Personel KPI", "analizler", true),
+
+      // getItem("Team 2", "team2", true)
     ],
     false
   ),
@@ -143,6 +155,7 @@ const rawItems = [
     [
       getItem("İş Talepleri", "isTalepleri", true),
       getItem("İş Talebi Kullanıcıları", "isTalebiKullanicilari", true),
+      // getItem("Team 2", "team2", true)
     ],
     false
   ),
@@ -153,6 +166,7 @@ const rawItems = [
     [
       getItem("Rapor Yönetimi", "raporYonetimi", true),
       getItem("Form Yönetimi", "formYonetimi", true),
+      // getItem("Team 2", "team2", true)
     ],
     false
   ),
@@ -169,28 +183,32 @@ const rawItems = [
       getItem("İş Emri Tipleri", "isEmriTipleri", true),
       getItem("Onaylayıcılar", "onaylayicilar", true),
       getItem("Proje Tanımları", "projeTanimlari", true),
+      // getItem("Team 2", "team2", true)
     ],
     false
   ),
+  // getItem("Files", "files", <FileOutlined />),
 ];
+
+// const Option1Page = () => <div>Option 1 Content</div>;
+// const BillPage = () => <div>Bill is a cat.</div>;
+// Diğer sayfa bileşenlerinizi burada tanımlayın...
+
+// diğer menüyü açtığımda diğer menüyü kapatıyor ve sayfa yüklendiğinde açık olan menüyü açık bırakıyor
+// diğer menüyü açtığımda diğer menüyü kapatıyor ve sayfa yüklendiğinde açık olan menüyü açık bırakıyor sonu
 
 export default function App() {
   const [user, setUser] = useRecoilState(userState);
-  const navigate = useNavigate();
 
+  // localStorage'dan kullanıcı bilgilerini oku
   useEffect(() => {
+    // Sayfa yüklendiğinde, kullanıcı bilgilerini localStorage'dan oku
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      setUser(JSON.parse(storedUser)); // Recoil durumunu güncelle
     }
-
-    const userPasswordCheck = JSON.parse(
-      localStorage.getItem("userPasswordCheck")
-    );
-    if (userPasswordCheck?.newUser) {
-      navigate("/User");
-    }
-  }, [setUser, navigate]);
+  }, [setUser]);
+  // localStorage'dan kullanıcı bilgilerini oku son
 
   return (
     <Routes>
@@ -204,6 +222,7 @@ export default function App() {
         }
       >
         {loginData?.Dashboard && <Route path="/" element={<Dashboard />} />}
+        {/* <Route path="/isemri" element={<Isemri />} /> */}
         <Route path="/isEmri1" element={<IsEmri />} />
         <Route path="/User" element={<ProfilEkrani />} />
         <Route path="/periyodikBakimlar" element={<PeriyodikBakimlar1 />} />
@@ -240,6 +259,7 @@ export default function App() {
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
+  // const token = sessionStorage.getItem("token");
 
   if (!token) {
     return <Navigate to={"/auth"} replace />;
@@ -259,14 +279,16 @@ const BaseLayout = () => {
     setCollapsed(!collapsed);
   };
 
+  // Ekran boyutu değişikliklerini dinle
   window.addEventListener("resize", () => {
     setMobileView(window.innerWidth < 768);
   });
 
   const logoStyle = {
-    marginTop: "20px",
-    maxWidth: "100px",
-    width: "80%",
+    marginTop: "20px", // Yukarıda 20 piksellik boşluk bırakın
+    maxWidth: "100px", // Genişliği sabit tutun
+    width: "80%", // Genişliği sabit tutun
+    // marginBottom: "20px", // Aşağıda 20 piksellik boşluk bırakın
   };
 
   return (
@@ -300,9 +322,9 @@ const BaseLayout = () => {
           collapsible
           collapsed={collapsed}
           onCollapse={setCollapsed}
-          width={250}
-          collapsedWidth={70}
-          breakpoint="lg"
+          width={250} // Genişletilmiş durumda Sider'ın genişliği
+          collapsedWidth={70} // Daraltılmış durumda Sider'ın genişliği
+          breakpoint="lg" // breakpoint="lg" olduğunda collapsedWidth değerini kullanır
         >
           <div
             className="demo-logo-vertical"

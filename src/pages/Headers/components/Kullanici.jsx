@@ -6,7 +6,8 @@ import { useRecoilValue } from "recoil"; // useRecoilValue import edin
 import { userState, authTokenState } from "../../../state/userState"; // Atomlarınızın yolunu güncelleyin
 import AxiosInstance from "../../../api/http";
 import { useAppContext } from "../../../AppContext";
-import HesapBilgileriDuzenle from "./HesapBilgileriDuzenle.jsx"; // AppContext'ten useAppContext hook'unu alın
+import HesapBilgileriDuzenle from "./HesapBilgileriDuzenle.jsx";
+import SifreDegistirme from "./SifreDegistirme.jsx"; // AppContext'ten useAppContext hook'unu alın
 
 const { Text, Link } = Typography;
 
@@ -18,6 +19,7 @@ export default function Header() {
   const [imageUrl, setImageUrl] = useState(null); // Resim URL'sini saklamak için state tanımlayın
   const [loadingImage, setLoadingImage] = useState(false); // Yükleme durumu için yeni bir state
   const [isModalVisible, setIsModalVisible] = useState(false); // Modal'ın görünürlüğünü kontrol etmek için state
+  const [isModalVisible2, setIsModalVisible2] = useState(false); // Modal'ın görünürlüğünü kontrol etmek için state
 
   const handleOpenChange = (newOpen) => {
     setOpen(newOpen);
@@ -29,7 +31,6 @@ export default function Header() {
     localStorage.removeItem("token"); // localStorage'dan token'i sil
     localStorage.removeItem("user"); // localStorage'dan kullanıcıyı sil
     localStorage.removeItem("login"); // localStorage'dan login'i sil
-    localStorage.removeItem("userPasswordCheck"); // localStorage'dan userPasswordCheck'i sil
     navigate("/auth"); // `/login` sayfasına yönlendir
     // window.location.reload(); // Sayfayı yenile
   };
@@ -38,13 +39,9 @@ export default function Header() {
     try {
       const response = await AxiosInstance.get("GetKullaniciProfile");
       setUserData1(response[0]); // API'den gelen veriyi setUserData1 ile güncelleyin
-      const userPasswordCheck = {
-        newUser: response[0].KLL_NEW_USER,
-      };
-      localStorage.setItem(
-        "userPasswordCheck",
-        JSON.stringify(userPasswordCheck)
-      );
+      if (response[0]?.KLL_NEW_USER === true) {
+        setIsModalVisible2(true); // Kullanıcıya göre butonu gizle
+      }
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
@@ -129,49 +126,57 @@ export default function Header() {
   );
 
   return (
-    <Popover
-      placement="bottom"
-      content={content}
-      trigger="click"
-      open={open}
-      onOpenChange={handleOpenChange}
-    >
-      <div
-        style={{
-          display: "flex",
-          gap: "10px",
-          alignItems: "flex-start",
-          cursor: "pointer",
-        }}
+    <div>
+      <Popover
+        placement="bottom"
+        content={content}
+        trigger="click"
+        open={open}
+        onOpenChange={handleOpenChange}
       >
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-end",
+            gap: "10px",
+            alignItems: "flex-start",
+            cursor: "pointer",
           }}
         >
-          <Text style={{ fontWeight: "500" }}>
-            {userData1?.KLL_TANIM || "Bilinmiyor"}
-          </Text>
-          <Text type="secondary">{userData1?.PRS_UNVAN || ""}</Text>
-        </div>
-        <Avatar
-          size="large"
-          src={imageUrl}
-          icon={!imageUrl && !loadingImage && <UserOutlined />} // Yükleme olmadığı ve imageUrl yoksa ikonu göster
-        >
-          {loadingImage && <Spin />}
-          {/* Resim yüklenirken Spin göster */}
-        </Avatar>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+            }}
+          >
+            <Text style={{ fontWeight: "500" }}>
+              {userData1?.KLL_TANIM || "Bilinmiyor"}
+            </Text>
+            <Text type="secondary">{userData1?.PRS_UNVAN || ""}</Text>
+          </div>
+          <Avatar
+            size="large"
+            src={imageUrl}
+            icon={!imageUrl && !loadingImage && <UserOutlined />} // Yükleme olmadığı ve imageUrl yoksa ikonu göster
+          >
+            {loadingImage && <Spin />}
+            {/* Resim yüklenirken Spin göster */}
+          </Avatar>
 
-        <HesapBilgileriDuzenle
-          accountEditModalOpen={isModalVisible}
-          accountEditModalClose={() => {
-            setIsModalVisible(false);
-          }}
-        />
-      </div>
-    </Popover>
+          <HesapBilgileriDuzenle
+            accountEditModalOpen={isModalVisible}
+            accountEditModalClose={() => {
+              setIsModalVisible(false);
+            }}
+          />
+        </div>
+      </Popover>{" "}
+      <SifreDegistirme
+        accountEditModalOpen={isModalVisible2}
+        accountEditModalClose={() => {
+          setIsModalVisible2(false);
+        }}
+      />
+    </div>
   );
 }
