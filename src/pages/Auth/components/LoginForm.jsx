@@ -85,13 +85,6 @@ export default function LoginForm() {
           projeTanimlari: response.KLL_WEB_PROJE,
         };
         localStorage.setItem("login", JSON.stringify(login));
-        const userPasswordCheck = {
-          newUser: response.KLL_NEW_USER,
-        };
-        localStorage.setItem(
-          "userPasswordCheck",
-          JSON.stringify(userPasswordCheck)
-        );
         const anar = localStorage.getItem("login");
         console.log(anar);
         message.success("Giriş başarılı!");
