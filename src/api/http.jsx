@@ -21,7 +21,10 @@ AxiosInstance.interceptors.response.use(
       localStorage.removeItem("user");
       localStorage.removeItem("login");
       // localStorage.removeItem("userId");
-      window.location.href = "/auth"; // `/auth` sayfasına yönlendir
+      if (window.location.pathname !== "/auth") {
+        window.location.href = "/auth"; // `/auth` sayfasına yönlendir
+      }
+      // window.location.href = "/auth"; // `/auth` sayfasına yönlendir
     }
     return Promise.reject(error);
   }

@@ -42,7 +42,9 @@ export default function Auth() {
           localStorage.setItem("baseURL", baseURL);
           window.location.reload();
         } else {
-          console.error("URL is not valid or server is not responding correctly.");
+          console.error(
+            "URL is not valid or server is not responding correctly."
+          );
           setErrorMessage("Geçerli Bir Bağlantı Anahtarı Giriniz.");
         }
       })
@@ -132,9 +134,12 @@ export default function Auth() {
         }
 
         try {
-          const responseBackground = await AxiosInstance.get(`ResimGetirById?id=2`, {
-            responseType: "blob",
-          });
+          const responseBackground = await AxiosInstance.get(
+            `ResimGetirById?id=2`,
+            {
+              responseType: "blob",
+            }
+          );
           const backgroundBlob = responseBackground;
           setBackgroundImageUrl(URL.createObjectURL(backgroundBlob));
         } catch (error) {
@@ -163,10 +168,18 @@ export default function Auth() {
                 padding: "70px 50px",
                 borderRadius: "16px",
                 boxShadow: "rgba(0, 0, 0, 0.2) 0px 0px 25px 3px",
-              }}>
-              <div style={{ width: "300px", marginBottom: "15px", display: "flex" }}>
+              }}
+            >
+              <div
+                style={{
+                  width: "300px",
+                  marginBottom: "15px",
+                  display: "flex",
+                }}
+              >
                 <Text style={{ textAlign: "center" }}>
-                  Uygulamayı kullanmak için aşağıdaki alana veri tabanı bağlantı anahtarını girin.
+                  Uygulamayı kullanmak için aşağıdaki alana veri tabanı bağlantı
+                  anahtarını girin.
                 </Text>
               </div>
 
@@ -179,7 +192,15 @@ export default function Auth() {
                   autoComplete="on"
                 />
                 {errorMessage && (
-                  <p style={{ color: "red", marginBottom: "-10px", marginTop: "5px" }}>{errorMessage}</p>
+                  <p
+                    style={{
+                      color: "red",
+                      marginBottom: "-10px",
+                      marginTop: "5px",
+                    }}
+                  >
+                    {errorMessage}
+                  </p>
                 )}
                 {/* <Button type="primary" onClick={saveBaseURL} style={{ marginTop: 20, width: "100%" }}>
                   Kaydet
@@ -188,7 +209,8 @@ export default function Auth() {
                   type="primary"
                   onClick={saveBaseURL}
                   style={{ marginTop: 20, width: "100%" }}
-                  disabled={loading}>
+                  disabled={loading}
+                >
                   {loading ? <Spin /> : "Kaydet"}
                 </Button>
               </Form>
@@ -207,10 +229,18 @@ export default function Auth() {
               height: "700px",
               flexDirection: "column",
               alignItems: "center",
-            }}>
+            }}
+          >
             <div>
               {loadingImage && <Spin />}
-              <img src={logoUrl} alt="Logo" style={{ ...logoStyle, visibility: loadingImage ? "hidden" : "visible" }} />
+              <img
+                src={logoUrl}
+                alt="Logo"
+                style={{
+                  ...logoStyle,
+                  visibility: loadingImage ? "hidden" : "visible",
+                }}
+              />
             </div>
             {target1 === "login" ? <LoginForm /> : <RegistrationForm />}
             {/* <Text type="secondary" style={{ fontSize: "14px", marginBottom: "20px" }}>

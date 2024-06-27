@@ -37,8 +37,10 @@ export default function LoginForm() {
       };
 
       const response = await AxiosInstance.post("/login", payload);
-
-      if (response && response.AUTH_TOKEN) {
+      if (response.status_code === 401) {
+        message.error("Kullanıcı adı ve ya şifre yanlıştır");
+        return;
+      } else if (response.AUTH_TOKEN) {
         setUser({
           userId: response.TB_KULLANICI_ID,
           userName: response.KLL_TANIM,
