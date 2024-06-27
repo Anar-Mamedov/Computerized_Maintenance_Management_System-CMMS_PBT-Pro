@@ -19,30 +19,48 @@ const ResimCarousel = () => {
   const [imageUrls, setImageUrls] = useState([]);
   const [loading, setLoading] = useState(false);
   const secilenTalepID = watch("secilenTalepID");
+  const isEmriNoID = watch("isEmriNoID");
   const carouselRef = useRef(null);
 
   useEffect(() => {
     const fetchResimIdsAndImages = async () => {
-      if (!secilenTalepID) return;
+      if (!isEmriNoID && !secilenTalepID) return;
       setLoading(true);
 
       try {
-        const resimIdResponse = await AxiosInstance.get(`GetResimIds?RefId=${secilenTalepID}&RefGrup=CAGRI MERKEZI`);
-        // API'den gelen response doğru şekilde işlenmelidir, burada doğrudan kullanılmıştır.
-        const resimIDler = resimIdResponse; // API'den gelen response'a uygun şekilde ayarlayın
+        const resimIdResponses = await Promise.all([
+          isEmriNoID
+            ? AxiosInstance.get(
+                `GetResimIds?RefId=${isEmriNoID}&RefGrup=ISEMRI`
+              )
+            : Promise.resolve([]),
+          secilenTalepID
+            ? AxiosInstance.get(
+                `GetResimIds?RefId=${secilenTalepID}&RefGrup=CAGRI MERKEZI`
+              )
+            : Promise.resolve([]),
+        ]);
+
+        const resimIDler = resimIdResponses.flat(); // API'den gelen response'a uygun şekilde ayarlayın
 
         const urls = await Promise.all(
           resimIDler.map(async (id) => {
-            const resimResponse = await AxiosInstance.get(`ResimGetirById?id=${id}`, {
-              responseType: "blob",
-            });
+            const resimResponse = await AxiosInstance.get(
+              `ResimGetirById?id=${id}`,
+              {
+                responseType: "blob",
+              }
+            );
             return URL.createObjectURL(resimResponse); // Blob'dan URL oluştur
           })
         );
 
         setImageUrls(urls);
       } catch (error) {
-        console.error("Resim ID'leri veya resimler alınırken bir hata oluştu:", error);
+        console.error(
+          "Resim ID'leri veya resimler alınırken bir hata oluştu:",
+          error
+        );
         message.error("Resimler yüklenirken bir hata oluştu.");
       } finally {
         setLoading(false);
@@ -54,7 +72,14 @@ const ResimCarousel = () => {
 
   if (loading) {
     return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "260px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "260px",
+        }}
+      >
         <Spin size="large" />
       </div>
     );
@@ -74,13 +99,28 @@ const ResimCarousel = () => {
         shape="circle"
         icon={<LeftOutlined />}
         onClick={prev}
-        style={{ position: "absolute", zIndex: 1, top: "50%", left: 0, transform: "translate(0, -50%)", opacity: 0.5 }}
+        style={{
+          position: "absolute",
+          zIndex: 1,
+          top: "50%",
+          left: 0,
+          transform: "translate(0, -50%)",
+          opacity: 0.5,
+        }}
       />
-      <Carousel autoplay ref={carouselRef} style={{ width: "250px", margin: "auto" }}>
+      <Carousel
+        autoplay
+        ref={carouselRef}
+        style={{ width: "250px", margin: "auto" }}
+      >
         {imageUrls.length > 0 ? (
           imageUrls.map((url, index) => (
             <div key={index}>
-              <Image src={url} alt={`Resim ${index}`} style={{ width: "250px", height: "260px", objectFit: "cover" }} />
+              <Image
+                src={url}
+                alt={`Resim ${index}`}
+                style={{ width: "250px", height: "260px", objectFit: "cover" }}
+              />
             </div>
           ))
         ) : (
@@ -93,7 +133,14 @@ const ResimCarousel = () => {
         shape="circle"
         icon={<RightOutlined />}
         onClick={next}
-        style={{ position: "absolute", zIndex: 1, top: "50%", right: 0, transform: "translate(0, -50%)", opacity: 0.5 }}
+        style={{
+          position: "absolute",
+          zIndex: 1,
+          top: "50%",
+          right: 0,
+          transform: "translate(0, -50%)",
+          opacity: 0.5,
+        }}
       />
     </div>
   );
