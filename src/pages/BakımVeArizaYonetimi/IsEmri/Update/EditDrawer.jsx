@@ -357,6 +357,7 @@ export default function EditDrawer({
           setValue("takvimID", item.ISM_TAKVIM_ID);
           setValue("talimatTanim", item.TALIMAT);
           setValue("talimatID", item.ISM_TALIMAT_ID);
+          setValue("secilenTalepID", item.ISM_IS_TALEP_ID);
           setValue("isTalebiKodu", item.IS_TALEP_NO);
           setValue("talepEden", item.IS_TALEP_EDEN);
           setValue(
