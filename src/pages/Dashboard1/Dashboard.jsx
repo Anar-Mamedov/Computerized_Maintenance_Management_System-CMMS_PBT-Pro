@@ -198,6 +198,13 @@ function Dashboard() {
     window.location.reload();
   };
 
+  const handleRearrange = () => {
+    const gridItems = JSON.parse(localStorage.getItem("gridItems")) || [];
+    const rearrangedItems = rearrangeWidgets(gridItems);
+    localStorage.setItem("gridItems", JSON.stringify(rearrangedItems));
+    window.updateWidgets(rearrangedItems);
+  };
+
   const content = (
     <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
       <Checkbox
@@ -235,8 +242,38 @@ function Dashboard() {
       style={{ overflow: "scroll", height: "calc(100vh - 170px)" }}
     >
       <div
-        style={{ width: "100%", display: "flex", justifyContent: "flex-end" }}
+        style={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: "10px",
+        }}
       >
+        <Button
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: "5px",
+          }}
+          onClick={handleRearrange}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill=""
+              fill-rule="evenodd"
+              d="M18 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1h-1zm-1 7.5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zM5 17a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1H5zm5.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm6.5 0a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm-5.5-7.5a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1h-1zm-7.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1H5a1 1 0 01-1-1v-1zM10.5 5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1V5zM5 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1H5z"
+              clip-rule="evenodd"
+            ></path>
+          </svg>
+          Yeniden Sırala
+        </Button>
         <Popover content={content} title="Widgetları Yönet" trigger="click">
           <Button
             style={{
