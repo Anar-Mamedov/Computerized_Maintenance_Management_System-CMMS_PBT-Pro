@@ -1,0 +1,10 @@
+/* custom-gridstack.css */
+.grid-stack .ui-resizable-se {
+    background: url('./icon.svg') no-repeat center center;
+    background-size: contain;
+    width: 16px; /* Icon width */
+    height: 16px; /* Icon height */
+    right: 0;
+    bottom: 0;
+    cursor: se-resize;
+}

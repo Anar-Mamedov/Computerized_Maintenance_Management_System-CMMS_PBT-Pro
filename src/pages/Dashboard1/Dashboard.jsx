@@ -8,6 +8,8 @@ import Component2 from "./components/Component2.jsx";
 import Component1 from "./components/Component1.jsx";
 import { createRoot } from "react-dom/client";
 
+import "./custom-gridstack.css"; // Add this line to import your custom CSS
+
 function Dashboard() {
   const [checkedWidgets, setCheckedWidgets] = useState({
     widget1: false,
