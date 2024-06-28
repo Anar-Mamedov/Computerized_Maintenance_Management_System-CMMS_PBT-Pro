@@ -131,21 +131,28 @@ export default function Header() {
   };
 
   const content = (
-    <div>
-      <p
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "8px",
+        alignItems: "flex-start",
+      }}
+    >
+      <div
         style={{ display: "flex", gap: "5px", cursor: "pointer" }}
         onClick={() => navigate("/User")}
       >
         <UserOutlined style={{ fontSize: "12px" }} />
         Profil
-      </p>
-      {/*<p*/}
+      </div>
+      {/*<div*/}
       {/*  style={{ display: "flex", gap: "5px", cursor: "pointer" }}*/}
       {/*  onClick={showModal}*/}
       {/*>*/}
       {/*  <EditOutlined style={{ fontSize: "12px" }} />*/}
       {/*  Hesabı Düzenle*/}
-      {/*</p>*/}
+      {/*</div>*/}
       {/* Çıkış düğmesine onClick olayı ekle */}
       <div
         style={{ display: "flex", gap: "5px", cursor: "pointer" }}
