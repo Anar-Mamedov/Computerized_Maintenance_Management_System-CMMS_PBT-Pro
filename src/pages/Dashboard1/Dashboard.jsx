@@ -18,7 +18,12 @@ function Dashboard() {
   });
 
   useEffect(() => {
-    const grid = GridStack.init({ float: true, resizable: true });
+    const grid = GridStack.init({
+      float: true,
+      resizable: {
+        handles: "se, sw", // Enable resizing from bottom right and bottom left
+      },
+    });
 
     const saveLayout = () => {
       const items = grid.engine.nodes.map((item) => ({

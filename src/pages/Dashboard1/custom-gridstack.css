@@ -1,4 +1,17 @@
 /* custom-gridstack.css */
+
+/* Widgetların kutu gölgesini ekleyin */
+.grid-stack-item > :first-child {
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    transition: filter 0.3s ease-in-out;
+}
+
+.grid-stack-item > :first-child:hover {
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
+}
+
+/* Resize handle için özel ikon */
+
 .grid-stack .ui-resizable-se {
     background: url('./icon.svg') no-repeat center center;
     background-size: contain;
@@ -7,4 +20,14 @@
     right: 0;
     bottom: 0;
     cursor: se-resize;
+}
+
+.grid-stack .ui-resizable-sw {
+    background: url('./icon.svg') no-repeat center center;
+    background-size: contain;
+    width: 16px; /* Icon width */
+    height: 16px; /* Icon height */
+    right: 0;
+    bottom: 0;
+    cursor: sw-resize;
 }
