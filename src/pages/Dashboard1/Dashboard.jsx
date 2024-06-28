@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { GridStack } from "gridstack";
 import "gridstack/dist/gridstack.css";
-import { Modal, Button, Checkbox } from "antd";
+import { Button, Checkbox, Popover } from "antd";
+import { DownOutlined } from "@ant-design/icons";
 import Component3 from "./components/Component3.jsx";
 import Component2 from "./components/Component2.jsx";
 import Component1 from "./components/Component1.jsx";
 import { createRoot } from "react-dom/client";
 
 function Dashboard() {
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [checkedWidgets, setCheckedWidgets] = useState({
     widget1: false,
     widget2: false,
@@ -120,18 +120,6 @@ function Dashboard() {
     window.updateWidgets = updateWidgets;
   }, []);
 
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
-
-  const handleOk = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
-
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
     setCheckedWidgets({
@@ -210,48 +198,75 @@ function Dashboard() {
     window.location.reload();
   };
 
+  const content = (
+    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      <Checkbox
+        name="widget1"
+        onChange={handleCheckboxChange}
+        checked={checkedWidgets.widget1}
+      >
+        Widget 1
+      </Checkbox>
+      <Checkbox
+        name="widget2"
+        onChange={handleCheckboxChange}
+        checked={checkedWidgets.widget2}
+      >
+        Widget 2
+      </Checkbox>
+      <Checkbox
+        name="widget3"
+        onChange={handleCheckboxChange}
+        checked={checkedWidgets.widget3}
+      >
+        Widget 3
+      </Checkbox>
+      <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+        <Button danger onClick={handleReset}>
+          Widgetları Sıfırla
+        </Button>
+      </div>
+    </div>
+  );
+
   return (
     <div
       className="App"
       style={{ overflow: "scroll", height: "calc(100vh - 170px)" }}
     >
-      <Button type="primary" onClick={showModal}>
-        Open Modal
-      </Button>
-      <Modal
-        title="Widget List"
-        open={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
+      <div
+        style={{ width: "100%", display: "flex", justifyContent: "flex-end" }}
       >
-        <Checkbox
-          name="widget1"
-          onChange={handleCheckboxChange}
-          checked={checkedWidgets.widget1}
-        >
-          Widget 1
-        </Checkbox>
-        <br />
-        <Checkbox
-          name="widget2"
-          onChange={handleCheckboxChange}
-          checked={checkedWidgets.widget2}
-        >
-          Widget 2
-        </Checkbox>
-        <br />
-        <Checkbox
-          name="widget3"
-          onChange={handleCheckboxChange}
-          checked={checkedWidgets.widget3}
-        >
-          Widget 3
-        </Checkbox>
-        <br />
-        <Button type="danger" onClick={handleReset}>
-          Reset Layout
-        </Button>
-      </Modal>
+        <Popover content={content} title="Widgetları Yönet" trigger="click">
+          <Button
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: "5px",
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              name="widget"
+            >
+              <path
+                fill=""
+                fillRule="evenodd"
+                d="M17.5 2a1 1 0 01.894.553l3.5 7A1 1 0 0121 11h-7a1 1 0 01-.894-1.447l3.5-7A1 1 0 0117.5 2zm-1.882 7h3.764L17.5 5.236 15.618 9zM4 13a2 2 0 00-2 2v5a2 2 0 002 2h5a2 2 0 002-2v-5a2 2 0 00-2-2H4zm0 7v-5h5v5H4zm13.5-7a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM15 17.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0zM6.5 2a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM4 6.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0z"
+                clipRule="evenodd"
+              ></path>
+            </svg>
+            Widgetleri Yönet
+            <DownOutlined style={{ marginLeft: "2px" }} />
+          </Button>
+        </Popover>
+      </div>
+
       <div className="grid-stack">
         <div
           className="grid-stack-item border-dark"
