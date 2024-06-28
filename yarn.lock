@@ -2191,6 +2191,11 @@ graphemer@^1.4.0:
   resolved "https://registry.npmjs.org/graphemer/-/graphemer-1.4.0.tgz"
   integrity sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==
 
+gridstack@^10.3.0:
+  version "10.3.0"
+  resolved "https://registry.npmjs.org/gridstack/-/gridstack-10.3.0.tgz"
+  integrity sha512-eGKsmU2TppV4coyDu9IIdIkm4qjgLLdjlEOFwQyQMuSwfOpzSfLdPc8du0HuebGr7CvAIrJxN4lBOmGrWSBg9g==
+
 hamt_plus@1.0.2:
   version "1.0.2"
   resolved "https://registry.npmjs.org/hamt_plus/-/hamt_plus-1.0.2.tgz"
