@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-
 import { GridStack } from "gridstack";
 import "gridstack/dist/gridstack.css";
 import Component3 from "./components/Component3.jsx";
@@ -16,7 +15,10 @@ function Dashboard() {
   // _________________________________________________
 
   return (
-    <div className="App">
+    <div
+      className="App"
+      style={{ overflow: "scroll", height: "calc(100vh - 170px)" }}
+    >
       <div className="grid-stack">
         <div
           className="grid-stack-item border-dark"
