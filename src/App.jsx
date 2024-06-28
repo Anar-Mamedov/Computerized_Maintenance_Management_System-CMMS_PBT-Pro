@@ -49,6 +49,7 @@ import PeriyodikBakimlar1 from "./pages/BakımVeArizaYonetimi/PeriyodikBakimlar1
 import RaporYonetimi from "./pages/Rapor&Formlar/RaporYonetimi/RaporYonetimi.jsx";
 import ProfilEkrani from "./pages/Headers/components/ProfilEkrani/ProfilEkrani.jsx";
 import Analizler from "./pages/PersonelYonetimi/PersonelKPI/Analizler.jsx";
+import Dashboard1 from "./pages/Dashboard1/Dashboard.jsx";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -252,6 +253,7 @@ export default function App() {
         <Route path="/atolye" element={<AtolyeTanimlari />} />
         <Route path="/personeltanimlari" element={<PersonelTanimlari />} />
         <Route path="/isTalepleri" element={<IsTalepleri />} />
+        <Route path="/demo" element={<Dashboard1 />} />
       </Route>
     </Routes>
   );
