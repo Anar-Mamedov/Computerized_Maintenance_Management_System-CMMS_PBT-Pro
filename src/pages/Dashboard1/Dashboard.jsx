@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { GridStack } from "gridstack";
 import "gridstack/dist/gridstack.css";
-import { Button, Checkbox, Popover } from "antd";
+import { Button, Checkbox, Popover, Typography, Switch } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import Component3 from "./components/Component3.jsx";
 import Component2 from "./components/Component2.jsx";
@@ -10,7 +10,10 @@ import { createRoot } from "react-dom/client";
 
 import "./custom-gridstack.css"; // Add this line to import your custom CSS
 
+const { Text } = Typography;
+
 function Dashboard() {
+  const [reorganize, setReorganize] = useState("");
   const [checkedWidgets, setCheckedWidgets] = useState({
     widget1: false,
     widget2: false,
@@ -18,10 +21,35 @@ function Dashboard() {
   });
 
   useEffect(() => {
+    const reorganizeValue = localStorage.getItem("reorganize");
+    if (reorganizeValue !== null) {
+      setReorganize(reorganizeValue);
+    } else {
+      setReorganize("true"); // Or any other default value you want
+      localStorage.setItem("reorganize", "true");
+    }
+  }, []);
+
+  const onChange = (checked) => {
+    if (checked) {
+      setReorganize(false);
+      localStorage.setItem("reorganize", "false");
+    } else {
+      setReorganize(true);
+      localStorage.setItem("reorganize", "true");
+    }
+  };
+
+  useEffect(() => {
+    console.log("reorganize", reorganize);
     const grid = GridStack.init({
-      float: true,
+      float: "reorganize",
       resizable: {
         handles: "se, sw", // Enable resizing from bottom right and bottom left
+      },
+      column: 12, // 12 sütunlu grid yapısı
+      draggable: {
+        handle: ".grid-stack-item-content", // Dragging handle to move widgets
       },
     });
 
@@ -45,8 +73,8 @@ function Dashboard() {
 
     const defaultItems = [
       { id: "widget1", x: 0, y: 0, width: 6, height: 4, minW: 4, minH: 4 },
-      { id: "widget2", x: 6, y: 0, width: 4, height: 2, minW: 4, minH: 2 },
-      { id: "widget3", x: 6, y: 2, width: 4, height: 2, minW: 4, minH: 2 },
+      { id: "widget2", x: 6, y: 0, width: 3, height: 2, minW: 3, minH: 2 },
+      { id: "widget3", x: 6, y: 2, width: 3, height: 2, minW: 3, minH: 2 },
     ];
 
     const itemsToLoad = storedItems?.length > 0 ? storedItems : defaultItems;
@@ -125,7 +153,7 @@ function Dashboard() {
     };
 
     window.updateWidgets = updateWidgets;
-  }, []);
+  }, [reorganize]);
 
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
@@ -202,6 +230,7 @@ function Dashboard() {
   const handleReset = () => {
     localStorage.removeItem("gridItems");
     localStorage.removeItem("hiddenWidgets");
+    localStorage.removeItem("reorganize");
     window.location.reload();
   };
 
@@ -214,6 +243,18 @@ function Dashboard() {
 
   const content = (
     <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          gap: "5px",
+        }}
+      >
+        <Switch defaultChecked={!reorganize} onChange={onChange} />
+        <Text>Boşlukları Doldur</Text>
+      </div>
+
       <Checkbox
         name="widget1"
         onChange={handleCheckboxChange}
@@ -274,9 +315,9 @@ function Dashboard() {
           >
             <path
               fill=""
-              fill-rule="evenodd"
+              fillRule="evenodd"
               d="M18 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1h-1zm-1 7.5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zM5 17a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1H5zm5.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm6.5 0a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm-5.5-7.5a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1h-1zm-7.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1H5a1 1 0 01-1-1v-1zM10.5 5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1V5zM5 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1H5z"
-              clip-rule="evenodd"
+              clipRule="evenodd"
             ></path>
           </svg>
           Yeniden Sırala
@@ -327,9 +368,9 @@ function Dashboard() {
         <div
           className="grid-stack-item border-dark"
           id="widget2"
-          gs-w="4"
+          gs-w="3"
           gs-h="2"
-          gs-min-w="4"
+          gs-min-w="3"
           gs-min-h="2"
         >
           <div className="grid-stack-item-content">
@@ -339,9 +380,9 @@ function Dashboard() {
         <div
           className="grid-stack-item border-dark"
           id="widget3"
-          gs-w="4"
+          gs-w="3"
           gs-h="2"
-          gs-min-w="4"
+          gs-min-w="3"
           gs-min-h="2"
         >
           <div className="grid-stack-item-content">
