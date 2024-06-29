@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { GridStack } from "gridstack";
 import "gridstack/dist/gridstack.css";
-import { Button, Checkbox, Popover, Typography, Switch } from "antd";
-import { DownOutlined } from "@ant-design/icons";
+import { Button, Checkbox, Popover, Typography, Switch, Tooltip } from "antd";
+import { DownOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import Component3 from "./components/Component3.jsx";
 import Component2 from "./components/Component2.jsx";
 import Component1 from "./components/Component1.jsx";
@@ -13,7 +13,7 @@ import "./custom-gridstack.css"; // Add this line to import your custom CSS
 const { Text } = Typography;
 
 function Dashboard() {
-  const [reorganize, setReorganize] = useState("");
+  const [reorganize, setReorganize] = useState(true);
   const [checkedWidgets, setCheckedWidgets] = useState({
     widget1: false,
     widget2: false,
@@ -23,9 +23,9 @@ function Dashboard() {
   useEffect(() => {
     const reorganizeValue = localStorage.getItem("reorganize");
     if (reorganizeValue !== null) {
-      setReorganize(reorganizeValue);
+      setReorganize(reorganizeValue === "true");
     } else {
-      setReorganize("true"); // Or any other default value you want
+      setReorganize(true); // Or any other default value you want
       localStorage.setItem("reorganize", "true");
     }
   }, []);
@@ -41,9 +41,8 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    console.log("reorganize", reorganize);
     const grid = GridStack.init({
-      float: "reorganize",
+      float: reorganize,
       resizable: {
         handles: "se, sw", // Enable resizing from bottom right and bottom left
       },
@@ -153,6 +152,9 @@ function Dashboard() {
     };
 
     window.updateWidgets = updateWidgets;
+
+    // Update float property when reorganize state changes
+    grid.engine.float = reorganize;
   }, [reorganize]);
 
   const handleCheckboxChange = (e) => {
@@ -251,8 +253,12 @@ function Dashboard() {
           gap: "5px",
         }}
       >
-        <Switch defaultChecked={!reorganize} onChange={onChange} />
-        <Text>Boşlukları Doldur</Text>
+        <Switch checked={!reorganize} onChange={onChange} />
+        <Tooltip title="Bu aktive edilirse widgetlar otomatik olarak boşlukları doldurur">
+          <Text>
+            Boşlukları Doldur <QuestionCircleOutlined />
+          </Text>
+        </Tooltip>
       </div>
 
       <Checkbox
