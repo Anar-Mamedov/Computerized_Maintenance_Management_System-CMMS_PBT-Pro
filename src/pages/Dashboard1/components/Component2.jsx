@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import bg from "../../../assets/images/bg-card.png";
 import { Spin, Typography } from "antd";
-import { ClockCircleOutlined } from "@ant-design/icons";
+import { FormOutlined } from "@ant-design/icons";
 import { Controller, useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../api/http.jsx";
 
@@ -63,7 +63,9 @@ function Component2(props) {
             <Text
               style={{ fontWeight: "500", fontSize: "35px", color: "white" }}
             >
-              {data?.ACIK_IS_EMIRLERI || ""}
+              {data?.ACIK_IS_EMIRLERI !== undefined
+                ? data.ACIK_IS_EMIRLERI
+                : ""}
             </Text>
             <Text
               style={{ color: "white", fontSize: "15px", fontWeight: "400" }}
@@ -71,7 +73,7 @@ function Component2(props) {
               Açık İş Emirleri
             </Text>
           </div>
-          <ClockCircleOutlined
+          <FormOutlined
             style={{ fontSize: "60px", color: "rgba(255,255,255,.8)" }}
           />
         </div>
