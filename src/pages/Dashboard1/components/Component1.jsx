@@ -85,7 +85,9 @@ function Component1(props) {
             <Text
               style={{ fontWeight: "500", fontSize: "35px", color: "white" }}
             >
-              {dashboardData.DEVAM_EDEN_IS_TALEPLERI}
+              {dashboardData?.DEVAM_EDEN_IS_TALEPLERI !== undefined
+                ? dashboardData.DEVAM_EDEN_IS_TALEPLERI
+                : ""}
             </Text>
             <Text
               style={{ color: "white", fontSize: "15px", fontWeight: "400" }}

@@ -12,6 +12,7 @@ import Component3 from "./components/Component3.jsx";
 import Component2 from "./components/Component2.jsx";
 import Component1 from "./components/Component1.jsx";
 import Component4 from "./components/Component4.jsx";
+import Component5 from "./components/Component5.jsx";
 import { createRoot } from "react-dom/client";
 
 import "./custom-gridstack.css"; // Add this line to import your custom CSS
@@ -25,6 +26,7 @@ function MainDashboard() {
     widget2: false,
     widget3: false,
     widget4: false,
+    widget5: false,
   });
 
   const methods = useForm({
@@ -96,6 +98,7 @@ function MainDashboard() {
       { id: "widget2", x: 3, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
       { id: "widget3", x: 6, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
       { id: "widget4", x: 9, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
+      { id: "widget5", x: 0, y: 1, width: 3, height: 2, minW: 3, minH: 2 },
     ];
 
     const itemsToLoad = storedItems?.length > 0 ? storedItems : defaultItems;
@@ -109,6 +112,7 @@ function MainDashboard() {
       widget2: false,
       widget3: false,
       widget4: false,
+      widget5: false,
     };
     itemsToLoad.forEach((item) => {
       if (Object.prototype.hasOwnProperty.call(checked, item.id)) {
@@ -163,6 +167,13 @@ function MainDashboard() {
             root.render(
               <FormProvider {...methods}>
                 <Component4 />
+              </FormProvider>
+            );
+            break;
+          case "widget5":
+            root.render(
+              <FormProvider {...methods}>
+                <Component5 />
               </FormProvider>
             );
             break;
@@ -309,28 +320,35 @@ function MainDashboard() {
         onChange={handleCheckboxChange}
         checked={checkedWidgets.widget1}
       >
-        Widget 1
+        Devam Eden İş Talepleri
       </Checkbox>
       <Checkbox
         name="widget2"
         onChange={handleCheckboxChange}
         checked={checkedWidgets.widget2}
       >
-        Widget 2
+        Açık İş Emirleri
       </Checkbox>
       <Checkbox
         name="widget3"
         onChange={handleCheckboxChange}
         checked={checkedWidgets.widget3}
       >
-        Widget 3
+        Düşük Stoklu Malzemeler
       </Checkbox>
       <Checkbox
         name="widget4"
         onChange={handleCheckboxChange}
         checked={checkedWidgets.widget4}
       >
-        Widget 3
+        Toplam Makine Sayısı
+      </Checkbox>
+      <Checkbox
+        name="widget5"
+        onChange={handleCheckboxChange}
+        checked={checkedWidgets.widget5}
+      >
+        Durum
       </Checkbox>
       <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
         <Button danger onClick={handleReset}>
@@ -451,6 +469,11 @@ function MainDashboard() {
             <div className="grid-stack-item border-dark" id="widget4">
               <div className="grid-stack-item-content">
                 <Component4 />
+              </div>
+            </div>
+            <div className="grid-stack-item border-dark" id="widget5">
+              <div className="grid-stack-item-content">
+                <Component5 />
               </div>
             </div>
           </div>
