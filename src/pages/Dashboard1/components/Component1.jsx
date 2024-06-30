@@ -19,10 +19,6 @@ function Component1(props) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const updateApi = watch("updateApi");
 
-  useEffect(() => {
-    fetchData();
-  }, [setValue, updateApi]);
-
   const fetchData = async () => {
     setIsLoading(true);
     try {
@@ -33,6 +29,10 @@ function Component1(props) {
       console.error("Failed to fetch data:", error);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, [setValue, updateApi]);
 
   const dashboardData = watch("dashboardData") || {};
 

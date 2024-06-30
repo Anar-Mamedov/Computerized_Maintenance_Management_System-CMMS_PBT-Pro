@@ -2,21 +2,31 @@ import React, { useState, useEffect } from "react";
 import bg from "../../../assets/images/bg-card.png";
 import { Spin, Typography } from "antd";
 import { ClockCircleOutlined } from "@ant-design/icons";
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
+import AxiosInstance from "../../../api/http.jsx";
 
 const { Text } = Typography;
 
 function Component2(props) {
-  const { watch } = useFormContext();
+  const { watch, setValue } = useFormContext();
   const [isLoading, setIsLoading] = useState(true);
-  const dashboardData = watch("dashboardData");
+  const [data, setData] = useState(null);
+  const updateApi = watch("updateApi");
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const response = await AxiosInstance.get("GetDashboardCards?ID=2");
+      setData(response);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    }
+  };
 
   useEffect(() => {
-    // dashboardData nesnesi her değiştiğinde isLoading durumunu güncelle
-    if (dashboardData?.ACIK_IS_EMIRLERI) {
-      setIsLoading(false);
-    }
-  }, [dashboardData]);
+    fetchData();
+  }, [setValue, updateApi]);
 
   return (
     <div
@@ -53,7 +63,7 @@ function Component2(props) {
             <Text
               style={{ fontWeight: "500", fontSize: "35px", color: "white" }}
             >
-              {dashboardData?.ACIK_IS_EMIRLERI}
+              {data?.ACIK_IS_EMIRLERI || ""}
             </Text>
             <Text
               style={{ color: "white", fontSize: "15px", fontWeight: "400" }}
