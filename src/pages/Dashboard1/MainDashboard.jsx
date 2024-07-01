@@ -21,7 +21,7 @@ import "./custom-gridstack.css"; // Add this line to import your custom CSS
 const { Text } = Typography;
 
 function MainDashboard() {
-  const [reorganize, setReorganize] = useState(true);
+  const [reorganize, setReorganize] = useState(false);
   const [updateApi, setUpdateApi] = useState(false);
   const [checkedWidgets, setCheckedWidgets] = useState({
     widget1: false,
@@ -49,8 +49,8 @@ function MainDashboard() {
     if (reorganizeValue !== null) {
       setReorganize(reorganizeValue === "true");
     } else {
-      setReorganize(true); // Or any other default value you want
-      localStorage.setItem("reorganize", "true");
+      setReorganize(false); // Or any other default value you want reorganize varsayılan değerini ayarla
+      localStorage.setItem("reorganize", "false");
     }
   }, []);
 
