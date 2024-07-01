@@ -194,6 +194,7 @@ function MainDashboard() {
         widget2: false,
         widget3: false,
         widget4: false,
+        widget5: false,
       };
       newGridItems.forEach((item) => {
         if (Object.prototype.hasOwnProperty.call(newChecked, item.id)) {
