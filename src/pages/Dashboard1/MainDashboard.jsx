@@ -297,6 +297,11 @@ function MainDashboard() {
     window.updateWidgets(rearrangedItems);
   };
 
+  const rerenderWidgets = () => {
+    const gridItems = JSON.parse(localStorage.getItem("gridItems")) || [];
+    window.updateWidgets(gridItems);
+  };
+
   const content = (
     <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
       <div
@@ -380,7 +385,11 @@ function MainDashboard() {
               gap: "10px",
             }}
           >
-            <Button type="text" onClick={updateApiTriger}>
+            <Button
+              type="text"
+              // onClick={updateApiTriger}
+              onClick={rerenderWidgets}
+            >
               <Text
                 type="secondary"
                 style={{
@@ -453,27 +462,27 @@ function MainDashboard() {
           <div className="grid-stack">
             <div className="grid-stack-item border-dark" id="widget1">
               <div className="grid-stack-item-content">
-                <Component1 updateApi={updateApi} />
+                <Component1 />
               </div>
             </div>
             <div className="grid-stack-item border-dark" id="widget2">
               <div className="grid-stack-item-content">
-                <Component2 updateApi={updateApi} />
+                <Component2 />
               </div>
             </div>
             <div className="grid-stack-item border-dark" id="widget3">
               <div className="grid-stack-item-content">
-                <Component3 updateApi={updateApi} />
+                <Component3 />
               </div>
             </div>
             <div className="grid-stack-item border-dark" id="widget4">
               <div className="grid-stack-item-content">
-                <Component4 updateApi={updateApi} />
+                <Component4 />
               </div>
             </div>
             <div className="grid-stack-item border-dark" id="widget5">
               <div className="grid-stack-item-content">
-                <Component5 updateApi={updateApi} />
+                <Component5 />
               </div>
             </div>
           </div>

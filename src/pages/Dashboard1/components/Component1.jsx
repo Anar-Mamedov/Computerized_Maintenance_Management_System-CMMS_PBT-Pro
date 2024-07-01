@@ -27,7 +27,7 @@ function Component1({ updateApi }) {
 
   useEffect(() => {
     fetchData();
-  }, [updateApi]);
+  }, []);
 
   const showModal = () => {
     setIsModalVisible(true);
