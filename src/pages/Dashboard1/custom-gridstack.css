@@ -1,14 +1,27 @@
 /* custom-gridstack.css */
 
 /* Widgetların kutu gölgesini ekleyin */
-.grid-stack-item > :first-child {
+.grid-stack-item {
+    -webkit-filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
     transition: filter 0.3s ease-in-out;
 }
 
-.grid-stack-item > :first-child:hover {
+.grid-stack-item:hover {
+    -webkit-filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
     filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
 }
+
+/*.grid-stack-item > :first-child {*/
+/*    -webkit-filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2)) !important;*/
+/*    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2)) !important;*/
+/*    transition: filter 0.3s ease-in-out !important;*/
+/*}*/
+
+/*.grid-stack-item > :first-child:hover {*/
+/*    -webkit-filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3)) !important;*/
+/*    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3)) !important;*/
+/*}*/
 
 /* Resize handle için özel ikon */
 

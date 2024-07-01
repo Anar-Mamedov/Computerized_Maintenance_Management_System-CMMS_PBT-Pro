@@ -21,6 +21,7 @@ const { Text } = Typography;
 
 function MainDashboard() {
   const [reorganize, setReorganize] = useState(true);
+  const [updateApi, setUpdateApi] = useState(false);
   const [checkedWidgets, setCheckedWidgets] = useState({
     widget1: false,
     widget2: false,
@@ -31,16 +32,14 @@ function MainDashboard() {
 
   const methods = useForm({
     defaultValues: {
-      updateApi: false,
       // ... Tüm default değerleriniz
     },
   });
 
   const { setValue, watch, reset } = methods;
 
-  const updateApi = () => {
-    const currentValue = watch("updateApi"); // replace 'yourFieldName' with the name of your field
-    setValue("updateApi", !currentValue); // set the value to the opposite of its current value
+  const updateApiTriger = () => {
+    setUpdateApi(!updateApi);
   };
 
   useEffect(() => {
@@ -380,7 +379,7 @@ function MainDashboard() {
               gap: "10px",
             }}
           >
-            <Button type="text" onClick={updateApi}>
+            <Button type="text" onClick={updateApiTriger}>
               <Text
                 type="secondary"
                 style={{
@@ -453,7 +452,7 @@ function MainDashboard() {
           <div className="grid-stack">
             <div className="grid-stack-item border-dark" id="widget1">
               <div className="grid-stack-item-content">
-                <Component1 />
+                <Component1 updateApi={updateApi} />
               </div>
             </div>
             <div className="grid-stack-item border-dark" id="widget2">

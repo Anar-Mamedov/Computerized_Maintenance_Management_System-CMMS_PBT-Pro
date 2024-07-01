@@ -46,6 +46,7 @@ function Component5(props) {
         display: "flex",
         flexDirection: "column",
         gap: "10px",
+        border: "1px solid #f0f0f0",
       }}
     >
       <div style={{ padding: "10px" }}>

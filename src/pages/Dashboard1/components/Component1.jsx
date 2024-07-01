@@ -8,33 +8,26 @@ import ModalTablo from "../../YardimMasasi/IsTalepleri/Table/ModalTablo/ModalTab
 
 const { Text } = Typography;
 
-function Component1(props) {
+function Component1({ updateApi }) {
   const [isLoading, setIsLoading] = useState(false);
-  const {
-    control,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useFormContext();
+  const [data, setData] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const updateApi = watch("updateApi");
 
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const response = await AxiosInstance.get("GetDashboardCards?ID=2");
-      setValue("dashboardData", response);
-      setIsLoading(false);
+      const response = await AxiosInstance.get("GetDashboardCards?ID=1");
+      setData(response);
     } catch (error) {
       console.error("Failed to fetch data:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, [setValue, updateApi]);
-
-  const dashboardData = watch("dashboardData") || {};
+  }, [updateApi]);
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -85,8 +78,8 @@ function Component1(props) {
             <Text
               style={{ fontWeight: "500", fontSize: "35px", color: "white" }}
             >
-              {dashboardData?.DEVAM_EDEN_IS_TALEPLERI !== undefined
-                ? dashboardData.DEVAM_EDEN_IS_TALEPLERI
+              {data?.DEVAM_EDEN_IS_TALEPLERI !== undefined
+                ? data.DEVAM_EDEN_IS_TALEPLERI
                 : ""}
             </Text>
             <Text
