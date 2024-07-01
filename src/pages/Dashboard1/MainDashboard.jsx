@@ -38,7 +38,7 @@ function MainDashboard() {
 
   const { setValue, watch, reset } = methods;
 
-  const updateApiTriger = () => {
+  const updateApiTriger = async () => {
     setUpdateApi(!updateApi);
   };
 
@@ -457,22 +457,22 @@ function MainDashboard() {
             </div>
             <div className="grid-stack-item border-dark" id="widget2">
               <div className="grid-stack-item-content">
-                <Component2 />
+                <Component2 updateApi={updateApi} />
               </div>
             </div>
             <div className="grid-stack-item border-dark" id="widget3">
               <div className="grid-stack-item-content">
-                <Component3 />
+                <Component3 updateApi={updateApi} />
               </div>
             </div>
             <div className="grid-stack-item border-dark" id="widget4">
               <div className="grid-stack-item-content">
-                <Component4 />
+                <Component4 updateApi={updateApi} />
               </div>
             </div>
             <div className="grid-stack-item border-dark" id="widget5">
               <div className="grid-stack-item-content">
-                <Component5 />
+                <Component5 updateApi={updateApi} />
               </div>
             </div>
           </div>
