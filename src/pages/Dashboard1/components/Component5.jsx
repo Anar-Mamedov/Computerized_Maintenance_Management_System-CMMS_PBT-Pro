@@ -22,7 +22,7 @@ function Component5(updateApi) {
       }
     };
     fetchData();
-  }, [updateApi]);
+  }, []);
 
   const showModal = () => {
     setIsModalVisible(true);

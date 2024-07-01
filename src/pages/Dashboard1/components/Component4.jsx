@@ -26,7 +26,7 @@ function Component4(props) {
 
   useEffect(() => {
     fetchData();
-  }, [setValue, updateApi]);
+  }, []);
 
   return (
     <div
