@@ -11,7 +11,10 @@ import {
 import { MoreOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../api/http.jsx";
 import { Controller, useFormContext } from "react-hook-form";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 import dayjs from "dayjs";
+import customFontBase64 from "./RobotoBase64.js";
 
 const { Text } = Typography;
 
@@ -31,6 +34,30 @@ function LokasyonBazindaIsTalepleri(props) {
     reset,
     formState: { errors },
   } = useFormContext();
+
+  const downloadPDF = () => {
+    const doc = new jsPDF();
+
+    // jsPDF içinde kullanım
+    doc.addFileToVFS("Roboto-Regular.ttf", customFontBase64);
+    doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
+
+    doc.setFont("Roboto");
+
+    const columns = ["Lokasyon", "Toplam İş Talebi", "Toplam İş Emri"];
+    const tableData = data.map((item) => [
+      item.LOKASYON,
+      item.TOPLAM_IS_TALEBI,
+      item.TOPLAM_IS_EMRI,
+    ]);
+
+    doc.autoTable({
+      head: [columns],
+      body: tableData,
+    });
+
+    doc.save("tablo_verileri.pdf");
+  };
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
@@ -203,7 +230,9 @@ function LokasyonBazindaIsTalepleri(props) {
       <Popover placement="right" content={content1} trigger="click">
         <div style={{ cursor: "pointer" }}>Zaman Seçimi</div>
       </Popover>
-      <div>Content</div>
+      <div style={{ cursor: "pointer" }} onClick={downloadPDF}>
+        İndır
+      </div>
     </div>
   );
 
