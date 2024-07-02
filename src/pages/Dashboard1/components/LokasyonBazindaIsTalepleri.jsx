@@ -217,11 +217,18 @@ function LokasyonBazindaIsTalepleri(props) {
 
   const content1 = (
     <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-      <div onClick={() => showModal("Tarih Aralığı Seç")}>
+      <div
+        style={{ cursor: "pointer" }}
+        onClick={() => showModal("Tarih Aralığı Seç")}
+      >
         Tarih Aralığı Seç
       </div>
-      <div onClick={() => showModal("Ay Seç")}>Ay Seç</div>
-      <div onClick={() => showModal("Yıl Seç")}>Yıl Seç</div>
+      <div style={{ cursor: "pointer" }} onClick={() => showModal("Ay Seç")}>
+        Ay Seç
+      </div>
+      <div style={{ cursor: "pointer" }} onClick={() => showModal("Yıl Seç")}>
+        Yıl Seç
+      </div>
     </div>
   );
 
