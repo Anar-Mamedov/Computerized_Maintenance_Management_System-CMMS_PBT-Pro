@@ -57,7 +57,7 @@ function LokasyonBazindaIsTalepleri(props) {
       body: tableData,
     });
 
-    doc.save("tablo_verileri.pdf");
+    doc.save("lokasyon_bazinda_is_talepleri.pdf");
   };
 
   const formatDateWithDayjs = (dateString) => {

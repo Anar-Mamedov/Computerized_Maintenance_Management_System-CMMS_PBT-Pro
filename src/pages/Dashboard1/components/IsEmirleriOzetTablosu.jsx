@@ -73,7 +73,7 @@ function IsEmirleriOzetTablosu(props) {
       body: tableData,
     });
 
-    doc.save("tablo_verileri.pdf");
+    doc.save("is_emirleri_ozet_tablo.pdf");
   };
 
   const formatDateWithDayjs = (dateString) => {
