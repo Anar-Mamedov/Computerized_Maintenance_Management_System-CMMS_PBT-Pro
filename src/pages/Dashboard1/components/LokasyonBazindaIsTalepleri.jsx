@@ -27,6 +27,7 @@ function LokasyonBazindaIsTalepleri(props) {
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const [baslamaTarihi, setBaslamaTarihi] = useState();
   const [bitisTarihi, setBitisTarihi] = useState();
+  const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false); // Expanded modal visibility state
   const {
     control,
     watch,
@@ -234,11 +235,17 @@ function LokasyonBazindaIsTalepleri(props) {
 
   const content = (
     <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      <div
+        style={{ cursor: "pointer" }}
+        onClick={() => setIsExpandedModalVisible(true)}
+      >
+        Büyüt
+      </div>
       <Popover placement="right" content={content1} trigger="click">
         <div style={{ cursor: "pointer" }}>Zaman Seçimi</div>
       </Popover>
       <div style={{ cursor: "pointer" }} onClick={downloadPDF}>
-        İndır
+        İndir
       </div>
     </div>
   );
@@ -412,6 +419,47 @@ function LokasyonBazindaIsTalepleri(props) {
             />
           </div>
         )}
+      </Modal>
+      {/* Expanded Modal */}
+      <Modal
+        title={
+          <div>
+            <Text style={{ fontWeight: "500", fontSize: "17px" }}>
+              Lokasyon Bazında İş talepleri / İş Emirleri Dağılımı{" "}
+              {`(${
+                baslamaTarihi && bitisTarihi
+                  ? `${formatDateWithLocale(
+                      baslamaTarihi
+                    )} / ${formatDateWithLocale(bitisTarihi)}`
+                  : ""
+              })`}
+            </Text>
+          </div>
+        }
+        centered
+        open={isExpandedModalVisible}
+        onOk={() => setIsExpandedModalVisible(false)}
+        onCancel={() => setIsExpandedModalVisible(false)}
+        width="90%"
+        destroyOnClose
+      >
+        <div>
+          <Spin spinning={isLoading}>
+            <Table
+              columns={columns}
+              dataSource={data}
+              pagination={{
+                defaultPageSize: 10,
+                showSizeChanger: true,
+                pageSizeOptions: ["10", "20", "50", "100"],
+                position: ["bottomRight"],
+                showTotal: (total, range) => `Toplam ${total}`,
+                showQuickJumper: true,
+              }}
+              scroll={{ y: "calc(100vh - 380px)" }}
+            />
+          </Spin>
+        </div>
       </Modal>
     </div>
   );
