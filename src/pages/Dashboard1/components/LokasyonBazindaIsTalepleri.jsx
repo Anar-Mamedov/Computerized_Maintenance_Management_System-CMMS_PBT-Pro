@@ -173,7 +173,7 @@ function LokasyonBazindaIsTalepleri(props) {
     {
       title: "Lokasyon",
       dataIndex: "LOKASYON",
-      width: 260,
+      width: 200,
       ellipsis: true,
     },
     {
