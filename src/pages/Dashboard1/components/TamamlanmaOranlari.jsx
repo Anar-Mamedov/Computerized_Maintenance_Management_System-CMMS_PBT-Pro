@@ -439,7 +439,11 @@ function TamamlanmaOranlari(props = {}) {
                 fill="#82ca9d"
                 hide={!visibleSeries.IsTalebi}
               >
-                <LabelList dataKey="IsTalebi" position="insideTop" />
+                <LabelList
+                  style={{ fill: "white" }}
+                  dataKey="IsTalebi"
+                  position="insideTop"
+                />
               </Bar>
             </BarChart>
           </ResponsiveContainer>
