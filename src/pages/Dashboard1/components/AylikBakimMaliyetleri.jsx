@@ -98,10 +98,10 @@ function AylikBakimMaliyetleri(props = {}) {
   }, [baslamaTarihi]);
 
   const downloadPDF = () => {
-    const element = document.getElementById("chart-container");
+    const element = document.getElementById("aylik-bakim");
     const opt = {
       margin: 10,
-      filename: "tamamlanma_oranlari.pdf",
+      filename: "aylik_bakim.pdf",
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { unit: "mm", format: "a4", orientation: "landscape" },
@@ -284,7 +284,7 @@ function AylikBakimMaliyetleri(props = {}) {
         <Spin />
       ) : (
         <div
-          id="chart-container"
+          id="aylik-bakim"
           style={{
             display: "flex",
             flexDirection: "column",
