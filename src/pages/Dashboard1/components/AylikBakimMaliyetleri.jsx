@@ -35,7 +35,7 @@ const monthNames = [
   "Aralık",
 ];
 
-function TamamlanmaOranlari(props = {}) {
+function AylikBakimMaliyetleri(props = {}) {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false); // Expanded modal visibility state
@@ -43,8 +43,7 @@ function TamamlanmaOranlari(props = {}) {
   const [modalContent, setModalContent] = useState("");
   const [baslamaTarihi, setBaslamaTarihi] = useState();
   const [visibleSeries, setVisibleSeries] = useState({
-    IsEmri: true,
-    IsTalebi: true,
+    AYLIK_BAKIM_ISEMRI_MALIYET: true,
   });
   const {
     control,
@@ -72,19 +71,17 @@ function TamamlanmaOranlari(props = {}) {
     setIsLoading(true);
     try {
       const response = await AxiosInstance.get(
-        `GetTamamlanmisIsEmirleriIsTalepleri?ID=2&year=${baslamaTarihi}`
+        `GetAylikBakimIsEmriMaliyet?ID=2&year=${baslamaTarihi}`
       );
 
-      const transformedData = response.reduce((acc, item) => {
-        const monthName = monthNames[item.AY];
-        const month = acc.find((el) => el.AY === monthName);
-        if (month) {
-          month[item.TIP] = item.DEGER;
-        } else {
-          acc.push({ AY: monthName, [item.TIP]: item.DEGER });
-        }
-        return acc;
-      }, []);
+      // Sort the response by month number
+      const sortedResponse = response.sort((a, b) => a.AY - b.AY);
+
+      // Transform the data
+      const transformedData = sortedResponse.map((item) => ({
+        AY: monthNames[item.AY],
+        AYLIK_BAKIM_ISEMRI_MALIYET: item.AYLIK_BAKIM_ISEMRI_MALIYET,
+      }));
 
       setData(transformedData);
     } catch (error) {
@@ -122,15 +119,13 @@ function TamamlanmaOranlari(props = {}) {
 
   const CustomLegend = ({ payload }) => {
     const customNames = {
-      IsEmri: "İş Emri",
-      IsTalebi: "İş Talebi",
+      AYLIK_BAKIM_ISEMRI_MALIYET: "İş Emri Maliyeti",
     };
 
     const handleToggleAll = () => {
       const allVisible = Object.values(visibleSeries).every((value) => value);
       setVisibleSeries({
-        IsEmri: !allVisible,
-        IsTalebi: !allVisible,
+        AYLIK_BAKIM_ISEMRI_MALIYET: !allVisible,
       });
     };
 
@@ -253,7 +248,7 @@ function TamamlanmaOranlari(props = {}) {
         }}
       >
         <Text
-          title={`Tamamlanmış İş Talepleri ve İş Emirleri Oranları${
+          title={`Aylık Bakım Maliyetleri${
             baslamaTarihi ? ` (${baslamaTarihi})` : ""
           }`}
           style={{
@@ -265,7 +260,7 @@ function TamamlanmaOranlari(props = {}) {
             maxWidth: "calc(100% - 50px)",
           }}
         >
-          Tamamlanmış İş Talepleri ve İş Emirleri Oranları
+          Aylık Bakım Maliyetleri
           {baslamaTarihi && ` (${baslamaTarihi})`}
         </Text>
         <Popover placement="bottom" content={content} trigger="click">
@@ -316,22 +311,13 @@ function TamamlanmaOranlari(props = {}) {
               <Tooltip />
               <Legend content={<CustomLegend />} />
               <Bar
-                dataKey="IsEmri"
+                dataKey="AYLIK_BAKIM_ISEMRI_MALIYET"
                 stackId="a"
                 fill="#8884d8"
-                hide={!visibleSeries.IsEmri}
-                name="İş Emri"
+                hide={!visibleSeries.AYLIK_BAKIM_ISEMRI_MALIYET}
+                name="İş Emri Maliyeti"
               >
-                {/*<LabelList dataKey="IsEmri" position="insideTop" />*/}
-              </Bar>
-              <Bar
-                dataKey="IsTalebi"
-                stackId="a"
-                fill="#82ca9d"
-                hide={!visibleSeries.IsTalebi}
-                name="İş Talebi"
-              >
-                {/*<LabelList dataKey="IsTalebi" position="insideTop" />*/}
+                {/*<LabelList dataKey="AYLIK_BAKIM_ISEMRI_MALIYET" position="insideTop" />*/}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
@@ -374,7 +360,7 @@ function TamamlanmaOranlari(props = {}) {
       <Modal
         title={
           <Text
-            title={`Tamamlanmış İş Talepleri ve İş Emirleri Oranları${
+            title={`Aylık Bakım Maliyetleri${
               baslamaTarihi ? ` (${baslamaTarihi})` : ""
             }`}
             style={{
@@ -386,7 +372,7 @@ function TamamlanmaOranlari(props = {}) {
               maxWidth: "calc(100% - 50px)",
             }}
           >
-            Tamamlanmış İş Talepleri ve İş Emirleri Oranları
+            Aylık Bakım Maliyetleri
             {baslamaTarihi && ` (${baslamaTarihi})`}
           </Text>
         }
@@ -419,33 +405,29 @@ function TamamlanmaOranlari(props = {}) {
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="AY" />
+              <XAxis
+                dataKey="AY"
+                // interval={0}
+                // angle={-90}
+                // textAnchor="end"
+                // height={70} // X ekseni yüksekliğini artırın
+                // tick={{
+                //   dy: 10, // Etiketleri aşağı kaydırın
+                // }}
+              />
               <YAxis />
               <Tooltip />
               <Legend content={<CustomLegend />} />
               <Bar
-                dataKey="IsEmri"
+                dataKey="AYLIK_BAKIM_ISEMRI_MALIYET"
                 stackId="a"
                 fill="#8884d8"
-                hide={!visibleSeries.IsEmri}
-                name="İş Emri"
+                hide={!visibleSeries.AYLIK_BAKIM_ISEMRI_MALIYET}
+                name="İş Emri Maliyeti"
               >
                 <LabelList
                   style={{ fill: "white" }}
-                  dataKey="IsEmri"
-                  position="insideTop"
-                />
-              </Bar>
-              <Bar
-                dataKey="IsTalebi"
-                stackId="a"
-                fill="#82ca9d"
-                hide={!visibleSeries.IsTalebi}
-                name="İş Talebi"
-              >
-                <LabelList
-                  style={{ fill: "white" }}
-                  dataKey="IsTalebi"
+                  dataKey="AYLIK_BAKIM_ISEMRI_MALIYET"
                   position="insideTop"
                 />
               </Bar>
@@ -457,4 +439,4 @@ function TamamlanmaOranlari(props = {}) {
   );
 }
 
-export default TamamlanmaOranlari;
+export default AylikBakimMaliyetleri;
