@@ -38,6 +38,7 @@
     "react-router-dom": "^6.23.1",
     "react-virtualized-auto-sizer": "^1.0.24",
     "react-window": "^1.8.10",
+    "recharts": "^2.12.7",
     "recoil": "^0.7.7",
     "styled-components": "^6.1.11",
     "uuid": "^9.0.1"
