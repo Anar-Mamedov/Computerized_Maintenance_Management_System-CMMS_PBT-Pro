@@ -27,7 +27,7 @@ import "./custom-gridstack.css"; // Add this line to import your custom CSS
 const { Text } = Typography;
 
 function MainDashboard() {
-  const [reorganize, setReorganize] = useState(false);
+  const [reorganize, setReorganize] = useState();
   const [updateApi, setUpdateApi] = useState(false);
   const [checkedWidgets, setCheckedWidgets] = useState({
     widget1: false,
@@ -74,9 +74,17 @@ function MainDashboard() {
       setReorganize(true);
       localStorage.setItem("reorganize", "true");
     }
+    setTimeout(() => {
+      const gridItems = JSON.parse(localStorage.getItem("gridItems")) || [];
+      window.updateWidgets(gridItems);
+    }, 50);
   };
 
   useEffect(() => {
+    // Check if reorganize is undefined, and if so, return early
+    if (reorganize === undefined) {
+      return;
+    }
     const grid = GridStack.init({
       float: reorganize,
       resizable: {
