@@ -584,7 +584,7 @@ function PersonelBazindaIsGucu(props = {}) {
       </Modal>
       {/* Filter Modal */}
       <Modal
-        title="İsimleri Filtrele"
+        title="Personelleri Filtrele"
         width={800}
         centered
         destroyOnClose
