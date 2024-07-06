@@ -328,11 +328,10 @@ function MainDashboard() {
   };
 
   const rearrangeWidgets = (items) => {
-    let grid = Array(12)
-      .fill(0)
-      .map(() => Array(12).fill(null));
+    // Dynamically adjust the grid size based on the highest Y position encountered
+    let maxY = 0;
+    let grid = Array.from({ length: 1000 }, () => Array(12).fill(null));
     let pos = { x: 0, y: 0 };
-    const MAX_HEIGHT = 12; // Maksimum yükseklik değeri
 
     items.forEach((item) => {
       while (!canPlaceWidget(grid, pos.x, pos.y, item.width, item.height)) {
@@ -340,23 +339,27 @@ function MainDashboard() {
         if (pos.x + item.width > 12) {
           pos.x = 0;
           pos.y++;
-          if (pos.y + item.height > MAX_HEIGHT) {
-            // Kaçış koşulu
-            console.error("Widget'lar sığmıyor, düzenleme iptal edildi.");
-            return items; // Orjinal item listesini döndürerek döngüden çık
-          }
         }
       }
+      placeWidget(grid, pos.x, pos.y, item.width, item.height, item.id);
       item.x = pos.x;
       item.y = pos.y;
-      placeWidget(grid, pos.x, pos.y, item.width, item.height, item.id);
+      maxY = Math.max(maxY, pos.y + item.height); // Update maxY based on the current item's placement
+      pos.x += item.width;
+      if (pos.x >= 12) {
+        pos.x = 0;
+        pos.y++;
+      }
     });
+
+    // Trim the grid based on the maxY value to remove unused rows
+    grid = grid.slice(0, maxY);
 
     return items;
   };
 
   const canPlaceWidget = (grid, x, y, width, height) => {
-    if (x + width > 12 || y + height > 12) return false;
+    if (x + width > 12 || y + height > grid.length) return false;
     for (let i = x; i < x + width; i++) {
       for (let j = y; j < y + height; j++) {
         if (grid[j][i] !== null) return false;
