@@ -332,6 +332,7 @@ function MainDashboard() {
       .fill(0)
       .map(() => Array(12).fill(null));
     let pos = { x: 0, y: 0 };
+    const MAX_HEIGHT = 12; // Maksimum yükseklik değeri
 
     items.forEach((item) => {
       while (!canPlaceWidget(grid, pos.x, pos.y, item.width, item.height)) {
@@ -339,6 +340,11 @@ function MainDashboard() {
         if (pos.x + item.width > 12) {
           pos.x = 0;
           pos.y++;
+          if (pos.y + item.height > MAX_HEIGHT) {
+            // Kaçış koşulu
+            console.error("Widget'lar sığmıyor, düzenleme iptal edildi.");
+            return items; // Orjinal item listesini döndürerek döngüden çık
+          }
         }
       }
       item.x = pos.x;
