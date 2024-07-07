@@ -18,6 +18,7 @@
     "@react-google-maps/api": "^2.19.3",
     "antd": "^5.17.4",
     "axios": "^1.7.2",
+    "chroma-js": "^2.4.2",
     "dayjs": "^1.11.11",
     "gridstack": "^10.3.0",
     "html2canvas": "^1.4.1",

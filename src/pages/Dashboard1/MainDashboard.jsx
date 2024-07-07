@@ -21,6 +21,7 @@ import TamamlanmaOranlari from "./components/TamamlanmaOranlari.jsx";
 import AylikBakimMaliyetleri from "./components/AylikBakimMaliyetleri.jsx";
 import IsEmriZamanDagilimi from "./components/IsEmriZamanDagilimi.jsx";
 import PersonelBazindaIsGucu from "./components/PersonelBazindaIsGucu.jsx";
+import ToplamHarcananIsGucu from "./components/ToplamHarcananIsGucu.jsx";
 import { createRoot } from "react-dom/client";
 
 import "./custom-gridstack.css"; // Add this line to import your custom CSS
@@ -44,6 +45,7 @@ function MainDashboard() {
     widget11: false,
     widget12: false,
     widget13: false,
+    widget14: false,
   });
 
   const methods = useForm({
@@ -126,10 +128,11 @@ function MainDashboard() {
       { id: "widget11", x: 4, y: 3, width: 4, height: 3, minW: 4, minH: 3 },
       { id: "widget12", x: 8, y: 3, width: 4, height: 3, minW: 4, minH: 3 },
       { id: "widget13", x: 0, y: 6, width: 4, height: 3, minW: 4, minH: 3 },
-      { id: "widget6", x: 6, y: 6, width: 6, height: 4, minW: 6, minH: 4 },
+      { id: "widget14", x: 4, y: 6, width: 4, height: 3, minW: 4, minH: 3 },
       { id: "widget7", x: 0, y: 9, width: 6, height: 4, minW: 6, minH: 4 },
-      { id: "widget8", x: 6, y: 10, width: 6, height: 4, minW: 6, minH: 4 },
+      { id: "widget6", x: 6, y: 9, width: 6, height: 4, minW: 6, minH: 4 },
       { id: "widget9", x: 0, y: 13, width: 6, height: 4, minW: 6, minH: 4 },
+      { id: "widget8", x: 6, y: 13, width: 6, height: 4, minW: 6, minH: 4 },
     ];
 
     const itemsToLoad = storedItems?.length > 0 ? storedItems : defaultItems;
@@ -152,6 +155,7 @@ function MainDashboard() {
       widget11: false,
       widget12: false,
       widget13: false,
+      widget14: false,
     };
     itemsToLoad.forEach((item) => {
       if (Object.prototype.hasOwnProperty.call(checked, item.id)) {
@@ -272,6 +276,13 @@ function MainDashboard() {
               </FormProvider>
             );
             break;
+          case "widget14":
+            root.render(
+              <FormProvider {...methods}>
+                <ToplamHarcananIsGucu />
+              </FormProvider>
+            );
+            break;
           default:
             break;
         }
@@ -299,6 +310,7 @@ function MainDashboard() {
         widget11: false,
         widget12: false,
         widget13: false,
+        widget14: false,
       };
       newGridItems.forEach((item) => {
         if (Object.prototype.hasOwnProperty.call(newChecked, item.id)) {
@@ -523,6 +535,13 @@ function MainDashboard() {
       >
         Personel Bazında İş Gücü
       </Checkbox>
+      <Checkbox
+        name="widget14"
+        onChange={handleCheckboxChange}
+        checked={checkedWidgets.widget14}
+      >
+        Toplam Harcanan İş Gücü
+      </Checkbox>
       <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
         <Button danger onClick={handleReset}>
           Widgetları Sıfırla
@@ -691,6 +710,11 @@ function MainDashboard() {
             <div className="grid-stack-item border-dark" id="widget13">
               <div className="grid-stack-item-content">
                 <PersonelBazindaIsGucu />
+              </div>
+            </div>
+            <div className="grid-stack-item border-dark" id="widget14">
+              <div className="grid-stack-item-content">
+                <ToplamHarcananIsGucu />
               </div>
             </div>
           </div>
