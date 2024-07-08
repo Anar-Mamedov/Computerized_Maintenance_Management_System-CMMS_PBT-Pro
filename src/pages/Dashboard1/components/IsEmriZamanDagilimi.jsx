@@ -451,33 +451,35 @@ function IsEmriZamanDagilimi(props = {}) {
             height: "100vh",
           }}
         >
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              width="100%"
-              height="100%"
-              data={data}
-              margin={{
-                top: 20,
-                right: 30,
-                left: 20,
-                bottom: 5,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="AY" />
-              <YAxis />
-              <Tooltip />
-              <Legend content={<CustomLegend />} />
-              <Line
-                type="monotone"
-                dataKey="AYLIK_BAKIM_ISEMRI_MALIYET"
-                stroke="#8884d8"
-                activeDot={{ r: 8 }}
-                hide={!visibleSeries.AYLIK_BAKIM_ISEMRI_MALIYET}
-                name="İş Emri Sayısı"
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <div style={{ width: "100%", height: "calc(100% - 5px)" }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                width="100%"
+                height="100%"
+                data={data}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="AY" />
+                <YAxis />
+                <Tooltip />
+                <Legend content={<CustomLegend />} />
+                <Line
+                  type="monotone"
+                  dataKey="AYLIK_BAKIM_ISEMRI_MALIYET"
+                  stroke="#8884d8"
+                  activeDot={{ r: 8 }}
+                  hide={!visibleSeries.AYLIK_BAKIM_ISEMRI_MALIYET}
+                  name="İş Emri Sayısı"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       )}
       <Modal

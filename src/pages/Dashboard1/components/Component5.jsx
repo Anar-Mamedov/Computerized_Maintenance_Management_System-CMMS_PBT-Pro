@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Modal, Typography, Spin } from "antd";
 import AxiosInstance from "../../../api/http.jsx";
 import ModalTablo from "../../YardimMasasi/IsTalepleri/Table/ModalTablo/ModalTablo.jsx";
+import MakineTablo from "./../../MakineEkipman/MakineTanim/Table/Table.jsx";
 
 const { Text } = Typography;
 
@@ -9,6 +10,8 @@ function Component5(updateApi) {
   const [data, setData] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalContent, setModalContent] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,7 +27,9 @@ function Component5(updateApi) {
     fetchData();
   }, []);
 
-  const showModal = () => {
+  const showModal = (title, content) => {
+    setModalTitle(title);
+    setModalContent(content);
     setIsModalVisible(true);
   };
 
@@ -65,7 +70,7 @@ function Component5(updateApi) {
           }}
         >
           <div
-            onClick={showModal}
+            onClick={() => showModal("Devam Eden İş Talepleri", <ModalTablo />)}
             style={{
               display: "flex",
               alignItems: "center",
@@ -193,6 +198,7 @@ function Component5(updateApi) {
             </Text>
           </div>
           <div
+            onClick={() => showModal("Makineler", <MakineTablo />)}
             style={{
               display: "flex",
               alignItems: "center",
@@ -200,6 +206,7 @@ function Component5(updateApi) {
               justifyContent: "space-between",
               padding: "0px 10px 5px 10px",
               borderBottom: "1px solid #f0f0f0",
+              cursor: "pointer",
             }}
           >
             <div
@@ -235,16 +242,14 @@ function Component5(updateApi) {
         </div>
       )}
       <Modal
-        width={1400}
+        width="90%"
         centered
-        title="Devam Eden İş Talepleri"
+        title={modalTitle}
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <div>
-          <ModalTablo />
-        </div>
+        <div>{modalContent}</div>
       </Modal>
     </div>
   );

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import bg from "../../../assets/images/bg-card.png";
-import { Spin, Typography } from "antd";
+import { Modal, Spin, Typography } from "antd";
 import { FallOutlined } from "@ant-design/icons";
 import { Controller, useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../api/http.jsx";
+import MakineTablo from "./../../MakineEkipman/MakineTanim/Table/Table.jsx";
 
 const { Text } = Typography;
 
@@ -12,6 +13,7 @@ function Component4(props) {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState(null);
   const updateApi = watch("updateApi");
+  const [modalVisible, setModalVisible] = useState(false);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -27,6 +29,10 @@ function Component4(props) {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const showModal = () => {
+    setModalVisible(true);
+  };
 
   return (
     <div
@@ -58,6 +64,7 @@ function Component4(props) {
             justifyContent: "space-between",
             cursor: "pointer",
           }}
+          onClick={showModal}
         >
           <div style={{ display: "flex", flexDirection: "column" }}>
             <Text
@@ -76,6 +83,19 @@ function Component4(props) {
           />
         </div>
       )}
+      <Modal
+        title="Makineler"
+        width="90%"
+        open={modalVisible}
+        onOk={() => setModalVisible(false)}
+        onCancel={() => setModalVisible(false)}
+        centered
+        footer={null}
+      >
+        <div>
+          <MakineTablo />
+        </div>
+      </Modal>
     </div>
   );
 }

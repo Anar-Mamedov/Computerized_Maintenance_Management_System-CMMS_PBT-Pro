@@ -298,43 +298,45 @@ function TamamlanmaOranlari(props = {}) {
             height: "100vh",
           }}
         >
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              width="100%"
-              height="100%"
-              data={data}
-              margin={{
-                top: 20,
-                right: 30,
-                left: 20,
-                bottom: 5,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="AY" />
-              <YAxis />
-              <Tooltip />
-              <Legend content={<CustomLegend />} />
-              <Bar
-                dataKey="IsEmri"
-                stackId="a"
-                fill="#8884d8"
-                hide={!visibleSeries.IsEmri}
-                name="İş Emri"
+          <div style={{ width: "100%", height: "calc(100% - 5px)" }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                width="100%"
+                height="100%"
+                data={data}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
               >
-                {/*<LabelList dataKey="IsEmri" position="insideTop" />*/}
-              </Bar>
-              <Bar
-                dataKey="IsTalebi"
-                stackId="a"
-                fill="#82ca9d"
-                hide={!visibleSeries.IsTalebi}
-                name="İş Talebi"
-              >
-                {/*<LabelList dataKey="IsTalebi" position="insideTop" />*/}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="AY" />
+                <YAxis />
+                <Tooltip />
+                <Legend content={<CustomLegend />} />
+                <Bar
+                  dataKey="IsEmri"
+                  stackId="a"
+                  fill="#8884d8"
+                  hide={!visibleSeries.IsEmri}
+                  name="İş Emri"
+                >
+                  {/*<LabelList dataKey="IsEmri" position="insideTop" />*/}
+                </Bar>
+                <Bar
+                  dataKey="IsTalebi"
+                  stackId="a"
+                  fill="#82ca9d"
+                  hide={!visibleSeries.IsTalebi}
+                  name="İş Talebi"
+                >
+                  {/*<LabelList dataKey="IsTalebi" position="insideTop" />*/}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       )}
       <Modal
