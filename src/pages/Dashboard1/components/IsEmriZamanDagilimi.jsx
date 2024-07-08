@@ -281,6 +281,7 @@ function IsEmriZamanDagilimi(props = {}) {
           gap: "15px",
           justifyContent: "center",
           margin: 0,
+          marginTop: "10px",
         }}
       >
         <li
@@ -465,7 +466,7 @@ function IsEmriZamanDagilimi(props = {}) {
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="AY" />
+                <XAxis dataKey="AY" hide={true} />
                 <YAxis />
                 <Tooltip />
                 <Legend content={<CustomLegend />} />
