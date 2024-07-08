@@ -448,7 +448,7 @@ function IsEmriZamanDagilimi(props = {}) {
             display: "flex",
             flexDirection: "column",
             gap: "7px",
-            overflow: "scroll",
+            overflow: "auto",
             height: "100vh",
           }}
         >
@@ -626,7 +626,7 @@ function IsEmriZamanDagilimi(props = {}) {
             display: "flex",
             flexDirection: "column",
             gap: "7px",
-            overflow: "scroll",
+            overflow: "auto",
             height: "calc(100vh - 180px)",
           }}
         >

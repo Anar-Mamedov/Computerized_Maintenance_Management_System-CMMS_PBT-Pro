@@ -441,7 +441,7 @@ function PersonelBazindaIsGucu(props = {}) {
           style={{
             display: "flex",
             flexDirection: "column",
-            overflow: "scroll",
+            overflow: "auto",
             height: "100vh",
           }}
         >
@@ -601,7 +601,7 @@ function PersonelBazindaIsGucu(props = {}) {
             flexWrap: "wrap",
             gap: "10px",
             maxHeight: "500px",
-            overflow: "scroll",
+            overflow: "auto",
           }}
         >
           <div
@@ -680,7 +680,7 @@ function PersonelBazindaIsGucu(props = {}) {
           style={{
             display: "flex",
             flexDirection: "column",
-            overflow: "scroll",
+            overflow: "auto",
             height: "calc(100vh - 180px)",
           }}
         >
