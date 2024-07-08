@@ -358,7 +358,6 @@ function IsEmirleriOzetTablosu(props) {
               showTotal: (total, range) => `Toplam ${total}`,
               showQuickJumper: true,
             }}
-            scroll={{ y: "100%" }}
           />
         </Spin>
       </div>
