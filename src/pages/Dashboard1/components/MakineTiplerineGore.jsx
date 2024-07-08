@@ -170,6 +170,7 @@ function MakineTiplerineGore(props) {
           <Table
             columns={columns}
             dataSource={data}
+            size="small"
             pagination={{
               defaultPageSize: 10,
               showSizeChanger: true,
