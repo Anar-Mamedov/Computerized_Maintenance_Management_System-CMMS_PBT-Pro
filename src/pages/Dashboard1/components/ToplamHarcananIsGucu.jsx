@@ -506,30 +506,32 @@ function ToplamHarcananIsGucu(props = {}) {
             height: "100vh",
           }}
         >
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart width={400} height={400}>
-              <Pie
-                data={data.filter((entry) => visibleSeries[entry.name])}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={renderCustomizedLabel}
-                outerRadius="90%"
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {data
-                  .filter((entry) => visibleSeries[entry.name])
-                  .map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={colors[index % colors.length]}
-                    />
-                  ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+          <div style={{ width: "100%", height: "calc(100% - 5px)" }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart width={400} height={400}>
+                <Pie
+                  data={data.filter((entry) => visibleSeries[entry.name])}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={renderCustomizedLabel}
+                  outerRadius="90%"
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {data
+                    .filter((entry) => visibleSeries[entry.name])
+                    .map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={colors[index % colors.length]}
+                      />
+                    ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       )}
       <Modal

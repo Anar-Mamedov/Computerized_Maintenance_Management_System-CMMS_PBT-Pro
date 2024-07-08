@@ -445,45 +445,47 @@ function PersonelBazindaIsGucu(props = {}) {
             height: "100vh",
           }}
         >
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              width="100%"
-              height="100%"
-              data={filteredData}
-              margin={{
-                top: 20,
-                right: 30,
-                left: 20,
-                bottom: 5,
+          <div style={{ width: "100%", height: "calc(100% - 43px)" }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                width="100%"
+                height="100%"
+                data={filteredData}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="ISIM" />
+                <YAxis />
+                <Tooltip />
+                <Bar
+                  dataKey="DAKIKA"
+                  stackId="a"
+                  fill="#8884d8"
+                  name="Harcanan Süre (dk.)"
+                ></Bar>
+              </BarChart>
+            </ResponsiveContainer>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="ISIM" />
-              <YAxis />
-              <Tooltip />
-              <Bar
-                dataKey="DAKIKA"
-                stackId="a"
-                fill="#8884d8"
-                name="Harcanan Süre (dk.)"
-              ></Bar>
-            </BarChart>
-          </ResponsiveContainer>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Button
-              style={{ marginBottom: "10px" }}
-              type="text"
-              onClick={handleFilterModalOpen}
-              icon={<FilterOutlined />}
-            >
-              Personel Filtrele
-            </Button>
+              <Button
+                style={{ marginBottom: "10px" }}
+                type="text"
+                onClick={handleFilterModalOpen}
+                icon={<FilterOutlined />}
+              >
+                Personel Filtrele
+              </Button>
+            </div>
           </div>
         </div>
       )}

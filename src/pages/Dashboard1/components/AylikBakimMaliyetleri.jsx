@@ -293,34 +293,36 @@ function AylikBakimMaliyetleri(props = {}) {
             height: "100vh",
           }}
         >
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              width="100%"
-              height="100%"
-              data={data}
-              margin={{
-                top: 20,
-                right: 30,
-                left: 20,
-                bottom: 5,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="AY" />
-              <YAxis />
-              <Tooltip />
-              <Legend content={<CustomLegend />} />
-              <Bar
-                dataKey="AYLIK_BAKIM_ISEMRI_MALIYET"
-                stackId="a"
-                fill="#8884d8"
-                hide={!visibleSeries.AYLIK_BAKIM_ISEMRI_MALIYET}
-                name="İş Emri Maliyeti"
+          <div style={{ width: "100%", height: "calc(100% - 5px)" }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                width="100%"
+                height="100%"
+                data={data}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
               >
-                {/*<LabelList dataKey="AYLIK_BAKIM_ISEMRI_MALIYET" position="insideTop" />*/}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="AY" />
+                <YAxis />
+                <Tooltip />
+                <Legend content={<CustomLegend />} />
+                <Bar
+                  dataKey="AYLIK_BAKIM_ISEMRI_MALIYET"
+                  stackId="a"
+                  fill="#8884d8"
+                  hide={!visibleSeries.AYLIK_BAKIM_ISEMRI_MALIYET}
+                  name="İş Emri Maliyeti"
+                >
+                  {/*<LabelList dataKey="AYLIK_BAKIM_ISEMRI_MALIYET" position="insideTop" />*/}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       )}
       <Modal
