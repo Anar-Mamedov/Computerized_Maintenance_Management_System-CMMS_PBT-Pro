@@ -178,7 +178,6 @@ function MakineTiplerineGore(props) {
               showTotal: (total, range) => `Toplam ${total}`,
               showQuickJumper: true,
             }}
-            scroll={{ y: "100vh" }}
           />
         </Spin>
       </div>
