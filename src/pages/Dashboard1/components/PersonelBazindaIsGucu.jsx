@@ -459,7 +459,7 @@ function PersonelBazindaIsGucu(props = {}) {
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="ISIM" />
+                <XAxis dataKey="ISIM" hide={true} />
                 <YAxis />
                 <Tooltip />
                 <Bar
