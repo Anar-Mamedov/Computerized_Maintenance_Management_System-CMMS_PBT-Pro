@@ -65,7 +65,7 @@ function Component5(updateApi) {
             display: "flex",
             flexDirection: "column",
             gap: "7px",
-            overflow: "scroll",
+            overflow: "auto",
             height: "100vh",
           }}
         >

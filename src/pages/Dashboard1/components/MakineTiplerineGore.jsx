@@ -161,7 +161,7 @@ function MakineTiplerineGore(props) {
           display: "flex",
           flexDirection: "column",
           gap: "7px",
-          overflow: "scroll",
+          overflow: "auto",
           height: "100vh",
           padding: "0px 10px 0 10px",
         }}
