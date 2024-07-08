@@ -222,7 +222,7 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        {loginData?.Dashboard && <Route path="/" element={<Dashboard />} />}
+        {loginData?.Dashboard && <Route path="/" element={<Dashboard1 />} />}
         {/* <Route path="/isemri" element={<Isemri />} /> */}
         <Route path="/isEmri1" element={<IsEmri />} />
         <Route path="/User" element={<ProfilEkrani />} />
