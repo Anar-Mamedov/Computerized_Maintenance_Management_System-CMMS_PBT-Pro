@@ -253,7 +253,7 @@ export default function App() {
         <Route path="/atolye" element={<AtolyeTanimlari />} />
         <Route path="/personeltanimlari" element={<PersonelTanimlari />} />
         <Route path="/isTalepleri" element={<IsTalepleri />} />
-        <Route path="/demo" element={<Dashboard1 />} />
+        <Route path="/demo" element={<Dashboard />} />
       </Route>
     </Routes>
   );
