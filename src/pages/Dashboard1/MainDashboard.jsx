@@ -129,10 +129,10 @@ function MainDashboard() {
       { id: "widget13", x: 0, y: 7, width: 4, height: 3, minW: 3, minH: 2 },
       { id: "widget14", x: 4, y: 7, width: 4, height: 3, minW: 3, minH: 2 },
       { id: "widget11", x: 8, y: 4, width: 4, height: 3, minW: 3, minH: 2 },
-      { id: "widget6", x: 6, y: 10, width: 6, height: 4, minW: 6, minH: 4 },
-      { id: "widget7", x: 0, y: 10, width: 6, height: 4, minW: 6, minH: 4 },
-      { id: "widget9", x: 0, y: 14, width: 6, height: 4, minW: 6, minH: 4 },
-      { id: "widget8", x: 6, y: 14, width: 6, height: 4, minW: 6, minH: 4 },
+      { id: "widget6", x: 6, y: 10, width: 6, height: 4, minW: 3, minH: 2 },
+      { id: "widget7", x: 0, y: 10, width: 6, height: 4, minW: 3, minH: 2 },
+      { id: "widget9", x: 0, y: 14, width: 6, height: 4, minW: 3, minH: 2 },
+      { id: "widget8", x: 6, y: 14, width: 6, height: 4, minW: 3, minH: 2 },
     ];
 
     const itemsToLoad = storedItems?.length > 0 ? storedItems : defaultItems;
