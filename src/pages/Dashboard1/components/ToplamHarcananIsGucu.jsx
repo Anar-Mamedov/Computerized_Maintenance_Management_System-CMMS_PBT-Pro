@@ -678,7 +678,8 @@ function ToplamHarcananIsGucu(props = {}) {
             flexDirection: "column",
             gap: "7px",
             overflow: "auto",
-            height: "calc(100vh - 180px)",
+            height: "100vh",
+            maxHeight: "800px",
           }}
         >
           <ResponsiveContainer id="toplam-is-gucu" width="100%" height="100%">
