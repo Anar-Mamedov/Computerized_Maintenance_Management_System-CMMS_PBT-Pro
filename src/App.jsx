@@ -315,7 +315,7 @@ const BaseLayout = () => {
             }}
           >
             <img src={logo} alt="Logo" style={logoStyle} />
-            <Text style={{ color: "white", marginTop: "11px" }}>v. 1.5.0</Text>
+            <Text style={{ color: "white", marginTop: "11px" }}>v. 1.7.0</Text>
           </div>
           <MenuWrapper />
         </Sider>
@@ -340,7 +340,7 @@ const BaseLayout = () => {
             }}
           >
             <img src={logo} alt="Logo" style={logoStyle} />
-            <Text style={{ color: "white", marginTop: "11px" }}>v. 1.5.0</Text>
+            <Text style={{ color: "white", marginTop: "11px" }}>v. 1.7.0</Text>
           </div>
           <MenuWrapper />
         </Sider>

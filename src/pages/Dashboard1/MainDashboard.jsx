@@ -22,6 +22,7 @@ import AylikBakimMaliyetleri from "./components/AylikBakimMaliyetleri.jsx";
 import IsEmriZamanDagilimi from "./components/IsEmriZamanDagilimi.jsx";
 import PersonelBazindaIsGucu from "./components/PersonelBazindaIsGucu.jsx";
 import ToplamHarcananIsGucu from "./components/ToplamHarcananIsGucu.jsx";
+import CustomDashboards from "./components/CustomDashboards.jsx";
 import { createRoot } from "react-dom/client";
 
 import "./custom-gridstack.css"; // Add this line to import your custom CSS
@@ -591,7 +592,8 @@ function MainDashboard() {
             marginBottom: "10px",
           }}
         >
-          <Text style={{ fontWeight: "600", fontSize: "24px" }}>Dashboard</Text>
+          {/*<Text style={{ fontWeight: "600", fontSize: "24px" }}>Dashboard</Text>*/}
+          <CustomDashboards />
           <div
             style={{
               display: "flex",
