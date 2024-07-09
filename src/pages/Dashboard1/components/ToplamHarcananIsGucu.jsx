@@ -19,8 +19,19 @@ import { Controller, useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
 import html2pdf from "html2pdf.js";
 import chroma from "chroma-js";
+import styled from "styled-components";
 
 const { Text } = Typography;
+
+// Styled component for the pie chart container
+const StyledResponsiveContainer = styled(ResponsiveContainer)`
+  &:focus {
+    outline: none !important;
+  }
+  .recharts-wrapper path:focus {
+    outline: none;
+  }
+`;
 
 function ToplamHarcananIsGucu(props = {}) {
   const [data, setData] = useState([]);
@@ -639,10 +650,7 @@ function ToplamHarcananIsGucu(props = {}) {
               width: "98%",
             }}
           >
-            <Text
-              title={`Toplam Harcanan İş Gücü (${
-                baslamaTarihi ? formatDate(baslamaTarihi) : ""
-              } - ${bitisTarihi ? formatDate(bitisTarihi) : ""})`}
+            <div
               style={{
                 fontWeight: "500",
                 fontSize: "17px",
@@ -651,6 +659,9 @@ function ToplamHarcananIsGucu(props = {}) {
                 textOverflow: "ellipsis",
                 maxWidth: "calc(100% - 50px)",
               }}
+              title={`Toplam Harcanan İş Gücü (${
+                baslamaTarihi ? formatDate(baslamaTarihi) : ""
+              } - ${bitisTarihi ? formatDate(bitisTarihi) : ""})`}
             >
               Toplam Harcanan İş Gücü
               {` (${
@@ -658,7 +669,7 @@ function ToplamHarcananIsGucu(props = {}) {
                   ? `${formatDate(baslamaTarihi)} / ${formatDate(bitisTarihi)}`
                   : ""
               })`}
-            </Text>
+            </div>
             <PrinterOutlined
               style={{ cursor: "pointer", fontSize: "20px" }}
               onClick={downloadPDF}
@@ -680,7 +691,11 @@ function ToplamHarcananIsGucu(props = {}) {
             height: "calc(100vh - 180px)",
           }}
         >
-          <ResponsiveContainer id="toplam-is-gucu" width="100%" height="100%">
+          <StyledResponsiveContainer
+            id="toplam-is-gucu"
+            width="100%"
+            height="100%"
+          >
             <PieChart width="100%" height="100%">
               <Pie
                 data={data.filter((entry) => visibleSeries[entry.name])}
@@ -704,7 +719,7 @@ function ToplamHarcananIsGucu(props = {}) {
               <Tooltip />
               <Legend content={<CustomLegend />} />
             </PieChart>
-          </ResponsiveContainer>
+          </StyledResponsiveContainer>
         </div>
       </Modal>
     </div>
