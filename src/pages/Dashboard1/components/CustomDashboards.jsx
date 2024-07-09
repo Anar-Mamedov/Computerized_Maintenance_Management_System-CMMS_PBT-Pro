@@ -45,6 +45,7 @@ function CustomDashboards(props) {
     // Update the header with the clicked dashboard name
     setHeader(dashboardName);
     // Set the value of the 'selectedDashboard' field in the form
+
     setValue("selectedDashboard", dashboardName);
   };
 
