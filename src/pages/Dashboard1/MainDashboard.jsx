@@ -28,6 +28,23 @@ import "./custom-gridstack.css"; // Add this line to import your custom CSS
 
 const { Text } = Typography;
 
+const widgetTitles = {
+  widget1: "Devam Eden İş Talepleri",
+  widget2: "Açık İş Emirleri",
+  widget3: "Düşük Stoklu Malzemeler",
+  widget4: "Toplam Makine Sayısı",
+  widget5: "Durum",
+  widget6: "Lokasyon Bazında İş Talepleri ve İş Emirleri Dağılımı",
+  widget7: "İş Emirleri Özet Tablosu",
+  widget8: "Arızalı Makineler",
+  widget9: "Makine Tiplerine Göre Envanter Dağılımı",
+  widget10: "Tamamlanmış İş Talepleri ve İş Emirleri Oranları",
+  widget11: "Aylık Bakım Maliyetleri",
+  widget12: "İş Emrinin Zaman Dağılımı",
+  widget13: "Personel Bazında İş Gücü",
+  widget14: "Toplam Harcanan İş Gücü",
+};
+
 function MainDashboard() {
   const [reorganize, setReorganize] = useState();
   const [updateApi, setUpdateApi] = useState(false);
@@ -95,8 +112,11 @@ function MainDashboard() {
         handles: "se, sw", // Enable resizing from bottom right and bottom left
       },
       column: 12, // 12 sütunlu grid yapısı
+      margin: 10, // Widgetler arasında 10px boşluk bırakır
+      minRow: 1,
+      cellHeight: "auto", // Widgetlerin otomatik yüksekliğini ayarla
       draggable: {
-        handle: ".grid-stack-item-content", // Dragging handle to move widgets
+        handle: ".widget-header", // Dragging handle to move widgets
       },
     });
 
@@ -110,14 +130,12 @@ function MainDashboard() {
         minW: item.minW,
         minH: item.minH,
       }));
-
       localStorage.setItem("gridItems", JSON.stringify(items));
     };
 
     grid.on("change", saveLayout);
 
     const storedItems = JSON.parse(localStorage.getItem("gridItems"));
-
     const defaultItems = [
       { id: "widget1", x: 0, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
       { id: "widget2", x: 3, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
@@ -179,11 +197,21 @@ function MainDashboard() {
 
         const contentEl = document.createElement("div");
         contentEl.className = "grid-stack-item-content";
-        widgetEl.appendChild(contentEl);
+
+        // Add a header to the widget
+        const headerEl = document.createElement("div");
+        headerEl.className = "widget-header";
+        headerEl.textContent = widgetTitles[item.id] || `Widget ${item.id}`;
+
+        const bodyEl = document.createElement("div");
+        bodyEl.className = "widget-body";
+
+        widgetEl.appendChild(headerEl);
+        widgetEl.appendChild(bodyEl);
 
         grid.addWidget(widgetEl);
 
-        const root = createRoot(contentEl);
+        const root = createRoot(bodyEl);
         switch (item.id) {
           case "widget1":
             root.render(
@@ -649,71 +677,85 @@ function MainDashboard() {
           <div className="grid-stack">
             <div className="grid-stack-item border-dark" id="widget1">
               <div className="grid-stack-item-content">
+                <div className="widget-header">{widgetTitles.widget1}</div>
                 <Component1 />
               </div>
             </div>
             <div className="grid-stack-item border-dark" id="widget2">
               <div className="grid-stack-item-content">
+                <div className="widget-header">{widgetTitles.widget2}</div>
                 <Component2 />
               </div>
             </div>
             <div className="grid-stack-item border-dark" id="widget3">
               <div className="grid-stack-item-content">
+                <div className="widget-header">{widgetTitles.widget3}</div>
                 <Component3 />
               </div>
             </div>
             <div className="grid-stack-item border-dark" id="widget4">
               <div className="grid-stack-item-content">
+                <div className="widget-header">{widgetTitles.widget4}</div>
                 <Component4 />
               </div>
             </div>
             <div className="grid-stack-item border-dark" id="widget5">
               <div className="grid-stack-item-content">
+                <div className="widget-header">{widgetTitles.widget5}</div>
                 <Component5 />
               </div>
             </div>
             <div className="grid-stack-item border-dark" id="widget6">
               <div className="grid-stack-item-content">
+                <div className="widget-header">{widgetTitles.widget6}</div>
                 <LokasyonBazindaIsTalepleri />
               </div>
             </div>
             <div className="grid-stack-item border-dark" id="widget7">
               <div className="grid-stack-item-content">
+                <div className="widget-header">{widgetTitles.widget7}</div>
                 <IsEmirleriOzetTablosu />
               </div>
             </div>
             <div className="grid-stack-item border-dark" id="widget8">
               <div className="grid-stack-item-content">
-                <IsEmirleriOzetTablosu />
+                <div className="widget-header">{widgetTitles.widget8}</div>
+                <ArizaliMakineler />
               </div>
             </div>
             <div className="grid-stack-item border-dark" id="widget9">
               <div className="grid-stack-item-content">
+                <div className="widget-header">{widgetTitles.widget9}</div>
                 <MakineTiplerineGore />
               </div>
             </div>
             <div className="grid-stack-item border-dark" id="widget10">
               <div className="grid-stack-item-content">
+                <div className="widget-header">{widgetTitles.widget10}</div>
                 <TamamlanmaOranlari />
               </div>
             </div>{" "}
             <div className="grid-stack-item border-dark" id="widget11">
               <div className="grid-stack-item-content">
+                <div className="widget-header">{widgetTitles.widget11}</div>
                 <AylikBakimMaliyetleri />
               </div>
             </div>{" "}
             <div className="grid-stack-item border-dark" id="widget12">
               <div className="grid-stack-item-content">
+                <div className="widget-header">{widgetTitles.widget12}</div>
                 <IsEmriZamanDagilimi />
               </div>
             </div>
             <div className="grid-stack-item border-dark" id="widget13">
               <div className="grid-stack-item-content">
+                <div className="widget-header">{widgetTitles.widget13}</div>
                 <PersonelBazindaIsGucu />
               </div>
             </div>
             <div className="grid-stack-item border-dark" id="widget14">
               <div className="grid-stack-item-content">
+                <div className="widget-header">{widgetTitles.widget14}</div>
                 <ToplamHarcananIsGucu />
               </div>
             </div>
