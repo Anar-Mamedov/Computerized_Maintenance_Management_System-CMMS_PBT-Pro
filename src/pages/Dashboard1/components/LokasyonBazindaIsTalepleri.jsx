@@ -291,6 +291,7 @@ function LokasyonBazindaIsTalepleri(props) {
               justifyContent: "center",
               padding: "0px 5px",
               height: "32px",
+              zIndex: 3,
             }}
           >
             <MoreOutlined
