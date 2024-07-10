@@ -349,19 +349,20 @@ function IsEmirleriOzetTablosu(props) {
         }}
       >
         <Spin spinning={isLoading}>
-          <Table
-            columns={columns}
-            dataSource={data}
-            size="small"
-            pagination={{
-              defaultPageSize: 10,
-              showSizeChanger: true,
-              pageSizeOptions: ["10", "20", "50", "100"],
-              position: ["bottomRight"],
-              showTotal: (total, range) => `Toplam ${total}`,
-              showQuickJumper: true,
-            }}
-          />
+          <IsEmriAnalizi />
+          {/*<Table*/}
+          {/*  columns={columns}*/}
+          {/*  dataSource={data}*/}
+          {/*  size="small"*/}
+          {/*  pagination={{*/}
+          {/*    defaultPageSize: 10,*/}
+          {/*    showSizeChanger: true,*/}
+          {/*    pageSizeOptions: ["10", "20", "50", "100"],*/}
+          {/*    position: ["bottomRight"],*/}
+          {/*    showTotal: (total, range) => `Toplam ${total}`,*/}
+          {/*    showQuickJumper: true,*/}
+          {/*  }}*/}
+          {/*/>*/}
         </Spin>
       </div>
 
