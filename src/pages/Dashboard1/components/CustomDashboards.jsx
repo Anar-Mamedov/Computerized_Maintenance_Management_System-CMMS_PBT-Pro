@@ -2,13 +2,11 @@ import React, { useState, useEffect } from "react";
 import {
   Button,
   Popover,
-  Spin,
   Typography,
   Modal,
-  DatePicker,
-  Checkbox,
   Input,
   Popconfirm,
+  Checkbox,
 } from "antd";
 import { CaretDownOutlined, DeleteOutlined } from "@ant-design/icons";
 import { Controller, useFormContext } from "react-hook-form";
@@ -20,6 +18,7 @@ function CustomDashboards(props) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [newDashboardName, setNewDashboardName] = useState("");
   const [dashboards, setDashboards] = useState([]);
+  const [defaultDashboard, setDefaultDashboard] = useState("Dashboard");
   const {
     control,
     watch,
@@ -33,11 +32,17 @@ function CustomDashboards(props) {
   useEffect(() => {
     const loadedDashboards =
       JSON.parse(localStorage.getItem("customDashboard")) || [];
+    const savedDefaultDashboard =
+      localStorage.getItem("defaultDashboard") || "Dashboard";
     setDashboards(loadedDashboards);
+    setDefaultDashboard(savedDefaultDashboard);
 
     const currentSelectedDashboard = getValues("selectedDashboard");
     if (!currentSelectedDashboard) {
-      setValue("selectedDashboard", "Dashboard", { shouldValidate: true });
+      setValue("selectedDashboard", savedDefaultDashboard, {
+        shouldValidate: true,
+      });
+      setHeader(savedDefaultDashboard);
     }
   }, [setValue, getValues]);
 
@@ -45,7 +50,6 @@ function CustomDashboards(props) {
     // Update the header with the clicked dashboard name
     setHeader(dashboardName);
     // Set the value of the 'selectedDashboard' field in the form
-
     setValue("selectedDashboard", dashboardName);
   };
 
@@ -76,16 +80,42 @@ function CustomDashboards(props) {
     );
     localStorage.setItem("customDashboard", JSON.stringify(updatedDashboards));
     setDashboards(updatedDashboards);
+
+    if (defaultDashboard === dashboardName) {
+      localStorage.setItem("defaultDashboard", "Dashboard");
+      setDefaultDashboard("Dashboard");
+      setHeader("Dashboard");
+      setValue("selectedDashboard", "Dashboard");
+    }
+  };
+
+  const handleCheckboxChange = (e, dashboardName) => {
+    if (e.target.checked) {
+      localStorage.setItem("defaultDashboard", dashboardName);
+      setDefaultDashboard(dashboardName);
+      setHeader(dashboardName);
+      setValue("selectedDashboard", dashboardName);
+    }
   };
 
   const content = (
     <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
       <div
         key="defaultDashboard"
-        style={{ padding: "5px 0", cursor: "pointer" }}
+        style={{
+          padding: "5px 0",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+        }}
         onClick={() => handleDashboardClick("Dashboard")}
       >
-        Dashboard
+        <Checkbox
+          style={{ marginRight: "5px" }}
+          checked={defaultDashboard === "Dashboard"}
+          onChange={(e) => handleCheckboxChange(e, "Dashboard")}
+        />
+        <span>Dashboard</span>
       </div>
       {dashboards.map((dashboard) => (
         <div
@@ -98,7 +128,17 @@ function CustomDashboards(props) {
             cursor: "pointer",
           }}
         >
-          <div onClick={() => handleDashboardClick(dashboard)}>{dashboard}</div>
+          <div
+            onClick={() => handleDashboardClick(dashboard)}
+            style={{ display: "flex", alignItems: "center" }}
+          >
+            <Checkbox
+              style={{ marginRight: "5px" }}
+              checked={defaultDashboard === dashboard}
+              onChange={(e) => handleCheckboxChange(e, dashboard)}
+            />
+            <span>{dashboard}</span>
+          </div>
           <Popconfirm
             title="Silmek istediğinize emin misiniz?"
             onConfirm={() => handleDeleteDashboard(dashboard)}
