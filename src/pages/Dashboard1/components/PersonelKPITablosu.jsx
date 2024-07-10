@@ -15,11 +15,11 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import dayjs from "dayjs";
 import customFontBase64 from "./RobotoBase64.js";
-import IsEmriAnalizi from "./IsEmriTipiSekmesi/Table/Table.jsx";
+import PersonelKPI from "./PersonelSekmesi/Table/MainTable.jsx";
 
 const { Text } = Typography;
 
-function IsEmirleriOzetTablosu(props) {
+function PersonelKPITablosu(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -311,7 +311,7 @@ function IsEmirleriOzetTablosu(props) {
         }}
       >
         <Text style={{ fontWeight: "500", fontSize: "17px" }}>
-          İş Emri Analizi
+          Personel KPİ'ları
           {/*{`(${*/}
           {/*  baslamaTarihi && bitisTarihi*/}
           {/*    ? `${formatDateWithLocale(*/}
@@ -350,7 +350,7 @@ function IsEmirleriOzetTablosu(props) {
       >
         <Spin spinning={isLoading}>
           <div style={{ width: "100%", height: "100%", overflow: "auto" }}>
-            <IsEmriAnalizi />
+            <PersonelKPI />
           </div>
 
           {/*<Table*/}
@@ -468,7 +468,7 @@ function IsEmirleriOzetTablosu(props) {
         title={
           <div>
             <Text style={{ fontWeight: "500", fontSize: "17px" }}>
-              İş Emri Analizi
+              Personel KPİ'ları
               {/*{`(${*/}
               {/*  baslamaTarihi && bitisTarihi*/}
               {/*    ? `${formatDateWithLocale(*/}
@@ -488,7 +488,7 @@ function IsEmirleriOzetTablosu(props) {
       >
         <div style={{ height: "calc(100vh - 200px)", overflow: "auto" }}>
           <Spin spinning={isLoading}>
-            <IsEmriAnalizi />
+            <PersonelKPI />
             {/*<Table*/}
             {/*  columns={columns}*/}
             {/*  dataSource={data}*/}
@@ -509,4 +509,4 @@ function IsEmirleriOzetTablosu(props) {
   );
 }
 
-export default IsEmirleriOzetTablosu;
+export default PersonelKPITablosu;

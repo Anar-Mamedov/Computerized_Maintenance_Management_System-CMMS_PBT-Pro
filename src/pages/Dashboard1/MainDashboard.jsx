@@ -23,6 +23,7 @@ import IsEmriZamanDagilimi from "./components/IsEmriZamanDagilimi.jsx";
 import PersonelBazindaIsGucu from "./components/PersonelBazindaIsGucu.jsx";
 import ToplamHarcananIsGucu from "./components/ToplamHarcananIsGucu.jsx";
 import CustomDashboards from "./components/CustomDashboards.jsx";
+import PersonelKPITablosu from "./components/PersonelKPITablosu.jsx";
 import { AppProvider } from "./../../AppContext.jsx";
 import { createRoot } from "react-dom/client";
 
@@ -45,6 +46,7 @@ const widgetTitles = {
   widget12: "İş Emrinin Zaman Dağılımı",
   widget13: "Personel Bazında İş Gücü",
   widget14: "Toplam Harcanan İş Gücü",
+  widget15: "Personel KPİ'ları",
 };
 
 const defaultItems = [
@@ -55,13 +57,14 @@ const defaultItems = [
   { id: "widget12", x: 0, y: 1, width: 12, height: 3, minW: 3, minH: 2 },
   { id: "widget5", x: 0, y: 4, width: 4, height: 3, minW: 3, minH: 2 },
   { id: "widget10", x: 4, y: 4, width: 4, height: 3, minW: 3, minH: 2 },
+  { id: "widget11", x: 8, y: 4, width: 4, height: 3, minW: 3, minH: 2 },
   { id: "widget13", x: 0, y: 7, width: 4, height: 3, minW: 3, minH: 2 },
   { id: "widget14", x: 4, y: 7, width: 4, height: 3, minW: 3, minH: 2 },
-  { id: "widget11", x: 8, y: 4, width: 4, height: 3, minW: 3, minH: 2 },
-  { id: "widget6", x: 6, y: 10, width: 6, height: 4, minW: 3, minH: 2 },
   { id: "widget7", x: 0, y: 10, width: 6, height: 4, minW: 3, minH: 2 },
+  { id: "widget15", x: 6, y: 10, width: 6, height: 4, minW: 3, minH: 2 },
   { id: "widget9", x: 0, y: 14, width: 6, height: 4, minW: 3, minH: 2 },
-  { id: "widget8", x: 6, y: 14, width: 6, height: 4, minW: 3, minH: 2 },
+  { id: "widget6", x: 6, y: 14, width: 6, height: 4, minW: 3, minH: 2 },
+  { id: "widget8", x: 0, y: 18, width: 6, height: 4, minW: 3, minH: 2 },
 ];
 
 function MainDashboard() {
@@ -82,6 +85,7 @@ function MainDashboard() {
     widget12: false,
     widget13: false,
     widget14: false,
+    widget15: false,
   });
 
   const methods = useForm({
@@ -312,6 +316,15 @@ function MainDashboard() {
               </FormProvider>
             );
             break;
+          case "widget15":
+            root.render(
+              <FormProvider {...methods}>
+                <AppProvider>
+                  <PersonelKPITablosu />
+                </AppProvider>
+              </FormProvider>
+            );
+            break;
           default:
             break;
         }
@@ -334,6 +347,7 @@ function MainDashboard() {
         widget12: false,
         widget13: false,
         widget14: false,
+        widget15: false,
       };
       newGridItems.forEach((item) => {
         if (Object.prototype.hasOwnProperty.call(newChecked, item.id)) {
@@ -368,6 +382,7 @@ function MainDashboard() {
         widget12: false,
         widget13: false,
         widget14: false,
+        widget15: false,
       };
       itemsToLoad.forEach((item) => {
         if (Object.prototype.hasOwnProperty.call(checked, item.id)) {
@@ -625,6 +640,13 @@ function MainDashboard() {
       >
         Toplam Harcanan İş Gücü
       </Checkbox>
+      <Checkbox
+        name="widget15"
+        onChange={handleCheckboxChange}
+        checked={checkedWidgets.widget15}
+      >
+        Personel KPİ'ları
+      </Checkbox>
       <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
         <Button danger onClick={handleReset}>
           Widgetları Sıfırla
@@ -813,6 +835,12 @@ function MainDashboard() {
                 <div className="grid-stack-item-content">
                   <div className="widget-header">{widgetTitles.widget14}</div>
                   <ToplamHarcananIsGucu />
+                </div>
+              </div>
+              <div className="grid-stack-item border-dark" id="widget15">
+                <div className="grid-stack-item-content">
+                  <div className="widget-header">{widgetTitles.widget15}</div>
+                  <PersonelKPITablosu />
                 </div>
               </div>
             </div>
