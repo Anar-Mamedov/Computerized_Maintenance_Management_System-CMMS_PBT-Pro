@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import bg from "../../../assets/images/bg-card.png";
 import { Modal, Spin, Typography } from "antd";
-import { FallOutlined } from "@ant-design/icons";
+import { FallOutlined, HistoryOutlined } from "@ant-design/icons";
 import { Controller, useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../api/http.jsx";
 import MakineTablo from "./../../MakineEkipman/MakineTanim/Table/Table.jsx";
@@ -78,7 +78,7 @@ function Component4(props) {
               Toplam Makine Sayısı
             </Text>
           </div>
-          <FallOutlined
+          <HistoryOutlined
             style={{ fontSize: "60px", color: "rgba(255,255,255,.8)" }}
           />
         </div>
