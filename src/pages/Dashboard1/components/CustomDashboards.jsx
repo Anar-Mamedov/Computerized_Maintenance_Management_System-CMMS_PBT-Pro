@@ -107,15 +107,16 @@ function CustomDashboards(props) {
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
+          justifyContent: "space-between",
         }}
         onClick={() => handleDashboardClick("Dashboard")}
       >
+        <span>Dashboard</span>{" "}
         <Checkbox
           style={{ marginRight: "5px" }}
           checked={defaultDashboard === "Dashboard"}
           onChange={(e) => handleCheckboxChange(e, "Dashboard")}
         />
-        <span>Dashboard</span>
       </div>
       {dashboards.map((dashboard) => (
         <div
@@ -132,11 +133,6 @@ function CustomDashboards(props) {
             onClick={() => handleDashboardClick(dashboard)}
             style={{ display: "flex", alignItems: "center" }}
           >
-            <Checkbox
-              style={{ marginRight: "5px" }}
-              checked={defaultDashboard === dashboard}
-              onChange={(e) => handleCheckboxChange(e, dashboard)}
-            />
             <span>{dashboard}</span>
           </div>
           <Popconfirm
@@ -146,9 +142,12 @@ function CustomDashboards(props) {
             okText="Evet"
             cancelText="Hayır"
           >
-            <Button type="text" icon={<DeleteOutlined />} danger>
-              Sil
-            </Button>
+            <Button type="text" icon={<DeleteOutlined />} danger></Button>{" "}
+            <Checkbox
+              style={{ marginRight: "5px" }}
+              checked={defaultDashboard === dashboard}
+              onChange={(e) => handleCheckboxChange(e, dashboard)}
+            />
           </Popconfirm>
         </div>
       ))}
