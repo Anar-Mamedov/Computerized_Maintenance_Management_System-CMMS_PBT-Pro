@@ -38,7 +38,7 @@ const widgetTitles = {
   widget4: "Toplam Makine Sayısı",
   widget5: "Durum",
   widget6: "Lokasyon Bazında İş Talepleri ve İş Emirleri Dağılımı",
-  widget7: "İş Emirleri Özet Tablosu",
+  widget7: "İş Emri Analizi",
   widget8: "Arızalı Makineler",
   widget9: "Makine Tiplerine Göre Envanter Dağılımı",
   widget10: "Tamamlanmış İş Talepleri ve İş Emirleri Oranları",
@@ -46,7 +46,7 @@ const widgetTitles = {
   widget12: "İş Emrinin Zaman Dağılımı",
   widget13: "Personel Bazında İş Gücü",
   widget14: "Toplam Harcanan İş Gücü",
-  widget15: "Personel KPİ'ları",
+  widget15: "Personel KPI",
 };
 
 const defaultItems = [
@@ -54,17 +54,17 @@ const defaultItems = [
   { id: "widget2", x: 3, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
   { id: "widget3", x: 6, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
   { id: "widget4", x: 9, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
-  { id: "widget12", x: 0, y: 1, width: 12, height: 3, minW: 3, minH: 2 },
-  { id: "widget5", x: 0, y: 4, width: 4, height: 3, minW: 3, minH: 2 },
-  { id: "widget10", x: 4, y: 4, width: 4, height: 3, minW: 3, minH: 2 },
-  { id: "widget11", x: 8, y: 4, width: 4, height: 3, minW: 3, minH: 2 },
-  { id: "widget13", x: 0, y: 7, width: 4, height: 3, minW: 3, minH: 2 },
-  { id: "widget14", x: 4, y: 7, width: 4, height: 3, minW: 3, minH: 2 },
-  { id: "widget7", x: 0, y: 10, width: 6, height: 4, minW: 3, minH: 2 },
-  { id: "widget15", x: 6, y: 10, width: 6, height: 4, minW: 3, minH: 2 },
-  { id: "widget9", x: 0, y: 14, width: 6, height: 4, minW: 3, minH: 2 },
-  { id: "widget6", x: 6, y: 14, width: 6, height: 4, minW: 3, minH: 2 },
-  { id: "widget8", x: 0, y: 18, width: 6, height: 4, minW: 3, minH: 2 },
+  { id: "widget5", x: 0, y: 1, width: 4, height: 3, minW: 3, minH: 2 },
+  { id: "widget10", x: 4, y: 1, width: 8, height: 3, minW: 3, minH: 2 },
+  { id: "widget13", x: 0, y: 4, width: 12, height: 3, minW: 3, minH: 2 },
+  { id: "widget6", x: 0, y: 7, width: 7, height: 4, minW: 3, minH: 2 },
+  { id: "widget14", x: 7, y: 7, width: 5, height: 4, minW: 3, minH: 2 },
+  { id: "widget12", x: 0, y: 11, width: 12, height: 3, minW: 3, minH: 2 },
+  { id: "widget11", x: 0, y: 14, width: 12, height: 3, minW: 3, minH: 2 },
+  { id: "widget15", x: 0, y: 17, width: 6, height: 4, minW: 3, minH: 2 },
+  { id: "widget7", x: 6, y: 17, width: 6, height: 4, minW: 3, minH: 2 },
+  { id: "widget8", x: 0, y: 21, width: 6, height: 4, minW: 3, minH: 2 },
+  { id: "widget9", x: 6, y: 21, width: 6, height: 4, minW: 3, minH: 2 },
 ];
 
 function MainDashboard() {
@@ -589,7 +589,7 @@ function MainDashboard() {
         onChange={handleCheckboxChange}
         checked={checkedWidgets.widget7}
       >
-        İş Emirleri Özet Tablosu
+        İş Emri Analizi
       </Checkbox>
       <Checkbox
         name="widget8"
@@ -645,7 +645,7 @@ function MainDashboard() {
         onChange={handleCheckboxChange}
         checked={checkedWidgets.widget15}
       >
-        Personel KPİ'ları
+        Personel KPI
       </Checkbox>
       <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
         <Button danger onClick={handleReset}>

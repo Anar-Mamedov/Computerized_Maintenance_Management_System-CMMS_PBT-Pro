@@ -252,11 +252,11 @@ export default function IkinciTablo({
             style={{ width: "300px", marginBottom: "15px" }}
           />
           <Table
-            rowSelection={{
-              type: "checkbox",
-              selectedRowKeys,
-              onChange: onRowSelectChange,
-            }}
+            // rowSelection={{
+            //   type: "checkbox",
+            //   selectedRowKeys,
+            //   onChange: onRowSelectChange,
+            // }}
             onRow={(record) => ({
               onClick: () => onRowClick(record),
             })}

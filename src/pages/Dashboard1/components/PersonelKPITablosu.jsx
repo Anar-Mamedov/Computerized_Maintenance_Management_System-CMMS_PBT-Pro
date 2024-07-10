@@ -311,7 +311,7 @@ function PersonelKPITablosu(props) {
         }}
       >
         <Text style={{ fontWeight: "500", fontSize: "17px" }}>
-          Personel KPİ'ları
+          Personel KPI
           {/*{`(${*/}
           {/*  baslamaTarihi && bitisTarihi*/}
           {/*    ? `${formatDateWithLocale(*/}
@@ -468,7 +468,7 @@ function PersonelKPITablosu(props) {
         title={
           <div>
             <Text style={{ fontWeight: "500", fontSize: "17px" }}>
-              Personel KPİ'ları
+              Personel KPI
               {/*{`(${*/}
               {/*  baslamaTarihi && bitisTarihi*/}
               {/*    ? `${formatDateWithLocale(*/}

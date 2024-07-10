@@ -229,11 +229,11 @@ export default function MainTable({ isActive }) {
       />
       <Table
         size="small"
-        rowSelection={{
-          type: "checkbox",
-          selectedRowKeys,
-          onChange: onRowSelectChange,
-        }}
+        // rowSelection={{
+        //   type: "checkbox",
+        //   selectedRowKeys,
+        //   onChange: onRowSelectChange,
+        // }}
         onRow={(record) => ({
           onClick: () => onRowClick(record),
         })}
