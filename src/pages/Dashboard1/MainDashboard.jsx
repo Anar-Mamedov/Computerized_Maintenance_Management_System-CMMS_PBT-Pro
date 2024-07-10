@@ -46,6 +46,23 @@ const widgetTitles = {
   widget14: "Toplam Harcanan İş Gücü",
 };
 
+const defaultItems = [
+  { id: "widget1", x: 0, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
+  { id: "widget2", x: 3, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
+  { id: "widget3", x: 6, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
+  { id: "widget4", x: 9, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
+  { id: "widget12", x: 0, y: 1, width: 12, height: 3, minW: 3, minH: 2 },
+  { id: "widget5", x: 0, y: 4, width: 4, height: 3, minW: 3, minH: 2 },
+  { id: "widget10", x: 4, y: 4, width: 4, height: 3, minW: 3, minH: 2 },
+  { id: "widget13", x: 0, y: 7, width: 4, height: 3, minW: 3, minH: 2 },
+  { id: "widget14", x: 4, y: 7, width: 4, height: 3, minW: 3, minH: 2 },
+  { id: "widget11", x: 8, y: 4, width: 4, height: 3, minW: 3, minH: 2 },
+  { id: "widget6", x: 6, y: 10, width: 6, height: 4, minW: 3, minH: 2 },
+  { id: "widget7", x: 0, y: 10, width: 6, height: 4, minW: 3, minH: 2 },
+  { id: "widget9", x: 0, y: 14, width: 6, height: 4, minW: 3, minH: 2 },
+  { id: "widget8", x: 6, y: 14, width: 6, height: 4, minW: 3, minH: 2 },
+];
+
 function MainDashboard() {
   const [reorganize, setReorganize] = useState();
   const [updateApi, setUpdateApi] = useState(false);
@@ -74,6 +91,8 @@ function MainDashboard() {
 
   const { setValue, watch, reset } = methods;
 
+  const selectedDashboard = watch("selectedDashboard");
+
   const updateApiTriger = async () => {
     setUpdateApi(!updateApi);
   };
@@ -97,13 +116,13 @@ function MainDashboard() {
       localStorage.setItem("reorganize", "true");
     }
     setTimeout(() => {
-      const gridItems = JSON.parse(localStorage.getItem("gridItems")) || [];
+      const gridItems =
+        JSON.parse(localStorage.getItem(selectedDashboard)) || [];
       window.updateWidgets(gridItems);
     }, 50);
   };
 
   useEffect(() => {
-    // Check if reorganize is undefined, and if so, return early
     if (reorganize === undefined) {
       return;
     }
@@ -131,57 +150,10 @@ function MainDashboard() {
         minW: item.minW,
         minH: item.minH,
       }));
-      localStorage.setItem("gridItems", JSON.stringify(items));
+      localStorage.setItem(selectedDashboard, JSON.stringify(items));
     };
 
     grid.on("change", saveLayout);
-
-    const storedItems = JSON.parse(localStorage.getItem("gridItems"));
-    const defaultItems = [
-      { id: "widget1", x: 0, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
-      { id: "widget2", x: 3, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
-      { id: "widget3", x: 6, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
-      { id: "widget4", x: 9, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
-      { id: "widget12", x: 0, y: 1, width: 12, height: 3, minW: 3, minH: 2 },
-      { id: "widget5", x: 0, y: 4, width: 4, height: 3, minW: 3, minH: 2 },
-      { id: "widget10", x: 4, y: 4, width: 4, height: 3, minW: 3, minH: 2 },
-      { id: "widget13", x: 0, y: 7, width: 4, height: 3, minW: 3, minH: 2 },
-      { id: "widget14", x: 4, y: 7, width: 4, height: 3, minW: 3, minH: 2 },
-      { id: "widget11", x: 8, y: 4, width: 4, height: 3, minW: 3, minH: 2 },
-      { id: "widget6", x: 6, y: 10, width: 6, height: 4, minW: 3, minH: 2 },
-      { id: "widget7", x: 0, y: 10, width: 6, height: 4, minW: 3, minH: 2 },
-      { id: "widget9", x: 0, y: 14, width: 6, height: 4, minW: 3, minH: 2 },
-      { id: "widget8", x: 6, y: 14, width: 6, height: 4, minW: 3, minH: 2 },
-    ];
-
-    const itemsToLoad = storedItems?.length > 0 ? storedItems : defaultItems;
-
-    if (!localStorage.getItem("hiddenWidgets")) {
-      localStorage.setItem("hiddenWidgets", JSON.stringify([]));
-    }
-
-    const checked = {
-      widget1: false,
-      widget2: false,
-      widget3: false,
-      widget4: false,
-      widget5: false,
-      widget6: false,
-      widget7: false,
-      widget8: false,
-      widget9: false,
-      widget10: false,
-      widget11: false,
-      widget12: false,
-      widget13: false,
-      widget14: false,
-    };
-    itemsToLoad.forEach((item) => {
-      if (Object.prototype.hasOwnProperty.call(checked, item.id)) {
-        checked[item.id] = true;
-      }
-    });
-    setCheckedWidgets(checked);
 
     const loadWidgets = (items) => {
       grid.removeAll();
@@ -199,7 +171,6 @@ function MainDashboard() {
         const contentEl = document.createElement("div");
         contentEl.className = "grid-stack-item-content";
 
-        // Add a header to the widget
         const headerEl = document.createElement("div");
         headerEl.className = "widget-header";
         headerEl.textContent = widgetTitles[item.id] || `Widget ${item.id}`;
@@ -318,12 +289,6 @@ function MainDashboard() {
       });
     };
 
-    loadWidgets(itemsToLoad);
-
-    if (!storedItems) {
-      saveLayout();
-    }
-
     const updateWidgets = (newGridItems) => {
       const newChecked = {
         widget1: false,
@@ -352,9 +317,48 @@ function MainDashboard() {
 
     window.updateWidgets = updateWidgets;
 
-    // Update float property when reorganize state changes
     grid.engine.float = reorganize;
-  }, [reorganize]);
+
+    const handleDashboardChange = () => {
+      const storedItems =
+        JSON.parse(localStorage.getItem(selectedDashboard)) || [];
+      const itemsToLoad = storedItems.length > 0 ? storedItems : defaultItems;
+
+      const checked = {
+        widget1: false,
+        widget2: false,
+        widget3: false,
+        widget4: false,
+        widget5: false,
+        widget6: false,
+        widget7: false,
+        widget8: false,
+        widget9: false,
+        widget10: false,
+        widget11: false,
+        widget12: false,
+        widget13: false,
+        widget14: false,
+      };
+      itemsToLoad.forEach((item) => {
+        if (Object.prototype.hasOwnProperty.call(checked, item.id)) {
+          checked[item.id] = true;
+        }
+      });
+      setCheckedWidgets(checked);
+      loadWidgets(itemsToLoad);
+
+      if (!storedItems.length) {
+        localStorage.setItem(selectedDashboard, JSON.stringify(itemsToLoad));
+      }
+    };
+
+    handleDashboardChange();
+
+    return () => {
+      grid.off("change", saveLayout);
+    };
+  }, [reorganize, selectedDashboard]);
 
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
@@ -363,60 +367,57 @@ function MainDashboard() {
       [name]: checked,
     });
 
-    let gridItems = JSON.parse(localStorage.getItem("gridItems")) || [];
-    let hiddenWidgets = JSON.parse(localStorage.getItem("hiddenWidgets")) || [];
+    let gridItems = JSON.parse(localStorage.getItem(selectedDashboard)) || [];
 
     if (!checked) {
       const widgetIndex = gridItems.findIndex((item) => item.id === name);
       if (widgetIndex > -1) {
-        const [removedWidget] = gridItems.splice(widgetIndex, 1);
-        hiddenWidgets.push(removedWidget);
+        gridItems.splice(widgetIndex, 1);
       }
     } else {
-      const widgetIndex = hiddenWidgets.findIndex((item) => item.id === name);
-      if (widgetIndex > -1) {
-        const [restoredWidget] = hiddenWidgets.splice(widgetIndex, 1);
-        gridItems.push(restoredWidget);
-      }
+      const defaultItem = defaultItems.find((item) => item.id === name);
+
+      const newPosition = findNextAvailablePosition(
+        gridItems,
+        defaultItem.width,
+        defaultItem.height
+      );
+      const newWidget = {
+        ...defaultItem,
+        ...newPosition,
+      };
+
+      gridItems.push(newWidget);
     }
 
     gridItems = rearrangeWidgets(gridItems);
 
-    localStorage.setItem("gridItems", JSON.stringify(gridItems));
-    localStorage.setItem("hiddenWidgets", JSON.stringify(hiddenWidgets));
+    localStorage.setItem(selectedDashboard, JSON.stringify(gridItems));
 
     window.updateWidgets(gridItems);
   };
 
-  const rearrangeWidgets = (items) => {
-    // Dynamically adjust the grid size based on the highest Y position encountered
-    let maxY = 0;
+  const findNextAvailablePosition = (gridItems, width, height) => {
     let grid = Array.from({ length: 1000 }, () => Array(12).fill(null));
     let pos = { x: 0, y: 0 };
 
-    items.forEach((item) => {
-      while (!canPlaceWidget(grid, pos.x, pos.y, item.width, item.height)) {
-        pos.x++;
-        if (pos.x + item.width > 12) {
-          pos.x = 0;
-          pos.y++;
+    gridItems.forEach((item) => {
+      for (let i = item.x; i < item.x + item.width; i++) {
+        for (let j = item.y; j < item.y + item.height; j++) {
+          grid[j][i] = item.id;
         }
-      }
-      placeWidget(grid, pos.x, pos.y, item.width, item.height, item.id);
-      item.x = pos.x;
-      item.y = pos.y;
-      maxY = Math.max(maxY, pos.y + item.height); // Update maxY based on the current item's placement
-      pos.x += item.width;
-      if (pos.x >= 12) {
-        pos.x = 0;
-        pos.y++;
       }
     });
 
-    // Trim the grid based on the maxY value to remove unused rows
-    grid = grid.slice(0, maxY);
+    while (!canPlaceWidget(grid, pos.x, pos.y, width, height)) {
+      pos.x++;
+      if (pos.x + width > 12) {
+        pos.x = 0;
+        pos.y++;
+      }
+    }
 
-    return items;
+    return { x: pos.x, y: pos.y };
   };
 
   const canPlaceWidget = (grid, x, y, width, height) => {
@@ -429,6 +430,31 @@ function MainDashboard() {
     return true;
   };
 
+  const rearrangeWidgets = (items) => {
+    let grid = Array.from({ length: 1000 }, () => Array(12).fill(null));
+    let pos = { x: 0, y: 0 };
+
+    items.forEach((item) => {
+      while (!canPlaceWidget(grid, pos.x, pos.y, item.width, item.height)) {
+        pos.x++;
+        if (pos.x + item.width > 12) {
+          pos.x = 0;
+          pos.y++;
+        }
+      }
+      item.x = pos.x;
+      item.y = pos.y;
+      placeWidget(grid, pos.x, pos.y, item.width, item.height, item.id);
+      pos.x += item.width;
+      if (pos.x >= 12) {
+        pos.x = 0;
+        pos.y++;
+      }
+    });
+
+    return items;
+  };
+
   const placeWidget = (grid, x, y, width, height, id) => {
     for (let i = x; i < x + width; i++) {
       for (let j = y; j < y + height; j++) {
@@ -438,21 +464,20 @@ function MainDashboard() {
   };
 
   const handleReset = () => {
-    localStorage.removeItem("gridItems");
-    localStorage.removeItem("hiddenWidgets");
+    localStorage.removeItem(selectedDashboard);
     localStorage.removeItem("reorganize");
     window.location.reload();
   };
 
   const handleRearrange = () => {
-    const gridItems = JSON.parse(localStorage.getItem("gridItems")) || [];
+    const gridItems = JSON.parse(localStorage.getItem(selectedDashboard)) || [];
     const rearrangedItems = rearrangeWidgets(gridItems);
-    localStorage.setItem("gridItems", JSON.stringify(rearrangedItems));
+    localStorage.setItem(selectedDashboard, JSON.stringify(rearrangedItems));
     window.updateWidgets(rearrangedItems);
   };
 
   const rerenderWidgets = () => {
-    const gridItems = JSON.parse(localStorage.getItem("gridItems")) || [];
+    const gridItems = JSON.parse(localStorage.getItem(selectedDashboard)) || [];
     window.updateWidgets(gridItems);
   };
 
@@ -592,7 +617,6 @@ function MainDashboard() {
             marginBottom: "10px",
           }}
         >
-          {/*<Text style={{ fontWeight: "600", fontSize: "24px" }}>Dashboard</Text>*/}
           <CustomDashboards />
           <div
             style={{
@@ -602,11 +626,7 @@ function MainDashboard() {
               gap: "10px",
             }}
           >
-            <Button
-              type="text"
-              // onClick={updateApiTriger}
-              onClick={rerenderWidgets}
-            >
+            <Button type="text" onClick={rerenderWidgets}>
               <Text
                 type="secondary"
                 style={{
