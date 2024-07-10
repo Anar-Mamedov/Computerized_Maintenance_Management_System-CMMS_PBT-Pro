@@ -306,6 +306,25 @@ function ToplamHarcananIsGucu(props = {}) {
     );
   };
 
+  // Custom Tooltip function
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div
+          style={{
+            backgroundColor: "#fff",
+            padding: "5px",
+            border: "1px solid #ccc",
+          }}
+        >
+          <p>{`${payload[0].name} : ${payload[0].value} dk`}</p>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   const handleLegendClick = (name) => {
     setVisibleSeries((prev) => ({
       ...prev,
@@ -398,17 +417,21 @@ function ToplamHarcananIsGucu(props = {}) {
 
   const handleCancel = () => {
     setIsModalVisible(false);
-    reset();
+    // reset();
   };
 
   useEffect(() => {
     if (isModalVisible === true) {
-      reset({
-        baslamaTarihiToplamIsGucu: undefined,
-        bitisTarihiToplamIsGucu: undefined,
-        aySecimiToplamIsGucu: undefined,
-        yilSecimiToplamIsGucu: undefined,
-      });
+      setValue("baslamaTarihiToplamIsGucu", null);
+      setValue("bitisTarihiToplamIsGucu", null);
+      setValue("aySecimiToplamIsGucu", null);
+      setValue("yilSecimiToplamIsGucu", null);
+      // reset({
+      //   baslamaTarihiToplamIsGucu: undefined,
+      //   bitisTarihiToplamIsGucu: undefined,
+      //   aySecimiToplamIsGucu: undefined,
+      //   yilSecimiToplamIsGucu: undefined,
+      // });
     }
   }, [isModalVisible]);
 
@@ -438,7 +461,7 @@ function ToplamHarcananIsGucu(props = {}) {
         Büyüt
       </div>
       <Popover placement="right" content={content1} trigger="click">
-        <div style={{ cursor: "pointer" }}>Zaman Seçimi</div>
+        <div style={{ cursor: "pointer" }}>Süre Seçimi</div>
       </Popover>
       <div style={{ cursor: "pointer" }} onClick={downloadPDF}>
         İndir
@@ -520,7 +543,7 @@ function ToplamHarcananIsGucu(props = {}) {
           }}
         >
           <div style={{ width: "100%", height: "calc(100% - 5px)" }}>
-            <ResponsiveContainer width="100%" height="100%">
+            <StyledResponsiveContainer width="100%" height="100%">
               <PieChart width={400} height={400}>
                 <Pie
                   data={data.filter((entry) => visibleSeries[entry.name])}
@@ -541,9 +564,9 @@ function ToplamHarcananIsGucu(props = {}) {
                       />
                     ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip content={<CustomTooltip />} />
               </PieChart>
-            </ResponsiveContainer>
+            </StyledResponsiveContainer>
           </div>
         </div>
       )}
@@ -718,7 +741,7 @@ function ToplamHarcananIsGucu(props = {}) {
                     />
                   ))}
               </Pie>
-              <Tooltip />
+              <Tooltip content={<CustomTooltip />} />
               <Legend content={<CustomLegend />} />
             </PieChart>
           </StyledResponsiveContainer>

@@ -280,17 +280,22 @@ function PersonelBazindaIsGucu(props = {}) {
 
   const handleCancel = () => {
     setIsModalVisible(false);
-    reset();
+    // reset();
   };
 
   useEffect(() => {
     if (isModalVisible === true) {
-      reset({
-        baslamaTarihiPersonelIsGucu: undefined,
-        bitisTarihiPersonelIsGucu: undefined,
-        aySecimiPersonelIsGucu: undefined,
-        yilSecimiPersonelIsGucu: undefined,
-      });
+      setValue("baslamaTarihiPersonelIsGucu", null);
+      setValue("bitisTarihiPersonelIsGucu", null);
+      setValue("aySecimiPersonelIsGucu", null);
+      setValue("yilSecimiPersonelIsGucu", null);
+
+      // reset({
+      //   baslamaTarihiPersonelIsGucu: undefined,
+      //   bitisTarihiPersonelIsGucu: undefined,
+      //   aySecimiPersonelIsGucu: undefined,
+      //   yilSecimiPersonelIsGucu: undefined,
+      // });
     }
   }, [isModalVisible]);
 
@@ -367,7 +372,7 @@ function PersonelBazindaIsGucu(props = {}) {
         Büyüt
       </div>
       <Popover placement="right" content={content1} trigger="click">
-        <div style={{ cursor: "pointer" }}>Zaman Seçimi</div>
+        <div style={{ cursor: "pointer" }}>Süre Seçimi</div>
       </Popover>
       <div style={{ cursor: "pointer" }} onClick={downloadPDF}>
         İndir
