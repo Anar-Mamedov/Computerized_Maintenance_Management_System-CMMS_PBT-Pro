@@ -135,20 +135,22 @@ function CustomDashboards(props) {
           >
             <span>{dashboard}</span>
           </div>
-          <Popconfirm
-            title="Silmek istediğinize emin misiniz?"
-            onConfirm={() => handleDeleteDashboard(dashboard)}
-            onCancel={() => ""}
-            okText="Evet"
-            cancelText="Hayır"
-          >
-            <Button type="text" icon={<DeleteOutlined />} danger></Button>{" "}
+          <div>
+            <Popconfirm
+              title="Silmek istediğinize emin misiniz?"
+              onConfirm={() => handleDeleteDashboard(dashboard)}
+              onCancel={() => ""}
+              okText="Evet"
+              cancelText="Hayır"
+            >
+              <Button type="text" icon={<DeleteOutlined />} danger></Button>{" "}
+            </Popconfirm>{" "}
             <Checkbox
               style={{ marginRight: "5px" }}
               checked={defaultDashboard === dashboard}
               onChange={(e) => handleCheckboxChange(e, dashboard)}
             />
-          </Popconfirm>
+          </div>
         </div>
       ))}
       <Button type="dashed" onClick={showModal}>

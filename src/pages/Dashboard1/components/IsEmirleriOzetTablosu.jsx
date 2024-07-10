@@ -15,6 +15,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import dayjs from "dayjs";
 import customFontBase64 from "./RobotoBase64.js";
+import IsEmriAnalizi from "./../../PersonelYonetimi/PersonelKPI/components/IsEmriTipiSekmesi/Table/Table.jsx";
 
 const { Text } = Typography;
 
