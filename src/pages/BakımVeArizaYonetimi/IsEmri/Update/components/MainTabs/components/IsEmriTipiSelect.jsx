@@ -1,6 +1,16 @@
 import React, { useState, createRef, useEffect } from "react";
 import { useFormContext, Controller } from "react-hook-form";
-import { Select, Typography, Divider, Spin, Button, Input, message, Space, Popconfirm } from "antd";
+import {
+  Select,
+  Typography,
+  Divider,
+  Spin,
+  Button,
+  Input,
+  message,
+  Space,
+  Popconfirm,
+} from "antd";
 import AxiosInstance from "../../../../../../../api/http";
 import { useAppContext } from "../../../../../../../AppContext"; // Context hook'unu import edin
 import { PlusOutlined } from "@ant-design/icons";
@@ -79,7 +89,10 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
         `ChangeIsEmriTipiProperty?isEmriTipId=${pendingValue}&isTanimId=${prosedurID}&isEmriId=${secilenIsEmriID}`
       );
       // İsteğin başarılı olduğunu kontrol et
-      if ((response && response.status_code === 200) || response.status_code === 201) {
+      if (
+        (response && response.status_code === 200) ||
+        response.status_code === 201
+      ) {
         // Başarılı işlem mesajı veya başka bir işlem yap
         message.success("İşlem Başarılı!");
         console.log("İşlem başarılı.");
@@ -100,7 +113,9 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
     // iş emrindeki zorunlu alanları dinamik olarak kontrol etmek için selectboxtaki seçenekleri seçtiğimizde o seçeneğe göre zorunlu alanların değişmesi için.
 
     // Seçilen değerin ID'sine göre objeyi bul
-    const selectedOption = options.find((option) => option.TB_ISEMRI_TIP_ID === pendingValue) ?? null;
+    const selectedOption =
+      options.find((option) => option.TB_ISEMRI_TIP_ID === pendingValue) ??
+      null;
 
     if (selectedOption) {
       // selectedOption için komple yeni bir obje oluştur
@@ -150,10 +165,30 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
   // Popconfirm iptal edildiğinde yapılacak işlemler sonu
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between" }}>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
+        justifyContent: "space-between",
+      }}
+    >
       {contextHolder}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", flexDirection: "column" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", width: "300px" }}>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "5px",
+          flexDirection: "column",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            width: "300px",
+          }}
+        >
           <Controller
             name="isEmriTipi"
             control={control}
@@ -170,14 +205,18 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
                 placeholder="Seçim Yapınız"
                 optionFilterProp="children"
                 filterOption={(input, option) =>
-                  option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
+                  option.label
+                    ? option.label.toLowerCase().includes(input.toLowerCase())
+                    : false
                 }
                 onDropdownVisibleChange={(open) => {
                   if (open && !confirmVisible) {
                     fetchData(); // Fetch data when the dropdown is opened
                   }
                 }}
-                dropdownRender={(menu) => <Spin spinning={loading}>{menu}</Spin>}
+                dropdownRender={(menu) => (
+                  <Spin spinning={loading}>{menu}</Spin>
+                )}
                 options={options.map((item) => ({
                   value: item.TB_ISEMRI_TIP_ID, // Use the ID as the value
                   label: item.IMT_TANIM, // Display the name in the dropdown
@@ -196,8 +235,9 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
               description={
                 <div>
                   <p style={{ width: "100%", maxWidth: "300px" }}>
-                    Bu işlem `Prosedür` ve prosedüre bağlı olan `Kontrol Listesi`, `Malzeme` ve `Duruş` tablolarını
-                    silecektir. BU İŞLEM GERİ ALINAMAZ!
+                    Bu işlem `Prosedür` ve prosedüre bağlı olan `Kontrol
+                    Listesi`, `Malzeme` ve `Duruş` tablolarını silecektir. BU
+                    İŞLEM GERİ ALINAMAZ!
                   </p>
                 </div>
               }
@@ -207,7 +247,8 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
               }}
               onCancel={() => {
                 handleCancel(); // Revert or ignore the change
-              }}>
+              }}
+            >
               {/* This button or similar trigger isn't directly necessary since we're programmatically controlling Popconfirm visibility */}
             </Popconfirm>
           )}
@@ -225,7 +266,11 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
           <CreateModal isEmriTipiID={isEmriTipiID} />
         </div>
 
-        {errors.isEmriTipi && <div style={{ color: "red", marginTop: "5px" }}>{errors.isEmriTipi.message}</div>}
+        {errors.isEmriTipi && (
+          <div style={{ color: "red", marginTop: "5px" }}>
+            {errors.isEmriTipi.message}
+          </div>
+        )}
       </div>
     </div>
   );
