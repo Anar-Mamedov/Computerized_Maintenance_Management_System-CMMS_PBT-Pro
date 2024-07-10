@@ -23,6 +23,7 @@ import IsEmriZamanDagilimi from "./components/IsEmriZamanDagilimi.jsx";
 import PersonelBazindaIsGucu from "./components/PersonelBazindaIsGucu.jsx";
 import ToplamHarcananIsGucu from "./components/ToplamHarcananIsGucu.jsx";
 import CustomDashboards from "./components/CustomDashboards.jsx";
+import { AppProvider } from "./../../AppContext.jsx";
 import { createRoot } from "react-dom/client";
 
 import "./custom-gridstack.css"; // Add this line to import your custom CSS
@@ -188,98 +189,126 @@ function MainDashboard() {
           case "widget1":
             root.render(
               <FormProvider {...methods}>
-                <Component1 />
+                <AppProvider>
+                  <Component1 />
+                </AppProvider>
               </FormProvider>
             );
             break;
           case "widget2":
             root.render(
               <FormProvider {...methods}>
-                <Component2 />
+                <AppProvider>
+                  <Component2 />
+                </AppProvider>
               </FormProvider>
             );
             break;
           case "widget3":
             root.render(
               <FormProvider {...methods}>
-                <Component3 />
+                <AppProvider>
+                  <Component3 />
+                </AppProvider>
               </FormProvider>
             );
             break;
           case "widget4":
             root.render(
               <FormProvider {...methods}>
-                <Component4 />
+                <AppProvider>
+                  <Component4 />
+                </AppProvider>
               </FormProvider>
             );
             break;
           case "widget5":
             root.render(
               <FormProvider {...methods}>
-                <Component5 />
+                <AppProvider>
+                  <Component5 />
+                </AppProvider>
               </FormProvider>
             );
             break;
           case "widget6":
             root.render(
               <FormProvider {...methods}>
-                <LokasyonBazindaIsTalepleri />
+                <AppProvider>
+                  <LokasyonBazindaIsTalepleri />
+                </AppProvider>
               </FormProvider>
             );
             break;
           case "widget7":
             root.render(
               <FormProvider {...methods}>
-                <IsEmirleriOzetTablosu />
+                <AppProvider>
+                  <IsEmirleriOzetTablosu />
+                </AppProvider>
               </FormProvider>
             );
             break;
           case "widget8":
             root.render(
               <FormProvider {...methods}>
-                <ArizaliMakineler />
+                <AppProvider>
+                  <ArizaliMakineler />
+                </AppProvider>
               </FormProvider>
             );
             break;
           case "widget9":
             root.render(
               <FormProvider {...methods}>
-                <MakineTiplerineGore />
+                <AppProvider>
+                  <MakineTiplerineGore />
+                </AppProvider>
               </FormProvider>
             );
             break;
           case "widget10":
             root.render(
               <FormProvider {...methods}>
-                <TamamlanmaOranlari />
+                <AppProvider>
+                  <TamamlanmaOranlari />
+                </AppProvider>
               </FormProvider>
             );
             break;
           case "widget11":
             root.render(
               <FormProvider {...methods}>
-                <AylikBakimMaliyetleri />
+                <AppProvider>
+                  <AylikBakimMaliyetleri />
+                </AppProvider>
               </FormProvider>
             );
             break;
           case "widget12":
             root.render(
               <FormProvider {...methods}>
-                <IsEmriZamanDagilimi />
+                <AppProvider>
+                  <IsEmriZamanDagilimi />
+                </AppProvider>
               </FormProvider>
             );
             break;
           case "widget13":
             root.render(
               <FormProvider {...methods}>
-                <PersonelBazindaIsGucu />
+                <AppProvider>
+                  <PersonelBazindaIsGucu />
+                </AppProvider>
               </FormProvider>
             );
             break;
           case "widget14":
             root.render(
               <FormProvider {...methods}>
-                <ToplamHarcananIsGucu />
+                <AppProvider>
+                  <ToplamHarcananIsGucu />
+                </AppProvider>
               </FormProvider>
             );
             break;
@@ -606,66 +635,41 @@ function MainDashboard() {
 
   return (
     <FormProvider {...methods}>
-      <div className="App">
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "10px",
-            marginBottom: "10px",
-          }}
-        >
-          <CustomDashboards />
+      <AppProvider>
+        <div className="App">
           <div
             style={{
+              width: "100%",
               display: "flex",
               alignItems: "center",
-              flexDirection: "row",
+              justifyContent: "space-between",
               gap: "10px",
+              marginBottom: "10px",
             }}
           >
-            <Button type="text" onClick={rerenderWidgets}>
-              <Text
-                type="secondary"
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  gap: "5px",
-                  alignItems: "center",
-                }}
-              >
-                <ReloadOutlined />
-                Verileri Yenile
-              </Text>
-            </Button>
-            <Button
+            <CustomDashboards />
+            <div
               style={{
                 display: "flex",
-                flexDirection: "row",
                 alignItems: "center",
-                gap: "5px",
+                flexDirection: "row",
+                gap: "10px",
               }}
-              onClick={handleRearrange}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  fill=""
-                  fillRule="evenodd"
-                  d="M18 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1h-1zm-1 7.5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zM5 17a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1H5zm5.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm6.5 0a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm-5.5-7.5a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1h-1zm-7.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1H5a1 1 0 01-1-1v-1zM10.5 5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1V5zM5 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1H5z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
-              Yeniden Sırala
-            </Button>
-            <Popover content={content} title="Widgetları Yönet" trigger="click">
+              <Button type="text" onClick={rerenderWidgets}>
+                <Text
+                  type="secondary"
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    gap: "5px",
+                    alignItems: "center",
+                  }}
+                >
+                  <ReloadOutlined />
+                  Verileri Yenile
+                </Text>
+              </Button>
               <Button
                 style={{
                   display: "flex",
@@ -673,6 +677,7 @@ function MainDashboard() {
                   alignItems: "center",
                   gap: "5px",
                 }}
+                onClick={handleRearrange}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -680,110 +685,140 @@ function MainDashboard() {
                   height="18"
                   fill="currentColor"
                   viewBox="0 0 24 24"
-                  name="widget"
                 >
                   <path
                     fill=""
                     fillRule="evenodd"
-                    d="M17.5 2a1 1 0 01.894.553l3.5 7A1 1 0 0121 11h-7a1 1 0 01-.894-1.447l3.5-7A1 1 0 0117.5 2zm-1.882 7h3.764L17.5 5.236 15.618 9zM4 13a2 2 0 00-2 2v5a2 2 0 002 2h5a2 2 0 002-2v-5a2 2 0 00-2-2H4zm0 7v-5h5v5H4zm13.5-7a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM15 17.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0zM6.5 2a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM4 6.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0z"
+                    d="M18 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1h-1zm-1 7.5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zM5 17a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1H5zm5.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm6.5 0a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm-5.5-7.5a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1h-1zm-7.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1H5a1 1 0 01-1-1v-1zM10.5 5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1V5zM5 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1H5z"
                     clipRule="evenodd"
                   ></path>
                 </svg>
-                Widgetleri Yönet
-                <DownOutlined style={{ marginLeft: "2px" }} />
+                Yeniden Sırala
               </Button>
-            </Popover>
-          </div>
-        </div>
-        <div style={{ overflow: "scroll", height: "calc(100vh - 210px)" }}>
-          <div className="grid-stack">
-            <div className="grid-stack-item border-dark" id="widget1">
-              <div className="grid-stack-item-content">
-                <div className="widget-header">{widgetTitles.widget1}</div>
-                <Component1 />
-              </div>
-            </div>
-            <div className="grid-stack-item border-dark" id="widget2">
-              <div className="grid-stack-item-content">
-                <div className="widget-header">{widgetTitles.widget2}</div>
-                <Component2 />
-              </div>
-            </div>
-            <div className="grid-stack-item border-dark" id="widget3">
-              <div className="grid-stack-item-content">
-                <div className="widget-header">{widgetTitles.widget3}</div>
-                <Component3 />
-              </div>
-            </div>
-            <div className="grid-stack-item border-dark" id="widget4">
-              <div className="grid-stack-item-content">
-                <div className="widget-header">{widgetTitles.widget4}</div>
-                <Component4 />
-              </div>
-            </div>
-            <div className="grid-stack-item border-dark" id="widget5">
-              <div className="grid-stack-item-content">
-                <div className="widget-header">{widgetTitles.widget5}</div>
-                <Component5 />
-              </div>
-            </div>
-            <div className="grid-stack-item border-dark" id="widget6">
-              <div className="grid-stack-item-content">
-                <div className="widget-header">{widgetTitles.widget6}</div>
-                <LokasyonBazindaIsTalepleri />
-              </div>
-            </div>
-            <div className="grid-stack-item border-dark" id="widget7">
-              <div className="grid-stack-item-content">
-                <div className="widget-header">{widgetTitles.widget7}</div>
-                <IsEmirleriOzetTablosu />
-              </div>
-            </div>
-            <div className="grid-stack-item border-dark" id="widget8">
-              <div className="grid-stack-item-content">
-                <div className="widget-header">{widgetTitles.widget8}</div>
-                <ArizaliMakineler />
-              </div>
-            </div>
-            <div className="grid-stack-item border-dark" id="widget9">
-              <div className="grid-stack-item-content">
-                <div className="widget-header">{widgetTitles.widget9}</div>
-                <MakineTiplerineGore />
-              </div>
-            </div>
-            <div className="grid-stack-item border-dark" id="widget10">
-              <div className="grid-stack-item-content">
-                <div className="widget-header">{widgetTitles.widget10}</div>
-                <TamamlanmaOranlari />
-              </div>
-            </div>{" "}
-            <div className="grid-stack-item border-dark" id="widget11">
-              <div className="grid-stack-item-content">
-                <div className="widget-header">{widgetTitles.widget11}</div>
-                <AylikBakimMaliyetleri />
-              </div>
-            </div>{" "}
-            <div className="grid-stack-item border-dark" id="widget12">
-              <div className="grid-stack-item-content">
-                <div className="widget-header">{widgetTitles.widget12}</div>
-                <IsEmriZamanDagilimi />
-              </div>
-            </div>
-            <div className="grid-stack-item border-dark" id="widget13">
-              <div className="grid-stack-item-content">
-                <div className="widget-header">{widgetTitles.widget13}</div>
-                <PersonelBazindaIsGucu />
-              </div>
-            </div>
-            <div className="grid-stack-item border-dark" id="widget14">
-              <div className="grid-stack-item-content">
-                <div className="widget-header">{widgetTitles.widget14}</div>
-                <ToplamHarcananIsGucu />
-              </div>
+              <Popover
+                content={content}
+                title="Widgetları Yönet"
+                trigger="click"
+              >
+                <Button
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: "5px",
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    name="widget"
+                  >
+                    <path
+                      fill=""
+                      fillRule="evenodd"
+                      d="M17.5 2a1 1 0 01.894.553l3.5 7A1 1 0 0121 11h-7a1 1 0 01-.894-1.447l3.5-7A1 1 0 0117.5 2zm-1.882 7h3.764L17.5 5.236 15.618 9zM4 13a2 2 0 00-2 2v5a2 2 0 002 2h5a2 2 0 002-2v-5a2 2 0 00-2-2H4zm0 7v-5h5v5H4zm13.5-7a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM15 17.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0zM6.5 2a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM4 6.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0z"
+                      clipRule="evenodd"
+                    ></path>
+                  </svg>
+                  Widgetleri Yönet
+                  <DownOutlined style={{ marginLeft: "2px" }} />
+                </Button>
+              </Popover>
             </div>
           </div>
+          <div style={{ overflow: "scroll", height: "calc(100vh - 210px)" }}>
+            <div className="grid-stack">
+              <div className="grid-stack-item border-dark" id="widget1">
+                <div className="grid-stack-item-content">
+                  <div className="widget-header">{widgetTitles.widget1}</div>
+                  <Component1 />
+                </div>
+              </div>
+              <div className="grid-stack-item border-dark" id="widget2">
+                <div className="grid-stack-item-content">
+                  <div className="widget-header">{widgetTitles.widget2}</div>
+                  <Component2 />
+                </div>
+              </div>
+              <div className="grid-stack-item border-dark" id="widget3">
+                <div className="grid-stack-item-content">
+                  <div className="widget-header">{widgetTitles.widget3}</div>
+                  <Component3 />
+                </div>
+              </div>
+              <div className="grid-stack-item border-dark" id="widget4">
+                <div className="grid-stack-item-content">
+                  <div className="widget-header">{widgetTitles.widget4}</div>
+                  <Component4 />
+                </div>
+              </div>
+              <div className="grid-stack-item border-dark" id="widget5">
+                <div className="grid-stack-item-content">
+                  <div className="widget-header">{widgetTitles.widget5}</div>
+                  <Component5 />
+                </div>
+              </div>
+              <div className="grid-stack-item border-dark" id="widget6">
+                <div className="grid-stack-item-content">
+                  <div className="widget-header">{widgetTitles.widget6}</div>
+                  <LokasyonBazindaIsTalepleri />
+                </div>
+              </div>
+              <div className="grid-stack-item border-dark" id="widget7">
+                <div className="grid-stack-item-content">
+                  <div className="widget-header">{widgetTitles.widget7}</div>
+                  <IsEmirleriOzetTablosu />
+                </div>
+              </div>
+              <div className="grid-stack-item border-dark" id="widget8">
+                <div className="grid-stack-item-content">
+                  <div className="widget-header">{widgetTitles.widget8}</div>
+                  <ArizaliMakineler />
+                </div>
+              </div>
+              <div className="grid-stack-item border-dark" id="widget9">
+                <div className="grid-stack-item-content">
+                  <div className="widget-header">{widgetTitles.widget9}</div>
+                  <MakineTiplerineGore />
+                </div>
+              </div>
+              <div className="grid-stack-item border-dark" id="widget10">
+                <div className="grid-stack-item-content">
+                  <div className="widget-header">{widgetTitles.widget10}</div>
+                  <TamamlanmaOranlari />
+                </div>
+              </div>{" "}
+              <div className="grid-stack-item border-dark" id="widget11">
+                <div className="grid-stack-item-content">
+                  <div className="widget-header">{widgetTitles.widget11}</div>
+                  <AylikBakimMaliyetleri />
+                </div>
+              </div>{" "}
+              <div className="grid-stack-item border-dark" id="widget12">
+                <div className="grid-stack-item-content">
+                  <div className="widget-header">{widgetTitles.widget12}</div>
+                  <IsEmriZamanDagilimi />
+                </div>
+              </div>
+              <div className="grid-stack-item border-dark" id="widget13">
+                <div className="grid-stack-item-content">
+                  <div className="widget-header">{widgetTitles.widget13}</div>
+                  <PersonelBazindaIsGucu />
+                </div>
+              </div>
+              <div className="grid-stack-item border-dark" id="widget14">
+                <div className="grid-stack-item-content">
+                  <div className="widget-header">{widgetTitles.widget14}</div>
+                  <ToplamHarcananIsGucu />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </AppProvider>
     </FormProvider>
   );
 }
