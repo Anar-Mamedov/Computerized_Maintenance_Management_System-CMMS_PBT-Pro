@@ -55,7 +55,10 @@ function Component5(updateApi) {
       }}
     >
       <div style={{ padding: "10px" }}>
-        <Text style={{ fontWeight: "500", fontSize: "17px" }}> Durum </Text>
+        <Text style={{ fontWeight: "500", fontSize: "17px" }}>
+          {" "}
+          Özet Durum{" "}
+        </Text>
       </div>
       {isLoading ? (
         <Spin size="large" />
@@ -233,7 +236,7 @@ function Component5(updateApi) {
                 borderRadius: "10px 10px 10px 10px",
                 backgroundColor: "rgba(255, 165, 0, 0.35)", // orange with 50% opacity
                 padding: "0px 5px 0px 5px",
-                color: "orange",
+                color: "#b57500",
               }}
             >
               {data?.MAKINE_SAYISI !== undefined ? data.MAKINE_SAYISI : ""}

@@ -54,7 +54,7 @@ function AylikBakimMaliyetleri(props = {}) {
   } = useFormContext();
 
   useEffect(() => {
-    const yilSecimiValue = watch("yilSecimi1");
+    const yilSecimiValue = watch("yilSecimiAylikBakim");
     if (!yilSecimiValue) {
       // Eğer baslamaTarihi değeri undefined ise, sistem saatinden o senenin yıl hanesini alıp setBaslamaTarihi'ye atar
       const currentYear = dayjs().format("YYYY");
@@ -65,7 +65,7 @@ function AylikBakimMaliyetleri(props = {}) {
       const yearOnly = yilSecimiValue.format("YYYY");
       setBaslamaTarihi(yearOnly);
     }
-  }, [watch("yilSecimi1")]);
+  }, [watch("yilSecimiAylikBakim")]);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -189,14 +189,15 @@ function AylikBakimMaliyetleri(props = {}) {
 
   const handleCancel = () => {
     setIsModalVisible(false);
-    reset();
+    // reset();
   };
 
   useEffect(() => {
     if (isModalVisible === true) {
-      reset({
-        yilSecimi1: undefined,
-      });
+      setValue("yilSecimiAylikBakim", null);
+      // reset({
+      //   yilSecimiAylikBakim: undefined,
+      // });
     }
   }, [isModalVisible]);
 
@@ -217,7 +218,7 @@ function AylikBakimMaliyetleri(props = {}) {
         Büyüt
       </div>
       <Popover placement="right" content={content1} trigger="click">
-        <div style={{ cursor: "pointer" }}>Zaman Seçimi</div>
+        <div style={{ cursor: "pointer" }}>Süre Seçimi</div>
       </Popover>
       <div style={{ cursor: "pointer" }} onClick={downloadPDF}>
         İndir
@@ -345,7 +346,7 @@ function AylikBakimMaliyetleri(props = {}) {
           >
             <div>Yıl Seç:</div>
             <Controller
-              name="yilSecimi1"
+              name="yilSecimiAylikBakim"
               control={control}
               render={({ field }) => (
                 <DatePicker

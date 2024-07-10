@@ -7,6 +7,7 @@ import {
   Popover,
   Modal,
   DatePicker,
+  ConfigProvider,
 } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../api/http.jsx";
@@ -15,6 +16,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import dayjs from "dayjs";
 import customFontBase64 from "./RobotoBase64.js";
+import trTR from "antd/lib/locale/tr_TR";
 
 const { Text } = Typography;
 
@@ -155,17 +157,21 @@ function LokasyonBazindaIsTalepleri(props) {
 
   const handleCancel = () => {
     setIsModalVisible(false);
-    reset();
+    // reset();
   };
 
   useEffect(() => {
     if (isModalVisible === true) {
-      reset({
-        baslamaTarihi: undefined,
-        bitisTarihi: undefined,
-        aySecimi: undefined,
-        yilSecimi: undefined,
-      });
+      setValue("baslamaTarihi", null);
+      setValue("bitisTarihi", null);
+      setValue("aySecimi", null);
+      setValue("yilSecimi", null);
+      // reset({
+      //   baslamaTarihi: undefined,
+      //   bitisTarihi: undefined,
+      //   aySecimi: undefined,
+      //   yilSecimi: undefined,
+      // });
     }
   }, [isModalVisible]);
 
@@ -242,7 +248,7 @@ function LokasyonBazindaIsTalepleri(props) {
         Büyüt
       </div>
       <Popover placement="right" content={content1} trigger="click">
-        <div style={{ cursor: "pointer" }}>Zaman Seçimi</div>
+        <div style={{ cursor: "pointer" }}>Süre Seçimi</div>
       </Popover>
       <div style={{ cursor: "pointer" }} onClick={downloadPDF}>
         İndir
@@ -251,204 +257,75 @@ function LokasyonBazindaIsTalepleri(props) {
   );
 
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        borderRadius: "5px",
-        backgroundColor: "white",
-        display: "flex",
-        flexDirection: "column",
-        gap: "10px",
-        border: "1px solid #f0f0f0",
-      }}
-    >
+    <ConfigProvider locale={trTR}>
       <div
         style={{
-          padding: "10px",
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text style={{ fontWeight: "500", fontSize: "17px" }}>
-          Lokasyon Bazında İş talepleri / İş Emirleri Dağılımı{" "}
-          {`(${
-            baslamaTarihi && bitisTarihi
-              ? `${formatDateWithLocale(
-                  baslamaTarihi
-                )} / ${formatDateWithLocale(bitisTarihi)}`
-              : ""
-          })`}
-        </Text>
-        <Popover placement="bottom" content={content} trigger="click">
-          <Button
-            type="text"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "0px 5px",
-              height: "32px",
-              zIndex: 3,
-            }}
-          >
-            <MoreOutlined
-              style={{ cursor: "pointer", fontWeight: "500", fontSize: "16px" }}
-            />
-          </Button>
-        </Popover>
-      </div>
-      <div
-        style={{
+          width: "100%",
+          height: "100%",
+          borderRadius: "5px",
+          backgroundColor: "white",
           display: "flex",
           flexDirection: "column",
-          gap: "7px",
-          overflow: "auto",
-          height: "100vh",
-          padding: "0px 10px 0 10px",
+          gap: "10px",
+          border: "1px solid #f0f0f0",
         }}
       >
-        <Spin spinning={isLoading}>
-          <Table
-            columns={columns}
-            dataSource={data}
-            size="small"
-            pagination={{
-              defaultPageSize: 10,
-              showSizeChanger: true,
-              pageSizeOptions: ["10", "20", "50", "100"],
-              position: ["bottomRight"],
-              showTotal: (total, range) => `Toplam ${total}`,
-              showQuickJumper: true,
-            }}
-          />
-        </Spin>
-      </div>
-
-      <Modal
-        title="Tarih Seçimi"
-        centered
-        open={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        destroyOnClose
-      >
-        {modalContent === "Tarih Aralığı Seç" && (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: "10px",
-            }}
-          >
-            <div>Tarih Aralığı Seç:</div>
-            <Controller
-              name="baslamaTarihi"
-              control={control}
-              render={({ field }) => (
-                <DatePicker
-                  {...field}
-                  style={{ width: "130px" }}
-                  format={localeDateFormat}
-                  placeholder="Tarih seçiniz"
-                />
-              )}
-            />
-            {" - "}
-            <Controller
-              name="bitisTarihi"
-              control={control}
-              render={({ field }) => (
-                <DatePicker
-                  {...field}
-                  style={{ width: "130px" }}
-                  format={localeDateFormat}
-                  placeholder="Tarih seçiniz"
-                />
-              )}
-            />
-          </div>
-        )}
-        {modalContent === "Ay Seç" && (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: "10px",
-            }}
-          >
-            <div>Ay Seç:</div>
-            <Controller
-              name="aySecimi"
-              control={control}
-              render={({ field }) => (
-                <DatePicker
-                  {...field}
-                  picker="month"
-                  style={{ width: "130px" }}
-                  placeholder="Tarih seçiniz"
-                />
-              )}
-            />
-          </div>
-        )}
-        {modalContent === "Yıl Seç" && (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: "10px",
-            }}
-          >
-            <div>Yıl Seç:</div>
-            <Controller
-              name="yilSecimi"
-              control={control}
-              render={({ field }) => (
-                <DatePicker
-                  {...field}
-                  picker="year"
-                  style={{ width: "130px" }}
-                  placeholder="Tarih seçiniz"
-                />
-              )}
-            />
-          </div>
-        )}
-      </Modal>
-      {/* Expanded Modal */}
-      <Modal
-        title={
-          <div>
-            <Text style={{ fontWeight: "500", fontSize: "17px" }}>
-              Lokasyon Bazında İş talepleri / İş Emirleri Dağılımı{" "}
-              {`(${
-                baslamaTarihi && bitisTarihi
-                  ? `${formatDateWithLocale(
-                      baslamaTarihi
-                    )} / ${formatDateWithLocale(bitisTarihi)}`
-                  : ""
-              })`}
-            </Text>
-          </div>
-        }
-        centered
-        open={isExpandedModalVisible}
-        onOk={() => setIsExpandedModalVisible(false)}
-        onCancel={() => setIsExpandedModalVisible(false)}
-        width="90%"
-        destroyOnClose
-      >
-        <div>
+        <div
+          style={{
+            padding: "10px",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Text style={{ fontWeight: "500", fontSize: "17px" }}>
+            Lokasyon Bazında İş talepleri / İş Emirleri Dağılımı{" "}
+            {`(${
+              baslamaTarihi && bitisTarihi
+                ? `${formatDateWithLocale(
+                    baslamaTarihi
+                  )} / ${formatDateWithLocale(bitisTarihi)}`
+                : ""
+            })`}
+          </Text>
+          <Popover placement="bottom" content={content} trigger="click">
+            <Button
+              type="text"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "0px 5px",
+                height: "32px",
+                zIndex: 3,
+              }}
+            >
+              <MoreOutlined
+                style={{
+                  cursor: "pointer",
+                  fontWeight: "500",
+                  fontSize: "16px",
+                }}
+              />
+            </Button>
+          </Popover>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "7px",
+            overflow: "auto",
+            height: "100vh",
+            padding: "0px 10px 0 10px",
+          }}
+        >
           <Spin spinning={isLoading}>
             <Table
               columns={columns}
               dataSource={data}
+              size="small"
               pagination={{
                 defaultPageSize: 10,
                 showSizeChanger: true,
@@ -457,12 +334,147 @@ function LokasyonBazindaIsTalepleri(props) {
                 showTotal: (total, range) => `Toplam ${total}`,
                 showQuickJumper: true,
               }}
-              scroll={{ y: "calc(100vh - 380px)" }}
             />
           </Spin>
         </div>
-      </Modal>
-    </div>
+
+        <Modal
+          title="Tarih Seçimi"
+          centered
+          open={isModalVisible}
+          onOk={handleOk}
+          onCancel={handleCancel}
+          destroyOnClose
+        >
+          {modalContent === "Tarih Aralığı Seç" && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+              <div>Tarih Aralığı Seç:</div>
+              <Controller
+                name="baslamaTarihi"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    {...field}
+                    style={{ width: "130px" }}
+                    format={localeDateFormat}
+                    placeholder="Tarih seçiniz"
+                  />
+                )}
+              />
+              {" - "}
+              <Controller
+                name="bitisTarihi"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    {...field}
+                    style={{ width: "130px" }}
+                    format={localeDateFormat}
+                    placeholder="Tarih seçiniz"
+                  />
+                )}
+              />
+            </div>
+          )}
+          {modalContent === "Ay Seç" && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+              <div>Ay Seç:</div>
+              <Controller
+                name="aySecimi"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    {...field}
+                    picker="month"
+                    style={{ width: "130px" }}
+                    placeholder="Tarih seçiniz"
+                  />
+                )}
+              />
+            </div>
+          )}
+          {modalContent === "Yıl Seç" && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+              <div>Yıl Seç:</div>
+              <Controller
+                name="yilSecimi"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    {...field}
+                    picker="year"
+                    style={{ width: "130px" }}
+                    placeholder="Tarih seçiniz"
+                  />
+                )}
+              />
+            </div>
+          )}
+        </Modal>
+        {/* Expanded Modal */}
+        <Modal
+          title={
+            <div>
+              <Text style={{ fontWeight: "500", fontSize: "17px" }}>
+                Lokasyon Bazında İş talepleri / İş Emirleri Dağılımı{" "}
+                {`(${
+                  baslamaTarihi && bitisTarihi
+                    ? `${formatDateWithLocale(
+                        baslamaTarihi
+                      )} / ${formatDateWithLocale(bitisTarihi)}`
+                    : ""
+                })`}
+              </Text>
+            </div>
+          }
+          centered
+          open={isExpandedModalVisible}
+          onOk={() => setIsExpandedModalVisible(false)}
+          onCancel={() => setIsExpandedModalVisible(false)}
+          width="90%"
+          destroyOnClose
+        >
+          <div>
+            <Spin spinning={isLoading}>
+              <Table
+                columns={columns}
+                dataSource={data}
+                pagination={{
+                  defaultPageSize: 10,
+                  showSizeChanger: true,
+                  pageSizeOptions: ["10", "20", "50", "100"],
+                  position: ["bottomRight"],
+                  showTotal: (total, range) => `Toplam ${total}`,
+                  showQuickJumper: true,
+                }}
+                scroll={{ y: "calc(100vh - 380px)" }}
+              />
+            </Spin>
+          </div>
+        </Modal>
+      </div>
+    </ConfigProvider>
   );
 }
 

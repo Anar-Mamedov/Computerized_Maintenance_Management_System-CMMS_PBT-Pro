@@ -333,17 +333,21 @@ function IsEmriZamanDagilimi(props = {}) {
 
   const handleCancel = () => {
     setIsModalVisible(false);
-    reset();
+    // reset();
   };
 
   useEffect(() => {
     if (isModalVisible === true) {
-      reset({
-        baslamaTarihiIsEmriZaman: undefined,
-        bitisTarihiIsEmriZaman: undefined,
-        aySecimiIsEmriZaman: undefined,
-        yilSecimiIsEmriZaman: undefined,
-      });
+      setValue("baslamaTarihiIsEmriZaman", null);
+      setValue("bitisTarihiIsEmriZaman", null);
+      setValue("aySecimiIsEmriZaman", null);
+      setValue("yilSecimiIsEmriZaman", null);
+      // reset({
+      //   baslamaTarihiIsEmriZaman: undefined,
+      //   bitisTarihiIsEmriZaman: undefined,
+      //   aySecimiIsEmriZaman: undefined,
+      //   yilSecimiIsEmriZaman: undefined,
+      // });
     }
   }, [isModalVisible]);
 
@@ -373,7 +377,7 @@ function IsEmriZamanDagilimi(props = {}) {
         Büyüt
       </div>
       <Popover placement="right" content={content1} trigger="click">
-        <div style={{ cursor: "pointer" }}>Zaman Seçimi</div>
+        <div style={{ cursor: "pointer" }}>Süre Seçimi</div>
       </Popover>
       <div style={{ cursor: "pointer" }} onClick={downloadPDF}>
         İndir
@@ -404,7 +408,7 @@ function IsEmriZamanDagilimi(props = {}) {
         }}
       >
         <Text
-          title={`İş Emrinin Zaman Dağılımı (${
+          title={`İş Emirlerinin Zaman Dağılımı (${
             baslamaTarihi ? formatDate(baslamaTarihi) : ""
           } - ${bitisTarihi ? formatDate(bitisTarihi) : ""})`}
           style={{
@@ -416,7 +420,7 @@ function IsEmriZamanDagilimi(props = {}) {
             maxWidth: "calc(100% - 50px)",
           }}
         >
-          İş Emrinin Zaman Dağılımı
+          İş Emirlerinin Zaman Dağılımı
           {` (${
             baslamaTarihi && bitisTarihi
               ? `${formatDate(baslamaTarihi)} / ${formatDate(bitisTarihi)}`
@@ -590,7 +594,7 @@ function IsEmriZamanDagilimi(props = {}) {
             }}
           >
             <Text
-              title={`İş Emrinin Zaman Dağılımı (${
+              title={`İş Emirlerinin Zaman Dağılımı (${
                 baslamaTarihi ? formatDate(baslamaTarihi) : ""
               } - ${bitisTarihi ? formatDate(bitisTarihi) : ""})`}
               style={{
@@ -602,7 +606,7 @@ function IsEmriZamanDagilimi(props = {}) {
                 maxWidth: "calc(100% - 50px)",
               }}
             >
-              İş Emrinin Zaman Dağılımı
+              İş Emirlerinin Zaman Dağılımı
               {` (${
                 baslamaTarihi && bitisTarihi
                   ? `${formatDate(baslamaTarihi)} / ${formatDate(bitisTarihi)}`

@@ -7,9 +7,11 @@ import {
   Popover,
   Modal,
   DatePicker,
+  ConfigProvider,
 } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../api/http.jsx";
+import trTR from "antd/lib/locale/tr_TR";
 import { Controller, useFormContext } from "react-hook-form";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -135,96 +137,68 @@ function ArizaliMakineler(props) {
   );
 
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        borderRadius: "5px",
-        backgroundColor: "white",
-        display: "flex",
-        flexDirection: "column",
-        gap: "10px",
-        border: "1px solid #f0f0f0",
-      }}
-    >
+    <ConfigProvider locale={trTR}>
       <div
         style={{
-          padding: "10px",
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text style={{ fontWeight: "500", fontSize: "17px" }}>
-          Arızalı Makineler
-        </Text>
-        <Popover placement="bottom" content={content} trigger="click">
-          <Button
-            type="text"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "0px 5px",
-              height: "32px",
-              zIndex: 3,
-            }}
-          >
-            <MoreOutlined
-              style={{ cursor: "pointer", fontWeight: "500", fontSize: "16px" }}
-            />
-          </Button>
-        </Popover>
-      </div>
-      <div
-        style={{
+          width: "100%",
+          height: "100%",
+          borderRadius: "5px",
+          backgroundColor: "white",
           display: "flex",
           flexDirection: "column",
-          gap: "7px",
-          overflow: "auto",
-          height: "100vh",
-          padding: "0px 10px 0 10px",
+          gap: "10px",
+          border: "1px solid #f0f0f0",
         }}
       >
-        <Spin spinning={isLoading}>
-          <Table
-            columns={columns}
-            dataSource={data}
-            size="small"
-            pagination={{
-              defaultPageSize: 10,
-              showSizeChanger: true,
-              pageSizeOptions: ["10", "20", "50", "100"],
-              position: ["bottomRight"],
-              showTotal: (total, range) => `Toplam ${total}`,
-              showQuickJumper: true,
-            }}
-          />
-        </Spin>
-      </div>
-
-      {/* Expanded Modal */}
-      <Modal
-        title={
-          <div>
-            <Text style={{ fontWeight: "500", fontSize: "17px" }}>
-              Arızalı Makineler
-            </Text>
-          </div>
-        }
-        centered
-        open={isExpandedModalVisible}
-        onOk={() => setIsExpandedModalVisible(false)}
-        onCancel={() => setIsExpandedModalVisible(false)}
-        width="90%"
-        destroyOnClose
-      >
-        <div>
+        <div
+          style={{
+            padding: "10px",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Text style={{ fontWeight: "500", fontSize: "17px" }}>
+            Arızalı Makineler
+          </Text>
+          <Popover placement="bottom" content={content} trigger="click">
+            <Button
+              type="text"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "0px 5px",
+                height: "32px",
+                zIndex: 3,
+              }}
+            >
+              <MoreOutlined
+                style={{
+                  cursor: "pointer",
+                  fontWeight: "500",
+                  fontSize: "16px",
+                }}
+              />
+            </Button>
+          </Popover>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "7px",
+            overflow: "auto",
+            height: "100vh",
+            padding: "0px 10px 0 10px",
+          }}
+        >
           <Spin spinning={isLoading}>
             <Table
               columns={columns}
               dataSource={data}
+              size="small"
               pagination={{
                 defaultPageSize: 10,
                 showSizeChanger: true,
@@ -233,12 +207,46 @@ function ArizaliMakineler(props) {
                 showTotal: (total, range) => `Toplam ${total}`,
                 showQuickJumper: true,
               }}
-              scroll={{ y: "calc(100vh - 380px)" }}
             />
           </Spin>
         </div>
-      </Modal>
-    </div>
+
+        {/* Expanded Modal */}
+        <Modal
+          title={
+            <div>
+              <Text style={{ fontWeight: "500", fontSize: "17px" }}>
+                Arızalı Makineler
+              </Text>
+            </div>
+          }
+          centered
+          open={isExpandedModalVisible}
+          onOk={() => setIsExpandedModalVisible(false)}
+          onCancel={() => setIsExpandedModalVisible(false)}
+          width="90%"
+          destroyOnClose
+        >
+          <div>
+            <Spin spinning={isLoading}>
+              <Table
+                columns={columns}
+                dataSource={data}
+                pagination={{
+                  defaultPageSize: 10,
+                  showSizeChanger: true,
+                  pageSizeOptions: ["10", "20", "50", "100"],
+                  position: ["bottomRight"],
+                  showTotal: (total, range) => `Toplam ${total}`,
+                  showQuickJumper: true,
+                }}
+                scroll={{ y: "calc(100vh - 380px)" }}
+              />
+            </Spin>
+          </div>
+        </Modal>
+      </div>
+    </ConfigProvider>
   );
 }
 

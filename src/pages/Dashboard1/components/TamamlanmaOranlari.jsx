@@ -54,6 +54,8 @@ function TamamlanmaOranlari(props = {}) {
     formState: { errors },
   } = useFormContext();
 
+  const yilSecimi1 = watch("yilSecimi1");
+
   useEffect(() => {
     const yilSecimiValue = watch("yilSecimi1");
     if (!yilSecimiValue) {
@@ -66,7 +68,7 @@ function TamamlanmaOranlari(props = {}) {
       const yearOnly = yilSecimiValue.format("YYYY");
       setBaslamaTarihi(yearOnly);
     }
-  }, [watch("yilSecimi1")]);
+  }, [yilSecimi1]);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -194,14 +196,15 @@ function TamamlanmaOranlari(props = {}) {
 
   const handleCancel = () => {
     setIsModalVisible(false);
-    reset();
+    // reset();
   };
 
   useEffect(() => {
     if (isModalVisible === true) {
-      reset({
-        yilSecimi1: undefined,
-      });
+      setValue("yilSecimi1", null);
+      // reset({
+      //   yilSecimi1: undefined,
+      // });
     }
   }, [isModalVisible]);
 
@@ -222,7 +225,7 @@ function TamamlanmaOranlari(props = {}) {
         Büyüt
       </div>
       <Popover placement="right" content={content1} trigger="click">
-        <div style={{ cursor: "pointer" }}>Zaman Seçimi</div>
+        <div style={{ cursor: "pointer" }}>Süre Seçimi</div>
       </Popover>
       <div style={{ cursor: "pointer" }} onClick={downloadPDF}>
         İndir
