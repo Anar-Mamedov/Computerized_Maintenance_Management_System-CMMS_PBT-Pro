@@ -76,7 +76,7 @@ const defaultItems = [
   { id: "widget7", x: 6, y: 17, width: 6, height: 4, minW: 3, minH: 2 },
   { id: "widget8", x: 0, y: 21, width: 6, height: 4, minW: 3, minH: 2 },
   { id: "widget9", x: 6, y: 21, width: 6, height: 4, minW: 3, minH: 2 },
-  { id: "widget16", x: 0, y: 50, width: 5, height: 4, minW: 3, minH: 2 },
+  { id: "widget16", x: 0, y: 25, width: 5, height: 4, minW: 3, minH: 2 },
 ];
 
 function MainDashboard() {
