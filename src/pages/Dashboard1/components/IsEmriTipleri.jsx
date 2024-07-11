@@ -45,6 +45,7 @@ function IsEmriTipleri(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [colors, setColors] = useState([]);
+  const [visibleSeries, setVisibleSeries] = useState({});
   const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false); // Expanded modal visibility state
 
   const fetchData = async () => {
@@ -155,6 +156,87 @@ function IsEmriTipleri(props) {
 
   const onPieEnter = (_, index) => {
     setActiveIndex(index);
+  };
+
+  const handleLegendClick = (name) => {
+    setVisibleSeries((prev) => ({
+      ...prev,
+      [name]: !prev[name],
+    }));
+  };
+
+  const CustomLegend = ({ payload }) => {
+    const handleToggleAll = () => {
+      const allVisible = Object.values(visibleSeries).every((value) => value);
+      const anyVisible = Object.values(visibleSeries).some((value) => value);
+
+      if (!anyVisible) {
+        // If no series are visible, set all to visible
+        const newVisibility = Object.keys(visibleSeries).reduce((acc, key) => {
+          acc[key] = true;
+          return acc;
+        }, {});
+        setVisibleSeries(newVisibility);
+      } else {
+        // Otherwise, toggle all based on the current state of allVisible
+        const newVisibility = Object.keys(visibleSeries).reduce((acc, key) => {
+          acc[key] = !allVisible;
+          return acc;
+        }, {});
+        setVisibleSeries(newVisibility);
+      }
+    };
+
+    return (
+      <ul
+        style={{
+          listStyle: "none",
+          padding: 0,
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "15px",
+          justifyContent: "center",
+          margin: 0,
+        }}
+      >
+        <li
+          style={{
+            cursor: "pointer",
+            color: Object.values(visibleSeries).every((value) => value)
+              ? "black"
+              : "gray",
+          }}
+          onClick={handleToggleAll}
+        >
+          Tümü
+        </li>
+        {payload.map((entry, index) => (
+          <li
+            key={`item-${index}`}
+            style={{
+              cursor: "pointer",
+              color: visibleSeries[entry.value]
+                ? colors[index % colors.length]
+                : "gray",
+            }}
+            onClick={() => handleLegendClick(entry.value)}
+          >
+            <span
+              style={{
+                display: "inline-block",
+                width: "10px",
+                height: "10px",
+                backgroundColor: visibleSeries[entry.value]
+                  ? colors[index % colors.length]
+                  : "gray",
+                marginRight: "5px",
+              }}
+            ></span>
+            {entry.value}
+          </li>
+        ))}
+      </ul>
+    );
   };
 
   const content = (
@@ -309,7 +391,7 @@ function IsEmriTipleri(props) {
               <Pie
                 activeIndex={activeIndex}
                 activeShape={renderActiveShape}
-                data={data}
+                data={data.filter((entry) => visibleSeries[entry.name])}
                 cx="50%"
                 cy="50%"
                 innerRadius="50%"
@@ -318,13 +400,16 @@ function IsEmriTipleri(props) {
                 dataKey="value"
                 onMouseEnter={onPieEnter}
               >
-                {data.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={colors[index % colors.length]}
-                  />
-                ))}
+                {data
+                  .filter((entry) => visibleSeries[entry.name])
+                  .map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={colors[index % colors.length]}
+                    />
+                  ))}
               </Pie>
+              <Legend content={<CustomLegend />} />
             </PieChart>
           </StyledResponsiveContainer>
         </div>
