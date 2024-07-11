@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { PieChart, Pie, Sector, ResponsiveContainer, Cell } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Sector,
+  ResponsiveContainer,
+  Cell,
+  Legend,
+} from "recharts";
 import AxiosInstance from "../../../api/http.jsx";
-import { Spin, Typography } from "antd";
-import { MoreOutlined } from "@ant-design/icons";
+import { Spin, Typography, Tooltip, Popover, Button, Modal } from "antd";
 import chroma from "chroma-js";
+import styled from "styled-components";
+import { MoreOutlined, PrinterOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
@@ -19,11 +27,25 @@ const generateColors = (dataLength) => {
   return chroma.scale(colors).mode("lch").colors(dataLength);
 };
 
+// Styled component for the pie chart container
+const StyledResponsiveContainer = styled(ResponsiveContainer)`
+  &:focus {
+    outline: none !important;
+  }
+  .recharts-wrapper path:focus {
+    outline: none;
+  }
+  :focus {
+    outline: none;
+  }
+`;
+
 function IsEmriTipleri(props) {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [colors, setColors] = useState([]);
+  const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false); // Expanded modal visibility state
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -73,9 +95,21 @@ function IsEmriTipleri(props) {
 
     return (
       <g>
-        <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill}>
-          {payload.name}
-        </text>
+        <Tooltip title={payload.name}>
+          <text
+            x={cx}
+            y={cy}
+            dy={8}
+            textAnchor="middle"
+            fill={fill}
+            title={payload.name}
+            style={{ fontSize: outerRadius * 0.1 }}
+          >
+            {payload.name.length > 20
+              ? `${payload.name.slice(0, 17)}...`
+              : payload.name}
+          </text>
+        </Tooltip>
         <Sector
           cx={cx}
           cy={cy}
@@ -105,7 +139,7 @@ function IsEmriTipleri(props) {
           y={ey}
           textAnchor={textAnchor}
           fill="#333"
-        >{`PV ${value}`}</text>
+        >{`İş Emri Sayısı: ${value}`}</text>
         <text
           x={ex + (cos >= 0 ? 1 : -1) * 12}
           y={ey}
@@ -113,7 +147,7 @@ function IsEmriTipleri(props) {
           textAnchor={textAnchor}
           fill="#999"
         >
-          {`(Rate ${(percent * 100).toFixed(2)}%)`}
+          {`( ${(percent * 100).toFixed(2)}%)`}
         </text>
       </g>
     );
@@ -122,6 +156,17 @@ function IsEmriTipleri(props) {
   const onPieEnter = (_, index) => {
     setActiveIndex(index);
   };
+
+  const content = (
+    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      <div
+        style={{ cursor: "pointer" }}
+        onClick={() => setIsExpandedModalVisible(true)}
+      >
+        Büyüt
+      </div>
+    </div>
+  );
 
   return (
     <div
@@ -158,6 +203,23 @@ function IsEmriTipleri(props) {
         >
           İş Emri Tipleri
         </Text>
+        <Popover placement="bottom" content={content} trigger="click">
+          <Button
+            type="text"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0px 5px",
+              height: "32px",
+              zIndex: 3,
+            }}
+          >
+            <MoreOutlined
+              style={{ cursor: "pointer", fontWeight: "500", fontSize: "16px" }}
+            />
+          </Button>
+        </Popover>
       </div>
       {isLoading ? (
         <Spin />
@@ -172,7 +234,7 @@ function IsEmriTipleri(props) {
           }}
         >
           <div style={{ width: "100%", height: "calc(100% - 5px)" }}>
-            <ResponsiveContainer width="100%" height="100%">
+            <StyledResponsiveContainer width="100%" height="100%">
               <PieChart width="100%" height="100%">
                 <Pie
                   activeIndex={activeIndex}
@@ -194,10 +256,79 @@ function IsEmriTipleri(props) {
                   ))}
                 </Pie>
               </PieChart>
-            </ResponsiveContainer>
+            </StyledResponsiveContainer>
           </div>
         </div>
       )}
+      <Modal
+        title={
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "98%",
+            }}
+          >
+            <div
+              style={{
+                fontWeight: "500",
+                fontSize: "17px",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                maxWidth: "calc(100% - 50px)",
+              }}
+              title={`Toplam Harcanan İş Gücü `}
+            >
+              İş Emri Tipleri
+            </div>
+            <PrinterOutlined
+              style={{ cursor: "pointer", fontSize: "20px" }}
+              // onClick={downloadPDF}
+            />
+          </div>
+        }
+        centered
+        open={isExpandedModalVisible}
+        onOk={() => setIsExpandedModalVisible(false)}
+        onCancel={() => setIsExpandedModalVisible(false)}
+        width="90%"
+        destroyOnClose
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "7px",
+            height: "calc(100vh - 180px)",
+          }}
+        >
+          <StyledResponsiveContainer width="100%" height="100%">
+            <PieChart width="100%" height="100%">
+              <Pie
+                activeIndex={activeIndex}
+                activeShape={renderActiveShape}
+                data={data}
+                cx="50%"
+                cy="50%"
+                innerRadius="50%"
+                outerRadius="70%"
+                fill="#8884d8"
+                dataKey="value"
+                onMouseEnter={onPieEnter}
+              >
+                {data.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={colors[index % colors.length]}
+                  />
+                ))}
+              </Pie>
+            </PieChart>
+          </StyledResponsiveContainer>
+        </div>
+      </Modal>
     </div>
   );
 }

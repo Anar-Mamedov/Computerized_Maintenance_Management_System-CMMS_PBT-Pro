@@ -306,9 +306,17 @@ function ToplamHarcananIsGucu(props = {}) {
     );
   };
 
+  // Sayıyı formata dönüştüren fonksiyon
+  function formatNumber(value) {
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  }
+
   // Custom Tooltip function
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
+      // Formatlanmış sayıyı almak
+      let formattedValue = formatNumber(payload[0].value);
+
       return (
         <div
           style={{
@@ -317,7 +325,7 @@ function ToplamHarcananIsGucu(props = {}) {
             border: "1px solid #ccc",
           }}
         >
-          <p>{`${payload[0].name} : ${payload[0].value} dk`}</p>
+          <p>{`${payload[0].name} : ${formattedValue} dk.`}</p>
         </div>
       );
     }
