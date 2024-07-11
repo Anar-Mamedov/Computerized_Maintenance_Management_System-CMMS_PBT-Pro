@@ -58,6 +58,12 @@ function IsEmriTipleri(props) {
       }));
       setData(transformedData);
       setColors(generateColors(transformedData.length));
+
+      const initialVisibleSeries = transformedData.reduce((acc, item) => {
+        acc[item.name] = true;
+        return acc;
+      }, {});
+      setVisibleSeries(initialVisibleSeries);
     } catch (error) {
       console.error("Failed to fetch data:", error);
     } finally {
