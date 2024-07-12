@@ -301,32 +301,18 @@ const IsTalebiTipleri = () => {
       description: (
         <div>
           <p>
-            Belirli bir süre zarfında tüm çalışanlar tarafından harcanan iş gücü
-            toplamının atölyelere dağılımını ifade eder. Bu kavram, genellikle
-            aşağıdaki amaçlar için kullanılır:
+            İş Taleplerinin Tiplerinine/Durumlarına göre sayılarını gösterir.
           </p>
-          <ol>
-            <li>
-              <strong>Genel Verimlilik Analizi</strong>: Organizasyonun genel
-              verimliliğini değerlendirmek için.
-            </li>
-            <li>
-              <strong>Proje ve Görev Takibi</strong>: Bir proje veya görev için
-              harcanan toplam zamanı ve çabayı belirlemek için.
-            </li>
-            <li>
-              <strong>Maliyet Kontrolü</strong>: İş gücü maliyetlerini kontrol
-              etmek ve bütçelendirme yapmak için.
-            </li>
-            <li>
-              <strong>Kaynak Yönetimi</strong>: Kaynakların etkin kullanımını
-              planlamak ve optimize etmek için.
-            </li>
-            <li>
-              <strong>İş Yükü Dağılımı</strong>: Çalışanlar arasındaki iş yükü
-              dağılımını değerlendirmek ve dengelemek için.
-            </li>
-          </ol>
+          <p>
+            <strong>Bilgi :</strong> İş taleplerinin farklı
+            tiplerini/durumlarını (örneğin, tamamlandı, devam ediyor, beklemede,
+            iptal edildi vs…) adet cinsinden gösteren bir grafiktir. Bu grafik,
+            farklı tiplerdeki/durumlardaki iş bildirimlerinin oransal dağılımını
+            da hızlıca göstermek için kullanılır. İş taleplerinin durumlarını
+            belirli bir zaman aralığında karşılaştırmak için kullanılabilir. Bu
+            grafik ile İş taleplerinin durumunu etkili bir şekilde
+            görselleştirebilirsiniz.
+          </p>
         </div>
       ),
 

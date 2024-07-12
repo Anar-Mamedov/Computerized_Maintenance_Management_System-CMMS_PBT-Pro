@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   LineChart,
   Line,
@@ -12,7 +12,15 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { Button, Popover, Spin, Typography, Modal, DatePicker } from "antd";
+import {
+  Button,
+  Popover,
+  Spin,
+  Typography,
+  Modal,
+  DatePicker,
+  Tour,
+} from "antd";
 import AxiosInstance from "../../../api/http.jsx";
 import { MoreOutlined, PrinterOutlined } from "@ant-design/icons";
 import { Controller, useFormContext } from "react-hook-form";
@@ -44,6 +52,8 @@ function ToplamHarcananIsGucu(props = {}) {
   const [baslamaTarihi, setBaslamaTarihi] = useState();
   const [bitisTarihi, setBitisTarihi] = useState();
   const [colors, setColors] = useState([]);
+  const [open, setOpen] = useState(false);
+  const ref1 = useRef(null);
   const [visibleSeries, setVisibleSeries] = useState({});
   const {
     control,
@@ -471,11 +481,77 @@ function ToplamHarcananIsGucu(props = {}) {
       <Popover placement="right" content={content1} trigger="click">
         <div style={{ cursor: "pointer" }}>Süre Seçimi</div>
       </Popover>
-      <div style={{ cursor: "pointer" }} onClick={downloadPDF}>
-        İndir
+      <div style={{ cursor: "pointer" }} onClick={() => setOpen(true)}>
+        Bilgi
       </div>
     </div>
   );
+
+  const steps = [
+    {
+      title: "Bilgi",
+      description: (
+        <div
+          style={{
+            overflow: "auto",
+            height: "100%",
+            maxHeight: "200px",
+          }}
+        >
+          <p>
+            İşlemlerinin zaman içerisindeki dağılımının grafiği, iş emri
+            verilerini daha iyi anlamak ve analiz etmek için çeşitli avantajlar
+            sunar:
+          </p>
+          <ol>
+            <li>
+              <strong>Trendlerin Belirlenmesi</strong>: İşlemlerin zaman
+              içindeki değişimini görsel olarak analiz ederek, belirli
+              dönemlerde artış veya azalış gösteren trendleri kolayca tespit
+              edebilirsiniz.
+            </li>
+            <li>
+              <strong>Mevsimsellik ve Döngüsellik</strong>: Yılın belirli
+              dönemlerinde (örneğin, tatil sezonları veya belirli aylarda) artan
+              veya azalan işlem hacimlerini görerek mevsimsel veya döngüsel
+              paternleri belirleyebilirsiniz.
+            </li>
+            <li>
+              <strong>Anormalliklerin Tespiti</strong>: Beklenen trendlerden
+              sapma gösteren anormallikleri (örneğin, ani artışlar veya
+              düşüşler) tespit ederek, potansiyel sorunlara veya fırsatlara
+              dikkat çekebilirsiniz.
+            </li>
+            <li>
+              <strong>Performans İzleme</strong>: İşlemlerin zaman içindeki
+              performansını izleyerek, belirli dönemlerdeki performans
+              değişikliklerini değerlendirebilirsiniz. Bu, işletme süreçlerini
+              iyileştirme fırsatları sunar.
+            </li>
+            <li>
+              <strong>Karar Verme</strong>: Görsel veriler, yöneticilerin ve
+              karar vericilerin daha bilinçli ve veriye dayalı kararlar almasına
+              yardımcı olabilir. İşlem hacmindeki değişiklikler, stratejik
+              planlamada önemli rol oynayabilir.
+            </li>
+            <li>
+              <strong>Kaynak Tahsisi</strong>: İşlem yoğunluğunun yüksek olduğu
+              dönemleri belirleyerek, bu dönemlerde daha fazla kaynak tahsis
+              edebilir ve hizmet kalitesini artırabilirsiniz.
+            </li>
+            <li>
+              <strong>Tahmin ve Planlama</strong>: Geçmiş verilerden elde edilen
+              trendler ve paternler, gelecekteki işlem hacmini tahmin etmek için
+              kullanılabilir. Bu da stok yönetimi, personel planlaması ve bütçe
+              hazırlama gibi konularda fayda sağlar
+            </li>
+          </ol>
+        </div>
+      ),
+
+      target: () => ref1.current,
+    },
+  ];
 
   return (
     <div
@@ -551,7 +627,7 @@ function ToplamHarcananIsGucu(props = {}) {
           }}
         >
           <div style={{ width: "100%", height: "calc(100% - 5px)" }}>
-            <StyledResponsiveContainer width="100%" height="100%">
+            <StyledResponsiveContainer ref={ref1} width="100%" height="100%">
               <PieChart width={400} height={400}>
                 <Pie
                   data={data.filter((entry) => visibleSeries[entry.name])}
@@ -578,6 +654,7 @@ function ToplamHarcananIsGucu(props = {}) {
           </div>
         </div>
       )}
+      <Tour open={open} onClose={() => setOpen(false)} steps={steps} />
       <Modal
         title="Tarih Seçimi"
         centered

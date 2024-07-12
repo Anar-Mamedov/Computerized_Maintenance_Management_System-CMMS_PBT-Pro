@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   BarChart,
   Bar,
@@ -10,9 +10,17 @@ import {
   LabelList,
   ResponsiveContainer,
 } from "recharts";
-import { Button, Popover, Spin, Typography, Modal, DatePicker } from "antd";
+import {
+  Button,
+  Popover,
+  Spin,
+  Typography,
+  Modal,
+  DatePicker,
+  Tour,
+} from "antd";
 import AxiosInstance from "../../../api/http.jsx";
-import { MoreOutlined } from "@ant-design/icons";
+import { MoreOutlined, PrinterOutlined } from "@ant-design/icons";
 import { Controller, useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
 import html2pdf from "html2pdf.js";
@@ -42,6 +50,8 @@ function AylikBakimMaliyetleri(props = {}) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState("");
   const [baslamaTarihi, setBaslamaTarihi] = useState();
+  const [open, setOpen] = useState(false);
+  const ref1 = useRef(null);
   const [visibleSeries, setVisibleSeries] = useState({
     AYLIK_BAKIM_ISEMRI_MALIYET: true,
   });
@@ -220,11 +230,35 @@ function AylikBakimMaliyetleri(props = {}) {
       <Popover placement="right" content={content1} trigger="click">
         <div style={{ cursor: "pointer" }}>Süre Seçimi</div>
       </Popover>
-      <div style={{ cursor: "pointer" }} onClick={downloadPDF}>
-        İndir
+      <div style={{ cursor: "pointer" }} onClick={() => setOpen(true)}>
+        Bilgi
       </div>
     </div>
   );
+
+  const steps = [
+    {
+      title: "Bilgi",
+      description: (
+        <div
+          style={{
+            overflow: "auto",
+            height: "100%",
+            maxHeight: "400px",
+          }}
+        >
+          <p>
+            Bu grafik ile aylık bakım maliyetlerini daha kapsamlı bir şekilde
+            analiz etmek ve raporlamak mümkündür. Bu bilgiler, bakım bütçesinin
+            yönetimi, maliyet optimizasyonu ve gelecekteki planlama için önemli
+            bir temel oluşturur.
+          </p>
+        </div>
+      ),
+
+      target: () => ref1.current,
+    },
+  ];
 
   return (
     <div
@@ -286,7 +320,6 @@ function AylikBakimMaliyetleri(props = {}) {
         <Spin />
       ) : (
         <div
-          id="aylik-bakim"
           style={{
             display: "flex",
             flexDirection: "column",
@@ -296,7 +329,7 @@ function AylikBakimMaliyetleri(props = {}) {
           }}
         >
           <div style={{ width: "100%", height: "calc(100% - 5px)" }}>
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer ref={ref1} width="100%" height="100%">
               <BarChart
                 width="100%"
                 height="100%"
@@ -327,6 +360,7 @@ function AylikBakimMaliyetleri(props = {}) {
           </div>
         </div>
       )}
+      <Tour open={open} onClose={() => setOpen(false)} steps={steps} />
       <Modal
         title="Tarih Seçimi"
         centered
@@ -363,22 +397,35 @@ function AylikBakimMaliyetleri(props = {}) {
       {/* Expanded Modal */}
       <Modal
         title={
-          <Text
-            title={`Aylık Bakım Maliyetleri${
-              baslamaTarihi ? ` (${baslamaTarihi})` : ""
-            }`}
+          <div
             style={{
-              fontWeight: "500",
-              fontSize: "17px",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              maxWidth: "calc(100% - 50px)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "98%",
             }}
           >
-            Aylık Bakım Maliyetleri
-            {baslamaTarihi && ` (${baslamaTarihi})`}
-          </Text>
+            <Text
+              title={`Aylık Bakım Maliyetleri${
+                baslamaTarihi ? ` (${baslamaTarihi})` : ""
+              }`}
+              style={{
+                fontWeight: "500",
+                fontSize: "17px",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                maxWidth: "calc(100% - 50px)",
+              }}
+            >
+              Aylık Bakım Maliyetleri
+              {baslamaTarihi && ` (${baslamaTarihi})`}
+            </Text>
+            <PrinterOutlined
+              style={{ cursor: "pointer", fontSize: "20px" }}
+              onClick={downloadPDF}
+            />
+          </div>
         }
         centered
         open={isExpandedModalVisible}
@@ -396,7 +443,7 @@ function AylikBakimMaliyetleri(props = {}) {
             height: "calc(100vh - 180px)",
           }}
         >
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer id="aylik-bakim" width="100%" height="100%">
             <BarChart
               width="100%"
               height="100%"
