@@ -408,7 +408,7 @@ function IsEmriZamanDagilimi(props = {}) {
         }}
       >
         <Text
-          title={`İş Emirlerinin Zaman Dağılımı (${
+          title={`İş Emri Listesi (${
             baslamaTarihi ? formatDate(baslamaTarihi) : ""
           } - ${bitisTarihi ? formatDate(bitisTarihi) : ""})`}
           style={{
@@ -420,7 +420,7 @@ function IsEmriZamanDagilimi(props = {}) {
             maxWidth: "calc(100% - 50px)",
           }}
         >
-          İş Emirlerinin Zaman Dağılımı
+          İş Emri Listesi
           {` (${
             baslamaTarihi && bitisTarihi
               ? `${formatDate(baslamaTarihi)} / ${formatDate(bitisTarihi)}`
@@ -594,7 +594,7 @@ function IsEmriZamanDagilimi(props = {}) {
             }}
           >
             <Text
-              title={`İş Emirlerinin Zaman Dağılımı (${
+              title={`İş Emri Listesi (${
                 baslamaTarihi ? formatDate(baslamaTarihi) : ""
               } - ${bitisTarihi ? formatDate(bitisTarihi) : ""})`}
               style={{
@@ -606,7 +606,7 @@ function IsEmriZamanDagilimi(props = {}) {
                 maxWidth: "calc(100% - 50px)",
               }}
             >
-              İş Emirlerinin Zaman Dağılımı
+              İş Emri Listesi
               {` (${
                 baslamaTarihi && bitisTarihi
                   ? `${formatDate(baslamaTarihi)} / ${formatDate(bitisTarihi)}`
