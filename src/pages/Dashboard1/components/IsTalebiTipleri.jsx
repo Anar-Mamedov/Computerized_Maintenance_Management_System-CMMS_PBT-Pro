@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import {
   PieChart,
   Pie,
-  Sector,
   ResponsiveContainer,
   Cell,
+  Tooltip,
   Legend,
 } from "recharts";
 import AxiosInstance from "../../../api/http.jsx";
-import { Spin, Typography, Tooltip, Popover, Button, Modal } from "antd";
+import { Spin, Typography, Popover, Button, Modal } from "antd";
 import chroma from "chroma-js";
 import styled from "styled-components";
 import { MoreOutlined, PrinterOutlined } from "@ant-design/icons";
@@ -16,6 +16,7 @@ import html2pdf from "html2pdf.js";
 
 const { Text } = Typography;
 
+// Generate colors for the pie chart
 const generateColors = (dataLength) => {
   const colors = [
     "#0088FE",
@@ -36,20 +37,17 @@ const StyledResponsiveContainer = styled(ResponsiveContainer)`
   .recharts-wrapper path:focus {
     outline: none;
   }
-  :focus {
-    outline: none;
-  }
 `;
 
-function IsTalebiTipleri(props) {
+const IsTalebiTipleri = () => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
   const [colors, setColors] = useState([]);
   const [visibleSeries, setVisibleSeries] = useState({});
   const [chartHeader, setChartHeader] = useState("İş Talebi Tipleri");
-  const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false); // Expanded modal visibility state
+  const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false);
 
+  // Fetch data for the first chart
   const fetchData = async () => {
     setIsLoading(true);
     try {
@@ -60,7 +58,6 @@ function IsTalebiTipleri(props) {
       }));
       setData(transformedData);
       setColors(generateColors(transformedData.length));
-
       const initialVisibleSeries = transformedData.reduce((acc, item) => {
         acc[item.name] = true;
         return acc;
@@ -92,6 +89,7 @@ function IsTalebiTipleri(props) {
     }
   };
 
+  // Fetch data for the second chart
   const fetchData1 = async () => {
     setIsLoading(true);
     try {
@@ -102,7 +100,6 @@ function IsTalebiTipleri(props) {
       }));
       setData(transformedData);
       setColors(generateColors(transformedData.length));
-
       const initialVisibleSeries = transformedData.reduce((acc, item) => {
         acc[item.name] = true;
         return acc;
@@ -119,6 +116,7 @@ function IsTalebiTipleri(props) {
     fetchData();
   }, []);
 
+  // Handle PDF download
   const downloadPDF = () => {
     const element = document.getElementById("is-talebi-tipleri");
     const opt = {
@@ -128,99 +126,61 @@ function IsTalebiTipleri(props) {
       html2canvas: { scale: 2 },
       jsPDF: { unit: "mm", format: "a4", orientation: "landscape" },
     };
-
     html2pdf().set(opt).from(element).save();
   };
 
-  const renderActiveShape = (props) => {
+  // Render custom label for the pie chart
+  const renderCustomizedLabel = ({
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    percent,
+    index,
+  }) => {
     const RADIAN = Math.PI / 180;
-    const {
-      cx,
-      cy,
-      midAngle,
-      innerRadius,
-      outerRadius,
-      startAngle,
-      endAngle,
-      fill,
-      payload,
-      percent,
-      value,
-    } = props;
-    const sin = Math.sin(-RADIAN * midAngle);
-    const cos = Math.cos(-RADIAN * midAngle);
-    const sx = cx + (outerRadius + 10) * cos;
-    const sy = cy + (outerRadius + 10) * sin;
-    const mx = cx + (outerRadius + 30) * cos;
-    const my = cy + (outerRadius + 30) * sin;
-    const ex = mx + (cos >= 0 ? 1 : -1) * 22;
-    const ey = my;
-    const textAnchor = cos >= 0 ? "start" : "end";
-
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
     return (
-      <g>
-        <Tooltip title={payload.name}>
-          <text
-            x={cx}
-            y={cy}
-            dy={8}
-            textAnchor="middle"
-            fill={fill}
-            title={payload.name}
-            style={{ fontSize: outerRadius * 0.1 }}
-          >
-            {payload.name.length > 20
-              ? `${payload.name.slice(0, 17)}...`
-              : payload.name}
-          </text>
-        </Tooltip>
-        <Sector
-          cx={cx}
-          cy={cy}
-          innerRadius={innerRadius}
-          outerRadius={outerRadius}
-          startAngle={startAngle}
-          endAngle={endAngle}
-          fill={fill}
-        />
-        <Sector
-          cx={cx}
-          cy={cy}
-          startAngle={startAngle}
-          endAngle={endAngle}
-          innerRadius={outerRadius + 6}
-          outerRadius={outerRadius + 10}
-          fill={fill}
-        />
-        <path
-          d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`}
-          stroke={fill}
-          fill="none"
-        />
-        <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
-        <text
-          x={ex + (cos >= 0 ? 1 : -1) * 12}
-          y={ey}
-          textAnchor={textAnchor}
-          fill="#333"
-        >{`Sayısı: ${value}`}</text>
-        <text
-          x={ex + (cos >= 0 ? 1 : -1) * 12}
-          y={ey}
-          dy={18}
-          textAnchor={textAnchor}
-          fill="#999"
-        >
-          {`( ${(percent * 100).toFixed(2)}%)`}
-        </text>
-      </g>
+      <text
+        x={x}
+        y={y}
+        fill="white"
+        textAnchor={x > cx ? "start" : "end"}
+        dominantBaseline="central"
+      >
+        {`${(percent * 100).toFixed(0)}%`}
+      </text>
     );
   };
 
-  const onPieEnter = (_, index) => {
-    setActiveIndex(index);
+  // Format numbers with dots
+  const formatNumber = (value) => {
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
+  // Custom Tooltip function
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      let formattedValue = formatNumber(payload[0].value);
+      return (
+        <div
+          style={{
+            backgroundColor: "#fff",
+            padding: "5px",
+            border: "1px solid #ccc",
+          }}
+        >
+          <p>{`${payload[0].name} : ${formattedValue}`}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // Handle legend item click
   const handleLegendClick = (name) => {
     setVisibleSeries((prev) => ({
       ...prev,
@@ -228,20 +188,18 @@ function IsTalebiTipleri(props) {
     }));
   };
 
+  // Custom Legend component
   const CustomLegend = ({ payload }) => {
     const handleToggleAll = () => {
       const allVisible = Object.values(visibleSeries).every((value) => value);
       const anyVisible = Object.values(visibleSeries).some((value) => value);
-
       if (!anyVisible) {
-        // If no series are visible, set all to visible
         const newVisibility = Object.keys(visibleSeries).reduce((acc, key) => {
           acc[key] = true;
           return acc;
         }, {});
         setVisibleSeries(newVisibility);
       } else {
-        // Otherwise, toggle all based on the current state of allVisible
         const newVisibility = Object.keys(visibleSeries).reduce((acc, key) => {
           acc[key] = !allVisible;
           return acc;
@@ -302,6 +260,7 @@ function IsTalebiTipleri(props) {
     );
   };
 
+  // Content for the popover menu
   const content = (
     <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
       <div
@@ -398,26 +357,27 @@ function IsTalebiTipleri(props) {
         >
           <div style={{ width: "100%", height: "calc(100% - 5px)" }}>
             <StyledResponsiveContainer width="100%" height="100%">
-              <PieChart width="100%" height="100%">
+              <PieChart width={400} height={400}>
                 <Pie
-                  activeIndex={activeIndex}
-                  activeShape={renderActiveShape}
-                  data={data}
+                  data={data.filter((entry) => visibleSeries[entry.name])}
                   cx="50%"
                   cy="50%"
-                  innerRadius="50%"
-                  outerRadius="70%"
+                  labelLine={false}
+                  label={renderCustomizedLabel}
+                  outerRadius="90%"
                   fill="#8884d8"
                   dataKey="value"
-                  onMouseEnter={onPieEnter}
                 >
-                  {data.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={colors[index % colors.length]}
-                    />
-                  ))}
+                  {data
+                    .filter((entry) => visibleSeries[entry.name])
+                    .map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={colors[index % colors.length]}
+                      />
+                    ))}
                 </Pie>
+                <Tooltip content={<CustomTooltip />} />
               </PieChart>
             </StyledResponsiveContainer>
           </div>
@@ -472,18 +432,16 @@ function IsTalebiTipleri(props) {
             width="100%"
             height="100%"
           >
-            <PieChart width="100%" height="100%">
+            <PieChart width={400} height={400}>
               <Pie
-                activeIndex={activeIndex}
-                activeShape={renderActiveShape}
                 data={data.filter((entry) => visibleSeries[entry.name])}
                 cx="50%"
                 cy="50%"
-                innerRadius="50%"
-                outerRadius="70%"
+                labelLine={false}
+                label={renderCustomizedLabel}
+                outerRadius="90%"
                 fill="#8884d8"
                 dataKey="value"
-                onMouseEnter={onPieEnter}
               >
                 {data
                   .filter((entry) => visibleSeries[entry.name])
@@ -494,6 +452,7 @@ function IsTalebiTipleri(props) {
                     />
                   ))}
               </Pie>
+              <Tooltip content={<CustomTooltip />} />
               <Legend content={<CustomLegend />} />
             </PieChart>
           </StyledResponsiveContainer>
@@ -501,6 +460,6 @@ function IsTalebiTipleri(props) {
       </Modal>
     </div>
   );
-}
+};
 
 export default IsTalebiTipleri;
