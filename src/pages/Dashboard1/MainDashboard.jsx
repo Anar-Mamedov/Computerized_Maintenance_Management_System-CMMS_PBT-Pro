@@ -839,7 +839,7 @@ function MainDashboard() {
                 </Popover>
               </div>
             </div>
-            <div style={{ overflow: "scroll", height: "calc(100vh - 210px)" }}>
+            <div style={{ overflow: "auto", height: "calc(100vh - 210px)" }}>
               <div className="grid-stack">
                 <div className="grid-stack-item border-dark" id="widget1">
                   <div className="grid-stack-item-content">

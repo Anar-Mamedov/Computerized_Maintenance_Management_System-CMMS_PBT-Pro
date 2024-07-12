@@ -279,7 +279,7 @@ function ArizaliMakineler(props) {
             <CSVLink
               data={data}
               headers={csvHeaders}
-              filename={`personel_raporu.csv`}
+              filename={`arizali_makineler.csv`}
               className="ant-btn ant-btn-primary"
             >
               <Button
@@ -347,7 +347,7 @@ function ArizaliMakineler(props) {
               <CSVLink
                 data={data}
                 headers={csvHeaders}
-                filename={`personel_raporu.csv`}
+                filename={`arizali_makineler.csv`}
                 className="ant-btn ant-btn-primary"
               >
                 <Button

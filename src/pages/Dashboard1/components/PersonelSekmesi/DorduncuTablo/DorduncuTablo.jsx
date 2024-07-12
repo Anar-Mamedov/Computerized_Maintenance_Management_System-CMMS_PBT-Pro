@@ -314,7 +314,7 @@ export default function DorduncuTablo({
             <CSVLink
               data={data}
               headers={csvHeaders}
-              filename={`personel_raporu.csv`}
+              filename={`personel_is_Emirleri.csv`}
               className="ant-btn ant-btn-primary"
             >
               <Button

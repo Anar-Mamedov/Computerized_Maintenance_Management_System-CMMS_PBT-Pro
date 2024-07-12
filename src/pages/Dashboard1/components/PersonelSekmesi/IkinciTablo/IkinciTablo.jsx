@@ -288,7 +288,7 @@ export default function IkinciTablo({
             <CSVLink
               data={data}
               headers={csvHeaders}
-              filename={`personel_raporu.csv`}
+              filename={`personel_is_tipleri.csv`}
               className="ant-btn ant-btn-primary"
             >
               <Button
