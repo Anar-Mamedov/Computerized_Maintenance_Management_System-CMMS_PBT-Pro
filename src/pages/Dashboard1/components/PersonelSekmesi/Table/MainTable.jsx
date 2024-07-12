@@ -1,6 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Input, Modal, Table } from "antd";
-import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { CSVLink } from "react-csv";
+import {
+  CheckOutlined,
+  CloseOutlined,
+  DownloadOutlined,
+} from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../api/http.jsx";
 // import CreateModal from "./Insert/CreateModal";
@@ -33,7 +38,7 @@ export default function MainTable({ isActive }) {
   const [selectedRowsData, setSelectedRowsData] = useState([]); // Seçilen satırların verilerini tutacak state
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
-
+  const [loadings, setLoadings] = useState([]);
   const [searchTerm1, setSearchTerm1] = useState("");
   const [filteredData1, setFilteredData1] = useState([]);
 
@@ -225,15 +230,64 @@ export default function MainTable({ isActive }) {
     }
   };
 
+  // csv dosyası için tablo başlık oluştur
+
+  const csvHeaders = columns.map((col) => ({
+    label: col.title,
+    key: col.dataIndex,
+  }));
+
+  const enterLoading = (index) => {
+    setLoadings((prevLoadings) => {
+      const newLoadings = [...prevLoadings];
+      newLoadings[index] = true;
+      return newLoadings;
+    });
+    setTimeout(() => {
+      setLoadings((prevLoadings) => {
+        const newLoadings = [...prevLoadings];
+        newLoadings[index] = false;
+        return newLoadings;
+      });
+    }, 1000);
+  };
+
   return (
     <div style={{ marginBottom: "25px" }}>
       {/*<CreateModal onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />*/}
-      <Input
-        placeholder="Arama..."
-        value={searchTerm1}
-        onChange={handleSearch1}
-        style={{ width: "300px", marginBottom: "15px" }}
-      />
+      <div
+        style={{
+          display: "flex",
+          marginBottom: "15px",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Input
+          placeholder="Arama..."
+          value={searchTerm1}
+          onChange={handleSearch1}
+          style={{ width: "300px" }}
+        />
+
+        {/*csv indirme butonu*/}
+        <CSVLink
+          data={data}
+          headers={csvHeaders}
+          filename={`personel_raporu.csv`}
+          className="ant-btn ant-btn-primary"
+        >
+          <Button
+            type="primary"
+            icon={<DownloadOutlined />}
+            loading={loadings[1]}
+            onClick={() => enterLoading(1)}
+          >
+            İndir
+          </Button>
+        </CSVLink>
+      </div>
+
       <Table
         size="small"
         // rowSelection={{
