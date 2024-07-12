@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Table,
   Typography,
@@ -8,6 +8,7 @@ import {
   Modal,
   DatePicker,
   ConfigProvider,
+  Tour,
 } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../api/http.jsx";
@@ -29,6 +30,8 @@ function LokasyonBazindaIsTalepleri(props) {
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const [baslamaTarihi, setBaslamaTarihi] = useState();
   const [bitisTarihi, setBitisTarihi] = useState();
+  const [open, setOpen] = useState(false);
+  const ref1 = useRef(null);
   const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false); // Expanded modal visibility state
   const {
     control,
@@ -253,8 +256,34 @@ function LokasyonBazindaIsTalepleri(props) {
       <div style={{ cursor: "pointer" }} onClick={downloadPDF}>
         İndir
       </div>
+      <div style={{ cursor: "pointer" }} onClick={() => setOpen(true)}>
+        Bilgi
+      </div>
     </div>
   );
+
+  const steps = [
+    {
+      title: "Bilgi",
+      description: (
+        <div
+          style={{
+            overflow: "auto",
+            height: "100%",
+            maxHeight: "200px",
+          }}
+        >
+          <p>
+            Belirli lokasyonlardaki ya da Atölyelerdeki iş yükünü veya
+            taleplerin dağılımını daha iyi anlayabilmek ve buna göre kararlar
+            alabilmek için kullanılır.
+          </p>
+        </div>
+      ),
+
+      target: () => ref1.current,
+    },
+  ];
 
   return (
     <ConfigProvider locale={trTR}>
@@ -312,6 +341,7 @@ function LokasyonBazindaIsTalepleri(props) {
           </Popover>
         </div>
         <div
+          ref={ref1}
           style={{
             display: "flex",
             flexDirection: "column",
@@ -337,7 +367,7 @@ function LokasyonBazindaIsTalepleri(props) {
             />
           </Spin>
         </div>
-
+        <Tour open={open} onClose={() => setOpen(false)} steps={steps} />
         <Modal
           title="Tarih Seçimi"
           centered

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   PieChart,
   Pie,
@@ -8,7 +8,7 @@ import {
   Legend,
 } from "recharts";
 import AxiosInstance from "../../../api/http.jsx";
-import { Spin, Typography, Tooltip, Popover, Button, Modal } from "antd";
+import { Spin, Typography, Tooltip, Popover, Button, Modal, Tour } from "antd";
 import chroma from "chroma-js";
 import styled from "styled-components";
 import { MoreOutlined, PrinterOutlined } from "@ant-design/icons";
@@ -49,6 +49,8 @@ function IsEmriTipleri(props) {
   const [visibleSeries, setVisibleSeries] = useState({});
   const [chartHeader, setChartHeader] = useState("İş Emri Tipleri");
   const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false); // Expanded modal visibility state
+  const [open, setOpen] = useState(false);
+  const ref1 = useRef(null);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -309,8 +311,38 @@ function IsEmriTipleri(props) {
       >
         İş Emri Durumları
       </div>
+      <div style={{ cursor: "pointer" }} onClick={() => setOpen(true)}>
+        Bilgi
+      </div>
     </div>
   );
+
+  const steps = [
+    {
+      title: "Bilgi",
+      description: (
+        <div>
+          <p>
+            Farklı tiplere ve durumlara sahip İş Emirlerinin{" "}
+            <strong>SAYISI (SÜRESİ)</strong> gösterilir.
+          </p>
+          <p>
+            <strong>Bilgi :</strong> Bu pasta grafikte, farklı iş emri
+            tiplerinin / durumlarının toplam iş emirleri içindeki oranları
+            gösterilmektedir. Her bir dilim, belirli bir iş emri tipinin /
+            durumunun toplam iş emirleri içindeki oranını temsil etmektedir.
+            Örneğin, pasta grafiğinde "Arıza" iş emri tipi için ayrılan dilim,
+            toplam iş emirlerinin yüzde 40'ını oluşturuyorsa, bu tip iş
+            emirlerinin diğerlerine göre daha fazla olduğunu gösterir. Bu
+            grafik, iş emirlerinin dağılımını hızlıca görselleştirerek analiz
+            etmenize yardımcı olabilir.
+          </p>
+        </div>
+      ),
+
+      target: () => ref1.current,
+    },
+  ];
 
   return (
     <div
@@ -378,7 +410,7 @@ function IsEmriTipleri(props) {
           }}
         >
           <div style={{ width: "100%", height: "calc(100% - 5px)" }}>
-            <StyledResponsiveContainer width="100%" height="100%">
+            <StyledResponsiveContainer ref={ref1} width="100%" height="100%">
               <PieChart width="100%" height="100%">
                 <Pie
                   activeIndex={activeIndex}
@@ -404,6 +436,7 @@ function IsEmriTipleri(props) {
           </div>
         </div>
       )}
+      <Tour open={open} onClose={() => setOpen(false)} steps={steps} />
       <Modal
         title={
           <div

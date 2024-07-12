@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   BarChart,
   Bar,
@@ -10,9 +10,17 @@ import {
   LabelList,
   ResponsiveContainer,
 } from "recharts";
-import { Button, Popover, Spin, Typography, Modal, DatePicker } from "antd";
+import {
+  Button,
+  Popover,
+  Spin,
+  Typography,
+  Modal,
+  DatePicker,
+  Tour,
+} from "antd";
 import AxiosInstance from "../../../api/http.jsx";
-import { MoreOutlined } from "@ant-design/icons";
+import { MoreOutlined, PrinterOutlined } from "@ant-design/icons";
 import { Controller, useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
 import html2pdf from "html2pdf.js";
@@ -42,6 +50,8 @@ function TamamlanmaOranlari(props = {}) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState("");
   const [baslamaTarihi, setBaslamaTarihi] = useState();
+  const [open, setOpen] = useState(false);
+  const ref1 = useRef(null);
   const [visibleSeries, setVisibleSeries] = useState({
     IsEmri: true,
     IsTalebi: true,
@@ -227,11 +237,43 @@ function TamamlanmaOranlari(props = {}) {
       <Popover placement="right" content={content1} trigger="click">
         <div style={{ cursor: "pointer" }}>Süre Seçimi</div>
       </Popover>
-      <div style={{ cursor: "pointer" }} onClick={downloadPDF}>
-        İndir
+      <div style={{ cursor: "pointer" }} onClick={() => setOpen(true)}>
+        Bilgi
       </div>
     </div>
   );
+
+  const steps = [
+    {
+      title: "Bilgi",
+      description: (
+        <div
+          style={{
+            overflow: "auto",
+            height: "100%",
+            maxHeight: "200px",
+          }}
+        >
+          <p>
+            Bu grafikte, belirli bir zaman diliminde tamamlanmış iş talepleri ve
+            iş emirleri oranları gösterilmektedir. Grafik, yatay eksende zamanı
+            (örneğin, günler, haftalar veya aylar) ve dikey eksende tamamlanmış
+            iş talepleri ve iş emirleri sayısını göstermektedir. Her bir çubuk,
+            toplam iş talepleri veya iş emirleri sayısına göre tamamlanmış
+            olanları temsil etmektedir.
+          </p>
+          <p>
+            Bu grafik, yöneticilere belirli bir dönemdeki işlerin ne kadarının
+            tamamlandığını görsel olarak göstererek performansı
+            değerlendirmelerine yardımcı olabilir. Ayrıca trendleri izlemek ve
+            performansı zaman içinde karşılaştırmak için kullanılabilir.
+          </p>
+        </div>
+      ),
+
+      target: () => ref1.current,
+    },
+  ];
 
   return (
     <div
@@ -293,7 +335,6 @@ function TamamlanmaOranlari(props = {}) {
         <Spin />
       ) : (
         <div
-          id="chart-container"
           style={{
             display: "flex",
             flexDirection: "column",
@@ -303,7 +344,7 @@ function TamamlanmaOranlari(props = {}) {
           }}
         >
           <div style={{ width: "100%", height: "calc(100% - 5px)" }}>
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer ref={ref1} width="100%" height="100%">
               <BarChart
                 width="100%"
                 height="100%"
@@ -343,6 +384,8 @@ function TamamlanmaOranlari(props = {}) {
           </div>
         </div>
       )}
+
+      <Tour open={open} onClose={() => setOpen(false)} steps={steps} />
       <Modal
         title="Tarih Seçimi"
         centered
@@ -379,22 +422,35 @@ function TamamlanmaOranlari(props = {}) {
       {/* Expanded Modal */}
       <Modal
         title={
-          <Text
-            title={`Tamamlanmış İş Talepleri ve İş Emirleri Oranları${
-              baslamaTarihi ? ` (${baslamaTarihi})` : ""
-            }`}
+          <div
             style={{
-              fontWeight: "500",
-              fontSize: "17px",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              maxWidth: "calc(100% - 50px)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "98%",
             }}
           >
-            Tamamlanmış İş Talepleri ve İş Emirleri Oranları
-            {baslamaTarihi && ` (${baslamaTarihi})`}
-          </Text>
+            <Text
+              title={`Tamamlanmış İş Talepleri ve İş Emirleri Oranları${
+                baslamaTarihi ? ` (${baslamaTarihi})` : ""
+              }`}
+              style={{
+                fontWeight: "500",
+                fontSize: "17px",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                maxWidth: "calc(100% - 50px)",
+              }}
+            >
+              Tamamlanmış İş Talepleri ve İş Emirleri Oranları
+              {baslamaTarihi && ` (${baslamaTarihi})`}
+            </Text>
+            <PrinterOutlined
+              style={{ cursor: "pointer", fontSize: "20px" }}
+              onClick={downloadPDF}
+            />
+          </div>
         }
         centered
         open={isExpandedModalVisible}
@@ -412,7 +468,7 @@ function TamamlanmaOranlari(props = {}) {
             height: "calc(100vh - 180px)",
           }}
         >
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer id="chart-container" width="100%" height="100%">
             <BarChart
               width="100%"
               height="100%"

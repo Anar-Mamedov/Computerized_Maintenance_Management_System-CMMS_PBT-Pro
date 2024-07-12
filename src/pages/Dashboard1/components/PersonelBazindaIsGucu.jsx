@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   LineChart,
   Line,
@@ -20,6 +20,7 @@ import {
   Modal,
   DatePicker,
   Checkbox,
+  Tour,
 } from "antd";
 import AxiosInstance from "../../../api/http.jsx";
 import {
@@ -62,6 +63,8 @@ function PersonelBazindaIsGucu(props = {}) {
   const [bitisTarihi, setBitisTarihi] = useState();
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [checkedNames, setCheckedNames] = useState({});
+  const [open, setOpen] = useState(false);
+  const ref1 = useRef(null);
   const [allChecked, setAllChecked] = useState(true);
   const {
     control,
@@ -374,11 +377,58 @@ function PersonelBazindaIsGucu(props = {}) {
       <Popover placement="right" content={content1} trigger="click">
         <div style={{ cursor: "pointer" }}>Süre Seçimi</div>
       </Popover>
-      <div style={{ cursor: "pointer" }} onClick={downloadPDF}>
-        İndir
+      <div style={{ cursor: "pointer" }} onClick={() => setOpen(true)}>
+        Bilgi
       </div>
     </div>
   );
+
+  const steps = [
+    {
+      title: "Bilgi",
+      description: (
+        <div
+          style={{
+            overflow: "auto",
+            height: "100%",
+            maxHeight: "200px",
+          }}
+        >
+          <p>
+            "Personel Bazında Harcanan İş Gücü," bir işletmede belirli bir
+            çalışan veya çalışan grubu tarafından ve belirli bir süre zarfında
+            harcanan toplam iş gücünü ifade eder. Bu grafik genellikle şu
+            amaçlar için kullanılır:
+          </p>
+          <ol>
+            <li>
+              <strong>Verimlilik Analizi</strong>: Her bir çalışanın veya
+              ekiplerin ne kadar verimli çalıştığını ölçmek için.
+            </li>
+            <li>
+              <strong>Proje Yönetimi</strong>: Belirli projelerde hangi
+              personelin ne kadar zaman harcadığını takip etmek için.
+            </li>
+            <li>
+              <strong>Maliyet Hesaplama</strong>: İş gücü maliyetlerini
+              hesaplamak ve bütçelendirme yapmak için.
+            </li>
+            <li>
+              <strong>Performans Değerlendirme</strong>: Çalışanların
+              performansını değerlendirmek ve gerekli iyileştirmeleri belirlemek
+              için.
+            </li>
+            <li>
+              <strong>Kaynak Planlaması</strong>: Gelecek projeler veya işler
+              için gerekli iş gücünü planlamak ve tahmin etmek için.
+            </li>
+          </ol>
+        </div>
+      ),
+
+      target: () => ref1.current,
+    },
+  ];
 
   return (
     <div
@@ -452,7 +502,7 @@ function PersonelBazindaIsGucu(props = {}) {
           }}
         >
           <div style={{ width: "100%", height: "calc(100% - 43px)" }}>
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer ref={ref1} width="100%" height="100%">
               <BarChart
                 width="100%"
                 height="100%"
@@ -495,7 +545,7 @@ function PersonelBazindaIsGucu(props = {}) {
           </div>
         </div>
       )}
-
+      <Tour open={open} onClose={() => setOpen(false)} steps={steps} />
       <Modal
         title="Tarih Seçimi"
         centered
