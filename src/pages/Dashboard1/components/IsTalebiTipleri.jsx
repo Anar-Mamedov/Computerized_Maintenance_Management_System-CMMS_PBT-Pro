@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   PieChart,
   Pie,
@@ -8,7 +8,7 @@ import {
   Legend,
 } from "recharts";
 import AxiosInstance from "../../../api/http.jsx";
-import { Spin, Typography, Popover, Button, Modal } from "antd";
+import { Spin, Typography, Popover, Button, Modal, Tour } from "antd";
 import chroma from "chroma-js";
 import styled from "styled-components";
 import { MoreOutlined, PrinterOutlined } from "@ant-design/icons";
@@ -46,6 +46,8 @@ const IsTalebiTipleri = () => {
   const [visibleSeries, setVisibleSeries] = useState({});
   const [chartHeader, setChartHeader] = useState("İş Talebi Tipleri");
   const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false);
+  const [open, setOpen] = useState(false);
+  const ref1 = useRef(null);
 
   // Fetch data for the first chart
   const fetchData = async () => {
@@ -287,8 +289,50 @@ const IsTalebiTipleri = () => {
       >
         İş Emri Durumları
       </div>
+      <div style={{ cursor: "pointer" }} onClick={() => setOpen(true)}>
+        Bilgi
+      </div>
     </div>
   );
+
+  const steps = [
+    {
+      title: "Bilgi",
+      description: (
+        <div>
+          <p>
+            Belirli bir süre zarfında tüm çalışanlar tarafından harcanan iş gücü
+            toplamının atölyelere dağılımını ifade eder. Bu kavram, genellikle
+            aşağıdaki amaçlar için kullanılır:
+          </p>
+          <ol>
+            <li>
+              <strong>Genel Verimlilik Analizi</strong>: Organizasyonun genel
+              verimliliğini değerlendirmek için.
+            </li>
+            <li>
+              <strong>Proje ve Görev Takibi</strong>: Bir proje veya görev için
+              harcanan toplam zamanı ve çabayı belirlemek için.
+            </li>
+            <li>
+              <strong>Maliyet Kontrolü</strong>: İş gücü maliyetlerini kontrol
+              etmek ve bütçelendirme yapmak için.
+            </li>
+            <li>
+              <strong>Kaynak Yönetimi</strong>: Kaynakların etkin kullanımını
+              planlamak ve optimize etmek için.
+            </li>
+            <li>
+              <strong>İş Yükü Dağılımı</strong>: Çalışanlar arasındaki iş yükü
+              dağılımını değerlendirmek ve dengelemek için.
+            </li>
+          </ol>
+        </div>
+      ),
+
+      target: () => ref1.current,
+    },
+  ];
 
   return (
     <div
@@ -356,7 +400,7 @@ const IsTalebiTipleri = () => {
           }}
         >
           <div style={{ width: "100%", height: "calc(100% - 5px)" }}>
-            <StyledResponsiveContainer width="100%" height="100%">
+            <StyledResponsiveContainer ref={ref1} width="100%" height="100%">
               <PieChart width={400} height={400}>
                 <Pie
                   data={data.filter((entry) => visibleSeries[entry.name])}
@@ -383,6 +427,7 @@ const IsTalebiTipleri = () => {
           </div>
         </div>
       )}
+      <Tour open={open} onClose={() => setOpen(false)} steps={steps} />
       <Modal
         title={
           <div
