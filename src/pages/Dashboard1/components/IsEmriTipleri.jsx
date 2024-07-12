@@ -12,6 +12,7 @@ import { Spin, Typography, Tooltip, Popover, Button, Modal } from "antd";
 import chroma from "chroma-js";
 import styled from "styled-components";
 import { MoreOutlined, PrinterOutlined } from "@ant-design/icons";
+import html2pdf from "html2pdf.js";
 
 const { Text } = Typography;
 
@@ -74,6 +75,19 @@ function IsEmriTipleri(props) {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const downloadPDF = () => {
+    const element = document.getElementById("is-emri-tipleri");
+    const opt = {
+      margin: 10,
+      filename: "is_emri_tipleri.pdf",
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "mm", format: "a4", orientation: "landscape" },
+    };
+
+    html2pdf().set(opt).from(element).save();
+  };
 
   const renderActiveShape = (props) => {
     const RADIAN = Math.PI / 180;
@@ -373,7 +387,7 @@ function IsEmriTipleri(props) {
             </div>
             <PrinterOutlined
               style={{ cursor: "pointer", fontSize: "20px" }}
-              // onClick={downloadPDF}
+              onClick={downloadPDF}
             />
           </div>
         }
@@ -392,7 +406,11 @@ function IsEmriTipleri(props) {
             height: "calc(100vh - 180px)",
           }}
         >
-          <StyledResponsiveContainer width="100%" height="100%">
+          <StyledResponsiveContainer
+            id="is-emri-tipleri"
+            width="100%"
+            height="100%"
+          >
             <PieChart width="100%" height="100%">
               <Pie
                 activeIndex={activeIndex}
