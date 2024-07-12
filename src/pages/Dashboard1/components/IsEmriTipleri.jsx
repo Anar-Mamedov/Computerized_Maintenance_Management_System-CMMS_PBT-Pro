@@ -47,6 +47,7 @@ function IsEmriTipleri(props) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [colors, setColors] = useState([]);
   const [visibleSeries, setVisibleSeries] = useState({});
+  const [chartHeader, setChartHeader] = useState("İş Emri Tipleri");
   const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false); // Expanded modal visibility state
 
   const fetchData = async () => {
@@ -55,6 +56,29 @@ function IsEmriTipleri(props) {
       const response = await AxiosInstance.get(`GetIsEmriTipEnvanter?ID=2`);
       const transformedData = response.map((item) => ({
         name: item.ISEMRI_TIPI,
+        value: Number(item.ISEMRI_SAYISI),
+      }));
+      setData(transformedData);
+      setColors(generateColors(transformedData.length));
+
+      const initialVisibleSeries = transformedData.reduce((acc, item) => {
+        acc[item.name] = true;
+        return acc;
+      }, {});
+      setVisibleSeries(initialVisibleSeries);
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchData1 = async () => {
+    setIsLoading(true);
+    try {
+      const response = await AxiosInstance.get(`GetIsEmriDurumEnvanter?ID=2`);
+      const transformedData = response.map((item) => ({
+        name: item.ISEMRI_DURUMU,
         value: Number(item.ISEMRI_SAYISI),
       }));
       setData(transformedData);
@@ -160,7 +184,7 @@ function IsEmriTipleri(props) {
           y={ey}
           textAnchor={textAnchor}
           fill="#333"
-        >{`İş Emri Sayısı: ${value}`}</text>
+        >{`Sayısı: ${value}`}</text>
         <text
           x={ex + (cos >= 0 ? 1 : -1) * 12}
           y={ey}
@@ -267,6 +291,24 @@ function IsEmriTipleri(props) {
       >
         Büyüt
       </div>
+      <div
+        style={{ cursor: "pointer" }}
+        onClick={() => {
+          fetchData();
+          setChartHeader("İş Emri Tipleri");
+        }}
+      >
+        İş Emri Tipleri
+      </div>
+      <div
+        style={{ cursor: "pointer" }}
+        onClick={() => {
+          fetchData1();
+          setChartHeader("İş Emri Durumları");
+        }}
+      >
+        İş Emri Durumları
+      </div>
     </div>
   );
 
@@ -303,7 +345,7 @@ function IsEmriTipleri(props) {
             maxWidth: "calc(100% - 50px)",
           }}
         >
-          İş Emri Tipleri
+          {chartHeader}
         </Text>
         <Popover placement="bottom" content={content} trigger="click">
           <Button
@@ -383,7 +425,7 @@ function IsEmriTipleri(props) {
               }}
               title={`Toplam Harcanan İş Gücü `}
             >
-              İş Emri Tipleri
+              {chartHeader}
             </div>
             <PrinterOutlined
               style={{ cursor: "pointer", fontSize: "20px" }}
