@@ -259,7 +259,7 @@ function MakineTiplerineGore(props) {
             <CSVLink
               data={data}
               headers={csvHeaders}
-              filename={`personel_raporu.csv`}
+              filename={`makine_tiplerine_gore_envanter_dagilimi.csv`}
               className="ant-btn ant-btn-primary"
             >
               <Button
@@ -327,7 +327,7 @@ function MakineTiplerineGore(props) {
               <CSVLink
                 data={data}
                 headers={csvHeaders}
-                filename={`personel_raporu.csv`}
+                filename={`makine_tiplerine_gore_envanter_dagilimi.csv`}
                 className="ant-btn ant-btn-primary"
               >
                 <Button

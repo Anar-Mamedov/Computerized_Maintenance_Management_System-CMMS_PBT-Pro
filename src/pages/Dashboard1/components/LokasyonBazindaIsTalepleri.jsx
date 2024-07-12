@@ -436,7 +436,7 @@ function LokasyonBazindaIsTalepleri(props) {
             <CSVLink
               data={data}
               headers={csvHeaders}
-              filename={`personel_raporu.csv`}
+              filename={`lokasyon_bazinda_is_talebi.csv`}
               className="ant-btn ant-btn-primary"
             >
               <Button
@@ -605,7 +605,7 @@ function LokasyonBazindaIsTalepleri(props) {
               <CSVLink
                 data={data}
                 headers={csvHeaders}
-                filename={`personel_raporu.csv`}
+                filename={`lkasyon_bazinda_is_talepleri.csv`}
                 className="ant-btn ant-btn-primary"
               >
                 <Button

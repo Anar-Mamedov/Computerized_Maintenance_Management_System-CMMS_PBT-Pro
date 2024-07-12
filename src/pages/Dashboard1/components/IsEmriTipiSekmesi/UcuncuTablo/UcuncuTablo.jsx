@@ -295,7 +295,7 @@ export default function UcuncuTablo({
             <CSVLink
               data={data}
               headers={csvHeaders}
-              filename={`personel_raporu.csv`}
+              filename={`is_emirleri.csv`}
               className="ant-btn ant-btn-primary"
             >
               <Button

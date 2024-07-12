@@ -267,7 +267,7 @@ export default function MainTable({ isActive }) {
         <CSVLink
           data={data}
           headers={csvHeaders}
-          filename={`personel_raporu.csv`}
+          filename={`is_emri_tipi_analizi.csv`}
           className="ant-btn ant-btn-primary"
         >
           <Button
