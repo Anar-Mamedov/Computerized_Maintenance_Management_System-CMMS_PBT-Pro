@@ -499,51 +499,30 @@ function ToplamHarcananIsGucu(props = {}) {
           }}
         >
           <p>
-            İşlemlerinin zaman içerisindeki dağılımının grafiği, iş emri
-            verilerini daha iyi anlamak ve analiz etmek için çeşitli avantajlar
-            sunar:
+            Belirli bir süre zarfında tüm çalışanlar tarafından harcanan iş gücü
+            toplamının atölyelere dağılımını ifade eder. Bu kavram, genellikle
+            aşağıdaki amaçlar için kullanılır:
           </p>
           <ol>
             <li>
-              <strong>Trendlerin Belirlenmesi</strong>: İşlemlerin zaman
-              içindeki değişimini görsel olarak analiz ederek, belirli
-              dönemlerde artış veya azalış gösteren trendleri kolayca tespit
-              edebilirsiniz.
+              <strong>Genel Verimlilik Analizi</strong>: Organizasyonun genel
+              verimliliğini değerlendirmek için.
             </li>
             <li>
-              <strong>Mevsimsellik ve Döngüsellik</strong>: Yılın belirli
-              dönemlerinde (örneğin, tatil sezonları veya belirli aylarda) artan
-              veya azalan işlem hacimlerini görerek mevsimsel veya döngüsel
-              paternleri belirleyebilirsiniz.
+              <strong>Proje ve Görev Takibi</strong>: Bir proje veya görev için
+              harcanan toplam zamanı ve çabayı belirlemek için.
             </li>
             <li>
-              <strong>Anormalliklerin Tespiti</strong>: Beklenen trendlerden
-              sapma gösteren anormallikleri (örneğin, ani artışlar veya
-              düşüşler) tespit ederek, potansiyel sorunlara veya fırsatlara
-              dikkat çekebilirsiniz.
+              <strong>Maliyet Kontrolü</strong>: İş gücü maliyetlerini kontrol
+              etmek ve bütçelendirme yapmak için.
             </li>
             <li>
-              <strong>Performans İzleme</strong>: İşlemlerin zaman içindeki
-              performansını izleyerek, belirli dönemlerdeki performans
-              değişikliklerini değerlendirebilirsiniz. Bu, işletme süreçlerini
-              iyileştirme fırsatları sunar.
+              <strong>Kaynak Yönetimi</strong>: Kaynakların etkin kullanımını
+              planlamak ve optimize etmek için.
             </li>
             <li>
-              <strong>Karar Verme</strong>: Görsel veriler, yöneticilerin ve
-              karar vericilerin daha bilinçli ve veriye dayalı kararlar almasına
-              yardımcı olabilir. İşlem hacmindeki değişiklikler, stratejik
-              planlamada önemli rol oynayabilir.
-            </li>
-            <li>
-              <strong>Kaynak Tahsisi</strong>: İşlem yoğunluğunun yüksek olduğu
-              dönemleri belirleyerek, bu dönemlerde daha fazla kaynak tahsis
-              edebilir ve hizmet kalitesini artırabilirsiniz.
-            </li>
-            <li>
-              <strong>Tahmin ve Planlama</strong>: Geçmiş verilerden elde edilen
-              trendler ve paternler, gelecekteki işlem hacmini tahmin etmek için
-              kullanılabilir. Bu da stok yönetimi, personel planlaması ve bütçe
-              hazırlama gibi konularda fayda sağlar
+              <strong>İş Yükü Dağılımı</strong>: Çalışanlar arasındaki iş yükü
+              dağılımını değerlendirmek ve dengelemek için.
             </li>
           </ol>
         </div>
