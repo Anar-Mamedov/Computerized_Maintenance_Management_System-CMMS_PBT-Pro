@@ -599,7 +599,16 @@ function MainDashboard() {
   };
 
   const content = (
-    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+        height: "calc(-200px + 100vh)",
+        maxHeight: "610px",
+        overflowY: "auto",
+      }}
+    >
       <div
         style={{
           display: "flex",
