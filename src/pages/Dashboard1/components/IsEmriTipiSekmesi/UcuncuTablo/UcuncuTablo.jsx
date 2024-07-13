@@ -169,7 +169,7 @@ export default function UcuncuTablo({
     },
 
     {
-      title: "Toplam Çalışma Süresi",
+      title: "Çalışma Süresi (dk.)",
       dataIndex: "TOPLAM_CALISMA_SURESI",
       key: "TOPLAM_CALISMA_SURESI",
       width: 200,
@@ -177,7 +177,7 @@ export default function UcuncuTablo({
     },
 
     {
-      title: "Toplam Maliyet",
+      title: "Maliyet",
       dataIndex: "TOPLAM_MALIYET",
       key: "TOPLAM_MALIYET",
       width: 200,

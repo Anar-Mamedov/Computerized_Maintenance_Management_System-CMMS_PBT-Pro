@@ -129,6 +129,9 @@ export default function MainTable({ isActive }) {
       key: "ISEMRI_TIPI",
       width: 200,
       ellipsis: true,
+      render: (text, record) => (
+        <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
+      ),
     },
     {
       title: "İş Emri Sayısı",
@@ -138,14 +141,14 @@ export default function MainTable({ isActive }) {
       ellipsis: true,
     },
     {
-      title: "Toplam Çalışma Süresi",
+      title: "Toplam Çalışma Süresi (dk.)",
       dataIndex: "TOPLAM_CALISMA_SURESI",
       key: "TOPLAM_CALISMA_SURESI",
       width: 200,
       ellipsis: true,
     },
     {
-      title: "Ortalama Çalışma Süresi",
+      title: "Ortalama Çalışma Süresi (dk.)",
       dataIndex: "ORTALAMA_CALISMA_SURESI",
       key: "ORTALAMA_CALISMA_SURESI",
       width: 200,
@@ -287,9 +290,9 @@ export default function MainTable({ isActive }) {
         //   selectedRowKeys,
         //   onChange: onRowSelectChange,
         // }}
-        onRow={(record) => ({
-          onClick: () => onRowClick(record),
-        })}
+        // onRow={(record) => ({
+        //   onClick: () => onRowClick(record),
+        // })}
         pagination={{
           defaultPageSize: 10,
           showSizeChanger: true,
