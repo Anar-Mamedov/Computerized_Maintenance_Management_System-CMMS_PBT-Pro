@@ -278,7 +278,7 @@ const IsTalebiTipleri = () => {
           setChartHeader("İş Talebi Tipleri");
         }}
       >
-        İş Emri Tipleri
+        İş Talebi Tipleri
       </div>
       <div
         style={{ cursor: "pointer" }}
@@ -287,7 +287,7 @@ const IsTalebiTipleri = () => {
           setChartHeader("İş Talebi Durumları");
         }}
       >
-        İş Emri Durumları
+        İş Talebi Durumları
       </div>
       <div style={{ cursor: "pointer" }} onClick={() => setOpen(true)}>
         Bilgi
