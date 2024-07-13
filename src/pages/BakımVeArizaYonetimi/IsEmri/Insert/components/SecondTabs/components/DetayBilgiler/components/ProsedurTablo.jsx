@@ -237,6 +237,15 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
     }
   };
 
+  useEffect(() => {
+    if (!isModalVisible) {
+      setSearchTerm1("");
+      setSearchTerm2("");
+      setFilteredData1([]);
+      setFilteredData2([]);
+    }
+  }, [isModalVisible]);
+
   // sekmelerin içerisindeki tablo bileşenleri
 
   const tabItems = [

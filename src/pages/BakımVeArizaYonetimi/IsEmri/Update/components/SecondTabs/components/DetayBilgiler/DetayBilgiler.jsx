@@ -1052,7 +1052,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       fontWeight: fieldRequirements.aciklama ? "600" : "normal",
                     }}
                   >
-                    Açıklama:
+                    İş Talebi Açıklaması:
                   </Text>
                   <div
                     style={{
@@ -1066,6 +1066,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   >
                     <Controller
                       name="aciklama"
+                      disabled
                       control={control}
                       rules={{
                         required: fieldRequirements.aciklama

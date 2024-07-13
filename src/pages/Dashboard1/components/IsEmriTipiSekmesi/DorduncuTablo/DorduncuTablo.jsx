@@ -165,7 +165,7 @@ export default function DorduncuTablo({
     },
 
     {
-      title: "Toplam Çalışma Süresi",
+      title: "Toplam Çalışma Süresi (dk.)",
       dataIndex: "TOPLAM_CALISMA_SURESI",
       key: "TOPLAM_CALISMA_SURESI",
       width: 200,

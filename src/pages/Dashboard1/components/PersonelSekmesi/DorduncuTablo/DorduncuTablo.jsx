@@ -168,23 +168,23 @@ export default function DorduncuTablo({
       ellipsis: true,
     },
 
-    {
-      title: "Personel İsim",
-      dataIndex: "PRS_ISIM",
-      key: "PRS_ISIM",
-      width: 200,
-      ellipsis: true,
-    },
-    {
-      title: "Ünvan",
-      dataIndex: "PRS_UNVAN",
-      key: "PRS_UNVAN",
-      width: 200,
-      ellipsis: true,
-    },
+    // {
+    //   title: "Personel İsim",
+    //   dataIndex: "PRS_ISIM",
+    //   key: "PRS_ISIM",
+    //   width: 200,
+    //   ellipsis: true,
+    // },
+    // {
+    //   title: "Ünvan",
+    //   dataIndex: "PRS_UNVAN",
+    //   key: "PRS_UNVAN",
+    //   width: 200,
+    //   ellipsis: true,
+    // },
 
     {
-      title: "Toplam Çalışma Süresi",
+      title: "Çalışma Süresi (dk.)",
       dataIndex: "TOPLAM_CALISMA_SURESI",
       key: "TOPLAM_CALISMA_SURESI",
       width: 200,
@@ -192,7 +192,7 @@ export default function DorduncuTablo({
     },
 
     {
-      title: "Toplam Maliyet",
+      title: "Maliyet",
       dataIndex: "TOPLAM_MALIYET",
       key: "TOPLAM_MALIYET",
       width: 200,
