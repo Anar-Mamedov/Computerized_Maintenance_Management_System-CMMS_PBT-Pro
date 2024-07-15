@@ -279,3 +279,7 @@ template {
 [hidden] {
   display: none;
 }
+
+.ant-input-disabled {
+  color: rgb(0, 0, 0) !important;
+}
