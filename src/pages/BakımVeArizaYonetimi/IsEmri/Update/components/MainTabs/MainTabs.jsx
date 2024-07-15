@@ -635,7 +635,7 @@ export default function MainTabs({
             flexDirection: "column",
             gap: "10px",
             width: "100%",
-            maxWidth: "755px",
+            maxWidth: "740px",
           }}
         >
           <div
