@@ -283,3 +283,9 @@ template {
 .ant-input-disabled {
   color: rgb(0, 0, 0) !important;
 }
+.ant-select-selection-item {
+  color: rgb(0, 0, 0) !important;
+}
+:where(.css-dev-only-do-not-override-j9bb5n).ant-picker-outlined.ant-picker-disabled input[disabled] {
+  color: rgb(0, 0, 0) !important;
+}
