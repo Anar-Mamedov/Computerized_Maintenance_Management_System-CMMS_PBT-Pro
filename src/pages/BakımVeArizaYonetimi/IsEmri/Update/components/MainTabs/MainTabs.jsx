@@ -73,7 +73,11 @@ const StyledDivMedia = styled.div`
   }
 `;
 
-export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) {
+export default function MainTabs({
+  drawerOpen,
+  isDisabled,
+  fieldRequirements,
+}) {
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const {
@@ -86,6 +90,26 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
   // garanti bitiş tarihi alanını izleme ve ona göre yazı yazdırma
   const garantiBitis = watch("garantiBitis"); // garantiBitis alanını izle
   const [garantiDurumu, setGarantiDurumu] = useState(""); // Garanti durum metnini tutacak state
+
+  // duzenlenmeTarihi ve duzenlenmeSaati alanlarının boş ve ye sistem tarih ve saatinden büyük olup olmadığını kontrol etmek için bir fonksiyon
+
+  const validateDateTime = (value) => {
+    const date = watch("duzenlenmeTarihi");
+    const time = watch("duzenlenmeSaati");
+    if (!date || !time) {
+      return "Alan Boş Bırakılamaz!";
+    }
+    const currentTime = dayjs();
+    const inputDateTime = dayjs(
+      `${dayjs(date).format("YYYY-MM-DD")} ${dayjs(time).format("HH:mm")}`
+    );
+    if (inputDateTime.isAfter(currentTime)) {
+      return "Düzenlenme tarihi ve saati mevcut tarih ve saatten büyük olamaz";
+    }
+    return true;
+  };
+
+  // duzenlenmeTarihi ve duzenlenmeSaati alanlarının boş ve ye sistem tarih ve saatinden büyük olup olmadığını kontrol etmek için bir fonksiyon sonu
 
   // Watch the 'kapali' field from the form
   const kapali = watch("kapali"); // Assuming 'kapali' is the name of the field in your form
@@ -173,7 +197,9 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
 
     // Örnek bir tarih formatla ve ay formatını belirle
     const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
-    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(
+      sampleDate
+    );
 
     let monthFormat;
     if (sampleFormatted.includes("January")) {
@@ -206,7 +232,14 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
       // Saat ve dakika değerlerinin geçerliliğini kontrol et
       const hoursInt = parseInt(hours, 10);
       const minutesInt = parseInt(minutes, 10);
-      if (isNaN(hoursInt) || isNaN(minutesInt) || hoursInt < 0 || hoursInt > 23 || minutesInt < 0 || minutesInt > 59) {
+      if (
+        isNaN(hoursInt) ||
+        isNaN(minutesInt) ||
+        hoursInt < 0 ||
+        hoursInt > 23 ||
+        minutesInt < 0 ||
+        minutesInt > 59
+      ) {
         throw new Error("Invalid time format");
       }
 
@@ -239,10 +272,18 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
     const dateFormatter = new Intl.DateTimeFormat(navigator.language);
     const sampleDate = new Date(2021, 10, 21);
     const formattedSampleDate = dateFormatter.format(sampleDate);
-    setLocaleDateFormat(formattedSampleDate.replace("2021", "YYYY").replace("21", "DD").replace("11", "MM"));
+    setLocaleDateFormat(
+      formattedSampleDate
+        .replace("2021", "YYYY")
+        .replace("21", "DD")
+        .replace("11", "MM")
+    );
 
     // Format the time based on the user's locale
-    const timeFormatter = new Intl.DateTimeFormat(navigator.language, { hour: "numeric", minute: "numeric" });
+    const timeFormatter = new Intl.DateTimeFormat(navigator.language, {
+      hour: "numeric",
+      minute: "numeric",
+    });
     const sampleTime = new Date(2021, 10, 21, 13, 45); // Use a sample time, e.g., 13:45
     const formattedSampleTime = timeFormatter.format(sampleTime);
 
@@ -261,8 +302,16 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
         marginBottom: "15px",
         gap: "20px",
         rowGap: "10px",
-      }}>
-      <div style={{ display: "flex", gap: "20px", width: "100%", flexWrap: "wrap" }}>
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          gap: "20px",
+          width: "100%",
+          flexWrap: "wrap",
+        }}
+      >
         <div
           style={{
             display: "flex",
@@ -271,9 +320,21 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
             gap: "10px",
             width: "100%",
             maxWidth: "450px",
-          }}>
-          <div style={{ borderBottom: "1px solid #e8e8e8", marginBottom: "5px", paddingBottom: "5px", width: "100%" }}>
-            <Text style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}>Genel Bilgiler</Text>
+          }}
+        >
+          <div
+            style={{
+              borderBottom: "1px solid #e8e8e8",
+              marginBottom: "5px",
+              paddingBottom: "5px",
+              width: "100%",
+            }}
+          >
+            <Text
+              style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}
+            >
+              Genel Bilgiler
+            </Text>
           </div>
           <div
             style={{
@@ -285,8 +346,11 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
               maxWidth: "450px",
               gap: "10px",
               rowGap: "0px",
-            }}>
-            <Text style={{ fontSize: "14px", fontWeight: "600" }}>İş Emri No:</Text>
+            }}
+          >
+            <Text style={{ fontSize: "14px", fontWeight: "600" }}>
+              İş Emri No:
+            </Text>
             <div
               style={{
                 display: "flex",
@@ -296,15 +360,29 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 minWidth: "300px",
                 gap: "10px",
                 width: "100%",
-              }}>
+              }}
+            >
               <Controller
                 name="isEmriNo"
                 control={control}
                 rules={{ required: "Alan Boş Bırakılamaz!" }}
                 render={({ field, fieldState: { error } }) => (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
-                    <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
-                    {error && <div style={{ color: "red" }}>{error.message}</div>}
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "5px",
+                      width: "100%",
+                    }}
+                  >
+                    <Input
+                      {...field}
+                      status={error ? "error" : ""}
+                      style={{ flex: 1 }}
+                    />
+                    {error && (
+                      <div style={{ color: "red" }}>{error.message}</div>
+                    )}
                   </div>
                 )}
               />
@@ -330,8 +408,11 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
               gap: "10px",
               width: "100%",
               justifyContent: "space-between",
-            }}>
-            <Text style={{ fontSize: "14px", fontWeight: "600" }}>Düzenlenme Tarihi:</Text>
+            }}
+          >
+            <Text style={{ fontSize: "14px", fontWeight: "600" }}>
+              Düzenlenme Tarihi:
+            </Text>
             <div
               style={{
                 display: "flex",
@@ -341,11 +422,12 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 minWidth: "300px",
                 gap: "10px",
                 width: "100%",
-              }}>
+              }}
+            >
               <Controller
                 name="duzenlenmeTarihi"
                 control={control}
-                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                rules={{ validate: validateDateTime }}
                 render={({ field, fieldState: { error } }) => (
                   <DatePicker
                     {...field}
@@ -360,11 +442,12 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
               <Controller
                 name="duzenlenmeSaati"
                 control={control}
-                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                rules={{ validate: validateDateTime }}
                 render={({ field, fieldState: { error } }) => (
                   <TimePicker
                     {...field}
-                    status={errors.duzenlenmeSaati ? "error" : ""}
+                    // status={errors.duzenlenmeSaati ? "error" : ""}
+                    status={error ? "error" : ""}
                     // disabled={!isDisabled}
                     style={{ width: "110px" }}
                     format={localeTimeFormat}
@@ -372,7 +455,11 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                   />
                 )}
               />
-              {errors.duzenlenmeSaati && <div style={{ color: "red" }}>{errors.duzenlenmeSaati.message}</div>}
+              {errors.duzenlenmeSaati && (
+                <div style={{ color: "red" }}>
+                  {errors.duzenlenmeSaati.message}
+                </div>
+              )}
             </div>
           </div>
           <div style={{ width: "100%", maxWidth: "450px" }}>
@@ -383,12 +470,22 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 alignItems: "flex-start",
                 justifyContent: "space-between",
                 width: "100%",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: "600" }}>İş Emri Tipi:</Text>
+              }}
+            >
+              <Text style={{ fontSize: "14px", fontWeight: "600" }}>
+                İş Emri Tipi:
+              </Text>
               <IsEmriTipiSelect fieldRequirements={fieldRequirements} />
             </StyledDivBottomLine>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              flexWrap: "wrap",
+            }}
+          >
             <StyledDivBottomLine
               style={{
                 display: "flex",
@@ -396,8 +493,11 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 justifyContent: "space-between",
                 width: "100%",
                 maxWidth: "450px",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: "600" }}>Durum:</Text>
+              }}
+            >
+              <Text style={{ fontSize: "14px", fontWeight: "600" }}>
+                Durum:
+              </Text>
               <div
                 style={{
                   display: "flex",
@@ -405,7 +505,8 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                   alignItems: "center",
                   justifyContent: "space-between",
                   width: "300px",
-                }}>
+                }}
+              >
                 <Controller
                   name="isEmriDurum"
                   control={control}
@@ -439,12 +540,21 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                   }}
                 />
                 {errors.isEmriDurum && (
-                  <div style={{ color: "red", marginTop: "10px" }}>{errors.isEmriDurum.message}</div>
+                  <div style={{ color: "red", marginTop: "10px" }}>
+                    {errors.isEmriDurum.message}
+                  </div>
                 )}
               </div>
             </StyledDivBottomLine>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              flexWrap: "wrap",
+            }}
+          >
             <StyledDivBottomLine
               style={{
                 display: "flex",
@@ -452,8 +562,16 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 justifyContent: "space-between",
                 width: "100%",
                 maxWidth: "450px",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.bagliIsEmriTanim ? "600" : "normal" }}>
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: "14px",
+                  fontWeight: fieldRequirements.bagliIsEmriTanim
+                    ? "600"
+                    : "normal",
+                }}
+              >
                 Bağlı İş Emri:
               </Text>
               <div
@@ -463,11 +581,16 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                   alignItems: "center",
                   justifyContent: "space-between",
                   width: "300px",
-                }}>
+                }}
+              >
                 <Controller
                   name="bagliIsEmriTanim"
                   control={control}
-                  rules={{ required: fieldRequirements.bagliIsEmriTanim ? "Alan Boş Bırakılamaz!" : false }}
+                  rules={{
+                    required: fieldRequirements.bagliIsEmriTanim
+                      ? "Alan Boş Bırakılamaz!"
+                      : false,
+                  }}
                   render={({ field }) => (
                     <Input
                       {...field}
@@ -497,7 +620,9 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 />
                 <Button onClick={handleBagliIsEmriMinusClick}> - </Button>
                 {errors.bagliIsEmriTanim && (
-                  <div style={{ color: "red", marginTop: "5px" }}>{errors.bagliIsEmriTanim.message}</div>
+                  <div style={{ color: "red", marginTop: "5px" }}>
+                    {errors.bagliIsEmriTanim.message}
+                  </div>
                 )}
               </div>
             </StyledDivBottomLine>
@@ -511,9 +636,21 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
             gap: "10px",
             width: "100%",
             maxWidth: "755px",
-          }}>
-          <div style={{ borderBottom: "1px solid #e8e8e8", marginBottom: "5px", paddingBottom: "5px", width: "100%" }}>
-            <Text style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}>Makine / Lokasyon Bilgileri</Text>
+          }}
+        >
+          <div
+            style={{
+              borderBottom: "1px solid #e8e8e8",
+              marginBottom: "5px",
+              paddingBottom: "5px",
+              width: "100%",
+            }}
+          >
+            <Text
+              style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}
+            >
+              Makine / Lokasyon Bilgileri
+            </Text>
           </div>
           <StyledDivMedia
             style={{
@@ -523,8 +660,14 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
               justifyContent: "space-between",
               width: "100%",
               maxWidth: "755px",
-            }}>
-            <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.lokasyonTanim ? "600" : "normal" }}>
+            }}
+          >
+            <Text
+              style={{
+                fontSize: "14px",
+                fontWeight: fieldRequirements.lokasyonTanim ? "600" : "normal",
+              }}
+            >
               Lokasyon:
             </Text>
             <div>
@@ -538,11 +681,16 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                     justifyContent: "space-between",
                     minWidth: "300px",
                     gap: "3px",
-                  }}>
+                  }}
+                >
                   <Controller
                     name="lokasyonTanim"
                     control={control}
-                    rules={{ required: fieldRequirements.lokasyonTanim ? "Alan Boş Bırakılamaz!" : false }}
+                    rules={{
+                      required: fieldRequirements.lokasyonTanim
+                        ? "Alan Boş Bırakılamaz!"
+                        : false,
+                    }}
                     render={({ field }) => (
                       <Input
                         {...field}
@@ -588,11 +736,20 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
               </div>
 
               {errors.lokasyonTanim && (
-                <div style={{ color: "red", marginTop: "5px" }}>{errors.lokasyonTanim.message}</div>
+                <div style={{ color: "red", marginTop: "5px" }}>
+                  {errors.lokasyonTanim.message}
+                </div>
               )}
             </div>
           </StyledDivMedia>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              flexWrap: "wrap",
+            }}
+          >
             <StyledDivBottomLine
               style={{
                 display: "flex",
@@ -600,9 +757,23 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 justifyContent: "space-between",
                 width: "100%",
                 maxWidth: "755px",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.makine ? "600" : "normal" }}>Makine:</Text>
-              <div style={{ display: "flex", flexWrap: "wrap", flexDirection: "column" }}>
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: "14px",
+                  fontWeight: fieldRequirements.makine ? "600" : "normal",
+                }}
+              >
+                Makine:
+              </Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  flexDirection: "column",
+                }}
+              >
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
                   <div
                     style={{
@@ -611,11 +782,16 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                       alignItems: "center",
                       justifyContent: "space-between",
                       width: "300px",
-                    }}>
+                    }}
+                  >
                     <Controller
                       name="makine"
                       control={control}
-                      rules={{ required: fieldRequirements.makine ? "Alan Boş Bırakılamaz!" : false }}
+                      rules={{
+                        required: fieldRequirements.makine
+                          ? "Alan Boş Bırakılamaz!"
+                          : false,
+                      }}
                       render={({ field }) => (
                         <Input
                           {...field}
@@ -644,10 +820,19 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                         setValue("makineTanim", selectedData.MKN_TANIM);
                         setValue("lokasyonID", selectedData.MKN_LOKASYON_ID);
                         setValue("lokasyonTanim", selectedData.MKN_LOKASYON);
-                        setValue("tamLokasyonTanim", selectedData.MKN_LOKASYON_TUM_YOL);
+                        setValue(
+                          "tamLokasyonTanim",
+                          selectedData.MKN_LOKASYON_TUM_YOL
+                        );
                         setValue("makineDurumu", selectedData.MKN_DURUM);
-                        setValue("makineDurumuID", selectedData.MKN_DURUM_KOD_ID);
-                        setValue("garantiBitis", formatDate(selectedData.MKN_GARANTI_BITIS));
+                        setValue(
+                          "makineDurumuID",
+                          selectedData.MKN_DURUM_KOD_ID
+                        );
+                        setValue(
+                          "garantiBitis",
+                          formatDate(selectedData.MKN_GARANTI_BITIS)
+                        );
                       }}
                     />
                     <Button onClick={handleMakineMinusClick}> - </Button>
@@ -665,11 +850,22 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                     )}
                   />
                 </div>
-                {errors.makine && <div style={{ color: "red", marginTop: "5px" }}>{errors.makine.message}</div>}
+                {errors.makine && (
+                  <div style={{ color: "red", marginTop: "5px" }}>
+                    {errors.makine.message}
+                  </div>
+                )}
               </div>
             </StyledDivBottomLine>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              flexWrap: "wrap",
+            }}
+          >
             <StyledDivBottomLine
               style={{
                 display: "flex",
@@ -677,12 +873,31 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 justifyContent: "space-between",
                 width: "100%",
                 maxWidth: "755px",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.garantiBitis ? "600" : "normal" }}>
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: "14px",
+                  fontWeight: fieldRequirements.garantiBitis ? "600" : "normal",
+                }}
+              >
                 Garanti Bitiş:
               </Text>
-              <div style={{ display: "flex", flexWrap: "wrap", flexDirection: "column" }}>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", alignItems: "center" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  flexDirection: "column",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "5px",
+                    alignItems: "center",
+                  }}
+                >
                   <div
                     style={{
                       display: "flex",
@@ -690,11 +905,16 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                       alignItems: "center",
                       justifyContent: "space-between",
                       width: "300px",
-                    }}>
+                    }}
+                  >
                     <Controller
                       name="garantiBitis"
                       control={control}
-                      rules={{ required: fieldRequirements.garantiBitis ? "Alan Boş Bırakılamaz!" : false }}
+                      rules={{
+                        required: fieldRequirements.garantiBitis
+                          ? "Alan Boş Bırakılamaz!"
+                          : false,
+                      }}
                       render={({ field }) => (
                         <Input
                           {...field}
@@ -711,18 +931,31 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                     style={{
                       fontSize: "14px",
                       width: "300px",
-                      color: garantiDurumu === "Garanti süresi doldu." ? "red" : "green",
-                    }}>
+                      color:
+                        garantiDurumu === "Garanti süresi doldu."
+                          ? "red"
+                          : "green",
+                    }}
+                  >
                     {garantiDurumu}
                   </Text>
                 </div>
                 {errors.garantiBitis && (
-                  <div style={{ color: "red", marginTop: "5px" }}>{errors.garantiBitis.message}</div>
+                  <div style={{ color: "red", marginTop: "5px" }}>
+                    {errors.garantiBitis.message}
+                  </div>
                 )}
               </div>
             </StyledDivBottomLine>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              flexWrap: "wrap",
+            }}
+          >
             <StyledDivBottomLine
               style={{
                 display: "flex",
@@ -730,11 +963,23 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 justifyContent: "space-between",
                 width: "100%",
                 maxWidth: "755px",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.ekipman ? "600" : "normal" }}>
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: "14px",
+                  fontWeight: fieldRequirements.ekipman ? "600" : "normal",
+                }}
+              >
                 Ekipman:
               </Text>
-              <div style={{ display: "flex", flexWrap: "wrap", flexDirection: "column" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  flexDirection: "column",
+                }}
+              >
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
                   <div
                     style={{
@@ -743,11 +988,16 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                       alignItems: "center",
                       justifyContent: "space-between",
                       width: "300px",
-                    }}>
+                    }}
+                  >
                     <Controller
                       name="ekipman"
                       control={control}
-                      rules={{ required: fieldRequirements.ekipman ? "Alan Boş Bırakılamaz!" : false }}
+                      rules={{
+                        required: fieldRequirements.ekipman
+                          ? "Alan Boş Bırakılamaz!"
+                          : false,
+                      }}
                       render={({ field }) => (
                         <Input
                           {...field}
@@ -791,11 +1041,22 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                     )}
                   />
                 </div>
-                {errors.ekipman && <div style={{ color: "red", marginTop: "5px" }}>{errors.ekipman.message}</div>}
+                {errors.ekipman && (
+                  <div style={{ color: "red", marginTop: "5px" }}>
+                    {errors.ekipman.message}
+                  </div>
+                )}
               </div>
             </StyledDivBottomLine>
           </div>
-          <div style={{ display: "flex", width: "100%", maxWidth: "755px", gap: "5px" }}>
+          <div
+            style={{
+              display: "flex",
+              width: "100%",
+              maxWidth: "755px",
+              gap: "5px",
+            }}
+          >
             <StyledDivBottomLine
               style={{
                 display: "flex",
@@ -803,8 +1064,14 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 alignItems: "flex-start",
                 justifyContent: "space-between",
                 width: "100%",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.makineDurumu ? "600" : "normal" }}>
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: "14px",
+                  fontWeight: fieldRequirements.makineDurumu ? "600" : "normal",
+                }}
+              >
                 Makine Durumu:
               </Text>
               <div
@@ -815,7 +1082,8 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                   maxWidth: "300px",
                   gap: "10px",
                   width: "100%",
-                }}>
+                }}
+              >
                 <MakineDurumu fieldRequirements={fieldRequirements} />
               </div>
             </StyledDivBottomLine>
@@ -826,20 +1094,39 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 justifyContent: "space-between",
                 width: "100%",
                 maxWidth: "300px",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.sayac ? "600" : "normal" }}>Sayaç:</Text>
-              <div style={{ display: "flex", flexWrap: "wrap", flexDirection: "column" }}>
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: "14px",
+                  fontWeight: fieldRequirements.sayac ? "600" : "normal",
+                }}
+              >
+                Sayaç:
+              </Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  flexDirection: "column",
+                }}
+              >
                 <div
                   style={{
                     display: "flex",
                     flexWrap: "wrap",
                     alignItems: "center",
                     justifyContent: "space-between",
-                  }}>
+                  }}
+                >
                   <Controller
                     name="sayac"
                     control={control}
-                    rules={{ required: fieldRequirements.sayac ? "Alan Boş Bırakılamaz!" : false }}
+                    rules={{
+                      required: fieldRequirements.sayac
+                        ? "Alan Boş Bırakılamaz!"
+                        : false,
+                    }}
                     render={({ field }) => (
                       <Input
                         {...field}
@@ -851,14 +1138,25 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                   />
                 </div>
 
-                {errors.sayac && <div style={{ color: "red", marginTop: "5px" }}>{errors.sayac.message}</div>}
+                {errors.sayac && (
+                  <div style={{ color: "red", marginTop: "5px" }}>
+                    {errors.sayac.message}
+                  </div>
+                )}
               </div>
             </StyledDivBottomLine>
           </div>
         </div>
 
         <div
-          style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "250px", height: "260px" }}>
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "250px",
+            height: "260px",
+          }}
+        >
           <ResimCarousel />
         </div>
       </div>
