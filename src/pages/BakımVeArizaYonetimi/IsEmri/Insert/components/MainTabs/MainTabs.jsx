@@ -90,6 +90,26 @@ export default function MainTabs({
   const garantiBitis = watch("garantiBitis"); // garantiBitis alanını izle
   const [garantiDurumu, setGarantiDurumu] = useState(""); // Garanti durum metnini tutacak state
 
+  // duzenlenmeTarihi ve duzenlenmeSaati alanlarının boş ve ye sistem tarih ve saatinden büyük olup olmadığını kontrol etmek için bir fonksiyon
+
+  const validateDateTime = (value) => {
+    const date = watch("duzenlenmeTarihi");
+    const time = watch("duzenlenmeSaati");
+    if (!date || !time) {
+      return "Alan Boş Bırakılamaz!";
+    }
+    const currentTime = dayjs();
+    const inputDateTime = dayjs(
+      `${dayjs(date).format("YYYY-MM-DD")} ${dayjs(time).format("HH:mm")}`
+    );
+    if (inputDateTime.isAfter(currentTime)) {
+      return "Düzenlenme tarihi ve saati mevcut tarih ve saatten büyük olamaz";
+    }
+    return true;
+  };
+
+  // duzenlenmeTarihi ve duzenlenmeSaati alanlarının boş ve ye sistem tarih ve saatinden büyük olup olmadığını kontrol etmek için bir fonksiyon sonu
+
   useEffect(() => {
     // garantiBitis değeri kontrol ediliyor
     if (garantiBitis) {
@@ -418,27 +438,31 @@ export default function MainTabs({
               <Controller
                 name="duzenlenmeTarihi"
                 control={control}
-                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                rules={{ validate: validateDateTime }}
                 render={({ field, fieldState: { error } }) => (
                   <DatePicker
                     {...field}
                     status={error ? "error" : ""}
-                    // disabled={!isDisabled}
                     style={{ width: "180px" }}
                     format={localeDateFormat}
                     placeholder="Tarih seçiniz"
                   />
                 )}
               />
+              {/*{errors.duzenlenmeTarihi && (*/}
+              {/*  <div style={{ color: "red" }}>*/}
+              {/*    {errors.duzenlenmeTarihi.message}*/}
+              {/*  </div>*/}
+              {/*)}*/}
+
               <Controller
                 name="duzenlenmeSaati"
                 control={control}
-                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                rules={{ validate: validateDateTime }}
                 render={({ field, fieldState: { error } }) => (
                   <TimePicker
                     {...field}
-                    status={errors.duzenlenmeSaati ? "error" : ""}
-                    // disabled={!isDisabled}
+                    status={error ? "error" : ""}
                     style={{ width: "110px" }}
                     format={localeTimeFormat}
                     placeholder="Saat seçiniz"
