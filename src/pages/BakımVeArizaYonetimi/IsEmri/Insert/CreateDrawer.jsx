@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { Button, Drawer, Space, ConfigProvider, Modal, message, Alert, Spin } from "antd";
+import {
+  Button,
+  Drawer,
+  Space,
+  ConfigProvider,
+  Modal,
+  message,
+  Alert,
+  Spin,
+} from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import tr_TR from "antd/es/locale/tr_TR";
 import AxiosInstance from "../../../../api/http";
@@ -305,7 +314,8 @@ export default function CreateDrawer({ onRefresh }) {
       ISM_MASRAF_MERKEZ_ID: data.masrafMerkeziID,
       ISM_PROJE_ID: data.projeID,
       ISM_REFERANS_NO: data.referansNo,
-      ISM_TAMAMLANMA_ORAN: data.tamamlanmaOranı === "" ? 0 : data.tamamlanmaOranı,
+      ISM_TAMAMLANMA_ORAN:
+        data.tamamlanmaOranı === "" ? 0 : data.tamamlanmaOranı,
       ISM_PLAN_BASLAMA_TARIH: formatDateWithDayjs(data.planlananBaslama),
       ISM_PLAN_BASLAMA_SAAT: formatTimeWithDayjs(data.planlananBaslamaSaati),
       ISM_PLAN_BITIS_TARIH: formatDateWithDayjs(data.planlananBitis),
@@ -372,7 +382,11 @@ export default function CreateDrawer({ onRefresh }) {
   return (
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
-        <Button type="primary" onClick={showDrawer} style={{ display: "flex", alignItems: "center" }}>
+        <Button
+          type="primary"
+          onClick={showDrawer}
+          style={{ display: "flex", alignItems: "center" }}
+        >
           <PlusOutlined />
           Ekle
         </Button>
@@ -399,21 +413,37 @@ export default function CreateDrawer({ onRefresh }) {
               <Button
                 type="submit"
                 onClick={methods.handleSubmit(onSubmit)}
-                style={{ backgroundColor: "#2bc770", borderColor: "#2bc770", color: "#ffffff" }}>
+                style={{
+                  backgroundColor: "#2bc770",
+                  borderColor: "#2bc770",
+                  color: "#ffffff",
+                }}
+              >
                 Kaydet
               </Button>
             </Space>
-          }>
+          }
+        >
           {loading ? (
             <Spin
               spinning={loading}
               size="large"
-              style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: "100vh",
+              }}
+            >
               {/* İçerik yüklenirken gösterilecek alan */}
             </Spin>
           ) : (
             <form onSubmit={methods.handleSubmit(onSubmit)}>
-              <MainTabs drawerOpen={open} isDisabled={isDisabled} fieldRequirements={fieldRequirements} />
+              <MainTabs
+                drawerOpen={open}
+                isDisabled={isDisabled}
+                fieldRequirements={fieldRequirements}
+              />
               <SecondTabs fieldRequirements={fieldRequirements} />
               <Footer />
             </form>
