@@ -76,7 +76,12 @@ const StyledDivMedia = styled.div`
   }
 `;
 
-export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequirements }) {
+export default function MainTabs({
+  drawerOpen,
+  disabled,
+  isDisabled,
+  fieldRequirements,
+}) {
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const {
@@ -87,6 +92,26 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
   } = useFormContext();
 
   const otonomBakimValue = watch("otonomBakim");
+
+  // duzenlenmeTarihi ve duzenlenmeSaati alanlarının boş ve ye sistem tarih ve saatinden büyük olup olmadığını kontrol etmek için bir fonksiyon
+
+  const validateDateTime = (value) => {
+    const date = watch("talepTarihi");
+    const time = watch("talepSaati");
+    if (!date || !time) {
+      return "Alan Boş Bırakılamaz!";
+    }
+    const currentTime = dayjs();
+    const inputDateTime = dayjs(
+      `${dayjs(date).format("YYYY-MM-DD")} ${dayjs(time).format("HH:mm")}`
+    );
+    if (inputDateTime.isAfter(currentTime)) {
+      return "Düzenlenme tarihi ve saati mevcut tarih ve saatten büyük olamaz";
+    }
+    return true;
+  };
+
+  // duzenlenmeTarihi ve duzenlenmeSaati alanlarının boş ve ye sistem tarih ve saatinden büyük olup olmadığını kontrol etmek için bir fonksiyon sonu
 
   const handleTalepteBulunanMinusClick = () => {
     setValue("talepteBulunan", "");
@@ -115,10 +140,18 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
     const dateFormatter = new Intl.DateTimeFormat(navigator.language);
     const sampleDate = new Date(2021, 10, 21);
     const formattedSampleDate = dateFormatter.format(sampleDate);
-    setLocaleDateFormat(formattedSampleDate.replace("2021", "YYYY").replace("21", "DD").replace("11", "MM"));
+    setLocaleDateFormat(
+      formattedSampleDate
+        .replace("2021", "YYYY")
+        .replace("21", "DD")
+        .replace("11", "MM")
+    );
 
     // Format the time based on the user's locale
-    const timeFormatter = new Intl.DateTimeFormat(navigator.language, { hour: "numeric", minute: "numeric" });
+    const timeFormatter = new Intl.DateTimeFormat(navigator.language, {
+      hour: "numeric",
+      minute: "numeric",
+    });
     const sampleTime = new Date(2021, 10, 21, 13, 45); // Use a sample time, e.g., 13:45
     const formattedSampleTime = timeFormatter.format(sampleTime);
 
@@ -138,7 +171,8 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
           marginBottom: "15px",
           gap: "20px",
           rowGap: "10px",
-        }}>
+        }}
+      >
         <div style={{ display: "flex", width: "100%", gap: "20px" }}>
           <div
             style={{
@@ -150,8 +184,11 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
               maxWidth: "450px",
               gap: "10px",
               rowGap: "0px",
-            }}>
-            <Text style={{ fontSize: "14px", fontWeight: "600" }}>Talep Kodu:</Text>
+            }}
+          >
+            <Text style={{ fontSize: "14px", fontWeight: "600" }}>
+              Talep Kodu:
+            </Text>
             <div
               style={{
                 display: "flex",
@@ -161,15 +198,30 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                 minWidth: "300px",
                 gap: "10px",
                 width: "100%",
-              }}>
+              }}
+            >
               <Controller
                 name="talepKodu"
                 control={control}
                 rules={{ required: "Alan Boş Bırakılamaz!" }}
                 render={({ field, fieldState: { error } }) => (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
-                    <Input {...field} disabled={disabled} status={error ? "error" : ""} style={{ flex: 1 }} />
-                    {error && <div style={{ color: "red" }}>{error.message}</div>}
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "5px",
+                      width: "100%",
+                    }}
+                  >
+                    <Input
+                      {...field}
+                      disabled={disabled}
+                      status={error ? "error" : ""}
+                      style={{ flex: 1 }}
+                    />
+                    {error && (
+                      <div style={{ color: "red" }}>{error.message}</div>
+                    )}
                   </div>
                 )}
               />
@@ -195,8 +247,11 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
               gap: "10px",
               width: "100%",
               justifyContent: "space-between",
-            }}>
-            <Text style={{ fontSize: "14px", fontWeight: "600" }}>Talep Tarihi:</Text>
+            }}
+          >
+            <Text style={{ fontSize: "14px", fontWeight: "600" }}>
+              Talep Tarihi:
+            </Text>
             <div
               style={{
                 display: "flex",
@@ -206,11 +261,12 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                 minWidth: "300px",
                 gap: "10px",
                 width: "100%",
-              }}>
+              }}
+            >
               <Controller
                 name="talepTarihi"
                 control={control}
-                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                rules={{ validate: validateDateTime }}
                 render={({ field, fieldState: { error } }) => (
                   <DatePicker
                     {...field}
@@ -225,19 +281,21 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
               <Controller
                 name="talepSaati"
                 control={control}
-                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                rules={{ validate: validateDateTime }}
                 render={({ field, fieldState: { error } }) => (
                   <TimePicker
                     {...field}
                     disabled={disabled}
-                    status={errors.talepSaati ? "error" : ""}
+                    status={error ? "error" : ""}
                     style={{ width: "110px" }}
                     format={localeTimeFormat}
                     placeholder="Saat seçiniz"
                   />
                 )}
               />
-              {errors.talepSaati && <div style={{ color: "red" }}>{errors.talepSaati.message}</div>}
+              {errors.talepSaati && (
+                <div style={{ color: "red" }}>{errors.talepSaati.message}</div>
+              )}
             </div>
           </div>
           <div
@@ -249,7 +307,8 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
               gap: "10px",
               width: "100%",
               justifyContent: "space-between",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px" }}>Kapanma Tarihi:</Text>
             <div
               style={{
@@ -260,19 +319,32 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                 minWidth: "300px",
                 gap: "10px",
                 width: "100%",
-              }}>
+              }}
+            >
               <Controller
                 name="kapanmaTarihi"
                 control={control}
                 render={({ field }) => (
-                  <DatePicker {...field} disabled style={{ width: "180px" }} format={localeDateFormat} placeholder="" />
+                  <DatePicker
+                    {...field}
+                    disabled
+                    style={{ width: "180px" }}
+                    format={localeDateFormat}
+                    placeholder=""
+                  />
                 )}
               />
               <Controller
                 name="kapanmaSaati"
                 control={control}
                 render={({ field }) => (
-                  <TimePicker {...field} disabled style={{ width: "110px" }} format={localeTimeFormat} placeholder="" />
+                  <TimePicker
+                    {...field}
+                    disabled
+                    style={{ width: "110px" }}
+                    format={localeTimeFormat}
+                    placeholder=""
+                  />
                 )}
               />
             </div>
@@ -287,8 +359,16 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
               gap: "10px",
               width: "100%",
               maxWidth: "450px",
-            }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                flexWrap: "wrap",
+              }}
+            >
               <StyledDivBottomLine
                 style={{
                   display: "flex",
@@ -296,8 +376,11 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                   justifyContent: "space-between",
                   width: "100%",
                   maxWidth: "450px",
-                }}>
-                <Text style={{ fontSize: "14px", fontWeight: "600" }}>Talepte Bulunan:</Text>
+                }}
+              >
+                <Text style={{ fontSize: "14px", fontWeight: "600" }}>
+                  Talepte Bulunan:
+                </Text>
                 <div
                   style={{
                     display: "flex",
@@ -305,7 +388,8 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                     alignItems: "center",
                     justifyContent: "space-between",
                     width: "300px",
-                  }}>
+                  }}
+                >
                   <Controller
                     name="talepteBulunan"
                     control={control}
@@ -344,12 +428,17 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                       setValue("email", selectedData.ISK_MAIL);
                     }}
                   />
-                  <Button disabled={disabled} onClick={handleTalepteBulunanMinusClick}>
+                  <Button
+                    disabled={disabled}
+                    onClick={handleTalepteBulunanMinusClick}
+                  >
                     {" "}
                     -{" "}
                   </Button>
                   {errors.talepteBulunan && (
-                    <div style={{ color: "red", marginTop: "5px" }}>{errors.talepteBulunan.message}</div>
+                    <div style={{ color: "red", marginTop: "5px" }}>
+                      {errors.talepteBulunan.message}
+                    </div>
                   )}
                 </div>
               </StyledDivBottomLine>
@@ -362,7 +451,8 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                 justifyContent: "space-between",
                 width: "100%",
                 maxWidth: "450px",
-              }}>
+              }}
+            >
               <Text style={{ fontSize: "14px" }}>Lokasyon:</Text>
               <div
                 className="anar"
@@ -373,7 +463,8 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                   justifyContent: "space-between",
                   minWidth: "300px",
                   gap: "3px",
-                }}>
+                }}
+              >
                 <Controller
                   name="lokasyonTanim"
                   control={control}
@@ -418,7 +509,8 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                   alignItems: "flex-start",
                   justifyContent: "space-between",
                   width: "100%",
-                }}>
+                }}
+              >
                 <Text style={{ fontSize: "14px" }}>Departman:</Text>
                 <Departman disabled={disabled} />
               </StyledDivBottomLine>
@@ -432,7 +524,8 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                 gap: "10px",
                 width: "100%",
                 justifyContent: "space-between",
-              }}>
+              }}
+            >
               <Text style={{ fontSize: "14px" }}>İrtibat Telefonu:</Text>
               <div
                 style={{
@@ -443,11 +536,14 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                   minWidth: "300px",
                   gap: "10px",
                   width: "100%",
-                }}>
+                }}
+              >
                 <Controller
                   name="irtibatTelefonu"
                   control={control}
-                  render={({ field }) => <Input {...field} disabled={disabled} style={{ flex: 1 }} />}
+                  render={({ field }) => (
+                    <Input {...field} disabled={disabled} style={{ flex: 1 }} />
+                  )}
                 />
               </div>
             </div>
@@ -460,7 +556,8 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                 gap: "10px",
                 width: "100%",
                 justifyContent: "space-between",
-              }}>
+              }}
+            >
               <Text style={{ fontSize: "14px" }}>E-Mail:</Text>
               <div
                 style={{
@@ -471,11 +568,14 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                   minWidth: "300px",
                   gap: "10px",
                   width: "100%",
-                }}>
+                }}
+              >
                 <Controller
                   name="email"
                   control={control}
-                  render={({ field }) => <Input {...field} disabled={disabled} style={{ flex: 1 }} />}
+                  render={({ field }) => (
+                    <Input {...field} disabled={disabled} style={{ flex: 1 }} />
+                  )}
                 />
               </div>
             </div>
@@ -488,7 +588,8 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
               gap: "10px",
               width: "100%",
               maxWidth: "450px",
-            }}>
+            }}
+          >
             <div style={{ width: "100%", maxWidth: "450px" }}>
               <StyledDivBottomLine
                 style={{
@@ -497,7 +598,8 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                   alignItems: "flex-start",
                   justifyContent: "space-between",
                   width: "100%",
-                }}>
+                }}
+              >
                 <Text style={{ fontSize: "14px" }}>İletişim Şekli:</Text>
                 <IletisimSekli disabled={disabled} />
               </StyledDivBottomLine>
@@ -510,7 +612,8 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                   alignItems: "flex-start",
                   justifyContent: "space-between",
                   width: "100%",
-                }}>
+                }}
+              >
                 <Text style={{ fontSize: "14px" }}>Talep Tipi:</Text>
                 <TalepTipi disabled={disabled} />
               </StyledDivBottomLine>
@@ -523,7 +626,8 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                   alignItems: "flex-start",
                   justifyContent: "space-between",
                   width: "100%",
-                }}>
+                }}
+              >
                 <Text style={{ fontSize: "14px" }}>İş Kategorisi:</Text>
                 <IsKategorisi disabled={disabled} />
               </StyledDivBottomLine>
@@ -536,7 +640,8 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                   alignItems: "flex-start",
                   justifyContent: "space-between",
                   width: "100%",
-                }}>
+                }}
+              >
                 <Text style={{ fontSize: "14px" }}>Servis Nedeni:</Text>
                 <ServisNedeni disabled={disabled} />
               </StyledDivBottomLine>
@@ -550,7 +655,8 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                 gap: "10px",
                 width: "100%",
                 justifyContent: "space-between",
-              }}>
+              }}
+            >
               <Text style={{ fontSize: "14px" }}>Atölye:</Text>
               <div
                 style={{
@@ -561,11 +667,14 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                   minWidth: "300px",
                   gap: "10px",
                   width: "100%",
-                }}>
+                }}
+              >
                 <Controller
                   name="atolye"
                   control={control}
-                  render={({ field }) => <Input {...field} disabled style={{ flex: 1 }} />}
+                  render={({ field }) => (
+                    <Input {...field} disabled style={{ flex: 1 }} />
+                  )}
                 />
               </div>
             </div>
@@ -578,8 +687,16 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
               gap: "10px",
               width: "100%",
               maxWidth: "450px",
-            }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                flexWrap: "wrap",
+              }}
+            >
               <StyledDivBottomLine
                 style={{
                   display: "flex",
@@ -587,7 +704,8 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                   justifyContent: "space-between",
                   width: "100%",
                   maxWidth: "450px",
-                }}>
+                }}
+              >
                 <Text style={{ fontSize: "14px" }}>Öncelik:</Text>
                 <div
                   style={{
@@ -596,7 +714,8 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                     alignItems: "center",
                     justifyContent: "space-between",
                     width: "300px",
-                  }}>
+                  }}
+                >
                   <Controller
                     name="oncelikTanim"
                     control={control}
@@ -642,7 +761,8 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                   alignItems: "flex-start",
                   justifyContent: "space-between",
                   width: "100%",
-                }}>
+                }}
+              >
                 <Text style={{ fontSize: "14px" }}>Bildirilen Bina:</Text>
                 <BildirilenBina disabled={disabled} />
               </StyledDivBottomLine>
@@ -655,13 +775,21 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                   alignItems: "flex-start",
                   justifyContent: "space-between",
                   width: "100%",
-                }}>
+                }}
+              >
                 <Text style={{ fontSize: "14px" }}>Bildirilen Kat:</Text>
                 <BildirilenKat disabled={disabled} />
               </StyledDivBottomLine>
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                flexWrap: "wrap",
+              }}
+            >
               <StyledDivBottomLine
                 style={{
                   display: "flex",
@@ -669,7 +797,8 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                   justifyContent: "space-between",
                   width: "100%",
                   maxWidth: "450px",
-                }}>
+                }}
+              >
                 <Text style={{ fontSize: "14px" }}>İlgili Kişi:</Text>
                 <div
                   style={{
@@ -678,7 +807,8 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                     alignItems: "center",
                     justifyContent: "space-between",
                     width: "300px",
-                  }}>
+                  }}
+                >
                   <Controller
                     name="ilgiliKisi"
                     control={control}
@@ -709,7 +839,10 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
                       setValue("ilgiliKisiID", selectedData.key);
                     }}
                   />
-                  <Button disabled={disabled} onClick={handleIlgiliKisiMinusClick}>
+                  <Button
+                    disabled={disabled}
+                    onClick={handleIlgiliKisiMinusClick}
+                  >
                     {" "}
                     -{" "}
                   </Button>
@@ -719,7 +852,15 @@ export default function MainTabs({ drawerOpen, disabled, isDisabled, fieldRequir
           </div>
         </div>
       </div>
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "250px", height: "260px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "250px",
+          height: "260px",
+        }}
+      >
         <ResimCarousel />
       </div>
     </div>
