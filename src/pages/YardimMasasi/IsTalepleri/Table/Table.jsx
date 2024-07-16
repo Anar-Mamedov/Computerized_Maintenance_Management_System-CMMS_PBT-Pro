@@ -1299,7 +1299,7 @@ const MainTable = () => {
             <MenuOutlined />
           </Button>
           <Input
-            style={{ width: "250px" }}
+            style={{ width: "250px", maxWidth: "200px" }}
             type="text"
             placeholder="Arama yap..."
             value={searchTerm}
