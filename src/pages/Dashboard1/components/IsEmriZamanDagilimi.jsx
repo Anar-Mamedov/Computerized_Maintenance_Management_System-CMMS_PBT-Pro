@@ -233,6 +233,7 @@ function IsEmriZamanDagilimi(props = {}) {
       // Transform the data
       const transformedData = response.map((item) => ({
         AY: formatDate(item.TARIH),
+        GUN: dayjs(item.TARIH).format("dddd"), // Day of the week in Turkish
         AYLIK_BAKIM_ISEMRI_MALIYET: Number(item.DEGER),
       }));
 
@@ -330,6 +331,32 @@ function IsEmriZamanDagilimi(props = {}) {
         ))}
       </ul>
     );
+  };
+
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      const { AY, GUN, AYLIK_BAKIM_ISEMRI_MALIYET } = payload[0].payload;
+      const stroke = payload[0].color; // Grafikteki verinin rengini alır
+
+      return (
+        <div
+          className="custom-tooltip"
+          style={{
+            backgroundColor: "#fff",
+            padding: "10px",
+            border: `1px solid ${stroke}`,
+          }}
+        >
+          <p className="label">{`${AY} ${GUN}`}</p>
+          <p
+            className="intro"
+            style={{ color: stroke }}
+          >{`İş Emri Sayısı: ${AYLIK_BAKIM_ISEMRI_MALIYET}`}</p>
+        </div>
+      );
+    }
+
+    return null;
   };
 
   const showModal = (content) => {
@@ -549,7 +576,7 @@ function IsEmriZamanDagilimi(props = {}) {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="AY" hide={true} />
                 <YAxis />
-                <Tooltip />
+                <Tooltip content={<CustomTooltip />} />
                 <Legend content={<CustomLegend />} />
                 <Line
                   type="monotone"
@@ -741,7 +768,7 @@ function IsEmriZamanDagilimi(props = {}) {
                 }}
               />
               <YAxis />
-              <Tooltip />
+              <Tooltip content={<CustomTooltip />} />
               <Legend content={<CustomLegend />} />
               <Line
                 type="monotone"
