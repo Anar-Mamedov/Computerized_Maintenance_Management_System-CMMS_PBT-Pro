@@ -9,24 +9,151 @@ import {
   Typography,
   Tag,
   Progress,
+  message,
 } from "antd";
-import { useFormContext } from "react-hook-form";
 import {
+  HolderOutlined,
   SearchOutlined,
   MenuOutlined,
   CheckOutlined,
   CloseOutlined,
 } from "@ant-design/icons";
+import {
+  DndContext,
+  useSensor,
+  useSensors,
+  PointerSensor,
+  KeyboardSensor,
+} from "@dnd-kit/core";
+import {
+  sortableKeyboardCoordinates,
+  arrayMove,
+  useSortable,
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { Resizable } from "react-resizable";
+import "./ResizeStyle.css";
 import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import Filters from "./filter/Filters";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
+import { useFormContext } from "react-hook-form";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 
-const { Text, Link } = Typography;
-const { TextArea } = Input;
+const { Text } = Typography;
 
-export default function MainTable() {
+// Sütunların boyutlarını ayarlamak için kullanılan component
+
+const ResizableTitle = (props) => {
+  const { onResize, width, ...restProps } = props;
+
+  // tabloyu genişletmek için kullanılan alanın stil özellikleri
+  const handleStyle = {
+    position: "absolute",
+    bottom: 0,
+    right: "-5px",
+    width: "20%",
+    height: "100%", // this is the area that is draggable, you can adjust it
+    zIndex: 2, // ensure it's above other elements
+    cursor: "col-resize",
+    padding: "0px",
+    backgroundSize: "0px",
+  };
+
+  if (!width) {
+    return <th {...restProps} />;
+  }
+  return (
+    <Resizable
+      width={width}
+      height={0}
+      handle={
+        <span
+          className="react-resizable-handle"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          style={handleStyle}
+        />
+      }
+      onResize={onResize}
+      draggableOpts={{
+        enableUserSelectHack: false,
+      }}
+    >
+      <th {...restProps} />
+    </Resizable>
+  );
+};
+// Sütunların boyutlarını ayarlamak için kullanılan component sonu
+
+// Sütunların sürüklenebilir olmasını sağlayan component
+
+const DraggableRow = ({
+  id,
+  text,
+  index,
+  moveRow,
+  className,
+  style,
+  visible,
+  onVisibilityChange,
+  ...restProps
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+  const styleWithTransform = {
+    ...style,
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    backgroundColor: isDragging ? "#f0f0f0" : "",
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={styleWithTransform}
+      {...restProps}
+      {...attributes}
+    >
+      {/* <Checkbox
+        checked={visible}
+        onChange={(e) => onVisibilityChange(index, e.target.checked)}
+        style={{ marginLeft: "auto" }}
+      /> */}
+      <div
+        {...listeners}
+        style={{
+          cursor: "grab",
+          flexGrow: 1,
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <HolderOutlined style={{ marginRight: 8 }} />
+        {text}
+      </div>
+    </div>
+  );
+};
+
+// Sütunların sürüklenebilir olmasını sağlayan component sonu
+
+const MainTable = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
   const [data, setData] = useState([]);
@@ -81,6 +208,7 @@ export default function MainTable() {
     const fetchData = async () => {
       try {
         const response = await AxiosInstance.get("OzelAlan?form=MAKINE"); // API URL'niz
+        localStorage.setItem("ozelAlanlarMakine", JSON.stringify(response));
         setLabel(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
       } catch (error) {
         console.error("API isteğinde hata oluştu:", error);
@@ -91,15 +219,17 @@ export default function MainTable() {
     fetchData();
   }, [drawer.visible]);
 
-  // Özel Alanların nameleri backend çekmek için api isteği sonu
+  const ozelAlanlarMakine = JSON.parse(
+    localStorage.getItem("ozelAlanlarMakine")
+  );
 
-  // Örnek kolonlar ve başlangıçta hepsinin görünür olacağı varsayılıyor
-  const columns = [
+  // Özel Alanların nameleri backend çekmek için api isteği sonu
+  const initialColumns = [
     {
       title: "#",
       dataIndex: "key",
       key: "key",
-      width: "100px",
+      width: 100,
       ellipsis: true,
       visible: false, // Varsayılan olarak açık
       onCell: () => ({
@@ -113,7 +243,7 @@ export default function MainTable() {
       title: "Belge",
       dataIndex: "MKN_BELGE_VAR",
       key: "MKN_BELGE_VAR",
-      width: "100px",
+      width: 100,
       ellipsis: true,
       visible: false, // Varsayılan olarak açık
       onCell: () => ({
@@ -137,7 +267,7 @@ export default function MainTable() {
       title: "Resim",
       dataIndex: "MKN_RESIM_VAR",
       key: "MKN_RESIM_VAR",
-      width: "100px",
+      width: 100,
       ellipsis: true,
       visible: false, // Varsayılan olarak açık
       onCell: () => ({
@@ -161,7 +291,7 @@ export default function MainTable() {
       title: "Peryodik Bakım",
       dataIndex: "MKN_PERIYODIK_BAKIM",
       key: "MKN_PERIYODIK_BAKIM",
-      width: "100px",
+      width: 100,
       ellipsis: true,
       visible: false, // Varsayılan olarak açık
       onCell: () => ({
@@ -189,7 +319,7 @@ export default function MainTable() {
       title: "Makine Kodu",
       dataIndex: "MKN_KOD",
       key: "MKN_KOD",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
       render: (text) => <a>{text}</a>,
@@ -203,7 +333,7 @@ export default function MainTable() {
       title: "Makine Tanımı",
       dataIndex: "MKN_TANIM",
       key: "MKN_TANIM",
-      width: "250px",
+      width: 250,
       ellipsis: true,
       sorter: (a, b) => {
         if (a.MKN_TANIM === null) return -1;
@@ -217,7 +347,7 @@ export default function MainTable() {
       title: "Aktif",
       dataIndex: "MKN_AKTIF",
       key: "MKN_AKTIF",
-      width: "100px",
+      width: 100,
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -245,7 +375,7 @@ export default function MainTable() {
       title: "Makine Durumu",
       dataIndex: "MKN_DURUM",
       key: "MKN_DURUM",
-      width: "150px",
+      width: 150,
       ellipsis: true,
       sorter: (a, b) => {
         if (a.MKN_DURUM === null) return -1;
@@ -263,7 +393,7 @@ export default function MainTable() {
     //   title: "Araç Tipi",
     //   dataIndex: "MKN_ARAC_TIP",
     //   key: "MKN_ARAC_TIP",
-    //   width: "100px",
+    //   width: 100,
     //   sorter: (a, b) => {
     //     if (a.MKN_ARAC_TIP === null && b.MKN_ARAC_TIP === null) return 0;
     //     if (a.MKN_ARAC_TIP === null) return 1;
@@ -282,7 +412,7 @@ export default function MainTable() {
       title: "Lokasyon",
       dataIndex: "MKN_LOKASYON",
       key: "MKN_LOKASYON",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (a.MKN_LOKASYON === null && b.MKN_LOKASYON === null) return 0;
         if (a.MKN_LOKASYON === null) return 1;
@@ -301,7 +431,7 @@ export default function MainTable() {
       title: "Makine Tipi",
       dataIndex: "MKN_TIP",
       key: "MKN_TIP",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (a.MKN_TIP === null && b.MKN_TIP === null) return 0;
         if (a.MKN_TIP === null) return 1;
@@ -320,7 +450,7 @@ export default function MainTable() {
       title: "Kategori",
       dataIndex: "MKN_KATEGORI",
       key: "MKN_KATEGORI",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (a.MKN_KATEGORI === null && b.MKN_KATEGORI === null) return 0;
         if (a.MKN_KATEGORI === null) return 1;
@@ -339,7 +469,7 @@ export default function MainTable() {
       title: "Marka",
       dataIndex: "MKN_MARKA",
       key: "MKN_MARKA",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (a.MKN_MARKA === null && b.MKN_MARKA === null) return 0;
         if (a.MKN_MARKA === null) return 1;
@@ -358,7 +488,7 @@ export default function MainTable() {
       title: "Model",
       dataIndex: "MKN_MODEL",
       key: "MKN_MODEL",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (a.MKN_MODEL === null && b.MKN_MODEL === null) return 0;
         if (a.MKN_MODEL === null) return 1;
@@ -377,7 +507,7 @@ export default function MainTable() {
       title: "Master Makine Tanımı",
       dataIndex: "MKN_MASTER_MAKINE_TANIM",
       key: "MKN_MASTER_MAKINE_TANIM",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (
           a.MKN_MASTER_MAKINE_TANIM === null &&
@@ -402,7 +532,7 @@ export default function MainTable() {
       title: "Master Makine Kod",
       dataIndex: "MKN_MASTER_MAKINE_KOD",
       key: "MKN_MASTER_MAKINE_KOD",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (
           a.MKN_MASTER_MAKINE_KOD === null &&
@@ -425,7 +555,7 @@ export default function MainTable() {
       title: "Çalışma Takvimi",
       dataIndex: "MKN_TAKVIM",
       key: "MKN_TAKVIM",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (a.MKN_TAKVIM === null && b.MKN_TAKVIM === null) return 0;
         if (a.MKN_TAKVIM === null) return 1;
@@ -444,7 +574,7 @@ export default function MainTable() {
       title: "Üretim Yılı",
       dataIndex: "MKN_URETIM_YILI",
       key: "MKN_URETIM_YILI",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (a.MKN_URETIM_YILI === null && b.MKN_URETIM_YILI === null) return 0;
         if (a.MKN_URETIM_YILI === null) return 1;
@@ -463,7 +593,7 @@ export default function MainTable() {
       title: "Masraf Merkezi",
       dataIndex: "MKN_MASRAF_MERKEZ",
       key: "MKN_MASRAF_MERKEZ",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (a.MKN_MASRAF_MERKEZ === null && b.MKN_MASRAF_MERKEZ === null)
           return 0;
@@ -483,7 +613,7 @@ export default function MainTable() {
       title: "Sorumlu Atölye",
       dataIndex: "MKN_ATOLYE",
       key: "MKN_ATOLYE",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (a.MKN_ATOLYE === null && b.MKN_ATOLYE === null) return 0;
         if (a.MKN_ATOLYE === null) return 1;
@@ -502,7 +632,7 @@ export default function MainTable() {
       title: "Bakım Grubu",
       dataIndex: "MKN_BAKIM_GRUP",
       key: "MKN_BAKIM_GRUP",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (a.MKN_BAKIM_GRUP === null && b.MKN_BAKIM_GRUP === null) return 0;
         if (a.MKN_BAKIM_GRUP === null) return 1;
@@ -521,7 +651,7 @@ export default function MainTable() {
       title: "Arıza Grubu",
       dataIndex: "MKN_ARIZA_GRUP",
       key: "MKN_ARIZA_GRUP",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (a.MKN_ARIZA_GRUP === null && b.MKN_ARIZA_GRUP === null) return 0;
         if (a.MKN_ARIZA_GRUP === null) return 1;
@@ -540,7 +670,7 @@ export default function MainTable() {
       title: "Öncelik",
       dataIndex: "MKN_ONCELIK",
       key: "MKN_ONCELIK",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (a.MKN_ONCELIK === null && b.MKN_ONCELIK === null) return 0;
         if (a.MKN_ONCELIK === null) return 1;
@@ -559,7 +689,7 @@ export default function MainTable() {
       title: "Arıza Sıklığı (Gün)",
       dataIndex: "ARIZA_SIKLIGI",
       key: "ARIZA_SIKLIGI",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (a.ARIZA_SIKLIGI === null && b.ARIZA_SIKLIGI === null) return 0;
         if (a.ARIZA_SIKLIGI === null) return 1;
@@ -578,7 +708,7 @@ export default function MainTable() {
       title: "Arıza Sayısı",
       dataIndex: "ARIZA_SAYISI",
       key: "ARIZA_SAYISI",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (a.ARIZA_SAYISI === null && b.ARIZA_SAYISI === null) return 0;
         if (a.ARIZA_SAYISI === null) return 1;
@@ -648,7 +778,7 @@ export default function MainTable() {
       title: "Seri No",
       dataIndex: "MKN_SERI_NO",
       key: "MKN_SERI_NO",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (a.MKN_SERI_NO === null && b.MKN_SERI_NO === null) return 0;
         if (a.MKN_SERI_NO === null) return 1;
@@ -667,7 +797,7 @@ export default function MainTable() {
       title: <div>{label.OZL_OZEL_ALAN_1}</div>,
       dataIndex: "MKN_OZEL_ALAN_1",
       key: "MKN_OZEL_ALAN_1",
-      width: "150px",
+      width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_1 && b.MKN_OZEL_ALAN_1) {
           return a.MKN_OZEL_ALAN_1.localeCompare(b.MKN_OZEL_ALAN_1);
@@ -1121,25 +1251,6 @@ export default function MainTable() {
     // Diğer kolonlarınız...
   ];
 
-  // Kullanıcının seçtiği kolonların key'lerini tutan state kolonlari göster/gizle butonu için
-
-  const [visibleColumnKeys, setVisibleColumnKeys] = useState(() => {
-    // 'visibleColumns' isimli anahtarla kaydedilmiş değeri oku
-    const savedVisibleColumns = JSON.parse(
-      localStorage.getItem("visibleColumnsMakine")
-    );
-
-    // Eğer localStorage'da bir değer varsa, bu değeri kullan
-    if (savedVisibleColumns) {
-      return savedVisibleColumns;
-    }
-
-    // Yoksa, varsayılan olarak görünür olacak kolonların key'lerini döndür
-    return columns.filter((col) => col.visible).map((col) => col.key);
-  });
-
-  // Kullanıcının seçtiği kolonların key'lerini tutan state kolonlari göster/gizle butonu için son
-
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 
   // Intl.DateTimeFormat kullanarak tarih formatlama
@@ -1191,7 +1302,10 @@ export default function MainTable() {
         minutesInt < 0 ||
         minutesInt > 59
       ) {
-        throw new Error("Invalid time format");
+        // throw new Error("Invalid time format"); // hata fırlatır ve uygulamanın çalışmasını durdurur
+        console.error("Invalid time format:", time);
+        // return time; // Hatalı formatı olduğu gibi döndür
+        return ""; // Hata durumunda boş bir string döndür
       }
 
       // Geçerli tarih ile birlikte bir Date nesnesi oluştur ve sadece saat ve dakika bilgilerini ayarla
@@ -1211,6 +1325,7 @@ export default function MainTable() {
     } catch (error) {
       console.error("Error formatting time:", error);
       return ""; // Hata durumunda boş bir string döndür
+      // return time; // Hatalı formatı olduğu gibi döndür
     }
   };
 
@@ -1283,6 +1398,13 @@ export default function MainTable() {
     } catch (error) {
       console.error("Error in API request:", error);
       setLoading(false);
+      if (navigator.onLine) {
+        // İnternet bağlantısı var
+        message.error("Hata Mesajı: " + error.message);
+      } else {
+        // İnternet bağlantısı yok
+        message.error("Internet Bağlantısı Mevcut Değil.");
+      }
     }
   };
 
@@ -1333,10 +1455,6 @@ export default function MainTable() {
     };
   };
 
-  // const refreshTableData = useCallback(() => {
-  //   fetchEquipmentData();
-  // }, []);
-
   const refreshTableData = useCallback(() => {
     // Sayfa numarasını 1 yap
     // setCurrentPage(1);
@@ -1359,64 +1477,254 @@ export default function MainTable() {
     // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
   }, [body, currentPage]); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
 
-  // Kolon görünürlüğünü güncelleme fonksiyonu
-  const handleVisibilityChange = (checkedValues) => {
-    setVisibleColumnKeys(checkedValues);
-    // Yeni görünürlük durumunu localStorage'a kaydet
-    localStorage.setItem("visibleColumnsMakine", JSON.stringify(checkedValues));
+  // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
+  const [columns, setColumns] = useState(() => {
+    const savedOrder = localStorage.getItem("columnOrderMakine");
+    const savedVisibility = localStorage.getItem("columnVisibilityMakine");
+    const savedWidths = localStorage.getItem("columnWidthsMakine");
+
+    let order = savedOrder ? JSON.parse(savedOrder) : [];
+    let visibility = savedVisibility ? JSON.parse(savedVisibility) : {};
+    let widths = savedWidths ? JSON.parse(savedWidths) : {};
+
+    initialColumns.forEach((col) => {
+      if (!order.includes(col.key)) {
+        order.push(col.key);
+      }
+      if (visibility[col.key] === undefined) {
+        visibility[col.key] = col.visible;
+      }
+      if (widths[col.key] === undefined) {
+        widths[col.key] = col.width;
+      }
+    });
+
+    localStorage.setItem("columnOrderMakine", JSON.stringify(order));
+    localStorage.setItem("columnVisibilityMakine", JSON.stringify(visibility));
+    localStorage.setItem("columnWidthsMakine", JSON.stringify(widths));
+
+    return order.map((key) => {
+      const column = initialColumns.find((col) => col.key === key);
+      return { ...column, visible: visibility[key], width: widths[key] };
+    });
+  });
+  // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz sonu
+
+  // sütunları local storage'a kaydediyoruz
+  useEffect(() => {
+    localStorage.setItem(
+      "columnOrderMakine",
+      JSON.stringify(columns.map((col) => col.key))
+    );
+    localStorage.setItem(
+      "columnVisibilityMakine",
+      JSON.stringify(
+        columns.reduce((acc, col) => ({ ...acc, [col.key]: col.visible }), {})
+      )
+    );
+    localStorage.setItem(
+      "columnWidthsMakine",
+      JSON.stringify(
+        columns.reduce((acc, col) => ({ ...acc, [col.key]: col.width }), {})
+      )
+    );
+  }, [columns]);
+  // sütunları local storage'a kaydediyoruz sonu
+
+  // sütunların boyutlarını ayarlamak için kullanılan fonksiyon
+  const handleResize =
+    (key) =>
+    (_, { size }) => {
+      setColumns((prev) =>
+        prev.map((col) =>
+          col.key === key ? { ...col, width: size.width } : col
+        )
+      );
+    };
+
+  const components = {
+    header: {
+      cell: ResizableTitle,
+    },
   };
 
-  // Kolonları gösterip gizleme Modalını göster/gizle
-  const toggleModal = () => {
-    setIsModalVisible(!isModalVisible);
+  const mergedColumns = columns.map((col) => ({
+    ...col,
+    onHeaderCell: (column) => ({
+      width: column.width,
+      onResize: handleResize(column.key),
+    }),
+  }));
+
+  // fitrelenmiş sütunları birleştiriyoruz ve sadece görünür olanları alıyoruz ve tabloya gönderiyoruz
+
+  const filteredColumns = mergedColumns.filter((col) => col.visible);
+
+  // fitrelenmiş sütunları birleştiriyoruz ve sadece görünür olanları alıyoruz ve tabloya gönderiyoruz sonu
+
+  // sütunların sıralamasını değiştirmek için kullanılan fonksiyon
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      const oldIndex = columns.findIndex((column) => column.key === active.id);
+      const newIndex = columns.findIndex((column) => column.key === over.id);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        setColumns((columns) => arrayMove(columns, oldIndex, newIndex));
+      } else {
+        console.error(
+          `Column with key ${active.id} or ${over.id} does not exist.`
+        );
+      }
+    }
   };
 
-  // Görünür kolonları filtrele
-  const visibleColumns = columns.filter((col) =>
-    visibleColumnKeys.includes(col.key)
-  );
+  // sütunların sıralamasını değiştirmek için kullanılan fonksiyon sonu
 
-  // Kolon görünürlüğünü güncelleme fonksiyonu son
+  // sütunların görünürlüğünü değiştirmek için kullanılan fonksiyon
+
+  const toggleVisibility = (key, checked) => {
+    const index = columns.findIndex((col) => col.key === key);
+    if (index !== -1) {
+      const newColumns = [...columns];
+      newColumns[index].visible = checked;
+      setColumns(newColumns);
+    } else {
+      console.error(`Column with key ${key} does not exist.`);
+    }
+  };
+
+  // sütunların görünürlüğünü değiştirmek için kullanılan fonksiyon sonu
+
+  // sütunları sıfırlamak için kullanılan fonksiyon
+
+  function resetColumns() {
+    localStorage.removeItem("columnOrderMakine");
+    localStorage.removeItem("columnVisibilityMakine");
+    localStorage.removeItem("columnWidthsMakine");
+    localStorage.removeItem("ozelAlanlarMakine");
+    window.location.reload();
+  }
+
+  // sütunları sıfırlamak için kullanılan fonksiyon sonu
 
   return (
-    <div>
-      <style>
-        {`
-          .boldRow {
-            font-weight: bold;
-          }
-        `}
-      </style>
-
+    <>
       <Modal
-        width={900}
-        title="Kolonları Düzenle"
+        title="Sütunları Yönet"
+        centered
+        width={800}
         open={isModalVisible}
-        onOk={toggleModal}
-        onCancel={toggleModal}
+        onOk={() => setIsModalVisible(false)}
+        onCancel={() => setIsModalVisible(false)}
       >
-        <Checkbox.Group
+        <Text style={{ marginBottom: "15px" }}>
+          Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını
+          Ayarlayabilirsiniz.
+        </Text>
+        <div
           style={{
-            width: "100%",
             display: "flex",
-            gap: "10px",
-            flexDirection: "column",
-            height: "500px",
+            width: "100%",
+            justifyContent: "center",
+            marginTop: "10px",
           }}
-          value={visibleColumnKeys}
-          onChange={handleVisibilityChange}
         >
-          {columns.map((col) => (
-            <Checkbox key={col.key} value={col.key}>
-              {col.title}
-            </Checkbox>
-          ))}
-        </Checkbox.Group>
+          <Button onClick={resetColumns} style={{ marginBottom: "15px" }}>
+            Sütunları Sıfırla
+          </Button>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div
+            style={{
+              width: "46%",
+              border: "1px solid #8080806e",
+              borderRadius: "8px",
+              padding: "10px",
+            }}
+          >
+            <div
+              style={{
+                marginBottom: "20px",
+                borderBottom: "1px solid #80808051",
+                padding: "8px 8px 12px 8px",
+              }}
+            >
+              <Text style={{ fontWeight: 600 }}>Sütunları Göster / Gizle</Text>
+            </div>
+            <div style={{ height: "400px", overflow: "auto" }}>
+              {initialColumns.map((col) => (
+                <div style={{ display: "flex", gap: "10px" }} key={col.key}>
+                  <Checkbox
+                    checked={
+                      columns.find((column) => column.key === col.key)
+                        ?.visible || false
+                    }
+                    onChange={(e) =>
+                      toggleVisibility(col.key, e.target.checked)
+                    }
+                  />
+                  {col.title}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <DndContext
+            onDragEnd={handleDragEnd}
+            sensors={useSensors(
+              useSensor(PointerSensor),
+              useSensor(KeyboardSensor, {
+                coordinateGetter: sortableKeyboardCoordinates,
+              })
+            )}
+          >
+            <div
+              style={{
+                width: "46%",
+                border: "1px solid #8080806e",
+                borderRadius: "8px",
+                padding: "10px",
+              }}
+            >
+              <div
+                style={{
+                  marginBottom: "20px",
+                  borderBottom: "1px solid #80808051",
+                  padding: "8px 8px 12px 8px",
+                }}
+              >
+                <Text style={{ fontWeight: 600 }}>
+                  Sütunların Sıralamasını Ayarla
+                </Text>
+              </div>
+              <div style={{ height: "400px", overflow: "auto" }}>
+                <SortableContext
+                  items={columns
+                    .filter((col) => col.visible)
+                    .map((col) => col.key)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {columns
+                    .filter((col) => col.visible)
+                    .map((col, index) => (
+                      <DraggableRow
+                        key={col.key}
+                        id={col.key}
+                        index={index}
+                        text={col.title}
+                      />
+                    ))}
+                </SortableContext>
+              </div>
+            </div>
+          </DndContext>
+        </div>
       </Modal>
       <div
         style={{
           display: "flex",
-          flexWrap: "wrap",
           justifyContent: "space-between",
           marginBottom: "20px",
           gap: "10px",
@@ -1428,9 +1736,8 @@ export default function MainTable() {
             display: "flex",
             gap: "10px",
             alignItems: "center",
-            width: "100%",
-            maxWidth: "780px",
             flexWrap: "wrap",
+            width: "100%",
           }}
         >
           <Button
@@ -1442,12 +1749,12 @@ export default function MainTable() {
               // width: "32px",
               height: "32px",
             }}
-            onClick={toggleModal}
+            onClick={() => setIsModalVisible(true)}
           >
             <MenuOutlined />
           </Button>
           <Input
-            style={{ width: "250px" }}
+            style={{ width: "250px", maxWidth: "200px" }}
             type="text"
             placeholder="Arama yap..."
             value={searchTerm}
@@ -1455,8 +1762,14 @@ export default function MainTable() {
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
           <Filters onChange={handleBodyChange} />
-          {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
-          <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
+          {/*<TeknisyenSubmit*/}
+          {/*  selectedRows={selectedRows}*/}
+          {/*  refreshTableData={refreshTableData}*/}
+          {/*/>*/}
+          {/*<AtolyeSubmit*/}
+          {/*  selectedRows={selectedRows}*/}
+          {/*  refreshTableData={refreshTableData}*/}
+          {/*/>*/}
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
           <ContextMenu
@@ -1471,8 +1784,9 @@ export default function MainTable() {
       </div>
       <Spin spinning={loading}>
         <Table
-          columns={visibleColumns}
+          components={components}
           rowSelection={rowSelection}
+          columns={filteredColumns}
           dataSource={data}
           pagination={{
             current: currentPage,
@@ -1487,20 +1801,21 @@ export default function MainTable() {
             showQuickJumper: true,
           }}
           onRow={onRowClick}
-          scroll={{ y: "calc(100vh - 380px)" }}
+          scroll={{ y: "calc(100vh - 370px)" }}
           onChange={handleTableChange}
           rowClassName={(record) =>
             record.IST_DURUM_ID === 0 ? "boldRow" : ""
           }
         />
       </Spin>
-
       <EditDrawer
         selectedRow={drawer.data}
         onDrawerClose={() => setDrawer({ ...drawer, visible: false })}
         drawerVisible={drawer.visible}
         onRefresh={refreshTableData}
       />
-    </div>
+    </>
   );
-}
+};
+
+export default MainTable;
