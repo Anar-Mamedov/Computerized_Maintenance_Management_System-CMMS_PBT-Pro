@@ -1,7 +1,22 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress } from "antd";
+import {
+  Table,
+  Button,
+  Modal,
+  Checkbox,
+  Input,
+  Spin,
+  Typography,
+  Tag,
+  Progress,
+} from "antd";
 import { useFormContext } from "react-hook-form";
-import { SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import {
+  SearchOutlined,
+  MenuOutlined,
+  CheckOutlined,
+  CloseOutlined,
+} from "@ant-design/icons";
 import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
@@ -106,10 +121,15 @@ export default function MainTable() {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) => (a.MKN_BELGE_VAR === b.MKN_BELGE_VAR ? 0 : a.MKN_BELGE_VAR ? -1 : 1),
+      sorter: (a, b) =>
+        a.MKN_BELGE_VAR === b.MKN_BELGE_VAR ? 0 : a.MKN_BELGE_VAR ? -1 : 1,
       render: (text) => (
         <div style={{ textAlign: "center" }}>
-          {text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}
+          {text ? (
+            <CheckOutlined style={{ color: "green" }} />
+          ) : (
+            <CloseOutlined style={{ color: "red" }} />
+          )}
         </div>
       ),
     },
@@ -125,10 +145,15 @@ export default function MainTable() {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) => (a.MKN_RESIM_VAR === b.MKN_RESIM_VAR ? 0 : a.MKN_RESIM_VAR ? -1 : 1),
+      sorter: (a, b) =>
+        a.MKN_RESIM_VAR === b.MKN_RESIM_VAR ? 0 : a.MKN_RESIM_VAR ? -1 : 1,
       render: (text) => (
         <div style={{ textAlign: "center" }}>
-          {text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}
+          {text ? (
+            <CheckOutlined style={{ color: "green" }} />
+          ) : (
+            <CloseOutlined style={{ color: "red" }} />
+          )}
         </div>
       ),
     },
@@ -144,10 +169,19 @@ export default function MainTable() {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) => (a.MKN_PERIYODIK_BAKIM === b.MKN_PERIYODIK_BAKIM ? 0 : a.MKN_PERIYODIK_BAKIM ? -1 : 1),
+      sorter: (a, b) =>
+        a.MKN_PERIYODIK_BAKIM === b.MKN_PERIYODIK_BAKIM
+          ? 0
+          : a.MKN_PERIYODIK_BAKIM
+          ? -1
+          : 1,
       render: (text) => (
         <div style={{ textAlign: "center" }}>
-          {text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}
+          {text ? (
+            <CheckOutlined style={{ color: "green" }} />
+          ) : (
+            <CloseOutlined style={{ color: "red" }} />
+          )}
         </div>
       ),
     },
@@ -193,7 +227,11 @@ export default function MainTable() {
       visible: false, // Varsayılan olarak açık
       render: (text) => (
         <div style={{ textAlign: "center" }}>
-          {text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}
+          {text ? (
+            <CheckOutlined style={{ color: "green" }} />
+          ) : (
+            <CloseOutlined style={{ color: "red" }} />
+          )}
         </div>
       ),
       sorter: (a, b) => {
@@ -341,10 +379,16 @@ export default function MainTable() {
       key: "MKN_MASTER_MAKINE_TANIM",
       width: "150px",
       sorter: (a, b) => {
-        if (a.MKN_MASTER_MAKINE_TANIM === null && b.MKN_MASTER_MAKINE_TANIM === null) return 0;
+        if (
+          a.MKN_MASTER_MAKINE_TANIM === null &&
+          b.MKN_MASTER_MAKINE_TANIM === null
+        )
+          return 0;
         if (a.MKN_MASTER_MAKINE_TANIM === null) return 1;
         if (b.MKN_MASTER_MAKINE_TANIM === null) return -1;
-        return a.MKN_MASTER_MAKINE_TANIM.localeCompare(b.MKN_MASTER_MAKINE_TANIM);
+        return a.MKN_MASTER_MAKINE_TANIM.localeCompare(
+          b.MKN_MASTER_MAKINE_TANIM
+        );
       },
       ellipsis: true,
       onCell: () => ({
@@ -360,7 +404,11 @@ export default function MainTable() {
       key: "MKN_MASTER_MAKINE_KOD",
       width: "150px",
       sorter: (a, b) => {
-        if (a.MKN_MASTER_MAKINE_KOD === null && b.MKN_MASTER_MAKINE_KOD === null) return 0;
+        if (
+          a.MKN_MASTER_MAKINE_KOD === null &&
+          b.MKN_MASTER_MAKINE_KOD === null
+        )
+          return 0;
         if (a.MKN_MASTER_MAKINE_KOD === null) return 1;
         if (b.MKN_MASTER_MAKINE_KOD === null) return -1;
         return a.MKN_MASTER_MAKINE_KOD.localeCompare(b.MKN_MASTER_MAKINE_KOD);
@@ -417,7 +465,8 @@ export default function MainTable() {
       key: "MKN_MASRAF_MERKEZ",
       width: "150px",
       sorter: (a, b) => {
-        if (a.MKN_MASRAF_MERKEZ === null && b.MKN_MASRAF_MERKEZ === null) return 0;
+        if (a.MKN_MASRAF_MERKEZ === null && b.MKN_MASRAF_MERKEZ === null)
+          return 0;
         if (a.MKN_MASRAF_MERKEZ === null) return 1;
         if (b.MKN_MASRAF_MERKEZ === null) return -1;
         return a.MKN_MASRAF_MERKEZ.localeCompare(b.MKN_MASRAF_MERKEZ);
@@ -851,7 +900,9 @@ export default function MainTable() {
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_11_KOD_ID && b.MKN_OZEL_ALAN_11_KOD_ID) {
-          return a.MKN_OZEL_ALAN_11_KOD_ID.localeCompare(b.MKN_OZEL_ALAN_11_KOD_ID);
+          return a.MKN_OZEL_ALAN_11_KOD_ID.localeCompare(
+            b.MKN_OZEL_ALAN_11_KOD_ID
+          );
         }
         if (!a.MKN_OZEL_ALAN_11_KOD_ID && !b.MKN_OZEL_ALAN_11_KOD_ID) {
           return 0; // Both are null or undefined, consider them equal
@@ -873,7 +924,9 @@ export default function MainTable() {
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_12_KOD_ID && b.MKN_OZEL_ALAN_12_KOD_ID) {
-          return a.MKN_OZEL_ALAN_12_KOD_ID.localeCompare(b.MKN_OZEL_ALAN_12_KOD_ID);
+          return a.MKN_OZEL_ALAN_12_KOD_ID.localeCompare(
+            b.MKN_OZEL_ALAN_12_KOD_ID
+          );
         }
         if (!a.MKN_OZEL_ALAN_12_KOD_ID && !b.MKN_OZEL_ALAN_12_KOD_ID) {
           return 0; // Both are null or undefined, consider them equal
@@ -895,7 +948,9 @@ export default function MainTable() {
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_13_KOD_ID && b.MKN_OZEL_ALAN_13_KOD_ID) {
-          return a.MKN_OZEL_ALAN_13_KOD_ID.localeCompare(b.MKN_OZEL_ALAN_13_KOD_ID);
+          return a.MKN_OZEL_ALAN_13_KOD_ID.localeCompare(
+            b.MKN_OZEL_ALAN_13_KOD_ID
+          );
         }
         if (!a.MKN_OZEL_ALAN_13_KOD_ID && !b.MKN_OZEL_ALAN_13_KOD_ID) {
           return 0; // Both are null or undefined, consider them equal
@@ -917,7 +972,9 @@ export default function MainTable() {
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_14_KOD_ID && b.MKN_OZEL_ALAN_14_KOD_ID) {
-          return a.MKN_OZEL_ALAN_14_KOD_ID.localeCompare(b.MKN_OZEL_ALAN_14_KOD_ID);
+          return a.MKN_OZEL_ALAN_14_KOD_ID.localeCompare(
+            b.MKN_OZEL_ALAN_14_KOD_ID
+          );
         }
         if (!a.MKN_OZEL_ALAN_14_KOD_ID && !b.MKN_OZEL_ALAN_14_KOD_ID) {
           return 0; // Both are null or undefined, consider them equal
@@ -939,7 +996,9 @@ export default function MainTable() {
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_15_KOD_ID && b.MKN_OZEL_ALAN_15_KOD_ID) {
-          return a.MKN_OZEL_ALAN_15_KOD_ID.localeCompare(b.MKN_OZEL_ALAN_15_KOD_ID);
+          return a.MKN_OZEL_ALAN_15_KOD_ID.localeCompare(
+            b.MKN_OZEL_ALAN_15_KOD_ID
+          );
         }
         if (!a.MKN_OZEL_ALAN_15_KOD_ID && !b.MKN_OZEL_ALAN_15_KOD_ID) {
           return 0; // Both are null or undefined, consider them equal
@@ -1066,7 +1125,9 @@ export default function MainTable() {
 
   const [visibleColumnKeys, setVisibleColumnKeys] = useState(() => {
     // 'visibleColumns' isimli anahtarla kaydedilmiş değeri oku
-    const savedVisibleColumns = JSON.parse(localStorage.getItem("visibleColumnsMakine"));
+    const savedVisibleColumns = JSON.parse(
+      localStorage.getItem("visibleColumnsMakine")
+    );
 
     // Eğer localStorage'da bir değer varsa, bu değeri kullan
     if (savedVisibleColumns) {
@@ -1087,7 +1148,9 @@ export default function MainTable() {
 
     // Örnek bir tarih formatla ve ay formatını belirle
     const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
-    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(
+      sampleDate
+    );
 
     let monthFormat;
     if (sampleFormatted.includes("January")) {
@@ -1120,7 +1183,14 @@ export default function MainTable() {
       // Saat ve dakika değerlerinin geçerliliğini kontrol et
       const hoursInt = parseInt(hours, 10);
       const minutesInt = parseInt(minutes, 10);
-      if (isNaN(hoursInt) || isNaN(minutesInt) || hoursInt < 0 || hoursInt > 23 || minutesInt < 0 || minutesInt > 59) {
+      if (
+        isNaN(hoursInt) ||
+        isNaN(minutesInt) ||
+        hoursInt < 0 ||
+        hoursInt > 23 ||
+        minutesInt < 0 ||
+        minutesInt > 59
+      ) {
         throw new Error("Invalid time format");
       }
 
@@ -1243,7 +1313,9 @@ export default function MainTable() {
       setValue("selectedLokasyonId", null);
     }
     // Seçilen satırların verisini bul
-    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
+    const newSelectedRows = data.filter((row) =>
+      newSelectedRowKeys.includes(row.key)
+    );
     setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
   };
 
@@ -1300,7 +1372,9 @@ export default function MainTable() {
   };
 
   // Görünür kolonları filtrele
-  const visibleColumns = columns.filter((col) => visibleColumnKeys.includes(col.key));
+  const visibleColumns = columns.filter((col) =>
+    visibleColumnKeys.includes(col.key)
+  );
 
   // Kolon görünürlüğünü güncelleme fonksiyonu son
 
@@ -1314,11 +1388,24 @@ export default function MainTable() {
         `}
       </style>
 
-      <Modal width={900} title="Kolonları Düzenle" open={isModalVisible} onOk={toggleModal} onCancel={toggleModal}>
+      <Modal
+        width={900}
+        title="Kolonları Düzenle"
+        open={isModalVisible}
+        onOk={toggleModal}
+        onCancel={toggleModal}
+      >
         <Checkbox.Group
-          style={{ width: "100%", display: "flex", gap: "10px", flexDirection: "column", height: "500px" }}
+          style={{
+            width: "100%",
+            display: "flex",
+            gap: "10px",
+            flexDirection: "column",
+            height: "500px",
+          }}
           value={visibleColumnKeys}
-          onChange={handleVisibilityChange}>
+          onChange={handleVisibilityChange}
+        >
           {columns.map((col) => (
             <Checkbox key={col.key} value={col.key}>
               {col.title}
@@ -1334,7 +1421,8 @@ export default function MainTable() {
           marginBottom: "20px",
           gap: "10px",
           padding: "0 5px",
-        }}>
+        }}
+      >
         <div
           style={{
             display: "flex",
@@ -1343,7 +1431,8 @@ export default function MainTable() {
             width: "100%",
             maxWidth: "780px",
             flexWrap: "wrap",
-          }}>
+          }}
+        >
           <Button
             style={{
               display: "flex",
@@ -1353,7 +1442,8 @@ export default function MainTable() {
               // width: "32px",
               height: "32px",
             }}
-            onClick={toggleModal}>
+            onClick={toggleModal}
+          >
             <MenuOutlined />
           </Button>
           <Input
@@ -1369,8 +1459,14 @@ export default function MainTable() {
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
-          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
-          <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
+          <ContextMenu
+            selectedRows={selectedRows}
+            refreshTableData={refreshTableData}
+          />
+          <CreateDrawer
+            selectedLokasyonId={selectedRowKeys[0]}
+            onRefresh={refreshTableData}
+          />
         </div>
       </div>
       <Spin spinning={loading}>
@@ -1393,7 +1489,9 @@ export default function MainTable() {
           onRow={onRowClick}
           scroll={{ y: "calc(100vh - 380px)" }}
           onChange={handleTableChange}
-          rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
+          rowClassName={(record) =>
+            record.IST_DURUM_ID === 0 ? "boldRow" : ""
+          }
         />
       </Spin>
 

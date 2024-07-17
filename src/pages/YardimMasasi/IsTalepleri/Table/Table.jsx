@@ -255,9 +255,9 @@ const MainTable = () => {
       key: "IST_KOD",
       width: 120,
       ellipsis: true,
-
-      visible: true, // Varsayılan olarak açık
+      visible: true,
       render: (text) => <a>{text}</a>,
+      sorter: (a, b) => (a.IST_KOD || "").localeCompare(b.IST_KOD || ""),
     },
     {
       title: "Tarih",
@@ -270,8 +270,10 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: true, // Varsayılan olarak açık
+      visible: true,
       render: (text) => formatDate(text),
+      sorter: (a, b) =>
+        (a.IST_ACILIS_TARIHI || "").localeCompare(b.IST_ACILIS_TARIHI || ""),
     },
     {
       title: "Saat",
@@ -284,8 +286,10 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: true, // Varsayılan olarak açık
+      visible: true,
       render: (text) => formatTime(text),
+      sorter: (a, b) =>
+        (a.IST_ACILIS_SAATI || "").localeCompare(b.IST_ACILIS_SAATI || ""),
     },
     {
       title: "Konu",
@@ -293,9 +297,9 @@ const MainTable = () => {
       key: "IST_TANIMI",
       width: 300,
       ellipsis: true,
-
-      visible: true, // Varsayılan olarak açık
+      visible: true,
       render: (text) => <a>{text}</a>,
+      sorter: (a, b) => (a.IST_TANIMI || "").localeCompare(b.IST_TANIMI || ""),
     },
     {
       title: "Talep Eden",
@@ -308,7 +312,9 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: true, // Varsayılan olarak açık
+      visible: true,
+      sorter: (a, b) =>
+        (a.IST_TALEP_EDEN_ADI || "").localeCompare(b.IST_TALEP_EDEN_ADI || ""),
     },
     {
       title: "Durum",
@@ -321,7 +327,7 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: true, // Varsayılan olarak açık
+      visible: true,
       render: (_, record) => {
         const { color, text } = statusTag(record.IST_DURUM_ID);
         return (
@@ -345,6 +351,7 @@ const MainTable = () => {
           </div>
         );
       },
+      sorter: (a, b) => (a.IST_DURUM_ID || 0) - (b.IST_DURUM_ID || 0),
     },
     {
       title: "Makine Tanım",
@@ -357,7 +364,9 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: true, // Varsayılan olarak açık
+      visible: true,
+      sorter: (a, b) =>
+        (a.IST_MAKINE_TANIM || "").localeCompare(b.IST_MAKINE_TANIM || ""),
     },
     {
       title: "İş Kategorisi",
@@ -370,7 +379,11 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak açık
+      visible: false,
+      sorter: (a, b) =>
+        (a.IST_KATEGORI_TANIMI || "").localeCompare(
+          b.IST_KATEGORI_TANIMI || ""
+        ),
     },
     {
       title: "Öncelik",
@@ -383,7 +396,9 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: true, // Varsayılan olarak açık
+      visible: true,
+      sorter: (a, b) =>
+        (a.IST_ONCELIK || "").localeCompare(b.IST_ONCELIK || ""),
     },
     {
       title: "Lokasyon",
@@ -396,9 +411,12 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: true, // Varsayılan olarak açık
+      visible: true,
+      sorter: (a, b) =>
+        (a.IST_BILDIREN_LOKASYON || "").localeCompare(
+          b.IST_BILDIREN_LOKASYON || ""
+        ),
     },
-
     {
       title: "İşlem Süresi",
       dataIndex: "ISLEM_SURE",
@@ -410,25 +428,19 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: true, // Varsayılan olarak açık
+      visible: true,
       render: (text, record) => {
         let baslangicTarihi, bitisTarihi;
-        // IST_ACILIS_TARIHI ve IST_ACILIS_SAATI'nin tarih ve saatini al
         baslangicTarihi = dayjs(
           record.IST_ACILIS_TARIHI.split("T")[0] +
             "T" +
             record.IST_ACILIS_SAATI,
           "YYYY-MM-DDTHH:mm:ss"
         );
-
-        // IST_DURUM_ID'nin değeri 4'ten farklıysa
         if (record.IST_DURUM_ID !== 4) {
-          // Şimdiki zamanı al
           bitisTarihi = dayjs();
         } else {
-          // IST_KAPAMA_TARIHI ve IST_KAPAMA_SAATI değerleri null, undefined veya boş değilse
           if (record.IST_KAPAMA_TARIHI && record.IST_KAPAMA_SAATI) {
-            // IST_KAPAMA_TARIHI ve IST_KAPAMA_SAATI'nin tarih ve saatini al
             bitisTarihi = dayjs(
               record.IST_KAPAMA_TARIHI.split("T")[0] +
                 "T" +
@@ -436,27 +448,19 @@ const MainTable = () => {
               "YYYY-MM-DDTHH:mm:ss"
             );
           } else {
-            // IST_KAPAMA_TARIHI ve IST_KAPAMA_SAATI değerleri null, undefined veya boşsa, hesaplama yapma ve boş döndür
             return "";
           }
         }
-
-        // İki zaman arasındaki farkı milisaniye cinsinden hesapla
         const fark = bitisTarihi.diff(baslangicTarihi);
-        // Farkı saniye cinsine çevir
         const farkSaniye = Math.floor(fark / 1000);
-        // Farkı dakika cinsine çevir
         const farkDakika = Math.floor(farkSaniye / 60);
-        // Farkı saat cinsine çevir
         const farkSaat = Math.floor(farkDakika / 60);
-        // Farkı gün cinsine çevir
         const farkGun = Math.floor(farkSaat / 24);
-        // İşlem süresini formatla ve döndür
-        // return `${farkGun > 0 ? farkGun + " gün " : ""}${farkSaat % 24} saat ${farkDakika % 60} dakika `;
         return `${farkGun > 0 ? farkGun + " gün " : ""}${
           farkSaat % 24 > 0 ? (farkSaat % 24) + " saat " : ""
         }${farkDakika % 60 > 0 ? (farkDakika % 60) + " dakika " : ""}`;
       },
+      sorter: (a, b) => (a.ISLEM_SURE || "").localeCompare(b.ISLEM_SURE || ""),
     },
     {
       title: "Kapanma Tarih",
@@ -469,8 +473,10 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak açık
+      visible: false,
       render: (text) => formatDate(text),
+      sorter: (a, b) =>
+        (a.IST_KAPAMA_TARIHI || "").localeCompare(b.IST_KAPAMA_TARIHI || ""),
     },
     {
       title: "Kapanma Saat",
@@ -483,8 +489,10 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak açık
+      visible: false,
       render: (text) => formatTime(text),
+      sorter: (a, b) =>
+        (a.IST_KAPAMA_SAATI || "").localeCompare(b.IST_KAPAMA_SAATI || ""),
     },
     {
       title: "İptal Tarih",
@@ -497,8 +505,10 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak açık
+      visible: false,
       render: (text) => formatDate(text),
+      sorter: (a, b) =>
+        (a.IST_IPTAL_TARIH || "").localeCompare(b.IST_IPTAL_TARIH || ""),
     },
     {
       title: "İptal Saat",
@@ -511,8 +521,10 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak açık
+      visible: false,
       render: (text) => formatTime(text),
+      sorter: (a, b) =>
+        (a.IST_IPTAL_SAAT || "").localeCompare(b.IST_IPTAL_SAAT || ""),
     },
     {
       title: "Müdahele Gecikme Süresi",
@@ -525,7 +537,11 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak kapalı
+      visible: false,
+      sorter: (a, b) =>
+        (a.mudaheleGecikmeSuresi || "").localeCompare(
+          b.mudaheleGecikmeSuresi || ""
+        ),
     },
     {
       title: "Durum Açıklaması",
@@ -538,7 +554,9 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak kapalı
+      visible: false,
+      sorter: (a, b) =>
+        (a.durumAciklamasi || "").localeCompare(b.durumAciklamasi || ""),
     },
     {
       title: "Planlanan Başlama Tarihi",
@@ -551,8 +569,12 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak kapalı
+      visible: false,
       render: (text) => formatDate(text),
+      sorter: (a, b) =>
+        (a.IST_PLANLANAN_BASLAMA_TARIHI || "").localeCompare(
+          b.IST_PLANLANAN_BASLAMA_TARIHI || ""
+        ),
     },
     {
       title: "Planlanan Başlama Saati",
@@ -565,8 +587,12 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak kapalı
+      visible: false,
       render: (text) => formatTime(text),
+      sorter: (a, b) =>
+        (a.IST_PLANLANAN_BASLAMA_SAATI || "").localeCompare(
+          b.IST_PLANLANAN_BASLAMA_SAATI || ""
+        ),
     },
     {
       title: "Planlanan Bitiş Tarihi",
@@ -579,8 +605,12 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak kapalı
+      visible: false,
       render: (text) => formatDate(text),
+      sorter: (a, b) =>
+        (a.IST_PLANLANAN_BITIS_TARIHI || "").localeCompare(
+          b.IST_PLANLANAN_BITIS_TARIHI || ""
+        ),
     },
     {
       title: "Planlanan Bitiş Saati",
@@ -593,8 +623,12 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak kapalı
+      visible: false,
       render: (text) => formatTime(text),
+      sorter: (a, b) =>
+        (a.IST_PLANLANAN_BITIS_SAATI || "").localeCompare(
+          b.IST_PLANLANAN_BITIS_SAATI || ""
+        ),
     },
     {
       title: "İş Emri No",
@@ -605,18 +639,15 @@ const MainTable = () => {
       onCell: (record) => ({
         onClick: (event) => {
           event.stopPropagation();
-
-          // Burada, record objesini doğrudan kullanmak yerine,
-          // bir kopyasını oluşturup `key` değerini `ISM_DURUM_KOD_ID` ile güncelliyoruz.
           const updatedRecord = { ...record, key: record.IST_ISEMRI_ID };
-          // const updatedRecord = { ...record, key: 378 };
-
-          setEditDrawer1Data(updatedRecord); // Güncellenmiş record'u EditDrawer1 için data olarak ayarla
-          setEditDrawer1Visible(true); // EditDrawer1'i aç
+          setEditDrawer1Data(updatedRecord);
+          setEditDrawer1Visible(true);
         },
       }),
       render: (text) => <a>{text}</a>,
-      visible: true, // Varsayılan olarak kapalı
+      visible: true,
+      sorter: (a, b) =>
+        (a.IST_ISEMRI_NO || "").localeCompare(b.IST_ISEMRI_NO || ""),
     },
     {
       title: "Teknisyen",
@@ -629,7 +660,11 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak kapalı
+      visible: false,
+      sorter: (a, b) =>
+        (a.IST_TEKNISYEN_TANIM || "").localeCompare(
+          b.IST_TEKNISYEN_TANIM || ""
+        ),
     },
     {
       title: "Atölye",
@@ -642,7 +677,9 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak kapalı
+      visible: false,
+      sorter: (a, b) =>
+        (a.IST_ATOLYE_TANIM || "").localeCompare(b.IST_ATOLYE_TANIM || ""),
     },
     {
       title: "Makine Kodu",
@@ -655,7 +692,9 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak kapalı
+      visible: false,
+      sorter: (a, b) =>
+        (a.IST_MAKINE_KOD || "").localeCompare(b.IST_MAKINE_KOD || ""),
     },
     {
       title: "Bildirim Tipi",
@@ -668,7 +707,9 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak kapalı
+      visible: false,
+      sorter: (a, b) =>
+        (a.IST_TIP_TANIM || "").localeCompare(b.IST_TIP_TANIM || ""),
     },
     {
       title: "İlgili Kişi",
@@ -681,7 +722,9 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak kapalı
+      visible: false,
+      sorter: (a, b) =>
+        (a.IST_TAKIP_EDEN_ADI || "").localeCompare(b.IST_TAKIP_EDEN_ADI || ""),
     },
     {
       title: "Bildirilen Bina",
@@ -694,7 +737,8 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak kapalı
+      visible: false,
+      sorter: (a, b) => (a.IST_BINA || "").localeCompare(b.IST_BINA || ""),
     },
     {
       title: "Bildirilen Kat",
@@ -707,7 +751,8 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak kapalı
+      visible: false,
+      sorter: (a, b) => (a.IST_KAT || "").localeCompare(b.IST_KAT || ""),
     },
     {
       title: "Servis Nedeni",
@@ -720,7 +765,9 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak kapalı
+      visible: false,
+      sorter: (a, b) =>
+        (a.IST_SERVIS_NEDENI || "").localeCompare(b.IST_SERVIS_NEDENI || ""),
     },
     {
       title: "Tam Lokasyon",
@@ -733,7 +780,11 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak kapalı
+      visible: false,
+      sorter: (a, b) =>
+        (a.IST_BILDIREN_LOKASYON_TUM || "").localeCompare(
+          b.IST_BILDIREN_LOKASYON_TUM || ""
+        ),
     },
     {
       title: "Ana Lokasyon",
@@ -744,7 +795,7 @@ const MainTable = () => {
         onClick: (event) => {
           event.stopPropagation();
         },
-      }), // Enable ellipsis for overflowed content
+      }),
       width: 300,
       sorter: (a, b) => {
         if (a.IST_BILDIREN_LOKASYON_TUM && b.IST_BILDIREN_LOKASYON_TUM) {
@@ -753,9 +804,9 @@ const MainTable = () => {
           );
         }
         if (!a.IST_BILDIREN_LOKASYON_TUM && !b.IST_BILDIREN_LOKASYON_TUM) {
-          return 0; // Both are null or undefined, consider them equal
+          return 0;
         }
-        return a.IST_BILDIREN_LOKASYON_TUM ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        return a.IST_BILDIREN_LOKASYON_TUM ? 1 : -1;
       },
       render: (text) => {
         if (text === null) {
@@ -763,8 +814,8 @@ const MainTable = () => {
         }
         const parts = text.split("/");
         return parts.length > 1 ? parts[0] : text;
-      }, // Add this line
-      visible: false, // Varsayılan olarak açık
+      },
+      visible: false,
     },
     {
       title: "Talep Değerlendirme Puan",
@@ -777,7 +828,11 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak kapalı
+      visible: false,
+      sorter: (a, b) =>
+        (a.IST_DEGERLENDIRME_PUAN || "").localeCompare(
+          b.IST_DEGERLENDIRME_PUAN || ""
+        ),
     },
     {
       title: "Talep Değerlendirme Açıklama",
@@ -790,7 +845,11 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      visible: false, // Varsayılan olarak kapalı
+      visible: false,
+      sorter: (a, b) =>
+        (a.IST_DEGERLENDIRME_ACIKLAMA || "").localeCompare(
+          b.IST_DEGERLENDIRME_ACIKLAMA || ""
+        ),
     },
 
     // Diğer kolonlarınız...
