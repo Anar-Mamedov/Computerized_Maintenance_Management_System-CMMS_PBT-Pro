@@ -16,6 +16,7 @@
     "@dnd-kit/sortable": "^8.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@react-google-maps/api": "^2.19.3",
+    "@simplewebauthn/browser": "^10.0.0",
     "antd": "^5.17.4",
     "axios": "^1.7.2",
     "chroma-js": "^2.4.2",
