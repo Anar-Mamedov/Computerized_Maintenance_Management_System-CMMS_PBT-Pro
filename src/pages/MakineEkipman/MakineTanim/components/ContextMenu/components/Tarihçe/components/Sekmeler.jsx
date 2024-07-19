@@ -48,6 +48,9 @@ const StyledTabs = styled(Tabs)`
   .ant-tabs-ink-bar {
     background: #2bc770;
   }
+  .ant-tabs-nav-operations {
+    display: none !important;
+  }
 `;
 
 //styled components end
@@ -69,7 +72,8 @@ export default function Sekmeler({ refreshKey, disabled, selectedRows }) {
         flexDirection: "column",
         gap: "5px",
         padding: "5px",
-      }}>
+      }}
+    >
       <Tooltip title={text}>
         <Text
           style={{
@@ -80,14 +84,22 @@ export default function Sekmeler({ refreshKey, disabled, selectedRows }) {
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-          }}>
+          }}
+        >
           {text}
         </Text>
       </Tooltip>
 
       <div style={{ display: "flex", gap: "10px" }}>
         <ResimCarousel selectedRows={selectedRows} />
-        <div style={{ display: "flex", flexDirection: "column", marginRight: "5px", gap: "1px" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            marginRight: "5px",
+            gap: "1px",
+          }}
+        >
           <Text
             type="secondary"
             style={{
@@ -97,7 +109,8 @@ export default function Sekmeler({ refreshKey, disabled, selectedRows }) {
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
             }}
-            title={`${selectedRows[0]?.MKN_MARKA} | ${selectedRows[0]?.MKN_MODEL}`}>
+            title={`${selectedRows[0]?.MKN_MARKA} | ${selectedRows[0]?.MKN_MODEL}`}
+          >
             {selectedRows[0]?.MKN_MARKA} | {selectedRows[0]?.MKN_MODEL}
           </Text>
           <Text
@@ -109,7 +122,8 @@ export default function Sekmeler({ refreshKey, disabled, selectedRows }) {
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
             }}
-            title={`Makne Tipi: ${selectedRows[0]?.MKN_TIP}`}>
+            title={`Makne Tipi: ${selectedRows[0]?.MKN_TIP}`}
+          >
             Makne Tipi: {selectedRows[0]?.MKN_TIP}
           </Text>
           <Text
@@ -121,7 +135,8 @@ export default function Sekmeler({ refreshKey, disabled, selectedRows }) {
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
             }}
-            title={`Lokasyon: ${selectedRows[0]?.MKN_LOKASYON}`}>
+            title={`Lokasyon: ${selectedRows[0]?.MKN_LOKASYON}`}
+          >
             Lokasyon: {selectedRows[0]?.MKN_LOKASYON}
           </Text>
           <Text
@@ -133,7 +148,8 @@ export default function Sekmeler({ refreshKey, disabled, selectedRows }) {
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
             }}
-            title={`Durum: ${selectedRows[0]?.MKN_DURUM}`}>
+            title={`Durum: ${selectedRows[0]?.MKN_DURUM}`}
+          >
             Durum: {selectedRows[0]?.MKN_DURUM}
           </Text>
         </div>
