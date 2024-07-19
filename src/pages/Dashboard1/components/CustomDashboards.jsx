@@ -103,11 +103,20 @@ function CustomDashboards(props) {
       <div
         key="defaultDashboard"
         style={{
-          padding: "5px 0",
+          padding: "5px 10px",
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
+          borderRadius: "5px",
+          backgroundColor:
+            getValues("selectedDashboard") === "Dashboard"
+              ? "#0086ff5c"
+              : "white",
+          border:
+            getValues("selectedDashboard") === "Dashboard"
+              ? "1px solid #0097ff"
+              : "none",
         }}
         onClick={() => handleDashboardClick("Dashboard")}
       >
@@ -125,8 +134,17 @@ function CustomDashboards(props) {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            padding: "5px 0",
+            padding: "5px 10px",
+            borderRadius: "5px",
             cursor: "pointer",
+            backgroundColor:
+              getValues("selectedDashboard") === dashboard
+                ? "#0086ff5c"
+                : "white",
+            border:
+              getValues("selectedDashboard") === dashboard
+                ? "1px solid #0097ff"
+                : "none",
           }}
         >
           <div
