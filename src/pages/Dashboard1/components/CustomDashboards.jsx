@@ -134,7 +134,7 @@ function CustomDashboards(props) {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            padding: "5px 10px",
+            padding: "0px 10px",
             borderRadius: "5px",
             cursor: "pointer",
             backgroundColor:
