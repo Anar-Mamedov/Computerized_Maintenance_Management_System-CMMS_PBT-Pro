@@ -1,63 +1,39 @@
-import { useEffect, useState } from "react";
-import {
-  Route,
-  Routes,
-  Link,
-  useLocation,
-  Outlet,
-  Navigate,
-} from "react-router-dom";
-import {
-  Breadcrumb,
-  Layout,
-  Menu,
-  theme,
-  Button,
-  Typography,
-  Input,
-} from "antd";
-import {
-  DesktopOutlined,
-  FileOutlined,
-  PieChartOutlined,
-  MenuUnfoldOutlined,
-  MenuFoldOutlined,
-  TeamOutlined,
-  UserOutlined,
-  KeyOutlined,
-} from "@ant-design/icons";
+import { useEffect, useState } from 'react';
+import { Route, Routes, Link, useLocation, Outlet, Navigate } from 'react-router-dom';
+import { Breadcrumb, Layout, Menu, theme, Button, Typography, Input } from 'antd';
+import { DesktopOutlined, FileOutlined, PieChartOutlined, MenuUnfoldOutlined, MenuFoldOutlined, TeamOutlined, UserOutlined, KeyOutlined } from '@ant-design/icons';
 // import Isemri from "./pages/DashboardAnalytics2/Isemri";
-import IsEmri from "./pages/BakımVeArizaYonetimi/IsEmri/IsEmri";
-import MakineTanim from "./pages/MakineEkipman/MakineTanim/MakineTanim";
-import LokasyonTanim from "./pages/Yonetim/LokasyonTanimlari/LokasyonTanimlari";
-import VardiyaTanim from "./pages/Yonetim/VardiyaTanimlari/VardiyaTanimlari";
-import Dashboard from "./pages/Dashboard/Dashboard";
-import BakimTanimlari from "./pages/BakımVeArizaYonetimi/BakimTanimlari/BakimTanimlari";
-import ArizaTanimlari from "./pages/BakımVeArizaYonetimi/ArizaTanimlari/ArizaTanimlari";
-import AtolyeTanimlari from "./pages/PersonelYonetimi/AtolyeTanimlari/AtolyeTanimlari";
-import PersonelTanimlari from "./pages/PersonelYonetimi/PersonelTanimlari/PersonelTanimlari";
-import IsTalepleri from "./pages/YardimMasasi/IsTalepleri/IsTalepleri";
-import Hazirlaniyor from "./pages/Hazirlaniyor";
-import Auth from "./pages/Auth/Auth";
-import logo from "../src/assets/images/logoBeyaz.png";
-import Headers from "./pages/Headers/Headers";
-import { useRecoilState } from "recoil";
-import { userState } from "./state/userState";
-import PlanlamaTakvimi from "./pages/BakımVeArizaYonetimi/PlanlamaTakvimi/PlanlamaTakvimi";
-import OtomatikIsEmri from "./pages/BakımVeArizaYonetimi/OtomatikIsEmri/OtomatikIsEmri";
-import PeriyodikBakimlar1 from "./pages/BakımVeArizaYonetimi/PeriyodikBakimlar1/PeryodikBakimlar";
-import RaporYonetimi from "./pages/Rapor&Formlar/RaporYonetimi/RaporYonetimi.jsx";
-import ProfilEkrani from "./pages/Headers/components/ProfilEkrani/ProfilEkrani.jsx";
-import Analizler from "./pages/PersonelYonetimi/PersonelKPI/Analizler.jsx";
-import Dashboard1 from "./pages/Dashboard1/Dashboard.jsx";
-import UserIdControl from "./pages/UserIdControl/UserIdControl.jsx";
+import IsEmri from './pages/BakımVeArizaYonetimi/IsEmri/IsEmri';
+import MakineTanim from './pages/MakineEkipman/MakineTanim/MakineTanim';
+import LokasyonTanim from './pages/Yonetim/LokasyonTanimlari/LokasyonTanimlari';
+import VardiyaTanim from './pages/Yonetim/VardiyaTanimlari/VardiyaTanimlari';
+import Dashboard from './pages/Dashboard/Dashboard';
+import BakimTanimlari from './pages/BakımVeArizaYonetimi/BakimTanimlari/BakimTanimlari';
+import ArizaTanimlari from './pages/BakımVeArizaYonetimi/ArizaTanimlari/ArizaTanimlari';
+import AtolyeTanimlari from './pages/PersonelYonetimi/AtolyeTanimlari/AtolyeTanimlari';
+import PersonelTanimlari from './pages/PersonelYonetimi/PersonelTanimlari/PersonelTanimlari';
+import IsTalepleri from './pages/YardimMasasi/IsTalepleri/IsTalepleri';
+import Hazirlaniyor from './pages/Hazirlaniyor';
+import Auth from './pages/Auth/Auth';
+import logo from '../src/assets/images/logoBeyaz.png';
+import Headers from './pages/Headers/Headers';
+import { useRecoilState } from 'recoil';
+import { userState } from './state/userState';
+import PlanlamaTakvimi from './pages/BakımVeArizaYonetimi/PlanlamaTakvimi/PlanlamaTakvimi';
+import OtomatikIsEmri from './pages/BakımVeArizaYonetimi/OtomatikIsEmri/OtomatikIsEmri';
+import PeriyodikBakimlar1 from './pages/BakımVeArizaYonetimi/PeriyodikBakimlar1/PeryodikBakimlar';
+import RaporYonetimi from './pages/Rapor&Formlar/RaporYonetimi/RaporYonetimi.jsx';
+import ProfilEkrani from './pages/Headers/components/ProfilEkrani/ProfilEkrani.jsx';
+import Analizler from './pages/PersonelYonetimi/PersonelKPI/Analizler.jsx';
+import Dashboard1 from './pages/Dashboard1/Dashboard.jsx';
+import UserIdControl from './pages/UserIdControl/UserIdControl.jsx';
 
 const { Text } = Typography;
 const { TextArea } = Input;
 
 const { Header, Content, Footer, Sider } = Layout;
 
-const loginData = JSON.parse(localStorage.getItem("login")) || {};
+const loginData = JSON.parse(localStorage.getItem('login')) || {};
 
 function getItem(label, key, icon, children, isClickable = true) {
   return {
@@ -70,7 +46,7 @@ function getItem(label, key, icon, children, isClickable = true) {
 
 function filterItems(items) {
   // LocalStorage'dan token kontrolü
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem('token');
 
   // Token yoksa, hiçbir filtreleme yapmadan tüm öğeleri döndür
   if (!token) {
@@ -81,110 +57,103 @@ function filterItems(items) {
   return items
     .map((item) => {
       // "Ana Sayfa" için özel durumu kontrol et
-      if (item.key === "" && item.label.props.children === "Ana Sayfa") {
+      if (item.key === '' && item.label.props.children === 'Ana Sayfa') {
         return item; // "Ana Sayfa" her zaman görünür
       }
 
-      const filteredChildren = item.children
-        ? filterItems(item.children).filter((child) => loginData[child.key])
-        : [];
+      const filteredChildren = item.children ? filterItems(item.children).filter((child) => loginData[child.key]) : [];
       return {
         ...item,
         children: filteredChildren.length > 0 ? filteredChildren : undefined,
       };
     })
-    .filter(
-      (item) =>
-        item.children ||
-        loginData[item.key] ||
-        (item.key === "" && item.label.props.children === "Ana Sayfa")
-    );
+    .filter((item) => item.children || loginData[item.key] || (item.key === '' && item.label.props.children === 'Ana Sayfa'));
 }
 
 const rawItems = [
-  getItem("Ana Sayfa", "", <PieChartOutlined />),
+  getItem('Ana Sayfa', '', <PieChartOutlined />),
   // getItem("Option 1", "option1", <PieChartOutlined />),
   // getItem("Option 2", "option2", <DesktopOutlined />),
   getItem(
-    "Makine & Ekipman Yönetimi",
-    "makine&ekipman",
+    'Makine & Ekipman Yönetimi',
+    'makine&ekipman',
     <TeamOutlined />,
     [
-      getItem("Makine Tanım", "makine", true),
-      getItem("Ekipman Veritabanı", "ekipmanVeritabani", true),
-      getItem("Sayaç Güncelleme", "sayacGuncelleme", true),
+      getItem('Makine Tanım', 'makine', true),
+      getItem('Ekipman Veritabanı', 'ekipmanVeritabani', true),
+      getItem('Sayaç Güncelleme', 'sayacGuncelleme', true),
       // getItem("Team 2", "team2", true)
     ],
     false
   ),
   getItem(
-    "Bakım ve Arıza Yönetimi",
-    "bakim&ariza",
+    'Bakım ve Arıza Yönetimi',
+    'bakim&ariza',
     <UserOutlined />,
     [
       // getItem("Tom", "tom", true),
-      getItem("Bakım Tanımları", "bakimTanimlari", true),
-      getItem("Arıza Tanımları", "arizaTanimlari", true),
+      getItem('Bakım Tanımları', 'bakimTanimlari', true),
+      getItem('Arıza Tanımları', 'arizaTanimlari', true),
       // getItem("İş Emri", "isemri", true),
-      getItem("İş Emirleri", "isEmri1", true),
-      getItem("Periyodik Bakımlar", "periyodikBakimlar", true),
-      getItem("Otomatik İş Emirleri", "otomatikIsEmirleri", true),
-      getItem("Planlama Takvimi", "planlamaTakvimi", true),
+      getItem('İş Emirleri', 'isEmri1', true),
+      getItem('Periyodik Bakımlar', 'periyodikBakimlar', true),
+      getItem('Otomatik İş Emirleri', 'otomatikIsEmirleri', true),
+      getItem('Planlama Takvimi', 'planlamaTakvimi', true),
       // getItem("Alex", "alex", true)
     ],
     false
   ),
   getItem(
-    "Personel Yönetimi",
-    "personelYonetimi",
+    'Personel Yönetimi',
+    'personelYonetimi',
     <UserOutlined />,
     [
-      getItem("Atölye Tanımları", "atolye", true),
-      getItem("Personel Tanımları", "personeltanimlari", true),
-      getItem("Personel İzinleri", "personelIzinleri", true),
-      getItem("Personel Nöbetleri", "personelNobetleri", true),
-      getItem("Personel Çalışma Planı", "personelCalismaPLani", true),
-      getItem("Personel KPI", "analizler", true),
+      getItem('Atölye Tanımları', 'atolye', true),
+      getItem('Personel Tanımları', 'personeltanimlari', true),
+      getItem('Personel İzinleri', 'personelIzinleri', true),
+      getItem('Personel Nöbetleri', 'personelNobetleri', true),
+      getItem('Personel Çalışma Planı', 'personelCalismaPLani', true),
+      getItem('Personel KPI', 'analizler', true),
 
       // getItem("Team 2", "team2", true)
     ],
     false
   ),
   getItem(
-    "Yardım Masası",
-    "yardimMasasi",
+    'Yardım Masası',
+    'yardimMasasi',
     <KeyOutlined />,
     [
-      getItem("İş Talepleri", "isTalepleri", true),
-      getItem("İş Talebi Kullanıcıları", "isTalebiKullanicilari", true),
+      getItem('İş Talepleri', 'isTalepleri', true),
+      getItem('İş Talebi Kullanıcıları', 'isTalebiKullanicilari', true),
       // getItem("Team 2", "team2", true)
     ],
     false
   ),
   getItem(
-    "Rapor & Formlar",
-    "rapor&formlar",
+    'Rapor & Formlar',
+    'rapor&formlar',
     <KeyOutlined />,
     [
-      getItem("Rapor Yönetimi", "raporYonetimi", true),
-      getItem("Form Yönetimi", "formYonetimi", true),
+      getItem('Rapor Yönetimi', 'raporYonetimi', true),
+      getItem('Form Yönetimi', 'formYonetimi', true),
       // getItem("Team 2", "team2", true)
     ],
     false
   ),
   getItem(
-    "Yönetim",
-    "yonetim",
+    'Yönetim',
+    'yonetim',
     <KeyOutlined />,
     [
-      getItem("Lokasyon Tanımları", "lokasyon", true),
-      getItem("Vardiya Tanımları", "vardiyalar", true),
-      getItem("Kod Yönetimi", "kodYonetimi", true),
-      getItem("Otomatik Kodlar", "otomatikKodlar", true),
-      getItem("Servis Öncelik Seviyeleri", "servisOncelikSeviyeleri", true),
-      getItem("İş Emri Tipleri", "isEmriTipleri", true),
-      getItem("Onaylayıcılar", "onaylayicilar", true),
-      getItem("Proje Tanımları", "projeTanimlari", true),
+      getItem('Lokasyon Tanımları', 'lokasyon', true),
+      getItem('Vardiya Tanımları', 'vardiyalar', true),
+      getItem('Kod Yönetimi', 'kodYonetimi', true),
+      getItem('Otomatik Kodlar', 'otomatikKodlar', true),
+      getItem('Servis Öncelik Seviyeleri', 'servisOncelikSeviyeleri', true),
+      getItem('İş Emri Tipleri', 'isEmriTipleri', true),
+      getItem('Onaylayıcılar', 'onaylayicilar', true),
+      getItem('Proje Tanımları', 'projeTanimlari', true),
       // getItem("Team 2", "team2", true)
     ],
     false
@@ -205,7 +174,7 @@ export default function App() {
   // localStorage'dan kullanıcı bilgilerini oku
   useEffect(() => {
     // Sayfa yüklendiğinde, kullanıcı bilgilerini localStorage'dan oku
-    const storedUser = localStorage.getItem("user");
+    const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser)); // Recoil durumunu güncelle
     }
@@ -262,11 +231,11 @@ export default function App() {
 }
 
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem('token');
   // const token = sessionStorage.getItem("token");
 
   if (!token) {
-    return <Navigate to={"/auth"} replace />;
+    return <Navigate to={'/auth'} replace />;
   }
 
   return children;
@@ -284,40 +253,34 @@ const BaseLayout = () => {
   };
 
   // Ekran boyutu değişikliklerini dinle
-  window.addEventListener("resize", () => {
+  window.addEventListener('resize', () => {
     setMobileView(window.innerWidth < 768);
   });
 
   const logoStyle = {
-    marginTop: "20px", // Yukarıda 20 piksellik boşluk bırakın
-    maxWidth: "100px", // Genişliği sabit tutun
-    width: "80%", // Genişliği sabit tutun
+    marginTop: '20px', // Yukarıda 20 piksellik boşluk bırakın
+    maxWidth: '100px', // Genişliği sabit tutun
+    width: '80%', // Genişliği sabit tutun
     // marginBottom: "20px", // Aşağıda 20 piksellik boşluk bırakın
   };
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
+    <Layout style={{ minHeight: '100vh' }}>
       {(mobileView && (
-        <Sider
-          collapsible
-          collapsed={collapsed}
-          onCollapse={setCollapsed}
-          breakpoint="lg"
-          collapsedWidth="0.0000000000001"
-        >
+        <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed} breakpoint="lg" collapsedWidth="0.0000000000001">
           <div
             className="demo-logo-vertical"
             style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
-              alignItems: "flex-end",
-              marginBottom: "20px",
-              columnGap: "5px",
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              marginBottom: '20px',
+              columnGap: '5px',
             }}
           >
             <img src={logo} alt="Logo" style={logoStyle} />
-            <Text style={{ color: "white", marginTop: "11px" }}>v. 1.7.0</Text>
+            <Text style={{ color: 'white', marginTop: '11px' }}>v. 1.7.0</Text>
           </div>
           <MenuWrapper />
         </Sider>
@@ -333,16 +296,16 @@ const BaseLayout = () => {
           <div
             className="demo-logo-vertical"
             style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
-              alignItems: "flex-end",
-              marginBottom: "20px",
-              columnGap: "5px",
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              marginBottom: '20px',
+              columnGap: '5px',
             }}
           >
             <img src={logo} alt="Logo" style={logoStyle} />
-            <Text style={{ color: "white", marginTop: "11px" }}>v. 1.7.0</Text>
+            <Text style={{ color: 'white', marginTop: '11px' }}>v. 1.7.0</Text>
           </div>
           <MenuWrapper />
         </Sider>
@@ -353,40 +316,36 @@ const BaseLayout = () => {
           style={{
             padding: 0,
             background: colorBgContainer,
-            display: "flex",
-            alignItems: "center",
+            display: 'flex',
+            alignItems: 'center',
           }}
         >
           {mobileView && (
             <Button
               onClick={toggleCollapsed}
               style={{
-                padding: "0 24px",
-                width: "40px",
-                height: "40px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                marginLeft: "10px",
+                padding: '0 24px',
+                width: '40px',
+                height: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginLeft: '10px',
               }}
             >
-              {collapsed ? (
-                <MenuUnfoldOutlined style={{ color: "#0066ff" }} />
-              ) : (
-                <MenuFoldOutlined style={{ color: "#0066ff" }} />
-              )}
+              {collapsed ? <MenuUnfoldOutlined style={{ color: '#0066ff' }} /> : <MenuFoldOutlined style={{ color: '#0066ff' }} />}
             </Button>
           )}
           <Headers />
         </Header>
-        <Content style={{ margin: mobileView ? "0 0px" : "0 16px" }}>
-          <Breadcrumb style={{ margin: "16px 0" }}></Breadcrumb>
+        <Content style={{ margin: mobileView ? '0 0px' : '0 16px' }}>
+          <Breadcrumb style={{ margin: '16px 0' }}></Breadcrumb>
           <div
             style={{
-              padding: mobileView ? "24px 0px" : 24,
-              borderRadius: "16px",
+              padding: mobileView ? '24px 0px' : 24,
+              borderRadius: '16px',
               minHeight: 360,
-              height: "calc(100vh - 129px)",
+              height: 'calc(100vh - 129px)',
               background: colorBgContainer,
             }}
           >
@@ -394,9 +353,7 @@ const BaseLayout = () => {
           </div>
         </Content>
 
-        <Footer style={{ textAlign: "center", padding: "10px 50px" }}>
-          Orjin {new Date().getFullYear()} - Design & Develop by Orjin Team
-        </Footer>
+        <Footer style={{ textAlign: 'center', padding: '10px 50px' }}>Orjin {new Date().getFullYear()} - Design & Develop by Orjin Team</Footer>
       </Layout>
     </Layout>
   );
@@ -409,10 +366,8 @@ const MenuWrapper = () => {
   const [openKeys, setOpenKeys] = useState([]);
 
   useEffect(() => {
-    const currentPath = location.pathname.split("/")[1];
-    const openKey = items.find((item) =>
-      item.children?.some((child) => `/${child.key}` === `/${currentPath}`)
-    )?.key;
+    const currentPath = location.pathname.split('/')[1];
+    const openKey = items.find((item) => item.children?.some((child) => `/${child.key}` === `/${currentPath}`))?.key;
     if (openKey) {
       setOpenKeys([openKey]);
     }
@@ -428,15 +383,8 @@ const MenuWrapper = () => {
   };
 
   return (
-    <div style={{ height: "calc(100vh - 115px)", overflow: "auto" }}>
-      <Menu
-        theme="dark"
-        defaultSelectedKeys={[location.pathname.split("/")[1]]}
-        mode="inline"
-        items={items}
-        openKeys={openKeys}
-        onOpenChange={onOpenChange}
-      />
+    <div style={{ height: 'calc(100vh - 115px)', overflow: 'auto' }}>
+      <Menu theme="dark" defaultSelectedKeys={[location.pathname.split('/')[1]]} mode="inline" items={items} openKeys={openKeys} onOpenChange={onOpenChange} />
     </div>
   );
 };
