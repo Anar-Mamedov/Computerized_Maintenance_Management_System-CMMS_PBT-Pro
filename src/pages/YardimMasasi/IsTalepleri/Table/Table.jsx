@@ -1,51 +1,22 @@
-import React, { useCallback, useEffect, useState } from "react";
-import {
-  Table,
-  Button,
-  Modal,
-  Checkbox,
-  Input,
-  Spin,
-  Typography,
-  Tag,
-  Progress,
-  message,
-} from "antd";
-import {
-  HolderOutlined,
-  SearchOutlined,
-  MenuOutlined,
-  CheckOutlined,
-  CloseOutlined,
-} from "@ant-design/icons";
-import {
-  DndContext,
-  useSensor,
-  useSensors,
-  PointerSensor,
-  KeyboardSensor,
-} from "@dnd-kit/core";
-import {
-  sortableKeyboardCoordinates,
-  arrayMove,
-  useSortable,
-  SortableContext,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { Resizable } from "react-resizable";
-import "./ResizeStyle.css";
-import AxiosInstance from "../../../../api/http";
-import CreateDrawer from "../Insert/CreateDrawer";
-import EditDrawer from "../Update/EditDrawer";
-import Filters from "./filter/Filters";
-import ContextMenu from "../components/ContextMenu/ContextMenu";
-import TeknisyenSubmit from "../components/IsEmrineCevir/Teknisyen/TeknisyenSubmit";
-import AtolyeSubmit from "../components/IsEmrineCevir/Atolye/AtolyeSubmit";
-import EditDrawer1 from "../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer";
-import { useFormContext } from "react-hook-form";
-import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
+import React, { useCallback, useEffect, useState } from 'react';
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from 'antd';
+import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from '@dnd-kit/core';
+import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Resizable } from 'react-resizable';
+import './ResizeStyle.css';
+import AxiosInstance from '../../../../api/http';
+import CreateDrawer from '../Insert/CreateDrawer';
+import EditDrawer from '../Update/EditDrawer';
+import Filters from './filter/Filters';
+import ContextMenu from '../components/ContextMenu/ContextMenu';
+import TeknisyenSubmit from '../components/IsEmrineCevir/Teknisyen/TeknisyenSubmit';
+import AtolyeSubmit from '../components/IsEmrineCevir/Atolye/AtolyeSubmit';
+import EditDrawer1 from '../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer';
+import { useFormContext } from 'react-hook-form';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
 const { Text } = Typography;
 
@@ -56,15 +27,15 @@ const ResizableTitle = (props) => {
 
   // tabloyu genişletmek için kullanılan alanın stil özellikleri
   const handleStyle = {
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
-    right: "-5px",
-    width: "20%",
-    height: "100%", // this is the area that is draggable, you can adjust it
+    right: '-5px',
+    width: '20%',
+    height: '100%', // this is the area that is draggable, you can adjust it
     zIndex: 2, // ensure it's above other elements
-    cursor: "col-resize",
-    padding: "0px",
-    backgroundSize: "0px",
+    cursor: 'col-resize',
+    padding: '0px',
+    backgroundSize: '0px',
   };
 
   if (!width) {
@@ -96,43 +67,21 @@ const ResizableTitle = (props) => {
 
 // Sütunların sürüklenebilir olmasını sağlayan component
 
-const DraggableRow = ({
-  id,
-  text,
-  index,
-  moveRow,
-  className,
-  style,
-  visible,
-  onVisibilityChange,
-  ...restProps
-}) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
+const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onVisibilityChange, ...restProps }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const styleWithTransform = {
     ...style,
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    backgroundColor: isDragging ? "#f0f0f0" : "",
-    display: "flex",
-    alignItems: "center",
+    backgroundColor: isDragging ? '#f0f0f0' : '',
+    display: 'flex',
+    alignItems: 'center',
     gap: 8,
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={styleWithTransform}
-      {...restProps}
-      {...attributes}
-    >
+    <div ref={setNodeRef} style={styleWithTransform} {...restProps} {...attributes}>
       {/* <Checkbox
         checked={visible}
         onChange={(e) => onVisibilityChange(index, e.target.checked)}
@@ -141,10 +90,10 @@ const DraggableRow = ({
       <div
         {...listeners}
         style={{
-          cursor: "grab",
+          cursor: 'grab',
           flexGrow: 1,
-          display: "flex",
-          alignItems: "center",
+          display: 'flex',
+          alignItems: 'center',
         }}
       >
         <HolderOutlined style={{ marginRight: 8 }} />
@@ -162,11 +111,11 @@ const MainTable = () => {
   const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [searchTimeout, setSearchTimeout] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0); // Toplam sayfa sayısı için state
-  const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
+  const [label, setLabel] = useState('Yükleniyor...'); // Başlangıç değeri özel alanlar için
   const [totalDataCount, setTotalDataCount] = useState(0); // Tüm veriyi tutan state
   const [pageSize, setPageSize] = useState(10); // Başlangıçta sayfa başına 10 kayıt göster
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
@@ -184,19 +133,19 @@ const MainTable = () => {
   const statusTag = (statusId) => {
     switch (statusId) {
       case 0:
-        return { color: "blue", text: "Açık" };
+        return { color: 'blue', text: 'Açık' };
       case 1:
-        return { color: "#ff5e00", text: "Bekliyor" };
+        return { color: '#ff5e00', text: 'Bekliyor' };
       case 2:
-        return { color: "#ffe600", text: "Planlandı" };
+        return { color: '#ffe600', text: 'Planlandı' };
       case 3:
-        return { color: "#00d300", text: "Devam Ediyor" };
+        return { color: '#00d300', text: 'Devam Ediyor' };
       case 4:
-        return { color: "#575757", text: "Kapandı" };
+        return { color: '#575757', text: 'Kapandı' };
       case 5:
-        return { color: "#d10000", text: "İptal Edildi" };
+        return { color: '#d10000', text: 'İptal Edildi' };
       default:
-        return { color: "default", text: "" }; // Eğer farklı bir değer gelirse
+        return { color: 'default', text: '' }; // Eğer farklı bir değer gelirse
     }
   };
 
@@ -231,38 +180,36 @@ const MainTable = () => {
     // API'den veri çekme işlemi
     const fetchData = async () => {
       try {
-        const response = await AxiosInstance.get("OzelAlan?form=ISEMRI"); // API URL'niz
-        localStorage.setItem("ozelAlanlarIsTalep", JSON.stringify(response));
+        const response = await AxiosInstance.get('OzelAlan?form=ISEMRI'); // API URL'niz
+        localStorage.setItem('ozelAlanlarIsTalep', JSON.stringify(response));
         setLabel(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
       } catch (error) {
-        console.error("API isteğinde hata oluştu:", error);
-        setLabel("Hata! Veri yüklenemedi."); // Hata durumunda kullanıcıya bilgi verme
+        console.error('API isteğinde hata oluştu:', error);
+        setLabel('Hata! Veri yüklenemedi.'); // Hata durumunda kullanıcıya bilgi verme
       }
     };
 
     fetchData();
   }, [drawer.visible]);
 
-  const ozelAlanlarIsTalep = JSON.parse(
-    localStorage.getItem("ozelAlanlarIsTalep")
-  );
+  const ozelAlanlarIsTalep = JSON.parse(localStorage.getItem('ozelAlanlarIsTalep'));
 
   // Özel Alanların nameleri backend çekmek için api isteği sonu
   const initialColumns = [
     {
-      title: "Talep Kodu",
-      dataIndex: "IST_KOD",
-      key: "IST_KOD",
+      title: 'Talep Kodu',
+      dataIndex: 'IST_KOD',
+      key: 'IST_KOD',
       width: 120,
       ellipsis: true,
       visible: true,
       render: (text) => <a>{text}</a>,
-      sorter: (a, b) => (a.IST_KOD || "").localeCompare(b.IST_KOD || ""),
+      sorter: (a, b) => (a.IST_KOD || '').localeCompare(b.IST_KOD || ''),
     },
     {
-      title: "Tarih",
-      dataIndex: "IST_ACILIS_TARIHI",
-      key: "IST_ACILIS_TARIHI",
+      title: 'Tarih',
+      dataIndex: 'IST_ACILIS_TARIHI',
+      key: 'IST_ACILIS_TARIHI',
       width: 110,
       ellipsis: true,
       onCell: () => ({
@@ -272,13 +219,12 @@ const MainTable = () => {
       }),
       visible: true,
       render: (text) => formatDate(text),
-      sorter: (a, b) =>
-        (a.IST_ACILIS_TARIHI || "").localeCompare(b.IST_ACILIS_TARIHI || ""),
+      sorter: (a, b) => (a.IST_ACILIS_TARIHI || '').localeCompare(b.IST_ACILIS_TARIHI || ''),
     },
     {
-      title: "Saat",
-      dataIndex: "IST_ACILIS_SAATI",
-      key: "IST_ACILIS_SAATI",
+      title: 'Saat',
+      dataIndex: 'IST_ACILIS_SAATI',
+      key: 'IST_ACILIS_SAATI',
       width: 90,
       ellipsis: true,
       onCell: () => ({
@@ -288,23 +234,22 @@ const MainTable = () => {
       }),
       visible: true,
       render: (text) => formatTime(text),
-      sorter: (a, b) =>
-        (a.IST_ACILIS_SAATI || "").localeCompare(b.IST_ACILIS_SAATI || ""),
+      sorter: (a, b) => (a.IST_ACILIS_SAATI || '').localeCompare(b.IST_ACILIS_SAATI || ''),
     },
     {
-      title: "Konu",
-      dataIndex: "IST_TANIMI",
-      key: "IST_TANIMI",
+      title: 'Konu',
+      dataIndex: 'IST_TANIMI',
+      key: 'IST_TANIMI',
       width: 300,
       ellipsis: true,
       visible: true,
       render: (text) => <a>{text}</a>,
-      sorter: (a, b) => (a.IST_TANIMI || "").localeCompare(b.IST_TANIMI || ""),
+      sorter: (a, b) => (a.IST_TANIMI || '').localeCompare(b.IST_TANIMI || ''),
     },
     {
-      title: "Talep Eden",
-      dataIndex: "IST_TALEP_EDEN_ADI",
-      key: "IST_TALEP_EDEN_ADI",
+      title: 'Talep Eden',
+      dataIndex: 'IST_TALEP_EDEN_ADI',
+      key: 'IST_TALEP_EDEN_ADI',
       width: 150,
       ellipsis: true,
       onCell: () => ({
@@ -313,13 +258,12 @@ const MainTable = () => {
         },
       }),
       visible: true,
-      sorter: (a, b) =>
-        (a.IST_TALEP_EDEN_ADI || "").localeCompare(b.IST_TALEP_EDEN_ADI || ""),
+      sorter: (a, b) => (a.IST_TALEP_EDEN_ADI || '').localeCompare(b.IST_TALEP_EDEN_ADI || ''),
     },
     {
-      title: "Durum",
-      dataIndex: "IST_DURUM_ID",
-      key: "IST_DURUM_ID",
+      title: 'Durum',
+      dataIndex: 'IST_DURUM_ID',
+      key: 'IST_DURUM_ID',
       width: 150,
       ellipsis: true,
       onCell: () => ({
@@ -333,14 +277,14 @@ const MainTable = () => {
         return (
           <div
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
             <Tag
               style={{
-                textAlign: "center",
+                textAlign: 'center',
                 backgroundColor: hexToRGBA(color, 0.2),
                 border: `1.2px solid ${hexToRGBA(color, 0.7)}`,
                 color: color,
@@ -354,9 +298,9 @@ const MainTable = () => {
       sorter: (a, b) => (a.IST_DURUM_ID || 0) - (b.IST_DURUM_ID || 0),
     },
     {
-      title: "Makine Tanım",
-      dataIndex: "IST_MAKINE_TANIM",
-      key: "IST_MAKINE_TANIM",
+      title: 'Makine Tanım',
+      dataIndex: 'IST_MAKINE_TANIM',
+      key: 'IST_MAKINE_TANIM',
       width: 150,
       ellipsis: true,
       onCell: () => ({
@@ -365,13 +309,12 @@ const MainTable = () => {
         },
       }),
       visible: true,
-      sorter: (a, b) =>
-        (a.IST_MAKINE_TANIM || "").localeCompare(b.IST_MAKINE_TANIM || ""),
+      sorter: (a, b) => (a.IST_MAKINE_TANIM || '').localeCompare(b.IST_MAKINE_TANIM || ''),
     },
     {
-      title: "İş Kategorisi",
-      dataIndex: "IST_KATEGORI_TANIMI",
-      key: "IST_KATEGORI_TANIMI",
+      title: 'İş Kategorisi',
+      dataIndex: 'IST_KATEGORI_TANIMI',
+      key: 'IST_KATEGORI_TANIMI',
       width: 150,
       ellipsis: true,
       onCell: () => ({
@@ -380,15 +323,12 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) =>
-        (a.IST_KATEGORI_TANIMI || "").localeCompare(
-          b.IST_KATEGORI_TANIMI || ""
-        ),
+      sorter: (a, b) => (a.IST_KATEGORI_TANIMI || '').localeCompare(b.IST_KATEGORI_TANIMI || ''),
     },
     {
-      title: "Öncelik",
-      dataIndex: "IST_ONCELIK",
-      key: "IST_ONCELIK",
+      title: 'Öncelik',
+      dataIndex: 'IST_ONCELIK',
+      key: 'IST_ONCELIK',
       width: 150,
       ellipsis: true,
       onCell: () => ({
@@ -397,13 +337,12 @@ const MainTable = () => {
         },
       }),
       visible: true,
-      sorter: (a, b) =>
-        (a.IST_ONCELIK || "").localeCompare(b.IST_ONCELIK || ""),
+      sorter: (a, b) => (a.IST_ONCELIK || '').localeCompare(b.IST_ONCELIK || ''),
     },
     {
-      title: "Lokasyon",
-      dataIndex: "IST_BILDIREN_LOKASYON",
-      key: "IST_BILDIREN_LOKASYON",
+      title: 'Lokasyon',
+      dataIndex: 'IST_BILDIREN_LOKASYON',
+      key: 'IST_BILDIREN_LOKASYON',
       width: 150,
       ellipsis: true,
       onCell: () => ({
@@ -412,15 +351,12 @@ const MainTable = () => {
         },
       }),
       visible: true,
-      sorter: (a, b) =>
-        (a.IST_BILDIREN_LOKASYON || "").localeCompare(
-          b.IST_BILDIREN_LOKASYON || ""
-        ),
+      sorter: (a, b) => (a.IST_BILDIREN_LOKASYON || '').localeCompare(b.IST_BILDIREN_LOKASYON || ''),
     },
     {
-      title: "İşlem Süresi",
-      dataIndex: "ISLEM_SURE",
-      key: "ISLEM_SURE",
+      title: 'İşlem Süresi',
+      dataIndex: 'ISLEM_SURE',
+      key: 'ISLEM_SURE',
       width: 300,
       ellipsis: true,
       onCell: () => ({
@@ -431,24 +367,14 @@ const MainTable = () => {
       visible: true,
       render: (text, record) => {
         let baslangicTarihi, bitisTarihi;
-        baslangicTarihi = dayjs(
-          record.IST_ACILIS_TARIHI.split("T")[0] +
-            "T" +
-            record.IST_ACILIS_SAATI,
-          "YYYY-MM-DDTHH:mm:ss"
-        );
+        baslangicTarihi = dayjs(record.IST_ACILIS_TARIHI.split('T')[0] + 'T' + record.IST_ACILIS_SAATI, 'YYYY-MM-DDTHH:mm:ss');
         if (record.IST_DURUM_ID !== 4) {
           bitisTarihi = dayjs();
         } else {
           if (record.IST_KAPAMA_TARIHI && record.IST_KAPAMA_SAATI) {
-            bitisTarihi = dayjs(
-              record.IST_KAPAMA_TARIHI.split("T")[0] +
-                "T" +
-                record.IST_KAPAMA_SAATI,
-              "YYYY-MM-DDTHH:mm:ss"
-            );
+            bitisTarihi = dayjs(record.IST_KAPAMA_TARIHI.split('T')[0] + 'T' + record.IST_KAPAMA_SAATI, 'YYYY-MM-DDTHH:mm:ss');
           } else {
-            return "";
+            return '';
           }
         }
         const fark = bitisTarihi.diff(baslangicTarihi);
@@ -456,16 +382,14 @@ const MainTable = () => {
         const farkDakika = Math.floor(farkSaniye / 60);
         const farkSaat = Math.floor(farkDakika / 60);
         const farkGun = Math.floor(farkSaat / 24);
-        return `${farkGun > 0 ? farkGun + " gün " : ""}${
-          farkSaat % 24 > 0 ? (farkSaat % 24) + " saat " : ""
-        }${farkDakika % 60 > 0 ? (farkDakika % 60) + " dakika " : ""}`;
+        return `${farkGun > 0 ? farkGun + ' gün ' : ''}${farkSaat % 24 > 0 ? (farkSaat % 24) + ' saat ' : ''}${farkDakika % 60 > 0 ? (farkDakika % 60) + ' dakika ' : ''}`;
       },
-      sorter: (a, b) => (a.ISLEM_SURE || "").localeCompare(b.ISLEM_SURE || ""),
+      sorter: (a, b) => (a.ISLEM_SURE || '').localeCompare(b.ISLEM_SURE || ''),
     },
     {
-      title: "Kapanma Tarih",
-      dataIndex: "IST_KAPAMA_TARIHI",
-      key: "IST_KAPAMA_TARIHI",
+      title: 'Kapanma Tarih',
+      dataIndex: 'IST_KAPAMA_TARIHI',
+      key: 'IST_KAPAMA_TARIHI',
       width: 110,
       ellipsis: true,
       onCell: () => ({
@@ -475,13 +399,12 @@ const MainTable = () => {
       }),
       visible: false,
       render: (text) => formatDate(text),
-      sorter: (a, b) =>
-        (a.IST_KAPAMA_TARIHI || "").localeCompare(b.IST_KAPAMA_TARIHI || ""),
+      sorter: (a, b) => (a.IST_KAPAMA_TARIHI || '').localeCompare(b.IST_KAPAMA_TARIHI || ''),
     },
     {
-      title: "Kapanma Saat",
-      dataIndex: "IST_KAPAMA_SAATI",
-      key: "IST_KAPAMA_SAATI",
+      title: 'Kapanma Saat',
+      dataIndex: 'IST_KAPAMA_SAATI',
+      key: 'IST_KAPAMA_SAATI',
       width: 90,
       ellipsis: true,
       onCell: () => ({
@@ -491,13 +414,12 @@ const MainTable = () => {
       }),
       visible: false,
       render: (text) => formatTime(text),
-      sorter: (a, b) =>
-        (a.IST_KAPAMA_SAATI || "").localeCompare(b.IST_KAPAMA_SAATI || ""),
+      sorter: (a, b) => (a.IST_KAPAMA_SAATI || '').localeCompare(b.IST_KAPAMA_SAATI || ''),
     },
     {
-      title: "İptal Tarih",
-      dataIndex: "IST_IPTAL_TARIH",
-      key: "IST_IPTAL_TARIH",
+      title: 'İptal Tarih',
+      dataIndex: 'IST_IPTAL_TARIH',
+      key: 'IST_IPTAL_TARIH',
       width: 110,
       ellipsis: true,
       onCell: () => ({
@@ -507,13 +429,12 @@ const MainTable = () => {
       }),
       visible: false,
       render: (text) => formatDate(text),
-      sorter: (a, b) =>
-        (a.IST_IPTAL_TARIH || "").localeCompare(b.IST_IPTAL_TARIH || ""),
+      sorter: (a, b) => (a.IST_IPTAL_TARIH || '').localeCompare(b.IST_IPTAL_TARIH || ''),
     },
     {
-      title: "İptal Saat",
-      dataIndex: "IST_IPTAL_SAAT",
-      key: "IST_IPTAL_SAAT",
+      title: 'İptal Saat',
+      dataIndex: 'IST_IPTAL_SAAT',
+      key: 'IST_IPTAL_SAAT',
       width: 90,
       ellipsis: true,
       onCell: () => ({
@@ -523,13 +444,12 @@ const MainTable = () => {
       }),
       visible: false,
       render: (text) => formatTime(text),
-      sorter: (a, b) =>
-        (a.IST_IPTAL_SAAT || "").localeCompare(b.IST_IPTAL_SAAT || ""),
+      sorter: (a, b) => (a.IST_IPTAL_SAAT || '').localeCompare(b.IST_IPTAL_SAAT || ''),
     },
     {
-      title: "Müdahele Gecikme Süresi",
-      dataIndex: "mudaheleGecikmeSuresi",
-      key: "mudaheleGecikmeSuresi",
+      title: 'Müdahele Gecikme Süresi',
+      dataIndex: 'mudaheleGecikmeSuresi',
+      key: 'mudaheleGecikmeSuresi',
       width: 150,
       ellipsis: true,
       onCell: () => ({
@@ -538,15 +458,12 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) =>
-        (a.mudaheleGecikmeSuresi || "").localeCompare(
-          b.mudaheleGecikmeSuresi || ""
-        ),
+      sorter: (a, b) => (a.mudaheleGecikmeSuresi || '').localeCompare(b.mudaheleGecikmeSuresi || ''),
     },
     {
-      title: "Durum Açıklaması",
-      dataIndex: "durumAciklamasi",
-      key: "durumAciklamasi",
+      title: 'Durum Açıklaması',
+      dataIndex: 'durumAciklamasi',
+      key: 'durumAciklamasi',
       width: 150,
       ellipsis: true,
       onCell: () => ({
@@ -555,49 +472,12 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) =>
-        (a.durumAciklamasi || "").localeCompare(b.durumAciklamasi || ""),
+      sorter: (a, b) => (a.durumAciklamasi || '').localeCompare(b.durumAciklamasi || ''),
     },
     {
-      title: "Planlanan Başlama Tarihi",
-      dataIndex: "IST_PLANLANAN_BASLAMA_TARIHI",
-      key: "IST_PLANLANAN_BASLAMA_TARIHI",
-      width: 150,
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      render: (text) => formatDate(text),
-      sorter: (a, b) =>
-        (a.IST_PLANLANAN_BASLAMA_TARIHI || "").localeCompare(
-          b.IST_PLANLANAN_BASLAMA_TARIHI || ""
-        ),
-    },
-    {
-      title: "Planlanan Başlama Saati",
-      dataIndex: "IST_PLANLANAN_BASLAMA_SAATI",
-      key: "IST_PLANLANAN_BASLAMA_SAATI",
-      width: 150,
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      render: (text) => formatTime(text),
-      sorter: (a, b) =>
-        (a.IST_PLANLANAN_BASLAMA_SAATI || "").localeCompare(
-          b.IST_PLANLANAN_BASLAMA_SAATI || ""
-        ),
-    },
-    {
-      title: "Planlanan Bitiş Tarihi",
-      dataIndex: "IST_PLANLANAN_BITIS_TARIHI",
-      key: "IST_PLANLANAN_BITIS_TARIHI",
+      title: 'Planlanan Başlama Tarihi',
+      dataIndex: 'IST_PLANLANAN_BASLAMA_TARIHI',
+      key: 'IST_PLANLANAN_BASLAMA_TARIHI',
       width: 150,
       ellipsis: true,
       onCell: () => ({
@@ -607,15 +487,12 @@ const MainTable = () => {
       }),
       visible: false,
       render: (text) => formatDate(text),
-      sorter: (a, b) =>
-        (a.IST_PLANLANAN_BITIS_TARIHI || "").localeCompare(
-          b.IST_PLANLANAN_BITIS_TARIHI || ""
-        ),
+      sorter: (a, b) => (a.IST_PLANLANAN_BASLAMA_TARIHI || '').localeCompare(b.IST_PLANLANAN_BASLAMA_TARIHI || ''),
     },
     {
-      title: "Planlanan Bitiş Saati",
-      dataIndex: "IST_PLANLANAN_BITIS_SAATI",
-      key: "IST_PLANLANAN_BITIS_SAATI",
+      title: 'Planlanan Başlama Saati',
+      dataIndex: 'IST_PLANLANAN_BASLAMA_SAATI',
+      key: 'IST_PLANLANAN_BASLAMA_SAATI',
       width: 150,
       ellipsis: true,
       onCell: () => ({
@@ -625,15 +502,42 @@ const MainTable = () => {
       }),
       visible: false,
       render: (text) => formatTime(text),
-      sorter: (a, b) =>
-        (a.IST_PLANLANAN_BITIS_SAATI || "").localeCompare(
-          b.IST_PLANLANAN_BITIS_SAATI || ""
-        ),
+      sorter: (a, b) => (a.IST_PLANLANAN_BASLAMA_SAATI || '').localeCompare(b.IST_PLANLANAN_BASLAMA_SAATI || ''),
     },
     {
-      title: "İş Emri No",
-      dataIndex: "IST_ISEMRI_NO",
-      key: "IST_ISEMRI_NO",
+      title: 'Planlanan Bitiş Tarihi',
+      dataIndex: 'IST_PLANLANAN_BITIS_TARIHI',
+      key: 'IST_PLANLANAN_BITIS_TARIHI',
+      width: 150,
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false,
+      render: (text) => formatDate(text),
+      sorter: (a, b) => (a.IST_PLANLANAN_BITIS_TARIHI || '').localeCompare(b.IST_PLANLANAN_BITIS_TARIHI || ''),
+    },
+    {
+      title: 'Planlanan Bitiş Saati',
+      dataIndex: 'IST_PLANLANAN_BITIS_SAATI',
+      key: 'IST_PLANLANAN_BITIS_SAATI',
+      width: 150,
+      ellipsis: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      visible: false,
+      render: (text) => formatTime(text),
+      sorter: (a, b) => (a.IST_PLANLANAN_BITIS_SAATI || '').localeCompare(b.IST_PLANLANAN_BITIS_SAATI || ''),
+    },
+    {
+      title: 'İş Emri No',
+      dataIndex: 'IST_ISEMRI_NO',
+      key: 'IST_ISEMRI_NO',
       width: 150,
       ellipsis: true,
       onCell: (record) => ({
@@ -646,13 +550,12 @@ const MainTable = () => {
       }),
       render: (text) => <a>{text}</a>,
       visible: true,
-      sorter: (a, b) =>
-        (a.IST_ISEMRI_NO || "").localeCompare(b.IST_ISEMRI_NO || ""),
+      sorter: (a, b) => (a.IST_ISEMRI_NO || '').localeCompare(b.IST_ISEMRI_NO || ''),
     },
     {
-      title: "Teknisyen",
-      dataIndex: "IST_TEKNISYEN_TANIM",
-      key: "IST_TEKNISYEN_TANIM",
+      title: 'Teknisyen',
+      dataIndex: 'IST_TEKNISYEN_TANIM',
+      key: 'IST_TEKNISYEN_TANIM',
       width: 150,
       ellipsis: true,
       onCell: () => ({
@@ -661,15 +564,12 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) =>
-        (a.IST_TEKNISYEN_TANIM || "").localeCompare(
-          b.IST_TEKNISYEN_TANIM || ""
-        ),
+      sorter: (a, b) => (a.IST_TEKNISYEN_TANIM || '').localeCompare(b.IST_TEKNISYEN_TANIM || ''),
     },
     {
-      title: "Atölye",
-      dataIndex: "IST_ATOLYE_TANIM",
-      key: "IST_ATOLYE_TANIM",
+      title: 'Atölye',
+      dataIndex: 'IST_ATOLYE_TANIM',
+      key: 'IST_ATOLYE_TANIM',
       width: 150,
       ellipsis: true,
       onCell: () => ({
@@ -678,13 +578,12 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) =>
-        (a.IST_ATOLYE_TANIM || "").localeCompare(b.IST_ATOLYE_TANIM || ""),
+      sorter: (a, b) => (a.IST_ATOLYE_TANIM || '').localeCompare(b.IST_ATOLYE_TANIM || ''),
     },
     {
-      title: "Makine Kodu",
-      dataIndex: "IST_MAKINE_KOD",
-      key: "IST_MAKINE_KOD",
+      title: 'Makine Kodu',
+      dataIndex: 'IST_MAKINE_KOD',
+      key: 'IST_MAKINE_KOD',
       width: 150,
       ellipsis: true,
       onCell: () => ({
@@ -693,13 +592,12 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) =>
-        (a.IST_MAKINE_KOD || "").localeCompare(b.IST_MAKINE_KOD || ""),
+      sorter: (a, b) => (a.IST_MAKINE_KOD || '').localeCompare(b.IST_MAKINE_KOD || ''),
     },
     {
-      title: "Bildirim Tipi",
-      dataIndex: "IST_TIP_TANIM",
-      key: "IST_TIP_TANIM",
+      title: 'Bildirim Tipi',
+      dataIndex: 'IST_TIP_TANIM',
+      key: 'IST_TIP_TANIM',
       width: 150,
       ellipsis: true,
       onCell: () => ({
@@ -708,13 +606,12 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) =>
-        (a.IST_TIP_TANIM || "").localeCompare(b.IST_TIP_TANIM || ""),
+      sorter: (a, b) => (a.IST_TIP_TANIM || '').localeCompare(b.IST_TIP_TANIM || ''),
     },
     {
-      title: "İlgili Kişi",
-      dataIndex: "IST_TAKIP_EDEN_ADI",
-      key: "IST_TAKIP_EDEN_ADI",
+      title: 'İlgili Kişi',
+      dataIndex: 'IST_TAKIP_EDEN_ADI',
+      key: 'IST_TAKIP_EDEN_ADI',
       width: 150,
       ellipsis: true,
       onCell: () => ({
@@ -723,13 +620,12 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) =>
-        (a.IST_TAKIP_EDEN_ADI || "").localeCompare(b.IST_TAKIP_EDEN_ADI || ""),
+      sorter: (a, b) => (a.IST_TAKIP_EDEN_ADI || '').localeCompare(b.IST_TAKIP_EDEN_ADI || ''),
     },
     {
-      title: "Bildirilen Bina",
-      dataIndex: "IST_BINA",
-      key: "IST_BINA",
+      title: 'Bildirilen Bina',
+      dataIndex: 'IST_BINA',
+      key: 'IST_BINA',
       width: 150,
       ellipsis: true,
       onCell: () => ({
@@ -738,12 +634,12 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) => (a.IST_BINA || "").localeCompare(b.IST_BINA || ""),
+      sorter: (a, b) => (a.IST_BINA || '').localeCompare(b.IST_BINA || ''),
     },
     {
-      title: "Bildirilen Kat",
-      dataIndex: "IST_KAT",
-      key: "IST_KAT",
+      title: 'Bildirilen Kat',
+      dataIndex: 'IST_KAT',
+      key: 'IST_KAT',
       width: 150,
       ellipsis: true,
       onCell: () => ({
@@ -752,12 +648,12 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) => (a.IST_KAT || "").localeCompare(b.IST_KAT || ""),
+      sorter: (a, b) => (a.IST_KAT || '').localeCompare(b.IST_KAT || ''),
     },
     {
-      title: "Servis Nedeni",
-      dataIndex: "IST_SERVIS_NEDENI",
-      key: "IST_SERVIS_NEDENI",
+      title: 'Servis Nedeni',
+      dataIndex: 'IST_SERVIS_NEDENI',
+      key: 'IST_SERVIS_NEDENI',
       width: 150,
       ellipsis: true,
       onCell: () => ({
@@ -766,13 +662,12 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) =>
-        (a.IST_SERVIS_NEDENI || "").localeCompare(b.IST_SERVIS_NEDENI || ""),
+      sorter: (a, b) => (a.IST_SERVIS_NEDENI || '').localeCompare(b.IST_SERVIS_NEDENI || ''),
     },
     {
-      title: "Tam Lokasyon",
-      dataIndex: "IST_BILDIREN_LOKASYON_TUM",
-      key: "IST_BILDIREN_LOKASYON_TUM",
+      title: 'Tam Lokasyon',
+      dataIndex: 'IST_BILDIREN_LOKASYON_TUM',
+      key: 'IST_BILDIREN_LOKASYON_TUM',
       width: 300,
       ellipsis: true,
       onCell: () => ({
@@ -781,15 +676,12 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) =>
-        (a.IST_BILDIREN_LOKASYON_TUM || "").localeCompare(
-          b.IST_BILDIREN_LOKASYON_TUM || ""
-        ),
+      sorter: (a, b) => (a.IST_BILDIREN_LOKASYON_TUM || '').localeCompare(b.IST_BILDIREN_LOKASYON_TUM || ''),
     },
     {
-      title: "Ana Lokasyon",
-      dataIndex: "IST_BILDIREN_LOKASYON_TUM",
-      key: "ANA_LOKASYON",
+      title: 'Ana Lokasyon',
+      dataIndex: 'IST_BILDIREN_LOKASYON_TUM',
+      key: 'ANA_LOKASYON',
       ellipsis: true,
       onCell: () => ({
         onClick: (event) => {
@@ -799,9 +691,7 @@ const MainTable = () => {
       width: 300,
       sorter: (a, b) => {
         if (a.IST_BILDIREN_LOKASYON_TUM && b.IST_BILDIREN_LOKASYON_TUM) {
-          return a.IST_BILDIREN_LOKASYON_TUM.localeCompare(
-            b.IST_BILDIREN_LOKASYON_TUM
-          );
+          return a.IST_BILDIREN_LOKASYON_TUM.localeCompare(b.IST_BILDIREN_LOKASYON_TUM);
         }
         if (!a.IST_BILDIREN_LOKASYON_TUM && !b.IST_BILDIREN_LOKASYON_TUM) {
           return 0;
@@ -812,15 +702,15 @@ const MainTable = () => {
         if (text === null) {
           return null;
         }
-        const parts = text.split("/");
+        const parts = text.split('/');
         return parts.length > 1 ? parts[0] : text;
       },
       visible: false,
     },
     {
-      title: "Talep Değerlendirme Puan",
-      dataIndex: "IST_DEGERLENDIRME_PUAN",
-      key: "IST_DEGERLENDIRME_PUAN",
+      title: 'Talep Değerlendirme Puan',
+      dataIndex: 'IST_DEGERLENDIRME_PUAN',
+      key: 'IST_DEGERLENDIRME_PUAN',
       width: 150,
       ellipsis: true,
       onCell: () => ({
@@ -829,15 +719,12 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) =>
-        (a.IST_DEGERLENDIRME_PUAN || "").localeCompare(
-          b.IST_DEGERLENDIRME_PUAN || ""
-        ),
+      sorter: (a, b) => (a.IST_DEGERLENDIRME_PUAN || '').localeCompare(b.IST_DEGERLENDIRME_PUAN || ''),
     },
     {
-      title: "Talep Değerlendirme Açıklama",
-      dataIndex: "IST_DEGERLENDIRME_ACIKLAMA",
-      key: "IST_DEGERLENDIRME_ACIKLAMA",
+      title: 'Talep Değerlendirme Açıklama',
+      dataIndex: 'IST_DEGERLENDIRME_ACIKLAMA',
+      key: 'IST_DEGERLENDIRME_ACIKLAMA',
       width: 250,
       ellipsis: true,
       onCell: () => ({
@@ -846,10 +733,7 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) =>
-        (a.IST_DEGERLENDIRME_ACIKLAMA || "").localeCompare(
-          b.IST_DEGERLENDIRME_ACIKLAMA || ""
-        ),
+      sorter: (a, b) => (a.IST_DEGERLENDIRME_ACIKLAMA || '').localeCompare(b.IST_DEGERLENDIRME_ACIKLAMA || ''),
     },
 
     // Diğer kolonlarınız...
@@ -859,57 +743,48 @@ const MainTable = () => {
 
   // Intl.DateTimeFormat kullanarak tarih formatlama
   const formatDate = (date) => {
-    if (!date) return "";
+    if (!date) return '';
 
     // Örnek bir tarih formatla ve ay formatını belirle
     const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
-    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(
-      sampleDate
-    );
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
 
     let monthFormat;
-    if (sampleFormatted.includes("January")) {
-      monthFormat = "long"; // Tam ad ("January")
-    } else if (sampleFormatted.includes("Jan")) {
-      monthFormat = "short"; // Üç harfli kısaltma ("Jan")
+    if (sampleFormatted.includes('January')) {
+      monthFormat = 'long'; // Tam ad ("January")
+    } else if (sampleFormatted.includes('Jan')) {
+      monthFormat = 'short'; // Üç harfli kısaltma ("Jan")
     } else {
-      monthFormat = "2-digit"; // Sayısal gösterim ("01")
+      monthFormat = '2-digit'; // Sayısal gösterim ("01")
     }
 
     // Kullanıcı için tarihi formatla
     const formatter = new Intl.DateTimeFormat(navigator.language, {
-      year: "numeric",
+      year: 'numeric',
       month: monthFormat,
-      day: "2-digit",
+      day: '2-digit',
     });
     return formatter.format(new Date(date));
   };
 
   const formatTime = (time) => {
-    if (!time || time.trim() === "") return ""; // `trim` metodu ile baştaki ve sondaki boşlukları temizle
+    if (!time || time.trim() === '') return ''; // `trim` metodu ile baştaki ve sondaki boşlukları temizle
 
     try {
       // Saati ve dakikayı parçalara ayır, boşlukları temizle
       const [hours, minutes] = time
         .trim()
-        .split(":")
+        .split(':')
         .map((part) => part.trim());
 
       // Saat ve dakika değerlerinin geçerliliğini kontrol et
       const hoursInt = parseInt(hours, 10);
       const minutesInt = parseInt(minutes, 10);
-      if (
-        isNaN(hoursInt) ||
-        isNaN(minutesInt) ||
-        hoursInt < 0 ||
-        hoursInt > 23 ||
-        minutesInt < 0 ||
-        minutesInt > 59
-      ) {
+      if (isNaN(hoursInt) || isNaN(minutesInt) || hoursInt < 0 || hoursInt > 23 || minutesInt < 0 || minutesInt > 59) {
         // throw new Error("Invalid time format"); // hata fırlatır ve uygulamanın çalışmasını durdurur
-        console.error("Invalid time format:", time);
+        console.error('Invalid time format:', time);
         // return time; // Hatalı formatı olduğu gibi döndür
-        return ""; // Hata durumunda boş bir string döndür
+        return ''; // Hata durumunda boş bir string döndür
       }
 
       // Geçerli tarih ile birlikte bir Date nesnesi oluştur ve sadece saat ve dakika bilgilerini ayarla
@@ -919,16 +794,16 @@ const MainTable = () => {
       // Kullanıcının lokal ayarlarına uygun olarak saat ve dakikayı formatla
       // `hour12` seçeneğini belirtmeyerek Intl.DateTimeFormat'ın kullanıcının yerel ayarlarına göre otomatik seçim yapmasına izin ver
       const formatter = new Intl.DateTimeFormat(navigator.language, {
-        hour: "numeric",
-        minute: "2-digit",
+        hour: 'numeric',
+        minute: '2-digit',
         // hour12 seçeneği burada belirtilmiyor; böylece otomatik olarak kullanıcının sistem ayarlarına göre belirleniyor
       });
 
       // Formatlanmış saati döndür
       return formatter.format(date);
     } catch (error) {
-      console.error("Error formatting time:", error);
-      return ""; // Hata durumunda boş bir string döndür
+      console.error('Error formatting time:', error);
+      return ''; // Hata durumunda boş bir string döndür
       // return time; // Hatalı formatı olduğu gibi döndür
     }
   };
@@ -936,7 +811,7 @@ const MainTable = () => {
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
   const [body, setBody] = useState({
-    keyword: "",
+    keyword: '',
     filters: {},
   });
 
@@ -957,7 +832,7 @@ const MainTable = () => {
     // Arama terimi değiştiğinde ve boş olduğunda API isteğini tetikle
     const timeout = setTimeout(() => {
       if (searchTerm !== body.keyword) {
-        handleBodyChange("keyword", searchTerm);
+        handleBodyChange('keyword', searchTerm);
         setCurrentPage(1); // Arama yapıldığında veya arama sıfırlandığında sayfa numarasını 1'e ayarla
       }
     }, 2000);
@@ -971,17 +846,14 @@ const MainTable = () => {
 
   const fetchEquipmentData = async (body, page, size) => {
     // body'nin undefined olması durumunda varsayılan değerler atanıyor
-    const { keyword = "", filters = {} } = body || {};
+    const { keyword = '', filters = {} } = body || {};
     // page'in undefined olması durumunda varsayılan değer olarak 1 atanıyor
     const currentPage = page || 1;
 
     try {
       setLoading(true);
       // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.post(
-        `GetIsTalepFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}`,
-        filters
-      );
+      const response = await AxiosInstance.post(`GetIsTalepFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}`, filters);
       if (response) {
         // Toplam sayfa sayısını ayarla
         setTotalPages(response.page);
@@ -996,18 +868,18 @@ const MainTable = () => {
         setData(formattedData);
         setLoading(false);
       } else {
-        console.error("API response is not in expected format");
+        console.error('API response is not in expected format');
         setLoading(false);
       }
     } catch (error) {
-      console.error("Error in API request:", error);
+      console.error('Error in API request:', error);
       setLoading(false);
       if (navigator.onLine) {
         // İnternet bağlantısı var
-        message.error("Hata Mesajı: " + error.message);
+        message.error('Hata Mesajı: ' + error.message);
       } else {
         // İnternet bağlantısı yok
-        message.error("Internet Bağlantısı Mevcut Değil.");
+        message.error('Internet Bağlantısı Mevcut Değil.');
       }
     }
   };
@@ -1034,19 +906,17 @@ const MainTable = () => {
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
     if (newSelectedRowKeys.length > 0) {
-      setValue("selectedLokasyonId", newSelectedRowKeys[0]);
+      setValue('selectedLokasyonId', newSelectedRowKeys[0]);
     } else {
-      setValue("selectedLokasyonId", null);
+      setValue('selectedLokasyonId', null);
     }
     // Seçilen satırların verisini bul
-    const newSelectedRows = data.filter((row) =>
-      newSelectedRowKeys.includes(row.key)
-    );
+    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
     setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
   };
 
   const rowSelection = {
-    type: "checkbox",
+    type: 'checkbox',
     selectedRowKeys,
     onChange: onSelectChange,
   };
@@ -1083,9 +953,9 @@ const MainTable = () => {
 
   // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
   const [columns, setColumns] = useState(() => {
-    const savedOrder = localStorage.getItem("columnOrderIsTalep");
-    const savedVisibility = localStorage.getItem("columnVisibilityIsTalep");
-    const savedWidths = localStorage.getItem("columnWidthsIsTalep");
+    const savedOrder = localStorage.getItem('columnOrderIsTalep');
+    const savedVisibility = localStorage.getItem('columnVisibilityIsTalep');
+    const savedWidths = localStorage.getItem('columnWidthsIsTalep');
 
     let order = savedOrder ? JSON.parse(savedOrder) : [];
     let visibility = savedVisibility ? JSON.parse(savedVisibility) : {};
@@ -1103,9 +973,9 @@ const MainTable = () => {
       }
     });
 
-    localStorage.setItem("columnOrderIsTalep", JSON.stringify(order));
-    localStorage.setItem("columnVisibilityIsTalep", JSON.stringify(visibility));
-    localStorage.setItem("columnWidthsIsTalep", JSON.stringify(widths));
+    localStorage.setItem('columnOrderIsTalep', JSON.stringify(order));
+    localStorage.setItem('columnVisibilityIsTalep', JSON.stringify(visibility));
+    localStorage.setItem('columnWidthsIsTalep', JSON.stringify(widths));
 
     return order.map((key) => {
       const column = initialColumns.find((col) => col.key === key);
@@ -1116,22 +986,9 @@ const MainTable = () => {
 
   // sütunları local storage'a kaydediyoruz
   useEffect(() => {
-    localStorage.setItem(
-      "columnOrderIsTalep",
-      JSON.stringify(columns.map((col) => col.key))
-    );
-    localStorage.setItem(
-      "columnVisibilityIsTalep",
-      JSON.stringify(
-        columns.reduce((acc, col) => ({ ...acc, [col.key]: col.visible }), {})
-      )
-    );
-    localStorage.setItem(
-      "columnWidthsIsTalep",
-      JSON.stringify(
-        columns.reduce((acc, col) => ({ ...acc, [col.key]: col.width }), {})
-      )
-    );
+    localStorage.setItem('columnOrderIsTalep', JSON.stringify(columns.map((col) => col.key)));
+    localStorage.setItem('columnVisibilityIsTalep', JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.visible }), {})));
+    localStorage.setItem('columnWidthsIsTalep', JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.width }), {})));
   }, [columns]);
   // sütunları local storage'a kaydediyoruz sonu
 
@@ -1139,11 +996,7 @@ const MainTable = () => {
   const handleResize =
     (key) =>
     (_, { size }) => {
-      setColumns((prev) =>
-        prev.map((col) =>
-          col.key === key ? { ...col, width: size.width } : col
-        )
-      );
+      setColumns((prev) => prev.map((col) => (col.key === key ? { ...col, width: size.width } : col)));
     };
 
   const components = {
@@ -1176,9 +1029,7 @@ const MainTable = () => {
       if (oldIndex !== -1 && newIndex !== -1) {
         setColumns((columns) => arrayMove(columns, oldIndex, newIndex));
       } else {
-        console.error(
-          `Column with key ${active.id} or ${over.id} does not exist.`
-        );
+        console.error(`Column with key ${active.id} or ${over.id} does not exist.`);
       }
     }
   };
@@ -1203,10 +1054,10 @@ const MainTable = () => {
   // sütunları sıfırlamak için kullanılan fonksiyon
 
   function resetColumns() {
-    localStorage.removeItem("columnOrderIsTalep");
-    localStorage.removeItem("columnVisibilityIsTalep");
-    localStorage.removeItem("columnWidthsIsTalep");
-    localStorage.removeItem("ozelAlanlarIsTalep");
+    localStorage.removeItem('columnOrderIsTalep');
+    localStorage.removeItem('columnVisibilityIsTalep');
+    localStorage.removeItem('columnWidthsIsTalep');
+    localStorage.removeItem('ozelAlanlarIsTalep');
     window.location.reload();
   }
 
@@ -1214,61 +1065,50 @@ const MainTable = () => {
 
   return (
     <>
-      <Modal
-        title="Sütunları Yönet"
-        centered
-        width={800}
-        open={isModalVisible}
-        onOk={() => setIsModalVisible(false)}
-        onCancel={() => setIsModalVisible(false)}
-      >
-        <Text style={{ marginBottom: "15px" }}>
-          Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını
-          Ayarlayabilirsiniz.
-        </Text>
+      <style>
+        {`
+          .boldRow {
+            font-weight: bold;
+          }
+        `}
+      </style>
+      <Modal title="Sütunları Yönet" centered width={800} open={isModalVisible} onOk={() => setIsModalVisible(false)} onCancel={() => setIsModalVisible(false)}>
+        <Text style={{ marginBottom: '15px' }}>Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını Ayarlayabilirsiniz.</Text>
         <div
           style={{
-            display: "flex",
-            width: "100%",
-            justifyContent: "center",
-            marginTop: "10px",
+            display: 'flex',
+            width: '100%',
+            justifyContent: 'center',
+            marginTop: '10px',
           }}
         >
-          <Button onClick={resetColumns} style={{ marginBottom: "15px" }}>
+          <Button onClick={resetColumns} style={{ marginBottom: '15px' }}>
             Sütunları Sıfırla
           </Button>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <div
             style={{
-              width: "46%",
-              border: "1px solid #8080806e",
-              borderRadius: "8px",
-              padding: "10px",
+              width: '46%',
+              border: '1px solid #8080806e',
+              borderRadius: '8px',
+              padding: '10px',
             }}
           >
             <div
               style={{
-                marginBottom: "20px",
-                borderBottom: "1px solid #80808051",
-                padding: "8px 8px 12px 8px",
+                marginBottom: '20px',
+                borderBottom: '1px solid #80808051',
+                padding: '8px 8px 12px 8px',
               }}
             >
               <Text style={{ fontWeight: 600 }}>Sütunları Göster / Gizle</Text>
             </div>
-            <div style={{ height: "400px", overflow: "auto" }}>
+            <div style={{ height: '400px', overflow: 'auto' }}>
               {initialColumns.map((col) => (
-                <div style={{ display: "flex", gap: "10px" }} key={col.key}>
-                  <Checkbox
-                    checked={
-                      columns.find((column) => column.key === col.key)
-                        ?.visible || false
-                    }
-                    onChange={(e) =>
-                      toggleVisibility(col.key, e.target.checked)
-                    }
-                  />
+                <div style={{ display: 'flex', gap: '10px' }} key={col.key}>
+                  <Checkbox checked={columns.find((column) => column.key === col.key)?.visible || false} onChange={(e) => toggleVisibility(col.key, e.target.checked)} />
                   {col.title}
                 </div>
               ))}
@@ -1286,39 +1126,27 @@ const MainTable = () => {
           >
             <div
               style={{
-                width: "46%",
-                border: "1px solid #8080806e",
-                borderRadius: "8px",
-                padding: "10px",
+                width: '46%',
+                border: '1px solid #8080806e',
+                borderRadius: '8px',
+                padding: '10px',
               }}
             >
               <div
                 style={{
-                  marginBottom: "20px",
-                  borderBottom: "1px solid #80808051",
-                  padding: "8px 8px 12px 8px",
+                  marginBottom: '20px',
+                  borderBottom: '1px solid #80808051',
+                  padding: '8px 8px 12px 8px',
                 }}
               >
-                <Text style={{ fontWeight: 600 }}>
-                  Sütunların Sıralamasını Ayarla
-                </Text>
+                <Text style={{ fontWeight: 600 }}>Sütunların Sıralamasını Ayarla</Text>
               </div>
-              <div style={{ height: "400px", overflow: "auto" }}>
-                <SortableContext
-                  items={columns
-                    .filter((col) => col.visible)
-                    .map((col) => col.key)}
-                  strategy={verticalListSortingStrategy}
-                >
+              <div style={{ height: '400px', overflow: 'auto' }}>
+                <SortableContext items={columns.filter((col) => col.visible).map((col) => col.key)} strategy={verticalListSortingStrategy}>
                   {columns
                     .filter((col) => col.visible)
                     .map((col, index) => (
-                      <DraggableRow
-                        key={col.key}
-                        id={col.key}
-                        index={index}
-                        text={col.title}
-                      />
+                      <DraggableRow key={col.key} id={col.key} index={index} text={col.title} />
                     ))}
                 </SortableContext>
               </div>
@@ -1328,62 +1156,50 @@ const MainTable = () => {
       </Modal>
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: "20px",
-          gap: "10px",
-          padding: "0 5px",
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginBottom: '20px',
+          gap: '10px',
+          padding: '0 5px',
         }}
       >
         <div
           style={{
-            display: "flex",
-            gap: "10px",
-            alignItems: "center",
-            flexWrap: "wrap",
-            width: "100%",
+            display: 'flex',
+            gap: '10px',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            width: '100%',
           }}
         >
           <Button
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "0px 8px",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '0px 8px',
               // width: "32px",
-              height: "32px",
+              height: '32px',
             }}
             onClick={() => setIsModalVisible(true)}
           >
             <MenuOutlined />
           </Button>
           <Input
-            style={{ width: "250px", maxWidth: "200px" }}
+            style={{ width: '250px', maxWidth: '200px' }}
             type="text"
             placeholder="Arama yap..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
+            prefix={<SearchOutlined style={{ color: '#0091ff' }} />}
           />
           <Filters onChange={handleBodyChange} />
-          <TeknisyenSubmit
-            selectedRows={selectedRows}
-            refreshTableData={refreshTableData}
-          />
-          <AtolyeSubmit
-            selectedRows={selectedRows}
-            refreshTableData={refreshTableData}
-          />
+          <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
+          <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
         </div>
-        <div style={{ display: "flex", gap: "10px" }}>
-          <ContextMenu
-            selectedRows={selectedRows}
-            refreshTableData={refreshTableData}
-          />
-          <CreateDrawer
-            selectedLokasyonId={selectedRowKeys[0]}
-            onRefresh={refreshTableData}
-          />
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
+          <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
         </div>
       </div>
       <Spin spinning={loading}>
@@ -1398,26 +1214,19 @@ const MainTable = () => {
             pageSize: pageSize,
             defaultPageSize: 10,
             showSizeChanger: true,
-            pageSizeOptions: ["10", "20", "50", "100"],
-            position: ["bottomRight"],
+            pageSizeOptions: ['10', '20', '50', '100'],
+            position: ['bottomRight'],
             onChange: handleTableChange,
             showTotal: (total, range) => `Toplam ${total}`, // Burada 'total' parametresi doğru kayıt sayısını yansıtacaktır
             showQuickJumper: true,
           }}
           onRow={onRowClick}
-          scroll={{ y: "calc(100vh - 370px)" }}
+          scroll={{ y: 'calc(100vh - 370px)' }}
           onChange={handleTableChange}
-          rowClassName={(record) =>
-            record.IST_DURUM_ID === 0 ? "boldRow" : ""
-          }
+          rowClassName={(record) => (record.IST_DURUM_ID === 0 ? 'boldRow' : '')}
         />
       </Spin>
-      <EditDrawer
-        selectedRow={drawer.data}
-        onDrawerClose={() => setDrawer({ ...drawer, visible: false })}
-        drawerVisible={drawer.visible}
-        onRefresh={refreshTableData}
-      />
+      <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
 
       {editDrawer1Visible && (
         <EditDrawer1
