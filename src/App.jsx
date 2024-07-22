@@ -27,6 +27,7 @@ import ProfilEkrani from './pages/Headers/components/ProfilEkrani/ProfilEkrani.j
 import Analizler from './pages/PersonelYonetimi/PersonelKPI/Analizler.jsx';
 import Dashboard1 from './pages/Dashboard1/Dashboard.jsx';
 import UserIdControl from './pages/UserIdControl/UserIdControl.jsx';
+import Breadcrumbs from './Breadcrumbs'; // Import the Breadcrumbs component
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -339,7 +340,7 @@ const BaseLayout = () => {
           <Headers />
         </Header>
         <Content style={{ margin: mobileView ? '0 0px' : '0 16px' }}>
-          <Breadcrumb style={{ margin: '16px 0' }}></Breadcrumb>
+          <Breadcrumbs style={{ margin: '16px 0' }}></Breadcrumbs>
           <div
             style={{
               padding: mobileView ? '24px 0px' : 24,
