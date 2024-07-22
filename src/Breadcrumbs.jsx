@@ -55,7 +55,7 @@ const Breadcrumbs = () => {
     ...breadcrumbItems,
   ];
 
-  return <Breadcrumb style={{ margin: '16px 0' }} items={items} />;
+  return <Breadcrumb style={{ margin: '7px 0' }} items={items} />;
 };
 
 export default Breadcrumbs;

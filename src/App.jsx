@@ -340,13 +340,13 @@ const BaseLayout = () => {
           <Headers />
         </Header>
         <Content style={{ margin: mobileView ? '0 0px' : '0 16px' }}>
-          <Breadcrumbs style={{ margin: '16px 0' }}></Breadcrumbs>
+          <Breadcrumbs />
           <div
             style={{
               padding: mobileView ? '24px 0px' : 24,
               borderRadius: '16px',
               minHeight: 360,
-              height: 'calc(100vh - 129px)',
+              height: 'calc(100vh - 132px)',
               background: colorBgContainer,
             }}
           >
