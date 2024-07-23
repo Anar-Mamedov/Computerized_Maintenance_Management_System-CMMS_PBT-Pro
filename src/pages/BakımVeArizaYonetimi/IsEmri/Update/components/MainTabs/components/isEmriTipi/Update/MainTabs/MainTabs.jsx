@@ -1,8 +1,8 @@
-import { Spin, Table, Input } from "antd";
-import React, { useCallback, useEffect, useState } from "react";
-import { useFormContext } from "react-hook-form";
-import AxiosInstance from "../../../../../../../../../../api/http";
-import TipEkle from "../../Insert/TipEkle";
+import { Spin, Table, Input } from 'antd';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
+import AxiosInstance from '../../../../../../../../../../api/http';
+import TipEkle from '../../Insert/TipEkle';
 
 export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
   const { setValue } = useFormContext();
@@ -12,15 +12,17 @@ export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
   const [loading, setLoading] = useState(true);
   const [selectedRows, setSelectedRows] = useState([]);
   const [filteredData, setFilteredData] = useState([]); // Filtrelenmiş veri için yeni state
-  const [searchTerm, setSearchTerm] = useState(""); // Arama terimi için state
+  const [searchTerm, setSearchTerm] = useState(''); // Arama terimi için state
+
+  console.log(isEmriTipiID);
 
   // Örnek kolonlar ve başlangıçta hepsinin görünür olacağı varsayılıyor
   const columns = [
     {
-      title: "",
-      dataIndex: "IMT_TANIM",
-      key: "IMT_TANIM",
-      width: "150px",
+      title: '',
+      dataIndex: 'IMT_TANIM',
+      key: 'IMT_TANIM',
+      width: '150px',
       ellipsis: true,
     },
 
@@ -60,11 +62,11 @@ export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
             }
           }
         } else {
-          console.error("API response is not in expected format");
+          console.error('API response is not in expected format');
           setLoading(false);
         }
       } catch (error) {
-        console.error("Error in API request:", error);
+        console.error('Error in API request:', error);
         setLoading(false);
       }
     };
@@ -75,9 +77,9 @@ export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
     if (newSelectedRowKeys.length > 0) {
-      setValue("selectedLokasyonId", newSelectedRowKeys[0]);
+      setValue('selectedLokasyonId', newSelectedRowKeys[0]);
     } else {
-      setValue("selectedLokasyonId", null);
+      setValue('selectedLokasyonId', null);
     }
     // Seçilen satırların verisini bul
     const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
@@ -85,7 +87,7 @@ export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
   };
 
   const rowSelection = {
-    type: "checkbox",
+    type: 'checkbox',
     selectedRowKeys,
     onChange: onSelectChange,
   };
@@ -100,7 +102,7 @@ export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
   };
 
   const rowClassName = (record) => {
-    return record.key === selectedRowKey ? "selected-row" : ""; // Seçili satıra özel class
+    return record.key === selectedRowKey ? 'selected-row' : ''; // Seçili satıra özel class
   };
 
   // const refreshTableData = useCallback(() => {
@@ -120,20 +122,20 @@ export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
   // Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
   const normalizeText = (text) => {
     return text
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/ğ/g, "g")
-      .replace(/Ğ/g, "G")
-      .replace(/ü/g, "u")
-      .replace(/Ü/g, "U")
-      .replace(/ş/g, "s")
-      .replace(/Ş/g, "S")
-      .replace(/ı/g, "i")
-      .replace(/İ/g, "I")
-      .replace(/ö/g, "o")
-      .replace(/Ö/g, "O")
-      .replace(/ç/g, "c")
-      .replace(/Ç/g, "C");
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/ğ/g, 'g')
+      .replace(/Ğ/g, 'G')
+      .replace(/ü/g, 'u')
+      .replace(/Ü/g, 'U')
+      .replace(/ş/g, 's')
+      .replace(/Ş/g, 'S')
+      .replace(/ı/g, 'i')
+      .replace(/İ/g, 'I')
+      .replace(/ö/g, 'o')
+      .replace(/Ö/g, 'O')
+      .replace(/ç/g, 'c')
+      .replace(/Ç/g, 'C');
   };
 
   const handleSearch = (e) => {
@@ -142,10 +144,7 @@ export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
     if (value) {
       const normalizedSearchTerm = normalizeText(value); // Arama terimini normalize et
       const filtered = data.filter((item) =>
-        Object.keys(item).some(
-          (key) =>
-            item[key] && normalizeText(item[key].toString()).toLowerCase().includes(normalizedSearchTerm.toLowerCase())
-        )
+        Object.keys(item).some((key) => item[key] && normalizeText(item[key].toString()).toLowerCase().includes(normalizedSearchTerm.toLowerCase()))
       );
       setFilteredData(filtered);
     } else {
@@ -164,7 +163,7 @@ export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
   // }, [isEmriTipiID, data]);
 
   return (
-    <div style={{ width: "200px", display: "flex", flexDirection: "column", alignItems: "center", gap: "15px" }}>
+    <div style={{ width: '200px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
       <style>
         {`
           .boldRow {
@@ -179,7 +178,7 @@ export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
         placeholder="Ara..."
         value={searchTerm}
         onChange={handleSearch}
-        style={{ marginBottom: "-48px", zIndex: "2" }} // Arama kutusunun altındaki boşluk
+        style={{ marginBottom: '-48px', zIndex: '2' }} // Arama kutusunun altındaki boşluk
       />
       <Spin spinning={loading}>
         <Table
@@ -189,7 +188,7 @@ export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
           dataSource={filteredData}
           pagination={false}
           onRow={onRowClick}
-          scroll={{ y: "500px" }}
+          scroll={{ y: '500px' }}
         />
       </Spin>
       <TipEkle onRefresh={refreshTableData} />
