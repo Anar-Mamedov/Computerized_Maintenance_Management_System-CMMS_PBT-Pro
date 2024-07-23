@@ -1,21 +1,14 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs, message, Spin } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import AxiosInstance from "../../../../../../../../../api/http";
-import { Controller, useForm, FormProvider, set } from "react-hook-form";
-import MainTabs from "./MainTabs/MainTabs";
-import EditTabs from "./SecondTabs/EditTabs";
-import dayjs from "dayjs";
-import { useAppContext } from "../../../../../../../../../AppContext";
+import React, { useCallback, useEffect, useState } from 'react';
+import { Button, Modal, Input, Typography, Tabs, message, Spin } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import AxiosInstance from '../../../../../../../../../api/http';
+import { Controller, useForm, FormProvider, set } from 'react-hook-form';
+import MainTabs from './MainTabs/MainTabs';
+import EditTabs from './SecondTabs/EditTabs';
+import dayjs from 'dayjs';
+import { useAppContext } from '../../../../../../../../../AppContext';
 
-export default function CreateModal({
-  workshopSelectedId,
-  onSubmit,
-  onRefresh,
-  secilenPersonelID,
-  selectedRow,
-  isEmriTipiID,
-}) {
+export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenPersonelID, selectedRow, isEmriTipiID }) {
   const { isModalVisible, setIsModalVisible } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [selectedData, setSelectedData] = useState({});
@@ -25,10 +18,10 @@ export default function CreateModal({
   // message end
   const methods = useForm({
     defaultValues: {
-      isEmriTipiTanim: "",
-      secilenID: "",
+      isEmriTipiTanim: '',
+      secilenID: '',
       varsayilanIsEmriTipi: false,
-      isEmriTipiRenk: "#ffffff",
+      isEmriTipiRenk: '#ffffff',
       aktifIsEmriTipi: false,
       tipGroup: 1,
       lokasyon: true,
@@ -119,8 +112,8 @@ export default function CreateModal({
       notlarKapama: false,
       // Çağrılacak Prosedür
       cagrilacakProsedur: null,
-      cagrilacakProsedurID: "",
-      cagrilacakProsedurLabel: "",
+      cagrilacakProsedurID: '',
+      cagrilacakProsedurLabel: '',
       // Add other default values here
     },
   });
@@ -135,12 +128,12 @@ export default function CreateModal({
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
-    return formattedDate.isValid() ? formattedDate.format("YYYY-MM-DD") : "";
+    return formattedDate.isValid() ? formattedDate.format('YYYY-MM-DD') : '';
   };
 
   const formatTimeWithDayjs = (timeObj) => {
     const formattedTime = dayjs(timeObj);
-    return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
+    return formattedTime.isValid() ? formattedTime.format('HH:mm:ss') : '';
   };
 
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi
@@ -273,26 +266,26 @@ export default function CreateModal({
       IMT_ACIKLAMA_KAPAT: data.aciklamaKapama,
       IMT_NOTLAR_KAPAT: data.notlarKapama,
     };
-    AxiosInstance.post("UpdateIsEmriTipi", Body)
+    AxiosInstance.post('UpdateIsEmriTipi', Body)
       .then((response) => {
-        console.log("Data sent successfully:", response);
+        console.log('Data sent successfully:', response);
         reset();
         setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
         setLoading(false);
         // onRefresh();
         // İsteğin başarılı olduğunu kontrol et
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success('Ekleme Başarılı.');
         } else if (response.status_code === 401) {
-          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+          message.error('Bu işlemi yapmaya yetkiniz bulunmamaktadır.');
         } else {
-          message.error("Ekleme Başarısız.");
+          message.error('Ekleme Başarısız.');
         }
       })
       .catch((error) => {
         // Handle errors here, e.g.:
-        console.error("Error sending data:", error);
-        message.error("Başarısız Olundu.");
+        console.error('Error sending data:', error);
+        message.error('Başarısız Olundu.');
         setLoading(false);
       });
 
@@ -317,102 +310,102 @@ export default function CreateModal({
     // Burada, tıklanan satırın verisini işleyebilirsiniz.
     // Örneğin, form alanlarını doldurmak veya başka bir işlem yapmak için kullanabilirsiniz.
     setTimeout(() => {
-      console.log("Seçilen satır:", selectedRowData);
+      console.log('Seçilen satır:', selectedRowData);
       setSelectedData(selectedRowData);
-      setValue("secilenID", selectedRowData.key);
-      setValue("isEmriTipiTanim", selectedRowData.IMT_TANIM);
-      setValue("varsayilanIsEmriTipi", selectedRowData.IMT_VARSAYILAN);
-      setValue("isEmriTipiRenk", selectedRowData.IMT_RENK_WEB_VERSION);
-      setValue("aktifIsEmriTipi", selectedRowData.IMT_AKTIF);
-      setValue("tipGroup", selectedRowData.IMT_TIP_GRUP);
-      setValue("lokasyon", selectedRowData.IMT_LOKASYON);
-      setValue("makine", selectedRowData.IMT_MAKINE);
-      setValue("ekipman", selectedRowData.IMT_EKIPMAN);
-      setValue("makineDurum", selectedRowData.IMT_MAKINE_DURUM);
-      setValue("sayacDegeri", selectedRowData.IMT_SAYAC_DEGERI);
-      setValue("prosedur", selectedRowData.IMT_PROSEDUR);
-      setValue("isTipi", selectedRowData.IMT_IS_TIP);
-      setValue("isNedeni", selectedRowData.IMT_IS_NEDEN);
-      setValue("konu", selectedRowData.IMT_KONU);
-      setValue("oncelik", selectedRowData.IMT_ONCELIK);
-      setValue("atolye", selectedRowData.IMT_ATOLYE);
-      setValue("takvim", selectedRowData.IMT_TAKVIM);
-      setValue("talimat", selectedRowData.IMT_TALIMAT);
-      setValue("planlananBaslangicTarihi", selectedRowData.IMT_PLAN_TARIH);
-      setValue("planlananBitisTarihi", selectedRowData.IMT_PLAN_BITIS);
-      setValue("masrafMerkezi", selectedRowData.IMT_MASRAF_MERKEZ);
-      setValue("proje", selectedRowData.IMT_PROJE);
-      setValue("referansNo", selectedRowData.IMT_REFERANS_NO);
-      setValue("firma", selectedRowData.IMT_FIRMA);
-      setValue("sozlesme", selectedRowData.IMT_SOZLESME);
-      setValue("evrakNo", selectedRowData.IMT_EVRAK_NO);
-      setValue("evrakTarihi", selectedRowData.IMT_EVRAK_TARIHI);
-      setValue("maliyet", selectedRowData.IMT_MALIYET);
-      setValue("notlar", selectedRowData.IMT_NOTLAR);
+      setValue('secilenID', selectedRowData.key);
+      setValue('isEmriTipiTanim', selectedRowData.IMT_TANIM);
+      setValue('varsayilanIsEmriTipi', selectedRowData.IMT_VARSAYILAN);
+      setValue('isEmriTipiRenk', selectedRowData.IMT_RENK_WEB_VERSION);
+      setValue('aktifIsEmriTipi', selectedRowData.IMT_AKTIF);
+      setValue('tipGroup', selectedRowData.IMT_TIP_GRUP);
+      setValue('lokasyon', selectedRowData.IMT_LOKASYON);
+      setValue('makine', selectedRowData.IMT_MAKINE);
+      setValue('ekipman', selectedRowData.IMT_EKIPMAN);
+      setValue('makineDurum', selectedRowData.IMT_MAKINE_DURUM);
+      setValue('sayacDegeri', selectedRowData.IMT_SAYAC_DEGERI);
+      setValue('prosedur', selectedRowData.IMT_PROSEDUR);
+      setValue('isTipi', selectedRowData.IMT_IS_TIP);
+      setValue('isNedeni', selectedRowData.IMT_IS_NEDEN);
+      setValue('konu', selectedRowData.IMT_KONU);
+      setValue('oncelik', selectedRowData.IMT_ONCELIK);
+      setValue('atolye', selectedRowData.IMT_ATOLYE);
+      setValue('takvim', selectedRowData.IMT_TAKVIM);
+      setValue('talimat', selectedRowData.IMT_TALIMAT);
+      setValue('planlananBaslangicTarihi', selectedRowData.IMT_PLAN_TARIH);
+      setValue('planlananBitisTarihi', selectedRowData.IMT_PLAN_BITIS);
+      setValue('masrafMerkezi', selectedRowData.IMT_MASRAF_MERKEZ);
+      setValue('proje', selectedRowData.IMT_PROJE);
+      setValue('referansNo', selectedRowData.IMT_REFERANS_NO);
+      setValue('firma', selectedRowData.IMT_FIRMA);
+      setValue('sozlesme', selectedRowData.IMT_SOZLESME);
+      setValue('evrakNo', selectedRowData.IMT_EVRAK_NO);
+      setValue('evrakTarihi', selectedRowData.IMT_EVRAK_TARIHI);
+      setValue('maliyet', selectedRowData.IMT_MALIYET);
+      setValue('notlar', selectedRowData.IMT_NOTLAR);
       // sekmeleri göster ve zorunlu olanları belirle
-      setValue("detayBilgiler", selectedRowData.IMT_DETAY_TAB);
-      setValue("kontrolListesiTab", selectedRowData.IMT_KONTROL_TAB);
-      setValue("kontrolListesiTabZorunlu", selectedRowData.IMT_KONTROL_TAB_ZORUNLU);
-      setValue("personelTab", selectedRowData.IMT_PERSONEL_TAB);
-      setValue("personelTabZorunlu", selectedRowData.IMT_PERSONEL_TAB_ZORUNLU);
-      setValue("malzemelerTab", selectedRowData.IMT_MALZEME_TAB);
-      setValue("malzemelerTabZorunlu", selectedRowData.IMT_MALZEME_TAB_ZORUNLU);
-      setValue("duruslarTab", selectedRowData.IMT_DURUS_TAB);
-      setValue("duruslarTabZorunlu", selectedRowData.IMT_DURUS_TAB_ZORUNLU);
-      setValue("sureBilgileriTab", selectedRowData.IMT_SURE_TAB);
-      setValue("maliyetlerTab", selectedRowData.IMT_MALIYET_TAB);
-      setValue("maliyetlerTabZorunlu", selectedRowData.IMT_TOPLAM_MALIYET_ZORUNLU);
-      setValue("ekipmanIslemleriTab", selectedRowData.IMT_EKIPMAN_TAB);
-      setValue("ekipmanIslemleriTabZorunlu", selectedRowData.IMT_EKIPMAN_TAB_ZORUNLU);
-      setValue("olcumDegerleriTab", selectedRowData.IMT_OLCUM_TAB);
-      setValue("olcumDegerleriTabZorunlu", selectedRowData.IMT_OLCUM_TAB_ZORUNLU);
-      setValue("ozelAlanlarTab", selectedRowData.IMT_OZEL_ALAN_TAB);
-      setValue("aracGereclerTab", selectedRowData.IMT_ARAC_GEREC_TAB);
-      setValue("aracGereclerTabZorunlu", selectedRowData.IMT_ARAC_GEREC_TAB_ZORUNLU);
-      setValue("notlarTab", selectedRowData.IMT_NOTLAR_TAB);
+      setValue('detayBilgiler', selectedRowData.IMT_DETAY_TAB);
+      setValue('kontrolListesiTab', selectedRowData.IMT_KONTROL_TAB);
+      setValue('kontrolListesiTabZorunlu', selectedRowData.IMT_KONTROL_TAB_ZORUNLU);
+      setValue('personelTab', selectedRowData.IMT_PERSONEL_TAB);
+      setValue('personelTabZorunlu', selectedRowData.IMT_PERSONEL_TAB_ZORUNLU);
+      setValue('malzemelerTab', selectedRowData.IMT_MALZEME_TAB);
+      setValue('malzemelerTabZorunlu', selectedRowData.IMT_MALZEME_TAB_ZORUNLU);
+      setValue('duruslarTab', selectedRowData.IMT_DURUS_TAB);
+      setValue('duruslarTabZorunlu', selectedRowData.IMT_DURUS_TAB_ZORUNLU);
+      setValue('sureBilgileriTab', selectedRowData.IMT_SURE_TAB);
+      setValue('maliyetlerTab', selectedRowData.IMT_MALIYET_TAB);
+      setValue('maliyetlerTabZorunlu', selectedRowData.IMT_TOPLAM_MALIYET_ZORUNLU);
+      setValue('ekipmanIslemleriTab', selectedRowData.IMT_EKIPMAN_TAB);
+      setValue('ekipmanIslemleriTabZorunlu', selectedRowData.IMT_EKIPMAN_TAB_ZORUNLU);
+      setValue('olcumDegerleriTab', selectedRowData.IMT_OLCUM_TAB);
+      setValue('olcumDegerleriTabZorunlu', selectedRowData.IMT_OLCUM_TAB_ZORUNLU);
+      setValue('ozelAlanlarTab', selectedRowData.IMT_OZEL_ALAN_TAB);
+      setValue('aracGereclerTab', selectedRowData.IMT_ARAC_GEREC_TAB);
+      setValue('aracGereclerTabZorunlu', selectedRowData.IMT_ARAC_GEREC_TAB_ZORUNLU);
+      setValue('notlarTab', selectedRowData.IMT_NOTLAR_TAB);
       // kapama zorunlu alanları
-      setValue("kapamaZamani", selectedRowData.IMT_KAPANMA_ZAMANI);
-      setValue("makineDurumuKapama", selectedRowData.IMT_MAKINE_DURUM_KAPAT);
-      setValue("bakimPuaniKapama", selectedRowData.IMT_BAKIM_PUAN);
-      setValue("personelCalismaSuresiKapama", selectedRowData.IMT_PERSONEL_SURE);
-      setValue("makineKapama", selectedRowData.IMT_MAKINE_KAPAT);
-      setValue("ekipmanKapama", selectedRowData.IMT_EKIPMAN_KAPAT);
-      setValue("sayacDegeriKapama", selectedRowData.IMT_SAYAC_DEGER_KAPAT);
-      setValue("prosedurKapama", selectedRowData.IMT_PROSEDUR_KAPAT);
-      setValue("isTipiKapama", selectedRowData.IMT_IS_TIPI_KAPAT);
-      setValue("okunanSayacKapama", selectedRowData.IMT_OKUNAN_SAYAC);
-      setValue("isNedeniKapama", selectedRowData.IMT_IS_NEDENI_KAPAT);
-      setValue("konuKapama", selectedRowData.IMT_KONU_KAPAT);
-      setValue("oncelikKapama", selectedRowData.IMT_ONCELIK_KAPAT);
-      setValue("atolyeKapama", selectedRowData.IMT_ATOLYE_KAPAT);
-      setValue("firmaKapama", selectedRowData.IMT_FIRMA_KAPAT);
-      setValue("sozlesmeKapama", selectedRowData.IMT_SOZLESME_KAPAT);
-      setValue("projeKapama", selectedRowData.IMT_PROJE_KAPAT);
-      setValue("referansNoKapama", selectedRowData.IMT_REFNO_KAPAT);
-      setValue("ozelAlan1Kapama", selectedRowData.IMT_OZEL_ALAN_1);
-      setValue("ozelAlan2Kapama", selectedRowData.IMT_OZEL_ALAN_2);
-      setValue("ozelAlan3Kapama", selectedRowData.IMT_OZEL_ALAN_3);
-      setValue("ozelAlan4Kapama", selectedRowData.IMT_OZEL_ALAN_4);
-      setValue("ozelAlan5Kapama", selectedRowData.IMT_OZEL_ALAN_5);
-      setValue("ozelAlan6Kapama", selectedRowData.IMT_OZEL_ALAN_6);
-      setValue("ozelAlan7Kapama", selectedRowData.IMT_OZEL_ALAN_7);
-      setValue("ozelAlan8Kapama", selectedRowData.IMT_OZEL_ALAN_8);
-      setValue("ozelAlan9Kapama", selectedRowData.IMT_OZEL_ALAN_9);
-      setValue("ozelAlan10Kapama", selectedRowData.IMT_OZEL_ALAN_10);
-      setValue("ozelAlan11Kapama", selectedRowData.IMT_OZEL_ALAN_11);
-      setValue("ozelAlan12Kapama", selectedRowData.IMT_OZEL_ALAN_12);
-      setValue("ozelAlan13Kapama", selectedRowData.IMT_OZEL_ALAN_13);
-      setValue("ozelAlan14Kapama", selectedRowData.IMT_OZEL_ALAN_14);
-      setValue("ozelAlan15Kapama", selectedRowData.IMT_OZEL_ALAN_15);
-      setValue("ozelAlan16Kapama", selectedRowData.IMT_OZEL_ALAN_16);
-      setValue("ozelAlan17Kapama", selectedRowData.IMT_OZEL_ALAN_17);
-      setValue("ozelAlan18Kapama", selectedRowData.IMT_OZEL_ALAN_18);
-      setValue("ozelAlan19Kapama", selectedRowData.IMT_OZEL_ALAN_19);
-      setValue("ozelAlan20Kapama", selectedRowData.IMT_OZEL_ALAN_20);
-      setValue("aciklamaKapama", selectedRowData.IMT_ACIKLAMA_KAPAT);
-      setValue("notlarKapama", selectedRowData.IMT_NOTLAR_KAPAT);
+      setValue('kapamaZamani', selectedRowData.IMT_KAPANMA_ZAMANI);
+      setValue('makineDurumuKapama', selectedRowData.IMT_MAKINE_DURUM_KAPAT);
+      setValue('bakimPuaniKapama', selectedRowData.IMT_BAKIM_PUAN);
+      setValue('personelCalismaSuresiKapama', selectedRowData.IMT_PERSONEL_SURE);
+      setValue('makineKapama', selectedRowData.IMT_MAKINE_KAPAT);
+      setValue('ekipmanKapama', selectedRowData.IMT_EKIPMAN_KAPAT);
+      setValue('sayacDegeriKapama', selectedRowData.IMT_SAYAC_DEGER_KAPAT);
+      setValue('prosedurKapama', selectedRowData.IMT_PROSEDUR_KAPAT);
+      setValue('isTipiKapama', selectedRowData.IMT_IS_TIPI_KAPAT);
+      setValue('okunanSayacKapama', selectedRowData.IMT_OKUNAN_SAYAC);
+      setValue('isNedeniKapama', selectedRowData.IMT_IS_NEDENI_KAPAT);
+      setValue('konuKapama', selectedRowData.IMT_KONU_KAPAT);
+      setValue('oncelikKapama', selectedRowData.IMT_ONCELIK_KAPAT);
+      setValue('atolyeKapama', selectedRowData.IMT_ATOLYE_KAPAT);
+      setValue('firmaKapama', selectedRowData.IMT_FIRMA_KAPAT);
+      setValue('sozlesmeKapama', selectedRowData.IMT_SOZLESME_KAPAT);
+      setValue('projeKapama', selectedRowData.IMT_PROJE_KAPAT);
+      setValue('referansNoKapama', selectedRowData.IMT_REFNO_KAPAT);
+      setValue('ozelAlan1Kapama', selectedRowData.IMT_OZEL_ALAN_1);
+      setValue('ozelAlan2Kapama', selectedRowData.IMT_OZEL_ALAN_2);
+      setValue('ozelAlan3Kapama', selectedRowData.IMT_OZEL_ALAN_3);
+      setValue('ozelAlan4Kapama', selectedRowData.IMT_OZEL_ALAN_4);
+      setValue('ozelAlan5Kapama', selectedRowData.IMT_OZEL_ALAN_5);
+      setValue('ozelAlan6Kapama', selectedRowData.IMT_OZEL_ALAN_6);
+      setValue('ozelAlan7Kapama', selectedRowData.IMT_OZEL_ALAN_7);
+      setValue('ozelAlan8Kapama', selectedRowData.IMT_OZEL_ALAN_8);
+      setValue('ozelAlan9Kapama', selectedRowData.IMT_OZEL_ALAN_9);
+      setValue('ozelAlan10Kapama', selectedRowData.IMT_OZEL_ALAN_10);
+      setValue('ozelAlan11Kapama', selectedRowData.IMT_OZEL_ALAN_11);
+      setValue('ozelAlan12Kapama', selectedRowData.IMT_OZEL_ALAN_12);
+      setValue('ozelAlan13Kapama', selectedRowData.IMT_OZEL_ALAN_13);
+      setValue('ozelAlan14Kapama', selectedRowData.IMT_OZEL_ALAN_14);
+      setValue('ozelAlan15Kapama', selectedRowData.IMT_OZEL_ALAN_15);
+      setValue('ozelAlan16Kapama', selectedRowData.IMT_OZEL_ALAN_16);
+      setValue('ozelAlan17Kapama', selectedRowData.IMT_OZEL_ALAN_17);
+      setValue('ozelAlan18Kapama', selectedRowData.IMT_OZEL_ALAN_18);
+      setValue('ozelAlan19Kapama', selectedRowData.IMT_OZEL_ALAN_19);
+      setValue('ozelAlan20Kapama', selectedRowData.IMT_OZEL_ALAN_20);
+      setValue('aciklamaKapama', selectedRowData.IMT_ACIKLAMA_KAPAT);
+      setValue('notlarKapama', selectedRowData.IMT_NOTLAR_KAPAT);
       // Çağrılacak Prosedür
-      setValue("cagrilacakProsedurID", selectedRowData.IMT_CAGRILACAK_PROSEDUR);
+      setValue('cagrilacakProsedurID', selectedRowData.IMT_CAGRILACAK_PROSEDUR);
     }, 200);
   };
 
@@ -421,31 +414,25 @@ export default function CreateModal({
       {contextHolder}
 
       <div>
-        <div style={{ display: "flex", width: "100%", justifyContent: "flex-end" }}>
+        <div style={{ display: 'flex', width: '100%', justifyContent: 'flex-end' }}>
           <Button
             style={{
-              width: "32px",
-              height: "32px",
-              padding: "0",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              width: '32px',
+              height: '32px',
+              padding: '0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
-            onClick={handleModalToggle}>
+            onClick={handleModalToggle}
+          >
             <PlusOutlined />
           </Button>
         </div>
 
-        <Modal
-          centered
-          width="1000px"
-          title="İş Emri Tipi"
-          open={isModalVisible}
-          onOk={methods.handleSubmit(onSubmited)}
-          onCancel={handleModalToggle}
-          destroyOnClose>
+        <Modal centered width="1000px" title="İş Emri Tipi" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle} destroyOnClose>
           <Spin spinning={loading}>
-            <div style={{ display: "flex", gap: "10px" }}>
+            <div style={{ display: 'flex', gap: '10px' }}>
               <MainTabs onSelectedRow={handleSelectedRow} isEmriTipiID={isEmriTipiID} />
               <form onSubmit={methods.handleSubmit(onSubmited)}>
                 {/* Koşullu renderlama burada yapılıyor */}
