@@ -14,8 +14,6 @@ export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
   const [filteredData, setFilteredData] = useState([]); // Filtrelenmiş veri için yeni state
   const [searchTerm, setSearchTerm] = useState(''); // Arama terimi için state
 
-  console.log(isEmriTipiID);
-
   // Örnek kolonlar ve başlangıçta hepsinin görünür olacağı varsayılıyor
   const columns = [
     {
@@ -25,8 +23,17 @@ export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
       width: '150px',
       ellipsis: true,
     },
+
     // Diğer kolonlarınız...
   ];
+
+  // ana tablo api isteği için kullanılan useEffect
+
+  // useEffect(() => {
+  //   fetchEquipmentData();
+  // }, []);
+
+  // ana tablo api isteği için kullanılan useEffect son
 
   useEffect(() => {
     const fetchEquipmentData = async () => {
@@ -98,13 +105,17 @@ export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
     return record.key === selectedRowKey ? 'selected-row' : ''; // Seçili satıra özel class
   };
 
+  // const refreshTableData = useCallback(() => {
+  //   fetchEquipmentData();
+  // }, []);
+
   const refreshTableData = useCallback(() => {
     // Tablodan seçilen kayıtların checkbox işaretini kaldır
     setSelectedRowKeys([]);
     setSelectedRows([]);
 
     // Verileri yeniden çekmek için `fetchEquipmentData` fonksiyonunu çağır
-    fetchEquipmentData();
+    // fetchEquipmentData();
   }, []); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
 
   // Arama terimindeki değişiklikleri işleyen fonksiyon
@@ -140,6 +151,16 @@ export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
       setFilteredData(data);
     }
   };
+
+  // useEffect(() => {
+  //   if (isEmriTipiID && data.length > 0) {
+  //     const selectedRow = data.find((row) => row.key === isEmriTipiID);
+  //     if (selectedRow) {
+  //       setSelectedRowKeys([selectedRow.key]);
+  //       setSelectedRows([selectedRow]);
+  //     }
+  //   }
+  // }, [isEmriTipiID, data]);
 
   return (
     <div style={{ width: '200px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
