@@ -27,6 +27,7 @@ import ProfilEkrani from './pages/Headers/components/ProfilEkrani/ProfilEkrani.j
 import Analizler from './pages/PersonelYonetimi/PersonelKPI/Analizler.jsx';
 import Dashboard1 from './pages/Dashboard1/Dashboard.jsx';
 import UserIdControl from './pages/UserIdControl/UserIdControl.jsx';
+import IsEmriTipleri from './pages/Yonetim/IsEmriTipleri/IsEmriTipleri.jsx';
 import Breadcrumbs from './Breadcrumbs'; // Import the Breadcrumbs component
 
 const { Text } = Typography;
@@ -214,7 +215,7 @@ export default function App() {
         <Route path="/kodYonetimi" element={<Hazirlaniyor />} />
         <Route path="/otomatikKodlar" element={<Hazirlaniyor />} />
         <Route path="/servisOncelikSeviyeleri" element={<Hazirlaniyor />} />
-        <Route path="/isEmriTipleri" element={<Hazirlaniyor />} />
+        <Route path="/isEmriTipleri" element={<IsEmriTipleri />} />
         <Route path="/onaylayicilar" element={<Hazirlaniyor />} />
         <Route path="/projeTanimlari" element={<Hazirlaniyor />} />
         <Route path="/lokasyon" element={<LokasyonTanim />} />
