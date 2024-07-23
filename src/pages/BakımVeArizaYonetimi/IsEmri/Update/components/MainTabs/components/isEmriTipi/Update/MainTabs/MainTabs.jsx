@@ -14,8 +14,6 @@ export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
   const [filteredData, setFilteredData] = useState([]); // Filtrelenmiş veri için yeni state
   const [searchTerm, setSearchTerm] = useState(''); // Arama terimi için state
 
-  console.log(isEmriTipiID);
-
   // Örnek kolonlar ve başlangıçta hepsinin görünür olacağı varsayılıyor
   const columns = [
     {
@@ -51,8 +49,8 @@ export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
           setFilteredData(formattedData);
           setLoading(false);
 
-          // Check if there's an ID to select initially
-          if (isEmriTipiID) {
+          // Check if there's an ID to select initially, including 0
+          if (isEmriTipiID !== null && isEmriTipiID !== undefined) {
             const selectedRow = formattedData.find((row) => row.key === isEmriTipiID);
             if (selectedRow) {
               setSelectedRowKeys([selectedRow.key]);
@@ -71,7 +69,9 @@ export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
       }
     };
 
-    fetchEquipmentData();
+    if (isEmriTipiID !== null && isEmriTipiID !== undefined) {
+      fetchEquipmentData();
+    }
   }, [isEmriTipiID]); // Dependency array to refetch when ID changes
 
   const onSelectChange = (newSelectedRowKeys) => {
