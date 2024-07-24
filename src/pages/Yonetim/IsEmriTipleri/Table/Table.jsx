@@ -169,7 +169,7 @@ const MainTable = () => {
   // Özel Alanların nameleri backend çekmek için api isteği sonu
   const initialColumns = [
     {
-      title: 'İş Emri Tipi Tanımı',
+      title: 'İş Emri Tipleri',
       dataIndex: 'IMT_TANIM',
       key: 'IMT_TANIM',
       width: '100%',
