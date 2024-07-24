@@ -1,5 +1,5 @@
-import React from "react";
-import styled from "styled-components";
+import React from 'react';
+import styled from 'styled-components';
 
 const StyledFooter = styled.div`
   display: flex;
@@ -13,7 +13,7 @@ const StyledFooter = styled.div`
   background-color: #ffffff;
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
   width: calc(100% - 30px);
-  max-width: 1430px;
+  max-width: 670px;
 `;
 
 export default function Footer() {

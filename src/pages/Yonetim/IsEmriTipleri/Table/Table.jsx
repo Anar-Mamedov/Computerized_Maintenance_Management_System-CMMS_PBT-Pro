@@ -172,7 +172,7 @@ const MainTable = () => {
       title: 'İş Emri Tipi Tanımı',
       dataIndex: 'IMT_TANIM',
       key: 'IMT_TANIM',
-      width: 150,
+      width: '100%',
       ellipsis: true,
       visible: true,
       render: (text, record) => (
