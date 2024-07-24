@@ -1,13 +1,14 @@
-import tr_TR from "antd/es/locale/tr_TR";
-import { PlusOutlined } from "@ant-design/icons";
-import { Button, Drawer, Space, ConfigProvider, Modal, message } from "antd";
-import React, { useEffect, useState } from "react";
-import MainTabs from "./components/MainTabs/MainTabs";
-import { useForm, Controller, useFormContext, FormProvider } from "react-hook-form";
-import dayjs from "dayjs";
-import AxiosInstance from "../../../../api/http";
-import Footer from "../Footer";
+import tr_TR from 'antd/es/locale/tr_TR';
+import { PlusOutlined } from '@ant-design/icons';
+import { Button, Drawer, Space, ConfigProvider, Modal, message, Input, Typography } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { useForm, Controller, useFormContext, FormProvider } from 'react-hook-form';
+import dayjs from 'dayjs';
+import AxiosInstance from '../../../../api/http';
+import Footer from '../Footer';
 // import SecondTabs from "./components/secondTabs/secondTabs";
+
+const { Text, Link } = Typography;
 
 export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
   const [open, setOpen] = useState(false);
@@ -17,10 +18,10 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
 
   const onClose = () => {
     Modal.confirm({
-      title: "İptal etmek istediğinden emin misin?",
-      content: "Kaydedilmemiş değişiklikler kaybolacaktır.",
-      okText: "Evet",
-      cancelText: "Hayır",
+      title: 'İptal etmek istediğinden emin misin?',
+      content: 'Kaydedilmemiş değişiklikler kaybolacaktır.',
+      okText: 'Evet',
+      cancelText: 'Hayır',
       onOk: () => {
         setOpen(false);
         methods.reset();
@@ -31,160 +32,115 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
     });
   };
 
-  // back-end'e gönderilecek veriler
-
-  const handleClick = () => {
-    const values = methods.getValues();
-    console.log(onSubmit(values));
-  };
-
   //* export
   const methods = useForm({
     defaultValues: {
-      bakimKodu: "",
-      secilenBakimID: "",
-      bakimTanimi: "",
-      bakimAktif: true,
-      bakimTipi: null,
-      bakimTipiID: "",
-      bakimGrubu: null,
-      bakimGrubuID: "",
-      bakimNedeni: null,
-      bakimNedeniID: "",
-      oncelikTanim: "",
-      oncelikID: "",
-      talimatTanim: "",
-      talimatID: "",
-      atolyeTanim: "",
-      atolyeID: "",
-      firmaTanim: "",
-      firmaID: "",
-      lokasyonTanim: "",
-      lokasyonID: "",
-      calismaSuresi: "",
-      durusSuresi: "",
-      personelSayisi: "",
-      otonomBakim: false,
-      periyot: "",
-      periyotID: "",
-      periyotLabel: "",
-      periyotSiklik: "",
+      yenIseEmriTipiAdi: '',
     },
   });
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
-    return formattedDate.isValid() ? formattedDate.format("YYYY-MM-DD") : "";
+    return formattedDate.isValid() ? formattedDate.format('YYYY-MM-DD') : '';
   };
 
   const formatTimeWithDayjs = (timeObj) => {
     const formattedTime = dayjs(timeObj);
-    return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
+    return formattedTime.isValid() ? formattedTime.format('HH:mm:ss') : '';
   };
 
-  const { setValue, reset } = methods;
+  const { setValue, reset, control, watch } = methods;
+
+  const name = watch('yenIseEmriTipiAdi');
 
   //* export
   const onSubmit = (data) => {
-    const Body = {
-      IST_KOD: data.bakimKodu,
-      IST_TANIM: data.bakimTanimi,
-      IST_TIP_KOD_ID: data.bakimTipiID,
-      IST_GRUP_KOD_ID: data.bakimGrubuID,
-      IST_NEDEN_KOD_ID: data.bakimNedeniID,
-      IST_ONCELIK_ID: data.oncelikID,
-      IST_TALIMAT_ID: data.talimatID,
-      IST_ATOLYE_ID: data.atolyeID,
-      IST_FIRMA_ID: data.firmaID,
-      IST_LOKASYON_ID: data.lokasyonID,
-      IST_CALISMA_SURE: data.calismaSuresi,
-      IST_DURUS_SURE: data.durusSuresi,
-      IST_PERSONEL_SAYI: data.personelSayisi,
-      IST_OTONOM_BAKIM: data.otonomBakim,
-      IST_UYARI_SIKLIGI: data.periyotSiklik,
-      IST_UYARI_PERIYOT: data.periyotID,
-      IST_AKTIF: data.bakimAktif,
-      // add more fields as needed
-    };
-
     // AxiosInstance.post("/api/endpoint", { Body }).then((response) => {
     // handle response
     // });
 
-    AxiosInstance.post("AddBakim", Body)
+    AxiosInstance.get(`AddIsEmriTipi?isEmriTipiKey=${name}`)
       .then((response) => {
         // Handle successful response here, e.g.:
-        console.log("Data sent successfully:", response);
+        console.log('Data sent successfully:', response);
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success('Ekleme Başarılı.');
           setOpen(false);
           onRefresh();
           methods.reset();
         } else if (response.status_code === 401) {
-          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+          message.error('Bu işlemi yapmaya yetkiniz bulunmamaktadır.');
         } else {
-          message.error("Ekleme Başarısız.");
+          message.error('Ekleme Başarısız.');
         }
       })
       .catch((error) => {
         // Handle errors here, e.g.:
-        console.error("Error sending data:", error);
-        message.error("Başarısız Olundu.");
+        console.error('Error sending data:', error);
+        message.error('Başarısız Olundu.');
       });
-    console.log({ Body });
   };
-
-  useEffect(() => {
-    // Eğer selectedLokasyonId varsa ve geçerli bir değerse, formun default değerini güncelle
-    if (selectedLokasyonId !== undefined && selectedLokasyonId !== null) {
-      methods.reset({
-        ...methods.getValues(),
-        selectedLokasyonId: selectedLokasyonId,
-      });
-    }
-  }, [selectedLokasyonId, methods]);
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)}>
-        <ConfigProvider locale={tr_TR}>
-          <Button
-            type="primary"
-            onClick={showDrawer}
-            style={{
-              display: "flex",
-              alignItems: "center",
-            }}>
-            <PlusOutlined />
-            Ekle
-          </Button>
-          <Drawer
-            width="550px"
-            title="Bakım Tanımı Ekle"
-            placement={"right"}
-            onClose={onClose}
-            open={open}
-            extra={
-              <Space>
-                <Button onClick={onClose}>İptal</Button>
-                <Button
-                  type="submit"
-                  onClick={handleClick}
-                  style={{
-                    backgroundColor: "#2bc770",
-                    borderColor: "#2bc770",
-                    color: "#ffffff",
-                  }}>
-                  Kaydet
-                </Button>
-              </Space>
-            }>
-            <MainTabs />
-            {/* <SecondTabs /> */}
+      <ConfigProvider locale={tr_TR}>
+        <Button
+          type="primary"
+          onClick={showDrawer}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <PlusOutlined />
+          Ekle
+        </Button>
+        <Drawer
+          width="550px"
+          title="İş Emri Tipi Ekle"
+          placement={'right'}
+          onClose={onClose}
+          open={open}
+          extra={
+            <Space>
+              <Button onClick={onClose}>İptal</Button>
+              <Button
+                type="submit"
+                onClick={methods.handleSubmit(onSubmit)}
+                style={{
+                  backgroundColor: '#2bc770',
+                  borderColor: '#2bc770',
+                  color: '#ffffff',
+                }}
+              >
+                Kaydet
+              </Button>
+            </Space>
+          }
+        >
+          <form onSubmit={methods.handleSubmit(onSubmit)}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={{ fontSize: '14px', fontWeight: '600' }}>İş Emri Tipi Adı:</Text>
+              <Controller
+                name="yenIseEmriTipiAdi"
+                control={control}
+                rules={{ required: 'Alan Boş Bırakılamaz!' }}
+                render={({ field, fieldState: { error } }) => (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', width: '300px' }}>
+                    <Input
+                      {...field}
+                      status={error ? 'error' : ''}
+                      type="text" // Set the type to "text" for name input
+                    />
+                    {error && <div style={{ color: 'red' }}>{error.message}</div>}
+                  </div>
+                )}
+              />
+            </div>
             <Footer />
-          </Drawer>
-        </ConfigProvider>
-      </form>
+          </form>
+        </Drawer>
+      </ConfigProvider>
     </FormProvider>
   );
 }
