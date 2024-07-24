@@ -323,6 +323,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setOpen(false);
           onRefresh();
           methods.reset();
+          onDrawerClose();
         } else if (response.status_code === 401) {
           message.error('Bu işlemi yapmaya yetkiniz bulunmamaktadır.');
         } else {
