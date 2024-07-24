@@ -1019,7 +1019,7 @@ const MainTable = () => {
       if (searchTerm !== body.keyword) {
         handleBodyChange('keyword', searchTerm);
         setCurrentPage(1); // Arama yapıldığında veya arama sıfırlandığında sayfa numarasını 1'e ayarla
-        setDrawer({ ...drawer, visible: false }); // Arama yapıldığında veya arama sıfırlandığında Drawer'ı kapat
+        // setDrawer({ ...drawer, visible: false }); // Arama yapıldığında veya arama sıfırlandığında Drawer'ı kapat
       }
     }, 2000);
 
