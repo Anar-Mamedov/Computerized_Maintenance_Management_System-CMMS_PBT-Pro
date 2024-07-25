@@ -918,7 +918,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       flexDirection: "column",
                     }}
                   >
-                    <Controller name="isTalebiAciklama" disabled control={control} render={({ field }) => <TextArea {...field} rows={2} style={{ flex: 1 }} />} />
+                    <Controller name="isTalebiAciklama" control={control} render={({ field }) => <TextArea {...field} disabled rows={2} style={{ flex: 1 }} />} />
                   </div>
                 </div>
               </div>
