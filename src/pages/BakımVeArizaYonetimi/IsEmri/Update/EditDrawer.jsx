@@ -280,8 +280,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         setLoading(true); // Yükleme başladığında
         try {
           const response = await AxiosInstance.get(`GetIsEmriById?isEmriId=${selectedRow.key}`);
-          const data = response;
-          const item = data[0]; // Veri dizisinin ilk elemanını al
+          const item = response[0]; // Veri dizisinin ilk elemanını al
           // Form alanlarını set et
           setValue('secilenIsEmriID', item.TB_ISEMRI_ID);
           setValue('kapali', item.KAPALI);
