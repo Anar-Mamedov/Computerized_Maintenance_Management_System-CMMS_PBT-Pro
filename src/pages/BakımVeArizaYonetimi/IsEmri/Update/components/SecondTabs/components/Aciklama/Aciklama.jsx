@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Button, Modal, Input, Typography, Tabs, DatePicker, TimePicker, Slider, InputNumber, Checkbox } from 'antd';
-import { Controller, useFormContext } from 'react-hook-form';
-import styled from 'styled-components';
-import dayjs from 'dayjs';
-import { useAppContext } from '../../../../../../../../AppContext'; // Context hook'unu import edin
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Button, Modal, Input, Typography, Tabs, DatePicker, TimePicker, Slider, InputNumber, Checkbox } from "antd";
+import { Controller, useFormContext } from "react-hook-form";
+import styled from "styled-components";
+import dayjs from "dayjs";
+import { useAppContext } from "../../../../../../../../AppContext"; // Context hook'unu import edin
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -41,8 +41,8 @@ export default function Aciklama({ fieldRequirements }) {
   } = useFormContext();
   const { selectedOption } = useAppContext(); // Context'ten seçilen opsiyonu al iş emri tipi selectboxu değiştiğinde prosedürü sıfırlaması için
   const previousSelectedOption = usePrevious(selectedOption); // Önceki seçilen opsiyonu al iş emri tipi selectboxu değiştiğinde prosedürü sıfırlaması için
-  const [localeDateFormat, setLocaleDateFormat] = useState('DD/MM/YYYY'); // Varsayılan format
-  const [localeTimeFormat, setLocaleTimeFormat] = useState('HH:mm'); // Default time format
+  const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
+  const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
 
   // date picker için tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
@@ -53,22 +53,22 @@ export default function Aciklama({ fieldRequirements }) {
     const dateFormatter = new Intl.DateTimeFormat(navigator.language);
     const sampleDate = new Date(2021, 10, 21);
     const formattedSampleDate = dateFormatter.format(sampleDate);
-    setLocaleDateFormat(formattedSampleDate.replace('2021', 'YYYY').replace('21', 'DD').replace('11', 'MM'));
+    setLocaleDateFormat(formattedSampleDate.replace("2021", "YYYY").replace("21", "DD").replace("11", "MM"));
 
     // Format the time based on the user's locale
-    const timeFormatter = new Intl.DateTimeFormat(navigator.language, { hour: 'numeric', minute: 'numeric' });
+    const timeFormatter = new Intl.DateTimeFormat(navigator.language, { hour: "numeric", minute: "numeric" });
     const sampleTime = new Date(2021, 10, 21, 13, 45); // Use a sample time, e.g., 13:45
     const formattedSampleTime = timeFormatter.format(sampleTime);
 
     // Check if the formatted time contains AM/PM, which implies a 12-hour format
     const is12HourFormat = /AM|PM/.test(formattedSampleTime);
-    setLocaleTimeFormat(is12HourFormat ? 'hh:mm A' : 'HH:mm');
+    setLocaleTimeFormat(is12HourFormat ? "hh:mm A" : "HH:mm");
   }, []);
 
   // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın sonu
 
   return (
-    <div style={{ paddingBottom: '35px' }}>
+    <div style={{ paddingBottom: "35px" }}>
       {/* number input okları kaldırma */}
       <style>
         {`
@@ -83,7 +83,7 @@ export default function Aciklama({ fieldRequirements }) {
       }
     `}
       </style>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
         <Controller name="isEmriAciklama" control={control} render={({ field }) => <TextArea {...field} rows={4} />} />
       </div>
     </div>
