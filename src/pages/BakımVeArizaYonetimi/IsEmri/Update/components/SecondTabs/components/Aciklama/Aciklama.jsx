@@ -84,7 +84,21 @@ export default function Aciklama({ fieldRequirements }) {
     `}
       </style>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-        <Controller name="isEmriAciklama" control={control} render={({ field }) => <TextArea {...field} rows={4} />} />
+        <Controller
+          name="isEmriAciklama"
+          control={control}
+          render={({ field }) => (
+            <TextArea
+              {...field}
+              rows={4}
+              value={`${field.value || ""}\n${getValues("isTalebiAciklama") || ""}`}
+              onChange={(e) => {
+                const value = e.target.value.split("\n")[0];
+                setValue("isEmriAciklama", value);
+              }}
+            />
+          )}
+        />
       </div>
     </div>
   );
