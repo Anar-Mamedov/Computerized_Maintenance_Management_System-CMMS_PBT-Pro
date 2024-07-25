@@ -91,7 +91,7 @@ export default function Aciklama({ fieldRequirements }) {
             <TextArea
               {...field}
               rows={4}
-              value={`${field.value || ""}\n${getValues("isTalebiAciklama") || ""}`}
+              value={`${field.value || ""}\n${getValues("isTalebiAciklama") ? `Talep: ${getValues("isTalebiAciklama")}` : ""}`}
               onChange={(e) => {
                 const value = e.target.value.split("\n")[0];
                 setValue("isEmriAciklama", value);
