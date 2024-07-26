@@ -6,13 +6,7 @@ import dayjs from "dayjs";
 // import MainTabs from "./MainTabs/MainTabs";
 import Table from "./Table.jsx";
 
-export default function EditModal({
-  selectedRow,
-  isModalVisible,
-  onModalClose,
-  onRefresh,
-  secilenIsEmriID,
-}) {
+export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh, secilenIsEmriID }) {
   const methods = useForm({
     defaultValues: {
       secilenID: "",
@@ -53,22 +47,8 @@ export default function EditModal({
       setValue("vardiya", selectedRow.IDK_VARDIYA_TANIM);
       setValue("vardiyaID", selectedRow.IDK_VARDIYA);
       setValue("aciklama", selectedRow.IDK_ACIKLAMA);
-      setValue(
-        "personelBaslamaZamani",
-        selectedRow.IDK_TARIH
-          ? dayjs(selectedRow.IDK_TARIH).isValid()
-            ? dayjs(selectedRow.IDK_TARIH)
-            : null
-          : null
-      );
-      setValue(
-        "personelBaslamaSaati",
-        selectedRow.IDK_SAAT
-          ? dayjs(selectedRow.IDK_SAAT, "HH:mm:ss").isValid()
-            ? dayjs(selectedRow.IDK_SAAT, "HH:mm:ss")
-            : null
-          : null
-      );
+      setValue("personelBaslamaZamani", selectedRow.IDK_TARIH ? (dayjs(selectedRow.IDK_TARIH).isValid() ? dayjs(selectedRow.IDK_TARIH) : null) : null);
+      setValue("personelBaslamaSaati", selectedRow.IDK_SAAT ? (dayjs(selectedRow.IDK_SAAT, "HH:mm:ss").isValid() ? dayjs(selectedRow.IDK_SAAT, "HH:mm:ss") : null) : null);
     }
   }, [selectedRow, isModalVisible, setValue]);
 
@@ -107,10 +87,7 @@ export default function EditModal({
       IDK_SAAT: formatTimeWithDayjs(data.personelBaslamaSaati),
     };
 
-    AxiosInstance.post(
-      `AddUpdateIsEmriPersonel?isEmriId=${secilenIsEmriID}`,
-      Body
-    )
+    AxiosInstance.post(`AddUpdateIsEmriPersonel?isEmriId=${secilenIsEmriID}`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
 
@@ -139,14 +116,7 @@ export default function EditModal({
   return (
     <FormProvider {...methods}>
       <div>
-        <Modal
-          width="1200px"
-          centered
-          title="Personel Analizi"
-          open={isModalVisible}
-          onOk={methods.handleSubmit(onSubmited)}
-          onCancel={onModalClose}
-        >
+        <Modal width="1200px" centered title="Personel Analizi" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={onModalClose}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <Table />
           </form>
