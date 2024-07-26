@@ -42,7 +42,7 @@ const ConditionFilter = ({ onSubmit }) => {
     // Bu objeyi onSubmit fonksiyonuna gönder
     setTimeout(() => {
       onSubmit(selectedKeysObj);
-    }, 500);
+    }, 900);
   }, []);
 
   const handleSubmit = () => {
@@ -81,14 +81,7 @@ const ConditionFilter = ({ onSubmit }) => {
         </Button>
       </div>
       <div style={{ padding: "10px" }}>
-        <Select
-          mode="multiple"
-          style={{ width: "100%" }}
-          placeholder="Ara..."
-          value={Object.values(filters)}
-          onChange={handleChange}
-          allowClear
-        >
+        <Select mode="multiple" style={{ width: "100%" }} placeholder="Ara..." value={Object.values(filters)} onChange={handleChange} allowClear>
           {options.map((option) => (
             <Option key={option.key} value={option.value}>
               {option.value}
