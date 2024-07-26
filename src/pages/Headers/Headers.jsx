@@ -2,6 +2,7 @@ import React from "react";
 import Kullanici from "./components/Kullanici";
 import Bildirim from "./components/Bildirim";
 import FirmaLogo from "./components/FirmaLogo.jsx";
+import Hatirlatici from "./components/Hatırlatıcı.jsx";
 
 export default function Header() {
   return (
@@ -26,6 +27,7 @@ export default function Header() {
           gap: "10px",
         }}
       >
+        <Hatirlatici />
         <Bildirim />
         <Kullanici />
       </div>
