@@ -4,7 +4,7 @@ import { BellOutlined } from "@ant-design/icons";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import Hatirlatici from "../../Dashboard/Hatirlatici/Hatirlatici";
 
-export default function Bildirim() {
+export default function HatirlaticiPopover() {
   const [open, setOpen] = useState(false);
 
   const handleOpenChange = (newOpen) => {
