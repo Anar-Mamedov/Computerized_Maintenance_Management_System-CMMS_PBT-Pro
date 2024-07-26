@@ -55,10 +55,7 @@ function Component5(updateApi) {
       }}
     >
       <div style={{ padding: "10px" }}>
-        <Text style={{ fontWeight: "500", fontSize: "17px" }}>
-          {" "}
-          Özet Durum{" "}
-        </Text>
+        <Text style={{ fontWeight: "500", fontSize: "17px" }}>Özet Durum</Text>
       </div>
       {isLoading ? (
         <Spin size="large" />
@@ -111,9 +108,7 @@ function Component5(updateApi) {
                 color: "blue",
               }}
             >
-              {data?.DEVAM_EDEN_IS_TALEPLERI !== undefined
-                ? data.DEVAM_EDEN_IS_TALEPLERI
-                : ""}
+              {data?.DEVAM_EDEN_IS_TALEPLERI !== undefined ? data.DEVAM_EDEN_IS_TALEPLERI : ""}
             </Text>
           </div>
           <div
@@ -153,9 +148,7 @@ function Component5(updateApi) {
                 color: "green",
               }}
             >
-              {data?.ACIK_IS_EMIRLERI !== undefined
-                ? data.ACIK_IS_EMIRLERI
-                : ""}
+              {data?.ACIK_IS_EMIRLERI !== undefined ? data.ACIK_IS_EMIRLERI : ""}
             </Text>
           </div>
           <div
@@ -195,9 +188,7 @@ function Component5(updateApi) {
                 color: "red",
               }}
             >
-              {data?.DUSUK_STOKLU_MALZEMELER !== undefined
-                ? data.DUSUK_STOKLU_MALZEMELER
-                : ""}
+              {data?.DUSUK_STOKLU_MALZEMELER !== undefined ? data.DUSUK_STOKLU_MALZEMELER : ""}
             </Text>
           </div>
           <div
@@ -244,14 +235,7 @@ function Component5(updateApi) {
           </div>
         </div>
       )}
-      <Modal
-        width="90%"
-        centered
-        title={modalTitle}
-        open={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
+      <Modal width="90%" centered title={modalTitle} open={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
         <div>{modalContent}</div>
       </Modal>
     </div>
