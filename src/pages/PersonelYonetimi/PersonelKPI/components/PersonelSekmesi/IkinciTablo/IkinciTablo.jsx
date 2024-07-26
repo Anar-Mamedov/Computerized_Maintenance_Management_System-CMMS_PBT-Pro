@@ -1,12 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Input, Typography, Tabs, message, Table } from "antd";
+import { CSVLink } from "react-csv";
+import { DownloadOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../api/http.jsx";
-import {
-  Controller,
-  useForm,
-  FormProvider,
-  useFormContext,
-} from "react-hook-form";
+import { Controller, useForm, FormProvider, useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
 // import MainTabs from "./MainTabs/MainTabs";
 import EditModal from "../UcuncuTablo/UcuncuTablo.jsx";
@@ -30,13 +27,7 @@ const normalizeText = (text) => {
     .replace(/Ç/g, "C");
 };
 
-export default function IkinciTablo({
-  selectedRowBirinciTablo,
-  isModalVisibleBirinciTablo,
-  onModalClose,
-  onRefresh,
-  secilenIsEmriID,
-}) {
+export default function IkinciTablo({ selectedRowBirinciTablo, isModalVisibleBirinciTablo, onModalClose, onRefresh, secilenIsEmriID }) {
   const [loading, setLoading] = useState(false);
   const { control, watch, setValue } = useFormContext();
   const [data, setData] = useState([]);
@@ -44,7 +35,7 @@ export default function IkinciTablo({
   const [selectedRowsData, setSelectedRowsData] = useState([]); // Seçilen satırların verilerini tutacak state
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
-
+  const [loadings, setLoadings] = useState([]);
   const [searchTerm1, setSearchTerm1] = useState("");
   const [filteredData1, setFilteredData1] = useState([]);
 
@@ -61,9 +52,7 @@ export default function IkinciTablo({
 
     // Örnek bir tarih formatla ve ay formatını belirle
     const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
-    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(
-      sampleDate
-    );
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
 
     let monthFormat;
     if (sampleFormatted.includes("January")) {
@@ -96,14 +85,7 @@ export default function IkinciTablo({
       // Saat ve dakika değerlerinin geçerliliğini kontrol et
       const hoursInt = parseInt(hours, 10);
       const minutesInt = parseInt(minutes, 10);
-      if (
-        isNaN(hoursInt) ||
-        isNaN(minutesInt) ||
-        hoursInt < 0 ||
-        hoursInt > 23 ||
-        minutesInt < 0 ||
-        minutesInt > 59
-      ) {
+      if (isNaN(hoursInt) || isNaN(minutesInt) || hoursInt < 0 || hoursInt > 23 || minutesInt < 0 || minutesInt > 59) {
         // throw new Error("Invalid time format"); // hata fırlatır ve uygulamanın çalışmasını durdurur
         console.error("Invalid time format:", time);
         // return time; // Hatalı formatı olduğu gibi döndür
@@ -140,6 +122,9 @@ export default function IkinciTablo({
       key: "IMT_TANIM",
       width: 200,
       ellipsis: true,
+      render: (text, record) => (
+        <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
+      ),
     },
 
     {
@@ -150,14 +135,14 @@ export default function IkinciTablo({
       ellipsis: true,
     },
     {
-      title: "Toplam Çalışma Süresi",
+      title: "Toplam Çalışma Süresi (dk.)",
       dataIndex: "TOPLAM_CALISMA_SURESI",
       key: "TOPLAM_CALISMA_SURESI",
       width: 200,
       ellipsis: true,
     },
     {
-      title: "Ortalama Çalışma Süresi",
+      title: "Ortalama Çalışma Süresi (dk.)",
       dataIndex: "ORTALAMA_CALISMA_SURESI",
       key: "ORTALAMA_CALISMA_SURESI",
       width: 200,
@@ -175,16 +160,11 @@ export default function IkinciTablo({
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get(
-        `RaporGetPersonel?PersonelID=${selectedRowBirinciTablo.key}`
-      );
+      const response = await AxiosInstance.get(`RaporGetPersonel?PersonelID=${selectedRowBirinciTablo.key}`);
       const fetchedData = response.map((item) => ({
         ...item,
         key: item.TB_ISEMRI_TIP_ID,
-        ORTALAMA_CALISMA_SURESI:
-          item.TOPLAM_CALISMA_SURESI && item.ISEMRI_SAYISI
-            ? (item.TOPLAM_CALISMA_SURESI / item.ISEMRI_SAYISI).toFixed(2)
-            : "",
+        ORTALAMA_CALISMA_SURESI: item.TOPLAM_CALISMA_SURESI && item.ISEMRI_SAYISI ? (item.TOPLAM_CALISMA_SURESI / item.ISEMRI_SAYISI).toFixed(2) : "",
       }));
       setData(fetchedData);
     } catch (error) {
@@ -219,18 +199,34 @@ export default function IkinciTablo({
     const normalizedSearchTerm = normalizeText(value);
     if (value) {
       const filtered = data.filter((item) =>
-        Object.keys(item).some(
-          (key) =>
-            item[key] &&
-            normalizeText(item[key].toString())
-              .toLowerCase()
-              .includes(normalizedSearchTerm.toLowerCase())
-        )
+        Object.keys(item).some((key) => item[key] && normalizeText(item[key].toString()).toLowerCase().includes(normalizedSearchTerm.toLowerCase()))
       );
       setFilteredData1(filtered);
     } else {
       setFilteredData1(data);
     }
+  };
+
+  // csv dosyası için tablo başlık oluştur
+
+  const csvHeaders = columns.map((col) => ({
+    label: col.title,
+    key: col.dataIndex,
+  }));
+
+  const enterLoading = (index) => {
+    setLoadings((prevLoadings) => {
+      const newLoadings = [...prevLoadings];
+      newLoadings[index] = true;
+      return newLoadings;
+    });
+    setTimeout(() => {
+      setLoadings((prevLoadings) => {
+        const newLoadings = [...prevLoadings];
+        newLoadings[index] = false;
+        return newLoadings;
+      });
+    }, 1000);
   };
 
   return (
@@ -245,21 +241,32 @@ export default function IkinciTablo({
       >
         <div style={{ marginBottom: "25px" }}>
           {/*<CreateModal onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />*/}
-          <Input
-            placeholder="Arama..."
-            value={searchTerm1}
-            onChange={handleSearch1}
-            style={{ width: "300px", marginBottom: "15px" }}
-          />
-          <Table
-            rowSelection={{
-              type: "checkbox",
-              selectedRowKeys,
-              onChange: onRowSelectChange,
+          <div
+            style={{
+              display: "flex",
+              marginBottom: "15px",
+              alignItems: "center",
+              justifyContent: "space-between",
             }}
-            onRow={(record) => ({
-              onClick: () => onRowClick(record),
-            })}
+          >
+            <Input placeholder="Arama..." value={searchTerm1} onChange={handleSearch1} style={{ width: "300px" }} />
+
+            {/*csv indirme butonu*/}
+            <CSVLink data={data} headers={csvHeaders} filename={`personel_is_tipleri.csv`} className="ant-btn ant-btn-primary">
+              <Button type="primary" icon={<DownloadOutlined />} loading={loadings[1]} onClick={() => enterLoading(1)}>
+                İndir
+              </Button>
+            </CSVLink>
+          </div>
+          <Table
+            // rowSelection={{
+            //   type: "checkbox",
+            //   selectedRowKeys,
+            //   onChange: onRowSelectChange,
+            // }}
+            // onRow={(record) => ({
+            //   onClick: () => onRowClick(record),
+            // })}
             pagination={{
               defaultPageSize: 10,
               showSizeChanger: true,
@@ -269,9 +276,7 @@ export default function IkinciTablo({
               showQuickJumper: true,
             }}
             columns={columns}
-            dataSource={
-              filteredData1.length > 0 || searchTerm1 ? filteredData1 : data
-            }
+            dataSource={filteredData1.length > 0 || searchTerm1 ? filteredData1 : data}
             loading={loading}
             scroll={{
               // x: "auto",
