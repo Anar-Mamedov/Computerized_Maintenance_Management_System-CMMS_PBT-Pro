@@ -42,9 +42,7 @@ export default function Auth() {
           localStorage.setItem("baseURL", baseURL);
           window.location.reload();
         } else {
-          console.error(
-            "URL is not valid or server is not responding correctly."
-          );
+          console.error("URL is not valid or server is not responding correctly.");
           setErrorMessage("Geçerli Bir Bağlantı Anahtarı Giriniz.");
         }
       })
@@ -134,12 +132,9 @@ export default function Auth() {
         }
 
         try {
-          const responseBackground = await AxiosInstance.get(
-            `ResimGetirById?id=2`,
-            {
-              responseType: "blob",
-            }
-          );
+          const responseBackground = await AxiosInstance.get(`ResimGetirById?id=2`, {
+            responseType: "blob",
+          });
           const backgroundBlob = responseBackground;
           setBackgroundImageUrl(URL.createObjectURL(backgroundBlob));
         } catch (error) {
@@ -177,20 +172,11 @@ export default function Auth() {
                   display: "flex",
                 }}
               >
-                <Text style={{ textAlign: "center" }}>
-                  Uygulamayı kullanmak için aşağıdaki alana veri tabanı bağlantı
-                  anahtarını girin.
-                </Text>
+                <Text style={{ textAlign: "center" }}>Uygulamayı kullanmak için aşağıdaki alana veri tabanı bağlantı anahtarını girin.</Text>
               </div>
 
               <Form style={{ width: "300px" }}>
-                <Input
-                  placeholder="Bağlantı Anahtarını Girin"
-                  value={baseURL}
-                  onChange={(e) => setBaseURL(e.target.value)}
-                  name="baseURL"
-                  autoComplete="on"
-                />
+                <Input placeholder="Bağlantı Anahtarını Girin" value={baseURL} onChange={(e) => setBaseURL(e.target.value)} name="baseURL" autoComplete="on" />
                 {errorMessage && (
                   <p
                     style={{
@@ -205,12 +191,7 @@ export default function Auth() {
                 {/* <Button type="primary" onClick={saveBaseURL} style={{ marginTop: 20, width: "100%" }}>
                   Kaydet
                 </Button> */}
-                <Button
-                  type="primary"
-                  onClick={saveBaseURL}
-                  style={{ marginTop: 20, width: "100%" }}
-                  disabled={loading}
-                >
+                <Button type="primary" onClick={saveBaseURL} style={{ marginTop: 20, width: "100%" }} disabled={loading}>
                   {loading ? <Spin /> : "Kaydet"}
                 </Button>
               </Form>
@@ -266,11 +247,7 @@ export default function Auth() {
 
   return (
     <div>
-      {loadingImage ? (
-        <Spin style={{ position: "fixed", right: "25%", top: "50%" }} />
-      ) : (
-        <div style={backgroundStyle}></div>
-      )}
+      {loadingImage ? <Spin style={{ position: "fixed", right: "25%", top: "50%" }} /> : <div style={backgroundStyle}></div>}
       {/* Beyaz alanı ekleyin */}
 
       {renderForm()}
