@@ -1,20 +1,18 @@
-// Fotoğrafı içe aktarın
 import React, { useEffect, useState } from "react";
 import { Button, Form, Input, Space, Spin, Typography } from "antd";
-import { UserAddOutlined } from "@ant-design/icons";
+import axios from "axios";
+import AxiosInstance from "../../api/http";
 import backgroundImage from "../../assets/images/login.jpg";
 import backgroundBaseURL from "../../assets/images/backgroundBaseURL.webp";
 import LoginForm from "./components/LoginForm";
 import logo from "../../assets/images/logo.svg";
 import RegistrationForm from "./components/RegistrationForm";
-import axios from "axios";
-import AxiosInstance from "../../api/http";
 
-const { Text, Link } = Typography;
+const { Text } = Typography;
 
 export default function Auth() {
-  const [target, setTarget] = React.useState("login"); // login veya register
-  const [target1, setTarget1] = React.useState("login"); // login veya register
+  const [target, setTarget] = useState("login"); // login veya register
+  const [target1, setTarget1] = useState("login"); // login veya register
   const [baseURL, setBaseURL] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false); // Yükleme durumunu takip eden durum değişkeni
@@ -52,13 +50,6 @@ export default function Auth() {
       })
       .finally(() => setLoading(false));
   };
-
-  // const saveBaseURL = () => {
-  //   localStorage.setItem("baseURL", baseURL);
-  //   window.location.reload();
-  //   // setTarget("login");
-  //   // baseURL kaydedildikten sonra login ekranına geçiş
-  // };
 
   // JavaScript objesi olarak stil tanımlaması
   const backgroundStyle = {
@@ -181,26 +172,23 @@ export default function Auth() {
                   width: "300px",
                   marginBottom: "15px",
                   display: "flex",
-                  flexDirection: "column",
                 }}
               >
                 <Text style={{ textAlign: "center" }}>Uygulamayı kullanmak için aşağıdaki alana veri tabanı bağlantı anahtarını girin.</Text>
+              </div>
+              <Form style={{ width: "300px" }}>
+                <Input placeholder="Bağlantı Anahtarını Girin" value={baseURL} onChange={handleBaseURLChange} name="baseURL" autoComplete="on" />
                 {sslWarning && (
-                  <Text
+                  <p
                     style={{
                       color: "red",
-                      marginBottom: "-5px",
+                      marginBottom: "-10px",
                       marginTop: "5px",
-                      textAlign: "center",
                     }}
                   >
                     {sslWarning}
-                  </Text>
+                  </p>
                 )}
-              </div>
-
-              <Form style={{ width: "300px" }}>
-                <Input placeholder="Bağlantı Anahtarını Girin" value={baseURL} onChange={handleBaseURLChange} name="baseURL" autoComplete="on" />
                 {errorMessage && (
                   <p
                     style={{
@@ -212,9 +200,6 @@ export default function Auth() {
                     {errorMessage}
                   </p>
                 )}
-                {/* <Button type="primary" onClick={saveBaseURL} style={{ marginTop: 20, width: "100%" }}>
-                  Kaydet
-                </Button> */}
                 <Button type="primary" onClick={saveBaseURL} style={{ marginTop: 20, width: "100%" }} disabled={loading}>
                   {loading ? <Spin /> : "Kaydet"}
                 </Button>
@@ -236,33 +221,16 @@ export default function Auth() {
               alignItems: "center",
             }}
           >
-            <div>
-              {loadingImage && <Spin />}
-              <img
-                src={logoUrl}
-                alt="Logo"
-                style={{
-                  ...logoStyle,
-                  visibility: loadingImage ? "hidden" : "visible",
-                }}
-              />
-            </div>
-            {target1 === "login" ? <LoginForm /> : <RegistrationForm />}
-            {/* <Text type="secondary" style={{ fontSize: "14px", marginBottom: "20px" }}>
-              ve ya
-            </Text>
-            <Button
+            {loadingImage && <Spin />}
+            <img
+              src={logoUrl}
+              alt="Logo"
               style={{
-                zIndex: "10",
-                width: "100%",
-                backgroundColor: "rgb(43, 199, 112)",
-                borderColor: "rgb(43, 199, 112)",
-                color: "white",
+                ...logoStyle,
+                visibility: loadingImage ? "hidden" : "visible",
               }}
-              onClick={toggleTarget}>
-              {target1 === "login" ? <UserAddOutlined /> : null}
-              {target1 === "login" ? "Kayıt Ol" : "Giriş Yap"}
-            </Button> */}
+            />
+            {target1 === "login" ? <LoginForm /> : <RegistrationForm />}
           </div>
         </div>
       );
@@ -272,11 +240,7 @@ export default function Auth() {
   return (
     <div>
       {loadingImage ? <Spin style={{ position: "fixed", right: "25%", top: "50%" }} /> : <div style={backgroundStyle}></div>}
-      {/* Beyaz alanı ekleyin */}
-
       {renderForm()}
-
-      {/* İçerik, beyaz alanın üzerine veya dışına gelebilir */}
     </div>
   );
 }
