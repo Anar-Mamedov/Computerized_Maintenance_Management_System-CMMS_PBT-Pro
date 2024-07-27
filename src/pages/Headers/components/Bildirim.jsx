@@ -5,7 +5,6 @@ import styled from "styled-components";
 
 const IconContainer = styled.div`
   position: relative;
-  display: inline-block;
   height: 100%;
   display: flex;
 `;
