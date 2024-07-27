@@ -31,7 +31,7 @@ export default function Bildirim() {
   const content = (
     <div>
       {/*<Hatirlatici />*/}
-      <p>Yeni bildirimler</p>
+      <p>Yeni bildirim yok</p>
     </div>
   );
 
