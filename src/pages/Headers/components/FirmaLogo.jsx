@@ -28,7 +28,7 @@ function FirmaLogo(props) {
   if (loading) {
     return <Spin />;
   } else if (imageUrl) {
-    return <img src={imageUrl} alt="Firma Logo" style={{ height: "25px" }} />;
+    return <img src={imageUrl} alt="Firma Logo" style={{ height: "30px" }} />;
   } else {
     return null;
   }
