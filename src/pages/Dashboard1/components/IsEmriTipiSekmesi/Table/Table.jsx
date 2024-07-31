@@ -225,7 +225,7 @@ export default function MainTable({ isActive }) {
   };
 
   return (
-    <div style={{ marginBottom: "25px" }}>
+    <div>
       {/*<CreateModal onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />*/}
       <div
         style={{
