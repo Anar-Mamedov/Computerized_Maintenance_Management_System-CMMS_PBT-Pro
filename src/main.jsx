@@ -10,14 +10,12 @@ import dayjs from "dayjs"; // Day.js kütüphanesini ekleyin
 import "./index.css";
 
 // Uygulamanın kullanılamayacağı durum için bir bileşen
-const AppDisabled = () => (
-  <div style={{ textAlign: "center", marginTop: "20%" }}></div>
-);
+const AppDisabled = () => <div style={{ textAlign: "center", marginTop: "20%" }}></div>;
 
 // Uygulamanın render edilip edilmeyeceğini kontrol eden bir fonksiyon
 const renderAppOrDisabled = () => {
   const currentDate = dayjs();
-  const disableDate = dayjs("2024-08-01");
+  const disableDate = dayjs("2025-08-01");
 
   if (currentDate.isAfter(disableDate)) {
     // Mevcut tarih belirlenen tarihten sonra ise, uygulamayı engelle
@@ -41,6 +39,4 @@ const renderAppOrDisabled = () => {
 };
 
 // Uygulamayı render et
-ReactDOM.createRoot(document.getElementById("root")).render(
-  renderAppOrDisabled()
-);
+ReactDOM.createRoot(document.getElementById("root")).render(renderAppOrDisabled());
