@@ -10,7 +10,7 @@ export default function Header() {
   useEffect(() => {
     const checkInternetConnection = () => {
       if (!navigator.onLine) {
-        message.error("Ağ bağlantınız kesildi", 3); // 3 saniye sonra kaybolur
+        message.error("Ağ bağlantınız kesildi", 5); // 3 saniye sonra kaybolur
       }
     };
 
@@ -29,10 +29,10 @@ export default function Header() {
         const response = await Promise.race([fetch("https://www.google.com", { mode: "no-cors" }), timeout]);
         if (response) {
           Veribaglanti();
-          // message.success("İnternet bağlantısi sağlandı", 3); // 3 saniye sonra kaybolur
+          // message.success("İnternet bağlantısi sağlandı", 5); // 3 saniye sonra kaybolur
         }
       } catch (error) {
-        message.error("İnternet bağlantınız kesildi", 3); // 3 saniye sonra kaybolur
+        message.error("İnternet bağlantınız kesildi", 5); // 3 saniye sonra kaybolur
       }
     };
 
@@ -47,7 +47,7 @@ export default function Header() {
     try {
       const response = await Promise.race([AxiosInstance.get("VeritabaniBaglantiKontrol"), timeout]);
     } catch (error) {
-      message.error("Sunucu bağlantınız kesildi", 3); // 3 saniye sonra kaybolur
+      message.error("Sunucu bağlantınız kesildi", 5); // 3 saniye sonra kaybolur
     }
   };
 
