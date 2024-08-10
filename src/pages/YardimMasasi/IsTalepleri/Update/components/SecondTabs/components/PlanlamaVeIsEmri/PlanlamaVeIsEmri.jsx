@@ -1,13 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  Button,
-  Modal,
-  Input,
-  Typography,
-  Tabs,
-  DatePicker,
-  TimePicker,
-} from "antd";
+import { Button, Modal, Input, Typography, Tabs, DatePicker, TimePicker } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
@@ -79,12 +71,7 @@ export default function PlanlamaVeIsEmri({ disabled, fieldRequirements }) {
     const dateFormatter = new Intl.DateTimeFormat(navigator.language);
     const sampleDate = new Date(2021, 10, 21);
     const formattedSampleDate = dateFormatter.format(sampleDate);
-    setLocaleDateFormat(
-      formattedSampleDate
-        .replace("2021", "YYYY")
-        .replace("21", "DD")
-        .replace("11", "MM")
-    );
+    setLocaleDateFormat(formattedSampleDate.replace("2021", "YYYY").replace("21", "DD").replace("11", "MM"));
 
     // Format the time based on the user's locale
     const timeFormatter = new Intl.DateTimeFormat(navigator.language, {
@@ -120,9 +107,7 @@ export default function PlanlamaVeIsEmri({ disabled, fieldRequirements }) {
       <div style={{ display: "flex", gap: "10px", flexDirection: "column" }}>
         <div style={{ display: "flex", width: "100%", gap: "10px" }}>
           <div style={{ maxWidth: "485px", width: "100%" }}>
-            <div
-              style={{ width: "100%", maxWidth: "485px", marginBottom: "10px" }}
-            >
+            <div style={{ width: "100%", maxWidth: "485px", marginBottom: "10px" }}>
               <StyledDivBottomLine
                 style={{
                   display: "flex",
@@ -150,10 +135,7 @@ export default function PlanlamaVeIsEmri({ disabled, fieldRequirements }) {
                     width: "100%",
                   }}
                 >
-                  <IsEmriTipi
-                    disabled={disabled}
-                    fieldRequirements={fieldRequirements}
-                  />
+                  <IsEmriTipi disabled={disabled} fieldRequirements={fieldRequirements} />
                 </div>
               </StyledDivBottomLine>
             </div>
@@ -172,9 +154,7 @@ export default function PlanlamaVeIsEmri({ disabled, fieldRequirements }) {
               <Text
                 style={{
                   fontSize: "14px",
-                  fontWeight: fieldRequirements.planlananBaslamaTarihi
-                    ? "600"
-                    : "normal",
+                  fontWeight: fieldRequirements.planlananBaslamaTarihi ? "600" : "normal",
                 }}
               >
                 Planlanan Başlama Tarihi:
@@ -194,9 +174,7 @@ export default function PlanlamaVeIsEmri({ disabled, fieldRequirements }) {
                   name="planlananBaslamaTarihi"
                   control={control}
                   rules={{
-                    required: fieldRequirements.planlananBaslamaTarihi
-                      ? "Alan Boş Bırakılamaz!"
-                      : false,
+                    required: fieldRequirements.planlananBaslamaTarihi ? "Alan Boş Bırakılamaz!" : false,
                   }}
                   render={({ field }) => (
                     <DatePicker
@@ -223,11 +201,7 @@ export default function PlanlamaVeIsEmri({ disabled, fieldRequirements }) {
                     />
                   )}
                 />
-                {errors.planlananBaslamaTarihi && (
-                  <div style={{ color: "red", marginTop: "-5px" }}>
-                    {errors.planlananBaslamaTarihi.message}
-                  </div>
-                )}
+                {errors.planlananBaslamaTarihi && <div style={{ color: "red", marginTop: "-5px" }}>{errors.planlananBaslamaTarihi.message}</div>}
               </div>
             </div>
             <div
@@ -245,9 +219,7 @@ export default function PlanlamaVeIsEmri({ disabled, fieldRequirements }) {
               <Text
                 style={{
                   fontSize: "14px",
-                  fontWeight: fieldRequirements.planlananBitisTarihi
-                    ? "600"
-                    : "normal",
+                  fontWeight: fieldRequirements.planlananBitisTarihi ? "600" : "normal",
                 }}
               >
                 Planlanan Bitiş Tarihi:
@@ -267,9 +239,7 @@ export default function PlanlamaVeIsEmri({ disabled, fieldRequirements }) {
                   name="planlananBitisTarihi"
                   control={control}
                   rules={{
-                    required: fieldRequirements.planlananBitisTarihi
-                      ? "Alan Boş Bırakılamaz!"
-                      : false,
+                    required: fieldRequirements.planlananBitisTarihi ? "Alan Boş Bırakılamaz!" : false,
                   }}
                   render={({ field }) => (
                     <DatePicker
@@ -296,18 +266,12 @@ export default function PlanlamaVeIsEmri({ disabled, fieldRequirements }) {
                     />
                   )}
                 />
-                {errors.planlananBitisTarihi && (
-                  <div style={{ color: "red", marginTop: "-5px" }}>
-                    {errors.planlananBitisTarihi.message}
-                  </div>
-                )}
+                {errors.planlananBitisTarihi && <div style={{ color: "red", marginTop: "-5px" }}>{errors.planlananBitisTarihi.message}</div>}
               </div>
             </div>
           </div>
           <div style={{ maxWidth: "475px", width: "100%" }}>
-            <div
-              style={{ width: "100%", maxWidth: "475px", marginBottom: "10px" }}
-            >
+            <div style={{ width: "100%", maxWidth: "475px", marginBottom: "10px" }}>
               <StyledDivBottomLine
                 style={{
                   display: "flex",
@@ -354,7 +318,7 @@ export default function PlanlamaVeIsEmri({ disabled, fieldRequirements }) {
                   {/* başka bir modülün güncelleme drawerini açmak için */}
                   <div>
                     {/* Drawer'ı açacak düğme */}
-                    <Button onClick={handleOpenDrawer}>
+                    <Button onClick={handleOpenDrawer} disabled={!watchedId}>
                       <EditOutlined />
                     </Button>
 
@@ -363,9 +327,7 @@ export default function PlanlamaVeIsEmri({ disabled, fieldRequirements }) {
                       selectedRow={{ key: watchedId }} // watchedId kullanarak selectedRow'u geçir
                       onDrawerClose={() => setDrawerVisible(false)}
                       drawerVisible={drawerVisible}
-                      onRefresh={() =>
-                        console.log("Listeyi yenileme veya gerekli işlemler")
-                      }
+                      onRefresh={() => console.log("Listeyi yenileme veya gerekli işlemler")}
                     />
                   </div>
                   {/* başka bir modülün güncelleme drawerini açmak için son */}
@@ -399,28 +361,12 @@ export default function PlanlamaVeIsEmri({ disabled, fieldRequirements }) {
                 <Controller
                   name="baslamaTarihi"
                   control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      {...field}
-                      disabled
-                      style={{ width: "180px" }}
-                      format={localeDateFormat}
-                      placeholder="Tarih seçiniz"
-                    />
-                  )}
+                  render={({ field }) => <DatePicker {...field} disabled style={{ width: "180px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />}
                 />
                 <Controller
                   name="baslamaSaati"
                   control={control}
-                  render={({ field }) => (
-                    <TimePicker
-                      {...field}
-                      disabled
-                      style={{ width: "110px" }}
-                      format={localeTimeFormat}
-                      placeholder="Saat seçiniz"
-                    />
-                  )}
+                  render={({ field }) => <TimePicker {...field} disabled style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />}
                 />
               </div>
             </div>
@@ -451,28 +397,12 @@ export default function PlanlamaVeIsEmri({ disabled, fieldRequirements }) {
                 <Controller
                   name="bitisTarihi"
                   control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      {...field}
-                      disabled
-                      style={{ width: "180px" }}
-                      format={localeDateFormat}
-                      placeholder="Tarih seçiniz"
-                    />
-                  )}
+                  render={({ field }) => <DatePicker {...field} disabled style={{ width: "180px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />}
                 />
                 <Controller
                   name="bitisSaati"
                   control={control}
-                  render={({ field }) => (
-                    <TimePicker
-                      {...field}
-                      disabled
-                      style={{ width: "110px" }}
-                      format={localeTimeFormat}
-                      placeholder="Saat seçiniz"
-                    />
-                  )}
+                  render={({ field }) => <TimePicker {...field} disabled style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />}
                 />
               </div>
             </div>
