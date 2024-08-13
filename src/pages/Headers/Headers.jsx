@@ -28,7 +28,7 @@ export default function Header() {
       try {
         const response = await Promise.race([fetch("https://www.google.com", { mode: "no-cors" }), timeout]);
         if (response) {
-          Veribaglanti();
+          // Veribaglanti();
           // message.success("İnternet bağlantısi sağlandı", 5); // 3 saniye sonra kaybolur
         }
       } catch (error) {
