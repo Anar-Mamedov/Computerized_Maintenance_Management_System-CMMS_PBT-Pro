@@ -292,11 +292,13 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
                     backgroundColor: "#2bc770",
                     borderColor: "#2bc770",
                     color: "#ffffff",
-                  }}>
+                  }}
+                >
                   Güncelle
                 </Button>
               </Space>
-            }>
+            }
+          >
             <MainTabs />
             <SecondTabs />
             <Footer />

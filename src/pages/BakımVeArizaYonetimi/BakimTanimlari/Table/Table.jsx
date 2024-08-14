@@ -1,37 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  Table,
-  Button,
-  Modal,
-  Checkbox,
-  Input,
-  Spin,
-  Typography,
-  Tag,
-  Progress,
-  message,
-} from "antd";
-import {
-  HolderOutlined,
-  SearchOutlined,
-  MenuOutlined,
-  CheckOutlined,
-  CloseOutlined,
-} from "@ant-design/icons";
-import {
-  DndContext,
-  useSensor,
-  useSensors,
-  PointerSensor,
-  KeyboardSensor,
-} from "@dnd-kit/core";
-import {
-  sortableKeyboardCoordinates,
-  arrayMove,
-  useSortable,
-  SortableContext,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
+import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
+import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Resizable } from "react-resizable";
 import "./ResizeStyle.css";
@@ -92,25 +63,8 @@ const ResizableTitle = (props) => {
 
 // Sütunların sürüklenebilir olmasını sağlayan component
 
-const DraggableRow = ({
-  id,
-  text,
-  index,
-  moveRow,
-  className,
-  style,
-  visible,
-  onVisibilityChange,
-  ...restProps
-}) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
+const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onVisibilityChange, ...restProps }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const styleWithTransform = {
     ...style,
     transform: CSS.Transform.toString(transform),
@@ -123,12 +77,7 @@ const DraggableRow = ({
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={styleWithTransform}
-      {...restProps}
-      {...attributes}
-    >
+    <div ref={setNodeRef} style={styleWithTransform} {...restProps} {...attributes}>
       {/* <Checkbox
         checked={visible}
         onChange={(e) => onVisibilityChange(index, e.target.checked)}
@@ -204,10 +153,7 @@ const MainTable = () => {
     const fetchData = async () => {
       try {
         const response = await AxiosInstance.get("OzelAlan?form=ISEMRI"); // API URL'niz
-        localStorage.setItem(
-          "ozelAlanlarBakimTanimlari",
-          JSON.stringify(response)
-        );
+        localStorage.setItem("ozelAlanlarBakimTanimlari", JSON.stringify(response));
         setLabel(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
       } catch (error) {
         console.error("API isteğinde hata oluştu:", error);
@@ -218,9 +164,7 @@ const MainTable = () => {
     fetchData();
   }, [drawer.visible]);
 
-  const ozelAlanlarBakimTanimlari = JSON.parse(
-    localStorage.getItem("ozelAlanlarBakimTanimlari")
-  );
+  const ozelAlanlarBakimTanimlari = JSON.parse(localStorage.getItem("ozelAlanlarBakimTanimlari"));
 
   // Özel Alanların nameleri backend çekmek için api isteği sonu
   const initialColumns = [
@@ -271,17 +215,8 @@ const MainTable = () => {
         },
       }),
       align: "center",
-      render: (text) => (
-        <div style={{ textAlign: "center" }}>
-          {text ? (
-            <CheckOutlined style={{ color: "green" }} />
-          ) : (
-            <CloseOutlined style={{ color: "red" }} />
-          )}
-        </div>
-      ),
-      sorter: (a, b) =>
-        a.IST_AKTIF === b.IST_AKTIF ? 0 : a.IST_AKTIF ? -1 : 1,
+      render: (text) => <div style={{ textAlign: "center" }}>{text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}</div>,
+      sorter: (a, b) => (a.IST_AKTIF === b.IST_AKTIF ? 0 : a.IST_AKTIF ? -1 : 1),
     },
     {
       title: "Bakım Tip",
@@ -457,10 +392,8 @@ const MainTable = () => {
       }),
       sorter: (a, b) => {
         if (a.IST_OZEL_ALAN_1 === b.IST_OZEL_ALAN_1) return 0;
-        if (a.IST_OZEL_ALAN_1 === null || a.IST_OZEL_ALAN_1 === undefined)
-          return -1;
-        if (b.IST_OZEL_ALAN_1 === null || b.IST_OZEL_ALAN_1 === undefined)
-          return 1;
+        if (a.IST_OZEL_ALAN_1 === null || a.IST_OZEL_ALAN_1 === undefined) return -1;
+        if (b.IST_OZEL_ALAN_1 === null || b.IST_OZEL_ALAN_1 === undefined) return 1;
         return a.IST_OZEL_ALAN_1.localeCompare(b.IST_OZEL_ALAN_1);
       },
     },
@@ -478,10 +411,8 @@ const MainTable = () => {
       }),
       sorter: (a, b) => {
         if (a.IST_OZEL_ALAN_2 === b.IST_OZEL_ALAN_2) return 0;
-        if (a.IST_OZEL_ALAN_2 === null || a.IST_OZEL_ALAN_2 === undefined)
-          return -1;
-        if (b.IST_OZEL_ALAN_2 === null || b.IST_OZEL_ALAN_2 === undefined)
-          return 1;
+        if (a.IST_OZEL_ALAN_2 === null || a.IST_OZEL_ALAN_2 === undefined) return -1;
+        if (b.IST_OZEL_ALAN_2 === null || b.IST_OZEL_ALAN_2 === undefined) return 1;
         return a.IST_OZEL_ALAN_2.localeCompare(b.IST_OZEL_ALAN_2);
       },
     },
@@ -499,10 +430,8 @@ const MainTable = () => {
       }),
       sorter: (a, b) => {
         if (a.IST_OZEL_ALAN_3 === b.IST_OZEL_ALAN_3) return 0;
-        if (a.IST_OZEL_ALAN_3 === null || a.IST_OZEL_ALAN_3 === undefined)
-          return -1;
-        if (b.IST_OZEL_ALAN_3 === null || b.IST_OZEL_ALAN_3 === undefined)
-          return 1;
+        if (a.IST_OZEL_ALAN_3 === null || a.IST_OZEL_ALAN_3 === undefined) return -1;
+        if (b.IST_OZEL_ALAN_3 === null || b.IST_OZEL_ALAN_3 === undefined) return 1;
         return a.IST_OZEL_ALAN_3.localeCompare(b.IST_OZEL_ALAN_3);
       },
     },
@@ -520,10 +449,8 @@ const MainTable = () => {
       }),
       sorter: (a, b) => {
         if (a.IST_OZEL_ALAN_4 === b.IST_OZEL_ALAN_4) return 0;
-        if (a.IST_OZEL_ALAN_4 === null || a.IST_OZEL_ALAN_4 === undefined)
-          return -1;
-        if (b.IST_OZEL_ALAN_4 === null || b.IST_OZEL_ALAN_4 === undefined)
-          return 1;
+        if (a.IST_OZEL_ALAN_4 === null || a.IST_OZEL_ALAN_4 === undefined) return -1;
+        if (b.IST_OZEL_ALAN_4 === null || b.IST_OZEL_ALAN_4 === undefined) return 1;
         return a.IST_OZEL_ALAN_4.localeCompare(b.IST_OZEL_ALAN_4);
       },
     },
@@ -541,10 +468,8 @@ const MainTable = () => {
       }),
       sorter: (a, b) => {
         if (a.IST_OZEL_ALAN_5 === b.IST_OZEL_ALAN_5) return 0;
-        if (a.IST_OZEL_ALAN_5 === null || a.IST_OZEL_ALAN_5 === undefined)
-          return -1;
-        if (b.IST_OZEL_ALAN_5 === null || b.IST_OZEL_ALAN_5 === undefined)
-          return 1;
+        if (a.IST_OZEL_ALAN_5 === null || a.IST_OZEL_ALAN_5 === undefined) return -1;
+        if (b.IST_OZEL_ALAN_5 === null || b.IST_OZEL_ALAN_5 === undefined) return 1;
         return a.IST_OZEL_ALAN_5.localeCompare(b.IST_OZEL_ALAN_5);
       },
     },
@@ -562,10 +487,8 @@ const MainTable = () => {
       }),
       sorter: (a, b) => {
         if (a.IST_OZEL_ALAN_6 === b.IST_OZEL_ALAN_6) return 0;
-        if (a.IST_OZEL_ALAN_6 === null || a.IST_OZEL_ALAN_6 === undefined)
-          return -1;
-        if (b.IST_OZEL_ALAN_6 === null || b.IST_OZEL_ALAN_6 === undefined)
-          return 1;
+        if (a.IST_OZEL_ALAN_6 === null || a.IST_OZEL_ALAN_6 === undefined) return -1;
+        if (b.IST_OZEL_ALAN_6 === null || b.IST_OZEL_ALAN_6 === undefined) return 1;
         return a.IST_OZEL_ALAN_6.localeCompare(b.IST_OZEL_ALAN_6);
       },
     },
@@ -583,10 +506,8 @@ const MainTable = () => {
       }),
       sorter: (a, b) => {
         if (a.IST_OZEL_ALAN_7 === b.IST_OZEL_ALAN_7) return 0;
-        if (a.IST_OZEL_ALAN_7 === null || a.IST_OZEL_ALAN_7 === undefined)
-          return -1;
-        if (b.IST_OZEL_ALAN_7 === null || b.IST_OZEL_ALAN_7 === undefined)
-          return 1;
+        if (a.IST_OZEL_ALAN_7 === null || a.IST_OZEL_ALAN_7 === undefined) return -1;
+        if (b.IST_OZEL_ALAN_7 === null || b.IST_OZEL_ALAN_7 === undefined) return 1;
         return a.IST_OZEL_ALAN_7.localeCompare(b.IST_OZEL_ALAN_7);
       },
     },
@@ -604,10 +525,8 @@ const MainTable = () => {
       }),
       sorter: (a, b) => {
         if (a.IST_OZEL_ALAN_8 === b.IST_OZEL_ALAN_8) return 0;
-        if (a.IST_OZEL_ALAN_8 === null || a.IST_OZEL_ALAN_8 === undefined)
-          return -1;
-        if (b.IST_OZEL_ALAN_8 === null || b.IST_OZEL_ALAN_8 === undefined)
-          return 1;
+        if (a.IST_OZEL_ALAN_8 === null || a.IST_OZEL_ALAN_8 === undefined) return -1;
+        if (b.IST_OZEL_ALAN_8 === null || b.IST_OZEL_ALAN_8 === undefined) return 1;
         return a.IST_OZEL_ALAN_8.localeCompare(b.IST_OZEL_ALAN_8);
       },
     },
@@ -625,10 +544,8 @@ const MainTable = () => {
       }),
       sorter: (a, b) => {
         if (a.IST_OZEL_ALAN_9 === b.IST_OZEL_ALAN_9) return 0;
-        if (a.IST_OZEL_ALAN_9 === null || a.IST_OZEL_ALAN_9 === undefined)
-          return -1;
-        if (b.IST_OZEL_ALAN_9 === null || b.IST_OZEL_ALAN_9 === undefined)
-          return 1;
+        if (a.IST_OZEL_ALAN_9 === null || a.IST_OZEL_ALAN_9 === undefined) return -1;
+        if (b.IST_OZEL_ALAN_9 === null || b.IST_OZEL_ALAN_9 === undefined) return 1;
         return a.IST_OZEL_ALAN_9.localeCompare(b.IST_OZEL_ALAN_9);
       },
     },
@@ -646,10 +563,8 @@ const MainTable = () => {
       }),
       sorter: (a, b) => {
         if (a.IST_OZEL_ALAN_10 === b.IST_OZEL_ALAN_10) return 0;
-        if (a.IST_OZEL_ALAN_10 === null || a.IST_OZEL_ALAN_10 === undefined)
-          return -1;
-        if (b.IST_OZEL_ALAN_10 === null || b.IST_OZEL_ALAN_10 === undefined)
-          return 1;
+        if (a.IST_OZEL_ALAN_10 === null || a.IST_OZEL_ALAN_10 === undefined) return -1;
+        if (b.IST_OZEL_ALAN_10 === null || b.IST_OZEL_ALAN_10 === undefined) return 1;
         return a.IST_OZEL_ALAN_10.localeCompare(b.IST_OZEL_ALAN_10);
       },
     },
@@ -664,9 +579,7 @@ const MainTable = () => {
 
     // Örnek bir tarih formatla ve ay formatını belirle
     const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
-    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(
-      sampleDate
-    );
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
 
     let monthFormat;
     if (sampleFormatted.includes("January")) {
@@ -699,14 +612,7 @@ const MainTable = () => {
       // Saat ve dakika değerlerinin geçerliliğini kontrol et
       const hoursInt = parseInt(hours, 10);
       const minutesInt = parseInt(minutes, 10);
-      if (
-        isNaN(hoursInt) ||
-        isNaN(minutesInt) ||
-        hoursInt < 0 ||
-        hoursInt > 23 ||
-        minutesInt < 0 ||
-        minutesInt > 59
-      ) {
+      if (isNaN(hoursInt) || isNaN(minutesInt) || hoursInt < 0 || hoursInt > 23 || minutesInt < 0 || minutesInt > 59) {
         // throw new Error("Invalid time format"); // hata fırlatır ve uygulamanın çalışmasını durdurur
         console.error("Invalid time format:", time);
         // return time; // Hatalı formatı olduğu gibi döndür
@@ -792,9 +698,7 @@ const MainTable = () => {
   };
 
   useEffect(() => {
-    const filtered = data.filter((item) =>
-      normalizeString(item.IST_TANIM).includes(normalizeString(searchTerm))
-    );
+    const filtered = data.filter((item) => normalizeString(item.IST_TANIM).includes(normalizeString(searchTerm)));
     setFilteredData(filtered);
   }, [searchTerm, data]);
 
@@ -806,9 +710,7 @@ const MainTable = () => {
       setValue("selectedLokasyonId", null);
     }
     // Seçilen satırların verisini bul
-    const newSelectedRows = data.filter((row) =>
-      newSelectedRowKeys.includes(row.key)
-    );
+    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
     setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
   };
 
@@ -851,9 +753,7 @@ const MainTable = () => {
   // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
   const [columns, setColumns] = useState(() => {
     const savedOrder = localStorage.getItem("columnOrderBakimTanimlari");
-    const savedVisibility = localStorage.getItem(
-      "columnVisibilityBakimTanimlari"
-    );
+    const savedVisibility = localStorage.getItem("columnVisibilityBakimTanimlari");
     const savedWidths = localStorage.getItem("columnWidthsBakimTanimlari");
 
     let order = savedOrder ? JSON.parse(savedOrder) : [];
@@ -873,10 +773,7 @@ const MainTable = () => {
     });
 
     localStorage.setItem("columnOrderBakimTanimlari", JSON.stringify(order));
-    localStorage.setItem(
-      "columnVisibilityBakimTanimlari",
-      JSON.stringify(visibility)
-    );
+    localStorage.setItem("columnVisibilityBakimTanimlari", JSON.stringify(visibility));
     localStorage.setItem("columnWidthsBakimTanimlari", JSON.stringify(widths));
 
     return order.map((key) => {
@@ -888,22 +785,9 @@ const MainTable = () => {
 
   // sütunları local storage'a kaydediyoruz
   useEffect(() => {
-    localStorage.setItem(
-      "columnOrderBakimTanimlari",
-      JSON.stringify(columns.map((col) => col.key))
-    );
-    localStorage.setItem(
-      "columnVisibilityBakimTanimlari",
-      JSON.stringify(
-        columns.reduce((acc, col) => ({ ...acc, [col.key]: col.visible }), {})
-      )
-    );
-    localStorage.setItem(
-      "columnWidthsBakimTanimlari",
-      JSON.stringify(
-        columns.reduce((acc, col) => ({ ...acc, [col.key]: col.width }), {})
-      )
-    );
+    localStorage.setItem("columnOrderBakimTanimlari", JSON.stringify(columns.map((col) => col.key)));
+    localStorage.setItem("columnVisibilityBakimTanimlari", JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.visible }), {})));
+    localStorage.setItem("columnWidthsBakimTanimlari", JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.width }), {})));
   }, [columns]);
   // sütunları local storage'a kaydediyoruz sonu
 
@@ -911,11 +795,7 @@ const MainTable = () => {
   const handleResize =
     (key) =>
     (_, { size }) => {
-      setColumns((prev) =>
-        prev.map((col) =>
-          col.key === key ? { ...col, width: size.width } : col
-        )
-      );
+      setColumns((prev) => prev.map((col) => (col.key === key ? { ...col, width: size.width } : col)));
     };
 
   const components = {
@@ -948,9 +828,7 @@ const MainTable = () => {
       if (oldIndex !== -1 && newIndex !== -1) {
         setColumns((columns) => arrayMove(columns, oldIndex, newIndex));
       } else {
-        console.error(
-          `Column with key ${active.id} or ${over.id} does not exist.`
-        );
+        console.error(`Column with key ${active.id} or ${over.id} does not exist.`);
       }
     }
   };
@@ -986,18 +864,8 @@ const MainTable = () => {
 
   return (
     <>
-      <Modal
-        title="Sütunları Yönet"
-        centered
-        width={800}
-        open={isModalVisible}
-        onOk={() => setIsModalVisible(false)}
-        onCancel={() => setIsModalVisible(false)}
-      >
-        <Text style={{ marginBottom: "15px" }}>
-          Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını
-          Ayarlayabilirsiniz.
-        </Text>
+      <Modal title="Sütunları Yönet" centered width={800} open={isModalVisible} onOk={() => setIsModalVisible(false)} onCancel={() => setIsModalVisible(false)}>
+        <Text style={{ marginBottom: "15px" }}>Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını Ayarlayabilirsiniz.</Text>
         <div
           style={{
             display: "flex",
@@ -1032,15 +900,7 @@ const MainTable = () => {
             <div style={{ height: "400px", overflow: "auto" }}>
               {initialColumns.map((col) => (
                 <div style={{ display: "flex", gap: "10px" }} key={col.key}>
-                  <Checkbox
-                    checked={
-                      columns.find((column) => column.key === col.key)
-                        ?.visible || false
-                    }
-                    onChange={(e) =>
-                      toggleVisibility(col.key, e.target.checked)
-                    }
-                  />
+                  <Checkbox checked={columns.find((column) => column.key === col.key)?.visible || false} onChange={(e) => toggleVisibility(col.key, e.target.checked)} />
                   {col.title}
                 </div>
               ))}
@@ -1071,26 +931,14 @@ const MainTable = () => {
                   padding: "8px 8px 12px 8px",
                 }}
               >
-                <Text style={{ fontWeight: 600 }}>
-                  Sütunların Sıralamasını Ayarla
-                </Text>
+                <Text style={{ fontWeight: 600 }}>Sütunların Sıralamasını Ayarla</Text>
               </div>
               <div style={{ height: "400px", overflow: "auto" }}>
-                <SortableContext
-                  items={columns
-                    .filter((col) => col.visible)
-                    .map((col) => col.key)}
-                  strategy={verticalListSortingStrategy}
-                >
+                <SortableContext items={columns.filter((col) => col.visible).map((col) => col.key)} strategy={verticalListSortingStrategy}>
                   {columns
                     .filter((col) => col.visible)
                     .map((col, index) => (
-                      <DraggableRow
-                        key={col.key}
-                        id={col.key}
-                        index={index}
-                        text={col.title}
-                      />
+                      <DraggableRow key={col.key} id={col.key} index={index} text={col.title} />
                     ))}
                 </SortableContext>
               </div>
@@ -1139,14 +987,8 @@ const MainTable = () => {
           />
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
-          <ContextMenu
-            selectedRows={selectedRows}
-            refreshTableData={refreshTableData}
-          />
-          <CreateDrawer
-            selectedLokasyonId={selectedRowKeys[0]}
-            onRefresh={refreshTableData}
-          />
+          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
+          <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
         </div>
       </div>
       <Spin spinning={loading}>
@@ -1167,12 +1009,7 @@ const MainTable = () => {
           scroll={{ y: "calc(100vh - 370px)" }}
         />
       </Spin>
-      <EditDrawer
-        selectedRow={drawer.data}
-        onDrawerClose={() => setDrawer({ ...drawer, visible: false })}
-        drawerVisible={drawer.visible}
-        onRefresh={refreshTableData}
-      />
+      <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
     </>
   );
 };
