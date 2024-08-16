@@ -42,17 +42,24 @@ jobs:
           FTP_HOST: ${{ secrets.FTP_HOST }}
         run: |
           echo "Starting FTP deployment..."
-          lftp -u $FTP_USERNAME,$FTP_PASSWORD $FTP_HOST <<EOF
+          lftp -d -u $FTP_USERNAME,$FTP_PASSWORD $FTP_HOST <<EOF
           set ssl:verify-certificate no
-          cd /
-          # Deleting matching files in the dist directory on the server
-          for file in \$(find dist -type f -o -type d); do
-            file_name=\$(basename "\$file")
-            if [ -e "/\$file_name" ]; then
-              echo "Deleting /\$file_name on server"
-              rm -rf "/\$file_name"
-            fi
-          done
-          mirror -R --verbose dist /
+          cd /public_html
+          mirror -R --exclude .htaccess --exclude .well-known dist /public_html
+          bye
+          EOF
+          echo "FTP deployment completed."
+
+      - name: Verify deployment
+        env:
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+        run: |
+          echo "Verifying deployment..."
+          lftp -d -u $FTP_USERNAME,$FTP_PASSWORD $FTP_HOST <<EOF
+          set ssl:verify-certificate no
+          cd /public_html
+          ls -al
           bye
           EOF
