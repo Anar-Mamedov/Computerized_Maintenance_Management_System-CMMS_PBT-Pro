@@ -25,7 +25,8 @@ export default function Hatirlatici() {
         width: "100%",
         flexDirection: "column",
         gap: "5px",
-      }}>
+      }}
+    >
       <div
         style={{
           display: "flex",
@@ -34,7 +35,8 @@ export default function Hatirlatici() {
           backgroundColor: "#80808051",
           borderRadius: "5px",
           padding: "10px 0",
-        }}>
+        }}
+      >
         Hatırlatıcı
       </div>
       <div
@@ -44,7 +46,8 @@ export default function Hatirlatici() {
           gap: "5px",
           overflow: "auto",
           padding: "5px",
-        }}>
+        }}
+      >
         <StyledCollapse
           size="small"
           collapsible="header"
@@ -65,7 +68,7 @@ export default function Hatirlatici() {
             {
               key: "1",
               label: "Bakım Yönetimi",
-              children: <FirmaVeSozlesme />,
+              // children: <FirmaVeSozlesme />,
             },
           ]}
         />
@@ -77,7 +80,7 @@ export default function Hatirlatici() {
             {
               key: "1",
               label: "Dökuman Yönetimi",
-              children: <FirmaVeSozlesme />,
+              // children: <FirmaVeSozlesme />,
             },
           ]}
         />
@@ -89,7 +92,7 @@ export default function Hatirlatici() {
             {
               key: "1",
               label: "Firma ve Sözleşme Yöntemi",
-              children: <FirmaVeSozlesme />,
+              // children: <FirmaVeSozlesme />,
             },
           ]}
         />
@@ -101,7 +104,7 @@ export default function Hatirlatici() {
             {
               key: "1",
               label: "Makine ve Ekipman Yönetimi",
-              children: <FirmaVeSozlesme />,
+              // children: <FirmaVeSozlesme />,
             },
           ]}
         />
@@ -113,7 +116,7 @@ export default function Hatirlatici() {
             {
               key: "1",
               label: "Malzeme ve Depo Yönetimi",
-              children: <FirmaVeSozlesme />,
+              // children: <FirmaVeSozlesme />,
             },
           ]}
         />
@@ -125,7 +128,7 @@ export default function Hatirlatici() {
             {
               key: "1",
               label: "Proje Yönetimi",
-              children: <FirmaVeSozlesme />,
+              // children: <FirmaVeSozlesme />,
             },
           ]}
         />
@@ -137,7 +140,7 @@ export default function Hatirlatici() {
             {
               key: "1",
               label: "Satınalma Yönetimi",
-              children: <FirmaVeSozlesme />,
+              // children: <FirmaVeSozlesme />,
             },
           ]}
         />
@@ -149,7 +152,7 @@ export default function Hatirlatici() {
             {
               key: "1",
               label: "Transfer Onayları",
-              children: <FirmaVeSozlesme />,
+              // children: <FirmaVeSozlesme />,
             },
           ]}
         />
