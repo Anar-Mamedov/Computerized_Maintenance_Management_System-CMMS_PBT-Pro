@@ -22,7 +22,7 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    const checkInternetConnection = async () => {
+    const checkInternetConnection1 = async () => {
       const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Request timed out")), 2000));
 
       try {
@@ -36,7 +36,7 @@ export default function Header() {
       }
     };
 
-    const intervalId = setInterval(checkInternetConnection, 15000); // 15 saniye = 15000 ms
+    const intervalId = setInterval(checkInternetConnection1, 15000); // 15 saniye = 15000 ms
 
     // Cleanup function to clear the interval when the component unmounts
     return () => clearInterval(intervalId);
