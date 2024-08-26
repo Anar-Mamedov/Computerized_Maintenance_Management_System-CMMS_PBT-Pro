@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { Button, Drawer, Space, ConfigProvider, Modal, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
@@ -10,6 +10,7 @@ import dayjs from "dayjs";
 
 export default function CreateDrawer({ onRefresh }) {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const methods = useForm({
     defaultValues: {
@@ -43,6 +44,8 @@ export default function CreateDrawer({ onRefresh }) {
       periyotSiklik: "",
     },
   });
+
+  const { setValue, reset, watch } = methods;
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
@@ -115,6 +118,32 @@ export default function CreateDrawer({ onRefresh }) {
     });
   };
 
+  useEffect(() => {
+    if (open) {
+      // Çekmece açıldığında gerekli işlemi yap
+      // Örneğin, MainTabs'a bir prop olarak geçir
+      // setLoading(true);
+      AxiosInstance.get("ModulKoduGetir?modulKodu=ARZ_KOD") // Replace with your actual API endpoint
+        .then((response) => {
+          // Assuming the response contains the new work order number in 'response.Tanim'
+          setValue("bakimKodu", response);
+          // setTimeout(() => {
+          //   setLoading(false);
+          // }, 100);
+        })
+        .catch((error) => {
+          console.error("Error fetching new work order number:", error);
+          if (navigator.onLine) {
+            // İnternet bağlantısı var
+            message.error("Hata Mesajı: " + error.message);
+          } else {
+            // İnternet bağlantısı yok
+            message.error("Internet Bağlantısı Mevcut Değil.");
+          }
+        });
+    }
+  }, [open]);
+
   return (
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
@@ -131,14 +160,12 @@ export default function CreateDrawer({ onRefresh }) {
           extra={
             <Space>
               <Button onClick={onClose}>İptal</Button>
-              <Button
-                type="submit"
-                onClick={methods.handleSubmit(onSubmit)}
-                style={{ backgroundColor: "#2bc770", borderColor: "#2bc770", color: "#ffffff" }}>
+              <Button type="submit" onClick={methods.handleSubmit(onSubmit)} style={{ backgroundColor: "#2bc770", borderColor: "#2bc770", color: "#ffffff" }}>
                 Kaydet
               </Button>
             </Space>
-          }>
+          }
+        >
           <form onSubmit={methods.handleSubmit(onSubmit)}>
             <MainTabs />
             <Footer />
