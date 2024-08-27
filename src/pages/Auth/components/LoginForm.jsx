@@ -1,11 +1,6 @@
 import React, { useState } from "react";
 import { Button, Form, Input, Typography, message, Spin } from "antd";
-import {
-  UserOutlined,
-  LockOutlined,
-  EyeInvisibleOutlined,
-  EyeTwoTone,
-} from "@ant-design/icons";
+import { UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import AxiosInstance from "../../../api/http";
 import { useSetRecoilState } from "recoil";
@@ -85,6 +80,7 @@ export default function LoginForm() {
           isEmriTipleri: response.KLL_WEB_ISEMRITIP,
           onaylayicilar: response.KLL_WEB_ONAY,
           projeTanimlari: response.KLL_WEB_PROJE,
+          mudaheleSuresi: response.KLL_WEB_RAPOR,
         };
         localStorage.setItem("login", JSON.stringify(login));
         const anar = localStorage.getItem("login");
@@ -121,32 +117,16 @@ export default function LoginForm() {
     >
       <div style={{ width: "100%" }}>
         <Text style={{ fontSize: "20px" }}>Giriş Yap</Text>
-        <Form
-          name="normal_login"
-          className="login-form"
-          initialValues={{ remember: true }}
-          onFinish={onSubmit}
-          style={{ width: "100%", marginTop: "20px" }}
-        >
-          <Form.Item
-            name="email"
-            rules={[
-              { required: true, message: "Lütfen kullanıcı kodunuzu girin!" },
-            ]}
-          >
-            <Input
-              prefix={<UserOutlined className="site-form-item-icon" />}
-              placeholder="Kullanıcı Kodu"
-            />
+        <Form name="normal_login" className="login-form" initialValues={{ remember: true }} onFinish={onSubmit} style={{ width: "100%", marginTop: "20px" }}>
+          <Form.Item name="email" rules={[{ required: true, message: "Lütfen kullanıcı kodunuzu girin!" }]}>
+            <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Kullanıcı Kodu" />
           </Form.Item>
           <Form.Item name="password">
             <Input.Password
               prefix={<LockOutlined className="site-form-item-icon" />}
               type={showPassword ? "text" : "password"}
               placeholder="Şifre"
-              iconRender={(visible) =>
-                visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-              }
+              iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
             />
           </Form.Item>
           <Form.Item>
@@ -156,22 +136,12 @@ export default function LoginForm() {
             />
           </Form.Item>
           <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="login-form-button"
-              style={{ width: "100%" }}
-              disabled={loading}
-            >
+            <Button type="primary" htmlType="submit" className="login-form-button" style={{ width: "100%" }} disabled={loading}>
               {loading ? <Spin /> : "Giriş Yap"}
             </Button>
           </Form.Item>
           <Form.Item>
-            <Button
-              danger
-              onClick={handleClearBaseURL}
-              style={{ width: "100%" }}
-            >
+            <Button danger onClick={handleClearBaseURL} style={{ width: "100%" }}>
               Anahtarı Değiştir
             </Button>
           </Form.Item>
