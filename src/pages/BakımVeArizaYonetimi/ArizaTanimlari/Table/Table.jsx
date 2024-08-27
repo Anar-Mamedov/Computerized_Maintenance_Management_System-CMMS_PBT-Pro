@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
+import React, { useCallback, useEffect, useState, useRef } from "react";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message, Space } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -11,6 +11,7 @@ import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import { useFormContext } from "react-hook-form";
+import Highlighter from "react-highlight-words";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 
@@ -112,6 +113,10 @@ const MainTable = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
 
+  const [searchText, setSearchText] = useState("");
+  const [searchedColumn, setSearchedColumn] = useState("");
+  const searchInput = useRef(null);
+
   // edit drawer için
   const [drawer, setDrawer] = useState({
     visible: false,
@@ -145,6 +150,111 @@ const MainTable = () => {
     }
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   }
+  // columda arama yapmak için kullanılan fonksiyonlar
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText("");
+  };
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+      <div
+        style={{
+          padding: 8,
+        }}
+        onKeyDown={(e) => e.stopPropagation()}
+      >
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{
+            marginBottom: 8,
+            display: "block",
+          }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Ara
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters)}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Sıfırla
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              confirm({
+                closeDropdown: false,
+              });
+              setSearchText(selectedKeys[0]);
+              setSearchedColumn(dataIndex);
+            }}
+          >
+            Filtrele
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              close();
+            }}
+          >
+            Kapat
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined
+        style={{
+          color: filtered ? "#1677ff" : undefined,
+          zIndex: 4,
+        }}
+      />
+    ),
+    onFilter: (value, record) => record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+    onFilterDropdownOpenChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
+    },
+    render: (text) =>
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{
+            backgroundColor: "#ffc069",
+            padding: 0,
+          }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ""}
+        />
+      ) : (
+        text
+      ),
+  });
+  // columda arama yapmak için kullanılan fonksiyonlar sonu
 
   // Özel Alanların nameleri backend çekmek için api isteği
 
@@ -175,6 +285,7 @@ const MainTable = () => {
       width: 150,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_KOD"),
       render: (text) => <a>{text}</a>,
       sorter: (a, b) => {
         if (a.IST_KOD === b.IST_KOD) return 0;
@@ -190,6 +301,7 @@ const MainTable = () => {
       width: 200,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_TANIM"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -209,6 +321,7 @@ const MainTable = () => {
       width: 100,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_AKTIF"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -225,6 +338,7 @@ const MainTable = () => {
       width: 250,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_TIP"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -244,6 +358,7 @@ const MainTable = () => {
       width: 200,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_GRUP"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -263,6 +378,7 @@ const MainTable = () => {
       width: 200,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_ATOLYE"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -282,6 +398,7 @@ const MainTable = () => {
       width: 200,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_LOKASYON"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -302,6 +419,7 @@ const MainTable = () => {
       width: 150,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_ONCELIK"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -321,6 +439,7 @@ const MainTable = () => {
       width: 150,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_TALIMAT"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -340,6 +459,7 @@ const MainTable = () => {
       width: 150,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_CALISMA_SURE"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -355,6 +475,7 @@ const MainTable = () => {
       width: 170,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_DURUS_SURE"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -370,6 +491,7 @@ const MainTable = () => {
       width: 170,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_PERSONEL_SAYI"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -385,6 +507,7 @@ const MainTable = () => {
       width: 150,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_OZEL_ALAN_1"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -404,6 +527,7 @@ const MainTable = () => {
       width: 150,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_OZEL_ALAN_2"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -423,6 +547,7 @@ const MainTable = () => {
       width: 150,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_OZEL_ALAN_3"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -442,6 +567,7 @@ const MainTable = () => {
       width: 150,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_OZEL_ALAN_4"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -461,6 +587,7 @@ const MainTable = () => {
       width: 150,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_OZEL_ALAN_5"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -480,6 +607,7 @@ const MainTable = () => {
       width: 150,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_OZEL_ALAN_6"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -499,6 +627,7 @@ const MainTable = () => {
       width: 150,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_OZEL_ALAN_7"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -518,6 +647,7 @@ const MainTable = () => {
       width: 150,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_OZEL_ALAN_8"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -537,6 +667,7 @@ const MainTable = () => {
       width: 150,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_OZEL_ALAN_9"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -556,6 +687,7 @@ const MainTable = () => {
       width: 150,
       ellipsis: true,
       visible: true,
+      ...getColumnSearchProps("IST_OZEL_ALAN_10"),
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -786,8 +918,30 @@ const MainTable = () => {
   // sütunları local storage'a kaydediyoruz
   useEffect(() => {
     localStorage.setItem("columnOrderArizaTanimlari", JSON.stringify(columns.map((col) => col.key)));
-    localStorage.setItem("columnVisibilityArizaTanimlari", JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.visible }), {})));
-    localStorage.setItem("columnWidthsArizaTanimlari", JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.width }), {})));
+    localStorage.setItem(
+      "columnVisibilityArizaTanimlari",
+      JSON.stringify(
+        columns.reduce(
+          (acc, col) => ({
+            ...acc,
+            [col.key]: col.visible,
+          }),
+          {}
+        )
+      )
+    );
+    localStorage.setItem(
+      "columnWidthsArizaTanimlari",
+      JSON.stringify(
+        columns.reduce(
+          (acc, col) => ({
+            ...acc,
+            [col.key]: col.width,
+          }),
+          {}
+        )
+      )
+    );
   }, [columns]);
   // sütunları local storage'a kaydediyoruz sonu
 
