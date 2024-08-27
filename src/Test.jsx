@@ -6,13 +6,12 @@ import trTR from "antd/es/locale/tr_TR";
 import { BrowserRouter as Router } from "react-router-dom";
 import { AppProvider } from "./AppContext.jsx";
 import { RecoilRoot } from "recoil";
-import dayjs from "dayjs";
-import AxiosInstance from "./api/http.jsx";
+import dayjs from "dayjs"; // Day.js kütüphanesini ekleyin
+import AxiosInstance from "./api/http.jsx"; // Axios kütüphanesini ekleyin
 import "./index.css";
 
-// Uygulamanın devre dışı olduğu durumu gösteren bileşen
+// Uygulamanın kullanılamayacağı durum için bir bileşen
 const AppDisabled = () => <div style={{ textAlign: "center", marginTop: "20%" }}></div>;
-
 const Main = () => {
   return (
     <React.StrictMode>
@@ -28,19 +27,15 @@ const Main = () => {
     </React.StrictMode>
   );
 };
-
 const MainComponent1 = () => {
   const [disableDate, setDisableDate] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    AxiosInstance.get("GetEndDate")
+    // API çağrısını burada yapın
+    AxiosInstance.get("GetEndDate") // Burada API endpoint'inizi kullanın
       .then((response) => {
-        if (response && response.length > 0) {
-          setDisableDate(dayjs(response[0].ISL_DONEM_BITIS).format("YYYY-MM-DD"));
-        } else {
-          console.error("API responsunda beklenen veri bulunamadı.");
-        }
+        setDisableDate(dayjs(response.ISL_DONEM_BITIS));
         setLoading(false);
       })
       .catch((error) => {
@@ -56,23 +51,23 @@ const MainComponent1 = () => {
   const currentDate = dayjs();
 
   if (disableDate && currentDate.isAfter(disableDate)) {
+    // Mevcut tarih belirlenen tarihten sonra ise, uygulamayı engelle
     return <AppDisabled />;
+  } else {
+    // Aksi takdirde, uygulamayı normal şekilde render et
+    return <Main />;
   }
-
-  return <Main />;
 };
 
 const MainComponent = () => {
-  const [baseURLExists, setBaseURLExists] = useState(false);
-
   useEffect(() => {
     const baseURL = localStorage.getItem("baseURL");
     if (baseURL) {
-      setBaseURLExists(true);
+      return <MainComponent1 />;
+    } else {
+      return <Main />;
     }
   }, []);
-
-  return baseURLExists ? <MainComponent1 /> : <Main />;
 };
 
 // Uygulamayı render et
