@@ -13,7 +13,7 @@ function Main(props) {
   } = useFormContext();
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "10px", overflow: "auto", height: "calc(100vh - 170px)" }}>
       <ShortInfo />
       <MainTable />
     </div>
