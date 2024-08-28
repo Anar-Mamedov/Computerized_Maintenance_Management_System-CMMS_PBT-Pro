@@ -1359,37 +1359,9 @@ const MainTable = () => {
           </DndContext>
         </div>
       </Modal>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "space-between",
-          marginBottom: "20px",
-          gap: "10px",
-          padding: "0 5px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            alignItems: "center",
-            width: "100%",
-            maxWidth: "935px",
-            flexWrap: "wrap",
-          }}
-        >
-          <Button
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "0px 8px",
-              // width: "32px",
-              height: "32px",
-            }}
-            onClick={() => setIsModalVisible(true)}
-          >
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: "10px", padding: "0 5px" }}>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center", width: "100%", maxWidth: "935px", flexWrap: "wrap" }}>
+          <Button style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "0px 8px", height: "32px" }} onClick={() => setIsModalVisible(true)}>
             <MenuOutlined />
           </Button>
           <Input

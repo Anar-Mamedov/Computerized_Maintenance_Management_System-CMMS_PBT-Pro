@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Select, Button, Popover, Spin, DatePicker, Typography } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
-import { BsCalendar2DateFill } from "react-icons/bs";
 import dayjs from "dayjs";
 
 const { Option } = Select;
