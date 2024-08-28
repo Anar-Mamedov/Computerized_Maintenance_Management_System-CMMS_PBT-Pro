@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Select, Button, Popover, Spin, DatePicker, Typography } from "antd";
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
+import { BsCalendar2DateFill } from "react-icons/bs";
 import dayjs from "dayjs";
 
 const { Option } = Select;
@@ -13,7 +14,7 @@ const TarihFilter = () => {
   const [endDate, setEndDate] = useState(null); // Normal React state
   const [timeRange, setTimeRange] = useState("all"); // Initial value is "all"
 
-  const { setValue } = useFormContext();
+  const { control, setValue } = useFormContext();
 
   const handleSubmit = () => {
     // React state'lerinden alınan değerleri react-hook-form ile set et
@@ -25,9 +26,9 @@ const TarihFilter = () => {
   const handleCancelClick = () => {
     setStartDate(null);
     setEndDate(null);
-    setValue("baslangicTarihi", startDate);
-    setValue("bitisTarihi", endDate);
     setTimeRange("all"); // Reset to "all"
+    setValue("baslangicTarihi", null);
+    setValue("bitisTarihi", null);
     setOpen(false);
   };
 
@@ -109,12 +110,13 @@ const TarihFilter = () => {
           Uygula
         </Button>
       </div>
-      <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
-        <DatePicker style={{ width: "100%" }} placeholder="Başlangıç Tarihi" value={startDate} onChange={(date) => setStartDate(date)} locale={dayjs.locale("tr")} />
-        <Text style={{ fontSize: "14px" }}>-</Text>
-        <DatePicker style={{ width: "100%" }} placeholder="Bitiş Tarihi" value={endDate} onChange={(date) => setEndDate(date)} locale={dayjs.locale("tr")} />
-      </div>
-      <div style={{ padding: "10px" }}>
+
+      <div style={{ padding: "10px", display: "flex", flexDirection: "column", gap: "10px" }}>
+        <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
+          <DatePicker style={{ width: "100%" }} placeholder="Başlangıç Tarihi" value={startDate} onChange={(date) => setStartDate(date)} locale={dayjs.locale("tr")} />
+          <Text style={{ fontSize: "14px" }}>-</Text>
+          <DatePicker style={{ width: "100%" }} placeholder="Bitiş Tarihi" value={endDate} onChange={(date) => setEndDate(date)} locale={dayjs.locale("tr")} />
+        </div>
         <Select
           style={{ width: "100%" }}
           value={timeRange} // Set the current value
@@ -162,19 +164,19 @@ const TarihFilter = () => {
           justifyContent: "center",
         }}
       >
-        {/* Eğer startDate veya endDate varsa, yuvarlak nokta göster */}
-        {(startDate || endDate) && (
-          <div
-            style={{
-              width: "8px",
-              height: "8px",
-              borderRadius: "50%",
-              backgroundColor: "#1890ff",
-              marginRight: "8px",
-            }}
-          />
-        )}
-        Tarih
+        <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          Tarih
+          {(startDate || endDate) && (
+            <div
+              style={{
+                width: "10px",
+                height: "10px",
+                borderRadius: "50%",
+                backgroundColor: "#006cb8",
+              }}
+            />
+          )}
+        </div>
       </Button>
     </Popover>
   );
