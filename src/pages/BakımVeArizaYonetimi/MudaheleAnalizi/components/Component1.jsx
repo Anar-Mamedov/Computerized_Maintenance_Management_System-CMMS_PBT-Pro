@@ -11,16 +11,27 @@ function Component1({ updateApi }) {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const {
+    control,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
+
+  const lokasyonId = watch("locationIds");
+  const atolyeId = watch("atolyeIds");
+  const baslangicTarihi = watch("baslangicTarihi");
+  const bitisTarihi = watch("bitisTarihi");
 
   const fetchData = async () => {
     setIsLoading(true);
     const currentYear = new Date().getFullYear();
     const body = {
-      LokasyonId: 0,
-      AtolyeId: 0,
-      BaslangicTarih: "",
-      BitisTarih: "",
-      Yil: currentYear,
+      LokasyonId: lokasyonId || "",
+      AtolyeId: atolyeId || "",
+      BaslangicTarih: baslangicTarihi || "",
+      BitisTarih: bitisTarihi || "",
+      // Yil: currentYear,
     };
     try {
       const response = await AxiosInstance.post(`GetMudahaleAnalizDashboard`, body);
@@ -34,7 +45,7 @@ function Component1({ updateApi }) {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [lokasyonId, atolyeId, baslangicTarihi, bitisTarihi]);
 
   return (
     <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", flexDirection: "row" }}>
