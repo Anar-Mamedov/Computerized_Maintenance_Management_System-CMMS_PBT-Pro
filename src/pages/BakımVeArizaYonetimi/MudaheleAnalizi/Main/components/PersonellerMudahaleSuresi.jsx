@@ -91,18 +91,36 @@ function PersonellerMudahaleSuresi(props) {
       dataIndex: "PRS_ISIM",
       width: 200,
       ellipsis: true,
+      sorter: (a, b) => {
+        if (a.PRS_ISIM === null && b.PRS_ISIM === null) return 0;
+        if (a.PRS_ISIM === null) return 1;
+        if (b.PRS_ISIM === null) return -1;
+        return a.PRS_ISIM.localeCompare(b.PRS_ISIM);
+      },
     },
     {
       title: "Toplam Talebi Sayısı",
       dataIndex: "TalepSayisi",
       // width: 100,
       ellipsis: true,
+      sorter: (a, b) => {
+        if (a.TalepSayisi === null && b.TalepSayisi === null) return 0;
+        if (a.TalepSayisi === null) return 1;
+        if (b.TalepSayisi === null) return -1;
+        return a.TalepSayisi - b.TalepSayisi;
+      },
     },
     {
       title: "Ortalama Müdahale Süresi",
       dataIndex: "OrtalamaMudahaleSuresi",
       // width: 100,
       ellipsis: true,
+      sorter: (a, b) => {
+        if (a.OrtalamaMudahaleSuresi === null && b.OrtalamaMudahaleSuresi === null) return 0;
+        if (a.OrtalamaMudahaleSuresi === null) return 1;
+        if (b.OrtalamaMudahaleSuresi === null) return -1;
+        return a.OrtalamaMudahaleSuresi - b.OrtalamaMudahaleSuresi;
+      },
     },
   ];
 

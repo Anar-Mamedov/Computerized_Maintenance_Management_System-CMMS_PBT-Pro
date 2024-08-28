@@ -91,18 +91,36 @@ function IsTalebiTipleriAtolyeler(props) {
       dataIndex: "ATL_TANIM",
       width: 200,
       ellipsis: true,
+      sorter: (a, b) => {
+        if (a.ATL_TANIM === null && b.ATL_TANIM === null) return 0;
+        if (a.ATL_TANIM === null) return 1;
+        if (b.ATL_TANIM === null) return -1;
+        return a.ATL_TANIM.localeCompare(b.ATL_TANIM);
+      },
     },
     {
       title: "Toplam İş Talebi",
       dataIndex: "ToplamTalepSayisi",
       // width: 100,
       ellipsis: true,
+      sorter: (a, b) => {
+        if (a.ToplamTalepSayisi === null && b.ToplamTalepSayisi === null) return 0;
+        if (a.ToplamTalepSayisi === null) return 1;
+        if (b.ToplamTalepSayisi === null) return -1;
+        return a.ToplamTalepSayisi - b.ToplamTalepSayisi;
+      },
     },
     {
       title: "Ortalama Müdahale Süresi",
       dataIndex: "OrtalamaMudahaleSuresi",
       // width: 100,
       ellipsis: true,
+      sorter: (a, b) => {
+        if (a.OrtalamaMudahaleSuresi === null && b.OrtalamaMudahaleSuresi === null) return 0;
+        if (a.OrtalamaMudahaleSuresi === null) return 1;
+        if (b.OrtalamaMudahaleSuresi === null) return -1;
+        return a.OrtalamaMudahaleSuresi - b.OrtalamaMudahaleSuresi;
+      },
     },
   ];
 
