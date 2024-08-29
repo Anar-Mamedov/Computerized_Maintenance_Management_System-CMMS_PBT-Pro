@@ -119,38 +119,37 @@ function AylikOrtalamaMudaheleSuresi() {
           overflow: "hidden",
           textOverflow: "ellipsis",
           maxWidth: "100%",
-          marginBottom: "10px",
         }}
       >
-        Aylık Müdahale Süreleri
+        Aylık Müdahale Süreleri Tablosu
       </Text>
       {isLoading ? (
         <Spin />
       ) : (
         <>
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart
-              width={500}
-              height={300}
-              data={data}
-              margin={{
-                top: 20,
-                right: 30,
-                left: 20,
-                bottom: 5,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="Ay" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="MaxMudahaleSuresi" fill="#ff7f7f" name="Max Müdahale Süresi" />
-              <Bar dataKey="MinMudahaleSuresi" fill="#82ca9d" name="Min Müdahale Süresi" />
-              <Bar dataKey="AvgMudahaleSuresi" fill="#8884d8" name="Ortalama Müdahale Süresi" />
-            </BarChart>
-          </ResponsiveContainer>
-          {/*<Table columns={columns} dataSource={dataSource} pagination={false} size="small" bordered style={{ marginTop: "20px" }} />*/}
+          {/*<ResponsiveContainer width="100%" height={400}>*/}
+          {/*  <BarChart*/}
+          {/*    width={500}*/}
+          {/*    height={300}*/}
+          {/*    data={data}*/}
+          {/*    margin={{*/}
+          {/*      top: 20,*/}
+          {/*      right: 30,*/}
+          {/*      left: 20,*/}
+          {/*      bottom: 5,*/}
+          {/*    }}*/}
+          {/*  >*/}
+          {/*    <CartesianGrid strokeDasharray="3 3" />*/}
+          {/*    <XAxis dataKey="Ay" />*/}
+          {/*    <YAxis />*/}
+          {/*    <Tooltip />*/}
+          {/*    <Legend />*/}
+          {/*    <Bar dataKey="MaxMudahaleSuresi" fill="#ff7f7f" name="Max Müdahale Süresi" />*/}
+          {/*    <Bar dataKey="MinMudahaleSuresi" fill="#82ca9d" name="Min Müdahale Süresi" />*/}
+          {/*    <Bar dataKey="AvgMudahaleSuresi" fill="#8884d8" name="Ortalama Müdahale Süresi" />*/}
+          {/*  </BarChart>*/}
+          {/*</ResponsiveContainer>*/}
+          <Table columns={columns} dataSource={dataSource} pagination={false} size="small" bordered />
         </>
       )}
     </div>

@@ -7,6 +7,7 @@ import IsTalebiTipleriAtolyeler from "./components/IsTalebiTipleriAtolyeler.jsx"
 import PersonellerMudahaleSuresi from "./components/PersonellerMudahaleSuresi.jsx";
 import MudaheleSuresiHistogram from "../components/MudaheleSuresiHistogram.jsx";
 import AylikOrtalamaMudaheleSuresi from "../components/AylikOrtalamaMudaheleSuresi.jsx";
+import AylikOrtalamaMudaheleSuresiTable from "../components/AylikOrtalamaMudaheleSuresiTable.jsx";
 
 function Main(props) {
   const {
@@ -36,6 +37,7 @@ function Main(props) {
         <MudaheleSuresiHistogram />
         <AylikOrtalamaMudaheleSuresi />
       </div>
+      <AylikOrtalamaMudaheleSuresiTable />
 
       <div
         style={{

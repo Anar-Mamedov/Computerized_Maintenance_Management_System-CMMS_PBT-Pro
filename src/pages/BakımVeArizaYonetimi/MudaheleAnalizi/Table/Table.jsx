@@ -1276,7 +1276,7 @@ const MainTable = () => {
   // sütunları sıfırlamak için kullanılan fonksiyon sonu
 
   return (
-    <>
+    <div style={{ border: "1px solid #f0f0f0", borderRadius: "5px", padding: "10px" }}>
       <Modal title="Sütunları Yönet" centered width={800} open={isModalVisible} onOk={() => setIsModalVisible(false)} onCancel={() => setIsModalVisible(false)}>
         <Text style={{ marginBottom: "15px" }}>Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını Ayarlayabilirsiniz.</Text>
         <div
@@ -1359,7 +1359,7 @@ const MainTable = () => {
           </DndContext>
         </div>
       </Modal>
-      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: "10px", padding: "0 5px" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: "10px", padding: "0 5px", marginBottom: "10px" }}>
         <div style={{ display: "flex", gap: "10px", alignItems: "center", width: "100%", maxWidth: "935px", flexWrap: "wrap" }}>
           <Button style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "0px 8px", height: "32px" }} onClick={() => setIsModalVisible(true)}>
             <MenuOutlined />
@@ -1416,7 +1416,7 @@ const MainTable = () => {
       {/*    }}*/}
       {/*  />*/}
       {/*)}*/}
-    </>
+    </div>
   );
 };
 
