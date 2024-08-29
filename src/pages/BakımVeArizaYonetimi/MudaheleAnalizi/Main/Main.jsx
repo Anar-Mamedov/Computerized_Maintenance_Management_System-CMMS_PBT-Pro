@@ -5,6 +5,7 @@ import ShortInfo from "../components/Component1.jsx";
 import Filters from "./../Filters/Filters.jsx";
 import IsTalebiTipleriAtolyeler from "./components/IsTalebiTipleriAtolyeler.jsx";
 import PersonellerMudahaleSuresi from "./components/PersonellerMudahaleSuresi.jsx";
+import MudaheleSuresiHistogram from "../components/MudaheleSuresiHistogram.jsx";
 
 function Main(props) {
   const {
@@ -30,6 +31,7 @@ function Main(props) {
     <div style={{ display: "flex", flexDirection: "column", gap: "10px", overflow: "auto", height: "calc(100vh - 170px)" }}>
       <Filters />
       <ShortInfo />
+      <MudaheleSuresiHistogram />
       <div
         style={{
           display: "flex",

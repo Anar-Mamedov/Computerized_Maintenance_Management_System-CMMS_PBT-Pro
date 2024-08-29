@@ -7,7 +7,7 @@ import { useFormContext } from "react-hook-form";
 const { Text } = Typography;
 
 function MudaheleSuresiHistogram() {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const { watch } = useFormContext();
 
@@ -15,34 +15,6 @@ function MudaheleSuresiHistogram() {
   const atolyeId = watch("atolyeIds");
   const baslangicTarihi = watch("baslangicTarihi");
   const bitisTarihi = watch("bitisTarihi");
-
-  const timeRanges = [
-    { label: "0-60 dk", min: 0, max: 60 },
-    { label: "60-120 dk", min: 60, max: 120 },
-    { label: "120-240 dk", min: 120, max: 240 },
-    { label: "240-480 dk", min: 240, max: 480 },
-    { label: "480+ dk", min: 480, max: Infinity },
-  ];
-
-  const groupDataByTimeRange = (apiData) => {
-    const groupedData = timeRanges.map((range) => ({
-      timeRange: range.label,
-      TalepSayi: 0,
-    }));
-
-    apiData.forEach((item) => {
-      const minValue = parseInt(item.MudaheleSuresiAraligi.split("-")[0]);
-      const maxValue = parseInt(item.MudaheleSuresiAraligi.split("-")[1]?.replace(" dk", "").replace("+", "")) || Infinity;
-
-      timeRanges.forEach((range, index) => {
-        if (minValue >= range.min && maxValue <= range.max) {
-          groupedData[index].TalepSayi += item.TalepSayi;
-        }
-      });
-    });
-
-    return groupedData;
-  };
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -54,15 +26,9 @@ function MudaheleSuresiHistogram() {
     };
     try {
       const response = await AxiosInstance.post(`GetMudahaleAnalizHistogramGraph`, body);
-      if (response.data && response.data.length > 0) {
-        const groupedData = groupDataByTimeRange(response.data);
-        setData(groupedData);
-      } else {
-        setData([]); // Eğer veri yoksa, boş array gönderelim
-      }
+      setData(response);
     } catch (error) {
       console.error("Failed to fetch data:", error);
-      setData([]); // Eğer hata olursa, boş array gönderelim
     } finally {
       setIsLoading(false);
     }
@@ -115,7 +81,7 @@ function MudaheleSuresiHistogram() {
             }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="timeRange" />
+            <XAxis dataKey="MudaheleSuresiAraligi" />
             <YAxis />
             <Tooltip />
             <Legend />
