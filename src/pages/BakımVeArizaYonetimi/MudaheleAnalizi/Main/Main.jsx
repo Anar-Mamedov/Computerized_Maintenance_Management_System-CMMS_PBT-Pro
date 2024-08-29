@@ -6,6 +6,7 @@ import Filters from "./../Filters/Filters.jsx";
 import IsTalebiTipleriAtolyeler from "./components/IsTalebiTipleriAtolyeler.jsx";
 import PersonellerMudahaleSuresi from "./components/PersonellerMudahaleSuresi.jsx";
 import MudaheleSuresiHistogram from "../components/MudaheleSuresiHistogram.jsx";
+import AylikOrtalamaMudaheleSuresi from "../components/AylikOrtalamaMudaheleSuresi.jsx";
 
 function Main(props) {
   const {
@@ -31,7 +32,11 @@ function Main(props) {
     <div style={{ display: "flex", flexDirection: "column", gap: "10px", overflow: "auto", height: "calc(100vh - 170px)" }}>
       <Filters />
       <ShortInfo />
-      <MudaheleSuresiHistogram />
+      <div style={{ display: "flex", gap: "10px" }}>
+        <MudaheleSuresiHistogram />
+        <AylikOrtalamaMudaheleSuresi />
+      </div>
+
       <div
         style={{
           display: "flex",
