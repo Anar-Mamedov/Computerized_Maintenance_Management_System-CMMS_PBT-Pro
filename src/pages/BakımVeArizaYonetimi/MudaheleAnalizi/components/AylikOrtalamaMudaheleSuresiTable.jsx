@@ -30,6 +30,7 @@ function AylikOrtalamaMudaheleSuresi() {
   const atolyeId = watch("atolyeIds");
   const baslangicTarihi = watch("baslangicTarihi");
   const bitisTarihi = watch("bitisTarihi");
+  const yil = baslangicTarihi ? new Date(baslangicTarihi).getFullYear() : "";
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -38,6 +39,7 @@ function AylikOrtalamaMudaheleSuresi() {
       AtolyeId: atolyeId || "",
       BaslangicTarih: baslangicTarihi || "",
       BitisTarih: bitisTarihi || "",
+      Yil: yil || "",
     };
     try {
       const response = await AxiosInstance.post(`GetMudahaleAnalizAvgMudahaleGraph`, body);
@@ -121,7 +123,7 @@ function AylikOrtalamaMudaheleSuresi() {
           maxWidth: "100%",
         }}
       >
-        Aylık Müdahale Süreleri Tablosu
+        Aylık Müdahale Süreleri Tablosu {yil}
       </Text>
       {isLoading ? (
         <Spin />
