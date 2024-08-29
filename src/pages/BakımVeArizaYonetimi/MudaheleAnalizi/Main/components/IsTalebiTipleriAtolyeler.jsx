@@ -275,6 +275,7 @@ function IsTalebiTipleriAtolyeler(props) {
                 showTotal: (total, range) => `Toplam ${total}`,
                 showQuickJumper: true,
               }}
+              scroll={{ y: "calc(100vh - 540px)" }}
             />
           </Spin>
         </div>
