@@ -150,7 +150,7 @@ function AylikOrtalamaMudaheleSuresi() {
               <Bar dataKey="AvgMudahaleSuresi" fill="#8884d8" name="Ortalama Müdahale Süresi" />
             </BarChart>
           </ResponsiveContainer>
-          <Table columns={columns} dataSource={dataSource} pagination={false} bordered style={{ marginTop: "20px" }} />
+          <Table columns={columns} dataSource={dataSource} pagination={false} size="small" bordered style={{ marginTop: "20px" }} />
         </>
       )}
     </div>
