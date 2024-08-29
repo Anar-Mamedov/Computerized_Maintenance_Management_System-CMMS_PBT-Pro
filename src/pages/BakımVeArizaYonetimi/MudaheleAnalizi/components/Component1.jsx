@@ -39,17 +39,17 @@ function Component1() {
     fetchData();
   }, [lokasyonId, atolyeId, baslangicTarihi, bitisTarihi]);
 
-  const renderCard = (value, label) => (
+  const renderCard = (value, label, backgroundColor) => (
     <div
       style={{
-        flex: "1 1 calc(33.33% - 20px)", // Flex-grow, flex-shrink, flex-basis
-        maxWidth: "calc(33.33% - 20px)",
-        background: `url(${bg}), linear-gradient(rgb(27 17 92), #7A6FBE)`,
+        flex: "1 1 calc(16.66% - 10px)",
+        maxWidth: "calc(16.66% - 10px)",
+        background: backgroundColor || `url(${bg}), linear-gradient(rgb(27 17 92), #007eff)`,
         backgroundPosition: "inherit",
         backgroundSize: "cover",
         borderRadius: "5px",
         padding: "10px",
-        marginBottom: "0px", // Alt satıra geçerken aralık bırakmak için
+        marginBottom: "0px",
       }}
     >
       {isLoading ? (
@@ -62,7 +62,7 @@ function Component1() {
             <Text style={{ fontWeight: "500", fontSize: "35px", color: "white" }}>{value !== undefined ? value : ""}</Text>
             <Text style={{ color: "white", fontSize: "15px", fontWeight: "400" }}>{label}</Text>
           </div>
-          <ClockCircleOutlined style={{ fontSize: "60px", color: "rgba(255,255,255,.8)" }} />
+          {/*<ClockCircleOutlined style={{ fontSize: "60px", color: "rgba(255,255,255,.8)" }} />*/}
         </div>
       )}
     </div>
@@ -73,15 +73,15 @@ function Component1() {
       style={{
         display: "flex",
         flexWrap: "wrap",
-        gap: "10px", // Kartlar arasında boşluk bırakmak için
+        gap: "10px",
       }}
     >
-      {renderCard(data?.ToplamTalepSayisi, "Toplam Talep Sayısı")}
-      {renderCard(data?.OrtalamaMudahaleSuresi, "Ortalama Müdahale Süresi")}
-      {renderCard(data?.EnHizliMudahaleSuresi, "En Hızlı Müdahale Süresi")}
-      {renderCard(data?.EnYavasMudahaleSuresi, "En Yavaş Müdahale Süresi")}
-      {renderCard(data?.OrtalamaCalismaSuresi, "Ortalama Çalışma Süresi")}
-      {renderCard(data?.ToplamCalismaSuresi, "Toplam Çalışma Süresi")}
+      {renderCard(data?.ToplamTalepSayisi, "Toplam Talep Sayısı", "linear-gradient(to right, #ff7e5f, #feb47b)")}
+      {renderCard(data?.OrtalamaMudahaleSuresi, "Ortalama Müdahale Süresi", "linear-gradient(to right, #6a11cb, #2575fc)")}
+      {renderCard(data?.EnHizliMudahaleSuresi, "En Hızlı Müdahale Süresi", "linear-gradient(to right, #43cea2, #185a9d)")}
+      {renderCard(data?.EnYavasMudahaleSuresi, "En Yavaş Müdahale Süresi", "linear-gradient(to right, #ff4e50, #f9d423)")}
+      {renderCard(data?.OrtalamaCalismaSuresi, "Ortalama Çalışma Süresi", "linear-gradient(to right, #00c6ff, #0072ff)")}
+      {renderCard(data?.ToplamCalismaSuresi, "Toplam Çalışma Süresi", "linear-gradient(to right, #f7971e, #ffd200)")}
     </div>
   );
 }
