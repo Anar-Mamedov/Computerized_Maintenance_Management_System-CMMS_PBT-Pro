@@ -17,7 +17,7 @@ import Hazirlaniyor from "./pages/Hazirlaniyor";
 import Auth from "./pages/Auth/Auth";
 import logo from "../src/assets/images/logoBeyaz.png";
 import Headers from "./pages/Headers/Headers";
-import { useRecoilState } from "recoil";
+import { useRecoilState, RecoilRoot } from "recoil";
 import { userState } from "./state/userState";
 import PlanlamaTakvimi from "./pages/BakımVeArizaYonetimi/PlanlamaTakvimi/PlanlamaTakvimi";
 import OtomatikIsEmri from "./pages/BakımVeArizaYonetimi/OtomatikIsEmri/OtomatikIsEmri";
@@ -30,6 +30,7 @@ import UserIdControl from "./pages/UserIdControl/UserIdControl.jsx";
 import IsEmriTipleri from "./pages/Yonetim/IsEmriTipleri/IsEmriTipleri.jsx";
 import Breadcrumbs from "./Breadcrumbs"; // Import the Breadcrumbs component
 import MudaheleSuresi from "./pages/BakımVeArizaYonetimi/MudaheleAnalizi/MudaheleAnalizi.jsx";
+import { selectedMenuItemState } from "./state/menuState";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -186,52 +187,54 @@ export default function App() {
   // localStorage'dan kullanıcı bilgilerini oku son
 
   return (
-    <Routes>
-      <Route path="/auth" element={<Auth />} />
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <BaseLayout />
-          </ProtectedRoute>
-        }
-      >
-        {loginData?.Dashboard && <Route path="/" element={<Dashboard1 />} />}
-        {/* <Route path="/isemri" element={<Isemri />} /> */}
-        <Route path="/isEmri1" element={<IsEmri />} />
-        <Route path="/User" element={<ProfilEkrani />} />
-        <Route path="/periyodikBakimlar" element={<PeriyodikBakimlar1 />} />
-        <Route path="/otomatikIsEmirleri" element={<OtomatikIsEmri />} />
-        <Route path="/raporYonetimi" element={<RaporYonetimi />} />
-        <Route path="/analizler" element={<Analizler />} />
-        <Route path="/planlamaTakvimi" element={<PlanlamaTakvimi />} />
-        <Route path="/makine" element={<MakineTanim />} />
-        <Route path="/ekipmanVeritabani" element={<Hazirlaniyor />} />
-        <Route path="/sayacGuncelleme" element={<Hazirlaniyor />} />
-        <Route path="/personelIzinleri" element={<Hazirlaniyor />} />
-        <Route path="/personelNobetleri" element={<Hazirlaniyor />} />
-        <Route path="/personelCalismaPLani" element={<Hazirlaniyor />} />
-        <Route path="/isTalebiKullanicilari" element={<Hazirlaniyor />} />
-        <Route path="/raporYonetimi" element={<Hazirlaniyor />} />
-        <Route path="/formYonetimi" element={<Hazirlaniyor />} />
-        <Route path="/kodYonetimi" element={<Hazirlaniyor />} />
-        <Route path="/otomatikKodlar" element={<Hazirlaniyor />} />
-        <Route path="/servisOncelikSeviyeleri" element={<Hazirlaniyor />} />
-        <Route path="/isEmriTipleri" element={<IsEmriTipleri />} />
-        <Route path="/onaylayicilar" element={<Hazirlaniyor />} />
-        <Route path="/projeTanimlari" element={<Hazirlaniyor />} />
-        <Route path="/lokasyon" element={<LokasyonTanim />} />
-        <Route path="/vardiyalar" element={<VardiyaTanim />} />
-        <Route path="/bakimTanimlari" element={<BakimTanimlari />} />
-        <Route path="/arizaTanimlari" element={<ArizaTanimlari />} />
-        <Route path="/atolye" element={<AtolyeTanimlari />} />
-        <Route path="/personeltanimlari" element={<PersonelTanimlari />} />
-        <Route path="/isTalepleri" element={<IsTalepleri />} />
-        <Route path="/demo" element={<Dashboard />} />
-        <Route path="/userid" element={<UserIdControl />} />
-        <Route path="/mudaheleSuresi" element={<MudaheleSuresi />} />
-      </Route>
-    </Routes>
+    <RecoilRoot>
+      <Routes>
+        <Route path="/auth" element={<Auth />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <BaseLayout />
+            </ProtectedRoute>
+          }
+        >
+          {loginData?.Dashboard && <Route path="/" element={<Dashboard1 />} />}
+          {/* <Route path="/isemri" element={<Isemri />} /> */}
+          <Route path="/isEmri1" element={<IsEmri />} />
+          <Route path="/User" element={<ProfilEkrani />} />
+          <Route path="/periyodikBakimlar" element={<PeriyodikBakimlar1 />} />
+          <Route path="/otomatikIsEmirleri" element={<OtomatikIsEmri />} />
+          <Route path="/raporYonetimi" element={<RaporYonetimi />} />
+          <Route path="/analizler" element={<Analizler />} />
+          <Route path="/planlamaTakvimi" element={<PlanlamaTakvimi />} />
+          <Route path="/makine" element={<MakineTanim />} />
+          <Route path="/ekipmanVeritabani" element={<Hazirlaniyor />} />
+          <Route path="/sayacGuncelleme" element={<Hazirlaniyor />} />
+          <Route path="/personelIzinleri" element={<Hazirlaniyor />} />
+          <Route path="/personelNobetleri" element={<Hazirlaniyor />} />
+          <Route path="/personelCalismaPLani" element={<Hazirlaniyor />} />
+          <Route path="/isTalebiKullanicilari" element={<Hazirlaniyor />} />
+          <Route path="/raporYonetimi" element={<Hazirlaniyor />} />
+          <Route path="/formYonetimi" element={<Hazirlaniyor />} />
+          <Route path="/kodYonetimi" element={<Hazirlaniyor />} />
+          <Route path="/otomatikKodlar" element={<Hazirlaniyor />} />
+          <Route path="/servisOncelikSeviyeleri" element={<Hazirlaniyor />} />
+          <Route path="/isEmriTipleri" element={<IsEmriTipleri />} />
+          <Route path="/onaylayicilar" element={<Hazirlaniyor />} />
+          <Route path="/projeTanimlari" element={<Hazirlaniyor />} />
+          <Route path="/lokasyon" element={<LokasyonTanim />} />
+          <Route path="/vardiyalar" element={<VardiyaTanim />} />
+          <Route path="/bakimTanimlari" element={<BakimTanimlari />} />
+          <Route path="/arizaTanimlari" element={<ArizaTanimlari />} />
+          <Route path="/atolye" element={<AtolyeTanimlari />} />
+          <Route path="/personeltanimlari" element={<PersonelTanimlari />} />
+          <Route path="/isTalepleri" element={<IsTalepleri />} />
+          <Route path="/demo" element={<Dashboard />} />
+          <Route path="/userid" element={<UserIdControl />} />
+          <Route path="/mudaheleSuresi" element={<MudaheleSuresi />} />
+        </Route>
+      </Routes>
+    </RecoilRoot>
   );
 }
 
@@ -369,6 +372,7 @@ const items = filterItems(rawItems);
 const MenuWrapper = () => {
   const location = useLocation();
   const [openKeys, setOpenKeys] = useState([]);
+  const [selectedMenuItem, setSelectedMenuItem] = useRecoilState(selectedMenuItemState);
 
   useEffect(() => {
     const currentPath = location.pathname.split("/")[1];
@@ -376,7 +380,8 @@ const MenuWrapper = () => {
     if (openKey) {
       setOpenKeys([openKey]);
     }
-  }, [location]);
+    setSelectedMenuItem(currentPath);
+  }, [location, setSelectedMenuItem]);
 
   const onOpenChange = (keys) => {
     const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);
@@ -389,7 +394,15 @@ const MenuWrapper = () => {
 
   return (
     <div style={{ height: "calc(100vh - 115px)", overflow: "auto" }}>
-      <Menu theme="dark" defaultSelectedKeys={[location.pathname.split("/")[1]]} mode="inline" items={items} openKeys={openKeys} onOpenChange={onOpenChange} />
+      <Menu
+        theme="dark"
+        defaultSelectedKeys={[location.pathname.split("/")[1]]}
+        selectedKeys={[selectedMenuItem]}
+        mode="inline"
+        items={items}
+        openKeys={openKeys}
+        onOpenChange={onOpenChange}
+      />
     </div>
   );
 };
