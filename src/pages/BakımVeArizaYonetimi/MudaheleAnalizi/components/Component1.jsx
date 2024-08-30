@@ -42,8 +42,8 @@ function Component1() {
   const renderCard = (value, label, backgroundColor) => (
     <div
       style={{
-        flex: "1 1 calc(16.66% - 10px)",
-        maxWidth: "calc(16.66% - 10px)",
+        flex: "1 1 16%", // Değiştirdim
+        maxWidth: "16%", // Değiştirdim
         background: backgroundColor || `url(${bg}), linear-gradient(rgb(27 17 92), #007eff)`,
         backgroundPosition: "inherit",
         backgroundSize: "cover",
@@ -74,6 +74,7 @@ function Component1() {
         display: "flex",
         flexWrap: "wrap",
         gap: "10px",
+        justifyContent: "space-between",
       }}
     >
       {renderCard(data?.ToplamTalepSayisi, "Toplam Talep Sayısı", "linear-gradient(to right, #ff7e5f, #feb47b)")}
