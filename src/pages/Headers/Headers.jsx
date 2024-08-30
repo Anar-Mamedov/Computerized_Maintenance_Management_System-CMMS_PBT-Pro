@@ -5,6 +5,7 @@ import Bildirim from "./components/Bildirim";
 import FirmaLogo from "./components/FirmaLogo.jsx";
 import Hatirlatici from "./components/Hatırlatıcı.jsx";
 import AxiosInstance from "../../api/http.jsx";
+import SearchComponent from "./components/SearchComponent.jsx";
 
 export default function Header() {
   useEffect(() => {
@@ -73,6 +74,7 @@ export default function Header() {
           gap: "10px",
         }}
       >
+        <SearchComponent />
         <Hatirlatici />
         <Bildirim />
         <Kullanici />
