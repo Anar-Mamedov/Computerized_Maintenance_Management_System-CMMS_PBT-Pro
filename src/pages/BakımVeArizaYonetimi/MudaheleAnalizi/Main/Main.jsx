@@ -19,6 +19,13 @@ function Main(props) {
   } = useFormContext();
 
   const [isWideScreen, setIsWideScreen] = useState(window.innerWidth > 850);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // handleScroll fonksiyonunu useEffect dışında tanımlıyoruz
+  const handleScroll = (e) => {
+    // console.log("Scroll Y:", e.target.scrollTop);
+    setIsScrolled(e.target.scrollTop > 50);
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -26,11 +33,17 @@ function Main(props) {
     };
 
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "10px", overflow: "auto", height: "calc(100vh - 170px)" }}>
+    <div
+      style={{ display: "flex", flexDirection: "column", gap: "10px", overflow: "auto", height: "calc(100vh - 170px)" }}
+      onScroll={handleScroll} // handleScroll burada tanımlanmalı
+    >
       <div
         style={{
           position: "sticky",
@@ -41,7 +54,8 @@ function Main(props) {
           backgroundColor: "white",
           border: "1px solid rgb(240, 240, 240)",
           borderRadius: "5px",
-          filter: "drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.2))",
+          filter: isScrolled ? "drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.2))" : "none",
+          transition: "filter 0.3s ease", // Animasyonlu geçiş için
         }}
       >
         <Filters />
