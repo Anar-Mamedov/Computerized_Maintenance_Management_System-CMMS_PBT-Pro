@@ -1,48 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import bg from "../../../../assets/images/bg-card.png";
 import { Spin, Typography } from "antd";
-import AxiosInstance from "../../../../api/http.jsx";
+import { ClockCircleOutlined } from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
+import AxiosInstance from "../../../../api/http.jsx";
 
 const { Text } = Typography;
 
-function MudaheleSuresiHistogram() {
-  const [data, setData] = useState([]);
+function Component1() {
   const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState(null);
   const { watch } = useFormContext();
 
   const lokasyonId = watch("locationIds");
   const atolyeId = watch("atolyeIds");
   const baslangicTarihi = watch("baslangicTarihi");
   const bitisTarihi = watch("bitisTarihi");
-
-  const timeRanges = [
-    { label: "0-60 dk", min: 0, max: 60 },
-    { label: "60-120 dk", min: 60, max: 120 },
-    { label: "120-240 dk", min: 120, max: 240 },
-    { label: "240-480 dk", min: 240, max: 480 },
-    { label: "480+ dk", min: 480, max: Infinity },
-  ];
-
-  const groupDataByTimeRange = (apiData) => {
-    const groupedData = timeRanges.map((range) => ({
-      timeRange: range.label,
-      TalepSayi: 0,
-    }));
-
-    apiData.forEach((item) => {
-      const minValue = parseInt(item.MudaheleSuresiAraligi.split("-")[0]);
-      const maxValue = parseInt(item.MudaheleSuresiAraligi.split("-")[1]?.replace(" dk", "").replace("+", "")) || Infinity;
-
-      timeRanges.forEach((range, index) => {
-        if (minValue >= range.min && maxValue <= range.max) {
-          groupedData[index].TalepSayi += item.TalepSayi;
-        }
-      });
-    });
-
-    return groupedData;
-  };
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -53,16 +26,10 @@ function MudaheleSuresiHistogram() {
       BitisTarih: bitisTarihi || "",
     };
     try {
-      const response = await AxiosInstance.post(`GetMudahaleAnalizHistogramGraph`, body);
-      if (response.data && response.data.length > 0) {
-        const groupedData = groupDataByTimeRange(response.data);
-        setData(groupedData);
-      } else {
-        setData([]); // Eğer veri yoksa, boş array gönderelim
-      }
+      const response = await AxiosInstance.post(`GetMudahaleAnalizDashboard`, body);
+      setData(response);
     } catch (error) {
       console.error("Failed to fetch data:", error);
-      setData([]); // Eğer hata olursa, boş array gönderelim
     } finally {
       setIsLoading(false);
     }
@@ -72,59 +39,52 @@ function MudaheleSuresiHistogram() {
     fetchData();
   }, [lokasyonId, atolyeId, baslangicTarihi, bitisTarihi]);
 
+  const renderCard = (value, label, backgroundColor) => (
+    <div
+      style={{
+        flex: "1 1 16%", // Değiştirdim
+        maxWidth: "16%", // Değiştirdim
+        background: backgroundColor || `url(${bg}), linear-gradient(rgb(27 17 92), #007eff)`,
+        backgroundPosition: "inherit",
+        backgroundSize: "cover",
+        borderRadius: "5px",
+        padding: "10px",
+        marginBottom: "0px",
+      }}
+    >
+      {isLoading ? (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
+          <Spin size="large" style={{ color: "#fff" }} />
+        </div>
+      ) : (
+        <div style={{ display: "flex", justifyContent: "space-between", cursor: "pointer" }}>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Text style={{ fontWeight: "500", fontSize: "35px", color: "white" }}>{value !== undefined ? value : ""}</Text>
+            <Text style={{ color: "white", fontSize: "15px", fontWeight: "400" }}>{label}</Text>
+          </div>
+          {/*<ClockCircleOutlined style={{ fontSize: "60px", color: "rgba(255,255,255,.8)" }} />*/}
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div
       style={{
-        width: "100%",
-        height: "100%",
-        borderRadius: "5px",
-        backgroundColor: "white",
         display: "flex",
-        flexDirection: "column",
+        flexWrap: "wrap",
         gap: "10px",
-        border: "1px solid #f0f0f0",
-        padding: "10px",
+        justifyContent: "space-between",
       }}
     >
-      <Text
-        style={{
-          fontWeight: "500",
-          fontSize: "17px",
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          maxWidth: "100%",
-          marginBottom: "10px",
-        }}
-      >
-        Müdahale Süresi Histogramı
-      </Text>
-      {isLoading ? (
-        <Spin />
-      ) : (
-        <ResponsiveContainer width="100%" height={400}>
-          <BarChart
-            width={500}
-            height={300}
-            data={data}
-            margin={{
-              top: 20,
-              right: 30,
-              left: 20,
-              bottom: 5,
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="timeRange" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="TalepSayi" fill="#8884d8" name="Talep Sayısı" />
-          </BarChart>
-        </ResponsiveContainer>
-      )}
+      {renderCard(data?.ToplamTalepSayisi, "Toplam Talep Sayısı", "linear-gradient(to right, #ff7e5f, #feb47b)")}
+      {renderCard(data?.OrtalamaMudahaleSuresi, "Ortalama Müdahale Süresi", "linear-gradient(to right, #6a11cb, #2575fc)")}
+      {renderCard(data?.EnHizliMudahaleSuresi, "En Hızlı Müdahale Süresi", "linear-gradient(to right, #43cea2, #185a9d)")}
+      {renderCard(data?.EnYavasMudahaleSuresi, "En Yavaş Müdahale Süresi", "linear-gradient(to right, #ff4e50, #f9d423)")}
+      {renderCard(data?.OrtalamaCalismaSuresi, "Ortalama Çalışma Süresi", "linear-gradient(to right, #00c6ff, #0072ff)")}
+      {renderCard(data?.ToplamCalismaSuresi, "Toplam Çalışma Süresi", "linear-gradient(to right, #f7971e, #ffd200)")}
     </div>
   );
 }
 
-export default MudaheleSuresiHistogram;
+export default Component1;

@@ -31,7 +31,21 @@ function Main(props) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "10px", overflow: "auto", height: "calc(100vh - 170px)" }}>
-      <Filters />
+      <div
+        style={{
+          position: "sticky",
+          top: 7,
+          zIndex: 4,
+          margin: "7px 7px 0px 7px",
+          padding: "7px",
+          backgroundColor: "white",
+          border: "1px solid rgb(240, 240, 240)",
+          borderRadius: "5px",
+          filter: "drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.2))",
+        }}
+      >
+        <Filters />
+      </div>
       <ShortInfo />
       <div style={{ display: "flex", gap: "10px" }}>
         <MudaheleSuresiHistogram />
