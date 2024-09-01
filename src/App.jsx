@@ -31,6 +31,7 @@ import IsEmriTipleri from "./pages/Yonetim/IsEmriTipleri/IsEmriTipleri.jsx";
 import Breadcrumbs from "./Breadcrumbs"; // Import the Breadcrumbs component
 import MudaheleSuresi from "./pages/BakımVeArizaYonetimi/MudaheleAnalizi/MudaheleAnalizi.jsx";
 import { selectedMenuItemState } from "./state/menuState";
+import FloatButton from "./pages/components/FloatButton/index.jsx";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -316,6 +317,7 @@ const BaseLayout = () => {
             <Text style={{ color: "white", marginTop: "11px" }}>v. 1.7.0</Text>
           </div>
           <MenuWrapper />
+          <FloatButton /> {/*FloatButton ekranran görüntüsü alacak ve help deske göndericek*/}
         </Sider>
       )}
 
