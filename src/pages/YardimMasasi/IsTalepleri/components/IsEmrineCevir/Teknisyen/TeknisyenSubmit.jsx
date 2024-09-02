@@ -9,6 +9,7 @@ import TeknisyenIsEmriCevir from "./TeknisyenIsEmriCevir";
 export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
   // Butonun disabled durumunu kontrol et
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [loading, setLoading] = useState(false); // Add loading state
   const methods = useForm({
     defaultValues: {
       personelTanim: "",
@@ -34,14 +35,13 @@ export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
   // personelID veya selectedRows değiştiğinde butonun durumunu güncelle
   useEffect(() => {
     const tbIsTalepId = selectedRows.map((row) => row.key).join(",");
-    const isValidStatus = selectedRows.every((row) =>
-      [0, 1, 2].includes(row.IST_DURUM_ID)
-    );
+    const isValidStatus = selectedRows.every((row) => [0, 1, 2].includes(row.IST_DURUM_ID));
 
     setIsButtonDisabled(!personelID || !tbIsTalepId || !isValidStatus);
   }, [personelID, selectedRows]);
 
   const onSubmited = (data) => {
+    setLoading(true); // Set loading to true when form is submitted
     // Tablodan seçilen kayıtların key değerlerini birleştir
     const tbIsTalepId = selectedRows.map((row) => row.key).join(","); // Eğer birden fazla ID varsa aralarına virgül koyarak birleştir
 
@@ -65,12 +65,8 @@ export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
           refreshTableData(); // Tablo verilerini yenile
         }, 1000); // 1000 milisaniye (1 saniye) bekler
         if (response.status_code === 200 || response.status_code === 201) {
-          const aciklamaValues = response.isEmriNolari
-            .map((item) => item.Aciklama)
-            .join(", ");
-          message.success(
-            aciklamaValues + " Numaralı İş Emirleri Oluşturulmuştur."
-          );
+          const aciklamaValues = response.isEmriNolari.map((item) => item.Aciklama).join(", ");
+          message.success(aciklamaValues + " Numaralı İş Emirleri Oluşturulmuştur.");
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
@@ -87,6 +83,9 @@ export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
           // İnternet bağlantısı yok
           message.error("Internet Bağlantısı Mevcut Değil.");
         }
+      })
+      .finally(() => {
+        setLoading(false); // Reset loading state after form submission is complete
       });
 
     console.log({ Body });
@@ -95,10 +94,7 @@ export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
   return (
     <FormProvider {...methods}>
       <div style={{ display: "flex", width: "100%", maxWidth: "335px" }}>
-        <form
-          style={{ width: "100%" }}
-          onSubmit={methods.handleSubmit(onSubmited)}
-        >
+        <form style={{ width: "100%" }} onSubmit={methods.handleSubmit(onSubmited)}>
           <TeknisyenIsEmriCevir selectedRows={selectedRows} />
         </form>
         <Button
@@ -112,7 +108,8 @@ export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
           }}
           type="submit"
           onClick={methods.handleSubmit(onSubmited)}
-          disabled={isButtonDisabled} // Butonun disabled durumunu ayarla
+          disabled={isButtonDisabled || loading} // Disable button if loading
+          loading={loading} // Show loading spinner
         >
           <CheckOutlined
             style={{
