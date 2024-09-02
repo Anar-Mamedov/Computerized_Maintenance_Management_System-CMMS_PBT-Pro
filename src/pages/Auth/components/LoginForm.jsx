@@ -78,7 +78,11 @@ export default function LoginForm() {
           otomatikKodlar: response.KLL_WEB_OTOKOD,
           servisOncelikSeviyeleri: response.KLL_WEB_SERVIS,
           isEmriTipleri: response.KLL_WEB_ISEMRITIP,
+          onayIslemleri: response.KLL_WEB_ONAY,
+          onayAyarlar: response.KLL_WEB_ONAY,
+          rolTanimlari: response.KLL_WEB_ONAY,
           onaylayicilar: response.KLL_WEB_ONAY,
+          kurallar: response.KLL_WEB_ONAY,
           projeTanimlari: response.KLL_WEB_PROJE,
           mudaheleSuresi: response.KLL_WEB_RAPOR,
         };
