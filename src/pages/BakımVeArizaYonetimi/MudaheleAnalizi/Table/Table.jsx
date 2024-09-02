@@ -9,7 +9,8 @@ import "./ResizeStyle.css";
 import AxiosInstance from "../../../../api/http";
 // import CreateDrawer from '../Insert/CreateDrawer';
 // import EditDrawer from '../Update/EditDrawer';
-import Filters from "./filter/Filters";
+// import Filters from "./filter/Filters";
+import Filters1 from "./Filters/Filters.jsx";
 // import ContextMenu from "../components/ContextMenu/ContextMenu";
 // import EditDrawer1 from '../../../YardimMasasi/IsTalepleri/Update/EditDrawer';
 import { useFormContext } from "react-hook-form";
@@ -103,7 +104,13 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
 
 const MainTable = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const { setValue } = useFormContext();
+  const {
+    control,
+    watch,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useFormContext();
   const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -175,8 +182,8 @@ const MainTable = () => {
   const initialColumns = [
     {
       title: "İş Emri No",
-      dataIndex: "ISEMRI_NO",
-      key: "ISEMRI_NO",
+      dataIndex: "ISM_ISEMRI_NO",
+      key: "ISM_ISEMRI_NO",
       width: 120,
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
@@ -184,741 +191,111 @@ const MainTable = () => {
         <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
       ),
       sorter: (a, b) => {
-        if (a.ISEMRI_NO === null) return -1;
-        if (b.ISEMRI_NO === null) return 1;
-        return a.ISEMRI_NO.localeCompare(b.ISEMRI_NO);
+        if (a.ISM_ISEMRI_NO === null) return -1;
+        if (b.ISM_ISEMRI_NO === null) return 1;
+        return a.ISM_ISEMRI_NO.localeCompare(b.ISM_ISEMRI_NO);
       },
     },
     {
-      title: "Tarih",
-      dataIndex: "DUZENLEME_TARIH",
-      key: "DUZENLEME_TARIH",
-      width: 110,
+      title: "İş Talebi No",
+      dataIndex: "IST_KOD",
+      key: "IST_KOD",
+      width: 120,
       ellipsis: true,
-      sorter: (a, b) => {
-        if (a.DUZENLEME_TARIH === null) return -1;
-        if (b.DUZENLEME_TARIH === null) return 1;
-        return a.DUZENLEME_TARIH.localeCompare(b.DUZENLEME_TARIH);
-      },
-
-      visible: true, // Varsayılan olarak açık
-      render: (text) => formatDate(text),
-    },
-    {
-      title: "Saat",
-      dataIndex: "DUZENLEME_SAAT",
-      key: "DUZENLEME_SAAT",
-      width: 90,
-      ellipsis: true,
-      sorter: (a, b) => {
-        if (a.DUZENLEME_SAAT === null) return -1;
-        if (b.DUZENLEME_SAAT === null) return 1;
-        return a.DUZENLEME_SAAT.localeCompare(b.DUZENLEME_SAAT);
-      },
-
-      visible: true, // Varsayılan olarak açık
-      render: (text) => formatTime(text),
-    },
-    {
-      title: "İş Emri Tipi",
-      dataIndex: "ISEMRI_TIP",
-      key: "ISEMRI_TIP",
-      width: 180,
-      ellipsis: true,
-      sorter: (a, b) => {
-        if (a.ISEMRI_TIP === null) return -1;
-        if (b.ISEMRI_TIP === null) return 1;
-        return a.ISEMRI_TIP.localeCompare(b.ISEMRI_TIP);
-      },
-
-      visible: true, // Varsayılan olarak açık
-      render: (text, record) => (
-        <div
-          style={{
-            textAlign: "center",
-          }}
-        >
-          <Tag
-            style={{
-              backgroundColor: hexToRGBA(record.ISM_TIP_RENK, 0.2),
-              border: `1.2px solid ${hexToRGBA(record.ISM_TIP_RENK, 0.7)}`,
-              color: record.ISM_TIP_RENK,
-            }}
-          >
-            {text}
-          </Tag>
-        </div>
-      ),
-    },
-    {
-      title: "Konu",
-      dataIndex: "KONU",
-      key: "KONU",
-      width: 300,
-      ellipsis: true,
-      sorter: (a, b) => {
-        if (a.KONU === null) return -1;
-        if (b.KONU === null) return 1;
-        return a.KONU.localeCompare(b.KONU);
-      },
       visible: true, // Varsayılan olarak açık
       render: (text, record) => (
         <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
       ),
+      sorter: (a, b) => {
+        if (a.IST_KOD === null) return -1;
+        if (b.IST_KOD === null) return 1;
+        return a.IST_KOD.localeCompare(b.IST_KOD);
+      },
     },
-
     {
-      title: "Durum",
-      dataIndex: "DURUM",
-      key: "DURUM",
+      title: "Lokasyon Tanım",
+      dataIndex: "LOK_TANIM",
+      key: "LOK_TANIM",
       width: 120,
       ellipsis: true,
-
       visible: true, // Varsayılan olarak açık
       sorter: (a, b) => {
-        if (a.DURUM === null && b.DURUM === null) return 0;
-        if (a.DURUM === null) return -1;
-        if (b.DURUM === null) return 1;
-        return a.DURUM.localeCompare(b.DURUM);
-      },
-      render: (text, record) => {
-        const circleStyle = {
-          backgroundColor: record.KAPALI ? "red" : "green", // KAPALI true ise kırmızı, değilse yeşil
-          borderRadius: "50%",
-          display: "inline-block",
-          width: "10px",
-          height: "10px",
-        };
-        return (
-          <div>
-            <span style={circleStyle}></span>
-            <span style={{ marginLeft: "5px" }}>{text}</span>
-          </div>
-        );
+        if (a.LOK_TANIM === null) return -1;
+        if (b.LOK_TANIM === null) return 1;
+        return a.LOK_TANIM.localeCompare(b.LOK_TANIM);
       },
     },
-
     {
-      title: "Lokasyon",
-      dataIndex: "LOKASYON",
-      key: "LOKASYON",
-      width: 200,
+      title: "Tipi",
+      dataIndex: "IMT_TANIM",
+      key: "IMT_TANIM",
+      width: 120,
       ellipsis: true,
-
       visible: true, // Varsayılan olarak açık
+
       sorter: (a, b) => {
-        if (a.LOKASYON === null && b.LOKASYON === null) return 0;
-        if (a.LOKASYON === null) return 1;
-        if (b.LOKASYON === null) return -1;
-        return a.LOKASYON.localeCompare(b.LOKASYON);
+        if (a.IMT_TANIM === null) return -1;
+        if (b.IMT_TANIM === null) return 1;
+        return a.IMT_TANIM.localeCompare(b.IMT_TANIM);
       },
-    },
-    {
-      title: "Makine Kodu",
-      dataIndex: "MAKINE_KODU",
-      key: "MAKINE_KODU",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MAKINE_KODU === null && b.MAKINE_KODU === null) return 0;
-        if (a.MAKINE_KODU === null) return 1;
-        if (b.MAKINE_KODU === null) return -1;
-        return a.MAKINE_KODU.localeCompare(b.MAKINE_KODU);
-      },
-      ellipsis: true,
-
-      visible: true, // Varsayılan olarak açık
-    },
-    {
-      title: "Makine Tanımı",
-      dataIndex: "MAKINE_TANIMI",
-      key: "MAKINE_TANIMI",
-      width: 300,
-      sorter: (a, b) => {
-        if (a.MAKINE_TANIMI === null && b.MAKINE_TANIMI === null) return 0;
-        if (a.MAKINE_TANIMI === null) return -1;
-        if (b.MAKINE_TANIMI === null) return 1;
-        return a.MAKINE_TANIMI.localeCompare(b.MAKINE_TANIMI);
-      },
-      ellipsis: true,
-
-      visible: true, // Varsayılan olarak açık
-    },
-    {
-      title: "Planlanan Başlama Tarihi",
-      dataIndex: "PLAN_BASLAMA_TARIH",
-      key: "PLAN_BASLAMA_TARIH",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.PLAN_BASLAMA_TARIH === null && b.PLAN_BASLAMA_TARIH === null) return 0;
-        if (a.PLAN_BASLAMA_TARIH === null) return 1;
-        if (b.PLAN_BASLAMA_TARIH === null) return -1;
-        return a.PLAN_BASLAMA_TARIH.localeCompare(b.PLAN_BASLAMA_TARIH);
-      },
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak açık
-      render: (text) => formatDate(text),
-    },
-
-    {
-      title: "Planlanan Başlama Saati",
-      dataIndex: "PLAN_BASLAMA_SAAT",
-      key: "PLAN_BASLAMA_SAAT",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.PLAN_BASLAMA_SAAT === null && b.PLAN_BASLAMA_SAAT === null) return 0;
-        if (a.PLAN_BASLAMA_SAAT === null) return 1;
-        if (b.PLAN_BASLAMA_SAAT === null) return -1;
-        return a.PLAN_BASLAMA_SAAT.localeCompare(b.PLAN_BASLAMA_SAAT);
-      },
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak açık
-      render: (text) => formatTime(text),
-    },
-    {
-      title: "Planlanan Bitiş Tarihi",
-      dataIndex: "PLAN_BITIS_TARIH",
-      key: "PLAN_BITIS_TARIH",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-      render: (text) => formatDate(text),
-    },
-    {
-      title: "Planlanan Bitiş Saati",
-      dataIndex: "PLAN_BITIS_SAAT",
-      key: "PLAN_BITIS_SAAT",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-      render: (text) => formatTime(text),
-    },
-    {
-      title: "Başlama Tarihi",
-      dataIndex: "BASLAMA_TARIH",
-      key: "BASLAMA_TARIH",
-      width: 110,
-      ellipsis: true,
-
-      visible: true, // Varsayılan olarak kapalı
-      render: (text) => formatDate(text),
-    },
-    {
-      title: "Başlama Saati",
-      dataIndex: "BASLAMA_SAAT",
-      key: "BASLAMA_SAAT",
-      width: 90,
-      ellipsis: true,
-
-      visible: true, // Varsayılan olarak kapalı
-      render: (text) => formatTime(text),
-    },
-    {
-      title: "Bitiş Tarihi",
-      dataIndex: "ISM_BITIS_TARIH",
-      key: "ISM_BITIS_TARIH",
-      width: 110,
-      ellipsis: true,
-
-      visible: true, // Varsayılan olarak kapalı
-      render: (text) => formatDate(text),
-    },
-    {
-      title: "Bitiş Saati",
-      dataIndex: "ISM_BITIS_SAAT",
-      key: "ISM_BITIS_SAAT",
-      width: 90,
-      ellipsis: true,
-
-      visible: true, // Varsayılan olarak kapalı
-      render: (text) => formatTime(text),
-    },
-    {
-      title: "İş Süresi (dk.)",
-      dataIndex: "IS_SURESI",
-      key: "IS_SURESI",
-      width: 110,
-      ellipsis: true,
-
-      visible: true, // Varsayılan olarak kapalı
-      render: (text) => (text > 0 ? text : null),
-    },
-    {
-      title: "Tamamlama (%)",
-      dataIndex: "TAMAMLANMA",
-      key: "TAMAMLANMA",
-      width: 200,
-      ellipsis: true,
-
-      visible: true, // Varsayılan olarak kapalı
-      render: (text) => <Progress percent={text} steps={8} />,
-    },
-    {
-      title: "Garanti",
-      dataIndex: "GARANTI",
-      key: "GARANTI",
-      width: 100,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-      render: (text, record) => {
-        return record.GARANTI ? (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <CheckOutlined style={{ color: "green" }} />
-          </div>
-        ) : (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <CloseOutlined style={{ color: "red" }} />
-          </div>
-        );
-      },
-    },
-    {
-      title: "Makine Durumu",
-      dataIndex: "MAKINE_DURUM",
-      key: "MAKINE_DURUM",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    // {
-    //   title: "Plaka",
-    //   dataIndex: "MAKINE_PLAKA",
-    //   key: "MAKINE_PLAKA",
-    //   width: 150,
-    //   ellipsis: true,
-    //   onCell: () => ({
-    //     onClick: (event) => {
-    //       event.stopPropagation();
-    //     },
-    //   }),
-    //   visible: false, // Varsayılan olarak kapalı
-    // },
-    {
-      title: "Makine Tipi",
-      dataIndex: "MAKINE_TIP",
-      key: "MAKINE_TIP",
-      width: 250,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "Ekipman",
-      dataIndex: "EKIPMAN",
-      key: "EKIPMAN",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "İş Tipi",
-      dataIndex: "IS_TIPI",
-      key: "IS_TIPI",
-      width: 250,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "İş Nedeni",
-      dataIndex: "IS_NEDENI",
-      key: "IS_NEDENI",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
     },
     {
       title: "Atölye",
-      dataIndex: "ATOLYE",
-      key: "ATOLYE",
-      width: 150,
+      dataIndex: "ATL_TANIM",
+      key: "ATL_TANIM",
+      width: 120,
       ellipsis: true,
+      visible: true, // Varsayılan olarak açık
 
-      visible: false, // Varsayılan olarak kapalı
+      sorter: (a, b) => {
+        if (a.ATL_TANIM === null) return -1;
+        if (b.ATL_TANIM === null) return 1;
+        return a.ATL_TANIM.localeCompare(b.ATL_TANIM);
+      },
     },
     {
-      title: "Talimat",
-      dataIndex: "TALIMAT",
-      key: "TALIMAT",
-      width: 250,
+      title: "Fark Dakika",
+      dataIndex: "FARK_DAKIKA",
+      key: "FARK_DAKIKA",
+      width: 120,
       ellipsis: true,
+      visible: true, // Varsayılan olarak açık
 
-      visible: false, // Varsayılan olarak kapalı
+      sorter: (a, b) => {
+        if (a.FARK_DAKIKA === null) return 1;
+        if (b.FARK_DAKIKA === null) return -1;
+        return a.FARK_DAKIKA - b.FARK_DAKIKA;
+      },
     },
     {
-      title: "Öncelik",
-      dataIndex: "ONCELIK",
-      key: "ONCELIK",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "Kapanış Tarihi",
-      dataIndex: "KAPANIS_TARIHI",
-      key: "KAPANIS_TARIHI",
+      title: "Talep Açılma Tarihi",
+      dataIndex: "TALEP_ACILIS_TAR",
+      key: "TALEP_ACILIS_TAR",
       width: 110,
       ellipsis: true,
-
-      visible: true, // Varsayılan olarak kapalı
-      render: (text) => formatDate(text),
-    },
-    {
-      title: "Kapanış Saati",
-      dataIndex: "KAPANIS_SAATI",
-      key: "KAPANIS_SAATI",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-      render: (text) => formatTime(text),
-    },
-    {
-      title: "Takvim",
-      dataIndex: "TAKVIM",
-      key: "TAKVIM",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "Masraf Merkezi",
-      dataIndex: "MASRAF_MERKEZI",
-      key: "MASRAF_MERKEZI",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "Firma",
-      dataIndex: "FRIMA",
-      key: "FRIMA",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "İş Talep Kodu",
-      dataIndex: "IS_TALEP_NO",
-      key: "IS_TALEP_NO",
-      width: 150,
-      ellipsis: true,
-      onCell: (record) => ({
-        onClick: (event) => {
-          event.stopPropagation();
-
-          // Burada, record objesini doğrudan kullanmak yerine,
-          // bir kopyasını oluşturup `key` değerini `ISM_DURUM_KOD_ID` ile güncelliyoruz.
-          const updatedRecord = { ...record, key: record.ISM_IS_TALEP_ID };
-          // const updatedRecord = { ...record, key: 378 };
-
-          setEditDrawer1Data(updatedRecord); // Güncellenmiş record'u EditDrawer1 için data olarak ayarla
-          setEditDrawer1Visible(true); // EditDrawer1'i aç
-        },
-      }),
-      render: (text) => <a>{text}</a>,
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "İş Talep Eden",
-      dataIndex: "IS_TALEP_EDEN",
-      key: "IS_TALEP_EDEN",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "İş Talep Tarihi",
-      dataIndex: "IS_TALEP_TARIH",
-      key: "IS_TALEP_TARIH",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-      render: (text) => formatDate(text),
-    },
-    {
-      title: "Personel Adı",
-      dataIndex: "PERSONEL_ADI",
-      key: "PERSONEL_ADI",
-      width: 180,
-      ellipsis: true,
-
-      visible: true, // Varsayılan olarak kapalı
-    },
-    {
-      title: "Tam Lokasyon",
-      dataIndex: "TAM_LOKASYON",
-      key: "TAM_LOKASYON",
-      width: 300,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "Ana Lokasyon",
-      dataIndex: "TAM_LOKASYON",
-      key: "ANA_LOKASYON",
-      ellipsis: true,
-      // Enable ellipsis for overflowed content
-      width: 300,
       sorter: (a, b) => {
-        if (a.TAM_LOKASYON && b.TAM_LOKASYON) {
-          return a.TAM_LOKASYON.localeCompare(b.TAM_LOKASYON);
-        }
-        if (!a.TAM_LOKASYON && !b.TAM_LOKASYON) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.TAM_LOKASYON ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
+        if (a.TALEP_ACILIS_TAR === null) return -1;
+        if (b.TALEP_ACILIS_TAR === null) return 1;
+        return a.TALEP_ACILIS_TAR.localeCompare(b.TALEP_ACILIS_TAR);
       },
-      render: (text) => {
-        if (text === null) {
-          return null;
-        }
-        const parts = text.split("/");
-        return parts.length > 1 ? parts[0] : text;
-      }, // Add this line
-      visible: false, // Varsayılan olarak açık
+
+      visible: true, // Varsayılan olarak açık
+      render: (text) => formatDate(text),
     },
     {
-      title: "Bildirilen Kat",
-      dataIndex: "BILDIRILEN_KAT",
-      key: "BILDIRILEN_KAT",
-      width: 150,
+      title: "İş Emri Başlama Tarihi",
+      dataIndex: "ISMERI_BAS_TAR",
+      key: "ISMERI_BAS_TAR",
+      width: 110,
       ellipsis: true,
+      sorter: (a, b) => {
+        if (a.ISMERI_BAS_TAR === null) return -1;
+        if (b.ISMERI_BAS_TAR === null) return 1;
+        return a.ISMERI_BAS_TAR.localeCompare(b.ISMERI_BAS_TAR);
+      },
 
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "Bildirilen Bina",
-      dataIndex: "BILDIRILEN_BINA",
-      key: "BILDIRILEN_BINA",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "Sayaç Değeri",
-      dataIndex: "GUNCEL_SAYAC_DEGER",
-      key: "GUNCEL_SAYAC_DEGER",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: "Notlar",
-      dataIndex: "ICERDEKI_NOT",
-      key: "ICERDEKI_NOT",
-      width: 250,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_1 ? ozelAlanlar.OZL_OZEL_ALAN_1 : label && label.OZL_OZEL_ALAN_1}</div>,
-      dataIndex: "OZEL_ALAN_1",
-      key: "OZEL_ALAN_1",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_2 ? ozelAlanlar.OZL_OZEL_ALAN_2 : label && label.OZL_OZEL_ALAN_2}</div>,
-      dataIndex: "OZEL_ALAN_2",
-      key: "OZEL_ALAN_2",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_3 ? ozelAlanlar.OZL_OZEL_ALAN_3 : label && label.OZL_OZEL_ALAN_3}</div>,
-      dataIndex: "OZEL_ALAN_3",
-      key: "OZEL_ALAN_3",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_4 ? ozelAlanlar.OZL_OZEL_ALAN_4 : label && label.OZL_OZEL_ALAN_4}</div>,
-      dataIndex: "OZEL_ALAN_4",
-      key: "OZEL_ALAN_4",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_5 ? ozelAlanlar.OZL_OZEL_ALAN_5 : label && label.OZL_OZEL_ALAN_5}</div>,
-      dataIndex: "OZEL_ALAN_5",
-      key: "OZEL_ALAN_5",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_6 ? ozelAlanlar.OZL_OZEL_ALAN_6 : label && label.OZL_OZEL_ALAN_6}</div>,
-      dataIndex: "OZEL_ALAN_6",
-      key: "OZEL_ALAN_6",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_7 ? ozelAlanlar.OZL_OZEL_ALAN_7 : label && label.OZL_OZEL_ALAN_7}</div>,
-      dataIndex: "OZEL_ALAN_7",
-      key: "OZEL_ALAN_7",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_8 ? ozelAlanlar.OZL_OZEL_ALAN_8 : label && label.OZL_OZEL_ALAN_8}</div>,
-      dataIndex: "OZEL_ALAN_8",
-      key: "OZEL_ALAN_8",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_9 ? ozelAlanlar.OZL_OZEL_ALAN_9 : label && label.OZL_OZEL_ALAN_9}</div>,
-      dataIndex: "OZEL_ALAN_9",
-      key: "OZEL_ALAN_9",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_10 ? ozelAlanlar.OZL_OZEL_ALAN_10 : label && label.OZL_OZEL_ALAN_10}</div>,
-      dataIndex: "OZEL_ALAN_10",
-      key: "OZEL_ALAN_10",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_11 ? ozelAlanlar.OZL_OZEL_ALAN_11 : label && label.OZL_OZEL_ALAN_11}</div>,
-      dataIndex: "OZEL_ALAN_11",
-      key: "OZEL_ALAN_11",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_12 ? ozelAlanlar.OZL_OZEL_ALAN_12 : label && label.OZL_OZEL_ALAN_12}</div>,
-      dataIndex: "OZEL_ALAN_12",
-      key: "OZEL_ALAN_12",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_13 ? ozelAlanlar.OZL_OZEL_ALAN_13 : label && label.OZL_OZEL_ALAN_13}</div>,
-      dataIndex: "OZEL_ALAN_13",
-      key: "OZEL_ALAN_13",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_14 ? ozelAlanlar.OZL_OZEL_ALAN_14 : label && label.OZL_OZEL_ALAN_14}</div>,
-      dataIndex: "OZEL_ALAN_14",
-      key: "OZEL_ALAN_14",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_15 ? ozelAlanlar.OZL_OZEL_ALAN_15 : label && label.OZL_OZEL_ALAN_15}</div>,
-      dataIndex: "OZEL_ALAN_15",
-      key: "OZEL_ALAN_15",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_16 ? ozelAlanlar.OZL_OZEL_ALAN_16 : label && label.OZL_OZEL_ALAN_16}</div>,
-      dataIndex: "OZEL_ALAN_16",
-      key: "OZEL_ALAN_16",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_17 ? ozelAlanlar.OZL_OZEL_ALAN_17 : label && label.OZL_OZEL_ALAN_17}</div>,
-      dataIndex: "OZEL_ALAN_17",
-      key: "OZEL_ALAN_17",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_18 ? ozelAlanlar.OZL_OZEL_ALAN_18 : label && label.OZL_OZEL_ALAN_18}</div>,
-      dataIndex: "OZEL_ALAN_18",
-      key: "OZEL_ALAN_18",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_19 ? ozelAlanlar.OZL_OZEL_ALAN_19 : label && label.OZL_OZEL_ALAN_19}</div>,
-      dataIndex: "OZEL_ALAN_19",
-      key: "OZEL_ALAN_19",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
-    },
-    {
-      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_20 ? ozelAlanlar.OZL_OZEL_ALAN_20 : label && label.OZL_OZEL_ALAN_20}</div>,
-      dataIndex: "OZEL_ALAN_20",
-      key: "OZEL_ALAN_20",
-      width: 150,
-      ellipsis: true,
-
-      visible: false, // Varsayılan olarak kapalı
+      visible: true, // Varsayılan olarak açık
+      render: (text) => formatDate(text),
     },
 
     // Diğer kolonlarınız...
@@ -1000,14 +377,6 @@ const MainTable = () => {
     filters: {},
   });
 
-  // ana tablo api isteği için kullanılan useEffect
-
-  useEffect(() => {
-    fetchEquipmentData(body, currentPage, pageSize);
-  }, [body, currentPage, pageSize]);
-
-  // ana tablo api isteği için kullanılan useEffect son
-
   // arama işlemi için kullanılan useEffect
   useEffect(() => {
     if (searchTimeout) {
@@ -1030,6 +399,11 @@ const MainTable = () => {
 
   // arama işlemi için kullanılan useEffect son
 
+  const lokasyonId = watch("locationIds1");
+  const atolyeId = watch("atolyeIds1");
+  const baslangicTarihi = watch("baslangicTarihi1");
+  const bitisTarihi = watch("bitisTarihi1");
+
   const fetchEquipmentData = async (body, page, size) => {
     // body'nin undefined olması durumunda varsayılan değerler atanıyor
     const { keyword = "", filters = {} } = body || {};
@@ -1039,7 +413,15 @@ const MainTable = () => {
     try {
       setLoading(true);
       // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.post(`getIsEmriFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}`, filters);
+      const body = {
+        LokasyonId: lokasyonId || "",
+        AtolyeId: atolyeId || "",
+        BaslangicTarih: baslangicTarihi || "",
+        BitisTarih: bitisTarihi || "",
+        // Yil: currentYear,
+      };
+
+      const response = await AxiosInstance.post(`GetMudahaleAnalizList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}`, body);
       if (response) {
         // Toplam sayfa sayısını ayarla
         setTotalPages(response.page);
@@ -1069,6 +451,14 @@ const MainTable = () => {
       }
     }
   };
+
+  // ana tablo api isteği için kullanılan useEffect
+
+  useEffect(() => {
+    fetchEquipmentData(body, currentPage, pageSize);
+  }, [body, currentPage, pageSize, lokasyonId, atolyeId, baslangicTarihi, bitisTarihi]);
+
+  // ana tablo api isteği için kullanılan useEffect son
 
   // filtreleme işlemi için kullanılan useEffect
   const handleBodyChange = useCallback((type, newBody) => {
@@ -1372,7 +762,8 @@ const MainTable = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
-          <Filters onChange={handleBodyChange} />
+          {/*<Filters onChange={handleBodyChange} />*/}
+          <Filters1 />
           {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>
