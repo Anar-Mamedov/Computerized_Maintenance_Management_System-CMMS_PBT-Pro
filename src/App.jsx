@@ -158,7 +158,18 @@ const rawItems = [
       getItem("Otomatik Kodlar", "otomatikKodlar", true),
       getItem("Servis Öncelik Seviyeleri", "servisOncelikSeviyeleri", true),
       getItem("İş Emri Tipleri", "isEmriTipleri", true),
-      getItem("Onaylayıcılar", "onaylayicilar", true),
+      getItem(
+        "Onay İşlemleri",
+        "onayIslemleri",
+        "",
+        [
+          getItem("Ayarlar", "onayAyarlar", true),
+          getItem("Rol Tanımları", "rolTanimlari", true),
+          getItem("Onaylayıcılar", "onaylayicilar", true),
+          getItem("Kurallar", "kurallar", true),
+        ],
+        false
+      ),
       getItem("Proje Tanımları", "projeTanimlari", true),
       // getItem("Team 2", "team2", true)
     ],
