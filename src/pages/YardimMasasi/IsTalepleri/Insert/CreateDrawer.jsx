@@ -200,7 +200,7 @@ export default function CreateDrawer({ onRefresh }) {
         console.error("Error sending data:", error);
         if (navigator.onLine) {
           // İnternet bağlantısı var
-          message.error("Hata Mesajı: " + error.message);
+          message.error(`Hata Mesajı: ${error.message} - ${error.response.data.ExceptionMessage}`);
         } else {
           // İnternet bağlantısı yok
           message.error("Internet Bağlantısı Mevcut Değil.");
@@ -245,7 +245,8 @@ export default function CreateDrawer({ onRefresh }) {
                   padding: "4px 30px",
                   fontWeight: "300",
                   fontSize: "14px",
-                }}>
+                }}
+              >
                 Açik
               </div>
             </div>
@@ -256,14 +257,12 @@ export default function CreateDrawer({ onRefresh }) {
           extra={
             <Space>
               <Button onClick={onClose}>İptal</Button>
-              <Button
-                type="submit"
-                onClick={methods.handleSubmit(onSubmit)}
-                style={{ backgroundColor: "#2bc770", borderColor: "#2bc770", color: "#ffffff" }}>
+              <Button type="submit" onClick={methods.handleSubmit(onSubmit)} style={{ backgroundColor: "#2bc770", borderColor: "#2bc770", color: "#ffffff" }}>
                 Kaydet
               </Button>
             </Space>
-          }>
+          }
+        >
           <form onSubmit={methods.handleSubmit(onSubmit)}>
             <MainTabs drawerOpen={open} isDisabled={isDisabled} fieldRequirements={fieldRequirements} />
             <SecondTabs fieldRequirements={fieldRequirements} />
