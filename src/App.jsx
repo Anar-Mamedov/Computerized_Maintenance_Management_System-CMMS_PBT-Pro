@@ -32,6 +32,7 @@ import Breadcrumbs from "./Breadcrumbs"; // Import the Breadcrumbs component
 import MudaheleSuresi from "./pages/BakımVeArizaYonetimi/MudaheleAnalizi/MudaheleAnalizi.jsx";
 import { selectedMenuItemState } from "./state/menuState";
 import FloatButton from "./pages/components/FloatButton/index.jsx";
+import RolTanimlari from "./pages/OnayIslemleri/RolTanimlari/RolTanimlari.jsx";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -244,7 +245,7 @@ export default function App() {
           <Route path="/userid" element={<UserIdControl />} />
           <Route path="/mudaheleSuresi" element={<MudaheleSuresi />} />
           <Route path="/onayAyarlar" element={<Hazirlaniyor />} />
-          <Route path="/rolTanimlari" element={<Hazirlaniyor />} />
+          <Route path="/rolTanimlari" element={<RolTanimlari />} />
           <Route path="/onaylayicilar" element={<Hazirlaniyor />} />
           <Route path="/kurallar" element={<Hazirlaniyor />} />
         </Route>
