@@ -1,103 +1,136 @@
-import React, { useState } from "react";
-import { Button, Input, Popover, message, Typography } from "antd";
-import { CameraOutlined, CloseOutlined } from "@ant-design/icons";
-import { FaQuestion } from "react-icons/fa";
-import html2canvas from "html2canvas";
-import axios from "axios";
-import styled from "styled-components";
+import React, { useCallback, useEffect, useState } from "react";
+import { Button, Modal, Table } from "antd";
+import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { useFormContext } from "react-hook-form";
+import AxiosInstance from "../../../../api/http.jsx";
+import CreateModal from "../Insert/CreateModal.jsx";
+import EditModal from "../Update/EditModal.jsx";
+import ContextMenu from "../components/ContextMenu/ContextMenu.jsx";
 
-const { Text } = Typography;
+export default function MainTable({ isActive }) {
+  const [loading, setLoading] = useState(false);
+  const { control, watch, setValue } = useFormContext();
+  const [data, setData] = useState([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]); // New state for selected rows
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
 
-const StyledPopover = styled(Popover)`
-  .ant-popover {
-    z-index: 10000 !important; /* Ensure the popover stays on top */
-  }
-`;
-
-const FloatButton = () => {
-  const [imageData, setImageData] = useState(null);
-  const [inputValue, setInputValue] = useState("");
-  const [textValue, setTextValue] = useState("");
-  const [visible, setVisible] = useState(false);
-
-  const handleScreenshot = () => {
-    html2canvas(document.body, {
-      scale: 2,
-      useCORS: true,
-      logging: true,
-      width: window.innerWidth,
-      height: window.innerHeight,
-      windowWidth: document.documentElement.scrollWidth,
-      windowHeight: document.documentElement.scrollHeight,
-    }).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png", 1.0);
-      setImageData(imgData);
-      setVisible(true);
+  const formatDate = (date) => {
+    if (!date) return "";
+    const sampleDate = new Date(2021, 0, 21);
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
+    let monthFormat;
+    if (sampleFormatted.includes("January")) {
+      monthFormat = "long";
+    } else if (sampleFormatted.includes("Jan")) {
+      monthFormat = "short";
+    } else {
+      monthFormat = "2-digit";
+    }
+    const formatter = new Intl.DateTimeFormat(navigator.language, {
+      year: "numeric",
+      month: monthFormat,
+      day: "2-digit",
     });
+    return formatter.format(new Date(date));
   };
 
-  const handleSend = async () => {
-    try {
-      await axios.post("YOUR_API_ENDPOINT", {
-        image: imageData,
-        input: inputValue,
-        text: textValue,
-      });
-      message.success("Veriler başarıyla gönderildi!");
-      setVisible(false);
-    } catch (error) {
-      message.error("Verileri gönderirken bir hata oluştu.");
-    }
+  const columns = [
+    {
+      title: "İş Tanımı",
+      dataIndex: "ROL_TANIM",
+      key: "ROL_TANIM",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Oluşturma Tarihi",
+      dataIndex: "ROL_OLUSTURMA_TAR",
+      key: "ROL_OLUSTURMA_TAR",
+      width: 200,
+      ellipsis: true,
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Değiştirme Tarihi",
+      dataIndex: "ROL_DEGISTIRME_TAR",
+      key: "ROL_DEGISTIRME_TAR",
+      width: 200,
+      ellipsis: true,
+      render: (text) => formatDate(text),
+    },
+  ];
+
+  const secilenIsEmriID = watch("secilenIsEmriID");
+
+  const fetch = useCallback(() => {
+    setLoading(true);
+    AxiosInstance.post(`GetOnayRolTanim`)
+      .then((response) => {
+        const fetchedData = response.map((item) => ({
+          ...item,
+          key: item.TB_ROL_ID,
+        }));
+        setData(fetchedData);
+      })
+      .catch((error) => {
+        console.error("API isteği sırasında hata oluştu:", error);
+      })
+      .finally(() => setLoading(false));
+  }, [secilenIsEmriID]);
+
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
+
+  const onRowSelectChange = (newSelectedRowKeys) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
+    setSelectedRows(newSelectedRows); // Update selected rows data
   };
 
-  const handleClose = () => {
-    setVisible(false);
+  const onRowClick = (record) => {
+    setSelectedRow(record);
+    setIsModalVisible(true);
   };
 
-  const handleVisibleChange = (vis) => {
-    if (vis) {
-      handleScreenshot();
-    }
-  };
-
-  const popoverContent = (
-    <div style={{ maxWidth: "300px", position: "relative" }}>
-      <Button
-        type="primary"
-        danger
-        icon={<CloseOutlined />}
-        style={{ position: "absolute", top: "-30px", right: "0px", width: "20px", height: "20px", padding: "10px" }}
-        onClick={handleClose}
-      />
-      <img src={imageData} alt="Screenshot" style={{ width: "100%", marginBottom: "10px" }} />
-      <Text>Talep Nedeni:</Text>
-      <Input placeholder="Başlık" value={inputValue} onChange={(e) => setInputValue(e.target.value)} style={{ marginBottom: "10px" }} />
-      <Text>Açıklama:</Text>
-      <Input.TextArea placeholder="Açıklama" value={textValue} onChange={(e) => setTextValue(e.target.value)} rows={4} style={{ marginBottom: "10px" }} />
-      <Button type="primary" onClick={handleSend} block>
-        Gönder
-      </Button>
-    </div>
-  );
+  const refreshTable = useCallback(() => {
+    fetch();
+  }, [fetch]);
 
   return (
-    <StyledPopover content={popoverContent} title="Fotoğraf Detayları" trigger="click" open={visible} onOpenChange={handleVisibleChange} destroyTooltipOnHide={true}>
-      <Button
-        type="primary"
-        shape="circle"
-        icon={<FaQuestion />}
-        size="large"
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          right: "20px",
-          zIndex: 9999,
-          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+    <div style={{ marginBottom: "25px" }}>
+      <ContextMenu selectedRows={selectedRows} onRefresh={refreshTable} />
+      <CreateModal onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />
+      <Table
+        rowSelection={{
+          type: "radio",
+          selectedRowKeys,
+          onChange: onRowSelectChange,
         }}
-        onClick={() => setVisible(true)}
+        onRow={(record) => ({
+          onClick: () => onRowClick(record),
+        })}
+        columns={columns}
+        dataSource={data}
+        loading={loading}
+        scroll={{
+          y: "calc(100vh - 360px)",
+        }}
       />
-    </StyledPopover>
+      {isModalVisible && (
+        <EditModal
+          selectedRow={selectedRow}
+          isModalVisible={isModalVisible}
+          onModalClose={() => {
+            setIsModalVisible(false);
+            setSelectedRow(null);
+          }}
+          onRefresh={refreshTable}
+          secilenIsEmriID={secilenIsEmriID}
+        />
+      )}
+    </div>
   );
-};
-
-export default FloatButton;
+}

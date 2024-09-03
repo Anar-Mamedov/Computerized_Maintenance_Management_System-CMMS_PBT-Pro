@@ -5,12 +5,14 @@ import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../api/http.jsx";
 import CreateModal from "../Insert/CreateModal.jsx";
 import EditModal from "../Update/EditModal.jsx";
+import ContextMenu from "../components/ContextMenu/ContextMenu.jsx";
 
 export default function MainTable({ isActive }) {
   const [loading, setLoading] = useState(false);
   const { control, watch, setValue } = useFormContext();
   const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]); // New state for selected rows
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
@@ -46,7 +48,7 @@ export default function MainTable({ isActive }) {
 
   const columns = [
     {
-      title: "İş Tanımı",
+      title: "Rol Tanımı",
       dataIndex: "ROL_TANIM",
       key: "ROL_TANIM",
       width: 200,
@@ -70,8 +72,6 @@ export default function MainTable({ isActive }) {
     },
   ];
 
-  const secilenIsEmriID = watch("secilenIsEmriID");
-
   const fetch = useCallback(() => {
     setLoading(true);
     AxiosInstance.post(`GetOnayRolTanim`)
@@ -87,15 +87,17 @@ export default function MainTable({ isActive }) {
         console.error("API isteği sırasında hata oluştu:", error);
       })
       .finally(() => setLoading(false));
-  }, [secilenIsEmriID]); // secilenIsEmriID değiştiğinde fetch fonksiyonunu güncelle
+  }, []); // secilenIsEmriID değiştiğinde fetch fonksiyonunu güncelle
 
   useEffect(() => {
     // secilenIsEmriID'nin varlığını ve geçerliliğini kontrol edin
     fetch(); // fetch fonksiyonunu çağırın
   }, [fetch]); // secilenIsEmriID veya fetch fonksiyonu değiştiğinde useEffect'i tetikle
 
-  const onRowSelectChange = (selectedKeys) => {
-    setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
+  const onRowSelectChange = (newSelectedRowKeys) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
+    setSelectedRows(newSelectedRows); // Update selected rows data
   };
 
   const onRowClick = (record) => {
@@ -105,11 +107,16 @@ export default function MainTable({ isActive }) {
 
   const refreshTable = useCallback(() => {
     fetch(); // fetch fonksiyonu tabloyu yeniler
+    setSelectedRowKeys([]); // Clear selected row keys
+    setSelectedRows([]); // Clear selected rows data
   }, [fetch]);
 
   return (
     <div style={{ marginBottom: "25px" }}>
-      <CreateModal onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTable} />
+        <CreateModal onRefresh={refreshTable} />
+      </div>
       <Table
         rowSelection={{
           type: "radio",
@@ -136,7 +143,6 @@ export default function MainTable({ isActive }) {
             setSelectedRow(null);
           }}
           onRefresh={refreshTable}
-          secilenIsEmriID={secilenIsEmriID}
         />
       )}
     </div>

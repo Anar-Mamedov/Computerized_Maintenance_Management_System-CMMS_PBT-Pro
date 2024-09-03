@@ -33,6 +33,8 @@ import MudaheleSuresi from "./pages/BakımVeArizaYonetimi/MudaheleAnalizi/Mudahe
 import { selectedMenuItemState } from "./state/menuState";
 import FloatButton from "./pages/components/FloatButton/index.jsx";
 import RolTanimlari from "./pages/OnayIslemleri/RolTanimlari/RolTanimlari.jsx";
+import OnayTanimlari from "./pages/OnayIslemleri/OnayTanimlari/OnayTanimlari.jsx";
+import Onaylayicilar from "./pages/OnayIslemleri/Onaylayicilar/Onaylayicilar.jsx";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -244,9 +246,9 @@ export default function App() {
           <Route path="/demo" element={<Dashboard />} />
           <Route path="/userid" element={<UserIdControl />} />
           <Route path="/mudaheleSuresi" element={<MudaheleSuresi />} />
-          <Route path="/onayAyarlar" element={<Hazirlaniyor />} />
+          <Route path="/onayAyarlar" element={<OnayTanimlari />} />
           <Route path="/rolTanimlari" element={<RolTanimlari />} />
-          <Route path="/onaylayicilar" element={<Hazirlaniyor />} />
+          <Route path="/onaylayicilar" element={<Onaylayicilar />} />
           <Route path="/kurallar" element={<Hazirlaniyor />} />
         </Route>
       </Routes>
