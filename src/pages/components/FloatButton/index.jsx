@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Input, Popover, message, Typography } from "antd";
 import { CameraOutlined, CloseOutlined } from "@ant-design/icons";
 import { FaQuestion } from "react-icons/fa";
 import html2canvas from "html2canvas";
 import axios from "axios";
+import styled from "styled-components";
 
 const { Text } = Typography;
 
@@ -50,6 +51,16 @@ const FloatButton = () => {
   const handleVisibleChange = (vis) => {
     if (vis) {
       handleScreenshot();
+      setTimeout(() => {
+        const popoverElements = document.getElementsByClassName("ant-popover");
+        if (popoverElements.length > 0) {
+          const popover = popoverElements[0];
+          popover.style.zIndex = "100000";
+          popover.style.position = "fixed";
+          popover.style.bottom = "70px";
+          popover.style.right = "0";
+        }
+      }, 100); // Popover'un render edilmesi için kısa bir gecikme
     }
   };
 
@@ -74,7 +85,7 @@ const FloatButton = () => {
   );
 
   return (
-    <Popover content={popoverContent} title="Fotoğraf Detayları" trigger="click" open={visible} onOpenChange={handleVisibleChange} destroyTooltipOnHide={true}>
+    <Popover content={popoverContent} title="Talep Detayları" trigger="click" open={visible} onOpenChange={handleVisibleChange} destroyTooltipOnHide={true}>
       <Button
         type="primary"
         shape="circle"
@@ -84,7 +95,7 @@ const FloatButton = () => {
           position: "fixed",
           bottom: "20px",
           right: "20px",
-          zIndex: 1000,
+          zIndex: 9999,
           boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
         }}
         onClick={() => setVisible(true)}
