@@ -1,18 +1,18 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from 'antd';
-import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from '@dnd-kit/core';
-import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { Resizable } from 'react-resizable';
-import './ResizeStyle.css';
-import AxiosInstance from '../../../../api/http';
-import CreateDrawer from '../Insert/CreateDrawer';
-import EditDrawer from '../Update/EditDrawer';
-import Filters from './filter/Filters';
-import ContextMenu from '../components/ContextMenu/ContextMenu';
-import EditDrawer1 from '../../../YardimMasasi/IsTalepleri/Update/EditDrawer';
-import { useFormContext } from 'react-hook-form';
+import React, { useCallback, useEffect, useState } from "react";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
+import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
+import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { Resizable } from "react-resizable";
+import "./ResizeStyle.css";
+import AxiosInstance from "../../../../api/http";
+import CreateDrawer from "../Insert/CreateDrawer";
+import EditDrawer from "../Update/EditDrawer";
+import Filters from "./filter/Filters";
+import ContextMenu from "../components/ContextMenu/ContextMenu";
+import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
+import { useFormContext } from "react-hook-form";
 
 const { Text } = Typography;
 
@@ -23,15 +23,15 @@ const ResizableTitle = (props) => {
 
   // tabloyu genişletmek için kullanılan alanın stil özellikleri
   const handleStyle = {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
-    right: '-5px',
-    width: '20%',
-    height: '100%', // this is the area that is draggable, you can adjust it
+    right: "-5px",
+    width: "20%",
+    height: "100%", // this is the area that is draggable, you can adjust it
     zIndex: 2, // ensure it's above other elements
-    cursor: 'col-resize',
-    padding: '0px',
-    backgroundSize: '0px',
+    cursor: "col-resize",
+    padding: "0px",
+    backgroundSize: "0px",
   };
 
   if (!width) {
@@ -70,9 +70,9 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    backgroundColor: isDragging ? '#f0f0f0' : '',
-    display: 'flex',
-    alignItems: 'center',
+    backgroundColor: isDragging ? "#f0f0f0" : "",
+    display: "flex",
+    alignItems: "center",
     gap: 8,
   };
 
@@ -86,10 +86,10 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
       <div
         {...listeners}
         style={{
-          cursor: 'grab',
+          cursor: "grab",
           flexGrow: 1,
-          display: 'flex',
-          alignItems: 'center',
+          display: "flex",
+          alignItems: "center",
         }}
       >
         <HolderOutlined style={{ marginRight: 8 }} />
@@ -107,11 +107,11 @@ const MainTable = () => {
   const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [searchTimeout, setSearchTimeout] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0); // Toplam sayfa sayısı için state
-  const [label, setLabel] = useState('Yükleniyor...'); // Başlangıç değeri özel alanlar için
+  const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
   const [totalDataCount, setTotalDataCount] = useState(0); // Tüm veriyi tutan state
   const [pageSize, setPageSize] = useState(10); // Başlangıçta sayfa başına 10 kayıt göster
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
@@ -157,26 +157,26 @@ const MainTable = () => {
     // API'den veri çekme işlemi
     const fetchData = async () => {
       try {
-        const response = await AxiosInstance.get('OzelAlan?form=ISEMRI'); // API URL'niz
-        localStorage.setItem('ozelAlanlar', JSON.stringify(response));
+        const response = await AxiosInstance.get("OzelAlan?form=ISEMRI"); // API URL'niz
+        localStorage.setItem("ozelAlanlar", JSON.stringify(response));
         setLabel(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
       } catch (error) {
-        console.error('API isteğinde hata oluştu:', error);
-        setLabel('Hata! Veri yüklenemedi.'); // Hata durumunda kullanıcıya bilgi verme
+        console.error("API isteğinde hata oluştu:", error);
+        setLabel("Hata! Veri yüklenemedi."); // Hata durumunda kullanıcıya bilgi verme
       }
     };
 
     fetchData();
   }, [drawer.visible]);
 
-  const ozelAlanlar = JSON.parse(localStorage.getItem('ozelAlanlar'));
+  const ozelAlanlar = JSON.parse(localStorage.getItem("ozelAlanlar"));
 
   // Özel Alanların nameleri backend çekmek için api isteği sonu
   const initialColumns = [
     {
-      title: 'İş Emri No',
-      dataIndex: 'ISEMRI_NO',
-      key: 'ISEMRI_NO',
+      title: "İş Emri No",
+      dataIndex: "ISEMRI_NO",
+      key: "ISEMRI_NO",
       width: 120,
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
@@ -190,9 +190,9 @@ const MainTable = () => {
       },
     },
     {
-      title: 'Tarih',
-      dataIndex: 'DUZENLEME_TARIH',
-      key: 'DUZENLEME_TARIH',
+      title: "Tarih",
+      dataIndex: "DUZENLEME_TARIH",
+      key: "DUZENLEME_TARIH",
       width: 110,
       ellipsis: true,
       sorter: (a, b) => {
@@ -205,9 +205,9 @@ const MainTable = () => {
       render: (text) => formatDate(text),
     },
     {
-      title: 'Saat',
-      dataIndex: 'DUZENLEME_SAAT',
-      key: 'DUZENLEME_SAAT',
+      title: "Saat",
+      dataIndex: "DUZENLEME_SAAT",
+      key: "DUZENLEME_SAAT",
       width: 90,
       ellipsis: true,
       sorter: (a, b) => {
@@ -220,9 +220,9 @@ const MainTable = () => {
       render: (text) => formatTime(text),
     },
     {
-      title: 'İş Emri Tipi',
-      dataIndex: 'ISEMRI_TIP',
-      key: 'ISEMRI_TIP',
+      title: "İş Emri Tipi",
+      dataIndex: "ISEMRI_TIP",
+      key: "ISEMRI_TIP",
       width: 180,
       ellipsis: true,
       sorter: (a, b) => {
@@ -235,7 +235,7 @@ const MainTable = () => {
       render: (text, record) => (
         <div
           style={{
-            textAlign: 'center',
+            textAlign: "center",
           }}
         >
           <Tag
@@ -251,9 +251,9 @@ const MainTable = () => {
       ),
     },
     {
-      title: 'Konu',
-      dataIndex: 'KONU',
-      key: 'KONU',
+      title: "Konu",
+      dataIndex: "KONU",
+      key: "KONU",
       width: 300,
       ellipsis: true,
       sorter: (a, b) => {
@@ -268,9 +268,9 @@ const MainTable = () => {
     },
 
     {
-      title: 'Durum',
-      dataIndex: 'DURUM',
-      key: 'DURUM',
+      title: "Durum",
+      dataIndex: "DURUM",
+      key: "DURUM",
       width: 120,
       ellipsis: true,
 
@@ -283,25 +283,25 @@ const MainTable = () => {
       },
       render: (text, record) => {
         const circleStyle = {
-          backgroundColor: record.KAPALI ? 'red' : 'green', // KAPALI true ise kırmızı, değilse yeşil
-          borderRadius: '50%',
-          display: 'inline-block',
-          width: '10px',
-          height: '10px',
+          backgroundColor: record.KAPALI ? "red" : "green", // KAPALI true ise kırmızı, değilse yeşil
+          borderRadius: "50%",
+          display: "inline-block",
+          width: "10px",
+          height: "10px",
         };
         return (
           <div>
             <span style={circleStyle}></span>
-            <span style={{ marginLeft: '5px' }}>{text}</span>
+            <span style={{ marginLeft: "5px" }}>{text}</span>
           </div>
         );
       },
     },
 
     {
-      title: 'Lokasyon',
-      dataIndex: 'LOKASYON',
-      key: 'LOKASYON',
+      title: "Lokasyon",
+      dataIndex: "LOKASYON",
+      key: "LOKASYON",
       width: 200,
       ellipsis: true,
 
@@ -314,9 +314,9 @@ const MainTable = () => {
       },
     },
     {
-      title: 'Makine Kodu',
-      dataIndex: 'MAKINE_KODU',
-      key: 'MAKINE_KODU',
+      title: "Makine Kodu",
+      dataIndex: "MAKINE_KODU",
+      key: "MAKINE_KODU",
       width: 150,
       sorter: (a, b) => {
         if (a.MAKINE_KODU === null && b.MAKINE_KODU === null) return 0;
@@ -329,9 +329,9 @@ const MainTable = () => {
       visible: true, // Varsayılan olarak açık
     },
     {
-      title: 'Makine Tanımı',
-      dataIndex: 'MAKINE_TANIMI',
-      key: 'MAKINE_TANIMI',
+      title: "Makine Tanımı",
+      dataIndex: "MAKINE_TANIMI",
+      key: "MAKINE_TANIMI",
       width: 300,
       sorter: (a, b) => {
         if (a.MAKINE_TANIMI === null && b.MAKINE_TANIMI === null) return 0;
@@ -344,9 +344,9 @@ const MainTable = () => {
       visible: true, // Varsayılan olarak açık
     },
     {
-      title: 'Planlanan Başlama Tarihi',
-      dataIndex: 'PLAN_BASLAMA_TARIH',
-      key: 'PLAN_BASLAMA_TARIH',
+      title: "Planlanan Başlama Tarihi",
+      dataIndex: "PLAN_BASLAMA_TARIH",
+      key: "PLAN_BASLAMA_TARIH",
       width: 150,
       sorter: (a, b) => {
         if (a.PLAN_BASLAMA_TARIH === null && b.PLAN_BASLAMA_TARIH === null) return 0;
@@ -361,9 +361,9 @@ const MainTable = () => {
     },
 
     {
-      title: 'Planlanan Başlama Saati',
-      dataIndex: 'PLAN_BASLAMA_SAAT',
-      key: 'PLAN_BASLAMA_SAAT',
+      title: "Planlanan Başlama Saati",
+      dataIndex: "PLAN_BASLAMA_SAAT",
+      key: "PLAN_BASLAMA_SAAT",
       width: 150,
       sorter: (a, b) => {
         if (a.PLAN_BASLAMA_SAAT === null && b.PLAN_BASLAMA_SAAT === null) return 0;
@@ -377,9 +377,9 @@ const MainTable = () => {
       render: (text) => formatTime(text),
     },
     {
-      title: 'Planlanan Bitiş Tarihi',
-      dataIndex: 'PLAN_BITIS_TARIH',
-      key: 'PLAN_BITIS_TARIH',
+      title: "Planlanan Bitiş Tarihi",
+      dataIndex: "PLAN_BITIS_TARIH",
+      key: "PLAN_BITIS_TARIH",
       width: 150,
       ellipsis: true,
 
@@ -387,9 +387,9 @@ const MainTable = () => {
       render: (text) => formatDate(text),
     },
     {
-      title: 'Planlanan Bitiş Saati',
-      dataIndex: 'PLAN_BITIS_SAAT',
-      key: 'PLAN_BITIS_SAAT',
+      title: "Planlanan Bitiş Saati",
+      dataIndex: "PLAN_BITIS_SAAT",
+      key: "PLAN_BITIS_SAAT",
       width: 150,
       ellipsis: true,
 
@@ -397,9 +397,9 @@ const MainTable = () => {
       render: (text) => formatTime(text),
     },
     {
-      title: 'Başlama Tarihi',
-      dataIndex: 'BASLAMA_TARIH',
-      key: 'BASLAMA_TARIH',
+      title: "Başlama Tarihi",
+      dataIndex: "BASLAMA_TARIH",
+      key: "BASLAMA_TARIH",
       width: 110,
       ellipsis: true,
 
@@ -407,9 +407,9 @@ const MainTable = () => {
       render: (text) => formatDate(text),
     },
     {
-      title: 'Başlama Saati',
-      dataIndex: 'BASLAMA_SAAT',
-      key: 'BASLAMA_SAAT',
+      title: "Başlama Saati",
+      dataIndex: "BASLAMA_SAAT",
+      key: "BASLAMA_SAAT",
       width: 90,
       ellipsis: true,
 
@@ -417,9 +417,9 @@ const MainTable = () => {
       render: (text) => formatTime(text),
     },
     {
-      title: 'Bitiş Tarihi',
-      dataIndex: 'ISM_BITIS_TARIH',
-      key: 'ISM_BITIS_TARIH',
+      title: "Bitiş Tarihi",
+      dataIndex: "ISM_BITIS_TARIH",
+      key: "ISM_BITIS_TARIH",
       width: 110,
       ellipsis: true,
 
@@ -427,9 +427,9 @@ const MainTable = () => {
       render: (text) => formatDate(text),
     },
     {
-      title: 'Bitiş Saati',
-      dataIndex: 'ISM_BITIS_SAAT',
-      key: 'ISM_BITIS_SAAT',
+      title: "Bitiş Saati",
+      dataIndex: "ISM_BITIS_SAAT",
+      key: "ISM_BITIS_SAAT",
       width: 90,
       ellipsis: true,
 
@@ -437,9 +437,9 @@ const MainTable = () => {
       render: (text) => formatTime(text),
     },
     {
-      title: 'İş Süresi (dk.)',
-      dataIndex: 'IS_SURESI',
-      key: 'IS_SURESI',
+      title: "İş Süresi (dk.)",
+      dataIndex: "IS_SURESI",
+      key: "IS_SURESI",
       width: 110,
       ellipsis: true,
 
@@ -447,9 +447,9 @@ const MainTable = () => {
       render: (text) => (text > 0 ? text : null),
     },
     {
-      title: 'Tamamlama (%)',
-      dataIndex: 'TAMAMLANMA',
-      key: 'TAMAMLANMA',
+      title: "Tamamlama (%)",
+      dataIndex: "TAMAMLANMA",
+      key: "TAMAMLANMA",
       width: 200,
       ellipsis: true,
 
@@ -457,9 +457,9 @@ const MainTable = () => {
       render: (text) => <Progress percent={text} steps={8} />,
     },
     {
-      title: 'Garanti',
-      dataIndex: 'GARANTI',
-      key: 'GARANTI',
+      title: "Garanti",
+      dataIndex: "GARANTI",
+      key: "GARANTI",
       width: 100,
       ellipsis: true,
 
@@ -468,30 +468,30 @@ const MainTable = () => {
         return record.GARANTI ? (
           <div
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <CheckOutlined style={{ color: 'green' }} />
+            <CheckOutlined style={{ color: "green" }} />
           </div>
         ) : (
           <div
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <CloseOutlined style={{ color: 'red' }} />
+            <CloseOutlined style={{ color: "red" }} />
           </div>
         );
       },
     },
     {
-      title: 'Makine Durumu',
-      dataIndex: 'MAKINE_DURUM',
-      key: 'MAKINE_DURUM',
+      title: "Makine Durumu",
+      dataIndex: "MAKINE_DURUM",
+      key: "MAKINE_DURUM",
       width: 150,
       ellipsis: true,
 
@@ -511,72 +511,72 @@ const MainTable = () => {
     //   visible: false, // Varsayılan olarak kapalı
     // },
     {
-      title: 'Makine Tipi',
-      dataIndex: 'MAKINE_TIP',
-      key: 'MAKINE_TIP',
+      title: "Makine Tipi",
+      dataIndex: "MAKINE_TIP",
+      key: "MAKINE_TIP",
       width: 250,
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: 'Ekipman',
-      dataIndex: 'EKIPMAN',
-      key: 'EKIPMAN',
+      title: "Ekipman",
+      dataIndex: "EKIPMAN",
+      key: "EKIPMAN",
       width: 150,
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: 'İş Tipi',
-      dataIndex: 'IS_TIPI',
-      key: 'IS_TIPI',
+      title: "İş Tipi",
+      dataIndex: "IS_TIPI",
+      key: "IS_TIPI",
       width: 250,
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: 'İş Nedeni',
-      dataIndex: 'IS_NEDENI',
-      key: 'IS_NEDENI',
+      title: "İş Nedeni",
+      dataIndex: "IS_NEDENI",
+      key: "IS_NEDENI",
       width: 150,
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: 'Atölye',
-      dataIndex: 'ATOLYE',
-      key: 'ATOLYE',
+      title: "Atölye",
+      dataIndex: "ATOLYE",
+      key: "ATOLYE",
       width: 150,
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: 'Talimat',
-      dataIndex: 'TALIMAT',
-      key: 'TALIMAT',
+      title: "Talimat",
+      dataIndex: "TALIMAT",
+      key: "TALIMAT",
       width: 250,
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: 'Öncelik',
-      dataIndex: 'ONCELIK',
-      key: 'ONCELIK',
+      title: "Öncelik",
+      dataIndex: "ONCELIK",
+      key: "ONCELIK",
       width: 150,
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: 'Kapanış Tarihi',
-      dataIndex: 'KAPANIS_TARIHI',
-      key: 'KAPANIS_TARIHI',
+      title: "Kapanış Tarihi",
+      dataIndex: "KAPANIS_TARIHI",
+      key: "KAPANIS_TARIHI",
       width: 110,
       ellipsis: true,
 
@@ -584,9 +584,9 @@ const MainTable = () => {
       render: (text) => formatDate(text),
     },
     {
-      title: 'Kapanış Saati',
-      dataIndex: 'KAPANIS_SAATI',
-      key: 'KAPANIS_SAATI',
+      title: "Kapanış Saati",
+      dataIndex: "KAPANIS_SAATI",
+      key: "KAPANIS_SAATI",
       width: 150,
       ellipsis: true,
 
@@ -594,36 +594,36 @@ const MainTable = () => {
       render: (text) => formatTime(text),
     },
     {
-      title: 'Takvim',
-      dataIndex: 'TAKVIM',
-      key: 'TAKVIM',
+      title: "Takvim",
+      dataIndex: "TAKVIM",
+      key: "TAKVIM",
       width: 150,
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: 'Masraf Merkezi',
-      dataIndex: 'MASRAF_MERKEZI',
-      key: 'MASRAF_MERKEZI',
+      title: "Masraf Merkezi",
+      dataIndex: "MASRAF_MERKEZI",
+      key: "MASRAF_MERKEZI",
       width: 150,
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: 'Firma',
-      dataIndex: 'FRIMA',
-      key: 'FRIMA',
+      title: "Firma",
+      dataIndex: "FRIMA",
+      key: "FRIMA",
       width: 150,
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: 'İş Talep Kodu',
-      dataIndex: 'IS_TALEP_NO',
-      key: 'IS_TALEP_NO',
+      title: "İş Talep Kodu",
+      dataIndex: "IS_TALEP_NO",
+      key: "IS_TALEP_NO",
       width: 150,
       ellipsis: true,
       onCell: (record) => ({
@@ -643,18 +643,18 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: 'İş Talep Eden',
-      dataIndex: 'IS_TALEP_EDEN',
-      key: 'IS_TALEP_EDEN',
+      title: "İş Talep Eden",
+      dataIndex: "IS_TALEP_EDEN",
+      key: "IS_TALEP_EDEN",
       width: 150,
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: 'İş Talep Tarihi',
-      dataIndex: 'IS_TALEP_TARIH',
-      key: 'IS_TALEP_TARIH',
+      title: "İş Talep Tarihi",
+      dataIndex: "IS_TALEP_TARIH",
+      key: "IS_TALEP_TARIH",
       width: 150,
       ellipsis: true,
 
@@ -662,27 +662,27 @@ const MainTable = () => {
       render: (text) => formatDate(text),
     },
     {
-      title: 'Personel Adı',
-      dataIndex: 'PERSONEL_ADI',
-      key: 'PERSONEL_ADI',
+      title: "Personel Adı",
+      dataIndex: "PERSONEL_ADI",
+      key: "PERSONEL_ADI",
       width: 180,
       ellipsis: true,
 
       visible: true, // Varsayılan olarak kapalı
     },
     {
-      title: 'Tam Lokasyon',
-      dataIndex: 'TAM_LOKASYON',
-      key: 'TAM_LOKASYON',
+      title: "Tam Lokasyon",
+      dataIndex: "TAM_LOKASYON",
+      key: "TAM_LOKASYON",
       width: 300,
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: 'Ana Lokasyon',
-      dataIndex: 'TAM_LOKASYON',
-      key: 'ANA_LOKASYON',
+      title: "Ana Lokasyon",
+      dataIndex: "TAM_LOKASYON",
+      key: "ANA_LOKASYON",
       ellipsis: true,
       // Enable ellipsis for overflowed content
       width: 300,
@@ -699,42 +699,42 @@ const MainTable = () => {
         if (text === null) {
           return null;
         }
-        const parts = text.split('/');
+        const parts = text.split("/");
         return parts.length > 1 ? parts[0] : text;
       }, // Add this line
       visible: false, // Varsayılan olarak açık
     },
     {
-      title: 'Bildirilen Kat',
-      dataIndex: 'BILDIRILEN_KAT',
-      key: 'BILDIRILEN_KAT',
+      title: "Bildirilen Kat",
+      dataIndex: "BILDIRILEN_KAT",
+      key: "BILDIRILEN_KAT",
       width: 150,
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: 'Bildirilen Bina',
-      dataIndex: 'BILDIRILEN_BINA',
-      key: 'BILDIRILEN_BINA',
+      title: "Bildirilen Bina",
+      dataIndex: "BILDIRILEN_BINA",
+      key: "BILDIRILEN_BINA",
       width: 150,
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: 'Sayaç Değeri',
-      dataIndex: 'GUNCEL_SAYAC_DEGER',
-      key: 'GUNCEL_SAYAC_DEGER',
+      title: "Sayaç Değeri",
+      dataIndex: "GUNCEL_SAYAC_DEGER",
+      key: "GUNCEL_SAYAC_DEGER",
       width: 150,
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: 'Notlar',
-      dataIndex: 'ICERDEKI_NOT',
-      key: 'ICERDEKI_NOT',
+      title: "Notlar",
+      dataIndex: "ICERDEKI_NOT",
+      key: "ICERDEKI_NOT",
       width: 250,
       ellipsis: true,
 
@@ -742,8 +742,8 @@ const MainTable = () => {
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_1 ? ozelAlanlar.OZL_OZEL_ALAN_1 : label && label.OZL_OZEL_ALAN_1}</div>,
-      dataIndex: 'OZEL_ALAN_1',
-      key: 'OZEL_ALAN_1',
+      dataIndex: "OZEL_ALAN_1",
+      key: "OZEL_ALAN_1",
       width: 150,
       ellipsis: true,
 
@@ -751,8 +751,8 @@ const MainTable = () => {
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_2 ? ozelAlanlar.OZL_OZEL_ALAN_2 : label && label.OZL_OZEL_ALAN_2}</div>,
-      dataIndex: 'OZEL_ALAN_2',
-      key: 'OZEL_ALAN_2',
+      dataIndex: "OZEL_ALAN_2",
+      key: "OZEL_ALAN_2",
       width: 150,
       ellipsis: true,
 
@@ -760,8 +760,8 @@ const MainTable = () => {
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_3 ? ozelAlanlar.OZL_OZEL_ALAN_3 : label && label.OZL_OZEL_ALAN_3}</div>,
-      dataIndex: 'OZEL_ALAN_3',
-      key: 'OZEL_ALAN_3',
+      dataIndex: "OZEL_ALAN_3",
+      key: "OZEL_ALAN_3",
       width: 150,
       ellipsis: true,
 
@@ -769,8 +769,8 @@ const MainTable = () => {
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_4 ? ozelAlanlar.OZL_OZEL_ALAN_4 : label && label.OZL_OZEL_ALAN_4}</div>,
-      dataIndex: 'OZEL_ALAN_4',
-      key: 'OZEL_ALAN_4',
+      dataIndex: "OZEL_ALAN_4",
+      key: "OZEL_ALAN_4",
       width: 150,
       ellipsis: true,
 
@@ -778,8 +778,8 @@ const MainTable = () => {
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_5 ? ozelAlanlar.OZL_OZEL_ALAN_5 : label && label.OZL_OZEL_ALAN_5}</div>,
-      dataIndex: 'OZEL_ALAN_5',
-      key: 'OZEL_ALAN_5',
+      dataIndex: "OZEL_ALAN_5",
+      key: "OZEL_ALAN_5",
       width: 150,
       ellipsis: true,
 
@@ -787,8 +787,8 @@ const MainTable = () => {
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_6 ? ozelAlanlar.OZL_OZEL_ALAN_6 : label && label.OZL_OZEL_ALAN_6}</div>,
-      dataIndex: 'OZEL_ALAN_6',
-      key: 'OZEL_ALAN_6',
+      dataIndex: "OZEL_ALAN_6",
+      key: "OZEL_ALAN_6",
       width: 150,
       ellipsis: true,
 
@@ -796,8 +796,8 @@ const MainTable = () => {
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_7 ? ozelAlanlar.OZL_OZEL_ALAN_7 : label && label.OZL_OZEL_ALAN_7}</div>,
-      dataIndex: 'OZEL_ALAN_7',
-      key: 'OZEL_ALAN_7',
+      dataIndex: "OZEL_ALAN_7",
+      key: "OZEL_ALAN_7",
       width: 150,
       ellipsis: true,
 
@@ -805,8 +805,8 @@ const MainTable = () => {
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_8 ? ozelAlanlar.OZL_OZEL_ALAN_8 : label && label.OZL_OZEL_ALAN_8}</div>,
-      dataIndex: 'OZEL_ALAN_8',
-      key: 'OZEL_ALAN_8',
+      dataIndex: "OZEL_ALAN_8",
+      key: "OZEL_ALAN_8",
       width: 150,
       ellipsis: true,
 
@@ -814,8 +814,8 @@ const MainTable = () => {
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_9 ? ozelAlanlar.OZL_OZEL_ALAN_9 : label && label.OZL_OZEL_ALAN_9}</div>,
-      dataIndex: 'OZEL_ALAN_9',
-      key: 'OZEL_ALAN_9',
+      dataIndex: "OZEL_ALAN_9",
+      key: "OZEL_ALAN_9",
       width: 150,
       ellipsis: true,
 
@@ -823,8 +823,8 @@ const MainTable = () => {
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_10 ? ozelAlanlar.OZL_OZEL_ALAN_10 : label && label.OZL_OZEL_ALAN_10}</div>,
-      dataIndex: 'OZEL_ALAN_10',
-      key: 'OZEL_ALAN_10',
+      dataIndex: "OZEL_ALAN_10",
+      key: "OZEL_ALAN_10",
       width: 150,
       ellipsis: true,
 
@@ -832,8 +832,8 @@ const MainTable = () => {
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_11 ? ozelAlanlar.OZL_OZEL_ALAN_11 : label && label.OZL_OZEL_ALAN_11}</div>,
-      dataIndex: 'OZEL_ALAN_11',
-      key: 'OZEL_ALAN_11',
+      dataIndex: "OZEL_ALAN_11",
+      key: "OZEL_ALAN_11",
       width: 150,
       ellipsis: true,
 
@@ -841,8 +841,8 @@ const MainTable = () => {
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_12 ? ozelAlanlar.OZL_OZEL_ALAN_12 : label && label.OZL_OZEL_ALAN_12}</div>,
-      dataIndex: 'OZEL_ALAN_12',
-      key: 'OZEL_ALAN_12',
+      dataIndex: "OZEL_ALAN_12",
+      key: "OZEL_ALAN_12",
       width: 150,
       ellipsis: true,
 
@@ -850,8 +850,8 @@ const MainTable = () => {
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_13 ? ozelAlanlar.OZL_OZEL_ALAN_13 : label && label.OZL_OZEL_ALAN_13}</div>,
-      dataIndex: 'OZEL_ALAN_13',
-      key: 'OZEL_ALAN_13',
+      dataIndex: "OZEL_ALAN_13",
+      key: "OZEL_ALAN_13",
       width: 150,
       ellipsis: true,
 
@@ -859,8 +859,8 @@ const MainTable = () => {
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_14 ? ozelAlanlar.OZL_OZEL_ALAN_14 : label && label.OZL_OZEL_ALAN_14}</div>,
-      dataIndex: 'OZEL_ALAN_14',
-      key: 'OZEL_ALAN_14',
+      dataIndex: "OZEL_ALAN_14",
+      key: "OZEL_ALAN_14",
       width: 150,
       ellipsis: true,
 
@@ -868,8 +868,8 @@ const MainTable = () => {
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_15 ? ozelAlanlar.OZL_OZEL_ALAN_15 : label && label.OZL_OZEL_ALAN_15}</div>,
-      dataIndex: 'OZEL_ALAN_15',
-      key: 'OZEL_ALAN_15',
+      dataIndex: "OZEL_ALAN_15",
+      key: "OZEL_ALAN_15",
       width: 150,
       ellipsis: true,
 
@@ -877,8 +877,8 @@ const MainTable = () => {
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_16 ? ozelAlanlar.OZL_OZEL_ALAN_16 : label && label.OZL_OZEL_ALAN_16}</div>,
-      dataIndex: 'OZEL_ALAN_16',
-      key: 'OZEL_ALAN_16',
+      dataIndex: "OZEL_ALAN_16",
+      key: "OZEL_ALAN_16",
       width: 150,
       ellipsis: true,
 
@@ -886,8 +886,8 @@ const MainTable = () => {
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_17 ? ozelAlanlar.OZL_OZEL_ALAN_17 : label && label.OZL_OZEL_ALAN_17}</div>,
-      dataIndex: 'OZEL_ALAN_17',
-      key: 'OZEL_ALAN_17',
+      dataIndex: "OZEL_ALAN_17",
+      key: "OZEL_ALAN_17",
       width: 150,
       ellipsis: true,
 
@@ -895,8 +895,8 @@ const MainTable = () => {
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_18 ? ozelAlanlar.OZL_OZEL_ALAN_18 : label && label.OZL_OZEL_ALAN_18}</div>,
-      dataIndex: 'OZEL_ALAN_18',
-      key: 'OZEL_ALAN_18',
+      dataIndex: "OZEL_ALAN_18",
+      key: "OZEL_ALAN_18",
       width: 150,
       ellipsis: true,
 
@@ -904,8 +904,8 @@ const MainTable = () => {
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_19 ? ozelAlanlar.OZL_OZEL_ALAN_19 : label && label.OZL_OZEL_ALAN_19}</div>,
-      dataIndex: 'OZEL_ALAN_19',
-      key: 'OZEL_ALAN_19',
+      dataIndex: "OZEL_ALAN_19",
+      key: "OZEL_ALAN_19",
       width: 150,
       ellipsis: true,
 
@@ -913,8 +913,8 @@ const MainTable = () => {
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_20 ? ozelAlanlar.OZL_OZEL_ALAN_20 : label && label.OZL_OZEL_ALAN_20}</div>,
-      dataIndex: 'OZEL_ALAN_20',
-      key: 'OZEL_ALAN_20',
+      dataIndex: "OZEL_ALAN_20",
+      key: "OZEL_ALAN_20",
       width: 150,
       ellipsis: true,
 
@@ -928,38 +928,38 @@ const MainTable = () => {
 
   // Intl.DateTimeFormat kullanarak tarih formatlama
   const formatDate = (date) => {
-    if (!date) return '';
+    if (!date) return "";
 
     // Örnek bir tarih formatla ve ay formatını belirle
     const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
     const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
 
     let monthFormat;
-    if (sampleFormatted.includes('January')) {
-      monthFormat = 'long'; // Tam ad ("January")
-    } else if (sampleFormatted.includes('Jan')) {
-      monthFormat = 'short'; // Üç harfli kısaltma ("Jan")
+    if (sampleFormatted.includes("January")) {
+      monthFormat = "long"; // Tam ad ("January")
+    } else if (sampleFormatted.includes("Jan")) {
+      monthFormat = "short"; // Üç harfli kısaltma ("Jan")
     } else {
-      monthFormat = '2-digit'; // Sayısal gösterim ("01")
+      monthFormat = "2-digit"; // Sayısal gösterim ("01")
     }
 
     // Kullanıcı için tarihi formatla
     const formatter = new Intl.DateTimeFormat(navigator.language, {
-      year: 'numeric',
+      year: "numeric",
       month: monthFormat,
-      day: '2-digit',
+      day: "2-digit",
     });
     return formatter.format(new Date(date));
   };
 
   const formatTime = (time) => {
-    if (!time || time.trim() === '') return ''; // `trim` metodu ile baştaki ve sondaki boşlukları temizle
+    if (!time || time.trim() === "") return ""; // `trim` metodu ile baştaki ve sondaki boşlukları temizle
 
     try {
       // Saati ve dakikayı parçalara ayır, boşlukları temizle
       const [hours, minutes] = time
         .trim()
-        .split(':')
+        .split(":")
         .map((part) => part.trim());
 
       // Saat ve dakika değerlerinin geçerliliğini kontrol et
@@ -967,9 +967,9 @@ const MainTable = () => {
       const minutesInt = parseInt(minutes, 10);
       if (isNaN(hoursInt) || isNaN(minutesInt) || hoursInt < 0 || hoursInt > 23 || minutesInt < 0 || minutesInt > 59) {
         // throw new Error("Invalid time format"); // hata fırlatır ve uygulamanın çalışmasını durdurur
-        console.error('Invalid time format:', time);
+        console.error("Invalid time format:", time);
         // return time; // Hatalı formatı olduğu gibi döndür
-        return ''; // Hata durumunda boş bir string döndür
+        return ""; // Hata durumunda boş bir string döndür
       }
 
       // Geçerli tarih ile birlikte bir Date nesnesi oluştur ve sadece saat ve dakika bilgilerini ayarla
@@ -979,16 +979,16 @@ const MainTable = () => {
       // Kullanıcının lokal ayarlarına uygun olarak saat ve dakikayı formatla
       // `hour12` seçeneğini belirtmeyerek Intl.DateTimeFormat'ın kullanıcının yerel ayarlarına göre otomatik seçim yapmasına izin ver
       const formatter = new Intl.DateTimeFormat(navigator.language, {
-        hour: 'numeric',
-        minute: '2-digit',
+        hour: "numeric",
+        minute: "2-digit",
         // hour12 seçeneği burada belirtilmiyor; böylece otomatik olarak kullanıcının sistem ayarlarına göre belirleniyor
       });
 
       // Formatlanmış saati döndür
       return formatter.format(date);
     } catch (error) {
-      console.error('Error formatting time:', error);
-      return ''; // Hata durumunda boş bir string döndür
+      console.error("Error formatting time:", error);
+      return ""; // Hata durumunda boş bir string döndür
       // return time; // Hatalı formatı olduğu gibi döndür
     }
   };
@@ -996,7 +996,7 @@ const MainTable = () => {
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
   const [body, setBody] = useState({
-    keyword: '',
+    keyword: "",
     filters: {},
   });
 
@@ -1017,7 +1017,7 @@ const MainTable = () => {
     // Arama terimi değiştiğinde ve boş olduğunda API isteğini tetikle
     const timeout = setTimeout(() => {
       if (searchTerm !== body.keyword) {
-        handleBodyChange('keyword', searchTerm);
+        handleBodyChange("keyword", searchTerm);
         setCurrentPage(1); // Arama yapıldığında veya arama sıfırlandığında sayfa numarasını 1'e ayarla
         // setDrawer({ ...drawer, visible: false }); // Arama yapıldığında veya arama sıfırlandığında Drawer'ı kapat
       }
@@ -1032,7 +1032,7 @@ const MainTable = () => {
 
   const fetchEquipmentData = async (body, page, size) => {
     // body'nin undefined olması durumunda varsayılan değerler atanıyor
-    const { keyword = '', filters = {} } = body || {};
+    const { keyword = "", filters = {} } = body || {};
     // page'in undefined olması durumunda varsayılan değer olarak 1 atanıyor
     const currentPage = page || 1;
 
@@ -1054,18 +1054,18 @@ const MainTable = () => {
         setData(formattedData);
         setLoading(false);
       } else {
-        console.error('API response is not in expected format');
+        console.error("API response is not in expected format");
         setLoading(false);
       }
     } catch (error) {
-      console.error('Error in API request:', error);
+      console.error("Error in API request:", error);
       setLoading(false);
       if (navigator.onLine) {
         // İnternet bağlantısı var
-        message.error('Hata Mesajı: ' + error.message);
+        message.error("Hata Mesajı: " + error.message);
       } else {
         // İnternet bağlantısı yok
-        message.error('Internet Bağlantısı Mevcut Değil.');
+        message.error("Internet Bağlantısı Mevcut Değil.");
       }
     }
   };
@@ -1092,9 +1092,9 @@ const MainTable = () => {
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
     if (newSelectedRowKeys.length > 0) {
-      setValue('selectedLokasyonId', newSelectedRowKeys[0]);
+      setValue("selectedLokasyonId", newSelectedRowKeys[0]);
     } else {
-      setValue('selectedLokasyonId', null);
+      setValue("selectedLokasyonId", null);
     }
     // Seçilen satırların verisini bul
     const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
@@ -1102,7 +1102,7 @@ const MainTable = () => {
   };
 
   const rowSelection = {
-    type: 'checkbox',
+    type: "checkbox",
     selectedRowKeys,
     onChange: onSelectChange,
   };
@@ -1143,9 +1143,9 @@ const MainTable = () => {
 
   // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
   const [columns, setColumns] = useState(() => {
-    const savedOrder = localStorage.getItem('columnOrder');
-    const savedVisibility = localStorage.getItem('columnVisibility');
-    const savedWidths = localStorage.getItem('columnWidths');
+    const savedOrder = localStorage.getItem("columnOrder");
+    const savedVisibility = localStorage.getItem("columnVisibility");
+    const savedWidths = localStorage.getItem("columnWidths");
 
     let order = savedOrder ? JSON.parse(savedOrder) : [];
     let visibility = savedVisibility ? JSON.parse(savedVisibility) : {};
@@ -1163,9 +1163,9 @@ const MainTable = () => {
       }
     });
 
-    localStorage.setItem('columnOrder', JSON.stringify(order));
-    localStorage.setItem('columnVisibility', JSON.stringify(visibility));
-    localStorage.setItem('columnWidths', JSON.stringify(widths));
+    localStorage.setItem("columnOrder", JSON.stringify(order));
+    localStorage.setItem("columnVisibility", JSON.stringify(visibility));
+    localStorage.setItem("columnWidths", JSON.stringify(widths));
 
     return order.map((key) => {
       const column = initialColumns.find((col) => col.key === key);
@@ -1176,9 +1176,9 @@ const MainTable = () => {
 
   // sütunları local storage'a kaydediyoruz
   useEffect(() => {
-    localStorage.setItem('columnOrder', JSON.stringify(columns.map((col) => col.key)));
+    localStorage.setItem("columnOrder", JSON.stringify(columns.map((col) => col.key)));
     localStorage.setItem(
-      'columnVisibility',
+      "columnVisibility",
       JSON.stringify(
         columns.reduce(
           (acc, col) => ({
@@ -1190,7 +1190,7 @@ const MainTable = () => {
       )
     );
     localStorage.setItem(
-      'columnWidths',
+      "columnWidths",
       JSON.stringify(
         columns.reduce(
           (acc, col) => ({
@@ -1266,10 +1266,10 @@ const MainTable = () => {
   // sütunları sıfırlamak için kullanılan fonksiyon
 
   function resetColumns() {
-    localStorage.removeItem('columnOrder');
-    localStorage.removeItem('columnVisibility');
-    localStorage.removeItem('columnWidths');
-    localStorage.removeItem('ozelAlanlar');
+    localStorage.removeItem("columnOrder");
+    localStorage.removeItem("columnVisibility");
+    localStorage.removeItem("columnWidths");
+    localStorage.removeItem("ozelAlanlar");
     window.location.reload();
   }
 
@@ -1278,41 +1278,41 @@ const MainTable = () => {
   return (
     <>
       <Modal title="Sütunları Yönet" centered width={800} open={isModalVisible} onOk={() => setIsModalVisible(false)} onCancel={() => setIsModalVisible(false)}>
-        <Text style={{ marginBottom: '15px' }}>Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını Ayarlayabilirsiniz.</Text>
+        <Text style={{ marginBottom: "15px" }}>Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını Ayarlayabilirsiniz.</Text>
         <div
           style={{
-            display: 'flex',
-            width: '100%',
-            justifyContent: 'center',
-            marginTop: '10px',
+            display: "flex",
+            width: "100%",
+            justifyContent: "center",
+            marginTop: "10px",
           }}
         >
-          <Button onClick={resetColumns} style={{ marginBottom: '15px' }}>
+          <Button onClick={resetColumns} style={{ marginBottom: "15px" }}>
             Sütunları Sıfırla
           </Button>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
           <div
             style={{
-              width: '46%',
-              border: '1px solid #8080806e',
-              borderRadius: '8px',
-              padding: '10px',
+              width: "46%",
+              border: "1px solid #8080806e",
+              borderRadius: "8px",
+              padding: "10px",
             }}
           >
             <div
               style={{
-                marginBottom: '20px',
-                borderBottom: '1px solid #80808051',
-                padding: '8px 8px 12px 8px',
+                marginBottom: "20px",
+                borderBottom: "1px solid #80808051",
+                padding: "8px 8px 12px 8px",
               }}
             >
               <Text style={{ fontWeight: 600 }}>Sütunları Göster / Gizle</Text>
             </div>
-            <div style={{ height: '400px', overflow: 'auto' }}>
+            <div style={{ height: "400px", overflow: "auto" }}>
               {initialColumns.map((col) => (
-                <div style={{ display: 'flex', gap: '10px' }} key={col.key}>
+                <div style={{ display: "flex", gap: "10px" }} key={col.key}>
                   <Checkbox checked={columns.find((column) => column.key === col.key)?.visible || false} onChange={(e) => toggleVisibility(col.key, e.target.checked)} />
                   {col.title}
                 </div>
@@ -1331,22 +1331,22 @@ const MainTable = () => {
           >
             <div
               style={{
-                width: '46%',
-                border: '1px solid #8080806e',
-                borderRadius: '8px',
-                padding: '10px',
+                width: "46%",
+                border: "1px solid #8080806e",
+                borderRadius: "8px",
+                padding: "10px",
               }}
             >
               <div
                 style={{
-                  marginBottom: '20px',
-                  borderBottom: '1px solid #80808051',
-                  padding: '8px 8px 12px 8px',
+                  marginBottom: "20px",
+                  borderBottom: "1px solid #80808051",
+                  padding: "8px 8px 12px 8px",
                 }}
               >
                 <Text style={{ fontWeight: 600 }}>Sütunların Sıralamasını Ayarla</Text>
               </div>
-              <div style={{ height: '400px', overflow: 'auto' }}>
+              <div style={{ height: "400px", overflow: "auto" }}>
                 <SortableContext items={columns.filter((col) => col.visible).map((col) => col.key)} strategy={verticalListSortingStrategy}>
                   {columns
                     .filter((col) => col.visible)
@@ -1361,50 +1361,50 @@ const MainTable = () => {
       </Modal>
       <div
         style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'space-between',
-          marginBottom: '20px',
-          gap: '10px',
-          padding: '0 5px',
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+          marginBottom: "20px",
+          gap: "10px",
+          padding: "0 5px",
         }}
       >
         <div
           style={{
-            display: 'flex',
-            gap: '10px',
-            alignItems: 'center',
-            width: '100%',
-            maxWidth: '935px',
-            flexWrap: 'wrap',
+            display: "flex",
+            gap: "10px",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "935px",
+            flexWrap: "wrap",
           }}
         >
           <Button
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '0px 8px',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0px 8px",
               // width: "32px",
-              height: '32px',
+              height: "32px",
             }}
             onClick={() => setIsModalVisible(true)}
           >
             <MenuOutlined />
           </Button>
           <Input
-            style={{ width: '250px' }}
+            style={{ width: "250px" }}
             type="text"
             placeholder="Arama yap..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            prefix={<SearchOutlined style={{ color: '#0091ff' }} />}
+            prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
           <Filters onChange={handleBodyChange} />
           {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: "flex", gap: "10px" }}>
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
         </div>
@@ -1421,16 +1421,16 @@ const MainTable = () => {
             pageSize: pageSize,
             defaultPageSize: 10,
             showSizeChanger: true,
-            pageSizeOptions: ['10', '20', '50', '100'],
-            position: ['bottomRight'],
+            pageSizeOptions: ["10", "20", "50", "100"],
+            position: ["bottomRight"],
             onChange: handleTableChange,
             showTotal: (total, range) => `Toplam ${total}`, // Burada 'total' parametresi doğru kayıt sayısını yansıtacaktır
             showQuickJumper: true,
           }}
           // onRow={onRowClick}
-          scroll={{ y: 'calc(100vh - 370px)' }}
+          scroll={{ y: "calc(100vh - 370px)" }}
           onChange={handleTableChange}
-          rowClassName={(record) => (record.IST_DURUM_ID === 0 ? 'boldRow' : '')}
+          rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
         />
       </Spin>
       <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />

@@ -5,55 +5,26 @@ import { Controller, useForm, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
 import MainTabs from "./MainTabs/MainTabs.jsx";
 
-export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh, secilenIsEmriID }) {
+const { Text, Link } = Typography;
+const { TextArea } = Input;
+
+export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh }) {
   const methods = useForm({
     defaultValues: {
-      siraNo: "",
-      secilenID: "",
-      isTanimi: "",
-      yapildi: false,
-      atolyeTanim: "",
-      atolyeID: "",
-      personelTanim: "",
-      personelID: "",
-      baslangicTarihi: "",
-      baslangicSaati: "",
-      vardiya: "",
-      vardiyaID: "",
-      bitisTarihi: "",
-      bitisSaati: "",
-      sure: "",
-      aciklama: "",
+      rolTanim: "",
       // Add other default values here
     },
   });
 
-  const { setValue, reset, handleSubmit } = methods;
+  const { setValue, reset, handleSubmit, control } = methods;
 
   useEffect(() => {
     if (isModalVisible && selectedRow) {
-      setValue("secilenID", selectedRow.key);
-      setValue("siraNo", selectedRow.DKN_SIRANO);
-      setValue("isTanimi", selectedRow.DKN_TANIM);
-      setValue("yapildi", selectedRow.DKN_YAPILDI);
-      setValue("atolyeTanim", selectedRow.DKN_ATOLYE_TANIM);
-      setValue("atolyeID", selectedRow.DKN_YAPILDI_ATOLYE_ID);
-      setValue("personelTanim", selectedRow.DKN_PERSONEL_ISIM);
-      setValue("personelID", selectedRow.DKN_YAPILDI_PERSONEL_ID);
-      setValue("baslangicTarihi", selectedRow.DKN_YAPILDI_TARIH ? (dayjs(selectedRow.DKN_YAPILDI_TARIH).isValid() ? dayjs(selectedRow.DKN_YAPILDI_TARIH) : null) : null);
-      setValue(
-        "baslangicSaati",
-        selectedRow.DKN_YAPILDI_SAAT ? (dayjs(selectedRow.DKN_YAPILDI_SAAT, "HH:mm:ss").isValid() ? dayjs(selectedRow.DKN_YAPILDI_SAAT, "HH:mm:ss") : null) : null
-      );
-
-      setValue("vardiya", selectedRow.DKN_VARDIYA_TANIM);
-      setValue("vardiyaID", selectedRow.DKN_YAPILDI_MESAI_KOD_ID);
-      setValue("bitisTarihi", selectedRow.DKN_BITIS_TARIH ? (dayjs(selectedRow.DKN_BITIS_TARIH).isValid() ? dayjs(selectedRow.DKN_BITIS_TARIH) : null) : null);
-      setValue("bitisSaati", selectedRow.DKN_BITIS_SAAT ? (dayjs(selectedRow.DKN_BITIS_SAAT, "HH:mm:ss").isValid() ? dayjs(selectedRow.DKN_BITIS_SAAT, "HH:mm:ss") : null) : null);
-      setValue("sure", selectedRow.DKN_YAPILDI_SURE);
-      setValue("aciklama", selectedRow.DKN_ACIKLAMA);
+      setValue("rolTanim", selectedRow.ROL_TANIM);
     }
   }, [selectedRow, isModalVisible, setValue]);
+
+  console.log(selectedRow);
 
   useEffect(() => {
     if (!isModalVisible) {
@@ -75,25 +46,12 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
 
   const onSubmited = (data) => {
     const Body = {
-      TB_ISEMRI_KONTROLLIST_ID: data.secilenID,
-      DKN_SIRANO: data.siraNo,
-      DKN_YAPILDI: data.yapildi,
-      DKN_TANIM: data.isTanimi,
-      // DKN_MALIYET: data.maliyet, // Maliyet diye bir alan yok frontda
-      DKN_YAPILDI_PERSONEL_ID: data.personelID,
-      DKN_YAPILDI_ATOLYE_ID: data.atolyeID,
-      DKN_YAPILDI_SURE: data.sure,
-      DKN_ACIKLAMA: data.aciklama,
-      DKN_YAPILDI_KOD_ID: -1,
-      DKN_REF_ID: -1,
-      DKN_YAPILDI_TARIH: formatDateWithDayjs(data.baslangicTarihi),
-      DKN_YAPILDI_SAAT: formatTimeWithDayjs(data.baslangicSaati),
-      DKN_BITIS_TARIH: formatDateWithDayjs(data.bitisTarihi),
-      DKN_BITIS_SAAT: formatTimeWithDayjs(data.bitisSaati),
-      DKN_YAPILDI_MESAI_KOD_ID: data.vardiyaID,
+      TB_ROL_ID: selectedRow.key,
+      ROL_TANIM: data.rolTanim,
+      ROL_DEGISTIRME_TAR: dayjs().format("YYYY-MM-DD"),
     };
 
-    AxiosInstance.post(`AddUpdateIsEmriKontrolList?isEmriId=${secilenIsEmriID}`, Body)
+    AxiosInstance.post(`UpdateOnayRolTanim`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
 
@@ -121,9 +79,47 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   return (
     <FormProvider {...methods}>
       <div>
-        <Modal width="800px" title="Kontrol Listesi Güncelle" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={onModalClose}>
+        <Modal width="500px" title="Rol Tanımı Güncelle" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={onModalClose}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
-            <MainTabs />
+            {/*<MainTabs />*/}
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "450px",
+                gap: "10px",
+                rowGap: "0px",
+                marginBottom: "10px",
+              }}
+            >
+              <Text style={{ fontSize: "14px", fontWeight: "600" }}>Rol Tanımı:</Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  maxWidth: "300px",
+                  minWidth: "300px",
+                  gap: "10px",
+                  width: "100%",
+                }}
+              >
+                <Controller
+                  name="rolTanim"
+                  control={control}
+                  rules={{ required: "Alan Boş Bırakılamaz!" }}
+                  render={({ field, fieldState: { error } }) => (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+                      <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
+                      {error && <div style={{ color: "red" }}>{error.message}</div>}
+                    </div>
+                  )}
+                />
+              </div>
+            </div>
           </form>
         </Modal>
       </div>
