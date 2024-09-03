@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { Spin, Typography, Table } from "antd";
+import { Spin, Typography } from "antd";
 import AxiosInstance from "../../../../api/http.jsx";
 import { useFormContext } from "react-hook-form";
 
@@ -25,6 +25,11 @@ function AylikOrtalamaMudaheleSuresi() {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const { watch } = useFormContext();
+  const [visibleSeries, setVisibleSeries] = useState({
+    MaxMudahaleSuresi: true,
+    MinMudahaleSuresi: true,
+    AvgMudahaleSuresi: true,
+  });
 
   const lokasyonId = watch("locationIds");
   const atolyeId = watch("atolyeIds");
@@ -59,45 +64,105 @@ function AylikOrtalamaMudaheleSuresi() {
     fetchData();
   }, [lokasyonId, atolyeId, baslangicTarihi, bitisTarihi]);
 
-  const columns = [
-    {
-      title: "",
-      dataIndex: "type",
-      key: "type",
-    },
-    ...(data?.map((item) => ({
-      title: item.Ay,
-      dataIndex: item.Ay,
-      key: item.Ay,
-    })) || []),
-  ];
+  // grafikteki serilerin görünürlüğünü değiştirmek için kullanılır
 
-  const dataSource = [
-    {
-      key: "avg",
-      type: "Ortalama",
-      ...(data?.reduce((acc, item) => {
-        acc[item.Ay] = item.AvgMudahaleSuresi;
-        return acc;
-      }, {}) || {}),
-    },
-    {
-      key: "min",
-      type: "Min",
-      ...(data?.reduce((acc, item) => {
-        acc[item.Ay] = item.MinMudahaleSuresi;
-        return acc;
-      }, {}) || {}),
-    },
-    {
-      key: "max",
-      type: "Max",
-      ...(data?.reduce((acc, item) => {
-        acc[item.Ay] = item.MaxMudahaleSuresi;
-        return acc;
-      }, {}) || {}),
-    },
-  ];
+  const handleLegendClick = (dataKey) => {
+    setVisibleSeries((prev) => ({
+      ...prev,
+      [dataKey]: !prev[dataKey],
+    }));
+  };
+
+  const CustomLegend = ({ payload }) => {
+    const customNames = {
+      MaxMudahaleSuresi: "Max Müdahale Süresi",
+      MinMudahaleSuresi: "Min Müdahale Süresi",
+      AvgMudahaleSuresi: "Ortalama Müdahale Süresi",
+    };
+
+    const handleToggleAll = () => {
+      const allVisible = Object.values(visibleSeries).every((value) => value);
+      setVisibleSeries({
+        MaxMudahaleSuresi: !allVisible,
+        MinMudahaleSuresi: !allVisible,
+        AvgMudahaleSuresi: !allVisible,
+      });
+    };
+
+    return (
+      <ul
+        style={{
+          listStyle: "none",
+          padding: 0,
+          display: "flex",
+          gap: "15px",
+          justifyContent: "center",
+          margin: 0,
+        }}
+      >
+        <li
+          style={{
+            cursor: "pointer",
+            color: Object.values(visibleSeries).every((value) => value) ? "black" : "gray",
+          }}
+          onClick={handleToggleAll}
+        >
+          Tümü
+        </li>
+        {payload.map((entry, index) => (
+          <li
+            key={`item-${index}`}
+            style={{
+              cursor: "pointer",
+              color: visibleSeries[entry.dataKey] ? entry.color : "gray",
+            }}
+            onClick={() => handleLegendClick(entry.dataKey)}
+          >
+            <span
+              style={{
+                display: "inline-block",
+                width: "10px",
+                height: "10px",
+                backgroundColor: visibleSeries[entry.dataKey] ? entry.color : "gray",
+                marginRight: "5px",
+              }}
+            ></span>
+            {customNames[entry.dataKey] || entry.value}
+          </li>
+        ))}
+      </ul>
+    );
+  };
+
+  // grafikteki serilerin görünürlüğünü değiştirmek için kullanılır sonu
+
+  // Custom Tooltip iöin kullanılır tool tipte rakamların sonuna birimini yazmak için
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div
+          className="custom-tooltip"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "5px",
+            backgroundColor: "#fff",
+            padding: "10px",
+            border: "1px solid #ccc",
+          }}
+        >
+          <div className="label">{`Ay: ${label}`}</div>
+          {payload.map((entry, index) => (
+            <div key={`item-${index}`} style={{ color: entry.color }}>{`${entry.name}: ${entry.value.toLocaleString("tr-TR")}  (dk.)`}</div>
+          ))}
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  // Custom Tooltip iöin kullanılır tool tipte rakamların sonuna birimini yazmak için
 
   return (
     <div
@@ -145,14 +210,14 @@ function AylikOrtalamaMudaheleSuresi() {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="Ay" />
               <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="MaxMudahaleSuresi" fill="#ff7f7f" name="Max Müdahale Süresi" />
-              <Bar dataKey="MinMudahaleSuresi" fill="#82ca9d" name="Min Müdahale Süresi" />
-              <Bar dataKey="AvgMudahaleSuresi" fill="#8884d8" name="Ortalama Müdahale Süresi" />
+              <Tooltip content={<CustomTooltip />} />
+              {/*<Tooltip />*/}
+              <Legend content={<CustomLegend />} />
+              <Bar dataKey="MaxMudahaleSuresi" fill="#ff7f7f" hide={!visibleSeries.MaxMudahaleSuresi} name="Max Müdahale Süresi" />
+              <Bar dataKey="MinMudahaleSuresi" fill="#82ca9d" hide={!visibleSeries.MinMudahaleSuresi} name="Min Müdahale Süresi" />
+              <Bar dataKey="AvgMudahaleSuresi" fill="#8884d8" hide={!visibleSeries.AvgMudahaleSuresi} name="Ortalama Müdahale Süresi" />
             </BarChart>
           </ResponsiveContainer>
-          {/*<Table columns={columns} dataSource={dataSource} pagination={false} size="small" bordered style={{ marginTop: "20px" }} />*/}
         </>
       )}
     </div>

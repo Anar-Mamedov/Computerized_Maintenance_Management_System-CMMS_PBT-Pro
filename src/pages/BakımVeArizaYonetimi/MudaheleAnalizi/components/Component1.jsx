@@ -39,11 +39,11 @@ function Component1() {
     fetchData();
   }, [lokasyonId, atolyeId, baslangicTarihi, bitisTarihi]);
 
-  const renderCard = (value, label, backgroundColor) => (
+  const renderCard = (value, label, backgroundColor, appendUnit) => (
     <div
       style={{
-        flex: "1 1 16%", // Değiştirdim
-        maxWidth: "16%", // Değiştirdim
+        flex: "1 1 16%",
+        maxWidth: "16%",
         background: backgroundColor || `url(${bg}), linear-gradient(rgb(27 17 92), #007eff)`,
         backgroundPosition: "inherit",
         backgroundSize: "cover",
@@ -59,7 +59,16 @@ function Component1() {
       ) : (
         <div style={{ display: "flex", justifyContent: "space-between", cursor: "pointer" }}>
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <Text style={{ fontWeight: "500", fontSize: "35px", color: "white" }}>{value !== undefined ? value : ""}</Text>
+            <Text style={{ fontWeight: "500", fontSize: "35px", color: "white" }}>
+              {value !== undefined ? (
+                <>
+                  {value}
+                  {appendUnit && <span style={{ fontSize: "20px" }}> (dk.)</span>}
+                </>
+              ) : (
+                ""
+              )}
+            </Text>
             <Text style={{ color: "white", fontSize: "15px", fontWeight: "400" }}>{label}</Text>
           </div>
           {/*<ClockCircleOutlined style={{ fontSize: "60px", color: "rgba(255,255,255,.8)" }} />*/}
@@ -77,12 +86,12 @@ function Component1() {
         justifyContent: "space-between",
       }}
     >
-      {renderCard(data?.ToplamTalepSayisi, "Toplam Talep Sayısı", "linear-gradient(to right, #ff7e5f, #feb47b)")}
-      {renderCard(data?.OrtalamaMudahaleSuresi, "Ortalama Müdahale Süresi", "linear-gradient(to right, #6a11cb, #2575fc)")}
-      {renderCard(data?.EnHizliMudahaleSuresi, "En Hızlı Müdahale Süresi", "linear-gradient(to right, #43cea2, #185a9d)")}
-      {renderCard(data?.EnYavasMudahaleSuresi, "En Yavaş Müdahale Süresi", "linear-gradient(to right, #ff4e50, #f9d423)")}
-      {renderCard(data?.OrtalamaCalismaSuresi, "Ortalama Çalışma Süresi", "linear-gradient(to right, #00c6ff, #0072ff)")}
-      {renderCard(data?.ToplamCalismaSuresi, "Toplam Çalışma Süresi", "linear-gradient(to right, #f7971e, #ffd200)")}
+      {renderCard(data?.ToplamTalepSayisi, "Toplam Talep Sayısı", "linear-gradient(to right, #ff7e5f, #feb47b)", false)}
+      {renderCard(data?.OrtalamaMudahaleSuresi, "Ortalama Müdahale Süresi", "linear-gradient(to right, #6a11cb, #2575fc)", true)}
+      {renderCard(data?.EnHizliMudahaleSuresi, "En Hızlı Müdahale Süresi", "linear-gradient(to right, #43cea2, #185a9d)", true)}
+      {renderCard(data?.EnYavasMudahaleSuresi, "En Yavaş Müdahale Süresi", "linear-gradient(to right, #ff4e50, #f9d423)", true)}
+      {renderCard(data?.OrtalamaCalismaSuresi, "Ortalama Çalışma Süresi", "linear-gradient(to right, #00c6ff, #0072ff)", true)}
+      {renderCard(data?.ToplamCalismaSuresi, "Toplam Çalışma Süresi", "linear-gradient(to right, #f7971e, #ffd200)", true)}
     </div>
   );
 }

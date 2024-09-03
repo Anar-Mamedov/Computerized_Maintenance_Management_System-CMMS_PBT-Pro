@@ -75,7 +75,7 @@ function AylikOrtalamaMudaheleSuresi() {
   const dataSource = [
     {
       key: "avg",
-      type: "Ortalama",
+      type: "Ortalama (dk.)",
       ...(data?.reduce((acc, item) => {
         acc[item.Ay] = item.AvgMudahaleSuresi;
         return acc;
@@ -83,7 +83,7 @@ function AylikOrtalamaMudaheleSuresi() {
     },
     {
       key: "min",
-      type: "Min",
+      type: "Min (dk.)",
       ...(data?.reduce((acc, item) => {
         acc[item.Ay] = item.MinMudahaleSuresi;
         return acc;
@@ -91,7 +91,7 @@ function AylikOrtalamaMudaheleSuresi() {
     },
     {
       key: "max",
-      type: "Max",
+      type: "Max (dk.)",
       ...(data?.reduce((acc, item) => {
         acc[item.Ay] = item.MaxMudahaleSuresi;
         return acc;

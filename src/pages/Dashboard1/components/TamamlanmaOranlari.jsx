@@ -1,24 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  LabelList,
-  ResponsiveContainer,
-} from "recharts";
-import {
-  Button,
-  Popover,
-  Spin,
-  Typography,
-  Modal,
-  DatePicker,
-  Tour,
-} from "antd";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LabelList, ResponsiveContainer } from "recharts";
+import { Button, Popover, Spin, Typography, Modal, DatePicker, Tour } from "antd";
 import AxiosInstance from "../../../api/http.jsx";
 import { MoreOutlined, PrinterOutlined } from "@ant-design/icons";
 import { Controller, useFormContext } from "react-hook-form";
@@ -27,21 +9,7 @@ import html2pdf from "html2pdf.js";
 
 const { Text } = Typography;
 
-const monthNames = [
-  "",
-  "Ocak",
-  "Şubat",
-  "Mart",
-  "Nisan",
-  "Mayıs",
-  "Haziran",
-  "Temmuz",
-  "Ağustos",
-  "Eylül",
-  "Ekim",
-  "Kasım",
-  "Aralık",
-];
+const monthNames = ["", "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
 
 function TamamlanmaOranlari(props = {}) {
   const [data, setData] = useState(null);
@@ -83,9 +51,7 @@ function TamamlanmaOranlari(props = {}) {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const response = await AxiosInstance.get(
-        `GetTamamlanmisIsEmirleriIsTalepleri?ID=2&year=${baslamaTarihi}`
-      );
+      const response = await AxiosInstance.get(`GetTamamlanmisIsEmirleriIsTalepleri?ID=2&year=${baslamaTarihi}`);
 
       const transformedData = response.reduce((acc, item) => {
         const monthName = monthNames[item.AY];
@@ -160,9 +126,7 @@ function TamamlanmaOranlari(props = {}) {
         <li
           style={{
             cursor: "pointer",
-            color: Object.values(visibleSeries).every((value) => value)
-              ? "black"
-              : "gray",
+            color: Object.values(visibleSeries).every((value) => value) ? "black" : "gray",
           }}
           onClick={handleToggleAll}
         >
@@ -182,9 +146,7 @@ function TamamlanmaOranlari(props = {}) {
                 display: "inline-block",
                 width: "10px",
                 height: "10px",
-                backgroundColor: visibleSeries[entry.dataKey]
-                  ? entry.color
-                  : "gray",
+                backgroundColor: visibleSeries[entry.dataKey] ? entry.color : "gray",
                 marginRight: "5px",
               }}
             ></span>
@@ -228,10 +190,7 @@ function TamamlanmaOranlari(props = {}) {
 
   const content = (
     <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-      <div
-        style={{ cursor: "pointer" }}
-        onClick={() => setIsExpandedModalVisible(true)}
-      >
+      <div style={{ cursor: "pointer" }} onClick={() => setIsExpandedModalVisible(true)}>
         Büyüt
       </div>
       <Popover placement="right" content={content1} trigger="click">
@@ -255,18 +214,13 @@ function TamamlanmaOranlari(props = {}) {
           }}
         >
           <p>
-            Bu grafikte, belirli bir zaman diliminde tamamlanmış iş talepleri ve
-            iş emirleri oranları gösterilmektedir. Grafik, yatay eksende zamanı
-            (örneğin, günler, haftalar veya aylar) ve dikey eksende tamamlanmış
-            iş talepleri ve iş emirleri sayısını göstermektedir. Her bir çubuk,
-            toplam iş talepleri veya iş emirleri sayısına göre tamamlanmış
+            Bu grafikte, belirli bir zaman diliminde tamamlanmış iş talepleri ve iş emirleri oranları gösterilmektedir. Grafik, yatay eksende zamanı (örneğin, günler, haftalar veya
+            aylar) ve dikey eksende tamamlanmış iş talepleri ve iş emirleri sayısını göstermektedir. Her bir çubuk, toplam iş talepleri veya iş emirleri sayısına göre tamamlanmış
             olanları temsil etmektedir.
           </p>
           <p>
-            Bu grafik, yöneticilere belirli bir dönemdeki işlerin ne kadarının
-            tamamlandığını görsel olarak göstererek performansı
-            değerlendirmelerine yardımcı olabilir. Ayrıca trendleri izlemek ve
-            performansı zaman içinde karşılaştırmak için kullanılabilir.
+            Bu grafik, yöneticilere belirli bir dönemdeki işlerin ne kadarının tamamlandığını görsel olarak göstererek performansı değerlendirmelerine yardımcı olabilir. Ayrıca
+            trendleri izlemek ve performansı zaman içinde karşılaştırmak için kullanılabilir.
           </p>
         </div>
       ),
@@ -298,9 +252,7 @@ function TamamlanmaOranlari(props = {}) {
         }}
       >
         <Text
-          title={`Tamamlanmış İş Talepleri ve İş Emirleri Oranları${
-            baslamaTarihi ? ` (${baslamaTarihi})` : ""
-          }`}
+          title={`Tamamlanmış İş Talepleri ve İş Emirleri Oranları${baslamaTarihi ? ` (${baslamaTarihi})` : ""}`}
           style={{
             fontWeight: "500",
             fontSize: "17px",
@@ -325,9 +277,7 @@ function TamamlanmaOranlari(props = {}) {
               zIndex: 3,
             }}
           >
-            <MoreOutlined
-              style={{ cursor: "pointer", fontWeight: "500", fontSize: "16px" }}
-            />
+            <MoreOutlined style={{ cursor: "pointer", fontWeight: "500", fontSize: "16px" }} />
           </Button>
         </Popover>
       </div>
@@ -361,22 +311,10 @@ function TamamlanmaOranlari(props = {}) {
                 <YAxis />
                 <Tooltip />
                 <Legend content={<CustomLegend />} />
-                <Bar
-                  dataKey="IsEmri"
-                  stackId="a"
-                  fill="#8884d8"
-                  hide={!visibleSeries.IsEmri}
-                  name="İş Emri"
-                >
+                <Bar dataKey="IsEmri" stackId="a" fill="#8884d8" hide={!visibleSeries.IsEmri} name="İş Emri">
                   {/*<LabelList dataKey="IsEmri" position="insideTop" />*/}
                 </Bar>
-                <Bar
-                  dataKey="IsTalebi"
-                  stackId="a"
-                  fill="#82ca9d"
-                  hide={!visibleSeries.IsTalebi}
-                  name="İş Talebi"
-                >
+                <Bar dataKey="IsTalebi" stackId="a" fill="#82ca9d" hide={!visibleSeries.IsTalebi} name="İş Talebi">
                   {/*<LabelList dataKey="IsTalebi" position="insideTop" />*/}
                 </Bar>
               </BarChart>
@@ -386,14 +324,7 @@ function TamamlanmaOranlari(props = {}) {
       )}
 
       <Tour open={open} onClose={() => setOpen(false)} steps={steps} />
-      <Modal
-        title="Tarih Seçimi"
-        centered
-        open={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        destroyOnClose
-      >
+      <Modal title="Tarih Seçimi" centered open={isModalVisible} onOk={handleOk} onCancel={handleCancel} destroyOnClose>
         {modalContent === "Yıl Seç" && (
           <div
             style={{
@@ -407,14 +338,7 @@ function TamamlanmaOranlari(props = {}) {
             <Controller
               name="yilSecimi1"
               control={control}
-              render={({ field }) => (
-                <DatePicker
-                  {...field}
-                  picker="year"
-                  style={{ width: "130px" }}
-                  placeholder="Tarih seçiniz"
-                />
-              )}
+              render={({ field }) => <DatePicker {...field} picker="year" style={{ width: "130px" }} placeholder="Tarih seçiniz" />}
             />
           </div>
         )}
@@ -431,9 +355,7 @@ function TamamlanmaOranlari(props = {}) {
             }}
           >
             <Text
-              title={`Tamamlanmış İş Talepleri ve İş Emirleri Oranları${
-                baslamaTarihi ? ` (${baslamaTarihi})` : ""
-              }`}
+              title={`Tamamlanmış İş Talepleri ve İş Emirleri Oranları${baslamaTarihi ? ` (${baslamaTarihi})` : ""}`}
               style={{
                 fontWeight: "500",
                 fontSize: "17px",
@@ -446,10 +368,7 @@ function TamamlanmaOranlari(props = {}) {
               Tamamlanmış İş Talepleri ve İş Emirleri Oranları
               {baslamaTarihi && ` (${baslamaTarihi})`}
             </Text>
-            <PrinterOutlined
-              style={{ cursor: "pointer", fontSize: "20px" }}
-              onClick={downloadPDF}
-            />
+            <PrinterOutlined style={{ cursor: "pointer", fontSize: "20px" }} onClick={downloadPDF} />
           </div>
         }
         centered
@@ -485,31 +404,11 @@ function TamamlanmaOranlari(props = {}) {
               <YAxis />
               <Tooltip />
               <Legend content={<CustomLegend />} />
-              <Bar
-                dataKey="IsEmri"
-                stackId="a"
-                fill="#8884d8"
-                hide={!visibleSeries.IsEmri}
-                name="İş Emri"
-              >
-                <LabelList
-                  style={{ fill: "white" }}
-                  dataKey="IsEmri"
-                  position="insideTop"
-                />
+              <Bar dataKey="IsEmri" stackId="a" fill="#8884d8" hide={!visibleSeries.IsEmri} name="İş Emri">
+                <LabelList style={{ fill: "white" }} dataKey="IsEmri" position="insideTop" />
               </Bar>
-              <Bar
-                dataKey="IsTalebi"
-                stackId="a"
-                fill="#82ca9d"
-                hide={!visibleSeries.IsTalebi}
-                name="İş Talebi"
-              >
-                <LabelList
-                  style={{ fill: "white" }}
-                  dataKey="IsTalebi"
-                  position="insideTop"
-                />
+              <Bar dataKey="IsTalebi" stackId="a" fill="#82ca9d" hide={!visibleSeries.IsTalebi} name="İş Talebi">
+                <LabelList style={{ fill: "white" }} dataKey="IsTalebi" position="insideTop" />
               </Bar>
             </BarChart>
           </ResponsiveContainer>

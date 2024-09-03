@@ -1,111 +1,162 @@
-import React, { useEffect, useState } from "react";
-import { Button, Modal, message } from "antd";
-import { CheckOutlined } from "@ant-design/icons";
-import { Controller, useForm, FormProvider } from "react-hook-form";
-import AxiosInstance from "../../../../../../api/http";
-import dayjs from "dayjs";
-import AtolyeIsEmriCevir from "./AtolyeIsEmriCevir";
+import React, { useState, useEffect } from "react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { Spin, Typography, Table } from "antd";
+import AxiosInstance from "../../../../api/http.jsx";
+import { useFormContext } from "react-hook-form";
 
-export default function AtolyeSubmit({ selectedRows, refreshTableData }) {
-  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-  const [loading, setLoading] = useState(false); // Add loading state
-  const methods = useForm({
-    defaultValues: {
-      atolyeTanim: "",
-      atolyeID: "",
-    },
-  });
-  const { setValue, reset, handleSubmit, watch } = methods;
+const { Text } = Typography;
 
-  const formatDateWithDayjs = (dateString) => {
-    const formattedDate = dayjs(dateString);
-    return formattedDate.isValid() ? formattedDate.format("YYYY-MM-DD") : "";
+const monthMap = {
+  January: "Ocak",
+  February: "Şubat",
+  March: "Mart",
+  April: "Nisan",
+  May: "Mayıs",
+  June: "Haziran",
+  July: "Temmuz",
+  August: "Ağustos",
+  September: "Eylül",
+  October: "Ekim",
+  November: "Kasım",
+  December: "Aralık",
+};
+
+function AylikOrtalamaMudaheleSuresi() {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { watch } = useFormContext();
+
+  const lokasyonId = watch("locationIds");
+  const atolyeId = watch("atolyeIds");
+  const baslangicTarihi = watch("baslangicTarihi");
+  const bitisTarihi = watch("bitisTarihi");
+  const yil = baslangicTarihi ? new Date(baslangicTarihi).getFullYear() : "";
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    const body = {
+      LokasyonId: lokasyonId || "",
+      AtolyeId: atolyeId || "",
+      BaslangicTarih: baslangicTarihi || "",
+      BitisTarih: bitisTarihi || "",
+      Yil: yil || "",
+    };
+    try {
+      const response = await AxiosInstance.post(`GetMudahaleAnalizAvgMudahaleGraph`, body);
+      const translatedData = response.map((item) => ({
+        ...item,
+        Ay: monthMap[item.Ay], // Ay'ları Türkçeye çeviriyoruz
+      }));
+      setData(translatedData);
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
-
-  const formatTimeWithDayjs = (timeObj) => {
-    const formattedTime = dayjs(timeObj);
-    return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
-  };
-
-  const atolyeID = watch("atolyeID");
 
   useEffect(() => {
-    const tbIsTalepId = selectedRows.map((row) => row.key).join(",");
-    const isValidStatus = selectedRows.every((row) => [0, 1, 2].includes(row.IST_DURUM_ID));
+    fetchData();
+  }, [lokasyonId, atolyeId, baslangicTarihi, bitisTarihi]);
 
-    setIsButtonDisabled(!atolyeID || !tbIsTalepId || !isValidStatus);
-  }, [atolyeID, selectedRows]);
+  const columns = [
+    {
+      title: "",
+      dataIndex: "type",
+      key: "type",
+    },
+    ...(data?.map((item) => ({
+      title: item.Ay,
+      dataIndex: item.Ay,
+      key: item.Ay,
+    })) || []),
+  ];
 
-  const onSubmited = (data) => {
-    setLoading(true); // Set loading to true when form is submitted
-    const atolyeIDValue = watch("atolyeID");
-
-    const Body = selectedRows.map((row) => ({
-      TALEP_ID: row.key,
-      ATOLYE_ID: atolyeIDValue,
-      ISM_WEB: true,
-      TEKNISYEN_IDS: [],
-    }));
-
-    AxiosInstance.post(`IsTalepToIsEmri`, Body)
-      .then((response) => {
-        console.log("Data sent successfully:", response);
-        reset();
-        setTimeout(() => {
-          refreshTableData();
-        }, 1000);
-        if (response.status_code === 200 || response.status_code === 201) {
-          const aciklamaValues = response.isEmriNolari.map((item) => item.Aciklama).join(", ");
-          message.success(aciklamaValues + " Numaralı İş Emirleri Oluşturulmuştur.");
-        } else if (response.status_code === 401) {
-          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
-        } else {
-          message.error("Ekleme Başarısız.");
-        }
-      })
-      .catch((error) => {
-        console.error("Error sending data:", error);
-        if (navigator.onLine) {
-          message.error("Hata Mesajı: " + error.message);
-        } else {
-          message.error("Internet Bağlantısı Mevcut Değil.");
-        }
-      })
-      .finally(() => {
-        setLoading(false); // Reset loading state after form submission is complete
-      });
-
-    console.log({ Body });
-  };
+  const dataSource = [
+    {
+      key: "avg",
+      type: "Ortalama",
+      ...(data?.reduce((acc, item) => {
+        acc[item.Ay] = item.AvgMudahaleSuresi;
+        return acc;
+      }, {}) || {}),
+    },
+    {
+      key: "min",
+      type: "Min",
+      ...(data?.reduce((acc, item) => {
+        acc[item.Ay] = item.MinMudahaleSuresi;
+        return acc;
+      }, {}) || {}),
+    },
+    {
+      key: "max",
+      type: "Max",
+      ...(data?.reduce((acc, item) => {
+        acc[item.Ay] = item.MaxMudahaleSuresi;
+        return acc;
+      }, {}) || {}),
+    },
+  ];
 
   return (
-    <FormProvider {...methods}>
-      <div style={{ display: "flex", width: "100%", maxWidth: "315px" }}>
-        <form style={{ width: "100%" }} onSubmit={methods.handleSubmit(onSubmited)}>
-          <AtolyeIsEmriCevir selectedRows={selectedRows} />
-        </form>
-        <Button
-          style={{
-            padding: "0px 0px",
-            width: "32px",
-            height: "32px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          type="submit"
-          onClick={methods.handleSubmit(onSubmited)}
-          disabled={isButtonDisabled || loading} // Disable button if loading
-          loading={loading} // Show loading spinner
-        >
-          <CheckOutlined
-            style={{
-              color: isButtonDisabled ? "grey" : "rgb(0, 211, 0)",
-              fontSize: "18px",
-            }}
-          />
-        </Button>
-      </div>
-    </FormProvider>
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        borderRadius: "5px",
+        backgroundColor: "white",
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+        border: "1px solid #f0f0f0",
+        padding: "10px",
+      }}
+    >
+      <Text
+        style={{
+          fontWeight: "500",
+          fontSize: "17px",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          maxWidth: "100%",
+          marginBottom: "10px",
+        }}
+      >
+        Aylık Müdahale Süreleri {yil}
+      </Text>
+      {isLoading ? (
+        <Spin />
+      ) : (
+        <>
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart
+              width={500}
+              height={300}
+              data={data}
+              margin={{
+                top: 20,
+                right: 30,
+                left: 20,
+                bottom: 5,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="Ay" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="MaxMudahaleSuresi" fill="#ff7f7f" name="Max Müdahale Süresi" />
+              <Bar dataKey="MinMudahaleSuresi" fill="#82ca9d" name="Min Müdahale Süresi" />
+              <Bar dataKey="AvgMudahaleSuresi" fill="#8884d8" name="Ortalama Müdahale Süresi" />
+            </BarChart>
+          </ResponsiveContainer>
+          {/*<Table columns={columns} dataSource={dataSource} pagination={false} size="small" bordered style={{ marginTop: "20px" }} />*/}
+        </>
+      )}
+    </div>
   );
 }
+
+export default AylikOrtalamaMudaheleSuresi;
