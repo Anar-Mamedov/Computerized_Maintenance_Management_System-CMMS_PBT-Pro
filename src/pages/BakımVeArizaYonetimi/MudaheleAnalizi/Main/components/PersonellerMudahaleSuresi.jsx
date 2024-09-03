@@ -111,7 +111,7 @@ function PersonellerMudahaleSuresi(props) {
       },
     },
     {
-      title: "Ortalama Müdahale Süresi",
+      title: "Ortalama Müdahale Süresi (dk.)",
       dataIndex: "OrtalamaMudahaleSuresi",
       // width: 100,
       ellipsis: true,

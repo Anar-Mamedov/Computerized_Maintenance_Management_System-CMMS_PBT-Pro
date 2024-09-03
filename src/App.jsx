@@ -232,7 +232,6 @@ export default function App() {
           <Route path="/otomatikKodlar" element={<Hazirlaniyor />} />
           <Route path="/servisOncelikSeviyeleri" element={<Hazirlaniyor />} />
           <Route path="/isEmriTipleri" element={<IsEmriTipleri />} />
-          <Route path="/onaylayicilar" element={<Hazirlaniyor />} />
           <Route path="/projeTanimlari" element={<Hazirlaniyor />} />
           <Route path="/lokasyon" element={<LokasyonTanim />} />
           <Route path="/vardiyalar" element={<VardiyaTanim />} />
@@ -244,6 +243,10 @@ export default function App() {
           <Route path="/demo" element={<Dashboard />} />
           <Route path="/userid" element={<UserIdControl />} />
           <Route path="/mudaheleSuresi" element={<MudaheleSuresi />} />
+          <Route path="/onayAyarlar" element={<Hazirlaniyor />} />
+          <Route path="/rolTanimlari" element={<Hazirlaniyor />} />
+          <Route path="/onaylayicilar" element={<Hazirlaniyor />} />
+          <Route path="/kurallar" element={<Hazirlaniyor />} />
         </Route>
       </Routes>
     </RecoilRoot>

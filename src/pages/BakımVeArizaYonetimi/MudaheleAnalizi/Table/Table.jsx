@@ -8,11 +8,11 @@ import { Resizable } from "react-resizable";
 import "./ResizeStyle.css";
 import AxiosInstance from "../../../../api/http";
 // import CreateDrawer from '../Insert/CreateDrawer';
-// import EditDrawer from '../Update/EditDrawer';
+import EditDrawer from "../../IsEmri/Update/EditDrawer.jsx";
 // import Filters from "./filter/Filters";
 import Filters1 from "./Filters/Filters.jsx";
 // import ContextMenu from "../components/ContextMenu/ContextMenu";
-// import EditDrawer1 from '../../../YardimMasasi/IsTalepleri/Update/EditDrawer';
+import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
 import { useFormContext } from "react-hook-form";
 
 const { Text } = Typography;
@@ -188,7 +188,13 @@ const MainTable = () => {
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
       render: (text, record) => (
-        <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
+        <a
+          onClick={() => {
+            setDrawer({ visible: true, data: record });
+          }}
+        >
+          {text}
+        </a>
       ),
       sorter: (a, b) => {
         if (a.ISM_ISEMRI_NO === null) return -1;
@@ -204,7 +210,18 @@ const MainTable = () => {
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
       render: (text, record) => (
-        <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
+        <a
+          onClick={() => {
+            // Create a copy of the record and update the key value
+            const updatedRecord = { ...record, key: record.ISM_IS_TALEP_ID };
+
+            // Set the updated record to EditDrawer1 data and make the drawer visible
+            setEditDrawer1Data(updatedRecord);
+            setEditDrawer1Visible(true);
+          }}
+        >
+          {text}
+        </a>
       ),
       sorter: (a, b) => {
         if (a.IST_KOD === null) return -1;
@@ -796,17 +813,11 @@ const MainTable = () => {
           rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
         />
       </Spin>
-      {/*<EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />*/}
+      <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
 
-      {/*{editDrawer1Visible && (*/}
-      {/*  <EditDrawer1*/}
-      {/*    selectedRow={editDrawer1Data}*/}
-      {/*    onDrawerClose={() => setEditDrawer1Visible(false)}*/}
-      {/*    drawerVisible={editDrawer1Visible}*/}
-      {/*    onRefresh={() => {*/}
-      {/*    }}*/}
-      {/*  />*/}
-      {/*)}*/}
+      {editDrawer1Visible && (
+        <EditDrawer1 selectedRow={editDrawer1Data} onDrawerClose={() => setEditDrawer1Visible(false)} drawerVisible={editDrawer1Visible} onRefresh={() => {}} />
+      )}
     </div>
   );
 };

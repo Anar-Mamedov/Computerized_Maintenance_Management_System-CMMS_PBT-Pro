@@ -26,6 +26,10 @@ const Breadcrumbs = () => {
     "/servisOncelikSeviyeleri": "Servis Öncelik Seviyeleri",
     "/isEmriTipleri": "İş Emri Tipleri",
     "/onaylayicilar": "Onaylayıcılar",
+    "/rolTanimlari": "Rol Tanımları",
+    "/onayIslemleri": "Onay İşlemleri",
+    "/onayAyarlar": "Onay Ayarları",
+    "/kurallar": "Kurallar",
     "/projeTanimlari": "Proje Tanımları",
     "/lokasyon": "Lokasyon Tanımları",
     "/vardiyalar": "Vardiya Tanımları",
@@ -36,7 +40,7 @@ const Breadcrumbs = () => {
     "/isTalepleri": "İş Talepleri",
     "/demo": "Demo",
     "/userid": "User ID Control",
-    "/mudaheleSuresi": "Müdahale Süresi",
+    "/mudaheleSuresi": "Müdahale Süresi Analizi",
     // Diğer route'lar için ekleyin...
   };
 
