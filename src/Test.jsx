@@ -1,162 +1,103 @@
-import React, { useState, useEffect } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { Spin, Typography, Table } from "antd";
-import AxiosInstance from "../../../../api/http.jsx";
-import { useFormContext } from "react-hook-form";
+import React, { useState } from "react";
+import { Button, Input, Popover, message, Typography } from "antd";
+import { CameraOutlined, CloseOutlined } from "@ant-design/icons";
+import { FaQuestion } from "react-icons/fa";
+import html2canvas from "html2canvas";
+import axios from "axios";
+import styled from "styled-components";
 
 const { Text } = Typography;
 
-const monthMap = {
-  January: "Ocak",
-  February: "Şubat",
-  March: "Mart",
-  April: "Nisan",
-  May: "Mayıs",
-  June: "Haziran",
-  July: "Temmuz",
-  August: "Ağustos",
-  September: "Eylül",
-  October: "Ekim",
-  November: "Kasım",
-  December: "Aralık",
-};
+const StyledPopover = styled(Popover)`
+  .ant-popover {
+    z-index: 10000 !important; /* Ensure the popover stays on top */
+  }
+`;
 
-function AylikOrtalamaMudaheleSuresi() {
-  const [data, setData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const { watch } = useFormContext();
+const FloatButton = () => {
+  const [imageData, setImageData] = useState(null);
+  const [inputValue, setInputValue] = useState("");
+  const [textValue, setTextValue] = useState("");
+  const [visible, setVisible] = useState(false);
 
-  const lokasyonId = watch("locationIds");
-  const atolyeId = watch("atolyeIds");
-  const baslangicTarihi = watch("baslangicTarihi");
-  const bitisTarihi = watch("bitisTarihi");
-  const yil = baslangicTarihi ? new Date(baslangicTarihi).getFullYear() : "";
+  const handleScreenshot = () => {
+    html2canvas(document.body, {
+      scale: 2,
+      useCORS: true,
+      logging: true,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      windowWidth: document.documentElement.scrollWidth,
+      windowHeight: document.documentElement.scrollHeight,
+    }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png", 1.0);
+      setImageData(imgData);
+      setVisible(true);
+    });
+  };
 
-  const fetchData = async () => {
-    setIsLoading(true);
-    const body = {
-      LokasyonId: lokasyonId || "",
-      AtolyeId: atolyeId || "",
-      BaslangicTarih: baslangicTarihi || "",
-      BitisTarih: bitisTarihi || "",
-      Yil: yil || "",
-    };
+  const handleSend = async () => {
     try {
-      const response = await AxiosInstance.post(`GetMudahaleAnalizAvgMudahaleGraph`, body);
-      const translatedData = response.map((item) => ({
-        ...item,
-        Ay: monthMap[item.Ay], // Ay'ları Türkçeye çeviriyoruz
-      }));
-      setData(translatedData);
+      await axios.post("YOUR_API_ENDPOINT", {
+        image: imageData,
+        input: inputValue,
+        text: textValue,
+      });
+      message.success("Veriler başarıyla gönderildi!");
+      setVisible(false);
     } catch (error) {
-      console.error("Failed to fetch data:", error);
-    } finally {
-      setIsLoading(false);
+      message.error("Verileri gönderirken bir hata oluştu.");
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, [lokasyonId, atolyeId, baslangicTarihi, bitisTarihi]);
+  const handleClose = () => {
+    setVisible(false);
+  };
 
-  const columns = [
-    {
-      title: "",
-      dataIndex: "type",
-      key: "type",
-    },
-    ...(data?.map((item) => ({
-      title: item.Ay,
-      dataIndex: item.Ay,
-      key: item.Ay,
-    })) || []),
-  ];
+  const handleVisibleChange = (vis) => {
+    if (vis) {
+      handleScreenshot();
+    }
+  };
 
-  const dataSource = [
-    {
-      key: "avg",
-      type: "Ortalama",
-      ...(data?.reduce((acc, item) => {
-        acc[item.Ay] = item.AvgMudahaleSuresi;
-        return acc;
-      }, {}) || {}),
-    },
-    {
-      key: "min",
-      type: "Min",
-      ...(data?.reduce((acc, item) => {
-        acc[item.Ay] = item.MinMudahaleSuresi;
-        return acc;
-      }, {}) || {}),
-    },
-    {
-      key: "max",
-      type: "Max",
-      ...(data?.reduce((acc, item) => {
-        acc[item.Ay] = item.MaxMudahaleSuresi;
-        return acc;
-      }, {}) || {}),
-    },
-  ];
-
-  return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        borderRadius: "5px",
-        backgroundColor: "white",
-        display: "flex",
-        flexDirection: "column",
-        gap: "10px",
-        border: "1px solid #f0f0f0",
-        padding: "10px",
-      }}
-    >
-      <Text
-        style={{
-          fontWeight: "500",
-          fontSize: "17px",
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          maxWidth: "100%",
-          marginBottom: "10px",
-        }}
-      >
-        Aylık Müdahale Süreleri {yil}
-      </Text>
-      {isLoading ? (
-        <Spin />
-      ) : (
-        <>
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart
-              width={500}
-              height={300}
-              data={data}
-              margin={{
-                top: 20,
-                right: 30,
-                left: 20,
-                bottom: 5,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="Ay" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="MaxMudahaleSuresi" fill="#ff7f7f" name="Max Müdahale Süresi" />
-              <Bar dataKey="MinMudahaleSuresi" fill="#82ca9d" name="Min Müdahale Süresi" />
-              <Bar dataKey="AvgMudahaleSuresi" fill="#8884d8" name="Ortalama Müdahale Süresi" />
-            </BarChart>
-          </ResponsiveContainer>
-          {/*<Table columns={columns} dataSource={dataSource} pagination={false} size="small" bordered style={{ marginTop: "20px" }} />*/}
-        </>
-      )}
+  const popoverContent = (
+    <div style={{ maxWidth: "300px", position: "relative" }}>
+      <Button
+        type="primary"
+        danger
+        icon={<CloseOutlined />}
+        style={{ position: "absolute", top: "-30px", right: "0px", width: "20px", height: "20px", padding: "10px" }}
+        onClick={handleClose}
+      />
+      <img src={imageData} alt="Screenshot" style={{ width: "100%", marginBottom: "10px" }} />
+      <Text>Talep Nedeni:</Text>
+      <Input placeholder="Başlık" value={inputValue} onChange={(e) => setInputValue(e.target.value)} style={{ marginBottom: "10px" }} />
+      <Text>Açıklama:</Text>
+      <Input.TextArea placeholder="Açıklama" value={textValue} onChange={(e) => setTextValue(e.target.value)} rows={4} style={{ marginBottom: "10px" }} />
+      <Button type="primary" onClick={handleSend} block>
+        Gönder
+      </Button>
     </div>
   );
-}
 
-export default AylikOrtalamaMudaheleSuresi;
+  return (
+    <StyledPopover content={popoverContent} title="Fotoğraf Detayları" trigger="click" open={visible} onOpenChange={handleVisibleChange} destroyTooltipOnHide={true}>
+      <Button
+        type="primary"
+        shape="circle"
+        icon={<FaQuestion />}
+        size="large"
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          right: "20px",
+          zIndex: 9999,
+          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+        }}
+        onClick={() => setVisible(true)}
+      />
+    </StyledPopover>
+  );
+};
+
+export default FloatButton;
