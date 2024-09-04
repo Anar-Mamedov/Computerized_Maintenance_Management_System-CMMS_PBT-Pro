@@ -166,7 +166,7 @@ const rawItems = [
         "onayIslemleri",
         "",
         [
-          getItem("Ayarlar", "onayAyarlar", true),
+          getItem("Onay Tanımları", "onayTanimlari", true),
           getItem("Rol Tanımları", "rolTanimlari", true),
           getItem("Onaylayıcılar", "onaylayicilar", true),
           getItem("Kurallar", "kurallar", true),
@@ -246,7 +246,7 @@ export default function App() {
           <Route path="/demo" element={<Dashboard />} />
           <Route path="/userid" element={<UserIdControl />} />
           <Route path="/mudaheleSuresi" element={<MudaheleSuresi />} />
-          <Route path="/onayAyarlar" element={<OnayTanimlari />} />
+          <Route path="/onayTanimlari" element={<OnayTanimlari />} />
           <Route path="/rolTanimlari" element={<RolTanimlari />} />
           <Route path="/onaylayicilar" element={<Onaylayicilar />} />
           <Route path="/kurallar" element={<Hazirlaniyor />} />

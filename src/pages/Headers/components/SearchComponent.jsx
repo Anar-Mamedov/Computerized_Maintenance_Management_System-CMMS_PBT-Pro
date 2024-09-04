@@ -28,7 +28,7 @@ const SearchComponent = () => {
     { path: "/servisOncelikSeviyeleri", label: "Servis Öncelik Seviyeleri", key: "servisOncelikSeviyeleri" },
     { path: "/isEmriTipleri", label: "İş Emri Tipleri", key: "isEmriTipleri" },
     { path: "/onaylayicilar", label: "Onaylayıcılar", key: "onaylayicilar" },
-    { path: "/onayAyarlar", label: "Onay Ayarları", key: "onayAyarlar" },
+    { path: "/onayAyarlar", label: "Onay Tanımları", key: "onayTanimlari" },
     { path: "/rolTanimlari", label: "Rol Tanımları", key: "rolTanimlari" },
     { path: "/kurallar", label: "Kurallar", key: "kurallar" },
     { path: "/projeTanimlari", label: "Proje Tanımları", key: "projeTanimlari" },
