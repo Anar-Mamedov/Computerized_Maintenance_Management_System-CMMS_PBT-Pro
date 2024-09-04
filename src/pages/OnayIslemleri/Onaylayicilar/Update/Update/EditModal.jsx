@@ -9,9 +9,15 @@ const { Text, Link } = Typography;
 const { TextArea } = Input;
 
 export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh }) {
+  const [header, setHeader] = useState("");
   const methods = useForm({
     defaultValues: {
       rolTanim: "",
+      rolID: "",
+      onayTanim: "",
+      onayID: "",
+      lokasyonTanim: "",
+      lokasyonID: "",
       // Add other default values here
     },
   });
@@ -20,11 +26,15 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
 
   useEffect(() => {
     if (isModalVisible && selectedRow) {
-      setValue("rolTanim", selectedRow.ONY_TANIM);
+      setValue("rolTanim", selectedRow.ROL_TANIM);
+      setValue("rolID", selectedRow.ONYK_ROL_ID);
+      setValue("onayTanim", selectedRow.ONY_TANIM);
+      setValue("onayID", selectedRow.ONYK_ID);
+      setValue("lokasyonTanim", selectedRow.LOK_TANIM);
+      setValue("lokasyonID", selectedRow.ONYK_LOKASYON_ID);
+      setHeader(selectedRow.KLL_TANIM);
     }
   }, [selectedRow, isModalVisible, setValue]);
-
-  console.log(selectedRow);
 
   useEffect(() => {
     if (!isModalVisible) {
@@ -47,10 +57,10 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   const onSubmited = (data) => {
     const Body = {
       TB_ONAY_KUL_ID: selectedRow.key,
-      ONYK_ROL_ID: 8,
-      ONYK_ID: 3,
-      ONYK_KUL_ID: 25,
-      ONYK_LOKASYON_ID: 3,
+      ONYK_ROL_ID: data.rolID,
+      ONYK_ID: data.onayID,
+      ONYK_KUL_ID: selectedRow.ONYK_KUL_ID,
+      ONYK_LOKASYON_ID: data.lokasyonID,
     };
 
     AxiosInstance.post(`UpdateOnayKullanici`, Body)
@@ -81,7 +91,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   return (
     <FormProvider {...methods}>
       <div>
-        <Modal width="500px" title="Onay Tanımı Güncelle" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={onModalClose}>
+        <Modal width="500px" title={`${header} - Onaylayıcı Listesi`} open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={onModalClose}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <MainTabs />
           </form>

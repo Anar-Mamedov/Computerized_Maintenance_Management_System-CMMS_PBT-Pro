@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Input, Modal, Table } from "antd";
-import AxiosInstance from "../../../../../../api/http";
+import AxiosInstance from "../../../../../../../api/http";
 
 // Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
 const normalizeText = (text) => {
@@ -21,7 +21,7 @@ const normalizeText = (text) => {
     .replace(/Ç/g, "C");
 };
 
-export default function PersonelTablo({ workshopSelectedId, onSubmit }) {
+export default function RolTablo({ workshopSelectedId, onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
@@ -30,64 +30,69 @@ export default function PersonelTablo({ workshopSelectedId, onSubmit }) {
   const [searchTerm1, setSearchTerm1] = useState("");
   const [filteredData1, setFilteredData1] = useState([]);
 
+  // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
+
+  // Intl.DateTimeFormat kullanarak tarih formatlama
+  const formatDate = (date) => {
+    if (!date) return "";
+
+    // Örnek bir tarih formatla ve ay formatını belirle
+    const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
+
+    let monthFormat;
+    if (sampleFormatted.includes("January")) {
+      monthFormat = "long"; // Tam ad ("January")
+    } else if (sampleFormatted.includes("Jan")) {
+      monthFormat = "short"; // Üç harfli kısaltma ("Jan")
+    } else {
+      monthFormat = "2-digit"; // Sayısal gösterim ("01")
+    }
+
+    // Kullanıcı için tarihi formatla
+    const formatter = new Intl.DateTimeFormat(navigator.language, {
+      year: "numeric",
+      month: monthFormat,
+      day: "2-digit",
+    });
+    return formatter.format(new Date(date));
+  };
+
+  // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
+
   const columns = [
     {
-      title: "Personel Kodu",
-      dataIndex: "code",
-      key: "code",
+      title: "Rol Tanımı",
+      dataIndex: "ROL_TANIM",
+      key: "ROL_TANIM",
       width: "150px",
       ellipsis: true,
     },
     {
-      title: "Personel Adı",
-      dataIndex: "subject",
-      key: "subject",
+      title: "Oluşturma Tarihi",
+      dataIndex: "ROL_OLUSTURMA_TAR",
+      key: "ROL_OLUSTURMA_TAR",
       width: "150px",
       ellipsis: true,
+      render: (text) => formatDate(text),
     },
     {
-      title: "Ünvan",
-      dataIndex: "workdays",
-      key: "workdays",
+      title: "Değiştirme Tarihi",
+      dataIndex: "ROL_DEGISTIRME_TAR",
+      key: "ROL_DEGISTIRME_TAR",
       width: "150px",
       ellipsis: true,
-    },
-    {
-      title: "Personel Tipi",
-      dataIndex: "description",
-      key: "description",
-      width: "150px",
-      ellipsis: true,
-    },
-
-    {
-      title: "Departman",
-      dataIndex: "fifthcolumn",
-      key: "fifthcolumn",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Lokasyon",
-      dataIndex: "sixthcolumn",
-      key: "sixthcolumn",
-      width: "150px",
-      ellipsis: true,
+      render: (text) => formatDate(text),
     },
   ];
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`Personel`)
+    AxiosInstance.post(`GetOnayRolTanim`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
-          key: item.TB_PERSONEL_ID,
-          code: item.PRS_PERSONEL_KOD,
-          subject: item.PRS_ISIM,
-          workdays: item.PRS_UNVAN,
-          description: item.PRS_TIP,
-          fifthcolumn: item.PRS_DEPARTMAN,
-          sixthcolumn: item.PRS_LOKASYON,
+          ...item,
+          key: item.TB_ROL_ID,
         }));
         setData(fetchedData);
       })
@@ -136,7 +141,7 @@ export default function PersonelTablo({ workshopSelectedId, onSubmit }) {
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
-      <Modal width={1200} centered title="Personel" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
+      <Modal width={1200} centered title="Rol Listesi" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <Input placeholder="Arama..." value={searchTerm1} onChange={handleSearch1} style={{ width: "300px", marginBottom: "15px" }} />
         <Table
           rowSelection={{

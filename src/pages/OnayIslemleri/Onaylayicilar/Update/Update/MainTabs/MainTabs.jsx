@@ -3,10 +3,9 @@ import { Button, Modal, Input, Typography, Tabs, DatePicker, TimePicker, InputNu
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import dayjs from "dayjs";
-import SertifikaTipi from "./components/SertifikaTipi.jsx";
-import AtolyeTablo from "./components/AtolyeTablo.jsx";
-import PersonelTablo from "./components/PersonelTablo.jsx";
-import VardiyaSelect from "./components/VardiyaSelect.jsx";
+import RolTablo from "./components/RolTablo.jsx";
+import OnayTablo from "./components/OnayTablo.jsx";
+import LokasyonTablo from "./components/LokasyonTablo.jsx";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -62,45 +61,20 @@ export default function MainTabs() {
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const { control, watch, setValue } = useFormContext();
 
-  const yapildi = watch("yapildi");
-
-  const handleAtolyeMinusClick = () => {
-    setValue("atolyeTanim", "");
-    setValue("atolyeID", "");
-  };
-
   const handlePersonelMinusClick = () => {
-    setValue("personelTanim", "");
-    setValue("personelID", "");
+    setValue("rolTanim", "");
+    setValue("rolID", "");
   };
 
-  const clearYapildi = useCallback(() => {
-    setValue("atolyeTanim", "");
-    setValue("atolyeID", "");
-    setValue("personelTanim", "");
-    setValue("personelID", "");
-    setValue("baslangicTarihi", null);
-    setValue("baslangicSaati", null);
-    setValue("vardiya", null);
-    setValue("vardiyaID", "");
-    setValue("bitisTarihi", null);
-    setValue("bitisSaati", null);
-    setValue("sure", 0);
-  }, [setValue]);
+  const handleOnayMinusClick = () => {
+    setValue("onayTanim", "");
+    setValue("onayID", "");
+  };
 
-  useEffect(() => {
-    if (!yapildi) {
-      clearYapildi();
-    }
-  }, [yapildi, clearYapildi]);
-
-  const items = [
-    {
-      key: "1",
-      label: "Açıklama",
-      children: <Controller name="aciklama" control={control} render={({ field }) => <TextArea {...field} disabled={!yapildi} rows={4} />} />,
-    },
-  ];
+  const handleLokasyonMinusClick = () => {
+    setValue("lokasyonTanim", "");
+    setValue("lokasyonID", "");
+  };
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 
@@ -190,227 +164,168 @@ export default function MainTabs() {
 
   // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın sonu
 
-  // iki tarih ve saat arasında geçen süreyi hesaplamak için
-
-  const watchFields = watch(["baslangicTarihi", "baslangicSaati", "bitisTarihi", "bitisSaati"]);
-
-  useEffect(() => {
-    const [baslangicTarihi, baslangicSaati, bitisTarihi, bitisSaati] = watchFields;
-    if (baslangicTarihi && baslangicSaati && bitisTarihi && bitisSaati) {
-      const baslangicZamani = dayjs(baslangicTarihi).hour(baslangicSaati.hour()).minute(baslangicSaati.minute());
-      const bitisZamani = dayjs(bitisTarihi).hour(bitisSaati.hour()).minute(bitisSaati.minute());
-
-      const sure = bitisZamani.diff(baslangicZamani, "minute");
-      setValue("sure", sure > 0 ? sure : 0);
-    }
-  }, [watchFields, setValue]);
-
-  // iki tarih ve saat arasında geçen süreyi hesaplamak için sonu
-
   return (
-    <div>
-      <div style={{ border: "1px solid #ececec", padding: "15px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", marginBottom: "10px" }}>
-          <StyledDivBottomLine
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "435px",
-            }}
-          >
-            <Text style={{ fontSize: "14px" }}>Atölye:</Text>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "300px",
-              }}
-            >
-              <Controller
-                name="atolyeTanim"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text" // Set the type to "text" for name input
-                    style={{ width: "215px" }}
-                    disabled
-                  />
-                )}
-              />
-              <Controller
-                name="atolyeID"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text" // Set the type to "text" for name input
-                    style={{ display: "none" }}
-                  />
-                )}
-              />
-              <AtolyeTablo
-                onSubmit={(selectedData) => {
-                  setValue("atolyeTanim", selectedData.subject);
-                  setValue("atolyeID", selectedData.key);
-                }}
-              />
-              <Button onClick={handleAtolyeMinusClick}>-</Button>
-            </div>
-          </StyledDivBottomLine>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", marginBottom: "10px" }}>
-          <StyledDivBottomLine
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "435px",
-            }}
-          >
-            <Text style={{ fontSize: "14px" }}>Personel:</Text>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "300px",
-              }}
-            >
-              <Controller
-                name="personelTanim"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text" // Set the type to "text" for name input
-                    style={{ width: "215px" }}
-                    disabled
-                  />
-                )}
-              />
-              <Controller
-                name="personelID"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text" // Set the type to "text" for name input
-                    style={{ display: "none" }}
-                  />
-                )}
-              />
-
-              <PersonelTablo
-                onSubmit={(selectedData) => {
-                  setValue("personelTanim", selectedData.subject);
-                  setValue("personelID", selectedData.key);
-                }}
-              />
-
-              <Button onClick={handlePersonelMinusClick}>-</Button>
-            </div>
-          </StyledDivBottomLine>
-        </div>
+    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      <StyledDivBottomLine
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+          width: "100%",
+          maxWidth: "435px",
+        }}
+      >
+        <Text style={{ fontSize: "14px" }}>Rol:</Text>
         <div
           style={{
             display: "flex",
             flexWrap: "wrap",
             alignItems: "center",
-            maxWidth: "720px",
-            gap: "10px",
-            width: "100%",
             justifyContent: "space-between",
-            marginBottom: "10px",
+            width: "300px",
           }}
         >
-          <Text style={{ fontSize: "14px" }}>Başlangıç Zamanı:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
+          <Controller
+            name="rolTanim"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="text" // Set the type to "text" for name input
+                style={{ width: "215px" }}
+                disabled
+              />
+            )}
+          />
+          <Controller
+            name="rolID"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="text" // Set the type to "text" for name input
+                style={{ display: "none" }}
+              />
+            )}
+          />
+
+          <RolTablo
+            onSubmit={(selectedData) => {
+              setValue("rolTanim", selectedData.ROL_TANIM);
+              setValue("rolID", selectedData.key);
             }}
-          >
-            <Controller
-              name="baslangicTarihi"
-              control={control}
-              render={({ field }) => <DatePicker {...field} disabled={!yapildi} style={{ width: "180px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />}
-            />
-            <Controller
-              name="baslangicSaati"
-              control={control}
-              render={({ field }) => <TimePicker {...field} disabled={!yapildi} style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />}
-            />
-          </div>
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}>
-            <Text style={{ fontSize: "14px" }}>Vardiya:</Text>
-            <VardiyaSelect />
-          </div>
+          />
+
+          <Button onClick={handlePersonelMinusClick}>-</Button>
         </div>
+      </StyledDivBottomLine>
+      <StyledDivBottomLine
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+          width: "100%",
+          maxWidth: "435px",
+        }}
+      >
+        <Text style={{ fontSize: "14px" }}>Onay:</Text>
         <div
           style={{
             display: "flex",
             flexWrap: "wrap",
             alignItems: "center",
-            maxWidth: "720px",
-            gap: "10px",
-            width: "100%",
             justifyContent: "space-between",
-            marginBottom: "10px",
+            width: "300px",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              width: "100%",
-              maxWidth: "435px",
-              justifyContent: "space-between",
-            }}
-          >
-            <Text style={{ fontSize: "14px" }}>Bitiş Zamanı:</Text>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "center",
-                maxWidth: "300px",
-                minWidth: "300px",
-                gap: "10px",
-                width: "100%",
-              }}
-            >
-              <Controller
-                name="bitisTarihi"
-                control={control}
-                render={({ field }) => <DatePicker {...field} disabled={!yapildi} style={{ width: "180px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />}
+          <Controller
+            name="onayTanim"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="text" // Set the type to "text" for name input
+                style={{ width: "215px" }}
+                disabled
               />
-              <Controller
-                name="bitisSaati"
-                control={control}
-                render={({ field }) => <TimePicker {...field} disabled={!yapildi} style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />}
+            )}
+          />
+          <Controller
+            name="onayID"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="text" // Set the type to "text" for name input
+                style={{ display: "none" }}
               />
-            </div>
-          </div>
+            )}
+          />
 
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}>
-            <Text style={{ fontSize: "14px" }}>Süre (dk):</Text>
-            <Controller name="sure" control={control} render={({ field }) => <InputNumber {...field} disabled={!yapildi} min={0} style={{ width: "200px" }} />} />
-          </div>
+          <OnayTablo
+            onSubmit={(selectedData) => {
+              setValue("onayTanim", selectedData.ONY_TANIM);
+              setValue("onayID", selectedData.key);
+            }}
+          />
+
+          <Button onClick={handleOnayMinusClick}>-</Button>
         </div>
-        <StyledTabs defaultActiveKey="1" items={items} onChange={onChange} />
-      </div>
+      </StyledDivBottomLine>
+
+      <StyledDivBottomLine
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+          width: "100%",
+          maxWidth: "435px",
+        }}
+      >
+        <Text style={{ fontSize: "14px" }}>Lokasyon:</Text>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "300px",
+          }}
+        >
+          <Controller
+            name="lokasyonTanim"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="text" // Set the type to "text" for name input
+                style={{ width: "215px" }}
+                disabled
+              />
+            )}
+          />
+          <Controller
+            name="lokasyonID"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="text" // Set the type to "text" for name input
+                style={{ display: "none" }}
+              />
+            )}
+          />
+
+          <LokasyonTablo
+            onSubmit={(selectedData) => {
+              setValue("lokasyonTanim", selectedData.LOK_TANIM);
+              setValue("lokasyonID", selectedData.key);
+            }}
+          />
+
+          <Button onClick={handleLokasyonMinusClick}>-</Button>
+        </div>
+      </StyledDivBottomLine>
     </div>
   );
 }
