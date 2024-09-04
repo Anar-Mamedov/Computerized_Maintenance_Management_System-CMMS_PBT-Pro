@@ -35,6 +35,7 @@ import FloatButton from "./pages/components/FloatButton/index.jsx";
 import RolTanimlari from "./pages/OnayIslemleri/RolTanimlari/RolTanimlari.jsx";
 import OnayTanimlari from "./pages/OnayIslemleri/OnayTanimlari/OnayTanimlari.jsx";
 import Onaylayicilar from "./pages/OnayIslemleri/Onaylayicilar/Onaylayicilar.jsx";
+import Kurallar from "./pages/OnayIslemleri/Kurallar/Kurallar.jsx";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -249,7 +250,7 @@ export default function App() {
           <Route path="/onayTanimlari" element={<OnayTanimlari />} />
           <Route path="/rolTanimlari" element={<RolTanimlari />} />
           <Route path="/onaylayicilar" element={<Onaylayicilar />} />
-          <Route path="/kurallar" element={<Hazirlaniyor />} />
+          <Route path="/kurallar" element={<Kurallar />} />
         </Route>
       </Routes>
     </RecoilRoot>
