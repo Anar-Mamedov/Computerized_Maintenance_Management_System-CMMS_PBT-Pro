@@ -1,10 +1,12 @@
-import React, { useState, useContext, useMemo } from "react";
+import React, { useState, useContext, useMemo, useEffect } from "react";
 import { Flex, Transfer, Table, Tag, Button } from "antd";
 import { DndContext } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { CSS } from "@dnd-kit/utilities";
 import { HolderOutlined } from "@ant-design/icons";
+import { useFormContext } from "react-hook-form"; // React Hook Form bağlama
+import AxiosInstance from "../../../../../api/http.jsx";
 
 const RowContext = React.createContext({});
 
@@ -59,6 +61,7 @@ const SortableRow = (props) => {
 const TableTransfer = (props) => {
   const { leftColumns, rightColumns, targetKeys, onTargetChange, ...restProps } = props;
   const [rightTableData, setRightTableData] = useState(props.dataSource.filter((item) => targetKeys.includes(item.key)));
+  const { setValue } = useFormContext(); // React Hook Form bağlama
 
   const handleDragEnd = ({ active, over }) => {
     if (active.id !== over?.id) {
@@ -66,7 +69,11 @@ const TableTransfer = (props) => {
         const activeIndex = prevState.findIndex((item) => item.key === active.id);
         const overIndex = prevState.findIndex((item) => item.key === over?.id);
         const updatedData = arrayMove(prevState, activeIndex, overIndex);
-        onTargetChange(updatedData.map((item) => item.key));
+        const updatedKeys = updatedData.map((item) => item.key);
+        onTargetChange(updatedKeys);
+
+        // Sıralamayı React Hook Form'a kaydet
+        setValue("sortedKeys", updatedKeys);
         return updatedData;
       });
     }
@@ -79,6 +86,9 @@ const TableTransfer = (props) => {
     // Update the data in the right table
     const newRightTableData = props.dataSource.filter((item) => nextTargetKeys.includes(item.key));
     setRightTableData(newRightTableData);
+
+    // Sıralamayı React Hook Form'a kaydet
+    setValue("sortedKeys", nextTargetKeys);
   };
 
   return (
@@ -88,7 +98,7 @@ const TableTransfer = (props) => {
         width: "100%",
       }}
       targetKeys={targetKeys}
-      onChange={handleTableTransferChange} // Update target keys and right table data when transferring items
+      onChange={handleTableTransferChange}
     >
       {({ direction, filteredItems, onItemSelect, onItemSelectAll, selectedKeys, disabled }) => {
         const columns = direction === "left" ? leftColumns : rightColumns;
@@ -164,49 +174,42 @@ const TableTransfer = (props) => {
 };
 
 // Sample data and columns for left and right tables
-const mockTags = ["cat", "dog", "bird"];
-const mockData = Array.from({ length: 20 }).map((_, i) => ({
-  key: i.toString(),
-  title: `content${i + 1}`,
-  description: `description of content${i + 1}`,
-  tag: mockTags[i % 3],
-}));
 const columns = [
   {
-    dataIndex: "title",
-    title: "Name",
-  },
-  {
-    dataIndex: "tag",
-    title: "Tag",
-    render: (tag) => (
-      <Tag
-        style={{
-          marginInlineEnd: 0,
-        }}
-        color="cyan"
-      >
-        {tag.toUpperCase()}
-      </Tag>
-    ),
-  },
-  {
-    dataIndex: "description",
-    title: "Description",
+    dataIndex: "ROL_TANIM",
+    title: "Rol Tanımı",
   },
 ];
 
-const filterOption = (input, item) => item.title?.includes(input) || item.tag?.includes(input);
+const filterOption = (input, item) => item.ROL_TANIM?.includes(input);
 
 const MainTabs = () => {
   const [targetKeys, setTargetKeys] = useState([]);
   const [disabled, setDisabled] = useState(false);
+  const [mockData, setMockData] = useState([]); // API'den gelen veriler için state
+
+  // API'den verileri çekme işlemi
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await AxiosInstance.post("/GetOnayRolTanim"); // API isteği
+        const data = response.map((item) => ({
+          ...item,
+          key: item.TB_ROL_ID.toString(),
+        }));
+        setMockData(data); // Gelen veriyi state'e ata
+      } catch (error) {
+        console.error("API Error:", error);
+      }
+    };
+
+    fetchData(); // useEffect içinde API isteği çalıştır
+  }, []);
+
   const onChange = (nextTargetKeys) => {
     setTargetKeys(nextTargetKeys);
   };
-  const toggleDisabled = (checked) => {
-    setDisabled(checked);
-  };
+
   return (
     <Flex align="start" gap="middle" vertical>
       <TableTransfer
