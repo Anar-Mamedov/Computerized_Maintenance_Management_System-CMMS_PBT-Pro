@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
-import AxiosInstance from "../../../../../../../api/http";
-import { Button, Modal, Table, Input } from "antd";
+import { Button, Input, Modal, Table } from "antd";
+import AxiosInstance from "../../../../../../api/http";
 
 // Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
 const normalizeText = (text) => {
@@ -21,7 +21,7 @@ const normalizeText = (text) => {
     .replace(/Ç/g, "C");
 };
 
-export default function AtolyeTablo({ workshopSelectedId, onSubmit }) {
+export default function OnayTablo({ workshopSelectedId, onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
@@ -30,27 +30,69 @@ export default function AtolyeTablo({ workshopSelectedId, onSubmit }) {
   const [searchTerm1, setSearchTerm1] = useState("");
   const [filteredData1, setFilteredData1] = useState([]);
 
+  // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
+
+  // Intl.DateTimeFormat kullanarak tarih formatlama
+  const formatDate = (date) => {
+    if (!date) return "";
+
+    // Örnek bir tarih formatla ve ay formatını belirle
+    const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
+
+    let monthFormat;
+    if (sampleFormatted.includes("January")) {
+      monthFormat = "long"; // Tam ad ("January")
+    } else if (sampleFormatted.includes("Jan")) {
+      monthFormat = "short"; // Üç harfli kısaltma ("Jan")
+    } else {
+      monthFormat = "2-digit"; // Sayısal gösterim ("01")
+    }
+
+    // Kullanıcı için tarihi formatla
+    const formatter = new Intl.DateTimeFormat(navigator.language, {
+      year: "numeric",
+      month: monthFormat,
+      day: "2-digit",
+    });
+    return formatter.format(new Date(date));
+  };
+
+  // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
+
   const columns = [
     {
-      title: "Atölye Kodu",
-      dataIndex: "code",
-      key: "code",
+      title: "Onay Tanımı",
+      dataIndex: "ONY_TANIM",
+      key: "ONY_TANIM",
+      width: "150px",
+      ellipsis: true,
     },
     {
-      title: "Atölye Tanımı",
-      dataIndex: "subject",
-      key: "subject",
+      title: "Oluşturma Tarihi",
+      dataIndex: "ONY_OLUSTURMA_TAR",
+      key: "ONY_OLUSTURMA_TAR",
+      width: "150px",
+      ellipsis: true,
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Değiştirme Tarihi",
+      dataIndex: "ONY_DEGISTIRME_TAR",
+      key: "ONY_DEGISTIRME_TAR",
+      width: "150px",
+      ellipsis: true,
+      render: (text) => formatDate(text),
     },
   ];
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`AtolyeList`)
+    AxiosInstance.post(`GetOnayTanimFullList`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
-          key: item.TB_ATOLYE_ID,
-          code: item.ATL_KOD,
-          subject: item.ATL_TANIM,
+          ...item,
+          key: item.TB_ONAY_ID,
         }));
         setData(fetchedData);
       })
@@ -95,10 +137,11 @@ export default function AtolyeTablo({ workshopSelectedId, onSubmit }) {
       setFilteredData1(data);
     }
   };
+
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
-      <Modal width={1200} centered title="Atölye Tanımları" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
+      <Modal width={1200} centered title="Onay Listesi" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <Input placeholder="Arama..." value={searchTerm1} onChange={handleSearch1} style={{ width: "300px", marginBottom: "15px" }} />
         <Table
           rowSelection={{
@@ -109,6 +152,10 @@ export default function AtolyeTablo({ workshopSelectedId, onSubmit }) {
           columns={columns}
           dataSource={filteredData1.length > 0 || searchTerm1 ? filteredData1 : data}
           loading={loading}
+          scroll={{
+            // x: "auto",
+            y: "calc(100vh - 360px)",
+          }}
         />
       </Modal>
     </div>
