@@ -48,37 +48,21 @@ export default function MainTable({ isActive }) {
 
   const columns = [
     {
-      title: "Rol Tanımı",
-      dataIndex: "ROL_TANIM",
-      key: "ROL_TANIM",
-      width: 200,
+      title: "Kural Tanımı",
+      dataIndex: "ONY_TANIM",
+      key: "ONY_TANIM",
+      width: "100%",
       ellipsis: true,
-    },
-    {
-      title: "Oluşturma Tarihi",
-      dataIndex: "ROL_OLUSTURMA_TAR",
-      key: "ROL_OLUSTURMA_TAR",
-      width: 200,
-      ellipsis: true,
-      render: (text) => formatDate(text),
-    },
-    {
-      title: "Değiştirme Tarihi",
-      dataIndex: "ROL_DEGISTIRME_TAR",
-      key: "ROL_DEGISTIRME_TAR",
-      width: 200,
-      ellipsis: true,
-      render: (text) => formatDate(text),
     },
   ];
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.post(`GetOnayRolTanim`)
+    AxiosInstance.post(`GetOnayTanimFullList`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
           ...item,
-          key: item.TB_ROL_ID,
+          key: item.TB_ONAY_ID,
         }));
         setData(fetchedData);
       })

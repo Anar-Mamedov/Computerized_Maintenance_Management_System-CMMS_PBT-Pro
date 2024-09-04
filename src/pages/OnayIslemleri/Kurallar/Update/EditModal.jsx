@@ -77,47 +77,9 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   return (
     <FormProvider {...methods}>
       <div>
-        <Modal width="500px" title="Rol Tanımı Güncelle" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={onModalClose}>
+        <Modal width="1200px" title="Kural Güncelle" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={onModalClose}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
-            {/*<MainTabs />*/}
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "100%",
-                maxWidth: "450px",
-                gap: "10px",
-                rowGap: "0px",
-                marginBottom: "10px",
-              }}
-            >
-              <Text style={{ fontSize: "14px", fontWeight: "600" }}>Rol Tanımı:</Text>
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  alignItems: "center",
-                  maxWidth: "300px",
-                  minWidth: "300px",
-                  gap: "10px",
-                  width: "100%",
-                }}
-              >
-                <Controller
-                  name="rolTanim"
-                  control={control}
-                  rules={{ required: "Alan Boş Bırakılamaz!" }}
-                  render={({ field, fieldState: { error } }) => (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
-                      <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
-                      {error && <div style={{ color: "red" }}>{error.message}</div>}
-                    </div>
-                  )}
-                />
-              </div>
-            </div>
+            <MainTabs />
           </form>
         </Modal>
       </div>
