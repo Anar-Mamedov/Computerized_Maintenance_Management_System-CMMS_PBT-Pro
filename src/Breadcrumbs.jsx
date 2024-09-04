@@ -28,7 +28,7 @@ const Breadcrumbs = () => {
     "/onaylayicilar": "Onaylayıcılar",
     "/rolTanimlari": "Rol Tanımları",
     "/onayIslemleri": "Onay İşlemleri",
-    "/onayAyarlar": "Onay Ayarları",
+    "/onayTanimlari": "Onay Tanımları",
     "/kurallar": "Kurallar",
     "/projeTanimlari": "Proje Tanımları",
     "/lokasyon": "Lokasyon Tanımları",
