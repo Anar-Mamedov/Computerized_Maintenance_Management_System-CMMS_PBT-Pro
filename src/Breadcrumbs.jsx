@@ -29,7 +29,6 @@ const Breadcrumbs = () => {
     "/rolTanimlari": "Rol Tanımları",
     "/onayIslemleri": "Onay İşlemleri",
     "/onayTanimlari": "Onay Tanımları",
-    "/kurallar": "Kurallar",
     "/projeTanimlari": "Proje Tanımları",
     "/lokasyon": "Lokasyon Tanımları",
     "/vardiyalar": "Vardiya Tanımları",

@@ -62,7 +62,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   return (
     <FormProvider {...methods}>
       <div>
-        <Modal width="1200px" title={`${header} - Onaylayıcı Listesi`} open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={onModalClose}>
+        <Modal width="1200px" title={`${header} - Kuralları`} open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={onModalClose}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <MainTabs selectedRow={selectedRow} />
           </form>

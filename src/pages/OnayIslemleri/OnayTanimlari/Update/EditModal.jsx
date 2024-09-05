@@ -12,6 +12,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   const methods = useForm({
     defaultValues: {
       rolTanim: "",
+      aciklama: "",
       // Add other default values here
     },
   });
@@ -21,6 +22,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   useEffect(() => {
     if (isModalVisible && selectedRow) {
       setValue("rolTanim", selectedRow.ONY_TANIM);
+      setValue("aciklama", selectedRow.ONY_ACIKLAMA);
     }
   }, [selectedRow, isModalVisible, setValue]);
 
@@ -46,6 +48,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
     const Body = {
       TB_ONAY_ID: selectedRow.key,
       ONY_TANIM: data.rolTanim,
+      ONY_ACIKLAMA: data.aciklama,
       ONY_DEGISTIRME_TAR: dayjs().format("YYYY-MM-DD"),
     };
 
@@ -112,6 +115,44 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
                   render={({ field, fieldState: { error } }) => (
                     <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
                       <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
+                      {error && <div style={{ color: "red" }}>{error.message}</div>}
+                    </div>
+                  )}
+                />
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "start",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "450px",
+                gap: "10px",
+                rowGap: "0px",
+                marginBottom: "10px",
+              }}
+            >
+              <Text style={{ fontSize: "14px", fontWeight: "600" }}>Açıklama:</Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  maxWidth: "300px",
+                  minWidth: "300px",
+                  gap: "10px",
+                  width: "100%",
+                }}
+              >
+                <Controller
+                  name="aciklama"
+                  control={control}
+                  rules={{ required: "Alan Boş Bırakılamaz!" }}
+                  render={({ field, fieldState: { error } }) => (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+                      <TextArea {...field} rows={4} status={error ? "error" : ""} style={{ flex: 1 }} />
                       {error && <div style={{ color: "red" }}>{error.message}</div>}
                     </div>
                   )}
