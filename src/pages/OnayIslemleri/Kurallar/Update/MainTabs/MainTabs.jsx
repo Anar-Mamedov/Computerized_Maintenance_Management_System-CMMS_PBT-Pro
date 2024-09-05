@@ -194,7 +194,7 @@ const columns = [
 
 const filterOption = (input, item) => item.ROL_TANIM?.includes(input);
 
-const MainTabs = () => {
+const MainTabs = ({ selectedRow }) => {
   const [targetKeys, setTargetKeys] = useState([]);
   const [disabled, setDisabled] = useState(false);
   const [mockData, setMockData] = useState([]); // API'den gelen veriler için state

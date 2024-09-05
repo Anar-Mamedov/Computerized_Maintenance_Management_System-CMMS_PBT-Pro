@@ -9,6 +9,7 @@ const { Text, Link } = Typography;
 const { TextArea } = Input;
 
 export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh }) {
+  const [header, setHeader] = useState(null);
   const methods = useForm({
     defaultValues: {
       rolTanim: "",
@@ -20,7 +21,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
 
   useEffect(() => {
     if (isModalVisible && selectedRow) {
-      setValue("rolTanim", selectedRow.ROL_TANIM);
+      setHeader(selectedRow.ONY_TANIM);
     }
   }, [selectedRow, isModalVisible, setValue]);
 
@@ -32,13 +33,11 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
 
   const onSubmited = (data) => {
     const Body = {
-      TB_ROL_ID: selectedRow.key,
-      ROL_TANIM: data.rolTanim,
-      ROL_DEGISTIRME_TAR: dayjs().format("YYYY-MM-DD"),
+      ONR_ONYTANIM_ID: selectedRow.key,
       sortedKeys: data.sortedKeys, // Sıralı verileri API'ye gönderiyoruz
     };
 
-    AxiosInstance.post(`UpdateOnayRolTanim`, Body)
+    AxiosInstance.post(`AddOnayKurallar`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
 
@@ -63,9 +62,9 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   return (
     <FormProvider {...methods}>
       <div>
-        <Modal width="1200px" title="Kural Güncelle" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={onModalClose}>
+        <Modal width="1200px" title={`${header} - Onaylayıcı Listesi`} open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={onModalClose}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
-            <MainTabs />
+            <MainTabs selectedRow={selectedRow} />
           </form>
         </Modal>
       </div>
