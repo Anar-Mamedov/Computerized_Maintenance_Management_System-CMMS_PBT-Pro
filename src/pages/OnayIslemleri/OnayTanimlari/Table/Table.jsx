@@ -6,6 +6,8 @@ import AxiosInstance from "../../../../api/http.jsx";
 import CreateModal from "../Insert/CreateModal.jsx";
 import EditModal from "../Update/EditModal.jsx";
 import ContextMenu from "../components/ContextMenu/ContextMenu.jsx";
+import EditModal1 from "../../Kurallar/Update/EditModal.jsx";
+import { GiCog } from "react-icons/gi";
 
 export default function MainTable({ isActive }) {
   const [loading, setLoading] = useState(false);
@@ -14,6 +16,7 @@ export default function MainTable({ isActive }) {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]); // New state for selected rows
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModal1Visible, setIsModal1Visible] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
@@ -53,22 +56,40 @@ export default function MainTable({ isActive }) {
       key: "ONY_TANIM",
       width: 200,
       ellipsis: true,
+      onCell: (record) => ({
+        onClick: () => {
+          setSelectedRow(record);
+          setIsModalVisible(true);
+        },
+      }),
+      render: (text) => <a>{text}</a>,
     },
+
     {
-      title: "Oluşturma Tarihi",
-      dataIndex: "ONY_OLUSTURMA_TAR",
-      key: "ONY_OLUSTURMA_TAR",
+      title: "Açıklama",
+      dataIndex: "ONY_ACIKLAMA",
+      key: "ONY_ACIKLAMA",
       width: 200,
       ellipsis: true,
-      render: (text) => formatDate(text),
     },
     {
-      title: "Değiştirme Tarihi",
-      dataIndex: "ONY_DEGISTIRME_TAR",
-      key: "ONY_DEGISTIRME_TAR",
-      width: 200,
+      title: "Kural",
+      dataIndex: "",
+      key: "Kural",
+      width: 80,
       ellipsis: true,
-      render: (text) => formatDate(text),
+      align: "center", // Center the title
+      onCell: (record) => ({
+        onClick: () => {
+          setSelectedRow(record);
+          setIsModal1Visible(true);
+        },
+      }),
+      render: () => (
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+          <GiCog style={{ color: "#2bc770", cursor: "pointer", fontSize: "22px" }} />
+        </div>
+      ),
     },
   ];
 
@@ -100,11 +121,6 @@ export default function MainTable({ isActive }) {
     setSelectedRows(newSelectedRows); // Update selected rows data
   };
 
-  const onRowClick = (record) => {
-    setSelectedRow(record);
-    setIsModalVisible(true);
-  };
-
   const refreshTable = useCallback(() => {
     fetch(); // fetch fonksiyonu tabloyu yeniler
     setSelectedRowKeys([]); // Clear selected row keys
@@ -123,9 +139,6 @@ export default function MainTable({ isActive }) {
           selectedRowKeys,
           onChange: onRowSelectChange,
         }}
-        onRow={(record) => ({
-          onClick: () => onRowClick(record),
-        })}
         columns={columns}
         dataSource={data}
         loading={loading}
@@ -140,6 +153,17 @@ export default function MainTable({ isActive }) {
           isModalVisible={isModalVisible}
           onModalClose={() => {
             setIsModalVisible(false);
+            setSelectedRow(null);
+          }}
+          onRefresh={refreshTable}
+        />
+      )}
+      {isModal1Visible && (
+        <EditModal1
+          selectedRow={selectedRow}
+          isModalVisible={isModal1Visible}
+          onModalClose={() => {
+            setIsModal1Visible(false);
             setSelectedRow(null);
           }}
           onRefresh={refreshTable}

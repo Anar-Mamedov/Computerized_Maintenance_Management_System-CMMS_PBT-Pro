@@ -70,6 +70,13 @@ export default function MainTable({ isActive }) {
       ellipsis: true,
       render: (text) => formatDate(text),
     },
+    {
+      title: "Açıklama",
+      dataIndex: "ROL_ACIKLAMA",
+      key: "ROL_ACIKLAMA",
+      width: 200,
+      ellipsis: true,
+    },
   ];
 
   const fetch = useCallback(() => {

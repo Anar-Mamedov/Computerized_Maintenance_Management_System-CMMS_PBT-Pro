@@ -146,7 +146,7 @@ const TableTransfer = (props) => {
 const columns = [
   {
     dataIndex: "ROL_TANIM",
-    title: "Rol Tanımı",
+    title: "",
   },
 ];
 

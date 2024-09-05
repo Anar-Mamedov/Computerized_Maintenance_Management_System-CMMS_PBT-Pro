@@ -48,9 +48,23 @@ export default function MainTable({ isActive }) {
 
   const columns = [
     {
-      title: "Onay Tanımı",
-      dataIndex: "ONY_TANIM",
-      key: "ONY_TANIM",
+      title: "Kullanıcı Tanımı",
+      dataIndex: "KLL_TANIM",
+      key: "KLL_TANIM",
+      width: "100%",
+      ellipsis: true,
+    },
+    {
+      title: "Lokasyon Tanımı",
+      dataIndex: "LOK_TANIM",
+      key: "LOK_TANIM",
+      width: "100%",
+      ellipsis: true,
+    },
+    {
+      title: "Rol Tanımı",
+      dataIndex: "ROL_TANIM",
+      key: "ROL_TANIM",
       width: "100%",
       ellipsis: true,
     },
@@ -58,11 +72,11 @@ export default function MainTable({ isActive }) {
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.post(`GetOnayTanimFullList`)
+    AxiosInstance.post(`GetOnayKullaniciList`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
           ...item,
-          key: item.TB_ONAY_ID,
+          key: item.TB_ONAY_KUL_ID,
         }));
         setData(fetchedData);
       })
