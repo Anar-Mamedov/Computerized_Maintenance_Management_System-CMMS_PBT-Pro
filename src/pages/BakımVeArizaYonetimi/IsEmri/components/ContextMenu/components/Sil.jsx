@@ -3,12 +3,7 @@ import AxiosInstance from "../../../../../../api/http";
 import { Button, message, Popconfirm } from "antd";
 import { DeleteOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 
-export default function Sil({
-  selectedRows,
-  refreshTableData,
-  disabled,
-  hidePopover,
-}) {
+export default function Sil({ selectedRows, refreshTableData, disabled, hidePopover }) {
   // selectedRows.forEach((row, index) => {
   //   console.log(`Satır ${index + 1} ID: ${row.key}`);
   //   // Eğer id değerleri farklı bir özellikte tutuluyorsa, row.key yerine o özelliği kullanın. Örneğin: row.id
@@ -27,7 +22,7 @@ export default function Sil({
         const response = await AxiosInstance.post(`IsEmriDelete?ID=${row.key}`);
         console.log("Silme işlemi başarılı:", response);
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("İşlem Başarılı.");
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
@@ -86,12 +81,7 @@ export default function Sil({
           />
         }
       >
-        <Button
-          style={{ paddingLeft: "0px" }}
-          type="link"
-          danger
-          icon={<DeleteOutlined />}
-        >
+        <Button style={{ paddingLeft: "0px" }} type="link" danger icon={<DeleteOutlined />}>
           Sil
         </Button>
       </Popconfirm>
