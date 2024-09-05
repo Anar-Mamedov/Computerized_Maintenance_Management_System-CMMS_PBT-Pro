@@ -22,22 +22,13 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
   };
   // Silme işlemi için disable durumunu kontrol et
   const isDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 4);
-  const iptalDisabled = selectedRows.some(
-    (row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 2 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5
-  );
-  const kapatDisabled = selectedRows.some(
-    (row) => row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5 || row.IST_DURUM_ID === 3
-  );
+  const iptalDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 2 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5);
+  const kapatDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5 || row.IST_DURUM_ID === 3);
 
   const content = (
     <div>
-      {/* <Sil
-        selectedRows={selectedRows}
-        refreshTableData={refreshTableData}
-        disabled={isDisabled}
-        hidePopover={hidePopover}
-      />
-      <Iptal selectedRows={selectedRows} refreshTableData={refreshTableData} iptalDisabled={iptalDisabled} />
+      <Sil selectedRows={selectedRows} refreshTableData={refreshTableData} disabled={isDisabled} hidePopover={hidePopover} />
+      {/*<Iptal selectedRows={selectedRows} refreshTableData={refreshTableData} iptalDisabled={iptalDisabled} />
       <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />
       <Parametreler /> */}
       {selectedRows.length === 1 && <Tarihce selectedRows={selectedRows} />}
@@ -55,7 +46,8 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
           backgroundColor: "#2BC770",
           borderColor: "#2BC770",
           height: "32px",
-        }}>
+        }}
+      >
         {selectedRows.length >= 1 && <Text style={{ color: "white", marginLeft: "3px" }}>{selectedRows.length}</Text>}
         <MoreOutlined style={{ color: "white", fontSize: "20px", margin: "0" }} />
       </Button>

@@ -1,93 +1,215 @@
-import React, { useState } from "react";
-import { Flex, Switch, Table, Tag, Transfer } from "antd";
+import React, { useState, useContext, useMemo, useEffect } from "react";
+import { Flex, Transfer, Table, Tag, Button } from "antd";
+import { DndContext } from "@dnd-kit/core";
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import { CSS } from "@dnd-kit/utilities";
+import { HolderOutlined } from "@ant-design/icons";
+import { useFormContext } from "react-hook-form"; // React Hook Form bağlama
+import AxiosInstance from "../../../../../api/http.jsx";
+
+const RowContext = React.createContext({});
+
+// Drag handle for sorting
+const DragHandle = () => {
+  const { setActivatorNodeRef, listeners } = useContext(RowContext);
+  return (
+    <Button
+      type="text"
+      size="small"
+      icon={<HolderOutlined />}
+      style={{
+        cursor: "move",
+      }}
+      ref={setActivatorNodeRef}
+      {...listeners}
+    />
+  );
+};
+
+// Sortable Row component for right-side table
+const SortableRow = (props) => {
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
+    id: props["data-row-key"],
+  });
+  const style = {
+    ...props.style,
+    transform: CSS.Translate.toString(transform),
+    transition,
+    ...(isDragging
+      ? {
+          position: "relative",
+          zIndex: 9999,
+        }
+      : {}),
+  };
+  const contextValue = useMemo(
+    () => ({
+      setActivatorNodeRef,
+      listeners,
+    }),
+    [setActivatorNodeRef, listeners]
+  );
+  return (
+    <RowContext.Provider value={contextValue}>
+      <tr {...props} ref={setNodeRef} style={style} {...attributes} />
+    </RowContext.Provider>
+  );
+};
+
 // Customize Table Transfer
 const TableTransfer = (props) => {
-  const { leftColumns, rightColumns, ...restProps } = props;
+  const { leftColumns, rightColumns, targetKeys, onTargetChange, ...restProps } = props;
+  const [rightTableData, setRightTableData] = useState(props.dataSource.filter((item) => targetKeys.includes(item.key)));
+  const { setValue } = useFormContext(); // React Hook Form bağlama
+
+  const handleDragEnd = ({ active, over }) => {
+    if (active.id !== over?.id) {
+      setRightTableData((prevState) => {
+        const activeIndex = prevState.findIndex((item) => item.key === active.id);
+        const overIndex = prevState.findIndex((item) => item.key === over?.id);
+        const updatedData = arrayMove(prevState, activeIndex, overIndex);
+        const updatedKeys = updatedData.map((item) => item.key);
+        onTargetChange(updatedKeys);
+
+        // Sıralamayı React Hook Form'a kaydet
+        setValue("sortedKeys", updatedKeys);
+        return updatedData;
+      });
+    }
+  };
+
+  const handleTableTransferChange = (nextTargetKeys) => {
+    // Update the target keys
+    onTargetChange(nextTargetKeys);
+
+    // Update the data in the right table
+    const newRightTableData = props.dataSource.filter((item) => nextTargetKeys.includes(item.key));
+    setRightTableData(newRightTableData);
+
+    // Sıralamayı React Hook Form'a kaydet
+    setValue("sortedKeys", nextTargetKeys);
+  };
+
   return (
     <Transfer
+      {...restProps}
       style={{
         width: "100%",
       }}
-      {...restProps}
+      targetKeys={targetKeys}
+      onChange={handleTableTransferChange}
     >
-      {({ direction, filteredItems, onItemSelect, onItemSelectAll, selectedKeys: listSelectedKeys, disabled: listDisabled }) => {
+      {({ direction, filteredItems, onItemSelect, onItemSelectAll, selectedKeys, disabled }) => {
         const columns = direction === "left" ? leftColumns : rightColumns;
+        const data = direction === "left" ? filteredItems : rightTableData;
+
         const rowSelection = {
           getCheckboxProps: () => ({
-            disabled: listDisabled,
+            disabled,
           }),
           onChange(selectedRowKeys) {
             onItemSelectAll(selectedRowKeys, "replace");
           },
-          selectedRowKeys: listSelectedKeys,
-          selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT, Table.SELECTION_NONE],
+          selectedRowKeys: selectedKeys,
         };
-        return (
+
+        return direction === "left" ? (
           <Table
             rowSelection={rowSelection}
             columns={columns}
             dataSource={filteredItems}
             size="small"
             style={{
-              pointerEvents: listDisabled ? "none" : undefined,
+              pointerEvents: disabled ? "none" : undefined,
             }}
             onRow={({ key, disabled: itemDisabled }) => ({
               onClick: () => {
-                if (itemDisabled || listDisabled) {
+                if (itemDisabled || disabled) {
                   return;
                 }
-                onItemSelect(key, !listSelectedKeys.includes(key));
+                onItemSelect(key, !selectedKeys.includes(key));
               },
             })}
           />
+        ) : (
+          <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={handleDragEnd}>
+            <SortableContext items={rightTableData.map((item) => item.key)} strategy={verticalListSortingStrategy}>
+              <Table
+                rowSelection={rowSelection}
+                columns={[
+                  {
+                    key: "sort",
+                    align: "center",
+                    width: 80,
+                    render: () => <DragHandle />,
+                  },
+                  ...rightColumns,
+                ]}
+                dataSource={rightTableData}
+                components={{
+                  body: {
+                    row: SortableRow,
+                  },
+                }}
+                size="small"
+                style={{
+                  pointerEvents: disabled ? "none" : undefined,
+                }}
+                onRow={({ key, disabled: itemDisabled }) => ({
+                  onClick: () => {
+                    if (itemDisabled || disabled) {
+                      return;
+                    }
+                    onItemSelect(key, !selectedKeys.includes(key));
+                  },
+                })}
+              />
+            </SortableContext>
+          </DndContext>
         );
       }}
     </Transfer>
   );
 };
-const mockTags = ["cat", "dog", "bird"];
-const mockData = Array.from({
-  length: 20,
-}).map((_, i) => ({
-  key: i.toString(),
-  title: `content${i + 1}`,
-  description: `description of content${i + 1}`,
-  tag: mockTags[i % 3],
-}));
+
+// Sample data and columns for left and right tables
 const columns = [
   {
-    dataIndex: "title",
-    title: "Name",
-  },
-  {
-    dataIndex: "tag",
-    title: "Tag",
-    render: (tag) => (
-      <Tag
-        style={{
-          marginInlineEnd: 0,
-        }}
-        color="cyan"
-      >
-        {tag.toUpperCase()}
-      </Tag>
-    ),
-  },
-  {
-    dataIndex: "description",
-    title: "Description",
+    dataIndex: "ROL_TANIM",
+    title: "Rol Tanımı",
   },
 ];
-const filterOption = (input, item) => item.title?.includes(input) || item.tag?.includes(input);
+
+const filterOption = (input, item) => item.ROL_TANIM?.includes(input);
+
 const MainTabs = () => {
   const [targetKeys, setTargetKeys] = useState([]);
   const [disabled, setDisabled] = useState(false);
+  const [mockData, setMockData] = useState([]); // API'den gelen veriler için state
+
+  // API'den verileri çekme işlemi
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await AxiosInstance.post("/GetOnayRolTanim"); // API isteği
+        const data = response.map((item) => ({
+          ...item,
+          key: item.TB_ROL_ID.toString(),
+        }));
+        setMockData(data); // Gelen veriyi state'e ata
+      } catch (error) {
+        console.error("API Error:", error);
+      }
+    };
+
+    fetchData(); // useEffect içinde API isteği çalıştır
+  }, []);
+
   const onChange = (nextTargetKeys) => {
     setTargetKeys(nextTargetKeys);
   };
-  const toggleDisabled = (checked) => {
-    setDisabled(checked);
-  };
+
   return (
     <Flex align="start" gap="middle" vertical>
       <TableTransfer
@@ -100,9 +222,10 @@ const MainTabs = () => {
         filterOption={filterOption}
         leftColumns={columns}
         rightColumns={columns}
+        onTargetChange={setTargetKeys}
       />
-      <Switch unCheckedChildren="disabled" checkedChildren="disabled" checked={disabled} onChange={toggleDisabled} />
     </Flex>
   );
 };
+
 export default MainTabs;

@@ -83,12 +83,23 @@ const TableTransfer = (props) => {
     // Update the target keys
     onTargetChange(nextTargetKeys);
 
-    // Update the data in the right table
-    const newRightTableData = props.dataSource.filter((item) => nextTargetKeys.includes(item.key));
-    setRightTableData(newRightTableData);
+    // Get the items that were removed from the right table
+    const removedItems = rightTableData.filter((item) => !nextTargetKeys.includes(item.key));
+
+    // Remove the items from the right table data
+    const newRightTableData = rightTableData.filter((item) => nextTargetKeys.includes(item.key));
+
+    // Append new items to the end of the right table data
+    const newItems = nextTargetKeys.filter((key) => !rightTableData.some((item) => item.key === key));
+    const updatedRightTableData = [...newRightTableData, ...props.dataSource.filter((item) => newItems.includes(item.key))];
+
+    setRightTableData(updatedRightTableData);
 
     // Sıralamayı React Hook Form'a kaydet
-    setValue("sortedKeys", nextTargetKeys);
+    setValue(
+      "sortedKeys",
+      updatedRightTableData.map((item) => item.key)
+    );
   };
 
   return (
