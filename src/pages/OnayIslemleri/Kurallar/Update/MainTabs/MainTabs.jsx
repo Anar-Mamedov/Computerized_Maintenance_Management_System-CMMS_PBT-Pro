@@ -214,8 +214,21 @@ const MainTabs = ({ selectedRow }) => {
       }
     };
 
+    const fetchRightTableData = async () => {
+      if (selectedRow) {
+        try {
+          const response = await AxiosInstance.post(`/GetOnayKuralList?ONR_ONYTANIM_ID=${selectedRow.key}`);
+          const data = response.map((item) => item.ONR_ROL_ID.toString());
+          setTargetKeys(data);
+        } catch (error) {
+          console.error("API Error:", error);
+        }
+      }
+    };
+
     fetchData(); // useEffect içinde API isteği çalıştır
-  }, []);
+    fetchRightTableData();
+  }, [selectedRow]);
 
   const onChange = (nextTargetKeys) => {
     setTargetKeys(nextTargetKeys);
