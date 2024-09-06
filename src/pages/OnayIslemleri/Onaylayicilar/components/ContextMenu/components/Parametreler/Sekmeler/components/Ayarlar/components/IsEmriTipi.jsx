@@ -33,7 +33,8 @@ export default function IsEmriTipi({ disabled }) {
         justifyContent: "space-between",
         maxWidth: "300px",
         width: "100%",
-      }}>
+      }}
+    >
       <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", width: "100%" }}>
         <Controller
           name="isEmriTipi"
@@ -47,11 +48,7 @@ export default function IsEmriTipi({ disabled }) {
               allowClear
               placeholder="Seçim Yapınız"
               optionFilterProp="children"
-              filterOption={(input, option) =>
-                option.label
-                  ? option.label.toLocaleLowerCase("tr-TR").includes(input.toLocaleLowerCase("tr-TR"))
-                  : false
-              }
+              filterOption={(input, option) => (option.label ? option.label.toLocaleLowerCase("tr-TR").includes(input.toLocaleLowerCase("tr-TR")) : false)}
               onDropdownVisibleChange={(open) => {
                 if (open) fetchData();
               }}

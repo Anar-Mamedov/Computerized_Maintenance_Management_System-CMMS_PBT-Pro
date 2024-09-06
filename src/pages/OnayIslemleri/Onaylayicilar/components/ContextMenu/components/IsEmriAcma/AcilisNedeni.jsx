@@ -1,15 +1,6 @@
 import React, { useState, createRef, useEffect } from "react";
 import { useFormContext, Controller } from "react-hook-form";
-import {
-  Select,
-  Typography,
-  Divider,
-  Spin,
-  Button,
-  Input,
-  message,
-  Space,
-} from "antd";
+import { Select, Typography, Divider, Spin, Button, Input, message, Space } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
 import { PlusOutlined } from "@ant-design/icons";
 
@@ -72,10 +63,7 @@ export default function AcilisNedeni({ disabled }) {
               type: "success",
               content: "Ekleme Başarılı",
             });
-            setOptions((prevOptions) => [
-              ...prevOptions,
-              { TB_KOD_ID: newId, KOD_TANIM: name },
-            ]);
+            setOptions((prevOptions) => [...prevOptions, { TB_KOD_ID: newId, KOD_TANIM: name }]);
             setSelectKey((prevKey) => prevKey + 1);
             setName("");
           } else {
@@ -124,11 +112,7 @@ export default function AcilisNedeni({ disabled }) {
               allowClear
               placeholder="Seçim Yapınız"
               optionFilterProp="children"
-              filterOption={(input, option) =>
-                option.label
-                  ? option.label.toLowerCase().includes(input.toLowerCase())
-                  : false
-              }
+              filterOption={(input, option) => (option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false)}
               onDropdownVisibleChange={(open) => {
                 if (open) {
                   fetchData(); // Fetch data when the dropdown is opened
@@ -147,17 +131,8 @@ export default function AcilisNedeni({ disabled }) {
                       padding: "0 8px 4px",
                     }}
                   >
-                    <Input
-                      placeholder=""
-                      ref={inputRef}
-                      value={name}
-                      onChange={onNameChange}
-                    />
-                    <Button
-                      type="text"
-                      icon={<PlusOutlined />}
-                      onClick={addItem}
-                    >
+                    <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
+                    <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
                       Ekle
                     </Button>
                   </Space>

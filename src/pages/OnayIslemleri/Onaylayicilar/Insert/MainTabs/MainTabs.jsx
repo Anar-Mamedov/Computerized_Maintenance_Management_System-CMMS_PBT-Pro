@@ -174,15 +174,7 @@ export default function MainTabs() {
     <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
       <StyledDivBottomLine style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", width: "100%", maxWidth: "435px" }}>
         <Text style={{ fontSize: "14px" }}>Kullanıcı:</Text>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "300px",
-          }}
-        >
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "300px" }}>
           <Controller
             name="kullaniciTanim"
             control={control}
@@ -262,59 +254,51 @@ export default function MainTabs() {
           <Button onClick={handlePersonelMinusClick}>-</Button>
         </div>
       </StyledDivBottomLine>
-      <StyledDivBottomLine
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "space-between",
-          width: "100%",
-          maxWidth: "435px",
-        }}
-      >
-        <Text style={{ fontSize: "14px" }}>Onay:</Text>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "300px",
-          }}
-        >
-          <Controller
-            name="onayTanim"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ width: "215px" }}
-                disabled
-              />
-            )}
-          />
-          <Controller
-            name="onayID"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ display: "none" }}
-              />
-            )}
-          />
+      {/*<StyledDivBottomLine style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", width: "100%", maxWidth: "435px" }}>*/}
+      {/*  <Text style={{ fontSize: "14px" }}>Onay:</Text>*/}
+      {/*  <div*/}
+      {/*    style={{*/}
+      {/*      display: "flex",*/}
+      {/*      flexWrap: "wrap",*/}
+      {/*      alignItems: "center",*/}
+      {/*      justifyContent: "space-between",*/}
+      {/*      width: "300px",*/}
+      {/*    }}*/}
+      {/*  >*/}
+      {/*    <Controller*/}
+      {/*      name="onayTanim"*/}
+      {/*      control={control}*/}
+      {/*      render={({ field }) => (*/}
+      {/*        <Input*/}
+      {/*          {...field}*/}
+      {/*          type="text" // Set the type to "text" for name input*/}
+      {/*          style={{ width: "215px" }}*/}
+      {/*          disabled*/}
+      {/*        />*/}
+      {/*      )}*/}
+      {/*    />*/}
+      {/*    <Controller*/}
+      {/*      name="onayID"*/}
+      {/*      control={control}*/}
+      {/*      render={({ field }) => (*/}
+      {/*        <Input*/}
+      {/*          {...field}*/}
+      {/*          type="text" // Set the type to "text" for name input*/}
+      {/*          style={{ display: "none" }}*/}
+      {/*        />*/}
+      {/*      )}*/}
+      {/*    />*/}
 
-          <OnayTablo
-            onSubmit={(selectedData) => {
-              setValue("onayTanim", selectedData.ONY_TANIM);
-              setValue("onayID", selectedData.key);
-            }}
-          />
+      {/*    <OnayTablo*/}
+      {/*      onSubmit={(selectedData) => {*/}
+      {/*        setValue("onayTanim", selectedData.ONY_TANIM);*/}
+      {/*        setValue("onayID", selectedData.key);*/}
+      {/*      }}*/}
+      {/*    />*/}
 
-          <Button onClick={handleOnayMinusClick}>-</Button>
-        </div>
-      </StyledDivBottomLine>
+      {/*    <Button onClick={handleOnayMinusClick}>-</Button>*/}
+      {/*  </div>*/}
+      {/*</StyledDivBottomLine>*/}
 
       <StyledDivBottomLine
         style={{

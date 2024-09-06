@@ -19,7 +19,8 @@ export default function OncelikTablo({ workshopSelectedId, onSubmit, disabled })
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -34,7 +35,8 @@ export default function OncelikTablo({ workshopSelectedId, onSubmit, disabled })
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),

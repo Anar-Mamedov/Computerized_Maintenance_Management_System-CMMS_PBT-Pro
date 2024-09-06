@@ -1,15 +1,6 @@
 import React, { useState, createRef, useEffect } from "react";
 import { useFormContext, Controller } from "react-hook-form";
-import {
-  Select,
-  Typography,
-  Divider,
-  Spin,
-  Button,
-  Input,
-  message,
-  Space,
-} from "antd";
+import { Select, Typography, Divider, Spin, Button, Input, message, Space } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
 import { PlusOutlined } from "@ant-design/icons";
 
@@ -74,10 +65,7 @@ export default function DurumSelect({ disabled, fieldRequirements }) {
               type: "success",
               content: "Ekleme Başarılı",
             });
-            setOptions((prevOptions) => [
-              ...prevOptions,
-              { TB_KOD_ID: newId, KOD_TANIM: name },
-            ]);
+            setOptions((prevOptions) => [...prevOptions, { TB_KOD_ID: newId, KOD_TANIM: name }]);
             setSelectKey((prevKey) => prevKey + 1);
             setName("");
           } else {
@@ -134,11 +122,7 @@ export default function DurumSelect({ disabled, fieldRequirements }) {
               allowClear
               placeholder="Seçim Yapınız"
               optionFilterProp="children"
-              filterOption={(input, option) =>
-                option.label
-                  ? option.label.toLowerCase().includes(input.toLowerCase())
-                  : false
-              }
+              filterOption={(input, option) => (option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false)}
               onDropdownVisibleChange={(open) => {
                 if (open) {
                   fetchData(); // Fetch data when the dropdown is opened
@@ -157,17 +141,8 @@ export default function DurumSelect({ disabled, fieldRequirements }) {
                       padding: "0 8px 4px",
                     }}
                   >
-                    <Input
-                      placeholder=""
-                      ref={inputRef}
-                      value={name}
-                      onChange={onNameChange}
-                    />
-                    <Button
-                      type="text"
-                      icon={<PlusOutlined />}
-                      onClick={addItem}
-                    >
+                    <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
+                    <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
                       Ekle
                     </Button>
                   </Space>
@@ -179,28 +154,16 @@ export default function DurumSelect({ disabled, fieldRequirements }) {
               }))}
               onChange={(value) => {
                 // Seçilen değerin ID'sine göre options dizisinden ilgili öğeyi bul
-                const selectedOption = options.find(
-                  (option) => option.TB_KOD_ID === value
-                );
+                const selectedOption = options.find((option) => option.TB_KOD_ID === value);
 
                 // Seçilen öğenin adını ve ID'sini form state'ine ayarla
-                setValue(
-                  "isEmriDurum1",
-                  selectedOption ? selectedOption.KOD_TANIM : null
-                );
+                setValue("isEmriDurum1", selectedOption ? selectedOption.KOD_TANIM : null);
                 setValue("isEmriDurum1ID", value ?? null); // ID değeri doğrudan kullanılabilir
-                setValue(
-                  "varsayilanDurum",
-                  selectedOption
-                    ? selectedOption.KOD_ISM_DURUM_VARSAYILAN
-                    : false
-                ); // KOD_ISM_DURUM_VARSAYILAN değerini set et
+                setValue("varsayilanDurum", selectedOption ? selectedOption.KOD_ISM_DURUM_VARSAYILAN : false); // KOD_ISM_DURUM_VARSAYILAN değerini set et
 
                 // Eğer field.onChange fonksiyonu varsa, seçilen değeri buraya da geçir
                 if (field.onChange) {
-                  field.onChange(
-                    selectedOption ? selectedOption.KOD_TANIM : null
-                  );
+                  field.onChange(selectedOption ? selectedOption.KOD_TANIM : null);
                 }
               }}
               value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
@@ -218,11 +181,7 @@ export default function DurumSelect({ disabled, fieldRequirements }) {
             />
           )}
         />
-        {errors.isEmriDurum && (
-          <div style={{ color: "red", marginTop: "5px" }}>
-            {errors.isEmriDurum.message}
-          </div>
-        )}
+        {errors.isEmriDurum && <div style={{ color: "red", marginTop: "5px" }}>{errors.isEmriDurum.message}</div>}
       </div>
     </div>
   );

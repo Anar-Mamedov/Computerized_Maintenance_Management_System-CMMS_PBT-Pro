@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Input, Modal, Table } from "antd";
-import AxiosInstance from "../../../../../../../api/http";
+import AxiosInstance from "../../../../../../api/http";
 
 // Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
 const normalizeText = (text) => {

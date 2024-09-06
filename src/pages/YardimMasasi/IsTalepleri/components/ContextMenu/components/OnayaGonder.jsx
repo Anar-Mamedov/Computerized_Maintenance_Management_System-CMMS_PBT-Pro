@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
-import AxiosInstance from "../../../../../../../../api/http";
+import AxiosInstance from "../../../../../../api/http";
 import { Button, message, Popconfirm } from "antd";
 import { DeleteOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import { BsSendCheck } from "react-icons/bs";
 
 export default function Sil({ selectedRows, refreshTableData, disabled, hidePopover }) {
   // selectedRows.forEach((row, index) => {
@@ -19,14 +20,18 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
     for (const row of selectedRows) {
       try {
         // Silme API isteğini gönder
-        const response = await AxiosInstance.post(`DeleteOnayKullanici?TB_ONAY_KUL_ID=${row.key}`);
+        const response = await AxiosInstance.post(`OnayaGonder`, {
+          ONAY_TABLO_ID: Number(row.key),
+          ONAY_TABLO_KOD: row.IST_KOD,
+          ONAY_ONYTANIM_ID: 2,
+        });
         console.log("Silme işlemi başarılı:", response);
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("İşlem Başarılı.");
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
-          message.error("Ekleme Başarısız.");
+          message.error("İşlem Başarısız.");
         }
         // Burada başarılı silme işlemi sonrası yapılacak işlemler bulunabilir.
       } catch (error) {
@@ -68,8 +73,8 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
   return (
     <div style={buttonStyle}>
       <Popconfirm
-        title="Silme İşlemi"
-        description="Bu öğeyi silmek istediğinize emin misiniz?"
+        title="Onaya Gönderme İşlemi"
+        description="Bu öğeyi onaya göndermek istediğinize emin misiniz?"
         onConfirm={handleDelete}
         okText="Evet"
         cancelText="Hayır"
@@ -81,8 +86,8 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
           />
         }
       >
-        <Button style={{ paddingLeft: "0px" }} type="link" danger icon={<DeleteOutlined />}>
-          Sil
+        <Button style={{ paddingLeft: "0px", display: "flex", alignItems: "center" }} type="link" icon={<BsSendCheck />}>
+          Onaya Gönder
         </Button>
       </Popconfirm>
     </div>

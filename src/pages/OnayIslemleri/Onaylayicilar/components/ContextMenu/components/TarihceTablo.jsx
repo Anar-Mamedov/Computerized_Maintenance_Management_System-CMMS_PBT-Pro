@@ -188,20 +188,11 @@ export default function TarihceTablo({ workshopSelectedId, onSubmit, selectedRow
   };
   return (
     <div>
-      <Button
-        style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
-        onClick={handleModalToggle}
-        type="submit">
+      <Button style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }} onClick={handleModalToggle} type="submit">
         {" "}
         Tarihçe{" "}
       </Button>
-      <Modal
-        width={1200}
-        centered
-        title="İş Talebi Tarihçesi"
-        open={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={handleModalToggle}>
+      <Modal width={1200} centered title="İş Talebi Tarihçesi" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <div style={{ marginBottom: "10px" }}>
           <Controller
             name="fisNo"
