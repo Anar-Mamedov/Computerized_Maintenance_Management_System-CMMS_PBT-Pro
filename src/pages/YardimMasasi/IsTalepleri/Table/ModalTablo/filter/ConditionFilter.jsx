@@ -30,6 +30,9 @@ const ConditionFilter = ({ onSubmit }) => {
       { key: 3, value: "Devam Ediyor" },
       { key: 4, value: "Kapandı" },
       { key: 5, value: "İptal Edildi" },
+      { key: 6, value: "Onay Bekliyor" },
+      { key: 7, value: "Onaylandı" },
+      { key: 8, value: "Reddedildi" },
     ];
     setOptions(hardcodedOptions);
 

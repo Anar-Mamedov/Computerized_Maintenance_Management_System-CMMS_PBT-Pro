@@ -214,18 +214,10 @@ export default function Parametreler() {
   return (
     <FormProvider {...methods}>
       <div>
-        <Button
-          style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
-          type="submit"
-          onClick={handleModalToggle}>
+        <Button style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }} type="submit" onClick={handleModalToggle}>
           Parametreler
         </Button>
-        <Modal
-          width={1200}
-          title="Parametreler"
-          open={isModalOpen}
-          onOk={methods.handleSubmit(onSubmited)}
-          onCancel={handleModalToggle}>
+        <Modal width={1200} title="Parametreler" open={isModalOpen} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <Sekmeler isModalOpen={isModalOpen} />
           </form>

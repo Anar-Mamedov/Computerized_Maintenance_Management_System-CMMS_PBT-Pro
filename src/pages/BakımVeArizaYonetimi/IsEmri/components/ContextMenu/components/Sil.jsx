@@ -26,7 +26,7 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
-          message.error("Ekleme Başarısız.");
+          message.error("İşlem Başarısız.");
         }
         // Burada başarılı silme işlemi sonrası yapılacak işlemler bulunabilir.
       } catch (error) {

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table, Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-import AxiosInstance from "../../../../../../../api/http";
+import AxiosInstance from "../../../../../../api/http";
 import styled from "styled-components";
 
 export default function LokasyonTablo({ workshopSelectedId, onSubmit, disabled }) {

@@ -83,11 +83,7 @@ export default function Iptal({ selectedRows, refreshTableData, iptalDisabled })
         <Button style={{ paddingLeft: "0px" }} type="text" onClick={handleModalToggle}>
           İptal Et
         </Button>
-        <Modal
-          title="İş Talebi İptal"
-          open={isModalOpen}
-          onOk={methods.handleSubmit(onSubmited)}
-          onCancel={handleModalToggle}>
+        <Modal title="İş Talebi İptal" open={isModalOpen} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <Forms isModalOpen={isModalOpen} selectedRows={selectedRows} />
           </form>

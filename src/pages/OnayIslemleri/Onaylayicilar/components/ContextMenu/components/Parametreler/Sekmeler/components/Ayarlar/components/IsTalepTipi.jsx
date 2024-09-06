@@ -104,9 +104,7 @@ export default function IsTalepTipi({ disabled }) {
               allowClear
               placeholder="Seçim Yapınız"
               optionFilterProp="children"
-              filterOption={(input, option) =>
-                option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
-              }
+              filterOption={(input, option) => (option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false)}
               onDropdownVisibleChange={(open) => open && fetchData()} // Fetch data when the dropdown is opened
               dropdownRender={(menu) => (
                 <Spin spinning={loading}>
@@ -119,7 +117,8 @@ export default function IsTalepTipi({ disabled }) {
                   <Space
                     style={{
                       padding: "0 8px 4px",
-                    }}>
+                    }}
+                  >
                     <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
                     <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
                       Ekle

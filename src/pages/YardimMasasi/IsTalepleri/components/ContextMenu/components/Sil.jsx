@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import AxiosInstance from "../../../../../../api/http";
-import { Button } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import { Button, message, Popconfirm } from "antd";
+import { DeleteOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 
 export default function Sil({ selectedRows, refreshTableData, disabled, hidePopover }) {
   // selectedRows.forEach((row, index) => {
@@ -21,6 +21,13 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
         // Silme API isteğini gönder
         const response = await AxiosInstance.post(`IsTalepSil?talepID=${row.key}`);
         console.log("Silme işlemi başarılı:", response);
+        if (response.status_code === 200 || response.status_code === 201) {
+          message.success("İşlem Başarılı.");
+        } else if (response.status_code === 401) {
+          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+        } else {
+          message.error("İşlem Başarısız.");
+        }
         // Burada başarılı silme işlemi sonrası yapılacak işlemler bulunabilir.
       } catch (error) {
         console.error("Silme işlemi sırasında hata oluştu:", error);
@@ -33,11 +40,51 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
     }
   };
 
+  // const handleDelete = async () => {
+  //   let isError = false;
+  //   // Local storage'dan userId değerini al
+  //   const user = JSON.parse(localStorage.getItem("user"));
+  //   // Seçili satırlar üzerinde döngü yaparak her birini sil
+  //   for (const row of selectedRows) {
+  //     try {
+  //       // Silme API isteğini gönder
+  //       const response = await AxiosInstance.post(`IsEmriDelete`, {
+  //         ID: row.key,
+  //         // KulID: user.userId,
+  //       });
+  //       console.log("Silme işlemi başarılı:", response);
+  //       // Burada başarılı silme işlemi sonrası yapılacak işlemler bulunabilir.
+  //     } catch (error) {
+  //       console.error("Silme işlemi sırasında hata oluştu:", error);
+  //     }
+  //   }
+  //   // Tüm silme işlemleri tamamlandıktan sonra ve hata oluşmamışsa refreshTableData'i çağır
+  //   if (!isError) {
+  //     refreshTableData();
+  //     hidePopover(); // Silme işlemi başarılı olursa Popover'ı kapat
+  //   }
+  // };
+
   return (
     <div style={buttonStyle}>
-      <Button style={{ paddingLeft: "0px" }} type="text" danger icon={<DeleteOutlined />} onClick={handleDelete}>
-        Sil
-      </Button>
+      <Popconfirm
+        title="Silme İşlemi"
+        description="Bu öğeyi silmek istediğinize emin misiniz?"
+        onConfirm={handleDelete}
+        okText="Evet"
+        cancelText="Hayır"
+        icon={
+          <QuestionCircleOutlined
+            style={{
+              color: "red",
+            }}
+          />
+        }
+      >
+        <Button style={{ paddingLeft: "0px" }} type="link" danger icon={<DeleteOutlined />}>
+          Sil
+        </Button>
+      </Popconfirm>
     </div>
   );
 }

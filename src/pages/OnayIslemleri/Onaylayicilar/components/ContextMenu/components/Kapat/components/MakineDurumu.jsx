@@ -100,7 +100,8 @@ export default function MakineDurumu({ disabled, fieldRequirements }) {
         justifyContent: "space-between",
         maxWidth: "300px",
         width: "100%",
-      }}>
+      }}
+    >
       {contextHolder}
       <div style={{ display: "flex", flexWrap: "wrap", width: "100%" }}>
         <Controller
@@ -117,9 +118,7 @@ export default function MakineDurumu({ disabled, fieldRequirements }) {
               allowClear
               placeholder="Seçim Yapınız"
               optionFilterProp="children"
-              filterOption={(input, option) =>
-                option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
-              }
+              filterOption={(input, option) => (option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false)}
               onDropdownVisibleChange={(open) => {
                 if (open) {
                   fetchData(); // Fetch data when the dropdown is opened
@@ -139,7 +138,8 @@ export default function MakineDurumu({ disabled, fieldRequirements }) {
                       flexWrap: "wrap",
                       justifyContent: "center",
                       padding: "0 8px 4px",
-                    }}>
+                    }}
+                  >
                     <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
                     <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
                       Ekle

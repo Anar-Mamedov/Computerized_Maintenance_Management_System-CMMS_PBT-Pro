@@ -389,6 +389,12 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           return { message: "Kapandı", color: "#575757" };
         case 5:
           return { message: "İptal Edildi", color: "#d10000" };
+        case 6:
+          return { color: "#ff5e00", text: "Onay Bekliyor" };
+        case 7:
+          return { color: "#00d300", text: "Onaylandı" };
+        case 8:
+          return { color: "#d10000", text: "Reddedildi" };
         default:
           return { message: "Bilinmiyor", color: "gray" };
       }

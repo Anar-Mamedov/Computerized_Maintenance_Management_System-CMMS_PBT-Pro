@@ -18,8 +18,8 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       kullaniciID: "",
       rolTanim: "",
       rolID: "",
-      onayTanim: "",
-      onayID: "",
+      // onayTanim: "",
+      // onayID: "",
       lokasyonTanim: "",
       lokasyonID: "",
       // Add other default values here
@@ -43,7 +43,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
   const onSubmited = (data) => {
     const Body = {
       ONYK_ROL_ID: data.rolID,
-      ONYK_ID: data.onayID,
+      // ONYK_ID: data.onayID,
       ONYK_KUL_ID: data.kullaniciID,
       ONYK_LOKASYON_ID: data.lokasyonID,
     };
@@ -90,7 +90,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
           </Button>
         </div>
 
-        <Modal width="500px" title="Yeni Onay Ekle" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
+        <Modal width="500px" title="Yeni Onaylayıcı Ekle" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
           {loading ? (
             <Spin spinning={loading} size="large" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
               {/* İçerik yüklenirken gösterilecek alan */}

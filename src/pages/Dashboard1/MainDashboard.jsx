@@ -1,20 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { GridStack } from "gridstack";
 import "gridstack/dist/gridstack.css";
-import {
-  Button,
-  Checkbox,
-  Popover,
-  Typography,
-  Switch,
-  Tooltip,
-  ConfigProvider,
-} from "antd";
-import {
-  DownOutlined,
-  QuestionCircleOutlined,
-  ReloadOutlined,
-} from "@ant-design/icons";
+import { Button, Checkbox, Popover, Typography, Switch, Tooltip, ConfigProvider } from "antd";
+import { DownOutlined, QuestionCircleOutlined, ReloadOutlined } from "@ant-design/icons";
 import trTR from "antd/lib/locale/tr_TR";
 import { useForm, FormProvider } from "react-hook-form";
 import Component3 from "./components/Component3.jsx";
@@ -37,6 +25,7 @@ import IsEmriTipleri from "./components/IsEmriTipleri.jsx";
 import IsTalebiTipleri from "./components/IsTalebiTipleri.jsx";
 import { AppProvider } from "./../../AppContext.jsx";
 import { createRoot } from "react-dom/client";
+import OnayIstekleriTablo from "./components/OnayIstekleriTablo.jsx";
 
 import "./custom-gridstack.css"; // Add this line to import your custom CSS
 
@@ -60,6 +49,7 @@ const widgetTitles = {
   widget15: "Personel KPI",
   widget16: "İş Emri Tipleri",
   widget17: "İş Talebi Tipleri",
+  widget18: "Bekleyen Onaylarım",
 };
 
 const defaultItems = [
@@ -67,21 +57,21 @@ const defaultItems = [
   { id: "widget2", x: 3, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
   { id: "widget3", x: 6, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
   { id: "widget4", x: 9, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
-  { id: "widget5", x: 0, y: 1, width: 4, height: 3, minW: 3, minH: 2 },
-  { id: "widget10", x: 4, y: 1, width: 8, height: 3, minW: 3, minH: 2 },
-  { id: "widget13", x: 0, y: 4, width: 12, height: 3, minW: 3, minH: 2 },
-  { id: "widget6", x: 0, y: 7, width: 7, height: 4, minW: 3, minH: 2 },
-  { id: "widget14", x: 7, y: 7, width: 5, height: 4, minW: 3, minH: 2 },
-  { id: "widget12", x: 0, y: 11, width: 12, height: 3, minW: 3, minH: 2 },
-  { id: "widget11", x: 0, y: 14, width: 12, height: 3, minW: 3, minH: 2 },
-  { id: "widget15", x: 0, y: 17, width: 6, height: 4, minW: 3, minH: 2 },
-  { id: "widget7", x: 6, y: 17, width: 6, height: 4, minW: 3, minH: 2 },
-  { id: "widget16", x: 0, y: 21, width: 6, height: 4, minW: 3, minH: 2 },
-  { id: "widget17", x: 6, y: 21, width: 6, height: 4, minW: 3, minH: 2 },
-  { id: "widget8", x: 0, y: 25, width: 6, height: 4, minW: 3, minH: 2 },
-  { id: "widget9", x: 6, y: 25, width: 6, height: 4, minW: 3, minH: 2 },
+  { id: "widget18", x: 0, y: 1, width: 6, height: 4, minW: 3, minH: 2 },
+  { id: "widget10", x: 6, y: 1, width: 6, height: 4, minW: 3, minH: 2 },
+  { id: "widget5", x: 0, y: 5, width: 4, height: 3, minW: 3, minH: 2 },
+  { id: "widget13", x: 4, y: 5, width: 8, height: 3, minW: 3, minH: 2 },
+  { id: "widget6", x: 0, y: 8, width: 7, height: 4, minW: 3, minH: 2 },
+  { id: "widget14", x: 7, y: 8, width: 5, height: 4, minW: 3, minH: 2 },
+  { id: "widget12", x: 0, y: 12, width: 12, height: 3, minW: 3, minH: 2 },
+  { id: "widget11", x: 0, y: 15, width: 12, height: 3, minW: 3, minH: 2 },
+  { id: "widget15", x: 0, y: 18, width: 6, height: 4, minW: 3, minH: 2 },
+  { id: "widget7", x: 6, y: 18, width: 6, height: 4, minW: 3, minH: 2 },
+  { id: "widget16", x: 0, y: 22, width: 6, height: 4, minW: 3, minH: 2 },
+  { id: "widget17", x: 6, y: 22, width: 6, height: 4, minW: 3, minH: 2 },
+  { id: "widget8", x: 0, y: 26, width: 6, height: 4, minW: 3, minH: 2 },
+  { id: "widget9", x: 6, y: 26, width: 6, height: 4, minW: 3, minH: 2 },
 ];
-
 function MainDashboard() {
   const [reorganize, setReorganize] = useState();
   const [updateApi, setUpdateApi] = useState(false);
@@ -103,6 +93,7 @@ function MainDashboard() {
     widget15: false,
     widget16: false,
     widget17: false,
+    widget18: false,
   });
 
   const methods = useForm({
@@ -138,8 +129,7 @@ function MainDashboard() {
       localStorage.setItem("reorganize", "true");
     }
     setTimeout(() => {
-      const gridItems =
-        JSON.parse(localStorage.getItem(selectedDashboard)) || [];
+      const gridItems = JSON.parse(localStorage.getItem(selectedDashboard)) || [];
       window.updateWidgets(gridItems);
     }, 50);
   };
@@ -394,6 +384,17 @@ function MainDashboard() {
               </FormProvider>
             );
             break;
+          case "widget18":
+            root.render(
+              <FormProvider {...methods}>
+                <ConfigProvider locale={trTR}>
+                  <AppProvider>
+                    <OnayIstekleriTablo />
+                  </AppProvider>
+                </ConfigProvider>
+              </FormProvider>
+            );
+            break;
           default:
             break;
         }
@@ -419,6 +420,7 @@ function MainDashboard() {
         widget15: false,
         widget16: false,
         widget17: false,
+        widget18: false,
       };
       newGridItems.forEach((item) => {
         if (Object.prototype.hasOwnProperty.call(newChecked, item.id)) {
@@ -434,8 +436,7 @@ function MainDashboard() {
     grid.engine.float = reorganize;
 
     const handleDashboardChange = () => {
-      const storedItems =
-        JSON.parse(localStorage.getItem(selectedDashboard)) || [];
+      const storedItems = JSON.parse(localStorage.getItem(selectedDashboard)) || [];
       const itemsToLoad = storedItems.length > 0 ? storedItems : defaultItems;
 
       const checked = {
@@ -456,6 +457,7 @@ function MainDashboard() {
         widget15: false,
         widget16: false,
         widget17: false,
+        widget18: false,
       };
       itemsToLoad.forEach((item) => {
         if (Object.prototype.hasOwnProperty.call(checked, item.id)) {
@@ -494,11 +496,7 @@ function MainDashboard() {
     } else {
       const defaultItem = defaultItems.find((item) => item.id === name);
 
-      const newPosition = findNextAvailablePosition(
-        gridItems,
-        defaultItem.width,
-        defaultItem.height
-      );
+      const newPosition = findNextAvailablePosition(gridItems, defaultItem.width, defaultItem.height);
       const newWidget = {
         ...defaultItem,
         ...newPosition,
@@ -624,124 +622,59 @@ function MainDashboard() {
           </Text>
         </Tooltip>
       </div>
-      <Checkbox
-        name="widget1"
-        onChange={handleCheckboxChange}
-        checked={checkedWidgets.widget1}
-      >
+      <Checkbox name="widget1" onChange={handleCheckboxChange} checked={checkedWidgets.widget1}>
         Devam Eden İş Talepleri
       </Checkbox>
-      <Checkbox
-        name="widget2"
-        onChange={handleCheckboxChange}
-        checked={checkedWidgets.widget2}
-      >
+      <Checkbox name="widget2" onChange={handleCheckboxChange} checked={checkedWidgets.widget2}>
         Açık İş Emirleri
       </Checkbox>
-      <Checkbox
-        name="widget3"
-        onChange={handleCheckboxChange}
-        checked={checkedWidgets.widget3}
-      >
+      <Checkbox name="widget3" onChange={handleCheckboxChange} checked={checkedWidgets.widget3}>
         Düşük Stoklu Malzemeler
       </Checkbox>
-      <Checkbox
-        name="widget4"
-        onChange={handleCheckboxChange}
-        checked={checkedWidgets.widget4}
-      >
+      <Checkbox name="widget4" onChange={handleCheckboxChange} checked={checkedWidgets.widget4}>
         Toplam Makine Sayısı
       </Checkbox>
-      <Checkbox
-        name="widget5"
-        onChange={handleCheckboxChange}
-        checked={checkedWidgets.widget5}
-      >
+      <Checkbox name="widget5" onChange={handleCheckboxChange} checked={checkedWidgets.widget5}>
         Özet Durum
       </Checkbox>
-      <Checkbox
-        name="widget6"
-        onChange={handleCheckboxChange}
-        checked={checkedWidgets.widget6}
-      >
+      <Checkbox name="widget6" onChange={handleCheckboxChange} checked={checkedWidgets.widget6}>
         Lokasyon Bazında İş Talepleri ve İş Emirleri Dağılımı
       </Checkbox>
-      <Checkbox
-        name="widget7"
-        onChange={handleCheckboxChange}
-        checked={checkedWidgets.widget7}
-      >
+      <Checkbox name="widget7" onChange={handleCheckboxChange} checked={checkedWidgets.widget7}>
         İş Emri Analizi
       </Checkbox>
-      <Checkbox
-        name="widget8"
-        onChange={handleCheckboxChange}
-        checked={checkedWidgets.widget8}
-      >
+      <Checkbox name="widget8" onChange={handleCheckboxChange} checked={checkedWidgets.widget8}>
         Arızalı Makineler
       </Checkbox>
-      <Checkbox
-        name="widget9"
-        onChange={handleCheckboxChange}
-        checked={checkedWidgets.widget9}
-      >
+      <Checkbox name="widget9" onChange={handleCheckboxChange} checked={checkedWidgets.widget9}>
         Makine Tiplerine Göre Envanter Dağılımı
       </Checkbox>
-      <Checkbox
-        name="widget10"
-        onChange={handleCheckboxChange}
-        checked={checkedWidgets.widget10}
-      >
+      <Checkbox name="widget10" onChange={handleCheckboxChange} checked={checkedWidgets.widget10}>
         Tamamlanmış İş Talepleri ve İş Emirleri Oranları
       </Checkbox>{" "}
-      <Checkbox
-        name="widget11"
-        onChange={handleCheckboxChange}
-        checked={checkedWidgets.widget11}
-      >
+      <Checkbox name="widget11" onChange={handleCheckboxChange} checked={checkedWidgets.widget11}>
         Aylık Bakım Maliyetleri
       </Checkbox>{" "}
-      <Checkbox
-        name="widget12"
-        onChange={handleCheckboxChange}
-        checked={checkedWidgets.widget12}
-      >
+      <Checkbox name="widget12" onChange={handleCheckboxChange} checked={checkedWidgets.widget12}>
         İş Emirlerinin Zaman Dağılımı
       </Checkbox>
-      <Checkbox
-        name="widget13"
-        onChange={handleCheckboxChange}
-        checked={checkedWidgets.widget13}
-      >
+      <Checkbox name="widget13" onChange={handleCheckboxChange} checked={checkedWidgets.widget13}>
         Personel Bazında İş Gücü
       </Checkbox>
-      <Checkbox
-        name="widget14"
-        onChange={handleCheckboxChange}
-        checked={checkedWidgets.widget14}
-      >
+      <Checkbox name="widget14" onChange={handleCheckboxChange} checked={checkedWidgets.widget14}>
         Toplam Harcanan İş Gücü
       </Checkbox>
-      <Checkbox
-        name="widget15"
-        onChange={handleCheckboxChange}
-        checked={checkedWidgets.widget15}
-      >
+      <Checkbox name="widget15" onChange={handleCheckboxChange} checked={checkedWidgets.widget15}>
         Personel KPI
       </Checkbox>
-      <Checkbox
-        name="widget16"
-        onChange={handleCheckboxChange}
-        checked={checkedWidgets.widget16}
-      >
+      <Checkbox name="widget16" onChange={handleCheckboxChange} checked={checkedWidgets.widget16}>
         İş Emri Tipleri
       </Checkbox>
-      <Checkbox
-        name="widget17"
-        onChange={handleCheckboxChange}
-        checked={checkedWidgets.widget17}
-      >
+      <Checkbox name="widget17" onChange={handleCheckboxChange} checked={checkedWidgets.widget17}>
         İş Emri Tipleri
+      </Checkbox>
+      <Checkbox name="widget18" onChange={handleCheckboxChange} checked={checkedWidgets.widget18}>
+        Bekleyen Onaylarım
       </Checkbox>
       <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
         <Button danger onClick={handleReset}>
@@ -798,13 +731,7 @@ function MainDashboard() {
                   }}
                   onClick={handleRearrange}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
                     <path
                       fill=""
                       fillRule="evenodd"
@@ -814,11 +741,7 @@ function MainDashboard() {
                   </svg>
                   Yeniden Sırala
                 </Button>
-                <Popover
-                  content={content}
-                  title="Widgetları Yönet"
-                  trigger="click"
-                >
+                <Popover content={content} title="Widgetları Yönet" trigger="click">
                   <Button
                     style={{
                       display: "flex",
@@ -827,14 +750,7 @@ function MainDashboard() {
                       gap: "5px",
                     }}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="18"
-                      height="18"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                      name="widget"
-                    >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="widget">
                       <path
                         fill=""
                         fillRule="evenodd"
@@ -950,6 +866,12 @@ function MainDashboard() {
                   <div className="grid-stack-item-content">
                     <div className="widget-header">{widgetTitles.widget17}</div>
                     <IsEmriTipleri />
+                  </div>
+                </div>
+                <div className="grid-stack-item border-dark" id="widget18">
+                  <div className="grid-stack-item-content">
+                    <div className="widget-header">{widgetTitles.widget18}</div>
+                    <OnayIstekleriTablo />
                   </div>
                 </div>
               </div>

@@ -57,6 +57,12 @@ export default function MainTable() {
         return { color: "#575757", text: "Kapandı" };
       case 5:
         return { color: "#d10000", text: "İptal Edildi" };
+      case 6:
+        return { color: "#ff5e00", text: "Onay Bekliyor" };
+      case 7:
+        return { color: "#00d300", text: "Onaylandı" };
+      case 8:
+        return { color: "#d10000", text: "Reddedildi" };
       default:
         return { color: "default", text: "" }; // Eğer farklı bir değer gelirse
     }
