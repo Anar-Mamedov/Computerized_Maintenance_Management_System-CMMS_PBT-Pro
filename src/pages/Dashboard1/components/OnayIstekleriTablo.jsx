@@ -9,6 +9,8 @@ import dayjs from "dayjs";
 import customFontBase64 from "./RobotoBase64.js";
 import trTR from "antd/lib/locale/tr_TR";
 import EditModal1 from "../../YardimMasasi/IsTalepleri/Update/EditDrawer.jsx";
+import { FaCircleCheck } from "react-icons/fa6";
+import { MdCancel } from "react-icons/md";
 import { CSVLink } from "react-csv";
 
 const { Text } = Typography;
@@ -192,18 +194,42 @@ function LokasyonBazindaIsTalepleri(props) {
       title: "",
       dataIndex: "",
       key: "action1",
-      // width: 100,
+      width: 100,
       ellipsis: true,
+      render: (text, record) => (
+        <Button
+          type="link"
+          icon={<MdCancel />}
+          onClick={async () => {
+            try {
+              const response = await AxiosInstance.post(`Onayla?ONAY_TABLO_ID=${record.ONAY_TABLO_ID}`);
+              // Handle success (e.g., show a notification or refresh the table)
+              if (response.status_code === 200 || response.status_code === 201) {
+                message.success("İşlem Başarılı.");
+                fetchData();
+              } else if (response.status_code === 401) {
+                message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+              } else {
+                message.error("İşlem Başarısız.");
+              }
+            } catch (error) {
+              console.error("API request failed:", error);
+              // Handle error (e.g., show an error message)
+            }
+          }}
+        />
+      ),
     },
     {
-      title: "Onayla",
+      title: "",
       dataIndex: "",
       key: "action2",
       width: 100,
       ellipsis: true,
       render: (text, record) => (
         <Button
-          icon={<CheckOutlined />}
+          type="link"
+          icon={<FaCircleCheck />}
           onClick={async () => {
             try {
               const response = await AxiosInstance.post(`Onayla?ONAY_TABLO_ID=${record.ONAY_TABLO_ID}`);
@@ -394,22 +420,16 @@ function LokasyonBazindaIsTalepleri(props) {
             padding: "0px 10px 0 10px",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Input placeholder="Arama..." value={searchTerm1} onChange={handleSearch1} style={{ width: "300px" }} />
+          {/*<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>*/}
+          {/*  <Input placeholder="Arama..." value={searchTerm1} onChange={handleSearch1} style={{ width: "300px" }} />*/}
 
-            {/*csv indirme butonu*/}
-            <CSVLink data={data} headers={csvHeaders} filename={`lokasyon_bazinda_is_talebi.csv`} className="ant-btn ant-btn-primary">
-              <Button type="primary" icon={<DownloadOutlined />} loading={loadings[1]} onClick={() => enterLoading(1)}>
-                İndir
-              </Button>
-            </CSVLink>
-          </div>
+          {/*  /!*csv indirme butonu*!/*/}
+          {/*  <CSVLink data={data} headers={csvHeaders} filename={`lokasyon_bazinda_is_talebi.csv`} className="ant-btn ant-btn-primary">*/}
+          {/*    <Button type="primary" icon={<DownloadOutlined />} loading={loadings[1]} onClick={() => enterLoading(1)}>*/}
+          {/*      İndir*/}
+          {/*    </Button>*/}
+          {/*  </CSVLink>*/}
+          {/*</div>*/}
           <Spin spinning={isLoading}>
             <Table
               columns={columns}
