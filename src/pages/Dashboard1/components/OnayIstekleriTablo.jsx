@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Table, Typography, Spin, Button, Popover, Modal, DatePicker, ConfigProvider, Tour, Input } from "antd";
-import { DownloadOutlined, MoreOutlined } from "@ant-design/icons";
+import { DownloadOutlined, MoreOutlined, CheckOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../api/http.jsx";
 import { Controller, useFormContext } from "react-hook-form";
 import jsPDF from "jspdf";
@@ -8,6 +8,7 @@ import "jspdf-autotable";
 import dayjs from "dayjs";
 import customFontBase64 from "./RobotoBase64.js";
 import trTR from "antd/lib/locale/tr_TR";
+import EditModal1 from "../../YardimMasasi/IsTalepleri/Update/EditDrawer.jsx";
 import { CSVLink } from "react-csv";
 
 const { Text } = Typography;
@@ -44,6 +45,7 @@ function LokasyonBazindaIsTalepleri(props) {
   const [searchTerm1, setSearchTerm1] = useState("");
   const [filteredData1, setFilteredData1] = useState([]);
   const [open, setOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
   const ref1 = useRef(null);
   const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false); // Expanded modal visibility state
   const {
@@ -168,22 +170,51 @@ function LokasyonBazindaIsTalepleri(props) {
 
   const columns = [
     {
-      title: "Lokasyon",
-      dataIndex: "LOKASYON",
+      title: "Kod",
+      dataIndex: "ONAY_TABLO_KOD",
       width: 200,
       ellipsis: true,
+      onCell: (record) => ({
+        onClick: () => {
+          setSelectedRow(record);
+          setIsModalVisible(true);
+        },
+      }),
+      render: (text) => <a>{text}</a>,
     },
     {
-      title: "Toplam İş Talebi",
-      dataIndex: "TOPLAM_IS_TALEBI",
+      title: "Onay Tipi",
+      dataIndex: "ONY_TANIM",
       // width: 100,
       ellipsis: true,
     },
     {
-      title: "Toplam İş Emri",
-      dataIndex: "TOPLAM_IS_EMRI",
+      title: "",
+      dataIndex: "",
+      key: "action1",
       // width: 100,
       ellipsis: true,
+    },
+    {
+      title: "Onayla",
+      dataIndex: "",
+      key: "action2",
+      width: 100,
+      ellipsis: true,
+      render: (text, record) => (
+        <Button
+          icon={<CheckOutlined />}
+          onClick={async () => {
+            try {
+              await AxiosInstance.post(`Onayla?ONAY_TABLO_ID=${record.ONAY_TABLO_ID}`);
+              // Handle success (e.g., show a notification or refresh the table)
+            } catch (error) {
+              console.error("API request failed:", error);
+              // Handle error (e.g., show an error message)
+            }
+          }}
+        />
+      ),
     },
   ];
 
@@ -194,7 +225,7 @@ function LokasyonBazindaIsTalepleri(props) {
       const formattedData = response.map((item) => {
         return {
           ...item,
-          key: item.ID,
+          key: item.TB_ONAYLAR_ID,
         };
       });
       setData(formattedData);
