@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Table, Typography, Spin, Button, Popover, Modal, DatePicker, ConfigProvider, Tour, Input } from "antd";
+import { Table, Typography, Spin, Button, Popover, Modal, DatePicker, ConfigProvider, Tour, Input, message } from "antd";
 import { DownloadOutlined, MoreOutlined, CheckOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../api/http.jsx";
 import { Controller, useFormContext } from "react-hook-form";
@@ -206,8 +206,16 @@ function LokasyonBazindaIsTalepleri(props) {
           icon={<CheckOutlined />}
           onClick={async () => {
             try {
-              await AxiosInstance.post(`Onayla?ONAY_TABLO_ID=${record.ONAY_TABLO_ID}`);
+              const response = await AxiosInstance.post(`Onayla?ONAY_TABLO_ID=${record.ONAY_TABLO_ID}`);
               // Handle success (e.g., show a notification or refresh the table)
+              if (response.status_code === 200 || response.status_code === 201) {
+                message.success("İşlem Başarılı.");
+                fetchData();
+              } else if (response.status_code === 401) {
+                message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+              } else {
+                message.error("İşlem Başarısız.");
+              }
             } catch (error) {
               console.error("API request failed:", error);
               // Handle error (e.g., show an error message)
