@@ -8,10 +8,11 @@ import "jspdf-autotable";
 import dayjs from "dayjs";
 import customFontBase64 from "./RobotoBase64.js";
 import trTR from "antd/lib/locale/tr_TR";
-import EditModal1 from "../../YardimMasasi/IsTalepleri/Update/EditDrawer.jsx";
 import { FaCircleCheck } from "react-icons/fa6";
 import { MdCancel } from "react-icons/md";
 import { CSVLink } from "react-csv";
+import EditDrawer1 from "../../YardimMasasi/IsTalepleri/Update/EditDrawer.jsx";
+import EditDrawer from "../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer.jsx";
 
 const { Text } = Typography;
 
@@ -38,6 +39,10 @@ function LokasyonBazindaIsTalepleri(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
+  const [editDrawer1Data, setEditDrawer1Data] = useState(null);
+  const [editDrawerVisible, setEditDrawerVisible] = useState(false);
+  const [editDrawerData, setEditDrawerData] = useState(null);
   const [modalContent, setModalContent] = useState("");
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
@@ -178,8 +183,18 @@ function LokasyonBazindaIsTalepleri(props) {
       ellipsis: true,
       onCell: (record) => ({
         onClick: () => {
-          setSelectedRow(record);
-          setIsModalVisible(true);
+          // Burada, record objesini doğrudan kullanmak yerine,
+          // bir kopyasını oluşturup `key` değerini `ISM_DURUM_KOD_ID` ile güncelliyoruz.
+          const updatedRecord = { ...record, key: record.ONAY_TABLO_ID };
+          // const updatedRecord = { ...record, key: 378 };
+
+          if (record.ONAY_ONYTANIM_ID === 2) {
+            setEditDrawer1Data(updatedRecord);
+            setEditDrawer1Visible(true);
+          } else if (record.ONAY_ONYTANIM_ID === 1) {
+            setEditDrawerData(updatedRecord);
+            setEditDrawerVisible(true);
+          }
         },
       }),
       render: (text) => <a>{text}</a>,
@@ -199,7 +214,8 @@ function LokasyonBazindaIsTalepleri(props) {
       render: (text, record) => (
         <Button
           type="link"
-          icon={<MdCancel />}
+          danger
+          icon={<MdCancel style={{ fontSize: "21px" }} />}
           onClick={async () => {
             try {
               const response = await AxiosInstance.post(`Onayla?ONAY_TABLO_ID=${record.ONAY_TABLO_ID}`);
@@ -229,7 +245,7 @@ function LokasyonBazindaIsTalepleri(props) {
       render: (text, record) => (
         <Button
           type="link"
-          icon={<FaCircleCheck />}
+          icon={<FaCircleCheck style={{ fontSize: "21px", color: "#2bc770" }} />}
           onClick={async () => {
             try {
               const response = await AxiosInstance.post(`Onayla?ONAY_TABLO_ID=${record.ONAY_TABLO_ID}`);
@@ -444,6 +460,26 @@ function LokasyonBazindaIsTalepleri(props) {
                 showQuickJumper: true,
               }}
             />
+            {editDrawerVisible && (
+              <EditDrawer
+                selectedRow={editDrawerData}
+                onDrawerClose={() => setEditDrawerVisible(false)}
+                drawerVisible={editDrawerVisible}
+                onRefresh={() => {
+                  /* Veri yenileme işlemi */
+                }}
+              />
+            )}
+            {editDrawer1Visible && (
+              <EditDrawer1
+                selectedRow={editDrawer1Data}
+                onDrawerClose={() => setEditDrawer1Visible(false)}
+                drawerVisible={editDrawer1Visible}
+                onRefresh={() => {
+                  /* Veri yenileme işlemi */
+                }}
+              />
+            )}
           </Spin>
         </div>
         <Tour open={open} onClose={() => setOpen(false)} steps={steps} />
