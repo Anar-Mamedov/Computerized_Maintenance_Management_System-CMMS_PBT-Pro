@@ -32,7 +32,7 @@ const ConditionFilter = ({ onSubmit }) => {
       { key: 5, value: "İptal Edildi" },
       { key: 6, value: "Onay Bekliyor" },
       { key: 7, value: "Onaylandı" },
-      { key: 8, value: "Reddedildi" },
+      { key: 8, value: "Onaylanmadı" },
     ];
     setOptions(hardcodedOptions);
   }, []);
@@ -59,21 +59,14 @@ const ConditionFilter = ({ onSubmit }) => {
 
   const content = (
     <div style={{ width: "300px" }}>
-      <div
-        style={{ borderBottom: "1px solid #ccc", padding: "10px", display: "flex", justifyContent: "space-between" }}>
+      <div style={{ borderBottom: "1px solid #ccc", padding: "10px", display: "flex", justifyContent: "space-between" }}>
         <Button onClick={handleCancelClick}>İptal</Button>
         <Button type="primary" onClick={handleSubmit}>
           Uygula
         </Button>
       </div>
       <div style={{ padding: "10px" }}>
-        <Select
-          mode="multiple"
-          style={{ width: "100%" }}
-          placeholder="Ara..."
-          value={Object.values(filters)}
-          onChange={handleChange}
-          allowClear>
+        <Select mode="multiple" style={{ width: "100%" }} placeholder="Ara..." value={Object.values(filters)} onChange={handleChange} allowClear>
           {options.map((option) => (
             <Option key={option.key} value={option.value}>
               {option.value}
@@ -105,7 +98,8 @@ const ConditionFilter = ({ onSubmit }) => {
             justifyContent: "center",
             alignItems: "center",
             color: "white",
-          }}>
+          }}
+        >
           {Object.keys(filters).length}
         </div>
       </Button>

@@ -150,7 +150,7 @@ const MainTable = () => {
       case 7:
         return { color: "#00d300", text: "Onaylandı" };
       case 8:
-        return { color: "#d10000", text: "Reddedildi" };
+        return { color: "#d10000", text: "Onaylanmadı" };
       default:
         return { color: "default", text: "" }; // Eğer farklı bir değer gelirse
     }

@@ -198,7 +198,7 @@ const MainTable = () => {
       case 2:
         return { color: "#00d300", text: "Onaylandı" };
       case 3:
-        return { color: "#d10000", text: "Reddedildi" };
+        return { color: "#d10000", text: "Onaylanmadı" };
       default:
         return { color: "", text: "" }; // Diğer durumlar için boş değer
     }

@@ -400,7 +400,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         case 7:
           return { color: "#00d300", text: "Onaylandı" };
         case 8:
-          return { color: "#d10000", text: "Reddedildi" };
+          return { color: "#d10000", text: "Onaylanmadı" };
         default:
           return { message: "Bilinmiyor", color: "gray" };
       }
