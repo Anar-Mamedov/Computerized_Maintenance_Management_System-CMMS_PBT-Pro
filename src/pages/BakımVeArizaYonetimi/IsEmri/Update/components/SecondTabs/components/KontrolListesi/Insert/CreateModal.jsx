@@ -6,7 +6,7 @@ import { Controller, useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
 import dayjs from "dayjs";
 
-export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID }) {
+export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID, kapali }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const methods = useForm({
@@ -129,22 +129,14 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     <FormProvider {...methods}>
       <div>
         <div style={{ display: "flex", width: "100%", justifyContent: "flex-end", marginBottom: "10px" }}>
-          <Button type="link" onClick={handleModalToggle}>
+          <Button disabled={kapali} type="link" onClick={handleModalToggle}>
             <PlusOutlined /> Yeni Kayıt
           </Button>
         </div>
 
-        <Modal
-          width="800px"
-          title="Kontrol Ekle"
-          open={isModalVisible}
-          onOk={methods.handleSubmit(onSubmited)}
-          onCancel={handleModalToggle}>
+        <Modal width="800px" title="Kontrol Ekle" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
           {loading ? (
-            <Spin
-              spinning={loading}
-              size="large"
-              style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+            <Spin spinning={loading} size="large" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
               {/* İçerik yüklenirken gösterilecek alan */}
             </Spin>
           ) : (
