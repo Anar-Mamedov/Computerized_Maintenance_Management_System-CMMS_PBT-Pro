@@ -116,6 +116,7 @@ const MainTable = () => {
   const [pageSize, setPageSize] = useState(10); // Başlangıçta sayfa başına 10 kayıt göster
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
+  const [onayCheck, setOnayCheck] = useState(false);
 
   // edit drawer için
   const [drawer, setDrawer] = useState({
@@ -151,6 +152,23 @@ const MainTable = () => {
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   }
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await AxiosInstance.post(`GetOnayCheck?TB_ONAY_ID=1`); // API URL'niz
+        if (response[0].ONY_AKTIF === 1) {
+          setOnayCheck(true);
+        } else {
+          setOnayCheck(false);
+        }
+      } catch (error) {
+        console.error("API isteğinde hata oluştu:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   // Özel Alanların nameleri backend çekmek için api isteği
 
   useEffect(() => {
@@ -172,6 +190,20 @@ const MainTable = () => {
   const ozelAlanlar = JSON.parse(localStorage.getItem("ozelAlanlar"));
 
   // Özel Alanların nameleri backend çekmek için api isteği sonu
+
+  const statusTag = (statusId) => {
+    switch (statusId) {
+      case 1:
+        return { color: "#ff5e00", text: "Onay Bekliyor" };
+      case 2:
+        return { color: "#00d300", text: "Onaylandı" };
+      case 3:
+        return { color: "#d10000", text: "Reddedildi" };
+      default:
+        return { color: "", text: "" }; // Diğer durumlar için boş değer
+    }
+  };
+
   const initialColumns = [
     {
       title: "İş Emri No",
@@ -296,6 +328,43 @@ const MainTable = () => {
           </div>
         );
       },
+    },
+
+    {
+      title: "Onay Durumu",
+      dataIndex: "ISM_ONAY_DURUM",
+      key: "ISM_ONAY_DURUM",
+      width: 150,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+      render: (_, record) => {
+        const validStatuses = [1, 2, 3];
+        if (validStatuses.includes(record.ISM_ONAY_DURUM)) {
+          const { color, text } = statusTag(record.ISM_ONAY_DURUM);
+          return (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Tag
+                style={{
+                  textAlign: "center",
+                  backgroundColor: hexToRGBA(color, 0.2),
+                  border: `1.2px solid ${hexToRGBA(color, 0.7)}`,
+                  color: color,
+                }}
+              >
+                {text}
+              </Tag>
+            </div>
+          );
+        }
+        return null; // Diğer durumlar için hiçbir şey render edilmez
+      },
+      sorter: (a, b) => (a.ISM_ONAY_DURUM || 0) - (b.ISM_ONAY_DURUM || 0),
     },
 
     {
@@ -1405,7 +1474,7 @@ const MainTable = () => {
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
-          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
+          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
           <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
         </div>
       </div>

@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Table, Typography, Spin, Button, Popover, Modal, DatePicker, ConfigProvider, Tour, Input, message } from "antd";
+import { Table, Typography, Spin, Button, Popover, Modal, DatePicker, ConfigProvider, Tour, Input, message, Form } from "antd";
 import { DownloadOutlined, MoreOutlined, CheckOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../api/http.jsx";
-import { Controller, useFormContext } from "react-hook-form";
+import { Controller, useForm, useFormContext } from "react-hook-form";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import dayjs from "dayjs";
@@ -13,75 +13,30 @@ import { MdCancel } from "react-icons/md";
 import { CSVLink } from "react-csv";
 import EditDrawer1 from "../../YardimMasasi/IsTalepleri/Update/EditDrawer.jsx";
 import EditDrawer from "../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer.jsx";
+import TextArea from "antd/es/input/TextArea";
 
 const { Text } = Typography;
-
-// Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
-const normalizeText = (text) => {
-  return text
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/ğ/g, "g")
-    .replace(/Ğ/g, "G")
-    .replace(/ü/g, "u")
-    .replace(/Ü/g, "U")
-    .replace(/ş/g, "s")
-    .replace(/Ş/g, "S")
-    .replace(/ı/g, "i")
-    .replace(/İ/g, "I")
-    .replace(/ö/g, "o")
-    .replace(/Ö/g, "O")
-    .replace(/ç/g, "c")
-    .replace(/Ç/g, "C");
-};
 
 function LokasyonBazindaIsTalepleri(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
   const [editDrawerVisible, setEditDrawerVisible] = useState(false);
   const [editDrawerData, setEditDrawerData] = useState(null);
-  const [modalContent, setModalContent] = useState("");
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
-  const [baslamaTarihi, setBaslamaTarihi] = useState();
-  const [bitisTarihi, setBitisTarihi] = useState();
-  const [loadings, setLoadings] = useState([]);
-  const [searchTerm1, setSearchTerm1] = useState("");
-  const [filteredData1, setFilteredData1] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
+  const [isReddetModal, setIsReddetModal] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
   const ref1 = useRef(null);
-  const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false); // Expanded modal visibility state
-  const {
-    control,
-    watch,
-    setValue,
-    reset,
-    formState: { errors },
-  } = useFormContext();
 
-  const downloadPDF = () => {
-    const doc = new jsPDF();
+  const methods = useForm({
+    defaultValues: {
+      reddetAciklama: "",
+    },
+  });
 
-    // jsPDF içinde kullanım
-    doc.addFileToVFS("Roboto-Regular.ttf", customFontBase64);
-    doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
-
-    doc.setFont("Roboto");
-
-    const columns = ["Lokasyon", "Toplam İş Talebi", "Toplam İş Emri"];
-    const tableData = data.map((item) => [item.LOKASYON, item.TOPLAM_IS_TALEBI, item.TOPLAM_IS_EMRI]);
-
-    doc.autoTable({
-      head: [columns],
-      body: tableData,
-    });
-
-    doc.save("lokasyon_bazinda_is_talepleri.pdf");
-  };
+  const { setValue, reset, handleSubmit, watch, control } = methods;
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
@@ -118,63 +73,6 @@ function LokasyonBazindaIsTalepleri(props) {
 
   // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın sonu
 
-  const showModal = (content) => {
-    setModalContent(content);
-    setIsModalVisible(true);
-  };
-
-  useEffect(() => {
-    const baslamaTarihiValue = watch("baslamaTarihi");
-    const bitisTarihiValue = watch("bitisTarihi");
-    const aySecimiValue = watch("aySecimi");
-    const yilSecimiValue = watch("yilSecimi");
-
-    if (!baslamaTarihiValue && !bitisTarihiValue && !aySecimiValue && !yilSecimiValue) {
-      const currentYear = dayjs().year();
-      const firstDayOfYear = dayjs().year(currentYear).startOf("year").format("YYYY-MM-DD");
-      const lastDayOfYear = dayjs().year(currentYear).endOf("year").format("YYYY-MM-DD");
-      setBaslamaTarihi(firstDayOfYear);
-      setBitisTarihi(lastDayOfYear);
-    } else if (baslamaTarihiValue && bitisTarihiValue) {
-      setBaslamaTarihi(formatDateWithDayjs(baslamaTarihiValue));
-      setBitisTarihi(formatDateWithDayjs(bitisTarihiValue));
-    } else if (aySecimiValue) {
-      const startOfMonth = dayjs(aySecimiValue).startOf("month");
-      const endOfMonth = dayjs(aySecimiValue).endOf("month");
-      setBaslamaTarihi(formatDateWithDayjs(startOfMonth));
-      setBitisTarihi(formatDateWithDayjs(endOfMonth));
-    } else if (yilSecimiValue) {
-      const startOfYear = dayjs(yilSecimiValue).startOf("year");
-      const endOfYear = dayjs(yilSecimiValue).endOf("year");
-      setBaslamaTarihi(formatDateWithDayjs(startOfYear));
-      setBitisTarihi(formatDateWithDayjs(endOfYear));
-    }
-  }, [watch("baslamaTarihi"), watch("bitisTarihi"), watch("aySecimi"), watch("yilSecimi")]);
-
-  const handleOk = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    // reset();
-  };
-
-  useEffect(() => {
-    if (isModalVisible === true) {
-      setValue("baslamaTarihi", null);
-      setValue("bitisTarihi", null);
-      setValue("aySecimi", null);
-      setValue("yilSecimi", null);
-      // reset({
-      //   baslamaTarihi: undefined,
-      //   bitisTarihi: undefined,
-      //   aySecimi: undefined,
-      //   yilSecimi: undefined,
-      // });
-    }
-  }, [isModalVisible]);
-
   const columns = [
     {
       title: "Kod",
@@ -206,42 +104,12 @@ function LokasyonBazindaIsTalepleri(props) {
       ellipsis: true,
     },
     {
-      title: "",
-      dataIndex: "",
-      key: "action1",
-      width: 100,
-      ellipsis: true,
-      render: (text, record) => (
-        <Button
-          type="link"
-          danger
-          icon={<MdCancel style={{ fontSize: "21px" }} />}
-          onClick={async () => {
-            try {
-              const response = await AxiosInstance.post(`Onayla?ONAY_TABLO_ID=${record.ONAY_TABLO_ID}`);
-              // Handle success (e.g., show a notification or refresh the table)
-              if (response.status_code === 200 || response.status_code === 201) {
-                message.success("İşlem Başarılı.");
-                fetchData();
-              } else if (response.status_code === 401) {
-                message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
-              } else {
-                message.error("İşlem Başarısız.");
-              }
-            } catch (error) {
-              console.error("API request failed:", error);
-              // Handle error (e.g., show an error message)
-            }
-          }}
-        />
-      ),
-    },
-    {
-      title: "",
+      title: "Onayla",
       dataIndex: "",
       key: "action2",
       width: 100,
       ellipsis: true,
+      align: "center",
       render: (text, record) => (
         <Button
           type="link"
@@ -266,7 +134,63 @@ function LokasyonBazindaIsTalepleri(props) {
         />
       ),
     },
+    {
+      title: "Reddet",
+      dataIndex: "",
+      key: "action1",
+      width: 100,
+      ellipsis: true,
+      align: "center",
+      render: (text, record) => (
+        <Button
+          type="link"
+          danger
+          icon={<MdCancel style={{ fontSize: "21px" }} />}
+          onClick={() => {
+            setSelectedRecord(record);
+            setIsReddetModal(true);
+          }}
+        />
+      ),
+    },
   ];
+
+  const onSubmited = (data) => {
+    const Body = {
+      ONAY_TABLO_ID: selectedRecord.ONAY_TABLO_ID,
+      ONAY_RED_ACIKLAMA: data.reddetAciklama,
+    };
+
+    AxiosInstance.post(`Reddet`, Body)
+      .then((response) => {
+        console.log("Data sent successfully:", response);
+
+        if (response.status_code === 200 || response.status_code === 201) {
+          message.success("İşlem Başarılı.");
+          fetchData();
+          setIsReddetModal(false);
+          setSelectedRecord(null);
+          reset();
+        } else if (response.status_code === 401) {
+          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+        } else {
+          message.error("İşlem Başarısız.");
+        }
+      })
+      .catch((error) => {
+        // Handle errors here, e.g.:
+        console.error("Error sending data:", error);
+        message.error("Başarısız Olundu.");
+      });
+
+    console.log({ Body });
+  };
+
+  const handleReddetCancle = () => {
+    setIsReddetModal(false);
+    setSelectedRecord(null);
+    reset();
+  };
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -287,97 +211,8 @@ function LokasyonBazindaIsTalepleri(props) {
   };
 
   useEffect(() => {
-    if (baslamaTarihi && bitisTarihi) {
-      fetchData();
-    }
-  }, [baslamaTarihi, bitisTarihi]);
-
-  const content1 = (
-    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-      <div style={{ cursor: "pointer" }} onClick={() => showModal("Tarih Aralığı Seç")}>
-        Tarih Aralığı Seç
-      </div>
-      <div style={{ cursor: "pointer" }} onClick={() => showModal("Ay Seç")}>
-        Ay Seç
-      </div>
-      <div style={{ cursor: "pointer" }} onClick={() => showModal("Yıl Seç")}>
-        Yıl Seç
-      </div>
-    </div>
-  );
-
-  const content = (
-    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-      <div style={{ cursor: "pointer" }} onClick={() => setIsExpandedModalVisible(true)}>
-        Büyüt
-      </div>
-      <Popover placement="right" content={content1} trigger="click">
-        <div style={{ cursor: "pointer" }}>Süre Seçimi</div>
-      </Popover>
-      {/*<div style={{ cursor: "pointer" }} onClick={downloadPDF}>*/}
-      {/*  İndir*/}
-      {/*</div>*/}
-      <div style={{ cursor: "pointer" }} onClick={() => setOpen(true)}>
-        Bilgi
-      </div>
-    </div>
-  );
-
-  const steps = [
-    {
-      title: "Bilgi",
-      description: (
-        <div
-          style={{
-            overflow: "auto",
-            height: "100%",
-            maxHeight: "200px",
-          }}
-        >
-          <p>Belirli lokasyonlardaki ya da Atölyelerdeki iş yükünü veya taleplerin dağılımını daha iyi anlayabilmek ve buna göre kararlar alabilmek için kullanılır.</p>
-        </div>
-      ),
-
-      target: () => ref1.current,
-    },
-  ];
-
-  // Arama işlevselliği için handleSearch fonksiyonları
-  const handleSearch1 = (e) => {
-    const value = e.target.value;
-    setSearchTerm1(value);
-    const normalizedSearchTerm = normalizeText(value);
-    if (value) {
-      const filtered = data.filter((item) =>
-        Object.keys(item).some((key) => item[key] && normalizeText(item[key].toString()).toLowerCase().includes(normalizedSearchTerm.toLowerCase()))
-      );
-      setFilteredData1(filtered);
-    } else {
-      setFilteredData1(data);
-    }
-  };
-
-  // csv dosyası için tablo başlık oluştur
-
-  const csvHeaders = columns.map((col) => ({
-    label: col.title,
-    key: col.dataIndex,
-  }));
-
-  const enterLoading = (index) => {
-    setLoadings((prevLoadings) => {
-      const newLoadings = [...prevLoadings];
-      newLoadings[index] = true;
-      return newLoadings;
-    });
-    setTimeout(() => {
-      setLoadings((prevLoadings) => {
-        const newLoadings = [...prevLoadings];
-        newLoadings[index] = false;
-        return newLoadings;
-      });
-    }, 1000);
-  };
+    fetchData();
+  }, []);
 
   return (
     <ConfigProvider locale={trTR}>
@@ -403,27 +238,6 @@ function LokasyonBazindaIsTalepleri(props) {
           }}
         >
           <Text style={{ fontWeight: "500", fontSize: "17px" }}>Bekleyen Onaylarim</Text>
-          <Popover placement="bottom" content={content} trigger="click">
-            <Button
-              type="text"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "0px 5px",
-                height: "32px",
-                zIndex: 3,
-              }}
-            >
-              <MoreOutlined
-                style={{
-                  cursor: "pointer",
-                  fontWeight: "500",
-                  fontSize: "16px",
-                }}
-              />
-            </Button>
-          </Popover>
         </div>
         <div
           ref={ref1}
@@ -436,20 +250,10 @@ function LokasyonBazindaIsTalepleri(props) {
             padding: "0px 10px 0 10px",
           }}
         >
-          {/*<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>*/}
-          {/*  <Input placeholder="Arama..." value={searchTerm1} onChange={handleSearch1} style={{ width: "300px" }} />*/}
-
-          {/*  /!*csv indirme butonu*!/*/}
-          {/*  <CSVLink data={data} headers={csvHeaders} filename={`lokasyon_bazinda_is_talebi.csv`} className="ant-btn ant-btn-primary">*/}
-          {/*    <Button type="primary" icon={<DownloadOutlined />} loading={loadings[1]} onClick={() => enterLoading(1)}>*/}
-          {/*      İndir*/}
-          {/*    </Button>*/}
-          {/*  </CSVLink>*/}
-          {/*</div>*/}
           <Spin spinning={isLoading}>
             <Table
               columns={columns}
-              dataSource={filteredData1.length > 0 || searchTerm1 ? filteredData1 : data}
+              dataSource={data}
               size="small"
               pagination={{
                 defaultPageSize: 10,
@@ -482,114 +286,48 @@ function LokasyonBazindaIsTalepleri(props) {
             )}
           </Spin>
         </div>
-        <Tour open={open} onClose={() => setOpen(false)} steps={steps} />
-        <Modal title="Tarih Seçimi" centered open={isModalVisible} onOk={handleOk} onCancel={handleCancel} destroyOnClose>
-          {modalContent === "Tarih Aralığı Seç" && (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: "10px",
-              }}
-            >
-              <div>Tarih Aralığı Seç:</div>
-              <Controller
-                name="baslamaTarihi"
-                control={control}
-                render={({ field }) => <DatePicker {...field} style={{ width: "130px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />}
-              />
-              {" - "}
-              <Controller
-                name="bitisTarihi"
-                control={control}
-                render={({ field }) => <DatePicker {...field} style={{ width: "130px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />}
-              />
-            </div>
-          )}
-          {modalContent === "Ay Seç" && (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: "10px",
-              }}
-            >
-              <div>Ay Seç:</div>
-              <Controller
-                name="aySecimi"
-                control={control}
-                render={({ field }) => <DatePicker {...field} picker="month" style={{ width: "130px" }} placeholder="Tarih seçiniz" />}
-              />
-            </div>
-          )}
-          {modalContent === "Yıl Seç" && (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: "10px",
-              }}
-            >
-              <div>Yıl Seç:</div>
-              <Controller
-                name="yilSecimi"
-                control={control}
-                render={({ field }) => <DatePicker {...field} picker="year" style={{ width: "130px" }} placeholder="Tarih seçiniz" />}
-              />
-            </div>
-          )}
-        </Modal>
-        {/* Expanded Modal */}
-        <Modal
-          title={
-            <div>
-              <Text style={{ fontWeight: "500", fontSize: "17px" }}>Bekleyen Onaylarim</Text>
-            </div>
-          }
-          centered
-          open={isExpandedModalVisible}
-          onOk={() => setIsExpandedModalVisible(false)}
-          onCancel={() => setIsExpandedModalVisible(false)}
-          width="90%"
-          destroyOnClose
-        >
-          <div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: "15px",
-              }}
-            >
-              <Input placeholder="Arama..." value={searchTerm1} onChange={handleSearch1} style={{ width: "300px" }} />
 
-              {/*csv indirme butonu*/}
-              <CSVLink data={data} headers={csvHeaders} filename={`lkasyon_bazinda_is_talepleri.csv`} className="ant-btn ant-btn-primary">
-                <Button type="primary" icon={<DownloadOutlined />} loading={loadings[1]} onClick={() => enterLoading(1)}>
-                  İndir
-                </Button>
-              </CSVLink>
-            </div>
-            <Spin spinning={isLoading}>
-              <Table
-                columns={columns}
-                dataSource={filteredData1.length > 0 || searchTerm1 ? filteredData1 : data}
-                pagination={{
-                  defaultPageSize: 10,
-                  showSizeChanger: true,
-                  pageSizeOptions: ["10", "20", "50", "100"],
-                  position: ["bottomRight"],
-                  showTotal: (total, range) => `Toplam ${total}`,
-                  showQuickJumper: true,
+        <Modal title="Reddetme İşlemi" open={isReddetModal} onCancel={handleReddetCancle} onOk={methods.handleSubmit(onSubmited)}>
+          <form onSubmit={methods.handleSubmit(onSubmited)}>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "start",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "450px",
+                gap: "10px",
+                rowGap: "0px",
+                marginBottom: "10px",
+              }}
+            >
+              <Text style={{ fontSize: "14px", fontWeight: "600" }}>Açıklama:</Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  maxWidth: "300px",
+                  minWidth: "300px",
+                  gap: "10px",
+                  width: "100%",
                 }}
-                scroll={{ y: "calc(100vh - 380px)" }}
-              />
-            </Spin>
-          </div>
+              >
+                <Controller
+                  name="reddetAciklama"
+                  control={control}
+                  rules={{ required: "Alan Boş Bırakılamaz!" }}
+                  render={({ field, fieldState: { error } }) => (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+                      <TextArea {...field} rows={4} status={error ? "error" : ""} style={{ flex: 1 }} />
+                      {error && <div style={{ color: "red" }}>{error.message}</div>}
+                    </div>
+                  )}
+                />
+              </div>
+            </div>
+          </form>
         </Modal>
       </div>
     </ConfigProvider>
