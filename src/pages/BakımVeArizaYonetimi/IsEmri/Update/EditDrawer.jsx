@@ -15,6 +15,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   const [open, setOpen] = useState(drawerVisible);
   const [disabled, setDisabled] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
+  const [onayCheck, setOnayCheck] = useState(false);
   // API'den gelen zorunluluk bilgilerini simüle eden bir örnek
   const [fieldRequirements, setFieldRequirements] = React.useState({
     // Varsayılan olarak zorunlu değil
@@ -271,6 +272,23 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   // iş emri tipine göre zorunlu alanları belirleme son
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await AxiosInstance.post(`GetOnayCheck?TB_ONAY_ID=1`); // API URL'niz
+        if (response[0].ONY_AKTIF === 1) {
+          setOnayCheck(true);
+        } else {
+          setOnayCheck(false);
+        }
+      } catch (error) {
+        console.error("API isteğinde hata oluştu:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   // aşağıdaki useEffect verileri form elemanlarına set etmeden önce durum güncellemesi yapıyor ondan sonra verileri set ediyor
 
   useEffect(() => {
@@ -285,6 +303,12 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("secilenIsEmriID", item.TB_ISEMRI_ID);
           setValue("kapali", item.KAPALI);
           setDisabled(item.KAPALI);
+          if (onayCheck === true) {
+            if (item.ISM_ONAY_DURUM === 1 || item.ISM_ONAY_DURUM === 2) {
+              setDisabled(true);
+              setValue("kapali", true);
+            }
+          }
           setValue("isEmriNo", item.ISEMRI_NO);
           setValue("duzenlenmeTarihi", item.DUZENLEME_TARIH ? (dayjs(item.DUZENLEME_TARIH).isValid() ? dayjs(item.DUZENLEME_TARIH) : null) : null);
           setValue("duzenlenmeSaati", item.DUZENLEME_SAAT ? (dayjs(item.DUZENLEME_SAAT, "HH:mm:ss").isValid() ? dayjs(item.DUZENLEME_SAAT, "HH:mm:ss") : null) : null);
@@ -450,7 +474,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     };
 
     handleDataFetchAndUpdate();
-  }, [drawerVisible, selectedRow, setValue, onRefresh, methods.reset, AxiosInstance, setDisabled]);
+  }, [drawerVisible, selectedRow, setValue, onRefresh, methods.reset, AxiosInstance, setDisabled, onayCheck]);
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);

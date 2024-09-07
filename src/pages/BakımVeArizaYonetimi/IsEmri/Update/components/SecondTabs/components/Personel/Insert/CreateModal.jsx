@@ -6,12 +6,7 @@ import { Controller, useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
 import dayjs from "dayjs";
 
-export default function CreateModal({
-  workshopSelectedId,
-  onSubmit,
-  onRefresh,
-  secilenIsEmriID,
-}) {
+export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID, kapali }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const methods = useForm({
     defaultValues: {
@@ -66,10 +61,7 @@ export default function CreateModal({
       IDK_SAAT: formatTimeWithDayjs(data.personelBaslamaSaati),
     };
 
-    AxiosInstance.post(
-      `AddUpdateIsEmriPersonel?isEmriId=${secilenIsEmriID}`,
-      Body
-    )
+    AxiosInstance.post(`AddUpdateIsEmriPersonel?isEmriId=${secilenIsEmriID}`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
 
@@ -113,20 +105,12 @@ export default function CreateModal({
             marginBottom: "10px",
           }}
         >
-          <Button type="link" onClick={handleModalToggle}>
+          <Button disabled={kapali} type="link" onClick={handleModalToggle}>
             <PlusOutlined /> Yeni Kayıt
           </Button>
         </div>
 
-        <Modal
-          width="985px"
-          title="Personel Ekle"
-          destroyOnClose
-          centered
-          open={isModalVisible}
-          onOk={methods.handleSubmit(onSubmited)}
-          onCancel={handleModalToggle}
-        >
+        <Modal width="985px" title="Personel Ekle" destroyOnClose centered open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <MainTabs />
           </form>

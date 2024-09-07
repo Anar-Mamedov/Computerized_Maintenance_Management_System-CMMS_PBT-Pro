@@ -14,6 +14,8 @@ export default function PersonelListesiTablo({ isActive }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
+  const kapali = watch("kapali");
+
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 
   // Intl.DateTimeFormat kullanarak tarih formatlama
@@ -22,9 +24,7 @@ export default function PersonelListesiTablo({ isActive }) {
 
     // Örnek bir tarih formatla ve ay formatını belirle
     const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
-    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(
-      sampleDate
-    );
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
 
     let monthFormat;
     if (sampleFormatted.includes("January")) {
@@ -57,14 +57,7 @@ export default function PersonelListesiTablo({ isActive }) {
       // Saat ve dakika değerlerinin geçerliliğini kontrol et
       const hoursInt = parseInt(hours, 10);
       const minutesInt = parseInt(minutes, 10);
-      if (
-        isNaN(hoursInt) ||
-        isNaN(minutesInt) ||
-        hoursInt < 0 ||
-        hoursInt > 23 ||
-        minutesInt < 0 ||
-        minutesInt > 59
-      ) {
+      if (isNaN(hoursInt) || isNaN(minutesInt) || hoursInt < 0 || hoursInt > 23 || minutesInt < 0 || minutesInt > 59) {
         // throw new Error("Invalid time format"); // hata fırlatır ve uygulamanın çalışmasını durdurur
         console.error("Invalid time format:", time);
         // return time; // Hatalı formatı olduğu gibi döndür
@@ -246,7 +239,7 @@ export default function PersonelListesiTablo({ isActive }) {
 
   return (
     <div style={{ marginBottom: "25px" }}>
-      <CreateModal onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />
+      <CreateModal kapali={kapali} onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />
       <Table
         rowSelection={{
           type: "radio",
