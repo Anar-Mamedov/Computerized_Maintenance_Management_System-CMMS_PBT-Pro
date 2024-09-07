@@ -38,10 +38,16 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
       )}
       {onayCheck &&
         selectedRows.length >= 1 &&
-        // selectedRows.some((row) => row.IST_DURUM_ID === 0 || row.IST_DURUM_ID === 1) &&
+        selectedRows.some((row) => row.ISM_ONAY_DURUM === 0 || row.ISM_ONAY_DURUM === 3) &&
         selectedRows.every((row) => row.KAPALI === false) && <OnayaGonder selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
       {/* <Iptal selectedRows={selectedRows} refreshTableData={refreshTableData} iptalDisabled={iptalDisabled} /> */}
-      {selectedRows.length >= 1 && <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />}
+      {/*{selectedRows.length >= 1 && <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />}*/}
+      {selectedRows.length >= 1 &&
+        (onayCheck ? (
+          selectedRows.every((row) => row.ISM_ONAY_DURUM === 2) && <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />
+        ) : (
+          <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />
+        ))}
 
       {/* <Parametreler />
       {selectedRows.length === 1 && <TarihceTablo selectedRows={selectedRows} />} */}
