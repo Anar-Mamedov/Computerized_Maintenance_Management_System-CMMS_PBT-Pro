@@ -22,9 +22,9 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
     setVisible(false);
   };
   // Silme işlemi için disable durumunu kontrol et
-  const isDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 4);
-  const iptalDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 2 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5);
-  const kapatDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5 || row.IST_DURUM_ID === 3);
+  const isDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 6);
+  const iptalDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 2 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5 || row.IST_DURUM_ID === 6);
+  const kapatDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5 || row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 6);
 
   const content = (
     <div>

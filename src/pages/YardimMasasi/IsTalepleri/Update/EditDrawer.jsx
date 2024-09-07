@@ -363,7 +363,13 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   useEffect(() => {
     // Örneğin, durum ID'si 4 (Kapandı) veya 5 (İptal Edildi) olduğunda formu disabled yap
-    if (selectedRow?.IST_DURUM_ID === 3 || selectedRow?.IST_DURUM_ID === 4 || selectedRow?.IST_DURUM_ID === 5) {
+    if (
+      selectedRow?.IST_DURUM_ID === 3 ||
+      selectedRow?.IST_DURUM_ID === 4 ||
+      selectedRow?.IST_DURUM_ID === 5 ||
+      selectedRow?.IST_DURUM_ID === 6 ||
+      selectedRow?.IST_DURUM_ID === 7
+    ) {
       setDisabled(true);
     } else {
       setDisabled(false);
