@@ -143,7 +143,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
                   marginBottom: "10px",
                 }}
               >
-                <Text style={{ fontSize: "14px", fontWeight: "600" }}>Açıklama:</Text>
+                <Text style={{ fontSize: "14px" }}>Açıklama:</Text>
                 <div
                   style={{
                     display: "flex",
@@ -158,11 +158,9 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
                   <Controller
                     name="aciklama"
                     control={control}
-                    rules={{ required: "Alan Boş Bırakılamaz!" }}
-                    render={({ field, fieldState: { error } }) => (
+                    render={({ field }) => (
                       <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
-                        <TextArea {...field} rows={4} status={error ? "error" : ""} style={{ flex: 1 }} />
-                        {error && <div style={{ color: "red" }}>{error.message}</div>}
+                        <TextArea {...field} rows={4} style={{ flex: 1 }} />
                       </div>
                     )}
                   />
