@@ -54,22 +54,7 @@ export default function MainTable({ isActive }) {
       width: 200,
       ellipsis: true,
     },
-    {
-      title: "Oluşturma Tarihi",
-      dataIndex: "ROL_OLUSTURMA_TAR",
-      key: "ROL_OLUSTURMA_TAR",
-      width: 200,
-      ellipsis: true,
-      render: (text) => formatDate(text),
-    },
-    {
-      title: "Değiştirme Tarihi",
-      dataIndex: "ROL_DEGISTIRME_TAR",
-      key: "ROL_DEGISTIRME_TAR",
-      width: 200,
-      ellipsis: true,
-      render: (text) => formatDate(text),
-    },
+
     {
       title: "Açıklama",
       dataIndex: "ROL_ACIKLAMA",
