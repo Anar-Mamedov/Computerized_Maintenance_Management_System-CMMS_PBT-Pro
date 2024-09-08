@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import bg from "../../../assets/images/bg-card.png";
-import { Spin, Typography } from "antd";
+import { Modal, Spin, Typography } from "antd";
 import { FormOutlined } from "@ant-design/icons";
 import { Controller, useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../api/http.jsx";
+import ModalTablo from "../../BakımVeArizaYonetimi/IsEmri/Table/Table.jsx";
 
 const { Text } = Typography;
 
@@ -12,6 +13,7 @@ function Component2(props) {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState(null);
   const updateApi = watch("updateApi");
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -27,6 +29,18 @@ function Component2(props) {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
 
   return (
     <div
@@ -58,26 +72,21 @@ function Component2(props) {
             justifyContent: "space-between",
             cursor: "pointer",
           }}
+          onClick={showModal}
         >
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <Text
-              style={{ fontWeight: "500", fontSize: "35px", color: "white" }}
-            >
-              {data?.ACIK_IS_EMIRLERI !== undefined
-                ? data.ACIK_IS_EMIRLERI
-                : ""}
-            </Text>
-            <Text
-              style={{ color: "white", fontSize: "15px", fontWeight: "400" }}
-            >
-              Açık İş Emirleri
-            </Text>
+            <Text style={{ fontWeight: "500", fontSize: "35px", color: "white" }}>{data?.ACIK_IS_EMIRLERI !== undefined ? data.ACIK_IS_EMIRLERI : ""}</Text>
+            <Text style={{ color: "white", fontSize: "15px", fontWeight: "400" }}>Açık İş Emirleri</Text>
           </div>
-          <FormOutlined
-            style={{ fontSize: "60px", color: "rgba(255,255,255,.8)" }}
-          />
+          <FormOutlined style={{ fontSize: "60px", color: "rgba(255,255,255,.8)" }} />
         </div>
       )}
+
+      <Modal width={1400} centered title="Açık İş Emirleri" open={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+        <div>
+          <ModalTablo />
+        </div>
+      </Modal>
     </div>
   );
 }
