@@ -7,6 +7,7 @@ import Kapat from "./components/Kapat/Kapat";
 import Parametreler from "./components/Parametreler/Parametreler";
 import Tarihce from "./components/Tarihçe/Tarihce";
 import Form from "./components/Form/Form";
+import TopluLokasyon from "./components/TopluLokasyon/CreateModal.jsx";
 
 const { Text, Link } = Typography;
 
@@ -27,7 +28,8 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
 
   const content = (
     <div>
-      <Sil selectedRows={selectedRows} refreshTableData={refreshTableData} disabled={isDisabled} hidePopover={hidePopover} />
+      {selectedRows.length >= 1 && <Sil selectedRows={selectedRows} refreshTableData={refreshTableData} disabled={isDisabled} hidePopover={hidePopover} />}
+      {selectedRows.length >= 1 && <TopluLokasyon selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
       {/*<Iptal selectedRows={selectedRows} refreshTableData={refreshTableData} iptalDisabled={iptalDisabled} />
       <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />
       <Parametreler /> */}
