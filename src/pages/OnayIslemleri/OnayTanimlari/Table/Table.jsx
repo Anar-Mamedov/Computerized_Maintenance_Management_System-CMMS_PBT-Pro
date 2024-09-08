@@ -131,11 +131,11 @@ export default function MainTable({ isActive }) {
     <div style={{ marginBottom: "25px" }}>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
         <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTable} />
-        <CreateModal onRefresh={refreshTable} />
+        {/*<CreateModal onRefresh={refreshTable} />*/}
       </div>
       <Table
         rowSelection={{
-          type: "radio",
+          type: "checkbox",
           selectedRowKeys,
           onChange: onRowSelectChange,
         }}

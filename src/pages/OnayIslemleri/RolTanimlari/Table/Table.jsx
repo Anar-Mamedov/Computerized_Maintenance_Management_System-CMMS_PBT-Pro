@@ -111,7 +111,7 @@ export default function MainTable({ isActive }) {
       </div>
       <Table
         rowSelection={{
-          type: "radio",
+          type: "checkbox",
           selectedRowKeys,
           onChange: onRowSelectChange,
         }}
