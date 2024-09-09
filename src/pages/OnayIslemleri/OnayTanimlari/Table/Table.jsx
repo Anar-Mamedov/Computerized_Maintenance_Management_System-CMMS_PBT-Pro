@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Table } from "antd";
+import { Button, Modal, Table, Switch, message } from "antd";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../api/http.jsx";
@@ -8,6 +8,7 @@ import EditModal from "../Update/EditModal.jsx";
 import ContextMenu from "../components/ContextMenu/ContextMenu.jsx";
 import EditModal1 from "../../Kurallar/Update/EditModal.jsx";
 import { GiCog } from "react-icons/gi";
+import dayjs from "dayjs";
 
 export default function MainTable({ isActive }) {
   const [loading, setLoading] = useState(false);
@@ -73,6 +74,13 @@ export default function MainTable({ isActive }) {
       ellipsis: true,
     },
     {
+      title: "Aktif",
+      dataIndex: "ONY_AKTIF",
+      key: "ONY_AKTIF",
+      width: 100,
+      render: (text, record) => <Switch checked={record.ONY_AKTIF} onChange={(checked) => handleSwitchChange(checked, record)} />,
+    },
+    {
       title: "Kural",
       dataIndex: "",
       key: "Kural",
@@ -92,6 +100,34 @@ export default function MainTable({ isActive }) {
       ),
     },
   ];
+
+  const handleSwitchChange = (checked, record) => {
+    const Body = {
+      TB_ONAY_ID: record.TB_ONAY_ID,
+      ONY_TANIM: record.ONY_TANIM,
+      ONY_ACIKLAMA: record.ONY_ACIKLAMA,
+      ONY_DEGISTIRME_TAR: dayjs().format("YYYY-MM-DD"),
+      ONY_AKTIF: checked,
+    };
+
+    AxiosInstance.post(`UpdateOnayTanim`, Body)
+      .then((response) => {
+        console.log("Data sent successfully:", response);
+
+        if (response.status_code === 200 || response.status_code === 201) {
+          message.success("Güncelleme Başarılı.");
+          refreshTable(); // Tabloyu yenile
+        } else if (response.status_code === 401) {
+          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+        } else {
+          message.error("Güncelleme Başarısız.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error sending data:", error);
+        message.error("Başarısız Olundu.");
+      });
+  };
 
   const fetch = useCallback(() => {
     setLoading(true);
@@ -130,8 +166,8 @@ export default function MainTable({ isActive }) {
   return (
     <div style={{ marginBottom: "25px" }}>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        {/* <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTable} />
-        <CreateModal onRefresh={refreshTable} />*/}
+        {/*<ContextMenu selectedRows={selectedRows} refreshTableData={refreshTable} />*/}
+        {/*  <CreateModal onRefresh={refreshTable} />*/}
       </div>
       <Table
         rowSelection={{

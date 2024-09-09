@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Input, Typography, Tabs, message, Spin } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import AxiosInstance from "../../../../../../../api/http";
+import AxiosInstance from "../../../../../../.././api/http";
 import { Controller, useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs.jsx";
 import dayjs from "dayjs";
@@ -9,13 +8,13 @@ import dayjs from "dayjs";
 const { Text, Link } = Typography;
 const { TextArea } = Input;
 
-export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID }) {
+export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID, selectedRows }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const methods = useForm({
     defaultValues: {
-      rolTanim: "",
-      aciklama: "",
+      lokasyonTanim: "",
+      lokasyonID: "",
       // Add other default values here
     },
   });
@@ -36,12 +35,11 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
 
   const onSubmited = (data) => {
     const Body = {
-      ONY_TANIM: data.rolTanim,
-      ONY_ACIKLAMA: data.aciklama,
-      ONY_OLUSTURMA_TAR: dayjs().format("YYYY-MM-DD"),
+      NEW_LOK_ID: data.lokasyonID,
+      UPDATE_LOK_IDS: selectedRows,
     };
 
-    AxiosInstance.post(`AddOnayTanim1231`, Body)
+    AxiosInstance.post(`UpdateLokasyonToplu`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
 
@@ -86,7 +84,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
           </Button>
         </div>
 
-        <Modal width="800px" title="Toplu Lokasyon Değişimi" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
+        <Modal width="500px" title="Toplu Lokasyon Değişimi" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
           {loading ? (
             <Spin spinning={loading} size="large" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
               {/* İçerik yüklenirken gösterilecek alan */}

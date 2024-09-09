@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Popover, Typography } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
 import Sil from "./components/Sil";
-import TopluLokasyon from "./components/TopluLokasyon/CreateModal.jsx";
+// import TopluLokasyon from "./components/TopluLokasyon/CreateModal.jsx";
 
 const { Text, Link } = Typography;
 
@@ -17,14 +17,14 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
     setVisible(false);
   };
   // Silme işlemi için disable durumunu kontrol et
-  const isDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 4);
-  const iptalDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 2 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5);
-  const kapatDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5 || row.IST_DURUM_ID === 3);
+  // const isDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 4);
+  // const iptalDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 2 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5);
+  // const kapatDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5 || row.IST_DURUM_ID === 3);
 
   const content = (
     <div>
-      {/*{selectedRows.length >= 1 && <Sil selectedRows={selectedRows} refreshTableData={refreshTableData} disabled={isDisabled} hidePopover={hidePopover} />}*/}
-      {selectedRows.length >= 1 && <TopluLokasyon selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
+      {selectedRows.length >= 1 && <Sil selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
+      {/*{selectedRows.length >= 1 && <TopluLokasyon selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}*/}
     </div>
   );
   return (

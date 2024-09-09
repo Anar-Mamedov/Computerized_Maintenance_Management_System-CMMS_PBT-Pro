@@ -5,6 +5,7 @@ import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import { SearchOutlined } from "@ant-design/icons";
 import EditDrawer from "../Update/EditDrawer";
+import ContextMenu from "../components/ContextMenu/ContextMenu.jsx";
 
 export default function MainTable() {
   const { watch, control, setValue } = useFormContext();
@@ -29,8 +30,6 @@ export default function MainTable() {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
-
-  console.log(selectedRowKeys);
 
   useEffect(() => {
     const timerId = setTimeout(() => {
@@ -261,7 +260,10 @@ export default function MainTable() {
           onChange={(e) => setSearchTerm(e.target.value)}
           prefix={<SearchOutlined style={{ color: "#0091ff" }} />} // Arama ikonunu ekle
         />
-        <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
+        <div style={{ display: "flex", gap: "10px" }}>
+          <ContextMenu selectedRows={selectedRowKeys} refreshTableData={refreshTableData} />
+          <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
+        </div>
       </div>
       <Spin spinning={loading}>
         <Table

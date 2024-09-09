@@ -6,15 +6,14 @@ import AxiosInstance from "../../../../../../api/http";
 import dayjs from "dayjs";
 import AtolyeIsEmriCevir from "./AtolyeIsEmriCevir";
 
-export default function AtolyeSubmit({ selectedRows, refreshTableData }) {
+export default function AtolyeSubmit({ selectedRows, refreshTableData, onayCheck }) {
   // Butonun disabled durumunu kontrol et
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [loading, setLoading] = useState(false); // Add loading state
   const methods = useForm({
     defaultValues: {
       atolyeTanim: "",
-      atolyeID: "",
-      // Add other default values here
+      atolyeID: "", // Add other default values here
     },
   });
   const { setValue, reset, handleSubmit, watch } = methods;
@@ -35,11 +34,19 @@ export default function AtolyeSubmit({ selectedRows, refreshTableData }) {
   // atolyeID veya selectedRows değiştiğinde butonun durumunu güncelle
   useEffect(() => {
     const tbIsTalepId = selectedRows.map((row) => row.key).join(",");
-    // Seçilen tüm kayıtların IST_DURUM_ID değerlerinin 0, 1 veya 2 olup olmadığını kontrol et
-    const isValidStatus = selectedRows.every((row) => [0, 1, 2].includes(row.IST_DURUM_ID));
+
+    let isValidStatus;
+
+    if (onayCheck) {
+      // Seçilen tüm kayıtların IST_DURUM_ID değerlerinin 7 olup olmadığını kontrol et
+      isValidStatus = selectedRows.every((row) => [7].includes(row.IST_DURUM_ID));
+    } else {
+      // Seçilen tüm kayıtların IST_DURUM_ID değerlerinin 0, 1 veya 2 olup olmadığını kontrol et
+      isValidStatus = selectedRows.every((row) => [0, 1, 2].includes(row.IST_DURUM_ID));
+    }
 
     setIsButtonDisabled(!atolyeID || !tbIsTalepId || !isValidStatus);
-  }, [atolyeID, selectedRows]);
+  }, [atolyeID, selectedRows, onayCheck]);
 
   const onSubmited = (data) => {
     setLoading(true); // Set loading to true when form is submitted

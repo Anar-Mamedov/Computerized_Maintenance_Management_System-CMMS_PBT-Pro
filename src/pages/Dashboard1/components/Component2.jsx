@@ -4,7 +4,7 @@ import { Modal, Spin, Typography } from "antd";
 import { FormOutlined } from "@ant-design/icons";
 import { Controller, useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../api/http.jsx";
-import ModalTablo from "../../BakımVeArizaYonetimi/IsEmri/Table/Table.jsx";
+import ModalTablo from "../../BakımVeArizaYonetimi/IsEmri/Table/ModalTable/ModalTable.jsx";
 
 const { Text } = Typography;
 

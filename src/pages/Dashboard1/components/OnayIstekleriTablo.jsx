@@ -104,7 +104,7 @@ function LokasyonBazindaIsTalepleri(props) {
       ellipsis: true,
     },
     {
-      title: "Onayla",
+      title: "Onay",
       dataIndex: "",
       key: "action2",
       width: 100,
@@ -135,7 +135,7 @@ function LokasyonBazindaIsTalepleri(props) {
       ),
     },
     {
-      title: "Reddet",
+      title: "Red",
       dataIndex: "",
       key: "action1",
       width: 100,
