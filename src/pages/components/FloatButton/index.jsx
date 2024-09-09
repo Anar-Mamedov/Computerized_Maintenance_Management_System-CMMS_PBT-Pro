@@ -13,6 +13,8 @@ const FloatButton = () => {
   const [inputValue, setInputValue] = useState("");
   const [textValue, setTextValue] = useState("");
   const [visible, setVisible] = useState(false);
+  const [baseURL, setBaseURL] = useState("");
+  const [userInfo, setUserInfo] = useState(null);
 
   const handleScreenshot = () => {
     html2canvas(document.body, {
@@ -30,12 +32,26 @@ const FloatButton = () => {
     });
   };
 
+  useEffect(() => {
+    // localStorage'den öğeyi al
+    const storedValue = localStorage.getItem("baseURL");
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (storedValue && user) {
+      // State değişkenine set et
+      setBaseURL(storedValue);
+      setUserInfo(user);
+    }
+  }, []); // Boş bağımlılık dizisi ile sadece bir kez çalışır
+
   const handleSend = async () => {
     try {
       await axios.post("YOUR_API_ENDPOINT", {
         image: imageData,
         input: inputValue,
         text: textValue,
+        userId: userInfo.userId,
+        userName: userInfo.userName,
+        company: baseURL,
       });
       message.success("Veriler başarıyla gönderildi!");
       setVisible(false);
