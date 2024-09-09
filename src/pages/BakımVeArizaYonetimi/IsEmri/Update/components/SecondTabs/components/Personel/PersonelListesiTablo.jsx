@@ -5,12 +5,14 @@ import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../api/http";
 import CreateModal from "./Insert/CreateModal";
 import EditModal from "./Update/EditModal";
+import ContextMenu from "./components/ContextMenu/ContextMenu.jsx";
 
 export default function PersonelListesiTablo({ isActive }) {
   const [loading, setLoading] = useState(false);
   const { control, watch, setValue } = useFormContext();
   const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]); // Store selected rows data
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
@@ -225,7 +227,9 @@ export default function PersonelListesiTablo({ isActive }) {
   }, [secilenIsEmriID, fetch]); // secilenIsEmriID veya fetch fonksiyonu değiştiğinde useEffect'i tetikle
 
   const onRowSelectChange = (selectedKeys) => {
-    setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
+    setSelectedRowKeys(selectedKeys);
+    const selectedData = selectedKeys.map((key) => data.find((item) => item.key === key));
+    setSelectedRows(selectedData);
   };
 
   const onRowClick = (record) => {
@@ -239,7 +243,11 @@ export default function PersonelListesiTablo({ isActive }) {
 
   return (
     <div style={{ marginBottom: "25px" }}>
-      <CreateModal kapali={kapali} onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTable} />
+        <CreateModal kapali={kapali} onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />
+      </div>
+
       <Table
         rowSelection={{
           type: "radio",

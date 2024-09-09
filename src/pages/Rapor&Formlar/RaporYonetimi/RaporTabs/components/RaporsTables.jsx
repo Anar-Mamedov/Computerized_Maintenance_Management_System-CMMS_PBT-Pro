@@ -1,32 +1,23 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Input, Spin, Table, Typography } from "antd";
-import {
-  CheckOutlined,
-  CloseOutlined,
-  SearchOutlined,
-  ToolOutlined,
-} from "@ant-design/icons";
+import { Button, Input, Modal, Spin, Table, Typography } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
+import Filters from "../components/Filters/Filters.jsx";
 import AxiosInstance from "../../../../../api/http.jsx";
+import RaporDetay from "./RaporDetay/RaporDetay.jsx";
+import dayjs from "dayjs";
 
 const { Text } = Typography;
 
 function RaporsTables({ tabKey, tabName }) {
-  const { setValue } = useFormContext();
+  const { setValue, watch } = useFormContext();
   const [data, setData] = useState([]);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
-
-  const [selectedRows, setSelectedRows] = useState([]);
-
-  // edit drawer için
-  const [drawer, setDrawer] = useState({
-    visible: false,
-    data: null,
-  });
-  // edit drawer için son
+  const [isFirstModalVisible, setIsFirstModalVisible] = useState(false);
+  const [isSecondModalVisible, setIsSecondModalVisible] = useState(false);
+  const [selectedRowData, setSelectedRowData] = useState(null); // Yeni state
 
   useEffect(() => {
     fetchEquipmentData();
@@ -35,9 +26,7 @@ function RaporsTables({ tabKey, tabName }) {
   const fetchEquipmentData = async () => {
     try {
       setLoading(true);
-      const response = await AxiosInstance.get(
-        `RaporListele?RaporGrupID=${tabKey}`
-      );
+      const response = await AxiosInstance.get(`RaporListele?RaporGrupID=${tabKey}`);
       if (response) {
         const formattedData = response.map((item) => {
           return {
@@ -45,7 +34,7 @@ function RaporsTables({ tabKey, tabName }) {
             key: item.TB_RAPOR_ID,
           };
         });
-        setData(formattedData); // Directly set the data
+        setData(formattedData);
         setLoading(false);
       } else {
         console.error("API response is not in expected format");
@@ -64,36 +53,40 @@ function RaporsTables({ tabKey, tabName }) {
   };
 
   useEffect(() => {
-    const filtered = data.filter((item) =>
-      normalizeString(item.RPR_TANIM).includes(normalizeString(searchTerm))
-    );
+    const filtered = data.filter((item) => normalizeString(item.RPR_TANIM).includes(normalizeString(searchTerm)));
     setFilteredData(filtered);
   }, [searchTerm, data]);
 
-  const onSelectChange = (newSelectedRowKeys) => {
-    setSelectedRowKeys(newSelectedRowKeys);
-    if (newSelectedRowKeys.length > 0) {
-      setValue("selectedLokasyonId", newSelectedRowKeys[0]);
-    } else {
-      setValue("selectedLokasyonId", null);
-    }
-
-    // Seçilen satırların verisini bul
-    const newSelectedRows = data.filter((row) =>
-      newSelectedRowKeys.includes(row.key)
-    );
-    setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
+  const handleRowClick = (record) => {
+    setValue("locationIds", "");
+    setValue("atolyeIds", "");
+    setValue("baslangicTarihi", "");
+    setValue("bitisTarihi", "");
+    setValue("resetField", 2);
+    setSelectedRowData(record); // Tıklanan satırın verilerini kaydet
+    setIsFirstModalVisible(true);
   };
 
-  const rowSelection = {
-    type: "checkbox",
-    selectedRowKeys,
-    onChange: onSelectChange,
+  const handleFirstModalOk = () => {
+    setIsFirstModalVisible(false);
+    setIsSecondModalVisible(true);
   };
 
-  const refreshTableData = useCallback(() => {
-    fetchEquipmentData();
-  }, []);
+  const handleSecondModalOk = () => {
+    setIsSecondModalVisible(false);
+    setValue("locationIds", "");
+    setValue("atolyeIds", "");
+    setValue("baslangicTarihi", "");
+    setValue("bitisTarihi", "");
+  };
+
+  const handleSecondModalCancel = () => {
+    setIsSecondModalVisible(false);
+    setValue("locationIds", "");
+    setValue("atolyeIds", "");
+    setValue("baslangicTarihi", "");
+    setValue("bitisTarihi", "");
+  };
 
   const columns = [
     {
@@ -102,23 +95,17 @@ function RaporsTables({ tabKey, tabName }) {
       key: "RPR_TANIM",
       width: 150,
       ellipsis: true,
-      render: (text, record) => (
-        <a onClick={() => setDrawer({ visible: true, data: record })}>{text}</a>
-      ),
+      render: (text, record) => <a onClick={() => handleRowClick(record)}>{text}</a>,
     },
-    // {
-    //   title: "Özel Alan 10",
-    //   dataIndex: "PBK_OZEL_ALAN_10",
-    //   key: "PBK_OZEL_ALAN_10",
-    //   width: 150,
-    //   ellipsis: true,
-    // },
-    // Other columns...
   ];
+
+  const LokasyonId = watch("locationIds");
+  const AtolyeId = watch("atolyeIds");
+  const BaslangicTarih = watch("baslangicTarihi") ? dayjs(watch("baslangicTarihi")).format("DD/MM/YYYY") : null;
+  const BitisTarih = watch("bitisTarihi") ? dayjs(watch("bitisTarihi")).format("DD/MM/YYYY") : null;
 
   return (
     <div>
-      {/* Search input and create drawer */}
       <div
         style={{
           display: "flex",
@@ -142,7 +129,6 @@ function RaporsTables({ tabKey, tabName }) {
       </div>
       <Spin spinning={loading}>
         <Table
-          // rowSelection={rowSelection}
           columns={columns}
           dataSource={searchTerm ? filteredData : data}
           pagination={{
@@ -156,6 +142,25 @@ function RaporsTables({ tabKey, tabName }) {
           scroll={{ y: "calc(100vh - 380px)" }}
         />
       </Spin>
+      <Modal title="Rapor İçin Filtreleme Yap" open={isFirstModalVisible} onOk={handleFirstModalOk} onCancel={() => setIsFirstModalVisible(false)}>
+        <Filters />
+      </Modal>
+      <Modal
+        title={
+          selectedRowData
+            ? `${selectedRowData.RPR_TANIM} - Lokasyon: ${LokasyonId ? LokasyonId : ""}, Atölye: ${AtolyeId ? AtolyeId : ""}, Başlangıç Tarihi: ${
+                BaslangicTarih ? BaslangicTarih : ""
+              }, Bitiş Tarihi: ${BitisTarih ? BitisTarih : ""}`
+            : null
+        }
+        destroyOnClose
+        width="1400px"
+        open={isSecondModalVisible}
+        onOk={handleSecondModalOk}
+        onCancel={handleSecondModalCancel}
+      >
+        <RaporDetay selectedRowData={selectedRowData} />
+      </Modal>
     </div>
   );
 }

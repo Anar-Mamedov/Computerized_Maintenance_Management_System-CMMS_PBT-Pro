@@ -6,7 +6,7 @@ import AxiosInstance from "../../../../../../api/http";
 import dayjs from "dayjs";
 import TeknisyenIsEmriCevir from "./TeknisyenIsEmriCevir";
 
-export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
+export default function TeknisyenSubmit({ selectedRows, refreshTableData, onayCheck }) {
   // Butonun disabled durumunu kontrol et
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [loading, setLoading] = useState(false); // Add loading state
@@ -35,10 +35,19 @@ export default function TeknisyenSubmit({ selectedRows, refreshTableData }) {
   // personelID veya selectedRows değiştiğinde butonun durumunu güncelle
   useEffect(() => {
     const tbIsTalepId = selectedRows.map((row) => row.key).join(",");
-    const isValidStatus = selectedRows.every((row) => [0, 1, 2].includes(row.IST_DURUM_ID));
+
+    let isValidStatus;
+
+    if (onayCheck) {
+      // Seçilen tüm kayıtların IST_DURUM_ID değerlerinin 7 olup olmadığını kontrol et
+      isValidStatus = selectedRows.every((row) => [7].includes(row.IST_DURUM_ID));
+    } else {
+      // Seçilen tüm kayıtların IST_DURUM_ID değerlerinin 0, 1 veya 2 olup olmadığını kontrol et
+      isValidStatus = selectedRows.every((row) => [0, 1, 2].includes(row.IST_DURUM_ID));
+    }
 
     setIsButtonDisabled(!personelID || !tbIsTalepId || !isValidStatus);
-  }, [personelID, selectedRows]);
+  }, [personelID, selectedRows, onayCheck]);
 
   const onSubmited = (data) => {
     setLoading(true); // Set loading to true when form is submitted

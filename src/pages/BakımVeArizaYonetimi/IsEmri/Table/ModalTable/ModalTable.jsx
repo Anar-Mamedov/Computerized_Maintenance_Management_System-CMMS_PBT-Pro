@@ -5,18 +5,14 @@ import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Resizable } from "react-resizable";
-import "./ResizeStyle.css";
-import AxiosInstance from "../../../../api/http";
-import CreateDrawer from "../Insert/CreateDrawer";
-import EditDrawer from "../Update/EditDrawer";
+import "../ResizeStyle.css";
+import AxiosInstance from "../../../../../api/http";
+import CreateDrawer from "../../Insert/CreateDrawer";
+import EditDrawer from "../../Update/EditDrawer";
 import Filters from "./filter/Filters";
-import ContextMenu from "../components/ContextMenu/ContextMenu";
-import TeknisyenSubmit from "../components/IsEmrineCevir/Teknisyen/TeknisyenSubmit";
-import AtolyeSubmit from "../components/IsEmrineCevir/Atolye/AtolyeSubmit";
-import EditDrawer1 from "../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer";
+import ContextMenu from "../../components/ContextMenu/ContextMenu";
+import EditDrawer1 from "../../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
 import { useFormContext } from "react-hook-form";
-import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
 
 const { Text } = Typography;
 
@@ -131,31 +127,6 @@ const MainTable = () => {
 
   const [selectedRows, setSelectedRows] = useState([]);
 
-  const statusTag = (statusId) => {
-    switch (statusId) {
-      case 0:
-        return { color: "blue", text: "Açık" };
-      case 1:
-        return { color: "#ff5e00", text: "Bekliyor" };
-      case 2:
-        return { color: "#ffe600", text: "Planlandı" };
-      case 3:
-        return { color: "#00d300", text: "Devam Ediyor" };
-      case 4:
-        return { color: "#575757", text: "Kapandı" };
-      case 5:
-        return { color: "#d10000", text: "İptal Edildi" };
-      case 6:
-        return { color: "#ff5e00", text: "Onay Bekliyor" };
-      case 7:
-        return { color: "#00d300", text: "Onaylandı" };
-      case 8:
-        return { color: "#d10000", text: "Onaylanmadı" };
-      default:
-        return { color: "default", text: "" }; // Eğer farklı bir değer gelirse
-    }
-  };
-
   function hexToRGBA(hex, opacity) {
     // hex veya opacity null ise hata döndür
     if (hex === null || opacity === null) {
@@ -181,12 +152,10 @@ const MainTable = () => {
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   }
 
-  // Özel Alanların nameleri backend çekmek için api isteği
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await AxiosInstance.post(`GetOnayCheck?TB_ONAY_ID=2`); // API URL'niz
+        const response = await AxiosInstance.post(`GetOnayCheck?TB_ONAY_ID=1`); // API URL'niz
         if (response[0].ONY_AKTIF === 1) {
           setOnayCheck(true);
         } else {
@@ -200,12 +169,14 @@ const MainTable = () => {
     fetchData();
   }, []);
 
+  // Özel Alanların nameleri backend çekmek için api isteği
+
   useEffect(() => {
     // API'den veri çekme işlemi
     const fetchData = async () => {
       try {
         const response = await AxiosInstance.get("OzelAlan?form=ISEMRI"); // API URL'niz
-        localStorage.setItem("ozelAlanlarIsTalep", JSON.stringify(response));
+        localStorage.setItem("ozelAlanlarIsEmriDashboard", JSON.stringify(response));
         setLabel(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
       } catch (error) {
         console.error("API isteğinde hata oluştu:", error);
@@ -216,89 +187,354 @@ const MainTable = () => {
     fetchData();
   }, [drawer.visible]);
 
-  const ozelAlanlarIsTalep = JSON.parse(localStorage.getItem("ozelAlanlarIsTalep"));
+  const ozelAlanlar = JSON.parse(localStorage.getItem("ozelAlanlarIsEmriDashboard"));
 
   // Özel Alanların nameleri backend çekmek için api isteği sonu
+
+  const statusTag = (statusId) => {
+    switch (statusId) {
+      case 1:
+        return { color: "#ff5e00", text: "Onay Bekliyor" };
+      case 2:
+        return { color: "#00d300", text: "Onaylandı" };
+      case 3:
+        return { color: "#d10000", text: "Onaylanmadı" };
+      default:
+        return { color: "", text: "" }; // Diğer durumlar için boş değer
+    }
+  };
+
   const initialColumns = [
     {
-      title: "Talep Kodu",
-      dataIndex: "IST_KOD",
-      key: "IST_KOD",
+      title: "İş Emri No",
+      dataIndex: "ISEMRI_NO",
+      key: "ISEMRI_NO",
       width: 120,
       ellipsis: true,
-      visible: true,
-      render: (text) => <a>{text}</a>,
-      sorter: (a, b) => (a.IST_KOD || "").localeCompare(b.IST_KOD || ""),
+      visible: true, // Varsayılan olarak açık
+      render: (text, record) => (
+        <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
+      ),
+      sorter: (a, b) => {
+        if (a.ISEMRI_NO === null) return -1;
+        if (b.ISEMRI_NO === null) return 1;
+        return a.ISEMRI_NO.localeCompare(b.ISEMRI_NO);
+      },
     },
     {
       title: "Tarih",
-      dataIndex: "IST_ACILIS_TARIHI",
-      key: "IST_ACILIS_TARIHI",
+      dataIndex: "DUZENLEME_TARIH",
+      key: "DUZENLEME_TARIH",
       width: 110,
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true,
+      sorter: (a, b) => {
+        if (a.DUZENLEME_TARIH === null) return -1;
+        if (b.DUZENLEME_TARIH === null) return 1;
+        return a.DUZENLEME_TARIH.localeCompare(b.DUZENLEME_TARIH);
+      },
+
+      visible: true, // Varsayılan olarak açık
       render: (text) => formatDate(text),
-      sorter: (a, b) => (a.IST_ACILIS_TARIHI || "").localeCompare(b.IST_ACILIS_TARIHI || ""),
     },
     {
       title: "Saat",
-      dataIndex: "IST_ACILIS_SAATI",
-      key: "IST_ACILIS_SAATI",
+      dataIndex: "DUZENLEME_SAAT",
+      key: "DUZENLEME_SAAT",
       width: 90,
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true,
+      sorter: (a, b) => {
+        if (a.DUZENLEME_SAAT === null) return -1;
+        if (b.DUZENLEME_SAAT === null) return 1;
+        return a.DUZENLEME_SAAT.localeCompare(b.DUZENLEME_SAAT);
+      },
+
+      visible: true, // Varsayılan olarak açık
       render: (text) => formatTime(text),
-      sorter: (a, b) => (a.IST_ACILIS_SAATI || "").localeCompare(b.IST_ACILIS_SAATI || ""),
+    },
+    {
+      title: "İş Emri Tipi",
+      dataIndex: "ISEMRI_TIP",
+      key: "ISEMRI_TIP",
+      width: 180,
+      ellipsis: true,
+      sorter: (a, b) => {
+        if (a.ISEMRI_TIP === null) return -1;
+        if (b.ISEMRI_TIP === null) return 1;
+        return a.ISEMRI_TIP.localeCompare(b.ISEMRI_TIP);
+      },
+
+      visible: true, // Varsayılan olarak açık
+      render: (text, record) => (
+        <div
+          style={{
+            textAlign: "center",
+          }}
+        >
+          <Tag
+            style={{
+              backgroundColor: hexToRGBA(record.ISM_TIP_RENK, 0.2),
+              border: `1.2px solid ${hexToRGBA(record.ISM_TIP_RENK, 0.7)}`,
+              color: record.ISM_TIP_RENK,
+            }}
+          >
+            {text}
+          </Tag>
+        </div>
+      ),
     },
     {
       title: "Konu",
-      dataIndex: "IST_TANIMI",
-      key: "IST_TANIMI",
+      dataIndex: "KONU",
+      key: "KONU",
       width: 300,
       ellipsis: true,
-      visible: true,
-      render: (text) => <a>{text}</a>,
-      sorter: (a, b) => (a.IST_TANIMI || "").localeCompare(b.IST_TANIMI || ""),
+      sorter: (a, b) => {
+        if (a.KONU === null) return -1;
+        if (b.KONU === null) return 1;
+        return a.KONU.localeCompare(b.KONU);
+      },
+      visible: true, // Varsayılan olarak açık
+      render: (text, record) => (
+        <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
+      ),
     },
-    {
-      title: "Talep Eden",
-      dataIndex: "IST_TALEP_EDEN_ADI",
-      key: "IST_TALEP_EDEN_ADI",
-      width: 150,
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true,
-      sorter: (a, b) => (a.IST_TALEP_EDEN_ADI || "").localeCompare(b.IST_TALEP_EDEN_ADI || ""),
-    },
+
     {
       title: "Durum",
-      dataIndex: "IST_DURUM_ID",
-      key: "IST_DURUM_ID",
+      dataIndex: "DURUM",
+      key: "DURUM",
+      width: 120,
+      ellipsis: true,
+
+      visible: true, // Varsayılan olarak açık
+      sorter: (a, b) => {
+        if (a.DURUM === null && b.DURUM === null) return 0;
+        if (a.DURUM === null) return -1;
+        if (b.DURUM === null) return 1;
+        return a.DURUM.localeCompare(b.DURUM);
+      },
+      render: (text, record) => {
+        const circleStyle = {
+          backgroundColor: record.KAPALI ? "red" : "green", // KAPALI true ise kırmızı, değilse yeşil
+          borderRadius: "50%",
+          display: "inline-block",
+          width: "10px",
+          height: "10px",
+        };
+        return (
+          <div>
+            <span style={circleStyle}></span>
+            <span style={{ marginLeft: "5px" }}>{text}</span>
+          </div>
+        );
+      },
+    },
+
+    {
+      title: "Onay Durumu",
+      dataIndex: "ISM_ONAY_DURUM",
+      key: "ISM_ONAY_DURUM",
       width: 150,
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true,
+      visible: true, // Varsayılan olarak açık
       render: (_, record) => {
-        const { color, text } = statusTag(record.IST_DURUM_ID);
-        return (
+        const validStatuses = [1, 2, 3];
+        if (validStatuses.includes(record.ISM_ONAY_DURUM)) {
+          const { color, text } = statusTag(record.ISM_ONAY_DURUM);
+          return (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Tag
+                style={{
+                  textAlign: "center",
+                  backgroundColor: hexToRGBA(color, 0.2),
+                  border: `1.2px solid ${hexToRGBA(color, 0.7)}`,
+                  color: color,
+                }}
+              >
+                {text}
+              </Tag>
+            </div>
+          );
+        }
+        return null; // Diğer durumlar için hiçbir şey render edilmez
+      },
+      sorter: (a, b) => (a.ISM_ONAY_DURUM || 0) - (b.ISM_ONAY_DURUM || 0),
+    },
+
+    {
+      title: "Lokasyon",
+      dataIndex: "LOKASYON",
+      key: "LOKASYON",
+      width: 200,
+      ellipsis: true,
+
+      visible: true, // Varsayılan olarak açık
+      sorter: (a, b) => {
+        if (a.LOKASYON === null && b.LOKASYON === null) return 0;
+        if (a.LOKASYON === null) return 1;
+        if (b.LOKASYON === null) return -1;
+        return a.LOKASYON.localeCompare(b.LOKASYON);
+      },
+    },
+    {
+      title: "Makine Kodu",
+      dataIndex: "MAKINE_KODU",
+      key: "MAKINE_KODU",
+      width: 150,
+      sorter: (a, b) => {
+        if (a.MAKINE_KODU === null && b.MAKINE_KODU === null) return 0;
+        if (a.MAKINE_KODU === null) return 1;
+        if (b.MAKINE_KODU === null) return -1;
+        return a.MAKINE_KODU.localeCompare(b.MAKINE_KODU);
+      },
+      ellipsis: true,
+
+      visible: true, // Varsayılan olarak açık
+    },
+    {
+      title: "Makine Tanımı",
+      dataIndex: "MAKINE_TANIMI",
+      key: "MAKINE_TANIMI",
+      width: 300,
+      sorter: (a, b) => {
+        if (a.MAKINE_TANIMI === null && b.MAKINE_TANIMI === null) return 0;
+        if (a.MAKINE_TANIMI === null) return -1;
+        if (b.MAKINE_TANIMI === null) return 1;
+        return a.MAKINE_TANIMI.localeCompare(b.MAKINE_TANIMI);
+      },
+      ellipsis: true,
+
+      visible: true, // Varsayılan olarak açık
+    },
+    {
+      title: "Planlanan Başlama Tarihi",
+      dataIndex: "PLAN_BASLAMA_TARIH",
+      key: "PLAN_BASLAMA_TARIH",
+      width: 150,
+      sorter: (a, b) => {
+        if (a.PLAN_BASLAMA_TARIH === null && b.PLAN_BASLAMA_TARIH === null) return 0;
+        if (a.PLAN_BASLAMA_TARIH === null) return 1;
+        if (b.PLAN_BASLAMA_TARIH === null) return -1;
+        return a.PLAN_BASLAMA_TARIH.localeCompare(b.PLAN_BASLAMA_TARIH);
+      },
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak açık
+      render: (text) => formatDate(text),
+    },
+
+    {
+      title: "Planlanan Başlama Saati",
+      dataIndex: "PLAN_BASLAMA_SAAT",
+      key: "PLAN_BASLAMA_SAAT",
+      width: 150,
+      sorter: (a, b) => {
+        if (a.PLAN_BASLAMA_SAAT === null && b.PLAN_BASLAMA_SAAT === null) return 0;
+        if (a.PLAN_BASLAMA_SAAT === null) return 1;
+        if (b.PLAN_BASLAMA_SAAT === null) return -1;
+        return a.PLAN_BASLAMA_SAAT.localeCompare(b.PLAN_BASLAMA_SAAT);
+      },
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak açık
+      render: (text) => formatTime(text),
+    },
+    {
+      title: "Planlanan Bitiş Tarihi",
+      dataIndex: "PLAN_BITIS_TARIH",
+      key: "PLAN_BITIS_TARIH",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Planlanan Bitiş Saati",
+      dataIndex: "PLAN_BITIS_SAAT",
+      key: "PLAN_BITIS_SAAT",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+      render: (text) => formatTime(text),
+    },
+    {
+      title: "Başlama Tarihi",
+      dataIndex: "BASLAMA_TARIH",
+      key: "BASLAMA_TARIH",
+      width: 110,
+      ellipsis: true,
+
+      visible: true, // Varsayılan olarak kapalı
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Başlama Saati",
+      dataIndex: "BASLAMA_SAAT",
+      key: "BASLAMA_SAAT",
+      width: 90,
+      ellipsis: true,
+
+      visible: true, // Varsayılan olarak kapalı
+      render: (text) => formatTime(text),
+    },
+    {
+      title: "Bitiş Tarihi",
+      dataIndex: "ISM_BITIS_TARIH",
+      key: "ISM_BITIS_TARIH",
+      width: 110,
+      ellipsis: true,
+
+      visible: true, // Varsayılan olarak kapalı
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Bitiş Saati",
+      dataIndex: "ISM_BITIS_SAAT",
+      key: "ISM_BITIS_SAAT",
+      width: 90,
+      ellipsis: true,
+
+      visible: true, // Varsayılan olarak kapalı
+      render: (text) => formatTime(text),
+    },
+    {
+      title: "İş Süresi (dk.)",
+      dataIndex: "IS_SURESI",
+      key: "IS_SURESI",
+      width: 110,
+      ellipsis: true,
+
+      visible: true, // Varsayılan olarak kapalı
+      render: (text) => (text > 0 ? text : null),
+    },
+    {
+      title: "Tamamlama (%)",
+      dataIndex: "TAMAMLANMA",
+      key: "TAMAMLANMA",
+      width: 200,
+      ellipsis: true,
+
+      visible: true, // Varsayılan olarak kapalı
+      render: (text) => <Progress percent={text} steps={8} />,
+    },
+    {
+      title: "Garanti",
+      dataIndex: "GARANTI",
+      key: "GARANTI",
+      width: 100,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+      render: (text, record) => {
+        return record.GARANTI ? (
           <div
             style={{
               display: "flex",
@@ -306,421 +542,227 @@ const MainTable = () => {
               justifyContent: "center",
             }}
           >
-            <Tag
-              style={{
-                textAlign: "center",
-                backgroundColor: hexToRGBA(color, 0.2),
-                border: `1.2px solid ${hexToRGBA(color, 0.7)}`,
-                color: color,
-              }}
-            >
-              {text}
-            </Tag>
+            <CheckOutlined style={{ color: "green" }} />
+          </div>
+        ) : (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <CloseOutlined style={{ color: "red" }} />
           </div>
         );
       },
-      sorter: (a, b) => (a.IST_DURUM_ID || 0) - (b.IST_DURUM_ID || 0),
     },
     {
-      title: "Makine Tanım",
-      dataIndex: "IST_MAKINE_TANIM",
-      key: "IST_MAKINE_TANIM",
+      title: "Makine Durumu",
+      dataIndex: "MAKINE_DURUM",
+      key: "MAKINE_DURUM",
       width: 150,
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true,
-      sorter: (a, b) => (a.IST_MAKINE_TANIM || "").localeCompare(b.IST_MAKINE_TANIM || ""),
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    // {
+    //   title: "Plaka",
+    //   dataIndex: "MAKINE_PLAKA",
+    //   key: "MAKINE_PLAKA",
+    //   width: 150,
+    //   ellipsis: true,
+    //   onCell: () => ({
+    //     onClick: (event) => {
+    //       event.stopPropagation();
+    //     },
+    //   }),
+    //   visible: false, // Varsayılan olarak kapalı
+    // },
+    {
+      title: "Makine Tipi",
+      dataIndex: "MAKINE_TIP",
+      key: "MAKINE_TIP",
+      width: 250,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "İş Kategorisi",
-      dataIndex: "IST_KATEGORI_TANIMI",
-      key: "IST_KATEGORI_TANIMI",
+      title: "Ekipman",
+      dataIndex: "EKIPMAN",
+      key: "EKIPMAN",
       width: 150,
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      sorter: (a, b) => (a.IST_KATEGORI_TANIMI || "").localeCompare(b.IST_KATEGORI_TANIMI || ""),
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "İş Tipi",
+      dataIndex: "IS_TIPI",
+      key: "IS_TIPI",
+      width: 250,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "İş Nedeni",
+      dataIndex: "IS_NEDENI",
+      key: "IS_NEDENI",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Atölye",
+      dataIndex: "ATOLYE",
+      key: "ATOLYE",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Talimat",
+      dataIndex: "TALIMAT",
+      key: "TALIMAT",
+      width: 250,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
     },
     {
       title: "Öncelik",
-      dataIndex: "IST_ONCELIK",
-      key: "IST_ONCELIK",
+      dataIndex: "ONCELIK",
+      key: "ONCELIK",
       width: 150,
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true,
-      sorter: (a, b) => (a.IST_ONCELIK || "").localeCompare(b.IST_ONCELIK || ""),
+
+      visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Lokasyon",
-      dataIndex: "IST_BILDIREN_LOKASYON",
-      key: "IST_BILDIREN_LOKASYON",
-      width: 150,
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true,
-      sorter: (a, b) => (a.IST_BILDIREN_LOKASYON || "").localeCompare(b.IST_BILDIREN_LOKASYON || ""),
-    },
-    {
-      title: "İşlem Süresi",
-      dataIndex: "ISLEM_SURE",
-      key: "ISLEM_SURE",
-      width: 300,
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true,
-      render: (text, record) => {
-        let baslangicTarihi, bitisTarihi;
-        baslangicTarihi = dayjs(record.IST_ACILIS_TARIHI.split("T")[0] + "T" + record.IST_ACILIS_SAATI, "YYYY-MM-DDTHH:mm:ss");
-        if (record.IST_DURUM_ID !== 4) {
-          bitisTarihi = dayjs();
-        } else {
-          if (record.IST_KAPAMA_TARIHI && record.IST_KAPAMA_SAATI) {
-            bitisTarihi = dayjs(record.IST_KAPAMA_TARIHI.split("T")[0] + "T" + record.IST_KAPAMA_SAATI, "YYYY-MM-DDTHH:mm:ss");
-          } else {
-            return "";
-          }
-        }
-        const fark = bitisTarihi.diff(baslangicTarihi);
-        const farkSaniye = Math.floor(fark / 1000);
-        const farkDakika = Math.floor(farkSaniye / 60);
-        const farkSaat = Math.floor(farkDakika / 60);
-        const farkGun = Math.floor(farkSaat / 24);
-        return `${farkGun > 0 ? farkGun + " gün " : ""}${farkSaat % 24 > 0 ? (farkSaat % 24) + " saat " : ""}${farkDakika % 60 > 0 ? (farkDakika % 60) + " dakika " : ""}`;
-      },
-      sorter: (a, b) => (a.ISLEM_SURE || "").localeCompare(b.ISLEM_SURE || ""),
-    },
-    {
-      title: "Kapanma Tarih",
-      dataIndex: "IST_KAPAMA_TARIHI",
-      key: "IST_KAPAMA_TARIHI",
+      title: "Kapanış Tarihi",
+      dataIndex: "KAPANIS_TARIHI",
+      key: "KAPANIS_TARIHI",
       width: 110,
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
+
+      visible: true, // Varsayılan olarak kapalı
       render: (text) => formatDate(text),
-      sorter: (a, b) => (a.IST_KAPAMA_TARIHI || "").localeCompare(b.IST_KAPAMA_TARIHI || ""),
     },
     {
-      title: "Kapanma Saat",
-      dataIndex: "IST_KAPAMA_SAATI",
-      key: "IST_KAPAMA_SAATI",
-      width: 90,
+      title: "Kapanış Saati",
+      dataIndex: "KAPANIS_SAATI",
+      key: "KAPANIS_SAATI",
+      width: 150,
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
+
+      visible: false, // Varsayılan olarak kapalı
       render: (text) => formatTime(text),
-      sorter: (a, b) => (a.IST_KAPAMA_SAATI || "").localeCompare(b.IST_KAPAMA_SAATI || ""),
     },
     {
-      title: "İptal Tarih",
-      dataIndex: "IST_IPTAL_TARIH",
-      key: "IST_IPTAL_TARIH",
-      width: 110,
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      render: (text) => formatDate(text),
-      sorter: (a, b) => (a.IST_IPTAL_TARIH || "").localeCompare(b.IST_IPTAL_TARIH || ""),
-    },
-    {
-      title: "İptal Saat",
-      dataIndex: "IST_IPTAL_SAAT",
-      key: "IST_IPTAL_SAAT",
-      width: 90,
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      render: (text) => formatTime(text),
-      sorter: (a, b) => (a.IST_IPTAL_SAAT || "").localeCompare(b.IST_IPTAL_SAAT || ""),
-    },
-    {
-      title: "Müdahele Gecikme Süresi",
-      dataIndex: "mudaheleGecikmeSuresi",
-      key: "mudaheleGecikmeSuresi",
+      title: "Takvim",
+      dataIndex: "TAKVIM",
+      key: "TAKVIM",
       width: 150,
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      sorter: (a, b) => (a.mudaheleGecikmeSuresi || "").localeCompare(b.mudaheleGecikmeSuresi || ""),
+
+      visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Durum Açıklaması",
-      dataIndex: "durumAciklamasi",
-      key: "durumAciklamasi",
+      title: "Masraf Merkezi",
+      dataIndex: "MASRAF_MERKEZI",
+      key: "MASRAF_MERKEZI",
       width: 150,
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      sorter: (a, b) => (a.durumAciklamasi || "").localeCompare(b.durumAciklamasi || ""),
+
+      visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Planlanan Başlama Tarihi",
-      dataIndex: "IST_PLANLANAN_BASLAMA_TARIHI",
-      key: "IST_PLANLANAN_BASLAMA_TARIHI",
+      title: "Firma",
+      dataIndex: "FRIMA",
+      key: "FRIMA",
       width: 150,
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      render: (text) => formatDate(text),
-      sorter: (a, b) => (a.IST_PLANLANAN_BASLAMA_TARIHI || "").localeCompare(b.IST_PLANLANAN_BASLAMA_TARIHI || ""),
+
+      visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Planlanan Başlama Saati",
-      dataIndex: "IST_PLANLANAN_BASLAMA_SAATI",
-      key: "IST_PLANLANAN_BASLAMA_SAATI",
-      width: 150,
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      render: (text) => formatTime(text),
-      sorter: (a, b) => (a.IST_PLANLANAN_BASLAMA_SAATI || "").localeCompare(b.IST_PLANLANAN_BASLAMA_SAATI || ""),
-    },
-    {
-      title: "Planlanan Bitiş Tarihi",
-      dataIndex: "IST_PLANLANAN_BITIS_TARIHI",
-      key: "IST_PLANLANAN_BITIS_TARIHI",
-      width: 150,
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      render: (text) => formatDate(text),
-      sorter: (a, b) => (a.IST_PLANLANAN_BITIS_TARIHI || "").localeCompare(b.IST_PLANLANAN_BITIS_TARIHI || ""),
-    },
-    {
-      title: "Planlanan Bitiş Saati",
-      dataIndex: "IST_PLANLANAN_BITIS_SAATI",
-      key: "IST_PLANLANAN_BITIS_SAATI",
-      width: 150,
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      render: (text) => formatTime(text),
-      sorter: (a, b) => (a.IST_PLANLANAN_BITIS_SAATI || "").localeCompare(b.IST_PLANLANAN_BITIS_SAATI || ""),
-    },
-    {
-      title: "İş Emri No",
-      dataIndex: "IST_ISEMRI_NO",
-      key: "IST_ISEMRI_NO",
+      title: "İş Talep Kodu",
+      dataIndex: "IS_TALEP_NO",
+      key: "IS_TALEP_NO",
       width: 150,
       ellipsis: true,
       onCell: (record) => ({
         onClick: (event) => {
           event.stopPropagation();
-          const updatedRecord = { ...record, key: record.IST_ISEMRI_ID };
-          setEditDrawer1Data(updatedRecord);
-          setEditDrawer1Visible(true);
+
+          // Burada, record objesini doğrudan kullanmak yerine,
+          // bir kopyasını oluşturup `key` değerini `ISM_DURUM_KOD_ID` ile güncelliyoruz.
+          const updatedRecord = { ...record, key: record.ISM_IS_TALEP_ID };
+          // const updatedRecord = { ...record, key: 378 };
+
+          setEditDrawer1Data(updatedRecord); // Güncellenmiş record'u EditDrawer1 için data olarak ayarla
+          setEditDrawer1Visible(true); // EditDrawer1'i aç
         },
       }),
       render: (text) => <a>{text}</a>,
-      visible: true,
-      sorter: (a, b) => (a.IST_ISEMRI_NO || "").localeCompare(b.IST_ISEMRI_NO || ""),
+      visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Teknisyen",
-      dataIndex: "IST_TEKNISYEN_TANIM",
-      key: "IST_TEKNISYEN_TANIM",
+      title: "İş Talep Eden",
+      dataIndex: "IS_TALEP_EDEN",
+      key: "IS_TALEP_EDEN",
       width: 150,
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      sorter: (a, b) => (a.IST_TEKNISYEN_TANIM || "").localeCompare(b.IST_TEKNISYEN_TANIM || ""),
+
+      visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Atölye",
-      dataIndex: "IST_ATOLYE_TANIM",
-      key: "IST_ATOLYE_TANIM",
+      title: "İş Talep Tarihi",
+      dataIndex: "IS_TALEP_TARIH",
+      key: "IS_TALEP_TARIH",
       width: 150,
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      sorter: (a, b) => (a.IST_ATOLYE_TANIM || "").localeCompare(b.IST_ATOLYE_TANIM || ""),
+
+      visible: false, // Varsayılan olarak kapalı
+      render: (text) => formatDate(text),
     },
     {
-      title: "Makine Kodu",
-      dataIndex: "IST_MAKINE_KOD",
-      key: "IST_MAKINE_KOD",
-      width: 150,
+      title: "Personel Adı",
+      dataIndex: "PERSONEL_ADI",
+      key: "PERSONEL_ADI",
+      width: 180,
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      sorter: (a, b) => (a.IST_MAKINE_KOD || "").localeCompare(b.IST_MAKINE_KOD || ""),
-    },
-    {
-      title: "Bildirim Tipi",
-      dataIndex: "IST_TIP_TANIM",
-      key: "IST_TIP_TANIM",
-      width: 150,
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      sorter: (a, b) => (a.IST_TIP_TANIM || "").localeCompare(b.IST_TIP_TANIM || ""),
-    },
-    {
-      title: "İlgili Kişi",
-      dataIndex: "IST_TAKIP_EDEN_ADI",
-      key: "IST_TAKIP_EDEN_ADI",
-      width: 150,
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      sorter: (a, b) => (a.IST_TAKIP_EDEN_ADI || "").localeCompare(b.IST_TAKIP_EDEN_ADI || ""),
-    },
-    {
-      title: "Bildirilen Bina",
-      dataIndex: "IST_BINA",
-      key: "IST_BINA",
-      width: 150,
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      sorter: (a, b) => (a.IST_BINA || "").localeCompare(b.IST_BINA || ""),
-    },
-    {
-      title: "Bildirilen Kat",
-      dataIndex: "IST_KAT",
-      key: "IST_KAT",
-      width: 150,
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      sorter: (a, b) => (a.IST_KAT || "").localeCompare(b.IST_KAT || ""),
-    },
-    {
-      title: "Servis Nedeni",
-      dataIndex: "IST_SERVIS_NEDENI",
-      key: "IST_SERVIS_NEDENI",
-      width: 150,
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      sorter: (a, b) => (a.IST_SERVIS_NEDENI || "").localeCompare(b.IST_SERVIS_NEDENI || ""),
+
+      visible: true, // Varsayılan olarak kapalı
     },
     {
       title: "Tam Lokasyon",
-      dataIndex: "IST_BILDIREN_LOKASYON_TUM",
-      key: "IST_BILDIREN_LOKASYON_TUM",
+      dataIndex: "TAM_LOKASYON",
+      key: "TAM_LOKASYON",
       width: 300,
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      sorter: (a, b) => (a.IST_BILDIREN_LOKASYON_TUM || "").localeCompare(b.IST_BILDIREN_LOKASYON_TUM || ""),
+
+      visible: false, // Varsayılan olarak kapalı
     },
     {
       title: "Ana Lokasyon",
-      dataIndex: "IST_BILDIREN_LOKASYON_TUM",
+      dataIndex: "TAM_LOKASYON",
       key: "ANA_LOKASYON",
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
+      // Enable ellipsis for overflowed content
       width: 300,
       sorter: (a, b) => {
-        if (a.IST_BILDIREN_LOKASYON_TUM && b.IST_BILDIREN_LOKASYON_TUM) {
-          return a.IST_BILDIREN_LOKASYON_TUM.localeCompare(b.IST_BILDIREN_LOKASYON_TUM);
+        if (a.TAM_LOKASYON && b.TAM_LOKASYON) {
+          return a.TAM_LOKASYON.localeCompare(b.TAM_LOKASYON);
         }
-        if (!a.IST_BILDIREN_LOKASYON_TUM && !b.IST_BILDIREN_LOKASYON_TUM) {
-          return 0;
+        if (!a.TAM_LOKASYON && !b.TAM_LOKASYON) {
+          return 0; // Both are null or undefined, consider them equal
         }
-        return a.IST_BILDIREN_LOKASYON_TUM ? 1 : -1;
+        return a.TAM_LOKASYON ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
       },
       render: (text) => {
         if (text === null) {
@@ -728,36 +770,224 @@ const MainTable = () => {
         }
         const parts = text.split("/");
         return parts.length > 1 ? parts[0] : text;
-      },
-      visible: false,
+      }, // Add this line
+      visible: false, // Varsayılan olarak açık
     },
     {
-      title: "Talep Değerlendirme Puan",
-      dataIndex: "IST_DEGERLENDIRME_PUAN",
-      key: "IST_DEGERLENDIRME_PUAN",
+      title: "Bildirilen Kat",
+      dataIndex: "BILDIRILEN_KAT",
+      key: "BILDIRILEN_KAT",
       width: 150,
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      sorter: (a, b) => (a.IST_DEGERLENDIRME_PUAN || "").localeCompare(b.IST_DEGERLENDIRME_PUAN || ""),
+
+      visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Talep Değerlendirme Açıklama",
-      dataIndex: "IST_DEGERLENDIRME_ACIKLAMA",
-      key: "IST_DEGERLENDIRME_ACIKLAMA",
+      title: "Bildirilen Bina",
+      dataIndex: "BILDIRILEN_BINA",
+      key: "BILDIRILEN_BINA",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Sayaç Değeri",
+      dataIndex: "GUNCEL_SAYAC_DEGER",
+      key: "GUNCEL_SAYAC_DEGER",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Notlar",
+      dataIndex: "ICERDEKI_NOT",
+      key: "ICERDEKI_NOT",
       width: 250,
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false,
-      sorter: (a, b) => (a.IST_DEGERLENDIRME_ACIKLAMA || "").localeCompare(b.IST_DEGERLENDIRME_ACIKLAMA || ""),
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_1 ? ozelAlanlar.OZL_OZEL_ALAN_1 : label && label.OZL_OZEL_ALAN_1}</div>,
+      dataIndex: "OZEL_ALAN_1",
+      key: "OZEL_ALAN_1",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_2 ? ozelAlanlar.OZL_OZEL_ALAN_2 : label && label.OZL_OZEL_ALAN_2}</div>,
+      dataIndex: "OZEL_ALAN_2",
+      key: "OZEL_ALAN_2",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_3 ? ozelAlanlar.OZL_OZEL_ALAN_3 : label && label.OZL_OZEL_ALAN_3}</div>,
+      dataIndex: "OZEL_ALAN_3",
+      key: "OZEL_ALAN_3",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_4 ? ozelAlanlar.OZL_OZEL_ALAN_4 : label && label.OZL_OZEL_ALAN_4}</div>,
+      dataIndex: "OZEL_ALAN_4",
+      key: "OZEL_ALAN_4",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_5 ? ozelAlanlar.OZL_OZEL_ALAN_5 : label && label.OZL_OZEL_ALAN_5}</div>,
+      dataIndex: "OZEL_ALAN_5",
+      key: "OZEL_ALAN_5",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_6 ? ozelAlanlar.OZL_OZEL_ALAN_6 : label && label.OZL_OZEL_ALAN_6}</div>,
+      dataIndex: "OZEL_ALAN_6",
+      key: "OZEL_ALAN_6",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_7 ? ozelAlanlar.OZL_OZEL_ALAN_7 : label && label.OZL_OZEL_ALAN_7}</div>,
+      dataIndex: "OZEL_ALAN_7",
+      key: "OZEL_ALAN_7",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_8 ? ozelAlanlar.OZL_OZEL_ALAN_8 : label && label.OZL_OZEL_ALAN_8}</div>,
+      dataIndex: "OZEL_ALAN_8",
+      key: "OZEL_ALAN_8",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_9 ? ozelAlanlar.OZL_OZEL_ALAN_9 : label && label.OZL_OZEL_ALAN_9}</div>,
+      dataIndex: "OZEL_ALAN_9",
+      key: "OZEL_ALAN_9",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_10 ? ozelAlanlar.OZL_OZEL_ALAN_10 : label && label.OZL_OZEL_ALAN_10}</div>,
+      dataIndex: "OZEL_ALAN_10",
+      key: "OZEL_ALAN_10",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_11 ? ozelAlanlar.OZL_OZEL_ALAN_11 : label && label.OZL_OZEL_ALAN_11}</div>,
+      dataIndex: "OZEL_ALAN_11",
+      key: "OZEL_ALAN_11",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_12 ? ozelAlanlar.OZL_OZEL_ALAN_12 : label && label.OZL_OZEL_ALAN_12}</div>,
+      dataIndex: "OZEL_ALAN_12",
+      key: "OZEL_ALAN_12",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_13 ? ozelAlanlar.OZL_OZEL_ALAN_13 : label && label.OZL_OZEL_ALAN_13}</div>,
+      dataIndex: "OZEL_ALAN_13",
+      key: "OZEL_ALAN_13",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_14 ? ozelAlanlar.OZL_OZEL_ALAN_14 : label && label.OZL_OZEL_ALAN_14}</div>,
+      dataIndex: "OZEL_ALAN_14",
+      key: "OZEL_ALAN_14",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_15 ? ozelAlanlar.OZL_OZEL_ALAN_15 : label && label.OZL_OZEL_ALAN_15}</div>,
+      dataIndex: "OZEL_ALAN_15",
+      key: "OZEL_ALAN_15",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_16 ? ozelAlanlar.OZL_OZEL_ALAN_16 : label && label.OZL_OZEL_ALAN_16}</div>,
+      dataIndex: "OZEL_ALAN_16",
+      key: "OZEL_ALAN_16",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_17 ? ozelAlanlar.OZL_OZEL_ALAN_17 : label && label.OZL_OZEL_ALAN_17}</div>,
+      dataIndex: "OZEL_ALAN_17",
+      key: "OZEL_ALAN_17",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_18 ? ozelAlanlar.OZL_OZEL_ALAN_18 : label && label.OZL_OZEL_ALAN_18}</div>,
+      dataIndex: "OZEL_ALAN_18",
+      key: "OZEL_ALAN_18",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_19 ? ozelAlanlar.OZL_OZEL_ALAN_19 : label && label.OZL_OZEL_ALAN_19}</div>,
+      dataIndex: "OZEL_ALAN_19",
+      key: "OZEL_ALAN_19",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_20 ? ozelAlanlar.OZL_OZEL_ALAN_20 : label && label.OZL_OZEL_ALAN_20}</div>,
+      dataIndex: "OZEL_ALAN_20",
+      key: "OZEL_ALAN_20",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
     },
 
     // Diğer kolonlarınız...
@@ -858,6 +1088,7 @@ const MainTable = () => {
       if (searchTerm !== body.keyword) {
         handleBodyChange("keyword", searchTerm);
         setCurrentPage(1); // Arama yapıldığında veya arama sıfırlandığında sayfa numarasını 1'e ayarla
+        // setDrawer({ ...drawer, visible: false }); // Arama yapıldığında veya arama sıfırlandığında Drawer'ı kapat
       }
     }, 2000);
 
@@ -877,16 +1108,16 @@ const MainTable = () => {
     try {
       setLoading(true);
       // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.post(`GetIsTalepFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}`, filters);
+      const response = await AxiosInstance.post(`GetIsEmriFullListDash?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}&Durum=0`, filters);
       if (response) {
         // Toplam sayfa sayısını ayarla
         setTotalPages(response.page);
         setTotalDataCount(response.kayit_sayisi);
 
         // Gelen veriyi formatla ve state'e ata
-        const formattedData = response.is_talep_listesi.map((item) => ({
+        const formattedData = response.list.map((item) => ({
           ...item,
-          key: item.TB_IS_TALEP_ID,
+          key: item.TB_ISEMRI_ID,
           // Diğer alanlarınız...
         }));
         setData(formattedData);
@@ -945,12 +1176,16 @@ const MainTable = () => {
     onChange: onSelectChange,
   };
 
+  // const onRowClick = (record) => {
+  //   return {
+  //     onClick: () => {
+  //       setDrawer({ visible: true, data: record });
+  //     },
+  //   };
+  // };
+
   const onRowClick = (record) => {
-    return {
-      onClick: () => {
-        setDrawer({ visible: true, data: record });
-      },
-    };
+    setDrawer({ visible: true, data: record });
   };
 
   const refreshTableData = useCallback(() => {
@@ -977,9 +1212,9 @@ const MainTable = () => {
 
   // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
   const [columns, setColumns] = useState(() => {
-    const savedOrder = localStorage.getItem("columnOrderIsTalep");
-    const savedVisibility = localStorage.getItem("columnVisibilityIsTalep");
-    const savedWidths = localStorage.getItem("columnWidthsIsTalep");
+    const savedOrder = localStorage.getItem("columnOrderIsEmriDashboard");
+    const savedVisibility = localStorage.getItem("columnVisibilityIsEmriDashboard");
+    const savedWidths = localStorage.getItem("columnWidthsIsEmriDashboard");
 
     let order = savedOrder ? JSON.parse(savedOrder) : [];
     let visibility = savedVisibility ? JSON.parse(savedVisibility) : {};
@@ -997,9 +1232,9 @@ const MainTable = () => {
       }
     });
 
-    localStorage.setItem("columnOrderIsTalep", JSON.stringify(order));
-    localStorage.setItem("columnVisibilityIsTalep", JSON.stringify(visibility));
-    localStorage.setItem("columnWidthsIsTalep", JSON.stringify(widths));
+    localStorage.setItem("columnOrderIsEmriDashboard", JSON.stringify(order));
+    localStorage.setItem("columnVisibilityIsEmriDashboard", JSON.stringify(visibility));
+    localStorage.setItem("columnWidthsIsEmriDashboard", JSON.stringify(widths));
 
     return order.map((key) => {
       const column = initialColumns.find((col) => col.key === key);
@@ -1010,9 +1245,31 @@ const MainTable = () => {
 
   // sütunları local storage'a kaydediyoruz
   useEffect(() => {
-    localStorage.setItem("columnOrderIsTalep", JSON.stringify(columns.map((col) => col.key)));
-    localStorage.setItem("columnVisibilityIsTalep", JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.visible }), {})));
-    localStorage.setItem("columnWidthsIsTalep", JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.width }), {})));
+    localStorage.setItem("columnOrderIsEmriDashboard", JSON.stringify(columns.map((col) => col.key)));
+    localStorage.setItem(
+      "columnVisibilityIsEmriDashboard",
+      JSON.stringify(
+        columns.reduce(
+          (acc, col) => ({
+            ...acc,
+            [col.key]: col.visible,
+          }),
+          {}
+        )
+      )
+    );
+    localStorage.setItem(
+      "columnWidthsIsEmriDashboard",
+      JSON.stringify(
+        columns.reduce(
+          (acc, col) => ({
+            ...acc,
+            [col.key]: col.width,
+          }),
+          {}
+        )
+      )
+    );
   }, [columns]);
   // sütunları local storage'a kaydediyoruz sonu
 
@@ -1078,10 +1335,10 @@ const MainTable = () => {
   // sütunları sıfırlamak için kullanılan fonksiyon
 
   function resetColumns() {
-    localStorage.removeItem("columnOrderIsTalep");
-    localStorage.removeItem("columnVisibilityIsTalep");
-    localStorage.removeItem("columnWidthsIsTalep");
-    localStorage.removeItem("ozelAlanlarIsTalep");
+    localStorage.removeItem("columnOrderIsEmriDashboard");
+    localStorage.removeItem("columnVisibilityIsEmriDashboard");
+    localStorage.removeItem("columnWidthsIsEmriDashboard");
+    localStorage.removeItem("ozelAlanlarIsEmriDashboard");
     window.location.reload();
   }
 
@@ -1089,13 +1346,6 @@ const MainTable = () => {
 
   return (
     <>
-      <style>
-        {`
-          .boldRow {
-            font-weight: bold;
-          }
-        `}
-      </style>
       <Modal title="Sütunları Yönet" centered width={800} open={isModalVisible} onOk={() => setIsModalVisible(false)} onCancel={() => setIsModalVisible(false)}>
         <Text style={{ marginBottom: "15px" }}>Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını Ayarlayabilirsiniz.</Text>
         <div
@@ -1181,6 +1431,7 @@ const MainTable = () => {
       <div
         style={{
           display: "flex",
+          flexWrap: "wrap",
           justifyContent: "space-between",
           marginBottom: "20px",
           gap: "10px",
@@ -1192,8 +1443,9 @@ const MainTable = () => {
             display: "flex",
             gap: "10px",
             alignItems: "center",
-            flexWrap: "wrap",
             width: "100%",
+            maxWidth: "935px",
+            flexWrap: "wrap",
           }}
         >
           <Button
@@ -1210,7 +1462,7 @@ const MainTable = () => {
             <MenuOutlined />
           </Button>
           <Input
-            style={{ width: "250px", maxWidth: "200px" }}
+            style={{ width: "250px" }}
             type="text"
             placeholder="Arama yap..."
             value={searchTerm}
@@ -1218,8 +1470,8 @@ const MainTable = () => {
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
           <Filters onChange={handleBodyChange} />
-          <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
-          <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
+          {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
+          <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
@@ -1244,7 +1496,7 @@ const MainTable = () => {
             showTotal: (total, range) => `Toplam ${total}`, // Burada 'total' parametresi doğru kayıt sayısını yansıtacaktır
             showQuickJumper: true,
           }}
-          onRow={onRowClick}
+          // onRow={onRowClick}
           scroll={{ y: "calc(100vh - 370px)" }}
           onChange={handleTableChange}
           rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}

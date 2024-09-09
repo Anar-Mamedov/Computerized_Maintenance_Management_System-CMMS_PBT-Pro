@@ -50,6 +50,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       ONY_TANIM: data.rolTanim,
       ONY_ACIKLAMA: data.aciklama,
       ONY_DEGISTIRME_TAR: dayjs().format("YYYY-MM-DD"),
+      ONY_AKTIF: selectedRow.ONY_AKTIF,
     };
 
     AxiosInstance.post(`UpdateOnayTanim`, Body)
