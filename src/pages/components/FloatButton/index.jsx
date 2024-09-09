@@ -45,14 +45,24 @@ const FloatButton = () => {
 
   const handleSend = async () => {
     try {
-      await axios.post("YOUR_API_ENDPOINT", {
-        image: imageData,
-        input: inputValue,
-        text: textValue,
-        userId: userInfo.userId,
-        userName: userInfo.userName,
-        company: baseURL,
+      const formData = new FormData();
+      formData.append("musteribaglantianahtar", baseURL);
+      formData.append("kullaniciId", userInfo.userId);
+      formData.append("kullaniciAdi", userInfo.userName);
+      formData.append("musteridestekbaslik", inputValue);
+      formData.append("musteridestekaciklama", textValue);
+
+      // Convert base64 image data to blob
+      const response = await fetch(imageData);
+      const blob = await response.blob();
+      formData.append("resim", blob, "screenshot.png");
+
+      await axios.post(`http://95.130.173.226:1212/api/HelpDesk/addMusteriDestek`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
+
       message.success("Veriler başarıyla gönderildi!");
       setVisible(false);
     } catch (error) {

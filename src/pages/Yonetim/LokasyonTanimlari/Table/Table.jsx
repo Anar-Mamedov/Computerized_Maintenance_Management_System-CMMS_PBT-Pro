@@ -30,6 +30,8 @@ export default function MainTable() {
   const [filteredData, setFilteredData] = useState([]);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
 
+  console.log(selectedRowKeys);
+
   useEffect(() => {
     const timerId = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
@@ -180,6 +182,13 @@ export default function MainTable() {
       key: "lokasyonBilgisi",
       width: 300,
       ellipsis: true,
+      onCell: (record) => {
+        return {
+          onClick: () => {
+            setDrawer({ visible: true, data: record });
+          },
+        };
+      },
       render: (text, record) => <div>{record.LOK_TANIM}</div>,
     },
     {
@@ -210,7 +219,7 @@ export default function MainTable() {
   };
 
   const rowSelection = {
-    type: "radio", // Radio tipi seçim kutuları kullan
+    type: "checkbox", // Radio tipi seçim kutuları kullan
     selectedRowKeys,
     onChange: onSelectChange,
     // You can add more configuration here if needed
@@ -242,7 +251,8 @@ export default function MainTable() {
           marginBottom: "20px",
           gap: "10px",
           padding: "0 5px",
-        }}>
+        }}
+      >
         <Input
           style={{ width: "250px" }}
           type="text"
@@ -259,18 +269,13 @@ export default function MainTable() {
           columns={columns}
           dataSource={debouncedSearchTerm ? filteredData : fields}
           pagination={false}
-          onRow={onRowClick}
+          // onRow={onRowClick}
           scroll={{ y: "calc(100vh - 300px)" }}
           expandedRowKeys={expandedRowKeys}
           onExpand={onTableRowExpand} // Elle genişletme/küçültme işlemlerini takip et
         />
       </Spin>
-      <EditDrawer
-        selectedRow={drawer.data}
-        onDrawerClose={() => setDrawer({ ...drawer, visible: false })}
-        drawerVisible={drawer.visible}
-        onRefresh={refreshTableData}
-      />
+      <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
     </div>
   );
 }
