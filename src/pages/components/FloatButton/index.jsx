@@ -8,6 +8,11 @@ import styled from "styled-components";
 
 const { Text } = Typography;
 
+const ErrorText = styled(Text)`
+  color: red;
+  margin-top: 5px;
+`;
+
 const FloatButton = () => {
   const [imageData, setImageData] = useState(null);
   const [inputValue, setInputValue] = useState("");
@@ -15,6 +20,8 @@ const FloatButton = () => {
   const [visible, setVisible] = useState(false);
   const [baseURL, setBaseURL] = useState("");
   const [userInfo, setUserInfo] = useState(null);
+  const [inputError, setInputError] = useState(false);
+  const [textError, setTextError] = useState(false);
 
   const handleScreenshot = () => {
     html2canvas(document.body, {
@@ -33,17 +40,31 @@ const FloatButton = () => {
   };
 
   useEffect(() => {
-    // localStorage'den öğeyi al
     const storedValue = localStorage.getItem("baseURL");
     const user = JSON.parse(localStorage.getItem("user"));
     if (storedValue && user) {
-      // State değişkenine set et
       setBaseURL(storedValue);
       setUserInfo(user);
     }
-  }, []); // Boş bağımlılık dizisi ile sadece bir kez çalışır
+  }, []);
 
   const handleSend = async () => {
+    if (!inputValue.trim()) {
+      setInputError(true);
+    } else {
+      setInputError(false);
+    }
+
+    if (!textValue.trim()) {
+      setTextError(true);
+    } else {
+      setTextError(false);
+    }
+
+    if (!inputValue.trim() || !textValue.trim()) {
+      return;
+    }
+
     try {
       const formData = new FormData();
       formData.append("musteribaglantianahtar", baseURL);
@@ -52,7 +73,6 @@ const FloatButton = () => {
       formData.append("musteridestekbaslik", inputValue);
       formData.append("musteridestekaciklama", textValue);
 
-      // Convert base64 image data to blob
       const response = await fetch(imageData);
       const blob = await response.blob();
       formData.append("resim", blob, "screenshot.png");
@@ -77,6 +97,10 @@ const FloatButton = () => {
   const handleVisibleChange = (vis) => {
     if (vis) {
       handleScreenshot();
+      setInputValue("");
+      setTextValue("");
+      setInputError(false);
+      setTextError(false);
       setTimeout(() => {
         const popoverElements = document.getElementsByClassName("ant-popover");
         if (popoverElements.length > 0) {
@@ -86,7 +110,7 @@ const FloatButton = () => {
           popover.style.bottom = "70px";
           popover.style.right = "0";
         }
-      }, 100); // Popover'un render edilmesi için kısa bir gecikme
+      }, 100);
     }
   };
 
@@ -100,10 +124,28 @@ const FloatButton = () => {
         onClick={handleClose}
       />
       <img src={imageData} alt="Screenshot" style={{ width: "100%", marginBottom: "10px" }} />
-      <Text>Talep Nedeni:</Text>
-      <Input placeholder="Başlık" value={inputValue} onChange={(e) => setInputValue(e.target.value)} style={{ marginBottom: "10px" }} />
-      <Text>Açıklama:</Text>
-      <Input.TextArea placeholder="Açıklama" value={textValue} onChange={(e) => setTextValue(e.target.value)} rows={4} style={{ marginBottom: "10px" }} />
+      <div style={{ display: "flex", flexDirection: "column", marginBottom: "5px" }}>
+        <Text>Talep Nedeni:</Text>
+        <Input
+          placeholder="Başlık"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          style={{ marginBottom: "5px", borderColor: inputError ? "red" : undefined }}
+        />
+        {inputError && <ErrorText>Başlık alanı zorunludur.</ErrorText>}
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", marginBottom: "5px" }}>
+        <Text>Açıklama:</Text>
+        <Input.TextArea
+          placeholder="Açıklama"
+          value={textValue}
+          onChange={(e) => setTextValue(e.target.value)}
+          rows={4}
+          style={{ marginBottom: "5px", borderColor: textError ? "red" : undefined }}
+        />
+        {textError && <ErrorText>Açıklama alanı zorunludur.</ErrorText>}
+      </div>
+
       <Button type="primary" onClick={handleSend} block>
         Gönder
       </Button>
