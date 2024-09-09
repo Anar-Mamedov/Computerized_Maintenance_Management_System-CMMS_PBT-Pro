@@ -82,7 +82,7 @@ function Component2(props) {
         </div>
       )}
 
-      <Modal width={1400} centered title="Açık İş Emirleri" open={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+      <Modal width={1400} destroyOnClose centered title="Açık İş Emirleri" open={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
         <div>
           <ModalTablo />
         </div>
