@@ -35,7 +35,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       cancelText: "Hayır",
       onOk: () => {
         onDrawerClose(); // Close the drawer
-        onRefresh();
+        // onRefresh();
         reset();
       },
       onCancel: () => {
@@ -215,11 +215,13 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
                     backgroundColor: "#2bc770",
                     borderColor: "#2bc770",
                     color: "#ffffff",
-                  }}>
+                  }}
+                >
                   Güncelle
                 </Button>
               </Space>
-            }>
+            }
+          >
             {/* <MainTabs /> */}
             <SecondTabs refreshKey={drawerKey} />
             <Footer />
