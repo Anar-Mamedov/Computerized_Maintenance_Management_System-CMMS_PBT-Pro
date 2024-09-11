@@ -5,6 +5,7 @@ import { FaQuestion } from "react-icons/fa";
 import html2canvas from "html2canvas";
 import axios from "axios";
 import styled from "styled-components";
+import dayjs from "dayjs";
 
 const { Text } = Typography;
 
@@ -75,7 +76,8 @@ const FloatButton = () => {
 
       const response = await fetch(imageData);
       const blob = await response.blob();
-      formData.append("resim", blob, "screenshot.png");
+      const timestamp = dayjs().format("YYYYMMDD_HHmmss");
+      formData.append("resim", blob, `screenshot_${timestamp}.png`);
 
       await axios.post(`http://95.130.173.226:1212/api/HelpDesk/addMusteriDestek`, formData, {
         headers: {

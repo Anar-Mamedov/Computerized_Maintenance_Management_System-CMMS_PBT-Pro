@@ -1,206 +1,177 @@
-// MainTabs.jsx
-import React, { useState, useContext, useMemo, useEffect } from "react";
-import { Flex, Transfer, Table, Button } from "antd";
-import { DndContext } from "@dnd-kit/core";
-import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import { CSS } from "@dnd-kit/utilities";
-import { HolderOutlined } from "@ant-design/icons";
-import { useFormContext } from "react-hook-form";
-import AxiosInstance from "../../../../../api/http.jsx";
+import React, { useState, useEffect } from "react";
+import { Button, Input, Popover, message, Typography } from "antd";
+import { CameraOutlined, CloseOutlined } from "@ant-design/icons";
+import { FaQuestion } from "react-icons/fa";
+import html2canvas from "html2canvas";
+import axios from "axios";
+import styled from "styled-components";
+import dayjs from "dayjs";
 
-const RowContext = React.createContext({});
+const { Text } = Typography;
 
-const DragHandle = () => {
-  const { setActivatorNodeRef, listeners } = useContext(RowContext);
-  return <Button type="text" size="small" icon={<HolderOutlined />} style={{ cursor: "move" }} ref={setActivatorNodeRef} {...listeners} />;
-};
+const ErrorText = styled(Text)`
+  color: red;
+  margin-top: 5px;
+`;
 
-const SortableRow = (props) => {
-  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
-    id: props["data-row-key"],
-  });
-  const style = {
-    ...props.style,
-    transform: CSS.Translate.toString(transform),
-    transition,
-    ...(isDragging ? { position: "relative", zIndex: 9999 } : {}),
+const FloatButton = () => {
+  const [imageData, setImageData] = useState(null);
+  const [inputValue, setInputValue] = useState("");
+  const [textValue, setTextValue] = useState("");
+  const [visible, setVisible] = useState(false);
+  const [baseURL, setBaseURL] = useState("");
+  const [userInfo, setUserInfo] = useState(null);
+  const [inputError, setInputError] = useState(false);
+  const [textError, setTextError] = useState(false);
+
+  const handleScreenshot = () => {
+    html2canvas(document.body, {
+      scale: 2,
+      useCORS: true,
+      logging: true,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      windowWidth: document.documentElement.scrollWidth,
+      windowHeight: document.documentElement.scrollHeight,
+    }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png", 1.0);
+      setImageData(imgData);
+      setVisible(true);
+    });
   };
-  const contextValue = useMemo(() => ({ setActivatorNodeRef, listeners }), [setActivatorNodeRef, listeners]);
-  return (
-    <RowContext.Provider value={contextValue}>
-      <tr {...props} ref={setNodeRef} style={style} {...attributes} />
-    </RowContext.Provider>
-  );
-};
-
-const TableTransfer = (props) => {
-  const { leftColumns, rightColumns, targetKeys, onTargetChange, ...restProps } = props;
-  const [rightTableData, setRightTableData] = useState(props.dataSource.filter((item) => targetKeys.includes(item.key)));
-  const { setValue } = useFormContext();
 
   useEffect(() => {
-    const updatedRightTableData = props.dataSource.filter((item) => targetKeys.includes(item.key));
-    setRightTableData(updatedRightTableData);
-  }, [targetKeys, props.dataSource]);
+    const storedValue = localStorage.getItem("baseURL");
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (storedValue && user) {
+      setBaseURL(storedValue);
+      setUserInfo(user);
+    }
+  }, []);
 
-  const handleDragEnd = ({ active, over }) => {
-    if (active.id !== over?.id) {
-      setRightTableData((prevState) => {
-        const activeIndex = prevState.findIndex((item) => item.key === active.id);
-        const overIndex = prevState.findIndex((item) => item.key === over?.id);
-        const updatedData = arrayMove(prevState, activeIndex, overIndex);
-        const updatedKeys = updatedData.map((item) => item.key);
-        onTargetChange(updatedKeys);
-        setValue("sortedKeys", updatedKeys);
-        return updatedData;
+  const handleSend = async () => {
+    if (!inputValue.trim()) {
+      setInputError(true);
+    } else {
+      setInputError(false);
+    }
+
+    if (!textValue.trim()) {
+      setTextError(true);
+    } else {
+      setTextError(false);
+    }
+
+    if (!inputValue.trim() || !textValue.trim()) {
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("musteribaglantianahtar", baseURL);
+      formData.append("kullaniciId", userInfo.userId);
+      formData.append("kullaniciAdi", userInfo.userName);
+      formData.append("musteridestekbaslik", inputValue);
+      formData.append("musteridestekaciklama", textValue);
+
+      const response = await fetch(imageData);
+      const blob = await response.blob();
+      const timestamp = dayjs().format("YYYYMMDD_HHmmss");
+      formData.append("resim", blob, `screenshot_${timestamp}.png`);
+
+      await axios.post(`http://95.130.173.226:1212/api/HelpDesk/addMusteriDestek`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
+
+      message.success("Veriler başarıyla gönderildi!");
+      setVisible(false);
+    } catch (error) {
+      message.error("Verileri gönderirken bir hata oluştu.");
     }
   };
 
-  const handleTableTransferChange = (nextTargetKeys) => {
-    onTargetChange(nextTargetKeys);
-    const newRightTableData = props.dataSource.filter((item) => nextTargetKeys.includes(item.key));
-    setRightTableData(newRightTableData);
-    setValue(
-      "sortedKeys",
-      newRightTableData.map((item) => item.key)
-    );
+  const handleClose = () => {
+    setVisible(false);
   };
 
-  return (
-    <Transfer {...restProps} style={{ width: "100%" }} targetKeys={targetKeys} onChange={handleTableTransferChange} render={(item) => item.ROL_TANIM}>
-      {({ direction, filteredItems, onItemSelect, onItemSelectAll, selectedKeys, disabled }) => {
-        const columns = direction === "left" ? leftColumns : rightColumns;
-        const data = direction === "left" ? filteredItems : rightTableData;
-
-        const rowSelection = {
-          getCheckboxProps: () => ({ disabled }),
-          onChange(selectedRowKeys) {
-            onItemSelectAll(selectedRowKeys, "replace");
-          },
-          selectedRowKeys: selectedKeys,
-        };
-
-        return direction === "left" ? (
-          <Table
-            rowSelection={rowSelection}
-            columns={columns}
-            dataSource={filteredItems}
-            size="small"
-            style={{ pointerEvents: disabled ? "none" : undefined }}
-            onRow={({ key, disabled: itemDisabled }) => ({
-              onClick: () => {
-                if (itemDisabled || disabled) {
-                  return;
-                }
-                onItemSelect(key, !selectedKeys.includes(key));
-              },
-            })}
-          />
-        ) : (
-          <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={handleDragEnd}>
-            <SortableContext items={rightTableData.map((item) => item.key)} strategy={verticalListSortingStrategy}>
-              <Table
-                rowSelection={rowSelection}
-                columns={[
-                  {
-                    key: "sort",
-                    align: "center",
-                    width: 80,
-                    render: () => <DragHandle />,
-                  },
-                  ...rightColumns,
-                ]}
-                dataSource={rightTableData}
-                components={{
-                  body: {
-                    row: SortableRow,
-                  },
-                }}
-                size="small"
-                style={{ pointerEvents: disabled ? "none" : undefined }}
-                onRow={({ key, disabled: itemDisabled }) => ({
-                  onClick: () => {
-                    if (itemDisabled || disabled) {
-                      return;
-                    }
-                    onItemSelect(key, !selectedKeys.includes(key));
-                  },
-                })}
-              />
-            </SortableContext>
-          </DndContext>
-        );
-      }}
-    </Transfer>
-  );
-};
-
-const columns = [{ dataIndex: "ROL_TANIM", title: "Rol Tanımı" }];
-
-const filterOption = (input, item) => item.ROL_TANIM?.includes(input);
-
-const MainTabs = ({ selectedRow }) => {
-  const [targetKeys, setTargetKeys] = useState([]);
-  const [disabled, setDisabled] = useState(false);
-  const [mockData, setMockData] = useState([]);
-  const [rightTableData, setRightTableData] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await AxiosInstance.post("/GetOnayRolTanim");
-        const data = response.map((item) => ({ ...item, key: item.TB_ROL_ID.toString() }));
-        setMockData(data);
-      } catch (error) {
-        console.error("API Error:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    const fetchRightTableData = async () => {
-      if (selectedRow) {
-        try {
-          const response = await AxiosInstance.post(`/GetOnayKuralList?ONR_ONYTANIM_ID=${selectedRow.key}`);
-          const data = response.map((item) => item.ONR_ROL_ID.toString());
-          setTargetKeys(data);
-          const updatedRightTableData = mockData.filter((item) => data.includes(item.key));
-          setRightTableData(updatedRightTableData);
-        } catch (error) {
-          console.error("API Error:", error);
+  const handleVisibleChange = (vis) => {
+    if (vis) {
+      handleScreenshot();
+      setInputValue("");
+      setTextValue("");
+      setInputError(false);
+      setTextError(false);
+      setTimeout(() => {
+        const popoverElements = document.getElementsByClassName("ant-popover");
+        if (popoverElements.length > 0) {
+          const popover = popoverElements[0];
+          popover.style.zIndex = "100000";
+          popover.style.position = "fixed";
+          popover.style.bottom = "70px";
+          popover.style.right = "0";
         }
-      }
-    };
-
-    fetchRightTableData();
-  }, [selectedRow, mockData]);
-
-  const onChange = (nextTargetKeys) => {
-    setTargetKeys(nextTargetKeys);
-    const newRightTableData = mockData.filter((item) => nextTargetKeys.includes(item.key));
-    setRightTableData(newRightTableData);
+      }, 100);
+    }
   };
 
-  return (
-    <Flex align="start" gap="middle" vertical>
-      <TableTransfer
-        dataSource={mockData}
-        targetKeys={targetKeys}
-        disabled={disabled}
-        showSearch
-        showSelectAll={false}
-        onChange={onChange}
-        filterOption={filterOption}
-        leftColumns={columns}
-        rightColumns={columns}
-        onTargetChange={setTargetKeys}
+  const popoverContent = (
+    <div style={{ maxWidth: "300px", position: "relative" }}>
+      <Button
+        type="primary"
+        danger
+        icon={<CloseOutlined />}
+        style={{ position: "absolute", top: "-30px", right: "0px", width: "20px", height: "20px", padding: "10px" }}
+        onClick={handleClose}
       />
-    </Flex>
+      <img src={imageData} alt="Screenshot" style={{ width: "100%", marginBottom: "10px" }} />
+      <div style={{ display: "flex", flexDirection: "column", marginBottom: "5px" }}>
+        <Text>Talep Nedeni:</Text>
+        <Input
+          placeholder="Başlık"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          style={{ marginBottom: "5px", borderColor: inputError ? "red" : undefined }}
+        />
+        {inputError && <ErrorText>Başlık alanı zorunludur.</ErrorText>}
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", marginBottom: "5px" }}>
+        <Text>Açıklama:</Text>
+        <Input.TextArea
+          placeholder="Açıklama"
+          value={textValue}
+          onChange={(e) => setTextValue(e.target.value)}
+          rows={4}
+          style={{ marginBottom: "5px", borderColor: textError ? "red" : undefined }}
+        />
+        {textError && <ErrorText>Açıklama alanı zorunludur.</ErrorText>}
+      </div>
+
+      <Button type="primary" onClick={handleSend} block>
+        Gönder
+      </Button>
+    </div>
+  );
+
+  return (
+    <Popover content={popoverContent} title="Talep Detayları" trigger="click" open={visible} onOpenChange={handleVisibleChange} destroyTooltipOnHide={true}>
+      <Button
+        type="primary"
+        shape="circle"
+        icon={<FaQuestion />}
+        size="large"
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          right: "20px",
+          zIndex: 9999,
+          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+        }}
+        onClick={() => setVisible(true)}
+      />
+    </Popover>
   );
 };
 
-export default MainTabs;
+export default FloatButton;
