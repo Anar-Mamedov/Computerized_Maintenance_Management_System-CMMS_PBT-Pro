@@ -19,22 +19,15 @@ const ResimUpload = () => {
     try {
       setLoadingImages(true);
       const [response1, response2] = await Promise.all([
-        AxiosInstance.get(
-          `GetResimIds?RefId=${secilenIsEmriID}&RefGrup=ISEMRI`
-        ),
-        AxiosInstance.get(
-          `GetResimIds?RefId=${secilenTalepID}&RefGrup=CAGRI MERKEZI`
-        ),
+        AxiosInstance.get(`GetResimIds?RefId=${secilenIsEmriID}&RefGrup=ISEMRI`),
+        AxiosInstance.get(`GetResimIds?RefId=${secilenTalepID}&RefGrup=CAGRI MERKEZI`),
       ]);
       const resimIDler = [...response1, ...response2]; // Her iki API'den gelen verileri birleştiriyoruz
       const urls = await Promise.all(
         resimIDler.map(async (id) => {
-          const resimResponse = await AxiosInstance.get(
-            `ResimGetirById?id=${id}`,
-            {
-              responseType: "blob",
-            }
-          );
+          const resimResponse = await AxiosInstance.get(`ResimGetirById?id=${id}`, {
+            responseType: "blob",
+          });
           return URL.createObjectURL(resimResponse); // Axios response objesinden blob data alınır
         })
       );
@@ -60,15 +53,11 @@ const ResimUpload = () => {
     beforeUpload: (file) => {
       const formData = new FormData();
       formData.append("file", file);
-      AxiosInstance.post(
-        `UploadPhoto?refid=${secilenIsEmriID}&refgrup=ISEMRI`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      )
+      AxiosInstance.post(`UploadPhoto?refid=${secilenIsEmriID}&refgrup=ISEMRI`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
         .then(() => {
           message.success(`${file.name} başarıyla yüklendi.`);
           setRefreshImages((prev) => !prev); // Başarılı yüklemeden sonra resim listesini yenile
@@ -119,12 +108,9 @@ const ResimUpload = () => {
         <p className="ant-upload-drag-icon">
           <InboxOutlined />
         </p>
-        <p className="ant-upload-text">
-          Tıklayın veya bu alana dosya sürükleyin
-        </p>
+        <p className="ant-upload-text">Tıklayın veya bu alana dosya sürükleyin</p>
         <p className="ant-upload-hint">
-          Tek seferde bir veya birden fazla dosya yüklemeyi destekler. Şirket
-          verileri veya diğer yasaklı dosyaların yüklenmesi kesinlikle yasaktır.
+          Tek seferde bir veya birden fazla dosya yüklemeyi destekler. Şirket verileri veya diğer yasaklı dosyaların yüklenmesi kesinlikle yasaktır.
         </p>
       </Upload.Dragger>
     </div>
