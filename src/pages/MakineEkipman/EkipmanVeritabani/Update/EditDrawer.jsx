@@ -103,7 +103,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       EKP_MAKINE_ID: Number(data.MakineModelID),
       EKP_DURUM_KOD_ID: Number(data.durumID),
       EKP_AKTIF: data.aktif,
-      // Diğer alanlarınız..
+      // Diğer alanlarınız...
     };
 
     // API'ye POST isteği gönder
