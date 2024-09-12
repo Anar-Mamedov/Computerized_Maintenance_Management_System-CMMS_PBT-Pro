@@ -35,6 +35,7 @@ import FloatButton from "./pages/components/FloatButton/index.jsx";
 import RolTanimlari from "./pages/OnayIslemleri/RolTanimlari/RolTanimlari.jsx";
 import OnayTanimlari from "./pages/OnayIslemleri/OnayTanimlari/OnayTanimlari.jsx";
 import Onaylayicilar from "./pages/OnayIslemleri/Onaylayicilar/Onaylayicilar.jsx";
+import EkipmanVeritabani from "./pages/MakineEkipman/EkipmanVeritabani/EkipmanVeritabani.jsx";
 // import Kurallar from "./pages/OnayIslemleri/Kurallar/Kurallar.jsx";
 
 const { Text } = Typography;
@@ -224,7 +225,7 @@ export default function App() {
           <Route path="/analizler" element={<Analizler />} />
           <Route path="/planlamaTakvimi" element={<PlanlamaTakvimi />} />
           <Route path="/makine" element={<MakineTanim />} />
-          <Route path="/ekipmanVeritabani" element={<Hazirlaniyor />} />
+          <Route path="/ekipmanVeritabani" element={<EkipmanVeritabani />} />
           <Route path="/sayacGuncelleme" element={<Hazirlaniyor />} />
           <Route path="/personelIzinleri" element={<Hazirlaniyor />} />
           <Route path="/personelNobetleri" element={<Hazirlaniyor />} />

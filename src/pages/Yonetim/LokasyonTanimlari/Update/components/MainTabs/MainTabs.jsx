@@ -92,7 +92,8 @@ export default function MainTabs() {
           width: "100%",
           gap: "10px",
           rowGap: "0px",
-        }}>
+        }}
+      >
         <Text style={{ fontSize: "14px" }}>Lokasyon Tanımı:</Text>
         <div
           style={{
@@ -103,12 +104,9 @@ export default function MainTabs() {
             minWidth: "300px",
             gap: "10px",
             width: "100%",
-          }}>
-          <Controller
-            name="lokasyonTanimi"
-            control={control}
-            render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
-          />
+          }}
+        >
+          <Controller name="lokasyonTanimi" control={control} render={({ field }) => <Input {...field} style={{ flex: 1 }} />} />
           <Controller
             name="selectedLokasyonId"
             control={control}
@@ -141,7 +139,8 @@ export default function MainTabs() {
             maxWidth: "450px",
             gap: "10px",
             width: "100%",
-          }}>
+          }}
+        >
           <LokasyonTipi />
         </div>
         <div
@@ -152,7 +151,8 @@ export default function MainTabs() {
             maxWidth: "410px",
             gap: "10px",
             width: "100%",
-          }}>
+          }}
+        >
           <LokasyonBina />
         </div>
       </div>
@@ -165,7 +165,8 @@ export default function MainTabs() {
             justifyContent: "space-between",
             width: "100%",
             maxWidth: "450px",
-          }}>
+          }}
+        >
           <Text style={{ fontSize: "14px" }}>Masraf Merkezi:</Text>
           <div
             style={{
@@ -174,7 +175,8 @@ export default function MainTabs() {
               alignItems: "center",
               justifyContent: "space-between",
               width: "300px",
-            }}>
+            }}
+          >
             <Controller
               name="lokasyonMasrafMerkeziTanim"
               control={control}
@@ -215,7 +217,8 @@ export default function MainTabs() {
             maxWidth: "410px",
             gap: "10px",
             width: "100%",
-          }}>
+          }}
+        >
           <LokasyonKat />
         </div>
       </div>
@@ -227,7 +230,8 @@ export default function MainTabs() {
             justifyContent: "space-between",
             width: "100%",
             maxWidth: "450px",
-          }}>
+          }}
+        >
           <Text style={{ fontSize: "14px" }}>Yönetici:</Text>
           <div
             style={{
@@ -236,7 +240,8 @@ export default function MainTabs() {
               alignItems: "center",
               justifyContent: "space-between",
               width: "300px",
-            }}>
+            }}
+          >
             <Controller
               name="lokasyonYoneticiTanim"
               control={control}
@@ -269,15 +274,7 @@ export default function MainTabs() {
             <Button onClick={handleYoneticiMinusClick}> - </Button>
           </div>
         </StyledDivBottomLine>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "410px",
-          }}>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "410px" }}>
           <Text style={{ fontSize: "14px" }}>Malzeme Depo:</Text>
           <div
             style={{
@@ -286,7 +283,8 @@ export default function MainTabs() {
               alignItems: "center",
               justifyContent: "space-between",
               width: "300px",
-            }}>
+            }}
+          >
             <Controller
               name="lokasyonDepoTanim"
               control={control}
@@ -328,7 +326,8 @@ export default function MainTabs() {
           justifyContent: "space-between",
           width: "100%",
           maxWidth: "870px",
-        }}>
+        }}
+      >
         <Text style={{ fontSize: "14px" }}>Ana Lokasyon:</Text>
         <div
           className="anar"
@@ -339,7 +338,8 @@ export default function MainTabs() {
             justifyContent: "space-between",
             minWidth: "300px",
             gap: "3px",
-          }}>
+          }}
+        >
           <Controller
             name="anaLokasyonTanim"
             control={control}
@@ -379,7 +379,8 @@ export default function MainTabs() {
 
           justifyContent: "space-between",
           width: "100%",
-        }}>
+        }}
+      >
         <Text style={{ fontSize: "14px" }}>E-Mail:</Text>
         <Controller
           name="lokasyonEmail"
@@ -399,7 +400,8 @@ export default function MainTabs() {
           alignItems: "flex-start",
           justifyContent: "space-between",
           width: "100%",
-        }}>
+        }}
+      >
         <Text style={{ fontSize: "14px" }}>Açıklama:</Text>
         <StyledDiv>
           <Controller
