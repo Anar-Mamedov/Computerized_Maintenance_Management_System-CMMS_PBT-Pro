@@ -107,7 +107,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     };
 
     // API'ye POST isteği gönder
-    AxiosInstance.post(`UpdateEkipman?TB_EKIPMAN_ID=${data.secilenID}`, Body)
+    AxiosInstance.post(`UpdateEkipman?TB_EKIPMAN_ID=${selectedRow.key}`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
         if (response.status_code === 200 || response.status_code === 201) {
