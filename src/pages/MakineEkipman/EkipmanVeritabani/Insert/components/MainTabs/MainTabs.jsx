@@ -229,16 +229,16 @@ export default function MainTabs() {
           />
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px" }}>
-          <Text style={{ fontSize: "14px", fontWeight: 600 }}>Depo:</Text>
+          <Text style={{ fontSize: "14px" }}>Depo:</Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", justifyContent: "space-between", width: "300px" }}>
             <Controller
               name="depoTanim"
               control={control}
-              rules={{ required: "Alan Boş Bırakılamaz!" }}
+              // rules={{ required: "Alan Boş Bırakılamaz!" }}
               render={({ field, fieldState: { error } }) => (
                 <Input
                   {...field}
-                  status={errors.depoTanim ? "error" : ""}
+                  // status={errors.depoTanim ? "error" : ""}
                   type="text" // Set the type to "text" for name input
                   style={{ width: "215px" }}
                   disabled
@@ -248,11 +248,11 @@ export default function MainTabs() {
             <Controller
               name="depoID"
               control={control}
-              rules={{ required: "Alan Boş Bırakılamaz!" }}
+              // rules={{ required: "Alan Boş Bırakılamaz!" }}
               render={({ field, fieldState: { error } }) => (
                 <Input
                   {...field}
-                  status={errors.depoID ? "error" : ""}
+                  // status={errors.depoID ? "error" : ""}
                   type="text" // Set the type to "text" for name input
                   style={{ display: "none" }}
                 />
@@ -265,7 +265,7 @@ export default function MainTabs() {
               }}
             />
             <Button onClick={handleDepoMinusClick}> - </Button>
-            {(errors.depoTanim || errors.depoID) && <div style={{ color: "red", marginTop: "5px" }}>Alan Boş Bırakılamaz!</div>}
+            {/*{(errors.depoTanim || errors.depoID) && <div style={{ color: "red", marginTop: "5px" }}>Alan Boş Bırakılamaz!</div>}*/}
           </div>
         </div>
       </div>
