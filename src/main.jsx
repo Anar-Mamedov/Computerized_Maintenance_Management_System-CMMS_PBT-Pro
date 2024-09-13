@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.jsx";
 import { ConfigProvider } from "antd";
 import trTR from "antd/es/locale/tr_TR";
 import { BrowserRouter as Router } from "react-router-dom";
@@ -10,43 +9,41 @@ import dayjs from "dayjs";
 import AxiosInstance from "./api/http.jsx";
 import "./index.css";
 
-// Uygulamanın devre dışı olduğu durumu gösteren bileşen
-const AppDisabled = () => <div style={{ textAlign: "center", marginTop: "20%" }}></div>;
+// App bileşenini lazy load ile yükleyin
+const App = React.lazy(() => import("./App.jsx"));
 
-const Main = () => {
-  return (
-    <React.StrictMode>
-      <ConfigProvider locale={trTR}>
-        <Router>
-          <AppProvider>
-            <RecoilRoot>
-              <App />
-            </RecoilRoot>
-          </AppProvider>
-        </Router>
-      </ConfigProvider>
-    </React.StrictMode>
-  );
+// Uygulamanın devre dışı olduğu durumu gösteren bileşen
+const AppDisabledComponent = () => <div style={{ textAlign: "center", marginTop: "20%" }}></div>;
+const AppDisabled = React.memo(AppDisabledComponent);
+
+// Ana bileşen
+const MainComponent = () => {
+  const baseURL = localStorage.getItem("baseURL");
+  return baseURL ? <MainComponent1 /> : <Main />;
 };
 
-const MainComponent1 = () => {
+// Ana uygulama bileşeni
+const MainComponent1 = React.memo(function MainComponent1() {
   const [disableDate, setDisableDate] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    AxiosInstance.get("GetEndDate")
-      .then((response) => {
-        if (response && response.length > 0) {
-          setDisableDate(dayjs(response[0].ISL_DONEM_BITIS).format("YYYY-MM-DD"));
+    const fetchDisableDate = async () => {
+      try {
+        const response = await AxiosInstance.get("GetEndDate");
+        const data = response.data;
+        if (data && data.length > 0) {
+          setDisableDate(dayjs(data[0].ISL_DONEM_BITIS).format("YYYY-MM-DD"));
         } else {
           console.error("API responsunda beklenen veri bulunamadı.");
         }
-        setLoading(false);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("API çağrısında hata oluştu:", error);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+    fetchDisableDate();
   }, []);
 
   if (loading) {
@@ -60,20 +57,26 @@ const MainComponent1 = () => {
   }
 
   return <Main />;
-};
+});
 
-const MainComponent = () => {
-  const [baseURLExists, setBaseURLExists] = useState(false);
-
-  useEffect(() => {
-    const baseURL = localStorage.getItem("baseURL");
-    if (baseURL) {
-      setBaseURLExists(true);
-    }
-  }, []);
-
-  return baseURLExists ? <MainComponent1 /> : <Main />;
-};
+// Main bileşeni
+const Main = React.memo(function Main() {
+  return (
+    <React.StrictMode>
+      <ConfigProvider locale={trTR}>
+        <Router>
+          <AppProvider>
+            <RecoilRoot>
+              <Suspense fallback={<div>Yükleniyor...</div>}>
+                <App />
+              </Suspense>
+            </RecoilRoot>
+          </AppProvider>
+        </Router>
+      </ConfigProvider>
+    </React.StrictMode>
+  );
+});
 
 // Uygulamayı render et
 ReactDOM.createRoot(document.getElementById("root")).render(<MainComponent />);
