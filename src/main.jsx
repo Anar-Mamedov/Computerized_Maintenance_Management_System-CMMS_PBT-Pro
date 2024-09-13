@@ -31,7 +31,7 @@ const MainComponent1 = React.memo(function MainComponent1() {
     const fetchDisableDate = async () => {
       try {
         const response = await AxiosInstance.get("GetEndDate");
-        const data = response.data;
+        const data = response;
         if (data && data.length > 0) {
           setDisableDate(dayjs(data[0].ISL_DONEM_BITIS).format("YYYY-MM-DD"));
         } else {
@@ -67,7 +67,11 @@ const Main = React.memo(function Main() {
         <Router>
           <AppProvider>
             <RecoilRoot>
-              <Suspense fallback={<div>Yükleniyor...</div>}>
+              <Suspense
+                fallback={
+                  <div style={{ textAlign: "center", fontSize: "18px", display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>Yükleniyor...</div>
+                }
+              >
                 <App />
               </Suspense>
             </RecoilRoot>
