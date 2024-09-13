@@ -13,17 +13,30 @@ import "./index.css";
 const App = React.lazy(() => import("./App.jsx"));
 
 // Uygulamanın devre dışı olduğu durumu gösteren bileşen
-const AppDisabledComponent = () => <div style={{ textAlign: "center", marginTop: "20%" }}></div>;
+const AppDisabledComponent = () => <div style={{ textAlign: "center", marginTop: "20%" }}>Uygulama kullanım süreniz dolmuştur.</div>;
 const AppDisabled = React.memo(AppDisabledComponent);
 
-// Ana bileşen
-const MainComponent = () => {
-  const baseURL = localStorage.getItem("baseURL");
-  return baseURL ? <MainComponent1 /> : <Main />;
-};
+// Main bileşeni
+function Main() {
+  return (
+    <React.StrictMode>
+      <ConfigProvider locale={trTR}>
+        <Router>
+          <AppProvider>
+            <RecoilRoot>
+              <Suspense fallback={<div>Yükleniyor...</div>}>
+                <App />
+              </Suspense>
+            </RecoilRoot>
+          </AppProvider>
+        </Router>
+      </ConfigProvider>
+    </React.StrictMode>
+  );
+}
 
-// Ana uygulama bileşeni
-const MainComponent1 = React.memo(function MainComponent1() {
+// Lisans süresi kontrolü yapan bileşen
+function MainComponent1() {
   const [disableDate, setDisableDate] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -33,7 +46,7 @@ const MainComponent1 = React.memo(function MainComponent1() {
         const response = await AxiosInstance.get("GetEndDate");
         const data = response.data;
         if (data && data.length > 0) {
-          setDisableDate(dayjs(data[0].ISL_DONEM_BITIS).format("YYYY-MM-DD"));
+          setDisableDate(dayjs(data[0].ISL_DONEM_BITIS));
         } else {
           console.error("API responsunda beklenen veri bulunamadı.");
         }
@@ -52,31 +65,18 @@ const MainComponent1 = React.memo(function MainComponent1() {
 
   const currentDate = dayjs();
 
-  if (disableDate && currentDate.isAfter(disableDate)) {
+  if (disableDate && currentDate.isAfter(disableDate, "day")) {
     return <AppDisabled />;
   }
 
   return <Main />;
-});
+}
 
-// Main bileşeni
-const Main = React.memo(function Main() {
-  return (
-    <React.StrictMode>
-      <ConfigProvider locale={trTR}>
-        <Router>
-          <AppProvider>
-            <RecoilRoot>
-              <Suspense fallback={<div>Yükleniyor...</div>}>
-                <App />
-              </Suspense>
-            </RecoilRoot>
-          </AppProvider>
-        </Router>
-      </ConfigProvider>
-    </React.StrictMode>
-  );
-});
+// Ana bileşen
+function MainComponent() {
+  const baseURL = localStorage.getItem("baseURL");
+  return baseURL ? <MainComponent1 /> : <Main />;
+}
 
 // Uygulamayı render et
 ReactDOM.createRoot(document.getElementById("root")).render(<MainComponent />);
