@@ -1,5 +1,5 @@
 import { Checkbox, Space, Tabs } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import FinancialDetailsTable from "./components/FinancialDetailsTable";
@@ -15,51 +15,11 @@ import FourthTab from "./components/FourthTab/FourthTab";
 import TenthTab from "./components/TenthTab/TenthTab";
 import ResimUpload from "./components/Resim/ResimUpload";
 import DosyaUpload from "./components/Dosya/DosyaUpload";
+import Ekipman from "./components/Ekipman/EkipmanListesiTablo.jsx";
 
 //styled components
 const StyledTabs = styled(Tabs)`
-  ${"" /* border-radius: 20px; */}
-  .ant-tabs-nav-list {
-    ${"" /* border-top-right-radius: 10px; */}
-    background-color: rgba(230, 230, 230, 0.3);
-    overflow: hidden;
-  }
-  .ant-tabs-tab {
-    /* background-color: rgba(230, 230, 230, 0.3); */
-    margin: 0 !important;
-    width: fit-content;
-    padding: 10px 15px;
-    justify-content: center;
-  }
-
-  .ant-tabs-nav-wrap {
-    ${"" /* border-radius: 10px 10px 0 0; */}
-  }
-
-  .ant-tabs-tab-active {
-    background-color: #2bc77135;
-    color: rgba(0, 0, 0, 0.88) !important;
-  }
-
-  .ant-tabs-nav .ant-tabs-tab-active .ant-tabs-tab-btn {
-    color: rgba(0, 0, 0, 0.88) !important;
-  }
-  .ant-tabs-tab:hover .ant-tabs-tab-btn {
-    color: rgba(0, 0, 0, 0.88) !important;
-  }
-
-  .ant-tabs-tab-disabled,
-  .ant-tabs-tab-disabled:hover .ant-tabs-tab-btn {
-    color: grey !important;
-  }
-
-  .ant-tabs-tab:not(:first-child) {
-    border-left: 1px solid #80808024;
-  }
-
-  .ant-tabs-ink-bar {
-    background-color: #2bc770;
-  }
+  // styled components code
 `;
 
 //styled components end
@@ -73,149 +33,82 @@ export default function SecondTabs() {
   const { watch } = useFormContext();
   const showYakitTab = watch("makineYakitKullanim");
   const showOtonomTab = watch("makineOtonomBakim");
+  const [activeTabKey, setActiveTabKey] = useState("3");
+
+  const handleTabChange = (key) => {
+    setActiveTabKey(key);
+  };
 
   return (
     <Space
       style={{
         display: "block",
-        // flexDirection: "column",
         alignItems: "flex-start",
         width: "100%",
-      }}>
-      {/* tab */}
-
+      }}
+    >
       <StyledTabs
         defaultActiveKey="3"
+        activeKey={activeTabKey}
+        onChange={handleTabChange}
         style={{
           maxWidth: "100%",
           marginBottom: "40px",
-        }}>
-        {/* <TabPane tab="Analiz" key="1" disabled>
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
-            <FinancialDetailsTable />
-          </div>
-        </TabPane> */}
-        <TabPane tab="Ekipman Ağacı" key="2">
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
-            <RequisiteTable />
+        }}
+      >
+        <TabPane tab="Ekipman Listesi" key="2">
+          <div style={{ gap: "15px" }}>
+            <Ekipman isActive={activeTabKey === "2"} />
           </div>
         </TabPane>
         <TabPane tab="Detay Bilgi" key="3">
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
+          <div style={{ gap: "15px" }}>
             <ThirdTab />
           </div>
         </TabPane>
         <TabPane tab="Finansal Bilgiler" key="4">
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
+          <div style={{ gap: "15px" }}>
             <FourthTab />
           </div>
         </TabPane>
         <TabPane tab="Sayaçlar" key="5">
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
+          <div style={{ gap: "15px" }}>
             <FifthTab />
           </div>
         </TabPane>
         <TabPane tab="Peryodik Bakımlar" key="6">
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
+          <div style={{ gap: "15px" }}>
             <DetailsTable />
           </div>
         </TabPane>
         {showOtonomTab && (
           <TabPane tab="Otonom Bakımlar" key="7">
-            <div
-              style={{
-                // display: "flex",
-                // flexFlow: "row wrap",
-                gap: "15px",
-              }}>
+            <div style={{ gap: "15px" }}>
               <DeliveryTable />
             </div>
           </TabPane>
         )}
-        {/* {showYakitTab && (
-          <TabPane tab="Yakıt Bilgileri" key="10">
-            <div
-              style={{
-                // display: "flex",
-                // flexFlow: "row wrap",
-                gap: "15px",
-              }}>
-              <TenthTab />
-            </div>
-          </TabPane>
-        )} */}
         <TabPane tab="Özel Alanlar" key="11">
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
+          <div style={{ gap: "15px" }}>
             <CustomFields />
           </div>
         </TabPane>
         <TabPane tab="Notlar" key="12">
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
+          <div style={{ gap: "15px" }}>
             <Notes />
           </div>
         </TabPane>
         <TabPane tab="Ekli Belgeler" key="9">
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
+          <div style={{ gap: "15px" }}>
             <DosyaUpload />
           </div>
         </TabPane>
         <TabPane tab="Resimler" key="13">
-          <div
-            style={{
-              // display: "flex",
-              // flexFlow: "row wrap",
-              gap: "15px",
-            }}>
+          <div style={{ gap: "15px" }}>
             <ResimUpload />
           </div>
         </TabPane>
       </StyledTabs>
-      {/* <Tabs defaultActiveKey="1" items={items} onChangeTab={onChangeTab} /> */}
     </Space>
   );
 }
