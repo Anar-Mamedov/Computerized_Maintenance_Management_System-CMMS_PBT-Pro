@@ -241,7 +241,6 @@ export default function EkipmanListesiTablo({ isActive }) {
           y: "calc(100vh - 360px)",
         }}
       />
-
       {isModalVisible && (
         <EditModal
           selectedRow={selectedRow}
