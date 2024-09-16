@@ -30,6 +30,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       garantiBitisTarihi: null,
       depoTanim: null,
       depoID: null,
+      seriNo: null,
       // ... Tüm default değerleriniz
     },
   });
@@ -48,6 +49,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("aktif", data.EKP_AKTIF);
           setValue("ekipmanKodu", data.EKP_KOD === "" || data.EKP_KOD === 0 ? null : data.EKP_KOD);
           setValue("ekipmanTanimi", data.EKP_TANIM === "" || data.EKP_TANIM === 0 ? null : data.EKP_TANIM);
+          setValue("seriNo", data.EKP_SERI_NO === "" || data.EKP_SERI_NO === 0 ? null : data.EKP_SERI_NO);
           setValue("tipi", data.EKP_TIP === "" || data.EKP_TIP === 0 ? null : data.EKP_TIP);
           setValue("tipiID", data.EKP_TIP_KOD_ID === "" || data.EKP_TIP_KOD_ID === 0 ? null : data.EKP_TIP_KOD_ID);
 
@@ -93,6 +95,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     const Body = {
       EKP_KOD: data.ekipmanKodu,
       EKP_TANIM: data.ekipmanTanimi,
+      EKP_SERI_NO: data.seriNo,
       EKP_TIP_KOD_ID: Number(data.tipiID),
       EKP_BIRIM_KOD_ID: Number(data.birimID),
       EKP_MARKA_KOD_ID: Number(data.MakineMarkaID),
