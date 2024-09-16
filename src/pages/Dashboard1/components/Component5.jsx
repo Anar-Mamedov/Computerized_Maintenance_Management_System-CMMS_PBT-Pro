@@ -238,7 +238,7 @@ function Component5(updateApi) {
           </div>
         </div>
       )}
-      <Modal width="90%" centered title={modalTitle} open={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+      <Modal width="90%" centered destroyOnClose title={modalTitle} open={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
         <div>{modalContent}</div>
       </Modal>
     </div>
