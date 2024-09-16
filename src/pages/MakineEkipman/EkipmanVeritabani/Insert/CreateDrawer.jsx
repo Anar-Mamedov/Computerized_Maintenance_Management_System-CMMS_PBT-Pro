@@ -31,6 +31,7 @@ export default function CreateDrawer({ onRefresh }) {
       garantiBitisTarihi: null,
       depoTanim: null,
       depoID: null,
+      seriNo: null,
     },
   });
 
@@ -51,6 +52,7 @@ export default function CreateDrawer({ onRefresh }) {
     const Body = {
       EKP_KOD: data.ekipmanKodu,
       EKP_TANIM: data.ekipmanTanimi,
+      EKP_SERI_NO: data.seriNo,
       EKP_TIP_KOD_ID: Number(data.tipiID),
       EKP_BIRIM_KOD_ID: Number(data.birimID),
       EKP_MARKA_KOD_ID: Number(data.MakineMarkaID),

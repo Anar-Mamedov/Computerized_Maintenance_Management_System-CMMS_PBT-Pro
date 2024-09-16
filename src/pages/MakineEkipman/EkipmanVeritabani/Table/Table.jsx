@@ -209,6 +209,34 @@ const MainTable = () => {
     },
 
     {
+      title: "Seri No",
+      dataIndex: "EKP_SERI_NO",
+      key: "EKP_SERI_NO",
+      width: 100,
+      ellipsis: true,
+      sorter: (a, b) => {
+        if (a.EKP_SERI_NO === null) return -1;
+        if (b.EKP_SERI_NO === null) return 1;
+        return a.EKP_SERI_NO.localeCompare(b.EKP_SERI_NO);
+      },
+      visible: true, // Varsayılan olarak açık
+    },
+
+    {
+      title: "Makine",
+      dataIndex: "MKN_TANIM",
+      key: "MKN_TANIM",
+      width: 200,
+      ellipsis: true,
+      sorter: (a, b) => {
+        if (a.MKN_TANIM === null) return -1;
+        if (b.MKN_TANIM === null) return 1;
+        return a.MKN_TANIM.localeCompare(b.MKN_TANIM);
+      },
+      visible: true, // Varsayılan olarak açık
+    },
+
+    {
       title: "Tipi",
       dataIndex: "EKP_TIP",
       key: "EKP_TIP",

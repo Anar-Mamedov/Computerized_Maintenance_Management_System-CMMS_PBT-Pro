@@ -181,6 +181,31 @@ export default function MainTabs() {
             />
           </div>
         </div>
+
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "450px", gap: "10px", width: "100%", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: "14px" }}>Seri No:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              maxWidth: "300px",
+              minWidth: "300px",
+              gap: "10px",
+              width: "100%",
+            }}
+          >
+            <Controller
+              name="seriNo"
+              control={control}
+              render={({ field, fieldState: { error } }) => (
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+                  <Input {...field} style={{ flex: 1 }} />
+                </div>
+              )}
+            />
+          </div>
+        </div>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "450px", gap: "10px", width: "100%" }}>
           <BakimTipi />
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", width: "100%", maxWidth: "450px" }}>
