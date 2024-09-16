@@ -3,6 +3,7 @@ import { Modal, Typography, Spin } from "antd";
 import AxiosInstance from "../../../api/http.jsx";
 import ModalTablo from "../../YardimMasasi/IsTalepleri/Table/ModalTablo/ModalTablo.jsx";
 import MakineTablo from "./../../MakineEkipman/MakineTanim/Table/Table.jsx";
+import AcikIsEmrirleri from "../../BakımVeArizaYonetimi/IsEmri/Table/ModalTable/ModalTable.jsx";
 
 const { Text } = Typography;
 
@@ -112,6 +113,7 @@ function Component5(updateApi) {
             </Text>
           </div>
           <div
+            onClick={() => showModal("Açık İş Emirleri", <AcikIsEmrirleri />)}
             style={{
               display: "flex",
               alignItems: "center",
@@ -119,6 +121,7 @@ function Component5(updateApi) {
               justifyContent: "space-between",
               padding: "0px 10px 5px 10px",
               borderBottom: "1px solid #f0f0f0",
+              cursor: "pointer",
             }}
           >
             <div
