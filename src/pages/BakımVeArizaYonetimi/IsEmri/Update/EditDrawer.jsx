@@ -305,7 +305,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("kapali", item.KAPALI);
           setDisabled(item.KAPALI);
           if (onayCheck === true) {
-            if (item.ISM_ONAY_DURUM === 1 || item.ISM_ONAY_DURUM === 2) {
+            if (item.ISM_ONAY_DURUM === 1) {
               setDisabled(true);
               setValue("kapali", true);
             }
