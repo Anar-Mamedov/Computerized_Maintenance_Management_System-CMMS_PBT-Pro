@@ -126,7 +126,9 @@ const MainTable = ({ setSelectedIds }) => {
   const [selectedRows, setSelectedRows] = useState([]);
 
   useEffect(() => {
-    setSelectedIds(selectedRows);
+    if (typeof setSelectedIds === "function") {
+      setSelectedIds(selectedRows);
+    }
   }, [selectedRows]);
 
   function hexToRGBA(hex, opacity) {
