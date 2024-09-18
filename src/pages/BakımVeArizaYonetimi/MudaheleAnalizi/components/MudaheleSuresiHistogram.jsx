@@ -13,6 +13,7 @@ function MudaheleSuresiHistogram() {
 
   const lokasyonId = watch("locationIds");
   const atolyeId = watch("atolyeIds");
+  const makineId = watch("makineIds");
   const baslangicTarihi = watch("baslangicTarihi");
   const bitisTarihi = watch("bitisTarihi");
 
@@ -21,6 +22,7 @@ function MudaheleSuresiHistogram() {
     const body = {
       LokasyonId: lokasyonId || "",
       AtolyeId: atolyeId || "",
+      MakineId: makineId || "",
       BaslangicTarih: baslangicTarihi || "",
       BitisTarih: bitisTarihi || "",
     };
@@ -36,7 +38,7 @@ function MudaheleSuresiHistogram() {
 
   useEffect(() => {
     fetchData();
-  }, [lokasyonId, atolyeId, baslangicTarihi, bitisTarihi]);
+  }, [lokasyonId, atolyeId, makineId, baslangicTarihi, bitisTarihi]);
 
   return (
     <div

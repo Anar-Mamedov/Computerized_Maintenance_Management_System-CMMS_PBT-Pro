@@ -14,6 +14,7 @@ function Component1() {
 
   const lokasyonId = watch("locationIds");
   const atolyeId = watch("atolyeIds");
+  const makineId = watch("makineIds");
   const baslangicTarihi = watch("baslangicTarihi");
   const bitisTarihi = watch("bitisTarihi");
 
@@ -22,6 +23,7 @@ function Component1() {
     const body = {
       LokasyonId: lokasyonId || "",
       AtolyeId: atolyeId || "",
+      MakineId: makineId || "",
       BaslangicTarih: baslangicTarihi || "",
       BitisTarih: bitisTarihi || "",
     };
@@ -37,7 +39,7 @@ function Component1() {
 
   useEffect(() => {
     fetchData();
-  }, [lokasyonId, atolyeId, baslangicTarihi, bitisTarihi]);
+  }, [lokasyonId, atolyeId, makineId, baslangicTarihi, bitisTarihi]);
 
   const renderCard = (value, label, backgroundColor, appendUnit) => (
     <div

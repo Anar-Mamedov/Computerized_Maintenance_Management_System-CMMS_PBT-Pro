@@ -46,16 +46,16 @@ function Main(props) {
     >
       <div
         style={{
-          position: "sticky",
-          top: 7,
-          zIndex: 4,
+          // position: "sticky",
+          // top: 7,
+          // zIndex: 4,
           margin: "7px 7px 0px 7px",
           padding: "7px",
           backgroundColor: "white",
           border: "1px solid rgb(240, 240, 240)",
           borderRadius: "5px",
-          filter: isScrolled ? "drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.2))" : "none",
-          transition: "filter 0.3s ease", // Animasyonlu geçiş için
+          /*filter: isScrolled ? "drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.2))" : "none",*/
+          /*transition: "filter 0.3s ease",*/ // Animasyonlu geçiş için
         }}
       >
         <Filters />
