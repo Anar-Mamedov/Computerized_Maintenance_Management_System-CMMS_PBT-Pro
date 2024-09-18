@@ -13,7 +13,7 @@ import Filters from "./filter/Filters";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
 import { useFormContext } from "react-hook-form";
-import { CSVLink } from "react-csv";
+import Papa from "papaparse";
 
 const { Text } = Typography;
 
@@ -113,6 +113,7 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
 };
 
 const MainTable = () => {
+  // State definitions...
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
   const [data, setData] = useState([]);
@@ -121,22 +122,19 @@ const MainTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchTimeout, setSearchTimeout] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0); // Toplam sayfa sayısı için state
-  const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
-  const [totalDataCount, setTotalDataCount] = useState(0); // Tüm veriyi tutan state
-  const [pageSize, setPageSize] = useState(10); // Başlangıçta sayfa başına 10 kayıt göster
+  const [totalPages, setTotalPages] = useState(0); // Total pages
+  const [label, setLabel] = useState("Yükleniyor...");
+  const [totalDataCount, setTotalDataCount] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
   const [onayCheck, setOnayCheck] = useState(false);
-
-  // edit drawer için
   const [drawer, setDrawer] = useState({
     visible: false,
     data: null,
   });
-  // edit drawer için son
-
   const [selectedRows, setSelectedRows] = useState([]);
+  const [csvLoading, setCsvLoading] = useState(false);
 
   function hexToRGBA(hex, opacity) {
     // hex veya opacity null ise hata döndür
@@ -1355,58 +1353,101 @@ const MainTable = () => {
 
   // sütunları sıfırlamak için kullanılan fonksiyon sonu
 
-  // Use useMemo to generate CSV data
-  const csvData = useMemo(() => {
-    const headers = filteredColumns
-      .map((col) => {
-        let label = extractTextFromElement(col.title);
-        return {
-          label: label,
-          key: col.dataIndex,
-        };
-      })
-      .filter((col) => col.key); // Only include columns with valid dataIndex
+  // Function to handle CSV download
+  const handleDownloadCSV = async () => {
+    try {
+      // Start CSV loading
+      setCsvLoading(true);
 
-    const csvRows = data.map((row) => {
-      let csvRow = {};
-      filteredColumns.forEach((col) => {
-        const key = col.dataIndex;
-        if (key) {
-          let value = row[key];
+      // Fetch data from the API
+      const { keyword = "", filters = {} } = body || {};
+      const response = await AxiosInstance.post(`GetIsEmriFullListExcel?parametre=${keyword}`, filters);
+      if (response) {
+        // Process the data to match visible columns
+        const csvData = response.map((row) => {
+          let csvRow = {};
+          filteredColumns.forEach((col) => {
+            const key = col.dataIndex;
+            if (key) {
+              let value = row[key];
 
-          // Handle special cases
-          if (col.render) {
-            if (key === "DUZENLEME_TARIH" || key.endsWith("_TARIH")) {
-              value = formatDate(value);
-            } else if (key === "DUZENLEME_SAAT" || key.endsWith("_SAAT")) {
-              value = formatTime(value);
-            } else if (key === "GARANTI") {
-              value = row.GARANTI ? "Evet" : "Hayır";
-            } else if (key === "TAMAMLANMA") {
-              value = `${row.TAMAMLANMA}%`;
-            } else if (key === "DURUM") {
-              value = row.DURUM;
-            } else if (key === "ISM_ONAY_DURUM") {
-              const { text } = statusTag(row.ISM_ONAY_DURUM);
-              value = text;
-            } else if (key === "ISEMRI_TIP") {
-              value = row.ISEMRI_TIP;
-            } else if (key.startsWith("OZEL_ALAN_")) {
-              value = row[key];
-            } else {
-              // For other columns, extract text from rendered value
-              value = extractTextFromElement(col.render(row[key], row));
+              // Handle special cases
+              if (col.render) {
+                if (key === "DUZENLEME_TARIH" || key.endsWith("_TARIH")) {
+                  value = formatDate(value);
+                } else if (key === "DUZENLEME_SAAT" || key.endsWith("_SAAT")) {
+                  value = formatTime(value);
+                } else if (key === "GARANTI") {
+                  value = row.GARANTI ? "Evet" : "Hayır";
+                } else if (key === "TAMAMLANMA") {
+                  value = `${row.TAMAMLANMA}%`;
+                } else if (key === "DURUM") {
+                  value = row.DURUM;
+                } else if (key === "ISM_ONAY_DURUM") {
+                  const { text } = statusTag(row.ISM_ONAY_DURUM);
+                  value = text;
+                } else if (key === "ISEMRI_TIP") {
+                  value = row.ISEMRI_TIP;
+                } else if (key.startsWith("OZEL_ALAN_")) {
+                  value = row[key];
+                } else {
+                  // For other columns, extract text from rendered value
+                  value = extractTextFromElement(col.render(row[key], row));
+                }
+              }
+
+              csvRow[key] = value;
             }
-          }
+          });
+          return csvRow;
+        });
 
-          csvRow[key] = value;
-        }
-      });
-      return csvRow;
-    });
+        // Prepare headers
+        const headers = filteredColumns
+          .map((col) => {
+            let label = extractTextFromElement(col.title);
+            return {
+              label: label,
+              key: col.dataIndex,
+            };
+          })
+          .filter((col) => col.key); // Only include columns with valid dataIndex
 
-    return { headers, data: csvRows };
-  }, [data, filteredColumns]);
+        // Generate CSV using papaparse
+        const csv = Papa.unparse({
+          fields: headers.map((h) => h.label),
+          data: csvData.map((row) => headers.map((h) => row[h.key])),
+        });
+
+        // Trigger download
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", "table_data.csv");
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Stop CSV loading after download
+        setCsvLoading(false);
+      } else {
+        console.error("API response is not in expected format");
+        // Stop CSV loading if there's an error
+        setCsvLoading(false);
+      }
+    } catch (error) {
+      // Stop CSV loading if there's an error
+      setCsvLoading(false);
+      console.error("Error downloading CSV:", error);
+      if (navigator.onLine) {
+        message.error("Hata Mesajı: " + error.message);
+      } else {
+        message.error("Internet Bağlantısı Mevcut Değil.");
+      }
+    }
+  };
 
   return (
     <>
@@ -1538,9 +1579,9 @@ const MainTable = () => {
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
-          <CSVLink headers={csvData.headers} data={csvData.data} filename="table_data.csv">
-            <Button>CSV Olarak İndir</Button>
-          </CSVLink>
+          <Button onClick={handleDownloadCSV} loading={csvLoading}>
+            CSV Olarak İndir
+          </Button>
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
           <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
         </div>
