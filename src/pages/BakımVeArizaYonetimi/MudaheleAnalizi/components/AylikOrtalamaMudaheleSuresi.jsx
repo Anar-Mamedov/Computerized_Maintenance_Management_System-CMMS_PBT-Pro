@@ -35,6 +35,7 @@ function AylikOrtalamaMudaheleSuresi() {
   const atolyeId = watch("atolyeIds");
   const baslangicTarihi = watch("baslangicTarihi");
   const bitisTarihi = watch("bitisTarihi");
+  const makineId = watch("makineIds");
   const yil = baslangicTarihi ? new Date(baslangicTarihi).getFullYear() : "";
 
   const fetchData = async () => {
@@ -42,6 +43,7 @@ function AylikOrtalamaMudaheleSuresi() {
     const body = {
       LokasyonId: lokasyonId || "",
       AtolyeId: atolyeId || "",
+      MakineId: makineId || "",
       BaslangicTarih: baslangicTarihi || "",
       BitisTarih: bitisTarihi || "",
       Yil: yil || "",
@@ -62,7 +64,7 @@ function AylikOrtalamaMudaheleSuresi() {
 
   useEffect(() => {
     fetchData();
-  }, [lokasyonId, atolyeId, baslangicTarihi, bitisTarihi]);
+  }, [lokasyonId, atolyeId, makineId, baslangicTarihi, bitisTarihi]);
 
   // grafikteki serilerin görünürlüğünü değiştirmek için kullanılır
 

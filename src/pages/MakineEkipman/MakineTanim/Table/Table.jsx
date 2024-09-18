@@ -1,37 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  Table,
-  Button,
-  Modal,
-  Checkbox,
-  Input,
-  Spin,
-  Typography,
-  Tag,
-  Progress,
-  message,
-} from "antd";
-import {
-  HolderOutlined,
-  SearchOutlined,
-  MenuOutlined,
-  CheckOutlined,
-  CloseOutlined,
-} from "@ant-design/icons";
-import {
-  DndContext,
-  useSensor,
-  useSensors,
-  PointerSensor,
-  KeyboardSensor,
-} from "@dnd-kit/core";
-import {
-  sortableKeyboardCoordinates,
-  arrayMove,
-  useSortable,
-  SortableContext,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
+import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
+import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Resizable } from "react-resizable";
 import "./ResizeStyle.css";
@@ -93,25 +64,8 @@ const ResizableTitle = (props) => {
 
 // Sütunların sürüklenebilir olmasını sağlayan component
 
-const DraggableRow = ({
-  id,
-  text,
-  index,
-  moveRow,
-  className,
-  style,
-  visible,
-  onVisibilityChange,
-  ...restProps
-}) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
+const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onVisibilityChange, ...restProps }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const styleWithTransform = {
     ...style,
     transform: CSS.Transform.toString(transform),
@@ -124,12 +78,7 @@ const DraggableRow = ({
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={styleWithTransform}
-      {...restProps}
-      {...attributes}
-    >
+    <div ref={setNodeRef} style={styleWithTransform} {...restProps} {...attributes}>
       {/* <Checkbox
         checked={visible}
         onChange={(e) => onVisibilityChange(index, e.target.checked)}
@@ -153,7 +102,7 @@ const DraggableRow = ({
 
 // Sütunların sürüklenebilir olmasını sağlayan component sonu
 
-const MainTable = () => {
+const MainTable = ({ setSelectedIds }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
   const [data, setData] = useState([]);
@@ -175,6 +124,10 @@ const MainTable = () => {
   // edit drawer için son
 
   const [selectedRows, setSelectedRows] = useState([]);
+
+  useEffect(() => {
+    setSelectedIds(selectedRows);
+  }, [selectedRows]);
 
   function hexToRGBA(hex, opacity) {
     // hex veya opacity null ise hata döndür
@@ -219,9 +172,7 @@ const MainTable = () => {
     fetchData();
   }, [drawer.visible]);
 
-  const ozelAlanlarMakine = JSON.parse(
-    localStorage.getItem("ozelAlanlarMakine")
-  );
+  const ozelAlanlarMakine = JSON.parse(localStorage.getItem("ozelAlanlarMakine"));
 
   // Özel Alanların nameleri backend çekmek için api isteği sonu
   const initialColumns = [
@@ -251,17 +202,8 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) =>
-        a.MKN_BELGE_VAR === b.MKN_BELGE_VAR ? 0 : a.MKN_BELGE_VAR ? -1 : 1,
-      render: (text) => (
-        <div style={{ textAlign: "center" }}>
-          {text ? (
-            <CheckOutlined style={{ color: "green" }} />
-          ) : (
-            <CloseOutlined style={{ color: "red" }} />
-          )}
-        </div>
-      ),
+      sorter: (a, b) => (a.MKN_BELGE_VAR === b.MKN_BELGE_VAR ? 0 : a.MKN_BELGE_VAR ? -1 : 1),
+      render: (text) => <div style={{ textAlign: "center" }}>{text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}</div>,
     },
     {
       title: "Resim",
@@ -275,17 +217,8 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) =>
-        a.MKN_RESIM_VAR === b.MKN_RESIM_VAR ? 0 : a.MKN_RESIM_VAR ? -1 : 1,
-      render: (text) => (
-        <div style={{ textAlign: "center" }}>
-          {text ? (
-            <CheckOutlined style={{ color: "green" }} />
-          ) : (
-            <CloseOutlined style={{ color: "red" }} />
-          )}
-        </div>
-      ),
+      sorter: (a, b) => (a.MKN_RESIM_VAR === b.MKN_RESIM_VAR ? 0 : a.MKN_RESIM_VAR ? -1 : 1),
+      render: (text) => <div style={{ textAlign: "center" }}>{text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}</div>,
     },
     {
       title: "Peryodik Bakım",
@@ -299,21 +232,8 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) =>
-        a.MKN_PERIYODIK_BAKIM === b.MKN_PERIYODIK_BAKIM
-          ? 0
-          : a.MKN_PERIYODIK_BAKIM
-          ? -1
-          : 1,
-      render: (text) => (
-        <div style={{ textAlign: "center" }}>
-          {text ? (
-            <CheckOutlined style={{ color: "green" }} />
-          ) : (
-            <CloseOutlined style={{ color: "red" }} />
-          )}
-        </div>
-      ),
+      sorter: (a, b) => (a.MKN_PERIYODIK_BAKIM === b.MKN_PERIYODIK_BAKIM ? 0 : a.MKN_PERIYODIK_BAKIM ? -1 : 1),
+      render: (text) => <div style={{ textAlign: "center" }}>{text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}</div>,
     },
     {
       title: "Makine Kodu",
@@ -355,15 +275,7 @@ const MainTable = () => {
         },
       }),
       visible: false, // Varsayılan olarak açık
-      render: (text) => (
-        <div style={{ textAlign: "center" }}>
-          {text ? (
-            <CheckOutlined style={{ color: "green" }} />
-          ) : (
-            <CloseOutlined style={{ color: "red" }} />
-          )}
-        </div>
-      ),
+      render: (text) => <div style={{ textAlign: "center" }}>{text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}</div>,
       sorter: (a, b) => {
         if (a.MKN_AKTIF === null) return -1;
         if (b.MKN_AKTIF === null) return 1;
@@ -509,16 +421,10 @@ const MainTable = () => {
       key: "MKN_MASTER_MAKINE_TANIM",
       width: 150,
       sorter: (a, b) => {
-        if (
-          a.MKN_MASTER_MAKINE_TANIM === null &&
-          b.MKN_MASTER_MAKINE_TANIM === null
-        )
-          return 0;
+        if (a.MKN_MASTER_MAKINE_TANIM === null && b.MKN_MASTER_MAKINE_TANIM === null) return 0;
         if (a.MKN_MASTER_MAKINE_TANIM === null) return 1;
         if (b.MKN_MASTER_MAKINE_TANIM === null) return -1;
-        return a.MKN_MASTER_MAKINE_TANIM.localeCompare(
-          b.MKN_MASTER_MAKINE_TANIM
-        );
+        return a.MKN_MASTER_MAKINE_TANIM.localeCompare(b.MKN_MASTER_MAKINE_TANIM);
       },
       ellipsis: true,
       onCell: () => ({
@@ -534,11 +440,7 @@ const MainTable = () => {
       key: "MKN_MASTER_MAKINE_KOD",
       width: 150,
       sorter: (a, b) => {
-        if (
-          a.MKN_MASTER_MAKINE_KOD === null &&
-          b.MKN_MASTER_MAKINE_KOD === null
-        )
-          return 0;
+        if (a.MKN_MASTER_MAKINE_KOD === null && b.MKN_MASTER_MAKINE_KOD === null) return 0;
         if (a.MKN_MASTER_MAKINE_KOD === null) return 1;
         if (b.MKN_MASTER_MAKINE_KOD === null) return -1;
         return a.MKN_MASTER_MAKINE_KOD.localeCompare(b.MKN_MASTER_MAKINE_KOD);
@@ -595,8 +497,7 @@ const MainTable = () => {
       key: "MKN_MASRAF_MERKEZ",
       width: 150,
       sorter: (a, b) => {
-        if (a.MKN_MASRAF_MERKEZ === null && b.MKN_MASRAF_MERKEZ === null)
-          return 0;
+        if (a.MKN_MASRAF_MERKEZ === null && b.MKN_MASRAF_MERKEZ === null) return 0;
         if (a.MKN_MASRAF_MERKEZ === null) return 1;
         if (b.MKN_MASRAF_MERKEZ === null) return -1;
         return a.MKN_MASRAF_MERKEZ.localeCompare(b.MKN_MASRAF_MERKEZ);
@@ -1030,9 +931,7 @@ const MainTable = () => {
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_11_KOD_ID && b.MKN_OZEL_ALAN_11_KOD_ID) {
-          return a.MKN_OZEL_ALAN_11_KOD_ID.localeCompare(
-            b.MKN_OZEL_ALAN_11_KOD_ID
-          );
+          return a.MKN_OZEL_ALAN_11_KOD_ID.localeCompare(b.MKN_OZEL_ALAN_11_KOD_ID);
         }
         if (!a.MKN_OZEL_ALAN_11_KOD_ID && !b.MKN_OZEL_ALAN_11_KOD_ID) {
           return 0; // Both are null or undefined, consider them equal
@@ -1054,9 +953,7 @@ const MainTable = () => {
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_12_KOD_ID && b.MKN_OZEL_ALAN_12_KOD_ID) {
-          return a.MKN_OZEL_ALAN_12_KOD_ID.localeCompare(
-            b.MKN_OZEL_ALAN_12_KOD_ID
-          );
+          return a.MKN_OZEL_ALAN_12_KOD_ID.localeCompare(b.MKN_OZEL_ALAN_12_KOD_ID);
         }
         if (!a.MKN_OZEL_ALAN_12_KOD_ID && !b.MKN_OZEL_ALAN_12_KOD_ID) {
           return 0; // Both are null or undefined, consider them equal
@@ -1078,9 +975,7 @@ const MainTable = () => {
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_13_KOD_ID && b.MKN_OZEL_ALAN_13_KOD_ID) {
-          return a.MKN_OZEL_ALAN_13_KOD_ID.localeCompare(
-            b.MKN_OZEL_ALAN_13_KOD_ID
-          );
+          return a.MKN_OZEL_ALAN_13_KOD_ID.localeCompare(b.MKN_OZEL_ALAN_13_KOD_ID);
         }
         if (!a.MKN_OZEL_ALAN_13_KOD_ID && !b.MKN_OZEL_ALAN_13_KOD_ID) {
           return 0; // Both are null or undefined, consider them equal
@@ -1102,9 +997,7 @@ const MainTable = () => {
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_14_KOD_ID && b.MKN_OZEL_ALAN_14_KOD_ID) {
-          return a.MKN_OZEL_ALAN_14_KOD_ID.localeCompare(
-            b.MKN_OZEL_ALAN_14_KOD_ID
-          );
+          return a.MKN_OZEL_ALAN_14_KOD_ID.localeCompare(b.MKN_OZEL_ALAN_14_KOD_ID);
         }
         if (!a.MKN_OZEL_ALAN_14_KOD_ID && !b.MKN_OZEL_ALAN_14_KOD_ID) {
           return 0; // Both are null or undefined, consider them equal
@@ -1126,9 +1019,7 @@ const MainTable = () => {
       width: 150,
       sorter: (a, b) => {
         if (a.MKN_OZEL_ALAN_15_KOD_ID && b.MKN_OZEL_ALAN_15_KOD_ID) {
-          return a.MKN_OZEL_ALAN_15_KOD_ID.localeCompare(
-            b.MKN_OZEL_ALAN_15_KOD_ID
-          );
+          return a.MKN_OZEL_ALAN_15_KOD_ID.localeCompare(b.MKN_OZEL_ALAN_15_KOD_ID);
         }
         if (!a.MKN_OZEL_ALAN_15_KOD_ID && !b.MKN_OZEL_ALAN_15_KOD_ID) {
           return 0; // Both are null or undefined, consider them equal
@@ -1259,9 +1150,7 @@ const MainTable = () => {
 
     // Örnek bir tarih formatla ve ay formatını belirle
     const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
-    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(
-      sampleDate
-    );
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
 
     let monthFormat;
     if (sampleFormatted.includes("January")) {
@@ -1294,14 +1183,7 @@ const MainTable = () => {
       // Saat ve dakika değerlerinin geçerliliğini kontrol et
       const hoursInt = parseInt(hours, 10);
       const minutesInt = parseInt(minutes, 10);
-      if (
-        isNaN(hoursInt) ||
-        isNaN(minutesInt) ||
-        hoursInt < 0 ||
-        hoursInt > 23 ||
-        minutesInt < 0 ||
-        minutesInt > 59
-      ) {
+      if (isNaN(hoursInt) || isNaN(minutesInt) || hoursInt < 0 || hoursInt > 23 || minutesInt < 0 || minutesInt > 59) {
         // throw new Error("Invalid time format"); // hata fırlatır ve uygulamanın çalışmasını durdurur
         console.error("Invalid time format:", time);
         // return time; // Hatalı formatı olduğu gibi döndür
@@ -1374,10 +1256,7 @@ const MainTable = () => {
     try {
       setLoading(true);
       // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.post(
-        `GetMakineFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}`,
-        filters
-      );
+      const response = await AxiosInstance.post(`GetMakineFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}`, filters);
       if (response) {
         // Toplam sayfa sayısını ayarla
         setTotalPages(response.page);
@@ -1435,9 +1314,7 @@ const MainTable = () => {
       setValue("selectedLokasyonId", null);
     }
     // Seçilen satırların verisini bul
-    const newSelectedRows = data.filter((row) =>
-      newSelectedRowKeys.includes(row.key)
-    );
+    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
     setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
   };
 
@@ -1512,22 +1389,9 @@ const MainTable = () => {
 
   // sütunları local storage'a kaydediyoruz
   useEffect(() => {
-    localStorage.setItem(
-      "columnOrderMakine",
-      JSON.stringify(columns.map((col) => col.key))
-    );
-    localStorage.setItem(
-      "columnVisibilityMakine",
-      JSON.stringify(
-        columns.reduce((acc, col) => ({ ...acc, [col.key]: col.visible }), {})
-      )
-    );
-    localStorage.setItem(
-      "columnWidthsMakine",
-      JSON.stringify(
-        columns.reduce((acc, col) => ({ ...acc, [col.key]: col.width }), {})
-      )
-    );
+    localStorage.setItem("columnOrderMakine", JSON.stringify(columns.map((col) => col.key)));
+    localStorage.setItem("columnVisibilityMakine", JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.visible }), {})));
+    localStorage.setItem("columnWidthsMakine", JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.width }), {})));
   }, [columns]);
   // sütunları local storage'a kaydediyoruz sonu
 
@@ -1535,11 +1399,7 @@ const MainTable = () => {
   const handleResize =
     (key) =>
     (_, { size }) => {
-      setColumns((prev) =>
-        prev.map((col) =>
-          col.key === key ? { ...col, width: size.width } : col
-        )
-      );
+      setColumns((prev) => prev.map((col) => (col.key === key ? { ...col, width: size.width } : col)));
     };
 
   const components = {
@@ -1572,9 +1432,7 @@ const MainTable = () => {
       if (oldIndex !== -1 && newIndex !== -1) {
         setColumns((columns) => arrayMove(columns, oldIndex, newIndex));
       } else {
-        console.error(
-          `Column with key ${active.id} or ${over.id} does not exist.`
-        );
+        console.error(`Column with key ${active.id} or ${over.id} does not exist.`);
       }
     }
   };
@@ -1610,18 +1468,8 @@ const MainTable = () => {
 
   return (
     <>
-      <Modal
-        title="Sütunları Yönet"
-        centered
-        width={800}
-        open={isModalVisible}
-        onOk={() => setIsModalVisible(false)}
-        onCancel={() => setIsModalVisible(false)}
-      >
-        <Text style={{ marginBottom: "15px" }}>
-          Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını
-          Ayarlayabilirsiniz.
-        </Text>
+      <Modal title="Sütunları Yönet" centered width={800} open={isModalVisible} onOk={() => setIsModalVisible(false)} onCancel={() => setIsModalVisible(false)}>
+        <Text style={{ marginBottom: "15px" }}>Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını Ayarlayabilirsiniz.</Text>
         <div
           style={{
             display: "flex",
@@ -1656,15 +1504,7 @@ const MainTable = () => {
             <div style={{ height: "400px", overflow: "auto" }}>
               {initialColumns.map((col) => (
                 <div style={{ display: "flex", gap: "10px" }} key={col.key}>
-                  <Checkbox
-                    checked={
-                      columns.find((column) => column.key === col.key)
-                        ?.visible || false
-                    }
-                    onChange={(e) =>
-                      toggleVisibility(col.key, e.target.checked)
-                    }
-                  />
+                  <Checkbox checked={columns.find((column) => column.key === col.key)?.visible || false} onChange={(e) => toggleVisibility(col.key, e.target.checked)} />
                   {col.title}
                 </div>
               ))}
@@ -1695,26 +1535,14 @@ const MainTable = () => {
                   padding: "8px 8px 12px 8px",
                 }}
               >
-                <Text style={{ fontWeight: 600 }}>
-                  Sütunların Sıralamasını Ayarla
-                </Text>
+                <Text style={{ fontWeight: 600 }}>Sütunların Sıralamasını Ayarla</Text>
               </div>
               <div style={{ height: "400px", overflow: "auto" }}>
-                <SortableContext
-                  items={columns
-                    .filter((col) => col.visible)
-                    .map((col) => col.key)}
-                  strategy={verticalListSortingStrategy}
-                >
+                <SortableContext items={columns.filter((col) => col.visible).map((col) => col.key)} strategy={verticalListSortingStrategy}>
                   {columns
                     .filter((col) => col.visible)
                     .map((col, index) => (
-                      <DraggableRow
-                        key={col.key}
-                        id={col.key}
-                        index={index}
-                        text={col.title}
-                      />
+                      <DraggableRow key={col.key} id={col.key} index={index} text={col.title} />
                     ))}
                 </SortableContext>
               </div>
@@ -1772,14 +1600,8 @@ const MainTable = () => {
           {/*/>*/}
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
-          <ContextMenu
-            selectedRows={selectedRows}
-            refreshTableData={refreshTableData}
-          />
-          <CreateDrawer
-            selectedLokasyonId={selectedRowKeys[0]}
-            onRefresh={refreshTableData}
-          />
+          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
+          <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
         </div>
       </div>
       <Spin spinning={loading}>
@@ -1803,17 +1625,10 @@ const MainTable = () => {
           onRow={onRowClick}
           scroll={{ y: "calc(100vh - 370px)" }}
           onChange={handleTableChange}
-          rowClassName={(record) =>
-            record.IST_DURUM_ID === 0 ? "boldRow" : ""
-          }
+          rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
         />
       </Spin>
-      <EditDrawer
-        selectedRow={drawer.data}
-        onDrawerClose={() => setDrawer({ ...drawer, visible: false })}
-        drawerVisible={drawer.visible}
-        onRefresh={refreshTableData}
-      />
+      <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
     </>
   );
 };
