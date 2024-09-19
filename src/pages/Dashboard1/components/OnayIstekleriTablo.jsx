@@ -135,7 +135,7 @@ function LokasyonBazindaIsTalepleri(props) {
       ),
     },
     {
-      title: "Red",
+      title: "Ret",
       dataIndex: "",
       key: "action1",
       width: 100,
