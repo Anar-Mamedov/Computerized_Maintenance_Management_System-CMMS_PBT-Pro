@@ -13,7 +13,8 @@ import Filters from "./filter/Filters";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
 import { useFormContext } from "react-hook-form";
-import Papa from "papaparse";
+import { SiMicrosoftexcel } from "react-icons/si";
+import * as XLSX from "xlsx";
 
 const { Text } = Typography;
 
@@ -134,7 +135,7 @@ const MainTable = () => {
     data: null,
   });
   const [selectedRows, setSelectedRows] = useState([]);
-  const [csvLoading, setCsvLoading] = useState(false);
+  const [xlsxLoading, setXlsxLoading] = useState(false);
 
   function hexToRGBA(hex, opacity) {
     // hex veya opacity null ise hata döndür
@@ -1354,24 +1355,24 @@ const MainTable = () => {
   // sütunları sıfırlamak için kullanılan fonksiyon sonu
 
   // Function to handle CSV download
-  const handleDownloadCSV = async () => {
+  const handleDownloadXLSX = async () => {
     try {
-      // Start CSV loading
-      setCsvLoading(true);
+      // İndirme işlemi başlıyor
+      setXlsxLoading(true);
 
-      // Fetch data from the API
+      // API'den verileri çekiyoruz
       const { keyword = "", filters = {} } = body || {};
       const response = await AxiosInstance.post(`GetIsEmriFullListExcel?parametre=${keyword}`, filters);
       if (response) {
-        // Process the data to match visible columns
-        const csvData = response.map((row) => {
-          let csvRow = {};
+        // Verileri işliyoruz
+        const xlsxData = response.map((row) => {
+          let xlsxRow = {};
           filteredColumns.forEach((col) => {
             const key = col.dataIndex;
             if (key) {
               let value = row[key];
 
-              // Handle special cases
+              // Özel durumları ele alıyoruz
               if (col.render) {
                 if (key === "DUZENLEME_TARIH" || key.endsWith("_TARIH")) {
                   value = formatDate(value);
@@ -1391,56 +1392,46 @@ const MainTable = () => {
                 } else if (key.startsWith("OZEL_ALAN_")) {
                   value = row[key];
                 } else {
-                  // For other columns, extract text from rendered value
+                  // Diğer sütunlar için
                   value = extractTextFromElement(col.render(row[key], row));
                 }
               }
 
-              csvRow[key] = value;
+              xlsxRow[extractTextFromElement(col.title)] = value;
             }
           });
-          return csvRow;
+          return xlsxRow;
         });
 
-        // Prepare headers
-        const headers = filteredColumns
-          .map((col) => {
-            let label = extractTextFromElement(col.title);
-            return {
-              label: label,
-              key: col.dataIndex,
-            };
-          })
-          .filter((col) => col.key); // Only include columns with valid dataIndex
+        // XLSX dosyasını oluşturuyoruz
+        const worksheet = XLSX.utils.json_to_sheet(xlsxData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 
-        // Generate CSV using papaparse
-        const csv = Papa.unparse({
-          fields: headers.map((h) => h.label),
-          data: csvData.map((row) => headers.map((h) => row[h.key])),
+        // İndirme işlemini başlatıyoruz
+        const excelBuffer = XLSX.write(workbook, {
+          bookType: "xlsx",
+          type: "array",
         });
-
-        // Trigger download
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.setAttribute("href", url);
-        link.setAttribute("download", "table_data.csv");
+        link.setAttribute("download", "table_data.xlsx");
         link.style.visibility = "hidden";
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
 
-        // Stop CSV loading after download
-        setCsvLoading(false);
+        // İndirme işlemi bitti
+        setXlsxLoading(false);
       } else {
-        console.error("API response is not in expected format");
-        // Stop CSV loading if there's an error
-        setCsvLoading(false);
+        console.error("API yanıtı beklenen formatta değil");
+        setXlsxLoading(false);
       }
     } catch (error) {
-      // Stop CSV loading if there's an error
-      setCsvLoading(false);
-      console.error("Error downloading CSV:", error);
+      setXlsxLoading(false);
+      console.error("XLSX indirme hatası:", error);
       if (navigator.onLine) {
         message.error("Hata Mesajı: " + error.message);
       } else {
@@ -1570,8 +1561,8 @@ const MainTable = () => {
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
-          <Button onClick={handleDownloadCSV} loading={csvLoading}>
-            CSV Olarak İndir
+          <Button style={{ display: "flex", alignItems: "center" }} onClick={handleDownloadXLSX} loading={xlsxLoading} icon={<SiMicrosoftexcel />}>
+            İndir
           </Button>
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
           <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
