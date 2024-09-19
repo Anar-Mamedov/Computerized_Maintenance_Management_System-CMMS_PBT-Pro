@@ -1408,6 +1408,25 @@ const MainTable = () => {
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 
+        // Sütun genişliklerini ayarlıyoruz
+        const headers = filteredColumns
+          .map((col) => {
+            let label = extractTextFromElement(col.title);
+            return {
+              label: label,
+              key: col.dataIndex,
+              width: col.width, // Tablo sütun genişliği
+            };
+          })
+          .filter((col) => col.key); // Geçerli dataIndex'e sahip sütunları dahil ediyoruz
+
+        // Genişlikleri ölçeklendirme faktörü ile ayarlıyoruz
+        const scalingFactor = 0.8; // Gerektiği gibi ayarlayın
+
+        worksheet["!cols"] = headers.map((header) => ({
+          wpx: header.width ? header.width * scalingFactor : 100, // Tablo sütun genişliğini kullanıyoruz
+        }));
+
         // İndirme işlemini başlatıyoruz
         const excelBuffer = XLSX.write(workbook, {
           bookType: "xlsx",
