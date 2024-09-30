@@ -7,7 +7,7 @@ const Form = ({ selectedRows }) => {
     try {
       const baseURL = localStorage.getItem("baseURL");
       selectedRows.forEach(async (row) => {
-        window.open(`${baseURL}/FormRapor/GetFormByType?id=${row.key}&tipId=3`, "_blank");
+        window.open(`${baseURL}/FormRapor/GetFormByType?id=${row.key}&tipId=2`, "_blank");
       });
     } catch (error) {
       console.error("PDF indirme hatası:", error);

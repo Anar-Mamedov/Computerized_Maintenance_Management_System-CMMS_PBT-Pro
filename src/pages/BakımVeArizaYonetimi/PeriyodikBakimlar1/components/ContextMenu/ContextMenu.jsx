@@ -7,11 +7,11 @@ import Kapat from "./components/Kapat/Kapat";
 import Parametreler from "./components/Parametreler/Parametreler";
 import TarihceTablo from "./components/TarihceTablo";
 import Form from "./components/Form/Form";
-import DownloadCSV from "./components/DownloadCSV/DownloadCSV";
+import OnayaGonder from "./components/OnayaGonder";
 
 const { Text, Link } = Typography;
 
-export default function ContextMenu({ selectedRows, refreshTableData }) {
+export default function ContextMenu({ selectedRows, refreshTableData, onayCheck }) {
   const [visible, setVisible] = useState(false);
 
   const handleVisibleChange = (visible) => {
@@ -22,28 +22,13 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
     setVisible(false);
   };
   // Silme işlemi için disable durumunu kontrol et
-  const isDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 4);
-  const iptalDisabled = selectedRows.some(
-    (row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 2 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5
-  );
-  const kapatDisabled = selectedRows.some(
-    (row) => row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5 || row.IST_DURUM_ID === 3
-  );
+  /*  const isDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 6); */
 
   const content = (
     <div>
-      {/* <Sil
-        selectedRows={selectedRows}
-        refreshTableData={refreshTableData}
-        disabled={isDisabled}
-        hidePopover={hidePopover}
-      />
-      <Iptal selectedRows={selectedRows} refreshTableData={refreshTableData} iptalDisabled={iptalDisabled} />
-      <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />
-      <Parametreler />
-      {selectedRows.length === 1 && <TarihceTablo selectedRows={selectedRows} />} */}
-      {selectedRows.length >= 1 && <Form selectedRows={selectedRows} />}
-      {selectedRows.length >= 1 && <DownloadCSV selectedRows={selectedRows} />}
+      {selectedRows.length >= 1 && <Sil selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
+
+      {/* {selectedRows.length >= 1 && <Iptal selectedRows={selectedRows} refreshTableData={refreshTableData} iptalDisabled={iptalDisabled} />} */}
     </div>
   );
   return (
@@ -57,7 +42,8 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
           backgroundColor: "#2BC770",
           borderColor: "#2BC770",
           height: "32px",
-        }}>
+        }}
+      >
         {selectedRows.length >= 1 && <Text style={{ color: "white", marginLeft: "3px" }}>{selectedRows.length}</Text>}
         <MoreOutlined style={{ color: "white", fontSize: "20px", margin: "0" }} />
       </Button>

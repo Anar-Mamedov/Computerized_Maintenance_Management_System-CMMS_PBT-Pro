@@ -1,17 +1,5 @@
 import React from "react";
-import {
-  Drawer,
-  Typography,
-  Button,
-  Input,
-  Select,
-  DatePicker,
-  TimePicker,
-  Row,
-  Col,
-  Checkbox,
-  ColorPicker,
-} from "antd";
+import { Drawer, Typography, Button, Input, Select, DatePicker, TimePicker, Row, Col, Checkbox, ColorPicker } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import BakimTipi from "./components/BakimTipi";
 import styled from "styled-components";
@@ -75,7 +63,12 @@ const StyledDivMedia = styled.div`
 `;
 
 export default function MainTabs() {
-  const { control, watch, setValue } = useFormContext();
+  const {
+    control,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
 
   const otonomBakimValue = watch("otonomBakim");
 
@@ -115,160 +108,71 @@ export default function MainTabs() {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        marginBottom: "15px",
-        gap: "20px",
-      }}>
-      <div
-        style={{
-          display: "flex",
-          marginBottom: "15px",
-          flexDirection: "column",
-          gap: "10px",
-          width: "100%",
-          maxWidth: "450px",
-        }}>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            gap: "10px",
-            rowGap: "0px",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Bakım Kodu:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}>
-            <Controller
-              name="bakimKodu"
-              control={control}
-              render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
-            />
-            <Controller
-              name="secilenBakimID"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ display: "none" }}
-                />
-              )}
-            />
-            <Controller
-              name="bakimAktif"
-              control={control}
-              defaultValue={true} // or true if you want it checked by default
-              render={({ field }) => (
-                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-                  Aktif
-                </Checkbox>
-              )}
-            />
+    <div style={{ display: "flex", flexWrap: "wrap", marginBottom: "15px", gap: "20px" }}>
+      <div style={{ display: "flex", marginBottom: "15px", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "450px" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", gap: "10px", rowGap: "0px" }}>
+          <Text style={{ fontSize: "14px", fontWeight: "600" }}>Bakım Kodu:</Text>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "5px", width: "100%" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
+              <Controller
+                name="bakimKodu"
+                control={control}
+                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                render={({ field }) => <Input {...field} status={errors.bakimKodu ? "error" : ""} style={{ flex: 1 }} />}
+              />
+              <Controller
+                name="secilenBakimID"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="text" // Set the type to "text" for name input
+                    style={{ display: "none" }}
+                  />
+                )}
+              />
+              <Controller
+                name="bakimAktif"
+                control={control}
+                defaultValue={true} // or true if you want it checked by default
+                render={({ field }) => (
+                  <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                    Aktif
+                  </Checkbox>
+                )}
+              />
+            </div>
+            {errors.bakimKodu && <div style={{ color: "red" }}>{errors.bakimKodu.message}</div>}
           </div>
         </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-            justifyContent: "space-between",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Bakım Tanımı:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "450px", gap: "10px", width: "100%", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: "14px", fontWeight: "600" }}>Bakım Tanımı:</Text>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
             <Controller
               name="bakimTanimi"
               control={control}
-              render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+              rules={{ required: "Alan Boş Bırakılamaz!" }}
+              render={({ field, fieldState: { error } }) => (
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+                  <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
+                  {error && <div style={{ color: "red" }}>{error.message}</div>}
+                </div>
+              )}
             />
           </div>
         </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-          }}>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "450px", gap: "10px", width: "100%" }}>
           <BakimTipi />
         </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-          }}>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "450px", gap: "10px", width: "100%" }}>
           <BakimGrubu />
         </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-          }}>
-          <BakimNedeni />
-        </div>
       </div>
-      <div
-        style={{
-          display: "flex",
-          marginBottom: "15px",
-          flexDirection: "column",
-          gap: "10px",
-          width: "100%",
-          maxWidth: "450px",
-        }}>
+      <div style={{ display: "flex", marginBottom: "15px", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "450px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-          <StyledDivBottomLine
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "450px",
-            }}>
+          <StyledDivBottomLine style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", width: "100%", maxWidth: "450px" }}>
             <Text style={{ fontSize: "14px" }}>Öncelik:</Text>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "300px",
-              }}>
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "300px" }}>
               <Controller
                 name="oncelikTanim"
                 control={control}
@@ -303,23 +207,9 @@ export default function MainTabs() {
           </StyledDivBottomLine>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-          <StyledDivBottomLine
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "450px",
-            }}>
+          <StyledDivBottomLine style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", width: "100%", maxWidth: "450px" }}>
             <Text style={{ fontSize: "14px" }}>Talimat:</Text>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "300px",
-              }}>
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "300px" }}>
               <Controller
                 name="talimatTanim"
                 control={control}
@@ -354,23 +244,9 @@ export default function MainTabs() {
           </StyledDivBottomLine>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-          <StyledDivBottomLine
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "450px",
-            }}>
+          <StyledDivBottomLine style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", width: "100%", maxWidth: "450px" }}>
             <Text style={{ fontSize: "14px" }}>Atölye:</Text>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "300px",
-              }}>
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "300px" }}>
               <Controller
                 name="atolyeTanim"
                 control={control}
@@ -405,23 +281,9 @@ export default function MainTabs() {
           </StyledDivBottomLine>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-          <StyledDivBottomLine
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "450px",
-            }}>
+          <StyledDivBottomLine style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", width: "100%", maxWidth: "450px" }}>
             <Text style={{ fontSize: "14px" }}>Firma:</Text>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "300px",
-              }}>
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "300px" }}>
               <Controller
                 name="firmaTanim"
                 control={control}
@@ -455,26 +317,9 @@ export default function MainTabs() {
             </div>
           </StyledDivBottomLine>
         </div>
-        <StyledDivMedia
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-          }}>
+        <StyledDivMedia style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px" }}>
           <Text style={{ fontSize: "14px" }}>Lokasyon:</Text>
-          <div
-            className="anar"
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              minWidth: "300px",
-              gap: "3px",
-            }}>
+          <div className="anar" style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", minWidth: "300px", gap: "3px" }}>
             <Controller
               name="lokasyonTanim"
               control={control}
@@ -509,36 +354,10 @@ export default function MainTabs() {
         </StyledDivMedia>
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          marginBottom: "15px",
-          flexDirection: "column",
-          gap: "10px",
-          width: "100%",
-          maxWidth: "450px",
-        }}>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-            justifyContent: "space-between",
-          }}>
+      <div style={{ display: "flex", marginBottom: "15px", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "450px" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "450px", gap: "10px", width: "100%", justifyContent: "space-between" }}>
           <Text style={{ fontSize: "14px" }}>Çalışma Süresis (dk.):</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
             <Controller
               name="calismaSuresi"
               control={control}
@@ -558,25 +377,9 @@ export default function MainTabs() {
             />
           </div>
         </div>
-        <StyledDivBottomLine
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "flex-start",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
+        <StyledDivBottomLine style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", justifyContent: "space-between", width: "100%" }}>
           <Text style={{ fontSize: "14px" }}>Duruş Süresis (dk.):</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
             <Controller
               name="durusSuresi"
               control={control}
@@ -596,25 +399,9 @@ export default function MainTabs() {
             />
           </div>
         </StyledDivBottomLine>
-        <StyledDivBottomLine
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "flex-start",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
+        <StyledDivBottomLine style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", justifyContent: "space-between", width: "100%" }}>
           <Text style={{ fontSize: "14px" }}>Personel (kişi):</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
             <Controller
               name="personelSayisi"
               control={control}
@@ -633,62 +420,6 @@ export default function MainTabs() {
             />
           </div>
         </StyledDivBottomLine>
-        <StyledDivBottomLine
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Otonom Bakım:</Text>
-
-          <Controller
-            name="otonomBakim"
-            control={control}
-            render={({ field }) => (
-              <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}></Checkbox>
-            )}
-          />
-        </StyledDivBottomLine>
-        {otonomBakimValue && (
-          <StyledDivBottomLine
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-              width: "100%",
-            }}>
-            <Text style={{ fontSize: "14px" }}>Periyot:</Text>
-            <div
-              style={{
-                display: "flex",
-                width: "100%",
-                maxWidth: "300px",
-                alignItems: "center",
-                flexDirection: "row",
-                gap: "10px",
-              }}>
-              <Periyot />
-              <Text style={{ fontSize: "14px" }}>Sıklık:</Text>
-              <Controller
-                name="periyotSiklik"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    style={{ flex: 1 }}
-                    onKeyPress={(e) => {
-                      // Only allow numeric input
-                      if (!/[0-9]/.test(e.key)) {
-                        e.preventDefault();
-                      }
-                    }}
-                  />
-                )}
-              />
-            </div>
-          </StyledDivBottomLine>
-        )}
       </div>
     </div>
   );

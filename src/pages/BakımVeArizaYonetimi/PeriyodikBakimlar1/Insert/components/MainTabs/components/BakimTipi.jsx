@@ -28,7 +28,12 @@ const StyledDiv = styled.div`
 `;
 
 export default function BakimTipi() {
-  const { control, setValue } = useFormContext();
+  const {
+    control,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const inputRef = createRef();
@@ -116,71 +121,79 @@ export default function BakimTipi() {
         width: "100%",
         flexWrap: "wrap",
         rowGap: "0px",
-      }}>
+      }}
+    >
       {contextHolder}
-      <Text style={{ fontSize: "14px", minWidth: "40px" }}>Bakım Tipi:</Text>
-      <Controller
-        name="bakimTipi"
-        control={control}
-        render={({ field }) => (
-          <StyledSelect
-            {...field}
-            key={selectKey}
-            // style={{ maxWidth: "300px", width: "100%" }}
-            showSearch
-            allowClear
-            placeholder="Seçim Yapınız"
-            optionFilterProp="children"
-            filterOption={(input, option) =>
-              option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
-            }
-            onDropdownVisibleChange={(open) => {
-              if (open) {
-                fetchData(); // Fetch data when the dropdown is opened
-              }
-            }}
-            dropdownRender={(menu) => (
-              <Spin spinning={loading}>
-                {menu}
-                <Divider
-                  style={{
-                    margin: "8px 0",
-                  }}
-                />
-                <Space
-                  style={{
-                    padding: "0 8px 4px",
-                  }}>
-                  <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
-                  <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
-                    Ekle
-                  </Button>
-                </Space>
-              </Spin>
-            )}
-            options={options.map((item) => ({
-              value: item.TB_KOD_ID, // Use the ID as the value
-              label: item.KOD_TANIM, // Display the name in the dropdown
-            }))}
-            onChange={(value) => {
-              // Seçilen değerin ID'sini NedeniID alanına set et
-              setValue("bakimTipiID", value);
-              field.onChange(value);
-            }}
-          />
-        )}
-      />
-      <Controller
-        name="bakimTipiID"
-        control={control}
-        render={({ field }) => (
-          <Input
-            {...field}
-            type="text" // Set the type to "text" for name input
-            style={{ display: "none" }}
-          />
-        )}
-      />
+      <Text style={{ fontSize: "14px", minWidth: "40px", fontWeight: "600" }}>Bakım Tipi:</Text>
+      <div>
+        {" "}
+        <Controller
+          name="bakimTipi"
+          control={control}
+          rules={{ required: "Alan boş bırakılamaz." }}
+          render={({ field }) => (
+            <StyledSelect
+              {...field}
+              key={selectKey}
+              status={errors.bakimTipi ? "error" : ""}
+              // style={{ maxWidth: "300px", width: "100%" }}
+              showSearch
+              allowClear
+              placeholder="Seçim Yapınız"
+              optionFilterProp="children"
+              filterOption={(input, option) => (option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false)}
+              onDropdownVisibleChange={(open) => {
+                if (open) {
+                  fetchData(); // Fetch data when the dropdown is opened
+                }
+              }}
+              dropdownRender={(menu) => (
+                <Spin spinning={loading}>
+                  {menu}
+                  <Divider
+                    style={{
+                      margin: "8px 0",
+                    }}
+                  />
+                  <Space
+                    style={{
+                      padding: "0 8px 4px",
+                    }}
+                  >
+                    <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
+                    <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
+                      Ekle
+                    </Button>
+                  </Space>
+                </Spin>
+              )}
+              options={options.map((item) => ({
+                value: item.TB_KOD_ID, // Use the ID as the value
+                label: item.KOD_TANIM, // Display the name in the dropdown
+              }))}
+              onChange={(value) => {
+                // Seçilen değerin ID'sini NedeniID alanına set et
+                setValue("bakimTipiID", value);
+                field.onChange(value);
+              }}
+            />
+          )}
+        />
+        <Controller
+          name="bakimTipiID"
+          control={control}
+          rules={{ required: "Alan boş bırakılamaz." }}
+          render={({ field }) => (
+            <Input
+              {...field}
+              status={errors.bakimTipiID ? "error" : ""}
+              type="text" // Set the type to "text" for name input
+              style={{ display: "none" }}
+            />
+          )}
+        />
+        {errors.bakimTipiID && <div style={{ color: "red", marginTop: "5px" }}>{errors.bakimTipiID.message}</div>}
+      </div>
     </StyledDiv>
   );
 }
