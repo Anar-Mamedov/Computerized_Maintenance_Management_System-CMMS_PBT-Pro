@@ -41,34 +41,34 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
   //* export
   const methods = useForm({
     defaultValues: {
-      bakimKodu: "",
-      secilenBakimID: "",
-      bakimTanimi: "",
+      bakimKodu: null,
+      secilenBakimID: null,
+      bakimTanimi: null,
       bakimAktif: true,
       bakimTipi: null,
-      bakimTipiID: "",
+      bakimTipiID: null,
       bakimGrubu: null,
-      bakimGrubuID: "",
+      bakimGrubuID: null,
       bakimNedeni: null,
-      bakimNedeniID: "",
-      oncelikTanim: "",
-      oncelikID: "",
-      talimatTanim: "",
-      talimatID: "",
-      atolyeTanim: "",
-      atolyeID: "",
-      firmaTanim: "",
-      firmaID: "",
-      lokasyonTanim: "",
-      lokasyonID: "",
-      calismaSuresi: "",
-      durusSuresi: "",
-      personelSayisi: "",
+      bakimNedeniID: null,
+      oncelikTanim: null,
+      oncelikID: null,
+      talimatTanim: null,
+      talimatID: null,
+      atolyeTanim: null,
+      atolyeID: null,
+      firmaTanim: null,
+      firmaID: null,
+      lokasyonTanim: null,
+      lokasyonID: null,
+      calismaSuresi: null,
+      durusSuresi: null,
+      personelSayisi: null,
       otonomBakim: false,
-      periyot: "",
-      periyotID: "",
-      periyotLabel: "",
-      periyotSiklik: "",
+      periyot: null,
+      periyotID: null,
+      periyotLabel: null,
+      periyotSiklik: null,
     },
   });
 
@@ -87,23 +87,22 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
   //* export
   const onSubmit = (data) => {
     const Body = {
-      IST_KOD: data.bakimKodu,
-      IST_TANIM: data.bakimTanimi,
-      IST_TIP_KOD_ID: data.bakimTipiID,
-      IST_GRUP_KOD_ID: data.bakimGrubuID,
-      IST_NEDEN_KOD_ID: data.bakimNedeniID,
-      IST_ONCELIK_ID: data.oncelikID,
-      IST_TALIMAT_ID: data.talimatID,
-      IST_ATOLYE_ID: data.atolyeID,
-      IST_FIRMA_ID: data.firmaID,
-      IST_LOKASYON_ID: data.lokasyonID,
-      IST_CALISMA_SURE: data.calismaSuresi,
-      IST_DURUS_SURE: data.durusSuresi,
-      IST_PERSONEL_SAYI: data.personelSayisi,
-      IST_OTONOM_BAKIM: data.otonomBakim,
-      IST_UYARI_SIKLIGI: data.periyotSiklik,
-      IST_UYARI_PERIYOT: data.periyotID,
-      IST_AKTIF: data.bakimAktif,
+      PBK_KOD: data.bakimKodu,
+      PBK_AKTIF: data.bakimAktif,
+      PBK_TANIM: data.bakimTanimi,
+      PBK_TIP_KOD_ID: Number(data.bakimTipiID),
+      PBK_GRUP_KOD_ID: Number(data.bakimGrubuID),
+
+      PBK_ONCELIK_ID: Number(data.oncelikID),
+      PBK_TALIMAT_ID: Number(data.talimatID),
+      PBK_ATOLYE_ID: Number(data.atolyeID),
+      PBK_FIRMA_ID: Number(data.firmaID),
+      PBK_LOKASYON_ID: Number(data.lokasyonID),
+
+      PBK_CALISMA_SURE: Number(data.calismaSuresi),
+      PBK_DURUS_SURE: Number(data.durusSuresi),
+      PBK_PERSONEL_SAYI: Number(data.personelSayisi),
+
       // add more fields as needed
     };
 
@@ -111,7 +110,7 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
     // handle response
     // });
 
-    AxiosInstance.post("AddBakim", Body)
+    AxiosInstance.post("PBakimAdd", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);
@@ -144,47 +143,68 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
     }
   }, [selectedLokasyonId, methods]);
 
+  useEffect(() => {
+    if (open) {
+      // Çekmece açıldığında gerekli işlemi yap
+      // Örneğin, MainTabs'a bir prop olarak geçir
+      // setLoading(true);
+      AxiosInstance.get("ModulKoduGetir?modulKodu=PBK_KOD") // Replace with your actual API endpoint
+        .then((response) => {
+          // Assuming the response contains the new work order number in 'response.Tanim'
+          setValue("bakimKodu", response);
+          // setTimeout(() => {
+          //   setLoading(false);
+          // }, 100);
+        })
+        .catch((error) => {
+          console.error("Error fetching new work order number:", error);
+          if (navigator.onLine) {
+            // İnternet bağlantısı var
+            message.error("Hata Mesajı: " + error.message);
+          } else {
+            // İnternet bağlantısı yok
+            message.error("Internet Bağlantısı Mevcut Değil.");
+          }
+        });
+    }
+  }, [open]);
+
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)}>
-        <ConfigProvider locale={tr_TR}>
-          <Button
-            type="primary"
-            onClick={showDrawer}
-            style={{
-              display: "flex",
-              alignItems: "center",
-            }}>
-            <PlusOutlined />
-            Ekle
-          </Button>
-          <Drawer
-            width="550px"
-            title="Bakım Tanımı Ekle"
-            placement={"right"}
-            onClose={onClose}
-            open={open}
-            extra={
-              <Space>
-                <Button onClick={onClose}>İptal</Button>
-                <Button
-                  type="submit"
-                  onClick={handleClick}
-                  style={{
-                    backgroundColor: "#2bc770",
-                    borderColor: "#2bc770",
-                    color: "#ffffff",
-                  }}>
-                  Kaydet
-                </Button>
-              </Space>
-            }>
+      <ConfigProvider locale={tr_TR}>
+        <Button
+          type="primary"
+          onClick={showDrawer}
+          style={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <PlusOutlined />
+          Ekle
+        </Button>
+        <Drawer
+          width="550px"
+          title="Periyordik Bakım Ekle"
+          placement={"right"}
+          onClose={onClose}
+          open={open}
+          extra={
+            <Space>
+              <Button onClick={onClose}>İptal</Button>
+              <Button type="submit" onClick={methods.handleSubmit(onSubmit)} style={{ backgroundColor: "#2bc770", borderColor: "#2bc770", color: "#ffffff" }}>
+                Kaydet
+              </Button>
+            </Space>
+          }
+        >
+          <form onSubmit={methods.handleSubmit(onSubmit)}>
             <MainTabs />
             {/* <SecondTabs /> */}
             <Footer />
-          </Drawer>
-        </ConfigProvider>
-      </form>
+          </form>
+        </Drawer>
+      </ConfigProvider>
     </FormProvider>
   );
 }
