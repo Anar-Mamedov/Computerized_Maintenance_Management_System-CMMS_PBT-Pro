@@ -93,12 +93,7 @@ export default function TarihVeYaSayac({ refreshKey }) {
 
   return (
     <div style={{ marginTop: "10px" }}>
-      <StyledTabs
-        tabPosition="left"
-        defaultActiveKey={activeTab}
-        items={items}
-        onChange={onChange}
-      />
+      <StyledTabs tabPosition="left" defaultActiveKey={activeTab} items={items} onChange={onChange} />
     </div>
   );
 }

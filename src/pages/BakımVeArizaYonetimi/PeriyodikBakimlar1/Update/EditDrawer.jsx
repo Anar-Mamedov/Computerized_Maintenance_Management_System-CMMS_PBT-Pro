@@ -1,13 +1,5 @@
 import tr_TR from "antd/es/locale/tr_TR";
-import {
-  Button,
-  Drawer,
-  Space,
-  ConfigProvider,
-  Modal,
-  message,
-  Spin,
-} from "antd";
+import { Button, Drawer, Space, ConfigProvider, Modal, message, Spin } from "antd";
 // eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState, useTransition } from "react";
 import { useForm, FormProvider } from "react-hook-form";
@@ -17,12 +9,7 @@ import Footer from "./components/Footer";
 import SecondTabs from "./components/SecondTabs/SecondTabs";
 import MainTabs1 from "./components/MainTabs/MainTabs1";
 
-export default function EditDrawer({
-  selectedRow,
-  onDrawerClose,
-  drawerVisible,
-  onRefresh,
-}) {
+export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
   const [startTransition] = useTransition();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -207,9 +194,7 @@ export default function EditDrawer({
         setOpen(true); // İşlemler tamamlandıktan sonra drawer'ı aç
         setLoading(true); // Yükleme başladığında
         try {
-          const response = await AxiosInstance.get(
-            `PeriyodikBakimDetayByBakim?BakimId=${selectedRow.key}`
-          );
+          const response = await AxiosInstance.get(`PeriyodikBakimDetayByBakim?BakimId=${selectedRow.key}`);
           const item = response[0]; // Veri dizisinin ilk elemanını al
           // Form alanlarını set et
           // console.log("selectedRow", selectedRow);
@@ -266,19 +251,12 @@ export default function EditDrawer({
           setValue("ozelAlan9", item.PBK_OZEL_ALAN_9);
           setValue("ozelAlan10", item.PBK_OZEL_ALAN_10);
           setValue("aciklama", item.PBK_ACIKLAMA);
-          if (
-            item.PBK_TARIH_BAZLI_IZLE == true &&
-            item.PBK_SAYAC_BAZLI_IZLE == true
-          ) {
+          if (item.PBK_TARIH_BAZLI_IZLE == true && item.PBK_SAYAC_BAZLI_IZLE == true) {
             setValue("tarihSayacBakim", "b");
             setValue("sayacSayisi", item.PBK_SAYAC_YINELEME_SIKLIK);
             setValue("peryodikBakimBirim", item.PBK_SAYAC_BIRIM);
             setValue("peryodikBakimBirimID", item.PBK_SAYAC_BIRIM_KOD_ID);
-            if (
-              item.PBK_TARIH_YINELEME_PERIYOT == "AY1" ||
-              item.PBK_TARIH_YINELEME_PERIYOT == "AY2" ||
-              item.PBK_TARIH_YINELEME_PERIYOT == "AY3"
-            ) {
+            if (item.PBK_TARIH_YINELEME_PERIYOT == "AY1" || item.PBK_TARIH_YINELEME_PERIYOT == "AY2" || item.PBK_TARIH_YINELEME_PERIYOT == "AY3") {
               setValue("activeTab", "AY123");
               if (item.PBK_TARIH_YINELEME_PERIYOT == "AY1") {
                 setValue("ayGroup", 1);
@@ -293,15 +271,9 @@ export default function EditDrawer({
                 setValue("ayinHafatlariBir", item.PBK_TARIH_YINELEME_SIKLIK);
                 let ayinGunleri = item.PBK_TARIH_AY_GUNLER.match(/.{1,2}/g);
                 setValue("ayinHaftalariSelect", ayinGunleri);
-                setValue(
-                  "ayinHaftalarininGunuSelect",
-                  item.PBK_TARIH_HAFTA_GUNLER
-                );
+                setValue("ayinHaftalarininGunuSelect", item.PBK_TARIH_HAFTA_GUNLER);
               }
-            } else if (
-              item.PBK_TARIH_YINELEME_PERIYOT == "YIL1" ||
-              item.PBK_TARIH_YINELEME_PERIYOT == "YIL2"
-            ) {
+            } else if (item.PBK_TARIH_YINELEME_PERIYOT == "YIL1" || item.PBK_TARIH_YINELEME_PERIYOT == "YIL2") {
               setValue("activeTab", "YIL123");
               if (item.PBK_TARIH_YINELEME_PERIYOT == "YIL1") {
                 setValue("yilGroup", 1);
@@ -323,16 +295,9 @@ export default function EditDrawer({
             } else if (item.PBK_TARIH_YINELEME_PERIYOT == "FIX") {
               setValue("activeTab", "FIX");
             }
-          } else if (
-            item.PBK_TARIH_BAZLI_IZLE == true ||
-            item.PBK_SAYAC_BAZLI_IZLE == true
-          ) {
+          } else if (item.PBK_TARIH_BAZLI_IZLE == true || item.PBK_SAYAC_BAZLI_IZLE == true) {
             setValue("tarihSayacBakim", "a");
-            if (
-              item.PBK_TARIH_YINELEME_PERIYOT == "AY1" ||
-              item.PBK_TARIH_YINELEME_PERIYOT == "AY2" ||
-              item.PBK_TARIH_YINELEME_PERIYOT == "AY3"
-            ) {
+            if (item.PBK_TARIH_YINELEME_PERIYOT == "AY1" || item.PBK_TARIH_YINELEME_PERIYOT == "AY2" || item.PBK_TARIH_YINELEME_PERIYOT == "AY3") {
               setValue("activeTab", "AY123");
               if (item.PBK_TARIH_YINELEME_PERIYOT == "AY1") {
                 setValue("ayGroup", 1);
@@ -347,15 +312,9 @@ export default function EditDrawer({
                 setValue("ayinHafatlariBir", item.PBK_TARIH_YINELEME_SIKLIK);
                 let ayinGunleri = item.PBK_TARIH_AY_GUNLER.match(/.{1,2}/g);
                 setValue("ayinHaftalariSelect", ayinGunleri);
-                setValue(
-                  "ayinHaftalarininGunuSelect",
-                  item.PBK_TARIH_HAFTA_GUNLER
-                );
+                setValue("ayinHaftalarininGunuSelect", item.PBK_TARIH_HAFTA_GUNLER);
               }
-            } else if (
-              item.PBK_TARIH_YINELEME_PERIYOT == "YIL1" ||
-              item.PBK_TARIH_YINELEME_PERIYOT == "YIL2"
-            ) {
+            } else if (item.PBK_TARIH_YINELEME_PERIYOT == "YIL1" || item.PBK_TARIH_YINELEME_PERIYOT == "YIL2") {
               setValue("activeTab", "YIL123");
               if (item.PBK_TARIH_YINELEME_PERIYOT == "YIL1") {
                 setValue("yilGroup", 1);
@@ -399,14 +358,7 @@ export default function EditDrawer({
             setValue("donemBitisAylariSelect", bitisDonem.slice(0, 2));
           } else if (item.PBK_TARIH_BITIS_SEKLI == 3) {
             setValue("baslangicGroup", 4);
-            setValue(
-              "bakimBitisTarihi",
-              item.PBK_TARIH_BITIS
-                ? dayjs(item.PBK_TARIH_BITIS).isValid()
-                  ? dayjs(item.PBK_TARIH_BITIS)
-                  : null
-                : null
-            );
+            setValue("bakimBitisTarihi", item.PBK_TARIH_BITIS ? (dayjs(item.PBK_TARIH_BITIS).isValid() ? dayjs(item.PBK_TARIH_BITIS) : null) : null);
           }
 
           // add more fields as needed
@@ -435,7 +387,7 @@ export default function EditDrawer({
       <ConfigProvider locale={tr_TR}>
         <Drawer
           width="1460px"
-          title="Bakim Tanımını Güncelle"
+          title="Periyodik Bakim Güncelle"
           placement={"right"}
           onClose={handleDrawerClose}
           open={drawerVisible}

@@ -37,12 +37,8 @@ function PeriyotBilgileri(props) {
           control={control}
           render={({ field }) => (
             <Radio.Group {...field}>
-              <Radio.Button value="a">
-                Tarih {'"veya"'} sayaç bazlı bakım
-              </Radio.Button>
-              <Radio.Button value="b">
-                Tarih {'"ve"'} sayaç bazlı bakım
-              </Radio.Button>
+              <Radio.Button value="a">Tarih {'"veya"'} sayaç bazlı bakım</Radio.Button>
+              <Radio.Button value="b">Tarih {'"ve"'} sayaç bazlı bakım</Radio.Button>
             </Radio.Group>
           )}
         />

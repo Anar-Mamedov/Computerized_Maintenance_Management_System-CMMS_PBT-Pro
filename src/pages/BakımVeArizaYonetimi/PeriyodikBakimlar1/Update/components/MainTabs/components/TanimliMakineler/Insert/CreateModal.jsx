@@ -15,6 +15,10 @@ export default function CreateModal({
   visible,
   onCancel,
   data,
+  activeTab,
+  tarihSayacBakim,
+  currentModalIndex,
+  totalModals,
 }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const methods = useForm({
@@ -27,7 +31,7 @@ export default function CreateModal({
     },
   });
 
-  const { setValue, reset, handleSubmit } = methods;
+  const { setValue, reset, handleSubmit, watch } = methods;
 
   useEffect(() => {
     if (visible && data) {
@@ -99,24 +103,14 @@ export default function CreateModal({
             marginBottom: "10px",
           }}
         >
-          <Button
-            style={{ display: "none" }}
-            type="link"
-            onClick={handleModalToggle}
-          >
+          <Button style={{ display: "none" }} type="link" onClick={handleModalToggle}>
             <PlusOutlined /> Yeni Kayıt
           </Button>
         </div>
 
-        <Modal
-          width="500px"
-          title="Peryodik Bakım Bilgileri Ekle"
-          open={visible}
-          onCancel={onCancel}
-          onOk={handleModalOk}
-        >
+        <Modal width="500px" title={`Peryodik Bakım Bilgileri Ekle ${currentModalIndex}/${totalModals}`} open={visible} onCancel={onCancel} onOk={handleModalOk}>
           {/*<MainTabs />*/}
-          <PeryotBakimBilgileriEkle />
+          <PeryotBakimBilgileriEkle tarihSayacBakim={tarihSayacBakim} activeTab={activeTab} />
         </Modal>
       </div>
     </FormProvider>
