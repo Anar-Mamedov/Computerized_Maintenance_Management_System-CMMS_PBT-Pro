@@ -16,6 +16,7 @@ export default function TanimliMakinelerTablo() {
   const [selectedRow, setSelectedRow] = useState(null);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [modalData, setModalData] = useState([]);
+  const [modalDataInitialLength, setModalDataInitialLength] = useState(0);
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 
@@ -25,9 +26,7 @@ export default function TanimliMakinelerTablo() {
 
     // Örnek bir tarih formatla ve ay formatını belirle
     const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
-    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(
-      sampleDate
-    );
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
 
     let monthFormat;
     if (sampleFormatted.includes("January")) {
@@ -60,14 +59,7 @@ export default function TanimliMakinelerTablo() {
       // Saat ve dakika değerlerinin geçerliliğini kontrol et
       const hoursInt = parseInt(hours, 10);
       const minutesInt = parseInt(minutes, 10);
-      if (
-        isNaN(hoursInt) ||
-        isNaN(minutesInt) ||
-        hoursInt < 0 ||
-        hoursInt > 23 ||
-        minutesInt < 0 ||
-        minutesInt > 59
-      ) {
+      if (isNaN(hoursInt) || isNaN(minutesInt) || hoursInt < 0 || hoursInt > 23 || minutesInt < 0 || minutesInt > 59) {
         throw new Error("Invalid time format");
       }
 
@@ -276,33 +268,42 @@ export default function TanimliMakinelerTablo() {
     // console.log("Makine tablosundan gelen veri:", data);
     if (data) {
       setModalData(data); // data'yı modalData state'ine kaydet
+      setModalDataInitialLength(data.length);
       setIsCreateModalVisible(true);
     }
   };
 
   const handleModalClose = () => {
-    setIsCreateModalVisible(false); // Modalı kapat
+    setIsCreateModalVisible(false);
     setModalData((prevData) => {
-      if (prevData.length > 1) {
-        // Eğer daha fazla obje varsa, bir sonrakini al ve modalı tekrar aç
+      const newData = prevData.slice(1);
+      if (newData.length > 0) {
         setTimeout(() => {
-          setIsCreateModalVisible(true); // 1 saniye bekledikten sonra modalı aç
-        }, 300); // 1000 milisaniye = 1 saniye
-        return prevData.slice(1); // İlk objeyi atla
-      } else {
-        // Eğer daha fazla obje yoksa, modalData'yı boş bir dizi yap
-        return [];
+          setIsCreateModalVisible(true);
+        }, 300);
       }
+      return newData;
     });
   };
 
+  const currentModalIndex = modalDataInitialLength - modalData.length + 1;
+
+  const tarihSayacBakim = watch("tarihSayacBakim");
+  const activeTab = watch("activeTab");
+
   return (
     <div>
-      <CreateModal
-        visible={isCreateModalVisible}
-        onCancel={handleModalClose} // Modal kapatıldığında handleModalClose fonksiyonunu çağır
-        data={modalData[0]} // İlk objeyi CreateModal'a ver
-      />
+      {modalData.length > 0 && (
+        <CreateModal
+          tarihSayacBakim={tarihSayacBakim}
+          activeTab={activeTab}
+          visible={isCreateModalVisible}
+          onCancel={handleModalClose}
+          data={modalData[0]}
+          currentModalIndex={currentModalIndex}
+          totalModals={modalDataInitialLength}
+        />
+      )}
       <MakineTablo onSubmit={handleMakineTabloSubmit} />
       <Table
         rowSelection={{
