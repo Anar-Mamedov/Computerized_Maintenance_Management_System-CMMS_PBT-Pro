@@ -25,7 +25,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       cancelText: "Hayır",
       onOk: () => {
         onDrawerClose(); // Close the drawer
-        onRefresh();
+        // onRefresh();
         reset();
       },
       onCancel: () => {
