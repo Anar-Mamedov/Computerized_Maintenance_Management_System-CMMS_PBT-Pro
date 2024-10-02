@@ -116,7 +116,8 @@ export default function BakimGrubu() {
         width: "100%",
         flexWrap: "wrap",
         rowGap: "0px",
-      }}>
+      }}
+    >
       {contextHolder}
       <Text style={{ fontSize: "14px", minWidth: "40px" }}>Bakım Grubu:</Text>
       <Controller
@@ -131,9 +132,7 @@ export default function BakimGrubu() {
             allowClear
             placeholder="Seçim Yapınız"
             optionFilterProp="children"
-            filterOption={(input, option) =>
-              option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
-            }
+            filterOption={(input, option) => (option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false)}
             onDropdownVisibleChange={(open) => {
               if (open) {
                 fetchData(); // Fetch data when the dropdown is opened
@@ -150,7 +149,8 @@ export default function BakimGrubu() {
                 <Space
                   style={{
                     padding: "0 8px 4px",
-                  }}>
+                  }}
+                >
                   <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
                   <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
                     Ekle
@@ -164,9 +164,11 @@ export default function BakimGrubu() {
             }))}
             onChange={(value) => {
               // Seçilen değerin ID'sini NedeniID alanına set et
-              setValue("bakimGrubuID", value);
-              field.onChange(value);
+              setValue("bakimGrubu", value ?? null);
+              setValue("bakimGrubuID", value ?? null);
+              field.onChange(value ?? null);
             }}
+            value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
           />
         )}
       />

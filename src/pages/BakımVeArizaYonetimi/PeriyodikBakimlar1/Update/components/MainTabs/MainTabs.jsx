@@ -1,17 +1,5 @@
 import React from "react";
-import {
-  Drawer,
-  Typography,
-  Button,
-  Input,
-  Select,
-  DatePicker,
-  TimePicker,
-  Row,
-  Col,
-  Checkbox,
-  ColorPicker,
-} from "antd";
+import { Drawer, Typography, Button, Input, Select, DatePicker, TimePicker, Row, Col, Checkbox, ColorPicker } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import BakimTipi from "./components/BakimTipi";
 import styled from "styled-components";
@@ -76,7 +64,12 @@ const StyledDivMedia = styled.div`
 `;
 
 export default function MainTabs() {
-  const { control, watch, setValue } = useFormContext();
+  const {
+    control,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
 
   const otonomBakimValue = watch("otonomBakim");
 
@@ -134,87 +127,54 @@ export default function MainTabs() {
           maxWidth: "450px",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            gap: "10px",
-            rowGap: "0px",
-          }}
-        >
-          <Text style={{ fontSize: "14px" }}>Bakım Kodu:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}
-          >
-            <Controller
-              name="bakimKodu"
-              control={control}
-              render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
-            />
-            <Controller
-              name="secilenBakimID"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ display: "none" }}
-                />
-              )}
-            />
-            <Controller
-              name="bakimAktif"
-              control={control}
-              defaultValue={true} // or true if you want it checked by default
-              render={({ field }) => (
-                <Checkbox
-                  checked={field.value}
-                  onChange={(e) => field.onChange(e.target.checked)}
-                >
-                  Aktif
-                </Checkbox>
-              )}
-            />
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", gap: "10px", rowGap: "0px" }}>
+          <Text style={{ fontSize: "14px", fontWeight: "600" }}>Bakım Kodu:</Text>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "5px", width: "100%" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
+              <Controller
+                name="bakimKodu"
+                control={control}
+                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                render={({ field }) => <Input {...field} status={errors.bakimKodu ? "error" : ""} style={{ flex: 1 }} />}
+              />
+              <Controller
+                name="secilenBakimID"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="text" // Set the type to "text" for name input
+                    style={{ display: "none" }}
+                  />
+                )}
+              />
+              <Controller
+                name="bakimAktif"
+                control={control}
+                defaultValue={true} // or true if you want it checked by default
+                render={({ field }) => (
+                  <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                    Aktif
+                  </Checkbox>
+                )}
+              />
+            </div>
+            {errors.bakimKodu && <div style={{ color: "red" }}>{errors.bakimKodu.message}</div>}
           </div>
         </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-            justifyContent: "space-between",
-          }}
-        >
-          <Text style={{ fontSize: "14px" }}>Bakım Tanımı:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}
-          >
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "450px", gap: "10px", width: "100%", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: "14px", fontWeight: "600" }}>Bakım Tanımı:</Text>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
             <Controller
               name="bakimTanimi"
               control={control}
-              render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
+              rules={{ required: "Alan Boş Bırakılamaz!" }}
+              render={({ field, fieldState: { error } }) => (
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+                  <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
+                  {error && <div style={{ color: "red" }}>{error.message}</div>}
+                </div>
+              )}
             />
           </div>
         </div>
@@ -242,29 +202,6 @@ export default function MainTabs() {
         >
           <BakimGrubu />
         </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-          }}
-        >
-          <BakimNedeni />
-        </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          marginBottom: "15px",
-          flexDirection: "column",
-          gap: "10px",
-          width: "100%",
-          maxWidth: "450px",
-        }}
-      >
         <div
           style={{
             display: "flex",
@@ -325,6 +262,17 @@ export default function MainTabs() {
             </div>
           </StyledDivBottomLine>
         </div>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          marginBottom: "15px",
+          flexDirection: "column",
+          gap: "10px",
+          width: "100%",
+          maxWidth: "450px",
+        }}
+      >
         <div
           style={{
             display: "flex",
@@ -604,10 +552,7 @@ export default function MainTabs() {
                   onKeyPress={(e) => {
                     const value = field.value;
                     // Rakam veya bir virgül olup olmadığını kontrol et
-                    if (
-                      !/[0-9]/.test(e.key) &&
-                      (e.key !== "," || value.includes(","))
-                    ) {
+                    if (!/[0-9]/.test(e.key) && (e.key !== "," || value.includes(","))) {
                       e.preventDefault();
                     }
                   }}
@@ -647,10 +592,7 @@ export default function MainTabs() {
                   onKeyPress={(e) => {
                     const value = field.value;
                     // Rakam veya bir virgül olup olmadığını kontrol et
-                    if (
-                      !/[0-9]/.test(e.key) &&
-                      (e.key !== "," || value.includes(","))
-                    ) {
+                    if (!/[0-9]/.test(e.key) && (e.key !== "," || value.includes(","))) {
                       e.preventDefault();
                     }
                   }}
@@ -698,68 +640,6 @@ export default function MainTabs() {
             />
           </div>
         </StyledDivBottomLine>
-        <StyledDivBottomLine
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "space-between",
-            width: "100%",
-          }}
-        >
-          <Text style={{ fontSize: "14px" }}>Otonom Bakım:</Text>
-
-          <Controller
-            name="otonomBakim"
-            control={control}
-            render={({ field }) => (
-              <Checkbox
-                checked={field.value}
-                onChange={(e) => field.onChange(e.target.checked)}
-              ></Checkbox>
-            )}
-          />
-        </StyledDivBottomLine>
-        {otonomBakimValue && (
-          <StyledDivBottomLine
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <Text style={{ fontSize: "14px" }}>Periyot:</Text>
-            <div
-              style={{
-                display: "flex",
-                width: "100%",
-                maxWidth: "300px",
-                alignItems: "center",
-                flexDirection: "row",
-                gap: "10px",
-              }}
-            >
-              <Periyot />
-              <Text style={{ fontSize: "14px" }}>Sıklık:</Text>
-              <Controller
-                name="periyotSiklik"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    style={{ flex: 1 }}
-                    onKeyPress={(e) => {
-                      // Only allow numeric input
-                      if (!/[0-9]/.test(e.key)) {
-                        e.preventDefault();
-                      }
-                    }}
-                  />
-                )}
-              />
-            </div>
-          </StyledDivBottomLine>
-        )}
       </div>
       <SecondTabs />
     </div>
