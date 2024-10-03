@@ -17,6 +17,12 @@ export default function TanimliMakinelerTablo() {
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [modalData, setModalData] = useState([]);
   const [modalDataInitialLength, setModalDataInitialLength] = useState(0);
+  const [keyArray, setKeyArray] = useState([]);
+
+  useEffect(() => {
+    const keys = data.map((item) => item.key);
+    setKeyArray(keys);
+  }, [data]);
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 
@@ -273,6 +279,7 @@ export default function TanimliMakinelerTablo() {
     }
   };
 
+  // Ensure handleModalClose correctly updates modalData
   const handleModalClose = () => {
     setIsCreateModalVisible(false);
     setModalData((prevData) => {
@@ -290,6 +297,7 @@ export default function TanimliMakinelerTablo() {
 
   const tarihSayacBakim = watch("tarihSayacBakim");
   const activeTab = watch("activeTab");
+  const selectedBakimID = watch("secilenBakimID");
 
   return (
     <div>
@@ -302,9 +310,11 @@ export default function TanimliMakinelerTablo() {
           data={modalData[0]}
           currentModalIndex={currentModalIndex}
           totalModals={modalDataInitialLength}
+          selectedBakimID={selectedBakimID}
+          onRefresh={refreshTable}
         />
       )}
-      <MakineTablo onSubmit={handleMakineTabloSubmit} />
+      <MakineTablo onSubmit={handleMakineTabloSubmit} tarihSayacBakim={tarihSayacBakim} activeTab={activeTab} keyArray={keyArray} />
       <Table
         rowSelection={{
           type: "radio",

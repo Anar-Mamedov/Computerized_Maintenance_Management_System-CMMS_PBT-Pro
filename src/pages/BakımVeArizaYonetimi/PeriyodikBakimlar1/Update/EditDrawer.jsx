@@ -105,8 +105,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       ayGroup: 1,
       ayinGunleriSelect: [],
       baslangicGroup: 1,
-      haftaninGunleri: [],
-      // add more fields as needed
+      haftaninGunleri: [], // add more fields as needed
     },
   });
 
@@ -125,49 +124,156 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   //* export
   const onSubmit = async (data) => {
     const Body = {
-      TB_IS_TANIM_ID: data.secilenBakimID,
-      IST_KOD: data.bakimKodu,
-      IST_TANIM: data.bakimTanimi,
-      IST_TIP_KOD_ID: data.bakimTipiID,
-      IST_GRUP_KOD_ID: data.bakimGrubuID,
-      IST_NEDEN_KOD_ID: data.bakimNedeniID,
-      IST_ONCELIK_ID: data.oncelikID,
-      IST_TALIMAT_ID: data.talimatID,
-      IST_ATOLYE_ID: data.atolyeID,
-      IST_FIRMA_ID: data.firmaID,
-      IST_LOKASYON_ID: data.lokasyonID,
-      IST_CALISMA_SURE: data.calismaSuresi,
-      IST_DURUS_SURE: data.durusSuresi,
-      IST_PERSONEL_SAYI: data.personelSayisi,
-      IST_OTONOM_BAKIM: data.otonomBakim,
-      IST_UYARI_SIKLIGI: data.periyotSiklik,
-      IST_UYARI_PERIYOT: data.periyot,
-      IST_AKTIF: data.bakimAktif,
-      IST_MALZEME_MALIYET: data.maliyetlerMalzeme,
-      IST_ISCILIK_MALIYET: data.maliyetlerIscilik,
-      IST_GENEL_GIDER_MALIYET: data.maliyetlerGenelGider,
-      IST_TOPLAM_MALIYET: data.maliyetlerToplam,
-      IST_SURE_LOJISTIK: data.lojistikSuresi,
-      IST_SURE_SEYAHAT: data.seyahetSuresi,
-      IST_SURE_ONAY: data.onaySuresi,
-      IST_SURE_BEKLEME: data.beklemeSuresi,
-      IST_SURE_DIGER: data.digerSuresi,
-      IST_OZEL_ALAN_1: data.ozelAlan1,
-      IST_OZEL_ALAN_2: data.ozelAlan2,
-      IST_OZEL_ALAN_3: data.ozelAlan3,
-      IST_OZEL_ALAN_4: data.ozelAlan4,
-      IST_OZEL_ALAN_5: data.ozelAlan5,
-      IST_OZEL_ALAN_6_KOD_ID: data.ozelAlan6ID,
-      IST_OZEL_ALAN_7_KOD_ID: data.ozelAlan7ID,
-      IST_OZEL_ALAN_8_KOD_ID: data.ozelAlan8ID,
-      IST_OZEL_ALAN_9: data.ozelAlan9,
-      IST_OZEL_ALAN_10: data.ozelAlan10,
-      IST_ACIKLAMA: data.aciklama,
-      // add more fields as needed
+      TB_PERIYODIK_BAKIM_ID: data.secilenBakimID,
+      PBK_KOD: data.bakimKodu,
+      PBK_TANIM: data.bakimTanimi,
+      PBK_AKTIF: data.bakimAktif,
+      PBK_TIP: data.bakimTipi,
+      PBK_TIP_KOD_ID: data.bakimTipiID,
+      PBK_GRUP: data.bakimGrubu,
+      PBK_GRUP_KOD_ID: data.bakimGrubuID,
+      /*  PBK_NEDEN: data.bakimNedeni,
+      PBK_NEDEN_KOD_ID: data.bakimNedeniID, */
+      PBK_ONCELIK: data.oncelikTanim,
+      PBK_ONCELIK_ID: data.oncelikID,
+      PBK_TALIMAT: data.talimatTanim,
+      PBK_TALIMAT_ID: data.talimatID,
+      PBK_ATOLYE: data.atolyeTanim,
+      PBK_ATOLYE_ID: data.atolyeID,
+      PBK_FIRMA: data.firmaTanim,
+      PBK_FIRMA_ID: data.firmaID,
+      PBK_LOKASYON: data.lokasyonTanim,
+      PBK_LOKASYON_ID: data.lokasyonID,
+      PBK_CALISMA_SURE: data.calismaSuresi,
+      PBK_DURUS_SURE: data.durusSuresi,
+      PBK_PERSONEL_SAYI: data.personelSayisi,
+      // PBK_OTONOM_BAKIM: data.otonomBakim,
+      // PBK_UYARI_PERIYOT: data.periyotID,
+      // PBK_UYARI_SIKLIGI: data.periyotSiklik,
+      PBK_MALZEME_MALIYET: data.maliyetlerMalzeme,
+      PBK_ISCILIK_MALIYET: data.maliyetlerIscilik,
+      PBK_GENEL_GIDER_MALIYET: data.maliyetlerGenelGider,
+      PBK_TOPLAM_MALIYET: data.maliyetlerToplam,
+      PBK_SURE_LOJISTIK: data.lojistikSuresi,
+      PBK_SURE_SEYAHAT: data.seyahetSuresi,
+      PBK_SURE_ONAY: data.onaySuresi,
+      PBK_SURE_BEKLEME: data.beklemeSuresi,
+      PBK_SURE_DIGER: data.digerSuresi,
+      PBK_OZEL_ALAN_1: data.ozelAlan1,
+      PBK_OZEL_ALAN_2: data.ozelAlan2,
+      PBK_OZEL_ALAN_3: data.ozelAlan3,
+      PBK_OZEL_ALAN_4: data.ozelAlan4,
+      PBK_OZEL_ALAN_5: data.ozelAlan5,
+      PBK_OZEL_ALAN_6: data.ozelAlan6,
+      PBK_OZEL_ALAN_6_KOD_ID: data.ozelAlan6ID,
+      PBK_OZEL_ALAN_7_KOD_ID: data.ozelAlan7ID,
+      PBK_OZEL_ALAN_8_KOD_ID: data.ozelAlan8ID,
+      PBK_OZEL_ALAN_9: data.ozelAlan9,
+      PBK_OZEL_ALAN_10: data.ozelAlan10,
+      PBK_ACIKLAMA: data.aciklama, // Initialize other fields to null or default values
+      PBK_TARIH_BAZLI_IZLE: false,
+      PBK_SAYAC_BAZLI_IZLE: false,
+      PBK_TARIH_YINELEME_PERIYOT: null,
+      PBK_TARIH_YINELEME_SIKLIK: null,
+      PBK_TARIH_AY_GUNLER: null,
+      PBK_TARIH_HAFTA_GUNLER: null,
+      PBK_SAYAC_YINELEME_SIKLIK: null,
+      PBK_SAYAC_BIRIM: null,
+      PBK_SAYAC_BIRIM_KOD_ID: null,
+      PBK_TARIH_BITIS_SEKLI: null,
+      PBK_TEKRAR_SAYI: null,
+      PBK_BITIS_DONEM1: null,
+      PBK_BITIS_DONEM2: null,
+      PBK_TARIH_BITIS: null,
+      PBK_TARIH_BASLANGIC_TARIHI: null, //??
     };
 
+    // Handle tarihSayacBakim and activeTab logic
+    if (data.tarihSayacBakim === "b") {
+      // Both date-based and counter-based tracking
+      Body.PBK_TARIH_BAZLI_IZLE = true;
+      Body.PBK_SAYAC_BAZLI_IZLE = true;
+    } else if (data.tarihSayacBakim === "a") {
+      if (data.activeTab === "SAYAC") {
+        // Only counter-based tracking
+        Body.PBK_TARIH_BAZLI_IZLE = false;
+        Body.PBK_SAYAC_BAZLI_IZLE = true;
+      } else {
+        // Only date-based tracking
+        Body.PBK_TARIH_BAZLI_IZLE = true;
+        Body.PBK_SAYAC_BAZLI_IZLE = false;
+      }
+    }
+
+    // Set counter-based fields if applicable
+    if (Body.PBK_SAYAC_BAZLI_IZLE) {
+      Body.PBK_SAYAC_YINELEME_SIKLIK = data.sayacSayisi;
+      Body.PBK_SAYAC_BIRIM = data.peryodikBakimBirim;
+      Body.PBK_SAYAC_BIRIM_KOD_ID = data.peryodikBakimBirimID;
+    }
+
+    // Set date-based fields if applicable
+    if (Body.PBK_TARIH_BAZLI_IZLE) {
+      switch (data.activeTab) {
+        case "GUN":
+          Body.PBK_TARIH_YINELEME_PERIYOT = "GUN";
+          Body.PBK_TARIH_YINELEME_SIKLIK = data.gunlukGun;
+          break;
+        case "HAFTA":
+          Body.PBK_TARIH_YINELEME_PERIYOT = "HAFTA";
+          Body.PBK_TARIH_YINELEME_SIKLIK = data.haftalik;
+          Body.PBK_TARIH_HAFTA_GUNLER = data.haftaninGunleri.join(",");
+          break;
+        case "AY123":
+          if (data.ayGroup === 1) {
+            Body.PBK_TARIH_YINELEME_PERIYOT = "AY1";
+            Body.PBK_TARIH_YINELEME_SIKLIK = data.herAy;
+          } else if (data.ayGroup === 2) {
+            Body.PBK_TARIH_YINELEME_PERIYOT = "AY2";
+            Body.PBK_TARIH_YINELEME_SIKLIK = data.ayinGunleriBir;
+            Body.PBK_TARIH_AY_GUNLER = data.ayinGunleriSelect.join(",");
+          } else if (data.ayGroup === 3) {
+            Body.PBK_TARIH_YINELEME_PERIYOT = "AY3";
+            Body.PBK_TARIH_YINELEME_SIKLIK = data.ayinHafatlariBir;
+            Body.PBK_TARIH_AY_GUNLER = data.ayinHaftalariSelect.join(",");
+            Body.PBK_TARIH_HAFTA_GUNLER = data.ayinHaftalarininGunuSelect.join(",");
+          }
+          break;
+        case "YIL123":
+          if (data.yilGroup === 1) {
+            Body.PBK_TARIH_YINELEME_PERIYOT = "YIL1";
+            Body.PBK_TARIH_YINELEME_SIKLIK = data.herYil;
+          } else if (data.yilGroup === 2) {
+            Body.PBK_TARIH_YINELEME_PERIYOT = "YIL2";
+            Body.PBK_TARIH_YINELEME_SIKLIK = data.yillikTekrarSayisi;
+            Body.PBK_TARIH_AY_GUNLER = data.yilinAylariSelect + data.ayinGunleriSelect;
+          }
+          break;
+        case "FIX":
+          Body.PBK_TARIH_YINELEME_PERIYOT = "FIX";
+          break;
+        default:
+          break;
+      }
+    }
+
+    // Set PBK_TARIH_BITIS_SEKLI and related fields
+    Body.PBK_TARIH_BITIS_SEKLI = data.baslangicGroup - 1; // Adjusting because baslangicGroup starts from 1
+
+    if (Body.PBK_TARIH_BITIS_SEKLI === 1) {
+      Body.PBK_TEKRAR_SAYI = data.tekrarlamaSayisi;
+    } else if (Body.PBK_TARIH_BITIS_SEKLI === 2) {
+      Body.PBK_BITIS_DONEM1 = data.donemBaslangicAylariSelect + data.donemBaslangicGunleriSelect;
+      Body.PBK_BITIS_DONEM2 = data.donemBitisAylariSelect + data.donemBitisGunleriSelect;
+    } else if (Body.PBK_TARIH_BITIS_SEKLI === 3) {
+      Body.PBK_TARIH_BITIS = data.bakimBitisTarihi ? dayjs(data.bakimBitisTarihi).format("YYYY-MM-DD") : null;
+    }
+
+    // Set PBK_TARIH_BASLANGIC_TARIHI if available
+    Body.PBK_TARIH_BASLANGIC_TARIHI = data.peryodikBakimBaslangicTarihi ? dayjs(data.peryodikBakimBaslangicTarihi).format("YYYY-MM-DD") : null;
+
     try {
-      const response = await AxiosInstance.post("UpdateBakim", Body);
+      const response = await AxiosInstance.post("PeriyodikBakimKaydetGüncelle", Body);
       // Handle successful response here, e.g.:
       console.log("Data sent successfully:", response);
       if (response.status_code === 200 || response.status_code === 201) {
@@ -197,11 +303,6 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           const response = await AxiosInstance.get(`PeriyodikBakimDetayByBakim?BakimId=${selectedRow.key}`);
           const item = response[0]; // Veri dizisinin ilk elemanını al
           // Form alanlarını set et
-          // console.log("selectedRow", selectedRow);
-          // startTransition(() => {
-          // Object.keys(selectedRow).forEach((key) => {
-          //   console.log(key, selectedRow[key]);
-          //   setValue(key, selectedRow[key]);
           setValue("secilenBakimID", selectedRow.key);
           setValue("bakimKodu", item.PBK_KOD);
           setValue("bakimTanimi", item.PBK_TANIM);
@@ -363,8 +464,6 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
           // add more fields as needed
 
-          // });
-          // });
           setLoading(false); // Yükleme tamamlandığında
         } catch (error) {
           console.error("Veri çekilirken hata oluştu:", error);
