@@ -7,13 +7,26 @@ import Filters from "./Machina/filter/Filters.jsx";
 import { Controller, useFormContext } from "react-hook-form";
 import { PlusOutlined } from "@ant-design/icons";
 
-export default function MakineTablo({ workshopSelectedId, onSubmit }) {
+export default function MakineTablo({ workshopSelectedId, onSubmit, tarihSayacBakim, activeTab, keyArray }) {
   const { control, watch, setValue } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1); // reset the cruent page when i search or filtered any thing
   const [filtersKey, setFiltersKey] = useState(0);
+  const [stateValue, setStateValue] = useState(-1);
+
+  useEffect(() => {
+    if (tarihSayacBakim === "a") {
+      if (activeTab === "SAYAC") {
+        setStateValue(1);
+      } else {
+        setStateValue(0);
+      }
+    } else if (tarihSayacBakim === "b") {
+      setStateValue(0);
+    }
+  }, [tarihSayacBakim, activeTab]);
 
   const [table, setTable] = useState({
     data: [],
@@ -201,44 +214,41 @@ export default function MakineTablo({ workshopSelectedId, onSubmit }) {
 
   const fetch = useCallback(
     ({ keyword, filters, page = 1 }) => {
-      setLoading(true);
-      AxiosInstance.post(
-        `GetMakineFullList?pagingDeger=${page}&lokasyonId=${""}&parametre=${keyword}`,
-        filters
-      )
-        .then((response) => {
-          const fetchedData = response.makine_listesi.map((item, index) => {
-            return {
-              ...item,
-              key: item.TB_MAKINE_ID,
-              code: item.MKN_KOD,
-              definition: item.MKN_TANIM,
-              location: item.MKN_LOKASYON,
-              machinelocationid: item.MKN_LOKASYON_ID,
-              fullLocation: item.MKN_LOKASYON_TUM_YOL,
-              machine_type: item.MKN_TIP,
-              category: item.MKN_KATEGORI,
-              brand: item.MKN_MARKA,
-              model: item.MKN_MODEL,
-              serial_no: item.MKN_SERI_NO,
-              // tb_makine_id: item.TB_MAKINE_ID,
-              machine_warranty: dayjs(item.MKN_GARANTI_BITIS).format(
-                "DD.MM.YYYY"
-              ),
-              machine_warranty_status: item.MKN_GARANTI_KAPSAMINDA,
-            };
-          });
-          setCurrentPage(page); //reset the cruent page when i search or filtered any thing
-          setTable({
-            data: fetchedData,
-            page: response.page,
-            // page: 1,
-          });
-          setLoading(false); // Set loading to false when data arrives
-        })
-        .finally(() => setLoading(false));
+      if (stateValue >= 0) {
+        setLoading(true);
+        AxiosInstance.post(`GetPBakimFullList?pagingDeger=${page}&pageSize=10&sayac=${stateValue}&parametre=${keyword}&makineler=${keyArray}`, filters)
+          .then((response) => {
+            const fetchedData = response.makine_listesi.map((item, index) => {
+              return {
+                ...item,
+                key: item.TB_MAKINE_ID,
+                code: item.MKN_KOD,
+                definition: item.MKN_TANIM,
+                location: item.MKN_LOKASYON,
+                machinelocationid: item.MKN_LOKASYON_ID,
+                fullLocation: item.MKN_LOKASYON_TUM_YOL,
+                machine_type: item.MKN_TIP,
+                category: item.MKN_KATEGORI,
+                brand: item.MKN_MARKA,
+                model: item.MKN_MODEL,
+                serial_no: item.MKN_SERI_NO,
+                // tb_makine_id: item.TB_MAKINE_ID,
+                machine_warranty: dayjs(item.MKN_GARANTI_BITIS).format("DD.MM.YYYY"),
+                machine_warranty_status: item.MKN_GARANTI_KAPSAMINDA,
+              };
+            });
+            setCurrentPage(page); //reset the cruent page when i search or filtered any thing
+            setTable({
+              data: fetchedData,
+              page: response.page,
+              // page: 1,
+            });
+            setLoading(false); // Set loading to false when data arrives
+          })
+          .finally(() => setLoading(false));
+      }
     },
-    [lokasyonID]
+    [lokasyonID, stateValue, keyArray]
   );
 
   // for search field
@@ -273,9 +283,7 @@ export default function MakineTablo({ workshopSelectedId, onSubmit }) {
   };
 
   const handleModalOk = () => {
-    const selectedData = selectedRowKeys.map((key) =>
-      table.data.find((item) => item.key === key)
-    );
+    const selectedData = selectedRowKeys.map((key) => table.data.find((item) => item.key === key));
     if (selectedData.length > 0) {
       onSubmit && onSubmit(selectedData);
     }
@@ -308,14 +316,7 @@ export default function MakineTablo({ workshopSelectedId, onSubmit }) {
           <PlusOutlined /> Yeni Kayıt
         </Button>
       </div>
-      <Modal
-        width="1200px"
-        centered
-        title="Makine Tanımları"
-        open={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={handleModalToggle}
-      >
+      <Modal width="1200px" centered title="Makine Tanımları" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <div
           style={{
             display: "flex",
@@ -326,11 +327,7 @@ export default function MakineTablo({ workshopSelectedId, onSubmit }) {
           }}
         >
           <SearchField onChange={handleBodyChange} />
-          <Filters
-            key={filtersKey}
-            onChange={handleBodyChange}
-            value={body.filters}
-          />
+          <Filters key={filtersKey} onChange={handleBodyChange} value={body.filters} />
         </div>
 
         <Table
@@ -355,8 +352,7 @@ export default function MakineTablo({ workshopSelectedId, onSubmit }) {
             total: table.page * 10,
             // Eger total toplam sehife sayisidirsa
             // total: table.page,
-            onChange: (page) =>
-              fetch({ filters: body.filters, keyword: body.keyword, page }),
+            onChange: (page) => fetch({ filters: body.filters, keyword: body.keyword, page }),
             // quick jump for page input field
           }}
         />
