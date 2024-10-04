@@ -320,7 +320,6 @@ export default function TanimliMakinelerTablo() {
         <ContextMenu selectedRows={selectedRowsData} refreshTableData={refreshTable} />
         <MakineTablo onSubmit={handleMakineTabloSubmit} tarihSayacBakim={tarihSayacBakim} activeTab={activeTab} keyArray={keyArray} />
       </div>
-
       <Table
         rowSelection={{
           type: "checkbox",
