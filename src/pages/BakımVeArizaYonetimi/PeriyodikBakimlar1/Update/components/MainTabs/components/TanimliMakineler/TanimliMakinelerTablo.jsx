@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import CreateModal from "./Insert/CreateModal";
 import EditModal from "./Update/EditModal";
 import MakineTablo from "./Insert/MakineTablo.jsx";
+import ContextMenu from "./components/ContextMenu/ContextMenu.jsx";
 
 export default function TanimliMakinelerTablo() {
   const [loading, setLoading] = useState(false);
@@ -18,6 +19,7 @@ export default function TanimliMakinelerTablo() {
   const [modalData, setModalData] = useState([]);
   const [modalDataInitialLength, setModalDataInitialLength] = useState(0);
   const [keyArray, setKeyArray] = useState([]);
+  const [selectedRowsData, setSelectedRowsData] = useState([]);
 
   useEffect(() => {
     const keys = data.map((item) => item.PBM_MAKINE_ID);
@@ -77,8 +79,7 @@ export default function TanimliMakinelerTablo() {
       // `hour12` seçeneğini belirtmeyerek Intl.DateTimeFormat'ın kullanıcının yerel ayarlarına göre otomatik seçim yapmasına izin ver
       const formatter = new Intl.DateTimeFormat(navigator.language, {
         hour: "numeric",
-        minute: "2-digit",
-        // hour12 seçeneği burada belirtilmiyor; böylece otomatik olarak kullanıcının sistem ayarlarına göre belirleniyor
+        minute: "2-digit", // hour12 seçeneği burada belirtilmiyor; böylece otomatik olarak kullanıcının sistem ayarlarına göre belirleniyor
       });
 
       // Formatlanmış saati döndür
@@ -256,8 +257,9 @@ export default function TanimliMakinelerTablo() {
     }
   }, [secilenBakimID, fetch]); // secilenBakimID veya fetch fonksiyonu değiştiğinde useEffect'i tetikle
 
-  const onRowSelectChange = (selectedKeys) => {
-    setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
+  const onRowSelectChange = (selectedKeys, selectedRows) => {
+    setSelectedRowKeys(selectedKeys);
+    setSelectedRowsData(selectedRows); // Store selected rows' data
   };
 
   const onRowClick = (record) => {
@@ -314,10 +316,14 @@ export default function TanimliMakinelerTablo() {
           onRefresh={refreshTable}
         />
       )}
-      <MakineTablo onSubmit={handleMakineTabloSubmit} tarihSayacBakim={tarihSayacBakim} activeTab={activeTab} keyArray={keyArray} />
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "right", gap: "10px", marginBottom: "10px" }}>
+        <ContextMenu selectedRows={selectedRowsData} refreshTableData={refreshTable} />
+        <MakineTablo onSubmit={handleMakineTabloSubmit} tarihSayacBakim={tarihSayacBakim} activeTab={activeTab} keyArray={keyArray} />
+      </div>
+
       <Table
         rowSelection={{
-          type: "radio",
+          type: "checkbox",
           selectedRowKeys,
           onChange: onRowSelectChange,
         }}
