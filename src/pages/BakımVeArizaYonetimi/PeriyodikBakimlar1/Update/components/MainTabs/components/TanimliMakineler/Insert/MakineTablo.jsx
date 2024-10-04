@@ -309,7 +309,6 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, tarihSayacBa
           display: "flex",
           width: "100%",
           justifyContent: "flex-end",
-          marginBottom: "10px",
         }}
       >
         <Button type="link" onClick={handleModalToggle}>
