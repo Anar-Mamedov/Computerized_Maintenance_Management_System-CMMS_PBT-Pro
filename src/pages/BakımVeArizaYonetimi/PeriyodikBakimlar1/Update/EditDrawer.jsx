@@ -150,6 +150,14 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       // PBK_OTONOM_BAKIM: data.otonomBakim,
       // PBK_UYARI_PERIYOT: data.periyotID,
       // PBK_UYARI_SIKLIGI: data.periyotSiklik,
+      PBK_TAKVIM_ID: 0,
+      PBK_PERIYOT_LIMIT: 0,
+      PBK_TARIH_HATIRLATICI: 0,
+      PBK_TARIH_HATIRLATICI_SURE: 0,
+      PBK_SAYAC_YINELEME_PERIYOT: null,
+      PBK_SAYAC_HATIRLATICI: 0,
+      PBK_SAYAC_HATIRLATICI_SURE: 0,
+
       PBK_MALZEME_MALIYET: data.maliyetlerMalzeme,
       PBK_ISCILIK_MALIYET: data.maliyetlerIscilik,
       PBK_GENEL_GIDER_MALIYET: data.maliyetlerGenelGider,
@@ -273,7 +281,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     Body.PBK_TARIH_BASLANGIC_TARIHI = data.peryodikBakimBaslangicTarihi ? dayjs(data.peryodikBakimBaslangicTarihi).format("YYYY-MM-DD") : null;
 
     try {
-      const response = await AxiosInstance.post("PeriyodikBakimKaydetGüncelle", Body);
+      const response = await AxiosInstance.post("PeriyodikBakimKaydetGuncelle", Body);
       // Handle successful response here, e.g.:
       console.log("Data sent successfully:", response);
       if (response.status_code === 200 || response.status_code === 201) {

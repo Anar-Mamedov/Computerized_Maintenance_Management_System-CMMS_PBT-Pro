@@ -20,7 +20,7 @@ export default function TanimliMakinelerTablo() {
   const [keyArray, setKeyArray] = useState([]);
 
   useEffect(() => {
-    const keys = data.map((item) => item.key);
+    const keys = data.map((item) => item.PBM_MAKINE_ID);
     setKeyArray(keys);
   }, [data]);
 
