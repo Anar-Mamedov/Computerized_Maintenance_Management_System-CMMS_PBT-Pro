@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import bg from "../../../../assets/images/bg-card.png";
 import { Spin, Typography } from "antd";
-import { ClockCircleOutlined } from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../api/http.jsx";
 
@@ -52,6 +51,9 @@ function Component1() {
         borderRadius: "5px",
         padding: "10px",
         marginBottom: "0px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
       }}
     >
       {isLoading ? (
@@ -59,9 +61,9 @@ function Component1() {
           <Spin size="large" style={{ color: "#fff" }} />
         </div>
       ) : (
-        <div style={{ display: "flex", justifyContent: "space-between", cursor: "pointer" }}>
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <Text style={{ fontWeight: "500", fontSize: "35px", color: "white" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+            <Text style={{ fontWeight: "500", fontSize: "35px", color: "white" }} ellipsis={{ tooltip: value }}>
               {value !== undefined ? (
                 <>
                   {value}
@@ -71,9 +73,10 @@ function Component1() {
                 ""
               )}
             </Text>
-            <Text style={{ color: "white", fontSize: "15px", fontWeight: "400" }}>{label}</Text>
+            <Text style={{ color: "white", fontSize: "15px", fontWeight: "400", marginTop: "5px" }} ellipsis>
+              {label}
+            </Text>
           </div>
-          {/*<ClockCircleOutlined style={{ fontSize: "60px", color: "rgba(255,255,255,.8)" }} />*/}
         </div>
       )}
     </div>
