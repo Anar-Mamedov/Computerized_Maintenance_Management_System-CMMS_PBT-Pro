@@ -179,8 +179,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       PBK_OZEL_ALAN_9: data.ozelAlan9,
       PBK_OZEL_ALAN_10: data.ozelAlan10,
       PBK_ACIKLAMA: data.aciklama, // Initialize other fields to null or default values
-      PBK_TARIH_BAZLI_IZLE: false,
-      PBK_SAYAC_BAZLI_IZLE: false,
+      // PBK_TARIH_BAZLI_IZLE: false,
+      // PBK_SAYAC_BAZLI_IZLE: false,
       PBK_TARIH_YINELEME_PERIYOT: null,
       PBK_TARIH_YINELEME_SIKLIK: null,
       PBK_TARIH_AY_GUNLER: null,
@@ -230,7 +230,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         case "HAFTA":
           Body.PBK_TARIH_YINELEME_PERIYOT = "HAFTA";
           Body.PBK_TARIH_YINELEME_SIKLIK = data.haftalik;
-          Body.PBK_TARIH_HAFTA_GUNLER = Array.isArray(data.haftaninGunleri) ? data.haftaninGunleri.join(",") : "";
+          Body.PBK_TARIH_HAFTA_GUNLER = data.haftaninGunleri;
           break;
         case "AY123":
           if (data.ayGroup === 1) {
@@ -239,7 +239,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           } else if (data.ayGroup === 2) {
             Body.PBK_TARIH_YINELEME_PERIYOT = "AY2";
             Body.PBK_TARIH_YINELEME_SIKLIK = data.ayinGunleriBir;
-            Body.PBK_TARIH_AY_GUNLER = Array.isArray(data.ayinGunleriSelect) ? data.ayinGunleriSelect.join(",") : "";
+            Body.PBK_TARIH_AY_GUNLER = data.ayinGunleriSelect.join("");
           } else if (data.ayGroup === 3) {
             Body.PBK_TARIH_YINELEME_PERIYOT = "AY3";
             Body.PBK_TARIH_YINELEME_SIKLIK = data.ayinHafatlariBir;
@@ -254,8 +254,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           } else if (data.yilGroup === 2) {
             Body.PBK_TARIH_YINELEME_PERIYOT = "YIL2";
             Body.PBK_TARIH_YINELEME_SIKLIK = data.yillikTekrarSayisi;
-            Body.PBK_TARIH_AY_GUNLER =
-              Array.isArray(data.yilinAylariSelect) && Array.isArray(data.ayinGunleriSelect) ? data.yilinAylariSelect.join(",") + data.ayinGunleriSelect.join(",") : "";
+            Body.PBK_TARIH_AY_GUNLER = data.ayinGunleriSelect;
           }
           break;
         case "FIX":
