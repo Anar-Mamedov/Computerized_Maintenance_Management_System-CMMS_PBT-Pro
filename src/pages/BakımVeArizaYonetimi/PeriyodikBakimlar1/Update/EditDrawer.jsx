@@ -230,7 +230,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         case "HAFTA":
           Body.PBK_TARIH_YINELEME_PERIYOT = "HAFTA";
           Body.PBK_TARIH_YINELEME_SIKLIK = data.haftalik;
-          Body.PBK_TARIH_HAFTA_GUNLER = data.haftaninGunleri.join(",");
+          Body.PBK_TARIH_HAFTA_GUNLER = Array.isArray(data.haftaninGunleri) ? data.haftaninGunleri.join(",") : "";
           break;
         case "AY123":
           if (data.ayGroup === 1) {
@@ -239,12 +239,12 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           } else if (data.ayGroup === 2) {
             Body.PBK_TARIH_YINELEME_PERIYOT = "AY2";
             Body.PBK_TARIH_YINELEME_SIKLIK = data.ayinGunleriBir;
-            Body.PBK_TARIH_AY_GUNLER = data.ayinGunleriSelect.join(",");
+            Body.PBK_TARIH_AY_GUNLER = Array.isArray(data.ayinGunleriSelect) ? data.ayinGunleriSelect.join(",") : "";
           } else if (data.ayGroup === 3) {
             Body.PBK_TARIH_YINELEME_PERIYOT = "AY3";
             Body.PBK_TARIH_YINELEME_SIKLIK = data.ayinHafatlariBir;
-            Body.PBK_TARIH_AY_GUNLER = data.ayinHaftalariSelect.join(",");
-            Body.PBK_TARIH_HAFTA_GUNLER = data.ayinHaftalarininGunuSelect.join(",");
+            Body.PBK_TARIH_AY_GUNLER = data.ayinHaftalariSelect;
+            Body.PBK_TARIH_HAFTA_GUNLER = data.ayinHaftalarininGunuSelect;
           }
           break;
         case "YIL123":
@@ -254,7 +254,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           } else if (data.yilGroup === 2) {
             Body.PBK_TARIH_YINELEME_PERIYOT = "YIL2";
             Body.PBK_TARIH_YINELEME_SIKLIK = data.yillikTekrarSayisi;
-            Body.PBK_TARIH_AY_GUNLER = data.yilinAylariSelect + data.ayinGunleriSelect;
+            Body.PBK_TARIH_AY_GUNLER =
+              Array.isArray(data.yilinAylariSelect) && Array.isArray(data.ayinGunleriSelect) ? data.yilinAylariSelect.join(",") + data.ayinGunleriSelect.join(",") : "";
           }
           break;
         case "FIX":
