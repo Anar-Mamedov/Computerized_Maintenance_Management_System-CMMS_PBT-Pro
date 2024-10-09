@@ -36,6 +36,7 @@ import RolTanimlari from "./pages/OnayIslemleri/RolTanimlari/RolTanimlari.jsx";
 import OnayTanimlari from "./pages/OnayIslemleri/OnayTanimlari/OnayTanimlari.jsx";
 import Onaylayicilar from "./pages/OnayIslemleri/Onaylayicilar/Onaylayicilar.jsx";
 import EkipmanVeritabani from "./pages/MakineEkipman/EkipmanVeritabani/EkipmanVeritabani.jsx";
+import IsTalebiKullanicilari from "./pages/YardimMasasi/IsTalebiKullanicilari/IsTalebiKullanicilari.jsx";
 // import Kurallar from "./pages/OnayIslemleri/Kurallar/Kurallar.jsx";
 
 const { Text } = Typography;
@@ -230,7 +231,7 @@ export default function App() {
           <Route path="/personelIzinleri" element={<Hazirlaniyor />} />
           <Route path="/personelNobetleri" element={<Hazirlaniyor />} />
           <Route path="/personelCalismaPLani" element={<Hazirlaniyor />} />
-          <Route path="/isTalebiKullanicilari" element={<Hazirlaniyor />} />
+          <Route path="/isTalebiKullanicilari" element={<IsTalebiKullanicilari />} />
           <Route path="/raporYonetimi" element={<Hazirlaniyor />} />
           <Route path="/formYonetimi" element={<Hazirlaniyor />} />
           <Route path="/kodYonetimi" element={<Hazirlaniyor />} />

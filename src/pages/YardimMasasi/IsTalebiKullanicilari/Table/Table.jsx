@@ -104,9 +104,9 @@ const MainTable = () => {
 
   const initialColumns = [
     {
-      title: "Ekipman No",
-      dataIndex: "EKP_KOD",
-      key: "EKP_KOD",
+      title: "Kullanıcı Kodu",
+      dataIndex: "ISK_KOD",
+      key: "ISK_KOD",
       width: 120,
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
@@ -114,22 +114,22 @@ const MainTable = () => {
         <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
       ),
       sorter: (a, b) => {
-        if (a.EKP_KOD === null) return -1;
-        if (b.EKP_KOD === null) return 1;
-        return a.EKP_KOD.localeCompare(b.EKP_KOD);
+        if (a.ISK_KOD === null) return -1;
+        if (b.ISK_KOD === null) return 1;
+        return a.ISK_KOD.localeCompare(b.ISK_KOD);
       },
     },
 
     {
-      title: "Tanım",
-      dataIndex: "EKP_TANIM",
-      key: "EKP_TANIM",
+      title: "Kullanıcı Adı",
+      dataIndex: "ISK_ISIM",
+      key: "ISK_ISIM",
       width: 250,
       ellipsis: true,
       sorter: (a, b) => {
-        if (a.EKP_TANIM === null) return -1;
-        if (b.EKP_TANIM === null) return 1;
-        return a.EKP_TANIM.localeCompare(b.EKP_TANIM);
+        if (a.ISK_ISIM === null) return -1;
+        if (b.ISK_ISIM === null) return 1;
+        return a.ISK_ISIM.localeCompare(b.ISK_ISIM);
       },
       visible: true, // Varsayılan olarak açık
       render: (text, record) => (
@@ -138,140 +138,140 @@ const MainTable = () => {
     },
 
     {
-      title: "Seri No",
-      dataIndex: "EKP_SERI_NO",
-      key: "EKP_SERI_NO",
-      width: 100,
-      ellipsis: true,
-      sorter: (a, b) => {
-        if (a.EKP_SERI_NO === null) return -1;
-        if (b.EKP_SERI_NO === null) return 1;
-        return a.EKP_SERI_NO.localeCompare(b.EKP_SERI_NO);
-      },
-      visible: true, // Varsayılan olarak açık
-    },
-
-    {
-      title: "Makine",
-      dataIndex: "MKN_TANIM",
-      key: "MKN_TANIM",
+      title: "Ünvan",
+      dataIndex: "ISK_UNVAN",
+      key: "ISK_UNVAN",
       width: 200,
       ellipsis: true,
       sorter: (a, b) => {
-        if (a.MKN_TANIM === null) return -1;
-        if (b.MKN_TANIM === null) return 1;
-        return a.MKN_TANIM.localeCompare(b.MKN_TANIM);
+        if (a.ISK_UNVAN === null) return -1;
+        if (b.ISK_UNVAN === null) return 1;
+        return a.ISK_UNVAN.localeCompare(b.ISK_UNVAN);
       },
       visible: true, // Varsayılan olarak açık
     },
 
     {
-      title: "Tipi",
-      dataIndex: "EKP_TIP",
-      key: "EKP_TIP",
+      title: "Kullanıcı Tipi",
+      dataIndex: "ISK_KULLANICI_TIP",
+      key: "ISK_KULLANICI_TIP",
+      width: 200,
+      ellipsis: true,
+      sorter: (a, b) => {
+        if (a.ISK_KULLANICI_TIP === null) return -1;
+        if (b.ISK_KULLANICI_TIP === null) return 1;
+        return a.ISK_KULLANICI_TIP.localeCompare(b.ISK_KULLANICI_TIP);
+      },
+      visible: true, // Varsayılan olarak açık
+    },
+
+    {
+      title: "Departman",
+      dataIndex: "ISK_DEPARTMAN",
+      key: "ISK_DEPARTMAN",
       width: 150,
       ellipsis: true,
       sorter: (a, b) => {
-        if (a.EKP_TIP === null) return -1;
-        if (b.EKP_TIP === null) return 1;
-        return a.EKP_TIP.localeCompare(b.EKP_TIP);
+        if (a.ISK_DEPARTMAN === null) return -1;
+        if (b.ISK_DEPARTMAN === null) return 1;
+        return a.ISK_DEPARTMAN.localeCompare(b.ISK_DEPARTMAN);
       },
       visible: true, // Varsayılan olarak açık
     },
 
     {
-      title: "Durum",
-      dataIndex: "EKP_DURUM",
-      key: "EKP_DURUM",
-      width: 150,
-      ellipsis: true,
-
-      visible: true, // Varsayılan olarak açık
-      sorter: (a, b) => {
-        if (a.EKP_DURUM === null && b.EKP_DURUM === null) return 0;
-        if (a.EKP_DURUM === null) return 1;
-        if (b.EKP_DURUM === null) return -1;
-        return a.EKP_DURUM.localeCompare(b.EKP_DURUM);
-      },
-    },
-
-    {
-      title: "Marka",
-      dataIndex: "EKP_MARKA",
-      key: "EKP_MARKA",
-      width: 150,
-      ellipsis: true,
-
-      visible: true, // Varsayılan olarak açık
-      sorter: (a, b) => {
-        if (a.EKP_MARKA === null && b.EKP_MARKA === null) return 0;
-        if (a.EKP_MARKA === null) return 1;
-        if (b.EKP_MARKA === null) return -1;
-        return a.EKP_MARKA.localeCompare(b.EKP_MARKA);
-      },
-    },
-
-    {
-      title: "Model",
-      dataIndex: "EKP_MODEL",
-      key: "EKP_MODEL",
+      title: "Lokasyon",
+      dataIndex: "ISK_LOKASYON",
+      key: "ISK_LOKASYON",
       width: 150,
       ellipsis: true,
 
       visible: true, // Varsayılan olarak açık
       sorter: (a, b) => {
-        if (a.EKP_MODEL === null && b.EKP_MODEL === null) return 0;
-        if (a.EKP_MODEL === null) return 1;
-        if (b.EKP_MODEL === null) return -1;
-        return a.EKP_MODEL.localeCompare(b.EKP_MODEL);
+        if (a.ISK_LOKASYON === null && b.ISK_LOKASYON === null) return 0;
+        if (a.ISK_LOKASYON === null) return 1;
+        if (b.ISK_LOKASYON === null) return -1;
+        return a.ISK_LOKASYON.localeCompare(b.ISK_LOKASYON);
       },
     },
 
     {
-      title: "Revizyon Tarih",
-      dataIndex: "EKP_REVIZYON_TARIH",
-      key: "EKP_REVIZYON_TARIH",
-      width: 110,
-      ellipsis: true,
-      sorter: (a, b) => {
-        if (a.EKP_REVIZYON_TARIH === null) return -1;
-        if (b.EKP_REVIZYON_TARIH === null) return 1;
-        return a.EKP_REVIZYON_TARIH.localeCompare(b.EKP_REVIZYON_TARIH);
-      },
-
-      visible: true, // Varsayılan olarak açık
-      render: (text) => formatDate(text),
-    },
-
-    {
-      title: "Garanti Tarih",
-      dataIndex: "EKP_GARANTI_BITIS_TARIH",
-      key: "EKP_GARANTI_BITIS_TARIH",
-      width: 110,
-      ellipsis: true,
-      sorter: (a, b) => {
-        if (a.EKP_GARANTI_BITIS_TARIH === null) return -1;
-        if (b.EKP_GARANTI_BITIS_TARIH === null) return 1;
-        return a.EKP_GARANTI_BITIS_TARIH.localeCompare(b.EKP_GARANTI_BITIS_TARIH);
-      },
-
-      visible: true, // Varsayılan olarak açık
-      render: (text) => formatDate(text),
-    },
-
-    {
-      title: "Depo",
-      dataIndex: "EKP_DEPO",
-      key: "EKP_DEPO",
+      title: "Telefon",
+      dataIndex: "ISK_TELEFON_1",
+      key: "ISK_TELEFON_1",
       width: 150,
       ellipsis: true,
 
       visible: true, // Varsayılan olarak açık
       sorter: (a, b) => {
-        if (a.EKP_DEPO === null && b.EKP_DEPO === null) return 0;
-        if (a.EKP_DEPO === null) return 1;
-        if (b.EKP_DEPO === null) return -1;
-        return a.EKP_DEPO.localeCompare(b.EKP_DEPO);
+        if (a.ISK_TELEFON_1 === null && b.ISK_TELEFON_1 === null) return 0;
+        if (a.ISK_TELEFON_1 === null) return 1;
+        if (b.ISK_TELEFON_1 === null) return -1;
+        return a.ISK_TELEFON_1.localeCompare(b.ISK_TELEFON_1);
+      },
+    },
+
+    {
+      title: "Dahili",
+      dataIndex: "ISK_DAHILI",
+      key: "ISK_DAHILI",
+      width: 150,
+      ellipsis: true,
+
+      visible: true, // Varsayılan olarak açık
+      sorter: (a, b) => {
+        if (a.ISK_DAHILI === null && b.ISK_DAHILI === null) return 0;
+        if (a.ISK_DAHILI === null) return 1;
+        if (b.ISK_DAHILI === null) return -1;
+        return a.ISK_DAHILI.localeCompare(b.ISK_DAHILI);
+      },
+    },
+
+    {
+      title: "GSM",
+      dataIndex: "ISK_GSM",
+      key: "ISK_GSM",
+      width: 150,
+      ellipsis: true,
+
+      visible: true, // Varsayılan olarak açık
+      sorter: (a, b) => {
+        if (a.ISK_GSM === null && b.ISK_GSM === null) return 0;
+        if (a.ISK_GSM === null) return 1;
+        if (b.ISK_GSM === null) return -1;
+        return a.ISK_GSM.localeCompare(b.ISK_GSM);
+      },
+    },
+
+    {
+      title: "E-Mail",
+      dataIndex: "ISK_MAIL",
+      key: "ISK_MAIL",
+      width: 150,
+      ellipsis: true,
+
+      visible: true, // Varsayılan olarak açık
+      sorter: (a, b) => {
+        if (a.ISK_MAIL === null && b.ISK_MAIL === null) return 0;
+        if (a.ISK_MAIL === null) return 1;
+        if (b.ISK_MAIL === null) return -1;
+        return a.ISK_MAIL.localeCompare(b.ISK_MAIL);
+      },
+    },
+
+    {
+      title: "Personel Adı",
+      dataIndex: "ISK_PERSONEL_ISIM",
+      key: "ISK_PERSONEL_ISIM",
+      width: 150,
+      ellipsis: true,
+
+      visible: true, // Varsayılan olarak açık
+      sorter: (a, b) => {
+        if (a.ISK_PERSONEL_ISIM === null && b.ISK_PERSONEL_ISIM === null) return 0;
+        if (a.ISK_PERSONEL_ISIM === null) return 1;
+        if (b.ISK_PERSONEL_ISIM === null) return -1;
+        return a.ISK_PERSONEL_ISIM.localeCompare(b.ISK_PERSONEL_ISIM);
       },
     },
 
