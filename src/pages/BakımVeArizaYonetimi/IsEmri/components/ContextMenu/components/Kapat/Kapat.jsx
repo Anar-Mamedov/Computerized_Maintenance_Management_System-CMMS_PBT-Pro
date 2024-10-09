@@ -38,31 +38,11 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
     if (isModalOpen && selectedRows.length === 1) {
       const row = selectedRows[0]; // Assuming you want to use the first selected row
 
-      setValue(
-        "baslamaTarihi",
-        row.BASLAMA_TARIH ? (dayjs(row.BASLAMA_TARIH).isValid() ? dayjs(row.BASLAMA_TARIH) : null) : null
-      );
-      setValue(
-        "baslamaSaati",
-        row.BASLAMA_SAAT
-          ? dayjs(row.BASLAMA_SAAT.trim(), "HH:mm").isValid()
-            ? dayjs(row.BASLAMA_SAAT.trim(), "HH:mm")
-            : null
-          : null
-      );
+      setValue("baslamaTarihi", row.BASLAMA_TARIH ? (dayjs(row.BASLAMA_TARIH).isValid() ? dayjs(row.BASLAMA_TARIH) : null) : null);
+      setValue("baslamaSaati", row.BASLAMA_SAAT ? (dayjs(row.BASLAMA_SAAT.trim(), "HH:mm").isValid() ? dayjs(row.BASLAMA_SAAT.trim(), "HH:mm") : null) : null);
 
-      setValue(
-        "bitisTarihi",
-        row.ISM_BITIS_TARIH ? (dayjs(row.ISM_BITIS_TARIH).isValid() ? dayjs(row.ISM_BITIS_TARIH) : null) : null
-      );
-      setValue(
-        "bitisSaati",
-        row.ISM_BITIS_SAAT
-          ? dayjs(row.ISM_BITIS_SAAT.trim(), "HH:mm").isValid()
-            ? dayjs(row.ISM_BITIS_SAAT.trim(), "HH:mm")
-            : null
-          : null
-      );
+      setValue("bitisTarihi", row.ISM_BITIS_TARIH ? (dayjs(row.ISM_BITIS_TARIH).isValid() ? dayjs(row.ISM_BITIS_TARIH) : null) : null);
+      setValue("bitisSaati", row.ISM_BITIS_SAAT ? (dayjs(row.ISM_BITIS_SAAT.trim(), "HH:mm").isValid() ? dayjs(row.ISM_BITIS_SAAT.trim(), "HH:mm") : null) : null);
 
       // Set other values here
     }
@@ -256,7 +236,7 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
               errorMsg += `${words.join(",\n")}, `;
             }
             if (response.IsmIsNotPersonelTimeSet === true) {
-              errorMsg += ``;
+              errorMsg += `Ekli Personele Süre Atanmamış`;
             }
             setErrorMessage(errorMsg);
             setDisabled(true);
@@ -299,11 +279,7 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
   return (
     <FormProvider {...methods}>
       <div style={buttonStyle}>
-        <Button
-          style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
-          type="link"
-          danger
-          onClick={handleModalToggle}>
+        <Button style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }} type="link" danger onClick={handleModalToggle}>
           Seçili İş Emirlerini Kapat
         </Button>
         <Modal
@@ -338,7 +314,8 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
                 </Button>
               </div>
             </div>,
-          ]}>
+          ]}
+        >
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <Forms isModalOpen={isModalOpen} selectedRows={selectedRows} />
             {/* <Text>{errorMessage}</Text> */}
