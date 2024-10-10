@@ -247,6 +247,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             Body.PBK_TARIH_HAFTA_GUNLER = data.ayinHaftalarininGunuSelect;
           }
           break;
+
         case "YIL123":
           if (data.yilGroup === 1) {
             Body.PBK_TARIH_YINELEME_PERIYOT = "YIL1";
