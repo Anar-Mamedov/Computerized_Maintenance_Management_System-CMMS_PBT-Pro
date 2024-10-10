@@ -16,14 +16,13 @@ export default function CreateDrawer({ onRefresh }) {
     defaultValues: {
       ekipmanKodu: null,
       secilenID: null,
-      aktif: null,
+      aktif: true,
       ekipmanTanimi: null,
       unvan: null,
       personelTanimi: null,
       personelID: null,
       lokasyonTanim: null,
       lokasyonID: null,
-      sifre: null,
       tipi: null,
       tipiID: null,
       departman: null,
@@ -54,7 +53,6 @@ export default function CreateDrawer({ onRefresh }) {
       ISK_UNVAN: data.unvan,
       ISK_LOKASYON_ID: Number(data.lokasyonID),
       ISK_AKTIF: data.aktif,
-      ISK_SIFRE: data.sifre,
       ISK_PERSONEL_ID: Number(data.personelID),
     };
 

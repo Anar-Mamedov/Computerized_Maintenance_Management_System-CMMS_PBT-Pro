@@ -297,30 +297,6 @@ export default function MainTabs() {
             {/*{(errors.lokasyonTanim || errors.lokasyonID) && <div style={{ color: "red", marginTop: "5px" }}>Alan Boş Bırakılamaz!</div>}*/}
           </div>
         </div>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "450px", gap: "10px", width: "100%", justifyContent: "space-between" }}>
-          <Text style={{ fontSize: "14px" }}>Şifre:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}
-          >
-            <Controller
-              name="sifre"
-              control={control}
-              render={({ field, fieldState: { error } }) => (
-                <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
-                  <Input.Password {...field} style={{ flex: 1 }} />
-                </div>
-              )}
-            />
-          </div>
-        </div>
       </div>
     </div>
   );
