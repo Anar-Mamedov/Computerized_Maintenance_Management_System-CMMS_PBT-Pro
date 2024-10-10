@@ -131,9 +131,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       PBK_TIP: data.bakimTipi,
       PBK_TIP_KOD_ID: data.bakimTipiID,
       PBK_GRUP: data.bakimGrubu,
-      PBK_GRUP_KOD_ID: data.bakimGrubuID,
-      /*  PBK_NEDEN: data.bakimNedeni,
-      PBK_NEDEN_KOD_ID: data.bakimNedeniID, */
+      PBK_GRUP_KOD_ID: data.bakimGrubuID /*  PBK_NEDEN: data.bakimNedeni,
+      PBK_NEDEN_KOD_ID: data.bakimNedeniID, */,
       PBK_ONCELIK: data.oncelikTanim,
       PBK_ONCELIK_ID: data.oncelikID,
       PBK_TALIMAT: data.talimatTanim,
@@ -146,8 +145,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       PBK_LOKASYON_ID: data.lokasyonID,
       PBK_CALISMA_SURE: data.calismaSuresi,
       PBK_DURUS_SURE: data.durusSuresi,
-      PBK_PERSONEL_SAYI: data.personelSayisi,
-      // PBK_OTONOM_BAKIM: data.otonomBakim,
+      PBK_PERSONEL_SAYI: data.personelSayisi, // PBK_OTONOM_BAKIM: data.otonomBakim,
       // PBK_UYARI_PERIYOT: data.periyotID,
       // PBK_UYARI_SIKLIGI: data.periyotSiklik,
       PBK_TAKVIM_ID: 0,
@@ -201,6 +199,40 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       // Both date-based and counter-based tracking
       Body.PBK_TARIH_BAZLI_IZLE = true;
       Body.PBK_SAYAC_BAZLI_IZLE = true;
+      if (data.activeTab === "GUN") {
+        // Only counter-based tracking
+        Body.PBK_TARIH_YINELEME_PERIYOT = "GUN";
+        Body.PBK_TARIH_YINELEME_SIKLIK = data.gunlukGun;
+      } else if (data.activeTab === "HAFTA") {
+        Body.PBK_TARIH_YINELEME_PERIYOT = "HAFTA";
+        Body.PBK_TARIH_YINELEME_SIKLIK = data.haftalik;
+        Body.PBK_TARIH_HAFTA_GUNLER = data.haftaninGunleri;
+      } else if (data.activeTab === "AY123") {
+        if (data.ayGroup === 1) {
+          Body.PBK_TARIH_YINELEME_PERIYOT = "AY1";
+          Body.PBK_TARIH_YINELEME_SIKLIK = data.herAy;
+        } else if (data.ayGroup === 2) {
+          Body.PBK_TARIH_YINELEME_PERIYOT = "AY2";
+          Body.PBK_TARIH_YINELEME_SIKLIK = data.ayinGunleriBir;
+          Body.PBK_TARIH_AY_GUNLER = data.ayinGunleriSelect.join("");
+        } else if (data.ayGroup === 3) {
+          Body.PBK_TARIH_YINELEME_PERIYOT = "AY3";
+          Body.PBK_TARIH_YINELEME_SIKLIK = data.ayinHafatlariBir;
+          Body.PBK_TARIH_AY_GUNLER = data.ayinHaftalariSelect;
+          Body.PBK_TARIH_HAFTA_GUNLER = data.ayinHaftalarininGunuSelect;
+        }
+      } else if (data.activeTab === "YIL123") {
+        if (data.yilGroup === 1) {
+          Body.PBK_TARIH_YINELEME_PERIYOT = "YIL1";
+          Body.PBK_TARIH_YINELEME_SIKLIK = data.herYil;
+        } else if (data.yilGroup === 2) {
+          Body.PBK_TARIH_YINELEME_PERIYOT = "YIL2";
+          Body.PBK_TARIH_YINELEME_SIKLIK = data.yillikTekrarSayisi;
+          Body.PBK_TARIH_AY_GUNLER = data.ayinGunleriSelect;
+        }
+      } else if (data.activeTab === "FIX") {
+        Body.PBK_TARIH_YINELEME_PERIYOT = "FIX";
+      }
     } else if (data.tarihSayacBakim === "a") {
       if (data.activeTab === "SAYAC") {
         // Only counter-based tracking
@@ -272,8 +304,12 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     if (Body.PBK_TARIH_BITIS_SEKLI === 1) {
       Body.PBK_TEKRAR_SAYI = data.tekrarlamaSayisi;
     } else if (Body.PBK_TARIH_BITIS_SEKLI === 2) {
-      Body.PBK_BITIS_DONEM1 = data.donemBaslangicAylariSelect + data.donemBaslangicGunleriSelect;
-      Body.PBK_BITIS_DONEM2 = data.donemBitisAylariSelect + data.donemBitisGunleriSelect;
+      Body.PBK_BITIS_DONEM1 =
+        (data.donemBaslangicGunleriSelect.length === 1 ? "0" + data.donemBaslangicGunleriSelect : data.donemBaslangicGunleriSelect) +
+        (data.donemBaslangicAylariSelect.length === 1 ? "0" + data.donemBaslangicAylariSelect : data.donemBaslangicAylariSelect);
+      Body.PBK_BITIS_DONEM2 =
+        (data.donemBitisGunleriSelect.length === 1 ? "0" + data.donemBitisGunleriSelect : data.donemBitisGunleriSelect) +
+        (data.donemBitisAylariSelect.length === 1 ? "0" + data.donemBitisAylariSelect : data.donemBitisAylariSelect);
     } else if (Body.PBK_TARIH_BITIS_SEKLI === 3) {
       Body.PBK_TARIH_BITIS = data.bakimBitisTarihi ? dayjs(data.bakimBitisTarihi).format("YYYY-MM-DD") : null;
     }
@@ -405,7 +441,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             } else if (item.PBK_TARIH_YINELEME_PERIYOT == "FIX") {
               setValue("activeTab", "FIX");
             }
-          } else if (item.PBK_TARIH_BAZLI_IZLE == true || item.PBK_SAYAC_BAZLI_IZLE == true) {
+          } else if (item.PBK_TARIH_BAZLI_IZLE == true && item.PBK_SAYAC_BAZLI_IZLE == false) {
             setValue("tarihSayacBakim", "a");
             if (item.PBK_TARIH_YINELEME_PERIYOT == "AY1" || item.PBK_TARIH_YINELEME_PERIYOT == "AY2" || item.PBK_TARIH_YINELEME_PERIYOT == "AY3") {
               setValue("activeTab", "AY123");
@@ -443,14 +479,15 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
               setValue("activeTab", "HAFTA");
               setValue("haftalik", item.PBK_TARIH_YINELEME_SIKLIK);
               setValue("haftaninGunleri", item.PBK_TARIH_HAFTA_GUNLER);
-            } else if (item.PBK_TARIH_YINELEME_PERIYOT == "SAYAC") {
-              setValue("activeTab", "SAYAC");
-              setValue("sayacSayisi", item.PBK_SAYAC_YINELEME_SIKLIK);
-              setValue("peryodikBakimBirim", item.PBK_SAYAC_BIRIM);
-              setValue("peryodikBakimBirimID", item.PBK_SAYAC_BIRIM_KOD_ID);
             } else if (item.PBK_TARIH_YINELEME_PERIYOT == "FIX") {
               setValue("activeTab", "FIX");
             }
+          } else if (item.PBK_TARIH_BAZLI_IZLE === false && item.PBK_SAYAC_BAZLI_IZLE === 1) {
+            setValue("tarihSayacBakim", "a");
+            setValue("activeTab", "SAYAC");
+            setValue("sayacSayisi", item.PBK_SAYAC_YINELEME_SIKLIK);
+            setValue("peryodikBakimBirim", item.PBK_SAYAC_BIRIM);
+            setValue("peryodikBakimBirimID", item.PBK_SAYAC_BIRIM_KOD_ID);
           }
 
           if (item.PBK_TARIH_BITIS_SEKLI == 0) {
@@ -461,11 +498,11 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           } else if (item.PBK_TARIH_BITIS_SEKLI == 2) {
             setValue("baslangicGroup", 3);
             let donem = item.PBK_BITIS_DONEM1.toString();
-            setValue("donemBaslangicGunleriSelect", donem.slice(-2));
-            setValue("donemBaslangicAylariSelect", donem.slice(0, 2));
+            setValue("donemBaslangicAylariSelect", donem.slice(-2));
+            setValue("donemBaslangicGunleriSelect", donem.slice(0, 2));
             let bitisDonem = item.PBK_BITIS_DONEM2.toString();
-            setValue("donemBitisGunleriSelect", bitisDonem.slice(-2));
-            setValue("donemBitisAylariSelect", bitisDonem.slice(0, 2));
+            setValue("donemBitisAylariSelect", bitisDonem.slice(-2));
+            setValue("donemBitisGunleriSelect", bitisDonem.slice(0, 2));
           } else if (item.PBK_TARIH_BITIS_SEKLI == 3) {
             setValue("baslangicGroup", 4);
             setValue("bakimBitisTarihi", item.PBK_TARIH_BITIS ? (dayjs(item.PBK_TARIH_BITIS).isValid() ? dayjs(item.PBK_TARIH_BITIS) : null) : null);
