@@ -185,7 +185,7 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
         </Button>
         <Drawer
           width="550px"
-          title="Periyordik Bakım Ekle"
+          title="Periyodik Bakım Ekle"
           placement={"right"}
           onClose={onClose}
           open={open}
