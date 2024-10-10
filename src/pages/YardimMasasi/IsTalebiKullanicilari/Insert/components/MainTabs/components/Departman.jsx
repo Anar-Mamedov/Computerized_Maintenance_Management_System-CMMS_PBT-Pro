@@ -116,7 +116,8 @@ export default function Departman() {
         width: "100%",
         flexWrap: "wrap",
         rowGap: "0px",
-      }}>
+      }}
+    >
       {contextHolder}
       <Text style={{ fontSize: "14px", minWidth: "40px" }}>Departman:</Text>
       <Controller
@@ -131,9 +132,7 @@ export default function Departman() {
             allowClear
             placeholder="Seçim Yapınız"
             optionFilterProp="children"
-            filterOption={(input, option) =>
-              option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
-            }
+            filterOption={(input, option) => (option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false)}
             onDropdownVisibleChange={(open) => {
               if (open) {
                 fetchData(); // Fetch data when the dropdown is opened
@@ -150,7 +149,8 @@ export default function Departman() {
                 <Space
                   style={{
                     padding: "0 8px 4px",
-                  }}>
+                  }}
+                >
                   <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
                   <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
                     Ekle

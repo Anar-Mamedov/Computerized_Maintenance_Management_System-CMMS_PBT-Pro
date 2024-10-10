@@ -13,24 +13,20 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   const methods = useForm({
     defaultValues: {
-      aktif: null,
       ekipmanKodu: null,
+      secilenID: null,
+      aktif: null,
       ekipmanTanimi: null,
+      unvan: null,
+      personelTanimi: null,
+      personelID: null,
+      lokasyonTanim: null,
+      lokasyonID: null,
+      sifre: null,
       tipi: null,
       tipiID: null,
-      MakineMarka: null,
-      MakineMarkaID: null,
-      MakineModel: null,
-      MakineModelID: null,
-      durum: null,
-      durumID: null,
-      birim: null,
-      birimID: null,
-      revizyonTarihi: null,
-      garantiBitisTarihi: null,
-      depoTanim: null,
-      depoID: null,
-      seriNo: null,
+      departman: null,
+      departmanID: null,
       // ... Tüm default değerleriniz
     },
   });
@@ -43,30 +39,22 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       if (drawerVisible && selectedRow) {
         setLoading(true);
         try {
-          const response = await AxiosInstance.get(`GetEkipmanBy?EkipmanID=${selectedRow.key}`);
+          const response = await AxiosInstance.get(`GetIsTalebiKullaniciList?TB_IS_TALEBI_KULLANICI_ID=${selectedRow.key}`);
           const data = response[0];
           setValue("secilenID", data.key);
-          setValue("aktif", data.EKP_AKTIF);
-          setValue("ekipmanKodu", data.EKP_KOD === "" || data.EKP_KOD === 0 ? null : data.EKP_KOD);
-          setValue("ekipmanTanimi", data.EKP_TANIM === "" || data.EKP_TANIM === 0 ? null : data.EKP_TANIM);
-          setValue("seriNo", data.EKP_SERI_NO === "" || data.EKP_SERI_NO === 0 ? null : data.EKP_SERI_NO);
-          setValue("tipi", data.EKP_TIP === "" || data.EKP_TIP === 0 ? null : data.EKP_TIP);
-          setValue("tipiID", data.EKP_TIP_KOD_ID === "" || data.EKP_TIP_KOD_ID === 0 ? null : data.EKP_TIP_KOD_ID);
-
-          setValue("MakineMarka", data.EKP_MARKA === "" || data.EKP_MARKA === 0 ? null : data.EKP_MARKA);
-          setValue("MakineMarkaID", data.EKP_MARKA_KOD_ID === "" || data.EKP_MARKA_KOD_ID === 0 ? null : data.EKP_MARKA_KOD_ID);
-          setTimeout(() => {
-            setValue("MakineModel", data.EKP_MODEL === "" || data.EKP_MODEL === 0 ? null : data.EKP_MODEL);
-            setValue("MakineModelID", data.EKP_MODEL_KOD_ID === "" || data.EKP_MODEL_KOD_ID === 0 ? null : data.EKP_MODEL_KOD_ID);
-          }, 200);
-          setValue("durum", data.EKP_DURUM === "" || data.EKP_DURUM === 0 ? null : data.EKP_DURUM);
-          setValue("durumID", data.EKP_DURUM_KOD_ID === "" || data.EKP_DURUM_KOD_ID === 0 ? null : data.EKP_DURUM_KOD_ID);
-          setValue("birim", data.EKP_BIRIM === "" || data.EKP_BIRIM === 0 ? null : data.EKP_BIRIM);
-          setValue("birimID", data.EKP_BIRIM_KOD_ID === "" || data.EKP_BIRIM_KOD_ID === 0 ? null : data.EKP_BIRIM_KOD_ID);
-          setValue("revizyonTarihi", data.EKP_REVIZYON_TARIH ? (dayjs(data.EKP_REVIZYON_TARIH).isValid() ? dayjs(data.EKP_REVIZYON_TARIH) : null) : null);
-          setValue("garantiBitisTarihi", data.EKP_GARANTI_BITIS_TARIH ? (dayjs(data.EKP_GARANTI_BITIS_TARIH).isValid() ? dayjs(data.EKP_GARANTI_BITIS_TARIH) : null) : null);
-          setValue("depoTanim", data.EKP_DEPO === "" || data.EKP_DEPO === 0 ? null : data.EKP_DEPO);
-          setValue("depoID", data.EKP_DEPO_ID === "" || data.EKP_DEPO_ID === 0 ? null : data.EKP_DEPO_ID);
+          setValue("aktif", data.ISK_AKTIF);
+          setValue("ekipmanKodu", data.ISK_KOD === "" || data.ISK_KOD === 0 ? null : data.ISK_KOD);
+          setValue("ekipmanTanimi", data.ISK_ISIM === "" || data.ISK_ISIM === 0 ? null : data.ISK_ISIM);
+          setValue("unvan", data.ISK_UNVAN === "" || data.ISK_UNVAN === 0 ? null : data.ISK_UNVAN);
+          setValue("personelTanimi", data.PERSONEL_TANIMI === "" || data.PERSONEL_TANIMI === 0 ? null : data.PERSONEL_TANIMI);
+          setValue("personelID", data.ISK_PERSONEL_ID === "" || data.ISK_PERSONEL_ID === 0 ? null : data.ISK_PERSONEL_ID);
+          setValue("lokasyonTanim", data.LOK_TANIM === "" || data.LOK_TANIM === 0 ? null : data.LOK_TANIM);
+          setValue("lokasyonID", data.ISK_LOKASYON_ID === "" || data.ISK_LOKASYON_ID === 0 ? null : data.ISK_LOKASYON_ID);
+          setValue("sifre", data.ISK_SIFRE === "" || data.ISK_SIFRE === 0 ? null : data.ISK_SIFRE);
+          setValue("tipi", data.KULLANICI_TIP === "" || data.KULLANICI_TIP === 0 ? null : data.KULLANICI_TIP);
+          setValue("tipiID", data.ISK_KULLANICI_TIP_KOD_ID === "" || data.ISK_KULLANICI_TIP_KOD_ID === 0 ? null : data.ISK_KULLANICI_TIP_KOD_ID);
+          setValue("departman", data.DEPARTMAN === "" || data.DEPARTMAN === 0 ? null : data.DEPARTMAN);
+          setValue("departmanID", data.ISK_DEPARTMAN_ID === "" || data.ISK_DEPARTMAN_ID === 0 ? null : data.ISK_DEPARTMAN_ID);
           // Set other fields as needed
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -93,27 +81,24 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   const onSubmit = (data) => {
     // Form verilerini API'nin beklediği formata dönüştür
     const Body = {
-      EKP_KOD: data.ekipmanKodu,
-      EKP_TANIM: data.ekipmanTanimi,
-      EKP_SERI_NO: data.seriNo,
-      EKP_TIP_KOD_ID: Number(data.tipiID),
-      EKP_BIRIM_KOD_ID: Number(data.birimID),
-      EKP_MARKA_KOD_ID: Number(data.MakineMarkaID),
-      EKP_DEPO_ID: Number(data.depoID),
-      EKP_MODEL_KOD_ID: Number(data.MakineModelID),
-      EKP_REVIZYON_TARIH: formatDateWithDayjs(data.revizyonTarihi),
-      EKP_GARANTI_BITIS_TARIH: formatDateWithDayjs(data.garantiBitisTarihi),
-      EKP_MAKINE_ID: Number(data.MakineModelID),
-      EKP_DURUM_KOD_ID: Number(data.durumID),
-      EKP_AKTIF: data.aktif,
+      TB_IS_TALEBI_KULLANICI_ID: Number(data.secilenID),
+      ISK_KOD: data.ekipmanKodu,
+      ISK_ISIM: data.ekipmanTanimi,
+      ISK_DEPARTMAN_ID: Number(data.departmanID),
+      ISK_KULLANICI_TIP_KOD_ID: Number(data.tipiID),
+      ISK_UNVAN: data.unvan,
+      ISK_LOKASYON_ID: Number(data.lokasyonID),
+      ISK_AKTIF: data.aktif,
+      ISK_SIFRE: data.sifre,
+      ISK_PERSONEL_ID: Number(data.personelID),
       // Diğer alanlarınız...
     };
 
     // API'ye POST isteği gönder
-    AxiosInstance.post(`UpdateEkipman?TB_EKIPMAN_ID=${selectedRow.key}`, Body)
+    AxiosInstance.post(`UpdateIsTalebiKullanici`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
-        if (response.status_code === 200 || response.status_code === 201) {
+        if (response.status_code === 200 || response.status_code === 201 || response.status === 201) {
           message.success("Ekleme Başarılı.");
           setOpen(false);
           onRefresh();
