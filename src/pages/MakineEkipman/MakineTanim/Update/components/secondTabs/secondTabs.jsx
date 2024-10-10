@@ -76,7 +76,7 @@ export default function SecondTabs() {
             <FifthTab />
           </div>
         </TabPane>
-        <TabPane tab="Peryodik Bakımlar" key="6">
+        <TabPane tab="Periyodik Bakımlar" key="6">
           <div style={{ gap: "15px" }}>
             <DetailsTable />
           </div>
