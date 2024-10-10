@@ -14,24 +14,20 @@ export default function CreateDrawer({ onRefresh }) {
 
   const methods = useForm({
     defaultValues: {
-      aktif: true,
       ekipmanKodu: null,
+      secilenID: null,
+      aktif: null,
       ekipmanTanimi: null,
+      unvan: null,
+      personelTanimi: null,
+      personelID: null,
+      lokasyonTanim: null,
+      lokasyonID: null,
+      sifre: null,
       tipi: null,
       tipiID: null,
-      MakineMarka: null,
-      MakineMarkaID: null,
-      MakineModel: null,
-      MakineModelID: null,
-      durum: null,
-      durumID: null,
-      birim: null,
-      birimID: null,
-      revizyonTarihi: null,
-      garantiBitisTarihi: null,
-      depoTanim: null,
-      depoID: null,
-      seriNo: null,
+      departman: null,
+      departmanID: null,
     },
   });
 
@@ -50,26 +46,23 @@ export default function CreateDrawer({ onRefresh }) {
   const onSubmit = (data) => {
     // Form verilerini API'nin beklediği formata dönüştür
     const Body = {
-      EKP_KOD: data.ekipmanKodu,
-      EKP_TANIM: data.ekipmanTanimi,
-      EKP_SERI_NO: data.seriNo,
-      EKP_TIP_KOD_ID: Number(data.tipiID),
-      EKP_BIRIM_KOD_ID: Number(data.birimID),
-      EKP_MARKA_KOD_ID: Number(data.MakineMarkaID),
-      EKP_DEPO_ID: Number(data.depoID),
-      EKP_MODEL_KOD_ID: Number(data.MakineModelID),
-      EKP_REVIZYON_TARIH: formatDateWithDayjs(data.revizyonTarihi),
-      EKP_GARANTI_BITIS_TARIH: formatDateWithDayjs(data.garantiBitisTarihi),
-      EKP_MAKINE_ID: Number(data.MakineModelID),
-      EKP_DURUM_KOD_ID: Number(data.durumID),
-      EKP_AKTIF: data.aktif,
+      // TB_IS_TALEBI_KULLANICI_ID: Number(data.secilenID),
+      ISK_KOD: data.ekipmanKodu,
+      ISK_ISIM: data.ekipmanTanimi,
+      ISK_DEPARTMAN_ID: Number(data.departmanID),
+      ISK_KULLANICI_TIP_KOD_ID: Number(data.tipiID),
+      ISK_UNVAN: data.unvan,
+      ISK_LOKASYON_ID: Number(data.lokasyonID),
+      ISK_AKTIF: data.aktif,
+      ISK_SIFRE: data.sifre,
+      ISK_PERSONEL_ID: Number(data.personelID),
     };
 
     // API'ye POST isteği gönder
-    AxiosInstance.post("AddEkipman", Body)
+    AxiosInstance.post("AddIsTalebiKullanici", Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
-        if (response.status_code === 200 || response.status_code === 201) {
+        if (response.status_code === 200 || response.status_code === 201 || response.status === 201) {
           message.success("Ekleme Başarılı.");
           setOpen(false);
           onRefresh();
@@ -108,7 +101,7 @@ export default function CreateDrawer({ onRefresh }) {
       // Çekmece açıldığında gerekli işlemi yap
       // Örneğin, MainTabs'a bir prop olarak geçir
       // setLoading(true);
-      AxiosInstance.get("ModulKoduGetir?modulKodu=EKP_KOD") // Replace with your actual API endpoint
+      AxiosInstance.get("ModulKoduGetir?modulKodu=ISK_KOD") // Replace with your actual API endpoint
         .then((response) => {
           // Assuming the response contains the new work order number in 'response.Tanim'
           setValue("ekipmanKodu", response);
