@@ -27,7 +27,11 @@ jobs:
         run: |
           set -e
           npm run build
-          echo "Build completed."
+
+      - name: Verify build output
+        run: |
+          echo "Listing contents of the 'dist' directory:"
+          ls -al dist/
 
       - name: Deploy to FTP Server
         uses: SamKirkland/FTP-Deploy-Action@4.3.0
@@ -35,11 +39,5 @@ jobs:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: dist
+          local-dir: dist/
           server-dir: /public_html
-
-      - name: Verify deployment
-        run: |
-          set -e
-          echo "Verifying deployment..."
-          lftp -u $FTP_USERNAME,$FTP_PASSWORD $FTP_HOST -e "cd /public_html; ls -al; bye"
