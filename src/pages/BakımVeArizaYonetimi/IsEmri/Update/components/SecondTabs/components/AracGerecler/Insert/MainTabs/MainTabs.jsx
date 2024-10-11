@@ -98,13 +98,7 @@ export default function MainTabs() {
     {
       key: "1",
       label: "Açıklama",
-      children: (
-        <Controller
-          name="aciklama"
-          control={control}
-          render={({ field }) => <TextArea {...field} disabled={!yapildi} rows={4} />}
-        />
-      ),
+      children: <Controller name="aciklama" control={control} render={({ field }) => <TextArea {...field} disabled={!yapildi} rows={4} />} />,
     },
   ];
 
@@ -226,7 +220,8 @@ export default function MainTabs() {
           gap: "10px",
           rowGap: "0px",
           marginBottom: "10px",
-        }}>
+        }}
+      >
         <Text style={{ fontSize: "14px" }}>Sıra no:</Text>
         <div
           style={{
@@ -237,7 +232,8 @@ export default function MainTabs() {
             minWidth: "300px",
             gap: "10px",
             width: "100%",
-          }}>
+          }}
+        >
           <Controller
             name="siraNo"
             control={control}
@@ -271,7 +267,8 @@ export default function MainTabs() {
           gap: "10px",
           rowGap: "0px",
           marginBottom: "10px",
-        }}>
+        }}
+      >
         <Text style={{ fontSize: "14px", fontWeight: "600" }}>İş Tanımı:</Text>
         <div
           style={{
@@ -282,7 +279,8 @@ export default function MainTabs() {
             minWidth: "300px",
             gap: "10px",
             width: "100%",
-          }}>
+          }}
+        >
           <Controller
             name="isTanimi"
             control={control}
@@ -303,7 +301,8 @@ export default function MainTabs() {
           left: "10px",
           background: "white",
           width: "70px",
-        }}>
+        }}
+      >
         <Controller
           name="yapildi"
           control={control}
@@ -323,7 +322,8 @@ export default function MainTabs() {
               justifyContent: "space-between",
               width: "100%",
               maxWidth: "435px",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px" }}>Atölye:</Text>
             <div
               style={{
@@ -332,7 +332,8 @@ export default function MainTabs() {
                 alignItems: "center",
                 justifyContent: "space-between",
                 width: "300px",
-              }}>
+              }}
+            >
               <Controller
                 name="atolyeTanim"
                 control={control}
@@ -380,7 +381,8 @@ export default function MainTabs() {
               justifyContent: "space-between",
               width: "100%",
               maxWidth: "435px",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px" }}>Personel:</Text>
             <div
               style={{
@@ -389,7 +391,8 @@ export default function MainTabs() {
                 alignItems: "center",
                 justifyContent: "space-between",
                 width: "300px",
-              }}>
+              }}
+            >
               <Controller
                 name="personelTanim"
                 control={control}
@@ -436,7 +439,8 @@ export default function MainTabs() {
             width: "100%",
             justifyContent: "space-between",
             marginBottom: "10px",
-          }}>
+          }}
+        >
           <Text style={{ fontSize: "14px" }}>Başlangıç Zamanı:</Text>
           <div
             style={{
@@ -447,31 +451,18 @@ export default function MainTabs() {
               minWidth: "300px",
               gap: "10px",
               width: "100%",
-            }}>
+            }}
+          >
             <Controller
               name="baslangicTarihi"
               control={control}
-              render={({ field }) => (
-                <DatePicker
-                  {...field}
-                  disabled={!yapildi}
-                  style={{ width: "180px" }}
-                  format={localeDateFormat}
-                  placeholder="Tarih seçiniz"
-                />
-              )}
+              render={({ field }) => <DatePicker {...field} disabled={!yapildi} style={{ width: "180px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />}
             />
             <Controller
               name="baslangicSaati"
               control={control}
               render={({ field }) => (
-                <TimePicker
-                  {...field}
-                  disabled={!yapildi}
-                  style={{ width: "110px" }}
-                  format={localeTimeFormat}
-                  placeholder="Saat seçiniz"
-                />
+                <TimePicker {...field} changeOnScroll needConfirm={false} disabled={!yapildi} style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />
               )}
             />
           </div>
@@ -490,7 +481,8 @@ export default function MainTabs() {
             width: "100%",
             justifyContent: "space-between",
             marginBottom: "10px",
-          }}>
+          }}
+        >
           <div
             style={{
               display: "flex",
@@ -498,7 +490,8 @@ export default function MainTabs() {
               width: "100%",
               maxWidth: "435px",
               justifyContent: "space-between",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px" }}>Bitiş Zamanı:</Text>
             <div
               style={{
@@ -509,31 +502,18 @@ export default function MainTabs() {
                 minWidth: "300px",
                 gap: "10px",
                 width: "100%",
-              }}>
+              }}
+            >
               <Controller
                 name="bitisTarihi"
                 control={control}
-                render={({ field }) => (
-                  <DatePicker
-                    {...field}
-                    disabled={!yapildi}
-                    style={{ width: "180px" }}
-                    format={localeDateFormat}
-                    placeholder="Tarih seçiniz"
-                  />
-                )}
+                render={({ field }) => <DatePicker {...field} disabled={!yapildi} style={{ width: "180px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />}
               />
               <Controller
                 name="bitisSaati"
                 control={control}
                 render={({ field }) => (
-                  <TimePicker
-                    {...field}
-                    disabled={!yapildi}
-                    style={{ width: "110px" }}
-                    format={localeTimeFormat}
-                    placeholder="Saat seçiniz"
-                  />
+                  <TimePicker {...field} changeOnScroll needConfirm={false} disabled={!yapildi} style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />
                 )}
               />
             </div>
@@ -541,11 +521,7 @@ export default function MainTabs() {
 
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}>
             <Text style={{ fontSize: "14px" }}>Süre (dk):</Text>
-            <Controller
-              name="sure"
-              control={control}
-              render={({ field }) => <InputNumber {...field} disabled={!yapildi} min={0} style={{ width: "200px" }} />}
-            />
+            <Controller name="sure" control={control} render={({ field }) => <InputNumber {...field} disabled={!yapildi} min={0} style={{ width: "200px" }} />} />
           </div>
         </div>
         <StyledTabs defaultActiveKey="1" items={items} onChange={onChange} />

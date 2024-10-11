@@ -1,17 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Drawer,
-  Typography,
-  Button,
-  Input,
-  Select,
-  DatePicker,
-  TimePicker,
-  Row,
-  Col,
-  Checkbox,
-  ColorPicker,
-} from "antd";
+import { Drawer, Typography, Button, Input, Select, DatePicker, TimePicker, Row, Col, Checkbox, ColorPicker } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import LokasyonTablo from "./components/LokasyonTablo";
@@ -72,11 +60,7 @@ const StyledDivMedia = styled.div`
   }
 `;
 
-export default function MainTabs({
-  drawerOpen,
-  isDisabled,
-  fieldRequirements,
-}) {
+export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) {
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const {
@@ -99,9 +83,7 @@ export default function MainTabs({
       return "Alan Boş Bırakılamaz!";
     }
     const currentTime = dayjs();
-    const inputDateTime = dayjs(
-      `${dayjs(date).format("YYYY-MM-DD")} ${dayjs(time).format("HH:mm")}`
-    );
+    const inputDateTime = dayjs(`${dayjs(date).format("YYYY-MM-DD")} ${dayjs(time).format("HH:mm")}`);
     if (inputDateTime.isAfter(currentTime)) {
       return "Düzenlenme tarihi ve saati mevcut tarih ve saatten büyük olamaz";
     }
@@ -208,9 +190,7 @@ export default function MainTabs({
 
     // Örnek bir tarih formatla ve ay formatını belirle
     const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
-    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(
-      sampleDate
-    );
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
 
     let monthFormat;
     if (sampleFormatted.includes("January")) {
@@ -243,14 +223,7 @@ export default function MainTabs({
       // Saat ve dakika değerlerinin geçerliliğini kontrol et
       const hoursInt = parseInt(hours, 10);
       const minutesInt = parseInt(minutes, 10);
-      if (
-        isNaN(hoursInt) ||
-        isNaN(minutesInt) ||
-        hoursInt < 0 ||
-        hoursInt > 23 ||
-        minutesInt < 0 ||
-        minutesInt > 59
-      ) {
+      if (isNaN(hoursInt) || isNaN(minutesInt) || hoursInt < 0 || hoursInt > 23 || minutesInt < 0 || minutesInt > 59) {
         throw new Error("Invalid time format");
       }
 
@@ -283,12 +256,7 @@ export default function MainTabs({
     const dateFormatter = new Intl.DateTimeFormat(navigator.language);
     const sampleDate = new Date(2021, 10, 21);
     const formattedSampleDate = dateFormatter.format(sampleDate);
-    setLocaleDateFormat(
-      formattedSampleDate
-        .replace("2021", "YYYY")
-        .replace("21", "DD")
-        .replace("11", "MM")
-    );
+    setLocaleDateFormat(formattedSampleDate.replace("2021", "YYYY").replace("21", "DD").replace("11", "MM"));
 
     // Format the time based on the user's locale
     const timeFormatter = new Intl.DateTimeFormat(navigator.language, {
@@ -341,11 +309,7 @@ export default function MainTabs({
               width: "100%",
             }}
           >
-            <Text
-              style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}
-            >
-              Genel Bilgiler
-            </Text>
+            <Text style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}>Genel Bilgiler</Text>
           </div>
           <div
             style={{
@@ -359,9 +323,7 @@ export default function MainTabs({
               rowGap: "0px",
             }}
           >
-            <Text style={{ fontSize: "14px", fontWeight: "600" }}>
-              İş Emri No:
-            </Text>
+            <Text style={{ fontSize: "14px", fontWeight: "600" }}>İş Emri No:</Text>
             <div
               style={{
                 display: "flex",
@@ -386,14 +348,8 @@ export default function MainTabs({
                       width: "100%",
                     }}
                   >
-                    <Input
-                      {...field}
-                      status={error ? "error" : ""}
-                      style={{ flex: 1 }}
-                    />
-                    {error && (
-                      <div style={{ color: "red" }}>{error.message}</div>
-                    )}
+                    <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
+                    {error && <div style={{ color: "red" }}>{error.message}</div>}
                   </div>
                 )}
               />
@@ -421,9 +377,7 @@ export default function MainTabs({
               justifyContent: "space-between",
             }}
           >
-            <Text style={{ fontSize: "14px", fontWeight: "600" }}>
-              Düzenlenme Tarihi:
-            </Text>
+            <Text style={{ fontSize: "14px", fontWeight: "600" }}>Düzenlenme Tarihi:</Text>
             <div
               style={{
                 display: "flex",
@@ -440,13 +394,7 @@ export default function MainTabs({
                 control={control}
                 rules={{ validate: validateDateTime }}
                 render={({ field, fieldState: { error } }) => (
-                  <DatePicker
-                    {...field}
-                    status={error ? "error" : ""}
-                    style={{ width: "180px" }}
-                    format={localeDateFormat}
-                    placeholder="Tarih seçiniz"
-                  />
+                  <DatePicker {...field} status={error ? "error" : ""} style={{ width: "180px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />
                 )}
               />
               {/*{errors.duzenlenmeTarihi && (*/}
@@ -462,6 +410,8 @@ export default function MainTabs({
                 render={({ field, fieldState: { error } }) => (
                   <TimePicker
                     {...field}
+                    changeOnScroll
+                    needConfirm={false}
                     status={error ? "error" : ""}
                     style={{ width: "110px" }}
                     format={localeTimeFormat}
@@ -469,11 +419,7 @@ export default function MainTabs({
                   />
                 )}
               />
-              {errors.duzenlenmeSaati && (
-                <div style={{ color: "red" }}>
-                  {errors.duzenlenmeSaati.message}
-                </div>
-              )}
+              {errors.duzenlenmeSaati && <div style={{ color: "red" }}>{errors.duzenlenmeSaati.message}</div>}
             </div>
           </div>
           <div style={{ width: "100%", maxWidth: "450px" }}>
@@ -486,9 +432,7 @@ export default function MainTabs({
                 width: "100%",
               }}
             >
-              <Text style={{ fontSize: "14px", fontWeight: "600" }}>
-                İş Emri Tipi:
-              </Text>
+              <Text style={{ fontSize: "14px", fontWeight: "600" }}>İş Emri Tipi:</Text>
               <IsEmriTipiSelect fieldRequirements={fieldRequirements} />
             </StyledDivBottomLine>
           </div>
@@ -509,9 +453,7 @@ export default function MainTabs({
                 maxWidth: "450px",
               }}
             >
-              <Text style={{ fontSize: "14px", fontWeight: "600" }}>
-                Durum:
-              </Text>
+              <Text style={{ fontSize: "14px", fontWeight: "600" }}>Durum:</Text>
               <div
                 style={{
                   display: "flex",
@@ -553,11 +495,7 @@ export default function MainTabs({
                     setValue("isEmriDurumID", selectedData.key);
                   }}
                 />
-                {errors.isEmriDurum && (
-                  <div style={{ color: "red", marginTop: "10px" }}>
-                    {errors.isEmriDurum.message}
-                  </div>
-                )}
+                {errors.isEmriDurum && <div style={{ color: "red", marginTop: "10px" }}>{errors.isEmriDurum.message}</div>}
               </div>
             </StyledDivBottomLine>
           </div>
@@ -581,9 +519,7 @@ export default function MainTabs({
               <Text
                 style={{
                   fontSize: "14px",
-                  fontWeight: fieldRequirements.bagliIsEmriTanim
-                    ? "600"
-                    : "normal",
+                  fontWeight: fieldRequirements.bagliIsEmriTanim ? "600" : "normal",
                 }}
               >
                 Bağlı İş Emri:
@@ -601,9 +537,7 @@ export default function MainTabs({
                   name="bagliIsEmriTanim"
                   control={control}
                   rules={{
-                    required: fieldRequirements.bagliIsEmriTanim
-                      ? "Alan Boş Bırakılamaz!"
-                      : false,
+                    required: fieldRequirements.bagliIsEmriTanim ? "Alan Boş Bırakılamaz!" : false,
                   }}
                   render={({ field }) => (
                     <Input
@@ -633,11 +567,7 @@ export default function MainTabs({
                   }}
                 />
                 <Button onClick={handleBagliIsEmriMinusClick}> - </Button>
-                {errors.bagliIsEmriTanim && (
-                  <div style={{ color: "red", marginTop: "5px" }}>
-                    {errors.bagliIsEmriTanim.message}
-                  </div>
-                )}
+                {errors.bagliIsEmriTanim && <div style={{ color: "red", marginTop: "5px" }}>{errors.bagliIsEmriTanim.message}</div>}
               </div>
             </StyledDivBottomLine>
           </div>
@@ -660,11 +590,7 @@ export default function MainTabs({
               width: "100%",
             }}
           >
-            <Text
-              style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}
-            >
-              Makine / Lokasyon Bilgileri
-            </Text>
+            <Text style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}>Makine / Lokasyon Bilgileri</Text>
           </div>
           <StyledDivMedia
             style={{
@@ -701,9 +627,7 @@ export default function MainTabs({
                     name="lokasyonTanim"
                     control={control}
                     rules={{
-                      required: fieldRequirements.lokasyonTanim
-                        ? "Alan Boş Bırakılamaz!"
-                        : false,
+                      required: fieldRequirements.lokasyonTanim ? "Alan Boş Bırakılamaz!" : false,
                     }}
                     render={({ field }) => (
                       <Input
@@ -749,11 +673,7 @@ export default function MainTabs({
                 />
               </div>
 
-              {errors.lokasyonTanim && (
-                <div style={{ color: "red", marginTop: "5px" }}>
-                  {errors.lokasyonTanim.message}
-                </div>
-              )}
+              {errors.lokasyonTanim && <div style={{ color: "red", marginTop: "5px" }}>{errors.lokasyonTanim.message}</div>}
             </div>
           </StyledDivMedia>
           <div
@@ -802,9 +722,7 @@ export default function MainTabs({
                       name="makine"
                       control={control}
                       rules={{
-                        required: fieldRequirements.makine
-                          ? "Alan Boş Bırakılamaz!"
-                          : false,
+                        required: fieldRequirements.makine ? "Alan Boş Bırakılamaz!" : false,
                       }}
                       render={({ field }) => (
                         <Input
@@ -834,19 +752,10 @@ export default function MainTabs({
                         setValue("makineTanim", selectedData.MKN_TANIM);
                         setValue("lokasyonID", selectedData.MKN_LOKASYON_ID);
                         setValue("lokasyonTanim", selectedData.MKN_LOKASYON);
-                        setValue(
-                          "tamLokasyonTanim",
-                          selectedData.MKN_LOKASYON_TUM_YOL
-                        );
+                        setValue("tamLokasyonTanim", selectedData.MKN_LOKASYON_TUM_YOL);
                         setValue("makineDurumu", selectedData.MKN_DURUM);
-                        setValue(
-                          "makineDurumuID",
-                          selectedData.MKN_DURUM_KOD_ID
-                        );
-                        setValue(
-                          "garantiBitis",
-                          formatDate(selectedData.MKN_GARANTI_BITIS)
-                        );
+                        setValue("makineDurumuID", selectedData.MKN_DURUM_KOD_ID);
+                        setValue("garantiBitis", formatDate(selectedData.MKN_GARANTI_BITIS));
                       }}
                     />
                     <Button onClick={handleMakineMinusClick}> - </Button>
@@ -864,11 +773,7 @@ export default function MainTabs({
                     )}
                   />
                 </div>
-                {errors.makine && (
-                  <div style={{ color: "red", marginTop: "5px" }}>
-                    {errors.makine.message}
-                  </div>
-                )}
+                {errors.makine && <div style={{ color: "red", marginTop: "5px" }}>{errors.makine.message}</div>}
               </div>
             </StyledDivBottomLine>
           </div>
@@ -925,9 +830,7 @@ export default function MainTabs({
                       name="garantiBitis"
                       control={control}
                       rules={{
-                        required: fieldRequirements.garantiBitis
-                          ? "Alan Boş Bırakılamaz!"
-                          : false,
+                        required: fieldRequirements.garantiBitis ? "Alan Boş Bırakılamaz!" : false,
                       }}
                       render={({ field }) => (
                         <Input
@@ -944,20 +847,13 @@ export default function MainTabs({
                     style={{
                       fontSize: "14px",
                       width: "300px",
-                      color:
-                        garantiDurumu === "Garanti süresi doldu."
-                          ? "red"
-                          : "green",
+                      color: garantiDurumu === "Garanti süresi doldu." ? "red" : "green",
                     }}
                   >
                     {garantiDurumu}
                   </Text>
                 </div>
-                {errors.garantiBitis && (
-                  <div style={{ color: "red", marginTop: "5px" }}>
-                    {errors.garantiBitis.message}
-                  </div>
-                )}
+                {errors.garantiBitis && <div style={{ color: "red", marginTop: "5px" }}>{errors.garantiBitis.message}</div>}
               </div>
             </StyledDivBottomLine>
           </div>
@@ -1007,9 +903,7 @@ export default function MainTabs({
                       name="ekipman"
                       control={control}
                       rules={{
-                        required: fieldRequirements.ekipman
-                          ? "Alan Boş Bırakılamaz!"
-                          : false,
+                        required: fieldRequirements.ekipman ? "Alan Boş Bırakılamaz!" : false,
                       }}
                       render={({ field }) => (
                         <Input
@@ -1054,11 +948,7 @@ export default function MainTabs({
                     )}
                   />
                 </div>
-                {errors.ekipman && (
-                  <div style={{ color: "red", marginTop: "5px" }}>
-                    {errors.ekipman.message}
-                  </div>
-                )}
+                {errors.ekipman && <div style={{ color: "red", marginTop: "5px" }}>{errors.ekipman.message}</div>}
               </div>
             </StyledDivBottomLine>
           </div>
@@ -1136,9 +1026,7 @@ export default function MainTabs({
                     name="sayac"
                     control={control}
                     rules={{
-                      required: fieldRequirements.sayac
-                        ? "Alan Boş Bırakılamaz!"
-                        : false,
+                      required: fieldRequirements.sayac ? "Alan Boş Bırakılamaz!" : false,
                     }}
                     render={({ field }) => (
                       <Input
@@ -1151,11 +1039,7 @@ export default function MainTabs({
                   />
                 </div>
 
-                {errors.sayac && (
-                  <div style={{ color: "red", marginTop: "5px" }}>
-                    {errors.sayac.message}
-                  </div>
-                )}
+                {errors.sayac && <div style={{ color: "red", marginTop: "5px" }}>{errors.sayac.message}</div>}
               </div>
             </StyledDivBottomLine>
           </div>

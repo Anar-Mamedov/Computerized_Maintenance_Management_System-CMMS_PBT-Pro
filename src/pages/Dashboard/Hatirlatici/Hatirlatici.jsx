@@ -7,9 +7,11 @@ const StyledCollapse = styled(Collapse)`
   .ant-collapse-content-box {
     padding: 0px 10px !important;
   }
+
   .ant-collapse-header {
     padding: 5px 10px !important;
   }
+
   .ant-collapse-header-text {
     color: #0239de !important;
   }

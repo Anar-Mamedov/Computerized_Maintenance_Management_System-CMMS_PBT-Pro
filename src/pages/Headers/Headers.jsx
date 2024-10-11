@@ -1,13 +1,17 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { message } from "antd";
 import Kullanici from "./components/Kullanici";
 import Bildirim from "./components/Bildirim";
 import FirmaLogo from "./components/FirmaLogo.jsx";
-import Hatirlatici from "./components/Hatırlatıcı.jsx";
+import Hatirlatici from "./components/Hatirlatici.jsx";
 import AxiosInstance from "../../api/http.jsx";
 import SearchComponent from "./components/SearchComponent.jsx";
 
 export default function Header() {
+  const [hatirlaticiData, setHatirlaticiData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+
   useEffect(() => {
     const checkInternetConnection = () => {
       if (!navigator.onLine) {
@@ -52,6 +56,22 @@ export default function Header() {
     }
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const response = await AxiosInstance.get("PbakimYaklasanSureSayi");
+        setHatirlaticiData(response);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [open]);
+
   return (
     <div
       style={{
@@ -75,7 +95,7 @@ export default function Header() {
         }}
       >
         <SearchComponent />
-        <Hatirlatici />
+        <Hatirlatici hatirlaticiData={hatirlaticiData} loading={loading} open={open} setOpen={setOpen} />
         <Bildirim />
         <Kullanici />
       </div>
