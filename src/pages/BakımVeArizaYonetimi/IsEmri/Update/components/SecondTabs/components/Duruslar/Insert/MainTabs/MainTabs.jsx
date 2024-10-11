@@ -424,7 +424,8 @@ export default function MainTabs() {
               <Controller
                 name="bitisSaati"
                 control={control}
-                render={({ field }) => <TimePicker {...field} style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />}
+                render={({ field }) => <TimePicker {...field} changeOnScroll
+                                                   needConfirm={false} style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />}
               />
             </div>
           </div>

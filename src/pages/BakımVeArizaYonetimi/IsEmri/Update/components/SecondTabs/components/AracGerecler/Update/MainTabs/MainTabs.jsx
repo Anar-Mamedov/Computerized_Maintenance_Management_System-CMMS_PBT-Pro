@@ -473,6 +473,8 @@ export default function MainTabs() {
               render={({ field }) => (
                 <TimePicker
                   {...field}
+                  changeOnScroll
+                  needConfirm={false}
                   disabled={!yapildi}
                   style={{ width: "110px" }}
                   format={localeTimeFormat}
@@ -535,6 +537,8 @@ export default function MainTabs() {
                 render={({ field }) => (
                   <TimePicker
                     {...field}
+                    changeOnScroll
+                    needConfirm={false}
                     disabled={!yapildi}
                     style={{ width: "110px" }}
                     format={localeTimeFormat}
