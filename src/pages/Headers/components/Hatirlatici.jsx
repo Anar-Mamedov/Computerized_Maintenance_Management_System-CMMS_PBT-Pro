@@ -133,7 +133,7 @@ export default function HatirlaticiPopover({ hatirlaticiData, loading, open, set
               items={[
                 {
                   key: "1",
-                  label: "Dökuman Yönetimi",
+                  label: "Doküman Yönetimi",
                   // children: <FirmaVeSozlesme />,
                 },
               ]}
