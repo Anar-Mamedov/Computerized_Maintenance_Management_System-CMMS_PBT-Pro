@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Button, Collapse, Popover, Badge, Spin, Modal } from "antd";
+import { BellOutlined } from "@ant-design/icons";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import styled from "styled-components";
+import YaklasanPeriyodikBakimlar from "./Tables/YaklasanPeriyodikBakimlar/PeryodikBakimlar.jsx";
 
 const StyledCollapse = styled(Collapse)`
   .ant-collapse-content-box {
@@ -43,6 +45,7 @@ export default function HatirlaticiPopover({ hatirlaticiData, loading, open, set
     setModalTitle(title);
     setModalContent(contentComponent);
     setIsModalOpen(true);
+    setOpen(false);
   };
 
   const handleModalClose = () => {
@@ -95,6 +98,7 @@ export default function HatirlaticiPopover({ hatirlaticiData, loading, open, set
                 {
                   key: "1",
                   label: "Ajanda",
+                  // children: <div>Ajanda</div>,
                 },
               ]}
             />
@@ -106,53 +110,120 @@ export default function HatirlaticiPopover({ hatirlaticiData, loading, open, set
                 {
                   key: "1",
                   label: "Bakım Yönetimi",
+                  // children: <FirmaVeSozlesme />,
                   children: (
                     <div>
-                      {/* First Item */}
                       <div
                         style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center", cursor: "pointer" }}
-                        onClick={() => handleItemClick("Yaklaşan Periyodik Bakımlar", <YaklasanPeriyodikBakimlarComponent />)}
+                        onClick={() => handleItemClick("Yaklaşan Periyodik Bakımlar", <YaklasanPeriyodikBakimlar />)}
                       >
                         <div>Yaklaşan Periyodik Bakımlar</div>
+                        {/*{hatirlaticiData?.TotalYaklasanSure}*/}
                         <Badge size="small" color="blue" count={hatirlaticiData?.TotalYaklasanSure} showZero={false} />
-                      </div>
-                      {/* Second Item */}
-                      <div
-                        style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center", cursor: "pointer" }}
-                        onClick={() => handleItemClick("Anar", <AnarComponent />)}
-                      >
-                        <div>Anar</div>
-                        <Badge size="small" color="blue" count={hatirlaticiData?.TotalYaklasanSure} showZero={false} />
-                      </div>
-                      {/* Add more items as needed */}
-                      {/* Example of adding another item */}
-                      <div
-                        style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center", cursor: "pointer" }}
-                        onClick={() => handleItemClick("Another Item", <AnotherComponent />)}
-                      >
-                        <div>Another Item</div>
-                        <Badge size="small" color="blue" count={someOtherData} showZero={false} />
                       </div>
                     </div>
                   ),
                 },
               ]}
             />
-            {/* Add other StyledCollapse components here, following the same pattern */}
+            <StyledCollapse
+              size="small"
+              collapsible="header"
+              defaultActiveKey={["1"]}
+              items={[
+                {
+                  key: "1",
+                  label: "Dökuman Yönetimi",
+                  // children: <FirmaVeSozlesme />,
+                },
+              ]}
+            />
+            <StyledCollapse
+              size="small"
+              collapsible="header"
+              defaultActiveKey={["1"]}
+              items={[
+                {
+                  key: "1",
+                  label: "Firma ve Sözleşme Yöntemi",
+                  // children: <FirmaVeSozlesme />,
+                },
+              ]}
+            />
+            <StyledCollapse
+              size="small"
+              collapsible="header"
+              defaultActiveKey={["1"]}
+              items={[
+                {
+                  key: "1",
+                  label: "Makine ve Ekipman Yönetimi",
+                  // children: <FirmaVeSozlesme />,
+                },
+              ]}
+            />
+            <StyledCollapse
+              size="small"
+              collapsible="header"
+              defaultActiveKey={["1"]}
+              items={[
+                {
+                  key: "1",
+                  label: "Malzeme ve Depo Yönetimi",
+                  // children: <FirmaVeSozlesme />,
+                },
+              ]}
+            />
+            <StyledCollapse
+              size="small"
+              collapsible="header"
+              defaultActiveKey={["1"]}
+              items={[
+                {
+                  key: "1",
+                  label: "Proje Yönetimi",
+                  // children: <FirmaVeSozlesme />,
+                },
+              ]}
+            />
+            <StyledCollapse
+              size="small"
+              collapsible="header"
+              defaultActiveKey={["1"]}
+              items={[
+                {
+                  key: "1",
+                  label: "Satınalma Yönetimi",
+                  // children: <FirmaVeSozlesme />,
+                },
+              ]}
+            />
+            <StyledCollapse
+              size="small"
+              collapsible="header"
+              defaultActiveKey={["1"]}
+              items={[
+                {
+                  key: "1",
+                  label: "Transfer Onayları",
+                  // children: <FirmaVeSozlesme />,
+                },
+              ]}
+            />
           </>
         )}
       </div>
     </div>
   );
-
   return (
     <>
       <Popover content={content} trigger="click" open={open} onOpenChange={handleOpenChange}>
         <Badge size="small" count={hatirlaticiDataCount}>
+          {/*<Button type="succes" shape="circle" icon={<FaRegCalendarAlt style={{ fontSize: "22px" }} />}></Button>*/}
           {loading ? <Spin /> : <FaRegCalendarAlt style={{ fontSize: "22px" }} />}
         </Badge>
       </Popover>
-      <Modal title={modalTitle} open={isModalOpen} onCancel={handleModalClose} footer={null}>
+      <Modal title={modalTitle} open={isModalOpen} width={1300} onCancel={handleModalClose} footer={null}>
         {modalContent}
       </Modal>
     </>

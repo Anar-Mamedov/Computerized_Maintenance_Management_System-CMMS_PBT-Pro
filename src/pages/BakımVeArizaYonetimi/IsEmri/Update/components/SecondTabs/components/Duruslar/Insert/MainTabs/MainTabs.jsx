@@ -69,9 +69,7 @@ export default function MainTabs() {
     {
       key: "1",
       label: "Açıklama",
-      children: (
-        <Controller name="aciklama" control={control} render={({ field }) => <TextArea {...field} rows={4} />} />
-      ),
+      children: <Controller name="aciklama" control={control} render={({ field }) => <TextArea {...field} rows={4} />} />,
     },
   ];
 
@@ -204,7 +202,8 @@ export default function MainTabs() {
           gap: "10px",
           rowGap: "0px",
           marginBottom: "10px",
-        }}>
+        }}
+      >
         <Text style={{ fontSize: "14px", fontWeight: "600" }}>Makine Tanımı:</Text>
         <div
           style={{
@@ -215,7 +214,8 @@ export default function MainTabs() {
             minWidth: "300px",
             gap: "10px",
             width: "100%",
-          }}>
+          }}
+        >
           <Controller
             name="makineTanimi"
             control={control}
@@ -251,7 +251,8 @@ export default function MainTabs() {
           gap: "10px",
           rowGap: "0px",
           marginBottom: "10px",
-        }}>
+        }}
+      >
         <Text style={{ fontSize: "14px" }}>Lokasyon:</Text>
         <div
           style={{
@@ -262,7 +263,8 @@ export default function MainTabs() {
             minWidth: "300px",
             gap: "10px",
             width: "100%",
-          }}>
+          }}
+        >
           <Controller
             name="lokasyon"
             control={control}
@@ -293,7 +295,8 @@ export default function MainTabs() {
             justifyContent: "space-between",
             width: "100%",
             maxWidth: "450px",
-          }}>
+          }}
+        >
           <Text style={{ fontSize: "14px" }}>Proje:</Text>
           <div
             style={{
@@ -302,7 +305,8 @@ export default function MainTabs() {
               alignItems: "center",
               justifyContent: "space-between",
               width: "300px",
-            }}>
+            }}
+          >
             <Controller
               name="proje"
               control={control}
@@ -345,7 +349,8 @@ export default function MainTabs() {
           width: "100%",
           maxWidth: "450px",
           marginBottom: "10px",
-        }}>
+        }}
+      >
         <Text style={{ fontSize: "14px", fontWeight: "600" }}>Duruş Nedeni:</Text>
         <DurusNedeniSelect />
       </div>
@@ -361,7 +366,8 @@ export default function MainTabs() {
               width: "100%",
               justifyContent: "space-between",
               marginBottom: "10px",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px" }}>Başlangıç Zamanı:</Text>
             <div
               style={{
@@ -372,30 +378,17 @@ export default function MainTabs() {
                 minWidth: "300px",
                 gap: "10px",
                 width: "100%",
-              }}>
+              }}
+            >
               <Controller
                 name="baslangicTarihi"
                 control={control}
-                render={({ field }) => (
-                  <DatePicker
-                    {...field}
-                    style={{ width: "180px" }}
-                    format={localeDateFormat}
-                    placeholder="Tarih seçiniz"
-                  />
-                )}
+                render={({ field }) => <DatePicker {...field} style={{ width: "180px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />}
               />
               <Controller
                 name="baslangicSaati"
                 control={control}
-                render={({ field }) => (
-                  <TimePicker
-                    {...field}
-                    style={{ width: "110px" }}
-                    format={localeTimeFormat}
-                    placeholder="Saat seçiniz"
-                  />
-                )}
+                render={({ field }) => <TimePicker {...field} changeOnScroll needConfirm={false} style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />}
               />
             </div>
           </div>
@@ -409,7 +402,8 @@ export default function MainTabs() {
               width: "100%",
               justifyContent: "space-between",
               marginBottom: "10px",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px" }}>Bitiş Zamanı:</Text>
             <div
               style={{
@@ -420,30 +414,17 @@ export default function MainTabs() {
                 minWidth: "300px",
                 gap: "10px",
                 width: "100%",
-              }}>
+              }}
+            >
               <Controller
                 name="bitisTarihi"
                 control={control}
-                render={({ field }) => (
-                  <DatePicker
-                    {...field}
-                    style={{ width: "180px" }}
-                    format={localeDateFormat}
-                    placeholder="Tarih seçiniz"
-                  />
-                )}
+                render={({ field }) => <DatePicker {...field} style={{ width: "180px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />}
               />
               <Controller
                 name="bitisSaati"
                 control={control}
-                render={({ field }) => (
-                  <TimePicker
-                    {...field}
-                    style={{ width: "110px" }}
-                    format={localeTimeFormat}
-                    placeholder="Saat seçiniz"
-                  />
-                )}
+                render={({ field }) => <TimePicker {...field} style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />}
               />
             </div>
           </div>
@@ -455,13 +436,10 @@ export default function MainTabs() {
               width: "100%",
               maxWidth: "435px",
               justifyContent: "space-between",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px" }}>Duruş Süresi (dk):</Text>
-            <Controller
-              name="sure"
-              control={control}
-              render={({ field }) => <InputNumber {...field} min={0} style={{ width: "300px" }} />}
-            />
+            <Controller name="sure" control={control} render={({ field }) => <InputNumber {...field} min={0} style={{ width: "300px" }} />} />
           </div>
         </div>
         <div style={{ border: "1px solid #ececec", padding: "15px", marginBottom: "10px", maxWidth: "350px" }}>
@@ -474,13 +452,10 @@ export default function MainTabs() {
               maxWidth: "435px",
               justifyContent: "space-between",
               marginBottom: "10px",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px" }}>Duruş Maliyeti (Saat):</Text>
-            <Controller
-              name="DurusMaliyeti"
-              control={control}
-              render={({ field }) => <InputNumber {...field} min={0} style={{ width: "130px" }} />}
-            />
+            <Controller name="DurusMaliyeti" control={control} render={({ field }) => <InputNumber {...field} min={0} style={{ width: "130px" }} />} />
           </div>
           <div
             style={{
@@ -490,13 +465,10 @@ export default function MainTabs() {
               width: "100%",
               maxWidth: "435px",
               justifyContent: "space-between",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px" }}>Toplam Maliyet:</Text>
-            <Controller
-              name="toplamMaliyet"
-              control={control}
-              render={({ field }) => <InputNumber {...field} min={0} style={{ width: "130px" }} />}
-            />
+            <Controller name="toplamMaliyet" control={control} render={({ field }) => <InputNumber {...field} min={0} style={{ width: "130px" }} />} />
           </div>
         </div>
       </div>
