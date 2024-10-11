@@ -220,7 +220,7 @@ export default function HatirlaticiPopover({ hatirlaticiData, loading, open, set
       <Popover content={content} trigger="click" open={open} onOpenChange={handleOpenChange}>
         <Badge size="small" count={hatirlaticiDataCount}>
           {/*<Button type="succes" shape="circle" icon={<FaRegCalendarAlt style={{ fontSize: "22px" }} />}></Button>*/}
-          {loading ? <Spin /> : <FaRegCalendarAlt style={{ fontSize: "22px" }} />}
+          {loading ? <Spin /> : <FaRegCalendarAlt style={{ fontSize: "22px", cursor: "pointer" }} />}
         </Badge>
       </Popover>
       <Modal title={modalTitle} open={isModalOpen} width={1300} onCancel={handleModalClose} footer={null}>
