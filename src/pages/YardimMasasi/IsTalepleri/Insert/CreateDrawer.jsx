@@ -12,6 +12,10 @@ import dayjs from "dayjs";
 export default function CreateDrawer({ onRefresh }) {
   const [open, setOpen] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
+  const [userData, setUserData] = useState(() => {
+    const savedUser = localStorage.getItem("user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
   // API'den gelen zorunluluk bilgilerini simüle eden bir örnek
   const [fieldRequirements, setFieldRequirements] = React.useState({
     // Varsayılan olarak zorunlu değil
@@ -58,14 +62,14 @@ export default function CreateDrawer({ onRefresh }) {
       talepSaati: "",
       kapanmaTarihi: "",
       kapanmaSaati: "",
-      talepteBulunan: "",
-      talepteBulunanID: "",
-      lokasyonTanim: "",
-      lokasyonID: "",
-      departman: null,
-      departmanID: "",
-      irtibatTelefonu: "",
-      email: "",
+      talepteBulunan: userData?.kullaniciName ?? "",
+      talepteBulunanID: userData?.kullaniciID ?? "",
+      lokasyonTanim: userData?.kullaniciLokasyon ?? "",
+      lokasyonID: userData?.kullaniciLokasyonID ?? "",
+      departman: userData?.kullaniciDepartman ?? null,
+      departmanID: userData?.kullaniciDepartmanID ?? "",
+      irtibatTelefonu: userData?.kullaniciTelefon ?? "",
+      email: userData?.kullaniciEmail ?? "",
       iletisimSekli: null,
       iletisimSekliID: "",
       talepTipi: null,
