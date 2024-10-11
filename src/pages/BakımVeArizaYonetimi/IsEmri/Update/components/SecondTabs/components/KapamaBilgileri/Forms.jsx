@@ -225,6 +225,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                 render={({ field, fieldState: { error } }) => (
                   <TimePicker
                     {...field}
+                    changeOnScroll
+                    needConfirm={false}
                     status={errors.kapamaBaslamaSaati ? "error" : ""}
                     // disabled={!isDisabled}
                     style={{ width: "110px" }}
@@ -288,6 +290,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                 render={({ field, fieldState: { error } }) => (
                   <TimePicker
                     {...field}
+                    changeOnScroll
+                    needConfirm={false}
                     status={errors.kapamaBitisSaati ? "error" : ""}
                     // disabled={!isDisabled}
                     style={{ width: "110px" }}
@@ -434,6 +438,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                 render={({ field, fieldState: { error } }) => (
                   <TimePicker
                     {...field}
+                    changeOnScroll
+                    needConfirm={false}
                     status={errors.kapatmaSaati ? "error" : ""}
                     style={{ width: "110px" }}
                     format={localeTimeFormat}

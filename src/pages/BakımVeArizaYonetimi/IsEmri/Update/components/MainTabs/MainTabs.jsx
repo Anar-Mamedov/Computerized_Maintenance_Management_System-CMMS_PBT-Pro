@@ -446,6 +446,8 @@ export default function MainTabs({
                 render={({ field, fieldState: { error } }) => (
                   <TimePicker
                     {...field}
+                    changeOnScroll
+                    needConfirm={false}
                     // status={errors.duzenlenmeSaati ? "error" : ""}
                     status={error ? "error" : ""}
                     // disabled={!isDisabled}

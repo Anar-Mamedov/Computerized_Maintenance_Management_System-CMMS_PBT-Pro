@@ -879,6 +879,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     render={({ field, fieldState: { error } }) => (
                       <TimePicker
                         {...field}
+                        changeOnScroll
+                        needConfirm={false}
                         status={errors.isTalebiSaati ? "error" : ""}
                         // disabled={!isDisabled}
                         disabled
@@ -1276,6 +1278,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   render={({ field, fieldState: { error } }) => (
                     <TimePicker
                       {...field}
+                      changeOnScroll
+                      needConfirm={false}
                       status={errors.planlananBaslama ? "error" : ""}
                       // disabled={!isDisabled}
                       style={{ width: "110px" }}
@@ -1343,6 +1347,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   render={({ field, fieldState: { error } }) => (
                     <TimePicker
                       {...field}
+                      changeOnScroll
+                      needConfirm={false}
                       status={errors.planlananBitis ? "error" : ""}
                       // disabled={!isDisabled}
                       style={{ width: "110px" }}
@@ -1410,6 +1416,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   render={({ field, fieldState: { error } }) => (
                     <TimePicker
                       {...field}
+                      changeOnScroll
+                      needConfirm={false}
                       status={errors.baslamaZamaniSaati ? "error" : ""}
                       // disabled={!isDisabled}
                       style={{ width: "110px" }}
@@ -1477,6 +1485,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   render={({ field, fieldState: { error } }) => (
                     <TimePicker
                       {...field}
+                      changeOnScroll
+                      needConfirm={false}
                       status={errors.bitisZamaniSaati ? "error" : ""}
                       // disabled={!isDisabled}
                       style={{ width: "110px" }}

@@ -391,6 +391,8 @@ export default function MainTabs() {
                 render={({ field }) => (
                   <TimePicker
                     {...field}
+                    changeOnScroll
+                    needConfirm={false}
                     style={{ width: "110px" }}
                     format={localeTimeFormat}
                     placeholder="Saat seçiniz"
@@ -439,6 +441,8 @@ export default function MainTabs() {
                 render={({ field }) => (
                   <TimePicker
                     {...field}
+                    changeOnScroll
+                    needConfirm={false}
                     style={{ width: "110px" }}
                     format={localeTimeFormat}
                     placeholder="Saat seçiniz"
