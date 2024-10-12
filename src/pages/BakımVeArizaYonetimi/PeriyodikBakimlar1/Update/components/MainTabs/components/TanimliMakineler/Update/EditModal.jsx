@@ -102,8 +102,6 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
     }
   }, [selectedRow, isModalVisible, setValue]);
 
-  console.log("selectedRow", selectedRow);
-
   useEffect(() => {
     if (!isModalVisible) {
       reset();
