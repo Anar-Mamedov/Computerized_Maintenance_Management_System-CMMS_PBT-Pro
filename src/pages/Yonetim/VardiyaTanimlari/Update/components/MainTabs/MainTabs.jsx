@@ -147,12 +147,14 @@ export default function MainTabs() {
           <Controller
             name="vardiyaBaslangicSaati"
             control={control}
-            render={({ field }) => <TimePicker {...field} style={{ width: "145px" }} format="HH:mm" />}
+            render={({ field }) => <TimePicker {...field}
+                                               changeOnScroll needConfirm={false} style={{ width: "145px" }} format="HH:mm" />}
           />
           <Controller
             name="vardiyaBitisSaati"
             control={control}
-            render={({ field }) => <TimePicker {...field} style={{ width: "145px" }} format="HH:mm" />}
+            render={({ field }) => <TimePicker {...field}
+                                               changeOnScroll needConfirm={false} style={{ width: "145px" }} format="HH:mm" />}
           />
         </div>
       </div>

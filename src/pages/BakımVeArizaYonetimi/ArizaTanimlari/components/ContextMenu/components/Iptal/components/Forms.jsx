@@ -155,6 +155,7 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
             render={({ field }) => (
               <TimePicker
                 {...field}
+                changeOnScroll needConfirm={false}
                 style={{ width: "110px" }}
                 disabled
                 format={localeTimeFormat}

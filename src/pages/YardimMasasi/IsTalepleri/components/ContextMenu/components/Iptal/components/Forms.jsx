@@ -124,7 +124,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
           width: "100%",
           justifyContent: "space-between",
           marginBottom: "10px",
-        }}>
+        }}
+      >
         <Text style={{ fontSize: "14px" }}>İptal Tarihi:</Text>
         <div
           style={{
@@ -135,31 +136,18 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
             minWidth: "300px",
             gap: "10px",
             width: "100%",
-          }}>
+          }}
+        >
           <Controller
             name="iptalTarihi"
             control={control}
-            render={({ field }) => (
-              <DatePicker
-                {...field}
-                style={{ width: "180px" }}
-                disabled
-                format={localeDateFormat}
-                placeholder="Tarih seçiniz"
-              />
-            )}
+            render={({ field }) => <DatePicker {...field} style={{ width: "180px" }} disabled format={localeDateFormat} placeholder="Tarih seçiniz" />}
           />
           <Controller
             name="iptalSaati"
             control={control}
             render={({ field }) => (
-              <TimePicker
-                {...field}
-                style={{ width: "110px" }}
-                disabled
-                format={localeTimeFormat}
-                placeholder="Saat seçiniz"
-              />
+              <TimePicker {...field} changeOnScroll needConfirm={false} style={{ width: "110px" }} disabled format={localeTimeFormat} placeholder="Saat seçiniz" />
             )}
           />
         </div>
@@ -169,14 +157,7 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
         <Controller
           name="iptalNeden"
           control={control}
-          render={({ field }) => (
-            <TextArea
-              {...field}
-              style={{ width: "100%", maxWidth: "350px" }}
-              rows={4}
-              placeholder="İptal Nedeni Ekle"
-            />
-          )}
+          render={({ field }) => <TextArea {...field} style={{ width: "100%", maxWidth: "350px" }} rows={4} placeholder="İptal Nedeni Ekle" />}
         />
       </div>
     </div>

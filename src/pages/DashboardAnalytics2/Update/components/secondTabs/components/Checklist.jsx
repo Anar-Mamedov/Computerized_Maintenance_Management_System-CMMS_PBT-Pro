@@ -78,7 +78,8 @@ export default function Checklist() {
                   }}>
                   <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
                     <DatePicker disabled={isDisabled} onChange={onChange} />
-                    <TimePicker disabled={isDisabled} format="HH:mm" placeholder="saat seçiniz" />
+                    <TimePicker disabled={isDisabled}
+                                changeOnScroll needConfirm={false} format="HH:mm" placeholder="saat seçiniz" />
                   </div>
                   <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
                     <Text>Vardiya</Text>
@@ -122,7 +123,8 @@ export default function Checklist() {
                   }}>
                   <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
                     <DatePicker disabled={isDisabled} onChange={onChange} />
-                    <TimePicker disabled={isDisabled} format="HH:mm" placeholder="saat seçiniz" />
+                    <TimePicker disabled={isDisabled}
+                                changeOnScroll needConfirm={false} format="HH:mm" placeholder="saat seçiniz" />
                   </div>
                   <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
                     <Text>Süre(dk)</Text>

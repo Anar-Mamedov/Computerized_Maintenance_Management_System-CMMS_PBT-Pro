@@ -193,6 +193,7 @@ export default function PlanlamaVeIsEmri({ disabled, fieldRequirements }) {
                   render={({ field }) => (
                     <TimePicker
                       {...field}
+                      changeOnScroll needConfirm={false}
                       status={errors.planlananBaslamaTarihi ? "error" : ""}
                       disabled={disabled}
                       style={{ width: "110px" }}
@@ -258,6 +259,7 @@ export default function PlanlamaVeIsEmri({ disabled, fieldRequirements }) {
                   render={({ field }) => (
                     <TimePicker
                       {...field}
+                      changeOnScroll needConfirm={false}
                       status={errors.planlananBitisTarihi ? "error" : ""}
                       disabled={disabled}
                       style={{ width: "110px" }}
@@ -366,7 +368,8 @@ export default function PlanlamaVeIsEmri({ disabled, fieldRequirements }) {
                 <Controller
                   name="baslamaSaati"
                   control={control}
-                  render={({ field }) => <TimePicker {...field} disabled style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />}
+                  render={({ field }) => <TimePicker {...field}
+                                                     changeOnScroll needConfirm={false} disabled style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />}
                 />
               </div>
             </div>
@@ -402,7 +405,8 @@ export default function PlanlamaVeIsEmri({ disabled, fieldRequirements }) {
                 <Controller
                   name="bitisSaati"
                   control={control}
-                  render={({ field }) => <TimePicker {...field} disabled style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />}
+                  render={({ field }) => <TimePicker {...field}
+                                                     changeOnScroll needConfirm={false} disabled style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />}
                 />
               </div>
             </div>

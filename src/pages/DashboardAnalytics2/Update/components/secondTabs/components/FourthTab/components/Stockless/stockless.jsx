@@ -173,7 +173,8 @@ export default function Stockless() {
             <Controller
               name="time"
               control={control}
-              render={({ field }) => <TimePicker {...field} format="HH:mm" onChange={(time) => field.onChange(time)} />}
+              render={({ field }) => <TimePicker {...field}
+                                                 changeOnScroll needConfirm={false} format="HH:mm" onChange={(time) => field.onChange(time)} />}
             />
           </div>
         </div>

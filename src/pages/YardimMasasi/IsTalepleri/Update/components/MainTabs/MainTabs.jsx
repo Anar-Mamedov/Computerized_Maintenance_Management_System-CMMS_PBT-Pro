@@ -285,6 +285,7 @@ export default function MainTabs({
                 render={({ field, fieldState: { error } }) => (
                   <TimePicker
                     {...field}
+                    changeOnScroll needConfirm={false}
                     disabled={disabled}
                     status={error ? "error" : ""}
                     style={{ width: "110px" }}
@@ -340,6 +341,7 @@ export default function MainTabs({
                 render={({ field }) => (
                   <TimePicker
                     {...field}
+                    changeOnScroll needConfirm={false}
                     disabled
                     style={{ width: "110px" }}
                     format={localeTimeFormat}

@@ -431,7 +431,8 @@ export default function RequisiteTable() {
                       <Controller
                         name="startTime"
                         control={control}
-                        render={({ field }) => <TimePicker {...field} disabled={!isDoneChecked} format="HH:mm" />}
+                        render={({ field }) => <TimePicker {...field}
+                                                           changeOnScroll needConfirm={false} disabled={!isDoneChecked} format="HH:mm" />}
                       />
                     </div>
                   </div>
@@ -455,7 +456,8 @@ export default function RequisiteTable() {
                       <Controller
                         name="endTime"
                         control={control}
-                        render={({ field }) => <TimePicker {...field} disabled={!isDoneChecked} format="HH:mm" />}
+                        render={({ field }) => <TimePicker {...field}
+                                                           changeOnScroll needConfirm={false} disabled={!isDoneChecked} format="HH:mm" />}
                       />
                     </div>
                     <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
