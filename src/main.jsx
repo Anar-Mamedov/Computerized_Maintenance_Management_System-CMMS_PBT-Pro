@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import { ConfigProvider } from "antd";
 import trTR from "antd/es/locale/tr_TR";
@@ -9,40 +9,52 @@ import dayjs from "dayjs";
 import AxiosInstance from "./api/http.jsx";
 import "./index.css";
 
-// App bileşenini lazy load ile yükleyin
-const App = React.lazy(() => import("./App.jsx"));
+// App component
+// const App = React.lazy(() => import("./App.jsx"));
+import App from "./App.jsx";
 
-// Uygulamanın devre dışı olduğu durumu gösteren bileşen
+// Component to show when the app is disabled
 const AppDisabledComponent = () => <div style={{ textAlign: "center", marginTop: "20%" }}></div>;
 const AppDisabled = React.memo(AppDisabledComponent);
 
-// Ana bileşen
+// Main component
 const MainComponent = () => {
   const baseURL = localStorage.getItem("baseURL");
   return baseURL ? <MainComponent1 /> : <Main />;
 };
 
-// Ana uygulama bileşeni
+// Main application component
 const MainComponent1 = React.memo(function MainComponent1() {
   const [disableDate, setDisableDate] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchDisableDate = async () => {
-      try {
-        const response = await AxiosInstance.get("GetEndDate");
-        const data = response;
-        if (data && data.length > 0) {
-          setDisableDate(dayjs(data[0].ISL_DONEM_BITIS).format("YYYY-MM-DD"));
+  const fetchDisableDate = async () => {
+    try {
+      const data = await AxiosInstance.get("GetEndDate");
+      if (data && data.length > 0) {
+        const endDate = data[0].ISL_DONEM_BITIS;
+        if (endDate) {
+          setDisableDate(dayjs(endDate).format("YYYY-MM-DD"));
         } else {
-          console.error("API responsunda beklenen veri bulunamadı.");
+          // ISL_DONEM_BITIS is null, treat as expired
+          setDisableDate(null);
         }
-      } catch (error) {
-        console.error("API çağrısında hata oluştu:", error);
-      } finally {
-        setLoading(false);
+      } else {
+        console.error("API responsunda beklenen veri bulunamadı.");
+        // Treat as expired if data is not as expected
+        setDisableDate(null);
       }
-    };
+    } catch (error) {
+      console.error("API çağrısında hata oluştu:", error);
+      // Optionally, you can decide how to handle API errors
+      // For example, you might set disableDate to null to disable the app
+      setDisableDate(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchDisableDate();
   }, []);
 
@@ -50,16 +62,14 @@ const MainComponent1 = React.memo(function MainComponent1() {
     return <div style={{ textAlign: "center", marginTop: "20%", fontSize: "18px" }}>Yükleniyor...</div>;
   }
 
-  const currentDate = dayjs();
-
-  if (disableDate && currentDate.isAfter(disableDate)) {
+  if (!disableDate || dayjs().isAfter(disableDate, "day")) {
     return <AppDisabled />;
   }
 
   return <Main />;
 });
 
-// Main bileşeni
+// Main component
 const Main = React.memo(function Main() {
   return (
     <React.StrictMode>
@@ -82,5 +92,5 @@ const Main = React.memo(function Main() {
   );
 });
 
-// Uygulamayı render et
+// Render the application
 ReactDOM.createRoot(document.getElementById("root")).render(<MainComponent />);

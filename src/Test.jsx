@@ -1,160 +1,95 @@
-import React, { useEffect, useState } from "react";
-import { Button, Collapse, Popover, Badge, Spin, Modal } from "antd";
-import { FaRegCalendarAlt } from "react-icons/fa";
-import styled from "styled-components";
+import React, { Suspense, useEffect, useState } from "react";
+import ReactDOM from "react-dom/client";
+import { ConfigProvider } from "antd";
+import trTR from "antd/es/locale/tr_TR";
+import { BrowserRouter as Router } from "react-router-dom";
+import { AppProvider } from "./AppContext.jsx";
+import { RecoilRoot } from "recoil";
+import dayjs from "dayjs";
+import AxiosInstance from "./api/http.jsx";
+import "./index.css";
 
-const StyledCollapse = styled(Collapse)`
-  .ant-collapse-content-box {
-    padding: 0px 10px !important;
-  }
+// App component
+import App from "./App.jsx";
 
-  .ant-collapse-header {
-    padding: 5px 10px !important;
-  }
+// Component to show when the app is disabled
+const AppDisabledComponent = () => <div style={{ textAlign: "center", marginTop: "20%" }}>Lisans süresi doldu.</div>;
+const AppDisabled = React.memo(AppDisabledComponent);
 
-  .ant-collapse-header-text {
-    color: #0239de !important;
-  }
-`;
+// Main component
+const MainComponent = () => {
+  const baseURL = localStorage.getItem("baseURL");
+  return baseURL ? <MainComponent1 /> : <Main />;
+};
 
-export default function HatirlaticiPopover({ hatirlaticiData, loading, open, setOpen }) {
-  const [hatirlaticiDataCount, setHatirlaticiDataCount] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalTitle, setModalTitle] = useState("");
-  const [modalContent, setModalContent] = useState(null);
+// Main application component
+const MainComponent1 = React.memo(function MainComponent1() {
+  const [disableDate, setDisableDate] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchDisableDate = async () => {
+    try {
+      const data = await AxiosInstance.get("GetEndDate");
+      if (data && data.length > 0) {
+        const endDate = data[0].ISL_DONEM_BITIS;
+        if (endDate) {
+          setDisableDate(dayjs(endDate).format("YYYY-MM-DD"));
+        } else {
+          // ISL_DONEM_BITIS is null, treat as expired
+          setDisableDate(null);
+        }
+      } else {
+        console.error("API responsunda beklenen veri bulunamadı.");
+        // Treat as expired if data is not as expected
+        setDisableDate(null);
+      }
+    } catch (error) {
+      console.error("API çağrısında hata oluştu:", error);
+      // Optionally, you can decide how to handle API errors
+      // For example, you might set disableDate to null to disable the app
+      setDisableDate(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (hatirlaticiData) {
-      const total = Object.values(hatirlaticiData).reduce((acc, value) => {
-        if (typeof value === "number") {
-          return acc + value;
-        }
-        return acc;
-      }, 0);
-      setHatirlaticiDataCount(total);
-    }
-  }, [hatirlaticiData]);
+    fetchDisableDate();
+  }, []);
 
-  const handleOpenChange = (newOpen) => {
-    setOpen(newOpen);
-  };
+  if (loading) {
+    return <div style={{ textAlign: "center", marginTop: "20%", fontSize: "18px" }}>Yükleniyor...</div>;
+  }
 
-  const handleItemClick = (title, contentComponent) => {
-    setModalTitle(title);
-    setModalContent(contentComponent);
-    setIsModalOpen(true);
-  };
+  if (!disableDate || dayjs().isAfter(disableDate, "day")) {
+    return <AppDisabled />;
+  }
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
+  return <Main />;
+});
 
-  const content = (
-    <div
-      style={{
-        display: "flex",
-        maxHeight: "calc(100vh - 100px)",
-        maxWidth: "350px",
-        width: "100%",
-        flexDirection: "column",
-        gap: "5px",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#80808051",
-          borderRadius: "5px",
-          padding: "10px 0",
-        }}
-      >
-        Hatırlatıcı
-      </div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "5px",
-          overflow: "auto",
-          padding: "5px",
-        }}
-      >
-        {loading ? (
-          <div style={{ display: "flex", width: "250px", alignItems: "center", justifyContent: "center" }}>
-            <Spin />
-          </div>
-        ) : (
-          <>
-            <StyledCollapse
-              size="small"
-              collapsible="header"
-              defaultActiveKey={["1"]}
-              items={[
-                {
-                  key: "1",
-                  label: "Ajanda",
-                },
-              ]}
-            />
-            <StyledCollapse
-              size="small"
-              collapsible="header"
-              defaultActiveKey={["1"]}
-              items={[
-                {
-                  key: "1",
-                  label: "Bakım Yönetimi",
-                  children: (
-                    <div>
-                      {/* First Item */}
-                      <div
-                        style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center", cursor: "pointer" }}
-                        onClick={() => handleItemClick("Yaklaşan Periyodik Bakımlar", <YaklasanPeriyodikBakimlarComponent />)}
-                      >
-                        <div>Yaklaşan Periyodik Bakımlar</div>
-                        <Badge size="small" color="blue" count={hatirlaticiData?.TotalYaklasanSure} showZero={false} />
-                      </div>
-                      {/* Second Item */}
-                      <div
-                        style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center", cursor: "pointer" }}
-                        onClick={() => handleItemClick("Anar", <AnarComponent />)}
-                      >
-                        <div>Anar</div>
-                        <Badge size="small" color="blue" count={hatirlaticiData?.TotalYaklasanSure} showZero={false} />
-                      </div>
-                      {/* Add more items as needed */}
-                      {/* Example of adding another item */}
-                      <div
-                        style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center", cursor: "pointer" }}
-                        onClick={() => handleItemClick("Another Item", <AnotherComponent />)}
-                      >
-                        <div>Another Item</div>
-                        <Badge size="small" color="blue" count={someOtherData} showZero={false} />
-                      </div>
-                    </div>
-                  ),
-                },
-              ]}
-            />
-            {/* Add other StyledCollapse components here, following the same pattern */}
-          </>
-        )}
-      </div>
-    </div>
-  );
-
+// Main component
+const Main = React.memo(function Main() {
   return (
-    <>
-      <Popover content={content} trigger="click" open={open} onOpenChange={handleOpenChange}>
-        <Badge size="small" count={hatirlaticiDataCount}>
-          {loading ? <Spin /> : <FaRegCalendarAlt style={{ fontSize: "22px" }} />}
-        </Badge>
-      </Popover>
-      <Modal title={modalTitle} open={isModalOpen} onCancel={handleModalClose} footer={null}>
-        {modalContent}
-      </Modal>
-    </>
+    <React.StrictMode>
+      <ConfigProvider locale={trTR}>
+        <Router>
+          <AppProvider>
+            <RecoilRoot>
+              <Suspense
+                fallback={
+                  <div style={{ textAlign: "center", fontSize: "18px", display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>Yükleniyor...</div>
+                }
+              >
+                <App />
+              </Suspense>
+            </RecoilRoot>
+          </AppProvider>
+        </Router>
+      </ConfigProvider>
+    </React.StrictMode>
   );
-}
+});
+
+// Render the application
+ReactDOM.createRoot(document.getElementById("root")).render(<MainComponent />);
