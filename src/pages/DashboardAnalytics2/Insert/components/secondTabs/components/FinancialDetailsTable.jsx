@@ -255,7 +255,8 @@ const FinancialDetailsTable = () => {
                   <Controller
                     name="detailTime"
                     control={control}
-                    render={({ field }) => <TimePicker {...field} format="HH:mm" placeholder="saat seçiniz" disabled />}
+                    render={({ field }) => <TimePicker {...field}
+                                                       changeOnScroll needConfirm={false} format="HH:mm" placeholder="saat seçiniz" disabled />}
                   />
                 </div>
               </div>
@@ -388,7 +389,8 @@ const FinancialDetailsTable = () => {
               <Controller
                 name="PlannedCommencementTime"
                 control={control}
-                render={({ field }) => <TimePicker {...field} format="HH:mm" placeholder="saat seçiniz" />}
+                render={({ field }) => <TimePicker {...field}
+                                                   changeOnScroll needConfirm={false} format="HH:mm" placeholder="saat seçiniz" />}
               />
             </div>
           </div>
@@ -413,7 +415,8 @@ const FinancialDetailsTable = () => {
               <Controller
                 name="PlannedCompletionTime"
                 control={control}
-                render={({ field }) => <TimePicker {...field} format="HH:mm" placeholder="saat seçiniz" />}
+                render={({ field }) => <TimePicker {...field}
+                                                   changeOnScroll needConfirm={false} format="HH:mm" placeholder="saat seçiniz" />}
               />
             </div>
           </div>
@@ -450,6 +453,7 @@ const FinancialDetailsTable = () => {
                 render={({ field }) => (
                   <TimePicker
                     {...field}
+                    changeOnScroll needConfirm={false}
                     format="HH:mm"
                     placeholder="saat seçiniz"
                     onChange={(date, dateString) => {
@@ -494,6 +498,7 @@ const FinancialDetailsTable = () => {
                 render={({ field }) => (
                   <TimePicker
                     {...field}
+                    changeOnScroll needConfirm={false}
                     format="HH:mm"
                     placeholder="saat seçiniz"
                     onChange={(date, dateString) => {

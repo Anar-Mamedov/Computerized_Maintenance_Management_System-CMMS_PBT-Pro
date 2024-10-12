@@ -461,7 +461,8 @@ export default function MainTabs() {
             <Controller
               name="baslangicSaati"
               control={control}
-              render={({ field }) => <TimePicker {...field} disabled={!yapildi} style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />}
+              render={({ field }) => <TimePicker {...field}
+                                                 changeOnScroll needConfirm={false} disabled={!yapildi} style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />}
             />
           </div>
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}>
@@ -510,7 +511,8 @@ export default function MainTabs() {
               <Controller
                 name="bitisSaati"
                 control={control}
-                render={({ field }) => <TimePicker {...field} disabled={!yapildi} style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />}
+                render={({ field }) => <TimePicker {...field}
+                                                   changeOnScroll needConfirm={false} disabled={!yapildi} style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />}
               />
             </div>
           </div>

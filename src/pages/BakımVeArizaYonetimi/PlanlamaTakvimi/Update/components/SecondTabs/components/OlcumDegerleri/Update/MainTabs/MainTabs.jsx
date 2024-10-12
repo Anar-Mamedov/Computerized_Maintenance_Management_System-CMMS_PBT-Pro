@@ -252,6 +252,7 @@ export default function MainTabs() {
               render={({ field }) => (
                 <TimePicker
                   {...field}
+                  changeOnScroll needConfirm={false}
                   status={errors.saat ? "error" : ""}
                   // disabled={!isDisabled}
                   style={{ width: "100%" }}

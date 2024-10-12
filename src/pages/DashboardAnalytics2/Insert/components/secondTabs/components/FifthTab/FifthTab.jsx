@@ -288,6 +288,7 @@ export default function FifthTab() {
                       render={({ field }) => (
                         <TimePicker
                           {...field}
+                          changeOnScroll needConfirm={false}
                           format="HH:mm"
                           onChange={(time) => {
                             field.onChange(time);
@@ -323,6 +324,7 @@ export default function FifthTab() {
                       render={({ field }) => (
                         <TimePicker
                           {...field}
+                          changeOnScroll needConfirm={false}
                           format="HH:mm"
                           placeholder="saat seçiniz"
                           onChange={(date, dateString) => {

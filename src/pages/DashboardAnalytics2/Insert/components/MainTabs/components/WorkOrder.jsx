@@ -140,7 +140,8 @@ const WorkOrder = ({ onDrawerClose, drawerVisible, selectedRow }) => {
               <Controller
                 name="time"
                 control={control}
-                render={({ field }) => <TimePicker {...field} format="HH:mm" placeholder="Saat seçiniz" />}
+                render={({ field }) => <TimePicker {...field}
+                                                   changeOnScroll needConfirm={false} format="HH:mm" placeholder="Saat seçiniz" />}
               />
             </div>
           </Col>

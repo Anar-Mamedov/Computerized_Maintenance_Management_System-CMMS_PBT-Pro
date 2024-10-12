@@ -235,7 +235,8 @@ export default function MainTabs() {
             rules={{ required: "Alan Boş Bırakılamaz!" }}
             render={({ field, fieldState: { error } }) => (
               <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
-                <TimePicker {...field} status={error ? "error" : ""} format={localeTimeFormat} />
+                <TimePicker {...field}
+                            changeOnScroll needConfirm={false} status={error ? "error" : ""} format={localeTimeFormat} />
                 {error && <div style={{ color: "red" }}>{error.message}</div>}
               </div>
             )}

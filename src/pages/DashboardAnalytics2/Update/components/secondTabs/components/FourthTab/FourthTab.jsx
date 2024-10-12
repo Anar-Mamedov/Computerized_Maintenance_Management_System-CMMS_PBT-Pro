@@ -914,7 +914,8 @@ export default function FourthTab() {
                     name="productTime"
                     control={control}
                     render={({ field }) => (
-                      <TimePicker {...field} format="HH:mm" onChange={(time) => field.onChange(time)} />
+                      <TimePicker {...field}
+                                  changeOnScroll needConfirm={false} format="HH:mm" onChange={(time) => field.onChange(time)} />
                     )}
                   />
                 </div>

@@ -456,6 +456,7 @@ export default function NinthTab() {
                 render={({ field }) => (
                   <TimePicker
                     {...field}
+                    changeOnScroll needConfirm={false}
                     onChange={handleTimeChange}
                     value={field.value ? dayjs(`1970-01-01T${field.value}`) : null}
                     // ... rest of the TimePicker code
