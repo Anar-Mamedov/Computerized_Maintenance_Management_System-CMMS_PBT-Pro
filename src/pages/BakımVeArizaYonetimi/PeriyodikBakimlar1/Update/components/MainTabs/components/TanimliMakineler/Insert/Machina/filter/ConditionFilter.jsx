@@ -88,15 +88,7 @@ const ConditionFilter = ({ onSubmit }) => {
         </Button>
       </div>
       <div style={{ padding: "10px", width: "100%" }}>
-        <Select
-          mode="multiple"
-          style={{ width: "100%" }}
-          placeholder="Ara..."
-          value={Object.values(filters)}
-          onChange={handleChange}
-          allowClear
-          showArrow={false}
-        >
+        <Select mode="multiple" style={{ width: "100%" }} placeholder="Ara..." value={Object.values(filters)} onChange={handleChange} allowClear showArrow={false}>
           {/* Seçenekleri elle ekleyin */}
           {options.map((option) => (
             <Option key={option.key} value={option.value}>
@@ -109,13 +101,7 @@ const ConditionFilter = ({ onSubmit }) => {
   );
 
   return (
-    <Dropdown
-      overlay={menu}
-      placement="bottomLeft"
-      trigger={["click"]}
-      visible={visible}
-      onVisibleChange={(v) => setVisible(v)}
-    >
+    <Dropdown overlay={menu} placement="bottomLeft" trigger={["click"]} visible={visible} onVisibleChange={(v) => setVisible(v)}>
       <Button
         style={{
           display: "flex",
