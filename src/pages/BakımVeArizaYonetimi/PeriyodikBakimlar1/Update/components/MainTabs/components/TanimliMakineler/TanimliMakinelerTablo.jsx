@@ -339,6 +339,8 @@ export default function TanimliMakinelerTablo() {
       />
       {isModalVisible && (
         <EditModal
+          tarihSayacBakim={tarihSayacBakim}
+          activeTab={activeTab}
           selectedRow={selectedRow}
           isModalVisible={isModalVisible}
           onModalClose={() => {

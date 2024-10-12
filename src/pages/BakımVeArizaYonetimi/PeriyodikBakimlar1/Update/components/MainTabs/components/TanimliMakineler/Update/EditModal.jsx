@@ -3,9 +3,10 @@ import { Button, Modal, Input, Typography, Tabs, message } from "antd";
 import AxiosInstance from "../../../../../../../../../api/http";
 import { Controller, useForm, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
-import MainTabs from "./MainTabs/MainTabs";
+import PeryotBakimBilgileriEkle from "./MainTabs/PeryotBakimBilgileriEkle.jsx";
 
-export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh }) {
+export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh, activeTab, tarihSayacBakim }) {
+  const [tabIndex, setTabIndex] = useState(0);
   const methods = useForm({
     defaultValues: {
       siraNo: "",
@@ -17,6 +18,18 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   });
 
   const { setValue, reset, handleSubmit } = methods;
+
+  useEffect(() => {
+    if (tarihSayacBakim === "b") {
+      setTabIndex(0);
+    } else if (tarihSayacBakim === "a") {
+      if (activeTab === "SAYAC") {
+        setTabIndex(1);
+      } else {
+        setTabIndex(2);
+      }
+    }
+  }, [tarihSayacBakim, activeTab]);
 
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi
 
@@ -67,16 +80,29 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       // Object.keys(selectedRow).forEach((key) => {
       //   console.log(key, selectedRow[key]);
       //   setValue(key, selectedRow[key]);
-      setValue("secilenID", selectedRow.key);
-      setValue("siraNo", selectedRow.ISK_SIRANO);
-      setValue("isTanimi", selectedRow.ISK_TANIM);
-      setValue("aciklama", selectedRow.ISK_ACIKLAMA);
+      setValue("makineID", selectedRow.key);
+      setValue("makineKodu", selectedRow.MKN_KOD);
+      setValue("makineTanimi", selectedRow.MKN_TANIM);
+      setValue("makineLokasyon", selectedRow.MKN_LOKASYON);
+      setValue("makineTipi", selectedRow.MKN_TIP);
+      setValue(
+        "sonUygulamaTarihi",
+        selectedRow.PBM_SON_UYGULAMA_TARIH ? (dayjs(selectedRow.PBM_SON_UYGULAMA_TARIH).isValid() ? dayjs(selectedRow.PBM_SON_UYGULAMA_TARIH) : null) : null
+      );
+      setValue("hedefTarih", selectedRow.PBM_HEDEF_TARIH ? (dayjs(selectedRow.PBM_HEDEF_TARIH).isValid() ? dayjs(selectedRow.PBM_HEDEF_TARIH) : null) : null);
+      setValue("harırlatmaGunOnce", selectedRow.PBM_HATIRLAT_TARIH);
+      // setValue("sayac", selectedRow.PBM_HATIRLAT_TARIH);
+      setValue("sonUygulamaSayac", selectedRow.PBM_SON_UYGULAMA_SAYAC);
+      setValue("hedefSayac", selectedRow.PBM_HEDEF_SAYAC);
+      setValue("harırlatmaSayiOnce", selectedRow.PBM_HATIRLAT_SAYAC);
       // add more fields as needed
 
       // });
       // });
     }
   }, [selectedRow, isModalVisible, setValue]);
+
+  console.log("selectedRow", selectedRow);
 
   useEffect(() => {
     if (!isModalVisible) {
@@ -87,13 +113,8 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   return (
     <FormProvider {...methods}>
       <div>
-        <Modal
-          width="800px"
-          title="Kontrol Listesi Güncelle"
-          open={isModalVisible}
-          onOk={handleModalOk}
-          onCancel={onModalClose}>
-          <MainTabs />
+        <Modal width="500px" title="Tanımlı Makine Listesi Güncelle" open={isModalVisible} onOk={handleModalOk} onCancel={onModalClose}>
+          <PeryotBakimBilgileriEkle tarihSayacBakim={tarihSayacBakim} activeTab={activeTab} />
         </Modal>
       </div>
     </FormProvider>
