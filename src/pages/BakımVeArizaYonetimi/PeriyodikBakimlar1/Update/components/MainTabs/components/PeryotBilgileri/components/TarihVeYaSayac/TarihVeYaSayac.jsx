@@ -43,6 +43,10 @@ const StyledTabs = styled(Tabs)`
   .ant-tabs-ink-bar {
     background: #2bc770;
   }
+    
+  .ant-tabs-nav-operations{
+  display: none !important;
+  }
 `;
 
 //styled components end
