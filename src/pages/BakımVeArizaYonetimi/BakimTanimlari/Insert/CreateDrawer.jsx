@@ -144,6 +144,32 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
     }
   }, [selectedLokasyonId, methods]);
 
+  useEffect(() => {
+    if (open) {
+      // Çekmece açıldığında gerekli işlemi yap
+      // Örneğin, MainTabs'a bir prop olarak geçir
+      // setLoading(true);
+      AxiosInstance.get("ModulKoduGetir?modulKodu=PRS_PERSONEL_KOD") // Replace with your actual API endpoint
+        .then((response) => {
+          // Assuming the response contains the new work order number in 'response.Tanim'
+          setValue("bakimKodu", response);
+          // setTimeout(() => {
+          //   setLoading(false);
+          // }, 100);
+        })
+        .catch((error) => {
+          console.error("Error fetching new work order number:", error);
+          if (navigator.onLine) {
+            // İnternet bağlantısı var
+            message.error("Hata Mesajı: " + error.message);
+          } else {
+            // İnternet bağlantısı yok
+            message.error("Internet Bağlantısı Mevcut Değil.");
+          }
+        });
+    }
+  }, [open]);
+
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)}>
@@ -154,7 +180,8 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
             style={{
               display: "flex",
               alignItems: "center",
-            }}>
+            }}
+          >
             <PlusOutlined />
             Ekle
           </Button>
@@ -174,11 +201,13 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
                     backgroundColor: "#2bc770",
                     borderColor: "#2bc770",
                     color: "#ffffff",
-                  }}>
+                  }}
+                >
                   Kaydet
                 </Button>
               </Space>
-            }>
+            }
+          >
             <MainTabs />
             {/* <SecondTabs /> */}
             <Footer />
