@@ -7,7 +7,7 @@ import Filters from "./Machina/filter/Filters.jsx";
 import { Controller, useFormContext } from "react-hook-form";
 import { PlusOutlined } from "@ant-design/icons";
 
-export default function MakineTablo({ workshopSelectedId, onSubmit, tarihSayacBakim, activeTab, keyArray }) {
+export default function MakineTablo({ workshopSelectedId, onSubmit, tarihSayacBakim, activeTab, keyArray, periyotBilgiDurum }) {
   const { control, watch, setValue } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -16,17 +16,19 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, tarihSayacBa
   const [filtersKey, setFiltersKey] = useState(0);
   const [stateValue, setStateValue] = useState(-1);
 
+  console.log("periyotBilgiDurum", periyotBilgiDurum);
+
   useEffect(() => {
-    if (tarihSayacBakim === "a") {
-      if (activeTab === "SAYAC") {
-        setStateValue(1);
-      } else {
-        setStateValue(0);
-      }
-    } else if (tarihSayacBakim === "b") {
+    if (periyotBilgiDurum === 1) {
       setStateValue(0);
+    } else if (periyotBilgiDurum === 2) {
+      setStateValue(1);
+    } else if (periyotBilgiDurum === 3) {
+      setStateValue(0);
+    } else if (periyotBilgiDurum === null) {
+      setStateValue(-1);
     }
-  }, [tarihSayacBakim, activeTab]);
+  }, [periyotBilgiDurum]);
 
   const [table, setTable] = useState({
     data: [],

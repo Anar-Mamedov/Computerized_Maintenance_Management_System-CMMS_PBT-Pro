@@ -6,7 +6,7 @@ const { Text } = Typography;
 
 import { Controller, useForm, FormProvider, useFormContext } from "react-hook-form";
 
-function PeryotBakimBilgileriEkle({ activeTab, tarihSayacBakim }) {
+function PeryotBakimBilgileriEkle({ activeTab, tarihSayacBakim, periyotBilgiDurum }) {
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const {
@@ -355,17 +355,15 @@ function PeryotBakimBilgileriEkle({ activeTab, tarihSayacBakim }) {
       {/* Always render Makine Bilgileri */}
       {makineBilgileri}
 
-      {tarihSayacBakim === "b" ? (
+      {periyotBilgiDurum === 1 ? (
+        <>{tarihBilgileri}</>
+      ) : periyotBilgiDurum === 2 ? (
+        <>{sayacBilgileri}</>
+      ) : periyotBilgiDurum === 3 ? (
         <>
           {tarihBilgileri}
           {sayacBilgileri}
         </>
-      ) : tarihSayacBakim === "a" ? (
-        activeTab === "SAYAC" ? (
-          <>{sayacBilgileri}</>
-        ) : (
-          <>{tarihBilgileri}</>
-        )
       ) : null}
     </div>
   );
