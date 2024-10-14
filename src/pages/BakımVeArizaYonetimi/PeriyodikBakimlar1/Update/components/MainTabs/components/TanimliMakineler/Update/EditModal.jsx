@@ -5,7 +5,7 @@ import { Controller, useForm, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
 import PeryotBakimBilgileriEkle from "./MainTabs/PeryotBakimBilgileriEkle.jsx";
 
-export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh, activeTab, tarihSayacBakim }) {
+export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh, activeTab, tarihSayacBakim, periyotBilgiDurum }) {
   const [tabIndex, setTabIndex] = useState(0);
   const methods = useForm({
     defaultValues: {
@@ -20,16 +20,16 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   const { setValue, reset, handleSubmit } = methods;
 
   useEffect(() => {
-    if (tarihSayacBakim === "b") {
+    if (periyotBilgiDurum === 3) {
       setTabIndex(0);
-    } else if (tarihSayacBakim === "a") {
-      if (activeTab === "SAYAC") {
-        setTabIndex(1);
-      } else {
-        setTabIndex(2);
-      }
+    } else if (periyotBilgiDurum === 2) {
+      setTabIndex(1);
+    } else if (periyotBilgiDurum === 1) {
+      setTabIndex(2);
+    } else {
+      return null;
     }
-  }, [tarihSayacBakim, activeTab]);
+  }, [periyotBilgiDurum]);
 
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi
 
@@ -112,7 +112,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
     <FormProvider {...methods}>
       <div>
         <Modal width="500px" title="Tanımlı Makine Listesi Güncelle" open={isModalVisible} onOk={handleModalOk} onCancel={onModalClose}>
-          <PeryotBakimBilgileriEkle tarihSayacBakim={tarihSayacBakim} activeTab={activeTab} />
+          <PeryotBakimBilgileriEkle tarihSayacBakim={tarihSayacBakim} activeTab={activeTab} periyotBilgiDurum={periyotBilgiDurum} />
         </Modal>
       </div>
     </FormProvider>

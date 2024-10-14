@@ -105,7 +105,17 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       ayGroup: 1,
       ayinGunleriSelect: [],
       baslangicGroup: 1,
-      haftaninGunleri: [], // add more fields as needed
+
+      periyotBilgiDurum: null,
+
+      // periyot bilgileri varsayilan degerleri
+      sayacSayisi: 1,
+      gunlukGun: 1,
+      haftalik: 1,
+      haftaninGunleri: "01", // add more fields as needed
+      herAy: 1,
+      yilGroup: 1,
+      herYil: 1,
     },
   });
 
@@ -399,6 +409,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("aciklama", item.PBK_ACIKLAMA);
           if (item.PBK_TARIH_BAZLI_IZLE == true && item.PBK_SAYAC_BAZLI_IZLE == true) {
             setValue("tarihSayacBakim", "b");
+            setValue("periyotBilgiDurum", 3);
             setValue("sayacSayisi", item.PBK_SAYAC_YINELEME_SIKLIK);
             setValue("peryodikBakimBirim", item.PBK_SAYAC_BIRIM);
             setValue("peryodikBakimBirimID", item.PBK_SAYAC_BIRIM_KOD_ID);
@@ -445,6 +456,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             setValue("tarihSayacBakim", "a");
             if (item.PBK_TARIH_YINELEME_PERIYOT == "AY1" || item.PBK_TARIH_YINELEME_PERIYOT == "AY2" || item.PBK_TARIH_YINELEME_PERIYOT == "AY3") {
               setValue("activeTab", "AY123");
+              setValue("periyotBilgiDurum", 1);
               if (item.PBK_TARIH_YINELEME_PERIYOT == "AY1") {
                 setValue("ayGroup", 1);
                 setValue("herAy", item.PBK_TARIH_YINELEME_SIKLIK);
@@ -462,6 +474,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
               }
             } else if (item.PBK_TARIH_YINELEME_PERIYOT == "YIL1" || item.PBK_TARIH_YINELEME_PERIYOT == "YIL2") {
               setValue("activeTab", "YIL123");
+              setValue("periyotBilgiDurum", 1);
               if (item.PBK_TARIH_YINELEME_PERIYOT == "YIL1") {
                 setValue("yilGroup", 1);
                 setValue("herYil", item.PBK_TARIH_YINELEME_SIKLIK);
@@ -474,17 +487,21 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
               }
             } else if (item.PBK_TARIH_YINELEME_PERIYOT == "GUN") {
               setValue("activeTab", "GUN");
+              setValue("periyotBilgiDurum", 1);
               setValue("gunlukGun", item.PBK_TARIH_YINELEME_SIKLIK);
             } else if (item.PBK_TARIH_YINELEME_PERIYOT == "HAFTA") {
               setValue("activeTab", "HAFTA");
+              setValue("periyotBilgiDurum", 1);
               setValue("haftalik", item.PBK_TARIH_YINELEME_SIKLIK);
               setValue("haftaninGunleri", item.PBK_TARIH_HAFTA_GUNLER);
             } else if (item.PBK_TARIH_YINELEME_PERIYOT == "FIX") {
               setValue("activeTab", "FIX");
+              setValue("periyotBilgiDurum", 1);
             }
           } else if (item.PBK_TARIH_BAZLI_IZLE == false && item.PBK_SAYAC_BAZLI_IZLE == 1) {
             setValue("tarihSayacBakim", "a");
             setValue("activeTab", "SAYAC");
+            setValue("periyotBilgiDurum", 2);
             setValue("sayacSayisi", item.PBK_SAYAC_YINELEME_SIKLIK);
             setValue("peryodikBakimBirim", item.PBK_SAYAC_BIRIM);
             setValue("peryodikBakimBirimID", item.PBK_SAYAC_BIRIM_KOD_ID);

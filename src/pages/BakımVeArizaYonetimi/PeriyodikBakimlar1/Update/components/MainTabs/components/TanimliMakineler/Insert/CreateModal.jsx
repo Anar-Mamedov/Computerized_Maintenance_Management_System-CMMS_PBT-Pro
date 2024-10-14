@@ -20,20 +20,19 @@ export default function CreateModal({
   currentModalIndex,
   totalModals,
   selectedBakimID,
+  periyotBilgiDurum,
 }) {
   const [tabIndex, setTabIndex] = useState(0);
 
   useEffect(() => {
-    if (tarihSayacBakim === "b") {
+    if (periyotBilgiDurum === 1) {
+      setTabIndex(2);
+    } else if (periyotBilgiDurum === 2) {
+      setTabIndex(1);
+    } else if (periyotBilgiDurum === 3) {
       setTabIndex(0);
-    } else if (tarihSayacBakim === "a") {
-      if (activeTab === "SAYAC") {
-        setTabIndex(1);
-      } else {
-        setTabIndex(2);
-      }
     }
-  }, [tarihSayacBakim, activeTab]);
+  }, [periyotBilgiDurum]);
 
   const methods = useForm({
     defaultValues: {
@@ -134,7 +133,7 @@ export default function CreateModal({
 
         <Modal width="500px" title={`Peryodik Bakım Bilgileri Ekle ${currentModalIndex}/${totalModals}`} open={visible} onCancel={onCancel} onOk={handleModalOk}>
           {/*<MainTabs />*/}
-          <PeryotBakimBilgileriEkle tarihSayacBakim={tarihSayacBakim} activeTab={activeTab} />
+          <PeryotBakimBilgileriEkle tarihSayacBakim={tarihSayacBakim} activeTab={activeTab} periyotBilgiDurum={periyotBilgiDurum} />
         </Modal>
       </div>
     </FormProvider>

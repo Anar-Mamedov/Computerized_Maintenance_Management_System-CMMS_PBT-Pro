@@ -300,6 +300,7 @@ export default function TanimliMakinelerTablo() {
   const tarihSayacBakim = watch("tarihSayacBakim");
   const activeTab = watch("activeTab");
   const selectedBakimID = watch("secilenBakimID");
+  const periyotBilgiDurum = watch("periyotBilgiDurum");
 
   return (
     <div>
@@ -307,6 +308,7 @@ export default function TanimliMakinelerTablo() {
         <CreateModal
           tarihSayacBakim={tarihSayacBakim}
           activeTab={activeTab}
+          periyotBilgiDurum={periyotBilgiDurum}
           visible={isCreateModalVisible}
           onCancel={handleModalClose}
           data={modalData[0]}
@@ -318,7 +320,7 @@ export default function TanimliMakinelerTablo() {
       )}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "right", gap: "10px", marginBottom: "10px" }}>
         <ContextMenu selectedRows={selectedRowsData} refreshTableData={refreshTable} />
-        <MakineTablo onSubmit={handleMakineTabloSubmit} tarihSayacBakim={tarihSayacBakim} activeTab={activeTab} keyArray={keyArray} />
+        <MakineTablo onSubmit={handleMakineTabloSubmit} tarihSayacBakim={tarihSayacBakim} activeTab={activeTab} keyArray={keyArray} periyotBilgiDurum={periyotBilgiDurum} />
       </div>
       <Table
         rowSelection={{
@@ -341,6 +343,7 @@ export default function TanimliMakinelerTablo() {
         <EditModal
           tarihSayacBakim={tarihSayacBakim}
           activeTab={activeTab}
+          periyotBilgiDurum={periyotBilgiDurum}
           selectedRow={selectedRow}
           isModalVisible={isModalVisible}
           onModalClose={() => {
