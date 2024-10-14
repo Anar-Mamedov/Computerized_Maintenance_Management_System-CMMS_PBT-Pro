@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { Button, Drawer, Space, ConfigProvider, Modal, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
@@ -41,6 +41,8 @@ export default function CreateDrawer({ onRefresh }) {
       diger: "",
     },
   });
+
+  const { setValue, reset, handleSubmit, watch } = methods;
 
   const onSubmit = (data) => {
     // Form verilerini API'nin beklediği formata dönüştür
@@ -104,6 +106,32 @@ export default function CreateDrawer({ onRefresh }) {
     });
   };
 
+  useEffect(() => {
+    if (open) {
+      // Çekmece açıldığında gerekli işlemi yap
+      // Örneğin, MainTabs'a bir prop olarak geçir
+      // setLoading(true);
+      AxiosInstance.get("ModulKoduGetir?modulKodu=PRS_PERSONEL_KOD") // Replace with your actual API endpoint
+        .then((response) => {
+          // Assuming the response contains the new work order number in 'response.Tanim'
+          setValue("personelKodu", response);
+          // setTimeout(() => {
+          //   setLoading(false);
+          // }, 100);
+        })
+        .catch((error) => {
+          console.error("Error fetching new work order number:", error);
+          if (navigator.onLine) {
+            // İnternet bağlantısı var
+            message.error("Hata Mesajı: " + error.message);
+          } else {
+            // İnternet bağlantısı yok
+            message.error("Internet Bağlantısı Mevcut Değil.");
+          }
+        });
+    }
+  }, [open]);
+
   return (
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
@@ -120,14 +148,12 @@ export default function CreateDrawer({ onRefresh }) {
           extra={
             <Space>
               <Button onClick={onClose}>İptal</Button>
-              <Button
-                type="submit"
-                onClick={methods.handleSubmit(onSubmit)}
-                style={{ backgroundColor: "#2bc770", borderColor: "#2bc770", color: "#ffffff" }}>
+              <Button type="submit" onClick={methods.handleSubmit(onSubmit)} style={{ backgroundColor: "#2bc770", borderColor: "#2bc770", color: "#ffffff" }}>
                 Kaydet
               </Button>
             </Space>
-          }>
+          }
+        >
           <form onSubmit={methods.handleSubmit(onSubmit)}>
             <MainTabs />
             <Footer />
