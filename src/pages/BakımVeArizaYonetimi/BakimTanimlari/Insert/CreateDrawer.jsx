@@ -149,7 +149,7 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
       // Çekmece açıldığında gerekli işlemi yap
       // Örneğin, MainTabs'a bir prop olarak geçir
       // setLoading(true);
-      AxiosInstance.get("ModulKoduGetir?modulKodu=PRS_PERSONEL_KOD") // Replace with your actual API endpoint
+      AxiosInstance.get("ModulKoduGetir?modulKodu=") // Replace with your actual API endpoint
         .then((response) => {
           // Assuming the response contains the new work order number in 'response.Tanim'
           setValue("bakimKodu", response);
