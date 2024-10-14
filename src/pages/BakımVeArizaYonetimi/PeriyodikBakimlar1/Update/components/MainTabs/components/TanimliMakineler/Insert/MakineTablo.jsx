@@ -16,8 +16,6 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, tarihSayacBa
   const [filtersKey, setFiltersKey] = useState(0);
   const [stateValue, setStateValue] = useState(-1);
 
-  console.log("periyotBilgiDurum", periyotBilgiDurum);
-
   useEffect(() => {
     if (periyotBilgiDurum === 1) {
       setStateValue(0);
