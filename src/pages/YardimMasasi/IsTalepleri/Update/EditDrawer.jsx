@@ -454,8 +454,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
                 type="submit"
                 onClick={methods.handleSubmit(onSubmit)}
                 style={{
-                  backgroundColor: "#2bc770",
-                  borderColor: "#2bc770",
+                  backgroundColor: disabled ? "#d3d3d3" : "#2bc770",
+                  borderColor: disabled ? "#d3d3d3" : "#2bc770",
                   color: "#ffffff",
                 }}
               >
