@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Table, Tabs, Input, Spin } from "antd";
+import { Button, Modal, Table, Tabs, Input, Spin, message } from "antd";
 import { useFormContext, Controller } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../../api/http";
 import styled from "styled-components";
@@ -168,13 +168,37 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
     }
   };
 
-  const handleModalOk = () => {
+  const prosedurID = watch("prosedurID");
+  const secilenIsEmriID = watch("secilenIsEmriID");
+
+  const handleModalOk = async () => {
     let selectedData;
     // Assuming only one set of row keys will be selected at a time.
     if (selectedRowKeys1.length) {
       selectedData = data1.find((item) => item.key === selectedRowKeys1[0]);
     } else if (selectedRowKeys2.length) {
       selectedData = data2.find((item) => item.key === selectedRowKeys2[0]);
+    }
+
+    try {
+      // API isteğini yap
+      const response = await AxiosInstance.get(`AddProsedurPropertyToIsEmri?yeniIsTanimId=${selectedData.key}&isEmriId=${secilenIsEmriID}&eskiIsTanimId=${prosedurID}`);
+      // İsteğin başarılı olduğunu kontrol et
+      if ((response && response.status_code === 200) || response.status_code === 201) {
+        // Başarılı işlem mesajı veya başka bir işlem yap
+        message.success("İşlem Başarılı!");
+        console.log("İşlem başarılı.");
+      } else if (response.status_code === 401) {
+        message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+      } else {
+        message.error("İşlem Başarısız!");
+        // Hata mesajı göster
+        console.error("Bir hata oluştu.");
+      }
+    } catch (error) {
+      // Hata yakalama
+      console.error("API isteği sırasında bir hata oluştu:", error);
+      message.error("Başarısız Olundu.");
     }
 
     if (selectedData) {
@@ -203,13 +227,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
     const normalizedSearchTerm = normalizeText(value);
     if (value) {
       const filtered = data1.filter((item) =>
-        Object.keys(item).some(
-          (key) =>
-            item[key] &&
-            normalizeText(item[key].toString())
-              .toLowerCase()
-              .includes(normalizedSearchTerm.toLowerCase())
-        )
+        Object.keys(item).some((key) => item[key] && normalizeText(item[key].toString()).toLowerCase().includes(normalizedSearchTerm.toLowerCase()))
       );
       setFilteredData1(filtered);
     } else {
@@ -223,13 +241,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
     const normalizedSearchTerm = normalizeText(value);
     if (value) {
       const filtered = data2.filter((item) =>
-        Object.keys(item).some(
-          (key) =>
-            item[key] &&
-            normalizeText(item[key].toString())
-              .toLowerCase()
-              .includes(normalizedSearchTerm.toLowerCase())
-        )
+        Object.keys(item).some((key) => item[key] && normalizeText(item[key].toString()).toLowerCase().includes(normalizedSearchTerm.toLowerCase()))
       );
       setFilteredData2(filtered);
     } else {
@@ -254,12 +266,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
       key: "1",
       children: (
         <div>
-          <Input
-            placeholder="Arama..."
-            value={searchTerm1}
-            onChange={handleSearch1}
-            style={{ width: "300px", marginBottom: "15px" }}
-          />
+          <Input placeholder="Arama..." value={searchTerm1} onChange={handleSearch1} style={{ width: "300px", marginBottom: "15px" }} />
           <Table
             rowSelection={{
               type: "radio",
@@ -267,9 +274,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
               onChange: onRowSelectChange1,
             }}
             columns={columns1}
-            dataSource={
-              filteredData1.length > 0 || searchTerm1 ? filteredData1 : data1
-            }
+            dataSource={filteredData1.length > 0 || searchTerm1 ? filteredData1 : data1}
             loading={loading}
             scroll={{
               y: "calc(100vh - 360px)",
@@ -283,12 +288,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
       key: "2",
       children: (
         <div>
-          <Input
-            placeholder="Arama..."
-            value={searchTerm2}
-            onChange={handleSearch2}
-            style={{ width: "300px", marginBottom: "15px" }}
-          />
+          <Input placeholder="Arama..." value={searchTerm2} onChange={handleSearch2} style={{ width: "300px", marginBottom: "15px" }} />
           <Table
             rowSelection={{
               type: "radio",
@@ -296,9 +296,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
               onChange: onRowSelectChange2,
             }}
             columns={columns2}
-            dataSource={
-              filteredData2.length > 0 || searchTerm2 ? filteredData2 : data2
-            }
+            dataSource={filteredData2.length > 0 || searchTerm2 ? filteredData2 : data2}
             loading={loading}
             scroll={{
               y: "calc(100vh - 360px)",
@@ -326,14 +324,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
-      <Modal
-        width={1200}
-        centered
-        title=""
-        open={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={handleModalToggle}
-      >
+      <Modal width={1200} centered title="" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <Spin spinning={loading}>
           <StyledTabs defaultActiveKey="1" items={visibleTabItems} />
         </Spin>
