@@ -79,7 +79,8 @@ export default function SecondTabs() {
         // flexDirection: "column",
         alignItems: "flex-start",
         width: "100%",
-      }}>
+      }}
+    >
       {/* tab */}
 
       <StyledTabs
@@ -87,7 +88,8 @@ export default function SecondTabs() {
         style={{
           maxWidth: "100%",
           marginBottom: "40px",
-        }}>
+        }}
+      >
         {/* <TabPane tab="Analiz" key="1" disabled>
           <div
             style={{
@@ -114,7 +116,8 @@ export default function SecondTabs() {
               // display: "flex",
               // flexFlow: "row wrap",
               gap: "15px",
-            }}>
+            }}
+          >
             <ThirdTab />
           </div>
         </TabPane>
@@ -124,7 +127,8 @@ export default function SecondTabs() {
               // display: "flex",
               // flexFlow: "row wrap",
               gap: "15px",
-            }}>
+            }}
+          >
             <FourthTab />
           </div>
         </TabPane>
@@ -138,7 +142,7 @@ export default function SecondTabs() {
             <FifthTab />
           </div>
         </TabPane> */}
-        {/* <TabPane tab="Peryodik Bakımlar" key="6" disabled>
+        {/* <TabPane tab="Periyodik Bakımlar" key="6" disabled>
           <div
             style={{
               // display: "flex",
@@ -178,7 +182,8 @@ export default function SecondTabs() {
               // display: "flex",
               // flexFlow: "row wrap",
               gap: "15px",
-            }}>
+            }}
+          >
             <CustomFields />
           </div>
         </TabPane>
@@ -188,7 +193,8 @@ export default function SecondTabs() {
               // display: "flex",
               // flexFlow: "row wrap",
               gap: "15px",
-            }}>
+            }}
+          >
             <Notes />
           </div>
         </TabPane>
@@ -198,7 +204,8 @@ export default function SecondTabs() {
               // display: "flex",
               // flexFlow: "row wrap",
               gap: "15px",
-            }}>
+            }}
+          >
             <NinthTab />
           </div>
         </TabPane>
@@ -208,7 +215,8 @@ export default function SecondTabs() {
               // display: "flex",
               // flexFlow: "row wrap",
               gap: "15px",
-            }}>
+            }}
+          >
             {/* <NinthTab /> */}
           </div>
         </TabPane>

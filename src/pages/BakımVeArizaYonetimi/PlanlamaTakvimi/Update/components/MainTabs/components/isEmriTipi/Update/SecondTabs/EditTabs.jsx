@@ -33,7 +33,8 @@ export default function EditTabs() {
           gap: "10px",
           rowGap: "0px",
           marginBottom: "10px",
-        }}>
+        }}
+      >
         <Text style={{ fontSize: "14px", fontWeight: "600" }}>İş Emri Tanımı:</Text>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <div
@@ -45,7 +46,8 @@ export default function EditTabs() {
               minWidth: "300px",
               gap: "10px",
               width: "100%",
-            }}>
+            }}
+          >
             <Controller
               name="isEmriTipiTanim"
               control={control}
@@ -93,7 +95,8 @@ export default function EditTabs() {
           gap: "10px",
           rowGap: "0px",
           marginBottom: "10px",
-        }}>
+        }}
+      >
         <Text style={{ fontSize: "14px" }}>Renk:</Text>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <div
@@ -105,7 +108,8 @@ export default function EditTabs() {
               minWidth: "300px",
               gap: "10px",
               width: "100%",
-            }}>
+            }}
+          >
             <Controller
               name="isEmriTipiRenk"
               control={control}
@@ -140,7 +144,8 @@ export default function EditTabs() {
             maxWidth: "460px",
             display: "flex",
             justifyContent: "center",
-          }}>
+          }}
+        >
           <Controller
             name="tipGroup"
             control={control}
@@ -148,7 +153,7 @@ export default function EditTabs() {
               <Radio.Group {...field}>
                 <Radio value={1}>Arıza</Radio>
                 <Radio value={2}>Bakım</Radio>
-                <Radio value={3}>Peryodik Bakım</Radio>
+                <Radio value={3}>Periyodik Bakım</Radio>
                 <Radio value={4}>İş Talebi</Radio>
                 <Radio value={5}>Diger</Radio>
               </Radio.Group>

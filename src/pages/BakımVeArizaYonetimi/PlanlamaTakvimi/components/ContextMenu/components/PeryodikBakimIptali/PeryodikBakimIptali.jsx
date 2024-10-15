@@ -18,7 +18,7 @@ function PeryodikBakimIptali({ selectedCells }) {
         danger
         onClick={handleModalToggle}
       >
-        Peryodik Bakım İptali
+        Periyodik Bakım İptali
       </Button>
     </div>
   );
