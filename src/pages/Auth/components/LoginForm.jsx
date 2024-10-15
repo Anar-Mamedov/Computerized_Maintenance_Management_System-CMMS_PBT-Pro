@@ -48,14 +48,14 @@ export default function LoginForm() {
           userName: response.KLL_TANIM ?? null,
           userResimID: response.resimId ?? null,
           userUnvan: response.KLL_UNVAN ?? null,
-          kullaniciName: response.KLL_PERSONEL?.PRS_ISIM ?? null,
+          /* kullaniciName: response.KLL_PERSONEL?.PRS_ISIM ?? null,
           kullaniciID: response.KLL_PERSONEL?.TB_PERSONEL_ID ?? null,
           kullaniciLokasyon: response.KLL_PERSONEL?.PRS_LOKASYON ?? null,
           kullaniciLokasyonID: response.KLL_PERSONEL?.PRS_LOKASYON_ID ?? null,
           kullaniciDepartman: response.KLL_PERSONEL?.PRS_DEPARTMAN ?? null,
           kullaniciDepartmanID: response.KLL_PERSONEL?.PRS_DEPARTMAN_ID ?? null,
           kullaniciEmail: response.KLL_PERSONEL?.PRS_EMAIL ?? null,
-          kullaniciTelefon: response.KLL_PERSONEL?.PRS_TELEFON ?? null,
+          kullaniciTelefon: response.KLL_PERSONEL?.PRS_TELEFON ?? null, */
         };
         localStorage.setItem("user", JSON.stringify(userInfo));
         const login = {
