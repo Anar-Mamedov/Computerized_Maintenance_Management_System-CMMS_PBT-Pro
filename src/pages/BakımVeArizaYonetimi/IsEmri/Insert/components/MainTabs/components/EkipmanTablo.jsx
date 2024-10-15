@@ -1,235 +1,210 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Table, Input } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import React, { useState, useEffect } from "react";
+import { Table, Button, Modal, Spin, Input } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
-import styled from "styled-components";
 import { Controller, useFormContext } from "react-hook-form";
 
-export default function EkipmanTablo({ workshopSelectedId, onSubmit }) {
-  const { control, watch, setValue } = useFormContext();
+function EkipmanTablo({ onSubmit }) {
+  const [data, setData] = useState([]);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [treeData, setTreeData] = useState([]);
+  const [selectedData, setSelectedData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [filteredData, setFilteredData] = useState([]);
-  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
+  const {
+    control,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
 
   const columns = [
-    // {
-    //   title: "",
-    //   key: "key",
-    //   dataIndex: "key",
-    //   width: 150,
-    //   render: (text, record) => <div >{record.key}</div>,
-    // },
     {
-      title: "",
-      key: "ekipmanBilgisi",
-      render: (text, record) => (
-        <div>
-          {record.EKP_KOD} - {record.EKP_TANIM}
-        </div>
-      ),
+      title: "Ekipman",
+      dataIndex: "EKP_KOD",
+      key: "EKP_KOD",
+      width: 200,
+      ellipsis: true,
+      visible: true,
+      sorter: (a, b) => {
+        if (a.EKP_KOD === null && b.EKP_KOD === null) return 0;
+        if (a.EKP_KOD === null) return 1;
+        if (b.EKP_KOD === null) return -1;
+        return a.EKP_KOD.localeCompare(b.EKP_KOD);
+      },
     },
-    // Other columns...
+
+    {
+      title: "Tanımı",
+      dataIndex: "EKP_TANIM",
+      key: "EKP_TANIM",
+      width: 200,
+      ellipsis: true,
+      visible: true,
+      sorter: (a, b) => {
+        if (a.EKP_TANIM === null && b.EKP_TANIM === null) return 0;
+        if (a.EKP_TANIM === null) return 1;
+        if (b.EKP_TANIM === null) return -1;
+        return a.EKP_TANIM.localeCompare(b.EKP_TANIM);
+      },
+    },
+
+    {
+      title: "Tipi",
+      dataIndex: "EKP_TIP",
+      key: "EKP_TIP",
+      width: 200,
+      ellipsis: true,
+      visible: true,
+      sorter: (a, b) => {
+        if (a.EKP_TIP === null && b.EKP_TIP === null) return 0;
+        if (a.EKP_TIP === null) return 1;
+        if (b.EKP_TIP === null) return -1;
+        return a.EKP_TIP.localeCompare(b.EKP_TIP);
+      },
+    },
+    {
+      title: "Birim",
+      dataIndex: "EKP_BIRIM",
+      key: "EKP_BIRIM",
+      width: 200,
+      ellipsis: true,
+      visible: true,
+      sorter: (a, b) => {
+        if (a.EKP_BIRIM === null && b.EKP_BIRIM === null) return 0;
+        if (a.EKP_BIRIM === null) return 1;
+        if (b.EKP_BIRIM === null) return -1;
+        return a.EKP_BIRIM.localeCompare(b.EKP_BIRIM);
+      },
+    },
+    {
+      title: "Durum",
+      dataIndex: "EKP_DURUM",
+      key: "EKP_DURUM",
+      width: 200,
+      ellipsis: true,
+      visible: true,
+      sorter: (a, b) => {
+        if (a.EKP_DURUM === null && b.EKP_DURUM === null) return 0;
+        if (a.EKP_DURUM === null) return 1;
+        if (b.EKP_DURUM === null) return -1;
+        return a.EKP_DURUM.localeCompare(b.EKP_DURUM);
+      },
+    },
   ];
 
-  const formatDataForTable = (data) => {
-    let nodes = {};
-    let tree = [];
+  const makineID = watch("makineID");
 
-    data.forEach((item) => {
-      nodes[item.TB_EKIPMAN_ID] = {
+  const fetchData = async (page, pageSize, parametre) => {
+    setLoading(true);
+    try {
+      const response = await AxiosInstance.get(`ekipman?parametre=${parametre}&MakineID=${makineID}&pagingDeger=${page}&pageSize=${pageSize}`);
+      const mappedData = response.list.map((item) => ({
         ...item,
         key: item.TB_EKIPMAN_ID,
-        children: [],
-      };
-    });
-
-    data.forEach((item) => {
-      if (item.EKP_REF_ID && nodes[item.EKP_REF_ID]) {
-        nodes[item.EKP_REF_ID].children.push(nodes[item.TB_EKIPMAN_ID]);
-      } else {
-        tree.push(nodes[item.TB_EKIPMAN_ID]);
-      }
-    });
-
-    Object.values(nodes).forEach((node) => {
-      if (node.children.length === 0) {
-        delete node.children;
-      }
-    });
-
-    return tree;
-  };
-
-  // Arama işlevi için
-
-  const toLowerTurkish = (str) => {
-    return str.replace(/İ/g, "i").replace(/I/g, "ı").toLowerCase();
-  };
-
-  const filterTree = (nodeList, searchTerm, path = []) => {
-    let isMatchFound = false;
-    let expandedKeys = [];
-
-    const lowerSearchTerm = toLowerTurkish(searchTerm);
-
-    const filtered = nodeList
-      .map((node) => {
-        let nodeMatch = toLowerTurkish(node.EKP_TANIM).includes(lowerSearchTerm);
-        let childrenMatch = false;
-        let filteredChildren = [];
-
-        if (node.children) {
-          const result = filterTree(node.children, lowerSearchTerm, path.concat(node.key));
-          childrenMatch = result.isMatch;
-          filteredChildren = result.filtered;
-          expandedKeys = expandedKeys.concat(result.expandedKeys);
-        }
-
-        if (nodeMatch || childrenMatch) {
-          isMatchFound = true;
-          expandedKeys = expandedKeys.concat(path);
-          // Eğer düğüm eşleşirse, tüm çocuklarını da dahil et
-          return { ...node, children: childrenMatch ? filteredChildren : node.children };
-        }
-
-        return null;
-      })
-      .filter((node) => node !== null);
-
-    return { filtered, isMatch: isMatchFound, expandedKeys };
+      }));
+      setData(mappedData);
+      setTotalRecords(response.kayit_sayisi);
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    const timerId = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
-    }, 1000);
+    if (isModalVisible) {
+      fetchData(1, pageSize, searchTerm);
+    }
+  }, [isModalVisible]);
 
-    return () => clearTimeout(timerId);
+  useEffect(() => {
+    if (searchTerm === "") return;
+
+    const delayDebounceFn = setTimeout(() => {
+      if (isModalVisible) {
+        setCurrentPage(1);
+        fetchData(1, pageSize, searchTerm);
+      }
+    }, 2000);
+
+    return () => clearTimeout(delayDebounceFn);
   }, [searchTerm]);
 
-  useEffect(() => {
-    if (debouncedSearchTerm) {
-      const result = filterTree(treeData, debouncedSearchTerm);
-      setFilteredData(result.filtered);
-      setExpandedRowKeys([...new Set(result.expandedKeys)]);
-    } else {
-      setFilteredData(treeData);
-      setExpandedRowKeys([]);
-    }
-  }, [debouncedSearchTerm, treeData]);
+  const handleTableChange = (pagination, filters, sorter) => {
+    setCurrentPage(pagination.current);
+    setPageSize(pagination.pageSize);
 
-  const onTableRowExpand = (expanded, record) => {
-    const keys = expanded ? [...expandedRowKeys, record.key] : expandedRowKeys.filter((k) => k !== record.key);
-    setExpandedRowKeys(keys);
-  };
+    // Check if pagination changed
+    const paginationChanged = pagination.current !== currentPage || pagination.pageSize !== pageSize;
 
-  // arama işlevi için son
+    // Check if filters changed (optional, if you have filters)
+    /*const filtersChanged =  your logic here ;*/
 
-  const fetchData = useCallback(() => {
-    const makineID = watch("makineID"); // useFormContext'ten gelen watch fonksiyonu ile makineID'yi izle
-    if (makineID) {
-      // makineID'nin varlığını kontrol et
-      setLoading(true);
-      AxiosInstance.get(`Ekipman?MakineID=${makineID}`) // Template literal kullanarak makineID'yi dinamik olarak ekle
-        .then((response) => {
-          const tree = formatDataForTable(response.data || response);
-          setTreeData(tree);
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error("API Error:", error);
-          setLoading(false);
-        });
-    }
-  }, [watch]); // Bağımlılıklar listesine watch fonksiyonunu ekle
-
-  const findItemInTree = (key, tree) => {
-    for (const item of tree) {
-      if (item.key === key) return item;
-      if (item.children) {
-        const found = findItemInTree(key, item.children);
-        if (found) return found;
-      }
-    }
-    return null;
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]); // fetchData fonksiyonunu bağımlılıklar listesine ekle
-
-  const handleModalToggle = () => {
-    setIsModalVisible((prev) => !prev);
-    if (!isModalVisible) {
-      fetchData();
-      setSelectedRowKeys([]);
-      setSearchTerm(""); // Modal kapandığında arama alanını sıfırla
-      setDebouncedSearchTerm(""); // Debounced arama terimini de sıfırla
-      setFilteredData(treeData); // Filtrelenmiş veriyi orijinal ağaç verisine döndür
-      setExpandedRowKeys([]); // Genişletilmiş satırları sıfırla
+    // Only fetch data if pagination changed
+    if (paginationChanged && isModalVisible) {
+      fetchData(pagination.current, pagination.pageSize, searchTerm);
     }
   };
 
-  const handleModalOk = () => {
-    const selectedData = findItemInTree(selectedRowKeys[0], treeData);
-    if (selectedData) {
-      onSubmit && onSubmit(selectedData); // This should handle both parents and children
+  const showModal = () => {
+    setSelectedData([]);
+    setData([]);
+    setTotalRecords(0);
+    setSearchTerm("");
+    setIsModalVisible(true);
+    fetchData(currentPage, pageSize, "");
+  };
+
+  const handleOk = () => {
+    if (selectedData.length > 0) {
+      onSubmit && onSubmit(selectedData[0]);
     }
     setIsModalVisible(false);
   };
 
-  useEffect(() => {
-    setSelectedRowKeys(workshopSelectedId ? [workshopSelectedId] : []);
-  }, [workshopSelectedId]);
-
-  const onRowSelectChange = (selectedKeys) => {
-    setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
+  const handleCancel = () => {
+    setIsModalVisible(false);
   };
 
-  // parentler seçilemesin diye
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
 
   const rowSelection = {
+    selectedRowKeys: selectedData.map((item) => item.key),
+    onChange: (selectedRowKeys, selectedRows) => {
+      setSelectedData(selectedRows);
+    },
     type: "radio",
-    selectedRowKeys,
-    onChange: onRowSelectChange,
   };
-
-  // parentler seçilemesin diye end
 
   return (
     <div>
-      <Button onClick={handleModalToggle}> + </Button>
-      <Modal
-        width="1200px"
-        title="Ekipman Listesi"
-        open={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={handleModalToggle}>
-        <Input
-          style={{ width: "250px", marginBottom: "10px" }}
-          type="text"
-          placeholder="Arama yap..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          prefix={<SearchOutlined style={{ color: "#0091ff" }} />} // Arama ikonunu ekle
-        />
+      <Button type="" onClick={showModal}>
+        +
+      </Button>
+      <Modal title="Ekipman Tablosu" centered open={isModalVisible} onOk={handleOk} onCancel={handleCancel} width={1200}>
+        <Input placeholder="Arama" onChange={handleSearchChange} value={searchTerm} style={{ marginBottom: 10, width: "200px" }} />
         <Table
-          rowSelection={rowSelection}
           columns={columns}
-          dataSource={debouncedSearchTerm ? filteredData : treeData}
+          dataSource={data}
           loading={loading}
-          scroll={{
-            y: "calc(100vh - 400px)",
+          pagination={{
+            current: currentPage,
+            pageSize: pageSize,
+            total: totalRecords,
+            showSizeChanger: true,
+            showTotal: (total, range) => `${range[0]}-${range[1]} Kayıt ${total}`,
           }}
-          expandedRowKeys={expandedRowKeys}
-          onExpand={onTableRowExpand}
+          scroll={{ y: "calc(100vh - 370px)" }}
+          onChange={handleTableChange}
+          rowSelection={rowSelection}
         />
       </Modal>
     </div>
   );
 }
+
+export default EkipmanTablo;
