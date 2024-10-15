@@ -17,7 +17,7 @@ function PeryodikBakimDetayi({ selectedCells }) {
         type="success"
         onClick={handleModalToggle}
       >
-        Peryodik Bakım Detayı
+        Periyodik Bakım Detayı
       </Button>
     </div>
   );

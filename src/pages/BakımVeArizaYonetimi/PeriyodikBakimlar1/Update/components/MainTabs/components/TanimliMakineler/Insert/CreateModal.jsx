@@ -131,7 +131,7 @@ export default function CreateModal({
           </Button>
         </div>
 
-        <Modal width="500px" title={`Peryodik Bakım Bilgileri Ekle ${currentModalIndex}/${totalModals}`} open={visible} onCancel={onCancel} onOk={handleModalOk}>
+        <Modal width="500px" title={`Periyodik Bakım Bilgileri Ekle ${currentModalIndex}/${totalModals}`} open={visible} onCancel={onCancel} onOk={handleModalOk}>
           {/*<MainTabs />*/}
           <PeryotBakimBilgileriEkle tarihSayacBakim={tarihSayacBakim} activeTab={activeTab} periyotBilgiDurum={periyotBilgiDurum} />
         </Modal>

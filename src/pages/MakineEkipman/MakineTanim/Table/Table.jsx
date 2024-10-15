@@ -223,7 +223,7 @@ const MainTable = ({ setSelectedIds }) => {
       render: (text) => <div style={{ textAlign: "center" }}>{text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}</div>,
     },
     {
-      title: "Peryodik Bakım",
+      title: "Periyodik Bakım",
       dataIndex: "MKN_PERIYODIK_BAKIM",
       key: "MKN_PERIYODIK_BAKIM",
       width: 100,

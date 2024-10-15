@@ -1,32 +1,10 @@
 import { Checkbox, Tag } from "antd";
 import dayjs from "dayjs";
-import {
-  getColor,
-  getDocumentIcon,
-  getDurusIcon,
-  getIcon,
-  getMaterialIcon,
-  getNotIcon,
-  getOpenIcon,
-  getPersonnelIcon,
-  getPictureIcon,
-  getSpecialareaIcon,
-} from "./utils";
+import { getColor, getDocumentIcon, getDurusIcon, getIcon, getMaterialIcon, getNotIcon, getOpenIcon, getPersonnelIcon, getPictureIcon, getSpecialareaIcon } from "./utils";
 import { useState } from "react";
 
 // Define an array of default visible column keys
-export const DEFAULT_VISIBLE_COLUMNS = [
-  "MKN_KOD",
-  "MKN_TANIM",
-  "MKN_AKTIF",
-  "MKN_DURUM",
-  "MKN_ARAC_TIP",
-  "MKN_LOKASYON",
-  "MKN_TIP",
-  "MKN_KATEGORI",
-  "MKN_MARKA",
-  "MKN_MODEL",
-]; // Replace with your desired default columns
+export const DEFAULT_VISIBLE_COLUMNS = ["MKN_KOD", "MKN_TANIM", "MKN_AKTIF", "MKN_DURUM", "MKN_ARAC_TIP", "MKN_LOKASYON", "MKN_TIP", "MKN_KATEGORI", "MKN_MARKA", "MKN_MODEL"]; // Replace with your desired default columns
 
 export default function useColumns(props) {
   const { handleNoteClick } = props;
@@ -97,7 +75,7 @@ export default function useColumns(props) {
       key: "MKN_PERIYODIK_BAKIM",
       sorter: (a, b) => (a.MKN_PERIYODIK_BAKIM === b.MKN_PERIYODIK_BAKIM ? 0 : a.MKN_PERIYODIK_BAKIM ? -1 : 1),
       width: 100,
-      description: "Peryodik Bakım",
+      description: "Periyodik Bakım",
       ellipsis: true,
 
       modalTitle: "Periyodik Bakım",
