@@ -3,7 +3,7 @@ import { Table, Button, Modal, Spin, Input } from "antd";
 import AxiosInstance from "../../../../../../../../../api/http";
 import { Controller, useFormContext } from "react-hook-form";
 
-function EkipmanTablo({ onSubmit }) {
+function EkipmanTablo({ onSubmit, disabled }) {
   const [data, setData] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -182,7 +182,7 @@ function EkipmanTablo({ onSubmit }) {
 
   return (
     <div>
-      <Button type="" onClick={showModal}>
+      <Button disabled={disabled} onClick={showModal}>
         +
       </Button>
       <Modal title="Ekipman Tablosu" centered open={isModalVisible} onOk={handleOk} onCancel={handleCancel} width={1200}>
