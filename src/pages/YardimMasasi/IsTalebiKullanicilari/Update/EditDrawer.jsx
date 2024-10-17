@@ -40,7 +40,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         try {
           const response = await AxiosInstance.get(`GetIsTalebiKullaniciList?TB_IS_TALEBI_KULLANICI_ID=${selectedRow.key}`);
           const data = response[0];
-          setValue("secilenID", data.key);
+          setValue("secilenID", data.TB_IS_TALEBI_KULLANICI_ID);
           setValue("aktif", data.ISK_AKTIF);
           setValue("ekipmanKodu", data.ISK_KOD === "" || data.ISK_KOD === 0 ? null : data.ISK_KOD);
           setValue("ekipmanTanimi", data.ISK_ISIM === "" || data.ISK_ISIM === 0 ? null : data.ISK_ISIM);
@@ -96,14 +96,14 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       .then((response) => {
         console.log("Data sent successfully:", response);
         if (response.status_code === 200 || response.status_code === 201 || response.status === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("Güncelleme Başarılı.");
           setOpen(false);
           onRefresh();
           methods.reset();
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
-          message.error("Ekleme Başarısız.");
+          message.error("Güncelleme Başarısız.");
         }
       })
       .catch((error) => {
