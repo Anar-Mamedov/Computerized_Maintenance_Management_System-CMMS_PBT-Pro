@@ -26,6 +26,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       tipiID: null,
       departman: null,
       departmanID: null,
+      sifre: null,
       // ... Tüm default değerleriniz
     },
   });
@@ -53,6 +54,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("tipiID", data.ISK_KULLANICI_TIP_KOD_ID === "" || data.ISK_KULLANICI_TIP_KOD_ID === 0 ? null : data.ISK_KULLANICI_TIP_KOD_ID);
           setValue("departman", data.DEPARTMAN === "" || data.DEPARTMAN === 0 ? null : data.DEPARTMAN);
           setValue("departmanID", data.ISK_DEPARTMAN_ID === "" || data.ISK_DEPARTMAN_ID === 0 ? null : data.ISK_DEPARTMAN_ID);
+          setValue("sifre", data.ISK_SIFRE === "" || data.ISK_SIFRE === 0 ? null : data.ISK_SIFRE);
           // Set other fields as needed
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -88,6 +90,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       ISK_LOKASYON_ID: Number(data.lokasyonID),
       ISK_AKTIF: data.aktif,
       ISK_PERSONEL_ID: Number(data.personelID),
+      ISK_SIFRE: data.sifre,
       // Diğer alanlarınız...
     };
 
