@@ -28,7 +28,7 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
   const content = (
     <div>
       {selectedRows.length >= 1 && <Sil selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
-      {selectedRows.length >= 1 && <IleriTarihePlanla selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
+      {selectedRows.length == 1 && <IleriTarihePlanla selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
 
       {/* {selectedRows.length >= 1 && <Iptal selectedRows={selectedRows} refreshTableData={refreshTableData} iptalDisabled={iptalDisabled} />} */}
     </div>

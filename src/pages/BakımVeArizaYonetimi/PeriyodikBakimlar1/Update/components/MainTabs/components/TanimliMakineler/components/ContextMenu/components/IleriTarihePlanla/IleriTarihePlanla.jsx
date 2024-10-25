@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Modal, message, Typography } from "antd";
 import Forms from "./components/Forms";
 import { Controller, useForm, FormProvider } from "react-hook-form";
@@ -11,14 +11,21 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
   const [isModalOpen, setIsModalOpen] = useState(false);
   const methods = useForm({
     defaultValues: {
-      fisNo: "",
-      iptalTarihi: "",
-      iptalSaati: "",
-      iptalNeden: "",
+      hedefTarihi: null,
+      planlamaNedeniID: null,
+      planlamaNedeni: null,
+      aciklama: "",
       // Add other default values here
     },
   });
   const { setValue, reset, handleSubmit } = methods;
+
+  useEffect(() => {
+    if (isModalOpen && selectedRows) {
+      const item = selectedRows[0];
+      setValue("hedefTarihi", item.PBM_HEDEF_TARIH ? (dayjs(item.PBM_HEDEF_TARIH).isValid() ? dayjs(item.PBM_HEDEF_TARIH) : null) : null);
+    }
+  }, [selectedRows, isModalOpen, setValue]);
 
   // Sil düğmesini gizlemek için koşullu stil
   const buttonStyle = kapatDisabled ? { display: "none" } : {};
@@ -36,20 +43,14 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
   const onSubmited = (data) => {
     // Seçili satırlar için Body dizisini oluştur
     const Body = selectedRows.map((row) => ({
-      TB_IS_TALEP_ID: row.key,
-      IST_TALEP_NO: row.IST_KOD,
-      KLL_ADI: "Orjin", // Bu değer sabitse bu şekilde, dinamikse değiştirilmelidir
-      IST_SONUC: data.iptalNeden,
-      IST_KAPAMA_TARIHI: formatDateWithDayjs(data.iptalTarihi),
-      IST_KAPAMA_SAATI: formatTimeWithDayjs(data.iptalSaati),
-      ITL_ISLEM_ID: 4, // Sabit bir değerse bu şekilde kalabilir, dinamikse değiştirilmelidir
-      ITL_ISLEM: "Kapandi",
-      ITL_ISLEM_DURUM: "KAPANDI",
-      ITL_TALEP_ISLEM: "Kapandi",
-      ITL_ACIKLAMA: "Tamamlandı",
+      PBM_MAKINE_ID: row.PBM_MAKINE_ID,
+      PBM_PERIYODIK_BAKIM_ID: row.PBM_PERIYODIK_BAKIM_ID,
+      PBM_HEDEF_TARIH: data.hedefTarihi ? dayjs(data.hedefTarihi).format("YYYY-MM-DD") : null,
+      PBI_IPTAL_NEDEN_KOD_ID: Number(data.planlamaNedeniID),
+      PBI_ACIKLAMA: data.aciklama,
     }));
 
-    AxiosInstance.post("IsTalepIptalEtKapat", Body)
+    AxiosInstance.post("PBakimMakineIleriTarihePlanla", Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
         reset();
