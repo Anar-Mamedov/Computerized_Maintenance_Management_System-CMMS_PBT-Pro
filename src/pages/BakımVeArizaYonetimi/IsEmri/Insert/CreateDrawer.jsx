@@ -1,15 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import {
-  Button,
-  Drawer,
-  Space,
-  ConfigProvider,
-  Modal,
-  message,
-  Alert,
-  Spin,
-} from "antd";
+import { Button, Drawer, Space, ConfigProvider, Modal, message, Alert, Spin } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import tr_TR from "antd/es/locale/tr_TR";
 import AxiosInstance from "../../../../api/http";
@@ -184,13 +175,15 @@ export default function CreateDrawer({ onRefresh }) {
       if (open) {
         try {
           const response = await AxiosInstance.get(`IsEmriTip`);
-          const data = response; // API'den gelen veriyi al
 
           // "IMT_VARSAYILAN": true olan objeyi bul
-          const defaultItem = data.find((item) => item.IMT_VARSAYILAN === true);
+          const defaultItem = response.find((item) => item.IMT_VARSAYILAN === true);
 
           if (defaultItem) {
             setValue("prosedurTab", defaultItem.IMT_CAGRILACAK_PROSEDUR);
+            // varsayılan iş emri tipini set et
+            setValue("isEmriTipID", defaultItem.TB_ISEMRI_TIP_ID);
+            setValue("isEmriTipi", defaultItem.IMT_TANIM);
             // Eğer varsayılan obje bulunursa, form alanlarını set et
             setFieldRequirements({
               lokasyonTanim: defaultItem.IMT_LOKASYON,
@@ -246,16 +239,16 @@ export default function CreateDrawer({ onRefresh }) {
           // Veriyi işle ve form alanlarını güncelle
           data.forEach((item) => {
             switch (item.TABLO_TANIMI) {
-              case "IS_EMRI_DURUM_VARSAYILAN":
+              /* case "IS_EMRI_DURUM_VARSAYILAN":
                 // Örneğin, sipariş durumu için
                 setValue("isEmriDurum", item.TANIM);
                 setValue("isEmriDurumID", item.ID);
-                break;
-              case "IS_EMRI_TIP_VARSAYILAN":
+                break; */
+              /* case "IS_EMRI_TIP_VARSAYILAN":
                 // Örneğin, iş emri tipi için
                 setValue("isEmriTipi", item.TANIM);
                 setValue("isEmriTipiID", item.ID);
-                break;
+                break; */
               case "SERVIS_ONCELIK":
                 // Örneğin, servis önceliği için
                 setValue("oncelikTanim", item.TANIM);
@@ -276,6 +269,27 @@ export default function CreateDrawer({ onRefresh }) {
   }, [open, setValue, methods.reset]);
 
   // API'den varsayılan değerleri çekip set etme son
+
+  useEffect(() => {
+    if (open) {
+      AxiosInstance.get("KodList?grup=32801")
+        .then((response) => {
+          const defaultItem = response.find((item) => item.KOD_ISM_DURUM_VARSAYILAN === true);
+          if (defaultItem) {
+            setValue("isEmriDurumID", defaultItem.TB_KOD_ID);
+            setValue("isEmriDurum", defaultItem.KOD_TANIM);
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching IsEmriTip:", error);
+          if (navigator.onLine) {
+            message.error("Hata Mesajı: " + error.message);
+          } else {
+            message.error("Internet Bağlantısı Mevcut Değil.");
+          }
+        });
+    }
+  }, [open]);
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
@@ -314,8 +328,7 @@ export default function CreateDrawer({ onRefresh }) {
       ISM_MASRAF_MERKEZ_ID: data.masrafMerkeziID,
       ISM_PROJE_ID: data.projeID,
       ISM_REFERANS_NO: data.referansNo,
-      ISM_TAMAMLANMA_ORAN:
-        data.tamamlanmaOranı === "" ? 0 : data.tamamlanmaOranı,
+      ISM_TAMAMLANMA_ORAN: data.tamamlanmaOranı === "" ? 0 : data.tamamlanmaOranı,
       ISM_PLAN_BASLAMA_TARIH: formatDateWithDayjs(data.planlananBaslama),
       ISM_PLAN_BASLAMA_SAAT: formatTimeWithDayjs(data.planlananBaslamaSaati),
       ISM_PLAN_BITIS_TARIH: formatDateWithDayjs(data.planlananBitis),
@@ -382,11 +395,7 @@ export default function CreateDrawer({ onRefresh }) {
   return (
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
-        <Button
-          type="primary"
-          onClick={showDrawer}
-          style={{ display: "flex", alignItems: "center" }}
-        >
+        <Button type="primary" onClick={showDrawer} style={{ display: "flex", alignItems: "center" }}>
           <PlusOutlined />
           Ekle
         </Button>
@@ -439,11 +448,7 @@ export default function CreateDrawer({ onRefresh }) {
             </Spin>
           ) : (
             <form onSubmit={methods.handleSubmit(onSubmit)}>
-              <MainTabs
-                drawerOpen={open}
-                isDisabled={isDisabled}
-                fieldRequirements={fieldRequirements}
-              />
+              <MainTabs drawerOpen={open} isDisabled={isDisabled} fieldRequirements={fieldRequirements} />
               <SecondTabs fieldRequirements={fieldRequirements} />
               <Footer />
             </form>
