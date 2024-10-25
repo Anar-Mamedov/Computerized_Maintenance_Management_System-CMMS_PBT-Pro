@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Button, Modal, Input, Typography, Tabs, DatePicker, TimePicker } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
-import IptalNedeni from "./IptalNedeni";
 import dayjs from "dayjs";
+import PlanlamaNedeni from "./PlanlamaNedeni";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
 
@@ -56,7 +56,13 @@ const StyledDivMedia = styled.div`
 export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
-  const { control, watch, setValue } = useFormContext();
+  const {
+    control,
+    watch,
+    setValue,
+    getValues,
+    formState: { errors },
+  } = useFormContext();
 
   // Sil düğmesini gizlemek için koşullu stil
   const buttonStyle = iptalDisabled ? { display: "none" } : {};
@@ -101,29 +107,48 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
 
   // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın sonu
 
-  console.log(selectedRows);
-
   return (
     <div style={buttonStyle}>
       <div style={{ marginBottom: "10px", display: "flex" }}>
-        <div style={{ display: "flex", width: "125px" }}>
+        <div style={{ display: "flex", width: "130px" }}>
           <Text>Makine:</Text>
         </div>
+        <Text>
+          {selectedRows[0].MKN_KOD} - {selectedRows[0].MKN_TANIM}
+        </Text>
+      </div>
+      <div style={{ marginBottom: "10px", display: "flex" }}>
+        <div style={{ display: "flex", width: "130px" }}>
+          <Text>Bakım Kodu:</Text>
+        </div>
         <Text>{selectedRows[0].PBK_KOD}</Text>
+      </div>
+      <div style={{ marginBottom: "10px", display: "flex" }}>
+        <div style={{ display: "flex", width: "130px" }}>
+          <Text>Bakım Tanımı:</Text>
+        </div>
+        <Text>{selectedRows[0].PBK_TANIM}</Text>
+      </div>
+
+      <div style={{ marginBottom: "10px", display: "flex" }}>
+        <div style={{ display: "flex", width: "130px" }}>
+          <Text>Tarih:</Text>
+        </div>
+        <Text>{new Intl.DateTimeFormat(navigator.language).format(new Date(selectedRows[0].PBM_SON_UYGULAMA_TARIH))}</Text>
       </div>
       <div
         style={{
           display: "flex",
           flexWrap: "wrap",
           alignItems: "center",
-          maxWidth: "422px",
+          maxWidth: "430px",
           gap: "10px",
           width: "100%",
           justifyContent: "space-between",
           marginBottom: "10px",
         }}
       >
-        <Text style={{ fontSize: "14px" }}>Kapatma Tarihi:</Text>
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Hedef Tarihi:</Text>
         <div
           style={{
             display: "flex",
@@ -131,30 +156,54 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
             alignItems: "center",
             maxWidth: "300px",
             minWidth: "300px",
-            gap: "10px",
+            gap: "5px",
             width: "100%",
           }}
         >
           <Controller
-            name="iptalTarihi"
+            name="hedefTarihi"
             control={control}
-            render={({ field }) => <DatePicker {...field} style={{ width: "180px" }} disabled format={localeDateFormat} placeholder="Tarih seçiniz" />}
-          />
-          <Controller
-            name="iptalSaati"
-            control={control}
+            rules={{ required: "Alan Boş Bırakılamaz!" }}
             render={({ field }) => (
-              <TimePicker {...field} changeOnScroll needConfirm={false} style={{ width: "110px" }} disabled format={localeTimeFormat} placeholder="Saat seçiniz" />
+              <DatePicker {...field} status={errors.hedefTarihi ? "error" : ""} style={{ width: "180px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />
             )}
           />
+          {errors.hedefTarihi && <div style={{ color: "red", marginTop: "0px" }}>{errors.hedefTarihi.message}</div>}
+        </div>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          maxWidth: "430px",
+          gap: "10px",
+          width: "100%",
+          justifyContent: "space-between",
+          marginBottom: "10px",
+        }}
+      >
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Planlama Nedeni:</Text>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            maxWidth: "300px",
+            minWidth: "300px",
+            gap: "5px",
+            width: "100%",
+          }}
+        >
+          <PlanlamaNedeni />
         </div>
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between" }}>
-        <Text>Sonuç:</Text>
+        <Text>Açıklama:</Text>
         <Controller
-          name="iptalNeden"
+          name="aciklama"
           control={control}
-          render={({ field }) => <TextArea {...field} style={{ width: "100%", maxWidth: "350px" }} rows={4} placeholder="Sonuç Ekle" />}
+          render={({ field }) => <TextArea {...field} style={{ width: "100%", maxWidth: "342px" }} rows={4} placeholder="Açıklama Ekle" />}
         />
       </div>
     </div>
