@@ -9,6 +9,7 @@ import TarihceTablo from "./components/TarihceTablo";
 import Form from "./components/Form/Form";
 import OnayaGonder from "./components/OnayaGonder";
 import IleriTarihePlanla from "./components/IleriTarihePlanla/IleriTarihePlanla";
+import PeriyodikBakimIptal from "./components/PeriyodikBakimIptal/PeriyodikBakimIptal";
 
 const { Text, Link } = Typography;
 
@@ -29,6 +30,7 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
     <div>
       {selectedRows.length >= 1 && <Sil selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
       {selectedRows.length == 1 && <IleriTarihePlanla selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
+      {selectedRows.length == 1 && <PeriyodikBakimIptal selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
 
       {/* {selectedRows.length >= 1 && <Iptal selectedRows={selectedRows} refreshTableData={refreshTableData} iptalDisabled={iptalDisabled} />} */}
     </div>
