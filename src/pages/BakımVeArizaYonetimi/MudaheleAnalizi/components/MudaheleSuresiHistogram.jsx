@@ -4,6 +4,7 @@ import { Spin, Typography, Modal } from "antd";
 import AxiosInstance from "../../../../api/http.jsx";
 import { useFormContext } from "react-hook-form";
 import Istalebi from "./HistogramModalContents/Table";
+import { t } from "i18next";
 
 const { Text } = Typography;
 
@@ -73,7 +74,7 @@ function MudaheleSuresiHistogram() {
       }}
     >
       <Text style={{ fontWeight: "500", fontSize: "17px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%", marginBottom: "10px" }}>
-        Müdahale Süresi Histogramı
+        {t("mudaheleSuresiHistogrami")}
       </Text>
       {isLoading ? (
         <Spin />

@@ -5,6 +5,8 @@ import trTR from "antd/es/locale/tr_TR";
 import { BrowserRouter as Router } from "react-router-dom";
 import { AppProvider } from "./AppContext.jsx";
 import { RecoilRoot } from "recoil";
+import { I18nextProvider } from "react-i18next";
+import i18n from "./utils/i18n.js";
 import dayjs from "dayjs";
 import AxiosInstance from "./api/http.jsx";
 import "./index.css";
@@ -73,21 +75,23 @@ const MainComponent1 = React.memo(function MainComponent1() {
 const Main = React.memo(function Main() {
   return (
     <React.StrictMode>
-      <ConfigProvider locale={trTR}>
-        <Router>
-          <AppProvider>
-            <RecoilRoot>
-              <Suspense
-                fallback={
-                  <div style={{ textAlign: "center", fontSize: "18px", display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>Yükleniyor...</div>
-                }
-              >
-                <App />
-              </Suspense>
-            </RecoilRoot>
-          </AppProvider>
-        </Router>
-      </ConfigProvider>
+      <I18nextProvider i18n={i18n}>
+        <ConfigProvider locale={trTR}>
+          <Router>
+            <AppProvider>
+              <RecoilRoot>
+                <Suspense
+                  fallback={
+                    <div style={{ textAlign: "center", fontSize: "18px", display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>Yükleniyor...</div>
+                  }
+                >
+                  <App />
+                </Suspense>
+              </RecoilRoot>
+            </AppProvider>
+          </Router>
+        </ConfigProvider>
+      </I18nextProvider>
     </React.StrictMode>
   );
 });
