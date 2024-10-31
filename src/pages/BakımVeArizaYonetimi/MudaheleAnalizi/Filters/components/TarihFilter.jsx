@@ -1,102 +1,123 @@
 import React, { useState, useEffect } from "react";
 import { Select, Button, Popover, Spin, DatePicker, Typography } from "antd";
-import { Controller, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
 
-const { Option } = Select;
 const { Text } = Typography;
 
 const TarihFilter = () => {
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false); // Loading state
-  const [startDate, setStartDate] = useState(dayjs().startOf("week")); // Start of this week
-  const [endDate, setEndDate] = useState(dayjs().endOf("week")); // End of this week
-  const [timeRange, setTimeRange] = useState("thisWeek"); // Initial value is "thisWeek"
+  const [loading] = useState(false); // Loading state
 
-  const { control, setValue } = useFormContext();
+  // Initialize with "thisWeek" time range
+  const [timeRange, setTimeRange] = useState("thisWeek");
+  const [startDate, setStartDate] = useState(dayjs().startOf("week"));
+  const [endDate, setEndDate] = useState(dayjs().endOf("week"));
 
+  // These states hold the values that will be applied when "Apply" is clicked
+  const [pendingTimeRange, setPendingTimeRange] = useState(timeRange);
+  const [pendingStartDate, setPendingStartDate] = useState(startDate);
+  const [pendingEndDate, setPendingEndDate] = useState(endDate);
+
+  const { setValue } = useFormContext();
+
+  // On component mount, apply the initial date range
   useEffect(() => {
-    handleTimeRangeChange(timeRange);
-    handleSubmit();
-  }, []);
-
-  const handleSubmit = () => {
-    // React state'lerinden alınan değerleri react-hook-form ile set et
     setValue("baslangicTarihi", startDate);
     setValue("bitisTarihi", endDate);
+  }, [startDate, endDate, setValue]);
+
+  const handleSubmit = () => {
+    // Apply the pending values to the actual state and form values
+    setStartDate(pendingStartDate);
+    setEndDate(pendingEndDate);
+    setTimeRange(pendingTimeRange);
+
+    // Update form values
+    setValue("baslangicTarihi", pendingStartDate);
+    setValue("bitisTarihi", pendingEndDate);
+
     setOpen(false);
   };
 
   const handleCancelClick = () => {
+    // Reset pending values to "all" and clear date pickers
+    setPendingStartDate(null);
+    setPendingEndDate(null);
+    setPendingTimeRange("all");
+
+    // Apply these changes immediately to the actual state and form values
     setStartDate(null);
     setEndDate(null);
-    setTimeRange("all"); // Reset to "all"
+    setTimeRange("all");
+
     setValue("baslangicTarihi", null);
     setValue("bitisTarihi", null);
+
     setOpen(false);
   };
 
   const handleTimeRangeChange = (value) => {
-    let startDate = null;
-    let endDate = null;
+    let start = null;
+    let end = null;
 
     switch (value) {
       case "all":
-        startDate = null;
-        endDate = null;
+        start = null;
+        end = null;
         break;
       case "today":
-        startDate = dayjs().startOf("day");
-        endDate = dayjs().endOf("day");
+        start = dayjs().startOf("day");
+        end = dayjs().endOf("day");
         break;
       case "yesterday":
-        startDate = dayjs().subtract(1, "day").startOf("day");
-        endDate = dayjs().subtract(1, "day").endOf("day");
+        start = dayjs().subtract(1, "day").startOf("day");
+        end = dayjs().subtract(1, "day").endOf("day");
         break;
       case "thisWeek":
-        startDate = dayjs().startOf("week");
-        endDate = dayjs().endOf("week");
+        start = dayjs().startOf("week");
+        end = dayjs().endOf("week");
         break;
       case "lastWeek":
-        startDate = dayjs().subtract(1, "week").startOf("week");
-        endDate = dayjs().subtract(1, "week").endOf("week");
+        start = dayjs().subtract(1, "week").startOf("week");
+        end = dayjs().subtract(1, "week").endOf("week");
         break;
       case "thisMonth":
-        startDate = dayjs().startOf("month");
-        endDate = dayjs().endOf("month");
+        start = dayjs().startOf("month");
+        end = dayjs().endOf("month");
         break;
       case "lastMonth":
-        startDate = dayjs().subtract(1, "month").startOf("month");
-        endDate = dayjs().subtract(1, "month").endOf("month");
+        start = dayjs().subtract(1, "month").startOf("month");
+        end = dayjs().subtract(1, "month").endOf("month");
         break;
       case "thisYear":
-        startDate = dayjs().startOf("year");
-        endDate = dayjs().endOf("year");
+        start = dayjs().startOf("year");
+        end = dayjs().endOf("year");
         break;
       case "lastYear":
-        startDate = dayjs().subtract(1, "year").startOf("year");
-        endDate = dayjs().subtract(1, "year").endOf("year");
+        start = dayjs().subtract(1, "year").startOf("year");
+        end = dayjs().subtract(1, "year").endOf("year");
         break;
       case "last1Month":
-        startDate = dayjs().subtract(1, "month");
-        endDate = dayjs();
+        start = dayjs().subtract(1, "month");
+        end = dayjs();
         break;
       case "last3Months":
-        startDate = dayjs().subtract(3, "months");
-        endDate = dayjs();
+        start = dayjs().subtract(3, "months");
+        end = dayjs();
         break;
       case "last6Months":
-        startDate = dayjs().subtract(6, "months");
-        endDate = dayjs();
+        start = dayjs().subtract(6, "months");
+        end = dayjs();
         break;
       default:
-        startDate = null;
-        endDate = null;
+        start = null;
+        end = null;
     }
 
-    setStartDate(startDate);
-    setEndDate(endDate);
-    setTimeRange(value); // Set the selected time range
+    setPendingStartDate(start);
+    setPendingEndDate(end);
+    setPendingTimeRange(value);
   };
 
   const content = (
@@ -117,13 +138,31 @@ const TarihFilter = () => {
 
       <div style={{ padding: "10px", display: "flex", flexDirection: "column", gap: "10px" }}>
         <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
-          <DatePicker style={{ width: "100%" }} placeholder="Başlangıç Tarihi" value={startDate} onChange={(date) => setStartDate(date)} locale={dayjs.locale("tr")} />
+          <DatePicker
+            style={{ width: "100%" }}
+            placeholder="Başlangıç Tarihi"
+            value={pendingStartDate}
+            onChange={(date) => {
+              setPendingStartDate(date);
+              setPendingTimeRange(null); // Reset timeRange if date is manually changed
+            }}
+            locale={dayjs.locale("tr")}
+          />
           <Text style={{ fontSize: "14px" }}>-</Text>
-          <DatePicker style={{ width: "100%" }} placeholder="Bitiş Tarihi" value={endDate} onChange={(date) => setEndDate(date)} locale={dayjs.locale("tr")} />
+          <DatePicker
+            style={{ width: "100%" }}
+            placeholder="Bitiş Tarihi"
+            value={pendingEndDate}
+            onChange={(date) => {
+              setPendingEndDate(date);
+              setPendingTimeRange(null); // Reset timeRange if date is manually changed
+            }}
+            locale={dayjs.locale("tr")}
+          />
         </div>
         <Select
           style={{ width: "100%" }}
-          value={timeRange} // Set the current value
+          value={pendingTimeRange || undefined}
           onChange={handleTimeRangeChange}
           notFoundContent={
             loading ? (

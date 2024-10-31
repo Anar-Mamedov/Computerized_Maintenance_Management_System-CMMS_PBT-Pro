@@ -878,11 +878,46 @@ const MainTable = ({ selectedBarData, mudaheleBody }) => {
     const currentPage = page || 1;
 
     // Merge the new data into filters
+    // Initialize empty objects
+    const atolyelerObj = {};
+    const lokasyonlarObj = {};
+    const makinelerObj = {};
+
+    // Process Atolye IDs if they exist
+    if (mudaheleBody?.AtolyeId) {
+      const atolyelerArray = mudaheleBody.AtolyeId.split(",");
+      atolyelerArray.forEach((id, index) => {
+        if (id) {
+          atolyelerObj[index] = parseInt(id);
+        }
+      });
+    }
+
+    // Process Lokasyon IDs if they exist
+    if (mudaheleBody?.LokasyonId) {
+      const lokasyonlarArray = mudaheleBody.LokasyonId.split(",");
+      lokasyonlarArray.forEach((id, index) => {
+        if (id) {
+          lokasyonlarObj[index] = parseInt(id);
+        }
+      });
+    }
+
+    // Process Makine IDs if they exist
+    if (mudaheleBody?.MakineId) {
+      const makinelerArray = mudaheleBody.MakineId.split(",");
+      makinelerArray.forEach((id, index) => {
+        if (id) {
+          makinelerObj[index] = parseInt(id);
+        }
+      });
+    }
+
     const updatedFilters = {
       ...filters,
-      lokasyonlar: mudaheleBody?.LokasyonId,
-      makineler: mudaheleBody?.MakineId,
-      atolyeler: mudaheleBody?.AtolyeId,
+      lokasyonlar: lokasyonlarObj,
+      makineler: makinelerObj,
+      atolyeler: atolyelerObj,
       tarihAraligi: {
         baslangicTarih: mudaheleBody?.BaslangicTarih ? dayjs(mudaheleBody.BaslangicTarih).format("YYYY-MM-DD") : undefined,
         bitisTarih: mudaheleBody?.BitisTarih ? dayjs(mudaheleBody.BitisTarih).format("YYYY-MM-DD") : undefined,
