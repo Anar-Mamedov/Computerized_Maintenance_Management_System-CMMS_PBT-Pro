@@ -17,6 +17,7 @@ import EditDrawer1 from "../../../../BakımVeArizaYonetimi/IsEmri/Update/EditDra
 import { useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { useDebouncedEffect } from "../../../../../hooks/useDebouncedEffect";
 
 const { Text } = Typography;
 
@@ -844,9 +845,15 @@ const MainTable = ({ selectedBarData, mudaheleBody }) => {
 
   // ana tablo api isteği için kullanılan useEffect
 
-  useEffect(() => {
-    fetchEquipmentData(body, currentPage, pageSize);
-  }, [body, currentPage, pageSize, selectedBarData]);
+  useDebouncedEffect(
+    () => {
+      if (body && currentPage !== undefined && pageSize !== undefined && selectedBarData) {
+        fetchEquipmentData(body, currentPage, pageSize);
+      }
+    },
+    [body, currentPage, pageSize, selectedBarData],
+    200
+  );
 
   // ana tablo api isteği için kullanılan useEffect son
 
