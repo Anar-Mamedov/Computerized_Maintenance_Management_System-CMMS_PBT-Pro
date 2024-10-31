@@ -88,7 +88,7 @@ function MudaheleSuresiHistogram() {
               <Bar dataKey="TalepSayi" fill="#8884d8" name="Talep Sayısı" />
             </BarChart>
           </ResponsiveContainer>
-          <Modal width={1400} centered open={isModalVisible} onCancel={handleModalClose} footer={null}>
+          <Modal width={1400} centered destroyOnClose open={isModalVisible} onCancel={handleModalClose} footer={null}>
             {/* <p>Tıklanan çubuğun verileri:</p>
             <pre>{JSON.stringify(selectedBarData, null, 2)}</pre> */}
             <div style={{ height: "40px" }}></div>
