@@ -138,7 +138,7 @@ export default function LoginForm() {
 
         <Form name="normal_login" className="login-form" initialValues={{ remember: true }} onFinish={onSubmit} style={{ width: "100%", marginTop: "20px" }}>
           <Form.Item name="email" rules={[{ required: true, message: "Lütfen kullanıcı kodunuzu girin!" }]}>
-            <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder={t("KullaniciKodu")} />
+            <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder={t("kullaniciKodu")} />
           </Form.Item>
           <Form.Item name="password">
             <Input.Password
