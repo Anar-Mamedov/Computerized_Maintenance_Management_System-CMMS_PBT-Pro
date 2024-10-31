@@ -91,12 +91,9 @@ function HesapBilgilerim(props) {
         try {
           setLoadingImage(true); // Resim yüklenmeye başladığında loadingImage'i true yap
           // responseType olarak 'blob' seçilir.
-          const response = await AxiosInstance.get(
-            `ResimGetirById?id=${userData1?.PRS_RESIM_ID}`,
-            {
-              responseType: "blob",
-            }
-          );
+          const response = await AxiosInstance.get(`ResimGetirById?id=${userData1?.PRS_RESIM_ID}`, {
+            responseType: "blob",
+          });
           // Yanıttaki blob verisi bir URL'ye dönüştürülür.
           const imageBlob = response;
           const imageObjectURL = URL.createObjectURL(imageBlob);
@@ -144,9 +141,7 @@ function HesapBilgilerim(props) {
         flexDirection: "column",
       }}
     >
-      <Text style={{ fontWeight: "500", fontSize: "16px" }}>
-        Hesap Bilgilerim
-      </Text>
+      <Text style={{ fontWeight: "500", fontSize: "16px" }}>Hesap Bilgilerim</Text>
       <div
         style={{
           borderRadius: "16px",
@@ -210,17 +205,11 @@ function HesapBilgilerim(props) {
             }}
           >
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <Text style={{ fontWeight: "500", fontSize: "15px" }}>
-                {userData1?.KLL_TANIM || "Bilinmiyor"}
-              </Text>
+              <Text style={{ fontWeight: "500", fontSize: "15px" }}>{userData1?.KLL_TANIM || "Bilinmiyor"}</Text>
               <Text type="secondary">{userData1?.PRS_UNVAN || ""}</Text>
               <Text type="secondary">{userData1?.PRS_ADRES || ""}</Text>
             </div>
-            <Button
-              shape="circle"
-              icon={<EditOutlined />}
-              onClick={showModal}
-            />
+            <Button shape="circle" icon={<EditOutlined />} onClick={showModal} />
           </div>
         </div>
       </div>
@@ -297,14 +286,7 @@ function HesapBilgilerim(props) {
         }}
       />
 
-      <Modal
-        title="Resim Yükle"
-        centered
-        open={isModalVisible1}
-        onOk={() => setIsModalVisible1(false)}
-        onCancel={() => setIsModalVisible1(false)}
-        width={800}
-      >
+      <Modal title="Resim Yükle" centered open={isModalVisible1} onOk={() => setIsModalVisible1(false)} onCancel={() => setIsModalVisible1(false)} width={800}>
         <ResimUpload />
       </Modal>
     </div>
