@@ -113,6 +113,7 @@ function AylikOrtalamaMudaheleSuresi() {
         gap: "10px",
         border: "1px solid #f0f0f0",
         padding: "10px",
+        filter: "drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))",
       }}
     >
       <Text
