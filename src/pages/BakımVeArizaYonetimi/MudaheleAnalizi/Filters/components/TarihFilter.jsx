@@ -9,11 +9,16 @@ const { Text } = Typography;
 const TarihFilter = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false); // Loading state
-  const [startDate, setStartDate] = useState(null); // Normal React state
-  const [endDate, setEndDate] = useState(null); // Normal React state
-  const [timeRange, setTimeRange] = useState("all"); // Initial value is "all"
+  const [startDate, setStartDate] = useState(dayjs().startOf("week")); // Start of this week
+  const [endDate, setEndDate] = useState(dayjs().endOf("week")); // End of this week
+  const [timeRange, setTimeRange] = useState("thisWeek"); // Initial value is "thisWeek"
 
   const { control, setValue } = useFormContext();
+
+  useEffect(() => {
+    handleTimeRangeChange(timeRange);
+    handleSubmit();
+  }, []);
 
   const handleSubmit = () => {
     // React state'lerinden alınan değerleri react-hook-form ile set et

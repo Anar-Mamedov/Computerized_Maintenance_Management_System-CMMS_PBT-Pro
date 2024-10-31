@@ -879,6 +879,7 @@ const MainTable = ({ selectedBarData, mudaheleBody }) => {
 
     // Merge the new data into filters
     const updatedFilters = {
+      ...filters,
       lokasyonlar: mudaheleBody?.LokasyonId,
       makineler: mudaheleBody?.MakineId,
       atolyeler: mudaheleBody?.AtolyeId,
