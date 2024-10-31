@@ -883,7 +883,10 @@ const MainTable = ({ selectedBarData, mudaheleBody }) => {
       lokasyonlar: mudaheleBody?.LokasyonId,
       makineler: mudaheleBody?.MakineId,
       atolyeler: mudaheleBody?.AtolyeId,
-      tarihAraligi: { baslangicTarih: dayjs(mudaheleBody?.BaslangicTarih).format("YYYY-MM-DD"), bitisTarih: dayjs(mudaheleBody?.BitisTarih).format("YYYY-MM-DD") },
+      tarihAraligi: {
+        baslangicTarih: mudaheleBody?.BaslangicTarih ? dayjs(mudaheleBody.BaslangicTarih).format("YYYY-MM-DD") : undefined,
+        bitisTarih: mudaheleBody?.BitisTarih ? dayjs(mudaheleBody.BitisTarih).format("YYYY-MM-DD") : undefined,
+      },
     };
 
     try {
