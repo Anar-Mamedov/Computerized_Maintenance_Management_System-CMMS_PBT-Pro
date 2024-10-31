@@ -6,6 +6,7 @@ import FirmaLogo from "./components/FirmaLogo.jsx";
 import Hatirlatici from "./components/Hatirlatici.jsx";
 import AxiosInstance from "../../api/http.jsx";
 import SearchComponent from "./components/SearchComponent.jsx";
+import LanguageSelectbox from "../components/Language/LanguageSelectbox.jsx";
 
 export default function Header() {
   const [hatirlaticiData, setHatirlaticiData] = useState(null);
@@ -84,6 +85,7 @@ export default function Header() {
       }}
     >
       <FirmaLogo />
+      <LanguageSelectbox />
       <div
         style={{
           display: "flex",

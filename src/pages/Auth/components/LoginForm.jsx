@@ -5,13 +5,17 @@ import { useNavigate } from "react-router-dom";
 import AxiosInstance from "../../../api/http";
 import { useSetRecoilState } from "recoil";
 import { userState, authTokenState } from "../../../state/userState";
+import { t } from "i18next";
+import LanguageSelectbox from "../../components/Language/LanguageSelectbox";
 import ReCAPTCHA from "react-google-recaptcha"; // reCAPTCHA bileşenini import edin
+import { useTranslation } from "react-i18next";
 
 const { Text } = Typography;
 
 export default function LoginForm() {
   const navigate = useNavigate();
   const setUser = useSetRecoilState(userState);
+  const { t, i18n } = useTranslation(); // Initialize useTranslation
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState(null); // reCAPTCHA token'ı için state
@@ -127,16 +131,20 @@ export default function LoginForm() {
       }}
     >
       <div style={{ width: "100%" }}>
-        <Text style={{ fontSize: "20px" }}>Giriş Yap</Text>
+        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: "20px" }}>{t("girisYap")}</Text>
+          <LanguageSelectbox />
+        </div>
+
         <Form name="normal_login" className="login-form" initialValues={{ remember: true }} onFinish={onSubmit} style={{ width: "100%", marginTop: "20px" }}>
           <Form.Item name="email" rules={[{ required: true, message: "Lütfen kullanıcı kodunuzu girin!" }]}>
-            <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Kullanıcı Kodu" />
+            <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder={t("KullaniciKodu")} />
           </Form.Item>
           <Form.Item name="password">
             <Input.Password
               prefix={<LockOutlined className="site-form-item-icon" />}
               type={showPassword ? "text" : "password"}
-              placeholder="Şifre"
+              placeholder={t("sifre")}
               iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
             />
           </Form.Item>
@@ -144,16 +152,17 @@ export default function LoginForm() {
             <ReCAPTCHA
               sitekey="6LdF_QAqAAAAAK7vusKLAVNVvf4o_vLu66azz_S8" // Google reCAPTCHA site anahtarınızı buraya ekleyin
               onChange={(token) => setRecaptchaToken(token)}
+              hl={i18n.language} // Set language based on i18n
             />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" className="login-form-button" style={{ width: "100%" }} disabled={loading}>
-              {loading ? <Spin /> : "Giriş Yap"}
+              {loading ? <Spin /> : t("girisYap")}
             </Button>
           </Form.Item>
           <Form.Item>
             <Button danger onClick={handleClearBaseURL} style={{ width: "100%" }}>
-              Anahtarı Değiştir
+              {t("anahtariDegistir")}
             </Button>
           </Form.Item>
         </Form>
