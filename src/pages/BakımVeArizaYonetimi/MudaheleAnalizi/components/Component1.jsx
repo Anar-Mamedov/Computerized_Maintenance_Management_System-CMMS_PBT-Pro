@@ -54,6 +54,7 @@ function Component1() {
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
+        filter: "drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))",
       }}
     >
       {isLoading ? (

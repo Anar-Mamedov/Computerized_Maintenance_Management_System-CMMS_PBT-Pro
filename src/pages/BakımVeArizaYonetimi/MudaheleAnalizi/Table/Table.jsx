@@ -683,7 +683,7 @@ const MainTable = () => {
   // sütunları sıfırlamak için kullanılan fonksiyon sonu
 
   return (
-    <div style={{ border: "1px solid #f0f0f0", borderRadius: "5px", padding: "10px" }}>
+    <div style={{ backgroundColor: "white", border: "1px solid #f0f0f0", borderRadius: "5px", padding: "10px", filter: "drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))" }}>
       <Modal title="Sütunları Yönet" centered width={800} open={isModalVisible} onOk={() => setIsModalVisible(false)} onCancel={() => setIsModalVisible(false)}>
         <Text style={{ marginBottom: "15px" }}>Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını Ayarlayabilirsiniz.</Text>
         <div
