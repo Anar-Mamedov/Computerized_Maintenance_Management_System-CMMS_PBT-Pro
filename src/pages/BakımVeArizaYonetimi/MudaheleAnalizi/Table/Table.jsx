@@ -271,7 +271,7 @@ const MainTable = () => {
       },
     },
     {
-      title: "Fark Dakika",
+      title: "Müdahele Süresi",
       dataIndex: "FARK_DAKIKA",
       key: "FARK_DAKIKA",
       width: 120,
