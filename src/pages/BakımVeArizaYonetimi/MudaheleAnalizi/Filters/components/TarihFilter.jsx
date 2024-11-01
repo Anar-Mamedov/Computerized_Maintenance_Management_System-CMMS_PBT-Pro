@@ -9,23 +9,24 @@ const TarihFilter = () => {
   const [open, setOpen] = useState(false);
   const [loading] = useState(false); // Loading state
 
-  // Initialize with "thisWeek" time range
-  const [timeRange, setTimeRange] = useState("thisWeek");
-  const [startDate, setStartDate] = useState(dayjs().startOf("week"));
-  const [endDate, setEndDate] = useState(dayjs().endOf("week"));
+  const { setValue, getValues } = useFormContext();
 
-  // These states hold the values that will be applied when "Apply" is clicked
+  // Retrieve initial values from the form context
+  const initialStartDate = getValues("baslangicTarihi") ? dayjs(getValues("baslangicTarihi")) : null;
+  const initialEndDate = getValues("bitisTarihi") ? dayjs(getValues("bitisTarihi")) : null;
+
+  const [startDate, setStartDate] = useState(initialStartDate);
+  const [endDate, setEndDate] = useState(initialEndDate);
+
+  // Determine the initial timeRange based on the start and end dates
+  const isThisWeek = startDate && endDate && startDate.isSame(dayjs().startOf("week"), "day") && endDate.isSame(dayjs().endOf("week"), "day");
+
+  const [timeRange, setTimeRange] = useState(isThisWeek ? "thisWeek" : "all");
+
+  // Initialize pending states
   const [pendingTimeRange, setPendingTimeRange] = useState(timeRange);
   const [pendingStartDate, setPendingStartDate] = useState(startDate);
   const [pendingEndDate, setPendingEndDate] = useState(endDate);
-
-  const { setValue } = useFormContext();
-
-  // On component mount, apply the initial date range
-  useEffect(() => {
-    setValue("baslangicTarihi", startDate);
-    setValue("bitisTarihi", endDate);
-  }, [startDate, endDate, setValue]);
 
   const handleSubmit = () => {
     // Apply the pending values to the actual state and form values
@@ -41,12 +42,12 @@ const TarihFilter = () => {
   };
 
   const handleCancelClick = () => {
-    // Reset pending values to "all" and clear date pickers
+    // Reset pending values to default and clear date pickers
     setPendingStartDate(null);
     setPendingEndDate(null);
     setPendingTimeRange("all");
 
-    // Apply these changes immediately to the actual state and form values
+    // Reset actual state and form values
     setStartDate(null);
     setEndDate(null);
     setTimeRange("all");

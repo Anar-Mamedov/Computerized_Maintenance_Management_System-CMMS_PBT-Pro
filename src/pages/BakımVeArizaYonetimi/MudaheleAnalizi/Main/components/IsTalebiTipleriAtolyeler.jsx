@@ -136,8 +136,8 @@ function IsTalebiTipleriAtolyeler(props) {
       LokasyonId: lokasyonId || "",
       AtolyeId: atolyeId || "",
       MakineId: makineId || "",
-      BaslangicTarih: baslangicTarihi || "",
-      BitisTarih: bitisTarihi || "",
+      BaslangicTarih: baslangicTarihi ? dayjs(baslangicTarihi).format("YYYY-MM-DD") : "",
+      BitisTarih: bitisTarihi ? dayjs(bitisTarihi).format("YYYY-MM-DD") : "",
       // Yil: currentYear,
     };
     try {

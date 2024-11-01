@@ -5,33 +5,33 @@ import AxiosInstance from "../../../../api/http.jsx";
 import { useFormContext } from "react-hook-form";
 import Istalebi from "./HistogramModalContents/Table";
 import { t } from "i18next";
+import dayjs from "dayjs";
 
 const { Text } = Typography;
 
 function MudaheleSuresiHistogram() {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { watch } = useFormContext();
+  const { watch, getValues } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedBarData, setSelectedBarData] = useState(null);
 
   const lokasyonId = watch("locationIds");
   const atolyeId = watch("atolyeIds");
   const makineId = watch("makineIds");
-  const baslangicTarihi = watch("baslangicTarihi");
-  const bitisTarihi = watch("bitisTarihi");
+  const baslangicTarihi = getValues("baslangicTarihi");
+  const bitisTarihi = getValues("bitisTarihi");
 
   const body = {
     LokasyonId: lokasyonId || "",
     AtolyeId: atolyeId || "",
     MakineId: makineId || "",
-    BaslangicTarih: baslangicTarihi || "",
-    BitisTarih: bitisTarihi || "",
+    BaslangicTarih: baslangicTarihi ? dayjs(baslangicTarihi).format("YYYY-MM-DD") : "",
+    BitisTarih: bitisTarihi ? dayjs(bitisTarihi).format("YYYY-MM-DD") : "",
   };
 
   const fetchData = async () => {
     setIsLoading(true);
-
     try {
       const response = await AxiosInstance.post(`GetMudahaleAnalizHistogramGraph`, body);
       setData(response);

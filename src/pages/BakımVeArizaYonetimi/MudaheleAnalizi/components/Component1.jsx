@@ -3,6 +3,7 @@ import bg from "../../../../assets/images/bg-card.png";
 import { Spin, Typography } from "antd";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../api/http.jsx";
+import dayjs from "dayjs";
 
 const { Text } = Typography;
 
@@ -23,8 +24,8 @@ function Component1() {
       LokasyonId: lokasyonId || "",
       AtolyeId: atolyeId || "",
       MakineId: makineId || "",
-      BaslangicTarih: baslangicTarihi || "",
-      BitisTarih: bitisTarihi || "",
+      BaslangicTarih: baslangicTarihi ? dayjs(baslangicTarihi).format("YYYY-MM-DD") : "",
+      BitisTarih: bitisTarihi ? dayjs(bitisTarihi).format("YYYY-MM-DD") : "",
     };
     try {
       const response = await AxiosInstance.post(`GetMudahaleAnalizDashboard`, body);
