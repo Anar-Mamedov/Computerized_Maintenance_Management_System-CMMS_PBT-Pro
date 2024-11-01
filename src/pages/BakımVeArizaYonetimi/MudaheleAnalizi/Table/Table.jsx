@@ -14,6 +14,7 @@ import Filters1 from "./Filters/Filters.jsx";
 // import ContextMenu from "../components/ContextMenu/ContextMenu";
 import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
 import { useFormContext } from "react-hook-form";
+import dayjs from "dayjs";
 
 const { Text } = Typography;
 
@@ -433,8 +434,8 @@ const MainTable = () => {
       const body = {
         LokasyonId: lokasyonId || "",
         AtolyeId: atolyeId || "",
-        BaslangicTarih: baslangicTarihi || "",
-        BitisTarih: bitisTarihi || "",
+        BaslangicTarih: baslangicTarihi ? dayjs(baslangicTarihi).format("YYYY-MM-DD") : "",
+        BitisTarih: bitisTarihi ? dayjs(bitisTarihi).format("YYYY-MM-DD") : "",
         // Yil: currentYear,
       };
 

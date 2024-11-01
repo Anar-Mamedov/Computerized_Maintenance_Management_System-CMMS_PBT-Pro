@@ -4,6 +4,7 @@ import { Spin, Typography } from "antd";
 import AxiosInstance from "../../../../api/http.jsx";
 import { useFormContext } from "react-hook-form";
 import { t } from "i18next";
+import dayjs from "dayjs";
 
 const { Text } = Typography;
 
@@ -45,8 +46,8 @@ function AylikOrtalamaMudaheleSuresi() {
       LokasyonId: lokasyonId || "",
       AtolyeId: atolyeId || "",
       MakineId: makineId || "",
-      BaslangicTarih: baslangicTarihi || "",
-      BitisTarih: bitisTarihi || "",
+      BaslangicTarih: baslangicTarihi ? dayjs(baslangicTarihi).format("YYYY-MM-DD") : "",
+      BitisTarih: bitisTarihi ? dayjs(bitisTarihi).format("YYYY-MM-DD") : "",
       Yil: yil || "",
     };
     try {
