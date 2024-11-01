@@ -4,6 +4,7 @@ import { Spin, Typography } from "antd";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../api/http.jsx";
 import dayjs from "dayjs";
+import EditDrawer from "../../IsEmri/Update/EditDrawer.jsx";
 
 const { Text } = Typography;
 
@@ -11,6 +12,7 @@ function Component1() {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(null);
   const { watch } = useFormContext();
+  const [drawer, setDrawer] = useState({ visible: false, data: null });
 
   const lokasyonId = watch("locationIds");
   const atolyeId = watch("atolyeIds");
@@ -41,9 +43,11 @@ function Component1() {
     fetchData();
   }, [lokasyonId, atolyeId, makineId, baslangicTarihi, bitisTarihi]);
 
-  const renderCard = (value, label, backgroundColor, appendUnit) => (
+  const renderCard = (value, label, backgroundColor, appendUnit, onClick) => (
     <div
+      onClick={onClick}
       style={{
+        cursor: onClick ? "pointer" : "default",
         flex: "1 1 16%",
         maxWidth: "16%",
         background: backgroundColor || `url(${bg}), linear-gradient(rgb(27 17 92), #007eff)`,
@@ -85,21 +89,42 @@ function Component1() {
   );
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "10px",
-        justifyContent: "space-between",
-      }}
-    >
-      {renderCard(data?.ToplamTalepSayisi, "Toplam Talep Sayısı", "linear-gradient(to right, #ff7e5f, #feb47b)", false)}
-      {renderCard(data?.OrtalamaMudahaleSuresi, "Ortalama Müdahale Süresi", "linear-gradient(to right, #6a11cb, #2575fc)", true)}
-      {renderCard(data?.EnHizliMudahaleSuresi, "En Hızlı Müdahale Süresi", "linear-gradient(to right, #43cea2, #185a9d)", true)}
-      {renderCard(data?.EnYavasMudahaleSuresi, "En Yavaş Müdahale Süresi", "linear-gradient(to right, #ff4e50, #f9d423)", true)}
-      {renderCard(data?.OrtalamaCalismaSuresi, "Ortalama Çalışma Süresi", "linear-gradient(to right, #00c6ff, #0072ff)", true)}
-      {renderCard(data?.ToplamCalismaSuresi, "Toplam Çalışma Süresi", "linear-gradient(to right, #f7971e, #ffd200)", true)}
-    </div>
+    <>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "10px",
+          justifyContent: "space-between",
+        }}
+      >
+        {renderCard(data?.ToplamTalepSayisi, "Toplam Talep Sayısı", "linear-gradient(to right, #ff7e5f, #feb47b)", false)}
+        {renderCard(data?.OrtalamaMudahaleSuresi, "Ortalama Müdahale Süresi", "linear-gradient(to right, #6a11cb, #2575fc)", true)}
+        {renderCard(data?.EnHizliMudahale?.EnHizliMudahaleSuresi, "En Hızlı Müdahale Süresi", "linear-gradient(to right, #43cea2, #185a9d)", true, () => {
+          setDrawer({
+            visible: true,
+            data: {
+              ...data?.EnHizliMudahale,
+              key: data?.EnHizliMudahale?.TB_ISEMRI_ID,
+            },
+          });
+        })}
+        {renderCard(data?.EnYavasMudahaleSuresi?.EnYavasMudahaleSuresi, "En Yavaş Müdahale Süresi", "linear-gradient(to right, #ff4e50, #f9d423)", true, () => {
+          setDrawer({
+            visible: true,
+            data: {
+              ...data?.EnYavasMudahaleSuresi,
+              key: data?.EnYavasMudahaleSuresi?.TB_ISEMRI_ID,
+            },
+          });
+        })}
+        {renderCard(data?.OrtalamaCalismaSuresi, "Ortalama Çalışma Süresi", "linear-gradient(to right, #00c6ff, #0072ff)", true)}
+        {renderCard(data?.ToplamCalismaSuresi, "Toplam Çalışma Süresi", "linear-gradient(to right, #f7971e, #ffd200)", true)}
+      </div>
+
+      {/* Include the EditDrawer component */}
+      <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} />
+    </>
   );
 }
 
