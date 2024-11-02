@@ -19,9 +19,9 @@ const TarihFilter = () => {
   const [endDate, setEndDate] = useState(initialEndDate);
 
   // Determine the initial timeRange based on the start and end dates
-  const isThisWeek = startDate && endDate && startDate.isSame(dayjs().startOf("week"), "day") && endDate.isSame(dayjs().endOf("week"), "day");
+  const isThisWeek = startDate && endDate && startDate.isSame(dayjs().startOf("year"), "day") && endDate.isSame(dayjs().endOf("year"), "day");
 
-  const [timeRange, setTimeRange] = useState(isThisWeek ? "thisWeek" : "all");
+  const [timeRange, setTimeRange] = useState(isThisWeek ? "thisYear" : "all");
 
   // Initialize pending states
   const [pendingTimeRange, setPendingTimeRange] = useState(timeRange);
