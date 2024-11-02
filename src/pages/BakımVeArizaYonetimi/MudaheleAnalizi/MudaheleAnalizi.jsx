@@ -9,8 +9,8 @@ export default function PersonelTanimlari() {
       locationIds: "",
       atolyeIds: "",
       makineIds: "",
-      baslangicTarihi: dayjs().startOf("week"),
-      bitisTarihi: dayjs().endOf("week"),
+      baslangicTarihi: dayjs().startOf("year"),
+      bitisTarihi: dayjs().endOf("year"),
     },
   });
   return (
