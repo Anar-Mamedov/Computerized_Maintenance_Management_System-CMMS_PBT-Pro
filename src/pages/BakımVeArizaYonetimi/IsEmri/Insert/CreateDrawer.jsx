@@ -12,6 +12,7 @@ import dayjs from "dayjs";
 export default function CreateDrawer({ onRefresh }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [disabled, setDisabled] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   // API'den gelen zorunluluk bilgilerini simüle eden bir örnek
   const [fieldRequirements, setFieldRequirements] = React.useState({
@@ -301,6 +302,18 @@ export default function CreateDrawer({ onRefresh }) {
     return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
   };
 
+  const calismaSaat = watch("calismaSaat");
+
+  useEffect(() => {
+    if (disabled == false) {
+      if (calismaSaat < 0) {
+        setDisabled(true);
+      } else {
+        setDisabled(false);
+      }
+    }
+  }, [calismaSaat]);
+
   const onSubmit = (data) => {
     // Form verilerini API'nin beklediği formata dönüştür
     const Body = {
@@ -420,12 +433,13 @@ export default function CreateDrawer({ onRefresh }) {
             <Space>
               <Button onClick={onClose}>İptal</Button>
               <Button
+                disabled={disabled}
                 type="submit"
                 onClick={methods.handleSubmit(onSubmit)}
                 style={{
-                  backgroundColor: "#2bc770",
-                  borderColor: "#2bc770",
-                  color: "#ffffff",
+                  backgroundColor: disabled ? "#d9d9d9" : "#2bc770",
+                  borderColor: disabled ? "#d9d9d9" : "#2bc770",
+                  color: disabled ? "black" : "#ffffff",
                 }}
               >
                 Kaydet

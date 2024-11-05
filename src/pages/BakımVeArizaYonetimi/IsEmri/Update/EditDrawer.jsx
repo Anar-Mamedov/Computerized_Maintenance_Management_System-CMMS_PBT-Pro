@@ -487,6 +487,18 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
   };
 
+  const calismaSaat = watch("calismaSaat");
+
+  useEffect(() => {
+    if (disabled == false) {
+      if (calismaSaat < 0) {
+        setDisabled(true);
+      } else {
+        setDisabled(false);
+      }
+    }
+  }, [calismaSaat]);
+
   const onSubmit = (data) => {
     // Form verilerini API'nin beklediği formata dönüştür
     const Body = {
@@ -581,7 +593,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       .then((response) => {
         console.log("Data sent successfully:", response);
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("İşlem Başarılı.");
           setOpen(false);
           onRefresh();
           methods.reset();
@@ -589,7 +601,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
-          message.error("Ekleme Başarısız.");
+          message.error("İşlem Başarısız.");
         }
       })
       .catch((error) => {
