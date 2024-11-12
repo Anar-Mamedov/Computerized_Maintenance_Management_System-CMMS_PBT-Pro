@@ -40,41 +40,16 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       setValue("atolyeID", selectedRow.DKN_YAPILDI_ATOLYE_ID);
       setValue("personelTanim", selectedRow.DKN_PERSONEL_ISIM);
       setValue("personelID", selectedRow.DKN_YAPILDI_PERSONEL_ID);
-      setValue(
-        "baslangicTarihi",
-        selectedRow.DKN_YAPILDI_TARIH
-          ? dayjs(selectedRow.DKN_YAPILDI_TARIH).isValid()
-            ? dayjs(selectedRow.DKN_YAPILDI_TARIH)
-            : null
-          : null
-      );
+      setValue("baslangicTarihi", selectedRow.DKN_YAPILDI_TARIH ? (dayjs(selectedRow.DKN_YAPILDI_TARIH).isValid() ? dayjs(selectedRow.DKN_YAPILDI_TARIH) : null) : null);
       setValue(
         "baslangicSaati",
-        selectedRow.DKN_YAPILDI_SAAT
-          ? dayjs(selectedRow.DKN_YAPILDI_SAAT, "HH:mm:ss").isValid()
-            ? dayjs(selectedRow.DKN_YAPILDI_SAAT, "HH:mm:ss")
-            : null
-          : null
+        selectedRow.DKN_YAPILDI_SAAT ? (dayjs(selectedRow.DKN_YAPILDI_SAAT, "HH:mm:ss").isValid() ? dayjs(selectedRow.DKN_YAPILDI_SAAT, "HH:mm:ss") : null) : null
       );
 
       setValue("vardiya", selectedRow.DKN_YAPILDI_MESAI_KOD_TANIM);
       setValue("vardiyaID", selectedRow.DKN_YAPILDI_MESAI_KOD_ID);
-      setValue(
-        "bitisTarihi",
-        selectedRow.DKN_BITIS_TARIH
-          ? dayjs(selectedRow.DKN_BITIS_TARIH).isValid()
-            ? dayjs(selectedRow.DKN_BITIS_TARIH)
-            : null
-          : null
-      );
-      setValue(
-        "bitisSaati",
-        selectedRow.DKN_BITIS_SAAT
-          ? dayjs(selectedRow.DKN_BITIS_SAAT, "HH:mm:ss").isValid()
-            ? dayjs(selectedRow.DKN_BITIS_SAAT, "HH:mm:ss")
-            : null
-          : null
-      );
+      setValue("bitisTarihi", selectedRow.DKN_BITIS_TARIH ? (dayjs(selectedRow.DKN_BITIS_TARIH).isValid() ? dayjs(selectedRow.DKN_BITIS_TARIH) : null) : null);
+      setValue("bitisSaati", selectedRow.DKN_BITIS_SAAT ? (dayjs(selectedRow.DKN_BITIS_SAAT, "HH:mm:ss").isValid() ? dayjs(selectedRow.DKN_BITIS_SAAT, "HH:mm:ss") : null) : null);
       setValue("sure", selectedRow.DKN_YAPILDI_SURE);
       setValue("aciklama", selectedRow.DKN_ACIKLAMA);
     }
@@ -123,7 +98,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
         console.log("Data sent successfully:", response);
 
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("İşlem Başarılı.");
           reset();
           onModalClose(); // Modal'ı kapat
           onRefresh(); // Tabloyu yenile
@@ -147,12 +122,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   return (
     <FormProvider {...methods}>
       <div>
-        <Modal
-          width="800px"
-          title="Kontrol Listesi Güncelle"
-          open={isModalVisible}
-          onOk={methods.handleSubmit(onSubmited)}
-          onCancel={onModalClose}>
+        <Modal width="800px" title="Kontrol Listesi Güncelle" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={onModalClose}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <MainTabs />
           </form>

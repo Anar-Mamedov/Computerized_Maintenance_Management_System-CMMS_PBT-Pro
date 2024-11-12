@@ -66,7 +66,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
         console.log("Data sent successfully:", response);
 
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("İşlem Başarılı.");
           reset();
           setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
           onRefresh();

@@ -52,7 +52,7 @@ export default function Iptal({ selectedRows, refreshTableData, iptalDisabled })
         console.log("Data sent successfully:", response);
 
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("İşlem Başarılı.");
           reset();
           setIsModalOpen(false); // Sadece başarılı olursa modalı kapat
           refreshTableData();
@@ -83,11 +83,7 @@ export default function Iptal({ selectedRows, refreshTableData, iptalDisabled })
         <Button style={{ paddingLeft: "0px" }} type="text" onClick={handleModalToggle}>
           İptal Et
         </Button>
-        <Modal
-          title="İş Talebi İptal"
-          open={isModalOpen}
-          onOk={methods.handleSubmit(onSubmited)}
-          onCancel={handleModalToggle}>
+        <Modal title="İş Talebi İptal" open={isModalOpen} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <Forms isModalOpen={isModalOpen} selectedRows={selectedRows} />
           </form>

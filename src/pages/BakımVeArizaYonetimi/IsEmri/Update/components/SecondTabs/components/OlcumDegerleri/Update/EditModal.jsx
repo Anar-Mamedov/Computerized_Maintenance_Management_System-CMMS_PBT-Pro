@@ -33,18 +33,8 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
     if (isModalVisible && selectedRow) {
       setValue("secilenID", selectedRow.key);
       setValue("siraNo", selectedRow.IDO_SIRANO);
-      setValue(
-        "tarih",
-        selectedRow.IDO_TARIH ? (dayjs(selectedRow.IDO_TARIH).isValid() ? dayjs(selectedRow.IDO_TARIH) : null) : null
-      );
-      setValue(
-        "saat",
-        selectedRow.IDO_SAAT
-          ? dayjs(selectedRow.IDO_SAAT, "HH:mm:ss").isValid()
-            ? dayjs(selectedRow.IDO_SAAT, "HH:mm:ss")
-            : null
-          : null
-      );
+      setValue("tarih", selectedRow.IDO_TARIH ? (dayjs(selectedRow.IDO_TARIH).isValid() ? dayjs(selectedRow.IDO_TARIH) : null) : null);
+      setValue("saat", selectedRow.IDO_SAAT ? (dayjs(selectedRow.IDO_SAAT, "HH:mm:ss").isValid() ? dayjs(selectedRow.IDO_SAAT, "HH:mm:ss") : null) : null);
       setValue("tanim", selectedRow.IDO_TANIM);
       setValue("birim", selectedRow.IDO_BIRIM);
       setValue("birimID", selectedRow.IDO_BIRIM_KOD_ID);
@@ -100,7 +90,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
         console.log("Data sent successfully:", response);
 
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("İşlem Başarılı.");
           reset();
           onModalClose(); // Modal'ı kapat
           onRefresh(); // Tabloyu yenile
@@ -124,12 +114,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   return (
     <FormProvider {...methods}>
       <div>
-        <Modal
-          width="800px"
-          title="Ölçüm Parametrelerini Güncelle"
-          open={isModalVisible}
-          onOk={methods.handleSubmit(onSubmited)}
-          onCancel={onModalClose}>
+        <Modal width="800px" title="Ölçüm Parametrelerini Güncelle" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={onModalClose}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <MainTabs />
           </form>

@@ -30,7 +30,7 @@ export default function TipEkle({ workshopSelectedId, onSubmit, onRefresh, secil
         setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
         onRefresh();
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("İşlem Başarılı.");
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
@@ -61,13 +61,7 @@ export default function TipEkle({ workshopSelectedId, onSubmit, onRefresh, secil
             <PlusOutlined /> Yeni Kayıt
           </Button>
         </div>
-        <Modal
-          width="480px"
-          centered
-          title="İş Emri Tipi Ekle"
-          open={isModalVisible}
-          onOk={methods.handleSubmit(onSubmited)}
-          onCancel={handleModalToggle}>
+        <Modal width="480px" centered title="İş Emri Tipi Ekle" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <Text style={{ fontSize: "14px", fontWeight: "600" }}>İş Emri Tipi Adı:</Text>

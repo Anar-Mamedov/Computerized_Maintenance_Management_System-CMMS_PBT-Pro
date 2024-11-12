@@ -84,7 +84,7 @@ export default function CreateAracGerecTablo({ workshopSelectedId, onSubmit, onR
       const response = await AxiosInstance.post(`AddUpdateIsEmriAracGerec?isEmriId=${secilenIsEmriID}`, payloads);
       if (response.status_code === 200) {
         // Başarılı bildirimi
-        message.success("Ekleme Başarılı.");
+        message.success("İşlem Başarılı.");
         setIsModalVisible(false); // Modalı kapat
         onRefresh(); // Verileri yenile
       } else {
@@ -119,13 +119,7 @@ export default function CreateAracGerecTablo({ workshopSelectedId, onSubmit, onR
         </Button>
       </div>
 
-      <Modal
-        width={1200}
-        centered
-        title="Araç Gereç Listesi"
-        open={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={handleModalToggle}>
+      <Modal width={1200} centered title="Araç Gereç Listesi" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <Table
           rowSelection={{
             type: "checkbox",

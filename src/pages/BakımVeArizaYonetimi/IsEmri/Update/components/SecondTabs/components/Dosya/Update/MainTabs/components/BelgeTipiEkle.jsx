@@ -89,7 +89,7 @@ export default function BelgeTipiEkle({ workshopSelectedId, onSubmit }) {
         reset();
         fetch();
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("İşlem Başarılı.");
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
@@ -130,13 +130,7 @@ export default function BelgeTipiEkle({ workshopSelectedId, onSubmit }) {
   return (
     <div>
       <Button onClick={handleModalToggle}>+</Button>
-      <Modal
-        width="1200px"
-        centered
-        title="Belge Tipi Ekle"
-        open={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={handleModalToggle}>
+      <Modal width="1200px" centered title="Belge Tipi Ekle" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <div
           style={{
             display: "flex",
@@ -144,7 +138,8 @@ export default function BelgeTipiEkle({ workshopSelectedId, onSubmit }) {
             width: "100%",
             marginBottom: "10px",
             justifyContent: "flex-end",
-          }}>
+          }}
+        >
           <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
             <Button type="primary" onClick={handleMarkaEkleModalToggle}>
               + Tip Ekle
@@ -155,12 +150,7 @@ export default function BelgeTipiEkle({ workshopSelectedId, onSubmit }) {
             </Button>
           </div>
 
-          <Modal
-            title="Tip Ekle"
-            centered
-            open={isMarkaEkleModalVisible}
-            onOk={handleMarkaEkleModalOk}
-            onCancel={handleMarkaEkleModalToggle}>
+          <Modal title="Tip Ekle" centered open={isMarkaEkleModalVisible} onOk={handleMarkaEkleModalOk} onCancel={handleMarkaEkleModalToggle}>
             <div
               style={{
                 display: "flex",
@@ -170,7 +160,8 @@ export default function BelgeTipiEkle({ workshopSelectedId, onSubmit }) {
                 maxWidth: "400px",
                 justifyContent: "space-between",
                 marginBottom: "10px",
-              }}>
+              }}
+            >
               <Text style={{ fontWeight: "600" }}>Belge Tipi</Text>
               <Controller
                 name="tipTanim"
@@ -185,7 +176,8 @@ export default function BelgeTipiEkle({ workshopSelectedId, onSubmit }) {
                       width: "100%",
                       maxWidth: "300px",
                       minWidth: "300px",
-                    }}>
+                    }}
+                  >
                     <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
                     {error && <div style={{ color: "red" }}>{error.message}</div>}
                   </div>
@@ -201,7 +193,8 @@ export default function BelgeTipiEkle({ workshopSelectedId, onSubmit }) {
                 maxWidth: "400px",
                 justifyContent: "space-between",
                 marginBottom: "10px",
-              }}>
+              }}
+            >
               <Text>Açıklama</Text>
               <Controller
                 name="tipAciklama"

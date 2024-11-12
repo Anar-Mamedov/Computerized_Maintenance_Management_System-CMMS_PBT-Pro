@@ -6,14 +6,7 @@ import { Controller, useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
 import dayjs from "dayjs";
 
-export default function CreateModal({
-  workshopSelectedId,
-  onSubmit,
-  onRefresh,
-  secilenIsEmriID,
-  duzenlenmeTarihi,
-  duzenlenmeSaati,
-}) {
+export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID, duzenlenmeTarihi, duzenlenmeSaati }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const methods = useForm({
     defaultValues: {
@@ -68,7 +61,7 @@ export default function CreateModal({
           reset();
           setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
           onRefresh();
-          message.success("Ekleme Başarılı.");
+          message.success("İşlem Başarılı.");
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
@@ -102,12 +95,7 @@ export default function CreateModal({
           </Button>
         </div>
 
-        <Modal
-          width="800px"
-          title="Ölçüm Parametreleri Ekleme Ekranı"
-          open={isModalVisible}
-          onOk={methods.handleSubmit(onSubmited)}
-          onCancel={handleModalToggle}>
+        <Modal width="800px" title="Ölçüm Parametreleri Ekleme Ekranı" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <MainTabs />
           </form>
