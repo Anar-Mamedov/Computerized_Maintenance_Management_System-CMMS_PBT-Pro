@@ -6,16 +6,7 @@ import { Controller, useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
 import dayjs from "dayjs";
 
-export default function CreateModal({
-  workshopSelectedId,
-  onSubmit,
-  onRefresh,
-  secilenIsEmriID,
-  makineTanim,
-  lokasyon,
-  lokasyonID,
-  makineID,
-}) {
+export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID, makineTanim, lokasyon, lokasyonID, makineID }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   // message
   const [messageApi, contextHolder] = message.useMessage();
@@ -81,7 +72,7 @@ export default function CreateModal({
         console.log("Data sent successfully:", response);
 
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("İşlem Başarılı.");
           reset();
           setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
           onRefresh();
@@ -126,12 +117,7 @@ export default function CreateModal({
           </Button>
         </div>
 
-        <Modal
-          width="830px"
-          title="Duruş Bilgisi"
-          open={isModalVisible}
-          onOk={methods.handleSubmit(onSubmited)}
-          onCancel={handleModalToggle}>
+        <Modal width="830px" title="Duruş Bilgisi" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <MainTabs lokasyon={lokasyon} makineTanim={makineTanim} />
           </form>

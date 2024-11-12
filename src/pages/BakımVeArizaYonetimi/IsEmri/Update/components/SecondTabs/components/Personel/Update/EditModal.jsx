@@ -5,13 +5,7 @@ import { Controller, useForm, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
 import MainTabs from "./MainTabs/MainTabs";
 
-export default function EditModal({
-  selectedRow,
-  isModalVisible,
-  onModalClose,
-  onRefresh,
-  secilenIsEmriID,
-}) {
+export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh, secilenIsEmriID }) {
   const methods = useForm({
     defaultValues: {
       secilenID: "",
@@ -52,22 +46,8 @@ export default function EditModal({
       setValue("vardiya", selectedRow.IDK_VARDIYA_TANIM);
       setValue("vardiyaID", selectedRow.IDK_VARDIYA);
       setValue("aciklama", selectedRow.IDK_ACIKLAMA);
-      setValue(
-        "personelBaslamaZamani",
-        selectedRow.IDK_TARIH
-          ? dayjs(selectedRow.IDK_TARIH).isValid()
-            ? dayjs(selectedRow.IDK_TARIH)
-            : null
-          : null
-      );
-      setValue(
-        "personelBaslamaSaati",
-        selectedRow.IDK_SAAT
-          ? dayjs(selectedRow.IDK_SAAT, "HH:mm:ss").isValid()
-            ? dayjs(selectedRow.IDK_SAAT, "HH:mm:ss")
-            : null
-          : null
-      );
+      setValue("personelBaslamaZamani", selectedRow.IDK_TARIH ? (dayjs(selectedRow.IDK_TARIH).isValid() ? dayjs(selectedRow.IDK_TARIH) : null) : null);
+      setValue("personelBaslamaSaati", selectedRow.IDK_SAAT ? (dayjs(selectedRow.IDK_SAAT, "HH:mm:ss").isValid() ? dayjs(selectedRow.IDK_SAAT, "HH:mm:ss") : null) : null);
     }
   }, [selectedRow, isModalVisible, setValue]);
 
@@ -106,15 +86,12 @@ export default function EditModal({
       IDK_SAAT: formatTimeWithDayjs(data.personelBaslamaSaati),
     };
 
-    AxiosInstance.post(
-      `AddUpdateIsEmriPersonel?isEmriId=${secilenIsEmriID}`,
-      Body
-    )
+    AxiosInstance.post(`AddUpdateIsEmriPersonel?isEmriId=${secilenIsEmriID}`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
 
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("İşlem Başarılı.");
           reset();
           onModalClose(); // Modal'ı kapat
           onRefresh(); // Tabloyu yenile
@@ -138,13 +115,7 @@ export default function EditModal({
   return (
     <FormProvider {...methods}>
       <div>
-        <Modal
-          width="985px"
-          title="Personel Güncelle"
-          open={isModalVisible}
-          onOk={methods.handleSubmit(onSubmited)}
-          onCancel={onModalClose}
-        >
+        <Modal width="985px" title="Personel Güncelle" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={onModalClose}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <MainTabs />
           </form>

@@ -187,7 +187,7 @@ export default function Parametreler() {
         console.log("Data sent successfully:", response);
 
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("İşlem Başarılı.");
           reset();
           setIsModalOpen(false); // Sadece başarılı olursa modalı kapat
         } else if (response.status_code === 401) {
@@ -214,18 +214,10 @@ export default function Parametreler() {
   return (
     <FormProvider {...methods}>
       <div>
-        <Button
-          style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
-          type="submit"
-          onClick={handleModalToggle}>
+        <Button style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }} type="submit" onClick={handleModalToggle}>
           Parametreler
         </Button>
-        <Modal
-          width={1200}
-          title="Parametreler"
-          open={isModalOpen}
-          onOk={methods.handleSubmit(onSubmited)}
-          onCancel={handleModalToggle}>
+        <Modal width={1200} title="Parametreler" open={isModalOpen} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <Sekmeler isModalOpen={isModalOpen} />
           </form>

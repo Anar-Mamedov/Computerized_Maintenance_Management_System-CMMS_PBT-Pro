@@ -34,7 +34,7 @@ export default function OzelAlan17({ label, onModalClose }) {
         onModalClose(); // Add this line to trigger the refresh in parent
         setIsModalOpen(false); // Sadece başarılı olursa modalı kapat
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("İşlem Başarılı.");
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
@@ -63,11 +63,7 @@ export default function OzelAlan17({ label, onModalClose }) {
       <Button type="submit" onClick={handleModalToggle}>
         {label.OZL_OZEL_ALAN_17}
       </Button>
-      <Modal
-        title="Özel Alan İsmi Güncelle"
-        open={isModalOpen}
-        onOk={methods.handleSubmit(onSubmited)}
-        onCancel={handleModalToggle}>
+      <Modal title="Özel Alan İsmi Güncelle" open={isModalOpen} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
         <form onSubmit={methods.handleSubmit(onSubmited)}>
           <div>
             <Controller name="ozelAlan" control={methods.control} render={({ field }) => <Input {...field} />} />

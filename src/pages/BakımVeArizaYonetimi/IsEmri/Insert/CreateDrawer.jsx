@@ -366,7 +366,7 @@ export default function CreateDrawer({ onRefresh }) {
       .then((response) => {
         console.log("Data sent successfully:", response);
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("İşlem Başarılı.");
           setOpen(false);
           onRefresh();
           methods.reset();

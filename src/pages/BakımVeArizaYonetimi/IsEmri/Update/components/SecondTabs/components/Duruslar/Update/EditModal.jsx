@@ -43,38 +43,13 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       setValue("projeID", selectedRow.MKD_PROJE?.TB_PROJE_ID ?? "");
       setValue("durusNedeni", selectedRow.MKD_NEDEN);
       setValue("durusNedeniID", selectedRow.MKD_NEDEN_KOD_ID);
-      setValue(
-        "baslangicTarihi",
-        selectedRow.MKD_BASLAMA_TARIH
-          ? dayjs(selectedRow.MKD_BASLAMA_TARIH).isValid()
-            ? dayjs(selectedRow.MKD_BASLAMA_TARIH)
-            : null
-          : null
-      );
+      setValue("baslangicTarihi", selectedRow.MKD_BASLAMA_TARIH ? (dayjs(selectedRow.MKD_BASLAMA_TARIH).isValid() ? dayjs(selectedRow.MKD_BASLAMA_TARIH) : null) : null);
       setValue(
         "baslangicSaati",
-        selectedRow.MKD_BASLAMA_SAAT
-          ? dayjs(selectedRow.MKD_BASLAMA_SAAT, "HH:mm:ss").isValid()
-            ? dayjs(selectedRow.MKD_BASLAMA_SAAT, "HH:mm:ss")
-            : null
-          : null
+        selectedRow.MKD_BASLAMA_SAAT ? (dayjs(selectedRow.MKD_BASLAMA_SAAT, "HH:mm:ss").isValid() ? dayjs(selectedRow.MKD_BASLAMA_SAAT, "HH:mm:ss") : null) : null
       );
-      setValue(
-        "bitisTarihi",
-        selectedRow.MKD_BITIS_TARIH
-          ? dayjs(selectedRow.MKD_BITIS_TARIH).isValid()
-            ? dayjs(selectedRow.MKD_BITIS_TARIH)
-            : null
-          : null
-      );
-      setValue(
-        "bitisSaati",
-        selectedRow.MKD_BITIS_SAAT
-          ? dayjs(selectedRow.MKD_BITIS_SAAT, "HH:mm:ss").isValid()
-            ? dayjs(selectedRow.MKD_BITIS_SAAT, "HH:mm:ss")
-            : null
-          : null
-      );
+      setValue("bitisTarihi", selectedRow.MKD_BITIS_TARIH ? (dayjs(selectedRow.MKD_BITIS_TARIH).isValid() ? dayjs(selectedRow.MKD_BITIS_TARIH) : null) : null);
+      setValue("bitisSaati", selectedRow.MKD_BITIS_SAAT ? (dayjs(selectedRow.MKD_BITIS_SAAT, "HH:mm:ss").isValid() ? dayjs(selectedRow.MKD_BITIS_SAAT, "HH:mm:ss") : null) : null);
       setValue("sure", selectedRow.MKD_SURE);
       setValue("DurusMaliyeti", selectedRow.MKD_SAAT_MALIYET);
       setValue("toplamMaliyet", selectedRow.MKD_TOPLAM_MALIYET);
@@ -124,7 +99,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
         console.log("Data sent successfully:", response);
 
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("İşlem Başarılı.");
           reset();
           onModalClose(); // Modal'ı kapat
           onRefresh(); // Tabloyu yenile
@@ -148,12 +123,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   return (
     <FormProvider {...methods}>
       <div>
-        <Modal
-          width="830px"
-          title="Duruş Nedeni Güncelle"
-          open={isModalVisible}
-          onOk={methods.handleSubmit(onSubmited)}
-          onCancel={onModalClose}>
+        <Modal width="830px" title="Duruş Nedeni Güncelle" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={onModalClose}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <MainTabs />
           </form>

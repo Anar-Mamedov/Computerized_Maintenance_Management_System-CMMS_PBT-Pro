@@ -30,31 +30,14 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
     if (isModalVisible && selectedRow) {
       setValue("secilenID", selectedRow.key);
       setValue("isTanimi", selectedRow.DSY_TANIM);
-      setValue(
-        "tarih",
-        selectedRow.DSY_TARIH ? (dayjs(selectedRow.DSY_TARIH).isValid() ? dayjs(selectedRow.DSY_TARIH) : null) : null
-      );
+      setValue("tarih", selectedRow.DSY_TARIH ? (dayjs(selectedRow.DSY_TARIH).isValid() ? dayjs(selectedRow.DSY_TARIH) : null) : null);
       setValue("aktifBelge", selectedRow.DSY_AKTIF);
       setValue("belgeTipi", selectedRow.DSY_DOSYA_TIP);
       setValue("belgeTipiID", selectedRow.DSY_DOSYA_TIP_ID);
       setValue("sureliBelge", selectedRow.DSY_SURELI);
-      setValue(
-        "bitisTarih",
-        selectedRow.DSY_BITIS_TARIH
-          ? dayjs(selectedRow.DSY_BITIS_TARIH).isValid()
-            ? dayjs(selectedRow.DSY_BITIS_TARIH)
-            : null
-          : null
-      );
+      setValue("bitisTarih", selectedRow.DSY_BITIS_TARIH ? (dayjs(selectedRow.DSY_BITIS_TARIH).isValid() ? dayjs(selectedRow.DSY_BITIS_TARIH) : null) : null);
       setValue("hatirlat", selectedRow.DSY_HATIRLAT);
-      setValue(
-        "hatirlatmaTarih",
-        selectedRow.DSY_HATIRLAT_TARIH
-          ? dayjs(selectedRow.DSY_HATIRLAT_TARIH).isValid()
-            ? dayjs(selectedRow.DSY_HATIRLAT_TARIH)
-            : null
-          : null
-      );
+      setValue("hatirlatmaTarih", selectedRow.DSY_HATIRLAT_TARIH ? (dayjs(selectedRow.DSY_HATIRLAT_TARIH).isValid() ? dayjs(selectedRow.DSY_HATIRLAT_TARIH) : null) : null);
       setValue("aciklama", selectedRow.DSY_ACIKLAMA);
       setValue("etiketler", selectedRow.DYS_ETIKET);
     }
@@ -98,7 +81,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
         console.log("Data sent successfully:", response);
 
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("İşlem Başarılı.");
           reset();
           onModalClose(); // Modal'ı kapat
           onRefresh(); // Tabloyu yenile
@@ -129,7 +112,8 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
           open={isModalVisible}
           onOk={methods.handleSubmit(onSubmited)}
           onCancel={onModalClose}
-          okButtonProps={{ disabled: kapali }}>
+          okButtonProps={{ disabled: kapali }}
+        >
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <MainTabs />
           </form>

@@ -8,12 +8,7 @@ import DurumSelect from "./IsEmriAcma/DurumSelect.jsx";
 
 const { Text, Link } = Typography;
 
-export default function IsEmriSilme({
-  selectedRows,
-  refreshTableData,
-  disabled,
-  hidePopover,
-}) {
+export default function IsEmriSilme({ selectedRows, refreshTableData, disabled, hidePopover }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const methods = useForm({
     defaultValues: {
@@ -63,7 +58,7 @@ export default function IsEmriSilme({
         console.log("Data sent successfully:", response);
 
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("İşlem Başarılı.");
           reset();
           setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
           refreshTableData();
@@ -87,23 +82,11 @@ export default function IsEmriSilme({
   return (
     <FormProvider {...methods}>
       <div>
-        <Button
-          type="submit"
-          style={{ paddingLeft: "0px" }}
-          onClick={handleModalToggle}
-        >
+        <Button type="submit" style={{ paddingLeft: "0px" }} onClick={handleModalToggle}>
           İş Emrini Aç
         </Button>
 
-        <Modal
-          width="500px"
-          title="Seçili İş Emrini Aç"
-          destroyOnClose
-          centered
-          open={isModalVisible}
-          onOk={methods.handleSubmit(onSubmited)}
-          onCancel={handleModalToggle}
-        >
+        <Modal width="500px" title="Seçili İş Emrini Aç" destroyOnClose centered open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <div
               style={{
