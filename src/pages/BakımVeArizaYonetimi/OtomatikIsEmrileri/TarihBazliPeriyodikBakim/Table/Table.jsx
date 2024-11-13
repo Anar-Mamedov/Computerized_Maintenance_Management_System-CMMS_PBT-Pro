@@ -202,34 +202,6 @@ const MainTable = () => {
         return a.MakineTanimi.localeCompare(b.MakineTanimi);
       },
     },
-    {
-      title: t("masterMakineKodu"),
-      dataIndex: "MasterMakineKod",
-      key: "MasterMakineKod",
-      width: 150,
-      ellipsis: true,
-      visible: true, // Varsayılan olarak açık
-      /* render: (text, record) => <a onClick={() => onRowClick(record)}>{text}</a>, */
-      sorter: (a, b) => {
-        if (a.MasterMakineKod === null) return -1;
-        if (b.MasterMakineKod === null) return 1;
-        return a.MasterMakineKod.localeCompare(b.MasterMakineKod);
-      },
-    },
-    {
-      title: t("masterMakineTanimi"),
-      dataIndex: "MasterMakineTanim",
-      key: "MasterMakineTanim",
-      width: 150,
-      ellipsis: true,
-      visible: true, // Varsayılan olarak açık
-      /* render: (text, record) => <a onClick={() => onRowClick(record)}>{text}</a>, */
-      sorter: (a, b) => {
-        if (a.MasterMakineTanim === null) return -1;
-        if (b.MasterMakineTanim === null) return 1;
-        return a.MasterMakineTanim.localeCompare(b.MasterMakineTanim);
-      },
-    },
 
     {
       title: t("bakimKodu"),
@@ -861,7 +833,7 @@ const MainTable = () => {
             showQuickJumper: true,
           }}
           // onRow={onRowClick}
-          scroll={{ y: "calc(100vh - 370px)" }}
+          scroll={{ y: "calc(100vh - 390px)" }}
           onChange={handleTableChange}
           rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
         />

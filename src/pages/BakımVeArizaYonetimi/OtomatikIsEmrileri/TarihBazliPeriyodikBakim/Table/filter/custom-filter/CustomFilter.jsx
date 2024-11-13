@@ -1,5 +1,5 @@
 import { CloseOutlined, FilterOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Col, Drawer, Row, Typography, Select, Space, Input, DatePicker } from "antd";
+import { Button, Col, Drawer, Row, Typography, Select, Space, Input, DatePicker, Switch } from "antd";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import "./style.css";
@@ -16,6 +16,7 @@ import BakimGrubu from "./components/BakimGrubu";
 import MakineTipi from "./components/MakineTipi";
 import AtolyeTablo from "./components/AtolyeTablo";
 import BakimTablo from "./components/BakimTablo";
+import { t } from "i18next";
 
 dayjs.extend(weekOfYear);
 dayjs.extend(advancedFormat);
@@ -92,6 +93,8 @@ export default function CustomFilter({ onSubmit1, isEmpty }) {
     timeRange: "all",
     startDate: null,
     endDate: null,
+    donemOncesiSuresiGecmisler: false,
+    devamEdenler: false,
   };
 
   const methods = useForm({ defaultValues });
@@ -122,7 +125,7 @@ export default function CustomFilter({ onSubmit1, isEmpty }) {
 
   const onSubmit = (data) => {
     // Get values from watch
-    const { startDate, endDate, lokasyonID, makineID, makineTipiID, bakimGrubuID, bakimTipiID, atolyeID, bakimID } = watch();
+    const { startDate, endDate, lokasyonID, makineID, makineTipiID, bakimGrubuID, bakimTipiID, atolyeID, bakimID, devamEdenler, donemOncesiSuresiGecmisler } = watch();
 
     // Combine selected values, input values for each row, and date range
     const filterData = {
@@ -135,8 +138,8 @@ export default function CustomFilter({ onSubmit1, isEmpty }) {
       FILTRE_PBAKIM_ID: bakimID ? bakimID : -1,
       FILTRE_PBAKIM_TIP_ID: bakimTipiID ? bakimTipiID : -1,
       FILTRE_PBAKIM_GRUP_ID: bakimGrubuID ? bakimGrubuID : -1,
-      CHB_DEVAM_EDEN: false,
-      CHB_SURE_GECMIS: false,
+      CHB_DEVAM_EDEN: donemOncesiSuresiGecmisler ? donemOncesiSuresiGecmisler : false,
+      CHB_SURE_GECMIS: devamEdenler ? devamEdenler : false,
     };
 
     console.log(filterData);
@@ -471,7 +474,7 @@ export default function CustomFilter({ onSubmit1, isEmpty }) {
               <ZamanAraligi />
               <div
                 style={{
-                  marginBottom: "20px",
+                  marginBottom: "0px",
                   border: "1px solid #80808048",
                   padding: "15px 10px",
                   borderRadius: "8px",
@@ -519,6 +522,14 @@ export default function CustomFilter({ onSubmit1, isEmpty }) {
                   />
                 </div>
                 {errors.startDate && <div style={{ color: "red", marginTop: "10px" }}>{errors.startDate.message}</div>}
+              </div>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+                <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("donemOncesiSuresiGecmisler")}</Text>
+                <Controller name="donemOncesiSuresiGecmisler" control={control} render={({ field }) => <Switch {...field} />} />
+              </div>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+                <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("devamEdenler")}</Text>
+                <Controller name="devamEdenler" control={control} render={({ field }) => <Switch {...field} />} />
               </div>
             </div>
           </form>
