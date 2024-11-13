@@ -7,16 +7,7 @@ import ContextMenu from "../components/ContextMenu/ContextMenu";
 import dayjs from "dayjs";
 import "dayjs/locale/tr";
 import weekOfYear from "dayjs/plugin/weekOfYear";
-import {
-  FcOk,
-  FcLeave,
-  FcHighPriority,
-  FcExpired,
-  FcCancel,
-  FcFlashAuto,
-  FcPlanner,
-  FcDisclaimer,
-} from "react-icons/fc";
+import { FcOk, FcLeave, FcHighPriority, FcExpired, FcCancel, FcFlashAuto, FcPlanner, FcDisclaimer } from "react-icons/fc";
 
 dayjs.locale("tr");
 dayjs.extend(weekOfYear);
@@ -67,7 +58,8 @@ const generateColumns = (startDate, endDate, data, checkedState, handleCheckboxC
           </div>
         }
         title="Hücre Detayı"
-        trigger="hover">
+        trigger="hover"
+      >
         {text && (
           <div
             style={{
@@ -83,7 +75,8 @@ const generateColumns = (startDate, endDate, data, checkedState, handleCheckboxC
               top: 0,
               left: 0,
             }}
-            onClick={() => handleCheckboxChange(key, text, record, column)}>
+            onClick={() => handleCheckboxChange(key, text, record, column)}
+          >
             <>
               <Checkbox checked={isChecked} style={{ opacity: 0, position: "absolute" }} />
               {getIconForValue(text)}
@@ -128,8 +121,7 @@ const generateColumns = (startDate, endDate, data, checkedState, handleCheckboxC
                 key: formattedDay,
                 width: 45,
                 ellipsis: true,
-                render: (text, record, rowIndex) =>
-                  renderFunction(text, record, { dataIndex: formattedDay, key: formattedDay }),
+                render: (text, record, rowIndex) => renderFunction(text, record, { dataIndex: formattedDay, key: formattedDay }),
               },
             ],
           },
@@ -148,8 +140,7 @@ const generateColumns = (startDate, endDate, data, checkedState, handleCheckboxC
               key: formattedDay,
               width: 45,
               ellipsis: true,
-              render: (text, record, rowIndex) =>
-                renderFunction(text, record, { dataIndex: formattedDay, key: formattedDay }),
+              render: (text, record, rowIndex) => renderFunction(text, record, { dataIndex: formattedDay, key: formattedDay }),
             },
           ],
         });
@@ -161,8 +152,7 @@ const generateColumns = (startDate, endDate, data, checkedState, handleCheckboxC
           key: formattedDay,
           width: 45,
           ellipsis: true,
-          render: (text, record, rowIndex) =>
-            renderFunction(text, record, { dataIndex: formattedDay, key: formattedDay }),
+          render: (text, record, rowIndex) => renderFunction(text, record, { dataIndex: formattedDay, key: formattedDay }),
         });
       }
     }
@@ -223,8 +213,7 @@ const MainTable = () => {
     });
   };
 
-  const columns =
-    startDate && endDate ? generateColumns(startDate, endDate, data, checkedState, handleCheckboxChange) : [];
+  const columns = startDate && endDate ? generateColumns(startDate, endDate, data, checkedState, handleCheckboxChange) : [];
 
   const { setValue } = useFormContext();
   const [loading, setLoading] = useState(true);
@@ -445,15 +434,12 @@ const MainTable = () => {
           marginBottom: "20px",
           gap: "10px",
           padding: "0 5px",
-        }}>
+        }}
+      >
         <Filters onChange={handleBodyChange} />
         <div style={{ display: "flex", gap: "10px" }}>
           <ContextMenu selectedCells={selectedCells} />
-          <Button
-            onClick={downloadCSV}
-            type="primary"
-            style={{ marginBottom: "10px" }}
-            disabled={!data || data.length === 0}>
+          <Button onClick={downloadCSV} type="primary" style={{ marginBottom: "10px" }} disabled={!data || data.length === 0}>
             CSV İndir
           </Button>
         </div>
