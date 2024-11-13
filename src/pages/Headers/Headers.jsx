@@ -7,9 +7,11 @@ import Hatirlatici from "./components/Hatirlatici.jsx";
 import AxiosInstance from "../../api/http.jsx";
 import SearchComponent from "./components/SearchComponent.jsx";
 import LanguageSelectbox from "../components/Language/LanguageSelectbox.jsx";
+import dayjs from "dayjs";
 
 export default function Header() {
   const [hatirlaticiData, setHatirlaticiData] = useState(null);
+  const [otomatikIsEmirleriListe, setOtomatikIsEmirleriListe] = useState(null);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -72,6 +74,66 @@ export default function Header() {
 
     fetchData();
   }, [open]);
+
+  // otomatik iş emirleri listesini çekiyor
+
+  const fetchDataOtomatikIsEmirleriListe = async () => {
+    const body = {
+      TARIH1: dayjs().format("YYYY-MM-DD"),
+      TARIH2: dayjs().format("YYYY-MM-DD"),
+    };
+    try {
+      const response = await AxiosInstance.post(`PBakimTarihGetList`, body);
+      setOtomatikIsEmirleriListe(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDataOtomatikIsEmirleriListe();
+  }, []);
+
+  // otomatik iş emirleri listesini iş emrine dönüştürüyor
+
+  const handleAutoCreateWorkOrder = async () => {
+    let isError = false;
+    // Seçili satırlar üzerinde döngü yaparak her birini API ye gönder
+    for (const row of otomatikIsEmirleriListe) {
+      try {
+        const body = {
+          PBakimId: row.BakimKodu,
+          MakineId: row.MakineKodu,
+          Tarih: row.PlanlamaTarih,
+        };
+        // API isteğini gönder
+        const response = await AxiosInstance.post(`IsEmriOlustur`, body);
+        console.log("İşlem başarılı:", response);
+        if (response.status_code === 200 || response.status_code === 201) {
+          isError = false;
+        } else if (response.status_code === 401) {
+          isError = true;
+        } else {
+          isError = true;
+        }
+        // Burada başarılı API isteğinden sonra yapılacak işlemler bulunabilir.
+      } catch (error) {
+        isError = true;
+        console.error("Silme işlemi sırasında hata oluştu:", error);
+      }
+    }
+    // Tüm Api işlemlerinden sonra eğer hata oluşmamışsa aşağıdaki işlemi yap
+    if (!isError) {
+      setOtomatikIsEmirleriListe(null);
+    }
+  };
+
+  useEffect(() => {
+    if (otomatikIsEmirleriListe && otomatikIsEmirleriListe.length > 0) {
+      // handleAutoCreateWorkOrder();
+      console.log(otomatikIsEmirleriListe);
+    }
+  }, [otomatikIsEmirleriListe]);
 
   return (
     <div
