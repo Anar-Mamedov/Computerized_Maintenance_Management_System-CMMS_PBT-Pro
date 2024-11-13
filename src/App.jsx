@@ -20,7 +20,7 @@ import Headers from "./pages/Headers/Headers";
 import { useRecoilState, RecoilRoot } from "recoil";
 import { userState } from "./state/userState";
 import PlanlamaTakvimi from "./pages/BakımVeArizaYonetimi/PlanlamaTakvimi/PlanlamaTakvimi";
-import OtomatikIsEmri from "./pages/BakımVeArizaYonetimi/OtomatikIsEmri/OtomatikIsEmri";
+import OtomatikIsEmri from "./pages/BakımVeArizaYonetimi/OtomatikIsEmrileri/Index.jsx";
 import PeriyodikBakimlar1 from "./pages/BakımVeArizaYonetimi/PeriyodikBakimlar1/PeryodikBakimlar";
 import RaporYonetimi from "./pages/Rapor&Formlar/RaporYonetimi/RaporYonetimi.jsx";
 import ProfilEkrani from "./pages/Headers/components/ProfilEkrani/ProfilEkrani.jsx";
