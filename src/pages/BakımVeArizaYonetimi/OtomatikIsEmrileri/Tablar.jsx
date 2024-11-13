@@ -17,7 +17,7 @@ function Tablar() {
         <Radio.Button value="1">{t("tarihBazliPeriyodikBakim")}</Radio.Button>
         <Radio.Button value="2">{t("sayacBazliPeriyodikBakim")}</Radio.Button>
       </Radio.Group>
-      <Divider style={{ marginBottom: 10 }} />
+      <Divider style={{ marginBottom: 10, marginTop: "10px" }} />
       {tabKey === "1" && <MainTable />}
       {tabKey === "2" && <Hazirlaniyor />}
     </>
