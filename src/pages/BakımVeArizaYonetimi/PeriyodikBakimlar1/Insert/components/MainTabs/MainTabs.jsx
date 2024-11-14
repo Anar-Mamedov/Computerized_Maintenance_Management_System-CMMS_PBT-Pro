@@ -356,7 +356,7 @@ export default function MainTabs() {
 
       <div style={{ display: "flex", marginBottom: "15px", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "450px" }}>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "450px", gap: "10px", width: "100%", justifyContent: "space-between" }}>
-          <Text style={{ fontSize: "14px" }}>Çalışma Süresis (dk.):</Text>
+          <Text style={{ fontSize: "14px" }}>Çalışma Süresi (dk.):</Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
             <Controller
               name="calismaSuresi"
@@ -378,7 +378,7 @@ export default function MainTabs() {
           </div>
         </div>
         <StyledDivBottomLine style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", justifyContent: "space-between", width: "100%" }}>
-          <Text style={{ fontSize: "14px" }}>Duruş Süresis (dk.):</Text>
+          <Text style={{ fontSize: "14px" }}>Duruş Süresi (dk.):</Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
             <Controller
               name="durusSuresi"
