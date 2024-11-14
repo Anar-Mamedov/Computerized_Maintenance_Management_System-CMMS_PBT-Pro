@@ -122,6 +122,7 @@ export default function Header() {
         console.error("Silme işlemi sırasında hata oluştu:", error);
       }
     }
+
     // Tüm Api işlemlerinden sonra eğer hata oluşmamışsa aşağıdaki işlemi yap
     if (!isError) {
       setOtomatikIsEmirleriListe(null);
