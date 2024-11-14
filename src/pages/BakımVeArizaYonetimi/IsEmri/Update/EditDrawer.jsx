@@ -303,13 +303,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           // Form alanlarını set et
           setValue("secilenIsEmriID", item.TB_ISEMRI_ID);
           setValue("kapali", item.KAPALI);
-          setDisabled(item.KAPALI);
-          if (onayCheck === true) {
-            if (item.ISM_ONAY_DURUM === 1) {
-              setDisabled(true);
-              setValue("kapali", true);
-            }
-          }
+          setValue("onayDurum", item.ISM_ONAY_DURUM);
+
           setValue("isEmriNo", item.ISEMRI_NO);
           setValue("duzenlenmeTarihi", item.DUZENLEME_TARIH ? (dayjs(item.DUZENLEME_TARIH).isValid() ? dayjs(item.DUZENLEME_TARIH) : null) : null);
           setValue("duzenlenmeSaati", item.DUZENLEME_SAAT ? (dayjs(item.DUZENLEME_SAAT, "HH:mm:ss").isValid() ? dayjs(item.DUZENLEME_SAAT, "HH:mm:ss") : null) : null);
@@ -475,7 +470,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     };
 
     handleDataFetchAndUpdate();
-  }, [drawerVisible, selectedRow, setValue, onRefresh, methods.reset, AxiosInstance, setDisabled, onayCheck]);
+  }, [drawerVisible, selectedRow, setValue, methods.reset, setDisabled]);
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
@@ -488,16 +483,24 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   };
 
   const calismaSaat = watch("calismaSaat");
+  const onayDurum = watch("onayDurum");
+  const kapali = watch("kapali");
 
   useEffect(() => {
-    if (disabled == false) {
+    if (kapali == true) {
+      setDisabled(true);
+    } else if (kapali == false) {
       if (calismaSaat < 0) {
         setDisabled(true);
+      } else if (onayCheck === true) {
+        if (onayDurum === 1) {
+          setDisabled(true);
+        }
       } else {
         setDisabled(false);
       }
     }
-  }, [calismaSaat]);
+  }, [calismaSaat, kapali, onayDurum, onayCheck]);
 
   const onSubmit = (data) => {
     // Form verilerini API'nin beklediği formata dönüştür
