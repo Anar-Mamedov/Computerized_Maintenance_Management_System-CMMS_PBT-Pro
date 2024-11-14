@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Modal, Input, Typography, Tabs, DatePicker, TimePicker, Slider, InputNumber, Checkbox, message } from "antd";
-import { Controller, useFormContext } from "react-hook-form";
+import { Controller, useFormContext, useWatch } from "react-hook-form";
 import styled from "styled-components";
 import dayjs from "dayjs";
 import { useAppContext } from "../../../../../../../../AppContext"; // Context hook'unu import edin
@@ -171,28 +171,41 @@ export default function DetayBilgiler({ fieldRequirements }) {
 
   //! Başlama Tarihi ve saati ile Bitiş Tarihi ve saati arasındaki farkı hesaplama
 
-  // Watch for changes in the relevant fields
-  const watchFields = watch(["baslamaZamani", "baslamaZamaniSaati", "bitisZamani", "bitisZamaniSaati"]);
+  // Watch each field individually
+  const baslamaZamani = useWatch({ control, name: "baslamaZamani" });
+  const baslamaZamaniSaati = useWatch({ control, name: "baslamaZamaniSaati" });
+  const bitisZamani = useWatch({ control, name: "bitisZamani" });
+  const bitisZamaniSaati = useWatch({ control, name: "bitisZamaniSaati" });
 
-  React.useEffect(() => {
-    const { baslamaZamani, baslamaZamaniSaati, bitisZamani, bitisZamaniSaati } = getValues();
+  useEffect(() => {
+    // Ensure all required fields have values
     if (baslamaZamani && baslamaZamaniSaati && bitisZamani && bitisZamaniSaati) {
-      // Başlangıç ve bitiş tarih/saatini birleştir
+      // Combine start date and time
       const startDateTime = dayjs(baslamaZamani).hour(baslamaZamaniSaati.hour()).minute(baslamaZamaniSaati.minute());
+
+      // Combine end date and time
       const endDateTime = dayjs(bitisZamani).hour(bitisZamaniSaati.hour()).minute(bitisZamaniSaati.minute());
 
-      // İki tarih/saat arasındaki farkı milisaniye cinsinden hesapla
+      // Calculate the difference in milliseconds
       const diff = endDateTime.diff(startDateTime);
 
-      // Farkı saat ve dakikaya dönüştür
+      // Convert difference to hours and minutes
       const hours = Math.floor(diff / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 
-      // Hesaplanan saat ve dakikaları form alanlarına yaz
-      setValue("calismaSaat", hours);
-      setValue("calismaDakika", minutes);
+      // Retrieve current values to prevent unnecessary updates
+      const currentHours = getValues("calismaSaat");
+      const currentMinutes = getValues("calismaDakika");
+
+      // Update only if values have changed
+      if (currentHours !== hours) {
+        setValue("calismaSaat", hours);
+      }
+      if (currentMinutes !== minutes) {
+        setValue("calismaDakika", minutes);
+      }
     }
-  }, [watchFields, setValue, getValues]);
+  }, [baslamaZamani, baslamaZamaniSaati, bitisZamani, bitisZamaniSaati, setValue, getValues]);
 
   //! Başlama Tarihi ve saati ile Bitiş Tarihi ve saati arasındaki farkı hesaplama sonu
 
