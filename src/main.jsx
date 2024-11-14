@@ -73,10 +73,11 @@ const MainComponent1 = React.memo(function MainComponent1() {
 
 // Main component
 const Main = React.memo(function Main() {
+  const language = localStorage.getItem("i18nextLng");
   return (
     <React.StrictMode>
       <I18nextProvider i18n={i18n}>
-        <ConfigProvider locale={trTR}>
+        <ConfigProvider locale={language}>
           <Router>
             <AppProvider>
               <RecoilRoot>

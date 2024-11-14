@@ -530,7 +530,7 @@ export default function MainTabs() {
             justifyContent: "space-between",
           }}
         >
-          <Text style={{ fontSize: "14px" }}>Çalışma Süresis (dk.):</Text>
+          <Text style={{ fontSize: "14px" }}>Çalışma Süresi (dk.):</Text>
           <div
             style={{
               display: "flex",
@@ -570,7 +570,7 @@ export default function MainTabs() {
             width: "100%",
           }}
         >
-          <Text style={{ fontSize: "14px" }}>Duruş Süresis (dk.):</Text>
+          <Text style={{ fontSize: "14px" }}>Duruş Süresi (dk.):</Text>
           <div
             style={{
               display: "flex",
