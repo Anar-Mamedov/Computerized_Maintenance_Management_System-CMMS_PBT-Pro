@@ -11,6 +11,7 @@ import Filters from "./filter/Filters";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import { useFormContext } from "react-hook-form";
 import { t } from "i18next";
+import PeriyodikBakim from "../../../PeriyodikBakimlar1/Update/EditDrawer";
 import { SiMicrosoftexcel } from "react-icons/si";
 import * as XLSX from "xlsx";
 
@@ -216,6 +217,18 @@ const MainTable = () => {
         if (b.BakimKodu === null) return 1;
         return a.BakimKodu.localeCompare(b.BakimKodu);
       },
+      render: (text, record) => (
+        <a
+          onClick={(event) => {
+            event.stopPropagation();
+            const updatedRecord = { ...record, key: record.BakimID };
+            setEditDrawer1Data(updatedRecord);
+            setEditDrawer1Visible(true);
+          }}
+        >
+          {text}
+        </a>
+      ),
     },
     {
       title: t("bakimTanimi"),
@@ -838,6 +851,16 @@ const MainTable = () => {
           rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
         />
       </Spin>
+      {editDrawer1Visible && (
+        <PeriyodikBakim
+          selectedRow={editDrawer1Data}
+          onDrawerClose={() => setEditDrawer1Visible(false)}
+          drawerVisible={editDrawer1Visible}
+          onRefresh={() => {
+            /* Veri yenileme işlemi */
+          }}
+        />
+      )}
     </>
   );
 };
