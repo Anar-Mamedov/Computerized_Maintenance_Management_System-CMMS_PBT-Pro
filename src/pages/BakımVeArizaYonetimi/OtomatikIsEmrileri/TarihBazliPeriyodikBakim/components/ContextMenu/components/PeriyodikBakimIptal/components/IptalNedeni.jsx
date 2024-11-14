@@ -1,13 +1,13 @@
 import React, { useState, createRef, useEffect } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import { Select, Typography, Divider, Spin, Button, Input, message, Space } from "antd";
-import AxiosInstance from "../../../../../../../../../../../../../api/http";
+import AxiosInstance from "../../../../../../../../../api/http";
 import { PlusOutlined } from "@ant-design/icons";
 
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function PlanlamaNedeni({ disabled }) {
+export default function IptalNedeni({ disabled }) {
   const {
     control,
     watch,
@@ -29,7 +29,7 @@ export default function PlanlamaNedeni({ disabled }) {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32914");
+      const response = await AxiosInstance.get("KodList?grup=32913");
       if (response && response) {
         setOptions(response);
       }
@@ -57,7 +57,7 @@ export default function PlanlamaNedeni({ disabled }) {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32914`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32913`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
@@ -98,13 +98,13 @@ export default function PlanlamaNedeni({ disabled }) {
       {contextHolder}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
         <Controller
-          name="planlamaNedeni"
+          name="iptalNedeni"
           control={control}
           rules={{ required: "Alan Boş Bırakılamaz!" }}
           render={({ field }) => (
             <Select
               {...field}
-              status={errors.planlamaNedeni ? "error" : ""}
+              status={errors.iptalNedeni ? "error" : ""}
               disabled={disabled}
               key={selectKey}
               style={{ width: "300px" }}
@@ -141,8 +141,8 @@ export default function PlanlamaNedeni({ disabled }) {
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
                 // `null` veya `undefined` değerlerini ele al
-                setValue("planlamaNedeni", value ?? null);
-                setValue("planlamaNedeniID", value ?? null);
+                setValue("iptalNedeni", value ?? null);
+                setValue("iptalNedeniID", value ?? null);
                 field.onChange(value ?? null);
               }}
               value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
@@ -151,7 +151,7 @@ export default function PlanlamaNedeni({ disabled }) {
         />
 
         <Controller
-          name="planlamaNedeniID"
+          name="iptalNedeniID"
           control={control}
           render={({ field }) => (
             <Input
@@ -162,7 +162,7 @@ export default function PlanlamaNedeni({ disabled }) {
           )}
         />
 
-        {errors.planlamaNedeni && <div style={{ color: "red", marginTop: "0px" }}>{errors.planlamaNedeni.message}</div>}
+        {errors.iptalNedeni && <div style={{ color: "red", marginTop: "0px" }}>{errors.iptalNedeni.message}</div>}
       </div>
     </div>
   );

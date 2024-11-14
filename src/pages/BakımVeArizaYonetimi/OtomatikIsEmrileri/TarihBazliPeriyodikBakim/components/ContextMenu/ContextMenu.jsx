@@ -3,6 +3,8 @@ import { Button, Popover, Typography } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
 import Sil from "./components/Sil";
 import IsEmriOlustur from "./components/IsEmriOlustur.jsx";
+import PeriyodikBakimIptal from "./components/PeriyodikBakimIptal/PeriyodikBakimIptal.jsx";
+import IleriTarihePlanla from "./components/IleriTarihePlanla/IleriTarihePlanla.jsx";
 
 const { Text, Link } = Typography;
 
@@ -18,8 +20,12 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
   };
 
   const content = (
-    <div>
+    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
       {selectedRows.length >= 1 && <IsEmriOlustur selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
+
+      {selectedRows.length == 1 && <IleriTarihePlanla selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
+
+      {selectedRows.length == 1 && <PeriyodikBakimIptal selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
 
       {/* {selectedRows.length >= 1 && selectedRows.every((row) => row.KAPALI === false) && (
         <Sil selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />

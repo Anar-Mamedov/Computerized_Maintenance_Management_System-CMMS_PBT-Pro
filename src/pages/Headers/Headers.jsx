@@ -104,7 +104,7 @@ export default function Header() {
         const body = {
           PBakimId: row.BakimKodu,
           MakineId: row.MakineKodu,
-          Tarih: row.PlanlamaTarih,
+          Tarih: row.SonUygulamaTarihi,
         };
         // API isteğini gönder
         const response = await AxiosInstance.post(`IsEmriOlustur`, body);
@@ -130,7 +130,7 @@ export default function Header() {
 
   useEffect(() => {
     if (otomatikIsEmirleriListe && otomatikIsEmirleriListe.length > 0) {
-      // handleAutoCreateWorkOrder();
+      handleAutoCreateWorkOrder();
       console.log(otomatikIsEmirleriListe);
     }
   }, [otomatikIsEmirleriListe]);
