@@ -15,6 +15,7 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, tarihSayacBa
   const [currentPage, setCurrentPage] = useState(1); // reset the cruent page when i search or filtered any thing
   const [filtersKey, setFiltersKey] = useState(0);
   const [stateValue, setStateValue] = useState(-1);
+  const [totalDataCount, setTotalDataCount] = useState("0");
 
   useEffect(() => {
     if (periyotBilgiDurum === 1) {
@@ -238,6 +239,7 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, tarihSayacBa
               };
             });
             setCurrentPage(page); //reset the cruent page when i search or filtered any thing
+            setTotalDataCount(response.kayit_sayisi);
             setTable({
               data: fetchedData,
               page: response.page,
@@ -315,7 +317,7 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, tarihSayacBa
           <PlusOutlined /> Yeni Kayıt
         </Button>
       </div>
-      <Modal width="1200px" centered title="Makine Tanımları" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
+      <Modal width="1200px" centered title="Periyodik Bakımlar Makine Seçimi" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <div
           style={{
             display: "flex",
@@ -353,6 +355,7 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, tarihSayacBa
             // total: table.page,
             onChange: (page) => fetch({ filters: body.filters, keyword: body.keyword, page }),
             // quick jump for page input field
+            showTotal: () => `Toplam ${totalDataCount}`,
           }}
         />
       </Modal>

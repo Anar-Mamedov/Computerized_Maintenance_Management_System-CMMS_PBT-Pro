@@ -4,6 +4,7 @@ import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../api/http";
 import dayjs from "dayjs";
 import CreateModal from "./Insert/CreateModal";
+import ContextMenu from "./components/ContextMenu/ContextMenu";
 import EditModal from "./Update/EditModal";
 
 export default function Tablo() {
@@ -84,24 +85,11 @@ export default function Tablo() {
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`GetIsTanimOlcum?isTanimID=${secilenBakimID}`)
+    AxiosInstance.get(`GetPBakimOlcumDegeri?TB_PERIYODIK_BAKIM_ID=${secilenBakimID}`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
-          key: item.TB_IS_TANIM_OLCUM_PARAMETRE_ID,
-          IOC_IS_TANIM_ID: item.IOC_IS_TANIM_ID,
-          IOC_SIRA_NO: item.IOC_SIRA_NO,
-          IOC_TANIM: item.IOC_TANIM,
-          IOC_BIRIM_KOD_ID: item.IOC_BIRIM_KOD_ID,
-          IOC_BIRIM: item.IOC_BIRIM,
-          IOC_HEDEF_DEGER: item.IOC_HEDEF_DEGER,
-          IOC_MIN_MAX_DEGER: item.IOC_MIN_MAX_DEGER,
-          IOC_MIN_DEGER: item.IOC_MIN_DEGER,
-          IOC_MAX_DEGER: item.IOC_MAX_DEGER,
-          IOC_FORMAT: item.IOC_FORMAT,
-          IOC_OLUSTURAN_ID: item.IOC_OLUSTURAN_ID,
-          IOC_OLUSTURMA_TARIH: item.IOC_OLUSTURMA_TARIH,
-          IOC_DEGISTIREN_ID: item.IOC_DEGISTIREN_ID,
-          IOC_DEGISTIRME_TARIH: item.IOC_DEGISTIRME_TARIH,
+          ...item,
+          key: item.TB_PERIYODIK_BAKIM_OLCUM_PARAMETRE_ID,
         }));
         setData(fetchedData);
       })
@@ -116,8 +104,11 @@ export default function Tablo() {
   }, [secilenBakimID, fetch]); // secilenBakimID veya fetch fonksiyonu değiştiğinde useEffect'i tetikle
 
   const onRowSelectChange = (selectedKeys) => {
-    setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
+    setSelectedRowKeys(selectedKeys);
   };
+
+  // Seçilen satır objelerini içeren bir dizi oluşturun
+  const selectedRows = data.filter((row) => selectedRowKeys.includes(row.key));
 
   const onRowClick = (record) => {
     setSelectedRow(record);
@@ -130,10 +121,14 @@ export default function Tablo() {
 
   return (
     <div>
-      <CreateModal onRefresh={refreshTable} secilenBakimID={secilenBakimID} />
+      <div style={{ display: "flex", alignItems: "center", marginBottom: "10px", justifyContent: "flex-end" }}>
+        <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTable} />
+        <CreateModal onRefresh={refreshTable} secilenBakimID={secilenBakimID} />
+      </div>
+
       <Table
         rowSelection={{
-          type: "radio",
+          type: "checkbox",
           selectedRowKeys,
           onChange: onRowSelectChange,
         }}

@@ -23,13 +23,13 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
 
   const onSubmited = (data) => {
     const Body = {
-      ISK_IS_TANIM_ID: secilenBakimID,
-      ISK_SIRANO: data.siraNo,
-      ISK_TANIM: data.isTanimi,
-      ISK_ACIKLAMA: data.aciklama,
+      PKN_PERIYODIK_BAKIM_ID: secilenBakimID,
+      PKN_SIRANO: data.siraNo,
+      PKN_TANIM: data.isTanimi,
+      PKN_ACIKLAMA: data.aciklama,
     };
 
-    AxiosInstance.post("AddIsTanimKontrolList", Body)
+    AxiosInstance.post("AddUpdatePBakimKontrolList", Body)
       .then((response) => {
         console.log("Data sent successfully:", response.data);
 
@@ -71,18 +71,13 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
   return (
     <FormProvider {...methods}>
       <div>
-        <div style={{ display: "flex", width: "100%", justifyContent: "flex-end", marginBottom: "10px" }}>
+        <div style={{ display: "flex", width: "100%", justifyContent: "flex-end" }}>
           <Button type="link" onClick={handleModalToggle}>
             <PlusOutlined /> Yeni Kayıt
           </Button>
         </div>
 
-        <Modal
-          width="800px"
-          title="Kontrol Listesi Ekle"
-          open={isModalVisible}
-          onOk={handleModalOk}
-          onCancel={handleModalToggle}>
+        <Modal width="800px" title="Kontrol Listesi Ekle" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
           <MainTabs />
         </Modal>
       </div>

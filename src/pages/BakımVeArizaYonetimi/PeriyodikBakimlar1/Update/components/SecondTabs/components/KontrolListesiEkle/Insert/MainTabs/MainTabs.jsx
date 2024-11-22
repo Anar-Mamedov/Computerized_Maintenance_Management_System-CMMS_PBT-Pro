@@ -49,15 +49,13 @@ export default function MainTabs() {
     {
       key: "1",
       label: "Açıklama",
-      children: (
-        <Controller name="aciklama" control={control} render={({ field }) => <TextArea {...field} rows={4} />} />
-      ),
+      children: <Controller name="aciklama" control={control} render={({ field }) => <TextArea {...field} rows={4} />} />,
     },
-    {
+    /* {
       key: "2",
       label: "Resimler",
       children: "test",
-    },
+    }, */
   ];
 
   return (
@@ -73,7 +71,8 @@ export default function MainTabs() {
           gap: "10px",
           rowGap: "0px",
           marginBottom: "10px",
-        }}>
+        }}
+      >
         <Text style={{ fontSize: "14px" }}>Sira no:</Text>
         <div
           style={{
@@ -84,12 +83,9 @@ export default function MainTabs() {
             minWidth: "300px",
             gap: "10px",
             width: "100%",
-          }}>
-          <Controller
-            name="siraNo"
-            control={control}
-            render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
-          />
+          }}
+        >
+          <Controller name="siraNo" control={control} render={({ field }) => <Input {...field} style={{ flex: 1 }} />} />
           <Controller
             name="secilenID"
             control={control}
@@ -114,7 +110,8 @@ export default function MainTabs() {
           gap: "10px",
           rowGap: "0px",
           marginBottom: "10px",
-        }}>
+        }}
+      >
         <Text style={{ fontSize: "14px" }}>İş Tanımı:</Text>
         <div
           style={{
@@ -125,12 +122,9 @@ export default function MainTabs() {
             minWidth: "300px",
             gap: "10px",
             width: "100%",
-          }}>
-          <Controller
-            name="isTanimi"
-            control={control}
-            render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
-          />
+          }}
+        >
+          <Controller name="isTanimi" control={control} render={({ field }) => <Input {...field} style={{ flex: 1 }} />} />
         </div>
       </div>
       <StyledTabs defaultActiveKey="1" items={items} onChange={onChange} />

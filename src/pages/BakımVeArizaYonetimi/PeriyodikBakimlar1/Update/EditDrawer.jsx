@@ -13,6 +13,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   const [startTransition] = useTransition();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [count, setCount] = useState();
   const showDrawer = () => {
     setOpen(true);
   };
@@ -544,6 +545,21 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     }
   }, [drawerVisible, reset]);
 
+  const fetchCount = async () => {
+    try {
+      const response = await AxiosInstance.post(`PeriyodikBakimTabSayi?TB_PERIYODIK_BAKIM_ID=${selectedRow.key}`);
+      setCount(response);
+    } catch (error) {
+      console.error("Error fetching  count:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedRow) {
+      fetchCount();
+    }
+  }, [selectedRow]);
+
   return (
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
@@ -585,7 +601,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             </Spin>
           ) : (
             <form onSubmit={methods.handleSubmit(onSubmit)}>
-              <MainTabs1 />
+              <MainTabs1 count={count} />
               {/*<SecondTabs />*/}
               <Footer />
             </form>

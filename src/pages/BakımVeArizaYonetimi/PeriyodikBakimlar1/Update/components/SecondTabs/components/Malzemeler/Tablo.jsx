@@ -87,24 +87,8 @@ export default function Tablo() {
     AxiosInstance.get(`GetIsTanimMazleme?isTanimID=${secilenBakimID}`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
+          ...item,
           key: item.TB_IS_TANIM_MLZ_ID,
-          ISM_STOK_ID: item.ISM_STOK_ID,
-          ISM_IS_TANIM_ID: item.ISM_IS_TANIM_ID,
-          ISM_DEPO_ID: item.ISM_DEPO_ID,
-          ISM_STOK_KOD: item.ISM_STOK_KOD,
-          ISM_STOK_TANIM: item.ISM_STOK_TANIM,
-          ISM_STOK_TIP_KOD_ID: item.ISM_STOK_TIP_KOD_ID,
-          ISM_STOK_TIP: item.ISM_STOK_TIP,
-          ISM_MIKTAR: item.ISM_MIKTAR,
-          ISM_TUTAR: item.ISM_TUTAR,
-          ISM_BIRIM_FIYAT: item.ISM_BIRIM_FIYAT,
-          ISM_BIRIM_KOD_ID: item.ISM_BIRIM_KOD_ID,
-          ISM_BIRIM: item.ISM_BIRIM,
-          ISM_OLUSTURMA_TARIH: item.ISM_OLUSTURMA_TARIH,
-          ISM_DEGISTIRME_TARIH: item.ISM_DEGISTIRME_TARIH,
-          ISM_OLUSTURAN_ID: item.ISM_OLUSTURAN_ID,
-          ISM_DEGISTIREN_ID: item.ISM_DEGISTIREN_ID,
-          ISM_ACIKLAMA: item.ISM_ACIKLAMA,
         }));
         setData(fetchedData);
       })
@@ -119,8 +103,11 @@ export default function Tablo() {
   }, [secilenBakimID, fetch]); // secilenBakimID veya fetch fonksiyonu değiştiğinde useEffect'i tetikle
 
   const onRowSelectChange = (selectedKeys) => {
-    setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
+    setSelectedRowKeys(selectedKeys);
   };
+
+  // Seçilen satır objelerini içeren bir dizi oluşturun
+  const selectedRows = data.filter((row) => selectedRowKeys.includes(row.key));
 
   const onRowClick = (record) => {
     setSelectedRow(record);
@@ -136,7 +123,7 @@ export default function Tablo() {
       <CreateModal onRefresh={refreshTable} secilenBakimID={secilenBakimID} />
       <Table
         rowSelection={{
-          type: "radio",
+          type: "checkbox",
           selectedRowKeys,
           onChange: onRowSelectChange,
         }}

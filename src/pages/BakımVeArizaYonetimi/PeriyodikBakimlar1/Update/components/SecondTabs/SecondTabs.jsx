@@ -50,18 +50,18 @@ const StyledTabs = styled(Tabs)`
 
 //styled components end
 
-export default function SecondTabs({ refreshKey }) {
+export default function SecondTabs({ refreshKey, count }) {
   const { watch } = useFormContext();
 
   const items = [
     {
       key: "1",
-      label: "Kontrol Listesi",
+      label: `Kontrol Listesi (${count?.KONTROL_SAYI})`,
       children: <KontrolListesiTablo />,
     },
     {
       key: "2",
-      label: "Malzemeler",
+      label: `Malzemeler (${count?.MALZEME_SAYI})`,
       children: <Tablo />,
     },
     {
@@ -71,7 +71,7 @@ export default function SecondTabs({ refreshKey }) {
     },
     {
       key: "4",
-      label: "Ölçümler",
+      label: `Ölçümler (${count?.OLCUM_SAYI})`,
       children: <Olcumler />,
     },
     {
@@ -106,9 +106,5 @@ export default function SecondTabs({ refreshKey }) {
     },
   ];
 
-  return (
-    <div>
-      <StyledTabs defaultActiveKey="1" items={items} onChange={onChange} />
-    </div>
-  );
+  return <StyledTabs style={{ width: "100%" }} defaultActiveKey="1" items={items} onChange={onChange} />;
 }
