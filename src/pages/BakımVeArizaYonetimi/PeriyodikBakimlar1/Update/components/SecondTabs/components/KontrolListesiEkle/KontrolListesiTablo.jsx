@@ -3,6 +3,7 @@ import { Button, Modal, Table } from "antd";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../api/http";
 import dayjs from "dayjs";
+import ContextMenu from "./components/ContextMenu/ContextMenu";
 import CreateModal from "./Insert/CreateModal";
 import EditModal from "./Update/EditModal";
 
@@ -17,22 +18,22 @@ export default function KontrolListesiTablo() {
   const columns = [
     {
       title: "Sıra No",
-      dataIndex: "ISK_SIRANO",
-      key: "ISK_SIRANO",
+      dataIndex: "PKN_SIRANO",
+      key: "PKN_SIRANO",
       width: 40,
       ellipsis: true,
     },
     {
       title: "Tanım",
-      dataIndex: "ISK_TANIM",
-      key: "ISK_TANIM",
+      dataIndex: "PKN_TANIM",
+      key: "PKN_TANIM",
       width: 200,
       ellipsis: true,
     },
     {
       title: "Açıklama",
-      dataIndex: "ISK_ACIKLAMA",
-      key: "ISK_ACIKLAMA",
+      dataIndex: "PKN_ACIKLAMA",
+      key: "PKN_ACIKLAMA",
       width: 200,
       ellipsis: true,
     },
@@ -42,13 +43,11 @@ export default function KontrolListesiTablo() {
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`IsTanimKontrolList?isTanimID=${secilenBakimID}`)
+    AxiosInstance.get(`GetPBakimKontrolList?bakimID=${secilenBakimID}`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
-          key: item.TB_IS_TANIM_KONROLLIST_ID,
-          ISK_SIRANO: item.ISK_SIRANO,
-          ISK_TANIM: item.ISK_TANIM,
-          ISK_ACIKLAMA: item.ISK_ACIKLAMA,
+          ...item,
+          key: item.TB_PERIYODIK_BAKIM_KONTROLLIST_ID,
         }));
         setData(fetchedData);
       })
@@ -67,8 +66,11 @@ export default function KontrolListesiTablo() {
   }, [secilenBakimID, fetch]); // secilenBakimID veya fetch fonksiyonu değiştiğinde useEffect'i tetikle
 
   const onRowSelectChange = (selectedKeys) => {
-    setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
+    setSelectedRowKeys(selectedKeys);
   };
+
+  // Seçilen satır objelerini içeren bir dizi oluşturun
+  const selectedRows = data.filter((row) => selectedRowKeys.includes(row.key));
 
   const onRowClick = (record) => {
     setSelectedRow(record);
@@ -81,10 +83,14 @@ export default function KontrolListesiTablo() {
 
   return (
     <div>
-      <CreateModal onRefresh={refreshTable} secilenBakimID={secilenBakimID} />
+      <div style={{ display: "flex", alignItems: "center", marginBottom: "10px", justifyContent: "flex-end" }}>
+        <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTable} />
+        <CreateModal onRefresh={refreshTable} secilenBakimID={secilenBakimID} />
+      </div>
+
       <Table
         rowSelection={{
-          type: "radio",
+          type: "checkbox",
           selectedRowKeys,
           onChange: onRowSelectChange,
         }}

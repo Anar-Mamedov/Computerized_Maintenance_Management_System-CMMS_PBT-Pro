@@ -63,7 +63,7 @@ const StyledDivMedia = styled.div`
   }
 `;
 
-export default function MainTabs() {
+export default function MainTabs({ count }) {
   const {
     control,
     watch,
@@ -115,6 +115,7 @@ export default function MainTabs() {
         flexWrap: "wrap",
         marginBottom: "15px",
         gap: "20px",
+        width: "100%",
       }}
     >
       <div
@@ -641,7 +642,7 @@ export default function MainTabs() {
           </div>
         </StyledDivBottomLine>
       </div>
-      <SecondTabs />
+      <SecondTabs count={count} />
     </div>
   );
 }

@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Tabs } from "antd";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import MainTabs from "./MainTabs.jsx";
 import PeriotBilgileri from "./components/PeryotBilgileri/PeriotBilgileri.jsx";
 import TanimliMakinelerTablo from "./components/TanimliMakineler/TanimliMakinelerTablo.jsx";
+import AxiosInstance from "../../../../../../api/http.jsx";
 
 const onChange = (key) => {
   // console.log(key);
@@ -43,14 +44,14 @@ const StyledTabs = styled(Tabs)`
 
 //styled components end
 
-export default function MainTabs1({ refreshKey }) {
+export default function MainTabs1({ refreshKey, count }) {
   const { watch } = useFormContext();
 
   const items = [
     {
       key: "1",
       label: "Bakım Bilgileri",
-      children: <MainTabs />,
+      children: <MainTabs count={count} />,
     },
     {
       key: "2",
@@ -59,7 +60,7 @@ export default function MainTabs1({ refreshKey }) {
     },
     {
       key: "3",
-      label: "Tanımlı Makineler",
+      label: `Tanımlı Makineler (${count?.MAKINE_SAYI})`,
       children: <TanimliMakinelerTablo />,
     },
   ];

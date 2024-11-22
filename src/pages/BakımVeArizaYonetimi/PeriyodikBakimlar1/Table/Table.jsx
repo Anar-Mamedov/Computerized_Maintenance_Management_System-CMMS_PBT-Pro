@@ -169,6 +169,22 @@ const MainTable = () => {
   // Özel Alanların nameleri backend çekmek için api isteği sonu
   const initialColumns = [
     {
+      title: "Aktif",
+      dataIndex: "PBK_AKTIF",
+      key: "PBK_AKTIF",
+      width: 100,
+      ellipsis: true,
+      visible: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      align: "center",
+      render: (text) => <div style={{ textAlign: "center" }}>{text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}</div>,
+      sorter: (a, b) => (a.PBK_AKTIF === b.PBK_AKTIF ? 0 : a.PBK_AKTIF ? -1 : 1),
+    },
+    {
       title: "Periyodik Bakım Kodu",
       dataIndex: "PBK_KOD",
       key: "PBK_KOD",
@@ -182,6 +198,21 @@ const MainTable = () => {
         if (b.PBK_KOD === null || b.PBK_KOD === undefined) return 1;
         return a.PBK_KOD.localeCompare(b.PBK_KOD);
       },
+    },
+    {
+      title: "Makine Sayısı",
+      dataIndex: "MAKINE_SAYI",
+      key: "MAKINE_SAYI",
+      width: 150,
+      ellipsis: true,
+      visible: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
+      sorter: (a, b) => a.MAKINE_SAYI - b.MAKINE_SAYI,
     },
     {
       title: "Periyodik Bakım Tanımı",
@@ -202,22 +233,7 @@ const MainTable = () => {
         return a.PBK_TANIM.localeCompare(b.PBK_TANIM);
       },
     },
-    {
-      title: "Aktif",
-      dataIndex: "PBK_AKTIF",
-      key: "PBK_AKTIF",
-      width: 100,
-      ellipsis: true,
-      visible: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      align: "center",
-      render: (text) => <div style={{ textAlign: "center" }}>{text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}</div>,
-      sorter: (a, b) => (a.PBK_AKTIF === b.PBK_AKTIF ? 0 : a.PBK_AKTIF ? -1 : 1),
-    },
+
     {
       title: "Periyodik Bakım Tipi",
       dataIndex: "PBK_TIP",
@@ -287,7 +303,7 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
+      render: (text) => <div style={{ textAlign: "left" }}>{text}</div>,
       sorter: (a, b) => {
         if (a.PBK_LOKASYON === b.PBK_LOKASYON) return 0;
         if (a.PBK_LOKASYON === null || a.PBK_LOKASYON === undefined) return -1;

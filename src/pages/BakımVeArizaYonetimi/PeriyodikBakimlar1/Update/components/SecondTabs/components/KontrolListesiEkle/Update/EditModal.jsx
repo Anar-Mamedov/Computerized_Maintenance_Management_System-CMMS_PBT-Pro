@@ -22,25 +22,26 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
 
   const onSubmited = (data) => {
     const Body = {
-      TB_IS_TANIM_KONROLLIST_ID: data.secilenID,
-      ISK_SIRANO: data.siraNo,
-      ISK_TANIM: data.isTanimi,
-      ISK_ACIKLAMA: data.aciklama,
+      /* PKN_PERIYODIK_BAKIM_ID: data.secilenID, */
+      PKN_PERIYODIK_BAKIM_ID: 1,
+      PKN_SIRANO: data.siraNo,
+      PKN_TANIM: data.isTanimi,
+      PKN_ACIKLAMA: data.aciklama,
     };
 
-    AxiosInstance.post("UpdateIsTanimKontrolList", Body)
+    AxiosInstance.post("AddUpdatePBakimKontrolList", Body)
       .then((response) => {
         console.log("Data sent successfully:", response.data);
 
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("İşlem Başarılı.");
           reset();
           onModalClose(); // Modal'ı kapat
           onRefresh(); // Tabloyu yenile
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
-          message.error("Ekleme Başarısız.");
+          message.error("İşlem Başarısız.");
         }
       })
       .catch((error) => {
@@ -68,9 +69,9 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       //   console.log(key, selectedRow[key]);
       //   setValue(key, selectedRow[key]);
       setValue("secilenID", selectedRow.key);
-      setValue("siraNo", selectedRow.ISK_SIRANO);
-      setValue("isTanimi", selectedRow.ISK_TANIM);
-      setValue("aciklama", selectedRow.ISK_ACIKLAMA);
+      setValue("siraNo", selectedRow.PKN_SIRANO);
+      setValue("isTanimi", selectedRow.PKN_TANIM);
+      setValue("aciklama", selectedRow.PKN_ACIKLAMA);
       // add more fields as needed
 
       // });
@@ -87,12 +88,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   return (
     <FormProvider {...methods}>
       <div>
-        <Modal
-          width="800px"
-          title="Kontrol Listesi Güncelle"
-          open={isModalVisible}
-          onOk={handleModalOk}
-          onCancel={onModalClose}>
+        <Modal width="800px" title="Kontrol Listesi Güncelle" open={isModalVisible} onOk={handleModalOk} onCancel={onModalClose}>
           <MainTabs />
         </Modal>
       </div>
