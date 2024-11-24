@@ -40,6 +40,7 @@ const Breadcrumbs = () => {
     "/demo": "Demo",
     "/userid": "User ID Control",
     "/mudaheleSuresi": "Müdahale Süresi Analizi",
+    "/kullaniciTanimlari": "Kullanıcı Tanımları",
     // Diğer route'lar için ekleyin...
   };
 

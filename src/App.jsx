@@ -37,6 +37,7 @@ import OnayTanimlari from "./pages/OnayIslemleri/OnayTanimlari/OnayTanimlari.jsx
 import Onaylayicilar from "./pages/OnayIslemleri/Onaylayicilar/Onaylayicilar.jsx";
 import EkipmanVeritabani from "./pages/MakineEkipman/EkipmanVeritabani/EkipmanVeritabani.jsx";
 import IsTalebiKullanicilari from "./pages/YardimMasasi/IsTalebiKullanicilari/IsTalebiKullanicilari.jsx";
+import KullaniciTanimlari from "./pages/Yonetim/KullaniciTanimlari/KullaniciTanimlari.jsx";
 // import Kurallar from "./pages/OnayIslemleri/Kurallar/Kurallar.jsx";
 
 const { Text } = Typography;
@@ -177,6 +178,7 @@ const rawItems = [
         false
       ),
       getItem("Proje Tanımları", "projeTanimlari", true),
+      getItem("Kullanıcı Tanımları", "kullaniciTanimlari", true),
       // getItem("Team 2", "team2", true)
     ],
     false
@@ -252,6 +254,7 @@ export default function App() {
           <Route path="/onayTanimlari" element={<OnayTanimlari />} />
           <Route path="/rolTanimlari" element={<RolTanimlari />} />
           <Route path="/onaylayicilar" element={<Onaylayicilar />} />
+          <Route path="/kullaniciTanimlari" element={<KullaniciTanimlari />} />
           {/*<Route path="/kurallar" element={<Kurallar />} />*/}
         </Route>
       </Routes>
