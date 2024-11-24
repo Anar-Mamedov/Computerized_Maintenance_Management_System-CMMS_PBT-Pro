@@ -1,20 +1,42 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
-import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message, Divider } from "antd";
+import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined, HomeOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Resizable } from "react-resizable";
 import "./ResizeStyle.css";
 import AxiosInstance from "../../../../api/http";
+import { useFormContext } from "react-hook-form";
+import styled from "styled-components";
+import ContextMenu from "../components/ContextMenu/ContextMenu";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
-import ContextMenu from "../components/ContextMenu/ContextMenu";
-import { useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
+
+import { t } from "i18next";
 
 const { Text } = Typography;
+
+const StyledButton = styled(Button)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0px 8px;
+  height: 32px !important;
+`;
+
+const CustomSpin = styled(Spin)`
+  .ant-spin-dot-item {
+    background-color: #0091ff !important; /* Blue color */
+  }
+`;
+
+const CustomTable = styled(Table)`
+  .ant-pagination-item-ellipsis {
+    display: flex !important;
+  }
+`;
 
 // Sütunların boyutlarını ayarlamak için kullanılan component
 
@@ -101,7 +123,7 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
 
 // Sütunların sürüklenebilir olmasını sağlayan component sonu
 
-const MainTable = () => {
+const Sigorta = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
   const [data, setData] = useState([]);
@@ -109,8 +131,13 @@ const MainTable = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchTimeout, setSearchTimeout] = useState(null);
-  const [filteredData, setFilteredData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0); // Toplam sayfa sayısı için state
   const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
+  const [totalDataCount, setTotalDataCount] = useState(0); // Tüm veriyi tutan state
+  const [pageSize, setPageSize] = useState(10); // Başlangıçta sayfa başına 10 kayıt göster
+  const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
+  const [editDrawer1Data, setEditDrawer1Data] = useState(null);
 
   // edit drawer için
   const [drawer, setDrawer] = useState({
@@ -120,6 +147,21 @@ const MainTable = () => {
   // edit drawer için son
 
   const [selectedRows, setSelectedRows] = useState([]);
+
+  const statusTag = (statusId) => {
+    switch (statusId) {
+      case 1:
+        return { color: "#ff9800", text: "Bekliyor" };
+      case 2:
+        return { color: "#2196f3", text: "Devam Ediyor" };
+      case 3:
+        return { color: "#ff0000", text: "İptal Edildi" };
+      case 4:
+        return { color: "#2bc770", text: "Tamamlandı" };
+      default:
+        return { color: "default", text: "" }; // Eğer farklı bir değer gelirse
+    }
+  };
 
   function hexToRGBA(hex, opacity) {
     // hex veya opacity null ise hata döndür
@@ -148,41 +190,86 @@ const MainTable = () => {
 
   // Özel Alanların nameleri backend çekmek için api isteği
 
-  useEffect(() => {
-    // API'den veri çekme işlemi
-    const fetchData = async () => {
-      try {
-        const response = await AxiosInstance.get("OzelAlan?form=ISEMRI"); // API URL'niz
-        localStorage.setItem("ozelAlanlarIsEmriTipleri", JSON.stringify(response));
-        setLabel(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
-      } catch (error) {
-        console.error("API isteğinde hata oluştu:", error);
-        setLabel("Hata! Veri yüklenemedi."); // Hata durumunda kullanıcıya bilgi verme
-      }
-    };
+  // useEffect(() => {
+  //   // API'den veri çekme işlemi
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await AxiosInstance.get("OzelAlan?form=ISEMRI"); // API URL'niz
+  //       localStorage.setItem("ozelAlanlarKullaniciTanimlari", JSON.stringify(response));
+  //       setLabel(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
+  //     } catch (error) {
+  //       console.error("API isteğinde hata oluştu:", error);
+  //       setLabel("Hata! Veri yüklenemedi."); // Hata durumunda kullanıcıya bilgi verme
+  //     }
+  //   };
+  //
+  //   fetchData();
+  // }, [drawer.visible]);
 
-    fetchData();
-  }, [drawer.visible]);
-
-  const ozelAlanlarIsEmriTipleri = JSON.parse(localStorage.getItem("ozelAlanlarIsEmriTipleri"));
+  const ozelAlanlar = JSON.parse(localStorage.getItem("ozelAlanlarKullaniciTanimlari"));
 
   // Özel Alanların nameleri backend çekmek için api isteği sonu
   const initialColumns = [
     {
-      title: "İş Emri Tipleri",
-      dataIndex: "IMT_TANIM",
-      key: "IMT_TANIM",
-      width: "100%",
+      title: t("kullaniciKod"),
+      dataIndex: "KLL_KOD",
+      key: "KLL_KOD",
+      width: 120,
       ellipsis: true,
-      visible: true,
+      visible: true, // Varsayılan olarak açık
       render: (text, record) => (
         <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
       ),
       sorter: (a, b) => {
-        if (a.IMT_TANIM === b.IMT_TANIM) return 0;
-        if (a.IMT_TANIM === null || a.IMT_TANIM === undefined) return -1;
-        if (b.IMT_TANIM === null || b.IMT_TANIM === undefined) return 1;
-        return a.IMT_TANIM.localeCompare(b.IMT_TANIM);
+        if (a.KLL_KOD === null) return -1;
+        if (b.KLL_KOD === null) return 1;
+        return a.KLL_KOD.localeCompare(b.KLL_KOD);
+      },
+    },
+
+    {
+      title: t("kullaniciTanim"),
+      dataIndex: "KLL_TANIM",
+      key: "KLL_TANIM",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.KLL_TANIM === null) return -1;
+        if (b.KLL_TANIM === null) return 1;
+        return a.KLL_TANIM.localeCompare(b.KLL_TANIM);
+      },
+    },
+    {
+      title: t("personel"),
+      dataIndex: "PRS_ISIM",
+      key: "PRS_ISIM",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.PRS_ISIM === null) return -1;
+        if (b.PRS_ISIM === null) return 1;
+        return a.PRS_ISIM.localeCompare(b.PRS_ISIM);
+      },
+    },
+    {
+      title: t("aktif"),
+      dataIndex: "KLL_AKTIF",
+      key: "KLL_AKTIF",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.KLL_AKTIF === null) return -1;
+        if (b.KLL_AKTIF === null) return 1;
+        return a.KLL_AKTIF === b.KLL_AKTIF ? 0 : a.KLL_AKTIF ? -1 : 1;
+      },
+      render: (text, record) => {
+        return record.KLL_AKTIF ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />;
       },
     },
     // Diğer kolonlarınız...
@@ -259,24 +346,60 @@ const MainTable = () => {
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
+  const [body, setBody] = useState({
+    keyword: "",
+    filters: {},
+  });
+
   // ana tablo api isteği için kullanılan useEffect
 
   useEffect(() => {
-    fetchEquipmentData();
-  }, []);
+    fetchEquipmentData(body, currentPage, pageSize);
+  }, [body, currentPage, pageSize]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
-  const fetchEquipmentData = async () => {
+  // arama işlemi için kullanılan useEffect
+  useEffect(() => {
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    // Arama terimi değiştiğinde ve boş olduğunda API isteğini tetikle
+    const timeout = setTimeout(() => {
+      if (searchTerm !== body.keyword) {
+        handleBodyChange("keyword", searchTerm);
+        setCurrentPage(1); // Arama yapıldığında veya arama sıfırlandığında sayfa numarasını 1'e ayarla
+        // setDrawer({ ...drawer, visible: false }); // Arama yapıldığında veya arama sıfırlandığında Drawer'ı kapat
+      }
+    }, 2000);
+
+    setSearchTimeout(timeout);
+
+    return () => clearTimeout(timeout);
+  }, [searchTerm]);
+
+  // arama işlemi için kullanılan useEffect son
+
+  const fetchEquipmentData = async (body, page, size) => {
+    // body'nin undefined olması durumunda varsayılan değerler atanıyor
+    const { keyword = "", filters = {} } = body || {};
+    // page'in undefined olması durumunda varsayılan değer olarak 1 atanıyor
+    const currentPage = page || 1;
+
     try {
       setLoading(true);
       // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.get(`IsEmriTip`);
+      const response = await AxiosInstance.get(`GetKullaniciList?page=${currentPage}&parameter=${keyword}`);
       if (response) {
+        // Toplam sayfa sayısını ayarla
+        setTotalPages(response.page);
+        setTotalDataCount(response.recordCount);
+
         // Gelen veriyi formatla ve state'e ata
         const formattedData = response.map((item) => ({
           ...item,
-          key: item.TB_ISEMRI_TIP_ID,
+          key: item.TB_KULLANICI_ID,
           // Diğer alanlarınız...
         }));
         setData(formattedData);
@@ -298,26 +421,24 @@ const MainTable = () => {
     }
   };
 
-  const normalizeString = (str) => {
-    if (str === null) {
-      return "";
-    }
-    return str
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .replace(/ğ/gim, "g")
-      .replace(/ü/gim, "u")
-      .replace(/ş/gim, "s")
-      .replace(/ı/gim, "i")
-      .replace(/ö/gim, "o")
-      .replace(/ç/gim, "c");
-  };
+  // filtreleme işlemi için kullanılan useEffect
+  const handleBodyChange = useCallback((type, newBody) => {
+    setBody((state) => ({
+      ...state,
+      [type]: newBody,
+    }));
+    setCurrentPage(1); // Filtreleme yapıldığında sayfa numarasını 1'e ayarla
+  }, []);
+  // filtreleme işlemi için kullanılan useEffect son
 
-  useEffect(() => {
-    const filtered = data.filter((item) => normalizeString(item.IMT_TANIM).includes(normalizeString(searchTerm)));
-    setFilteredData(filtered);
-  }, [searchTerm, data]);
+  // sayfalama için kullanılan useEffect
+  const handleTableChange = (pagination, filters, sorter, extra) => {
+    if (pagination) {
+      setCurrentPage(pagination.current);
+      setPageSize(pagination.pageSize); // pageSize güncellemesi
+    }
+  };
+  // sayfalama için kullanılan useEffect son
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -365,17 +486,17 @@ const MainTable = () => {
     setSelectedRows([]);
 
     // Verileri yeniden çekmek için `fetchEquipmentData` fonksiyonunu çağır
-    fetchEquipmentData();
+    fetchEquipmentData(body, currentPage);
     // Burada `body` ve `currentPage`'i güncellediğimiz için, bu değerlerin en güncel hallerini kullanarak veri çekme işlemi yapılır.
     // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
     // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
-  }, []); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
+  }, [body, currentPage]); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
 
   // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
   const [columns, setColumns] = useState(() => {
-    const savedOrder = localStorage.getItem("columnOrderIsEmriTipleri");
-    const savedVisibility = localStorage.getItem("columnVisibilityIsEmriTipleri");
-    const savedWidths = localStorage.getItem("columnWidthsIsEmriTipleri");
+    const savedOrder = localStorage.getItem("columnOrderKullaniciTanimlari");
+    const savedVisibility = localStorage.getItem("columnVisibilityKullaniciTanimlari");
+    const savedWidths = localStorage.getItem("columnWidthsKullaniciTanimlari");
 
     let order = savedOrder ? JSON.parse(savedOrder) : [];
     let visibility = savedVisibility ? JSON.parse(savedVisibility) : {};
@@ -393,9 +514,9 @@ const MainTable = () => {
       }
     });
 
-    localStorage.setItem("columnOrderIsEmriTipleri", JSON.stringify(order));
-    localStorage.setItem("columnVisibilityIsEmriTipleri", JSON.stringify(visibility));
-    localStorage.setItem("columnWidthsIsEmriTipleri", JSON.stringify(widths));
+    localStorage.setItem("columnOrderKullaniciTanimlari", JSON.stringify(order));
+    localStorage.setItem("columnVisibilityKullaniciTanimlari", JSON.stringify(visibility));
+    localStorage.setItem("columnWidthsKullaniciTanimlari", JSON.stringify(widths));
 
     return order.map((key) => {
       const column = initialColumns.find((col) => col.key === key);
@@ -406,9 +527,9 @@ const MainTable = () => {
 
   // sütunları local storage'a kaydediyoruz
   useEffect(() => {
-    localStorage.setItem("columnOrderIsEmriTipleri", JSON.stringify(columns.map((col) => col.key)));
+    localStorage.setItem("columnOrderKullaniciTanimlari", JSON.stringify(columns.map((col) => col.key)));
     localStorage.setItem(
-      "columnVisibilityIsEmriTipleri",
+      "columnVisibilityKullaniciTanimlari",
       JSON.stringify(
         columns.reduce(
           (acc, col) => ({
@@ -420,7 +541,7 @@ const MainTable = () => {
       )
     );
     localStorage.setItem(
-      "columnWidthsIsEmriTipleri",
+      "columnWidthsKullaniciTanimlari",
       JSON.stringify(
         columns.reduce(
           (acc, col) => ({
@@ -496,10 +617,10 @@ const MainTable = () => {
   // sütunları sıfırlamak için kullanılan fonksiyon
 
   function resetColumns() {
-    localStorage.removeItem("columnOrderIsEmriTipleri");
-    localStorage.removeItem("columnVisibilityIsEmriTipleri");
-    localStorage.removeItem("columnWidthsIsEmriTipleri");
-    localStorage.removeItem("ozelAlanlarIsEmriTipleri");
+    localStorage.removeItem("columnOrderKullaniciTanimlari");
+    localStorage.removeItem("columnVisibilityKullaniciTanimlari");
+    localStorage.removeItem("columnWidthsKullaniciTanimlari");
+    localStorage.removeItem("ozelAlanlarKullaniciTanimlari");
     window.location.reload();
   }
 
@@ -607,21 +728,11 @@ const MainTable = () => {
             width: "100%",
           }}
         >
-          <Button
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "0px 8px",
-              // width: "32px",
-              height: "32px",
-            }}
-            onClick={() => setIsModalVisible(true)}
-          >
+          <StyledButton onClick={() => setIsModalVisible(true)}>
             <MenuOutlined />
-          </Button>
+          </StyledButton>
           <Input
-            style={{ width: "250px", maxWidth: "200px" }}
+            style={{ width: "250px" }}
             type="text"
             placeholder="Arama yap..."
             value={searchTerm}
@@ -635,21 +746,27 @@ const MainTable = () => {
         </div>
       </div>
       <Spin spinning={loading}>
-        <Table
+        <CustomTable
           components={components}
           rowSelection={rowSelection}
           columns={filteredColumns}
-          dataSource={searchTerm ? filteredData : data}
+          dataSource={data}
           pagination={{
+            current: currentPage,
+            total: totalDataCount, // Toplam kayıt sayısı (sayfa başına kayıt sayısı ile çarpılır)
+            pageSize: pageSize,
             defaultPageSize: 10,
             showSizeChanger: true,
             pageSizeOptions: ["10", "20", "50", "100"],
             position: ["bottomRight"],
-            showTotal: (total, range) => `Toplam ${total}`,
+            onChange: handleTableChange,
+            showTotal: (total, range) => `Toplam ${total}`, // Burada 'total' parametresi doğru kayıt sayısını yansıtacaktır
             showQuickJumper: true,
           }}
           // onRow={onRowClick}
-          scroll={{ y: "calc(100vh - 370px)" }}
+          scroll={{ y: "calc(100vh - 300px)" }}
+          onChange={handleTableChange}
+          rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
         />
       </Spin>
       <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
@@ -657,4 +774,4 @@ const MainTable = () => {
   );
 };
 
-export default MainTable;
+export default Sigorta;
