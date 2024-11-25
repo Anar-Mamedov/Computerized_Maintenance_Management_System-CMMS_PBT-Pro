@@ -3,7 +3,6 @@ import AxiosInstance from "../../../../../../api/http";
 import { Table, Tag, Input, Button } from "antd";
 import { useFormContext } from "react-hook-form";
 import { SearchOutlined } from "@ant-design/icons";
-import { width } from "dom-helpers";
 
 function LokasyonYetkiler1() {
   const { watch } = useFormContext();
