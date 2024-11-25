@@ -1553,7 +1553,7 @@ const MainTable = () => {
           padding: "0 5px",
         }}
       >
-        <div style={{ display: "flex", gap: "10px", alignItems: "center", width: "100%", maxWidth: "935px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
           <Button
             style={{
               display: "flex",
