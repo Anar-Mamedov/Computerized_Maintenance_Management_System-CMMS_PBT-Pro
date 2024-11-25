@@ -29,30 +29,30 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   const onSubmited = (data) => {
     const Body = {
       TB_IS_TANIM_OLCUM_PARAMETRE_ID: data.secilenID,
-      IOC_SIRA_NO: data.olcumSiraNo,
-      IOC_TANIM: data.olcumTanim,
-      // IOC_BIRIM: data.birim,
-      IOC_BIRIM_KOD_ID: data.birimID,
-      IOC_FORMAT: data.ondalikSayi,
-      IOC_HEDEF_DEGER: data.hedefDeger,
-      IOC_MIN_MAX_DEGER: data.olcumLimit,
-      IOC_MIN_DEGER: data.minimumDeger,
-      IOC_MAX_DEGER: data.maximumDeger,
+      PBC_SIRA_NO: data.olcumSiraNo,
+      PBC_TANIM: data.olcumTanim,
+      // PBC_BIRIM: data.birim,
+      PBC_BIRIM_KOD_ID: data.birimID,
+      PBC_FORMAT: data.ondalikSayi,
+      PBC_HEDEF_DEGER: parseFloat(data.hedefDeger),
+      PBC_MIN_MAX_DEGER: parseFloat(data.olcumLimit),
+      PBC_MIN_DEGER: parseFloat(data.minimumDeger),
+      PBC_MAX_DEGER: parseFloat(data.maximumDeger),
     };
 
-    AxiosInstance.post("UpdateIsTanimOlcum", Body)
+    AxiosInstance.post("AddUpdatePBakimOlcumDegeri", Body)
       .then((response) => {
         console.log("Data sent successfully:", response.data);
 
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("İşlem Başarılı.");
           reset();
           onModalClose(); // Modal'ı kapat
           onRefresh(); // Tabloyu yenile
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
-          message.error("Ekleme Başarısız.");
+          message.error("İşlem Başarısız.");
         }
       })
       .catch((error) => {
@@ -80,15 +80,15 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       //   console.log(key, selectedRow[key]);
       //   setValue(key, selectedRow[key]);
       setValue("secilenID", selectedRow.key);
-      setValue("olcumSiraNo", selectedRow.IOC_SIRA_NO);
-      setValue("olcumTanim", selectedRow.IOC_TANIM);
-      setValue("birim", selectedRow.IOC_BIRIM);
-      setValue("birimID", selectedRow.IOC_BIRIM_KOD_ID);
-      setValue("ondalikSayi", selectedRow.IOC_FORMAT);
-      setValue("hedefDeger", selectedRow.IOC_HEDEF_DEGER);
-      setValue("olcumLimit", selectedRow.IOC_MIN_MAX_DEGER);
-      setValue("minimumDeger", selectedRow.IOC_MIN_DEGER);
-      setValue("maximumDeger", selectedRow.IOC_MAX_DEGER);
+      setValue("olcumSiraNo", selectedRow.PBC_SIRA_NO);
+      setValue("olcumTanim", selectedRow.PBC_TANIM);
+      setValue("birim", selectedRow.PBC_BIRIM);
+      setValue("birimID", selectedRow.PBC_BIRIM_KOD_ID);
+      setValue("ondalikSayi", selectedRow.PBC_FORMAT);
+      setValue("hedefDeger", selectedRow.PBC_HEDEF_DEGER);
+      setValue("olcumLimit", selectedRow.PBC_MIN_MAX_DEGER);
+      setValue("minimumDeger", selectedRow.PBC_MIN_DEGER);
+      setValue("maximumDeger", selectedRow.PBC_MAX_DEGER);
       // add more fields as needed
 
       // });
