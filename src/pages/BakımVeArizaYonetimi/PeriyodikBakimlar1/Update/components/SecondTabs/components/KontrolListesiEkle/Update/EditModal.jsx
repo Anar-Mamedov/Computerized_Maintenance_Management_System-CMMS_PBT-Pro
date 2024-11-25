@@ -22,8 +22,8 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
 
   const onSubmited = (data) => {
     const Body = {
-      /* PKN_PERIYODIK_BAKIM_ID: data.secilenID, */
-      PKN_PERIYODIK_BAKIM_ID: 1,
+      TB_PERIYODIK_BAKIM_KONTROLLIST_ID: data.TB_PERIYODIK_BAKIM_KONTROLLIST_ID,
+      PKN_PERIYODIK_BAKIM_ID: data.secilenID,
       PKN_SIRANO: data.siraNo,
       PKN_TANIM: data.isTanimi,
       PKN_ACIKLAMA: data.aciklama,
@@ -69,6 +69,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       //   console.log(key, selectedRow[key]);
       //   setValue(key, selectedRow[key]);
       setValue("secilenID", selectedRow.key);
+      setValue("TB_PERIYODIK_BAKIM_KONTROLLIST_ID", selectedRow.TB_PERIYODIK_BAKIM_KONTROLLIST_ID);
       setValue("siraNo", selectedRow.PKN_SIRANO);
       setValue("isTanimi", selectedRow.PKN_TANIM);
       setValue("aciklama", selectedRow.PKN_ACIKLAMA);
