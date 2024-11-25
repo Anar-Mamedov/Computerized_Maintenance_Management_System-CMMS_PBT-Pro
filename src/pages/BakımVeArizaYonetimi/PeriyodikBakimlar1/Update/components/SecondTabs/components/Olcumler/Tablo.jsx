@@ -18,8 +18,8 @@ export default function Tablo() {
   const columns = [
     {
       title: "Sira No",
-      dataIndex: "IOC_SIRA_NO",
-      key: "IOC_SIRA_NO",
+      dataIndex: "PBC_SIRA_NO",
+      key: "PBC_SIRA_NO",
       width: 200,
       ellipsis: true,
       align: "center",
@@ -27,8 +27,8 @@ export default function Tablo() {
     },
     {
       title: "Tanım",
-      dataIndex: "IOC_TANIM",
-      key: "IOC_TANIM",
+      dataIndex: "PBC_TANIM",
+      key: "PBC_TANIM",
       width: 200,
       ellipsis: true,
       align: "center",
@@ -36,8 +36,8 @@ export default function Tablo() {
     },
     {
       title: "Hedef Değer",
-      dataIndex: "IOC_HEDEF_DEGER",
-      key: "IOC_HEDEF_DEGER",
+      dataIndex: "PBC_HEDEF_DEGER",
+      key: "PBC_HEDEF_DEGER",
       width: 200,
       ellipsis: true,
       align: "center",
@@ -45,8 +45,8 @@ export default function Tablo() {
     },
     {
       title: "Ondalık",
-      dataIndex: "IOC_FORMAT",
-      key: "IOC_FORMAT",
+      dataIndex: "PBC_FORMAT",
+      key: "PBC_FORMAT",
       width: 200,
       ellipsis: true,
       align: "center",
@@ -54,8 +54,8 @@ export default function Tablo() {
     },
     {
       title: "Limit",
-      dataIndex: "IOC_MIN_MAX_DEGER",
-      key: "IOC_MIN_MAX_DEGER",
+      dataIndex: "PBC_MIN_MAX_DEGER",
+      key: "PBC_MIN_MAX_DEGER",
       width: 200,
       ellipsis: true,
       align: "center",
@@ -63,8 +63,8 @@ export default function Tablo() {
     },
     {
       title: "Min Değer",
-      dataIndex: "IOC_MIN_DEGER",
-      key: "IOC_MIN_DEGER",
+      dataIndex: "PBC_MIN_DEGER",
+      key: "PBC_MIN_DEGER",
       width: 200,
       ellipsis: true,
       align: "center",
@@ -72,8 +72,8 @@ export default function Tablo() {
     },
     {
       title: "Max Değer",
-      dataIndex: "IOC_MAX_DEGER",
-      key: "IOC_MAX_DEGER",
+      dataIndex: "PBC_MAX_DEGER",
+      key: "PBC_MAX_DEGER",
       width: 200,
       ellipsis: true,
       align: "center",
@@ -87,7 +87,7 @@ export default function Tablo() {
     setLoading(true);
     AxiosInstance.get(`GetPBakimOlcumDegeri?TB_PERIYODIK_BAKIM_ID=${secilenBakimID}`)
       .then((response) => {
-        const fetchedData = response.map((item) => ({
+        const fetchedData = response.listem.map((item) => ({
           ...item,
           key: item.TB_PERIYODIK_BAKIM_OLCUM_PARAMETRE_ID,
         }));

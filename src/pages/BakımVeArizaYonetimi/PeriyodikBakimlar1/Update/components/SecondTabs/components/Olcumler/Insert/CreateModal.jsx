@@ -29,19 +29,20 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
 
   const onSubmited = (data) => {
     const Body = {
-      IOC_IS_TANIM_ID: secilenBakimID,
-      IOC_SIRA_NO: data.olcumSiraNo,
-      IOC_TANIM: data.olcumTanim,
+      TB_PERIYODIK_BAKIM_OLCUM_PARAMETRE_ID: 0,
+      PBC_PERIYODIK_BAKIM_ID: secilenBakimID,
+      PBC_SIRA_NO: data.olcumSiraNo,
+      PBC_TANIM: data.olcumTanim,
       // IOC_BIRIM: data.birim,
-      IOC_BIRIM_KOD_ID: data.birimID,
-      IOC_FORMAT: data.ondalikSayi,
-      IOC_HEDEF_DEGER: data.hedefDeger,
-      IOC_MIN_MAX_DEGER: data.olcumLimit,
-      IOC_MIN_DEGER: data.minimumDeger,
-      IOC_MAX_DEGER: data.maximumDeger,
+      PBC_BIRIM_KOD_ID: data.birimID,
+      PBC_FORMAT: data.ondalikSayi,
+      PBC_HEDEF_DEGER: parseFloat(data.hedefDeger),
+      PBC_MIN_MAX_DEGER: parseFloat(data.olcumLimit),
+      PBC_MIN_DEGER: parseFloat(data.minimumDeger),
+      PBC_MAX_DEGER: parseFloat(data.maximumDeger),
     };
 
-    AxiosInstance.post("AddIsTanimOlcum", Body)
+    AxiosInstance.post("AddUpdatePBakimOlcumDegeri", Body)
       .then((response) => {
         console.log("Data sent successfully:", response.data);
 
@@ -82,7 +83,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
   return (
     <FormProvider {...methods}>
       <div>
-        <div style={{ display: "flex", width: "100%", justifyContent: "flex-end", marginBottom: "10px" }}>
+        <div style={{ display: "flex", width: "100%", justifyContent: "flex-end" }}>
           <Button type="link" onClick={handleModalToggle}>
             <PlusOutlined /> Yeni Kayıt
           </Button>
