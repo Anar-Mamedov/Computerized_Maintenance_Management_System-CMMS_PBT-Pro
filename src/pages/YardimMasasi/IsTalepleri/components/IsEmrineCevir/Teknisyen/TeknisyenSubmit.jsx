@@ -102,7 +102,7 @@ export default function TeknisyenSubmit({ selectedRows, refreshTableData, onayCh
 
   return (
     <FormProvider {...methods}>
-      <div style={{ display: "flex", width: "100%", maxWidth: "335px" }}>
+      <div style={{ display: "flex", maxWidth: "335px" }}>
         <form style={{ width: "100%" }} onSubmit={methods.handleSubmit(onSubmited)}>
           <TeknisyenIsEmriCevir selectedRows={selectedRows} />
         </form>
