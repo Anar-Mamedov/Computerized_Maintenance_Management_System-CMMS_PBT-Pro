@@ -55,6 +55,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
           setValue("siraNo", item.TB_KULLANICI_ID);
           setValue("kullaniciKod", item.KLL_KOD);
           setValue("personelID", item.KLL_PERSONEL_ID);
+          setValue("sistemYetkilisi", item.KLL_SISTEM_YETKILISI);
           setValue("personel", item.PRS_ISIM);
           setValue("isim", item.KLL_TANIM);
           setValue("sifre", item.KLL_SIFRE);
