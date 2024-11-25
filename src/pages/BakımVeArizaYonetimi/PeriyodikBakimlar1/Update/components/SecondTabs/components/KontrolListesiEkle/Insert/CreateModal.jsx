@@ -23,6 +23,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
 
   const onSubmited = (data) => {
     const Body = {
+      TB_PERIYODIK_BAKIM_KONTROLLIST_ID: 0,
       PKN_PERIYODIK_BAKIM_ID: secilenBakimID,
       PKN_SIRANO: data.siraNo,
       PKN_TANIM: data.isTanimi,
