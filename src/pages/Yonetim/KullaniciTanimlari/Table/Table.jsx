@@ -764,7 +764,7 @@ const Sigorta = () => {
             showQuickJumper: true,
           }}
           // onRow={onRowClick}
-          scroll={{ y: "calc(100vh - 300px)" }}
+          scroll={{ y: "calc(100vh - 330px)" }}
           onChange={handleTableChange}
           rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
         />
