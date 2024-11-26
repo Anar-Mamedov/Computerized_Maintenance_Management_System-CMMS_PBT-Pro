@@ -208,97 +208,15 @@ export default function MainTabs({ modalOpen }) {
 
   return (
     <div style={{ display: "flex", marginBottom: "15px", flexDirection: "column", gap: "10px", width: "100%" }}>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "flex-start",
-          width: "100%",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          gap: "8px",
-        }}
-      >
-        <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("rolTanimi")}</Text>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            minWidth: "300px",
-            gap: "10px",
-            width: "100%",
-          }}
-        >
-          <RolSelectBox />
-        </div>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-        <StyledDivBottomLine
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "flex-start",
-            width: "100%",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            gap: "8px",
-          }}
-        >
-          <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("personel")}</Text>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <Controller
-              name="personel"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  disabled
-                />
-              )}
-            />
-            <Controller
-              name="personelID"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ display: "none" }}
-                />
-              )}
-            />
-            <PersonelTablo
-              onSubmit={(selectedData) => {
-                setValue("personel", selectedData.subject);
-                setValue("personelID", selectedData.key);
-              }}
-            />
-            <Button onClick={handleIdariAmiriMinusClick}> - </Button>
-          </div>
-        </StyledDivBottomLine>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
-        <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("hesabinDurumunuAktifVeYaPasifYap")}</Text>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("aktif")}</Text>
         <Controller name="aktif" control={control} render={({ field }) => <Switch {...field} />} />
       </div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
-        <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("sistemYetkilisi")}</Text>
-        <Controller name="sistemYetkilisi" control={control} render={({ field }) => <Switch {...field} />} />
-      </div>
+
       <div style={{ display: "flex", gap: "15px", width: "100%", alignItems: "flex-start" }}>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", width: "100%", flexDirection: "column", justifyContent: "space-between", gap: "8px" }}>
           <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>
-            {t("kullaniciKodu")}
+            {t("rolKodu")}
             <div style={{ color: "red" }}>*</div>
           </Text>
           <div
@@ -323,7 +241,7 @@ export default function MainTabs({ modalOpen }) {
       <div style={{ display: "flex", gap: "15px", width: "100%", alignItems: "flex-start" }}>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", width: "100%", flexDirection: "column", justifyContent: "space-between", gap: "8px" }}>
           <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>
-            {t("tanim")}
+            {t("tanimi")}
             <div style={{ color: "red" }}>*</div>
           </Text>
           <div
@@ -357,22 +275,7 @@ export default function MainTabs({ modalOpen }) {
           </div>
         </div>
       </div>
-      <div style={{ display: "flex", gap: "15px", width: "100%", alignItems: "flex-start" }}>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", width: "100%", flexDirection: "column", justifyContent: "space-between", gap: "8px" }}>
-          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>{t("sifre")}</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              width: "100%",
-              alignItems: "flex-start",
-              flexDirection: "column",
-            }}
-          >
-            <Controller name="sifre" control={control} render={({ field }) => <Input {...field} style={{ flex: 1 }} />} />
-          </div>
-        </div>
-      </div>
+      <div style={{ display: "flex", gap: "15px", width: "100%", alignItems: "flex-start" }}></div>
       <div style={{ display: "flex", gap: "15px", width: "100%" }}></div>
     </div>
   );

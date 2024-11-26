@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message, Divider } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined, HomeOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
@@ -129,15 +129,8 @@ const Sigorta = () => {
   const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchTimeout, setSearchTimeout] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0); // Toplam sayfa sayısı için state
-  const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
-  const [totalDataCount, setTotalDataCount] = useState(0); // Tüm veriyi tutan state
-  const [pageSize, setPageSize] = useState(10); // Başlangıçta sayfa başına 10 kayıt göster
-  const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
-  const [editDrawer1Data, setEditDrawer1Data] = useState(null);
+  const [searchInput, setSearchInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // edit drawer için
   const [drawer, setDrawer] = useState({
@@ -148,70 +141,12 @@ const Sigorta = () => {
 
   const [selectedRows, setSelectedRows] = useState([]);
 
-  const statusTag = (statusId) => {
-    switch (statusId) {
-      case 1:
-        return { color: "#ff9800", text: "Bekliyor" };
-      case 2:
-        return { color: "#2196f3", text: "Devam Ediyor" };
-      case 3:
-        return { color: "#ff0000", text: "İptal Edildi" };
-      case 4:
-        return { color: "#2bc770", text: "Tamamlandı" };
-      default:
-        return { color: "default", text: "" }; // Eğer farklı bir değer gelirse
-    }
-  };
-
-  function hexToRGBA(hex, opacity) {
-    // hex veya opacity null ise hata döndür
-    if (hex === null || opacity === null) {
-      // console.error("hex veya opacity null olamaz!");
-      return; // veya uygun bir varsayılan değer döndürebilirsiniz
-    }
-
-    let r = 0,
-      g = 0,
-      b = 0;
-    // 3 karakterli hex kodunu kontrol et
-    if (hex.length === 4) {
-      r = parseInt(hex[1] + hex[1], 16);
-      g = parseInt(hex[2] + hex[2], 16);
-      b = parseInt(hex[3] + hex[3], 16);
-    }
-    // 6 karakterli hex kodunu kontrol et
-    else if (hex.length === 7) {
-      r = parseInt(hex[1] + hex[2], 16);
-      g = parseInt(hex[3] + hex[4], 16);
-      b = parseInt(hex[5] + hex[6], 16);
-    }
-    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-  }
-
-  // Özel Alanların nameleri backend çekmek için api isteği
-
-  // useEffect(() => {
-  //   // API'den veri çekme işlemi
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await AxiosInstance.get("OzelAlan?form=ISEMRI"); // API URL'niz
-  //       localStorage.setItem("ozelAlanlarKullaniciTanimlari", JSON.stringify(response));
-  //       setLabel(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
-  //     } catch (error) {
-  //       console.error("API isteğinde hata oluştu:", error);
-  //       setLabel("Hata! Veri yüklenemedi."); // Hata durumunda kullanıcıya bilgi verme
-  //     }
-  //   };
-  //
-  //   fetchData();
-  // }, [drawer.visible]);
-
-  const ozelAlanlar = JSON.parse(localStorage.getItem("ozelAlanlarKullaniciTanimlari"));
+  const ozelAlanlar = JSON.parse(localStorage.getItem("ozelAlanlarRolTanimlama"));
 
   // Özel Alanların nameleri backend çekmek için api isteği sonu
   const initialColumns = [
     {
-      title: t("kullaniciKod"),
+      title: t("rolKodu"),
       dataIndex: "KLL_KOD",
       key: "KLL_KOD",
       width: 120,
@@ -228,7 +163,7 @@ const Sigorta = () => {
     },
 
     {
-      title: t("kullaniciTanim"),
+      title: t("rolTanimi"),
       dataIndex: "KLL_TANIM",
       key: "KLL_TANIM",
       width: 120,
@@ -239,20 +174,6 @@ const Sigorta = () => {
         if (a.KLL_TANIM === null) return -1;
         if (b.KLL_TANIM === null) return 1;
         return a.KLL_TANIM.localeCompare(b.KLL_TANIM);
-      },
-    },
-    {
-      title: t("personel"),
-      dataIndex: "PRS_ISIM",
-      key: "PRS_ISIM",
-      width: 120,
-      ellipsis: true,
-      visible: true, // Varsayılan olarak açık
-
-      sorter: (a, b) => {
-        if (a.PRS_ISIM === null) return -1;
-        if (b.PRS_ISIM === null) return 1;
-        return a.PRS_ISIM.localeCompare(b.PRS_ISIM);
       },
     },
     {
@@ -346,56 +267,20 @@ const Sigorta = () => {
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
-  const [body, setBody] = useState({
-    keyword: "",
-    filters: {},
-  });
-
   // ana tablo api isteği için kullanılan useEffect
 
   useEffect(() => {
-    fetchEquipmentData(body, currentPage, pageSize);
-  }, [body, currentPage, pageSize]);
+    fetchEquipmentData();
+  }, []);
 
   // ana tablo api isteği için kullanılan useEffect son
 
-  // arama işlemi için kullanılan useEffect
-  useEffect(() => {
-    if (searchTimeout) {
-      clearTimeout(searchTimeout);
-    }
-
-    // Arama terimi değiştiğinde ve boş olduğunda API isteğini tetikle
-    const timeout = setTimeout(() => {
-      if (searchTerm !== body.keyword) {
-        handleBodyChange("keyword", searchTerm);
-        setCurrentPage(1); // Arama yapıldığında veya arama sıfırlandığında sayfa numarasını 1'e ayarla
-        // setDrawer({ ...drawer, visible: false }); // Arama yapıldığında veya arama sıfırlandığında Drawer'ı kapat
-      }
-    }, 2000);
-
-    setSearchTimeout(timeout);
-
-    return () => clearTimeout(timeout);
-  }, [searchTerm]);
-
-  // arama işlemi için kullanılan useEffect son
-
-  const fetchEquipmentData = async (body, page, size) => {
-    // body'nin undefined olması durumunda varsayılan değerler atanıyor
-    const { keyword = "", filters = {} } = body || {};
-    // page'in undefined olması durumunda varsayılan değer olarak 1 atanıyor
-    const currentPage = page || 1;
-
+  const fetchEquipmentData = async () => {
     try {
       setLoading(true);
       // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.get(`GetKullaniciList?page=${currentPage}&parameter=${keyword}`);
+      const response = await AxiosInstance.get(`GetRoles`);
       if (response) {
-        // Toplam sayfa sayısını ayarla
-        setTotalPages(response.page);
-        setTotalDataCount(response.recordCount);
-
         // Gelen veriyi formatla ve state'e ata
         const formattedData = response.map((item) => ({
           ...item,
@@ -421,25 +306,6 @@ const Sigorta = () => {
     }
   };
 
-  // filtreleme işlemi için kullanılan useEffect
-  const handleBodyChange = useCallback((type, newBody) => {
-    setBody((state) => ({
-      ...state,
-      [type]: newBody,
-    }));
-    setCurrentPage(1); // Filtreleme yapıldığında sayfa numarasını 1'e ayarla
-  }, []);
-  // filtreleme işlemi için kullanılan useEffect son
-
-  // sayfalama için kullanılan useEffect
-  const handleTableChange = (pagination, filters, sorter, extra) => {
-    if (pagination) {
-      setCurrentPage(pagination.current);
-      setPageSize(pagination.pageSize); // pageSize güncellemesi
-    }
-  };
-  // sayfalama için kullanılan useEffect son
-
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
     if (newSelectedRowKeys.length > 0) {
@@ -458,45 +324,27 @@ const Sigorta = () => {
     onChange: onSelectChange,
   };
 
-  // const onRowClick = (record) => {
-  //   return {
-  //     onClick: () => {
-  //       setDrawer({ visible: true, data: record });
-  //     },
-  //   };
-  // };
-
   const onRowClick = (record) => {
     setDrawer({ visible: true, data: record });
   };
 
   const refreshTableData = useCallback(() => {
-    // Sayfa numarasını 1 yap
-    // setCurrentPage(1);
-
-    // `body` içerisindeki filtreleri ve arama terimini sıfırla
-    // setBody({
-    //   keyword: "",
-    //   filters: {},
-    // });
-    // setSearchTerm("");
-
     // Tablodan seçilen kayıtların checkbox işaretini kaldır
     setSelectedRowKeys([]);
     setSelectedRows([]);
 
     // Verileri yeniden çekmek için `fetchEquipmentData` fonksiyonunu çağır
-    fetchEquipmentData(body, currentPage);
+    fetchEquipmentData();
     // Burada `body` ve `currentPage`'i güncellediğimiz için, bu değerlerin en güncel hallerini kullanarak veri çekme işlemi yapılır.
     // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
     // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
-  }, [body, currentPage]); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
+  }, []); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
 
   // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
   const [columns, setColumns] = useState(() => {
-    const savedOrder = localStorage.getItem("columnOrderKullaniciTanimlari");
-    const savedVisibility = localStorage.getItem("columnVisibilityKullaniciTanimlari");
-    const savedWidths = localStorage.getItem("columnWidthsKullaniciTanimlari");
+    const savedOrder = localStorage.getItem("columnOrderRolTanimlama");
+    const savedVisibility = localStorage.getItem("columnVisibilityRolTanimlama");
+    const savedWidths = localStorage.getItem("columnWidthsRolTanimlama");
 
     let order = savedOrder ? JSON.parse(savedOrder) : [];
     let visibility = savedVisibility ? JSON.parse(savedVisibility) : {};
@@ -514,9 +362,9 @@ const Sigorta = () => {
       }
     });
 
-    localStorage.setItem("columnOrderKullaniciTanimlari", JSON.stringify(order));
-    localStorage.setItem("columnVisibilityKullaniciTanimlari", JSON.stringify(visibility));
-    localStorage.setItem("columnWidthsKullaniciTanimlari", JSON.stringify(widths));
+    localStorage.setItem("columnOrderRolTanimlama", JSON.stringify(order));
+    localStorage.setItem("columnVisibilityRolTanimlama", JSON.stringify(visibility));
+    localStorage.setItem("columnWidthsRolTanimlama", JSON.stringify(widths));
 
     return order.map((key) => {
       const column = initialColumns.find((col) => col.key === key);
@@ -527,9 +375,9 @@ const Sigorta = () => {
 
   // sütunları local storage'a kaydediyoruz
   useEffect(() => {
-    localStorage.setItem("columnOrderKullaniciTanimlari", JSON.stringify(columns.map((col) => col.key)));
+    localStorage.setItem("columnOrderRolTanimlama", JSON.stringify(columns.map((col) => col.key)));
     localStorage.setItem(
-      "columnVisibilityKullaniciTanimlari",
+      "columnVisibilityRolTanimlama",
       JSON.stringify(
         columns.reduce(
           (acc, col) => ({
@@ -541,7 +389,7 @@ const Sigorta = () => {
       )
     );
     localStorage.setItem(
-      "columnWidthsKullaniciTanimlari",
+      "columnWidthsRolTanimlama",
       JSON.stringify(
         columns.reduce(
           (acc, col) => ({
@@ -617,14 +465,30 @@ const Sigorta = () => {
   // sütunları sıfırlamak için kullanılan fonksiyon
 
   function resetColumns() {
-    localStorage.removeItem("columnOrderKullaniciTanimlari");
-    localStorage.removeItem("columnVisibilityKullaniciTanimlari");
-    localStorage.removeItem("columnWidthsKullaniciTanimlari");
-    localStorage.removeItem("ozelAlanlarKullaniciTanimlari");
+    localStorage.removeItem("columnOrderRolTanimlama");
+    localStorage.removeItem("columnVisibilityRolTanimlama");
+    localStorage.removeItem("columnWidthsRolTanimlama");
+    localStorage.removeItem("ozelAlanlarRolTanimlama");
     window.location.reload();
   }
 
   // sütunları sıfırlamak için kullanılan fonksiyon sonu
+
+  // arama islemi
+
+  const filteredData = useMemo(() => {
+    if (!searchQuery) {
+      return data;
+    }
+    return data.filter((item) => {
+      return filteredColumns.some((col) => {
+        const value = item[col.dataIndex];
+        return value && String(value).toLowerCase().includes(searchQuery.toLowerCase());
+      });
+    });
+  }, [data, searchQuery, filteredColumns]);
+
+  // arama islemi son
 
   return (
     <>
@@ -731,14 +595,10 @@ const Sigorta = () => {
           <StyledButton onClick={() => setIsModalVisible(true)}>
             <MenuOutlined />
           </StyledButton>
-          <Input
-            style={{ width: "250px" }}
-            type="text"
-            placeholder="Arama yap..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
-          />
+          <Input placeholder="Ara" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} onPressEnter={() => setSearchQuery(searchInput)} style={{ width: 200 }} />
+          <Button type="primary" icon={<SearchOutlined />} onClick={() => setSearchQuery(searchInput)}>
+            Ara
+          </Button>
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
@@ -750,23 +610,17 @@ const Sigorta = () => {
           components={components}
           rowSelection={rowSelection}
           columns={filteredColumns}
-          dataSource={data}
+          dataSource={filteredData}
           pagination={{
-            current: currentPage,
-            total: totalDataCount, // Toplam kayıt sayısı (sayfa başına kayıt sayısı ile çarpılır)
-            pageSize: pageSize,
             defaultPageSize: 10,
             showSizeChanger: true,
             pageSizeOptions: ["10", "20", "50", "100"],
             position: ["bottomRight"],
-            onChange: handleTableChange,
             showTotal: (total, range) => `Toplam ${total}`, // Burada 'total' parametresi doğru kayıt sayısını yansıtacaktır
             showQuickJumper: true,
           }}
           // onRow={onRowClick}
           scroll={{ y: "calc(100vh - 330px)" }}
-          onChange={handleTableChange}
-          rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
         />
       </Spin>
       <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />

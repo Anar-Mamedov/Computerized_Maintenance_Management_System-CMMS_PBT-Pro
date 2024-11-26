@@ -67,16 +67,16 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
   //* export
   const onSubmit = (data) => {
     const Body = {
-      KLL_PERSONEL_ID: data.personelID,
+      // KLL_PERSONEL_ID: data.personelID,
       KLL_TANIM: data.isim,
       KLL_KOD: data.kullaniciKod,
-      KLL_SIFRE: data.sifre,
+      // KLL_SIFRE: data.sifre,
       KLL_AKTIF: data.aktif,
-      KLL_SISTEM_YETKILISI: data.sistemYetkilisi,
-      KLL_ROL_ID: data.rolSelectID,
+      /* KLL_SISTEM_YETKILISI: data.sistemYetkilisi,
+      KLL_ROL_ID: data.rolSelectID, */
     };
 
-    AxiosInstance.post("AddUser", Body)
+    AxiosInstance.post("AddRole", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);
@@ -137,7 +137,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
         <Modal
           width="600px"
           centered
-          title={t("kullaniciTanimlama")}
+          title={t("rolTanimlama")}
           destroyOnClose
           open={open}
           onCancel={onClose}
