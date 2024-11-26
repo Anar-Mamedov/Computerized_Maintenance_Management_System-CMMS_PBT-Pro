@@ -36,10 +36,10 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       // IOC_BIRIM: data.birim,
       PBC_BIRIM_KOD_ID: data.birimID,
       PBC_FORMAT: data.ondalikSayi,
-      PBC_HEDEF_DEGER: data.hedefDeger.replace(".", ","),
-      PBC_MIN_MAX_DEGER: data.olcumLimit.replace(".", ","),
-      PBC_MIN_DEGER: data.minimumDeger.replace(".", ","),
-      PBC_MAX_DEGER: data.maximumDeger.replace(".", ","),
+      PBC_HEDEF_DEGER: parseFloat(data.hedefDeger),
+      PBC_MIN_MAX_DEGER: parseFloat(data.olcumLimit),
+      PBC_MIN_DEGER: parseFloat(data.minimumDeger),
+      PBC_MAX_DEGER: parseFloat(data.maximumDeger),
     };
 
     AxiosInstance.post("AddUpdatePBakimOlcumDegeri", Body)
