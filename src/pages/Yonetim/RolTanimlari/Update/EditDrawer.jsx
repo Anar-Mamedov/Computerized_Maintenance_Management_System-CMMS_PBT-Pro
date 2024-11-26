@@ -49,19 +49,19 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
         setOpen(true); // İşlemler tamamlandıktan sonra drawer'ı aç
         setLoading(true); // Yükleme başladığında
         try {
-          const response = await AxiosInstance.get(`GetKullaniciById?id=${selectedRow.key}`);
-          const item = response; // Veri dizisinin ilk elemanını al
           // Form alanlarını set et
-          setValue("siraNo", item.TB_KULLANICI_ID);
-          setValue("kullaniciKod", item.KLL_KOD);
-          setValue("personelID", item.KLL_PERSONEL_ID);
+          setValue("siraNo", selectedRow.TB_KULLANICI_ID);
+          setValue("kullaniciKod", selectedRow.KLL_KOD);
+          /*  setValue("personelID", item.KLL_PERSONEL_ID);
           setValue("sistemYetkilisi", item.KLL_SISTEM_YETKILISI);
-          setValue("personel", item.PRS_ISIM);
-          setValue("isim", item.KLL_TANIM);
+          setValue("personel", item.PRS_ISIM); 
           setValue("sifre", item.KLL_SIFRE);
-          setValue("aktif", item.KLL_AKTIF);
           setValue("rolSelect", item.KLL_ROL);
           setValue("rolSelectID", item.KLL_ROL_ID);
+          */
+          setValue("isim", selectedRow.KLL_TANIM);
+          setValue("aktif", selectedRow.KLL_AKTIF);
+
           // ... Diğer setValue çağrıları
 
           setLoading(false); // Yükleme tamamlandığında
@@ -90,17 +90,17 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
     // Form verilerini API'nin beklediği formata dönüştür
     const Body = {
       TB_KULLANICI_ID: data.siraNo,
-      KLL_PERSONEL_ID: data.personelID,
+      // KLL_PERSONEL_ID: data.personelID,
       KLL_TANIM: data.isim,
       KLL_KOD: data.kullaniciKod,
-      KLL_SIFRE: data.sifre,
+      // KLL_SIFRE: data.sifre,
       KLL_AKTIF: data.aktif,
-      KLL_SISTEM_YETKILISI: data.sistemYetkilisi,
-      KLL_ROL_ID: data.rolSelectID,
+      /* KLL_SISTEM_YETKILISI: data.sistemYetkilisi,
+      KLL_ROL_ID: data.rolSelectID, */
     };
 
     // API'ye POST isteği gönder
-    AxiosInstance.post("UpdateUser", Body)
+    AxiosInstance.post("UpdateRole", Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
         if (response.status_code === 200 || response.status_code === 201 || response.status_code === 202) {
@@ -154,7 +154,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
         <Modal
           width="600px"
           centered
-          title={t("kullaniciGuncelleme")}
+          title={t("rolGuncelleme")}
           open={drawerVisible}
           onCancel={onClose}
           footer={
