@@ -97,6 +97,7 @@ export default function LoginForm() {
           projeTanimlari: response.KLL_WEB_PROJE,
           mudaheleSuresi: response.KLL_WEB_RAPOR,
           kullaniciTanimlari: response.KLL_WEB_RAPOR,
+          RolTanimlari1: response.KLL_WEB_RAPOR,
         };
         localStorage.setItem("login", JSON.stringify(login));
         const anar = localStorage.getItem("login");
