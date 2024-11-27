@@ -1,0 +1,86 @@
+/* MainTable.css */
+
+/* Genel Grid Yapısı */
+.header-container {
+  display: grid;
+  grid-template-rows: 35px 35px 35px; /* Üç satır yüksekliği */
+  grid-template-columns: 200px repeat(auto-fill, 100px); /* İlk sütun sabit, diğerleri 100px */
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  z-index: 2;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* İlk Header Hücresi (Makine) */
+.first-header-cell {
+  grid-row: 1 / span 3; /* Üç satırı kapsar */
+  grid-column: 1 / 2; /* İlk sütun */
+  border-right: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: #fafafa;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Diğer Header Hücreleri (Ay, Hafta, Gün) */
+.header-cell {
+  border-right: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 8px;
+  box-sizing: border-box;
+  text-align: center;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fafafa;
+}
+
+/* VirtualizedGrid İçin Stil */
+.VirtualizedGrid {
+  outline: none;
+}
+
+.virtual-table-cell {
+  box-sizing: border-box;
+  border-bottom: 1px solid #f0f0f0;
+  border-right: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+.virtual-table-row-parent {
+  background-color: #fafafa;
+  font-weight: 600;
+  display: flex;
+  justify-content: flex-start;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.virtual-table-row-child {
+  background-color: white;
+  font-weight: normal;
+}
+
+.virtual-table-cell-checked {
+  background-color: #188fff1d;
+}
+
+.virtual-table-cell:hover {
+  background-color: #f5f5f5;
+  cursor: pointer;
+}
+
+/* Sticky İlk Sütun için Stil */
+.sticky-cell {
+  position: sticky;
+  left: 0;
+  background: white; /* Arka planı ayarlayın */
+  z-index: 1; /* Üstte görünmesi için z-index ayarlayın */
+}
