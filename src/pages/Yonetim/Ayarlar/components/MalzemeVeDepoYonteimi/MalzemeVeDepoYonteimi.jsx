@@ -77,7 +77,8 @@ function Araclar() {
     // Gönderilecek parametreleri dinamik olarak oluşturuyoruz
     const Body = Object.keys(paramMapping).map((key) => ({
       PRM_KOD: paramMapping[key],
-      PRM_DEGER: data[key],
+      /*  PRM_DEGER: data[key], */
+      PRM_DEGER: key === "OTVOrani" ? String(data[key]) : data[key],
     }));
 
     setLoading(true);
