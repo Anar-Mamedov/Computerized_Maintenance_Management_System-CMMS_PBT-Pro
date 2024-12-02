@@ -394,10 +394,10 @@ const Sigorta = () => {
       if (response) {
         // Toplam sayfa sayısını ayarla
         setTotalPages(response.page);
-        setTotalDataCount(response.recordCount);
+        setTotalDataCount(response.TotalCount);
 
         // Gelen veriyi formatla ve state'e ata
-        const formattedData = response.map((item) => ({
+        const formattedData = response.Data.map((item) => ({
           ...item,
           key: item.TB_KULLANICI_ID,
           // Diğer alanlarınız...

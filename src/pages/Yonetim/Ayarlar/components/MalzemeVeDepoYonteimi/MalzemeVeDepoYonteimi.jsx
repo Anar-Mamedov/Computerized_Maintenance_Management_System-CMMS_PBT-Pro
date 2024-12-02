@@ -40,7 +40,7 @@ function Araclar() {
         setValue("OTVOrani", oTVOrani);
         setValue("stokMiktarininNegatifeDusmesi", stokMiktarininNegatifeDusmesi);
         setValue("sayimFazlasi", sayimFazlasi);
-        setValue("transferOnayi", transferOnayi);
+        setValue("transferOnayi", transferOnayi === "true");
       }
     } catch (error) {
       console.error("Veri çekilirken hata oluştu:", error);
