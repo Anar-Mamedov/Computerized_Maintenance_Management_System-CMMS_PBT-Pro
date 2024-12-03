@@ -98,25 +98,25 @@ const Main = React.memo(function Main() {
     dayjs.locale(language);
   }, [language]);
   return (
-    <React.StrictMode>
-      <I18nextProvider i18n={i18n}>
-        <ConfigProvider locale={antdLocale}>
-          <Router>
-            <AppProvider>
-              <RecoilRoot>
-                <Suspense
-                  fallback={
-                    <div style={{ textAlign: "center", fontSize: "18px", display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>Yükleniyor...</div>
-                  }
-                >
-                  <App />
-                </Suspense>
-              </RecoilRoot>
-            </AppProvider>
-          </Router>
-        </ConfigProvider>
-      </I18nextProvider>
-    </React.StrictMode>
+    // <React.StrictMode>
+    <I18nextProvider i18n={i18n}>
+      <ConfigProvider locale={antdLocale}>
+        <Router>
+          <AppProvider>
+            <RecoilRoot>
+              <Suspense
+                fallback={
+                  <div style={{ textAlign: "center", fontSize: "18px", display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>Yükleniyor...</div>
+                }
+              >
+                <App />
+              </Suspense>
+            </RecoilRoot>
+          </AppProvider>
+        </Router>
+      </ConfigProvider>
+    </I18nextProvider>
+    // </React.StrictMode>
   );
 });
 

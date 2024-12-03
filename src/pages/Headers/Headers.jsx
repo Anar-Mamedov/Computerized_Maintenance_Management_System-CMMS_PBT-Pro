@@ -78,6 +78,7 @@ export default function Header() {
   // otomatik iş emirleri listesini çekiyor
 
   const fetchDataOtomatikIsEmirleriListe = async () => {
+    setOtomatikIsEmirleriListe(null); // Clear the state
     const body = {
       TARIH1: dayjs().format("YYYY-MM-DD"),
       TARIH2: dayjs().format("YYYY-MM-DD"),
@@ -91,41 +92,46 @@ export default function Header() {
   };
 
   useEffect(() => {
-    fetchDataOtomatikIsEmirleriListe();
-  }, []);
+    if (otomatikIsEmirleriListe === null) {
+      fetchDataOtomatikIsEmirleriListe();
+    }
+  }, [otomatikIsEmirleriListe]);
 
   // otomatik iş emirleri listesini iş emrine dönüştürüyor
 
   const handleAutoCreateWorkOrder = async () => {
     let isError = false;
-    // Seçili satırlar üzerinde döngü yaparak her birini API ye gönder
-    for (const row of otomatikIsEmirleriListe) {
-      try {
-        const body = {
-          PBakimId: row.BakimKodu,
-          MakineId: row.MakineKodu,
-          Tarih: row.HedefTarihi,
-        };
-        // API isteğini gönder
-        const response = await AxiosInstance.post(`IsEmriOlustur`, body);
-        console.log("İşlem başarılı:", response);
-        if (response.status_code === 200 || response.status_code === 201) {
-          isError = false;
-        } else if (response.status_code === 401) {
+    // Ensure that the list exists and has items
+    if (otomatikIsEmirleriListe && otomatikIsEmirleriListe.length > 0) {
+      // Seçili satırlar üzerinde döngü yaparak her birini API ye gönder
+      for (const row of otomatikIsEmirleriListe) {
+        try {
+          const body = {
+            PBakimId: row.BakimKodu,
+            MakineId: row.MakineKodu,
+            Tarih: row.HedefTarihi,
+          };
+          // API isteğini gönder
+          const response = await AxiosInstance.post(`IsEmriOlustur`, body);
+          console.log("İşlem başarılı:", response);
+          if (response.status_code === 200 || response.status_code === 201) {
+            isError = false;
+          } else if (response.status_code === 401) {
+            isError = true;
+          } else {
+            isError = true;
+          }
+          // Burada başarılı API isteğinden sonra yapılacak işlemler bulunabilir.
+        } catch (error) {
           isError = true;
-        } else {
-          isError = true;
+          console.error("Silme işlemi sırasında hata oluştu:", error);
         }
-        // Burada başarılı API isteğinden sonra yapılacak işlemler bulunabilir.
-      } catch (error) {
-        isError = true;
-        console.error("Silme işlemi sırasında hata oluştu:", error);
       }
-    }
 
-    // Tüm Api işlemlerinden sonra eğer hata oluşmamışsa aşağıdaki işlemi yap
-    if (!isError) {
-      setOtomatikIsEmirleriListe(null);
+      // Tüm Api işlemlerinden sonra eğer hata oluşmamışsa aşağıdaki işlemi yap
+      if (!isError) {
+        setOtomatikIsEmirleriListe(null);
+      }
     }
   };
 
@@ -135,6 +141,8 @@ export default function Header() {
       /* console.log(otomatikIsEmirleriListe); */
     }
   }, [otomatikIsEmirleriListe]);
+
+  console.log(otomatikIsEmirleriListe);
 
   return (
     <div
