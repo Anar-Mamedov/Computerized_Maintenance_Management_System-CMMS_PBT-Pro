@@ -40,6 +40,7 @@ import EkipmanVeritabani from "./pages/MakineEkipman/EkipmanVeritabani/EkipmanVe
 import IsTalebiKullanicilari from "./pages/YardimMasasi/IsTalebiKullanicilari/IsTalebiKullanicilari.jsx";
 import KullaniciTanimlari from "./pages/Yonetim/KullaniciTanimlari/KullaniciTanimlari.jsx";
 import RolTanimlari1 from "./pages/Yonetim/RolTanimlari/RolTanimlari.jsx";
+import MalzemeTanimlari from "./pages/Malzeme&DepoYonetimi/MalzemeTanimlari/MalzemeTanimlari.jsx";
 import Ayarlar from "./pages/Yonetim/Ayarlar/Ayarlar.jsx";
 import { t } from "i18next";
 // import Kurallar from "./pages/OnayIslemleri/Kurallar/Kurallar.jsx";
@@ -98,6 +99,23 @@ const rawItems = [
       getItem("Makine Tanım", "makine", true),
       getItem("Ekipman Veritabanı", "ekipmanVeritabani", true),
       getItem("Sayaç Güncelleme", "sayacGuncelleme", true),
+      // getItem("Team 2", "team2", true)
+    ],
+    false
+  ),
+  getItem(
+    "Malzeme & Depo Yönetimi",
+    "malzeme&depo",
+    <TeamOutlined />,
+    [
+      getItem("Malzeme Tanımı", "malzemeTanimi", true),
+      getItem("Malzeme Depoları", "malzemeDepolari", true),
+      getItem("Malzeme Giriş Fişi", "malzemeGirisFisi", true),
+      getItem("Malzeme Çıkış Fişi", "malzemeCikisFisi", true),
+      getItem("Malzeme Transfer Fişi", "malzemeTransferFisi", true),
+      getItem("Stok Sayımları", "stokSayimlari", true),
+      getItem("Hızlı Maliyetlendirme", "hizliMaliyetlendirme", true),
+      getItem("Malzeme Transfer Onay İşlemleri", "malzemeTransferOnayIslemleri", true),
       // getItem("Team 2", "team2", true)
     ],
     false
@@ -262,6 +280,14 @@ export default function App() {
           <Route path="/onaylayicilar" element={<Onaylayicilar />} />
           <Route path="/kullaniciTanimlari" element={<KullaniciTanimlari />} />
           <Route path="/RolTanimlari1" element={<RolTanimlari1 />} />
+          <Route path="/malzemeTanimi" element={<MalzemeTanimlari />} />
+          <Route path="/malzemeDepolari" element={<Hazirlaniyor />} />
+          <Route path="/malzemeGirisFisi" element={<Hazirlaniyor />} />
+          <Route path="/malzemeCikisFisi" element={<Hazirlaniyor />} />
+          <Route path="/malzemeTransferFisi" element={<Hazirlaniyor />} />
+          <Route path="/stokSayimlari" element={<Hazirlaniyor />} />
+          <Route path="/hizliMaliyetlendirme" element={<Hazirlaniyor />} />
+          <Route path="/malzemeTransferOnayIslemleri" element={<Hazirlaniyor />} />
           {/*<Route path="/kurallar" element={<Kurallar />} />*/}
         </Route>
       </Routes>

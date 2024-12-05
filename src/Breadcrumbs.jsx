@@ -41,6 +41,16 @@ const Breadcrumbs = () => {
     "/userid": "User ID Control",
     "/mudaheleSuresi": "Müdahale Süresi Analizi",
     "/kullaniciTanimlari": "Kullanıcı Tanımları",
+    "/RolTanimlari1": "Rol Tanımları",
+    "/malzemeTanimi": "Malzeme Tanımları",
+    "/malzemeDepolari": "Malzeme Depoları",
+    "/malzemeGirisFisi": "Malzeme Giriş Fişi",
+    "/malzemeCikisFisi": "Malzeme Çıkış Fişi",
+    "/malzemeTransferFisi": "Malzeme Transfer Fişi",
+    "/stokSayimlari": "Stok Sayımları",
+    "/hizliMaliyetlendirme": "Hızlı Maliyetlendirme",
+    "/malzemeTransferOnayIslemleri": "Malzeme Transfer Onay İşlemleri",
+
     // Diğer route'lar için ekleyin...
   };
 

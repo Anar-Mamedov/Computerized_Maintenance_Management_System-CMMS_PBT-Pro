@@ -99,6 +99,14 @@ export default function LoginForm() {
           kullaniciTanimlari: response.KLL_WEB_RAPOR,
           RolTanimlari1: response.KLL_WEB_RAPOR,
           Ayarlar: response.KLL_WEB_RAPOR,
+          malzemeTanimi: response.KLL_WEB_RAPOR,
+          malzemeDepolari: response.KLL_WEB_RAPOR,
+          malzemeGirisFisi: response.KLL_WEB_RAPOR,
+          malzemeCikisFisi: response.KLL_WEB_RAPOR,
+          malzemeTransferFisi: response.KLL_WEB_RAPOR,
+          stokSayimlari: response.KLL_WEB_RAPOR,
+          hizliMaliyetlendirme: response.KLL_WEB_RAPOR,
+          malzemeTransferOnayIslemleri: response.KLL_WEB_RAPOR,
         };
         localStorage.setItem("login", JSON.stringify(login));
         const anar = localStorage.getItem("login");
