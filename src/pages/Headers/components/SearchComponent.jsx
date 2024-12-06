@@ -41,6 +41,16 @@ const SearchComponent = () => {
     { path: "/demo", label: "Demo", key: "demo" },
     { path: "/userid", label: "User ID Control", key: "userid" },
     { path: "/mudaheleSuresi", label: "Müdahele Süresi", key: "mudaheleSuresi" },
+    { path: "/kullaniciTanimlari", label: "Kullanıcı Tanımları", key: "kullaniciTanimlari" },
+    { path: "/RolTanimlari1", label: "Rol Tanımları", key: "RolTanimlari1" },
+    { path: "/malzemeTanimi", label: "Malzeme Tanımları", key: "malzemeTanimi" },
+    { path: "/malzemeDepolari", label: "Malzeme Depoları", key: "malzemeDepolari" },
+    { path: "/malzemeGirisFisi", label: "Malzeme Giriş Fişi", key: "malzemeGirisFisi" },
+    { path: "/malzemeCikisFisi", label: "Malzeme Çıkış Fişi", key: "malzemeCikisFisi" },
+    { path: "/malzemeTransferFisi", label: "Malzeme Transfer Fişi", key: "malzemeTransferFisi" },
+    { path: "/stokSayimlari", label: "Stok Sayımları", key: "stokSayimlari" },
+    { path: "/hizliMaliyetlendirme", label: "Hızlı Maliyetlendirme", key: "hizliMaliyetlendirme" },
+    { path: "/malzemeTransferOnayIslemleri", label: "Malzeme Transfer Onay İşlemleri", key: "malzemeTransferOnayIslemleri" },
   ]);
 
   const [options, setOptions] = useState([]);
