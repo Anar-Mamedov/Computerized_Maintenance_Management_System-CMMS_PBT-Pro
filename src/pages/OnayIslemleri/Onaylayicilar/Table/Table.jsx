@@ -7,12 +7,13 @@ import CreateModal from "../Insert/CreateModal.jsx";
 import EditModal from "../Update/EditModal.jsx";
 import ContextMenu from "../components/ContextMenu/ContextMenu.jsx";
 
-export default function MainTable({ isActive }) {
+export default function MainTable({ isActive, selectedRows1, setSelectedRows1 = () => {} }) {
   const [loading, setLoading] = useState(false);
   const { control, watch, setValue } = useFormContext();
   const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]); // New state for selected rows
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
@@ -96,6 +97,7 @@ export default function MainTable({ isActive }) {
     setSelectedRowKeys(newSelectedRowKeys);
     const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
     setSelectedRows(newSelectedRows); // Update selected rows data
+    setSelectedRows1(newSelectedRows); // Update selected rows data
   };
 
   const onRowClick = (record) => {
@@ -107,7 +109,8 @@ export default function MainTable({ isActive }) {
     fetch(); // fetch fonksiyonu tabloyu yeniler
     setSelectedRowKeys([]); // Clear selected row keys
     setSelectedRows([]); // Clear selected rows data
-  }, [fetch]);
+    setSelectedRows1([]); // Clear selected rows data
+  }, [fetch, setSelectedRows1]);
 
   return (
     <div style={{ marginBottom: "25px" }}>

@@ -9,6 +9,7 @@ import TarihceTablo from "./components/TarihceTablo";
 import Form from "./components/Form/Form";
 import Ac from "./components/Ac";
 import OnayaGonder from "./components/OnayaGonder.jsx";
+import OnayaGonderOnaylayiciList from "./components/OnayaGonderOnaylayiciList.jsx";
 
 const { Text, Link } = Typography;
 
@@ -36,18 +37,29 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
       {selectedRows.length >= 1 && selectedRows.every((row) => row.KAPALI === false) && (
         <Sil selectedRows={selectedRows} refreshTableData={refreshTableData} disabled={isDisabled} hidePopover={hidePopover} />
       )}
-      {onayCheck &&
+      {onayCheck.ONY_AKTIF == 1 &&
+        onayCheck.ONY_MANUEL == 0 &&
         selectedRows.length >= 1 &&
         selectedRows.some((row) => row.ISM_ONAY_DURUM === 0 || row.ISM_ONAY_DURUM === 3) &&
         selectedRows.every((row) => row.KAPALI === false) && <OnayaGonder selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
+
       {/* <Iptal selectedRows={selectedRows} refreshTableData={refreshTableData} iptalDisabled={iptalDisabled} /> */}
       {/*{selectedRows.length >= 1 && <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />}*/}
+
       {selectedRows.length >= 1 &&
-        (onayCheck ? (
+        (onayCheck.ONY_AKTIF == 1 && onayCheck.ONY_MANUEL == 0 ? (
           selectedRows.every((row) => row.ISM_ONAY_DURUM === 2) && <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />
         ) : (
           <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />
         ))}
+
+      {onayCheck.ONY_AKTIF == 1 &&
+        onayCheck.ONY_MANUEL == 1 &&
+        selectedRows.length >= 1 &&
+        selectedRows.some((row) => row.ISM_ONAY_DURUM === 0 || row.ISM_ONAY_DURUM === 3) &&
+        selectedRows.every((row) => row.KAPALI === false) && (
+          <OnayaGonderOnaylayiciList selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />
+        )}
 
       {/* <Parametreler />
       {selectedRows.length === 1 && <TarihceTablo selectedRows={selectedRows} />} */}

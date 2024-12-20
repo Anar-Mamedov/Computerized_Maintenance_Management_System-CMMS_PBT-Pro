@@ -166,11 +166,7 @@ const MainTable = () => {
     const fetchData = async () => {
       try {
         const response = await AxiosInstance.post(`GetOnayCheck?TB_ONAY_ID=1`); // API URL'niz
-        if (response[0].ONY_AKTIF === 1) {
-          setOnayCheck(true);
-        } else {
-          setOnayCheck(false);
-        }
+        setOnayCheck(response[0]);
       } catch (error) {
         console.error("API isteğinde hata oluştu:", error);
       }

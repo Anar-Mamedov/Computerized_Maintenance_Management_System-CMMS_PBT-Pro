@@ -190,21 +190,21 @@ const Sigorta = () => {
 
   // Özel Alanların nameleri backend çekmek için api isteği
 
-  // useEffect(() => {
-  //   // API'den veri çekme işlemi
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await AxiosInstance.get("OzelAlan?form=ISEMRI"); // API URL'niz
-  //       localStorage.setItem("ozelAlanlarMalzemeTanimlari", JSON.stringify(response));
-  //       setLabel(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
-  //     } catch (error) {
-  //       console.error("API isteğinde hata oluştu:", error);
-  //       setLabel("Hata! Veri yüklenemedi."); // Hata durumunda kullanıcıya bilgi verme
-  //     }
-  //   };
-  //
-  //   fetchData();
-  // }, [drawer.visible]);
+  useEffect(() => {
+    // API'den veri çekme işlemi
+    const fetchData = async () => {
+      try {
+        const response = await AxiosInstance.get("OzelAlan?form=stok"); // API URL'niz
+        localStorage.setItem("ozelAlanlarMalzemeTanimlari", JSON.stringify(response));
+        setLabel(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
+      } catch (error) {
+        console.error("API isteğinde hata oluştu:", error);
+        setLabel("Hata! Veri yüklenemedi."); // Hata durumunda kullanıcıya bilgi verme
+      }
+    };
+
+    fetchData();
+  }, [drawer.visible]);
 
   const ozelAlanlar = JSON.parse(localStorage.getItem("ozelAlanlarMalzemeTanimlari"));
 
@@ -212,8 +212,8 @@ const Sigorta = () => {
   const initialColumns = [
     {
       title: t("malzemeKodu"),
-      dataIndex: "KLL_KOD",
-      key: "KLL_KOD",
+      dataIndex: "STK_KOD",
+      key: "STK_KOD",
       width: 120,
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
@@ -221,56 +221,570 @@ const Sigorta = () => {
         <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
       ),
       sorter: (a, b) => {
-        if (a.KLL_KOD === null) return -1;
-        if (b.KLL_KOD === null) return 1;
-        return a.KLL_KOD.localeCompare(b.KLL_KOD);
+        if (a.STK_KOD === null) return -1;
+        if (b.STK_KOD === null) return 1;
+        return a.STK_KOD.localeCompare(b.STK_KOD);
       },
     },
 
     {
       title: t("malzemeTanimi"),
-      dataIndex: "KLL_TANIM",
-      key: "KLL_TANIM",
+      dataIndex: "STK_TANIM",
+      key: "STK_TANIM",
       width: 120,
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
 
       sorter: (a, b) => {
-        if (a.KLL_TANIM === null) return -1;
-        if (b.KLL_TANIM === null) return 1;
-        return a.KLL_TANIM.localeCompare(b.KLL_TANIM);
+        if (a.STK_TANIM === null) return -1;
+        if (b.STK_TANIM === null) return 1;
+        return a.STK_TANIM.localeCompare(b.STK_TANIM);
       },
     },
     {
       title: t("ureticiKodu"),
-      dataIndex: "PRS_ISIM",
-      key: "PRS_ISIM",
+      dataIndex: "STK_URETICI_KOD",
+      key: "STK_URETICI_KOD",
       width: 120,
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
 
       sorter: (a, b) => {
-        if (a.PRS_ISIM === null) return -1;
-        if (b.PRS_ISIM === null) return 1;
-        return a.PRS_ISIM.localeCompare(b.PRS_ISIM);
+        if (a.STK_URETICI_KOD === null) return -1;
+        if (b.STK_URETICI_KOD === null) return 1;
+        return a.STK_URETICI_KOD.localeCompare(b.STK_URETICI_KOD);
       },
     },
     {
       title: t("aktif"),
-      dataIndex: "KLL_AKTIF",
-      key: "KLL_AKTIF",
+      dataIndex: "STK_AKTIF",
+      key: "STK_AKTIF",
       width: 120,
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
 
       sorter: (a, b) => {
-        if (a.KLL_AKTIF === null) return -1;
-        if (b.KLL_AKTIF === null) return 1;
-        return a.KLL_AKTIF === b.KLL_AKTIF ? 0 : a.KLL_AKTIF ? -1 : 1;
+        if (a.STK_AKTIF === null) return -1;
+        if (b.STK_AKTIF === null) return 1;
+        return a.STK_AKTIF === b.STK_AKTIF ? 0 : a.STK_AKTIF ? -1 : 1;
       },
       render: (text, record) => {
-        return record.KLL_AKTIF ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />;
+        return record.STK_AKTIF ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />;
       },
+    },
+    {
+      title: t("tip"),
+      dataIndex: "STK_TIP",
+      key: "STK_TIP",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_TIP === null) return -1;
+        if (b.STK_TIP === null) return 1;
+        return a.STK_TIP.localeCompare(b.STK_TIP);
+      },
+    },
+    {
+      title: t("birim"),
+      dataIndex: "STK_TIP",
+      key: "STK_TIP",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_TIP === null) return -1;
+        if (b.STK_TIP === null) return 1;
+        return a.STK_TIP.localeCompare(b.STK_TIP);
+      },
+    },
+    {
+      title: t("girenMiktar"),
+      dataIndex: "STK_GIREN_MIKTAR",
+      key: "STK_GIREN_MIKTAR",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_GIREN_MIKTAR === null) return -1;
+        if (b.STK_GIREN_MIKTAR === null) return 1;
+        return a.STK_GIREN_MIKTAR.localeCompare(b.STK_GIREN_MIKTAR);
+      },
+    },
+    {
+      title: t("cikanMiktar"),
+      dataIndex: "STK_CIKAN_MIKTAR",
+      key: "STK_CIKAN_MIKTAR",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_CIKAN_MIKTAR === null) return -1;
+        if (b.STK_CIKAN_MIKTAR === null) return 1;
+        return a.STK_CIKAN_MIKTAR.localeCompare(b.STK_CIKAN_MIKTAR);
+      },
+    },
+    {
+      title: t("stokMiktar"),
+      dataIndex: "STK_MIKTAR",
+      key: "STK_MIKTAR",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_MIKTAR === null) return -1;
+        if (b.STK_MIKTAR === null) return 1;
+        return a.STK_MIKTAR.localeCompare(b.STK_MIKTAR);
+      },
+    },
+    {
+      title: t("grup"),
+      dataIndex: "STK_GRUP",
+      key: "STK_GRUP",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_GRUP === null) return -1;
+        if (b.STK_GRUP === null) return 1;
+        return a.STK_GRUP.localeCompare(b.STK_GRUP);
+      },
+    },
+    {
+      title: t("lokasyon"),
+      dataIndex: "STK_LOKASYON",
+      key: "STK_LOKASYON",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_LOKASYON === null) return -1;
+        if (b.STK_LOKASYON === null) return 1;
+        return a.STK_LOKASYON.localeCompare(b.STK_LOKASYON);
+      },
+    },
+    {
+      title: t("marka"),
+      dataIndex: "STK_MARKA",
+      key: "STK_MARKA",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_MARKA === null) return -1;
+        if (b.STK_MARKA === null) return 1;
+        return a.STK_MARKA.localeCompare(b.STK_MARKA);
+      },
+    },
+    {
+      title: t("model"),
+      dataIndex: "STK_MODEL",
+      key: "STK_MODEL",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_MODEL === null) return -1;
+        if (b.STK_MODEL === null) return 1;
+        return a.STK_MODEL.localeCompare(b.STK_MODEL);
+      },
+    },
+    {
+      title: t("malzemeSinifi"),
+      dataIndex: "STK_SINIF",
+      key: "STK_SINIF",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_SINIF === null) return -1;
+        if (b.STK_SINIF === null) return 1;
+        return a.STK_SINIF.localeCompare(b.STK_SINIF);
+      },
+    },
+    {
+      title: t("masrafMerkezi"),
+      dataIndex: "STK_MASRAF_MERKEZI",
+      key: "STK_MASRAF_MERKEZI",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_MASRAF_MERKEZI === null) return -1;
+        if (b.STK_MASRAF_MERKEZI === null) return 1;
+        return a.STK_MASRAF_MERKEZI.localeCompare(b.STK_MASRAF_MERKEZI);
+      },
+    },
+    {
+      title: t("yedekParca"),
+      dataIndex: "STK_YEDEK_PARCA",
+      key: "STK_YEDEK_PARCA",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_YEDEK_PARCA === null) return -1;
+        if (b.STK_YEDEK_PARCA === null) return 1;
+        return a.STK_YEDEK_PARCA === b.STK_YEDEK_PARCA ? 0 : a.STK_YEDEK_PARCA ? -1 : 1;
+      },
+      render: (text, record) => {
+        return record.STK_YEDEK_PARCA ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />;
+      },
+    },
+    {
+      title: t("sarfMalzeme"),
+      dataIndex: "STK_SARF_MALZEME",
+      key: "STK_SARF_MALZEME",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_SARF_MALZEME === null) return -1;
+        if (b.STK_SARF_MALZEME === null) return 1;
+        return a.STK_SARF_MALZEME === b.STK_SARF_MALZEME ? 0 : a.STK_SARF_MALZEME ? -1 : 1;
+      },
+      render: (text, record) => {
+        return record.STK_SARF_MALZEME ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />;
+      },
+    },
+    {
+      title: t("stoksuzMalzeme"),
+      dataIndex: "STK_STOKSUZ_MALZEME",
+      key: "STK_STOKSUZ_MALZEME",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_STOKSUZ_MALZEME === null) return -1;
+        if (b.STK_STOKSUZ_MALZEME === null) return 1;
+        return a.STK_STOKSUZ_MALZEME === b.STK_STOKSUZ_MALZEME ? 0 : a.STK_STOKSUZ_MALZEME ? -1 : 1;
+      },
+      render: (text, record) => {
+        return record.STK_STOKSUZ_MALZEME ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />;
+      },
+    },
+    {
+      title: t("kritikMalzeme"),
+      dataIndex: "STK_KRITIK_MALZEME",
+      key: "STK_KRITIK_MALZEME",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_KRITIK_MALZEME === null) return -1;
+        if (b.STK_KRITIK_MALZEME === null) return 1;
+        return a.STK_KRITIK_MALZEME === b.STK_KRITIK_MALZEME ? 0 : a.STK_KRITIK_MALZEME ? -1 : 1;
+      },
+      render: (text, record) => {
+        return record.STK_KRITIK_MALZEME ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />;
+      },
+    },
+    {
+      title: t("tehlikeSinifi"),
+      dataIndex: "STK_TEHLIKE_SINIF",
+      key: "STK_TEHLIKE_SINIF",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_TEHLIKE_SINIF === null) return -1;
+        if (b.STK_TEHLIKE_SINIF === null) return 1;
+        return a.STK_TEHLIKE_SINIF.localeCompare(b.STK_TEHLIKE_SINIF);
+      },
+    },
+    {
+      title: t("girisFiyati"),
+      dataIndex: "STK_GIRIS_FIYAT_DEGERI",
+      key: "STK_GIRIS_FIYAT_DEGERI",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_GIRIS_FIYAT_DEGERI === null) return -1;
+        if (b.STK_GIRIS_FIYAT_DEGERI === null) return 1;
+        return a.STK_GIRIS_FIYAT_DEGERI.localeCompare(b.STK_GIRIS_FIYAT_DEGERI);
+      },
+    },
+    {
+      title: t("cikisFiyati"),
+      dataIndex: "STK_CIKIS_FIYAT_DEGERI",
+      key: "STK_CIKIS_FIYAT_DEGERI",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_CIKIS_FIYAT_DEGERI === null) return -1;
+        if (b.STK_CIKIS_FIYAT_DEGERI === null) return 1;
+        return a.STK_CIKIS_FIYAT_DEGERI.localeCompare(b.STK_CIKIS_FIYAT_DEGERI);
+      },
+    },
+    {
+      title: t("kdvOrani"),
+      dataIndex: "STK_KDV_ORAN",
+      key: "STK_KDV_ORAN",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_KDV_ORAN === null) return -1;
+        if (b.STK_KDV_ORAN === null) return 1;
+        return a.STK_KDV_ORAN.localeCompare(b.STK_KDV_ORAN);
+      },
+    },
+    {
+      title: t("otvOrani"),
+      dataIndex: "STK_OTV_ORAN",
+      key: "STK_OTV_ORAN",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_OTV_ORAN === null) return -1;
+        if (b.STK_OTV_ORAN === null) return 1;
+        return a.STK_OTV_ORAN.localeCompare(b.STK_OTV_ORAN);
+      },
+    },
+    {
+      title: t("minStokMiktari"),
+      dataIndex: "STK_MIN_MIKTAR",
+      key: "STK_MIN_MIKTAR",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_MIN_MIKTAR === null) return -1;
+        if (b.STK_MIN_MIKTAR === null) return 1;
+        return a.STK_MIN_MIKTAR.localeCompare(b.STK_MIN_MIKTAR);
+      },
+    },
+    {
+      title: t("maxStokMiktari"),
+      dataIndex: "STK_MAX_MIKTAR",
+      key: "STK_MAX_MIKTAR",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_MAX_MIKTAR === null) return -1;
+        if (b.STK_MAX_MIKTAR === null) return 1;
+        return a.STK_MAX_MIKTAR.localeCompare(b.STK_MAX_MIKTAR);
+      },
+    },
+    {
+      title: t("siparisMiktari"),
+      dataIndex: "STK_SIPARIS_MIKTARI",
+      key: "STK_SIPARIS_MIKTARI",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_SIPARIS_MIKTARI === null) return -1;
+        if (b.STK_SIPARIS_MIKTARI === null) return 1;
+        return a.STK_SIPARIS_MIKTARI.localeCompare(b.STK_SIPARIS_MIKTARI);
+      },
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_1 ? ozelAlanlar.OZL_OZEL_ALAN_1 : label && label.OZL_OZEL_ALAN_1}</div>,
+      dataIndex: "STK_OZEL_ALAN_1",
+      key: "STK_OZEL_ALAN_1",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_2 ? ozelAlanlar.OZL_OZEL_ALAN_2 : label && label.OZL_OZEL_ALAN_2}</div>,
+      dataIndex: "STK_OZEL_ALAN_2",
+      key: "STK_OZEL_ALAN_2",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_3 ? ozelAlanlar.OZL_OZEL_ALAN_3 : label && label.OZL_OZEL_ALAN_3}</div>,
+      dataIndex: "STK_OZEL_ALAN_3",
+      key: "STK_OZEL_ALAN_3",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_4 ? ozelAlanlar.OZL_OZEL_ALAN_4 : label && label.OZL_OZEL_ALAN_4}</div>,
+      dataIndex: "STK_OZEL_ALAN_4",
+      key: "STK_OZEL_ALAN_4",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_5 ? ozelAlanlar.OZL_OZEL_ALAN_5 : label && label.OZL_OZEL_ALAN_5}</div>,
+      dataIndex: "STK_OZEL_ALAN_5",
+      key: "STK_OZEL_ALAN_5",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_6 ? ozelAlanlar.OZL_OZEL_ALAN_6 : label && label.OZL_OZEL_ALAN_6}</div>,
+      dataIndex: "STK_OZEL_ALAN_6",
+      key: "STK_OZEL_ALAN_6",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_7 ? ozelAlanlar.OZL_OZEL_ALAN_7 : label && label.OZL_OZEL_ALAN_7}</div>,
+      dataIndex: "STK_OZEL_ALAN_7",
+      key: "STK_OZEL_ALAN_7",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_8 ? ozelAlanlar.OZL_OZEL_ALAN_8 : label && label.OZL_OZEL_ALAN_8}</div>,
+      dataIndex: "STK_OZEL_ALAN_8",
+      key: "STK_OZEL_ALAN_8",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_9 ? ozelAlanlar.OZL_OZEL_ALAN_9 : label && label.OZL_OZEL_ALAN_9}</div>,
+      dataIndex: "STK_OZEL_ALAN_9",
+      key: "STK_OZEL_ALAN_9",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_10 ? ozelAlanlar.OZL_OZEL_ALAN_10 : label && label.OZL_OZEL_ALAN_10}</div>,
+      dataIndex: "STK_OZEL_ALAN_10",
+      key: "STK_OZEL_ALAN_10",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_11 ? ozelAlanlar.OZL_OZEL_ALAN_11 : label && label.OZL_OZEL_ALAN_11}</div>,
+      dataIndex: "STK_OZEL_ALAN_11",
+      key: "STK_OZEL_ALAN_11",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_12 ? ozelAlanlar.OZL_OZEL_ALAN_12 : label && label.OZL_OZEL_ALAN_12}</div>,
+      dataIndex: "STK_OZEL_ALAN_12",
+      key: "STK_OZEL_ALAN_12",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_13 ? ozelAlanlar.OZL_OZEL_ALAN_13 : label && label.OZL_OZEL_ALAN_13}</div>,
+      dataIndex: "STK_OZEL_ALAN_13",
+      key: "STK_OZEL_ALAN_13",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_14 ? ozelAlanlar.OZL_OZEL_ALAN_14 : label && label.OZL_OZEL_ALAN_14}</div>,
+      dataIndex: "STK_OZEL_ALAN_14",
+      key: "STK_OZEL_ALAN_14",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_15 ? ozelAlanlar.OZL_OZEL_ALAN_15 : label && label.OZL_OZEL_ALAN_15}</div>,
+      dataIndex: "STK_OZEL_ALAN_15",
+      key: "STK_OZEL_ALAN_15",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_16 ? ozelAlanlar.OZL_OZEL_ALAN_16 : label && label.OZL_OZEL_ALAN_16}</div>,
+      dataIndex: "STK_OZEL_ALAN_16",
+      key: "STK_OZEL_ALAN_16",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_17 ? ozelAlanlar.OZL_OZEL_ALAN_17 : label && label.OZL_OZEL_ALAN_17}</div>,
+      dataIndex: "STK_OZEL_ALAN_17",
+      key: "STK_OZEL_ALAN_17",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_18 ? ozelAlanlar.OZL_OZEL_ALAN_18 : label && label.OZL_OZEL_ALAN_18}</div>,
+      dataIndex: "STK_OZEL_ALAN_18",
+      key: "STK_OZEL_ALAN_18",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_19 ? ozelAlanlar.OZL_OZEL_ALAN_19 : label && label.OZL_OZEL_ALAN_19}</div>,
+      dataIndex: "STK_OZEL_ALAN_19",
+      key: "STK_OZEL_ALAN_19",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_20 ? ozelAlanlar.OZL_OZEL_ALAN_20 : label && label.OZL_OZEL_ALAN_20}</div>,
+      dataIndex: "STK_OZEL_ALAN_20",
+      key: "STK_OZEL_ALAN_20",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
     },
     // Diğer kolonlarınız...
   ];
