@@ -78,8 +78,16 @@ export default function MainTable({ isActive }) {
       dataIndex: "ONY_AKTIF",
       key: "ONY_AKTIF",
       width: 100,
-      render: (text, record) => <Switch checked={record.ONY_AKTIF} onChange={(checked) => handleSwitchChange(checked, record)} />,
+      render: (text, record) => <Switch checked={record.ONY_AKTIF} onChange={(checked) => handleOnyAktifChange(checked, record)} />,
     },
+    {
+      title: "Manuel Onay",
+      dataIndex: "ONY_MANUEL",
+      key: "ONY_MANUEL",
+      width: 100,
+      render: (text, record) => <Switch checked={record.ONY_MANUEL} disabled={!record.ONY_AKTIF} onChange={(checked) => handleOnyManuelChange(checked, record)} />,
+    },
+
     {
       title: "Kural",
       dataIndex: "",
@@ -101,22 +109,50 @@ export default function MainTable({ isActive }) {
     },
   ];
 
-  const handleSwitchChange = (checked, record) => {
+  // ONY_AKTIF için ayrı bir fonksiyon
+  const handleOnyAktifChange = (checked, record) => {
     const Body = {
       TB_ONAY_ID: record.TB_ONAY_ID,
       ONY_TANIM: record.ONY_TANIM,
       ONY_ACIKLAMA: record.ONY_ACIKLAMA,
       ONY_DEGISTIRME_TAR: dayjs().format("YYYY-MM-DD"),
       ONY_AKTIF: checked,
+      ONY_MANUEL: record.ONY_MANUEL, // Manuel onay değerini mevcut satırın değerinden alıyoruz
     };
 
     AxiosInstance.post(`UpdateOnayTanim`, Body)
       .then((response) => {
-        console.log("Data sent successfully:", response);
-
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("Güncelleme Başarılı.");
-          refreshTable(); // Tabloyu yenile
+          refreshTable();
+        } else if (response.status_code === 401) {
+          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+        } else {
+          message.error("Güncelleme Başarısız.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error sending data:", error);
+        message.error("Başarısız Olundu.");
+      });
+  };
+
+  // ONY_MANUEL için ayrı bir fonksiyon
+  const handleOnyManuelChange = (checked, record) => {
+    const Body = {
+      TB_ONAY_ID: record.TB_ONAY_ID,
+      ONY_TANIM: record.ONY_TANIM,
+      ONY_ACIKLAMA: record.ONY_ACIKLAMA,
+      ONY_DEGISTIRME_TAR: dayjs().format("YYYY-MM-DD"),
+      ONY_AKTIF: record.ONY_AKTIF, // Aktif değerini mevcut satırın değerinden alıyoruz
+      ONY_MANUEL: checked,
+    };
+
+    AxiosInstance.post(`UpdateOnayTanim`, Body)
+      .then((response) => {
+        if (response.status_code === 200 || response.status_code === 201) {
+          message.success("Güncelleme Başarılı.");
+          refreshTable();
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {

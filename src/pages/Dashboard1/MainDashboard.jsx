@@ -52,26 +52,49 @@ const widgetTitles = {
   widget18: "Bekleyen Onaylarım",
 };
 
+const widgetDefaults = {
+  widget1: { width: 3, height: 1, minW: 3, minH: 1 },
+  widget2: { width: 3, height: 1, minW: 3, minH: 1 },
+  widget3: { width: 3, height: 1, minW: 3, minH: 1 },
+  widget4: { width: 3, height: 1, minW: 3, minH: 1 },
+  widget5: { width: 5, height: 3, minW: 3, minH: 2 },
+  widget16: { width: 5, height: 3, minW: 3, minH: 2 },
+  widget10: { width: 7, height: 3, minW: 3, minH: 2 },
+  widget17: { width: 5, height: 3, minW: 3, minH: 2 },
+  widget7: { width: 7, height: 3, minW: 3, minH: 2 },
+  widget6: { width: 5, height: 3, minW: 3, minH: 2 },
+  widget11: { width: 7, height: 3, minW: 3, minH: 2 },
+  widget8: { width: 5, height: 3, minW: 3, minH: 2 },
+  widget13: { width: 7, height: 3, minW: 3, minH: 2 },
+  widget9: { width: 7, height: 3, minW: 3, minH: 2 },
+  widget14: { width: 5, height: 3, minW: 3, minH: 2 },
+  widget15: { width: 7, height: 3, minW: 3, minH: 2 },
+  widget12: { width: 12, height: 3, minW: 3, minH: 2 },
+  widget18: { width: 5, height: 3, minW: 3, minH: 2 },
+};
+
 const defaultItems = [
-  { id: "widget1", x: 0, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
-  { id: "widget2", x: 3, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
-  { id: "widget3", x: 6, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
-  { id: "widget4", x: 9, y: 0, width: 3, height: 1, minW: 3, minH: 1 },
-  { id: "widget5", x: 0, y: 1, width: 5, height: 3, minW: 3, minH: 2 },
-  { id: "widget16", x: 0, y: 4, width: 5, height: 3, minW: 3, minH: 2 },
-  { id: "widget10", x: 5, y: 1, width: 7, height: 3, minW: 3, minH: 2 },
-  { id: "widget17", x: 0, y: 7, width: 5, height: 3, minW: 3, minH: 2 },
-  { id: "widget7", x: 5, y: 4, width: 7, height: 3, minW: 3, minH: 2 },
-  { id: "widget6", x: 0, y: 10, width: 5, height: 3, minW: 3, minH: 2 },
-  { id: "widget11", x: 5, y: 7, width: 7, height: 3, minW: 3, minH: 2 },
-  { id: "widget8", x: 0, y: 13, width: 5, height: 3, minW: 3, minH: 2 },
-  { id: "widget13", x: 5, y: 10, width: 7, height: 3, minW: 3, minH: 2 },
-  { id: "widget9", x: 5, y: 13, width: 7, height: 3, minW: 3, minH: 2 },
-  { id: "widget14", x: 0, y: 16, width: 5, height: 3, minW: 3, minH: 2 },
-  { id: "widget15", x: 5, y: 16, width: 7, height: 3, minW: 3, minH: 2 },
-  { id: "widget12", x: 0, y: 19, width: 12, height: 3, minW: 3, minH: 2 },
+  { id: "widget1", x: 0, y: 0, ...widgetDefaults["widget1"] },
+  { id: "widget2", x: 3, y: 0, ...widgetDefaults["widget2"] },
+  { id: "widget3", x: 6, y: 0, ...widgetDefaults["widget3"] },
+  { id: "widget4", x: 9, y: 0, ...widgetDefaults["widget4"] },
+  { id: "widget5", x: 0, y: 1, ...widgetDefaults["widget5"] },
+  { id: "widget16", x: 0, y: 4, ...widgetDefaults["widget16"] },
+  { id: "widget10", x: 5, y: 1, ...widgetDefaults["widget10"] },
+  { id: "widget17", x: 0, y: 7, ...widgetDefaults["widget17"] },
+  { id: "widget7", x: 5, y: 4, ...widgetDefaults["widget7"] },
+  { id: "widget6", x: 0, y: 10, ...widgetDefaults["widget6"] },
+  { id: "widget11", x: 5, y: 7, ...widgetDefaults["widget11"] },
+  { id: "widget8", x: 0, y: 13, ...widgetDefaults["widget8"] },
+  { id: "widget13", x: 5, y: 10, ...widgetDefaults["widget13"] },
+  { id: "widget9", x: 5, y: 13, ...widgetDefaults["widget9"] },
+  { id: "widget14", x: 0, y: 16, ...widgetDefaults["widget14"] },
+  { id: "widget15", x: 5, y: 16, ...widgetDefaults["widget15"] },
+  { id: "widget12", x: 0, y: 19, ...widgetDefaults["widget12"] },
 ];
+
 function MainDashboard() {
+  const [gridInstance, setGridInstance] = useState(null);
   const [reorganize, setReorganize] = useState();
   const [updateApi, setUpdateApi] = useState(false);
   const [checkedWidgets, setCheckedWidgets] = useState({
@@ -150,6 +173,8 @@ function MainDashboard() {
         handle: ".widget-header", // Dragging handle to move widgets
       },
     });
+
+    setGridInstance(grid);
 
     const saveLayout = () => {
       const items = grid.engine.nodes.map((item) => ({
@@ -480,34 +505,32 @@ function MainDashboard() {
 
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
-    setCheckedWidgets({
-      ...checkedWidgets,
-      [name]: checked,
-    });
+    setCheckedWidgets({ ...checkedWidgets, [name]: checked });
 
     let gridItems = JSON.parse(localStorage.getItem(selectedDashboard)) || [];
 
     if (!checked) {
+      // Widget'ı çıkar
       const widgetIndex = gridItems.findIndex((item) => item.id === name);
       if (widgetIndex > -1) {
         gridItems.splice(widgetIndex, 1);
       }
     } else {
-      const defaultItem = defaultItems.find((item) => item.id === name);
+      // defaultItem'ı defaultItems'tan bul, yoksa widgetDefaults'tan al
+      let defaultItem = defaultItems.find((item) => item.id === name);
+      if (!defaultItem) {
+        defaultItem = { id: name, ...widgetDefaults[name] };
+      }
 
-      const newPosition = findNextAvailablePosition(gridItems, defaultItem.width, defaultItem.height);
-      const newWidget = {
-        ...defaultItem,
-        ...newPosition,
-      };
+      // Mevcut en alt widget'ın altına yerleştir
+      const maxY = gridItems.reduce((acc, cur) => Math.max(acc, cur.y + cur.height), 0);
+      const newWidget = { ...defaultItem, x: 0, y: maxY };
 
       gridItems.push(newWidget);
     }
 
-    gridItems = rearrangeWidgets(gridItems);
-
+    // Artık rearrangeWidgets fonksiyonunu çağırmıyoruz
     localStorage.setItem(selectedDashboard, JSON.stringify(gridItems));
-
     window.updateWidgets(gridItems);
   };
 
@@ -583,11 +606,23 @@ function MainDashboard() {
     window.location.reload();
   };
 
+  // Burada eski rearrangeWidgets kullanılmayacak, yerine compact kullanacağız.
   const handleRearrange = () => {
-    const gridItems = JSON.parse(localStorage.getItem(selectedDashboard)) || [];
-    const rearrangedItems = rearrangeWidgets(gridItems);
-    localStorage.setItem(selectedDashboard, JSON.stringify(rearrangedItems));
-    window.updateWidgets(rearrangedItems);
+    if (gridInstance) {
+      // GridStack'ın yerleşim sıkıştırma fonksiyonunu çağırın
+      gridInstance.compact();
+      // Sıkıştırma sonrası düzeni tekrar kaydedin
+      const items = gridInstance.engine.nodes.map((item) => ({
+        id: item.el.id,
+        x: item.x,
+        y: item.y,
+        width: item.w,
+        height: item.h,
+        minW: item.minW,
+        minH: item.minH,
+      }));
+      localStorage.setItem(selectedDashboard, JSON.stringify(items));
+    }
   };
 
   const rerenderWidgets = () => {
@@ -670,7 +705,7 @@ function MainDashboard() {
         İş Emri Tipleri
       </Checkbox>
       <Checkbox name="widget17" onChange={handleCheckboxChange} checked={checkedWidgets.widget17}>
-        İş Emri Tipleri
+        İş Talebi Tipleri
       </Checkbox>
       <Checkbox name="widget18" onChange={handleCheckboxChange} checked={checkedWidgets.widget18}>
         Bekleyen Onaylarım
