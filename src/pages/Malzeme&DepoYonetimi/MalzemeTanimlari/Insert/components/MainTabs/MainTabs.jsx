@@ -4,6 +4,8 @@ import { Controller, useFormContext } from "react-hook-form";
 import RolSelectBox from "./components/RolSelectBox";
 import PersonelTablo from "./components/PersonelTablo";
 import styled from "styled-components";
+import FreeTextInput from "../../../../../../utils/components/FreeTextInput";
+import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
 
 import dayjs from "dayjs";
 
@@ -208,6 +210,148 @@ export default function MainTabs({ modalOpen }) {
 
   return (
     <div style={{ display: "flex", marginBottom: "15px", flexDirection: "column", gap: "10px", width: "100%" }}>
+      <div
+        style={{
+          display: "flex",
+          flexFlow: "column wrap",
+          alignItems: "center",
+          width: "100%",
+          maxWidth: "350px",
+          justifyContent: "space-between",
+          gap: "8px",
+          flexDirection: "row",
+        }}
+      >
+        <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>
+          {t("kod")}
+          <div style={{ color: "red" }}>*</div>
+        </Text>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            width: "100%",
+            maxWidth: "250px",
+            flexDirection: "column",
+          }}
+        >
+          <FreeTextInput name1="malzemeKod" isRequired={true} />
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          flexFlow: "column wrap",
+          alignItems: "center",
+          width: "100%",
+          maxWidth: "350px",
+          justifyContent: "space-between",
+          gap: "8px",
+          flexDirection: "row",
+        }}
+      >
+        <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>
+          {t("tanim")}
+          <div style={{ color: "red" }}>*</div>
+        </Text>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            width: "100%",
+            maxWidth: "250px",
+            flexDirection: "column",
+          }}
+        >
+          <FreeTextInput name1="tanim" isRequired={true} />
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          flexFlow: "column wrap",
+          alignItems: "center",
+          width: "100%",
+          maxWidth: "350px",
+          justifyContent: "space-between",
+          gap: "8px",
+          flexDirection: "row",
+        }}
+      >
+        <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>
+          {t("tip")}
+          <div style={{ color: "red" }}>*</div>
+        </Text>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            width: "100%",
+            maxWidth: "250px",
+            flexDirection: "column",
+          }}
+        >
+          <KodIDSelectbox name1="tip" isRequired={true} kodID="13005" />
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          flexFlow: "column wrap",
+          alignItems: "center",
+          width: "100%",
+          maxWidth: "350px",
+          justifyContent: "space-between",
+          gap: "8px",
+          flexDirection: "row",
+        }}
+      >
+        <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>
+          {t("birim")}
+          <div style={{ color: "red" }}>*</div>
+        </Text>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            width: "100%",
+            maxWidth: "250px",
+            flexDirection: "column",
+          }}
+        >
+          <KodIDSelectbox name1="birim" isRequired={true} kodID="32001" />
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          flexFlow: "column wrap",
+          alignItems: "center",
+          width: "100%",
+          maxWidth: "350px",
+          justifyContent: "space-between",
+          gap: "8px",
+          flexDirection: "row",
+        }}
+      >
+        <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>{t("grup")}</Text>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            width: "100%",
+            maxWidth: "250px",
+            flexDirection: "column",
+          }}
+        >
+          <KodIDSelectbox name1="grup" isRequired={false} kodID="32001" />
+        </div>
+      </div>
+
       <div
         style={{
           display: "flex",
