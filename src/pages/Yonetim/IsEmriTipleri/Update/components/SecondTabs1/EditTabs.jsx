@@ -1,4 +1,4 @@
-import { Checkbox, ColorPicker, Input, Radio, Typography } from "antd";
+import { Checkbox, ColorPicker, Input, Radio, Typography, Tag } from "antd";
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
@@ -19,6 +19,75 @@ const StyledDivBottomLine = styled.div`
 
 export default function EditTabs() {
   const { control, watch, setValue } = useFormContext();
+
+  function hexToRGBA(color, opacity) {
+    // 1) Geçersiz parametreleri engelle
+    if (!color || color.trim() === "" || opacity == null) {
+      // Boş ya da null renk için boş değer döndürelim
+      return;
+    }
+
+    // 2) rgb(...) veya rgba(...) formatını yakala
+    if (color.startsWith("rgb(") || color.startsWith("rgba(")) {
+      // Örnek: "rgb(0,123,255)" -> ["0","123","255"]
+      // Örnek: "rgba(255,0,0,0.96)" -> ["255","0","0","0.96"]
+      const rawValues = color.replace(/^rgba?\(|\s+|\)$/g, "").split(",");
+      const r = parseInt(rawValues[0], 10) || 0;
+      const g = parseInt(rawValues[1], 10) || 0;
+      const b = parseInt(rawValues[2], 10) || 0;
+      // Her hâlükârda dışarıdan gelen `opacity` ile override edelim
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    }
+
+    // 3) "#" ile başlayan (HEX) formatları işle
+    if (color.startsWith("#")) {
+      let r = 0,
+        g = 0,
+        b = 0;
+
+      // => #rgb  (3 hane)
+      if (color.length === 4) {
+        // #abc -> r=aa, g=bb, b=cc
+        r = parseInt(color[1] + color[1], 16);
+        g = parseInt(color[2] + color[2], 16);
+        b = parseInt(color[3] + color[3], 16);
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+      }
+
+      // => #rgba (4 hane)
+      else if (color.length === 5) {
+        // #abcf -> r=aa, g=bb, b=cc, a=ff (ama biz alpha’yı yok sayıp dışarıdan gelen opacity'yi kullanacağız)
+        r = parseInt(color[1] + color[1], 16);
+        g = parseInt(color[2] + color[2], 16);
+        b = parseInt(color[3] + color[3], 16);
+        // color[4] + color[4] => alpha. Ama override ediyoruz.
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+      }
+
+      // => #rrggbb (6 hane)
+      else if (color.length === 7) {
+        r = parseInt(color.slice(1, 3), 16);
+        g = parseInt(color.slice(3, 5), 16);
+        b = parseInt(color.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+      }
+
+      // => #rrggbbaa (8 hane)
+      else if (color.length === 9) {
+        // #ff0000c9 gibi
+        r = parseInt(color.slice(1, 3), 16);
+        g = parseInt(color.slice(3, 5), 16);
+        b = parseInt(color.slice(5, 7), 16);
+        // Son 2 karakter alpha’ya denk geliyor ama biz fonksiyon parametresini kullanıyoruz.
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+      }
+    }
+
+    // 4) Hiçbir formata uymuyorsa default dön
+    return `rgba(0, 0, 0, ${opacity})`;
+  }
+
+  const isEmriTipiRenk = watch("isEmriTipiRenk");
 
   return (
     <div>
@@ -81,6 +150,46 @@ export default function EditTabs() {
                 </Checkbox>
               )}
             />
+          </div>
+        </div>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+          maxWidth: "418px",
+          gap: "10px",
+          rowGap: "0px",
+          marginBottom: "10px",
+        }}
+      >
+        <Text style={{ fontSize: "14px" }}>Görünüm:</Text>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              maxWidth: "300px",
+              minWidth: "300px",
+              gap: "10px",
+              width: "100%",
+            }}
+          >
+            <div>
+              <Tag
+                style={{
+                  backgroundColor: hexToRGBA(isEmriTipiRenk ? isEmriTipiRenk : "#000000", 0.2),
+                  border: `1.2px solid ${hexToRGBA(isEmriTipiRenk ? isEmriTipiRenk : "#000000", 0.7)}`,
+                  color: isEmriTipiRenk ? isEmriTipiRenk : "#000000",
+                }}
+              >
+                {watch("isEmriTipiTanim")}
+              </Tag>
+            </div>
           </div>
         </div>
       </div>
