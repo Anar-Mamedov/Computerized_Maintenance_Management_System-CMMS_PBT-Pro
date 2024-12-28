@@ -121,29 +121,71 @@ const MainTable = () => {
 
   const [selectedRows, setSelectedRows] = useState([]);
 
-  function hexToRGBA(hex, opacity) {
-    // hex veya opacity null ise hata döndür
-    if (hex === null || opacity === null) {
-      // console.error("hex veya opacity null olamaz!");
-      return; // veya uygun bir varsayılan değer döndürebilirsiniz
+  function hexToRGBA(color, opacity) {
+    // 1) Geçersiz parametreleri engelle
+    if (!color || color.trim() === "" || opacity == null) {
+      // Boş ya da null renk için boş değer döndürelim
+      return;
     }
 
-    let r = 0,
-      g = 0,
-      b = 0;
-    // 3 karakterli hex kodunu kontrol et
-    if (hex.length === 4) {
-      r = parseInt(hex[1] + hex[1], 16);
-      g = parseInt(hex[2] + hex[2], 16);
-      b = parseInt(hex[3] + hex[3], 16);
+    // 2) rgb(...) veya rgba(...) formatını yakala
+    if (color.startsWith("rgb(") || color.startsWith("rgba(")) {
+      // Örnek: "rgb(0,123,255)" -> ["0","123","255"]
+      // Örnek: "rgba(255,0,0,0.96)" -> ["255","0","0","0.96"]
+      const rawValues = color.replace(/^rgba?\(|\s+|\)$/g, "").split(",");
+      const r = parseInt(rawValues[0], 10) || 0;
+      const g = parseInt(rawValues[1], 10) || 0;
+      const b = parseInt(rawValues[2], 10) || 0;
+      // Her hâlükârda dışarıdan gelen `opacity` ile override edelim
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
     }
-    // 6 karakterli hex kodunu kontrol et
-    else if (hex.length === 7) {
-      r = parseInt(hex[1] + hex[2], 16);
-      g = parseInt(hex[3] + hex[4], 16);
-      b = parseInt(hex[5] + hex[6], 16);
+
+    // 3) "#" ile başlayan (HEX) formatları işle
+    if (color.startsWith("#")) {
+      let r = 0,
+        g = 0,
+        b = 0;
+
+      // => #rgb  (3 hane)
+      if (color.length === 4) {
+        // #abc -> r=aa, g=bb, b=cc
+        r = parseInt(color[1] + color[1], 16);
+        g = parseInt(color[2] + color[2], 16);
+        b = parseInt(color[3] + color[3], 16);
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+      }
+
+      // => #rgba (4 hane)
+      else if (color.length === 5) {
+        // #abcf -> r=aa, g=bb, b=cc, a=ff (ama biz alpha’yı yok sayıp dışarıdan gelen opacity'yi kullanacağız)
+        r = parseInt(color[1] + color[1], 16);
+        g = parseInt(color[2] + color[2], 16);
+        b = parseInt(color[3] + color[3], 16);
+        // color[4] + color[4] => alpha. Ama override ediyoruz.
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+      }
+
+      // => #rrggbb (6 hane)
+      else if (color.length === 7) {
+        r = parseInt(color.slice(1, 3), 16);
+        g = parseInt(color.slice(3, 5), 16);
+        b = parseInt(color.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+      }
+
+      // => #rrggbbaa (8 hane)
+      else if (color.length === 9) {
+        // #ff0000c9 gibi
+        r = parseInt(color.slice(1, 3), 16);
+        g = parseInt(color.slice(3, 5), 16);
+        b = parseInt(color.slice(5, 7), 16);
+        // Son 2 karakter alpha’ya denk geliyor ama biz fonksiyon parametresini kullanıyoruz.
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+      }
     }
-    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+
+    // 4) Hiçbir formata uymuyorsa default dön
+    return `rgba(0, 0, 0, ${opacity})`;
   }
 
   // Özel Alanların nameleri backend çekmek için api isteği
@@ -172,11 +214,40 @@ const MainTable = () => {
       title: "İş Emri Tipleri",
       dataIndex: "IMT_TANIM",
       key: "IMT_TANIM",
-      width: "100%",
+      width: 180,
       ellipsis: true,
       visible: true,
       render: (text, record) => (
         <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
+      ),
+      sorter: (a, b) => {
+        if (a.IMT_TANIM === b.IMT_TANIM) return 0;
+        if (a.IMT_TANIM === null || a.IMT_TANIM === undefined) return -1;
+        if (b.IMT_TANIM === null || b.IMT_TANIM === undefined) return 1;
+        return a.IMT_TANIM.localeCompare(b.IMT_TANIM);
+      },
+    },
+
+    {
+      title: "Tip Renkleri",
+      dataIndex: "IMT_TANIM",
+      key: "TipRenkleri",
+      width: 180,
+      ellipsis: true,
+      visible: true,
+      align: "left",
+      render: (text, record) => (
+        <div>
+          <Tag
+            style={{
+              backgroundColor: hexToRGBA(record.IMT_RENK_WEB_VERSION ? record.IMT_RENK_WEB_VERSION : "#000000", 0.2),
+              border: `1.2px solid ${hexToRGBA(record.IMT_RENK_WEB_VERSION ? record.IMT_RENK_WEB_VERSION : "#000000", 0.7)}`,
+              color: record.IMT_RENK_WEB_VERSION ? record.IMT_RENK_WEB_VERSION : "#000000",
+            }}
+          >
+            {text}
+          </Tag>
+        </div>
       ),
       sorter: (a, b) => {
         if (a.IMT_TANIM === b.IMT_TANIM) return 0;

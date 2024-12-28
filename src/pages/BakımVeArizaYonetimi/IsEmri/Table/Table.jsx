@@ -139,8 +139,9 @@ const MainTable = () => {
 
   function hexToRGBA(color, opacity) {
     // 1) Geçersiz parametreleri engelle
-    if (!color || opacity == null) {
-      return "rgba(0, 0, 0, 1)";
+    if (!color || color.trim() === "" || opacity == null) {
+      // Boş ya da null renk için boş değer döndürelim
+      return;
     }
 
     // 2) rgb(...) veya rgba(...) formatını yakala
