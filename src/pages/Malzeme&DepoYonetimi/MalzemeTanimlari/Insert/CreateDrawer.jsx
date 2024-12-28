@@ -125,7 +125,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
       <ConfigProvider locale={tr_TR}>
         <Button
           type="primary"
-          // onClick={showModal}
+          onClick={showModal}
           style={{
             display: "flex",
             alignItems: "center",
@@ -135,9 +135,9 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
           Ekle
         </Button>
         <Modal
-          width="600px"
+          width={1200}
           centered
-          title={t("kullaniciTanimlama")}
+          title={t("malzemeEkleme")}
           destroyOnClose
           open={open}
           onCancel={onClose}

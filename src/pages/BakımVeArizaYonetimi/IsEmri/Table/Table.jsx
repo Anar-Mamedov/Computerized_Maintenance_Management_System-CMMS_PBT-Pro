@@ -137,29 +137,53 @@ const MainTable = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [xlsxLoading, setXlsxLoading] = useState(false);
 
-  function hexToRGBA(hex, opacity) {
-    // hex veya opacity null ise hata döndür
-    if (hex === null || opacity === null) {
-      // console.error("hex veya opacity null olamaz!");
-      return; // veya uygun bir varsayılan değer döndürebilirsiniz
+  function hexToRGBA(color, opacity) {
+    // Geçersiz ya da boş parametreleri önlemek için kontrol
+    if (!color || opacity == null) {
+      // Uygun bir varsayılan değer döndürün veya hata fırlatın
+      return "rgba(0, 0, 0, 1)";
     }
 
-    let r = 0,
-      g = 0,
-      b = 0;
-    // 3 karakterli hex kodunu kontrol et
-    if (hex.length === 4) {
-      r = parseInt(hex[1] + hex[1], 16);
-      g = parseInt(hex[2] + hex[2], 16);
-      b = parseInt(hex[3] + hex[3], 16);
+    // Eğer color zaten 'rgba(...)' veya 'rgb(...)' formatında ise
+    if (color.startsWith("rgb(") || color.startsWith("rgba(")) {
+      // "rgb(" veya "rgba(" ifadesini, parantezi, boşlukları vs. ayıklayalım
+      // Örn: "rgb(0,123,255)" -> ["0", "123", "255"]
+      // Örn: "rgba(255,0,0,0.96)" -> ["255", "0", "0", "0.96"]
+      const rawValues = color.replace(/^rgba?\(|\s+|\)$/g, "").split(",");
+
+      const r = parseInt(rawValues[0], 10) || 0;
+      const g = parseInt(rawValues[1], 10) || 0;
+      const b = parseInt(rawValues[2], 10) || 0;
+      // Orijinal renk "rgba" ise 4. eleman zaten alpha; ama biz
+      // buraya dışarıdan gelen 'opacity' değerini kullanacağız.
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
     }
-    // 6 karakterli hex kodunu kontrol et
-    else if (hex.length === 7) {
-      r = parseInt(hex[1] + hex[2], 16);
-      g = parseInt(hex[3] + hex[4], 16);
-      b = parseInt(hex[5] + hex[6], 16);
+    // Eğer color '#' ile başlıyorsa HEX formatındadır
+    else if (color.startsWith("#")) {
+      let r = 0,
+        g = 0,
+        b = 0;
+
+      // 3 karakterli hex (#fff) ise
+      if (color.length === 4) {
+        r = parseInt(color[1] + color[1], 16);
+        g = parseInt(color[2] + color[2], 16);
+        b = parseInt(color[3] + color[3], 16);
+      }
+      // 6 karakterli hex (#ffffff) ise
+      else if (color.length === 7) {
+        r = parseInt(color.slice(1, 3), 16);
+        g = parseInt(color.slice(3, 5), 16);
+        b = parseInt(color.slice(5, 7), 16);
+      }
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
     }
-    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+
+    // Yukarıdaki durumların hiçbiri değilse
+    // Varsayılan bir değer dönebiliriz ya da rengi olduğu gibi döndürebiliriz
+    // Ama yine de istenen opacity'i eklemek için 0,0,0 ile birlikte döndürülebilir
+    // Şimdilik sadece "rgba(0,0,0, opacity)" dönelim
+    return `rgba(0, 0, 0, ${opacity})`;
   }
 
   useEffect(() => {
