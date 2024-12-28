@@ -138,51 +138,68 @@ const MainTable = () => {
   const [xlsxLoading, setXlsxLoading] = useState(false);
 
   function hexToRGBA(color, opacity) {
-    // Geçersiz ya da boş parametreleri önlemek için kontrol
+    // 1) Geçersiz parametreleri engelle
     if (!color || opacity == null) {
-      // Uygun bir varsayılan değer döndürün veya hata fırlatın
       return "rgba(0, 0, 0, 1)";
     }
 
-    // Eğer color zaten 'rgba(...)' veya 'rgb(...)' formatında ise
+    // 2) rgb(...) veya rgba(...) formatını yakala
     if (color.startsWith("rgb(") || color.startsWith("rgba(")) {
-      // "rgb(" veya "rgba(" ifadesini, parantezi, boşlukları vs. ayıklayalım
-      // Örn: "rgb(0,123,255)" -> ["0", "123", "255"]
-      // Örn: "rgba(255,0,0,0.96)" -> ["255", "0", "0", "0.96"]
+      // Örnek: "rgb(0,123,255)" -> ["0","123","255"]
+      // Örnek: "rgba(255,0,0,0.96)" -> ["255","0","0","0.96"]
       const rawValues = color.replace(/^rgba?\(|\s+|\)$/g, "").split(",");
-
       const r = parseInt(rawValues[0], 10) || 0;
       const g = parseInt(rawValues[1], 10) || 0;
       const b = parseInt(rawValues[2], 10) || 0;
-      // Orijinal renk "rgba" ise 4. eleman zaten alpha; ama biz
-      // buraya dışarıdan gelen 'opacity' değerini kullanacağız.
+      // Her hâlükârda dışarıdan gelen `opacity` ile override edelim
       return `rgba(${r}, ${g}, ${b}, ${opacity})`;
     }
-    // Eğer color '#' ile başlıyorsa HEX formatındadır
-    else if (color.startsWith("#")) {
+
+    // 3) "#" ile başlayan (HEX) formatları işle
+    if (color.startsWith("#")) {
       let r = 0,
         g = 0,
         b = 0;
 
-      // 3 karakterli hex (#fff) ise
+      // => #rgb  (3 hane)
       if (color.length === 4) {
+        // #abc -> r=aa, g=bb, b=cc
         r = parseInt(color[1] + color[1], 16);
         g = parseInt(color[2] + color[2], 16);
         b = parseInt(color[3] + color[3], 16);
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
       }
-      // 6 karakterli hex (#ffffff) ise
+
+      // => #rgba (4 hane)
+      else if (color.length === 5) {
+        // #abcf -> r=aa, g=bb, b=cc, a=ff (ama biz alpha’yı yok sayıp dışarıdan gelen opacity'yi kullanacağız)
+        r = parseInt(color[1] + color[1], 16);
+        g = parseInt(color[2] + color[2], 16);
+        b = parseInt(color[3] + color[3], 16);
+        // color[4] + color[4] => alpha. Ama override ediyoruz.
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+      }
+
+      // => #rrggbb (6 hane)
       else if (color.length === 7) {
         r = parseInt(color.slice(1, 3), 16);
         g = parseInt(color.slice(3, 5), 16);
         b = parseInt(color.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
       }
-      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+
+      // => #rrggbbaa (8 hane)
+      else if (color.length === 9) {
+        // #ff0000c9 gibi
+        r = parseInt(color.slice(1, 3), 16);
+        g = parseInt(color.slice(3, 5), 16);
+        b = parseInt(color.slice(5, 7), 16);
+        // Son 2 karakter alpha’ya denk geliyor ama biz fonksiyon parametresini kullanıyoruz.
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+      }
     }
 
-    // Yukarıdaki durumların hiçbiri değilse
-    // Varsayılan bir değer dönebiliriz ya da rengi olduğu gibi döndürebiliriz
-    // Ama yine de istenen opacity'i eklemek için 0,0,0 ile birlikte döndürülebilir
-    // Şimdilik sadece "rgba(0,0,0, opacity)" dönelim
+    // 4) Hiçbir formata uymuyorsa default dön
     return `rgba(0, 0, 0, ${opacity})`;
   }
 
