@@ -20,7 +20,7 @@ export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
       title: "",
       dataIndex: "IMT_TANIM",
       key: "IMT_TANIM",
-      width: "150px",
+      width: 150,
       ellipsis: true,
     },
 
@@ -142,10 +142,7 @@ export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
     if (value) {
       const normalizedSearchTerm = normalizeText(value); // Arama terimini normalize et
       const filtered = data.filter((item) =>
-        Object.keys(item).some(
-          (key) =>
-            item[key] && normalizeText(item[key].toString()).toLowerCase().includes(normalizedSearchTerm.toLowerCase())
-        )
+        Object.keys(item).some((key) => item[key] && normalizeText(item[key].toString()).toLowerCase().includes(normalizedSearchTerm.toLowerCase()))
       );
       setFilteredData(filtered);
     } else {
@@ -181,17 +178,16 @@ export default function MainTabs({ onSelectedRow, isEmriTipiID }) {
         onChange={handleSearch}
         style={{ marginBottom: "-48px", zIndex: "2" }} // Arama kutusunun altındaki boşluk
       />
-      <Spin spinning={loading}>
-        <Table
-          columns={columns}
-          // rowSelection={rowSelection}
-          rowClassName={rowClassName}
-          dataSource={filteredData}
-          pagination={false}
-          onRow={onRowClick}
-          scroll={{ y: "500px" }}
-        />
-      </Spin>
+      <Table
+        columns={columns}
+        loading={loading}
+        // rowSelection={rowSelection}
+        rowClassName={rowClassName}
+        dataSource={filteredData}
+        pagination={false}
+        onRow={onRowClick}
+        scroll={{ y: "500px" }}
+      />
       <TipEkle onRefresh={refreshTableData} />
     </div>
   );
