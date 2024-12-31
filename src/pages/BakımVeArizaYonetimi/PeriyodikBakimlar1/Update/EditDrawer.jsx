@@ -565,7 +565,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       <ConfigProvider locale={tr_TR}>
         <Drawer
           width="1460px"
-          title="Periyodik Bakim Güncelle"
+          title={`Periyodik Bakim Güncelle [${selectedRow?.PBK_KOD} - ${selectedRow?.PBK_TANIM}]`}
           placement={"right"}
           onClose={handleDrawerClose}
           open={drawerVisible}
