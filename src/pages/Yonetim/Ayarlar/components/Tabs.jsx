@@ -10,6 +10,7 @@ import StokIslemleri from "./StokIslemleri/StokIslemleri";
 import MalzemeVeDepoYonteimi from "./MalzemeVeDepoYonteimi/MalzemeVeDepoYonteimi";
 import OtomatikKodlar from "./OtomatikKodlar/OtomatikKodlar";
 import YakitIslemleri from "./YakitIslemleri/YakitIslemleri";
+import BakimVeArizaYonetimi from "./BakimVeArizaYonetimi/BakimVeArizaYonetimi";
 
 const StyledTabs = styled(Tabs)`
   .ant-tabs-tab-active {
@@ -76,6 +77,16 @@ function AyarlarTabs() {
         </div>
       ),
       children: activeKey === "5" && <MalzemeVeDepoYonteimi />,
+    },
+    {
+      key: "6",
+      label: (
+        <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+          <DatabaseOutlined />
+          <div style={{ paddingTop: "2px" }}>{t("bakimVeArizaYonetimi")}</div>
+        </div>
+      ),
+      children: activeKey === "6" && <BakimVeArizaYonetimi />,
     },
     /* {
       key: "6",
