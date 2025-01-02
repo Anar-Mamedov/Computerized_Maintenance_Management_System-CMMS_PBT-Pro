@@ -13,50 +13,81 @@ function LokasyonYetkiler1() {
   const [expandedKeys, setExpandedKeys] = useState([]);
   const currentUserId = watch("siraNo");
 
+  // 1) Boş children'ları tamamen kaldıran helper fonksiyon
+  function removeEmptyChildren(dataArray) {
+    return dataArray.map((item) => {
+      // Eğer çocukları varsa (ve sayıları > 0 ise), onları da özyinelemeli (recursive) kontrol edelim
+      if (item.children && item.children.length > 0) {
+        item.children = removeEmptyChildren(item.children);
+      } else {
+        // children var ama boşsa -> property'yi tamamen sil
+        if (item.children) {
+          delete item.children;
+        }
+      }
+      return item;
+    });
+  }
+
+  // 2) Veriyi çeken ve buildTree ile işleyen fonksiyon
   const fetchData = async () => {
     setLoading(true);
     try {
       const response = await AxiosInstance.get(`GetLokasyonYetki?id=${currentUserId}`);
       if (response) {
         // Transform the flat data into a tree structure
-        const treeData = buildTree(response);
+        let treeData = buildTree(response);
+
+        // Boş children'ları sil => alt dalı olmayan node'lardan children property kalksın
+        treeData = removeEmptyChildren(treeData);
+
         setData(treeData);
-        setFilteredData(treeData); // Initialize filteredData with full data
-        setExpandedKeys([]); // Initialize expandedKeys as empty
-        setLoading(false);
+        setFilteredData(treeData);
+        setExpandedKeys([]);
       } else {
         console.error("API response is not in expected format");
-        setLoading(false);
       }
     } catch (error) {
       console.error("Veri çekme hatası:", error);
+    } finally {
       setLoading(false);
     }
   };
 
-  // Function to build the tree structure
-  const buildTree = (flatData) => {
-    const idMapping = flatData.reduce((acc, el, i) => {
-      acc[el.KLT_LOKASYON_ID] = i;
+  // 3) Ağaç yapısını oluşturan fonksiyon
+  function buildTree(flatData) {
+    // 3.1) Her kaydı "harita" benzeri bir yapıya atıyoruz
+    const recordMap = flatData.reduce((acc, item) => {
+      acc[item.KLT_LOKASYON_ID] = { ...item, children: [] };
       return acc;
     }, {});
 
-    let root = [];
-    flatData.forEach((el) => {
-      // Handle the root element
-      if (el.KLT_ANA_LOKASYON_ID === 0) {
-        root.push(el);
-        return;
-      }
-      // Use our mapping to locate the parent element in our data array
-      const parentEl = flatData[idMapping[el.KLT_ANA_LOKASYON_ID]];
-      // Add our current el to its parent's `children` array
-      parentEl.children = [...(parentEl.children || []), el];
-    });
-    return root;
-  };
+    // 3.2) Root olanları tutacağımız dizi
+    const rootList = [];
 
-  // Function to update KLT_GOR value in the data tree for the clicked node and its descendants
+    // 3.3) Tüm kayıtların parent/child ilişkisini kuralım
+    flatData.forEach((item) => {
+      const parentId = item.KLT_ANA_LOKASYON_ID;
+      const currentId = item.KLT_LOKASYON_ID;
+
+      if (parentId === 0) {
+        rootList.push(recordMap[currentId]);
+      } else {
+        const parentNode = recordMap[parentId];
+        if (parentNode) {
+          parentNode.children.push(recordMap[currentId]);
+        } else {
+          console.warn(`Parent (ID: ${parentId}) bulunamadı, bu kaydı root’a ekliyoruz:`, item);
+          rootList.push(recordMap[currentId]);
+        }
+      }
+    });
+
+    // 3.4) Root listesini döndür (iç içe children dizileriyle birlikte)
+    return rootList;
+  }
+
+  // 4) KLT_GOR güncelleme fonksiyonları
   const updateDataKLT_GOR = (dataArray, KLT_LOKASYON_ID, newKLT_GOR) => {
     return dataArray.map((item) => {
       if (item.KLT_LOKASYON_ID === KLT_LOKASYON_ID) {
@@ -73,7 +104,6 @@ function LokasyonYetkiler1() {
     });
   };
 
-  // Helper function to update KLT_GOR for all descendants
   const updateDataKLT_GORAll = (dataArray, newKLT_GOR) => {
     return dataArray.map((item) => {
       const updatedItem = { ...item, KLT_GOR: newKLT_GOR };
@@ -84,7 +114,7 @@ function LokasyonYetkiler1() {
     });
   };
 
-  // Function to get all descendants of a record, including the record itself
+  // 5) Bir record'un tüm alt dallarını (descendants) getiren fonksiyon
   const getAllDescendants = (record) => {
     let descendants = [record];
     if (record.children) {
@@ -95,13 +125,12 @@ function LokasyonYetkiler1() {
     return descendants;
   };
 
-  // Handler for toggling KLT_GOR for the record and its descendants
+  // 6) KLT_GOR toggle handler
   const handleToggleKLT_GOR = async (record) => {
     const newKLT_GOR = !record.KLT_GOR;
     const recordsToUpdate = getAllDescendants(record);
 
     try {
-      // Send API requests for each record and update the KLT_GOR value
       await Promise.all(
         recordsToUpdate.map((rec) => {
           const requestData = {
@@ -113,10 +142,10 @@ function LokasyonYetkiler1() {
         })
       );
 
-      // Update the state to reflect the changes
+      // State'i güncelle
       const updatedData = updateDataKLT_GOR(data, record.KLT_LOKASYON_ID, newKLT_GOR);
       setData(updatedData);
-      // Also update filteredData in case the data is filtered
+
       const updatedFilteredData = updateDataKLT_GOR(filteredData, record.KLT_LOKASYON_ID, newKLT_GOR);
       setFilteredData(updatedFilteredData);
     } catch (error) {
@@ -124,7 +153,7 @@ function LokasyonYetkiler1() {
     }
   };
 
-  // Helper function to collect all keys from the tree data
+  // 7) Tüm node ID'lerini toplayan fonksiyon
   const getAllKeys = (nodes) => {
     let keys = [];
     nodes.forEach((node) => {
@@ -136,13 +165,14 @@ function LokasyonYetkiler1() {
     return keys;
   };
 
-  // Search functionality
+  // 8) Arama (search) işlemi
   const handleSearch = () => {
     if (!searchValue) {
       setFilteredData(data);
-      setExpandedKeys([]); // Collapse all nodes when search is cleared
+      setExpandedKeys([]);
       return;
     }
+
     const filterTree = (nodes) => {
       return nodes
         .map((node) => {
@@ -154,14 +184,15 @@ function LokasyonYetkiler1() {
         })
         .filter((node) => node);
     };
+
     const filtered = filterTree(data);
     setFilteredData(filtered);
 
-    // Collect all keys from the filtered data to expand all nodes
     const allKeys = getAllKeys(filtered);
     setExpandedKeys(allKeys);
   };
 
+  // 9) Input değişim ve Enter ile arama
   const handleInputChange = (e) => {
     setSearchValue(e.target.value);
   };
@@ -172,28 +203,28 @@ function LokasyonYetkiler1() {
     }
   };
 
-  // New handler for expand/collapse events
+  // 10) Satır expand/collapse handler
   const handleExpand = (expanded, record) => {
     const key = record.KLT_LOKASYON_ID;
     let newExpandedKeys = [...expandedKeys];
 
     if (expanded) {
-      // If the row is expanded, add it to the expandedKeys array
       newExpandedKeys.push(key);
     } else {
-      // If the row is collapsed, remove it from the expandedKeys array
       newExpandedKeys = newExpandedKeys.filter((k) => k !== key);
     }
 
     setExpandedKeys(newExpandedKeys);
   };
 
+  // 11) Sayfa ilk yüklendiğinde / currentUserId değiştiğinde veriyi çek
   useEffect(() => {
     if (currentUserId) {
       fetchData();
     }
   }, [currentUserId]);
 
+  // 12) Tablonun kolonları
   const columns = [
     {
       title: "Lokasyon",
@@ -214,9 +245,9 @@ function LokasyonYetkiler1() {
         </Tag>
       ),
     },
-    // Add more columns if needed
   ];
 
+  // 13) Render
   return (
     <div>
       <div style={{ marginBottom: 16 }}>
@@ -232,8 +263,8 @@ function LokasyonYetkiler1() {
         scroll={{ y: "calc(100vh - 300px)" }}
         rowKey="KLT_LOKASYON_ID"
         pagination={false}
-        expandedRowKeys={expandedKeys} // Pass expanded row keys to expand the tree
-        onExpand={handleExpand} // Add the onExpand handler
+        expandedRowKeys={expandedKeys}
+        onExpand={handleExpand}
       />
     </div>
   );
