@@ -33,6 +33,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
         reset();
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("Ekleme Başarılı.");
+          fetch();
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
@@ -92,12 +93,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   return (
     <FormProvider {...methods}>
       <div>
-        <Modal
-          width="800px"
-          title="Malzeme Güncelle"
-          open={isModalVisible}
-          onOk={handleModalOk}
-          onCancel={onModalClose}>
+        <Modal width="800px" title="Malzeme Güncelle" open={isModalVisible} onOk={handleModalOk} onCancel={onModalClose}>
           <MainTabs />
         </Modal>
       </div>
