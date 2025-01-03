@@ -82,6 +82,7 @@ export default function MarkaEkle({ workshopSelectedId, onSubmit }) {
         reset();
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("Ekleme Başarılı.");
+          fetch();
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
@@ -104,13 +105,7 @@ export default function MarkaEkle({ workshopSelectedId, onSubmit }) {
   return (
     <div>
       <Button onClick={handleModalToggle}>+</Button>
-      <Modal
-        width="1200px"
-        centered
-        title="Marka Ekle"
-        open={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={handleModalToggle}>
+      <Modal width="1200px" centered title="Marka Ekle" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <div
           style={{
             display: "flex",
@@ -118,7 +113,8 @@ export default function MarkaEkle({ workshopSelectedId, onSubmit }) {
             width: "100%",
             marginBottom: "10px",
             justifyContent: "flex-end",
-          }}>
+          }}
+        >
           <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
             <Button type="primary" onClick={handleMarkaEkleModalToggle}>
               + Marka Ekle
@@ -129,12 +125,7 @@ export default function MarkaEkle({ workshopSelectedId, onSubmit }) {
             </Button>
           </div>
 
-          <Modal
-            title="Marka Ekle"
-            centered
-            open={isMarkaEkleModalVisible}
-            onOk={handleMarkaEkleModalOk}
-            onCancel={handleMarkaEkleModalToggle}>
+          <Modal title="Marka Ekle" centered open={isMarkaEkleModalVisible} onOk={handleMarkaEkleModalOk} onCancel={handleMarkaEkleModalToggle}>
             <Controller name="markaEkle" control={control} render={({ field }) => <Input {...field} />} />
           </Modal>
         </div>
