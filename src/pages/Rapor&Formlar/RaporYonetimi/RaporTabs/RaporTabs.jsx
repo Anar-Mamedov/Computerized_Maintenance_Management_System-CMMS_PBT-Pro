@@ -8,11 +8,13 @@ import {
   PieChartOutlined,
   ApartmentOutlined,
   WalletOutlined,
+  HomeOutlined,
 } from "@ant-design/icons";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../api/http.jsx";
-import RaporsTables from "./components/RaporsTables";
+import RaporsTables from "./components/RaporsTables.jsx";
+import { t } from "i18next";
 
 const { Text } = Typography;
 
@@ -73,7 +75,8 @@ export default function RaporTabs({ refreshKey, disabled, fieldRequirements }) {
 
   useEffect(() => {
     // fetch data from API
-    AxiosInstance.get("RaporGetir").then((response) => {
+    const lan = localStorage.getItem("i18nextLng") || "tr";
+    AxiosInstance.get(`RaporGetir?lan=${lan}`).then((response) => {
       // map over the data to create items
       const newItems = response.map((item) => ({
         key: item.RPR_RAPOR_GRUP_ID.toString(),
@@ -101,12 +104,7 @@ export default function RaporTabs({ refreshKey, disabled, fieldRequirements }) {
             </Text>
           </div>
         ),
-        children: (
-          <RaporsTables
-            tabKey={item.RPR_RAPOR_GRUP_ID.toString()}
-            tabName={item.RPG_ACIKLAMA}
-          />
-        ), // replace with actual component
+        children: <RaporsTables tabKey={item.RPR_RAPOR_GRUP_ID.toString()} tabName={item.RPG_ACIKLAMA} />, // replace with actual component
       }));
 
       // set the items
@@ -114,227 +112,19 @@ export default function RaporTabs({ refreshKey, disabled, fieldRequirements }) {
     });
   }, []);
 
-  // const items = [
-  //   {
-  //     key: "1",
-  //     label: (
-  //       <div
-  //         style={{
-  //           display: "flex",
-  //           alignItems: "center",
-  //           justifyContent: "space-between",
-  //         }}
-  //       >
-  //         <div style={{ marginRight: "10px" }}>
-  //           <ToolOutlined /> Bakım ve Arıza Raporları
-  //         </div>
-  //         <Text
-  //           style={{
-  //             display: "flex",
-  //             alignItems: "center",
-  //             justifyContent: "center",
-  //             borderRadius: "50%",
-  //             backgroundColor: "#e4e4e4",
-  //             minWidth: "20px",
-  //             height: "20px",
-  //           }}
-  //         >
-  //           10
-  //         </Text>
-  //       </div>
-  //     ),
-  //     children: <BakimVeArizaRaporlari />,
-  //   },
-  //   {
-  //     key: "2",
-  //     label: (
-  //       <div
-  //         style={{
-  //           display: "flex",
-  //           alignItems: "center",
-  //           justifyContent: "space-between",
-  //         }}
-  //       >
-  //         <div style={{ marginRight: "10px" }}>
-  //           <PieChartOutlined /> Finans Raporları
-  //         </div>
-  //         <Text
-  //           style={{
-  //             display: "flex",
-  //             alignItems: "center",
-  //             justifyContent: "center",
-  //             borderRadius: "50%",
-  //             backgroundColor: "#e4e4e4",
-  //             minWidth: "20px",
-  //             height: "20px",
-  //           }}
-  //         >
-  //           3
-  //         </Text>
-  //       </div>
-  //     ),
-  //     children: <div>Test</div>,
-  //   },
-  //   {
-  //     key: "3",
-  //     label: (
-  //       <div
-  //         style={{
-  //           display: "flex",
-  //           alignItems: "center",
-  //           justifyContent: "space-between",
-  //         }}
-  //       >
-  //         <div style={{ marginRight: "10px" }}>
-  //           <ApartmentOutlined /> Makine ve Ekipman Raporları
-  //         </div>
-  //         <Text
-  //           style={{
-  //             display: "flex",
-  //             alignItems: "center",
-  //             justifyContent: "center",
-  //             borderRadius: "50%",
-  //             backgroundColor: "#e4e4e4",
-  //             minWidth: "20px",
-  //             height: "20px",
-  //           }}
-  //         >
-  //           5
-  //         </Text>
-  //       </div>
-  //     ),
-  //     children: <div>Test</div>,
-  //   },
-  //   {
-  //     key: "4",
-  //     label: (
-  //       <div
-  //         style={{
-  //           display: "flex",
-  //           alignItems: "center",
-  //           justifyContent: "space-between",
-  //         }}
-  //       >
-  //         <div style={{ marginRight: "10px" }}>
-  //           <ProductOutlined /> Malzeme Raporları
-  //         </div>
-  //         <Text
-  //           style={{
-  //             display: "flex",
-  //             alignItems: "center",
-  //             justifyContent: "center",
-  //             borderRadius: "50%",
-  //             backgroundColor: "#e4e4e4",
-  //             minWidth: "20px",
-  //             height: "20px",
-  //           }}
-  //         >
-  //           2
-  //         </Text>
-  //       </div>
-  //     ),
-  //     children: <div>Test</div>,
-  //   },
-  //   {
-  //     key: "5",
-  //     label: (
-  //       <div
-  //         style={{
-  //           display: "flex",
-  //           alignItems: "center",
-  //           justifyContent: "space-between",
-  //         }}
-  //       >
-  //         <div style={{ marginRight: "10px" }}>
-  //           <SolutionOutlined /> Personel Raporları
-  //         </div>
-  //         <Text
-  //           style={{
-  //             display: "flex",
-  //             alignItems: "center",
-  //             justifyContent: "center",
-  //             borderRadius: "50%",
-  //             backgroundColor: "#e4e4e4",
-  //             minWidth: "20px",
-  //             height: "20px",
-  //           }}
-  //         >
-  //           3
-  //         </Text>
-  //       </div>
-  //     ),
-  //     children: <div>Test</div>,
-  //   },
-  //   {
-  //     key: "6",
-  //     label: (
-  //       <div
-  //         style={{
-  //           display: "flex",
-  //           alignItems: "center",
-  //           justifyContent: "space-between",
-  //         }}
-  //       >
-  //         <div style={{ marginRight: "10px" }}>
-  //           <FundProjectionScreenOutlined /> Proje ve Şantiye Raporları
-  //         </div>
-  //         <Text
-  //           style={{
-  //             display: "flex",
-  //             alignItems: "center",
-  //             justifyContent: "center",
-  //             borderRadius: "50%",
-  //             backgroundColor: "#e4e4e4",
-  //             minWidth: "20px",
-  //             height: "20px",
-  //           }}
-  //         >
-  //           4
-  //         </Text>
-  //       </div>
-  //     ),
-  //     children: <div>Test</div>,
-  //   },
-  //   {
-  //     key: "7",
-  //     label: (
-  //       <div
-  //         style={{
-  //           display: "flex",
-  //           alignItems: "center",
-  //           justifyContent: "space-between",
-  //         }}
-  //       >
-  //         <div style={{ marginRight: "10px" }}>
-  //           <WalletOutlined /> Satınalma Raporları
-  //         </div>
-  //         <Text
-  //           style={{
-  //             display: "flex",
-  //             alignItems: "center",
-  //             justifyContent: "center",
-  //             borderRadius: "50%",
-  //             backgroundColor: "#e4e4e4",
-  //             minWidth: "20px",
-  //             height: "20px",
-  //           }}
-  //         >
-  //           1
-  //         </Text>
-  //       </div>
-  //     ),
-  //     children: <div>Test</div>,
-  //   },
-  // ];
-
   return (
     <div>
-      <StyledTabs
-        tabPosition="left"
-        defaultActiveKey="1"
-        items={items}
-        onChange={onChange}
-      />
+      <div
+        style={{
+          backgroundColor: "white",
+          padding: "10px",
+          height: "calc(100vh - 115px)",
+          borderRadius: "8px 8px 8px 8px",
+          filter: "drop-shadow(0px 2px 4px rgba(0,0,0,0.1))",
+        }}
+      >
+        <StyledTabs tabPosition="left" defaultActiveKey="1" items={items} onChange={onChange} />
+      </div>
     </div>
   );
 }
