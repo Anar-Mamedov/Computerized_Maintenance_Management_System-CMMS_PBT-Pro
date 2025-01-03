@@ -157,7 +157,7 @@ export default function Header() {
           };
           // API isteğini gönder
           const response = await AxiosInstance.post(`IsEmriOlustur`, body);
-          console.log("İşlem başarılı:", response);
+          // console.log("İşlem başarılı:", response);
 
           if (response.status_code === 200 || response.status_code === 201) {
             isError = false;
@@ -187,7 +187,7 @@ export default function Header() {
     }
   }, [otomatikIsEmirleriListe]);
 
-  console.log(otomatikIsEmirleriListe);
+  // console.log(otomatikIsEmirleriListe);
 
   return (
     <div

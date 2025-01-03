@@ -168,7 +168,7 @@ function RaporsTables({ tabKey, tabName }) {
       </div>
 
       {/* Detail Modal */}
-      <RaporModal selectedRow={drawer} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
+      <RaporModal selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
     </div>
   );
 }

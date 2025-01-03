@@ -10,6 +10,7 @@ import * as XLSX from "xlsx";
 import { SiMicrosoftexcel } from "react-icons/si";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import Filters from "./components/Filters.jsx";
 
 dayjs.extend(customParseFormat); // Enable custom date formats
 
@@ -34,49 +35,34 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
   const [manageColumnsVisible, setManageColumnsVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [columnFilters, setColumnFilters] = useState({});
+  const [filters, setFilters] = useState({});
 
   const searchInput = useRef(null);
+  const lan = localStorage.getItem("i18nextLng") || "tr";
+
+  useEffect(() => {
+    if (Object.keys(filters).length > 0) {
+      fetchLists();
+    }
+  }, [filters]);
+
+  const handleFilterSubmit = (values) => {
+    setFilters([values]);
+  };
+
+  const fetchFilters = async () => {
+    try {
+      const response = await AxiosInstance.get(`RaporFiltreListele?RaporID=${selectedRow.key}`);
+      setFilters(response);
+    } catch (error) {
+      console.error("Filtreler yüklenirken bir hata oluştu:", error);
+    }
+  };
 
   useEffect(() => {
     if (drawerVisible && selectedRow) {
       setLoading(true);
-      const lan = localStorage.getItem("i18nextLng") || "tr";
-      AxiosInstance.get("RaporGetirBy", {
-        params: { id: selectedRow.key, lan: lan },
-      })
-        .then((response) => {
-          const { headers, list } = response.data;
-          if (headers && headers.length > 0) {
-            const cols = headers.map((header) => {
-              // Calculate width based on header length
-              const headerLength = header.title.length;
-              const width = Math.max(headerLength * 10, 150); // Adjust multiplier and default as needed
-
-              return {
-                title: header.title,
-                dataIndex: header.dataIndex,
-                key: header.dataIndex,
-                visible: header.visible,
-                width: width, // Set width based on header length
-                isDate: header.isDate,
-                isYear: header.isYear,
-                isHour: header.isHour,
-                isNumber: header.isNumber,
-              };
-            });
-
-            setInitialColumns(cols);
-            setColumns(cols);
-            setTableData(list);
-            setOriginalData(list);
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching detail:", error);
-        })
-        .finally(() => {
-          setLoading(false); // Stop spinner after data is loaded or error occurs
-        });
+      fetchFilters();
     } else {
       // Reset when modal is closed
       setTableData([]);
@@ -84,8 +70,51 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
       setInitialColumns([]);
       setColumns([]);
       setColumnFilters({});
+      setFilters({});
     }
   }, [drawerVisible, selectedRow]);
+
+  const fetchLists = async () => {
+    setLoading(true);
+    AxiosInstance.post("GetReportDetail", {
+      id: selectedRow.key,
+      lan: lan,
+      ...filters[0],
+    })
+      .then((response) => {
+        const { headers, list } = response;
+        if (headers && headers.length > 0) {
+          const cols = headers.map((header) => {
+            // Calculate width based on header length
+            const headerLength = header.title.length;
+            const width = Math.max(headerLength * 10, 150); // Adjust multiplier and default as needed
+
+            return {
+              title: header.title,
+              dataIndex: header.dataIndex,
+              key: header.dataIndex,
+              visible: header.visible,
+              width: width, // Set width based on header length
+              isDate: header.isDate,
+              isYear: header.isYear,
+              isHour: header.isHour,
+              isNumber: header.isNumber,
+            };
+          });
+
+          setInitialColumns(cols);
+          setColumns(cols);
+          setTableData(list);
+          setOriginalData(list);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching detail:", error);
+      })
+      .finally(() => {
+        setLoading(false); // Stop spinner after data is loaded or error occurs
+      });
+  };
 
   const visibleColumns = useMemo(() => columns.filter((col) => col.visible), [columns]);
 
@@ -530,12 +559,14 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
       const isFiltered = (typeof val === "string" && val !== "") || (typeof val === "object" && val !== null && (val.start !== "" || val.end !== ""));
       return <SearchOutlined style={{ color: isFiltered ? "#1890ff" : undefined }} />;
     },
-    onFilterDropdownOpenChange: (visible) => {
-      const column = columns.find((col) => col.key === dataIndex);
-      if (visible && !column?.isDate && !column?.isYear && !column?.isNumber) {
-        // Exclude date, year, and number columns from auto-select
-        setTimeout(() => searchInput.current?.select(), 100);
-      }
+    filterDropdownProps: {
+      onOpenChange: (visible) => {
+        const column = columns.find((col) => col.key === dataIndex);
+        if (visible && !column?.isDate && !column?.isYear && !column?.isNumber) {
+          // Exclude date, year, and number columns from auto-select
+          setTimeout(() => searchInput.current?.select(), 100);
+        }
+      },
     },
   });
 
@@ -598,7 +629,7 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
 
   return (
     <>
-      <Modal title={selectedRow?.rprTanim} open={drawerVisible} onCancel={handleRecordModalClose} footer={null} width="90%">
+      <Modal destroyOnClose title={selectedRow?.RPR_TANIM} open={drawerVisible} onCancel={handleRecordModalClose} footer={null} width="90%">
         <div
           style={{
             marginBottom: "10px",
@@ -606,9 +637,13 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
             justifyContent: "space-between",
           }}
         >
-          <Button style={{ padding: "0px", width: "32px", height: "32px" }} onClick={() => setManageColumnsVisible(true)}>
-            <MenuOutlined />
-          </Button>
+          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+            <Button style={{ padding: "0px", width: "32px", height: "32px" }} onClick={() => setManageColumnsVisible(true)}>
+              <MenuOutlined />
+            </Button>
+            <Filters onSubmit={handleFilterSubmit} />
+          </div>
+
           <Button style={{ display: "flex", alignItems: "center" }} onClick={handleExportXLSX} icon={<SiMicrosoftexcel />}>
             İndir
           </Button>
