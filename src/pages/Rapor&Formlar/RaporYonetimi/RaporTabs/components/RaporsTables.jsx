@@ -1,43 +1,48 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Input, Modal, Spin, Table, Typography } from "antd";
+import { Input, Spin, Typography, Card, Pagination } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
-import Filters from "../components/Filters/Filters.jsx";
 import AxiosInstance from "../../../../../api/http.jsx";
-import RaporDetay from "./RaporDetay/RaporDetay.jsx";
-import dayjs from "dayjs";
+import RaporModal from "./RaporModal/RaporModal.jsx";
 
 const { Text } = Typography;
 
 function RaporsTables({ tabKey, tabName }) {
-  const { setValue, watch } = useFormContext();
+  const { setValue } = useFormContext();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
-  const [isFirstModalVisible, setIsFirstModalVisible] = useState(false);
-  const [isSecondModalVisible, setIsSecondModalVisible] = useState(false);
-  const [selectedRowData, setSelectedRowData] = useState(null); // Yeni state
+
+  // Drawer state for detail view
+  const [drawer, setDrawer] = useState({
+    visible: false,
+    data: null,
+  });
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1); // Current active page
+  const [pageSize, setPageSize] = useState(10); // Number of cards per page
 
   useEffect(() => {
     fetchEquipmentData();
-  }, []);
+  }, [tabKey]);
 
   const fetchEquipmentData = async () => {
     try {
       setLoading(true);
-      const response = await AxiosInstance.get(`RaporListele?RaporGrupID=${tabKey}`);
-      if (response) {
-        const formattedData = response.map((item) => {
-          return {
-            ...item,
-            key: item.TB_RAPOR_ID,
-          };
-        });
+      const lan = localStorage.getItem("i18nextLng") || "tr";
+      const response = await AxiosInstance.get(`RaporListele?RaporGrupID=${tabKey}&lan=${lan}`);
+      if (response && response) {
+        const formattedData = response.map((item) => ({
+          ...item,
+          key: item.TB_RAPOR_ID,
+        }));
         setData(formattedData);
         setLoading(false);
       } else {
         console.error("API response is not in expected format");
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error in API request:", error);
@@ -55,57 +60,31 @@ function RaporsTables({ tabKey, tabName }) {
   useEffect(() => {
     const filtered = data.filter((item) => normalizeString(item.RPR_TANIM).includes(normalizeString(searchTerm)));
     setFilteredData(filtered);
+    setCurrentPage(1); // Reset to first page on search
   }, [searchTerm, data]);
 
-  const handleRowClick = (record) => {
-    setValue("locationIds", "");
-    setValue("atolyeIds", "");
-    setValue("baslangicTarihi", "");
-    setValue("bitisTarihi", "");
-    setValue("resetField", 2);
-    setSelectedRowData(record); // Tıklanan satırın verilerini kaydet
-    setIsFirstModalVisible(true);
+  const refreshTableData = useCallback(() => {
+    fetchEquipmentData();
+  }, [tabKey]);
+
+  // Determine which data to display based on search
+  const displayData = searchTerm ? filteredData : data;
+
+  // Calculate the data to display on the current page
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const currentPageData = displayData.slice(startIndex, endIndex);
+
+  // Handler for page change
+  const handlePageChange = (page, size) => {
+    setCurrentPage(page);
+    setPageSize(size);
+    // Optionally, you can fetch new data here if you're implementing server-side pagination
   };
-
-  const handleFirstModalOk = () => {
-    setIsFirstModalVisible(false);
-    setIsSecondModalVisible(true);
-  };
-
-  const handleSecondModalOk = () => {
-    setIsSecondModalVisible(false);
-    setValue("locationIds", "");
-    setValue("atolyeIds", "");
-    setValue("baslangicTarihi", "");
-    setValue("bitisTarihi", "");
-  };
-
-  const handleSecondModalCancel = () => {
-    setIsSecondModalVisible(false);
-    setValue("locationIds", "");
-    setValue("atolyeIds", "");
-    setValue("baslangicTarihi", "");
-    setValue("bitisTarihi", "");
-  };
-
-  const columns = [
-    {
-      title: "",
-      dataIndex: "RPR_TANIM",
-      key: "RPR_TANIM",
-      width: 150,
-      ellipsis: true,
-      render: (text, record) => <a onClick={() => handleRowClick(record)}>{text}</a>,
-    },
-  ];
-
-  const LokasyonId = watch("locationIds");
-  const AtolyeId = watch("atolyeIds");
-  const BaslangicTarih = watch("baslangicTarihi") ? dayjs(watch("baslangicTarihi")).format("DD/MM/YYYY") : null;
-  const BitisTarih = watch("bitisTarihi") ? dayjs(watch("bitisTarihi")).format("DD/MM/YYYY") : null;
 
   return (
     <div>
+      {/* Search input and header */}
       <div
         style={{
           display: "flex",
@@ -125,42 +104,71 @@ function RaporsTables({ tabKey, tabName }) {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
+          allowClear
         />
       </div>
+
       <Spin spinning={loading}>
-        <Table
-          columns={columns}
-          dataSource={searchTerm ? filteredData : data}
-          pagination={{
-            defaultPageSize: 10,
-            showSizeChanger: true,
-            pageSizeOptions: ["10", "20", "50", "100"],
-            position: ["bottomRight"],
-            showTotal: (total, range) => `Toplam ${total}`,
-            showQuickJumper: true,
+        {/* Card Grid Container */}
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "16px",
+            maxHeight: "calc(100vh - 250px)", // Adjust as needed
+            overflowY: "auto",
+            padding: "10px",
+            border: "1px solid #f0f0f0",
+            borderRadius: "8px",
+            backgroundColor: "#fafafa",
           }}
-          scroll={{ y: "calc(100vh - 380px)" }}
-        />
+        >
+          {currentPageData.length > 0 ? (
+            currentPageData.map((record) => (
+              <Card
+                key={record.key}
+                hoverable
+                style={{ width: 340, height: 150 }}
+                onClick={() => setDrawer({ visible: true, data: record })}
+                styles={{ body: { padding: "16px", display: "flex", flexDirection: "column" } }} // Updated prop
+              >
+                <Text strong ellipsis>
+                  {record.RPR_TANIM}
+                </Text>
+                <div style={{ height: "100px", overflowX: "auto" }}>
+                  <Text type="secondary" style={{ fontSize: "13px" }}>
+                    {record.RPR_ACIKLAMA}
+                  </Text>
+                </div>
+
+                {/* Add more fields as needed */}
+                {/* Example:
+                <p>{record.PBK_OZEL_ALAN_10}</p>
+                */}
+              </Card>
+            ))
+          ) : (
+            <Text type="secondary">No data found.</Text>
+          )}
+        </div>
       </Spin>
-      <Modal title="Rapor İçin Filtreleme Yap" open={isFirstModalVisible} onOk={handleFirstModalOk} onCancel={() => setIsFirstModalVisible(false)}>
-        <Filters />
-      </Modal>
-      <Modal
-        title={
-          selectedRowData
-            ? `${selectedRowData.RPR_TANIM} - Lokasyon: ${LokasyonId ? LokasyonId : ""}, Atölye: ${AtolyeId ? AtolyeId : ""}, Başlangıç Tarihi: ${
-                BaslangicTarih ? BaslangicTarih : ""
-              }, Bitiş Tarihi: ${BitisTarih ? BitisTarih : ""}`
-            : null
-        }
-        destroyOnClose
-        width="1400px"
-        open={isSecondModalVisible}
-        onOk={handleSecondModalOk}
-        onCancel={handleSecondModalCancel}
-      >
-        <RaporDetay selectedRowData={selectedRowData} />
-      </Modal>
+
+      {/* Pagination Component */}
+      <div style={{ display: "flex", marginTop: "20px", textAlign: "right", justifyContent: "flex-end" }}>
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={displayData.length}
+          onChange={handlePageChange}
+          onShowSizeChange={handlePageChange}
+          showSizeChanger
+          pageSizeOptions={["5", "10", "20", "50"]}
+          showTotal={(total, range) => `Toplam ${total} kayıt`}
+        />
+      </div>
+
+      {/* Detail Modal */}
+      <RaporModal selectedRow={drawer} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
     </div>
   );
 }
