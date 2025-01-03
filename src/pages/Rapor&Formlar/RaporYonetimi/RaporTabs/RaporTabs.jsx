@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Tabs, Typography } from "antd";
+import { Tabs, Typography, Button, Modal, Input, message } from "antd";
 import {
   ToolOutlined,
   FundProjectionScreenOutlined,
@@ -72,10 +72,26 @@ const StyledTabs = styled(Tabs)`
 export default function RaporTabs({ refreshKey, disabled, fieldRequirements }) {
   const { watch } = useFormContext();
   const [items, setItems] = useState([]); // state to hold the items
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newGroupName, setNewGroupName] = useState("");
+  const lan = localStorage.getItem("i18nextLng") || "tr";
 
-  useEffect(() => {
-    // fetch data from API
-    const lan = localStorage.getItem("i18nextLng") || "tr";
+  const handleAddGroup = async () => {
+    try {
+      await AxiosInstance.post("RaporGrupAdd", {
+        RPG_ACIKLAMA: newGroupName,
+      });
+      message.success("Yeni grup başarıyla eklendi");
+      setIsModalOpen(false);
+      setNewGroupName("");
+      // Grupları yeniden yükle
+      fetchData();
+    } catch (error) {
+      message.error("Grup eklenirken bir hata oluştu");
+    }
+  };
+
+  const fetchData = async () => {
     AxiosInstance.get(`RaporGetir?lan=${lan}`).then((response) => {
       // map over the data to create items
       const newItems = response.map((item) => ({
@@ -110,21 +126,33 @@ export default function RaporTabs({ refreshKey, disabled, fieldRequirements }) {
       // set the items
       setItems(newItems);
     });
+  };
+
+  useEffect(() => {
+    // fetch data from API
+    fetchData();
   }, []);
 
   return (
     <div>
-      <div
-        style={{
-          backgroundColor: "white",
-          padding: "10px",
-          height: "calc(100vh - 115px)",
-          borderRadius: "8px 8px 8px 8px",
-          filter: "drop-shadow(0px 2px 4px rgba(0,0,0,0.1))",
+      <div style={{ width: "316px", display: "flex", justifyContent: "center" }}>
+        <Button type="primary" onClick={() => setIsModalOpen(true)} style={{ marginBottom: "10px" }}>
+          Rapor Grubu Ekle
+        </Button>
+      </div>
+      <StyledTabs tabPosition="left" defaultActiveKey="1" items={items} onChange={onChange} />
+
+      <Modal
+        title="Yeni Rapor Grubu Ekle"
+        open={isModalOpen}
+        onOk={handleAddGroup}
+        onCancel={() => {
+          setIsModalOpen(false);
+          setNewGroupName("");
         }}
       >
-        <StyledTabs tabPosition="left" defaultActiveKey="1" items={items} onChange={onChange} />
-      </div>
+        <Input placeholder="Rapor Grubu Adı" value={newGroupName} onChange={(e) => setNewGroupName(e.target.value)} />
+      </Modal>
     </div>
   );
 }
