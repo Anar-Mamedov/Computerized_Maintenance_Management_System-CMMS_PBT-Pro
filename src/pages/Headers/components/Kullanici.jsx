@@ -30,8 +30,11 @@ export default function Header() {
   // Çıkış işlevini tanımla
   const handleLogout = () => {
     localStorage.removeItem("token"); // localStorage'dan token'i sil
+    sessionStorage.removeItem("token"); // sessionStorage'dan token'i sil
     localStorage.removeItem("user"); // localStorage'dan kullanıcıyı sil
+    sessionStorage.removeItem("user"); // sessionStorage'dan kullanıcıyı sil
     localStorage.removeItem("login"); // localStorage'dan login'i sil
+    sessionStorage.removeItem("login"); // sessionStorage'dan login'i sil
     navigate("/auth"); // `/login` sayfasına yönlendir
     // window.location.reload(); // Sayfayı yenile
   };
@@ -98,12 +101,9 @@ export default function Header() {
         try {
           setLoadingImage(true); // Resim yüklenmeye başladığında loadingImage'i true yap
           // responseType olarak 'blob' seçilir.
-          const response = await AxiosInstance.get(
-            `ResimGetirById?id=${userData1?.PRS_RESIM_ID}`,
-            {
-              responseType: "blob",
-            }
-          );
+          const response = await AxiosInstance.get(`ResimGetirById?id=${userData1?.PRS_RESIM_ID}`, {
+            responseType: "blob",
+          });
           // Yanıttaki blob verisi bir URL'ye dönüştürülür.
           const imageBlob = response;
           const imageObjectURL = URL.createObjectURL(imageBlob);
@@ -139,10 +139,7 @@ export default function Header() {
         alignItems: "flex-start",
       }}
     >
-      <div
-        style={{ display: "flex", gap: "5px", cursor: "pointer" }}
-        onClick={() => navigate("/User")}
-      >
+      <div style={{ display: "flex", gap: "5px", cursor: "pointer" }} onClick={() => navigate("/User")}>
         <UserOutlined style={{ fontSize: "12px" }} />
         Profil
       </div>
@@ -154,10 +151,7 @@ export default function Header() {
       {/*  Hesabı Düzenle*/}
       {/*</div>*/}
       {/* Çıkış düğmesine onClick olayı ekle */}
-      <div
-        style={{ display: "flex", gap: "5px", cursor: "pointer" }}
-        onClick={handleLogout}
-      >
+      <div style={{ display: "flex", gap: "5px", cursor: "pointer" }} onClick={handleLogout}>
         <LogoutOutlined style={{ fontSize: "12px" }} />
         Çıkış
       </div>
@@ -166,13 +160,7 @@ export default function Header() {
 
   return (
     <div>
-      <Popover
-        placement="bottom"
-        content={content}
-        trigger="click"
-        open={open}
-        onOpenChange={handleOpenChange}
-      >
+      <Popover placement="bottom" content={content} trigger="click" open={open} onOpenChange={handleOpenChange}>
         <div
           style={{
             display: "flex",
@@ -188,9 +176,7 @@ export default function Header() {
               alignItems: "flex-end",
             }}
           >
-            <Text style={{ fontWeight: "500" }}>
-              {userData1?.KLL_TANIM || "Bilinmiyor"}
-            </Text>
+            <Text style={{ fontWeight: "500" }}>{userData1?.KLL_TANIM || "Bilinmiyor"}</Text>
             <Text type="secondary">{userData1?.PRS_UNVAN || ""}</Text>
           </div>
           <Avatar

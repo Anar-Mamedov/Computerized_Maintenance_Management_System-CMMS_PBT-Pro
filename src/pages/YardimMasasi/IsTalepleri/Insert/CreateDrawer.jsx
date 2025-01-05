@@ -13,7 +13,7 @@ export default function CreateDrawer({ onRefresh }) {
   const [open, setOpen] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [userData, setUserData] = useState(() => {
-    const savedUser = localStorage.getItem("user");
+    const savedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
   // API'den gelen zorunluluk bilgilerini simüle eden bir örnek

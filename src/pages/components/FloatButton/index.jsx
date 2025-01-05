@@ -42,7 +42,7 @@ const FloatButton = () => {
 
   useEffect(() => {
     const storedValue = localStorage.getItem("baseURL");
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = JSON.parse(localStorage.getItem("user")) || JSON.parse(sessionStorage.getItem("user"));
     if (storedValue && user) {
       setBaseURL(storedValue);
       setUserInfo(user);

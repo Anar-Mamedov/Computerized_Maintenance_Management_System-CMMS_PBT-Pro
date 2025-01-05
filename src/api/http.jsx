@@ -1,8 +1,7 @@
 import axios from "axios";
 
 // `localStorage`'dan baseURL alınıyor
-const baseURL =
-  localStorage.getItem("baseURL") || import.meta.env.VITE_API_BASE_URL;
+const baseURL = localStorage.getItem("baseURL") || import.meta.env.VITE_API_BASE_URL;
 
 const AxiosInstance = axios.create({
   baseURL: `${baseURL}/api/`, // baseURL artık dinamik
@@ -18,8 +17,11 @@ AxiosInstance.interceptors.response.use(
   function (error) {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
       localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
       localStorage.removeItem("login");
+      sessionStorage.removeItem("login");
       // localStorage.removeItem("userId");
       if (window.location.pathname !== "/auth") {
         window.location.href = "/auth"; // `/auth` sayfasına yönlendir
@@ -31,8 +33,8 @@ AxiosInstance.interceptors.response.use(
 );
 
 AxiosInstance.interceptors.request.use(function (request) {
-  const user = JSON.parse(localStorage.getItem("user"));
-  request.headers.Authorization = `Bearer ${localStorage.getItem("token")}`;
+  const user = JSON.parse(localStorage.getItem("user")) || JSON.parse(sessionStorage.getItem("user"));
+  request.headers.Authorization = `Bearer ${localStorage.getItem("token") || sessionStorage.getItem("token")}`;
   if (user) {
     // user objesi varsa
     request.headers["User-Id"] = user.userId; // User-Id başlığını ekliyoruz
@@ -56,8 +58,11 @@ PdfAxiosInstance.interceptors.response.use(
   function (error) {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
       localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
       localStorage.removeItem("login");
+      sessionStorage.removeItem("login");
       // localStorage.removeItem("userId");
       window.location.href = "/auth"; // `/auth` sayfasına yönlendir
     }
@@ -66,8 +71,8 @@ PdfAxiosInstance.interceptors.response.use(
 );
 
 PdfAxiosInstance.interceptors.request.use(function (request) {
-  const user = JSON.parse(localStorage.getItem("user"));
-  request.headers.Authorization = `Bearer ${localStorage.getItem("token")}`;
+  const user = JSON.parse(localStorage.getItem("user")) || JSON.parse(sessionStorage.getItem("user"));
+  request.headers.Authorization = `Bearer ${localStorage.getItem("token") || sessionStorage.getItem("token")}`;
   if (user) {
     // user objesi varsa
     request.headers["User-Id"] = user.userId; // User-Id başlığını ekliyoruz

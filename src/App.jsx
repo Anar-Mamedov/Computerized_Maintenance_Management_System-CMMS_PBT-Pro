@@ -50,7 +50,7 @@ const { TextArea } = Input;
 
 const { Header, Content, Footer, Sider } = Layout;
 
-const loginData = JSON.parse(localStorage.getItem("login")) || {};
+const loginData = JSON.parse(localStorage.getItem("login")) || JSON.parse(sessionStorage.getItem("login")) || {};
 
 function getItem(label, key, icon, children, isClickable = true) {
   return {
@@ -63,7 +63,7 @@ function getItem(label, key, icon, children, isClickable = true) {
 
 function filterItems(items) {
   // LocalStorage'dan token kontrolü
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 
   // Token yoksa, hiçbir filtreleme yapmadan tüm öğeleri döndür
   if (!token) {
@@ -296,7 +296,7 @@ export default function App() {
 }
 
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
   // const token = sessionStorage.getItem("token");
 
   if (!token) {
