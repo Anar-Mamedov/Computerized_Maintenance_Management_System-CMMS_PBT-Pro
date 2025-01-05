@@ -14,8 +14,7 @@ function ChangePassword(props) {
     reset,
   } = useForm();
   const [passwordStrength, setPasswordStrength] = useState(0);
-  const [isStrongPasswordRequired, setIsStrongPasswordRequired] =
-    useState(true);
+  const [isStrongPasswordRequired, setIsStrongPasswordRequired] = useState(true);
 
   useEffect(() => {
     const fetchPasswordPolicy = async () => {
@@ -53,11 +52,9 @@ function ChangePassword(props) {
     }
 
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
+      const user = JSON.parse(localStorage.getItem("user")) || JSON.parse(sessionStorage.getItem("user"));
       console.log(user.userId);
-      const response = await AxiosInstance.post(
-        `UpdateUserPass?oldPass=${data.oldPassword}&updatePass=${data.newPassword}`
-      );
+      const response = await AxiosInstance.post(`UpdateUserPass?oldPass=${data.oldPassword}&updatePass=${data.newPassword}`);
       console.log("Data sent successfully:", response);
       if (response.status_code === 200 || response.status_code === 201) {
         message.success("Şifre Güncellendi.");
@@ -83,9 +80,7 @@ function ChangePassword(props) {
           gap: "10px",
         }}
       >
-        <Text style={{ fontSize: "16px", fontWeight: "500" }}>
-          Şifre Güncelleme
-        </Text>
+        <Text style={{ fontSize: "16px", fontWeight: "500" }}>Şifre Güncelleme</Text>
         <div
           style={{
             padding: "20px",
@@ -104,14 +99,7 @@ function ChangePassword(props) {
               marginBottom: errors.oldPassword ? "0px" : "0", // Hata olduğunda normal margin, aksi halde 0
             }}
           >
-            <Controller
-              name="oldPassword"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <Input.Password {...field} placeholder="Eski Şifreniz" />
-              )}
-            />
+            <Controller name="oldPassword" control={control} defaultValue="" render={({ field }) => <Input.Password {...field} placeholder="Eski Şifreniz" />} />
           </Form.Item>
 
           <Controller
@@ -119,9 +107,7 @@ function ChangePassword(props) {
             control={control}
             defaultValue=""
             rules={{
-              required: isStrongPasswordRequired
-                ? "Alan boş bırakılamaz"
-                : "Alan boş bırakılamaz",
+              required: isStrongPasswordRequired ? "Alan boş bırakılamaz" : "Alan boş bırakılamaz",
               validate: (value) => {
                 if (value === watch("oldPassword")) {
                   return "Yeni şifre, eski şifreyle aynı olamaz.";
@@ -130,15 +116,10 @@ function ChangePassword(props) {
                   const hasUpperCase = /[A-Z]/.test(value);
                   const hasLowerCase = /[a-z]/.test(value);
                   const hasNumber = /\d/.test(value);
-                  const hasSpecialChar =
-                    /[^A-Za-z0-9 `!@$%^*()_+\-={};"|,.<>?~/':§]/.test(value);
+                  const hasSpecialChar = /[^A-Za-z0-9 `!@$%^*()_+\-={};"|,.<>?~/':§]/.test(value);
                   const hasMinLength = value.length >= 8;
                   return (
-                    (hasUpperCase &&
-                      hasLowerCase &&
-                      hasNumber &&
-                      !hasSpecialChar &&
-                      hasMinLength) ||
+                    (hasUpperCase && hasLowerCase && hasNumber && !hasSpecialChar && hasMinLength) ||
                     "Şifreniz en az 8 karakter uzunluğunda olmalı, büyük ve küçük harfler, rakam ve belirtilen özel karakterler ( `!@$%^*()_+\\-={};\"|,.<>?~/':§) dışında herhangi bir özel karakter içermemelidir."
                   );
                 } else {
@@ -173,32 +154,16 @@ function ChangePassword(props) {
               defaultValue=""
               rules={{
                 required: "Alan boş bırakılamaz",
-                validate: (value) =>
-                  value === newPassword ||
-                  "Şifreler eşleşmiyor, lütfen kontrol edin.",
+                validate: (value) => value === newPassword || "Şifreler eşleşmiyor, lütfen kontrol edin.",
               }}
               render={({ field }) => (
                 <>
-                  <Input.Password
-                    {...field}
-                    placeholder="Yeni Şifrenizi Onaylayın"
-                  />
+                  <Input.Password {...field} placeholder="Yeni Şifrenizi Onaylayın" />
                 </>
               )}
             />
           </Form.Item>
-          {newPassword && (
-            <Progress
-              percent={passwordStrength}
-              status={
-                passwordStrength < 50
-                  ? "exception"
-                  : passwordStrength < 100
-                  ? "active"
-                  : "success"
-              }
-            />
-          )}
+          {newPassword && <Progress percent={passwordStrength} status={passwordStrength < 50 ? "exception" : passwordStrength < 100 ? "active" : "success"} />}
           <Button type="primary" htmlType="submit">
             Uygula
           </Button>

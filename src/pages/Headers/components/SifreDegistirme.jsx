@@ -1,22 +1,8 @@
 import React, { useEffect, useState } from "react";
-import {
-  Alert,
-  Button,
-  Form,
-  Input,
-  message,
-  Modal,
-  Progress,
-  Typography,
-} from "antd";
+import { Alert, Button, Form, Input, message, Modal, Progress, Typography } from "antd";
 import { InfoCircleTwoTone } from "@ant-design/icons";
 import { useAppContext } from "../../../AppContext.jsx";
-import {
-  Controller,
-  useForm,
-  FormProvider,
-  useFormContext,
-} from "react-hook-form";
+import { Controller, useForm, FormProvider, useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../api/http.jsx";
 import dayjs from "dayjs";
 
@@ -34,8 +20,7 @@ const SifreDegistirme = ({ accountEditModalOpen, accountEditModalClose }) => {
     reset,
   } = useForm();
   const [passwordStrength, setPasswordStrength] = useState(0);
-  const [isStrongPasswordRequired, setIsStrongPasswordRequired] =
-    useState(true);
+  const [isStrongPasswordRequired, setIsStrongPasswordRequired] = useState(true);
   const [mesaj, setMesaj] = useState("");
   const [errorMessageShow, setErrorMessageShow] = useState(false);
 
@@ -76,13 +61,9 @@ const SifreDegistirme = ({ accountEditModalOpen, accountEditModalClose }) => {
     }
 
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
+      const user = JSON.parse(localStorage.getItem("user")) || JSON.parse(sessionStorage.getItem("user"));
       console.log(user.userId);
-      const response = await AxiosInstance.post(
-        `UpdateUserPass?oldPass=${encodeURIComponent(
-          data.oldPassword
-        )}&updatePass=${encodeURIComponent(data.newPassword)}`
-      );
+      const response = await AxiosInstance.post(`UpdateUserPass?oldPass=${encodeURIComponent(data.oldPassword)}&updatePass=${encodeURIComponent(data.newPassword)}`);
       console.log("Data sent successfully:", response);
       if (response.status_code === 200 || response.status_code === 201) {
         message.success("Şifre Güncellendi.");
@@ -108,9 +89,7 @@ const SifreDegistirme = ({ accountEditModalOpen, accountEditModalClose }) => {
   useEffect(() => {
     if (userData1?.KLL_NEW_USER === true) {
       setErrorMessageShow(true);
-      setMesaj(
-        "İlk girişiniz olduğu için şifrenizi güncellemeniz gerekmektedir."
-      );
+      setMesaj("İlk girişiniz olduğu için şifrenizi güncellemeniz gerekmektedir.");
     } else if (userData1?.KLL_NEW_USER === false) {
       setErrorMessageShow(true);
       setMesaj("Şifrenizin süresi dolmuştur lütfen şifrenizi güncelleyiniz");
@@ -151,15 +130,7 @@ const SifreDegistirme = ({ accountEditModalOpen, accountEditModalClose }) => {
           }}
         >
           <div style={{ width: "100%" }}>
-            {errorMessageShow ? (
-              <Alert
-                key="alert"
-                style={{ fontWeight: 500, color: "red", textAlign: "left" }}
-                message={mesaj}
-                type="error"
-                showIcon
-              />
-            ) : null}
+            {errorMessageShow ? <Alert key="alert" style={{ fontWeight: 500, color: "red", textAlign: "left" }} message={mesaj} type="error" showIcon /> : null}
           </div>
           <Form.Item
             validateStatus={errors.oldPassword ? "error" : ""}
@@ -168,14 +139,7 @@ const SifreDegistirme = ({ accountEditModalOpen, accountEditModalClose }) => {
               marginBottom: errors.oldPassword ? "0px" : "0", // Hata olduğunda normal margin, aksi halde 0
             }}
           >
-            <Controller
-              name="oldPassword"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <Input.Password {...field} placeholder="Eski Şifreniz" />
-              )}
-            />
+            <Controller name="oldPassword" control={control} defaultValue="" render={({ field }) => <Input.Password {...field} placeholder="Eski Şifreniz" />} />
           </Form.Item>
 
           <Controller
@@ -183,9 +147,7 @@ const SifreDegistirme = ({ accountEditModalOpen, accountEditModalClose }) => {
             control={control}
             defaultValue=""
             rules={{
-              required: isStrongPasswordRequired
-                ? "Alan boş bırakılamaz"
-                : "Alan boş bırakılamaz",
+              required: isStrongPasswordRequired ? "Alan boş bırakılamaz" : "Alan boş bırakılamaz",
               validate: (value) => {
                 if (value === watch("oldPassword")) {
                   return "Yeni şifre, eski şifreyle aynı olamaz.";
@@ -194,15 +156,10 @@ const SifreDegistirme = ({ accountEditModalOpen, accountEditModalClose }) => {
                   const hasUpperCase = /[A-Z]/.test(value);
                   const hasLowerCase = /[a-z]/.test(value);
                   const hasNumber = /\d/.test(value);
-                  const hasSpecialChar =
-                    /[^A-Za-z0-9 `!@$%^*()_+\-={};"|,.<>?~/':§]/.test(value);
+                  const hasSpecialChar = /[^A-Za-z0-9 `!@$%^*()_+\-={};"|,.<>?~/':§]/.test(value);
                   const hasMinLength = value.length >= 8;
                   return (
-                    (hasUpperCase &&
-                      hasLowerCase &&
-                      hasNumber &&
-                      !hasSpecialChar &&
-                      hasMinLength) ||
+                    (hasUpperCase && hasLowerCase && hasNumber && !hasSpecialChar && hasMinLength) ||
                     "Şifreniz en az 8 karakter uzunluğunda olmalı, büyük ve küçük harfler, rakam ve belirtilen özel karakterler ( `!@$%^*()_+\\-={};\"|,.<>?~/':§) dışında herhangi bir özel karakter içermemelidir."
                   );
                 } else {
@@ -237,32 +194,16 @@ const SifreDegistirme = ({ accountEditModalOpen, accountEditModalClose }) => {
               defaultValue=""
               rules={{
                 required: "Alan boş bırakılamaz",
-                validate: (value) =>
-                  value === newPassword ||
-                  "Şifreler eşleşmiyor, lütfen kontrol edin.",
+                validate: (value) => value === newPassword || "Şifreler eşleşmiyor, lütfen kontrol edin.",
               }}
               render={({ field }) => (
                 <>
-                  <Input.Password
-                    {...field}
-                    placeholder="Yeni Şifrenizi Onaylayın"
-                  />
+                  <Input.Password {...field} placeholder="Yeni Şifrenizi Onaylayın" />
                 </>
               )}
             />
           </Form.Item>
-          {newPassword && (
-            <Progress
-              percent={passwordStrength}
-              status={
-                passwordStrength < 50
-                  ? "exception"
-                  : passwordStrength < 100
-                  ? "active"
-                  : "success"
-              }
-            />
-          )}
+          {newPassword && <Progress percent={passwordStrength} status={passwordStrength < 50 ? "exception" : passwordStrength < 100 ? "active" : "success"} />}
           <Button type="primary" htmlType="submit">
             Uygula
           </Button>

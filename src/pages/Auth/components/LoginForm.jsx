@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Form, Input, Typography, message, Spin } from "antd";
+import { Button, Form, Input, Typography, message, Spin, Checkbox } from "antd";
 import { UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import AxiosInstance from "../../../api/http";
@@ -46,22 +46,6 @@ export default function LoginForm() {
           userResimID: response.resimId,
           userUnvan: response.KLL_UNVAN,
         });
-        localStorage.setItem("token", response.AUTH_TOKEN);
-        const userInfo = {
-          userId: response.TB_KULLANICI_ID ?? null,
-          userName: response.KLL_TANIM ?? null,
-          userResimID: response.resimId ?? null,
-          userUnvan: response.KLL_UNVAN ?? null,
-          /* kullaniciName: response.KLL_PERSONEL?.PRS_ISIM ?? null,
-          kullaniciID: response.KLL_PERSONEL?.TB_PERSONEL_ID ?? null,
-          kullaniciLokasyon: response.KLL_PERSONEL?.PRS_LOKASYON ?? null,
-          kullaniciLokasyonID: response.KLL_PERSONEL?.PRS_LOKASYON_ID ?? null,
-          kullaniciDepartman: response.KLL_PERSONEL?.PRS_DEPARTMAN ?? null,
-          kullaniciDepartmanID: response.KLL_PERSONEL?.PRS_DEPARTMAN_ID ?? null,
-          kullaniciEmail: response.KLL_PERSONEL?.PRS_EMAIL ?? null,
-          kullaniciTelefon: response.KLL_PERSONEL?.PRS_TELEFON ?? null, */
-        };
-        localStorage.setItem("user", JSON.stringify(userInfo));
         const login = {
           "": true,
           Dashboard: response.KLL_WEB_DASHBOARD,
@@ -108,8 +92,31 @@ export default function LoginForm() {
           hizliMaliyetlendirme: response.KLL_WEB_RAPOR,
           malzemeTransferOnayIslemleri: response.KLL_WEB_RAPOR,
         };
-        localStorage.setItem("login", JSON.stringify(login));
-        const anar = localStorage.getItem("login");
+        const userInfo = {
+          userId: response.TB_KULLANICI_ID ?? null,
+          userName: response.KLL_TANIM ?? null,
+          userResimID: response.resimId ?? null,
+          userUnvan: response.KLL_UNVAN ?? null,
+          /* kullaniciName: response.KLL_PERSONEL?.PRS_ISIM ?? null,
+          kullaniciID: response.KLL_PERSONEL?.TB_PERSONEL_ID ?? null,
+          kullaniciLokasyon: response.KLL_PERSONEL?.PRS_LOKASYON ?? null,
+          kullaniciLokasyonID: response.KLL_PERSONEL?.PRS_LOKASYON_ID ?? null,
+          kullaniciDepartman: response.KLL_PERSONEL?.PRS_DEPARTMAN ?? null,
+          kullaniciDepartmanID: response.KLL_PERSONEL?.PRS_DEPARTMAN_ID ?? null,
+          kullaniciEmail: response.KLL_PERSONEL?.PRS_EMAIL ?? null,
+          kullaniciTelefon: response.KLL_PERSONEL?.PRS_TELEFON ?? null, */
+        };
+        if (values.remember) {
+          localStorage.setItem("token", response.AUTH_TOKEN);
+          localStorage.setItem("user", JSON.stringify(userInfo));
+          localStorage.setItem("login", JSON.stringify(login));
+        } else {
+          sessionStorage.setItem("token", response.AUTH_TOKEN);
+          sessionStorage.setItem("user", JSON.stringify(userInfo));
+          sessionStorage.setItem("login", JSON.stringify(login));
+        }
+
+        const anar = localStorage.getItem("login") || sessionStorage.getItem("login");
         console.log(anar);
         message.success("Giriş başarılı!");
         navigate("/");
@@ -158,6 +165,9 @@ export default function LoginForm() {
               placeholder={t("sifre")}
               iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
             />
+          </Form.Item>
+          <Form.Item name="remember" valuePropName="checked" label={null}>
+            <Checkbox>{t("beniHatirla")}</Checkbox>
           </Form.Item>
           <Form.Item>
             <ReCAPTCHA
