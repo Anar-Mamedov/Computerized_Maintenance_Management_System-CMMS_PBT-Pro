@@ -36,6 +36,7 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
   const [loading, setLoading] = useState(false);
   const [columnFilters, setColumnFilters] = useState({});
   const [filters, setFilters] = useState({});
+  const [kullaniciRaporu, setKullaniciRaporu] = useState({});
 
   const searchInput = useRef(null);
   const lan = localStorage.getItem("i18nextLng") || "tr";
@@ -48,12 +49,20 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
 
   const handleFilterSubmit = (values) => {
     setFilters([values]);
+    setKullaniciRaporu(true);
   };
 
   const fetchFilters = async () => {
     try {
       const response = await AxiosInstance.get(`RaporFiltreListele?RaporID=${selectedRow.key}`);
-      setFilters(response);
+      const filteredResponse = {
+        LokasyonID: response[0].LokasyonID,
+        AtolyeID: response[0].AtolyeID,
+        BaslamaTarih: response[0].BaslamaTarih,
+        BitisTarih: response[0].BitisTarih,
+      };
+      setFilters([filteredResponse]); // Array içinde obje olarak set et
+      setKullaniciRaporu(response[0].KullaniciRaporu);
     } catch (error) {
       console.error("Filtreler yüklenirken bir hata oluştu:", error);
     }
@@ -67,6 +76,7 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
       // Reset when modal is closed
       setTableData([]);
       setOriginalData([]);
+      setKullaniciRaporu({});
       setInitialColumns([]);
       setColumns([]);
       setColumnFilters({});
@@ -76,7 +86,7 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
 
   const fetchLists = async () => {
     setLoading(true);
-    AxiosInstance.post("GetReportDetail", {
+    AxiosInstance.post(`GetReportDetail?KullaniciRaporu=${kullaniciRaporu}`, {
       id: selectedRow.key,
       lan: lan,
       ...filters[0],
@@ -99,6 +109,10 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
               isYear: header.isYear,
               isHour: header.isHour,
               isNumber: header.isNumber,
+
+              // Yeni ekleyeceğimiz alanlar:
+              isFilter: header.isFilter, // Örneğin "date", "number", "hour", "text" vs.
+              isFilter1: header.isFilter1, // İkinci filtre tipi
             };
           });
 
