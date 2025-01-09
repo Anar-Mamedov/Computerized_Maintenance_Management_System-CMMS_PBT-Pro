@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DatePicker, Button } from "antd";
-import { Controller, useFormContext } from "react-hook-form";
+import { useForm, FormProvider, Controller } from "react-hook-form";
 import Lokasyon from "./Lokasyon";
 import AtolyeSelect from "./AtolyeSelect";
 import dayjs from "dayjs";
@@ -9,7 +9,8 @@ import locale from "antd/es/date-picker/locale/tr_TR";
 
 dayjs.locale("tr");
 
-function Filters({ onSubmit }) {
+function Filters({ filtersLabel, onSubmit }) {
+  const [lokasyonID1, setLokasyonID1] = useState("");
   const [filterValues, setFilterValues] = useState({
     LokasyonID: "",
     AtolyeID: "",
@@ -17,48 +18,107 @@ function Filters({ onSubmit }) {
     BitisTarih: null,
   });
 
-  const handleLocationChange = (locationString) => {
-    setFilterValues((prev) => ({
-      ...prev,
-      LokasyonID: locationString,
-    }));
-  };
+  const methods = useForm({
+    defaultValues: {
+      Lokasyon: "",
+      LokasyonID: "",
+      Atolye: "",
+      AtolyeID: "",
+      BaslamaTarih: null,
+      BitisTarih: null,
+      // ... Tüm default değerleriniz
+    },
+  });
 
-  const handleAtolyeChange = (atolyeString) => {
-    setFilterValues((prev) => ({
-      ...prev,
-      AtolyeID: atolyeString,
-    }));
-  };
+  const { setValue, reset, watch, control } = methods;
 
-  const handleStartDateChange = (date) => {
-    setFilterValues((prev) => ({
-      ...prev,
-      BaslamaTarih: date ? dayjs(date).format("YYYY-MM-DD") : null,
-    }));
-  };
+  useEffect(() => {
+    setValue("lokasyon", filtersLabel.LokasyonName);
+    setValue("lokasyonID", filtersLabel.LokasyonID);
+    setValue("atolye", filtersLabel.AtolyeName);
+    setValue("atolyeID", filtersLabel.AtolyeID);
+    setValue("startDate", filtersLabel.BaslamaTarih ? dayjs(filtersLabel.BaslamaTarih).format("DD.MM.YYYY") : null);
+    setValue("endDate", filtersLabel.BitisTarih ? dayjs(filtersLabel.BitisTarih).format("DD.MM.YYYY") : null);
+  }, [filtersLabel]);
 
-  const handleEndDateChange = (date) => {
-    setFilterValues((prev) => ({
-      ...prev,
-      BitisTarih: date ? dayjs(date).format("YYYY-MM-DD") : null,
-    }));
-  };
+  const lokasyonID = watch("lokasyonID");
+  const atolyeID = watch("atolyeID");
+  const startDate = watch("startDate");
+  const endDate = watch("endDate");
+
+  useEffect(() => {
+    if (lokasyonID) {
+      setFilterValues((prev) => ({
+        ...prev,
+        LokasyonID: Array.isArray(lokasyonID) ? lokasyonID.join(",") : lokasyonID,
+      }));
+    }
+    if (atolyeID) {
+      setFilterValues((prev) => ({
+        ...prev,
+        AtolyeID: Array.isArray(atolyeID) ? atolyeID.join(",") : atolyeID,
+      }));
+    }
+    if (startDate) {
+      setFilterValues((prev) => ({
+        ...prev,
+        BaslamaTarih: startDate ? dayjs(startDate).format("YYYY-MM-DD") : null,
+      }));
+    }
+    if (endDate) {
+      setFilterValues((prev) => ({
+        ...prev,
+        BitisTarih: endDate ? dayjs(endDate).format("YYYY-MM-DD") : null,
+      }));
+    }
+  }, [lokasyonID, atolyeID, startDate, endDate]);
 
   const handleSubmit = () => {
     onSubmit?.(filterValues);
   };
 
   return (
-    <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-      <Lokasyon onLocationChange={handleLocationChange} />
-      <AtolyeSelect onAtolyeChange={handleAtolyeChange} />
-      <DatePicker placeholder="Başlangıç Tarihi" onChange={handleStartDateChange} format="DD.MM.YYYY" locale={locale} />
-      <DatePicker placeholder="Bitiş Tarihi" onChange={handleEndDateChange} format="DD.MM.YYYY" locale={locale} />
-      <Button type="primary" onClick={handleSubmit}>
-        Sorgula
-      </Button>
-    </div>
+    <FormProvider {...methods}>
+      <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+        <Lokasyon filtersLabel={filtersLabel} />
+        <AtolyeSelect filtersLabel={filtersLabel} />
+        <Controller
+          name="startDate"
+          control={control}
+          render={({ field }) => (
+            <DatePicker
+              {...field}
+              filtersLabel={filtersLabel}
+              placeholder="Başlangıç Tarihi"
+              onChange={(date) => {
+                field.onChange(date);
+              }}
+              format="DD.MM.YYYY"
+              locale={locale}
+            />
+          )}
+        />
+        <Controller
+          name="endDate"
+          control={control}
+          render={({ field }) => (
+            <DatePicker
+              {...field}
+              filtersLabel={filtersLabel}
+              placeholder="Bitiş Tarihi"
+              onChange={(date) => {
+                field.onChange(date);
+              }}
+              format="DD.MM.YYYY"
+              locale={locale}
+            />
+          )}
+        />
+        <Button type="primary" onClick={handleSubmit}>
+          Sorgula
+        </Button>
+      </div>
+    </FormProvider>
   );
 }
 
