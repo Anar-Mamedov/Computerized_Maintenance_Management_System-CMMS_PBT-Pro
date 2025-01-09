@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Tabs, Typography, Button, Modal, Input, message } from "antd";
+import { Tabs, Typography, Button, Modal, Input, message, Popconfirm } from "antd";
 import {
   ToolOutlined,
   FundProjectionScreenOutlined,
@@ -9,6 +9,7 @@ import {
   ApartmentOutlined,
   WalletOutlined,
   HomeOutlined,
+  QuestionCircleOutlined,
 } from "@ant-design/icons";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
@@ -75,6 +76,11 @@ export default function RaporTabs({ refreshKey, disabled, fieldRequirements }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
   const lan = localStorage.getItem("i18nextLng") || "tr";
+  const [activeTabKey, setActiveTabKey] = useState("1");
+
+  const onChange = (key) => {
+    setActiveTabKey(key);
+  };
 
   const handleAddGroup = async () => {
     try {
@@ -88,6 +94,21 @@ export default function RaporTabs({ refreshKey, disabled, fieldRequirements }) {
       fetchData();
     } catch (error) {
       message.error("Grup eklenirken bir hata oluştu");
+    }
+  };
+
+  const handleDeleteGroup = async () => {
+    try {
+      const response = await AxiosInstance.post(`RaporGrupDelete?TB_RAPOR_GRUP_ID=${Number(activeTabKey)}`);
+      if (response.status_code === 200) {
+        message.success("Rapor grubu başarıyla silindi");
+        // Grupları yeniden yükle
+        fetchData();
+      } else if (response.status_code === 500) {
+        message.error(response.Message);
+      }
+    } catch (error) {
+      message.error("Rapor grubu silinirken bir hata oluştu");
     }
   };
 
@@ -120,7 +141,7 @@ export default function RaporTabs({ refreshKey, disabled, fieldRequirements }) {
             </Text>
           </div>
         ),
-        children: <RaporsTables tabKey={item.RPR_RAPOR_GRUP_ID.toString()} tabName={item.RPG_ACIKLAMA} />, // replace with actual component
+        children: <RaporsTables key={item.RPR_RAPOR_GRUP_ID} tabKey={item.RPR_RAPOR_GRUP_ID.toString()} tabName={item.RPG_ACIKLAMA} />, // replace with actual component
       }));
 
       // set the items
@@ -135,12 +156,30 @@ export default function RaporTabs({ refreshKey, disabled, fieldRequirements }) {
 
   return (
     <div>
-      <div style={{ width: "316px", display: "flex", justifyContent: "center" }}>
+      <div style={{ width: "316px", display: "flex", justifyContent: "center", gap: "10px", alignItems: "center" }}>
         <Button type="primary" onClick={() => setIsModalOpen(true)} style={{ marginBottom: "10px" }}>
           Rapor Grubu Ekle
         </Button>
+        <Popconfirm
+          title="Rapor Grubu Silme"
+          description="Bu rapor grubunu silmek istediğinize emin misiniz?"
+          onConfirm={handleDeleteGroup}
+          okText="Evet"
+          cancelText="Hayır"
+          icon={
+            <QuestionCircleOutlined
+              style={{
+                color: "red",
+              }}
+            />
+          }
+        >
+          <Button danger style={{ marginBottom: "10px" }}>
+            Rapor Grubu Sil
+          </Button>
+        </Popconfirm>
       </div>
-      <StyledTabs tabPosition="left" defaultActiveKey="1" items={items} onChange={onChange} />
+      <StyledTabs tabPosition="left" defaultActiveKey="1" destroyInactiveTabPane items={items} onChange={onChange} />
 
       <Modal
         title="Yeni Rapor Grubu Ekle"

@@ -1,26 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { Select, Spin } from "antd";
+import { Select, Spin, Input, Divider, Space, Button } from "antd";
 import AxiosInstance from "../../../../../../../api/http";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, Controller } from "react-hook-form";
 
 const { Option } = Select;
 
-const AtolyeSelect = ({ onAtolyeChange }) => {
+const AtolyeSelect = ({ filtersLabel }) => {
   const [options, setOptions] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(false);
+  const {
+    control,
+    watch,
+    setValue,
+    getValues,
+    formState: { errors },
+  } = useFormContext();
 
-  const { setValue } = useFormContext();
-
+  // Önce options'ları yükle
   useEffect(() => {
     setLoading(true);
     AxiosInstance.get("AtolyeList")
       .then((response) => {
-        const newOptions = response.map((item) => ({
-          key: item.TB_ATOLYE_ID.toString(), // ID
-          value: item.ATL_TANIM, // Gösterilecek metin
-        }));
-        setOptions(newOptions);
+        setOptions(response);
         setLoading(false);
       })
       .catch((error) => {
@@ -29,51 +31,46 @@ const AtolyeSelect = ({ onAtolyeChange }) => {
       });
   }, []);
 
-  const handleChange = (selectedKeys) => {
-    // Direkt ID üzerinden gelen selectedKeys değerlerini sakla
-    setSelectedIds(selectedKeys);
+  // Options yüklendikten sonra filtersLabel değerlerini set et
+  useEffect(() => {
+    if (filtersLabel?.AtolyeName && filtersLabel?.AtolyeID && options.length > 0) {
+      const atolyeIDs = filtersLabel.AtolyeID.split(",");
 
-    // String'e çevirme ve üst bileşene gönderme
-    const atolyeString = selectedKeys.join(",");
-    setValue("atolyeIds", atolyeString);
-
-    // Üst bileşene bildir
-    if (onAtolyeChange) {
-      onAtolyeChange(atolyeString);
+      setSelectedIds(atolyeIDs);
     }
-  };
+  }, [filtersLabel, options]);
 
   return (
-    <Select
-      mode="multiple"
-      style={{ width: "250px" }}
-      placeholder="Atölye Seçin"
-      value={selectedIds} // Seçili ID'ler
-      onChange={handleChange} // ID array’i güncelleyen fonksiyon
-      allowClear
-      showSearch // Arama barını aktif eder
-      optionFilterProp="children" // Aramayı children (görünen label) üzerinden yapsın
-      notFoundContent={
-        loading ? (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "40px",
+    <>
+      <Controller
+        name="atolye"
+        control={control}
+        render={({ field }) => (
+          <Select
+            {...field}
+            mode="multiple"
+            style={{ width: "250px" }}
+            showSearch
+            allowClear
+            loading={loading}
+            placeholder="Seçim Yapınız"
+            optionFilterProp="children"
+            filterOption={(input, option) => (option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false)}
+            options={options.map((item) => ({
+              value: item.TB_ATOLYE_ID.toString(),
+              label: item.ATL_TANIM,
+            }))}
+            value={loading ? [] : selectedIds}
+            onChange={(value) => {
+              setValue("atolyeID", value);
+              setSelectedIds(value);
+              field.onChange(value);
             }}
-          >
-            <Spin size="small" />
-          </div>
-        ) : null
-      }
-    >
-      {options.map((option) => (
-        <Option key={option.key} value={option.key}>
-          {option.value}
-        </Option>
-      ))}
-    </Select>
+          />
+        )}
+      />
+      <Controller name="atolyeID" control={control} render={({ field }) => <Input {...field} type="text" style={{ display: "none" }} />} />
+    </>
   );
 };
 
