@@ -16,6 +16,8 @@ function RaporsTables({ tabKey, tabName }) {
   const [filteredData, setFilteredData] = useState([]);
   const [selectedCards, setSelectedCards] = useState([]);
 
+  console.log(selectedCards);
+
   // Drawer state for detail view
   const [drawer, setDrawer] = useState({
     visible: false,
@@ -123,7 +125,7 @@ function RaporsTables({ tabKey, tabName }) {
           />
         </div>
 
-        <ContextMenu selectedRows={selectedCards} refreshTableData={refreshTableData} />
+        <ContextMenu selectedRows={selectedCards} refreshTableData={refreshTableData} setSelectedCards={setSelectedCards} />
       </div>
 
       <Spin spinning={loading}>

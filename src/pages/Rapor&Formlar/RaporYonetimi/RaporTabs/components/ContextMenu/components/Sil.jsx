@@ -3,7 +3,7 @@ import AxiosInstance from "../../../../../../../api/http";
 import { Button, message, Popconfirm } from "antd";
 import { DeleteOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 
-export default function Sil({ selectedRows, refreshTableData, disabled, hidePopover }) {
+export default function Sil({ selectedRows, setSelectedCards, refreshTableData, disabled, hidePopover }) {
   // selectedRows.forEach((row, index) => {
   //   console.log(`Satır ${index + 1} ID: ${row.key}`);
   //   // Eğer id değerleri farklı bir özellikte tutuluyorsa, row.key yerine o özelliği kullanın. Örneğin: row.id
@@ -38,6 +38,7 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
     // Tüm silme işlemleri tamamlandıktan sonra ve hata oluşmamışsa refreshTableData'i çağır
     if (!isError) {
       refreshTableData();
+      setSelectedCards([]);
       hidePopover(); // Silme işlemi başarılı olursa Popover'ı kapat
     }
   };
