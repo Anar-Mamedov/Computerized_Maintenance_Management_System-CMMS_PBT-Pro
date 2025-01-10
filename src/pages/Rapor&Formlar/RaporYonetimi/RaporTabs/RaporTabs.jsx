@@ -100,7 +100,7 @@ export default function RaporTabs({ refreshKey, disabled, fieldRequirements }) {
   const handleDeleteGroup = async () => {
     try {
       const response = await AxiosInstance.post(`RaporGrupDelete?TB_RAPOR_GRUP_ID=${Number(activeTabKey)}`);
-      if (response.status_code === 200) {
+      if (response.status_code === 200 || response.status_code === 201 || response.status_code === 204) {
         message.success("Rapor grubu başarıyla silindi");
         // Grupları yeniden yükle
         fetchData();

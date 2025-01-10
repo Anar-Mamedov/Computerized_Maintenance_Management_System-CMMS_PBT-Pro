@@ -12,7 +12,7 @@ import OnayaGonder from "./components/OnayaGonder";
 
 const { Text, Link } = Typography;
 
-export default function ContextMenu({ selectedRows, refreshTableData, onayCheck }) {
+export default function ContextMenu({ selectedRows, refreshTableData, onayCheck, setSelectedCards }) {
   const [visible, setVisible] = useState(false);
 
   const handleVisibleChange = (visible) => {
@@ -27,7 +27,7 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
 
   const content = (
     <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-      {selectedRows.length >= 1 && <Sil selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
+      {selectedRows.length >= 1 && <Sil selectedRows={selectedRows} setSelectedCards={setSelectedCards} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
       {selectedRows.length == 1 && <Guncelle selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
 
       {/* {selectedRows.length >= 1 && <Iptal selectedRows={selectedRows} refreshTableData={refreshTableData} iptalDisabled={iptalDisabled} />} */}
