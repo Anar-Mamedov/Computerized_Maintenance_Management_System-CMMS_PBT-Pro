@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Select, Button, Popover, Spin, Modal, Input } from "antd";
-import AxiosInstance from "../../../../../api/http";
+import AxiosInstance from "../../../../../api/http.jsx";
 import { Controller, useFormContext } from "react-hook-form";
 import MakineTable from "../../../../MakineEkipman/MakineTanim/Table/Table.jsx";
 
@@ -33,13 +33,16 @@ const MakineFilter = ({ onSubmit }) => {
 
   const handleSubmit = () => {
     // console.log("Selected IDs:", selectedIds);
+    setOpen(false);
+    // onSubmit(selectedIds); // onSubmit ile id'leri gönder
+  };
+
+  useEffect(() => {
     // Seçilen id'leri setValue ile ayarla
     // Map selectedIds to their key values and join them with commas
     const selectedIdsString = selectedIds.map((id) => id.key).join(",");
     setValue("makineIds", selectedIdsString);
-    setOpen(false);
-    // onSubmit(selectedIds); // onSubmit ile id'leri gönder
-  };
+  }, [selectedIds]);
 
   const handleCancelClick = () => {
     setSelectedIds([]);
@@ -90,7 +93,7 @@ const MakineFilter = ({ onSubmit }) => {
 
   return (
     <>
-      <Popover content={content} trigger={null} open={open} onOpenChange={setOpen} placement="bottom">
+      <Popover content={content} trigger="click" open={open} onOpenChange={setOpen} placement="bottom">
         <Button
           style={{
             display: "flex",

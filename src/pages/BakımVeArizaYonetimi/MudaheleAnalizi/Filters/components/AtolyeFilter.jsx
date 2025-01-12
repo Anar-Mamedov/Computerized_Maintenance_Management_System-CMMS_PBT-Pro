@@ -51,16 +51,20 @@ const AtolyeFilter = ({ onSubmit }) => {
 
   const handleSubmit = () => {
     // console.log("Selected IDs:", selectedIds);
-    // Seçilen id'leri setValue ile ayarla
-    const selectedIdsString = selectedIds.join(",");
-    setValue("atolyeIds", selectedIdsString);
+
     setOpen(false);
     // onSubmit(selectedIds); // onSubmit ile id'leri gönder
   };
 
+  useEffect(() => {
+    // Seçilen id'leri setValue ile ayarla
+    const selectedIdsString = selectedIds.join(",");
+    setValue("atolyeIds", selectedIdsString);
+  }, [selectedIds]);
+
   const handleCancelClick = () => {
     setSelectedIds([]);
-    setValue("atolyeIds", "");
+    setValue("departmanIds", "");
     // console.log(watch("locationIds"));
     setOpen(false);
     // onSubmit([]);
