@@ -51,12 +51,16 @@ const LocationFilter = ({ onSubmit }) => {
 
   const handleSubmit = () => {
     // console.log("Selected IDs:", selectedIds);
-    // Seçilen id'leri setValue ile ayarla
-    const selectedIdsString = selectedIds.join(",");
-    setValue("locationIds", selectedIdsString);
+
     setOpen(false);
     // onSubmit(selectedIds); // onSubmit ile id'leri gönder
   };
+
+  useEffect(() => {
+    // Seçilen id'leri setValue ile ayarla
+    const selectedIdsString = selectedIds.join(",");
+    setValue("locationIds", selectedIdsString);
+  }, [selectedIds]);
 
   const handleCancelClick = () => {
     setSelectedIds([]);

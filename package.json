@@ -23,6 +23,7 @@
     "classnames": "^2.5.1",
     "dayjs": "^1.11.11",
     "dom-helpers": "^5.2.1",
+    "file-saver": "^2.0.5",
     "gridstack": "^10.3.0",
     "html2canvas": "^1.4.1",
     "html2pdf.js": "^0.10.1",

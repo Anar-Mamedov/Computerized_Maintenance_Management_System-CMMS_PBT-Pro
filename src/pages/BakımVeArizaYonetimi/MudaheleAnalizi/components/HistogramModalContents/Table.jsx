@@ -13,7 +13,7 @@ import Filters from "../../../../YardimMasasi/IsTalepleri/Table/filter/Filters";
 import ContextMenu from "../../../../YardimMasasi/IsTalepleri/components/ContextMenu/ContextMenu";
 import TeknisyenSubmit from "../../../../YardimMasasi/IsTalepleri/components/IsEmrineCevir/Teknisyen/TeknisyenSubmit";
 import AtolyeSubmit from "../../../../YardimMasasi/IsTalepleri/components/IsEmrineCevir/Atolye/AtolyeSubmit";
-import EditDrawer1 from "../../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer";
+import EditDrawer1 from "../../../IsEmri/Update/EditDrawer";
 import { useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
