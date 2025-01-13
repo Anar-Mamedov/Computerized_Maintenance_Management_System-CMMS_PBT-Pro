@@ -15,9 +15,11 @@ import RaporGrupSelectbox from "./RaporGrupSelectbox.jsx";
 import { t } from "i18next";
 
 dayjs.extend(customParseFormat);
-
 const { Text } = Typography;
 
+// =============================================
+// Yardımcı Fonksiyonlar
+// =============================================
 const arrayMove = (array, from, to) => {
   const newArray = [...array];
   const [movedItem] = newArray.splice(from, 1);
@@ -40,6 +42,10 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
   const [kullaniciRaporu, setKullaniciRaporu] = useState({});
   const [saveModalVisible, setSaveModalVisible] = useState(false);
   const [filtersLabel, setFiltersLabel] = useState({});
+
+  // Bu state ile hangi sütunun dropdown'unun açık/kapalı olacağını kontrol edeceğiz
+  const [filterDropdownOpen, setFilterDropdownOpen] = useState({});
+
   const searchInput = useRef(null);
   const [form] = useForm();
   const lan = localStorage.getItem("i18nextLng") || "tr";
@@ -51,6 +57,24 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
     }
   }, [filters]);
 
+  useEffect(() => {
+    if (drawerVisible && selectedRow) {
+      setLoading(true);
+      fetchFilters();
+    } else {
+      // Reset when modal is closed
+      setTableData([]);
+      setOriginalData([]);
+      setKullaniciRaporu({});
+      setInitialColumns([]);
+      setColumns([]);
+      setColumnFilters({});
+      setFilters({});
+      setFilterDropdownOpen({});
+    }
+  }, [drawerVisible, selectedRow]);
+
+  // ------------------ DATA FETCH ------------------
   const handleFilterSubmit = (values) => {
     setFilters([values]);
     setKullaniciRaporu(true);
@@ -81,23 +105,6 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
     }
   };
 
-  useEffect(() => {
-    if (drawerVisible && selectedRow) {
-      setLoading(true);
-      fetchFilters();
-    } else {
-      // Reset when modal is closed
-      setTableData([]);
-      setOriginalData([]);
-      setKullaniciRaporu({});
-      setInitialColumns([]);
-      setColumns([]);
-      setColumnFilters({});
-      setFilters({});
-    }
-  }, [drawerVisible, selectedRow]);
-
-  // ------------------ DATA FETCH ------------------
   const fetchLists = async () => {
     setLoading(true);
     AxiosInstance.post(`GetReportDetail?KullaniciRaporu=${kullaniciRaporu}`, {
@@ -124,9 +131,9 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
               isYear: header.isYear,
               isHour: header.isHour,
               isNumber: header.isNumber,
-              // Potential existing default filters:
-              isFilter: header.isFilter, // e.g. "drenaj"
-              isFilter1: header.isFilter1, // e.g. "foo"
+              // varsa default filter değerleri:
+              isFilter: header.isFilter,
+              isFilter1: header.isFilter1,
             };
           });
 
@@ -170,7 +177,7 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
 
       // Handle numeric/date/year/hour columns or skip if you only want to do text
       if (column.isYear || column.isDate || column.isNumber || column.isHour) {
-        // (Handle numeric or date logic if needed)
+        // Numeric/date/hour vs. text bazlı filtre gibi durumlarınızı burada ayrıca ele alabilirsiniz
         return;
       }
 
@@ -202,7 +209,7 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
       return newFilters;
     });
 
-    // 2) **Also update the columns array** so isFilter/isFilter1 reflect the user's input
+    // 2) Sütunların isFilter / isFilter1 alanlarını da güncelle
     setColumns((prevColumns) =>
       prevColumns.map((col) => {
         if (col.dataIndex === dataIndex) {
@@ -219,7 +226,10 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
       })
     );
 
-    closeDropdown && closeDropdown();
+    // Artık dışarı tıklamayla kapanmayı engelleyeceğimiz için,
+    // "Ara" butonuna basıldığında dropdown açık kalmasını istediğimiz sürece
+    // `closeDropdown()` fonksiyonunu burada çağırmıyoruz.
+    // Yine de kapatmak isterseniz, manuel olarak çağırabilirsiniz.
   };
 
   const handleReset = (dataIndex, closeDropdown, setSelectedKeys) => {
@@ -249,17 +259,28 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
         return col;
       })
     );
-
-    closeDropdown && closeDropdown();
   };
 
   // ------------------ GET FILTER DROPDOWN PROPS ------------------
   const getColumnSearchProps = (dataIndex) => ({
+    // Ant Design 5 için "filterDropdownOpen" ve "onFilterDropdownOpenChange"
+    // ile durumu manuel kontrol ediyoruz.
+    filterDropdownOpen: filterDropdownOpen[dataIndex] || false,
+    onFilterDropdownOpenChange: (open) => {
+      // Sadece "true" olduğunda (dropdown açılırken) state'i güncelleyelim;
+      // dışarı tıklandığında kapanmasını engellemek için "false" durumunu yoksayacağız.
+      if (open) {
+        setFilterDropdownOpen((prev) => ({ ...prev, [dataIndex]: true }));
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
+    },
+
+    // filterDropdown içeriğini tamamen özelleştiriyoruz.
     filterDropdown: ({ setSelectedKeys, selectedKeys, closeDropdown, close }) => {
       const column = columns.find((col) => col.dataIndex === dataIndex);
       if (!column) return null;
 
-      // YEAR FILTER
+      // Yıl filtresi
       if (column.isYear) {
         return (
           <div style={{ padding: 8 }}>
@@ -301,7 +322,12 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
                   type="link"
                   size="small"
                   onClick={() => {
-                    close();
+                    // Sadece kapat butonuna basıldığında
+                    // dropdown'u kapatalım.
+                    setFilterDropdownOpen((prev) => ({
+                      ...prev,
+                      [dataIndex]: false,
+                    }));
                   }}
                 >
                   Kapat
@@ -312,7 +338,7 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
         );
       }
 
-      // DATE FILTER
+      // Tarih filtresi
       if (column.isDate) {
         return (
           <div style={{ padding: 8 }}>
@@ -354,7 +380,10 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
                   type="link"
                   size="small"
                   onClick={() => {
-                    close();
+                    setFilterDropdownOpen((prev) => ({
+                      ...prev,
+                      [dataIndex]: false,
+                    }));
                   }}
                 >
                   Kapat
@@ -365,7 +394,7 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
         );
       }
 
-      // HOUR FILTER
+      // Saat filtresi
       if (column.isHour) {
         return (
           <div style={{ padding: 8 }}>
@@ -407,7 +436,10 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
                   type="link"
                   size="small"
                   onClick={() => {
-                    close();
+                    setFilterDropdownOpen((prev) => ({
+                      ...prev,
+                      [dataIndex]: false,
+                    }));
                   }}
                 >
                   Kapat
@@ -418,7 +450,7 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
         );
       }
 
-      // NUMBER FILTER
+      // Sayısal filtre
       if (column.isNumber) {
         return (
           <div style={{ padding: 8 }}>
@@ -452,7 +484,10 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
                   type="link"
                   size="small"
                   onClick={() => {
-                    close();
+                    setFilterDropdownOpen((prev) => ({
+                      ...prev,
+                      [dataIndex]: false,
+                    }));
                   }}
                 >
                   Kapat
@@ -463,14 +498,14 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
         );
       }
 
-      // STRING-BASED FILTER
+      // Metinsel filtre (string-based)
       const currentValues = columnFilters[dataIndex] || ["", ""];
 
       return (
         <div style={{ padding: 8, width: 300 }}>
           <Space direction="vertical" style={{ width: "100%" }}>
-            {/* Filter #1 */}
             <Input
+              ref={searchInput}
               placeholder="Filter #1"
               value={selectedKeys[0] ?? currentValues[0]}
               onChange={(e) => {
@@ -481,9 +516,8 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
               onPressEnter={() => handleSearch(selectedKeys, dataIndex, closeDropdown, setSelectedKeys)}
               style={{ width: "100%" }}
             />
-
-            {/* If you also want a second input, uncomment below */}
-            {/* 
+            {/* İkinci bir input isterseniz burayı açabilirsiniz:
+            
             <Input
               placeholder="Filter #2"
               value={selectedKeys[1] ?? currentValues[1]}
@@ -493,17 +527,12 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
                 setSelectedKeys([newVal1, newVal2]);
               }}
               onPressEnter={() =>
-                handleSearch(
-                  selectedKeys,
-                  dataIndex,
-                  closeDropdown,
-                  setSelectedKeys
-                )
+                handleSearch(selectedKeys, dataIndex, closeDropdown, setSelectedKeys)
               }
               style={{ width: "100%" }}
             />
+            
             */}
-
             <Space>
               <Button
                 type="primary"
@@ -521,7 +550,11 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
                 type="link"
                 size="small"
                 onClick={() => {
-                  close();
+                  // Artık sadece bu butona basıldığında dropdown kapanacak
+                  setFilterDropdownOpen((prev) => ({
+                    ...prev,
+                    [dataIndex]: false,
+                  }));
                 }}
               >
                 Kapat
@@ -531,17 +564,11 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
         </div>
       );
     },
+
     filterIcon: () => {
       const vals = columnFilters[dataIndex] || [];
       const isFiltered = vals.some((v) => v && v.toString().trim() !== "");
       return <SearchOutlined style={{ color: isFiltered ? "#1890ff" : undefined }} />;
-    },
-    filterDropdownProps: {
-      onOpenChange: (visible) => {
-        if (visible) {
-          setTimeout(() => searchInput.current?.select(), 100);
-        }
-      },
     },
   });
 
@@ -606,6 +633,52 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
     XLSX.writeFile(wb, "tablo_export.xlsx");
   };
 
+  // ------------------ SORTING ------------------
+  const getSorter = (column) => {
+    // Sayısal değerler için
+    if (column.isNumber) {
+      return (a, b) => {
+        const aVal = a[column.dataIndex];
+        const bVal = b[column.dataIndex];
+        return (aVal || 0) - (bVal || 0);
+      };
+    }
+
+    // Tarih değerleri için
+    if (column.isDate) {
+      return (a, b) => {
+        const aVal = a[column.dataIndex] ? dayjs(a[column.dataIndex], "DD.MM.YYYY").valueOf() : 0;
+        const bVal = b[column.dataIndex] ? dayjs(b[column.dataIndex], "DD.MM.YYYY").valueOf() : 0;
+        return aVal - bVal;
+      };
+    }
+
+    // Saat değerleri için
+    if (column.isHour) {
+      return (a, b) => {
+        const aVal = a[column.dataIndex] ? dayjs(a[column.dataIndex], "HH:mm").valueOf() : 0;
+        const bVal = b[column.dataIndex] ? dayjs(b[column.dataIndex], "HH:mm").valueOf() : 0;
+        return aVal - bVal;
+      };
+    }
+
+    // Yıl değerleri için
+    if (column.isYear) {
+      return (a, b) => {
+        const aVal = a[column.dataIndex] || 0;
+        const bVal = b[column.dataIndex] || 0;
+        return aVal - bVal;
+      };
+    }
+
+    // Metin değerleri için (varsayılan)
+    return (a, b) => {
+      const aVal = a[column.dataIndex] ? a[column.dataIndex].toString().toLowerCase() : "";
+      const bVal = b[column.dataIndex] ? b[column.dataIndex].toString().toLowerCase() : "";
+      return aVal.localeCompare(bVal);
+    };
+  };
+
   // ------------------ RENDER ------------------
   const styledColumns = useMemo(() => {
     return visibleColumns.map((col) => {
@@ -613,6 +686,9 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
       return {
         ...col,
         ...searchProps,
+        sorter: getSorter(col),
+        sortDirections: ["ascend", "descend"],
+        showSorterTooltip: false,
         onHeaderCell: () => ({
           style: {
             whiteSpace: "nowrap",
@@ -630,19 +706,17 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
         render: (text) => <span style={{ whiteSpace: "nowrap" }}>{text !== null && text !== undefined ? text : "\u00A0"}</span>,
       };
     });
-  }, [visibleColumns, columnFilters]);
+  }, [visibleColumns, columnFilters, filterDropdownOpen]);
 
   const handleRecordModalClose = () => {
     onDrawerClose();
   };
 
   const handleSaveColumns = () => {
-    console.log("columns", columns);
     setSaveModalVisible(true);
   };
 
   const onFinish = (values) => {
-    // console.log("Success:", values);
     saveReport(values);
   };
   const onFinishFailed = (errorInfo) => {
@@ -663,11 +737,10 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
     };
     try {
       const response = await AxiosInstance.post(`SaveNewReport`, body);
-      if (response.status_code == 200) {
+      if (response.status_code === 200) {
         message.success("Ekleme Başarılı");
         setSaveModalVisible(false);
       }
-      console.log("response", response);
     } catch (error) {
       console.log("error", error);
     }
@@ -780,6 +853,7 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
               setColumns(initialColumns);
               setColumnFilters({});
               setTableData(originalData);
+              setFilterDropdownOpen({});
             }}
             style={{ marginBottom: "15px" }}
           >
