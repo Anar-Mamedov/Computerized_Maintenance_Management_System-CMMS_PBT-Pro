@@ -53,7 +53,7 @@ const LocationFilter = ({ filtersLabel, setLokasyonID1, lokasyonID1 }) => {
             showSearch
             allowClear
             loading={loading}
-            placeholder="Seçim Yapınız"
+            placeholder="Lokasyon Seçiniz"
             optionFilterProp="children"
             filterOption={(input, option) => (option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false)}
             options={options.map((item) => ({
