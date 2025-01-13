@@ -30,7 +30,7 @@ import Dashboard1 from "./pages/Dashboard1/Dashboard.jsx";
 import UserIdControl from "./pages/UserIdControl/UserIdControl.jsx";
 import IsEmriTipleri from "./pages/Yonetim/IsEmriTipleri/IsEmriTipleri.jsx";
 import Breadcrumbs from "./Breadcrumbs"; // Import the Breadcrumbs component
-import MudaheleSuresi from "./pages/BakımVeArizaYonetimi/MudaheleAnalizi/MudaheleAnalizi.jsx";
+import MudaheleSuresi from "./pages/Analizler/MudaheleAnalizi/MudaheleAnalizi.jsx";
 import { selectedMenuItemState } from "./state/menuState";
 import FloatButton from "./pages/components/FloatButton/index.jsx";
 import RolTanimlari from "./pages/OnayIslemleri/RolTanimlari/RolTanimlari.jsx";
@@ -133,7 +133,7 @@ const rawItems = [
       getItem("Periyodik Bakımlar", "periyodikBakimlar", true),
       getItem("Otomatik İş Emirleri", "otomatikIsEmirleri", true),
       getItem("Planlama Takvimi", "planlamaTakvimi", true),
-      getItem("Müdahale Süresi Analizi", "mudaheleSuresi", true),
+      // getItem("Müdahale Süresi Analizi", "mudaheleSuresi", true),
       // getItem("Alex", "alex", true)
     ],
     false
@@ -148,7 +148,6 @@ const rawItems = [
       getItem("Personel İzinleri", "personelIzinleri", true),
       getItem("Personel Nöbetleri", "personelNobetleri", true),
       getItem("Personel Çalışma Planı", "personelCalismaPLani", true),
-      getItem("Personel KPI Analizi", "analizler", true),
 
       // getItem("Team 2", "team2", true)
     ],
@@ -161,6 +160,18 @@ const rawItems = [
     [
       getItem("İş Talepleri", "isTalepleri", true),
       getItem("İş Talebi Kullanıcıları", "isTalebiKullanicilari", true),
+      // getItem("Team 2", "team2", true)
+    ],
+    false
+  ),
+  getItem(
+    "Analizler",
+    "analizler",
+    <KeyOutlined />,
+    [
+      getItem("Müdahale Süresi Analizi", "mudaheleSuresi", true),
+      getItem("Personel KPI Analizi", "analizler", true),
+
       // getItem("Team 2", "team2", true)
     ],
     false
