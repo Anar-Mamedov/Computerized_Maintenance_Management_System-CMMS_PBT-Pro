@@ -1,4 +1,4 @@
-name: Deploy to SFTP Server
+name: Deploy to FTP Server
 
 on:
   push:
@@ -33,12 +33,12 @@ jobs:
           echo "Listing contents of the 'dist' directory:"
           ls -al dist/
 
-      - name: Deploy to SFTP Server
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+      - name: Deploy to FTP Server
+        uses: SamKirkland/FTP-Deploy-Action@4.3.0
         with:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local_path: "./dist/*"
-          remote_path: "/public_html/"
-          sftpArgs: "-o StrictHostKeyChecking=no"
+          local-dir: dist/
+          server-dir: /public_html/
+          debug: true
