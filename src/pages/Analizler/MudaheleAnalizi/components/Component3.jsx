@@ -5,7 +5,7 @@ import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../api/http.jsx";
 import { t } from "i18next";
 import dayjs from "dayjs";
-import EditDrawer from "../../IsEmri/Update/EditDrawer.jsx";
+import EditDrawer from "../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer.jsx";
 
 const { Text } = Typography;
 

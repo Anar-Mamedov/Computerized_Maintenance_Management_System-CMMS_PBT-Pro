@@ -3,7 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Spin, Typography, Modal } from "antd";
 import AxiosInstance from "../../../../api/http.jsx";
 import { useFormContext } from "react-hook-form";
-import Istalebi from "./HistogramModalContents/Table";
+import Istalebi from "./HistogramModalContents/Table.jsx";
 import { t } from "i18next";
 import dayjs from "dayjs";
 

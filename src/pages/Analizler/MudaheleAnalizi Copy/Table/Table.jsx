@@ -8,7 +8,7 @@ import { Resizable } from "react-resizable";
 import "./ResizeStyle.css";
 import AxiosInstance from "../../../../api/http.jsx";
 // import CreateDrawer from '../Insert/CreateDrawer';
-import EditDrawer from "../../IsEmri/Update/EditDrawer.jsx";
+import EditDrawer from "../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer.jsx";
 // import Filters from "./filter/Filters";
 import Filters1 from "./Filters/Filters.jsx";
 // import ContextMenu from "../components/ContextMenu/ContextMenu";
