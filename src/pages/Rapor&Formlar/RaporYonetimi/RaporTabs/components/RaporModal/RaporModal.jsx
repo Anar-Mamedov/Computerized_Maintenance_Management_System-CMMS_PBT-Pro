@@ -711,6 +711,7 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
             showSizeChanger: true,
             pageSizeOptions: ["10", "20", "50", "100"],
             defaultPageSize: 10,
+            showTotal: (total) => `Toplam ${total} kayıt`,
           }}
           scroll={{ y: "calc(100vh - 340px)", x: "max-content" }}
           locale={{

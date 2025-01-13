@@ -53,7 +53,7 @@ const AtolyeSelect = ({ filtersLabel }) => {
             showSearch
             allowClear
             loading={loading}
-            placeholder="Seçim Yapınız"
+            placeholder="Atölye Seçiniz"
             optionFilterProp="children"
             filterOption={(input, option) => (option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false)}
             options={options.map((item) => ({
