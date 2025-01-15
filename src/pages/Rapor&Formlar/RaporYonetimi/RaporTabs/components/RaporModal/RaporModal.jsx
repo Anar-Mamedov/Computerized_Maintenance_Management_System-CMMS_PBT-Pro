@@ -748,7 +748,7 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
 
   return (
     <>
-      <Modal destroyOnClose title={selectedRow?.RPR_TANIM} open={drawerVisible} onCancel={handleRecordModalClose} footer={null} width="90%">
+      <Modal destroyOnClose title={selectedRow?.RPR_TANIM} open={drawerVisible} onCancel={handleRecordModalClose} footer={null} width="90%" zIndex={1000}>
         <div
           style={{
             marginBottom: "10px",
@@ -794,7 +794,7 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
         />
       </Modal>
 
-      <Modal title="Raporu Kaydet" centered width={500} open={saveModalVisible} onOk={() => form.submit()} onCancel={() => setSaveModalVisible(false)}>
+      <Modal title="Raporu Kaydet" centered width={500} open={saveModalVisible} onOk={() => form.submit()} onCancel={() => setSaveModalVisible(false)} zIndex={1001}>
         <Form
           form={form}
           name="basic"
@@ -837,7 +837,15 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
       </Modal>
 
       {/* Manage Columns Modal */}
-      <Modal title="Sütunları Yönet" centered width={800} open={manageColumnsVisible} onOk={() => setManageColumnsVisible(false)} onCancel={() => setManageColumnsVisible(false)}>
+      <Modal
+        title="Sütunları Yönet"
+        centered
+        width={800}
+        open={manageColumnsVisible}
+        onOk={() => setManageColumnsVisible(false)}
+        onCancel={() => setManageColumnsVisible(false)}
+        zIndex={1001}
+      >
         <Text style={{ marginBottom: "15px", display: "block" }}>Aşağıdaki Ekranlardan Sütunları Göster / Gizle, Sıralamalarını ve Genişliklerini Ayarlayabilirsiniz.</Text>
 
         <div
