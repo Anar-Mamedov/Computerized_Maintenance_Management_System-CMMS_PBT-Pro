@@ -166,7 +166,7 @@ const rawItems = [
   ),
   getItem(
     "Analizler",
-    "analizler",
+    "analizler1",
     <KeyOutlined />,
     [
       getItem("Müdahale Süresi Analizi", "mudaheleSuresi", true),
