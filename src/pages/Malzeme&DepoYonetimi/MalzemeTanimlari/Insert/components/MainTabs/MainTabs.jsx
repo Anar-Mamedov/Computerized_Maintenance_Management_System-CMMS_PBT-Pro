@@ -6,7 +6,7 @@ import PersonelTablo from "./components/PersonelTablo";
 import styled from "styled-components";
 import FreeTextInput from "../../../../../../utils/components/FreeTextInput";
 import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
-
+import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
 import dayjs from "dayjs";
 
 import { t } from "i18next";
@@ -208,6 +208,11 @@ export default function MainTabs({ modalOpen }) {
     setValue("personelID", "");
   };
 
+  const handleLokasyonMinusClick = () => {
+    setValue("lokasyonTanim", "");
+    setValue("lokasyonID", "");
+  };
+
   return (
     <div style={{ display: "flex", marginBottom: "15px", flexDirection: "column", gap: "10px", width: "100%" }}>
       <div
@@ -216,7 +221,7 @@ export default function MainTabs({ modalOpen }) {
           flexFlow: "column wrap",
           alignItems: "center",
           width: "100%",
-          maxWidth: "350px",
+          maxWidth: "400px",
           justifyContent: "space-between",
           gap: "8px",
           flexDirection: "row",
@@ -231,7 +236,7 @@ export default function MainTabs({ modalOpen }) {
             display: "flex",
             alignItems: "flex-start",
             width: "100%",
-            maxWidth: "250px",
+            maxWidth: "300px",
             flexDirection: "column",
           }}
         >
@@ -245,7 +250,7 @@ export default function MainTabs({ modalOpen }) {
           flexFlow: "column wrap",
           alignItems: "center",
           width: "100%",
-          maxWidth: "350px",
+          maxWidth: "400px",
           justifyContent: "space-between",
           gap: "8px",
           flexDirection: "row",
@@ -260,7 +265,7 @@ export default function MainTabs({ modalOpen }) {
             display: "flex",
             alignItems: "flex-start",
             width: "100%",
-            maxWidth: "250px",
+            maxWidth: "300px",
             flexDirection: "column",
           }}
         >
@@ -274,7 +279,7 @@ export default function MainTabs({ modalOpen }) {
           flexFlow: "column wrap",
           alignItems: "center",
           width: "100%",
-          maxWidth: "350px",
+          maxWidth: "400px",
           justifyContent: "space-between",
           gap: "8px",
           flexDirection: "row",
@@ -289,7 +294,7 @@ export default function MainTabs({ modalOpen }) {
             display: "flex",
             alignItems: "flex-start",
             width: "100%",
-            maxWidth: "250px",
+            maxWidth: "300px",
             flexDirection: "column",
           }}
         >
@@ -303,7 +308,7 @@ export default function MainTabs({ modalOpen }) {
           flexFlow: "column wrap",
           alignItems: "center",
           width: "100%",
-          maxWidth: "350px",
+          maxWidth: "400px",
           justifyContent: "space-between",
           gap: "8px",
           flexDirection: "row",
@@ -318,7 +323,7 @@ export default function MainTabs({ modalOpen }) {
             display: "flex",
             alignItems: "flex-start",
             width: "100%",
-            maxWidth: "250px",
+            maxWidth: "300px",
             flexDirection: "column",
           }}
         >
@@ -332,7 +337,7 @@ export default function MainTabs({ modalOpen }) {
           flexFlow: "column wrap",
           alignItems: "center",
           width: "100%",
-          maxWidth: "350px",
+          maxWidth: "400px",
           justifyContent: "space-between",
           gap: "8px",
           flexDirection: "row",
@@ -344,13 +349,77 @@ export default function MainTabs({ modalOpen }) {
             display: "flex",
             alignItems: "flex-start",
             width: "100%",
-            maxWidth: "250px",
+            maxWidth: "300px",
             flexDirection: "column",
           }}
         >
-          <KodIDSelectbox name1="grup" isRequired={false} kodID="32001" />
+          <KodIDSelectbox name1="grup" isRequired={false} kodID="13004" />
         </div>
       </div>
+
+      <StyledDivMedia
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+          maxWidth: "400px",
+        }}
+      >
+        <Text
+          style={{
+            fontSize: "14px",
+          }}
+        >
+          Lokasyon:
+        </Text>
+        <div>
+          <div
+            className="anar"
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              minWidth: "300px",
+              gap: "3px",
+            }}
+          >
+            <Controller
+              name="lokasyonTanim"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  status={errors.lokasyonTanim ? "error" : ""}
+                  type="text" // Set the type to "text" for name input
+                  style={{ width: "100%", maxWidth: "630px" }}
+                  disabled
+                />
+              )}
+            />
+            <Controller
+              name="lokasyonID"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="text" // Set the type to "text" for name input
+                  style={{ display: "none" }}
+                />
+              )}
+            />
+            <LokasyonTablo
+              onSubmit={(selectedData) => {
+                setValue("lokasyonTanim", selectedData.LOK_TANIM);
+                setValue("lokasyonID", selectedData.key);
+              }}
+            />
+            <Button onClick={handleLokasyonMinusClick}> - </Button>
+          </div>
+        </div>
+      </StyledDivMedia>
 
       <div
         style={{
