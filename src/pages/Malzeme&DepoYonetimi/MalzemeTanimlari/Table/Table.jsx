@@ -913,7 +913,7 @@ const Sigorta = () => {
         // Gelen veriyi formatla ve state'e ata
         const formattedData = response.Data.map((item) => ({
           ...item,
-          key: item.TB_KULLANICI_ID,
+          key: item.TB_STOK_ID,
           // Diğer alanlarınız...
         }));
         setData(formattedData);
