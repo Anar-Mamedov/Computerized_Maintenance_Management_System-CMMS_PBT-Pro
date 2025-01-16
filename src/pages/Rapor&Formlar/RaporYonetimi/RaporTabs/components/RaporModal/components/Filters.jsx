@@ -37,8 +37,8 @@ function Filters({ filtersLabel, onSubmit }) {
     setValue("lokasyonID", filtersLabel.LokasyonID);
     setValue("atolye", filtersLabel.AtolyeName);
     setValue("atolyeID", filtersLabel.AtolyeID);
-    setValue("startDate", filtersLabel.BaslamaTarih ? dayjs(filtersLabel.BaslamaTarih).format("DD.MM.YYYY") : null);
-    setValue("endDate", filtersLabel.BitisTarih ? dayjs(filtersLabel.BitisTarih).format("DD.MM.YYYY") : null);
+    setValue("startDate", filtersLabel.BaslamaTarih ? dayjs(filtersLabel.BaslamaTarih) : null);
+    setValue("endDate", filtersLabel.BitisTarih ? dayjs(filtersLabel.BitisTarih) : null);
   }, [filtersLabel]);
 
   const lokasyonID = watch("lokasyonID");
@@ -88,10 +88,11 @@ function Filters({ filtersLabel, onSubmit }) {
           render={({ field }) => (
             <DatePicker
               {...field}
+              value={field.value ? dayjs(field.value) : null}
               filtersLabel={filtersLabel}
               placeholder="Başlangıç Tarihi"
               onChange={(date) => {
-                field.onChange(date);
+                field.onChange(date ? dayjs(date) : null);
               }}
               format="DD.MM.YYYY"
               locale={locale}
@@ -104,10 +105,11 @@ function Filters({ filtersLabel, onSubmit }) {
           render={({ field }) => (
             <DatePicker
               {...field}
+              value={field.value ? dayjs(field.value) : null}
               filtersLabel={filtersLabel}
               placeholder="Bitiş Tarihi"
               onChange={(date) => {
-                field.onChange(date);
+                field.onChange(date ? dayjs(date) : null);
               }}
               format="DD.MM.YYYY"
               locale={locale}

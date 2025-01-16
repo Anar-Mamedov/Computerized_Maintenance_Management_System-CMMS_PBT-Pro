@@ -265,14 +265,16 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
   const getColumnSearchProps = (dataIndex) => ({
     // Ant Design 5 için "filterDropdownOpen" ve "onFilterDropdownOpenChange"
     // ile durumu manuel kontrol ediyoruz.
-    filterDropdownOpen: filterDropdownOpen[dataIndex] || false,
-    onFilterDropdownOpenChange: (open) => {
-      // Sadece "true" olduğunda (dropdown açılırken) state'i güncelleyelim;
-      // dışarı tıklandığında kapanmasını engellemek için "false" durumunu yoksayacağız.
-      if (open) {
-        setFilterDropdownOpen((prev) => ({ ...prev, [dataIndex]: true }));
-        setTimeout(() => searchInput.current?.select(), 100);
-      }
+    filterDropdownProps: {
+      open: filterDropdownOpen[dataIndex] || false,
+      onOpenChange: (open) => {
+        // Sadece "true" olduğunda (dropdown açılırken) state'i güncelleyelim;
+        // dışarı tıklandığında kapanmasını engellemek için "false" durumunu yoksayacağız.
+        if (open) {
+          setFilterDropdownOpen((prev) => ({ ...prev, [dataIndex]: true }));
+          setTimeout(() => searchInput.current?.select(), 100);
+        }
+      },
     },
 
     // filterDropdown içeriğini tamamen özelleştiriyoruz.
