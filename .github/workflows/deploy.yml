@@ -19,14 +19,10 @@ jobs:
           node-version: "16"
 
       - name: Install dependencies
-        run: |
-          set -e
-          npm ci
+        run: npm ci
 
       - name: Build project
-        run: |
-          set -e
-          npm run build
+        run: npm run build
 
       - name: Verify build output
         run: |
@@ -39,6 +35,9 @@ jobs:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          port: 21
+          security: none
           local-dir: dist/
           server-dir: /public_html/
-          debug: true
+          log-level: verbose
