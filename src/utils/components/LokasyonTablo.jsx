@@ -1,10 +1,18 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table, Input, message } from "antd";
+import { Controller, useFormContext } from "react-hook-form";
 import { SearchOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../api/http";
 import styled from "styled-components";
 
 export default function LokasyonTablo({ workshopSelectedId, onSubmit, disabled }) {
+  const {
+    control,
+    watch,
+    setValue,
+    getValues,
+    formState: { errors },
+  } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -171,7 +179,9 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit, disabled }
   const handleModalOk = () => {
     const selectedData = findItemInTree(selectedRowKeys[0], treeData);
     if (selectedData) {
-      onSubmit && onSubmit(selectedData); // This should handle both parents and children
+      setValue("lokasyonTanim", selectedData.LOK_TANIM);
+      setValue("lokasyonID", selectedData.key);
+      onSubmit && onSubmit(selectedData);
     }
     setIsModalVisible(false);
   };
@@ -194,11 +204,46 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit, disabled }
 
   // parentler seçilemesin diye end
 
+  const handleLokasyonMinusClick = () => {
+    setValue("lokasyonTanim", "");
+    setValue("lokasyonID", "");
+  };
+
   return (
-    <div>
-      <Button disabled={disabled} onClick={handleModalToggle}>
-        +
-      </Button>
+    <div style={{ width: "100%" }}>
+      <div style={{ display: "flex", gap: "5px", width: "100%" }}>
+        <Controller
+          name="lokasyonTanim"
+          control={control}
+          render={({ field }) => (
+            <Input
+              {...field}
+              status={errors.lokasyonTanim ? "error" : ""}
+              type="text" // Set the type to "text" for name input
+              style={{ width: "100%", maxWidth: "630px" }}
+              disabled
+            />
+          )}
+        />
+        <Controller
+          name="lokasyonID"
+          control={control}
+          render={({ field }) => (
+            <Input
+              {...field}
+              type="text" // Set the type to "text" for name input
+              style={{ display: "none" }}
+            />
+          )}
+        />
+        <div style={{ display: "flex", gap: "5px" }}>
+          <Button disabled={disabled} onClick={handleModalToggle}>
+            +
+          </Button>
+          <Button onClick={handleLokasyonMinusClick}> - </Button>
+        </div>
+      </div>
+
       <Modal width="1200px" title="Lokasyon" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <Input
           style={{ width: "250px", marginBottom: "10px" }}
