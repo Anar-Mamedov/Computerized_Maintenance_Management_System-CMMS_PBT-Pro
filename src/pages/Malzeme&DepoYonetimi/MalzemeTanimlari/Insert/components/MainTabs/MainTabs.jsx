@@ -203,338 +203,50 @@ export default function MainTabs({ modalOpen }) {
 
   // console.log(watch("color")?.toHexString?.());
 
-  const handleIdariAmiriMinusClick = () => {
-    setValue("personel", "");
-    setValue("personelID", "");
-  };
-
-  const handleLokasyonMinusClick = () => {
-    setValue("lokasyonTanim", "");
-    setValue("lokasyonID", "");
-  };
-
   return (
-    <div style={{ display: "flex", marginBottom: "15px", flexDirection: "column", gap: "10px", width: "100%" }}>
-      <div
-        style={{
-          display: "flex",
-          flexFlow: "column wrap",
-          alignItems: "center",
-          width: "100%",
-          maxWidth: "400px",
-          justifyContent: "space-between",
-          gap: "8px",
-          flexDirection: "row",
-        }}
-      >
-        <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>
-          {t("kod")}
-          <div style={{ color: "red" }}>*</div>
-        </Text>
+    <div style={{ display: "flex", marginBottom: "15px", flexDirection: "row", gap: "10px", width: "100%" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "400px" }}>
         <div
           style={{
             display: "flex",
-            alignItems: "flex-start",
-            width: "100%",
-            maxWidth: "300px",
-            flexDirection: "column",
-          }}
-        >
-          <FreeTextInput name1="malzemeKod" isRequired={true} />
-        </div>
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          flexFlow: "column wrap",
-          alignItems: "center",
-          width: "100%",
-          maxWidth: "400px",
-          justifyContent: "space-between",
-          gap: "8px",
-          flexDirection: "row",
-        }}
-      >
-        <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>
-          {t("tanim")}
-          <div style={{ color: "red" }}>*</div>
-        </Text>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "flex-start",
-            width: "100%",
-            maxWidth: "300px",
-            flexDirection: "column",
-          }}
-        >
-          <FreeTextInput name1="tanim" isRequired={true} />
-        </div>
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          flexFlow: "column wrap",
-          alignItems: "center",
-          width: "100%",
-          maxWidth: "400px",
-          justifyContent: "space-between",
-          gap: "8px",
-          flexDirection: "row",
-        }}
-      >
-        <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>
-          {t("tip")}
-          <div style={{ color: "red" }}>*</div>
-        </Text>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "flex-start",
-            width: "100%",
-            maxWidth: "300px",
-            flexDirection: "column",
-          }}
-        >
-          <KodIDSelectbox name1="tip" isRequired={true} kodID="13005" />
-        </div>
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          flexFlow: "column wrap",
-          alignItems: "center",
-          width: "100%",
-          maxWidth: "400px",
-          justifyContent: "space-between",
-          gap: "8px",
-          flexDirection: "row",
-        }}
-      >
-        <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>
-          {t("birim")}
-          <div style={{ color: "red" }}>*</div>
-        </Text>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "flex-start",
-            width: "100%",
-            maxWidth: "300px",
-            flexDirection: "column",
-          }}
-        >
-          <KodIDSelectbox name1="birim" isRequired={true} kodID="32001" />
-        </div>
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          flexFlow: "column wrap",
-          alignItems: "center",
-          width: "100%",
-          maxWidth: "400px",
-          justifyContent: "space-between",
-          gap: "8px",
-          flexDirection: "row",
-        }}
-      >
-        <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>{t("grup")}</Text>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "flex-start",
-            width: "100%",
-            maxWidth: "300px",
-            flexDirection: "column",
-          }}
-        >
-          <KodIDSelectbox name1="grup" isRequired={false} kodID="13004" />
-        </div>
-      </div>
-
-      <StyledDivMedia
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          width: "100%",
-          maxWidth: "400px",
-        }}
-      >
-        <Text
-          style={{
-            fontSize: "14px",
-          }}
-        >
-          Lokasyon:
-        </Text>
-        <div>
-          <div
-            className="anar"
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              minWidth: "300px",
-              gap: "3px",
-            }}
-          >
-            <Controller
-              name="lokasyonTanim"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  status={errors.lokasyonTanim ? "error" : ""}
-                  type="text" // Set the type to "text" for name input
-                  style={{ width: "100%", maxWidth: "630px" }}
-                  disabled
-                />
-              )}
-            />
-            <Controller
-              name="lokasyonID"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ display: "none" }}
-                />
-              )}
-            />
-            <LokasyonTablo
-              onSubmit={(selectedData) => {
-                setValue("lokasyonTanim", selectedData.LOK_TANIM);
-                setValue("lokasyonID", selectedData.key);
-              }}
-            />
-            <Button onClick={handleLokasyonMinusClick}> - </Button>
-          </div>
-        </div>
-      </StyledDivMedia>
-
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "flex-start",
-          width: "100%",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          gap: "8px",
-        }}
-      >
-        <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("rolTanimi")}</Text>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
+            flexFlow: "column wrap",
             alignItems: "center",
-            minWidth: "300px",
-            gap: "10px",
             width: "100%",
-          }}
-        >
-          <RolSelectBox />
-        </div>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-        <StyledDivBottomLine
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "flex-start",
-            width: "100%",
-            flexDirection: "column",
+            maxWidth: "400px",
             justifyContent: "space-between",
             gap: "8px",
+            flexDirection: "row",
           }}
         >
-          <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("personel")}</Text>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <Controller
-              name="personel"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  disabled
-                />
-              )}
-            />
-            <Controller
-              name="personelID"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ display: "none" }}
-                />
-              )}
-            />
-            <PersonelTablo
-              onSubmit={(selectedData) => {
-                setValue("personel", selectedData.subject);
-                setValue("personelID", selectedData.key);
-              }}
-            />
-            <Button onClick={handleIdariAmiriMinusClick}> - </Button>
-          </div>
-        </StyledDivBottomLine>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
-        <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("hesabinDurumunuAktifVeYaPasifYap")}</Text>
-        <Controller name="aktif" control={control} render={({ field }) => <Switch {...field} />} />
-      </div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
-        <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("sistemYetkilisi")}</Text>
-        <Controller name="sistemYetkilisi" control={control} render={({ field }) => <Switch {...field} />} />
-      </div>
-      <div style={{ display: "flex", gap: "15px", width: "100%", alignItems: "flex-start" }}>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", width: "100%", flexDirection: "column", justifyContent: "space-between", gap: "8px" }}>
           <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>
-            {t("kullaniciKodu")}
+            {t("kod")}
             <div style={{ color: "red" }}>*</div>
           </Text>
           <div
             style={{
               display: "flex",
-              flexWrap: "wrap",
-              width: "100%",
               alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
               flexDirection: "column",
             }}
           >
-            <Controller
-              name="kullaniciKod"
-              control={control}
-              rules={{ required: t("alanBosBirakilamaz") }}
-              render={({ field }) => <Input {...field} status={errors.kullaniciKod ? "error" : ""} style={{ flex: 1 }} />}
-            />
-            {errors.kullaniciKod && <div style={{ color: "red", marginTop: "5px" }}>{errors.kullaniciKod.message}</div>}
+            <FreeTextInput name1="malzemeKod" isRequired={true} />
           </div>
         </div>
-      </div>
-      <div style={{ display: "flex", gap: "15px", width: "100%", alignItems: "flex-start" }}>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", width: "100%", flexDirection: "column", justifyContent: "space-between", gap: "8px" }}>
+
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "400px",
+            justifyContent: "space-between",
+            gap: "8px",
+            flexDirection: "row",
+          }}
+        >
           <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>
             {t("tanim")}
             <div style={{ color: "red" }}>*</div>
@@ -542,51 +254,155 @@ export default function MainTabs({ modalOpen }) {
           <div
             style={{
               display: "flex",
-              flexWrap: "wrap",
-              width: "100%",
               alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
               flexDirection: "column",
             }}
           >
-            <Controller
-              name="isim"
-              control={control}
-              rules={{ required: t("alanBosBirakilamaz") }}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  onChange={(e) => {
-                    field.onChange(e);
-                    const value = e.target.value;
-                    setIsimValue(value);
-                    updateParaf(value, soyisimValue);
-                  }}
-                  status={errors.isim ? "error" : ""}
-                  style={{ flex: 1 }}
-                />
-              )}
-            />
-            {errors.isim && <div style={{ color: "red", marginTop: "5px" }}>{errors.isim.message}</div>}
+            <FreeTextInput name1="tanim" isRequired={true} />
           </div>
         </div>
-      </div>
-      <div style={{ display: "flex", gap: "15px", width: "100%", alignItems: "flex-start" }}>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", width: "100%", flexDirection: "column", justifyContent: "space-between", gap: "8px" }}>
-          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>{t("sifre")}</Text>
+
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "400px",
+            justifyContent: "space-between",
+            gap: "8px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>
+            {t("tip")}
+            <div style={{ color: "red" }}>*</div>
+          </Text>
           <div
             style={{
               display: "flex",
-              flexWrap: "wrap",
-              width: "100%",
               alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
               flexDirection: "column",
             }}
           >
-            <Controller name="sifre" control={control} render={({ field }) => <Input {...field} style={{ flex: 1 }} />} />
+            <KodIDSelectbox name1="tip" isRequired={true} kodID="13005" />
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "400px",
+            justifyContent: "space-between",
+            gap: "8px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>
+            {t("birim")}
+            <div style={{ color: "red" }}>*</div>
+          </Text>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
+              flexDirection: "column",
+            }}
+          >
+            <KodIDSelectbox name1="birim" isRequired={true} kodID="32001" />
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "400px",
+            justifyContent: "space-between",
+            gap: "8px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>{t("grup")}</Text>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
+              flexDirection: "column",
+            }}
+          >
+            <KodIDSelectbox name1="grup" isRequired={false} kodID="13004" />
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "400px",
+            justifyContent: "space-between",
+            gap: "8px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>{t("lokasyon")}</Text>
+          <div
+            className="anar"
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
+              flexDirection: "column",
+            }}
+          >
+            <LokasyonTablo />
           </div>
         </div>
       </div>
-      <div style={{ display: "flex", gap: "15px", width: "100%" }}></div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "400px" }}>
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "400px",
+            justifyContent: "space-between",
+            gap: "8px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>{t("ureticiKodu")}</Text>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
+              flexDirection: "column",
+            }}
+          >
+            <FreeTextInput name1="ureticiKodu" isRequired={false} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
