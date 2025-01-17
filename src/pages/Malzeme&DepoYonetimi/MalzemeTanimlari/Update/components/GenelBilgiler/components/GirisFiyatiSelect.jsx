@@ -22,9 +22,9 @@ function GirisFiyatiSelect() {
   ];
 
   return (
-    <div style={{ width: "100%", minWidth: "100px" }}>
+    <div style={{ width: "100%" }}>
       <Controller
-        name="girisFiyati"
+        name="girisFiyatTuru"
         control={control}
         render={({ field }) => <Select {...field} placeholder={t("secimYapiniz")} allowClear options={options} style={{ width: "100%" }} />}
       />

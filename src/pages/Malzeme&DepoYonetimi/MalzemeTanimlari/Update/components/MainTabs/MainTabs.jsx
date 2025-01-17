@@ -203,10 +203,6 @@ export default function MainTabs({ modalOpen }) {
     setValue("paraf", paraf);
   };
 
-  // console.log(watch("color")?.toHexString?.());
-
-  console.log(watch("MakineMarka"));
-
   return (
     <div style={{ display: "flex", marginBottom: "15px", flexDirection: "row", gap: "20px", width: "100%" }}>
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "400px" }}>

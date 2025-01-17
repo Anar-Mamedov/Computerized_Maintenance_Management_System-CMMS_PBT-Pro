@@ -192,7 +192,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <div>
                 <MainTabs />
-                <Tablar />
+                <Tablar selectedRowID={selectedRow?.key} />
               </div>
             </form>
           )}

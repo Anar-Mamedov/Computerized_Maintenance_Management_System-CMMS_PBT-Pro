@@ -44,8 +44,6 @@ export default function SinifiTablo({ workshopSelectedId, onSubmit, disabled }) 
   const [isEditMode, setIsEditMode] = useState(false);
   const [updateRecordId, setUpdateRecordId] = useState(null);
 
-  console.log(selectedRowData);
-
   const columns = [
     {
       title: "Sınıf Tanımı",
