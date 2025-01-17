@@ -7,7 +7,7 @@ import AtolyeYetkisi from "./AtolyeYetkisi/AtolyeYetkisi";
 import GenelBilgiler from "./GenelBilgiler/GenelBilgiler";
 import { t } from "i18next";
 
-function Tablar() {
+function Tablar({ selectedRowID }) {
   const [tabKey, setTabKey] = useState("1");
 
   const handleTabChange = (e) => {
@@ -24,7 +24,7 @@ function Tablar() {
         <Radio.Button value="5">{t("yetkiler")}</Radio.Button>
       </Radio.Group>
       <Divider style={{ marginBottom: 10 }} />
-      {tabKey === "1" && <GenelBilgiler />}
+      {tabKey === "1" && <GenelBilgiler selectedRowID={selectedRowID} />}
       {tabKey === "2" && <LokasyonYetkileri />}
       {tabKey === "3" && <DepoYetkisi />}
       {tabKey === "4" && <AtolyeYetkisi />}
