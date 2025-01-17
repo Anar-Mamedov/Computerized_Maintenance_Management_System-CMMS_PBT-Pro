@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Drawer, Typography, Button, Input, Select, DatePicker, TimePicker, Row, Col, Checkbox, InputNumber, Radio, ColorPicker, Switch } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
-import RolSelectBox from "./components/RolSelectBox";
-import PersonelTablo from "./components/PersonelTablo";
 import styled from "styled-components";
 import FreeTextInput from "../../../../../../utils/components/FreeTextInput";
 import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
 import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
+import AtolyeTablo from "../../../../../../utils/components/AtolyeTablo";
+import MarkaEkleSelect from "../../../../../../utils/components/MarkaEkleSelect";
+import ModelEkleSelect from "../../../../../../utils/components/ModelEkleSelect";
+import SinifiTablo from "../../../../../../utils/components/SinifiTablo";
 import dayjs from "dayjs";
 
 import { t } from "i18next";
@@ -203,8 +205,10 @@ export default function MainTabs({ modalOpen }) {
 
   // console.log(watch("color")?.toHexString?.());
 
+  console.log(watch("MakineMarka"));
+
   return (
-    <div style={{ display: "flex", marginBottom: "15px", flexDirection: "row", gap: "10px", width: "100%" }}>
+    <div style={{ display: "flex", marginBottom: "15px", flexDirection: "row", gap: "20px", width: "100%" }}>
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "400px" }}>
         <div
           style={{
@@ -401,6 +405,145 @@ export default function MainTabs({ modalOpen }) {
           >
             <FreeTextInput name1="ureticiKodu" isRequired={false} />
           </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "400px",
+            justifyContent: "space-between",
+            gap: "8px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>{t("sinifi")}</Text>
+          <div
+            className="anar"
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
+              flexDirection: "column",
+            }}
+          >
+            <SinifiTablo />
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "400px",
+            justifyContent: "space-between",
+            gap: "8px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>{t("marka")}</Text>
+          <div
+            className="anar"
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
+              flexDirection: "column",
+            }}
+          >
+            <MarkaEkleSelect />
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "400px",
+            justifyContent: "space-between",
+            gap: "8px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>{t("model")}</Text>
+          <div
+            className="anar"
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
+              flexDirection: "column",
+            }}
+          >
+            <ModelEkleSelect />
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "400px",
+            justifyContent: "space-between",
+            gap: "8px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>{t("altolye")}</Text>
+          <div
+            className="anar"
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
+              flexDirection: "column",
+            }}
+          >
+            <AtolyeTablo />
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "200px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("aktif")}</Text>
+          <Controller name="aktif" control={control} render={({ field }) => <Switch {...field} />} />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("yedekParca")}</Text>
+          <Controller name="yedekParca" control={control} render={({ field }) => <Switch {...field} />} />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("sarfMalzeme")}</Text>
+          <Controller name="sarfMalzeme" control={control} render={({ field }) => <Switch {...field} />} />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("stoksuzMalzeme")}</Text>
+          <Controller name="stoksuzMalzeme" control={control} render={({ field }) => <Switch {...field} />} />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("kritikMalzeme")}</Text>
+          <Controller name="kritikMalzeme" control={control} render={({ field }) => <Switch {...field} />} />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("yag")}</Text>
+          <Controller name="yag" control={control} render={({ field }) => <Switch {...field} />} />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("filtre")}</Text>
+          <Controller name="filtre" control={control} render={({ field }) => <Switch {...field} />} />
         </div>
       </div>
     </div>
