@@ -152,9 +152,9 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
         <Modal
-          width="600px"
+          width="1200px"
           centered
-          title={t("kullaniciGuncelleme")}
+          title={t("malzemeGuncelleme")}
           open={drawerVisible}
           onCancel={onClose}
           footer={
@@ -191,6 +191,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
           ) : (
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <div>
+                <MainTabs />
                 <Tablar />
               </div>
             </form>

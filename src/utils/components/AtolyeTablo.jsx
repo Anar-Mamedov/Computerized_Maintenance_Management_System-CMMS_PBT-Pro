@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Input, Modal, Table } from "antd";
-import AxiosInstance from "../../../../../../../api/http";
+import { Button, Modal, Table, Input } from "antd";
+import { Controller, useFormContext } from "react-hook-form";
+import AxiosInstance from "../../api/http";
 
 // Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
 const normalizeText = (text) => {
@@ -21,7 +22,14 @@ const normalizeText = (text) => {
     .replace(/Ç/g, "C");
 };
 
-export default function IdariAmiriTablo({ workshopSelectedId, onSubmit }) {
+export default function AtolyeTablo({ workshopSelectedId, onSubmit, disabled }) {
+  const {
+    control,
+    watch,
+    setValue,
+    getValues,
+    formState: { errors },
+  } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
@@ -32,62 +40,24 @@ export default function IdariAmiriTablo({ workshopSelectedId, onSubmit }) {
 
   const columns = [
     {
-      title: "Personel Kodu",
-      dataIndex: "code",
-      key: "code",
-      width: "150px",
-      ellipsis: true,
+      title: "Atölye Kodu",
+      dataIndex: "ATL_KOD",
+      key: "ATL_KOD",
     },
     {
-      title: "Personel Adı",
-      dataIndex: "subject",
-      key: "subject",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Ünvan",
-      dataIndex: "workdays",
-      key: "workdays",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Personel Tipi",
-      dataIndex: "description",
-      key: "description",
-      width: "150px",
-      ellipsis: true,
-    },
-
-    {
-      title: "Departman",
-      dataIndex: "fifthcolumn",
-      key: "fifthcolumn",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Lokasyon",
-      dataIndex: "sixthcolumn",
-      key: "sixthcolumn",
-      width: "150px",
-      ellipsis: true,
+      title: "Atölye Tanımı",
+      dataIndex: "ATL_TANIM",
+      key: "ATL_TANIM",
     },
   ];
 
   const fetch = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`Personel`)
+    AxiosInstance.get(`AtolyeList`)
       .then((response) => {
         const fetchedData = response.map((item) => ({
-          key: item.TB_PERSONEL_ID,
-          code: item.PRS_PERSONEL_KOD,
-          subject: item.PRS_ISIM,
-          workdays: item.PRS_UNVAN,
-          description: item.PRS_TIP,
-          fifthcolumn: item.PRS_DEPARTMAN,
-          sixthcolumn: item.PRS_LOKASYON,
+          ...item,
+          key: item.TB_ATOLYE_ID,
         }));
         setData(fetchedData);
       })
@@ -99,12 +69,16 @@ export default function IdariAmiriTablo({ workshopSelectedId, onSubmit }) {
     if (!isModalVisible) {
       fetch();
       setSelectedRowKeys([]);
+      setSearchTerm1("");
+      setFilteredData1(data);
     }
   };
 
   const handleModalOk = () => {
     const selectedData = data.find((item) => item.key === selectedRowKeys[0]);
     if (selectedData) {
+      setValue("atolyeTanim", selectedData.ATL_TANIM);
+      setValue("atolyeID", selectedData.key);
       onSubmit && onSubmit(selectedData);
     }
     setIsModalVisible(false);
@@ -125,13 +99,7 @@ export default function IdariAmiriTablo({ workshopSelectedId, onSubmit }) {
     const normalizedSearchTerm = normalizeText(value);
     if (value) {
       const filtered = data.filter((item) =>
-        Object.keys(item).some(
-          (key) =>
-            item[key] &&
-            normalizeText(item[key].toString())
-              .toLowerCase()
-              .includes(normalizedSearchTerm.toLowerCase())
-        )
+        Object.keys(item).some((key) => item[key] && normalizeText(item[key].toString()).toLowerCase().includes(normalizedSearchTerm.toLowerCase()))
       );
       setFilteredData1(filtered);
     } else {
@@ -139,23 +107,46 @@ export default function IdariAmiriTablo({ workshopSelectedId, onSubmit }) {
     }
   };
 
+  const handleMinusClick = () => {
+    setValue("atolyeTanim", "");
+    setValue("atolyeID", "");
+  };
   return (
-    <div>
-      <Button onClick={handleModalToggle}> + </Button>
-      <Modal
-        width={1200}
-        centered
-        title="Personel"
-        open={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={handleModalToggle}
-      >
-        <Input
-          placeholder="Arama..."
-          value={searchTerm1}
-          onChange={handleSearch1}
-          style={{ width: "300px", marginBottom: "15px" }}
+    <div style={{ width: "100%" }}>
+      <div style={{ display: "flex", gap: "5px", width: "100%" }}>
+        <Controller
+          name="atolyeTanim"
+          control={control}
+          render={({ field }) => (
+            <Input
+              {...field}
+              status={errors.atolyeTanim ? "error" : ""}
+              type="text" // Set the type to "text" for name input
+              style={{ width: "100%", maxWidth: "630px" }}
+              disabled
+            />
+          )}
         />
+        <Controller
+          name="atolyeID"
+          control={control}
+          render={({ field }) => (
+            <Input
+              {...field}
+              type="text" // Set the type to "text" for name input
+              style={{ display: "none" }}
+            />
+          )}
+        />
+        <div style={{ display: "flex", gap: "5px" }}>
+          <Button disabled={disabled} onClick={handleModalToggle}>
+            +
+          </Button>
+          <Button onClick={handleMinusClick}> - </Button>
+        </div>
+      </div>
+      <Modal width={1200} centered title="Atölye Tanımları" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
+        <Input placeholder="Arama..." value={searchTerm1} onChange={handleSearch1} style={{ width: "300px", marginBottom: "15px" }} />
         <Table
           rowSelection={{
             type: "radio",
@@ -163,14 +154,8 @@ export default function IdariAmiriTablo({ workshopSelectedId, onSubmit }) {
             onChange: onRowSelectChange,
           }}
           columns={columns}
-          dataSource={
-            filteredData1.length > 0 || searchTerm1 ? filteredData1 : data
-          }
+          dataSource={filteredData1.length > 0 || searchTerm1 ? filteredData1 : data}
           loading={loading}
-          scroll={{
-            // x: "auto",
-            y: "calc(100vh - 360px)",
-          }}
         />
       </Modal>
     </div>

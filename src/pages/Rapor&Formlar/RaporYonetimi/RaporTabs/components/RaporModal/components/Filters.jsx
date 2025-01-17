@@ -92,13 +92,18 @@ function Filters({ filtersLabel, onSubmit }) {
               filtersLabel={filtersLabel}
               placeholder="Başlangıç Tarihi"
               onChange={(date) => {
-                field.onChange(date ? dayjs(date) : null);
+                field.onChange(date);
+                setFilterValues((prev) => ({
+                  ...prev,
+                  BaslamaTarih: date ? dayjs(date).format("YYYY-MM-DD") : null,
+                }));
               }}
               format="DD.MM.YYYY"
               locale={locale}
             />
           )}
         />
+
         <Controller
           name="endDate"
           control={control}
@@ -109,7 +114,11 @@ function Filters({ filtersLabel, onSubmit }) {
               filtersLabel={filtersLabel}
               placeholder="Bitiş Tarihi"
               onChange={(date) => {
-                field.onChange(date ? dayjs(date) : null);
+                field.onChange(date);
+                setFilterValues((prev) => ({
+                  ...prev,
+                  BitisTarih: date ? dayjs(date).format("YYYY-MM-DD") : null,
+                }));
               }}
               format="DD.MM.YYYY"
               locale={locale}

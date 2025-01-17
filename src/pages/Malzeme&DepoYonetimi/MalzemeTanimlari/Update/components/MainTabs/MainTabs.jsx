@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Drawer, Typography, Button, Input, Select, DatePicker, TimePicker, Row, Col, Checkbox, InputNumber, Radio, ColorPicker, Switch } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
-import RolSelectBox from "./components/RolSelectBox";
-import PersonelTablo from "./components/PersonelTablo";
 import styled from "styled-components";
-
+import FreeTextInput from "../../../../../../utils/components/FreeTextInput";
+import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
+import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
+import AtolyeTablo from "../../../../../../utils/components/AtolyeTablo";
+import MarkaEkleSelect from "../../../../../../utils/components/MarkaEkleSelect";
+import ModelEkleSelect from "../../../../../../utils/components/ModelEkleSelect";
+import SinifiTablo from "../../../../../../utils/components/SinifiTablo";
 import dayjs from "dayjs";
 
 import { t } from "i18next";
@@ -201,127 +205,52 @@ export default function MainTabs({ modalOpen }) {
 
   // console.log(watch("color")?.toHexString?.());
 
-  const handleIdariAmiriMinusClick = () => {
-    setValue("personel", "");
-    setValue("personelID", "");
-  };
+  console.log(watch("MakineMarka"));
 
   return (
-    <div style={{ display: "flex", marginBottom: "15px", flexDirection: "column", gap: "10px", width: "100%" }}>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "flex-start",
-          width: "100%",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          gap: "8px",
-        }}
-      >
-        <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("rolTanimi")}</Text>
+    <div style={{ display: "flex", marginBottom: "15px", flexDirection: "row", gap: "20px", width: "100%" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "400px" }}>
         <div
           style={{
             display: "flex",
-            flexWrap: "wrap",
+            flexFlow: "column wrap",
             alignItems: "center",
-            minWidth: "300px",
-            gap: "10px",
             width: "100%",
-          }}
-        >
-          <RolSelectBox />
-        </div>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-        <StyledDivBottomLine
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "flex-start",
-            width: "100%",
-            flexDirection: "column",
+            maxWidth: "400px",
             justifyContent: "space-between",
             gap: "8px",
+            flexDirection: "row",
           }}
         >
-          <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("personel")}</Text>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <Controller
-              name="personel"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  disabled
-                />
-              )}
-            />
-            <Controller
-              name="personelID"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ display: "none" }}
-                />
-              )}
-            />
-            <PersonelTablo
-              onSubmit={(selectedData) => {
-                setValue("personel", selectedData.subject);
-                setValue("personelID", selectedData.key);
-              }}
-            />
-            <Button onClick={handleIdariAmiriMinusClick}> - </Button>
-          </div>
-        </StyledDivBottomLine>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
-        <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("hesabinDurumunuAktifVeYaPasifYap")}</Text>
-        <Controller name="aktif" control={control} render={({ field }) => <Switch {...field} />} />
-      </div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
-        <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("sistemYetkilisi")}</Text>
-        <Controller name="sistemYetkilisi" control={control} render={({ field }) => <Switch {...field} />} />
-      </div>
-      <div style={{ display: "flex", gap: "15px", width: "100%", alignItems: "flex-start" }}>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", width: "100%", flexDirection: "column", justifyContent: "space-between", gap: "8px" }}>
           <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>
-            {t("kullaniciKodu")}
+            {t("kod")}
             <div style={{ color: "red" }}>*</div>
           </Text>
           <div
             style={{
               display: "flex",
-              flexWrap: "wrap",
-              width: "100%",
               alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
               flexDirection: "column",
             }}
           >
-            <Controller
-              name="kullaniciKod"
-              control={control}
-              rules={{ required: t("alanBosBirakilamaz") }}
-              render={({ field }) => <Input {...field} status={errors.kullaniciKod ? "error" : ""} style={{ flex: 1 }} />}
-            />
-            {errors.kullaniciKod && <div style={{ color: "red", marginTop: "5px" }}>{errors.kullaniciKod.message}</div>}
+            <FreeTextInput name1="malzemeKod" isRequired={true} />
           </div>
         </div>
-      </div>
-      <div style={{ display: "flex", gap: "15px", width: "100%", alignItems: "flex-start" }}>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", width: "100%", flexDirection: "column", justifyContent: "space-between", gap: "8px" }}>
+
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "400px",
+            justifyContent: "space-between",
+            gap: "8px",
+            flexDirection: "row",
+          }}
+        >
           <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>
             {t("tanim")}
             <div style={{ color: "red" }}>*</div>
@@ -329,51 +258,294 @@ export default function MainTabs({ modalOpen }) {
           <div
             style={{
               display: "flex",
-              flexWrap: "wrap",
-              width: "100%",
               alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
               flexDirection: "column",
             }}
           >
-            <Controller
-              name="isim"
-              control={control}
-              rules={{ required: t("alanBosBirakilamaz") }}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  onChange={(e) => {
-                    field.onChange(e);
-                    const value = e.target.value;
-                    setIsimValue(value);
-                    updateParaf(value, soyisimValue);
-                  }}
-                  status={errors.isim ? "error" : ""}
-                  style={{ flex: 1 }}
-                />
-              )}
-            />
-            {errors.isim && <div style={{ color: "red", marginTop: "5px" }}>{errors.isim.message}</div>}
+            <FreeTextInput name1="tanim" isRequired={true} />
           </div>
         </div>
-      </div>
-      <div style={{ display: "flex", gap: "15px", width: "100%", alignItems: "flex-start" }}>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", width: "100%", flexDirection: "column", justifyContent: "space-between", gap: "8px" }}>
-          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>{t("sifre")}</Text>
+
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "400px",
+            justifyContent: "space-between",
+            gap: "8px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>
+            {t("tip")}
+            <div style={{ color: "red" }}>*</div>
+          </Text>
           <div
             style={{
               display: "flex",
-              flexWrap: "wrap",
-              width: "100%",
               alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
               flexDirection: "column",
             }}
           >
-            <Controller name="sifre" control={control} render={({ field }) => <Input {...field} style={{ flex: 1 }} />} />
+            <KodIDSelectbox name1="tip" isRequired={true} kodID="13005" />
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "400px",
+            justifyContent: "space-between",
+            gap: "8px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>
+            {t("birim")}
+            <div style={{ color: "red" }}>*</div>
+          </Text>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
+              flexDirection: "column",
+            }}
+          >
+            <KodIDSelectbox name1="birim" isRequired={true} kodID="32001" />
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "400px",
+            justifyContent: "space-between",
+            gap: "8px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>{t("grup")}</Text>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
+              flexDirection: "column",
+            }}
+          >
+            <KodIDSelectbox name1="grup" isRequired={false} kodID="13004" />
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "400px",
+            justifyContent: "space-between",
+            gap: "8px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>{t("lokasyon")}</Text>
+          <div
+            className="anar"
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
+              flexDirection: "column",
+            }}
+          >
+            <LokasyonTablo />
           </div>
         </div>
       </div>
-      <div style={{ display: "flex", gap: "15px", width: "100%" }}></div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "400px" }}>
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "400px",
+            justifyContent: "space-between",
+            gap: "8px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>{t("ureticiKodu")}</Text>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
+              flexDirection: "column",
+            }}
+          >
+            <FreeTextInput name1="ureticiKodu" isRequired={false} />
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "400px",
+            justifyContent: "space-between",
+            gap: "8px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>{t("sinifi")}</Text>
+          <div
+            className="anar"
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
+              flexDirection: "column",
+            }}
+          >
+            <SinifiTablo />
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "400px",
+            justifyContent: "space-between",
+            gap: "8px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>{t("marka")}</Text>
+          <div
+            className="anar"
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
+              flexDirection: "column",
+            }}
+          >
+            <MarkaEkleSelect />
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "400px",
+            justifyContent: "space-between",
+            gap: "8px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>{t("model")}</Text>
+          <div
+            className="anar"
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
+              flexDirection: "column",
+            }}
+          >
+            <ModelEkleSelect />
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "400px",
+            justifyContent: "space-between",
+            gap: "8px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontSize: "14px", color: "#000000a4", display: "flex" }}>{t("altolye")}</Text>
+          <div
+            className="anar"
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "300px",
+              flexDirection: "column",
+            }}
+          >
+            <AtolyeTablo />
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "200px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("aktif")}</Text>
+          <Controller name="aktif" control={control} render={({ field }) => <Switch {...field} />} />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("yedekParca")}</Text>
+          <Controller name="yedekParca" control={control} render={({ field }) => <Switch {...field} />} />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("sarfMalzeme")}</Text>
+          <Controller name="sarfMalzeme" control={control} render={({ field }) => <Switch {...field} />} />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("stoksuzMalzeme")}</Text>
+          <Controller name="stoksuzMalzeme" control={control} render={({ field }) => <Switch {...field} />} />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("kritikMalzeme")}</Text>
+          <Controller name="kritikMalzeme" control={control} render={({ field }) => <Switch {...field} />} />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("yag")}</Text>
+          <Controller name="yag" control={control} render={({ field }) => <Switch {...field} />} />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("filtre")}</Text>
+          <Controller name="filtre" control={control} render={({ field }) => <Switch {...field} />} />
+        </div>
+      </div>
     </div>
   );
 }
