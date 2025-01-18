@@ -31,7 +31,16 @@ const antdLocales = {
 };
 
 // Component to show when the app is disabled
-const AppDisabledComponent = () => <div style={{ textAlign: "center", marginTop: "20%" }}></div>;
+const AppDisabledComponent = () => {
+  const isDevToolsOpen = useDevToolsStatus();
+
+  useEffect(() => {
+    if (isDevToolsOpen) {
+      window.location.href = "about:blank";
+    }
+  }, [isDevToolsOpen]);
+  return <div style={{ textAlign: "center", marginTop: "20%" }}></div>;
+};
 const AppDisabled = React.memo(AppDisabledComponent);
 
 // Main component
@@ -98,6 +107,14 @@ const MainComponent1 = React.memo(function MainComponent1() {
 const Main = React.memo(function Main() {
   const { i18n } = useTranslation();
   const language = i18n.language || "tr"; // Varsayılan dili 'tr' olarak ayarlayın
+
+  const isDevToolsOpen = useDevToolsStatus();
+
+  useEffect(() => {
+    if (isDevToolsOpen) {
+      window.location.href = "about:blank";
+    }
+  }, [isDevToolsOpen]);
 
   // Ant Design locale objesini belirleme
   const antdLocale = antdLocales[language] || enUS; // Desteklenmeyen diller için varsayılan olarak enUS
