@@ -10,6 +10,7 @@ import { AppProvider } from "./AppContext.jsx";
 import { RecoilRoot } from "recoil";
 import { I18nextProvider, useTranslation } from "react-i18next";
 import i18n from "./utils/i18n.js";
+import { useDevToolsStatus } from "./utils/useDevToolsStatus.js";
 import dayjs from "dayjs";
 import AxiosInstance from "./api/http.jsx";
 import "./index.css";
@@ -43,6 +44,14 @@ const MainComponent = () => {
 const MainComponent1 = React.memo(function MainComponent1() {
   const [disableDate, setDisableDate] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const isDevToolsOpen = useDevToolsStatus();
+
+  useEffect(() => {
+    if (isDevToolsOpen) {
+      window.location.href = "about:blank";
+    }
+  }, [isDevToolsOpen]);
 
   const fetchDisableDate = async () => {
     try {
