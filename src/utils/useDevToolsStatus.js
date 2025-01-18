@@ -5,24 +5,23 @@ export function useDevToolsStatus() {
   const [isDevToolsOpen, setIsDevToolsOpen] = useState(false);
 
   useEffect(() => {
-    // Check if we're on localhost:5173
-    if (window.location.href === "http://localhost:5173/") {
-      // Don't initialize devtools detection on localhost
-      return;
-    }
+    // Check if running on localhost
+    const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 
-    function handleDevToolsChange(isOpen) {
-      setIsDevToolsOpen(isOpen);
-    }
+    if (!isLocalhost) {
+      function handleDevToolsChange(isOpen) {
+        setIsDevToolsOpen(isOpen);
+      }
 
-    addListener(handleDevToolsChange);
-    launch();
+      addListener(handleDevToolsChange);
+      launch();
+    }
 
     return () => {
       // Cleanup not needed as library doesn't provide cleanup functions
     };
   }, []);
 
-  // Always return false for localhost
-  return window.location.href === "http://localhost:5173/" ? false : isDevToolsOpen;
+  // Return false for localhost, otherwise return actual status
+  return window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" ? false : isDevToolsOpen;
 }
