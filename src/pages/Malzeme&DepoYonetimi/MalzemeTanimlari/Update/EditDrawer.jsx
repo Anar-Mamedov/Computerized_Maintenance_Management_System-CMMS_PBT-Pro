@@ -57,6 +57,14 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
       kritikMalzeme: false,
       yag: false,
       filtre: false,
+      // genel bilgiler
+      girisFiyatTuru: null,
+      girisFiyati: null,
+      cikisFiyatTuru: null,
+      cikisFiyati: null,
+      kdv: null,
+      kdvSekli: null,
+      otv: null,
     },
   });
 
@@ -102,8 +110,12 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
           setValue("yag", item.STK_YAG);
           setValue("filtre", item.STK_FILTRE);
           setValue("kdvSekli", item.STK_KDV_DH);
-          setValue("kdvOran", item.STK_KDV_ORAN);
-          setValue("otvOran", item.STK_OTV_ORAN);
+          setValue("kdv", item.STK_KDV_ORAN);
+          setValue("otv", item.STK_OTV_ORAN);
+          setValue("girisFiyatTuru", Number(item.STK_GIRIS_FIYAT_SEKLI));
+          setValue("cikisFiyatTuru", Number(item.STK_CIKIS_FIYAT_SEKLI));
+          setValue("girisFiyati", item.STK_GIRIS_FIYAT_DEGERI);
+          setValue("cikisFiyati", item.STK_CIKIS_FIYAT_DEGERI);
           // ... Diğer setValue çağrıları
 
           setLoading(false); // Yükleme tamamlandığında
@@ -131,6 +143,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
     console.log(data.color);
     // Form verilerini API'nin beklediği formata dönüştür
     const Body = {
+      STK_ID: selectedRow.key,
       STK_KOD: data.malzemeKod,
       STK_TANIM: data.tanim,
       STK_TIP_KOD_ID: data.tipID,
@@ -150,13 +163,13 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
       STK_KRITIK_MALZEME: data.kritikMalzeme,
       STK_YAG: data.yag,
       STK_FILTRE: data.filtre,
-      STK_GIRIS_FIYAT_SEKLI: "2",
-      STK_GIRIS_FIYAT_DEGERI: 0,
-      STK_CIKIS_FIYAT_DEGERI: 0,
-      STK_CIKIS_FIYAT_SEKLI: "2",
+      STK_GIRIS_FIYAT_SEKLI: data.girisFiyatTuru,
+      STK_GIRIS_FIYAT_DEGERI: data.girisFiyati,
+      STK_CIKIS_FIYAT_DEGERI: data.cikisFiyati,
+      STK_CIKIS_FIYAT_SEKLI: data.cikisFiyatTuru,
       STK_KDV_DH: data.kdvSekli,
-      STK_KDV_ORAN: data.kdvOran,
-      STK_OTV_ORAN: data.otvOran,
+      STK_KDV_ORAN: data.kdv,
+      STK_OTV_ORAN: data.otv,
       STK_GARANTI_SURE: null,
       STK_GARANTI_SURE_BIRIM_ID: -1,
       STK_RAF_OMRU: null,
