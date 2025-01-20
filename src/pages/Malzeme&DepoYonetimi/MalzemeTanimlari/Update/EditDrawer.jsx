@@ -1,4 +1,7 @@
 import tr_TR from "antd/es/locale/tr_TR";
+import enUS from "antd/es/locale/en_US";
+import ruRU from "antd/es/locale/ru_RU";
+import azAZ from "antd/es/locale/az_AZ";
 import { PlusOutlined } from "@ant-design/icons";
 import { Button, Drawer, Space, ConfigProvider, Modal, message, Spin } from "antd";
 import React, { useEffect, useState, useTransition } from "react";
@@ -9,8 +12,17 @@ import AxiosInstance from "../../../../api/http.jsx";
 import Tablar from "./components/Tablar.jsx";
 import { t } from "i18next";
 
+// Add locale mapping
+const localeMap = {
+  tr: tr_TR,
+  en: enUS,
+  ru: ruRU,
+  az: azAZ,
+};
+
 export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
   const [, startTransition] = useTransition();
+  const [currentLocale, setCurrentLocale] = useState(tr_TR);
   const [open, setOpen] = useState(false);
   const showModal = () => {
     setOpen(true);
@@ -19,21 +31,32 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
 
   const methods = useForm({
     defaultValues: {
-      rolSelect: null,
-      mail: "",
-      kullaniciKod: "",
-      isim: "",
-      soyisim: "",
-      telefonNo: "",
-      sifre: "",
-      paraf: "",
-      rolSelectID: null,
-      color: "#ffffff",
+      malzemeKod: null,
+      tanim: null,
+      tip: null,
+      tipID: null,
+      birim: null,
+      birimID: null,
+      grup: null,
+      grupID: null,
+      lokasyonTanim: null,
+      lokasyonID: null,
+      ureticiKodu: null,
+      sinifTanim: null,
+      sinifID: null,
+      MakineMarka: null,
+      MakineMarkaID: null,
+      MakineModel: null,
+      MakineModelID: null,
+      atolyeTanim: null,
+      atolyeID: null,
       aktif: true,
-      sistemYetkilisi: false,
-      personel: null,
-      personelID: null,
-      siraNo: null,
+      yedekParca: false,
+      sarfMalzeme: false,
+      stoksuzMalzeme: false,
+      kritikMalzeme: false,
+      yag: false,
+      filtre: false,
     },
   });
 
@@ -49,19 +72,38 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
         setOpen(true); // İşlemler tamamlandıktan sonra drawer'ı aç
         setLoading(true); // Yükleme başladığında
         try {
-          const response = await AxiosInstance.get(`GetKullaniciById?id=${selectedRow.key}`);
+          const response = await AxiosInstance.get(`GetStokById?id=${selectedRow.key}`);
           const item = response; // Veri dizisinin ilk elemanını al
           // Form alanlarını set et
-          setValue("siraNo", item.TB_KULLANICI_ID);
-          setValue("kullaniciKod", item.KLL_KOD);
-          setValue("personelID", item.KLL_PERSONEL_ID);
-          setValue("sistemYetkilisi", item.KLL_SISTEM_YETKILISI);
-          setValue("personel", item.PRS_ISIM);
-          setValue("isim", item.KLL_TANIM);
-          setValue("sifre", item.KLL_SIFRE);
-          setValue("aktif", item.KLL_AKTIF);
-          setValue("rolSelect", item.KLL_ROL);
-          setValue("rolSelectID", item.KLL_ROL_ID);
+          setValue("malzemeKod", item.STK_KOD);
+          setValue("tanim", item.STK_TANIM);
+          setValue("tipID", item.STK_TIP_KOD_ID);
+          setValue("tip", item.STK_TIP);
+          setValue("grupID", item.STK_GRUP_KOD_ID);
+          setValue("grup", item.STK_GRUP);
+          setValue("lokasyonID", item.STK_LOKASYON_ID);
+          setValue("lokasyonTanim", item.STK_LOKASYON);
+          setValue("birimID", item.STK_BIRIM_KOD_ID);
+          setValue("birim", item.STK_BIRIM);
+          setValue("ureticiKodu", item.STK_URETICI_KOD);
+          setValue("sinifID", item.STK_SINIF_ID);
+          setValue("sinifTanim", item.STK_SINIF);
+          setValue("MakineMarkaID", item.STK_MARKA_KOD_ID);
+          setValue("MakineMarka", item.STK_MARKA);
+          setValue("MakineModelID", item.STK_MODEL_KOD_ID);
+          setValue("MakineModel", item.STK_MODEL);
+          setValue("atolyeID", item.STK_ATOLYE_ID);
+          setValue("atolyeTanim", item.STK_ATOLYE);
+          setValue("aktif", item.STK_AKTIF);
+          setValue("yedekParca", item.STK_YEDEK_PARCA);
+          setValue("sarfMalzeme", item.STK_SARF_MALZEME);
+          setValue("stoksuzMalzeme", item.STK_STOKSUZ_MALZEME);
+          setValue("kritikMalzeme", item.STK_KRITIK_MALZEME);
+          setValue("yag", item.STK_YAG);
+          setValue("filtre", item.STK_FILTRE);
+          setValue("kdvSekli", item.STK_KDV_DH);
+          setValue("kdvOran", item.STK_KDV_ORAN);
+          setValue("otvOran", item.STK_OTV_ORAN);
           // ... Diğer setValue çağrıları
 
           setLoading(false); // Yükleme tamamlandığında
@@ -89,18 +131,43 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
     console.log(data.color);
     // Form verilerini API'nin beklediği formata dönüştür
     const Body = {
-      TB_KULLANICI_ID: data.siraNo,
-      KLL_PERSONEL_ID: data.personelID,
-      KLL_TANIM: data.isim,
-      KLL_KOD: data.kullaniciKod,
-      KLL_SIFRE: data.sifre,
-      KLL_AKTIF: data.aktif,
-      KLL_SISTEM_YETKILISI: data.sistemYetkilisi,
-      KLL_ROL_ID: data.rolSelectID,
+      STK_KOD: data.malzemeKod,
+      STK_TANIM: data.tanim,
+      STK_TIP_KOD_ID: data.tipID,
+      STK_GRUP_KOD_ID: data.grupID,
+      STK_LOKASYON_ID: data.lokasyonID,
+      STK_BIRIM_KOD_ID: data.birimID,
+      STK_URETICI_KOD: data.ureticiKodu,
+      STK_SINIF_ID: data.sinifID,
+      STK_MARKA_KOD_ID: data.MakineMarkaID,
+      STK_MODEL_KOD_ID: data.MakineModelID,
+      STK_ATOLYE_ID: data.atolyeID,
+      STK_MODUL_NO: 1,
+      STK_AKTIF: data.aktif,
+      STK_YEDEK_PARCA: data.yedekParca,
+      STK_SARF_MALZEME: data.sarfMalzeme,
+      STK_STOKSUZ_MALZEME: data.stoksuzMalzeme,
+      STK_KRITIK_MALZEME: data.kritikMalzeme,
+      STK_YAG: data.yag,
+      STK_FILTRE: data.filtre,
+      STK_GIRIS_FIYAT_SEKLI: "2",
+      STK_GIRIS_FIYAT_DEGERI: 0,
+      STK_CIKIS_FIYAT_DEGERI: 0,
+      STK_CIKIS_FIYAT_SEKLI: "2",
+      STK_KDV_DH: data.kdvSekli,
+      STK_KDV_ORAN: data.kdvOran,
+      STK_OTV_ORAN: data.otvOran,
+      STK_GARANTI_SURE: null,
+      STK_GARANTI_SURE_BIRIM_ID: -1,
+      STK_RAF_OMRU: null,
+      STK_RAF_OMRU_BIRIM_ID: -1,
+      STK_MASRAF_MERKEZI_ID: -1,
+      STK_GELIR_ID: -1,
+      STK_GIDER_ID: -1,
     };
 
     // API'ye POST isteği gönder
-    AxiosInstance.post("UpdateUser", Body)
+    AxiosInstance.post("UpdateStok", Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
         if (response.status_code === 200 || response.status_code === 201 || response.status_code === 202) {
@@ -148,9 +215,20 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
     });
   };
 
+  useEffect(() => {
+    // Get language from localStorage and handle hyphenated formats
+    let storedLanguage = localStorage.getItem("i18nextLng") || "tr";
+    if (storedLanguage.includes("-")) {
+      storedLanguage = storedLanguage.split("-")[0];
+    }
+
+    // Set the appropriate locale
+    setCurrentLocale(localeMap[storedLanguage] || tr_TR);
+  }, []);
+
   return (
     <FormProvider {...methods}>
-      <ConfigProvider locale={tr_TR}>
+      <ConfigProvider locale={currentLocale}>
         <Modal
           width="1200px"
           centered
