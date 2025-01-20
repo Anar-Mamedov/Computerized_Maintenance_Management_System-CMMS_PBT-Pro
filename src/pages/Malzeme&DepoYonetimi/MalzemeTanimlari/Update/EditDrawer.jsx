@@ -109,6 +109,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
           setValue("kritikMalzeme", item.STK_KRITIK_MALZEME);
           setValue("yag", item.STK_YAG);
           setValue("filtre", item.STK_FILTRE);
+          // genel bilgiler
           setValue("kdvSekli", item.STK_KDV_DH);
           setValue("kdv", item.STK_KDV_ORAN);
           setValue("otv", item.STK_OTV_ORAN);
@@ -163,6 +164,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
       STK_KRITIK_MALZEME: data.kritikMalzeme,
       STK_YAG: data.yag,
       STK_FILTRE: data.filtre,
+      // genel bilgiler
       STK_GIRIS_FIYAT_SEKLI: data.girisFiyatTuru,
       STK_GIRIS_FIYAT_DEGERI: data.girisFiyati,
       STK_CIKIS_FIYAT_DEGERI: data.cikisFiyati,
