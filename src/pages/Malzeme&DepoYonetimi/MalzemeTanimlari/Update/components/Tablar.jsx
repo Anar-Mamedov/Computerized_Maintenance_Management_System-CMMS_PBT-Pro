@@ -18,10 +18,10 @@ function Tablar({ selectedRowID }) {
     <>
       <Radio.Group value={tabKey} onChange={handleTabChange} style={{ display: "flex", justifyContent: "center" }}>
         <Radio.Button value="1">{t("genelBilgiler")}</Radio.Button>
-        <Radio.Button value="2">{t("lokasyonlar")}</Radio.Button>
-        <Radio.Button value="3">{t("depoYetkileri")}</Radio.Button>
-        <Radio.Button value="4">{t("atolyeYetkileri")}</Radio.Button>
-        <Radio.Button value="5">{t("yetkiler")}</Radio.Button>
+        <Radio.Button value="2">{t("ozelAlanlar")}</Radio.Button>
+        <Radio.Button value="3">{t("ekliBelgeler")}</Radio.Button>
+        <Radio.Button value="4">{t("resimler")}</Radio.Button>
+        <Radio.Button value="5">{t("aciklama")}</Radio.Button>
       </Radio.Group>
       <Divider style={{ marginBottom: 10 }} />
       {tabKey === "1" && <GenelBilgiler selectedRowID={selectedRowID} />}
