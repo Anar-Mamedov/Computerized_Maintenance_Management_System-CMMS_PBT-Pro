@@ -62,7 +62,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
           setValue("saat", saat);
         }
         setValue("tutar", selectedRow?.SFT_TUTAR);
-        setValue("tipi", selectedRow?.SFT_GC_NEW);
+        setValue("tipi", selectedRow?.SFT_GC);
         setValue("aciklama", selectedRow?.SFT_ACIKLAMA);
         // ... Diğer setValue çağrıları
 
@@ -85,7 +85,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
 
   const onSubmit = (data) => {
     const Body = {
-      SFT_STOK_ID: selectedRow?.key,
+      TB_STOK_FIYAT_ID: selectedRow?.key,
       SFT_TARIH: formatDateWithDayjs(data.tarih),
       SFT_SAAT: formatTimeWithDayjs(data.saat),
       SFT_ACIKLAMA: data.aciklama,

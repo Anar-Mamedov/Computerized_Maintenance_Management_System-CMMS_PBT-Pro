@@ -35,20 +35,32 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
   //* export
   const methods = useForm({
     defaultValues: {
-      rolSelect: null,
-      mail: "",
-      kullaniciKod: "",
-      isim: "",
-      soyisim: "",
-      telefonNo: "",
-      sifre: "",
-      paraf: "",
-      rolSelectID: null,
-      color: "#ffffff",
+      malzemeKod: null,
+      tanim: null,
+      tip: null,
+      tipID: null,
+      birim: null,
+      birimID: null,
+      grup: null,
+      grupID: null,
+      lokasyonTanim: null,
+      lokasyonID: null,
+      ureticiKodu: null,
+      sinifTanim: null,
+      sinifID: null,
+      MakineMarka: null,
+      MakineMarkaID: null,
+      MakineModel: null,
+      MakineModelID: null,
+      atolyeTanim: null,
+      atolyeID: null,
       aktif: true,
-      sistemYetkilisi: false,
-      personel: null,
-      personelID: null,
+      yedekParca: false,
+      sarfMalzeme: false,
+      stoksuzMalzeme: false,
+      kritikMalzeme: false,
+      yag: false,
+      filtre: false,
     },
   });
 
@@ -64,32 +76,80 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
 
   const { setValue, reset, watch } = methods;
 
+  useEffect(() => {
+    if (open) {
+      // Çekmece açıldığında gerekli işlemi yap
+      // Örneğin, MainTabs'a bir prop olarak geçir
+      AxiosInstance.get("ModulKoduGetir?modulKodu=STK_KOD") // Replace with your actual API endpoint
+        .then((response) => {
+          // Assuming the response contains the new work order number in 'response.Tanim'
+          setValue("malzemeKod", response);
+        })
+        .catch((error) => {
+          console.error("Error fetching new work order number:", error);
+          if (navigator.onLine) {
+            // İnternet bağlantısı var
+            message.error("Hata Mesajı: " + error.message);
+          } else {
+            // İnternet bağlantısı yok
+            message.error("Internet Bağlantısı Mevcut Değil.");
+          }
+        });
+    }
+  }, [open]);
+
   //* export
   const onSubmit = (data) => {
     const Body = {
-      KLL_PERSONEL_ID: data.personelID,
-      KLL_TANIM: data.isim,
-      KLL_KOD: data.kullaniciKod,
-      KLL_SIFRE: data.sifre,
-      KLL_AKTIF: data.aktif,
-      KLL_SISTEM_YETKILISI: data.sistemYetkilisi,
-      KLL_ROL_ID: data.rolSelectID,
+      STK_KOD: data.malzemeKod,
+      STK_TANIM: data.tanim,
+      STK_TIP_KOD_ID: data.tipID,
+      STK_GRUP_KOD_ID: data.grupID,
+      STK_LOKASYON_ID: data.lokasyonID,
+      STK_BIRIM_KOD_ID: data.birimID,
+      STK_URETICI_KOD: data.ureticiKodu,
+      STK_SINIF_ID: data.sinifID,
+      STK_MARKA_KOD_ID: data.MakineMarkaID,
+      STK_MODEL_KOD_ID: data.MakineModelID,
+      STK_ATOLYE_ID: data.atolyeID,
+      STK_MODUL_NO: 1,
+      STK_AKTIF: data.aktif,
+      STK_YEDEK_PARCA: data.yedekParca,
+      STK_SARF_MALZEME: data.sarfMalzeme,
+      STK_STOKSUZ_MALZEME: data.stoksuzMalzeme,
+      STK_KRITIK_MALZEME: data.kritikMalzeme,
+      STK_YAG: data.yag,
+      STK_FILTRE: data.filtre,
+      STK_GIRIS_FIYAT_SEKLI: "2",
+      STK_GIRIS_FIYAT_DEGERI: 0,
+      STK_CIKIS_FIYAT_DEGERI: 0,
+      STK_CIKIS_FIYAT_SEKLI: "2",
+      STK_KDV_DH: "H",
+      STK_KDV_ORAN: 0,
+      STK_OTV_ORAN: 0,
+      STK_GARANTI_SURE: null,
+      STK_GARANTI_SURE_BIRIM_ID: -1,
+      STK_RAF_OMRU: null,
+      STK_RAF_OMRU_BIRIM_ID: -1,
+      STK_MASRAF_MERKEZI_ID: -1,
+      STK_GELIR_ID: -1,
+      STK_GIDER_ID: -1,
     };
 
-    AxiosInstance.post("AddUser", Body)
+    AxiosInstance.post("AddStok", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);
 
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("İşlem Başarılı.");
           setOpen(false);
           onRefresh();
           reset();
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
-          message.error("Ekleme Başarısız.");
+          message.error("İşlem Başarısız.");
         }
       })
       .catch((error) => {

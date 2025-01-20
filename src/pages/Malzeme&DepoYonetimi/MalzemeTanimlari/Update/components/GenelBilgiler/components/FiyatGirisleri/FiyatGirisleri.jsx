@@ -35,8 +35,9 @@ const FiyatGirisleri = ({ selectedRowID }) => {
     },
     {
       title: t("girisCikis"),
-      dataIndex: "SFT_GC_NEW",
-      key: "SFT_GC_NEW",
+      dataIndex: "SFT_GC",
+      key: "SFT_GC",
+      render: (text) => (text === "G" ? t("giris") : t("cikis")),
     },
     {
       title: t("aciklama"),
