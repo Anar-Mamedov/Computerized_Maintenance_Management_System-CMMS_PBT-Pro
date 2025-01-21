@@ -6,7 +6,7 @@ export function useDevToolsStatus() {
 
   useEffect(() => {
     // Check if running on localhost
-    const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname === "pbtpro.netlify.app";
 
     if (!isLocalhost) {
       function handleDevToolsChange(isOpen) {
@@ -23,5 +23,5 @@ export function useDevToolsStatus() {
   }, []);
 
   // Return false for localhost, otherwise return actual status
-  return window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" ? false : isDevToolsOpen;
+  return window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname === "pbtpro.netlify.app" ? false : isDevToolsOpen;
 }
