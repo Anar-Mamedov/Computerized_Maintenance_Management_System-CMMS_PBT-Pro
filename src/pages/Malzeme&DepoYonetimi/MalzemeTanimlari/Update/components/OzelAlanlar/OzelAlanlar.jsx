@@ -351,7 +351,7 @@ function OzelAlanlar() {
                 flexDirection: "column",
               }}
             >
-              <KodIDSelectbox name1="ozelAlan11" isRequired={false} kodID="13004" />
+              <KodIDSelectbox name1="ozelAlan11" isRequired={false} kodID="50005" />
             </div>
           </div>
           <div
@@ -378,7 +378,7 @@ function OzelAlanlar() {
                 flexDirection: "column",
               }}
             >
-              <KodIDSelectbox name1="ozelAlan12" isRequired={false} kodID="13004" />
+              <KodIDSelectbox name1="ozelAlan12" isRequired={false} kodID="50006" />
             </div>
           </div>
           <div
@@ -405,7 +405,7 @@ function OzelAlanlar() {
                 flexDirection: "column",
               }}
             >
-              <KodIDSelectbox name1="ozelAlan13" isRequired={false} kodID="13004" />
+              <KodIDSelectbox name1="ozelAlan13" isRequired={false} kodID="50007" />
             </div>
           </div>
           <div
@@ -432,7 +432,7 @@ function OzelAlanlar() {
                 flexDirection: "column",
               }}
             >
-              <KodIDSelectbox name1="ozelAlan14" isRequired={false} kodID="13004" />
+              <KodIDSelectbox name1="ozelAlan14" isRequired={false} kodID="50008" />
             </div>
           </div>
           <div
@@ -459,7 +459,7 @@ function OzelAlanlar() {
                 flexDirection: "column",
               }}
             >
-              <KodIDSelectbox name1="ozelAlan15" isRequired={false} kodID="13004" />
+              <KodIDSelectbox name1="ozelAlan15" isRequired={false} kodID="50009" />
             </div>
           </div>
           <div

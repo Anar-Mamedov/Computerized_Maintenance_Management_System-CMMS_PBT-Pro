@@ -30,7 +30,7 @@ export default function Header() {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     const checkInternetConnection1 = async () => {
       const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Request timed out")), 2000));
 
@@ -49,7 +49,7 @@ export default function Header() {
 
     // Cleanup function to clear the interval when the component unmounts
     return () => clearInterval(intervalId);
-  }, []);
+  }, []); */
 
   const Veribaglanti = async () => {
     const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Request timed out")), 2000));
