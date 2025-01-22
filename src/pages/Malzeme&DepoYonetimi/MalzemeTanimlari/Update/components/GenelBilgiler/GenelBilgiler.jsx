@@ -40,7 +40,11 @@ function GenelBilgiler({ selectedRowID }) {
                   <div style={{ width: "200px" }}>
                     <GirisFiyatiSelect />
                   </div>
-                  <Controller name="girisFiyati" control={control} render={({ field }) => <InputNumber {...field} readOnly status={errors.girisFiyati ? "error" : ""} />} />
+                  <Controller
+                    name="girisFiyati"
+                    control={control}
+                    render={({ field }) => <InputNumber {...field} disabled={watch("girisFiyatTuru") !== 6} status={errors.girisFiyati ? "error" : ""} />}
+                  />
                 </div>
               </div>
               <FiyatGirisleri selectedRowID={selectedRowID} />
@@ -51,7 +55,11 @@ function GenelBilgiler({ selectedRowID }) {
                 <div style={{ width: "200px" }}>
                   <CikisiyatiSelect />
                 </div>
-                <Controller name="cikisFiyati" control={control} render={({ field }) => <InputNumber {...field} readOnly status={errors.cikisFiyati ? "error" : ""} />} />
+                <Controller
+                  name="cikisFiyati"
+                  control={control}
+                  render={({ field }) => <InputNumber {...field} disabled={watch("cikisFiyatTuru") !== 6} status={errors.cikisFiyati ? "error" : ""} />}
+                />
               </div>
             </div>
           </div>
