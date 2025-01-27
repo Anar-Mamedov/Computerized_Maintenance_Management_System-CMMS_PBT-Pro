@@ -27,6 +27,7 @@ export default function CreateDrawer({ onRefresh }) {
       tipiID: null,
       departman: null,
       departmanID: null,
+      mail: null,
       sifre: null,
     },
   });
@@ -55,6 +56,7 @@ export default function CreateDrawer({ onRefresh }) {
       ISK_LOKASYON_ID: Number(data.lokasyonID),
       ISK_AKTIF: data.aktif,
       ISK_PERSONEL_ID: Number(data.personelID),
+      ISK_MAIL: data.mail,
       ISK_SIFRE: data.sifre,
     };
 
