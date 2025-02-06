@@ -17,6 +17,7 @@ import EditDrawer1 from "../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer
 import { useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { t } from "i18next";
 
 const { Text } = Typography;
 
@@ -879,6 +880,10 @@ const MainTable = () => {
       // API isteğinde keyword ve currentPage kullanılıyor
       const response = await AxiosInstance.post(`GetIsTalepFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}`, filters);
       if (response) {
+        if (response.status_code === 401) {
+          message.error(t("buSayfayaErisimYetkinizBulunmamaktadir"));
+          return;
+        }
         // Toplam sayfa sayısını ayarla
         setTotalPages(response.page);
         setTotalDataCount(response.kayit_sayisi);

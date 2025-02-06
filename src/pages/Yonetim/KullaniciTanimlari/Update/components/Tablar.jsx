@@ -5,6 +5,7 @@ import Yetkiler from "./Yetkiler/Yetkiler";
 import LokasyonYetkileri from "./LokasyonYetkileri/LokasyonYetkileri1";
 import DepoYetkisi from "./DepoYetkisi/DepoYetkisi";
 import AtolyeYetkisi from "./AtolyeYetkisi/AtolyeYetkisi";
+import MenuVeEkranYetkileri from "./MenuVeEkranYetkileri/MenuVeEkranYetkileri";
 import { t } from "i18next";
 
 function Tablar() {
@@ -22,6 +23,7 @@ function Tablar() {
         <Radio.Button value="3">{t("depoYetkileri")}</Radio.Button>
         <Radio.Button value="4">{t("atolyeYetkileri")}</Radio.Button>
         <Radio.Button value="5">{t("yetkiler")}</Radio.Button>
+        <Radio.Button value="6">{t("menuVeEkranYetkileri")}</Radio.Button>
       </Radio.Group>
       <Divider style={{ marginBottom: 10 }} />
       {tabKey === "1" && <MainTabs />}
@@ -29,6 +31,7 @@ function Tablar() {
       {tabKey === "3" && <DepoYetkisi />}
       {tabKey === "4" && <AtolyeYetkisi />}
       {tabKey === "5" && <Yetkiler />}
+      {tabKey === "6" && <MenuVeEkranYetkileri />}
     </>
   );
 }
