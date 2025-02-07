@@ -15,6 +15,7 @@ import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
 import { useFormContext } from "react-hook-form";
 import { SiMicrosoftexcel } from "react-icons/si";
 import * as XLSX from "xlsx";
+import { t } from "i18next";
 
 const { Text } = Typography;
 
@@ -1158,6 +1159,10 @@ const MainTable = () => {
       // API isteğinde keyword ve currentPage kullanılıyor
       const response = await AxiosInstance.post(`getIsEmriFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}`, filters);
       if (response) {
+        if (response.status_code === 401) {
+          message.error(t("buSayfayaErisimYetkinizBulunmamaktadir"));
+          return;
+        }
         // Toplam sayfa sayısını ayarla
         setTotalPages(response.page);
         setTotalDataCount(response.kayit_sayisi);

@@ -152,7 +152,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
         <Modal
-          width="600px"
+          width="750px"
           centered
           title={t("kullaniciGuncelleme")}
           open={drawerVisible}
