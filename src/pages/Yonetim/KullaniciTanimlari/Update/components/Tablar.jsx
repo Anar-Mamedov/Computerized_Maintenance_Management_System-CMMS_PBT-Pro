@@ -7,13 +7,23 @@ import DepoYetkisi from "./DepoYetkisi/DepoYetkisi";
 import AtolyeYetkisi from "./AtolyeYetkisi/AtolyeYetkisi";
 import MenuVeEkranYetkileri from "./MenuVeEkranYetkileri/MenuVeEkranYetkileri";
 import { t } from "i18next";
+import { useFormContext } from "react-hook-form";
 
 function Tablar() {
   const [tabKey, setTabKey] = useState("1");
+  const { watch } = useFormContext();
+  const rolSelect = watch("rolSelect");
 
   const handleTabChange = (e) => {
     setTabKey(e.target.value);
   };
+
+  // If rolSelect has a value and user tries to access disabled tabs, prevent tab change
+  React.useEffect(() => {
+    if (rolSelect && (tabKey === "5" || tabKey === "6")) {
+      setTabKey("1");
+    }
+  }, [rolSelect]);
 
   return (
     <>
@@ -22,8 +32,12 @@ function Tablar() {
         <Radio.Button value="2">{t("lokasyonlar")}</Radio.Button>
         <Radio.Button value="3">{t("depoYetkileri")}</Radio.Button>
         <Radio.Button value="4">{t("atolyeYetkileri")}</Radio.Button>
-        <Radio.Button value="5">{t("yetkiler")}</Radio.Button>
-        <Radio.Button value="6">{t("menuVeEkranYetkileri")}</Radio.Button>
+        <Radio.Button value="5" disabled={!!rolSelect}>
+          {t("yetkiler")}
+        </Radio.Button>
+        <Radio.Button value="6" disabled={!!rolSelect}>
+          {t("menuVeEkranYetkileri")}
+        </Radio.Button>
       </Radio.Group>
       <Divider style={{ marginBottom: 10 }} />
       {tabKey === "1" && <MainTabs />}
