@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { message, Select } from "antd";
+import { message, Select, Input } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../api/http";
 import { t } from "i18next";
@@ -45,14 +45,17 @@ function RolSelectBox() {
             style={{ width: "100%" }}
             placeholder={t("secimYapin")}
             options={options}
-            onChange={(value) => {
-              field.onChange(value); // Update 'rolSelect' field
-              setValue("rolSelectID", value); // Set the additional field
+            onChange={(value, option) => {
+              const label = option?.label || null;
+              field.onChange(label); // Set label to rolSelect
+              setValue("rolSelectID", value ?? null); // Set ID to rolSelectID
             }}
+            value={field.value ?? null}
             filterOption={(input, option) => option.label.toLowerCase().includes(input.toLowerCase())}
           />
         )}
       />
+      <Controller name="rolSelectID" control={control} render={({ field }) => <Input {...field} type="text" style={{ display: "none" }} />} />
     </>
   );
 }
