@@ -37,7 +37,8 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
       {selectedRows.length >= 1 && selectedRows.every((row) => row.KAPALI === false) && (
         <Sil selectedRows={selectedRows} refreshTableData={refreshTableData} disabled={isDisabled} hidePopover={hidePopover} />
       )}
-      {onayCheck.ONY_AKTIF == 1 &&
+      {onayCheck &&
+        onayCheck.ONY_AKTIF == 1 &&
         onayCheck.ONY_MANUEL == 0 &&
         selectedRows.length >= 1 &&
         selectedRows.some((row) => row.ISM_ONAY_DURUM === 0 || row.ISM_ONAY_DURUM === 3) &&
@@ -47,13 +48,14 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
       {/*{selectedRows.length >= 1 && <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />}*/}
 
       {selectedRows.length >= 1 &&
-        (onayCheck.ONY_AKTIF == 1 && onayCheck.ONY_MANUEL == 0 ? (
+        (onayCheck && onayCheck.ONY_AKTIF == 1 && onayCheck.ONY_MANUEL == 0 ? (
           selectedRows.every((row) => row.ISM_ONAY_DURUM === 2) && <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />
         ) : (
           <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />
         ))}
 
-      {onayCheck.ONY_AKTIF == 1 &&
+      {onayCheck &&
+        onayCheck.ONY_AKTIF == 1 &&
         onayCheck.ONY_MANUEL == 1 &&
         selectedRows.length >= 1 &&
         selectedRows.some((row) => row.ISM_ONAY_DURUM === 0 || row.ISM_ONAY_DURUM === 3) &&

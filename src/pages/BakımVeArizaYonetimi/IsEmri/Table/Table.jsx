@@ -130,7 +130,7 @@ const MainTable = () => {
   const [pageSize, setPageSize] = useState(10);
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
-  const [onayCheck, setOnayCheck] = useState(false);
+  const [onayCheck, setOnayCheck] = useState({ ONY_AKTIF: 0, ONY_MANUEL: 0 });
   const [drawer, setDrawer] = useState({
     visible: false,
     data: null,
@@ -174,7 +174,7 @@ const MainTable = () => {
 
       // => #rgba (4 hane)
       else if (color.length === 5) {
-        // #abcf -> r=aa, g=bb, b=cc, a=ff (ama biz alpha’yı yok sayıp dışarıdan gelen opacity'yi kullanacağız)
+        // #abcf -> r=aa, g=bb, b=cc, a=ff (ama biz alpha'yı yok sayıp dışarıdan gelen opacity'yi kullanacağız)
         r = parseInt(color[1] + color[1], 16);
         g = parseInt(color[2] + color[2], 16);
         b = parseInt(color[3] + color[3], 16);
@@ -196,7 +196,7 @@ const MainTable = () => {
         r = parseInt(color.slice(1, 3), 16);
         g = parseInt(color.slice(3, 5), 16);
         b = parseInt(color.slice(5, 7), 16);
-        // Son 2 karakter alpha’ya denk geliyor ama biz fonksiyon parametresini kullanıyoruz.
+        // Son 2 karakter alpha'ya denk geliyor ama biz fonksiyon parametresini kullanıyoruz.
         return `rgba(${r}, ${g}, ${b}, ${opacity})`;
       }
     }
@@ -209,9 +209,15 @@ const MainTable = () => {
     const fetchData = async () => {
       try {
         const response = await AxiosInstance.post(`GetOnayCheck?TB_ONAY_ID=1`); // API URL'niz
-        setOnayCheck(response[0]);
+        if (response && response[0]) {
+          setOnayCheck(response[0]);
+        } else {
+          console.warn("API response is empty or invalid for onayCheck");
+          // Keep the default values set in useState
+        }
       } catch (error) {
         console.error("API isteğinde hata oluştu:", error);
+        // Keep the default values set in useState
       }
     };
 
@@ -1261,7 +1267,7 @@ const MainTable = () => {
     // Burada `body` ve `currentPage`'i güncellediğimiz için, bu değerlerin en güncel hallerini kullanarak veri çekme işlemi yapılır.
     // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
     // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
-  }, [body, currentPage]); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
+  }, [body, currentPage]);
 
   // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
   const [columns, setColumns] = useState(() => {
