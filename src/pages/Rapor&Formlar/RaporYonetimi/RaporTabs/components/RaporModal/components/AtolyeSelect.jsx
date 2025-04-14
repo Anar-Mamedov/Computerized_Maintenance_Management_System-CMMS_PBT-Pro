@@ -35,10 +35,15 @@ const AtolyeSelect = ({ filtersLabel }) => {
   useEffect(() => {
     if (filtersLabel?.AtolyeName && filtersLabel?.AtolyeID && options.length > 0) {
       const atolyeIDs = filtersLabel.AtolyeID.split(",");
+      console.log("AtolyeSelect.jsx - Setting atolye IDs from filtersLabel:", atolyeIDs);
+      console.log("AtolyeSelect.jsx - Original filtersLabel.AtolyeID:", filtersLabel.AtolyeID);
 
       setSelectedIds(atolyeIDs);
+
+      // Ensure atolyeID form value is set
+      setValue("atolyeID", atolyeIDs);
     }
-  }, [filtersLabel, options]);
+  }, [filtersLabel, options, setValue]);
 
   return (
     <>
@@ -62,9 +67,18 @@ const AtolyeSelect = ({ filtersLabel }) => {
             }))}
             value={loading ? [] : selectedIds}
             onChange={(value) => {
+              console.log("AtolyeSelect.jsx - Select onChange, new value:", value);
               setValue("atolyeID", value);
               setSelectedIds(value);
               field.onChange(value);
+
+              // Log current form values after update
+              setTimeout(() => {
+                console.log("AtolyeSelect.jsx - Current form values after update:", {
+                  atolye: getValues("atolye"),
+                  atolyeID: getValues("atolyeID"),
+                });
+              }, 0);
             }}
           />
         )}

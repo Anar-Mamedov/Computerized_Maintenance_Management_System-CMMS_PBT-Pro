@@ -24,6 +24,15 @@ function RaporsTables({ tabKey, tabName }) {
     data: null,
   });
 
+  // Memoize the drawer setter to avoid unnecessary re-renders
+  const openDrawer = useCallback((record) => {
+    setDrawer({ visible: true, data: record });
+  }, []);
+
+  const closeDrawer = useCallback(() => {
+    setDrawer({ visible: false, data: null });
+  }, []);
+
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1); // Current active page
   const [pageSize, setPageSize] = useState(10); // Number of cards per page
@@ -149,7 +158,7 @@ function RaporsTables({ tabKey, tabName }) {
                 key={record.key}
                 hoverable
                 style={{ width: 340, height: 150 }}
-                onClick={() => setDrawer({ visible: true, data: record })}
+                onClick={() => openDrawer(record)}
                 styles={{ body: { padding: "16px", display: "flex", flexDirection: "column" } }} // Updated prop
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -196,7 +205,7 @@ function RaporsTables({ tabKey, tabName }) {
       </div>
 
       {/* Detail Modal */}
-      <RaporModal selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
+      {drawer.visible && drawer.data && <RaporModal selectedRow={drawer.data} onDrawerClose={closeDrawer} drawerVisible={drawer.visible} onRefresh={refreshTableData} />}
     </div>
   );
 }
