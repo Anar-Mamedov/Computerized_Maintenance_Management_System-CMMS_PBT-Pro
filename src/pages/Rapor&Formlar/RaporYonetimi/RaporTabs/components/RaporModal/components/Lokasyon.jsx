@@ -35,10 +35,15 @@ const LocationFilter = ({ filtersLabel, setLokasyonID1, lokasyonID1 }) => {
   useEffect(() => {
     if (filtersLabel?.LokasyonName && filtersLabel?.LokasyonID && options.length > 0) {
       const lokasyonIDs = filtersLabel.LokasyonID.split(",");
+      console.log("Lokasyon.jsx - Setting lokasyon IDs from filtersLabel:", lokasyonIDs);
+      console.log("Lokasyon.jsx - Original filtersLabel.LokasyonID:", filtersLabel.LokasyonID);
 
       setSelectedIds(lokasyonIDs);
+
+      // Ensure lokasyonID form value is set
+      setValue("lokasyonID", lokasyonIDs);
     }
-  }, [filtersLabel, options]);
+  }, [filtersLabel, options, setValue]);
 
   return (
     <>
@@ -62,9 +67,18 @@ const LocationFilter = ({ filtersLabel, setLokasyonID1, lokasyonID1 }) => {
             }))}
             value={loading ? [] : selectedIds}
             onChange={(value) => {
+              console.log("Lokasyon.jsx - Select onChange, new value:", value);
               setValue("lokasyonID", value);
               setSelectedIds(value);
               field.onChange(value);
+
+              // Log current form values after update
+              setTimeout(() => {
+                console.log("Lokasyon.jsx - Current form values after update:", {
+                  lokasyon: getValues("lokasyon"),
+                  lokasyonID: getValues("lokasyonID"),
+                });
+              }, 0);
             }}
           />
         )}

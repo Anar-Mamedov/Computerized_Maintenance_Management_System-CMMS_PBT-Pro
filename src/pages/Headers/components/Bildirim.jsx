@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Popover } from "antd";
+import { Button, Popover, List, Empty } from "antd";
 import { IoNotificationsOutline } from "react-icons/io5";
 import styled from "styled-components";
 
@@ -20,17 +20,61 @@ const Badge = styled.span`
   border: 2px solid white; /* Rozetin etrafında beyaz bir sınır */
 `;
 
-export default function Bildirim() {
+const ReportList = styled(List)`
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+`;
+
+const ReportItem = styled(List.Item)`
+  cursor: pointer;
+  padding: 8px 12px;
+  &:hover {
+    background-color: #f0f0f0;
+  }
+`;
+
+export default function Bildirim({ reportResponse, setRaporModalVisible, updateReportData }) {
   const [open, setOpen] = useState(false);
 
   const handleOpenChange = (newOpen) => {
     setOpen(newOpen);
   };
 
+  const handleReportClick = (report) => {
+    // Update context with the selected report data
+    updateReportData({
+      initialColumns: report.headers,
+      columns: report.headers,
+      tableData: report.list,
+      originalData: report.list,
+      columnFilters: {},
+      filters: report.filters,
+      reportName: report.reportName,
+      totalRecords: report.totalRecords,
+    });
+
+    // Open the modal
+    setRaporModalVisible(true);
+
+    // Close the notification popover
+    setOpen(false);
+  };
+
   const content = (
     <div>
-      {/*<Hatirlatici />*/}
-      <p>Yeni bildirim yok</p>
+      {reportResponse && reportResponse.length > 0 ? (
+        <ReportList
+          dataSource={reportResponse}
+          renderItem={(item, index) => (
+            <ReportItem style={{ padding: "10px" }} onClick={() => handleReportClick(item)}>
+              <List.Item.Meta title={item.reportName} description={`${item.totalRecords} kayıt - ${new Date(item.timestamp).toLocaleString()}`} />
+            </ReportItem>
+          )}
+        />
+      ) : (
+        <Empty description="Bildirim bulunamadı" />
+      )}
     </div>
   );
 
@@ -38,7 +82,7 @@ export default function Bildirim() {
     <Popover content={content} trigger="click" open={open} onOpenChange={handleOpenChange}>
       <IconContainer>
         <Button type="success" shape="circle" icon={<IoNotificationsOutline style={{ fontSize: "24px" }} />}></Button>
-        <Badge />
+        {reportResponse && reportResponse.length > 0 && <Badge />}
       </IconContainer>
     </Popover>
   );

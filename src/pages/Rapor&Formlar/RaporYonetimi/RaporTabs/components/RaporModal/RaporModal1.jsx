@@ -30,7 +30,7 @@ const arrayMove = (array, from, to) => {
 
 const pxToWch = (px) => Math.ceil(px / 7); // 1 wch ≈ 7px
 
-function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
+function RecordModal({ selectedRow, onDrawerClose, drawerVisible, dataAlreadyLoaded = false }) {
   // Context'ten rapor verilerini al
   const { reportData, updateReportData, reportLoading, setReportLoading } = useAppContext();
 
@@ -60,8 +60,8 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
 
   useEffect(() => {
     if (!drawerVisible) {
-      // Reset when modal is closed - don't reset if already done
-      if (columns.length > 0 || tableData.length > 0) {
+      // Reset when modal is closed, but only if not already loaded from context
+      if (!dataAlreadyLoaded && (columns.length > 0 || tableData.length > 0)) {
         updateReportData({
           tableData: [],
           originalData: [],
@@ -71,9 +71,8 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
           columnFilters: {},
           filters: [],
         });
-        setFilterDropdownOpen({});
       }
-      // Reset the initialization flag when modal is closed
+      setFilterDropdownOpen({});
       hasInitialized.current = false;
       return;
     }
@@ -81,28 +80,37 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
     // If modal is visible but no selectedRow, exit early
     if (!selectedRow) return;
 
+    // For pre-loaded data, just set the filters label if needed
+    if (dataAlreadyLoaded) {
+      if (reportData && reportData.filters && Object.keys(filtersLabel).length === 0) {
+        const contextFilters = reportData.filters;
+        setFiltersLabel({
+          LokasyonID: contextFilters.LokasyonID || "",
+          AtolyeID: contextFilters.AtolyeID || "",
+          BaslamaTarih: contextFilters.BaslamaTarih || null,
+          BitisTarih: contextFilters.BitisTarih || null,
+          // context namleride set etme
+          LokasyonName: contextFilters.LokasyonName || "",
+          AtolyeName: contextFilters.AtolyeName || "",
+          reportName: reportData.reportName || selectedRow?.RPR_TANIM,
+        });
+      }
+      return;
+    }
+
     // Skip if already initialized for this row
     if (hasInitialized.current && reportData.selectedRow?.key === selectedRow.key) {
       return;
     }
 
-    // Mark as initialized
+    // Mark as initialized and fetch data
     hasInitialized.current = true;
     setReportLoading(true);
 
-    // Fetch filters
     fetchFilters().finally(() => {
       setReportLoading(false);
     });
-  }, [drawerVisible, selectedRow?.key]); // Only depend on drawerVisible and selectedRow.key, not reportData
-
-  // Sorgula Düğmesine tıklandığında Modalı'ı kapat
-
-  useEffect(() => {
-    if (kullaniciRaporu === true) {
-      onDrawerClose();
-    }
-  }, [kullaniciRaporu, onDrawerClose]);
+  }, [drawerVisible, selectedRow?.key, dataAlreadyLoaded]); // Only depend on these key props
 
   // ------------------ DATA FETCH ------------------
   const handleFilterSubmit = (values) => {
@@ -694,35 +702,82 @@ function RecordModal({ selectedRow, onDrawerClose, drawerVisible }) {
   };
 
   const onFinish = (values) => {
+    console.log("Form values:", values);
+    console.log("ReportData state:", reportData);
+    console.log("Filters:", filters);
+    console.log("FiltersLabel:", filtersLabel);
+    console.log("SelectedRow:", selectedRow);
     saveReport(values);
   };
+
   const onFinishFailed = (errorInfo) => {
     // console.log("Failed:", errorInfo);
   };
 
   const saveReport = async (values) => {
+    // Tüm durum değişkenlerini yazdır
+    console.log("Save Report - Current state:", {
+      reportData,
+      filters,
+      filtersLabel,
+      selectedRow,
+      values,
+    });
+
+    // Form değerlerini values parametresinden al (form.getValues() yerine)
+    // Form values zaten onFinish callback'i ile values parametresi olarak geliyor
+    console.log("Form values received:", values);
+
     // Filters boş olabilir, o yüzden varsayılan değerler tanımlayalım
     const filterValues = filters && filters.length > 0 ? filters[0] : {};
+
+    console.log("FilterValues to be used:", filterValues);
+
+    // FiltersLabel'dan değerler alınabilir mi kontrol et
+    if (Object.keys(filtersLabel).length > 0) {
+      console.log("FiltersLabel available:", filtersLabel);
+    }
+
+    // values'da lokasyonID ve atolyeID olmadığından, bunları filterValues veya filtersLabel'dan alıyoruz
+    const lokasyonID = filterValues.LokasyonID || filtersLabel.LokasyonID || "";
+    const atolyeID = filterValues.AtolyeID || filtersLabel.AtolyeID || "";
+
+    console.log("Final values:", {
+      lokasyonID,
+      atolyeID,
+      baslamaTarih: filterValues.BaslamaTarih || filtersLabel.BaslamaTarih || null,
+      bitisTarih: filterValues.BitisTarih || filtersLabel.BitisTarih || null,
+    });
+
+    // lokasyonID ve atolyeID array olarak gelmiş olabilir, bu durumda string'e çevirelim
+    const lokasyonIDValue = Array.isArray(lokasyonID) ? lokasyonID.join(",") : lokasyonID;
+    const atolyeIDValue = Array.isArray(atolyeID) ? atolyeID.join(",") : atolyeID;
 
     const body = {
       EskiRaporID: selectedRow.key,
       YeniRaporGrupID: values.reportID,
       YeniRaporAdi: values.nameOfReport,
-      LokasyonID: filterValues.LokasyonID || "",
-      AtolyeID: filterValues.AtolyeID || "",
-      BaslamaTarih: filterValues.BaslamaTarih || null,
-      BitisTarih: filterValues.BitisTarih || null,
+      LokasyonID: lokasyonIDValue,
+      AtolyeID: atolyeIDValue,
+      BaslamaTarih: filterValues.BaslamaTarih || filtersLabel.BaslamaTarih || null,
+      BitisTarih: filterValues.BitisTarih || filtersLabel.BitisTarih || null,
       YeniRaporAciklama: values.raporAciklama,
       Basliklar: columns,
     };
+
+    console.log("Request body:", body);
+
     try {
       const response = await AxiosInstance.post(`SaveNewReport`, body);
+      console.log("SaveNewReport response:", response);
       if (response.status_code === 200) {
         message.success("Ekleme Başarılı");
         setSaveModalVisible(false);
+      } else {
+        message.warning(`İşlem durumu: ${response.status_code}`);
       }
     } catch (error) {
-      console.log("error", error);
+      console.error("Error saving report:", error);
       message.error("Rapor kaydedilirken bir hata oluştu");
     }
   };

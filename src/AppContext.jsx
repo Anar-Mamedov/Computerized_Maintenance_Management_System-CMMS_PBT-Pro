@@ -12,6 +12,28 @@ export const AppProvider = ({ children }) => {
   const [userData1, setUserData1] = useState(null);
   const [isButtonClicked, setIsButtonClicked] = useState(false);
 
+  // Rapor için eklenmiş state'ler
+  const [reportLoading, setReportLoading] = useState(false);
+  const [reportData, setReportData] = useState({
+    initialColumns: [],
+    columns: [],
+    tableData: [],
+    originalData: [],
+    columnFilters: {},
+    selectedRow: null,
+    kullaniciRaporu: {},
+    filters: [],
+    requestInProgress: false, // API isteği takibi için yeni flag
+  });
+
+  // Report verilerini güncellemek için fonksiyon
+  const updateReportData = (newData) => {
+    setReportData((prev) => ({
+      ...prev,
+      ...newData,
+    }));
+  };
+
   // Paylaşılacak değerler
   const value = {
     isModalVisible,
@@ -24,6 +46,12 @@ export const AppProvider = ({ children }) => {
     setUserData1,
     isButtonClicked,
     setIsButtonClicked,
+
+    // Rapor için eklenen state ve fonksiyonlar
+    reportLoading,
+    setReportLoading,
+    reportData,
+    updateReportData,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
