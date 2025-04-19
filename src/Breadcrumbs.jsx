@@ -39,7 +39,7 @@ const Breadcrumbs = () => {
     "/isTalepleri": "İş Talepleri",
     "/demo": "Demo",
     "/userid": "User ID Control",
-    "/mudaheleSuresi": "Müdahale Süresi Analizi",
+    "/mudaheleSuresi": "Müdahale Süreleri Analizi",
     "/kullaniciTanimlari": "Kullanıcı Tanımları",
     "/RolTanimlari1": "Rol Tanımları",
     "/malzemeTanimi": "Malzeme Tanımları",

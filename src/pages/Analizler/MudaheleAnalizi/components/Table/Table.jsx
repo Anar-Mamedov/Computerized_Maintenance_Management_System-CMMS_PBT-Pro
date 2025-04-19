@@ -15,6 +15,7 @@ import Filters1 from "./Filters/Filters.jsx";
 import EditDrawer1 from "../../../../YardimMasasi/IsTalepleri/Update/EditDrawer.jsx";
 import { useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
+import { t } from "i18next";
 
 const { Text } = Typography;
 
@@ -697,6 +698,7 @@ const MainTable = () => {
         filter: "drop-shadow(0 0 0.75rem rgba(0, 0, 0, 0.1))",
       }}
     >
+      <Text style={{ fontWeight: 600, marginBottom: "15px" }}>{t("isEmirleriMudaheleSureleri")}</Text>
       <Modal title="Sütunları Yönet" centered width={800} open={isModalVisible} onOk={() => setIsModalVisible(false)} onCancel={() => setIsModalVisible(false)}>
         <Text style={{ marginBottom: "15px" }}>Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını Ayarlayabilirsiniz.</Text>
         <div
