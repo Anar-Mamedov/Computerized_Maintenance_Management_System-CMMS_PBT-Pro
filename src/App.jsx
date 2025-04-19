@@ -169,7 +169,7 @@ const rawItems = [
     "analizler1",
     <KeyOutlined />,
     [
-      getItem("Müdahale Süresi Analizi", "mudaheleSuresi", true),
+      getItem("Müdahale Süreleri Analizi", "mudaheleSuresi", true),
       getItem("Personel KPI Analizi", "analizler", true),
 
       // getItem("Team 2", "team2", true)
