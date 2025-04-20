@@ -19,12 +19,52 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [reportResponse, setReportResponse] = useState([]);
   const [raporModalVisible, setRaporModalVisible] = useState(false);
+  const [kullaniciData, setKullaniciData] = useState(null);
 
   // Add a ref to track API call status
   const apiCallInProgressRef = useRef(false);
 
   // Context'ten rapor verileri için gerekli state ve fonksiyonları al
   const { reportData, updateReportData, setReportLoading } = useAppContext();
+
+  // Kullanıcı bilgilerini getiren API isteği
+  useEffect(() => {
+    const fetchKullaniciData = async () => {
+      try {
+        // localStorage'dan userKey'i al ve içindeki userId'yi çıkar
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        const userId = user.userId;
+
+        if (userId) {
+          const response = await AxiosInstance.get(`GetKullaniciById?id=${userId}`);
+          setKullaniciData(response);
+
+          // Response içerisinde KLL_ROL_ID kontrolü
+          if (response && response.KLL_ROL_ID > 0) {
+            // KLL_ROL_ID değeri varsa, GetKullaniciYetkiById endpoint'ine istek at
+            try {
+              const yetkiResponse = await AxiosInstance.get(`GetKullaniciYetkiById?id=${response.KLL_ROL_ID}`);
+              localStorage.setItem("userAuthorization", JSON.stringify(yetkiResponse));
+              // İhtiyaca göre bu veriyi state'e kaydedebilirsiniz
+            } catch (yetkiError) {
+              console.error("Kullanıcı yetki bilgileri alınırken hata oluştu:", yetkiError);
+            }
+          } else if (response && response.KLL_ROL_ID == 0) {
+            try {
+              const yetkiResponse = await AxiosInstance.get(`GetKullaniciYetkiById?id=${userId}`);
+              localStorage.setItem("userAuthorization", JSON.stringify(yetkiResponse));
+            } catch (yetkiError) {
+              console.error("Kullanıcı yetki bilgileri alınırken hata oluştu:", yetkiError);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Kullanıcı bilgileri alınırken hata oluştu:", error);
+      }
+    };
+
+    fetchKullaniciData();
+  }, []);
 
   useEffect(() => {
     const checkInternetConnection = () => {
