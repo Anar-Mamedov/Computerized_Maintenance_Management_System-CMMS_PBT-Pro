@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Modal, Input, Typography, Tabs, DatePicker, TimePicker, Slider, InputNumber, Checkbox, message } from "antd";
+import { ClockCircleOutlined } from "@ant-design/icons";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
 import styled from "styled-components";
 import dayjs from "dayjs";
@@ -55,6 +56,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
   const previousSelectedOption = usePrevious(selectedOption); // Önceki seçilen opsiyonu al iş emri tipi selectboxu değiştiğinde prosedürü sıfırlaması için
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
+  const [baslamaZamaniEditPermission, setBaslamaZamaniEditPermission] = useState(false);
+  const [bitisZamaniEditPermission, setBitisZamaniEditPermission] = useState(false);
 
   // iş emri tipi selectboxu değiştiğinde prosedür ve ondan sonraki 3 fieldin değerlerini sıfırlamak için Context API kullanarak
   useEffect(() => {
@@ -208,6 +211,32 @@ export default function DetayBilgiler({ fieldRequirements }) {
   }, [baslamaZamani, baslamaZamaniSaati, bitisZamani, bitisZamaniSaati, setValue, getValues]);
 
   //! Başlama Tarihi ve saati ile Bitiş Tarihi ve saati arasındaki farkı hesaplama sonu
+
+  const setBaslamaZamani = () => {
+    setValue("baslamaZamani", dayjs());
+    setValue("baslamaZamaniSaati", dayjs());
+  };
+  const setBitisZamani = () => {
+    setValue("bitisZamani", dayjs());
+    setValue("bitisZamaniSaati", dayjs());
+  };
+
+  useEffect(() => {
+    try {
+      const userAuthorization = JSON.parse(localStorage.getItem("userAuthorization") || "[]");
+      const permission = userAuthorization.find((item) => item.KYT_YETKI_KOD == 2014);
+      const permissionBitisZamani = userAuthorization.find((item) => item.KYT_YETKI_KOD == 2015);
+
+      if (permission) {
+        setBaslamaZamaniEditPermission(permission.KYT_DEGISTIR);
+      }
+      if (permissionBitisZamani) {
+        setBitisZamaniEditPermission(permissionBitisZamani.KYT_DEGISTIR);
+      }
+    } catch (error) {
+      console.error("Yetki kontrolü sırasında bir hata oluştu:", error);
+    }
+  }, []);
 
   return (
     <div style={{ paddingBottom: "35px" }}>
@@ -1403,42 +1432,50 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   width: "100%",
                 }}
               >
-                <Controller
-                  name="baslamaZamani"
-                  control={control}
-                  rules={{
-                    required: fieldRequirements.baslamaZamani ? "Alan Boş Bırakılamaz!" : false,
-                  }}
-                  render={({ field, fieldState: { error } }) => (
-                    <DatePicker
-                      {...field}
-                      status={errors.baslamaZamani ? "error" : ""}
-                      // disabled={!isDisabled}
-                      style={{ width: "180px" }}
-                      format={localeDateFormat}
-                      placeholder="Tarih seçiniz"
-                    />
-                  )}
-                />
-                <Controller
-                  name="baslamaZamaniSaati"
-                  control={control}
-                  rules={{
-                    required: fieldRequirements.baslamaZamaniSaati ? "Alan Boş Bırakılamaz!" : false,
-                  }}
-                  render={({ field, fieldState: { error } }) => (
-                    <TimePicker
-                      {...field}
-                      changeOnScroll
-                      needConfirm={false}
-                      status={errors.baslamaZamaniSaati ? "error" : ""}
-                      // disabled={!isDisabled}
-                      style={{ width: "110px" }}
-                      format={localeTimeFormat}
-                      placeholder="Saat seçiniz"
-                    />
-                  )}
-                />
+                <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                  <Controller
+                    name="baslamaZamani"
+                    control={control}
+                    rules={{
+                      required: fieldRequirements.baslamaZamani ? "Alan Boş Bırakılamaz!" : false,
+                    }}
+                    render={({ field, fieldState: { error } }) => (
+                      <DatePicker
+                        {...field}
+                        disabled={!baslamaZamaniEditPermission}
+                        status={errors.baslamaZamani ? "error" : ""}
+                        // disabled={!isDisabled}
+                        style={{ width: "145px" }}
+                        format={localeDateFormat}
+                        placeholder="Tarih seçiniz"
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="baslamaZamaniSaati"
+                    control={control}
+                    rules={{
+                      required: fieldRequirements.baslamaZamaniSaati ? "Alan Boş Bırakılamaz!" : false,
+                    }}
+                    render={({ field, fieldState: { error } }) => (
+                      <TimePicker
+                        {...field}
+                        disabled={!baslamaZamaniEditPermission}
+                        changeOnScroll
+                        needConfirm={false}
+                        status={errors.baslamaZamaniSaati ? "error" : ""}
+                        // disabled={!isDisabled}
+                        style={{ width: "100px" }}
+                        format={localeTimeFormat}
+                        placeholder="Saat seçiniz"
+                      />
+                    )}
+                  />
+
+                  <Button type="primary" onClick={setBaslamaZamani}>
+                    <ClockCircleOutlined />
+                  </Button>
+                </div>
                 {errors.baslamaZamaniSaati && <div style={{ color: "red", marginTop: "5px" }}>{errors.baslamaZamaniSaati.message}</div>}
               </div>
             </div>
@@ -1472,42 +1509,49 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   width: "100%",
                 }}
               >
-                <Controller
-                  name="bitisZamani"
-                  control={control}
-                  rules={{
-                    required: fieldRequirements.bitisZamani ? "Alan Boş Bırakılamaz!" : false,
-                  }}
-                  render={({ field, fieldState: { error } }) => (
-                    <DatePicker
-                      {...field}
-                      status={errors.bitisZamani ? "error" : ""}
-                      // disabled={!isDisabled}
-                      style={{ width: "180px" }}
-                      format={localeDateFormat}
-                      placeholder="Tarih seçiniz"
-                    />
-                  )}
-                />
-                <Controller
-                  name="bitisZamaniSaati"
-                  control={control}
-                  rules={{
-                    required: fieldRequirements.bitisZamaniSaati ? "Alan Boş Bırakılamaz!" : false,
-                  }}
-                  render={({ field, fieldState: { error } }) => (
-                    <TimePicker
-                      {...field}
-                      changeOnScroll
-                      needConfirm={false}
-                      status={errors.bitisZamaniSaati ? "error" : ""}
-                      // disabled={!isDisabled}
-                      style={{ width: "110px" }}
-                      format={localeTimeFormat}
-                      placeholder="Saat seçiniz"
-                    />
-                  )}
-                />
+                <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                  <Controller
+                    name="bitisZamani"
+                    control={control}
+                    rules={{
+                      required: fieldRequirements.bitisZamani ? "Alan Boş Bırakılamaz!" : false,
+                    }}
+                    render={({ field, fieldState: { error } }) => (
+                      <DatePicker
+                        {...field}
+                        disabled={!bitisZamaniEditPermission}
+                        status={errors.bitisZamani ? "error" : ""}
+                        // disabled={!isDisabled}
+                        style={{ width: "145px" }}
+                        format={localeDateFormat}
+                        placeholder="Tarih seçiniz"
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="bitisZamaniSaati"
+                    control={control}
+                    rules={{
+                      required: fieldRequirements.bitisZamaniSaati ? "Alan Boş Bırakılamaz!" : false,
+                    }}
+                    render={({ field, fieldState: { error } }) => (
+                      <TimePicker
+                        {...field}
+                        disabled={!bitisZamaniEditPermission}
+                        changeOnScroll
+                        needConfirm={false}
+                        status={errors.bitisZamaniSaati ? "error" : ""}
+                        // disabled={!isDisabled}
+                        style={{ width: "100px" }}
+                        format={localeTimeFormat}
+                        placeholder="Saat seçiniz"
+                      />
+                    )}
+                  />
+                  <Button type="primary" onClick={setBitisZamani} disabled={!baslamaZamani || !baslamaZamaniSaati}>
+                    <ClockCircleOutlined />
+                  </Button>
+                </div>
                 {errors.bitisZamaniSaati && <div style={{ color: "red", marginTop: "5px" }}>{errors.bitisZamaniSaati.message}</div>}
               </div>
             </div>
