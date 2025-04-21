@@ -14,6 +14,7 @@ export default function CreateDrawer({ onRefresh }) {
   const [open, setOpen] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
+  const [addButtonStatus, setAddButtonStatus] = useState(false);
   // API'den gelen zorunluluk bilgilerini simüle eden bir örnek
   const [fieldRequirements, setFieldRequirements] = React.useState({
     // Varsayılan olarak zorunlu değil
@@ -315,6 +316,7 @@ export default function CreateDrawer({ onRefresh }) {
   }, [calismaSaat]);
 
   const onSubmit = (data) => {
+    setAddButtonStatus(true);
     // Form verilerini API'nin beklediği formata dönüştür
     const Body = {
       ISM_ISEMRI_NO: data.isEmriNo,
@@ -433,7 +435,7 @@ export default function CreateDrawer({ onRefresh }) {
             <Space>
               <Button onClick={onClose}>İptal</Button>
               <Button
-                disabled={disabled}
+                disabled={disabled || addButtonStatus}
                 type="submit"
                 onClick={methods.handleSubmit(onSubmit)}
                 style={{

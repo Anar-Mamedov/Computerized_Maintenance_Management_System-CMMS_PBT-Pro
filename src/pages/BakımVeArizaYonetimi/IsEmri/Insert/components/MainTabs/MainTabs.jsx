@@ -63,6 +63,7 @@ const StyledDivMedia = styled.div`
 export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) {
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
+  const [duzenlemeZamaniEditPermission, setDuzenlemeZamaniEditPermission] = useState(false);
   const {
     control,
     watch,
@@ -273,6 +274,19 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
 
   // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın sonu
 
+  useEffect(() => {
+    try {
+      const userAuthorization = JSON.parse(localStorage.getItem("userAuthorization") || "[]");
+      const permission = userAuthorization.find((item) => item.KYT_YETKI_KOD == 2010);
+
+      if (permission) {
+        setDuzenlemeZamaniEditPermission(permission.KYT_DEGISTIR);
+      }
+    } catch (error) {
+      console.error("Yetki kontrolü sırasında bir hata oluştu:", error);
+    }
+  }, []);
+
   return (
     <div
       style={{
@@ -394,7 +408,14 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 control={control}
                 rules={{ validate: validateDateTime }}
                 render={({ field, fieldState: { error } }) => (
-                  <DatePicker {...field} status={error ? "error" : ""} style={{ width: "180px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />
+                  <DatePicker
+                    {...field}
+                    disabled={!duzenlemeZamaniEditPermission}
+                    status={error ? "error" : ""}
+                    style={{ width: "180px" }}
+                    format={localeDateFormat}
+                    placeholder="Tarih seçiniz"
+                  />
                 )}
               />
               {/*{errors.duzenlenmeTarihi && (*/}
@@ -410,6 +431,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 render={({ field, fieldState: { error } }) => (
                   <TimePicker
                     {...field}
+                    disabled={!duzenlemeZamaniEditPermission}
                     changeOnScroll
                     needConfirm={false}
                     status={error ? "error" : ""}

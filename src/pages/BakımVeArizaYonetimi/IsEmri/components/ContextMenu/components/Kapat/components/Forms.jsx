@@ -58,6 +58,9 @@ const StyledDivMedia = styled.div`
 export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
+  const [baslamaZamaniEditPermission, setBaslamaZamaniEditPermission] = useState(false);
+  const [bitisZamaniEditPermission, setBitisZamaniEditPermission] = useState(false);
+  const [kapatmaZamaniEditPermission, setKapatmaZamaniEditPermission] = useState(false);
   const {
     control,
     watch,
@@ -112,7 +115,7 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
   //! Başlama Tarihi ve saati ile Bitiş Tarihi ve saati arasındaki farkı hesaplama
 
   // Watch for changes in the relevant fields
-  const watchFields = watch(["baslamaTarihi", "baslamaSaati", "bitisTarihi", "bitisSaati"]);
+  const watchFields = watch(["baslamaTarihi", "baslamaSaati", "bitisTarihi", "bitisSaati", "kapatmaTarihi", "kapatmaSaati"]);
 
   React.useEffect(() => {
     const { baslamaTarihi, baslamaSaati, bitisTarihi, bitisSaati } = getValues();
@@ -136,6 +139,58 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
 
   //! Başlama Tarihi ve saati ile Bitiş Tarihi ve saati arasındaki farkı hesaplama sonu
 
+  // Kapatma zamanının bitiş zamanından önce olup olmadığını kontrol et
+  const validateKapatmaZamani = () => {
+    const { bitisTarihi, bitisSaati, kapatmaTarihi, kapatmaSaati } = getValues();
+
+    if (bitisTarihi && bitisSaati && kapatmaTarihi && kapatmaSaati) {
+      // Bitiş tarihini ve saatini birleştiriyoruz
+      const bitisYear = bitisTarihi.year();
+      const bitisMonth = bitisTarihi.month();
+      const bitisDay = bitisTarihi.date();
+      const bitisHour = bitisSaati.hour();
+      const bitisMinute = bitisSaati.minute();
+
+      // Kapatma tarihini ve saatini birleştiriyoruz
+      const kapatmaYear = kapatmaTarihi.year();
+      const kapatmaMonth = kapatmaTarihi.month();
+      const kapatmaDay = kapatmaTarihi.date();
+      const kapatmaHour = kapatmaSaati.hour();
+      const kapatmaMinute = kapatmaSaati.minute();
+
+      // Tam datetime nesneleri oluşturuyoruz
+      const endDateTime = dayjs().year(bitisYear).month(bitisMonth).date(bitisDay).hour(bitisHour).minute(bitisMinute).second(0);
+      const closeDateTime = dayjs().year(kapatmaYear).month(kapatmaMonth).date(kapatmaDay).hour(kapatmaHour).minute(kapatmaMinute).second(0);
+
+      // İki tarih arasındaki farkı milisaniye cinsinden hesaplıyoruz
+      // Pozitif veya sıfır ise kapatma zamanı bitiş zamanından sonra veya aynı zamanda demektir
+      return closeDateTime.diff(endDateTime) >= 0 || "Kapatma zamanı, bitiş zamanından önce olamaz";
+    }
+
+    return true;
+  };
+
+  useEffect(() => {
+    try {
+      const userAuthorization = JSON.parse(localStorage.getItem("userAuthorization") || "[]");
+      const permission = userAuthorization.find((item) => item.KYT_YETKI_KOD == 2014);
+      const permissionBitisZamani = userAuthorization.find((item) => item.KYT_YETKI_KOD == 2015);
+      const permissionKapatmaZamani = userAuthorization.find((item) => item.KYT_YETKI_KOD == 2011);
+
+      if (permission) {
+        setBaslamaZamaniEditPermission(permission.KYT_DEGISTIR);
+      }
+      if (permissionBitisZamani) {
+        setBitisZamaniEditPermission(permissionBitisZamani.KYT_DEGISTIR);
+      }
+      if (permissionKapatmaZamani) {
+        setKapatmaZamaniEditPermission(permissionKapatmaZamani.KYT_DEGISTIR);
+      }
+    } catch (error) {
+      console.error("Yetki kontrolü sırasında bir hata oluştu:", error);
+    }
+  }, []);
+
   return (
     <div style={buttonStyle}>
       <div style={{ display: "flex", flexWrap: "wrap", columnGap: "10px" }}>
@@ -150,7 +205,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
               width: "100%",
               justifyContent: "space-between",
               marginBottom: "10px",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px", fontWeight: "600" }}>Başlama Zamanı:</Text>
             <div
               style={{
@@ -161,7 +217,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                 minWidth: "300px",
                 gap: "10px",
                 width: "100%",
-              }}>
+              }}
+            >
               <Controller
                 name="baslamaTarihi"
                 control={control}
@@ -169,6 +226,7 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                 render={({ field, fieldState: { error } }) => (
                   <DatePicker
                     {...field}
+                    disabled={!baslamaZamaniEditPermission}
                     status={errors.baslamaTarihi ? "error" : ""}
                     // disabled={!isDisabled}
                     style={{ width: "180px" }}
@@ -184,7 +242,9 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                 render={({ field, fieldState: { error } }) => (
                   <TimePicker
                     {...field}
-                    changeOnScroll needConfirm={false} 
+                    disabled={!baslamaZamaniEditPermission}
+                    changeOnScroll
+                    needConfirm={false}
                     status={errors.baslamaSaati ? "error" : ""}
                     // disabled={!isDisabled}
                     style={{ width: "110px" }}
@@ -206,7 +266,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
               width: "100%",
               justifyContent: "space-between",
               marginBottom: "10px",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px", fontWeight: "600" }}>Bitiş Zamanı:</Text>
             <div
               style={{
@@ -217,7 +278,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                 minWidth: "300px",
                 gap: "10px",
                 width: "100%",
-              }}>
+              }}
+            >
               <Controller
                 name="bitisTarihi"
                 control={control}
@@ -225,6 +287,7 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                 render={({ field, fieldState: { error } }) => (
                   <DatePicker
                     {...field}
+                    disabled={!bitisZamaniEditPermission}
                     status={errors.bitisTarihi ? "error" : ""}
                     // disabled={!isDisabled}
                     style={{ width: "180px" }}
@@ -240,7 +303,9 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                 render={({ field, fieldState: { error } }) => (
                   <TimePicker
                     {...field}
-                    changeOnScroll needConfirm={false} 
+                    disabled={!bitisZamaniEditPermission}
+                    changeOnScroll
+                    needConfirm={false}
                     status={errors.bitisSaati ? "error" : ""}
                     // disabled={!isDisabled}
                     style={{ width: "110px" }}
@@ -260,7 +325,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
               width: "100%",
               maxWidth: "490px",
               marginBottom: "10px",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px", fontWeight: "600" }}>Çalışma Süresi (Saat - dk):</Text>
             <div
               style={{
@@ -269,7 +335,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                 alignItems: "center",
                 justifyContent: "space-between",
                 width: "300px",
-              }}>
+              }}
+            >
               <Controller
                 name="calismaSaat"
                 control={control}
@@ -288,19 +355,9 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                 name="calismaDakika"
                 control={control}
                 rules={{ required: "Alan Boş Bırakılamaz!" }}
-                render={({ field }) => (
-                  <InputNumber
-                    {...field}
-                    min={0}
-                    max={59}
-                    status={errors.calismaDakika ? "error" : ""}
-                    style={{ width: "145px" }}
-                  />
-                )}
+                render={({ field }) => <InputNumber {...field} min={0} max={59} status={errors.calismaDakika ? "error" : ""} style={{ width: "145px" }} />}
               />
-              {errors.calismaDakika && (
-                <div style={{ color: "red", marginTop: "5px" }}>{errors.calismaDakika.message}</div>
-              )}
+              {errors.calismaDakika && <div style={{ color: "red", marginTop: "5px" }}>{errors.calismaDakika.message}</div>}
             </div>
           </StyledDivBottomLine>
           <StyledDivBottomLine
@@ -312,7 +369,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
               width: "100%",
               maxWidth: "490px",
               marginBottom: "10px",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px", fontWeight: "600" }}>Sonuç:</Text>
             <div
               style={{
@@ -322,7 +380,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                 maxWidth: "300px",
                 gap: "10px",
                 width: "100%",
-              }}>
+              }}
+            >
               <SonucSelect />
             </div>
           </StyledDivBottomLine>
@@ -338,7 +397,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
               width: "100%",
               justifyContent: "space-between",
               marginBottom: "10px",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px", fontWeight: 600 }}>Kapatma Tarihi:</Text>
             <div
               style={{
@@ -349,14 +409,19 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                 minWidth: "300px",
                 gap: "10px",
                 width: "100%",
-              }}>
+              }}
+            >
               <Controller
                 name="kapatmaTarihi"
                 control={control}
-                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                rules={{
+                  required: "Alan Boş Bırakılamaz!",
+                  validate: validateKapatmaZamani,
+                }}
                 render={({ field, fieldState: { error } }) => (
                   <DatePicker
                     {...field}
+                    disabled={!kapatmaZamaniEditPermission}
                     status={errors.kapatmaTarihi ? "error" : ""}
                     style={{ width: "180px" }}
                     format={localeDateFormat}
@@ -367,11 +432,16 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
               <Controller
                 name="kapatmaSaati"
                 control={control}
-                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                rules={{
+                  required: "Alan Boş Bırakılamaz!",
+                  validate: validateKapatmaZamani,
+                }}
                 render={({ field, fieldState: { error } }) => (
                   <TimePicker
                     {...field}
-                    changeOnScroll needConfirm={false} 
+                    disabled={!kapatmaZamaniEditPermission}
+                    changeOnScroll
+                    needConfirm={false}
                     status={errors.kapatmaSaati ? "error" : ""}
                     style={{ width: "110px" }}
                     format={localeTimeFormat}
@@ -380,6 +450,7 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                 )}
               />
               {errors.kapatmaTarihi && <div style={{ color: "red" }}>{errors.kapatmaTarihi.message}</div>}
+              {/* {errors.kapatmaSaati && <div style={{ color: "red" }}>{errors.kapatmaSaati.message}</div>} */}
             </div>
           </div>
           <StyledDivBottomLine
@@ -390,7 +461,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
               width: "100%",
               maxWidth: "490px",
               marginBottom: "10px",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px" }}>Bakım Puanı:</Text>
             <div
               style={{
@@ -399,7 +471,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                 alignItems: "center",
                 justifyContent: "space-between",
                 width: "300px",
-              }}>
+              }}
+            >
               <Controller
                 name="bakimPuani"
                 control={control}
@@ -423,7 +496,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
               width: "100%",
               maxWidth: "490px",
               marginBottom: "10px",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px" }}>Makine Durumu:</Text>
             <div
               style={{
@@ -433,7 +507,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
                 maxWidth: "300px",
                 gap: "10px",
                 width: "100%",
-              }}>
+              }}
+            >
               <MakineDurumu />
             </div>
           </StyledDivBottomLine>
