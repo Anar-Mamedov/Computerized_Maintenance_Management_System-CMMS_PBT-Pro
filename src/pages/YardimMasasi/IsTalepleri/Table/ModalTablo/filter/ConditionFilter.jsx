@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Popover, Button, Select } from "antd";
 
 const { Option } = Select;
@@ -7,6 +7,7 @@ const ConditionFilter = ({ onSubmit }) => {
   const [visible, setVisible] = useState(false);
   const [options, setOptions] = React.useState([]);
   const [filters, setFilters] = useState({ 3: "Devam Ediyor" }); // Key 3 olan seçeneği varsayılan olarak seçili hale getir
+  const initialRenderRef = useRef(true);
 
   const handleChange = (value) => {
     const selectedItemsCopy = { ...filters };
@@ -36,16 +37,16 @@ const ConditionFilter = ({ onSubmit }) => {
     ];
     setOptions(hardcodedOptions);
 
-    // Seçilen durumların key değerlerini bir obje olarak oluştur
-    let selectedKeysObj = {};
-    Object.keys(filters).forEach((key, index) => {
-      selectedKeysObj[`key${index}`] = key;
-    });
+    // Sadece ilk render'da çalışsın
+    if (initialRenderRef.current) {
+      initialRenderRef.current = false;
 
-    // Bu objeyi onSubmit fonksiyonuna gönder
-    setTimeout(() => {
-      onSubmit(selectedKeysObj);
-    }, 900);
+      // Seçilen durumların key değerlerini bir obje olarak oluştur
+      const defaultSelectedKeysObj = { key0: "3" };
+
+      // Bu objeyi onSubmit fonksiyonuna gönder
+      onSubmit(defaultSelectedKeysObj);
+    }
   }, []);
 
   const handleSubmit = () => {
