@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 import { Table, Button, Modal, Checkbox, Input, Spin, Tag, message } from "antd";
 import { useFormContext } from "react-hook-form";
 import { SearchOutlined, MenuOutlined } from "@ant-design/icons";
@@ -37,6 +37,8 @@ export default function MainTable() {
   const [totalPages, setTotalPages] = useState(0); // Toplam sayfa sayısı için state
   const [totalDataCount, setTotalDataCount] = useState(0); // Tüm veriyi tutan state
   const [pageSize, setPageSize] = useState(10); // Başlangıçta sayfa başına 10 kayıt göster
+  const apiRequestInProgress = useRef(false);
+  const [requestCounter, setRequestCounter] = useState(0);
 
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
@@ -776,7 +778,7 @@ export default function MainTable() {
       date.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0);
 
       // Kullanıcının lokal ayarlarına uygun olarak saat ve dakikayı formatla
-      // `hour12` seçeneğini belirtmeyerek Intl.DateTimeFormat'ın kullanıcının yerel ayarlarına göre otomatik seçim yapmasına izin ver
+      // `hour12` seçeneğini belirtmeyerek Intl.DateTimeFormat'ın kullanıcının sistem ayarlarına göre otomatik seçim yapmasına izin ver
       const formatter = new Intl.DateTimeFormat(navigator.language, {
         hour: "numeric",
         minute: "2-digit",
@@ -802,16 +804,25 @@ export default function MainTable() {
 
   const [body, setBody] = useState({
     keyword: "",
-    filters: {},
+    filters: {
+      durumlar: { key0: "3" }, // Varsayılan filtre - Devam Ediyor
+    },
   });
 
   // ana tablo api isteği için kullanılan useEffect
-
   useEffect(() => {
-    fetchEquipmentData(body, currentPage, pageSize);
-  }, [body, currentPage, pageSize]);
+    // Çok fazla API isteği gönderilmesini önlemek için bir zamanlayıcı kullanıyoruz
+    const fetchTimeout = setTimeout(() => {
+      if (!apiRequestInProgress.current) {
+        apiRequestInProgress.current = true;
+        fetchEquipmentData(body, currentPage, pageSize).finally(() => {
+          apiRequestInProgress.current = false;
+        });
+      }
+    }, 300);
 
-  // ana tablo api isteği için kullanılan useEffect son
+    return () => clearTimeout(fetchTimeout);
+  }, [body, currentPage, pageSize, requestCounter]);
 
   // arama işlemi için kullanılan useEffect
   useEffect(() => {
@@ -842,6 +853,8 @@ export default function MainTable() {
 
     try {
       setLoading(true);
+      console.log("API isteği gönderiliyor:", filters);
+
       // API isteğinde keyword ve currentPage kullanılıyor
       const response = await AxiosInstance.post(`GetIsTalepFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}`, filters);
       if (response) {
@@ -876,13 +889,25 @@ export default function MainTable() {
 
   // filtreleme işlemi için kullanılan useEffect
   const handleBodyChange = useCallback((type, newBody) => {
-    setBody((state) => ({
-      ...state,
-      [type]: newBody,
-    }));
+    setBody((state) => {
+      // Eğer filters güncelleniyor ise
+      if (type === "filters") {
+        return {
+          ...state,
+          [type]: newBody,
+        };
+      }
+
+      return {
+        ...state,
+        [type]: newBody,
+      };
+    });
     setCurrentPage(1); // Filtreleme yapıldığında sayfa numarasını 1'e ayarla
+
+    // Yeni bir istek tetiklemek için sayacı artır
+    setRequestCounter((prev) => prev + 1);
   }, []);
-  // filtreleme işlemi için kullanılan useEffect son
 
   // sayfalama için kullanılan useEffect
   const handleTableChange = (pagination, filters, sorter, extra) => {

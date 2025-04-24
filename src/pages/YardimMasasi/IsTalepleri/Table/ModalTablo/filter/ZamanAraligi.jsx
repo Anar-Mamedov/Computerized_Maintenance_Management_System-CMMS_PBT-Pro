@@ -1,48 +1,42 @@
-import React, { useEffect } from "react";
-import { useForm, Controller, useFormContext } from "react-hook-form";
-import { Typography, Select } from "antd";
+import React, { useEffect, useState, useRef } from "react";
+import { useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
 import "dayjs/locale/tr"; // For Turkish locale
 import weekOfYear from "dayjs/plugin/weekOfYear";
 import advancedFormat from "dayjs/plugin/advancedFormat";
+import { Select } from "antd";
 
 dayjs.extend(weekOfYear);
 dayjs.extend(advancedFormat);
 
 dayjs.locale("tr"); // use Turkish locale
 
-const { Text } = Typography;
+export default function ZamanAraligi({ onChange }) {
+  const { setValue } = useFormContext();
+  const [selectedOption, setSelectedOption] = useState("all");
+  const isUpdatingRef = useRef(false);
+  const initialRenderRef = useRef(true);
 
-export default function ZamanAraligi() {
-  const {
-    control,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useFormContext();
-
-  const selectedTimeRange = watch("timeRange");
-
+  // Component yüklendiğinde varsayılan olarak "Tümü" seçeneğini uygula
   useEffect(() => {
-    // Set default value on initial render if not already set
-    if (selectedTimeRange === undefined) {
-      setValue("timeRange", "all", { shouldValidate: true });
+    if (initialRenderRef.current) {
+      initialRenderRef.current = false;
       handleTimeRangeChange("all");
-    } else {
-      handleTimeRangeChange(selectedTimeRange);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTimeRange]);
+  }, []);
 
-  const handleTimeRangeChange = (value) => {
-    let startDate;
-    let endDate;
+  const handleTimeRangeChange = (timeRange) => {
+    // Eğer güncelleme işlemi devam ediyorsa, return
+    if (isUpdatingRef.current) return;
 
-    switch (value) {
-      case "all":
-        startDate = null;
-        endDate = null;
-        break;
+    isUpdatingRef.current = true;
+    setSelectedOption(timeRange);
+
+    let startDate = null;
+    let endDate = null;
+
+    // Zaman aralığı değerine göre başlangıç ve bitiş tarihlerini ayarla
+    switch (timeRange) {
       case "today":
         startDate = dayjs().startOf("day");
         endDate = dayjs().endOf("day");
@@ -67,6 +61,14 @@ export default function ZamanAraligi() {
         startDate = dayjs().subtract(1, "month").startOf("month");
         endDate = dayjs().subtract(1, "month").endOf("month");
         break;
+      case "thisQuarter":
+        startDate = dayjs().startOf("quarter");
+        endDate = dayjs().endOf("quarter");
+        break;
+      case "lastQuarter":
+        startDate = dayjs().subtract(1, "quarter").startOf("quarter");
+        endDate = dayjs().subtract(1, "quarter").endOf("quarter");
+        break;
       case "thisYear":
         startDate = dayjs().startOf("year");
         endDate = dayjs().endOf("year");
@@ -75,54 +77,64 @@ export default function ZamanAraligi() {
         startDate = dayjs().subtract(1, "year").startOf("year");
         endDate = dayjs().subtract(1, "year").endOf("year");
         break;
-      case "last1Month":
-        startDate = dayjs().subtract(1, "month");
-        endDate = dayjs();
-        break;
-      case "last3Months":
-        startDate = dayjs().subtract(3, "months");
-        endDate = dayjs();
-        break;
-      case "last6Months":
-        startDate = dayjs().subtract(6, "months");
-        endDate = dayjs();
-        break;
+      case "all":
       default:
+        // Seçim "Tümü" ise veya tanımlanmamışsa null değerleri ayarlanır
         startDate = null;
         endDate = null;
+        break;
     }
 
-    setValue("startDate", startDate);
-    setValue("endDate", endDate);
+    // Form state'i güncelle
+    setValue("startDate", startDate ? startDate.format("YYYY-MM-DD") : null);
+    setValue("endDate", endDate ? endDate.format("YYYY-MM-DD") : null);
+
+    // customfilters objesi oluştur
+    const customfilters = {};
+
+    if (timeRange === "all") {
+      // "Tümü" seçildiğinde, tarih değerlerini customfilters'dan kaldırmak için
+      // özel bir sinyal gönderiyoruz (null değerleri kullanarak)
+      onChange({
+        customfilters: {
+          removeDateFilters: true,
+        },
+      });
+    } else {
+      // Sadece null olmayan tarihleri ekle
+      if (startDate) {
+        customfilters.startDate = startDate.format("YYYY-MM-DD");
+      }
+
+      if (endDate) {
+        customfilters.endDate = endDate.format("YYYY-MM-DD");
+      }
+
+      // Callback'i çağır ve filtreleme için değerleri gönder
+      onChange({
+        customfilters,
+      });
+    }
+
+    // Kısa bir süre sonra isUpdatingRef'i false yap
+    setTimeout(() => {
+      isUpdatingRef.current = false;
+    }, 10);
   };
 
-  return (
-    <div style={{}}>
-      <Controller
-        name="timeRange"
-        control={control}
-        render={({ field }) => (
-          <Select
-            {...field}
-            style={{ width: "130px" }}
-            placeholder="Seçim Yap"
-            options={[
-              { value: "all", label: "Tümü" },
-              { value: "today", label: "Bugün" },
-              { value: "yesterday", label: "Dün" },
-              { value: "thisWeek", label: "Bu Hafta" },
-              { value: "lastWeek", label: "Geçen Hafta" },
-              { value: "thisMonth", label: "Bu Ay" },
-              { value: "lastMonth", label: "Geçen Ay" },
-              { value: "thisYear", label: "Bu Yıl" },
-              { value: "lastYear", label: "Geçen Yıl" },
-              { value: "last1Month", label: "Son 1 Ay" },
-              { value: "last3Months", label: "Son 3 Ay" },
-              { value: "last6Months", label: "Son 6 Ay" },
-            ]}
-          />
-        )}
-      />
-    </div>
-  );
+  const options = [
+    { value: "all", label: "Tümü" },
+    { value: "today", label: "Bugün" },
+    { value: "yesterday", label: "Dün" },
+    { value: "thisWeek", label: "Bu Hafta" },
+    { value: "lastWeek", label: "Geçen Hafta" },
+    { value: "thisMonth", label: "Bu Ay" },
+    { value: "lastMonth", label: "Geçen Ay" },
+    { value: "thisQuarter", label: "Bu Çeyrek" },
+    { value: "lastQuarter", label: "Geçen Çeyrek" },
+    { value: "thisYear", label: "Bu Yıl" },
+    { value: "lastYear", label: "Geçen Yıl" },
+  ];
+
+  return <Select value={selectedOption} onChange={handleTimeRangeChange} style={{ width: 130 }} options={options} />;
 }

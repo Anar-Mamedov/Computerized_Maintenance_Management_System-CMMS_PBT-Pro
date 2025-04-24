@@ -9,7 +9,7 @@ export default function Filters({ onChange }) {
   const [filters, setFilters] = React.useState({
     lokasyonlar: {},
     isemritipleri: {},
-    durumlar: {},
+    durumlar: { key0: "3" },
     customfilters: {},
   });
 
@@ -17,13 +17,55 @@ export default function Filters({ onChange }) {
     onChange("filters", filters);
   }, [filters, onChange]);
 
+  const handleZamanAraligiChange = (zamanFilters) => {
+    setFilters((state) => {
+      let updatedCustomFilters = { ...state.customfilters };
+
+      // "Tümü" seçeneği seçildiğinde tarih filtrelerini kaldır
+      if (zamanFilters.customfilters && zamanFilters.customfilters.removeDateFilters) {
+        // removeDateFilters özelliğini filtreleme objemizden silelim
+        const { removeDateFilters, ...restCustomFilters } = zamanFilters.customfilters;
+
+        // startDate ve endDate özelliklerini mevcut customfilters'dan kaldıralım
+        const { startDate, endDate, ...restStateCustomFilters } = updatedCustomFilters;
+
+        // Güncellenmiş customfilters'ı diğer filtrelerle birleştirelim
+        updatedCustomFilters = {
+          ...restStateCustomFilters,
+          ...restCustomFilters,
+        };
+      } else {
+        // Normal durum: Yeni filtreleri mevcut filterlarla birleştir
+        updatedCustomFilters = {
+          ...updatedCustomFilters,
+          ...zamanFilters.customfilters,
+        };
+      }
+
+      return {
+        ...state,
+        customfilters: updatedCustomFilters,
+      };
+    });
+  };
+
+  const handleCustomFilterChange = (customFilters) => {
+    setFilters((state) => ({
+      ...state,
+      customfilters: {
+        ...state.customfilters,
+        ...customFilters,
+      },
+    }));
+  };
+
   return (
     <>
       {/* <TypeFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, isemritipleri: newFilters }))} /> */}
       <ConditionFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, durumlar: newFilters }))} />
-      <ZamanAraligi />
+      <ZamanAraligi onChange={handleZamanAraligiChange} />
       {/* <LocationFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, lokasyonlar: newFilters }))} /> */}
-      <CustomFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, customfilters: newFilters }))} />
+      <CustomFilter onSubmit={handleCustomFilterChange} />
     </>
   );
 }
