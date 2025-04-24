@@ -9,6 +9,9 @@ import EditDrawer1 from "../../../../../BakımVeArizaYonetimi/IsEmri/Update/Edit
 import { CSVLink } from "react-csv";
 import { DownloadOutlined } from "@ant-design/icons";
 
+import { SiMicrosoftexcel } from "react-icons/si";
+import * as XLSX from "xlsx";
+
 // Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
 const normalizeText = (text) => {
   return text
@@ -254,6 +257,56 @@ export default function DorduncuTablo({ selectedRowUcuncuTablo, isModalVisibleUc
     }, 1000);
   };
 
+  const [xlsxLoading, setXlsxLoading] = useState(false);
+
+  // Excel indirme işlevi
+  const handleDownloadXLSX = () => {
+    try {
+      setXlsxLoading(true);
+      const tableData = filteredData1.length > 0 || searchTerm1 ? filteredData1 : data;
+
+      // Sütun başlıklarını kolonlardan otomatik olarak al
+      const exportHeaders = columns.reduce((acc, column) => {
+        acc[column.dataIndex] = column.title;
+        return acc;
+      }, {});
+
+      // Tablodan indireceğimiz verileri hazırlama
+      const exportData = tableData.map((item) => {
+        const row = {};
+        columns.forEach((column) => {
+          row[column.title] = item[column.dataIndex] !== undefined ? item[column.dataIndex] : "";
+        });
+        return row;
+      });
+
+      // Worksheet oluşturma
+      const ws = XLSX.utils.json_to_sheet(exportData, { header: columns.map((col) => col.title) });
+
+      // Sütun genişliklerini ayarla
+      const wscols = columns.map((col) => ({ wch: Math.max(col.title.length, (col.width || 120) / 8) }));
+      ws["!cols"] = wscols;
+
+      // İş emri tipi başlığından dosya adı oluşturma
+      const randomId = Math.random().toString(36).substring(2, 8);
+      const fileName = `analiz_${randomId}_${dayjs().format("YYYY-MM-DD")}.xlsx`;
+
+      // Workbook oluşturma ve worksheet ekleme
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "İş Analizi");
+
+      // Dosyayı indirme
+      XLSX.writeFile(wb, fileName);
+
+      message.success("Excel dosyası başarıyla indirildi");
+    } catch (error) {
+      console.error("Excel indirme hatası:", error);
+      message.error("Excel dosyası indirilirken bir hata oluştu");
+    } finally {
+      setXlsxLoading(false);
+    }
+  };
+
   return (
     <div>
       <Modal
@@ -277,11 +330,15 @@ export default function DorduncuTablo({ selectedRowUcuncuTablo, isModalVisibleUc
             <Input placeholder="Arama..." value={searchTerm1} onChange={handleSearch1} style={{ width: "300px" }} />
 
             {/*csv indirme butonu*/}
-            <CSVLink data={data} headers={csvHeaders} filename={`personel_is_Emirleri.csv`} className="ant-btn ant-btn-primary">
+            {/* <CSVLink data={data} headers={csvHeaders} filename={`personel_is_Emirleri.csv`} className="ant-btn ant-btn-primary">
               <Button type="primary" icon={<DownloadOutlined />} loading={loadings[1]} onClick={() => enterLoading(1)}>
                 İndir
               </Button>
-            </CSVLink>
+            </CSVLink> */}
+
+            <Button style={{ display: "flex", alignItems: "center" }} onClick={handleDownloadXLSX} loading={xlsxLoading} icon={<SiMicrosoftexcel />}>
+              İndir
+            </Button>
           </div>
           <Table
             // rowSelection={{
