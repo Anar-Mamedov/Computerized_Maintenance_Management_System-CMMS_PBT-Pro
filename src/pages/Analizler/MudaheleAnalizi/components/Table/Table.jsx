@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
-import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined, ReloadOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -796,6 +796,19 @@ const MainTable = () => {
           />
           {/*<Filters onChange={handleBodyChange} />*/}
           <Filters1 />
+          <Button
+            style={{ backgroundColor: "#2bc770", color: "white" }}
+            onClick={() => {
+              setCurrentPage(1);
+              setPageSize(10);
+              setSearchTerm("");
+              setSelectedRowKeys([]);
+              setSelectedRows([]);
+            }}
+          >
+            <ReloadOutlined />
+            Sorgula
+          </Button>
           {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>
