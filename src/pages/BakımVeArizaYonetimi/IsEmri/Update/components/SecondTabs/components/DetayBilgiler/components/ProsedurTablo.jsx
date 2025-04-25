@@ -129,7 +129,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
     setLoadingData2(true);
 
     // İlk tablo verilerini çeken API isteği
-    AxiosInstance.get(`GetProsedur?tipId=1`)
+    AxiosInstance.get(`GetProsedur?tipId=1&atolyeId=${watch("atolyeID") || 0}`)
       .then((response) => {
         const fetchedData = response.PROSEDUR_LISTE.map((item) => ({
           ...item,
@@ -141,7 +141,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
       .finally(() => setLoadingData1(false));
 
     // İkinci tablo verilerini çeken API isteği
-    AxiosInstance.get(`GetProsedur?tipId=2`)
+    AxiosInstance.get(`GetProsedur?tipId=2&atolyeId=${watch("atolyeID") || 0}`)
       .then((response) => {
         const fetchedData = response.PROSEDUR_LISTE.map((item) => ({
           ...item,

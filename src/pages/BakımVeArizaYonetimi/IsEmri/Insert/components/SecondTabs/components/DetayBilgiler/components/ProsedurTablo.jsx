@@ -129,7 +129,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
     setLoadingData2(true);
 
     // İlk tablo verilerini çeken API isteği
-    AxiosInstance.get(`GetProsedur?tipId=1`)
+    AxiosInstance.get(`GetProsedur?tipId=1&atolyeId=${watch("atolyeID") || 0}`)
       .then((response) => {
         const fetchedData = response.PROSEDUR_LISTE.map((item) => ({
           ...item,
@@ -141,7 +141,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
       .finally(() => setLoadingData1(false));
 
     // İkinci tablo verilerini çeken API isteği
-    AxiosInstance.get(`GetProsedur?tipId=2`)
+    AxiosInstance.get(`GetProsedur?tipId=2&atolyeId=${watch("atolyeID") || 0}`)
       .then((response) => {
         const fetchedData = response.PROSEDUR_LISTE.map((item) => ({
           ...item,
@@ -203,13 +203,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
     const normalizedSearchTerm = normalizeText(value);
     if (value) {
       const filtered = data1.filter((item) =>
-        Object.keys(item).some(
-          (key) =>
-            item[key] &&
-            normalizeText(item[key].toString())
-              .toLowerCase()
-              .includes(normalizedSearchTerm.toLowerCase())
-        )
+        Object.keys(item).some((key) => item[key] && normalizeText(item[key].toString()).toLowerCase().includes(normalizedSearchTerm.toLowerCase()))
       );
       setFilteredData1(filtered);
     } else {
@@ -223,13 +217,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
     const normalizedSearchTerm = normalizeText(value);
     if (value) {
       const filtered = data2.filter((item) =>
-        Object.keys(item).some(
-          (key) =>
-            item[key] &&
-            normalizeText(item[key].toString())
-              .toLowerCase()
-              .includes(normalizedSearchTerm.toLowerCase())
-        )
+        Object.keys(item).some((key) => item[key] && normalizeText(item[key].toString()).toLowerCase().includes(normalizedSearchTerm.toLowerCase()))
       );
       setFilteredData2(filtered);
     } else {
@@ -254,12 +242,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
       key: "1",
       children: (
         <div>
-          <Input
-            placeholder="Arama..."
-            value={searchTerm1}
-            onChange={handleSearch1}
-            style={{ width: "300px", marginBottom: "15px" }}
-          />
+          <Input placeholder="Arama..." value={searchTerm1} onChange={handleSearch1} style={{ width: "300px", marginBottom: "15px" }} />
           <Table
             rowSelection={{
               type: "radio",
@@ -267,9 +250,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
               onChange: onRowSelectChange1,
             }}
             columns={columns1}
-            dataSource={
-              filteredData1.length > 0 || searchTerm1 ? filteredData1 : data1
-            }
+            dataSource={filteredData1.length > 0 || searchTerm1 ? filteredData1 : data1}
             loading={loading}
             scroll={{
               y: "calc(100vh - 360px)",
@@ -283,12 +264,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
       key: "2",
       children: (
         <div>
-          <Input
-            placeholder="Arama..."
-            value={searchTerm2}
-            onChange={handleSearch2}
-            style={{ width: "300px", marginBottom: "15px" }}
-          />
+          <Input placeholder="Arama..." value={searchTerm2} onChange={handleSearch2} style={{ width: "300px", marginBottom: "15px" }} />
           <Table
             rowSelection={{
               type: "radio",
@@ -296,9 +272,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
               onChange: onRowSelectChange2,
             }}
             columns={columns2}
-            dataSource={
-              filteredData2.length > 0 || searchTerm2 ? filteredData2 : data2
-            }
+            dataSource={filteredData2.length > 0 || searchTerm2 ? filteredData2 : data2}
             loading={loading}
             scroll={{
               y: "calc(100vh - 360px)",
@@ -326,14 +300,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
-      <Modal
-        width={1200}
-        centered
-        title=""
-        open={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={handleModalToggle}
-      >
+      <Modal width={1200} centered title="" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <Spin spinning={loading}>
           <StyledTabs defaultActiveKey="1" items={visibleTabItems} />
         </Spin>

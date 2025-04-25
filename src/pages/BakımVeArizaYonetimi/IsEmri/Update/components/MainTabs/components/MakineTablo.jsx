@@ -1263,7 +1263,10 @@ const MainTable = ({ setSelectedIds, onSubmit }) => {
     try {
       setLoading(true);
       // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.post(`GetMakineFullList?pagingDeger=${page}&pageSize=${size}&lokasyonId=${lokasyonID}&parametre=${keyword}`, filters);
+      const response = await AxiosInstance.post(
+        `GetMakineFullList?pagingDeger=${page}&pageSize=${size}&lokasyonId=${lokasyonID}&parametre=${keyword}&atolyeId=${watch("atolyeID") || 0}`,
+        filters
+      );
       if (response) {
         // Toplam sayfa sayısını ayarla
         setTotalPages(response.page);
