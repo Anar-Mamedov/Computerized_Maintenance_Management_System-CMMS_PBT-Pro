@@ -41,6 +41,12 @@ import IsTalebiKullanicilari from "./pages/YardimMasasi/IsTalebiKullanicilari/Is
 import KullaniciTanimlari from "./pages/Yonetim/KullaniciTanimlari/KullaniciTanimlari.jsx";
 import RolTanimlari1 from "./pages/Yonetim/RolTanimlari/RolTanimlari.jsx";
 import MalzemeTanimlari from "./pages/Malzeme&DepoYonetimi/MalzemeTanimlari/MalzemeTanimlari.jsx";
+
+// Malzemeler
+
+import GirisFisleri from "./pages/Malzeme&DepoYonetimi/GirisFisleri/GirisFisleri.jsx";
+
+// Ayarlar
 import Ayarlar from "./pages/Yonetim/Ayarlar/Ayarlar.jsx";
 import { t } from "i18next";
 // import Kurallar from "./pages/OnayIslemleri/Kurallar/Kurallar.jsx";
@@ -293,7 +299,7 @@ export default function App() {
           <Route path="/RolTanimlari1" element={<RolTanimlari1 />} />
           <Route path="/malzemeTanimi" element={<MalzemeTanimlari />} />
           <Route path="/malzemeDepolari" element={<Hazirlaniyor />} />
-          <Route path="/malzemeGirisFisi" element={<Hazirlaniyor />} />
+          <Route path="/malzemeGirisFisi" element={<GirisFisleri />} />
           <Route path="/malzemeCikisFisi" element={<Hazirlaniyor />} />
           <Route path="/malzemeTransferFisi" element={<Hazirlaniyor />} />
           <Route path="/stokSayimlari" element={<Hazirlaniyor />} />

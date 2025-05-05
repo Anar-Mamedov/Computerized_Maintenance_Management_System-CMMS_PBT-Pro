@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
-import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined, ReloadOutlined } from "@ant-design/icons";
+import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined, ReloadOutlined, FullscreenOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -106,6 +106,7 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
 
 const MainTable = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isFullScreenModalVisible, setIsFullScreenModalVisible] = useState(false);
   const {
     control,
     watch,
@@ -809,12 +810,17 @@ const MainTable = () => {
             <ReloadOutlined />
             Sorgula
           </Button>
+
           {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>
+
         <div style={{ display: "flex", gap: "10px" }}>
           {/*<ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />*/}
           {/*<CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />*/}
+          <Button style={{ backgroundColor: "#1677ff", color: "white" }} onClick={() => setIsFullScreenModalVisible(true)}>
+            <FullscreenOutlined />
+          </Button>
         </div>
       </div>
       <div style={{ width: "100%", height: "calc(100% - 5px)", overflow: "auto" }}>
@@ -848,6 +854,78 @@ const MainTable = () => {
       {editDrawer1Visible && (
         <EditDrawer1 selectedRow={editDrawer1Data} onDrawerClose={() => setEditDrawer1Visible(false)} drawerVisible={editDrawer1Visible} onRefresh={() => {}} />
       )}
+
+      {/* Tam Ekran Modal */}
+      <Modal
+        title={
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+            <Text style={{ fontWeight: 600 }}>{t("isEmirleriMudaheleSureleri")}</Text>
+          </div>
+        }
+        open={isFullScreenModalVisible}
+        onCancel={() => setIsFullScreenModalVisible(false)}
+        width="90%"
+        footer={null}
+        destroyOnClose
+        style={{ top: 20 }}
+      >
+        <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: "10px", padding: "0 5px", marginBottom: "10px" }}>
+            <div style={{ display: "flex", gap: "10px", alignItems: "center", width: "100%", maxWidth: "935px", flexWrap: "wrap" }}>
+              <Button style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "0px 8px", height: "32px" }} onClick={() => setIsModalVisible(true)}>
+                <MenuOutlined />
+              </Button>
+              <Input
+                style={{ width: "250px" }}
+                type="text"
+                placeholder="Arama yap..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
+              />
+              <Filters1 />
+              <Button
+                style={{ backgroundColor: "#2bc770", color: "white" }}
+                onClick={() => {
+                  setCurrentPage(1);
+                  setPageSize(10);
+                  setSearchTerm("");
+                  setSelectedRowKeys([]);
+                  setSelectedRows([]);
+                }}
+              >
+                <ReloadOutlined />
+                Sorgula
+              </Button>
+            </div>
+          </div>
+          <div style={{ flex: 1, overflow: "auto" }}>
+            <Spin spinning={loading}>
+              <Table
+                components={components}
+                rowSelection={rowSelection}
+                columns={filteredColumns}
+                dataSource={data}
+                pagination={{
+                  current: currentPage,
+                  total: totalDataCount,
+                  pageSize: pageSize,
+                  defaultPageSize: 10,
+                  showSizeChanger: true,
+                  pageSizeOptions: ["10", "20", "50", "100"],
+                  position: ["bottomRight"],
+                  onChange: handleTableChange,
+                  showTotal: (total, range) => `Toplam ${total}`,
+                  showQuickJumper: true,
+                }}
+                scroll={{ y: "calc(100vh - 280px)" }}
+                onChange={handleTableChange}
+                rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
+              />
+            </Spin>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

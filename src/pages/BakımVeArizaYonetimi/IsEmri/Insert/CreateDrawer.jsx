@@ -392,7 +392,10 @@ export default function CreateDrawer({ onRefresh }) {
     console.log({ Body });
   };
 
-  const showDrawer = () => setOpen(true);
+  const showDrawer = () => {
+    setAddButtonStatus(false);
+    setOpen(true);
+  };
 
   const onClose = () => {
     Modal.confirm({
@@ -439,9 +442,9 @@ export default function CreateDrawer({ onRefresh }) {
                 type="submit"
                 onClick={methods.handleSubmit(onSubmit)}
                 style={{
-                  backgroundColor: disabled ? "#d9d9d9" : "#2bc770",
-                  borderColor: disabled ? "#d9d9d9" : "#2bc770",
-                  color: disabled ? "black" : "#ffffff",
+                  backgroundColor: disabled || addButtonStatus ? "#d9d9d9" : "#2bc770",
+                  borderColor: disabled || addButtonStatus ? "#d9d9d9" : "#2bc770",
+                  color: disabled || addButtonStatus ? "black" : "#ffffff",
                 }}
               >
                 Kaydet
