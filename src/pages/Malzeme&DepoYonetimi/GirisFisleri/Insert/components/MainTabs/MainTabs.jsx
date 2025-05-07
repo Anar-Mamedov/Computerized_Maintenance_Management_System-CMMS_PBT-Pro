@@ -7,6 +7,7 @@ import { t } from "i18next";
 import AxiosInstance from "../../../../../../api/http";
 import FirmaSelectBox from "../../../../../../utils/components/FirmaTablo";
 // import PlakaSelectBox from "../../../../../../../_root/components/PlakaSelectbox";
+import MakineTablo from "../../../../../../utils/components/Machina/MakineTablo";
 import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
 import DepoSelectBox from "../../../../../../utils/components/DepoSelectBox";
 import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
@@ -403,7 +404,7 @@ export default function MainTabs({ modalOpen }) {
             flexDirection: "row",
           }}
         >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("plaka")}</Text>
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("makine")}</Text>
           <div
             style={{
               display: "flex",
@@ -413,6 +414,7 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "220px",
             }}
           >
+            <MakineTablo />
             {/* <PlakaSelectBox name1="plaka" isRequired={false} /> */}
           </div>
         </div>

@@ -188,7 +188,7 @@ const rawItems = [
     <KeyOutlined />,
     [
       getItem("Rapor Yönetimi", "raporYonetimi", true),
-      getItem("Form Yönetimi", "formYonetimi", true),
+      // getItem("Form Yönetimi", "formYonetimi", true),
       // getItem("Team 2", "team2", true)
     ],
     false

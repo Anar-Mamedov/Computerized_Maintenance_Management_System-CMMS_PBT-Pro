@@ -282,7 +282,7 @@ const GirisFisleri = () => {
         render: (text) => formatDate(text),
       },
       {
-        title: t("firmaTanimi"),
+        title: t("firmaTanimi ?"),
         dataIndex: "firmaTanim",
         key: "firmaTanim",
         width: 190,
