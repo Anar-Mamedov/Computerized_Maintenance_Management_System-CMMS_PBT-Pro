@@ -34,7 +34,8 @@ export default function FirmaTablo({ workshopSelectedId, onSubmit }) {
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -52,7 +53,8 @@ export default function FirmaTablo({ workshopSelectedId, onSubmit }) {
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -69,7 +71,8 @@ export default function FirmaTablo({ workshopSelectedId, onSubmit }) {
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -87,7 +90,8 @@ export default function FirmaTablo({ workshopSelectedId, onSubmit }) {
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -104,7 +108,8 @@ export default function FirmaTablo({ workshopSelectedId, onSubmit }) {
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -199,13 +204,7 @@ export default function FirmaTablo({ workshopSelectedId, onSubmit }) {
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
-      <Modal
-        width="1200px"
-        centered
-        title="Firma Tanımları"
-        open={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={handleModalToggle}>
+      <Modal width="1200px" centered title="Firma Tanımları" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <Input
           placeholder="Ara..."
           value={searchValue}
