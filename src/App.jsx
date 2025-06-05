@@ -41,6 +41,7 @@ import IsTalebiKullanicilari from "./pages/YardimMasasi/IsTalebiKullanicilari/Is
 import KullaniciTanimlari from "./pages/Yonetim/KullaniciTanimlari/KullaniciTanimlari.jsx";
 import RolTanimlari1 from "./pages/Yonetim/RolTanimlari/RolTanimlari.jsx";
 import MalzemeTanimlari from "./pages/Malzeme&DepoYonetimi/MalzemeTanimlari/MalzemeTanimlari.jsx";
+import AxiosInstance from "./api/http";
 
 // Malzemeler
 
@@ -237,6 +238,41 @@ const rawItems = [
 export default function App() {
   const [user, setUser] = useRecoilState(userState);
 
+  // Lisans kontrolü fonksiyonu
+  const checkLicenseExpiry = async () => {
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+
+      // Token yoksa lisans kontrolü yapma
+      if (!token) {
+        return;
+      }
+
+      const response = await AxiosInstance.get("GetEndDate");
+
+      if (response && response.length > 0) {
+        const licenseEndDate = new Date(response[0].ISL_DONEM_BITIS);
+        const currentDate = new Date();
+
+        // Lisans süresi dolmuş mu kontrol et
+        if (licenseEndDate < currentDate) {
+          // Lisans süresi dolmuş, kullanıcı verilerini temizle
+          localStorage.removeItem("token");
+          sessionStorage.removeItem("token");
+          localStorage.removeItem("user");
+          sessionStorage.removeItem("user");
+          localStorage.removeItem("login");
+          sessionStorage.removeItem("login");
+
+          // Auth sayfasına yönlendir
+          window.location.href = "/auth";
+        }
+      }
+    } catch (error) {
+      console.error("Lisans kontrolü sırasında hata oluştu:", error);
+    }
+  };
+
   // localStorage'dan kullanıcı bilgilerini oku
   useEffect(() => {
     // Sayfa yüklendiğinde, kullanıcı bilgilerini localStorage'dan oku
@@ -244,6 +280,9 @@ export default function App() {
     if (storedUser) {
       setUser(JSON.parse(storedUser)); // Recoil durumunu güncelle
     }
+
+    // Lisans kontrolünü yap
+    checkLicenseExpiry();
   }, [setUser]);
   // localStorage'dan kullanıcı bilgilerini oku son
 
