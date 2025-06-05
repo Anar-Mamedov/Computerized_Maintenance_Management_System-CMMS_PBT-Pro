@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Form, Input, Typography, message, Spin, Checkbox } from "antd";
+import { Button, Form, Input, Typography, message, Spin, Checkbox, Modal } from "antd";
 import { UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import AxiosInstance from "../../../api/http";
@@ -19,6 +19,38 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState(null); // reCAPTCHA token'ı için state
+  const [licenseModalVisible, setLicenseModalVisible] = useState(false);
+
+  // Lisans kontrolü fonksiyonu
+  const checkLicense = async () => {
+    try {
+      const response = await AxiosInstance.get("/GetEndDate");
+
+      if (response && response.length > 0) {
+        const endDate = new Date(response[0].ISL_DONEM_BITIS);
+        const currentDate = new Date();
+
+        // Tarihleri karşılaştır (sadece tarih kısmını, saat kısmını göz ardı et)
+        const endDateOnly = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+        const currentDateOnly = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+
+        // Eğer mevcut tarih, bitiş tarihinden sonraysa lisans süresi bitmiştir
+        if (currentDateOnly > endDateOnly) {
+          setLicenseModalVisible(true);
+          return false; // Lisans süresi bitmiş
+        }
+
+        return true; // Lisans geçerli
+      }
+
+      // Response boşsa veya beklenmeyen formattaysa, güvenlik için false döndür
+      return false;
+    } catch (error) {
+      console.error("License check error:", error);
+      // Lisans kontrolünde hata olursa, güvenlik için false döndür
+      return false;
+    }
+  };
 
   const onSubmit = async (values) => {
     if (!recaptchaToken) {
@@ -28,7 +60,17 @@ export default function LoginForm() {
 
     console.log("Received values of form: ", values);
     setLoading(true);
+
     try {
+      // İlk önce lisans kontrolü yap
+      const isLicenseValid = await checkLicense();
+
+      if (!isLicenseValid) {
+        setLoading(false);
+        return; // Lisans geçersizse giriş işlemini durdur
+      }
+
+      // Lisans geçerliyse normal giriş işlemine devam et
       const payload = {
         KLL_KOD: values.email,
         KLL_SIFRE: values.password ?? "",
@@ -189,6 +231,33 @@ export default function LoginForm() {
           </Form.Item>
         </Form>
       </div>
+
+      {/* Lisans Süresi Bitmiş Modal */}
+      <Modal
+        title="Sözleşme Süreniz Sona Erdi..!"
+        open={licenseModalVisible}
+        onCancel={() => setLicenseModalVisible(false)}
+        footer={[
+          <Button key="ok" type="primary" onClick={() => setLicenseModalVisible(false)}>
+            Tamam
+          </Button>,
+        ]}
+        centered
+        width={500}
+      >
+        <div style={{ padding: "1px 0", lineHeight: "1.6" }}>
+          <p>
+            PBT PRO yazılımına erişiminiz, sözleşme sürenizin sona ermesi nedeniyle geçici olarak durdurulmuştur. Sisteme yeniden erişim sağlayabilmek için sözleşmenizi yenilemeniz
+            gerekmektedir.
+          </p>
+          <p>
+            Detaylı bilgi ve yenileme işlemleri için lütfen Orjin Yazılım ile iletişime geçin:{" "}
+            <a href="mailto:destek@orjin.net" style={{ color: "#1890ff", fontWeight: "bold" }}>
+              destek@orjin.net
+            </a>
+          </p>
+        </div>
+      </Modal>
     </div>
   );
 }
