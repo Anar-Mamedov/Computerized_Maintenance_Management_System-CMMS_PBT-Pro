@@ -298,10 +298,10 @@ export default function App() {
           <Route path="/kullaniciTanimlari" element={<KullaniciTanimlari />} />
           <Route path="/RolTanimlari1" element={<RolTanimlari1 />} />
           <Route path="/malzemeTanimi" element={<MalzemeTanimlari />} />
-          <Route path="/malzemeDepolari" element={<Hazirlaniyor />} />
+          <Route path="/malzemeDepolari" element={<AtolyeTanimlari />} />
           <Route path="/malzemeGirisFisi" element={<GirisFisleri />} />
-          <Route path="/malzemeCikisFisi" element={<Hazirlaniyor />} />
-          <Route path="/malzemeTransferFisi" element={<Hazirlaniyor />} />
+          <Route path="/malzemeCikisFisi" element={<GirisFisleri />} />
+          <Route path="/malzemeTransferFisi" element={<GirisFisleri />} />
           <Route path="/stokSayimlari" element={<Hazirlaniyor />} />
           <Route path="/hizliMaliyetlendirme" element={<Hazirlaniyor />} />
           <Route path="/malzemeTransferOnayIslemleri" element={<Hazirlaniyor />} />
