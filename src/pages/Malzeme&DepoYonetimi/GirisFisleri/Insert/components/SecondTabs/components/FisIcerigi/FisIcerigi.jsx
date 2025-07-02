@@ -6,7 +6,6 @@ import { t } from "i18next";
 import Malzemeler from "../../../../../../MalzemeTanimlari/Table/Table";
 // import PlakaSelectBox from "../../../../../../../../components/PlakaSelectbox";
 import ModalInput from "../../../../../../../../utils/components/ModalInput";
-import LokasyonTablo from "../../../../../../../../utils/components/LokasyonTablo";
 import KodIDSelectbox from "../../../../../../../../utils/components/KodIDSelectbox";
 
 const { Text, Link } = Typography;
@@ -918,30 +917,6 @@ function FisIcerigi({ modalOpen }) {
       </div>
 
       <MalzemeSecModal visible={isModalVisible} onCancel={() => setIsModalVisible(false)} onOk={handleMalzemeSelect} />
-      <LokasyonTablo
-        onSubmit={(selectedData) => {
-          if (currentEditingRow !== null) {
-            try {
-              const newData = [...dataSource];
-              const item = newData[currentEditingRow];
-              newData.splice(currentEditingRow, 1, {
-                ...item,
-                malzemeLokasyon: selectedData.location,
-                malzemeLokasyonID: selectedData.key,
-              });
-              setDataSource(newData);
-              setValue(`fisIcerigi.${currentEditingRow}.malzemeLokasyon`, selectedData.location);
-              setValue(`fisIcerigi.${currentEditingRow}.malzemeLokasyonID`, selectedData.key);
-              setCurrentEditingRow(null);
-            } catch (error) {
-              console.error("Error updating lokasyon:", error);
-              setCurrentEditingRow(null);
-            }
-          }
-        }}
-        isModalVisible={isLokasyonModalOpen}
-        setIsModalVisible={setIsLokasyonModalOpen}
-      />
     </div>
   );
 }
