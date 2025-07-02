@@ -11,7 +11,9 @@ import MakineTablo from "../../../../../../utils/components/Machina/MakineTablo"
 import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
 import DepoSelectBox from "../../../../../../utils/components/DepoSelectBox";
 import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
-import ModalInput from "../../../../../../utils/components/ModalInput";
+import DepoTablo from "../../../../../../utils/components/DepoTablo";
+import ProjeTablo from "../../../../../../utils/components/ProjeTablo";
+import ServisTablo from "../../../../../../utils/components/ServisTablo";
 import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -327,6 +329,31 @@ export default function MainTabs({ modalOpen }) {
             <FirmaSelectBox name1="firma" isRequired={false} />
           </div>
         </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: "400px",
+            gap: "10px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("servis")}</Text>
+          <div
+            style={{
+              display: "flex",
+              flexFlow: "column wrap",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "220px",
+            }}
+          >
+            <ServisTablo name1="servis" isRequired={false} />
+          </div>
+        </div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "300px" }}>
         <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
@@ -442,7 +469,6 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "220px",
             }}
           >
-            <ModalInput name="lokasyon" readonly={true} required={false} onPlusClick={handleYeniLokasyonPlusClick} onMinusClick={handleYeniLokasyonMinusClick} />
             <LokasyonTablo
               onSubmit={(selectedData) => {
                 setValue("lokasyon", selectedData.location);
@@ -492,10 +518,7 @@ export default function MainTabs({ modalOpen }) {
             flexDirection: "row",
           }}
         >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
-            {t("girisDeposu")}
-            <div style={{ color: "red" }}>*</div>
-          </Text>
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("girisDeposu")}</Text>
           <div
             style={{
               display: "flex",
@@ -505,7 +528,33 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "220px",
             }}
           >
-            <DepoSelectBox name1="girisDeposu" kodID={"MALZEME"} isRequired={true} />
+            <DepoTablo name1="girisDeposu" isRequired={false} />
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: "400px",
+            gap: "10px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("proje")}</Text>
+          <div
+            style={{
+              display: "flex",
+              flexFlow: "column wrap",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "220px",
+            }}
+          >
+            <ProjeTablo name1="proje" isRequired={false} />
           </div>
         </div>
       </div>
