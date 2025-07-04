@@ -18,13 +18,9 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
 
   const getFisNo = async () => {
     try {
-      const response = await AxiosInstance.get("Numbering/GetModuleCodeByCode", {
-        params: {
-          code: "STOK_FIS_ALIS",
-        },
-      });
-      if (response.data) {
-        setValue("fisNo", response.data);
+      const response = await AxiosInstance.get("ModulKoduGetir?modulKodu=SFS_GIRIS_FIS_NO");
+      if (response) {
+        setValue("fisNo", response);
       }
     } catch (error) {
       console.error("Error fetching fisNo:", error);
@@ -223,7 +219,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
         })) || [],
     };
 
-    AxiosInstance.post("MaterialReceipt/AddMaterialReceipt", Body)
+    AxiosInstance.post("UpsertMalzemeFisWithItems", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);
