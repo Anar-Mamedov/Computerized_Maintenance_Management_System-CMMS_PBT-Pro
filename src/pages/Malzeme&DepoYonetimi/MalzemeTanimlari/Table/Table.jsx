@@ -123,9 +123,17 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
 
 // Sütunların sürüklenebilir olmasını sağlayan component sonu
 
-const Sigorta = () => {
+const Sigorta = ({ onRowSelect, isSelectionMode = false }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const { setValue } = useFormContext();
+  let setValue;
+
+  try {
+    const formContext = useFormContext();
+    setValue = formContext?.setValue;
+  } catch (error) {
+    // Form context yoksa setValue null olacak
+    setValue = null;
+  }
   const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -956,21 +964,37 @@ const Sigorta = () => {
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
-    if (newSelectedRowKeys.length > 0) {
-      setValue("selectedLokasyonId", newSelectedRowKeys[0]);
-    } else {
-      setValue("selectedLokasyonId", null);
-    }
+
     // Seçilen satırların verisini bul
     const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
     setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
+
+    if (isSelectionMode && onRowSelect) {
+      // Selection mode için callback çağır
+      onRowSelect(newSelectedRows);
+    } else {
+      // Normal mode için form value set et
+      if (setValue) {
+        if (newSelectedRowKeys.length > 0) {
+          setValue("selectedLokasyonId", newSelectedRowKeys[0]);
+        } else {
+          setValue("selectedLokasyonId", null);
+        }
+      }
+    }
   };
 
-  const rowSelection = {
-    type: "checkbox",
-    selectedRowKeys,
-    onChange: onSelectChange,
-  };
+  const rowSelection = isSelectionMode
+    ? {
+        type: "checkbox",
+        selectedRowKeys,
+        onChange: onSelectChange,
+      }
+    : {
+        type: "checkbox",
+        selectedRowKeys,
+        onChange: onSelectChange,
+      };
 
   // const onRowClick = (record) => {
   //   return {
@@ -981,7 +1005,9 @@ const Sigorta = () => {
   // };
 
   const onRowClick = (record) => {
-    setDrawer({ visible: true, data: record });
+    if (!isSelectionMode) {
+      setDrawer({ visible: true, data: record });
+    }
   };
 
   const refreshTableData = useCallback(() => {
@@ -1254,10 +1280,12 @@ const Sigorta = () => {
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
         </div>
-        <div style={{ display: "flex", gap: "10px" }}>
-          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
-          <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
-        </div>
+        {!isSelectionMode && (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
+            <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
+          </div>
+        )}
       </div>
       <Spin spinning={loading}>
         <CustomTable
@@ -1283,7 +1311,9 @@ const Sigorta = () => {
           rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
         />
       </Spin>
-      <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
+      {!isSelectionMode && (
+        <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
+      )}
     </>
   );
 };

@@ -12,6 +12,7 @@ dist
 dist-ssr
 .cursorrules
 *.local
+knowledge-base.md
 
 # Editor directories and files
 .vscode/*
