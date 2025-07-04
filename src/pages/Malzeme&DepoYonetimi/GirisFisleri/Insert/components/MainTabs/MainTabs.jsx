@@ -13,7 +13,7 @@ import DepoSelectBox from "../../../../../../utils/components/DepoSelectBox";
 import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
 import DepoTablo from "../../../../../../utils/components/DepoTablo";
 import ProjeTablo from "../../../../../../utils/components/ProjeTablo";
-import ServisTablo from "../../../../../../utils/components/ServisTablo";
+import SiparisTablo from "../../../../../../utils/components/SiparisTablo";
 import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -341,7 +341,7 @@ export default function MainTabs({ modalOpen }) {
             flexDirection: "row",
           }}
         >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("servis")}</Text>
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("siparisNo")}</Text>
           <div
             style={{
               display: "flex",
@@ -351,7 +351,7 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "220px",
             }}
           >
-            <ServisTablo name1="servis" isRequired={false} />
+            <SiparisTablo name1="siparisNo" isRequired={false} />
           </div>
         </div>
       </div>
@@ -501,7 +501,7 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "220px",
             }}
           >
-            <KodIDSelectbox name1="islemTipi" kodID={302} isRequired={false} />
+            <KodIDSelectbox name1="islemTipi" kodID={13006} isRequired={false} />
           </div>
         </div>
       </div>

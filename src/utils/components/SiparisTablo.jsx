@@ -23,7 +23,7 @@ const normalizeText = (text) => {
     .replace(/Ç/g, "C");
 };
 
-const ServisTablo = ({ workshopSelectedId, onSubmit, disabled, name1, isRequired }) => {
+const SiparisTablo = ({ workshopSelectedId, onSubmit, disabled, name1, isRequired }) => {
   const {
     control,
     setValue,
@@ -229,4 +229,4 @@ const ServisTablo = ({ workshopSelectedId, onSubmit, disabled, name1, isRequired
   );
 };
 
-export default ServisTablo;
+export default SiparisTablo;
