@@ -470,9 +470,16 @@ export default function MainTabs({ modalOpen }) {
             }}
           >
             <LokasyonTablo
+              lokasyonFieldName="lokasyon"
+              lokasyonIdFieldName="lokasyonID"
               onSubmit={(selectedData) => {
-                setValue("lokasyon", selectedData.location);
+                setValue("lokasyon", selectedData.LOK_TANIM);
                 setValue("lokasyonID", selectedData.key);
+                // Force trigger to ensure FisIcerigi component detects the change
+                setTimeout(() => {
+                  setValue("lokasyon", selectedData.LOK_TANIM, { shouldDirty: true });
+                  setValue("lokasyonID", selectedData.key, { shouldDirty: true });
+                }, 100);
               }}
               isModalVisible={isLokasyonModalOpen}
               setIsModalVisible={setIsLokasyonModalOpen}

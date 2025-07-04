@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState, useCallback } from "react";
 import { Table, Button, Form as AntForm, Input, InputNumber, Popconfirm, Modal, Typography, message } from "antd";
 import { useFieldArray, useFormContext, Controller } from "react-hook-form";
 import { PlusOutlined } from "@ant-design/icons";
@@ -57,7 +57,7 @@ const EditableCell = ({ title, editable, children, dataIndex, record, handleSave
       toggleEdit();
       handleSave({ ...record, ...values });
     } catch (errInfo) {
-      console.log("Save failed:", errInfo);
+      console.error("Save failed:", errInfo);
     }
   };
 
@@ -221,32 +221,61 @@ function FisIcerigi({ modalOpen }) {
   const lokasyon = watch("lokasyon");
   const lokasyonID = watch("lokasyonID");
 
-  // Safely update fields with watched values
-  useEffect(() => {
-    try {
-      if (dataSource.length > 0) {
-        const updatedData = dataSource.map((item) => ({
-          ...item,
-          malzemeLokasyon: item.malzemeLokasyon || lokasyon || "",
-          malzemeLokasyonID: item.malzemeLokasyonID || lokasyonID || null,
-        }));
+  // Use ref to store previous lokasyon values to prevent unnecessary updates
+  const prevLokasyonRef = useRef({ lokasyon: null, lokasyonID: null });
 
-        setDataSource(updatedData);
+  // Function to update empty locations
+  const updateEmptyLocations = useCallback(() => {
+    if (!lokasyon && !lokasyonID) return;
 
-        // Update form values with try/catch to avoid errors
-        updatedData.forEach((item, index) => {
-          try {
-            setValue(`fisIcerigi.${index}.malzemeLokasyon`, item.malzemeLokasyon);
-            setValue(`fisIcerigi.${index}.malzemeLokasyonID`, item.malzemeLokasyonID);
-          } catch (error) {
-            console.error(`Error updating form values for index ${index}:`, error);
-          }
-        });
+    setDataSource((currentDataSource) => {
+      if (currentDataSource.length === 0) return currentDataSource;
+
+      let hasChanges = false;
+      const updatedData = currentDataSource.map((item, index) => {
+        // Only update if the item doesn't have a location set or if it's empty
+        if (!item.malzemeLokasyon || item.malzemeLokasyon === "" || item.malzemeLokasyon === null || item.malzemeLokasyon === undefined) {
+          hasChanges = true;
+
+          return {
+            ...item,
+            malzemeLokasyon: lokasyon || "",
+            malzemeLokasyonID: lokasyonID || null,
+          };
+        }
+        // Keep existing location if already set
+        return item;
+      });
+
+      if (hasChanges) {
+        // Use replace to update the form fields
+        setTimeout(() => {
+          replace(updatedData);
+        }, 0);
+        return updatedData;
       }
-    } catch (error) {
-      console.error("Error in useEffect:", error);
+
+      return currentDataSource;
+    });
+  }, [lokasyon, lokasyonID, replace]);
+
+  // Safely update fields with watched values - only update empty locations
+  useEffect(() => {
+    // Check if lokasyon values actually changed
+    const prevValues = prevLokasyonRef.current;
+    if (prevValues.lokasyon === lokasyon && prevValues.lokasyonID === lokasyonID) {
+      return; // No change, exit early
     }
-  }, [lokasyon, lokasyonID, setValue]);
+
+    // Update ref with new values
+    prevLokasyonRef.current = { lokasyon, lokasyonID };
+
+    try {
+      updateEmptyLocations();
+    } catch (error) {
+      console.error("Error in lokasyon useEffect:", error);
+    }
+  }, [lokasyon, lokasyonID, updateEmptyLocations]);
 
   // Watch for birim changes and update dataSource
   useEffect(() => {
@@ -635,6 +664,18 @@ function FisIcerigi({ modalOpen }) {
               // Update form values
               setValue(`fisIcerigi.${index}.malzemeLokasyon`, selectedData.LOK_TANIM);
               setValue(`fisIcerigi.${index}.malzemeLokasyonID`, selectedData.key);
+            }
+          }}
+          onClear={() => {
+            // Update the specific row's location data to empty
+            const newData = [...dataSource];
+            if (newData[index]) {
+              newData[index] = {
+                ...newData[index],
+                malzemeLokasyon: "",
+                malzemeLokasyonID: null,
+              };
+              setDataSource(newData);
             }
           }}
         />

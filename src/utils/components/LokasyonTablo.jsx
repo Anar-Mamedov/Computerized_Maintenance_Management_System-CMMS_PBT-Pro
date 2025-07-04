@@ -5,7 +5,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../api/http";
 import styled from "styled-components";
 
-export default function LokasyonTablo({ workshopSelectedId, onSubmit, disabled, lokasyonFieldName = "lokasyonTanim", lokasyonIdFieldName = "lokasyonID" }) {
+export default function LokasyonTablo({ workshopSelectedId, onSubmit, onClear, disabled, lokasyonFieldName = "lokasyonTanim", lokasyonIdFieldName = "lokasyonID" }) {
   const {
     control,
     watch,
@@ -207,6 +207,7 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit, disabled, 
   const handleLokasyonMinusClick = () => {
     setValue(lokasyonFieldName, "");
     setValue(lokasyonIdFieldName, "");
+    onClear && onClear();
   };
 
   return (
