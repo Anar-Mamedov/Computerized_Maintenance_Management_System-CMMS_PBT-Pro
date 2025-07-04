@@ -5,7 +5,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../api/http";
 import styled from "styled-components";
 
-export default function LokasyonTablo({ workshopSelectedId, onSubmit, disabled }) {
+export default function LokasyonTablo({ workshopSelectedId, onSubmit, disabled, lokasyonFieldName = "lokasyonTanim", lokasyonIdFieldName = "lokasyonID" }) {
   const {
     control,
     watch,
@@ -179,8 +179,8 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit, disabled }
   const handleModalOk = () => {
     const selectedData = findItemInTree(selectedRowKeys[0], treeData);
     if (selectedData) {
-      setValue("lokasyonTanim", selectedData.LOK_TANIM);
-      setValue("lokasyonID", selectedData.key);
+      setValue(lokasyonFieldName, selectedData.LOK_TANIM);
+      setValue(lokasyonIdFieldName, selectedData.key);
       onSubmit && onSubmit(selectedData);
     }
     setIsModalVisible(false);
@@ -205,20 +205,20 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit, disabled }
   // parentler seçilemesin diye end
 
   const handleLokasyonMinusClick = () => {
-    setValue("lokasyonTanim", "");
-    setValue("lokasyonID", "");
+    setValue(lokasyonFieldName, "");
+    setValue(lokasyonIdFieldName, "");
   };
 
   return (
     <div style={{ width: "100%" }}>
       <div style={{ display: "flex", gap: "5px", width: "100%" }}>
         <Controller
-          name="lokasyonTanim"
+          name={lokasyonFieldName}
           control={control}
           render={({ field }) => (
             <Input
               {...field}
-              status={errors.lokasyonTanim ? "error" : ""}
+              status={errors[lokasyonFieldName] ? "error" : ""}
               type="text" // Set the type to "text" for name input
               style={{ width: "100%", maxWidth: "630px" }}
               disabled
@@ -226,7 +226,7 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit, disabled }
           )}
         />
         <Controller
-          name="lokasyonID"
+          name={lokasyonIdFieldName}
           control={control}
           render={({ field }) => (
             <Input

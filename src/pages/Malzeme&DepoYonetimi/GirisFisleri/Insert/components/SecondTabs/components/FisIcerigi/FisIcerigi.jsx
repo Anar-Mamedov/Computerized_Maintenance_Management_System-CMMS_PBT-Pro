@@ -613,10 +613,32 @@ function FisIcerigi({ modalOpen }) {
       title: "Lokasyon",
       dataIndex: "malzemeLokasyon",
       key: "malzemeLokasyon",
-      width: 200,
+      width: 250,
       ellipsis: true,
       visible: true,
-      render: (text, record, index) => <span>{text || ""}</span>,
+      render: (text, record, index) => (
+        <LokasyonTablo
+          disabled={false}
+          lokasyonFieldName={`fisIcerigi.${index}.malzemeLokasyon`}
+          lokasyonIdFieldName={`fisIcerigi.${index}.malzemeLokasyonID`}
+          onSubmit={(selectedData) => {
+            // Update the specific row's location data
+            const newData = [...dataSource];
+            if (newData[index]) {
+              newData[index] = {
+                ...newData[index],
+                malzemeLokasyon: selectedData.LOK_TANIM,
+                malzemeLokasyonID: selectedData.key,
+              };
+              setDataSource(newData);
+
+              // Update form values
+              setValue(`fisIcerigi.${index}.malzemeLokasyon`, selectedData.LOK_TANIM);
+              setValue(`fisIcerigi.${index}.malzemeLokasyonID`, selectedData.key);
+            }
+          }}
+        />
+      ),
     },
     {
       title: "Açıklama",
