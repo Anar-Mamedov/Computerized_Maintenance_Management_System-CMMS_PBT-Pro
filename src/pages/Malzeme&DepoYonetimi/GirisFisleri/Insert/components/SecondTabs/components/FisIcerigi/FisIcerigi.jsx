@@ -465,8 +465,8 @@ function FisIcerigi({ modalOpen }) {
           toplam,
           malzemeLokasyon: row.STK_LOKASYON || lokasyon || "",
           malzemeLokasyonID: row.STK_LOKASYON_ID || lokasyonID || null,
-          masrafMerkezi: "",
-          masrafMerkeziID: null,
+          masrafMerkezi: row.STK_MASRAFMERKEZ || "",
+          masrafMerkeziID: row.STK_MASRAF_MERKEZI_ID || null,
           aciklama: "",
         };
 

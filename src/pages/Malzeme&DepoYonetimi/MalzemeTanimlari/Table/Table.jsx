@@ -422,16 +422,16 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false }) => {
     },
     {
       title: t("masrafMerkezi"),
-      dataIndex: "STK_MASRAF_MERKEZI",
-      key: "STK_MASRAF_MERKEZI",
+      dataIndex: "STK_MASRAFMERKEZ",
+      key: "STK_MASRAFMERKEZ",
       width: 120,
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
 
       sorter: (a, b) => {
-        if (a.STK_MASRAF_MERKEZI === null) return -1;
-        if (b.STK_MASRAF_MERKEZI === null) return 1;
-        return a.STK_MASRAF_MERKEZI.localeCompare(b.STK_MASRAF_MERKEZI);
+        if (a.STK_MASRAFMERKEZ === null) return -1;
+        if (b.STK_MASRAFMERKEZ === null) return 1;
+        return a.STK_MASRAFMERKEZ.localeCompare(b.STK_MASRAFMERKEZ);
       },
     },
     {
