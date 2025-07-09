@@ -217,6 +217,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
           toplam: Number(item.toplam),
           // lokasyon: item.malzemeLokasyon,
           lokasyonId: Number(item.malzemeLokasyonID),
+          masrafmerkezi: Number(item.masrafMerkeziID),
           aciklama: item.aciklama,
           gc: 1,
           fisTip: "MALZEME",
