@@ -4,7 +4,14 @@ import { Controller, useFormContext } from "react-hook-form";
 import { SearchOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../api/http";
 
-export default function MasrafMerkeziTablo({ workshopSelectedId, onSubmit, disabled }) {
+export default function MasrafMerkeziTablo({
+  workshopSelectedId,
+  onSubmit,
+  onClear,
+  disabled,
+  masrafMerkeziFieldName = "masrafMerkeziTanim",
+  masrafMerkeziIdFieldName = "masrafMerkeziID",
+}) {
   const {
     control,
     setValue,
@@ -229,8 +236,8 @@ export default function MasrafMerkeziTablo({ workshopSelectedId, onSubmit, disab
     const pickedKey = selectedRowKeys[0];
     const selectedData = findItemInTree(pickedKey, treeData);
     if (selectedData) {
-      setValue("masrafMerkeziTanim", selectedData.MAM_KOD);
-      setValue("masrafMerkeziID", selectedData.key);
+      setValue(masrafMerkeziFieldName, selectedData.MAM_KOD);
+      setValue(masrafMerkeziIdFieldName, selectedData.key);
       onSubmit?.(selectedData);
     }
     setIsModalVisible(false);
@@ -258,8 +265,9 @@ export default function MasrafMerkeziTablo({ workshopSelectedId, onSubmit, disab
 
   // 13) Clear the selected masraf merkezi fields
   const handleMasrafMerkeziMinusClick = () => {
-    setValue("masrafMerkeziTanim", "");
-    setValue("masrafMerkeziID", "");
+    setValue(masrafMerkeziFieldName, "");
+    setValue(masrafMerkeziIdFieldName, "");
+    onClear && onClear();
   };
 
   return (
@@ -267,11 +275,11 @@ export default function MasrafMerkeziTablo({ workshopSelectedId, onSubmit, disab
       {/* The two form inputs: one visible (the code) and one hidden (the ID) */}
       <div style={{ display: "flex", gap: "5px", width: "100%" }}>
         <Controller
-          name="masrafMerkeziTanim"
+          name={masrafMerkeziFieldName}
           control={control}
-          render={({ field }) => <Input {...field} status={errors.masrafMerkeziTanim ? "error" : ""} style={{ width: "100%", maxWidth: "630px" }} disabled />}
+          render={({ field }) => <Input {...field} status={errors[masrafMerkeziFieldName] ? "error" : ""} style={{ width: "100%", maxWidth: "630px" }} disabled />}
         />
-        <Controller name="masrafMerkeziID" control={control} render={({ field }) => <Input {...field} type="text" style={{ display: "none" }} />} />
+        <Controller name={masrafMerkeziIdFieldName} control={control} render={({ field }) => <Input {...field} type="text" style={{ display: "none" }} />} />
         {/* Buttons to open modal / clear field */}
         <div style={{ display: "flex", gap: "5px" }}>
           <Button disabled={disabled} onClick={handleModalToggle}>
