@@ -1,12 +1,12 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState, useCallback } from "react";
 import { Table, Button, Form as AntForm, Input, InputNumber, Popconfirm, Modal, Typography, message } from "antd";
 import { useFieldArray, useFormContext, Controller } from "react-hook-form";
 import { PlusOutlined } from "@ant-design/icons";
 import { t } from "i18next";
 import Malzemeler from "../../../../../../MalzemeTanimlari/Table/Table";
 // import PlakaSelectBox from "../../../../../../../../components/PlakaSelectbox";
-import ModalInput from "../../../../../../../../utils/components/ModalInput";
 import LokasyonTablo from "../../../../../../../../utils/components/LokasyonTablo";
+import MasrafMerkeziTablo from "../../../../../../../../utils/components/MasrafMerkeziTablo";
 import KodIDSelectbox from "../../../../../../../../utils/components/KodIDSelectbox";
 
 const { Text, Link } = Typography;
@@ -58,7 +58,7 @@ const EditableCell = ({ title, editable, children, dataIndex, record, handleSave
       toggleEdit();
       handleSave({ ...record, ...values });
     } catch (errInfo) {
-      console.log("Save failed:", errInfo);
+      console.error("Save failed:", errInfo);
     }
   };
 
@@ -110,14 +110,22 @@ const EditableCell = ({ title, editable, children, dataIndex, record, handleSave
 
 const MalzemeSecModal = ({ visible, onCancel, onOk }) => {
   const [selectedRows, setSelectedRows] = useState([]);
+  const [modalKey, setModalKey] = useState(Date.now());
 
   const handleMalzemeSelect = (rows) => {
     setSelectedRows(rows);
   };
 
+  useEffect(() => {
+    if (visible) {
+      setModalKey(Date.now());
+      setSelectedRows([]); // Reset selection when modal opens
+    }
+  }, [visible]);
+
   return (
-    <Modal title="Malzeme Seç" open={visible} onCancel={onCancel} onOk={() => onOk(selectedRows)} width={1200} style={{ top: 20 }}>
-      <Malzemeler onRowSelect={handleMalzemeSelect} isSelectionMode={true} />
+    <Modal title="Malzeme Seç" open={visible} onCancel={onCancel} onOk={() => onOk(selectedRows)} width={1200} style={{ top: 20 }} destroyOnClose>
+      <Malzemeler key={modalKey} onRowSelect={handleMalzemeSelect} isSelectionMode={true} />
     </Modal>
   );
 };
@@ -134,6 +142,7 @@ function FisIcerigi({ modalOpen }) {
     control,
     name: "fisIcerigi",
     shouldUnregister: true,
+    shouldFocus: false,
   });
 
   const [dataSource, setDataSource] = useState([]);
@@ -141,10 +150,7 @@ function FisIcerigi({ modalOpen }) {
   // Add useEffect for calculating totals
   useEffect(() => {
     try {
-      // Filter out deleted items before calculating totals
-      const activeDataSource = dataSource.filter((item) => !item.isDeleted);
-
-      const totals = activeDataSource.reduce(
+      const totals = dataSource.reduce(
         (acc, item) => {
           acc.araToplam += Number(item.araToplam) || 0;
           acc.indirim += Number(item.indirimTutari) || 0;
@@ -216,39 +222,92 @@ function FisIcerigi({ modalOpen }) {
 
   const lokasyon = watch("lokasyon");
   const lokasyonID = watch("lokasyonID");
-  const plaka = watch("plaka");
-  const plakaID = watch("plakaID");
 
-  // Safely update fields with watched values
+  // Use ref to store previous lokasyon values to prevent unnecessary updates
+  const prevLokasyonRef = useRef({ lokasyon: null, lokasyonID: null });
+
+  // Function to update empty locations
+  const updateEmptyLocations = useCallback(() => {
+    if (!lokasyon && !lokasyonID) return;
+
+    setDataSource((currentDataSource) => {
+      if (currentDataSource.length === 0) return currentDataSource;
+
+      let hasChanges = false;
+      const updatedData = currentDataSource.map((item, index) => {
+        // Only update if the item doesn't have a location set or if it's empty
+        if (!item.malzemeLokasyon || item.malzemeLokasyon === "" || item.malzemeLokasyon === null || item.malzemeLokasyon === undefined) {
+          hasChanges = true;
+
+          return {
+            ...item,
+            malzemeLokasyon: lokasyon || "",
+            malzemeLokasyonID: lokasyonID || null,
+          };
+        }
+        // Keep existing location if already set
+        return item;
+      });
+
+      if (hasChanges) {
+        // Use replace to update the form fields
+        setTimeout(() => {
+          replace(updatedData);
+        }, 0);
+        return updatedData;
+      }
+
+      return currentDataSource;
+    });
+  }, [lokasyon, lokasyonID, replace]);
+
+  // Safely update fields with watched values - only update empty locations
+  useEffect(() => {
+    // Check if lokasyon values actually changed
+    const prevValues = prevLokasyonRef.current;
+    if (prevValues.lokasyon === lokasyon && prevValues.lokasyonID === lokasyonID) {
+      return; // No change, exit early
+    }
+
+    // Update ref with new values
+    prevLokasyonRef.current = { lokasyon, lokasyonID };
+
+    try {
+      updateEmptyLocations();
+    } catch (error) {
+      console.error("Error in lokasyon useEffect:", error);
+    }
+  }, [lokasyon, lokasyonID, updateEmptyLocations]);
+
+  // Watch for birim changes and update dataSource
   useEffect(() => {
     try {
-      if (dataSource.length > 0) {
-        const updatedData = dataSource.map((item) => ({
-          ...item,
-          malzemeLokasyon: item.malzemeLokasyon || lokasyon || "",
-          malzemeLokasyonID: item.malzemeLokasyonID || lokasyonID || null,
-          malzemePlaka: item.malzemePlaka || plaka || "",
-          malzemePlakaId: item.malzemePlakaId || plakaID || null,
-        }));
+      const subscription = watch((value, { name }) => {
+        if (name && name.includes(".birim") && !name.includes(".birimKodId")) {
+          const indexMatch = name.match(/fisIcerigi\.(\d+)\.birim$/);
+          if (indexMatch) {
+            const index = parseInt(indexMatch[1]);
+            const birimValue = value.fisIcerigi?.[index]?.birim;
+            const birimIdValue = value.fisIcerigi?.[index]?.birimID;
 
-        setDataSource(updatedData);
-
-        // Update form values with try/catch to avoid errors
-        updatedData.forEach((item, index) => {
-          try {
-            setValue(`fisIcerigi.${index}.malzemeLokasyon`, item.malzemeLokasyon);
-            setValue(`fisIcerigi.${index}.malzemeLokasyonID`, item.malzemeLokasyonID);
-            setValue(`fisIcerigi.${index}.malzemePlaka`, item.malzemePlaka);
-            setValue(`fisIcerigi.${index}.malzemePlakaId`, item.malzemePlakaId);
-          } catch (error) {
-            console.error(`Error updating form values for index ${index}:`, error);
+            if (dataSource[index] && birimValue) {
+              const newData = [...dataSource];
+              const item = newData[index];
+              newData.splice(index, 1, {
+                ...item,
+                birim: birimValue,
+                birimKodId: birimIdValue,
+              });
+              setDataSource(newData);
+            }
           }
-        });
-      }
+        }
+      });
+      return () => subscription.unsubscribe();
     } catch (error) {
-      console.error("Error in useEffect:", error);
+      console.error("Error in birim watch effect:", error);
     }
-  }, [lokasyon, lokasyonID, plaka, plakaID, setValue]);
+  }, [watch, dataSource, setValue]);
 
   // Safe handleSave with error handling
   const handleSave = (row) => {
@@ -315,15 +374,12 @@ function FisIcerigi({ modalOpen }) {
         ...row,
         birim: item.birim,
         birimKodId: item.birimKodId,
-        malzemePlaka: item.malzemePlaka,
-        malzemePlakaId: item.malzemePlakaId,
         araToplam,
         indirimOrani: round(indirimOrani),
         indirimTutari: round(indirimTutari),
         kdvTutar: round(kdvTutar),
         toplam: round(toplam),
         isPriceChanged: isPriceChanged || item.isPriceChanged,
-        isDeleted: false,
       };
 
       newData.splice(index, 1, updatedRow);
@@ -349,7 +405,7 @@ function FisIcerigi({ modalOpen }) {
       const existingMalzemeIds = new Set(dataSource.map((item) => item.malzemeId));
 
       // Filter out already existing materials
-      const newRows = selectedRows.filter((row) => !existingMalzemeIds.has(row.malzemeId));
+      const newRows = selectedRows.filter((row) => !existingMalzemeIds.has(row.TB_STOK_ID));
 
       // If all selected materials already exist, show a warning
       if (newRows.length === 0) {
@@ -368,9 +424,9 @@ function FisIcerigi({ modalOpen }) {
 
       newRows.forEach((row) => {
         const miktar = 1;
-        const fiyat = row.fiyat || 0;
-        const kdvOrani = row.kdvOran || 0;
-        const kdvDH = Boolean(row.kdvDahilHaric);
+        const fiyat = row.STK_CIKIS_FIYAT_DEGERI || 0;
+        const kdvOrani = row.STK_KDV_ORAN || 0;
+        const kdvDH = Boolean(row.STK_KDV_DH);
 
         // Exception: Always calculate araToplam as miktar * fiyat regardless of kdvDH
         const araToplam = round(miktar * fiyat);
@@ -392,13 +448,14 @@ function FisIcerigi({ modalOpen }) {
         const toplam = kdvDH ? round(kdvMatrah) : round(kdvMatrah + kdvTutar);
 
         const newRow = {
-          malzemeId: row.malzemeId,
-          birimKodId: row.birimKodId,
-          malzemeKodu: row.malzemeKod,
-          malzemeTanimi: row.tanim,
-          malzemeTipi: row.malzemeTipKodText,
+          id: Date.now() + Math.random(), // Generate unique ID
+          malzemeId: row.TB_STOK_ID,
+          birimKodId: row.STK_BIRIM_KOD_ID,
+          malzemeKodu: row.STK_KOD,
+          malzemeTanimi: row.STK_TANIM,
+          malzemeTipi: row.STK_TIP,
           miktar,
-          birim: row.birim,
+          birim: row.STK_BIRIM,
           fiyat,
           araToplam,
           indirimOrani,
@@ -407,12 +464,11 @@ function FisIcerigi({ modalOpen }) {
           kdvDahilHaric: kdvDH,
           kdvTutar,
           toplam,
-          malzemePlaka: row.malzemePlaka || plaka || "",
-          malzemePlakaId: row.malzemePlakaId || plakaID || null,
-          malzemeLokasyon: row.lokasyon || lokasyon || "",
-          malzemeLokasyonID: row.lokasyonId || lokasyonID || null,
+          malzemeLokasyon: row.STK_LOKASYON || lokasyon || "",
+          malzemeLokasyonID: row.STK_LOKASYON_ID || lokasyonID || null,
+          masrafMerkezi: row.STK_MASRAFMERKEZ || "",
+          masrafMerkeziID: row.STK_MASRAF_MERKEZI_ID || null,
           aciklama: "",
-          isDeleted: false,
         };
 
         append(newRow);
@@ -476,30 +532,11 @@ function FisIcerigi({ modalOpen }) {
       key: "birim",
       width: 150,
       editable: false,
-      render: (_, record, index) => (
+      render: (text, record, index) => (
         <Controller
           name={`fisIcerigi.${index}.birim`}
           control={control}
-          render={({ field }) => (
-            <KodIDSelectbox
-              {...field}
-              name1={`fisIcerigi.${index}.birim`}
-              kodID={300}
-              isRequired={false}
-              onChange={(label, value) => {
-                const newData = [...dataSource];
-                const item = newData[index];
-                newData.splice(index, 1, {
-                  ...item,
-                  birim: label,
-                  birimKodId: value,
-                });
-                setDataSource(newData);
-                setValue(`fisIcerigi.${index}.birim`, label);
-                setValue(`fisIcerigi.${index}.birimKodId`, value);
-              }}
-            />
-          )}
+          render={({ field }) => <KodIDSelectbox name1={`fisIcerigi.${index}.birim`} kodID={32001} isRequired={false} />}
         />
       ),
     },
@@ -604,72 +641,89 @@ function FisIcerigi({ modalOpen }) {
         </div>
       ),
     },
-    {
-      title: "Plaka",
-      dataIndex: "malzemePlaka",
-      key: "malzemePlaka",
-      width: 200,
-      editable: false,
-      render: (_, record, index) => (
-        <Controller
-          name={`fisIcerigi.${index}.malzemePlaka`}
-          control={control}
-          render={({ field }) => ({
-            /* <PlakaSelectBox
-              {...field}
-              name1={`fisIcerigi.${index}.malzemePlaka`}
-              isRequired={false}
-              onChange={(value, option) => {
-                const newData = [...dataSource];
-                const item = newData[index];
-                newData.splice(index, 1, {
-                  ...item,
-                  malzemePlaka: option?.label || "",
-                  malzemePlakaId: value,
-                });
-                setDataSource(newData);
-                setValue(`fisIcerigi.${index}.malzemePlaka`, option?.label || "");
-                setValue(`fisIcerigi.${index}.malzemePlakaId`, value);
-              }}
-            /> */
-          })}
-        />
-      ),
-    },
+
     {
       title: "Lokasyon",
       dataIndex: "malzemeLokasyon",
       key: "malzemeLokasyon",
-      width: 200,
+      width: 250,
       ellipsis: true,
       visible: true,
-      render: (_, record, index) => (
-        <Controller
-          name={`fisIcerigi.${index}.malzemeLokasyon`}
-          control={control}
-          render={({ field }) => (
-            <ModalInput
-              {...field}
-              readonly={true}
-              required={false}
-              onPlusClick={() => {
-                setCurrentEditingRow(index);
-                setIsLokasyonModalOpen(true);
-              }}
-              onMinusClick={() => {
-                const newData = [...dataSource];
-                const item = newData[index];
-                newData.splice(index, 1, {
-                  ...item,
-                  malzemeLokasyon: "",
-                  malzemeLokasyonID: null,
-                });
-                setDataSource(newData);
-                field.onChange("");
-                setValue(`fisIcerigi.${index}.malzemeLokasyonID`, null);
-              }}
-            />
-          )}
+      render: (text, record, index) => (
+        <LokasyonTablo
+          disabled={false}
+          lokasyonFieldName={`fisIcerigi.${index}.malzemeLokasyon`}
+          lokasyonIdFieldName={`fisIcerigi.${index}.malzemeLokasyonID`}
+          onSubmit={(selectedData) => {
+            // Update the specific row's location data
+            const newData = [...dataSource];
+            if (newData[index]) {
+              newData[index] = {
+                ...newData[index],
+                malzemeLokasyon: selectedData.LOK_TANIM,
+                malzemeLokasyonID: selectedData.key,
+              };
+              setDataSource(newData);
+
+              // Update form values
+              setValue(`fisIcerigi.${index}.malzemeLokasyon`, selectedData.LOK_TANIM);
+              setValue(`fisIcerigi.${index}.malzemeLokasyonID`, selectedData.key);
+            }
+          }}
+          onClear={() => {
+            // Update the specific row's location data to empty
+            const newData = [...dataSource];
+            if (newData[index]) {
+              newData[index] = {
+                ...newData[index],
+                malzemeLokasyon: "",
+                malzemeLokasyonID: null,
+              };
+              setDataSource(newData);
+            }
+          }}
+        />
+      ),
+    },
+    {
+      title: "Masraf Merkezi",
+      dataIndex: "masrafMerkezi",
+      key: "masrafMerkezi",
+      width: 200,
+      ellipsis: true,
+      render: (text, record, index) => (
+        <MasrafMerkeziTablo
+          disabled={false}
+          masrafMerkeziFieldName={`fisIcerigi.${index}.masrafMerkezi`}
+          masrafMerkeziIdFieldName={`fisIcerigi.${index}.masrafMerkeziID`}
+          onSubmit={(selectedData) => {
+            // Update the specific row's masraf merkezi data
+            const newData = [...dataSource];
+            if (newData[index]) {
+              newData[index] = {
+                ...newData[index],
+                masrafMerkezi: selectedData.MAM_KOD,
+                masrafMerkeziID: selectedData.key,
+              };
+              setDataSource(newData);
+
+              // Update form values
+              setValue(`fisIcerigi.${index}.masrafMerkezi`, selectedData.MAM_KOD);
+              setValue(`fisIcerigi.${index}.masrafMerkeziID`, selectedData.key);
+            }
+          }}
+          onClear={() => {
+            // Update the specific row's masraf merkezi data to empty
+            const newData = [...dataSource];
+            if (newData[index]) {
+              newData[index] = {
+                ...newData[index],
+                masrafMerkezi: "",
+                masrafMerkeziID: null,
+              };
+              setDataSource(newData);
+            }
+          }}
         />
       ),
     },
@@ -688,21 +742,7 @@ function FisIcerigi({ modalOpen }) {
       width: 100,
       render: (_, record) =>
         dataSource.length >= 1 ? (
-          <Popconfirm
-            title="Silmek istediğinize emin misiniz?"
-            onConfirm={() => {
-              const index = dataSource.findIndex((item) => item.id === record.id);
-              if (index !== -1) {
-                // Update React Hook Form state
-                setValue(`fisIcerigi.${index}.isDeleted`, true);
-
-                // Update local dataSource state directly
-                const newData = [...dataSource];
-                newData[index] = { ...newData[index], isDeleted: true };
-                setDataSource(newData);
-              }
-            }}
-          >
+          <Popconfirm title="Silmek istediğinize emin misiniz?" onConfirm={() => remove(dataSource.findIndex((item) => item.id === record.id))}>
             <Button type="link" danger>
               Sil
             </Button>
@@ -728,9 +768,6 @@ function FisIcerigi({ modalOpen }) {
     };
   });
 
-  // Filter out deleted rows before rendering
-  const filteredDataSource = dataSource.filter((item) => !item.isDeleted);
-
   return (
     <div style={{ marginTop: "-55px", zIndex: 10 }}>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
@@ -743,7 +780,7 @@ function FisIcerigi({ modalOpen }) {
         rowClassName={() => "editable-row"}
         size="small"
         bordered
-        dataSource={filteredDataSource}
+        dataSource={dataSource}
         columns={columns}
         pagination={false}
         rowKey={(record) => record.id || Math.random().toString(36).substr(2, 9)} // Ensure stable keys
@@ -933,30 +970,6 @@ function FisIcerigi({ modalOpen }) {
       </div>
 
       <MalzemeSecModal visible={isModalVisible} onCancel={() => setIsModalVisible(false)} onOk={handleMalzemeSelect} />
-      <LokasyonTablo
-        onSubmit={(selectedData) => {
-          if (currentEditingRow !== null) {
-            try {
-              const newData = [...dataSource];
-              const item = newData[currentEditingRow];
-              newData.splice(currentEditingRow, 1, {
-                ...item,
-                malzemeLokasyon: selectedData.location,
-                malzemeLokasyonID: selectedData.key,
-              });
-              setDataSource(newData);
-              setValue(`fisIcerigi.${currentEditingRow}.malzemeLokasyon`, selectedData.location);
-              setValue(`fisIcerigi.${currentEditingRow}.malzemeLokasyonID`, selectedData.key);
-              setCurrentEditingRow(null);
-            } catch (error) {
-              console.error("Error updating lokasyon:", error);
-              setCurrentEditingRow(null);
-            }
-          }
-        }}
-        isModalVisible={isLokasyonModalOpen}
-        setIsModalVisible={setIsLokasyonModalOpen}
-      />
     </div>
   );
 }

@@ -142,6 +142,7 @@ function FisIcerigi({ modalOpen }) {
     control,
     name: "fisIcerigi",
     shouldUnregister: true,
+    shouldFocus: false,
   });
 
   const [dataSource, setDataSource] = useState([]);

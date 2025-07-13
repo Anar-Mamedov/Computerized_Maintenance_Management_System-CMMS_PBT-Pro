@@ -70,7 +70,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
         setOpen(true); // İşlemler tamamlandıktan sonra drawer'ı aç
         setLoading(true); // Yükleme başladığında
         try {
-          const response = await AxiosInstance.get(`MaterialReceipt/GetMaterialReceiptById?receiptId=${selectedRow.key}`);
+          const response = await AxiosInstance.get(`GetMalzemeFisById?fisId=${selectedRow.key}`);
           const item = response.data; // Veri dizisinin ilk elemanını al
           // Form alanlarını set et
           setValue("mlzFisId", item.mlzFisId);

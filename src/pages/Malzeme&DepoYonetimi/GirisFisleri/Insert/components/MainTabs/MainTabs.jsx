@@ -525,7 +525,10 @@ export default function MainTabs({ modalOpen }) {
             flexDirection: "row",
           }}
         >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("girisDeposu")}</Text>
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
+            {t("girisDeposu")}
+            <div style={{ color: "red" }}>*</div>
+          </Text>
           <div
             style={{
               display: "flex",
@@ -535,7 +538,7 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "220px",
             }}
           >
-            <DepoTablo name1="girisDeposu" isRequired={false} />
+            <DepoTablo name1="girisDeposu" isRequired={true} />
           </div>
         </div>
 

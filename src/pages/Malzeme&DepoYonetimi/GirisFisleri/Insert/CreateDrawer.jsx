@@ -192,7 +192,8 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
       ozelAlanKodId10: Number(data.ozelAlan10ID),
       ozelAlan11: Number(data.ozelAlan11),
       ozelAlan12: Number(data.ozelAlan12),
-      gc: 1,
+      islemTip: "01",
+      gc: "G",
       fisTip: "MALZEME",
       materialMovements:
         data.fisIcerigi?.map((item) => ({
@@ -212,14 +213,14 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
           indirimOran: Number(item.indirimOrani),
           indirim: Number(item.indirimTutari),
           kdvOran: Number(item.kdvOrani),
-          kdvDahilHaric: item.kdvDahilHaric,
+          kdvDahilHaric: item.kdvDahilHaric ? "D" : "H",
           kdvTutar: Number(item.kdvTutar),
           toplam: Number(item.toplam),
           // lokasyon: item.malzemeLokasyon,
           lokasyonId: Number(item.malzemeLokasyonID),
           masrafmerkezi: Number(item.masrafMerkeziID),
           aciklama: item.aciklama,
-          gc: 1,
+          gc: "G",
           fisTip: "MALZEME",
         })) || [],
     };
@@ -229,7 +230,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);
 
-        if (response.data.statusCode === 200 || response.data.statusCode === 201) {
+        if (response.status_code === 200 || response.status_code === 201) {
           message.success("Ekleme Başarılı.");
 
           // First close the modal to avoid focus errors
