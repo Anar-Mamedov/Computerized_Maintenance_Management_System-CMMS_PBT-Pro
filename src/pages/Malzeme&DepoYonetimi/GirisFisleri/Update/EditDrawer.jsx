@@ -71,7 +71,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
         setLoading(true); // Yükleme başladığında
         try {
           const response = await AxiosInstance.get(`GetMalzemeFisById?fisId=${selectedRow.key}`);
-          const item = response.data; // Veri dizisinin ilk elemanını al
+          const item = response; // Veri dizisinin ilk elemanını al
           // Form alanlarını set et
           setValue("mlzFisId", item.mlzFisId);
           setValue("fisNo", item.fisNo);
@@ -123,7 +123,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
               indirimOrani: movement.indirimOran,
               indirimTutari: movement.indirim,
               kdvOrani: movement.kdvOran,
-              kdvDahilHaric: movement.kdvDahilHaric,
+              kdvDahilHaric: movement.kdvDahilHaric === "D",
               kdvTutar: movement.kdvTutar,
               toplam: movement.toplam,
               malzemePlakaId: movement.mlzAracId,

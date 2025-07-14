@@ -23,19 +23,32 @@ function OzelAlanlar(props) {
     setIsModalVisible(true);
   };
 
-  const handleOk = async () => {
-    try {
-      const response = await AxiosInstance.post(`/CustomField/AddCustomFieldTopic?form=SERVİS&topic=${inputValue}&field=${clickedField}`);
-      setIsModalVisible(false);
-      setInputValue("");
-      if (response.data.statusCode === 200) {
-        message.success("Ekleme Başarılı");
-        nameOfField();
-      }
-    } catch (error) {
-      console.error("API request failed: ", error);
-      message.error("Ekleme Başarısız");
-    }
+  const handleOk = () => {
+    const Body = {
+      [clickedField]: inputValue,
+      OZL_FORM: "GİRİŞ FİŞİ",
+    };
+
+    AxiosInstance.post("OzelAlanTopicGuncelle", Body)
+      .then((response) => {
+        console.log("Data sent successfully:", response);
+        setIsModalVisible(false);
+        setInputValue("");
+        nameOfField(); // Refresh the field names
+        if (response.status_code === 200 || response.status_code === 201) {
+          message.success("İşlem Başarılı.");
+        } else if (response.status_code === 401) {
+          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+        } else {
+          message.error("Ekleme Başarısız.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error sending data:", error);
+        message.error("Başarısız Olundu.");
+      });
+
+    console.log({ Body });
   };
 
   const handleCancel = () => {
@@ -60,7 +73,7 @@ function OzelAlanlar(props) {
     <div style={{ display: "flex", gap: "10px" }}>
       <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZELALAN_1")}>
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_1")}>
             {customFieldNames?.OZL_OZEL_ALAN_1 || t("ozelAlan1")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
@@ -68,7 +81,7 @@ function OzelAlanlar(props) {
           </div>
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZELALAN_2")}>
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_2")}>
             {customFieldNames?.OZL_OZEL_ALAN_2 || t("ozelAlan2")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
@@ -77,7 +90,7 @@ function OzelAlanlar(props) {
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZELALAN_3")}>
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_3")}>
             {customFieldNames?.OZL_OZEL_ALAN_3 || t("ozelAlan3")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
@@ -86,7 +99,7 @@ function OzelAlanlar(props) {
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZELALAN_4")}>
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_4")}>
             {customFieldNames?.OZL_OZEL_ALAN_4 || t("ozelAlan4")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
@@ -95,7 +108,7 @@ function OzelAlanlar(props) {
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZELALAN_5")}>
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_5")}>
             {customFieldNames?.OZL_OZEL_ALAN_5 || t("ozelAlan5")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
@@ -104,7 +117,7 @@ function OzelAlanlar(props) {
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZELALAN_6")}>
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_6")}>
             {customFieldNames?.OZL_OZEL_ALAN_6 || t("ozelAlan6")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
@@ -112,7 +125,7 @@ function OzelAlanlar(props) {
           </div>
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZELALAN_7")}>
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_7")}>
             {customFieldNames?.OZL_OZEL_ALAN_7 || t("ozelAlan7")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
@@ -121,7 +134,7 @@ function OzelAlanlar(props) {
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZELALAN_8")}>
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_8")}>
             {customFieldNames?.OZL_OZEL_ALAN_8 || t("ozelAlan8")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
@@ -130,7 +143,7 @@ function OzelAlanlar(props) {
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZELALAN_9")}>
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_9")}>
             {customFieldNames?.OZL_OZEL_ALAN_9 || t("ozelAlan9")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
@@ -139,7 +152,7 @@ function OzelAlanlar(props) {
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZELALAN_10")}>
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_10")}>
             {customFieldNames?.OZL_OZEL_ALAN_10 || t("ozelAlan10")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
@@ -149,7 +162,7 @@ function OzelAlanlar(props) {
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZELALAN_11")}>
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_11")}>
             {customFieldNames?.OZL_OZEL_ALAN_11 || t("ozelAlan11")}:
           </Text>
           <div
@@ -166,7 +179,7 @@ function OzelAlanlar(props) {
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZELALAN_12")}>
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_12")}>
             {customFieldNames?.OZL_OZEL_ALAN_12 || t("ozelAlan12")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
@@ -175,7 +188,7 @@ function OzelAlanlar(props) {
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZELALAN_13")}>
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_13")}>
             {customFieldNames?.OZL_OZEL_ALAN_13 || t("ozelAlan13")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
@@ -184,7 +197,7 @@ function OzelAlanlar(props) {
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZELALAN_14")}>
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_14")}>
             {customFieldNames?.OZL_OZEL_ALAN_14 || t("ozelAlan14")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
@@ -193,7 +206,7 @@ function OzelAlanlar(props) {
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZELALAN_15")}>
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_15")}>
             {customFieldNames?.OZL_OZEL_ALAN_15 || t("ozelAlan15")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
@@ -202,7 +215,7 @@ function OzelAlanlar(props) {
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZELALAN_16")}>
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_16")}>
             {customFieldNames?.OZL_OZEL_ALAN_16 || t("ozelAlan16")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
@@ -211,7 +224,7 @@ function OzelAlanlar(props) {
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZELALAN_17")}>
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_17")}>
             {customFieldNames?.OZL_OZEL_ALAN_17 || t("ozelAlan17")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
@@ -220,7 +233,7 @@ function OzelAlanlar(props) {
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZELALAN_18")}>
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_18")}>
             {customFieldNames?.OZL_OZEL_ALAN_18 || t("ozelAlan18")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
@@ -229,7 +242,7 @@ function OzelAlanlar(props) {
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZELALAN_19")}>
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_19")}>
             {customFieldNames?.OZL_OZEL_ALAN_19 || t("ozelAlan19")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
@@ -238,7 +251,7 @@ function OzelAlanlar(props) {
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZELALAN_20")}>
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_20")}>
             {customFieldNames?.OZL_OZEL_ALAN_20 || t("ozelAlan20")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
