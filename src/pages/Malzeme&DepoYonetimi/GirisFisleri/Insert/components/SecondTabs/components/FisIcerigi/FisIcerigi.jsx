@@ -6,6 +6,7 @@ import { t } from "i18next";
 import Malzemeler from "../../../../../../MalzemeTanimlari/Table/Table";
 // import PlakaSelectBox from "../../../../../../../../components/PlakaSelectbox";
 import LokasyonTablo from "../../../../../../../../utils/components/LokasyonTablo";
+import MasrafMerkeziTablo from "../../../../../../../../utils/components/MasrafMerkeziTablo";
 import KodIDSelectbox from "../../../../../../../../utils/components/KodIDSelectbox";
 
 const { Text, Link } = Typography;
@@ -141,6 +142,7 @@ function FisIcerigi({ modalOpen }) {
     control,
     name: "fisIcerigi",
     shouldUnregister: true,
+    shouldFocus: false,
   });
 
   const [dataSource, setDataSource] = useState([]);
@@ -464,6 +466,8 @@ function FisIcerigi({ modalOpen }) {
           toplam,
           malzemeLokasyon: row.STK_LOKASYON || lokasyon || "",
           malzemeLokasyonID: row.STK_LOKASYON_ID || lokasyonID || null,
+          masrafMerkezi: row.STK_MASRAFMERKEZ || "",
+          masrafMerkeziID: row.STK_MASRAF_MERKEZI_ID || null,
           aciklama: "",
         };
 
@@ -674,6 +678,48 @@ function FisIcerigi({ modalOpen }) {
                 ...newData[index],
                 malzemeLokasyon: "",
                 malzemeLokasyonID: null,
+              };
+              setDataSource(newData);
+            }
+          }}
+        />
+      ),
+    },
+    {
+      title: "Masraf Merkezi",
+      dataIndex: "masrafMerkezi",
+      key: "masrafMerkezi",
+      width: 200,
+      ellipsis: true,
+      render: (text, record, index) => (
+        <MasrafMerkeziTablo
+          disabled={false}
+          masrafMerkeziFieldName={`fisIcerigi.${index}.masrafMerkezi`}
+          masrafMerkeziIdFieldName={`fisIcerigi.${index}.masrafMerkeziID`}
+          onSubmit={(selectedData) => {
+            // Update the specific row's masraf merkezi data
+            const newData = [...dataSource];
+            if (newData[index]) {
+              newData[index] = {
+                ...newData[index],
+                masrafMerkezi: selectedData.MAM_KOD,
+                masrafMerkeziID: selectedData.key,
+              };
+              setDataSource(newData);
+
+              // Update form values
+              setValue(`fisIcerigi.${index}.masrafMerkezi`, selectedData.MAM_KOD);
+              setValue(`fisIcerigi.${index}.masrafMerkeziID`, selectedData.key);
+            }
+          }}
+          onClear={() => {
+            // Update the specific row's masraf merkezi data to empty
+            const newData = [...dataSource];
+            if (newData[index]) {
+              newData[index] = {
+                ...newData[index],
+                masrafMerkezi: "",
+                masrafMerkeziID: null,
               };
               setDataSource(newData);
             }

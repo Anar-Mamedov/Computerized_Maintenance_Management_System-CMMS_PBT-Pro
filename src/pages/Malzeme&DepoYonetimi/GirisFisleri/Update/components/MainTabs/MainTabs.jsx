@@ -7,10 +7,13 @@ import { t } from "i18next";
 import AxiosInstance from "../../../../../../api/http";
 import FirmaSelectBox from "../../../../../../utils/components/FirmaTablo";
 // import PlakaSelectBox from "../../../../../../../_root/components/PlakaSelectbox";
+import MakineTablo from "../../../../../../utils/components/Machina/MakineTablo";
 import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
 import DepoSelectBox from "../../../../../../utils/components/DepoSelectBox";
 import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
-import ModalInput from "../../../../../../utils/components/ModalInput";
+import DepoTablo from "../../../../../../utils/components/DepoTablo";
+import ProjeTablo from "../../../../../../utils/components/ProjeTablo";
+import SiparisTablo from "../../../../../../utils/components/SiparisTablo";
 import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -326,6 +329,31 @@ export default function MainTabs({ modalOpen }) {
             <FirmaSelectBox name1="firma" isRequired={false} />
           </div>
         </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: "400px",
+            gap: "10px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("siparisNo")}</Text>
+          <div
+            style={{
+              display: "flex",
+              flexFlow: "column wrap",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "220px",
+            }}
+          >
+            <SiparisTablo name1="siparisNo" isRequired={false} />
+          </div>
+        </div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "300px" }}>
         <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
@@ -403,7 +431,7 @@ export default function MainTabs({ modalOpen }) {
             flexDirection: "row",
           }}
         >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("plaka")}</Text>
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("makine")}</Text>
           <div
             style={{
               display: "flex",
@@ -413,6 +441,7 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "220px",
             }}
           >
+            <MakineTablo />
             {/* <PlakaSelectBox name1="plaka" isRequired={false} /> */}
           </div>
         </div>
@@ -440,11 +469,17 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "220px",
             }}
           >
-            <ModalInput name="lokasyon" readonly={true} required={false} onPlusClick={handleYeniLokasyonPlusClick} onMinusClick={handleYeniLokasyonMinusClick} />
             <LokasyonTablo
+              lokasyonFieldName="lokasyon"
+              lokasyonIdFieldName="lokasyonID"
               onSubmit={(selectedData) => {
-                setValue("lokasyon", selectedData.location);
+                setValue("lokasyon", selectedData.LOK_TANIM);
                 setValue("lokasyonID", selectedData.key);
+                // Force trigger to ensure FisIcerigi component detects the change
+                setTimeout(() => {
+                  setValue("lokasyon", selectedData.LOK_TANIM, { shouldDirty: true });
+                  setValue("lokasyonID", selectedData.key, { shouldDirty: true });
+                }, 100);
               }}
               isModalVisible={isLokasyonModalOpen}
               setIsModalVisible={setIsLokasyonModalOpen}
@@ -473,7 +508,7 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "220px",
             }}
           >
-            <KodIDSelectbox name1="islemTipi" kodID={302} isRequired={false} />
+            <KodIDSelectbox name1="islemTipi" kodID={13006} isRequired={false} />
           </div>
         </div>
       </div>
@@ -503,7 +538,33 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "220px",
             }}
           >
-            <DepoSelectBox name1="girisDeposu" kodID={"MALZEME"} isRequired={true} />
+            <DepoTablo name1="girisDeposu" isRequired={true} />
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: "400px",
+            gap: "10px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("proje")}</Text>
+          <div
+            style={{
+              display: "flex",
+              flexFlow: "column wrap",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "220px",
+            }}
+          >
+            <ProjeTablo name1="proje" isRequired={false} />
           </div>
         </div>
       </div>

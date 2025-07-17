@@ -25,6 +25,8 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
       fisNo: null,
       firma: null,
       firmaID: null,
+      makineID: null,
+      makine: null,
       plaka: null,
       plakaID: null,
       tarih: null,
@@ -70,15 +72,15 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
         setOpen(true); // İşlemler tamamlandıktan sonra drawer'ı aç
         setLoading(true); // Yükleme başladığında
         try {
-          const response = await AxiosInstance.get(`MaterialReceipt/GetMaterialReceiptById?receiptId=${selectedRow.key}`);
-          const item = response.data; // Veri dizisinin ilk elemanını al
+          const response = await AxiosInstance.get(`GetMalzemeFisById?fisId=${selectedRow.key}`);
+          const item = response; // Veri dizisinin ilk elemanını al
           // Form alanlarını set et
           setValue("mlzFisId", item.mlzFisId);
           setValue("fisNo", item.fisNo);
           setValue("firma", item.firmaTanim);
           setValue("firmaID", item.firmaId);
-          setValue("plaka", item.plaka);
-          setValue("plakaID", item.aracId);
+          setValue("makine", item.plaka);
+          setValue("makineID", item.aracId);
           setValue("tarih", item.tarih ? (dayjs(item.tarih).isValid() ? dayjs(item.tarih) : null) : null);
           setValue("saat", item.saat ? (dayjs(item.saat, "HH:mm:ss").isValid() ? dayjs(item.saat, "HH:mm:ss") : null) : null);
           setValue("islemTipi", item.islemTipi);
@@ -101,11 +103,21 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
           setValue("ozelAlan7", item.ozelAlan7);
           setValue("ozelAlan8", item.ozelAlan8);
           setValue("ozelAlan9", item.ozelAlan9);
-          setValue("ozelAlan9ID", item.ozelAlanKodId9);
           setValue("ozelAlan10", item.ozelAlan10);
-          setValue("ozelAlan10ID", item.ozelAlanKodId10);
           setValue("ozelAlan11", item.ozelAlan11);
+          setValue("ozelAlan11ID", item.ozelAlanKodId11);
           setValue("ozelAlan12", item.ozelAlan12);
+          setValue("ozelAlan12ID", item.ozelAlanKodId12);
+          setValue("ozelAlan13", item.ozelAlan13);
+          setValue("ozelAlan13ID", item.ozelAlanKodId13);
+          setValue("ozelAlan14", item.ozelAlan14);
+          setValue("ozelAlan14ID", item.ozelAlanKodId14);
+          setValue("ozelAlan15", item.ozelAlan15);
+          setValue("ozelAlan16", item.ozelAlan16);
+          setValue("ozelAlan17", item.ozelAlan17);
+          setValue("ozelAlan18", item.ozelAlan18);
+          setValue("ozelAlan19", item.ozelAlan19);
+          setValue("ozelAlan20", item.ozelAlan20);
           setValue(
             "fisIcerigi",
             item.materialMovements?.map((movement) => ({
@@ -123,7 +135,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
               indirimOrani: movement.indirimOran,
               indirimTutari: movement.indirim,
               kdvOrani: movement.kdvOran,
-              kdvDahilHaric: movement.kdvDahilHaric,
+              kdvDahilHaric: movement.kdvDahilHaric === "D",
               kdvTutar: movement.kdvTutar,
               toplam: movement.toplam,
               malzemePlakaId: movement.mlzAracId,
@@ -161,18 +173,18 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
     const Body = {
       mlzFisId: data.mlzFisId,
       fisNo: data.fisNo,
+      aracId: data.makineID || -1,
       // firma: data.firma,
-      firmaId: Number(data.firmaID),
+      firmaId: Number(data.firmaID) || -1,
       // plaka: data.plaka,
-      aracId: Number(data.plakaID),
       tarih: formatDateWithDayjs(data.tarih),
       saat: formatTimeWithDayjs(data.saat),
       // islemTipi: data.islemTipi,
-      islemTipiKodId: Number(data.islemTipiID),
+      islemTipiKodId: Number(data.islemTipiID) || -1,
       // girisDeposu: data.girisDeposu,
-      girisDepoSiraNo: Number(data.girisDeposuID),
+      girisDepoSiraNo: Number(data.girisDeposuID) || -1,
       // lokasyon: data.lokasyon,
-      lokasyonId: Number(data.lokasyonID),
+      lokasyonId: Number(data.lokasyonID) || -1,
       araToplam: Number(data.totalAraToplam),
       indirimliToplam: Number(data.totalIndirim),
       kdvToplam: Number(data.totalKdvToplam),
@@ -186,11 +198,20 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
       ozelAlan6: data.ozelAlan6,
       ozelAlan7: data.ozelAlan7,
       ozelAlan8: data.ozelAlan8,
-      ozelAlanKodId9: Number(data.ozelAlan9ID),
-      ozelAlanKodId10: Number(data.ozelAlan10ID),
-      ozelAlan11: Number(data.ozelAlan11),
-      ozelAlan12: Number(data.ozelAlan12),
-      gc: 1,
+      ozelAlan9: data.ozelAlan9,
+      ozelAlan10: data.ozelAlan10,
+      ozelAlanKodId11: Number(data.ozelAlan11ID),
+      ozelAlanKodId12: Number(data.ozelAlan12ID),
+      ozelAlanKodId13: Number(data.ozelAlan13ID),
+      ozelAlanKodId14: Number(data.ozelAlan14ID),
+      ozelAlan15: Number(data.ozelAlan15),
+      ozelAlan16: Number(data.ozelAlan16),
+      ozelAlan17: Number(data.ozelAlan17),
+      ozelAlan18: Number(data.ozelAlan18),
+      ozelAlan19: Number(data.ozelAlan19),
+      ozelAlan20: Number(data.ozelAlan20),
+      islemTip: "01",
+      gc: "G",
       fisTip: "MALZEME",
       materialMovements:
         data.fisIcerigi?.map((item) => ({
@@ -220,7 +241,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
           // lokasyon: item.malzemeLokasyon,
           lokasyonId: Number(item.malzemeLokasyonID),
           aciklama: item.aciklama,
-          gc: 1,
+          gc: "G",
           fisTip: "MALZEME",
         })) || [],
     };
