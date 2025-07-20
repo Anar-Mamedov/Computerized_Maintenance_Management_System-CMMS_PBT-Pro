@@ -77,17 +77,17 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
           // Form alanlarını set et
           setValue("mlzFisId", item.mlzFisId);
           setValue("fisNo", item.fisNo);
-          setValue("firma", item.firmaTanim);
+          setValue("firma", item.firmaName);
           setValue("firmaID", item.firmaId);
-          setValue("makine", item.plaka);
+          setValue("makine", item.aracName);
           setValue("makineID", item.aracId);
           setValue("tarih", item.tarih ? (dayjs(item.tarih).isValid() ? dayjs(item.tarih) : null) : null);
           setValue("saat", item.saat ? (dayjs(item.saat, "HH:mm:ss").isValid() ? dayjs(item.saat, "HH:mm:ss") : null) : null);
           setValue("islemTipi", item.islemTipi);
           setValue("islemTipiID", item.islemTipiKodId);
-          setValue("girisDeposu", item.girisDepo);
+          setValue("girisDeposu", item.girisDepoName);
           setValue("girisDeposuID", item.girisDepoSiraNo);
-          setValue("lokasyon", item.lokasyon);
+          setValue("lokasyon", item.lokasyonName);
           setValue("lokasyonID", item.lokasyonId);
           setTimeout(() => setValue("totalAraToplam", item.araToplam), 200);
           setTimeout(() => setValue("totalIndirim", item.indirimliToplam), 200);
@@ -109,26 +109,26 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
           setValue("ozelAlan12", item.ozelAlan12);
           setValue("ozelAlan12ID", item.ozelAlanKodId12);
           setValue("ozelAlan13", item.ozelAlan13);
-          setValue("ozelAlan13ID", item.ozelAlanKodId13);
+          setValue("ozelAlan13ID", item.OzelAlankodId13);
           setValue("ozelAlan14", item.ozelAlan14);
-          setValue("ozelAlan14ID", item.ozelAlanKodId14);
-          setValue("ozelAlan15", item.ozelAlan15);
-          setValue("ozelAlan16", item.ozelAlan16);
-          setValue("ozelAlan17", item.ozelAlan17);
-          setValue("ozelAlan18", item.ozelAlan18);
-          setValue("ozelAlan19", item.ozelAlan19);
-          setValue("ozelAlan20", item.ozelAlan20);
+          setValue("ozelAlan14ID", item.OzelAlankodId14);
+          setValue("ozelAlan15", item.OzelAlankodId15);
+          setValue("ozelAlan16", item.OzelAlan16);
+          setValue("ozelAlan17", item.OzelAlan17);
+          setValue("ozelAlan18", item.OzelAlan18);
+          setValue("ozelAlan19", item.OzelAlan19);
+          setValue("ozelAlan20", item.OzelAlan20);
           setValue(
             "fisIcerigi",
             item.materialMovements?.map((movement) => ({
               key: movement.siraNo,
               siraNo: movement.siraNo,
               malzemeId: movement.malzemeId,
-              malzemeKodu: movement.malezemeKod,
-              malzemeTanimi: movement.malezemeTanim,
+              malzemeKodu: movement.malzemeKod,
+              malzemeTanimi: movement.malzemeName,
               malzemeTipi: movement.malzemeTip,
               birimKodId: movement.birimKodId,
-              birim: movement.birim,
+              birim: movement.birimName,
               miktar: movement.miktar,
               fiyat: movement.fiyat,
               araToplam: movement.araToplam,
@@ -139,9 +139,9 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
               kdvTutar: movement.kdvTutar,
               toplam: movement.toplam,
               malzemePlakaId: movement.mlzAracId,
-              malzemePlaka: movement.plaka,
+              malzemePlaka: movement.mlzAracName,
               malzemeLokasyonID: movement.lokasyonId,
-              malzemeLokasyon: movement.lokasyon,
+              malzemeLokasyon: movement.lokasyonName,
               aciklama: movement.aciklama,
               isPriceChanged: movement.isPriceChanged || false,
             })) || []
