@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Drawer, Typography, Button, Input, Select, DatePicker, TimePicker, Row, Col, Checkbox, InputNumber, Radio, message } from "antd";
+import { Drawer, Typography, Button, Input, Select, DatePicker, TimePicker, Row, Col, Checkbox, InputNumber, Radio, message, Tabs } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import dayjs from "dayjs";
@@ -61,6 +61,41 @@ const StyledDivMedia = styled.div`
   }
 `;
 
+//styled components
+const StyledTabs = styled(Tabs)`
+  .ant-tabs-tab {
+    margin: 0 !important;
+    width: fit-content;
+    padding: 10px 15px;
+    justify-content: center;
+    background-color: rgba(230, 230, 230, 0.3);
+  }
+
+  .ant-tabs-nav {
+    z-index: 20 !important;
+  }
+
+  .ant-tabs-tab-active {
+    background-color: #2bc77135;
+  }
+
+  .ant-tabs-nav .ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: rgba(0, 0, 0, 0.88) !important;
+  }
+
+  .ant-tabs-tab:hover .ant-tabs-tab-btn {
+    color: rgba(0, 0, 0, 0.88) !important;
+  }
+
+  .ant-tabs-tab:not(:first-child) {
+    border-left: 1px solid #80808024;
+  }
+
+  .ant-tabs-ink-bar {
+    background: #2bc770;
+  }
+`;
+
 export default function MainTabs({ modalOpen }) {
   const {
     control,
@@ -74,6 +109,7 @@ export default function MainTabs({ modalOpen }) {
   const [initialFisNo, setInitialFisNo] = useState("");
   const [isFisNoModified, setIsFisNoModified] = useState(false);
   const [isLokasyonModalOpen, setIsLokasyonModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("1");
 
   const handleMinusClick = () => {
     setValue("servisKodu", "");
@@ -245,329 +281,342 @@ export default function MainTabs({ modalOpen }) {
     setValue("lokasyonID", null);
   };
 
-  return (
-    <div style={{ display: "flex", marginBottom: "20px", flexDirection: "row", gap: "10px", width: "100%" }}>
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "300px" }}>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "400px",
-            gap: "10px",
-            flexDirection: "row",
-          }}
-        >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
-            {t("fisNo")}
-            <div style={{ color: "red" }}>*</div>
-          </Text>
-          <div
-            style={{
-              display: "flex",
-              flexFlow: "column wrap",
-              alignItems: "flex-start",
-              width: "100%",
-              maxWidth: "220px",
-            }}
-          >
-            <Controller
-              name="fisNo"
-              control={control}
-              rules={{ required: t("alanBosBirakilamaz") }}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  status={errors["fisNo"] ? "error" : ""}
-                  style={{ flex: 1 }}
-                  onFocus={(e) => {
-                    setInitialFisNo(e.target.value);
-                    setIsFisNoModified(false);
-                  }}
-                  onChange={(e) => {
-                    field.onChange(e);
-                    if (e.target.value !== initialFisNo) {
-                      setIsFisNoModified(true);
-                    }
-                  }}
-                  onBlur={(e) => {
-                    field.onBlur(e);
-                    if (isFisNoModified) {
-                      validateFisNo(e.target.value);
-                    }
-                  }}
-                />
-              )}
-            />
-            {errors["fisNo"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["fisNo"].message}</div>}
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "400px",
-            gap: "10px",
-            flexDirection: "row",
-          }}
-        >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("firma")}</Text>
-          <div
-            style={{
-              display: "flex",
-              flexFlow: "column wrap",
-              alignItems: "flex-start",
-              width: "100%",
-              maxWidth: "220px",
-            }}
-          >
-            <FirmaSelectBox name1="firma" isRequired={false} />
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "400px",
-            gap: "10px",
-            flexDirection: "row",
-          }}
-        >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("siparisNo")}</Text>
-          <div
-            style={{
-              display: "flex",
-              flexFlow: "column wrap",
-              alignItems: "flex-start",
-              width: "100%",
-              maxWidth: "220px",
-            }}
-          >
-            <SiparisTablo name1="siparisNo" isRequired={false} />
-          </div>
-        </div>
-      </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "300px" }}>
-        <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "400px",
-              gap: "10px",
-              flexDirection: "row",
-            }}
-          >
-            <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
-              {t("tarih")}
-              <div style={{ color: "red" }}>*</div>
-            </Text>
+  const tabItems = [
+    {
+      key: "1",
+      label: t("depoBilgileri"),
+      children: (
+        <div style={{ display: "flex", marginBottom: "20px", flexDirection: "row", gap: "10px", width: "100%" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "300px" }}>
             <div
               style={{
                 display: "flex",
-                flexDirection: "row",
+                flexWrap: "wrap",
                 alignItems: "center",
-                width: "100%",
-                maxWidth: "220px",
                 justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "400px",
+                gap: "10px",
+                flexDirection: "row",
               }}
             >
-              <Controller
-                name="tarih"
-                control={control}
-                rules={{ required: t("alanBosBirakilamaz") }}
-                render={({ field }) => (
-                  <DatePicker
-                    {...field}
-                    status={errors["tarih"] ? "error" : ""}
-                    style={{ width: "100%", maxWidth: "130px" }}
-                    format={localeDateFormat}
-                    onChange={(date) => {
-                      field.onChange(date);
-                      setValue("tarih", date);
-                    }}
+              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
+                {t("fisNo")}
+                <div style={{ color: "red" }}>*</div>
+              </Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexFlow: "column wrap",
+                  alignItems: "flex-start",
+                  width: "100%",
+                  maxWidth: "220px",
+                }}
+              >
+                <Controller
+                  name="fisNo"
+                  control={control}
+                  rules={{ required: t("alanBosBirakilamaz") }}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      status={errors["fisNo"] ? "error" : ""}
+                      style={{ flex: 1 }}
+                      onFocus={(e) => {
+                        setInitialFisNo(e.target.value);
+                        setIsFisNoModified(false);
+                      }}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        if (e.target.value !== initialFisNo) {
+                          setIsFisNoModified(true);
+                        }
+                      }}
+                      onBlur={(e) => {
+                        field.onBlur(e);
+                        if (isFisNoModified) {
+                          validateFisNo(e.target.value);
+                        }
+                      }}
+                    />
+                  )}
+                />
+                {errors["fisNo"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["fisNo"].message}</div>}
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "400px",
+                gap: "10px",
+                flexDirection: "row",
+              }}
+            >
+              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("firma")}</Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexFlow: "column wrap",
+                  alignItems: "flex-start",
+                  width: "100%",
+                  maxWidth: "220px",
+                }}
+              >
+                <FirmaSelectBox name1="firma" isRequired={false} />
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "400px",
+                gap: "10px",
+                flexDirection: "row",
+              }}
+            >
+              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("siparisNo")}</Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexFlow: "column wrap",
+                  alignItems: "flex-start",
+                  width: "100%",
+                  maxWidth: "220px",
+                }}
+              >
+                <SiparisTablo name1="siparisNo" isRequired={false} />
+              </div>
+            </div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "300px" }}>
+            <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  maxWidth: "400px",
+                  gap: "10px",
+                  flexDirection: "row",
+                }}
+              >
+                <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
+                  {t("tarih")}
+                  <div style={{ color: "red" }}>*</div>
+                </Text>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    width: "100%",
+                    maxWidth: "220px",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Controller
+                    name="tarih"
+                    control={control}
+                    rules={{ required: t("alanBosBirakilamaz") }}
+                    render={({ field }) => (
+                      <DatePicker
+                        {...field}
+                        status={errors["tarih"] ? "error" : ""}
+                        style={{ width: "100%", maxWidth: "130px" }}
+                        format={localeDateFormat}
+                        onChange={(date) => {
+                          field.onChange(date);
+                          setValue("tarih", date);
+                        }}
+                      />
+                    )}
                   />
-                )}
-              />
-              <Controller
-                name="saat"
-                control={control}
-                render={({ field }) => (
-                  <TimePicker
-                    {...field}
-                    style={{ width: "100%", maxWidth: "85px" }}
-                    format={localeTimeFormat}
-                    onChange={(date) => {
-                      field.onChange(date);
-                      setValue("saat", date);
-                    }}
+                  <Controller
+                    name="saat"
+                    control={control}
+                    render={({ field }) => (
+                      <TimePicker
+                        {...field}
+                        style={{ width: "100%", maxWidth: "85px" }}
+                        format={localeTimeFormat}
+                        onChange={(date) => {
+                          field.onChange(date);
+                          setValue("saat", date);
+                        }}
+                      />
+                    )}
                   />
-                )}
-              />
-              {errors["tarih"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["tarih"].message}</div>}
+                  {errors["tarih"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["tarih"].message}</div>}
+                </div>
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "400px",
+                gap: "10px",
+                flexDirection: "row",
+              }}
+            >
+              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("makine")}</Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexFlow: "column wrap",
+                  alignItems: "flex-start",
+                  width: "100%",
+                  maxWidth: "220px",
+                }}
+              >
+                <MakineTablo />
+                {/* <PlakaSelectBox name1="plaka" isRequired={false} /> */}
+              </div>
+            </div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "300px" }}>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "400px",
+                gap: "10px",
+                flexDirection: "row",
+              }}
+            >
+              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("lokasyon")}</Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexFlow: "column wrap",
+                  alignItems: "flex-start",
+                  width: "100%",
+                  maxWidth: "220px",
+                }}
+              >
+                <LokasyonTablo
+                  lokasyonFieldName="lokasyon"
+                  lokasyonIdFieldName="lokasyonID"
+                  onSubmit={(selectedData) => {
+                    setValue("lokasyon", selectedData.LOK_TANIM);
+                    setValue("lokasyonID", selectedData.key);
+                    // Force trigger to ensure FisIcerigi component detects the change
+                    setTimeout(() => {
+                      setValue("lokasyon", selectedData.LOK_TANIM, { shouldDirty: true });
+                      setValue("lokasyonID", selectedData.key, { shouldDirty: true });
+                    }, 100);
+                  }}
+                  isModalVisible={isLokasyonModalOpen}
+                  setIsModalVisible={setIsLokasyonModalOpen}
+                />
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "400px",
+                gap: "10px",
+                flexDirection: "row",
+              }}
+            >
+              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("islemTipi")}</Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexFlow: "column wrap",
+                  alignItems: "flex-start",
+                  width: "100%",
+                  maxWidth: "220px",
+                }}
+              >
+                <KodIDSelectbox name1="islemTipi" kodID={13006} isRequired={false} />
+              </div>
+            </div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "350px" }}>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "400px",
+                gap: "10px",
+                flexDirection: "row",
+              }}
+            >
+              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
+                {t("girisDeposu")}
+                <div style={{ color: "red" }}>*</div>
+              </Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexFlow: "column wrap",
+                  alignItems: "flex-start",
+                  width: "100%",
+                  maxWidth: "220px",
+                }}
+              >
+                <DepoTablo name1="girisDeposu" isRequired={true} />
+              </div>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "400px",
+                gap: "10px",
+                flexDirection: "row",
+              }}
+            >
+              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("proje")}</Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexFlow: "column wrap",
+                  alignItems: "flex-start",
+                  width: "100%",
+                  maxWidth: "220px",
+                }}
+              >
+                <ProjeTablo name1="proje" isRequired={false} />
+              </div>
             </div>
           </div>
         </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "400px",
-            gap: "10px",
-            flexDirection: "row",
-          }}
-        >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("makine")}</Text>
-          <div
-            style={{
-              display: "flex",
-              flexFlow: "column wrap",
-              alignItems: "flex-start",
-              width: "100%",
-              maxWidth: "220px",
-            }}
-          >
-            <MakineTablo />
-            {/* <PlakaSelectBox name1="plaka" isRequired={false} /> */}
-          </div>
-        </div>
-      </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "300px" }}>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "400px",
-            gap: "10px",
-            flexDirection: "row",
-          }}
-        >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("lokasyon")}</Text>
-          <div
-            style={{
-              display: "flex",
-              flexFlow: "column wrap",
-              alignItems: "flex-start",
-              width: "100%",
-              maxWidth: "220px",
-            }}
-          >
-            <LokasyonTablo
-              lokasyonFieldName="lokasyon"
-              lokasyonIdFieldName="lokasyonID"
-              onSubmit={(selectedData) => {
-                setValue("lokasyon", selectedData.LOK_TANIM);
-                setValue("lokasyonID", selectedData.key);
-                // Force trigger to ensure FisIcerigi component detects the change
-                setTimeout(() => {
-                  setValue("lokasyon", selectedData.LOK_TANIM, { shouldDirty: true });
-                  setValue("lokasyonID", selectedData.key, { shouldDirty: true });
-                }, 100);
-              }}
-              isModalVisible={isLokasyonModalOpen}
-              setIsModalVisible={setIsLokasyonModalOpen}
-            />
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "400px",
-            gap: "10px",
-            flexDirection: "row",
-          }}
-        >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("islemTipi")}</Text>
-          <div
-            style={{
-              display: "flex",
-              flexFlow: "column wrap",
-              alignItems: "flex-start",
-              width: "100%",
-              maxWidth: "220px",
-            }}
-          >
-            <KodIDSelectbox name1="islemTipi" kodID={13006} isRequired={false} />
-          </div>
-        </div>
-      </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "350px" }}>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "400px",
-            gap: "10px",
-            flexDirection: "row",
-          }}
-        >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
-            {t("girisDeposu")}
-            <div style={{ color: "red" }}>*</div>
-          </Text>
-          <div
-            style={{
-              display: "flex",
-              flexFlow: "column wrap",
-              alignItems: "flex-start",
-              width: "100%",
-              maxWidth: "220px",
-            }}
-          >
-            <DepoTablo name1="girisDeposu" isRequired={true} />
-          </div>
-        </div>
+      ),
+    },
+    {
+      key: "2",
+      label: t("depoLokasyonBilgileri"),
+      children: <div style={{ padding: "20px", textAlign: "center", color: "#999" }}>{t("icerikEklenecek")}</div>,
+    },
+  ];
 
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "400px",
-            gap: "10px",
-            flexDirection: "row",
-          }}
-        >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("proje")}</Text>
-          <div
-            style={{
-              display: "flex",
-              flexFlow: "column wrap",
-              alignItems: "flex-start",
-              width: "100%",
-              maxWidth: "220px",
-            }}
-          >
-            <ProjeTablo name1="proje" isRequired={false} />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <StyledTabs activeKey={activeTab} onChange={setActiveTab} items={tabItems} style={{ width: "100%" }} />;
 }
