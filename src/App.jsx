@@ -41,6 +41,7 @@ import IsTalebiKullanicilari from "./pages/YardimMasasi/IsTalebiKullanicilari/Is
 import KullaniciTanimlari from "./pages/Yonetim/KullaniciTanimlari/KullaniciTanimlari.jsx";
 import RolTanimlari1 from "./pages/Yonetim/RolTanimlari/RolTanimlari.jsx";
 import MalzemeTanimlari from "./pages/Malzeme&DepoYonetimi/MalzemeTanimlari/MalzemeTanimlari.jsx";
+import MalzemeDepolari from "./pages/Malzeme&DepoYonetimi/MalzemeDepolari/MalzemeDepolari.jsx";
 import AxiosInstance from "./api/http";
 
 // Malzemeler
@@ -337,7 +338,7 @@ export default function App() {
           <Route path="/kullaniciTanimlari" element={<KullaniciTanimlari />} />
           <Route path="/RolTanimlari1" element={<RolTanimlari1 />} />
           <Route path="/malzemeTanimi" element={<MalzemeTanimlari />} />
-          <Route path="/malzemeDepolari" element={<AtolyeTanimlari />} />
+          <Route path="/malzemeDepolari" element={<MalzemeDepolari />} />
           <Route path="/malzemeGirisFisi" element={<GirisFisleri />} />
           <Route path="/malzemeCikisFisi" element={<GirisFisleri />} />
           <Route path="/malzemeTransferFisi" element={<GirisFisleri />} />

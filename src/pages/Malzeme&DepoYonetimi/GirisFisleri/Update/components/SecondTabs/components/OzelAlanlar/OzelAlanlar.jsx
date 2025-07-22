@@ -174,7 +174,7 @@ function OzelAlanlar(props) {
               flexDirection: "column",
             }}
           >
-            <KodIDSelectbox name1="ozelAlan11" isRequired={false} kodID="50005" />
+            <KodIDSelectbox name1="ozelAlan11" isRequired={false} kodID="13020" />
           </div>
         </div>
 
@@ -183,7 +183,7 @@ function OzelAlanlar(props) {
             {customFieldNames?.OZL_OZEL_ALAN_12 || t("ozelAlan12")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <KodIDSelectbox name1="ozelAlan12" isRequired={false} kodID="50005" />
+            <KodIDSelectbox name1="ozelAlan12" isRequired={false} kodID="13021" />
           </div>
         </div>
 
@@ -192,7 +192,7 @@ function OzelAlanlar(props) {
             {customFieldNames?.OZL_OZEL_ALAN_13 || t("ozelAlan13")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <KodIDSelectbox name1="ozelAlan13" isRequired={false} kodID="50005" />
+            <KodIDSelectbox name1="ozelAlan13" isRequired={false} kodID="13022" />
           </div>
         </div>
 
@@ -201,7 +201,7 @@ function OzelAlanlar(props) {
             {customFieldNames?.OZL_OZEL_ALAN_14 || t("ozelAlan14")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <KodIDSelectbox name1="ozelAlan14" isRequired={false} kodID="50005" />
+            <KodIDSelectbox name1="ozelAlan14" isRequired={false} kodID="13023" />
           </div>
         </div>
 
@@ -210,7 +210,7 @@ function OzelAlanlar(props) {
             {customFieldNames?.OZL_OZEL_ALAN_15 || t("ozelAlan15")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <Controller name="ozelAlan15" control={control} render={({ field }) => <InputNumber {...field} style={{ flex: 1 }} />} />
+            <KodIDSelectbox name1="ozelAlan15" isRequired={false} kodID="13024" />
           </div>
         </div>
 
