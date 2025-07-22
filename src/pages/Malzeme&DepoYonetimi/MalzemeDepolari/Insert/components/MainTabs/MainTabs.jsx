@@ -5,15 +5,12 @@ import styled from "styled-components";
 import dayjs from "dayjs";
 import { t } from "i18next";
 import AxiosInstance from "../../../../../../api/http";
-import FirmaSelectBox from "../../../../../../utils/components/FirmaTablo";
-// import PlakaSelectBox from "../../../../../../../_root/components/PlakaSelectbox";
-import MakineTablo from "../../../../../../utils/components/Machina/MakineTablo";
-import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
-import DepoSelectBox from "../../../../../../utils/components/DepoSelectBox";
+import TextInput from "../../../../../../utils/components/Form/TextInput";
 import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
-import DepoTablo from "../../../../../../utils/components/DepoTablo";
-import ProjeTablo from "../../../../../../utils/components/ProjeTablo";
-import SiparisTablo from "../../../../../../utils/components/SiparisTablo";
+import AtolyeTablo from "../../../../../../utils/components/AtolyeTablo";
+import PersonelTablo from "../../../../../../utils/components/PersonelTablo";
+import CheckboxInput from "../../../../../../utils/components/Form/CheckboxInput";
+
 import { PlusOutlined } from "@ant-design/icons";
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -265,7 +262,7 @@ export default function MainTabs({ modalOpen }) {
 
       if (response.data.status === true) {
         message.error("Fiş numarası benzersiz değildir!");
-        setValue("fisNo", "");
+        setValue("depoNo", "");
       }
     } catch (error) {
       console.error("Error checking fisNo uniqueness:", error);
@@ -287,7 +284,7 @@ export default function MainTabs({ modalOpen }) {
       label: t("depoBilgileri"),
       children: (
         <div style={{ display: "flex", marginBottom: "20px", flexDirection: "row", gap: "10px", width: "100%" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "300px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "350px" }}>
             <div
               style={{
                 display: "flex",
@@ -301,7 +298,7 @@ export default function MainTabs({ modalOpen }) {
               }}
             >
               <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
-                {t("fisNo")}
+                {t("depoNo")}
                 <div style={{ color: "red" }}>*</div>
               </Text>
               <div
@@ -314,13 +311,13 @@ export default function MainTabs({ modalOpen }) {
                 }}
               >
                 <Controller
-                  name="fisNo"
+                  name="depoNo"
                   control={control}
                   rules={{ required: t("alanBosBirakilamaz") }}
                   render={({ field }) => (
                     <Input
                       {...field}
-                      status={errors["fisNo"] ? "error" : ""}
+                      status={errors["depoNo"] ? "error" : ""}
                       style={{ flex: 1 }}
                       onFocus={(e) => {
                         setInitialFisNo(e.target.value);
@@ -341,9 +338,10 @@ export default function MainTabs({ modalOpen }) {
                     />
                   )}
                 />
-                {errors["fisNo"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["fisNo"].message}</div>}
+                {errors["depoNo"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["depoNo"].message}</div>}
               </div>
             </div>
+
             <div
               style={{
                 display: "flex",
@@ -356,7 +354,10 @@ export default function MainTabs({ modalOpen }) {
                 flexDirection: "row",
               }}
             >
-              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("firma")}</Text>
+              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
+                {t("depoTanimi")}
+                <div style={{ color: "red" }}>*</div>
+              </Text>
               <div
                 style={{
                   display: "flex",
@@ -366,9 +367,10 @@ export default function MainTabs({ modalOpen }) {
                   maxWidth: "220px",
                 }}
               >
-                <FirmaSelectBox name1="firma" isRequired={false} />
+                <TextInput name="depoTanimi" required="true" placeholder={t("depoTanimi")} />
               </div>
             </div>
+
             <div
               style={{
                 display: "flex",
@@ -381,7 +383,7 @@ export default function MainTabs({ modalOpen }) {
                 flexDirection: "row",
               }}
             >
-              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("siparisNo")}</Text>
+              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("personel")}</Text>
               <div
                 style={{
                   display: "flex",
@@ -391,102 +393,31 @@ export default function MainTabs({ modalOpen }) {
                   maxWidth: "220px",
                 }}
               >
-                <SiparisTablo name1="siparisNo" isRequired={false} />
+                <PersonelTablo name1="personel" isRequired={false} />
               </div>
             </div>
           </div>
+
           <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "300px" }}>
-            <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  width: "100%",
-                  maxWidth: "400px",
-                  gap: "10px",
-                  flexDirection: "row",
-                }}
-              >
-                <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
-                  {t("tarih")}
-                  <div style={{ color: "red" }}>*</div>
-                </Text>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    width: "100%",
-                    maxWidth: "220px",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Controller
-                    name="tarih"
-                    control={control}
-                    rules={{ required: t("alanBosBirakilamaz") }}
-                    render={({ field }) => (
-                      <DatePicker
-                        {...field}
-                        status={errors["tarih"] ? "error" : ""}
-                        style={{ width: "100%", maxWidth: "130px" }}
-                        format={localeDateFormat}
-                        onChange={(date) => {
-                          field.onChange(date);
-                          setValue("tarih", date);
-                        }}
-                      />
-                    )}
-                  />
-                  <Controller
-                    name="saat"
-                    control={control}
-                    render={({ field }) => (
-                      <TimePicker
-                        {...field}
-                        style={{ width: "100%", maxWidth: "85px" }}
-                        format={localeTimeFormat}
-                        onChange={(date) => {
-                          field.onChange(date);
-                          setValue("saat", date);
-                        }}
-                      />
-                    )}
-                  />
-                  {errors["tarih"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["tarih"].message}</div>}
-                </div>
-              </div>
-            </div>
             <div
               style={{
                 display: "flex",
                 flexWrap: "wrap",
                 alignItems: "center",
                 justifyContent: "space-between",
+                height: "32px",
                 width: "100%",
                 maxWidth: "400px",
                 gap: "10px",
                 flexDirection: "row",
               }}
             >
-              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("makine")}</Text>
-              <div
-                style={{
-                  display: "flex",
-                  flexFlow: "column wrap",
-                  alignItems: "flex-start",
-                  width: "100%",
-                  maxWidth: "220px",
-                }}
-              >
-                <MakineTablo />
-                {/* <PlakaSelectBox name1="plaka" isRequired={false} /> */}
+              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("atkif")}</Text>
+
+              <div style={{ width: "100%", maxWidth: "220px" }}>
+                <CheckboxInput name="aktif" isRequired={false} />
               </div>
             </div>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "300px" }}>
             <div
               style={{
                 display: "flex",
@@ -538,7 +469,7 @@ export default function MainTabs({ modalOpen }) {
                 flexDirection: "row",
               }}
             >
-              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("islemTipi")}</Text>
+              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("atolye")}</Text>
               <div
                 style={{
                   display: "flex",
@@ -548,63 +479,7 @@ export default function MainTabs({ modalOpen }) {
                   maxWidth: "220px",
                 }}
               >
-                <KodIDSelectbox name1="islemTipi" kodID={13006} isRequired={false} />
-              </div>
-            </div>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "350px" }}>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "100%",
-                maxWidth: "400px",
-                gap: "10px",
-                flexDirection: "row",
-              }}
-            >
-              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
-                {t("girisDeposu")}
-                <div style={{ color: "red" }}>*</div>
-              </Text>
-              <div
-                style={{
-                  display: "flex",
-                  flexFlow: "column wrap",
-                  alignItems: "flex-start",
-                  width: "100%",
-                  maxWidth: "220px",
-                }}
-              >
-                <DepoTablo name1="girisDeposu" isRequired={true} />
-              </div>
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "100%",
-                maxWidth: "400px",
-                gap: "10px",
-                flexDirection: "row",
-              }}
-            >
-              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("proje")}</Text>
-              <div
-                style={{
-                  display: "flex",
-                  flexFlow: "column wrap",
-                  alignItems: "flex-start",
-                  width: "100%",
-                  maxWidth: "220px",
-                }}
-              >
-                <ProjeTablo name1="proje" isRequired={false} />
+                <AtolyeTablo nameFields={{ tanim: "atolye", id: "atolyeID" }} isRequired={false} />
               </div>
             </div>
           </div>
