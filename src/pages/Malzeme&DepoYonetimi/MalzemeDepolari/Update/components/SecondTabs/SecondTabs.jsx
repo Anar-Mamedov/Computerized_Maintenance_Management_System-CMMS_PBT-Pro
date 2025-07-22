@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { Controller, useFormContext } from "react-hook-form";
 import { t } from "i18next";
 import OzelAlanlar from "./components/OzelAlanlar/OzelAlanlar.jsx";
-import FisIcerigi from "./components/FisIcerigi/FisIcerigi.jsx";
+import { IletisimBilgileri } from "./components/IletisimBilgileri/IletisimBilgileri.jsx";
 import ResimUpload from "../../../../../../utils/components/Resim/ResimUpload.jsx";
 import DosyaUpload from "../../../../../../utils/components/Dosya/DosyaUpload.jsx";
 const { Text, Link } = Typography;
@@ -66,8 +66,8 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen, s
     },*/
     {
       key: "4",
-      label: t("fisIcerigi"),
-      children: <FisIcerigi modalOpen={modalOpen} />,
+      label: t("iletisimBilgileri"),
+      children: <IletisimBilgileri />,
     },
 
     {
@@ -77,7 +77,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen, s
       children: <OzelAlanlar />,
     },
 
-    /* {
+    {
       key: "6",
       label: "Açıklama",
       children: (
@@ -85,7 +85,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen, s
           <Controller name="aciklama" render={({ field }) => <TextArea {...field} rows={4} placeholder="Açıklama" style={{ width: "100%", resize: "none" }} />} />
         </div>
       ),
-    }, */
+    },
     {
       key: "7",
       label: "Resimler",

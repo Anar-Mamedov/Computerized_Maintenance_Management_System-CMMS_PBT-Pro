@@ -22,7 +22,7 @@ const normalizeText = (text) => {
     .replace(/Ç/g, "C");
 };
 
-export default function AtolyeTablo({ workshopSelectedId, onSubmit, disabled }) {
+export default function AtolyeTablo({ workshopSelectedId, onSubmit, disabled, nameFields = { tanim: "atolyeTanim", id: "atolyeID" }, isRequired }) {
   const {
     control,
     watch,
@@ -77,8 +77,8 @@ export default function AtolyeTablo({ workshopSelectedId, onSubmit, disabled }) 
   const handleModalOk = () => {
     const selectedData = data.find((item) => item.key === selectedRowKeys[0]);
     if (selectedData) {
-      setValue("atolyeTanim", selectedData.ATL_TANIM);
-      setValue("atolyeID", selectedData.key);
+      setValue(nameFields.tanim, selectedData.ATL_TANIM);
+      setValue(nameFields.id, selectedData.key);
       onSubmit && onSubmit(selectedData);
     }
     setIsModalVisible(false);
@@ -108,27 +108,20 @@ export default function AtolyeTablo({ workshopSelectedId, onSubmit, disabled }) 
   };
 
   const handleMinusClick = () => {
-    setValue("atolyeTanim", "");
-    setValue("atolyeID", "");
+    setValue(nameFields.tanim, "");
+    setValue(nameFields.id, "");
   };
   return (
     <div style={{ width: "100%" }}>
       <div style={{ display: "flex", gap: "5px", width: "100%" }}>
         <Controller
-          name="atolyeTanim"
+          name={nameFields.tanim}
           control={control}
-          render={({ field }) => (
-            <Input
-              {...field}
-              status={errors.atolyeTanim ? "error" : ""}
-              type="text" // Set the type to "text" for name input
-              style={{ width: "100%", maxWidth: "630px" }}
-              disabled
-            />
-          )}
+          rules={isRequired ? { required: "Bu alan zorunludur" } : {}}
+          render={({ field }) => <Input {...field} status={errors[nameFields.tanim] ? "error" : ""} type="text" style={{ width: "100%", maxWidth: "630px" }} disabled />}
         />
         <Controller
-          name="atolyeID"
+          name={nameFields.id}
           control={control}
           render={({ field }) => (
             <Input

@@ -633,8 +633,6 @@ const MalzemeDepolari = () => {
                   display: "flex",
                   gap: "10px",
                   alignItems: "center",
-                  width: "100%",
-                  maxWidth: "935px",
                   flexWrap: "wrap",
                 }}
               >
