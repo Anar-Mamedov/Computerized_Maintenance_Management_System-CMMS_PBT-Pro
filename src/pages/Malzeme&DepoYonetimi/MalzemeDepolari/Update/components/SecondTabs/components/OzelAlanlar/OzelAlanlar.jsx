@@ -115,55 +115,11 @@ function OzelAlanlar(props) {
             <Controller name="ozelAlan5" control={control} render={({ field }) => <Input {...field} style={{ flex: 1 }} />} />
           </div>
         </div>
-
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_6")}>
-            {customFieldNames?.OZL_OZEL_ALAN_6 || t("ozelAlan6")}:
-          </Text>
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <Controller name="ozelAlan6" control={control} render={({ field }) => <Input {...field} style={{ flex: 1 }} />} />
-          </div>
-        </div>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_7")}>
-            {customFieldNames?.OZL_OZEL_ALAN_7 || t("ozelAlan7")}:
-          </Text>
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <Controller name="ozelAlan7" control={control} render={({ field }) => <Input {...field} style={{ flex: 1 }} />} />
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_8")}>
-            {customFieldNames?.OZL_OZEL_ALAN_8 || t("ozelAlan8")}:
-          </Text>
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <Controller name="ozelAlan8" control={control} render={({ field }) => <Input {...field} style={{ flex: 1 }} />} />
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_9")}>
-            {customFieldNames?.OZL_OZEL_ALAN_9 || t("ozelAlan9")}:
-          </Text>
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <Controller name="ozelAlan9" control={control} render={({ field }) => <Input {...field} style={{ flex: 1 }} />} />
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_10")}>
-            {customFieldNames?.OZL_OZEL_ALAN_10 || t("ozelAlan10")}:
-          </Text>
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <Controller name="ozelAlan10" control={control} render={({ field }) => <Input {...field} style={{ flex: 1 }} />} />
-          </div>
-        </div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_11")}>
-            {customFieldNames?.OZL_OZEL_ALAN_11 || t("ozelAlan11")}:
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_6")}>
+            {customFieldNames?.OZL_OZEL_ALAN_6 || t("ozelAlan6")}:
           </Text>
           <div
             style={{
@@ -174,88 +130,43 @@ function OzelAlanlar(props) {
               flexDirection: "column",
             }}
           >
-            <KodIDSelectbox name1="ozelAlan11" isRequired={false} kodID="13020" />
+            <KodIDSelectbox name1="ozelAlan6" isRequired={false} kodID="13020" />
           </div>
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_12")}>
-            {customFieldNames?.OZL_OZEL_ALAN_12 || t("ozelAlan12")}:
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_7")}>
+            {customFieldNames?.OZL_OZEL_ALAN_7 || t("ozelAlan7")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <KodIDSelectbox name1="ozelAlan12" isRequired={false} kodID="13021" />
+            <KodIDSelectbox name1="ozelAlan7" isRequired={false} kodID="13021" />
           </div>
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_13")}>
-            {customFieldNames?.OZL_OZEL_ALAN_13 || t("ozelAlan13")}:
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_8")}>
+            {customFieldNames?.OZL_OZEL_ALAN_8 || t("ozelAlan8")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <KodIDSelectbox name1="ozelAlan13" isRequired={false} kodID="13022" />
+            <KodIDSelectbox name1="ozelAlan8" isRequired={false} kodID="13022" />
           </div>
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_14")}>
-            {customFieldNames?.OZL_OZEL_ALAN_14 || t("ozelAlan14")}:
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_9")}>
+            {customFieldNames?.OZL_OZEL_ALAN_9 || t("ozelAlan9")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <KodIDSelectbox name1="ozelAlan14" isRequired={false} kodID="13023" />
+            <Controller name="ozelAlan9" control={control} render={({ field }) => <InputNumber {...field} style={{ flex: 1 }} />} />
           </div>
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_15")}>
-            {customFieldNames?.OZL_OZEL_ALAN_15 || t("ozelAlan15")}:
+          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_10")}>
+            {customFieldNames?.OZL_OZEL_ALAN_10 || t("ozelAlan10")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <KodIDSelectbox name1="ozelAlan15" isRequired={false} kodID="13024" />
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_16")}>
-            {customFieldNames?.OZL_OZEL_ALAN_16 || t("ozelAlan16")}:
-          </Text>
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <Controller name="ozelAlan16" control={control} render={({ field }) => <InputNumber {...field} style={{ flex: 1 }} />} />
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_17")}>
-            {customFieldNames?.OZL_OZEL_ALAN_17 || t("ozelAlan17")}:
-          </Text>
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <Controller name="ozelAlan17" control={control} render={({ field }) => <InputNumber {...field} style={{ flex: 1 }} />} />
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_18")}>
-            {customFieldNames?.OZL_OZEL_ALAN_18 || t("ozelAlan18")}:
-          </Text>
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <Controller name="ozelAlan18" control={control} render={({ field }) => <InputNumber {...field} style={{ flex: 1 }} />} />
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_19")}>
-            {customFieldNames?.OZL_OZEL_ALAN_19 || t("ozelAlan19")}:
-          </Text>
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <Controller name="ozelAlan19" control={control} render={({ field }) => <InputNumber {...field} style={{ flex: 1 }} />} />
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: "450px", gap: "10px", rowGap: "0px" }}>
-          <Text style={{ fontSize: "14px", cursor: "pointer" }} onClick={() => showModal("OZL_OZEL_ALAN_20")}>
-            {customFieldNames?.OZL_OZEL_ALAN_20 || t("ozelAlan20")}:
-          </Text>
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <Controller name="ozelAlan20" control={control} render={({ field }) => <InputNumber {...field} style={{ flex: 1 }} />} />
+            <Controller name="ozelAlan10" control={control} render={({ field }) => <InputNumber {...field} style={{ flex: 1 }} />} />
           </div>
         </div>
       </div>
