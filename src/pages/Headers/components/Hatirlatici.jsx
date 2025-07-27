@@ -73,7 +73,7 @@ export default function HatirlaticiPopover({ hatirlaticiData, loading, open, set
           padding: "10px 0",
         }}
       >
-        Hatırlatıcı
+        Hatırlatıcı1
       </div>
       <div
         style={{

@@ -114,7 +114,8 @@ export default function Header() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await AxiosInstance.get("PbakimYaklasanSureSayi");
+        const lan = localStorage.getItem("i18nextLng") || "tr";
+        const response = await AxiosInstance.get(`GetHatirlaticilar?dil=${lan}`);
         setHatirlaticiData(response);
       } catch (error) {
         console.error(error);

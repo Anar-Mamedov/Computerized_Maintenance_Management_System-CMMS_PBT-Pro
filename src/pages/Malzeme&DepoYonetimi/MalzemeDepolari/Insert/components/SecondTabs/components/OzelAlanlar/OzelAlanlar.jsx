@@ -58,7 +58,7 @@ function OzelAlanlar(props) {
 
   const nameOfField = async () => {
     try {
-      const response = await AxiosInstance.get(`OzelAlan?form=GİRİŞ FİŞİ`);
+      const response = await AxiosInstance.get(`OzelAlan?form=DEPO`);
       setCustomFieldNames(response);
     } catch (error) {
       console.error("API request failed: ", error);
@@ -130,7 +130,7 @@ function OzelAlanlar(props) {
               flexDirection: "column",
             }}
           >
-            <KodIDSelectbox name1="ozelAlan6" isRequired={false} kodID="13020" />
+            <KodIDSelectbox name1="ozelAlan6" isRequired={false} kodID="988" />
           </div>
         </div>
 
@@ -139,7 +139,7 @@ function OzelAlanlar(props) {
             {customFieldNames?.OZL_OZEL_ALAN_7 || t("ozelAlan7")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <KodIDSelectbox name1="ozelAlan7" isRequired={false} kodID="13021" />
+            <KodIDSelectbox name1="ozelAlan7" isRequired={false} kodID="989" />
           </div>
         </div>
 
@@ -148,7 +148,7 @@ function OzelAlanlar(props) {
             {customFieldNames?.OZL_OZEL_ALAN_8 || t("ozelAlan8")}:
           </Text>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <KodIDSelectbox name1="ozelAlan8" isRequired={false} kodID="13022" />
+            <KodIDSelectbox name1="ozelAlan8" isRequired={false} kodID="990" />
           </div>
         </div>
 
