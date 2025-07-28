@@ -47,6 +47,12 @@ const ReminderItem = styled.div`
   justify-content: space-between;
   padding: 8px 0;
   border-bottom: 1px solid #f5f5f5;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover {
+    background-color: #f0f0f0;
+  }
 
   &:last-child {
     border-bottom: none;
@@ -124,11 +130,25 @@ export default function HatirlaticiPopover({ hatirlaticiData, loading, open, set
     setOpen(newOpen);
   };
 
-  const handleItemClick = (title, contentComponent) => {
-    setModalTitle(title);
-    setModalContent(contentComponent);
-    setIsModalOpen(true);
-    setOpen(false);
+  const handleItemClick = (item) => {
+    let contentComponent;
+    const title = item.Aciklama2;
+
+    switch (item.SiraId) {
+      case 5:
+        contentComponent = <YaklasanPeriyodikBakimlar />;
+        break;
+      default:
+        contentComponent = null;
+        break;
+    }
+
+    if (contentComponent) {
+      setModalTitle(title);
+      setModalContent(contentComponent);
+      setIsModalOpen(true);
+      setOpen(false);
+    }
   };
 
   const handleModalClose = () => {
@@ -168,7 +188,7 @@ export default function HatirlaticiPopover({ hatirlaticiData, loading, open, set
               {group.Hatirlaticilar.map((item) => {
                 const colors = getColorForItem(item);
                 return (
-                  <ReminderItem key={item.SiraId}>
+                  <ReminderItem key={item.SiraId} onClick={() => handleItemClick(item)}>
                     <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
                       <ColorBar isCritical={colors.isCritical} isWarning={colors.isWarning} />
                       <span style={{ fontSize: "13px", color: "#333" }}>{item.Aciklama2}</span>
