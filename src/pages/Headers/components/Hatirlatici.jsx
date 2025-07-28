@@ -23,6 +23,8 @@ const StyledCard = styled(Card)`
   margin-bottom: 16px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  break-inside: avoid;
+  page-break-inside: avoid;
 
   .ant-card-head {
     border-bottom: 1px solid #f0f0f0;
@@ -83,6 +85,7 @@ const PopoverContent = styled.div`
   flex-direction: column;
   gap: 8px;
   padding: 16px;
+  overflow-y: auto;
 `;
 
 const HeaderSection = styled.div`
@@ -98,12 +101,8 @@ const HeaderSection = styled.div`
 `;
 
 const CardsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 16px;
-  overflow: auto;
-  max-height: calc(100vh - 200px);
-  align-items: start;
+  column-width: 300px;
+  column-gap: 16px;
 `;
 
 export default function HatirlaticiPopover({ hatirlaticiData, loading, open, setOpen }) {
