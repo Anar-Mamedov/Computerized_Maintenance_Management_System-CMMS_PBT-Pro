@@ -18,7 +18,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
 
   const getFisNo = async () => {
     try {
-      const response = await AxiosInstance.get("ModulKoduGetir?modulKodu=SFS_GIRIS_FIS_NO");
+      const response = await AxiosInstance.get("ModulKoduGetir?modulKodu=DEP_KOD");
       if (response) {
         setValue("depoNo", response);
       }
