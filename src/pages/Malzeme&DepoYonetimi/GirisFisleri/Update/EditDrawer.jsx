@@ -33,6 +33,8 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
       saat: null,
       islemTipi: null,
       islemTipiID: null,
+      proje: null,
+      projeID: null,
       girisDeposu: null,
       girisDeposuID: null,
       lokasyon: null,
@@ -83,8 +85,10 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
           setValue("makineID", item.aracId);
           setValue("tarih", item.tarih ? (dayjs(item.tarih).isValid() ? dayjs(item.tarih) : null) : null);
           setValue("saat", item.saat ? (dayjs(item.saat, "HH:mm:ss").isValid() ? dayjs(item.saat, "HH:mm:ss") : null) : null);
-          setValue("islemTipi", item.islemTipi);
+          setValue("islemTipi", item.islemTipiName);
           setValue("islemTipiID", item.islemTipiKodId);
+          setValue("proje", item.projeName);
+          setValue("projeID", item.projeId);
           setValue("girisDeposu", item.girisDepoName);
           setValue("girisDeposuID", item.girisDepoSiraNo);
           setValue("lokasyon", item.lokasyonName);
@@ -104,15 +108,15 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
           setValue("ozelAlan8", item.ozelAlan8);
           setValue("ozelAlan9", item.ozelAlan9);
           setValue("ozelAlan10", item.ozelAlan10);
-          setValue("ozelAlan11", item.ozelAlan11);
+          setValue("ozelAlan11", item.OzelAlan11);
           setValue("ozelAlan11ID", item.ozelAlanKodId11);
-          setValue("ozelAlan12", item.ozelAlan12);
+          setValue("ozelAlan12", item.OzelAlan12);
           setValue("ozelAlan12ID", item.ozelAlanKodId12);
-          setValue("ozelAlan13", item.ozelAlan13);
+          setValue("ozelAlan13", item.OzelAlan13);
           setValue("ozelAlan13ID", item.OzelAlankodId13);
-          setValue("ozelAlan14", item.ozelAlan14);
+          setValue("ozelAlan14", item.OzelAlan14);
           setValue("ozelAlan14ID", item.OzelAlankodId14);
-          setValue("ozelAlan15", item.ozelAlan15);
+          setValue("ozelAlan15", item.OzelAlan15);
           setValue("ozelAlan15ID", item.OzelAlankodId15);
           setValue("ozelAlan16", item.OzelAlan16);
           setValue("ozelAlan17", item.OzelAlan17);
@@ -182,6 +186,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
       saat: formatTimeWithDayjs(data.saat),
       // islemTipi: data.islemTipi,
       islemTipiKodId: Number(data.islemTipiID) || -1,
+      projeId: Number(data.projeID) || -1,
       // girisDeposu: data.girisDeposu,
       girisDepoSiraNo: Number(data.girisDeposuID) || -1,
       // lokasyon: data.lokasyon,
@@ -248,24 +253,19 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
     };
 
     // API'ye POST isteği gönder
-    AxiosInstance.post("MaterialReceipt/UpdateMaterialReceipt", Body)
+    AxiosInstance.post("UpsertMalzemeFisWithItems", Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
-        if (response.data.statusCode === 200 || response.data.statusCode === 201 || response.data.statusCode === 202) {
-          const formattedDate = dayjs(response.data.targetDate).isValid() ? dayjs(response.data.targetDate).format("DD-MM-YYYY") : response.data.targetDate;
-          if (response.data.targetKm !== undefined && response.data.targetDate !== undefined) {
-            message.success(data.Plaka + " Plakalı Aracın " + " (" + data.servisTanimi + ") " + response.data.targetKm + " km ve " + formattedDate + " Tarihine Güncellenmiştir.");
-          } else {
-            message.success("Güncelleme Başarılı.");
-          }
+        if (response.status_code === 200 || response.status_code === 201 || response.status_code === 202) {
+          message.success("Güncelleme Başarılı.");
           setOpen(false);
           onRefresh();
           methods.reset();
           onDrawerClose();
-        } else if (response.data.statusCode === 401) {
+        } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
-          message.error("Ekleme Başarısız.");
+          message.error("Güncelleme Başarısız.");
         }
       })
       .catch((error) => {

@@ -90,13 +90,13 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen, s
       key: "7",
       label: "Resimler",
       // children: <SureBilgileri fieldRequirements={fieldRequirements} />,
-      children: <ResimUpload selectedRowID={selectedRowID} refGroup={"MALZEME_GIRIS_FIS"} />,
+      children: <ResimUpload selectedRowID={selectedRowID} refGroup={"MALZEME_TALEP"} />,
     },
     {
       key: "8",
       label: "Dosyalar",
       // children: <SureBilgileri fieldRequirements={fieldRequirements} />,
-      children: <DosyaUpload selectedRowID={selectedRowID} refGroup={"MALZEME_GIRIS_FIS"} />,
+      children: <DosyaUpload selectedRowID={selectedRowID} refGroup={"FIS"} />,
     },
   ];
 

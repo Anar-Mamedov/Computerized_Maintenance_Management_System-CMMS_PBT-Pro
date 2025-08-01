@@ -505,14 +505,14 @@ function FisIcerigi({ modalOpen }) {
       editable: false,
       inputType: "text",
     },
-    {
+    /*  {
       title: "Malzeme Tipi",
       dataIndex: "malzemeTipi",
       key: "malzemeTipi",
       width: 150,
       editable: false,
       inputType: "text",
-    },
+    }, */
     {
       title: "Miktar",
       dataIndex: "miktar",
