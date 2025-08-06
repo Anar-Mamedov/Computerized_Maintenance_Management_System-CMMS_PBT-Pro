@@ -157,16 +157,16 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
     };
 
     // API'ye POST isteği gönder
-    AxiosInstance.post("UpdatDepo", Body)
+    AxiosInstance.post("UpdateDepo", Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
-        if (response.data.statusCode === 200 || response.data.statusCode === 201 || response.data.statusCode === 202) {
+        if (response.status_code === 200 || response.status_code === 201 || response.status_code === 202) {
           message.success("Güncelleme Başarılı.");
           setOpen(false);
           onRefresh();
           methods.reset();
           onDrawerClose();
-        } else if (response.data.statusCode === 401) {
+        } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
           message.error("Ekleme Başarısız.");
