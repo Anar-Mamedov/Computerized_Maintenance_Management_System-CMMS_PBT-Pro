@@ -108,7 +108,7 @@ const EditableCell = ({ title, editable, children, dataIndex, record, handleSave
   );
 };
 
-const MalzemeSecModal = ({ visible, onCancel, onOk }) => {
+const MalzemeSecModal = ({ visible, onCancel, onOk, deposuID }) => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [modalKey, setModalKey] = useState(Date.now());
 
@@ -125,7 +125,7 @@ const MalzemeSecModal = ({ visible, onCancel, onOk }) => {
 
   return (
     <Modal title="Malzeme Seç" open={visible} onCancel={onCancel} onOk={() => onOk(selectedRows)} width={1200} style={{ top: 20 }} destroyOnClose>
-      <Malzemeler key={modalKey} onRowSelect={handleMalzemeSelect} isSelectionMode={true} />
+      <Malzemeler key={modalKey} onRowSelect={handleMalzemeSelect} isSelectionMode={true} deposuID={deposuID} islemTip="T" />
     </Modal>
   );
 };
@@ -137,6 +137,9 @@ function FisIcerigi({ modalOpen }) {
   const [currentEditingRow, setCurrentEditingRow] = useState(null);
   const [previousModalState, setPreviousModalState] = useState(false);
   const [isIndirimManuallyEdited, setIsIndirimManuallyEdited] = useState(false);
+
+  // Watch for girisDeposuID to control button state
+  const girisDeposuID = watch("cikisDeposuID");
 
   const { fields, append, remove, replace } = useFieldArray({
     control,
@@ -505,7 +508,7 @@ function FisIcerigi({ modalOpen }) {
       editable: false,
       inputType: "text",
     },
-    /*  {
+    /* {
       title: "Malzeme Tipi",
       dataIndex: "malzemeTipi",
       key: "malzemeTipi",
@@ -771,7 +774,7 @@ function FisIcerigi({ modalOpen }) {
   return (
     <div style={{ marginTop: "-55px", zIndex: 10 }}>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
-        <Button style={{ zIndex: 21 }} type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
+        <Button style={{ zIndex: 21 }} type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)} disabled={!girisDeposuID}>
           Ekle
         </Button>
       </div>
@@ -969,7 +972,7 @@ function FisIcerigi({ modalOpen }) {
         </div>
       </div>
 
-      <MalzemeSecModal visible={isModalVisible} onCancel={() => setIsModalVisible(false)} onOk={handleMalzemeSelect} />
+      <MalzemeSecModal visible={isModalVisible} onCancel={() => setIsModalVisible(false)} onOk={handleMalzemeSelect} deposuID={girisDeposuID} />
     </div>
   );
 }
