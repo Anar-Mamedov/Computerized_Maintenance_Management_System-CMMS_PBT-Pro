@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Image, Spin, Upload, message, Button, Popconfirm } from "antd";
-import { InboxOutlined, UserOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Image, Spin, Upload, message } from "antd";
+import { InboxOutlined, UserOutlined } from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../api/http";
 
-const ResimUpload = ({ selectedRowID, setPhotoUploaded, setPhotoCount, refGroup }) => {
+const ResimUpload = ({ selectedRowID, refGroup }) => {
   const { watch } = useFormContext();
   const [imageUrls, setImageUrls] = useState([]);
-  const [resimData, setResimData] = useState([]); // Store the full image data including IDs
   const [loadingImages, setLoadingImages] = useState(false);
-  const [deletingImageIndex, setDeletingImageIndex] = useState(null); // Track which image is being deleted
   const [refreshImages, setRefreshImages] = useState(false); // Resim listesini yenilemek için kullanılacak
-  const secilenIsEmriID = watch("secilenIsEmriID");
 
   // Watch the 'kapali' field from the form
   const kapali = watch("kapali"); // Assuming 'kapali' is the name of the field in your form
@@ -19,25 +16,14 @@ const ResimUpload = ({ selectedRowID, setPhotoUploaded, setPhotoCount, refGroup 
   const fetchResimIds = async () => {
     try {
       setLoadingImages(true);
-
-      const response = await AxiosInstance.get(`Photo/GetPhotosByRefGroup?refId=${selectedRowID}&refGroup=${refGroup}`);
-      const resimIDler = response.data; // API'den gelen verileri alıyoruz
-      setResimData(resimIDler); // Store the full image data
-
+      const [response1] = await Promise.all([AxiosInstance.get(`GetResimIds?RefId=${selectedRowID}&RefGrup=${refGroup}`)]);
+      const resimIDler = [...response1]; // Her iki API'den gelen verileri birleştiriyoruz
       const urls = await Promise.all(
-        resimIDler.map(async (resim) => {
-          const resimResponse = await AxiosInstance.post(
-            `Photo/DownloadPhotoById`,
-            {
-              photoId: resim.tbResimId,
-              extension: resim.rsmUzanti,
-              fileName: resim.rsmAd,
-            },
-            {
-              responseType: "blob",
-            }
-          );
-          return URL.createObjectURL(resimResponse.data); // Axios response objesinden blob data alınır
+        resimIDler.map(async (id) => {
+          const resimResponse = await AxiosInstance.get(`ResimGetirById?id=${id}`, {
+            responseType: "blob",
+          });
+          return URL.createObjectURL(resimResponse); // Axios response objesinden blob data alınır
         })
       );
       setImageUrls(urls);
@@ -55,42 +41,14 @@ const ResimUpload = ({ selectedRowID, setPhotoUploaded, setPhotoCount, refGroup 
     }
   }, [selectedRowID, refreshImages]); // refreshImages değişikliklerini de takip eder
 
-  const handleDeletePhoto = async (index) => {
-    try {
-      setDeletingImageIndex(index); // Set the deleting state for this image
-
-      if (!resimData[index] || !resimData[index].tbResimId) {
-        throw new Error("Fotoğraf ID'si bulunamadı");
-      }
-
-      const photoId = resimData[index].tbResimId;
-      const response = await AxiosInstance.get(`Photo/DeletePhotoById?id=${photoId}`);
-
-      // Check if the response indicates success
-      if (response && response.data && response.data.success === false) {
-        throw new Error(response.data.message || "Silme işlemi başarısız oldu");
-      }
-
-      message.success("Fotoğraf başarıyla silindi.");
-      setRefreshImages((prev) => !prev); // Refresh the image list after deletion
-      /* setPhotoUploaded((prev) => prev + 1); */ // Decrement the photo count
-      // setPhotoCount((prev) => prev - 1);
-    } catch (error) {
-      console.error("Fotoğraf silinirken bir hata oluştu:", error);
-      message.error(error.message || "Fotoğraf silinirken bir hata oluştu.");
-    } finally {
-      setDeletingImageIndex(null); // Clear the deleting state
-    }
-  };
-
   const draggerProps = {
-    name: "images",
+    name: "file",
     multiple: true,
     showUploadList: false,
     beforeUpload: (file) => {
       const formData = new FormData();
-      formData.append("images", file);
-      AxiosInstance.post(`Photo/UploadPhoto?refId=${selectedRowID}&refGroup=${refGroup}`, formData, {
+      formData.append("file", file);
+      AxiosInstance.post(`UploadPhoto?refid=${selectedRowID}&refgrup=${refGroup}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -98,8 +56,6 @@ const ResimUpload = ({ selectedRowID, setPhotoUploaded, setPhotoCount, refGroup 
         .then(() => {
           message.success(`${file.name} başarıyla yüklendi.`);
           setRefreshImages((prev) => !prev); // Başarılı yüklemeden sonra resim listesini yenile
-          /*  setPhotoUploaded((prev) => prev + 1); */
-          // setPhotoCount((prev) => prev + 1);
         })
         .catch(() => {
           message.error(`${file.name} yükleme sırasında bir hata oluştu.`);
@@ -127,51 +83,17 @@ const ResimUpload = ({ selectedRowID, setPhotoUploaded, setPhotoCount, refGroup 
         </div>
       ) : (
         imageUrls.map((url, index) => (
-          <div key={index} style={{ position: "relative", display: "inline-block", margin: "10px" }}>
-            <Image
-              style={{
-                height: "150px",
-                width: "150px",
-                objectFit: "cover",
-              }}
-              src={url}
-              fallback={<UserOutlined />}
-              preview={{ mask: deletingImageIndex === index ? <Spin /> : undefined }}
-            />
-            {!kapali && deletingImageIndex !== index && (
-              <Popconfirm title="Bu fotoğrafı silmek istediğinizden emin misiniz?" onConfirm={() => handleDeletePhoto(index)} okText="Evet" cancelText="Hayır">
-                <Button
-                  danger
-                  icon={<DeleteOutlined />}
-                  size="small"
-                  style={{
-                    position: "absolute",
-                    top: "5px",
-                    right: "5px",
-                    background: "rgba(255, 255, 255, 0.7)",
-                    boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
-                  }}
-                />
-              </Popconfirm>
-            )}
-            {deletingImageIndex === index && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "0",
-                  left: "0",
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  background: "rgba(0,0,0,0.5)",
-                }}
-              >
-                <Spin />
-              </div>
-            )}
-          </div>
+          <Image
+            style={{
+              margin: "10px",
+              height: "150px",
+              width: "150px",
+              objectFit: "cover",
+            }}
+            key={index}
+            src={url}
+            fallback={<UserOutlined />}
+          />
         ))
       )}
       <Upload.Dragger

@@ -239,7 +239,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
           indirimOran: Number(item.indirimOrani),
           indirim: Number(item.indirimTutari),
           kdvOran: Number(item.kdvOrani),
-          kdvDahilHaric: item.kdvDahilHaric,
+          kdvDahilHaric: item.kdvDahilHaric ? "D" : "H",
           kdvTutar: Number(item.kdvTutar),
           toplam: Number(item.toplam),
           // plaka: item.malzemePlaka,
