@@ -47,6 +47,8 @@ import AxiosInstance from "./api/http";
 // Malzemeler
 
 import GirisFisleri from "./pages/Malzeme&DepoYonetimi/GirisFisleri/GirisFisleri.jsx";
+import CikisFisleri from "./pages/Malzeme&DepoYonetimi/CikisFisleri/CikisFisleri.jsx";
+import TransferFisleri from "./pages/Malzeme&DepoYonetimi/TransferFisleri/TransferFisleri.jsx";
 
 // Ayarlar
 import Ayarlar from "./pages/Yonetim/Ayarlar/Ayarlar.jsx";
@@ -340,8 +342,8 @@ export default function App() {
           <Route path="/malzemeTanimi" element={<MalzemeTanimlari />} />
           <Route path="/malzemeDepolari" element={<MalzemeDepolari />} />
           <Route path="/malzemeGirisFisi" element={<GirisFisleri />} />
-          <Route path="/malzemeCikisFisi" element={<GirisFisleri />} />
-          <Route path="/malzemeTransferFisi" element={<GirisFisleri />} />
+          <Route path="/malzemeCikisFisi" element={<CikisFisleri />} />
+          <Route path="/malzemeTransferFisi" element={<TransferFisleri />} />
           <Route path="/stokSayimlari" element={<Hazirlaniyor />} />
           <Route path="/hizliMaliyetlendirme" element={<Hazirlaniyor />} />
           <Route path="/malzemeTransferOnayIslemleri" element={<Hazirlaniyor />} />
