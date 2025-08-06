@@ -282,16 +282,16 @@ const GirisFisleri = () => {
         render: (text) => formatDate(text),
       },
       {
-        title: t("firmaTanimi ?"),
-        dataIndex: "firmaTanim",
-        key: "firmaTanim",
+        title: t("firmaTanimi"),
+        dataIndex: "SFS_CARI",
+        key: "SFS_CARI",
         width: 190,
         ellipsis: true,
         visible: true,
         sorter: (a, b) => {
-          if (a.firmaTanim === null) return -1;
-          if (b.firmaTanim === null) return 1;
-          return a.firmaTanim.localeCompare(b.firmaTanim);
+          if (a.SFS_CARI === null) return -1;
+          if (b.SFS_CARI === null) return 1;
+          return a.SFS_CARI.localeCompare(b.SFS_CARI);
         },
       },
       {

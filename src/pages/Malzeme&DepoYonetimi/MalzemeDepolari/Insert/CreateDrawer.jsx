@@ -174,7 +174,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
       DEP_OZEL_ALAN_7: String(data.ozelAlan7),
       DEP_OZEL_ALAN_8: String(data.ozelAlan8),
       DEP_FAX: String(data.fax),
-      DEP_TEL: String(data.tel),
+      DEP_TEL: String(data.telefon),
       DEP_EMAIL: String(data.email),
       DEP_ADRES: String(data.adres),
     };
