@@ -6,7 +6,7 @@ import { t } from "i18next";
 import OzelAlanlar from "./components/OzelAlanlar/OzelAlanlar.jsx";
 import FisIcerigi from "./components/FisIcerigi/FisIcerigi.jsx";
 import ResimUpload from "../../../../../../utils/components/Resim/ResimUpload.jsx";
-import DosyaUpload from "../../../../../../utils/components/Dosya/DosyaUpload.jsx";
+import DosyaUpload from "../../../../../../utils/components/Belgeler/DosyaUpload.jsx";
 const { Text, Link } = Typography;
 const { TextArea } = Input;
 
@@ -86,12 +86,12 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen, s
         </div>
       ),
     }, */
-    {
+    /*  {
       key: "7",
       label: "Resimler",
       // children: <SureBilgileri fieldRequirements={fieldRequirements} />,
       children: <ResimUpload selectedRowID={selectedRowID} refGroup={"MALZEME_TALEP"} />,
-    },
+    }, */
     {
       key: "8",
       label: "Dosyalar",
