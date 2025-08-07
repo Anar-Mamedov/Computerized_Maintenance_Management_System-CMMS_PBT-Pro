@@ -139,7 +139,7 @@ DraggableRow.displayName = "DraggableRow";
 
 // Sütunların sürüklenebilir olmasını sağlayan component sonu
 
-const GirisFisleri = () => {
+const CikisFisleri = () => {
   const formMethods = useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [data, setData] = useState([]);
@@ -477,9 +477,9 @@ const GirisFisleri = () => {
 
   // Manage columns from localStorage or default
   const [columns, setColumns] = useState(() => {
-    const savedOrder = localStorage.getItem("columnOrderGirisFisleri");
-    const savedVisibility = localStorage.getItem("columnVisibilityGirisFisleri");
-    const savedWidths = localStorage.getItem("columnWidthsGirisFisleri");
+    const savedOrder = localStorage.getItem("columnOrderCikisFisleri");
+    const savedVisibility = localStorage.getItem("columnVisibilityCikisFisleri");
+    const savedWidths = localStorage.getItem("columnWidthsCikisFisleri");
 
     let order = savedOrder ? JSON.parse(savedOrder) : [];
     let visibility = savedVisibility ? JSON.parse(savedVisibility) : {};
@@ -497,9 +497,9 @@ const GirisFisleri = () => {
       }
     });
 
-    localStorage.setItem("columnOrderGirisFisleri", JSON.stringify(order));
-    localStorage.setItem("columnVisibilityGirisFisleri", JSON.stringify(visibility));
-    localStorage.setItem("columnWidthsGirisFisleri", JSON.stringify(widths));
+    localStorage.setItem("columnOrderCikisFisleri", JSON.stringify(order));
+    localStorage.setItem("columnVisibilityCikisFisleri", JSON.stringify(visibility));
+    localStorage.setItem("columnWidthsCikisFisleri", JSON.stringify(widths));
 
     return order.map((key) => {
       const column = initialColumns.find((col) => col.key === key);
@@ -509,9 +509,9 @@ const GirisFisleri = () => {
 
   // Save columns to localStorage
   useEffect(() => {
-    localStorage.setItem("columnOrderGirisFisleri", JSON.stringify(columns.map((col) => col.key)));
+    localStorage.setItem("columnOrderCikisFisleri", JSON.stringify(columns.map((col) => col.key)));
     localStorage.setItem(
-      "columnVisibilityGirisFisleri",
+      "columnVisibilityCikisFisleri",
       JSON.stringify(
         columns.reduce(
           (acc, col) => ({
@@ -523,7 +523,7 @@ const GirisFisleri = () => {
       )
     );
     localStorage.setItem(
-      "columnWidthsGirisFisleri",
+      "columnWidthsCikisFisleri",
       JSON.stringify(
         columns.reduce(
           (acc, col) => ({
@@ -588,9 +588,9 @@ const GirisFisleri = () => {
 
   // Reset columns
   const resetColumns = () => {
-    localStorage.removeItem("columnOrderGirisFisleri");
-    localStorage.removeItem("columnVisibilityGirisFisleri");
-    localStorage.removeItem("columnWidthsGirisFisleri");
+    localStorage.removeItem("columnOrderCikisFisleri");
+    localStorage.removeItem("columnVisibilityCikisFisleri");
+    localStorage.removeItem("columnWidthsCikisFisleri");
     window.location.reload();
   };
 
@@ -799,4 +799,4 @@ const GirisFisleri = () => {
   );
 };
 
-export default memo(GirisFisleri);
+export default memo(CikisFisleri);

@@ -15,25 +15,24 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
   // Silme işlemini tetikleyecek fonksiyon
   const handleDelete = async () => {
     let isError = false;
-    // Map over selectedRows to create an array of keys
-    const keysToDelete = selectedRows.map((row) => row.key);
+    // Seçili satırlar üzerinde döngü yaparak her birini sil
+    for (const row of selectedRows) {
+      try {
+        // Silme API isteğini gönder
 
-    try {
-      // Silme API isteğini gönder, body olarak anahtar dizisini gönder
-      const response = await AxiosInstance.post(`MaterialReceipt/DeleteReceiptById`, keysToDelete);
-      console.log("Silme işlemi başarılı:", response);
-      if (response.data.statusCode === 200 || response.data.statusCode === 201 || response.data.statusCode === 202 || response.data.statusCode === 204) {
-        message.success("İşlem Başarılı.");
-      } else if (response.data.statusCode === 401) {
-        message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
-      } else {
-        message.error("İşlem Başarısız.");
+        const response = await AxiosInstance.post(`DeleteMalzemeFis?fisID=${row.key}`);
+        console.log("Silme işlemi başarılı:", response);
+        if (response.status_code === 200 || response.status_code === 201) {
+          message.success("İşlem Başarılı.");
+        } else if (response.status_code === 401) {
+          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+        } else {
+          message.error("İşlem Başarısız.");
+        }
+        // Burada başarılı silme işlemi sonrası yapılacak işlemler bulunabilir.
+      } catch (error) {
+        console.error("Silme işlemi sırasında hata oluştu:", error);
       }
-      // Burada başarılı silme işlemi sonrası yapılacak işlemler bulunabilir.
-    } catch (error) {
-      console.error("Silme işlemi sırasında hata oluştu:", error);
-      message.error("Silme işlemi sırasında bir hata oluştu."); // Kullanıcıya hata mesajı göster
-      isError = true; // Hata durumunu işaretle
     }
     // Tüm silme işlemleri tamamlandıktan sonra ve hata oluşmamışsa refreshTableData'i çağır
     if (!isError) {
