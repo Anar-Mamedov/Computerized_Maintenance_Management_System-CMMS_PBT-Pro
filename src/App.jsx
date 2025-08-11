@@ -114,23 +114,6 @@ const rawItems = [
     false
   ),
   getItem(
-    "Malzeme & Depo Yönetimi",
-    "malzeme&depo",
-    <TeamOutlined />,
-    [
-      getItem("Malzeme Tanımı", "malzemeTanimi", true),
-      getItem("Malzeme Depoları", "malzemeDepolari", true),
-      getItem("Malzeme Giriş Fişi", "malzemeGirisFisi", true),
-      getItem("Malzeme Çıkış Fişi", "malzemeCikisFisi", true),
-      getItem("Malzeme Transfer Fişi", "malzemeTransferFisi", true),
-      /*  getItem("Stok Sayımları", "stokSayimlari", true),
-      getItem("Hızlı Maliyetlendirme", "hizliMaliyetlendirme", true),
-      getItem("Malzeme Transfer Onay İşlemleri", "malzemeTransferOnayIslemleri", true), */
-      // getItem("Team 2", "team2", true)
-    ],
-    false
-  ),
-  getItem(
     "Bakım ve Arıza Yönetimi",
     "bakim&ariza",
     <UserOutlined />,
@@ -148,6 +131,24 @@ const rawItems = [
     ],
     false
   ),
+  getItem(
+    "Malzeme & Depo Yönetimi",
+    "malzeme&depo",
+    <TeamOutlined />,
+    [
+      getItem("Malzeme Tanımı", "malzemeTanimi", true),
+      getItem("Malzeme Depoları", "malzemeDepolari", true),
+      getItem("Malzeme Giriş Fişi", "malzemeGirisFisi", true),
+      getItem("Malzeme Çıkış Fişi", "malzemeCikisFisi", true),
+      getItem("Malzeme Transfer Fişi", "malzemeTransferFisi", true),
+      /*  getItem("Stok Sayımları", "stokSayimlari", true),
+      getItem("Hızlı Maliyetlendirme", "hizliMaliyetlendirme", true),
+      getItem("Malzeme Transfer Onay İşlemleri", "malzemeTransferOnayIslemleri", true), */
+      // getItem("Team 2", "team2", true)
+    ],
+    false
+  ),
+
   getItem(
     "Personel Yönetimi",
     "personelYonetimi",
