@@ -3,18 +3,17 @@ import tr_TR from "antd/es/locale/tr_TR";
 import { PlusOutlined } from "@ant-design/icons";
 import { Button, Space, ConfigProvider, Modal, message } from "antd";
 import React, { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import { t } from "i18next";
 import MainTabs from "./components/MainTabs/MainTabs";
 import { useForm, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
 import AxiosInstance from "../../../../api/http.jsx";
-import Footer from "../Footer";
 import SecondTabs from "./components/SecondTabs/SecondTabs.jsx";
 // import SecondTabs from "./components/secondTabs/secondTabs";
 
 export default function CreateModal({ selectedLokasyonId, onRefresh }) {
   const [open, setOpen] = useState(false);
-  const [periyodikBakim, setPeriyodikBakim] = useState("");
 
   const showModal = () => {
     setOpen(true);
@@ -102,11 +101,14 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
   //* export
   const onSubmit = (data) => {
     const Body = {
-      makineler: [{ makineId: data.fisIcerigi.makineId, lokasyonId: data.fisIcerigi.makineLokasyonID }],
-      baslamaTarih: data.baslamaZamani,
-      baslamaSaat: data.baslamaSaati,
-      bitisTarih: data.bitisZamani,
-      bitisSaat: data.bitisSaati,
+      makineler: (Array.isArray(data.fisIcerigi) ? data.fisIcerigi : []).map((item) => ({
+        makineId: item.makineId,
+        lokasyonId: item.makineLokasyonID,
+      })),
+      baslamaTarih: formatDateWithDayjs(data.baslamaZamani),
+      baslamaSaat: formatTimeWithDayjs(data.baslamaSaati),
+      bitisTarih: formatDateWithDayjs(data.bitisZamani),
+      bitisSaat: formatTimeWithDayjs(data.bitisSaati),
       sure: data.durusSuresiDakika,
       saatMaliyet: data.durusMaliyetiSaat,
       toplamMaliyet: data.toplamMaliyet,
@@ -171,15 +173,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
     }
   }, [selectedLokasyonId, methods]);
 
-  const periyodikBilgisi = watch("periyodikBilgisi");
-
-  useEffect(() => {
-    if (periyodikBilgisi === true) {
-      setPeriyodikBakim("[Periyodik Bakım]");
-    } else {
-      setPeriyodikBakim("");
-    }
-  }, [periyodikBilgisi]);
+  // periyodikBilgisi takibi ve state'i kaldırıldı (kullanılmıyordu)
 
   return (
     <FormProvider {...methods}>
