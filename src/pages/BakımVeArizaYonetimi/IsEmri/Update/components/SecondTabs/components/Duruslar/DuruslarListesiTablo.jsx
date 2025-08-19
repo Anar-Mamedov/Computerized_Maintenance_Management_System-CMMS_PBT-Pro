@@ -160,7 +160,7 @@ export default function DuruslarListesiTablo({ isActive }) {
   const fetch = useCallback(() => {
     if (isActive) {
       setLoading(true);
-      AxiosInstance.get(`FetchIsEmriDurusList?isemriID=${secilenIsEmriID}`)
+      AxiosInstance.get(`FetchIsEmriDurusList?isemriID=${secilenIsEmriID}&durusID=0`)
         .then((response) => {
           const fetchedData = response.map((item) => ({
             ...item,
@@ -203,14 +203,7 @@ export default function DuruslarListesiTablo({ isActive }) {
 
   return (
     <div style={{ marginBottom: "25px" }}>
-      <CreateModal
-        onRefresh={refreshTable}
-        secilenIsEmriID={secilenIsEmriID}
-        lokasyon={lokasyon}
-        makineTanim={makineTanim}
-        lokasyonID={lokasyonID}
-        makineID={makineID}
-      />
+      <CreateModal onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} lokasyon={lokasyon} makineTanim={makineTanim} lokasyonID={lokasyonID} makineID={makineID} />
       <Table
         rowSelection={{
           type: "radio",

@@ -62,11 +62,11 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen })
       label: "Sigorta",
       children: <Sigorta fieldRequirements={fieldRequirements} />,
     },*/
-    {
+    /* {
       key: "4",
       label: t("makineListesi"),
       children: <FisIcerigi modalOpen={modalOpen} />,
-    },
+    }, */
 
     /* {
       key: "5",
