@@ -16,28 +16,12 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
   const [open, setOpen] = useState(false);
   const [periyodikBakim, setPeriyodikBakim] = useState("");
 
-  const getFisNo = async () => {
-    try {
-      const response = await AxiosInstance.get("ModulKoduGetir?modulKodu=SFS_CIKIS_FIS_NO");
-      if (response) {
-        setValue("fisNo", response);
-      }
-    } catch (error) {
-      console.error("Error fetching fisNo:", error);
-      message.error("Fiş numarası alınamadı!");
-    }
-  };
-
   const showModal = () => {
     setOpen(true);
   };
 
   useEffect(() => {
     if (open) {
-      getFisNo();
-      setValue("tarih", dayjs());
-      setValue("saat", dayjs());
-
       // Reset the fisIcerigi with a timeout to avoid focus errors
       setTimeout(() => {
         setValue("fisIcerigi", []);
@@ -58,42 +42,19 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
         // Then reset the form with a slight delay
         setTimeout(() => {
           methods.reset({
-            fisNo: null,
-            firma: null,
-            firmaID: null,
-            makineID: null,
-            makine: null,
-            tarih: null,
-            saat: null,
-            islemTipi: null,
-            islemTipiID: null,
-            girisDeposu: null,
-            girisDeposuID: null,
-            lokasyon: null,
-            lokasyonID: null,
-            siparisNo: null,
-            siparisNoID: null,
-            proje: null,
-            projeID: null,
-            totalAraToplam: null,
-            totalIndirim: null,
-            totalKdvToplam: null,
-            totalGenelToplam: null,
-            aciklama: null,
-            ozelAlan1: null,
-            ozelAlan2: null,
-            ozelAlan3: null,
-            ozelAlan4: null,
-            ozelAlan5: null,
-            ozelAlan6: null,
-            ozelAlan7: null,
-            ozelAlan8: null,
-            ozelAlan9: null,
-            ozelAlan9ID: null,
-            ozelAlan10: null,
-            ozelAlan10ID: null,
-            ozelAlan11: null,
-            ozelAlan12: null,
+            durusNedeni: undefined,
+            durusNedeniID: undefined,
+            planli: undefined,
+            baslamaZamani: undefined,
+            baslamaSaati: undefined,
+            bitisZamani: undefined,
+            bitisSaati: undefined,
+            durusSuresiDakika: undefined,
+            durusMaliyetiSaat: undefined,
+            toplamMaliyet: undefined,
+            proje: undefined,
+            projeID: undefined,
+            aciklama: undefined,
             fisIcerigi: [],
           });
         }, 100);
@@ -109,42 +70,19 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
   //* export
   const methods = useForm({
     defaultValues: {
-      fisNo: null,
-      firma: null,
-      firmaID: null,
-      makineID: null,
-      makine: null,
-      tarih: null,
-      saat: null,
-      islemTipi: null,
-      islemTipiID: null,
-      girisDeposu: null,
-      girisDeposuID: null,
-      lokasyon: null,
-      lokasyonID: null,
-      siparisNo: null,
-      siparisNoID: null,
-      proje: null,
-      projeID: null,
-      totalAraToplam: null,
-      totalIndirim: null,
-      totalKdvToplam: null,
-      totalGenelToplam: null,
-      aciklama: null,
-      ozelAlan1: null,
-      ozelAlan2: null,
-      ozelAlan3: null,
-      ozelAlan4: null,
-      ozelAlan5: null,
-      ozelAlan6: null,
-      ozelAlan7: null,
-      ozelAlan8: null,
-      ozelAlan9: null,
-      ozelAlan9ID: null,
-      ozelAlan10: null,
-      ozelAlan10ID: null,
-      ozelAlan11: null,
-      ozelAlan12: null,
+      durusNedeni: undefined,
+      durusNedeniID: undefined,
+      planli: undefined,
+      baslamaZamani: undefined,
+      baslamaSaati: undefined,
+      bitisZamani: undefined,
+      bitisSaati: undefined,
+      durusSuresiDakika: undefined,
+      durusMaliyetiSaat: undefined,
+      toplamMaliyet: undefined,
+      proje: undefined,
+      projeID: undefined,
+      aciklama: undefined,
       fisIcerigi: [],
     },
   });
@@ -164,81 +102,21 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
   //* export
   const onSubmit = (data) => {
     const Body = {
-      fisNo: data.fisNo,
-      aracId: data.makineID || -1,
-      // firma: data.firma,
-      firmaId: Number(data.firmaID) || -1,
-      tarih: formatDateWithDayjs(data.tarih),
-      saat: formatTimeWithDayjs(data.saat),
-      // islemTipi: data.islemTipi,
-      islemTipiKodId: Number(data.islemTipiID) || -1,
-      // girisDeposu: data.girisDeposu,
-      cikisDepoSiraNo: Number(data.girisDeposuID) || -1,
-      // lokasyon: data.lokasyon,
-      lokasyonId: Number(data.lokasyonID) || -1,
-      // siparisNo: data.siparisNo,
-      siparisNoId: Number(data.siparisNoID) || -1,
-      // proje: data.proje,
-      projeId: Number(data.projeID) || -1,
-      araToplam: Number(data.totalAraToplam),
-      indirimliToplam: Number(data.totalIndirim),
-      kdvToplam: Number(data.totalKdvToplam),
-      genelToplam: Number(data.totalGenelToplam),
+      makineler: [{ makineId: data.fisIcerigi.makineId, lokasyonId: data.fisIcerigi.makineLokasyonID }],
+      baslamaTarih: data.baslamaZamani,
+      baslamaSaat: data.baslamaSaati,
+      bitisTarih: data.bitisZamani,
+      bitisSaat: data.bitisSaati,
+      sure: data.durusSuresiDakika,
+      saatMaliyet: data.durusMaliyetiSaat,
+      toplamMaliyet: data.toplamMaliyet,
+      nedenKodId: data.durusNedeniID,
       aciklama: data.aciklama,
-      ozelAlan1: data.ozelAlan1,
-      ozelAlan2: data.ozelAlan2,
-      ozelAlan3: data.ozelAlan3,
-      ozelAlan4: data.ozelAlan4,
-      ozelAlan5: data.ozelAlan5,
-      ozelAlan6: data.ozelAlan6,
-      ozelAlan7: data.ozelAlan7,
-      ozelAlan8: data.ozelAlan8,
-      ozelAlan9: data.ozelAlan9,
-      ozelAlan10: data.ozelAlan10,
-      ozelAlanKodId11: Number(data.ozelAlan11ID) || 0,
-      ozelAlanKodId12: Number(data.ozelAlan12ID) || 0,
-      ozelAlanKodId13: Number(data.ozelAlan13ID) || 0,
-      ozelAlanKodId14: Number(data.ozelAlan14ID) || 0,
-      ozelAlanKodId15: Number(data.ozelAlan15ID) || 0,
-      ozelAlan16: Number(data.ozelAlan16) || 0,
-      ozelAlan17: Number(data.ozelAlan17) || 0,
-      ozelAlan18: Number(data.ozelAlan18) || 0,
-      ozelAlan19: Number(data.ozelAlan19) || 0,
-      ozelAlan20: Number(data.ozelAlan20) || 0,
-      islemTip: "03",
-      gc: "C",
-      fisTip: "MALZEME",
-      materialMovements:
-        data.fisIcerigi?.map((item) => ({
-          tarih: formatDateWithDayjs(data.tarih),
-          firmaId: Number(data.firmaID),
-          cikisDepoSiraNo: Number(data.girisDeposuID),
-          isPriceChanged: item.isPriceChanged || false,
-          // malzemeKodu: item.malzemeKodu,
-          // malzemeTanimi: item.malzemeTanimi,
-          // malzemeTipi: item.malzemeTipi,
-          malzemeId: Number(item.malzemeId),
-          // birim: item.birim,
-          birimKodId: Number(item.birimKodId),
-          miktar: Number(item.miktar),
-          fiyat: Number(item.fiyat),
-          araToplam: Number(item.araToplam),
-          indirimOran: Number(item.indirimOrani),
-          indirim: Number(item.indirimTutari),
-          kdvOran: Number(item.kdvOrani),
-          kdvDahilHaric: item.kdvDahilHaric ? "D" : "H",
-          kdvTutar: Number(item.kdvTutar),
-          toplam: Number(item.toplam),
-          // lokasyon: item.malzemeLokasyon,
-          lokasyonId: Number(item.malzemeLokasyonID),
-          masrafmerkezi: Number(item.masrafMerkeziID),
-          aciklama: item.aciklama,
-          gc: "C",
-          fisTip: "MALZEME",
-        })) || [],
+      planli: data.planli,
+      projeId: data.projeID,
     };
 
-    AxiosInstance.post("UpsertMalzemeFisWithItems", Body)
+    AxiosInstance.post("AddMakineDurus", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);
@@ -253,42 +131,19 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
           // Then reset the form with a slight delay
           setTimeout(() => {
             methods.reset({
-              fisNo: null,
-              firma: null,
-              firmaID: null,
-              makineID: null,
-              makine: null,
-              tarih: null,
-              saat: null,
-              islemTipi: null,
-              islemTipiID: null,
-              girisDeposu: null,
-              girisDeposuID: null,
-              lokasyon: null,
-              lokasyonID: null,
-              siparisNo: null,
-              siparisNoID: null,
-              proje: null,
-              projeID: null,
-              totalAraToplam: null,
-              totalIndirim: null,
-              totalKdvToplam: null,
-              totalGenelToplam: null,
-              aciklama: null,
-              ozelAlan1: null,
-              ozelAlan2: null,
-              ozelAlan3: null,
-              ozelAlan4: null,
-              ozelAlan5: null,
-              ozelAlan6: null,
-              ozelAlan7: null,
-              ozelAlan8: null,
-              ozelAlan9: null,
-              ozelAlan9ID: null,
-              ozelAlan10: null,
-              ozelAlan10ID: null,
-              ozelAlan11: null,
-              ozelAlan12: null,
+              durusNedeni: undefined,
+              durusNedeniID: undefined,
+              planli: undefined,
+              baslamaZamani: undefined,
+              baslamaSaati: undefined,
+              bitisZamani: undefined,
+              bitisSaati: undefined,
+              durusSuresiDakika: undefined,
+              durusMaliyetiSaat: undefined,
+              toplamMaliyet: undefined,
+              proje: undefined,
+              projeID: undefined,
+              aciklama: undefined,
               fisIcerigi: [],
             });
           }, 100);
