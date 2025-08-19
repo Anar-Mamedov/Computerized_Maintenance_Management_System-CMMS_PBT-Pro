@@ -1,16 +1,13 @@
 import React, { useContext, useEffect, useRef, useState, useCallback } from "react";
-import { Table, Button, Form as AntForm, Input, InputNumber, Popconfirm, Modal, Typography, message } from "antd";
-import { useFieldArray, useFormContext, Controller } from "react-hook-form";
+import { Table, Button, Form as AntForm, Input, InputNumber, Modal, message } from "antd";
+import { useFieldArray, useFormContext } from "react-hook-form";
 import { PlusOutlined } from "@ant-design/icons";
-import { t } from "i18next";
 import Malzemeler from "../../../../../../../../pages/Malzeme&DepoYonetimi/MalzemeTanimlari/Table/Table";
 // import PlakaSelectBox from "../../../../../../../../components/PlakaSelectbox";
 import LokasyonTablo from "../../../../../../../../utils/components/LokasyonTablo";
-import MasrafMerkeziTablo from "../../../../../../../../utils/components/MasrafMerkeziTablo";
-import KodIDSelectbox from "../../../../../../../../utils/components/KodIDSelectbox";
+// Removed unused MasrafMerkeziTablo and KodIDSelectbox imports after column simplification
 
-const { Text, Link } = Typography;
-const { TextArea } = Input;
+// Removed unused Typography and TextArea destructuring
 
 const EditableContext = React.createContext(null);
 
@@ -141,7 +138,7 @@ function FisIcerigi({ modalOpen }) {
   // Watch for girisDeposuID to control button state
   const girisDeposuID = watch("girisDeposuID");
 
-  const { fields, append, remove, replace } = useFieldArray({
+  const { fields, append, replace } = useFieldArray({
     control,
     name: "fisIcerigi",
     shouldUnregister: true,
@@ -493,158 +490,21 @@ function FisIcerigi({ modalOpen }) {
 
   const defaultColumns = [
     {
-      title: "Malzeme Kodu",
+      title: "Makine Kodu",
       dataIndex: "malzemeKodu",
       key: "malzemeKodu",
-      width: 150,
+      width: 160,
       editable: false,
       inputType: "text",
     },
     {
-      title: "Malzeme Tanimi",
+      title: "Makine Tanımı",
       dataIndex: "malzemeTanimi",
       key: "malzemeTanimi",
-      width: 200,
+      width: 220,
       editable: false,
       inputType: "text",
     },
-    /* {
-      title: "Malzeme Tipi",
-      dataIndex: "malzemeTipi",
-      key: "malzemeTipi",
-      width: 150,
-      editable: false,
-      inputType: "text",
-    }, */
-    {
-      title: "Miktar",
-      dataIndex: "miktar",
-      key: "miktar",
-      width: 100,
-      editable: true,
-      inputType: "number",
-      render: (text, record) => (
-        <div className="">
-          <span>{Number(text).toLocaleString(localStorage.getItem("i18nextLng"))}</span>
-        </div>
-      ),
-    },
-    {
-      title: "Birim",
-      dataIndex: "birim",
-      key: "birim",
-      width: 150,
-      editable: false,
-      render: (text, record, index) => (
-        <Controller
-          name={`fisIcerigi.${index}.birim`}
-          control={control}
-          render={({ field }) => <KodIDSelectbox name1={`fisIcerigi.${index}.birim`} kodID={32001} isRequired={false} />}
-        />
-      ),
-    },
-    {
-      title: "Fiyat",
-      dataIndex: "fiyat",
-      key: "fiyat",
-      width: 120,
-      editable: true,
-      inputType: "number",
-      render: (text, record) => (
-        <div className="">
-          <span>{Number(text).toLocaleString(localStorage.getItem("i18nextLng"), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-        </div>
-      ),
-    },
-    {
-      title: "Ara Toplam",
-      dataIndex: "araToplam",
-      key: "araToplam",
-      width: 120,
-      editable: false,
-      inputType: "number",
-      render: (text, record) => (
-        <div className="">
-          <span>{Number(text).toLocaleString(localStorage.getItem("i18nextLng"), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-        </div>
-      ),
-    },
-    {
-      title: "İndirim %",
-      dataIndex: "indirimOrani",
-      key: "indirimOrani",
-      width: 80,
-      editable: true,
-      inputType: "number",
-      render: (text, record) => (
-        <div className="">
-          <span>{Number(text).toLocaleString(localStorage.getItem("i18nextLng"))}</span>
-        </div>
-      ),
-    },
-    {
-      title: "İndirim Tutarı",
-      dataIndex: "indirimTutari",
-      key: "indirimTutari",
-      width: 120,
-      editable: true,
-      inputType: "number",
-      render: (text, record) => (
-        <div className="">
-          <span>{Number(text).toLocaleString(localStorage.getItem("i18nextLng"), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-        </div>
-      ),
-    },
-    {
-      title: "KDV %",
-      dataIndex: "kdvOrani",
-      key: "kdvOrani",
-      width: 80,
-      editable: false,
-      inputType: "number",
-      render: (text, record) => (
-        <div className="">
-          <span>{Number(text).toLocaleString(localStorage.getItem("i18nextLng"))}</span>
-        </div>
-      ),
-    },
-    {
-      title: "KDV D/H",
-      dataIndex: "kdvDahilHaric",
-      key: "kdvDahilHaric",
-      width: 100,
-      editable: false,
-      ellipsis: true,
-      inputType: "text",
-      render: (value) => (value ? "Dahil" : "Haric"),
-    },
-    {
-      title: "KDV Tutarı",
-      dataIndex: "kdvTutar",
-      key: "kdvTutar",
-      width: 120,
-      editable: false,
-      inputType: "number",
-      render: (text, record) => (
-        <div className="">
-          <span>{Number(text).toLocaleString(localStorage.getItem("i18nextLng"), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-        </div>
-      ),
-    },
-    {
-      title: "Toplam",
-      dataIndex: "toplam",
-      key: "toplam",
-      width: 120,
-      editable: false,
-      inputType: "number",
-      render: (text, record) => (
-        <div className="">
-          <span>{Number(text).toLocaleString(localStorage.getItem("i18nextLng"), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-        </div>
-      ),
-    },
-
     {
       title: "Lokasyon",
       dataIndex: "malzemeLokasyon",
@@ -658,7 +518,6 @@ function FisIcerigi({ modalOpen }) {
           lokasyonFieldName={`fisIcerigi.${index}.malzemeLokasyon`}
           lokasyonIdFieldName={`fisIcerigi.${index}.malzemeLokasyonID`}
           onSubmit={(selectedData) => {
-            // Update the specific row's location data
             const newData = [...dataSource];
             if (newData[index]) {
               newData[index] = {
@@ -668,13 +527,11 @@ function FisIcerigi({ modalOpen }) {
               };
               setDataSource(newData);
 
-              // Update form values
               setValue(`fisIcerigi.${index}.malzemeLokasyon`, selectedData.LOK_TANIM);
               setValue(`fisIcerigi.${index}.malzemeLokasyonID`, selectedData.key);
             }
           }}
           onClear={() => {
-            // Update the specific row's location data to empty
             const newData = [...dataSource];
             if (newData[index]) {
               newData[index] = {
@@ -689,68 +546,12 @@ function FisIcerigi({ modalOpen }) {
       ),
     },
     {
-      title: "Masraf Merkezi",
-      dataIndex: "masrafMerkezi",
-      key: "masrafMerkezi",
-      width: 200,
-      ellipsis: true,
-      render: (text, record, index) => (
-        <MasrafMerkeziTablo
-          disabled={false}
-          masrafMerkeziFieldName={`fisIcerigi.${index}.masrafMerkezi`}
-          masrafMerkeziIdFieldName={`fisIcerigi.${index}.masrafMerkeziID`}
-          onSubmit={(selectedData) => {
-            // Update the specific row's masraf merkezi data
-            const newData = [...dataSource];
-            if (newData[index]) {
-              newData[index] = {
-                ...newData[index],
-                masrafMerkezi: selectedData.MAM_KOD,
-                masrafMerkeziID: selectedData.key,
-              };
-              setDataSource(newData);
-
-              // Update form values
-              setValue(`fisIcerigi.${index}.masrafMerkezi`, selectedData.MAM_KOD);
-              setValue(`fisIcerigi.${index}.masrafMerkeziID`, selectedData.key);
-            }
-          }}
-          onClear={() => {
-            // Update the specific row's masraf merkezi data to empty
-            const newData = [...dataSource];
-            if (newData[index]) {
-              newData[index] = {
-                ...newData[index],
-                masrafMerkezi: "",
-                masrafMerkeziID: null,
-              };
-              setDataSource(newData);
-            }
-          }}
-        />
-      ),
-    },
-    {
-      title: "Açıklama",
-      dataIndex: "aciklama",
-      key: "aciklama",
-      width: 200,
-      editable: true,
+      title: "Makine Tipi",
+      dataIndex: "malzemeTipi",
+      key: "malzemeTipi",
+      width: 160,
+      editable: false,
       inputType: "text",
-      ellipsis: true,
-    },
-    {
-      title: "İşlemler",
-      dataIndex: "operation",
-      width: 100,
-      render: (_, record) =>
-        dataSource.length >= 1 ? (
-          <Popconfirm title="Silmek istediğinize emin misiniz?" onConfirm={() => remove(dataSource.findIndex((item) => item.id === record.id))}>
-            <Button type="link" danger>
-              Sil
-            </Button>
-          </Popconfirm>
-        ) : null,
     },
   ];
 
@@ -774,7 +575,7 @@ function FisIcerigi({ modalOpen }) {
   return (
     <div style={{ marginTop: "-55px", zIndex: 10 }}>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
-        <Button style={{ zIndex: 21 }} type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)} disabled={!girisDeposuID}>
+        <Button style={{ zIndex: 21 }} type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
           Ekle
         </Button>
       </div>

@@ -259,7 +259,7 @@ export default function MainTabs({ modalOpen }) {
 
   return (
     <div style={{ display: "flex", marginBottom: "20px", flexDirection: "column", gap: "10px", width: "100%" }}>
-      <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: "10px", width: "100%", maxWidth: "860px" }}>
+      <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: "10px", width: "100%", maxWidth: "655px" }}>
         <div
           style={{
             display: "flex",
@@ -295,7 +295,7 @@ export default function MainTabs({ modalOpen }) {
             alignItems: "center",
             justifyContent: "space-between",
             width: "100%",
-            maxWidth: "400px",
+            maxWidth: "225px",
             gap: "10px",
             flexDirection: "row",
           }}
@@ -306,8 +306,6 @@ export default function MainTabs({ modalOpen }) {
               display: "flex",
               flexFlow: "column wrap",
               alignItems: "flex-start",
-              width: "100%",
-              maxWidth: "220px",
             }}
           >
             <CheckboxInput name="planli" />
