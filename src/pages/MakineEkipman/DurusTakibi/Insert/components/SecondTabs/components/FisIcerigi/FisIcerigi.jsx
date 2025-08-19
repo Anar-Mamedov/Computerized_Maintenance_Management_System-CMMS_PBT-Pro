@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState, useCallback } from "rea
 import { useTranslation } from "react-i18next";
 import { Table, Button, Form as AntForm, Input, InputNumber, message } from "antd";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 // import Malzemeler from "../../../../../../../../pages/Malzeme&DepoYonetimi/MalzemeTanimlari/Table/Table";
 import MakineTablo from "../../../../../../../../utils/components/Machina/MakineTablo";
 // import PlakaSelectBox from "../../../../../../../../components/PlakaSelectbox";
@@ -418,6 +418,19 @@ function FisIcerigi({ modalOpen }) {
     }
   };
 
+  const handleDelete = (id) => {
+    try {
+      const newData = (dataSource || []).filter((item) => item.id !== id);
+      setDataSource(newData);
+      // Sync form array
+      setTimeout(() => {
+        replace(newData);
+      }, 0);
+    } catch (error) {
+      console.error("Error deleting row:", error);
+    }
+  };
+
   const components = {
     body: {
       row: EditableRow,
@@ -430,23 +443,23 @@ function FisIcerigi({ modalOpen }) {
       title: t("makineKodu"),
       dataIndex: "malzemeKodu",
       key: "malzemeKodu",
-      width: 160,
-      editable: false,
-      inputType: "text",
+      width: 150,
+      ellipsis: true,
+      visible: true,
     },
     {
       title: t("makineTanimi"),
       dataIndex: "malzemeTanimi",
       key: "malzemeTanimi",
       width: 220,
-      editable: false,
-      inputType: "text",
+      ellipsis: true,
+      visible: true,
     },
     {
       title: t("lokasyon"),
       dataIndex: "malzemeLokasyon",
       key: "malzemeLokasyon",
-      width: 250,
+      width: 180,
       ellipsis: true,
       visible: true,
     },
@@ -454,9 +467,17 @@ function FisIcerigi({ modalOpen }) {
       title: t("makineTipi"),
       dataIndex: "malzemeTipi",
       key: "malzemeTipi",
-      width: 160,
-      editable: false,
-      inputType: "text",
+      width: 220,
+      ellipsis: true,
+      visible: true,
+    },
+    {
+      title: t("sil") || "Sil",
+      key: "actions",
+      width: 60,
+      ellipsis: true,
+      visible: true,
+      render: (_, record) => <Button danger size="small" icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} />,
     },
   ];
 
