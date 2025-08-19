@@ -66,6 +66,12 @@ export default function MainTabs({ modalOpen }) {
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
 
+  // Başlama ve bitiş tarih/saatlerini izle
+  const baslamaZamani = watch("baslamaZamani");
+  const baslamaSaati = watch("baslamaSaati");
+  const bitisZamani = watch("bitisZamani");
+  const bitisSaati = watch("bitisSaati");
+
   // duzenlenmeTarihi ve duzenlenmeSaati alanlarının boş ve ye sistem tarih ve saatinden büyük olup olmadığını kontrol etmek için bir fonksiyon
 
   const validateDateTime = (value) => {
@@ -210,6 +216,29 @@ export default function MainTabs({ modalOpen }) {
       message.error("Fiş numarası kontrolü sırasında hata oluştu!");
     }
   };
+
+  // Başlama ve bitiş tarih/saatlerinden dakika cinsinden süre hesapla ve durusSuresiDakika alanına yaz
+  useEffect(() => {
+    if (!baslamaZamani || !baslamaSaati || !bitisZamani || !bitisSaati) {
+      return;
+    }
+
+    try {
+      const start = dayjs(baslamaZamani).hour(dayjs(baslamaSaati).hour()).minute(dayjs(baslamaSaati).minute()).second(0).millisecond(0);
+
+      const end = dayjs(bitisZamani).hour(dayjs(bitisSaati).hour()).minute(dayjs(bitisSaati).minute()).second(0).millisecond(0);
+
+      const diffInMinutes = end.diff(start, "minute");
+
+      if (!Number.isNaN(diffInMinutes) && diffInMinutes >= 0) {
+        setValue("durusSuresiDakika", diffInMinutes);
+      } else {
+        setValue("durusSuresiDakika", 0);
+      }
+    } catch (e) {
+      // Hata durumunda değeri temizlemez, kullanıcının müdahalesine bırakır
+    }
+  }, [baslamaZamani, baslamaSaati, bitisZamani, bitisSaati, setValue]);
 
   return (
     <div style={{ display: "flex", marginBottom: "20px", flexDirection: "column", gap: "10px", width: "100%" }}>
