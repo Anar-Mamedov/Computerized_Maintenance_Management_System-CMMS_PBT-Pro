@@ -75,6 +75,7 @@ export default function MainTabs({ modalOpen }) {
   const bitisSaati = watch("bitisSaati");
   const durusSuresiDakikaValue = watch("durusSuresiDakika");
   const durusMaliyetiSaatValue = watch("durusMaliyetiSaat");
+  const isEmri = watch("isEmri");
 
   // duzenlenmeTarihi ve duzenlenmeSaati alanlarının boş ve ye sistem tarih ve saatinden büyük olup olmadığını kontrol etmek için bir fonksiyon
 
@@ -257,6 +258,15 @@ export default function MainTabs({ modalOpen }) {
       setValue("toplamMaliyet", 0);
     }
   }, [durusSuresiDakikaValue, durusMaliyetiSaatValue, setValue]);
+
+  // MakineTablo submit işlemini üst bileşende yakalamak için
+  const handleMakineSubmit = (selectedData) => {
+    if (!selectedData) return;
+    setValue("makine", selectedData.MKN_KOD || "");
+    setValue("makineID", selectedData.key || "");
+    setValue("lokasyon1", selectedData.MKN_LOKASYON || "");
+    setValue("lokasyon1ID", selectedData.MKN_LOKASYON_ID || "");
+  };
 
   return (
     <div style={{ display: "flex", marginBottom: "20px", flexDirection: "column", gap: "10px", width: "100%" }}>
@@ -561,7 +571,7 @@ export default function MainTabs({ modalOpen }) {
             maxWidth: "520px",
           }}
         >
-          <MakineTablo />
+          {isEmri ? <TextInput name="makine" isRequired={false} checked={true} /> : <MakineTablo onSubmit={handleMakineSubmit} suppressFormFields={true} />}
         </div>
       </div>
 
@@ -579,7 +589,7 @@ export default function MainTabs({ modalOpen }) {
       >
         <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("lokasyon")}</Text>
         <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "520px" }}>
-          <TextInput name="lokasyon" isRequired={false} checked={true} />
+          <TextInput name="lokasyon1" isRequired={false} checked={true} />
         </div>
       </div>
     </div>

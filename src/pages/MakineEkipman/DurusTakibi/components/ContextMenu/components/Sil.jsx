@@ -20,7 +20,7 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
       try {
         // Silme API isteğini gönder
 
-        const response = await AxiosInstance.post(`DeleteMalzemeFis?fisID=${row.key}`);
+        const response = await AxiosInstance.post(`DeleteMakineDurusBy?durusId=${row.key}&isemri=false`);
         console.log("Silme işlemi başarılı:", response);
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("İşlem Başarılı.");

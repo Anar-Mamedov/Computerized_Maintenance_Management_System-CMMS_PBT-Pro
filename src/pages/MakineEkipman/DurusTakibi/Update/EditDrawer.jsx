@@ -89,8 +89,8 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
 
             setValue("makine", machine.MKN_TANIM || "");
             setValue("makineID", machine.TB_MAKINE_ID ?? item.MKD_MAKINE_ID ?? null);
-            setValue("lokasyon", location.LOK_TANIM || "");
-            setValue("lokasyonID", location.TB_LOKASYON_ID ?? item.MKD_LOKASYON_ID ?? null);
+            setValue("lokasyon1", location.LOK_TANIM || "");
+            setValue("lokasyon1ID", location.TB_LOKASYON_ID ?? item.MKD_LOKASYON_ID ?? null);
 
             const fisRow = {
               id: Date.now() + Math.random(),
@@ -141,10 +141,6 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
   const onSubmit = (data) => {
     // Form verilerini API'nin beklediği formata dönüştür
     const Body = {
-      makineler: (Array.isArray(data.fisIcerigi) ? data.fisIcerigi : []).map((item) => ({
-        makineId: item.makineId,
-        lokasyonId: item.makineLokasyonID,
-      })),
       baslamaTarih: formatDateWithDayjs(data.baslamaZamani),
       baslamaSaat: formatTimeWithDayjs(data.baslamaSaati),
       bitisTarih: formatDateWithDayjs(data.bitisZamani),
@@ -156,6 +152,8 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
       aciklama: data.aciklama,
       planli: data.planli,
       projeId: data.projeID,
+      makineId: data.makineID,
+      lokasyonId: data.lokasyon1ID,
     };
 
     // API'ye POST isteği gönder
@@ -206,9 +204,9 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
         <Modal
-          width="1300px"
+          width="710px"
           centered
-          title={t("girisFisiGuncelle")}
+          title={t("makineDurusGuncelle")}
           open={drawerVisible}
           onCancel={onClose}
           footer={
