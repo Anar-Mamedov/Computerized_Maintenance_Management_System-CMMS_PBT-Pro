@@ -5,16 +5,12 @@ import styled from "styled-components";
 import dayjs from "dayjs";
 import { t } from "i18next";
 import AxiosInstance from "../../../../../../api/http";
-import FirmaSelectBox from "../../../../../../utils/components/FirmaTablo";
-// import PlakaSelectBox from "../../../../../../../_root/components/PlakaSelectbox";
 import MakineTablo from "../../../../../../utils/components/Machina/MakineTablo";
 import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
-import DepoSelectBox from "../../../../../../utils/components/DepoSelectBox";
-import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
-import DepoTablo from "../../../../../../utils/components/DepoTablo";
+import CheckboxInput from "../../../../../../utils/components/Form/CheckboxInput";
 import ProjeTablo from "../../../../../../utils/components/ProjeTablo";
-import SiparisTablo from "../../../../../../utils/components/SiparisTablo";
-import { PlusOutlined } from "@ant-design/icons";
+import NumberInput from "../../../../../../utils/components/NumberInput";
+
 const { Text, Link } = Typography;
 const { TextArea } = Input;
 
@@ -70,27 +66,14 @@ export default function MainTabs({ modalOpen }) {
   } = useFormContext();
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
-  const [selectboxTitle, setSelectboxTitle] = useState("Yetkili Servis");
-  const [initialFisNo, setInitialFisNo] = useState("");
-  const [isFisNoModified, setIsFisNoModified] = useState(false);
-  const [isLokasyonModalOpen, setIsLokasyonModalOpen] = useState(false);
 
-  const handleMinusClick = () => {
-    setValue("servisKodu", "");
-    setValue("servisKoduID", "");
-    setValue("servisTanimi", "");
-    setValue("servisTipi", "");
-    setValue("servisTipiID", "");
-  };
-
-  const handleHasarNoMinusClick = () => {
-    setValue("hasarNo", "");
-    setValue("hasarNoID", "");
-  };
-  const handleIslemiYapan1MinusClick = () => {
-    setValue("islemiYapan1", "");
-    setValue("islemiYapan1ID", "");
-  };
+  // Başlama ve bitiş tarih/saatlerini izle
+  const baslamaZamani = watch("baslamaZamani");
+  const baslamaSaati = watch("baslamaSaati");
+  const bitisZamani = watch("bitisZamani");
+  const bitisSaati = watch("bitisSaati");
+  const durusSuresiDakikaValue = watch("durusSuresiDakika");
+  const durusMaliyetiSaatValue = watch("durusMaliyetiSaat");
 
   // duzenlenmeTarihi ve duzenlenmeSaati alanlarının boş ve ye sistem tarih ve saatinden büyük olup olmadığını kontrol etmek için bir fonksiyon
 
@@ -237,17 +220,46 @@ export default function MainTabs({ modalOpen }) {
     }
   };
 
-  const handleYeniLokasyonPlusClick = () => {
-    setIsLokasyonModalOpen(true);
-  };
-  const handleYeniLokasyonMinusClick = () => {
-    setValue("lokasyon", null);
-    setValue("lokasyonID", null);
-  };
+  // Başlama ve bitiş tarih/saatlerinden dakika cinsinden süre hesapla ve durusSuresiDakika alanına yaz
+  useEffect(() => {
+    if (!baslamaZamani || !baslamaSaati || !bitisZamani || !bitisSaati) {
+      return;
+    }
+
+    try {
+      const start = dayjs(baslamaZamani).hour(dayjs(baslamaSaati).hour()).minute(dayjs(baslamaSaati).minute()).second(0).millisecond(0);
+
+      const end = dayjs(bitisZamani).hour(dayjs(bitisSaati).hour()).minute(dayjs(bitisSaati).minute()).second(0).millisecond(0);
+
+      const diffInMinutes = end.diff(start, "minute");
+
+      if (!Number.isNaN(diffInMinutes) && diffInMinutes >= 0) {
+        setValue("durusSuresiDakika", diffInMinutes);
+      } else {
+        setValue("durusSuresiDakika", 0);
+      }
+    } catch (e) {
+      // Hata durumunda değeri temizlemez, kullanıcının müdahalesine bırakır
+    }
+  }, [baslamaZamani, baslamaSaati, bitisZamani, bitisSaati, setValue]);
+
+  // Duruş süresi (dk) ve saatlik maliyetten toplam maliyeti hesapla
+  useEffect(() => {
+    const minutes = Number(durusSuresiDakikaValue);
+    const hourlyCost = Number(durusMaliyetiSaatValue);
+
+    if (Number.isFinite(minutes) && Number.isFinite(hourlyCost) && minutes >= 0 && hourlyCost >= 0) {
+      const totalCost = (minutes / 60) * hourlyCost;
+      const rounded = Number(totalCost.toFixed(2));
+      setValue("toplamMaliyet", rounded);
+    } else if (minutes === 0 || hourlyCost === 0) {
+      setValue("toplamMaliyet", 0);
+    }
+  }, [durusSuresiDakikaValue, durusMaliyetiSaatValue, setValue]);
 
   return (
-    <div style={{ display: "flex", marginBottom: "20px", flexDirection: "row", gap: "10px", width: "100%" }}>
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "300px" }}>
+    <div style={{ display: "flex", marginBottom: "20px", flexDirection: "column", gap: "10px", width: "100%" }}>
+      <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: "10px", width: "100%", maxWidth: "546px" }}>
         <div
           style={{
             display: "flex",
@@ -255,13 +267,13 @@ export default function MainTabs({ modalOpen }) {
             alignItems: "center",
             justifyContent: "space-between",
             width: "100%",
-            maxWidth: "400px",
+            maxWidth: "420px",
             gap: "10px",
             flexDirection: "row",
           }}
         >
           <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
-            {t("fisNo")}
+            {t("durusNedeni")}
             <div style={{ color: "red" }}>*</div>
           </Text>
           <div
@@ -270,38 +282,10 @@ export default function MainTabs({ modalOpen }) {
               flexFlow: "column wrap",
               alignItems: "flex-start",
               width: "100%",
-              maxWidth: "220px",
+              maxWidth: "280px",
             }}
           >
-            <Controller
-              name="fisNo"
-              control={control}
-              rules={{ required: t("alanBosBirakilamaz") }}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  status={errors["fisNo"] ? "error" : ""}
-                  style={{ flex: 1 }}
-                  onFocus={(e) => {
-                    setInitialFisNo(e.target.value);
-                    setIsFisNoModified(false);
-                  }}
-                  onChange={(e) => {
-                    field.onChange(e);
-                    if (e.target.value !== initialFisNo) {
-                      setIsFisNoModified(true);
-                    }
-                  }}
-                  onBlur={(e) => {
-                    field.onBlur(e);
-                    if (isFisNoModified) {
-                      validateFisNo(e.target.value);
-                    }
-                  }}
-                />
-              )}
-            />
-            {errors["fisNo"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["fisNo"].message}</div>}
+            <KodIDSelectbox name1="durusNedeni" kodID={32300} isRequired={true} />
           </div>
         </div>
         <div
@@ -311,53 +295,168 @@ export default function MainTabs({ modalOpen }) {
             alignItems: "center",
             justifyContent: "space-between",
             width: "100%",
-            maxWidth: "400px",
+            maxWidth: "116px",
             gap: "10px",
             flexDirection: "row",
           }}
         >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("firma")}</Text>
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("planli")}</Text>
           <div
             style={{
               display: "flex",
               flexFlow: "column wrap",
               alignItems: "flex-start",
-              width: "100%",
-              maxWidth: "220px",
             }}
           >
-            <FirmaSelectBox name1="firma" isRequired={false} />
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "400px",
-            gap: "10px",
-            flexDirection: "row",
-          }}
-        >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("siparisNo")}</Text>
-          <div
-            style={{
-              display: "flex",
-              flexFlow: "column wrap",
-              alignItems: "flex-start",
-              width: "100%",
-              maxWidth: "220px",
-            }}
-          >
-            <SiparisTablo name1="siparisNo" isRequired={false} />
+            <CheckboxInput name="planli" />
           </div>
         </div>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "300px" }}>
-        <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
-          <div
+      <div style={{ display: "flex", flexDirection: "row", gap: "10px", width: "100%" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "360px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "400px",
+                gap: "10px",
+                flexDirection: "row",
+              }}
+            >
+              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("baslamaZamani")}</Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  width: "100%",
+                  maxWidth: "220px",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Controller
+                  name="baslamaZamani"
+                  control={control}
+                  render={({ field }) => (
+                    <DatePicker
+                      {...field}
+                      style={{ width: "100%", maxWidth: "130px" }}
+                      format={localeDateFormat}
+                      onChange={(date) => {
+                        field.onChange(date);
+                        setValue("baslamaZamani", date);
+                      }}
+                    />
+                  )}
+                />
+                <Controller
+                  name="baslamaSaati"
+                  control={control}
+                  render={({ field }) => (
+                    <TimePicker
+                      {...field}
+                      style={{ width: "100%", maxWidth: "85px" }}
+                      format={localeTimeFormat}
+                      onChange={(date) => {
+                        field.onChange(date);
+                        setValue("baslamaSaati", date);
+                      }}
+                    />
+                  )}
+                />
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "400px",
+                gap: "10px",
+                flexDirection: "row",
+              }}
+            >
+              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("bitisZamani")}</Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  width: "100%",
+                  maxWidth: "220px",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Controller
+                  name="bitisZamani"
+                  control={control}
+                  render={({ field }) => (
+                    <DatePicker
+                      {...field}
+                      style={{ width: "100%", maxWidth: "130px" }}
+                      format={localeDateFormat}
+                      onChange={(date) => {
+                        field.onChange(date);
+                        setValue("bitisZamani", date);
+                      }}
+                    />
+                  )}
+                />
+                <Controller
+                  name="bitisSaati"
+                  control={control}
+                  render={({ field }) => (
+                    <TimePicker
+                      {...field}
+                      style={{ width: "100%", maxWidth: "85px" }}
+                      format={localeTimeFormat}
+                      onChange={(date) => {
+                        field.onChange(date);
+                        setValue("bitisSaati", date);
+                      }}
+                    />
+                  )}
+                />
+              </div>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "400px",
+                gap: "10px",
+                flexDirection: "row",
+              }}
+            >
+              <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
+                {t("durusSuresiDakika")}
+                <div style={{ color: "red" }}>*</div>
+              </Text>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  width: "100%",
+                  maxWidth: "220px",
+                  justifyContent: "space-between",
+                }}
+              >
+                <NumberInput name1="durusSuresiDakika" isRequired={true} />
+              </div>
+            </div>
+          </div>
+          {/* <div
             style={{
               display: "flex",
               flexWrap: "wrap",
@@ -369,203 +468,99 @@ export default function MainTabs({ modalOpen }) {
               flexDirection: "row",
             }}
           >
-            <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
-              {t("tarih")}
-              <div style={{ color: "red" }}>*</div>
-            </Text>
+            <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("makine")}</Text>
+            <div
+              style={{
+                display: "flex",
+                flexFlow: "column wrap",
+                alignItems: "flex-start",
+                width: "100%",
+                maxWidth: "220px",
+              }}
+            >
+              <MakineTablo />
+            </div>
+          </div> */}
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "285px" }}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+              maxWidth: "380px",
+              gap: "10px",
+              flexDirection: "row",
+            }}
+          >
+            <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("durusMaliyetiSaat")}</Text>
             <div
               style={{
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
                 width: "100%",
-                maxWidth: "220px",
+                maxWidth: "125px",
                 justifyContent: "space-between",
               }}
             >
-              <Controller
-                name="tarih"
-                control={control}
-                rules={{ required: t("alanBosBirakilamaz") }}
-                render={({ field }) => (
-                  <DatePicker
-                    {...field}
-                    status={errors["tarih"] ? "error" : ""}
-                    style={{ width: "100%", maxWidth: "130px" }}
-                    format={localeDateFormat}
-                    onChange={(date) => {
-                      field.onChange(date);
-                      setValue("tarih", date);
-                    }}
-                  />
-                )}
-              />
-              <Controller
-                name="saat"
-                control={control}
-                render={({ field }) => (
-                  <TimePicker
-                    {...field}
-                    style={{ width: "100%", maxWidth: "85px" }}
-                    format={localeTimeFormat}
-                    onChange={(date) => {
-                      field.onChange(date);
-                      setValue("saat", date);
-                    }}
-                  />
-                )}
-              />
-              {errors["tarih"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["tarih"].message}</div>}
+              <NumberInput name1="durusMaliyetiSaat" isRequired={false} />
+            </div>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+              maxWidth: "285px",
+              gap: "10px",
+              flexDirection: "row",
+            }}
+          >
+            <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("toplamMaliyet")}</Text>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                width: "100%",
+                maxWidth: "125px",
+                justifyContent: "space-between",
+              }}
+            >
+              <NumberInput name1="toplamMaliyet" isRequired={false} readOnly={true} />
             </div>
           </div>
         </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "400px",
-            gap: "10px",
-            flexDirection: "row",
-          }}
-        >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("makine")}</Text>
-          <div
-            style={{
-              display: "flex",
-              flexFlow: "column wrap",
-              alignItems: "flex-start",
-              width: "100%",
-              maxWidth: "220px",
-            }}
-          >
-            <MakineTablo />
-            {/* <PlakaSelectBox name1="plaka" isRequired={false} /> */}
-          </div>
-        </div>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "300px" }}>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+          maxWidth: "660px",
+          gap: "10px",
+          flexDirection: "row",
+        }}
+      >
+        <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("proje")}</Text>
         <div
           style={{
             display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
+            flexFlow: "column wrap",
+            alignItems: "flex-start",
             width: "100%",
-            maxWidth: "400px",
-            gap: "10px",
-            flexDirection: "row",
+            maxWidth: "520px",
           }}
         >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("lokasyon")}</Text>
-          <div
-            style={{
-              display: "flex",
-              flexFlow: "column wrap",
-              alignItems: "flex-start",
-              width: "100%",
-              maxWidth: "220px",
-            }}
-          >
-            <LokasyonTablo
-              lokasyonFieldName="lokasyon"
-              lokasyonIdFieldName="lokasyonID"
-              onSubmit={(selectedData) => {
-                setValue("lokasyon", selectedData.LOK_TANIM);
-                setValue("lokasyonID", selectedData.key);
-                // Force trigger to ensure FisIcerigi component detects the change
-                setTimeout(() => {
-                  setValue("lokasyon", selectedData.LOK_TANIM, { shouldDirty: true });
-                  setValue("lokasyonID", selectedData.key, { shouldDirty: true });
-                }, 100);
-              }}
-              isModalVisible={isLokasyonModalOpen}
-              setIsModalVisible={setIsLokasyonModalOpen}
-            />
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "400px",
-            gap: "10px",
-            flexDirection: "row",
-          }}
-        >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("islemTipi")}</Text>
-          <div
-            style={{
-              display: "flex",
-              flexFlow: "column wrap",
-              alignItems: "flex-start",
-              width: "100%",
-              maxWidth: "220px",
-            }}
-          >
-            <KodIDSelectbox name1="islemTipi" kodID={13006} isRequired={false} />
-          </div>
-        </div>
-      </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "350px" }}>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "400px",
-            gap: "10px",
-            flexDirection: "row",
-          }}
-        >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
-            {t("cikisDeposu")}
-            <div style={{ color: "red" }}>*</div>
-          </Text>
-          <div
-            style={{
-              display: "flex",
-              flexFlow: "column wrap",
-              alignItems: "flex-start",
-              width: "100%",
-              maxWidth: "220px",
-            }}
-          >
-            <DepoTablo name1="girisDeposu" isRequired={true} />
-          </div>
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "400px",
-            gap: "10px",
-            flexDirection: "row",
-          }}
-        >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("proje")}</Text>
-          <div
-            style={{
-              display: "flex",
-              flexFlow: "column wrap",
-              alignItems: "flex-start",
-              width: "100%",
-              maxWidth: "220px",
-            }}
-          >
-            <ProjeTablo name1="proje" isRequired={false} />
-          </div>
+          <ProjeTablo name1="proje" isRequired={false} />
         </div>
       </div>
     </div>

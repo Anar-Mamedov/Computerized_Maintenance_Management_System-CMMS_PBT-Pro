@@ -22,42 +22,19 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
 
   const methods = useForm({
     defaultValues: {
-      fisNo: null,
-      firma: null,
-      firmaID: null,
-      makineID: null,
-      makine: null,
-      plaka: null,
-      plakaID: null,
-      tarih: null,
-      saat: null,
-      islemTipi: null,
-      islemTipiID: null,
-      proje: null,
-      projeID: null,
-      girisDeposu: null,
-      girisDeposuID: null,
-      lokasyon: null,
-      lokasyonID: null,
-      totalAraToplam: null,
-      totalIndirim: null,
-      totalKdvToplam: null,
-      totalGenelToplam: null,
-      aciklama: null,
-      ozelAlan1: null,
-      ozelAlan2: null,
-      ozelAlan3: null,
-      ozelAlan4: null,
-      ozelAlan5: null,
-      ozelAlan6: null,
-      ozelAlan7: null,
-      ozelAlan8: null,
-      ozelAlan9: null,
-      ozelAlan9ID: null,
-      ozelAlan10: null,
-      ozelAlan10ID: null,
-      ozelAlan11: null,
-      ozelAlan12: null,
+      durusNedeni: undefined,
+      durusNedeniID: undefined,
+      planli: undefined,
+      baslamaZamani: undefined,
+      baslamaSaati: undefined,
+      bitisZamani: undefined,
+      bitisSaati: undefined,
+      durusSuresiDakika: undefined,
+      durusMaliyetiSaat: undefined,
+      toplamMaliyet: undefined,
+      proje: undefined,
+      projeID: undefined,
+      aciklama: undefined,
       fisIcerigi: [],
     },
   });
@@ -74,83 +51,18 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
         setOpen(true); // İşlemler tamamlandıktan sonra drawer'ı aç
         setLoading(true); // Yükleme başladığında
         try {
-          const response = await AxiosInstance.get(`GetMalzemeFisById?fisId=${selectedRow.key}`);
+          const response = await AxiosInstance.get(`FetchIsEmriDurusList?isemriID=0&durusID=${selectedRow.TB_MAKINE_DURUS_ID}`);
           const item = response; // Veri dizisinin ilk elemanını al
           // Form alanlarını set et
-          setValue("mlzFisId", item.mlzFisId);
-          setValue("fisNo", item.fisNo);
-          setValue("firma", item.firmaName);
-          setValue("firmaID", item.firmaId);
-          setValue("makine", item.aracName);
-          setValue("makineID", item.aracId);
-          setValue("tarih", item.tarih ? (dayjs(item.tarih).isValid() ? dayjs(item.tarih) : null) : null);
-          setValue("saat", item.saat ? (dayjs(item.saat, "HH:mm:ss").isValid() ? dayjs(item.saat, "HH:mm:ss") : null) : null);
-          setValue("islemTipi", item.islemTipiName);
-          setValue("islemTipiID", item.islemTipiKodId);
-          setValue("proje", item.projeName);
-          setValue("projeID", item.projeId);
-          setValue("girisDeposu", item.cikisDepoName);
-          setValue("girisDeposuID", item.cikisDepoSiraNo);
-          setValue("lokasyon", item.lokasyonName);
-          setValue("lokasyonID", item.lokasyonId);
-          setTimeout(() => setValue("totalAraToplam", item.araToplam), 200);
-          setTimeout(() => setValue("totalIndirim", item.indirimliToplam), 200);
-          setTimeout(() => setValue("totalKdvToplam", item.kdvToplam), 200);
-          setTimeout(() => setValue("totalGenelToplam", item.genelToplam), 200);
-          setValue("aciklama", item.aciklama);
-          setValue("ozelAlan1", item.ozelAlan1);
-          setValue("ozelAlan2", item.ozelAlan2);
-          setValue("ozelAlan3", item.ozelAlan3);
-          setValue("ozelAlan4", item.ozelAlan4);
-          setValue("ozelAlan5", item.ozelAlan5);
-          setValue("ozelAlan6", item.ozelAlan6);
-          setValue("ozelAlan7", item.ozelAlan7);
-          setValue("ozelAlan8", item.ozelAlan8);
-          setValue("ozelAlan9", item.ozelAlan9);
-          setValue("ozelAlan10", item.ozelAlan10);
-          setValue("ozelAlan11", item.OzelAlan11);
-          setValue("ozelAlan11ID", item.ozelAlanKodId11);
-          setValue("ozelAlan12", item.OzelAlan12);
-          setValue("ozelAlan12ID", item.ozelAlanKodId12);
-          setValue("ozelAlan13", item.OzelAlan13);
-          setValue("ozelAlan13ID", item.OzelAlankodId13);
-          setValue("ozelAlan14", item.OzelAlan14);
-          setValue("ozelAlan14ID", item.OzelAlankodId14);
-          setValue("ozelAlan15", item.OzelAlan15);
-          setValue("ozelAlan15ID", item.OzelAlankodId15);
-          setValue("ozelAlan16", item.OzelAlan16);
-          setValue("ozelAlan17", item.OzelAlan17);
-          setValue("ozelAlan18", item.OzelAlan18);
-          setValue("ozelAlan19", item.OzelAlan19);
-          setValue("ozelAlan20", item.OzelAlan20);
-          setValue(
-            "fisIcerigi",
-            item.materialMovements?.map((movement) => ({
-              key: movement.siraNo,
-              siraNo: movement.siraNo,
-              malzemeId: movement.malzemeId,
-              malzemeKodu: movement.malzemeKod,
-              malzemeTanimi: movement.malzemeName,
-              malzemeTipi: movement.malzemeTip,
-              birimKodId: movement.birimKodId,
-              birim: movement.birimName,
-              miktar: movement.miktar,
-              fiyat: movement.fiyat,
-              araToplam: movement.araToplam,
-              indirimOrani: movement.indirimOran,
-              indirimTutari: movement.indirim,
-              kdvOrani: movement.kdvOran,
-              kdvDahilHaric: movement.kdvDahilHaric === "D",
-              kdvTutar: movement.kdvTutar,
-              toplam: movement.toplam,
-              malzemePlakaId: movement.mlzAracId,
-              malzemePlaka: movement.mlzAracName,
-              malzemeLokasyonID: movement.lokasyonId,
-              malzemeLokasyon: movement.lokasyonName,
-              aciklama: movement.aciklama,
-              isPriceChanged: movement.isPriceChanged || false,
-            })) || []
-          );
+          setValue("makine", item.makineName);
+          setValue("makineID", item.makineId);
+          setValue("makineLokasyonID", item.makineLokasyonID);
+          setValue("makineLokasyon", item.makineLokasyon);
+          setValue("makineTipi", item.makineTipi);
+          setValue("makineTipiID", item.makineTipiKodId);
+          setValue("makineKodu", item.makineKodu);
+          setValue("makineTanimi", item.makineTanimi);
+          setValue("makineTanimiID", item.makineTanimiKodId);
 
           setLoading(false); // Yükleme tamamlandığında
         } catch (error) {
@@ -176,84 +88,25 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
   const onSubmit = (data) => {
     // Form verilerini API'nin beklediği formata dönüştür
     const Body = {
-      mlzFisId: data.mlzFisId,
-      fisNo: data.fisNo,
-      aracId: data.makineID || -1,
-      // firma: data.firma,
-      firmaId: Number(data.firmaID) || -1,
-      // plaka: data.plaka,
-      tarih: formatDateWithDayjs(data.tarih),
-      saat: formatTimeWithDayjs(data.saat),
-      // islemTipi: data.islemTipi,
-      islemTipiKodId: Number(data.islemTipiID) || -1,
-      projeId: Number(data.projeID) || -1,
-      // girisDeposu: data.girisDeposu,
-      cikisDepoSiraNo: Number(data.girisDeposuID) || -1,
-      // lokasyon: data.lokasyon,
-      lokasyonId: Number(data.lokasyonID) || -1,
-      araToplam: Number(data.totalAraToplam),
-      indirimliToplam: Number(data.totalIndirim),
-      kdvToplam: Number(data.totalKdvToplam),
-      genelToplam: Number(data.totalGenelToplam),
+      makineler: (Array.isArray(data.fisIcerigi) ? data.fisIcerigi : []).map((item) => ({
+        makineId: item.makineId,
+        lokasyonId: item.makineLokasyonID,
+      })),
+      baslamaTarih: formatDateWithDayjs(data.baslamaZamani),
+      baslamaSaat: formatTimeWithDayjs(data.baslamaSaati),
+      bitisTarih: formatDateWithDayjs(data.bitisZamani),
+      bitisSaat: formatTimeWithDayjs(data.bitisSaati),
+      sure: data.durusSuresiDakika,
+      saatMaliyet: data.durusMaliyetiSaat,
+      toplamMaliyet: data.toplamMaliyet,
+      nedenKodId: data.durusNedeniID,
       aciklama: data.aciklama,
-      ozelAlan1: data.ozelAlan1,
-      ozelAlan2: data.ozelAlan2,
-      ozelAlan3: data.ozelAlan3,
-      ozelAlan4: data.ozelAlan4,
-      ozelAlan5: data.ozelAlan5,
-      ozelAlan6: data.ozelAlan6,
-      ozelAlan7: data.ozelAlan7,
-      ozelAlan8: data.ozelAlan8,
-      ozelAlan9: data.ozelAlan9,
-      ozelAlan10: data.ozelAlan10,
-      ozelAlanKodId11: Number(data.ozelAlan11ID) || 0,
-      ozelAlanKodId12: Number(data.ozelAlan12ID) || 0,
-      ozelAlanKodId13: Number(data.ozelAlan13ID) || 0,
-      ozelAlanKodId14: Number(data.ozelAlan14ID) || 0,
-      ozelAlanKodId15: Number(data.ozelAlan15ID) || 0,
-      ozelAlan16: Number(data.ozelAlan16) || 0,
-      ozelAlan17: Number(data.ozelAlan17) || 0,
-      ozelAlan18: Number(data.ozelAlan18) || 0,
-      ozelAlan19: Number(data.ozelAlan19) || 0,
-      ozelAlan20: Number(data.ozelAlan20) || 0,
-      islemTip: "03",
-      gc: "C",
-      fisTip: "MALZEME",
-      materialMovements:
-        data.fisIcerigi?.map((item) => ({
-          siraNo: item.key ? Number(item.key) : 0,
-          tarih: formatDateWithDayjs(data.tarih),
-          firmaId: Number(data.firmaID),
-          cikisDepoSiraNo: Number(data.girisDeposuID),
-          isPriceChanged: item.isPriceChanged || false,
-          isDeleted: item.isDeleted || false,
-          // malzemeKodu: item.malzemeKodu,
-          // malzemeTanimi: item.malzemeTanimi,
-          // malzemeTipi: item.malzemeTipi,
-          malzemeId: Number(item.malzemeId),
-          // birim: item.birim,
-          birimKodId: Number(item.birimKodId),
-          miktar: Number(item.miktar),
-          fiyat: Number(item.fiyat),
-          araToplam: Number(item.araToplam),
-          indirimOran: Number(item.indirimOrani),
-          indirim: Number(item.indirimTutari),
-          kdvOran: Number(item.kdvOrani),
-          kdvDahilHaric: item.kdvDahilHaric ? "D" : "H",
-          kdvTutar: Number(item.kdvTutar),
-          toplam: Number(item.toplam),
-          // plaka: item.malzemePlaka,
-          mlzAracId: Number(item.malzemePlakaId),
-          // lokasyon: item.malzemeLokasyon,
-          lokasyonId: Number(item.malzemeLokasyonID),
-          aciklama: item.aciklama,
-          gc: "C",
-          fisTip: "MALZEME",
-        })) || [],
+      planli: data.planli,
+      projeId: data.projeID,
     };
 
     // API'ye POST isteği gönder
-    AxiosInstance.post("UpsertMalzemeFisWithItems", Body)
+    AxiosInstance.post("UpdateMakineDurus", Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
         if (response.status_code === 200 || response.status_code === 201 || response.status_code === 202) {
