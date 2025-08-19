@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useRef, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { Table, Button, Form as AntForm, Input, InputNumber, Modal, message } from "antd";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { PlusOutlined } from "@ant-design/icons";
 import Malzemeler from "../../../../../../../../pages/Malzeme&DepoYonetimi/MalzemeTanimlari/Table/Table";
 // import PlakaSelectBox from "../../../../../../../../components/PlakaSelectbox";
-import LokasyonTablo from "../../../../../../../../utils/components/LokasyonTablo";
 // Removed unused MasrafMerkeziTablo and KodIDSelectbox imports after column simplification
 
 // Removed unused Typography and TextArea destructuring
@@ -128,6 +128,7 @@ const MalzemeSecModal = ({ visible, onCancel, onOk, deposuID }) => {
 };
 
 function FisIcerigi({ modalOpen }) {
+  const { t } = useTranslation();
   const { control, setValue, watch, getValues } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isLokasyonModalOpen, setIsLokasyonModalOpen] = useState(false);
@@ -490,7 +491,7 @@ function FisIcerigi({ modalOpen }) {
 
   const defaultColumns = [
     {
-      title: "Makine Kodu",
+      title: t("makineKodu"),
       dataIndex: "malzemeKodu",
       key: "malzemeKodu",
       width: 160,
@@ -498,7 +499,7 @@ function FisIcerigi({ modalOpen }) {
       inputType: "text",
     },
     {
-      title: "Makine Tanımı",
+      title: t("makineTanimi"),
       dataIndex: "malzemeTanimi",
       key: "malzemeTanimi",
       width: 220,
@@ -506,47 +507,15 @@ function FisIcerigi({ modalOpen }) {
       inputType: "text",
     },
     {
-      title: "Lokasyon",
+      title: t("lokasyon"),
       dataIndex: "malzemeLokasyon",
       key: "malzemeLokasyon",
       width: 250,
       ellipsis: true,
       visible: true,
-      render: (text, record, index) => (
-        <LokasyonTablo
-          disabled={false}
-          lokasyonFieldName={`fisIcerigi.${index}.malzemeLokasyon`}
-          lokasyonIdFieldName={`fisIcerigi.${index}.malzemeLokasyonID`}
-          onSubmit={(selectedData) => {
-            const newData = [...dataSource];
-            if (newData[index]) {
-              newData[index] = {
-                ...newData[index],
-                malzemeLokasyon: selectedData.LOK_TANIM,
-                malzemeLokasyonID: selectedData.key,
-              };
-              setDataSource(newData);
-
-              setValue(`fisIcerigi.${index}.malzemeLokasyon`, selectedData.LOK_TANIM);
-              setValue(`fisIcerigi.${index}.malzemeLokasyonID`, selectedData.key);
-            }
-          }}
-          onClear={() => {
-            const newData = [...dataSource];
-            if (newData[index]) {
-              newData[index] = {
-                ...newData[index],
-                malzemeLokasyon: "",
-                malzemeLokasyonID: null,
-              };
-              setDataSource(newData);
-            }
-          }}
-        />
-      ),
     },
     {
-      title: "Makine Tipi",
+      title: t("makineTipi"),
       dataIndex: "malzemeTipi",
       key: "malzemeTipi",
       width: 160,
