@@ -1,11 +1,10 @@
 import React, { useContext, useEffect, useRef, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { Table, Button, Form as AntForm, Input, InputNumber, Modal, message } from "antd";
+import { Table, Button, Form as AntForm, Input, InputNumber, message } from "antd";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { PlusOutlined } from "@ant-design/icons";
 // import Malzemeler from "../../../../../../../../pages/Malzeme&DepoYonetimi/MalzemeTanimlari/Table/Table";
-// import MakineTablo from "../../../../../../../../utils/components/Machina/MakineTablo";
-import MakineTabloSelection from "../../../../../../../../pages/Yonetim/LokasyonTanimlari/Update/components/SecondTabs/components/MakineTablo";
+import MakineTablo from "../../../../../../../../utils/components/Machina/MakineTablo";
 // import PlakaSelectBox from "../../../../../../../../components/PlakaSelectbox";
 // Removed unused MasrafMerkeziTablo and KodIDSelectbox imports after column simplification
 
@@ -107,25 +106,7 @@ const EditableCell = ({ title, editable, children, dataIndex, record, handleSave
   );
 };
 
-const MakineSecModal = ({ visible, onCancel, onOk, refreshKey }) => {
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [modalKey, setModalKey] = useState(Date.now());
-
-  useEffect(() => {
-    if (visible) {
-      setModalKey(Date.now());
-      setSelectedRows([]);
-    }
-  }, [visible]);
-
-  return (
-    <Modal title="Makine Seç" open={visible} onCancel={onCancel} onOk={() => onOk(selectedRows)} width={1200} style={{ top: 20 }} destroyOnClose>
-      <div key={modalKey}>
-        <MakineTabloSelection selectionType="checkbox" onSelectionChange={setSelectedRows} refreshKey={modalKey} />
-      </div>
-    </Modal>
-  );
-};
+// Makine seçimi util bileşeni ile kontrol edilecek
 
 function FisIcerigi({ modalOpen }) {
   const { t } = useTranslation();
@@ -499,20 +480,7 @@ function FisIcerigi({ modalOpen }) {
   return (
     <div style={{ marginTop: "-55px", zIndex: 10 }}>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
-        <Button
-          style={{ zIndex: 21 }}
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => {
-            try {
-              // Makine tablosu lokasyon filtrasyonu için formda beklenen alanı set et
-              setValue("selectedLokasyonId", lokasyonID || null);
-            } catch (e) {
-              // no-op
-            }
-            setIsModalVisible(true);
-          }}
-        >
+        <Button style={{ zIndex: 21 }} type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
           Ekle
         </Button>
       </div>
@@ -527,7 +495,17 @@ function FisIcerigi({ modalOpen }) {
         rowKey={(record) => record.id || Math.random().toString(36).substr(2, 9)} // Ensure stable keys
         scroll={{ y: "calc(100vh - 540px)" }}
       />
-      <MakineSecModal visible={isModalVisible} onCancel={() => setIsModalVisible(false)} onOk={handleMakineSelect} refreshKey={Date.now()} />
+      <MakineTablo
+        controlledOpen={isModalVisible}
+        onControlledOk={(rows) => {
+          handleMakineSelect(rows);
+          setIsModalVisible(false);
+        }}
+        onControlledCancel={() => setIsModalVisible(false)}
+        selectionType="checkbox"
+        hideHeader
+        suppressFormFields
+      />
     </div>
   );
 }

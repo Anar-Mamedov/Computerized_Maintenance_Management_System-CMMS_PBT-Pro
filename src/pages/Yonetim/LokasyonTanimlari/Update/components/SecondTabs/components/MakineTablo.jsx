@@ -6,7 +6,7 @@ import SearchField from "../../../../Table/SearchField";
 import Filters from "../../../../Table/filter/Filters";
 import { useFormContext } from "react-hook-form";
 
-export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey, onSelectionChange, selectionType = "radio" }) {
+export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey }) {
   const { control, watch, setValue } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -40,7 +40,8 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey, 
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -61,7 +62,8 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey, 
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -81,7 +83,8 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey, 
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -101,7 +104,8 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey, 
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -121,7 +125,8 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey, 
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -141,7 +146,8 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey, 
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -161,7 +167,8 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey, 
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -181,7 +188,8 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey, 
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -270,13 +278,7 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey, 
   }, [workshopSelectedId]);
 
   const onRowSelectChange = (selectedKeys) => {
-    // Çoklu seçim için tüm seçili anahtarları sakla; tek seçim için ilkini koru
-    setSelectedRowKeys(selectionType === "radio" ? (selectedKeys.length ? [selectedKeys[0]] : []) : selectedKeys);
-
-    if (typeof onSelectionChange === "function") {
-      const selected = table.data.filter((row) => selectedKeys.includes(row.key));
-      onSelectionChange(selected);
-    }
+    setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
   };
 
   return (
@@ -286,12 +288,12 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey, 
         <Filters key={filtersKey} onChange={handleBodyChange} value={body.filters} />
       </div>
 
-        <Table
-          rowSelection={{
-            type: selectionType,
-            selectedRowKeys,
-            onChange: onRowSelectChange,
-          }}
+      <Table
+        rowSelection={{
+          type: "radio",
+          selectedRowKeys,
+          onChange: onRowSelectChange,
+        }}
         scroll={{
           // x: "auto",
           y: "100vh",
