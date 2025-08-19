@@ -3,10 +3,8 @@ import { Input, Tabs, Typography } from "antd";
 import styled from "styled-components";
 import { Controller, useFormContext } from "react-hook-form";
 import { t } from "i18next";
-import OzelAlanlar from "./components/OzelAlanlar/OzelAlanlar.jsx";
+// import OzelAlanlar from "./components/OzelAlanlar/OzelAlanlar.jsx";
 import FisIcerigi from "./components/FisIcerigi/FisIcerigi.jsx";
-import ResimUpload from "../../../../../../utils/components/Resim/ResimUpload.jsx";
-import DosyaUpload from "../../../../../../utils/components/Dosya/DosyaUpload.jsx";
 const { Text, Link } = Typography;
 const { TextArea } = Input;
 
@@ -47,7 +45,7 @@ const StyledTabs = styled(Tabs)`
 
 //styled components end
 
-export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen, selectedRowID }) {
+export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen }) {
   const { watch } = useFormContext();
   const [activeTabKey, setActiveTabKey] = useState("4"); // Default to the FisIcerigi tab
 
@@ -66,18 +64,17 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen, s
     },*/
     {
       key: "4",
-      label: t("fisIcerigi"),
+      label: t("makineListesi"),
       children: <FisIcerigi modalOpen={modalOpen} />,
     },
 
-    {
+    /* {
       key: "5",
       label: "Özel Alanlar",
       // children: <SureBilgileri fieldRequirements={fieldRequirements} />,
       children: <OzelAlanlar />,
-    },
-
-    /* {
+    }, */
+    {
       key: "6",
       label: "Açıklama",
       children: (
@@ -85,18 +82,6 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen, s
           <Controller name="aciklama" render={({ field }) => <TextArea {...field} rows={4} placeholder="Açıklama" style={{ width: "100%", resize: "none" }} />} />
         </div>
       ),
-    }, */
-    /* {
-      key: "7",
-      label: "Resimler",
-      // children: <SureBilgileri fieldRequirements={fieldRequirements} />,
-      children: <ResimUpload selectedRowID={selectedRowID} refGroup={"MALZEME_TALEP"} />,
-    }, */
-    {
-      key: "8",
-      label: "Dosyalar",
-      // children: <SureBilgileri fieldRequirements={fieldRequirements} />,
-      children: <DosyaUpload selectedRowID={selectedRowID} refGroup={"FIS"} />,
     },
   ];
 
