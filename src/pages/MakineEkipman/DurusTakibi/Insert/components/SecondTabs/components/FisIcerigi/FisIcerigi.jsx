@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { Table, Button, message } from "antd";
 import { useFieldArray, useFormContext } from "react-hook-form";
@@ -29,8 +30,8 @@ function FisIcerigi({ modalOpen }) {
   // Safe handleMalzemeSelect with error handling
   const handleMakineSelect = (selectedRows) => {
     try {
-      const existingMalzemeIds = new Set((fields || []).map((item) => item.malzemeId));
-      const newRows = selectedRows.filter((row) => !existingMalzemeIds.has(row.TB_MAKINE_ID || row.key));
+      const existingMakineIds = new Set((fields || []).map((item) => item.makineId));
+      const newRows = selectedRows.filter((row) => !existingMakineIds.has(row.TB_MAKINE_ID || row.key));
 
       if (newRows.length === 0) {
         message.warning("Seçilen makineler zaten tabloda mevcut.");
@@ -78,32 +79,32 @@ function FisIcerigi({ modalOpen }) {
   const defaultColumns = [
     {
       title: t("makineKodu"),
-      dataIndex: "malzemeKodu",
-      key: "malzemeKodu",
+      dataIndex: "makineKodu",
+      key: "makineKodu",
       width: 150,
       ellipsis: true,
       visible: true,
     },
     {
       title: t("makineTanimi"),
-      dataIndex: "malzemeTanimi",
-      key: "malzemeTanimi",
+      dataIndex: "makineTanimi",
+      key: "makineTanimi",
       width: 220,
       ellipsis: true,
       visible: true,
     },
     {
       title: t("lokasyon"),
-      dataIndex: "malzemeLokasyon",
-      key: "malzemeLokasyon",
+      dataIndex: "makineLokasyon",
+      key: "makineLokasyon",
       width: 180,
       ellipsis: true,
       visible: true,
     },
     {
       title: t("makineTipi"),
-      dataIndex: "malzemeTipi",
-      key: "malzemeTipi",
+      dataIndex: "makineTipi",
+      key: "makineTipi",
       width: 220,
       ellipsis: true,
       visible: true,
