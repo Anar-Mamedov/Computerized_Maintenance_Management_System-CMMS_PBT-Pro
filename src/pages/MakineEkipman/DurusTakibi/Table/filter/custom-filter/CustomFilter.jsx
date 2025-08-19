@@ -343,7 +343,7 @@ export default function CustomFilter({ onSubmit }) {
             </Col>
           </Row>
         ))}
-        <Button
+        {/*  <Button
           type="primary"
           onClick={handleAddFilterClick}
           style={{
@@ -355,7 +355,7 @@ export default function CustomFilter({ onSubmit }) {
         >
           <PlusOutlined />
           Filtre ekle
-        </Button>
+        </Button> */}
       </Drawer>
     </>
   );

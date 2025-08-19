@@ -313,6 +313,7 @@ const DurusTakibi = () => {
         width: 140,
         ellipsis: true,
         visible: true,
+        render: (text, record) => <a onClick={() => onRowClick(record)}>{text}</a>,
         sorter: (a, b) => {
           if (a.MKN_KOD === null) return -1;
           if (b.MKN_KOD === null) return 1;
@@ -330,6 +331,19 @@ const DurusTakibi = () => {
           if (a.MKN_TANIM === null) return -1;
           if (b.MKN_TANIM === null) return 1;
           return String(a.MKN_TANIM).localeCompare(String(b.MKN_TANIM));
+        },
+      },
+      {
+        title: t("durusNedeni"),
+        dataIndex: "MKD_NEDEN",
+        key: "MKD_NEDEN",
+        width: 140,
+        ellipsis: true,
+        visible: true,
+        sorter: (a, b) => {
+          if (a.MKD_NEDEN === null) return -1;
+          if (b.MKD_NEDEN === null) return 1;
+          return String(a.MKD_NEDEN).localeCompare(String(b.MKD_NEDEN));
         },
       },
       {
@@ -401,19 +415,7 @@ const DurusTakibi = () => {
           return Number(a.MKD_SURE) - Number(b.MKD_SURE);
         },
       },
-      {
-        title: t("neden"),
-        dataIndex: "MKD_NEDEN",
-        key: "MKD_NEDEN",
-        width: 140,
-        ellipsis: true,
-        visible: true,
-        sorter: (a, b) => {
-          if (a.MKD_NEDEN === null) return -1;
-          if (b.MKD_NEDEN === null) return 1;
-          return String(a.MKD_NEDEN).localeCompare(String(b.MKD_NEDEN));
-        },
-      },
+
       {
         title: t("planli"),
         dataIndex: "MKD_PLANLI",
@@ -438,7 +440,7 @@ const DurusTakibi = () => {
         },
       },
       {
-        title: t("saatMaliyeti"),
+        title: t("durusMaliyeti"),
         dataIndex: "MKD_SAAT_MALIYET",
         key: "MKD_SAAT_MALIYET",
         width: 140,
@@ -463,6 +465,22 @@ const DurusTakibi = () => {
           if (a.MKD_TOPLAM_MALIYET === null) return -1;
           if (b.MKD_TOPLAM_MALIYET === null) return 1;
           return Number(a.MKD_TOPLAM_MALIYET) - Number(b.MKD_TOPLAM_MALIYET);
+        },
+      },
+      {
+        title: t("aciklama"),
+        dataIndex: "MKD_ACIKLAMA",
+        key: "MKD_ACIKLAMA",
+        width: 140,
+        ellipsis: true,
+        visible: true,
+        render: (text) => <span>{text}</span>,
+        sorter: (a, b) => {
+          const aciklamaA = a.MKD_ACIKLAMA ? a.MKD_ACIKLAMA.toLowerCase() : "";
+          const aciklamaB = b.MKD_ACIKLAMA ? b.MKD_ACIKLAMA.toLowerCase() : "";
+          if (aciklamaA < aciklamaB) return -1;
+          if (aciklamaA > aciklamaB) return 1;
+          return 0;
         },
       },
     ],
