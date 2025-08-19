@@ -10,6 +10,7 @@ import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
 import CheckboxInput from "../../../../../../utils/components/Form/CheckboxInput";
 import ProjeTablo from "../../../../../../utils/components/ProjeTablo";
 import NumberInput from "../../../../../../utils/components/NumberInput";
+import TextInput from "../../../../../../utils/components/Form/TextInput";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -456,31 +457,6 @@ export default function MainTabs({ modalOpen }) {
               </div>
             </div>
           </div>
-          {/* <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "400px",
-              gap: "10px",
-              flexDirection: "row",
-            }}
-          >
-            <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("makine")}</Text>
-            <div
-              style={{
-                display: "flex",
-                flexFlow: "column wrap",
-                alignItems: "flex-start",
-                width: "100%",
-                maxWidth: "220px",
-              }}
-            >
-              <MakineTablo />
-            </div>
-          </div> */}
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "285px" }}>
@@ -561,6 +537,49 @@ export default function MainTabs({ modalOpen }) {
           }}
         >
           <ProjeTablo name1="proje" isRequired={false} />
+        </div>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+          maxWidth: "660px",
+          gap: "10px",
+          flexDirection: "row",
+        }}
+      >
+        <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("makine")}</Text>
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "column wrap",
+            alignItems: "flex-start",
+            width: "100%",
+            maxWidth: "520px",
+          }}
+        >
+          <MakineTablo />
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+          maxWidth: "660px",
+          gap: "10px",
+          flexDirection: "row",
+        }}
+      >
+        <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("lokasyon")}</Text>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "520px" }}>
+          <TextInput name="lokasyon" isRequired={false} checked={true} />
         </div>
       </div>
     </div>

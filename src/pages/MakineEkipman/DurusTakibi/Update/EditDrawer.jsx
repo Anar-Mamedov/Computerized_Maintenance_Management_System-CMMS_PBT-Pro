@@ -8,7 +8,6 @@ import secondTabs from "./components/SecondTabs/SecondTabs";
 import { useForm, Controller, useFormContext, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
 import AxiosInstance from "../../../../api/http.jsx";
-import Footer from "../Footer";
 import SecondTabs from "./components/SecondTabs/SecondTabs";
 import { t } from "i18next";
 
@@ -22,6 +21,10 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
 
   const methods = useForm({
     defaultValues: {
+      lokasyon: undefined,
+      lokasyonID: undefined,
+      makine: undefined,
+      makineID: undefined,
       durusNedeni: undefined,
       durusNedeniID: undefined,
       planli: undefined,
@@ -35,7 +38,6 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
       proje: undefined,
       projeID: undefined,
       aciklama: undefined,
-      fisIcerigi: [],
     },
   });
 
@@ -52,17 +54,68 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
         setLoading(true); // Yükleme başladığında
         try {
           const response = await AxiosInstance.get(`FetchIsEmriDurusList?isemriID=0&durusID=${selectedRow.TB_MAKINE_DURUS_ID}`);
-          const item = response; // Veri dizisinin ilk elemanını al
-          // Form alanlarını set et
-          setValue("makine", item.makineName);
-          setValue("makineID", item.makineId);
-          setValue("makineLokasyonID", item.makineLokasyonID);
-          setValue("makineLokasyon", item.makineLokasyon);
-          setValue("makineTipi", item.makineTipi);
-          setValue("makineTipiID", item.makineTipiKodId);
-          setValue("makineKodu", item.makineKodu);
-          setValue("makineTanimi", item.makineTanimi);
-          setValue("makineTanimiID", item.makineTanimiKodId);
+          const item = Array.isArray(response) ? response[0] : response; // Veri dizisinin ilk elemanını al
+
+          if (item) {
+            // Durus ve genel alanlar
+            setValue("durusNedeni", item.MKD_NEDEN ?? undefined);
+            setValue("durusNedeniID", item.MKD_NEDEN_KOD_ID ?? undefined);
+            setValue("planli", Boolean(item.MKD_PLANLI));
+
+            // Tarih ve saat alanları (dayjs nesneleri)
+            const baslamaDate = item.MKD_BASLAMA_TARIH ? dayjs(item.MKD_BASLAMA_TARIH) : undefined;
+            const bitisDate = item.MKD_BITIS_TARIH ? dayjs(item.MKD_BITIS_TARIH) : undefined;
+            const baslamaTime = item.MKD_BASLAMA_SAAT ? dayjs(item.MKD_BASLAMA_SAAT, "HH:mm:ss") : baslamaDate;
+            const bitisTime = item.MKD_BITIS_SAAT ? dayjs(item.MKD_BITIS_SAAT, "HH:mm:ss") : bitisDate;
+
+            setValue("baslamaZamani", baslamaDate);
+            setValue("baslamaSaati", baslamaTime);
+            setValue("bitisZamani", bitisDate);
+            setValue("bitisSaati", bitisTime);
+
+            // Süre ve maliyet alanları
+            setValue("durusSuresiDakika", item.MKD_SURE ?? undefined);
+            setValue("durusMaliyetiSaat", item.MKD_SAAT_MALIYET ?? undefined);
+            setValue("toplamMaliyet", item.MKD_TOPLAM_MALIYET ?? undefined);
+
+            // Proje ve açıklama
+            setValue("proje", (item.MKD_PROJE && item.MKD_PROJE.PRJ_TANIM) || undefined);
+            setValue("projeID", item.MKD_PROJE_ID ?? (item.MKD_PROJE && item.MKD_PROJE.TB_PROJE_ID) ?? undefined);
+            setValue("aciklama", item.MKD_ACIKLAMA ?? undefined);
+
+            // Fiş içeriği (makine listesi)
+            const machine = item.MKD_MAKINE || {};
+            const location = item.MKD_LOKASYON || {};
+
+            setValue("makine", machine.MKN_TANIM || "");
+            setValue("makineID", machine.TB_MAKINE_ID ?? item.MKD_MAKINE_ID ?? null);
+            setValue("lokasyon", location.LOK_TANIM || "");
+            setValue("lokasyonID", location.TB_LOKASYON_ID ?? item.MKD_LOKASYON_ID ?? null);
+
+            const fisRow = {
+              id: Date.now() + Math.random(),
+              makineId: machine.TB_MAKINE_ID ?? item.MKD_MAKINE_ID ?? null,
+              makineKodu: machine.MKN_KOD || "",
+              makineTanimi: machine.MKN_TANIM || "",
+              makineTipi: machine.MKN_TIP || "",
+              makineLokasyon: machine.MKN_LOKASYON || location.LOK_TANIM || "",
+              makineLokasyonID: machine.MKN_LOKASYON_ID ?? item.MKD_LOKASYON_ID ?? location.TB_LOKASYON_ID ?? null,
+            };
+
+            if (fisRow.makineId) {
+              setValue("fisIcerigi", [fisRow]);
+            } else {
+              setValue("fisIcerigi", []);
+            }
+
+            // iş emri kontrolü
+
+            if (item.MKD_ISEMRI_ID > 0) {
+              setValue("isEmri", true);
+            } else {
+              setValue("isEmri", false);
+            }
+          }
 
           setLoading(false); // Yükleme tamamlandığında
         } catch (error) {
