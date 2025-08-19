@@ -9,6 +9,7 @@ import MakineTablo from "../../../../../../utils/components/Machina/MakineTablo"
 import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
 import CheckboxInput from "../../../../../../utils/components/Form/CheckboxInput";
 import ProjeTablo from "../../../../../../utils/components/ProjeTablo";
+import NumberInput from "../../../../../../utils/components/NumberInput";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -453,20 +454,7 @@ export default function MainTabs({ modalOpen }) {
                   justifyContent: "space-between",
                 }}
               >
-                <Controller
-                  name="durusSuresiDakika"
-                  control={control}
-                  render={({ field }) => (
-                    <InputNumber
-                      {...field}
-                      style={{ width: "100%", maxWidth: "130px" }}
-                      onChange={(value) => {
-                        field.onChange(value);
-                        setValue("durusSuresiDakika", value);
-                      }}
-                    />
-                  )}
-                />
+                <NumberInput name1="durusSuresiDakika" isRequired={true} />
               </div>
             </div>
           </div>
@@ -497,7 +485,7 @@ export default function MainTabs({ modalOpen }) {
           </div> */}
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "380px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "285px" }}>
           <div
             style={{
               display: "flex",
@@ -517,24 +505,11 @@ export default function MainTabs({ modalOpen }) {
                 flexDirection: "row",
                 alignItems: "center",
                 width: "100%",
-                maxWidth: "220px",
+                maxWidth: "125px",
                 justifyContent: "space-between",
               }}
             >
-              <Controller
-                name="durusMaliyetiSaat"
-                control={control}
-                render={({ field }) => (
-                  <InputNumber
-                    {...field}
-                    style={{ width: "100%", maxWidth: "130px" }}
-                    onChange={(value) => {
-                      field.onChange(value);
-                      setValue("durusMaliyetiSaat", value);
-                    }}
-                  />
-                )}
-              />
+              <NumberInput name1="durusMaliyetiSaat" isRequired={false} />
             </div>
           </div>
           <div
@@ -544,7 +519,7 @@ export default function MainTabs({ modalOpen }) {
               alignItems: "center",
               justifyContent: "space-between",
               width: "100%",
-              maxWidth: "380px",
+              maxWidth: "285px",
               gap: "10px",
               flexDirection: "row",
             }}
@@ -556,24 +531,11 @@ export default function MainTabs({ modalOpen }) {
                 flexDirection: "row",
                 alignItems: "center",
                 width: "100%",
-                maxWidth: "220px",
+                maxWidth: "125px",
                 justifyContent: "space-between",
               }}
             >
-              <Controller
-                name="toplamMaliyet"
-                control={control}
-                render={({ field }) => (
-                  <InputNumber
-                    {...field}
-                    style={{ width: "100%", maxWidth: "130px" }}
-                    onChange={(value) => {
-                      field.onChange(value);
-                      setValue("toplamMaliyet", value);
-                    }}
-                  />
-                )}
-              />
+              <NumberInput name1="toplamMaliyet" isRequired={false} readOnly={true} />
             </div>
           </div>
         </div>

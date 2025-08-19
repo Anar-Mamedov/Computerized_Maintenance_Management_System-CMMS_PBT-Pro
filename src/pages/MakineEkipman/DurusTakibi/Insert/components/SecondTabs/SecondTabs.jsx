@@ -64,17 +64,17 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen })
     },*/
     {
       key: "4",
-      label: t("fisIcerigi"),
+      label: t("makineListesi"),
       children: <FisIcerigi modalOpen={modalOpen} />,
     },
 
-    {
+    /* {
       key: "5",
       label: "Özel Alanlar",
       // children: <SureBilgileri fieldRequirements={fieldRequirements} />,
       children: <OzelAlanlar />,
-    },
-    /* {
+    }, */
+    {
       key: "6",
       label: "Açıklama",
       children: (
@@ -82,7 +82,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen })
           <Controller name="aciklama" render={({ field }) => <TextArea {...field} rows={4} placeholder="Açıklama" style={{ width: "100%", resize: "none" }} />} />
         </div>
       ),
-    }, */
+    },
   ];
 
   return (
