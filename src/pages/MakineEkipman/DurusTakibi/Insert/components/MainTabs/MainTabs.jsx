@@ -71,6 +71,8 @@ export default function MainTabs({ modalOpen }) {
   const baslamaSaati = watch("baslamaSaati");
   const bitisZamani = watch("bitisZamani");
   const bitisSaati = watch("bitisSaati");
+  const durusSuresiDakikaValue = watch("durusSuresiDakika");
+  const durusMaliyetiSaatValue = watch("durusMaliyetiSaat");
 
   // duzenlenmeTarihi ve duzenlenmeSaati alanlarının boş ve ye sistem tarih ve saatinden büyük olup olmadığını kontrol etmek için bir fonksiyon
 
@@ -239,6 +241,20 @@ export default function MainTabs({ modalOpen }) {
       // Hata durumunda değeri temizlemez, kullanıcının müdahalesine bırakır
     }
   }, [baslamaZamani, baslamaSaati, bitisZamani, bitisSaati, setValue]);
+
+  // Duruş süresi (dk) ve saatlik maliyetten toplam maliyeti hesapla
+  useEffect(() => {
+    const minutes = Number(durusSuresiDakikaValue);
+    const hourlyCost = Number(durusMaliyetiSaatValue);
+
+    if (Number.isFinite(minutes) && Number.isFinite(hourlyCost) && minutes >= 0 && hourlyCost >= 0) {
+      const totalCost = (minutes / 60) * hourlyCost;
+      const rounded = Number(totalCost.toFixed(2));
+      setValue("toplamMaliyet", rounded);
+    } else if (minutes === 0 || hourlyCost === 0) {
+      setValue("toplamMaliyet", 0);
+    }
+  }, [durusSuresiDakikaValue, durusMaliyetiSaatValue, setValue]);
 
   return (
     <div style={{ display: "flex", marginBottom: "20px", flexDirection: "column", gap: "10px", width: "100%" }}>
