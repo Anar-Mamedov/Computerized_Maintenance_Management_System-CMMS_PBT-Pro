@@ -3,7 +3,9 @@ import { useTranslation } from "react-i18next";
 import { Table, Button, Form as AntForm, Input, InputNumber, Modal, message } from "antd";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { PlusOutlined } from "@ant-design/icons";
-import Malzemeler from "../../../../../../../../pages/Malzeme&DepoYonetimi/MalzemeTanimlari/Table/Table";
+// import Malzemeler from "../../../../../../../../pages/Malzeme&DepoYonetimi/MalzemeTanimlari/Table/Table";
+// import MakineTablo from "../../../../../../../../utils/components/Machina/MakineTablo";
+import MakineTabloSelection from "../../../../../../../../pages/Yonetim/LokasyonTanimlari/Update/components/SecondTabs/components/MakineTablo";
 // import PlakaSelectBox from "../../../../../../../../components/PlakaSelectbox";
 // Removed unused MasrafMerkeziTablo and KodIDSelectbox imports after column simplification
 
@@ -105,24 +107,22 @@ const EditableCell = ({ title, editable, children, dataIndex, record, handleSave
   );
 };
 
-const MalzemeSecModal = ({ visible, onCancel, onOk, deposuID }) => {
+const MakineSecModal = ({ visible, onCancel, onOk, refreshKey }) => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [modalKey, setModalKey] = useState(Date.now());
-
-  const handleMalzemeSelect = (rows) => {
-    setSelectedRows(rows);
-  };
 
   useEffect(() => {
     if (visible) {
       setModalKey(Date.now());
-      setSelectedRows([]); // Reset selection when modal opens
+      setSelectedRows([]);
     }
   }, [visible]);
 
   return (
-    <Modal title="Malzeme Seç" open={visible} onCancel={onCancel} onOk={() => onOk(selectedRows)} width={1200} style={{ top: 20 }} destroyOnClose>
-      <Malzemeler key={modalKey} onRowSelect={handleMalzemeSelect} isSelectionMode={true} deposuID={deposuID} islemTip="C" />
+    <Modal title="Makine Seç" open={visible} onCancel={onCancel} onOk={() => onOk(selectedRows)} width={1200} style={{ top: 20 }} destroyOnClose>
+      <div key={modalKey}>
+        <MakineTabloSelection selectionType="checkbox" onSelectionChange={setSelectedRows} refreshKey={modalKey} />
+      </div>
     </Modal>
   );
 };
@@ -400,75 +400,30 @@ function FisIcerigi({ modalOpen }) {
   };
 
   // Safe handleMalzemeSelect with error handling
-  const handleMalzemeSelect = (selectedRows) => {
+  const handleMakineSelect = (selectedRows) => {
     try {
-      // Get existing malzemeIds from the current dataSource
       const existingMalzemeIds = new Set(dataSource.map((item) => item.malzemeId));
+      const newRows = selectedRows.filter((row) => !existingMalzemeIds.has(row.TB_MAKINE_ID || row.key));
 
-      // Filter out already existing materials
-      const newRows = selectedRows.filter((row) => !existingMalzemeIds.has(row.TB_STOK_ID));
-
-      // If all selected materials already exist, show a warning
       if (newRows.length === 0) {
-        message.warning("Seçilen malzemeler zaten tabloda mevcut.");
+        message.warning("Seçilen makineler zaten tabloda mevcut.");
         setIsModalVisible(false);
         return;
       }
 
-      // If some materials were filtered out, show an info message
       if (newRows.length < selectedRows.length) {
-        message.info(`${selectedRows.length - newRows.length} malzeme zaten tabloda mevcut olduğu için eklenmedi.`);
+        message.info(`${selectedRows.length - newRows.length} makine zaten tabloda mevcut olduğu için eklenmedi.`);
       }
 
-      // Helper function to round to 2 decimal places
-      const round = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
-
       newRows.forEach((row) => {
-        const miktar = 1;
-        const fiyat = row.STK_CIKIS_FIYAT_DEGERI || 0;
-        const kdvOrani = row.STK_KDV_ORAN || 0;
-        const kdvDH = Boolean(row.STK_KDV_DH);
-
-        // Exception: Always calculate araToplam as miktar * fiyat regardless of kdvDH
-        const araToplam = round(miktar * fiyat);
-        const indirimOrani = 0;
-        const indirimTutari = 0;
-        const kdvMatrah = round(araToplam - indirimTutari);
-
-        let kdvTutar;
-        if (kdvDH) {
-          // If KDV is inclusive, calculate KDV portion from the price
-          const baseAmount = round(kdvMatrah / (1 + kdvOrani / 100));
-          kdvTutar = round(kdvMatrah - baseAmount);
-        } else {
-          // If KDV is exclusive, calculate KDV as additional
-          kdvTutar = round(kdvMatrah * (kdvOrani / 100));
-        }
-
-        // Calculate total based on kdvDH
-        const toplam = kdvDH ? round(kdvMatrah) : round(kdvMatrah + kdvTutar);
-
         const newRow = {
           id: Date.now() + Math.random(), // Generate unique ID
-          malzemeId: row.TB_STOK_ID,
-          birimKodId: row.STK_BIRIM_KOD_ID,
-          malzemeKodu: row.STK_KOD,
-          malzemeTanimi: row.STK_TANIM,
-          malzemeTipi: row.STK_TIP,
-          miktar,
-          birim: row.STK_BIRIM,
-          fiyat,
-          araToplam,
-          indirimOrani,
-          indirimTutari,
-          kdvOrani,
-          kdvDahilHaric: kdvDH,
-          kdvTutar,
-          toplam,
-          malzemeLokasyon: row.STK_LOKASYON || lokasyon || "",
-          malzemeLokasyonID: row.STK_LOKASYON_ID || lokasyonID || null,
-          masrafMerkezi: row.STK_MASRAFMERKEZ || "",
-          masrafMerkeziID: row.STK_MASRAF_MERKEZI_ID || null,
+          malzemeId: row.TB_MAKINE_ID || row.key,
+          malzemeKodu: row.code || row.MKN_KOD,
+          malzemeTanimi: row.definition || row.MKN_TANIM,
+          malzemeTipi: row.machine_type || row.MKN_TIP,
+          malzemeLokasyon: row.location || row.MKN_LOKASYON || lokasyon || "",
+          malzemeLokasyonID: row.machinelocationid || row.MKN_LOKASYON_ID || lokasyonID || null,
           aciklama: "",
         };
 
@@ -476,8 +431,8 @@ function FisIcerigi({ modalOpen }) {
       });
       setIsModalVisible(false);
     } catch (error) {
-      console.error("Error in handleMalzemeSelect:", error);
-      message.error("Malzeme eklenirken bir hata oluştu.");
+      console.error("Error in handleMakineSelect:", error);
+      message.error("Makine eklenirken bir hata oluştu.");
       setIsModalVisible(false);
     }
   };
@@ -544,7 +499,20 @@ function FisIcerigi({ modalOpen }) {
   return (
     <div style={{ marginTop: "-55px", zIndex: 10 }}>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
-        <Button style={{ zIndex: 21 }} type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
+        <Button
+          style={{ zIndex: 21 }}
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => {
+            try {
+              // Makine tablosu lokasyon filtrasyonu için formda beklenen alanı set et
+              setValue("selectedLokasyonId", lokasyonID || null);
+            } catch (e) {
+              // no-op
+            }
+            setIsModalVisible(true);
+          }}
+        >
           Ekle
         </Button>
       </div>
@@ -559,8 +527,7 @@ function FisIcerigi({ modalOpen }) {
         rowKey={(record) => record.id || Math.random().toString(36).substr(2, 9)} // Ensure stable keys
         scroll={{ y: "calc(100vh - 540px)" }}
       />
-
-      <MalzemeSecModal visible={isModalVisible} onCancel={() => setIsModalVisible(false)} onOk={handleMalzemeSelect} deposuID={girisDeposuID} />
+      <MakineSecModal visible={isModalVisible} onCancel={() => setIsModalVisible(false)} onOk={handleMakineSelect} refreshKey={Date.now()} />
     </div>
   );
 }
