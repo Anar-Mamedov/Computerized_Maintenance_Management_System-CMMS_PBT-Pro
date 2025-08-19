@@ -341,7 +341,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
           {t("ekle")}
         </Button>
         <Modal
-          width="900px"
+          width="710px"
           centered
           title={t("hizliMakineDurusGirisi")}
           destroyOnClose

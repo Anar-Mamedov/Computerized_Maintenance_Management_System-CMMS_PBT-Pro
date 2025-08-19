@@ -1529,6 +1529,17 @@ const MainTable = ({
     setValue("makineID", "");
   };
 
+  // Controlled modal açıldığında eski seçimleri ve filtreleri sıfırla
+  useEffect(() => {
+    if (typeof controlledOpen === "boolean" && controlledOpen) {
+      setSelectedRowKeys([]);
+      setSelectedRows([]);
+      setBody({ keyword: "", filters: {} });
+      setFiltersKey((prevKey) => prevKey + 1);
+      fetch({ filters: {}, keyword: "", page: 1 });
+    }
+  }, [controlledOpen]);
+
   return (
     <>
       {!hideHeader && (
