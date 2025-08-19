@@ -40,7 +40,8 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey }
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -61,7 +62,8 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey }
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -81,7 +83,8 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey }
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -101,7 +104,8 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey }
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -121,7 +125,8 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey }
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -141,7 +146,8 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey }
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -161,7 +167,8 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey }
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -181,7 +188,8 @@ export default function MakineTablo({ workshopSelectedId, onSubmit, refreshKey }
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
