@@ -94,7 +94,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       MKD_PLANLI: data.planliDurus,
     };
 
-    AxiosInstance.post(`AddUpdateIsEmriKontrolList?isEmriId=${secilenIsEmriID}`, Body)
+    AxiosInstance.post(`AddUpdateIsEmriDurus?isEmriId=${secilenIsEmriID}`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
 
