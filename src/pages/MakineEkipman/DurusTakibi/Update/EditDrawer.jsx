@@ -157,7 +157,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
     };
 
     // API'ye POST isteği gönder
-    AxiosInstance.post("UpdateMakineDurus", Body)
+    AxiosInstance.post(`UpdateMakineDurusBy?durusId=${selectedRow.TB_MAKINE_DURUS_ID}`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
         if (response.status_code === 200 || response.status_code === 201 || response.status_code === 202) {
