@@ -50,6 +50,9 @@ const Breadcrumbs = () => {
     "/stokSayimlari": "Stok Sayımları",
     "/hizliMaliyetlendirme": "Hızlı Maliyetlendirme",
     "/malzemeTransferOnayIslemleri": "Malzeme Transfer Onay İşlemleri",
+    "/malzemeTalepleri": "Malzeme Talepleri",
+    "/satinalmaSiparisleri": "Satınalma Siparişleri",
+    "/tedarikciFirmalar": "Tedarikçi Firmalar",
 
     // Diğer route'lar için ekleyin...
   };

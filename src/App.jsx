@@ -43,6 +43,9 @@ import KullaniciTanimlari from "./pages/Yonetim/KullaniciTanimlari/KullaniciTani
 import RolTanimlari1 from "./pages/Yonetim/RolTanimlari/RolTanimlari.jsx";
 import MalzemeTanimlari from "./pages/Malzeme&DepoYonetimi/MalzemeTanimlari/MalzemeTanimlari.jsx";
 import MalzemeDepolari from "./pages/Malzeme&DepoYonetimi/MalzemeDepolari/MalzemeDepolari.jsx";
+import MalzemeTalepleri from "./pages/SatinalmaYonetimi/MalzemeTalepleri/MalzemeTalepleri.jsx";
+import SatinalmaSiparisleri from "./pages/SatinalmaYonetimi/SatinalmaSiparisleri/SatinalmaSiparisleri.jsx";
+import DetarikciFirmalar from "./pages/SatinalmaYonetimi/FirmaTanimlari/FirmaTanimlari.jsx";
 import AxiosInstance from "./api/http";
 
 // Malzemeler
@@ -161,6 +164,19 @@ const rawItems = [
       getItem("Personel İzinleri", "personelIzinleri", true),
       getItem("Personel Nöbetleri", "personelNobetleri", true),
       getItem("Personel Çalışma Planı", "personelCalismaPLani", true),
+
+      // getItem("Team 2", "team2", true)
+    ],
+    false
+  ),
+  getItem(
+    "Satımalma Yönetimi",
+    "satinalmaYonetimi",
+    <UserOutlined />,
+    [
+      getItem("Malzeme Talepleri", "malzemeTalepleri", true),
+      getItem("Satınalma Siparişleri", "satinalmaSiparisleri", true),
+      getItem("Tedarikçi Firmalar", "tedarikciFirmalar", true),
 
       // getItem("Team 2", "team2", true)
     ],
@@ -351,6 +367,9 @@ export default function App() {
           <Route path="/stokSayimlari" element={<Hazirlaniyor />} />
           <Route path="/hizliMaliyetlendirme" element={<Hazirlaniyor />} />
           <Route path="/malzemeTransferOnayIslemleri" element={<Hazirlaniyor />} />
+          <Route path="/malzemeTalepleri" element={<MalzemeTalepleri />}/>
+          <Route path="/satinalmaSiparisleri" element={<SatinalmaSiparisleri/>}/>
+          <Route path="/tedarikciFirmalar" element={<DetarikciFirmalar/>}/>
           {/*<Route path="/kurallar" element={<Kurallar />} />*/}
         </Route>
       </Routes>
