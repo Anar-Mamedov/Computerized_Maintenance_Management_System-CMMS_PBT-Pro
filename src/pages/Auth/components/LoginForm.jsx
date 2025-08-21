@@ -95,6 +95,7 @@ export default function LoginForm() {
           hatirlatici: response.KLL_WEB_HATIR,
           makine: response.KLL_WEB_MAKINE,
           ekipmanVeritabani: response.KLL_WEB_EKIPMAN,
+          durusTakibi: response.KLL_WEB_EKIPMAN,
           sayacGuncelleme: response.KLL_WEB_SAYAC,
           bakimTanimlari: response.KLL_WEB_BAKIM,
           arizaTanimlari: response.KLL_WEB_ARIZA,

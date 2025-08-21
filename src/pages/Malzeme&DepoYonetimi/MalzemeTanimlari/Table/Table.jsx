@@ -123,7 +123,7 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
 
 // Sütunların sürüklenebilir olmasını sağlayan component sonu
 
-const Sigorta = ({ onRowSelect, isSelectionMode = false }) => {
+const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposuID = null }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   let setValue;
 
@@ -911,8 +911,21 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false }) => {
 
     try {
       setLoading(true);
-      // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.get(`Stok?modulNo=1&page=${currentPage}&prm=${keyword}`);
+
+      // islemTip değerine göre API URL'ini oluştur
+      let apiUrl = `Stok?modulNo=1&page=${currentPage}&prm=${keyword}`;
+
+      if (islemTip === "C" || islemTip === "T") {
+        // islemTip C veya T ise özel parametreler ekle
+        apiUrl += `&islemTip=${islemTip}&depoId=${deposuID || 1}`;
+      } else {
+        // islemTip null ise normal parametreler ekle
+        apiUrl;
+      }
+
+      // API isteğini yap
+      const response = await AxiosInstance.get(apiUrl);
+
       if (response) {
         // Toplam sayfa sayısını ayarla
         setTotalPages(response.page);

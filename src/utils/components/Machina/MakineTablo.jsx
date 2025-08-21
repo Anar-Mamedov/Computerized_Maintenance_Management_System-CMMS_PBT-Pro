@@ -103,7 +103,17 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
 
 // Sütunların sürüklenebilir olmasını sağlayan component sonu
 
-const MainTable = ({ setSelectedIds, onSubmit }) => {
+const MainTable = ({
+  setSelectedIds,
+  onSubmit,
+  controlledOpen,
+  onControlledOk,
+  onControlledCancel,
+  selectionType = "radio",
+  onSelectionChange,
+  hideHeader = false,
+  suppressFormFields = false,
+}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalVisible1, setIsModalVisible1] = useState(false);
   const {
@@ -137,6 +147,9 @@ const MainTable = ({ setSelectedIds, onSubmit }) => {
   useEffect(() => {
     if (typeof setSelectedIds === "function") {
       setSelectedIds(selectedRows);
+    }
+    if (typeof onSelectionChange === "function") {
+      onSelectionChange(selectedRows);
     }
   }, [selectedRows]);
 
@@ -1335,7 +1348,7 @@ const MainTable = ({ setSelectedIds, onSubmit }) => {
   };
 
   const rowSelection = {
-    type: "radio",
+    type: selectionType,
     selectedRowKeys,
     onChange: onSelectChange,
   };
@@ -1493,13 +1506,22 @@ const MainTable = ({ setSelectedIds, onSubmit }) => {
   };
 
   const handleModalOk = () => {
-    const selectedData = data.find((item) => item.key === selectedRowKeys[0]);
-    if (selectedData) {
-      setValue("makine", selectedData.MKN_KOD);
-      setValue("makineID", selectedData.key);
-      onSubmit && onSubmit(selectedData);
+    const selectedDataArray = data.filter((item) => selectedRowKeys.includes(item.key));
+    const selectedData = selectedDataArray[0];
+    if (typeof onControlledOk === "function") {
+      onControlledOk(selectedDataArray);
+    } else {
+      if (selectedData) {
+        if (!suppressFormFields) {
+          setValue("makine", selectedData.MKN_KOD);
+          setValue("makineID", selectedData.key);
+        }
+        onSubmit && onSubmit(selectedData);
+      }
     }
-    setIsModalVisible1(false);
+    if (typeof controlledOpen !== "boolean") {
+      setIsModalVisible1(false);
+    }
   };
 
   const handleMinusClick = () => {
@@ -1507,39 +1529,62 @@ const MainTable = ({ setSelectedIds, onSubmit }) => {
     setValue("makineID", "");
   };
 
+  // Controlled modal açıldığında eski seçimleri ve filtreleri sıfırla
+  useEffect(() => {
+    if (typeof controlledOpen === "boolean" && controlledOpen) {
+      setSelectedRowKeys([]);
+      setSelectedRows([]);
+      setBody({ keyword: "", filters: {} });
+      setFiltersKey((prevKey) => prevKey + 1);
+      fetch({ filters: {}, keyword: "", page: 1 });
+    }
+  }, [controlledOpen]);
+
   return (
     <>
-      <div style={{ display: "flex", gap: "5px", width: "100%" }}>
-        <Controller
-          name="makine"
-          control={control}
-          render={({ field }) => (
-            <Input
-              {...field}
-              status={errors.makine ? "error" : ""}
-              type="text" // Set the type to "text" for name input
-              style={{ width: "100%", maxWidth: "630px" }}
-              disabled
-            />
-          )}
-        />
-        <Controller
-          name="makineID"
-          control={control}
-          render={({ field }) => (
-            <Input
-              {...field}
-              type="text" // Set the type to "text" for name input
-              style={{ display: "none" }}
-            />
-          )}
-        />
-        <div style={{ display: "flex", gap: "5px" }}>
-          <Button onClick={handleModalToggle}>+</Button>
-          <Button onClick={handleMinusClick}> - </Button>
+      {!hideHeader && (
+        <div style={{ display: "flex", gap: "5px", width: "100%" }}>
+          <Controller
+            name="makine"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                status={errors.makine ? "error" : ""}
+                type="text"
+                style={{ width: "100%", maxWidth: "630px" }}
+                disabled
+              />
+            )}
+          />
+          <Controller
+            name="makineID"
+            control={control}
+            render={({ field }) => (
+              <Input {...field} type="text" style={{ display: "none" }} />
+            )}
+          />
+          <div style={{ display: "flex", gap: "5px" }}>
+            <Button onClick={handleModalToggle}>+</Button>
+            <Button onClick={handleMinusClick}> - </Button>
+          </div>
         </div>
-      </div>
-      <Modal width="1200px" centered title="Makine Tanımları" open={isModalVisible1} onOk={handleModalOk} onCancel={handleModalToggle}>
+      )}
+      <Modal
+        width="1200px"
+        centered
+        title="Makine Tanımları"
+        open={typeof controlledOpen === "boolean" ? controlledOpen : isModalVisible1}
+        onOk={handleModalOk}
+        onCancel={() => {
+          if (typeof onControlledCancel === "function") {
+            onControlledCancel();
+          }
+          if (typeof controlledOpen !== "boolean") {
+            handleModalToggle();
+          }
+        }}
+      >
         <Modal title="Sütunları Yönet" centered width={800} open={isModalVisible} onOk={() => setIsModalVisible(false)} onCancel={() => setIsModalVisible(false)}>
           <Text style={{ marginBottom: "15px" }}>Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını Ayarlayabilirsiniz.</Text>
           <div

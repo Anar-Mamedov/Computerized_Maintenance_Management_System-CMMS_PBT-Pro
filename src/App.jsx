@@ -37,6 +37,7 @@ import RolTanimlari from "./pages/OnayIslemleri/RolTanimlari/RolTanimlari.jsx";
 import OnayTanimlari from "./pages/OnayIslemleri/OnayTanimlari/OnayTanimlari.jsx";
 import Onaylayicilar from "./pages/OnayIslemleri/Onaylayicilar/Onaylayicilar.jsx";
 import EkipmanVeritabani from "./pages/MakineEkipman/EkipmanVeritabani/EkipmanVeritabani.jsx";
+import DurusTakibi from "./pages/MakineEkipman/DurusTakibi/DurusTakibi.jsx";
 import IsTalebiKullanicilari from "./pages/YardimMasasi/IsTalebiKullanicilari/IsTalebiKullanicilari.jsx";
 import KullaniciTanimlari from "./pages/Yonetim/KullaniciTanimlari/KullaniciTanimlari.jsx";
 import RolTanimlari1 from "./pages/Yonetim/RolTanimlari/RolTanimlari.jsx";
@@ -50,6 +51,8 @@ import AxiosInstance from "./api/http";
 // Malzemeler
 
 import GirisFisleri from "./pages/Malzeme&DepoYonetimi/GirisFisleri/GirisFisleri.jsx";
+import CikisFisleri from "./pages/Malzeme&DepoYonetimi/CikisFisleri/CikisFisleri.jsx";
+import TransferFisleri from "./pages/Malzeme&DepoYonetimi/TransferFisleri/TransferFisleri.jsx";
 
 // Ayarlar
 import Ayarlar from "./pages/Yonetim/Ayarlar/Ayarlar.jsx";
@@ -109,24 +112,8 @@ const rawItems = [
     [
       getItem("Makine Tanım", "makine", true),
       getItem("Ekipman Veritabanı", "ekipmanVeritabani", true),
+      getItem("Makine Duruş Takibi", "durusTakibi", true),
       getItem("Sayaç Güncelleme", "sayacGuncelleme", true),
-      // getItem("Team 2", "team2", true)
-    ],
-    false
-  ),
-  getItem(
-    "Malzeme & Depo Yönetimi",
-    "malzeme&depo",
-    <TeamOutlined />,
-    [
-      getItem("Malzeme Tanımı", "malzemeTanimi", true),
-      getItem("Malzeme Depoları", "malzemeDepolari", true),
-      getItem("Malzeme Giriş Fişi", "malzemeGirisFisi", true),
-      getItem("Malzeme Çıkış Fişi", "malzemeCikisFisi", true),
-      getItem("Malzeme Transfer Fişi", "malzemeTransferFisi", true),
-      /*  getItem("Stok Sayımları", "stokSayimlari", true),
-      getItem("Hızlı Maliyetlendirme", "hizliMaliyetlendirme", true),
-      getItem("Malzeme Transfer Onay İşlemleri", "malzemeTransferOnayIslemleri", true), */
       // getItem("Team 2", "team2", true)
     ],
     false
@@ -149,6 +136,24 @@ const rawItems = [
     ],
     false
   ),
+  getItem(
+    "Malzeme & Depo Yönetimi",
+    "malzeme&depo",
+    <TeamOutlined />,
+    [
+      getItem("Malzeme Tanımı", "malzemeTanimi", true),
+      getItem("Malzeme Depoları", "malzemeDepolari", true),
+      getItem("Malzeme Giriş Fişi", "malzemeGirisFisi", true),
+      getItem("Malzeme Çıkış Fişi", "malzemeCikisFisi", true),
+      getItem("Malzeme Transfer Fişi", "malzemeTransferFisi", true),
+      /*  getItem("Stok Sayımları", "stokSayimlari", true),
+      getItem("Hızlı Maliyetlendirme", "hizliMaliyetlendirme", true),
+      getItem("Malzeme Transfer Onay İşlemleri", "malzemeTransferOnayIslemleri", true), */
+      // getItem("Team 2", "team2", true)
+    ],
+    false
+  ),
+
   getItem(
     "Personel Yönetimi",
     "personelYonetimi",
@@ -326,6 +331,7 @@ export default function App() {
           <Route path="/planlamaTakvimi" element={<PlanlamaTakvimi />} />
           <Route path="/makine" element={<MakineTanim />} />
           <Route path="/ekipmanVeritabani" element={<EkipmanVeritabani />} />
+          <Route path="/durusTakibi" element={<DurusTakibi />} />
           <Route path="/sayacGuncelleme" element={<Hazirlaniyor />} />
           <Route path="/personelIzinleri" element={<Hazirlaniyor />} />
           <Route path="/personelNobetleri" element={<Hazirlaniyor />} />
@@ -356,8 +362,8 @@ export default function App() {
           <Route path="/malzemeTanimi" element={<MalzemeTanimlari />} />
           <Route path="/malzemeDepolari" element={<MalzemeDepolari />} />
           <Route path="/malzemeGirisFisi" element={<GirisFisleri />} />
-          <Route path="/malzemeCikisFisi" element={<GirisFisleri />} />
-          <Route path="/malzemeTransferFisi" element={<GirisFisleri />} />
+          <Route path="/malzemeCikisFisi" element={<CikisFisleri />} />
+          <Route path="/malzemeTransferFisi" element={<TransferFisleri />} />
           <Route path="/stokSayimlari" element={<Hazirlaniyor />} />
           <Route path="/hizliMaliyetlendirme" element={<Hazirlaniyor />} />
           <Route path="/malzemeTransferOnayIslemleri" element={<Hazirlaniyor />} />

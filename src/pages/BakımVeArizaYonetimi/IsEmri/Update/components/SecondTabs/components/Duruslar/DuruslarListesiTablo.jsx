@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Table } from "antd";
-import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { Button, Table, message, Popconfirm } from "antd";
+import { CheckOutlined, CloseOutlined, DeleteOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../api/http";
 import CreateModal from "./Insert/CreateModal";
 import EditModal from "./Update/EditModal";
+import { useTranslation } from "react-i18next";
 
 export default function DuruslarListesiTablo({ isActive }) {
   const [loading, setLoading] = useState(false);
@@ -13,6 +14,7 @@ export default function DuruslarListesiTablo({ isActive }) {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
+  const { t } = useTranslation();
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 
@@ -160,7 +162,7 @@ export default function DuruslarListesiTablo({ isActive }) {
   const fetch = useCallback(() => {
     if (isActive) {
       setLoading(true);
-      AxiosInstance.get(`FetchIsEmriDurusList?isemriID=${secilenIsEmriID}`)
+      AxiosInstance.get(`FetchIsEmriDurusList?isemriID=${secilenIsEmriID}&durusID=0`)
         .then((response) => {
           const fetchedData = response.map((item) => ({
             ...item,
@@ -201,16 +203,51 @@ export default function DuruslarListesiTablo({ isActive }) {
   const makineTanim = watch("makineTanim");
   const makineID = watch("makineID");
 
+  const handleDelete = async () => {
+    if (!selectedRowKeys.length) return;
+    const durusId = selectedRowKeys[0];
+    try {
+      setLoading(true);
+      const response = await AxiosInstance.post(`DeleteMakineDurusBy?durusId=${durusId}&isemri=true`);
+      if (response?.status_code === 200 || response?.status_code === 201) {
+        message.success(t("islemBasarili", "İşlem Başarılı."));
+      } else if (response?.status_code === 401) {
+        message.error(t("yetkiHatasi", "Bu işlemi yapmaya yetkiniz bulunmamaktadır."));
+      } else {
+        message.error(t("islemBasarisiz", "İşlem Başarısız."));
+      }
+      refreshTable();
+      setSelectedRowKeys([]);
+    } catch (error) {
+      console.error("Silme işlemi sırasında hata oluştu:", error);
+      message.error(t("islemBasarisiz", "İşlem Başarısız."));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div style={{ marginBottom: "25px" }}>
-      <CreateModal
-        onRefresh={refreshTable}
-        secilenIsEmriID={secilenIsEmriID}
-        lokasyon={lokasyon}
-        makineTanim={makineTanim}
-        lokasyonID={lokasyonID}
-        makineID={makineID}
-      />
+      <div style={{ display: "flex", justifySelf: "right" }}>
+        {selectedRowKeys.length > 0 && (
+          <div>
+            <Popconfirm
+              title={t("silmeIslemi", "Silme İşlemi")}
+              description={t("silmeOnayi", "Bu öğeyi silmek istediğinize emin misiniz?")}
+              onConfirm={handleDelete}
+              okText={t("evet", "Evet")}
+              cancelText={t("hayir", "Hayır")}
+              icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+            >
+              <Button danger icon={<DeleteOutlined />}>
+                {t("sil", "Sil")}
+              </Button>
+            </Popconfirm>
+          </div>
+        )}
+        <CreateModal onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} lokasyon={lokasyon} makineTanim={makineTanim} lokasyonID={lokasyonID} makineID={makineID} />
+      </div>
+
       <Table
         rowSelection={{
           type: "radio",
