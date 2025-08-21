@@ -134,6 +134,9 @@ export default function LoginForm() {
           stokSayimlari: response.KLL_WEB_STOKSAY,
           hizliMaliyetlendirme: response.KLL_WEB_HIZLIMAL,
           malzemeTransferOnayIslemleri: response.KLL_WEB_MALTRANSONAY,
+          malzemeTalepleri: true,
+          satinalmaSiparisleri: true,
+          tedarikciFirmalar: true,
         };
         const userInfo = {
           userId: response.TB_KULLANICI_ID ?? null,
