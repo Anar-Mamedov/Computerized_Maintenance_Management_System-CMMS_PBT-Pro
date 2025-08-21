@@ -15,7 +15,7 @@ import AtolyeTablo from "../../../../../../utils/components/AtolyeTablo";
 import DepoTablo from "../../../../../../utils/components/DepoTablo";
 import ProjeTablo from "../../../../../../utils/components/ProjeTablo";
 import SiparisTablo from "../../../../../../utils/components/SiparisTablo";
-import PersonelTablo from "../../../../../../utils/components/PersonelTablo";
+import PersonelTablo from "../../../components/PersonelTablo";
 import OncelikTablo from "./components/OncelikTablo";
 
 import { PlusOutlined } from "@ant-design/icons";
