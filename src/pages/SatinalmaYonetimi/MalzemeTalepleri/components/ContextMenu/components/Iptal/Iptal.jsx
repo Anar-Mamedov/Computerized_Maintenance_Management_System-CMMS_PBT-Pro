@@ -8,7 +8,7 @@ export default function Iptal({ selectedRows, refreshTableData, iptalDisabled })
   const [isModalOpen, setIsModalOpen] = useState(false);
   const methods = useForm({
     defaultValues: {
-      NedenKodId: 0,
+      NedenKodId: null,
       Aciklama: "",
     },
   });
@@ -19,8 +19,8 @@ export default function Iptal({ selectedRows, refreshTableData, iptalDisabled })
   const onSubmited = (data) => {
     // Seçili satırlar için Body dizisi
     const Body = selectedRows.map((row) => ({
-      FisId: row.key,          // row.key ile FisId atanıyor
-      NedenKodId: data.NedenKodId || 0,
+      FisId: row.key,                 // id
+      NedenKodId: data.NedenKodId,
       Aciklama: data.Aciklama || "",
     }));
 

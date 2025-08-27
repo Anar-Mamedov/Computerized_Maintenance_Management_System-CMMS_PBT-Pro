@@ -60,6 +60,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const { control, watch, setValue } = useFormContext();
 
+  const fisNo = selectedRows?.length === 1 ? selectedRows[0].SFS_FIS_NO : "";
+
   // Sil düğmesini gizlemek için koşullu stil
   const buttonStyle = iptalDisabled ? { display: "none" } : {};
 
@@ -112,7 +114,7 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
         control={control}
         render={({ field }) => (
           <Text {...field} style={{ fontSize: "14px", fontWeight: "600" }}>
-            Fiş No: {field.value}
+            Fiş No: {fisNo || "-"}
           </Text>
         )}
       />

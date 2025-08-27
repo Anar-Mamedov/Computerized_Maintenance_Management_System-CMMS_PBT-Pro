@@ -15,7 +15,7 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
       try {
         const payload = {
           ONAY_TABLO_ID: Number(row.key) || 0,       // Satır ID
-          ONAY_TABLO_KOD: row.IST_KOD || "",         // Satır kodu
+          ONAY_TABLO_KOD: row.SFS_FIS_NO || "",         // Satır kodu
           ONAY_ONYTANIM_ID: 3                         // Sabit değer, istersen burayı props ile dinamik yapabilirsin
         };
 
