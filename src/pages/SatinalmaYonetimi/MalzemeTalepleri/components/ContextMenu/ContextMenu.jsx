@@ -39,6 +39,7 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
     selectedRows,
     refreshTableData,
     hidePopover,
+    fisNo: selectedRows.length === 1 ? selectedRows[0].SFS_FIS_NO : null,
   };
 
   const renderButtonsByDurum = (id) => {
