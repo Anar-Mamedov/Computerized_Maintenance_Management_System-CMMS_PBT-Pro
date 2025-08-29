@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Filters from "./filter/Filters";
-import { Button, Modal, Table, Spin, message } from "antd";
+import { Button, Modal, Table, Spin, message, Tag } from "antd";
 import AxiosInstance from "../../../../../../../../../api/http";
 import dayjs from "dayjs";
 
@@ -21,6 +21,15 @@ const MainTable = ({ selectedRowId }) => {
     dataIndex: "gc",
     key: "gc",
     width: 60,
+    render: (value) => {
+      if (value === "G") {
+        return <Tag color="green">+</Tag>;
+      }
+      if (value === "C" || value === "T") {
+        return <Tag color="red">-</Tag>;
+      }
+      return value; // başka değer gelirse olduğu gibi göster
+    },
   },
   {
     title: "Makine Kodu",
@@ -29,10 +38,11 @@ const MainTable = ({ selectedRowId }) => {
     width: 150,
   },
   {
-    title: "Makine Tanım",
+    title: "Makine Tanımı",
     dataIndex: "makineTanim",
     key: "makineTanim",
-    width: 250,
+    width: 200,  // 200px genişlik
+    ellipsis: { showTitle: true },
   },
   {
     title: "Tarih",
@@ -169,19 +179,19 @@ const MainTable = ({ selectedRowId }) => {
         </div>
         <Spin spinning={loading}>
           <Table
-  columns={columns}
-  dataSource={data}
-  rowKey={(record, index) => `${record.makineKodu}-${index}`}
-  pagination={{
-    defaultPageSize: 10,
-    showSizeChanger: true,
-    pageSizeOptions: ["10", "20", "50", "100"],
-    position: ["bottomRight"],
-    showTotal: (total) => `Toplam ${total}`,
-    showQuickJumper: true,
-  }}
-  scroll={{ y: "calc(100vh - 370px)" }}
-/>
+            columns={columns}
+            dataSource={data}
+            rowKey={(record, index) => `${record.makineKodu}-${index}`}
+            pagination={{
+              defaultPageSize: 10,
+              showSizeChanger: true,
+              pageSizeOptions: ["10", "20", "50", "100"],
+              position: ["bottomRight"],
+              showTotal: (total) => `Toplam ${total}`,
+              showQuickJumper: true,
+            }}
+            scroll={{ y: "calc(100vh - 370px)" }}
+          />
         </Spin>
       </Modal>
     </>

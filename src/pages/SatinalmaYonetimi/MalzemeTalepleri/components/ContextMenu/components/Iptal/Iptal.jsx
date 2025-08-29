@@ -58,7 +58,9 @@ export default function Iptal({ selectedRows, refreshTableData, iptalDisabled })
   return (
     <FormProvider {...methods}>
       <div style={buttonStyle}>
-        <Button type="text" onClick={handleModalToggle}>
+        <Button style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
+  onClick={handleModalToggle}
+  type="text">
           İptal Et
         </Button>
         <Modal

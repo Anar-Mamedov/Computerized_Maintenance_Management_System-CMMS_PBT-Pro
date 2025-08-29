@@ -16,11 +16,15 @@ const MainTable = ({ selectedRowId }) => {
     title: "Depo Tanımı",
     dataIndex: "depoTanim",
     key: "depoTanim",
+    width: 200,  // 200px genişlik
+    ellipsis: { showTitle: true },
   },
   {
     title: "Üretici Kodu",
     dataIndex: "ureticiKod",
     key: "ureticiKod",
+    width: 125,  // 200px genişlik
+    ellipsis: { showTitle: true },
   },
   {
     title: "Giren Miktar",

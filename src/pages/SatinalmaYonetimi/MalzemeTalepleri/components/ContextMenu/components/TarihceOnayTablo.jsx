@@ -57,7 +57,7 @@ export default function TarihceTablo({ workshopSelectedId, onSubmit, selectedRow
   const fetch = useCallback(() => {
     setLoading(true);
     const selectedKey = selectedRows.map((item) => item.key).join(",");
-    AxiosInstance.get(`GetMalzemeSatinalmaTarihceDetayli?fisId=${selectedKey}`)
+    AxiosInstance.get(`GetMalzemeSatinalmaTarihceDetayli?fisId=${selectedKey}&detayId=&Onay=1`)
       .then((response) => {
         const fetchedData = response.data.map((item) => ({
           key: item.tarihceId,
@@ -95,12 +95,12 @@ export default function TarihceTablo({ workshopSelectedId, onSubmit, selectedRow
         onClick={handleModalToggle}
         type="text"
       >
-        Tarihçe
+        Onay Tarihçesi
       </Button>
       <Modal
         width={1000}
         centered
-        title="Malzeme Talebi Tarihçesi"
+        title="Malzeme Talebi Onay Tarihçesi"
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}

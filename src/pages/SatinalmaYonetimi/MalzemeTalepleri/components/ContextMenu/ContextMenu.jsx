@@ -9,7 +9,9 @@ import Kapat from "./components/Kapat/Kapat";
 import Iptal from "./components/Iptal/Iptal";
 import SatinalmaSiparisleri from "./components/SatinalmaSiparisleri";
 import TalebiAc from "./components/Kapat/Kapat";
-import OnayaGonder from "./components/OnayaGonder"; // ekledik
+import OnayaGonder from "./components/OnayaGonder";
+import TarihceOnayTablo from "./components/TarihceOnayTablo";
+import OnayGeriAl from "./components/OnayGeriAl";
 
 const { Text } = Typography;
 
@@ -51,8 +53,20 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
             <Iptal {...commonProps} />
           </>
         );
+      case 3:
+      return (
+        <>
+          <SatinalmaSiparisleri {...commonProps} />
+          <Iptal {...commonProps} />
+        </>
+      );
       case 7:
-        return <Iptal {...commonProps} />;
+        return (
+        <>
+          <OnayGeriAl {...commonProps} />
+          <Iptal {...commonProps} />
+        </>
+      );
       case 8:
         return (
           <>
@@ -109,12 +123,12 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
 
       {selectedRows.length >= 1 && (
         <>
-          <Sil
-            {...commonProps}
-            disabled={isDisabled}
-          />
+          <Sil {...commonProps} disabled={isDisabled} />
           <div style={{ marginTop: 10 }}>
             <TarihceTablo selectedRows={selectedRows} />
+          </div>
+          <div style={{ marginTop: 10 }}>
+            <TarihceOnayTablo selectedRows={selectedRows} />
           </div>
         </>
       )}

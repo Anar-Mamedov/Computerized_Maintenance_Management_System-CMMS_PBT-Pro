@@ -205,24 +205,28 @@ export default function MainTabs({ modalOpen }) {
   // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın
 
   useEffect(() => {
-    // Format the date based on the user's locale
-    const dateFormatter = new Intl.DateTimeFormat(navigator.language);
-    const sampleDate = new Date(2021, 10, 21);
-    const formattedSampleDate = dateFormatter.format(sampleDate);
-    setLocaleDateFormat(formattedSampleDate.replace("2021", "YYYY").replace("21", "DD").replace("11", "MM"));
+  // Format the date based on the user's locale
+  const dateFormatter = new Intl.DateTimeFormat(navigator.language);
+  const sampleDate = new Date(2021, 10, 21);
+  const formattedSampleDate = dateFormatter.format(sampleDate);
+  setLocaleDateFormat(
+    formattedSampleDate.replace("2021", "YYYY").replace("21", "DD").replace("11", "MM")
+  );
 
-    // Format the time based on the user's locale
-    const timeFormatter = new Intl.DateTimeFormat(navigator.language, {
-      hour: "numeric",
-      minute: "numeric",
-    });
-    const sampleTime = new Date(2021, 10, 21, 13, 45); // Use a sample time, e.g., 13:45
-    const formattedSampleTime = timeFormatter.format(sampleTime);
+  // Format the time based on the user's locale
+  const timeFormatter = new Intl.DateTimeFormat(navigator.language, {
+    hour: "numeric",
+    minute: "numeric",
+  });
+  const sampleTime = new Date(2021, 10, 21, 13, 45);
+  const formattedSampleTime = timeFormatter.format(sampleTime);
+  const is12HourFormat = /AM|PM/.test(formattedSampleTime);
+  setLocaleTimeFormat(is12HourFormat ? "hh:mm A" : "HH:mm");
 
-    // Check if the formatted time contains AM/PM, which implies a 12-hour format
-    const is12HourFormat = /AM|PM/.test(formattedSampleTime);
-    setLocaleTimeFormat(is12HourFormat ? "hh:mm A" : "HH:mm");
-  }, []);
+  // ✅ Form alanlarına başlangıç değerini set et
+  setValue("talepTarihi", dayjs());
+  setValue("saat", dayjs());
+}, []);
 
   // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın sonu
 
@@ -670,8 +674,7 @@ export default function MainTabs({ modalOpen }) {
         <Controller
           name="talepDurumName"
           control={control}
-          defaultValue="AÇIK"
-          render={({ field }) => <Input {...field} disabled value="AÇIK" style={{ flex: 1 }} />}
+          render={({ field }) => <Input {...field} disabled style={{ flex: 1 }} />}
         />
       </div>
     </div>
