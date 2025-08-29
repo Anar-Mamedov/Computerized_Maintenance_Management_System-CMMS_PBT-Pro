@@ -16,6 +16,8 @@ const MainTable = ({ selectedRowId }) => {
     title: "Tedarikçi Adı",
     dataIndex: "tedarikcAdi",
     key: "tedarikcAdi",
+    width: 200,  // 200px genişlik
+    ellipsis: { showTitle: true },
   },
   {
     title: "Son Alış Tarihi",

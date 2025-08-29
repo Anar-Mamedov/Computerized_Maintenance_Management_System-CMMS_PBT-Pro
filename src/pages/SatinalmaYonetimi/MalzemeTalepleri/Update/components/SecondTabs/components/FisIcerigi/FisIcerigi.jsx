@@ -3,12 +3,13 @@ import { Table, Button, Form as AntForm, Input, InputNumber, Popconfirm, Modal, 
 import { useFieldArray, useFormContext, Controller } from "react-hook-form";
 import { PlusOutlined } from "@ant-design/icons";
 import { t } from "i18next";
-import Malzemeler from "../../../../../../../Malzeme&DepoYonetimi/MalzemeTanimlari/MalzemeTanimlari";
+import Malzemeler from "../../../../../../../Malzeme&DepoYonetimi/MalzemeTanimlari/Table/Table";
 // import PlakaSelectBox from "../../../../../../../../components/PlakaSelectbox";
 import LokasyonTablo from "../../../../../../../../utils/components/LokasyonTablo";
 import MasrafMerkeziTablo from "../../../../../../../../utils/components/MasrafMerkeziTablo";
+import MakineTablo from "../../../../../components/MakineTablo";
 import KodIDSelectbox from "../../../../../../../../utils/components/KodIDSelectbox";
-import MakineTablo from "../../../../../../../../utils/components/Machina/MakineTablo";
+import ContextMenu from "./ContextMenu"
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -120,13 +121,29 @@ const MalzemeSecModal = ({ visible, onCancel, onOk }) => {
   useEffect(() => {
     if (visible) {
       setModalKey(Date.now());
-      setSelectedRows([]); // Reset selection when modal opens
+      setSelectedRows([]);
     }
   }, [visible]);
 
+  // Burada hangi kolonlar gözükmeli belirliyorsun
+  const visibleColumns = ["malzemeKodu", "malzemeTanimi", "ureticiKodu","tip", "birim", "stokMiktar","grup", "lokasyon", "marka", "model", "malzemeSinifi"]; // örnek kolonlar
+
   return (
-    <Modal title="Malzeme Seç" open={visible} onCancel={onCancel} onOk={() => onOk(selectedRows)} width={1200} style={{ top: 20 }} destroyOnClose>
-      <Malzemeler key={modalKey} onRowSelect={handleMalzemeSelect} isSelectionMode={true} />
+    <Modal
+      title="Malzeme Listesi"
+      open={visible}
+      onCancel={onCancel}
+      onOk={() => onOk(selectedRows)}
+      width={1200}
+      style={{ top: 20 }}
+      destroyOnClose
+    >
+      <Malzemeler
+        key={modalKey}
+        onRowSelect={handleMalzemeSelect}
+        isSelectionMode={true}
+        visibleColumns={visibleColumns} // props ile gönderiyoruz
+      />
     </Modal>
   );
 };
@@ -134,8 +151,6 @@ const MalzemeSecModal = ({ visible, onCancel, onOk }) => {
 function FisIcerigi({ modalOpen }) {
   const { control, setValue, watch, getValues } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isLokasyonModalOpen, setIsLokasyonModalOpen] = useState(false);
-  const [currentEditingRow, setCurrentEditingRow] = useState(null);
   const [previousModalState, setPreviousModalState] = useState(false);
   const [isIndirimManuallyEdited, setIsIndirimManuallyEdited] = useState(false);
   const [selectedRowId, setSelectedRowId] = useState(null);
@@ -402,81 +417,90 @@ function FisIcerigi({ modalOpen }) {
 
   // Safe handleMalzemeSelect with error handling
   const handleMalzemeSelect = (selectedRows) => {
-  try {
-    // Mevcut malzemeId'leri al
-    const existingMalzemeIds = new Set(dataSource.map((item) => item.malzemeId));
+    try {
+      // Get existing malzemeIds from the current dataSource
+      const existingMalzemeIds = new Set(dataSource.map((item) => item.malzemeId));
 
-    // Zaten ekli olanları filtrele
-    const newRows = selectedRows.filter((row) => !existingMalzemeIds.has(row.TB_STOK_ID));
+      // Filter out already existing materials
+      const newRows = selectedRows.filter((row) => !existingMalzemeIds.has(row.TB_STOK_ID));
 
-    if (newRows.length === 0) {
-      message.warning("Seçilen malzemeler zaten tabloda mevcut.");
-      setIsModalVisible(false);
-      return;
-    }
-
-    if (newRows.length < selectedRows.length) {
-      message.info(`${selectedRows.length - newRows.length} malzeme zaten tabloda mevcut olduğu için eklenmedi.`);
-    }
-
-    const round = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
-
-    newRows.forEach((row) => {
-      const miktar = row.talepMiktar || 0;
-      const fiyat = row.STK_CIKIS_FIYAT_DEGERI || 0;
-      const kdvOrani = row.STK_KDV_ORAN || 0;
-      const kdvDH = Boolean(row.STK_KDV_DH);
-
-      const araToplam = round(miktar * fiyat);
-      const indirimTutari = 0;
-      const kdvMatrah = round(araToplam - indirimTutari);
-
-      let kdvTutar;
-      if (kdvDH) {
-        const baseAmount = round(kdvMatrah / (1 + kdvOrani / 100));
-        kdvTutar = round(kdvMatrah - baseAmount);
-      } else {
-        kdvTutar = round(kdvMatrah * (kdvOrani / 100));
+      // If all selected materials already exist, show a warning
+      if (newRows.length === 0) {
+        message.warning("Seçilen malzemeler zaten tabloda mevcut.");
+        setIsModalVisible(false);
+        return;
       }
 
-      const toplam = kdvDH ? round(kdvMatrah) : round(kdvMatrah + kdvTutar);
+      // If some materials were filtered out, show an info message
+      if (newRows.length < selectedRows.length) {
+        message.info(`${selectedRows.length - newRows.length} malzeme zaten tabloda mevcut olduğu için eklenmedi.`);
+      }
 
-      const newRow = {
-        siraNo: Date.now() + Math.random(), // benzersiz sıraNo
-        fisId: null, // sonradan atanabilir
-        malzemeKod: row.STK_KOD,
-        malzemeName: row.STK_TANIM,
-        malzemeId: row.TB_STOK_ID,
-        malDurumID: null,
-        malDurumName: null,
-        malKarsilamaSekli: null,
-        talepMiktar: miktar,
-        gelenMiktar: 0,
-        kalanMiktar: 0,
-        satinalmaMiktar: miktar,
-        iptalMiktar: 0,
-        stokKullanimMiktar: 0,
-        birimKodId: row.STK_BIRIM_KOD_ID,
-        birimName: row.STK_BIRIM,
-        makineId: row.makineId || 0,
-        makineName: row.makineName || null,
-        aciklama: row.aciklama || "",
-        araToplam,
-        indirimliToplam: round(araToplam - indirimTutari),
-        kdvToplam: kdvTutar,
-        genelToplam: toplam,
-      };
+      // Helper function to round to 2 decimal places
+      const round = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
 
-      append(newRow); // react-hook-form append ile ekle
-    });
+      newRows.forEach((row) => {
+        const miktar = 1;
+        const fiyat = row.STK_CIKIS_FIYAT_DEGERI || 0;
+        const kdvOrani = row.STK_KDV_ORAN || 0;
+        const kdvDH = Boolean(row.STK_KDV_DH);
 
-    setIsModalVisible(false);
-  } catch (error) {
-    console.error("Error in handleMalzemeSelect:", error);
-    message.error("Malzeme eklenirken bir hata oluştu.");
-    setIsModalVisible(false);
-  }
+        // Exception: Always calculate araToplam as miktar * fiyat regardless of kdvDH
+        const araToplam = round(miktar * fiyat);
+        const indirimOrani = 0;
+        const indirimTutari = 0;
+        const kdvMatrah = round(araToplam - indirimTutari);
+
+        let kdvTutar;
+        if (kdvDH) {
+          // If KDV is inclusive, calculate KDV portion from the price
+          const baseAmount = round(kdvMatrah / (1 + kdvOrani / 100));
+          kdvTutar = round(kdvMatrah - baseAmount);
+        } else {
+          // If KDV is exclusive, calculate KDV as additional
+          kdvTutar = round(kdvMatrah * (kdvOrani / 100));
+        }
+
+        // Calculate total based on kdvDH
+        const toplam = kdvDH ? round(kdvMatrah) : round(kdvMatrah + kdvTutar);
+
+        const newRow = {
+  id: Date.now() + Math.random(), // Unique ID, frontend için
+  siraNo: 0,
+  fisId: 0,
+  malzemeKod: row.STK_KOD,
+  malzemeName: row.STK_TANIM,
+  malzemeId: row.TB_STOK_ID,
+  malDurumID: 0,
+  malDurumName: "AÇIK", // isteğe göre formdaki talepDurumName ile de set edilebilir
+  malKarsilamaSekli: "SATINALMA",
+  talepMiktar: miktar || 0,
+  gelenMiktar: 0,
+  kalanMiktar: 0,
+  satinalmaMiktar: 0,
+  iptalMiktar: 0,
+  stokKullanimMiktar: 0,
+  birimKodId: row.STK_BIRIM_KOD_ID,
+  birimName: row.STK_BIRIM,
+  makineId: 0,
+  makineName: "",
+  malzemeLokasyon: row.STK_LOKASYON || lokasyon || "",
+  malzemeLokasyonID: row.STK_LOKASYON_ID || lokasyonID || null,
+  masrafMerkezi: row.STK_MASRAFMERKEZ || "",
+  masrafMerkeziID: row.STK_MASRAF_MERKEZI_ID || null,
+  aciklama: "",
+  isDeleted: false,
 };
+
+        append(newRow);
+      });
+      setIsModalVisible(false);
+    } catch (error) {
+      console.error("Error in handleMalzemeSelect:", error);
+      message.error("Malzeme eklenirken bir hata oluştu.");
+      setIsModalVisible(false);
+    }
+  };
 
   const components = {
     body: {
@@ -579,14 +603,14 @@ function FisIcerigi({ modalOpen }) {
     },
     {
       title: "Makine",
-      dataIndex: "makineName",
-      key: "makineName",
+      dataIndex: "makine",
+      key: "makine",
       width: 200,
       ellipsis: true,
       render: (text, record, index) => (
         <MakineTablo
           disabled={false}
-          makineFieldName={`fisIcerigi.${index}.makine`}
+          makineFieldName={`fisIcerigi.${index}.makineTanim`}
           makineIdFieldName={`fisIcerigi.${index}.makineID`}
           onSubmit={(selectedData) => {
             // Update the specific row's masraf merkezi data
@@ -594,13 +618,13 @@ function FisIcerigi({ modalOpen }) {
             if (newData[index]) {
               newData[index] = {
                 ...newData[index],
-                makine: selectedData.MKN_KOD,
+                makineTanim: selectedData.MKN_KOD,
                 makineID: selectedData.key,
               };
               setDataSource(newData);
 
               // Update form values
-              setValue(`fisIcerigi.${index}.makine`, selectedData.MKN_KOD);
+              setValue(`fisIcerigi.${index}.makineTanim`, selectedData.MKN_KOD);
               setValue(`fisIcerigi.${index}.makineID`, selectedData.key);
             }
           }}
@@ -610,7 +634,7 @@ function FisIcerigi({ modalOpen }) {
             if (newData[index]) {
               newData[index] = {
                 ...newData[index],
-                makine: "",
+                makineTanim: "",
                 makineID: null,
               };
               setDataSource(newData);
@@ -690,11 +714,12 @@ function FisIcerigi({ modalOpen }) {
 
   return (
     <div style={{ marginTop: "-55px", zIndex: 10 }}>
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
-        <Button style={{ zIndex: 21 }} type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
-          Ekle
-        </Button>
-      </div>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16, position: "relative", zIndex: 1000, gap: "10px", }}>
+     <ContextMenu selectedRowId={selectedRowId} />
+  <Button style={{ zIndex: 1001 }} type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
+    Ekle
+  </Button>
+</div>
       <Table
         components={components}
         rowClassName={() => "editable-row"}
@@ -706,7 +731,6 @@ function FisIcerigi({ modalOpen }) {
         rowKey={(record) => record.id || Math.random().toString(36).substr(2, 9)} // Ensure stable keys
         scroll={{ y: "calc(100vh - 540px)" }}
       />
-
       <MalzemeSecModal visible={isModalVisible} onCancel={() => setIsModalVisible(false)} onOk={handleMalzemeSelect} />
     </div>
   );

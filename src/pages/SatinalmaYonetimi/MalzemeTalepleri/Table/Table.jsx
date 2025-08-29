@@ -335,35 +335,54 @@ const MainTable = () => {
       render: (text) => formatTime(text),
     },
     {
-      title: "Durum",
-      dataIndex: "SFS_DURUM",
-      key: "SFS_DURUM",
-      width: 150,
-      ellipsis: true,
+  title: "Durum",
+  dataIndex: "SFS_DURUM",
+  key: "SFS_DURUM",
+  width: 150,
+  ellipsis: true,
+  render: (text) => {
+    let style = {
+      borderRadius: "12px",
+      padding: "2px 8px",
+      fontWeight: 500,
+      fontSize: "12px",
+    };
 
-      visible: true, // Varsayılan olarak açık
-      sorter: (a, b) => {
-        if (a.SFS_DURUM === null && b.SFS_DURUM === null) return 0;
-        if (a.SFS_DURUM === null) return -1;
-        if (b.SFS_DURUM === null) return 1;
-        return a.SFS_DURUM.localeCompare(b.SFS_DURUM);
-      },
-      render: (text, record) => {
-        const circleStyle = {
-          backgroundColor: record.KAPALI ? "red" : "green", // KAPALI true ise kırmızı, değilse yeşil
-          borderRadius: "50%",
-          display: "inline-block",
-          width: "10px",
-          height: "10px",
-        };
-        return (
-          <div>
-            <span style={circleStyle}></span>
-            <span style={{ marginLeft: "5px" }}>{text}</span>
-          </div>
-        );
-      },
-    },
+    switch (text) {
+      case "ONAYLANDI":
+        style = { ...style, backgroundColor: "#d4f8e8", color: "#207868" }; // pastel yeşil
+        break;
+      case "ONAY BEKLİYOR":
+        style = { ...style, backgroundColor: "#fff4d6", color: "#b8860b" }; // pastel sarı
+        break;
+      case "ONAYLANMADI":
+        style = { ...style, backgroundColor: "#ffe0e0", color: "#b22222" }; // pastel kırmızı
+        break;
+      case "SİPARİŞ":
+        style = { ...style, backgroundColor: "#e6ecff", color: "#4056a1" }; // pastel mavi
+        break;
+      case "AÇIK":
+        style = { ...style, backgroundColor: "#e1f7d5", color: "#3c763d" }; // açık yeşil
+        break;
+      case "TEKLİF":
+        style = { ...style, backgroundColor: "#e0f7fa", color: "#00796b" }; // pastel turkuaz
+        break;
+      case "KAPALI":
+        style = { ...style, backgroundColor: "#fde2e4", color: "#d64550" }; // pastel kırmızı/rose
+        break;
+      case "İPTAL":
+        style = { ...style, backgroundColor: "#fde2e4", color: "#d64550" }; // pastel kırmızı/rose (KAPALI ile aynı)
+        break;
+      case "KARŞILANIYOR":
+        style = { ...style, backgroundColor: "#e6f7ff", color: "#096dd9" }; // pastel açık mavi
+        break;
+      default:
+        style = { ...style, backgroundColor: "#f5f5f5", color: "#595959" }; // gri
+    }
+
+    return <span style={style}>{text}</span>;
+  },
+},
     {
       title: "Lokasyon",
       dataIndex: "SFS_LOKASYON",

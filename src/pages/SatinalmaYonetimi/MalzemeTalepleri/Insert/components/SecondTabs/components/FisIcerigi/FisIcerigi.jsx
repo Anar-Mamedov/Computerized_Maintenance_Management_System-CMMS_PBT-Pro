@@ -473,7 +473,7 @@ function FisIcerigi({ modalOpen }) {
   malzemeId: row.TB_STOK_ID,
   malDurumID: 0,
   malDurumName: "AÇIK", // isteğe göre formdaki talepDurumName ile de set edilebilir
-  karsilamaSekli: "SATINALMA",
+  malKarsilamaSekli: "SATINALMA",
   talepMiktar: miktar || 0,
   gelenMiktar: 0,
   kalanMiktar: 0,
@@ -552,13 +552,13 @@ function FisIcerigi({ modalOpen }) {
     },
     {
   title: "Karşılama Şekli",
-  dataIndex: "karsilamaSekli",
-  key: "karsilamaSekli",
+  dataIndex: "malKarsilamaSekli",
+  key: "malKarsilamaSekli",
   width: 150,
   editable: false,
   render: (text, record, index) => (
     <Controller
-      name={`fisIcerigi.${index}.karsilamaSekli`}
+      name={`fisIcerigi.${index}.malKarsilamaSekli`}
       control={control}
       defaultValue="SATINALMA" // default değer
       render={({ field }) => (
