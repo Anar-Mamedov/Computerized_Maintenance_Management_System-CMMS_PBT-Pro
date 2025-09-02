@@ -1,13 +1,21 @@
-import tr_TR from "antd/es/locale/tr_TR";
+import trTR from "antd/es/locale/tr_TR";
+import enUS from "antd/es/locale/en_US";
+import ruRU from "antd/es/locale/ru_RU";
+import azAZ from "antd/es/locale/az_AZ";
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Drawer, Space, ConfigProvider, Modal, message } from "antd";
+import { Button, Drawer, Space, ConfigProvider, Modal, message, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import MainTabs from "./components/MainTabs/MainTabs";
-import { useForm, Controller, useFormContext, FormProvider } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
+import PropTypes from "prop-types";
 import dayjs from "dayjs";
 import AxiosInstance from "../../../../api/http";
-import Footer from "../Footer";
+/* import Footer from "../Footer"; */
 import SecondTabs from "./components/secondTabs/secondTabs";
+import { t } from "i18next";
+import Tabs from "./components/Tabs/Tabs";
+
+const { Text } = Typography;
 
 export default function CreateDrawer({ onRefresh }) {
   const [open, setOpen] = useState(false);
@@ -62,13 +70,13 @@ export default function CreateDrawer({ onRefresh }) {
       makineGarantiBitisTarihi: "",
       makineDurusBirimMaliyeti: "",
       makinePlanCalismaSuresi: "",
-      makineAktif: "true",
-      makineKalibrasyon: "",
-      kritikMakine: "",
-      makineGucKaynagi: "",
-      makineIsBildirimi: "",
-      makineYakitKullanim: "",
-      makineOtonomBakim: "",
+      makineAktif: false,
+      makineKalibrasyon: false,
+      kritikMakine: false,
+      makineGucKaynagi: false,
+      makineIsBildirimi: false,
+      makineYakitKullanim: false,
+      makineOtonomBakim: false,
       // detay bilgi sekmesi
       makineMasrafMerkeziTanim: "",
       makineMasrafMerkeziID: "",
@@ -211,7 +219,7 @@ export default function CreateDrawer({ onRefresh }) {
     return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
   };
 
-  const { setValue, reset } = methods;
+  const { setValue, reset, watch } = methods;
 
   //* export
   const onSubmit = (data) => {
@@ -427,23 +435,42 @@ export default function CreateDrawer({ onRefresh }) {
 
   return (
     <FormProvider {...methods}>
-      <ConfigProvider locale={tr_TR}>
+      <ConfigProvider
+        locale={(() => {
+          const localeMap = { tr: trTR, en: enUS, ru: ruRU, az: azAZ };
+          const currentLang = (localStorage.getItem("i18nextLng") || "tr").split("-")[0];
+          return localeMap[currentLang] || enUS;
+        })()}
+      >
         <Button
           type="primary"
           onClick={showDrawer}
           style={{
             display: "flex",
             alignItems: "center",
-          }}>
+          }}
+        >
           <PlusOutlined />
           Ekle
         </Button>
         <Drawer
-          width="1660px"
-          title="Yeni Kayıt Ekle"
+          width="1200px"
+          title={
+            <div style={{ display: "flex", alignItems: "flex-start", flexDirection: "column" }}>
+              <Text type="secondary" style={{ fontWeight: "300", fontSize: "12px" }}>
+                PBT PRO / {t("makineSicilKarti")}
+              </Text>
+              <Text>{watch("makineKodu")}</Text>
+            </div>
+          }
           placement={"right"}
           onClose={onClose}
           open={open}
+          styles={{
+            content: { backgroundColor: "#f5f5f5" },
+            body: { backgroundColor: "#f5f5f5" },
+            header: { backgroundColor: "#ffffff" },
+          }}
           extra={
             <Space>
               <Button onClick={onClose}>İptal</Button>
@@ -454,18 +481,25 @@ export default function CreateDrawer({ onRefresh }) {
                   backgroundColor: "#2bc770",
                   borderColor: "#2bc770",
                   color: "#ffffff",
-                }}>
+                }}
+              >
                 Kaydet
               </Button>
             </Space>
-          }>
+          }
+        >
           <form onSubmit={methods.handleSubmit(onSubmit)}>
             <MainTabs />
-            <SecondTabs />
-            <Footer />
+            {/* <SecondTabs /> */}
+            <Tabs />
+            {/*  <Footer /> */}
           </form>
         </Drawer>
       </ConfigProvider>
     </FormProvider>
   );
 }
+
+CreateDrawer.propTypes = {
+  onRefresh: PropTypes.func.isRequired,
+};

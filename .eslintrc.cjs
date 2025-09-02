@@ -5,10 +5,11 @@ module.exports = {
   ignorePatterns: ["dist", ".eslintrc.cjs"],
   parserOptions: { ecmaVersion: "latest", sourceType: "module" },
   settings: { react: { version: "18.2" } },
-  plugins: ["react-refresh"],
+  plugins: ["react", "react-refresh"],
   rules: {
     "no-unused-vars": ["warn", { varsIgnorePattern: "^React$" }], // Nihad qardaşın ayarı
     "react/prop-types": "warn", // Nihad qardaşın ayarı
+    "react/no-unstable-nested-components": "warn",
     "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
   },
 };

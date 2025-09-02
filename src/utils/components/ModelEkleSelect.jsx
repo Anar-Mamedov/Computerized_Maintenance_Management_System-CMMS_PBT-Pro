@@ -3,8 +3,16 @@ import { Button, Input, Modal, Table, message, Select, Spin, Popconfirm } from "
 import AxiosInstance from "../../api/http";
 import { useFormContext, Controller } from "react-hook-form";
 import { DeleteOutlined } from "@ant-design/icons";
+import PropTypes from "prop-types";
 
-export default function ModelEkleSelect({ workshopSelectedId, onSubmit }) {
+export default function ModelEkleSelect({
+  workshopSelectedId,
+  onSubmit,
+  modelFieldName = "MakineModel",
+  modelIdFieldName = "MakineModelID",
+  markaIdFieldName = "MakineMarkaID",
+  style = {},
+}) {
   // useFormContext is replaced with useForm for local form state management
   const { control, setValue, watch } = useFormContext();
 
@@ -17,7 +25,7 @@ export default function ModelEkleSelect({ workshopSelectedId, onSubmit }) {
   const [yeniMarka, setYeniMarka] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
 
-  const selectedMarkaID = watch("MakineMarkaID");
+  const selectedMarkaID = watch(markaIdFieldName);
 
   const fetchData = async () => {
     setLoading(true);
@@ -137,21 +145,21 @@ export default function ModelEkleSelect({ workshopSelectedId, onSubmit }) {
   };
 
   useEffect(() => {
-    setValue("MakineModel", null);
-    setValue("MakineModelID", null);
+    setValue(modelFieldName, null);
+    setValue(modelIdFieldName, null);
     setOptions([]); // Also reset options
-  }, [selectedMarkaID, setValue]);
+  }, [selectedMarkaID, setValue, modelFieldName, modelIdFieldName]);
 
   return (
     <div style={{ width: "100%" }}>
       <div style={{ display: "flex", gap: "5px", width: "100%" }}>
         <Controller
-          name="MakineModel"
+          name={modelFieldName}
           control={control}
           render={({ field }) => (
             <Select
               {...field}
-              style={{ width: "100%" }}
+              style={{ width: "100%", ...style }}
               disabled={!selectedMarkaID}
               showSearch
               allowClear
@@ -170,14 +178,14 @@ export default function ModelEkleSelect({ workshopSelectedId, onSubmit }) {
               }))}
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
-                setValue("MakineModelID", value);
+                setValue(modelIdFieldName, value);
                 field.onChange(value);
               }}
             />
           )}
         />
         <Controller
-          name="MakineModelID"
+          name={modelIdFieldName}
           control={control}
           render={({ field }) => (
             <Input
@@ -234,3 +242,12 @@ export default function ModelEkleSelect({ workshopSelectedId, onSubmit }) {
     </div>
   );
 }
+
+ModelEkleSelect.propTypes = {
+  workshopSelectedId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  onSubmit: PropTypes.func,
+  modelFieldName: PropTypes.string,
+  modelIdFieldName: PropTypes.string,
+  markaIdFieldName: PropTypes.string,
+  style: PropTypes.object,
+};
