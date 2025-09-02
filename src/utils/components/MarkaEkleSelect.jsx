@@ -3,8 +3,9 @@ import { Button, Input, Modal, Table, message, Select, Spin, Popconfirm } from "
 import AxiosInstance from "../../api/http";
 import { useFormContext, Controller } from "react-hook-form";
 import { DeleteOutlined } from "@ant-design/icons";
+import PropTypes from "prop-types";
 
-export default function MarkaEkleSelect({ workshopSelectedId, onSubmit }) {
+export default function MarkaEkleSelect({ workshopSelectedId, onSubmit, markaFieldName = "MakineMarka", markaIdFieldName = "MakineMarkaID", style = {} }) {
   // useFormContext is replaced with useForm for local form state management
   const { control, setValue } = useFormContext();
 
@@ -137,12 +138,12 @@ export default function MarkaEkleSelect({ workshopSelectedId, onSubmit }) {
     <div style={{ width: "100%" }}>
       <div style={{ display: "flex", gap: "5px", width: "100%" }}>
         <Controller
-          name="MakineMarka"
+          name={markaFieldName}
           control={control}
           render={({ field }) => (
             <Select
               {...field}
-              style={{ width: "100%" }}
+              style={{ width: "100%", ...style }}
               showSearch
               allowClear
               placeholder="Seçim Yapınız"
@@ -160,14 +161,14 @@ export default function MarkaEkleSelect({ workshopSelectedId, onSubmit }) {
               }))}
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
-                setValue("MakineMarkaID", value);
+                setValue(markaIdFieldName, value);
                 field.onChange(value);
               }}
             />
           )}
         />
         <Controller
-          name="MakineMarkaID"
+          name={markaIdFieldName}
           control={control}
           render={({ field }) => (
             <Input
@@ -222,3 +223,11 @@ export default function MarkaEkleSelect({ workshopSelectedId, onSubmit }) {
     </div>
   );
 }
+
+MarkaEkleSelect.propTypes = {
+  workshopSelectedId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  onSubmit: PropTypes.func,
+  markaFieldName: PropTypes.string,
+  markaIdFieldName: PropTypes.string,
+  style: PropTypes.object,
+};

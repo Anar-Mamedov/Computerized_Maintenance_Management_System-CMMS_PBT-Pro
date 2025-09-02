@@ -19,7 +19,8 @@ export default function OncelikTablo({ workshopSelectedId, onSubmit, disabled })
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -34,7 +35,8 @@ export default function OncelikTablo({ workshopSelectedId, onSubmit, disabled })
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-          }}>
+          }}
+        >
           {text}
         </div>
       ),
@@ -88,8 +90,7 @@ export default function OncelikTablo({ workshopSelectedId, onSubmit, disabled })
   return (
     <div>
       <Button disabled={disabled} onClick={handleModalToggle}>
-        {" "}
-        +{" "}
+        +
       </Button>
       <Modal width="1200px" title="Öncelik" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <Table

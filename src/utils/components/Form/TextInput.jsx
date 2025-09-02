@@ -3,7 +3,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import PropTypes from "prop-types";
 import { Input } from "antd";
 
-const TextInput = ({ name, length, style, readonly, required, checked, placeholder = "" }) => {
+const TextInput = ({ name, length, style, readonly, required, checked, placeholder = "", disabled = false }) => {
   const { control } = useFormContext();
 
   return (
@@ -21,7 +21,7 @@ const TextInput = ({ name, length, style, readonly, required, checked, placehold
               ...style,
             }}
             readOnly={readonly}
-            disabled={checked}
+            disabled={checked || disabled}
             onChange={(e) => {
               field.onChange(e.target.value);
             }}
@@ -40,6 +40,7 @@ TextInput.propTypes = {
   readonly: PropTypes.bool,
   required: PropTypes.bool,
   checked: PropTypes.bool,
+  disabled: PropTypes.bool,
 };
 
 export default TextInput;
