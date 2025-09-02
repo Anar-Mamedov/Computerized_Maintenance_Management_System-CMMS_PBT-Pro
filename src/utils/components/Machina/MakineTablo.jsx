@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
@@ -61,6 +62,10 @@ const ResizableTitle = (props) => {
     </Resizable>
   );
 };
+ResizableTitle.propTypes = {
+  onResize: PropTypes.func,
+  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+};
 // Sütunların boyutlarını ayarlamak için kullanılan component sonu
 
 // Sütunların sürüklenebilir olmasını sağlayan component
@@ -100,6 +105,16 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
     </div>
   );
 };
+DraggableRow.propTypes = {
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  text: PropTypes.node,
+  index: PropTypes.number,
+  moveRow: PropTypes.func,
+  className: PropTypes.string,
+  style: PropTypes.object,
+  visible: PropTypes.bool,
+  onVisibilityChange: PropTypes.func,
+};
 
 // Sütunların sürüklenebilir olmasını sağlayan component sonu
 
@@ -113,6 +128,11 @@ const MainTable = ({
   onSelectionChange,
   hideHeader = false,
   suppressFormFields = false,
+  // MasrafMerkeziTablo ile paralel: alan adlarını ve kontrolü prop ile al
+  makineFieldName = "makine",
+  makineIdFieldName = "makineID",
+  disabled = false,
+  onClear,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalVisible1, setIsModalVisible1] = useState(false);
@@ -1513,8 +1533,8 @@ const MainTable = ({
     } else {
       if (selectedData) {
         if (!suppressFormFields) {
-          setValue("makine", selectedData.MKN_KOD);
-          setValue("makineID", selectedData.key);
+          setValue(makineFieldName, selectedData.MKN_KOD);
+          setValue(makineIdFieldName, selectedData.key);
         }
         onSubmit && onSubmit(selectedData);
       }
@@ -1525,8 +1545,11 @@ const MainTable = ({
   };
 
   const handleMinusClick = () => {
-    setValue("makine", "");
-    setValue("makineID", "");
+    setValue(makineFieldName, "");
+    setValue(makineIdFieldName, "");
+    if (typeof onClear === "function") {
+      onClear();
+    }
   };
 
   // Controlled modal açıldığında eski seçimleri ve filtreleri sıfırla
@@ -1545,27 +1568,15 @@ const MainTable = ({
       {!hideHeader && (
         <div style={{ display: "flex", gap: "5px", width: "100%" }}>
           <Controller
-            name="makine"
+            name={makineFieldName}
             control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                status={errors.makine ? "error" : ""}
-                type="text"
-                style={{ width: "100%", maxWidth: "630px" }}
-                disabled
-              />
-            )}
+            render={({ field }) => <Input {...field} status={errors[makineFieldName] ? "error" : ""} type="text" style={{ width: "100%", maxWidth: "630px" }} disabled />}
           />
-          <Controller
-            name="makineID"
-            control={control}
-            render={({ field }) => (
-              <Input {...field} type="text" style={{ display: "none" }} />
-            )}
-          />
+          <Controller name={makineIdFieldName} control={control} render={({ field }) => <Input {...field} type="text" style={{ display: "none" }} />} />
           <div style={{ display: "flex", gap: "5px" }}>
-            <Button onClick={handleModalToggle}>+</Button>
+            <Button disabled={disabled} onClick={handleModalToggle}>
+              +
+            </Button>
             <Button onClick={handleMinusClick}> - </Button>
           </div>
         </div>
@@ -1741,6 +1752,22 @@ const MainTable = ({
       </Modal>
     </>
   );
+};
+
+MainTable.propTypes = {
+  setSelectedIds: PropTypes.func,
+  onSubmit: PropTypes.func,
+  controlledOpen: PropTypes.bool,
+  onControlledOk: PropTypes.func,
+  onControlledCancel: PropTypes.func,
+  selectionType: PropTypes.oneOf(["radio", "checkbox"]),
+  onSelectionChange: PropTypes.func,
+  hideHeader: PropTypes.bool,
+  suppressFormFields: PropTypes.bool,
+  makineFieldName: PropTypes.string,
+  makineIdFieldName: PropTypes.string,
+  disabled: PropTypes.bool,
+  onClear: PropTypes.func,
 };
 
 export default MainTable;

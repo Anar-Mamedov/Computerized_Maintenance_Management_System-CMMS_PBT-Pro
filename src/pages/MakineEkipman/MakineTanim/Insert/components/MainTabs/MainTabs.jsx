@@ -13,6 +13,7 @@ import MasrafMerkeziTablo from "../../../../../../utils/components/MasrafMerkezi
 import MakineTakvimTablo from "../../../../../../utils/components/MakineTakvimTablo";
 import FullDatePicker from "../../../../../../utils/components/FullDatePicker";
 import NumberInput from "../../../../../../utils/components/NumberInput";
+import MakineTablo from "../../../../../../utils/components/Machina/MakineTablo";
 import StatusButtons from "./components/StatusButtons";
 
 const { Text, Link } = Typography;
@@ -27,7 +28,7 @@ export default function MainTabs() {
   const [isLokasyonModalOpen, setIsLokasyonModalOpen] = useState(false);
 
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginBottom: "10px" }}>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginBottom: "10px" /* alignItems: "flex-start" */ }}>
       <div
         style={{
           backgroundColor: "#ffffffff",
@@ -169,8 +170,8 @@ export default function MainTabs() {
             <TextInput name="seriNo" required={false} />
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
-            <Text type="secondary">{t("masrafMerkezi")}</Text>
-            <MasrafMerkeziTablo masrafMerkeziFieldName="masrafMerkezi" masrafMerkeziIdFieldName="masrafMerkeziID" />
+            <Text type="secondary">{t("masterMakine")}</Text>
+            <MakineTablo makineFieldName="masterMakine" makineIdFieldName="masterMakineID" />
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
             <Text type="secondary">{t("takvim")}</Text>
