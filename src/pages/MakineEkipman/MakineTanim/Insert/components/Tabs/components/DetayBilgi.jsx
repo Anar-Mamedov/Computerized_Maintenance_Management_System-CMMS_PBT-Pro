@@ -109,7 +109,7 @@ export function DetayBilgi(props) {
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
             <Text type="secondary">{t("agirlik")}</Text>
-            <div style={{ display: "flex", gap: "5px" }}>
+            <div style={{ display: "flex", gap: "5px", width: "100%" }}>
               <div style={{ width: "90px" }}>
                 <NumberInput name1="agirlik" required={false} minNumber={0} />
               </div>
@@ -120,7 +120,7 @@ export function DetayBilgi(props) {
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
             <Text type="secondary">{t("hacim")}</Text>
-            <div style={{ display: "flex", gap: "5px" }}>
+            <div style={{ display: "flex", gap: "5px", width: "100%" }}>
               <div style={{ width: "90px" }}>
                 <NumberInput name1="hacim" required={false} minNumber={0} />
               </div>
@@ -132,7 +132,7 @@ export function DetayBilgi(props) {
 
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
             <Text type="secondary">{t("kapasite")}</Text>
-            <div style={{ display: "flex", gap: "5px" }}>
+            <div style={{ display: "flex", gap: "5px", width: "100%" }}>
               <div style={{ width: "90px" }}>
                 <NumberInput name1="kapasite" required={false} minNumber={0} />
               </div>
@@ -144,7 +144,7 @@ export function DetayBilgi(props) {
 
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
             <Text type="secondary">{t("elektrikTuketimi")}</Text>
-            <div style={{ display: "flex", gap: "5px" }}>
+            <div style={{ display: "flex", gap: "5px", width: "100%" }}>
               <div style={{ width: "90px" }}>
                 <NumberInput name1="elektrikTuketimi" required={false} minNumber={0} />
               </div>
@@ -155,7 +155,7 @@ export function DetayBilgi(props) {
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
             <Text type="secondary">{t("voltaj/guc(amper)")}</Text>
-            <div style={{ display: "flex", gap: "6px" }}>
+            <div style={{ display: "flex", gap: "6px", width: "100%" }}>
               <div style={{ width: "147px" }}>
                 <NumberInput name1="voltaj" required={false} minNumber={0} />
               </div>
@@ -223,7 +223,7 @@ export function DetayBilgi(props) {
 
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
             <Text type="secondary">{t("basincMiktar")}</Text>
-            <div style={{ display: "flex", gap: "5px" }}>
+            <div style={{ display: "flex", gap: "5px", width: "100%" }}>
               <div style={{ width: "90px" }}>
                 <NumberInput name1="basincMiktar" required={false} minNumber={0} />
               </div>

@@ -31,7 +31,7 @@ export function FinansalBilgiler(props) {
             alignItems: "flex-start",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
             width: "100%",
-            maxWidth: "610px",
+            maxWidth: "632px",
           }}
         >
           <div style={{ paddingBottom: "10px", display: "inline-flex", flexDirection: "column", alignItems: "flex-start" }}>
@@ -77,7 +77,7 @@ export function FinansalBilgiler(props) {
             alignItems: "flex-start",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
             width: "100%",
-            maxWidth: "610px",
+            maxWidth: "632px",
           }}
         >
           <div style={{ paddingBottom: "10px", display: "inline-flex", flexDirection: "column", alignItems: "flex-start" }}>
@@ -141,7 +141,7 @@ export function FinansalBilgiler(props) {
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
             <Text type="secondary">{t("kiraSuresi")}</Text>
-            <div style={{ display: "flex", gap: "5px" }}>
+            <div style={{ display: "flex", gap: "5px", width: "100%" }}>
               <div style={{ width: "90px" }}>
                 <NumberInput name1="kiraSuresi" required={false} minNumber={0} disabled={!watch("kiralik")} />
               </div>

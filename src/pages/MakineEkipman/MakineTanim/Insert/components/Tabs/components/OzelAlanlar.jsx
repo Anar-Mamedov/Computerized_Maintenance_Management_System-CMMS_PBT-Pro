@@ -80,7 +80,7 @@ function OzelAlanlar(props) {
         borderRadius: "6px",
         border: "1px solid #D9D4D5",
         boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-        maxWidth: "610px",
+        maxWidth: "632px",
       }}
     >
       <div style={{ paddingBottom: "10px", display: "inline-flex", flexDirection: "column", alignItems: "flex-start" }}>
