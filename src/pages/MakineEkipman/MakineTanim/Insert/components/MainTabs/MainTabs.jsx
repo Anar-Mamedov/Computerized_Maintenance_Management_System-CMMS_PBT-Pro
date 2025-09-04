@@ -40,7 +40,8 @@ export default function MainTabs() {
           alignItems: "flex-start",
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
           width: "100%",
-          maxWidth: "610px",
+          maxWidth: "632px",
+          boxSizing: "border-box",
         }}
       >
         <div style={{ paddingBottom: "10px", display: "inline-flex", flexDirection: "column", alignItems: "flex-start" }}>
@@ -86,20 +87,20 @@ export default function MainTabs() {
             <Text type="secondary">{t("kategori")}</Text>
             <KodIDSelectbox name1="kategori" kodID={32502} isRequired={false} />
           </div>
-          <div style={{ display: "flex", flexDirection: "row", gap: "10px", width: "100%", maxWidth: "300px" }}>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "150px" }}>
-              <Text type="secondary">{t("marka")}</Text>
-              <MarkaEkleSelect markaFieldName="marka" markaIdFieldName="markaID" style={{ maxWidth: "100px" }} />
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
-              <Text type="secondary">{t("model")}</Text>
-              <ModelEkleSelect modelFieldName="model" modelIdFieldName="modelID" markaIdFieldName="markaID" style={{ maxWidth: "100px" }} />
-            </div>
-          </div>
 
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
             <Text type="secondary">{t("operator")}</Text>
             <OperatorSelectBox name1="operator" isRequired={false} />
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
+            <Text type="secondary">{t("marka")}</Text>
+            <MarkaEkleSelect markaFieldName="marka" markaIdFieldName="markaID" style={{ maxWidth: "300px" }} />
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
+            <Text type="secondary">{t("model")}</Text>
+            <ModelEkleSelect modelFieldName="model" modelIdFieldName="modelID" markaIdFieldName="markaID" style={{ maxWidth: "300px" }} />
           </div>
         </div>
       </div>
@@ -115,7 +116,8 @@ export default function MainTabs() {
           alignItems: "flex-start",
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
           width: "100%",
-          maxWidth: "488px",
+          maxWidth: "510px",
+          boxSizing: "border-box",
         }}
       >
         <div style={{ paddingBottom: "10px", display: "inline-flex", flexDirection: "column", alignItems: "flex-start" }}>
@@ -153,7 +155,8 @@ export default function MainTabs() {
           alignItems: "flex-start",
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
           width: "100%",
-          maxWidth: "610px",
+          maxWidth: "632px",
+          boxSizing: "border-box",
         }}
       >
         <div style={{ paddingBottom: "10px", display: "inline-flex", flexDirection: "column", alignItems: "flex-start" }}>
@@ -211,7 +214,8 @@ export default function MainTabs() {
           alignItems: "flex-start",
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
           width: "100%",
-          maxWidth: "488px",
+          maxWidth: "510px",
+          boxSizing: "border-box",
         }}
       >
         <div style={{ paddingBottom: "10px", display: "inline-flex", flexDirection: "column", alignItems: "flex-start" }}>
