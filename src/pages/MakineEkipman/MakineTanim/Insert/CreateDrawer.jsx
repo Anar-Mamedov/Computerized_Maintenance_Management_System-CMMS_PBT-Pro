@@ -488,7 +488,7 @@ export default function CreateDrawer({ onRefresh }) {
             </Space>
           }
         >
-          <form onSubmit={methods.handleSubmit(onSubmit)}>
+          <form onSubmit={methods.handleSubmit(onSubmit)} style={{ width: "100%", boxSizing: "border-box" }}>
             <MainTabs />
             {/* <SecondTabs /> */}
             <Tabs />
