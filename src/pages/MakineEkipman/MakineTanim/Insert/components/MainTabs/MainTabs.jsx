@@ -14,7 +14,7 @@ import MakineTakvimTablo from "../../../../../../utils/components/MakineTakvimTa
 import FullDatePicker from "../../../../../../utils/components/FullDatePicker";
 import NumberInput from "../../../../../../utils/components/NumberInput";
 import MakineTablo from "../../../../../../utils/components/Machina/MakineTablo";
-import StatusButtons from "./components/StatusButtons";
+import StatusButtons from "./components/StatusButtons.jsx";
 
 const { Text, Link } = Typography;
 
