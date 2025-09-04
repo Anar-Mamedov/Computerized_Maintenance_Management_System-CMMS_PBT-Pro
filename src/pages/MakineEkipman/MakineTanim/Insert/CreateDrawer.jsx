@@ -441,22 +441,15 @@ export default function CreateDrawer({ onRefresh }) {
           return localeMap[currentLang] || enUS;
         })()}
       >
-        <Button
-          type="primary"
-          onClick={showDrawer}
-          style={{
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
+        <Button type="primary" onClick={showDrawer} className="flex items-center">
           <PlusOutlined />
           Ekle
         </Button>
         <Drawer
           width="1200px"
           title={
-            <div style={{ display: "flex", alignItems: "flex-start", flexDirection: "column" }}>
-              <Text type="secondary" style={{ fontWeight: "300", fontSize: "12px" }}>
+            <div className="flex items-start flex-col">
+              <Text type="secondary" className="font-light text-[12px]">
                 PBT PRO / {t("makineSicilKarti")}
               </Text>
               <Text>{watch("makineKodu")}</Text>
@@ -465,29 +458,17 @@ export default function CreateDrawer({ onRefresh }) {
           placement={"right"}
           onClose={onClose}
           open={open}
-          styles={{
-            content: { backgroundColor: "#f5f5f5" },
-            body: { backgroundColor: "#f5f5f5" },
-            header: { backgroundColor: "#ffffff" },
-          }}
+          rootClassName="[&_.ant-drawer-content]:bg-[#f5f5f5] [&_.ant-drawer-body]:bg-[#f5f5f5] [&_.ant-drawer-header]:bg-white"
           extra={
             <Space>
               <Button onClick={onClose}>İptal</Button>
-              <Button
-                type="submit"
-                onClick={methods.handleSubmit(onSubmit)}
-                style={{
-                  backgroundColor: "#2bc770",
-                  borderColor: "#2bc770",
-                  color: "#ffffff",
-                }}
-              >
+              <Button type="submit" onClick={methods.handleSubmit(onSubmit)} className="!bg-[#2bc770] !border-[#2bc770] !text-white">
                 Kaydet
               </Button>
             </Space>
           }
         >
-          <form onSubmit={methods.handleSubmit(onSubmit)} style={{ width: "100%", boxSizing: "border-box" }}>
+          <form onSubmit={methods.handleSubmit(onSubmit)} className="w-full box-border">
             <MainTabs />
             {/* <SecondTabs /> */}
             <Tabs />
