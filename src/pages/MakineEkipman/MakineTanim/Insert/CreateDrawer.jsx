@@ -11,7 +11,6 @@ import PropTypes from "prop-types";
 import dayjs from "dayjs";
 import AxiosInstance from "../../../../api/http";
 /* import Footer from "../Footer"; */
-import SecondTabs from "./components/secondTabs/secondTabs";
 import { t } from "i18next";
 import Tabs from "./components/Tabs/Tabs";
 
