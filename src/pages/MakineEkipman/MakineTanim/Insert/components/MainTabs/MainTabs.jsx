@@ -28,7 +28,7 @@ export default function MainTabs() {
   const [isLokasyonModalOpen, setIsLokasyonModalOpen] = useState(false);
 
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginBottom: "10px" /* alignItems: "flex-start" */ }}>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginBottom: "10px", /* alignItems: "flex-start" */ boxSizing: "border-box" }}>
       <div
         style={{
           backgroundColor: "#ffffffff",
