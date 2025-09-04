@@ -20,7 +20,7 @@ function Notlar() {
           alignItems: "flex-start",
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
           width: "100%",
-          maxWidth: "549px",
+          maxWidth: "563.5px",
         }}
       >
         <div style={{ paddingBottom: "10px", display: "inline-flex", flexDirection: "column", alignItems: "flex-start" }}>
@@ -42,7 +42,7 @@ function Notlar() {
           alignItems: "flex-start",
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
           width: "100%",
-          maxWidth: "549px",
+          maxWidth: "563.5px",
         }}
       >
         <div style={{ paddingBottom: "10px", display: "inline-flex", flexDirection: "column", alignItems: "flex-start" }}>
