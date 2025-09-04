@@ -84,7 +84,7 @@ export default function MainTabs() {
         </div>
       </div>
 
-      <div className="bg-white p-[10px] border border-[#80808068] rounded-[5px] flex flex-col items-start shadow-[0_2px_8px_rgba(0,0,0,0.08)] w-full max-w-[510px] box-border">
+      <div className="bg-white p-[10px] border border-[#80808068] rounded-[5px] flex flex-col items-start shadow-[0_2px_8px_rgba(0,0,0,0.08)] w-full max-w-[495px] box-border">
         <div className="pb-[10px] inline-flex flex-col items-start">
           <Text className="text-base font-semibold">{t("makineGorseli")}</Text>
           <Text type="secondary">{t("buMakineyeOzelFotograflariInceleyin")}</Text>
@@ -143,7 +143,7 @@ export default function MainTabs() {
         </div>
       </div>
 
-      <div className="bg-white p-[10px] border border-[#80808068] rounded-[5px] flex flex-col items-start shadow-[0_2px_8px_rgba(0,0,0,0.08)] w-full max-w-[510px] box-border">
+      <div className="bg-white p-[10px] border border-[#80808068] rounded-[5px] flex flex-col items-start shadow-[0_2px_8px_rgba(0,0,0,0.08)] w-full max-w-[495px] box-border">
         <div className="pb-[10px] inline-flex flex-col items-start">
           <Text className="text-base font-semibold">{t("durum&Ozellikler")}</Text>
           <Text type="secondary">{t("isaretlenebilirNitelikler")}</Text>
