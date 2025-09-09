@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message, Popover } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -131,6 +131,7 @@ const MainTable = () => {
   // edit drawer için son
 
   const [selectedRows, setSelectedRows] = useState([]);
+  const [assignPopoverOpen, setAssignPopoverOpen] = useState(false);
 
   const statusTag = (statusId) => {
     switch (statusId) {
@@ -1273,8 +1274,20 @@ const MainTable = () => {
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
           <Filters onChange={handleBodyChange} />
-          <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
-          <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
+          <Popover
+            content={
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "360px" }}>
+                <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
+                <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
+              </div>
+            }
+            trigger="click"
+            open={assignPopoverOpen}
+            onOpenChange={setAssignPopoverOpen}
+            placement="bottomLeft"
+          >
+            <Button>{t("isEmrineCevir")}</Button>
+          </Popover>
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
@@ -1291,7 +1304,7 @@ const MainTable = () => {
             current: currentPage,
             total: totalDataCount, // Toplam kayıt sayısı (sayfa başına kayıt sayısı ile çarpılır)
             pageSize: pageSize,
-            defaultPageSize: 10,
+            defaultPageSize: 20,
             showSizeChanger: true,
             pageSizeOptions: ["10", "20", "50", "100"],
             position: ["bottomRight"],
