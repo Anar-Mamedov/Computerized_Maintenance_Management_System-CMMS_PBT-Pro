@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, isValidElement } from "react";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message, Popover } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
@@ -18,8 +18,25 @@ import { useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { t } from "i18next";
+import { SiMicrosoftexcel } from "react-icons/si";
+import * as XLSX from "xlsx";
 
 const { Text } = Typography;
+
+// Function to extract text from React elements
+function extractTextFromElement(element) {
+  let text = "";
+  if (typeof element === "string") {
+    text = element;
+  } else if (Array.isArray(element)) {
+    text = element.map((child) => extractTextFromElement(child)).join("");
+  } else if (isValidElement(element)) {
+    text = extractTextFromElement(element.props.children);
+  } else if (element !== null && element !== undefined) {
+    text = element.toString();
+  }
+  return text;
+}
 
 // Sütunların boyutlarını ayarlamak için kullanılan component
 
@@ -132,6 +149,7 @@ const MainTable = () => {
 
   const [selectedRows, setSelectedRows] = useState([]);
   const [assignPopoverOpen, setAssignPopoverOpen] = useState(false);
+  const [xlsxLoading, setXlsxLoading] = useState(false);
 
   const statusTag = (statusId) => {
     switch (statusId) {
@@ -1143,6 +1161,117 @@ const MainTable = () => {
 
   // sütunları sıfırlamak için kullanılan fonksiyon sonu
 
+  // Function to handle XLSX download
+  const handleDownloadXLSX = async () => {
+    try {
+      setXlsxLoading(true);
+
+      const { keyword = "", filters = {} } = body || {};
+      const response = await AxiosInstance.post(`GetIsTalepFullListWithExcel?parametre=${keyword}`, filters);
+      if (response) {
+        const list = Array.isArray(response) ? response : Array.isArray(response?.is_talep_listesi) ? response.is_talep_listesi : [];
+
+        if (!Array.isArray(list) || list.length === 0) {
+          console.error("Excel için beklenmeyen API yanıtı: is_talep_listesi dizi değil veya boş", response);
+          message.error("Excel verisi bulunamadı veya beklenmeyen yanıt alındı.");
+          setXlsxLoading(false);
+          return;
+        }
+
+        const xlsxData = list.map((row) => {
+          let xlsxRow = {};
+          filteredColumns.forEach((col) => {
+            const key = col.dataIndex;
+            if (key) {
+              let value = row[key];
+
+              if (col.render) {
+                if (key.endsWith("_TARIH") || key.endsWith("_TARIHI")) {
+                  value = formatDate(value);
+                } else if (key.endsWith("_SAAT") || key.endsWith("_SAATI")) {
+                  value = formatTime(value);
+                } else if (key === "IST_DURUM_ID") {
+                  const { text } = statusTag(row.IST_DURUM_ID);
+                  value = text;
+                } else if (key === "ISLEM_SURE") {
+                  let baslangicTarihi = null;
+                  let bitisTarihi = null;
+                  if (row.IST_ACILIS_TARIHI && row.IST_ACILIS_SAATI) {
+                    baslangicTarihi = dayjs(row.IST_ACILIS_TARIHI.split("T")[0] + "T" + row.IST_ACILIS_SAATI, "YYYY-MM-DDTHH:mm:ss");
+                  }
+                  if (row.IST_DURUM_ID !== 4) {
+                    bitisTarihi = dayjs();
+                  } else if (row.IST_KAPAMA_TARIHI && row.IST_KAPAMA_SAATI) {
+                    bitisTarihi = dayjs(row.IST_KAPAMA_TARIHI.split("T")[0] + "T" + row.IST_KAPAMA_SAATI, "YYYY-MM-DDTHH:mm:ss");
+                  }
+                  if (baslangicTarihi && bitisTarihi) {
+                    const fark = bitisTarihi.diff(baslangicTarihi);
+                    const farkSaniye = Math.floor(fark / 1000);
+                    const farkDakika = Math.floor(farkSaniye / 60);
+                    const farkSaat = Math.floor(farkDakika / 60);
+                    const farkGun = Math.floor(farkSaat / 24);
+                    value = `${farkGun > 0 ? farkGun + " gün " : ""}${farkSaat % 24 > 0 ? (farkSaat % 24) + " saat " : ""}${
+                      farkDakika % 60 > 0 ? (farkDakika % 60) + " dakika " : ""
+                    }`;
+                  } else {
+                    value = "";
+                  }
+                } else if (key === "IST_KULLANICI_ONAY_DURUM") {
+                  value = t(row.IST_KULLANICI_ONAY_DURUM);
+                } else {
+                  value = extractTextFromElement(col.render(row[key], row));
+                }
+              }
+
+              xlsxRow[extractTextFromElement(col.title)] = value;
+            }
+          });
+          return xlsxRow;
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(xlsxData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+        const headers = filteredColumns
+          .map((col) => {
+            const label = extractTextFromElement(col.title);
+            return { label, key: col.dataIndex, width: col.width };
+          })
+          .filter((col) => col.key);
+
+        const scalingFactor = 0.8;
+        worksheet["!cols"] = headers.map((header) => ({
+          wpx: header.width ? header.width * scalingFactor : 100,
+        }));
+
+        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+        const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", "is_talepleri.xlsx");
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        setXlsxLoading(false);
+      } else {
+        console.error("API yanıtı beklenen formatta değil");
+        setXlsxLoading(false);
+      }
+    } catch (error) {
+      setXlsxLoading(false);
+      console.error("XLSX indirme hatası:", error);
+      if (navigator.onLine) {
+        message.error("Hata Mesajı: " + error.message);
+      } else {
+        message.error("Internet Bağlantısı Mevcut Değil.");
+      }
+    }
+  };
+
   return (
     <>
       <style>
@@ -1290,6 +1419,9 @@ const MainTable = () => {
           </Popover>
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
+          <Button style={{ display: "flex", alignItems: "center" }} onClick={handleDownloadXLSX} loading={xlsxLoading} icon={<SiMicrosoftexcel />}>
+            İndir
+          </Button>
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
           <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
         </div>
