@@ -118,7 +118,7 @@ const MainTable = () => {
   const [totalPages, setTotalPages] = useState(0); // Toplam sayfa sayısı için state
   const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
   const [totalDataCount, setTotalDataCount] = useState(0); // Tüm veriyi tutan state
-  const [pageSize, setPageSize] = useState(10); // Başlangıçta sayfa başına 10 kayıt göster
+  const [pageSize, setPageSize] = useState(20); // Başlangıçta sayfa başına 20 kayıt göster
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
   const [onayCheck, setOnayCheck] = useState(false);
