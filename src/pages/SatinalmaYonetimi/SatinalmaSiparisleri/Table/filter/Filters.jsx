@@ -7,10 +7,10 @@ import ZamanAraligi from "./ZamanAraligi";
 
 export default function Filters({ onChange }) {
   const [filters, setFilters] = React.useState({
-    lokasyonlar: {},
-    isemritipleri: {},
-    durumlar: {},
-    customfilters: {},
+    durumId: -1,
+    baslangicTarihi: null,
+    bitisTarihi: null,
+    kelime: "",
   });
 
   React.useEffect(() => {
@@ -19,11 +19,32 @@ export default function Filters({ onChange }) {
 
   return (
     <>
-      {/* <TypeFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, isemritipleri: newFilters }))} /> */}
-      <ConditionFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, durumlar: newFilters }))} />
-      <ZamanAraligi />
-      {/* <LocationFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, lokasyonlar: newFilters }))} /> */}
-      <CustomFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, customfilters: newFilters }))} />
+      <ConditionFilter
+        onSubmit={(newFilters) =>
+          setFilters((state) => ({
+            ...state,
+            ...newFilters, // durumId
+          }))
+        }
+      />
+
+      <ZamanAraligi
+        onSubmit={(dateRange) =>
+          setFilters((state) => ({
+            ...state,
+            ...dateRange, // baslangicTarihi, bitisTarihi
+          }))
+        }
+      />
+
+      <CustomFilter
+        onSubmit={(newFilters) =>
+          setFilters((state) => ({
+            ...state,
+            ...newFilters, // kelime vb.
+          }))
+        }
+      />
     </>
   );
 }

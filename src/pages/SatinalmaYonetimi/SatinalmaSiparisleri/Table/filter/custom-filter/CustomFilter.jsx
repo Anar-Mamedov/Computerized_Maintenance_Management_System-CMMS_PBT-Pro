@@ -49,38 +49,38 @@ export default function CustomFilter({ onSubmit }) {
   const [filters, setFilters] = useState({});
   const [filterValues, setFilterValues] = useState({});
 
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const [baslangicTarihi, setbaslangicTarihi] = useState(null);
+  const [bitisTarihi, setbitisTarihi] = useState(null);
 
   // selectboxtan seçilen tarihlerin watch edilmesi ve set edilmesi
-  const startDateSelected = watch("startDate");
-  const endDateSelected = watch("endDate");
+  const baslangicTarihiSelected = watch("baslangicTarihi");
+  const bitisTarihiSelected = watch("bitisTarihi");
 
   useEffect(() => {
-    if (startDateSelected === null) {
-      setStartDate(null);
+    if (baslangicTarihiSelected === null) {
+      setbaslangicTarihi(null);
     } else {
-      setStartDate(dayjs(startDateSelected));
+      setbaslangicTarihi(dayjs(baslangicTarihiSelected));
     }
-    if (endDateSelected === null) {
-      setEndDate(null);
+    if (bitisTarihiSelected === null) {
+      setbitisTarihi(null);
     } else {
-      setEndDate(dayjs(endDateSelected));
+      setbitisTarihi(dayjs(bitisTarihiSelected));
     }
-  }, [startDateSelected, endDateSelected]);
+  }, [baslangicTarihiSelected, bitisTarihiSelected]);
 
   useEffect(() => {
-    if ((startDate !== null && endDate !== null) || (startDate === null && endDate === null)) {
+    if ((baslangicTarihi !== null && bitisTarihi !== null) || (baslangicTarihi === null && bitisTarihi === null)) {
       handleSubmit();
     }
-  }, [startDate, endDate]);
+  }, [baslangicTarihi, bitisTarihi]);
   // selectboxtan seçilen tarihlerin watch edilmesi ve set edilmesi sonu
 
   // Create a state variable to store selected values for each row
   const [selectedValues, setSelectedValues] = useState({});
 
   // Tarih seçimi yapıldığında veya filtreler eklenip kaldırıldığında düğmenin stilini değiştirmek için bir durum
-  const isFilterApplied = newObjectsAdded || filtersExist || startDate || endDate;
+  const isFilterApplied = newObjectsAdded || filtersExist || baslangicTarihi || bitisTarihi;
 
   const handleSelectChange = (value, rowId) => {
     setSelectedValues((prevSelectedValues) => ({
@@ -109,11 +109,11 @@ export default function CustomFilter({ onSubmit }) {
     }, {});
 
     // Add date range to the filterData object if dates are selected
-    if (startDate) {
-      filterData.startDate = startDate.format("YYYY-MM-DD");
+    if (baslangicTarihi) {
+      filterData.baslangicTarihi = baslangicTarihi.format("YYYY-MM-DD");
     }
-    if (endDate) {
-      filterData.endDate = endDate.format("YYYY-MM-DD");
+    if (bitisTarihi) {
+      filterData.bitisTarihi = bitisTarihi.format("YYYY-MM-DD");
     }
 
     console.log(filterData);
@@ -200,16 +200,16 @@ export default function CustomFilter({ onSubmit }) {
             <DatePicker
               style={{ width: "100%" }}
               placeholder="Başlangıç Tarihi"
-              value={startDate}
-              onChange={setStartDate}
+              value={baslangicTarihi}
+              onChange={setbaslangicTarihi}
               locale={dayjs.locale("tr")}
             />
             <Text style={{ fontSize: "14px" }}>-</Text>
             <DatePicker
               style={{ width: "100%" }}
               placeholder="Bitiş Tarihi"
-              value={endDate}
-              onChange={setEndDate}
+              value={bitisTarihi}
+              onChange={setbitisTarihi}
               locale={dayjs.locale("tr")}
             />
           </div>

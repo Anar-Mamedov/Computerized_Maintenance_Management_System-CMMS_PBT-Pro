@@ -18,12 +18,12 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
 
   const getFisNo = async () => {
     try {
-      const response = await AxiosInstance.get("ModulKoduGetir?modulKodu=SFS_GIRIS_FIS_NO");
+      const response = await AxiosInstance.get("ModulKoduGetir?modulKodu=SSP_SIPARIS_KODU");
       if (response) {
-        setValue("fisNo", response);
+        setValue("siparisKodu", response);
       }
     } catch (error) {
-      console.error("Error fetching fisNo:", error);
+      console.error("Error fetching siparisKodu:", error);
       message.error("Fiş numarası alınamadı!");
     }
   };
@@ -163,148 +163,115 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
 
   //* export
   const onSubmit = (data) => {
-    const Body = {
-      fisNo: data.fisNo,
-      aracId: data.makineID || -1,
-      // firma: data.firma,
-      firmaId: Number(data.firmaID) || -1,
-      tarih: formatDateWithDayjs(data.tarih),
-      saat: formatTimeWithDayjs(data.saat),
-      // islemTipi: data.islemTipi,
-      islemTipiKodId: Number(data.islemTipiID) || -1,
-      // girisDeposu: data.girisDeposu,
-      girisDepoSiraNo: Number(data.girisDeposuID) || -1,
-      // lokasyon: data.lokasyon,
-      lokasyonId: Number(data.lokasyonID) || -1,
-      // siparisNo: data.siparisNo,
-      siparisNoId: Number(data.siparisNoID) || -1,
-      // proje: data.proje,
-      projeId: Number(data.projeID) || -1,
-      araToplam: Number(data.totalAraToplam),
-      indirimliToplam: Number(data.totalIndirim),
-      kdvToplam: Number(data.totalKdvToplam),
-      genelToplam: Number(data.totalGenelToplam),
-      aciklama: data.aciklama,
-      ozelAlan1: data.ozelAlan1,
-      ozelAlan2: data.ozelAlan2,
-      ozelAlan3: data.ozelAlan3,
-      ozelAlan4: data.ozelAlan4,
-      ozelAlan5: data.ozelAlan5,
-      ozelAlan6: data.ozelAlan6,
-      ozelAlan7: data.ozelAlan7,
-      ozelAlan8: data.ozelAlan8,
-      ozelAlan9: data.ozelAlan9,
-      ozelAlan10: data.ozelAlan10,
-      ozelAlanKodId11: Number(data.ozelAlan11ID) || 0,
-      ozelAlanKodId12: Number(data.ozelAlan12ID) || 0,
-      ozelAlanKodId13: Number(data.ozelAlan13ID) || 0,
-      ozelAlanKodId14: Number(data.ozelAlan14ID) || 0,
-      ozelAlanKodId15: Number(data.ozelAlan15ID) || 0,
-      ozelAlan16: Number(data.ozelAlan16) || 0,
-      ozelAlan17: Number(data.ozelAlan17) || 0,
-      ozelAlan18: Number(data.ozelAlan18) || 0,
-      ozelAlan19: Number(data.ozelAlan19) || 0,
-      ozelAlan20: Number(data.ozelAlan20) || 0,
-      islemTip: "01",
-      gc: "G",
-      fisTip: "MALZEME",
-      materialMovements:
-        data.fisIcerigi?.map((item) => ({
-          tarih: formatDateWithDayjs(data.tarih),
-          firmaId: Number(data.firmaID),
-          girisDepoSiraNo: Number(data.girisDeposuID),
-          isPriceChanged: item.isPriceChanged || false,
-          // malzemeKodu: item.malzemeKodu,
-          // malzemeTanimi: item.malzemeTanimi,
-          // malzemeTipi: item.malzemeTipi,
-          malzemeId: Number(item.malzemeId),
-          // birim: item.birim,
-          birimKodId: Number(item.birimKodId),
-          miktar: Number(item.miktar),
-          fiyat: Number(item.fiyat),
-          araToplam: Number(item.araToplam),
-          indirimOran: Number(item.indirimOrani),
-          indirim: Number(item.indirimTutari),
-          kdvOran: Number(item.kdvOrani),
-          kdvDahilHaric: item.kdvDahilHaric ? "D" : "H",
-          kdvTutar: Number(item.kdvTutar),
-          toplam: Number(item.toplam),
-          // lokasyon: item.malzemeLokasyon,
-          lokasyonId: Number(item.malzemeLokasyonID),
-          masrafmerkezi: Number(item.masrafMerkeziID),
-          aciklama: item.aciklama,
-          gc: "G",
-          fisTip: "MALZEME",
-        })) || [],
-    };
-
-    AxiosInstance.post("UpsertMalzemeFisWithItems", Body)
-      .then((response) => {
-        // Handle successful response here, e.g.:
-        console.log("Data sent successfully:", response);
-
-        if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
-
-          // First close the modal to avoid focus errors
-          setOpen(false);
-          onRefresh();
-
-          // Then reset the form with a slight delay
-          setTimeout(() => {
-            methods.reset({
-              fisNo: null,
-              firma: null,
-              firmaID: null,
-              makineID: null,
-              makine: null,
-              tarih: null,
-              saat: null,
-              islemTipi: null,
-              islemTipiID: null,
-              girisDeposu: null,
-              girisDeposuID: null,
-              lokasyon: null,
-              lokasyonID: null,
-              siparisNo: null,
-              siparisNoID: null,
-              proje: null,
-              projeID: null,
-              totalAraToplam: null,
-              totalIndirim: null,
-              totalKdvToplam: null,
-              totalGenelToplam: null,
-              aciklama: null,
-              ozelAlan1: null,
-              ozelAlan2: null,
-              ozelAlan3: null,
-              ozelAlan4: null,
-              ozelAlan5: null,
-              ozelAlan6: null,
-              ozelAlan7: null,
-              ozelAlan8: null,
-              ozelAlan9: null,
-              ozelAlan9ID: null,
-              ozelAlan10: null,
-              ozelAlan10ID: null,
-              ozelAlan11: null,
-              ozelAlan12: null,
-              fisIcerigi: [],
-            });
-          }, 100);
-        } else if (response.data.statusCode === 401) {
-          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
-        } else {
-          message.error("Ekleme Başarısız.");
-        }
-      })
-      .catch((error) => {
-        // Handle errors here, e.g.:
-        console.error("Error sending data:", error);
-        message.error("Başarısız Olundu.");
-      });
-    console.log({ Body });
+  const Body = {
+    siparisId: Number(data.siparisId) || 0,
+    teklifId: Number(data.teklifId) || 0,
+    siparisKodu: data.siparisKodu || "",
+    siparisTarihi: formatDateWithDayjs(data.siparisTarihi),
+    teslimTarihi: formatDateWithDayjs(data.teslimTarihi),
+    firmaId: Number(data.firmaId) || 0,
+    siparisVerenId: Number(data.siparisVerenId) || 0,
+    odemeSekliKodId: Number(data.odemeSekliKodId) || 0,
+    referansNo: data.referansNo || "",
+    teslimYeriKodId: Number(data.teslimYeriKodId) || 0,
+    projeId: Number(data.projeId) || 0,
+    oncelikId: Number(data.oncelikId) || 0,
+    sevkKodId: Number(data.sevkKodId) || 0,
+    sevkAdresiId: Number(data.sevkAdresiId) || 0,
+    nakliyeKodu: data.nakliyeKodu || "",
+    indirimToplam: Number(data.indirimToplam) || 0,
+    araToplam: Number(data.araToplam) || 0,
+    kdvToplam: Number(data.kdvToplam) || 0,
+    yuvarlamaToplami: Number(data.yuvarlamaToplami) || 0,
+    genelToplam: Number(data.genelToplam) || 0,
+    baslik: data.baslik || "",
+    aciklama: data.aciklama || "",
+    durumId: Number(data.durumId) || 0,
+    depoId: Number(data.depoId) || 0,
+    evrakNo: data.evrakNo || "",
+    lokasyonId: Number(data.lokasyonId) || 0,
+    adres1: data.adres1 || "",
+    adres2: data.adres2 || "",
+    postaKodu: data.postaKodu || "",
+    sehir: data.sehir || "",
+    ulke: data.ulke || "",
+    sinifId: Number(data.sinifId) || 0,
+    sinifName: data.sinifName || "",
+    sozlesmeId: Number(data.sozlesmeId) || 0,
+    atolyeId: Number(data.atolyeId) || 0,
+    masrafMerkeziId: Number(data.masrafMerkeziId) || 0,
+    duzenlemeTarih: formatDateWithDayjs(data.duzenlemeTarih),
+    duzenlemeSaat: formatTimeWithDayjs(data.duzenlemeSaat),
+    ozelAlan1: data.ozelAlan1 || "",
+    ozelAlan2: data.ozelAlan2 || "",
+    ozelAlan3: data.ozelAlan3 || "",
+    ozelAlan4: data.ozelAlan4 || "",
+    ozelAlan5: data.ozelAlan5 || "",
+    ozelAlan6: data.ozelAlan6 || "",
+    ozelAlan7: data.ozelAlan7 || "",
+    ozelAlan8: data.ozelAlan8 || "",
+    ozelAlan9: data.ozelAlan9 || "",
+    ozelAlan10: data.ozelAlan10 || "",
+    ozelAlanKodId11: Number(data.ozelAlanKodId11) || 0,
+    ozelAlanKodId12: Number(data.ozelAlanKodId12) || 0,
+    ozelAlanKodId13: Number(data.ozelAlanKodId13) || 0,
+    ozelAlanKodId14: Number(data.ozelAlanKodId14) || 0,
+    ozelAlanKodId15: Number(data.ozelAlanKodId15) || 0,
+    ozelAlan16: data.ozelAlan16 || "",
+    ozelAlan17: data.ozelAlan17 || "",
+    ozelAlan18: data.ozelAlan18 || "",
+    ozelAlan19: data.ozelAlan19 || "",
+    ozelAlan20: data.ozelAlan20 || "",
+    materialMovements: data.fisIcerigi?.map((item) => ({
+      detayId: Number(item.detayId) || 0,
+      siparisId: Number(data.siparisId) || 0,
+      stokId: Number(item.stokId) || 0,
+      miktar: Number(item.miktar) || 0,
+      birimFiyat: Number(item.birimFiyat) || 0,
+      kdvOran: Number(item.kdvOran) || 0,
+      kdvTutar: Number(item.kdvTutar) || 0,
+      otvOran: Number(item.otvOran) || 0,
+      otvTutar: Number(item.otvTutar) || 0,
+      indirimOran: Number(item.indirimOran) || 0,
+      indirimTutar: Number(item.indirimTutar) || 0,
+      kdvDahil: item.kdvDahil || "",
+      araToplam: Number(item.araToplam) || 0,
+      toplam: Number(item.toplam) || 0,
+      anaBirimMiktar: Number(item.anaBirimMiktar) || 0,
+      fisGridKonum: Number(item.fisGridKonum) || 0,
+      birimKodId: Number(item.birimKodId) || 0,
+      talepId: Number(item.talepId) || 0,
+      sinifId: Number(item.sinifId) || 0,
+      teklifFiyatId: Number(item.teklifFiyatId) || 0,
+      girenMiktar: Number(item.girenMiktar) || 0,
+      kalanMiktar: Number(item.kalanMiktar) || 0,
+      alternatifStokId: Number(item.alternatifStokId) || 0,
+      aciklama: item.aciklama || "",
+      isDeleted: item.isDeleted || false,
+    })) || [],
   };
+
+  AxiosInstance.post("UpsertSiparis", Body)
+    .then((response) => {
+      console.log("Data sent successfully:", response);
+      if (response.status_code === 200 || response.status_code === 201) {
+        message.success("Ekleme Başarılı.");
+        setOpen(false);
+        onRefresh();
+        setTimeout(() => methods.reset(), 100);
+      } else if (response.data.statusCode === 401) {
+        message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+      } else {
+        message.error("Ekleme Başarısız.");
+      }
+    })
+    .catch((error) => {
+      console.error("Error sending data:", error);
+      message.error("Başarısız Olundu.");
+    });
+
+  console.log({ Body });
+};
 
   useEffect(() => {
     // Eğer selectedLokasyonId varsa ve geçerli bir değerse, formun default değerini güncelle
@@ -343,7 +310,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
         <Modal
           width="1300px"
           centered
-          title={t("Satınalma Siparişi")}
+          title={t("Satınalma Siparişi (Yeni Kayıt)")}
           destroyOnClose
           open={open}
           onCancel={onClose}

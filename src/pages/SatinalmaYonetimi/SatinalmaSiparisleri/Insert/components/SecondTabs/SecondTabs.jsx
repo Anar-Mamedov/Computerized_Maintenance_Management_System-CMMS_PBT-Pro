@@ -5,6 +5,9 @@ import { Controller, useFormContext } from "react-hook-form";
 import { t } from "i18next";
 import OzelAlanlar from "./components/OzelAlanlar/OzelAlanlar.jsx";
 import FisIcerigi from "./components/FisIcerigi/FisIcerigi.jsx";
+import Aciklama from "./components/Aciklama/Aciklama.jsx";
+import SiparisDetay from "./components/SiparisDetay/SiparisDetayi.jsx";
+
 const { Text, Link } = Typography;
 const { TextArea } = Input;
 
@@ -69,20 +72,17 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen })
     },
 
     {
+      key: "7",
+      label: t("Sipariş Detayı"),
+      children: <SiparisDetay modalOpen={modalOpen} />,
+    },
+
+    {
       key: "5",
       label: "Özel Alanlar",
       // children: <SureBilgileri fieldRequirements={fieldRequirements} />,
       children: <OzelAlanlar />,
     },
-    /* {
-      key: "6",
-      label: "Açıklama",
-      children: (
-        <div>
-          <Controller name="aciklama" render={({ field }) => <TextArea {...field} rows={4} placeholder="Açıklama" style={{ width: "100%", resize: "none" }} />} />
-        </div>
-      ),
-    }, */
   ];
 
   return (

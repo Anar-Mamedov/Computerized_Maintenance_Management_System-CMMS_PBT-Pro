@@ -1,74 +1,71 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Popover, Button, Select } from "antd";
 
 const { Option } = Select;
 
 const ConditionFilter = ({ onSubmit }) => {
   const [visible, setVisible] = useState(false);
-  const [options, setOptions] = React.useState([]);
-  const [filters, setFilters] = useState({});
+  const [options, setOptions] = useState([]);
+  const [selectedKey, setSelectedKey] = useState(null);
 
-  const handleChange = (value) => {
-    const selectedItemsCopy = { ...filters };
-    options.forEach((option) => {
-      const isSelected = selectedItemsCopy[option.key] !== undefined;
-      if (isSelected && !value.includes(option.value)) {
-        delete selectedItemsCopy[option.key];
-      } else if (!isSelected && value.includes(option.value)) {
-        selectedItemsCopy[option.key] = option.value;
-      }
-    });
-    setFilters(selectedItemsCopy);
-  };
-
-  React.useEffect(() => {
-    // Sabit verileri kullanarak options state'ini ayarlama
+  useEffect(() => {
+    // Durum listesi
     const hardcodedOptions = [
-      { key: 0, value: "Açık" },
-      { key: 1, value: "Bekliyor" },
-      { key: 2, value: "Planlandı" },
-      { key: 3, value: "Devam Ediyor" },
-      { key: 4, value: "Kapandı" },
-      { key: 5, value: "İptal Edildi" },
-      { key: 6, value: "Onay Bekliyor" },
-      { key: 7, value: "Onaylandı" },
-      { key: 8, value: "Onaylanmadı" },
+      { key: -1, value: "Tüm Durumlar" },
+      { key: 1, value: "Açık" },
+      { key: 2, value: "Karşılanıyor" },
+      { key: 3, value: "Kapalı" },
+      { key: 4, value: "İptal" },
+      { key: 5, value: "Onay Bekliyor" },
+      { key: 6, value: "Onaylandı" },
+      { key: 7, value: "Onaylanmadı" },
     ];
     setOptions(hardcodedOptions);
   }, []);
 
   const handleSubmit = () => {
-    // Seçilen durumların key değerlerini bir obje olarak oluştur
-    let selectedKeysObj = {};
-    Object.keys(filters).forEach((key, index) => {
-      selectedKeysObj[`key${index}`] = key;
-    });
+  const value = parseInt(selectedKey);
 
-    // Bu objeyi onSubmit fonksiyonuna gönder
-    onSubmit(selectedKeysObj);
+  if (isNaN(value)) {
+    onSubmit({}); // Seçim yapılmadıysa filtreleme gönderme
+  } else {
+    onSubmit({ durumId: value }); // Seçim ne olursa olsun gönder
+  }
 
-    // Dropdown'ı gizle
-    setVisible(false);
-  };
+  setVisible(false);
+};
 
   const handleCancelClick = () => {
-    setFilters([]);
-    setVisible(false);
-    onSubmit("");
-  };
+  setSelectedKey(-1);
+  onSubmit({ durumId: -1 });
+  setVisible(false);
+};
 
   const content = (
     <div style={{ width: "300px" }}>
-      <div style={{ borderBottom: "1px solid #ccc", padding: "10px", display: "flex", justifyContent: "space-between" }}>
-        <Button onClick={handleCancelClick}>İptal</Button>
+      <div
+        style={{
+          borderBottom: "1px solid #ccc",
+          padding: "10px",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <Button onClick={handleCancelClick}>Temizle</Button>
         <Button type="primary" onClick={handleSubmit}>
           Uygula
         </Button>
       </div>
       <div style={{ padding: "10px" }}>
-        <Select mode="multiple" style={{ width: "100%" }} placeholder="Ara..." value={Object.values(filters)} onChange={handleChange} allowClear>
+        <Select
+          style={{ width: "100%" }}
+          placeholder="Durum Seç..."
+          value={selectedKey}
+          onChange={setSelectedKey}
+          allowClear
+        >
           {options.map((option) => (
-            <Option key={option.key} value={option.value}>
+            <Option key={option.key} value={option.key}>
               {option.value}
             </Option>
           ))}
@@ -83,25 +80,28 @@ const ConditionFilter = ({ onSubmit }) => {
       trigger="click"
       open={visible}
       onOpenChange={setVisible}
-      placement="bottom" // Popover'ın açılacağı yön
+      placement="bottom"
     >
-      <Button style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-        Durum
-        <div
-          style={{
-            marginLeft: "5px",
-            background: "#006cb8",
-            borderRadius: "50%",
-            width: "17px",
-            height: "17px",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            color: "white",
-          }}
-        >
-          {Object.keys(filters).length}
-        </div>
+      <Button>
+        Durum{" "}
+        {selectedKey !== null && selectedKey !== -1 && (
+          <div
+            style={{
+              marginLeft: "5px",
+              background: "#006cb8",
+              borderRadius: "50%",
+              width: "17px",
+              height: "17px",
+              display: "inline-flex",
+              justifyContent: "center",
+              alignItems: "center",
+              color: "white",
+              fontSize: "12px",
+            }}
+          >
+            1
+          </div>
+        )}
       </Button>
     </Popover>
   );

@@ -4,18 +4,14 @@ import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import dayjs from "dayjs";
 import { t } from "i18next";
-import AxiosInstance from "../../../../../../api/http";
-import FirmaSelectBox from "../../../../../../utils/components/FirmaTablo";
+import AxiosInstance from "../../../../../../../../api/http";
 // import PlakaSelectBox from "../../../../../../../_root/components/PlakaSelectbox";
-import MakineTablo from "../../../../../../utils/components/Machina/MakineTablo";
-import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
-import DepoSelectBox from "../../../../../../utils/components/DepoSelectBox";
-import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
-import AtolyeTablo from "../../../../../../utils/components/AtolyeTablo";
-import DepoTablo from "../../../../../../utils/components/DepoTablo";
-import ProjeTablo from "../../../../../../utils/components/ProjeTablo";
-import SiparisTablo from "../../../../../../utils/components/SiparisTablo";
-import PersonelTablo from "../../../../MalzemeTalepleri/components/PersonelTablo"
+import KodIDSelectbox from "../../../../../../../../utils/components/KodIDSelectbox";
+import MasrafMerkezi from "../../../../../../../../utils/components/MasrafMerkeziTablo";
+import AtolyeTablo from "../../../../../../../../utils/components/AtolyeTablo";
+import DepoTablo from "../../../../../../../../utils/components/DepoTablo";
+import ProjeTablo from "../../../../../../../../utils/components/ProjeTablo";
+import PersonelTablo from "../../../../../../MalzemeTalepleri/components/PersonelTablo"
 import { PlusOutlined } from "@ant-design/icons";
 
 const { Text, Link } = Typography;
@@ -74,8 +70,8 @@ export default function MainTabs({ modalOpen }) {
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const [selectboxTitle, setSelectboxTitle] = useState("Yetkili Servis");
-  const [initialSiparisKodu, setInitialSiparisKodu] = useState("");
-  const [isSiparisKoduModified, setIsSiparisKoduModified] = useState(false);
+  const [initialTalepNo, setInitialTalepNo] = useState("");
+  const [isTalepNoModified, setIsTalepNoModified] = useState(false);
   const [isLokasyonModalOpen, setIsLokasyonModalOpen] = useState(false);
   const [isAtolyeModalOpen, setIsAtolyeModalOpen] = useState(false);
   const [initialBaslik, setInitialBaslik] = useState("");
@@ -257,169 +253,6 @@ export default function MainTabs({ modalOpen }) {
 
   return (
     <div style={{ display: "flex", marginBottom: "20px", flexDirection: "row", gap: "10px", width: "100%" }}>
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "300px" }}>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "400px",
-            gap: "10px",
-            flexDirection: "row",
-          }}
-        >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
-            {t("Sipariş No")}
-            <div style={{ color: "red" }}>*</div>
-          </Text>
-          <div
-            style={{
-              display: "flex",
-              flexFlow: "column wrap",
-              alignItems: "flex-start",
-              width: "100%",
-              maxWidth: "210px",
-            }}
-          >
-            <Controller
-              name="siparisKodu"
-              control={control}
-              rules={{ required: t("alanBosBirakilamaz") }}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  status={errors["siparisKodu"] ? "error" : ""}
-                  style={{ flex: 1 }}
-                  onFocus={(e) => {
-                    setInitialSiparisKodu(e.target.value);
-                    setIsSiparisKoduModified(false);
-                  }}
-                  onChange={(e) => {
-                    field.onChange(e);
-                    if (e.target.value !== initialSiparisKodu) {
-                      setIsSiparisKoduModified(true);
-                    }
-                  }}
-                  onBlur={(e) => {
-                    field.onBlur(e);
-                    if (isSiparisKoduModified) {
-                      validateSiparisKodu(e.target.value);
-                    }
-                  }}
-                />
-              )}
-            />
-            {errors["siparisKodu"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["siparisKodu"].message}</div>}
-          </div>
-        </div>
-        <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "400px",
-              gap: "10px",
-              flexDirection: "row",
-            }}
-          >
-            <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
-              {t("Sipariş Tarihi")}
-              <div style={{ color: "red" }}>*</div>
-            </Text>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                width: "100%",
-                maxWidth: "207px",
-                justifyContent: "space-between",
-              }}
-            >
-              <Controller
-                name="siparisTarihi"
-                control={control}
-                rules={{ required: t("alanBosBirakilamaz") }}
-                render={({ field }) => (
-                  <DatePicker
-                    {...field}
-                    status={errors["siparisTarihi"] ? "error" : ""}
-                    style={{ width: "100%", maxWidth: "210px" }}
-                    format={localeDateFormat}
-                    value={field.value || dayjs()}
-                    onChange={(date) => {
-                      field.onChange(date);
-                      setValue("siparisTarihi", date);
-                    }}
-                  />
-                )}
-              />
-              {errors["siparisTarihi"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["siparisTarihi"].message}</div>}
-            </div>
-          </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "400px",
-            gap: "10px",
-            flexDirection: "row",
-          }}
-        >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
-            {t("Başlık")}
-            <div style={{ color: "red" }}>*</div>
-          </Text>
-          <div
-            style={{
-              display: "flex",
-              flexFlow: "column wrap",
-              alignItems: "flex-start",
-              width: "100%",
-              maxWidth: "210px",
-            }}
-          >
-            <Controller
-              name="baslik"
-              control={control}
-              defaultValue="SATINALMA SİPARİŞİ"
-              rules={{ required: t("alanBosBirakilamaz") }}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  value="SATINALMA SİPARİŞİ"
-                  status={errors["baslik"] ? "error" : ""}
-                  style={{ flex: 1 }}
-                  onFocus={(e) => {
-                    setInitialBaslik(e.target.value);
-                    setIsBaslikModified(false);
-                  }}
-                  onChange={(e) => {
-                    field.onChange(e);
-                    if (e.target.value !== initialTalepNo) {
-                      setIsBaslikModified(true);
-                    }
-                  }}
-                  onBlur={(e) => {
-                    field.onBlur(e);
-                    if (isTalepNoModified) {
-                      validateBaslik(e.target.value);
-                    }
-                  }}
-                />
-              )}
-            />
-            {errors["baslik"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["baslik"].message}</div>}
-          </div>
-        </div>
-      </div>
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "350px" }}>
         <div
           style={{
@@ -433,58 +266,30 @@ export default function MainTabs({ modalOpen }) {
             flexDirection: "row",
           }}
         >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("Firma")} <div style={{ color: "red" }}>*</div> </Text>
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("atolye")}</Text>
           <div
             style={{
               display: "flex",
               flexFlow: "column wrap",
               alignItems: "flex-start",
               width: "100%",
-              maxWidth: "250px",
+              maxWidth: "240px",
             }}
           >
-            <KodIDSelectbox name1="talepNedenKodId" kodID={13072} isRequired={false} />
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "400px",
-            gap: "10px",
-            flexDirection: "row",
-          }}
-        >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("Teslim Tarihi")} <div style={{ color: "red" }}>*</div> </Text>
-          <div
-            style={{
-              display: "flex",
-              flexFlow: "column wrap",
-              alignItems: "flex-start",
-              width: "100%",
-              maxWidth: "250px",
-            }}
-          >
-            <Controller
-              name="siparisTarihi"
-              control={control}
-              rules={{ required: t("alanBosBirakilamaz") }}
-              render={({ field }) => (
-                <DatePicker
-                  {...field}
-                  status={errors["siparisTarihi"] ? "error" : ""}
-                  style={{ width: "100%", maxWidth: "250px" }}
-                  format={localeDateFormat}
-                  value={field.value || null} // başlangıçta boş
-                  onChange={(date) => {
-                    field.onChange(date);
-                    setValue("siparisTarihi", date);
-                  }}
-                />
-              )}
+            <AtolyeTablo
+              atolyeFieldName="atolye"
+              atolyeIdFieldName="atolyeID"
+              onSubmit={(selectedData) => {
+                setValue("atolye", selectedData.ATL_TANIM);
+                setValue("atolyeID", selectedData.key);
+                // Force trigger to ensure FisIcerigi component detects the change
+                setTimeout(() => {
+                  setValue("atolye", selectedData.ATL_TANIM, { shouldDirty: true });
+                  setValue("atolyeID", selectedData.key, { shouldDirty: true });
+                }, 100);
+              }}
+              isModalVisible={isAtolyeModalOpen}
+              setIsModalVisible={setIsAtolyeModalOpen}
             />
           </div>
         </div>
@@ -500,17 +305,17 @@ export default function MainTabs({ modalOpen }) {
             flexDirection: "row",
           }}
         >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("lokasyon")} <div style={{ color: "red" }}>*</div> </Text>
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("masrafMerkezi")}</Text>
           <div
             style={{
               display: "flex",
               flexFlow: "column wrap",
               alignItems: "flex-start",
               width: "100%",
-              maxWidth: "250px",
+              maxWidth: "240px",
             }}
           >
-            <LokasyonTablo
+            <MasrafMerkezi
               lokasyonFieldName="lokasyonName"
               lokasyonIdFieldName="lokasyonID"
               onSubmit={(selectedData) => {
@@ -525,6 +330,69 @@ export default function MainTabs({ modalOpen }) {
               isModalVisible={isLokasyonModalOpen}
               setIsModalVisible={setIsLokasyonModalOpen}
             />
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: "400px",
+            gap: "10px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("Depo")}</Text>
+          <div
+            style={{
+              display: "flex",
+              flexFlow: "column wrap",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "240px",
+            }}
+          >
+            <DepoTablo name1="proje" isRequired={false} />
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: "400px",
+            gap: "10px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
+            {t("Sözleşme")}
+          </Text>
+          <div
+            style={{
+              display: "flex",
+              flexFlow: "column wrap",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "240px",
+            }}
+          >
+            <Controller
+              name="referans"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  status={errors["referans"] ? "error" : ""}
+                  style={{ flex: 1 }}
+                />
+              )}
+            />
+            {errors["referans"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["referans"].message}</div>}
           </div>
         </div>
       </div>
@@ -542,7 +410,9 @@ export default function MainTabs({ modalOpen }) {
             flexDirection: "row",
           }}
         >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("Sevk Tipi")} </Text>
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
+            {t("Referans No")}
+          </Text>
           <div
             style={{
               display: "flex",
@@ -552,7 +422,18 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "200px",
             }}
           >
-            <KodIDSelectbox name1="talepNedenKodId" kodID={13070} isRequired={false} />
+            <Controller
+              name="referans"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  status={errors["referans"] ? "error" : ""}
+                  style={{ flex: 1 }}
+                />
+              )}
+            />
+            {errors["referans"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["referans"].message}</div>}
           </div>
           </div>
         </div>
@@ -568,7 +449,7 @@ export default function MainTabs({ modalOpen }) {
             flexDirection: "row",
           }}
         >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("Sipariş Veren")}</Text>
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("Ödeme Şekli")} </Text>
           <div
             style={{
               display: "flex",
@@ -578,10 +459,123 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "200px",
             }}
           >
-            <PersonelTablo
-              selectedId={watch("talepEdenPersonelId")}
-              nameField="talepEden"
-              idField="talepEdenPersonelId"
+            <KodIDSelectbox name1="talepNedenKodId" kodID={13070} isRequired={false} />
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: "400px",
+            gap: "10px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
+            {t("Nakliye Kodu")}
+          </Text>
+          <div
+            style={{
+              display: "flex",
+              flexFlow: "column wrap",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "200px",
+            }}
+          >
+            <Controller
+              name="referans"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  status={errors["referans"] ? "error" : ""}
+                  style={{ flex: 1 }}
+                />
+              )}
+            />
+            {errors["referans"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["referans"].message}</div>}
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: "400px",
+            gap: "10px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
+            {t("Evrak No")}
+          </Text>
+          <div
+            style={{
+              display: "flex",
+              flexFlow: "column wrap",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "200px",
+            }}
+          >
+            <Controller
+              name="referans"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  status={errors["referans"] ? "error" : ""}
+                  style={{ flex: 1 }}
+                />
+              )}
+            />
+            {errors["referans"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["referans"].message}</div>}
+          </div>
+        </div>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "350px" }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: "400px",
+            gap: "10px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("Adres 1")}</Text>
+          <div
+            style={{
+              display: "flex",
+              flexFlow: "column wrap",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "240px",
+            }}
+          >
+            <AtolyeTablo
+              atolyeFieldName="atolye"
+              atolyeIdFieldName="atolyeID"
+              onSubmit={(selectedData) => {
+                setValue("atolye", selectedData.ATL_TANIM);
+                setValue("atolyeID", selectedData.key);
+                // Force trigger to ensure FisIcerigi component detects the change
+                setTimeout(() => {
+                  setValue("atolye", selectedData.ATL_TANIM, { shouldDirty: true });
+                  setValue("atolyeID", selectedData.key, { shouldDirty: true });
+                }, 100);
+              }}
+              isModalVisible={isAtolyeModalOpen}
+              setIsModalVisible={setIsAtolyeModalOpen}
             />
           </div>
         </div>
@@ -597,47 +591,149 @@ export default function MainTabs({ modalOpen }) {
             flexDirection: "row",
           }}
         >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("Proje")}</Text>
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
+            {t("Adres 2")}
+          </Text>
           <div
             style={{
               display: "flex",
               flexFlow: "column wrap",
               alignItems: "flex-start",
               width: "100%",
-              maxWidth: "200px",
+              maxWidth: "240px",
             }}
           >
-            <ProjeTablo name1="proje" isRequired={false} />
+            <Controller
+              name="referans"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  status={errors["referans"] ? "error" : ""}
+                  style={{ flex: 1 }}
+                />
+              )}
+            />
+            {errors["referans"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["referans"].message}</div>}
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: "400px",
+            gap: "10px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
+            {t("Posta Kodu")}
+          </Text>
+          <div
+            style={{
+              display: "flex",
+              flexFlow: "column wrap",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "240px",
+            }}
+          >
+            <Controller
+              name="referans"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  status={errors["referans"] ? "error" : ""}
+                  style={{ flex: 1 }}
+                />
+              )}
+            />
+            {errors["referans"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["referans"].message}</div>}
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: "400px",
+            gap: "10px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
+            {t("Şehir")}
+          </Text>
+          <div
+            style={{
+              display: "flex",
+              flexFlow: "column wrap",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "240px",
+            }}
+          >
+            <Controller
+              name="referans"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  status={errors["referans"] ? "error" : ""}
+                  style={{ flex: 1 }}
+                />
+              )}
+            />
+            {errors["referans"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["referans"].message}</div>}
           </div>
         </div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "200px" }}>
-    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", width: "100%", gap: "10px", flexDirection: "row" }}>
-      <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", minWidth: "80px" }}>{t("durum")}</Text>
-      <div style={{ display: "flex", flexFlow: "column wrap", alignItems: "flex-start", width: "100%", maxWidth: "110px" }}>
-        <Controller
-          name="talepDurumName"
-          control={control}
-          defaultValue="AÇIK"
-          render={({ field }) => <Input {...field} disabled value="AÇIK" style={{ flex: 1 }} />}
-        />
-      </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: "400px",
+            gap: "10px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
+            {t("Ülke")}
+          </Text>
+          <div
+            style={{
+              display: "flex",
+              flexFlow: "column wrap",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "150px",
+            }}
+          >
+            <Controller
+              name="referans"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  status={errors["referans"] ? "error" : ""}
+                  style={{ flex: 1 }}
+                />
+              )}
+            />
+            {errors["referans"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["referans"].message}</div>}
+          </div>
+        </div>
     </div>
-
-    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", width: "100%", gap: "10px", flexDirection: "row" }}>
-      <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", minWidth: "80px" }}>{t("Öncelik")}</Text>
-      <div style={{ display: "flex", flexFlow: "column wrap", alignItems: "flex-start", width: "100%", maxWidth: "110px" }}>
-        <KodIDSelectbox name1="talepOncelikId" kodID={13093} isRequired={false} />
-      </div>
-    </div>
-
-    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", width: "100%", gap: "10px", flexDirection: "row" }}>
-      <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", minWidth: "80px" }}>{t("Teslim Yeri")}</Text>
-      <div style={{ display: "flex", flexFlow: "column wrap", alignItems: "flex-start", width: "100%", maxWidth: "110px" }}>
-        <KodIDSelectbox name1="teslimYeriKodId" kodID={13072} isRequired={false} />
-      </div>
-    </div>
-  </div>
     </div>
   );
 }

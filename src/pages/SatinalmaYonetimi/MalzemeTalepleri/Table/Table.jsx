@@ -368,7 +368,7 @@ const MainTable = () => {
         style = { ...style, backgroundColor: "#e0f7fa", color: "#00796b" }; // pastel turkuaz
         break;
       case "KAPALI":
-        style = { ...style, backgroundColor: "#fde2e4", color: "#d64550" }; // pastel kırmızı/rose
+        style = { ...style, backgroundColor: "#eaeaeaff", color: "#949494ff" }; // pastel kırmızı/rose
         break;
       case "İPTAL":
         style = { ...style, backgroundColor: "#fde2e4", color: "#d64550" }; // pastel kırmızı/rose (KAPALI ile aynı)

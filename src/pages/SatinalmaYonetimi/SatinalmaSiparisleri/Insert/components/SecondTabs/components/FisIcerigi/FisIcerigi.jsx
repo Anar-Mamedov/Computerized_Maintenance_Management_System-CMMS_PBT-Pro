@@ -684,9 +684,186 @@ function FisIcerigi({ modalOpen }) {
         rowKey={(record) => record.id || Math.random().toString(36).substr(2, 9)} // Ensure stable keys
         scroll={{ y: "calc(100vh - 540px)" }}
       />
-      <div style={{ display: "flex", flexFlow: "column wrap", gap: "10px", marginTop: "20px", width: "100%", flexDirection: "row", justifyContent: "space-between" }}>
-        <div style={{ width: "100%", maxWidth: "1500px" }}>
+<div style={{ display: "flex", flexFlow: "column wrap", gap: "10px", marginTop: "20px", width: "100%", flexDirection: "row", justifyContent: "space-between" }}>
+        <div style={{ width: "100%", maxWidth: "830px" }}>
           <Controller name="aciklama" render={({ field }) => <TextArea {...field} rows={4} placeholder="Açıklama" style={{ width: "100%", minHeight: "160px" }} />} />
+        </div>
+        <div style={{ width: "100%", maxWidth: "400px", display: "flex", flexFlow: "wrap", gap: "10px", flexDirection: "column", alignItems: "flex-start" }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+              maxWidth: "400px",
+              gap: "10px",
+            }}
+          >
+            <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", fontWeight: 600 }}>{t("araToplam")}</Text>
+            <div
+              style={{
+                display: "flex",
+                flexFlow: "column wrap",
+                alignItems: "flex-start",
+                width: "100%",
+                maxWidth: "250px",
+              }}
+            >
+              <Controller
+                name="totalAraToplam"
+                control={control}
+                render={({ field }) => {
+                  // Determine decimal separator based on language
+                  const language = localStorage.getItem("i18nextLng") || "en";
+                  const decimalSeparator = ["tr", "az"].includes(language) ? "," : ".";
+
+                  return <InputNumber {...field} readOnly style={{ width: "100%" }} decimalSeparator={decimalSeparator} precision={2} />;
+                }}
+              />
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+              maxWidth: "400px",
+              gap: "10px",
+              flexDirection: "row",
+            }}
+          >
+            <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", fontWeight: 600 }}>{t("indirim")}</Text>
+            <div
+              style={{
+                display: "flex",
+                flexFlow: "column wrap",
+                alignItems: "flex-start",
+                width: "100%",
+                maxWidth: "250px",
+              }}
+            >
+              <Controller
+                name="totalIndirim"
+                control={control}
+                render={({ field }) => {
+                  // Determine decimal separator based on language
+                  const language = localStorage.getItem("i18nextLng") || "en";
+                  const decimalSeparator = ["tr", "az"].includes(language) ? "," : ".";
+
+                  return (
+                    <InputNumber
+                      {...field}
+                      style={{ width: "100%" }}
+                      decimalSeparator={decimalSeparator}
+                      precision={2}
+                      onChange={(value) => {
+                        try {
+                          // With InputNumber, value is already a number (or null)
+                          const numValue = value || 0;
+
+                          // Mark as manually edited
+                          setIsIndirimManuallyEdited(true);
+
+                          // Update the totalIndirim field - store with decimals but display as rounded
+                          field.onChange(numValue.toFixed(2));
+                          setValue("totalIndirim", numValue.toFixed(2));
+
+                          // Get current values
+                          const araToplam = parseFloat(getValues("totalAraToplam")) || 0;
+                          const kdvToplam = parseFloat(getValues("totalKdvToplam")) || 0;
+
+                          // Recalculate general total (araToplam - indirim + kdvToplam)
+                          const newGenelToplam = araToplam - numValue + kdvToplam;
+
+                          // Update the general total
+                          setValue("totalGenelToplam", newGenelToplam.toFixed(2));
+                        } catch (error) {
+                          console.error("Error updating discount:", error);
+                        }
+                      }}
+                    />
+                  );
+                }}
+              />
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+              maxWidth: "400px",
+              gap: "10px",
+              flexDirection: "row",
+            }}
+          >
+            <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", fontWeight: 600 }}>{t("kdvToplam")}</Text>
+            <div
+              style={{
+                display: "flex",
+                flexFlow: "column wrap",
+                alignItems: "flex-start",
+                width: "100%",
+                maxWidth: "250px",
+              }}
+            >
+              <Controller
+                name="totalKdvToplam"
+                control={control}
+                render={({ field }) => {
+                  // Determine decimal separator based on language
+                  const language = localStorage.getItem("i18nextLng") || "en";
+                  const decimalSeparator = ["tr", "az"].includes(language) ? "," : ".";
+
+                  return <InputNumber {...field} readOnly style={{ width: "100%" }} decimalSeparator={decimalSeparator} precision={2} />;
+                }}
+              />
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+              maxWidth: "400px",
+              gap: "10px",
+              flexDirection: "row",
+            }}
+          >
+            <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", fontWeight: 600 }}>{t("genelToplam")}</Text>
+            <div
+              style={{
+                display: "flex",
+                flexFlow: "column wrap",
+                alignItems: "flex-start",
+                width: "100%",
+                maxWidth: "250px",
+              }}
+            >
+              <Controller
+                name="totalGenelToplam"
+                control={control}
+                render={({ field }) => {
+                  // Determine decimal separator based on language
+                  const language = localStorage.getItem("i18nextLng") || "en";
+                  const decimalSeparator = ["tr", "az"].includes(language) ? "," : ".";
+
+                  return <InputNumber {...field} readOnly style={{ width: "100%" }} decimalSeparator={decimalSeparator} precision={2} />;
+                }}
+              />
+            </div>
+          </div>
         </div>
       </div>
 

@@ -13,7 +13,7 @@ dayjs.locale("tr"); // use Turkish locale
 
 const { Text } = Typography;
 
-export default function ZamanAraligi() {
+export default function ZamanAraligi({ onSubmit }) {
   const {
     control,
     watch,
@@ -24,77 +24,78 @@ export default function ZamanAraligi() {
   const selectedTimeRange = watch("timeRange");
 
   useEffect(() => {
-    // Set default value on initial render if not already set
-    if (selectedTimeRange === undefined) {
-      setValue("timeRange", "all", { shouldValidate: true });
-      handleTimeRangeChange("all");
-    } else {
-      handleTimeRangeChange(selectedTimeRange);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTimeRange]);
+  if (!selectedTimeRange) {
+    setValue("timeRange", "all", { shouldValidate: true });
+    handleTimeRangeChange("all");
+  } else {
+    handleTimeRangeChange(selectedTimeRange);
+  }
+}, [selectedTimeRange]);
 
   const handleTimeRangeChange = (value) => {
-    let startDate;
-    let endDate;
+  if (value === "all") {
+    setValue("baslangicTarihi", null);
+    setValue("bitisTarihi", null);
+    onSubmit?.({ baslangicTarihi: null, bitisTarihi: null })
+    return;
+  }
 
-    switch (value) {
-      case "all":
-        startDate = null;
-        endDate = null;
-        break;
-      case "today":
-        startDate = dayjs().startOf("day");
-        endDate = dayjs().endOf("day");
-        break;
-      case "yesterday":
-        startDate = dayjs().subtract(1, "day").startOf("day");
-        endDate = dayjs().subtract(1, "day").endOf("day");
-        break;
-      case "thisWeek":
-        startDate = dayjs().startOf("week");
-        endDate = dayjs().endOf("week");
-        break;
-      case "lastWeek":
-        startDate = dayjs().subtract(1, "week").startOf("week");
-        endDate = dayjs().subtract(1, "week").endOf("week");
-        break;
-      case "thisMonth":
-        startDate = dayjs().startOf("month");
-        endDate = dayjs().endOf("month");
-        break;
-      case "lastMonth":
-        startDate = dayjs().subtract(1, "month").startOf("month");
-        endDate = dayjs().subtract(1, "month").endOf("month");
-        break;
-      case "thisYear":
-        startDate = dayjs().startOf("year");
-        endDate = dayjs().endOf("year");
-        break;
-      case "lastYear":
-        startDate = dayjs().subtract(1, "year").startOf("year");
-        endDate = dayjs().subtract(1, "year").endOf("year");
-        break;
-      case "last1Month":
-        startDate = dayjs().subtract(1, "month");
-        endDate = dayjs();
-        break;
-      case "last3Months":
-        startDate = dayjs().subtract(3, "months");
-        endDate = dayjs();
-        break;
-      case "last6Months":
-        startDate = dayjs().subtract(6, "months");
-        endDate = dayjs();
-        break;
-      default:
-        startDate = null;
-        endDate = null;
-    }
+  let baslangicTarihi;
+  let bitisTarihi;
 
-    setValue("startDate", startDate);
-    setValue("endDate", endDate);
-  };
+  switch (value) {
+    case "today":
+      baslangicTarihi = dayjs().startOf("day");
+      bitisTarihi = dayjs().endOf("day");
+      break;
+    case "yesterday":
+      baslangicTarihi = dayjs().subtract(1, "day").startOf("day");
+      bitisTarihi = dayjs().subtract(1, "day").endOf("day");
+      break;
+    case "thisWeek":
+      baslangicTarihi = dayjs().startOf("week");
+      bitisTarihi = dayjs().endOf("week");
+      break;
+    case "lastWeek":
+      baslangicTarihi = dayjs().subtract(1, "week").startOf("week");
+      bitisTarihi = dayjs().subtract(1, "week").endOf("week");
+      break;
+    case "thisMonth":
+      baslangicTarihi = dayjs().startOf("month");
+      bitisTarihi = dayjs().endOf("month");
+      break;
+    case "lastMonth":
+      baslangicTarihi = dayjs().subtract(1, "month").startOf("month");
+      bitisTarihi = dayjs().subtract(1, "month").endOf("month");
+      break;
+    case "thisYear":
+      baslangicTarihi = dayjs().startOf("year");
+      bitisTarihi = dayjs().endOf("year");
+      break;
+    case "lastYear":
+      baslangicTarihi = dayjs().subtract(1, "year").startOf("year");
+      bitisTarihi = dayjs().subtract(1, "year").endOf("year");
+      break;
+    case "last1Month":
+      baslangicTarihi = dayjs().subtract(1, "month");
+      bitisTarihi = dayjs();
+      break;
+    case "last3Months":
+      baslangicTarihi = dayjs().subtract(3, "months");
+      bitisTarihi = dayjs();
+      break;
+    case "last6Months":
+      baslangicTarihi = dayjs().subtract(6, "months");
+      bitisTarihi = dayjs();
+      break;
+    default:
+      baslangicTarihi = null;
+      bitisTarihi = null;
+  }
+
+  setValue("baslangicTarihi", baslangicTarihi);
+  setValue("bitisTarihi", bitisTarihi);
+};
 
   return (
     <div style={{}}>
