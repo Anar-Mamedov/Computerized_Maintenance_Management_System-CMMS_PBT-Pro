@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
+import React, { useCallback, useEffect, useState, isValidElement } from "react";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message, Popover } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -18,8 +18,25 @@ import { useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { t } from "i18next";
+import { SiMicrosoftexcel } from "react-icons/si";
+import * as XLSX from "xlsx";
 
 const { Text } = Typography;
+
+// Function to extract text from React elements
+function extractTextFromElement(element) {
+  let text = "";
+  if (typeof element === "string") {
+    text = element;
+  } else if (Array.isArray(element)) {
+    text = element.map((child) => extractTextFromElement(child)).join("");
+  } else if (isValidElement(element)) {
+    text = extractTextFromElement(element.props.children);
+  } else if (element !== null && element !== undefined) {
+    text = element.toString();
+  }
+  return text;
+}
 
 // Sütunların boyutlarını ayarlamak için kullanılan component
 
@@ -118,7 +135,7 @@ const MainTable = () => {
   const [totalPages, setTotalPages] = useState(0); // Toplam sayfa sayısı için state
   const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
   const [totalDataCount, setTotalDataCount] = useState(0); // Tüm veriyi tutan state
-  const [pageSize, setPageSize] = useState(10); // Başlangıçta sayfa başına 10 kayıt göster
+  const [pageSize, setPageSize] = useState(20); // Başlangıçta sayfa başına 20 kayıt göster
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
   const [onayCheck, setOnayCheck] = useState(false);
@@ -131,6 +148,8 @@ const MainTable = () => {
   // edit drawer için son
 
   const [selectedRows, setSelectedRows] = useState([]);
+  const [assignPopoverOpen, setAssignPopoverOpen] = useState(false);
+  const [xlsxLoading, setXlsxLoading] = useState(false);
 
   const statusTag = (statusId) => {
     switch (statusId) {
@@ -321,6 +340,56 @@ const MainTable = () => {
         );
       },
       sorter: (a, b) => (a.IST_DURUM_ID || 0) - (b.IST_DURUM_ID || 0),
+    },
+    {
+      title: t("kullaniciDurumu"),
+      dataIndex: "IST_KULLANICI_ONAY_DURUM",
+      key: "IST_KULLANICI_ONAY_DURUM",
+      width: 150,
+      ellipsis: true,
+      visible: true,
+      render: (text) => {
+        let tagStyle = {};
+        let tagText = t(text);
+
+        switch (text) {
+          case "Bekliyor":
+            tagStyle = {
+              color: "#ff6a00",
+              backgroundColor: "rgba(255, 106, 0, 0.1)",
+              border: "1.2px solid #ff6a00",
+            };
+            break;
+          case "onaylandi":
+            tagStyle = {
+              color: "green",
+              backgroundColor: "rgba(0, 128, 0, 0.1)",
+              border: "1.2px solid green",
+            };
+            break;
+          case "reddedildi":
+            tagStyle = {
+              color: "red",
+              backgroundColor: "rgba(255, 0, 0, 0.1)",
+              border: "1.2px solid red",
+            };
+            break;
+          default:
+            tagStyle = {};
+        }
+
+        return <Tag style={tagStyle}>{tagText}</Tag>;
+      },
+      sorter: (a, b) => (a.IST_KULLANICI_ONAY_DURUM || "").localeCompare(b.IST_KULLANICI_ONAY_DURUM || ""),
+    },
+    {
+      title: t("kullaniciAciklama"),
+      dataIndex: "IST_RED_ACIKLAMA",
+      key: "IST_RED_ACIKLAMA",
+      width: 200,
+      ellipsis: true,
+      visible: true,
+      sorter: (a, b) => (a.IST_RED_ACIKLAMA || "").localeCompare(b.IST_RED_ACIKLAMA || ""),
     },
     {
       title: "Makine Tanım",
@@ -1092,6 +1161,117 @@ const MainTable = () => {
 
   // sütunları sıfırlamak için kullanılan fonksiyon sonu
 
+  // Function to handle XLSX download
+  const handleDownloadXLSX = async () => {
+    try {
+      setXlsxLoading(true);
+
+      const { keyword = "", filters = {} } = body || {};
+      const response = await AxiosInstance.post(`GetIsTalepFullListWithExcel?parametre=${keyword}`, filters);
+      if (response) {
+        const list = Array.isArray(response) ? response : Array.isArray(response?.is_talep_listesi) ? response.is_talep_listesi : [];
+
+        if (!Array.isArray(list) || list.length === 0) {
+          console.error("Excel için beklenmeyen API yanıtı: is_talep_listesi dizi değil veya boş", response);
+          message.error("Excel verisi bulunamadı veya beklenmeyen yanıt alındı.");
+          setXlsxLoading(false);
+          return;
+        }
+
+        const xlsxData = list.map((row) => {
+          let xlsxRow = {};
+          filteredColumns.forEach((col) => {
+            const key = col.dataIndex;
+            if (key) {
+              let value = row[key];
+
+              if (col.render) {
+                if (key.endsWith("_TARIH") || key.endsWith("_TARIHI")) {
+                  value = formatDate(value);
+                } else if (key.endsWith("_SAAT") || key.endsWith("_SAATI")) {
+                  value = formatTime(value);
+                } else if (key === "IST_DURUM_ID") {
+                  const { text } = statusTag(row.IST_DURUM_ID);
+                  value = text;
+                } else if (key === "ISLEM_SURE") {
+                  let baslangicTarihi = null;
+                  let bitisTarihi = null;
+                  if (row.IST_ACILIS_TARIHI && row.IST_ACILIS_SAATI) {
+                    baslangicTarihi = dayjs(row.IST_ACILIS_TARIHI.split("T")[0] + "T" + row.IST_ACILIS_SAATI, "YYYY-MM-DDTHH:mm:ss");
+                  }
+                  if (row.IST_DURUM_ID !== 4) {
+                    bitisTarihi = dayjs();
+                  } else if (row.IST_KAPAMA_TARIHI && row.IST_KAPAMA_SAATI) {
+                    bitisTarihi = dayjs(row.IST_KAPAMA_TARIHI.split("T")[0] + "T" + row.IST_KAPAMA_SAATI, "YYYY-MM-DDTHH:mm:ss");
+                  }
+                  if (baslangicTarihi && bitisTarihi) {
+                    const fark = bitisTarihi.diff(baslangicTarihi);
+                    const farkSaniye = Math.floor(fark / 1000);
+                    const farkDakika = Math.floor(farkSaniye / 60);
+                    const farkSaat = Math.floor(farkDakika / 60);
+                    const farkGun = Math.floor(farkSaat / 24);
+                    value = `${farkGun > 0 ? farkGun + " gün " : ""}${farkSaat % 24 > 0 ? (farkSaat % 24) + " saat " : ""}${
+                      farkDakika % 60 > 0 ? (farkDakika % 60) + " dakika " : ""
+                    }`;
+                  } else {
+                    value = "";
+                  }
+                } else if (key === "IST_KULLANICI_ONAY_DURUM") {
+                  value = t(row.IST_KULLANICI_ONAY_DURUM);
+                } else {
+                  value = extractTextFromElement(col.render(row[key], row));
+                }
+              }
+
+              xlsxRow[extractTextFromElement(col.title)] = value;
+            }
+          });
+          return xlsxRow;
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(xlsxData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+        const headers = filteredColumns
+          .map((col) => {
+            const label = extractTextFromElement(col.title);
+            return { label, key: col.dataIndex, width: col.width };
+          })
+          .filter((col) => col.key);
+
+        const scalingFactor = 0.8;
+        worksheet["!cols"] = headers.map((header) => ({
+          wpx: header.width ? header.width * scalingFactor : 100,
+        }));
+
+        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+        const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", "is_talepleri.xlsx");
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        setXlsxLoading(false);
+      } else {
+        console.error("API yanıtı beklenen formatta değil");
+        setXlsxLoading(false);
+      }
+    } catch (error) {
+      setXlsxLoading(false);
+      console.error("XLSX indirme hatası:", error);
+      if (navigator.onLine) {
+        message.error("Hata Mesajı: " + error.message);
+      } else {
+        message.error("Internet Bağlantısı Mevcut Değil.");
+      }
+    }
+  };
+
   return (
     <>
       <style>
@@ -1223,10 +1403,25 @@ const MainTable = () => {
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
           <Filters onChange={handleBodyChange} />
-          <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
-          <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
+          <Popover
+            content={
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "360px" }}>
+                <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
+                <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
+              </div>
+            }
+            trigger="click"
+            open={assignPopoverOpen}
+            onOpenChange={setAssignPopoverOpen}
+            placement="bottomLeft"
+          >
+            <Button>{t("isEmrineCevir")}</Button>
+          </Popover>
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
+          <Button style={{ display: "flex", alignItems: "center" }} onClick={handleDownloadXLSX} loading={xlsxLoading} icon={<SiMicrosoftexcel />}>
+            İndir
+          </Button>
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
           <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
         </div>
@@ -1241,7 +1436,7 @@ const MainTable = () => {
             current: currentPage,
             total: totalDataCount, // Toplam kayıt sayısı (sayfa başına kayıt sayısı ile çarpılır)
             pageSize: pageSize,
-            defaultPageSize: 10,
+            defaultPageSize: 20,
             showSizeChanger: true,
             pageSizeOptions: ["10", "20", "50", "100"],
             position: ["bottomRight"],
