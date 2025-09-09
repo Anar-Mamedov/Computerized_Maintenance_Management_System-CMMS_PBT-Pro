@@ -323,6 +323,56 @@ const MainTable = () => {
       sorter: (a, b) => (a.IST_DURUM_ID || 0) - (b.IST_DURUM_ID || 0),
     },
     {
+      title: t("kullaniciDurumu"),
+      dataIndex: "IST_KULLANICI_ONAY_DURUM",
+      key: "IST_KULLANICI_ONAY_DURUM",
+      width: 150,
+      ellipsis: true,
+      visible: true,
+      render: (text) => {
+        let tagStyle = {};
+        let tagText = t(text);
+
+        switch (text) {
+          case "Bekliyor":
+            tagStyle = {
+              color: "#ff6a00",
+              backgroundColor: "rgba(255, 106, 0, 0.1)",
+              border: "1.2px solid #ff6a00",
+            };
+            break;
+          case "onaylandi":
+            tagStyle = {
+              color: "green",
+              backgroundColor: "rgba(0, 128, 0, 0.1)",
+              border: "1.2px solid green",
+            };
+            break;
+          case "reddedildi":
+            tagStyle = {
+              color: "red",
+              backgroundColor: "rgba(255, 0, 0, 0.1)",
+              border: "1.2px solid red",
+            };
+            break;
+          default:
+            tagStyle = {};
+        }
+
+        return <Tag style={tagStyle}>{tagText}</Tag>;
+      },
+      sorter: (a, b) => (a.IST_KULLANICI_ONAY_DURUM || "").localeCompare(b.IST_KULLANICI_ONAY_DURUM || ""),
+    },
+    {
+      title: t("kullaniciAciklama"),
+      dataIndex: "IST_RED_ACIKLAMA",
+      key: "IST_RED_ACIKLAMA",
+      width: 200,
+      ellipsis: true,
+      visible: true,
+      sorter: (a, b) => (a.IST_RED_ACIKLAMA || "").localeCompare(b.IST_RED_ACIKLAMA || ""),
+    },
+    {
       title: "Makine Tanım",
       dataIndex: "IST_MAKINE_TANIM",
       key: "IST_MAKINE_TANIM",
