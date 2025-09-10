@@ -360,14 +360,14 @@ const MainTable = () => {
               border: "1.2px solid #ff6a00",
             };
             break;
-          case "onaylandi":
+          case "Onaylandi":
             tagStyle = {
               color: "green",
               backgroundColor: "rgba(0, 128, 0, 0.1)",
               border: "1.2px solid green",
             };
             break;
-          case "reddedildi":
+          case "Reddedildi":
             tagStyle = {
               color: "red",
               backgroundColor: "rgba(255, 0, 0, 0.1)",
