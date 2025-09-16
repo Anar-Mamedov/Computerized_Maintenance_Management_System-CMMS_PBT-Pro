@@ -106,14 +106,14 @@ const rawItems = [
   // getItem("Option 1", "option1", <PieChartOutlined />),
   // getItem("Option 2", "option2", <DesktopOutlined />),
   getItem(
-    "Makine & Ekipman Yönetimi",
+    "Varlık Yönetimi",
     "makine&ekipman",
     <TeamOutlined />,
     [
-      getItem("Makine Tanım", "makine", true),
-      getItem("Ekipman Veritabanı", "ekipmanVeritabani", true),
-      getItem("Makine Duruş Takibi", "durusTakibi", true),
-      getItem("Sayaç Güncelleme", "sayacGuncelleme", true),
+      getItem("Varlık Tanımları", "makine", true),
+      getItem("Alt Ekipman Veritabanı", "ekipmanVeritabani", true),
+      getItem("Duruş Takibi", "durusTakibi", true),
+      getItem("Sayaç Güncellemeleri", "sayacGuncelleme", true),
       // getItem("Team 2", "team2", true)
     ],
     false
@@ -124,10 +124,10 @@ const rawItems = [
     <UserOutlined />,
     [
       // getItem("Tom", "tom", true),
-      getItem("Bakım Tanımları", "bakimTanimlari", true),
-      getItem("Arıza Tanımları", "arizaTanimlari", true),
+      getItem("Bakım Planları", "bakimTanimlari", true),
+      getItem("Arıza Kodları", "arizaTanimlari", true),
       // getItem("İş Emri", "isemri", true),
-      getItem("İş Emirleri", "isEmri1", true),
+      getItem("Bakım İş Emirleri", "isEmri1", true),
       getItem("Periyodik Bakımlar", "periyodikBakimlar", true),
       getItem("Otomatik İş Emirleri", "otomatikIsEmirleri", true),
       getItem("Planlama Takvimi", "planlamaTakvimi", true),
@@ -367,9 +367,9 @@ export default function App() {
           <Route path="/stokSayimlari" element={<Hazirlaniyor />} />
           <Route path="/hizliMaliyetlendirme" element={<Hazirlaniyor />} />
           <Route path="/malzemeTransferOnayIslemleri" element={<Hazirlaniyor />} />
-          <Route path="/malzemeTalepleri" element={<MalzemeTalepleri />}/>
-          <Route path="/satinalmaSiparisleri" element={<SatinalmaSiparisleri/>}/>
-          <Route path="/tedarikciFirmalar" element={<DetarikciFirmalar/>}/>
+          <Route path="/malzemeTalepleri" element={<MalzemeTalepleri />} />
+          <Route path="/satinalmaSiparisleri" element={<SatinalmaSiparisleri />} />
+          <Route path="/tedarikciFirmalar" element={<DetarikciFirmalar />} />
           {/*<Route path="/kurallar" element={<Kurallar />} />*/}
         </Route>
       </Routes>
