@@ -449,7 +449,7 @@ export default function MainTabs({ modalOpen }) {
             flexDirection: "row",
           }}
         >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("Talep Eden")}</Text>
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("Talep Eden")} <div style={{ color: "red" }}>*</div> </Text>
           <div
             style={{
               display: "flex",
@@ -459,9 +459,16 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "200px",
             }}
           >
-            <PersonelTablo
+            <PersonelTablo 
+              onSubmit={(selectedData) => {
+                setValue("lokasyonName", selectedData.PRS_LOKASYON);
+                setValue("lokasyonID", selectedData.PRS_LOKASYON_ID);
+                setValue("atolyeTanim", selectedData.PRS_ATOLYE);
+                setValue("atolyeID", selectedData.PRS_ATOLYE_ID);
+              }}
               selectedId={watch("talepEdenPersonelId")}
               nameField="talepEden"
+              rules={{ required: t("alanBosBirakilamaz") }}
               idField="talepEdenPersonelId"
             />
           </div>
@@ -479,7 +486,7 @@ export default function MainTabs({ modalOpen }) {
             flexDirection: "row",
           }}
         >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("Talep Nedeni")} </Text>
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("Talep Nedeni")} <div style={{ color: "red" }}>*</div> </Text>
           <div
             style={{
               display: "flex",
@@ -489,7 +496,7 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "200px",
             }}
           >
-            <KodIDSelectbox name1="talepNedenKodId" kodID={13070} isRequired={false} />
+            <KodIDSelectbox name1="talepNedenKodId" kodID={13070} rules={{ required: t("alanBosBirakilamaz") }} isRequired={true} />
           </div>
         </div>
         <div

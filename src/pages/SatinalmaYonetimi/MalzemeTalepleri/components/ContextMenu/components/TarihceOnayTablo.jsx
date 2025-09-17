@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table, Typography } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../api/http";
+import dayjs from "dayjs";
 
 const { Text } = Typography;
 
@@ -22,32 +23,86 @@ export default function TarihceTablo({ workshopSelectedId, onSubmit, selectedRow
     return new Date(date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
+  const formatDateTime = (value) => {
+  if (!value) return "";
+  return dayjs(value).format("DD.MM.YYYY HH:mm"); 
+};
+
   const columns = [
     {
-      title: "İşlem",
-      dataIndex: "islem",
-      key: "islem",
+      title: "Kullanıcı",
+      dataIndex: "kullanici",
+      key: "kullanici",
+      width: 200,
+      ellipsis: true,
+      render: (text) => text || "-",
+    },
+    {
+      title: "Gönderim Zamanı",
+      dataIndex: "gonderimZamani",
+      key: "gonderimZamani",
+      width: 150,
+      render: (text) => formatDateTime(text),
+    },
+    {
+      title: "İşlem Zamanı",
+      dataIndex: "islemZamani",
+      key: "islemZamani",
+      width: 150,
+      render: (text) => formatDateTime(text),
+    },
+    {
+      title: "Talep Kodu",
+      dataIndex: "tabloKod",
+      key: "tabloKod",
       width: 250,
       ellipsis: true,
     },
     {
-      title: "Tarih",
-      dataIndex: "islemZamani",
-      key: "tarih",
+      title: "İşlem",
+      dataIndex: "islem",
+      key: "islem",
       width: 150,
-      render: (text) => formatDate(text),
+      ellipsis: true,
+      render: (text) => {
+        let style = {
+          borderRadius: "12px",
+          padding: "2px 8px",
+          fontWeight: 500,
+          fontSize: "14px",
+        };
+
+      switch (text) {
+        case "Onaylandı":
+          style = { ...style, backgroundColor: "#d4f8e8", color: "#207868" }; // pastel yeşil
+        break;
+        case "Onay Bekliyor":
+          style = { ...style, backgroundColor: "#fff4d6", color: "#b8860b" }; // pastel sarı
+        break;
+        case "Reddedildi":
+          style = { ...style, backgroundColor: "#ffe0e0", color: "#b22222" }; // pastel kırmızı
+        break;
+        case "Bekliyor":
+          style = { ...style, backgroundColor: "#f5f5f5", color: "#595959" }; // gri 
+        default:
+        style = { ...style, backgroundColor: "#f5f5f5", color: "#595959" }; // gri
+      }
+
+        return <span style={style}>{text}</span>;
+      },
     },
     {
-      title: "Saat",
-      dataIndex: "islemZamani",
-      key: "saat",
-      width: 100,
-      render: (text) => formatTime(text),
+      title: "Süre (Fark)",
+      dataIndex: "fark",
+      key: "fark",
+      width: 200,
+      ellipsis: true,
+      render: (text) => text || "-",
     },
     {
-      title: "İşlem Yapan",
-      dataIndex: "islemYapanAdi",
-      key: "islemYapanAdi",
+      title: "Açıklama",
+      dataIndex: "redAciklama",
+      key: "redAciklama",
       width: 200,
       ellipsis: true,
       render: (text) => text || "-",
@@ -57,7 +112,7 @@ export default function TarihceTablo({ workshopSelectedId, onSubmit, selectedRow
   const fetch = useCallback(() => {
     setLoading(true);
     const selectedKey = selectedRows.map((item) => item.key).join(",");
-    AxiosInstance.get(`GetMalzemeSatinalmaTarihceDetayli?fisId=${selectedKey}&detayId=&Onay=1`)
+    AxiosInstance.get(`GetOnayTarihceBy?tabloId=${selectedKey}`)
       .then((response) => {
         const fetchedData = response.data.map((item) => ({
           key: item.tarihceId,
@@ -100,7 +155,7 @@ export default function TarihceTablo({ workshopSelectedId, onSubmit, selectedRow
       <Modal
         width={1000}
         centered
-        title="Malzeme Talebi Onay Tarihçesi"
+        title={`Malzeme Talebi Onay Tarihçesi (${selectedRows[0]?.SFS_FIS_NO || ""})`}
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}

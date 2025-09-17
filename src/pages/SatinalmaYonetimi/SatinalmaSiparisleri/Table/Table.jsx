@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
@@ -11,16 +11,30 @@ import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import Filters from "./filter/Filters";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
-import AtolyeSubmit from "../components/IsEmrineCevir/Atolye/AtolyeSubmit";
-import EditDrawer1 from "../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer";
+import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
 import { useFormContext } from "react-hook-form";
-import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
+import { SiMicrosoftexcel } from "react-icons/si";
+import * as XLSX from "xlsx";
 import { t } from "i18next";
 
 const { Text } = Typography;
 
-// Sütunların boyutlarını ayarlamak için kullanılan component
+// Function to extract text from React elements
+import { isValidElement } from "react";
+
+function extractTextFromElement(element) {
+  let text = "";
+  if (typeof element === "string") {
+    text = element;
+  } else if (Array.isArray(element)) {
+    text = element.map((child) => extractTextFromElement(child)).join("");
+  } else if (isValidElement(element)) {
+    text = extractTextFromElement(element.props.children);
+  } else if (element !== null && element !== undefined) {
+    text = element.toString();
+  }
+  return text;
+}
 
 const ResizableTitle = (props) => {
   const { onResize, width, ...restProps } = props;
@@ -63,9 +77,6 @@ const ResizableTitle = (props) => {
     </Resizable>
   );
 };
-// Sütunların boyutlarını ayarlamak için kullanılan component sonu
-
-// Sütunların sürüklenebilir olmasını sağlayan component
 
 const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onVisibilityChange, ...restProps }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
@@ -103,9 +114,8 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
   );
 };
 
-// Sütunların sürüklenebilir olmasını sağlayan component sonu
-
 const MainTable = () => {
+  // State definitions...
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
   const [data, setData] = useState([]);
@@ -114,79 +124,91 @@ const MainTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchTimeout, setSearchTimeout] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0); // Toplam sayfa sayısı için state
-  const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
-  const [totalDataCount, setTotalDataCount] = useState(0); // Tüm veriyi tutan state
-  const [pageSize, setPageSize] = useState(10); // Başlangıçta sayfa başına 10 kayıt göster
+  const [totalPages, setTotalPages] = useState(0); // Total pages
+  const [label, setLabel] = useState("Yükleniyor...");
+  const [totalDataCount, setTotalDataCount] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
-  const [onayCheck, setOnayCheck] = useState(false);
-
-  // edit drawer için
+  const [onayCheck, setOnayCheck] = useState({ ONY_AKTIF: 0, ONY_MANUEL: 0 });
   const [drawer, setDrawer] = useState({
     visible: false,
     data: null,
   });
-  // edit drawer için son
-
   const [selectedRows, setSelectedRows] = useState([]);
+  const [xlsxLoading, setXlsxLoading] = useState(false);
 
-  const statusTag = (statusId) => {
-    switch (statusId) {
-      case 0:
-        return { color: "blue", text: "Açık" };
-      case 1:
-        return { color: "#ff5e00", text: "Bekliyor" };
-      case 2:
-        return { color: "#ffe600", text: "Planlandı" };
-      case 3:
-        return { color: "#00d300", text: "Devam Ediyor" };
-      case 4:
-        return { color: "#575757", text: "Kapandı" };
-      case 5:
-        return { color: "#d10000", text: "İptal Edildi" };
-      case 6:
-        return { color: "#ff5e00", text: "Onay Bekliyor" };
-      case 7:
-        return { color: "#00d300", text: "Onaylandı" };
-      case 8:
-        return { color: "#d10000", text: "Onaylanmadı" };
-      default:
-        return { color: "default", text: "" }; // Eğer farklı bir değer gelirse
-    }
-  };
-
-  function hexToRGBA(hex, opacity) {
-    // hex veya opacity null ise hata döndür
-    if (hex === null || opacity === null) {
-      // console.error("hex veya opacity null olamaz!");
-      return; // veya uygun bir varsayılan değer döndürebilirsiniz
+  function hexToRGBA(color, opacity) {
+    // 1) Geçersiz parametreleri engelle
+    if (!color || color.trim() === "" || opacity == null) {
+      // Boş ya da null renk için boş değer döndürelim
+      return;
     }
 
-    let r = 0,
-      g = 0,
-      b = 0;
-    // 3 karakterli hex kodunu kontrol et
-    if (hex.length === 4) {
-      r = parseInt(hex[1] + hex[1], 16);
-      g = parseInt(hex[2] + hex[2], 16);
-      b = parseInt(hex[3] + hex[3], 16);
+    // 2) rgb(...) veya rgba(...) formatını yakala
+    if (color.startsWith("rgb(") || color.startsWith("rgba(")) {
+      // Örnek: "rgb(0,123,255)" -> ["0","123","255"]
+      // Örnek: "rgba(255,0,0,0.96)" -> ["255","0","0","0.96"]
+      const rawValues = color.replace(/^rgba?\(|\s+|\)$/g, "").split(",");
+      const r = parseInt(rawValues[0], 10) || 0;
+      const g = parseInt(rawValues[1], 10) || 0;
+      const b = parseInt(rawValues[2], 10) || 0;
+      // Her hâlükârda dışarıdan gelen `opacity` ile override edelim
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
     }
-    // 6 karakterli hex kodunu kontrol et
-    else if (hex.length === 7) {
-      r = parseInt(hex[1] + hex[2], 16);
-      g = parseInt(hex[3] + hex[4], 16);
-      b = parseInt(hex[5] + hex[6], 16);
+
+    // 3) "#" ile başlayan (HEX) formatları işle
+    if (color.startsWith("#")) {
+      let r = 0,
+        g = 0,
+        b = 0;
+
+      // => #rgb  (3 hane)
+      if (color.length === 4) {
+        // #abc -> r=aa, g=bb, b=cc
+        r = parseInt(color[1] + color[1], 16);
+        g = parseInt(color[2] + color[2], 16);
+        b = parseInt(color[3] + color[3], 16);
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+      }
+
+      // => #rgba (4 hane)
+      else if (color.length === 5) {
+        // #abcf -> r=aa, g=bb, b=cc, a=ff (ama biz alpha'yı yok sayıp dışarıdan gelen opacity'yi kullanacağız)
+        r = parseInt(color[1] + color[1], 16);
+        g = parseInt(color[2] + color[2], 16);
+        b = parseInt(color[3] + color[3], 16);
+        // color[4] + color[4] => alpha. Ama override ediyoruz.
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+      }
+
+      // => #rrggbb (6 hane)
+      else if (color.length === 7) {
+        r = parseInt(color.slice(1, 3), 16);
+        g = parseInt(color.slice(3, 5), 16);
+        b = parseInt(color.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+      }
+
+      // => #rrggbbaa (8 hane)
+      else if (color.length === 9) {
+        // #ff0000c9 gibi
+        r = parseInt(color.slice(1, 3), 16);
+        g = parseInt(color.slice(3, 5), 16);
+        b = parseInt(color.slice(5, 7), 16);
+        // Son 2 karakter alpha'ya denk geliyor ama biz fonksiyon parametresini kullanıyoruz.
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+      }
     }
-    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+
+    // 4) Hiçbir formata uymuyorsa default dön
+    return `rgba(0, 0, 0, ${opacity})`;
   }
-
-  // Özel Alanların nameleri backend çekmek için api isteği
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await AxiosInstance.post(`GetOnayCheck?TB_ONAY_ID=2`); // API URL'niz
+        const response = await AxiosInstance.post(`GetOnayCheck?TB_ONAY_ID=3`); // API URL'niz
         if (response[0].ONY_AKTIF === 1) {
           setOnayCheck(true);
         } else {
@@ -200,12 +222,14 @@ const MainTable = () => {
     fetchData();
   }, []);
 
+  // Özel Alanların nameleri backend çekmek için api isteği
+
   useEffect(() => {
     // API'den veri çekme işlemi
     const fetchData = async () => {
       try {
-        const response = await AxiosInstance.get("OzelAlan?form=ISEMRI"); // API URL'niz
-        localStorage.setItem("ozelAlanlarIsTalep", JSON.stringify(response));
+        const response = await AxiosInstance.get("OzelAlan?form=MALZEME_SIPARIS"); // API URL'niz
+        localStorage.setItem("ozelAlanlar", JSON.stringify(response));
         setLabel(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
       } catch (error) {
         console.error("API isteğinde hata oluştu:", error);
@@ -216,208 +240,535 @@ const MainTable = () => {
     fetchData();
   }, [drawer.visible]);
 
-  const ozelAlanlarIsTalep = JSON.parse(localStorage.getItem("ozelAlanlarIsTalep"));
+  const ozelAlanlar = JSON.parse(localStorage.getItem("ozelAlanlar"));
 
   // Özel Alanların nameleri backend çekmek için api isteği sonu
+
+  const statusTag = (statusId) => {
+    switch (statusId) {
+      case 1:
+        return { color: "#ff5e00", text: "Onay Bekliyor" };
+      case 2:
+        return { color: "#00d300", text: "Onaylandı" };
+      case 3:
+        return { color: "#d10000", text: "Onaylanmadı" };
+      default:
+        return { color: "", text: "" }; // Diğer durumlar için boş değer
+    }
+  };
+
   const initialColumns = [
     {
-      title: "Talep No",
-      dataIndex: "IST_KOD",
-      key: "IST_KOD",
+      title: "Sipariş No",
+      dataIndex: "SSP_SIPARIS_KODU",
+      key: "SSP_SIPARIS_KODU",
       width: 120,
       ellipsis: true,
-      visible: true,
-      render: (text) => <a>{text}</a>,
-      sorter: (a, b) => (a.IST_KOD || "").localeCompare(b.IST_KOD || ""),
+      visible: true, // Varsayılan olarak açık
+      render: (text, record) => (
+        <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
+      ),
+      sorter: (a, b) => {
+        if (a.SSP_SIPARIS_KODU === null) return -1;
+        if (b.SSP_SIPARIS_KODU === null) return 1;
+        return a.SSP_SIPARIS_KODU.localeCompare(b.SSP_SIPARIS_KODU);
+      },
     },
     {
-      title: "Sipariş No",
-      dataIndex: "siparisNo",
-      key: "siparisNo",
+      title: "Talep No",
+      dataIndex: "TALEP_NO",
+      key: "TALEP_NO",
       width: 120,
       ellipsis: true,
-      visible: true,
-      render: (text) => <a>{text}</a>,
-      sorter: (a, b) => (a.siparisNo || "").localeCompare(b.siparisNo || ""),
+      visible: true, // Varsayılan olarak açık
+      render: (text, record) => (
+        <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
+      ),
+      sorter: (a, b) => {
+        if (a.TALEP_NO === null) return -1;
+        if (b.TALEP_NO === null) return 1;
+        return a.TALEP_NO.localeCompare(b.TALEP_NO);
+      },
     },
     {
       title: "Başlık",
-      dataIndex: "IST_TANIMI",
-      key: "IST_TANIMI",
-      width: 300,
+      dataIndex: "SSP_BASLIK",
+      key: "SSP_BASLIK",
+      width: 200,
       ellipsis: true,
-      visible: true,
-      render: (text) => <a>{text}</a>,
-      sorter: (a, b) => (a.IST_TANIMI || "").localeCompare(b.IST_TANIMI || ""),
+
+      visible: true, // Varsayılan olarak açık
+      sorter: (a, b) => {
+        if (a.SSP_BASLIK === null && b.SSP_BASLIK === null) return 0;
+        if (a.SSP_BASLIK === null) return 1;
+        if (b.SSP_BASLIK === null) return -1;
+        return a.SSP_BASLIK.localeCompare(b.SSP_BASLIK);
+      },
     },
     {
-      title: "Talep Tarihi",
-      dataIndex: "IST_ACILIS_TARIHI",
-      key: "IST_ACILIS_TARIHI",
-      width: 110,
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true,
-      render: (text) => formatDate(text),
-      sorter: (a, b) => (a.IST_ACILIS_TARIHI || "").localeCompare(b.IST_ACILIS_TARIHI || ""),
-    },
-    {
-      title: "Durum",
-      dataIndex: "IST_DURUM_ID",
-      key: "IST_DURUM_ID",
+      title: "Sipariş Tarihi",
+      dataIndex: "SSP_SIPARIS_TARIHI",
+      key: "SSP_SIPARIS_TARIHI",
       width: 150,
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true,
-      render: (_, record) => {
-        const { color, text } = statusTag(record.IST_DURUM_ID);
-        return (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Tag
-              style={{
-                textAlign: "center",
-                backgroundColor: hexToRGBA(color, 0.2),
-                border: `1.2px solid ${hexToRGBA(color, 0.7)}`,
-                color: color,
-              }}
-            >
-              {text}
-            </Tag>
-          </div>
-        );
+      sorter: (a, b) => {
+        if (a.SSP_SIPARIS_TARIHI === null) return -1;
+        if (b.SSP_SIPARIS_TARIHI === null) return 1;
+        return a.SSP_SIPARIS_TARIHI.localeCompare(b.SSP_SIPARIS_TARIHI);
       },
-      sorter: (a, b) => (a.IST_DURUM_ID || 0) - (b.IST_DURUM_ID || 0),
+
+      visible: true, // Varsayılan olarak açık
+      render: (text) => formatDate(text),
     },
+    {
+      title: "Teslim Tarihi",
+      dataIndex: "SSP_TESLIM_TARIHI",
+      key: "SSP_TESLIM_TARIHI",
+      width: 150,
+      ellipsis: true,
+      sorter: (a, b) => {
+        if (a.SSP_TESLIM_TARIHI === null) return -1;
+        if (b.SSP_TESLIM_TARIHI === null) return 1;
+        return a.SSP_TESLIM_TARIHI.localeCompare(b.SSP_TESLIM_TARIHI);
+      },
+
+      visible: true, // Varsayılan olarak açık
+      render: (text) => formatDate(text),
+    },
+    {
+  title: "Durum",
+  dataIndex: "SSP_DURUM",
+  key: "SSP_DURUM",
+  width: 150,
+  ellipsis: true,
+  render: (text) => {
+    let style = {
+      borderRadius: "12px",
+      padding: "2px 8px",
+      fontWeight: 500,
+      fontSize: "12px",
+    };
+
+    switch (text) {
+      case "ONAYLANDI":
+        style = { ...style, backgroundColor: "#d4f8e8", color: "#207868" }; // pastel yeşil
+        break;
+      case "ONAY BEKLİYOR":
+        style = { ...style, backgroundColor: "#fff4d6", color: "#b8860b" }; // pastel sarı
+        break;
+      case "ONAYLANMADI":
+        style = { ...style, backgroundColor: "#ffe0e0", color: "#b22222" }; // pastel kırmızı
+        break;
+      case "SİPARİŞ":
+        style = { ...style, backgroundColor: "#e6ecff", color: "#4056a1" }; // pastel mavi
+        break;
+      case "AÇIK":
+        style = { ...style, backgroundColor: "#e1f7d5", color: "#3c763d" }; // açık yeşil
+        break;
+      case "TEKLİF":
+        style = { ...style, backgroundColor: "#e0f7fa", color: "#00796b" }; // pastel turkuaz
+        break;
+      case "KAPALI":
+        style = { ...style, backgroundColor: "#eaeaeaff", color: "#949494ff" }; // pastel kırmızı/rose
+        break;
+      case "İPTAL":
+        style = { ...style, backgroundColor: "#fde2e4", color: "#d64550" }; // pastel kırmızı/rose (KAPALI ile aynı)
+        break;
+      case "KARŞILANIYOR":
+        style = { ...style, backgroundColor: "#e6f7ff", color: "#096dd9" }; // pastel açık mavi
+        break;
+      default:
+        style = { ...style, backgroundColor: "#f5f5f5", color: "#595959" }; // gri
+    }
+
+    return <span style={style}>{text}</span>;
+  },
+},
     {
       title: "Lokasyon",
-      dataIndex: "IST_BILDIREN_LOKASYON",
-      key: "IST_BILDIREN_LOKASYON",
-      width: 150,
+      dataIndex: "SSP_LOKASYON",
+      key: "SSP_LOKASYON",
+      width: 200,
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true,
-      sorter: (a, b) => (a.IST_BILDIREN_LOKASYON || "").localeCompare(b.IST_BILDIREN_LOKASYON || ""),
-    },
-    
-    {
-      title: "Talep Eden",
-      dataIndex: "IST_TALEP_EDEN_ADI",
-      key: "IST_TALEP_EDEN_ADI",
-      width: 150,
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true,
-      sorter: (a, b) => (a.IST_TALEP_EDEN_ADI || "").localeCompare(b.IST_TALEP_EDEN_ADI || ""),
+
+      visible: true, // Varsayılan olarak açık
+      sorter: (a, b) => {
+        if (a.SSP_LOKASYON === null && b.SSP_LOKASYON === null) return 0;
+        if (a.SSP_LOKASYON === null) return 1;
+        if (b.SSP_LOKASYON === null) return -1;
+        return a.SSP_LOKASYON.localeCompare(b.SSP_LOKASYON);
+      },
     },
     {
-      title: "Talep Edilen Personel",
-      dataIndex: "IST_TALEP_EDEN_ADI",
-      key: "IST_TALEP_EDEN_ADI",
+      title: "Sipariş Veren",
+      dataIndex: "SSP_SIPARIS_VEREN",
+      key: "SSP_SIPARIS_VEREN",
       width: 150,
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true,
-      sorter: (a, b) => (a.IST_TALEP_EDEN_ADI || "").localeCompare(b.IST_TALEP_EDEN_ADI || ""),
+
+      visible: true, // Varsayılan olarak açık
+      sorter: (a, b) => {
+        if (a.SSP_SIPARIS_VEREN === null) return -1;
+        if (b.SSP_SIPARIS_VEREN === null) return 1;
+        return a.SSP_SIPARIS_VEREN.localeCompare(b.SSP_SIPARIS_VEREN);
+      },
     },
     {
-      title: "Talep Nedeni",
-      dataIndex: "IST_TALEP_EDEN_ADI",
-      key: "IST_TALEP_EDEN_ADI",
-      width: 150,
+      title: "Firma",
+      dataIndex: "SSP_FIRMA",
+      key: "SSP_FIRMA",
+      width: 250,
+      sorter: (a, b) => {
+        if (a.SSP_FIRMA === null && b.SSP_FIRMA === null) return 0;
+        if (a.SSP_FIRMA === null) return -1;
+        if (b.SSP_FIRMA === null) return 1;
+        return a.SSP_FIRMA.localeCompare(b.SSP_FIRMA);
+      },
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true,
-      sorter: (a, b) => (a.IST_TALEP_EDEN_ADI || "").localeCompare(b.IST_TALEP_EDEN_ADI || ""),
+
+      visible: true, // Varsayılan olarak açık
     },
     {
-      title: "Bölüm",
-      dataIndex: "IST_TALEP_EDEN_ADI",
-      key: "IST_TALEP_EDEN_ADI",
+      title: "Ödeme Şekli",
+      dataIndex: "SSP_ODEME_SEKLI",
+      key: "SSP_ODEME_SEKLI",
       width: 150,
+      sorter: (a, b) => {
+        if (a.SSP_ODEME_SEKLI === null && b.SSP_ODEME_SEKLI === null) return 0;
+        if (a.SSP_ODEME_SEKLI === null) return -1;
+        if (b.SSP_ODEME_SEKLI === null) return 1;
+        return a.SSP_ODEME_SEKLI.localeCompare(b.SSP_ODEME_SEKLI);
+      },
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true,
-      sorter: (a, b) => (a.IST_TALEP_EDEN_ADI || "").localeCompare(b.IST_TALEP_EDEN_ADI || ""),
+
+      visible: true, // Varsayılan olarak açık
     },
     {
       title: "Teslim Yeri",
-      dataIndex: "IST_TALEP_EDEN_ADI",
-      key: "IST_TALEP_EDEN_ADI",
+      dataIndex: "SSP_TESLIM_YERI",
+      key: "SSP_TESLIM_YERI",
       width: 150,
+      sorter: (a, b) => {
+        if (a.SSP_TESLIM_YERI === null && b.SSP_TESLIM_YERI === null) return 0;
+        if (a.SSP_TESLIM_YERI === null) return -1;
+        if (b.SSP_TESLIM_YERI === null) return 1;
+        return a.SSP_TESLIM_YERI.localeCompare(b.SSP_TESLIM_YERI);
+      },
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true,
-      sorter: (a, b) => (a.IST_TALEP_EDEN_ADI || "").localeCompare(b.IST_TALEP_EDEN_ADI || ""),
+
+      visible: true, // Varsayılan olarak açık
+    },
+    {
+      title: "Sevk",
+      dataIndex: "SSP_SEVK",
+      key: "SSP_SEVK",
+      width: 150,
+      sorter: (a, b) => {
+        if (a.SSP_SEVK === null && b.SSP_SEVK === null) return 0;
+        if (a.SSP_SEVK === null) return -1;
+        if (b.SSP_SEVK === null) return 1;
+        return a.SSP_SEVK.localeCompare(b.SSP_SEVK);
+      },
+      ellipsis: true,
+
+      visible: true, // Varsayılan olarak açık
     },
     {
       title: "Proje",
-      dataIndex: "durumAciklamasi",
-      key: "durumAciklamasi",
+      dataIndex: "SSP_PROJE",
+      key: "SSP_PROJE",
       width: 150,
+      sorter: (a, b) => {
+        if (a.SSP_PROJE === null && b.SSP_PROJE === null) return 0;
+        if (a.SSP_PROJE === null) return -1;
+        if (b.SSP_PROJE === null) return 1;
+        return a.SSP_PROJE.localeCompare(b.SSP_PROJE);
+      },
       ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true,
-      sorter: (a, b) => (a.durumAciklamasi || "").localeCompare(b.durumAciklamasi || ""),
+
+      visible: true, // Varsayılan olarak kapalı
     },
     {
-      title: "Referans No",
-      dataIndex: "IST_ISEMRI_NO",
-      key: "IST_ISEMRI_NO",
+      title: "Masraf Merkezi",
+      dataIndex: "SSP_MASRAF_MERKEZI",
+      key: "SSP_MASRAF_MERKEZI",
+      width: 150,
+      sorter: (a, b) => {
+        if (a.SSP_MASRAF_MERKEZI === null && b.SSP_MASRAF_MERKEZI === null) return 0;
+        if (a.SSP_MASRAF_MERKEZI === null) return -1;
+        if (b.SSP_MASRAF_MERKEZI === null) return 1;
+        return a.SSP_MASRAF_MERKEZI.localeCompare(b.SSP_MASRAF_MERKEZI);
+      },
+      ellipsis: true,
+
+      visible: true, // Varsayılan olarak kapalı
+    },
+    {
+      title: "Öncelik",
+      dataIndex: "SSP_ONCELIK",
+      key: "SSP_ONCELIK",
+      width: 150,
+      sorter: (a, b) => {
+        if (a.SSP_ONCELIK === null && b.SSP_ONCELIK === null) return 0;
+        if (a.SSP_ONCELIK === null) return -1;
+        if (b.SSP_ONCELIK === null) return 1;
+        return a.SSP_ONCELIK.localeCompare(b.SSP_ONCELIK);
+      },
+      ellipsis: true,
+
+      visible: true, // Varsayılan olarak kapalı
+    },
+    {
+        title: t("kdvToplam"),
+        dataIndex: "SSP_KDV_TOPLAM",
+        key: "SSP_KDV_TOPLAM",
+        width: 120,
+        ellipsis: true,
+        visible: true,
+        render: (text, record) => (
+        <div className="">
+          <span>{Number(text).toFixed(Number(record?.tutarFormat))} </span>
+        </div>
+      ),
+        sorter: (a, b) => {
+        if (a.SSP_KDV_TOPLAM === null) return -1;
+        if (b.SSP_KDV_TOPLAM === null) return 1;
+        return a.SSP_KDV_TOPLAM - b.SSP_KDV_TOPLAM;
+      },
+    },
+    {
+      title: t("araToplam"),
+      dataIndex: "SSP_ARA_TOPLAM",
+      key: "SSP_ARA_TOPLAM",
+      width: 120,
+      ellipsis: true,
+      visible: true,
+      render: (text, record) => (
+        <div className="">
+          <span>{Number(text).toFixed(Number(record?.tutarFormat))} </span>
+        </div>
+      ),
+      sorter: (a, b) => {
+        if (a.SSP_ARA_TOPLAM === null) return -1;
+        if (b.SSP_ARA_TOPLAM === null) return 1;
+        return a.SSP_ARA_TOPLAM - b.SSP_ARA_TOPLAM;
+      },
+    },
+    {
+      title: t("Yuvarlama Toplamı"),
+      dataIndex: "SSP_YUVARLAMA_TOPLAMI",
+      key: "SSP_YUVARLAMA_TOPLAMI",
+      width: 120,
+      ellipsis: true,
+      visible: true,
+      render: (text, record) => (
+        <div className="">
+          <span>{Number(text).toFixed(Number(record?.tutarFormat))} </span>
+        </div>
+      ),
+      sorter: (a, b) => {
+        if (a.SSP_YUVARLAMA_TOPLAMI === null) return -1;
+        if (b.SSP_YUVARLAMA_TOPLAMI === null) return 1;
+        return a.SSP_YUVARLAMA_TOPLAMI - b.SSP_YUVARLAMA_TOPLAMI;
+      },
+    },
+    {
+      title: t("genelToplam"),
+      dataIndex: "SSP_GENEL_TOPLAM",
+      key: "SSP_GENEL_TOPLAM",
+      width: 120,
+      ellipsis: true,
+      visible: true,
+      render: (text, record) => (
+        <div className="">
+          <span>{Number(text).toFixed(Number(record?.tutarFormat))} </span>
+        </div>
+      ),
+      sorter: (a, b) => {
+        if (a.SSP_GENEL_TOPLAM === null) return -1;
+        if (b.SSP_GENEL_TOPLAM === null) return 1;
+        return a.SSP_GENEL_TOPLAM - b.SSP_GENEL_TOPLAM;
+      },
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_1 ? ozelAlanlar.OZL_OZEL_ALAN_1 : label && label.OZL_OZEL_ALAN_1}</div>,
+      dataIndex: "OZEL_ALAN_1",
+      key: "OZEL_ALAN_1",
       width: 150,
       ellipsis: true,
-      onCell: (record) => ({
-        onClick: (event) => {
-          event.stopPropagation();
-          const updatedRecord = { ...record, key: record.IST_ISEMRI_ID };
-          setEditDrawer1Data(updatedRecord);
-          setEditDrawer1Visible(true);
-        },
-      }),
-      render: (text) => <a>{text}</a>,
-      visible: true,
-      sorter: (a, b) => (a.IST_ISEMRI_NO || "").localeCompare(b.IST_ISEMRI_NO || ""),
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_2 ? ozelAlanlar.OZL_OZEL_ALAN_2 : label && label.OZL_OZEL_ALAN_2}</div>,
+      dataIndex: "OZEL_ALAN_2",
+      key: "OZEL_ALAN_2",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_3 ? ozelAlanlar.OZL_OZEL_ALAN_3 : label && label.OZL_OZEL_ALAN_3}</div>,
+      dataIndex: "OZEL_ALAN_3",
+      key: "OZEL_ALAN_3",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_4 ? ozelAlanlar.OZL_OZEL_ALAN_4 : label && label.OZL_OZEL_ALAN_4}</div>,
+      dataIndex: "OZEL_ALAN_4",
+      key: "OZEL_ALAN_4",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_5 ? ozelAlanlar.OZL_OZEL_ALAN_5 : label && label.OZL_OZEL_ALAN_5}</div>,
+      dataIndex: "OZEL_ALAN_5",
+      key: "OZEL_ALAN_5",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_6 ? ozelAlanlar.OZL_OZEL_ALAN_6 : label && label.OZL_OZEL_ALAN_6}</div>,
+      dataIndex: "OZEL_ALAN_6",
+      key: "OZEL_ALAN_6",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_7 ? ozelAlanlar.OZL_OZEL_ALAN_7 : label && label.OZL_OZEL_ALAN_7}</div>,
+      dataIndex: "OZEL_ALAN_7",
+      key: "OZEL_ALAN_7",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_8 ? ozelAlanlar.OZL_OZEL_ALAN_8 : label && label.OZL_OZEL_ALAN_8}</div>,
+      dataIndex: "OZEL_ALAN_8",
+      key: "OZEL_ALAN_8",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_9 ? ozelAlanlar.OZL_OZEL_ALAN_9 : label && label.OZL_OZEL_ALAN_9}</div>,
+      dataIndex: "OZEL_ALAN_9",
+      key: "OZEL_ALAN_9",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_10 ? ozelAlanlar.OZL_OZEL_ALAN_10 : label && label.OZL_OZEL_ALAN_10}</div>,
+      dataIndex: "OZEL_ALAN_10",
+      key: "OZEL_ALAN_10",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_11 ? ozelAlanlar.OZL_OZEL_ALAN_11 : label && label.OZL_OZEL_ALAN_11}</div>,
+      dataIndex: "OZEL_ALAN_11",
+      key: "OZEL_ALAN_11",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_12 ? ozelAlanlar.OZL_OZEL_ALAN_12 : label && label.OZL_OZEL_ALAN_12}</div>,
+      dataIndex: "OZEL_ALAN_12",
+      key: "OZEL_ALAN_12",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_13 ? ozelAlanlar.OZL_OZEL_ALAN_13 : label && label.OZL_OZEL_ALAN_13}</div>,
+      dataIndex: "OZEL_ALAN_13",
+      key: "OZEL_ALAN_13",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_14 ? ozelAlanlar.OZL_OZEL_ALAN_14 : label && label.OZL_OZEL_ALAN_14}</div>,
+      dataIndex: "OZEL_ALAN_14",
+      key: "OZEL_ALAN_14",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_15 ? ozelAlanlar.OZL_OZEL_ALAN_15 : label && label.OZL_OZEL_ALAN_15}</div>,
+      dataIndex: "OZEL_ALAN_15",
+      key: "OZEL_ALAN_15",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_16 ? ozelAlanlar.OZL_OZEL_ALAN_16 : label && label.OZL_OZEL_ALAN_16}</div>,
+      dataIndex: "OZEL_ALAN_16",
+      key: "OZEL_ALAN_16",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_17 ? ozelAlanlar.OZL_OZEL_ALAN_17 : label && label.OZL_OZEL_ALAN_17}</div>,
+      dataIndex: "OZEL_ALAN_17",
+      key: "OZEL_ALAN_17",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_18 ? ozelAlanlar.OZL_OZEL_ALAN_18 : label && label.OZL_OZEL_ALAN_18}</div>,
+      dataIndex: "OZEL_ALAN_18",
+      key: "OZEL_ALAN_18",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_19 ? ozelAlanlar.OZL_OZEL_ALAN_19 : label && label.OZL_OZEL_ALAN_19}</div>,
+      dataIndex: "OZEL_ALAN_19",
+      key: "OZEL_ALAN_19",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
+    },
+    {
+      title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_20 ? ozelAlanlar.OZL_OZEL_ALAN_20 : label && label.OZL_OZEL_ALAN_20}</div>,
+      dataIndex: "OZEL_ALAN_20",
+      key: "OZEL_ALAN_20",
+      width: 150,
+      ellipsis: true,
+
+      visible: false, // Varsayılan olarak kapalı
     },
 
     // Diğer kolonlarınız...
@@ -495,8 +846,9 @@ const MainTable = () => {
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
   const [body, setBody] = useState({
-    keyword: "",
-    filters: {},
+    filters: {
+      kelime: "",
+    },
   });
 
   // ana tablo api isteği için kullanılan useEffect
@@ -515,9 +867,10 @@ const MainTable = () => {
 
     // Arama terimi değiştiğinde ve boş olduğunda API isteğini tetikle
     const timeout = setTimeout(() => {
-      if (searchTerm !== body.keyword) {
-        handleBodyChange("keyword", searchTerm);
+      if (searchTerm !== body.kelime) {
+        handleBodyChange("kelime", searchTerm);
         setCurrentPage(1); // Arama yapıldığında veya arama sıfırlandığında sayfa numarasını 1'e ayarla
+        // setDrawer({ ...drawer, visible: false }); // Arama yapıldığında veya arama sıfırlandığında Drawer'ı kapat
       }
     }, 2000);
 
@@ -529,49 +882,50 @@ const MainTable = () => {
   // arama işlemi için kullanılan useEffect son
 
   const fetchEquipmentData = async (body, page, size) => {
-    // body'nin undefined olması durumunda varsayılan değerler atanıyor
-    const { keyword = "", filters = {} } = body || {};
-    // page'in undefined olması durumunda varsayılan değer olarak 1 atanıyor
-    const currentPage = page || 1;
+  const { kelime = "", filters = {} } = body || {};
+  const currentPage = page || 1;
 
-    try {
-      setLoading(true);
-      // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.post(``, filters);
-      if (response) {
-        if (response.status_code === 401) {
-          message.error(t("buSayfayaErisimYetkinizBulunmamaktadir"));
-          return;
-        }
-        // Toplam sayfa sayısını ayarla
-        setTotalPages(response.page);
-        setTotalDataCount(response.kayit_sayisi);
+  try {
+    setLoading(true);
 
-        // Gelen veriyi formatla ve state'e ata
-        const formattedData = response.is_talep_listesi.map((item) => ({
-          ...item,
-          key: item.TB_IS_TALEP_ID,
-          // Diğer alanlarınız...
-        }));
-        setData(formattedData);
-        setLoading(false);
-      } else {
-        console.error("API response is not in expected format");
-        setLoading(false);
-      }
-    } catch (error) {
-      console.error("Error in API request:", error);
-      setLoading(false);
-      if (navigator.onLine) {
-        // İnternet bağlantısı var
-        //message.error("Hata Mesajı: " + error.message);
-      } else {
-        // İnternet bağlantısı yok
-        message.error("Internet Bağlantısı Mevcut Değil.");
-      }
+    // API isteği (filters burada aslında requestBody olmalı)
+    const response = await AxiosInstance.post(
+      `GetSatinalmaSiparisList?pagingDeger=${currentPage}&pageSize=${size}`,
+      filters // <-- burada filters değil, düzgün body verisi bekleniyor olabilir
+    );
+
+    if (response.status_code === 401) {
+      message.error(t("buSayfayaErisimYetkinizBulunmamaktadir"));
+      return;
     }
-  };
 
+    setTotalPages(response.page);
+    setTotalDataCount(response.kayit_sayisi);
+
+    // Listeyi siparis_listesi olarak çek
+    const list = Array.isArray(response?.siparis_listesi) ? response.siparis_listesi : [];
+
+    if (!Array.isArray(list)) {
+      console.error("siparis_listesi array değil!", list);
+    }
+
+    const formattedData = list.map((item) => ({
+      ...item,
+      key: item.TB_SATINALMA_SIPARIS_ID,
+    }));
+
+    setData(formattedData);
+    setLoading(false);
+  } catch (error) {
+    console.error("Error in API request:", error);
+    setLoading(false);
+    if (navigator.onLine) {
+      message.error("Hata Mesajı: " + error.message);
+    } else {
+      message.error("Internet Bağlantısı Mevcut Değil.");
+    }
+  }
+};
   // filtreleme işlemi için kullanılan useEffect
   const handleBodyChange = useCallback((type, newBody) => {
     setBody((state) => ({
@@ -601,6 +955,7 @@ const MainTable = () => {
     // Seçilen satırların verisini bul
     const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
     setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
+    console.log("Seçilen Satırlar:", newSelectedRows);
   };
 
   const rowSelection = {
@@ -609,12 +964,16 @@ const MainTable = () => {
     onChange: onSelectChange,
   };
 
+  // const onRowClick = (record) => {
+  //   return {
+  //     onClick: () => {
+  //       setDrawer({ visible: true, data: record });
+  //     },
+  //   };
+  // };
+
   const onRowClick = (record) => {
-    return {
-      onClick: () => {
-        setDrawer({ visible: true, data: record });
-      },
-    };
+    setDrawer({ visible: true, data: record });
   };
 
   const refreshTableData = useCallback(() => {
@@ -623,7 +982,7 @@ const MainTable = () => {
 
     // `body` içerisindeki filtreleri ve arama terimini sıfırla
     // setBody({
-    //   keyword: "",
+    //   kelime: "",
     //   filters: {},
     // });
     // setSearchTerm("");
@@ -637,13 +996,13 @@ const MainTable = () => {
     // Burada `body` ve `currentPage`'i güncellediğimiz için, bu değerlerin en güncel hallerini kullanarak veri çekme işlemi yapılır.
     // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
     // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
-  }, [body, currentPage]); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
+  }, [body, currentPage]);
 
   // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
   const [columns, setColumns] = useState(() => {
-    const savedOrder = localStorage.getItem("columnOrderSatinalamSiparisleri");
-    const savedVisibility = localStorage.getItem("columnVisibilitySatinalamSiparisleri");
-    const savedWidths = localStorage.getItem("columnWidthsSatinalamSiparisleri");
+    const savedOrder = localStorage.getItem("columnSiparisOrder");
+    const savedVisibility = localStorage.getItem("columnSiparisVisibility");
+    const savedWidths = localStorage.getItem("columnSiparisWidths");
 
     let order = savedOrder ? JSON.parse(savedOrder) : [];
     let visibility = savedVisibility ? JSON.parse(savedVisibility) : {};
@@ -661,9 +1020,9 @@ const MainTable = () => {
       }
     });
 
-    localStorage.setItem("columnOrderSatinalamSiparisleri", JSON.stringify(order));
-    localStorage.setItem("columnVisibilitySatinalamSiparisleri", JSON.stringify(visibility));
-    localStorage.setItem("columnWidthsSatinalamSiparisleri", JSON.stringify(widths));
+    localStorage.setItem("columnSiparisOrder", JSON.stringify(order));
+    localStorage.setItem("columnSiparisVisibility", JSON.stringify(visibility));
+    localStorage.setItem("columnSiparisWidths", JSON.stringify(widths));
 
     return order.map((key) => {
       const column = initialColumns.find((col) => col.key === key);
@@ -674,9 +1033,31 @@ const MainTable = () => {
 
   // sütunları local storage'a kaydediyoruz
   useEffect(() => {
-    localStorage.setItem("columnOrderSatinalamSiparisleri", JSON.stringify(columns.map((col) => col.key)));
-    localStorage.setItem("columnVisibilitySatinalamSiparisleri", JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.visible }), {})));
-    localStorage.setItem("columnWidthsSatinalamSiparisleri", JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.width }), {})));
+    localStorage.setItem("columnSiparisOrder", JSON.stringify(columns.map((col) => col.key)));
+    localStorage.setItem(
+      "columnSiparisVisibility",
+      JSON.stringify(
+        columns.reduce(
+          (acc, col) => ({
+            ...acc,
+            [col.key]: col.visible,
+          }),
+          {}
+        )
+      )
+    );
+    localStorage.setItem(
+      "columnSiparisWidths",
+      JSON.stringify(
+        columns.reduce(
+          (acc, col) => ({
+            ...acc,
+            [col.key]: col.width,
+          }),
+          {}
+        )
+      )
+    );
   }, [columns]);
   // sütunları local storage'a kaydediyoruz sonu
 
@@ -742,24 +1123,122 @@ const MainTable = () => {
   // sütunları sıfırlamak için kullanılan fonksiyon
 
   function resetColumns() {
-    localStorage.removeItem("columnOrderSatinalamSiparisleri");
-    localStorage.removeItem("columnVisibilitySatinalamSiparisleri");
-    localStorage.removeItem("columnWidthsSatinalamSiparisleri");
-    localStorage.removeItem("ozelAlanlarSatinalamSiparisleri");
+    localStorage.removeItem("columnOrder");
+    localStorage.removeItem("columnVisibility");
+    localStorage.removeItem("columnWidths");
+    localStorage.removeItem("ozelAlanlar");
     window.location.reload();
   }
 
   // sütunları sıfırlamak için kullanılan fonksiyon sonu
 
+  // Function to handle CSV download
+  const handleDownloadXLSX = async () => {
+    try {
+      // İndirme işlemi başlıyor
+      setXlsxLoading(true);
+
+      // API'den verileri çekiyoruz
+      const { kelime = "", filters = {} } = body || {};
+      const response = await AxiosInstance.post(`GetIsEmriFullListExcel?parametre=${kelime}`, filters);
+      if (response) {
+        // Verileri işliyoruz
+        const xlsxData = response.map((row) => {
+          let xlsxRow = {};
+          filteredColumns.forEach((col) => {
+            const key = col.dataIndex;
+            if (key) {
+              let value = row[key];
+
+              // Özel durumları ele alıyoruz
+              if (col.render) {
+                if (key === "DUZENLEME_TARIH" || key.endsWith("_TARIH")) {
+                  value = formatDate(value);
+                } else if (key === "DUZENLEME_SAAT" || key.endsWith("_SAAT")) {
+                  value = formatTime(value);
+                } else if (key === "GARANTI") {
+                  value = row.GARANTI ? "Evet" : "Hayır";
+                } else if (key === "TAMAMLANMA") {
+                  value = `${row.TAMAMLANMA}%`;
+                } else if (key === "DURUM") {
+                  value = row.DURUM;
+                } else if (key === "ISM_ONAY_DURUM") {
+                  const { text } = statusTag(row.ISM_ONAY_DURUM);
+                  value = text;
+                } else if (key === "ISEMRI_TIP") {
+                  value = row.ISEMRI_TIP;
+                } else if (key.startsWith("OZEL_ALAN_")) {
+                  value = row[key];
+                } else {
+                  // Diğer sütunlar için
+                  value = extractTextFromElement(col.render(row[key], row));
+                }
+              }
+
+              xlsxRow[extractTextFromElement(col.title)] = value;
+            }
+          });
+          return xlsxRow;
+        });
+
+        // XLSX dosyasını oluşturuyoruz
+        const worksheet = XLSX.utils.json_to_sheet(xlsxData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+        // Sütun genişliklerini ayarlıyoruz
+        const headers = filteredColumns
+          .map((col) => {
+            let label = extractTextFromElement(col.title);
+            return {
+              label: label,
+              key: col.dataIndex,
+              width: col.width, // Tablo sütun genişliği
+            };
+          })
+          .filter((col) => col.key); // Geçerli dataIndex'e sahip sütunları dahil ediyoruz
+
+        // Genişlikleri ölçeklendirme faktörü ile ayarlıyoruz
+        const scalingFactor = 0.8; // Gerektiği gibi ayarlayın
+
+        worksheet["!cols"] = headers.map((header) => ({
+          wpx: header.width ? header.width * scalingFactor : 100, // Tablo sütun genişliğini kullanıyoruz
+        }));
+
+        // İndirme işlemini başlatıyoruz
+        const excelBuffer = XLSX.write(workbook, {
+          bookType: "xlsx",
+          type: "array",
+        });
+        const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", "table_data.xlsx");
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // İndirme işlemi bitti
+        setXlsxLoading(false);
+      } else {
+        console.error("API yanıtı beklenen formatta değil");
+        setXlsxLoading(false);
+      }
+    } catch (error) {
+      setXlsxLoading(false);
+      console.error("XLSX indirme hatası:", error);
+      if (navigator.onLine) {
+        message.error("Hata Mesajı: " + error.message);
+      } else {
+        message.error("Internet Bağlantısı Mevcut Değil.");
+      }
+    }
+  };
+
   return (
     <>
-      <style>
-        {`
-          .boldRow {
-            font-weight: bold;
-          }
-        `}
-      </style>
       <Modal title="Sütunları Yönet" centered width={800} open={isModalVisible} onOk={() => setIsModalVisible(false)} onCancel={() => setIsModalVisible(false)}>
         <Text style={{ marginBottom: "15px" }}>Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını Ayarlayabilirsiniz.</Text>
         <div
@@ -845,21 +1324,14 @@ const MainTable = () => {
       <div
         style={{
           display: "flex",
+          flexWrap: "wrap",
           justifyContent: "space-between",
           marginBottom: "20px",
           gap: "10px",
           padding: "0 5px",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            alignItems: "center",
-            flexWrap: "wrap",
-            width: "100%",
-          }}
-        >
+        <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
           <Button
             style={{
               display: "flex",
@@ -874,16 +1346,21 @@ const MainTable = () => {
             <MenuOutlined />
           </Button>
           <Input
-            style={{ width: "250px", maxWidth: "200px" }}
-            type="text"
-            placeholder="Arama yap..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
-          />
-          <Filters onChange={handleBodyChange} />
+                      style={{ width: "250px" }}
+                      type="text"
+                      placeholder="Arama yap..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
+                    />
+          <Filters kelime={searchTerm} onChange={handleBodyChange} />
+          {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
+          <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
+          <Button style={{ display: "flex", alignItems: "center" }} onClick={handleDownloadXLSX} loading={xlsxLoading} icon={<SiMicrosoftexcel />}>
+            İndir
+          </Button>
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
           <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
         </div>
@@ -906,10 +1383,10 @@ const MainTable = () => {
             showTotal: (total, range) => `Toplam ${total}`, // Burada 'total' parametresi doğru kayıt sayısını yansıtacaktır
             showQuickJumper: true,
           }}
-          onRow={onRowClick}
+          // onRow={onRowClick}
           scroll={{ y: "calc(100vh - 370px)" }}
           onChange={handleTableChange}
-          rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
+          rowClassName={(record) => (record.SFS_TALEP_DURUM_ID === 0 ? "boldRow" : "")}
         />
       </Spin>
       <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />

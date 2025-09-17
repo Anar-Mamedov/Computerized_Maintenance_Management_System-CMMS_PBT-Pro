@@ -100,7 +100,7 @@ export default function TarihceTablo({ workshopSelectedId, onSubmit, selectedRow
       <Modal
         width={1000}
         centered
-        title="Malzeme Talebi Tarihçesi"
+        title={`Malzeme Talebi Tarihçesi (${selectedRows[0]?.SFS_FIS_NO || ""})`}
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}

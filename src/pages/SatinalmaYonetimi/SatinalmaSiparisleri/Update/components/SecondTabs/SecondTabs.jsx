@@ -1,20 +1,14 @@
-import React from "react";
-import { Tabs } from "antd";
+import React, { useCallback, useEffect, useState } from "react";
+import { Input, Tabs, Typography } from "antd";
 import styled from "styled-components";
-import { useFormContext } from "react-hook-form";
-import IsTakibi from "./components/IsTakibi/IsTakibi";
-import MakineVeEkipman from "./components/MakineVeEkipman/MakineVeEkipman";
-import PlanlamaVeIsEmri from "./components/PlanlamaVeIsEmri/PlanlamaVeIsEmri";
-import Not from "./components/Not/Not";
-import Sonuc from "./components/Sonuc/Sonuc";
-import Degerlendirme from "./components/Degerlendirme/Degerlendirme";
-import TeknisyenListesi from "./components/TeknisyenListesi/TeknisyenListesi";
-import ResimUpload from "./components/Resim/ResimUpload";
-import DosyaUpload from "./components/Dosya/DosyaUpload";
+import { Controller, useFormContext } from "react-hook-form";
+import { t } from "i18next";
+import OzelAlanlar from "./components/OzelAlanlar/OzelAlanlar.jsx";
+import FisIcerigi from "./components/FisIcerigi/FisIcerigi.jsx";
+import SiparisDetay from "./components/SiparisDetay/SiparisDetayi.jsx";
 
-const onChange = (key) => {
-  // console.log(key);
-};
+const { Text, Link } = Typography;
+const { TextArea } = Input;
 
 //styled components
 const StyledTabs = styled(Tabs)`
@@ -24,6 +18,10 @@ const StyledTabs = styled(Tabs)`
     padding: 10px 15px;
     justify-content: center;
     background-color: rgba(230, 230, 230, 0.3);
+  }
+
+  .ant-tabs-nav {
+    z-index: 20 !important;
   }
 
   .ant-tabs-tab-active {
@@ -49,60 +47,46 @@ const StyledTabs = styled(Tabs)`
 
 //styled components end
 
-export default function SecondTabs({ refreshKey, disabled, fieldRequirements }) {
+export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen }) {
   const { watch } = useFormContext();
+  const [activeTabKey, setActiveTabKey] = useState("4"); // Default to the FisIcerigi tab
+
+  // Modify the onChange handler to update the active tab state
+  const onChange = (key) => {
+    setActiveTabKey(key);
+  };
+
+  const secilenIsEmriID = watch("secilenIsEmriID");
 
   const items = [
-    {
-      key: "1",
-      label: "İş Takibi",
-      children: <IsTakibi disabled={disabled} />,
-    },
-    {
-      key: "2",
-      label: "Makine ve Ekipman",
-      children: <MakineVeEkipman disabled={disabled} />,
-    },
-    {
+    /*{
       key: "3",
-      label: "Teknisyen Listesi",
-      children: <TeknisyenListesi disabled={disabled} />,
-    },
+      label: "Sigorta",
+      children: <Sigorta fieldRequirements={fieldRequirements} />,
+    },*/
     {
       key: "4",
-      label: "Planlama ve İş Emri",
-      children: <PlanlamaVeIsEmri disabled={disabled} fieldRequirements={fieldRequirements} />,
+      label: t("fisIcerigi"),
+      children: <FisIcerigi modalOpen={modalOpen} />,
     },
-    {
-      key: "5",
-      label: "Not",
-      children: <Not disabled={disabled} />,
-    },
-    {
-      key: "6",
-      label: "Sonuç",
-      children: <Sonuc disabled={disabled} />,
-    },
+
     {
       key: "7",
-      label: "Ekli Belgeler",
-      children: <DosyaUpload />,
+      label: t("Sipariş Detayı"),
+      children: <SiparisDetay modalOpen={modalOpen} />,
     },
+
     {
-      key: "8",
-      label: "Resimler",
-      children: <ResimUpload />,
-    },
-    {
-      key: "9",
-      label: "Ön Değerlendirme",
-      children: <Degerlendirme disabled={disabled} />,
+      key: "5",
+      label: "Özel Alanlar",
+      // children: <SureBilgileri fieldRequirements={fieldRequirements} />,
+      children: <OzelAlanlar />,
     },
   ];
 
   return (
     <div>
-      <StyledTabs defaultActiveKey="1" items={items} onChange={onChange} />
+      <StyledTabs defaultActiveKey={activeTabKey} items={items} onChange={onChange} />
     </div>
   );
 }

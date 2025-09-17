@@ -12,6 +12,7 @@ import TalebiAc from "./components/Kapat/Kapat";
 import OnayaGonder from "./components/OnayaGonder";
 import TarihceOnayTablo from "./components/TarihceOnayTablo";
 import OnayGeriAl from "./components/OnayGeriAl";
+import SipariseAktar from "./components/SipariseAktar/EditDrawer";
 
 const { Text } = Typography;
 
@@ -69,11 +70,12 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
       );
       case 8:
         return (
-          <>
-            <Kapat {...commonProps} />
-            <Iptal {...commonProps} />
-          </>
-        );
+        <>
+          <Kapat {...commonProps} />
+          <Iptal {...commonProps} />
+          <SipariseAktar selectedRow={selectedRows[0]} onRefresh={refreshTableData} />
+        </>
+      );
       case 9:
         return (
           <>
@@ -125,10 +127,10 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
         <>
           <Sil {...commonProps} disabled={isDisabled} />
           <div style={{ marginTop: 10 }}>
-            <TarihceTablo selectedRows={selectedRows} />
+            <TarihceTablo {...commonProps} />
           </div>
           <div style={{ marginTop: 10 }}>
-            <TarihceOnayTablo selectedRows={selectedRows} />
+            <TarihceOnayTablo {...commonProps} />
           </div>
         </>
       )}
