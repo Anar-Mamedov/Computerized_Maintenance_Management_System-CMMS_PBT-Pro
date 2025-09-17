@@ -73,6 +73,7 @@ export default function MainTabs({ modalOpen }) {
   const [initialTalepNo, setInitialTalepNo] = useState("");
   const [isTalepNoModified, setIsTalepNoModified] = useState(false);
   const [isLokasyonModalOpen, setIsLokasyonModalOpen] = useState(false);
+  const [isMasrafMerkeziModalOpen, setIsMasrafMerkeziModalOpen] = useState(false);
   const [isAtolyeModalOpen, setIsAtolyeModalOpen] = useState(false);
   const [initialBaslik, setInitialBaslik] = useState("");
   const [isBaslikModified, setIsBaslikModified] = useState(false);
@@ -251,6 +252,14 @@ export default function MainTabs({ modalOpen }) {
     setValue("lokasyonID", null);
   };
 
+  const handleYeniMasrafMerkeziPlusClick = () => {
+    setIsMasrafMerkeziModalOpen(true);
+  };
+  const handleYeniMasrafMerkeziMinusClick = () => {
+    setValue("masrafMerkeziTanim", null);
+    setValue("masrafMerkeziID", null);
+  };
+
   return (
     <div style={{ display: "flex", marginBottom: "20px", flexDirection: "row", gap: "10px", width: "100%" }}>
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "350px" }}>
@@ -316,15 +325,15 @@ export default function MainTabs({ modalOpen }) {
             }}
           >
             <MasrafMerkezi
-              lokasyonFieldName="lokasyonName"
-              lokasyonIdFieldName="lokasyonID"
+              masrafMerkeziFieldName="masrafMerkeziTanim"
+              masrafMerkeziIdFieldName="masrafMerkeziID"
               onSubmit={(selectedData) => {
-                setValue("lokasyonName", selectedData.LOK_TANIM);
-                setValue("lokasyonID", selectedData.key);
+                setValue("masrafMerkeziTanim", selectedData.MAM_TANIM);
+                setValue("masrafMerkeziID", selectedData.key);
                 // Force trigger to ensure FisIcerigi component detects the change
                 setTimeout(() => {
-                setValue("lokasyonName", selectedData.LOK_TANIM, { shouldDirty: true });
-                setValue("lokasyonID", selectedData.key, { shouldDirty: true });
+                setValue("masrafMerkeziTanim", selectedData.MAM_TANIM, { shouldDirty: true });
+                setValue("masrafMerkeziID", selectedData.key, { shouldDirty: true });
                }, 100);
               }}
               isModalVisible={isLokasyonModalOpen}
@@ -354,7 +363,7 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "240px",
             }}
           >
-            <DepoTablo name1="proje" isRequired={false} />
+            <DepoTablo name1="depo" isRequired={false} />
           </div>
         </div>
         <div
@@ -382,17 +391,17 @@ export default function MainTabs({ modalOpen }) {
             }}
           >
             <Controller
-              name="referans"
+              name="sozlesme"
               control={control}
               render={({ field }) => (
                 <Input
                   {...field}
-                  status={errors["referans"] ? "error" : ""}
+                  status={errors["sozlesme"] ? "error" : ""}
                   style={{ flex: 1 }}
                 />
               )}
             />
-            {errors["referans"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["referans"].message}</div>}
+            {errors["sozlesmeId"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["sozlesmeId"].message}</div>}
           </div>
         </div>
       </div>
@@ -423,17 +432,17 @@ export default function MainTabs({ modalOpen }) {
             }}
           >
             <Controller
-              name="referans"
+              name="referansNo"
               control={control}
               render={({ field }) => (
                 <Input
                   {...field}
-                  status={errors["referans"] ? "error" : ""}
+                  status={errors["referansNo"] ? "error" : ""}
                   style={{ flex: 1 }}
                 />
               )}
             />
-            {errors["referans"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["referans"].message}</div>}
+            {errors["referansNo"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["referansNo"].message}</div>}
           </div>
           </div>
         </div>
@@ -459,7 +468,7 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "200px",
             }}
           >
-            <KodIDSelectbox name1="talepNedenKodId" kodID={13070} isRequired={false} />
+            <KodIDSelectbox name1="odemeSekliKodId" kodID={33021} isRequired={false} />
           </div>
         </div>
         <div
@@ -487,17 +496,17 @@ export default function MainTabs({ modalOpen }) {
             }}
           >
             <Controller
-              name="referans"
+              name="nakliyeKodu"
               control={control}
               render={({ field }) => (
                 <Input
                   {...field}
-                  status={errors["referans"] ? "error" : ""}
+                  status={errors["nakliyeKodu"] ? "error" : ""}
                   style={{ flex: 1 }}
                 />
               )}
             />
-            {errors["referans"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["referans"].message}</div>}
+            {errors["nakliyeKodu"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["nakliyeKodu"].message}</div>}
           </div>
         </div>
         <div
@@ -525,17 +534,17 @@ export default function MainTabs({ modalOpen }) {
             }}
           >
             <Controller
-              name="referans"
+              name="evrakNo"
               control={control}
               render={({ field }) => (
                 <Input
                   {...field}
-                  status={errors["referans"] ? "error" : ""}
+                  status={errors["evrakNo"] ? "error" : ""}
                   style={{ flex: 1 }}
                 />
               )}
             />
-            {errors["referans"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["referans"].message}</div>}
+            {errors["evrakNo"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["evrakNo"].message}</div>}
           </div>
         </div>
       </div>
@@ -552,7 +561,9 @@ export default function MainTabs({ modalOpen }) {
             flexDirection: "row",
           }}
         >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("Adres 1")}</Text>
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
+            {t("Adres 1")}
+          </Text>
           <div
             style={{
               display: "flex",
@@ -562,21 +573,18 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "240px",
             }}
           >
-            <AtolyeTablo
-              atolyeFieldName="atolye"
-              atolyeIdFieldName="atolyeID"
-              onSubmit={(selectedData) => {
-                setValue("atolye", selectedData.ATL_TANIM);
-                setValue("atolyeID", selectedData.key);
-                // Force trigger to ensure FisIcerigi component detects the change
-                setTimeout(() => {
-                  setValue("atolye", selectedData.ATL_TANIM, { shouldDirty: true });
-                  setValue("atolyeID", selectedData.key, { shouldDirty: true });
-                }, 100);
-              }}
-              isModalVisible={isAtolyeModalOpen}
-              setIsModalVisible={setIsAtolyeModalOpen}
+            <Controller
+              name="adres1"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  status={errors["adres1"] ? "error" : ""}
+                  style={{ flex: 1 }}
+                />
+              )}
             />
+            {errors["adres1"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["adres1"].message}</div>}
           </div>
         </div>
         <div
@@ -604,17 +612,17 @@ export default function MainTabs({ modalOpen }) {
             }}
           >
             <Controller
-              name="referans"
+              name="adres2"
               control={control}
               render={({ field }) => (
                 <Input
                   {...field}
-                  status={errors["referans"] ? "error" : ""}
+                  status={errors["adres2"] ? "error" : ""}
                   style={{ flex: 1 }}
                 />
               )}
             />
-            {errors["referans"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["referans"].message}</div>}
+            {errors["adres2"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["adres2"].message}</div>}
           </div>
         </div>
         <div
@@ -642,17 +650,17 @@ export default function MainTabs({ modalOpen }) {
             }}
           >
             <Controller
-              name="referans"
+              name="postaKodu"
               control={control}
               render={({ field }) => (
                 <Input
                   {...field}
-                  status={errors["referans"] ? "error" : ""}
+                  status={errors["postaKodu"] ? "error" : ""}
                   style={{ flex: 1 }}
                 />
               )}
             />
-            {errors["referans"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["referans"].message}</div>}
+            {errors["postaKodu"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["postaKodu"].message}</div>}
           </div>
         </div>
         <div
@@ -680,17 +688,17 @@ export default function MainTabs({ modalOpen }) {
             }}
           >
             <Controller
-              name="referans"
+              name="sehir"
               control={control}
               render={({ field }) => (
                 <Input
                   {...field}
-                  status={errors["referans"] ? "error" : ""}
+                  status={errors["sehir"] ? "error" : ""}
                   style={{ flex: 1 }}
                 />
               )}
             />
-            {errors["referans"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["referans"].message}</div>}
+            {errors["sehir"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["sehir"].message}</div>}
           </div>
         </div>
       </div>
@@ -720,17 +728,17 @@ export default function MainTabs({ modalOpen }) {
             }}
           >
             <Controller
-              name="referans"
+              name="ulke"
               control={control}
               render={({ field }) => (
                 <Input
                   {...field}
-                  status={errors["referans"] ? "error" : ""}
+                  status={errors["ulke"] ? "error" : ""}
                   style={{ flex: 1 }}
                 />
               )}
             />
-            {errors["referans"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["referans"].message}</div>}
+            {errors["ulke"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["ulke"].message}</div>}
           </div>
         </div>
     </div>

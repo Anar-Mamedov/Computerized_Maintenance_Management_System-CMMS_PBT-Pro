@@ -348,6 +348,9 @@ const MainTable = () => {
       fontSize: "12px",
     };
 
+    
+        <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
+
     switch (text) {
       case "ONAYLANDI":
         style = { ...style, backgroundColor: "#d4f8e8", color: "#207868" }; // pastel yeşil
@@ -424,9 +427,6 @@ const MainTable = () => {
         return a.SFS_TALEP_EDILEN.localeCompare(b.SFS_TALEP_EDILEN);
       },
       visible: false, // Varsayılan olarak açık
-      render: (text, record) => (
-        <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
-      ),
     },
     {
       title: "Talep Nedeni",
@@ -789,9 +789,10 @@ const MainTable = () => {
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
   const [body, setBody] = useState({
-    keyword: "",
-    filters: {},
-  });
+  filters: {
+    Kelime: "",
+  },
+});
 
   // ana tablo api isteği için kullanılan useEffect
 
@@ -1295,7 +1296,7 @@ const MainTable = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
-          <Filters onChange={handleBodyChange} />
+           <Filters kelime={searchTerm} onChange={handleBodyChange} />
           {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>

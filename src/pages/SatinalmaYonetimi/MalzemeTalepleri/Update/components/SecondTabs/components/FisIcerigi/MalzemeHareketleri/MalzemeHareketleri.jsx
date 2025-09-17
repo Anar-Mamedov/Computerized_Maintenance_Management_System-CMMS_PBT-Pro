@@ -166,7 +166,7 @@ const MainTable = ({ selectedRowId }) => {
     <>
       <Button onClick={() => setIsModalVisible(true)}>Malzeme Depo Durumları</Button>
       <Modal
-        title="Malzeme Depo Durumları"
+        title="Malzeme Hareketleri"
         centered
         width={900}
         open={isModalVisible}

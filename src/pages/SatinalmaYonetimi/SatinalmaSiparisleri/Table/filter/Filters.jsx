@@ -5,17 +5,21 @@ import TypeFilter from "./TypeFilter";
 import CustomFilter from "./custom-filter/CustomFilter";
 import ZamanAraligi from "./ZamanAraligi";
 
-export default function Filters({ onChange }) {
+export default function Filters({ onChange, kelime }) {
   const [filters, setFilters] = React.useState({
     durumId: -1,
     baslangicTarihi: null,
     bitisTarihi: null,
-    kelime: "",
+    kelime: kelime || "",
   });
 
   React.useEffect(() => {
-    onChange("filters", filters);
-  }, [filters, onChange]);
+      onChange("filters", filters);
+    }, [filters, onChange]);
+  
+    React.useEffect(() => {
+      setFilters((prev) => ({ ...prev, kelime: kelime }));
+    }, [kelime]);
 
   return (
     <>

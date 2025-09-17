@@ -81,7 +81,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
         setValue("bolumKodId", item.bolumKodId);
         setValue("bolumName", item.bolumName);
         setValue("atolyeId", item.atolyeId);
-        setValue("atolyeName", item.atolyeName);
+        setValue("atolyeTanim", item.atolyeName);
         setValue("teslimYeriKodId", item.teslimYeriKodId);
         setValue("teslimYeriName", item.teslimYeriName);
         setValue("referans", item.referans);

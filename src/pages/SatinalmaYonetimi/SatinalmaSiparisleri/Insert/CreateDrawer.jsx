@@ -169,13 +169,13 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
     siparisKodu: data.siparisKodu || "",
     siparisTarihi: formatDateWithDayjs(data.siparisTarihi),
     teslimTarihi: formatDateWithDayjs(data.teslimTarihi),
-    firmaId: Number(data.firmaId) || 0,
-    siparisVerenId: Number(data.siparisVerenId) || 0,
+    firmaId: Number(data.firmaID) || 0,
+    siparisVerenId: Number(data.talepEdenPersonelId) || 0,
     odemeSekliKodId: Number(data.odemeSekliKodId) || 0,
     referansNo: data.referansNo || "",
     teslimYeriKodId: Number(data.teslimYeriKodId) || 0,
-    projeId: Number(data.projeId) || 0,
-    oncelikId: Number(data.oncelikId) || 0,
+    projeId: Number(data.projeID) || 0,
+    oncelikId: Number(data.talepOncelikId) || 0,
     sevkKodId: Number(data.sevkKodId) || 0,
     sevkAdresiId: Number(data.sevkAdresiId) || 0,
     nakliyeKodu: data.nakliyeKodu || "",
@@ -186,10 +186,10 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
     genelToplam: Number(data.genelToplam) || 0,
     baslik: data.baslik || "",
     aciklama: data.aciklama || "",
-    durumId: Number(data.durumId) || 0,
-    depoId: Number(data.depoId) || 0,
+    durumId: 1,
+    depoId: Number(data.depoID) || 0,
     evrakNo: data.evrakNo || "",
-    lokasyonId: Number(data.lokasyonId) || 0,
+    lokasyonId: Number(data.lokasyonID) || 0,
     adres1: data.adres1 || "",
     adres2: data.adres2 || "",
     postaKodu: data.postaKodu || "",
@@ -198,8 +198,8 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
     sinifId: Number(data.sinifId) || 0,
     sinifName: data.sinifName || "",
     sozlesmeId: Number(data.sozlesmeId) || 0,
-    atolyeId: Number(data.atolyeId) || 0,
-    masrafMerkeziId: Number(data.masrafMerkeziId) || 0,
+    atolyeId: Number(data.atolyeID) || 0,
+    masrafMerkeziId: Number(data.masrafMerkeziID) || 0,
     duzenlemeTarih: formatDateWithDayjs(data.duzenlemeTarih),
     duzenlemeSaat: formatTimeWithDayjs(data.duzenlemeSaat),
     ozelAlan1: data.ozelAlan1 || "",
@@ -251,7 +251,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
     })) || [],
   };
 
-  AxiosInstance.post("UpsertSiparis", Body)
+  AxiosInstance.post("UpsertSatinalmaSiparis", Body)
     .then((response) => {
       console.log("Data sent successfully:", response);
       if (response.status_code === 200 || response.status_code === 201) {

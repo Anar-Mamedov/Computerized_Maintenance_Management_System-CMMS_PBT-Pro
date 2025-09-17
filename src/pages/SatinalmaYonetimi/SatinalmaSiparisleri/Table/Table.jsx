@@ -309,7 +309,7 @@ const MainTable = () => {
       title: "Sipariş Tarihi",
       dataIndex: "SSP_SIPARIS_TARIHI",
       key: "SSP_SIPARIS_TARIHI",
-      width: 110,
+      width: 150,
       ellipsis: true,
       sorter: (a, b) => {
         if (a.SSP_SIPARIS_TARIHI === null) return -1;
@@ -324,7 +324,7 @@ const MainTable = () => {
       title: "Teslim Tarihi",
       dataIndex: "SSP_TESLIM_TARIHI",
       key: "SSP_TESLIM_TARIHI",
-      width: 110,
+      width: 150,
       ellipsis: true,
       sorter: (a, b) => {
         if (a.SSP_TESLIM_TARIHI === null) return -1;
@@ -417,7 +417,7 @@ const MainTable = () => {
       title: "Firma",
       dataIndex: "SSP_FIRMA",
       key: "SSP_FIRMA",
-      width: 150,
+      width: 250,
       sorter: (a, b) => {
         if (a.SSP_FIRMA === null && b.SSP_FIRMA === null) return 0;
         if (a.SSP_FIRMA === null) return -1;
@@ -846,8 +846,9 @@ const MainTable = () => {
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
   const [body, setBody] = useState({
-    keyword: "",
-    filters: {},
+    filters: {
+      kelime: "",
+    },
   });
 
   // ana tablo api isteği için kullanılan useEffect
@@ -880,8 +881,8 @@ const MainTable = () => {
 
   // arama işlemi için kullanılan useEffect son
 
- const fetchEquipmentData = async (body, page, size) => {
-  const { keyword = "", filters = {} } = body || {};
+  const fetchEquipmentData = async (body, page, size) => {
+  const { kelime = "", filters = {} } = body || {};
   const currentPage = page || 1;
 
   try {
@@ -981,7 +982,7 @@ const MainTable = () => {
 
     // `body` içerisindeki filtreleri ve arama terimini sıfırla
     // setBody({
-    //   keyword: "",
+    //   kelime: "",
     //   filters: {},
     // });
     // setSearchTerm("");
@@ -1138,8 +1139,8 @@ const MainTable = () => {
       setXlsxLoading(true);
 
       // API'den verileri çekiyoruz
-      const { keyword = "", filters = {} } = body || {};
-      const response = await AxiosInstance.post(`GetIsEmriFullListExcel?parametre=${keyword}`, filters);
+      const { kelime = "", filters = {} } = body || {};
+      const response = await AxiosInstance.post(`GetIsEmriFullListExcel?parametre=${kelime}`, filters);
       if (response) {
         // Verileri işliyoruz
         const xlsxData = response.map((row) => {
@@ -1345,14 +1346,14 @@ const MainTable = () => {
             <MenuOutlined />
           </Button>
           <Input
-            style={{ width: "250px" }}
-            type="text"
-            placeholder="Arama yap..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
-          />
-          <Filters onChange={handleBodyChange} />
+                      style={{ width: "250px" }}
+                      type="text"
+                      placeholder="Arama yap..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
+                    />
+          <Filters kelime={searchTerm} onChange={handleBodyChange} />
           {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>

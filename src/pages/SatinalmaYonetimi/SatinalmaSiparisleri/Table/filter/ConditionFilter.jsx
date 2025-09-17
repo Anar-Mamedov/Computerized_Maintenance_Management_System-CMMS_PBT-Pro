@@ -11,7 +11,7 @@ const ConditionFilter = ({ onSubmit }) => {
   useEffect(() => {
     // Durum listesi
     const hardcodedOptions = [
-      { key: -1, value: "Tüm Durumlar" },
+      { key: -1, value: "Tümü" },
       { key: 1, value: "Açık" },
       { key: 2, value: "Karşılanıyor" },
       { key: 3, value: "Kapalı" },

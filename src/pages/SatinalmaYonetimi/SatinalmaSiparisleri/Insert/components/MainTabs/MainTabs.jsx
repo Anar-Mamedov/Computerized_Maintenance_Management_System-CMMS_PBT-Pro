@@ -15,7 +15,8 @@ import AtolyeTablo from "../../../../../../utils/components/AtolyeTablo";
 import DepoTablo from "../../../../../../utils/components/DepoTablo";
 import ProjeTablo from "../../../../../../utils/components/ProjeTablo";
 import SiparisTablo from "../../../../../../utils/components/SiparisTablo";
-import PersonelTablo from "../../../../MalzemeTalepleri/components/PersonelTablo"
+import PersonelTablo from "../../../../MalzemeTalepleri/components/PersonelTablo";
+import FirmaTablo from "../FirmaTablo";
 import { PlusOutlined } from "@ant-design/icons";
 
 const { Text, Link } = Typography;
@@ -443,7 +444,7 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "250px",
             }}
           >
-            <KodIDSelectbox name1="talepNedenKodId" kodID={13072} isRequired={false} />
+            <FirmaTablo name1="firma" isRequired={false} />
           </div>
         </div>
         <div
@@ -552,7 +553,7 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "200px",
             }}
           >
-            <KodIDSelectbox name1="talepNedenKodId" kodID={13070} isRequired={false} />
+            <KodIDSelectbox name1="sevkKodId" kodID={13071} isRequired={false} />
           </div>
           </div>
         </div>

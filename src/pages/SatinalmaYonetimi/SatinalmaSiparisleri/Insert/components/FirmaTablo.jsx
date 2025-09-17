@@ -1,168 +1,170 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Input, Modal, Table } from "antd";
+import { Button, Modal, Table, Input, Space } from "antd";
+import { Controller, useFormContext } from "react-hook-form";
+import { SearchOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../api/http";
-import dayjs from "dayjs";
 
-export default function FirmaTablo({ workshopSelectedId, onSubmit }) {
+// Türkçe karakterleri normalize eden fonksiyon
+const normalizeText = (text) => {
+  return text
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ğ/g, "g")
+    .replace(/Ğ/g, "G")
+    .replace(/ü/g, "u")
+    .replace(/Ü/g, "U")
+    .replace(/ş/g, "s")
+    .replace(/Ş/g, "S")
+    .replace(/ı/g, "i")
+    .replace(/İ/g, "I")
+    .replace(/ö/g, "o")
+    .replace(/Ö/g, "O")
+    .replace(/ç/g, "c")
+    .replace(/Ç/g, "C");
+};
+
+const FirmaTablo = ({ workshopSelectedId, onSubmit, disabled, name1, isRequired }) => {
+  const {
+    control,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
-  // tablodaki search kısmı için
+  const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
   const [searchValue, setSearchValue] = useState("");
-  // 1. Add a state variable for searchTimeout
-  const [searchTimeout, setSearchTimeout] = useState(null);
-  // tablodaki search kısmı için son
-  // sayfalama için
-  const [currentPage, setCurrentPage] = useState(1); // Initial page
-  const [pageSize, setPageSize] = useState(0); // Default to 0
-  // sayfalama için son
-  // sayfa değiştiğinde apiye istek hemen gitsin filtrelemede bulunan gecikmeden etkilenmesin diye
-  const [changeSource, setChangeSource] = useState(null);
-  // sayfa değiştiğinde apiye istek hemen gitsin filtrelemede bulunan gecikmeden etkilenmesin diye son
 
+  // Form alanları
+  const fieldName = name1;
+  const fieldIdName = `${name1}ID`;
+
+  // Kolonlar
   const columns = [
     {
       title: "Firma Kodu",
-      dataIndex: "code",
-      key: "code",
-      width: "150px",
-      render: (text) => (
-        <div
-          style={{
-            lineHeight: "20px",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
+      dataIndex: "CAR_KOD",
+      key: "CAR_KOD",
+      width: 150,
+      ellipsis: true,
     },
     {
-      title: "Firma Ünvanı",
-      dataIndex: "subject",
-      key: "subject",
-      width: "350px",
-
-      render: (text) => (
-        <div
-          style={{
-            lineHeight: "20px",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
+      title: "Firma Tanımı",
+      dataIndex: "CAR_TANIM",
+      key: "CAR_TANIM",
+      width: 250,
+      ellipsis: true,
     },
     {
-      title: "Firma Tipi",
-      dataIndex: "workdays",
-      key: "workdays",
-      width: "150px",
-      render: (text) => (
-        <div
-          style={{
-            lineHeight: "20px",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
+      title: "Sektör",
+      dataIndex: "CAR_SEKTOR",
+      key: "CAR_SEKTOR",
+      width: 200,
+      ellipsis: true,
     },
     {
-      title: "Lokasyon",
-      dataIndex: "description",
-      key: "description",
-      width: "150px",
-
-      render: (text) => (
-        <div
-          style={{
-            lineHeight: "20px",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
+      title: "Bölge",
+      dataIndex: "CAR_BOLGE",
+      key: "CAR_BOLGE",
+      width: 200,
+      ellipsis: true,
     },
     {
       title: "Şehir",
-      dataIndex: "fifthcolumn",
-      key: "fifthcolumn",
-      width: "150px",
-      render: (text) => (
-        <div
-          style={{
-            lineHeight: "20px",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {text}
-        </div>
-      ),
+      dataIndex: "CAR_SEHIR",
+      key: "CAR_SEHIR",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "İlçe",
+      dataIndex: "CAR_ILCE",
+      key: "CAR_ILCE",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "Telefon",
+      dataIndex: "CAR_TEL1",
+      key: "CAR_TEL1",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "E-posta",
+      dataIndex: "CAR_EMAIL",
+      key: "CAR_EMAIL",
+      width: 250,
+      ellipsis: true,
     },
   ];
 
-  const fetch = useCallback(() => {
+  // Veri çekme
+  const fetchData = useCallback(() => {
     setLoading(true);
     AxiosInstance.get(`GetFirmaList?pagingDeger=${currentPage}&search=${searchValue}`)
       .then((response) => {
-        // sayfalama için
-        // Set the total pages based on the pageSize from the API response
-        setPageSize(response.pageSize);
+        const allData = response.Firma_Liste.map((item) => ({
+          ...item,
+          key: item.TB_CARI_ID,
+        }));
 
-        // sayfalama için son
+        // Arama
+        const filteredData = searchValue
+          ? allData.filter((d) =>
+              normalizeText(
+                `${d.CAR_KOD || ""} ${d.CAR_TANIM || ""} ${d.CAR_SEKTOR || ""} ${d.CAR_BOLGE || ""} ${d.CAR_SEHIR || ""} ${d.CAR_ILCE || ""} ${d.CAR_TEL1 || ""} ${d.CAR_EMAIL || ""}`
+              ).includes(normalizeText(searchValue))
+            )
+          : allData;
 
-        const fetchedData = response.Firma_Liste.map((item) => {
-          return {
-            key: item.TB_CARI_ID,
-            code: item.CAR_KOD,
-            subject: item.CAR_TANIM,
-            workdays: item.CAR_TIP,
-            description: item.CAR_LOKASYON,
-            fifthcolumn: item.CAR_SEHIR,
-          };
-        });
-        setData(fetchedData);
-        setLoading(false);
+        setData(filteredData);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
-      });
-  }, [searchValue, currentPage]); // Added currentPage as a dependency
+      })
+      .finally(() => setLoading(false));
+  }, [searchValue, currentPage]);
 
+  // Arama
+  const handleSearch = () => {
+    setCurrentPage(1);
+    fetchData();
+  };
+
+  // Modal aç/kapat
   const handleModalToggle = () => {
     setIsModalVisible((prev) => !prev);
-    // Bu fonksiyon sadece modalın açılıp kapatılmasını kontrol eder.
   };
 
-  const handleClear = () => {
-    setSelectedRowKeys([]);
-    setSearchValue("");
-    setCurrentPage(1);
-  };
-
+  // Modal açıkken veri çek
   useEffect(() => {
-  if (isModalVisible) {
-    // Modal açıldığında verileri yükle
-    fetch();
-  } else {
-    // Modal kapandığında temizle
-    handleClear();
-  }
-}, [isModalVisible]);
+    if (isModalVisible) {
+      fetchData();
+    } else {
+      setSearchValue("");
+      setCurrentPage(1);
+      setSelectedRowKeys([]);
+    }
+  }, [isModalVisible]);
 
+  // Sayfa değişince
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    fetchData();
+  };
+
+  // Onayla
   const handleModalOk = () => {
     const selectedData = data.find((item) => item.key === selectedRowKeys[0]);
-    if (selectedData) onSubmit && onSubmit(selectedData);
+    if (selectedData) {
+      setValue(fieldName, selectedData.CAR_TANIM);
+      setValue(fieldIdName, selectedData.TB_CARI_ID);
+      onSubmit && onSubmit(selectedData);
+    }
     setIsModalVisible(false);
   };
 
@@ -174,67 +176,76 @@ export default function FirmaTablo({ workshopSelectedId, onSubmit }) {
     setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
   };
 
-  // tablodaki search kısmı için
-  useEffect(() => {
-    if (changeSource === "searchValue") {
-      if (searchTimeout) clearTimeout(searchTimeout);
-      const timeout = setTimeout(() => {
-        fetch();
-        setChangeSource(null);
-      }, 2000);
-      setSearchTimeout(timeout);
-      return () => clearTimeout(timeout);
-    } else if (changeSource === "currentPage") {
-      fetch();
-      setChangeSource(null);
-    }
-  }, [searchValue, currentPage, fetch]);
+  // Seçimi temizle
+  const handleMinusClick = () => {
+    setValue(fieldName, "");
+    setValue(fieldIdName, "");
+  };
 
-  // tablodaki search kısmı için son
-
-   return (
-    <div>
-      <Button onClick={handleModalToggle}> + </Button>
-
-      <Modal
-        width="1200px"
-        centered
-        title="Firma Tanımları"
-        open={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={handleModalToggle}>
-        <Input
-          placeholder="Ara..."
-          value={searchValue}
-          onChange={(e) => {
-            setSearchValue(e.target.value);
-            setCurrentPage(1);
-            setChangeSource("searchValue");
-          }}
-          style={{ marginBottom: "20px", width: "250px" }}
+  return (
+    <div style={{ width: "100%" }}>
+      <div style={{ display: "flex", gap: "5px", width: "100%" }}>
+        <Controller
+          name={fieldName}
+          control={control}
+          rules={isRequired ? { required: "Bu alan zorunludur" } : {}}
+          render={({ field }) => (
+            <Input
+              {...field}
+              status={errors[fieldName] ? "error" : ""}
+              type="text"
+              style={{ width: "100%", maxWidth: "630px" }}
+              disabled
+            />
+          )}
         />
+        <Controller name={fieldIdName} control={control} render={({ field }) => <Input {...field} type="text" style={{ display: "none" }} />} />
+        <div style={{ display: "flex", gap: "5px" }}>
+          <Button disabled={disabled} onClick={handleModalToggle}>
+            +
+          </Button>
+          <Button onClick={handleMinusClick}> - </Button>
+        </div>
+      </div>
 
-        <Table
-          rowSelection={{
-            type: "radio",
-            selectedRowKeys,
-            onChange: onRowSelectChange,
-          }}
-          scroll={{ y: "100vh" }}
-          columns={columns}
-          dataSource={data}
-          loading={loading}
-          pagination={{
-            position: ["bottomRight"],
-            current: currentPage,
-            total: pageSize * 10,
-            onChange: (page) => {
-              setCurrentPage(page);
-              setChangeSource("currentPage");
-            },
-          }}
-        />
+      <Modal title="Firma Tanımları" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle} width={1400} centered bodyStyle={{ maxHeight: "70vh", overflowY: "auto" }}>
+        <Space direction="vertical" style={{ width: "100%" }}>
+          <Space.Compact style={{ width: "300px", marginBottom: "15px" }}>
+            <Input
+              placeholder="Ara..."
+              value={searchValue}
+              onChange={(e) => {
+                setSearchValue(e.target.value);
+              }}
+              onPressEnter={handleSearch}
+              allowClear
+            />
+            <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
+              Ara
+            </Button>
+          </Space.Compact>
+          <Table
+            rowSelection={{
+              type: "radio",
+              selectedRowKeys,
+              onChange: onRowSelectChange,
+            }}
+            columns={columns}
+            dataSource={data}
+            loading={loading}
+            pagination={{
+              position: ["bottomRight"],
+              current: currentPage,
+              pageSize,
+              total: data.length,
+              onChange: handlePageChange,
+            }}
+            scroll={{ x: "max-content" }}
+          />
+        </Space>
       </Modal>
     </div>
   );
-}
+};
+
+export default FirmaTablo;

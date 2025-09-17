@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState, useCallback } from "react";
-import { Table, Button, Form as AntForm, Input, InputNumber, Popconfirm, Modal, Typography, message } from "antd";
+import { Table, Button, Form as AntForm, Input, InputNumber, Popconfirm, Modal, Typography, message, Radio, Select } from "antd";
 import { useFieldArray, useFormContext, Controller } from "react-hook-form";
 import { PlusOutlined } from "@ant-design/icons";
 import { t } from "i18next";
@@ -7,8 +7,8 @@ import Malzemeler from "../../../../../../../Malzeme&DepoYonetimi/MalzemeTanimla
 // import PlakaSelectBox from "../../../../../../../../components/PlakaSelectbox";
 import LokasyonTablo from "../../../../../../../../utils/components/LokasyonTablo";
 import MasrafMerkeziTablo from "../../../../../../../../utils/components/MasrafMerkeziTablo";
-import MakineTablo from "../../../../../../../../utils/components/Machina/MakineTablo";
 import KodIDSelectbox from "../../../../../../../../utils/components/KodIDSelectbox";
+import ContextMenu from "./ContextMenu"
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -120,13 +120,29 @@ const MalzemeSecModal = ({ visible, onCancel, onOk }) => {
   useEffect(() => {
     if (visible) {
       setModalKey(Date.now());
-      setSelectedRows([]); // Reset selection when modal opens
+      setSelectedRows([]);
     }
   }, [visible]);
 
+  // Burada hangi kolonlar gözükmeli belirliyorsun
+  const visibleColumns = ["malzemeKodu", "malzemeTanimi", "ureticiKodu","tip", "birim", "stokMiktar","grup", "lokasyon", "marka", "model", "malzemeSinifi"]; // örnek kolonlar
+
   return (
-    <Modal title="Malzeme Seç" open={visible} onCancel={onCancel} onOk={() => onOk(selectedRows)} width={1200} style={{ top: 20 }} destroyOnClose>
-      <Malzemeler key={modalKey} onRowSelect={handleMalzemeSelect} isSelectionMode={true} />
+    <Modal
+      title="Malzeme Listesi"
+      open={visible}
+      onCancel={onCancel}
+      onOk={() => onOk(selectedRows)}
+      width={1200}
+      style={{ top: 20 }}
+      destroyOnClose
+    >
+      <Malzemeler
+        key={modalKey}
+        onRowSelect={handleMalzemeSelect}
+        isSelectionMode={true}
+        visibleColumns={visibleColumns} // props ile gönderiyoruz
+      />
     </Modal>
   );
 };
@@ -134,10 +150,9 @@ const MalzemeSecModal = ({ visible, onCancel, onOk }) => {
 function FisIcerigi({ modalOpen }) {
   const { control, setValue, watch, getValues } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isLokasyonModalOpen, setIsLokasyonModalOpen] = useState(false);
-  const [currentEditingRow, setCurrentEditingRow] = useState(null);
   const [previousModalState, setPreviousModalState] = useState(false);
   const [isIndirimManuallyEdited, setIsIndirimManuallyEdited] = useState(false);
+  const [selectedRowId, setSelectedRowId] = useState(null);
 
   const { fields, append, remove, replace } = useFieldArray({
     control,
@@ -152,9 +167,10 @@ function FisIcerigi({ modalOpen }) {
   useEffect(() => {
     try {
       const totals = dataSource.reduce(
+        
         (acc, item) => {
           acc.araToplam += Number(item.araToplam) || 0;
-          acc.indirim += Number(item.indirimTutari) || 0;
+          acc.indirim += Number(item.indirimTutar) || 0;
           acc.kdvToplam += Number(item.kdvTutar) || 0;
           acc.genelToplam += Number(item.toplam) || 0;
           return acc;
@@ -166,24 +182,25 @@ function FisIcerigi({ modalOpen }) {
           genelToplam: 0,
         }
       );
+      console.log(totals),
 
       // Update form values with calculated totals
-      setValue("totalAraToplam", totals.araToplam.toFixed(2));
+      setValue("araToplam", totals.araToplam.toFixed(2));
 
       // Only update indirim if not manually edited
       if (!isIndirimManuallyEdited) {
-        setValue("totalIndirim", totals.indirim.toFixed(2));
+        setValue("indirimliToplam", totals.indirim.toFixed(2));
       }
 
-      setValue("totalKdvToplam", totals.kdvToplam.toFixed(2));
+      setValue("kdvToplam", totals.kdvToplam.toFixed(2));
 
       // If discount was manually edited, recalculate general total
       if (isIndirimManuallyEdited) {
-        const manualIndirim = parseFloat(getValues("totalIndirim")) || 0;
+        const manualIndirim = parseFloat(getValues("indirimliToplam")) || 0;
         const newGenelToplam = totals.araToplam - manualIndirim + totals.kdvToplam;
-        setValue("totalGenelToplam", newGenelToplam.toFixed(2));
+        setValue("genelToplam", newGenelToplam.toFixed(2));
       } else {
-        setValue("totalGenelToplam", totals.genelToplam.toFixed(2));
+        setValue("genelToplam", totals.genelToplam.toFixed(2));
       }
     } catch (error) {
       console.error("Error calculating totals:", error);
@@ -326,7 +343,7 @@ function FisIcerigi({ modalOpen }) {
       const isPriceChanged = item.fiyat !== row.fiyat;
 
       // Check if discount has changed (either discount rate or amount)
-      const isDiscountChanged = item.indirimOrani !== row.indirimOrani || item.indirimTutari !== row.indirimTutari;
+      const isDiscountChanged = item.indirimOrani !== row.indirimOrani || item.indirimTutar !== row.indirimTutar;
 
       // If discount was edited in table, reset manual edit flag so table calculations take precedence
       if (isDiscountChanged) {
@@ -343,19 +360,19 @@ function FisIcerigi({ modalOpen }) {
       const araToplam = round(miktar * fiyat);
 
       let indirimOrani = Number(row.indirimOrani) || 0;
-      let indirimTutari = Number(row.indirimTutari) || 0;
+      let indirimTutar = Number(row.indirimTutar) || 0;
 
       // If indirimOrani was changed
       if (item.indirimOrani !== row.indirimOrani) {
-        indirimTutari = round((araToplam * indirimOrani) / 100);
+        indirimTutar = round((araToplam * indirimOrani) / 100);
       }
-      // If indirimTutari was changed
-      else if (item.indirimTutari !== row.indirimTutari) {
-        indirimOrani = round((indirimTutari / araToplam) * 100);
+      // If indirimTutar was changed
+      else if (item.indirimTutar !== row.indirimTutar) {
+        indirimOrani = round((indirimTutar / araToplam) * 100);
       }
 
       // Calculate KDV amount based on kdvDH
-      const kdvMatrah = round(araToplam - indirimTutari);
+      const kdvMatrah = round(araToplam - indirimTutar);
       let kdvTutar;
 
       if (kdvDH) {
@@ -377,7 +394,7 @@ function FisIcerigi({ modalOpen }) {
         birimKodId: item.birimKodId,
         araToplam,
         indirimOrani: round(indirimOrani),
-        indirimTutari: round(indirimTutari),
+        indirimTutar: round(indirimTutar),
         kdvTutar: round(kdvTutar),
         toplam: round(toplam),
         isPriceChanged: isPriceChanged || item.isPriceChanged,
@@ -403,7 +420,7 @@ function FisIcerigi({ modalOpen }) {
   const handleMalzemeSelect = (selectedRows) => {
     try {
       // Get existing malzemeIds from the current dataSource
-      const existingMalzemeIds = new Set(dataSource.map((item) => item.malzemeId));
+      const existingMalzemeIds = new Set(dataSource.map((item) => item.stokId));
 
       // Filter out already existing materials
       const newRows = selectedRows.filter((row) => !existingMalzemeIds.has(row.TB_STOK_ID));
@@ -432,8 +449,8 @@ function FisIcerigi({ modalOpen }) {
         // Exception: Always calculate araToplam as miktar * fiyat regardless of kdvDH
         const araToplam = round(miktar * fiyat);
         const indirimOrani = 0;
-        const indirimTutari = 0;
-        const kdvMatrah = round(araToplam - indirimTutari);
+        const indirimTutar = 0;
+        const kdvMatrah = round(araToplam - indirimTutar);
 
         let kdvTutar;
         if (kdvDH) {
@@ -449,28 +466,36 @@ function FisIcerigi({ modalOpen }) {
         const toplam = kdvDH ? round(kdvMatrah) : round(kdvMatrah + kdvTutar);
 
         const newRow = {
-          id: Date.now() + Math.random(), // Generate unique ID
-          malzemeId: row.TB_STOK_ID,
-          birimKodId: row.STK_BIRIM_KOD_ID,
-          malzemeKodu: row.STK_KOD,
-          malzemeTanimi: row.STK_TANIM,
-          malzemeTipi: row.STK_TIP,
-          miktar,
-          birim: row.STK_BIRIM,
-          fiyat,
-          araToplam,
-          indirimOrani,
-          indirimTutari,
-          kdvOrani,
-          kdvDahilHaric: kdvDH,
-          kdvTutar,
-          toplam,
-          malzemeLokasyon: row.STK_LOKASYON || lokasyon || "",
-          malzemeLokasyonID: row.STK_LOKASYON_ID || lokasyonID || null,
-          masrafMerkezi: row.STK_MASRAFMERKEZ || "",
-          masrafMerkeziID: row.STK_MASRAF_MERKEZI_ID || null,
-          aciklama: "",
-        };
+  detayId: 0,
+  siparisId: 0,
+  stokId: row.TB_STOK_ID || 0,
+  malzemeKod: row.STK_KOD,
+  malzemeName: row.STK_TANIM,
+  markaName: row.STK_MARKA,
+  birimName: row.STK_BIRIM,
+  miktar: miktar ?? 0,
+  birimFiyat: row.STK_GIRIS_FIYAT_DEGERI,
+  kdvOran: row.STK_KDV_ORAN ?? 0,
+  kdvTutar: 0,
+  otvOran: row.STK_OTV_ORAN ?? 0,
+  otvTutar: 0,
+  indirimOran: 0,
+  indirimTutar: 0,
+  kdvDahil: "", // veya "EVET", senin senaryoya göre setlenir
+  araToplam: 0,
+  toplam: 0,
+  anaBirimMiktar: miktar ?? 0, // genelde miktar ile aynı olabilir
+  fisGridKonum: 0,
+  birimKodId: row.STK_BIRIM_KOD_ID || 0,
+  talepId: 0,
+  sinifId: 0,
+  teklifFiyatId: 0,
+  girenMiktar: 0,
+  kalanMiktar: miktar ?? 0,
+  alternatifStokId: 0,
+  aciklama: "",
+  isDeleted: false,
+};
 
         append(newRow);
       });
@@ -489,113 +514,145 @@ function FisIcerigi({ modalOpen }) {
     },
   };
 
+  const handleRowSelect = (record) => {
+    console.log("Seçilen stokId:", record.stokId);
+    setSelectedRowId(record.stokId);
+  };
+
   const defaultColumns = [
     {
-      title: "Malzeme Kodu",
-      dataIndex: "malzemeKodu",
-      key: "malzemeKodu",
-      width: 150,
-      editable: false,
-      inputType: "text",
-    },
-    {
-      title: "Malzeme Tanimi",
-      dataIndex: "malzemeTanimi",
-      key: "malzemeTanimi",
-      width: 200,
-      editable: false,
-      inputType: "text",
-    },
-    {
-      title: "Durum",
-      dataIndex: "durum",
-      key: "durum",
-      width: 200,
-      editable: false,
-      inputType: "text",
-    },
-    {
-      title: "Karşılama Şekli",
-      dataIndex: "karsilamaSekli",
-      key: "karsilamaSekli",
-      width: 150,
-      editable: false,
-      render: (text, record, index) => (
-        <Controller
-          name={`fisIcerigi.${index}.karsilamaSekli`}
-          control={control}
-          render={({ field }) => <KodIDSelectbox name1={`fisIcerigi.${index}.karsilamaSekli`} kodID={0} isRequired={false} />}
+      title: '',
+      dataIndex: 'radio',
+      render: (_, record) => (
+        <Radio
+          checked={selectedRowId === record.stokId}
+          onChange={() => setSelectedRowId(record.stokId)}
         />
       ),
+      width: 50,
     },
     {
-      title: "Talep Miktarı",
+      title: "Malzeme Kodu",
+      dataIndex: "malzemeKod",
+      key: "malzemeKod",
+      width: 150,
+      editable: false,
+      inputType: "text",
+    },
+    {
+      title: "Malzeme Tanımı",
+      dataIndex: "malzemeName",
+      key: "malzemeName",
+      width: 200,
+      editable: false,
+      inputType: "text",
+    },
+    {
+      title: "Marka",
+      dataIndex: "markaName",
+      key: "markaName",
+      width: 200,
+      editable: false,
+      inputType: "text",
+    },
+    {
+      title: "Miktar",
       dataIndex: "miktar",
       key: "miktar",
       width: 100,
       editable: true,
       inputType: "number",
-      render: (text, record) => (
-        <div className="">
-          <span>{Number(text).toLocaleString(localStorage.getItem("i18nextLng"))}</span>
-        </div>
+      render: (text) => (
+        <span>{(text ?? 0).toLocaleString(localStorage.getItem("i18nextLng"))}</span>
       ),
+    },
+    {
+      title: "Gelen",
+      dataIndex: "gelen",
+      key: "gelen",
+      width: 100,
+      editable: true,
+      inputType: "number",
+    },
+    {
+      title: "Kalan",
+      dataIndex: "kalan",
+      key: "kalan",
+      width: 100,
+      editable: true,
+      inputType: "number",
     },
     {
       title: "Birim",
-      dataIndex: "birim",
-      key: "birim",
-      width: 150,
+      dataIndex: "birimName",
+      key: "birimName",
+      width: 200,
       editable: false,
-      render: (text, record, index) => (
-        <Controller
-          name={`fisIcerigi.${index}.birim`}
-          control={control}
-          render={({ field }) => <KodIDSelectbox name1={`fisIcerigi.${index}.birim`} kodID={0} isRequired={false} />}
-        />
+      inputType: "text",
+    },
+    {
+      title: "Birim Fiyat",
+      dataIndex: "birimFiyat",
+      key: "birimFiyat",
+      width: 100,
+      editable: true,
+      render: (text) => (
+        <span>{Number(text ?? 0).toLocaleString(localStorage.getItem("i18nextLng"))}</span>
       ),
     },
     {
-      title: "Makine",
-      dataIndex: "makine",
-      key: "makine",
-      width: 200,
-      ellipsis: true,
-      render: (text, record, index) => (
-        <MakineTablo
-          disabled={false}
-          masrafMerkeziFieldName={`fisIcerigi.${index}.makine`}
-          masrafMerkeziIdFieldName={`fisIcerigi.${index}.makineID`}
-          onSubmit={(selectedData) => {
-            // Update the specific row's masraf merkezi data
-            const newData = [...dataSource];
-            if (newData[index]) {
-              newData[index] = {
-                ...newData[index],
-                makine: selectedData.MKN_KOD,
-                makineID: selectedData.key,
-              };
-              setDataSource(newData);
-
-              // Update form values
-              setValue(`fisIcerigi.${index}.makine`, selectedData.MKN_KOD);
-              setValue(`fisIcerigi.${index}.makineID`, selectedData.key);
-            }
-          }}
-          onClear={() => {
-            // Update the specific row's masraf merkezi data to empty
-            const newData = [...dataSource];
-            if (newData[index]) {
-              newData[index] = {
-                ...newData[index],
-                makine: "",
-                makineID: null,
-              };
-              setDataSource(newData);
-            }
-          }}
-        />
+      title: "Kdv (%)",
+      dataIndex: "kdvOran",
+      key: "kdvOran",
+      width: 100,
+      editable: true,
+      inputType: "number",
+      render: (text) => (
+        <span>{(text ?? 0).toLocaleString(localStorage.getItem("i18nextLng"))}</span>
       ),
+    },
+    {
+      title: "Kdv Tutar",
+      dataIndex: "kdvTutar",
+      key: "kdvTutar",
+      width: 100,
+      editable: false,
+      inputType: "number",
+    },
+    {
+      title: "İndirim (%)",
+      dataIndex: "indirimOran",
+      key: "indirimOran",
+      width: 100,
+      editable: true,
+      inputType: "number",
+      render: (text) => (
+        <span>{(text ?? 0).toLocaleString(localStorage.getItem("i18nextLng"))}</span>
+      ),
+    },
+    {
+      title: "İndirim Tutar",
+      dataIndex: "indirimTutar",
+      key: "indirimTutar",
+      width: 100,
+      editable: false,
+      inputType: "number",
+    },
+    {
+      title: "Ara Toplam",
+      dataIndex: "araToplam",
+      key: "araToplam",
+      width: 100,
+      editable: false,
+      inputType: "number",
+    },
+    {
+      title: "Toplam",
+      dataIndex: "toplam",
+      key: "toplam",
+      width: 100,
+      editable: false,
+      inputType: "number",
     },
     {
       title: "Açıklama",
@@ -605,34 +662,6 @@ function FisIcerigi({ modalOpen }) {
       editable: true,
       inputType: "text",
       ellipsis: true,
-    },
-    {
-      title: "Marka",
-      dataIndex: "marka",
-      key: "marka",
-      width: 150,
-      editable: false,
-      render: (text, record, index) => (
-        <Controller
-          name={`fisIcerigi.${index}.marka`}
-          control={control}
-          render={({ field }) => <KodIDSelectbox name1={`fisIcerigi.${index}.marka`} kodID={13002} isRequired={false} />}
-        />
-      ),
-    },
-    {
-      title: "Model",
-      dataIndex: "Model",
-      key: "Model",
-      width: 150,
-      editable: false,
-      render: (text, record, index) => (
-        <Controller
-          name={`fisIcerigi.${index}.Model`}
-          control={control}
-          render={({ field }) => <KodIDSelectbox name1={`fisIcerigi.${index}.Model`} kodID={13003} isRequired={false} />}
-        />
-      ),
     },
     {
       title: "İşlemler",
@@ -668,11 +697,12 @@ function FisIcerigi({ modalOpen }) {
 
   return (
     <div style={{ marginTop: "-55px", zIndex: 10 }}>
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
-        <Button style={{ zIndex: 21 }} type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
-          Ekle
-        </Button>
-      </div>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16, position: "relative", zIndex: 1000, gap: "10px", }}>
+     <ContextMenu selectedRowId={selectedRowId} />
+  <Button style={{ zIndex: 1001 }} type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
+    Ekle
+  </Button>
+</div>
       <Table
         components={components}
         rowClassName={() => "editable-row"}
@@ -684,7 +714,7 @@ function FisIcerigi({ modalOpen }) {
         rowKey={(record) => record.id || Math.random().toString(36).substr(2, 9)} // Ensure stable keys
         scroll={{ y: "calc(100vh - 540px)" }}
       />
-<div style={{ display: "flex", flexFlow: "column wrap", gap: "10px", marginTop: "20px", width: "100%", flexDirection: "row", justifyContent: "space-between" }}>
+      <div style={{ display: "flex", flexFlow: "column wrap", gap: "10px", marginTop: "20px", width: "100%", flexDirection: "row", justifyContent: "space-between" }}>
         <div style={{ width: "100%", maxWidth: "830px" }}>
           <Controller name="aciklama" render={({ field }) => <TextArea {...field} rows={4} placeholder="Açıklama" style={{ width: "100%", minHeight: "160px" }} />} />
         </div>
@@ -712,7 +742,8 @@ function FisIcerigi({ modalOpen }) {
               }}
             >
               <Controller
-                name="totalAraToplam"
+                name="araToplam"
+                readOnly
                 control={control}
                 render={({ field }) => {
                   // Determine decimal separator based on language
@@ -748,7 +779,8 @@ function FisIcerigi({ modalOpen }) {
               }}
             >
               <Controller
-                name="totalIndirim"
+                name="indirimliToplam"
+                readOnly
                 control={control}
                 render={({ field }) => {
                   // Determine decimal separator based on language
@@ -769,19 +801,19 @@ function FisIcerigi({ modalOpen }) {
                           // Mark as manually edited
                           setIsIndirimManuallyEdited(true);
 
-                          // Update the totalIndirim field - store with decimals but display as rounded
+                          // Update the indirimliToplam field - store with decimals but display as rounded
                           field.onChange(numValue.toFixed(2));
-                          setValue("totalIndirim", numValue.toFixed(2));
+                          setValue("indirimliToplam", numValue.toFixed(2));
 
                           // Get current values
-                          const araToplam = parseFloat(getValues("totalAraToplam")) || 0;
-                          const kdvToplam = parseFloat(getValues("totalKdvToplam")) || 0;
+                          const araToplam = parseFloat(getValues("araToplam")) || 0;
+                          const kdvToplam = parseFloat(getValues("kdvToplam")) || 0;
 
                           // Recalculate general total (araToplam - indirim + kdvToplam)
                           const newGenelToplam = araToplam - numValue + kdvToplam;
 
                           // Update the general total
-                          setValue("totalGenelToplam", newGenelToplam.toFixed(2));
+                          setValue("genelToplam", newGenelToplam.toFixed(2));
                         } catch (error) {
                           console.error("Error updating discount:", error);
                         }
@@ -816,7 +848,8 @@ function FisIcerigi({ modalOpen }) {
               }}
             >
               <Controller
-                name="totalKdvToplam"
+                name="kdvToplam"
+                readOnly
                 control={control}
                 render={({ field }) => {
                   // Determine decimal separator based on language
@@ -852,7 +885,8 @@ function FisIcerigi({ modalOpen }) {
               }}
             >
               <Controller
-                name="totalGenelToplam"
+                name="genelToplam"
+                readOnly
                 control={control}
                 render={({ field }) => {
                   // Determine decimal separator based on language
