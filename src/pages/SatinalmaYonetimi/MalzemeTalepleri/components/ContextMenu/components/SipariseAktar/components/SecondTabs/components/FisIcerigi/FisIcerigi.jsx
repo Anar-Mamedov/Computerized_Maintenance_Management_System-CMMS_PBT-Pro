@@ -164,9 +164,10 @@ function FisIcerigi({ modalOpen }) {
   useEffect(() => {
     try {
       const totals = dataSource.reduce(
+        
         (acc, item) => {
           acc.araToplam += Number(item.araToplam) || 0;
-          acc.indirim += Number(item.indirimTutari) || 0;
+          acc.indirim += Number(item.indirimTutar) || 0;
           acc.kdvToplam += Number(item.kdvTutar) || 0;
           acc.genelToplam += Number(item.toplam) || 0;
           return acc;
@@ -178,24 +179,25 @@ function FisIcerigi({ modalOpen }) {
           genelToplam: 0,
         }
       );
+      console.log(totals),
 
       // Update form values with calculated totals
-      setValue("totalAraToplam", totals.araToplam.toFixed(2));
+      setValue("araToplam", totals.araToplam.toFixed(2));
 
       // Only update indirim if not manually edited
       if (!isIndirimManuallyEdited) {
-        setValue("totalIndirim", totals.indirim.toFixed(2));
+        setValue("indirimliToplam", totals.indirim.toFixed(2));
       }
 
-      setValue("totalKdvToplam", totals.kdvToplam.toFixed(2));
+      setValue("kdvToplam", totals.kdvToplam.toFixed(2));
 
       // If discount was manually edited, recalculate general total
       if (isIndirimManuallyEdited) {
-        const manualIndirim = parseFloat(getValues("totalIndirim")) || 0;
+        const manualIndirim = parseFloat(getValues("indirimliToplam")) || 0;
         const newGenelToplam = totals.araToplam - manualIndirim + totals.kdvToplam;
-        setValue("totalGenelToplam", newGenelToplam.toFixed(2));
+        setValue("genelToplam", newGenelToplam.toFixed(2));
       } else {
-        setValue("totalGenelToplam", totals.genelToplam.toFixed(2));
+        setValue("genelToplam", totals.genelToplam.toFixed(2));
       }
     } catch (error) {
       console.error("Error calculating totals:", error);
@@ -338,7 +340,7 @@ function FisIcerigi({ modalOpen }) {
       const isPriceChanged = item.fiyat !== row.fiyat;
 
       // Check if discount has changed (either discount rate or amount)
-      const isDiscountChanged = item.indirimOrani !== row.indirimOrani || item.indirimTutari !== row.indirimTutari;
+      const isDiscountChanged = item.indirimOrani !== row.indirimOrani || item.indirimTutar !== row.indirimTutar;
 
       // If discount was edited in table, reset manual edit flag so table calculations take precedence
       if (isDiscountChanged) {
@@ -355,19 +357,19 @@ function FisIcerigi({ modalOpen }) {
       const araToplam = round(miktar * fiyat);
 
       let indirimOrani = Number(row.indirimOrani) || 0;
-      let indirimTutari = Number(row.indirimTutari) || 0;
+      let indirimTutar = Number(row.indirimTutar) || 0;
 
       // If indirimOrani was changed
       if (item.indirimOrani !== row.indirimOrani) {
-        indirimTutari = round((araToplam * indirimOrani) / 100);
+        indirimTutar = round((araToplam * indirimOrani) / 100);
       }
-      // If indirimTutari was changed
-      else if (item.indirimTutari !== row.indirimTutari) {
-        indirimOrani = round((indirimTutari / araToplam) * 100);
+      // If indirimTutar was changed
+      else if (item.indirimTutar !== row.indirimTutar) {
+        indirimOrani = round((indirimTutar / araToplam) * 100);
       }
 
       // Calculate KDV amount based on kdvDH
-      const kdvMatrah = round(araToplam - indirimTutari);
+      const kdvMatrah = round(araToplam - indirimTutar);
       let kdvTutar;
 
       if (kdvDH) {
@@ -389,7 +391,7 @@ function FisIcerigi({ modalOpen }) {
         birimKodId: item.birimKodId,
         araToplam,
         indirimOrani: round(indirimOrani),
-        indirimTutari: round(indirimTutari),
+        indirimTutar: round(indirimTutar),
         kdvTutar: round(kdvTutar),
         toplam: round(toplam),
         isPriceChanged: isPriceChanged || item.isPriceChanged,
@@ -444,8 +446,8 @@ function FisIcerigi({ modalOpen }) {
         // Exception: Always calculate araToplam as miktar * fiyat regardless of kdvDH
         const araToplam = round(miktar * fiyat);
         const indirimOrani = 0;
-        const indirimTutari = 0;
-        const kdvMatrah = round(araToplam - indirimTutari);
+        const indirimTutar = 0;
+        const kdvMatrah = round(araToplam - indirimTutar);
 
         let kdvTutar;
         if (kdvDH) {
@@ -551,28 +553,28 @@ function FisIcerigi({ modalOpen }) {
       inputType: "text",
     },
     {
-  title: "Miktar",
-  dataIndex: "miktar",
-  key: "miktar",
-  width: 100,
-  editable: true,
-  inputType: "number",
-  render: (text) => (
-    <span>{(text ?? 0).toLocaleString(localStorage.getItem("i18nextLng"))}</span>
-  ),
-},
+      title: "Miktar",
+      dataIndex: "miktar",
+      key: "miktar",
+      width: 100,
+      editable: true,
+      inputType: "number",
+      render: (text) => (
+        <span>{(text ?? 0).toLocaleString(localStorage.getItem("i18nextLng"))}</span>
+      ),
+    },
     {
       title: "Gelen",
-      dataIndex: "gelen",
-      key: "gelen",
+      dataIndex: "girenMiktar",
+      key: "girenMiktar",
       width: 100,
       editable: true,
       inputType: "number",
     },
     {
       title: "Kalan",
-      dataIndex: "kalan",
-      key: "kalan",
+      dataIndex: "kalanMiktar",
+      key: "kalanMiktar",
       width: 100,
       editable: true,
       inputType: "number",
@@ -586,26 +588,26 @@ function FisIcerigi({ modalOpen }) {
       inputType: "text",
     },
     {
-  title: "Birim Fiyat",
-  dataIndex: "birimFiyat",
-  key: "birimFiyat",
-  width: 100,
-  editable: true,
-  render: (text) => (
-    <span>{Number(text ?? 0).toLocaleString(localStorage.getItem("i18nextLng"))}</span>
-  ),
-},
+      title: "Birim Fiyat",
+      dataIndex: "birimFiyat",
+      key: "birimFiyat",
+      width: 100,
+      editable: true,
+      render: (text) => (
+        <span>{Number(text ?? 0).toLocaleString(localStorage.getItem("i18nextLng"))}</span>
+      ),
+    },
     {
-  title: "Kdv (%)",
-  dataIndex: "kdvOran",
-  key: "kdvOran",
-  width: 100,
-  editable: true,
-  inputType: "number",
-  render: (text) => (
-    <span>{(text ?? 0).toLocaleString(localStorage.getItem("i18nextLng"))}</span>
-  ),
-},
+      title: "Kdv (%)",
+      dataIndex: "kdvOran",
+      key: "kdvOran",
+      width: 100,
+      editable: true,
+      inputType: "number",
+      render: (text) => (
+        <span>{(text ?? 0).toLocaleString(localStorage.getItem("i18nextLng"))}</span>
+      ),
+    },
     {
       title: "Kdv Tutar",
       dataIndex: "kdvTutar",
@@ -615,16 +617,16 @@ function FisIcerigi({ modalOpen }) {
       inputType: "number",
     },
     {
-  title: "İndirim (%)",
-  dataIndex: "indirimOran",
-  key: "indirimOran",
-  width: 100,
-  editable: true,
-  inputType: "number",
-  render: (text) => (
-    <span>{(text ?? 0).toLocaleString(localStorage.getItem("i18nextLng"))}</span>
-  ),
-},
+      title: "İndirim (%)",
+      dataIndex: "indirimOran",
+      key: "indirimOran",
+      width: 100,
+      editable: true,
+      inputType: "number",
+      render: (text) => (
+        <span>{(text ?? 0).toLocaleString(localStorage.getItem("i18nextLng"))}</span>
+      ),
+    },
     {
       title: "İndirim Tutar",
       dataIndex: "indirimTutar",
@@ -738,6 +740,7 @@ function FisIcerigi({ modalOpen }) {
             >
               <Controller
                 name="araToplam"
+                readOnly
                 control={control}
                 render={({ field }) => {
                   // Determine decimal separator based on language
@@ -773,7 +776,8 @@ function FisIcerigi({ modalOpen }) {
               }}
             >
               <Controller
-                name="indirimToplam"
+                name="indirimliToplam"
+                readOnly
                 control={control}
                 render={({ field }) => {
                   // Determine decimal separator based on language
@@ -794,9 +798,9 @@ function FisIcerigi({ modalOpen }) {
                           // Mark as manually edited
                           setIsIndirimManuallyEdited(true);
 
-                          // Update the totalIndirim field - store with decimals but display as rounded
+                          // Update the indirimliToplam field - store with decimals but display as rounded
                           field.onChange(numValue.toFixed(2));
-                          setValue("totalIndirim", numValue.toFixed(2));
+                          setValue("indirimliToplam", numValue.toFixed(2));
 
                           // Get current values
                           const araToplam = parseFloat(getValues("araToplam")) || 0;
@@ -842,6 +846,7 @@ function FisIcerigi({ modalOpen }) {
             >
               <Controller
                 name="kdvToplam"
+                readOnly
                 control={control}
                 render={({ field }) => {
                   // Determine decimal separator based on language
@@ -878,6 +883,7 @@ function FisIcerigi({ modalOpen }) {
             >
               <Controller
                 name="genelToplam"
+                readOnly
                 control={control}
                 render={({ field }) => {
                   // Determine decimal separator based on language

@@ -451,7 +451,7 @@ export default function MainTabs({ modalOpen }) {
             flexDirection: "row",
           }}
         >
-          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("Talep Eden")}</Text>
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("Talep Eden")} <div style={{ color: "red" }}>*</div> </Text>
           <div
             style={{
               display: "flex",
@@ -461,10 +461,30 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "200px",
             }}
           >
-            <PersonelTablo
-              selectedId={watch("talepEdenPersonelId")}
-              nameField="talepEden"
-              idField="talepEdenPersonelId"
+            <Controller
+              name="talepEdenPersonelId"
+              control={control}
+              rules={{ required: t("alanBosBirakilamaz") }}
+              render={({ field, fieldState }) => (
+                <div style={{ width: "100%", maxWidth: "200px" }}>
+                  <PersonelTablo 
+                    onSubmit={(selectedData) => {
+                    setValue("lokasyonName", selectedData.PRS_LOKASYON);
+                    setValue("lokasyonID", selectedData.PRS_LOKASYON_ID);
+                    setValue("atolyeTanim", selectedData.PRS_ATOLYE);
+                    setValue("atolyeID", selectedData.PRS_ATOLYE_ID);
+                    }}
+                    selectedId={watch("talepEdenPersonelId")}
+                    nameField="talepEden"
+                    idField="talepEdenPersonelId"
+                  />
+                {fieldState.error && (
+                  <span style={{ color: "red", fontSize: "12px" }}>
+                    {fieldState.error.message}
+                  </span>
+                )}
+              </div>
+              )}
             />
           </div>
           </div>
@@ -491,7 +511,7 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "200px",
             }}
           >
-            <KodIDSelectbox name1="talepNeden" kodID={13070} isRequired={false} />
+            <KodIDSelectbox name1="talepNeden" isRequired={true} kodID="13070" />
           </div>
         </div>
         <div
@@ -586,7 +606,7 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "250px",
             }}
           >
-            <ProjeTablo name1="projeName" isRequired={false} />
+            <ProjeTablo name1="proje" isRequired={false} />
           </div>
         </div>
         <div

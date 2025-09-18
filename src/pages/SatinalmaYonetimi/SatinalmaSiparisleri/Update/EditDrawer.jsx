@@ -95,18 +95,18 @@ const { setValue, reset, watch } = methods;
         setValue("teslimTarihi", item.teslimTarihi ? dayjs(item.teslimTarihi) : null);
         setValue("firmaId", item.firmaId);
         setValue("firmaName", item.firmaName);
-        setValue("siparisVerenId", item.siparisVerenId);
+        setValue("talepEdenPersonelId", item.siparisVerenId);
         setValue("siparisVerenName", item.siparisVerenName);
-        setValue("odemeSekliKodId", item.odemeSekliKodId);
+        setValue("odemeSekliNameID", item.odemeSekliKodId);
         setValue("odemeSekliName", item.odemeSekliName);
         setValue("referansNo", item.referansNo);
-        setValue("teslimYeriKodId", item.teslimYeriKodId);
+        setValue("teslimYeriNameID", item.teslimYeriKodId);
         setValue("teslimYeriName", item.teslimYeriName);
         setValue("projeId", item.projeId);
         setValue("projeName", item.projeName);
-        setValue("oncelikId", item.oncelikId);
+        setValue("oncelikNameID", item.oncelikId);
         setValue("oncelikName", item.oncelikName);
-        setValue("sevkKodId", item.sevkKodId);
+        setValue("sevkNameID", item.sevkKodId);
         setValue("sevkName", item.sevkName);
         setValue("sevkAdresiId", item.sevkAdresiId);
         setValue("nakliyeKodu", item.nakliyeKodu);
@@ -119,10 +119,10 @@ const { setValue, reset, watch } = methods;
         setValue("aciklama", item.aciklama);
         setValue("durumId", item.durumId);
         setValue("durumName", item.durumName);
-        setValue("depoId", item.depoId);
+        setValue("depoNameID", item.depoId);
         setValue("depoName", item.depoName);
         setValue("evrakNo", item.evrakNo);
-        setValue("lokasyonId", item.lokasyonId);
+        setValue("lokasyonID", item.lokasyonId);
         setValue("lokasyonName", item.lokasyonName);
         setValue("adres1", item.adres1);
         setValue("adres2", item.adres2);
@@ -132,9 +132,9 @@ const { setValue, reset, watch } = methods;
         setValue("sinifId", item.sinifId);
         setValue("sinifName", item.sinifName);
         setValue("sozlesmeId", item.sozlesmeId);
-        setValue("atolyeId", item.atolyeID);
+        setValue("atolyeID", item.atolyeID);
         setValue("atolyeTanim", item.atolyeName);
-        setValue("masrafMerkeziId", item.masrafMerkeziId);
+        setValue("masrafMerkeziID", item.masrafMerkeziId);
         setValue("masrafMerkeziName", item.masrafMerkeziName);
         setValue("parabirimiId", item.parabirimiId);
         setValue("parabirimiKur", item.parabirimiKur);
@@ -225,13 +225,13 @@ const { setValue, reset, watch } = methods;
     siparisTarihi: data.siparisTarihi || null,
     teslimTarihi: data.teslimTarihi || null,
     firmaId: Number(data.firmaNameID) || 0,
-    siparisVerenId: Number(data.siparisVerenId) || 0,
-    odemeSekliKodId: Number(data.odemeSekliKodId) || 0,
+    siparisVerenId: Number(data.talepEdenPersonelId) || 0,
+    odemeSekliKodId: Number(data.odemeSekliNameID) || 0,
     referansNo: data.referansNo || "",
-    teslimYeriKodId: Number(data.teslimYeriKodId) || 0,
+    teslimYeriKodId: Number(data.teslimYeriNameID) || 0,
     projeId: Number(data.projeId) || 0,
-    oncelikId: Number(data.oncelikId) || 0,
-    sevkKodId: Number(data.sevkKodId) || 0,
+    oncelikId: Number(data.oncelikNameID) || 0,
+    sevkKodId: Number(data.sevkNameID) || 0,
     sevkAdresiId: Number(data.sevkAdresiId) || 0,
     nakliyeKodu: data.nakliyeKodu || "",
     indirimToplam: Number(data.indirimToplam) || 0,
@@ -242,9 +242,9 @@ const { setValue, reset, watch } = methods;
     baslik: data.baslik || "",
     aciklama: data.aciklama || "",
     durumId: Number(data.durumId) || 0,
-    depoId: Number(data.depoId) || 0,
+    depoId: Number(data.depoNameID) || 0,
     evrakNo: data.evrakNo || "",
-    lokasyonId: Number(data.lokasyonId) || 0,
+    lokasyonId: Number(data.lokasyonID) || 0,
     adres1: data.adres1 || "",
     adres2: data.adres2 || "",
     postaKodu: data.postaKodu || "",
@@ -253,8 +253,8 @@ const { setValue, reset, watch } = methods;
     sinifId: Number(data.sinifId) || 0,
     sinifName: data.sinifName || "",
     sozlesmeId: Number(data.sozlesmeId) || 0,
-    atolyeId: Number(data.atolyeId) || 0,
-    masrafMerkeziId: Number(data.masrafMerkeziId) || 0,
+    atolyeId: Number(data.atolyeID) || 0,
+    masrafMerkeziId: Number(data.masrafMerkeziID) || 0,
     duzenlemeTarih: data.duzenlemeTarih || null,
     duzenlemeSaat: currentTimeString,
     ozelAlan1: data.ozelAlan1 || "",
