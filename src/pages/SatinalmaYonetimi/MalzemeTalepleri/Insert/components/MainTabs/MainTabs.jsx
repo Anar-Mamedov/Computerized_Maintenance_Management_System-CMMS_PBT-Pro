@@ -459,17 +459,30 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "200px",
             }}
           >
-            <PersonelTablo 
-              onSubmit={(selectedData) => {
-                setValue("lokasyonName", selectedData.PRS_LOKASYON);
-                setValue("lokasyonID", selectedData.PRS_LOKASYON_ID);
-                setValue("atolyeTanim", selectedData.PRS_ATOLYE);
-                setValue("atolyeID", selectedData.PRS_ATOLYE_ID);
-              }}
-              selectedId={watch("talepEdenPersonelId")}
-              nameField="talepEden"
+            <Controller
+              name="talepEdenPersonelId"
+              control={control}
               rules={{ required: t("alanBosBirakilamaz") }}
-              idField="talepEdenPersonelId"
+              render={({ field, fieldState }) => (
+                <div style={{ width: "100%", maxWidth: "200px" }}>
+                  <PersonelTablo 
+                    onSubmit={(selectedData) => {
+                    setValue("lokasyonName", selectedData.PRS_LOKASYON);
+                    setValue("lokasyonID", selectedData.PRS_LOKASYON_ID);
+                    setValue("atolyeTanim", selectedData.PRS_ATOLYE);
+                    setValue("atolyeID", selectedData.PRS_ATOLYE_ID);
+                    }}
+                    selectedId={watch("talepEdenPersonelId")}
+                    nameField="talepEden"
+                    idField="talepEdenPersonelId"
+                  />
+                {fieldState.error && (
+                  <span style={{ color: "red", fontSize: "12px" }}>
+                    {fieldState.error.message}
+                  </span>
+                )}
+              </div>
+              )}
             />
           </div>
           </div>

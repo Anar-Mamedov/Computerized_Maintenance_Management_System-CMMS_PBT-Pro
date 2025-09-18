@@ -17,12 +17,15 @@ export default function Iptal({ selectedRows, refreshTableData, iptalDisabled })
   const buttonStyle = iptalDisabled ? { display: "none" } : {};
 
   const onSubmited = (data) => {
-    // Seçili satırlar için Body dizisi
-    const Body = selectedRows.map((row) => ({
-      FisId: row.key,                 // id
+    if (!selectedRows || selectedRows.length === 0) {
+    message.warning("Lütfen önce bir satır seçin.");
+    return;
+    }
+    const Body = {
+      FisId: selectedRows[0].key,
       NedenKodId: data.NedenKodId,
       Aciklama: data.Aciklama || "",
-    }));
+    };
 
     AxiosInstance.post("MalzemeTalepIptal", Body)
       .then((response) => {

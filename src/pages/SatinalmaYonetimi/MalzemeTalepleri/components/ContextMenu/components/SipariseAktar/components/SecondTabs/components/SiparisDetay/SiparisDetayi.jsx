@@ -361,7 +361,7 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "240px",
             }}
           >
-            <DepoTablo name1="depoName" isRequired={false} />
+            <DepoTablo name1="depo" isRequired={false} />
           </div>
         </div>
         <div
@@ -466,7 +466,7 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "200px",
             }}
           >
-            <KodIDSelectbox name1="odemeSekliName" kodID={33021} isRequired={false} />
+            <KodIDSelectbox name1="odemeSekliKodId" kodID={33021} isRequired={false} />
           </div>
         </div>
         <div

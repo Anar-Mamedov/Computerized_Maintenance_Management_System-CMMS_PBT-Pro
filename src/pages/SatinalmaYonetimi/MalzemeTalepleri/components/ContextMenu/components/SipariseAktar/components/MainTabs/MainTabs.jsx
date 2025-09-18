@@ -547,7 +547,7 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "200px",
             }}
           >
-            <KodIDSelectbox name1="sevkName" kodID={13071} isRequired={false} />
+            <KodIDSelectbox name1="sevkKodId" kodID={13071} isRequired={false} />
           </div>
           </div>
         </div>
@@ -602,7 +602,7 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "200px",
             }}
           >
-            <ProjeTablo name1="projeName" isRequired={false} />
+            <ProjeTablo name1="proje" isRequired={false} />
           </div>
         </div>
       </div>
@@ -621,14 +621,14 @@ export default function MainTabs({ modalOpen }) {
     <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", width: "100%", gap: "10px", flexDirection: "row" }}>
       <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", minWidth: "80px" }}>{t("Öncelik")}</Text>
       <div style={{ display: "flex", flexFlow: "column wrap", alignItems: "flex-start", width: "100%", maxWidth: "110px" }}>
-        <KodIDSelectbox name1="oncelikName" kodID={13093} isRequired={false} />
+        <KodIDSelectbox name1="talepOncelikId" kodID={13093} isRequired={false} />
       </div>
     </div>
 
     <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", width: "100%", gap: "10px", flexDirection: "row" }}>
       <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", minWidth: "80px" }}>{t("Teslim Yeri")}</Text>
       <div style={{ display: "flex", flexFlow: "column wrap", alignItems: "flex-start", width: "100%", maxWidth: "110px" }}>
-        <KodIDSelectbox name1="teslimYeriName" kodID={13072} isRequired={false} />
+        <KodIDSelectbox name1="teslimYeriKodId" kodID={13072} isRequired={false} />
       </div>
     </div>
   </div>

@@ -9,10 +9,10 @@ import MainTabs from "./components/MainTabs/MainTabs.jsx";
 import SecondTabs from "./components/SecondTabs/SecondTabs.jsx";
 import { t } from "i18next";
 
-export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
+export default function EditModal({ selectedRow, onDrawerClose, onRefresh }) {
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [drawerVisible, setDrawerVisible] = useState(false);
 
   const methods = useForm({
   defaultValues: {
@@ -136,9 +136,6 @@ const { setValue, reset, watch } = methods;
     };
 
   const onSubmit = (data) => {
-  const currentTime = new Date();
-  const currentTimeString = currentTime.toLocaleTimeString("tr-TR", { hour12: false });
-
   const payload = {
     siparisId: 0, // Yeni kayıt
     teklifId: Number(data.teklifId) || 0,
@@ -198,9 +195,9 @@ const { setValue, reset, watch } = methods;
     ozelAlan18: data.ozelAlan18 || "",
     ozelAlan19: data.ozelAlan19 || "",
     ozelAlan20: data.ozelAlan20 || "",
-    materialMovements: data.fisIcerigi?.map((item) => ({
+    materialMovements: (data.fisIcerigi || []).map((item) => ({
       detayId: Number(item.detayId) || -1,
-      siparisId: Number(data.siparisId) || -1,
+      siparisId: Number(data.siparisId) || 0,
       stokId: Number(item.stokId) || -1,
       miktar: Number(item.miktar) || 0,
       birimFiyat: Number(item.birimFiyat) || 0,
@@ -210,7 +207,7 @@ const { setValue, reset, watch } = methods;
       otvTutar: Number(item.otvTutar) || 0,
       indirimOran: Number(item.indirimOran) || 0,
       indirimTutar: Number(item.indirimTutar) || 0,
-      kdvDahil: item.kdvDahil || "",
+      kdvDahil: Boolean(item.kdvDahil),
       araToplam: Number(item.araToplam) || 0,
       toplam: Number(item.toplam) || 0,
       anaBirimMiktar: Number(item.anaBirimMiktar) || 0,
@@ -224,28 +221,27 @@ const { setValue, reset, watch } = methods;
       alternatifStokId: Number(item.alternatifStokId) || -1,
       aciklama: item.aciklama || "",
       isDeleted: item.isDeleted || false,
-    })) || [],
+    })),
   };
 
   AxiosInstance.post(`UpsertSatinalmaSiparis?TalepID=${data.talepID}`, payload)
-  .then((res) => {
-    const { status_code, message: apiMessage } = res?.data || res;
-
-    if ([200, 201, 202].includes(status_code)) {
-      message.success(apiMessage || "Kayıt Başarılı.");
-      onRefresh();
-      reset();
-      onDrawerClose();
-    } else if (status_code === 401) {
-      message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
-    } else {
-      message.error(apiMessage || "Kayıt Başarısız.");
-    }
-  })
-  .catch((err) => {
-    console.error("Error:", err);
-    message.error("Hata: " + err.message);
-  });
+    .then((res) => {
+      const { status_code, message: apiMessage } = res?.data || res;
+      if ([200, 201, 202].includes(status_code)) {
+        message.success(apiMessage || "Kayıt Başarılı.");
+        onRefresh();
+        reset();
+        setIsModalVisible(false); // Modal'ı kapatıyoruz
+      } else if (status_code === 401) {
+        message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+      } else {
+        message.error(apiMessage || "Kayıt Başarısız.");
+      }
+    })
+    .catch((err) => {
+      console.error("Error:", err);
+      message.error("Hata: " + err.message);
+    });
 };
 
   const onClose = () => {
