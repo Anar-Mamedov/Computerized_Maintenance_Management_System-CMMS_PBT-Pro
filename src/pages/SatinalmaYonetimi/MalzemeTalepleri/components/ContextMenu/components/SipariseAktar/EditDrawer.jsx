@@ -78,7 +78,7 @@ const { setValue, reset, watch } = methods;
     setValue("depoName", item.depoName);
     setValue("lokasyonID", item.lokasyonId);
     setValue("lokasyonName", item.lokasyonName);
-    setValue("atolyeId", item.atolyeId);
+    setValue("atolyeID", item.atolyeId);
     setValue("atolyeTanim", item.atolyeName);
 
     // materialMovements array'ini fisIcerigi olarak set et
@@ -196,7 +196,7 @@ const { setValue, reset, watch } = methods;
     ozelAlan19: data.ozelAlan19 || "",
     ozelAlan20: data.ozelAlan20 || "",
     materialMovements: (data.fisIcerigi || []).map((item) => ({
-      detayId: Number(item.detayId) || -1,
+      detayId: Number(item.detayId) || 0,
       siparisId: Number(data.siparisId) || 0,
       stokId: Number(item.stokId) || -1,
       miktar: Number(item.miktar) || 0,
@@ -207,7 +207,7 @@ const { setValue, reset, watch } = methods;
       otvTutar: Number(item.otvTutar) || 0,
       indirimOran: Number(item.indirimOran) || 0,
       indirimTutar: Number(item.indirimTutar) || 0,
-      kdvDahil: Boolean(item.kdvDahil),
+      kdvDahil: item.kdvDahil || "",
       araToplam: Number(item.araToplam) || 0,
       toplam: Number(item.toplam) || 0,
       anaBirimMiktar: Number(item.anaBirimMiktar) || 0,
