@@ -65,7 +65,7 @@ const StyledDivMedia = styled.div`
   }
 `;
 
-export default function MainTabs({ modalOpen }) {
+export default function MainTabs({ modalOpen, disabled }) {
   const {
     control,
     watch,
@@ -291,6 +291,7 @@ export default function MainTabs({ modalOpen }) {
               render={({ field }) => (
                 <Input
                   {...field}
+                  disabled={disabled}
                   status={errors["siparisKodu"] ? "error" : ""}
                   style={{ flex: 1 }}
                   onFocus={(e) => {
@@ -348,6 +349,7 @@ export default function MainTabs({ modalOpen }) {
                 render={({ field }) => (
                   <DatePicker
                     {...field}
+                    disabled={disabled}
                     status={errors["siparisTarihi"] ? "error" : ""}
                     style={{ width: "100%", maxWidth: "210px" }}
                     format={localeDateFormat}
@@ -395,6 +397,7 @@ export default function MainTabs({ modalOpen }) {
               render={({ field }) => (
                 <Input
                   {...field}
+                  disabled={disabled}
                   value="SATINALMA SİPARİŞİ"
                   status={errors["baslik"] ? "error" : ""}
                   style={{ flex: 1 }}
@@ -441,10 +444,10 @@ export default function MainTabs({ modalOpen }) {
               flexFlow: "column wrap",
               alignItems: "flex-start",
               width: "100%",
-              maxWidth: "250px",
+              maxWidth: "240px",
             }}
           >
-            <FirmaTablo name1="firmaName" isRequired={false} />
+            <FirmaTablo name1="firmaName" isRequired={false} disabled={disabled} />
           </div>
         </div>
         <div
@@ -466,7 +469,7 @@ export default function MainTabs({ modalOpen }) {
               flexFlow: "column wrap",
               alignItems: "flex-start",
               width: "100%",
-              maxWidth: "250px",
+              maxWidth: "240px",
             }}
           >
             <Controller
@@ -476,6 +479,7 @@ export default function MainTabs({ modalOpen }) {
               render={({ field }) => (
                 <DatePicker
                   {...field}
+                  disabled={disabled}
                   status={errors["siparisTarihi"] ? "error" : ""}
                   style={{ width: "100%", maxWidth: "250px" }}
                   format={localeDateFormat}
@@ -508,10 +512,11 @@ export default function MainTabs({ modalOpen }) {
               flexFlow: "column wrap",
               alignItems: "flex-start",
               width: "100%",
-              maxWidth: "250px",
+              maxWidth: "240px",
             }}
           >
             <LokasyonTablo
+              disabled={disabled}
               lokasyonFieldName="lokasyonName"
               lokasyonIdFieldName="lokasyonID"
               onSubmit={(selectedData) => {
@@ -551,6 +556,7 @@ export default function MainTabs({ modalOpen }) {
               alignItems: "flex-start",
               width: "100%",
               maxWidth: "200px",
+              ...(disabled ? { pointerEvents: "none", opacity: 0.6 } : {}),
             }}
           >
             <KodIDSelectbox name1="sevkName" kodID={13071} isRequired={false} />
@@ -580,6 +586,7 @@ export default function MainTabs({ modalOpen }) {
             }}
           >
             <PersonelTablo
+              disabled={disabled}
               selectedId={watch("talepEdenPersonelId")}
               nameField="siparisVerenName"
               idField="talepEdenPersonelId"
@@ -608,32 +615,32 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "200px",
             }}
           >
-            <ProjeTablo name1="projeName" isRequired={false} />
+            <ProjeTablo name1="projeName" isRequired={false} disabled={disabled} />
           </div>
         </div>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "200px" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "280px" }}>
     <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", width: "100%", gap: "10px", flexDirection: "row" }}>
       <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", minWidth: "80px" }}>{t("durum")}</Text>
-      <div style={{ display: "flex", flexFlow: "column wrap", alignItems: "flex-start", width: "100%", maxWidth: "110px" }}>
+      <div style={{ display: "flex", flexFlow: "column wrap", alignItems: "flex-start", width: "100%", maxWidth: "190px" }}>
         <Controller
           name="durumName"
           control={control}
-          render={({ field }) => <Input {...field} disabled value="AÇIK" style={{ flex: 1 }} />}
+          render={({ field }) => <Input {...field} disabled style={{ flex: 1 }} />}
         />
       </div>
     </div>
 
     <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", width: "100%", gap: "10px", flexDirection: "row" }}>
       <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", minWidth: "80px" }}>{t("Öncelik")}</Text>
-      <div style={{ display: "flex", flexFlow: "column wrap", alignItems: "flex-start", width: "100%", maxWidth: "110px" }}>
+      <div style={{ display: "flex", flexFlow: "column wrap", alignItems: "flex-start", width: "100%", maxWidth: "190px", ...(disabled ? { pointerEvents: "none", opacity: 0.6 } : {}) }}>
         <KodIDSelectbox name1="oncelikName" kodID={13093} isRequired={false} />
       </div>
     </div>
 
     <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", width: "100%", gap: "10px", flexDirection: "row" }}>
       <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", minWidth: "80px" }}>{t("Teslim Yeri")}</Text>
-      <div style={{ display: "flex", flexFlow: "column wrap", alignItems: "flex-start", width: "100%", maxWidth: "110px" }}>
+      <div style={{ display: "flex", flexFlow: "column wrap", alignItems: "flex-start", width: "100%", maxWidth: "190px", ...(disabled ? { pointerEvents: "none", opacity: 0.6 } : {}) }}>
         <KodIDSelectbox name1="teslimYeriName" kodID={13072} isRequired={false} />
       </div>
     </div>

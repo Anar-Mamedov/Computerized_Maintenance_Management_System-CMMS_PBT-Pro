@@ -78,6 +78,8 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
 
 const { setValue, reset, watch } = methods;
 
+const durumId = watch("durumId");
+
   useEffect(() => {
   const fetchData = async () => {
     if (drawerVisible && selectedRow) {
@@ -368,8 +370,8 @@ const { setValue, reset, watch } = methods;
             </div>
           ) : (
             <form onSubmit={methods.handleSubmit(onSubmit)}>
-              <MainTabs />
-              <SecondTabs selectedRowID={selectedRow?.key} />
+              <MainTabs disabled={durumId !== 1} />
+              <SecondTabs selectedRowID={selectedRow?.key} disabled={durumId !== 1} />
             </form>
           )}
         </Modal>

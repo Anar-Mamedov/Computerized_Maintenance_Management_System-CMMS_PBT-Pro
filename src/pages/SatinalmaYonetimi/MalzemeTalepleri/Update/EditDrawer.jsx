@@ -56,6 +56,8 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
 
   const { setValue, reset, watch } = methods;
 
+  const talepdurumId = watch("talepdurumId");
+
   useEffect(() => {
   const fetchData = async () => {
     if (drawerVisible && selectedRow) {
@@ -300,8 +302,8 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
             </div>
           ) : (
             <form onSubmit={methods.handleSubmit(onSubmit)}>
-              <MainTabs />
-              <SecondTabs selectedRowID={selectedRow?.key} />
+              <MainTabs disabled={talepdurumId !== 1} />
+              <SecondTabs selectedRowID={selectedRow?.key} disabled={talepdurumId !== 1} />
             </form>
           )}
         </Modal>

@@ -60,7 +60,7 @@ const StyledDivMedia = styled.div`
   }
 `;
 
-export default function MainTabs({ modalOpen }) {
+export default function MainTabs({ modalOpen, disabled }) {
   const {
     control,
     watch,
@@ -286,6 +286,7 @@ export default function MainTabs({ modalOpen }) {
             }}
           >
             <AtolyeTablo
+              disabled={disabled}
               atolyeFieldName="atolyeName"
               atolyeIdFieldName="atolyeId"
               onSubmit={(selectedData) => {
@@ -325,6 +326,7 @@ export default function MainTabs({ modalOpen }) {
             }}
           >
             <MasrafMerkezi
+              disabled={disabled}
               masrafMerkeziFieldName="masrafMerkeziName"
               masrafMerkeziIdFieldName="masrafMerkeziID"
               onSubmit={(selectedData) => {
@@ -363,7 +365,7 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "240px",
             }}
           >
-            <DepoTablo name1="depoName" isRequired={false} />
+            <DepoTablo disabled={disabled} name1="depoName" isRequired={false} />
           </div>
         </div>
         <div
@@ -396,6 +398,7 @@ export default function MainTabs({ modalOpen }) {
               render={({ field }) => (
                 <Input
                   {...field}
+                  disabled={disabled}
                   status={errors["sozlesme"] ? "error" : ""}
                   style={{ flex: 1 }}
                 />
@@ -437,6 +440,7 @@ export default function MainTabs({ modalOpen }) {
               render={({ field }) => (
                 <Input
                   {...field}
+                  disabled={disabled}
                   status={errors["referans"] ? "error" : ""}
                   style={{ flex: 1 }}
                 />
@@ -466,6 +470,7 @@ export default function MainTabs({ modalOpen }) {
               alignItems: "flex-start",
               width: "100%",
               maxWidth: "200px",
+              ...(disabled ? { pointerEvents: "none", opacity: 0.6 } : {}),
             }}
           >
             <KodIDSelectbox name1="odemeSekliName" kodID={33021} isRequired={false} />
@@ -501,6 +506,7 @@ export default function MainTabs({ modalOpen }) {
               render={({ field }) => (
                 <Input
                   {...field}
+                  disabled={disabled}
                   status={errors["nakliyeKodu"] ? "error" : ""}
                   style={{ flex: 1 }}
                 />
@@ -539,6 +545,7 @@ export default function MainTabs({ modalOpen }) {
               render={({ field }) => (
                 <Input
                   {...field}
+                  disabled={disabled}
                   status={errors["evrakNo"] ? "error" : ""}
                   style={{ flex: 1 }}
                 />
@@ -579,6 +586,7 @@ export default function MainTabs({ modalOpen }) {
               render={({ field }) => (
                 <Input
                   {...field}
+                  disabled={disabled}
                   status={errors["adres1"] ? "error" : ""}
                   style={{ flex: 1 }}
                 />
@@ -617,6 +625,7 @@ export default function MainTabs({ modalOpen }) {
               render={({ field }) => (
                 <Input
                   {...field}
+                  disabled={disabled}
                   status={errors["adres2"] ? "error" : ""}
                   style={{ flex: 1 }}
                 />
@@ -655,6 +664,7 @@ export default function MainTabs({ modalOpen }) {
               render={({ field }) => (
                 <Input
                   {...field}
+                  disabled={disabled}
                   status={errors["postaKodu"] ? "error" : ""}
                   style={{ flex: 1 }}
                 />
@@ -693,6 +703,7 @@ export default function MainTabs({ modalOpen }) {
               render={({ field }) => (
                 <Input
                   {...field}
+                  disabled={disabled}
                   status={errors["sehir"] ? "error" : ""}
                   style={{ flex: 1 }}
                 />
@@ -733,6 +744,7 @@ export default function MainTabs({ modalOpen }) {
               render={({ field }) => (
                 <Input
                   {...field}
+                  disabled={disabled}
                   status={errors["ulke"] ? "error" : ""}
                   style={{ flex: 1 }}
                 />
