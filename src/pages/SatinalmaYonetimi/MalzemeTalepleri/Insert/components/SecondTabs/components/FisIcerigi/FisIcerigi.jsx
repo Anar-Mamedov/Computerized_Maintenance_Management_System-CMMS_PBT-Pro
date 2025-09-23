@@ -681,13 +681,13 @@ function FisIcerigi({ modalOpen }) {
   });
 
   return (
-    <div style={{ marginTop: "-55px", zIndex: 10 }}>
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16, position: "relative", zIndex: 1000, gap: "10px", }}>
-     <ContextMenu selectedRowId={selectedRowId} />
-  <Button style={{ zIndex: 1001 }} type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
-    Ekle
-  </Button>
-</div>
+    <div style={{ position: "relative" }}>
+      <div style={{ position: "absolute", top: "-55px", right: "0", display: "flex", gap: "10px", zIndex: 1000 }}>
+        <ContextMenu selectedRowId={selectedRowId} />
+        <Button style={{ zIndex: 1001 }} type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
+          Ekle
+        </Button>
+      </div>
       <Table
         components={components}
         rowClassName={() => "editable-row"}

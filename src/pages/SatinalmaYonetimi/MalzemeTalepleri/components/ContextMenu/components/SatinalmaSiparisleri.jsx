@@ -6,7 +6,7 @@ import AxiosInstance from "../../../../../../api/http";
 const { Text } = Typography;
 
 export default function SatinalmaTablo({ workshopSelectedId, onSubmit, selectedRows }) {
-  const { control, setValue } = useFormContext();
+  const { control } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
@@ -17,124 +17,121 @@ export default function SatinalmaTablo({ workshopSelectedId, onSubmit, selectedR
     return new Date(date).toLocaleDateString();
   };
 
-  const formatTime = (date) => {
-    if (!date) return "";
-    return new Date(date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  };
-
   const columns = [
     {
       title: "Talep No",
-      dataIndex: "islem",
-      key: "islem",
-      width: 250,
+      dataIndex: "TALEP_NO",
+      key: "TALEP_NO",
+      width: 150,
       ellipsis: true,
     },
     {
       title: "Sipariş No",
-      dataIndex: "islem",
-      key: "islem",
-      width: 250,
+      dataIndex: "SSP_SIPARIS_KODU",
+      key: "SSP_SIPARIS_KODU",
+      width: 150,
       ellipsis: true,
     },
     {
       title: "Başlık",
-      dataIndex: "islem",
-      key: "islem",
+      dataIndex: "SSP_BASLIK",
+      key: "SSP_BASLIK",
       width: 250,
       ellipsis: true,
     },
     {
       title: "Durum",
-      dataIndex: "islem",
-      key: "islem",
-      width: 250,
+      dataIndex: "SSP_DURUM",
+      key: "SSP_DURUM",
+      width: 150,
       ellipsis: true,
     },
     {
       title: "Sipariş Tarihi",
-      dataIndex: "islemZamani",
-      key: "tarih",
+      dataIndex: "SSP_SIPARIS_TARIHI",
+      key: "SSP_SIPARIS_TARIHI",
       width: 150,
       render: (text) => formatDate(text),
     },
     {
       title: "Teslim Tarihi",
-      dataIndex: "islemZamani",
-      key: "tarih",
+      dataIndex: "SSP_TESLIM_TARIHI",
+      key: "SSP_TESLIM_TARIHI",
       width: 150,
       render: (text) => formatDate(text),
     },
     {
       title: "Firma",
-      dataIndex: "islemZamani",
-      key: "tarih",
-      width: 150,
-      render: (text) => formatDate(text),
+      dataIndex: "SSP_FIRMA",
+      key: "SSP_FIRMA",
+      width: 200,
     },
     {
       title: "Lokasyon",
-      dataIndex: "islemZamani",
-      key: "tarih",
+      dataIndex: "SSP_LOKASYON",
+      key: "SSP_LOKASYON",
       width: 150,
-      render: (text) => formatDate(text),
     },
     {
       title: "Sipariş Veren",
-      dataIndex: "islemZamani",
-      key: "tarih",
+      dataIndex: "SSP_SIPARIS_VEREN",
+      key: "SSP_SIPARIS_VEREN",
       width: 150,
-      render: (text) => formatDate(text),
     },
   ];
 
-  const fetch = useCallback(() => {
+  const fetchData = useCallback(async () => {
+    if (!selectedRows || selectedRows.length === 0) return;
     setLoading(true);
-    const selectedKey = selectedRows.map((item) => item.key).join(",");
-    AxiosInstance.get(`GetSatinalmaSiparisListBy?fisId=${selectedKey}`)
-      .then((response) => {
-        const fetchedData = response.data.map((item) => ({
-          key: item.tarihceId,
-          ...item,
-        }));
-        setData(fetchedData);
-      })
-      .finally(() => setLoading(false));
+
+    try {
+      const selectedKey = selectedRows.map(item => item.key).join(",");
+      const response = await AxiosInstance.get(`GetSatinalmaSiparisListBy?fisId=${selectedKey}`);
+
+      console.log("API Cevabı:", response.siparis_listesi); // debug için
+      const siparisListesi = response.siparis_listesi || [];
+      const formattedData = siparisListesi.map(item => ({
+        key: item.TB_SATINALMA_SIPARIS_ID,
+        ...item
+      }));
+      setData(formattedData);
+    } catch (err) {
+      console.error("API Hatası:", err);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
   }, [selectedRows]);
 
-  const handleModalToggle = () => {
-    setIsModalVisible((prev) => !prev);
-    if (!isModalVisible) {
-      fetch();
+  useEffect(() => {
+    if (isModalVisible) {
+      fetchData();
       setSelectedRowKeys([]);
     }
-  };
+  }, [isModalVisible, fetchData]);
+
+  const handleModalToggle = () => setIsModalVisible(prev => !prev);
 
   const handleModalOk = () => {
-    const selectedData = data.find((item) => item.key === selectedRowKeys[0]);
-    if (selectedData) {
-      onSubmit && onSubmit(selectedData);
-    }
+    const selectedData = data.find(item => item.key === selectedRowKeys[0]);
+    if (selectedData && onSubmit) onSubmit(selectedData);
     setIsModalVisible(false);
-  };
-
-  const onRowSelectChange = (selectedKeys) => {
-    setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
   };
 
   return (
     <div>
       <Button
-  style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
-  onClick={handleModalToggle}
-  type="text"
->
-  Satınalma Siparişleri
-</Button>
+        style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
+        onClick={handleModalToggle}
+        type="text"
+      >
+        Satınalma Siparişleri
+      </Button>
+
       <Modal
         width={1000}
         centered
-        title="Satınalma Siparişleri"
+        title={`Satınalma Siparişleri (${selectedRows[0]?.SFS_FIS_NO || ""})`}
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}
@@ -144,11 +141,11 @@ export default function SatinalmaTablo({ workshopSelectedId, onSubmit, selectedR
             name="fisNo"
             control={control}
             render={({ field }) => (
-              <Text {...field} style={{ fontSize: "14px", fontWeight: "600" }}>
-              </Text>
+              <Text {...field} style={{ fontSize: "14px", fontWeight: "600" }} />
             )}
           />
         </div>
+
         <Table
           columns={columns}
           dataSource={data}
