@@ -168,7 +168,7 @@ const MainTable = ({ selectedRowId }) => {
       <Modal
         title="Malzeme Hareketleri"
         centered
-        width={900}
+        width={1400}
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={null}

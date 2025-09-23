@@ -438,8 +438,22 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "250px",
             }}
           >
-            <FirmaTablo name1="firmaName" isRequired={false} />
-          </div>
+            <Controller
+    name="firmaName"
+    control={control}
+    rules={{ required: t("alanBosBirakilamaz") }}
+    render={({ field, fieldState }) => (
+      <>
+        <FirmaTablo {...field} isRequired={true} />
+        {fieldState.error && (
+          <span style={{ color: "red", fontSize: "12px" }}>
+            {fieldState.error.message}
+          </span>
+        )}
+      </>
+    )}
+  />
+</div>
         </div>
         <div
           style={{

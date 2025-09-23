@@ -7,7 +7,7 @@ import Malzemeler from "../../../../../../../Malzeme&DepoYonetimi/MalzemeTanimla
 // import PlakaSelectBox from "../../../../../../../../components/PlakaSelectbox";
 import LokasyonTablo from "../../../../../../../../utils/components/LokasyonTablo";
 import MasrafMerkeziTablo from "../../../../../../../../utils/components/MasrafMerkeziTablo";
-import MakineTablo from "../../../../../components/MakineTablo";
+import MakineTablo from "../../../../../../../../utils/components/Machina/MakineTablo";
 import KodIDSelectbox from "../../../../../../../../utils/components/KodIDSelectbox";
 import ContextMenu from "./ContextMenu"
 
@@ -608,39 +608,7 @@ function FisIcerigi({ modalOpen }) {
       width: 200,
       ellipsis: true,
       render: (text, record, index) => (
-        <MakineTablo
-          disabled={false}
-          makineFieldName={`fisIcerigi.${index}.makineTanim`}
-          makineIdFieldName={`fisIcerigi.${index}.makineID`}
-          onSubmit={(selectedData) => {
-            // Update the specific row's masraf merkezi data
-            const newData = [...dataSource];
-            if (newData[index]) {
-              newData[index] = {
-                ...newData[index],
-                makineTanim: selectedData.MKN_KOD,
-                makineID: selectedData.key,
-              };
-              setDataSource(newData);
-
-              // Update form values
-              setValue(`fisIcerigi.${index}.makineTanim`, selectedData.MKN_KOD);
-              setValue(`fisIcerigi.${index}.makineID`, selectedData.key);
-            }
-          }}
-          onClear={() => {
-            // Update the specific row's masraf merkezi data to empty
-            const newData = [...dataSource];
-            if (newData[index]) {
-              newData[index] = {
-                ...newData[index],
-                makineTanim: "",
-                makineID: null,
-              };
-              setDataSource(newData);
-            }
-          }}
-        />
+        <MakineTablo />
       ),
     },
     {

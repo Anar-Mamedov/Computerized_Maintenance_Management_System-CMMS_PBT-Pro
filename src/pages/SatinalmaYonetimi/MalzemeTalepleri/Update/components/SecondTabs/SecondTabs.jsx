@@ -45,7 +45,7 @@ const StyledTabs = styled(Tabs)`
 
 //styled components end
 
-export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen }) {
+export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen, disabled }) {
   const { watch } = useFormContext();
   const [activeTabKey, setActiveTabKey] = useState("4"); // Default to the FisIcerigi tab
 
@@ -65,7 +65,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen })
     {
       key: "4",
       label: t("fisIcerigi"),
-      children: <FisIcerigi modalOpen={modalOpen} />,
+      children: <FisIcerigi modalOpen={modalOpen} disabled={disabled} />,
     },
 
     {
@@ -73,7 +73,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen })
       label: "Açıklama",
       children: (
         <div>
-          <Controller name="aciklama" render={({ field }) => <TextArea {...field} rows={4} placeholder="Açıklama" style={{ width: "100%", resize: "none" }} />} />
+          <Controller name="aciklama" render={({ field }) => <TextArea {...field} rows={4} placeholder="Açıklama" style={{ width: "100%", resize: "none" }} disabled={disabled} />} />
         </div>
       ),
     },
@@ -82,7 +82,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen })
       key: "5",
       label: "Özel Alanlar",
       // children: <SureBilgileri fieldRequirements={fieldRequirements} />,
-      children: <OzelAlanlar />,
+      children: <OzelAlanlar disabled={disabled} />,
     },
   ];
 

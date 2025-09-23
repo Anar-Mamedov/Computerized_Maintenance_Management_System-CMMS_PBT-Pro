@@ -148,7 +148,7 @@ const MalzemeSecModal = ({ visible, onCancel, onOk }) => {
   );
 };
 
-function FisIcerigi({ modalOpen }) {
+function FisIcerigi({ modalOpen, disabled }) {
   const { control, setValue, watch, getValues } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [previousModalState, setPreviousModalState] = useState(false);
@@ -516,16 +516,16 @@ function FisIcerigi({ modalOpen }) {
 
   const defaultColumns = [
     {
-  title: '',
-  dataIndex: 'radio',
-  render: (_, record) => (
-    <Radio
-      checked={selectedRowId === record.malzemeId}
-      onChange={() => setSelectedRowId(record.malzemeId)}
-    />
-  ),
-  width: 50,
-},
+      title: '',
+      dataIndex: 'radio',
+      render: (_, record) => (
+        <Radio
+          checked={selectedRowId === record.malzemeId}
+          onChange={() => setSelectedRowId(record.malzemeId)}
+        />
+      ),
+      width: 50,
+    },
     {
       title: "Malzeme Kodu",
       dataIndex: "malzemeKod",
@@ -551,29 +551,30 @@ function FisIcerigi({ modalOpen }) {
       inputType: "text",
     },
     {
-  title: "Karşılama Şekli",
-  dataIndex: "malKarsilamaSekli",
-  key: "malKarsilamaSekli",
-  width: 150,
-  editable: false,
-  render: (text, record, index) => (
-    <Controller
-      name={`fisIcerigi.${index}.malKarsilamaSekli`}
-      control={control}
-      defaultValue="SATINALMA" // default değer
-      render={({ field }) => (
-        <Select
-          {...field}
-          style={{ width: "100%" }}
-          options={[
-            { label: "SATINALMA", value: "SATINALMA" },
-            { label: "STOKTAN", value: "STOKTAN" },
-          ]}
+      title: "Karşılama Şekli",
+      dataIndex: "malKarsilamaSekli",
+      key: "malKarsilamaSekli",
+      width: 150,
+      editable: false,
+      render: (text, record, index) => (
+        <Controller
+          name={`fisIcerigi.${index}.malKarsilamaSekli`}
+          control={control}
+          defaultValue="SATINALMA" // default değer
+          render={({ field }) => (
+            <Select
+              {...field}
+              disabled={disabled}
+              style={{ width: "100%" }}
+              options={[
+                { label: "SATINALMA", value: "SATINALMA" },
+                { label: "STOKTAN", value: "STOKTAN" },
+              ]}
+            />
+          )}
         />
-      )}
-    />
-  ),
-},
+      ),
+    },
     {
       title: "Talep Miktarı",
       dataIndex: "talepMiktar",
@@ -581,10 +582,19 @@ function FisIcerigi({ modalOpen }) {
       width: 100,
       editable: true,
       inputType: "number",
-      render: (text, record) => (
-        <div className="">
-          <span>{Number(text).toLocaleString(localStorage.getItem("i18nextLng"))}</span>
-        </div>
+      render: (text, record, index) => (
+        <Controller
+          name={`fisIcerigi.${index}.talepMiktar`}
+          control={control}
+          defaultValue={text}
+          render={({ field }) => (
+            <InputNumber
+              {...field}
+              style={{ width: "100%" }}
+              disabled={disabled} // 🔥 burası
+            />
+          )}
+        />
       ),
     },
     {
@@ -597,7 +607,15 @@ function FisIcerigi({ modalOpen }) {
         <Controller
           name={`fisIcerigi.${index}.birimName`}
           control={control}
-          render={({ field }) => <KodIDSelectbox name1={`fisIcerigi.${index}.birimName`} kodID={13001} isRequired={false} />}
+          render={({ field }) => (
+            <div style={{ ...(disabled ? { pointerEvents: "none", opacity: 0.6 } : {}) }}>
+              <KodIDSelectbox
+                name1={`fisIcerigi.${index}.birimName`}
+                kodID={13001}
+                isRequired={false}
+              />
+            </div>
+          )}
         />
       ),
     },
@@ -609,7 +627,7 @@ function FisIcerigi({ modalOpen }) {
       ellipsis: true,
       render: (text, record, index) => (
         <MakineTablo
-          disabled={false}
+          disabled={disabled}
           makineFieldName={`fisIcerigi.${index}.makineTanim`}
           makineIdFieldName={`fisIcerigi.${index}.makineID`}
           onSubmit={(selectedData) => {
@@ -651,6 +669,20 @@ function FisIcerigi({ modalOpen }) {
       editable: true,
       inputType: "text",
       ellipsis: true,
+      render: (text, record, index) => (
+        <Controller
+          name={`fisIcerigi.${index}.aciklama`}
+          control={control}
+          defaultValue={text}
+          render={({ field }) => (
+            <Input
+              {...field}
+              style={{ width: "100%" }}
+              disabled={disabled}
+            />
+          )}
+        />
+      ),
     },
     {
       title: "Marka",
@@ -662,7 +694,15 @@ function FisIcerigi({ modalOpen }) {
         <Controller
           name={`fisIcerigi.${index}.marka`}
           control={control}
-          render={({ field }) => <KodIDSelectbox name1={`fisIcerigi.${index}.marka`} kodID={13002} isRequired={false} />}
+          render={({ field }) => (
+            <div style={{ ...(disabled ? { pointerEvents: "none", opacity: 0.6 } : {}) }}>
+              <KodIDSelectbox
+                name1={`fisIcerigi.${index}.marka`}
+                kodID={13002}
+                isRequired={false}
+              />
+            </div>
+          )}
         />
       ),
     },
@@ -676,7 +716,15 @@ function FisIcerigi({ modalOpen }) {
         <Controller
           name={`fisIcerigi.${index}.Model`}
           control={control}
-          render={({ field }) => <KodIDSelectbox name1={`fisIcerigi.${index}.Model`} kodID={13003} isRequired={false} />}
+          render={({ field }) => (
+            <div style={{ ...(disabled ? { pointerEvents: "none", opacity: 0.6 } : {}) }}>
+              <KodIDSelectbox
+                name1={`fisIcerigi.${index}.Model`}
+                kodID={13003}
+                isRequired={false}
+              />
+            </div>
+          )}
         />
       ),
     },
@@ -687,7 +735,7 @@ function FisIcerigi({ modalOpen }) {
       render: (_, record) =>
         dataSource.length >= 1 ? (
           <Popconfirm title="Silmek istediğinize emin misiniz?" onConfirm={() => remove(dataSource.findIndex((item) => item.id === record.id))}>
-            <Button type="link" danger>
+            <Button type="link" danger disabled={disabled}>
               Sil
             </Button>
           </Popconfirm>
@@ -716,7 +764,7 @@ function FisIcerigi({ modalOpen }) {
     <div style={{ marginTop: "-55px", zIndex: 10 }}>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16, position: "relative", zIndex: 1000, gap: "10px", }}>
      <ContextMenu selectedRowId={selectedRowId} />
-  <Button style={{ zIndex: 1001 }} type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
+  <Button style={{ zIndex: 1001 }} type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}  disabled={disabled} >
     Ekle
   </Button>
 </div>

@@ -11,6 +11,7 @@ export default function MakineTablo({
   disabled,
   makineFieldName = "makineTanim",
   makineIdFieldName = "makineID",
+  lokasyonID,
 }) {
   const {
     control,
@@ -22,6 +23,10 @@ export default function MakineTablo({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalDataCount, setTotalDataCount] = useState(0);
+  const [data, setData] = useState([]);
+
 
   // Full tree data from API
   const [treeData, setTreeData] = useState([]);
@@ -183,28 +188,48 @@ export default function MakineTablo({
     setExpandedRowKeys(newKeys);
   };
 
-  // 7) Fetch data from API
-  const fetchData = async (page = 1, size = 50, keyword = "", lokasyonID = -1, atolyeId = -1) => {
-  setLoading(true);
-  try {
-    const response = await AxiosInstance.post(
-      `GetMakineFullList?pagingDeger=${page}&pageSize=${size}&lokasyonId=${lokasyonID}&parametre=${keyword}&atolyeId=${atolyeId}`
-    );
-    const raw = Array.isArray(response.data) ? response.data : response;
-    const tree = formatDataForTable(raw); // Senin tree formatlama fonksiyonunu kullanabilirsin
-    setTreeData(tree);
-    setFilteredData(tree); // başta tümünü göster
-  } catch (error) {
-    console.error("API Error:", error);
-    if (navigator.onLine) {
-      message.error("Hata Mesajı: " + error.message);
-    } else {
-      message.error("Internet Bağlantısı Mevcut Değil.");
+const fetchData = async (body, page, size) => {
+    // body'nin undefined olması durumunda varsayılan değerler atanıyor
+    const { keyword = "", filters = {} } = body || {};
+    // page'in undefined olması durumunda varsayılan değer olarak 1 atanıyor
+    const currentPage = page || 1;
+
+    try {
+      setLoading(true);
+      // API isteğinde keyword ve currentPage kullanılıyor
+      const response = await AxiosInstance.post(
+        `GetMakineFullList?pagingDeger=${page}&pageSize=${size}&lokasyonId=${lokasyonID}&parametre=${keyword}&atolyeId=${watch("atolyeID") || 0}`,
+        filters
+      );
+      if (response) {
+        // Toplam sayfa sayısını ayarla
+        setTotalPages(response.page);
+        setTotalDataCount(response.kayit_sayisi);
+
+        // Gelen veriyi formatla ve state'e ata
+        const formattedData = response.makine_listesi.map((item) => ({
+  ...item,
+  key: item.TB_MAKINE_ID,
+}));
+        setData(formattedData);
+setTreeData(formatDataForTable(formattedData)); // <--- burayı ekle
+setFilteredData(formattedData); // başta tümünü göster
+      } else {
+        console.error("API response is not in expected format");
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error in API request:", error);
+      setLoading(false);
+      if (navigator.onLine) {
+        // İnternet bağlantısı var
+        message.error("Hata Mesajı: " + error.message);
+      } else {
+        // İnternet bağlantısı yok
+        message.error("Internet Bağlantısı Mevcut Değil.");
+      }
     }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   // 8) Helper to find selected node in the tree
   const findItemInTree = (key, nodeList) => {
@@ -234,15 +259,20 @@ export default function MakineTablo({
 
   // 10) On modal OK, set the form fields
   const handleModalOk = () => {
-    const pickedKey = selectedRowKeys[0];
-    const selectedData = findItemInTree(pickedKey, treeData);
-    if (selectedData) {
-      setValue(makineFieldName, selectedData.MKN_KOD);
-      setValue(makineIdFieldName, selectedData.key);
-      onSubmit?.(selectedData);
-    }
-    setIsModalVisible(false);
-  };
+  const pickedKey = selectedRowKeys[0];
+  const selectedData = findItemInTree(pickedKey, treeData);
+  if (selectedData) {
+    // Form değerlerini güncelle
+    setValue(makineFieldName, selectedData.MKN_KOD);
+    setValue(makineIdFieldName, selectedData.key);
+
+    // Ana tablo state'ini güncelle
+    onSubmit?.(selectedData); 
+    // onSubmit içinde dataSource[index] güncellenmeli ve
+    // tablo dataIndex ile eşleşmeli
+  }
+  setIsModalVisible(false);
+};
 
   // 11) If `workshopSelectedId` changes, reflect that in local state
   useEffect(() => {
@@ -253,16 +283,16 @@ export default function MakineTablo({
     }
   }, [workshopSelectedId]);
 
-  // 12) Single-select row
   const onRowSelectChange = (newSelectedKeys) => {
-    setSelectedRowKeys(newSelectedKeys.length ? [newSelectedKeys[0]] : []);
-  };
+  const pickedKey = newSelectedKeys.length ? newSelectedKeys[0] : null;
+  setSelectedRowKeys(pickedKey ? [pickedKey] : []);
+};
 
-  const rowSelection = {
-    type: "radio",
-    selectedRowKeys,
-    onChange: onRowSelectChange,
-  };
+const rowSelection = {
+  type: "radio",
+  selectedRowKeys,
+  onChange: onRowSelectChange,
+};
 
   // 13) Clear the selected masraf merkezi fields
   const handleMasrafMerkeziMinusClick = () => {
@@ -306,7 +336,7 @@ export default function MakineTablo({
           rowKey="key"
           rowSelection={rowSelection}
           columns={columns}
-          dataSource={filteredData} // show filtered data
+          dataSource={data} // show filtered data
           loading={loading}
           scroll={{ y: "calc(100vh - 400px)" }}
           // Must use `expandable` for tree expansion
