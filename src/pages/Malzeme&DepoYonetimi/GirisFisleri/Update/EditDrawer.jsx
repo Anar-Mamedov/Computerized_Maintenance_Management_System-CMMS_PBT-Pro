@@ -91,6 +91,8 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
           setValue("projeID", item.projeId);
           setValue("girisDeposu", item.girisDepoName);
           setValue("girisDeposuID", item.girisDepoSiraNo);
+          setValue("siparisNoID", item.siparisID);
+          setValue("siparisNo", item.siparisKodu);
           setValue("lokasyon", item.lokasyonName);
           setValue("lokasyonID", item.lokasyonId);
           setTimeout(() => setValue("totalAraToplam", item.araToplam), 200);
@@ -191,6 +193,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
       girisDepoSiraNo: Number(data.girisDeposuID) || -1,
       // lokasyon: data.lokasyon,
       lokasyonId: Number(data.lokasyonID) || -1,
+      siparisID: Number(data.siparisNoID) || -1,
       araToplam: Number(data.totalAraToplam),
       indirimliToplam: Number(data.totalIndirim),
       kdvToplam: Number(data.totalKdvToplam),

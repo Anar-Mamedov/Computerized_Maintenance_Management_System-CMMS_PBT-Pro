@@ -7,12 +7,16 @@ import { t } from "i18next";
 import MainTabs from "./components/MainTabs/MainTabs";
 import { useForm, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
+import "dayjs/locale/tr";
+import "dayjs/locale/en";
+import "dayjs/locale/az";
+import "dayjs/locale/ru";
 import AxiosInstance from "../../../../api/http.jsx";
 import Footer from "../Footer";
 import SecondTabs from "./components/SecondTabs/SecondTabs.jsx";
 // import SecondTabs from "./components/secondTabs/secondTabs";
 
-export default function CreateModal({ selectedLokasyonId, onRefresh }) {
+export default function CreateModal({ selectedLokasyonId, onRefresh, numarator = false }) {
   const [open, setOpen] = useState(false);
   const [periyodikBakim, setPeriyodikBakim] = useState("");
 
@@ -32,11 +36,41 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
     setOpen(true);
   };
 
+  const getCurrentLocale = () => {
+    if (typeof window === "undefined") {
+      return "tr";
+    }
+
+    const storedLocale = localStorage.getItem("i18nextLng") || "tr";
+    return storedLocale.split("-")[0];
+  };
+
+  const getLocalizedDate = (dateValue) => {
+    const locale = getCurrentLocale();
+    const parsed = dayjs(dateValue);
+    return parsed.isValid() ? parsed.locale(locale) : null;
+  };
+
+  const getLocalizedTime = (dateValue, timeValue) => {
+    const sanitizedTime = timeValue?.trim();
+
+    if (!sanitizedTime) {
+      return null;
+    }
+    const locale = getCurrentLocale();
+    const input = `${dateValue || dayjs().format("YYYY-MM-DD")}T${sanitizedTime}`;
+    const parsed = dayjs(input);
+    return parsed.isValid() ? parsed.locale(locale) : null;
+  };
+
   useEffect(() => {
     if (open) {
-      getFisNo();
-      setValue("tarih", dayjs());
-      setValue("saat", dayjs());
+      if (numarator === false) {
+        getFisNo();
+      }
+      const locale = getCurrentLocale();
+      setValue("tarih", dayjs().locale(locale));
+      setValue("saat", dayjs().locale(locale));
 
       // Reset the fisIcerigi with a timeout to avoid focus errors
       setTimeout(() => {
@@ -161,6 +195,74 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
 
   const { setValue, reset, watch } = methods;
 
+  const siparisNoID = watch("siparisNoID");
+
+  const getDataFromSiparisInfo = async (siparisNoID) => {
+    try {
+      const response = await AxiosInstance.get(`PrepareMalzemeFisFromSiparis?siparisId=${siparisNoID}&Numarator=${numarator}`);
+      const payload = response?.data;
+
+      const statusCode = response?.status_code;
+
+      if (statusCode !== 200) {
+        message.error("Sipariş bilgileri alınamadı!");
+        return null;
+      }
+
+      return payload;
+    } catch (error) {
+      console.error("Error fetching siparis info:", error);
+      message.error("Fiş numarası alınamadı!");
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    if (!siparisNoID) {
+      return;
+    }
+
+    const fetchSiparisInfo = async () => {
+      const data = await getDataFromSiparisInfo(siparisNoID);
+
+      if (!data) {
+        return;
+      }
+
+      if (numarator === true) {
+        setValue("fisNo", data.fisNo ?? null);
+      }
+
+      const currentLocale = getCurrentLocale();
+      const localizedDate = getLocalizedDate(data.tarih);
+      const localizedTime = getLocalizedTime(data.tarih, data.saat);
+
+      setValue("tarih", localizedDate || dayjs().locale(currentLocale));
+      setValue("saat", localizedTime || dayjs().locale(currentLocale));
+      setValue("firmaID", data.firmaId ?? null);
+      setValue("firma", data.firmaName ?? null);
+      setValue("makineID", data.makineID ?? data.aracId ?? null);
+      setValue("makine", data.makine ?? data.aracName ?? null);
+      setValue("islemTipiID", data.islemTipiKodId ?? null);
+      setValue("girisDeposuID", data.girisDepoSiraNo ?? null);
+      setValue("girisDeposu", data.girisDepoName ?? null);
+      setValue("lokasyonID", data.lokasyonId ?? null);
+      setValue("lokasyon", data.lokasyonName ?? null);
+      setValue("siparisNoID", data.siparisID ?? data.siparisId ?? null);
+      setValue("siparisNo", data.siparisKodu ?? null);
+      setValue("projeID", data.projeId ?? null);
+      setValue("proje", data.projeName ?? null);
+      setValue("totalAraToplam", data.araToplam ?? 0);
+      setValue("totalIndirim", data.indirimliToplam ?? 0);
+      setValue("totalKdvToplam", data.kdvToplam ?? 0);
+      setValue("totalGenelToplam", data.genelToplam ?? 0);
+      setValue("aciklama", data.aciklama ?? "");
+      setValue("fisIcerigi", data.materialMovements ?? []);
+    };
+
+    fetchSiparisInfo();
+  }, [siparisNoID, numarator, setValue]);
+
   //* export
   const onSubmit = (data) => {
     const Body = {
@@ -177,7 +279,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
       // lokasyon: data.lokasyon,
       lokasyonId: Number(data.lokasyonID) || -1,
       // siparisNo: data.siparisNo,
-      siparisNoId: Number(data.siparisNoID) || -1,
+      siparisID: Number(data.siparisNoID) || -1,
       // proje: data.proje,
       projeId: Number(data.projeID) || -1,
       araToplam: Number(data.totalAraToplam),
