@@ -12,7 +12,7 @@ import Footer from "../Footer";
 import SecondTabs from "./components/SecondTabs/SecondTabs.jsx";
 // import SecondTabs from "./components/secondTabs/secondTabs";
 
-export default function CreateModal({ selectedLokasyonId, onRefresh }) {
+export default function CreateModal({ selectedLokasyonId, onRefresh, numarator = false }) {
   const [open, setOpen] = useState(false);
   const [periyodikBakim, setPeriyodikBakim] = useState("");
 
@@ -34,7 +34,9 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
 
   useEffect(() => {
     if (open) {
-      getFisNo();
+      if (numarator) {
+        getFisNo();
+      }
       setValue("tarih", dayjs());
       setValue("saat", dayjs());
 
@@ -160,6 +162,53 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
   };
 
   const { setValue, reset, watch } = methods;
+
+  const siparisNoID = watch("siparisNoID");
+
+  const getDataFromSiparisInfo = async (siparisNoID) => {
+    try {
+      const response = await AxiosInstance.get(`PrepareMalzemeFisFromSiparis?siparisId=${siparisNoID}&Numarator=${numarator}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching siparis info:", error);
+      message.error("Fiş numarası alınamadı!");
+    }
+  };
+
+  useEffect(() => {
+    if (siparisNoID && numarator) {
+      const response = await getDataFromSiparisInfo(siparisNoID);
+      setValue("fisNo", response.data.fisNo);
+      setValue("firmaID", response.data.firmaID);
+      setValue("makineID", response.data.makineID);
+      setValue("makine", response.data.makine);
+      setValue("tarih", response.data.tarih);
+      setValue("saat", response.data.saat);
+      setValue("islemTipiID", response.data.islemTipiID);
+      setValue("girisDeposuID", response.data.girisDeposuID);
+      setValue("lokasyonID", response.data.lokasyonID);
+      setValue("siparisNoID", response.data.siparisNoID);
+      setValue("projeID", response.data.projeID);
+      setValue("totalAraToplam", response.data.totalAraToplam);
+      setValue("totalIndirim", response.data.totalIndirim);
+      setValue("totalKdvToplam", response.data.totalKdvToplam);
+      setValue("totalGenelToplam", response.data.totalGenelToplam);
+      setValue("aciklama", response.data.aciklama);
+      setValue("ozelAlan1", response.data.ozelAlan1);
+      setValue("ozelAlan2", response.data.ozelAlan2);
+      setValue("ozelAlan3", response.data.ozelAlan3);
+      setValue("ozelAlan4", response.data.ozelAlan4);
+      setValue("ozelAlan5", response.data.ozelAlan5);
+      setValue("ozelAlan6", response.data.ozelAlan6);
+      setValue("ozelAlan7", response.data.ozelAlan7);
+      setValue("ozelAlan8", response.data.ozelAlan8);
+      setValue("ozelAlan9", response.data.ozelAlan9);
+      setValue("ozelAlan10", response.data.ozelAlan10);
+      setValue("ozelAlan11", response.data.ozelAlan11);
+      setValue("ozelAlan12", response.data.ozelAlan12);
+      setValue("fisIcerigi", response.data.fisIcerigi);
+    }
+  }, [siparisNoID]);
 
   //* export
   const onSubmit = (data) => {
