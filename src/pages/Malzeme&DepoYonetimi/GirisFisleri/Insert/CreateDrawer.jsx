@@ -34,7 +34,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh, numarator =
 
   useEffect(() => {
     if (open) {
-      if (numarator) {
+      if (numarator === false) {
         getFisNo();
       }
       setValue("tarih", dayjs());
@@ -172,43 +172,32 @@ export default function CreateModal({ selectedLokasyonId, onRefresh, numarator =
     } catch (error) {
       console.error("Error fetching siparis info:", error);
       message.error("Fiş numarası alınamadı!");
+      return null;
     }
   };
 
   useEffect(() => {
-    if (siparisNoID && numarator) {
-      const response = await getDataFromSiparisInfo(siparisNoID);
-      setValue("fisNo", response.data.fisNo);
-      setValue("firmaID", response.data.firmaID);
-      setValue("makineID", response.data.makineID);
-      setValue("makine", response.data.makine);
-      setValue("tarih", response.data.tarih);
-      setValue("saat", response.data.saat);
-      setValue("islemTipiID", response.data.islemTipiID);
-      setValue("girisDeposuID", response.data.girisDeposuID);
-      setValue("lokasyonID", response.data.lokasyonID);
-      setValue("siparisNoID", response.data.siparisNoID);
-      setValue("projeID", response.data.projeID);
-      setValue("totalAraToplam", response.data.totalAraToplam);
-      setValue("totalIndirim", response.data.totalIndirim);
-      setValue("totalKdvToplam", response.data.totalKdvToplam);
-      setValue("totalGenelToplam", response.data.totalGenelToplam);
-      setValue("aciklama", response.data.aciklama);
-      setValue("ozelAlan1", response.data.ozelAlan1);
-      setValue("ozelAlan2", response.data.ozelAlan2);
-      setValue("ozelAlan3", response.data.ozelAlan3);
-      setValue("ozelAlan4", response.data.ozelAlan4);
-      setValue("ozelAlan5", response.data.ozelAlan5);
-      setValue("ozelAlan6", response.data.ozelAlan6);
-      setValue("ozelAlan7", response.data.ozelAlan7);
-      setValue("ozelAlan8", response.data.ozelAlan8);
-      setValue("ozelAlan9", response.data.ozelAlan9);
-      setValue("ozelAlan10", response.data.ozelAlan10);
-      setValue("ozelAlan11", response.data.ozelAlan11);
-      setValue("ozelAlan12", response.data.ozelAlan12);
-      setValue("fisIcerigi", response.data.fisIcerigi);
+    if (!siparisNoID) {
+      return;
     }
-  }, [siparisNoID]);
+
+    const fetchSiparisInfo = async () => {
+      const data = await getDataFromSiparisInfo(siparisNoID);
+
+      if (!data) {
+        return;
+      }
+      if (numarator === true) {
+        setValue("fisNo", data.fisNo);
+      }
+      setValue("firmaID", data.firmaId);
+      setValue("firma", data.firmaName);
+      setValue("makineID", data.makineID);
+      setValue("makine", data.makine);
+    };
+
+    fetchSiparisInfo();
+  }, [siparisNoID, numarator, setValue]);
 
   //* export
   const onSubmit = (data) => {
