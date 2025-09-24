@@ -16,6 +16,42 @@ import Footer from "../Footer";
 import SecondTabs from "./components/SecondTabs/SecondTabs.jsx";
 // import SecondTabs from "./components/secondTabs/secondTabs";
 
+const normalizeMaterialMovements = (items) => {
+  if (!Array.isArray(items)) {
+    return [];
+  }
+
+  return items.map((item, index) => {
+    const kdvValue = item?.kdvDahilHaric;
+    const normalizedKdv = typeof kdvValue === "boolean" ? kdvValue : String(kdvValue || "H").toUpperCase() === "D";
+
+    return {
+      id: item?.siraNo ?? `${item?.malzemeId || "movement"}-${index}`,
+      malzemeId: item?.malzemeId != null ? Number(item.malzemeId) : null,
+      birimKodId: item?.birimKodId != null ? Number(item.birimKodId) : null,
+      malzemeKodu: item?.malzemeKod ?? "",
+      malzemeTanimi: item?.malzemeName ?? "",
+      malzemeTipi: item?.malzemeTipi ?? "",
+      miktar: Number(item?.miktar ?? 0),
+      birim: item?.birimName ?? "",
+      fiyat: Number(item?.fiyat ?? 0),
+      araToplam: Number(item?.araToplam ?? 0),
+      indirimOrani: Number(item?.indirimOran ?? 0),
+      indirimTutari: Number(item?.indirim ?? 0),
+      kdvOrani: Number(item?.kdvOran ?? 0),
+      kdvDahilHaric: normalizedKdv,
+      kdvTutar: Number(item?.kdvTutar ?? 0),
+      toplam: Number(item?.toplam ?? 0),
+      malzemeLokasyon: item?.lokasyonName ?? "",
+      malzemeLokasyonID: item?.lokasyonId != null ? Number(item.lokasyonId) : null,
+      masrafMerkezi: item?.masrafmerkeziName ?? "",
+      masrafMerkeziID: item?.masrafmerkezi != null ? Number(item.masrafmerkezi) : null,
+      aciklama: item?.aciklama ?? "",
+      isPriceChanged: item?.isPriceChanged ?? false,
+    };
+  });
+};
+
 export default function CreateModal({ selectedLokasyonId, onRefresh, numarator = false }) {
   const [open, setOpen] = useState(false);
   const [periyodikBakim, setPeriyodikBakim] = useState("");
@@ -257,7 +293,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh, numarator =
       setValue("totalKdvToplam", data.kdvToplam ?? 0);
       setValue("totalGenelToplam", data.genelToplam ?? 0);
       setValue("aciklama", data.aciklama ?? "");
-      setValue("fisIcerigi", data.materialMovements ?? []);
+      setValue("fisIcerigi", normalizeMaterialMovements(data.materialMovements));
     };
 
     fetchSiparisInfo();
