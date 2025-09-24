@@ -3,6 +3,7 @@ import { Button, Popover, Typography } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
 import Sil from "./components/Sil";
 import TarihceTablo from "./components/TarihceTablo";
+import GirisFisleri from "../../../../Malzeme&DepoYonetimi/GirisFisleri/Insert/CreateDrawer";
 
 const { Text, Link } = Typography;
 
@@ -23,6 +24,7 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
     <div>
       {selectedRows.length >= 1 && <Sil selectedRows={selectedRows} refreshTableData={refreshTableData} disabled={isDisabled} hidePopover={hidePopover} />}
       {selectedRows.length === 1 && <TarihceTablo selectedRows={selectedRows} />}
+      {selectedRows.length === 1 && <GirisFisleri selectedRows={selectedRows} numarator={true} siparisID={selectedRows[0].key} />}
     </div>
   );
   return (
