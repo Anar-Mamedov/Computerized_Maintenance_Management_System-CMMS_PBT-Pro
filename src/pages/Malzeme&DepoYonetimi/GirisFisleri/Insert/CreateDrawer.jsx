@@ -254,7 +254,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh, numarator =
   };
 
   useEffect(() => {
-    if (!siparisNoID) {
+    if (!siparisNoID || !open) {
       return;
     }
 
@@ -297,7 +297,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh, numarator =
     };
 
     fetchSiparisInfo();
-  }, [siparisNoID, numarator, setValue]);
+  }, [siparisNoID, numarator, setValue, open]);
 
   //* export
   const onSubmit = (data) => {
