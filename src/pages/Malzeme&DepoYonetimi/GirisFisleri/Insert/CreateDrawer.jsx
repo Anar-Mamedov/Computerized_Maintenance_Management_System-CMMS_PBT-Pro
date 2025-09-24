@@ -52,7 +52,7 @@ const normalizeMaterialMovements = (items) => {
   });
 };
 
-export default function CreateModal({ selectedLokasyonId, onRefresh, numarator = false }) {
+export default function CreateModal({ selectedLokasyonId, onRefresh, numarator = false, siparisID = null }) {
   const [open, setOpen] = useState(false);
   const [periyodikBakim, setPeriyodikBakim] = useState("");
 
@@ -231,7 +231,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh, numarator =
 
   const { setValue, reset, watch } = methods;
 
-  const siparisNoID = watch("siparisNoID");
+  const siparisNoID = watch("siparisNoID") || siparisID;
 
   const getDataFromSiparisInfo = async (siparisNoID) => {
     try {
@@ -467,17 +467,23 @@ export default function CreateModal({ selectedLokasyonId, onRefresh, numarator =
   return (
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
-        <Button
-          type="primary"
-          onClick={showModal}
-          style={{
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <PlusOutlined />
-          {t("ekle")}
-        </Button>
+        {numarator ? (
+          <Button onClick={showModal} type="text" style={{ paddingLeft: "0px" }}>
+            {t("fisOlustur")}
+          </Button>
+        ) : (
+          <Button
+            type="primary"
+            onClick={showModal}
+            style={{
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <PlusOutlined />
+            {t("ekle")}
+          </Button>
+        )}
         <Modal
           width="1300px"
           centered
