@@ -227,7 +227,9 @@ const SiparisTablo = ({ workshopSelectedId, onSubmit, disabled, name1, isRequire
           <Button disabled={disabled} onClick={handleModalToggle}>
             +
           </Button>
-          <Button onClick={handleMinusClick}> - </Button>
+          <Button onClick={handleMinusClick} disabled={disabled}>
+            -
+          </Button>
         </div>
       </div>
 
