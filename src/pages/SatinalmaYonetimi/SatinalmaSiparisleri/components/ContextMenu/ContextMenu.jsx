@@ -1,32 +1,65 @@
 import React, { useState } from "react";
 import { Button, Popover, Typography } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
+// Gerçek işlem yapan componentler
 import Sil from "./components/Sil";
 import TarihceTablo from "./components/TarihceTablo";
+import Kapat from "./components/Kapat/Kapat";
+import Iptal from "./components/Iptal/Iptal";
+import Ac from "./components/Ac/Ac";
 
-const { Text, Link } = Typography;
+const { Text } = Typography;
 
-export default function ContextMenu({ selectedRows, refreshTableData, onayCheck }) {
+export default function ContextMenu({ selectedRows, refreshTableData }) {
   const [visible, setVisible] = useState(false);
 
-  const handleVisibleChange = (visible) => {
-    setVisible(visible);
+  const hidePopover = () => setVisible(false);
+
+  const durumId = selectedRows.length === 1 ? selectedRows[0].SSP_DURUM_ID : null;
+
+  const commonProps = {
+    selectedRows,
+    refreshTableData,
+    hidePopover,
+    fisNo: selectedRows.length === 1 ? selectedRows[0].SSP_SIPARIS_KODU : null,
   };
 
-  const hidePopover = () => {
-    setVisible(false);
+  const renderButtonsByDurum = (id) => {
+    switch (id) {
+      case 1:
+      case 5:
+        return <Iptal {...commonProps} />; // İptal Et
+      case 6:
+      case 2:
+        return <Kapat {...commonProps} />; // Kapat
+      case 4:
+      case 3:
+        return <Ac {...commonProps} />; //Aç
+      default:
+        return null;
+    }
   };
-  // Silme işlemi için disable durumunu kontrol et
-  const isDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 6);
 
   const content = (
     <div>
-      {selectedRows.length >= 1 && <Sil selectedRows={selectedRows} refreshTableData={refreshTableData} disabled={isDisabled} hidePopover={hidePopover} />}
-      {selectedRows.length === 1 && <TarihceTablo selectedRows={selectedRows} />}
+      {durumId && renderButtonsByDurum(durumId)}
+
+      {/* Sil ve Tarihçe her durumda gözükecek */}
+        <Sil {...commonProps} />
+      <div style={{ marginTop: 10 }}>
+        <TarihceTablo {...commonProps} />
+      </div>
     </div>
   );
+
   return (
-    <Popover placement="bottom" content={content} trigger="click" open={visible} onOpenChange={handleVisibleChange}>
+    <Popover
+      placement="bottom"
+      content={content}
+      trigger="click"
+      open={visible}
+      onOpenChange={setVisible}
+    >
       <Button
         style={{
           display: "flex",
@@ -38,7 +71,11 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
           height: "32px",
         }}
       >
-        {selectedRows.length >= 1 && <Text style={{ color: "white", marginLeft: "3px" }}>{selectedRows.length}</Text>}
+        {selectedRows.length > 0 && (
+          <Text style={{ color: "white", marginLeft: "3px" }}>
+            {selectedRows.length}
+          </Text>
+        )}
         <MoreOutlined style={{ color: "white", fontSize: "20px", margin: "0" }} />
       </Button>
     </Popover>

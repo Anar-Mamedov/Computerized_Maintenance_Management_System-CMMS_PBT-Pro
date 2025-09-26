@@ -130,7 +130,6 @@ const MainTable = () => {
   const [pageSize, setPageSize] = useState(10);
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
-  const [onayCheck, setOnayCheck] = useState({ ONY_AKTIF: 0, ONY_MANUEL: 0 });
   const [drawer, setDrawer] = useState({
     visible: false,
     data: null,
@@ -204,23 +203,6 @@ const MainTable = () => {
     // 4) Hiçbir formata uymuyorsa default dön
     return `rgba(0, 0, 0, ${opacity})`;
   }
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await AxiosInstance.post(`GetOnayCheck?TB_ONAY_ID=3`); // API URL'niz
-        if (response[0].ONY_AKTIF === 1) {
-          setOnayCheck(true);
-        } else {
-          setOnayCheck(false);
-        }
-      } catch (error) {
-        console.error("API isteğinde hata oluştu:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   // Özel Alanların nameleri backend çekmek için api isteği
 
@@ -955,7 +937,6 @@ const MainTable = () => {
     // Seçilen satırların verisini bul
     const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
     setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
-    console.log("Seçilen Satırlar:", newSelectedRows);
   };
 
   const rowSelection = {
@@ -1361,7 +1342,7 @@ const MainTable = () => {
           <Button style={{ display: "flex", alignItems: "center" }} onClick={handleDownloadXLSX} loading={xlsxLoading} icon={<SiMicrosoftexcel />}>
             İndir
           </Button>
-          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
+          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
         </div>
       </div>
