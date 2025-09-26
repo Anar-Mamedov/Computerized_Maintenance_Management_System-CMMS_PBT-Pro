@@ -253,7 +253,6 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
 
   AxiosInstance.post("UpsertSatinalmaSiparis", Body)
     .then((response) => {
-      console.log("Data sent successfully:", response);
       if (response.status_code === 200 || response.status_code === 201) {
         message.success("Ekleme Başarılı.");
         setOpen(false);
@@ -269,8 +268,6 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
       console.error("Error sending data:", error);
       message.error("Başarısız Olundu.");
     });
-
-  console.log({ Body });
 };
 
   useEffect(() => {

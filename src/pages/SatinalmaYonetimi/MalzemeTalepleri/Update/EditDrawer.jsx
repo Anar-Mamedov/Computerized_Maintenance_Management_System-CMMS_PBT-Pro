@@ -290,6 +290,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
                 type="primary"
                 onClick={methods.handleSubmit(onSubmit)}
                 style={{ backgroundColor: "#2bc770", borderColor: "#2bc770", color: "#fff" }}
+                disabled={talepdurumId !== 1}
               >
                 Güncelle
               </Button>

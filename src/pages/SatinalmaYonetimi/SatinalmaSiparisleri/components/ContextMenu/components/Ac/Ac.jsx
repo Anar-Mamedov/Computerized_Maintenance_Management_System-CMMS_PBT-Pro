@@ -23,7 +23,7 @@ export default function Iptal({ selectedRows, refreshTableData, iptalDisabled })
     }
     const Body = {
       siparisId: selectedRows[0].key,
-      islem: "iptal",
+      islem: "yenidenac",
       nedenKodId: data.nedenKodId,
       aciklama: data.aciklama || "",
     };
@@ -65,10 +65,10 @@ export default function Iptal({ selectedRows, refreshTableData, iptalDisabled })
         <Button style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
           onClick={handleModalToggle}
           type="text">
-            İptal Et
+            Yeniden Aç
         </Button>
         <Modal
-          title="Satınalma Siparişi İptal"
+          title="Satınalma Siparişi Yeniden Aç"
           open={isModalOpen}
           onOk={methods.handleSubmit(onSubmited)}
           onCancel={handleModalToggle}

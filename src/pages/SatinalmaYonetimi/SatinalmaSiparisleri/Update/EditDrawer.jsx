@@ -358,6 +358,7 @@ const durumId = watch("durumId");
                 type="primary"
                 onClick={methods.handleSubmit(onSubmit)}
                 style={{ backgroundColor: "#2bc770", borderColor: "#2bc770", color: "#fff" }}
+                disabled={durumId !== 1}
               >
                 Güncelle
               </Button>

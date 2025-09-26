@@ -1,74 +1,52 @@
 import React, { useState } from "react";
 import { Button, Modal, message } from "antd";
 import Forms from "./components/Forms";
-import { Controller, useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import AxiosInstance from "../../../../../../../api/http";
-import dayjs from "dayjs";
 
-export default function Iptal({ selectedRows, refreshTableData, kapatDisabled }) {
+export default function Iptal({ selectedRows, refreshTableData, iptalDisabled }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const methods = useForm({
     defaultValues: {
-      fisNo: "",
-      iptalTarihi: "",
-      iptalSaati: "",
-      iptalNeden: "",
-      // Add other default values here
+      nedenKodId: null,
+      aciklama: "",
     },
   });
-  const { setValue, reset, handleSubmit } = methods;
+  const { reset } = methods;
 
-  // Sil düğmesini gizlemek için koşullu stil
-  const buttonStyle = kapatDisabled ? { display: "none" } : {};
-
-  const formatDateWithDayjs = (dateString) => {
-    const formattedDate = dayjs(dateString);
-    return formattedDate.isValid() ? formattedDate.format("YYYY-MM-DD") : "";
-  };
-
-  const formatTimeWithDayjs = (timeObj) => {
-    const formattedTime = dayjs(timeObj);
-    return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
-  };
+  const buttonStyle = iptalDisabled ? { display: "none" } : {};
 
   const onSubmited = (data) => {
-    // Seçili satırlar için Body dizisini oluştur
-    const Body = selectedRows.map((row) => ({
-      TB_IS_TALEP_ID: row.key,
-      IST_TALEP_NO: row.IST_KOD,
-      KLL_ADI: "Orjin", // Bu değer sabitse bu şekilde, dinamikse değiştirilmelidir
-      IST_SONUC: data.iptalNeden,
-      IST_KAPAMA_TARIHI: formatDateWithDayjs(data.iptalTarihi),
-      IST_KAPAMA_SAATI: formatTimeWithDayjs(data.iptalSaati),
-      ITL_ISLEM_ID: 4, // Sabit bir değerse bu şekilde kalabilir, dinamikse değiştirilmelidir
-      ITL_ISLEM: "Kapandi",
-      ITL_ISLEM_DURUM: "KAPANDI",
-      ITL_TALEP_ISLEM: "Kapandi",
-      ITL_ACIKLAMA: "Tamamlandı",
-    }));
+    if (!selectedRows || selectedRows.length === 0) {
+    message.warning("Lütfen önce bir satır seçin.");
+    return;
+    }
+    const Body = {
+      siparisId: selectedRows[0].key,
+      islem: "kapat",
+      nedenKodId: data.nedenKodId,
+      aciklama: data.aciklama || "",
+    };
 
-    AxiosInstance.post("IsTalepIptalEtKapat", Body)
+    AxiosInstance.post("SatinalmaSiparisDurum", Body)
       .then((response) => {
-        console.log("Data sent successfully:", response);
         reset();
-        setIsModalOpen(false); // Sadece başarılı olursa modalı kapat
+        setIsModalOpen(false);
         refreshTableData();
+
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("İptal işlemi başarılı.");
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
-          message.error("Ekleme Başarısız.");
+          message.error("İptal işlemi başarısız.");
         }
       })
       .catch((error) => {
-        // Handle errors here, e.g.:
         console.error("Error sending data:", error);
         if (navigator.onLine) {
-          // İnternet bağlantısı var
           message.error("Hata Mesajı: " + error.message);
         } else {
-          // İnternet bağlantısı yok
           message.error("Internet Bağlantısı Mevcut Değil.");
         }
       });
@@ -78,21 +56,23 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
 
   const handleModalToggle = () => {
     setIsModalOpen((prev) => !prev);
-    if (!isModalOpen) {
-      reset();
-    }
+    if (!isModalOpen) reset();
   };
+
   return (
     <FormProvider {...methods}>
       <div style={buttonStyle}>
-        <Button style={{ paddingLeft: "0px" }} type="text" onClick={handleModalToggle}>
-          Kapat
+        <Button style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
+          onClick={handleModalToggle}
+          type="text">
+            Kapat
         </Button>
         <Modal
-          title="İş Talebi Kapatma"
+          title="Satınalma Siparişi Kapat"
           open={isModalOpen}
           onOk={methods.handleSubmit(onSubmited)}
-          onCancel={handleModalToggle}>
+          onCancel={handleModalToggle}
+        >
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <Forms isModalOpen={isModalOpen} selectedRows={selectedRows} />
           </form>
