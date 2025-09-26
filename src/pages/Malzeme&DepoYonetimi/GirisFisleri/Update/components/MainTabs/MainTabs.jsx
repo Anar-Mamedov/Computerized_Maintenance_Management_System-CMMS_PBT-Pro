@@ -351,7 +351,7 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "220px",
             }}
           >
-            <SiparisTablo name1="siparisNo" isRequired={false} />
+            <SiparisTablo name1="siparisNo" isRequired={false} disabled={true} />
           </div>
         </div>
       </div>

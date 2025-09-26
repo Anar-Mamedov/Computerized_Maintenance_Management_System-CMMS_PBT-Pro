@@ -127,7 +127,7 @@ const MainTable = () => {
   const [totalPages, setTotalPages] = useState(0); // Total pages
   const [label, setLabel] = useState("Yükleniyor...");
   const [totalDataCount, setTotalDataCount] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(20);
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
   const [onayCheck, setOnayCheck] = useState({ ONY_AKTIF: 0, ONY_MANUEL: 0 });
@@ -1646,7 +1646,7 @@ const MainTable = () => {
             current: currentPage,
             total: totalDataCount, // Toplam kayıt sayısı (sayfa başına kayıt sayısı ile çarpılır)
             pageSize: pageSize,
-            defaultPageSize: 10,
+            defaultPageSize: 20,
             showSizeChanger: true,
             pageSizeOptions: ["10", "20", "50", "100"],
             position: ["bottomRight"],

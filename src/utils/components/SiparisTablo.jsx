@@ -1,26 +1,18 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Table, Input, Space } from "antd";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Button, Modal, Table, Input, Space, DatePicker, message } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import { SearchOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 import AxiosInstance from "../../api/http";
 
-// Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
-const normalizeText = (text) => {
-  return text
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/ğ/g, "g")
-    .replace(/Ğ/g, "G")
-    .replace(/ü/g, "u")
-    .replace(/Ü/g, "U")
-    .replace(/ş/g, "s")
-    .replace(/Ş/g, "S")
-    .replace(/ı/g, "i")
-    .replace(/İ/g, "I")
-    .replace(/ö/g, "o")
-    .replace(/Ö/g, "O")
-    .replace(/ç/g, "c")
-    .replace(/Ç/g, "C");
+const DATE_FORMAT = "YYYY-MM-DD";
+const DURUM_IDS = [1, 2, 6];
+const DISPLAY_DATE_FORMATS = {
+  tr: "DD.MM.YYYY",
+  az: "DD.MM.YYYY",
+  ru: "DD.MM.YYYY",
+  en: "MM/DD/YYYY",
 };
 
 const SiparisTablo = ({ workshopSelectedId, onSubmit, disabled, name1, isRequired }) => {
@@ -29,6 +21,13 @@ const SiparisTablo = ({ workshopSelectedId, onSubmit, disabled, name1, isRequire
     setValue,
     formState: { errors },
   } = useFormContext();
+  const { i18n } = useTranslation();
+
+  const displayDateFormat = useMemo(() => {
+    const storedLanguage = typeof window !== "undefined" ? localStorage.getItem("i18nextLng") : null;
+    const language = (i18n?.language || storedLanguage || "tr").split("-")[0];
+    return DISPLAY_DATE_FORMATS[language] || DISPLAY_DATE_FORMATS.tr;
+  }, [i18n?.language]);
 
   // State tanımlamaları
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -38,6 +37,9 @@ const SiparisTablo = ({ workshopSelectedId, onSubmit, disabled, name1, isRequire
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [searchValue, setSearchValue] = useState("");
+  const [startDate, setStartDate] = useState(() => dayjs().subtract(3, "month"));
+  const [endDate, setEndDate] = useState(() => dayjs());
+  const [totalCount, setTotalCount] = useState(0);
 
   // Form alanı isimleri
   const fieldName = name1;
@@ -46,81 +48,115 @@ const SiparisTablo = ({ workshopSelectedId, onSubmit, disabled, name1, isRequire
   // Tablo kolonları
   const columns = [
     {
-      title: "Proje Kodu",
-      dataIndex: "PRJ_KOD",
-      key: "PRJ_KOD",
+      title: "Sipariş Kodu",
+      dataIndex: "SSP_SIPARIS_KODU",
+      key: "SSP_SIPARIS_KODU",
+      width: 160,
+      ellipsis: true,
+    },
+    {
+      title: "Sipariş Tarihi",
+      dataIndex: "SSP_SIPARIS_TARIHI",
+      key: "SSP_SIPARIS_TARIHI",
       width: 150,
       ellipsis: true,
+      render: (value) => (value ? dayjs(value).format(displayDateFormat) : "-"),
     },
     {
-      title: "Proje Tanımı",
-      dataIndex: "PRJ_TANIM",
-      key: "PRJ_TANIM",
-      width: 300,
+      title: "Teslim Tarihi",
+      dataIndex: "SSP_TESLIM_TARIHI",
+      key: "SSP_TESLIM_TARIHI",
+      width: 150,
       ellipsis: true,
-    },
-    {
-      title: "Proje Yöneticisi",
-      dataIndex: "PRJ_YONETICI",
-      key: "PRJ_YONETICI",
-      width: 200,
-      ellipsis: true,
+      render: (value) => (value ? dayjs(value).format(displayDateFormat) : "-"),
     },
     {
       title: "Firma",
-      dataIndex: "PRJ_FIRMA",
-      key: "PRJ_FIRMA",
-      width: 250,
+      dataIndex: "SSP_FIRMA",
+      key: "SSP_FIRMA",
+      width: 220,
       ellipsis: true,
     },
     {
-      title: "Lokasyon",
-      dataIndex: "PRJ_LOKASYON",
-      key: "PRJ_LOKASYON",
-      width: 200,
+      title: "Durum",
+      dataIndex: "SSP_DURUM",
+      key: "SSP_DURUM",
+      width: 160,
       ellipsis: true,
     },
     {
-      title: "Masraf Merkezi",
-      dataIndex: "PRJ_MASRAF_MERKEZ",
-      key: "PRJ_MASRAF_MERKEZ",
-      width: 150,
+      title: "Başlık",
+      dataIndex: "SSP_BASLIK",
+      key: "SSP_BASLIK",
       ellipsis: true,
     },
   ];
 
+  const disabledStartDate = (current) => {
+    if (!current || !endDate) {
+      return false;
+    }
+    return current.isAfter(endDate, "day");
+  };
+
+  const disabledEndDate = (current) => {
+    if (!current || !startDate) {
+      return false;
+    }
+    return current.isBefore(startDate, "day");
+  };
+
+  const handleStartDateChange = (value) => {
+    setStartDate(value);
+  };
+
+  const handleEndDateChange = (value) => {
+    setEndDate(value);
+  };
+
   // Veri çekme fonksiyonu
-  const fetchData = useCallback(() => {
-    setLoading(true);
-    AxiosInstance.get("GetProjeList")
-      .then((response) => {
-        // API'den gelen veriyi tablo formatına dönüştür
-        const allData = response.Proje_Liste.map((item) => ({
-          ...item,
-          key: item.TB_PROJE_ID,
-        }));
+  const fetchData = useCallback(
+    async ({ page = 1, start = startDate, end = endDate, keyword = searchValue } = {}) => {
+      if (!start || !end) {
+        message.warning("Lütfen başlangıç ve bitiş tarihlerini seçiniz.");
+        return;
+      }
 
-        // Arama metni varsa filtrele
-        const filteredData = searchValue
-          ? allData.filter((d) =>
-              normalizeText(`${d.PRJ_KOD || ""} ${d.PRJ_TANIM || ""} ${d.PRJ_YONETICI || ""} ${d.PRJ_FIRMA || ""} ${d.PRJ_LOKASYON || ""} ${d.PRJ_MASRAF_MERKEZ || ""}`).includes(
-                normalizeText(searchValue)
-              )
-            )
-          : allData;
+      setCurrentPage(page);
+      setLoading(true);
 
-        setData(filteredData);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      })
-      .finally(() => setLoading(false));
-  }, [searchValue]);
+      try {
+        const payload = {
+          durumId: DURUM_IDS,
+          baslangicTarihi: start.format(DATE_FORMAT),
+          bitisTarihi: end.format(DATE_FORMAT),
+          kelime: typeof keyword === "string" ? keyword.trim() : "",
+        };
+
+        const response = await AxiosInstance.post(`GetSatinalmaSiparisList?pagingDeger=${page}&pageSize=${pageSize}`, payload);
+
+        const list = Array.isArray(response?.siparis_listesi) ? response.siparis_listesi : [];
+
+        setData(
+          list.map((item) => ({
+            ...item,
+            key: item.TB_SATINALMA_SIPARIS_ID,
+          }))
+        );
+        setTotalCount(Number(response?.kayit_sayisi) || list.length);
+      } catch (error) {
+        console.error("Error fetching purchase order data:", error);
+        setData([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [pageSize, searchValue, startDate, endDate]
+  );
 
   // Arama işlemi
   const handleSearch = () => {
-    setCurrentPage(1);
-    fetchData();
+    fetchData({ page: 1, start: startDate, end: endDate, keyword: searchValue });
   };
 
   // Modal açma kapama
@@ -131,32 +167,36 @@ const SiparisTablo = ({ workshopSelectedId, onSubmit, disabled, name1, isRequire
   // Modal açıldığında ve kapandığında çalışacak effect
   useEffect(() => {
     if (isModalVisible) {
-      fetchData();
+      fetchData({ page: 1, start: startDate, end: endDate, keyword: searchValue });
     } else {
       setSearchValue("");
       setCurrentPage(1);
       setSelectedRowKeys([]);
+      setStartDate(dayjs().subtract(3, "month"));
+      setEndDate(dayjs());
+      setData([]);
+      setTotalCount(0);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isModalVisible]);
 
   // Sayfa değişikliğinde veri çekme
   const handlePageChange = (page) => {
-    setCurrentPage(page);
-    fetchData();
+    fetchData({ page, start: startDate, end: endDate, keyword: searchValue });
   };
 
   // Modal onay işlemi
   const handleModalOk = () => {
     const selectedData = data.find((item) => item.key === selectedRowKeys[0]);
     if (selectedData) {
-      setValue(fieldName, selectedData.PRJ_TANIM);
-      setValue(fieldIdName, selectedData.TB_PROJE_ID);
-      onSubmit && onSubmit(selectedData);
+      setValue(fieldName, selectedData.SSP_SIPARIS_KODU || "");
+      setValue(fieldIdName, selectedData.TB_SATINALMA_SIPARIS_ID);
+      onSubmit?.(selectedData);
     }
     setIsModalVisible(false);
   };
 
-  // Seçili proje ID'si değiştiğinde çalışacak effect
+  // Seçili sipariş ID'si değiştiğinde çalışacak effect
   useEffect(() => {
     setSelectedRowKeys(workshopSelectedId ? [workshopSelectedId] : []);
   }, [workshopSelectedId]);
@@ -166,10 +206,11 @@ const SiparisTablo = ({ workshopSelectedId, onSubmit, disabled, name1, isRequire
     setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
   };
 
-  // Proje seçimini temizleme
+  // Sipariş seçimini temizleme
   const handleMinusClick = () => {
     setValue(fieldName, "");
     setValue(fieldIdName, "");
+    setSelectedRowKeys([]);
   };
 
   return (
@@ -186,26 +227,50 @@ const SiparisTablo = ({ workshopSelectedId, onSubmit, disabled, name1, isRequire
           <Button disabled={disabled} onClick={handleModalToggle}>
             +
           </Button>
-          <Button onClick={handleMinusClick}> - </Button>
+          <Button onClick={handleMinusClick} disabled={disabled}>
+            -
+          </Button>
         </div>
       </div>
 
-      <Modal title="Proje Tanımları" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle} width={1400} centered>
+      <Modal title="Satınalma Siparişleri" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle} width={1400} centered>
         <Space direction="vertical" style={{ width: "100%" }}>
-          <Space.Compact style={{ width: "300px", marginBottom: "15px" }}>
-            <Input
-              placeholder="Ara..."
-              value={searchValue}
-              onChange={(e) => {
-                setSearchValue(e.target.value);
-              }}
-              onPressEnter={handleSearch}
+          <Space wrap style={{ width: "100%", marginBottom: "15px" }}>
+            <Space.Compact style={{ minWidth: "200px" }}>
+              <Input
+                placeholder="Ara..."
+                value={searchValue}
+                onChange={(e) => {
+                  setSearchValue(e.target.value);
+                }}
+                style={{ width: "100%", maxWidth: "200px" }}
+                onPressEnter={handleSearch}
+                allowClear
+              />
+            </Space.Compact>
+
+            <DatePicker
+              placeholder="Başlangıç Tarihi"
+              format={displayDateFormat}
+              value={startDate}
+              onChange={handleStartDateChange}
+              disabledDate={disabledStartDate}
               allowClear
+              style={{ minWidth: "170px" }}
+            />
+            <DatePicker
+              placeholder="Bitiş Tarihi"
+              format={displayDateFormat}
+              value={endDate}
+              onChange={handleEndDateChange}
+              disabledDate={disabledEndDate}
+              allowClear
+              style={{ minWidth: "170px" }}
             />
             <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
               Ara
             </Button>
-          </Space.Compact>
+          </Space>
           <Table
             rowSelection={{
               type: "radio",
@@ -219,7 +284,7 @@ const SiparisTablo = ({ workshopSelectedId, onSubmit, disabled, name1, isRequire
               position: ["bottomRight"],
               current: currentPage,
               pageSize,
-              total: data.length,
+              total: totalCount,
               onChange: handlePageChange,
             }}
           />

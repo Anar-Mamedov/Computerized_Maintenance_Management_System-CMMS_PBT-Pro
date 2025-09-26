@@ -3,7 +3,7 @@ import { InputNumber } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import { t } from "i18next";
 
-export default function NumberInput({ name1, isRequired, minNumber, maxNumber, readOnly }) {
+export default function NumberInput({ name1, isRequired, minNumber, maxNumber, readOnly, disabled = false }) {
   const {
     control,
     formState: { errors },
@@ -36,6 +36,7 @@ export default function NumberInput({ name1, isRequired, minNumber, maxNumber, r
             status={errors[name1] ? "error" : ""}
             style={{ width: "100%" }}
             readOnly={readOnly ? true : false}
+            disabled={disabled}
             formatter={(value) => {
               if (!value) return "";
               // Convert to string and split at decimal point

@@ -1,418 +1,156 @@
-import React from "react";
-import { Drawer, Typography, Button, Input, Select, DatePicker, TimePicker, Row, Col, Checkbox } from "antd";
-import { Controller, useFormContext } from "react-hook-form";
-import Location from "./components/Location";
-import MakineTipi from "./components/MakineTipi";
-import Kategori from "./components/Kategori";
-import MarkaSelect from "./components/MarkaSelect";
-import ModelSelect from "./components/ModelSelect";
-import MakineDurum from "./components/MakineDurum";
-import MasterMakineTablo from "./components/MasterMakineTablo";
-import MakineTakvimTablo from "./components/MakineTakvimTablo";
-import OperatorSelect from "./components/OperatorSelect";
-import MarkaEkle from "./components/MarkaEkle";
-import ModelEkle from "./components/ModelEkle";
+import React, { useState } from "react";
+import { CiImageOn } from "react-icons/ci";
+import { Typography } from "antd";
 
-const { Text, Link } = Typography;
+import { t } from "i18next";
+import TextInput from "../../../../../../utils/components/Form/TextInput";
+import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
+import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
+import MarkaEkleSelect from "../../../../../../utils/components/MarkaEkleSelect";
+import ModelEkleSelect from "../../../../../../utils/components/ModelEkleSelect";
+import OperatorSelectBox from "../../../../../../utils/components/OperatorSelectBox";
+import MakineTakvimTablo from "../../../../../../utils/components/MakineTakvimTablo";
+import FullDatePicker from "../../../../../../utils/components/FullDatePicker";
+import NumberInput from "../../../../../../utils/components/NumberInput";
+import MakineTablo from "../../../../../../utils/components/Machina/MakineTablo";
+import StatusButtons from "./components/StatusButtons.jsx";
+
+const { Text } = Typography;
 
 export default function MainTabs() {
-  const {
-    control,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useFormContext();
-
-  const handleMinusClick = () => {
-    setValue("masterMakineTanimi", "");
-    setValue("masterMakineID", "");
-  };
-
-  const handleTakvimMinusClick = () => {
-    setValue("makineTakvimTanimi", "");
-    setValue("makineTakvimID", "");
-  };
+  const [isLokasyonModalOpen, setIsLokasyonModalOpen] = useState(false);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        columnGap: "10px",
-        marginBottom: "20px",
-      }}>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          border: "1px solid #80808068",
-          width: "430px",
-          padding: "5px",
-          justifyContent: "center",
-          gap: "5px",
-          alignContent: "flex-start",
-          height: "fit-content",
-        }}>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px", fontWeight: 600 }}>Makine Kodu:</Text>
-          <Controller
-            name="makineKodu"
-            control={control}
-            rules={{ required: "Alan Boş Bırakılamaz!" }}
-            render={({ field, fieldState: { error } }) => (
-              <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%", maxWidth: "300px" }}>
-                <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
-                {error && <div style={{ color: "red" }}>{error.message}</div>}
-              </div>
-            )}
-          />
+    <div className="flex flex-wrap gap-[10px] mb-[10px] box-border">
+      <div className="bg-white p-[10px] border border-[#80808068] rounded-[5px] flex flex-col items-start shadow-[0_2px_8px_rgba(0,0,0,0.08)] w-full max-w-[632px] box-border">
+        <div className="pb-[10px] inline-flex flex-col items-start">
+          <Text className="text-base font-semibold">{t("temelBilgiler")}</Text>
+          <Text type="secondary">{t("makineKimlikVeKonumBilgileri")}</Text>
         </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px", fontWeight: 600 }}>Makine Tanımı:</Text>
-          <Controller
-            name="makineTanimi"
-            control={control}
-            rules={{ required: "Alan Boş Bırakılamaz!" }}
-            render={({ field, fieldState: { error } }) => (
-              <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%", maxWidth: "300px" }}>
-                <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
-                {error && <div style={{ color: "red" }}>{error.message}</div>}
-              </div>
-            )}
-          />
-        </div>
-        <Location />
-        <MakineTipi />
-        <Kategori />
-        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", width: "100%" }}>
-          <MarkaSelect />
-          <MarkaEkle />
-        </div>
+        <div className="flex flex-row flex-wrap w-full gap-[10px]">
+          <div className="flex flex-col items-start w-full max-w-[300px]">
+            <Text type="secondary">
+              {t("makineKodu")}
+              <span className="text-[#c90000]">*</span>
+            </Text>
+            <TextInput name="makineKodu" required={true} />
+          </div>
+          <div className="flex flex-col items-start w-full max-w-[300px]">
+            <Text type="secondary">
+              {t("makineTanimi")}
+              <span className="text-[#c90000]">*</span>
+            </Text>
+            <TextInput name="makineTanimi" required={true} />
+          </div>
+          <div className="flex flex-col items-start w-full max-w-[300px]">
+            <Text type="secondary">
+              {t("lokasyon")}
+              <span className="text-[#c90000]">*</span>
+            </Text>
+            <LokasyonTablo
+              lokasyonFieldName="lokasyon"
+              lokasyonIdFieldName="lokasyonID"
+              isModalVisible={isLokasyonModalOpen}
+              setIsModalVisible={setIsLokasyonModalOpen}
+              isRequired={true}
+            />
+          </div>
+          <div className="flex flex-col items-start w-full max-w-[300px]">
+            <Text type="secondary">
+              {t("makineTipi")}
+              <span className="text-[#c90000]">*</span>
+            </Text>
+            <KodIDSelectbox name1="makineTipi" kodID={32501} isRequired={true} />
+          </div>
+          <div className="flex flex-col items-start w-full max-w-[300px]">
+            <Text type="secondary">{t("kategori")}</Text>
+            <KodIDSelectbox name1="kategori" kodID={32502} isRequired={false} />
+          </div>
 
-        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", width: "100%" }}>
-          <ModelSelect />
-          <ModelEkle />
-        </div>
+          <div className="flex flex-col items-start w-full max-w-[300px]">
+            <Text type="secondary">{t("operator")}</Text>
+            <OperatorSelectBox name1="operator" isRequired={false} />
+          </div>
 
-        <OperatorSelect />
-      </div>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          border: "1px solid #80808068",
-          width: "430px",
-          padding: "5px",
-          justifyContent: "center",
-          gap: "5px",
-          alignContent: "flex-start",
-          height: "fit-content",
-        }}>
-        <MakineDurum />
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Seri No #:</Text>
-          <Controller
-            name="makineSeriNO"
-            control={control}
-            render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Master Makine:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "300px",
-            }}>
-            <Controller
-              name="masterMakineTanimi"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ width: "215px" }}
-                  disabled
-                />
-              )}
-            />
-            <Controller
-              name="masterMakineID"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ display: "none" }}
-                />
-              )}
-            />
-            <MasterMakineTablo
-              onSubmit={(selectedData) => {
-                setValue("masterMakineTanimi", selectedData.definition);
-                setValue("masterMakineID", selectedData.key);
-              }}
-            />
-            <Button onClick={handleMinusClick}> - </Button>
+          <div className="flex flex-col items-start w-full max-w-[300px]">
+            <Text type="secondary">{t("marka")}</Text>
+            <MarkaEkleSelect markaFieldName="marka" markaIdFieldName="markaID" />
           </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Çalışma Takvimi:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "300px",
-            }}>
-            <Controller
-              name="makineTakvimTanimi"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ width: "215px" }}
-                  disabled
-                />
-              )}
-            />
-            <Controller
-              name="makineTakvimID"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ display: "none" }}
-                />
-              )}
-            />
-            <MakineTakvimTablo
-              onSubmit={(selectedData) => {
-                setValue("makineTakvimTanimi", selectedData.subject);
-                setValue("makineTakvimID", selectedData.key);
-              }}
-            />
-            <Button onClick={handleTakvimMinusClick}> - </Button>
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Üretici:</Text>
-          <Controller
-            name="uretici"
-            control={control}
-            render={({ field }) => <Input {...field} style={{ width: "300px" }} />}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Üretim Yılı:</Text>
-          <Controller
-            name="uretimYili"
-            control={control}
-            render={({ field: { onChange, ...restField } }) => (
-              <Input
-                {...restField}
-                style={{ width: "300px" }}
-                onChange={(e) => {
-                  // Sadece sayısal girişe izin ver ve maksimum 4 karakter sınırlaması koy
-                  const numericValue = e.target.value.replace(/[^0-9]/g, "").slice(0, 4);
-                  onChange(numericValue);
-                }}
-              />
-            )}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Garanti Bitiş Tarihi:</Text>
-          <Controller
-            name="makineGarantiBitisTarihi"
-            control={control}
-            render={({ field }) => (
-              <DatePicker {...field} style={{ width: "200px" }} format="DD-MM-YYYY" placeholder="Tarih seçiniz" />
-            )}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Duruş Birim Maliyeti:</Text>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", alignItems: "center", width: "200px" }}>
-            <Controller
-              name="makineDurusBirimMaliyeti"
-              control={control}
-              render={({ field }) => <Input {...field} style={{ width: "150px" }} />}
-            />
-            <Text style={{ fontSize: "12px" }}>(tl/saat)</Text>
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Plan. Çalışma Süresi:</Text>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", alignItems: "center", width: "200px" }}>
-            <Controller
-              name="makinePlanCalismaSuresi"
-              control={control}
-              render={({ field }) => <Input {...field} style={{ width: "140px" }} />}
-            />
-            <Text style={{ fontSize: "12px" }}>(saat/yıl)</Text>
+
+          <div className="flex flex-col items-start w-full max-w-[300px]">
+            <Text type="secondary">{t("model")}</Text>
+            <ModelEkleSelect modelFieldName="model" modelIdFieldName="modelID" markaIdFieldName="markaID" />
           </div>
         </div>
       </div>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          flexDirection: "column",
-          border: "1px solid #80808068",
-          width: "fit-content",
-          padding: "5px",
-          justifyContent: "flex-start",
-          gap: "15px",
-          alignContent: "flex-start",
-          height: "fit-content",
-        }}>
-        <Controller
-          name="makineAktif"
-          control={control}
-          defaultValue={true} // or true if you want it checked by default
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Aktif
-            </Checkbox>
-          )}
-        />
-        <Controller
-          name="makineKalibrasyon"
-          control={control}
-          defaultValue={false} // or true if you want it checked by default
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Kalibrasyon Var
-            </Checkbox>
-          )}
-        />
-        <Controller
-          name="kritikMakine"
-          control={control}
-          defaultValue={false} // or true if you want it checked by default
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Kritik Makine
-            </Checkbox>
-          )}
-        />
-        <Controller
-          name="makineGucKaynagi"
-          control={control}
-          defaultValue={false} // or true if you want it checked by default
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Güç Kaynağı
-            </Checkbox>
-          )}
-        />
-        <Controller
-          name="makineIsBildirimi"
-          control={control}
-          defaultValue={false} // or true if you want it checked by default
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              İş Bildirimi
-            </Checkbox>
-          )}
-        />
-        {/* <Controller
-          name="makineYakitKullanim"
-          control={control}
-          defaultValue={false} // or true if you want it checked by default
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Yakıt Kullanım
-            </Checkbox>
-          )}
-        /> */}
-        {/* <Controller
-          name="makineOtonomBakim"
-          control={control}
-          defaultValue={false} // or true if you want it checked by default
-          render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Otonom Bakım
-            </Checkbox>
-          )}
-        /> */}
+
+      <div className="bg-white p-[10px] border border-[#80808068] rounded-[5px] flex flex-col items-start shadow-[0_2px_8px_rgba(0,0,0,0.08)] w-full max-w-[495px] box-border">
+        <div className="pb-[10px] inline-flex flex-col items-start">
+          <Text className="text-base font-semibold">{t("makineGorseli")}</Text>
+          <Text type="secondary">{t("buMakineyeOzelFotograflariInceleyin")}</Text>
+        </div>
+        <div className="flex flex-row flex-wrap w-full gap-[10px]">
+          <div className="w-full min-h-[180px] border-2 border-dashed border-[#d9d9d9] rounded-[6px] flex items-center justify-center bg-[#fafafa]">
+            <div className="flex flex-col items-center gap-[8px]">
+              <CiImageOn className="text-[28px] text-[#bfbfbf]" />
+              <Text type="secondary">{t("resimBulunamadi")}</Text>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="bg-white p-[10px] border border-[#80808068] rounded-[5px] flex flex-col items-start shadow-[0_2px_8px_rgba(0,0,0,0.08)] w-full max-w-[632px] box-border">
+        <div className="pb-[10px] inline-flex flex-col items-start">
+          <Text className="text-base font-semibold">{t("operasyon&Maliyet")}</Text>
+          <Text type="secondary">{t("durumSeriNoVeMaliyetParametreleri")}</Text>
+        </div>
+        <div className="flex flex-row flex-wrap w-full gap-[10px]">
+          <div className="flex flex-col items-start w-full max-w-[300px]">
+            <Text type="secondary">{t("durum")}</Text>
+            <KodIDSelectbox name1="operasyonDurumu" kodID={32505} isRequired={false} />
+          </div>
+          <div className="flex flex-col items-start w-full max-w-[300px]">
+            <Text type="secondary">{t("seriNo")}</Text>
+            <TextInput name="seriNo" required={false} />
+          </div>
+          <div className="flex flex-col items-start w-full max-w-[300px]">
+            <Text type="secondary">{t("masterMakine")}</Text>
+            <MakineTablo makineFieldName="masterMakine" makineIdFieldName="masterMakineID" />
+          </div>
+          <div className="flex flex-col items-start w-full max-w-[300px]">
+            <Text type="secondary">{t("takvim")}</Text>
+            <MakineTakvimTablo fieldName="takvim" fieldNameID="takvimID" />
+          </div>
+          <div className="flex flex-col items-start w-full max-w-[300px]">
+            <Text type="secondary">{t("uretici")}</Text>
+            <TextInput name="uretici" required={false} />
+          </div>
+          <div className="flex flex-col items-start w-full max-w-[300px]">
+            <Text type="secondary">{t("uretimYili")}</Text>
+            <FullDatePicker name1="uretimYili" isRequired={false} pickType="year" />
+          </div>
+          <div className="flex flex-col items-start w-full max-w-[300px]">
+            <Text type="secondary">{t("garantiBitisTarihi")}</Text>
+            <FullDatePicker name1="garantiBitisTarihi" isRequired={false} />
+          </div>
+          <div className="flex flex-col items-start w-full max-w-[300px]">
+            <Text type="secondary">{t("durusBirimMaliyeti(ucret/saat)")}</Text>
+            <NumberInput name1="durusBirimMaliyeti" required={false} minNumber={0} />
+          </div>
+          <div className="flex flex-col items-start w-full max-w-[300px]">
+            <Text type="secondary">{t("planCalismaSuresi(saat/yil)")}</Text>
+            <NumberInput name1="planCalismaSuresi" required={false} minNumber={0} />
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white p-[10px] border border-[#80808068] rounded-[5px] flex flex-col items-start shadow-[0_2px_8px_rgba(0,0,0,0.08)] w-full max-w-[495px] box-border">
+        <div className="pb-[10px] inline-flex flex-col items-start">
+          <Text className="text-base font-semibold">{t("durum&Ozellikler")}</Text>
+          <Text type="secondary">{t("isaretlenebilirNitelikler")}</Text>
+        </div>
+        <div className="flex flex-row flex-wrap w-full gap-[10px]">
+          <StatusButtons />
+        </div>
       </div>
     </div>
   );

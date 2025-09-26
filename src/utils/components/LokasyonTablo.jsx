@@ -3,9 +3,18 @@ import { Button, Modal, Table, Input, message } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import { SearchOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../api/http";
-import styled from "styled-components";
+import PropTypes from "prop-types";
+import { t } from "i18next";
 
-export default function LokasyonTablo({ workshopSelectedId, onSubmit, onClear, disabled, lokasyonFieldName = "lokasyonTanim", lokasyonIdFieldName = "lokasyonID" }) {
+export default function LokasyonTablo({
+  workshopSelectedId,
+  onSubmit,
+  onClear,
+  disabled,
+  lokasyonFieldName = "lokasyonTanim",
+  lokasyonIdFieldName = "lokasyonID",
+  isRequired = false,
+}) {
   const {
     control,
     watch,
@@ -73,7 +82,7 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit, onClear, d
     return str.replace(/İ/g, "i").replace(/I/g, "ı").toLowerCase();
   };
 
-  const filterTree = (nodeList, searchTerm, path = []) => {
+  const filterTree = useCallback((nodeList, searchTerm, path = []) => {
     let isMatchFound = false;
     let expandedKeys = [];
 
@@ -104,7 +113,7 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit, onClear, d
       .filter((node) => node !== null);
 
     return { filtered, isMatch: isMatchFound, expandedKeys };
-  };
+  }, []);
 
   useEffect(() => {
     const timerId = setTimeout(() => {
@@ -123,7 +132,7 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit, onClear, d
       setFilteredData(treeData);
       setExpandedRowKeys([]);
     }
-  }, [debouncedSearchTerm, treeData]);
+  }, [debouncedSearchTerm, treeData, filterTree]);
 
   const onTableRowExpand = (expanded, record) => {
     const keys = expanded ? [...expandedRowKeys, record.key] : expandedRowKeys.filter((k) => k !== record.key);
@@ -216,6 +225,7 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit, onClear, d
         <Controller
           name={lokasyonFieldName}
           control={control}
+          rules={{ required: isRequired ? t("alanBosBirakilamaz") : false }}
           render={({ field }) => (
             <Input
               {...field}
@@ -226,6 +236,7 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit, onClear, d
             />
           )}
         />
+
         <Controller
           name={lokasyonIdFieldName}
           control={control}
@@ -244,6 +255,7 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit, onClear, d
           <Button onClick={handleLokasyonMinusClick}> - </Button>
         </div>
       </div>
+      {errors[lokasyonFieldName] && <div style={{ color: "red", marginTop: "5px" }}>{errors[lokasyonFieldName].message}</div>}
 
       <Modal width="1200px" title="Lokasyon" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <Input
@@ -269,3 +281,13 @@ export default function LokasyonTablo({ workshopSelectedId, onSubmit, onClear, d
     </div>
   );
 }
+
+LokasyonTablo.propTypes = {
+  workshopSelectedId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  onSubmit: PropTypes.func,
+  onClear: PropTypes.func,
+  disabled: PropTypes.bool,
+  lokasyonFieldName: PropTypes.string,
+  lokasyonIdFieldName: PropTypes.string,
+  isRequired: PropTypes.bool,
+};

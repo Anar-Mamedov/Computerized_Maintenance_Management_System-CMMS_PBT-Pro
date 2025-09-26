@@ -29,7 +29,7 @@ const StyledDiv = styled.div`
   }
 `;
 
-export default function KodIDSelectbox({ name1, kodID, isRequired }) {
+export default function KodIDSelectbox({ name1, kodID, isRequired, disabled = false }) {
   const {
     control,
     watch,
@@ -116,6 +116,7 @@ export default function KodIDSelectbox({ name1, kodID, isRequired }) {
           <StyledSelect
             {...field}
             status={errors[name1] ? "error" : ""}
+            disabled={disabled}
             key={selectKey}
             // style={{ maxWidth: "300px", width: "100%" }}
             showSearch

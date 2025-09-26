@@ -1,29 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Table, Input, Space } from "antd";
+import PropTypes from "prop-types";
+import { Button, Modal, Table, Input, message } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
-import { PlusOutlined, MinusOutlined, SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 import AxiosInstance from "../../api/http";
 
-// Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
-const normalizeText = (text) => {
-  return text
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/ğ/g, "g")
-    .replace(/Ğ/g, "G")
-    .replace(/ü/g, "u")
-    .replace(/Ü/g, "U")
-    .replace(/ş/g, "s")
-    .replace(/Ş/g, "S")
-    .replace(/ı/g, "i")
-    .replace(/İ/g, "I")
-    .replace(/ö/g, "o")
-    .replace(/Ö/g, "O")
-    .replace(/ç/g, "c")
-    .replace(/Ç/g, "C");
-};
-
-const FirmaTablo = ({ workshopSelectedId, onSubmit, disabled }) => {
+const FirmaTablo = ({ workshopSelectedId, onSubmit, onClear, disabled, firmaFieldName = "firma", firmaIdFieldName = "firmaID" }) => {
+  const { t } = useTranslation();
   const {
     control,
     setValue,
@@ -37,12 +21,13 @@ const FirmaTablo = ({ workshopSelectedId, onSubmit, disabled }) => {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(0);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
   // Tablo kolonları
   const columns = [
     {
-      title: "Firma Kodu",
+      title: t("company.code", { defaultValue: "Firma Kodu" }),
       dataIndex: "CAR_KOD",
       key: "CAR_KOD",
       width: 150,
@@ -60,7 +45,7 @@ const FirmaTablo = ({ workshopSelectedId, onSubmit, disabled }) => {
       ),
     },
     {
-      title: "Firma Ünvanı",
+      title: t("company.title", { defaultValue: "Firma Ünvanı" }),
       dataIndex: "CAR_TANIM",
       key: "CAR_TANIM",
       width: 350,
@@ -78,7 +63,7 @@ const FirmaTablo = ({ workshopSelectedId, onSubmit, disabled }) => {
       ),
     },
     {
-      title: "Firma Tipi",
+      title: t("company.type", { defaultValue: "Firma Tipi" }),
       dataIndex: "CAR_TIP",
       key: "CAR_TIP",
       width: 150,
@@ -96,7 +81,7 @@ const FirmaTablo = ({ workshopSelectedId, onSubmit, disabled }) => {
       ),
     },
     {
-      title: "Lokasyon",
+      title: t("company.location", { defaultValue: "Lokasyon" }),
       dataIndex: "CAR_LOKASYON",
       key: "CAR_LOKASYON",
       width: 150,
@@ -114,7 +99,7 @@ const FirmaTablo = ({ workshopSelectedId, onSubmit, disabled }) => {
       ),
     },
     {
-      title: "Şehir",
+      title: t("company.city", { defaultValue: "Şehir" }),
       dataIndex: "CAR_SEHIR",
       key: "CAR_SEHIR",
       width: 150,
@@ -136,26 +121,34 @@ const FirmaTablo = ({ workshopSelectedId, onSubmit, disabled }) => {
   // Veri çekme fonksiyonu
   const fetchData = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get(`GetFirmaList?pagingDeger=${currentPage}&search=${searchValue}`)
+    AxiosInstance.get(`GetFirmaList?pagingDeger=${currentPage}&search=${debouncedSearchTerm}`)
       .then((response) => {
-        setPageSize(response.pageSize);
-        const fetchedData = response.Firma_Liste.map((item) => ({
+        const pageSz = response?.pageSize ?? 0;
+        const list = Array.isArray(response?.Firma_Liste) ? response.Firma_Liste : [];
+        setPageSize(pageSz);
+        const fetchedData = list.map((item) => ({
           ...item,
           key: item.TB_CARI_ID,
         }));
         setData(fetchedData);
       })
       .catch((error) => {
-        console.error("Error fetching data:", error);
+        if (navigator.onLine) {
+          message.error("Hata Mesajı: " + error.message);
+        } else {
+          message.error("Internet Bağlantısı Mevcut Değil.");
+        }
       })
       .finally(() => setLoading(false));
-  }, [searchValue, currentPage]);
+  }, [debouncedSearchTerm, currentPage]);
 
-  // Arama işlemi
-  const handleSearch = () => {
-    setCurrentPage(1);
-    fetchData();
-  };
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   // Modal açma kapama
   const handleModalToggle = () => {
@@ -167,25 +160,32 @@ const FirmaTablo = ({ workshopSelectedId, onSubmit, disabled }) => {
     if (isModalVisible) {
       fetchData();
     } else {
-      setSearchValue("");
+      setSearchTerm("");
+      setDebouncedSearchTerm("");
       setCurrentPage(1);
       setSelectedRowKeys([]);
     }
-  }, [isModalVisible]);
+  }, [isModalVisible, fetchData]);
+
+  // Fetch when debounced search changes or page changes while modal is open
+  useEffect(() => {
+    if (isModalVisible) {
+      fetchData();
+    }
+  }, [debouncedSearchTerm, currentPage, isModalVisible, fetchData]);
 
   // Sayfa değişikliğinde veri çekme
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    fetchData();
   };
 
   // Modal onay işlemi
   const handleModalOk = () => {
     const selectedData = data.find((item) => item.key === selectedRowKeys[0]);
     if (selectedData) {
-      setValue("firma", selectedData.CAR_TANIM);
-      setValue("firmaID", selectedData.key);
-      onSubmit && onSubmit(selectedData);
+      setValue(firmaFieldName, selectedData.CAR_TANIM);
+      setValue(firmaIdFieldName, selectedData.key);
+      onSubmit?.(selectedData);
     }
     setIsModalVisible(false);
   };
@@ -202,81 +202,65 @@ const FirmaTablo = ({ workshopSelectedId, onSubmit, disabled }) => {
 
   // Firma seçimini temizleme
   const handleMinusClick = () => {
-    setValue("firma", "");
-    setValue("firmaID", "");
+    setValue(firmaFieldName, "");
+    setValue(firmaIdFieldName, "");
+    onClear && onClear();
   };
 
   return (
     <div style={{ width: "100%" }}>
       <div style={{ display: "flex", gap: "5px", width: "100%" }}>
         <Controller
-          name="firma"
+          name={firmaFieldName}
           control={control}
-          render={({ field }) => (
-            <Input
-              {...field}
-              status={errors.firma ? "error" : ""}
-              type="text" // Set the type to "text" for name input
-              style={{ width: "100%", maxWidth: "630px" }}
-              disabled
-            />
-          )}
+          render={({ field }) => <Input {...field} status={errors[firmaFieldName] ? "error" : ""} type="text" style={{ width: "100%", maxWidth: "630px" }} disabled />}
         />
-        <Controller
-          name="firmaID"
-          control={control}
-          render={({ field }) => (
-            <Input
-              {...field}
-              type="text" // Set the type to "text" for name input
-              style={{ display: "none" }}
-            />
-          )}
-        />
+        <Controller name={firmaIdFieldName} control={control} render={({ field }) => <Input {...field} type="text" style={{ display: "none" }} />} />
         <div style={{ display: "flex", gap: "5px" }}>
           <Button disabled={disabled} onClick={handleModalToggle}>
             +
           </Button>
-          <Button onClick={handleMinusClick}> - </Button>
+          <Button onClick={handleMinusClick}>-</Button>
         </div>
       </div>
 
-      <Modal title="Firma Tanımları" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle} width={1200} centered>
-        <Space direction="vertical" style={{ width: "100%" }}>
-          <Space.Compact style={{ width: "300px", marginBottom: "15px" }}>
-            <Input
-              placeholder="Ara..."
-              value={searchValue}
-              onChange={(e) => {
-                setSearchValue(e.target.value);
-              }}
-              onPressEnter={handleSearch}
-              allowClear
-            />
-            <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
-              Ara
-            </Button>
-          </Space.Compact>
-          <Table
-            rowSelection={{
-              type: "radio",
-              selectedRowKeys,
-              onChange: onRowSelectChange,
-            }}
-            columns={columns}
-            dataSource={data}
-            loading={loading}
-            pagination={{
-              position: ["bottomRight"],
-              current: currentPage,
-              total: pageSize * 10,
-              onChange: handlePageChange,
-            }}
-          />
-        </Space>
+      <Modal title={t("company.titleModal", { defaultValue: "Firma Tanımları" })} open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle} width={1200} centered>
+        <Input
+          style={{ width: "300px", marginBottom: "15px" }}
+          placeholder={t("search.placeholder", { defaultValue: "Ara..." })}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          allowClear
+          prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
+        />
+        <Table
+          rowSelection={{
+            type: "radio",
+            selectedRowKeys,
+            onChange: onRowSelectChange,
+          }}
+          columns={columns}
+          dataSource={data}
+          loading={loading}
+          pagination={{
+            position: ["bottomRight"],
+            current: currentPage,
+            total: pageSize * 10,
+            onChange: handlePageChange,
+          }}
+        />
       </Modal>
     </div>
   );
+};
+
+FirmaTablo.propTypes = {
+  workshopSelectedId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  onSubmit: PropTypes.func,
+  onClear: PropTypes.func,
+  disabled: PropTypes.bool,
+  firmaFieldName: PropTypes.string,
+  firmaIdFieldName: PropTypes.string,
 };
 
 export default FirmaTablo;

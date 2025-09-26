@@ -7,6 +7,7 @@ import TarihceTablo from "./components/TarihceTablo";
 import Kapat from "./components/Kapat/Kapat";
 import Iptal from "./components/Iptal/Iptal";
 import Ac from "./components/Ac/Ac";
+import GirisFisleri from "../../../../Malzeme&DepoYonetimi/GirisFisleri/Insert/CreateDrawer";
 
 const { Text } = Typography;
 
@@ -49,6 +50,7 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
       <div style={{ marginTop: 10 }}>
         <TarihceTablo {...commonProps} />
       </div>
+      {selectedRows.length === 1 && <GirisFisleri selectedRows={selectedRows} numarator={true} siparisID={selectedRows[0].key} />}
     </div>
   );
 
