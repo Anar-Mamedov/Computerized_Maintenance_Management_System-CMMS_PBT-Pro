@@ -580,22 +580,8 @@ function FisIcerigi({ modalOpen, disabled }) {
       dataIndex: "talepMiktar",
       key: "talepMiktar",
       width: 100,
-      editable: true,
+      editable: !disabled,
       inputType: "number",
-      render: (text, record, index) => (
-        <Controller
-          name={`fisIcerigi.${index}.talepMiktar`}
-          control={control}
-          defaultValue={text}
-          render={({ field }) => (
-            <InputNumber
-              {...field}
-              style={{ width: "100%" }}
-              disabled={disabled} // 🔥 burası
-            />
-          )}
-        />
-      ),
     },
     {
       title: "Birim",

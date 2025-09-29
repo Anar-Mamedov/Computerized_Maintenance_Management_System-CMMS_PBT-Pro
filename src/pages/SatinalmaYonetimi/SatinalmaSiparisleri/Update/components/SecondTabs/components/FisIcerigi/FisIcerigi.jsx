@@ -518,223 +518,96 @@ function FisIcerigi({ modalOpen, disabled }) {
       dataIndex: "miktar",
       key: "miktar",
       width: 100,
-      editable: true,
+      editable: !disabled,
       inputType: "number",
-      render: (text, record, index) => (
-        <InputNumber
-          value={text}
-          disabled={disabled}
-          style={{ width: "100%" }}
-        />
-      ),
     },
     {
       title: "Gelen",
       dataIndex: "gelen",
       key: "gelen",
       width: 100,
-      editable: true,
+      editable: false,
       inputType: "number",
-      render: (text, record, index) => (
-        <InputNumber
-          value={text}
-          disabled={disabled}
-          style={{ width: "100%" }}
-        />
-      ),
     },
     {
       title: "Kalan",
       dataIndex: "kalan",
       key: "kalan",
       width: 100,
-      editable: true,
+      editable: false,
       inputType: "number",
-      render: (text, record, index) => (
-        <InputNumber
-          value={text}
-          disabled={disabled}
-          style={{ width: "100%" }}
-        />
-      ),
     },
     {
       title: "Birim",
       dataIndex: "birimName",
       key: "birimName",
       width: 100,
-      editable: true,
-      inputType: "number",
-      render: (text, record, index) => (
-        <InputNumber
-          value={text}
-          disabled={disabled}
-          style={{ width: "100%" }}
-        />
-      ),
+      editable: false,
     },
     {
       title: "Birim Fiyat",
       dataIndex: "birimFiyat",
       key: "birimFiyat",
       width: 120,
-      editable: true,
+      editable: !disabled,
       inputType: "number",
-      render: (text, record) => (
-        <InputNumber
-          value={text}
-          disabled={disabled} // inputu disable yapar
-          style={{ width: "100%" }}
-          formatter={(value) =>
-            Number(value).toLocaleString(localStorage.getItem("i18nextLng"), {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })
-          }
-        />
-      ),
-    },
-    {
-      title: "Ara Toplam",
-      dataIndex: "araToplam",
-      key: "araToplam",
-      width: 120,
-      editable: true,
-      inputType: "number",
-      render: (text, record) => (
-        <InputNumber
-          value={text}
-          disabled={disabled} // inputu disable yapar
-          style={{ width: "100%" }}
-          formatter={(value) =>
-            Number(value).toLocaleString(localStorage.getItem("i18nextLng"), {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })
-          }
-        />
-      ),
     },
     {
       title: "İndirim %",
       dataIndex: "indirimOran",
       key: "indirimOran",
       width: 120,
-      editable: true,
+      editable: !disabled,
       inputType: "number",
-      render: (text, record) => (
-        <InputNumber
-          value={text}
-          disabled={disabled} // inputu disable yapar
-          style={{ width: "100%" }}
-          formatter={(value) =>
-            Number(value).toLocaleString(localStorage.getItem("i18nextLng"), {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })
-          }
-        />
-      ),
     },
     {
       title: "İndirim Tutarı",
       dataIndex: "indirimTutar",
       key: "indirimTutar",
       width: 120,
-      editable: true,
+      editable: false,
       inputType: "number",
-      render: (text, record) => (
-        <InputNumber
-          value={text}
-          disabled={disabled} // inputu disable yapar
-          style={{ width: "100%" }}
-          formatter={(value) =>
-            Number(value).toLocaleString(localStorage.getItem("i18nextLng"), {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })
-          }
-        />
-      ),
     },
     {
       title: "KDV %",
       dataIndex: "kdvOran",
       key: "kdvOran",
       width: 120,
-      editable: true,
+      editable: !disabled,
       inputType: "number",
-      render: (text, record) => (
-        <InputNumber
-          value={text}
-          disabled={disabled} // inputu disable yapar
-          style={{ width: "100%" }}
-          formatter={(value) =>
-            Number(value).toLocaleString(localStorage.getItem("i18nextLng"), {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })
-          }
-        />
-      ),
     },
     {
       title: "KDV Tutarı",
       dataIndex: "kdvTutar",
       key: "kdvTutar",
       width: 120,
-      editable: true,
+      editable: false,
       inputType: "number",
-      render: (text, record) => (
-        <InputNumber
-          value={text}
-          disabled={disabled} // inputu disable yapar
-          style={{ width: "100%" }}
-          formatter={(value) =>
-            Number(value).toLocaleString(localStorage.getItem("i18nextLng"), {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })
-          }
-        />
-      ),
+    },
+    {
+      title: "Ara Toplam",
+      dataIndex: "araToplam",
+      key: "araToplam",
+      width: 120,
+      editable: false,
+      inputType: "number",
     },
     {
       title: "Toplam",
       dataIndex: "toplam",
       key: "toplam",
       width: 120,
-      editable: true,
+      editable: false,
       inputType: "number",
-      render: (text, record) => (
-        <InputNumber
-          value={text}
-          disabled={disabled} // inputu disable yapar
-          style={{ width: "100%" }}
-          formatter={(value) =>
-            Number(value).toLocaleString(localStorage.getItem("i18nextLng"), {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })
-          }
-        />
-      ),
     },
     {
       title: "Açıklama",
       dataIndex: "aciklama",
       key: "aciklama",
       width: 200,
-      editable: true,
+      editable: !disabled,
       inputType: "text",
       ellipsis: true,
-      render: (text, record) => (
-        <Input
-          value={text}
-          disabled={disabled} // inputu disable yapar
-          style={{ width: "100%" }}
-        />
-      ),
     },
     {
       title: "İşlemler",

@@ -531,7 +531,7 @@ function FisIcerigi({ modalOpen }) {
       dataIndex: "gelen",
       key: "gelen",
       width: 100,
-      editable: true,
+      editable: false,
       inputType: "number",
     },
     {
@@ -539,7 +539,7 @@ function FisIcerigi({ modalOpen }) {
       dataIndex: "kalan",
       key: "kalan",
       width: 100,
-      editable: true,
+      editable: false,
       inputType: "number",
     },
     {
@@ -556,19 +556,6 @@ function FisIcerigi({ modalOpen }) {
       key: "birimFiyat",
       width: 120,
       editable: true,
-      inputType: "number",
-      render: (text, record) => (
-        <div className="">
-          <span>{Number(text).toLocaleString(localStorage.getItem("i18nextLng"), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-        </div>
-      ),
-    },
-    {
-      title: "Ara Toplam",
-      dataIndex: "araToplam",
-      key: "araToplam",
-      width: 120,
-      editable: false,
       inputType: "number",
       render: (text, record) => (
         <div className="">
@@ -594,7 +581,7 @@ function FisIcerigi({ modalOpen }) {
       dataIndex: "indirimTutar",
       key: "indirimTutar",
       width: 120,
-      editable: true,
+      editable: false,
       inputType: "number",
       render: (text, record) => (
         <div className="">
@@ -607,7 +594,7 @@ function FisIcerigi({ modalOpen }) {
       dataIndex: "kdvOran",
       key: "kdvOran",
       width: 80,
-      editable: false,
+      editable: true,
       inputType: "number",
       render: (text, record) => (
         <div className="">
@@ -619,6 +606,19 @@ function FisIcerigi({ modalOpen }) {
       title: "KDV Tutarı",
       dataIndex: "kdvTutar",
       key: "kdvTutar",
+      width: 120,
+      editable: false,
+      inputType: "number",
+      render: (text, record) => (
+        <div className="">
+          <span>{Number(text).toLocaleString(localStorage.getItem("i18nextLng"), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+        </div>
+      ),
+    },
+    {
+      title: "Ara Toplam",
+      dataIndex: "araToplam",
+      key: "araToplam",
       width: 120,
       editable: false,
       inputType: "number",
