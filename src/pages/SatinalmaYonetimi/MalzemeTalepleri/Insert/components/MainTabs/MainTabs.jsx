@@ -438,17 +438,17 @@ export default function MainTabs({ modalOpen }) {
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "300px" }}>
         <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
           <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "400px",
-            gap: "10px",
-            flexDirection: "row",
-          }}
-        >
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+              maxWidth: "400px",
+              gap: "10px",
+              flexDirection: "row",
+            }}
+          >
           <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("Talep Eden")} <div style={{ color: "red" }}>*</div> </Text>
           <div
             style={{
@@ -464,27 +464,31 @@ export default function MainTabs({ modalOpen }) {
               control={control}
               rules={{ required: t("alanBosBirakilamaz") }}
               render={({ field, fieldState }) => (
-                <div style={{ width: "100%", maxWidth: "200px" }}>
-                  <PersonelTablo 
-                    onSubmit={(selectedData) => {
-                    setValue("lokasyonName", selectedData.PRS_LOKASYON);
-                    setValue("lokasyonID", selectedData.PRS_LOKASYON_ID);
-                    setValue("atolyeTanim", selectedData.PRS_ATOLYE);
-                    setValue("atolyeID", selectedData.PRS_ATOLYE_ID);
-                    }}
-                    selectedId={watch("talepEdenPersonelId")}
-                    nameField="talepEden"
-                    idField="talepEdenPersonelId"
-                  />
-                {fieldState.error && (
-                  <span style={{ color: "red", fontSize: "12px" }}>
-                    {fieldState.error.message}
-                  </span>
+              <div style={{ width: "100%", maxWidth: "200px" }}>
+                <PersonelTablo
+                  onSubmit={(selectedData) => {
+                  // Burada zorunlu olan alanı güncelle
+                  field.onChange(selectedData.TB_PERSONEL_ID);
+
+                  // Diğer dependent alanlar
+                  setValue("lokasyonName", selectedData.PRS_LOKASYON, { shouldValidate: true });
+                  setValue("lokasyonID", selectedData.PRS_LOKASYON_ID, { shouldValidate: true });
+                  setValue("atolyeTanim", selectedData.PRS_ATOLYE, { shouldValidate: true });
+                  setValue("atolyeID", selectedData.PRS_ATOLYE_ID, { shouldValidate: true });
+                  }}
+                  selectedId={field.value}
+                  nameField="talepEden"
+                  idField="talepEdenPersonelId"
+                />
+                  {fieldState.error && (
+                    <span style={{ color: "red", fontSize: "12px" }}>
+                      {fieldState.error.message}
+                    </span>
+                  )}
+                </div>
                 )}
+                />
               </div>
-              )}
-            />
-          </div>
           </div>
         </div>
         <div

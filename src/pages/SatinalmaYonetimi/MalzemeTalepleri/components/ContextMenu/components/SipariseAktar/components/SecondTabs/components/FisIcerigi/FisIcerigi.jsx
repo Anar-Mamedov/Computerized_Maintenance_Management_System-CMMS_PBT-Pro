@@ -162,47 +162,45 @@ function FisIcerigi({ modalOpen }) {
 
   // Add useEffect for calculating totals
   useEffect(() => {
-    try {
-      const totals = dataSource.reduce(
-        
-        (acc, item) => {
-          acc.araToplam += Number(item.araToplam) || 0;
-          acc.indirim += Number(item.indirimTutar) || 0;
-          acc.kdvToplam += Number(item.kdvTutar) || 0;
-          acc.genelToplam += Number(item.toplam) || 0;
-          return acc;
-        },
-        {
-          araToplam: 0,
-          indirim: 0,
-          kdvToplam: 0,
-          genelToplam: 0,
+      try {
+        const totals = dataSource.reduce(
+          (acc, item) => {
+            acc.araToplam += Number(item.araToplam) || 0;
+            acc.indirim += Number(item.indirimTutar) || 0;
+            acc.kdvToplam += Number(item.kdvTutar) || 0;
+            acc.genelToplam += Number(item.toplam) || 0;
+            return acc;
+          },
+          {
+            araToplam: 0,
+            indirim: 0,
+            kdvToplam: 0,
+            genelToplam: 0,
+          }
+        );
+  
+        // Update form values with calculated totals
+        setValue("totalAraToplam", totals.araToplam.toFixed(2));
+  
+        // Only update indirim if not manually edited
+        if (!isIndirimManuallyEdited) {
+          setValue("totalIndirim", totals.indirim.toFixed(2));
         }
-      );
-      console.log(totals),
-
-      // Update form values with calculated totals
-      setValue("araToplam", totals.araToplam.toFixed(2));
-
-      // Only update indirim if not manually edited
-      if (!isIndirimManuallyEdited) {
-        setValue("indirimliToplam", totals.indirim.toFixed(2));
+  
+        setValue("totalKdvToplam", totals.kdvToplam.toFixed(2));
+  
+        // If discount was manually edited, recalculate general total
+        if (isIndirimManuallyEdited) {
+          const manualIndirim = parseFloat(getValues("totalIndirim")) || 0;
+          const newGenelToplam = totals.araToplam - manualIndirim + totals.kdvToplam;
+          setValue("totalGenelToplam", newGenelToplam.toFixed(2));
+        } else {
+          setValue("totalGenelToplam", totals.genelToplam.toFixed(2));
+        }
+      } catch (error) {
+        console.error("Error calculating totals:", error);
       }
-
-      setValue("kdvToplam", totals.kdvToplam.toFixed(2));
-
-      // If discount was manually edited, recalculate general total
-      if (isIndirimManuallyEdited) {
-        const manualIndirim = parseFloat(getValues("indirimliToplam")) || 0;
-        const newGenelToplam = totals.araToplam - manualIndirim + totals.kdvToplam;
-        setValue("genelToplam", newGenelToplam.toFixed(2));
-      } else {
-        setValue("genelToplam", totals.genelToplam.toFixed(2));
-      }
-    } catch (error) {
-      console.error("Error calculating totals:", error);
-    }
-  }, [dataSource, setValue, isIndirimManuallyEdited, getValues]);
+    }, [dataSource, setValue, isIndirimManuallyEdited, getValues]);
 
   // Safely update dataSource when fields change
   useEffect(() => {
@@ -337,10 +335,10 @@ function FisIcerigi({ modalOpen }) {
       const round = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
 
       // Check if price has changed
-      const isPriceChanged = item.fiyat !== row.fiyat;
+      const isPriceChanged = item.birimFiyat !== row.birimFiyat;
 
       // Check if discount has changed (either discount rate or amount)
-      const isDiscountChanged = item.indirimOrani !== row.indirimOrani || item.indirimTutar !== row.indirimTutar;
+      const isDiscountChanged = item.indirimOran !== row.indirimOran || item.indirimTutar !== row.indirimTutar;
 
       // If discount was edited in table, reset manual edit flag so table calculations take precedence
       if (isDiscountChanged) {
@@ -349,23 +347,23 @@ function FisIcerigi({ modalOpen }) {
 
       // Calculate totals
       const miktar = Number(row.miktar) || 0;
-      const fiyat = Number(row.fiyat) || 0;
-      const kdvOrani = Number(row.kdvOrani) || 0;
-      const kdvDH = Boolean(row.kdvDahilHaric);
+      const birimFiyat = Number(row.birimFiyat) || 0;
+      const kdvOran = Number(row.kdvOran) || 0;
+      const kdvDH = Boolean(row.kdvDahil);
 
-      // Exception: Always calculate araToplam as miktar * fiyat regardless of kdvDH
-      const araToplam = round(miktar * fiyat);
+      // Exception: Always calculate araToplam as miktar * birimFiyat regardless of kdvDH
+      const araToplam = round(miktar * birimFiyat);
 
-      let indirimOrani = Number(row.indirimOrani) || 0;
+      let indirimOran = Number(row.indirimOran) || 0;
       let indirimTutar = Number(row.indirimTutar) || 0;
 
-      // If indirimOrani was changed
-      if (item.indirimOrani !== row.indirimOrani) {
-        indirimTutar = round((araToplam * indirimOrani) / 100);
+      // If indirimOran was changed
+      if (item.indirimOran !== row.indirimOran) {
+        indirimTutar = round((araToplam * indirimOran) / 100);
       }
       // If indirimTutar was changed
       else if (item.indirimTutar !== row.indirimTutar) {
-        indirimOrani = round((indirimTutar / araToplam) * 100);
+        indirimOran = round((indirimTutar / araToplam) * 100);
       }
 
       // Calculate KDV amount based on kdvDH
@@ -374,11 +372,11 @@ function FisIcerigi({ modalOpen }) {
 
       if (kdvDH) {
         // If KDV is inclusive, calculate KDV portion from the price
-        const baseAmount = round(kdvMatrah / (1 + kdvOrani / 100));
+        const baseAmount = round(kdvMatrah / (1 + kdvOran / 100));
         kdvTutar = round(kdvMatrah - baseAmount);
       } else {
         // If KDV is exclusive, calculate KDV as additional
-        kdvTutar = round(kdvMatrah * (kdvOrani / 100));
+        kdvTutar = round(kdvMatrah * (kdvOran / 100));
       }
 
       // Calculate total
@@ -390,7 +388,7 @@ function FisIcerigi({ modalOpen }) {
         birim: item.birim,
         birimKodId: item.birimKodId,
         araToplam,
-        indirimOrani: round(indirimOrani),
+        indirimOran: round(indirimOran),
         indirimTutar: round(indirimTutar),
         kdvTutar: round(kdvTutar),
         toplam: round(toplam),
@@ -415,94 +413,86 @@ function FisIcerigi({ modalOpen }) {
 
   // Safe handleMalzemeSelect with error handling
   const handleMalzemeSelect = (selectedRows) => {
-    try {
-      // Get existing malzemeIds from the current dataSource
-      const existingMalzemeIds = new Set(dataSource.map((item) => item.stokId));
-
-      // Filter out already existing materials
-      const newRows = selectedRows.filter((row) => !existingMalzemeIds.has(row.TB_STOK_ID));
-
-      // If all selected materials already exist, show a warning
-      if (newRows.length === 0) {
-        message.warning("Seçilen malzemeler zaten tabloda mevcut.");
-        setIsModalVisible(false);
-        return;
-      }
-
-      // If some materials were filtered out, show an info message
-      if (newRows.length < selectedRows.length) {
-        message.info(`${selectedRows.length - newRows.length} malzeme zaten tabloda mevcut olduğu için eklenmedi.`);
-      }
-
-      // Helper function to round to 2 decimal places
-      const round = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
-
-      newRows.forEach((row) => {
-        const miktar = 1;
-        const fiyat = row.STK_CIKIS_FIYAT_DEGERI || 0;
-        const kdvOrani = row.STK_KDV_ORAN || 0;
-        const kdvDH = Boolean(row.STK_KDV_DH);
-
-        // Exception: Always calculate araToplam as miktar * fiyat regardless of kdvDH
-        const araToplam = round(miktar * fiyat);
-        const indirimOrani = 0;
-        const indirimTutar = 0;
-        const kdvMatrah = round(araToplam - indirimTutar);
-
-        let kdvTutar;
-        if (kdvDH) {
-          // If KDV is inclusive, calculate KDV portion from the price
-          const baseAmount = round(kdvMatrah / (1 + kdvOrani / 100));
-          kdvTutar = round(kdvMatrah - baseAmount);
-        } else {
-          // If KDV is exclusive, calculate KDV as additional
-          kdvTutar = round(kdvMatrah * (kdvOrani / 100));
+      try {
+        // Get existing malzemeIds from the current dataSource
+        const existingMalzemeIds = new Set(dataSource.map((item) => item.malzemeId));
+  
+        // Filter out already existing materials
+        const newRows = selectedRows.filter((row) => !existingMalzemeIds.has(row.TB_STOK_ID));
+  
+        // If all selected materials already exist, show a warning
+        if (newRows.length === 0) {
+          message.warning("Seçilen malzemeler zaten tabloda mevcut.");
+          setIsModalVisible(false);
+          return;
         }
-
-        // Calculate total based on kdvDH
-        const toplam = kdvDH ? round(kdvMatrah) : round(kdvMatrah + kdvTutar);
-
-        const newRow = {
-  detayId: 0,
-  siparisId: 0,
-  stokId: row.TB_STOK_ID || 0,
-  malzemeKod: row.STK_KOD,
-  malzemeName: row.STK_TANIM,
-  markaName: row.STK_MARKA,
-  birimName: row.STK_BIRIM,
-  miktar: miktar ?? 0,
-  birimFiyat: row.STK_GIRIS_FIYAT_DEGERI,
-  kdvOran: row.STK_KDV_ORAN ?? 0,
-  kdvTutar: 0,
-  otvOran: row.STK_OTV_ORAN ?? 0,
-  otvTutar: 0,
-  indirimOran: 0,
-  indirimTutar: 0,
-  kdvDahil: "", // veya "EVET", senin senaryoya göre setlenir
-  araToplam: 0,
-  toplam: 0,
-  anaBirimMiktar: miktar ?? 0, // genelde miktar ile aynı olabilir
-  fisGridKonum: 0,
-  birimKodId: row.STK_BIRIM_KOD_ID || 0,
-  talepId: 0,
-  sinifId: 0,
-  teklifFiyatId: 0,
-  girenMiktar: 0,
-  kalanMiktar: miktar ?? 0,
-  alternatifStokId: 0,
-  aciklama: "",
-  isDeleted: false,
-};
-
-        append(newRow);
-      });
-      setIsModalVisible(false);
-    } catch (error) {
-      console.error("Error in handleMalzemeSelect:", error);
-      message.error("Malzeme eklenirken bir hata oluştu.");
-      setIsModalVisible(false);
-    }
-  };
+  
+        // If some materials were filtered out, show an info message
+        if (newRows.length < selectedRows.length) {
+          message.info(`${selectedRows.length - newRows.length} malzeme zaten tabloda mevcut olduğu için eklenmedi.`);
+        }
+  
+        // Helper function to round to 2 decimal places
+        const round = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
+  
+        newRows.forEach((row) => {
+          const miktar = 1;
+          const birimFiyat = row.STK_GIRIS_FIYAT_DEGERI || 0;
+          const kdvOran = row.STK_KDV_ORAN || 0;
+          const kdvDH = Boolean(row.STK_KDV_DH);
+  
+          // Exception: Always calculate araToplam as miktar * birimFiyat regardless of kdvDH
+          const araToplam = round(miktar * birimFiyat);
+          const indirimOran = 0;
+          const indirimTutar = 0;
+          const kdvMatrah = round(araToplam - indirimTutar);
+  
+          let kdvTutar;
+          if (kdvDH) {
+            // If KDV is inclusive, calculate KDV portion from the price
+            const baseAmount = round(kdvMatrah / (1 + kdvOran / 100));
+            kdvTutar = round(kdvMatrah - baseAmount);
+          } else {
+            // If KDV is exclusive, calculate KDV as additional
+            kdvTutar = round(kdvMatrah * (kdvOran / 100));
+          }
+  
+          // Calculate total based on kdvDH
+          const toplam = kdvDH ? round(kdvMatrah) : round(kdvMatrah + kdvTutar);
+  
+          const newRow = {
+            detayId: 0,
+            siparisId: 0, // Generate unique ID
+            stokId: row.TB_STOK_ID,
+            birimKodId: row.STK_BIRIM_KOD_ID || -1,
+            stokKod: row.STK_KOD,
+            stokName: row.STK_TANIM,
+            markaName: row.STK_MARKA,
+            miktar,
+            birimName: row.STK_BIRIM,
+            birimFiyat,
+            araToplam,
+            indirimOran,
+            indirimTutar,
+            kdvOran,
+            kdvTutar,
+            toplam,
+            malzemeLokasyon: row.STK_LOKASYON || lokasyon || "",
+            malzemeLokasyonID: row.STK_LOKASYON_ID || lokasyonID || null,
+            masrafMerkezi: row.STK_MASRAFMERKEZ || "",
+            masrafMerkeziID: row.STK_MASRAF_MERKEZI_ID || null,
+            aciklama: "",
+          };
+  
+          append(newRow);
+        });
+        setIsModalVisible(false);
+      } catch (error) {
+        console.error("Error in handleMalzemeSelect:", error);
+        message.error("Malzeme eklenirken bir hata oluştu.");
+        setIsModalVisible(false);
+      }
+    };
 
   const components = {
     body: {
@@ -568,16 +558,12 @@ function FisIcerigi({ modalOpen }) {
       dataIndex: "girenMiktar",
       key: "girenMiktar",
       width: 100,
-      editable: true,
-      inputType: "number",
     },
     {
       title: "Kalan",
       dataIndex: "kalanMiktar",
       key: "kalanMiktar",
       width: 100,
-      editable: true,
-      inputType: "number",
     },
     {
       title: "Birim",
@@ -593,9 +579,6 @@ function FisIcerigi({ modalOpen }) {
       key: "birimFiyat",
       width: 100,
       editable: true,
-      render: (text) => (
-        <span>{Number(text ?? 0).toLocaleString(localStorage.getItem("i18nextLng"))}</span>
-      ),
     },
     {
       title: "Kdv (%)",
@@ -716,191 +699,189 @@ function FisIcerigi({ modalOpen }) {
           <Controller name="aciklama" render={({ field }) => <TextArea {...field} rows={4} placeholder="Açıklama" style={{ width: "100%", minHeight: "160px" }} />} />
         </div>
         <div style={{ width: "100%", maxWidth: "400px", display: "flex", flexFlow: "wrap", gap: "10px", flexDirection: "column", alignItems: "flex-start" }}>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "400px",
-              gap: "10px",
-            }}
-          >
-            <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", fontWeight: 600 }}>{t("araToplam")}</Text>
-            <div
-              style={{
-                display: "flex",
-                flexFlow: "column wrap",
-                alignItems: "flex-start",
-                width: "100%",
-                maxWidth: "250px",
-              }}
-            >
-              <Controller
-                name="araToplam"
-                readOnly
-                control={control}
-                render={({ field }) => {
-                  // Determine decimal separator based on language
-                  const language = localStorage.getItem("i18nextLng") || "en";
-                  const decimalSeparator = ["tr", "az"].includes(language) ? "," : ".";
-
-                  return <InputNumber {...field} readOnly style={{ width: "100%" }} decimalSeparator={decimalSeparator} precision={2} />;
-                }}
-              />
-            </div>
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "400px",
-              gap: "10px",
-              flexDirection: "row",
-            }}
-          >
-            <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", fontWeight: 600 }}>{t("indirim")}</Text>
-            <div
-              style={{
-                display: "flex",
-                flexFlow: "column wrap",
-                alignItems: "flex-start",
-                width: "100%",
-                maxWidth: "250px",
-              }}
-            >
-              <Controller
-                name="indirimliToplam"
-                readOnly
-                control={control}
-                render={({ field }) => {
-                  // Determine decimal separator based on language
-                  const language = localStorage.getItem("i18nextLng") || "en";
-                  const decimalSeparator = ["tr", "az"].includes(language) ? "," : ".";
-
-                  return (
-                    <InputNumber
-                      {...field}
-                      style={{ width: "100%" }}
-                      decimalSeparator={decimalSeparator}
-                      precision={2}
-                      onChange={(value) => {
-                        try {
-                          // With InputNumber, value is already a number (or null)
-                          const numValue = value || 0;
-
-                          // Mark as manually edited
-                          setIsIndirimManuallyEdited(true);
-
-                          // Update the indirimliToplam field - store with decimals but display as rounded
-                          field.onChange(numValue.toFixed(2));
-                          setValue("indirimliToplam", numValue.toFixed(2));
-
-                          // Get current values
-                          const araToplam = parseFloat(getValues("araToplam")) || 0;
-                          const kdvToplam = parseFloat(getValues("kdvToplam")) || 0;
-
-                          // Recalculate general total (araToplam - indirim + kdvToplam)
-                          const newGenelToplam = araToplam - numValue + kdvToplam;
-
-                          // Update the general total
-                          setValue("genelToplam", newGenelToplam.toFixed(2));
-                        } catch (error) {
-                          console.error("Error updating discount:", error);
-                        }
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "100%",
+                      maxWidth: "400px",
+                      gap: "10px",
+                    }}
+                  >
+                    <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", fontWeight: 600 }}>{t("araToplam")}</Text>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexFlow: "column wrap",
+                        alignItems: "flex-start",
+                        width: "100%",
+                        maxWidth: "250px",
                       }}
-                    />
-                  );
-                }}
-              />
+                    >
+                      <Controller
+                        name="totalAraToplam"
+                        control={control}
+                        readOnly
+                        render={({ field }) => {
+                          // Determine decimal separator based on language
+                          const language = localStorage.getItem("i18nextLng") || "en";
+                          const decimalSeparator = ["tr", "az"].includes(language) ? "," : ".";
+        
+                          return <InputNumber {...field} readOnly style={{ width: "100%" }} decimalSeparator={decimalSeparator} precision={2} />;
+                        }}
+                      />
+                    </div>
+                  </div>
+        
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "100%",
+                      maxWidth: "400px",
+                      gap: "10px",
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", fontWeight: 600 }}>{t("indirim")}</Text>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexFlow: "column wrap",
+                        alignItems: "flex-start",
+                        width: "100%",
+                        maxWidth: "250px",
+                      }}
+                    >
+                      <Controller
+                        name="totalIndirim"
+                        control={control}
+                        render={({ field }) => {
+                          // Determine decimal separator based on language
+                          const language = localStorage.getItem("i18nextLng") || "en";
+                          const decimalSeparator = ["tr", "az"].includes(language) ? "," : ".";
+        
+                          return (
+                            <InputNumber
+                              {...field}
+                              style={{ width: "100%" }}
+                              decimalSeparator={decimalSeparator}
+                              readOnly
+                              precision={2}
+                              onChange={(value) => {
+                                try {
+                                  // With InputNumber, value is already a number (or null)
+                                  const numValue = value || 0;
+        
+                                  // Mark as manually edited
+                                  setIsIndirimManuallyEdited(true);
+        
+                                  // Update the totalIndirim field - store with decimals but display as rounded
+                                  field.onChange(numValue.toFixed(2));
+                                  setValue("totalIndirim", numValue.toFixed(2));
+        
+                                  // Get current values
+                                  const araToplam = parseFloat(getValues("totalAraToplam")) || 0;
+                                  const kdvToplam = parseFloat(getValues("totalKdvToplam")) || 0;
+        
+                                  // Recalculate general total (araToplam - indirim + kdvToplam)
+                                  const newGenelToplam = araToplam - numValue + kdvToplam;
+        
+                                  // Update the general total
+                                  setValue("totalGenelToplam", newGenelToplam.toFixed(2));
+                                } catch (error) {
+                                  console.error("Error updating discount:", error);
+                                }
+                              }}
+                            />
+                          );
+                        }}
+                      />
+                    </div>
+                  </div>
+        
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "100%",
+                      maxWidth: "400px",
+                      gap: "10px",
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", fontWeight: 600 }}>{t("kdvToplam")}</Text>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexFlow: "column wrap",
+                        alignItems: "flex-start",
+                        width: "100%",
+                        maxWidth: "250px",
+                      }}
+                    >
+                      <Controller
+                        name="totalKdvToplam"
+                        control={control}
+                        render={({ field }) => {
+                          // Determine decimal separator based on language
+                          const language = localStorage.getItem("i18nextLng") || "en";
+                          const decimalSeparator = ["tr", "az"].includes(language) ? "," : ".";
+        
+                          return <InputNumber {...field} readOnly style={{ width: "100%" }} decimalSeparator={decimalSeparator} precision={2} />;
+                        }}
+                      />
+                    </div>
+                  </div>
+        
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "100%",
+                      maxWidth: "400px",
+                      gap: "10px",
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", fontWeight: 600 }}>{t("genelToplam")}</Text>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexFlow: "column wrap",
+                        alignItems: "flex-start",
+                        width: "100%",
+                        maxWidth: "250px",
+                      }}
+                    >
+                      <Controller
+                        name="totalGenelToplam"
+                        control={control}
+                        render={({ field }) => {
+                          // Determine decimal separator based on language
+                          const language = localStorage.getItem("i18nextLng") || "en";
+                          const decimalSeparator = ["tr", "az"].includes(language) ? "," : ".";
+        
+                          return <InputNumber {...field} readOnly style={{ width: "100%" }} decimalSeparator={decimalSeparator} precision={2} />;
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+        
+              <MalzemeSecModal visible={isModalVisible} onCancel={() => setIsModalVisible(false)} onOk={handleMalzemeSelect} />
             </div>
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "400px",
-              gap: "10px",
-              flexDirection: "row",
-            }}
-          >
-            <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", fontWeight: 600 }}>{t("kdvToplam")}</Text>
-            <div
-              style={{
-                display: "flex",
-                flexFlow: "column wrap",
-                alignItems: "flex-start",
-                width: "100%",
-                maxWidth: "250px",
-              }}
-            >
-              <Controller
-                name="kdvToplam"
-                readOnly
-                control={control}
-                render={({ field }) => {
-                  // Determine decimal separator based on language
-                  const language = localStorage.getItem("i18nextLng") || "en";
-                  const decimalSeparator = ["tr", "az"].includes(language) ? "," : ".";
-
-                  return <InputNumber {...field} readOnly style={{ width: "100%" }} decimalSeparator={decimalSeparator} precision={2} />;
-                }}
-              />
-            </div>
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "400px",
-              gap: "10px",
-              flexDirection: "row",
-            }}
-          >
-            <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", fontWeight: 600 }}>{t("genelToplam")}</Text>
-            <div
-              style={{
-                display: "flex",
-                flexFlow: "column wrap",
-                alignItems: "flex-start",
-                width: "100%",
-                maxWidth: "250px",
-              }}
-            >
-              <Controller
-                name="genelToplam"
-                readOnly
-                control={control}
-                render={({ field }) => {
-                  // Determine decimal separator based on language
-                  const language = localStorage.getItem("i18nextLng") || "en";
-                  const decimalSeparator = ["tr", "az"].includes(language) ? "," : ".";
-
-                  return <InputNumber {...field} readOnly style={{ width: "100%" }} decimalSeparator={decimalSeparator} precision={2} />;
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <MalzemeSecModal visible={isModalVisible} onCancel={() => setIsModalVisible(false)} onOk={handleMalzemeSelect} />
-    </div>
-  );
-}
+          );
+        }
 
 export default FisIcerigi;

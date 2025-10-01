@@ -13,6 +13,7 @@ import OnayaGonder from "./components/OnayaGonder";
 import TarihceOnayTablo from "./components/TarihceOnayTablo";
 import OnayGeriAl from "./components/OnayGeriAl";
 import SipariseAktar from "./components/SipariseAktar/EditDrawer";
+//import Teklif from "./components/Teklif/Teklif";
 
 const { Text } = Typography;
 

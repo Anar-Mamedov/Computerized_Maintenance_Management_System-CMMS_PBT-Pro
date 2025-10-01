@@ -581,11 +581,6 @@ function FisIcerigi({ modalOpen }) {
       width: 100,
       editable: true,
       inputType: "number",
-      render: (text, record) => (
-        <div className="">
-          <span>{Number(text).toLocaleString(localStorage.getItem("i18nextLng"))}</span>
-        </div>
-      ),
     },
     {
       title: "Birim",
