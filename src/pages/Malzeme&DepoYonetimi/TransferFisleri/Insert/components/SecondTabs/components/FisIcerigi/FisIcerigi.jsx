@@ -745,7 +745,19 @@ function FisIcerigi({ modalOpen }) {
       width: 100,
       render: (_, record) =>
         dataSource.length >= 1 ? (
-          <Popconfirm title="Silmek istediğinize emin misiniz?" onConfirm={() => remove(dataSource.findIndex((item) => item.id === record.id))}>
+          <Popconfirm
+            title="Silmek istediğinize emin misiniz?"
+            onConfirm={() => {
+              const index = dataSource.findIndex((item) => item.id === record.id);
+              if (index !== -1) {
+                // Remove from both dataSource and form fields
+                const newData = [...dataSource];
+                newData.splice(index, 1);
+                setDataSource(newData);
+                remove(index);
+              }
+            }}
+          >
             <Button type="link" danger>
               Sil
             </Button>
@@ -786,7 +798,7 @@ function FisIcerigi({ modalOpen }) {
         dataSource={dataSource}
         columns={columns}
         pagination={false}
-        rowKey={(record) => record.id || Math.random().toString(36).substr(2, 9)} // Ensure stable keys
+        rowKey={(record) => record.id || Math.random().toString(36).substring(2, 11)} // Ensure stable keys
         scroll={{ y: "calc(100vh - 540px)" }}
       />
       <div style={{ display: "flex", flexFlow: "column wrap", gap: "10px", marginTop: "20px", width: "100%", flexDirection: "row", justifyContent: "space-between" }}>
