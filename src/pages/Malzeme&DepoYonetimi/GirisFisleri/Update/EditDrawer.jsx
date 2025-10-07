@@ -151,6 +151,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
               malzemeLokasyon: movement.lokasyonName,
               aciklama: movement.aciklama,
               isPriceChanged: movement.isPriceChanged || false,
+              isDeleted: false,
             })) || []
           );
 
