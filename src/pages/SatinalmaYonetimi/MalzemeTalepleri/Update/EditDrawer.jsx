@@ -101,6 +101,31 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
         setValue("kdvToplam", item.kdvToplam);
         setValue("genelToplam", item.genelToplam);
         setValue("aciklama", item.aciklama);
+        setValue("ozelAlan1", item.ozelAlan1);
+        setValue("ozelAlan2", item.ozelAlan2);
+        setValue("ozelAlan3", item.ozelAlan3);
+        setValue("ozelAlan4", item.ozelAlan4);
+        setValue("ozelAlan5", item.ozelAlan5);
+        setValue("ozelAlan6", item.ozelAlan6);
+        setValue("ozelAlan7", item.ozelAlan7);
+        setValue("ozelAlan8", item.ozelAlan8);
+        setValue("ozelAlan9", item.ozelAlan9);
+        setValue("ozelAlan10", item.ozelAlan10);
+        setValue("ozelAlanKodId11", item.ozelAlanKodId11);
+        setValue("ozelAlanKodId12", item.ozelAlanKodId12);
+        setValue("ozelAlanKodId13", item.OzelAlankodId13);
+        setValue("ozelAlanKodId14", item.OzelAlankodId14);
+        setValue("ozelAlanKodId15", item.OzelAlankodId15);
+        setValue("ozelAlan11", item.OzelAlan11);
+        setValue("ozelAlan12", item.OzelAlan12);
+        setValue("ozelAlan13", item.OzelAlan13);
+        setValue("ozelAlan14", item.OzelAlan14);
+        setValue("ozelAlan15", item.OzelAlan15);
+        setValue("ozelAlan16", item.OzelAlan16);
+        setValue("ozelAlan17", item.OzelAlan17);
+        setValue("ozelAlan18", item.OzelAlan18);
+        setValue("ozelAlan19", item.OzelAlan19);
+        setValue("ozelAlan20", item.OzelAlan20);
 
         // materialMovements array'ini fisIcerigi olarak set et
         const materialMovements = item.materialMovements?.map((mat) => ({
@@ -235,7 +260,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
       makineId: Number(item.makineId) || -1,
       makineName: item.makineName || "",
       aciklama: item.aciklama || "",
-      isDeleted: item.isDeleted || false,
+      isDeleted: false,
     })) || [],
   };
 

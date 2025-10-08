@@ -50,7 +50,7 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
       <div style={{ marginTop: 10 }}>
         <TarihceTablo {...commonProps} />
       </div>
-      {selectedRows.length === 1 && <GirisFisleri selectedRows={selectedRows} numarator={true} siparisID={selectedRows[0].key} />}
+      {selectedRows.length === 1 && <GirisFisleri selectedRows={selectedRows} numarator={true} siparisID={selectedRows[0].key} onRefresh={refreshTableData} />}
     </div>
   );
 

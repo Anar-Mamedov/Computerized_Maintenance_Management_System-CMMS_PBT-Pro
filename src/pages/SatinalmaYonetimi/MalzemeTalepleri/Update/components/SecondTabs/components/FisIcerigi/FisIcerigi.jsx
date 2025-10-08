@@ -167,7 +167,9 @@ function FisIcerigi({ modalOpen, disabled }) {
   // Add useEffect for calculating totals
   useEffect(() => {
     try {
-      const totals = dataSource.reduce(
+      const totals = dataSource
+        .filter((item) => !item.isDeleted)
+        .reduce(
         (acc, item) => {
           acc.araToplam += Number(item.araToplam) || 0;
           acc.indirim += Number(item.indirimTutari) || 0;
@@ -419,7 +421,7 @@ function FisIcerigi({ modalOpen, disabled }) {
   const handleMalzemeSelect = (selectedRows) => {
     try {
       // Get existing malzemeIds from the current dataSource
-      const existingMalzemeIds = new Set(dataSource.map((item) => item.malzemeId));
+      const existingMalzemeIds = new Set(dataSource.filter((item) => !item.isDeleted).map((item) => item.malzemeId));
 
       // Filter out already existing materials
       const newRows = selectedRows.filter((row) => !existingMalzemeIds.has(row.TB_STOK_ID));
@@ -465,32 +467,32 @@ function FisIcerigi({ modalOpen, disabled }) {
         const toplam = kdvDH ? round(kdvMatrah) : round(kdvMatrah + kdvTutar);
 
         const newRow = {
-  id: Date.now() + Math.random(), // Unique ID, frontend için
-  siraNo: 0,
-  fisId: 0,
-  malzemeKod: row.STK_KOD,
-  malzemeName: row.STK_TANIM,
-  malzemeId: row.TB_STOK_ID,
-  malDurumID: 0,
-  malDurumName: "AÇIK", // isteğe göre formdaki talepDurumName ile de set edilebilir
-  malKarsilamaSekli: "SATINALMA",
-  talepMiktar: miktar || 0,
-  gelenMiktar: 0,
-  kalanMiktar: 0,
-  satinalmaMiktar: 0,
-  iptalMiktar: 0,
-  stokKullanimMiktar: 0,
-  birimKodId: row.STK_BIRIM_KOD_ID,
-  birimName: row.STK_BIRIM,
-  makineId: 0,
-  makineName: "",
-  malzemeLokasyon: row.STK_LOKASYON || lokasyon || "",
-  malzemeLokasyonID: row.STK_LOKASYON_ID || lokasyonID || null,
-  masrafMerkezi: row.STK_MASRAFMERKEZ || "",
-  masrafMerkeziID: row.STK_MASRAF_MERKEZI_ID || null,
-  aciklama: "",
-  isDeleted: false,
-};
+          id: Date.now() + Math.random(), // Unique ID, frontend için
+          siraNo: 0,
+          fisId: 0,
+          malzemeKod: row.STK_KOD,
+          malzemeName: row.STK_TANIM,
+          malzemeId: row.TB_STOK_ID,
+          malDurumID: 0,
+          malDurumName: "AÇIK", // isteğe göre formdaki talepDurumName ile de set edilebilir
+          malKarsilamaSekli: "SATINALMA",
+          talepMiktar: miktar || 0,
+          gelenMiktar: 0,
+          kalanMiktar: 0,
+          satinalmaMiktar: 0,
+          iptalMiktar: 0,
+          stokKullanimMiktar: 0,
+          birimKodId: row.STK_BIRIM_KOD_ID,
+          birimName: row.STK_BIRIM,
+          makineId: 0,
+          makineName: "",
+          malzemeLokasyon: row.STK_LOKASYON || lokasyon || "",
+          malzemeLokasyonID: row.STK_LOKASYON_ID || lokasyonID || null,
+          masrafMerkezi: row.STK_MASRAFMERKEZ || "",
+          masrafMerkeziID: row.STK_MASRAF_MERKEZI_ID || null,
+          aciklama: "",
+          isDeleted: false,
+        };
 
         append(newRow);
       });
@@ -611,39 +613,13 @@ function FisIcerigi({ modalOpen, disabled }) {
       key: "makine",
       width: 200,
       ellipsis: true,
-      render: (text, record, index) => (
+      render: (_, record, index) => (
         <MakineTablo
+          control={control}
+          setValue={setValue}
           disabled={disabled}
-          makineFieldName={`fisIcerigi.${index}.makineTanim`}
-          makineIdFieldName={`fisIcerigi.${index}.makineID`}
-          onSubmit={(selectedData) => {
-            // Update the specific row's masraf merkezi data
-            const newData = [...dataSource];
-            if (newData[index]) {
-              newData[index] = {
-                ...newData[index],
-                makineTanim: selectedData.MKN_KOD,
-                makineID: selectedData.key,
-              };
-              setDataSource(newData);
-
-              // Update form values
-              setValue(`fisIcerigi.${index}.makineTanim`, selectedData.MKN_KOD);
-              setValue(`fisIcerigi.${index}.makineID`, selectedData.key);
-            }
-          }}
-          onClear={() => {
-            // Update the specific row's masraf merkezi data to empty
-            const newData = [...dataSource];
-            if (newData[index]) {
-              newData[index] = {
-                ...newData[index],
-                makineTanim: "",
-                makineID: null,
-              };
-              setDataSource(newData);
-            }
-          }}
+          makineFieldName={`fisIcerigi.${index}.makineName`}
+          makineIdFieldName={`fisIcerigi.${index}.makineId`}
         />
       ),
     },
@@ -718,15 +694,31 @@ function FisIcerigi({ modalOpen, disabled }) {
       title: "İşlemler",
       dataIndex: "operation",
       width: 100,
-      render: (_, record) =>
-        dataSource.length >= 1 ? (
-          <Popconfirm title="Silmek istediğinize emin misiniz?" onConfirm={() => remove(dataSource.findIndex((item) => item.id === record.id))}>
-            <Button type="link" danger disabled={disabled}>
-              Sil
-            </Button>
-          </Popconfirm>
-        ) : null,
-    },
+      render: (_, record) => {
+        dataSource.filter((item) => !item.isDeleted).length >= 1 ? (
+        <Popconfirm
+          title="Silmek istediğinize emin misiniz?"
+          onConfirm={() => {
+            const index = dataSource.findIndex((item) => item.id === record.id);
+            if (index !== -1) {
+              const newData = [...dataSource];
+              newData[index] = {
+                ...newData[index],
+                isDeleted: true,
+              };
+              setDataSource(newData);
+
+              setValue(`fisIcerigi.${index}.isDeleted`, true);
+            }
+          }}
+        >
+        <Button type="link" danger>
+          Sil
+        </Button>
+        </Popconfirm>
+        ) : null;
+      },
+    }
   ];
 
   const columns = defaultColumns.map((col) => {
@@ -759,10 +751,10 @@ function FisIcerigi({ modalOpen, disabled }) {
         rowClassName={() => "editable-row"}
         size="small"
         bordered
-        dataSource={dataSource}
+        dataSource={dataSource.filter((item) => !item.isDeleted)}
         columns={columns}
         pagination={false}
-        rowKey={(record) => record.id || Math.random().toString(36).substr(2, 9)} // Ensure stable keys
+        rowKey={(record) => record.id || Math.random().toString(36).substring(2, 11)}
         scroll={{ y: "calc(100vh - 540px)" }}
       />
       <MalzemeSecModal visible={isModalVisible} onCancel={() => setIsModalVisible(false)} onOk={handleMalzemeSelect} />
