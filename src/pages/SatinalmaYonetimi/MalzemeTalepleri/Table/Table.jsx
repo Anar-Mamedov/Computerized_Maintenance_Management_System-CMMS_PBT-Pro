@@ -276,18 +276,19 @@ const MainTable = () => {
     },
     {
       title: "Sipariş No",
-      dataIndex: "DUZENLEME_TARIH",
-      key: "DUZENLEME_TARIH",
-      width: 130,
+      dataIndex: "SFS_TALEP_SIPARIS_NO",
+      key: "SFS_TALEP_SIPARIS_NO",
+      width: 120,
       ellipsis: true,
-      sorter: (a, b) => {
-        if (a.DUZENLEME_TARIH === null) return -1;
-        if (b.DUZENLEME_TARIH === null) return 1;
-        return a.DUZENLEME_TARIH.localeCompare(b.DUZENLEME_TARIH);
-      },
-
       visible: true, // Varsayılan olarak açık
-      render: (text) => formatDate(text),
+      render: (text, record) => (
+        <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
+      ),
+      sorter: (a, b) => {
+        if (a.SFS_TALEP_SIPARIS_NO === null) return -1;
+        if (b.SFS_TALEP_SIPARIS_NO === null) return 1;
+        return a.SFS_TALEP_SIPARIS_NO.localeCompare(b.SFS_TALEP_SIPARIS_NO);
+      },
     },
     {
       title: "Başlık",

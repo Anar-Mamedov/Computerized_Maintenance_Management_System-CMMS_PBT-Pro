@@ -150,7 +150,9 @@ function FisIcerigi({ modalOpen, disabled }) {
   // Add useEffect for calculating totals
   useEffect(() => {
     try {
-      const totals = dataSource.reduce(
+      const totals = dataSource
+        .filter((item) => !item.isDeleted)
+        .reduce(
         (acc, item) => {
           acc.araToplam += Number(item.araToplam) || 0;
           acc.indirim += Number(item.indirimTutar) || 0;
@@ -402,7 +404,7 @@ function FisIcerigi({ modalOpen, disabled }) {
   const handleMalzemeSelect = (selectedRows) => {
     try {
       // Get existing malzemeIds from the current dataSource
-      const existingMalzemeIds = new Set(dataSource.map((item) => item.malzemeId));
+      const existingMalzemeIds = new Set(dataSource.filter((item) => !item.isDeleted).map((item) => item.malzemeId));
 
       // Filter out already existing materials
       const newRows = selectedRows.filter((row) => !existingMalzemeIds.has(row.TB_STOK_ID));
@@ -523,16 +525,16 @@ function FisIcerigi({ modalOpen, disabled }) {
     },
     {
       title: "Gelen",
-      dataIndex: "gelen",
-      key: "gelen",
+      dataIndex: "girenMiktar",
+      key: "girenMiktar",
       width: 100,
       editable: false,
       inputType: "number",
     },
     {
       title: "Kalan",
-      dataIndex: "kalan",
-      key: "kalan",
+      dataIndex: "kalanMiktar",
+      key: "kalanMiktar",
       width: 100,
       editable: false,
       inputType: "number",
@@ -614,13 +616,28 @@ function FisIcerigi({ modalOpen, disabled }) {
       dataIndex: "operation",
       width: 100,
       render: (_, record) =>
-        dataSource.length >= 1 ? (
-          <Popconfirm title="Silmek istediğinize emin misiniz?" onConfirm={() => remove(dataSource.findIndex((item) => item.id === record.id))}>
-            <Button type="link" danger disabled={disabled} >
+        dataSource.filter((item) => !item.isDeleted).length >= 1 ? (
+          <Popconfirm
+            title="Silmek istediğinize emin misiniz?"
+            onConfirm={() => {
+              const index = dataSource.findIndex((item) => item.id === record.id);
+              if (index !== -1) {
+                const newData = [...dataSource];
+                newData[index] = {
+                  ...newData[index],
+                  isDeleted: true,
+                };
+                setDataSource(newData);
+    
+                setValue(`fisIcerigi.${index}.isDeleted`, true);
+              }
+            }}
+          >
+            <Button type="link" danger>
               Sil
             </Button>
           </Popconfirm>
-        ) : null,
+      ) : null,
     },
   ];
 
@@ -653,10 +670,10 @@ function FisIcerigi({ modalOpen, disabled }) {
         rowClassName={() => "editable-row"}
         size="small"
         bordered
-        dataSource={dataSource}
+        dataSource={dataSource.filter((item) => !item.isDeleted)}
         columns={columns}
         pagination={false}
-        rowKey={(record) => record.id || Math.random().toString(36).substr(2, 9)} // Ensure stable keys
+        rowKey={(record) => record.id || Math.random().toString(36).substring(2, 11)}
         scroll={{ y: "calc(100vh - 540px)" }}
       />
       <div style={{ display: "flex", flexFlow: "column wrap", gap: "10px", marginTop: "20px", width: "100%", flexDirection: "row", justifyContent: "space-between" }}>

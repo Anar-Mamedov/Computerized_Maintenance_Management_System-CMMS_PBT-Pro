@@ -304,7 +304,7 @@ const durumId = watch("durumId");
       kalanMiktar: Number(item.kalanMiktar) || 0,
       alternatifStokId: Number(item.alternatifStokId) || 0,
       aciklama: item.aciklama || "",
-      isDeleted: Boolean(item.isDeleted) || false,
+      isDeleted: item.isDeleted || false,
     })),
   };
 

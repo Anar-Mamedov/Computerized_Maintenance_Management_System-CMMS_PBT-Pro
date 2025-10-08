@@ -2,11 +2,16 @@ import React, { useState } from "react";
 import { Modal, Button } from "antd";
 import TalepTeklifeAktarmaAntd from "./components/TalepTeklifAktarmaAntd";
 
-export default function TalepTeklifeAktarmaModal() {
+export default function TalepTeklifeAktarmaModal({ selectedRow, refreshTableData }) {
   const [open, setOpen] = useState(false);
 
   const showModal = () => setOpen(true);
-  const handleCancel = () => setOpen(false);
+  const handleCancel = () => {
+    setOpen(false); // modal kapanıyor
+    if (typeof refreshTableData === "function") {
+      refreshTableData(); // tablo sadece modal kapandığında yenileniyor
+    }
+  };
 
   return (
     <>
@@ -19,13 +24,15 @@ export default function TalepTeklifeAktarmaModal() {
       </Button>
 
       <Modal
-        title="Talep → Teklife Aktarma"
-        open={open}
-        onCancel={handleCancel}
-        footer={null} // İçeride zaten kendi butonları var
-        width={1500} // Genişlik ayarı, istersen değiştirebilirsin
-      >
-        <TalepTeklifeAktarmaAntd />
+  title="Talep → Teklife Aktarma"
+  open={open}
+  onCancel={handleCancel}
+  footer={null}
+  width="73%"
+  style={{ top: 20 }}
+  bodyStyle={{ maxHeight: "80vh", overflowY: "auto" }}
+>
+        <TalepTeklifeAktarmaAntd fisId={selectedRow?.TB_STOK_FIS_ID} baslik={selectedRow?.SFS_BASLIK} fisNo={selectedRow?.SFS_FIS_NO} refreshTableData={refreshTableData} />
       </Modal>
     </>
   );

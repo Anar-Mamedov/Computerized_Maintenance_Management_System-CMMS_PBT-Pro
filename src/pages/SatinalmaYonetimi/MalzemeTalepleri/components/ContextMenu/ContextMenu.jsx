@@ -13,7 +13,7 @@ import OnayaGonder from "./components/OnayaGonder";
 import TarihceOnayTablo from "./components/TarihceOnayTablo";
 import OnayGeriAl from "./components/OnayGeriAl";
 import SipariseAktar from "./components/SipariseAktar/EditDrawer";
-//import Teklif from "./components/Teklif/Teklif";
+import Teklif from "./components/Teklif/Teklif";
 
 const { Text } = Typography;
 
@@ -44,6 +44,7 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
     refreshTableData,
     hidePopover,
     fisNo: selectedRows.length === 1 ? selectedRows[0].SFS_FIS_NO : null,
+    baslik: selectedRows.length === 1 ? selectedRows[0].SFS_BASLIK : null,
   };
 
   const renderButtonsByDurum = (id) => {
@@ -75,6 +76,7 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
           <Kapat {...commonProps} />
           <Iptal {...commonProps} />
           <SipariseAktar selectedRow={selectedRows[0]} onRefresh={refreshTableData} />
+          <Teklif {...commonProps} selectedRow={selectedRows[0]} onRefresh={refreshTableData} />
         </>
       );
       case 9:

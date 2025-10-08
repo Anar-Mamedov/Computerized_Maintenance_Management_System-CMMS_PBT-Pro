@@ -654,15 +654,26 @@ function FisIcerigi({ modalOpen }) {
       title: "İşlemler",
       dataIndex: "operation",
       width: 100,
-      render: (_, record) =>
+      render: (_, record, index) =>
         dataSource.length >= 1 ? (
-          <Popconfirm title="Silmek istediğinize emin misiniz?" onConfirm={() => remove(dataSource.findIndex((item) => item.id === record.id))}>
-            <Button type="link" danger>
-              Sil
-            </Button>
-          </Popconfirm>
-        ) : null,
-    },
+          <Popconfirm
+            title="Silmek istediğinize emin misiniz?"
+            onConfirm={() => {
+              const index = dataSource.findIndex((item) => item.id === record.id);
+              if (index !== -1) {
+                const newData = [...dataSource];
+                newData.splice(index,1);
+                setDataSource(newData);
+                remove(index);
+              }
+            }}
+          >
+          <Button type="link" danger>
+            Sil
+          </Button>
+        </Popconfirm>
+      ) : null,
+    }
   ];
 
   const columns = defaultColumns.map((col) => {
@@ -697,7 +708,7 @@ function FisIcerigi({ modalOpen }) {
         dataSource={dataSource}
         columns={columns}
         pagination={false}
-        rowKey={(record) => record.id || Math.random().toString(36).substr(2, 9)} // Ensure stable keys
+        rowkey={(record) => record.id || Math.random.toString(36).substring(2, 11)}
         scroll={{ y: "calc(100vh - 540px)" }}
       />
       <div style={{ display: "flex", flexFlow: "column wrap", gap: "10px", marginTop: "20px", width: "100%", flexDirection: "row", justifyContent: "space-between" }}>

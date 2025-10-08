@@ -252,7 +252,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
       makineId: Number(item.makineId) || -1,
       makineName: item.makineName || "",
       aciklama: item.aciklama || "",
-      isDeleted: item.isDeleted || false,
+      isDeleted: false,
     })) || [],
   };
 
