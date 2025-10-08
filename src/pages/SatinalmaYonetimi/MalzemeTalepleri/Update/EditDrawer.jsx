@@ -260,7 +260,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
       makineId: Number(item.makineId) || -1,
       makineName: item.makineName || "",
       aciklama: item.aciklama || "",
-      isDeleted: false,
+      isDeleted: item.isDeleted || false,
     })) || [],
   };
 

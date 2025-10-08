@@ -694,31 +694,30 @@ function FisIcerigi({ modalOpen, disabled }) {
       title: "İşlemler",
       dataIndex: "operation",
       width: 100,
-      render: (_, record) => {
+      render: (_, record) =>
         dataSource.filter((item) => !item.isDeleted).length >= 1 ? (
-        <Popconfirm
-          title="Silmek istediğinize emin misiniz?"
-          onConfirm={() => {
-            const index = dataSource.findIndex((item) => item.id === record.id);
-            if (index !== -1) {
-              const newData = [...dataSource];
-              newData[index] = {
-                ...newData[index],
-                isDeleted: true,
-              };
-              setDataSource(newData);
+          <Popconfirm
+            title="Silmek istediğinize emin misiniz?"
+            onConfirm={() => {
+              const index = dataSource.findIndex((item) => item.id === record.id);
+              if (index !== -1) {
+                const newData = [...dataSource];
+                newData[index] = {
+                  ...newData[index],
+                  isDeleted: true,
+                };
+                setDataSource(newData);
 
-              setValue(`fisIcerigi.${index}.isDeleted`, true);
-            }
-          }}
-        >
-        <Button type="link" danger>
-          Sil
-        </Button>
-        </Popconfirm>
-        ) : null;
-      },
-    }
+                setValue(`fisIcerigi.${index}.isDeleted`, true);
+              }
+            }}
+          >
+            <Button type="link" danger>
+              Sil
+            </Button>
+          </Popconfirm>
+        ) : null,
+    },
   ];
 
   const columns = defaultColumns.map((col) => {
