@@ -92,6 +92,7 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
             <SatinalmaSiparisleri {...commonProps} />
             <Kapat {...commonProps} />
             <Iptal {...commonProps} />
+            <Teklif {...commonProps} selectedRow={selectedRows[0]} onRefresh={refreshTableData} />
           </>
         );
       case 6:

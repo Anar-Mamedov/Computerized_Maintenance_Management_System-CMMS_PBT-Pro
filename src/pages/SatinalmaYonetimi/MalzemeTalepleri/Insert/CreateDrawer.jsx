@@ -258,7 +258,6 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
 
   AxiosInstance.post("UpsertMalzemeTalep", Body)
     .then((response) => {
-      console.log("Data sent successfully:", response);
       if (response.status_code === 200 || response.status_code === 201) {
         message.success("Ekleme Başarılı.");
         setOpen(false);
