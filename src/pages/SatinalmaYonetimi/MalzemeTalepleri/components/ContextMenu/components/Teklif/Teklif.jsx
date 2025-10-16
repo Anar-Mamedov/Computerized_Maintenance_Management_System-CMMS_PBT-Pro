@@ -20,18 +20,18 @@ export default function TalepTeklifeAktarmaModal({ selectedRow, refreshTableData
         onClick={showModal}
         type="text"
       >
-        Talep → Teklife Aktar
+        {selectedRow && selectedRow.SFS_TALEP_DURUM_ID === 2 ? "Fiyat Teklifleri" : "Talep → Teklife Aktar"}
       </Button>
 
       <Modal
-  title="Talep → Teklife Aktarma"
-  open={open}
-  onCancel={handleCancel}
-  footer={null}
-  width="73%"
-  style={{ top: 20 }}
-  bodyStyle={{ maxHeight: "80vh", overflowY: "auto" }}
->
+        title={selectedRow && selectedRow.SFS_TALEP_DURUM_ID === 2 ? "Fiyat Teklifleri" : "Talep → Teklife Aktarma"}
+        open={open}
+        onCancel={handleCancel}
+        footer={null}
+        width="73%"
+        style={{ top: 20 }}
+        bodyStyle={{ maxHeight: "80vh", overflowY: "auto" }}
+      >
         <TalepTeklifeAktarmaAntd fisId={selectedRow?.TB_STOK_FIS_ID} baslik={selectedRow?.SFS_BASLIK} fisNo={selectedRow?.SFS_FIS_NO} refreshTableData={refreshTableData} />
       </Modal>
     </>

@@ -16,8 +16,6 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
           `DeleteMalzemeTalep?fisID=${row.key}&fisDurumID=${row.SFS_TALEP_DURUM_ID}`
         );
 
-        console.log("Silme işlemi sonucu:", response);
-
         if (response.status_code === 200) {
           message.success(response.message || "İşlem başarılı.");
         } else {
