@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useMemo } from "react";
+import React, { useCallback, useEffect, useState, useMemo, useRef } from "react";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
@@ -835,7 +835,13 @@ const MainTable = () => {
 
   // ana tablo api isteği için kullanılan useEffect
 
+  const lastRequestRef = useRef(null);
+  
   useEffect(() => {
+    const params = JSON.stringify({ body, currentPage, pageSize });
+    if (lastRequestRef.current === params) return;
+    lastRequestRef.current = params;
+  
     fetchEquipmentData(body, currentPage, pageSize);
   }, [body, currentPage, pageSize]);
 
@@ -843,21 +849,17 @@ const MainTable = () => {
 
   // arama işlemi için kullanılan useEffect
   useEffect(() => {
-    if (searchTimeout) {
-      clearTimeout(searchTimeout);
-    }
-
-    // Arama terimi değiştiğinde ve boş olduğunda API isteğini tetikle
+    if (searchTimeout) clearTimeout(searchTimeout);
+  
     const timeout = setTimeout(() => {
-      if (searchTerm !== body.kelime) {
-        handleBodyChange("kelime", searchTerm);
-        setCurrentPage(1); // Arama yapıldığında veya arama sıfırlandığında sayfa numarasını 1'e ayarla
-        // setDrawer({ ...drawer, visible: false }); // Arama yapıldığında veya arama sıfırlandığında Drawer'ı kapat
+      // burada doğru path: body.filters.Kelime
+      if (searchTerm !== body.filters.kelime) {
+        handleBodyChange("filters", { ...body.filters, kelime: searchTerm });
+        setCurrentPage(1);
       }
     }, 2000);
-
+  
     setSearchTimeout(timeout);
-
     return () => clearTimeout(timeout);
   }, [searchTerm]);
 
@@ -914,18 +916,18 @@ const MainTable = () => {
       ...state,
       [type]: newBody,
     }));
-    setCurrentPage(1); // Filtreleme yapıldığında sayfa numarasını 1'e ayarla
+    setCurrentPage(1);
   }, []);
-  // filtreleme işlemi için kullanılan useEffect son
-
-  // sayfalama için kullanılan useEffect
-  const handleTableChange = (pagination, filters, sorter, extra) => {
+    // filtreleme işlemi için kullanılan useEffect son
+  
+    // sayfalama için kullanılan useEffect
+    const handleTableChange = (pagination) => {
     if (pagination) {
       setCurrentPage(pagination.current);
-      setPageSize(pagination.pageSize); // pageSize güncellemesi
+      setPageSize(pagination.pageSize);
     }
   };
-  // sayfalama için kullanılan useEffect son
+    // sayfalama için kullanılan useEffect son
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);

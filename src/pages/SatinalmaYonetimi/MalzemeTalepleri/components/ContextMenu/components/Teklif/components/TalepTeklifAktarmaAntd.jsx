@@ -248,6 +248,7 @@ const handleDelete = async (teklifId) => {
       message.error("Silme işlemi başarısız.");
     }
     fetchTeklifPaketleri();
+    fetchMalzemeler();
   } catch (error) {
     isError = true;
     console.error("Silme işlemi sırasında hata oluştu:", error);
