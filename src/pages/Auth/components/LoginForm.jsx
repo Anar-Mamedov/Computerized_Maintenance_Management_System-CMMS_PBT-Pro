@@ -138,6 +138,7 @@ export default function LoginForm() {
           malzemeTalepleri: true,
           satinalmaSiparisleri: true,
           tedarikciFirmalar: true,
+          isEmriAnalizi: true,
         };
         const userInfo = {
           userId: response.TB_KULLANICI_ID ?? null,
