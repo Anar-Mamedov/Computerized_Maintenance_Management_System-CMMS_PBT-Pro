@@ -308,95 +308,92 @@ const MainTable = () => {
   const summaryRequestIdRef = useRef(0);
   const previousSummaryErrorsRef = useRef({});
 
-  const requestSummaryData = useCallback(
-    async ({ keyword = "", filters = {}, sortField: currentSortField, sortOrder: currentSortOrder, operations = [] }) => {
-      const validOperations = Array.isArray(operations) ? operations.filter((operation) => operation && operation.islemTipi && operation.alan) : [];
+  const requestSummaryData = useCallback(async ({ keyword = "", filters = {}, sortField: currentSortField, sortOrder: currentSortOrder, operations = [] }) => {
+    const validOperations = Array.isArray(operations) ? operations.filter((operation) => operation && operation.islemTipi && operation.alan) : [];
 
-      if (validOperations.length === 0) {
-        setSummaryData({});
-        setSummaryErrors({});
-        setSummaryLoading(false);
-        return;
+    if (validOperations.length === 0) {
+      setSummaryData({});
+      setSummaryErrors({});
+      setSummaryLoading(false);
+      return;
+    }
+
+    const requestId = summaryRequestIdRef.current + 1;
+    summaryRequestIdRef.current = requestId;
+    setSummaryLoading(true);
+    setSummaryErrors((prev) => {
+      if (!prev || Object.keys(prev).length === 0) {
+        return prev;
       }
-
-      const requestId = summaryRequestIdRef.current + 1;
-      summaryRequestIdRef.current = requestId;
-      setSummaryLoading(true);
-      setSummaryErrors((prev) => {
-        if (!prev || Object.keys(prev).length === 0) {
-          return prev;
-        }
-        let updated = null;
-        validOperations.forEach((operation) => {
-          if (operation && operation.alan && Object.prototype.hasOwnProperty.call(prev, operation.alan)) {
-            if (!updated) {
-              updated = { ...prev };
-            }
-            delete updated[operation.alan];
+      let updated = null;
+      validOperations.forEach((operation) => {
+        if (operation && operation.alan && Object.prototype.hasOwnProperty.call(prev, operation.alan)) {
+          if (!updated) {
+            updated = { ...prev };
           }
-        });
-        return updated || prev;
+          delete updated[operation.alan];
+        }
+      });
+      return updated || prev;
+    });
+
+    let sortParam = "";
+    if (currentSortField && currentSortOrder) {
+      const normalizedOrder = currentSortOrder === "ascend" ? "ASC" : "DESC";
+      sortParam = `&sortField=${currentSortField}&sortOrder=${normalizedOrder}`;
+    }
+
+    try {
+      const response = await AxiosInstance.post(`GetIsEmriAltToplamlar?parametre=${keyword}${sortParam}`, {
+        hesaplamalar: validOperations,
+        filtreler: filters,
       });
 
-      let sortParam = "";
-      if (currentSortField && currentSortOrder) {
-        const normalizedOrder = currentSortOrder === "ascend" ? "ASC" : "DESC";
-        sortParam = `&sortField=${currentSortField}&sortOrder=${normalizedOrder}`;
-      }
+      const normalized = normalizeSummaryResponse(response, validOperations);
+      const responseErrorFields = buildSummaryErrorMap(validOperations, response?.hataliAlanlar, response?.status || response?.message);
 
-      try {
-        const response = await AxiosInstance.post(`GetIsEmriAltToplamlar?parametre=${keyword}${sortParam}`, {
-          hesaplamalar: validOperations,
-          filtreler: filters,
-        });
-
-        const normalized = normalizeSummaryResponse(response, validOperations);
-        const responseErrorFields = buildSummaryErrorMap(validOperations, response?.hataliAlanlar, response?.status || response?.message);
-
-        if (summaryRequestIdRef.current === requestId) {
-          setSummaryData(normalized);
-          if (Object.keys(responseErrorFields).length > 0) {
-            setSummaryErrors((prev) => {
-              const next = { ...(prev || {}) };
-              let changed = false;
-              Object.entries(responseErrorFields).forEach(([field, detail]) => {
-                if (next[field] !== detail) {
-                  next[field] = detail;
-                  changed = true;
-                }
-              });
-              return changed ? next : prev;
+      if (summaryRequestIdRef.current === requestId) {
+        setSummaryData(normalized);
+        if (Object.keys(responseErrorFields).length > 0) {
+          setSummaryErrors((prev) => {
+            const next = { ...(prev || {}) };
+            let changed = false;
+            Object.entries(responseErrorFields).forEach(([field, detail]) => {
+              if (next[field] !== detail) {
+                next[field] = detail;
+                changed = true;
+              }
             });
-          }
-        }
-      } catch (error) {
-        console.error("Toplam verileri çekilirken hata oluştu:", error);
-        if (summaryRequestIdRef.current === requestId) {
-          setSummaryData({});
-          const errorData = error?.response?.data;
-          const errorFields = buildSummaryErrorMap(validOperations, errorData?.hataliAlanlar, errorData?.status || error?.message || "Toplama işlemi gerçekleştirilemedi.");
-          if (Object.keys(errorFields).length > 0) {
-            setSummaryErrors((prev) => {
-              const next = { ...(prev || {}) };
-              let changed = false;
-              Object.entries(errorFields).forEach(([field, detail]) => {
-                if (next[field] !== detail) {
-                  next[field] = detail;
-                  changed = true;
-                }
-              });
-              return changed ? next : prev;
-            });
-          }
-        }
-      } finally {
-        if (summaryRequestIdRef.current === requestId) {
-          setSummaryLoading(false);
+            return changed ? next : prev;
+          });
         }
       }
-    },
-    []
-  );
+    } catch (error) {
+      console.error("Toplam verileri çekilirken hata oluştu:", error);
+      if (summaryRequestIdRef.current === requestId) {
+        setSummaryData({});
+        const errorData = error?.response?.data;
+        const errorFields = buildSummaryErrorMap(validOperations, errorData?.hataliAlanlar, errorData?.status || error?.message || "Toplama işlemi gerçekleştirilemedi.");
+        if (Object.keys(errorFields).length > 0) {
+          setSummaryErrors((prev) => {
+            const next = { ...(prev || {}) };
+            let changed = false;
+            Object.entries(errorFields).forEach(([field, detail]) => {
+              if (next[field] !== detail) {
+                next[field] = detail;
+                changed = true;
+              }
+            });
+            return changed ? next : prev;
+          });
+        }
+      }
+    } finally {
+      if (summaryRequestIdRef.current === requestId) {
+        setSummaryLoading(false);
+      }
+    }
+  }, []);
 
   const handleSummaryOperationSelect = useCallback((fieldKey, operationKey) => {
     if (!fieldKey || !operationKey) {
@@ -651,7 +648,7 @@ const MainTable = () => {
       width: 150,
       ellipsis: true,
       sorter: true,
-      visible: true,
+      visible: false,
       render: (_, record) => {
         const validStatuses = [1, 2, 3];
         if (validStatuses.includes(record.ISM_ONAY_DURUM)) {
