@@ -326,13 +326,16 @@ const MainTable = () => {
         if (!prev || Object.keys(prev).length === 0) {
           return prev;
         }
-        const updated = { ...prev };
+        let updated = null;
         validOperations.forEach((operation) => {
-          if (operation && operation.alan) {
+          if (operation && operation.alan && Object.prototype.hasOwnProperty.call(prev, operation.alan)) {
+            if (!updated) {
+              updated = { ...prev };
+            }
             delete updated[operation.alan];
           }
         });
-        return updated;
+        return updated || prev;
       });
 
       let sortParam = "";
@@ -353,10 +356,17 @@ const MainTable = () => {
         if (summaryRequestIdRef.current === requestId) {
           setSummaryData(normalized);
           if (Object.keys(responseErrorFields).length > 0) {
-            setSummaryErrors((prev) => ({
-              ...prev,
-              ...responseErrorFields,
-            }));
+            setSummaryErrors((prev) => {
+              const next = { ...(prev || {}) };
+              let changed = false;
+              Object.entries(responseErrorFields).forEach(([field, detail]) => {
+                if (next[field] !== detail) {
+                  next[field] = detail;
+                  changed = true;
+                }
+              });
+              return changed ? next : prev;
+            });
           }
         }
       } catch (error) {
@@ -364,16 +374,19 @@ const MainTable = () => {
         if (summaryRequestIdRef.current === requestId) {
           setSummaryData({});
           const errorData = error?.response?.data;
-          const errorFields = buildSummaryErrorMap(
-            validOperations,
-            errorData?.hataliAlanlar,
-            errorData?.status || error?.message || "Toplama işlemi gerçekleştirilemedi."
-          );
+          const errorFields = buildSummaryErrorMap(validOperations, errorData?.hataliAlanlar, errorData?.status || error?.message || "Toplama işlemi gerçekleştirilemedi.");
           if (Object.keys(errorFields).length > 0) {
-            setSummaryErrors((prev) => ({
-              ...prev,
-              ...errorFields,
-            }));
+            setSummaryErrors((prev) => {
+              const next = { ...(prev || {}) };
+              let changed = false;
+              Object.entries(errorFields).forEach(([field, detail]) => {
+                if (next[field] !== detail) {
+                  next[field] = detail;
+                  changed = true;
+                }
+              });
+              return changed ? next : prev;
+            });
           }
         }
       } finally {
@@ -1316,7 +1329,14 @@ const MainTable = () => {
       return;
     }
 
-    const operationsPayload = entries.map(([field, operation]) => ({
+    const validEntries = entries.filter(([field]) => !summaryErrors[field]);
+
+    if (validEntries.length === 0) {
+      setSummaryLoading(false);
+      return;
+    }
+
+    const operationsPayload = validEntries.map(([field, operation]) => ({
       islemTipi: operation,
       alan: field,
     }));
@@ -1328,7 +1348,7 @@ const MainTable = () => {
       sortOrder,
       operations: operationsPayload,
     });
-  }, [summarySelections, body.keyword, body.filters, sortField, sortOrder, requestSummaryData]);
+  }, [summarySelections, summaryErrors, body.keyword, body.filters, sortField, sortOrder, requestSummaryData]);
 
   // ana tablo api isteği için kullanılan useEffect
 
