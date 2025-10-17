@@ -1676,7 +1676,11 @@ const MainTable = () => {
               const operationLabel = OPERATION_LABELS[selectedOperation] || selectedOperation;
               content = <Text type="secondary">{`${operationLabel} seçildi`}</Text>;
             } else {
-              content = <Text type="secondary">Seçiniz</Text>;
+              content = (
+                <Text type="secondary">
+                  <span style={{ letterSpacing: "2px" }}>...</span>
+                </Text>
+              );
             }
 
             return (
