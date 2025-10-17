@@ -233,7 +233,7 @@ const MainTable = () => {
     const fetchData = async () => {
       try {
         const response = await AxiosInstance.get("OzelAlan?form=ISEMRI"); // API URL'niz
-        localStorage.setItem("ozelAlanlar", JSON.stringify(response));
+        localStorage.setItem("ozelAlanlarIsEmriAnalizi", JSON.stringify(response));
         setLabel(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
       } catch (error) {
         console.error("API isteğinde hata oluştu:", error);
@@ -244,7 +244,7 @@ const MainTable = () => {
     fetchData();
   }, [drawer.visible]);
 
-  const ozelAlanlar = JSON.parse(localStorage.getItem("ozelAlanlar"));
+  const ozelAlanlar = JSON.parse(localStorage.getItem("ozelAlanlarIsEmriAnalizi"));
 
   // Özel Alanların nameleri backend çekmek için api isteği sonu
 
@@ -1105,7 +1105,7 @@ const MainTable = () => {
     try {
       setLoading(true);
       // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.post(`getIsEmriFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}${sortParam}`, filters);
+      const response = await AxiosInstance.post(`GetIsEmriAnaliz?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}${sortParam}`, filters);
       if (response) {
         if (response.status_code === 401) {
           message.error(t("buSayfayaErisimYetkinizBulunmamaktadir"));
@@ -1222,9 +1222,9 @@ const MainTable = () => {
 
   // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
   const [columns, setColumns] = useState(() => {
-    const savedOrder = localStorage.getItem("columnOrder");
-    const savedVisibility = localStorage.getItem("columnVisibility");
-    const savedWidths = localStorage.getItem("columnWidths");
+    const savedOrder = localStorage.getItem("columnOrderIsEmriAnalizi");
+    const savedVisibility = localStorage.getItem("columnVisibilityIsEmriAnalizi");
+    const savedWidths = localStorage.getItem("columnWidthsIsEmriAnalizi");
 
     let order = savedOrder ? JSON.parse(savedOrder) : [];
     let visibility = savedVisibility ? JSON.parse(savedVisibility) : {};
@@ -1242,9 +1242,9 @@ const MainTable = () => {
       }
     });
 
-    localStorage.setItem("columnOrder", JSON.stringify(order));
-    localStorage.setItem("columnVisibility", JSON.stringify(visibility));
-    localStorage.setItem("columnWidths", JSON.stringify(widths));
+    localStorage.setItem("columnOrderIsEmriAnalizi", JSON.stringify(order));
+    localStorage.setItem("columnVisibilityIsEmriAnalizi", JSON.stringify(visibility));
+    localStorage.setItem("columnWidthsIsEmriAnalizi", JSON.stringify(widths));
 
     return order.map((key) => {
       const column = initialColumns.find((col) => col.key === key);
@@ -1255,9 +1255,9 @@ const MainTable = () => {
 
   // sütunları local storage'a kaydediyoruz
   useEffect(() => {
-    localStorage.setItem("columnOrder", JSON.stringify(columns.map((col) => col.key)));
+    localStorage.setItem("columnOrderIsEmriAnalizi", JSON.stringify(columns.map((col) => col.key)));
     localStorage.setItem(
-      "columnVisibility",
+      "columnVisibilityIsEmriAnalizi",
       JSON.stringify(
         columns.reduce(
           (acc, col) => ({
@@ -1269,7 +1269,7 @@ const MainTable = () => {
       )
     );
     localStorage.setItem(
-      "columnWidths",
+      "columnWidthsIsEmriAnalizi",
       JSON.stringify(
         columns.reduce(
           (acc, col) => ({
@@ -1345,10 +1345,10 @@ const MainTable = () => {
   // sütunları sıfırlamak için kullanılan fonksiyon
 
   function resetColumns() {
-    localStorage.removeItem("columnOrder");
-    localStorage.removeItem("columnVisibility");
-    localStorage.removeItem("columnWidths");
-    localStorage.removeItem("ozelAlanlar");
+    localStorage.removeItem("columnOrderIsEmriAnalizi");
+    localStorage.removeItem("columnVisibilityIsEmriAnalizi");
+    localStorage.removeItem("columnWidthsIsEmriAnalizi");
+    localStorage.removeItem("ozelAlanlarIsEmriAnalizi");
     window.location.reload();
   }
 
