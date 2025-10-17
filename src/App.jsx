@@ -31,6 +31,7 @@ import UserIdControl from "./pages/UserIdControl/UserIdControl.jsx";
 import IsEmriTipleri from "./pages/Yonetim/IsEmriTipleri/IsEmriTipleri.jsx";
 import Breadcrumbs from "./Breadcrumbs"; // Import the Breadcrumbs component
 import MudaheleSuresi from "./pages/Analizler/MudaheleAnalizi/MudaheleAnalizi.jsx";
+import IsEmriAnalizi from "./pages/Analizler/IsEmriAnalizi/IsEmriAnalizi.jsx";
 import { selectedMenuItemState } from "./state/menuState";
 import FloatButton from "./pages/components/FloatButton/index.jsx";
 import RolTanimlari from "./pages/OnayIslemleri/RolTanimlari/RolTanimlari.jsx";
@@ -57,6 +58,7 @@ import TransferFisleri from "./pages/Malzeme&DepoYonetimi/TransferFisleri/Transf
 // Ayarlar
 import Ayarlar from "./pages/Yonetim/Ayarlar/Ayarlar.jsx";
 import { t } from "i18next";
+import { get } from "lodash";
 // import Kurallar from "./pages/OnayIslemleri/Kurallar/Kurallar.jsx";
 
 const { Text } = Typography;
@@ -200,6 +202,7 @@ const rawItems = [
     [
       getItem("Müdahale Süreleri Analizi", "mudaheleSuresi", true),
       getItem("Personel KPI Analizi", "analizler", true),
+      getItem("İş Emri Analizi", "isEmriAnalizi", true),
 
       // getItem("Team 2", "team2", true)
     ],
@@ -354,6 +357,7 @@ export default function App() {
           <Route path="/demo" element={<Dashboard />} />
           <Route path="/userid" element={<UserIdControl />} />
           <Route path="/mudaheleSuresi" element={<MudaheleSuresi />} />
+          <Route path="/isEmriAnalizi" element={<IsEmriAnalizi />} />
           <Route path="/onayTanimlari" element={<OnayTanimlari />} />
           <Route path="/rolTanimlari" element={<RolTanimlari />} />
           <Route path="/onaylayicilar" element={<Onaylayicilar />} />
