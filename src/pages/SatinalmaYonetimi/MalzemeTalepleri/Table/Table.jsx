@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useMemo } from "react";
+import React, { useCallback, useEffect, useState, useMemo, useRef } from "react";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
@@ -797,31 +797,34 @@ const MainTable = () => {
 
   // ana tablo api isteği için kullanılan useEffect
 
-  useEffect(() => {
-    fetchEquipmentData(body, currentPage, pageSize);
-  }, [body, currentPage, pageSize]);
+  const lastRequestRef = useRef(null);
+
+// ✅ API isteği
+useEffect(() => {
+  const params = JSON.stringify({ body, currentPage, pageSize });
+  if (lastRequestRef.current === params) return;
+  lastRequestRef.current = params;
+
+  fetchEquipmentData(body, currentPage, pageSize);
+}, [body, currentPage, pageSize]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
   // arama işlemi için kullanılan useEffect
   useEffect(() => {
-    if (searchTimeout) {
-      clearTimeout(searchTimeout);
+  if (searchTimeout) clearTimeout(searchTimeout);
+
+  const timeout = setTimeout(() => {
+    // burada doğru path: body.filters.Kelime
+    if (searchTerm !== body.filters.Kelime) {
+      handleBodyChange("filters", { ...body.filters, Kelime: searchTerm });
+      setCurrentPage(1);
     }
+  }, 2000);
 
-    // Arama terimi değiştiğinde ve boş olduğunda API isteğini tetikle
-    const timeout = setTimeout(() => {
-      if (searchTerm !== body.Kelime) {
-        handleBodyChange("Kelime", searchTerm);
-        setCurrentPage(1); // Arama yapıldığında veya arama sıfırlandığında sayfa numarasını 1'e ayarla
-        // setDrawer({ ...drawer, visible: false }); // Arama yapıldığında veya arama sıfırlandığında Drawer'ı kapat
-      }
-    }, 2000);
-
-    setSearchTimeout(timeout);
-
-    return () => clearTimeout(timeout);
-  }, [searchTerm]);
+  setSearchTimeout(timeout);
+  return () => clearTimeout(timeout);
+}, [searchTerm]);
 
   // arama işlemi için kullanılan useEffect son
 
@@ -872,21 +875,21 @@ const MainTable = () => {
 };
   // filtreleme işlemi için kullanılan useEffect
   const handleBodyChange = useCallback((type, newBody) => {
-    setBody((state) => ({
-      ...state,
-      [type]: newBody,
-    }));
-    setCurrentPage(1); // Filtreleme yapıldığında sayfa numarasını 1'e ayarla
-  }, []);
+  setBody((state) => ({
+    ...state,
+    [type]: newBody,
+  }));
+  setCurrentPage(1);
+}, []);
   // filtreleme işlemi için kullanılan useEffect son
 
   // sayfalama için kullanılan useEffect
-  const handleTableChange = (pagination, filters, sorter, extra) => {
-    if (pagination) {
-      setCurrentPage(pagination.current);
-      setPageSize(pagination.pageSize); // pageSize güncellemesi
-    }
-  };
+  const handleTableChange = (pagination) => {
+  if (pagination) {
+    setCurrentPage(pagination.current);
+    setPageSize(pagination.pageSize);
+  }
+};
   // sayfalama için kullanılan useEffect son
 
   const onSelectChange = (newSelectedRowKeys) => {
