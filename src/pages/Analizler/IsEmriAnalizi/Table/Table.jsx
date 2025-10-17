@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState, useMemo } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message, Dropdown } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -18,6 +18,168 @@ import * as XLSX from "xlsx";
 import { t } from "i18next";
 
 const { Text } = Typography;
+
+const SUMMARY_OPTIONS = [
+  { key: "SUM", label: "Toplam" },
+  { key: "AVG", label: "Ortalama" },
+  { key: "MAX", label: "Maksimum" },
+  { key: "MIN", label: "Minimum" },
+];
+
+const OPERATION_LABELS = SUMMARY_OPTIONS.reduce((acc, option) => {
+  acc[option.key] = option.label;
+  return acc;
+}, {});
+
+const SUMMARY_CELL_STYLE = {
+  border: "1px solid #f0f0f0",
+  backgroundColor: "#ffffff",
+  padding: "8px",
+  cursor: "pointer",
+};
+
+const SUMMARY_DROPDOWN_ITEMS = SUMMARY_OPTIONS.map((option) => ({
+  key: option.key,
+  label: option.label,
+}));
+
+const buildSummaryErrorMap = (operations, errorEntries, fallbackMessage) => {
+  const errorMap = {};
+  if (!Array.isArray(operations) || operations.length === 0) {
+    return errorMap;
+  }
+
+  const operationFieldLookup = operations.reduce((acc, operation) => {
+    if (operation && operation.alan) {
+      acc[operation.alan.toUpperCase()] = operation.alan;
+    }
+    return acc;
+  }, {});
+
+  if (Array.isArray(errorEntries)) {
+    errorEntries.forEach((entry) => {
+      if (typeof entry !== "string" || entry.trim() === "") {
+        return;
+      }
+      const trimmedEntry = entry.trim();
+      const match = trimmedEntry.match(/^([^(]+)\s*(?:\((.+)\))?$/);
+      const rawField = (match && match[1] ? match[1] : trimmedEntry).trim();
+      const detail = (match && match[2] ? match[2] : trimmedEntry).trim();
+      const normalizedField = operationFieldLookup[rawField.toUpperCase()] || rawField;
+      errorMap[normalizedField] = detail;
+    });
+  }
+
+  if (Object.keys(errorMap).length === 0 && fallbackMessage) {
+    operations.forEach((operation) => {
+      if (operation && operation.alan) {
+        errorMap[operation.alan] = fallbackMessage;
+      }
+    });
+  }
+
+  return errorMap;
+};
+
+const normalizeSummaryResponse = (apiResponse, operations) => {
+  const normalized = {};
+
+  if (!apiResponse) {
+    return normalized;
+  }
+
+  const operationsList = Array.isArray(operations) ? operations : [];
+
+  const operationsByField = operationsList.reduce((acc, operation) => {
+    acc[operation.alan] = operation;
+    return acc;
+  }, {});
+
+  const registerResult = (field, value, overrideOperation) => {
+    if (field === undefined || field === null) {
+      return;
+    }
+
+    if (value === undefined || value === null) {
+      return;
+    }
+
+    const operationType = (overrideOperation || operationsByField[field]?.islemTipi || "").toUpperCase();
+    normalized[field] = {
+      value,
+      operation: operationType,
+    };
+  };
+
+  if (apiResponse.altToplamlar && typeof apiResponse.altToplamlar === "object" && apiResponse.altToplamlar !== null) {
+    Object.entries(apiResponse.altToplamlar).forEach(([rawKey, value]) => {
+      if (rawKey == null) {
+        return;
+      }
+
+      const upperKey = String(rawKey).toUpperCase();
+      const separatorIndex = upperKey.indexOf("_");
+
+      if (separatorIndex === -1) {
+        return;
+      }
+
+      const candidateOperation = upperKey.slice(0, separatorIndex);
+      const candidateFieldRaw = rawKey.slice(separatorIndex + 1);
+      const matchedOperation = operationsList.find(
+        (operation) => (operation.islemTipi || "").toUpperCase() === candidateOperation && operation.alan.toUpperCase() === candidateFieldRaw.toUpperCase()
+      );
+
+      const fieldName = matchedOperation ? matchedOperation.alan : candidateFieldRaw;
+      registerResult(fieldName, value, candidateOperation);
+    });
+  }
+
+  const candidateArrays = [
+    Array.isArray(apiResponse) ? apiResponse : null,
+    Array.isArray(apiResponse?.results) ? apiResponse.results : null,
+    Array.isArray(apiResponse?.data) ? apiResponse.data : null,
+    Array.isArray(apiResponse?.sonuclar) ? apiResponse.sonuclar : null,
+  ].filter(Boolean);
+
+  if (candidateArrays.length) {
+    candidateArrays.forEach((entries) => {
+      entries.forEach((entry) => {
+        if (!entry || typeof entry !== "object") {
+          return;
+        }
+
+        const field = entry.alan || entry.ALAN || entry.field || entry.Field;
+        const value = entry.sonuc ?? entry.SONUC ?? entry.value ?? entry.deger ?? entry.result;
+        const operationType = entry.islemTipi || entry.ISLEM_TIPI || entry.operationType || entry.operation || operationsByField[field]?.islemTipi;
+
+        registerResult(field, value, operationType);
+      });
+    });
+
+    return normalized;
+  }
+
+  if (typeof apiResponse === "object" && apiResponse !== null) {
+    operationsList.forEach((operation) => {
+      const field = operation.alan;
+      const operationType = (operation.islemTipi || "").toUpperCase();
+      const upperKey = operationType ? `${field}_${operationType}` : null;
+      const lowerKey = operationType ? `${field}_${operationType.toLowerCase()}` : null;
+      const capitalizedKey = operationType ? `${field}_${operationType.charAt(0)}${operationType.slice(1).toLowerCase()}` : null;
+
+      const value =
+        apiResponse[field] ??
+        (upperKey ? apiResponse[upperKey] : undefined) ??
+        (lowerKey ? apiResponse[lowerKey] : undefined) ??
+        (capitalizedKey ? apiResponse[capitalizedKey] : undefined);
+
+      registerResult(field, value, operationType);
+    });
+  }
+
+  return normalized;
+};
 
 // Function to extract text from React elements
 import { isValidElement } from "react";
@@ -139,6 +301,123 @@ const MainTable = () => {
   const [xlsxLoading, setXlsxLoading] = useState(false);
   const [sortField, setSortField] = useState(null);
   const [sortOrder, setSortOrder] = useState(null);
+  const [summaryData, setSummaryData] = useState({});
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [summarySelections, setSummarySelections] = useState({});
+  const [summaryErrors, setSummaryErrors] = useState({});
+  const summaryRequestIdRef = useRef(0);
+  const previousSummaryErrorsRef = useRef({});
+
+  const requestSummaryData = useCallback(
+    async ({ keyword = "", filters = {}, sortField: currentSortField, sortOrder: currentSortOrder, operations = [] }) => {
+      const validOperations = Array.isArray(operations) ? operations.filter((operation) => operation && operation.islemTipi && operation.alan) : [];
+
+      if (validOperations.length === 0) {
+        setSummaryData({});
+        setSummaryErrors({});
+        setSummaryLoading(false);
+        return;
+      }
+
+      const requestId = summaryRequestIdRef.current + 1;
+      summaryRequestIdRef.current = requestId;
+      setSummaryLoading(true);
+      setSummaryErrors((prev) => {
+        if (!prev || Object.keys(prev).length === 0) {
+          return prev;
+        }
+        const updated = { ...prev };
+        validOperations.forEach((operation) => {
+          if (operation && operation.alan) {
+            delete updated[operation.alan];
+          }
+        });
+        return updated;
+      });
+
+      let sortParam = "";
+      if (currentSortField && currentSortOrder) {
+        const normalizedOrder = currentSortOrder === "ascend" ? "ASC" : "DESC";
+        sortParam = `&sortField=${currentSortField}&sortOrder=${normalizedOrder}`;
+      }
+
+      try {
+        const response = await AxiosInstance.post(`GetIsEmriAltToplamlar?parametre=${keyword}${sortParam}`, {
+          hesaplamalar: validOperations,
+          filtreler: filters,
+        });
+
+        const normalized = normalizeSummaryResponse(response, validOperations);
+        const responseErrorFields = buildSummaryErrorMap(validOperations, response?.hataliAlanlar, response?.status || response?.message);
+
+        if (summaryRequestIdRef.current === requestId) {
+          setSummaryData(normalized);
+          if (Object.keys(responseErrorFields).length > 0) {
+            setSummaryErrors((prev) => ({
+              ...prev,
+              ...responseErrorFields,
+            }));
+          }
+        }
+      } catch (error) {
+        console.error("Toplam verileri çekilirken hata oluştu:", error);
+        if (summaryRequestIdRef.current === requestId) {
+          setSummaryData({});
+          const errorData = error?.response?.data;
+          const errorFields = buildSummaryErrorMap(
+            validOperations,
+            errorData?.hataliAlanlar,
+            errorData?.status || error?.message || "Toplama işlemi gerçekleştirilemedi."
+          );
+          if (Object.keys(errorFields).length > 0) {
+            setSummaryErrors((prev) => ({
+              ...prev,
+              ...errorFields,
+            }));
+          }
+        }
+      } finally {
+        if (summaryRequestIdRef.current === requestId) {
+          setSummaryLoading(false);
+        }
+      }
+    },
+    []
+  );
+
+  const handleSummaryOperationSelect = useCallback((fieldKey, operationKey) => {
+    if (!fieldKey || !operationKey) {
+      return;
+    }
+
+    setSummarySelections((prev) => {
+      if (prev[fieldKey] === operationKey) {
+        return prev;
+      }
+      return {
+        ...prev,
+        [fieldKey]: operationKey,
+      };
+    });
+
+    setSummaryData((prevData) => {
+      if (!prevData || prevData[fieldKey] === undefined) {
+        return prevData;
+      }
+      const updated = { ...prevData };
+      delete updated[fieldKey];
+      return updated;
+    });
+
+    setSummaryErrors((prevErrors) => {
+      if (!prevErrors || prevErrors[fieldKey] === undefined) {
+        return prevErrors;
+      }
+      const updated = { ...prevErrors };
+      delete updated[fieldKey];
+      return updated;
+    });
+  }, []);
 
   function hexToRGBA(color, opacity) {
     // 1) Geçersiz parametreleri engelle
@@ -1027,6 +1306,30 @@ const MainTable = () => {
     filters: {},
   });
 
+  useEffect(() => {
+    const entries = Object.entries(summarySelections).filter(([field, operation]) => field && operation);
+
+    if (entries.length === 0) {
+      setSummaryData({});
+      setSummaryErrors({});
+      setSummaryLoading(false);
+      return;
+    }
+
+    const operationsPayload = entries.map(([field, operation]) => ({
+      islemTipi: operation,
+      alan: field,
+    }));
+
+    requestSummaryData({
+      keyword: body.keyword || "",
+      filters: body.filters || {},
+      sortField,
+      sortOrder,
+      operations: operationsPayload,
+    });
+  }, [summarySelections, body.keyword, body.filters, sortField, sortOrder, requestSummaryData]);
+
   // ana tablo api isteği için kullanılan useEffect
 
   useEffect(() => {
@@ -1220,6 +1523,44 @@ const MainTable = () => {
   });
   // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz sonu
 
+  const getColumnLabel = useCallback(
+    (fieldKey) => {
+      if (!fieldKey) {
+        return "";
+      }
+      const column = columns.find((col) => col.dataIndex === fieldKey || col.key === fieldKey);
+      if (column && column.title) {
+        const extracted = extractTextFromElement(column.title);
+        if (extracted && extracted.trim() !== "") {
+          return extracted;
+        }
+      }
+      return fieldKey;
+    },
+    [columns]
+  );
+
+  useEffect(() => {
+    const previous = previousSummaryErrorsRef.current || {};
+    const current = summaryErrors || {};
+
+    Object.entries(current).forEach(([field, detail]) => {
+      if (previous[field] !== detail) {
+        const label = getColumnLabel(field);
+        const text = detail && typeof detail === "string" && detail.trim() !== "" ? detail : "Toplama işlemi gerçekleştirilemedi.";
+        message.error(`${label}: ${text}`);
+      }
+    });
+
+    Object.keys(previous).forEach((field) => {
+      if (!current[field]) {
+        delete previous[field];
+      }
+    });
+
+    previousSummaryErrorsRef.current = { ...current };
+  }, [summaryErrors, getColumnLabel]);
+
   // sütunları local storage'a kaydediyoruz
   useEffect(() => {
     localStorage.setItem("columnOrderIsEmriAnalizi", JSON.stringify(columns.map((col) => col.key)));
@@ -1274,6 +1615,74 @@ const MainTable = () => {
   // fitrelenmiş sütunları birleştiriyoruz ve sadece görünür olanları alıyoruz ve tabloya gönderiyoruz
 
   const filteredColumns = mergedColumns.filter((col) => col.visible);
+
+  const renderTableSummary = (_pageData) => {
+    const hasSelectionColumn = Boolean(rowSelection);
+
+    return (
+      <Table.Summary fixed="bottom">
+        <Table.Summary.Row>
+          {hasSelectionColumn ? <Table.Summary.Cell index={0} key="summary-selection" style={{ ...SUMMARY_CELL_STYLE, cursor: "default" }} /> : null}
+          {filteredColumns.map((column, columnIndex) => {
+            const summaryIndex = hasSelectionColumn ? columnIndex + 1 : columnIndex;
+            const fieldKey = column.dataIndex || column.key;
+            const selectedOperation = fieldKey ? summarySelections[fieldKey] : null;
+            const summaryEntry = fieldKey ? summaryData[fieldKey] : undefined;
+            const isLoading = summaryLoading && !!selectedOperation && !summaryEntry;
+            const errorMessage = fieldKey ? summaryErrors[fieldKey] : null;
+
+            let content;
+
+            if (fieldKey && errorMessage) {
+              content = (
+                <Text type="danger" strong>
+                  Hata
+                </Text>
+              );
+            } else if (fieldKey && selectedOperation && summaryEntry) {
+              const operationLabel = OPERATION_LABELS[selectedOperation] || selectedOperation;
+              const formattedValue =
+                typeof summaryEntry.value === "number" ? summaryEntry.value.toLocaleString("tr-TR", { minimumFractionDigits: 0, maximumFractionDigits: 2 }) : summaryEntry.value;
+
+              content = (
+                <Text strong>
+                  {operationLabel ? `${operationLabel}: ` : ""}
+                  {formattedValue}
+                </Text>
+              );
+            } else if (isLoading) {
+              content = <Text type="secondary">Yükleniyor...</Text>;
+            } else if (fieldKey && selectedOperation) {
+              const operationLabel = OPERATION_LABELS[selectedOperation] || selectedOperation;
+              content = <Text type="secondary">{`${operationLabel} seçildi`}</Text>;
+            } else {
+              content = <Text type="secondary">Seçiniz</Text>;
+            }
+
+            return (
+              <Table.Summary.Cell key={`summary-${fieldKey || columnIndex}`} index={summaryIndex} style={SUMMARY_CELL_STYLE}>
+                {fieldKey ? (
+                  <Dropdown
+                    menu={{
+                      items: SUMMARY_DROPDOWN_ITEMS,
+                      selectable: true,
+                      selectedKeys: selectedOperation ? [selectedOperation] : [],
+                      onClick: ({ key }) => handleSummaryOperationSelect(fieldKey, key),
+                    }}
+                    trigger={["click"]}
+                  >
+                    <div style={{ width: "100%", cursor: "pointer" }}>{content}</div>
+                  </Dropdown>
+                ) : (
+                  content
+                )}
+              </Table.Summary.Cell>
+            );
+          })}
+        </Table.Summary.Row>
+      </Table.Summary>
+    );
+  };
 
   // fitrelenmiş sütunları birleştiriyoruz ve sadece görünür olanları alıyoruz ve tabloya gönderiyoruz sonu
 
@@ -1558,6 +1967,8 @@ const MainTable = () => {
           rowSelection={rowSelection}
           columns={filteredColumns}
           dataSource={data}
+          bordered
+          summary={renderTableSummary}
           pagination={{
             current: currentPage,
             total: totalDataCount, // Toplam kayıt sayısı (sayfa başına kayıt sayısı ile çarpılır)
@@ -1571,7 +1982,7 @@ const MainTable = () => {
             showQuickJumper: true,
           }}
           // onRow={onRowClick}
-          scroll={{ y: "calc(100vh - 370px)" }}
+          scroll={{ y: "calc(100vh - 430px)" }}
           onChange={handleTableChange}
           rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
         />
