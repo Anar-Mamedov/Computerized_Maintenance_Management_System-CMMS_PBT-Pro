@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Row, Col, Input, Button, Table, Card, Tag, Divider, message, Tooltip, Space, DatePicker, Popconfirm, Typography } from "antd";
 import { SendOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../api/http";
@@ -20,7 +20,36 @@ export default function TalepTeklifeAktarmaAntd({ fisId, baslik, fisNo }) {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [malzemeSearch, setMalzemeSearch] = useState("");
   const [searchValue, setSearchValue] = useState("");
+  const [leftWidth, setLeftWidth] = useState(50); // tablolar arası genişlik
+  const [topHeight, setTopHeight] = useState(60); // tablolar & paketler arası yükseklik
+  const containerRef = useRef(null);
+  const isDraggingX = useRef(false);
+  const isDraggingY = useRef(false);
+
+  // sürükleme fonksiyonları
+  const handleMouseDownX = () => (isDraggingX.current = true);
+  const handleMouseDownY = () => (isDraggingY.current = true);
+  const handleMouseUp = () => {
+    isDraggingX.current = false;
+    isDraggingY.current = false;
+  };
+
+  const handleMouseMove = (e) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+
+    if (isDraggingX.current) {
+      const newLeft = ((e.clientX - rect.left) / rect.width) * 100;
+      if (newLeft > 20 && newLeft < 80) setLeftWidth(newLeft);
+    }
+
+    if (isDraggingY.current) {
+      const newTop = ((e.clientY - rect.top) / rect.height) * 100;
+      if (newTop > 25 && newTop < 80) setTopHeight(newTop);
+    }
+  };
 
   // --- Malzemeleri getir
   const fetchMalzemeler = async () => {
@@ -303,180 +332,220 @@ const handleFinishEditing = async (id) => {
 // Paket Başlık Değiştirme Fonksiyonları Bitiş
 
   return (
-    <div style={{ padding: 20, background: "#f5f7fa", height: "77vh", width: "70vw", overflowY: "auto" }}>
-      <Card>
-        <Row justify="space-between" align="middle">
-          <Col flex="auto">
-            <Row gutter={16}>
-              <Col span={6}>
-                <div style={{ marginBottom: 4, color: "#000000", fontSize: 15, fontWeight: 500 }}>
-                  Düzenleme Tarihi
-                </div>
-                <DatePicker
-                  style={{ width: "100%" }}
-                  value={duzenlemeTarihi}
-                  onChange={(date) => setDuzenlemeTarihi(date)}
-                  format="DD.MM.YYYY"
-                  placeholder="Düzenleme Tarihi"
-                />
-              </Col>
-              <Col span={6}>
   <div
+    ref={containerRef}
     style={{
-      marginBottom: 4,
-      color: "#000000",
-      fontSize: 15,
-      fontWeight: 500,
+      padding: 20,
+      background: "#f5f7fa",
+      height: "77vh",
+      width: "70vw",
+      display: "flex",
+      flexDirection: "column",
+      overflow: "hidden",
     }}
+    onMouseMove={handleMouseMove}
+    onMouseUp={handleMouseUp}
+    onMouseLeave={handleMouseUp}
   >
-    Konu
-  </div>
-  <Input
-    value={konu}
-    onChange={(e) => setKonu(e.target.value)}
-    placeholder="Konu"
-  />
-</Col>
-            </Row>
-          </Col>
-          {/* <Col>
-    <Button type="primary" icon={<SendOutlined />} disabled={loading}>
-      Teklif İste
-    </Button>
-  </Col> */}
-        </Row>
-      </Card>
-
-      <Row gutter={16} style={{ marginTop: 16 }}>
-        <Col xs={24} md={12}>
-          <Card style={{ height: 425, display: "flex", flexDirection: "column" }}>
-            <Search
-              placeholder="Malzeme ara..."
-              allowClear
-              onSearch={(v) => setSearchValue(v)}
-              style={{ marginBottom: 12 }}
-            />
-              <Divider />
-            <Table
-              size="small"
-              columns={itemColumns}
-              dataSource={data}
-              rowSelection={itemRowSelection}
-              rowKey={(record) =>
-                record.stokId !== -1
-                ? record.stokId
-                : `tmp-${record.stokKod ?? Math.random()}`
-              }
-              loading={loading}
-              pagination={{ pageSize: 5 }}
-              scroll={{ y: 300 }}
-            />
-          </Card>
+    <Card>
+      <Row gutter={16} align="middle">
+        {/* Düzenleme Tarihi */}
+        <Col span={6}>
+          <div
+            style={{
+              marginBottom: 4,
+              color: "#000000",
+              fontSize: 15,
+              fontWeight: 500,
+            }}
+          >
+            Düzenleme Tarihi
+          </div>
+          <DatePicker
+            style={{ width: "100%" }}
+            value={duzenlemeTarihi}
+            onChange={(date) => setDuzenlemeTarihi(date)}
+            format="DD.MM.YYYY"
+            placeholder="Düzenleme Tarihi"
+          />
         </Col>
 
-        <Col xs={24} md={12}>
-          <Card style={{ height: 425, display: "flex", flexDirection: "column" }}>
-            <Search
-              placeholder="Tedarikçi ara..."
-              allowClear
-              onSearch={(v) => setSearchValue(v)}
-              style={{ marginBottom: 12 }}
-            />
-              <Divider />
-            <Table
-              size="small"
-              columns={supplierColumns}
-              dataSource={suppliers}
-              rowSelection={supplierRowSelection}
-              rowKey={(record) => record.TB_CARI_ID ?? Math.random()}
-              pagination={{ pageSize: 5 }}
-              scroll={{ y: 300 }}
-            />
-          </Card>
+        {/* Konu */}
+        <Col flex="auto">
+          <div
+            style={{
+              marginBottom: 4,
+              color: "#000000",
+              fontSize: 15,
+              fontWeight: 500,
+            }}
+          >
+            Konu
+          </div>
+          <Input
+            value={konu}
+            onChange={(e) => setKonu(e.target.value)}
+            placeholder="Konu"
+            style={{ width: "100%" }}
+          />
+        </Col>
+
+        {/* Buton */}
+        <Col>
+          <Button
+  type={data.length > 0 ? "primary" : "default"} // primary = mavi, default ile style kullanacağız
+  style={{
+    marginTop: 22,
+    backgroundColor: data.length > 0 ? undefined : "#52c41a", // Teklifleri Karşılaştır yeşil
+    borderColor: data.length > 0 ? undefined : "#52c41a",
+    color: data.length > 0 ? undefined : "#fff",
+  }}
+  icon={<SendOutlined />}
+  loading={loading}
+  onClick={data.length > 0 ? handleCreateTeklif : handleCompareTeklifler}
+>
+  {data.length > 0 ? "Teklif Oluştur" : "Teklifleri Karşılaştır"}
+</Button>
         </Col>
       </Row>
-
-      <Card>
-  <Row justify="space-between" align="middle">
-    <Col></Col>
-    <Col>
-      <Button
-        type="primary"
-        icon={<SendOutlined />}
-        loading={loading}
-        onClick={data.length > 0 ? handleCreateTeklif : handleCompareTeklifler} // Buton davranışı değişiyor
-      >
-        {data.length > 0 ? "Teklif Oluştur" : "Teklifleri Karşılaştır"}
-      </Button>
-    </Col>
-  </Row>
-</Card>
-
-    <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-      {teklifPaketleri.map((t) => (
-  <Col xs={24} sm={12} md={8} key={t.teklifId}>
-    <Card
-      size="small"
-      title={
-        <Text strong style={{ fontSize: 16 }}>
-          {t.editing ? ( // Eğer düzenleme modundaysa input göster
-            <Input
-              value={t.baslik}
-              onChange={(e) => handleTitleChange(t.teklifId, e.target.value)}
-              onPressEnter={() => handleFinishEditing(t.teklifId)}
-              onBlur={() => handleFinishEditing(t.teklifId)}
-              autoFocus
-            />
-          ) : (
-            `RFQ — ${t.baslik}`
-          )}
-        </Text>
-      }
-      extra={
-        <Space>
-          <Button
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => handleEditClick(t.teklifId)}
-          />
-          <Popconfirm
-            title="Bu teklifi silmek istediğine emin misin?"
-            okText="Evet"
-            cancelText="Hayır"
-            onConfirm={() => handleDelete(t.teklifId)}
-          >
-            <Button size="small" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
-        </Space>
-      }
-      style={{
-        borderRadius: 12,
-        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-        height: "100%",
-      }}
-    >
-      <div style={{ marginBottom: 6 }}>
-        <Text>
-          <b>Kalem:</b> {t.kalemSayisi} • <b>Tedarikçi:</b> {t.tedarikcSayisi}
-        </Text>
-      </div>
-
-      <div style={{ marginBottom: 6 }}>
-        <Text>
-          <b>Tedarikçiler:</b> {t.tedarikciler?.trim() || "-"}
-        </Text>
-      </div>
-
-      <div style={{ marginBottom: 6 }}>
-        <Text>
-          <b>Oluşturma Tarihi:</b>{" "}
-          {dayjs(t.olusturmaTarih).format("DD.MM.YYYY HH:mm")}
-        </Text>
-      </div>
     </Card>
-  </Col>
-))}
-    </Row>
+{/* --- Tablolar ve sürükleme çubuğu --- */}
+<div style={{ flex: `${topHeight}%`, display: "flex", marginTop: 16, overflow: "hidden" }}>
+  {/* Malzeme tablosu */}
+  <div style={{ width: `${leftWidth}%`, overflow: "auto" }}>
+    <Card style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+          {/* Malzeme arama */}
+<Search
+  placeholder="Malzeme ara..."
+  allowClear
+  onChange={(e) => setMalzemeSearch(e.target.value)}
+  value={malzemeSearch}
+  style={{ marginBottom: 12 }}
+/>
+          <Divider />
+          <Table
+  size="small"
+  columns={itemColumns}
+  dataSource={data.filter((d) =>
+    !malzemeSearch || d.stokAdi.toLowerCase().includes(malzemeSearch.toLowerCase())
+  )}
+  rowSelection={itemRowSelection}
+  rowKey={(record) => (record.stokId !== -1 ? record.stokId : `tmp-${record.stokKod ?? Math.random()}`)}
+  loading={loading}
+  pagination={{ pageSize: 5 }}
+  scroll={{ y: 300 }}
+/>
+        </Card>
+      </div>
+
+      {/* Yatay sürükleme çubuğu */}
+  <div
+    onMouseDown={handleMouseDownX}
+    style={{
+      width: 5,
+      cursor: "col-resize",
+      backgroundColor: "#d9d9d9",
+      zIndex: 1,
+    }}
+  />
+
+      {/* Tedarikçi tablosu */}
+  <div style={{ width: `${100 - leftWidth - 0.5}%`, overflow: "auto" }}>
+    <Card style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+          {/* Tedarikçi arama */}
+<Search
+  placeholder="Tedarikçi ara..."
+  allowClear
+  onChange={(e) => setSearchValue(e.target.value)}
+  value={searchValue}
+  style={{ marginBottom: 12 }}
+/>
+          <Divider />
+          <Table
+  size="small"
+  columns={supplierColumns}
+  dataSource={suppliers.filter((s) =>
+    !searchValue || s.CAR_TANIM.toLowerCase().includes(searchValue.toLowerCase())
+  )}
+  rowSelection={supplierRowSelection}
+  rowKey={(record) => record.TB_CARI_ID ?? Math.random()}
+  pagination={{ pageSize: 5 }}
+  scroll={{ y: 300 }}
+/>
+        </Card>
+      </div>
     </div>
-  );
+
+    {/* Dikey sürükleme çubuğu */}
+    <div
+      onMouseDown={handleMouseDownY}
+      style={{
+        height: 5,
+        cursor: "row-resize",
+        backgroundColor: "#d9d9d9",
+        margin: "8px 0",
+      }}
+    />
+
+    {/* Teklif paketleri */}
+    <div style={{ flex: `${100 - topHeight}%`, overflowY: "auto" }}>
+      <Row gutter={[16, 16]}>
+        {teklifPaketleri.map((t) => (
+          <Col xs={24} sm={12} md={8} key={t.teklifId}>
+            <Card
+              size="small"
+              title={
+                <Text strong style={{ fontSize: 16 }}>
+                  {t.editing ? (
+                    <Input
+                      value={t.baslik}
+                      onChange={(e) => handleTitleChange(t.teklifId, e.target.value)}
+                      onPressEnter={() => handleFinishEditing(t.teklifId)}
+                      onBlur={() => handleFinishEditing(t.teklifId)}
+                      autoFocus
+                    />
+                  ) : (
+                    `RFQ — ${t.baslik}`
+                  )}
+                </Text>
+              }
+              extra={
+                <Space>
+                  <Button size="small" icon={<EditOutlined />} onClick={() => handleEditClick(t.teklifId)} />
+                  <Popconfirm
+                    title="Bu teklifi silmek istediğine emin misin?"
+                    okText="Evet"
+                    cancelText="Hayır"
+                    onConfirm={() => handleDelete(t.teklifId)}
+                  >
+                    <Button size="small" danger icon={<DeleteOutlined />} />
+                  </Popconfirm>
+                </Space>
+              }
+              style={{ borderRadius: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", height: "100%" }}
+            >
+              <div style={{ marginBottom: 6 }}>
+                <Text>
+                  <b>Kalem:</b> {t.kalemSayisi} • <b>Tedarikçi:</b> {t.tedarikcSayisi}
+                </Text>
+              </div>
+
+              <div style={{ marginBottom: 6 }}>
+                <Text>
+                  <b>Tedarikçiler:</b> {t.tedarikciler?.trim() || "-"}
+                </Text>
+              </div>
+
+              <div style={{ marginBottom: 6 }}>
+                <Text>
+                  <b>Oluşturma Tarihi:</b> {dayjs(t.olusturmaTarih).format("DD.MM.YYYY HH:mm")}
+                </Text>
+              </div>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    </div>
+  </div>
+);
 }
