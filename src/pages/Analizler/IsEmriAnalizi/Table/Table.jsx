@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message, Dropdown } from "antd";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message, Dropdown, Tabs } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -298,6 +298,7 @@ const MainTable = () => {
     data: null,
   });
   const [selectedRows, setSelectedRows] = useState([]);
+  const [activeTab, setActiveTab] = useState("detay");
   const [xlsxLoading, setXlsxLoading] = useState(false);
   const [sortField, setSortField] = useState(null);
   const [sortOrder, setSortOrder] = useState(null);
@@ -2651,7 +2652,7 @@ const MainTable = () => {
           display: "flex",
           flexWrap: "wrap",
           justifyContent: "space-between",
-          marginBottom: "20px",
+          marginBottom: "7px",
           gap: "10px",
           padding: "0 5px",
         }}
@@ -2690,32 +2691,56 @@ const MainTable = () => {
           {/* <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} /> */}
         </div>
       </div>
-      <Spin spinning={loading}>
-        <Table
-          components={components}
-          rowSelection={rowSelection}
-          columns={filteredColumns}
-          dataSource={data}
-          bordered
-          summary={renderTableSummary}
-          pagination={{
-            current: currentPage,
-            total: totalDataCount, // Toplam kayıt sayısı (sayfa başına kayıt sayısı ile çarpılır)
-            pageSize: pageSize,
-            defaultPageSize: 20,
-            showSizeChanger: true,
-            pageSizeOptions: ["10", "20", "50", "100"],
-            position: ["bottomRight"],
-            onChange: handleTableChange,
-            showTotal: (total, range) => `Toplam ${total}`, // Burada 'total' parametresi doğru kayıt sayısını yansıtacaktır
-            showQuickJumper: true,
-          }}
-          // onRow={onRowClick}
-          scroll={{ y: "calc(100vh - 430px)" }}
-          onChange={handleTableChange}
-          rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
-        />
-      </Spin>
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        style={{ marginTop: 0 }}
+        centered
+        items={[
+          {
+            key: "detay",
+            label: "Detay",
+            children: (
+              <Spin spinning={loading}>
+                <Table
+                  components={components}
+                  rowSelection={rowSelection}
+                  columns={filteredColumns}
+                  dataSource={data}
+                  bordered
+                  summary={renderTableSummary}
+                  pagination={{
+                    current: currentPage,
+                    total: totalDataCount, // Toplam kayıt sayısı (sayfa başına kayıt sayısı ile çarpılır)
+                    pageSize: pageSize,
+                    defaultPageSize: 20,
+                    showSizeChanger: true,
+                    pageSizeOptions: ["10", "20", "50", "100"],
+                    position: ["bottomRight"],
+                    onChange: handleTableChange,
+                    showTotal: (total, range) => `Toplam ${total}`, // Burada 'total' parametresi doğru kayıt sayısını yansıtacaktır
+                    showQuickJumper: true,
+                  }}
+                  // onRow={onRowClick}
+                  scroll={{ y: "calc(100vh - 470px)" }}
+                  onChange={handleTableChange}
+                  rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
+                />
+              </Spin>
+            ),
+          },
+          {
+            key: "aylik",
+            label: "Aylık",
+            children: null,
+          },
+          {
+            key: "yillik",
+            label: "Yıllık",
+            children: null,
+          },
+        ]}
+      />
       {/* <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
 
       {editDrawer1Visible && (
