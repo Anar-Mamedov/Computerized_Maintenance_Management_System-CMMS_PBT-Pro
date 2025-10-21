@@ -150,6 +150,8 @@ const MainTable = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [assignPopoverOpen, setAssignPopoverOpen] = useState(false);
   const [xlsxLoading, setXlsxLoading] = useState(false);
+  const [sortField, setSortField] = useState(null);
+  const [sortOrder, setSortOrder] = useState(null);
 
   const statusTag = (statusId) => {
     switch (statusId) {
@@ -248,7 +250,7 @@ const MainTable = () => {
       ellipsis: true,
       visible: true,
       render: (text) => <a>{text}</a>,
-      sorter: (a, b) => (a.IST_KOD || "").localeCompare(b.IST_KOD || ""),
+      sorter: true,
     },
     {
       title: "Tarih",
@@ -263,7 +265,7 @@ const MainTable = () => {
       }),
       visible: true,
       render: (text) => formatDate(text),
-      sorter: (a, b) => (a.IST_ACILIS_TARIHI || "").localeCompare(b.IST_ACILIS_TARIHI || ""),
+      sorter: true,
     },
     {
       title: "Saat",
@@ -278,7 +280,7 @@ const MainTable = () => {
       }),
       visible: true,
       render: (text) => formatTime(text),
-      sorter: (a, b) => (a.IST_ACILIS_SAATI || "").localeCompare(b.IST_ACILIS_SAATI || ""),
+      sorter: true,
     },
     {
       title: "Konu",
@@ -288,7 +290,7 @@ const MainTable = () => {
       ellipsis: true,
       visible: true,
       render: (text) => <a>{text}</a>,
-      sorter: (a, b) => (a.IST_TANIMI || "").localeCompare(b.IST_TANIMI || ""),
+      sorter: true,
     },
     {
       title: "Talep Eden",
@@ -302,7 +304,7 @@ const MainTable = () => {
         },
       }),
       visible: true,
-      sorter: (a, b) => (a.IST_TALEP_EDEN_ADI || "").localeCompare(b.IST_TALEP_EDEN_ADI || ""),
+      sorter: true,
     },
     {
       title: "Durum",
@@ -339,7 +341,7 @@ const MainTable = () => {
           </div>
         );
       },
-      sorter: (a, b) => (a.IST_DURUM_ID || 0) - (b.IST_DURUM_ID || 0),
+      sorter: true,
     },
     {
       title: t("kullaniciOnayi"),
@@ -380,7 +382,7 @@ const MainTable = () => {
 
         return <Tag style={tagStyle}>{tagText}</Tag>;
       },
-      sorter: (a, b) => (a.IST_KULLANICI_ONAY_DURUM || "").localeCompare(b.IST_KULLANICI_ONAY_DURUM || ""),
+      sorter: true,
     },
     {
       title: t("onayAciklamasi"),
@@ -389,7 +391,7 @@ const MainTable = () => {
       width: 200,
       ellipsis: true,
       visible: false,
-      sorter: (a, b) => (a.IST_RED_ACIKLAMA || "").localeCompare(b.IST_RED_ACIKLAMA || ""),
+      sorter: true,
     },
     {
       title: "Makine Tanım",
@@ -403,7 +405,7 @@ const MainTable = () => {
         },
       }),
       visible: true,
-      sorter: (a, b) => (a.IST_MAKINE_TANIM || "").localeCompare(b.IST_MAKINE_TANIM || ""),
+      sorter: true,
     },
     {
       title: "İş Kategorisi",
@@ -417,7 +419,7 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) => (a.IST_KATEGORI_TANIMI || "").localeCompare(b.IST_KATEGORI_TANIMI || ""),
+      sorter: true,
     },
     {
       title: "Öncelik",
@@ -431,7 +433,7 @@ const MainTable = () => {
         },
       }),
       visible: true,
-      sorter: (a, b) => (a.IST_ONCELIK || "").localeCompare(b.IST_ONCELIK || ""),
+      sorter: true,
     },
     {
       title: "Lokasyon",
@@ -445,7 +447,7 @@ const MainTable = () => {
         },
       }),
       visible: true,
-      sorter: (a, b) => (a.IST_BILDIREN_LOKASYON || "").localeCompare(b.IST_BILDIREN_LOKASYON || ""),
+      sorter: true,
     },
     {
       title: "İşlem Süresi",
@@ -478,7 +480,7 @@ const MainTable = () => {
         const farkGun = Math.floor(farkSaat / 24);
         return `${farkGun > 0 ? farkGun + " gün " : ""}${farkSaat % 24 > 0 ? (farkSaat % 24) + " saat " : ""}${farkDakika % 60 > 0 ? (farkDakika % 60) + " dakika " : ""}`;
       },
-      sorter: (a, b) => (a.ISLEM_SURE || "").localeCompare(b.ISLEM_SURE || ""),
+      sorter: true,
     },
     {
       title: "Kapanma Tarih",
@@ -493,7 +495,7 @@ const MainTable = () => {
       }),
       visible: false,
       render: (text) => formatDate(text),
-      sorter: (a, b) => (a.IST_KAPAMA_TARIHI || "").localeCompare(b.IST_KAPAMA_TARIHI || ""),
+      sorter: true,
     },
     {
       title: "Kapanma Saat",
@@ -508,7 +510,7 @@ const MainTable = () => {
       }),
       visible: false,
       render: (text) => formatTime(text),
-      sorter: (a, b) => (a.IST_KAPAMA_SAATI || "").localeCompare(b.IST_KAPAMA_SAATI || ""),
+      sorter: true,
     },
     {
       title: "İptal Tarih",
@@ -523,7 +525,7 @@ const MainTable = () => {
       }),
       visible: false,
       render: (text) => formatDate(text),
-      sorter: (a, b) => (a.IST_IPTAL_TARIH || "").localeCompare(b.IST_IPTAL_TARIH || ""),
+      sorter: true,
     },
     {
       title: "İptal Saat",
@@ -538,7 +540,7 @@ const MainTable = () => {
       }),
       visible: false,
       render: (text) => formatTime(text),
-      sorter: (a, b) => (a.IST_IPTAL_SAAT || "").localeCompare(b.IST_IPTAL_SAAT || ""),
+      sorter: true,
     },
     {
       title: "Müdahele Gecikme Süresi",
@@ -552,7 +554,7 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) => (a.mudaheleGecikmeSuresi || "").localeCompare(b.mudaheleGecikmeSuresi || ""),
+      sorter: true,
     },
     {
       title: "Durum Açıklaması",
@@ -566,7 +568,7 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) => (a.durumAciklamasi || "").localeCompare(b.durumAciklamasi || ""),
+      sorter: true,
     },
     {
       title: "Planlanan Başlama Tarihi",
@@ -581,7 +583,7 @@ const MainTable = () => {
       }),
       visible: false,
       render: (text) => formatDate(text),
-      sorter: (a, b) => (a.IST_PLANLANAN_BASLAMA_TARIHI || "").localeCompare(b.IST_PLANLANAN_BASLAMA_TARIHI || ""),
+      sorter: true,
     },
     {
       title: "Planlanan Başlama Saati",
@@ -596,7 +598,7 @@ const MainTable = () => {
       }),
       visible: false,
       render: (text) => formatTime(text),
-      sorter: (a, b) => (a.IST_PLANLANAN_BASLAMA_SAATI || "").localeCompare(b.IST_PLANLANAN_BASLAMA_SAATI || ""),
+      sorter: true,
     },
     {
       title: "Planlanan Bitiş Tarihi",
@@ -611,7 +613,7 @@ const MainTable = () => {
       }),
       visible: false,
       render: (text) => formatDate(text),
-      sorter: (a, b) => (a.IST_PLANLANAN_BITIS_TARIHI || "").localeCompare(b.IST_PLANLANAN_BITIS_TARIHI || ""),
+      sorter: true,
     },
     {
       title: "Planlanan Bitiş Saati",
@@ -626,7 +628,7 @@ const MainTable = () => {
       }),
       visible: false,
       render: (text) => formatTime(text),
-      sorter: (a, b) => (a.IST_PLANLANAN_BITIS_SAATI || "").localeCompare(b.IST_PLANLANAN_BITIS_SAATI || ""),
+      sorter: true,
     },
     {
       title: "İş Emri No",
@@ -644,7 +646,7 @@ const MainTable = () => {
       }),
       render: (text) => <a>{text}</a>,
       visible: true,
-      sorter: (a, b) => (a.IST_ISEMRI_NO || "").localeCompare(b.IST_ISEMRI_NO || ""),
+      sorter: true,
     },
     {
       title: "Teknisyen",
@@ -658,7 +660,7 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) => (a.IST_TEKNISYEN_TANIM || "").localeCompare(b.IST_TEKNISYEN_TANIM || ""),
+      sorter: true,
     },
     {
       title: "Atölye",
@@ -672,7 +674,7 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) => (a.IST_ATOLYE_TANIM || "").localeCompare(b.IST_ATOLYE_TANIM || ""),
+      sorter: true,
     },
     {
       title: "Makine Kodu",
@@ -686,7 +688,7 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) => (a.IST_MAKINE_KOD || "").localeCompare(b.IST_MAKINE_KOD || ""),
+      sorter: true,
     },
     {
       title: "Bildirim Tipi",
@@ -700,7 +702,7 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) => (a.IST_TIP_TANIM || "").localeCompare(b.IST_TIP_TANIM || ""),
+      sorter: true,
     },
     {
       title: "İlgili Kişi",
@@ -714,7 +716,7 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) => (a.IST_TAKIP_EDEN_ADI || "").localeCompare(b.IST_TAKIP_EDEN_ADI || ""),
+      sorter: true,
     },
     {
       title: "Bildirilen Bina",
@@ -728,7 +730,7 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) => (a.IST_BINA || "").localeCompare(b.IST_BINA || ""),
+      sorter: true,
     },
     {
       title: "Bildirilen Kat",
@@ -742,7 +744,7 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) => (a.IST_KAT || "").localeCompare(b.IST_KAT || ""),
+      sorter: true,
     },
     {
       title: "Servis Nedeni",
@@ -756,7 +758,7 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) => (a.IST_SERVIS_NEDENI || "").localeCompare(b.IST_SERVIS_NEDENI || ""),
+      sorter: true,
     },
     {
       title: "Tam Lokasyon",
@@ -770,7 +772,7 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) => (a.IST_BILDIREN_LOKASYON_TUM || "").localeCompare(b.IST_BILDIREN_LOKASYON_TUM || ""),
+      sorter: true,
     },
     {
       title: "Ana Lokasyon",
@@ -783,15 +785,7 @@ const MainTable = () => {
         },
       }),
       width: 300,
-      sorter: (a, b) => {
-        if (a.IST_BILDIREN_LOKASYON_TUM && b.IST_BILDIREN_LOKASYON_TUM) {
-          return a.IST_BILDIREN_LOKASYON_TUM.localeCompare(b.IST_BILDIREN_LOKASYON_TUM);
-        }
-        if (!a.IST_BILDIREN_LOKASYON_TUM && !b.IST_BILDIREN_LOKASYON_TUM) {
-          return 0;
-        }
-        return a.IST_BILDIREN_LOKASYON_TUM ? 1 : -1;
-      },
+      sorter: true,
       render: (text) => {
         if (text === null) {
           return null;
@@ -813,7 +807,7 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) => (a.IST_DEGERLENDIRME_PUAN || "").localeCompare(b.IST_DEGERLENDIRME_PUAN || ""),
+      sorter: true,
     },
     {
       title: "Talep Değerlendirme Açıklama",
@@ -827,7 +821,7 @@ const MainTable = () => {
         },
       }),
       visible: false,
-      sorter: (a, b) => (a.IST_DEGERLENDIRME_ACIKLAMA || "").localeCompare(b.IST_DEGERLENDIRME_ACIKLAMA || ""),
+      sorter: true,
     },
 
     // Diğer kolonlarınız...
@@ -912,8 +906,8 @@ const MainTable = () => {
   // ana tablo api isteği için kullanılan useEffect
 
   useEffect(() => {
-    fetchEquipmentData(body, currentPage, pageSize);
-  }, [body, currentPage, pageSize]);
+    fetchEquipmentData(body, currentPage, pageSize, sortField, sortOrder);
+  }, [body, currentPage, pageSize, sortField, sortOrder]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
@@ -938,16 +932,26 @@ const MainTable = () => {
 
   // arama işlemi için kullanılan useEffect son
 
-  const fetchEquipmentData = async (body, page, size) => {
+  const fetchEquipmentData = async (body, page, size, currentSortField, currentSortOrder) => {
     // body'nin undefined olması durumunda varsayılan değerler atanıyor
     const { keyword = "", filters = {} } = body || {};
     // page'in undefined olması durumunda varsayılan değer olarak 1 atanıyor
     const currentPage = page || 1;
+    const normalizedPageSize = size || pageSize;
+
+    let sortParam = "";
+    if (currentSortField && currentSortOrder) {
+      const normalizedOrder = currentSortOrder === "ascend" ? "ASC" : "DESC";
+      sortParam = `&sortField=${currentSortField}&sortOrder=${normalizedOrder}`;
+    }
 
     try {
       setLoading(true);
       // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.post(`GetIsTalepFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}`, filters);
+      const response = await AxiosInstance.post(
+        `GetIsTalepFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${normalizedPageSize}${sortParam}`,
+        filters
+      );
       if (response) {
         if (response.status_code === 401) {
           message.error(t("buSayfayaErisimYetkinizBulunmamaktadir"));
@@ -998,6 +1002,20 @@ const MainTable = () => {
       setCurrentPage(pagination.current);
       setPageSize(pagination.pageSize); // pageSize güncellemesi
     }
+
+    if (sorter && (sorter.field || sorter.columnKey)) {
+      const nextField = sorter.field || sorter.columnKey;
+      if (sorter.order) {
+        setSortField(nextField);
+        setSortOrder(sorter.order);
+      } else {
+        setSortField(null);
+        setSortOrder(null);
+      }
+    } else {
+      setSortField(null);
+      setSortOrder(null);
+    }
   };
   // sayfalama için kullanılan useEffect son
 
@@ -1043,11 +1061,11 @@ const MainTable = () => {
     setSelectedRows([]);
 
     // Verileri yeniden çekmek için `fetchEquipmentData` fonksiyonunu çağır
-    fetchEquipmentData(body, currentPage);
+    fetchEquipmentData(body, currentPage, pageSize, sortField, sortOrder);
     // Burada `body` ve `currentPage`'i güncellediğimiz için, bu değerlerin en güncel hallerini kullanarak veri çekme işlemi yapılır.
     // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
     // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
-  }, [body, currentPage]); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
+  }, [body, currentPage, pageSize, sortField, sortOrder]);
 
   // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
   const [columns, setColumns] = useState(() => {
@@ -1103,13 +1121,18 @@ const MainTable = () => {
     },
   };
 
-  const mergedColumns = columns.map((col) => ({
-    ...col,
-    onHeaderCell: (column) => ({
-      width: column.width,
-      onResize: handleResize(column.key),
-    }),
-  }));
+  const mergedColumns = columns.map((col) => {
+    const isSorted = sortField && (col.dataIndex === sortField || col.key === sortField);
+
+    return {
+      ...col,
+      sortOrder: col.sorter ? (isSorted ? sortOrder : null) : col.sortOrder,
+      onHeaderCell: (column) => ({
+        width: column.width,
+        onResize: handleResize(column.key),
+      }),
+    };
+  });
 
   // fitrelenmiş sütunları birleştiriyoruz ve sadece görünür olanları alıyoruz ve tabloya gönderiyoruz
 

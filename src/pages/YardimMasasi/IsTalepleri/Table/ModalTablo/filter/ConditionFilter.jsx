@@ -3,15 +3,81 @@ import { Popover, Button, Select } from "antd";
 
 const { Option } = Select;
 
-const ConditionFilter = ({ onSubmit }) => {
+const STATUS_OPTIONS = [
+  { key: 0, value: "Açık" },
+  { key: 1, value: "Bekliyor" },
+  { key: 2, value: "Planlandı" },
+  { key: 3, value: "Devam Ediyor" },
+  { key: 4, value: "Kapandı" },
+  { key: 5, value: "İptal Edildi" },
+  { key: 6, value: "Onay Bekliyor" },
+  { key: 7, value: "Onaylandı" },
+  { key: 8, value: "Onaylanmadı" },
+];
+
+const DEFAULT_STATUS_KEYS = ["3"];
+
+const normalizeStatusKeys = (keys) => {
+  if (!Array.isArray(keys) || keys.length === 0) {
+    return DEFAULT_STATUS_KEYS;
+  }
+  return keys.map((key) => key.toString());
+};
+
+const buildFilterMapFromKeys = (keys) => {
+  const normalized = normalizeStatusKeys(keys);
+  const result = {};
+
+  normalized.forEach((key) => {
+    const option = STATUS_OPTIONS.find((opt) => opt.key.toString() === key);
+    if (option) {
+      result[option.key] = option.value;
+    }
+  });
+
+  if (Object.keys(result).length === 0) {
+    const fallback = {};
+    normalizeStatusKeys(DEFAULT_STATUS_KEYS).forEach((key) => {
+      const option = STATUS_OPTIONS.find((opt) => opt.key.toString() === key);
+      if (option) {
+        fallback[option.key] = option.value;
+      }
+    });
+    return fallback;
+  }
+
+  return result;
+};
+
+const buildSubmitPayloadFromFilters = (filterMap) =>
+  Object.keys(filterMap).reduce((acc, key, index) => {
+    acc[`key${index}`] = key.toString();
+    return acc;
+  }, {});
+
+const ConditionFilter = ({ onSubmit, defaultStatusKeys = DEFAULT_STATUS_KEYS }) => {
   const [visible, setVisible] = useState(false);
-  const [options, setOptions] = React.useState([]);
-  const [filters, setFilters] = useState({ 3: "Devam Ediyor" }); // Key 3 olan seçeneği varsayılan olarak seçili hale getir
-  const initialRenderRef = useRef(true);
+  const onSubmitRef = useRef(onSubmit);
+  const defaultFilters = React.useMemo(() => buildFilterMapFromKeys(defaultStatusKeys), [defaultStatusKeys]);
+  const [filters, setFilters] = useState(() => ({ ...defaultFilters }));
+
+  React.useEffect(() => {
+    onSubmitRef.current = onSubmit;
+  }, [onSubmit]);
+
+  React.useEffect(() => {
+    setFilters((state) => {
+      if (JSON.stringify(state) === JSON.stringify(defaultFilters)) {
+        return state;
+      }
+      return { ...defaultFilters };
+    });
+    onSubmitRef.current(buildSubmitPayloadFromFilters(defaultFilters));
+  }, [defaultFilters]);
 
   const handleChange = (value) => {
     const selectedItemsCopy = { ...filters };
-    options.forEach((option) => {
+    STATUS_OPTIONS.forEach((option) => {
       const isSelected = selectedItemsCopy[option.key] !== undefined;
       if (isSelected && !value.includes(option.value)) {
         delete selectedItemsCopy[option.key];
@@ -22,51 +88,17 @@ const ConditionFilter = ({ onSubmit }) => {
     setFilters(selectedItemsCopy);
   };
 
-  React.useEffect(() => {
-    // Sabit verileri kullanarak options state'ini ayarlama
-    const hardcodedOptions = [
-      { key: 0, value: "Açık" },
-      { key: 1, value: "Bekliyor" },
-      { key: 2, value: "Planlandı" },
-      { key: 3, value: "Devam Ediyor" },
-      { key: 4, value: "Kapandı" },
-      { key: 5, value: "İptal Edildi" },
-      { key: 6, value: "Onay Bekliyor" },
-      { key: 7, value: "Onaylandı" },
-      { key: 8, value: "Onaylanmadı" },
-    ];
-    setOptions(hardcodedOptions);
-
-    // Sadece ilk render'da çalışsın
-    if (initialRenderRef.current) {
-      initialRenderRef.current = false;
-
-      // Seçilen durumların key değerlerini bir obje olarak oluştur
-      const defaultSelectedKeysObj = { key0: "3" };
-
-      // Bu objeyi onSubmit fonksiyonuna gönder
-      onSubmit(defaultSelectedKeysObj);
-    }
-  }, []);
-
   const handleSubmit = () => {
-    // Seçilen durumların key değerlerini bir obje olarak oluştur
-    let selectedKeysObj = {};
-    Object.keys(filters).forEach((key, index) => {
-      selectedKeysObj[`key${index}`] = key;
-    });
-
-    // Bu objeyi onSubmit fonksiyonuna gönder
-    onSubmit(selectedKeysObj);
+    onSubmitRef.current(buildSubmitPayloadFromFilters(filters));
 
     // Dropdown'ı gizle
     setVisible(false);
   };
 
   const handleCancelClick = () => {
-    setFilters([]);
+    setFilters({});
     setVisible(false);
-    onSubmit("");
+    onSubmitRef.current("");
   };
 
   const content = (
@@ -86,7 +118,7 @@ const ConditionFilter = ({ onSubmit }) => {
       </div>
       <div style={{ padding: "10px" }}>
         <Select mode="multiple" style={{ width: "100%" }} placeholder="Ara..." value={Object.values(filters)} onChange={handleChange} allowClear>
-          {options.map((option) => (
+          {STATUS_OPTIONS.map((option) => (
             <Option key={option.key} value={option.value}>
               {option.value}
             </Option>
