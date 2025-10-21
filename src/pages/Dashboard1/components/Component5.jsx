@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Modal, Typography, Spin } from "antd";
+import React, { useEffect, useMemo, useState } from "react";
+import { Modal, Typography, Spin, Table } from "antd";
 import AxiosInstance from "../../../api/http.jsx";
 import ModalTablo from "../../YardimMasasi/IsTalepleri/Table/ModalTablo/ModalTablo.jsx";
 import MakineTablo from "./../../MakineEkipman/MakineTanim/Table/Table.jsx";
@@ -13,6 +13,14 @@ function Component5(updateApi) {
   const [isLoading, setIsLoading] = useState(true);
   const [modalTitle, setModalTitle] = useState("");
   const [modalContent, setModalContent] = useState(null);
+  const [kritikModalVisible, setKritikModalVisible] = useState(false);
+  const [kritikModalLoading, setKritikModalLoading] = useState(false);
+  const [kritikModalData, setKritikModalData] = useState([]);
+  const [kritikPagination, setKritikPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,6 +48,111 @@ function Component5(updateApi) {
 
   const handleCancel = () => {
     setIsModalVisible(false);
+  };
+
+  const kritikColumns = useMemo(
+    () => [
+      {
+        title: "Stok Tanım",
+        dataIndex: "STK_TANIM",
+        key: "STK_TANIM",
+        width: 250,
+        ellipsis: true,
+      },
+      {
+        title: "Tip",
+        dataIndex: "STK_TIP",
+        key: "STK_TIP",
+        ellipsis: true,
+        width: 100,
+      },
+      {
+        title: "Birim",
+        dataIndex: "STK_BIRIM",
+        key: "STK_BIRIM",
+        ellipsis: true,
+        width: 100,
+      },
+      {
+        title: "Min. Miktar",
+        dataIndex: "STK_MIN_MIKTAR",
+        key: "STK_MIN_MIKTAR",
+        ellipsis: true,
+        width: 100,
+      },
+      {
+        title: "Max. Miktar",
+        dataIndex: "STK_MAX_MIKTAR",
+        key: "STK_MAX_MIKTAR",
+        ellipsis: true,
+        width: 100,
+      },
+      {
+        title: "Mevcut Miktar",
+        dataIndex: "STK_MIKTAR",
+        key: "STK_MIKTAR",
+        ellipsis: true,
+        width: 100,
+      },
+      {
+        title: "Kritik Miktar",
+        dataIndex: "STK_KRITIK_STOK_MIKTAR",
+        key: "STK_KRITIK_STOK_MIKTAR",
+        ellipsis: true,
+        width: 100,
+      },
+      {
+        title: "Durum",
+        dataIndex: "STK_DURUM",
+        key: "STK_DURUM",
+        ellipsis: true,
+        width: 100,
+      },
+    ],
+    []
+  );
+
+  const fetchKritikStoklar = async () => {
+    setKritikModalLoading(true);
+    try {
+      const response = await AxiosInstance.get("GetKritikStoklar");
+      const rows = response?.data || [];
+      setKritikModalData(rows);
+      setKritikPagination((prev) => ({
+        ...prev,
+        total: rows.length,
+      }));
+    } catch (error) {
+      console.error("Failed to fetch critical stock data:", error);
+      setKritikModalData([]);
+      setKritikPagination((prev) => ({
+        ...prev,
+        total: 0,
+      }));
+    } finally {
+      setKritikModalLoading(false);
+    }
+  };
+
+  const showKritikModal = () => {
+    setKritikPagination((prev) => ({
+      ...prev,
+      current: 1,
+    }));
+    setKritikModalVisible(true);
+    fetchKritikStoklar();
+  };
+
+  const handleKritikModalClose = () => {
+    setKritikModalVisible(false);
+  };
+
+  const handleKritikTableChange = (paginationInfo) => {
+    setKritikPagination((prev) => ({
+      ...prev,
+      current: paginationInfo?.current || prev.current,
+      pageSize: paginationInfo?.pageSize || prev.pageSize,
+    }));
   };
 
   return (
@@ -162,7 +275,9 @@ function Component5(updateApi) {
               justifyContent: "space-between",
               padding: "0px 10px 5px 10px",
               borderBottom: "1px solid #f0f0f0",
+              cursor: "pointer",
             }}
+            onClick={showKritikModal}
           >
             <div
               style={{
@@ -180,7 +295,7 @@ function Component5(updateApi) {
                   borderRadius: "50%",
                 }}
               ></div>
-              <Text> Düşük Stoklu Malzemeler </Text>
+              <Text> Kritik Stoklar </Text>
             </div>
 
             <Text
@@ -240,6 +355,24 @@ function Component5(updateApi) {
       )}
       <Modal width="90%" centered destroyOnClose title={modalTitle} open={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
         <div>{modalContent}</div>
+      </Modal>
+      <Modal width={1400} destroyOnClose centered title="Kritik Stoklar" open={kritikModalVisible} onOk={handleKritikModalClose} onCancel={handleKritikModalClose}>
+        <div style={{ flex: 1, minHeight: 0 }}>
+          <Table
+            columns={kritikColumns}
+            dataSource={kritikModalData}
+            pagination={{
+              ...kritikPagination,
+              showSizeChanger: true,
+              pageSizeOptions: ["10", "20", "50", "100"],
+            }}
+            rowKey={(record) => record?.TB_STOK_ID || `${record?.STK_KOD}-${record?.STK_STOK_DURUM}`}
+            scroll={{ y: "calc(100vh - 415px)" }}
+            bordered
+            onChange={handleKritikTableChange}
+            loading={kritikModalLoading}
+          />
+        </div>
       </Modal>
     </div>
   );
