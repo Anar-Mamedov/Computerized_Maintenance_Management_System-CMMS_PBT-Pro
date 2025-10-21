@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Table, Select, Spin, message } from "antd";
-import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../api/http";
 import dayjs from "dayjs";
 
@@ -14,6 +13,40 @@ const ACIKLAMA_SUTUN_OPTIONS = [
   { value: "ISM_PROJE", label: "Proje" },
   { value: "ISM_ATOLYE", label: "Atölye" },
 ];
+
+const parseNumericValue = (value) => {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+  if (typeof value === "number") {
+    return Number.isNaN(value) ? null : value;
+  }
+  if (typeof value === "string") {
+    const cleaned = value.replace(/\./g, "").replace(",", ".");
+    const parsed = Number(cleaned);
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+  return null;
+};
+
+const normalizeNumericValue = (value) => {
+  const numeric = parseNumericValue(value);
+  return numeric === null ? Number.NEGATIVE_INFINITY : numeric;
+};
+
+const getStringSorter = (dataIndex) => (rowA, rowB) => {
+  const valueA = rowA?.[dataIndex];
+  const valueB = rowB?.[dataIndex];
+  const textA = valueA === null || valueA === undefined ? "" : valueA.toString();
+  const textB = valueB === null || valueB === undefined ? "" : valueB.toString();
+  return textA.localeCompare(textB, "tr", { sensitivity: "base" });
+};
+
+const getNumericSorter = (dataIndex) => (rowA, rowB) => {
+  const numA = normalizeNumericValue(rowA?.[dataIndex]);
+  const numB = normalizeNumericValue(rowB?.[dataIndex]);
+  return numA - numB;
+};
 
 export const Aylik = ({ body }) => {
   const [loading, setLoading] = useState(false);
@@ -89,6 +122,8 @@ export const Aylik = ({ body }) => {
         key: "ACIKLAMA",
         fixed: "left",
         width: 200,
+        sorter: getStringSorter("ACIKLAMA"),
+        sortDirections: ["ascend", "descend"],
       },
     ];
 
@@ -101,6 +136,8 @@ export const Aylik = ({ body }) => {
         key: month,
         width: 100,
         align: "right",
+        sorter: getNumericSorter(month),
+        sortDirections: ["descend", "ascend"],
         render: (value) => (value !== null && value !== undefined ? value : "-"),
       });
     });
@@ -113,6 +150,8 @@ export const Aylik = ({ body }) => {
         key: "Toplam",
         width: 100,
         align: "right",
+        sorter: getNumericSorter("Toplam"),
+        sortDirections: ["descend", "ascend"],
         fixed: "right",
         render: (value) => (value !== null && value !== undefined ? value : "-"),
       });
@@ -125,6 +164,48 @@ export const Aylik = ({ body }) => {
     }));
 
     return { data: tableData, columns: cols };
+  };
+
+  const renderSummaryRow = () => {
+    if (!columns.length || !data.length) {
+      return null;
+    }
+
+    const numberFormatter = new Intl.NumberFormat("tr-TR", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    });
+
+    return (
+      <Table.Summary fixed>
+        <Table.Summary.Row>
+          {columns.map((column, columnIndex) => {
+            const columnKey = column.dataIndex ?? column.key ?? columnIndex;
+
+            if (columnIndex === 0) {
+              return (
+                <Table.Summary.Cell key={columnKey} index={columnIndex}>
+                  Toplam
+                </Table.Summary.Cell>
+              );
+            }
+
+            const numericValues = data
+              .map((row) => parseNumericValue(row?.[columnKey]))
+              .filter((value) => value !== null);
+
+            const total = numericValues.reduce((acc, val) => acc + val, 0);
+            const displayValue = numericValues.length ? numberFormatter.format(total) : "-";
+
+            return (
+              <Table.Summary.Cell key={columnKey} index={columnIndex} style={{ textAlign: column.align || "left" }}>
+                {displayValue}
+              </Table.Summary.Cell>
+            );
+          })}
+        </Table.Summary.Row>
+      </Table.Summary>
+    );
   };
 
   return (
@@ -148,6 +229,7 @@ export const Aylik = ({ body }) => {
             showSizeChanger: true,
             showTotal: (total) => `Toplam ${total} kayıt`,
           }}
+          summary={renderSummaryRow}
           /*  scroll={{ x: 1500, y: 600 }} */
           scroll={{ y: "calc(100vh - 470px)" }}
           bordered
