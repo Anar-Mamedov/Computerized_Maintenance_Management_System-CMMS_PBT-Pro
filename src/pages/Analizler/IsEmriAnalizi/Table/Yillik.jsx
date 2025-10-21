@@ -62,14 +62,10 @@ export const Yillik = ({ body }) => {
   const fetchPivotData = async () => {
     setLoading(true);
     try {
-      // Get dates from body.filters.customfilter
-      const customFilter = body?.filters?.customfilter || {};
-      const startDate = customFilter.startDate;
-      const endDate = customFilter.endDate;
-
-      // Format dates
-      const formattedStartDate = startDate ? dayjs(startDate).format("YYYY-MM-DD") : dayjs().startOf("year").format("YYYY-MM-DD");
-      const formattedEndDate = endDate ? dayjs(endDate).format("YYYY-MM-DD") : dayjs().endOf("year").format("YYYY-MM-DD");
+      // Always use last 10 full years relative to today
+      const today = dayjs();
+      const formattedStartDate = today.subtract(10, "year").startOf("year").format("YYYY-MM-DD");
+      const formattedEndDate = today.endOf("year").format("YYYY-MM-DD");
 
       // Clean filters: remove startDate and endDate from customfilter
       const cleanedFilters = { ...(body?.filters || {}) };
@@ -202,9 +198,7 @@ export const Yillik = ({ body }) => {
               );
             }
 
-            const numericValues = data
-              .map((row) => parseNumericValue(row?.[columnKey]))
-              .filter((value) => value !== null);
+            const numericValues = data.map((row) => parseNumericValue(row?.[columnKey])).filter((value) => value !== null);
 
             const total = numericValues.reduce((acc, val) => acc + val, 0);
             const displayValue = numericValues.length ? numberFormatter.format(total) : "-";
