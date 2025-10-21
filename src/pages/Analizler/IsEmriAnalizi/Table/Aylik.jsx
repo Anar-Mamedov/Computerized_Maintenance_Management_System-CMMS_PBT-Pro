@@ -188,9 +188,7 @@ export const Aylik = ({ body }) => {
               );
             }
 
-            const numericValues = data
-              .map((row) => parseNumericValue(row?.[columnKey]))
-              .filter((value) => value !== null);
+            const numericValues = data.map((row) => parseNumericValue(row?.[columnKey])).filter((value) => value !== null);
 
             const total = numericValues.reduce((acc, val) => acc + val, 0);
             const displayValue = numericValues.length ? numberFormatter.format(total) : "-";
@@ -231,6 +229,7 @@ export const Aylik = ({ body }) => {
         <Table
           columns={columns}
           dataSource={data}
+          showSorterTooltip={false}
           pagination={{
             pageSize: 20,
             showSizeChanger: true,

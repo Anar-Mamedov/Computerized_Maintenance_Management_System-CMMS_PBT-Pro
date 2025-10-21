@@ -230,6 +230,7 @@ export const Yillik = ({ body }) => {
         <Table
           columns={columns}
           dataSource={data}
+          showSorterTooltip={false}
           pagination={{
             pageSize: 20,
             showSizeChanger: true,
