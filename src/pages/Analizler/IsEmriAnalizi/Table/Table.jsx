@@ -595,11 +595,19 @@ const MainTable = () => {
       render: (text, record) => (
         <div
           style={{
-            textAlign: "center",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
           }}
         >
           <Tag
             style={{
+              display: "inline-flex",
+              alignItems: "center",
+              margin: 0,
+              padding: "0 8px",
+              lineHeight: "20px",
               backgroundColor: hexToRGBA(record.ISM_TIP_RENK ? record.ISM_TIP_RENK : "#000000", 0.2),
               border: `1.2px solid ${hexToRGBA(record.ISM_TIP_RENK ? record.ISM_TIP_RENK : "#000000", 0.7)}`,
               color: record.ISM_TIP_RENK ? record.ISM_TIP_RENK : "#000000",
@@ -662,11 +670,17 @@ const MainTable = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                height: "100%",
               }}
             >
               <Tag
                 style={{
-                  textAlign: "center",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  margin: 0,
+                  padding: "0 8px",
+                  lineHeight: "20px",
                   backgroundColor: hexToRGBA(color, 0.2),
                   border: `1.2px solid ${hexToRGBA(color, 0.7)}`,
                   color: color,

@@ -216,7 +216,7 @@ export const Yillik = ({ body }) => {
   };
 
   return (
-    <div style={{ padding: "16px" }}>
+    <div>
       <div style={{ marginBottom: "16px" }}>
         <Select value={aciklamaSutun} onChange={(value) => setAciklamaSutun(value)} style={{ width: 200 }} placeholder="Açıklama Sütunu Seçin">
           {ACIKLAMA_SUTUN_OPTIONS.map((option) => (
