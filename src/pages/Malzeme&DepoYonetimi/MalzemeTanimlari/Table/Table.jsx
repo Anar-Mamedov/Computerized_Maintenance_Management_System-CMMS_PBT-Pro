@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message, Divider } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined, HomeOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
@@ -155,6 +155,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
   // edit drawer için son
 
   const [selectedRows, setSelectedRows] = useState([]);
+  const selectedRowsMapRef = useRef(new Map());
 
   const statusTag = (statusId) => {
     switch (statusId) {
@@ -978,21 +979,32 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
 
-    // Seçilen satırların verisini bul
-    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
-    setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
+    const keyStrings = newSelectedRowKeys.map((key) => key.toString());
+    const currentPageMap = new Map(data.map((row) => [row.key.toString(), row]));
+    const preservedMap = selectedRowsMapRef.current;
+
+    Array.from(preservedMap.keys()).forEach((key) => {
+      if (!keyStrings.includes(key)) {
+        preservedMap.delete(key);
+      }
+    });
+
+    keyStrings.forEach((key) => {
+      if (currentPageMap.has(key)) {
+        preservedMap.set(key, currentPageMap.get(key));
+      }
+    });
+
+    const mergedSelection = keyStrings.map((key) => preservedMap.get(key)).filter(Boolean);
+    setSelectedRows(mergedSelection);
 
     if (isSelectionMode && onRowSelect) {
-      // Selection mode için callback çağır
-      onRowSelect(newSelectedRows);
-    } else {
-      // Normal mode için form value set et
-      if (setValue) {
-        if (newSelectedRowKeys.length > 0) {
-          setValue("selectedLokasyonId", newSelectedRowKeys[0]);
-        } else {
-          setValue("selectedLokasyonId", null);
-        }
+      onRowSelect(mergedSelection);
+    } else if (setValue) {
+      if (newSelectedRowKeys.length > 0) {
+        setValue("selectedLokasyonId", newSelectedRowKeys[0]);
+      } else {
+        setValue("selectedLokasyonId", null);
       }
     }
   };
@@ -1002,11 +1014,13 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
         type: "checkbox",
         selectedRowKeys,
         onChange: onSelectChange,
+        preserveSelectedRowKeys: true,
       }
     : {
         type: "checkbox",
         selectedRowKeys,
         onChange: onSelectChange,
+        preserveSelectedRowKeys: true,
       };
 
   // const onRowClick = (record) => {
@@ -1037,6 +1051,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
     // Tablodan seçilen kayıtların checkbox işaretini kaldır
     setSelectedRowKeys([]);
     setSelectedRows([]);
+    selectedRowsMapRef.current.clear();
 
     // Verileri yeniden çekmek için `fetchEquipmentData` fonksiyonunu çağır
     fetchEquipmentData(body, currentPage);
