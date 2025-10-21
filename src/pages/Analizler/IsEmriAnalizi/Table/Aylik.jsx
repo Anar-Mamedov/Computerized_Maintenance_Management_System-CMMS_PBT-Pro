@@ -15,6 +15,13 @@ const ACIKLAMA_SUTUN_OPTIONS = [
   { value: "ISM_ATOLYE", label: "Atölye" },
 ];
 
+const SUMMARY_TOTAL_COLUMN_KEY = "__summaryGrandTotal";
+const SUMMARY_TOTAL_COLUMN_TITLE = "Toplam";
+const DEFAULT_NUMBER_FORMATTER = new Intl.NumberFormat("tr-TR", {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 2,
+});
+
 const parseNumericValue = (value) => {
   if (value === null || value === undefined || value === "") {
     return null;
@@ -158,11 +165,45 @@ export const Aylik = ({ body }) => {
       });
     }
 
+    cols.push({
+      title: SUMMARY_TOTAL_COLUMN_TITLE,
+      dataIndex: SUMMARY_TOTAL_COLUMN_KEY,
+      key: SUMMARY_TOTAL_COLUMN_KEY,
+      width: 120,
+      align: "right",
+      fixed: "right",
+      sorter: getNumericSorter(SUMMARY_TOTAL_COLUMN_KEY),
+      sortDirections: ["descend", "ascend"],
+      render: (value) => {
+        const numericValue = parseNumericValue(value);
+        return numericValue !== null ? DEFAULT_NUMBER_FORMATTER.format(numericValue) : "-";
+      },
+    });
+
     // Transform data rows - use the response data directly with a key added
-    const tableData = responseData.map((row, index) => ({
-      key: index,
-      ...row,
-    }));
+    const numericKeysForRowTotal = monthKeys.length > 0 ? monthKeys : Object.prototype.hasOwnProperty.call(firstRow, "Toplam") ? ["Toplam"] : [];
+    const tableData = responseData.map((row, index) => {
+      const hasNumericValue = numericKeysForRowTotal.some((key) => parseNumericValue(row?.[key]) !== null);
+      const calculatedTotal = numericKeysForRowTotal.reduce((acc, key) => {
+        const numericValue = parseNumericValue(row?.[key]);
+        return numericValue !== null ? acc + numericValue : acc;
+      }, 0);
+      const fallbackToplam = parseNumericValue(row?.Toplam);
+
+      let grandTotal = null;
+      if (numericKeysForRowTotal.length > 0 && hasNumericValue) {
+        grandTotal = calculatedTotal;
+      }
+      if (grandTotal === null && fallbackToplam !== null) {
+        grandTotal = fallbackToplam;
+      }
+
+      return {
+        key: index,
+        ...row,
+        [SUMMARY_TOTAL_COLUMN_KEY]: grandTotal,
+      };
+    });
 
     return { data: tableData, columns: cols };
   };
@@ -180,11 +221,6 @@ export const Aylik = ({ body }) => {
       return null;
     }
 
-    const numberFormatter = new Intl.NumberFormat("tr-TR", {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    });
-
     return (
       <Table.Summary fixed>
         <Table.Summary.Row className="table-summary-row">
@@ -199,10 +235,22 @@ export const Aylik = ({ body }) => {
               );
             }
 
+            if (columnKey === SUMMARY_TOTAL_COLUMN_KEY) {
+              const numericValues = data.map((row) => parseNumericValue(row?.[SUMMARY_TOTAL_COLUMN_KEY])).filter((value) => value !== null);
+              const total = numericValues.reduce((acc, val) => acc + val, 0);
+              const displayValue = numericValues.length ? DEFAULT_NUMBER_FORMATTER.format(total) : "-";
+
+              return (
+                <Table.Summary.Cell key={columnKey} index={columnIndex} style={{ textAlign: column.align || "left" }}>
+                  {displayValue}
+                </Table.Summary.Cell>
+              );
+            }
+
             const numericValues = data.map((row) => parseNumericValue(row?.[columnKey])).filter((value) => value !== null);
 
             const total = numericValues.reduce((acc, val) => acc + val, 0);
-            const displayValue = numericValues.length ? numberFormatter.format(total) : "-";
+            const displayValue = numericValues.length ? DEFAULT_NUMBER_FORMATTER.format(total) : "-";
 
             return (
               <Table.Summary.Cell key={columnKey} index={columnIndex} style={{ textAlign: column.align || "left" }}>
