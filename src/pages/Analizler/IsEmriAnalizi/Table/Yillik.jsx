@@ -54,6 +54,7 @@ export const Yillik = ({ body }) => {
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([]);
   const [aciklamaSutun, setAciklamaSutun] = useState("ISM_TIP");
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 20 });
 
   // Fetch data whenever filters, keyword, or aciklamaSutun changes
   useEffect(() => {
@@ -96,6 +97,7 @@ export const Yillik = ({ body }) => {
         const transformedData = transformPivotData(response.data);
         setData(transformedData.data);
         setColumns(transformedData.columns);
+        setPagination((prev) => ({ ...prev, current: 1 }));
       }
     } catch (error) {
       console.error("Error fetching pivot data:", error);
@@ -175,6 +177,14 @@ export const Yillik = ({ body }) => {
     return { data: tableData, columns: cols };
   };
 
+  const handleTableChange = (nextPagination) => {
+    setPagination((prev) => ({
+      ...prev,
+      current: nextPagination.current,
+      pageSize: nextPagination.pageSize,
+    }));
+  };
+
   const renderSummaryRow = () => {
     if (!columns.length || !data.length) {
       return null;
@@ -233,10 +243,12 @@ export const Yillik = ({ body }) => {
           dataSource={data}
           showSorterTooltip={false}
           pagination={{
-            pageSize: 20,
+            ...pagination,
             showSizeChanger: true,
+            pageSizeOptions: ["10", "20", "50", "100"],
             showTotal: (total) => `Toplam ${total} kayıt`,
           }}
+          onChange={handleTableChange}
           summary={renderSummaryRow}
           /*  scroll={{ x: 1500, y: 600 }} */
           scroll={{ y: "calc(100vh - 470px)" }}
