@@ -2649,67 +2649,80 @@ const MainTable = () => {
           </DndContext>
         </div>
       </Modal>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "space-between",
-          marginBottom: "7px",
-          gap: "10px",
-          padding: "0 5px",
-        }}
-      >
-        <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
-          <Button
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "0px 8px",
-              // width: "32px",
-              height: "32px",
-            }}
-            onClick={() => setIsModalVisible(true)}
-          >
-            <MenuOutlined />
-          </Button>
-          <Input
-            style={{ width: "250px" }}
-            type="text"
-            placeholder="Arama yap..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
-          />
-          <Filters onChange={handleBodyChange} />
-          {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
-          <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
-        </div>
-        <div style={{ display: "flex", gap: "10px" }}>
-          <Button style={{ display: "flex", alignItems: "center" }} onClick={handleDownloadXLSX} loading={xlsxLoading} icon={<SiMicrosoftexcel />}>
-            İndir
-          </Button>
-          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
-          {/* <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} /> */}
-        </div>
-      </div>
       <Tabs
         activeKey={activeTab}
         onChange={setActiveTab}
-        style={{ marginTop: 0 }}
-        centered
+        tabBarStyle={{ marginBottom: 0, height: "50px" }}
+        renderTabBar={(tabBarProps, DefaultTabBar) => (
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: "7px",
+              gap: "10px",
+            }}
+          >
+            <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+              <Input
+                style={{ width: "250px" }}
+                type="text"
+                placeholder="Arama yap..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
+              />
+              <Filters onChange={handleBodyChange} />
+              {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
+              <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
+            </div>
+            <div style={{ marginLeft: "auto", display: "flex", justifyContent: "flex-end", alignItems: "center", height: "50px" }}>
+              <DefaultTabBar
+                {...tabBarProps}
+                style={{
+                  marginLeft: "auto",
+                  flex: "0 0 auto",
+                  height: "50px",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              />
+            </div>
+          </div>
+        )}
         items={[
           {
             key: "detay",
             label: "Detaylı",
             children: (
               <Spin spinning={loading}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px", gap: "10px", flexWrap: "wrap" }}>
+                  <Button
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "0px 8px",
+                      // width: "32px",
+                      height: "32px",
+                    }}
+                    onClick={() => setIsModalVisible(true)}
+                  >
+                    <MenuOutlined />
+                  </Button>
+                  <Button style={{ display: "flex", alignItems: "center" }} onClick={handleDownloadXLSX} loading={xlsxLoading} icon={<SiMicrosoftexcel />}>
+                    İndir
+                  </Button>
+                </div>
+
                 <Table
                   components={components}
                   rowSelection={rowSelection}
                   columns={filteredColumns}
                   dataSource={data}
                   bordered
+                  size="small"
                   summary={renderTableSummary}
                   pagination={{
                     current: currentPage,

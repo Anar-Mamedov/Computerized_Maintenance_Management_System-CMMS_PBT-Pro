@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Table, Select, Spin, message } from "antd";
 import AxiosInstance from "../../../../api/http";
 import dayjs from "dayjs";
+import "./TableSummary.css";
 
 const { Option } = Select;
 
@@ -186,7 +187,7 @@ export const Yillik = ({ body }) => {
 
     return (
       <Table.Summary fixed>
-        <Table.Summary.Row>
+        <Table.Summary.Row className="table-summary-row">
           {columns.map((column, columnIndex) => {
             const columnKey = column.dataIndex ?? column.key ?? columnIndex;
 
