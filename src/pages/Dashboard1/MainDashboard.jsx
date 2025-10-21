@@ -10,6 +10,7 @@ import Component2 from "./components/Component2.jsx";
 import Component1 from "./components/Component1.jsx";
 import Component4 from "./components/Component4.jsx";
 import Component5 from "./components/Component5.jsx";
+import Component6 from "./components/Component6.jsx";
 import LokasyonBazindaIsTalepleri from "./components/LokasyonBazindaIsTalepleri.jsx";
 import IsEmirleriOzetTablosu from "./components/IsEmirleriOzetTablosu.jsx";
 import ArizaliMakineler from "./components/ArizaliMakineler.jsx";
@@ -50,6 +51,7 @@ const widgetTitles = {
   widget16: "İş Emri Tipleri",
   widget17: "İş Talebi Tipleri",
   widget18: "Bekleyen Onaylarım",
+  widget19: "Bekleyen İş Talepleri",
 };
 
 const widgetDefaults = {
@@ -71,10 +73,11 @@ const widgetDefaults = {
   widget15: { width: 7, height: 3, minW: 3, minH: 2 },
   widget12: { width: 12, height: 3, minW: 3, minH: 2 },
   widget18: { width: 5, height: 3, minW: 3, minH: 2 },
+  widget19: { width: 3, height: 1, minW: 3, minH: 1 },
 };
 
 const defaultItems = [
-  { id: "widget1", x: 0, y: 0, ...widgetDefaults["widget1"] },
+  { id: "widget19", x: 0, y: 0, ...widgetDefaults["widget19"] },
   { id: "widget2", x: 3, y: 0, ...widgetDefaults["widget2"] },
   { id: "widget3", x: 6, y: 0, ...widgetDefaults["widget3"] },
   { id: "widget4", x: 9, y: 0, ...widgetDefaults["widget4"] },
@@ -116,6 +119,7 @@ function MainDashboard() {
     widget16: false,
     widget17: false,
     widget18: false,
+    widget19: false,
   });
 
   const methods = useForm({
@@ -419,6 +423,17 @@ function MainDashboard() {
               </FormProvider>
             );
             break;
+          case "widget19":
+            root.render(
+              <FormProvider {...methods}>
+                <ConfigProvider locale={trTR}>
+                  <AppProvider>
+                    <Component6 />
+                  </AppProvider>
+                </ConfigProvider>
+              </FormProvider>
+            );
+            break;
           default:
             break;
         }
@@ -445,6 +460,7 @@ function MainDashboard() {
         widget16: false,
         widget17: false,
         widget18: false,
+        widget19: false,
       };
       newGridItems.forEach((item) => {
         if (Object.prototype.hasOwnProperty.call(newChecked, item.id)) {
@@ -482,6 +498,7 @@ function MainDashboard() {
         widget16: false,
         widget17: false,
         widget18: false,
+        widget19: false,
       };
       itemsToLoad.forEach((item) => {
         if (Object.prototype.hasOwnProperty.call(checked, item.id)) {
@@ -710,6 +727,9 @@ function MainDashboard() {
       <Checkbox name="widget18" onChange={handleCheckboxChange} checked={checkedWidgets.widget18}>
         Bekleyen Onaylarım
       </Checkbox>
+      <Checkbox name="widget19" onChange={handleCheckboxChange} checked={checkedWidgets.widget19}>
+        Bekleyen İş Talepleri
+      </Checkbox>
       <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
         <Button danger onClick={handleReset}>
           Widgetları Sıfırla
@@ -870,6 +890,12 @@ function MainDashboard() {
                   <div className="grid-stack-item-content">
                     <div className="widget-header">{widgetTitles.widget12}</div>
                     <IsEmriZamanDagilimi />
+                  </div>
+                </div>
+                <div className="grid-stack-item border-dark" id="widget19">
+                  <div className="grid-stack-item-content">
+                    <div className="widget-header">{widgetTitles.widget19}</div>
+                    <Component6 />
                   </div>
                 </div>
                 <div className="grid-stack-item border-dark" id="widget13">
