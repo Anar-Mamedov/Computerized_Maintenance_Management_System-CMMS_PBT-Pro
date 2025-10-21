@@ -7,8 +7,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { Resizable } from "react-resizable";
 import "./ResizeStyle.css";
 import AxiosInstance from "../../../../api/http";
-/* import CreateDrawer from "../Insert/CreateDrawer";
-import EditDrawer from "../Update/EditDrawer"; */
+/* import CreateDrawer from "../Insert/CreateDrawer"; */
+import EditDrawer from "../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer";
 import Filters from "./filter/Filters";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import Aylik from "./Aylik";
@@ -2743,9 +2743,8 @@ const MainTable = () => {
           },
         ]}
       />
-      {/* <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
-
-      {editDrawer1Visible && (
+      <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ visible: false, data: null })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
+      {/* {editDrawer1Visible && (
         <EditDrawer1
           selectedRow={editDrawer1Data}
           onDrawerClose={() => setEditDrawer1Visible(false)}
