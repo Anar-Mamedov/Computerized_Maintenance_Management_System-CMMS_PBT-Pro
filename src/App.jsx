@@ -133,6 +133,7 @@ const rawItems = [
       getItem("Periyodik Bakımlar", "periyodikBakimlar", true),
       getItem("Otomatik İş Emirleri", "otomatikIsEmirleri", true),
       getItem("Planlama Takvimi", "planlamaTakvimi", true),
+      getItem("İş Emri Takip Paneli", "isEmriAnalizi", true),
       // getItem("Müdahale Süresi Analizi", "mudaheleSuresi", true),
       // getItem("Alex", "alex", true)
     ],
@@ -202,7 +203,6 @@ const rawItems = [
     [
       getItem("Müdahale Süreleri Analizi", "mudaheleSuresi", true),
       getItem("Personel KPI Analizi", "analizler", true),
-      getItem("İş Emri Analizi", "isEmriAnalizi", true),
 
       // getItem("Team 2", "team2", true)
     ],
