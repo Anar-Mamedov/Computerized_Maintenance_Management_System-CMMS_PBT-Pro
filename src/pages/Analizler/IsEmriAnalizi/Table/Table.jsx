@@ -12,6 +12,7 @@ import EditDrawer from "../Update/EditDrawer"; */
 import Filters from "./filter/Filters";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import Aylik from "./Aylik";
+import Yillik from "./Yillik";
 /* import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer"; */
 import { useFormContext } from "react-hook-form";
 import { SiMicrosoftexcel } from "react-icons/si";
@@ -2700,7 +2701,7 @@ const MainTable = () => {
         items={[
           {
             key: "detay",
-            label: "Detay",
+            label: "Detaylı",
             children: (
               <Spin spinning={loading}>
                 <Table
@@ -2738,7 +2739,7 @@ const MainTable = () => {
           {
             key: "yillik",
             label: "Yıllık",
-            children: null,
+            children: <Yillik body={body} />,
           },
         ]}
       />

@@ -342,12 +342,12 @@ const MainTable = () => {
       sorter: (a, b) => (a.IST_DURUM_ID || 0) - (b.IST_DURUM_ID || 0),
     },
     {
-      title: t("kullaniciDurumu"),
+      title: t("kullaniciOnayi"),
       dataIndex: "IST_KULLANICI_ONAY_DURUM",
       key: "IST_KULLANICI_ONAY_DURUM",
       width: 150,
       ellipsis: true,
-      visible: true,
+      visible: false,
       render: (text) => {
         let tagStyle = {};
         let tagText = t(text);
@@ -383,12 +383,12 @@ const MainTable = () => {
       sorter: (a, b) => (a.IST_KULLANICI_ONAY_DURUM || "").localeCompare(b.IST_KULLANICI_ONAY_DURUM || ""),
     },
     {
-      title: t("kullaniciAciklama"),
+      title: t("onayAciklamasi"),
       dataIndex: "IST_RED_ACIKLAMA",
       key: "IST_RED_ACIKLAMA",
       width: 200,
       ellipsis: true,
-      visible: true,
+      visible: false,
       sorter: (a, b) => (a.IST_RED_ACIKLAMA || "").localeCompare(b.IST_RED_ACIKLAMA || ""),
     },
     {

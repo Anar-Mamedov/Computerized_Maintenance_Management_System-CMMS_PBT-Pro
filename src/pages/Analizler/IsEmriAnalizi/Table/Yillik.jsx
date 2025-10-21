@@ -48,7 +48,7 @@ const getNumericSorter = (dataIndex) => (rowA, rowB) => {
   return numA - numB;
 };
 
-export const Aylik = ({ body }) => {
+export const Yillik = ({ body }) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([]);
@@ -87,7 +87,7 @@ export const Aylik = ({ body }) => {
         Filtreler: cleanedFilters,
       };
 
-      const response = await AxiosInstance.post("GetIsEmriAylikPivot", requestBody);
+      const response = await AxiosInstance.post("GetIsEmriYillikPivot", requestBody);
 
       if (response) {
         if (response.status_code === 401) {
@@ -129,7 +129,18 @@ export const Aylik = ({ body }) => {
     ];
 
     // Extract month columns from the first row (excluding ACIKLAMA and Toplam fields)
-    const monthKeys = Object.keys(firstRow).filter((key) => key !== "ACIKLAMA" && key !== "Toplam");
+    const monthKeys = Object.keys(firstRow)
+      .filter((key) => key !== "ACIKLAMA" && key !== "Toplam")
+      .sort((a, b) => {
+        const aNum = Number(a);
+        const bNum = Number(b);
+
+        if (!Number.isNaN(aNum) && !Number.isNaN(bNum)) {
+          return bNum - aNum; // newest year first
+        }
+
+        return a.localeCompare(b);
+      });
     monthKeys.forEach((month) => {
       cols.push({
         title: month,
@@ -241,4 +252,4 @@ export const Aylik = ({ body }) => {
   );
 };
 
-export default Aylik;
+export default Yillik;
