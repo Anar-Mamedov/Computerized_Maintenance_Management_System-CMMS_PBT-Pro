@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message, Dropdown, Tabs } from "antd";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message, Dropdown, Radio } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -595,11 +595,19 @@ const MainTable = () => {
       render: (text, record) => (
         <div
           style={{
-            textAlign: "center",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
           }}
         >
           <Tag
             style={{
+              display: "inline-flex",
+              alignItems: "center",
+              margin: 0,
+              padding: "0 8px",
+              lineHeight: "20px",
               backgroundColor: hexToRGBA(record.ISM_TIP_RENK ? record.ISM_TIP_RENK : "#000000", 0.2),
               border: `1.2px solid ${hexToRGBA(record.ISM_TIP_RENK ? record.ISM_TIP_RENK : "#000000", 0.7)}`,
               color: record.ISM_TIP_RENK ? record.ISM_TIP_RENK : "#000000",
@@ -662,11 +670,17 @@ const MainTable = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                height: "100%",
               }}
             >
               <Tag
                 style={{
-                  textAlign: "center",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  margin: 0,
+                  padding: "0 8px",
+                  lineHeight: "20px",
                   backgroundColor: hexToRGBA(color, 0.2),
                   border: `1.2px solid ${hexToRGBA(color, 0.7)}`,
                   color: color,
@@ -2653,26 +2667,13 @@ const MainTable = () => {
         style={{
           display: "flex",
           flexWrap: "wrap",
+          alignItems: "center",
           justifyContent: "space-between",
           marginBottom: "7px",
           gap: "10px",
-          padding: "0 5px",
         }}
       >
         <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
-          <Button
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "0px 8px",
-              // width: "32px",
-              height: "32px",
-            }}
-            onClick={() => setIsModalVisible(true)}
-          >
-            <MenuOutlined />
-          </Button>
           <Input
             style={{ width: "250px" }}
             type="text"
@@ -2685,64 +2686,64 @@ const MainTable = () => {
           {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>
-        <div style={{ display: "flex", gap: "10px" }}>
-          <Button style={{ display: "flex", alignItems: "center" }} onClick={handleDownloadXLSX} loading={xlsxLoading} icon={<SiMicrosoftexcel />}>
-            İndir
-          </Button>
-          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
-          {/* <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} /> */}
+        <div style={{ marginLeft: "auto", display: "flex", justifyContent: "flex-end", alignItems: "center", height: "50px" }}>
+          <Radio.Group value={activeTab} onChange={(e) => setActiveTab(e.target.value)} buttonStyle="solid">
+            <Radio.Button value="detay">Detaylı</Radio.Button>
+            <Radio.Button value="aylik">Aylık</Radio.Button>
+            <Radio.Button value="yillik">Yıllık</Radio.Button>
+          </Radio.Group>
         </div>
       </div>
-      <Tabs
-        activeKey={activeTab}
-        onChange={setActiveTab}
-        style={{ marginTop: 0 }}
-        centered
-        items={[
-          {
-            key: "detay",
-            label: "Detaylı",
-            children: (
-              <Spin spinning={loading}>
-                <Table
-                  components={components}
-                  rowSelection={rowSelection}
-                  columns={filteredColumns}
-                  dataSource={data}
-                  bordered
-                  summary={renderTableSummary}
-                  pagination={{
-                    current: currentPage,
-                    total: totalDataCount, // Toplam kayıt sayısı (sayfa başına kayıt sayısı ile çarpılır)
-                    pageSize: pageSize,
-                    defaultPageSize: 20,
-                    showSizeChanger: true,
-                    pageSizeOptions: ["10", "20", "50", "100"],
-                    position: ["bottomRight"],
-                    onChange: handleTableChange,
-                    showTotal: (total, range) => `Toplam ${total}`, // Burada 'total' parametresi doğru kayıt sayısını yansıtacaktır
-                    showQuickJumper: true,
-                  }}
-                  // onRow={onRowClick}
-                  scroll={{ y: "calc(100vh - 470px)" }}
-                  onChange={handleTableChange}
-                  rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
-                />
-              </Spin>
-            ),
-          },
-          {
-            key: "aylik",
-            label: "Aylık",
-            children: <Aylik body={body} />,
-          },
-          {
-            key: "yillik",
-            label: "Yıllık",
-            children: <Yillik body={body} />,
-          },
-        ]}
-      />
+      {activeTab === "detay" && (
+        <Spin spinning={loading}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px", gap: "10px", flexWrap: "wrap" }}>
+            <Button
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "0px 8px",
+                // width: "32px",
+                height: "32px",
+              }}
+              onClick={() => setIsModalVisible(true)}
+            >
+              <MenuOutlined />
+            </Button>
+            <Button style={{ display: "flex", alignItems: "center" }} onClick={handleDownloadXLSX} loading={xlsxLoading} icon={<SiMicrosoftexcel />}>
+              İndir
+            </Button>
+          </div>
+
+          <Table
+            components={components}
+            rowSelection={rowSelection}
+            columns={filteredColumns}
+            dataSource={data}
+            bordered
+            size="small"
+            summary={renderTableSummary}
+            pagination={{
+              current: currentPage,
+              total: totalDataCount, // Toplam kayıt sayısı (sayfa başına kayıt sayısı ile çarpılır)
+              pageSize: pageSize,
+              defaultPageSize: 20,
+              showSizeChanger: true,
+              pageSizeOptions: ["10", "20", "50", "100"],
+              position: ["bottomRight"],
+              onChange: handleTableChange,
+              showTotal: (total, range) => `Toplam ${total}`, // Burada 'total' parametresi doğru kayıt sayısını yansıtacaktır
+              showQuickJumper: true,
+            }}
+            // onRow={onRowClick}
+            scroll={{ y: "calc(100vh - 415px)" }}
+            onChange={handleTableChange}
+            rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
+          />
+        </Spin>
+      )}
+      {activeTab === "aylik" && <Aylik body={body} />}
+      {activeTab === "yillik" && <Yillik body={body} />}
       <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ visible: false, data: null })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
       {/* {editDrawer1Visible && (
         <EditDrawer1

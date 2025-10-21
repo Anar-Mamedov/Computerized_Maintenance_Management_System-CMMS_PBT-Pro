@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Table, Select, Spin, message } from "antd";
+import { Table, Select, Spin, message, DatePicker } from "antd";
 import AxiosInstance from "../../../../api/http";
 import dayjs from "dayjs";
+import "./TableSummary.css";
 
 const { Option } = Select;
 
@@ -53,23 +54,21 @@ export const Aylik = ({ body }) => {
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([]);
   const [aciklamaSutun, setAciklamaSutun] = useState("ISM_TIP");
+  const [selectedYear, setSelectedYear] = useState(() => dayjs());
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 20 });
 
   // Fetch data whenever filters, keyword, or aciklamaSutun changes
   useEffect(() => {
     fetchPivotData();
-  }, [aciklamaSutun, body]);
+  }, [aciklamaSutun, body, selectedYear]);
 
   const fetchPivotData = async () => {
     setLoading(true);
     try {
-      // Get dates from body.filters.customfilter
-      const customFilter = body?.filters?.customfilter || {};
-      const startDate = customFilter.startDate;
-      const endDate = customFilter.endDate;
-
-      // Format dates
-      const formattedStartDate = startDate ? dayjs(startDate).format("YYYY-MM-DD") : dayjs().startOf("year").format("YYYY-MM-DD");
-      const formattedEndDate = endDate ? dayjs(endDate).format("YYYY-MM-DD") : dayjs().endOf("year").format("YYYY-MM-DD");
+      // Determine the selected year (default to current year)
+      const yearValue = selectedYear || dayjs();
+      const formattedStartDate = yearValue.startOf("year").format("YYYY-MM-DD");
+      const formattedEndDate = yearValue.endOf("year").format("YYYY-MM-DD");
 
       // Clean filters: remove startDate and endDate from customfilter
       const cleanedFilters = { ...(body?.filters || {}) };
@@ -99,6 +98,7 @@ export const Aylik = ({ body }) => {
         const transformedData = transformPivotData(response.data);
         setData(transformedData.data);
         setColumns(transformedData.columns);
+        setPagination((prev) => ({ ...prev, current: 1 }));
       }
     } catch (error) {
       console.error("Error fetching pivot data:", error);
@@ -167,6 +167,14 @@ export const Aylik = ({ body }) => {
     return { data: tableData, columns: cols };
   };
 
+  const handleTableChange = (nextPagination) => {
+    setPagination((prev) => ({
+      ...prev,
+      current: nextPagination.current,
+      pageSize: nextPagination.pageSize,
+    }));
+  };
+
   const renderSummaryRow = () => {
     if (!columns.length || !data.length) {
       return null;
@@ -179,7 +187,7 @@ export const Aylik = ({ body }) => {
 
     return (
       <Table.Summary fixed>
-        <Table.Summary.Row>
+        <Table.Summary.Row className="table-summary-row">
           {columns.map((column, columnIndex) => {
             const columnKey = column.dataIndex ?? column.key ?? columnIndex;
 
@@ -191,9 +199,7 @@ export const Aylik = ({ body }) => {
               );
             }
 
-            const numericValues = data
-              .map((row) => parseNumericValue(row?.[columnKey]))
-              .filter((value) => value !== null);
+            const numericValues = data.map((row) => parseNumericValue(row?.[columnKey])).filter((value) => value !== null);
 
             const total = numericValues.reduce((acc, val) => acc + val, 0);
             const displayValue = numericValues.length ? numberFormatter.format(total) : "-";
@@ -210,8 +216,8 @@ export const Aylik = ({ body }) => {
   };
 
   return (
-    <div style={{ padding: "16px" }}>
-      <div style={{ marginBottom: "16px" }}>
+    <div>
+      <div style={{ marginBottom: "16px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
         <Select value={aciklamaSutun} onChange={(value) => setAciklamaSutun(value)} style={{ width: 200 }} placeholder="Açıklama Sütunu Seçin">
           {ACIKLAMA_SUTUN_OPTIONS.map((option) => (
             <Option key={option.value} value={option.value}>
@@ -219,20 +225,32 @@ export const Aylik = ({ body }) => {
             </Option>
           ))}
         </Select>
+        <DatePicker
+          picker="year"
+          allowClear={false}
+          value={selectedYear}
+          onChange={(value) => setSelectedYear(value || dayjs())}
+          format="YYYY"
+          style={{ width: 120 }}
+          placeholder="Yıl seçin"
+        />
       </div>
 
       <Spin spinning={loading}>
         <Table
           columns={columns}
           dataSource={data}
+          showSorterTooltip={false}
           pagination={{
-            pageSize: 20,
+            ...pagination,
             showSizeChanger: true,
+            pageSizeOptions: ["10", "20", "50", "100"],
             showTotal: (total) => `Toplam ${total} kayıt`,
           }}
+          onChange={handleTableChange}
           summary={renderSummaryRow}
           /*  scroll={{ x: 1500, y: 600 }} */
-          scroll={{ y: "calc(100vh - 470px)" }}
+          scroll={{ y: "calc(100vh - 400px)" }}
           bordered
           size="small"
         />
