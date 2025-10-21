@@ -74,7 +74,7 @@ export default function UserStatusFilter({ onSubmit }) {
   return (
     <Popover content={content} trigger="click" open={visible} onOpenChange={setVisible} placement="bottom">
       <Button style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-        {t("onayDurumu")}
+        {t("kullaniciOnayi")}
         <div
           style={{
             marginLeft: "5px",

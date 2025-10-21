@@ -122,6 +122,7 @@ export const Yillik = ({ body }) => {
         key: "ACIKLAMA",
         fixed: "left",
         width: 200,
+        ellipsis: true,
         sorter: getStringSorter("ACIKLAMA"),
         sortDirections: ["ascend", "descend"],
       },
