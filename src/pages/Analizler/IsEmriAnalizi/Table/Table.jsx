@@ -2733,7 +2733,7 @@ const MainTable = () => {
           {
             key: "aylik",
             label: "Aylık",
-            children: <Aylik />,
+            children: <Aylik body={body} />,
           },
           {
             key: "yillik",
