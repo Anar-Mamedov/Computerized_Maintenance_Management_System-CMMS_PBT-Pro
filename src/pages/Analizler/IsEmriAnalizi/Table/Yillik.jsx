@@ -251,7 +251,7 @@ export const Yillik = ({ body }) => {
           onChange={handleTableChange}
           summary={renderSummaryRow}
           /*  scroll={{ x: 1500, y: 600 }} */
-          scroll={{ y: "calc(100vh - 470px)" }}
+          scroll={{ y: "calc(100vh - 400px)" }}
           bordered
           size="small"
         />
