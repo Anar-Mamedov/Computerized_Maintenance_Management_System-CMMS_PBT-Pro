@@ -11,6 +11,7 @@ import AxiosInstance from "../../../../api/http";
 import EditDrawer from "../Update/EditDrawer"; */
 import Filters from "./filter/Filters";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
+import Aylik from "./Aylik";
 /* import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer"; */
 import { useFormContext } from "react-hook-form";
 import { SiMicrosoftexcel } from "react-icons/si";
@@ -2732,7 +2733,7 @@ const MainTable = () => {
           {
             key: "aylik",
             label: "Aylık",
-            children: null,
+            children: <Aylik />,
           },
           {
             key: "yillik",
