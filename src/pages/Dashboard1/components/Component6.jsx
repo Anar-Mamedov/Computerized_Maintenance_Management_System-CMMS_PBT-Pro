@@ -77,33 +77,14 @@ function Component6({ updateApi }) {
           onClick={showModal}
         >
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <Text
-              style={{ fontWeight: "500", fontSize: "35px", color: "white" }}
-            >
-              {data?.DEVAM_EDEN_IS_TALEPLERI !== undefined
-                ? data.DEVAM_EDEN_IS_TALEPLERI
-                : ""}
-            </Text>
-            <Text
-              style={{ color: "white", fontSize: "15px", fontWeight: "400" }}
-            >
-              Bekleyen İş Talepleri
-            </Text>
+            <Text style={{ fontWeight: "500", fontSize: "35px", color: "white" }}>{data?.BEKLEYEN_IS_TALEPLERI !== undefined ? data.BEKLEYEN_IS_TALEPLERI : ""}</Text>
+            <Text style={{ color: "white", fontSize: "15px", fontWeight: "400" }}>Bekleyen İş Talepleri</Text>
           </div>
-          <ClockCircleOutlined
-            style={{ fontSize: "60px", color: "rgba(255,255,255,.8)" }}
-          />
+          <ClockCircleOutlined style={{ fontSize: "60px", color: "rgba(255,255,255,.8)" }} />
         </div>
       )}
 
-      <Modal
-        width={1400}
-        centered
-        title="Bekleyen İş Talepleri"
-        open={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
+      <Modal width={1400} centered title="Bekleyen İş Talepleri" open={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
         <div>
           <ModalTablo defaultStatusKeys={DEFAULT_STATUS_FILTER} />
         </div>
