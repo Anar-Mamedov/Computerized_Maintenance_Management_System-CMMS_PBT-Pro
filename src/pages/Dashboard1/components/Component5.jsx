@@ -6,6 +6,7 @@ import MakineTablo from "./../../MakineEkipman/MakineTanim/Table/Table.jsx";
 import AcikIsEmrirleri from "../../BakımVeArizaYonetimi/IsEmri/Table/ModalTable/ModalTable.jsx";
 
 const { Text } = Typography;
+const DEFAULT_STATUS_FILTER = [0, 1];
 
 function Component5(updateApi) {
   const [data, setData] = useState(null);
@@ -223,6 +224,48 @@ function Component5(updateApi) {
               }}
             >
               {data?.DEVAM_EDEN_IS_TALEPLERI !== undefined ? data.DEVAM_EDEN_IS_TALEPLERI : ""}
+            </Text>
+          </div>
+          <div
+            onClick={() => showModal("Bekleyen İş Talepleri", <ModalTablo defaultStatusKeys={DEFAULT_STATUS_FILTER} />)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              padding: "0px 10px 5px 10px",
+              borderBottom: "1px solid #f0f0f0",
+              cursor: "pointer",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+              <div
+                style={{
+                  width: "10px",
+                  height: "10px",
+                  backgroundColor: "purple",
+                  borderRadius: "50%",
+                }}
+              ></div>
+              <Text> Bekleyen İş Talepleri </Text>
+            </div>
+
+            <Text
+              style={{
+                borderRadius: "10px 10px 10px 10px",
+                backgroundColor: "rgba(128, 0, 128, 0.2)", // purple with 20% opacity
+                padding: "0px 5px 0px 5px",
+                color: "purple",
+              }}
+            >
+              {data?.BEKLEYEN_IS_TALEPLERI !== undefined ? data.BEKLEYEN_IS_TALEPLERI : ""}
             </Text>
           </div>
           <div
