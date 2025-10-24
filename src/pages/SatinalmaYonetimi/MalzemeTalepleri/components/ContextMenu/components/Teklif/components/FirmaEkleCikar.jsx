@@ -117,13 +117,6 @@ const FirmaEkleCikar = ({ visible, onCancel, onOk, firmalar = [], teklifId }) =>
       ellipsis: true,
       render: text => <Tooltip title={text}>{text}</Tooltip>,
     },
-    {
-      title: "Tip",
-      dataIndex: "CAR_TIP",
-      key: "CAR_TIP",
-      ellipsis: true,
-      render: text => <Tooltip title={text}>{text}</Tooltip>,
-    },
   ];
 
   return (
