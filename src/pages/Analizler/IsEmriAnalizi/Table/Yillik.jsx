@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Table, Select, Spin, message } from "antd";
+import { Table, Select, Spin, message, Button } from "antd";
 import AxiosInstance from "../../../../api/http";
 import dayjs from "dayjs";
 import "./TableSummary.css";
+import * as XLSX from "xlsx";
+import { SiMicrosoftexcel } from "react-icons/si";
 
 const { Option } = Select;
 
@@ -21,6 +23,9 @@ const DEFAULT_NUMBER_FORMATTER = new Intl.NumberFormat("tr-TR", {
   minimumFractionDigits: 0,
   maximumFractionDigits: 2,
 });
+const DEFAULT_EXPORT_COLUMN_WIDTH = 120;
+const MIN_EXPORT_COLUMN_WIDTH = 60;
+const EXPORT_COLUMN_WIDTH_SCALING_FACTOR = 0.85;
 
 const parseNumericValue = (value) => {
   if (value === null || value === undefined || value === "") {
@@ -56,12 +61,39 @@ const getNumericSorter = (dataIndex) => (rowA, rowB) => {
   return numA - numB;
 };
 
+const resolveColumnTitle = (column, columnIndex) => {
+  if (column?.title === null || column?.title === undefined) {
+    return column?.key ?? `Sütun ${columnIndex + 1}`;
+  }
+  if (typeof column.title === "string" || typeof column.title === "number") {
+    return String(column.title);
+  }
+  if (React.isValidElement(column.title)) {
+    const childText = React.Children.toArray(column.title.props?.children)
+      .filter((child) => typeof child === "string")
+      .join(" ")
+      .trim();
+    if (childText) {
+      return childText;
+    }
+  }
+  return column?.key ?? `Sütun ${columnIndex + 1}`;
+};
+
+const computeExportColumnWidth = (width) => {
+  if (typeof width !== "number" || Number.isNaN(width) || width <= 0) {
+    return DEFAULT_EXPORT_COLUMN_WIDTH;
+  }
+  return Math.max(MIN_EXPORT_COLUMN_WIDTH, Math.round(width * EXPORT_COLUMN_WIDTH_SCALING_FACTOR));
+};
+
 export const Yillik = ({ body }) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([]);
   const [aciklamaSutun, setAciklamaSutun] = useState("ISM_TIP");
   const [pagination, setPagination] = useState({ current: 1, pageSize: 20 });
+  const [xlsxLoading, setXlsxLoading] = useState(false);
 
   // Fetch data whenever filters, keyword, or aciklamaSutun changes
   useEffect(() => {
@@ -218,6 +250,98 @@ export const Yillik = ({ body }) => {
     return { data: tableData, columns: cols };
   };
 
+  const getCurrentPageData = () => {
+    if (!pagination?.pageSize || !pagination?.current) {
+      return data;
+    }
+
+    const startIndex = (pagination.current - 1) * pagination.pageSize;
+    const endIndex = startIndex + pagination.pageSize;
+    return data.slice(startIndex, endIndex);
+  };
+
+  const buildExportMatrix = () => {
+    const visibleColumns = columns
+      .filter((column) => column && (column.dataIndex || column.key))
+      .map((column, columnIndex) => ({
+        header: resolveColumnTitle(column, columnIndex),
+        key: column.dataIndex ?? column.key,
+        width: column.width,
+      }));
+    const currentPageRows = getCurrentPageData();
+
+    const headers = visibleColumns.map(({ header }) => header);
+
+    const exportRows = currentPageRows.map((row) => {
+      const cells = visibleColumns.map(({ key }) => {
+        if (!key) {
+          return "";
+        }
+
+        const rawValue = row?.[key];
+        let value = rawValue;
+
+        if (rawValue === null || rawValue === undefined || rawValue === Number.NEGATIVE_INFINITY) {
+          value = "";
+        } else if (typeof rawValue === "string") {
+          const numericValue = parseNumericValue(rawValue);
+          value = numericValue !== null ? numericValue : rawValue;
+        }
+
+        return value;
+      });
+
+      return cells;
+    });
+
+    if (currentPageRows.length) {
+      const summaryRow = visibleColumns.map(({ key }, columnIndex) => {
+        if (columnIndex === 0) {
+          return "Toplam";
+        }
+
+        if (!key) {
+          return "";
+        }
+
+        const numericValues = currentPageRows.map((row) => parseNumericValue(row?.[key])).filter((value) => value !== null);
+        const total = numericValues.reduce((acc, val) => acc + val, 0);
+        return numericValues.length ? total : "";
+      });
+      exportRows.push(summaryRow);
+    }
+
+    return { headers, exportRows, visibleColumns };
+  };
+
+  const handleDownloadXLSX = () => {
+    if (!columns.length || !data.length) {
+      message.warning("İndirilecek veri bulunmuyor.");
+      return;
+    }
+
+    try {
+      setXlsxLoading(true);
+      const { headers, exportRows, visibleColumns } = buildExportMatrix();
+      const worksheet = XLSX.utils.aoa_to_sheet([headers, ...exportRows]);
+      worksheet["!cols"] = visibleColumns.map(({ width }) => ({
+        wpx: computeExportColumnWidth(width),
+      }));
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Yıllık Analiz");
+
+      const timestamp = dayjs().format("YYYY-MM-DD_HH-mm");
+      const fileName = `is_emri_yillik_${timestamp}.xlsx`;
+      XLSX.writeFile(workbook, fileName);
+      message.success("Excel dosyası indirildi.");
+    } catch (error) {
+      console.error("Excel indirme hatası:", error);
+      message.error("Excel indirme sırasında bir hata oluştu.");
+    } finally {
+      setXlsxLoading(false);
+    }
+  };
+
   const handleTableChange = (nextPagination) => {
     setPagination((prev) => ({
       ...prev,
@@ -275,7 +399,7 @@ export const Yillik = ({ body }) => {
 
   return (
     <div>
-      <div style={{ marginBottom: "16px" }}>
+      <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
         <Select value={aciklamaSutun} onChange={(value) => setAciklamaSutun(value)} style={{ width: 200 }} placeholder="Açıklama Sütunu Seçin">
           {ACIKLAMA_SUTUN_OPTIONS.map((option) => (
             <Option key={option.value} value={option.value}>
@@ -283,6 +407,9 @@ export const Yillik = ({ body }) => {
             </Option>
           ))}
         </Select>
+        <Button icon={<SiMicrosoftexcel />} onClick={handleDownloadXLSX} loading={xlsxLoading}>
+          İndir
+        </Button>
       </div>
 
       <Spin spinning={loading}>
