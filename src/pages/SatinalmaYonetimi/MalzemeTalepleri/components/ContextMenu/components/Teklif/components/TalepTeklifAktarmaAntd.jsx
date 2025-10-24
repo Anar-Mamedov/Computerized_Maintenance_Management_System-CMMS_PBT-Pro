@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Row, Col, Input, Button, Table, Card, Tag, Divider, message, Tooltip, Space, DatePicker, Popconfirm, Typography } from "antd";
+import { Row, Col, Input, Button, Table, Card, Tag, Divider, message, Tooltip, Space, DatePicker, Popconfirm, Typography, Drawer } from "antd";
 import { SendOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../api/http";
 import dayjs from "dayjs";
+import TeklifKarsilastirma from "./TeklifKarsilastirma";
 
 const { Search } = Input;
 const { Text } = Typography;
@@ -27,6 +28,7 @@ export default function TalepTeklifeAktarmaAntd({ fisId, baslik, fisNo }) {
   const containerRef = useRef(null);
   const isDraggingX = useRef(false);
   const isDraggingY = useRef(false);
+  const [drawerVisible, setDrawerVisible] = useState(false);
 
   // sürükleme fonksiyonları
   const handleMouseDownX = () => (isDraggingX.current = true);
@@ -258,10 +260,6 @@ const fetchTeklifPaketleri = async () => {
   }
 };
 
-const handleCompareTeklifler = () => {
-  message.info("Malzeme listesi boş → Teklifleri karşılaştır işlemi tetiklendi.");
-};
-
 // --- Teklif Paketini Sil
 const handleDelete = async (teklifId) => {
   let isError = false;
@@ -330,6 +328,18 @@ const handleFinishEditing = async (id) => {
   }
 };
 // Paket Başlık Değiştirme Fonksiyonları Bitiş
+
+// --- Teklifleri Karşılaştır
+  const handleCompareTeklifler = () => {
+    setDrawerVisible(true);
+  };
+
+  // --- Drawer kapatmak için
+  const handleCloseDrawer = () => {
+    setDrawerVisible(false);
+    fetchMalzemeler();
+    fetchTeklifPaketleri();
+  };
 
   return (
   <div
@@ -546,6 +556,24 @@ const handleFinishEditing = async (id) => {
         ))}
       </Row>
     </div>
+    <Drawer
+  title="Teklif Karşılaştırma"
+  placement="right"
+  open={drawerVisible}
+  onClose={handleCloseDrawer}
+  width="100vw"
+  styles={{
+    background: "#f0f2f5",
+    padding: 0,
+    overflow: "hidden",
+  }}
+>
+  <TeklifKarsilastirma
+  onClose={handleCloseDrawer}
+  teklifIds={teklifPaketleri.map(t => t.teklifId)}
+  open={drawerVisible}
+/>
+</Drawer>
   </div>
 );
 }
