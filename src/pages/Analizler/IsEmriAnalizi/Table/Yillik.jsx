@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Table, Select, Spin, message, Button } from "antd";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { Table, Select, message, Button } from "antd";
 import AxiosInstance from "../../../../api/http";
 import dayjs from "dayjs";
 import "./TableSummary.css";
 import * as XLSX from "xlsx";
 import { SiMicrosoftexcel } from "react-icons/si";
+import i18n from "i18next";
 
 const { Option } = Select;
 
@@ -90,10 +91,84 @@ const computeExportColumnWidth = (width) => {
 export const Yillik = ({ body }) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
+  const [visibleData, setVisibleData] = useState([]);
   const [columns, setColumns] = useState([]);
   const [aciklamaSutun, setAciklamaSutun] = useState("ISM_TIP");
   const [pagination, setPagination] = useState({ current: 1, pageSize: 20 });
+  const [pageSize, setPageSize] = useState(20);
+  const [totalCount, setTotalCount] = useState(0);
+  const [isScrollPageEnabled, setIsScrollPageEnabled] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+    try {
+      return localStorage.getItem("scroolPage") === "true";
+    } catch (error) {
+      return false;
+    }
+  });
+  const [hasMoreData, setHasMoreData] = useState(true);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [currentScrollPage, setCurrentScrollPage] = useState(1);
+  const isFetchingMoreRef = useRef(false);
+  const tableWrapperRef = useRef(null);
   const [xlsxLoading, setXlsxLoading] = useState(false);
+
+  const formattedTotalCount = useMemo(() => {
+    const locale = i18n?.language || (typeof navigator !== "undefined" ? navigator.language : undefined);
+    try {
+      return new Intl.NumberFormat(locale).format(totalCount);
+    } catch (error) {
+      return (Number(totalCount) || 0).toLocaleString();
+    }
+  }, [totalCount, i18n.language]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const handleStorageChange = (event) => {
+      if (event.key === "scroolPage") {
+        setIsScrollPageEnabled(event.newValue === "true");
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    setCurrentScrollPage(1);
+    setVisibleData([]);
+    setHasMoreData(true);
+    isFetchingMoreRef.current = false;
+    setIsFetchingMore(false);
+  }, [isScrollPageEnabled]);
+
+  useEffect(() => {
+    if (!isScrollPageEnabled) {
+      setVisibleData(data);
+      setHasMoreData(false);
+      isFetchingMoreRef.current = false;
+      setIsFetchingMore(false);
+      return;
+    }
+
+    const sliceSize = currentScrollPage * pageSize;
+    const nextVisible = data.slice(0, sliceSize);
+    setVisibleData(nextVisible);
+    const moreAvailable = nextVisible.length < data.length;
+    setHasMoreData(moreAvailable);
+    isFetchingMoreRef.current = false;
+    setIsFetchingMore(false);
+  }, [data, isScrollPageEnabled, currentScrollPage, pageSize]);
+
+  useEffect(() => {
+    setTotalCount(data.length);
+  }, [data]);
 
   // Fetch data whenever filters, keyword, or aciklamaSutun changes
   useEffect(() => {
@@ -136,6 +211,12 @@ export const Yillik = ({ body }) => {
         const transformedData = transformPivotData(response.data);
         setData(transformedData.data);
         setColumns(transformedData.columns);
+        setTotalCount(transformedData.data.length);
+        if (isScrollPageEnabled) {
+          setCurrentScrollPage(1);
+        } else {
+          setVisibleData(transformedData.data);
+        }
         setPagination((prev) => ({ ...prev, current: 1 }));
       }
     } catch (error) {
@@ -250,16 +331,6 @@ export const Yillik = ({ body }) => {
     return { data: tableData, columns: cols };
   };
 
-  const getCurrentPageData = () => {
-    if (!pagination?.pageSize || !pagination?.current) {
-      return data;
-    }
-
-    const startIndex = (pagination.current - 1) * pagination.pageSize;
-    const endIndex = startIndex + pagination.pageSize;
-    return data.slice(startIndex, endIndex);
-  };
-
   const buildExportMatrix = () => {
     const visibleColumns = columns
       .filter((column) => column && (column.dataIndex || column.key))
@@ -268,11 +339,11 @@ export const Yillik = ({ body }) => {
         key: column.dataIndex ?? column.key,
         width: column.width,
       }));
-    const currentPageRows = getCurrentPageData();
+    const exportRowsSource = data;
 
     const headers = visibleColumns.map(({ header }) => header);
 
-    const exportRows = currentPageRows.map((row) => {
+    const exportRows = exportRowsSource.map((row) => {
       const cells = visibleColumns.map(({ key }) => {
         if (!key) {
           return "";
@@ -294,7 +365,7 @@ export const Yillik = ({ body }) => {
       return cells;
     });
 
-    if (currentPageRows.length) {
+    if (exportRowsSource.length) {
       const summaryRow = visibleColumns.map(({ key }, columnIndex) => {
         if (columnIndex === 0) {
           return "Toplam";
@@ -304,7 +375,7 @@ export const Yillik = ({ body }) => {
           return "";
         }
 
-        const numericValues = currentPageRows.map((row) => parseNumericValue(row?.[key])).filter((value) => value !== null);
+        const numericValues = exportRowsSource.map((row) => parseNumericValue(row?.[key])).filter((value) => value !== null);
         const total = numericValues.reduce((acc, val) => acc + val, 0);
         return numericValues.length ? total : "";
       });
@@ -342,13 +413,112 @@ export const Yillik = ({ body }) => {
     }
   };
 
-  const handleTableChange = (nextPagination) => {
+  const handleTableChange = (nextPagination, filters, sorter) => {
+    if (isScrollPageEnabled) {
+      applySorterToData(Array.isArray(sorter) ? sorter[0] : sorter);
+      return;
+    }
     setPagination((prev) => ({
       ...prev,
       current: nextPagination.current,
       pageSize: nextPagination.pageSize,
     }));
+    setPageSize(nextPagination.pageSize);
+    applySorterToData(Array.isArray(sorter) ? sorter[0] : sorter);
   };
+
+  const handleScrollPageSizeChange = useCallback((value) => {
+    const numericValue = Number(value);
+    if (!numericValue || Number.isNaN(numericValue)) {
+      return;
+    }
+    setPageSize(numericValue);
+    setPagination((prev) => ({
+      ...prev,
+      current: 1,
+      pageSize: numericValue,
+    }));
+    setCurrentScrollPage(1);
+    setVisibleData([]);
+    setHasMoreData(true);
+    isFetchingMoreRef.current = false;
+    setIsFetchingMore(false);
+  }, []);
+
+  const requestLoadMore = useCallback(() => {
+    if (!isScrollPageEnabled) {
+      return;
+    }
+    if (!hasMoreData || loading || isFetchingMoreRef.current) {
+      return;
+    }
+    if (currentScrollPage * pageSize >= data.length) {
+      setHasMoreData(false);
+      return;
+    }
+    isFetchingMoreRef.current = true;
+    setIsFetchingMore(true);
+    setCurrentScrollPage((prev) => prev + 1);
+  }, [currentScrollPage, data.length, hasMoreData, isScrollPageEnabled, loading, pageSize]);
+
+  const applySorterToData = useCallback(
+    (sorter) => {
+      if (!Array.isArray(data) || data.length === 0) {
+        return;
+      }
+
+      const { field, order } = sorter || {};
+      if (!field || !order) {
+        return;
+      }
+
+      const targetColumn = columns.find((column) => column.dataIndex === field || column.key === field);
+      const sorterFn = targetColumn?.sorter;
+      if (typeof sorterFn !== "function") {
+        return;
+      }
+
+      const sortedData = [...data].sort((a, b) => sorterFn(a, b));
+      if (order === "descend") {
+        sortedData.reverse();
+      }
+      setData(sortedData);
+      setCurrentScrollPage(1);
+      setVisibleData([]);
+      setHasMoreData(true);
+      isFetchingMoreRef.current = false;
+      setIsFetchingMore(false);
+    },
+    [columns, data]
+  );
+
+  useEffect(() => {
+    if (!isScrollPageEnabled) {
+      return;
+    }
+
+    const wrapper = tableWrapperRef.current;
+    if (!wrapper) {
+      return;
+    }
+
+    const tableBody = wrapper.querySelector(".ant-table-body");
+    if (!tableBody) {
+      return;
+    }
+
+    const handleScroll = () => {
+      const remainingScroll = tableBody.scrollHeight - tableBody.scrollTop - tableBody.clientHeight;
+      if (remainingScroll < 100) {
+        requestLoadMore();
+      }
+    };
+
+    tableBody.addEventListener("scroll", handleScroll);
+    return () => {
+      tableBody.removeEventListener("scroll", handleScroll);
+    };
+  }, [isScrollPageEnabled, requestLoadMore, visibleData.length]);
 
   const renderSummaryRow = () => {
     if (!columns.length || !data.length) {
@@ -412,25 +582,48 @@ export const Yillik = ({ body }) => {
         </Button>
       </div>
 
-      <Spin spinning={loading}>
+      <div ref={tableWrapperRef}>
         <Table
           columns={columns}
-          dataSource={data}
+          dataSource={isScrollPageEnabled ? visibleData : data}
           showSorterTooltip={false}
-          pagination={{
-            ...pagination,
-            showSizeChanger: true,
-            pageSizeOptions: ["10", "20", "50", "100"],
-            showTotal: (total) => `Toplam ${total} kayıt`,
-          }}
+          pagination={
+            isScrollPageEnabled
+              ? false
+              : {
+                  ...pagination,
+                  showSizeChanger: true,
+                  pageSizeOptions: ["10", "20", "50", "100"],
+                  showTotal: (total) => `Toplam ${total} kayıt`,
+                }
+          }
+          loading={loading || (isScrollPageEnabled && isFetchingMore)}
           onChange={handleTableChange}
           summary={renderSummaryRow}
-          /*  scroll={{ x: 1500, y: 600 }} */
           scroll={{ y: "calc(100vh - 400px)" }}
           bordered
           size="small"
         />
-      </Spin>
+        {isScrollPageEnabled && (
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", padding: "8px 0" }}>
+            <div style={{ color: "rgba(0,0,0,0.45)" }}>{!hasMoreData && visibleData.length === data.length && data.length > 0 ? "Tüm kayıtlar yüklendi" : ""}</div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span style={{ color: "rgba(0,0,0,0.65)" }}>Toplam {formattedTotalCount}</span>
+              <span style={{ fontWeight: 600 }}>Sayfa başına</span>
+              <Select
+                value={pageSize}
+                style={{ width: 120 }}
+                onChange={handleScrollPageSizeChange}
+                options={[
+                  { value: 20, label: "20" },
+                  { value: 50, label: "50" },
+                  { value: 100, label: "100" },
+                ]}
+              />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
