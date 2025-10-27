@@ -3,6 +3,7 @@ import { Table, InputNumber, Select, Typography, Card, Button, Space, Radio, Tab
 import { FileExcelOutlined, PrinterOutlined, PlusOutlined, CheckCircleOutlined, SaveOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../api/http";
 import TedarikciEkle from "./FirmaEkleCikar";
+import MalzemeEkle from "./MalzemeEkleCikar";
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -15,6 +16,7 @@ const TeklifKarsilastirma = ({ teklifIds = [] }) => {
   const [selectedFirmaId, setSelectedFirmaId] = useState(null);
   const [kaydedildi, setKaydedildi] = useState(true);
   const [isTedarikciModalOpen, setTedarikciModalOpen] = useState(false);
+  const [isMalzemeModalOpen, setMalzemeModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("1");
   const aktifPaketIndex = Number(activeTab) - 1;
   const aktifPaket = paketler[aktifPaketIndex] || {};
@@ -210,6 +212,13 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
     );
   }
 
+  const malzemeListesi = paketler.length
+  ? paketler.flatMap(p => p.malzemeler || []).map(m => ({
+      id: m.malzemeId,
+      tanim: m.malzeme,
+    }))
+  : [];
+
   return (
     <Card
       title="Satınalma Teklif Kıyaslama"
@@ -220,7 +229,9 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
           <Button icon={<PlusOutlined />} onClick={() => setTedarikciModalOpen(true)}>
             Tedarikçi Ekle / Sil
           </Button>
-          <Button icon={<PlusOutlined />}>Malzeme Ekle</Button>
+          <Button icon={<PlusOutlined />} onClick={() => setMalzemeModalOpen(true)}>
+            Malzeme Ekle / Sil
+          </Button>
           <Button
             icon={<SaveOutlined />}
             style={{ backgroundColor: "#52c41a", borderColor: "#52c41a", color: "#fff" }}
@@ -485,6 +496,22 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
           const allTeklifIds = paketler.map(p => p.id);
           if (allTeklifIds.length) fetchAllTeklifler(allTeklifIds); // tüm teklifler için fetch
         }}
+      />
+      <MalzemeEkle
+        visible={isMalzemeModalOpen}
+        teklifId={paketler[activeTab - 1]?.teklif?.teklifId || paketler[activeTab - 1]?.teklifBaslik?.teklifId}
+        onCancel={() => {
+          setMalzemeModalOpen(false);
+          const allTeklifIds = paketler.map(p => p.id);
+          if (allTeklifIds.length) fetchAllTeklifler(allTeklifIds); // tüm teklifler için fetch
+        }}
+        malzemeler={
+          paketler[activeTab - 1]?.malzemeler?.map((m) => ({
+          malzemeId: m.malzemeId,  // 👈 malzemeId kesin gelmeli
+          stokId: m.stokId ?? null, // 👈 stokId opsiyonel
+          malzeme: m.malzeme,
+          })) || []
+        }
       />
     </Card>
   );
