@@ -53,6 +53,7 @@ const Breadcrumbs = () => {
     "/malzemeTalepleri": "Malzeme Talepleri",
     "/satinalmaSiparisleri": "Satınalma Siparişleri",
     "/tedarikciFirmalar": "Tedarikçi Firmalar",
+    "/satinalmaDashboard": "Satınalma Yönetici Paneli",
 
     // Diğer route'lar için ekleyin...
   };
