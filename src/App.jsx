@@ -47,6 +47,7 @@ import MalzemeDepolari from "./pages/Malzeme&DepoYonetimi/MalzemeDepolari/Malzem
 import MalzemeTalepleri from "./pages/SatinalmaYonetimi/MalzemeTalepleri/MalzemeTalepleri.jsx";
 import SatinalmaSiparisleri from "./pages/SatinalmaYonetimi/SatinalmaSiparisleri/SatinalmaSiparisleri.jsx";
 import DetarikciFirmalar from "./pages/SatinalmaYonetimi/FirmaTanimlari/FirmaTanimlari.jsx";
+import SatinalmaDashboard from "./pages/SatinalmaYonetimi/SatinalmaDashboard/SatinalmaDashboard.jsx";
 import AxiosInstance from "./api/http";
 
 // Malzemeler
@@ -177,6 +178,7 @@ const rawItems = [
     "satinalmaYonetimi",
     <UserOutlined />,
     [
+      getItem("Satınalma Yönetici Paneli", "satinalmaDashboard", true),
       getItem("Malzeme Talepleri", "malzemeTalepleri", true),
       getItem("Satınalma Siparişleri", "satinalmaSiparisleri", true),
       getItem("Tedarikçi Firmalar", "tedarikciFirmalar", true),
@@ -374,6 +376,7 @@ export default function App() {
           <Route path="/malzemeTalepleri" element={<MalzemeTalepleri />} />
           <Route path="/satinalmaSiparisleri" element={<SatinalmaSiparisleri />} />
           <Route path="/tedarikciFirmalar" element={<DetarikciFirmalar />} />
+          <Route path="/satinalmaDashboard" element={<SatinalmaDashboard />} />
           {/*<Route path="/kurallar" element={<Kurallar />} />*/}
         </Route>
       </Routes>

@@ -138,6 +138,7 @@ export default function LoginForm() {
           malzemeTalepleri: true,
           satinalmaSiparisleri: true,
           tedarikciFirmalar: true,
+          satinalmaDashboard:true,
           isEmriAnalizi: true,
         };
         const userInfo = {
