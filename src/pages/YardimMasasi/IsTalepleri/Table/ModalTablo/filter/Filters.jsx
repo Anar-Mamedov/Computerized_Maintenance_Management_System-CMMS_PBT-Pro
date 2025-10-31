@@ -5,13 +5,44 @@ import TypeFilter from "./TypeFilter";
 import CustomFilter from "./custom-filter/CustomFilter";
 import ZamanAraligi from "./ZamanAraligi";
 
-export default function Filters({ onChange }) {
+const DEFAULT_STATUS_KEYS = ["3"];
+
+const normalizeStatusKeys = (keys) => {
+  if (!Array.isArray(keys) || keys.length === 0) {
+    return DEFAULT_STATUS_KEYS;
+  }
+  return keys.map((key) => key.toString());
+};
+
+const buildDurumlarFilter = (keys) =>
+  normalizeStatusKeys(keys).reduce((acc, key, index) => {
+    acc[`key${index}`] = key;
+    return acc;
+  }, {});
+
+export default function Filters({ onChange, defaultStatusKeys = DEFAULT_STATUS_KEYS }) {
+  const resolvedStatusKeys = React.useMemo(() => normalizeStatusKeys(defaultStatusKeys), [defaultStatusKeys]);
+  const defaultDurumlarFilter = React.useMemo(() => buildDurumlarFilter(resolvedStatusKeys), [resolvedStatusKeys]);
+
   const [filters, setFilters] = React.useState({
     lokasyonlar: {},
     isemritipleri: {},
-    durumlar: { key0: "3" },
+    durumlar: defaultDurumlarFilter,
     customfilters: {},
   });
+
+  React.useEffect(() => {
+    setFilters((state) => {
+      if (JSON.stringify(state.durumlar) === JSON.stringify(defaultDurumlarFilter)) {
+        return state;
+      }
+
+      return {
+        ...state,
+        durumlar: defaultDurumlarFilter,
+      };
+    });
+  }, [defaultDurumlarFilter]);
 
   React.useEffect(() => {
     onChange("filters", filters);
@@ -62,7 +93,10 @@ export default function Filters({ onChange }) {
   return (
     <>
       {/* <TypeFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, isemritipleri: newFilters }))} /> */}
-      <ConditionFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, durumlar: newFilters }))} />
+      <ConditionFilter
+        defaultStatusKeys={resolvedStatusKeys}
+        onSubmit={(newFilters) => setFilters((state) => ({ ...state, durumlar: newFilters }))}
+      />
       <ZamanAraligi onChange={handleZamanAraligiChange} />
       {/* <LocationFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, lokasyonlar: newFilters }))} /> */}
       <CustomFilter onSubmit={handleCustomFilterChange} />

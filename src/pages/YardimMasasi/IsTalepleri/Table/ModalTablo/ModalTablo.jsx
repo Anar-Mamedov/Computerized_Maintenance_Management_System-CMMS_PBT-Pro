@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { Table, Button, Modal, Checkbox, Input, Spin, Tag, message } from "antd";
 import { useFormContext } from "react-hook-form";
 import { SearchOutlined, MenuOutlined } from "@ant-design/icons";
@@ -25,7 +25,24 @@ const StyledTable = styled(Table)`
 
 //styled components end
 
-export default function MainTable() {
+const DEFAULT_STATUS_KEYS = ["3"];
+
+const normalizeStatusKeys = (keys) => {
+  if (!Array.isArray(keys) || keys.length === 0) {
+    return DEFAULT_STATUS_KEYS;
+  }
+  return keys.map((key) => key.toString());
+};
+
+const buildStatusFilterObject = (keys) =>
+  normalizeStatusKeys(keys).reduce((acc, key, index) => {
+    acc[`key${index}`] = key;
+    return acc;
+  }, {});
+
+export default function MainTable({ defaultStatusKeys = DEFAULT_STATUS_KEYS }) {
+  const resolvedStatusKeys = useMemo(() => normalizeStatusKeys(defaultStatusKeys), [defaultStatusKeys]);
+  const defaultStatusFilter = useMemo(() => buildStatusFilterObject(resolvedStatusKeys), [resolvedStatusKeys]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
   const [data, setData] = useState([]);
@@ -802,12 +819,29 @@ export default function MainTable() {
   });
   // edit drawer için son
 
-  const [body, setBody] = useState({
+  const [body, setBody] = useState(() => ({
     keyword: "",
     filters: {
-      durumlar: { key0: "3" }, // Varsayılan filtre - Devam Ediyor
+      durumlar: defaultStatusFilter,
     },
-  });
+  }));
+
+  useEffect(() => {
+    setBody((state) => {
+      const currentDurumlar = state?.filters?.durumlar || {};
+      if (JSON.stringify(currentDurumlar) === JSON.stringify(defaultStatusFilter)) {
+        return state;
+      }
+
+      return {
+        ...state,
+        filters: {
+          ...state.filters,
+          durumlar: defaultStatusFilter,
+        },
+      };
+    });
+  }, [defaultStatusFilter]);
 
   // ana tablo api isteği için kullanılan useEffect
   useEffect(() => {
@@ -1055,7 +1089,7 @@ export default function MainTable() {
             onChange={(e) => setSearchTerm(e.target.value)}
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
-          <Filters onChange={handleBodyChange} />
+          <Filters onChange={handleBodyChange} defaultStatusKeys={resolvedStatusKeys} />
           <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
         </div>

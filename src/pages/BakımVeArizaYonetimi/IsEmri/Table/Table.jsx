@@ -137,6 +137,8 @@ const MainTable = () => {
   });
   const [selectedRows, setSelectedRows] = useState([]);
   const [xlsxLoading, setXlsxLoading] = useState(false);
+  const [sortField, setSortField] = useState(null);
+  const [sortOrder, setSortOrder] = useState(null);
 
   function hexToRGBA(color, opacity) {
     // 1) Geçersiz parametreleri engelle
@@ -270,11 +272,7 @@ const MainTable = () => {
       render: (text, record) => (
         <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
       ),
-      sorter: (a, b) => {
-        if (a.ISEMRI_NO === null) return -1;
-        if (b.ISEMRI_NO === null) return 1;
-        return a.ISEMRI_NO.localeCompare(b.ISEMRI_NO);
-      },
+      sorter: true,
     },
     {
       title: "Tarih",
@@ -282,12 +280,7 @@ const MainTable = () => {
       key: "DUZENLEME_TARIH",
       width: 110,
       ellipsis: true,
-      sorter: (a, b) => {
-        if (a.DUZENLEME_TARIH === null) return -1;
-        if (b.DUZENLEME_TARIH === null) return 1;
-        return a.DUZENLEME_TARIH.localeCompare(b.DUZENLEME_TARIH);
-      },
-
+      sorter: true,
       visible: true, // Varsayılan olarak açık
       render: (text) => formatDate(text),
     },
@@ -297,12 +290,7 @@ const MainTable = () => {
       key: "DUZENLEME_SAAT",
       width: 90,
       ellipsis: true,
-      sorter: (a, b) => {
-        if (a.DUZENLEME_SAAT === null) return -1;
-        if (b.DUZENLEME_SAAT === null) return 1;
-        return a.DUZENLEME_SAAT.localeCompare(b.DUZENLEME_SAAT);
-      },
-
+      sorter: true,
       visible: true, // Varsayılan olarak açık
       render: (text) => formatTime(text),
     },
@@ -312,13 +300,8 @@ const MainTable = () => {
       key: "ISEMRI_TIP",
       width: 180,
       ellipsis: true,
-      sorter: (a, b) => {
-        if (a.ISEMRI_TIP === null) return -1;
-        if (b.ISEMRI_TIP === null) return 1;
-        return a.ISEMRI_TIP.localeCompare(b.ISEMRI_TIP);
-      },
-
       visible: true, // Varsayılan olarak açık
+      sorter: true,
       render: (text, record) => (
         <div
           style={{
@@ -343,11 +326,7 @@ const MainTable = () => {
       key: "KONU",
       width: 300,
       ellipsis: true,
-      sorter: (a, b) => {
-        if (a.KONU === null) return -1;
-        if (b.KONU === null) return 1;
-        return a.KONU.localeCompare(b.KONU);
-      },
+      sorter: true,
       visible: true, // Varsayılan olarak açık
       render: (text, record) => (
         <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
@@ -360,14 +339,8 @@ const MainTable = () => {
       key: "DURUM",
       width: 120,
       ellipsis: true,
-
       visible: true, // Varsayılan olarak açık
-      sorter: (a, b) => {
-        if (a.DURUM === null && b.DURUM === null) return 0;
-        if (a.DURUM === null) return -1;
-        if (b.DURUM === null) return 1;
-        return a.DURUM.localeCompare(b.DURUM);
-      },
+      sorter: true,
       render: (text, record) => {
         const circleStyle = {
           backgroundColor: record.KAPALI ? "red" : "green", // KAPALI true ise kırmızı, değilse yeşil
@@ -391,6 +364,7 @@ const MainTable = () => {
       key: "ISM_ONAY_DURUM",
       width: 150,
       ellipsis: true,
+      sorter: true,
       visible: true, // Varsayılan olarak açık
       render: (_, record) => {
         const validStatuses = [1, 2, 3];
@@ -419,7 +393,6 @@ const MainTable = () => {
         }
         return null; // Diğer durumlar için hiçbir şey render edilmez
       },
-      sorter: (a, b) => (a.ISM_ONAY_DURUM || 0) - (b.ISM_ONAY_DURUM || 0),
     },
 
     {
@@ -428,28 +401,16 @@ const MainTable = () => {
       key: "LOKASYON",
       width: 200,
       ellipsis: true,
-
+      sorter: true,
       visible: true, // Varsayılan olarak açık
-      sorter: (a, b) => {
-        if (a.LOKASYON === null && b.LOKASYON === null) return 0;
-        if (a.LOKASYON === null) return 1;
-        if (b.LOKASYON === null) return -1;
-        return a.LOKASYON.localeCompare(b.LOKASYON);
-      },
     },
     {
       title: "Makine Kodu",
       dataIndex: "MAKINE_KODU",
       key: "MAKINE_KODU",
       width: 150,
-      sorter: (a, b) => {
-        if (a.MAKINE_KODU === null && b.MAKINE_KODU === null) return 0;
-        if (a.MAKINE_KODU === null) return 1;
-        if (b.MAKINE_KODU === null) return -1;
-        return a.MAKINE_KODU.localeCompare(b.MAKINE_KODU);
-      },
+      sorter: true,
       ellipsis: true,
-
       visible: true, // Varsayılan olarak açık
     },
     {
@@ -457,14 +418,8 @@ const MainTable = () => {
       dataIndex: "MAKINE_TANIMI",
       key: "MAKINE_TANIMI",
       width: 300,
-      sorter: (a, b) => {
-        if (a.MAKINE_TANIMI === null && b.MAKINE_TANIMI === null) return 0;
-        if (a.MAKINE_TANIMI === null) return -1;
-        if (b.MAKINE_TANIMI === null) return 1;
-        return a.MAKINE_TANIMI.localeCompare(b.MAKINE_TANIMI);
-      },
+      sorter: true,
       ellipsis: true,
-
       visible: true, // Varsayılan olarak açık
     },
     {
@@ -472,14 +427,8 @@ const MainTable = () => {
       dataIndex: "PLAN_BASLAMA_TARIH",
       key: "PLAN_BASLAMA_TARIH",
       width: 150,
-      sorter: (a, b) => {
-        if (a.PLAN_BASLAMA_TARIH === null && b.PLAN_BASLAMA_TARIH === null) return 0;
-        if (a.PLAN_BASLAMA_TARIH === null) return 1;
-        if (b.PLAN_BASLAMA_TARIH === null) return -1;
-        return a.PLAN_BASLAMA_TARIH.localeCompare(b.PLAN_BASLAMA_TARIH);
-      },
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak açık
       render: (text) => formatDate(text),
     },
@@ -489,14 +438,8 @@ const MainTable = () => {
       dataIndex: "PLAN_BASLAMA_SAAT",
       key: "PLAN_BASLAMA_SAAT",
       width: 150,
-      sorter: (a, b) => {
-        if (a.PLAN_BASLAMA_SAAT === null && b.PLAN_BASLAMA_SAAT === null) return 0;
-        if (a.PLAN_BASLAMA_SAAT === null) return 1;
-        if (b.PLAN_BASLAMA_SAAT === null) return -1;
-        return a.PLAN_BASLAMA_SAAT.localeCompare(b.PLAN_BASLAMA_SAAT);
-      },
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak açık
       render: (text) => formatTime(text),
     },
@@ -506,7 +449,7 @@ const MainTable = () => {
       key: "PLAN_BITIS_TARIH",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
       render: (text) => formatDate(text),
     },
@@ -516,7 +459,7 @@ const MainTable = () => {
       key: "PLAN_BITIS_SAAT",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
       render: (text) => formatTime(text),
     },
@@ -526,7 +469,7 @@ const MainTable = () => {
       key: "BASLAMA_TARIH",
       width: 110,
       ellipsis: true,
-
+      sorter: true,
       visible: true, // Varsayılan olarak kapalı
       render: (text) => formatDate(text),
     },
@@ -536,7 +479,7 @@ const MainTable = () => {
       key: "BASLAMA_SAAT",
       width: 90,
       ellipsis: true,
-
+      sorter: true,
       visible: true, // Varsayılan olarak kapalı
       render: (text) => formatTime(text),
     },
@@ -546,7 +489,7 @@ const MainTable = () => {
       key: "ISM_BITIS_TARIH",
       width: 110,
       ellipsis: true,
-
+      sorter: true,
       visible: true, // Varsayılan olarak kapalı
       render: (text) => formatDate(text),
     },
@@ -556,7 +499,7 @@ const MainTable = () => {
       key: "ISM_BITIS_SAAT",
       width: 90,
       ellipsis: true,
-
+      sorter: true,
       visible: true, // Varsayılan olarak kapalı
       render: (text) => formatTime(text),
     },
@@ -566,7 +509,7 @@ const MainTable = () => {
       key: "IS_SURESI",
       width: 110,
       ellipsis: true,
-
+      sorter: true,
       visible: true, // Varsayılan olarak kapalı
       render: (text) => (text > 0 ? text : null),
     },
@@ -576,7 +519,7 @@ const MainTable = () => {
       key: "TAMAMLANMA",
       width: 200,
       ellipsis: true,
-
+      sorter: true,
       visible: true, // Varsayılan olarak kapalı
       render: (text) => <Progress percent={text} steps={8} />,
     },
@@ -586,7 +529,7 @@ const MainTable = () => {
       key: "GARANTI",
       width: 100,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
       render: (text, record) => {
         return record.GARANTI ? (
@@ -618,7 +561,7 @@ const MainTable = () => {
       key: "MAKINE_DURUM",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     // {
@@ -640,7 +583,7 @@ const MainTable = () => {
       key: "MAKINE_TIP",
       width: 250,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -649,7 +592,7 @@ const MainTable = () => {
       key: "EKIPMAN",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -658,7 +601,7 @@ const MainTable = () => {
       key: "IS_TIPI",
       width: 250,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -667,7 +610,7 @@ const MainTable = () => {
       key: "IS_NEDENI",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -676,7 +619,7 @@ const MainTable = () => {
       key: "ATOLYE",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -685,7 +628,7 @@ const MainTable = () => {
       key: "TALIMAT",
       width: 250,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -694,7 +637,7 @@ const MainTable = () => {
       key: "ONCELIK",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -703,7 +646,7 @@ const MainTable = () => {
       key: "KAPANIS_TARIHI",
       width: 110,
       ellipsis: true,
-
+      sorter: true,
       visible: true, // Varsayılan olarak kapalı
       render: (text) => formatDate(text),
     },
@@ -713,7 +656,7 @@ const MainTable = () => {
       key: "KAPANIS_SAATI",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
       render: (text) => formatTime(text),
     },
@@ -723,7 +666,7 @@ const MainTable = () => {
       key: "TAKVIM",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -732,7 +675,7 @@ const MainTable = () => {
       key: "MASRAF_MERKEZI",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -741,7 +684,7 @@ const MainTable = () => {
       key: "FRIMA",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -750,6 +693,7 @@ const MainTable = () => {
       key: "IS_TALEP_NO",
       width: 150,
       ellipsis: true,
+      sorter: true,
       onCell: (record) => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -772,7 +716,7 @@ const MainTable = () => {
       key: "IS_TALEP_EDEN",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -781,7 +725,7 @@ const MainTable = () => {
       key: "IS_TALEP_TARIH",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
       render: (text) => formatDate(text),
     },
@@ -791,7 +735,7 @@ const MainTable = () => {
       key: "PERSONEL_ADI",
       width: 180,
       ellipsis: true,
-
+      sorter: true,
       visible: true, // Varsayılan olarak kapalı
     },
     {
@@ -800,7 +744,7 @@ const MainTable = () => {
       key: "TAM_LOKASYON",
       width: 300,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -810,15 +754,7 @@ const MainTable = () => {
       ellipsis: true,
       // Enable ellipsis for overflowed content
       width: 300,
-      sorter: (a, b) => {
-        if (a.TAM_LOKASYON && b.TAM_LOKASYON) {
-          return a.TAM_LOKASYON.localeCompare(b.TAM_LOKASYON);
-        }
-        if (!a.TAM_LOKASYON && !b.TAM_LOKASYON) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.TAM_LOKASYON ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
+      sorter: true,
       render: (text) => {
         if (text === null) {
           return null;
@@ -834,7 +770,7 @@ const MainTable = () => {
       key: "BILDIRILEN_KAT",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -843,7 +779,7 @@ const MainTable = () => {
       key: "BILDIRILEN_BINA",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -852,7 +788,7 @@ const MainTable = () => {
       key: "GUNCEL_SAYAC_DEGER",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -861,7 +797,7 @@ const MainTable = () => {
       key: "ICERDEKI_NOT",
       width: 250,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -870,7 +806,7 @@ const MainTable = () => {
       key: "OZEL_ALAN_1",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -879,7 +815,7 @@ const MainTable = () => {
       key: "OZEL_ALAN_2",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -888,7 +824,7 @@ const MainTable = () => {
       key: "OZEL_ALAN_3",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -897,7 +833,7 @@ const MainTable = () => {
       key: "OZEL_ALAN_4",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -906,7 +842,7 @@ const MainTable = () => {
       key: "OZEL_ALAN_5",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -915,7 +851,7 @@ const MainTable = () => {
       key: "OZEL_ALAN_6",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -924,7 +860,7 @@ const MainTable = () => {
       key: "OZEL_ALAN_7",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -933,7 +869,7 @@ const MainTable = () => {
       key: "OZEL_ALAN_8",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -942,7 +878,7 @@ const MainTable = () => {
       key: "OZEL_ALAN_9",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -951,7 +887,7 @@ const MainTable = () => {
       key: "OZEL_ALAN_10",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -960,7 +896,7 @@ const MainTable = () => {
       key: "OZEL_ALAN_11",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -969,7 +905,7 @@ const MainTable = () => {
       key: "OZEL_ALAN_12",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -978,7 +914,7 @@ const MainTable = () => {
       key: "OZEL_ALAN_13",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -987,7 +923,7 @@ const MainTable = () => {
       key: "OZEL_ALAN_14",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -996,7 +932,7 @@ const MainTable = () => {
       key: "OZEL_ALAN_15",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -1005,7 +941,7 @@ const MainTable = () => {
       key: "OZEL_ALAN_16",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -1014,7 +950,7 @@ const MainTable = () => {
       key: "OZEL_ALAN_17",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -1023,7 +959,7 @@ const MainTable = () => {
       key: "OZEL_ALAN_18",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -1032,7 +968,7 @@ const MainTable = () => {
       key: "OZEL_ALAN_19",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
     {
@@ -1041,7 +977,7 @@ const MainTable = () => {
       key: "OZEL_ALAN_20",
       width: 150,
       ellipsis: true,
-
+      sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
 
@@ -1127,8 +1063,8 @@ const MainTable = () => {
   // ana tablo api isteği için kullanılan useEffect
 
   useEffect(() => {
-    fetchEquipmentData(body, currentPage, pageSize);
-  }, [body, currentPage, pageSize]);
+    fetchEquipmentData(body, currentPage, pageSize, sortField, sortOrder);
+  }, [body, currentPage, pageSize, sortField, sortOrder]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
@@ -1154,16 +1090,22 @@ const MainTable = () => {
 
   // arama işlemi için kullanılan useEffect son
 
-  const fetchEquipmentData = async (body, page, size) => {
+  const fetchEquipmentData = async (body, page, size, sortField, sortOrder) => {
     // body'nin undefined olması durumunda varsayılan değerler atanıyor
     const { keyword = "", filters = {} } = body || {};
     // page'in undefined olması durumunda varsayılan değer olarak 1 atanıyor
     const currentPage = page || 1;
 
+    // Sorting parametrelerini oluşturun
+    let sortParam = '';
+    if (sortField && sortOrder) {
+      sortParam = `&sortField=${sortField}&sortOrder=${sortOrder === 'ascend' ? 'ASC' : 'DESC'}`;
+    }
+
     try {
       setLoading(true);
       // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.post(`getIsEmriFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}`, filters);
+      const response = await AxiosInstance.post(`getIsEmriFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}${sortParam}`, filters);
       if (response) {
         if (response.status_code === 401) {
           message.error(t("buSayfayaErisimYetkinizBulunmamaktadir"));
@@ -1214,6 +1156,15 @@ const MainTable = () => {
       setCurrentPage(pagination.current);
       setPageSize(pagination.pageSize); // pageSize güncellemesi
     }
+
+    // Sorting bilgisini yakalayın
+    if (sorter && sorter.field) {
+      setSortField(sorter.field);
+      setSortOrder(sorter.order); // 'ascend', 'descend' veya undefined
+    } else {
+      setSortField(null);
+      setSortOrder(null);
+    }
   };
   // sayfalama için kullanılan useEffect son
 
@@ -1263,11 +1214,11 @@ const MainTable = () => {
     setSelectedRows([]);
 
     // Verileri yeniden çekmek için `fetchEquipmentData` fonksiyonunu çağır
-    fetchEquipmentData(body, currentPage);
+    fetchEquipmentData(body, currentPage, pageSize, sortField, sortOrder);
     // Burada `body` ve `currentPage`'i güncellediğimiz için, bu değerlerin en güncel hallerini kullanarak veri çekme işlemi yapılır.
     // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
     // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
-  }, [body, currentPage]);
+  }, [body, currentPage, pageSize, sortField, sortOrder]);
 
   // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
   const [columns, setColumns] = useState(() => {
