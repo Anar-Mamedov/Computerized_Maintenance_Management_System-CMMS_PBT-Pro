@@ -23,6 +23,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import AxiosInstance from "../../../api/http";
+import TalepDurumDagilimi from "./Components/TalepDurumDagilimi";
 const { Title } = Typography;
 
 /**
@@ -92,7 +93,7 @@ export default function Dashboard() {
 
         // üst kartlar
         setBekleyenMalzemeTalepleri(
-          Number(resBekMal?.data?.ADET ?? 0)
+          Number(resBekMal?.ADET ?? 0)
         );
         setBekleyenFiyatTeklifleri(Number(resBekFiyat?.ADET ?? 0));
         setAcikSiparisler(Number(resAcikSip?.ADET ?? 0));
@@ -230,26 +231,7 @@ export default function Dashboard() {
         </Card>
 
         <Card title="Malzeme Talepleri Durum Dağılımı" style={{ flex: 1, minHeight: 320 }}>
-          <div style={{ width: "100%", height: 280 }}>
-  <ResponsiveContainer width="100%" height="100%">
-    <PieChart>
-      <ReTooltip />
-      <Pie
-        data={talepDurumlari}
-        dataKey="Adet"
-        nameKey="Durum"
-        cx="50%"
-        cy="50%"
-        outerRadius={90}
-        label={(entry) => `${entry.Durum} (${entry.Adet})`}
-      >
-        {talepDurumlari.map((entry, idx) => (
-          <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
-        ))}
-      </Pie>
-    </PieChart>
-  </ResponsiveContainer>
-</div>
+          <TalepDurumDagilimi talepDurumlari={talepDurumlari} />
         </Card>
       </Col>
 
