@@ -170,17 +170,22 @@ const MalzemeEkleCikar = ({ visible, onCancel, malzemeler = [], teklifId }) => {
             }}
           />
           <Table
-            columns={columnsExternal}
-            dataSource={filteredExternal}
-            rowKey={(record) => record.TB_STOK_ID}
-            rowSelection={{
-              type: "checkbox",
-              selectedRowKeys: selectedMalzemeIds,
-              onChange: (keys) => setSelectedMalzemeIds(keys),
-            }}
-            loading={loadingExternal}
-            pagination={{ pageSize: 10 }}
-          />
+  columns={columnsExternal}
+  dataSource={filteredExternal}
+  rowKey={(record) => record.TB_STOK_ID}
+  rowSelection={{
+    type: "checkbox",
+    selectedRowKeys: selectedMalzemeIds,
+    onChange: (keys) => setSelectedMalzemeIds(keys),
+  }}
+  loading={loadingExternal}
+  pagination={{
+    current: currentPage,
+    pageSize: 10,
+    total: totalExternalCount,
+    onChange: (page) => setCurrentPage(page),
+  }}
+/>
         </Col>
 
         <Col span={12}>

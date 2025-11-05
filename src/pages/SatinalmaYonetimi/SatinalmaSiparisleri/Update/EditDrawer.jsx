@@ -95,8 +95,8 @@ const durumId = watch("durumId");
         setValue("siparisKodu", item.siparisKodu);
         setValue("siparisTarihi", item.siparisTarihi ? dayjs(item.siparisTarihi) : null);
         setValue("teslimTarihi", item.teslimTarihi ? dayjs(item.teslimTarihi) : null);
-        setValue("firmaId", item.firmaId);
-        setValue("firmaName", item.firmaName);
+        setValue("firmaID", item.firmaId);
+        setValue("firma", item.firmaName);
         setValue("talepEdenPersonelId", item.siparisVerenId);
         setValue("siparisVerenName", item.siparisVerenName);
         setValue("odemeSekliNameID", item.odemeSekliKodId);
@@ -226,7 +226,7 @@ const durumId = watch("durumId");
     siparisKodu: data.siparisKodu || "",
     siparisTarihi: data.siparisTarihi || null,
     teslimTarihi: data.teslimTarihi || null,
-    firmaId: Number(data.firmaNameID) || 0,
+    firmaId: Number(data.firmaID) || 0,
     siparisVerenId: Number(data.talepEdenPersonelId) || 0,
     odemeSekliKodId: Number(data.odemeSekliNameID) || 0,
     referansNo: data.referansNo || "",

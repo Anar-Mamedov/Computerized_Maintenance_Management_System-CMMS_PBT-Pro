@@ -16,7 +16,7 @@ import DepoTablo from "../../../../../../utils/components/DepoTablo";
 import ProjeTablo from "../../../../../../utils/components/ProjeTablo";
 import SiparisTablo from "../../../../../../utils/components/SiparisTablo";
 import PersonelTablo from "../../../../MalzemeTalepleri/components/PersonelTablo";
-import FirmaTablo from "../FirmaTablo";
+import FirmaTablo from "../../../../../../utils/components/FirmaTablo";
 import { PlusOutlined } from "@ant-design/icons";
 
 const { Text, Link } = Typography;
@@ -70,6 +70,7 @@ export default function MainTabs({ modalOpen }) {
     control,
     watch,
     setValue,
+    clearErrors,
     formState: { errors },
   } = useFormContext();
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
@@ -444,7 +445,31 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "240px",
             }}
           >
-            <FirmaTablo name1="firma" isRequired={false} />
+            <Controller
+              name="firmaName"
+              control={control}
+              rules={{
+                required: "Firma seçimi zorunludur.",
+                validate: (value) => !!value || "Firma seçimi yapılmalıdır."
+              }}
+              render={({ field, fieldState }) => (
+              <div style={{ width: "100%", maxWidth: "200px" }}>
+                <FirmaTablo
+                  onSubmit={(selectedData) => {
+                  field.onChange(selectedData.TB_CARI_ID);
+                  }}
+                  selectedId={field.value}
+                  nameField="firma"
+                  idField="firmaName"
+                />
+                  {fieldState.error && (
+                    <span style={{ color: "red", fontSize: "12px" }}>
+                      {fieldState.error.message}
+                    </span>
+                  )}
+                </div>
+              )}
+            />
           </div>
         </div>
         <div
@@ -511,21 +536,39 @@ export default function MainTabs({ modalOpen }) {
               maxWidth: "240px",
             }}
           >
+            <Controller
+              name="lokasyonID"
+              control={control}
+        rules={{
+          required: "Lokasyon seçimi zorunludur.",
+        }}
+        render={({ field, fieldState }) => (
+          <div style={{ width: "100%", maxWidth: "200px" }}>
             <LokasyonTablo
               lokasyonFieldName="lokasyonName"
               lokasyonIdFieldName="lokasyonID"
               onSubmit={(selectedData) => {
                 setValue("lokasyonName", selectedData.LOK_TANIM);
                 setValue("lokasyonID", selectedData.key);
-                // Force trigger to ensure FisIcerigi component detects the change
+                clearErrors("lokasyonID"); // ✅ seçim yapılınca hata kalkar
+
+                // FisIcerigi tetikleme (önceki davranış korunuyor)
                 setTimeout(() => {
-                setValue("lokasyonName", selectedData.LOK_TANIM, { shouldDirty: true });
-                setValue("lokasyonID", selectedData.key, { shouldDirty: true });
-               }, 100);
+                  setValue("lokasyonName", selectedData.LOK_TANIM, { shouldDirty: true });
+                  setValue("lokasyonID", selectedData.key, { shouldDirty: true });
+                }, 100);
               }}
               isModalVisible={isLokasyonModalOpen}
               setIsModalVisible={setIsLokasyonModalOpen}
             />
+            {fieldState.error && (
+              <span style={{ color: "red", fontSize: "12px" }}>
+                {fieldState.error.message}
+              </span>
+            )}
+          </div>
+        )}
+      />
           </div>
         </div>
       </div>
