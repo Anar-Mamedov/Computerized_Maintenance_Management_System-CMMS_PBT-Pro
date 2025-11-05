@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Row, Col, Input, Button, Table, Card, Tag, Divider, message, Tooltip, Space, DatePicker, Popconfirm, Typography, Drawer } from "antd";
+import { Row, Col, Input, Button, Table, Card, Tag, Divider, message, Tooltip, Space, DatePicker, Popconfirm, Typography, Drawer, Modal } from "antd";
 import { SendOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../api/http";
 import dayjs from "dayjs";
@@ -237,6 +237,7 @@ const handleCreateTeklif = async () => {
     setSelectedSupplierKeys([]);
     setSelectedSuppliersData([]);
     fetchTeklifNo();
+    setKonu(`${fisNo} Talebin Fiyat Teklifi`);
   } catch (err) {
     console.error("Teklif oluşturulurken hata:", err);
     message.error("Teklif oluşturulurken bir hata oluştu");
@@ -336,10 +337,18 @@ const handleFinishEditing = async (id) => {
 
   // --- Drawer kapatmak için
   const handleCloseDrawer = () => {
-    setDrawerVisible(false);
-    fetchMalzemeler();
-    fetchTeklifPaketleri();
-  };
+    Modal.confirm({
+      title: "İptal etmek istediğinize emin misiniz?",
+      content: "Kaydedilmemiş değişiklikler kaybolacaktır.",
+      okText: "Evet",
+      cancelText: "Hayır",
+    onOk() {
+      setDrawerVisible(false);
+      fetchMalzemeler();
+      fetchTeklifPaketleri();
+    },
+  });
+};
 
   return (
   <div

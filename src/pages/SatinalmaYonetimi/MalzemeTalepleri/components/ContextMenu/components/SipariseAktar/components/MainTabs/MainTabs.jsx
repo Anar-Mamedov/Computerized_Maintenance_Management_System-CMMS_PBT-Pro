@@ -441,24 +441,26 @@ export default function MainTabs({ modalOpen }) {
             <Controller
               name="firmaName"
               control={control}
-              rules={{ required: t("alanBosBirakilamaz") }}
+              rules={{
+                required: "Firma seçimi zorunludur.",
+                validate: (value) => !!value || "Firma seçimi yapılmalıdır."
+              }}
               render={({ field, fieldState }) => (
-              <div style={{ width: "100%", maxWidth: "200px" }}>
-                <FirmaTablo
-                  onSubmit={(selectedData) => {
-                  // Zorunlu olan alanı güncelle
-                  field.onChange(selectedData.TB_CARI_ID);
-                  }}
-                  selectedId={field.value}
-                  nameField="firma"
-                  idField="firmaName"
-                />
+                <div style={{ width: "100%", maxWidth: "200px" }}>
+                  <FirmaTablo
+                    onSubmit={(selectedData) => {
+                    field.onChange(selectedData.TB_CARI_ID);
+                    }}
+                    selectedId={field.value}
+                    nameField="firma"
+                    idField="firmaName"
+                  />
                   {fieldState.error && (
                     <span style={{ color: "red", fontSize: "12px" }}>
                       {fieldState.error.message}
                     </span>
                   )}
-              </div>
+                </div>
               )}
             />
           </div>

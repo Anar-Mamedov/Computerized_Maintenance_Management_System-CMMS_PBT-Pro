@@ -285,22 +285,27 @@ export default function MainTabs({ modalOpen, disabled }) {
               maxWidth: "240px",
             }}
           >
-            <AtolyeTablo
-              disabled={disabled}
-              atolyeFieldName="atolyeName"
-              atolyeIdFieldName="atolyeId"
-              onSubmit={(selectedData) => {
-                setValue("atolyeName", selectedData.ATL_TANIM);
-                setValue("atolyeId", selectedData.key);
-                // Force trigger to ensure FisIcerigi component detects the change
-                setTimeout(() => {
-                  setValue("atolyeName", selectedData.ATL_TANIM, { shouldDirty: true });
-                  setValue("atolyeId", selectedData.key, { shouldDirty: true });
-                }, 100);
-              }}
-              isModalVisible={isAtolyeModalOpen}
-              setIsModalVisible={setIsAtolyeModalOpen}
-            />
+            <Controller
+  name="atolyeName"
+  control={control}
+  rules={{ required: false }} // zorunlu değil
+  render={({ field }) => (
+    <div style={{ width: "100%", maxWidth: "200px" }}>
+      <AtolyeTablo
+        disabled={disabled}
+        atolyeFieldName="atolyeName"
+        atolyeIdFieldName="atolyeId"
+        onSubmit={(selectedData) => {
+          field.onChange(selectedData.ATL_TANIM);
+          setValue("atolyeId", selectedData.key);
+          setValue("atolyeName", selectedData.ATL_TANIM, { shouldDirty: true });
+        }}
+        isModalVisible={isAtolyeModalOpen}
+        setIsModalVisible={setIsAtolyeModalOpen}
+      />
+    </div>
+  )}
+/>
           </div>
         </div>
         <div

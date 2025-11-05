@@ -16,7 +16,7 @@ import DepoTablo from "../../../../../../utils/components/DepoTablo";
 import ProjeTablo from "../../../../../../utils/components/ProjeTablo";
 import SiparisTablo from "../../../../../../utils/components/SiparisTablo";
 import PersonelTablo from "../../../../MalzemeTalepleri/components/PersonelTablo";
-import FirmaTablo from "../../../Insert/components/FirmaTablo";
+import FirmaTablo from "../../../../../../utils/components/FirmaTablo";
 import { PlusOutlined } from "@ant-design/icons";
 
 const { Text, Link } = Typography;
@@ -70,6 +70,7 @@ export default function MainTabs({ modalOpen, disabled }) {
     control,
     watch,
     setValue,
+    clearErrors,
     formState: { errors },
   } = useFormContext();
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
@@ -447,7 +448,34 @@ export default function MainTabs({ modalOpen, disabled }) {
               maxWidth: "240px",
             }}
           >
-            <FirmaTablo name1="firmaName" isRequired={false} disabled={disabled} />
+            <Controller
+  name="firma"
+  control={control}
+  rules={{
+    required: "Firma seçimi zorunludur.",
+    validate: (value) => !!value || "Firma seçimi yapılmalıdır.",
+  }}
+  render={({ field, fieldState }) => (
+    <div style={{ width: "100%", maxWidth: "200px" }}>
+      <FirmaTablo
+        onSubmit={(selectedData) => {
+          // Firma seçildiğinde hem ID hem isim güncellensin
+          setValue("firmaID", selectedData.TB_CARI_ID, { shouldDirty: true });
+          setValue("firma", selectedData.CAR_TANIM, { shouldDirty: true });
+          field.onChange(selectedData.CAR_TANIM); // validation için
+        }}
+        selectedId={field.value}
+        nameField="firma"
+        idField="firma"
+      />
+      {fieldState.error && (
+        <span style={{ color: "red", fontSize: "12px" }}>
+          {fieldState.error.message}
+        </span>
+      )}
+    </div>
+  )}
+/>
           </div>
         </div>
         <div

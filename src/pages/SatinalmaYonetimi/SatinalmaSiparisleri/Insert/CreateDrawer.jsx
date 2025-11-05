@@ -163,6 +163,11 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
 
   //* export
   const onSubmit = (data) => {
+    if (!data?.fisIcerigi || data.fisIcerigi.length === 0) {
+      message.warning("Fiş içeriği boş, lütfen en az bir malzeme ekleyiniz.");
+      return;
+    }
+  
   const Body = {
     siparisId: Number(data.siparisId) || 0,
     teklifId: Number(data.teklifId) || 0,
