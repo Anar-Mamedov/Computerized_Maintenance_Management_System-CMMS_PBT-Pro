@@ -18,11 +18,18 @@ const ResimUpload = () => {
   const fetchResimIds = async () => {
     try {
       setLoadingImages(true);
-      const [response1, response2] = await Promise.all([
+      const requests = [
         AxiosInstance.get(`GetResimIds?RefId=${secilenIsEmriID}&RefGrup=ISEMRI`),
-        AxiosInstance.get(`GetResimIds?RefId=${secilenTalepID}&RefGrup=CAGRI MERKEZI`),
-      ]);
-      const resimIDler = [...response1, ...response2]; // Her iki API'den gelen verileri birleştiriyoruz
+      ];
+
+      if (secilenTalepID > 0) {
+        requests.push(
+          AxiosInstance.get(`GetResimIds?RefId=${secilenTalepID}&RefGrup=CAGRI MERKEZI`)
+        );
+      }
+
+      const responses = await Promise.all(requests);
+      const resimIDler = responses.reduce((acc, ids) => acc.concat(ids), []); // Her iki API'den gelen verileri birleştiriyoruz
       const urls = await Promise.all(
         resimIDler.map(async (id) => {
           const resimResponse = await AxiosInstance.get(`ResimGetirById?id=${id}`, {
