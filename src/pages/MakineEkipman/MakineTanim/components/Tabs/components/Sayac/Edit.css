@@ -1,0 +1,23 @@
+.sayac-edit-modal .ant-modal-content {
+  background-color: #f5f5f5;
+  padding: 0;
+}
+
+.sayac-edit-modal .ant-modal-header {
+  background-color: #ffffff;
+  padding: 10px 20px;
+}
+
+.sayac-edit-modal .ant-modal-body {
+  background-color: #f5f5f5;
+  padding: 10px 15px;
+}
+
+.sayac-edit-modal .ant-modal-footer {
+  background-color: #f5f5f5;
+  padding: 0 20px 10px;
+  margin-top: 0px;
+}
+.sayac-edit-modal .ant-modal-close {
+  top: 17px;
+}
