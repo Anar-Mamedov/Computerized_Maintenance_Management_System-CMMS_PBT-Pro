@@ -114,7 +114,7 @@ const MainTable = ({ setSelectedIds }) => {
   const [totalPages, setTotalPages] = useState(0); // Toplam sayfa sayısı için state
   const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
   const [totalDataCount, setTotalDataCount] = useState(0); // Tüm veriyi tutan state
-  const [pageSize, setPageSize] = useState(10); // Başlangıçta sayfa başına 10 kayıt göster
+  const [pageSize, setPageSize] = useState(20); // Başlangıçta sayfa başına 20 kayıt göster
 
   // edit drawer için
   const [drawer, setDrawer] = useState({
@@ -1608,6 +1608,7 @@ const MainTable = ({ setSelectedIds }) => {
       </div>
       <Spin spinning={loading}>
         <Table
+          bordered
           components={components}
           rowSelection={rowSelection}
           columns={filteredColumns}
@@ -1616,7 +1617,7 @@ const MainTable = ({ setSelectedIds }) => {
             current: currentPage,
             total: totalDataCount, // Toplam kayıt sayısı (sayfa başına kayıt sayısı ile çarpılır)
             pageSize: pageSize,
-            defaultPageSize: 10,
+            defaultPageSize: 20,
             showSizeChanger: true,
             pageSizeOptions: ["10", "20", "50", "100"],
             position: ["bottomRight"],
@@ -1625,7 +1626,7 @@ const MainTable = ({ setSelectedIds }) => {
             showQuickJumper: true,
           }}
           onRow={onRowClick}
-          scroll={{ y: "calc(100vh - 370px)" }}
+          scroll={{ y: "calc(100vh - 340px)" }}
           onChange={handleTableChange}
           rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
         />
