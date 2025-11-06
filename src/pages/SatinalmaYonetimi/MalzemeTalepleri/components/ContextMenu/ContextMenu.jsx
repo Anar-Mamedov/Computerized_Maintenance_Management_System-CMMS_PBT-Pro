@@ -102,6 +102,7 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
           <>
             <TalebiAc {...commonProps} />
             <SatinalmaSiparisleri {...commonProps} />
+            <Teklif {...commonProps} selectedRow={selectedRows[0]} onRefresh={refreshTableData} disabled={true} />
           </>
         );
       case 4:

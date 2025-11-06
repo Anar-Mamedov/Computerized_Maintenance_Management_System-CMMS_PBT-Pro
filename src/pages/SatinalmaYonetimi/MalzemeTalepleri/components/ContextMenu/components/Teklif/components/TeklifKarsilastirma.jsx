@@ -9,7 +9,7 @@ const { Text } = Typography;
 const { Option } = Select;
 const { TabPane } = Tabs;
 
-const TeklifKarsilastirma = ({ teklifIds = [] }) => {
+const TeklifKarsilastirma = ({ teklifIds = [], disabled = false }) => {
   const [loading, setLoading] = useState(false);
   const [paketler, setPaketler] = useState([]);
   const [paketRenkleri, setPaketRenkleri] = useState({});
@@ -226,20 +226,21 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
         <Space>
           <Button icon={<FileExcelOutlined />}>Excel</Button>
           <Button icon={<PrinterOutlined />}>Yazdır/PDF</Button>
-          <Button icon={<PlusOutlined />} onClick={() => setTedarikciModalOpen(true)}>
+          <Button icon={<PlusOutlined />} onClick={() => setTedarikciModalOpen(true)} disabled={disabled} >
             Tedarikçi Ekle / Sil
           </Button>
-          <Button icon={<PlusOutlined />} onClick={() => setMalzemeModalOpen(true)}>
+          <Button icon={<PlusOutlined />} onClick={() => setMalzemeModalOpen(true)} disabled={disabled} >
             Malzeme Ekle / Sil
           </Button>
           <Button
             icon={<SaveOutlined />}
             style={{ backgroundColor: "#52c41a", borderColor: "#52c41a", color: "#fff" }}
             onClick={() => upsertTeklifKarsilastirma(0)}
+            disabled={disabled}
           >
             Teklifi Kaydet
           </Button>
-          <Button type="primary" icon={<CheckCircleOutlined />} onClick={onOnayaGonder}>
+          <Button type="primary" icon={<CheckCircleOutlined />} onClick={onOnayaGonder} disabled={disabled} >
             Onaya Gönder
           </Button>
         </Space>
@@ -287,7 +288,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                   align: "center",
                   onCell: () => ({ style: { backgroundColor: pastelColor } }),
                   render: (_, record) => (
-                    <Select value={record?.firmalar?.find(f => f.firmaId === firma.firmaId)?.marka || undefined} style={{ width: "90%" }}>
+                    <Select value={record?.firmalar?.find(f => f.firmaId === firma.firmaId)?.marka || undefined} style={{ width: "90%" }} disabled={disabled} >
                       <Option value="Bosch">Bosch</Option>
                       <Option value="Mann">Mann</Option>
                       <Option value="Castrol">Castrol</Option>
@@ -308,6 +309,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                         value={Number(f.miktar ?? 0)}
                         style={{ width: "90%" }}
                         onChange={(val) => handleValueChange(paketIndex, record.malzemeId, firma.firmaId, "miktar", val)}
+                        disabled={disabled}
                       />
                     );
                   },
@@ -327,6 +329,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                         style={{ width: "90%" }}
                         // onChange verirsek anında günceller; istersen onBlur ile de yapabilirsin
                         onChange={(val) => handleValueChange(paketIndex, record.malzemeId, firma.firmaId, "fiyat", val)}
+                        disabled={disabled}
                       />
                     );
                   },
