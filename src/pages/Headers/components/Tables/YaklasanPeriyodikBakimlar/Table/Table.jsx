@@ -12,7 +12,7 @@ import ContextMenu from "../components/ContextMenu/ContextMenu";
 import { useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import MakineUpdate from "../../../../../MakineEkipman/MakineTanim/Update/EditDrawer.jsx";
+import MakineUpdate from "../../../../../MakineEkipman/MakineTanim/EditDrawer.jsx";
 
 const { Text } = Typography;
 
