@@ -8,7 +8,7 @@ import TeklifKarsilastirma from "./TeklifKarsilastirma";
 const { Search } = Input;
 const { Text } = Typography;
 
-export default function TalepTeklifeAktarmaAntd({ fisId, baslik, fisNo }) {
+export default function TalepTeklifeAktarmaAntd({ fisId, baslik, fisNo, disabled }) {
   const [suppliers, setSuppliers] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]); // seçilen malzeme satırları
   const [selectedSuppliersData, setSelectedSuppliersData] = useState([]); // seçilen tedarikçi satırları
@@ -386,6 +386,7 @@ const handleFinishEditing = async (id) => {
             onChange={(date) => setDuzenlemeTarihi(date)}
             format="DD.MM.YYYY"
             placeholder="Düzenleme Tarihi"
+            disabled={disabled}
           />
         </Col>
 
@@ -406,25 +407,27 @@ const handleFinishEditing = async (id) => {
             onChange={(e) => setKonu(e.target.value)}
             placeholder="Konu"
             style={{ width: "100%" }}
+            disabled={disabled}
           />
         </Col>
 
         {/* Buton */}
         <Col>
           <Button
-  type={data.length > 0 ? "primary" : "default"} // primary = mavi, default ile style kullanacağız
-  style={{
-    marginTop: 22,
-    backgroundColor: data.length > 0 ? undefined : "#52c41a", // Teklifleri Karşılaştır yeşil
-    borderColor: data.length > 0 ? undefined : "#52c41a",
-    color: data.length > 0 ? undefined : "#fff",
-  }}
-  icon={<SendOutlined />}
-  loading={loading}
-  onClick={data.length > 0 ? handleCreateTeklif : handleCompareTeklifler}
->
-  {data.length > 0 ? "Teklif Oluştur" : "Teklifleri Karşılaştır"}
-</Button>
+            type={data.length > 0 ? "primary" : "default"} // primary = mavi, default ile style kullanacağız
+            style={{
+              marginTop: 22,
+              backgroundColor: data.length > 0 ? undefined : "#52c41a", // Teklifleri Karşılaştır yeşil
+              borderColor: data.length > 0 ? undefined : "#52c41a",
+              color: data.length > 0 ? undefined : "#fff",
+            }}
+            icon={<SendOutlined />}
+            loading={loading}
+            onClick={data.length > 0 ? handleCreateTeklif : handleCompareTeklifler}
+            disabled={disabled && data.length > 0}
+          >
+          {data.length > 0 ? "Teklif Oluştur" : "Teklifleri Karşılaştır"}
+          </Button>
         </Col>
       </Row>
     </Card>
@@ -530,14 +533,14 @@ const handleFinishEditing = async (id) => {
               }
               extra={
                 <Space>
-                  <Button size="small" icon={<EditOutlined />} onClick={() => handleEditClick(t.teklifId)} />
+                  <Button size="small" icon={<EditOutlined />} onClick={() => handleEditClick(t.teklifId)} disabled={disabled} />
                   <Popconfirm
                     title="Bu teklifi silmek istediğine emin misin?"
                     okText="Evet"
                     cancelText="Hayır"
                     onConfirm={() => handleDelete(t.teklifId)}
                   >
-                    <Button size="small" danger icon={<DeleteOutlined />} />
+                    <Button size="small" danger icon={<DeleteOutlined />} disabled={disabled} />
                   </Popconfirm>
                 </Space>
               }
@@ -581,6 +584,7 @@ const handleFinishEditing = async (id) => {
   onClose={handleCloseDrawer}
   teklifIds={teklifPaketleri.map(t => t.teklifId)}
   open={drawerVisible}
+  disabled={disabled}
 />
 </Drawer>
   </div>
