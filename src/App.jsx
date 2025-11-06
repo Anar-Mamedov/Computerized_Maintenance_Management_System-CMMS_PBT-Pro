@@ -18,7 +18,7 @@ import Hazirlaniyor from "./pages/Hazirlaniyor";
 import Auth from "./pages/Auth/Auth";
 import logo from "../src/assets/images/logoBeyaz.png";
 import Headers from "./pages/Headers/Headers";
-import { useRecoilState, RecoilRoot } from "recoil";
+import { useRecoilState, RecoilRoot, useSetRecoilState } from "recoil";
 import { userState } from "./state/userState";
 import PlanlamaTakvimi from "./pages/BakımVeArizaYonetimi/PlanlamaTakvimi/PlanlamaTakvimi";
 import OtomatikIsEmri from "./pages/BakımVeArizaYonetimi/OtomatikIsEmrileri/Index.jsx";
@@ -32,7 +32,7 @@ import IsEmriTipleri from "./pages/Yonetim/IsEmriTipleri/IsEmriTipleri.jsx";
 import Breadcrumbs from "./Breadcrumbs"; // Import the Breadcrumbs component
 import MudaheleSuresi from "./pages/Analizler/MudaheleAnalizi/MudaheleAnalizi.jsx";
 import IsEmriAnalizi from "./pages/Analizler/IsEmriAnalizi/IsEmriAnalizi.jsx";
-import { selectedMenuItemState } from "./state/menuState";
+import { selectedMenuItemState, menuItemsState } from "./state/menuState";
 import FloatButton from "./pages/components/FloatButton/index.jsx";
 import RolTanimlari from "./pages/OnayIslemleri/RolTanimlari/RolTanimlari.jsx";
 import OnayTanimlari from "./pages/OnayIslemleri/OnayTanimlari/OnayTanimlari.jsx";
@@ -68,12 +68,14 @@ const { Header, Content, Footer, Sider } = Layout;
 
 const loginData = JSON.parse(localStorage.getItem("login")) || JSON.parse(sessionStorage.getItem("login")) || {};
 
-function getItem(label, key, icon, children, isClickable = true) {
+function getItem(labelText, key, icon, children, isClickable = true) {
   return {
     key,
     icon,
     children,
-    label: isClickable ? <Link to={`/${key}`}>{label}</Link> : label,
+    label: isClickable ? <Link to={`/${key}`}>{labelText}</Link> : labelText,
+    labelText,
+    isClickable,
   };
 }
 
@@ -101,6 +103,23 @@ function filterItems(items) {
       };
     })
     .filter((item) => item.children || loginData[item.key] || (item.key === "" && item.label.props.children === "Ana Sayfa"));
+}
+
+function flattenMenuItems(items) {
+  const result = [];
+  items.forEach((item) => {
+    if (item.isClickable) {
+      result.push({
+        path: item.key ? `/${item.key}` : "/",
+        label: item.labelText,
+        key: item.key,
+      });
+    }
+    if (item.children) {
+      result.push(...flattenMenuItems(item.children));
+    }
+  });
+  return result;
 }
 
 const rawItems = [
@@ -519,6 +538,7 @@ const MenuWrapper = () => {
   const [open, setOpen] = useState(false);
   const [openKeys, setOpenKeys] = useState([]);
   const [selectedMenuItem, setSelectedMenuItem] = useRecoilState(selectedMenuItemState);
+  const setMenuItems = useSetRecoilState(menuItemsState);
   const [bounds, setBounds] = useState({
     left: 0,
     top: 0,
@@ -535,6 +555,10 @@ const MenuWrapper = () => {
     }
     setSelectedMenuItem(currentPath);
   }, [location, setSelectedMenuItem]);
+
+  useEffect(() => {
+    setMenuItems(flattenMenuItems(items));
+  }, [setMenuItems]);
 
   const onOpenChange = (keys) => {
     const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);
