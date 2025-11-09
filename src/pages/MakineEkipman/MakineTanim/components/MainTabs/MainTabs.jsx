@@ -17,12 +17,17 @@ import StatusButtons from "./components/StatusButtons.jsx";
 
 const { Text } = Typography;
 
+const cardBaseClasses =
+  "bg-white p-[10px] border border-[#80808068] rounded-[5px] flex flex-col items-start shadow-[0_2px_8px_rgba(0,0,0,0.08)] w-full box-border min-w-0";
+const wideCardClasses = "lg:w-auto lg:flex-[7] lg:min-w-[420px] lg:max-w-[632px]";
+const narrowCardClasses = "lg:w-auto lg:flex-[5] lg:min-w-[320px] lg:max-w-[495px]";
+
 export default function MainTabs() {
   const [isLokasyonModalOpen, setIsLokasyonModalOpen] = useState(false);
 
   return (
     <div className="flex flex-wrap gap-[10px] mb-[10px] box-border">
-      <div className="bg-white p-[10px] border border-[#80808068] rounded-[5px] flex flex-col items-start shadow-[0_2px_8px_rgba(0,0,0,0.08)] w-full max-w-[632px] box-border">
+      <div className={`${cardBaseClasses} ${wideCardClasses}`}>
         <div className="pb-[10px] inline-flex flex-col items-start">
           <Text className="text-base font-semibold">{t("temelBilgiler")}</Text>
           <Text type="secondary">{t("makineKimlikVeKonumBilgileri")}</Text>
@@ -84,7 +89,7 @@ export default function MainTabs() {
         </div>
       </div>
 
-      <div className="bg-white p-[10px] border border-[#80808068] rounded-[5px] flex flex-col items-start shadow-[0_2px_8px_rgba(0,0,0,0.08)] w-full max-w-[495px] box-border">
+      <div className={`${cardBaseClasses} ${narrowCardClasses}`}>
         <div className="pb-[10px] inline-flex flex-col items-start">
           <Text className="text-base font-semibold">{t("makineGorseli")}</Text>
           <Text type="secondary">{t("buMakineyeOzelFotograflariInceleyin")}</Text>
@@ -98,7 +103,7 @@ export default function MainTabs() {
           </div>
         </div>
       </div>
-      <div className="bg-white p-[10px] border border-[#80808068] rounded-[5px] flex flex-col items-start shadow-[0_2px_8px_rgba(0,0,0,0.08)] w-full max-w-[632px] box-border">
+      <div className={`${cardBaseClasses} ${wideCardClasses}`}>
         <div className="pb-[10px] inline-flex flex-col items-start">
           <Text className="text-base font-semibold">{t("operasyon&Maliyet")}</Text>
           <Text type="secondary">{t("durumSeriNoVeMaliyetParametreleri")}</Text>
@@ -143,7 +148,7 @@ export default function MainTabs() {
         </div>
       </div>
 
-      <div className="bg-white p-[10px] border border-[#80808068] rounded-[5px] flex flex-col items-start shadow-[0_2px_8px_rgba(0,0,0,0.08)] w-full max-w-[495px] box-border">
+      <div className={`${cardBaseClasses} ${narrowCardClasses}`}>
         <div className="pb-[10px] inline-flex flex-col items-start">
           <Text className="text-base font-semibold">{t("durum&Ozellikler")}</Text>
           <Text type="secondary">{t("isaretlenebilirNitelikler")}</Text>
