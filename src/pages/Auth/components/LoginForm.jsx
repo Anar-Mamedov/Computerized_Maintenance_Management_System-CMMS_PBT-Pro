@@ -19,6 +19,7 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState(null); // reCAPTCHA token'ı için state
+  const [isRecaptchaEnabled] = useState(true); // Toggle etmek için true/false yapın
   const [licenseModalVisible, setLicenseModalVisible] = useState(false);
 
   // Lisans kontrolü fonksiyonu
@@ -53,7 +54,7 @@ export default function LoginForm() {
   };
 
   const onSubmit = async (values) => {
-    if (!recaptchaToken) {
+    if (isRecaptchaEnabled && !recaptchaToken) {
       message.error("Lütfen reCAPTCHA doğrulamasını tamamlayın.");
       return;
     }
@@ -74,7 +75,7 @@ export default function LoginForm() {
       const payload = {
         KLL_KOD: values.email,
         KLL_SIFRE: values.password ?? "",
-        recaptchaToken, // reCAPTCHA token'ı payload'a ekleyin
+        recaptchaToken: isRecaptchaEnabled ? recaptchaToken : null, // reCAPTCHA token'ı payload'a ekleyin
       };
 
       const response = await AxiosInstance.post("/login", payload);
@@ -138,7 +139,7 @@ export default function LoginForm() {
           malzemeTalepleri: true,
           satinalmaSiparisleri: true,
           tedarikciFirmalar: true,
-          satinalmaDashboard:true,
+          satinalmaDashboard: true,
           isEmriAnalizi: true,
         };
         const userInfo = {
@@ -218,13 +219,15 @@ export default function LoginForm() {
           <Form.Item name="remember" valuePropName="checked" label={null}>
             <Checkbox>{t("beniHatirla")}</Checkbox>
           </Form.Item>
-          <Form.Item>
-            <ReCAPTCHA
-              sitekey="6LdF_QAqAAAAAK7vusKLAVNVvf4o_vLu66azz_S8" // Google reCAPTCHA site anahtarınızı buraya ekleyin
-              onChange={(token) => setRecaptchaToken(token)}
-              hl={i18n.language} // Set language based on i18n
-            />
-          </Form.Item>
+          {isRecaptchaEnabled && (
+            <Form.Item>
+              <ReCAPTCHA
+                sitekey="6LdF_QAqAAAAAK7vusKLAVNVvf4o_vLu66azz_S8" // Google reCAPTCHA site anahtarınızı buraya ekleyin
+                onChange={(token) => setRecaptchaToken(token)}
+                hl={i18n.language} // Set language based on i18n
+              />
+            </Form.Item>
+          )}
           <Form.Item>
             <Button type="primary" htmlType="submit" className="login-form-button" style={{ width: "100%" }} disabled={loading}>
               {loading ? <Spin /> : t("girisYap")}

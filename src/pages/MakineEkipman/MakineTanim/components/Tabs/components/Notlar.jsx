@@ -1,55 +1,33 @@
 import React from "react";
 import { Typography } from "antd";
 import { t } from "i18next";
-import { useFormContext } from "react-hook-form";
 import Textarea from "../../../../../../utils/components/Form/Textarea";
 
 const { Text } = Typography;
 
+const containerClasses = "flex flex-wrap gap-[10px] mb-[10px] box-border";
+const cardBaseClasses =
+  "bg-white p-[10px] border border-[#80808068] rounded-[5px] flex flex-col items-start shadow-[0_2px_8px_rgba(0,0,0,0.08)] w-full box-border min-w-0";
+const noteCardClasses = "lg:w-auto lg:flex-[1] lg:min-w-[340px] lg:max-w-[565px]";
+
 function Notlar() {
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginBottom: "10px" }}>
-      <div
-        style={{
-          backgroundColor: "#ffffffff",
-          padding: "10px",
-          border: "1px solid #80808068",
-          borderRadius: "5px",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-          width: "100%",
-          maxWidth: "563.5px",
-        }}
-      >
-        <div style={{ paddingBottom: "10px", display: "inline-flex", flexDirection: "column", alignItems: "flex-start" }}>
+    <div className={containerClasses}>
+      <div className={`${cardBaseClasses} ${noteCardClasses}`}>
+        <div className="pb-[10px] inline-flex flex-col items-start">
           <Text style={{ fontSize: "16px", fontWeight: "600" }}>{t("genelNot")}</Text>
           <Text type="secondary">{t("makineHakkindaGenelNotlar")}</Text>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
+        <div className="flex flex-col items-start w-full">
           <Textarea name="makineGenelNot" required={true} styles={{ minHeight: "200px" }} />
         </div>
       </div>
-      <div
-        style={{
-          backgroundColor: "#ffffffff",
-          padding: "10px",
-          border: "1px solid #80808068",
-          borderRadius: "5px",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-          width: "100%",
-          maxWidth: "563.5px",
-        }}
-      >
-        <div style={{ paddingBottom: "10px", display: "inline-flex", flexDirection: "column", alignItems: "flex-start" }}>
+      <div className={`${cardBaseClasses} ${noteCardClasses}`}>
+        <div className="pb-[10px] inline-flex flex-col items-start">
           <Text style={{ fontSize: "16px", fontWeight: "600" }}>{t("guvenlikNotu")}</Text>
           <Text type="secondary">{t("makineHakkindaGüvenlikNotları")}</Text>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
+        <div className="flex flex-col items-start w-full">
           <Textarea name="makineGuvenlikNotu" required={true} styles={{ minHeight: "200px" }} />
         </div>
       </div>
