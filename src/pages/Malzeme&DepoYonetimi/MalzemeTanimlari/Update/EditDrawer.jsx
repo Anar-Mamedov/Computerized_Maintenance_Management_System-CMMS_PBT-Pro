@@ -371,7 +371,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   return (
     <FormProvider {...methods}>
       <ConfigProvider locale={currentLocale}>
-        <Drawer title={t("malzemeGuncelleme")} placement="right" width="1300px" onClose={onClose} open={drawerVisible} extra={extraButton}>
+        <Drawer title={t("malzemeGuncelleme")} placement="right" width="1330px" onClose={onClose} open={drawerVisible} extra={extraButton}>
           {loading ? (
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
               <Spin size="large" />
