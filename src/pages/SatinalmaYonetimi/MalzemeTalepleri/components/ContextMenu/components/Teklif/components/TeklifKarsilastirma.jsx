@@ -9,7 +9,7 @@ const { Text } = Typography;
 const { Option } = Select;
 const { TabPane } = Tabs;
 
-const TeklifKarsilastirma = ({ teklifIds = [], disabled = false }) => {
+const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, disabled = false }) => {
   const [loading, setLoading] = useState(false);
   const [paketler, setPaketler] = useState([]);
   const [paketRenkleri, setPaketRenkleri] = useState({});
@@ -256,6 +256,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
         {paketler.map((paket, paketIndex) => {
           const malzemeler = paket.malzemeler || [];
           const firmalar = paket.firmaTotaller || [];
+          const durumAciklama = teklifDurumlari?.find(d => d.teklifId === paket.id)?.durumAciklama || "-";
 
           const firmaColumns = (firma, paketIndex) => {
           // Paket renkleri yalnızca ilk yüklemede atandı
@@ -282,17 +283,44 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
               ),
               children: [
                 {
+                  title: "Seç",
+                  dataIndex: `secili${firma.firmaId}`,
+                  width: 100,
+                  align: "center",
+                  onCell: () => ({ style: { backgroundColor: pastelColor } }),
+                  render: (_, record) => {
+                    const firmaData = record.firmalar.find(f => f.firmaId === firma.firmaId);
+
+                    return (
+                      <Select
+                        style={{ width: "90%" }}
+                        disabled={disabled}
+                        value={firmaData?.secili ? "true" : "false"} // başta seçili olan değer
+                        onChange={(val) => {
+                        // değiştiğinde record içindeki secili değerini güncelle
+                          if (firmaData) {
+                            firmaData.secili = val === "true";
+                          }
+                        }}
+                      >
+                        <Select.Option value="true">
+                          <span style={{ color: "green" }}>✓</span>
+                        </Select.Option>
+                        <Select.Option value="false">
+                          <span style={{ color: "red" }}>X</span>
+                        </Select.Option>
+                      </Select>
+                    );
+                  },
+                },
+                {
                   title: "Marka",
                   dataIndex: `marka_${firma.firmaId}`,
-                  width: 150,
+                  width: 100,
                   align: "center",
                   onCell: () => ({ style: { backgroundColor: pastelColor } }),
                   render: (_, record) => (
-                    <Select value={record?.firmalar?.find(f => f.firmaId === firma.firmaId)?.marka || undefined} style={{ width: "90%" }} disabled={disabled} >
-                      <Option value="Bosch">Bosch</Option>
-                      <Option value="Mann">Mann</Option>
-                      <Option value="Castrol">Castrol</Option>
-                    </Select>
+                    <Select value={record?.firmalar?.find(f => f.firmaId === firma.firmaId)?.marka || undefined} style={{ width: "90%" }} disabled={disabled} ></Select>
                   ),
                 },
                 {
@@ -375,7 +403,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
         const kdvOrani = paket.kdvOrani ?? 0;
 
           return (
-            <TabPane tab={paket.teklifBaslik?.baslik || `Teklif ${paketIndex + 1}`} key={`${paketIndex + 1}`}>
+            <TabPane tab={`${paket.teklifBaslik?.baslik || `Teklif ${paketIndex + 1}`} (${durumAciklama})`} key={`${paketIndex + 1}`}>
               <Table
                 columns={columns}
                 dataSource={dataSource}

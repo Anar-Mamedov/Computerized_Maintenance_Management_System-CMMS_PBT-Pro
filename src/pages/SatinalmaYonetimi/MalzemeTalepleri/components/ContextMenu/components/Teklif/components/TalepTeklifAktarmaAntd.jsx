@@ -548,6 +548,12 @@ const handleFinishEditing = async (id) => {
             >
               <div style={{ marginBottom: 6 }}>
                 <Text>
+                  <b>Durum:</b> {t.durumAciklama || "-"}
+                </Text>
+              </div>
+
+              <div style={{ marginBottom: 6 }}>
+                <Text>
                   <b>Kalem:</b> {t.kalemSayisi} • <b>Tedarikçi:</b> {t.tedarikcSayisi}
                 </Text>
               </div>
@@ -568,25 +574,29 @@ const handleFinishEditing = async (id) => {
         ))}
       </Row>
     </div>
-    <Drawer
-  title="Teklif Karşılaştırma"
-  placement="right"
-  open={drawerVisible}
-  onClose={handleCloseDrawer}
-  width="100vw"
-  styles={{
-    background: "#f0f2f5",
-    padding: 0,
-    overflow: "hidden",
-  }}
->
-  <TeklifKarsilastirma
-  onClose={handleCloseDrawer}
-  teklifIds={teklifPaketleri.map(t => t.teklifId)}
-  open={drawerVisible}
-  disabled={disabled}
-/>
-</Drawer>
+  <Drawer
+    title="Teklif Karşılaştırma"
+    placement="right"
+    open={drawerVisible}
+    onClose={handleCloseDrawer}
+    width="100vw"
+    styles={{
+      background: "#f0f2f5",
+      padding: 0,
+      overflow: "hidden",
+    }}
+  >
+    <TeklifKarsilastirma
+    onClose={handleCloseDrawer}
+    teklifIds={teklifPaketleri.map(t => t.teklifId)}
+    teklifDurumlari={teklifPaketleri.map(t => ({
+      teklifId: t.teklifId,
+      durumAciklama: t.durumAciklama || "-",
+    }))}
+    open={drawerVisible}
+    disabled={disabled}
+  />
+  </Drawer>
   </div>
 );
 }
