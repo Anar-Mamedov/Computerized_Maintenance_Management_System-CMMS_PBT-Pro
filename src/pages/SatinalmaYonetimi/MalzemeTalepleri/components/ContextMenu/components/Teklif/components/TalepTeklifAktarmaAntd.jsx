@@ -30,6 +30,14 @@ export default function TalepTeklifeAktarmaAntd({ fisId, baslik, fisNo, disabled
   const isDraggingY = useRef(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
 
+  const DURUM_STYLES = {
+    1: { text: "TEKLİFLER TOPLANIYOR", backgroundColor: "#e1f7d5", color: "#3c763d" },
+    2: { text: "ONAYA GÖNDERİLDİ", backgroundColor: "#fff4d6", color: "#b8860b" },
+    3: { text: "ONAYLANDI", backgroundColor: "#d4f8e8", color: "#207868" },
+    4: { text: "REDDEDİLDİ", backgroundColor: "#fde2e4", color: "#c63b3b" }, 
+    5: { text: "SİPARİŞ ALINDI", backgroundColor: "#e6f7ff", color: "#096dd9" }
+  };
+
   // sürükleme fonksiyonları
   const handleMouseDownX = () => (isDraggingX.current = true);
   const handleMouseDownY = () => (isDraggingY.current = true);
@@ -546,11 +554,20 @@ const handleFinishEditing = async (id) => {
               }
               style={{ borderRadius: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", height: "100%" }}
             >
-              <div style={{ marginBottom: 6 }}>
-                <Text>
-                  <b>Durum:</b> {t.durumAciklama || "-"}
-                </Text>
-              </div>
+              <div
+  style={{
+    marginBottom: 6,
+    backgroundColor: DURUM_STYLES[t.durumID]?.backgroundColor || "transparent",
+    color: DURUM_STYLES[t.durumID]?.color || "inherit",
+    padding: "4px 8px",
+    borderRadius: 6,
+    display: "inline-block"
+  }}
+>
+  <Text>
+    {DURUM_STYLES[t.durumID]?.text || "-"}
+  </Text>
+</div>
 
               <div style={{ marginBottom: 6 }}>
                 <Text>
@@ -591,8 +608,9 @@ const handleFinishEditing = async (id) => {
     teklifIds={teklifPaketleri.map(t => t.teklifId)}
     teklifDurumlari={teklifPaketleri.map(t => ({
       teklifId: t.teklifId,
-      durumAciklama: t.durumAciklama || "-",
+      durumID: t.durumID || null,
     }))}
+    fisNo={fisNo}
     open={drawerVisible}
     disabled={disabled}
   />
