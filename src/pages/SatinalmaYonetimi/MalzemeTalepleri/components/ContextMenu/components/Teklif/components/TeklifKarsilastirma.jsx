@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Table, InputNumber, Select, Typography, Card, Button, Space, Radio, Tabs, Spin, message } from "antd";
-import { FileExcelOutlined, PrinterOutlined, PlusOutlined, CheckCircleOutlined, SaveOutlined } from "@ant-design/icons";
+import { FileExcelOutlined, PrinterOutlined, PlusOutlined, CheckCircleOutlined, SaveOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../api/http";
 import TedarikciEkle from "./FirmaEkleCikar";
 import MalzemeEkle from "./MalzemeEkleCikar";
+import TekifSipariseAktar from "./TeklifSipariseAktarma/EditDrawer"
 
 const { Text } = Typography;
 const { Option } = Select;
 const { TabPane } = Tabs;
 
-const TeklifKarsilastirma = ({ teklifIds = [], disabled = false }) => {
+const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, disabled = false }) => {
   const [loading, setLoading] = useState(false);
   const [paketler, setPaketler] = useState([]);
   const [paketRenkleri, setPaketRenkleri] = useState({});
@@ -20,7 +21,19 @@ const TeklifKarsilastirma = ({ teklifIds = [], disabled = false }) => {
   const [activeTab, setActiveTab] = useState("1");
   const aktifPaketIndex = Number(activeTab) - 1;
   const aktifPaket = paketler[aktifPaketIndex] || {};
+  const aktifPaketDurumID = teklifDurumlari?.find(d => d.teklifId === aktifPaket.id)?.durumID || null;
+  const isDisabled = !(aktifPaketDurumID === 1 || aktifPaketDurumID === 4);
   const [detayGosterilenPaket, setDetayGosterilenPaket] = useState(null);
+  const DURUM_STYLES = {
+    1: { text: "TEKLİFLER TOPLANIYOR", backgroundColor: "#e1f7d5", color: "#3c763d" },
+    2: { text: "ONAYA GÖNDERİLDİ", backgroundColor: "#fff4d6", color: "#b8860b" },
+    3: { text: "ONAYLANDI", backgroundColor: "#d4f8e8", color: "#207868" },
+    4: { text: "REDDEDİLDİ", backgroundColor: "#fde2e4", color: "#c63b3b" },
+    5: { text: "SİPARİŞ ALINDI", backgroundColor: "#e6f7ff", color: "#096dd9" }
+  };
+  const [onayCheck, setOnayCheck] = useState({ ONY_AKTIF: 0, ONY_MANUEL: 0 });
+  const [siparisModalOpen, setSiparisModalOpen] = useState(false);
+  const [seciliMalzemeler, setSeciliMalzemeler] = useState([]);
 
   // Paketler ilk yüklendiğinde renkleri ata
   useEffect(() => {
@@ -48,6 +61,23 @@ const TeklifKarsilastirma = ({ teklifIds = [], disabled = false }) => {
       fetchAllTeklifler(teklifIds);
     }
   }, [teklifIds]);
+
+  useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const response = await AxiosInstance.post(`GetOnayCheck?TB_ONAY_ID=4`); // API URL'niz
+          if (response[0].ONY_AKTIF === 1) {
+            setOnayCheck(true);
+          } else {
+            setOnayCheck(false);
+          }
+        } catch (error) {
+          console.error("API isteğinde hata oluştu:", error);
+        }
+      };
+  
+      fetchData();
+    }, []);
 
   const fetchAllTeklifler = async (ids) => {
   try {
@@ -146,22 +176,42 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
   });
 };
 
-  const onOnayaGonder = () => {
-    if (!selectedFirmaId) {
-      alert("Lütfen bir firma seçin!");
-      return;
-    }
-    const firmaAd = paketler[0]?.firmaTotaller?.find(f => f.firmaId === selectedFirmaId)?.firmaTanim || "";
-    alert(`Onaya gönderilen firma: ${firmaAd}`);
-  };
+  const onOnayaGonder = async (paketId) => {
+  const paket = paketler.find(p => {
+    return p.teklifId === paketId || p.id === paketId || p.teklifBaslik?.teklifId === paketId;
+  });
 
-  if (loading) {
-    return (
-      <div style={{ textAlign: "center", padding: 80 }}>
-        <Spin size="large" />
-      </div>
-    );
+  if (!paket) {
+    message.error("Paket bulunamadı!");
+    return;
   }
+
+  const onayTabloId = paket.teklifId || paket.id || paket.teklifBaslik?.teklifId || 0;
+
+  try {
+    const response = await AxiosInstance.post(`/OnayaGonder`, {
+      ONAY_TABLO_ID: Number(onayTabloId), // Teklif ID
+      ONAY_TABLO_KOD: fisNo || "",        // fisNo
+      ONAY_ONYTANIM_ID: 4                 // Sabit değer
+    });
+
+    console.log("Gönderme işlemi başarılı:", response);
+
+    if (response.status === 200 || response.status === 201) {
+      message.success(`Teklif ${paket.baslik} başarıyla onaya gönderildi.`);
+      // Eğer fonksiyonlar varsa onları çağır
+      if (typeof refreshTableData === "function") refreshTableData();
+      if (typeof hidePopover === "function") hidePopover();
+    } else if (response.status === 401) {
+      message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+    } else {
+      message.error("İşlem Başarısız.");
+    }
+  } catch (error) {
+    console.error("Gönderme işlemi sırasında hata oluştu:", error);
+    message.error("Onaya gönderme sırasında hata oluştu.");
+  }
+};
 
   const upsertTeklifKarsilastirma = async (paketIndex) => {
     if (!paketler[paketIndex]) return;
@@ -176,6 +226,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
         miktar: Number(f.miktar ?? 0),
         fiyat: Number(f.fiyat ?? 0),
         tutar: Number(f.tutar ?? 0),
+        secili: f.secili ? 1 : 0,
       })),
     }));
 
@@ -219,6 +270,31 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
     }))
   : [];
 
+  const handleSecimChange = (paketIndex, malzemeId, firmaId, val) => {
+    setPaketler(prev => {
+      const updated = prev.map((p, idx) => {
+         if (idx !== paketIndex) return p;
+
+        const paket = { ...p };
+        paket.malzemeler = paket.malzemeler.map(m => {
+          if (m.malzemeId !== malzemeId) return m;
+
+          return {
+            ...m,
+            firmalar: m.firmalar.map(f => {
+              if (f.firmaId !== firmaId) return f;
+              return { ...f, secili: val === "true" };
+            })
+          };
+        });
+
+        return paket;
+      });
+
+      return updated;
+    });
+  };
+
   return (
     <Card
       title="Satınalma Teklif Kıyaslama"
@@ -226,23 +302,50 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
         <Space>
           <Button icon={<FileExcelOutlined />}>Excel</Button>
           <Button icon={<PrinterOutlined />}>Yazdır/PDF</Button>
-          <Button icon={<PlusOutlined />} onClick={() => setTedarikciModalOpen(true)} disabled={disabled} >
+          <Button icon={<PlusOutlined />} onClick={() => setTedarikciModalOpen(true)} disabled={disabled || isDisabled} >
             Tedarikçi Ekle / Sil
           </Button>
-          <Button icon={<PlusOutlined />} onClick={() => setMalzemeModalOpen(true)} disabled={disabled} >
+          <Button icon={<PlusOutlined />} onClick={() => setMalzemeModalOpen(true)} disabled={disabled || isDisabled} >
             Malzeme Ekle / Sil
           </Button>
           <Button
             icon={<SaveOutlined />}
             style={{ backgroundColor: "#52c41a", borderColor: "#52c41a", color: "#fff" }}
-            onClick={() => upsertTeklifKarsilastirma(0)}
-            disabled={disabled}
+            onClick={() => upsertTeklifKarsilastirma(aktifPaketIndex)}
+            disabled={disabled || isDisabled}
           >
             Teklifi Kaydet
           </Button>
-          <Button type="primary" icon={<CheckCircleOutlined />} onClick={onOnayaGonder} disabled={disabled} >
-            Onaya Gönder
-          </Button>
+          <Button
+  type="primary"
+  icon={onayCheck ? <CheckCircleOutlined /> : <ShoppingCartOutlined />}
+  style={{
+    backgroundColor: onayCheck ? "#52c41a" : "#00BBFF",
+    borderColor: onayCheck ? "#52c41a" : "#2BC770",
+    color: "#fff"
+  }}
+  onClick={() => {
+    if (onayCheck) {
+      onOnayaGonder(aktifPaket.teklifId); // onaya gönder
+    } else {
+      // tüm paketlerden secili malzemeleri al
+      const secili = paketler.flatMap(paket =>
+        (paket.malzemeler || [])
+          .map(m => ({
+            ...m,
+            firmalar: (m.firmalar || []).filter(f => f.secili)
+          }))
+          .filter(m => m.firmalar.length > 0)
+      );
+
+      setSeciliMalzemeler(secili); // state'e ata
+      setSiparisModalOpen(true);    // modal aç
+    }
+  }}
+  disabled={disabled || isDisabled}
+>
+  {onayCheck ? "Onaya Gönder" : "Siparişe Aktar"}
+</Button>
         </Space>
       }
       bordered={false}
@@ -256,6 +359,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
         {paketler.map((paket, paketIndex) => {
           const malzemeler = paket.malzemeler || [];
           const firmalar = paket.firmaTotaller || [];
+          const durumID = teklifDurumlari?.find(d => d.teklifId === paket.id)?.durumID || null;
 
           const firmaColumns = (firma, paketIndex) => {
           // Paket renkleri yalnızca ilk yüklemede atandı
@@ -282,17 +386,41 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
               ),
               children: [
                 {
+                  title: "Seç",
+                  dataIndex: `secili${firma.firmaId}`,
+                  width: 100,
+                  align: "center",
+                  onCell: () => ({ style: { backgroundColor: pastelColor } }),
+                  render: (_, record) => {
+                    const firmaData = record.firmalar.find(f => f.firmaId === firma.firmaId);
+
+                    return (
+                      <Select
+                        style={{ width: "90%" }}
+                        disabled={isDisabled}
+                        value={firmaData?.secili ? "true" : "false"}
+                        onChange={(val) =>
+                          handleSecimChange(paketIndex, record.malzemeId, firma.firmaId, val)
+                        }
+                      >
+                        <Select.Option value="true">
+                          <span style={{ color: "green" }}>✓</span>
+                        </Select.Option>
+                        <Select.Option value="false">
+                          <span style={{ color: "red" }}>X</span>
+                        </Select.Option>
+                      </Select>
+                    );
+                  },
+                },
+                {
                   title: "Marka",
                   dataIndex: `marka_${firma.firmaId}`,
-                  width: 150,
+                  width: 100,
                   align: "center",
                   onCell: () => ({ style: { backgroundColor: pastelColor } }),
                   render: (_, record) => (
-                    <Select value={record?.firmalar?.find(f => f.firmaId === firma.firmaId)?.marka || undefined} style={{ width: "90%" }} disabled={disabled} >
-                      <Option value="Bosch">Bosch</Option>
-                      <Option value="Mann">Mann</Option>
-                      <Option value="Castrol">Castrol</Option>
-                    </Select>
+                    <Select value={record?.firmalar?.find(f => f.firmaId === firma.firmaId)?.marka || undefined} style={{ width: "90%" }} disabled={isDisabled} ></Select>
                   ),
                 },
                 {
@@ -309,7 +437,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                         value={Number(f.miktar ?? 0)}
                         style={{ width: "90%" }}
                         onChange={(val) => handleValueChange(paketIndex, record.malzemeId, firma.firmaId, "miktar", val)}
-                        disabled={disabled}
+                        disabled={isDisabled}
                       />
                     );
                   },
@@ -329,7 +457,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                         style={{ width: "90%" }}
                         // onChange verirsek anında günceller; istersen onBlur ile de yapabilirsin
                         onChange={(val) => handleValueChange(paketIndex, record.malzemeId, firma.firmaId, "fiyat", val)}
-                        disabled={disabled}
+                        disabled={isDisabled}
                       />
                     );
                   },
@@ -375,7 +503,17 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
         const kdvOrani = paket.kdvOrani ?? 0;
 
           return (
-            <TabPane tab={paket.teklifBaslik?.baslik || `Teklif ${paketIndex + 1}`} key={`${paketIndex + 1}`}>
+            <TabPane
+              tab={ 
+                <div 
+                  style={{backgroundColor: DURUM_STYLES[durumID]?.backgroundColor, color: DURUM_STYLES[durumID]?.color, padding: "4px 12px", borderRadius: 6, fontWeight: "bold" }}
+                >
+                  {paket?.teklifBaslik?.baslik || `Teklif ${paketIndex + 1}`} - 
+                  {" "}
+                  {DURUM_STYLES[durumID]?.text || ""}
+                </div>
+              } key={`${paketIndex + 1}`}
+            >
               <Table
                 columns={columns}
                 dataSource={dataSource}
@@ -516,6 +654,12 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
           })) || []
         }
       />
+<TekifSipariseAktar
+  open={siparisModalOpen}          // open prop'u kontrol ediyor
+  malzemeler={seciliMalzemeler}    // seçili malzemeleri gönder
+  firma={paketler[aktifPaketIndex]?.firmaTotaller || []} // aktif paketin firma bilgileri
+  onCancel={() => setSiparisModalOpen(false)} // kapatma fonksiyonu
+/>
     </Card>
   );
 };
