@@ -611,6 +611,7 @@ const handleFinishEditing = async (id) => {
       durumID: t.durumID || null,
     }))}
     fisNo={fisNo}
+    fisId={fisId}
     open={drawerVisible}
     disabled={disabled}
   />

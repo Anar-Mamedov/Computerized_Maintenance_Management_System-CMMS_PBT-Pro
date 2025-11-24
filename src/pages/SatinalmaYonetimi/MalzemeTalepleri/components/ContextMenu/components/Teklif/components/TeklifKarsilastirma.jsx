@@ -4,13 +4,13 @@ import { FileExcelOutlined, PrinterOutlined, PlusOutlined, CheckCircleOutlined, 
 import AxiosInstance from "../../../../../../../../api/http";
 import TedarikciEkle from "./FirmaEkleCikar";
 import MalzemeEkle from "./MalzemeEkleCikar";
-import TekifSipariseAktar from "./TeklifSipariseAktarma/EditDrawer"
+import TeklifiSipariseAktar from "./TeklifSipariseAktar/EditDrawer";
 
 const { Text } = Typography;
 const { Option } = Select;
 const { TabPane } = Tabs;
 
-const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, disabled = false }) => {
+const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disabled = false }) => {
   const [loading, setLoading] = useState(false);
   const [paketler, setPaketler] = useState([]);
   const [paketRenkleri, setPaketRenkleri] = useState({});
@@ -22,7 +22,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, disabled = fal
   const aktifPaketIndex = Number(activeTab) - 1;
   const aktifPaket = paketler[aktifPaketIndex] || {};
   const aktifPaketDurumID = teklifDurumlari?.find(d => d.teklifId === aktifPaket.id)?.durumID || null;
-  const isDisabled = !(aktifPaketDurumID === 1 || aktifPaketDurumID === 4);
+  const isDisabled = !(aktifPaketDurumID === 1 || aktifPaketDurumID === 4 || aktifPaketDurumID === 3);
   const [detayGosterilenPaket, setDetayGosterilenPaket] = useState(null);
   const DURUM_STYLES = {
     1: { text: "TEKLİFLER TOPLANIYOR", backgroundColor: "#e1f7d5", color: "#3c763d" },
@@ -32,8 +32,9 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, disabled = fal
     5: { text: "SİPARİŞ ALINDI", backgroundColor: "#e6f7ff", color: "#096dd9" }
   };
   const [onayCheck, setOnayCheck] = useState({ ONY_AKTIF: 0, ONY_MANUEL: 0 });
+  const showOnayaGonder = onayCheck && aktifPaketDurumID !== 3;
   const [siparisModalOpen, setSiparisModalOpen] = useState(false);
-  const [seciliMalzemeler, setSeciliMalzemeler] = useState([]);
+  const [selectedRow, setSelectedRow] = useState(null);
 
   // Paketler ilk yüklendiğinde renkleri ata
   useEffect(() => {
@@ -195,8 +196,6 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
       ONAY_ONYTANIM_ID: 4                 // Sabit değer
     });
 
-    console.log("Gönderme işlemi başarılı:", response);
-
     if (response.status === 200 || response.status === 201) {
       message.success(`Teklif ${paket.baslik} başarıyla onaya gönderildi.`);
       // Eğer fonksiyonlar varsa onları çağır
@@ -247,7 +246,6 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
     try {
       const res = await AxiosInstance.post("/UpsertTeklifKarsilastirma", payload);
       message.success("Teklif başarıyla kaydedildi!");
-      console.log("API Response:", res.data);
       setKaydedildi(true);
     } catch (err) {
       console.error("UpsertTeklifKarsilastirma hatası:", err);
@@ -318,33 +316,28 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
           </Button>
           <Button
   type="primary"
-  icon={onayCheck ? <CheckCircleOutlined /> : <ShoppingCartOutlined />}
+  icon={showOnayaGonder ? <CheckCircleOutlined /> : <ShoppingCartOutlined />}
   style={{
-    backgroundColor: onayCheck ? "#52c41a" : "#00BBFF",
-    borderColor: onayCheck ? "#52c41a" : "#2BC770",
+    backgroundColor: showOnayaGonder ? "#52c41a" : "#00BBFF",
+    borderColor: showOnayaGonder ? "#52c41a" : "#2BC770",
     color: "#fff"
   }}
   onClick={() => {
-    if (onayCheck) {
-      onOnayaGonder(aktifPaket.teklifId); // onaya gönder
-    } else {
-      // tüm paketlerden secili malzemeleri al
-      const secili = paketler.flatMap(paket =>
-        (paket.malzemeler || [])
-          .map(m => ({
-            ...m,
-            firmalar: (m.firmalar || []).filter(f => f.secili)
-          }))
-          .filter(m => m.firmalar.length > 0)
-      );
+    if (!aktifPaket) return message.error("Aktif paket bulunamadı!");
 
-      setSeciliMalzemeler(secili); // state'e ata
-      setSiparisModalOpen(true);    // modal aç
+    const teklifId = aktifPaket.teklifId || aktifPaket.id;
+    if (!teklifId) return message.error("Teklif ID bulunamadı!");
+
+    if (showOnayaGonder) {
+      onOnayaGonder(teklifId);
+    } else {
+      setSelectedRow(teklifId);
+      setSiparisModalOpen(true);
     }
   }}
   disabled={disabled || isDisabled}
 >
-  {onayCheck ? "Onaya Gönder" : "Siparişe Aktar"}
+  {showOnayaGonder ? "Onaya Gönder" : "Siparişe Aktar"}
 </Button>
         </Space>
       }
@@ -654,12 +647,12 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
           })) || []
         }
       />
-<TekifSipariseAktar
-  open={siparisModalOpen}          // open prop'u kontrol ediyor
-  malzemeler={seciliMalzemeler}    // seçili malzemeleri gönder
-  firma={paketler[aktifPaketIndex]?.firmaTotaller || []} // aktif paketin firma bilgileri
-  onCancel={() => setSiparisModalOpen(false)} // kapatma fonksiyonu
-/>
+      <TeklifiSipariseAktar
+        open={siparisModalOpen}
+        onCloseModal={() => setSiparisModalOpen(false)}
+        teklifId={selectedRow}
+        fisId={fisId}
+      />
     </Card>
   );
 };

@@ -1,5 +1,4 @@
 import tr_TR from "antd/es/locale/tr_TR";
-import { PlusOutlined } from "@ant-design/icons";
 import { Button, Modal, Space, ConfigProvider, message, Spin } from "antd";
 import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
@@ -9,114 +8,66 @@ import MainTabs from "./components/MainTabs/MainTabs.jsx";
 import SecondTabs from "./components/SecondTabs/SecondTabs.jsx";
 import { t } from "i18next";
 
-export default function EditModal({ selectedRow, onDrawerClose, onRefresh }) {
+export default function EditModal({ teklifId, open, onCloseModal, fisId }) {
   const [loading, setLoading] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [siparisler, setSiparisler] = useState([]);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const methods = useForm({
-  defaultValues: {
-    siparisId: 0,
-    teklifId: 0,
-    talepID: 0,
-    talepKod: "",
-    siparisKodu: "",
-    siparisTarihi: null,
-    teslimTarihi: null,
-    firmaId: 0,
-    firmaName: "",
-    indirimToplam: 0,
-    araToplam: 0,
-    kdvToplam: 0,
-    yuvarlamaToplami: 0,
-    genelToplam: 0,
-    baslik: "",
-    aciklama: "",
-    depoId: 0,
-    depoName: "",
-    lokasyonId: 0,
-    lokasyonName: "",
-    atolyeId: 0,
-    atolyeName: "",
-    materialMovements: [], // Satır detayları burada olacak
-  },
-});
+    defaultValues: {
+      siparisId: 0,
+      teklifId: 0,
+      talepID: fisId,
+      talepKod: "",
+      siparisKodu: "",
+      siparisTarihi: null,
+      teslimTarihi: null,
+      firmaId: 0,
+      firmaName: "",
+      indirimToplam: 0,
+      araToplam: 0,
+      kdvToplam: 0,
+      yuvarlamaToplami: 0,
+      genelToplam: 0,
+      baslik: "",
+      aciklama: "",
+      depoId: 0,
+      depoName: "",
+      lokasyonId: 0,
+      lokasyonName: "",
+      atolyeId: 0,
+      atolyeName: "",
+      materialMovements: [],
+    },
+  });
 
-const { setValue, reset, watch } = methods;
+  const { setValue, reset } = methods;
 
-  const handleModalToggle = async () => {
-  if (!selectedRow) {
-    message.warning("Lütfen önce bir satır seçin.");
-    return;
-  }
+  // API'den siparişleri çek ve state'e at
+  useEffect(() => {
+    if (!teklifId || !open) return;
 
-  setIsModalVisible(true);
+    const fetchData = async () => {
   setLoading(true);
-
   try {
-    const response = await AxiosInstance.get(`PrepareSatinalmaSiparisFromTalep?fisId=${selectedRow.key}`);
-    const item = response.data; // JSON'daki data alanını kullan
+    const response = await AxiosInstance.get(
+      `PrepareSatinalmaSiparisFromTeklif?teklifId=${teklifId}`
+    );
 
-    // Form alanlarını set et
-    setValue("siparisId", item.siparisId);
-    setValue("teklifId", item.teklifId);
-    setValue("talepID", item.talepID);
-    setValue("talepKod", item.talepKod);
-    setValue("siparisKodu", item.siparisKodu);
-    setValue("siparisTarihi", item.siparisTarihi ? dayjs(item.siparisTarihi) : null);
-    setValue("teslimTarihi", item.teslimTarihi ? dayjs(item.teslimTarihi) : null);
-    setValue("firmaId", item.firmaId);
-    setValue("firmaName", item.firmaName);
-    setValue("indirimToplam", item.indirimToplam);
-    setValue("araToplam", item.araToplam);
-    setValue("kdvToplam", item.kdvToplam);
-    setValue("yuvarlamaToplami", item.yuvarlamaToplami);
-    setValue("genelToplam", item.genelToplam);
-    setValue("baslik", item.baslik);
-    setValue("aciklama", item.aciklama);
-    setValue("depoId", item.depoId);
-    setValue("depoName", item.depoName);
-    setValue("lokasyonID", item.lokasyonId);
-    setValue("lokasyonName", item.lokasyonName);
-    setValue("atolyeID", item.atolyeId);
-    setValue("atolyeTanim", item.atolyeName);
+    // response.data yoksa response direkt json olabilir
+    const item = response.data || response;
 
-    // materialMovements array'ini fisIcerigi olarak set et
-    const fisIcerigi = (item.materialMovements || []).map((mat) => ({
-      detayId: mat.detayId,
-      siparisId: mat.siparisId,
-      stokId: mat.stokId,
-      stokKod: mat.stokKod,
-      stokName: mat.stokName,
-      miktar: mat.miktar,
-      anaBirimMiktar: mat.anaBirimMiktar,
-      birimFiyat: mat.birimFiyat,
-      kdvOran: mat.kdvOran,
-      kdvTutar: mat.kdvTutar,
-      otvOran: mat.otvOran,
-      otvTutar: mat.otvTutar,
-      indirimOran: mat.indirimOran,
-      indirimTutar: mat.indirimTutar,
-      kdvDahil: Boolean(mat.kdvDahil),
-      araToplam: mat.araToplam,
-      toplam: mat.toplam,
-      fisGridKonum: mat.fisGridKonum,
-      birimKodId: mat.birimKodId,
-      birimName: mat.birimName,
-      talepId: mat.talepId,
-      sinifId: mat.sinifId,
-      sinifName: mat.sinifName,
-      marka: mat.marka,
-      teklifFiyatId: mat.teklifFiyatId,
-      girenMiktar: mat.girenMiktar,
-      kalanMiktar: mat.kalanMiktar,
-      alternatifStokId: mat.alternatifStokId,
-      aciklama: mat.aciklama,
-      isDeleted: Boolean(mat.isDeleted),
-    }));
+    const siparisListesi = item.siparisler || [];
 
-    setValue("fisIcerigi", fisIcerigi);
+    if (siparisListesi.length === 0) {
+      message.info("Bu teklife ait sipariş bulunamadı.");
+      onCloseModal();
+      return;
+    }
 
+    setSiparisler(siparisListesi);
+    setActiveIndex(0); // İlk siparişi göster
+    loadSiparisToForm(siparisListesi[0]);
     setLoading(false);
   } catch (err) {
     console.error(err);
@@ -125,16 +76,53 @@ const { setValue, reset, watch } = methods;
   }
 };
 
-  const formatDateWithDayjs = (dateString) => {
-      const formattedDate = dayjs(dateString);
-      return formattedDate.isValid() ? formattedDate.format("YYYY-MM-DD") : "";
-    };
-  
-    const formatTimeWithDayjs = (timeObj) => {
-      const formattedTime = dayjs(timeObj);
-      return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
-    };
+    fetchData();
+  }, [teklifId, open]);
 
+  // Form'a sipariş verilerini yükleyen fonksiyon
+  const loadSiparisToForm = (siparis) => {
+    setValue("siparisId", siparis.siparisId);
+    setValue("teklifId", siparis.teklifId);
+    setValue("talepID", fisId);
+    setValue("talepKod", siparis.talepNo);
+    setValue("siparisKodu", siparis.siparisKodu);
+    setValue("siparisTarihi", siparis.siparisTarihi ? dayjs(siparis.siparisTarihi) : null);
+    setValue("teslimTarihi", siparis.teslimTarihi ? dayjs(siparis.teslimTarihi) : null);
+    setValue("firmaID", siparis.firmaId);
+    setValue("firma", siparis.firmaName);
+    setValue("indirimToplam", siparis.indirimToplam);
+    setValue("araToplam", siparis.araToplam);
+    setValue("kdvToplam", siparis.kdvToplam);
+    setValue("yuvarlamaToplami", siparis.yuvarlamaToplami);
+    setValue("genelToplam", siparis.genelToplam);
+    setValue("baslik", siparis.baslik);
+    setValue("aciklama", siparis.aciklama);
+    setValue("depoId", siparis.depoId);
+    setValue("depoName", siparis.depoName);
+    setValue("lokasyonID", siparis.lokasyonId);
+    setValue("lokasyonName", siparis.lokasyonName);
+    setValue("atolyeID", siparis.atolyeId);
+    setValue("atolyeTanim", siparis.atolyeName);
+
+    const fisIcerigi = (siparis.materialMovements || []).map((mat) => ({
+      ...mat,
+      kdvDahil: Boolean(mat.kdvDahil),
+      isDeleted: Boolean(mat.isDeleted),
+    }));
+    setValue("fisIcerigi", fisIcerigi);
+  };
+
+  const formatDateWithDayjs = (dateString) => {
+    const formattedDate = dayjs(dateString);
+    return formattedDate.isValid() ? formattedDate.format("YYYY-MM-DD") : "";
+  };
+
+  const formatTimeWithDayjs = (timeObj) => {
+    const formattedTime = dayjs(timeObj);
+    return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
+  };
+
+  // Kaydetme işlemi
   const onSubmit = (data) => {
   const payload = {
     siparisId: 0, // Yeni kayıt
@@ -207,7 +195,8 @@ const { setValue, reset, watch } = methods;
       otvTutar: Number(item.otvTutar) || 0,
       indirimOran: Number(item.indirimOran) || 0,
       indirimTutar: Number(item.indirimTutar) || 0,
-      kdvDahil: item.kdvDahil || "",
+      kdvDahil: item.kdvDahil === true ? "D" : item.kdvDahil === false ? "H" : "",
+      araToplam: Number(item.araToplam) || 0,
       araToplam: Number(item.araToplam) || 0,
       toplam: Number(item.toplam) || 0,
       anaBirimMiktar: Number(item.anaBirimMiktar) || 0,
@@ -224,14 +213,23 @@ const { setValue, reset, watch } = methods;
     })),
   };
 
-  AxiosInstance.post(`UpsertSatinalmaSiparis?TalepID=${data.talepID}`, payload)
+  AxiosInstance.post(`UpsertSatinalmaSiparis?TalepID=${fisId}`, payload)
     .then((res) => {
       const { status_code, message: apiMessage } = res?.data || res;
       if ([200, 201, 202].includes(status_code)) {
         message.success(apiMessage || "Kayıt Başarılı.");
-        onRefresh();
+
+      if (activeIndex < siparisler.length - 1) {
+      const nextIndex = activeIndex + 1;
+
+        setActiveIndex(nextIndex);
+        loadSiparisToForm(siparisler[nextIndex]); // Yeni siparişi forma yükle
+
+        return; // Modalı kapatma!
+      }
+
         reset();
-        setIsModalVisible(false); // Modal'ı kapatıyoruz
+        onCloseModal(); // Modal'ı kapatıyoruz
       } else if (status_code === 401) {
         message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
       } else {
@@ -245,34 +243,26 @@ const { setValue, reset, watch } = methods;
 };
 
   const onClose = () => {
-  Modal.confirm({
-    title: "İptal etmek istediğinize emin misiniz?",
-    content: "Kaydedilmemiş değişiklikler kaybolacaktır.",
-    okText: "Evet",
-    cancelText: "Hayır",
-    onOk: () => {
-      reset();
-      // drawer'ı kapat
-      setIsModalVisible(false);
-    },
-  });
-};
+    Modal.confirm({
+      title: "İptal etmek istediğinize emin misiniz?",
+      content: "Kaydedilmemiş değişiklikler kaybolacaktır.",
+      okText: "Evet",
+      cancelText: "Hayır",
+      onOk: () => {
+        reset();
+        onCloseModal();
+      },
+    });
+  };
 
   return (
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
-        <Button
-          style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
-          onClick={handleModalToggle}
-          type="text"
-        >
-          Siparişe Aktar
-        </Button>
         <Modal
           width={1300}
           centered
-          title={t("Satınalma Siparişi Ekle")}
-          open={isModalVisible}
+          title={`${t("Satınalma Siparişi Ekle")} (${siparisler.length > 0 ? activeIndex + 1 : 0}/${siparisler.length})`}
+          open={open}
           onCancel={onClose}
           footer={
             <Space>
@@ -294,7 +284,7 @@ const { setValue, reset, watch } = methods;
           ) : (
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <MainTabs />
-              <SecondTabs selectedRowID={selectedRow?.key} />
+              <SecondTabs teklifId={teklifId} />
             </form>
           )}
         </Modal>
