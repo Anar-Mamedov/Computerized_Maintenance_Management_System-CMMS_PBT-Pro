@@ -20,11 +20,11 @@ export default function TalepTeklifeAktarmaModal({ selectedRow, refreshTableData
         onClick={showModal}
         type="text"
       >
-        {selectedRow && (selectedRow.SFS_TALEP_DURUM_ID === 2 || selectedRow.SFS_TALEP_DURUM_ID === 5) ? "Fiyat Teklifleri" : "Talep → Teklife Aktar"}
+        {selectedRow && (selectedRow.SFS_TALEP_DURUM_ID === 2 || selectedRow.SFS_TALEP_DURUM_ID === 5 || selectedRow.SFS_TALEP_DURUM_ID === 3) ? "Fiyat Teklifleri" : "Talep → Teklife Aktar"}
       </Button>
 
       <Modal
-        title={selectedRow && selectedRow.SFS_TALEP_DURUM_ID === 2 ? "Fiyat Teklifleri" : "Talep → Teklife Aktarma"}
+        title={selectedRow && (selectedRow.SFS_TALEP_DURUM_ID === 2 || selectedRow.SFS_TALEP_DURUM_ID === 5 || selectedRow.SFS_TALEP_DURUM_ID === 3) ? "Fiyat Teklifleri" : "Talep → Teklife Aktarma"}
         open={open}
         onCancel={handleCancel}
         footer={null}

@@ -389,7 +389,6 @@ export default function MainTabs({ modalOpen }) {
               render={({ field }) => (
                 <Input
                   {...field}
-                  value="SATINALMA SİPARİŞİ"
                   status={errors["baslik"] ? "error" : ""}
                   style={{ flex: 1 }}
                   onFocus={(e) => {
@@ -439,7 +438,7 @@ export default function MainTabs({ modalOpen }) {
             }}
           >
             <Controller
-              name="firmaName"
+              name="firma"
               control={control}
               rules={{
                 required: "Firma seçimi zorunludur.",

@@ -3,11 +3,11 @@ import { Table, Button, Form as AntForm, Input, InputNumber, Popconfirm, Modal, 
 import { useFieldArray, useFormContext, Controller } from "react-hook-form";
 import { PlusOutlined } from "@ant-design/icons";
 import { t } from "i18next";
-import Malzemeler from "../../../../../../../../../../../../Malzeme&DepoYonetimi/MalzemeTanimlari/Table/Table";
+import Malzemeler from "../../../../../../../Malzeme&DepoYonetimi/MalzemeTanimlari/Table/Table";
 // import PlakaSelectBox from "../../../../../../../../components/PlakaSelectbox";
 import LokasyonTablo from "../../../../../../../../utils/components/LokasyonTablo";
 import MasrafMerkeziTablo from "../../../../../../../../utils/components/MasrafMerkeziTablo";
-import KodIDSelectbox from "../../../../../../../../../../../../../utils/components/KodIDSelectbox";
+import KodIDSelectbox from "../../../../../../../../utils/components/KodIDSelectbox";
 import ContextMenu from "./ContextMenu"
 
 const { Text, Link } = Typography;
