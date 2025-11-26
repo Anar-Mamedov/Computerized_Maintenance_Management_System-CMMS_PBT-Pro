@@ -3,36 +3,18 @@ import { addListener, launch } from "devtools-detector";
 
 export function useDevToolsStatus() {
   const [isDevToolsOpen, setIsDevToolsOpen] = useState(false);
-  const [initialCheckComplete, setInitialCheckComplete] = useState(false);
 
   useEffect(() => {
-    // Development/test domains whitelist
-    const allowedDomains = ["localhost", "127.0.0.1", "pbtpro.netlify.app"];
-    const isAllowedDomain = allowedDomains.includes(window.location.hostname);
+    // Check if running on localhost
+    const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname === "pbtpro.netlify.app";
 
-    console.log("DevTools Detector - Domain:", window.location.hostname);
-    console.log("DevTools Detector - Is Allowed:", isAllowedDomain);
-
-    const handleDevToolsChange = (isOpen) => {
-      console.log("DevTools Detector - Status changed:", isOpen);
-      setIsDevToolsOpen(isOpen);
-    };
-
-    if (!isAllowedDomain) {
-      // Wait 2 seconds before initial check to avoid false positives during page load
-      const initialDelay = setTimeout(() => {
-        setInitialCheckComplete(true);
-        console.log("DevTools Detector - Initial check enabled");
-      }, 2000);
+    if (!isLocalhost) {
+      function handleDevToolsChange(isOpen) {
+        setIsDevToolsOpen(isOpen);
+      }
 
       addListener(handleDevToolsChange);
       launch();
-
-      return () => {
-        clearTimeout(initialDelay);
-      };
-    } else {
-      console.log("DevTools Detector - Disabled for this domain");
     }
 
     return () => {
@@ -40,14 +22,6 @@ export function useDevToolsStatus() {
     };
   }, []);
 
-  // Development/test domains whitelist
-  const allowedDomains = ["localhost", "127.0.0.1", "pbtpro.netlify.app"];
-  const isAllowedDomain = allowedDomains.includes(window.location.hostname);
-
-  // Return false for allowed domains or during initial 2-second grace period
-  if (isAllowedDomain || !initialCheckComplete) {
-    return false;
-  }
-
-  return isDevToolsOpen;
+  // Return false for localhost, otherwise return actual status
+  return window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname === "pbtpro.netlify.app" ? false : isDevToolsOpen;
 }
