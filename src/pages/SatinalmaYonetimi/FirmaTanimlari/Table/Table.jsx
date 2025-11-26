@@ -38,7 +38,7 @@ import "./ResizeStyle.css";
 import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
-import ContextMenu from "../components/ContextMenu/ContextMenu";
+import ContextMenu from "../components/ContextMenu";
 import { useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
@@ -501,7 +501,6 @@ const MainTable = () => {
 
     setLoading(false);
   } catch (err) {
-    console.log(err);
     setLoading(false);
   }
 };
@@ -878,36 +877,36 @@ const MainTable = () => {
           />
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
-          <ContextMenu
-            selectedRows={selectedRows}
-            refreshTableData={refreshTableData}
-          />
-          <CreateDrawer
-            selectedLokasyonId={selectedRowKeys[0]}
-            onRefresh={refreshTableData}
-          />
-        </div>
+  {/* ContextMenu sol tarafta */}
+  <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
+  
+  {/* Ekle butonu / CreateDrawer sağda */}
+  <CreateDrawer
+    selectedLokasyonId={selectedRowKeys[0]}
+    onRefresh={refreshTableData}
+  />
+</div>
       </div>
       <Spin spinning={loading}>
         <Table
-  components={components}
-  rowSelection={rowSelection}
-  columns={filteredColumns}
-  dataSource={filteredData}
-  pagination={{
-    current: currentPage,
-    total: totalRecords,
-    pageSize: pageSize,
-    showTotal: (total, range) => `Toplam ${total}`,
-    showSizeChanger: true,
-    onChange: (page, size) => {
-      setPageSize(size);
-      fetchEquipmentData(page, size, searchTerm);
-    }
-  }}
-  onRow={onRowClick}
-  scroll={{ y: "calc(100vh - 370px)" }}
-/>
+          components={components}
+          rowSelection={rowSelection}
+          columns={filteredColumns}
+          dataSource={filteredData}
+          pagination={{
+            current: currentPage,
+            total: totalRecords,
+            pageSize: pageSize,
+            showTotal: (total, range) => `Toplam ${total}`,
+            showSizeChanger: true,
+            onChange: (page, size) => {
+              setPageSize(size);
+              fetchEquipmentData(page, size, searchTerm);
+            }
+          }}
+          onRow={onRowClick}
+          scroll={{ y: "calc(100vh - 370px)" }}
+        />
       </Spin>
       <EditDrawer
         selectedRow={drawer.data}
