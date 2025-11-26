@@ -9,17 +9,6 @@ export default defineConfig({
     host: true,
     port: 5173,
   },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: undefined,
-      },
-    },
-  },
-  preview: {
-    port: 5173,
-    strictPort: true,
-  },
 });
 
 // import { defineConfig } from "vite";
