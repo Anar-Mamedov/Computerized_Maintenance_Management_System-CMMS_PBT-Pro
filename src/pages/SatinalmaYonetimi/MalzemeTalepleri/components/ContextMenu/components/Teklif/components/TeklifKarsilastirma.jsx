@@ -10,7 +10,7 @@ const { Text } = Typography;
 const { Option } = Select;
 const { TabPane } = Tabs;
 
-const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disabled = false }) => {
+const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disabled = false, onDurumGuncelle }) => {
   const [loading, setLoading] = useState(false);
   const [paketler, setPaketler] = useState([]);
   const [paketRenkleri, setPaketRenkleri] = useState({});
@@ -32,7 +32,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
     5: { text: "SİPARİŞ ALINDI", backgroundColor: "#e6f7ff", color: "#096dd9" }
   };
   const [onayCheck, setOnayCheck] = useState({ ONY_AKTIF: 0, ONY_MANUEL: 0 });
-  const showOnayaGonder = onayCheck && aktifPaketDurumID !== 3;
+  const showOnayaGonder = onayCheck && aktifPaketDurumID !== 3 && aktifPaketDurumID !== 2;
   const [siparisModalOpen, setSiparisModalOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
@@ -191,23 +191,24 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
 
   try {
     const response = await AxiosInstance.post(`/OnayaGonder`, {
-      ONAY_TABLO_ID: Number(onayTabloId), // Teklif ID
-      ONAY_TABLO_KOD: fisNo || "",        // fisNo
-      ONAY_ONYTANIM_ID: 4                 // Sabit değer
+      ONAY_TABLO_ID: Number(onayTabloId) || 0,
+      ONAY_TABLO_KOD: fisNo || "",
+      ONAY_ONYTANIM_ID: 4
     });
 
-    if (response.status === 200 || response.status === 201) {
-      message.success(`Teklif ${paket.baslik} başarıyla onaya gönderildi.`);
-      // Eğer fonksiyonlar varsa onları çağır
-      if (typeof refreshTableData === "function") refreshTableData();
-      if (typeof hidePopover === "function") hidePopover();
-    } else if (response.status === 401) {
+    if (response.status_code === 200 || response.status_code === 201) {
+      message.success("Teklif onaya gönderildi.");
+      if (typeof onDurumGuncelle === "function") {
+        onDurumGuncelle({ teklifId: paketId, durumID: 2 }); // 2 = Onaya Gönderildi
+      }
+    } else if (response.status_code === 401) {
       message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
     } else {
       message.error("İşlem Başarısız.");
     }
+
   } catch (error) {
-    console.error("Gönderme işlemi sırasında hata oluştu:", error);
+    console.error("Onaya gönderme sırasında hata oluştu:", error);
     message.error("Onaya gönderme sırasında hata oluştu.");
   }
 };
@@ -270,9 +271,8 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
 
   const handleSecimChange = (paketIndex, malzemeId, firmaId, val) => {
     setPaketler(prev => {
-      const updated = prev.map((p, idx) => {
-         if (idx !== paketIndex) return p;
-
+      return prev.map((p, idx) => {
+        if (idx !== paketIndex) return p;
         const paket = { ...p };
         paket.malzemeler = paket.malzemeler.map(m => {
           if (m.malzemeId !== malzemeId) return m;
@@ -280,18 +280,37 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
           return {
             ...m,
             firmalar: m.firmalar.map(f => {
-              if (f.firmaId !== firmaId) return f;
-              return { ...f, secili: val === "true" };
-            })
+              if (val === "true") {
+                return { ...f, secili: f.firmaId === firmaId }; // sadece tıklanan firma true
+              } else {
+                return { ...f, secili: false }; // x yapınca tüm firmalar false
+              }
+            }),
           };
         });
-
         return paket;
       });
-
-      return updated;
     });
   };
+
+  const handleRadioClick = (paketIndex, firmaId) => {
+  setSelectedFirmaId(prev => prev === firmaId ? null : firmaId); // tekrar tıklayınca kaldır
+
+  setPaketler(prev => {
+    const updated = [...prev];
+    const paket = updated[paketIndex];
+
+    paket.malzemeler = (paket.malzemeler || []).map(m => ({
+      ...m,
+      firmalar: m.firmalar.map(f => {
+        if (prev === firmaId) return { ...f, secili: false }; // tekrar tıklayınca tümünü kaldır
+        return { ...f, secili: f.firmaId === firmaId }; // aksi halde tüm malzemeleri o firma seçili yap
+      }),
+    }));
+
+    return updated;
+  });
+};
 
   return (
     <Card
@@ -315,30 +334,30 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
             Teklifi Kaydet
           </Button>
           <Button
-  type="primary"
-  icon={showOnayaGonder ? <CheckCircleOutlined /> : <ShoppingCartOutlined />}
-  style={{
-    backgroundColor: showOnayaGonder ? "#52c41a" : "#00BBFF",
-    borderColor: showOnayaGonder ? "#52c41a" : "#2BC770",
-    color: "#fff"
-  }}
-  onClick={() => {
-    if (!aktifPaket) return message.error("Aktif paket bulunamadı!");
+            type="primary"
+            icon={showOnayaGonder ? <CheckCircleOutlined /> : <ShoppingCartOutlined />}
+            style={{
+              backgroundColor: showOnayaGonder ? "#52c41a" : "#00BBFF",
+              borderColor: showOnayaGonder ? "#52c41a" : "#2BC770",
+              color: "#fff"
+            }}
+            onClick={() => {
+              if (!aktifPaket) return message.error("Aktif paket bulunamadı!");
 
-    const teklifId = aktifPaket.teklifId || aktifPaket.id;
-    if (!teklifId) return message.error("Teklif ID bulunamadı!");
+              const teklifId = aktifPaket.teklifId || aktifPaket.id;
+              if (!teklifId) return message.error("Teklif ID bulunamadı!");
 
-    if (showOnayaGonder) {
-      onOnayaGonder(teklifId);
-    } else {
-      setSelectedRow(teklifId);
-      setSiparisModalOpen(true);
-    }
-  }}
-  disabled={disabled || isDisabled}
->
-  {showOnayaGonder ? "Onaya Gönder" : "Siparişe Aktar"}
-</Button>
+              if (showOnayaGonder) {
+                onOnayaGonder(teklifId);
+              } else {
+                setSelectedRow(teklifId);
+                setSiparisModalOpen(true);
+              }
+            }}
+              disabled={disabled || isDisabled}
+            >
+              {showOnayaGonder ? "Onaya Gönder" : "Siparişe Aktar"}
+          </Button>
         </Space>
       }
       bordered={false}
@@ -373,7 +392,10 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                 }}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "center" }}>
                     <span>{firma.firmaTanim}</span>
-                    <Radio checked={selectedFirmaId === firma.firmaId} onChange={() => setSelectedFirmaId(firma.firmaId)} style={{ marginLeft: 8 }} />
+                    <Radio
+                      checked={selectedFirmaId === firma.firmaId}
+                      onChange={() => handleRadioClick(aktifPaketIndex, firma.firmaId)}
+                    />
                   </div>
                 </div>
               ),

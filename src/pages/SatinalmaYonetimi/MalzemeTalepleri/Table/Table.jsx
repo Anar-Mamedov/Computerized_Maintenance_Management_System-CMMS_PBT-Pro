@@ -9,6 +9,7 @@ import "./ResizeStyle.css";
 import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
+import EditDrawerSiparis from "../../SatinalmaSiparisleri/Update/EditDrawer";
 import Filters from "./filter/Filters";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
@@ -131,12 +132,22 @@ const MainTable = () => {
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
   const [onayCheck, setOnayCheck] = useState({ ONY_AKTIF: 0, ONY_MANUEL: 0 });
-  const [drawer, setDrawer] = useState({
-    visible: false,
-    data: null,
-  });
+  const [drawer, setDrawer] = useState({ visible: false, data: null });
+  const [siparisDrawer, setSiparisDrawer] = useState({ visible: false, data: null });
   const [selectedRows, setSelectedRows] = useState([]);
   const [xlsxLoading, setXlsxLoading] = useState(false);
+  const [cardsData, setCardsData] = useState({});
+
+  const cardItems = useMemo(() => {
+    if (!cardsData || Object.keys(cardsData).length === 0) return [];
+    return [
+      { title: "Açık Talepler", value: cardsData.ACIK_TALEPLER },
+      { title: "Onay Bekleyen", value: cardsData.ONAY_BEKLEYEN },
+      { title: "Gecikmede", value: cardsData.GECIKMEDE },
+      { title: "Bugün Teslim", value: cardsData.BUGUN_TESLIM },
+      { title: "Ortalama Onay Süresi (dk)", value: cardsData.ORT_ONAY_SURESI_DK },
+    ];
+  }, [cardsData]);
 
   function hexToRGBA(color, opacity) {
     // 1) Geçersiz parametreleri engelle
@@ -204,6 +215,26 @@ const MainTable = () => {
     // 4) Hiçbir formata uymuyorsa default dön
     return `rgba(0, 0, 0, ${opacity})`;
   }
+
+  useEffect(() => {
+    const fetchCards = async () => {
+      try {
+        const res = await AxiosInstance.get("getTalepCards");
+        if (res.status_code === 200 && res.data) {
+          setCardsData(res.data);
+        } else {
+          setCardsData({});
+        }
+      } catch (err) {
+        console.error(err);
+        setCardsData({});
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCards();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -282,7 +313,7 @@ const MainTable = () => {
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
       render: (text, record) => (
-        <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
+        <a onClick={() => onSiparisNoClick(record)}>{text}</a> // Updated this line
       ),
       sorter: (a, b) => {
         if (a.SFS_TALEP_SIPARIS_NO === null) return -1;
@@ -336,57 +367,57 @@ const MainTable = () => {
       render: (text) => formatTime(text),
     },
     {
-  title: "Durum",
-  dataIndex: "SFS_DURUM",
-  key: "SFS_DURUM",
-  width: 150,
-  ellipsis: true,
-  render: (text) => {
-    let style = {
-      borderRadius: "12px",
-      padding: "2px 8px",
-      fontWeight: 500,
-      fontSize: "12px",
-    };
+      title: "Durum",
+      dataIndex: "SFS_DURUM",
+      key: "SFS_DURUM",
+      width: 150,
+      ellipsis: true,
+      render: (text) => {
+        let style = {
+          borderRadius: "12px",
+          padding: "2px 8px",
+          fontWeight: 500,
+          fontSize: "12px",
+        };
 
     
-        <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
+          <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
 
-    switch (text) {
-      case "ONAYLANDI":
-        style = { ...style, backgroundColor: "#d4f8e8", color: "#207868" }; // pastel yeşil
-        break;
-      case "ONAY BEKLİYOR":
-        style = { ...style, backgroundColor: "#fff4d6", color: "#b8860b" }; // pastel sarı
-        break;
-      case "ONAYLANMADI":
-        style = { ...style, backgroundColor: "#ffe0e0", color: "#b22222" }; // pastel kırmızı
-        break;
-      case "SİPARİŞ":
-        style = { ...style, backgroundColor: "#e6ecff", color: "#4056a1" }; // pastel mavi
-        break;
-      case "AÇIK":
-        style = { ...style, backgroundColor: "#e1f7d5", color: "#3c763d" }; // açık yeşil
-        break;
-      case "TEKLİF":
-        style = { ...style, backgroundColor: "#e0f7fa", color: "#00796b" }; // pastel turkuaz
-        break;
-      case "KAPALI":
-        style = { ...style, backgroundColor: "#eaeaeaff", color: "#949494ff" }; // pastel kırmızı/rose
-        break;
-      case "İPTAL":
-        style = { ...style, backgroundColor: "#fde2e4", color: "#d64550" }; // pastel kırmızı/rose (KAPALI ile aynı)
-        break;
-      case "KARŞILANIYOR":
-        style = { ...style, backgroundColor: "#e6f7ff", color: "#096dd9" }; // pastel açık mavi
-        break;
-      default:
-        style = { ...style, backgroundColor: "#f5f5f5", color: "#595959" }; // gri
-    }
+        switch (text) {
+          case "ONAYLANDI":
+            style = { ...style, backgroundColor: "#d4f8e8", color: "#207868" }; // pastel yeşil
+          break;
+          case "ONAY BEKLİYOR":
+            style = { ...style, backgroundColor: "#fff4d6", color: "#b8860b" }; // pastel sarı
+          break;
+          case "ONAYLANMADI":
+            style = { ...style, backgroundColor: "#ffe0e0", color: "#b22222" }; // pastel kırmızı
+          break;
+          case "SİPARİŞ":
+            style = { ...style, backgroundColor: "#e6ecff", color: "#4056a1" }; // pastel mavi
+          break;
+          case "AÇIK":
+            style = { ...style, backgroundColor: "#e1f7d5", color: "#3c763d" }; // açık yeşil
+          break;
+          case "TEKLİF":
+            style = { ...style, backgroundColor: "#e0f7fa", color: "#00796b" }; // pastel turkuaz
+          break;
+          case "KAPALI":
+            style = { ...style, backgroundColor: "#eaeaeaff", color: "#949494ff" }; // pastel kırmızı/rose
+          break;
+          case "İPTAL":
+            style = { ...style, backgroundColor: "#fde2e4", color: "#d64550" }; // pastel kırmızı/rose (KAPALI ile aynı)
+          break;
+          case "KARŞILANIYOR":
+            style = { ...style, backgroundColor: "#e6f7ff", color: "#096dd9" }; // pastel açık mavi
+          break;
+          default:
+          style = { ...style, backgroundColor: "#f5f5f5", color: "#595959" }; // gri
+        }
 
-    return <span style={style}>{text}</span>;
-  },
-},
+        return <span style={style}>{text}</span>;
+      },
+    },
     {
       title: "Lokasyon",
       dataIndex: "SFS_LOKASYON",
@@ -919,8 +950,17 @@ useEffect(() => {
   //   };
   // };
 
+  // Talep No için
   const onRowClick = (record) => {
-    setDrawer({ visible: true, data: record });
+    setDrawer({ visible: true, data: { ...record, key: record.TB_STOK_FIS_ID } });
+  };
+
+  // Sipariş No için
+  const onSiparisNoClick = (record) => {
+    setSiparisDrawer({ 
+      visible: true, 
+      data: { ...record, key: record.SFS_REF_ID } // SFS_REF_ID’yi key olarak ekledik
+    });
   };
 
   const refreshTableData = useCallback(() => {
@@ -1268,6 +1308,37 @@ useEffect(() => {
           </DndContext>
         </div>
       </Modal>
+      <div style={{ display: "flex", gap: "15px", marginBottom: "20px", flexWrap: "wrap" }}>
+      {loading ? (
+        <Spin size="large" />
+      ) : cardItems.length > 0 ? (
+        cardItems.map((item, index) => (
+          <div
+            key={index}
+            style={{
+              flex: "1",
+              minWidth: "150px",
+              backgroundColor: "#fff",
+              padding: "20px",
+              borderRadius: "8px",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "flex-start",
+            }}
+          >
+            <Text style={{ fontWeight: 600, fontSize: "14px", color: "#5C595C" }}>
+              {item.title}
+            </Text>
+            <Text style={{ marginTop: "8px", fontWeight: 700, fontSize: "22px", color: "#1F1E1F" }}>
+              {item.value}
+            </Text>
+          </div>
+        ))
+      ) : (
+        <div>Veri Yok</div>
+      )}
+    </div>
       <div
         style={{
           display: "flex",
@@ -1336,7 +1407,19 @@ useEffect(() => {
           rowClassName={(record) => (record.SFS_TALEP_DURUM_ID === 0 ? "boldRow" : "")}
         />
       </Spin>
-      <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
+      <EditDrawer 
+    selectedRow={drawer.data} 
+    onDrawerClose={() => setDrawer({ ...drawer, visible: false })} 
+    drawerVisible={drawer.visible} 
+    onRefresh={refreshTableData} 
+/>
+
+<EditDrawerSiparis 
+    selectedRow={siparisDrawer.data} 
+    onDrawerClose={() => setSiparisDrawer({ ...siparisDrawer, visible: false })} 
+    drawerVisible={siparisDrawer.visible} 
+    onRefresh={refreshTableData} 
+/>
 
       {editDrawer1Visible && (
         <EditDrawer1

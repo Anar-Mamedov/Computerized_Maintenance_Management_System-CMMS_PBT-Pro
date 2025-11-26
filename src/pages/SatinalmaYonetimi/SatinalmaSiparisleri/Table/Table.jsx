@@ -9,6 +9,7 @@ import "./ResizeStyle.css";
 import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
+import EditDrawerTalep from "../../MalzemeTalepleri/Update/EditDrawer";
 import Filters from "./filter/Filters";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
@@ -130,12 +131,22 @@ const MainTable = () => {
   const [pageSize, setPageSize] = useState(10);
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
-  const [drawer, setDrawer] = useState({
-    visible: false,
-    data: null,
-  });
+  const [drawer, setDrawer] = useState({ visible: false, data: null });
+  const [talepDrawer, setTalepDrawer] = useState({ visible: false, data: null });
   const [selectedRows, setSelectedRows] = useState([]);
   const [xlsxLoading, setXlsxLoading] = useState(false);
+  const [cardsData, setCardsData] = useState({});
+
+  const cardItems = useMemo(() => {
+    if (!cardsData || Object.keys(cardsData).length === 0) return [];
+    return [
+      { title: "Açık Siparişler", value: cardsData.ACIK_SIPARIS_SAYISI },
+      { title: "Onay Bekleyen Siparişler", value: cardsData.ONAY_BEKLEYEN_SAYISI },
+      { title: "Geciken Siparişler", value: cardsData.GECIKEN_SAYISI },
+      { title: "Bugün Teslim Siparişler", value: cardsData.BUGUN_TESLIM_SAYISI },
+      { title: "Toplam Açık Sipariş Tutarı", value: cardsData.TOPLAM_ACIK_TUTAR },
+    ];
+  }, [cardsData]);
 
   function hexToRGBA(color, opacity) {
     // 1) Geçersiz parametreleri engelle
@@ -204,6 +215,26 @@ const MainTable = () => {
     return `rgba(0, 0, 0, ${opacity})`;
   }
 
+  useEffect(() => {
+    const fetchCards = async () => {
+      try {
+        const res = await AxiosInstance.get("GetSiparisCards");
+        if (res.status_code === 200 && res.data) {
+          setCardsData(res.data);
+        } else {
+          setCardsData({});
+        }
+      } catch (err) {
+        console.error(err);
+        setCardsData({});
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCards();
+  }, []);
+
   // Özel Alanların nameleri backend çekmek için api isteği
 
   useEffect(() => {
@@ -264,7 +295,7 @@ const MainTable = () => {
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
       render: (text, record) => (
-        <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
+        <a onClick={() => onTalepNoClick(record)}>{text}</a> // Updated this line
       ),
       sorter: (a, b) => {
         if (a.TALEP_NO === null) return -1;
@@ -955,8 +986,17 @@ const MainTable = () => {
   //   };
   // };
 
+  // Sipariş No için
   const onRowClick = (record) => {
-    setDrawer({ visible: true, data: record });
+    setDrawer({ visible: true, data: { ...record, key: record.TB_SATINALMA_SIPARIS_ID } });
+  };
+
+  // Talep No için
+  const onTalepNoClick = (record) => {
+    setTalepDrawer({ 
+      visible: true, 
+      data: { ...record, key: record.TALEP_ID } // TALEP_ID’yi key olarak ekledik
+    });
   };
 
   const refreshTableData = useCallback(() => {
@@ -1304,6 +1344,37 @@ const MainTable = () => {
           </DndContext>
         </div>
       </Modal>
+      <div style={{ display: "flex", gap: "15px", marginBottom: "20px", flexWrap: "wrap" }}>
+            {loading ? (
+              <Spin size="large" />
+            ) : cardItems.length > 0 ? (
+              cardItems.map((item, index) => (
+                <div
+                  key={index}
+                  style={{
+                    flex: "1",
+                    minWidth: "150px",
+                    backgroundColor: "#fff",
+                    padding: "20px",
+                    borderRadius: "8px",
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "flex-start",
+                  }}
+                >
+                  <Text style={{ fontWeight: 600, fontSize: "14px", color: "#5C595C" }}>
+                    {item.title}
+                  </Text>
+                  <Text style={{ marginTop: "8px", fontWeight: 700, fontSize: "22px", color: "#1F1E1F" }}>
+                    {item.value}
+                  </Text>
+                </div>
+              ))
+            ) : (
+              <div>Veri Yok</div>
+            )}
+          </div>
       <div
         style={{
           display: "flex",
@@ -1373,6 +1444,7 @@ const MainTable = () => {
         />
       </Spin>
       <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
+      <EditDrawerTalep selectedRow={talepDrawer.data} onDrawerClose={() => setTalepDrawer({ ...talepDrawer, visible: false })} drawerVisible={talepDrawer.visible} onRefresh={refreshTableData} />
 
       {editDrawer1Visible && (
         <EditDrawer1

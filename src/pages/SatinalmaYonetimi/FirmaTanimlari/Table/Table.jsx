@@ -162,6 +162,9 @@ const MainTable = () => {
   const [searchTimeout, setSearchTimeout] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
   const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalRecords, setTotalRecords] = useState(0);
 
   // edit drawer için
   const [drawer, setDrawer] = useState({
@@ -226,24 +229,24 @@ const MainTable = () => {
   const initialColumns = [
     {
       title: "Firma Kodu",
-      dataIndex: "code",
-      key: "code",
+      dataIndex: "CAR_KOD",
+      key: "CAR_KOD",
       width: 150,
       ellipsis: true,
       visible: true,
       render: (text) => <a>{text}</a>,
       sorter: (a, b) => {
-        if (a.code == null || a.code === "") return 1;
-        if (b.code == null || b.code === "") return -1;
-        if (typeof a.code === "boolean") return a.code - b.code;
-        if (!isNaN(a.code) && !isNaN(b.code)) return a.code - b.code;
-        return a.code.toString().localeCompare(b.code.toString());
+        if (a.CAR_KOD == null || a.CAR_KOD === "") return 1;
+        if (b.CAR_KOD == null || b.CAR_KOD === "") return -1;
+        if (typeof a.CAR_KOD === "boolean") return a.CAR_KOD - b.CAR_KOD;
+        if (!isNaN(a.CAR_KOD) && !isNaN(b.CAR_KOD)) return a.CAR_KOD - b.CAR_KOD;
+        return a.CAR_KOD.toString().localeCompare(b.CAR_KOD.toString());
       },
     },
     {
       title: "Firma Ünvanı",
-      dataIndex: "subject",
-      key: "subject",
+      dataIndex: "CAR_TANIM",
+      key: "CAR_TANIM",
       width: 150,
       ellipsis: true,
       visible: true,
@@ -253,15 +256,15 @@ const MainTable = () => {
         },
       }),
       sorter: (a, b) => {
-        if (a.subject == null || a.subject === "") return 1;
-        if (b.subject == null || b.subject === "") return -1;
-        return a.subject.toString().localeCompare(b.subject.toString());
+        if (a.CAR_TANIM == null || a.CAR_TANIM === "") return 1;
+        if (b.CAR_TANIM == null || b.CAR_TANIM === "") return -1;
+        return a.CAR_TANIM.toString().localeCompare(b.CAR_TANIM.toString());
       },
     },
     {
-      title: "Firma Tipi",
-      dataIndex: "workdays",
-      key: "workdays",
+      title: "Adres",
+      dataIndex: "CAR_ADRES",
+      key: "CAR_ADRES",
       width: 150,
       ellipsis: true,
       visible: true,
@@ -271,33 +274,15 @@ const MainTable = () => {
         },
       }),
       sorter: (a, b) => {
-        if (a.workdays == null || a.workdays === "") return 1;
-        if (b.workdays == null || b.workdays === "") return -1;
-        return a.workdays.toString().localeCompare(b.workdays.toString());
-      },
-    },
-    {
-      title: "Lokasyon",
-      dataIndex: "description",
-      key: "description",
-      width: 150,
-      ellipsis: true,
-      visible: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      sorter: (a, b) => {
-        if (a.description == null || a.description === "") return 1;
-        if (b.description == null || b.description === "") return -1;
-        return a.description.toString().localeCompare(b.description.toString());
+        if (a.CAR_ADRES == null || a.CAR_ADRES === "") return 1;
+        if (b.CAR_ADRES == null || b.CAR_ADRES === "") return -1;
+        return a.CAR_ADRES.toString().localeCompare(b.CAR_ADRES.toString());
       },
     },
     {
       title: "Şehir",
-      dataIndex: "fifthcolumn",
-      key: "fifthcolumn",
+      dataIndex: "CAR_SEHIR",
+      key: "CAR_SEHIR",
       width: 150,
       ellipsis: true,
       visible: true,
@@ -307,15 +292,15 @@ const MainTable = () => {
         },
       }),
       sorter: (a, b) => {
-        if (a.fifthcolumn == null || a.fifthcolumn === "") return 1;
-        if (b.fifthcolumn == null || b.fifthcolumn === "") return -1;
-        return a.fifthcolumn.toString().localeCompare(b.fifthcolumn.toString());
+        if (a.CAR_SEHIR == null || a.CAR_SEHIR === "") return 1;
+        if (b.CAR_SEHIR == null || b.CAR_SEHIR === "") return -1;
+        return a.CAR_SEHIR.toString().localeCompare(b.CAR_SEHIR.toString());
       },
     },
     {
-      title: "Sektör",
-      dataIndex: "sixthcolumn",
-      key: "sixthcolumn",
+      title: "İlçe",
+      dataIndex: "CAR_ILCE",
+      key: "CAR_ILCE",
       width: 150,
       ellipsis: true,
       visible: true,
@@ -325,58 +310,82 @@ const MainTable = () => {
         },
       }),
       sorter: (a, b) => {
-        if (a.sixthcolumn == null || a.sixthcolumn === "") return 1;
-        if (b.sixthcolumn == null || b.sixthcolumn === "") return -1;
-        return a.sixthcolumn.toString().localeCompare(b.sixthcolumn.toString());
+        if (a.CAR_ILCE == null || a.CAR_ILCE === "") return 1;
+        if (b.CAR_ILCE == null || b.CAR_ILCE === "") return -1;
+        return a.CAR_ILCE.toString().localeCompare(b.CAR_ILCE.toString());
+      },
+    },
+    {
+      title: "Telefon",
+      dataIndex: "CAR_TEL1",
+      key: "CAR_TEL1",
+      width: 150,
+      ellipsis: true,
+      visible: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      sorter: (a, b) => {
+        if (a.CAR_TEL1 == null || a.CAR_TEL1 === "") return 1;
+        if (b.CAR_TEL1 == null || b.CAR_TEL1 === "") return -1;
+        return a.CAR_TEL1.toString().localeCompare(b.CAR_TEL1.toString());
       },
       
     },
     {
-      title: "Firma Kodu",
-      dataIndex: "code",
-      key: "code",
+      title: "Mail",
+      dataIndex: "CAR_EMAIL",
+      key: "CAR_EMAIL",
       width: 150,
       ellipsis: true,
       visible: true,
-      render: (text) => <a>{text}</a>,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       sorter: (a, b) => {
-        if (a.code == null || a.code === "") return 1;
-        if (b.code == null || b.code === "") return -1;
-        if (typeof a.code === "boolean") return a.code - b.code;
-        if (!isNaN(a.code) && !isNaN(b.code)) return a.code - b.code;
-        return a.code.toString().localeCompare(b.code.toString());
+        if (a.CAR_EMAIL == null || a.CAR_EMAIL === "") return 1;
+        if (b.CAR_EMAIL == null || b.CAR_EMAIL === "") return -1;
+        return a.CAR_EMAIL.toString().localeCompare(b.CAR_EMAIL.toString());
       },
     },
     {
-      title: "Posta Kodu",
-      dataIndex: "code",
-      key: "code",
+      title: "Vergi Dairesi",
+      dataIndex: "CAR_VERGI_DAIRE",
+      key: "CAR_VERGI_DAIRE",
       width: 150,
       ellipsis: true,
       visible: true,
-      render: (text) => <a>{text}</a>,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       sorter: (a, b) => {
-        if (a.code == null || a.code === "") return 1;
-        if (b.code == null || b.code === "") return -1;
-        if (typeof a.code === "boolean") return a.code - b.code;
-        if (!isNaN(a.code) && !isNaN(b.code)) return a.code - b.code;
-        return a.code.toString().localeCompare(b.code.toString());
+        if (a.CAR_VERGI_DAIRE == null || a.CAR_VERGI_DAIRE === "") return 1;
+        if (b.CAR_VERGI_DAIRE == null || b.CAR_VERGI_DAIRE === "") return -1;
+        return a.CAR_VERGI_DAIRE.toString().localeCompare(b.CAR_VERGI_DAIRE.toString());
       },
     },
     {
-      title: "Fax",
-      dataIndex: "code",
-      key: "code",
+      title: "Vergi No",
+      dataIndex: "CAR_VERGI_NO",
+      key: "CAR_VERGI_NO",
       width: 150,
       ellipsis: true,
       visible: true,
-      render: (text) => <a>{text}</a>,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       sorter: (a, b) => {
-        if (a.code == null || a.code === "") return 1;
-        if (b.code == null || b.code === "") return -1;
-        if (typeof a.code === "boolean") return a.code - b.code;
-        if (!isNaN(a.code) && !isNaN(b.code)) return a.code - b.code;
-        return a.code.toString().localeCompare(b.code.toString());
+        if (a.CAR_VERGI_NO == null || a.CAR_VERGI_NO === "") return 1;
+        if (b.CAR_VERGI_NO == null || b.CAR_VERGI_NO === "") return -1;
+        return a.CAR_VERGI_NO.toString().localeCompare(b.CAR_VERGI_NO.toString());
       },
     },
 
@@ -471,65 +480,59 @@ const MainTable = () => {
 
   // ana tablo api isteği için kullanılan useEffect son
 
-  const fetchEquipmentData = async () => {
-    try {
-      setLoading(true);
-      // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.get(``);
-      if (response) {
-        // Gelen veriyi formatla ve state'e ata
-        const formattedData = response.map((item) => ({
-          ...item,
-          key: item.TB_PERSONEL_ID,
-          code: item.PRS_PERSONEL_KOD,
-          subject: item.PRS_ISIM,
-          workdays: item.PRS_UNVAN,
-          description: item.PRS_TIP,
-          fifthcolumn: item.PRS_DEPARTMAN,
-          sixthcolumn: item.PRS_LOKASYON,
-          // Diğer alanlarınız...
-        }));
-        setData(formattedData);
-        setLoading(false);
-      } else {
-        console.error("API response is not in expected format");
-        setLoading(false);
-      }
-    } catch (error) {
-      console.error("Error in API request:", error);
-      setLoading(false);
-      if (navigator.onLine) {
-        // İnternet bağlantısı var
-        //message.error("Hata Mesajı: " + error.message);
-      } else {
-        // İnternet bağlantısı yok
-        message.error("Internet Bağlantısı Mevcut Değil.");
-      }
-    }
-  };
+  const fetchEquipmentData = async (page = 1, size = 10, searchTerm = "") => {
+  try {
+    setLoading(true);
 
-  const normalizeString = (str) => {
-    if (str === null) {
-      return "";
-    }
-    return str
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .replace(/ğ/gim, "g")
-      .replace(/ü/gim, "u")
-      .replace(/ş/gim, "s")
-      .replace(/ı/gim, "i")
-      .replace(/ö/gim, "o")
-      .replace(/ç/gim, "c");
-  };
+    const response = await AxiosInstance.get(
+      `GetTedarikciList?aktif=1&searchText=${searchTerm}&pagingDeger=${page}&pageSize=${size}`
+    );
+
+    const list = response?.data ?? [];
+
+    const formatted = list.map(item => ({
+      ...item,
+      key: item.TB_CARI_ID,
+    }));
+
+    setData(formatted);
+    setTotalRecords(response.pagination?.total_records || 0);
+    setCurrentPage(response.pagination?.current_page || 1);
+
+    setLoading(false);
+  } catch (err) {
+    console.log(err);
+    setLoading(false);
+  }
+};
+
+  const normalizeSafe = (str) => {
+  if (!str) return ""; // null, undefined, boş hepsi için
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/ğ/g, "g")
+    .replace(/ü/g, "u")
+    .replace(/ş/g, "s")
+    .replace(/ı/g, "i")
+    .replace(/ö/g, "o")
+    .replace(/ç/g, "c");
+};
 
   useEffect(() => {
-    const filtered = data.filter((item) =>
-      normalizeString(item.subject).includes(normalizeString(searchTerm))
-    );
-    setFilteredData(filtered);
-  }, [searchTerm, data]);
+  if (!searchTerm) {
+    setFilteredData(data);
+    return;
+  }
+
+  const filtered = data.filter((item) => {
+    const text = normalizeSafe(item.CAR_TANIM || item.UNVAN || item.CARI_ADI);
+    return text.includes(normalizeSafe(searchTerm));
+  });
+
+  setFilteredData(filtered);
+}, [searchTerm, data]);
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -887,21 +890,24 @@ const MainTable = () => {
       </div>
       <Spin spinning={loading}>
         <Table
-          components={components}
-          rowSelection={rowSelection}
-          columns={filteredColumns}
-          dataSource={searchTerm ? filteredData : data}
-          pagination={{
-            defaultPageSize: 10,
-            showSizeChanger: true,
-            pageSizeOptions: ["10", "20", "50", "100"],
-            position: ["bottomRight"],
-            showTotal: (total, range) => `Toplam ${total}`,
-            showQuickJumper: true,
-          }}
-          onRow={onRowClick}
-          scroll={{ y: "calc(100vh - 370px)" }}
-        />
+  components={components}
+  rowSelection={rowSelection}
+  columns={filteredColumns}
+  dataSource={filteredData}
+  pagination={{
+    current: currentPage,
+    total: totalRecords,
+    pageSize: pageSize,
+    showTotal: (total, range) => `Toplam ${total}`,
+    showSizeChanger: true,
+    onChange: (page, size) => {
+      setPageSize(size);
+      fetchEquipmentData(page, size, searchTerm);
+    }
+  }}
+  onRow={onRowClick}
+  scroll={{ y: "calc(100vh - 370px)" }}
+/>
       </Spin>
       <EditDrawer
         selectedRow={drawer.data}
