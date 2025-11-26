@@ -12,66 +12,49 @@ export default function CreateDrawer({ onRefresh }) {
 
   const methods = useForm({
     defaultValues: {
-      personelKodu: "",
-      secilenPersonelID: "",
-      personelAktif: true,
-      personelAdi: "",
-      personelTipi: null,
-      personelTipiID: "",
-      departman: null,
-      departmanID: "",
-      atolyeTanim: "",
-      atolyeID: "",
-      lokasyonTanim: "",
-      lokasyonID: "",
-      unvan: "",
-      gorevi: null,
-      goreviID: "",
-      taseronTanim: "",
-      taseronID: "",
-      idariAmiriTanim: "",
-      idariAmiriID: "",
-      masrafMerkeziTanim: "",
-      masrafMerkeziID: "",
-      teknisyen: "",
-      operator: "",
-      bakim: "",
-      santiye: "",
-      surucu: "",
-      diger: "",
+      carKod: "",
+      carTanim: "",
+      carAdres: "",
+      carSehir: "",
+      carIlce: "",
+      carTel1: "",
+      carEmail: "",
+      carVergiDaire: "",
+      carVergiNo: "",
+      carTedarikci: false,  // boolean
+      carMusteri: false,    // boolean
+      carNakliyeci: false,  // boolean
+      carServis: false,     // boolean
+      carSube: false,       // boolean
+      carDiger: false,      // boolean
     },
   });
 
   const { setValue, reset, handleSubmit, watch } = methods;
 
   const onSubmit = (data) => {
-    // Form verilerini API'nin beklediği formata dönüştür
+  // Form verilerini API'nin beklediği formata dönüştür
     const Body = {
-      PRS_PERSONEL_KOD: data.personelKodu,
-      PRS_ISIM: data.personelAdi,
-      PRS_PERSONEL_TIP_KOD_ID: data.personelTipiID,
-      PRS_DEPARTMAN_ID: data.departmanID,
-      PRS_LOKASYON_ID: data.lokasyonID,
-      PRS_ATOLYE_ID: data.atolyeID,
-      PRS_UNVAN: data.unvan,
-      PRS_GOREV_KOD_ID: data.goreviID,
-      PRS_FIRMA_ID: data.taseronID,
-      PRS_IDARI_PERSONEL_ID: data.idariAmiriID,
-      PRS_MASRAF_MERKEZI_ID: data.masrafMerkeziID,
-      PRS_AKTIF: data.personelAktif,
-      PRS_TEKNISYEN: data.teknisyen,
-      PRS_SURUCU: data.surucu,
-      PRS_OPERATOR: data.operator,
-      PRS_BAKIM: data.bakim,
-      PRS_DIGER: data.diger,
-      PRS_SANTIYE: data.santiye,
-      // Diğer alanlarınız...
+      CAR_KOD: data.carKod,
+      CAR_TANIM: data.carTanim,
+      CAR_ADRES: data.carAdres,
+      CAR_SEHIR: data.carSehir,
+      CAR_ILCE: data.carIlce,
+      CAR_TEL1: data.carTel1,
+      CAR_EMAIL: data.carEmail,
+      CAR_VERGI_DAIRE: data.carVergiDaire,
+      CAR_VERGI_NO: data.carVergiNo,
+      CAR_TEDARIKCI: data.carTedarikci,   // boolean
+      CAR_MUSTERI: data.carMusteri,       // boolean
+      CAR_NAKLIYECI: data.carNakliyeci,   // boolean
+      CAR_SERVIS: data.carServis,         // boolean
+      CAR_SUBE: data.carSube,             // boolean
+      CAR_DIGER: data.carDiger,           // boolean
     };
 
     // API'ye POST isteği gönder
-    AxiosInstance.post("AddPersonel", Body)
+    AxiosInstance.post("AddTedarikci", Body)
       .then((response) => {
-        console.log("Data sent successfully:", response);
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("Ekleme Başarılı.");
           setOpen(false);
@@ -84,11 +67,9 @@ export default function CreateDrawer({ onRefresh }) {
         }
       })
       .catch((error) => {
-        // Handle errors here, e.g.:
         console.error("Error sending data:", error);
         message.error("Başarısız Olundu.");
       });
-    console.log({ Body });
   };
 
   const showDrawer = () => setOpen(true);
@@ -141,7 +122,7 @@ export default function CreateDrawer({ onRefresh }) {
         </Button>
         <Drawer
           width="550px"
-          title="Firma Tanımı"
+          title="Tedarikçi Firma Tanımı"
           placement="right"
           onClose={onClose}
           open={open}

@@ -115,417 +115,140 @@ export default function MainTabs() {
   };
 
   return (
+  <div
+    style={{
+      display: "flex",
+      flexWrap: "wrap",
+      marginBottom: "15px",
+      gap: "20px",
+    }}
+  >
+    {/* Sol Kolon */}
     <div
       style={{
         display: "flex",
-        flexWrap: "wrap",
-        marginBottom: "15px",
-        gap: "20px",
-      }}>
-      <div
-        style={{
-          display: "flex",
-          marginBottom: "15px",
-          flexDirection: "column",
-          gap: "10px",
-          width: "100%",
-          maxWidth: "450px",
-        }}>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            gap: "10px",
-            rowGap: "0px",
-          }}>
-          <Text style={{ fontSize: "14px", fontWeight: "600" }}>Firma Kodu:</Text>
-          <div
-            style={{
-              display: "flex",
-              // flexWrap: "wrap",
-              alignItems: "flex-start",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}>
-            <Controller
-              name="personelKodu"
-              control={control}
-              rules={{ required: "Alan Boş Bırakılamaz!" }}
-              render={({ field, fieldState: { error } }) => (
-                <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
-                  <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
-                  {error && <div style={{ color: "red" }}>{error.message}</div>}
-                </div>
-              )}
-            />
-            <Controller
-              name="secilenPersonelID"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ display: "none" }}
-                />
-              )}
-            />
-            <Controller
-              name="personelAktif"
-              control={control}
-              defaultValue={true} // or true if you want it checked by default
-              render={({ field }) => (
-                <Checkbox
-                  style={{ marginTop: "5px" }}
-                  checked={field.value}
-                  onChange={(e) => field.onChange(e.target.checked)}>
-                  Aktif
-                </Checkbox>
-              )}
-            />
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-            justifyContent: "space-between",
-          }}>
-          <Text style={{ fontSize: "14px", fontWeight: "600" }}>Firma Ünvanı:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}>
-            <Controller
-              name="personelAdi"
-              control={control}
-              rules={{ required: "Alan Boş Bırakılamaz!" }}
-              render={({ field, fieldState: { error } }) => (
-                <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
-                  <Input {...field} status={error ? "error" : ""} style={{ flex: 1 }} />
-                  {error && <div style={{ color: "red" }}>{error.message}</div>}
-                </div>
-              )}
-            />
-          </div>
-        </div>
-        <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    maxWidth: "450px",
-                    gap: "10px",
-                    flexDirection: "row",
-                  }}
-                >
-                  <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>Firma Tipi</Text>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexFlow: "column wrap",
-                      alignItems: "flex-start",
-                      width: "100%",
-                      maxWidth: "300px",
-                    }}
-                  >
-                    <KodIDSelectbox name1="oncelik" kodID={0} isRequired={false} />
-                  </div>
-                </div>
-        <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    maxWidth: "450px",
-                    gap: "10px",
-                    flexDirection: "row",
-                  }}
-                >
-                  <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>Bölge</Text>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexFlow: "column wrap",
-                      alignItems: "flex-start",
-                      width: "100%",
-                      maxWidth: "300px",
-                    }}
-                  >
-                    <KodIDSelectbox name1="oncelik" kodID={0} isRequired={false} />
-                  </div>
-                </div>
-        <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    maxWidth: "450px",
-                    gap: "10px",
-                    flexDirection: "row",
-                  }}
-                >
-                  <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>Sektör</Text>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexFlow: "column wrap",
-                      alignItems: "flex-start",
-                      width: "100%",
-                      maxWidth: "300px",
-                    }}
-                  >
-                    <KodIDSelectbox name1="oncelik" kodID={0} isRequired={false} />
-                  </div>
-                </div>
-        <StyledDivMedia
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Lokasyon:</Text>
-          <div
-            className="anar"
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              minWidth: "300px",
-              gap: "3px",
-            }}>
-            <Controller
-              name="lokasyonTanim"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ width: "100%", maxWidth: "630px" }}
-                  disabled
-                />
-              )}
-            />
-            <Controller
-              name="lokasyonID"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ display: "none" }}
-                />
-              )}
-            />
-            <LokasyonTablo
-              onSubmit={(selectedData) => {
-                setValue("lokasyonTanim", selectedData.LOK_TANIM);
-                setValue("lokasyonID", selectedData.key);
-              }}
-            />
-            <Button onClick={handleLokasyonMinusClick}> - </Button>
-          </div>
-        </StyledDivMedia>
+        flexDirection: "column",
+        gap: "10px",
+        width: "100%",
+        maxWidth: "450px",
+      }}
+    >
+      {/* CAR_KOD */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "10px" }}>
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Firma Kodu:</Text>
+        <Controller
+          name="carKod"
+          control={control}
+          rules={{ required: "Alan Boş Bırakılamaz!" }}
+          render={({ field, fieldState: { error } }) => (
+            <div style={{ display: "flex", flexDirection: "column", gap: "5px", maxWidth: "300px", width: "100%" }}>
+              <Input {...field} status={error ? "error" : ""} />
+              {error && <div style={{ color: "red" }}>{error.message}</div>}
+            </div>
+          )}
+        />
       </div>
-      <div
-        style={{
-          display: "flex",
-          marginBottom: "15px",
-          flexDirection: "column",
-          gap: "10px",
-          width: "100%",
-          maxWidth: "450px",
-        }}>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-            justifyContent: "space-between",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Kredi Limiti:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}>
-            <Controller
-              name="unvan"
-              control={control}
-              render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
-            />
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-            justifyContent: "space-between",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Temin Süresi:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}>
-            <Controller
-              name="unvan"
-              control={control}
-              render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
-            />
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-            justifyContent: "space-between",
-          }}>
-          <Text style={{ fontSize: "14px" }}>Şartname No:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}>
-            <Controller
-              name="unvan"
-              control={control}
-              render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
-            />
-          </div>
-        </div>
-        <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    maxWidth: "450px",
-                    gap: "10px",
-                    flexDirection: "row",
-                  }}
-                >
-                  <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>Hizmet Değeri</Text>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexFlow: "column wrap",
-                      alignItems: "flex-start",
-                      width: "100%",
-                      maxWidth: "300px",
-                    }}
-                  >
-                    <KodIDSelectbox name1="oncelik" kodID={0} isRequired={false} />
-                  </div>
-                </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-            justifyContent: "space-between",
-          }}>
-          <Text style={{ fontSize: "14px" }}>İşlem Hacmi:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}>
-            <Controller
-              name="unvan"
-              control={control}
-              render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
-            />
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            maxWidth: "450px",
-            gap: "10px",
-            width: "100%",
-            justifyContent: "space-between",
-          }}>
-          <Text style={{ fontSize: "14px" }}>İndirim Oranı:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              maxWidth: "300px",
-              minWidth: "300px",
-              gap: "10px",
-              width: "100%",
-            }}>
-            <Controller
-              name="unvan"
-              control={control}
-              render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
-            />
-          </div>
-        </div>
+
+      {/* CAR_TANIM */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "10px" }}>
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Firma Tanımı:</Text>
+        <Controller
+          name="carTanim"
+          control={control}
+          rules={{ required: "Alan Boş Bırakılamaz!" }}
+          render={({ field, fieldState: { error } }) => (
+            <div style={{ display: "flex", flexDirection: "column", gap: "5px", maxWidth: "300px", width: "100%" }}>
+              <Input {...field} status={error ? "error" : ""} />
+              {error && <div style={{ color: "red" }}>{error.message}</div>}
+            </div>
+          )}
+        />
+      </div>
+
+      {/* CAR_ADRES */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "10px" }}>
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Adres:</Text>
+        <Controller
+          name="carAdres"
+          control={control}
+          render={({ field }) => <Input {...field} style={{ maxWidth: "300px", width: "100%" }} />}
+        />
+      </div>
+
+      {/* CAR_SEHIR */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "10px" }}>
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Şehir:</Text>
+        <Controller
+          name="carSehir"
+          control={control}
+          render={({ field }) => <Input {...field} style={{ maxWidth: "300px", width: "100%" }} />}
+        />
+      </div>
+
+      {/* CAR_ILCE */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "10px" }}>
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>İlçe:</Text>
+        <Controller
+          name="carIlce"
+          control={control}
+          render={({ field }) => <Input {...field} style={{ maxWidth: "300px", width: "100%" }} />}
+        />
+      </div>
+
+      {/* CAR_TEL1 */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "10px" }}>
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Telefon:</Text>
+        <Controller
+          name="carTel1"
+          control={control}
+          render={({ field }) => <Input {...field} style={{ maxWidth: "300px", width: "100%" }} />}
+        />
+      </div>
+
+      {/* CAR_EMAIL */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "10px" }}>
+        <Text style={{ fontSize: "14px", fontWeight: "600" }}>Email:</Text>
+        <Controller
+          name="carEmail"
+          control={control}
+          render={({ field }) => <Input {...field} style={{ maxWidth: "300px", width: "100%" }} />}
+        />
       </div>
     </div>
-  );
+
+    {/* Sağ Kolon - Boolean alanlar */}
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+        width: "100%",
+        maxWidth: "450px",
+      }}
+    >
+      {[
+        { label: "Tedarikçi", name: "carTedarikci" },
+        { label: "Müşteri", name: "carMusteri" },
+        { label: "Nakliyeci", name: "carNakliyeci" },
+        { label: "Servis", name: "carServis" },
+        { label: "Şube", name: "carSube" },
+        { label: "Diğer", name: "carDiger" },
+      ].map((item) => (
+        <Controller
+          key={item.name}
+          name={item.name}
+          control={control}
+          render={({ field }) => (
+            <Checkbox
+              checked={field.value}
+              onChange={(e) => field.onChange(e.target.checked)}
+            >
+              {item.label}
+            </Checkbox>
+          )}
+        />
+      ))}
+    </div>
+  </div>
+);
 }
