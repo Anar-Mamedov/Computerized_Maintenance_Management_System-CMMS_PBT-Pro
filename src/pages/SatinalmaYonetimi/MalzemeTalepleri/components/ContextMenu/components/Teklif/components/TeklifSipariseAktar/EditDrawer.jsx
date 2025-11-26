@@ -197,7 +197,6 @@ export default function EditModal({ teklifId, open, onCloseModal, fisId }) {
       indirimTutar: Number(item.indirimTutar) || 0,
       kdvDahil: item.kdvDahil === true ? "D" : item.kdvDahil === false ? "H" : "",
       araToplam: Number(item.araToplam) || 0,
-      araToplam: Number(item.araToplam) || 0,
       toplam: Number(item.toplam) || 0,
       anaBirimMiktar: Number(item.anaBirimMiktar) || 0,
       fisGridKonum: Number(item.fisGridKonum) || 0,

@@ -604,17 +604,26 @@ const handleFinishEditing = async (id) => {
     }}
   >
     <TeklifKarsilastirma
-    onClose={handleCloseDrawer}
-    teklifIds={teklifPaketleri.map(t => t.teklifId)}
-    teklifDurumlari={teklifPaketleri.map(t => ({
-      teklifId: t.teklifId,
-      durumID: t.durumID || null,
-    }))}
-    fisNo={fisNo}
-    fisId={fisId}
-    open={drawerVisible}
-    disabled={disabled}
-  />
+  onClose={handleCloseDrawer}
+  teklifIds={teklifPaketleri.map(t => t.teklifId)}
+  teklifDurumlari={teklifPaketleri.map(t => ({
+    teklifId: t.teklifId,
+    durumID: t.durumID || null,
+  }))}
+  fisNo={fisNo}
+  fisId={fisId}
+  open={drawerVisible}
+  disabled={disabled}
+  onDurumGuncelle={(updatedTeklif) => {
+    setTeklifPaketleri(prev =>
+      prev.map(t =>
+        t.teklifId === updatedTeklif.teklifId
+          ? { ...t, durumID: updatedTeklif.durumID }
+          : t
+      )
+    );
+  }}
+/>
   </Drawer>
   </div>
 );
