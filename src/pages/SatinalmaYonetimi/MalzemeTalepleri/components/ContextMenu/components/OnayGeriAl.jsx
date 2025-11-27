@@ -1,92 +1,71 @@
-import React, { useEffect } from "react";
+import React from "react";
 import AxiosInstance from "../../../../../../api/http";
-import { Button, message, Popconfirm } from "antd";
-import { DeleteOutlined, QuestionCircleOutlined } from "@ant-design/icons";
-import { BsSendCheck } from "react-icons/bs";
+import { message, Popconfirm } from "antd";
+import { UndoOutlined, QuestionCircleOutlined } from "@ant-design/icons"; // UndoOutlined eklendi
 
-export default function Sil({ selectedRows, refreshTableData, disabled, hidePopover }) {
-  // selectedRows.forEach((row, index) => {
-  //   console.log(`Satır ${index + 1} ID: ${row.key}`);
-  //   // Eğer id değerleri farklı bir özellikte tutuluyorsa, row.key yerine o özelliği kullanın. Örneğin: row.id
-  // });
-
-  // Sil düğmesini gizlemek için koşullu stil
+export default function OnayiGeriAl({ selectedRows, refreshTableData, disabled, hidePopover }) {
   const buttonStyle = disabled ? { display: "none" } : {};
 
-  // Silme işlemini tetikleyecek fonksiyon
   const handleDelete = async () => {
     let isError = false;
-    // Seçili satırlar üzerinde döngü yaparak her birini sil
     for (const row of selectedRows) {
       try {
-        const fisId = row.key || row.ONAY_TABLO_ID || 0; // Satırdan fisId al
-        // Silme API isteğini gönder
+        const fisId = row.key || row.ONAY_TABLO_ID || 0;
         const response = await AxiosInstance.post(`OnayGeriAlBy?fisId=${fisId}`);
-        console.log("Silme işlemi başarılı:", response);
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("İşlem Başarılı.");
         } else if (response.status_code === 401) {
-          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+          message.error("Yetkiniz yok.");
         } else {
           message.error("İşlem Başarısız.");
         }
-        // Burada başarılı silme işlemi sonrası yapılacak işlemler bulunabilir.
       } catch (error) {
-        console.error("Silme işlemi sırasında hata oluştu:", error);
+        console.error("Hata:", error);
       }
     }
-    // Tüm silme işlemleri tamamlandıktan sonra ve hata oluşmamışsa refreshTableData'i çağır
     if (!isError) {
       refreshTableData();
-      hidePopover(); // Silme işlemi başarılı olursa Popover'ı kapat
+      hidePopover();
     }
   };
 
-  // const handleDelete = async () => {
-  //   let isError = false;
-  //   // Local storage'dan userId değerini al
-  //   const user = JSON.parse(localStorage.getItem("user"));
-  //   // Seçili satırlar üzerinde döngü yaparak her birini sil
-  //   for (const row of selectedRows) {
-  //     try {
-  //       // Silme API isteğini gönder
-  //       const response = await AxiosInstance.post(`IsEmriDelete`, {
-  //         ID: row.key,
-  //         // KulID: user.userId,
-  //       });
-  //       console.log("Silme işlemi başarılı:", response);
-  //       // Burada başarılı silme işlemi sonrası yapılacak işlemler bulunabilir.
-  //     } catch (error) {
-  //       console.error("Silme işlemi sırasında hata oluştu:", error);
-  //     }
-  //   }
-  //   // Tüm silme işlemleri tamamlandıktan sonra ve hata oluşmamışsa refreshTableData'i çağır
-  //   if (!isError) {
-  //     refreshTableData();
-  //     hidePopover(); // Silme işlemi başarılı olursa Popover'ı kapat
-  //   }
-  // };
-
   return (
-    <div style={buttonStyle}>
-      <Popconfirm
-        title="Onayı Geri Al"
-        description="Onaya gönderme işlemini geri almak emin misiniz?"
-        onConfirm={handleDelete}
-        okText="Evet"
-        cancelText="Hayır"
-        icon={
-          <QuestionCircleOutlined
-            style={{
-              color: "red",
-            }}
-          />
-        }
+    <Popconfirm
+      title="Onayı Geri Al"
+      description="Onaya gönderme işlemini geri almak emin misiniz?"
+      onConfirm={handleDelete}
+      okText="Evet"
+      cancelText="Hayır"
+      icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+    >
+      <div
+        className="menu-item-hover"
+        style={{
+          ...buttonStyle,
+          display: disabled ? 'none' : 'flex',
+          alignItems: 'flex-start',
+          gap: '12px',
+          cursor: 'pointer',
+          padding: '10px 12px',
+          transition: 'background-color 0.3s',
+          width: '100%'
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
       >
-        <Button style={{ paddingLeft: "0px", display: "flex", alignItems: "center", color: "red" }} type="link" icon={<BsSendCheck />}>
-          Onayı Geri Al
-        </Button>
-      </Popconfirm>
-    </div>
+        <div>
+           {/* Görseldeki turuncu renk */}
+          <UndoOutlined style={{ color: '#d46b08', fontSize: '18px', marginTop: '4px' }} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <span style={{ fontWeight: '500', color: '#262626', fontSize: '14px', lineHeight: '1.2' }}>
+            Onayı Geri Al
+          </span>
+          <span style={{ fontSize: '12px', color: '#8c8c8c', marginTop: '4px', lineHeight: '1.4' }}>
+            Verilen onayı geri alır, talebi önceki duruma çeker.
+          </span>
+        </div>
+      </div>
+    </Popconfirm>
   );
 }

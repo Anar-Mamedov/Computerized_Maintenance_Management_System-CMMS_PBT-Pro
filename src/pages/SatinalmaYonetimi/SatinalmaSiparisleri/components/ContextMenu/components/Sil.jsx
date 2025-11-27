@@ -1,6 +1,6 @@
 import React from "react";
 import AxiosInstance from "../../../../../../api/http";
-import { Button, message, Popconfirm } from "antd";
+import { message, Popconfirm } from "antd";
 import { DeleteOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 
 export default function Sil({ selectedRows, refreshTableData, disabled, hidePopover }) {
@@ -11,13 +11,9 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
 
     for (const row of selectedRows) {
       try {
-        // row.key → fisID, row.fisDurumID → durum ID
         const response = await AxiosInstance.post(
           `DeleteSatinalmaSiparis?siparisId=${row.key}`
         );
-
-        console.log("Silme işlemi sonucu:", response);
-
         if (response.status_code === 200) {
           message.success(response.message || "İşlem başarılı.");
         } else {
@@ -26,7 +22,7 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
         }
       } catch (error) {
         isError = true;
-        console.error("Silme işlemi sırasında hata oluştu:", error);
+        console.error("Hata:", error);
         message.error("Sunucu hatası.");
       }
     }
@@ -38,19 +34,41 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
   };
 
   return (
-    <div style={buttonStyle}>
-      <Popconfirm
-        title="Silme İşlemi"
-        description="Bu öğeyi silmek istediğinize emin misiniz?"
-        onConfirm={handleDelete}
-        okText="Evet"
-        cancelText="Hayır"
-        icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+    <Popconfirm
+      title="Silme İşlemi"
+      description="Bu öğeyi silmek istediğinize emin misiniz?"
+      onConfirm={handleDelete}
+      okText="Evet"
+      cancelText="Hayır"
+      icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+    >
+      <div
+        className="menu-item-hover"
+        style={{
+          ...buttonStyle,
+          display: disabled ? 'none' : 'flex',
+          alignItems: 'flex-start',
+          gap: '12px',
+          cursor: 'pointer',
+          padding: '10px 12px',
+          transition: 'background-color 0.3s',
+          width: '100%'
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
       >
-        <Button style={{ paddingLeft: "0px" }} type="link" danger icon={<DeleteOutlined />}>
-          Sil
-        </Button>
-      </Popconfirm>
-    </div>
+        <div>
+          <DeleteOutlined style={{ color: '#cf1322', fontSize: '18px', marginTop: '4px' }} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <span style={{ fontWeight: '500', color: '#262626', fontSize: '14px', lineHeight: '1.2' }}>
+            Sil
+          </span>
+          <span style={{ fontSize: '12px', color: '#8c8c8c', marginTop: '4px', lineHeight: '1.4' }}>
+            Sipariş kaydını kalıcı olarak siler. Geri alınamaz.
+          </span>
+        </div>
+      </div>
+    </Popconfirm>
   );
 }

@@ -247,6 +247,24 @@ const MainTable = () => {
       title: "Firma Ünvanı",
       dataIndex: "CAR_TANIM",
       key: "CAR_TANIM",
+      width: 450,
+      ellipsis: true,
+      visible: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      sorter: (a, b) => {
+        if (a.CAR_TANIM == null || a.CAR_TANIM === "") return 1;
+        if (b.CAR_TANIM == null || b.CAR_TANIM === "") return -1;
+        return a.CAR_TANIM.toString().localeCompare(b.CAR_TANIM.toString());
+      },
+    },
+    {
+      title: "Firma Tipi",
+      dataIndex: "",
+      key: "",
       width: 150,
       ellipsis: true,
       visible: true,
@@ -267,7 +285,7 @@ const MainTable = () => {
       key: "CAR_ADRES",
       width: 150,
       ellipsis: true,
-      visible: true,
+      visible: false,
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -340,7 +358,7 @@ const MainTable = () => {
       key: "CAR_EMAIL",
       width: 150,
       ellipsis: true,
-      visible: true,
+      visible: false,
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -358,7 +376,7 @@ const MainTable = () => {
       key: "CAR_VERGI_DAIRE",
       width: 150,
       ellipsis: true,
-      visible: true,
+      visible: false,
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -376,7 +394,7 @@ const MainTable = () => {
       key: "CAR_VERGI_NO",
       width: 150,
       ellipsis: true,
-      visible: true,
+      visible: false,
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();

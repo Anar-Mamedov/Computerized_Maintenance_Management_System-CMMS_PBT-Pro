@@ -304,6 +304,21 @@ const MainTable = () => {
       },
     },
     {
+      title: "Tarih",
+      dataIndex: "SSP_SIPARIS_TARIHI",
+      key: "SSP_SIPARIS_TARIHI",
+      width: 150,
+      ellipsis: true,
+      sorter: (a, b) => {
+        if (a.SSP_SIPARIS_TARIHI === null) return -1;
+        if (b.SSP_SIPARIS_TARIHI === null) return 1;
+        return a.SSP_SIPARIS_TARIHI.localeCompare(b.SSP_SIPARIS_TARIHI);
+      },
+
+      visible: true, // Varsayılan olarak açık
+      render: (text) => formatDate(text),
+    },
+    {
       title: "Başlık",
       dataIndex: "SSP_BASLIK",
       key: "SSP_BASLIK",
@@ -319,41 +334,12 @@ const MainTable = () => {
       },
     },
     {
-      title: "Sipariş Tarihi",
-      dataIndex: "SSP_SIPARIS_TARIHI",
-      key: "SSP_SIPARIS_TARIHI",
-      width: 150,
-      ellipsis: true,
-      sorter: (a, b) => {
-        if (a.SSP_SIPARIS_TARIHI === null) return -1;
-        if (b.SSP_SIPARIS_TARIHI === null) return 1;
-        return a.SSP_SIPARIS_TARIHI.localeCompare(b.SSP_SIPARIS_TARIHI);
-      },
-
-      visible: true, // Varsayılan olarak açık
-      render: (text) => formatDate(text),
-    },
-    {
-      title: "Teslim Tarihi",
-      dataIndex: "SSP_TESLIM_TARIHI",
-      key: "SSP_TESLIM_TARIHI",
-      width: 150,
-      ellipsis: true,
-      sorter: (a, b) => {
-        if (a.SSP_TESLIM_TARIHI === null) return -1;
-        if (b.SSP_TESLIM_TARIHI === null) return 1;
-        return a.SSP_TESLIM_TARIHI.localeCompare(b.SSP_TESLIM_TARIHI);
-      },
-
-      visible: true, // Varsayılan olarak açık
-      render: (text) => formatDate(text),
-    },
-    {
   title: "Durum",
   dataIndex: "SSP_DURUM",
   key: "SSP_DURUM",
   width: 150,
   ellipsis: true,
+  visible: true,
   render: (text) => {
     let style = {
       borderRadius: "12px",
@@ -404,7 +390,7 @@ const MainTable = () => {
       width: 200,
       ellipsis: true,
 
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
       sorter: (a, b) => {
         if (a.SSP_LOKASYON === null && b.SSP_LOKASYON === null) return 0;
         if (a.SSP_LOKASYON === null) return 1;
@@ -419,7 +405,7 @@ const MainTable = () => {
       width: 150,
       ellipsis: true,
 
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
       sorter: (a, b) => {
         if (a.SSP_SIPARIS_VEREN === null) return -1;
         if (b.SSP_SIPARIS_VEREN === null) return 1;
@@ -442,6 +428,21 @@ const MainTable = () => {
       visible: true, // Varsayılan olarak açık
     },
     {
+      title: "Teslim Tarihi",
+      dataIndex: "SSP_TESLIM_TARIHI",
+      key: "SSP_TESLIM_TARIHI",
+      width: 150,
+      ellipsis: true,
+      sorter: (a, b) => {
+        if (a.SSP_TESLIM_TARIHI === null) return -1;
+        if (b.SSP_TESLIM_TARIHI === null) return 1;
+        return a.SSP_TESLIM_TARIHI.localeCompare(b.SSP_TESLIM_TARIHI);
+      },
+
+      visible: true, // Varsayılan olarak açık
+      render: (text) => formatDate(text),
+    },
+    {
       title: "Ödeme Şekli",
       dataIndex: "SSP_ODEME_SEKLI",
       key: "SSP_ODEME_SEKLI",
@@ -454,7 +455,7 @@ const MainTable = () => {
       },
       ellipsis: true,
 
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
     },
     {
       title: "Teslim Yeri",
@@ -484,7 +485,7 @@ const MainTable = () => {
       },
       ellipsis: true,
 
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
     },
     {
       title: "Proje",
@@ -499,7 +500,7 @@ const MainTable = () => {
       },
       ellipsis: true,
 
-      visible: true, // Varsayılan olarak kapalı
+      visible: false, // Varsayılan olarak kapalı
     },
     {
       title: "Masraf Merkezi",
@@ -514,7 +515,7 @@ const MainTable = () => {
       },
       ellipsis: true,
 
-      visible: true, // Varsayılan olarak kapalı
+      visible: false, // Varsayılan olarak kapalı
     },
     {
       title: "Öncelik",
@@ -529,7 +530,7 @@ const MainTable = () => {
       },
       ellipsis: true,
 
-      visible: true, // Varsayılan olarak kapalı
+      visible: false, // Varsayılan olarak kapalı
     },
     {
         title: t("kdvToplam"),
@@ -537,7 +538,7 @@ const MainTable = () => {
         key: "SSP_KDV_TOPLAM",
         width: 120,
         ellipsis: true,
-        visible: true,
+        visible: false,
         render: (text, record) => (
         <div className="">
           <span>{Number(text).toFixed(Number(record?.tutarFormat))} </span>
@@ -555,7 +556,7 @@ const MainTable = () => {
       key: "SSP_ARA_TOPLAM",
       width: 120,
       ellipsis: true,
-      visible: true,
+      visible: false,
       render: (text, record) => (
         <div className="">
           <span>{Number(text).toFixed(Number(record?.tutarFormat))} </span>
@@ -573,7 +574,7 @@ const MainTable = () => {
       key: "SSP_YUVARLAMA_TOPLAMI",
       width: 120,
       ellipsis: true,
-      visible: true,
+      visible: false,
       render: (text, record) => (
         <div className="">
           <span>{Number(text).toFixed(Number(record?.tutarFormat))} </span>
@@ -1438,7 +1439,7 @@ const MainTable = () => {
             showQuickJumper: true,
           }}
           // onRow={onRowClick}
-          scroll={{ y: "calc(100vh - 370px)" }}
+          scroll={{ y: "calc(100vh - 450px)" }}
           onChange={handleTableChange}
           rowClassName={(record) => (record.SFS_TALEP_DURUM_ID === 0 ? "boldRow" : "")}
         />

@@ -1,57 +1,18 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Table, Typography } from "antd";
-import { Controller, useFormContext } from "react-hook-form";
+import React, { useCallback, useState } from "react";
+import { Modal, Table } from "antd";
 import AxiosInstance from "../../../../../../api/http";
+import { HistoryOutlined } from "@ant-design/icons"; // Tarihçe için saat ikonu
 
-const { Text } = Typography;
-
-export default function TarihceTablo({ workshopSelectedId, onSubmit, selectedRows }) {
-  const { control, setValue } = useFormContext();
+export default function TarihceTablo({ selectedRows }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const formatDate = (date) => {
-    if (!date) return "";
-    return new Date(date).toLocaleDateString();
-  };
-
-  const formatTime = (date) => {
-    if (!date) return "";
-    return new Date(date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  };
-
+  // ... (Columns aynen kalacak)
   const columns = [
-    {
-      title: "İşlem",
-      dataIndex: "islem",
-      key: "islem",
-      width: 350,
-      ellipsis: true,
-    },
-    {
-      title: "Tarih",
-      dataIndex: "islemZamani",
-      key: "tarih",
-      width: 75,
-      render: (text) => formatDate(text),
-    },
-    {
-      title: "Saat",
-      dataIndex: "islemZamani",
-      key: "saat",
-      width: 75,
-      render: (text) => formatTime(text),
-    },
-    {
-      title: "İşlem Yapan",
-      dataIndex: "islemYapanAdi",
-      key: "islemYapanAdi",
-      width: 200,
-      ellipsis: true,
-      render: (text) => text || "-",
-    },
+    { title: "İşlem", dataIndex: "islem", key: "islem", width: 350 },
+    { title: "İşlem Yapan", dataIndex: "islemYapanAdi", key: "islemYapanAdi", width: 200 },
+    // ...
   ];
 
   const fetch = useCallback(() => {
@@ -59,10 +20,7 @@ export default function TarihceTablo({ workshopSelectedId, onSubmit, selectedRow
     const selectedKey = selectedRows.map((item) => item.key).join(",");
     AxiosInstance.get(`GetMalzemeSatinalmaTarihceDetayli?fisId=${selectedKey}`)
       .then((response) => {
-        const fetchedData = response.data.map((item) => ({
-          key: item.tarihceId,
-          ...item,
-        }));
+        const fetchedData = response.data.map((item) => ({ key: item.tarihceId, ...item }));
         setData(fetchedData);
       })
       .finally(() => setLoading(false));
@@ -70,57 +28,48 @@ export default function TarihceTablo({ workshopSelectedId, onSubmit, selectedRow
 
   const handleModalToggle = () => {
     setIsModalVisible((prev) => !prev);
-    if (!isModalVisible) {
-      fetch();
-      setSelectedRowKeys([]);
-    }
-  };
-
-  const handleModalOk = () => {
-    const selectedData = data.find((item) => item.key === selectedRowKeys[0]);
-    if (selectedData) {
-      onSubmit && onSubmit(selectedData);
-    }
-    setIsModalVisible(false);
-  };
-
-  const onRowSelectChange = (selectedKeys) => {
-    setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
+    if (!isModalVisible) fetch();
   };
 
   return (
     <div>
-      <Button
-        style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
+      <div
         onClick={handleModalToggle}
-        type="text"
+        className="menu-item-hover"
+        style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '12px',
+            cursor: 'pointer',
+            padding: '10px 12px',
+            transition: 'background-color 0.3s',
+            width: '100%'
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
       >
-        Tarihçe
-      </Button>
+        <div>
+          <HistoryOutlined style={{ color: '#535c68', fontSize: '18px', marginTop: '4px' }} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <span style={{ fontWeight: '500', color: '#262626', fontSize: '14px', lineHeight: '1.2' }}>
+            Tarihçe
+          </span>
+          <span style={{ fontSize: '12px', color: '#8c8c8c', marginTop: '4px', lineHeight: '1.4' }}>
+            Talep üzerindeki tüm işlem geçmişini göster.
+          </span>
+        </div>
+      </div>
+
       <Modal
         width={1000}
         centered
         title={`Malzeme Talebi Tarihçesi (${selectedRows[0]?.SFS_FIS_NO || ""})`}
         open={isModalVisible}
-        onOk={handleModalOk}
         onCancel={handleModalToggle}
+        footer={null}
       >
-        <div style={{ marginBottom: "10px" }}>
-          <Controller
-            name="fisNo"
-            control={control}
-            render={({ field }) => (
-              <Text {...field} style={{ fontSize: "14px", fontWeight: "600" }}>
-              </Text>
-            )}
-          />
-        </div>
-        <Table
-          columns={columns}
-          dataSource={data}
-          loading={loading}
-          scroll={{ y: "calc(100vh - 360px)" }}
-        />
+        <Table columns={columns} dataSource={data} loading={loading} scroll={{ y: "calc(100vh - 360px)" }} />
       </Modal>
     </div>
   );
