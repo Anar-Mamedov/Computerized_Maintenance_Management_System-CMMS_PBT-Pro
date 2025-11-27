@@ -287,7 +287,7 @@ export default function Dashboard() {
             dataSource={teslimAlinmamisSiparisler}
             columns={teslimColumns}
             rowKey={(r, i) => r.SiparisNo ?? i}
-            pagination={false}
+            pagination={{ pageSize: 5 }}
             locale={{ emptyText: "Kayıt bulunamadı" }}
             size="small"
           />
