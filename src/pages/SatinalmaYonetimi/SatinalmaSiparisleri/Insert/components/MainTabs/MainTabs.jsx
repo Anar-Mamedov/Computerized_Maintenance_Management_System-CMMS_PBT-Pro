@@ -663,7 +663,13 @@ export default function MainTabs({ modalOpen }) {
           name="talepDurumName"
           control={control}
           defaultValue="AÇIK"
-          render={({ field }) => <Input {...field} disabled value="AÇIK" style={{ flex: 1 }} />}
+          render={({ field }) => <Input {...field} disabled value="AÇIK"
+          style={{
+            flex: 1,
+            backgroundColor: "#e1f7d5",
+            color: "white",
+            border: "1px solid #e1f7d5"
+          }} />}
         />
       </div>
     </div>

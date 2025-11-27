@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { Button, Popover, Typography } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
-// Gerçek işlem yapan componentler
+
+// Componentler
 import Sil from "./components/Sil";
 import TarihceTablo from "./components/TarihceTablo";
 import Kapat from "./components/Kapat/Kapat";
 import Iptal from "./components/Iptal/Iptal";
-import Ac from "./components/Ac/Ac";
+import Ac from "./components/Ac/Ac"; // Yeniden Aç componenti
 import GirisFisleri from "../../../../Malzeme&DepoYonetimi/GirisFisleri/Insert/CreateDrawer";
 
 const { Text } = Typography;
@@ -14,10 +15,17 @@ const { Text } = Typography;
 export default function ContextMenu({ selectedRows, refreshTableData }) {
   const [visible, setVisible] = useState(false);
 
-  const hidePopover = () => setVisible(false);
+  const handleVisibleChange = (visible) => {
+    setVisible(visible);
+  };
+
+  const hidePopover = () => {
+    setVisible(false);
+  };
 
   const durumId = selectedRows.length === 1 ? selectedRows[0].SSP_DURUM_ID : null;
 
+  // Ortak props
   const commonProps = {
     selectedRows,
     refreshTableData,
@@ -25,56 +33,110 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
     fisNo: selectedRows.length === 1 ? selectedRows[0].SSP_SIPARIS_KODU : null,
   };
 
-  const renderButtonsByDurum = (id) => {
-    switch (id) {
-      case 1:
-      case 5:
-        return <Iptal {...commonProps} />; // İptal Et
-      case 6:
-      case 2:
-        return <Kapat {...commonProps} />; // Kapat
-      case 4:
-      case 3:
-        return <Ac {...commonProps} />; //Aç
-      default:
-        return null;
-    }
+  // --- STİLLER ---
+  
+  // Temel Başlık Stili (Çizgisiz)
+  const baseHeaderStyle = {
+    color: '#8c8c8c',
+    fontSize: '11px',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+    textAlign: 'right', 
+    padding: '8px 12px 4px 12px',
+  };
+
+  // Ara Başlıklar İçin Stil (Üstte Çizgi Var)
+  const separatorHeaderStyle = {
+    ...baseHeaderStyle,
+    borderTop: '1px solid #f0f0f0', 
+    marginTop: '4px', 
+    paddingTop: '8px'
+  };
+
+  const contentContainerStyle = {
+    width: '260px', 
+    padding: '0',
+    display: 'flex',
+    flexDirection: 'column'
+  };
+
+  // --- GRUP 1: SİPARİŞ İŞLEMLERİ ---
+  const renderSiparisIslemleri = () => {
+    return (
+      <>
+        <div style={baseHeaderStyle}>Sipariş İşlemleri</div>
+
+        {/* Duruma göre butonlar */}
+        {(durumId === 1 || durumId === 5) && <Iptal {...commonProps} />}
+        {(durumId === 6 || durumId === 2) && <Kapat {...commonProps} />}
+        {(durumId === 4 || durumId === 3) && <Ac {...commonProps} />}
+
+        {/* Giriş Fişleri (Eğer tek satır seçiliyse) */}
+        {selectedRows.length === 1 && (
+          <GirisFisleri 
+            selectedRows={selectedRows} 
+            numarator={true} 
+            siparisID={selectedRows[0].key} 
+            onRefresh={refreshTableData} 
+          />
+        )}
+
+        {/* Sil İşlemi */}
+        <Sil {...commonProps} />
+      </>
+    );
+  };
+
+  // --- GRUP 2: KAYIT VE TARİHÇE ---
+  const renderKayitVeTarihce = () => {
+    return (
+      <>
+        {/* Ayırıcı çizgi içeren stil */}
+        <div style={separatorHeaderStyle}>Kayıt ve Tarihçe</div>
+        
+        <TarihceTablo {...commonProps} />
+      </>
+    );
   };
 
   const content = (
-    <div>
-      {durumId && renderButtonsByDurum(durumId)}
-
-      {/* Sil ve Tarihçe her durumda gözükecek */}
-        <Sil {...commonProps} />
-      <div style={{ marginTop: 10 }}>
-        <TarihceTablo {...commonProps} />
-      </div>
-      {selectedRows.length === 1 && <GirisFisleri selectedRows={selectedRows} numarator={true} siparisID={selectedRows[0].key} onRefresh={refreshTableData} />}
+    <div style={contentContainerStyle}>
+      {selectedRows.length >= 1 ? (
+        <>
+          {renderSiparisIslemleri()}
+          {renderKayitVeTarihce()}
+        </>
+      ) : (
+        <div style={{ padding: '10px', color: '#999', textAlign: 'center' }}>Lütfen bir satır seçiniz.</div>
+      )}
     </div>
   );
 
   return (
     <Popover
-      placement="bottom"
+      placement="bottomRight"
       content={content}
       trigger="click"
       open={visible}
-      onOpenChange={setVisible}
+      arrow={false}
+      onOpenChange={handleVisibleChange}
+      overlayInnerStyle={{ padding: 0 }}
     >
       <Button
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0px 5px",
+          padding: "0px 10px",
           backgroundColor: "#2BC770",
           borderColor: "#2BC770",
           height: "32px",
+          minWidth: "60px"
         }}
       >
-        {selectedRows.length > 0 && (
-          <Text style={{ color: "white", marginLeft: "3px" }}>
+        {selectedRows.length >= 1 && (
+          <Text style={{ color: "white", marginRight: "8px", fontWeight: 600 }}>
             {selectedRows.length}
           </Text>
         )}

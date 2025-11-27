@@ -322,21 +322,6 @@ const MainTable = () => {
       },
     },
     {
-      title: "Başlık",
-      dataIndex: "SFS_BASLIK",
-      key: "SFS_BASLIK",
-      width: 200,
-      ellipsis: true,
-
-      visible: true, // Varsayılan olarak açık
-      sorter: (a, b) => {
-        if (a.SFS_BASLIK === null && b.SFS_BASLIK === null) return 0;
-        if (a.SFS_BASLIK === null) return 1;
-        if (b.SFS_BASLIK === null) return -1;
-        return a.SFS_BASLIK.localeCompare(b.SFS_BASLIK);
-      },
-    },
-    {
       title: "Tarih",
       dataIndex: "SFS_TARIH",
       key: "SFS_TARIH",
@@ -363,8 +348,23 @@ const MainTable = () => {
         return a.SFS_SAAT.localeCompare(b.SFS_SAAT);
       },
 
-      visible: true, // Varsayılan olarak açık
+      visible: false,
       render: (text) => formatTime(text),
+    },
+    {
+      title: "Başlık",
+      dataIndex: "SFS_BASLIK",
+      key: "SFS_BASLIK",
+      width: 200,
+      ellipsis: true,
+
+      visible: true, // Varsayılan olarak açık
+      sorter: (a, b) => {
+        if (a.SFS_BASLIK === null && b.SFS_BASLIK === null) return 0;
+        if (a.SFS_BASLIK === null) return 1;
+        if (b.SFS_BASLIK === null) return -1;
+        return a.SFS_BASLIK.localeCompare(b.SFS_BASLIK);
+      },
     },
     {
       title: "Durum",
@@ -372,6 +372,7 @@ const MainTable = () => {
       key: "SFS_DURUM",
       width: 150,
       ellipsis: true,
+      visible: true,
       render: (text) => {
         let style = {
           borderRadius: "12px",
@@ -419,21 +420,6 @@ const MainTable = () => {
       },
     },
     {
-      title: "Lokasyon",
-      dataIndex: "SFS_LOKASYON",
-      key: "SFS_LOKASYON",
-      width: 200,
-      ellipsis: true,
-
-      visible: true, // Varsayılan olarak açık
-      sorter: (a, b) => {
-        if (a.SFS_LOKASYON === null && b.SFS_LOKASYON === null) return 0;
-        if (a.SFS_LOKASYON === null) return 1;
-        if (b.SFS_LOKASYON === null) return -1;
-        return a.SFS_LOKASYON.localeCompare(b.SFS_LOKASYON);
-      },
-    },
-    {
       title: "Talep Eden",
       dataIndex: "SFS_TALEP_EDEN",
       key: "SFS_TALEP_EDEN",
@@ -476,6 +462,21 @@ const MainTable = () => {
       visible: true, // Varsayılan olarak açık
     },
     {
+      title: "Lokasyon",
+      dataIndex: "SFS_LOKASYON",
+      key: "SFS_LOKASYON",
+      width: 200,
+      ellipsis: true,
+
+      visible: true, // Varsayılan olarak açık
+      sorter: (a, b) => {
+        if (a.SFS_LOKASYON === null && b.SFS_LOKASYON === null) return 0;
+        if (a.SFS_LOKASYON === null) return 1;
+        if (b.SFS_LOKASYON === null) return -1;
+        return a.SFS_LOKASYON.localeCompare(b.SFS_LOKASYON);
+      },
+    },
+    {
       title: "Bölüm",
       dataIndex: "SFS_BOLUM",
       key: "SFS_BOLUM",
@@ -503,7 +504,7 @@ const MainTable = () => {
       },
       ellipsis: true,
 
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
     },
     {
       title: "Öncelik",
@@ -1402,7 +1403,7 @@ useEffect(() => {
             showQuickJumper: true,
           }}
           // onRow={onRowClick}
-          scroll={{ y: "calc(100vh - 370px)" }}
+          scroll={{ y: "calc(100vh - 450px)" }}
           onChange={handleTableChange}
           rowClassName={(record) => (record.SFS_TALEP_DURUM_ID === 0 ? "boldRow" : "")}
         />

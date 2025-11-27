@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Button, Modal, message } from "antd";
+import { Modal, message } from "antd";
 import Forms from "./components/Forms";
 import { useForm, FormProvider } from "react-hook-form";
 import AxiosInstance from "../../../../../../../api/http";
+import { CheckCircleOutlined } from "@ant-design/icons"; // İkon eklendi
 
-export default function Iptal({ selectedRows, refreshTableData, iptalDisabled }) {
+export default function Kapat({ selectedRows, refreshTableData, iptalDisabled }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const methods = useForm({
     defaultValues: {
@@ -14,12 +15,20 @@ export default function Iptal({ selectedRows, refreshTableData, iptalDisabled })
   });
   const { reset } = methods;
 
-  const buttonStyle = iptalDisabled ? { display: "none" } : {};
+  const containerStyle = {
+    display: iptalDisabled ? "none" : "flex",
+    alignItems: "flex-start",
+    gap: "12px",
+    cursor: "pointer",
+    padding: "10px 12px",
+    transition: "background-color 0.3s",
+    width: "100%",
+  };
 
   const onSubmited = (data) => {
     if (!selectedRows || selectedRows.length === 0) {
-    message.warning("Lütfen önce bir satır seçin.");
-    return;
+      message.warning("Lütfen önce bir satır seçin.");
+      return;
     }
     const Body = {
       siparisId: selectedRows[0].key,
@@ -35,23 +44,17 @@ export default function Iptal({ selectedRows, refreshTableData, iptalDisabled })
         refreshTableData();
 
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("İptal işlemi başarılı.");
+          message.success("İşlem başarılı.");
         } else if (response.status_code === 401) {
-          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+          message.error("Yetkiniz yok.");
         } else {
-          message.error("İptal işlemi başarısız.");
+          message.error("İşlem başarısız.");
         }
       })
       .catch((error) => {
-        console.error("Error sending data:", error);
-        if (navigator.onLine) {
-          message.error("Hata Mesajı: " + error.message);
-        } else {
-          message.error("Internet Bağlantısı Mevcut Değil.");
-        }
+        console.error("Error:", error);
+        message.error("Hata oluştu.");
       });
-
-    console.log({ Body });
   };
 
   const handleModalToggle = () => {
@@ -61,23 +64,36 @@ export default function Iptal({ selectedRows, refreshTableData, iptalDisabled })
 
   return (
     <FormProvider {...methods}>
-      <div style={buttonStyle}>
-        <Button style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
-          onClick={handleModalToggle}
-          type="text">
+      <div
+        className="menu-item-hover"
+        style={containerStyle}
+        onClick={handleModalToggle}
+        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f5f5f5")}
+        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+      >
+        <div>
+          <CheckCircleOutlined style={{ color: "#cf1322", fontSize: "18px", marginTop: "4px" }} />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <span style={{ fontWeight: "500", color: "#262626", fontSize: "14px", lineHeight: "1.2" }}>
             Kapat
-        </Button>
-        <Modal
-          title="Satınalma Siparişi Kapat"
-          open={isModalOpen}
-          onOk={methods.handleSubmit(onSubmited)}
-          onCancel={handleModalToggle}
-        >
-          <form onSubmit={methods.handleSubmit(onSubmited)}>
-            <Forms isModalOpen={isModalOpen} selectedRows={selectedRows} />
-          </form>
-        </Modal>
+          </span>
+          <span style={{ fontSize: "12px", color: "#8c8c8c", marginTop: "4px", lineHeight: "1.4" }}>
+            Sipariş sürecini sonlandırır ve kapatır.
+          </span>
+        </div>
       </div>
+
+      <Modal
+        title="Satınalma Siparişi Kapat"
+        open={isModalOpen}
+        onOk={methods.handleSubmit(onSubmited)}
+        onCancel={handleModalToggle}
+      >
+        <form onSubmit={methods.handleSubmit(onSubmited)}>
+          <Forms isModalOpen={isModalOpen} selectedRows={selectedRows} />
+        </form>
+      </Modal>
     </FormProvider>
   );
 }

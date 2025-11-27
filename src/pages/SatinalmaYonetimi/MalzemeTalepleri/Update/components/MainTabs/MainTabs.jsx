@@ -699,15 +699,44 @@ export default function MainTabs({ modalOpen, disabled }) {
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "300px" }}>
     <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", width: "100%", gap: "10px", flexDirection: "row" }}>
-      <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", minWidth: "80px" }}>{t("durum")}</Text>
-      <div style={{ display: "flex", flexFlow: "column wrap", alignItems: "flex-start", width: "100%", maxWidth: "210px" }}>
-        <Controller
-          name="talepDurumName"
-          control={control}
-          render={({ field }) => <Input {...field} disabled style={{ flex: 1 }} />}
-        />
-      </div>
-    </div>
+  <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", minWidth: "80px" }}>{t("durum")}</Text>
+  <div style={{ display: "flex", flexFlow: "column wrap", alignItems: "flex-start", width: "100%", maxWidth: "210px" }}>
+    <Controller
+      name="talepDurumName"
+      control={control}
+      render={({ field }) => {
+        // 1. Renk haritasını burada tanımlıyoruz
+        const statusColors = {
+          "ONAYLANDI": "#d4f8e8",
+          "ONAY BEKLİYOR": "#fff4d6",
+          "ONAYLANMADI": "#ffe0e0",
+          "SİPARİŞ": "#e6ecff",
+          "AÇIK": "#e1f7d5",
+          "TEKLİF": "#e0f7fa",
+          "KAPALI": "#eaeaeaff",
+          "İPTAL": "#fde2e4",
+          "KARŞILANIYOR": "#e6f7ff"
+        };
+
+        // 2. Gelen değere göre rengi seçiyoruz (yoksa varsayılan gri)
+        const activeColor = statusColors[field.value] || "#f5f5f5";
+
+        return (
+          <Input
+            {...field}
+            disabled
+            style={{
+              flex: 1,
+              backgroundColor: activeColor, // Listendeki arka plan rengi
+              color: "white",               // Senin istediğin gibi beyaz yazı
+              border: `1px solid ${activeColor}` // Kenarlık da aynı renk
+            }}
+          />
+        );
+      }}
+    />
+  </div>
+</div>
 
     <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", width: "100%", gap: "10px", flexDirection: "row" }}>
       <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", minWidth: "80px" }}>{t("Departman")}</Text>
