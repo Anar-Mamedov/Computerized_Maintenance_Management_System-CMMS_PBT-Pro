@@ -21,6 +21,7 @@ export default function TalepTeklifeAktarmaAntd({ fisId, baslik, fisNo, disabled
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
   const [malzemeSearch, setMalzemeSearch] = useState("");
   const [searchValue, setSearchValue] = useState("");
   const [leftWidth, setLeftWidth] = useState(50); // tablolar arası genişlik
@@ -35,7 +36,7 @@ export default function TalepTeklifeAktarmaAntd({ fisId, baslik, fisNo, disabled
     2: { text: "ONAYA GÖNDERİLDİ", backgroundColor: "#fff4d6", color: "#b8860b" },
     3: { text: "ONAYLANDI", backgroundColor: "#d4f8e8", color: "#207868" },
     4: { text: "REDDEDİLDİ", backgroundColor: "#fde2e4", color: "#c63b3b" }, 
-    5: { text: "SİPARİŞ ALINDI", backgroundColor: "#e6f7ff", color: "#096dd9" }
+    5: { text: "SİPARİŞ", backgroundColor: "#e6f7ff", color: "#096dd9" }
   };
 
   // sürükleme fonksiyonları
@@ -83,17 +84,17 @@ export default function TalepTeklifeAktarmaAntd({ fisId, baslik, fisNo, disabled
   useEffect(() => {
   if (!currentPage) setCurrentPage(1);
 
-  AxiosInstance.get(`GetFirmaList?pagingDeger=${currentPage}&search=${searchValue}`)
+  AxiosInstance.get(`GetTedarikciList?aktif=1&searchText=${searchValue}&pagingDeger=${currentPage}&pageSize=${pageSize}`)
     .then((res) => {
       // res.Firma_Liste array mi kontrol et
-      const list = Array.isArray(res.Firma_Liste) ? res.Firma_Liste : [];
+      const list = Array.isArray(res.data) ? res.data : [];
       setSuppliers(list);
     })
     .catch(() => {
       message.error("Tedarikçiler yüklenirken hata oluştu");
       setSuppliers([]);
     });
-}, [currentPage, searchValue]);
+}, [currentPage, searchValue, pageSize]);
 
   // --- Tablo kolonları
   const itemColumns = [
@@ -152,9 +153,9 @@ const supplierColumns = [
     ),
   },
   {
-    title: "Tip",
-    dataIndex: "CAR_TIP",
-    key: "CAR_TIP",
+    title: "Firma Kodu",
+    dataIndex: "CAR_KOD",
+    key: "CAR_KOD",
     ellipsis: true,
     render: (text) => (
       <Tooltip placement="topLeft" title={text}>

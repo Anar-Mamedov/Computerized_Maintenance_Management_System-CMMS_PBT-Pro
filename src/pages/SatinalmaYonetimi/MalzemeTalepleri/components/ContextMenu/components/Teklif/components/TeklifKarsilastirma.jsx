@@ -22,14 +22,14 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   const aktifPaketIndex = Number(activeTab) - 1;
   const aktifPaket = paketler[aktifPaketIndex] || {};
   const aktifPaketDurumID = teklifDurumlari?.find(d => d.teklifId === aktifPaket.id)?.durumID || null;
-  const isDisabled = !(aktifPaketDurumID === 1 || aktifPaketDurumID === 4 || aktifPaketDurumID === 3);
+  const isDisabled = !(aktifPaketDurumID === 1 || aktifPaketDurumID === 4);
   const [detayGosterilenPaket, setDetayGosterilenPaket] = useState(null);
   const DURUM_STYLES = {
     1: { text: "TEKLİFLER TOPLANIYOR", backgroundColor: "#e1f7d5", color: "#3c763d" },
     2: { text: "ONAYA GÖNDERİLDİ", backgroundColor: "#fff4d6", color: "#b8860b" },
     3: { text: "ONAYLANDI", backgroundColor: "#d4f8e8", color: "#207868" },
     4: { text: "REDDEDİLDİ", backgroundColor: "#fde2e4", color: "#c63b3b" },
-    5: { text: "SİPARİŞ ALINDI", backgroundColor: "#e6f7ff", color: "#096dd9" }
+    5: { text: "SİPARİŞ", backgroundColor: "#e6f7ff", color: "#096dd9" }
   };
   const [onayCheck, setOnayCheck] = useState({ ONY_AKTIF: 0, ONY_MANUEL: 0 });
   const showOnayaGonder = onayCheck && aktifPaketDurumID !== 3 && aktifPaketDurumID !== 2;
@@ -37,19 +37,25 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   const [selectedRow, setSelectedRow] = useState(null);
 
   // Paketler ilk yüklendiğinde renkleri ata
-  useEffect(() => {
+useEffect(() => {
   if (paketler.length === 0) return;
-
   if (Object.keys(paketRenkleri).length > 0) return;
 
   const renkler = {};
   paketler.forEach((paket, paketIndex) => {
     renkler[paketIndex] = {};
     (paket.firmaTotaller || []).forEach(firma => {
-      // Bir tık daha koyu pastel
-      const r = Math.floor(Math.random() * 15 + 230); // 230-245
-      const g = Math.floor(Math.random() * 15 + 230);
-      const b = Math.floor(Math.random() * 15 + 230);
+      
+      // MANTIK: 200 ile 230 arasında rastgele sayı üretiyoruz.
+      // 255 (Beyaz) sınırına yaklaşmadığımız için beyaz çıkmaz.
+      // 200'ün altına inmediğimiz için koyu çıkmaz.
+      const min = 205;
+      const max = 230;
+
+      const r = Math.floor(Math.random() * (max - min) + min);
+      const g = Math.floor(Math.random() * (max - min) + min);
+      const b = Math.floor(Math.random() * (max - min) + min);
+      
       renkler[paketIndex][firma.firmaId] = `rgb(${r}, ${g}, ${b})`;
     });
   });
@@ -408,21 +414,28 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                   onCell: () => ({ style: { backgroundColor: pastelColor } }),
                   render: (_, record) => {
                     const firmaData = record.firmalar.find(f => f.firmaId === firma.firmaId);
+                    const isSecili = firmaData?.secili;
+                    const isRenkliAmaKilitli = isDisabled && isSecili;
 
                     return (
                       <Select
-                        style={{ width: "90%" }}
-                        disabled={isDisabled}
+                        style={{ 
+                          width: "90%", 
+                          pointerEvents: isRenkliAmaKilitli ? 'none' : 'auto' 
+                        }} 
+                        disabled={isRenkliAmaKilitli ? false : isDisabled}
+                        open={isRenkliAmaKilitli ? false : undefined}
+                        showArrow={!isRenkliAmaKilitli}
                         value={firmaData?.secili ? "true" : "false"}
                         onChange={(val) =>
                           handleSecimChange(paketIndex, record.malzemeId, firma.firmaId, val)
                         }
                       >
                         <Select.Option value="true">
-                          <span style={{ color: "green" }}>✓</span>
+                          <span style={{ color: "green", fontWeight: "bold" }}>✓</span>
                         </Select.Option>
                         <Select.Option value="false">
-                          <span style={{ color: "red" }}>X</span>
+                          <span style={{ color: "red", fontWeight: "bold" }}>X</span>
                         </Select.Option>
                       </Select>
                     );
@@ -434,9 +447,26 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                   width: 100,
                   align: "center",
                   onCell: () => ({ style: { backgroundColor: pastelColor } }),
-                  render: (_, record) => (
-                    <Select value={record?.firmalar?.find(f => f.firmaId === firma.firmaId)?.marka || undefined} style={{ width: "90%" }} disabled={isDisabled} ></Select>
-                  ),
+                  render: (_, record) => {
+                    const f = record?.firmalar?.find(x => x.firmaId === firma.firmaId) || {};
+                    const isSelected = f.secili;
+                    const shouldBeDisabled = isDisabled && !isSelected;
+                    const isLockedMode = isDisabled; 
+
+                    return (
+                      <Select 
+                        value={f.marka || undefined} 
+                        style={{ 
+                          width: "90%",
+                          pointerEvents: isLockedMode ? 'none' : 'auto'
+                        }} 
+                        disabled={shouldBeDisabled}
+                        open={isLockedMode ? false : undefined}
+                        showArrow={!isLockedMode}
+                      >
+                      </Select>
+                    );
+                  },
                 },
                 {
                   title: "Miktar",
@@ -446,13 +476,17 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                   onCell: () => ({ style: { backgroundColor: pastelColor } }),
                   render: (_, record) => {
                     const f = record?.firmalar?.find(x => x.firmaId === firma.firmaId) || {};
+                    const isSelected = f.secili;
+                    const shouldBeDisabled = isDisabled && !isSelected;
+
                     return (
                       <InputNumber
                         min={0}
                         value={Number(f.miktar ?? 0)}
                         style={{ width: "90%" }}
+                        disabled={shouldBeDisabled}
+                        readOnly={isDisabled}
                         onChange={(val) => handleValueChange(paketIndex, record.malzemeId, firma.firmaId, "miktar", val)}
-                        disabled={isDisabled}
                       />
                     );
                   },
@@ -465,14 +499,17 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                   onCell: () => ({ style: { backgroundColor: pastelColor } }),
                   render: (_, record) => {
                     const f = record?.firmalar?.find(x => x.firmaId === firma.firmaId) || {};
+                    const isSelected = f.secili;
+                    const shouldBeDisabled = isDisabled && !isSelected;
+
                     return (
                       <InputNumber
                         min={0}
                         value={Number(f.fiyat ?? 0)}
                         style={{ width: "90%" }}
-                        // onChange verirsek anında günceller; istersen onBlur ile de yapabilirsin
+                        disabled={shouldBeDisabled}
+                        readOnly={isDisabled}
                         onChange={(val) => handleValueChange(paketIndex, record.malzemeId, firma.firmaId, "fiyat", val)}
-                        disabled={isDisabled}
                       />
                     );
                   },
@@ -674,6 +711,14 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
         onCloseModal={() => setSiparisModalOpen(false)}
         teklifId={selectedRow}
         fisId={fisId}
+        onSiparisGuncelle={(siparisData) => {
+    // Burada önceki ekrana güncelleme yapılacak
+    message.success("Sipariş başarıyla oluşturuldu!");
+    // Örneğin, aktif paketin durumunu 5 = Sipariş Alındı olarak güncelle
+    if (typeof onDurumGuncelle === "function") {
+      onDurumGuncelle({ teklifId: selectedRow, durumID: 5 });
+    }
+  }}
       />
     </Card>
   );

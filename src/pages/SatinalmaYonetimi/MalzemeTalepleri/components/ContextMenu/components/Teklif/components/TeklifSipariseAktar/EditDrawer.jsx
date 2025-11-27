@@ -8,7 +8,7 @@ import MainTabs from "./components/MainTabs/MainTabs.jsx";
 import SecondTabs from "./components/SecondTabs/SecondTabs.jsx";
 import { t } from "i18next";
 
-export default function EditModal({ teklifId, open, onCloseModal, fisId }) {
+export default function EditModal({ teklifId, open, onCloseModal, fisId, onSiparisGuncelle}) {
   const [loading, setLoading] = useState(false);
   const [siparisler, setSiparisler] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -213,32 +213,37 @@ export default function EditModal({ teklifId, open, onCloseModal, fisId }) {
   };
 
   AxiosInstance.post(`UpsertSatinalmaSiparis?TalepID=${fisId}`, payload)
-    .then((res) => {
-      const { status_code, message: apiMessage } = res?.data || res;
-      if ([200, 201, 202].includes(status_code)) {
-        message.success(apiMessage || "Kayıt Başarılı.");
+  .then((res) => {
+    const { status_code, message: apiMessage } = res?.data || res;
+    if ([200, 201, 202].includes(status_code)) {
+      message.success(apiMessage || "Kayıt Başarılı.");
+
+      const newSiparisId = data?.siparisId || 0;
 
       if (activeIndex < siparisler.length - 1) {
-      const nextIndex = activeIndex + 1;
-
+        const nextIndex = activeIndex + 1;
         setActiveIndex(nextIndex);
-        loadSiparisToForm(siparisler[nextIndex]); // Yeni siparişi forma yükle
-
-        return; // Modalı kapatma!
+        loadSiparisToForm(siparisler[nextIndex]);
+        return; // Modalı kapatma
       }
 
-        reset();
-        onCloseModal(); // Modal'ı kapatıyoruz
-      } else if (status_code === 401) {
-        message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
-      } else {
-        message.error(apiMessage || "Kayıt Başarısız.");
-      }
-    })
-    .catch((err) => {
-      console.error("Error:", err);
-      message.error("Hata: " + err.message);
-    });
+      // Modal kapatılmadan önce önceki ekranı güncelle
+      if (typeof onSiparisGuncelle === "function") {
+      onSiparisGuncelle({ teklifId, siparisId: newSiparisId });
+    }
+
+      reset();
+      onCloseModal(); // Modalı kapatıyoruz
+    } else if (status_code === 401) {
+      message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+    } else {
+      message.error(apiMessage || "Kayıt Başarısız.");
+    }
+  })
+  .catch((err) => {
+    console.error("Error:", err);
+    message.error("Hata: " + err.message);
+  });
 };
 
   const onClose = () => {
