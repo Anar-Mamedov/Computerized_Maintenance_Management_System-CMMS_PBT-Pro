@@ -649,15 +649,45 @@ export default function MainTabs({ modalOpen, disabled }) {
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "280px" }}>
     <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", width: "100%", gap: "10px", flexDirection: "row" }}>
-      <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", minWidth: "80px" }}>{t("durum")}</Text>
-      <div style={{ display: "flex", flexFlow: "column wrap", alignItems: "flex-start", width: "100%", maxWidth: "190px" }}>
-        <Controller
-          name="durumName"
-          control={control}
-          render={({ field }) => <Input {...field} disabled style={{ flex: 1 }} />}
-        />
-      </div>
-    </div>
+  <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", minWidth: "80px" }}>{t("durum")}</Text>
+  <div style={{ display: "flex", flexFlow: "column wrap", alignItems: "flex-start", width: "100%", maxWidth: "190px" }}>
+    <Controller
+      name="durumName"
+      control={control}
+      render={({ field }) => {
+        // Renk haritası (Senin attığın switch case'deki renkler)
+        const statusColors = {
+          "ONAYLANDI": "#d4f8e8",
+          "ONAY BEKLİYOR": "#fff4d6",
+          "ONAYLANMADI": "#ffe0e0",
+          "SİPARİŞ": "#e6ecff",
+          "AÇIK": "#e1f7d5",
+          "TEKLİF": "#e0f7fa",
+          "KAPALI": "#eaeaeaff",
+          "İPTAL": "#fde2e4",
+          "KARŞILANIYOR": "#e6f7ff"
+        };
+
+        // Eğer değer listede yoksa gri (#f5f5f5) olsun
+        const activeColor = statusColors[field.value] || "#f5f5f5";
+
+        return (
+          <Input
+            {...field}
+            disabled
+            style={{
+              flex: 1,
+              backgroundColor: activeColor, // Arka plan rengi
+              color: "white",               // Yazı rengi beyaz
+              border: `1px solid ${activeColor}`, // Çerçeve rengi
+              opacity: 1                    // Disabled olduğu için soluklaşmasını engeller
+            }}
+          />
+        );
+      }}
+    />
+  </div>
+</div>
 
     <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", width: "100%", gap: "10px", flexDirection: "row" }}>
       <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row", minWidth: "80px" }}>{t("Öncelik")}</Text>

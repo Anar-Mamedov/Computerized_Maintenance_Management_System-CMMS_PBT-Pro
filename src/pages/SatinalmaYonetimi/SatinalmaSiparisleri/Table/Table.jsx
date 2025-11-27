@@ -144,7 +144,10 @@ const MainTable = () => {
       { title: "Onay Bekleyen Siparişler", value: cardsData.ONAY_BEKLEYEN_SAYISI },
       { title: "Geciken Siparişler", value: cardsData.GECIKEN_SAYISI },
       { title: "Bugün Teslim Siparişler", value: cardsData.BUGUN_TESLIM_SAYISI },
-      { title: "Toplam Açık Sipariş Tutarı", value: cardsData.TOPLAM_ACIK_TUTAR },
+      { title: "Toplam Açık Sipariş Tutarı", 
+        value: Number(cardsData.TOPLAM_ACIK_TUTAR).toLocaleString("tr-TR", 
+        { minimumFractionDigits: 2, maximumFractionDigits: 2 }) 
+      },
     ];
   }, [cardsData]);
 
