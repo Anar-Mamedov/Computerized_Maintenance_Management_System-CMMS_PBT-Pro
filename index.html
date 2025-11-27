@@ -5,7 +5,18 @@
     <link rel="icon" type="image/svg+xml" href="/src/assets/images/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/src/index.css" />
-    <title>PBT Pro</title>
+    <title>Yükleniyor...</title>
+    <script>
+      // Domain'e göre title'ı hemen ayarla
+      (function() {
+        const hostname = window.location.hostname;
+        if (hostname === "omegaerp.net" || hostname === "www.omegaerp.net") {
+          document.title = "Omega";
+        } else {
+          document.title = "PBT Pro";
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -75,14 +75,6 @@ const Main = React.memo(function Main() {
     }
   }, [isDevToolsOpen]);
 
-  // Domain'e göre title'ı değiştir
-  useEffect(() => {
-    const hostname = window.location.hostname;
-    if (hostname === "omegaerp.net" || hostname === "www.omegaerp.net") {
-      document.title = "Omega";
-    }
-  }, []);
-
   // Ant Design locale objesini belirleme
   const antdLocale = antdLocales[language] || enUS; // Desteklenmeyen diller için varsayılan olarak enUS
 
