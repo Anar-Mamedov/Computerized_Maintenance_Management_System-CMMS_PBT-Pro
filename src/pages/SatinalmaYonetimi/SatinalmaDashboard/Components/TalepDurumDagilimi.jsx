@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   PieChart,
   Pie,
@@ -25,11 +25,45 @@ const COLORS = [
 const TalepDurumDagilimi = ({ talepDurumlari = [] }) => {
   const [open, setOpen] = useState(false);
 
+  const defaultHidden = ["Kapanmış Talepler"];
+
+  const [activeKeys, setActiveKeys] = useState([]);
+
+  useEffect(() => {
+  if (talepDurumlari.length > 0) {
+    setActiveKeys(
+      talepDurumlari
+        .filter((d) => !defaultHidden.includes(d.Durum))
+        .map((d) => d.Durum)
+    );
+  }
+}, [talepDurumlari]);
+
+  const toggleLegend = (data) => {
+    const { value } = data;
+
+    // "Tümü" seçeneği tıklanırsa tüm dilimleri göster
+    if (value === "Tümü") {
+      setActiveKeys(talepDurumlari.map((d) => d.Durum));
+      return;
+    }
+
+    if (activeKeys.includes(value)) {
+      setActiveKeys(activeKeys.filter((key) => key !== value));
+    } else {
+      setActiveKeys([...activeKeys, value]);
+    }
+  };
+
   // Toplam adet sayısı
   const total = talepDurumlari.reduce((sum, item) => sum + (item.Adet || 0), 0);
 
   // İşlem yapılmadan direkt veriyi kullanıyoruz
-  const processedData = talepDurumlari;
+  const processedData = talepDurumlari.filter((d) =>
+    activeKeys.includes(d.Durum)
+  );
+
+  const legendData = [{ Durum: "Tümü" }, ...talepDurumlari];
 
   return (
     <>
@@ -44,7 +78,23 @@ const TalepDurumDagilimi = ({ talepDurumlari = [] }) => {
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <ReTooltip formatter={(value, name) => [`${value} Adet`, name]} />
-            <Legend verticalAlign="bottom" height={36} />
+            <Legend
+              verticalAlign="bottom"
+              height={36}
+              payload={legendData.map((item) => ({
+                id: item.Durum,
+                value: item.Durum,
+                type: "square",
+                color:
+                  item.Durum === "Tümü"
+                    ? "#888888"
+                    : COLORS[
+                        talepDurumlari.findIndex((d) => d.Durum === item.Durum) %
+                          COLORS.length
+                      ],
+              }))}
+              onClick={toggleLegend}
+            />
             <Pie
               data={processedData}
               dataKey="Adet"
@@ -68,39 +118,60 @@ const TalepDurumDagilimi = ({ talepDurumlari = [] }) => {
 
       {/* Modal içindeki büyük versiyon */}
       <Modal
-  title="Malzeme Talepleri Durum Dağılımı (Detaylı Görünüm)"
-  open={open}
-  onCancel={() => setOpen(false)}
-  footer={null}
-  width={800}
->
-  <div style={{ width: "100%", height: 500 }}>
-    <ResponsiveContainer width="100%" height="100%">
-      <PieChart>
-        <ReTooltip formatter={(value, name) => [`${value} Adet`, name]} />
-        {/* Legend altta olacak şekilde ayarlandı */}
-        <Legend verticalAlign="bottom" align="center" layout="horizontal" height={36} />
-        <Pie
-          data={processedData}
-          dataKey="Adet"
-          nameKey="Durum"
-          cx="50%"
-          cy="50%"
-          outerRadius={150}
-          innerRadius={30}
-          labelLine={true}
-          label={({ name, percent }) =>
-            `${name} ${(percent * 100).toFixed(1)}%`
-          }
-        >
-          {processedData.map((entry, idx) => (
-            <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
-          ))}
-        </Pie>
-      </PieChart>
-    </ResponsiveContainer>
-  </div>
-</Modal>
+        title="Malzeme Talepleri Durum Dağılımı (Detaylı Görünüm)"
+        open={open}
+        onCancel={() => setOpen(false)}
+        footer={null}
+        width={800}
+      >
+        <div style={{ width: "100%", height: 500 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <ReTooltip formatter={(value, name) => [`${value} Adet`, name]} />
+              <Legend
+                verticalAlign="bottom"
+                align="center"
+                layout="horizontal"
+                height={36}
+                payload={legendData.map((item) => ({
+                  id: item.Durum,
+                  value: item.Durum,
+                  type: "square",
+                  color:
+                    item.Durum === "Tümü"
+                      ? "#888888"
+                      : COLORS[
+                          talepDurumlari.findIndex(
+                            (d) => d.Durum === item.Durum
+                          ) % COLORS.length
+                        ],
+                }))}
+                onClick={toggleLegend}
+              />
+              <Pie
+                data={processedData}
+                dataKey="Adet"
+                nameKey="Durum"
+                cx="50%"
+                cy="50%"
+                outerRadius={150}
+                innerRadius={30}
+                labelLine={true}
+                label={({ name, percent }) =>
+                  `${name} ${(percent * 100).toFixed(1)}%`
+                }
+              >
+                {processedData.map((entry, idx) => (
+                  <Cell
+                    key={`cell-${idx}`}
+                    fill={COLORS[idx % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </Modal>
     </>
   );
 };
