@@ -17,6 +17,7 @@ import IsTalepleri from "./pages/YardimMasasi/IsTalepleri/IsTalepleri";
 import Hazirlaniyor from "./pages/Hazirlaniyor";
 import Auth from "./pages/Auth/Auth";
 import logo from "../src/assets/images/logoBeyaz.png";
+import omegaLogo from "../src/assets/images/omega-logo.png";
 import Headers from "./pages/Headers/Headers";
 import { useRecoilState, RecoilRoot, useSetRecoilState } from "recoil";
 import { userState } from "./state/userState";
@@ -421,6 +422,11 @@ const BaseLayout = () => {
     token: { colorBgContainer },
   } = theme.useToken();
 
+  // Domain'e göre logo seçimi
+  const hostname = window.location.hostname;
+  const isOmega = hostname === "omegaerp.net" || hostname === "www.omegaerp.net";
+  const currentLogo = isOmega ? omegaLogo : logo;
+
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
   };
@@ -438,8 +444,25 @@ const BaseLayout = () => {
   };
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      {(mobileView && (
+    <>
+      {isOmega && (
+        <style>{`
+          .ant-layout-sider-trigger {
+            background: #d9c8b8 !important;
+          }
+          .ant-layout-sider-trigger svg {
+            color: #2c1810 !important;
+          }
+          .ant-menu-dark .ant-menu-item:not(.ant-menu-item-selected):not(:hover) {
+            color: #2c1810 !important;
+          }
+          .ant-menu-dark .ant-menu-submenu-title:not(:hover) {
+            color: #2c1810 !important;
+          }
+        `}</style>
+      )}
+      <Layout style={{ minHeight: "100vh" }}>
+        {(mobileView && (
         <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed} breakpoint="lg" collapsedWidth="0.0000000000001">
           <div
             className="demo-logo-vertical"
@@ -452,7 +475,7 @@ const BaseLayout = () => {
               columnGap: "5px",
             }}
           >
-            <img src={logo} alt="Logo" style={logoStyle} />
+            <img src={currentLogo} alt="Logo" style={logoStyle} />
             <Text style={{ color: "white", marginTop: "11px" }}>v. 1.7.5</Text>
           </div>
           <MenuWrapper />
@@ -477,7 +500,7 @@ const BaseLayout = () => {
               columnGap: "5px",
             }}
           >
-            <img src={logo} alt="Logo" style={logoStyle} />
+            <img src={currentLogo} alt="Logo" style={logoStyle} />
             <Text style={{ color: "white", marginTop: "11px" }}>v. 1.7.5</Text>
           </div>
           <MenuWrapper />
@@ -530,6 +553,7 @@ const BaseLayout = () => {
         <Footer style={{ textAlign: "center", padding: "10px 50px" }}>Orjin {new Date().getFullYear()} - Design & Develop by Orjin Team</Footer>
       </Layout>
     </Layout>
+    </>
   );
 };
 

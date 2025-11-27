@@ -75,6 +75,31 @@ const Main = React.memo(function Main() {
     }
   }, [isDevToolsOpen]);
 
+  // Domain'e göre theme seçimi
+  const hostname = window.location.hostname;
+  const isOmega = hostname === "omegaerp.net" || hostname === "www.omegaerp.net";
+
+  const customTheme = isOmega ? {
+    token: {
+      colorPrimary: '#fd5300',
+    },
+    components: {
+      Layout: {
+        siderBg: '#ecdfd6',
+      },
+      Menu: {
+        darkItemBg: '#ecdfd6',
+        darkItemSelectedBg: '#fd5300',
+        darkItemHoverBg: '#ff7733',
+        darkSubMenuItemBg: '#d9c8b8',
+        darkItemColor: '#2c1810',
+        darkItemSelectedColor: '#ffffff',
+        darkItemHoverColor: '#ffffff',
+        darkGroupTitleColor: '#2c1810',
+      },
+    },
+  } : undefined;
+
   // Ant Design locale objesini belirleme
   const antdLocale = antdLocales[language] || enUS; // Desteklenmeyen diller için varsayılan olarak enUS
 
@@ -85,7 +110,7 @@ const Main = React.memo(function Main() {
   return (
     // <React.StrictMode>
     <I18nextProvider i18n={i18n}>
-      <ConfigProvider locale={antdLocale}>
+      <ConfigProvider locale={antdLocale} theme={customTheme}>
         <Router>
           <AppProvider>
             <RecoilRoot>
