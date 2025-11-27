@@ -541,7 +541,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                       <Table.Summary.Row>
                         <Table.Summary.Cell index={0}><Text strong>ARA TOPLAM</Text></Table.Summary.Cell>
                           {firmalar.map(firma => (
-                            <Table.Summary.Cell key={`toplam-${firma.firmaId}`} colSpan={4} align="right">
+                            <Table.Summary.Cell key={`toplam-${firma.firmaId}`} colSpan={5} align="right">
                               {(firma.araToplam ?? 0).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}
                             </Table.Summary.Cell>
                           ))}
@@ -550,7 +550,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                       <Table.Summary.Row>
                         <Table.Summary.Cell index={0}><Text strong>İNDİRİM</Text></Table.Summary.Cell>
                           {firmalar.map(firma => (
-                            <Table.Summary.Cell key={`indirim-${firma.firmaId}`} colSpan={4} align="right">
+                            <Table.Summary.Cell key={`indirim-${firma.firmaId}`} colSpan={5} align="right">
                               {(firma.indirimTutar ?? 0).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}
                             </Table.Summary.Cell>
                           ))}
@@ -559,7 +559,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                       <Table.Summary.Row>
                         <Table.Summary.Cell index={0}><Text strong>KDV</Text></Table.Summary.Cell>
                           {firmalar.map(firma => (
-                            <Table.Summary.Cell key={`kdv-${firma.firmaId}`} colSpan={4} align="right">
+                            <Table.Summary.Cell key={`kdv-${firma.firmaId}`} colSpan={5} align="right">
                               {(firma.kdvTutar ?? 0).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}
                             </Table.Summary.Cell>
                           ))}
@@ -568,7 +568,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                       <Table.Summary.Row>
                         <Table.Summary.Cell index={0}><Text strong>GENEL TOPLAM</Text></Table.Summary.Cell>
                           {firmalar.map(firma => (
-                            <Table.Summary.Cell key={`genel-${firma.firmaId}`} colSpan={4} align="right">
+                            <Table.Summary.Cell key={`genel-${firma.firmaId}`} colSpan={5} align="right">
                               {(firma.genelToplam ?? 0).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}
                             </Table.Summary.Cell>
                           ))}
