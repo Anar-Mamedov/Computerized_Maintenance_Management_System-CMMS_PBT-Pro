@@ -41,3 +41,16 @@ jobs:
           local-dir: dist/
           server-dir: /public_html/
           log-level: verbose
+
+      - name: Deploy to Omega FTP Server
+        uses: SamKirkland/FTP-Deploy-Action@4.3.0
+        with:
+          server: ${{ secrets.OMEGA_FTP_HOST }}
+          username: ${{ secrets.OMEGA_FTP_USERNAME }}
+          password: ${{ secrets.OMEGA_FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          security: loose
+          local-dir: dist/
+          server-dir: /public_html/
+          log-level: verbose
