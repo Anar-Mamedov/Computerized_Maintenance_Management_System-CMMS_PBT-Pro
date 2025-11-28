@@ -448,16 +448,16 @@ const BaseLayout = () => {
       {isOmega && (
         <style>{`
           .ant-layout-sider-trigger {
-            background: #d9c8b8 !important;
+            background: #0f1419 !important;
           }
           .ant-layout-sider-trigger svg {
-            color: #2c1810 !important;
+            color: #e8eaed !important;
           }
           .ant-menu-dark .ant-menu-item:not(.ant-menu-item-selected):not(:hover) {
-            color: #2c1810 !important;
+            color: #e8eaed !important;
           }
           .ant-menu-dark .ant-menu-submenu-title:not(:hover) {
-            color: #2c1810 !important;
+            color: #e8eaed !important;
           }
         `}</style>
       )}

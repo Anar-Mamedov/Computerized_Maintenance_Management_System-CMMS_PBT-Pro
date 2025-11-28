@@ -85,17 +85,17 @@ const Main = React.memo(function Main() {
     },
     components: {
       Layout: {
-        siderBg: '#ecdfd6',
+        siderBg: '#1a2332',
       },
       Menu: {
-        darkItemBg: '#ecdfd6',
+        darkItemBg: '#1a2332',
         darkItemSelectedBg: '#fd5300',
-        darkItemHoverBg: '#ff7733',
-        darkSubMenuItemBg: '#d9c8b8',
-        darkItemColor: '#2c1810',
+        darkItemHoverBg: '#2c3e50',
+        darkSubMenuItemBg: '#0f1419',
+        darkItemColor: '#e8eaed',
         darkItemSelectedColor: '#ffffff',
         darkItemHoverColor: '#ffffff',
-        darkGroupTitleColor: '#2c1810',
+        darkGroupTitleColor: '#e8eaed',
       },
     },
   } : undefined;
