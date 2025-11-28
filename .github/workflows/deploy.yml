@@ -48,9 +48,9 @@ jobs:
           server: ${{ secrets.OMEGA_FTP_HOST }}
           username: ${{ secrets.OMEGA_FTP_USERNAME }}
           password: ${{ secrets.OMEGA_FTP_PASSWORD }}
-          protocol: ftps
+          protocol: ftp
           port: 21
-          security: loose
+          security: none
           local-dir: dist/
           server-dir: /public_html/
           log-level: verbose
