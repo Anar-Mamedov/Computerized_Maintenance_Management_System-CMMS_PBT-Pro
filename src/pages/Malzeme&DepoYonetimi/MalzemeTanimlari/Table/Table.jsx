@@ -223,7 +223,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       title: t("malzemeKodu"),
       dataIndex: "STK_KOD",
       key: "STK_KOD",
-      width: 120,
+      width: 150,
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
       render: (text, record) => (
@@ -240,7 +240,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       title: t("malzemeTanimi"),
       dataIndex: "STK_TANIM",
       key: "STK_TANIM",
-      width: 120,
+      width: 250,
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
 
@@ -256,7 +256,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       key: "STK_URETICI_KOD",
       width: 120,
       ellipsis: true,
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
 
       sorter: (a, b) => {
         if (a.STK_URETICI_KOD === null) return -1;
@@ -270,7 +270,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       key: "STK_AKTIF",
       width: 120,
       ellipsis: true,
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
 
       sorter: (a, b) => {
         if (a.STK_AKTIF === null) return -1;
@@ -301,7 +301,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       key: "STK_TIP",
       width: 120,
       ellipsis: true,
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
 
       sorter: (a, b) => {
         if (a.STK_TIP === null) return -1;
@@ -309,76 +309,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
         return a.STK_TIP.localeCompare(b.STK_TIP);
       },
     },
-    {
-      title: t("girenMiktar"),
-      dataIndex: "STK_GIREN_MIKTAR",
-      key: "STK_GIREN_MIKTAR",
-      width: 120,
-      ellipsis: true,
-      visible: true, // Varsayılan olarak açık
 
-      sorter: (a, b) => {
-        if (a.STK_GIREN_MIKTAR === null) return -1;
-        if (b.STK_GIREN_MIKTAR === null) return 1;
-        return a.STK_GIREN_MIKTAR.localeCompare(b.STK_GIREN_MIKTAR);
-      },
-    },
-    {
-      title: t("cikanMiktar"),
-      dataIndex: "STK_CIKAN_MIKTAR",
-      key: "STK_CIKAN_MIKTAR",
-      width: 120,
-      ellipsis: true,
-      visible: true, // Varsayılan olarak açık
-
-      sorter: (a, b) => {
-        if (a.STK_CIKAN_MIKTAR === null) return -1;
-        if (b.STK_CIKAN_MIKTAR === null) return 1;
-        return a.STK_CIKAN_MIKTAR.localeCompare(b.STK_CIKAN_MIKTAR);
-      },
-    },
-    {
-      title: t("stokMiktar"),
-      dataIndex: "STK_MIKTAR",
-      key: "STK_MIKTAR",
-      width: 120,
-      ellipsis: true,
-      visible: true, // Varsayılan olarak açık
-
-      sorter: (a, b) => {
-        if (a.STK_MIKTAR === null) return -1;
-        if (b.STK_MIKTAR === null) return 1;
-        return a.STK_MIKTAR.localeCompare(b.STK_MIKTAR);
-      },
-    },
-    {
-      title: t("grup"),
-      dataIndex: "STK_GRUP",
-      key: "STK_GRUP",
-      width: 120,
-      ellipsis: true,
-      visible: true, // Varsayılan olarak açık
-
-      sorter: (a, b) => {
-        if (a.STK_GRUP === null) return -1;
-        if (b.STK_GRUP === null) return 1;
-        return a.STK_GRUP.localeCompare(b.STK_GRUP);
-      },
-    },
-    {
-      title: t("lokasyon"),
-      dataIndex: "STK_LOKASYON",
-      key: "STK_LOKASYON",
-      width: 120,
-      ellipsis: true,
-      visible: true, // Varsayılan olarak açık
-
-      sorter: (a, b) => {
-        if (a.STK_LOKASYON === null) return -1;
-        if (b.STK_LOKASYON === null) return 1;
-        return a.STK_LOKASYON.localeCompare(b.STK_LOKASYON);
-      },
-    },
     {
       title: t("marka"),
       dataIndex: "STK_MARKA",
@@ -408,12 +339,83 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       },
     },
     {
+      title: t("girenMiktar"),
+      dataIndex: "STK_GIREN_MIKTAR",
+      key: "STK_GIREN_MIKTAR",
+      width: 120,
+      ellipsis: true,
+      visible: false, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_GIREN_MIKTAR === null) return -1;
+        if (b.STK_GIREN_MIKTAR === null) return 1;
+        return a.STK_GIREN_MIKTAR.localeCompare(b.STK_GIREN_MIKTAR);
+      },
+    },
+    {
+      title: t("cikanMiktar"),
+      dataIndex: "STK_CIKAN_MIKTAR",
+      key: "STK_CIKAN_MIKTAR",
+      width: 120,
+      ellipsis: true,
+      visible: false, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_CIKAN_MIKTAR === null) return -1;
+        if (b.STK_CIKAN_MIKTAR === null) return 1;
+        return a.STK_CIKAN_MIKTAR.localeCompare(b.STK_CIKAN_MIKTAR);
+      },
+    },
+    {
+      title: t("stokMiktar"),
+      dataIndex: "STK_MIKTAR",
+      key: "STK_MIKTAR",
+      width: 120,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_MIKTAR === null) return -1;
+        if (b.STK_MIKTAR === null) return 1;
+        return a.STK_MIKTAR.localeCompare(b.STK_MIKTAR);
+      },
+    },
+    {
+      title: t("grup"),
+      dataIndex: "STK_GRUP",
+      key: "STK_GRUP",
+      width: 120,
+      ellipsis: true,
+      visible: false, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_GRUP === null) return -1;
+        if (b.STK_GRUP === null) return 1;
+        return a.STK_GRUP.localeCompare(b.STK_GRUP);
+      },
+    },
+    {
+      title: t("lokasyon"),
+      dataIndex: "STK_LOKASYON",
+      key: "STK_LOKASYON",
+      width: 120,
+      ellipsis: true,
+      visible: false, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_LOKASYON === null) return -1;
+        if (b.STK_LOKASYON === null) return 1;
+        return a.STK_LOKASYON.localeCompare(b.STK_LOKASYON);
+      },
+    },
+
+    {
       title: t("malzemeSinifi"),
       dataIndex: "STK_SINIF",
       key: "STK_SINIF",
       width: 120,
       ellipsis: true,
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
 
       sorter: (a, b) => {
         if (a.STK_SINIF === null) return -1;
@@ -427,7 +429,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       key: "STK_MASRAFMERKEZ",
       width: 120,
       ellipsis: true,
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
 
       sorter: (a, b) => {
         if (a.STK_MASRAFMERKEZ === null) return -1;
@@ -441,7 +443,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       key: "STK_YEDEK_PARCA",
       width: 120,
       ellipsis: true,
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
 
       sorter: (a, b) => {
         if (a.STK_YEDEK_PARCA === null) return -1;
@@ -458,7 +460,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       key: "STK_SARF_MALZEME",
       width: 120,
       ellipsis: true,
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
 
       sorter: (a, b) => {
         if (a.STK_SARF_MALZEME === null) return -1;
@@ -475,7 +477,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       key: "STK_STOKSUZ_MALZEME",
       width: 120,
       ellipsis: true,
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
 
       sorter: (a, b) => {
         if (a.STK_STOKSUZ_MALZEME === null) return -1;
@@ -492,7 +494,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       key: "STK_KRITIK_MALZEME",
       width: 120,
       ellipsis: true,
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
 
       sorter: (a, b) => {
         if (a.STK_KRITIK_MALZEME === null) return -1;
@@ -509,7 +511,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       key: "STK_TEHLIKE_SINIF",
       width: 120,
       ellipsis: true,
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
 
       sorter: (a, b) => {
         if (a.STK_TEHLIKE_SINIF === null) return -1;
@@ -523,7 +525,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       key: "STK_GIRIS_FIYAT_DEGERI",
       width: 120,
       ellipsis: true,
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
 
       sorter: (a, b) => {
         if (a.STK_GIRIS_FIYAT_DEGERI === null) return -1;
@@ -537,7 +539,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       key: "STK_CIKIS_FIYAT_DEGERI",
       width: 120,
       ellipsis: true,
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
 
       sorter: (a, b) => {
         if (a.STK_CIKIS_FIYAT_DEGERI === null) return -1;
@@ -551,7 +553,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       key: "STK_KDV_ORAN",
       width: 120,
       ellipsis: true,
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
 
       sorter: (a, b) => {
         if (a.STK_KDV_ORAN === null) return -1;
@@ -565,7 +567,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       key: "STK_OTV_ORAN",
       width: 120,
       ellipsis: true,
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
 
       sorter: (a, b) => {
         if (a.STK_OTV_ORAN === null) return -1;
@@ -579,7 +581,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       key: "STK_MIN_MIKTAR",
       width: 120,
       ellipsis: true,
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
 
       sorter: (a, b) => {
         if (a.STK_MIN_MIKTAR === null) return -1;
@@ -593,7 +595,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       key: "STK_MAX_MIKTAR",
       width: 120,
       ellipsis: true,
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
 
       sorter: (a, b) => {
         if (a.STK_MAX_MIKTAR === null) return -1;
@@ -607,7 +609,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       key: "STK_SIPARIS_MIKTARI",
       width: 120,
       ellipsis: true,
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Varsayılan olarak açık
 
       sorter: (a, b) => {
         if (a.STK_SIPARIS_MIKTARI === null) return -1;
@@ -1026,14 +1028,14 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
   // const onRowClick = (record) => {
   //   return {
   //     onClick: () => {
-  //       setDrawer({ visible: true, data: record });
+  //       setDrawer({ visible: false, data: record });
   //     },
   //   };
   // };
 
   const onRowClick = (record) => {
     if (!isSelectionMode) {
-      setDrawer({ visible: true, data: record });
+      setDrawer({ visible: false, data: record });
     }
   };
 

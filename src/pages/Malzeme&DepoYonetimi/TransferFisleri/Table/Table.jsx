@@ -241,7 +241,7 @@ const TransferFisleri = () => {
   };
 
   const onRowClick = (record) => {
-    setDrawer({ visible: true, data: record });
+    setDrawer({ visible: false, data: record });
   };
 
   const refreshTableData = useCallback(() => {
@@ -287,7 +287,7 @@ const TransferFisleri = () => {
         key: "SFS_CARI",
         width: 190,
         ellipsis: true,
-        visible: true,
+        visible: false,
         sorter: (a, b) => {
           if (a.SFS_CARI === null) return -1;
           if (b.SFS_CARI === null) return 1;
@@ -300,7 +300,7 @@ const TransferFisleri = () => {
         key: "SFS_MAKINE",
         width: 120,
         ellipsis: true,
-        visible: true,
+        visible: false,
         sorter: (a, b) => {
           if (a.SFS_MAKINE === null) return -1;
           if (b.SFS_MAKINE === null) return 1;
@@ -324,7 +324,7 @@ const TransferFisleri = () => {
         title: t("girisDeposu"),
         dataIndex: "SFS_GIRIS_DEPO",
         key: "SFS_GIRIS_DEPO",
-        width: 150,
+        width: 200,
         ellipsis: true,
         visible: true,
         sorter: (a, b) => {
@@ -337,7 +337,7 @@ const TransferFisleri = () => {
         title: t("cikisDeposu"),
         dataIndex: "SFS_CIKIS_DEPO",
         key: "SFS_CIKIS_DEPO",
-        width: 150,
+        width: 200,
         ellipsis: true,
         visible: true,
         sorter: (a, b) => {
@@ -352,7 +352,7 @@ const TransferFisleri = () => {
         key: "SFS_ARA_TOPLAM",
         width: 120,
         ellipsis: true,
-        visible: true,
+        visible: false,
         render: (text, record) => (
           <div className="">
             <span>{Number(text).toFixed(Number(record?.tutarFormat))} </span>
@@ -370,7 +370,7 @@ const TransferFisleri = () => {
         key: "SFS_KDV_TOPLAM",
         width: 120,
         ellipsis: true,
-        visible: true,
+        visible: false,
         render: (text, record) => (
           <div className="">
             <span>{Number(text).toFixed(Number(record?.tutarFormat))} </span>
@@ -388,7 +388,7 @@ const TransferFisleri = () => {
         key: "SFS_GENEL_TOPLAM",
         width: 120,
         ellipsis: true,
-        visible: true,
+        visible: false,
         render: (text, record) => (
           <div className="">
             <span>{Number(text).toFixed(Number(record?.tutarFormat))} </span>
