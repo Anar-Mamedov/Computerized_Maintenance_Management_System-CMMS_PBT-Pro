@@ -50,7 +50,7 @@ jobs:
           password: ${{ secrets.OMEGA_FTP_PASSWORD }}
           protocol: ftp
           port: 21
-          security: none
+          security: loose
           local-dir: dist/
           server-dir: /public_html/
           log-level: verbose
