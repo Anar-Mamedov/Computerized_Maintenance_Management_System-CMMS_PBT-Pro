@@ -241,7 +241,7 @@ const GirisFisleri = () => {
   };
 
   const onRowClick = (record) => {
-    setDrawer({ visible: true, data: record });
+    setDrawer({ visible: false, data: record });
   };
 
   const refreshTableData = useCallback(() => {
@@ -281,43 +281,18 @@ const GirisFisleri = () => {
         },
         render: (text) => formatDate(text),
       },
-      {
-        title: t("firmaTanimi"),
-        dataIndex: "SFS_CARI",
-        key: "SFS_CARI",
-        width: 190,
-        ellipsis: true,
-        visible: true,
-        sorter: (a, b) => {
-          if (a.SFS_CARI === null) return -1;
-          if (b.SFS_CARI === null) return 1;
-          return a.SFS_CARI.localeCompare(b.SFS_CARI);
-        },
-      },
+
       {
         title: t("makine"),
         dataIndex: "SFS_MAKINE",
         key: "SFS_MAKINE",
         width: 120,
         ellipsis: true,
-        visible: true,
+        visible: false,
         sorter: (a, b) => {
           if (a.SFS_MAKINE === null) return -1;
           if (b.SFS_MAKINE === null) return 1;
           return a.SFS_MAKINE.localeCompare(b.SFS_MAKINE);
-        },
-      },
-      {
-        title: t("islemTipi"),
-        dataIndex: "SFS_ISLEM_TIP_DEGER",
-        key: "SFS_ISLEM_TIP_DEGER",
-        width: 150,
-        ellipsis: true,
-        visible: true,
-        sorter: (a, b) => {
-          if (a.SFS_ISLEM_TIP_DEGER === null) return -1;
-          if (b.SFS_ISLEM_TIP_DEGER === null) return 1;
-          return a.SFS_ISLEM_TIP_DEGER.localeCompare(b.SFS_ISLEM_TIP_DEGER);
         },
       },
       {
@@ -334,12 +309,39 @@ const GirisFisleri = () => {
         },
       },
       {
+        title: t("firmaTanimi"),
+        dataIndex: "SFS_CARI",
+        key: "SFS_CARI",
+        width: 190,
+        ellipsis: true,
+        visible: true,
+        sorter: (a, b) => {
+          if (a.SFS_CARI === null) return -1;
+          if (b.SFS_CARI === null) return 1;
+          return a.SFS_CARI.localeCompare(b.SFS_CARI);
+        },
+      },
+      {
+        title: t("islemTipi"),
+        dataIndex: "SFS_ISLEM_TIP_DEGER",
+        key: "SFS_ISLEM_TIP_DEGER",
+        width: 150,
+        ellipsis: true,
+        visible: true,
+        sorter: (a, b) => {
+          if (a.SFS_ISLEM_TIP_DEGER === null) return -1;
+          if (b.SFS_ISLEM_TIP_DEGER === null) return 1;
+          return a.SFS_ISLEM_TIP_DEGER.localeCompare(b.SFS_ISLEM_TIP_DEGER);
+        },
+      },
+
+      {
         title: t("cikisDeposu"),
         dataIndex: "SFS_CIKIS_DEPO",
         key: "SFS_CIKIS_DEPO",
         width: 150,
         ellipsis: true,
-        visible: true,
+        visible: false,
         sorter: (a, b) => {
           if (a.SFS_CIKIS_DEPO === null) return -1;
           if (b.SFS_CIKIS_DEPO === null) return 1;

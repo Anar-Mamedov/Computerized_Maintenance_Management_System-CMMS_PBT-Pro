@@ -241,7 +241,7 @@ const CikisFisleri = () => {
   };
 
   const onRowClick = (record) => {
-    setDrawer({ visible: true, data: record });
+    setDrawer({ visible: false, data: record });
   };
 
   const refreshTableData = useCallback(() => {
@@ -282,6 +282,19 @@ const CikisFisleri = () => {
         render: (text) => formatDate(text),
       },
       {
+        title: t("cikisDeposu"),
+        dataIndex: "SFS_CIKIS_DEPO",
+        key: "SFS_CIKIS_DEPO",
+        width: 150,
+        ellipsis: true,
+        visible: true,
+        sorter: (a, b) => {
+          if (a.SFS_CIKIS_DEPO === null) return -1;
+          if (b.SFS_CIKIS_DEPO === null) return 1;
+          return a.SFS_CIKIS_DEPO.localeCompare(b.SFS_CIKIS_DEPO);
+        },
+      },
+      {
         title: t("firmaTanimi"),
         dataIndex: "SFS_CARI",
         key: "SFS_CARI",
@@ -300,7 +313,7 @@ const CikisFisleri = () => {
         key: "SFS_MAKINE",
         width: 120,
         ellipsis: true,
-        visible: true,
+        visible: false,
         sorter: (a, b) => {
           if (a.SFS_MAKINE === null) return -1;
           if (b.SFS_MAKINE === null) return 1;
@@ -326,26 +339,14 @@ const CikisFisleri = () => {
         key: "SFS_GIRIS_DEPO",
         width: 150,
         ellipsis: true,
-        visible: true,
+        visible: false,
         sorter: (a, b) => {
           if (a.SFS_GIRIS_DEPO === null) return -1;
           if (b.SFS_GIRIS_DEPO === null) return 1;
           return a.SFS_GIRIS_DEPO.localeCompare(b.SFS_GIRIS_DEPO);
         },
       },
-      {
-        title: t("cikisDeposu"),
-        dataIndex: "SFS_CIKIS_DEPO",
-        key: "SFS_CIKIS_DEPO",
-        width: 150,
-        ellipsis: true,
-        visible: true,
-        sorter: (a, b) => {
-          if (a.SFS_CIKIS_DEPO === null) return -1;
-          if (b.SFS_CIKIS_DEPO === null) return 1;
-          return a.SFS_CIKIS_DEPO.localeCompare(b.SFS_CIKIS_DEPO);
-        },
-      },
+
       {
         title: t("araToplam"),
         dataIndex: "SFS_ARA_TOPLAM",
