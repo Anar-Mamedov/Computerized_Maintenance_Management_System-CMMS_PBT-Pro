@@ -124,6 +124,10 @@ function flattenMenuItems(items) {
   return result;
 }
 
+// Domain kontrolü menü için
+const menuHostname = window.location.hostname;
+const isOmegaMenu = menuHostname === "omegaerp.net" || menuHostname === "www.omegaerp.net";
+
 const rawItems = [
   getItem("Ana Sayfa", "", <PieChartOutlined />),
   // getItem("Option 1", "option1", <PieChartOutlined />),
@@ -198,7 +202,7 @@ const rawItems = [
     "satinalmaYonetimi",
     <UserOutlined />,
     [
-      getItem("Satınalma Yönetici Paneli", "satinalmaDashboard", true),
+      ...(isOmegaMenu ? [] : [getItem("Satınalma Yönetici Paneli", "satinalmaDashboard", true)]),
       getItem("Malzeme Talepleri", "malzemeTalepleri", true),
       getItem("Satınalma Siparişleri", "satinalmaSiparisleri", true),
       getItem("Tedarikçi Firmalar", "tedarikciFirmalar", true),
