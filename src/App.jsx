@@ -285,6 +285,10 @@ const rawItems = [
 export default function App() {
   const [user, setUser] = useRecoilState(userState);
 
+  // Domain'e göre kontrol
+  const hostname = window.location.hostname;
+  const isOmega = hostname === "omegaerp.net" || hostname === "www.omegaerp.net";
+
   // Lisans kontrolü fonksiyonu
   const checkLicenseExpiry = async () => {
     try {
@@ -345,7 +349,7 @@ export default function App() {
             </ProtectedRoute>
           }
         >
-          {loginData?.Dashboard && <Route path="/" element={<Dashboard1 />} />}
+          {loginData?.Dashboard && <Route path="/" element={isOmega ? <SatinalmaDashboard /> : <Dashboard1 />} />}
           {/* <Route path="/isemri" element={<Isemri />} /> */}
           <Route path="/isEmri1" element={<IsEmri />} />
           <Route path="/User" element={<ProfilEkrani />} />
