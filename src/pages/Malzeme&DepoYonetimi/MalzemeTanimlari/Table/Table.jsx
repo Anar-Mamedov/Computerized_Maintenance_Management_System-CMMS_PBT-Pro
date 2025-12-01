@@ -1035,7 +1035,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
 
   const onRowClick = (record) => {
     if (!isSelectionMode) {
-      setDrawer({ visible: false, data: record });
+      setDrawer({ visible: true, data: record });
     }
   };
 
