@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, InputNumber, Select, Typography, Card, Button, Space, Radio, Tabs, Spin, message } from "antd";
+import { Table, InputNumber, Select, Typography, Card, Button, Space, Radio, Tabs, Spin, message, Modal } from "antd";
 import { FileExcelOutlined, PrinterOutlined, PlusOutlined, CheckCircleOutlined, SaveOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../api/http";
 import TedarikciEkle from "./FirmaEkleCikar";
@@ -22,7 +22,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   const aktifPaketIndex = Number(activeTab) - 1;
   const aktifPaket = paketler[aktifPaketIndex] || {};
   const aktifPaketDurumID = teklifDurumlari?.find(d => d.teklifId === aktifPaket.id)?.durumID || null;
-  const isDisabled = !(aktifPaketDurumID === 1 || aktifPaketDurumID === 4);
+  const isDisabled = !(aktifPaketDurumID === 1 || aktifPaketDurumID === 4 || aktifPaketDurumID === 3);
   const [detayGosterilenPaket, setDetayGosterilenPaket] = useState(null);
   const DURUM_STYLES = {
     1: { text: "TEKLİFLER TOPLANIYOR", backgroundColor: "#e1f7d5", color: "#3c763d" },
@@ -35,6 +35,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   const showOnayaGonder = onayCheck && aktifPaketDurumID !== 3 && aktifPaketDurumID !== 2;
   const [siparisModalOpen, setSiparisModalOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
+  const [hasChanges, setHasChanges] = useState(false)
 
   // Paketler ilk yüklendiğinde renkleri ata
 useEffect(() => {
@@ -159,6 +160,7 @@ const computeFirmaTotals = (malzemeler = [], firmaTotaller = []) => {
 
 // InputNumber değiştiğinde çağrılır
 const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
+  setHasChanges(true);
   const val = value == null ? 0 : Number(value);
 
   setPaketler((prev) => {
@@ -254,6 +256,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
       const res = await AxiosInstance.post("/UpsertTeklifKarsilastirma", payload);
       message.success("Teklif başarıyla kaydedildi!");
       setKaydedildi(true);
+      setHasChanges(false);
     } catch (err) {
       console.error("UpsertTeklifKarsilastirma hatası:", err);
       message.error("Teklif kaydedilirken hata oluştu.");
@@ -276,6 +279,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
   : [];
 
   const handleSecimChange = (paketIndex, malzemeId, firmaId, val) => {
+    setHasChanges(true);
     setPaketler(prev => {
       return prev.map((p, idx) => {
         if (idx !== paketIndex) return p;
@@ -300,27 +304,48 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
   };
 
   const handleRadioClick = (paketIndex, firmaId) => {
-  setSelectedFirmaId(prev => prev === firmaId ? null : firmaId); // tekrar tıklayınca kaldır
+    setSelectedFirmaId(prev => prev === firmaId ? null : firmaId); // tekrar tıklayınca kaldır
 
-  setPaketler(prev => {
-    const updated = [...prev];
-    const paket = updated[paketIndex];
+    setPaketler(prev => {
+      const updated = [...prev];
+      const paket = updated[paketIndex];
 
-    paket.malzemeler = (paket.malzemeler || []).map(m => ({
-      ...m,
-      firmalar: m.firmalar.map(f => {
-        if (prev === firmaId) return { ...f, secili: false }; // tekrar tıklayınca tümünü kaldır
-        return { ...f, secili: f.firmaId === firmaId }; // aksi halde tüm malzemeleri o firma seçili yap
-      }),
-    }));
+      paket.malzemeler = (paket.malzemeler || []).map(m => ({
+        ...m,
+        firmalar: m.firmalar.map(f => {
+          if (prev === firmaId) return { ...f, secili: false }; // tekrar tıklayınca tümünü kaldır
+          return { ...f, secili: f.firmaId === firmaId }; // aksi halde tüm malzemeleri o firma seçili yap
+        }),
+      }));
 
-    return updated;
-  });
-};
+      return updated;
+    });
+  };
+
+  // Tab değiştirme fonksiyonu
+  const handleTabChange = (newKey) => {
+    if (hasChanges) {
+      Modal.confirm({
+        title: "Kaydedilmemiş Değişiklikler Var",
+        content: "Yaptığınız değişiklikleri kaydetmeden diğer sekmeye geçmek istediğinize emin misiniz?",
+        okText: "Evet, Geç",
+        cancelText: "İptal",
+        onOk: () => {
+          setHasChanges(false);
+          setActiveTab(newKey);
+        },
+        onCancel: () => {
+        },
+      });
+    } else {
+      setActiveTab(newKey);
+    }
+  };
+
 
   return (
     <Card
-      title="Satınalma Teklif Kıyaslama"
+      title={`Satınalma Teklif Kıyaslama - ${fisNo}`}
       extra={
         <Space>
           <Button icon={<FileExcelOutlined />}>Excel</Button>
@@ -354,15 +379,28 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
               if (!teklifId) return message.error("Teklif ID bulunamadı!");
 
               if (showOnayaGonder) {
-                onOnayaGonder(teklifId);
+                if (hasChanges) {
+                    Modal.confirm({
+                        title: "Kaydedilmemiş Değişiklikler Var",
+                        content: "Onaya göndermeden önce değişiklikleri kaydetmeniz gerekiyor. Şimdi kaydedip devam etmek ister misiniz?",
+                        okText: "Kaydet ve Gönder",
+                        cancelText: "İptal",
+                        onOk: async () => {
+                            await upsertTeklifKarsilastirma(aktifPaketIndex);
+                            onOnayaGonder(teklifId, true);
+                        }
+                    });
+                } else {
+                    onOnayaGonder(teklifId);
+                }
               } else {
                 setSelectedRow(teklifId);
                 setSiparisModalOpen(true);
               }
             }}
-              disabled={disabled || isDisabled}
-            >
-              {showOnayaGonder ? "Onaya Gönder" : "Siparişe Aktar"}
+            disabled={disabled || isDisabled}
+          >
+            {showOnayaGonder ? "Onaya Gönder" : "Siparişe Aktar"}
           </Button>
         </Space>
       }
@@ -371,7 +409,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
     >
       <Tabs
         activeKey={activeTab}
-        onChange={(key) => setActiveTab(key)}
+        onChange={handleTabChange}
         defaultActiveKey="1"
       >
         {paketler.map((paket, paketIndex) => {
@@ -409,7 +447,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                 {
                   title: "Seç",
                   dataIndex: `secili${firma.firmaId}`,
-                  width: 100,
+                  width: 5,
                   align: "center",
                   onCell: () => ({ style: { backgroundColor: pastelColor } }),
                   render: (_, record) => {
@@ -420,7 +458,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                     return (
                       <Select
                         style={{ 
-                          width: "90%", 
+                          width: "100%", 
                           pointerEvents: isRenkliAmaKilitli ? 'none' : 'auto' 
                         }} 
                         disabled={isRenkliAmaKilitli ? false : isDisabled}
@@ -492,7 +530,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                   },
                 },
                 {
-                  title: "Fiyat",
+                  title: "Birim Fiyat",
                   dataIndex: `fiyat_${firma.firmaId}`,
                   width: 125,
                   align: "center",
@@ -562,7 +600,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                 >
                   {paket?.teklifBaslik?.baslik || `Teklif ${paketIndex + 1}`} - 
                   {" "}
-                  {DURUM_STYLES[durumID]?.text || ""}
+                  ({DURUM_STYLES[durumID]?.text || ""})
                 </div>
               } key={`${paketIndex + 1}`}
             >
@@ -585,7 +623,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                       </Table.Summary.Row>
 
                       <Table.Summary.Row>
-                        <Table.Summary.Cell index={0}><Text strong>İNDİRİM</Text></Table.Summary.Cell>
+                        <Table.Summary.Cell index={0}><Text strong>İNDİRİM TUTARI</Text></Table.Summary.Cell>
                           {firmalar.map(firma => (
                             <Table.Summary.Cell key={`indirim-${firma.firmaId}`} colSpan={5} align="right">
                               {(firma.indirimTutar ?? 0).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}
@@ -594,7 +632,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                       </Table.Summary.Row>
 
                       <Table.Summary.Row>
-                        <Table.Summary.Cell index={0}><Text strong>KDV</Text></Table.Summary.Cell>
+                        <Table.Summary.Cell index={0}><Text strong>KDV TUTARI</Text></Table.Summary.Cell>
                           {firmalar.map(firma => (
                             <Table.Summary.Cell key={`kdv-${firma.firmaId}`} colSpan={5} align="right">
                               {(firma.kdvTutar ?? 0).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}

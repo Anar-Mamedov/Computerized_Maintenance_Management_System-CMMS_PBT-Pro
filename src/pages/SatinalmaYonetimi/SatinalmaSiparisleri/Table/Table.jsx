@@ -218,25 +218,25 @@ const MainTable = () => {
     return `rgba(0, 0, 0, ${opacity})`;
   }
 
-  useEffect(() => {
-    const fetchCards = async () => {
-      try {
-        const res = await AxiosInstance.get("GetSiparisCards");
-        if (res.status_code === 200 && res.data) {
-          setCardsData(res.data);
-        } else {
-          setCardsData({});
-        }
-      } catch (err) {
-        console.error(err);
+  const fetchCards = useCallback(async () => {
+    try {
+      const res = await AxiosInstance.get("getSiparisCards");
+      if (res.status_code === 200 && res.data) {
+        setCardsData(res.data);
+      } else {
         setCardsData({});
-      } finally {
-        setLoading(false);
       }
-    };
-
-    fetchCards();
+    } catch (err) {
+      console.error(err);
+      setCardsData({});
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchCards();
+  }, [fetchCards]);
 
   // Özel Alanların nameleri backend çekmek için api isteği
 
@@ -1020,6 +1020,7 @@ const MainTable = () => {
 
     // Verileri yeniden çekmek için `fetchEquipmentData` fonksiyonunu çağır
     fetchEquipmentData(body, currentPage);
+    fetchCards();
     // Burada `body` ve `currentPage`'i güncellediğimiz için, bu değerlerin en güncel hallerini kullanarak veri çekme işlemi yapılır.
     // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
     // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.

@@ -396,25 +396,9 @@ export default function MainTabs({ modalOpen }) {
               render={({ field }) => (
                 <Input
                   {...field}
-                  value="SATINALMA SİPARİŞİ"
+                  placeholder="SATINALMA SİPARİŞİ"
                   status={errors["baslik"] ? "error" : ""}
                   style={{ flex: 1 }}
-                  onFocus={(e) => {
-                    setInitialBaslik(e.target.value);
-                    setIsBaslikModified(false);
-                  }}
-                  onChange={(e) => {
-                    field.onChange(e);
-                    if (e.target.value !== initialTalepNo) {
-                      setIsBaslikModified(true);
-                    }
-                  }}
-                  onBlur={(e) => {
-                    field.onBlur(e);
-                    if (isTalepNoModified) {
-                      validateBaslik(e.target.value);
-                    }
-                  }}
                 />
               )}
             />
@@ -495,19 +479,19 @@ export default function MainTabs({ modalOpen }) {
             }}
           >
             <Controller
-              name="siparisTarihi"
+              name="teslimTarihi"
               control={control}
               rules={{ required: t("alanBosBirakilamaz") }}
               render={({ field }) => (
                 <DatePicker
                   {...field}
-                  status={errors["siparisTarihi"] ? "error" : ""}
+                  status={errors["teslimTarihi"] ? "error" : ""}
                   style={{ width: "100%", maxWidth: "250px" }}
                   format={localeDateFormat}
                   value={field.value || null} // başlangıçta boş
                   onChange={(date) => {
                     field.onChange(date);
-                    setValue("siparisTarihi", date);
+                    setValue("teslimTarihi", date);
                   }}
                 />
               )}

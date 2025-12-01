@@ -6,7 +6,7 @@ import DepoStokListesi from "./DepoStokListesi/DepoStokListesi";
 import MalzemeHareketleri from "./MalzemeHareketleri/MalzemeHareketleri";
 import MalzemeTarihce from "./MalzemeTarihce/MalzemeTarihce";
 
-export default function ContextMenu({ selectedRowId, refreshTableData, onayCheck }) {
+export default function ContextMenu({ selectedRowId, refreshTableData, onayCheck, selectedRowData }) {
   const [visible, setVisible] = useState(false);
 
   const handleVisibleChange = (newVisible) => {
@@ -19,10 +19,10 @@ export default function ContextMenu({ selectedRowId, refreshTableData, onayCheck
 
   const content = (
     <div style={{ display: "flex", flexDirection: "column", gap: 8, minWidth: 220 }}>
-      <TedarikciListesi selectedRowId={selectedRowId} hidePopover={hidePopover} />
-      <DepoStokListesi selectedRowId={selectedRowId} hidePopover={hidePopover} />
-      <MalzemeHareketleri selectedRowId={selectedRowId} hidePopover={hidePopover} />
-      <MalzemeTarihce selectedRowId={selectedRowId} hidePopover={hidePopover} />
+      <TedarikciListesi selectedRowId={selectedRowId} malzemeKod={selectedRowData?.malzemeKod} hidePopover={hidePopover} />
+      <DepoStokListesi selectedRowId={selectedRowId} malzemeKod={selectedRowData?.malzemeKod} hidePopover={hidePopover} />
+      <MalzemeHareketleri selectedRowId={selectedRowId} malzemeKod={selectedRowData?.malzemeKod} hidePopover={hidePopover} />
+      <MalzemeTarihce selectedRowId={selectedRowId} malzemeKod={selectedRowData?.malzemeKod} hidePopover={hidePopover} />
     </div>
   );
 

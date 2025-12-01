@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Modal, Table, Typography } from "antd";
+import { Modal, Table, Typography, Tag } from "antd";
 import AxiosInstance from "../../../../../../api/http";
 import dayjs from "dayjs";
 import { FileProtectOutlined } from "@ant-design/icons"; // İkon eklendi
@@ -14,10 +14,65 @@ export default function OnayTarihceTablo({ selectedRows }) {
   // ... (formatDate, formatDateTime ve columns kodları aynen kalacak)
   // Not: columns içindeki render fonksiyonlarını korudum
   const formatDateTime = (value) => { if (!value) return ""; return dayjs(value).format("DD.MM.YYYY HH:mm"); };
+
   const columns = [
-      { title: "Kullanıcı", dataIndex: "kullanici", key: "kullanici", width: 150 },
-      { title: "İşlem", dataIndex: "islem", key: "islem", width: 120 },
-       // ... diğerleri ...
+    {
+      title: "Sıra No",
+      dataIndex: "siraNo",
+      key: "siraNo",
+      width: 80,
+      align: "center",
+    },
+    {
+      title: "Kullanıcı",
+      dataIndex: "kullanici",
+      key: "kullanici",
+      width: 150,
+    },
+    {
+      title: "İşlem",
+      dataIndex: "islem",
+      key: "islem",
+      width: 120,
+      align: "center",
+      render: (text) => {
+        let color = "geekblue";
+        if (text === "Onaylandı") color = "green";
+        if (text === "Reddedildi" || text === "İptal") color = "red";
+        return (
+          <Tag color={color} style={{ width: "100%", textAlign: "center" }}>
+            {text}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: "Gönderim Zamanı",
+      dataIndex: "gonderimZamani",
+      key: "gonderimZamani",
+      width: 160,
+      render: formatDateTime,
+    },
+    {
+      title: "İşlem Zamanı",
+      dataIndex: "islemZamani",
+      key: "islemZamani",
+      width: 160,
+      render: formatDateTime,
+    },
+    {
+      title: "Bekleme Süresi",
+      dataIndex: "fark",
+      key: "fark",
+      width: 130,
+    },
+    {
+      title: "Açıklama",
+      dataIndex: "redAciklama",
+      key: "redAciklama",
+      width: 200,
+      ellipsis: true, // Uzun açıklamalar taşmasın diye
+    },
   ];
 
   const fetch = useCallback(() => {

@@ -1,18 +1,43 @@
 import React, { useCallback, useState } from "react";
 import { Modal, Table } from "antd";
 import AxiosInstance from "../../../../../../api/http";
-import { HistoryOutlined } from "@ant-design/icons"; // Tarihçe için saat ikonu
+import { HistoryOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
 
 export default function TarihceTablo({ selectedRows }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // ... (Columns aynen kalacak)
+  const formatDateTime = (value) => {
+    if (!value) return "";
+    return dayjs(value).format("DD.MM.YYYY HH:mm");
+  };
+
   const columns = [
-    { title: "İşlem", dataIndex: "islem", key: "islem", width: 350 },
-    { title: "İşlem Yapan", dataIndex: "islemYapanAdi", key: "islemYapanAdi", width: 200 },
-    // ...
+    {
+      title: "İşlem Yapan",
+      dataIndex: "islemYapanAdi",
+      key: "islemYapanAdi",
+      width: 150,
+      ellipsis: true, // İsim çok uzunsa ... koysun
+    },
+    {
+      title: "İşlem Detayı",
+      dataIndex: "islem",
+      key: "islem",
+      width: 400, // Açıklama uzun olduğu için genişlik verildi
+      render: (text) => (
+        <span style={{ whiteSpace: "normal" }}>{text}</span> // Uzun metinler alt satıra geçsin
+      ),
+    },
+    {
+      title: "İşlem Zamanı",
+      dataIndex: "islemZamani",
+      key: "islemZamani",
+      width: 160,
+      render: formatDateTime, // 2025-11-27T13... formatını düzeltir
+    },
   ];
 
   const fetch = useCallback(() => {
