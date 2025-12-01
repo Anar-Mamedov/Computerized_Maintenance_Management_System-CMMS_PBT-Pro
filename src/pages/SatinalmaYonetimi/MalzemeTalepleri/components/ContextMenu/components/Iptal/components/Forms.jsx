@@ -154,7 +154,7 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
     {/* İptal Nedeni */}
     <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
       <Text style={{ minWidth: "100px", fontSize: "14px" }}>İptal Nedeni:</Text>
-      <KodIDSelectbox style={{ width: "150px" }} name1="NedenKodId" kodID={33020} isRequired={false} />
+      <KodIDSelectbox style={{ width: "300px" }} name1="NedenKodId" kodID={33020} isRequired={false} />
     </div>
 
     {/* Açıklama */}

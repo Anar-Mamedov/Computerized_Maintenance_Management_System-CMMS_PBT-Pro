@@ -163,6 +163,7 @@ function FisIcerigi({ modalOpen }) {
   });
 
   const [dataSource, setDataSource] = useState([]);
+  const selectedRowData = dataSource.find((item) => item.malzemeId === selectedRowId);
 
   // Add useEffect for calculating totals
   useEffect(() => {
@@ -326,6 +327,38 @@ function FisIcerigi({ modalOpen }) {
     }
   }, [watch, dataSource, setValue]);
 
+  useEffect(() => {
+    const subscription = watch((value, { name, type }) => {
+      // Eğer değişen alan makineName veya makineId ise
+      if (name && (name.includes(".makineName") || name.includes(".makineId"))) {
+        
+        // Hangi satırda işlem yapıldığını bul (regex ile index yakala)
+        const indexMatch = name.match(/fisIcerigi\.(\d+)\.makine/);
+        
+        if (indexMatch) {
+          const index = parseInt(indexMatch[1]);
+          
+          // Formdaki o satırın en güncel halini çek
+          const currentFormRow = getValues(`fisIcerigi.${index}`);
+
+          setDataSource((prevDataSource) => {
+            const newData = [...prevDataSource];
+            // Eğer satır mevcutsa güncelle
+            if (newData[index]) {
+              newData[index] = {
+                ...newData[index],
+                makineId: currentFormRow.makineId,
+                makineName: currentFormRow.makineName
+              };
+            }
+            return newData;
+          });
+        }
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, getValues]);
+
   // Safe handleSave with error handling
   const handleSave = (row) => {
     try {
@@ -391,6 +424,8 @@ function FisIcerigi({ modalOpen }) {
         ...row,
         birim: item.birim,
         birimKodId: item.birimKodId,
+        makineId: item.makineId, 
+        makineName: item.makineName,
         araToplam,
         indirimOrani: round(indirimOrani),
         indirimTutari: round(indirimTutari),
@@ -465,32 +500,32 @@ function FisIcerigi({ modalOpen }) {
         const toplam = kdvDH ? round(kdvMatrah) : round(kdvMatrah + kdvTutar);
 
         const newRow = {
-  id: Date.now() + Math.random(), // Unique ID, frontend için
-  siraNo: 0,
-  fisId: 0,
-  malzemeKod: row.STK_KOD,
-  malzemeName: row.STK_TANIM,
-  malzemeId: row.TB_STOK_ID,
-  malDurumID: 0,
-  malDurumName: "AÇIK", // isteğe göre formdaki talepDurumName ile de set edilebilir
-  malKarsilamaSekli: "SATINALMA",
-  talepMiktar: miktar || 0,
-  gelenMiktar: 0,
-  kalanMiktar: 0,
-  satinalmaMiktar: 0,
-  iptalMiktar: 0,
-  stokKullanimMiktar: 0,
-  birimKodId: row.STK_BIRIM_KOD_ID,
-  birimName: row.STK_BIRIM,
-  makineId: 0,
-  makineName: "",
-  malzemeLokasyon: row.STK_LOKASYON || lokasyon || "",
-  malzemeLokasyonID: row.STK_LOKASYON_ID || lokasyonID || null,
-  masrafMerkezi: row.STK_MASRAFMERKEZ || "",
-  masrafMerkeziID: row.STK_MASRAF_MERKEZI_ID || null,
-  aciklama: "",
-  isDeleted: false,
-};
+          id: Date.now() + Math.random(), // Unique ID, frontend için
+          siraNo: 0,
+          fisId: 0,
+          malzemeKod: row.STK_KOD,
+          malzemeName: row.STK_TANIM,
+          malzemeId: row.TB_STOK_ID,
+          malDurumID: 0,
+          malDurumName: "AÇIK", // isteğe göre formdaki talepDurumName ile de set edilebilir
+          malKarsilamaSekli: "SATINALMA",
+          talepMiktar: miktar || 0,
+          gelenMiktar: 0,
+          kalanMiktar: 0,
+          satinalmaMiktar: 0,
+          iptalMiktar: 0,
+          stokKullanimMiktar: 0,
+          birimKodId: row.STK_BIRIM_KOD_ID,
+          birimName: row.STK_BIRIM,
+          makineId: 0,
+          makineName: "",
+          malzemeLokasyon: row.STK_LOKASYON || lokasyon || "",
+          malzemeLokasyonID: row.STK_LOKASYON_ID || lokasyonID || null,
+          masrafMerkezi: row.STK_MASRAFMERKEZ || "",
+          masrafMerkeziID: row.STK_MASRAF_MERKEZI_ID || null,
+          aciklama: "",
+          isDeleted: false,
+        };
 
         append(newRow);
       });
@@ -516,16 +551,16 @@ function FisIcerigi({ modalOpen }) {
 
   const defaultColumns = [
     {
-  title: '',
-  dataIndex: 'radio',
-  render: (_, record) => (
-    <Radio
-      checked={selectedRowId === record.malzemeId}
-      onChange={() => setSelectedRowId(record.malzemeId)}
-    />
-  ),
-  width: 50,
-},
+      title: '',
+      dataIndex: 'radio',
+      render: (_, record) => (
+        <Radio
+          checked={selectedRowId === record.malzemeId}
+          onChange={() => setSelectedRowId(record.malzemeId)}
+        />
+      ),
+      width: 50,
+    },
     {
       title: "Malzeme Kodu",
       dataIndex: "malzemeKod",
@@ -551,29 +586,29 @@ function FisIcerigi({ modalOpen }) {
       inputType: "text",
     },
     {
-  title: "Karşılama Şekli",
-  dataIndex: "malKarsilamaSekli",
-  key: "malKarsilamaSekli",
-  width: 150,
-  editable: false,
-  render: (text, record, index) => (
-    <Controller
-      name={`fisIcerigi.${index}.malKarsilamaSekli`}
-      control={control}
-      defaultValue="SATINALMA" // default değer
-      render={({ field }) => (
-        <Select
-          {...field}
-          style={{ width: "100%" }}
-          options={[
-            { label: "SATINALMA", value: "SATINALMA" },
-            { label: "STOKTAN", value: "STOKTAN" },
-          ]}
+      title: "Karşılama Şekli",
+      dataIndex: "malKarsilamaSekli",
+      key: "malKarsilamaSekli",
+      width: 150,
+      editable: false,
+      render: (text, record, index) => (
+        <Controller
+          name={`fisIcerigi.${index}.malKarsilamaSekli`}
+          control={control}
+          defaultValue="SATINALMA" // default değer
+          render={({ field }) => (
+            <Select
+              {...field}
+              style={{ width: "100%" }}
+              options={[
+                { label: "SATINALMA", value: "SATINALMA" },
+                { label: "STOKTAN", value: "STOKTAN" },
+              ]}
+            />
+          )}
         />
-      )}
-    />
-  ),
-},
+      ),
+    },
     {
       title: "Talep Miktarı",
       dataIndex: "talepMiktar",
@@ -592,7 +627,7 @@ function FisIcerigi({ modalOpen }) {
         <Controller
           name={`fisIcerigi.${index}.birimName`}
           control={control}
-          render={({ field }) => <KodIDSelectbox name1={`fisIcerigi.${index}.birimName`} kodID={13001} isRequired={false} />}
+          render={({ field }) => <KodIDSelectbox name1={`fisIcerigi.${index}.birimName`} kodID={32001} isRequired={false} />}
         />
       ),
     },
@@ -626,13 +661,7 @@ function FisIcerigi({ modalOpen }) {
       key: "marka",
       width: 150,
       editable: false,
-      render: (text, record, index) => (
-        <Controller
-          name={`fisIcerigi.${index}.marka`}
-          control={control}
-          render={({ field }) => <KodIDSelectbox name1={`fisIcerigi.${index}.marka`} kodID={13002} isRequired={false} />}
-        />
-      ),
+      render: (text, record) => record.marka || "-",
     },
     {
       title: "Model",
@@ -640,13 +669,7 @@ function FisIcerigi({ modalOpen }) {
       key: "Model",
       width: 150,
       editable: false,
-      render: (text, record, index) => (
-        <Controller
-          name={`fisIcerigi.${index}.Model`}
-          control={control}
-          render={({ field }) => <KodIDSelectbox name1={`fisIcerigi.${index}.Model`} kodID={13003} isRequired={false} />}
-        />
-      ),
+      render: (text, record) => record.Model || "-",
     },
     {
       title: "İşlemler",
@@ -694,7 +717,7 @@ function FisIcerigi({ modalOpen }) {
   return (
     <div style={{ position: "relative" }}>
       <div style={{ position: "absolute", top: "-55px", right: "0", display: "flex", gap: "10px", zIndex: 1000 }}>
-        <ContextMenu selectedRowId={selectedRowId} />
+        <ContextMenu selectedRowId={selectedRowId} selectedRowData={selectedRowData} />
         <Button style={{ zIndex: 1001 }} type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
           Ekle
         </Button>

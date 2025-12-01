@@ -163,6 +163,7 @@ function FisIcerigi({ modalOpen, disabled }) {
   });
 
   const [dataSource, setDataSource] = useState([]);
+  const selectedRowData = dataSource.find((item) => item.malzemeId === selectedRowId);
 
   // Add useEffect for calculating totals
   useEffect(() => {
@@ -599,7 +600,7 @@ function FisIcerigi({ modalOpen, disabled }) {
             <div style={{ ...(disabled ? { pointerEvents: "none", opacity: 0.6 } : {}) }}>
               <KodIDSelectbox
                 name1={`fisIcerigi.${index}.birimName`}
-                kodID={13001}
+                kodID={32001}
                 isRequired={false}
               />
             </div>
@@ -740,7 +741,7 @@ function FisIcerigi({ modalOpen, disabled }) {
   return (
     <div style={{ position: "relative" }}>
       <div style={{ position: "absolute", top: "-55px", right: "0", display: "flex", gap: "10px", zIndex: 1000 }}>
-        <ContextMenu selectedRowId={selectedRowId} />
+        <ContextMenu selectedRowId={selectedRowId} selectedRowData={selectedRowData} />
         <Button style={{ zIndex: 1001 }} type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}  disabled={disabled} >
           Ekle
         </Button>

@@ -18,7 +18,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
       firmaId: -1,
       projeId: 1,
       projeName: "",
-      tarih: null,
+      talepTarihi: null,
       saat: null,
       baslik: "",
       talepEdenPersonelId: null,
@@ -71,7 +71,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
         setValue("firmaId", item.firmaId);
         setValue("projeID", item.projeId);
         setValue("proje", item.projeName);
-        setValue("tarih", item.tarih ? dayjs(item.tarih) : null);
+        setValue("talepTarihi", item.tarih ? dayjs(item.tarih) : null);
         setValue("saat", item.saat ? dayjs(item.saat, "HH:mm:ss") : null);
         setValue("baslik", item.baslik);
         setValue("talepEdenPersonelId", item.talepEdenPersonelId);
@@ -183,7 +183,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
     firmaId: Number(data.firmaID) || -1,
     projeId: Number(data.projeID) || -1,
     projeName: data.proje || "",
-    tarih: formatDateWithDayjs(data.tarih),
+    tarih: formatDateWithDayjs(data.talepTarihi),
     saat: formatTimeWithDayjs(data.saat),
     baslik: data.baslik || "",
     talepEdenPersonelId: Number(data.talepEdenPersonelId) || -1,

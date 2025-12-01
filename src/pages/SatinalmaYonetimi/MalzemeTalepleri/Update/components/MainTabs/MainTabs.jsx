@@ -118,23 +118,6 @@ export default function MainTabs({ modalOpen, disabled }) {
 
   // duzenlenmeTarihi ve duzenlenmeSaati alanlarının boş ve ye sistem tarih ve saatinden büyük olup olmadığını kontrol etmek için bir fonksiyon sonu
 
-  // sistemin o anki tarih ve saatini almak için
-
-  useEffect(() => {
-    if (modalOpen) {
-      const currentDate = dayjs(); // Şu anki tarih için dayjs nesnesi
-      const currentTime = dayjs(); // Şu anki saat için dayjs nesnesi
-
-      // Tarih ve saat alanlarını güncelle
-      setTimeout(() => {
-        setValue("duzenlenmeTarihi", currentDate);
-        setValue("duzenlenmeSaati", currentTime);
-      }, 50);
-    }
-  }, [modalOpen, setValue]);
-
-  // sistemin o anki tarih ve saatini almak sonu
-
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 
   // Intl.DateTimeFormat kullanarak tarih formatlama
@@ -202,6 +185,14 @@ export default function MainTabs({ modalOpen, disabled }) {
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
+  useEffect(() => {
+  if (!modalOpen) return;
+
+  // Modal açıldığında tarih ve saat boş olacak
+  setValue("talepTarihi", null);
+  setValue("saat", null);
+}, [modalOpen, setValue]);
+
   // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın
 
   useEffect(() => {
@@ -222,10 +213,6 @@ export default function MainTabs({ modalOpen, disabled }) {
   const formattedSampleTime = timeFormatter.format(sampleTime);
   const is12HourFormat = /AM|PM/.test(formattedSampleTime);
   setLocaleTimeFormat(is12HourFormat ? "hh:mm A" : "HH:mm");
-
-  // ✅ Form alanlarına başlangıç değerini set et
-  setValue("talepTarihi", dayjs());
-  setValue("saat", dayjs());
 }, []);
 
   // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın sonu
@@ -351,21 +338,23 @@ export default function MainTabs({ modalOpen, disabled }) {
                 <Input
                   {...field}
                   disabled={disabled}
-                  value="MALZEME TALEBİ"
                   status={errors["baslik"] ? "error" : ""}
                   style={{ flex: 1 }}
+
                   onFocus={(e) => {
                     setInitialBaslik(e.target.value);
                     setIsBaslikModified(false);
                   }}
+
                   onChange={(e) => {
-                    field.onChange(e);
+                    field.onChange(e.target.value);
                     if (e.target.value !== initialTalepNo) {
                       setIsBaslikModified(true);
                     }
                   }}
+
                   onBlur={(e) => {
-                    field.onBlur(e);
+                    field.onBlur();
                     if (isTalepNoModified) {
                       validateBaslik(e.target.value);
                     }
@@ -403,40 +392,40 @@ export default function MainTabs({ modalOpen, disabled }) {
               }}
             >
               <Controller
-                name="talepTarihi"
-                control={control}
-                rules={{ required: t("alanBosBirakilamaz") }}
-                render={({ field }) => (
-                  <DatePicker
-                    {...field}
-                    disabled={disabled}
-                    status={errors["talepTarihi"] ? "error" : ""}
-                    style={{ width: "100%", maxWidth: "130px" }}
-                    format={localeDateFormat}
-                    value={field.value || dayjs()}
-                    onChange={(date) => {
-                      field.onChange(date);
-                      setValue("talepTarihi", date);
-                    }}
-                  />
-                )}
-              />
-              <Controller
-                name="saat"
-                control={control}
-                render={({ field }) => (
-                  <TimePicker
-                    {...field}
-                    disabled={disabled}
-                    style={{ width: "100%", maxWidth: "85px" }}
-                    format={localeTimeFormat}
-                    onChange={(date) => {
-                      field.onChange(date);
-                      setValue("saat", date);
-                    }}
-                  />
-                )}
-              />
+  name="talepTarihi"
+  control={control}
+  rules={{ required: t("alanBosBirakilamaz") }}
+  render={({ field }) => (
+    <DatePicker
+      {...field}
+      disabled={disabled}
+      status={errors["talepTarihi"] ? "error" : ""}
+      format={localeDateFormat}
+      value={field.value ?? null}
+      onChange={(date) => {
+        field.onChange(date);
+        setValue("talepTarihi", date);
+      }}
+    />
+  )}
+/>
+
+<Controller
+  name="saat"
+  control={control}
+  render={({ field }) => (
+    <TimePicker
+      {...field}
+      disabled={disabled}
+      format={localeTimeFormat}
+      value={field.value ?? null}
+      onChange={(date) => {
+        field.onChange(date);
+        setValue("saat", date);
+      }}
+    />
+  )}
+/>
               {errors["talepTarihi"] && <div style={{ color: "red", marginTop: "5px" }}>{errors["talepTarihi"].message}</div>}
             </div>
           </div>

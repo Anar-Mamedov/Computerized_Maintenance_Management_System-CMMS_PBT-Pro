@@ -89,7 +89,7 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
         {/* 2. Onaya Gönder */}
         {onayCheck &&
           selectedRows.length >= 1 &&
-          selectedRows.some((row) => row.SFS_TALEP_DURUM_ID === 0 || row.SFS_TALEP_DURUM_ID === 1) && (
+          selectedRows.some((row) => row.SFS_TALEP_DURUM_ID === 0 || row.SFS_TALEP_DURUM_ID === 1 || row.SFS_TALEP_DURUM_ID === 9) && (
             <OnayaGonder {...commonProps} />
         )}
 
@@ -158,14 +158,12 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
 
   const content = (
     <div style={contentContainerStyle}>
-      {selectedRows.length >= 1 ? (
+      {selectedRows.length >= 1 && (
         <>
           {renderTalepIslemleri()}
           {renderIlgiliKayitlar()}
           {renderKayitVeTarihce()}
         </>
-      ) : (
-        <div style={{ padding: '10px', color: '#999', textAlign: 'center' }}>Lütfen bir satır seçiniz.</div>
       )}
     </div>
   );

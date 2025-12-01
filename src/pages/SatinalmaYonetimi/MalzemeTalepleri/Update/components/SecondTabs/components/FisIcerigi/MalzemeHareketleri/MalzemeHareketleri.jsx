@@ -4,7 +4,7 @@ import { Button, Modal, Table, Spin, message, Tag } from "antd";
 import AxiosInstance from "../../../../../../../../../api/http";
 import dayjs from "dayjs";
 
-const MainTable = ({ selectedRowId }) => {
+const MainTable = ({ selectedRowId, malzemeKod }) => {
   const [filters, setFilters] = useState({
     basTarih: null,
     bitTarih: null,
@@ -32,13 +32,13 @@ const MainTable = ({ selectedRowId }) => {
     },
   },
   {
-    title: "Makine Kodu",
+    title: "Malzeme Kodu",
     dataIndex: "makineKodu",
     key: "makineKodu",
     width: 150,
   },
   {
-    title: "Makine Tanımı",
+    title: "Malzeme Tanımı",
     dataIndex: "makineTanim",
     key: "makineTanim",
     width: 200,  // 200px genişlik
@@ -74,7 +74,7 @@ const MainTable = ({ selectedRowId }) => {
     dataIndex: "firma",
     key: "firma",
     width: 150,
-    render: (text) => text || "-", // firma null ise '-' göster
+    render: (text) => text || "-",
   },
   {
     title: "Miktar",
@@ -164,9 +164,9 @@ const MainTable = ({ selectedRowId }) => {
 
   return (
     <>
-      <Button onClick={() => setIsModalVisible(true)}>Malzeme Depo Durumları</Button>
+      <Button onClick={() => setIsModalVisible(true)}>Malzeme Hareketleri</Button>
       <Modal
-        title="Malzeme Hareketleri"
+        title={malzemeKod ? `Malzeme Hareketleri - ${malzemeKod}` : "Malzeme Hareketleri"}
         centered
         width={900}
         open={isModalVisible}

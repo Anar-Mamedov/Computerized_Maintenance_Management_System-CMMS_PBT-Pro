@@ -24,6 +24,7 @@ import {
 } from "recharts";
 import AxiosInstance from "../../../api/http";
 import TalepDurumDagilimi from "./Components/TalepDurumDagilimi";
+import BekleyenOnaylarim from "../../Dashboard1/components/OnayIstekleriTablo"
 const { Title } = Typography;
 
 /**
@@ -292,6 +293,15 @@ export default function Dashboard() {
             size="small"
           />
         </Card>
+      </Col>
+    </Row>
+
+    {/* 3. alt bölüm */}
+    <Row gutter={[16, 16]} align="stretch">
+      <Col xs={24} lg={12}>
+        <div style={{ height: "250px", overflow: "auto" }}>
+           <BekleyenOnaylarim />
+        </div>
       </Col>
     </Row>
   </div>

@@ -347,25 +347,9 @@ export default function MainTabs({ modalOpen }) {
               render={({ field }) => (
                 <Input
                   {...field}
-                  value="MALZEME TALEBİ"
+                  placeholder="MALZEME TALEBİ"
                   status={errors["baslik"] ? "error" : ""}
                   style={{ flex: 1 }}
-                  onFocus={(e) => {
-                    setInitialBaslik(e.target.value);
-                    setIsBaslikModified(false);
-                  }}
-                  onChange={(e) => {
-                    field.onChange(e);
-                    if (e.target.value !== initialTalepNo) {
-                      setIsBaslikModified(true);
-                    }
-                  }}
-                  onBlur={(e) => {
-                    field.onBlur(e);
-                    if (isTalepNoModified) {
-                      validateBaslik(e.target.value);
-                    }
-                  }}
                 />
               )}
             />

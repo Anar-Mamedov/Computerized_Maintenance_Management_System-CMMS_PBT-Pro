@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Row, Col, Input, Button, Table, Card, Tag, Divider, message, Tooltip, Space, DatePicker, Popconfirm, Typography, Drawer, Modal } from "antd";
-import { SendOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, BarChartOutlined, SnippetsOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../api/http";
 import dayjs from "dayjs";
 import TeklifKarsilastirma from "./TeklifKarsilastirma";
@@ -10,13 +10,13 @@ const { Text } = Typography;
 
 export default function TalepTeklifeAktarmaAntd({ fisId, baslik, fisNo, disabled }) {
   const [suppliers, setSuppliers] = useState([]);
-  const [selectedItems, setSelectedItems] = useState([]); // seçilen malzeme satırları
-  const [selectedSuppliersData, setSelectedSuppliersData] = useState([]); // seçilen tedarikçi satırları
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedSuppliersData, setSelectedSuppliersData] = useState([]);
   const [teklifPaketleri, setTeklifPaketleri] = useState([]);
   const [selectedItemKeys, setSelectedItemKeys] = useState([]);
   const [selectedSupplierKeys, setSelectedSupplierKeys] = useState([]);
   const [teklifNo, setTeklifNo] = useState(null);
-  const [duzenlemeTarihi, setDuzenlemeTarihi] = useState(dayjs()); // Bugünün tarihi
+  const [duzenlemeTarihi, setDuzenlemeTarihi] = useState(dayjs());
   const [konu, setKonu] = useState("");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
@@ -24,12 +24,13 @@ export default function TalepTeklifeAktarmaAntd({ fisId, baslik, fisNo, disabled
   const [pageSize, setPageSize] = useState(5);
   const [malzemeSearch, setMalzemeSearch] = useState("");
   const [searchValue, setSearchValue] = useState("");
-  const [leftWidth, setLeftWidth] = useState(50); // tablolar arası genişlik
-  const [topHeight, setTopHeight] = useState(60); // tablolar & paketler arası yükseklik
+  const [leftWidth, setLeftWidth] = useState(50);
+  const [topHeight, setTopHeight] = useState(60);
   const containerRef = useRef(null);
   const isDraggingX = useRef(false);
   const isDraggingY = useRef(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
+  const [totalRecords, setTotalRecords] = useState(0);
 
   const DURUM_STYLES = {
     1: { text: "TEKLİFLER TOPLANIYOR", backgroundColor: "#e1f7d5", color: "#3c763d" },
@@ -82,24 +83,33 @@ export default function TalepTeklifeAktarmaAntd({ fisId, baslik, fisNo, disabled
 
   // --- Tedarikçi listesi
   useEffect(() => {
-  if (!currentPage) setCurrentPage(1);
+    setLoading(true);
+  
+    AxiosInstance.get(`GetTedarikciList?aktif=1&searchText=${searchValue}&pagingDeger=${currentPage}&pageSize=${pageSize}`)
+      .then((res) => {
+        const list = Array.isArray(res.data) ? res.data : [];
+        setSuppliers(list);
 
-  AxiosInstance.get(`GetTedarikciList?aktif=1&searchText=${searchValue}&pagingDeger=${currentPage}&pageSize=${pageSize}`)
-    .then((res) => {
-      // res.Firma_Liste array mi kontrol et
-      const list = Array.isArray(res.data) ? res.data : [];
-      setSuppliers(list);
-    })
-    .catch(() => {
-      message.error("Tedarikçiler yüklenirken hata oluştu");
-      setSuppliers([]);
-    });
-}, [currentPage, searchValue, pageSize]);
+        if (res.pagination && res.pagination.total_records) {
+          setTotalRecords(res.pagination.total_records);
+        } else {
+          setTotalRecords(0);
+        }
+      })
+      .catch(() => {
+        message.error("Tedarikçiler yüklenirken hata oluştu");
+        setSuppliers([]);
+        setTotalRecords(0);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [currentPage, searchValue, pageSize]);
 
   // --- Tablo kolonları
   const itemColumns = [
   {
-    title: "Malzeme Kodu",
+    title: "Kod",
     dataIndex: "stokKod",
     key: "stokKod",
     ellipsis: true,
@@ -110,7 +120,7 @@ export default function TalepTeklifeAktarmaAntd({ fisId, baslik, fisNo, disabled
     ),
   },
   {
-    title: "Malzeme Tanımı",
+    title: "Tanım",
     dataIndex: "stokAdi",
     key: "stokAdi",
     ellipsis: true,
@@ -370,6 +380,7 @@ const handleFinishEditing = async (id) => {
       display: "flex",
       flexDirection: "column",
       overflow: "hidden",
+      position: "relative",
     }}
     onMouseMove={handleMouseMove}
     onMouseUp={handleMouseUp}
@@ -420,23 +431,24 @@ const handleFinishEditing = async (id) => {
           />
         </Col>
 
-        {/* Buton */}
+        {/* Butonlar */}
         <Col>
-          <Button
-            type={data.length > 0 ? "primary" : "default"} // primary = mavi, default ile style kullanacağız
-            style={{
-              marginTop: 22,
-              backgroundColor: data.length > 0 ? undefined : "#52c41a", // Teklifleri Karşılaştır yeşil
-              borderColor: data.length > 0 ? undefined : "#52c41a",
-              color: data.length > 0 ? undefined : "#fff",
-            }}
-            icon={<SendOutlined />}
-            loading={loading}
-            onClick={data.length > 0 ? handleCreateTeklif : handleCompareTeklifler}
-            disabled={disabled && data.length > 0}
-          >
-          {data.length > 0 ? "Teklif Oluştur" : "Teklifleri Karşılaştır"}
-          </Button>
+          <Space direction="vertical" size={8} style={{ marginTop: 5 }}> {/* direction="vertical" ekledik */}
+            <Button
+              type="primary"
+              style={{
+                width: "100%", // Genişlikleri eşitlemek için %100 yaptık
+                backgroundColor: "#52c41a",
+                borderColor: "#52c41a",
+              }}
+              icon={<BarChartOutlined />}
+              onClick={handleCompareTeklifler}
+              disabled={teklifPaketleri.length === 0 || disabled}
+            >
+              Teklifleri Karşılaştır
+            </Button>
+            
+          </Space>
         </Col>
       </Row>
     </Card>
@@ -446,6 +458,9 @@ const handleFinishEditing = async (id) => {
   <div style={{ width: `${leftWidth}%`, overflow: "auto" }}>
     <Card style={{ height: "100%", display: "flex", flexDirection: "column" }}>
           {/* Malzeme arama */}
+    <div style={{ marginTop: 10, marginBottom: 5, fontWeight: "bold", fontSize: "15px", color: "#262626" }}>
+        Malzemeler
+      </div>
 <Search
   placeholder="Malzeme ara..."
   allowClear
@@ -464,7 +479,6 @@ const handleFinishEditing = async (id) => {
   rowKey={(record) => (record.stokId !== -1 ? record.stokId : `tmp-${record.stokKod ?? Math.random()}`)}
   loading={loading}
   pagination={{ pageSize: 5 }}
-  scroll={{ y: 300 }}
 />
         </Card>
       </div>
@@ -484,10 +498,16 @@ const handleFinishEditing = async (id) => {
   <div style={{ width: `${100 - leftWidth - 0.5}%`, overflow: "auto" }}>
     <Card style={{ height: "100%", display: "flex", flexDirection: "column" }}>
           {/* Tedarikçi arama */}
+    <div style={{ marginTop: 10, marginBottom: 5, fontWeight: "bold", fontSize: "15px", color: "#262626" }}>
+        Tedarikçiler
+      </div>
 <Search
   placeholder="Tedarikçi ara..."
   allowClear
-  onChange={(e) => setSearchValue(e.target.value)}
+  onChange={(e) => {
+      setSearchValue(e.target.value);
+      setCurrentPage(1); 
+  }}
   value={searchValue}
   style={{ marginBottom: 12 }}
 />
@@ -495,13 +515,17 @@ const handleFinishEditing = async (id) => {
           <Table
   size="small"
   columns={supplierColumns}
-  dataSource={suppliers.filter((s) =>
-    !searchValue || s.CAR_TANIM.toLowerCase().includes(searchValue.toLowerCase())
-  )}
+  dataSource={suppliers}
   rowSelection={supplierRowSelection}
-  rowKey={(record) => record.TB_CARI_ID ?? Math.random()}
-  pagination={{ pageSize: 5 }}
-  scroll={{ y: 300 }}
+  rowKey={(record) => record.TB_CARI_ID}
+  loading={loading}
+  pagination={{
+    current: currentPage,
+    pageSize: pageSize,
+    total: totalRecords,
+    showSizeChanger: false,
+    onChange: (page) => setCurrentPage(page)
+  }}
 />
         </Card>
       </div>
@@ -519,79 +543,111 @@ const handleFinishEditing = async (id) => {
     />
 
     {/* Teklif paketleri */}
-    <div style={{ flex: `${100 - topHeight}%`, overflowY: "auto" }}>
-      <Row gutter={[16, 16]}>
-        {teklifPaketleri.map((t) => (
-          <Col xs={24} sm={12} md={8} key={t.teklifId}>
-            <Card
-              size="small"
-              title={
-                <Text strong style={{ fontSize: 16 }}>
-                  {t.editing ? (
-                    <Input
-                      value={t.baslik}
-                      onChange={(e) => handleTitleChange(t.teklifId, e.target.value)}
-                      onPressEnter={() => handleFinishEditing(t.teklifId)}
-                      onBlur={() => handleFinishEditing(t.teklifId)}
-                      autoFocus
-                    />
-                  ) : (
-                    `RFQ — ${t.baslik}`
-                  )}
-                </Text>
-              }
-              extra={
-                <Space>
-                  <Button size="small" icon={<EditOutlined />} onClick={() => handleEditClick(t.teklifId)} disabled={disabled} />
-                  <Popconfirm
-                    title="Bu teklifi silmek istediğine emin misin?"
-                    okText="Evet"
-                    cancelText="Hayır"
-                    onConfirm={() => handleDelete(t.teklifId)}
-                  >
-                    <Button size="small" danger icon={<DeleteOutlined />} disabled={disabled} />
-                  </Popconfirm>
-                </Space>
-              }
-              style={{ borderRadius: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", height: "100%" }}
-            >
-              <div
-  style={{
-    marginBottom: 6,
-    backgroundColor: DURUM_STYLES[t.durumID]?.backgroundColor || "transparent",
-    color: DURUM_STYLES[t.durumID]?.color || "inherit",
-    padding: "4px 8px",
-    borderRadius: 6,
-    display: "inline-block"
-  }}
->
-  <Text>
-    {DURUM_STYLES[t.durumID]?.text || "-"}
-  </Text>
-</div>
+      <div 
+        style={{ 
+          flex: `${100 - topHeight}%`, 
+          overflowY: "auto", 
+          overflowX: "hidden", // 1. Yan scroll'u kapatır
+          padding: "4px"       // 2. Kart gölgeleri ve Row kenarları kesilmesin diye boşluk
+        }}
+      >
+      
+        <Row gutter={[16, 16]}>
+          {teklifPaketleri.map((t) => (
+            <Col xs={24} sm={12} md={8} key={t.teklifId}>
+              <Card
+                size="small"
+                title={
+                  <Text strong style={{ fontSize: 16 }}>
+                    {t.editing ? (
+                      <Input
+                        value={t.baslik}
+                        onChange={(e) => handleTitleChange(t.teklifId, e.target.value)}
+                        onPressEnter={() => handleFinishEditing(t.teklifId)}
+                        onBlur={() => handleFinishEditing(t.teklifId)}
+                        autoFocus
+                      />
+                    ) : (
+                      `RFQ — ${t.baslik}`
+                    )}
+                  </Text>
+                }
+                extra={
+                  <Space>
+                    <Button size="small" icon={<EditOutlined />} onClick={() => handleEditClick(t.teklifId)} disabled={disabled} />
+                    <Popconfirm
+                      title="Bu teklifi silmek istediğine emin misin?"
+                      okText="Evet"
+                      cancelText="Hayır"
+                      onConfirm={() => handleDelete(t.teklifId)}
+                    >
+                      <Button size="small" danger icon={<DeleteOutlined />} disabled={disabled} />
+                    </Popconfirm>
+                  </Space>
+                }
+                style={{ borderRadius: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", height: "100%" }}
+              >
+                {/* Durum (Parantez içinde) */}
+                <div
+                  style={{
+                    marginBottom: 6,
+                    backgroundColor: DURUM_STYLES[t.durumID]?.backgroundColor || "transparent",
+                    color: DURUM_STYLES[t.durumID]?.color || "inherit",
+                    padding: "4px 8px",
+                    borderRadius: 6,
+                    display: "inline-block"
+                  }}
+                >
+                  <Text>
+                    {t.baslik} ({DURUM_STYLES[t.durumID]?.text || "-"})
+                  </Text>
+                </div>
 
-              <div style={{ marginBottom: 6 }}>
-                <Text>
-                  <b>Kalem:</b> {t.kalemSayisi} • <b>Tedarikçi:</b> {t.tedarikcSayisi}
-                </Text>
-              </div>
+                <div style={{ marginBottom: 6 }}>
+                  <Text>
+                    <b>Kalem:</b> {t.kalemSayisi} • <b>Tedarikçi:</b> {t.tedarikcSayisi}
+                  </Text>
+                </div>
 
-              <div style={{ marginBottom: 6 }}>
-                <Text>
-                  <b>Tedarikçiler:</b> {t.tedarikciler?.trim() || "-"}
-                </Text>
-              </div>
+                <div style={{ marginBottom: 6 }}>
+                  <Text>
+                    <b>Tedarikçiler:</b> {t.tedarikciler?.trim() || "-"}
+                  </Text>
+                </div>
 
-              <div style={{ marginBottom: 6 }}>
-                <Text>
-                  <b>Oluşturma Tarihi:</b> {dayjs(t.olusturmaTarih).format("DD.MM.YYYY HH:mm")}
-                </Text>
-              </div>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-    </div>
+                <div style={{ marginBottom: 6 }}>
+                  <Text>
+                    <b>Oluşturma Tarihi:</b> {dayjs(t.olusturmaTarih).format("DD.MM.YYYY HH:mm")}
+                  </Text>
+                </div>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </div>
+    <div
+        style={{
+          marginTop: "auto",            
+          padding: "10px 20px",         
+          backgroundColor: "#fff",      
+          borderTop: "1px solid #e8e8e8", 
+          display: "flex",
+          justifyContent: "flex-end",   
+          alignItems: "center",         
+          flexShrink: 0,                
+        }}
+      >
+        <Button
+          type="primary"
+          style={{ width: 160 }}
+          icon={<SnippetsOutlined />}
+          loading={loading}
+          onClick={handleCreateTeklif}
+          disabled={disabled}
+        >
+          Teklif Paketi Oluştur
+        </Button>
+      </div>
   <Drawer
     title="Teklif Karşılaştırma"
     placement="right"

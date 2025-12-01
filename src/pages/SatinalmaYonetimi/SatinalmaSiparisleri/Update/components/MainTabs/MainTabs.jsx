@@ -399,21 +399,23 @@ export default function MainTabs({ modalOpen, disabled }) {
                 <Input
                   {...field}
                   disabled={disabled}
-                  value="SATINALMA SİPARİŞİ"
                   status={errors["baslik"] ? "error" : ""}
                   style={{ flex: 1 }}
+
                   onFocus={(e) => {
                     setInitialBaslik(e.target.value);
                     setIsBaslikModified(false);
                   }}
+
                   onChange={(e) => {
-                    field.onChange(e);
+                    field.onChange(e.target.value);
                     if (e.target.value !== initialTalepNo) {
                       setIsBaslikModified(true);
                     }
                   }}
+
                   onBlur={(e) => {
-                    field.onBlur(e);
+                    field.onBlur();
                     if (isTalepNoModified) {
                       validateBaslik(e.target.value);
                     }

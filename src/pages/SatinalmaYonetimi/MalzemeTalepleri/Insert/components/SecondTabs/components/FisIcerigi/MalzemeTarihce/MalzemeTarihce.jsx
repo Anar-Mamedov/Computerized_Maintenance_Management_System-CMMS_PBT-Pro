@@ -6,7 +6,7 @@ import { t } from "i18next";
 
 const { Text } = Typography;
 
-const MainTable = ({ selectedRowId }) => {
+const MainTable = ({ selectedRowId, malzemeKod }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -77,7 +77,7 @@ const MainTable = ({ selectedRowId }) => {
     <>
       <Button onClick={() => setIsModalVisible(true)}>Malzeme Tarihçesi</Button>
       <Modal
-        title="Malzeme Tarihçesi"
+        title={malzemeKod ? `Malzeme Tarihçesi - ${malzemeKod}` : "Malzeme Tarihçesi"}
         centered
         width={800}
         open={isModalVisible}
