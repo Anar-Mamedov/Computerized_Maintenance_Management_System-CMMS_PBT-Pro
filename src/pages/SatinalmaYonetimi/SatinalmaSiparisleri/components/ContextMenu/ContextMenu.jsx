@@ -58,7 +58,10 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
     width: '260px', 
     padding: '0',
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    maxHeight: '60vh',
+    overflowY: 'auto',
+    overflowX: 'hidden',
   };
 
   // --- GRUP 1: SİPARİŞ İŞLEMLERİ ---

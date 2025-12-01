@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState, useMemo, useRef } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
-import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Progress, message, Card, Row, Col, Space, Popconfirm, Tag, Popover } from "antd";
+import { HolderOutlined, SearchOutlined, MenuOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -17,6 +17,7 @@ import { useFormContext } from "react-hook-form";
 import { SiMicrosoftexcel } from "react-icons/si";
 import * as XLSX from "xlsx";
 import { t } from "i18next";
+import dayjs from "dayjs";
 
 const { Text } = Typography;
 
@@ -289,6 +290,126 @@ const MainTable = () => {
     }
   };
 
+  const TeklifPopoverContent = ({ fisId }) => {
+  const [loading, setLoading] = useState(true);
+  const [teklifPaketleri, setTeklifPaketleri] = useState([]);
+
+  useEffect(() => {
+    let active = true; 
+    const fetchData = async () => {
+      if (!fisId) return;
+      try {
+        setLoading(true);
+        // API İsteğin
+        const res = await AxiosInstance.get(`ListTeklifPaketleriByTalep?talepId=${fisId}`);
+        
+        if (active) {
+          // Backend yanıtına göre burayı ayarla (res.items veya direkt res)
+          if (res?.items) {
+            setTeklifPaketleri(res.items);
+          } else if (Array.isArray(res)) {
+             setTeklifPaketleri(res);
+          } else {
+            setTeklifPaketleri([]);
+          }
+        }
+      } catch (err) {
+        console.error("Hata:", err);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    fetchData();
+    return () => { active = false; };
+  }, [fisId]);
+
+  const DURUM_STYLES = {
+    1: { text: "TEKLİFLER TOPLANIYOR", backgroundColor: "#e1f7d5", color: "#3c763d" },
+    2: { text: "ONAYA GÖNDERİLDİ", backgroundColor: "#fff4d6", color: "#b8860b" },
+    3: { text: "ONAYLANDI", backgroundColor: "#d4f8e8", color: "#207868" },
+    4: { text: "REDDEDİLDİ", backgroundColor: "#fde2e4", color: "#c63b3b" }, 
+    5: { text: "SİPARİŞ", backgroundColor: "#e6f7ff", color: "#096dd9" }
+  };
+
+  if (loading) {
+    return (
+      <div style={{ padding: "20px", width: "200px", textAlign: "center" }}>
+        <Spin size="small" /> Yükleniyor...
+      </div>
+    );
+  }
+
+  if (teklifPaketleri.length === 0) {
+    return <div style={{ padding: "10px", color: "#999" }}>Teklif paketi yok.</div>;
+  }
+
+  // --- DİNAMİK STİL AYARLARI ---
+  const isMulti = teklifPaketleri.length > 1;
+  
+  const containerStyle = {
+    display: "flex",           // Kartları yan yana dizer
+    flexDirection: "row",      // Yatay hizalama
+    gap: "12px",               // Kartlar arası boşluk
+    padding: "10px",
+    
+    // Genişlik Mantığı: 
+    // Eğer 1 tane ise tek kartlık yer (320px), 
+    // birden fazlaysa 2 kartlık yer (660px) kaplasın.
+    width: isMulti ? "660px" : "320px",
+    
+    // Scroll Mantığı:
+    // Sadece x ekseninde scroll, y ekseninde gizli
+    overflowX: "auto", 
+    overflowY: "hidden",
+    
+    // Scrollbarın düzgün çalışması için elemanların alt satıra geçmesini engelle
+    whiteSpace: "nowrap" 
+  };
+
+  return (
+    <div style={containerStyle}>
+      {teklifPaketleri.map((t) => (
+        <div 
+            key={t.teklifId} 
+            style={{ 
+                // Flex: Büyüme(0), Küçülme(0), Baz Genişlik(300px)
+                // Bu sayede kartlar ezilmez, hep 300px kalır.
+                flex: "0 0 300px", 
+                width: "300px" 
+            }}
+        >
+          <Card
+            size="small"
+            title={<Text strong style={{ fontSize: 13 }}>RFQ — {t.baslik}</Text>}
+            style={{ 
+                borderRadius: 8, 
+                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                height: "100%", // Kartların boyu eşit olsun
+                whiteSpace: "normal" // Kart içindeki metinler normal alt satıra geçebilsin
+            }}
+            bodyStyle={{ padding: "10px" }}
+          >
+            <div style={{ marginBottom: 6 }}>
+               <Tag color={DURUM_STYLES[t.durumID]?.color || "default"}>
+                  {DURUM_STYLES[t.durumID]?.text || t.durumID}
+               </Tag>
+            </div>
+            
+            <div style={{ fontSize: "12px", display: "flex", flexDirection: "column", gap: "4px" }}>
+                <span><b>Kalem:</b> {t.kalemSayisi} adet</span>
+                <span><b>Tedarikçi:</b> {t.tedarikcSayisi} firma</span>
+                <span><b>Tedarikçler:</b> {t.tedarikciler} firma</span>
+                <span style={{ color: "#888", fontSize: "11px", marginTop: "4px" }}>
+                   {t.olusturmaTarih ? dayjs(t.olusturmaTarih).format("DD.MM.YYYY") : "-"}
+                </span>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+  );
+};
+
   const initialColumns = [
     {
       title: "Talep No",
@@ -374,50 +495,76 @@ const MainTable = () => {
       width: 150,
       ellipsis: true,
       visible: true,
-      render: (text) => {
+      render: (text, record) => {
+        // --- Stil Tanımlamaları ---
         let style = {
           borderRadius: "12px",
           padding: "2px 8px",
           fontWeight: 500,
           fontSize: "12px",
+          cursor: "help", // Hover edileceği belli olsun diye imleci soru işareti/yardım yaptık
+          display: "inline-block", // Hizalama düzgün dursun diye
         };
 
-    
-          <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
-
+        // --- Renk Mantığı (Senin Orijinal Kodun) ---
         switch (text) {
           case "ONAYLANDI":
             style = { ...style, backgroundColor: "#d4f8e8", color: "#207868" }; // pastel yeşil
-          break;
+            break;
           case "ONAY BEKLİYOR":
             style = { ...style, backgroundColor: "#fff4d6", color: "#b8860b" }; // pastel sarı
-          break;
+            break;
           case "ONAYLANMADI":
             style = { ...style, backgroundColor: "#ffe0e0", color: "#b22222" }; // pastel kırmızı
-          break;
+            break;
           case "SİPARİŞ":
             style = { ...style, backgroundColor: "#e6ecff", color: "#4056a1" }; // pastel mavi
-          break;
+            break;
           case "AÇIK":
             style = { ...style, backgroundColor: "#e1f7d5", color: "#3c763d" }; // açık yeşil
-          break;
+            break;
           case "TEKLİF":
             style = { ...style, backgroundColor: "#e0f7fa", color: "#00796b" }; // pastel turkuaz
-          break;
+            break;
           case "KAPALI":
-            style = { ...style, backgroundColor: "#eaeaeaff", color: "#949494ff" }; // pastel kırmızı/rose
-          break;
+            style = { ...style, backgroundColor: "#eaeaeaff", color: "#949494ff" }; // pastel kırmızı/rose (KAPALI ile aynı)
+            break;
           case "İPTAL":
-            style = { ...style, backgroundColor: "#fde2e4", color: "#d64550" }; // pastel kırmızı/rose (KAPALI ile aynı)
-          break;
+            style = { ...style, backgroundColor: "#fde2e4", color: "#d64550" }; // pastel kırmızı/rose
+            break;
           case "KARŞILANIYOR":
             style = { ...style, backgroundColor: "#e6f7ff", color: "#096dd9" }; // pastel açık mavi
-          break;
+            break;
           default:
-          style = { ...style, backgroundColor: "#f5f5f5", color: "#595959" }; // gri
+            style = { ...style, backgroundColor: "#f5f5f5", color: "#595959" }; // gri
         }
 
-        return <span style={style}>{text}</span>;
+        // --- Render Return ---
+        return (
+          <Popover
+            // Popover açıldığında "TeklifPopoverContent" componenti çalışır ve API isteği atar.
+            // record.TB_STOK_FIS_ID'nin backenddeki doğru ID alanı olduğundan emin ol.
+            content={<TeklifPopoverContent fisId={record.TB_STOK_FIS_ID} />}
+            title="Teklif Paketleri"
+            trigger="hover"
+            // destroyTooltipOnHide={true}: Popup kapandığında içeriği (componenti) yok eder.
+            // Tekrar açıldığında component baştan oluşur ve API isteği yeniden atılır.
+            // Böylece veri hep güncel kalır.
+            destroyTooltipOnHide={true}
+          >
+            {/* Tıklama özelliği (onRowClick) korunuyor */}
+            <span
+              style={style}
+              onClick={(e) => {
+                // Eğer satır tıklamasıyla çakışma olursa diye stopPropagation eklenebilir, 
+                // ama senin senaryonda onRowClick çağrılması yeterli.
+                onRowClick(record);
+              }}
+            >
+              {text}
+            </span>
+          </Popover>
+        );
       },
     },
     {
