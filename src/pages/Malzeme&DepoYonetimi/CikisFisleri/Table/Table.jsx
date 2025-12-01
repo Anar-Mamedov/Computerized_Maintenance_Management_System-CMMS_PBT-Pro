@@ -241,7 +241,7 @@ const CikisFisleri = () => {
   };
 
   const onRowClick = (record) => {
-    setDrawer({ visible: false, data: record });
+    setDrawer({ visible: true, data: record });
   };
 
   const refreshTableData = useCallback(() => {
