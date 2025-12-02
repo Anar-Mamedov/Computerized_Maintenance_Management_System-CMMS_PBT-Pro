@@ -144,9 +144,9 @@ const MainTable = () => {
     return [
       { title: "Açık Talepler", value: cardsData.ACIK_TALEPLER },
       { title: "Onay Bekleyen", value: cardsData.ONAY_BEKLEYEN },
-      { title: "Gecikmede", value: cardsData.GECIKMEDE },
-      { title: "Bugün Teslim", value: cardsData.BUGUN_TESLIM },
-      { title: "Ortalama Onay Süresi (dk)", value: cardsData.ORT_ONAY_SURESI_DK },
+      { title: "Siparişte", value: cardsData.SIPARIS_SAYISI },
+      { title: "Teklif Sürecindekiler", value: cardsData.TEKLIF_SURECINDE },
+      { title: "Ortalama Onay Süresi", value: cardsData.ORT_ONAY_SURESI_FORMAT },
     ];
   }, [cardsData]);
 
