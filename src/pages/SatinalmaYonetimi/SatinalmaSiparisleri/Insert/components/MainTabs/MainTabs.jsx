@@ -224,7 +224,7 @@ export default function MainTabs({ modalOpen }) {
   setLocaleTimeFormat(is12HourFormat ? "hh:mm A" : "HH:mm");
 
   // ✅ Form alanlarına başlangıç değerini set et
-  setValue("talepTarihi", dayjs());
+  setValue("siparisTarihi", dayjs());
   setValue("saat", dayjs());
 }, []);
 

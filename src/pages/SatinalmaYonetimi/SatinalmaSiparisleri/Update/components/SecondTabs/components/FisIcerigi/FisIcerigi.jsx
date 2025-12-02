@@ -313,92 +313,105 @@ function FisIcerigi({ modalOpen, disabled }) {
 
   // Safe handleSave with error handling
   const handleSave = (row) => {
-    try {
-      const newData = [...dataSource];
-      const index = newData.findIndex((item) => row.id === item.id);
-      if (index < 0) return;
+    try {
+      const newData = [...dataSource];
+      const index = newData.findIndex((item) => row.id === item.id);
+      if (index < 0) return;
 
-      const item = newData[index];
+      const item = newData[index];
 
-      // Helper function to round to 2 decimal places
-      const round = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
+      // Helper function to round to 2 decimal places
+      const round = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
 
-      // Check if price has changed
-      const isPriceChanged = item.birimFiyat !== row.birimFiyat;
+      // Check if price has changed
+      const isPriceChanged = item.birimFiyat !== row.birimFiyat;
 
-      // Check if discount has changed (either discount rate or amount)
-      const isDiscountChanged = item.indirimOran !== row.indirimOran || item.indirimTutar !== row.indirimTutar;
+      // Check if discount has changed (either discount rate or amount)
+      const isDiscountChanged = item.indirimOran !== row.indirimOran || item.indirimTutar !== row.indirimTutar;
 
-      // If discount was edited in table, reset manual edit flag so table calculations take precedence
-      if (isDiscountChanged) {
-        setIsIndirimManuallyEdited(false);
-      }
+      // If discount was edited in table, reset manual edit flag
+      if (isDiscountChanged) {
+        setIsIndirimManuallyEdited(false);
+      }
 
-      // Calculate totals
-      const miktar = Number(row.miktar) || 0;
-      const birimFiyat = Number(row.birimFiyat) || 0;
-      const kdvOran = Number(row.kdvOran) || 0;
-      const kdvDH = Boolean(row.kdvDahil);
+      // Calculate totals
+      const miktar = Number(row.miktar) || 0;
+      const birimFiyat = Number(row.birimFiyat) || 0;
+      const kdvOran = Number(row.kdvOran) || 0;
+      const kdvDH = Boolean(row.kdvDahil);
 
-      // Exception: Always calculate araToplam as miktar * birimFiyat regardless of kdvDH
-      const araToplam = round(miktar * birimFiyat);
+      // Exception: Always calculate araToplam as miktar * birimFiyat regardless of kdvDH
+      const araToplam = round(miktar * birimFiyat);
 
-      let indirimOran = Number(row.indirimOran) || 0;
-      let indirimTutar = Number(row.indirimTutar) || 0;
+      let indirimOran = Number(row.indirimOran) || 0;
+      let indirimTutar = Number(row.indirimTutar) || 0;
 
-      // If indirimOran was changed
-      if (item.indirimOran !== row.indirimOran) {
+      // --- MANTIK DÜZELTME BURADA ---
+      
+      // 1. Durum: Kullanıcı İndirim Oranını değiştirdiyse -> Tutarı hesapla
+      if (item.indirimOran !== row.indirimOran) {
+        indirimTutar = round((araToplam * indirimOran) / 100);
+      }
+      // 2. Durum: Kullanıcı İndirim Tutarını değiştirdiyse -> Oranı hesapla
+      else if (item.indirimTutar !== row.indirimTutar) {
+        if (araToplam !== 0) {
+          indirimOran = round((indirimTutar / araToplam) * 100);
+        } else {
+          indirimOran = 0;
+        }
+      }
+      // 3. Durum (Senin sorunun çözümü): İndirim alanlarına dokunulmadı ama Fiyat/Miktar değişti.
+      // Mevcut "indirimOran"ı baz alarak tutarı güncellemeliyiz.
+      else {
         indirimTutar = round((araToplam * indirimOran) / 100);
       }
-      // If indirimTutar was changed
-      else if (item.indirimTutar !== row.indirimTutar) {
-        indirimOran = round((indirimTutar / araToplam) * 100);
-      }
+      
+      // --------------------------------
 
-      // Calculate KDV amount based on kdvDH
-      const kdvMatrah = round(araToplam - indirimTutar);
-      let kdvTutar;
+      // Calculate KDV amount based on kdvDH
+      const kdvMatrah = round(araToplam - indirimTutar);
+      let kdvTutar;
 
-      if (kdvDH) {
-        // If KDV is inclusive, calculate KDV portion from the price
-        const baseAmount = round(kdvMatrah / (1 + kdvOran / 100));
-        kdvTutar = round(kdvMatrah - baseAmount);
-      } else {
-        // If KDV is exclusive, calculate KDV as additional
-        kdvTutar = round(kdvMatrah * (kdvOran / 100));
-      }
+      if (kdvDH) {
+        // If KDV is inclusive, calculate KDV portion from the price
+        const baseAmount = round(kdvMatrah / (1 + kdvOran / 100));
+        kdvTutar = round(kdvMatrah - baseAmount);
+      } else {
+        // If KDV is exclusive, calculate KDV as additional
+        kdvTutar = round(kdvMatrah * (kdvOran / 100));
+      }
 
-      // Calculate total
-      const toplam = kdvDH ? round(kdvMatrah) : round(kdvMatrah + kdvTutar);
+      // Calculate total
+      const toplam = kdvDH ? round(kdvMatrah) : round(kdvMatrah + kdvTutar);
 
-      const updatedRow = {
-        ...item,
-        ...row,
-        birim: item.birim,
-        birimKodId: item.birimKodId,
-        araToplam,
-        indirimOran: round(indirimOran),
-        indirimTutar: round(indirimTutar),
-        kdvTutar: round(kdvTutar),
-        toplam: round(toplam),
-        isPriceChanged: isPriceChanged || item.isPriceChanged,
-      };
+      const updatedRow = {
+        ...item,
+        ...row,
+        birim: item.birim,
+        birimKodId: item.birimKodId,
+        araToplam,
+        indirimOran: round(indirimOran),
+        indirimTutar: round(indirimTutar),
+        kdvTutar: round(kdvTutar),
+        toplam: round(toplam),
+        isPriceChanged: isPriceChanged || item.isPriceChanged,
+      };
 
-      newData.splice(index, 1, updatedRow);
-      setDataSource(newData);
+      newData.splice(index, 1, updatedRow);
+      setDataSource(newData);
 
-      // Update form value safely
-      setTimeout(() => {
-        try {
-          setValue(`fisIcerigi.${index}`, updatedRow);
-        } catch (error) {
-          console.error(`Error updating form value for index ${index}:`, error);
-        }
-      }, 0);
-    } catch (error) {
-      console.error("Error in handleSave:", error);
-    }
-  };
+      // Update form value safely
+      setTimeout(() => {
+        try {
+          setValue(`fisIcerigi.${index}`, updatedRow);
+        } catch (error) {
+          console.error(`Error updating form value for index ${index}:`, error);
+        }
+      }, 0);
+    } catch (error) {
+      console.error("Error in handleSave:", error);
+    }
+  };
 
   // Safe handleMalzemeSelect with error handling
   const handleMalzemeSelect = (selectedRows) => {
@@ -463,6 +476,7 @@ function FisIcerigi({ modalOpen, disabled }) {
           araToplam,
           indirimOran,
           indirimTutar,
+          kdvDahil: row.STK_KDV_DH,
           kdvOran,
           kdvTutar,
           toplam,
@@ -569,6 +583,14 @@ function FisIcerigi({ modalOpen, disabled }) {
       width: 120,
       editable: false,
       inputType: "number",
+    },
+    {
+      title: "KDV Dahil",
+      dataIndex: "kdvDahil",
+      key: "kdvDahil",
+      width: 85,
+      editable: false,
+      inputType: "text",
     },
     {
       title: "KDV %",

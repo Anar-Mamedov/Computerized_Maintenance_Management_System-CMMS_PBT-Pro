@@ -22,7 +22,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   const aktifPaketIndex = Number(activeTab) - 1;
   const aktifPaket = paketler[aktifPaketIndex] || {};
   const aktifPaketDurumID = teklifDurumlari?.find(d => d.teklifId === aktifPaket.id)?.durumID || null;
-  const isDisabled = !(aktifPaketDurumID === 1 || aktifPaketDurumID === 4 || aktifPaketDurumID === 3);
+  const isDisabled = !(aktifPaketDurumID === 1 || aktifPaketDurumID === 4);
   const [detayGosterilenPaket, setDetayGosterilenPaket] = useState(null);
   const DURUM_STYLES = {
     1: { text: "TEKLİFLER TOPLANIYOR", backgroundColor: "#e1f7d5", color: "#3c763d" },
@@ -36,32 +36,47 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   const [siparisModalOpen, setSiparisModalOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [hasChanges, setHasChanges] = useState(false)
+  const [saving, setSaving] = useState(false);
 
   // Paketler ilk yüklendiğinde renkleri ata
 useEffect(() => {
-  if (paketler.length === 0) return;
-  if (Object.keys(paketRenkleri).length > 0) return;
+    if (paketler.length === 0) return;
+    
+    // NOT: `if (Object.keys(paketRenkleri).length > 0) return;` satırını kaldırdık.
+    // Çünkü bu satır yüzünden yeni eklenenlere renk vermiyordu.
 
-  const renkler = {};
-  paketler.forEach((paket, paketIndex) => {
-    renkler[paketIndex] = {};
-    (paket.firmaTotaller || []).forEach(firma => {
-      
-      // MANTIK: 200 ile 230 arasında rastgele sayı üretiyoruz.
-      // 255 (Beyaz) sınırına yaklaşmadığımız için beyaz çıkmaz.
-      // 200'ün altına inmediğimiz için koyu çıkmaz.
-      const min = 205;
-      const max = 230;
+    setPaketRenkleri(prev => {
+      // Önceki renkleri kopyala (State'i korumak için)
+      const guncelRenkler = { ...prev };
 
-      const r = Math.floor(Math.random() * (max - min) + min);
-      const g = Math.floor(Math.random() * (max - min) + min);
-      const b = Math.floor(Math.random() * (max - min) + min);
-      
-      renkler[paketIndex][firma.firmaId] = `rgb(${r}, ${g}, ${b})`;
+      paketler.forEach((paket, paketIndex) => {
+        // Eğer o paket için henüz renk objesi yoksa oluştur
+        if (!guncelRenkler[paketIndex]) {
+          guncelRenkler[paketIndex] = {};
+        }
+
+        (paket.firmaTotaller || []).forEach(firma => {
+          // KRİTİK NOKTA BURASI:
+          // Eğer bu firmanın zaten bir rengi varsa onu KORU (değiştirme).
+          // Eğer rengi yoksa (yeni eklendiyse) ona özel yeni random renk üret.
+          if (!guncelRenkler[paketIndex][firma.firmaId]) {
+            
+            // Senin orijinal random mantığın aynen burada
+            const min = 205;
+            const max = 230;
+
+            const r = Math.floor(Math.random() * (max - min) + min);
+            const g = Math.floor(Math.random() * (max - min) + min);
+            const b = Math.floor(Math.random() * (max - min) + min);
+            
+            guncelRenkler[paketIndex][firma.firmaId] = `rgb(${r}, ${g}, ${b})`;
+          }
+        });
+      });
+
+      return guncelRenkler;
     });
-  });
-  setPaketRenkleri(renkler);
-}, [paketler]);
+  }, [paketler]);
 
 // Teklifler için API isteği
   useEffect(() => {
@@ -221,7 +236,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
   }
 };
 
-  const upsertTeklifKarsilastirma = async (paketIndex) => {
+  const upsertTeklifKarsilastirma = async (paketIndex, showMessage = true) => {
     if (!paketler[paketIndex]) return;
 
     const paket = paketler[paketIndex];
@@ -254,7 +269,9 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
 
     try {
       const res = await AxiosInstance.post("/UpsertTeklifKarsilastirma", payload);
-      message.success("Teklif başarıyla kaydedildi!");
+      if (showMessage) {
+        message.success("Teklif başarıyla kaydedildi!");
+      }
       setKaydedildi(true);
       setHasChanges(false);
     } catch (err) {
@@ -350,12 +367,49 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
         <Space>
           <Button icon={<FileExcelOutlined />}>Excel</Button>
           <Button icon={<PrinterOutlined />}>Yazdır/PDF</Button>
-          <Button icon={<PlusOutlined />} onClick={() => setTedarikciModalOpen(true)} disabled={disabled || isDisabled} >
-            Tedarikçi Ekle / Sil
-          </Button>
-          <Button icon={<PlusOutlined />} onClick={() => setMalzemeModalOpen(true)} disabled={disabled || isDisabled} >
-            Malzeme Ekle / Sil
-          </Button>
+          {/* Tedarikçi Ekle Butonu */}
+<Button 
+  icon={<PlusOutlined />} 
+  loading={saving} // Buton içinde dönen loading
+  disabled={disabled || isDisabled || saving} // Kayıt yaparken tekrar basamasınlar
+  onClick={async () => {
+    try {
+      setSaving(true);
+      // Sessizce kaydet (false gönderiyoruz)
+      await upsertTeklifKarsilastirma(aktifPaketIndex, false); 
+      // Kayıt başarılıysa modalı aç
+      setTedarikciModalOpen(true);
+    } catch (error) {
+      // Hata varsa modal açılmaz, console'a düşer
+    } finally {
+      setSaving(false);
+    }
+  }} 
+>
+  Tedarikçi Ekle / Sil
+</Button>
+
+{/* Malzeme Ekle Butonu */}
+<Button 
+  icon={<PlusOutlined />} 
+  loading={saving} 
+  disabled={disabled || isDisabled || saving} 
+  onClick={async () => {
+    try {
+      setSaving(true);
+      // Sessizce kaydet (false gönderiyoruz)
+      await upsertTeklifKarsilastirma(aktifPaketIndex, false);
+      // Kayıt başarılıysa modalı aç
+      setMalzemeModalOpen(true);
+    } catch (error) {
+      // Hata yönetimi
+    } finally {
+      setSaving(false);
+    }
+  }} 
+>
+  Malzeme Ekle / Sil
+</Button>
           <Button
             icon={<SaveOutlined />}
             style={{ backgroundColor: "#52c41a", borderColor: "#52c41a", color: "#fff" }}
@@ -398,7 +452,7 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                 setSiparisModalOpen(true);
               }
             }}
-            disabled={disabled || isDisabled}
+            disabled={disabled || (isDisabled && aktifPaketDurumID !== 3)}
           >
             {showOnayaGonder ? "Onaya Gönder" : "Siparişe Aktar"}
           </Button>
