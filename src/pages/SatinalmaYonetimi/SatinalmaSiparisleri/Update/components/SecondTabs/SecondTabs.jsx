@@ -58,6 +58,8 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen, d
 
   const secilenIsEmriID = watch("secilenIsEmriID");
 
+  const fisIcerigi = watch("fisIcerigi");
+
   const items = [
     /*{
       key: "3",
@@ -66,7 +68,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen, d
     },*/
     {
       key: "4",
-      label: t("fisIcerigi"),
+      label: `${t("fisIcerigi")} (${fisIcerigi?.length || 0})`, 
       children: <FisIcerigi modalOpen={modalOpen} disabled={disabled} />,
     },
 

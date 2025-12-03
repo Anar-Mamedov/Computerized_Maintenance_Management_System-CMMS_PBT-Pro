@@ -1275,39 +1275,49 @@ useEffect(() => {
       // İndirme işlemi başlıyor
       setXlsxLoading(true);
 
-      // API'den verileri çekiyoruz
-      const { keyword = "", filters = {} } = body || {};
-      const response = await AxiosInstance.post(`GetIsEmriFullListExcel?parametre=${keyword}`, filters);
-      if (response) {
+      // Body state'inden filtreleri alıyoruz
+      const { filters = {} } = body || {};
+
+      // ✅ API İsteği: GetMalzemeTalepleriExcel
+      // Filtreleri body olarak gönderiyoruz
+      const response = await AxiosInstance.post("GetMalzemeTalepleriExcel", filters);
+
+      // Gelen yanıtı kontrol et (Direkt array mi yoksa obje içinde mi?)
+      // Eğer ana tablo yapısına benziyorsa response.talep_listesi olabilir, 
+      // direkt liste dönüyorsa response kendisidir.
+      const dataToProcess = Array.isArray(response) 
+        ? response 
+        : (response?.talep_listesi || response?.items || []);
+
+      if (dataToProcess.length > 0) {
         // Verileri işliyoruz
-        const xlsxData = response.map((row) => {
+        const xlsxData = dataToProcess.map((row) => {
           let xlsxRow = {};
           filteredColumns.forEach((col) => {
             const key = col.dataIndex;
             if (key) {
               let value = row[key];
 
-              // Özel durumları ele alıyoruz
+              // Özel durumları ele alıyoruz (Formatlama işlemleri)
               if (col.render) {
-                if (key === "DUZENLEME_TARIH" || key.endsWith("_TARIH")) {
+                if (key === "DUZENLEME_TARIH" || key.endsWith("_TARIH") || key === "SFS_TARIH") {
                   value = formatDate(value);
-                } else if (key === "DUZENLEME_SAAT" || key.endsWith("_SAAT")) {
+                } else if (key === "DUZENLEME_SAAT" || key.endsWith("_SAAT") || key === "SFS_SAAT") {
                   value = formatTime(value);
                 } else if (key === "GARANTI") {
                   value = row.GARANTI ? "Evet" : "Hayır";
                 } else if (key === "TAMAMLANMA") {
                   value = `${row.TAMAMLANMA}%`;
-                } else if (key === "DURUM") {
-                  value = row.DURUM;
+                } else if (key === "SFS_DURUM") { // Durum metnini al
+                  value = row.SFS_DURUM; 
                 } else if (key === "ISM_ONAY_DURUM") {
                   const { text } = statusTag(row.ISM_ONAY_DURUM);
                   value = text;
-                } else if (key === "ISEMRI_TIP") {
-                  value = row.ISEMRI_TIP;
                 } else if (key.startsWith("OZEL_ALAN_")) {
                   value = row[key];
                 } else {
-                  // Diğer sütunlar için
+                  // Diğer sütunlar için render fonksiyonundan metni çıkar
+                  // extractTextFromElement fonksiyonun zaten yukarıda tanımlıydı
                   value = extractTextFromElement(col.render(row[key], row));
                 }
               }
@@ -1321,7 +1331,7 @@ useEffect(() => {
         // XLSX dosyasını oluşturuyoruz
         const worksheet = XLSX.utils.json_to_sheet(xlsxData);
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Talep Listesi");
 
         // Sütun genişliklerini ayarlıyoruz
         const headers = filteredColumns
@@ -1333,13 +1343,12 @@ useEffect(() => {
               width: col.width, // Tablo sütun genişliği
             };
           })
-          .filter((col) => col.key); // Geçerli dataIndex'e sahip sütunları dahil ediyoruz
+          .filter((col) => col.key);
 
-        // Genişlikleri ölçeklendirme faktörü ile ayarlıyoruz
-        const scalingFactor = 0.8; // Gerektiği gibi ayarlayın
+        const scalingFactor = 0.8; 
 
         worksheet["!cols"] = headers.map((header) => ({
-          wpx: header.width ? header.width * scalingFactor : 100, // Tablo sütun genişliğini kullanıyoruz
+          wpx: header.width ? header.width * scalingFactor : 100, 
         }));
 
         // İndirme işlemini başlatıyoruz
@@ -1351,16 +1360,15 @@ useEffect(() => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.setAttribute("href", url);
-        link.setAttribute("download", "table_data.xlsx");
+        link.setAttribute("download", `Malzeme_Talepleri_${dayjs().format("DD_MM_YYYY")}.xlsx`); // Dosya ismine tarih ekledim
         link.style.visibility = "hidden";
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
 
-        // İndirme işlemi bitti
         setXlsxLoading(false);
       } else {
-        console.error("API yanıtı beklenen formatta değil");
+        message.warning("İndirilecek veri bulunamadı.");
         setXlsxLoading(false);
       }
     } catch (error) {

@@ -1,14 +1,13 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Input, Tabs, Typography } from "antd";
 import styled from "styled-components";
 import { Controller, useFormContext } from "react-hook-form";
 import { t } from "i18next";
 import OzelAlanlar from "./components/OzelAlanlar/OzelAlanlar.jsx";
 import FisIcerigi from "./components/FisIcerigi/FisIcerigi.jsx";
-const { Text, Link } = Typography;
+
 const { TextArea } = Input;
 
-//styled components
 const StyledTabs = styled(Tabs)`
   .ant-tabs-tab {
     margin: 0 !important;
@@ -43,45 +42,46 @@ const StyledTabs = styled(Tabs)`
   }
 `;
 
-//styled components end
-
 export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen, disabled }) {
   const { watch } = useFormContext();
-  const [activeTabKey, setActiveTabKey] = useState("4"); // Default to the FisIcerigi tab
+  const [activeTabKey, setActiveTabKey] = useState("4");
 
-  // Modify the onChange handler to update the active tab state
   const onChange = (key) => {
     setActiveTabKey(key);
   };
 
-  const secilenIsEmriID = watch("secilenIsEmriID");
+  const fisIcerigi = watch("fisIcerigi");
+  const aciklama = watch("aciklama");
 
   const items = [
-    /*{
-      key: "3",
-      label: "Sigorta",
-      children: <Sigorta fieldRequirements={fieldRequirements} />,
-    },*/
     {
       key: "4",
-      label: t("fisIcerigi"),
+      label: `${t("fisIcerigi")} (${fisIcerigi?.length || 0})`,
       children: <FisIcerigi modalOpen={modalOpen} disabled={disabled} />,
     },
-
     {
       key: "6",
-      label: "Açıklama",
+      label: aciklama && aciklama.length > 0 ? "Açıklama (x)" : "Açıklama",
       children: (
         <div>
-          <Controller name="aciklama" render={({ field }) => <TextArea {...field} rows={4} placeholder="Açıklama" style={{ width: "100%", resize: "none" }} disabled={disabled} />} />
+          <Controller
+            name="aciklama"
+            render={({ field }) => (
+              <TextArea 
+                {...field} 
+                rows={4} 
+                placeholder="Açıklama" 
+                style={{ width: "100%", resize: "none" }} 
+                disabled={disabled} 
+              />
+            )}
+          />
         </div>
       ),
     },
-
     {
       key: "5",
       label: "Özel Alanlar",
-      // children: <SureBilgileri fieldRequirements={fieldRequirements} />,
       children: <OzelAlanlar disabled={disabled} />,
     },
   ];

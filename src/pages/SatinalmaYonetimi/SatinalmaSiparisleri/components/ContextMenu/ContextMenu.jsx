@@ -9,6 +9,7 @@ import Kapat from "./components/Kapat/Kapat";
 import Iptal from "./components/Iptal/Iptal";
 import Ac from "./components/Ac/Ac"; // Yeniden Aç componenti
 import GirisFisleri from "../../../../Malzeme&DepoYonetimi/GirisFisleri/Insert/CreateDrawer";
+import Form from "./components/Form/Form";
 
 const { Text } = Typography;
 
@@ -103,12 +104,24 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
     );
   };
 
+  // --- GRUP 3: FORM ---
+  const renderForm = () => {
+    return (
+      <>
+        <div style={separatorHeaderStyle}>Form</div>
+        
+        <Form {...commonProps} />
+      </>
+    );
+  };
+
   const content = (
     <div style={contentContainerStyle}>
       {selectedRows.length >= 1 ? (
         <>
           {renderSiparisIslemleri()}
           {renderKayitVeTarihce()}
+          {renderForm()}
         </>
       ) : (
         <div style={{ padding: '10px', color: '#999', textAlign: 'center' }}>Lütfen bir satır seçiniz.</div>

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Table, InputNumber, Select, Typography, Card, Button, Space, Radio, Tabs, Spin, message, Modal } from "antd";
+import { Table, InputNumber, Select, Typography, Card, Button, Space, Radio, Tabs, Spin, message, Modal, Input, DatePicker } from "antd";
 import { FileExcelOutlined, PrinterOutlined, PlusOutlined, CheckCircleOutlined, SaveOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../api/http";
 import TedarikciEkle from "./FirmaEkleCikar";
 import MalzemeEkle from "./MalzemeEkleCikar";
 import TeklifiSipariseAktar from "./TeklifSipariseAktar/EditDrawer";
+import KodIDSelectbox from "../../../../../../../../utils/components/KodIDSelectbox";
+import dayjs from "dayjs";
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -37,9 +39,10 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   const [selectedRow, setSelectedRow] = useState(null);
   const [hasChanges, setHasChanges] = useState(false)
   const [saving, setSaving] = useState(false);
+  const [editingCell, setEditingCell] = useState(null);
 
   // Paketler ilk yüklendiğinde renkleri ata
-useEffect(() => {
+  useEffect(() => {
     if (paketler.length === 0) return;
     
     // NOT: `if (Object.keys(paketRenkleri).length > 0) return;` satırını kaldırdık.
@@ -103,14 +106,16 @@ useEffect(() => {
     }, []);
 
   const fetchAllTeklifler = async (ids) => {
-  try {
-    setLoading(true);
-    if (!Array.isArray(ids)) ids = [ids];
+    try {
+      setLoading(true);
+      if (!Array.isArray(ids)) ids = [ids];
+      
       const results = await Promise.all(
         ids.map(async (id) => {
           const res = await AxiosInstance.get(`/GetTeklifKarsilastirmaDetay?TeklifId=${id}`);
-          // ensure shapes: miktar,fiyat,tutar numeric
           const data = res.data || {};
+
+          // 1. Malzemeleri Hazırla
           if (data.malzemeler) {
             data.malzemeler = data.malzemeler.map((m) => ({
               ...m,
@@ -122,6 +127,37 @@ useEffect(() => {
               })),
             }));
           }
+
+          // 2. Detayları Firmalara Eşle
+          if (data.firmaTotaller) {
+            const detaylar = data.teklifDetaylar || [];
+            
+            data.firmaTotaller = data.firmaTotaller.map(firma => {
+              const detay = detaylar.find(d => d.TFD_CARI_ID === firma.firmaId);
+
+              const checkDate = (dateVal) => {
+                if (!dateVal || dateVal.startsWith("1900-01-01") || dateVal.startsWith("0001-01-01")) return null;
+                return dateVal;
+              };
+
+              return {
+                ...firma,
+                teklifTarihi: checkDate(detay?.TFD_TEKLIF_TARIH),
+                gecerlilikTarihi: checkDate(detay?.TFD_GECERLILIK_TARIH),
+                teslimTarihi: checkDate(detay?.TFD_TESLIM_TARIH),
+                teslimYeri: detay?.TFD_TESLIM_YERI || "",
+                sevkSekli: detay?.TFD_SEVK_SEKLI_ID || null, 
+                odemeBilgisi: detay?.TFD_ODEME_SEKLI_ID || null,
+                yetkili: detay?.TFD_YETKILI || "",
+                telefon: detay?.TFD_TELEFON || "",
+                aciklama: detay?.TFD_ACIKLAMA || "",
+                toplamKDVtutar: firma.toplamKDVtutar, 
+                toplamIndirim: firma.toplamIndirim,
+                genelToplam: firma.genelToplam
+              };
+            });
+          }
+
           return { id, ...(data || {}) };
         })
       );
@@ -147,58 +183,212 @@ useEffect(() => {
   }, [kaydedildi]);
 
   // firma toplamlarını güncelleme
-const computeFirmaTotals = (malzemeler = [], firmaTotaller = []) => {
-  return (firmaTotaller || []).map((firma) => {
-    // Ara Toplam = tüm malzemelerin tutarları
-    const araToplam = (malzemeler || []).reduce((acc, m) => {
-      const f = (m.firmalar || []).find((x) => x.firmaId === firma.firmaId);
-      return acc + (Number(f?.tutar ?? 0));
-    }, 0);
+  const computeFirmaTotals = (malzemeler = [], firmaTotaller = []) => {
+    return (firmaTotaller || []).map((firma) => {
+      // 1. Ara Toplam
+      const araToplam = (malzemeler || []).reduce((acc, m) => {
+        const f = (m.firmalar || []).find((x) => x.firmaId === firma.firmaId);
+        return acc + (Number(f?.tutar ?? 0));
+      }, 0);
 
-    const indirimOrani = Number(firma.indirimOrani ?? 0); // % indirim, API'den gelmezse 0
-    const indirimTutar = araToplam * indirimOrani;
+      // 2. İndirim
+      const indirimOrani = Number(firma.indirimOrani ?? 0);
+      const indirimTutar = araToplam * (indirimOrani / 100);
 
-    const kdvOrani = Number(firma.kdvOrani ?? 0); // %20 örnek, API'den gelmezse default
-    const kdvTutar = (araToplam - indirimTutar) * kdvOrani;
+      // 3. KDV Hesaplama (Dahil/Hariç Kontrolü)
+      const kdvOrani = Number(firma.kdvOrani ?? 0);
+      const matrah = araToplam - indirimTutar; // İndirim düşülmüş tutar
+      const kdvDurum = firma.kdvDurum || "Hariç"; // Default Hariç olsun
 
-    const genelToplam = araToplam - indirimTutar + kdvTutar;
+      let kdvTutar = 0;
+      let genelToplam = 0;
 
-    return {
-      ...firma,
-      araToplam,
-      indirimTutar,
-      kdvTutar,
-      genelToplam,
-    };
-  });
-};
+      if (kdvDurum === "Hariç") {
+        // --- HARİÇ HESABI ---
+        // Matrah + (Matrah * Oran)
+        kdvTutar = matrah * (kdvOrani / 100);
+        genelToplam = matrah + kdvTutar;
+      } else {
+        // --- DAHİL HESABI (İçyüzde Yöntemi) ---
+        // KDV = Tutar - (Tutar / (1 + Oran/100))
+        // Genel Toplam = Matrah (Çünkü KDV zaten içindeydi)
+        kdvTutar = matrah - (matrah / (1 + (kdvOrani / 100)));
+        genelToplam = matrah; 
+      }
 
-// InputNumber değiştiğinde çağrılır
-const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
-  setHasChanges(true);
-  const val = value == null ? 0 : Number(value);
-
-  setPaketler((prev) => {
-    const updated = prev.map((p, idx) => {
-      if (idx !== paketIndex) return p;
-      const paket = { ...p };
-      paket.malzemeler = (p.malzemeler || []).map((m) => {
-        if (m.malzemeId !== malzemeId) return { ...m, firmalar: (m.firmalar || []).map(x => ({ ...x })) };
-        const newFirmalar = (m.firmalar || []).map((f) => {
-          if (f.firmaId !== firmaId) return { ...f };
-          const yeni = { ...f, [field]: val };
-          yeni.tutar = Number(yeni.miktar ?? 0) * Number(yeni.fiyat ?? 0);
-          return yeni;
-        });
-        return { ...m, firmalar: newFirmalar };
-      });
-
-      paket.firmaTotaller = computeFirmaTotals(paket.malzemeler, paket.firmaTotaller || []);
-      return paket;
+      return {
+        ...firma,
+        araToplam,
+        indirimTutar,
+        kdvTutar,
+        genelToplam,
+        kdvDurum, // Durumu kaybetmemek için geri dönüyoruz
+      };
     });
-    return updated;
-  });
-};
+  };
+
+  // InputNumber değiştiğinde çağrılır
+  const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
+    setHasChanges(true);
+    const val = value == null ? 0 : Number(value);
+
+    setPaketler((prev) => {
+      const updated = prev.map((p, idx) => {
+        if (idx !== paketIndex) return p;
+        const paket = { ...p };
+        paket.malzemeler = (p.malzemeler || []).map((m) => {
+          if (m.malzemeId !== malzemeId) return { ...m, firmalar: (m.firmalar || []).map(x => ({ ...x })) };
+          const newFirmalar = (m.firmalar || []).map((f) => {
+            if (f.firmaId !== firmaId) return { ...f };
+            const yeni = { ...f, [field]: val };
+            yeni.tutar = Number(yeni.miktar ?? 0) * Number(yeni.fiyat ?? 0);
+            return yeni;
+          });
+          return { ...m, firmalar: newFirmalar };
+        });
+
+        paket.firmaTotaller = computeFirmaTotals(paket.malzemeler, paket.firmaTotaller || []);
+        return paket;
+      });
+      return updated;
+    });
+  };
+
+  const handleTutarChange = (paketIndex, firmaId, field, value) => {
+    setHasChanges(true);
+    const girilenTutar = value == null ? 0 : Number(value); // Örn: 1000 TL
+
+    setPaketler((prev) => {
+      return prev.map((p, idx) => {
+        if (idx !== paketIndex) return p;
+
+        const paket = { ...p };
+        
+        // 1. Ara Toplamı Bul (Yüzdeyi hesaplamak için lazım)
+        const araToplam = (paket.malzemeler || []).reduce((acc, m) => {
+          const f = (m.firmalar || []).find((x) => x.firmaId === firmaId);
+          return acc + (Number(f?.tutar ?? 0));
+        }, 0);
+
+        // 2. Yüzdeyi Hesapla (Tutar / Ara Toplam * 100)
+        let yeniOran = 0;
+        if (araToplam > 0) {
+          if (field === "indirimOrani") {
+             // İndirim Oranı Hesabı
+             yeniOran = (girilenTutar / araToplam) * 100;
+          } else if (field === "kdvOrani") {
+             // KDV Oranı Hesabı (Matrah üzerinden)
+             // Matrah = Ara Toplam - İndirim Tutarı
+             const mevcutIndirimOrani = paket.firmaTotaller.find(f => f.firmaId === firmaId)?.indirimOrani || 0;
+             const indirimTutari = araToplam * (mevcutIndirimOrani / 100);
+             const matrah = araToplam - indirimTutari;
+             
+             if (matrah > 0) {
+                yeniOran = (girilenTutar / matrah) * 100;
+             }
+          }
+        }
+
+        // 3. Yeni Oranı Kaydet
+        paket.firmaTotaller = (paket.firmaTotaller || []).map((f) => {
+          if (f.firmaId !== firmaId) return f;
+          return { ...f, [field]: yeniOran };
+        });
+
+        // 4. Tutarları Tekrar Hesapla (State güncellensin)
+        paket.firmaTotaller = computeFirmaTotals(paket.malzemeler, paket.firmaTotaller);
+        return paket;
+      });
+    });
+  };
+
+  const renderEditableSummaryCell = (paketIndex, firmaId, field, amountValue, percentValue) => {
+    const isEditing = editingCell?.paketIndex === paketIndex && 
+                      editingCell?.firmaId === firmaId && 
+                      editingCell?.field === field;
+
+    if (isEditing) {
+      return (
+        <InputNumber
+          autoFocus
+          min={0}
+          formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+          parser={value => value.replace(/\$\s?|(,*)/g, '')}
+          value={Number(amountValue.toFixed(2))}
+          onChange={(val) => handleTutarChange(paketIndex, firmaId, field, val)}
+          onBlur={() => setEditingCell(null)}
+          onPressEnter={() => setEditingCell(null)}
+          size="small"
+          style={{ width: "110px" }}
+          placeholder="Tutar Gir"
+        />
+      );
+    }
+
+    return (
+      <div 
+        onClick={() => {
+          if (!isDisabled) {
+            setEditingCell({ paketIndex, firmaId, field });
+          }
+        }}
+        style={{ 
+          cursor: isDisabled ? "default" : "pointer", 
+          border: "1px solid transparent",
+          padding: "4px 8px",
+          borderRadius: "4px",
+          transition: "all 0.3s",
+          textAlign: "right",
+          minHeight: "24px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-end"
+        }}
+        className="editable-cell-hover"
+      >
+        {/* strong propunu kaldırdık, artık normal yazı */}
+        <Text>
+           % {Number(percentValue).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        </Text>
+      </div>
+    );
+  };
+
+  const handleKdvDurumChange = (paketIndex, firmaId, value) => {
+    setHasChanges(true);
+    setPaketler((prev) => {
+      return prev.map((p, idx) => {
+        if (idx !== paketIndex) return p;
+
+        const paket = { ...p };
+        paket.firmaTotaller = (paket.firmaTotaller || []).map((f) => {
+          if (f.firmaId !== firmaId) return f;
+          return { ...f, kdvDurum: value };
+        });
+
+        // Yeni duruma göre tekrar hesapla
+        paket.firmaTotaller = computeFirmaTotals(paket.malzemeler, paket.firmaTotaller);
+        return paket;
+      });
+    });
+  };
+
+  const handleFirmaDetailChange = (paketIndex, firmaId, field, value) => {
+    setHasChanges(true);
+    setPaketler((prev) => {
+      return prev.map((p, idx) => {
+        if (idx !== paketIndex) return p;
+
+        const newPaket = { ...p };
+        // Firma listesinde ilgili firmayı bulup alanını güncelliyoruz
+        newPaket.firmaTotaller = (newPaket.firmaTotaller || []).map((f) => {
+          if (f.firmaId !== firmaId) return f;
+          return { ...f, [field]: value };
+        });
+        return newPaket;
+      });
+    });
+  };
 
   const onOnayaGonder = async (paketId) => {
   const paket = paketler.find(p => {
@@ -241,11 +431,12 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
 
     const paket = paketler[paketIndex];
 
+    // 1. Malzemeler Payload Hazırlığı
     const malzemelerPayload = (paket.malzemeler || []).map((m) => ({
       malzemeId: m.malzemeId,
       firmalar: (m.firmalar || []).map((f) => ({
         firmaId: f.firmaId,
-        markaId: 0,
+        marka: f.marka || "", 
         miktar: Number(f.miktar ?? 0),
         fiyat: Number(f.fiyat ?? 0),
         tutar: Number(f.tutar ?? 0),
@@ -253,14 +444,26 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
       })),
     }));
 
+    // 2. Firma Detayları Payload Hazırlığı (JSON Formatına Göre)
     const firmaDetaylarPayload = (paket.firmaTotaller || []).map((f) => ({
       firmaId: f.firmaId,
-      teslimSuresi: 0,
-      odemeSekliId: 0,
-      sevkSekliId: 0,
-      aciklama: "",
+      teklifTarihi: f.teklifTarihi || null,
+      teklifGecerlilikTarihi: f.gecerlilikTarihi || null,
+      teslimTarihi: f.teslimTarihi || null,
+      
+      teslimYeri: f.teslimYeri || "",
+      
+      // Selectboxlar string değer tutuyor, ID isteniyorsa 0 gönderiyoruz.
+      // Veri kaybolmasın diye string değerleri de ekliyoruz.
+      sevkSekliId: f.sevkSekli || 0, 
+      odemeSekliId: f.odemeBilgisi || 0,
+      
+      yetkili: f.yetkili || "",
+      telefon: f.telefon || "",
+      aciklama: f.aciklama || "",
     }));
 
+    // 3. Ana Payload
     const payload = {
       teklifId: paket.id || 0,
       malzemeler: malzemelerPayload,
@@ -320,6 +523,30 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
     });
   };
 
+  const handleMarkaChange = (paketIndex, val, malzemeId, firmaId) => {
+    setHasChanges(true);
+    setPaketler((prev) => {
+      return prev.map((p, idx) => {
+        if (idx !== paketIndex) return p;
+
+        const newPaket = { ...p };
+        newPaket.malzemeler = newPaket.malzemeler.map((m) => {
+          // 3. Doğru satırı (malzemeId) bul
+          if (m.malzemeId !== malzemeId) return m;
+
+          return {
+            ...m,
+            firmalar: m.firmalar.map((f) => {
+              if (f.firmaId !== firmaId) return f;
+              return { ...f, marka: val };
+            }),
+          };
+        });
+        return newPaket;
+      });
+    });
+  };
+
   const handleRadioClick = (paketIndex, firmaId) => {
     setSelectedFirmaId(prev => prev === firmaId ? null : firmaId); // tekrar tıklayınca kaldır
 
@@ -367,49 +594,40 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
         <Space>
           <Button icon={<FileExcelOutlined />}>Excel</Button>
           <Button icon={<PrinterOutlined />}>Yazdır/PDF</Button>
-          {/* Tedarikçi Ekle Butonu */}
-<Button 
-  icon={<PlusOutlined />} 
-  loading={saving} // Buton içinde dönen loading
-  disabled={disabled || isDisabled || saving} // Kayıt yaparken tekrar basamasınlar
-  onClick={async () => {
-    try {
-      setSaving(true);
-      // Sessizce kaydet (false gönderiyoruz)
-      await upsertTeklifKarsilastirma(aktifPaketIndex, false); 
-      // Kayıt başarılıysa modalı aç
-      setTedarikciModalOpen(true);
-    } catch (error) {
-      // Hata varsa modal açılmaz, console'a düşer
-    } finally {
-      setSaving(false);
-    }
-  }} 
->
-  Tedarikçi Ekle / Sil
-</Button>
-
-{/* Malzeme Ekle Butonu */}
-<Button 
-  icon={<PlusOutlined />} 
-  loading={saving} 
-  disabled={disabled || isDisabled || saving} 
-  onClick={async () => {
-    try {
-      setSaving(true);
-      // Sessizce kaydet (false gönderiyoruz)
-      await upsertTeklifKarsilastirma(aktifPaketIndex, false);
-      // Kayıt başarılıysa modalı aç
-      setMalzemeModalOpen(true);
-    } catch (error) {
-      // Hata yönetimi
-    } finally {
-      setSaving(false);
-    }
-  }} 
->
-  Malzeme Ekle / Sil
-</Button>
+          <Button 
+            icon={<PlusOutlined />} 
+            loading={saving}
+            disabled={disabled || isDisabled || saving}
+            onClick={async () => {
+              try {
+                setSaving(true);
+                await upsertTeklifKarsilastirma(aktifPaketIndex, false);
+                setTedarikciModalOpen(true);
+              } catch (error) {
+              } finally {
+                setSaving(false);
+              }
+            }} 
+          >
+            Tedarikçi Ekle / Sil
+          </Button>
+          <Button 
+            icon={<PlusOutlined />} 
+            loading={saving} 
+            disabled={disabled || isDisabled || saving} 
+            onClick={async () => {
+              try {
+                setSaving(true);
+                await upsertTeklifKarsilastirma(aktifPaketIndex, false);
+                setMalzemeModalOpen(true);
+              } catch (error) {
+              } finally {
+                setSaving(false);
+              }
+            }} 
+          >
+            Malzeme Ekle / Sil
+          </Button>
           <Button
             icon={<SaveOutlined />}
             style={{ backgroundColor: "#52c41a", borderColor: "#52c41a", color: "#fff" }}
@@ -536,27 +754,25 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                 {
                   title: "Marka",
                   dataIndex: `marka_${firma.firmaId}`,
-                  width: 100,
+                  width: 200,
                   align: "center",
                   onCell: () => ({ style: { backgroundColor: pastelColor } }),
                   render: (_, record) => {
-                    const f = record?.firmalar?.find(x => x.firmaId === firma.firmaId) || {};
+                    const f = record?.firmalar?.find((x) => x.firmaId === firma.firmaId) || {};
                     const isSelected = f.secili;
                     const shouldBeDisabled = isDisabled && !isSelected;
-                    const isLockedMode = isDisabled; 
-
+                    const isLockedMode = isDisabled;
                     return (
-                      <Select 
-                        value={f.marka || undefined} 
-                        style={{ 
+                      <Input
+                        value={f.marka || ""}
+                        onChange={(e) => handleMarkaChange(paketIndex, e.target.value, record.key, firma.firmaId)}
+                        style={{
                           width: "90%",
-                          pointerEvents: isLockedMode ? 'none' : 'auto'
-                        }} 
+                          pointerEvents: isLockedMode ? "none" : "auto",
+                        }}
                         disabled={shouldBeDisabled}
-                        open={isLockedMode ? false : undefined}
-                        showArrow={!isLockedMode}
-                      >
-                      </Select>
+                        placeholder="Marka giriniz."
+                      />
                     );
                   },
                 },
@@ -665,43 +881,303 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                 bordered
                 scroll={{ x: "max-content" }}
                 summary={() => {
+                  // Ortalamak için standart stil
+                  const cellWrapperStyle = { 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    width: '100%' 
+                  };
+                  
+                  // Bileşenlerin genişliği (Hepsi aynı olsun)
+                  const componentStyle = { width: "50%" };
+
                   return (
                     <>
+                      {/* --- BOŞLUK SATIRI --- */}
+                      <Table.Summary.Row style={{ height: "30px", background: "transparent" }}>
+                         <Table.Summary.Cell index={0} colSpan={columns.length} />
+                      </Table.Summary.Row>
+
+                      {/* --- NORMAL TOPLAMLAR (RENKLİ) --- */}
                       <Table.Summary.Row>
                         <Table.Summary.Cell index={0}><Text strong>ARA TOPLAM</Text></Table.Summary.Cell>
-                          {firmalar.map(firma => (
-                            <Table.Summary.Cell key={`toplam-${firma.firmaId}`} colSpan={5} align="right">
-                              {(firma.araToplam ?? 0).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}
-                            </Table.Summary.Cell>
-                          ))}
+                          {firmalar.map(firma => {
+                            const pastelColor = paketRenkleri[paketIndex]?.[firma.firmaId] || "#fff";
+                            return (
+                              <Table.Summary.Cell key={`toplam-${firma.firmaId}`} colSpan={5} align="right" style={{ backgroundColor: pastelColor }}>
+                                {(firma.araToplam ?? 0).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}
+                              </Table.Summary.Cell>
+                            );
+                          })}
                       </Table.Summary.Row>
 
                       <Table.Summary.Row>
-                        <Table.Summary.Cell index={0}><Text strong>İNDİRİM TUTARI</Text></Table.Summary.Cell>
-                          {firmalar.map(firma => (
-                            <Table.Summary.Cell key={`indirim-${firma.firmaId}`} colSpan={5} align="right">
-                              {(firma.indirimTutar ?? 0).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}
-                            </Table.Summary.Cell>
-                          ))}
+                        <Table.Summary.Cell index={0}><Text strong>İNDİRİM</Text></Table.Summary.Cell>
+                          {firmalar.map(firma => {
+                            const pastelColor = paketRenkleri[paketIndex]?.[firma.firmaId] || "#fff";
+                            return (
+                              <Table.Summary.Cell key={`indirim-${firma.firmaId}`} colSpan={5} align="right" style={{ backgroundColor: pastelColor }}>
+                                {renderEditableSummaryCell(
+                                  paketIndex, 
+                                  firma.firmaId, 
+                                  "indirimOrani", 
+                                  firma.indirimTutar ?? 0, 
+                                  firma.indirimOrani ?? 0 
+                                )}
+                              </Table.Summary.Cell>
+                            );
+                          })}
                       </Table.Summary.Row>
 
                       <Table.Summary.Row>
-                        <Table.Summary.Cell index={0}><Text strong>KDV TUTARI</Text></Table.Summary.Cell>
-                          {firmalar.map(firma => (
-                            <Table.Summary.Cell key={`kdv-${firma.firmaId}`} colSpan={5} align="right">
-                              {(firma.kdvTutar ?? 0).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}
-                            </Table.Summary.Cell>
-                          ))}
+                        <Table.Summary.Cell index={0}><Text strong>KDV</Text></Table.Summary.Cell>
+                          {firmalar.map(firma => {
+                            const pastelColor = paketRenkleri[paketIndex]?.[firma.firmaId] || "#fff";
+                            return (
+                              <Table.Summary.Cell key={`kdv-${firma.firmaId}`} colSpan={5} align="right" style={{ backgroundColor: pastelColor }}>
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '8px' }}>
+                                  <Radio.Group 
+                                    options={[{ label: 'Hariç', value: 'Hariç' }, { label: 'Dahil', value: 'Dahil' }]}
+                                    onChange={(e) => handleKdvDurumChange(paketIndex, firma.firmaId, e.target.value)}
+                                    value={firma.kdvDurum || "Hariç"}
+                                    optionType="button"
+                                    buttonStyle="solid"
+                                    size="small"
+                                    disabled={isDisabled}
+                                  />
+                                  <InputNumber
+                                    min={0} max={100}
+                                    formatter={value => `% ${value}`}
+                                    parser={value => value.replace('% ', '')}
+                                    value={firma.kdvOrani}
+                                    onChange={(val) => handleKdvRateChange(paketIndex, firma.firmaId, val)}
+                                    disabled={isDisabled}
+                                    size="small"
+                                    style={{ width: "60px" }}
+                                  />
+                                  <Text>{(firma.kdvTutar ?? 0).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}</Text>
+                                </div>
+                              </Table.Summary.Cell>
+                            );
+                          })}
                       </Table.Summary.Row>
 
                       <Table.Summary.Row>
                         <Table.Summary.Cell index={0}><Text strong>GENEL TOPLAM</Text></Table.Summary.Cell>
-                          {firmalar.map(firma => (
-                            <Table.Summary.Cell key={`genel-${firma.firmaId}`} colSpan={5} align="right">
-                              {(firma.genelToplam ?? 0).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}
-                            </Table.Summary.Cell>
-                          ))}
+                          {firmalar.map(firma => {
+                            const pastelColor = paketRenkleri[paketIndex]?.[firma.firmaId] || "#fff";
+                            return (
+                              <Table.Summary.Cell key={`genel-${firma.firmaId}`} colSpan={5} align="right" style={{ backgroundColor: pastelColor }}>
+                                {(firma.genelToplam ?? 0).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}
+                              </Table.Summary.Cell>
+                            );
+                          })}
                       </Table.Summary.Row>
+
+                      {/* --- DETAY BİLGİLERİ (HEPSİ ORTALI VE AYNI HİZADA) --- */}
+                      {detayGosterilenPaket === paketIndex && (
+                        <>
+                          <Table.Summary.Row style={{ height: "20px", background: "transparent" }}>
+                             <Table.Summary.Cell index={0} colSpan={columns.length} />
+                          </Table.Summary.Row>
+
+                          {/* TEKLİF TARİHİ */}
+                          <Table.Summary.Row>
+                            <Table.Summary.Cell index={0}><Text strong>TEKLİF TARİHİ</Text></Table.Summary.Cell>
+                            {firmalar.map(firma => {
+                              const pastelColor = paketRenkleri[paketIndex]?.[firma.firmaId] || "#fff";
+                              return (
+                                <Table.Summary.Cell key={`tarih-${firma.firmaId}`} colSpan={5} align="center" style={{ backgroundColor: pastelColor }}>
+                                  <div style={cellWrapperStyle}>
+                                    <DatePicker 
+                                      style={componentStyle}
+                                      format="DD.MM.YYYY"
+                                      value={firma.teklifTarihi ? dayjs(firma.teklifTarihi) : null}
+                                      onChange={(date) => handleFirmaDetailChange(paketIndex, firma.firmaId, "teklifTarihi", date ? date.toISOString() : null)}
+                                      disabled={isDisabled}
+                                      placeholder="Tarih Seç"
+                                    />
+                                  </div>
+                                </Table.Summary.Cell>
+                              );
+                            })}
+                          </Table.Summary.Row>
+
+                          {/* GEÇERLİLİK TARİHİ */}
+                          <Table.Summary.Row>
+                            <Table.Summary.Cell index={0}><Text strong>GEÇERLİLİK TARİHİ</Text></Table.Summary.Cell>
+                            {firmalar.map(firma => {
+                              const pastelColor = paketRenkleri[paketIndex]?.[firma.firmaId] || "#fff";
+                              return (
+                                <Table.Summary.Cell key={`gecerlilik-${firma.firmaId}`} colSpan={5} align="center" style={{ backgroundColor: pastelColor }}>
+                                  <div style={cellWrapperStyle}>
+                                    <DatePicker 
+                                      style={componentStyle}
+                                      format="DD.MM.YYYY"
+                                      value={firma.gecerlilikTarihi ? dayjs(firma.gecerlilikTarihi) : null}
+                                      onChange={(date) => handleFirmaDetailChange(paketIndex, firma.firmaId, "gecerlilikTarihi", date ? date.toISOString() : null)}
+                                      disabled={isDisabled}
+                                      placeholder="Tarih Seç"
+                                    />
+                                  </div>
+                                </Table.Summary.Cell>
+                              );
+                            })}
+                          </Table.Summary.Row>
+
+                          {/* TESLİM TARİHİ */}
+                          <Table.Summary.Row>
+                            <Table.Summary.Cell index={0}><Text strong>TESLİM TARİHİ</Text></Table.Summary.Cell>
+                            {firmalar.map(firma => {
+                              const pastelColor = paketRenkleri[paketIndex]?.[firma.firmaId] || "#fff";
+                              return (
+                                <Table.Summary.Cell key={`teslimT-${firma.firmaId}`} colSpan={5} align="center" style={{ backgroundColor: pastelColor }}>
+                                  <div style={cellWrapperStyle}>
+                                    <DatePicker 
+                                      style={componentStyle}
+                                      format="DD.MM.YYYY"
+                                      value={firma.teslimTarihi ? dayjs(firma.teslimTarihi) : null}
+                                      onChange={(date) => handleFirmaDetailChange(paketIndex, firma.firmaId, "teslimTarihi", date ? date.toISOString() : null)}
+                                      disabled={isDisabled}
+                                      placeholder="Tarih Seç"
+                                    />
+                                  </div>
+                                </Table.Summary.Cell>
+                              );
+                            })}
+                          </Table.Summary.Row>
+
+                          {/* TESLİM YERİ */}
+                          <Table.Summary.Row>
+                            <Table.Summary.Cell index={0}><Text strong>TESLİM YERİ</Text></Table.Summary.Cell>
+                            {firmalar.map(firma => {
+                              const pastelColor = paketRenkleri[paketIndex]?.[firma.firmaId] || "#fff";
+                              return (
+                                <Table.Summary.Cell key={`teslimY-${firma.firmaId}`} colSpan={5} align="center" style={{ backgroundColor: pastelColor }}>
+                                  <div style={cellWrapperStyle}>
+                                    <Input
+                                      style={componentStyle}
+                                      value={firma.teslimYeri} 
+                                      onChange={(e) => handleFirmaDetailChange(paketIndex, firma.firmaId, "teslimYeri", e.target.value)}
+                                      disabled={isDisabled}
+                                    />
+                                  </div>
+                                </Table.Summary.Cell>
+                              );
+                            })}
+                          </Table.Summary.Row>
+
+                          {/* SEVK ŞEKLİ */}
+                          <Table.Summary.Row>
+                            <Table.Summary.Cell index={0}><Text strong>SEVK ŞEKLİ</Text></Table.Summary.Cell>
+                            {firmalar.map(firma => {
+                              const pastelColor = paketRenkleri[paketIndex]?.[firma.firmaId] || "#fff";
+                              return (
+                                <Table.Summary.Cell key={`sevk-${firma.firmaId}`} colSpan={5} align="center" style={{ backgroundColor: pastelColor }}>
+                                  <div style={cellWrapperStyle}>
+                                    <div style={componentStyle}>
+                                      <KodIDSelectbox 
+                                        name1="sevkKodId" 
+                                        kodID={13071} 
+                                        isRequired={false} 
+                                        value={firma.sevkSekli} 
+                                        onChange={(val) => handleFirmaDetailChange(paketIndex, firma.firmaId, "sevkSekli", val)}
+                                        disabled={isDisabled}
+                                      />
+                                    </div>
+                                  </div>
+                                </Table.Summary.Cell>
+                              );
+                            })}
+                          </Table.Summary.Row>
+
+                          {/* ÖDEME BİLGİSİ */}
+                          <Table.Summary.Row>
+                            <Table.Summary.Cell index={0}><Text strong>ÖDEME BİLGİSİ</Text></Table.Summary.Cell>
+                            {firmalar.map(firma => {
+                              const pastelColor = paketRenkleri[paketIndex]?.[firma.firmaId] || "#fff";
+                              return (
+                                <Table.Summary.Cell key={`odeme-${firma.firmaId}`} colSpan={5} align="center" style={{ backgroundColor: pastelColor }}>
+                                  <div style={cellWrapperStyle}>
+                                    <div style={componentStyle}>
+                                      <KodIDSelectbox 
+                                        name1="odemeSekliKodId" 
+                                        kodID={33021} 
+                                        isRequired={false}
+                                        value={firma.odemeBilgisi} 
+                                        onChange={(val) => handleFirmaDetailChange(paketIndex, firma.firmaId, "odemeBilgisi", val)}
+                                        disabled={isDisabled}
+                                      />
+                                    </div>
+                                  </div>
+                                </Table.Summary.Cell>
+                              );
+                            })}
+                          </Table.Summary.Row>
+
+                          {/* YETKİLİ */}
+                          <Table.Summary.Row>
+                            <Table.Summary.Cell index={0}><Text strong>YETKİLİ</Text></Table.Summary.Cell>
+                            {firmalar.map(firma => {
+                              const pastelColor = paketRenkleri[paketIndex]?.[firma.firmaId] || "#fff";
+                              return (
+                                <Table.Summary.Cell key={`yetkili-${firma.firmaId}`} colSpan={5} align="center" style={{ backgroundColor: pastelColor }}>
+                                  <div style={cellWrapperStyle}>
+                                    <Input 
+                                      style={componentStyle}
+                                      value={firma.yetkili} 
+                                      onChange={(e) => handleFirmaDetailChange(paketIndex, firma.firmaId, "yetkili", e.target.value)}
+                                      disabled={isDisabled}
+                                    />
+                                  </div>
+                                </Table.Summary.Cell>
+                              );
+                            })}
+                          </Table.Summary.Row>
+
+                          {/* TELEFON */}
+                          <Table.Summary.Row>
+                            <Table.Summary.Cell index={0}><Text strong>TELEFON</Text></Table.Summary.Cell>
+                            {firmalar.map(firma => {
+                              const pastelColor = paketRenkleri[paketIndex]?.[firma.firmaId] || "#fff";
+                              return (
+                                <Table.Summary.Cell key={`telefon-${firma.firmaId}`} colSpan={5} align="center" style={{ backgroundColor: pastelColor }}>
+                                  <div style={cellWrapperStyle}>
+                                    <Input 
+                                      style={componentStyle}
+                                      value={firma.telefon} 
+                                      onChange={(e) => handleFirmaDetailChange(paketIndex, firma.firmaId, "telefon", e.target.value)}
+                                      disabled={isDisabled}
+                                    />
+                                  </div>
+                                </Table.Summary.Cell>
+                              );
+                            })}
+                          </Table.Summary.Row>
+
+                          {/* AÇIKLAMA */}
+                          <Table.Summary.Row>
+                            <Table.Summary.Cell index={0}><Text strong>AÇIKLAMA</Text></Table.Summary.Cell>
+                            {firmalar.map(firma => {
+                              const pastelColor = paketRenkleri[paketIndex]?.[firma.firmaId] || "#fff";
+                              return (
+                                <Table.Summary.Cell key={`aciklama-${firma.firmaId}`} colSpan={5} align="center" style={{ backgroundColor: pastelColor }}>
+                                  <div style={cellWrapperStyle}>
+                                    <Input.TextArea 
+                                      style={componentStyle}
+                                      value={firma.aciklama} 
+                                      onChange={(e) => handleFirmaDetailChange(paketIndex, firma.firmaId, "aciklama", e.target.value)}
+                                      disabled={isDisabled}
+                                      autoSize={{ minRows: 1, maxRows: 3 }}
+                                    />
+                                  </div>
+                                </Table.Summary.Cell>
+                              );
+                            })}
+                          </Table.Summary.Row>
+                        </>
+                      )}
                     </>
                   );
                 }}
@@ -715,47 +1191,6 @@ const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
                   {detayGosterilenPaket === paketIndex ? "Detayı Gizle" : "Detay Gör"}
                 </a>
               </div>
-
-              {detayGosterilenPaket === paketIndex && (
-                <div style={{ marginTop: 16 }}>
-                  <Table
-                    dataSource={(paket.teklifDetaylar || []).map((d, i) => ({
-                      key: i,
-                      ...d,
-                    }))}
-                    bordered
-                    pagination={false}
-                    size="small"
-                    columns={[
-                      {
-                        title: "Detay No",
-                        dataIndex: "detayNo",
-                        key: "detayNo",
-                        width: 120,
-                      },
-                      {
-                        title: "Açıklama",
-                        dataIndex: "aciklama",
-                        key: "aciklama",
-                      },
-                      {
-                        title: "Tarih",
-                        dataIndex: "tarih",
-                        key: "tarih",
-                        width: 160,
-                        render: (val) => (val ? new Date(val).toLocaleDateString("tr-TR") : "-"),
-                      },
-                      {
-                        title: "Durum",
-                        dataIndex: "durum",
-                        key: "durum",
-                        width: 150,
-                      },
-                    ]}
-                    locale={{ emptyText: "Detay bilgisi bulunamadı." }}
-                  />
-                </div>
-              )}
             </TabPane>
           );
         })}
