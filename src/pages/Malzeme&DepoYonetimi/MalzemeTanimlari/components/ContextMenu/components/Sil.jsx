@@ -3,7 +3,7 @@ import AxiosInstance from "../../../../../../api/http";
 import { Button, message, Popconfirm } from "antd";
 import { DeleteOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 
-export default function Sil({ selectedRows, refreshTableData, disabled, hidePopover }) {
+export default function Sil({ selectedRows, refreshTableData, disabled, hidePopover, renderTrigger }) {
   // selectedRows.forEach((row, index) => {
   //   console.log(`Satır ${index + 1} ID: ${row.key}`);
   //   // Eğer id değerleri farklı bir özellikte tutuluyorsa, row.key yerine o özelliği kullanın. Örneğin: row.id
@@ -65,6 +65,15 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
   //   }
   // };
 
+  const triggerNode =
+    typeof renderTrigger === "function" ? (
+      renderTrigger()
+    ) : (
+      <Button style={{ paddingLeft: "0px" }} type="link" danger icon={<DeleteOutlined />}>
+        Sil
+      </Button>
+    );
+
   return (
     <div style={buttonStyle}>
       <Popconfirm
@@ -81,9 +90,7 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
           />
         }
       >
-        <Button style={{ paddingLeft: "0px" }} type="link" danger icon={<DeleteOutlined />}>
-          Sil
-        </Button>
+        {triggerNode}
       </Popconfirm>
     </div>
   );

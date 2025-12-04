@@ -67,7 +67,7 @@ export default function MalzemeTalepTablo({ workshopSelectedId, onSubmit, select
       ellipsis: true,
     },
     {
-      title: "Sabrına Miktarı",
+      title: "Satınalma Miktarı",
       dataIndex: "SFD_SATINALMA_MIKTARI",
       key: "SFD_SATINALMA_MIKTARI",
       width: 120,
