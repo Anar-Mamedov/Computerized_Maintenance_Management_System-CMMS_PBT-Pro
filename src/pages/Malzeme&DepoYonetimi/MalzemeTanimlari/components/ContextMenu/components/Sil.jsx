@@ -1,81 +1,40 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useMemo } from "react";
 import AxiosInstance from "../../../../../../api/http";
-import { Button, message, Popconfirm } from "antd";
-import { DeleteOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import { message, Popconfirm } from "antd";
+import { QuestionCircleOutlined } from "@ant-design/icons";
 
-export default function Sil({ selectedRows, refreshTableData, disabled, hidePopover, renderTrigger }) {
-  // selectedRows.forEach((row, index) => {
-  //   console.log(`Satır ${index + 1} ID: ${row.key}`);
-  //   // Eğer id değerleri farklı bir özellikte tutuluyorsa, row.key yerine o özelliği kullanın. Örneğin: row.id
-  // });
+export default function Sil({ selectedRows, refreshTableData, disabled, hidePopover, icon, iconColor, title, description }) {
+  const rows = useMemo(() => (Array.isArray(selectedRows) ? selectedRows : []), [selectedRows]);
+  const isDisabled = disabled || rows.length === 0;
 
-  // Sil düğmesini gizlemek için koşullu stil
-  const buttonStyle = disabled ? { display: "none" } : {};
+  const handleDelete = useCallback(async () => {
+    if (rows.length === 0) return;
 
-  // Silme işlemini tetikleyecek fonksiyon
-  const handleDelete = async () => {
-    let isError = false;
-    // Seçili satırlar üzerinde döngü yaparak her birini sil
-    for (const row of selectedRows) {
-      try {
-        // Silme API isteğini gönder
-        const response = await AxiosInstance.get(`VehicleServices/DeleteVehicleService?sId=${row.key}&vId=${row.aracId}&pId=${row.bakimId}`);
-        console.log("Silme işlemi başarılı:", response);
-        if (response.data.statusCode === 200 || response.data.statusCode === 201 || response.data.statusCode === 202) {
-          message.success("İşlem Başarılı.");
-        } else if (response.data.statusCode === 401) {
-          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
-        } else {
-          message.error("İşlem Başarısız.");
-        }
-        // Burada başarılı silme işlemi sonrası yapılacak işlemler bulunabilir.
-      } catch (error) {
-        console.error("Silme işlemi sırasında hata oluştu:", error);
+    const successStatuses = new Set([200, 201, 202]);
+    try {
+      const results = await Promise.allSettled(
+        rows.map((row) => AxiosInstance.get(`VehicleServices/DeleteVehicleService?sId=${row.key}&vId=${row.aracId}&pId=${row.bakimId}`)),
+      );
+
+      const successes = results.filter((result) => result.status === "fulfilled" && successStatuses.has(result.value?.data?.statusCode)).length;
+      const failures = results.length - successes;
+
+      if (successes) {
+        message.success(`${successes} kayıt silindi.`);
       }
-    }
-    // Tüm silme işlemleri tamamlandıktan sonra ve hata oluşmamışsa refreshTableData'i çağır
-    if (!isError) {
-      refreshTableData();
-      hidePopover(); // Silme işlemi başarılı olursa Popover'ı kapat
-    }
-  };
+      if (failures) {
+        message.error(`${failures} kayıt silinemedi.`);
+      }
 
-  // const handleDelete = async () => {
-  //   let isError = false;
-  //   // Local storage'dan userId değerini al
-  //   const user = JSON.parse(localStorage.getItem("user"));
-  //   // Seçili satırlar üzerinde döngü yaparak her birini sil
-  //   for (const row of selectedRows) {
-  //     try {
-  //       // Silme API isteğini gönder
-  //       const response = await AxiosInstance.post(`IsEmriDelete`, {
-  //         ID: row.key,
-  //         // KulID: user.userId,
-  //       });
-  //       console.log("Silme işlemi başarılı:", response);
-  //       // Burada başarılı silme işlemi sonrası yapılacak işlemler bulunabilir.
-  //     } catch (error) {
-  //       console.error("Silme işlemi sırasında hata oluştu:", error);
-  //     }
-  //   }
-  //   // Tüm silme işlemleri tamamlandıktan sonra ve hata oluşmamışsa refreshTableData'i çağır
-  //   if (!isError) {
-  //     refreshTableData();
-  //     hidePopover(); // Silme işlemi başarılı olursa Popover'ı kapat
-  //   }
-  // };
-
-  const triggerNode =
-    typeof renderTrigger === "function" ? (
-      renderTrigger()
-    ) : (
-      <Button style={{ paddingLeft: "0px" }} type="link" danger icon={<DeleteOutlined />}>
-        Sil
-      </Button>
-    );
+      refreshTableData?.();
+      hidePopover?.();
+    } catch (error) {
+      message.error("Silme işlemi sırasında bir sorun oluştu.");
+    }
+  }, [hidePopover, refreshTableData, rows]);
 
   return (
-    <div style={buttonStyle}>
+    <div style={isDisabled ? { display: "none" } : {}}>
       <Popconfirm
         title="Silme İşlemi"
         description="Bu öğeyi silmek istediğinize emin misiniz?"
@@ -90,7 +49,26 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
           />
         }
       >
-        {triggerNode}
+        <div
+          className="menu-item-hover"
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: "12px",
+            cursor: "pointer",
+            padding: "10px 12px",
+            transition: "background-color 0.3s",
+            width: "100%",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f5f5f5")}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+        >
+          <div>{icon && <span style={{ color: iconColor, fontSize: "18px", marginTop: "4px" }}>{icon}</span>}</div>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {title && <span style={{ fontWeight: "500", color: "#262626", fontSize: "14px", lineHeight: "1.2" }}>{title}</span>}
+            {description && <span style={{ fontSize: "12px", color: "#8c8c8c", marginTop: "4px", lineHeight: "1.4" }}>{description}</span>}
+          </div>
+        </div>
       </Popconfirm>
     </div>
   );

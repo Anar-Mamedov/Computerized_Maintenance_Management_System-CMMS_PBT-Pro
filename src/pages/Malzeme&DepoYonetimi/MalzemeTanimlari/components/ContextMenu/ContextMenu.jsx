@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Button, Popover, Typography } from "antd";
 import { ApartmentOutlined, DeleteOutlined, MoreOutlined } from "@ant-design/icons";
 import Sil from "./components/Sil";
@@ -6,95 +6,86 @@ import DepoDurumModal from "../../../../../utils/components/DepoDurumModal";
 
 const { Text } = Typography;
 
-export default function ContextMenu({ selectedRows, refreshTableData }) {
+const baseHeaderStyle = {
+  color: "#8c8c8c",
+  fontSize: "11px",
+  fontWeight: "600",
+  textTransform: "uppercase",
+  letterSpacing: "0.5px",
+  textAlign: "right",
+  padding: "8px 12px 4px 12px",
+};
+
+const separatorHeaderStyle = {
+  ...baseHeaderStyle,
+  borderTop: "1px solid #f0f0f0",
+  marginTop: "4px",
+  paddingTop: "8px",
+};
+
+const contentContainerStyle = {
+  width: "260px",
+  padding: "0",
+  display: "flex",
+  flexDirection: "column",
+  maxHeight: "60vh",
+  overflowY: "auto",
+  overflowX: "hidden",
+};
+
+export default function ContextMenu({ selectedRows = [], refreshTableData }) {
   const [visible, setVisible] = useState(false);
+  const selectionCount = Array.isArray(selectedRows) ? selectedRows.length : 0;
+  const hasSingleSelection = selectionCount === 1;
+  const selectedRow = hasSingleSelection ? selectedRows[0] : null;
+  const selectedStokId = selectedRow?.TB_STOK_ID ?? selectedRow?.key ?? null;
+  const selectedStokKod = selectedRow?.STK_KOD ?? null;
 
-  const handleVisibleChange = (visible) => {
-    setVisible(visible);
-  };
+  const hidePopover = useCallback(() => setVisible(false), []);
+  const handleVisibleChange = useCallback((nextVisible) => setVisible(nextVisible), []);
 
-  const hidePopover = () => {
-    setVisible(false);
-  };
-
-  const hasSingleSelection = selectedRows?.length === 1;
-  const selectedStokId = hasSingleSelection ? selectedRows?.[0]?.TB_STOK_ID ?? selectedRows?.[0]?.key ?? null : null;
-  const selectedStokKod = hasSingleSelection ? selectedRows?.[0]?.STK_KOD ?? null : null;
-
-  const sectionTitleStyle = {
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: 0.3,
-    color: "#6B7280",
-    textTransform: "uppercase",
-    marginBottom: 10,
-  };
-
-  const actionButtonStyle = {
-    width: "100%",
-    textAlign: "left",
-    height: "auto",
-    padding: "12px 8px",
-    display: "flex",
-    alignItems: "flex-start",
-    gap: 12,
-    borderRadius: 10,
-  };
-
-  const ActionContent = ({ icon, iconColor, title, description }) => (
-    <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-      <span style={{ color: iconColor, fontSize: 20, lineHeight: "20px" }}>{icon}</span>
-      <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <span style={{ fontWeight: 700, color: "#111827" }}>{title}</span>
-        {description && <span style={{ color: "#6B7280", fontSize: 13, lineHeight: 1.45 }}>{description}</span>}
-      </div>
-    </div>
-  );
-
-  const content = (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 320, maxWidth: 360, background: "#fff", padding: "8px 12px" }}>
-      {selectedRows.length >= 1 ? (
-        <>
-          {hasSingleSelection && (
-            <div style={{ borderBottom: "1px solid #F3F4F6", paddingBottom: 6 }}>
-              <Text style={sectionTitleStyle}>Stok İşlemleri</Text>
-              <DepoDurumModal
-                stokId={selectedStokId}
-                stokKod={selectedStokKod}
-                onOpenModal={hidePopover}
-                triggerLabel={
-                  <ActionContent icon={<ApartmentOutlined />} iconColor="#2563EB" title="Depodaki Durumu" description="Seçili stok için depodaki dağılımı görüntüler." />
-                }
-                buttonProps={{
-                  style: actionButtonStyle,
-                }}
-              />
-            </div>
-          )}
-
-          <div style={{ borderBottom: "1px solid #F3F4F6", paddingBottom: 6, paddingTop: 2 }}>
-            <Text style={sectionTitleStyle}>Kayıt</Text>
-            <Sil
-              selectedRows={selectedRows}
-              refreshTableData={refreshTableData}
-              hidePopover={hidePopover}
-              renderTrigger={() => (
-                <Button type="text" style={actionButtonStyle} danger>
-                  <ActionContent icon={<DeleteOutlined />} iconColor="#DC2626" title="Sil" description="Stok kaydını kalıcı olarak siler. Geri alınamaz." />
-                </Button>
-              )}
-            />
-          </div>
-        </>
-      ) : (
-        <div style={{ padding: "8px 0" }}>
+  const content = useMemo(() => {
+    if (selectionCount < 1) {
+      return (
+        <div style={{ padding: "12px" }}>
           <Text type="secondary">İşlem yapmak için en az bir satır seçin.</Text>
         </div>
-      )}
-    </div>
-  );
+      );
+    }
+
+    return (
+      <>
+        {hasSingleSelection && (
+          <>
+            <div style={baseHeaderStyle}>Stok İşlemleri</div>
+            <DepoDurumModal
+              stokId={selectedStokId}
+              stokKod={selectedStokKod}
+              onOpenModal={hidePopover}
+              icon={<ApartmentOutlined />}
+              iconColor="#535c68"
+              title="Depodaki Durumu"
+              description="Seçili stok için depodaki dağılımı görüntüler."
+            />
+          </>
+        )}
+
+        <div style={hasSingleSelection ? separatorHeaderStyle : baseHeaderStyle}>Kayıt</div>
+        <Sil
+          selectedRows={selectedRows}
+          refreshTableData={refreshTableData}
+          hidePopover={hidePopover}
+          icon={<DeleteOutlined />}
+          iconColor="#DC2626"
+          title="Sil"
+          description="Stok kaydını kalıcı olarak siler. Geri alınamaz."
+        />
+      </>
+    );
+  }, [hasSingleSelection, hidePopover, refreshTableData, selectedRows, selectedStokId, selectedStokKod, selectionCount]);
+
   return (
-    <Popover placement="bottom" content={content} trigger="click" open={visible} onOpenChange={handleVisibleChange}>
+    <Popover placement="bottom" content={<div style={contentContainerStyle}>{content}</div>} trigger="click" open={visible} onOpenChange={handleVisibleChange} arrow={false} overlayInnerStyle={{ padding: 0 }}>
       <Button
         style={{
           display: "flex",
@@ -106,7 +97,7 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
           height: "32px",
         }}
       >
-        {selectedRows.length >= 1 && <Text style={{ color: "white", marginLeft: "3px" }}>{selectedRows.length}</Text>}
+        {selectionCount >= 1 && <Text style={{ color: "white", marginLeft: "3px" }}>{selectionCount}</Text>}
         <MoreOutlined style={{ color: "white", fontSize: "20px", margin: "0" }} />
       </Button>
     </Popover>

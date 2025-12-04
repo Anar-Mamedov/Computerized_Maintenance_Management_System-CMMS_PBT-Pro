@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Alert, Button, Modal, Spin, Table, Typography } from "antd";
-import { ApartmentOutlined } from "@ant-design/icons";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Alert, Modal, Spin, Table, Typography } from "antd";
 import AxiosInstance from "../../api/http";
 
 const { Text } = Typography;
@@ -44,43 +43,55 @@ const defaultColumns = [
   },
 ];
 
-/**
- * Stok kayıtlarının depo bazlı durumunu gösteren, buton + modal birleşik component.
- * Gerektiğinde farklı yerlerde de kullanılabilmesi için utils altında tutulur.
- */
-export default function DepoDurumModal({ stokId, stokKod, triggerLabel = "Depodaki Durumu", buttonProps = {}, modalProps = {}, onOpenModal }) {
+export default function DepoDurumModal({ stokId, stokKod, icon, iconColor, title, description, modalProps = {}, onOpenModal }) {
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const isMountedRef = useRef(true);
+  const requestIdRef = useRef(0);
 
-  const handleOpen = () => {
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  const handleOpen = useCallback(() => {
     if (!stokId) return;
     onOpenModal?.();
     setOpen(true);
-  };
+  }, [onOpenModal, stokId]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setOpen(false);
-  };
+  }, []);
 
   const fetchData = useCallback(async () => {
     if (!stokId) return;
+    const currentRequestId = requestIdRef.current + 1;
+    requestIdRef.current = currentRequestId;
     setLoading(true);
     setError("");
     try {
       const response = await AxiosInstance.get(`GetMalzemeDepoDurumlari?stokId=${stokId}`);
-      const payload = Array.isArray(response?.data) ? response.data : Array.isArray(response?.Data) ? response.Data : [];
+      const payload = Array.isArray(response?.data) ? response.data : [];
       const parsedRows = payload.map((item, index) => ({
         ...item,
         key: item?.key ?? `${item?.depoTanim || "depo"}-${index}`,
       }));
-      setRows(parsedRows);
+      if (isMountedRef.current && requestIdRef.current === currentRequestId) {
+        setRows(parsedRows);
+      }
     } catch (err) {
-      setRows([]);
-      setError("Depo durumu alınırken bir sorun oluştu.");
+      if (isMountedRef.current && requestIdRef.current === currentRequestId) {
+        setRows([]);
+        setError("Depo durumu alınırken bir sorun oluştu.");
+      }
     } finally {
-      setLoading(false);
+      if (isMountedRef.current && requestIdRef.current === currentRequestId) {
+        setLoading(false);
+      }
     }
   }, [stokId]);
 
@@ -97,27 +108,37 @@ export default function DepoDurumModal({ stokId, stokKod, triggerLabel = "Depoda
     }
   }, [open, stokId]);
 
-  const mergedButtonProps = useMemo(() => {
-    const mergedStyle = { padding: 0, width: "100%", textAlign: "left", ...buttonProps?.style };
-    return {
-      type: "text",
-      ...buttonProps,
-      style: mergedStyle,
-    };
-  }, [buttonProps]);
-
   return (
     <>
-      <Button disabled={!stokId} {...mergedButtonProps} onClick={handleOpen}>
-        {triggerLabel}
-      </Button>
+      <div
+        onClick={!stokId ? undefined : handleOpen}
+        className="menu-item-hover"
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "12px",
+          cursor: stokId ? "pointer" : "not-allowed",
+          padding: "10px 12px",
+          transition: "background-color 0.3s",
+          width: "100%",
+          opacity: stokId ? 1 : 0.5,
+        }}
+        onMouseEnter={(e) => stokId && (e.currentTarget.style.backgroundColor = "#f5f5f5")}
+        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+      >
+        <div>{icon && <span style={{ color: iconColor, fontSize: "18px", marginTop: "4px" }}>{icon}</span>}</div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          {title && <span style={{ fontWeight: "500", color: "#262626", fontSize: "14px", lineHeight: "1.2" }}>{title}</span>}
+          {description && <span style={{ fontSize: "12px", color: "#8c8c8c", marginTop: "4px", lineHeight: "1.4" }}>{description}</span>}
+        </div>
+      </div>
 
-      <Modal title="Depodaki Durumu" width={900} open={open} onCancel={handleClose} footer={null} destroyOnClose {...modalProps}>
+      <Modal title={title || "Depodaki Durumu"} width={900} open={open} onCancel={handleClose} footer={null} destroyOnClose {...modalProps}>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {(stokKod || stokId) && (
             <Text type="secondary">
               {stokKod && <span style={{ marginRight: 8 }}>Stok Kodu: {stokKod}</span>}
-              {stokId && <span>Stok ID: {stokId}</span>}
+              {/* {stokId && <span>Stok ID: {stokId}</span>} */}
             </Text>
           )}
 
