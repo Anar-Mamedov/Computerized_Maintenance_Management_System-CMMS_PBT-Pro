@@ -247,7 +247,7 @@ const MainTable = () => {
       title: "Firma Ünvanı",
       dataIndex: "CAR_TANIM",
       key: "CAR_TANIM",
-      width: 450,
+      width: 300,
       ellipsis: true,
       visible: true,
       onCell: () => ({
@@ -259,42 +259,6 @@ const MainTable = () => {
         if (a.CAR_TANIM == null || a.CAR_TANIM === "") return 1;
         if (b.CAR_TANIM == null || b.CAR_TANIM === "") return -1;
         return a.CAR_TANIM.toString().localeCompare(b.CAR_TANIM.toString());
-      },
-    },
-    {
-      title: "Firma Tipi",
-      dataIndex: "",
-      key: "",
-      width: 150,
-      ellipsis: true,
-      visible: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      sorter: (a, b) => {
-        if (a.CAR_TANIM == null || a.CAR_TANIM === "") return 1;
-        if (b.CAR_TANIM == null || b.CAR_TANIM === "") return -1;
-        return a.CAR_TANIM.toString().localeCompare(b.CAR_TANIM.toString());
-      },
-    },
-    {
-      title: "Adres",
-      dataIndex: "CAR_ADRES",
-      key: "CAR_ADRES",
-      width: 150,
-      ellipsis: true,
-      visible: false,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      sorter: (a, b) => {
-        if (a.CAR_ADRES == null || a.CAR_ADRES === "") return 1;
-        if (b.CAR_ADRES == null || b.CAR_ADRES === "") return -1;
-        return a.CAR_ADRES.toString().localeCompare(b.CAR_ADRES.toString());
       },
     },
     {
@@ -321,7 +285,7 @@ const MainTable = () => {
       key: "CAR_ILCE",
       width: 150,
       ellipsis: true,
-      visible: true,
+      visible: false,
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();
@@ -334,12 +298,84 @@ const MainTable = () => {
       },
     },
     {
+      title: "Firma Tipi",
+      dataIndex: "CAR_TIP",
+      key: "CAR_TIP",
+      width: 150,
+      ellipsis: true,
+      visible: true,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      sorter: (a, b) => {
+        if (a.CAR_TIP == null || a.CAR_TIP === "") return 1;
+        if (b.CAR_TIP == null || b.CAR_TIP === "") return -1;
+        return a.CAR_TIP.toString().localeCompare(b.CAR_TIP.toString());
+      },
+    },
+    {
+      title: "Lokasyon",
+      dataIndex: "CAR_LOKASYON",
+      key: "CAR_LOKASYON",
+      width: 150,
+      ellipsis: true,
+      visible: false,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      sorter: (a, b) => {
+        if (a.CAR_LOKASYON == null || a.CAR_LOKASYON === "") return 1;
+        if (b.CAR_LOKASYON == null || b.CAR_LOKASYON === "") return -1;
+        return a.CAR_LOKASYON.toString().localeCompare(b.CAR_LOKASYON.toString());
+      },
+    },
+    {
+      title: "Sektör",
+      dataIndex: "CAR_SEKTOR",
+      key: "CAR_SEKTOR",
+      width: 150,
+      ellipsis: true,
+      visible: false,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      sorter: (a, b) => {
+        if (a.CAR_SEKTOR == null || a.CAR_SEKTOR === "") return 1;
+        if (b.CAR_SEKTOR == null || b.CAR_SEKTOR === "") return -1;
+        return a.CAR_SEKTOR.toString().localeCompare(b.CAR_SEKTOR.toString());
+      },
+    },
+    {
+      title: "Adres",
+      dataIndex: "CAR_ADRES",
+      key: "CAR_ADRES",
+      width: 150,
+      ellipsis: true,
+      visible: false,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      sorter: (a, b) => {
+        if (a.CAR_ADRES == null || a.CAR_ADRES === "") return 1;
+        if (b.CAR_ADRES == null || b.CAR_ADRES === "") return -1;
+        return a.CAR_ADRES.toString().localeCompare(b.CAR_ADRES.toString());
+      },
+    },
+    {
       title: "Telefon",
       dataIndex: "CAR_TEL1",
       key: "CAR_TEL1",
       width: 150,
       ellipsis: true,
-      visible: true,
+      visible: false,
       onCell: () => ({
         onClick: (event) => {
           event.stopPropagation();

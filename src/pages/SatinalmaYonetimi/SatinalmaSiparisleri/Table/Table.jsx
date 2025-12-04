@@ -1166,39 +1166,45 @@ const MainTable = () => {
       // İndirme işlemi başlıyor
       setXlsxLoading(true);
 
-      // API'den verileri çekiyoruz
-      const { kelime = "", filters = {} } = body || {};
-      const response = await AxiosInstance.post(`GetIsEmriFullListExcel?parametre=${kelime}`, filters);
-      if (response) {
+      // Body state'inden filtreleri alıyoruz
+      const { filters = {} } = body || {};
+
+      // ✅ API İsteği: GetSatinalmaSiparisListExcel
+      // Filtreleri body olarak gönderiyoruz
+      const response = await AxiosInstance.post("GetSatinalmaSiparisListExcel", filters);
+
+      // Gelen yanıtı kontrol et (Direkt array mi yoksa obje içinde mi?)
+      // Genelde siparis_listesi içinde döner ama direkt array gelme ihtimaline karşı kontrol ediyoruz.
+      const dataToProcess = Array.isArray(response) 
+        ? response 
+        : (response?.siparis_listesi || response?.items || []);
+
+      if (dataToProcess.length > 0) {
         // Verileri işliyoruz
-        const xlsxData = response.map((row) => {
+        const xlsxData = dataToProcess.map((row) => {
           let xlsxRow = {};
           filteredColumns.forEach((col) => {
             const key = col.dataIndex;
             if (key) {
               let value = row[key];
 
-              // Özel durumları ele alıyoruz
+              // Özel durumları ele alıyoruz (Formatlama işlemleri)
               if (col.render) {
-                if (key === "DUZENLEME_TARIH" || key.endsWith("_TARIH")) {
+                if (key.includes("TARIH")) {
                   value = formatDate(value);
-                } else if (key === "DUZENLEME_SAAT" || key.endsWith("_SAAT")) {
+                } else if (key.includes("SAAT")) {
                   value = formatTime(value);
-                } else if (key === "GARANTI") {
-                  value = row.GARANTI ? "Evet" : "Hayır";
-                } else if (key === "TAMAMLANMA") {
-                  value = `${row.TAMAMLANMA}%`;
-                } else if (key === "DURUM") {
-                  value = row.DURUM;
-                } else if (key === "ISM_ONAY_DURUM") {
-                  const { text } = statusTag(row.ISM_ONAY_DURUM);
-                  value = text;
-                } else if (key === "ISEMRI_TIP") {
-                  value = row.ISEMRI_TIP;
+                } else if (key === "SSP_DURUM") {
+                  // Durum kolonunda HTML/CSS render ediliyor, Excel için sadece metni alıyoruz
+                  value = row.SSP_DURUM; 
+                } else if (["SSP_KDV_TOPLAM", "SSP_ARA_TOPLAM", "SSP_YUVARLAMA_TOPLAMI", "SSP_GENEL_TOPLAM"].includes(key)) {
+                  // Para birimi formatlama (kayıttaki tutarFormat değerine göre)
+                  const decimals = row.tutarFormat ? Number(row.tutarFormat) : 2;
+                  value = Number(value).toFixed(decimals);
                 } else if (key.startsWith("OZEL_ALAN_")) {
                   value = row[key];
                 } else {
-                  // Diğer sütunlar için
+                  // Diğer sütunlar için render fonksiyonundan metni çıkar
                   value = extractTextFromElement(col.render(row[key], row));
                 }
               }
@@ -1212,7 +1218,7 @@ const MainTable = () => {
         // XLSX dosyasını oluşturuyoruz
         const worksheet = XLSX.utils.json_to_sheet(xlsxData);
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Siparis Listesi");
 
         // Sütun genişliklerini ayarlıyoruz
         const headers = filteredColumns
@@ -1224,14 +1230,17 @@ const MainTable = () => {
               width: col.width, // Tablo sütun genişliği
             };
           })
-          .filter((col) => col.key); // Geçerli dataIndex'e sahip sütunları dahil ediyoruz
+          .filter((col) => col.key);
 
-        // Genişlikleri ölçeklendirme faktörü ile ayarlıyoruz
-        const scalingFactor = 0.8; // Gerektiği gibi ayarlayın
+        const scalingFactor = 0.8; 
 
         worksheet["!cols"] = headers.map((header) => ({
-          wpx: header.width ? header.width * scalingFactor : 100, // Tablo sütun genişliğini kullanıyoruz
+          wpx: header.width ? header.width * scalingFactor : 100, 
         }));
+
+        // Dosya ismine günün tarihini ekleyelim
+        const dateStr = new Date().toLocaleDateString("tr-TR").replace(/\./g, "_");
+        const fileName = `Satinalma_Siparisleri_${dateStr}.xlsx`;
 
         // İndirme işlemini başlatıyoruz
         const excelBuffer = XLSX.write(workbook, {
@@ -1242,16 +1251,15 @@ const MainTable = () => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.setAttribute("href", url);
-        link.setAttribute("download", "table_data.xlsx");
+        link.setAttribute("download", fileName);
         link.style.visibility = "hidden";
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
 
-        // İndirme işlemi bitti
         setXlsxLoading(false);
       } else {
-        console.error("API yanıtı beklenen formatta değil");
+        message.warning("İndirilecek veri bulunamadı.");
         setXlsxLoading(false);
       }
     } catch (error) {

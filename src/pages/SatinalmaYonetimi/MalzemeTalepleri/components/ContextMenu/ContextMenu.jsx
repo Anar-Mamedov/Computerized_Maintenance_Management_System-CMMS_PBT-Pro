@@ -13,6 +13,7 @@ import TarihceOnayTablo from "./components/TarihceOnayTablo";
 import OnayGeriAl from "./components/OnayGeriAl";
 import SipariseAktar from "./components/SipariseAktar/EditDrawer";
 import Teklif from "./components/Teklif/Teklif";
+import Form from "./components/Form/Form";
 
 const { Text } = Typography;
 
@@ -152,9 +153,20 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
       <>
         {/* Ayırıcı çizgi içeren stil kullanıldı */}
         <div style={separatorHeaderStyle}>Kayıt ve Tarihçe</div>
-        
+
         <TarihceTablo {...commonProps} />
         <TarihceOnayTablo {...commonProps} />
+      </>
+    );
+  };
+
+  // --- GRUP 4: FORM ---
+  const renderForm = () => {
+    return (
+      <>
+        <div style={separatorHeaderStyle}>Form</div>
+        
+        <Form {...commonProps} />
       </>
     );
   };
@@ -166,6 +178,7 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
           {renderTalepIslemleri()}
           {renderIlgiliKayitlar()}
           {renderKayitVeTarihce()}
+          {renderForm()}
         </>
       )}
     </div>
