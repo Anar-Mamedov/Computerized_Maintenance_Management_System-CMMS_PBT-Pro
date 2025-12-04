@@ -13,6 +13,7 @@ import ContextMenu from "../components/ContextMenu/ContextMenu";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import dayjs from "dayjs";
+import AktifPasifHepsiSelect from "../../../../utils/components/AktifPasifHepsiSelect";
 
 import { t } from "i18next";
 
@@ -156,6 +157,14 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
 
   const [selectedRows, setSelectedRows] = useState([]);
   const selectedRowsMapRef = useRef(new Map());
+
+  const handleOpenEditDrawer = useCallback(
+    (stokId) => {
+      if (!stokId) return;
+      setDrawer({ visible: true, data: { key: stokId } });
+    },
+    [setDrawer]
+  );
 
   const statusTag = (statusId) => {
     switch (statusId) {
@@ -874,6 +883,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
   const [body, setBody] = useState({
     keyword: "",
     filters: {},
+    isAktif: 1,
   });
 
   // ana tablo api isteği için kullanılan useEffect
@@ -908,15 +918,16 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
 
   const fetchEquipmentData = async (body, page, size) => {
     // body'nin undefined olması durumunda varsayılan değerler atanıyor
-    const { keyword = "", filters = {} } = body || {};
+    const { keyword = "", filters = {}, isAktif = 1 } = body || {};
     // page'in undefined olması durumunda varsayılan değer olarak 1 atanıyor
     const currentPage = page || 1;
+    const currentPageSize = size || pageSize;
 
     try {
       setLoading(true);
 
       // islemTip değerine göre API URL'ini oluştur
-      let apiUrl = `Stok?modulNo=1&page=${currentPage}&prm=${keyword}`;
+      let apiUrl = `Stok?modulNo=1&pagingDeger=${currentPage}&pageSize=${currentPageSize}&prm=${keyword}&isAktif=${isAktif ?? -1}`;
 
       if (islemTip === "C" || islemTip === "T") {
         // islemTip C veya T ise özel parametreler ekle
@@ -971,9 +982,22 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
 
   // sayfalama için kullanılan useEffect
   const handleTableChange = (pagination, filters, sorter, extra) => {
-    if (pagination) {
-      setCurrentPage(pagination.current);
-      setPageSize(pagination.pageSize); // pageSize güncellemesi
+    if (!pagination) return;
+
+    // pagination nesne olarak geldiğinde (Table onChange)
+    if (typeof pagination === "object") {
+      const nextSize = pagination.pageSize || pageSize;
+      setPageSize(nextSize);
+      setCurrentPage(pagination.current || 1);
+      return;
+    }
+
+    // pagination sayısal olarak geldiğinde (Pagination onChange)
+    if (typeof pagination === "number") {
+      const nextPage = pagination || 1;
+      const nextSize = typeof filters === "number" ? filters : pageSize;
+      setPageSize(nextSize);
+      setCurrentPage(nextPage);
     }
   };
   // sayfalama için kullanılan useEffect son
@@ -1309,11 +1333,12 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
             onChange={(e) => setSearchTerm(e.target.value)}
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
+          <AktifPasifHepsiSelect style={{ width: 160 }} value={body.isAktif} onChange={(value) => handleBodyChange("isAktif", value)} />
         </div>
         {!isSelectionMode && (
           <div style={{ display: "flex", gap: "10px" }}>
             <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
-            <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
+            <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} onOpenEdit={handleOpenEditDrawer} />
           </div>
         )}
       </div>
