@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import AxiosInstance from "../../../../api/http.jsx";
 import { t } from "i18next";
 
-export default function CreateModal({ selectedLokasyonId, onRefresh }) {
+export default function CreateModal({ selectedLokasyonId, onRefresh, onOpenEdit }) {
   const [open, setOpen] = useState(false);
   const [periyodikBakim, setPeriyodikBakim] = useState("");
   const showModal = () => {
@@ -144,8 +144,11 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("İşlem Başarılı.");
           setOpen(false);
-          onRefresh();
+          onRefresh?.();
           reset();
+          if (response?.TB_STOK_ID && onOpenEdit) {
+            onOpenEdit(response.TB_STOK_ID);
+          }
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
