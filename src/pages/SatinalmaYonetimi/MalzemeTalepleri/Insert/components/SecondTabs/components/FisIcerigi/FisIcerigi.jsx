@@ -32,6 +32,7 @@ const EditableCell = ({ title, editable, children, dataIndex, record, handleSave
   const inputRef = useRef(null);
   const formInstance = useContext(EditableContext);
   const [decimalSeparator, setDecimalSeparator] = useState(".");
+  const isAciklama = dataIndex === "aciklama";
 
   useEffect(() => {
     if (editing && inputRef.current) {
@@ -81,7 +82,7 @@ const EditableCell = ({ title, editable, children, dataIndex, record, handleSave
         {inputType === "number" ? (
           <InputNumber ref={inputRef} onPressEnter={save} onBlur={save} min={0} style={{ width: "100%", textAlign: "center" }} decimalSeparator={decimalSeparator} />
         ) : (
-          <Input ref={inputRef} onPressEnter={save} onBlur={save} style={{ textAlign: "center" }} />
+          <Input ref={inputRef} onPressEnter={save} onBlur={save} style={{ textAlign: isAciklama ? "left" : "center" }} />
         )}
       </AntForm.Item>
     ) : (
@@ -89,7 +90,7 @@ const EditableCell = ({ title, editable, children, dataIndex, record, handleSave
         className="editable-cell-value-wrap"
         style={{
           paddingRight: 24,
-          textAlign: "center",
+          textAlign: isAciklama ? "left" : "center",
           cursor: "pointer",
           minHeight: "22px",
           display: "flex",
