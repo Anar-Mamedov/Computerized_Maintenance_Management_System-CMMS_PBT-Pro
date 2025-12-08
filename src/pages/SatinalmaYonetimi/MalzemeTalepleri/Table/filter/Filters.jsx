@@ -7,7 +7,7 @@ import ZamanAraligi from "./ZamanAraligi";
 
 export default function Filters({ onChange, kelime }) {
   const [filters, setFilters] = React.useState({
-    tabDurumID: -1,
+    tabDurumID: [-1], // Kanka burayı array başlattım
     BasTarih: null,
     BitTarih: null,
     Kelime: kelime || "",
@@ -27,7 +27,7 @@ export default function Filters({ onChange, kelime }) {
         onSubmit={(newFilters) =>
           setFilters((state) => ({
             ...state,
-            ...newFilters, // tabDurumID
+            ...newFilters, // tabDurumID artık array gelecek
           }))
         }
       />
@@ -36,7 +36,7 @@ export default function Filters({ onChange, kelime }) {
         onSubmit={(dateRange) =>
           setFilters((state) => ({
             ...state,
-            ...dateRange, // BasTarih, BitTarih
+            ...dateRange, 
           }))
         }
       />
@@ -45,7 +45,7 @@ export default function Filters({ onChange, kelime }) {
         onSubmit={(newFilters) =>
           setFilters((state) => ({
             ...state,
-            ...newFilters, // Kelime vb.
+            ...newFilters, 
           }))
         }
       />
