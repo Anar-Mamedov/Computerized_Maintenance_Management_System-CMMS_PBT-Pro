@@ -11,7 +11,7 @@ const { Text } = Typography;
 const { Option } = Select;
 const { TabPane } = Tabs;
 
-// --- ÖZEL SELECTBOX BİLEŞENİ (react-hook-form bağımlılığı kaldırıldı) ---
+// --- ÖZEL SELECTBOX BİLEŞENİ ---
 const SimpleKodSelectbox = ({ kodID, value, onChange, disabled, style, placeholder }) => {
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -19,9 +19,7 @@ const SimpleKodSelectbox = ({ kodID, value, onChange, disabled, style, placehold
   const inputRef = useRef(null);
 
   const fetchData = async () => {
-    // Eğer zaten seçenekler yüklüyse tekrar çekme (Performans için)
     if (options.length > 0) return;
-
     setLoading(true);
     try {
       const response = await AxiosInstance.get(`KodList?grup=${kodID}`);
@@ -35,7 +33,6 @@ const SimpleKodSelectbox = ({ kodID, value, onChange, disabled, style, placehold
     }
   };
 
-  // KRİTİK DÜZELTME: Bileşen yüklendiği anda listeyi çek ki ID yerine İsim yazsın
   useEffect(() => {
     if (kodID) {
       fetchData();
@@ -49,7 +46,6 @@ const SimpleKodSelectbox = ({ kodID, value, onChange, disabled, style, placehold
         message.warning("Bu kayıt zaten var!");
         return;
       }
-
       setLoading(true);
       AxiosInstance.post(`AddKodList?entity=${name}&grup=${kodID}`)
         .then((response) => {
@@ -58,7 +54,6 @@ const SimpleKodSelectbox = ({ kodID, value, onChange, disabled, style, placehold
             message.success("Eklendi.");
             setOptions((prev) => [...prev, { TB_KOD_ID: newId, KOD_TANIM: name }]);
             setName("");
-            // Yeni ekleneni otomatik seçmek istersen: onChange(newId);
           } else {
             message.error("Eklenemedi.");
           }
@@ -77,10 +72,8 @@ const SimpleKodSelectbox = ({ kodID, value, onChange, disabled, style, placehold
       placeholder={placeholder || "Seçiniz"}
       optionFilterProp="children"
       filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
-      // Value 0 veya null ise boş göster, yoksa değeri göster
       value={value === 0 || value === null ? null : value} 
       onChange={onChange}
-      // Dropdown açıldığında yüklenmemişse yükle (Yedek kontrol)
       onDropdownVisibleChange={(open) => {
         if (open && options.length === 0) {
           fetchData();
@@ -110,6 +103,7 @@ const SimpleKodSelectbox = ({ kodID, value, onChange, disabled, style, placehold
     />
   );
 };
+
 // -----------------------------------------------------------------------
 
 const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disabled = false, onDurumGuncelle }) => {
@@ -121,10 +115,13 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   const [isTedarikciModalOpen, setTedarikciModalOpen] = useState(false);
   const [isMalzemeModalOpen, setMalzemeModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("1");
+  
   const aktifPaketIndex = Number(activeTab) - 1;
   const aktifPaket = paketler[aktifPaketIndex] || {};
   const aktifPaketDurumID = teklifDurumlari?.find(d => d.teklifId === aktifPaket.id)?.durumID || null;
+  // Kilitli mi kontrolü (Sadece 1:Açık ve 4:Reddedildi durumlarında editlenebilir)
   const isDisabled = !(aktifPaketDurumID === 1 || aktifPaketDurumID === 4);
+  
   const [detayGosterilenPaket, setDetayGosterilenPaket] = useState(null);
   
   const DURUM_STYLES = {
@@ -144,13 +141,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   const [saving, setSaving] = useState(false);
   const [editingCell, setEditingCell] = useState(null);
 
-  // Stil Tanımları
-  const cellWrapperStyle = { 
-    display: 'flex', 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    width: '100%' 
-  };
+  const cellWrapperStyle = { display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' };
   const componentStyle = { width: "90%" }; 
 
   useEffect(() => {
@@ -234,11 +225,8 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
                 gecerlilikTarihi: checkDate(detay?.TFD_GECERLILIK_TARIH),
                 teslimTarihi: checkDate(detay?.TFD_TESLIM_TARIH),
                 teslimYeri: detay?.TFD_TESLIM_YERI || "",
-                
-                // API'den gelen veriyi Number'a çeviriyoruz
                 sevkSekli: Number(detay?.TFD_SEVK_SEKLI_ID) || null, 
                 odemeBilgisi: Number(detay?.TFD_ODEME_SEKLI_ID) || null,
-                
                 yetkili: detay?.TFD_YETKILI || "",
                 telefon: detay?.TFD_TELEFON || "",
                 aciklama: detay?.TFD_ACIKLAMA || "",
@@ -263,13 +251,14 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {
-      if (!kaydedildi) {
+      // Eğer disabled ise değişiklik olsa bile sorma
+      if (!kaydedildi && !isDisabled) {
         e.preventDefault(); e.returnValue = "";
       }
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [kaydedildi]);
+  }, [kaydedildi, isDisabled]);
 
   const computeFirmaTotals = (malzemeler = [], firmaTotaller = []) => {
     return (firmaTotaller || []).map((firma) => {
@@ -300,6 +289,9 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   };
 
   const handleValueChange = (paketIndex, malzemeId, firmaId, field, value) => {
+    // Kanka buraya da ekledim, kilitliyse state değişmesin hiç
+    if (isDisabled) return;
+
     setHasChanges(true); setKaydedildi(false);
     const val = value == null ? 0 : Number(value);
     setPaketler((prev) => {
@@ -324,6 +316,8 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   };
 
   const handleTutarChange = (paketIndex, firmaId, field, value) => {
+    if (isDisabled) return;
+
     setHasChanges(true); setKaydedildi(false);
     const girilenTutar = value == null ? 0 : Number(value);
     setPaketler((prev) => {
@@ -357,6 +351,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   };
 
   const handleKdvRateChange = (paketIndex, firmaId, value) => {
+    if (isDisabled) return;
     setHasChanges(true); setKaydedildi(false);
     const yeniOran = value == null ? 0 : Number(value);
     setPaketler((prev) => {
@@ -374,6 +369,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   };
 
   const handleKdvDurumChange = (paketIndex, firmaId, value) => {
+    if (isDisabled) return;
     setHasChanges(true); setKaydedildi(false);
     setPaketler((prev) => {
       return prev.map((p, idx) => {
@@ -390,6 +386,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   };
 
   const handleFirmaDetailChange = (paketIndex, firmaId, field, value) => {
+    if (isDisabled) return;
     setHasChanges(true); setKaydedildi(false);
     setPaketler((prev) => {
       return prev.map((p, idx) => {
@@ -454,7 +451,20 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
     if (!paketler[paketIndex]) return;
     const paket = paketler[paketIndex];
 
-    // GÜVENLİK: Gelen değerleri kesinlikle Number'a çevir
+    // --- GÜVENLİK: KAYIT ÖNCESİ DURUM KONTROLÜ ---
+    // Eğer paket kilitli bir durumdaysa (Onaylandı, Sipariş vb.) API'ye istek atma
+    const currentDurumID = teklifDurumlari?.find(d => d.teklifId === paket.id)?.durumID || null;
+    const isEditable = (currentDurumID === 1 || currentDurumID === 4);
+
+    if (!isEditable) {
+        if(showMessage) message.warning("Bu teklif durumu nedeniyle değişiklikler kaydedilemez.");
+        // Kaydedildi varsayıp çıkıyoruz ki loop'a girmesin
+        setKaydedildi(true); 
+        setHasChanges(false);
+        return; 
+    }
+    // ----------------------------------------------
+
     const safeNumber = (val) => {
        if (val && typeof val === 'object' && val.value) return Number(val.value);
        return Number(val || 0);
@@ -499,8 +509,8 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
       teklifGecerlilikTarihi: f.gecerlilikTarihi || null,
       teslimTarihi: f.teslimTarihi || null,
       teslimYeri: f.teslimYeri || "",
-      sevkSekliId: safeNumber(f.sevkSekli), // Number'a çevrilmiş ID
-      odemeSekliId: safeNumber(f.odemeBilgisi), // Number'a çevrilmiş ID
+      sevkSekliId: safeNumber(f.sevkSekli),
+      odemeSekliId: safeNumber(f.odemeBilgisi),
       yetkili: f.yetkili || "",
       telefon: f.telefon || "",
       aciklama: f.aciklama || "",
@@ -520,6 +530,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   };
 
   const handleSecimChange = (paketIndex, malzemeId, firmaId, val) => {
+    if (isDisabled) return;
     setHasChanges(true); setKaydedildi(false);
     setPaketler(prev => {
       return prev.map((p, idx) => {
@@ -541,6 +552,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   };
 
   const handleMarkaChange = (paketIndex, val, malzemeId, firmaId) => {
+    if (isDisabled) return;
     setHasChanges(true); setKaydedildi(false);
     setPaketler((prev) => {
       return prev.map((p, idx) => {
@@ -562,6 +574,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   };
 
   const handleRadioClick = (paketIndex, firmaId) => {
+    if (isDisabled) return;
     setSelectedFirmaId(prev => prev === firmaId ? null : firmaId);
     setHasChanges(true);
     setPaketler(prev => {
@@ -579,6 +592,14 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   };
 
   const handleTabChange = (newKey) => {
+    // --- KRİTİK DÜZELTME: Eğer disabled ise hiçbir şey sorma, direkt geç ---
+    if (isDisabled) {
+        setActiveTab(newKey);
+        setHasChanges(false); // Varsa değişikliği unut
+        return;
+    }
+    // ----------------------------------------------------------------------
+
     if (hasChanges) {
       Modal.confirm({
         title: "Kaydedilmemiş Değişiklikler Var",
@@ -670,7 +691,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
                  title: (
                    <div style={{ backgroundColor: pastelColor, padding: "8px 0", borderRadius: 4, textAlign: "center" }}>
                      <div>{firma.firmaTanim}</div>
-                     <Radio checked={selectedFirmaId === firma.firmaId} onClick={() => handleRadioClick(paketIndex, firma.firmaId)} />
+                     <Radio checked={selectedFirmaId === firma.firmaId} onClick={() => handleRadioClick(paketIndex, firma.firmaId)} disabled={isDisabled} />
                    </div>
                  ),
                  children: [
@@ -775,7 +796,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
                                <Table.Summary.Cell index={0}><Text strong>ARA TOPLAM</Text></Table.Summary.Cell>
                                {firmalar.map(firma => (
                                    <Table.Summary.Cell key={firma.firmaId} colSpan={5} align="right" style={{ backgroundColor: paketRenkleri[paketIndex]?.[firma.firmaId] }}>
-                                       <Text strong>{Number(firma.araToplam).toLocaleString('tr-TR', {minimumFractionDigits: 2})}</Text>
+                                           <Text strong>{Number(firma.araToplam).toLocaleString('tr-TR', {minimumFractionDigits: 2})}</Text>
                                    </Table.Summary.Cell>
                                ))}
                            </Table.Summary.Row>
@@ -784,7 +805,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
                                <Table.Summary.Cell index={0}><Text strong>İNDİRİM</Text></Table.Summary.Cell>
                                {firmalar.map(firma => (
                                    <Table.Summary.Cell key={firma.firmaId} colSpan={5} align="right" style={{ backgroundColor: paketRenkleri[paketIndex]?.[firma.firmaId] }}>
-                                       {renderEditableSummaryCell(paketIndex, firma.firmaId, "indirimOrani", firma.indirimTutar ?? 0, firma.indirimOrani ?? 0)}
+                                           {renderEditableSummaryCell(paketIndex, firma.firmaId, "indirimOrani", firma.indirimTutar ?? 0, firma.indirimOrani ?? 0)}
                                    </Table.Summary.Cell>
                                ))}
                            </Table.Summary.Row>
@@ -793,26 +814,26 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
                                <Table.Summary.Cell index={0}><Text strong>KDV</Text></Table.Summary.Cell>
                                {firmalar.map(firma => (
                                    <Table.Summary.Cell key={firma.firmaId} colSpan={5} align="right" style={{ backgroundColor: paketRenkleri[paketIndex]?.[firma.firmaId] }}>
-                                       <Space>
-                                            <Radio.Group 
-                                                size="small" 
-                                                options={[{ label: 'H', value: 'Hariç' }, { label: 'D', value: 'Dahil' }]}
-                                                value={firma.kdvDurum}
-                                                onChange={(e) => handleKdvDurumChange(paketIndex, firma.firmaId, e.target.value)}
-                                                disabled={isDisabled}
-                                            />
-                                            <InputNumber
-                                                min={0} max={100}
-                                                formatter={val => `% ${val}`}
-                                                parser={val => val.replace('% ', '')}
-                                                value={firma.kdvOrani}
-                                                onChange={(val) => handleKdvRateChange(paketIndex, firma.firmaId, val)}
-                                                disabled={isDisabled}
-                                                size="small"
-                                                style={{ width: 60 }}
-                                            />
-                                            <Text>{Number(firma.kdvTutar).toLocaleString('tr-TR', {minimumFractionDigits: 2})}</Text>
-                                       </Space>
+                                           <Space>
+                                                <Radio.Group 
+                                                    size="small" 
+                                                    options={[{ label: 'H', value: 'Hariç' }, { label: 'D', value: 'Dahil' }]}
+                                                    value={firma.kdvDurum}
+                                                    onChange={(e) => handleKdvDurumChange(paketIndex, firma.firmaId, e.target.value)}
+                                                    disabled={isDisabled}
+                                                />
+                                                <InputNumber
+                                                    min={0} max={100}
+                                                    formatter={val => `% ${val}`}
+                                                    parser={val => val.replace('% ', '')}
+                                                    value={firma.kdvOrani}
+                                                    onChange={(val) => handleKdvRateChange(paketIndex, firma.firmaId, val)}
+                                                    disabled={isDisabled}
+                                                    size="small"
+                                                    style={{ width: 60 }}
+                                                />
+                                                <Text>{Number(firma.kdvTutar).toLocaleString('tr-TR', {minimumFractionDigits: 2})}</Text>
+                                           </Space>
                                    </Table.Summary.Cell>
                                ))}
                            </Table.Summary.Row>
@@ -821,7 +842,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
                                <Table.Summary.Cell index={0}><Text strong>GENEL TOPLAM</Text></Table.Summary.Cell>
                                {firmalar.map(firma => (
                                    <Table.Summary.Cell key={firma.firmaId} colSpan={5} align="right" style={{ backgroundColor: paketRenkleri[paketIndex]?.[firma.firmaId] }}>
-                                       <Text strong style={{ fontSize: '1.1em' }}>{Number(firma.genelToplam).toLocaleString('tr-TR', {minimumFractionDigits: 2})}</Text>
+                                           <Text strong style={{ fontSize: '1.1em' }}>{Number(firma.genelToplam).toLocaleString('tr-TR', {minimumFractionDigits: 2})}</Text>
                                    </Table.Summary.Cell>
                                ))}
                            </Table.Summary.Row>
@@ -897,7 +918,6 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
                                       ))}
                                    </Table.Summary.Row>
 
-                                   {/* --- YENİ BİLEŞEN: Sevk Şekli --- */}
                                    <Table.Summary.Row>
                                       <Table.Summary.Cell index={0}><Text strong>SEVK ŞEKLİ</Text></Table.Summary.Cell>
                                       {firmalar.map(f => (
@@ -917,7 +937,6 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
                                       ))}
                                    </Table.Summary.Row>
 
-                                   {/* --- YENİ BİLEŞEN: Ödeme Bilgisi --- */}
                                    <Table.Summary.Row>
                                       <Table.Summary.Cell index={0}><Text strong>ÖDEME BİLGİSİ</Text></Table.Summary.Cell>
                                       {firmalar.map(f => (
@@ -973,15 +992,15 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
                                       <Table.Summary.Cell index={0}><Text strong>AÇIKLAMA</Text></Table.Summary.Cell>
                                       {firmalar.map(f => (
                                           <Table.Summary.Cell key={f.firmaId} colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
-                                            <div style={cellWrapperStyle}>
-                                              <Input.TextArea 
-                                                value={f.aciklama}
-                                                onChange={(e) => handleFirmaDetailChange(paketIndex, f.firmaId, 'aciklama', e.target.value)}
-                                                disabled={isDisabled}
-                                                autoSize={{ minRows: 1, maxRows: 3 }}
-                                                style={componentStyle}
-                                              />
-                                            </div>
+                                              <div style={cellWrapperStyle}>
+                                                <Input.TextArea 
+                                                  value={f.aciklama}
+                                                  onChange={(e) => handleFirmaDetailChange(paketIndex, f.firmaId, 'aciklama', e.target.value)}
+                                                  disabled={isDisabled}
+                                                  autoSize={{ minRows: 1, maxRows: 3 }}
+                                                  style={componentStyle}
+                                                />
+                                              </div>
                                           </Table.Summary.Cell>
                                       ))}
                                    </Table.Summary.Row>

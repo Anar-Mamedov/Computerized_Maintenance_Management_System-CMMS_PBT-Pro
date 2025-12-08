@@ -7,7 +7,7 @@ import ZamanAraligi from "./ZamanAraligi";
 
 export default function Filters({ onChange, kelime }) {
   const [filters, setFilters] = React.useState({
-    durumId: -1,
+    durumId: [], // Başlangıç değeri boş array
     baslangicTarihi: null,
     bitisTarihi: null,
     kelime: kelime || "",
@@ -27,7 +27,7 @@ export default function Filters({ onChange, kelime }) {
         onSubmit={(newFilters) =>
           setFilters((state) => ({
             ...state,
-            ...newFilters, // durumId
+            ...newFilters, // durumId artık bir array olarak gelecek: [1, 2] gibi
           }))
         }
       />
