@@ -61,7 +61,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen, d
     },
     {
       key: "6",
-      label: aciklama && aciklama.length > 0 ? "Açıklama (x)" : "Açıklama",
+      label: aciklama && aciklama.length > 0 ? "Açıklama (*)" : "Açıklama",
       children: (
         <div>
           <Controller

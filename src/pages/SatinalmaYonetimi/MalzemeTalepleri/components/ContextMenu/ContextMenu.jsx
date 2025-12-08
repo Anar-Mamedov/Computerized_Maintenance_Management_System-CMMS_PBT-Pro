@@ -80,6 +80,21 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
 
   // --- GRUP 1: TALEP İŞLEMLERİ ---
   const renderTalepIslemleri = () => {
+    
+    // Teklif alma ve Siparişe aktarma butonlarının görünürlük mantığı (Ortak Mantık)
+    const isProcessAllowed = () => {
+      // 1. Zaten işlem görmüş durumlar (3 ve 8 gibi)
+      if ([3, 8].includes(durumId)) return true;
+
+      // 2. Onay mekanizması KAPALI ise -> Direkt "Açık (1)" durumunda işlem yap
+      if (!onayCheck && durumId === 1) return true;
+
+      // 3. Onay mekanizması AÇIK ise -> "Onaylandı (7)" durumunda işlem yap
+      if (onayCheck && durumId === 7) return true;
+
+      return false;
+    };
+
     return (
       <>
         {/* İlk başlık olduğu için çizgi yok (baseHeaderStyle kullanıldı) */}
@@ -101,12 +116,12 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
         {durumId === 7 && <OnayGeriAl {...commonProps} />}
 
         {/* 4. Fiyat Teklifi Al */}
-        {[3, 8].includes(durumId) && (
+        {isProcessAllowed() && (
            <Teklif {...commonProps} selectedRow={selectedRows[0]} onRefresh={refreshTableData} />
         )}
 
-        {/* 5. Siparişe Aktar */}
-        {durumId === 8 && (
+        {/* 5. Siparişe Aktar (Teklif mantığı ile aynı şartlara bağlandı) */}
+        {isProcessAllowed() && (
           <SipariseAktar selectedRow={selectedRows[0]} onRefresh={refreshTableData} />
         )}
 
@@ -124,6 +139,8 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
   // --- GRUP 2: İLGİLİ KAYITLAR ---
   const renderIlgiliKayitlar = () => {
     const showSatinalma = [2, 3, 4, 5].includes(durumId);
+    
+    // Durum 2 veya 5 (Kapalı) ise Teklifleri göster
     const showTeklifView = [2, 5].includes(durumId);
 
     if (!showSatinalma && !showTeklifView) return null;
@@ -140,7 +157,7 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
              {...commonProps} 
              selectedRow={selectedRows[0]} 
              onRefresh={refreshTableData} 
-             disabled={durumId === 5} 
+             // disabled propunu kaldırdım, artık 5 olduğunda da içine girip bakabilirsin.
            />
         )}
       </>

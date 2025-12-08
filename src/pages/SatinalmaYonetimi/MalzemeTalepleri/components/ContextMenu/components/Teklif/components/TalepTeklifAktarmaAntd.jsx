@@ -193,6 +193,7 @@ const itemRowSelection = {
 
   // --- Tedarikçi seçimleri
 const supplierRowSelection = {
+  hideSelectAll: true, // BU SATIRI EKLEDİK: Başlıktaki tümünü seç kutusu kalkar
   selectedRowKeys: selectedSupplierKeys,
   onChange: (keys, rows) => {
     setSelectedSupplierKeys(keys);

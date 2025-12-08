@@ -6,12 +6,11 @@ const { Option } = Select;
 const ConditionFilter = ({ onSubmit }) => {
   const [visible, setVisible] = useState(false);
   const [options, setOptions] = useState([]);
-  const [selectedKey, setSelectedKey] = useState(null);
+  const [selectedKeys, setSelectedKeys] = useState([]); // Array olarak başlattık
 
   useEffect(() => {
-    // Durum listesi
+    // Durum listesi (-1 Tümü seçeneğini kaldırdım, çoklu seçimde boş bırakmak 'Tümü' demektir genelde)
     const hardcodedOptions = [
-      { key: -1, value: "Tümü" },
       { key: 1, value: "Açık" },
       { key: 2, value: "Karşılanıyor" },
       { key: 3, value: "Kapalı" },
@@ -24,22 +23,16 @@ const ConditionFilter = ({ onSubmit }) => {
   }, []);
 
   const handleSubmit = () => {
-  const value = parseInt(selectedKey);
-
-  if (isNaN(value)) {
-    onSubmit({}); // Seçim yapılmadıysa filtreleme gönderme
-  } else {
-    onSubmit({ durumId: value }); // Seçim ne olursa olsun gönder
-  }
-
-  setVisible(false);
-};
+    // Array'i olduğu gibi gönderiyoruz
+    onSubmit({ durumId: selectedKeys }); 
+    setVisible(false);
+  };
 
   const handleCancelClick = () => {
-  setSelectedKey(-1);
-  onSubmit({ durumId: -1 });
-  setVisible(false);
-};
+    setSelectedKeys([]); // Seçimleri temizle (boş array)
+    onSubmit({ durumId: [] }); // Dışarıya boş array bildir
+    setVisible(false);
+  };
 
   const content = (
     <div style={{ width: "300px" }}>
@@ -58,11 +51,13 @@ const ConditionFilter = ({ onSubmit }) => {
       </div>
       <div style={{ padding: "10px" }}>
         <Select
+          mode="multiple" // ÇOKLU SEÇİM MODU
           style={{ width: "100%" }}
           placeholder="Durum Seç..."
-          value={selectedKey}
-          onChange={setSelectedKey}
+          value={selectedKeys}
+          onChange={(values) => setSelectedKeys(values)} // Antd multiple modunda values direkt array döner
           allowClear
+          maxTagCount="responsive" // Çok fazla seçilirse +2 gibi gösterir input içinde
         >
           {options.map((option) => (
             <Option key={option.key} value={option.key}>
@@ -83,15 +78,17 @@ const ConditionFilter = ({ onSubmit }) => {
       placement="bottom"
     >
       <Button>
-        Durum{" "}
-        {selectedKey !== null && selectedKey !== -1 && (
+        Durum
+        {/* Eğer array doluysa sayısını göster */}
+        {selectedKeys && selectedKeys.length > 0 && (
           <div
             style={{
               marginLeft: "5px",
               background: "#006cb8",
               borderRadius: "50%",
-              width: "17px",
+              minWidth: "17px",
               height: "17px",
+              padding: "0 4px",
               display: "inline-flex",
               justifyContent: "center",
               alignItems: "center",
@@ -99,7 +96,7 @@ const ConditionFilter = ({ onSubmit }) => {
               fontSize: "12px",
             }}
           >
-            1
+            {selectedKeys.length}
           </div>
         )}
       </Button>

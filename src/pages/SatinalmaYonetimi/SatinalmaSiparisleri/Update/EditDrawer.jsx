@@ -104,7 +104,7 @@ const durumId = watch("durumId");
         setValue("referansNo", item.referansNo);
         setValue("teslimYeriNameID", item.teslimYeriKodId);
         setValue("teslimYeriName", item.teslimYeriName);
-        setValue("projeId", item.projeId);
+        setValue("projeNameID", item.projeId);
         setValue("projeName", item.projeName);
         setValue("oncelikNameID", item.oncelikId);
         setValue("oncelikName", item.oncelikName);
@@ -231,7 +231,7 @@ const durumId = watch("durumId");
     odemeSekliKodId: Number(data.odemeSekliNameID) || 0,
     referansNo: data.referansNo || "",
     teslimYeriKodId: Number(data.teslimYeriNameID) || 0,
-    projeId: Number(data.projeId) || 0,
+    projeId: Number(data.projeNameID) || 0,
     oncelikId: Number(data.oncelikNameID) || 0,
     sevkKodId: Number(data.sevkNameID) || 0,
     sevkAdresiId: Number(data.sevkAdresiId) || 0,
