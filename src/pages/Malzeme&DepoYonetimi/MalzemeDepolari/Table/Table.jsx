@@ -18,6 +18,7 @@ import styled from "styled-components";
 import dayjs from "dayjs";
 import { t } from "i18next";
 import trTR from "antd/lib/locale/tr_TR";
+import AktifPasifHepsiSelect from "../../../../utils/components/AktifPasifHepsiSelect";
 import enUS from "antd/lib/locale/en_US";
 import ruRU from "antd/lib/locale/ru_RU";
 import azAZ from "antd/lib/locale/az_AZ";
@@ -166,6 +167,7 @@ const MalzemeDepolari = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false); // Set initial loading state to false
   const [searchValue, setSearchValue] = useState("");
+  const [isAktif, setIsAktif] = useState(1); // Aktif/Pasif/Hepsi filtresi
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0); // Total data count
   const [pageSize, setPageSize] = useState(10); // Page size
@@ -182,7 +184,7 @@ const MalzemeDepolari = () => {
   // Veri çekme fonksiyonu
   const fetchData = useCallback(() => {
     setLoading(true);
-    AxiosInstance.get("GetDepo?DEP_MODUL_NO=1")
+    AxiosInstance.get(`GetDepo?DEP_MODUL_NO=1&isAktif=${isAktif}`)
       .then((response) => {
         // API'den gelen veriyi tablo formatına dönüştür
         const fetchedData = response.map((item) => ({
@@ -191,25 +193,15 @@ const MalzemeDepolari = () => {
         }));
 
         setAllData(fetchedData);
-
-        // Arama metni varsa filtrele
-        const filteredData = searchValue
-          ? fetchedData.filter((d) =>
-              normalizeText(`${d.DEP_KOD || ""} ${d.DEP_TANIM || ""} ${d.SORUMLU_PERSONEL || ""} ${d.ATOLYE_TANIM || ""} ${d.LOKASYON_TANIM || ""}`)
-                .toLowerCase()
-                .includes(normalizeText(searchValue).toLowerCase())
-            )
-          : fetchedData;
-
-        setData(filteredData);
-        setTotalCount(filteredData.length);
+        setData(fetchedData);
+        setTotalCount(fetchedData.length);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
         message.error(t("hataOlustu"));
       })
       .finally(() => setLoading(false));
-  }, [searchValue]);
+  }, [isAktif]);
 
   // Arama işlemi
   const handleSearch = () => {
@@ -221,6 +213,23 @@ const MalzemeDepolari = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Client-side arama için useEffect
+  useEffect(() => {
+    if (searchValue) {
+      const filteredData = allData.filter((d) =>
+        normalizeText(`${d.DEP_KOD || ""} ${d.DEP_TANIM || ""} ${d.SORUMLU_PERSONEL || ""} ${d.ATOLYE_TANIM || ""} ${d.LOKASYON_TANIM || ""}`)
+          .toLowerCase()
+          .includes(normalizeText(searchValue).toLowerCase())
+      );
+      setData(filteredData);
+      setTotalCount(filteredData.length);
+    } else {
+      setData(allData);
+      setTotalCount(allData.length);
+    }
+    setCurrentPage(1); // Arama yapıldığında sayfa 1'e dön
+  }, [searchValue, allData]);
 
   // Sayfa değişikliğinde çalışacak fonksiyon
   const handlePageChange = (page) => {
@@ -649,6 +658,14 @@ const MalzemeDepolari = () => {
                   // prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
                   suffix={<SearchOutlined style={{ color: "#0091ff" }} onClick={handleSearch} />}
                   allowClear
+                />
+                <AktifPasifHepsiSelect
+                  style={{ width: 160 }}
+                  value={isAktif}
+                  onChange={(value) => {
+                    setIsAktif(value);
+                    setCurrentPage(1);
+                  }}
                 />
 
                 {/* <Filters onChange={handleBodyChange} /> */}

@@ -1,24 +1,91 @@
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Button, Popover, Typography } from "antd";
-import { MoreOutlined, DownOutlined } from "@ant-design/icons";
+import { MoreOutlined, DatabaseOutlined, DeleteOutlined } from "@ant-design/icons";
 import Sil from "./components/Sil";
+import DepoStokDurumlariModal from "../../../../../utils/components/DepoStokDurumlariModal";
 
-const { Text, Link } = Typography;
+const { Text } = Typography;
 
-export default function ContextMenu({ selectedRows, refreshTableData }) {
+const baseHeaderStyle = {
+  color: "#8c8c8c",
+  fontSize: "11px",
+  fontWeight: "600",
+  textTransform: "uppercase",
+  letterSpacing: "0.5px",
+  textAlign: "right",
+  padding: "8px 12px 4px 12px",
+};
+
+const separatorHeaderStyle = {
+  ...baseHeaderStyle,
+  borderTop: "1px solid #f0f0f0",
+  marginTop: "4px",
+  paddingTop: "8px",
+};
+
+const contentContainerStyle = {
+  width: "260px",
+  padding: "0",
+  display: "flex",
+  flexDirection: "column",
+  maxHeight: "60vh",
+  overflowY: "auto",
+  overflowX: "hidden",
+};
+
+export default function ContextMenu({ selectedRows = [], refreshTableData }) {
   const [visible, setVisible] = useState(false);
+  const selectionCount = Array.isArray(selectedRows) ? selectedRows.length : 0;
+  const hasSingleSelection = selectionCount === 1;
+  const selectedDepo = hasSingleSelection ? selectedRows[0] : null;
+  const selectedDepoId = selectedDepo?.TB_DEPO_ID ?? selectedDepo?.key ?? null;
+  const selectedDepoKod = selectedDepo?.DEP_KOD ?? null;
 
-  const handleVisibleChange = (visible) => {
-    setVisible(visible);
-  };
+  const hidePopover = useCallback(() => setVisible(false), []);
+  const handleVisibleChange = useCallback((nextVisible) => setVisible(nextVisible), []);
 
-  const hidePopover = () => {
-    setVisible(false);
-  };
+  const content = useMemo(() => {
+    if (selectionCount < 1) {
+      return (
+        <div style={{ padding: "12px" }}>
+          <Text type="secondary">İşlem yapmak için en az bir satır seçin.</Text>
+        </div>
+      );
+    }
 
-  const content = <div>{selectedRows.length >= 1 && <Sil selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}</div>;
+    return (
+      <>
+        {hasSingleSelection && (
+          <>
+            <div style={baseHeaderStyle}>Depo İşlemleri</div>
+            <DepoStokDurumlariModal
+              depoId={selectedDepoId}
+              depoKod={selectedDepoKod}
+              onOpenModal={hidePopover}
+              icon={<DatabaseOutlined />}
+              iconColor="#535c68"
+              title="Depo Stok Durumları"
+              description="Seçili depo için stok durumlarını görüntüler."
+            />
+          </>
+        )}
+
+        <div style={hasSingleSelection ? separatorHeaderStyle : baseHeaderStyle}>Kayıt</div>
+        <Sil
+          selectedRows={selectedRows}
+          refreshTableData={refreshTableData}
+          hidePopover={hidePopover}
+          icon={<DeleteOutlined />}
+          iconColor="#DC2626"
+          title="Sil"
+          description="Depo kaydını kalıcı olarak siler. Geri alınamaz."
+        />
+      </>
+    );
+  }, [hasSingleSelection, hidePopover, refreshTableData, selectedRows, selectedDepoId, selectedDepoKod, selectionCount]);
+
   return (
-    <Popover placement="bottom" content={content} trigger="click" open={visible} onOpenChange={handleVisibleChange}>
+    <Popover placement="bottom" content={<div style={contentContainerStyle}>{content}</div>} trigger="click" open={visible} onOpenChange={handleVisibleChange} arrow={false} overlayInnerStyle={{ padding: 0 }}>
       <Button
         style={{
           display: "flex",
@@ -30,7 +97,7 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
           height: "32px",
         }}
       >
-        {selectedRows.length >= 1 && <Text style={{ color: "white", marginLeft: "3px" }}>{selectedRows.length}</Text>}
+        {selectionCount >= 1 && <Text style={{ color: "white", marginLeft: "3px" }}>{selectionCount}</Text>}
         <MoreOutlined style={{ color: "white", fontSize: "20px", margin: "0" }} />
       </Button>
     </Popover>
