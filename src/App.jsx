@@ -567,6 +567,17 @@ const BaseLayout = () => {
 
 const items = filterItems(rawItems);
 
+// Ant Design Menu için gereksiz propları temizleyen fonksiyon
+function cleanItemsForMenu(items) {
+  return items.map((item) => {
+    const { isClickable, labelText, ...cleanItem } = item;
+    if (cleanItem.children) {
+      cleanItem.children = cleanItemsForMenu(cleanItem.children);
+    }
+    return cleanItem;
+  });
+}
+
 const MenuWrapper = () => {
   const location = useLocation();
   const [disabled, setDisabled] = useState(true);
@@ -640,6 +651,9 @@ const MenuWrapper = () => {
     }
   };
 
+  // Ant Design Menu'ye göndermeden önce gereksiz propları temizle
+  const cleanedItems = cleanItemsForMenu(items);
+
   return (
     <div style={{ height: "calc(100vh - 115px)", overflow: "auto" }}>
       <Menu
@@ -647,7 +661,7 @@ const MenuWrapper = () => {
         defaultSelectedKeys={[location.pathname.split("/")[1]]}
         selectedKeys={[selectedMenuItem]}
         mode="inline"
-        items={items}
+        items={cleanedItems}
         openKeys={openKeys}
         onOpenChange={onOpenChange}
         onClick={handleMenuClick}
