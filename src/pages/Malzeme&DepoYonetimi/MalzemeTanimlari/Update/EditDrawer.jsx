@@ -209,6 +209,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("stkDepoLokasyonID", item.STK_DEPO_LOKASYON_ID);
           setValue("stkDepoLokasyon", item.STK_DEPO_LOKASYON);
 
+          setValue("talepMiktar", item.TALEP_MIKTAR);
+
           setLoading(false);
         } catch (error) {
           console.error("Veri çekilirken hata oluştu:", error);
