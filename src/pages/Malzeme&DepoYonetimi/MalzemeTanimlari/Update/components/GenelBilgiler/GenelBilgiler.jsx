@@ -10,6 +10,8 @@ import MasrafMerkeziTablo from "../../../../../../utils/components/MasrafMerkezi
 import FifoTablo from "../../../../../../utils/components/FifoTablo";
 import MalzemeTalepTablo from "../../../../../../utils/components/MalzemeTalepTablo";
 import StokMıktarTablo from "../../../../../../utils/components/StokMıktarTablo";
+import DepoTablo from "../../../../../../utils/components/DepoTablo";
+import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
 import { Controller, useFormContext } from "react-hook-form";
 import { t } from "i18next";
 
@@ -113,6 +115,26 @@ function GenelBilgiler({ selectedRowID }) {
                     <PeriyotSelect name1="rafOmruPeriyot" />
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{ width: "550px" }}>
+          <div>
+            <Text style={{ color: "#0062ff", fontWeight: "500", fontSize: "14px" }}>{t("depolamaBilgileri")}</Text>
+            <Divider style={{ margin: "8px 0" }} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div style={{ display: "flex", alignItems: "center", width: "100%", gap: "10px", justifyContent: "space-between" }}>
+              <Text>{t("bulunduguDepo")}</Text>
+              <div style={{ width: "350px" }}>
+                <DepoTablo name1="stkDepo" isRequired={false} />
+              </div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", width: "100%", gap: "10px", justifyContent: "space-between" }}>
+              <Text>{t("depoLokasyonu")}</Text>
+              <div style={{ width: "350px" }}>
+                <LokasyonTablo lokasyonFieldName="stkDepoLokasyon" lokasyonIdFieldName="stkDepoLokasyonID" isRequired={false} />
               </div>
             </div>
           </div>
