@@ -1,8 +1,9 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Button, Popover, Typography } from "antd";
-import { ApartmentOutlined, DeleteOutlined, MoreOutlined } from "@ant-design/icons";
+import { ApartmentOutlined, DeleteOutlined, MoreOutlined, SwapOutlined } from "@ant-design/icons";
 import Sil from "./components/Sil";
 import DepoDurumModal from "../../../../../utils/components/DepoDurumModal";
+import MalzemeHareketleriModal from "../../../../../utils/components/MalzemeHareketleriModal";
 
 const { Text } = Typography;
 
@@ -66,6 +67,15 @@ export default function ContextMenu({ selectedRows = [], refreshTableData }) {
               iconColor="#535c68"
               title="Depodaki Durumu"
               description="Seçili stok için depodaki dağılımı görüntüler."
+            />
+            <MalzemeHareketleriModal
+              stokId={selectedStokId}
+              stokKod={selectedStokKod}
+              onOpenModal={hidePopover}
+              icon={<SwapOutlined />}
+              iconColor="#1890ff"
+              title="Malzeme Hareketleri"
+              description="Seçili stok için giriş/çıkış hareketlerini görüntüler."
             />
           </>
         )}

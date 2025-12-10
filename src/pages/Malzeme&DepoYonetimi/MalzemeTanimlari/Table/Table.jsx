@@ -358,7 +358,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       sorter: (a, b) => {
         if (a.STK_GIREN_MIKTAR === null) return -1;
         if (b.STK_GIREN_MIKTAR === null) return 1;
-        return a.STK_GIREN_MIKTAR.localeCompare(b.STK_GIREN_MIKTAR);
+        return a.STK_GIREN_MIKTAR - b.STK_GIREN_MIKTAR;
       },
     },
     {
@@ -372,7 +372,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       sorter: (a, b) => {
         if (a.STK_CIKAN_MIKTAR === null) return -1;
         if (b.STK_CIKAN_MIKTAR === null) return 1;
-        return a.STK_CIKAN_MIKTAR.localeCompare(b.STK_CIKAN_MIKTAR);
+        return a.STK_CIKAN_MIKTAR - b.STK_CIKAN_MIKTAR;
       },
     },
     {
@@ -386,7 +386,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       sorter: (a, b) => {
         if (a.STK_MIKTAR === null) return -1;
         if (b.STK_MIKTAR === null) return 1;
-        return a.STK_MIKTAR.localeCompare(b.STK_MIKTAR);
+        return a.STK_MIKTAR - b.STK_MIKTAR;
       },
     },
     {
@@ -539,7 +539,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       sorter: (a, b) => {
         if (a.STK_GIRIS_FIYAT_DEGERI === null) return -1;
         if (b.STK_GIRIS_FIYAT_DEGERI === null) return 1;
-        return a.STK_GIRIS_FIYAT_DEGERI.localeCompare(b.STK_GIRIS_FIYAT_DEGERI);
+        return a.STK_GIRIS_FIYAT_DEGERI - b.STK_GIRIS_FIYAT_DEGERI;
       },
     },
     {
@@ -553,7 +553,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       sorter: (a, b) => {
         if (a.STK_CIKIS_FIYAT_DEGERI === null) return -1;
         if (b.STK_CIKIS_FIYAT_DEGERI === null) return 1;
-        return a.STK_CIKIS_FIYAT_DEGERI.localeCompare(b.STK_CIKIS_FIYAT_DEGERI);
+        return a.STK_CIKIS_FIYAT_DEGERI - b.STK_CIKIS_FIYAT_DEGERI;
       },
     },
     {
@@ -567,7 +567,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       sorter: (a, b) => {
         if (a.STK_KDV_ORAN === null) return -1;
         if (b.STK_KDV_ORAN === null) return 1;
-        return a.STK_KDV_ORAN.localeCompare(b.STK_KDV_ORAN);
+        return a.STK_KDV_ORAN - b.STK_KDV_ORAN;
       },
     },
     {
@@ -581,7 +581,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       sorter: (a, b) => {
         if (a.STK_OTV_ORAN === null) return -1;
         if (b.STK_OTV_ORAN === null) return 1;
-        return a.STK_OTV_ORAN.localeCompare(b.STK_OTV_ORAN);
+        return a.STK_OTV_ORAN - b.STK_OTV_ORAN;
       },
     },
     {
@@ -595,7 +595,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       sorter: (a, b) => {
         if (a.STK_MIN_MIKTAR === null) return -1;
         if (b.STK_MIN_MIKTAR === null) return 1;
-        return a.STK_MIN_MIKTAR.localeCompare(b.STK_MIN_MIKTAR);
+        return a.STK_MIN_MIKTAR - b.STK_MIN_MIKTAR;
       },
     },
     {
@@ -609,7 +609,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       sorter: (a, b) => {
         if (a.STK_MAX_MIKTAR === null) return -1;
         if (b.STK_MAX_MIKTAR === null) return 1;
-        return a.STK_MAX_MIKTAR.localeCompare(b.STK_MAX_MIKTAR);
+        return a.STK_MAX_MIKTAR - b.STK_MAX_MIKTAR;
       },
     },
     {
@@ -623,7 +623,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       sorter: (a, b) => {
         if (a.STK_SIPARIS_MIKTARI === null) return -1;
         if (b.STK_SIPARIS_MIKTARI === null) return 1;
-        return a.STK_SIPARIS_MIKTARI.localeCompare(b.STK_SIPARIS_MIKTARI);
+        return a.STK_SIPARIS_MIKTARI - b.STK_SIPARIS_MIKTARI;
       },
     },
     {

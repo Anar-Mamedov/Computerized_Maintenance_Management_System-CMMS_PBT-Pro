@@ -78,6 +78,11 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       cikanMiktar: null,
       stokMiktar: null,
       talepMiktar: null,
+      // Depolama Bilgileri
+      stkDepo: null,
+      stkDepoID: null,
+      stkDepoLokasyon: null,
+      stkDepoLokasyonID: null,
       // ozel Alanlar
       ozelAlan1: null,
       ozelAlan2: null,
@@ -198,6 +203,13 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("ozelAlan18", item.STK_OZEL_ALAN_18);
           setValue("ozelAlan19", item.STK_OZEL_ALAN_19);
           setValue("ozelAlan20", item.STK_OZEL_ALAN_20);
+          // Depolama Bilgileri
+          setValue("stkDepoID", item.STK_DEPO_ID);
+          setValue("stkDepo", item.STK_DEPO);
+          setValue("stkDepoLokasyonID", item.STK_DEPO_LOKASYON_ID);
+          setValue("stkDepoLokasyon", item.STK_DEPO_LOKASYON);
+
+          setValue("talepMiktar", item.TALEP_MIKTAR);
 
           setLoading(false);
         } catch (error) {
@@ -291,6 +303,9 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       STK_OZEL_ALAN_18: data.ozelAlan18,
       STK_OZEL_ALAN_19: data.ozelAlan19,
       STK_OZEL_ALAN_20: data.ozelAlan20,
+      // Depolama Bilgileri
+      STK_DEPO_ID: data.stkDepoID,
+      STK_DEPO_LOKASYON_ID: data.stkDepoLokasyonID,
     };
 
     // API'ye POST isteği gönder
