@@ -1,13 +1,20 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Modal, Table, Typography } from "antd";
-import { Controller, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../api/http";
 import { FileTextOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
-// 1. PROPS KISMINA 'tableMode' EKLE
-export default function SatinalmaTablo({ workshopSelectedId, onSubmit, selectedRows, tableMode = false }) {
+// 1. Propslara onTalepClick ve onSiparisClick ekledik
+export default function SatinalmaTablo({ 
+  workshopSelectedId, 
+  onSubmit, 
+  selectedRows, 
+  tableMode = false,
+  onTalepClick,   // Talep No tıklandığında çalışacak fonksiyon
+  onSiparisClick  // Sipariş No tıklandığında çalışacak fonksiyon
+}) {
   const { control } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [data, setData] = useState([]);
@@ -15,10 +22,43 @@ export default function SatinalmaTablo({ workshopSelectedId, onSubmit, selectedR
 
   const formatDate = (date) => { if (!date) return ""; return new Date(date).toLocaleDateString(); };
   
+  // 2. Columns tanımını güncelledik
   const columns = [
-     { title: "Talep No", dataIndex: "TALEP_NO", key: "TALEP_NO", width: 150, ellipsis: true },
-     // ... senin diğer kolonların ...
-     { title: "Sipariş No", dataIndex: "SSP_SIPARIS_KODU", key: "SSP_SIPARIS_KODU", width: 150 },
+     { 
+       title: "Talep No", 
+       dataIndex: "TALEP_NO", 
+       key: "TALEP_NO", 
+       width: 150, 
+       ellipsis: true,
+       render: (text, record) => {
+         // Eğer tableMode açıksa link yap, değilse normal yazı
+         if (tableMode) {
+           return (
+             <a onClick={() => onTalepClick?.(record)} style={{ color: "#1890ff", textDecoration: "underline" }}>
+               {text}
+             </a>
+           );
+         }
+         return <Text>{text}</Text>;
+       }
+     },
+     { 
+       title: "Sipariş No", 
+       dataIndex: "SSP_SIPARIS_KODU", 
+       key: "SSP_SIPARIS_KODU", 
+       width: 150,
+       render: (text, record) => {
+         // Eğer tableMode açıksa link yap, değilse normal yazı
+         if (tableMode) {
+           return (
+             <a onClick={() => onSiparisClick?.(record)} style={{ color: "#1890ff", textDecoration: "underline" }}>
+               {text}
+             </a>
+           );
+         }
+         return <Text>{text}</Text>;
+       }
+     },
      { title: "Firma", dataIndex: "SSP_FIRMA", key: "SSP_FIRMA", width: 200 }
   ];
 
@@ -26,11 +66,10 @@ export default function SatinalmaTablo({ workshopSelectedId, onSubmit, selectedR
     if (!selectedRows || selectedRows.length === 0) return;
     setLoading(true);
     try {
-      // Gelen veri array mi değil mi kontrol edip ona göre işlem yapıyoruz
       const rows = Array.isArray(selectedRows) ? selectedRows : [selectedRows];
       const selectedKey = rows.map(item => item.key || item.TB_SATINALMA_SIPARIS_ID || item.id).join(",");
 
-      if(!selectedKey) { setLoading(false); return; } // Key yoksa hata vermesin
+      if(!selectedKey) { setLoading(false); return; }
 
       const response = await AxiosInstance.get(`GetSatinalmaSiparisListBy?fisId=${selectedKey}`);
       const siparisListesi = response.siparis_listesi || [];
@@ -48,8 +87,6 @@ export default function SatinalmaTablo({ workshopSelectedId, onSubmit, selectedR
   }, [selectedRows]);
 
   useEffect(() => {
-    // 2. FETCH DATA TETİKLEME MANTIĞINI GÜNCELLE
-    // Modal açıldığında VEYA tableMode true ise veriyi çek
     if (isModalVisible || tableMode) {
       fetchData();
     }
@@ -58,7 +95,6 @@ export default function SatinalmaTablo({ workshopSelectedId, onSubmit, selectedR
   const handleModalToggle = () => setIsModalVisible(prev => !prev);
   const handleModalOk = () => setIsModalVisible(false);
 
-  // 3. TABLO MODUNDAYSA DİREKT TABLOYU DÖNDÜR (Butonsuz, Modalsız)
   if (tableMode) {
       return (
         <Table
@@ -73,7 +109,7 @@ export default function SatinalmaTablo({ workshopSelectedId, onSubmit, selectedR
       );
   }
 
-  // --- ESKİ YAPI (DOKUNULMADI) ---
+  // --- ESKİ YAPI (Div ve Modal) ---
   return (
     <div>
       <div

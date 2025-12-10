@@ -13,6 +13,7 @@ import EditDrawerSiparis from "../../SatinalmaSiparisleri/Update/EditDrawer";
 import Filters from "./filter/Filters";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
+import TeklifKarsilastirma from "../components/ContextMenu/components/Teklif/components/TeklifKarsilastirma";
 import { useFormContext } from "react-hook-form";
 import { SiMicrosoftexcel } from "react-icons/si";
 import * as XLSX from "xlsx";
@@ -290,21 +291,24 @@ const MainTable = () => {
     }
   };
 
-  const TeklifPopoverContent = ({ fisId }) => {
+  const TeklifPopoverContent = ({ fisId, fisNo }) => { // fisNo'yu da prop olarak almak isteyebilirsin başlık için
   const [loading, setLoading] = useState(true);
   const [teklifPaketleri, setTeklifPaketleri] = useState([]);
 
+  // --- MODAL STATE'LERİ ---
+  const [isKarsilastirmaOpen, setIsKarsilastirmaOpen] = useState(false);
+  const [selectedTeklifId, setSelectedTeklifId] = useState(null);
+  const [selectedDurumId, setSelectedDurumId] = useState(null);
+
   useEffect(() => {
-    let active = true; 
+    let active = true;
     const fetchData = async () => {
       if (!fisId) return;
       try {
         setLoading(true);
-        // API İsteğin
         const res = await AxiosInstance.get(`ListTeklifPaketleriByTalep?talepId=${fisId}`);
         
         if (active) {
-          // Backend yanıtına göre burayı ayarla (res.items veya direkt res)
           if (res?.items) {
             setTeklifPaketleri(res.items);
           } else if (Array.isArray(res)) {
@@ -327,8 +331,15 @@ const MainTable = () => {
     1: { text: "TEKLİFLER TOPLANIYOR", backgroundColor: "#e1f7d5", color: "#3c763d" },
     2: { text: "ONAYA GÖNDERİLDİ", backgroundColor: "#fff4d6", color: "#b8860b" },
     3: { text: "ONAYLANDI", backgroundColor: "#d4f8e8", color: "#207868" },
-    4: { text: "REDDEDİLDİ", backgroundColor: "#fde2e4", color: "#c63b3b" }, 
+    4: { text: "REDDEDİLDİ", backgroundColor: "#fde2e4", color: "#c63b3b" },
     5: { text: "SİPARİŞ", backgroundColor: "#e6f7ff", color: "#096dd9" }
+  };
+
+  // --- MODAL AÇMA FONKSİYONU ---
+  const handleOpenKarsilastirma = (teklif) => {
+      setSelectedTeklifId(teklif.teklifId);
+      setSelectedDurumId(teklif.durumID);
+      setIsKarsilastirmaOpen(true);
   };
 
   if (loading) {
@@ -343,70 +354,95 @@ const MainTable = () => {
     return <div style={{ padding: "10px", color: "#999" }}>Teklif paketi yok.</div>;
   }
 
-  // --- DİNAMİK STİL AYARLARI ---
   const isMulti = teklifPaketleri.length > 1;
   
   const containerStyle = {
-    display: "flex",           // Kartları yan yana dizer
-    flexDirection: "row",      // Yatay hizalama
-    gap: "12px",               // Kartlar arası boşluk
+    display: "flex",
+    flexDirection: "row",
+    gap: "12px",
     padding: "10px",
-    
-    // Genişlik Mantığı: 
-    // Eğer 1 tane ise tek kartlık yer (320px), 
-    // birden fazlaysa 2 kartlık yer (660px) kaplasın.
     width: isMulti ? "660px" : "320px",
-    
-    // Scroll Mantığı:
-    // Sadece x ekseninde scroll, y ekseninde gizli
-    overflowX: "auto", 
+    overflowX: "auto",
     overflowY: "hidden",
-    
-    // Scrollbarın düzgün çalışması için elemanların alt satıra geçmesini engelle
-    whiteSpace: "nowrap" 
+    whiteSpace: "nowrap"
   };
 
   return (
-    <div style={containerStyle}>
-      {teklifPaketleri.map((t) => (
-        <div 
-            key={t.teklifId} 
-            style={{ 
-                // Flex: Büyüme(0), Küçülme(0), Baz Genişlik(300px)
-                // Bu sayede kartlar ezilmez, hep 300px kalır.
-                flex: "0 0 300px", 
-                width: "300px" 
-            }}
-        >
-          <Card
-            size="small"
-            title={<Text strong style={{ fontSize: 13 }}>RFQ — {t.baslik}</Text>}
-            style={{ 
-                borderRadius: 8, 
-                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                height: "100%", // Kartların boyu eşit olsun
-                whiteSpace: "normal" // Kart içindeki metinler normal alt satıra geçebilsin
-            }}
-            bodyStyle={{ padding: "10px" }}
-          >
-            <div style={{ marginBottom: 6 }}>
-               <Tag color={DURUM_STYLES[t.durumID]?.color || "default"}>
-                  {DURUM_STYLES[t.durumID]?.text || t.durumID}
-               </Tag>
+    <>
+        <div style={containerStyle}>
+        {teklifPaketleri.map((t) => (
+            <div 
+                key={t.teklifId} 
+                style={{ flex: "0 0 300px", width: "300px" }}
+            >
+            <Card
+                size="small"
+                // --- BURASI GÜNCELLENDİ: BAŞLIK LİNK YAPILDI ---
+                title={
+                    <span style={{ fontSize: 13, fontWeight: "bold" }}>
+                        RFQ —{" "}
+                        <a 
+                            onClick={() => handleOpenKarsilastirma(t)}
+                            style={{ color: "#1890ff", textDecoration: "underline", cursor: "pointer" }}
+                        >
+                            {t.baslik}
+                        </a>
+                    </span>
+                }
+                style={{ 
+                    borderRadius: 8, 
+                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                    height: "100%", 
+                    whiteSpace: "normal" 
+                }}
+                bodyStyle={{ padding: "10px" }}
+            >
+                <div style={{ marginBottom: 6 }}>
+                    <Tag color={DURUM_STYLES[t.durumID]?.color || "default"}>
+                        {DURUM_STYLES[t.durumID]?.text || t.durumID}
+                    </Tag>
+                </div>
+                
+                <div style={{ fontSize: "12px", display: "flex", flexDirection: "column", gap: "4px" }}>
+                    <span><b>Kalem:</b> {t.kalemSayisi} adet</span>
+                    <span><b>Tedarikçi:</b> {t.tedarikcSayisi} firma</span>
+                    {/* Tedarikçiler uzun olabilir, tek satıra sığdırmak için truncate eklenebilir */}
+                    <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        <b>Tedarikçiler:</b> {t.tedarikciler}
+                    </span>
+                    <span style={{ color: "#888", fontSize: "11px", marginTop: "4px" }}>
+                        {t.olusturmaTarih ? dayjs(t.olusturmaTarih).format("DD.MM.YYYY") : "-"}
+                    </span>
+                </div>
+            </Card>
             </div>
-            
-            <div style={{ fontSize: "12px", display: "flex", flexDirection: "column", gap: "4px" }}>
-                <span><b>Kalem:</b> {t.kalemSayisi} adet</span>
-                <span><b>Tedarikçi:</b> {t.tedarikcSayisi} firma</span>
-                <span><b>Tedarikçler:</b> {t.tedarikciler} firma</span>
-                <span style={{ color: "#888", fontSize: "11px", marginTop: "4px" }}>
-                   {t.olusturmaTarih ? dayjs(t.olusturmaTarih).format("DD.MM.YYYY") : "-"}
-                </span>
-            </div>
-          </Card>
+        ))}
         </div>
-      ))}
-    </div>
+
+        <Modal
+            title={`Teklif Karşılaştırma`}
+            open={isKarsilastirmaOpen}
+            onCancel={() => setIsKarsilastirmaOpen(false)}
+            width="95%" // Geniş ekran
+            style={{ top: 20 }} // Biraz yukarıdan başlasın
+            footer={null} // Alt butonları gizle (TeklifKarsilastirma içinde kendi butonları var)
+            destroyOnClose // Kapandığında içini temizle
+        >
+            {/* TeklifKarsilastirma bileşeni array ID beklediği için diziye alıyoruz */}
+            <TeklifKarsilastirma 
+                teklifIds={selectedTeklifId ? [selectedTeklifId] : []}
+                teklifDurumlari={selectedTeklifId ? [{ teklifId: selectedTeklifId, durumID: selectedDurumId }] : []}
+                fisId={fisId}
+                fisNo={fisNo} // Eğer bu prop yoksa parenttan alman gerekebilir
+                // onDurumGuncelle fonksiyonunu da buraya eklemen gerekebilir, 
+                // sayfa yenilemeden durum değişince karttaki etiketin güncellenmesi için.
+                onDurumGuncelle={() => {
+                    // Modal kapandığında veya işlem yapıldığında veriyi tazelemek istersen
+                    // buraya kod yazabilirsin.
+                }}
+            />
+        </Modal>
+    </>
   );
 };
 

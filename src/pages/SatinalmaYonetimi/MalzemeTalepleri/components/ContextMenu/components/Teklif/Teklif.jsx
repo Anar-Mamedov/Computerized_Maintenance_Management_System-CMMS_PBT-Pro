@@ -15,7 +15,7 @@ export default function TalepTeklifeAktarmaModal({ selectedRow, refreshTableData
   };
 
   // Duruma göre Başlık ve Açıklama belirleme
-  const isViewMode = selectedRow && (selectedRow.SFS_TALEP_DURUM_ID === 2 || selectedRow.SFS_TALEP_DURUM_ID === 5 || selectedRow.SFS_TALEP_DURUM_ID === 3);
+  const isViewMode = selectedRow && (selectedRow.SFS_TALEP_DURUM_ID === 2 || selectedRow.SFS_TALEP_DURUM_ID === 5 || selectedRow.SFS_TALEP_DURUM_ID === 3 || selectedRow.SFS_TALEP_DURUM_ID === 4);
   
   const titleText = isViewMode ? "Fiyat Teklifleri" : "Fiyat Teklifi Al";
   const descText = isViewMode 

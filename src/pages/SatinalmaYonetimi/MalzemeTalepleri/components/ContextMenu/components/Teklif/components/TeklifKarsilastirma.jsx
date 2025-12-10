@@ -6,6 +6,8 @@ import TedarikciEkle from "./FirmaEkleCikar";
 import MalzemeEkle from "./MalzemeEkleCikar";
 import TeklifiSipariseAktar from "./TeklifSipariseAktar/EditDrawer";
 import Siparislerim from "../../SatinalmaSiparisleri";
+import MalzemeTalepModal from "../../../../../Update/EditDrawer";
+import SatinalmaSiparisModal from "../../../../../../SatinalmaSiparisleri/Update/EditDrawer";
 import dayjs from "dayjs";
 
 const { Text } = Typography;
@@ -123,6 +125,15 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   const isDisabled = !(aktifPaketDurumID === 1 || aktifPaketDurumID === 4);
   const [siparislerimOpen, setSiparislerimOpen] = useState(false);
   const isSiparis = aktifPaketDurumID === 5;
+  const [talepModalOpen, setTalepModalOpen] = useState(false); 
+
+  // 2. Tablo içindeki Talep No linki için
+  const [talepDetayId, setTalepDetayId] = useState(0);
+  const [isTalepModalOpen, setIsTalepModalOpen] = useState(false);
+
+  // 3. Tablo içindeki Sipariş No linki için
+  const [siparisDetayId, setSiparisDetayId] = useState(0);
+  const [isSiparisModalOpen, setIsSiparisModalOpen] = useState(false);
   
   const [detayGosterilenPaket, setDetayGosterilenPaket] = useState(null);
   
@@ -618,7 +629,17 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
 
   return (
     <Card
-      title={`Satınalma Teklif Kıyaslama - ${fisNo || ""}`}
+      title={
+        <span>
+          Satınalma Teklif Kıyaslama -{" "}
+        <a 
+          onClick={() => setTalepModalOpen(true)} 
+          style={{ color: "#1890ff", textDecoration: "underline", cursor: "pointer" }}
+        >
+          {fisNo || ""}
+        </a>
+        </span>
+      }
       extra={
         <Space>
           <Button icon={<FileExcelOutlined />}>Excel</Button>
@@ -1190,19 +1211,69 @@ const dataSource = malzemeler.map((m) => ({ key: m.malzemeId, ...m }));
         }}
       />
       <Modal
-        title="Siparişlerim"
-        open={siparislerimOpen}
-        onCancel={() => setSiparislerimOpen(false)}
-        width={1100}
-        footer={null}
-        destroyOnClose
-        centered
-      >
-        <Siparislerim 
-          selectedRows={[{ key: fisId }]}
-          tableMode={true} 
-        />
-      </Modal>
+  title="Siparişlerim"
+  open={siparislerimOpen}
+  onCancel={() => setSiparislerimOpen(false)}
+  width={1100}
+  footer={null}
+  destroyOnClose
+  centered
+>
+  <Siparislerim 
+    selectedRows={[{ key: fisId }]}
+    tableMode={true} 
+    
+    // TALEP NO TIKLANINCA
+    onTalepClick={(record) => {
+        // API'den gelen veride talep ID'si hangi alandaysa onu buraya yaz (Örn: TALEP_ID)
+        // Eğer tabloda direkt TALEP_ID yoksa backend sorgusuna eklemen gerekebilir.
+        if(record.TALEP_ID) {
+            setTalepDetayId(record.TALEP_ID);
+            setIsTalepModalOpen(true);
+        } else {
+            message.warning("Talep ID bulunamadı.");
+        }
+    }}
+
+    // SİPARİŞ NO TIKLANINCA
+    onSiparisClick={(record) => {
+        // Tablodaki key zaten TB_SATINALMA_SIPARIS_ID olarak set edilmişti
+        if(record.key || record.TB_SATINALMA_SIPARIS_ID) {
+            setSiparisDetayId(record.key || record.TB_SATINALMA_SIPARIS_ID);
+            setIsSiparisModalOpen(true);
+        }
+    }}
+  />
+</Modal>
+      <MalzemeTalepModal
+        drawerVisible={talepModalOpen}
+        onDrawerClose={() => setTalepModalOpen(false)} 
+        selectedRow={fisId ? { key: fisId } : null} 
+        onRefresh={() => {
+           // Gerekirse buraya yenileme fonksiyonu
+        }}
+      />
+      <MalzemeTalepModal
+  drawerVisible={isTalepModalOpen}
+  onDrawerClose={() => setIsTalepModalOpen(false)}
+  selectedRow={talepDetayId ? { key: talepDetayId } : null}
+  onRefresh={() => {
+     // Gerekirse refresh işlemleri
+  }}
+/>
+
+{/* 2. Sipariş Düzenleme Modalı */}
+{/* Bu component senin projendeki sipariş güncelleme ekranı olmalı */}
+{isSiparisModalOpen && (
+    <SatinalmaSiparisModal
+        drawerVisible={isSiparisModalOpen}
+        onDrawerClose={() => setIsSiparisModalOpen(false)}
+        selectedRow={siparisDetayId ? { key: siparisDetayId } : null}
+        onRefresh={() => {
+            // Gerekirse refresh işlemleri
+        }}
+    />
+)}
     </Card>
   );
 };
