@@ -1,7 +1,22 @@
 import { useEffect, useState, useRef } from "react";
 import { Route, Routes, Link, useLocation, Outlet, Navigate } from "react-router-dom";
 import { Breadcrumb, Layout, Menu, theme, Button, Typography, Input, Modal } from "antd";
-import { DesktopOutlined, FileOutlined, PieChartOutlined, MenuUnfoldOutlined, MenuFoldOutlined, TeamOutlined, UserOutlined, KeyOutlined } from "@ant-design/icons";
+import {
+  DesktopOutlined,
+  FileOutlined,
+  PieChartOutlined,
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
+  TeamOutlined,
+  ToolOutlined,
+  InboxOutlined,
+  ShoppingCartOutlined,
+  CustomerServiceOutlined,
+  BarChartOutlined,
+  FileTextOutlined,
+  SettingOutlined,
+  AppstoreOutlined,
+} from "@ant-design/icons";
 import Draggable from "react-draggable";
 // import Isemri from "./pages/DashboardAnalytics2/Isemri";
 import IsEmri from "./pages/BakımVeArizaYonetimi/IsEmri/IsEmri";
@@ -129,15 +144,15 @@ const menuHostname = window.location.hostname;
 const isOmegaMenu = menuHostname === "omegaerp.net" || menuHostname === "www.omegaerp.net";
 
 const rawItems = [
-  getItem("Ana Sayfa", "", <PieChartOutlined />),
+  getItem("Dashboard", "", <PieChartOutlined />),
   // getItem("Option 1", "option1", <PieChartOutlined />),
   // getItem("Option 2", "option2", <DesktopOutlined />),
   getItem(
-    "Varlık Yönetimi",
+    "Ekipman Yönetimi",
     "makine&ekipman",
-    <TeamOutlined />,
+    <AppstoreOutlined />,
     [
-      getItem("Varlık Tanımları", "makine", true),
+      getItem("Ekipman Tanımları", "makine", true),
       getItem("Alt Ekipman Veritabanı", "ekipmanVeritabani", true),
       getItem("Duruş Takibi", "durusTakibi", true),
       getItem("Sayaç Güncellemeleri", "sayacGuncelleme", true),
@@ -146,9 +161,9 @@ const rawItems = [
     false
   ),
   getItem(
-    "Bakım ve Arıza Yönetimi",
+    "Bakım Yönetimi",
     "bakim&ariza",
-    <UserOutlined />,
+    <ToolOutlined />,
     [
       // getItem("Tom", "tom", true),
       getItem("Bakım Planları", "bakimTanimlari", true),
@@ -167,13 +182,13 @@ const rawItems = [
   getItem(
     "Malzeme & Depo Yönetimi",
     "malzeme&depo",
-    <TeamOutlined />,
+    <InboxOutlined />,
     [
-      getItem("Malzeme Tanımı", "malzemeTanimi", true),
+      getItem("Malzeme Tanımıları", "malzemeTanimi", true),
       getItem("Malzeme Depoları", "malzemeDepolari", true),
-      getItem("Malzeme Giriş Fişi", "malzemeGirisFisi", true),
-      getItem("Malzeme Çıkış Fişi", "malzemeCikisFisi", true),
-      getItem("Malzeme Transfer Fişi", "malzemeTransferFisi", true),
+      getItem("Malzeme Girişleri", "malzemeGirisFisi", true),
+      getItem("Malzeme Çıkışları", "malzemeCikisFisi", true),
+      getItem("Malzeme Transferleri", "malzemeTransferFisi", true),
       /*  getItem("Stok Sayımları", "stokSayimlari", true),
       getItem("Hızlı Maliyetlendirme", "hizliMaliyetlendirme", true),
       getItem("Malzeme Transfer Onay İşlemleri", "malzemeTransferOnayIslemleri", true), */
@@ -185,9 +200,9 @@ const rawItems = [
   getItem(
     "Personel Yönetimi",
     "personelYonetimi",
-    <UserOutlined />,
+    <TeamOutlined />,
     [
-      getItem("Atölye Tanımları", "atolye", true),
+      getItem("Atölye / Ekip Tanımları", "atolye", true),
       getItem("Personel Tanımları", "personeltanimlari", true),
       getItem("Personel İzinleri", "personelIzinleri", true),
       getItem("Personel Nöbetleri", "personelNobetleri", true),
@@ -200,7 +215,7 @@ const rawItems = [
   getItem(
     "Satımalma Yönetimi",
     "satinalmaYonetimi",
-    <UserOutlined />,
+    <ShoppingCartOutlined />,
     [
       ...(isOmegaMenu ? [] : [getItem("Satınalma Yönetici Paneli", "satinalmaDashboard", true)]),
       getItem("Malzeme Talepleri", "malzemeTalepleri", true),
@@ -214,7 +229,7 @@ const rawItems = [
   getItem(
     "Yardım Masası",
     "yardimMasasi",
-    <KeyOutlined />,
+    <CustomerServiceOutlined />,
     [
       getItem("İş Talepleri", "isTalepleri", true),
       getItem("İş Talebi Kullanıcıları", "isTalebiKullanicilari", true),
@@ -225,7 +240,7 @@ const rawItems = [
   getItem(
     "Analizler",
     "analizler1",
-    <KeyOutlined />,
+    <BarChartOutlined />,
     [
       getItem("Müdahale Süreleri Analizi", "mudaheleSuresi", true),
       getItem("Personel KPI Analizi", "analizler", true),
@@ -237,7 +252,7 @@ const rawItems = [
   getItem(
     "Rapor & Formlar",
     "rapor&formlar",
-    <KeyOutlined />,
+    <FileTextOutlined />,
     [
       getItem("Rapor Yönetimi", "raporYonetimi", true),
       // getItem("Form Yönetimi", "formYonetimi", true),
@@ -248,7 +263,7 @@ const rawItems = [
   getItem(
     "Yönetim",
     "yonetim",
-    <KeyOutlined />,
+    <SettingOutlined />,
     [
       getItem("Lokasyon Tanımları", "lokasyon", true),
       getItem("Vardiya Tanımları", "vardiyalar", true),
@@ -471,96 +486,96 @@ const BaseLayout = () => {
       )}
       <Layout style={{ minHeight: "100vh" }}>
         {(mobileView && (
-        <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed} breakpoint="lg" collapsedWidth="0.0000000000001">
-          <div
-            className="demo-logo-vertical"
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
-              alignItems: "flex-end",
-              marginBottom: "20px",
-              columnGap: "5px",
-            }}
-          >
-            <img src={currentLogo} alt="Logo" style={logoStyle} />
-            <Text style={{ color: "white", marginTop: "11px" }}>v. 1.7.5</Text>
-          </div>
-          <MenuWrapper />
-        </Sider>
-      )) || (
-        <Sider
-          collapsible
-          collapsed={collapsed}
-          onCollapse={setCollapsed}
-          width={250} // Genişletilmiş durumda Sider'ın genişliği
-          collapsedWidth={70} // Daraltılmış durumda Sider'ın genişliği
-          breakpoint="lg" // breakpoint="lg" olduğunda collapsedWidth değerini kullanır
-        >
-          <div
-            className="demo-logo-vertical"
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
-              alignItems: "flex-end",
-              marginBottom: "20px",
-              columnGap: "5px",
-            }}
-          >
-            <img src={currentLogo} alt="Logo" style={logoStyle} />
-            <Text style={{ color: "white", marginTop: "11px" }}>v. 1.7.5</Text>
-          </div>
-          <MenuWrapper />
-          <FloatButton /> {/*FloatButton ekranran görüntüsü alacak ve help deske göndericek*/}
-        </Sider>
-      )}
-
-      <Layout>
-        <Header
-          style={{
-            padding: 0,
-            background: colorBgContainer,
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          {mobileView && (
-            <Button
-              onClick={toggleCollapsed}
+          <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed} breakpoint="lg" collapsedWidth="0.0000000000001">
+            <div
+              className="demo-logo-vertical"
               style={{
-                padding: "0 24px",
-                width: "40px",
-                height: "40px",
                 display: "flex",
-                alignItems: "center",
+                flexWrap: "wrap",
                 justifyContent: "center",
-                marginLeft: "10px",
+                alignItems: "flex-end",
+                marginBottom: "20px",
+                columnGap: "5px",
               }}
             >
-              {collapsed ? <MenuUnfoldOutlined style={{ color: "#0066ff" }} /> : <MenuFoldOutlined style={{ color: "#0066ff" }} />}
-            </Button>
-          )}
-          <Headers />
-        </Header>
-        <Content style={{ margin: mobileView ? "0 0px" : "0 16px" }}>
-          <Breadcrumbs />
-          <div
+              <img src={currentLogo} alt="Logo" style={logoStyle} />
+              <Text style={{ color: "white", marginTop: "11px" }}>v. 1.7.5</Text>
+            </div>
+            <MenuWrapper />
+          </Sider>
+        )) || (
+          <Sider
+            collapsible
+            collapsed={collapsed}
+            onCollapse={setCollapsed}
+            width={250} // Genişletilmiş durumda Sider'ın genişliği
+            collapsedWidth={70} // Daraltılmış durumda Sider'ın genişliği
+            breakpoint="lg" // breakpoint="lg" olduğunda collapsedWidth değerini kullanır
+          >
+            <div
+              className="demo-logo-vertical"
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                alignItems: "flex-end",
+                marginBottom: "20px",
+                columnGap: "5px",
+              }}
+            >
+              <img src={currentLogo} alt="Logo" style={logoStyle} />
+              <Text style={{ color: "white", marginTop: "11px" }}>v. 1.7.5</Text>
+            </div>
+            <MenuWrapper />
+            <FloatButton /> {/*FloatButton ekranran görüntüsü alacak ve help deske göndericek*/}
+          </Sider>
+        )}
+
+        <Layout>
+          <Header
             style={{
-              padding: mobileView ? "24px 0px" : 24,
-              borderRadius: "16px",
-              minHeight: 360,
-              height: "calc(100vh - 132px)",
+              padding: 0,
               background: colorBgContainer,
+              display: "flex",
+              alignItems: "center",
             }}
           >
-            <Outlet />
-          </div>
-        </Content>
+            {mobileView && (
+              <Button
+                onClick={toggleCollapsed}
+                style={{
+                  padding: "0 24px",
+                  width: "40px",
+                  height: "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginLeft: "10px",
+                }}
+              >
+                {collapsed ? <MenuUnfoldOutlined style={{ color: "#0066ff" }} /> : <MenuFoldOutlined style={{ color: "#0066ff" }} />}
+              </Button>
+            )}
+            <Headers />
+          </Header>
+          <Content style={{ margin: mobileView ? "0 0px" : "0 16px" }}>
+            <Breadcrumbs />
+            <div
+              style={{
+                padding: mobileView ? "24px 0px" : 24,
+                borderRadius: "16px",
+                minHeight: 360,
+                height: "calc(100vh - 132px)",
+                background: colorBgContainer,
+              }}
+            >
+              <Outlet />
+            </div>
+          </Content>
 
-        <Footer style={{ textAlign: "center", padding: "10px 50px" }}>Orjin {new Date().getFullYear()} - Design & Develop by Orjin Team</Footer>
+          <Footer style={{ textAlign: "center", padding: "10px 50px" }}>Orjin {new Date().getFullYear()} - Design & Develop by Orjin Team</Footer>
+        </Layout>
       </Layout>
-    </Layout>
     </>
   );
 };

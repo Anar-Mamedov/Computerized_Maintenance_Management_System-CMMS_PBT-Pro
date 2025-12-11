@@ -174,7 +174,7 @@ const MainTable = ({ setSelectedIds }) => {
     fetchData();
   }, [drawer.visible]);
 
-  const ozelAlanlarMakine = JSON.parse(localStorage.getItem("ozelAlanlarMakine"));
+  const ozelAlanlarEkipman = JSON.parse(localStorage.getItem("ozelAlanlarMakine"));
 
   // Özel Alanların nameleri backend çekmek için api isteği sonu
   const initialColumns = [
@@ -238,7 +238,7 @@ const MainTable = ({ setSelectedIds }) => {
       render: (text) => <div style={{ textAlign: "center" }}>{text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}</div>,
     },
     {
-      title: "Makine Kodu",
+      title: "Ekipman Kodu",
       dataIndex: "MKN_KOD",
       key: "MKN_KOD",
       width: 150,
@@ -252,7 +252,7 @@ const MainTable = ({ setSelectedIds }) => {
       },
     },
     {
-      title: "Makine Tanımı",
+      title: "Ekipman Tanımı",
       dataIndex: "MKN_TANIM",
       key: "MKN_TANIM",
       width: 250,
@@ -286,7 +286,7 @@ const MainTable = ({ setSelectedIds }) => {
     },
 
     {
-      title: "Makine Durumu",
+      title: "Ekipman Durumu",
       dataIndex: "MKN_DURUM",
       key: "MKN_DURUM",
       width: 150,
@@ -342,7 +342,7 @@ const MainTable = ({ setSelectedIds }) => {
       visible: true, // Varsayılan olarak açık
     },
     {
-      title: "Makine Tipi",
+      title: "Ekipman Tipi",
       dataIndex: "MKN_TIP",
       key: "MKN_TIP",
       width: 150,
@@ -418,7 +418,7 @@ const MainTable = ({ setSelectedIds }) => {
       visible: true, // Varsayılan olarak açık
     },
     {
-      title: "Master Makine Tanımı",
+      title: "Master Ekipman Tanımı",
       dataIndex: "MKN_MASTER_MAKINE_TANIM",
       key: "MKN_MASTER_MAKINE_TANIM",
       width: 150,
@@ -437,7 +437,7 @@ const MainTable = ({ setSelectedIds }) => {
       visible: false, // Varsayılan olarak açık
     },
     {
-      title: "Master Makine Kod",
+      title: "Master Ekipman Kod",
       dataIndex: "MKN_MASTER_MAKINE_KOD",
       key: "MKN_MASTER_MAKINE_KOD",
       width: 150,

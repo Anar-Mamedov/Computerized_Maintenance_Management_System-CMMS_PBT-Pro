@@ -444,7 +444,7 @@ export default function CreateDrawer({ onRefresh }) {
           title={
             <div className="flex items-start flex-col">
               <Text type="secondary" className="font-light text-[12px]">
-                PBT PRO / {t("makineSicilKarti")}
+                PBT PRO / {t("ekipmanSicilKarti")}
               </Text>
               <Text>{watch("makineKodu")}</Text>
             </div>

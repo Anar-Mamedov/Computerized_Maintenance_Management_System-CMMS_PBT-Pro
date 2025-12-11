@@ -9,7 +9,7 @@ function StatusButtons() {
   const statusConfigs = [
     { name: "makineAktif", label: "aktif", color: "#52c41a" }, // green-6
     { name: "makineKalibrasyon", label: "kalibrasyon", color: "#faad14" }, // gold-6
-    { name: "kritikMakine", label: "kritikMakine", color: "#f5222d" }, // red-6
+    { name: "kritikMakine", label: "kritikEkipman", color: "#f5222d" }, // red-6
     { name: "makineGucKaynagi", label: "gucKaynagi", color: "#722ed1" }, // purple-6
     { name: "makineIsBildirimi", label: "isBildirimi", color: "#1890ff" }, // blue-6
     { name: "makineOtonomBakim", label: "otonomBakim", color: "#13c2c2" }, // cyan-6

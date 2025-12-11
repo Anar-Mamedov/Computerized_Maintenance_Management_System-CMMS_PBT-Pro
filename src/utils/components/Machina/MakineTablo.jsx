@@ -280,7 +280,7 @@ const MainTable = ({
       render: (text) => <div style={{ textAlign: "center" }}>{text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}</div>,
     },
     {
-      title: "Makine Kodu",
+      title: "Ekipman Kodu",
       dataIndex: "MKN_KOD",
       key: "MKN_KOD",
       width: 150,
@@ -294,7 +294,7 @@ const MainTable = ({
       },
     },
     {
-      title: "Makine Tanımı",
+      title: "Ekipman Tanımı",
       dataIndex: "MKN_TANIM",
       key: "MKN_TANIM",
       width: 250,
@@ -328,7 +328,7 @@ const MainTable = ({
     },
 
     {
-      title: "Makine Durumu",
+      title: "Ekipman Durumu",
       dataIndex: "MKN_DURUM",
       key: "MKN_DURUM",
       width: 150,
@@ -384,7 +384,7 @@ const MainTable = ({
       visible: true, // Varsayılan olarak açık
     },
     {
-      title: "Makine Tipi",
+      title: "Ekipman Tipi",
       dataIndex: "MKN_TIP",
       key: "MKN_TIP",
       width: 150,
@@ -460,7 +460,7 @@ const MainTable = ({
       visible: true, // Varsayılan olarak açık
     },
     {
-      title: "Master Makine Tanımı",
+      title: "Master Ekipman Tanımı",
       dataIndex: "MKN_MASTER_MAKINE_TANIM",
       key: "MKN_MASTER_MAKINE_TANIM",
       width: 150,
@@ -479,7 +479,7 @@ const MainTable = ({
       visible: false, // Varsayılan olarak açık
     },
     {
-      title: "Master Makine Kod",
+      title: "Master Ekipman Kod",
       dataIndex: "MKN_MASTER_MAKINE_KOD",
       key: "MKN_MASTER_MAKINE_KOD",
       width: 150,
@@ -1584,7 +1584,7 @@ const MainTable = ({
       <Modal
         width="1200px"
         centered
-        title="Makine Tanımları"
+        title="Ekipman Tanımları"
         open={typeof controlledOpen === "boolean" ? controlledOpen : isModalVisible1}
         onOk={handleModalOk}
         onCancel={() => {

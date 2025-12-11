@@ -17,8 +17,7 @@ import StatusButtons from "./components/StatusButtons.jsx";
 
 const { Text } = Typography;
 
-const cardBaseClasses =
-  "bg-white p-[10px] border border-[#80808068] rounded-[5px] flex flex-col items-start shadow-[0_2px_8px_rgba(0,0,0,0.08)] w-full box-border min-w-0";
+const cardBaseClasses = "bg-white p-[10px] border border-[#80808068] rounded-[5px] flex flex-col items-start shadow-[0_2px_8px_rgba(0,0,0,0.08)] w-full box-border min-w-0";
 const wideCardClasses = "lg:w-auto lg:flex-[7] lg:min-w-[420px] lg:max-w-[632px]";
 const narrowCardClasses = "lg:w-auto lg:flex-[5] lg:min-w-[320px] lg:max-w-[495px]";
 
@@ -30,19 +29,19 @@ export default function MainTabs() {
       <div className={`${cardBaseClasses} ${wideCardClasses}`}>
         <div className="pb-[10px] inline-flex flex-col items-start">
           <Text className="text-base font-semibold">{t("temelBilgiler")}</Text>
-          <Text type="secondary">{t("makineKimlikVeKonumBilgileri")}</Text>
+          <Text type="secondary">{t("ekipmanKimlikVeKonumBilgileri")}</Text>
         </div>
         <div className="flex flex-row flex-wrap w-full gap-[10px]">
           <div className="flex flex-col items-start w-full max-w-[300px]">
             <Text type="secondary">
-              {t("makineKodu")}
+              {t("ekipmanKodu")}
               <span className="text-[#c90000]">*</span>
             </Text>
             <TextInput name="makineKodu" required={true} />
           </div>
           <div className="flex flex-col items-start w-full max-w-[300px]">
             <Text type="secondary">
-              {t("makineTanimi")}
+              {t("ekipmanTanimi")}
               <span className="text-[#c90000]">*</span>
             </Text>
             <TextInput name="makineTanimi" required={true} />
@@ -62,7 +61,7 @@ export default function MainTabs() {
           </div>
           <div className="flex flex-col items-start w-full max-w-[300px]">
             <Text type="secondary">
-              {t("makineTipi")}
+              {t("ekipmanTipi")}
               <span className="text-[#c90000]">*</span>
             </Text>
             <KodIDSelectbox name1="makineTipi" kodID={32501} isRequired={true} />
@@ -91,8 +90,8 @@ export default function MainTabs() {
 
       <div className={`${cardBaseClasses} ${narrowCardClasses}`}>
         <div className="pb-[10px] inline-flex flex-col items-start">
-          <Text className="text-base font-semibold">{t("makineGorseli")}</Text>
-          <Text type="secondary">{t("buMakineyeOzelFotograflariInceleyin")}</Text>
+          <Text className="text-base font-semibold">{t("ekipmanGorseli")}</Text>
+          <Text type="secondary">{t("buEkipmanaOzelFotograflariInceleyin")}</Text>
         </div>
         <div className="flex flex-row flex-wrap w-full gap-[10px]">
           <div className="w-full min-h-[180px] border-2 border-dashed border-[#d9d9d9] rounded-[6px] flex items-center justify-center bg-[#fafafa]">
@@ -118,7 +117,7 @@ export default function MainTabs() {
             <TextInput name="seriNo" required={false} />
           </div>
           <div className="flex flex-col items-start w-full max-w-[300px]">
-            <Text type="secondary">{t("masterMakine")}</Text>
+            <Text type="secondary">{t("masterEkipman")}</Text>
             <MakineTablo makineFieldName="masterMakine" makineIdFieldName="masterMakineID" />
           </div>
           <div className="flex flex-col items-start w-full max-w-[300px]">
