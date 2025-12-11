@@ -597,7 +597,7 @@ function FisIcerigi({ modalOpen }) {
       dataIndex: "kdvOrani",
       key: "kdvOrani",
       width: 80,
-      editable: false,
+      editable: true,
       inputType: "number",
       render: (text, record) => (
         <div className="">
