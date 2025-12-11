@@ -146,7 +146,7 @@ export default function EkipmanListesiTablo({ isActive = false }) {
     },
 
     {
-      title: "Makine",
+      title: "Ekipman",
       dataIndex: "MKN_TANIM",
       key: "MKN_TANIM",
       width: 200,

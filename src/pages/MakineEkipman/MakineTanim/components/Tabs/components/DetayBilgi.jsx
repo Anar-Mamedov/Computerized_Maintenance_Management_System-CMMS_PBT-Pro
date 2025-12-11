@@ -218,7 +218,7 @@ export function DetayBilgi(props) {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
-            <Text type="secondary">{t("makineBasinc")}</Text>
+            <Text type="secondary">{t("ekipmanBasinc")}</Text>
             <KodIDSelectbox name1="makineBasinc" kodID={32519} isRequired={false} />
           </div>
 

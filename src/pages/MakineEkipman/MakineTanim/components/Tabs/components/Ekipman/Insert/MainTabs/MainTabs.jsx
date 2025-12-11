@@ -82,7 +82,7 @@ export default function PersonelTablo({ onSelectedIdsChange }) {
     },
 
     {
-      title: "Makine",
+      title: "Ekipman",
       dataIndex: "MKN_TANIM",
       key: "MKN_TANIM",
       width: 200,

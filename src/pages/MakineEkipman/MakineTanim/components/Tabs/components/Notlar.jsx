@@ -6,8 +6,7 @@ import Textarea from "../../../../../../utils/components/Form/Textarea";
 const { Text } = Typography;
 
 const containerClasses = "flex flex-wrap gap-[10px] mb-[10px] box-border";
-const cardBaseClasses =
-  "bg-white p-[10px] border border-[#80808068] rounded-[5px] flex flex-col items-start shadow-[0_2px_8px_rgba(0,0,0,0.08)] w-full box-border min-w-0";
+const cardBaseClasses = "bg-white p-[10px] border border-[#80808068] rounded-[5px] flex flex-col items-start shadow-[0_2px_8px_rgba(0,0,0,0.08)] w-full box-border min-w-0";
 const noteCardClasses = "lg:w-auto lg:flex-[1] lg:min-w-[340px] lg:max-w-[565px]";
 
 function Notlar() {
@@ -16,7 +15,7 @@ function Notlar() {
       <div className={`${cardBaseClasses} ${noteCardClasses}`}>
         <div className="pb-[10px] inline-flex flex-col items-start">
           <Text style={{ fontSize: "16px", fontWeight: "600" }}>{t("genelNot")}</Text>
-          <Text type="secondary">{t("makineHakkindaGenelNotlar")}</Text>
+          <Text type="secondary">{t("ekipmanHakkindaGenelNotlar")}</Text>
         </div>
         <div className="flex flex-col items-start w-full">
           <Textarea name="makineGenelNot" required={true} styles={{ minHeight: "200px" }} />
@@ -25,7 +24,7 @@ function Notlar() {
       <div className={`${cardBaseClasses} ${noteCardClasses}`}>
         <div className="pb-[10px] inline-flex flex-col items-start">
           <Text style={{ fontSize: "16px", fontWeight: "600" }}>{t("guvenlikNotu")}</Text>
-          <Text type="secondary">{t("makineHakkindaGüvenlikNotları")}</Text>
+          <Text type="secondary">{t("ekipmanHakkindaGüvenlikNotları")}</Text>
         </div>
         <div className="flex flex-col items-start w-full">
           <Textarea name="makineGuvenlikNotu" required={true} styles={{ minHeight: "200px" }} />
