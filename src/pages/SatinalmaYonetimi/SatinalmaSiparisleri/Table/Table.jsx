@@ -554,6 +554,24 @@ const MainTable = () => {
       },
     },
     {
+        title: t("indirimTop"),
+        dataIndex: "SSP_INDIRIM_TOPAM",
+        key: "SSP_INDIRIM_TOPAM",
+        width: 120,
+        ellipsis: true,
+        visible: false,
+        render: (text, record) => (
+        <div className="">
+          <span>{Number(text).toFixed(Number(record?.tutarFormat))} </span>
+        </div>
+      ),
+        sorter: (a, b) => {
+        if (a.SSP_INDIRIM_TOPAM === null) return -1;
+        if (b.SSP_INDIRIM_TOPAM === null) return 1;
+        return a.SSP_INDIRIM_TOPAM - b.SSP_INDIRIM_TOPAM;
+      },
+    },
+    {
       title: t("araToplam"),
       dataIndex: "SSP_ARA_TOPLAM",
       key: "SSP_ARA_TOPLAM",
@@ -569,24 +587,6 @@ const MainTable = () => {
         if (a.SSP_ARA_TOPLAM === null) return -1;
         if (b.SSP_ARA_TOPLAM === null) return 1;
         return a.SSP_ARA_TOPLAM - b.SSP_ARA_TOPLAM;
-      },
-    },
-    {
-      title: t("Yuvarlama Toplamı"),
-      dataIndex: "SSP_YUVARLAMA_TOPLAMI",
-      key: "SSP_YUVARLAMA_TOPLAMI",
-      width: 120,
-      ellipsis: true,
-      visible: false,
-      render: (text, record) => (
-        <div className="">
-          <span>{Number(text).toFixed(Number(record?.tutarFormat))} </span>
-        </div>
-      ),
-      sorter: (a, b) => {
-        if (a.SSP_YUVARLAMA_TOPLAMI === null) return -1;
-        if (b.SSP_YUVARLAMA_TOPLAMI === null) return 1;
-        return a.SSP_YUVARLAMA_TOPLAMI - b.SSP_YUVARLAMA_TOPLAMI;
       },
     },
     {

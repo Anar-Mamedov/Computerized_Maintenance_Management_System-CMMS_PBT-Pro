@@ -457,34 +457,35 @@ const handleFinishEditing = async (id) => {
 <div style={{ flex: `${topHeight}%`, display: "flex", marginTop: 16, overflow: "hidden" }}>
   {/* Malzeme tablosu */}
   <div style={{ width: `${leftWidth}%`, overflow: "auto" }}>
-    <Card style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-          {/* Malzeme arama */}
-    <div style={{ marginTop: 10, marginBottom: 5, fontWeight: "bold", fontSize: "15px", color: "#262626" }}>
+    <Card style={{ height: "100%", display: "flex", flexDirection: "column" }} bodyStyle={{ padding: "12px" }}>
+      {/* Malzeme arama */}
+      <div style={{ marginBottom: 5, fontWeight: "bold", fontSize: "15px", color: "#262626" }}>
         Malzemeler
       </div>
-<Search
-  placeholder="Malzeme ara..."
-  allowClear
-  onChange={(e) => setMalzemeSearch(e.target.value)}
-  value={malzemeSearch}
-  style={{ marginBottom: 12 }}
-/>
-          <Divider />
-          <Table
-  size="small"
-  columns={itemColumns}
-  dataSource={data.filter((d) =>
-    !malzemeSearch || d.stokAdi.toLowerCase().includes(malzemeSearch.toLowerCase())
-  )}
-  rowSelection={itemRowSelection}
-  rowKey={(record) => (record.stokId !== -1 ? record.stokId : `tmp-${record.stokKod ?? Math.random()}`)}
-  loading={loading}
-  pagination={{ pageSize: 5 }}
-/>
-        </Card>
-      </div>
+      <Search
+        placeholder="Malzeme ara..."
+        allowClear
+        onChange={(e) => setMalzemeSearch(e.target.value)}
+        value={malzemeSearch}
+        style={{ marginBottom: 8 }} // Boşluk azaltıldı
+      />
+      {/* Divider kaldırıldı */}
+      <Table
+        size="small"
+        columns={itemColumns}
+        dataSource={data.filter((d) =>
+          !malzemeSearch || d.stokAdi.toLowerCase().includes(malzemeSearch.toLowerCase())
+        )}
+        rowSelection={itemRowSelection}
+        rowKey={(record) => (record.stokId !== -1 ? record.stokId : `tmp-${record.stokKod ?? Math.random()}`)}
+        loading={loading}
+        pagination={{ pageSize: 5 }}
+        scroll={{ x: 'max-content' }} // Tablo taşarsa diye güvenlik
+      />
+    </Card>
+  </div>
 
-      {/* Yatay sürükleme çubuğu */}
+  {/* Yatay sürükleme çubuğu */}
   <div
     onMouseDown={handleMouseDownX}
     style={{
@@ -495,42 +496,43 @@ const handleFinishEditing = async (id) => {
     }}
   />
 
-      {/* Tedarikçi tablosu */}
+  {/* Tedarikçi tablosu */}
   <div style={{ width: `${100 - leftWidth - 0.5}%`, overflow: "auto" }}>
-    <Card style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-          {/* Tedarikçi arama */}
-    <div style={{ marginTop: 10, marginBottom: 5, fontWeight: "bold", fontSize: "15px", color: "#262626" }}>
+    <Card style={{ height: "100%", display: "flex", flexDirection: "column" }} bodyStyle={{ padding: "12px" }}>
+      {/* Tedarikçi arama */}
+      <div style={{ marginBottom: 5, fontWeight: "bold", fontSize: "15px", color: "#262626" }}>
         Tedarikçiler
       </div>
-<Search
-  placeholder="Tedarikçi ara..."
-  allowClear
-  onChange={(e) => {
-      setSearchValue(e.target.value);
-      setCurrentPage(1); 
-  }}
-  value={searchValue}
-  style={{ marginBottom: 12 }}
-/>
-          <Divider />
-          <Table
-  size="small"
-  columns={supplierColumns}
-  dataSource={suppliers}
-  rowSelection={supplierRowSelection}
-  rowKey={(record) => record.TB_CARI_ID}
-  loading={loading}
-  pagination={{
-    current: currentPage,
-    pageSize: pageSize,
-    total: totalRecords,
-    showSizeChanger: false,
-    onChange: (page) => setCurrentPage(page)
-  }}
-/>
-        </Card>
-      </div>
-    </div>
+      <Search
+        placeholder="Tedarikçi ara..."
+        allowClear
+        onChange={(e) => {
+          setSearchValue(e.target.value);
+          setCurrentPage(1);
+        }}
+        value={searchValue}
+        style={{ marginBottom: 8 }} // Boşluk azaltıldı
+      />
+      {/* Divider kaldırıldı */}
+      <Table
+        size="small"
+        columns={supplierColumns}
+        dataSource={suppliers}
+        rowSelection={supplierRowSelection}
+        rowKey={(record) => record.TB_CARI_ID}
+        loading={loading}
+        pagination={{
+          current: currentPage,
+          pageSize: pageSize,
+          total: totalRecords,
+          showSizeChanger: false,
+          onChange: (page) => setCurrentPage(page)
+        }}
+        scroll={{ x: 'max-content' }}
+      />
+    </Card>
+  </div>
+</div>
 
     {/* Dikey sürükleme çubuğu */}
     <div

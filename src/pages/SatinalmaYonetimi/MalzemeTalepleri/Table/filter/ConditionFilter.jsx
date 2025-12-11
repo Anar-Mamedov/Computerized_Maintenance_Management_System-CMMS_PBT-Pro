@@ -6,7 +6,8 @@ const { Option } = Select;
 const ConditionFilter = ({ onSubmit }) => {
   const [visible, setVisible] = useState(false);
   const [options, setOptions] = useState([]);
-  const [selectedKey, setSelectedKey] = useState(null);
+  // Kanka burayı array'e çevirdim, varsayılan boş array
+  const [selectedKeys, setSelectedKeys] = useState([]); 
 
   useEffect(() => {
     // Durum listesi
@@ -26,22 +27,40 @@ const ConditionFilter = ({ onSubmit }) => {
   }, []);
 
   const handleSubmit = () => {
-  const value = parseInt(selectedKey);
+    // Eğer hiç seçim yapılmadıysa veya boşsa [-1] (Tümü) gönderebilirsin 
+    // veya backend boş array kabul ediyorsa direkt selectedKeys gönder.
+    // Ben senin eski mantığına göre boşsa [-1] gönderiyorum:
+    
+    if (selectedKeys.length === 0) {
+      onSubmit({ tabDurumID: [-1] });
+    } else {
+      onSubmit({ tabDurumID: selectedKeys }); // Array olarak gönderiliyor
+    }
 
-  if (isNaN(value)) {
-    onSubmit({}); // Seçim yapılmadıysa filtreleme gönderme
-  } else {
-    onSubmit({ tabDurumID: value }); // Seçim ne olursa olsun gönder
-  }
-
-  setVisible(false);
-};
+    setVisible(false);
+  };
 
   const handleCancelClick = () => {
-  setSelectedKey(-1);
-  onSubmit({ tabDurumID: -1 });
-  setVisible(false);
-};
+    setSelectedKeys([]); // Seçimleri temizle
+    onSubmit({ tabDurumID: [-1] }); // Filtreyi sıfırla
+    setVisible(false);
+  };
+
+  // Select değişince çalışacak fonksiyon
+  const handleChange = (values) => {
+    // Eğer kullanıcı "Tümü" (-1) seçerse diğerlerini temizleyip sadece -1 bırakabiliriz
+    // Ya da sadece seçimleri state'e atarız. 
+    // Burada standart multi-select mantığı kurdum:
+    if (values.includes(-1) && values.length > 1 && values[values.length -1] === -1) {
+       // Son seçilen "Tümü" ise diğerlerini sil
+       setSelectedKeys([-1]);
+    } else if (values.includes(-1) && values.length > 1) {
+       // "Tümü" seçiliyken başka bir şey seçilirse "Tümü"nü kaldır
+       setSelectedKeys(values.filter(v => v !== -1));
+    } else {
+       setSelectedKeys(values);
+    }
+  };
 
   const content = (
     <div style={{ width: "300px" }}>
@@ -60,11 +79,13 @@ const ConditionFilter = ({ onSubmit }) => {
       </div>
       <div style={{ padding: "10px" }}>
         <Select
+          mode="multiple" // Kanka burası önemli, çoklu seçim açıldı
           style={{ width: "100%" }}
           placeholder="Durum Seç..."
-          value={selectedKey}
-          onChange={setSelectedKey}
+          value={selectedKeys}
+          onChange={handleChange}
           allowClear
+          maxTagCount="responsive" // Çok fazla seçilirse +3 gibi gösterir input içinde
         >
           {options.map((option) => (
             <Option key={option.key} value={option.key}>
@@ -76,6 +97,9 @@ const ConditionFilter = ({ onSubmit }) => {
     </div>
   );
 
+  // Buton üzerindeki badge (sayı) mantığı
+  const showBadge = selectedKeys.length > 0 && !selectedKeys.includes(-1);
+
   return (
     <Popover
       content={content}
@@ -86,7 +110,7 @@ const ConditionFilter = ({ onSubmit }) => {
     >
       <Button>
         Durum{" "}
-        {selectedKey !== null && selectedKey !== -1 && (
+        {showBadge && (
           <div
             style={{
               marginLeft: "5px",
@@ -101,7 +125,7 @@ const ConditionFilter = ({ onSubmit }) => {
               fontSize: "12px",
             }}
           >
-            1
+            {selectedKeys.length} 
           </div>
         )}
       </Button>

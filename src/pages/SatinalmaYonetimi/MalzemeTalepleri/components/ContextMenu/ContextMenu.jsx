@@ -81,23 +81,26 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
   // --- GRUP 1: TALEP İŞLEMLERİ ---
   const renderTalepIslemleri = () => {
     
-    // Teklif alma ve Siparişe aktarma butonlarının görünürlük mantığı (Ortak Mantık)
-    const isProcessAllowed = () => {
-      // 1. Zaten işlem görmüş durumlar (3 ve 8 gibi)
-      if ([3, 8].includes(durumId)) return true;
-
-      // 2. Onay mekanizması KAPALI ise -> Direkt "Açık (1)" durumunda işlem yap
+    // 1. Teklif Alma Butonu Kontrolü (4 BURADA VAR)
+    const isTeklifAllowed = () => {
+      // 3, 8 ve 4 (Red) durumlarında Teklif butonu görünsün
+      if ([3, 4, 8].includes(durumId)) return true;
+      // Onay kapalıysa Açık (1) durumda da görünsün
       if (!onayCheck && durumId === 1) return true;
+      return false;
+    };
 
-      // 3. Onay mekanizması AÇIK ise -> "Onaylandı (7)" durumunda işlem yap
-      if (onayCheck && durumId === 7) return true;
-
+    // 2. Siparişe Aktar Butonu Kontrolü (4 BURADA YOK)
+    const isSiparisAllowed = () => {
+      // Sadece 3 ve 8 durumlarında görünsün (4 YOK)
+      if ([3, 8].includes(durumId)) return true;
+      // Onay kapalıysa Açık (1) durumda da görünsün
+      if (!onayCheck && durumId === 1) return true;
       return false;
     };
 
     return (
       <>
-        {/* İlk başlık olduğu için çizgi yok (baseHeaderStyle kullanıldı) */}
         <div style={baseHeaderStyle}>Talep İşlemleri</div>
 
         {/* 1. Talebi Aç / Kapat */}
@@ -115,13 +118,13 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
         {/* 3. Onayı Geri Al */}
         {durumId === 7 && <OnayGeriAl {...commonProps} />}
 
-        {/* 4. Fiyat Teklifi Al */}
-        {isProcessAllowed() && (
+        {/* 4. Fiyat Teklifi Al (isTeklifAllowed kullanıyoruz - 4 Dahil) */}
+        {isTeklifAllowed() && (
            <Teklif {...commonProps} selectedRow={selectedRows[0]} onRefresh={refreshTableData} />
         )}
 
-        {/* 5. Siparişe Aktar (Teklif mantığı ile aynı şartlara bağlandı) */}
-        {isProcessAllowed() && (
+        {/* 5. Siparişe Aktar (isSiparisAllowed kullanıyoruz - 4 Hariç) */}
+        {isSiparisAllowed() && (
           <SipariseAktar selectedRow={selectedRows[0]} onRefresh={refreshTableData} />
         )}
 
