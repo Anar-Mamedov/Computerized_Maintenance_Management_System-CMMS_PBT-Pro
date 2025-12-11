@@ -21,16 +21,21 @@ const SimpleKodSelectbox = ({ kodID, value, onChange, disabled, style, placehold
   const [name, setName] = useState("");
   const inputRef = useRef(null);
 
-  const fetchData = async () => {
-    if (options.length > 0) return;
+  // 1. DEĞİŞİKLİK: fetchData artık veriyi return ediyor
+  const fetchData = async (force = false) => {
+    if (!force && options.length > 0) return options;
+    
     setLoading(true);
     try {
       const response = await AxiosInstance.get(`KodList?grup=${kodID}`);
       if (response) {
         setOptions(response);
+        return response; // Veriyi döndür ki aşağıda kullanabilelim
       }
+      return [];
     } catch (error) {
       console.error("Veri çekme hatası:", error);
+      return [];
     } finally {
       setLoading(false);
     }
@@ -44,24 +49,38 @@ const SimpleKodSelectbox = ({ kodID, value, onChange, disabled, style, placehold
 
   const addItem = (e) => {
     e.preventDefault();
-    if (name.trim() !== "") {
-      if (options.some((option) => option.KOD_TANIM === name)) {
+    const textToAdd = name.trim(); // Eklenen ismi değişkene alalım
+
+    if (textToAdd !== "") {
+      if (options.some((option) => option.KOD_TANIM === textToAdd)) {
         message.warning("Bu kayıt zaten var!");
         return;
       }
+
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=${kodID}`)
-        .then((response) => {
-          if (response.status_code === 201 || response.id) {
-            const newId = response.id; 
-            message.success("Eklendi.");
-            setOptions((prev) => [...prev, { TB_KOD_ID: newId, KOD_TANIM: name }]);
-            setName("");
-          } else {
-            message.error("Eklenemedi.");
-          }
+      
+      // Post işlemi
+      AxiosInstance.post(`AddKodList?entity=${textToAdd}&grup=${kodID}`)
+        .then(async (response) => {
+            // API Hata vermediyse başarılı kabul ediyoruz
+            message.success("Eklendi ve Seçildi.");
+            setName(""); // Inputu temizle
+
+            // 2. LİSTEYİ YENİLE VE YENİ LİSTEYİ AL
+            const guncelListe = await fetchData(true);
+
+            // 3. YENİ LİSTEDE AZ ÖNCE EKLEDİĞİMİZ İSMİ BUL
+            const eklenenKayit = guncelListe.find(item => item.KOD_TANIM === textToAdd);
+
+            // 4. BULDUYSAK SEÇİLİ YAP
+            if (eklenenKayit && onChange) {
+                onChange(eklenenKayit.TB_KOD_ID);
+            }
         })
-        .catch((err) => console.error(err))
+        .catch((err) => {
+            console.error(err);
+            message.error("Hata oluştu, eklenemedi.");
+        })
         .finally(() => setLoading(false));
     }
   };
@@ -92,6 +111,7 @@ const SimpleKodSelectbox = ({ kodID, value, onChange, disabled, style, placehold
               ref={inputRef}
               value={name}
               onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => e.stopPropagation()} 
             />
             <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
               Ekle
@@ -713,8 +733,47 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
           const firmalar = paket.firmaTotaller || [];
           const durumID = teklifDurumlari?.find(d => d.teklifId === paket.id)?.durumID || null;
 
+          const isFirmaFullSelected = (firmaId) => {
+            if (malzemeler.length === 0) return false;
+            return malzemeler.every(m => {
+              const f = m.firmalar.find(x => x.firmaId === firmaId);
+              return f && (f.secili === true || f.secili === 1); 
+            });
+          };
+
+          const getFirmaColumnStyle = (firmaId, isHeader = false, isLastRow = false) => {
+    const isSelected = isFirmaFullSelected(firmaId);
+    const pastelColor = paketRenkleri[paketIndex]?.[firmaId] || "#fff";
+    
+    // Eğer hepsi seçiliyse yeşil border, değilse standart gri
+    const borderColor = isSelected ? "#52c41a" : "#f0f0f0"; 
+    const borderWidth = isSelected ? "2px" : "1px";
+    // Seçiliyse arka planı çok hafif yeşil yapalım, değilse kendi rengi
+    const backgroundColor = isSelected ? "#f6ffed" : pastelColor;
+
+    let style = {
+      backgroundColor: backgroundColor,
+      borderLeft: `${borderWidth} solid ${borderColor}`,
+      borderRight: `${borderWidth} solid ${borderColor}`,
+    };
+
+    if (isHeader) {
+      style.borderTop = `${borderWidth} solid ${borderColor}`;
+      style.borderBottom = "none"; // Header ile body arası çizgi olmasın bütünlük için
+    }
+
+    if (isLastRow && isSelected) {
+      style.borderBottom = `${borderWidth} solid ${borderColor}`;
+    }
+
+    return style;
+  };
+
           const firmaColumns = (firma) => {
              const pastelColor = paketRenkleri[paketIndex]?.[firma.firmaId] || "#fff";
+             const cellStyle = getFirmaColumnStyle(firma.firmaId, false);
+
+             const noBorderStyle = { ...cellStyle, borderLeft: 'none', borderRight: 'none' };
              return [
                {
                  title: (
@@ -723,129 +782,146 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
                    </div>
                  ),
                  children: [
-                   {
-                     title: "Seç",
-                     dataIndex: `secili${firma.firmaId}`,
-                     width: 50,
-                     align: "center",
-                     onCell: () => ({ style: { backgroundColor: pastelColor } }),
-                     render: (_, record) => {
-                       const f = record.firmalar.find(x => x.firmaId === firma.firmaId);
-                       const val = f?.secili ? "true" : "false";
-                       return (
-                          <Select
-                            size="small"
-                            value={val}
-                            style={{ width: "100%" }}
-                            onChange={(v) => handleSecimChange(paketIndex, record.malzemeId, firma.firmaId, v)}
-                            disabled={isDisabled && !f?.secili}
-                          >
-                             <Option value="true"><span style={{ color: "green", fontWeight: "bold" }}>✓</span></Option>
-                             <Option value="false"><span style={{ color: "red", fontWeight: "bold" }}>X</span></Option>
-                          </Select>
-                       )
-                     }
-                   },
-                   {
-                    title: "Marka",
-                    dataIndex: `marka_${firma.firmaId}`,
-                    width: 120,
-                    onCell: () => ({ style: { backgroundColor: pastelColor } }),
-                    render: (_, record) => {
-                      const f = record.firmalar.find(x => x.firmaId === firma.firmaId) || {};
-                      return <Input size="small" value={f.marka} onChange={(e) => handleMarkaChange(paketIndex, e.target.value, record.malzemeId, firma.firmaId)} disabled={isDisabled && !f.secili} />
-                    }
-                   },
-                   {
-           title: "Miktar",
-           width: 80,
-           onCell: () => ({ style: { backgroundColor: pastelColor } }),
-           render: (_, record) => {
-               const f = record.firmalar.find(x => x.firmaId === firma.firmaId) || {};
-               return (
-                 <InputNumber 
-                    size="small" 
-                    min={0}
-                    step={0.01} 
-                    decimalSeparator=","
-                    formatter={value => `${value}`.replace('.', ',')}
-                    parser={value => value?.replace(',', '.')}
-                    value={f.miktar} 
-                    onChange={(v) => handleValueChange(paketIndex, record.malzemeId, firma.firmaId, 'miktar', v)} 
-                    disabled={isDisabled && !f.secili} 
-                    style={{ width: "100%" }}
-                 />
-               );
-           }
+          {
+            title: "Seç",
+            width: 60,
+            align: "center",
+            onCell: () => ({ style: { ...cellStyle, borderRight: 'none' } }), // Sol border var, sağ yok
+            render: (_, record) => {
+              const f = record.firmalar.find((x) => x.firmaId === firma.firmaId);
+              const val = f?.secili ? "true" : "false";
+              return (
+                <Select
+                  size="small"
+                  value={val}
+                  style={{ width: "100%" }}
+                  onChange={(v) => handleSecimChange(paketIndex, record.malzemeId, firma.firmaId, v)}
+                  disabled={isDisabled && !f?.secili}
+                >
+                  <Option value="true"><span style={{ color: "green", fontWeight: "bold" }}>✓</span></Option>
+                  <Option value="false"><span style={{ color: "red", fontWeight: "bold" }}>X</span></Option>
+                </Select>
+              );
+            },
           },
-                   {
-           title: "Birim Fiyat",
-           width: 100,
-           onCell: () => ({ style: { backgroundColor: pastelColor } }),
-           render: (_, record) => {
-               const f = record.firmalar.find(x => x.firmaId === firma.firmaId) || {};
-               return (
-                 <InputNumber 
-                    size="small" 
-                    min={0} 
-                    // Virgüllü giriş için ayarlar:
-                    step={0.01}
-                    decimalSeparator=","
-                    formatter={value => `${value}`.replace('.', ',')}
-                    parser={value => value?.replace(',', '.')}
-                    // ---------------------------
-                    value={f.fiyat} 
-                    onChange={(v) => handleValueChange(paketIndex, record.malzemeId, firma.firmaId, 'fiyat', v)} 
-                    disabled={isDisabled && !f.secili} 
-                    style={{ width: "100%" }}
-                 />
-               );
-           }
+          {
+            title: "Marka",
+            width: 100,
+            onCell: () => ({ style: noBorderStyle }), // Ortadaki kolon, border yok
+            render: (_, record) => {
+              const f = record.firmalar.find((x) => x.firmaId === firma.firmaId) || {};
+              return (
+                <Input
+                  size="small"
+                  value={f.marka}
+                  onChange={(e) => handleMarkaChange(paketIndex, e.target.value, record.malzemeId, firma.firmaId)}
+                  disabled={isDisabled && !f.secili}
+                />
+              );
+            },
           },
-                   {
-           title: "Tutar",
-           width: 100,
-           align: "right",
-           onCell: () => ({ style: { backgroundColor: pastelColor } }),
-           render: (_, record) => {
-               const f = record.firmalar.find(x => x.firmaId === firma.firmaId) || {};
-               // 2 basamaklı ondalık gösterim (1.250,50 gibi)
-               return <Text strong>{Number(f.tutar).toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Text>
-           }
-          }
-                 ]
-               }
-             ];
-          };
+          {
+            title: "Miktar",
+            width: 70,
+            onCell: () => ({ style: noBorderStyle }),
+            render: (_, record) => {
+              const f = record.firmalar.find((x) => x.firmaId === firma.firmaId) || {};
+              return (
+                <InputNumber
+                  size="small"
+                  min={0}
+                  value={f.miktar}
+                  onChange={(v) => handleValueChange(paketIndex, record.malzemeId, firma.firmaId, "miktar", v)}
+                  disabled={isDisabled && !f.secili}
+                  style={{ width: "100%" }}
+                />
+              );
+            },
+          },
+          {
+            title: "Birim Fiyat",
+            width: 90,
+            onCell: () => ({ style: noBorderStyle }),
+            render: (_, record) => {
+              const f = record.firmalar.find((x) => x.firmaId === firma.firmaId) || {};
+              return (
+                <InputNumber
+                  size="small"
+                  min={0}
+                  value={f.fiyat}
+                  onChange={(v) => handleValueChange(paketIndex, record.malzemeId, firma.firmaId, "fiyat", v)}
+                  disabled={isDisabled && !f.secili}
+                  style={{ width: "100%" }}
+                />
+              );
+            },
+          },
+          {
+            title: "Tutar",
+            width: 90,
+            align: "right",
+            onCell: () => ({ style: { ...cellStyle, borderLeft: 'none' } }), // Sağ border var, sol yok
+            render: (_, record) => {
+              const f = record.firmalar.find((x) => x.firmaId === firma.firmaId) || {};
+              return (
+                <Text strong>
+                  {Number(f.tutar).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </Text>
+              );
+            },
+          },
+        ],
+      },
+    ];
+  };
 
-          const columns = [
-  {
-    title: "Malzeme Kodu / Adı",
-    key: "malzeme",
-    fixed: "left",
-    width: 250,
-    render: (_, r) => <Text strong>{r.malzeme}</Text>,
-  },
-  // BURASI DEĞİŞTİ: Firmalar arasına boş sütun ekleme mantığı
-  ...firmalar.flatMap((f, index) => {
-    const cols = firmaColumns(f); // Mevcut firma kolonları
-    
-    // Eğer son firma değilse, araya boşluk kolonu ekle
-    if (index < firmalar.length - 1) {
-      return [
-        ...cols,
-        {
-          title: "", // Başlık yok
-          dataIndex: `spacer_${f.firmaId}`,
-          width: 20, // 20px boşluk genişliği
-          onHeaderCell: () => ({ style: { border: "none", background: "transparent" } }), // Header çizgilerini kaldır
-          onCell: () => ({ style: { border: "none", background: "transparent" } }), // Hücre çizgilerini kaldır
-        },
-      ];
-    }
-    return cols;
-  }),
-];
+  const columns = [
+    {
+      title: "MALZEME", // Başlık
+      key: "malzeme",
+      fixed: "left",
+      width: 250,
+      render: (_, r) => (
+        // --- BURASI GÖRSELDEKİ TASARIM ---
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            {/* KOD KISMI: Gri kutucuk */}
+            <span style={{ 
+                backgroundColor: '#f5f5f5', 
+                color: '#595959', 
+                padding: '2px 6px', 
+                borderRadius: '4px', 
+                fontSize: '11px', 
+                marginBottom: '4px',
+                border: '1px solid #d9d9d9',
+                display: 'inline-block'
+            }}>
+                {r.malzemeKodu || r.stokKodu || "KOD"} {/* Backend'den gelen kod alanı */}
+            </span>
+            {/* İSİM KISMI: Kalın yazı */}
+            <Text strong style={{ fontSize: '13px', lineHeight: '1.2' }}>
+                {r.malzeme}
+            </Text>
+        </div>
+      ),
+    },
+    ...firmalar.flatMap((f, index) => {
+      const cols = firmaColumns(f);
+      // Firmalar arası boşluk
+      if (index < firmalar.length - 1) {
+        return [
+          ...cols,
+          {
+            title: "",
+            dataIndex: `spacer_${f.firmaId}`,
+            width: 15,
+            onHeaderCell: () => ({ style: { border: "none", background: "transparent" } }),
+            onCell: () => ({ style: { border: "none", background: "transparent" } }),
+          },
+        ];
+      }
+      return cols;
+    }),
+  ];
 
 const dataSource = malzemeler.map((m) => ({ key: m.malzemeId, ...m }));
 

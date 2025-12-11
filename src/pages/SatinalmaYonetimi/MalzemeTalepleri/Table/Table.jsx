@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState, useMemo, useRef } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Progress, message, Card, Row, Col, Space, Popconfirm, Tag, Popover } from "antd";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Progress, message, Card, Row, Col, Space, Popconfirm, Tag, Popover, Drawer } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -139,6 +139,23 @@ const MainTable = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [xlsxLoading, setXlsxLoading] = useState(false);
   const [cardsData, setCardsData] = useState({});
+  const [teklifDrawer, setTeklifDrawer] = useState({ 
+    visible: false, 
+    teklifId: null, 
+    durumId: null, 
+    fisId: null, 
+    fisNo: null // FisNo başlıkta lazım olabilir
+  });
+
+  const handleOpenTeklifDrawer = (teklifId, durumId, fisId, fisNo) => {
+    setTeklifDrawer({
+        visible: true,
+        teklifId,
+        durumId,
+        fisId,
+        fisNo
+    });
+  };
 
   const cardItems = useMemo(() => {
     if (!cardsData || Object.keys(cardsData).length === 0) return [];
@@ -291,14 +308,9 @@ const MainTable = () => {
     }
   };
 
-  const TeklifPopoverContent = ({ fisId, fisNo }) => { // fisNo'yu da prop olarak almak isteyebilirsin başlık için
-  const [loading, setLoading] = useState(true);
-  const [teklifPaketleri, setTeklifPaketleri] = useState([]);
-
-  // --- MODAL STATE'LERİ ---
-  const [isKarsilastirmaOpen, setIsKarsilastirmaOpen] = useState(false);
-  const [selectedTeklifId, setSelectedTeklifId] = useState(null);
-  const [selectedDurumId, setSelectedDurumId] = useState(null);
+  const TeklifPopoverContent = ({ fisId, fisNo, onOpenDrawer, onClosePopover }) => {
+    const [loading, setLoading] = useState(true);
+    const [teklifPaketleri, setTeklifPaketleri] = useState([]);
 
   useEffect(() => {
     let active = true;
@@ -335,11 +347,9 @@ const MainTable = () => {
     5: { text: "SİPARİŞ", backgroundColor: "#e6f7ff", color: "#096dd9" }
   };
 
-  // --- MODAL AÇMA FONKSİYONU ---
-  const handleOpenKarsilastirma = (teklif) => {
-      setSelectedTeklifId(teklif.teklifId);
-      setSelectedDurumId(teklif.durumID);
-      setIsKarsilastirmaOpen(true);
+  const handleLinkClick = (teklif) => {
+    onOpenDrawer(teklif.teklifId, teklif.durumID, fisId, fisNo);
+    if (onClosePopover) onClosePopover();
   };
 
   if (loading) {
@@ -367,8 +377,7 @@ const MainTable = () => {
     whiteSpace: "nowrap"
   };
 
-  return (
-    <>
+    return (
         <div style={containerStyle}>
         {teklifPaketleri.map((t) => (
             <div 
@@ -377,13 +386,12 @@ const MainTable = () => {
             >
             <Card
                 size="small"
-                // --- BURASI GÜNCELLENDİ: BAŞLIK LİNK YAPILDI ---
                 title={
                     <span style={{ fontSize: 13, fontWeight: "bold" }}>
                         RFQ —{" "}
                         <a 
-                            onClick={() => handleOpenKarsilastirma(t)}
-                            style={{ color: "#1890ff", textDecoration: "underline", cursor: "pointer" }}
+                          onClick={() => handleLinkClick(t)}
+                          style={{ color: "#1890ff", textDecoration: "underline", cursor: "pointer" }}
                         >
                             {t.baslik}
                         </a>
@@ -417,34 +425,68 @@ const MainTable = () => {
             </Card>
             </div>
         ))}
-        </div>
+      </div>
+    );
+  };
 
-        <Modal
-            title={`Teklif Karşılaştırma`}
-            open={isKarsilastirmaOpen}
-            onCancel={() => setIsKarsilastirmaOpen(false)}
-            width="95%" // Geniş ekran
-            style={{ top: 20 }} // Biraz yukarıdan başlasın
-            footer={null} // Alt butonları gizle (TeklifKarsilastirma içinde kendi butonları var)
-            destroyOnClose // Kapandığında içini temizle
+  const DurumHucre = ({ record, handleOpenTeklifDrawer, statusTag }) => {
+    const [open, setOpen] = useState(false); // Popover'ın görünürlüğünü kontrol eden state
+
+    // Drawer açılınca bu fonksiyon çalışacak ve Popover'ı kapatacak
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    // Senin eski stil ve renk mantığın
+    const { color, text } = statusTag(record.ISM_ONAY_DURUM) || {}; // Veya senin statusTag fonksiyonun nasıl çalışıyorsa
+    
+    // NOT: Senin "switch case" mantığını buraya taşıdım
+    let style = {
+        borderRadius: "12px",
+        padding: "2px 8px",
+        fontWeight: 500,
+        fontSize: "12px",
+        cursor: "help",
+        display: "inline-block",
+    };
+
+    const statusText = record.SFS_DURUM; // Tablodan gelen metin
+
+    switch (statusText) {
+        case "ONAYLANDI": style = { ...style, backgroundColor: "#d4f8e8", color: "#207868" }; break;
+        case "ONAY BEKLİYOR": style = { ...style, backgroundColor: "#fff4d6", color: "#b8860b" }; break;
+        case "ONAYLANMADI": style = { ...style, backgroundColor: "#ffe0e0", color: "#b22222" }; break;
+        case "SİPARİŞ": style = { ...style, backgroundColor: "#e6ecff", color: "#4056a1" }; break;
+        case "AÇIK": style = { ...style, backgroundColor: "#e1f7d5", color: "#3c763d" }; break;
+        case "TEKLİF": style = { ...style, backgroundColor: "#e0f7fa", color: "#00796b" }; break;
+        case "KAPALI": style = { ...style, backgroundColor: "#eaeaeaff", color: "#949494ff" }; break;
+        case "İPTAL": style = { ...style, backgroundColor: "#fde2e4", color: "#d64550" }; break;
+        case "KARŞILANIYOR": style = { ...style, backgroundColor: "#e6f7ff", color: "#096dd9" }; break;
+        default: style = { ...style, backgroundColor: "#f5f5f5", color: "#595959" };
+    }
+
+    return (
+        <Popover
+            content={
+                <TeklifPopoverContent 
+                    fisId={record.TB_STOK_FIS_ID} 
+                    fisNo={record.SFS_FIS_NO} 
+                    onOpenDrawer={handleOpenTeklifDrawer}
+                    onClosePopover={handleClose} // <--- Kapatma fonksiyonunu gönderiyoruz
+                />
+            }
+            title="Teklif Paketleri"
+            trigger="hover" // Hover ile açılır
+            open={open}     // Görünürlük state'e bağlandı
+            onOpenChange={setOpen} // Mouse girip çıktığında state güncellenir
+            destroyTooltipOnHide={true}
         >
-            {/* TeklifKarsilastirma bileşeni array ID beklediği için diziye alıyoruz */}
-            <TeklifKarsilastirma 
-                teklifIds={selectedTeklifId ? [selectedTeklifId] : []}
-                teklifDurumlari={selectedTeklifId ? [{ teklifId: selectedTeklifId, durumID: selectedDurumId }] : []}
-                fisId={fisId}
-                fisNo={fisNo} // Eğer bu prop yoksa parenttan alman gerekebilir
-                // onDurumGuncelle fonksiyonunu da buraya eklemen gerekebilir, 
-                // sayfa yenilemeden durum değişince karttaki etiketin güncellenmesi için.
-                onDurumGuncelle={() => {
-                    // Modal kapandığında veya işlem yapıldığında veriyi tazelemek istersen
-                    // buraya kod yazabilirsin.
-                }}
-            />
-        </Modal>
-    </>
-  );
-};
+            <span style={style} onClick={() => { /* İsteğe bağlı click */ }}>
+                {statusText}
+            </span>
+        </Popover>
+    );
+  };
 
   const initialColumns = [
     {
@@ -525,84 +567,21 @@ const MainTable = () => {
       },
     },
     {
-      title: "Durum",
-      dataIndex: "SFS_DURUM",
-      key: "SFS_DURUM",
-      width: 150,
-      ellipsis: true,
-      visible: true,
-      render: (text, record) => {
-        // --- Stil Tanımlamaları ---
-        let style = {
-          borderRadius: "12px",
-          padding: "2px 8px",
-          fontWeight: 500,
-          fontSize: "12px",
-          cursor: "help", // Hover edileceği belli olsun diye imleci soru işareti/yardım yaptık
-          display: "inline-block", // Hizalama düzgün dursun diye
-        };
-
-        // --- Renk Mantığı (Senin Orijinal Kodun) ---
-        switch (text) {
-          case "ONAYLANDI":
-            style = { ...style, backgroundColor: "#d4f8e8", color: "#207868" }; // pastel yeşil
-            break;
-          case "ONAY BEKLİYOR":
-            style = { ...style, backgroundColor: "#fff4d6", color: "#b8860b" }; // pastel sarı
-            break;
-          case "ONAYLANMADI":
-            style = { ...style, backgroundColor: "#ffe0e0", color: "#b22222" }; // pastel kırmızı
-            break;
-          case "SİPARİŞ":
-            style = { ...style, backgroundColor: "#e6ecff", color: "#4056a1" }; // pastel mavi
-            break;
-          case "AÇIK":
-            style = { ...style, backgroundColor: "#e1f7d5", color: "#3c763d" }; // açık yeşil
-            break;
-          case "TEKLİF":
-            style = { ...style, backgroundColor: "#e0f7fa", color: "#00796b" }; // pastel turkuaz
-            break;
-          case "KAPALI":
-            style = { ...style, backgroundColor: "#eaeaeaff", color: "#949494ff" }; // pastel kırmızı/rose (KAPALI ile aynı)
-            break;
-          case "İPTAL":
-            style = { ...style, backgroundColor: "#fde2e4", color: "#d64550" }; // pastel kırmızı/rose
-            break;
-          case "KARŞILANIYOR":
-            style = { ...style, backgroundColor: "#e6f7ff", color: "#096dd9" }; // pastel açık mavi
-            break;
-          default:
-            style = { ...style, backgroundColor: "#f5f5f5", color: "#595959" }; // gri
-        }
-
-        // --- Render Return ---
-        return (
-          <Popover
-            // Popover açıldığında "TeklifPopoverContent" componenti çalışır ve API isteği atar.
-            // record.TB_STOK_FIS_ID'nin backenddeki doğru ID alanı olduğundan emin ol.
-            content={<TeklifPopoverContent fisId={record.TB_STOK_FIS_ID} />}
-            title="Teklif Paketleri"
-            trigger="hover"
-            // destroyTooltipOnHide={true}: Popup kapandığında içeriği (componenti) yok eder.
-            // Tekrar açıldığında component baştan oluşur ve API isteği yeniden atılır.
-            // Böylece veri hep güncel kalır.
-            destroyTooltipOnHide={true}
-          >
-            {/* Tıklama özelliği (onRowClick) korunuyor */}
-            <span
-              style={style}
-              onClick={(e) => {
-                // Eğer satır tıklamasıyla çakışma olursa diye stopPropagation eklenebilir, 
-                // ama senin senaryonda onRowClick çağrılması yeterli.
-                onRowClick(record);
-              }}
-            >
-              {text}
-            </span>
-          </Popover>
-        );
-      },
-    },
+  title: "Durum",
+  dataIndex: "SFS_DURUM",
+  key: "SFS_DURUM",
+  width: 150,
+  ellipsis: true,
+  visible: true,
+  render: (text, record) => (
+    // Render fonksiyonu artık sadece bizim özel bileşeni çağırıyor
+    <DurumHucre 
+        record={record} 
+        handleOpenTeklifDrawer={handleOpenTeklifDrawer} // MainTable'daki fonksiyonu prop olarak geçiyoruz
+        statusTag={statusTag} // Eğer renk fonksiyonuna ihtiyacın varsa
+    />
+  ),
+},
     {
       title: "Talep Eden",
       dataIndex: "SFS_TALEP_EDEN",
@@ -1602,18 +1581,18 @@ useEffect(() => {
         />
       </Spin>
       <EditDrawer 
-    selectedRow={drawer.data} 
-    onDrawerClose={() => setDrawer({ ...drawer, visible: false })} 
-    drawerVisible={drawer.visible} 
-    onRefresh={refreshTableData} 
-/>
+        selectedRow={drawer.data} 
+        onDrawerClose={() => setDrawer({ ...drawer, visible: false })} 
+        drawerVisible={drawer.visible} 
+        onRefresh={refreshTableData} 
+      />
 
-<EditDrawerSiparis 
-    selectedRow={siparisDrawer.data} 
-    onDrawerClose={() => setSiparisDrawer({ ...siparisDrawer, visible: false })} 
-    drawerVisible={siparisDrawer.visible} 
-    onRefresh={refreshTableData} 
-/>
+      <EditDrawerSiparis 
+        selectedRow={siparisDrawer.data} 
+        onDrawerClose={() => setSiparisDrawer({ ...siparisDrawer, visible: false })} 
+        drawerVisible={siparisDrawer.visible} 
+        onRefresh={refreshTableData} 
+      />
 
       {editDrawer1Visible && (
         <EditDrawer1
@@ -1625,6 +1604,32 @@ useEffect(() => {
           }}
         />
       )}
+      <Drawer
+            title="Teklif Karşılaştırma"
+            open={teklifDrawer.visible}
+            onClose={() => setTeklifDrawer({ ...teklifDrawer, visible: false })}
+            width="100%"
+            placement="right"
+            destroyOnClose
+            styles={{ body: { padding: 0 } }}
+        >
+            {teklifDrawer.visible && (
+                <TeklifKarsilastirma
+                    teklifIds={teklifDrawer.teklifId ? [teklifDrawer.teklifId] : []}
+                    teklifDurumlari={
+                        teklifDrawer.teklifId 
+                        ? [{ teklifId: teklifDrawer.teklifId, durumID: teklifDrawer.durumId }] 
+                        : []
+                    }
+                    fisId={teklifDrawer.fisId}
+                    fisNo={teklifDrawer.fisNo}
+                    onDurumGuncelle={() => {
+                       // Gerekirse tabloyu refresh et veya state güncelle
+                       refreshTableData();
+                    }}
+                />
+            )}
+        </Drawer>
     </>
   );
 };
