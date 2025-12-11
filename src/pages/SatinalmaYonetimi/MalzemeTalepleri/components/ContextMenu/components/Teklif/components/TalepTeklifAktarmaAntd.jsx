@@ -19,6 +19,8 @@ export default function TalepTeklifeAktarmaAntd({ fisId, baslik, fisNo, disabled
   const [duzenlemeTarihi, setDuzenlemeTarihi] = useState(dayjs());
   const [konu, setKonu] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingMalzeme, setLoadingMalzeme] = useState(false);
+  const [loadingTedarikci, setLoadingTedarikci] = useState(false);
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
@@ -66,7 +68,7 @@ export default function TalepTeklifeAktarmaAntd({ fisId, baslik, fisNo, disabled
   // --- Malzemeleri getir
   const fetchMalzemeler = async () => {
     if (!fisId) return;
-    setLoading(true);
+    setLoadingMalzeme(true);
 
     try {
       const result = await AxiosInstance.get(`GetTalepMaterialMovements?fisId=${fisId}`);
@@ -77,13 +79,13 @@ export default function TalepTeklifeAktarmaAntd({ fisId, baslik, fisNo, disabled
       message.error("Malzemeler yüklenirken hata oluştu");
       setData([]);
     } finally {
-      setLoading(false);
+      setLoadingMalzeme(false);
     }
   };
 
   // --- Tedarikçi listesi
   useEffect(() => {
-    setLoading(true);
+    setLoadingTedarikci(true);
   
     AxiosInstance.get(`GetTedarikciList?aktif=1&searchText=${searchValue}&pagingDeger=${currentPage}&pageSize=${pageSize}`)
       .then((res) => {
@@ -102,7 +104,7 @@ export default function TalepTeklifeAktarmaAntd({ fisId, baslik, fisNo, disabled
         setTotalRecords(0);
       })
       .finally(() => {
-        setLoading(false);
+        setLoadingTedarikci(false);
       });
   }, [currentPage, searchValue, pageSize]);
 
@@ -193,13 +195,25 @@ const itemRowSelection = {
 
   // --- Tedarikçi seçimleri
 const supplierRowSelection = {
-  hideSelectAll: true, // BU SATIRI EKLEDİK: Başlıktaki tümünü seç kutusu kalkar
-  selectedRowKeys: selectedSupplierKeys,
-  onChange: (keys, rows) => {
-    setSelectedSupplierKeys(keys);
-    setSelectedSuppliersData(rows); // full satırları yakala
-  },
-};
+    hideSelectAll: true,
+    preserveSelectedRowKeys: true,
+    selectedRowKeys: selectedSupplierKeys,
+    onChange: (keys, currentPageRows) => {
+      setSelectedSupplierKeys(keys);
+      setSelectedSuppliersData((prevData) => {
+        const allCandidates = [...prevData, ...currentPageRows];
+        const uniqueMap = new Map();
+        
+        allCandidates.forEach((item) => {
+          if (keys.includes(item.TB_CARI_ID)) {
+            uniqueMap.set(item.TB_CARI_ID, item);
+          }
+        });
+
+        return Array.from(uniqueMap.values());
+      });
+    },
+  };
 
 // Teklif Numarası getiren fonksiyon
 const fetchTeklifNo = async () => {
@@ -478,7 +492,7 @@ const handleFinishEditing = async (id) => {
         )}
         rowSelection={itemRowSelection}
         rowKey={(record) => (record.stokId !== -1 ? record.stokId : `tmp-${record.stokKod ?? Math.random()}`)}
-        loading={loading}
+        loading={loadingMalzeme}
         pagination={{ pageSize: 5 }}
         scroll={{ x: 'max-content' }} // Tablo taşarsa diye güvenlik
       />
@@ -520,7 +534,7 @@ const handleFinishEditing = async (id) => {
         dataSource={suppliers}
         rowSelection={supplierRowSelection}
         rowKey={(record) => record.TB_CARI_ID}
-        loading={loading}
+        loading={loadingTedarikci}
         pagination={{
           current: currentPage,
           pageSize: pageSize,
