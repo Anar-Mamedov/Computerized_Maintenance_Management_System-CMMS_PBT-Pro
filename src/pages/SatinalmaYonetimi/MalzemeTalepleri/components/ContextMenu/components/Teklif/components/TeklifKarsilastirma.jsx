@@ -462,6 +462,31 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
     );
   };
 
+  useEffect(() => {
+    if (!paketler || paketler.length === 0) return;
+
+    const currentPaketIndex = Number(activeTab) - 1;
+    const paket = paketler[currentPaketIndex];
+
+    if (!paket || !paket.malzemeler || !paket.firmaTotaller) return;
+
+    let fullSeciliFirmaId = null;
+    for (const firma of paket.firmaTotaller) {
+      const isAllSelected = paket.malzemeler.every((malzeme) => {
+        const firmaDetay = malzeme.firmalar.find((f) => f.firmaId === firma.firmaId);
+        return firmaDetay && (firmaDetay.secili === true || firmaDetay.secili === 1);
+      });
+
+      if (isAllSelected) {
+        fullSeciliFirmaId = firma.firmaId;
+        break;
+      }
+    }
+    if (selectedFirmaId !== fullSeciliFirmaId) {
+      setSelectedFirmaId(fullSeciliFirmaId);
+    }
+  }, [paketler, activeTab, selectedFirmaId]);
+
   const onOnayaGonder = async (paketId) => {
     const paket = paketler.find(p => p.teklifId === paketId || p.id === paketId || p.teklifBaslik?.teklifId === paketId);
     if (!paket) { message.error("Paket bulunamadı!"); return; }
@@ -1028,7 +1053,29 @@ const dataSource = malzemeler.map((m) => ({ key: m.malzemeId, ...m }));
           ))}
         </Table.Summary.Row>
 
-                           {detayGosterilenPaket === paketIndex && (
+        {/* AÇIKLAMA */}
+    <Table.Summary.Row>
+      <Table.Summary.Cell index={0}><Text strong>Açıklama</Text></Table.Summary.Cell>
+      {firmalar.map((f, i) => (
+        <React.Fragment key={f.firmaId}>
+          <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
+            <div style={cellWrapperStyle}>
+              <Input.TextArea
+                value={f.aciklama}
+                onChange={(e) => handleFirmaDetailChange(paketIndex, f.firmaId, 'aciklama', e.target.value)}
+                disabled={isDisabled}
+                autoSize={{ minRows: 1, maxRows: 3 }}
+                style={componentStyle}
+              />
+            </div>
+          </Table.Summary.Cell>
+          {/* BOŞLUK HÜCRESİ */}
+          {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
+        </React.Fragment>
+      ))}
+    </Table.Summary.Row>
+
+      {detayGosterilenPaket === paketIndex && (
   <>
     {/* Detay başlığı ile üstteki toplamlar arasına minik bir boşluk */}
     <Table.Summary.Row style={{ height: 10 }}>
@@ -1037,7 +1084,7 @@ const dataSource = malzemeler.map((m) => ({ key: m.malzemeId, ...m }));
 
     {/* TEKLİF TARİHİ */}
     <Table.Summary.Row>
-      <Table.Summary.Cell index={0}><Text strong>TEKLİF TARİHİ</Text></Table.Summary.Cell>
+      <Table.Summary.Cell index={0}><Text strong>Teklif Tarihi</Text></Table.Summary.Cell>
       {firmalar.map((f, i) => (
         <React.Fragment key={f.firmaId}>
           <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
@@ -1059,7 +1106,7 @@ const dataSource = malzemeler.map((m) => ({ key: m.malzemeId, ...m }));
 
     {/* GEÇERLİLİK TARİHİ */}
     <Table.Summary.Row>
-      <Table.Summary.Cell index={0}><Text strong>GEÇERLİLİK TARİHİ</Text></Table.Summary.Cell>
+      <Table.Summary.Cell index={0}><Text strong>Geçerlilik Tarihi</Text></Table.Summary.Cell>
       {firmalar.map((f, i) => (
         <React.Fragment key={f.firmaId}>
           <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
@@ -1081,7 +1128,7 @@ const dataSource = malzemeler.map((m) => ({ key: m.malzemeId, ...m }));
 
     {/* TESLİM TARİHİ */}
     <Table.Summary.Row>
-      <Table.Summary.Cell index={0}><Text strong>TESLİM TARİHİ</Text></Table.Summary.Cell>
+      <Table.Summary.Cell index={0}><Text strong>Teslim Tarihi</Text></Table.Summary.Cell>
       {firmalar.map((f, i) => (
         <React.Fragment key={f.firmaId}>
           <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
@@ -1103,7 +1150,7 @@ const dataSource = malzemeler.map((m) => ({ key: m.malzemeId, ...m }));
 
     {/* TESLİM YERİ */}
     <Table.Summary.Row>
-      <Table.Summary.Cell index={0}><Text strong>TESLİM YERİ</Text></Table.Summary.Cell>
+      <Table.Summary.Cell index={0}><Text strong>Teslim Yeri</Text></Table.Summary.Cell>
       {firmalar.map((f, i) => (
         <React.Fragment key={f.firmaId}>
           <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
@@ -1124,7 +1171,7 @@ const dataSource = malzemeler.map((m) => ({ key: m.malzemeId, ...m }));
 
     {/* SEVK ŞEKLİ */}
     <Table.Summary.Row>
-      <Table.Summary.Cell index={0}><Text strong>SEVK ŞEKLİ</Text></Table.Summary.Cell>
+      <Table.Summary.Cell index={0}><Text strong>Sevk Şekli</Text></Table.Summary.Cell>
       {firmalar.map((f, i) => (
         <React.Fragment key={f.firmaId}>
           <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
@@ -1148,7 +1195,7 @@ const dataSource = malzemeler.map((m) => ({ key: m.malzemeId, ...m }));
 
     {/* ÖDEME BİLGİSİ */}
     <Table.Summary.Row>
-      <Table.Summary.Cell index={0}><Text strong>ÖDEME BİLGİSİ</Text></Table.Summary.Cell>
+      <Table.Summary.Cell index={0}><Text strong>Ödeme Bilgisi</Text></Table.Summary.Cell>
       {firmalar.map((f, i) => (
         <React.Fragment key={f.firmaId}>
           <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
@@ -1172,7 +1219,7 @@ const dataSource = malzemeler.map((m) => ({ key: m.malzemeId, ...m }));
 
     {/* YETKİLİ */}
     <Table.Summary.Row>
-      <Table.Summary.Cell index={0}><Text strong>YETKİLİ</Text></Table.Summary.Cell>
+      <Table.Summary.Cell index={0}><Text strong>Yetkili</Text></Table.Summary.Cell>
       {firmalar.map((f, i) => (
         <React.Fragment key={f.firmaId}>
           <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
@@ -1193,7 +1240,7 @@ const dataSource = malzemeler.map((m) => ({ key: m.malzemeId, ...m }));
 
     {/* TELEFON */}
     <Table.Summary.Row>
-      <Table.Summary.Cell index={0}><Text strong>TELEFON</Text></Table.Summary.Cell>
+      <Table.Summary.Cell index={0}><Text strong>Telefon</Text></Table.Summary.Cell>
       {firmalar.map((f, i) => (
         <React.Fragment key={f.firmaId}>
           <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
@@ -1202,28 +1249,6 @@ const dataSource = malzemeler.map((m) => ({ key: m.malzemeId, ...m }));
                 value={f.telefon}
                 onChange={(e) => handleFirmaDetailChange(paketIndex, f.firmaId, "telefon", e.target.value)}
                 disabled={isDisabled}
-                style={componentStyle}
-              />
-            </div>
-          </Table.Summary.Cell>
-          {/* BOŞLUK HÜCRESİ */}
-          {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
-        </React.Fragment>
-      ))}
-    </Table.Summary.Row>
-
-    {/* AÇIKLAMA */}
-    <Table.Summary.Row>
-      <Table.Summary.Cell index={0}><Text strong>AÇIKLAMA</Text></Table.Summary.Cell>
-      {firmalar.map((f, i) => (
-        <React.Fragment key={f.firmaId}>
-          <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
-            <div style={cellWrapperStyle}>
-              <Input.TextArea
-                value={f.aciklama}
-                onChange={(e) => handleFirmaDetailChange(paketIndex, f.firmaId, 'aciklama', e.target.value)}
-                disabled={isDisabled}
-                autoSize={{ minRows: 1, maxRows: 3 }}
                 style={componentStyle}
               />
             </div>
