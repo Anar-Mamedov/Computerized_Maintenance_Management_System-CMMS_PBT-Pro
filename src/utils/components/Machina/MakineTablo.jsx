@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
-import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined, PlusOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -1563,6 +1563,8 @@ const MainTable = ({
     }
   }, [controlledOpen]);
 
+  const makineValue = watch(makineFieldName);
+
   return (
     <>
       {!hideHeader && (
@@ -1570,15 +1572,30 @@ const MainTable = ({
           <Controller
             name={makineFieldName}
             control={control}
-            render={({ field }) => <Input {...field} status={errors[makineFieldName] ? "error" : ""} type="text" style={{ width: "100%", maxWidth: "630px" }} disabled />}
+            render={({ field }) => (
+              <Input
+                {...field}
+                status={errors[makineFieldName] ? "error" : ""}
+                type="text"
+                style={{ width: "100%" }}
+                readOnly
+                suffix={
+                  makineValue ? (
+                    <CloseOutlined
+                      style={{ color: "#8c8c8c", cursor: "pointer", fontSize: "12px" }}
+                      onClick={handleMinusClick}
+                    />
+                  ) : (
+                    <PlusOutlined
+                      style={{ color: disabled ? "#d9d9d9" : "#0091ff", cursor: disabled ? "not-allowed" : "pointer", fontSize: "12px" }}
+                      onClick={disabled ? undefined : handleModalToggle}
+                    />
+                  )
+                }
+              />
+            )}
           />
           <Controller name={makineIdFieldName} control={control} render={({ field }) => <Input {...field} type="text" style={{ display: "none" }} />} />
-          <div style={{ display: "flex", gap: "5px" }}>
-            <Button disabled={disabled} onClick={handleModalToggle}>
-              +
-            </Button>
-            <Button onClick={handleMinusClick}> - </Button>
-          </div>
         </div>
       )}
       <Modal

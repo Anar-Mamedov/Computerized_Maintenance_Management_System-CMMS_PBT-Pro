@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Table, Input, message } from "antd";
+import { Modal, Table, Input, message } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
-import { SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined, PlusOutlined, CloseOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../api/http";
 import PropTypes from "prop-types";
 import { t } from "i18next";
@@ -19,7 +19,6 @@ export default function LokasyonTablo({
     control,
     watch,
     setValue,
-    getValues,
     formState: { errors },
   } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -219,6 +218,8 @@ export default function LokasyonTablo({
     onClear && onClear();
   };
 
+  const lokasyonValue = watch(lokasyonFieldName);
+
   return (
     <div style={{ width: "100%" }}>
       <div style={{ display: "flex", gap: "5px", width: "100%" }}>
@@ -230,9 +231,22 @@ export default function LokasyonTablo({
             <Input
               {...field}
               status={errors[lokasyonFieldName] ? "error" : ""}
-              type="text" // Set the type to "text" for name input
-              style={{ width: "100%", maxWidth: "630px" }}
-              disabled
+              type="text"
+              style={{ width: "100%" }}
+              readOnly
+              suffix={
+                lokasyonValue ? (
+                  <CloseOutlined
+                    style={{ color: "#8c8c8c", cursor: "pointer", fontSize: "12px" }}
+                    onClick={handleLokasyonMinusClick}
+                  />
+                ) : (
+                  <PlusOutlined
+                    style={{ color: disabled ? "#d9d9d9" : "#0091ff", cursor: disabled ? "not-allowed" : "pointer", fontSize: "12px" }}
+                    onClick={disabled ? undefined : handleModalToggle}
+                  />
+                )
+              }
             />
           )}
         />
@@ -243,17 +257,11 @@ export default function LokasyonTablo({
           render={({ field }) => (
             <Input
               {...field}
-              type="text" // Set the type to "text" for name input
+              type="text"
               style={{ display: "none" }}
             />
           )}
         />
-        <div style={{ display: "flex", gap: "5px" }}>
-          <Button disabled={disabled} onClick={handleModalToggle}>
-            +
-          </Button>
-          <Button onClick={handleLokasyonMinusClick}> - </Button>
-        </div>
       </div>
       {errors[lokasyonFieldName] && <div style={{ color: "red", marginTop: "5px" }}>{errors[lokasyonFieldName].message}</div>}
 

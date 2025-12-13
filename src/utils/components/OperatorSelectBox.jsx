@@ -9,10 +9,10 @@ import { t } from "i18next";
 
 const StyledSelect = styled(Select)`
   @media (min-width: 600px) {
-    width: 300px;
+    width: 100%;
   }
   @media (max-width: 600px) {
-    width: 300px;
+    width: 100%;
   }
 `;
 

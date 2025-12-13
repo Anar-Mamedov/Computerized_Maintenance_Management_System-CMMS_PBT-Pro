@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { Button, Modal, Table, Input, message } from "antd";
+import { Modal, Table, Input, message } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
-import { SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined, PlusOutlined, CloseOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../api/http";
 
 export default function MakineTakvimtablo({ workshopSelectedId, onSubmit, onClear, disabled, fieldName = "takvimTanim", fieldNameID = "takvimID" }) {
   const {
     control,
+    watch,
     setValue,
     formState: { errors },
   } = useFormContext();
@@ -175,21 +176,37 @@ export default function MakineTakvimtablo({ workshopSelectedId, onSubmit, onClea
     onClear && onClear();
   };
 
+  const takvimValue = watch(fieldName);
+
   return (
     <div style={{ width: "100%" }}>
       <div style={{ display: "flex", gap: "5px", width: "100%" }}>
         <Controller
           name={fieldName}
           control={control}
-          render={({ field }) => <Input {...field} status={errors[fieldName] ? "error" : ""} style={{ width: "100%", maxWidth: "630px" }} disabled />}
+          render={({ field }) => (
+            <Input
+              {...field}
+              status={errors[fieldName] ? "error" : ""}
+              style={{ width: "100%" }}
+              readOnly
+              suffix={
+                takvimValue ? (
+                  <CloseOutlined
+                    style={{ color: "#8c8c8c", cursor: "pointer", fontSize: "12px" }}
+                    onClick={handleMinusClick}
+                  />
+                ) : (
+                  <PlusOutlined
+                    style={{ color: disabled ? "#d9d9d9" : "#0091ff", cursor: disabled ? "not-allowed" : "pointer", fontSize: "12px" }}
+                    onClick={disabled ? undefined : handleModalToggle}
+                  />
+                )
+              }
+            />
+          )}
         />
         <Controller name={fieldNameID} control={control} render={({ field }) => <Input {...field} type="text" style={{ display: "none" }} />} />
-        <div style={{ display: "flex", gap: "5px" }}>
-          <Button disabled={disabled} onClick={handleModalToggle}>
-            +
-          </Button>
-          <Button onClick={handleMinusClick}>-</Button>
-        </div>
       </div>
 
       <Modal width="1200px" title="Takvim" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>

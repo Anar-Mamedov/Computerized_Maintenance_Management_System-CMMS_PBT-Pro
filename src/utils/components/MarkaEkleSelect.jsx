@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Input, Modal, Table, message, Select, Spin, Popconfirm } from "antd";
+import { Button, Input, Modal, Table, message, Select, Spin, Popconfirm, Divider, Space } from "antd";
 import AxiosInstance from "../../api/http";
 import { useFormContext, Controller } from "react-hook-form";
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import PropTypes from "prop-types";
 
 export default function MarkaEkleSelect({ workshopSelectedId, onSubmit, markaFieldName = "MakineMarka", markaIdFieldName = "MakineMarkaID", style = {} }) {
@@ -96,6 +96,7 @@ export default function MarkaEkleSelect({ workshopSelectedId, onSubmit, markaFie
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("Ekleme Başarılı.");
           fetch(); // Refresh the data
+          fetchData(); // Also refresh dropdown options
           setYeniMarka(""); // Clear input
           setIsMarkaEkleModalVisible(false);
         } else if (response.status_code === 401) {
@@ -154,7 +155,25 @@ export default function MarkaEkleSelect({ workshopSelectedId, onSubmit, markaFie
                   fetchData(); // Fetch data when the dropdown is opened
                 }
               }}
-              dropdownRender={(menu) => <Spin spinning={loading}>{menu}</Spin>}
+              dropdownRender={(menu) => (
+                <Spin spinning={loading}>
+                  {menu}
+                  <Divider style={{ margin: "8px 0" }} />
+                  <div style={{ padding: "8px", textAlign: "center" }}>
+                    <Button
+                      type="link"
+                      icon={<PlusOutlined />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleModalToggle();
+                      }}
+                      style={{ width: "100%" }}
+                    >
+                      Ekle
+                    </Button>
+                  </div>
+                </Spin>
+              )}
               options={options.map((item) => ({
                 value: item.TB_MARKA_ID, // Use the ID as the value
                 label: item.MRK_MARKA, // Display the name in the dropdown
@@ -178,7 +197,6 @@ export default function MarkaEkleSelect({ workshopSelectedId, onSubmit, markaFie
             />
           )}
         />
-        <Button onClick={handleModalToggle}>+</Button>
       </div>
 
       <Modal width="1200px" centered title="Marka Ekle" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle} footer={null}>
