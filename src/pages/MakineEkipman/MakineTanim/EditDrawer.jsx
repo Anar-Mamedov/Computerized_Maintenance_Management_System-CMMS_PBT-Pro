@@ -39,6 +39,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       modelID: null,
       operasyonDurumu: null,
       operasyonDurumuID: null,
+      operasyonDurumuText: null,
       seriNo: null,
       masterMakine: null,
       masterMakineID: null,
@@ -179,6 +180,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   });
 
   const { setValue, reset, watch } = methods;
+  const statusLabel = watch("operasyonDurumuText") ?? watch("operasyonDurumu");
 
   const parseDateValue = (value, format) => {
     if (!value) {
@@ -233,6 +235,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("operatorID", item.MKN_OPERATOR_PERSONEL_ID ?? null);
           setValue("operasyonDurumu", trimIfString(item.MKN_DURUM));
           setValue("operasyonDurumuID", item.MKN_DURUM_KOD_ID ?? null);
+          setValue("operasyonDurumuText", trimIfString(item.MKN_DURUM));
           setValue("seriNo", trimIfString(item.MKN_SERI_NO));
           setValue("masterMakine", trimIfString(item.MKN_MASTER_MAKINE_TANIM));
           setValue("masterMakineID", item.MKN_MASTER_ID ?? null);
@@ -597,6 +600,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
                 <Tag color={watch("makineAktif") ? "green" : "red"}>
                   {watch("makineAktif") ? "Aktif" : "Pasif"}
                 </Tag>
+                {statusLabel && <Tag color="default">{statusLabel}</Tag>}
                 {watch("makineKalibrasyon") && <Tag color="blue">Kalibrasyon</Tag>}
                 {watch("kritikMakine") && <Tag color="red">Kritik Ekipman</Tag>}
                 {watch("makineGucKaynagi") && <Tag color="orange">Güç Kaynağı</Tag>}
