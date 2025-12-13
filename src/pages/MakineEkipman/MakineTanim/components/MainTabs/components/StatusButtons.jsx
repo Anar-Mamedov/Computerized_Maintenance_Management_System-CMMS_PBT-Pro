@@ -5,6 +5,7 @@ import { t } from "i18next";
 
 function StatusButtons() {
   const { control } = useFormContext();
+  const BUTTON_GRID_COLUMNS = 2;
 
   const statusConfigs = [
     { name: "makineAktif", label: "aktif", color: "#52c41a" }, // green-6
@@ -25,7 +26,14 @@ function StatusButtons() {
   };
 
   return (
-    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: `repeat(${BUTTON_GRID_COLUMNS}, minmax(0, 1fr))`,
+        gap: "8px",
+        width: "100%",
+      }}
+    >
       {statusConfigs.map(({ name, label, color }) => (
         <Controller
           key={name}
@@ -36,15 +44,16 @@ function StatusButtons() {
               type="default"
               onClick={() => field.onChange(!field.value)}
               aria-pressed={field.value}
-              style={
-                field.value
+              style={{
+                width: "100%",
+                ...(field.value
                   ? {
                       color: color,
                       borderColor: color,
                       backgroundColor: hexToRgba(color, 0.12),
                     }
-                  : undefined
-              }
+                  : null),
+              }}
             >
               {t(label)}
             </Button>

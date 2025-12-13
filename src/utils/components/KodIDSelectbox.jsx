@@ -29,7 +29,7 @@ const StyledDiv = styled.div`
   }
 `;
 
-export default function KodIDSelectbox({ name1, kodID, isRequired, disabled = false, style = {} }) {
+export default function KodIDSelectbox({ name1, kodID, isRequired, disabled = false, style = {}, onLabelChange }) {
   const {
     control,
     watch,
@@ -154,9 +154,12 @@ export default function KodIDSelectbox({ name1, kodID, isRequired, disabled = fa
               value: item.TB_KOD_ID, // Use the ID as the value
               label: item.KOD_TANIM, // Display the name in the dropdown
             }))}
-            onChange={(value) => {
+            onChange={(value, option) => {
               // Seçilen değerin ID'sini NedeniID alanına set et
               setValue(`${name1}ID`, value);
+              if (onLabelChange) {
+                onLabelChange(option?.label ?? null);
+              }
               field.onChange(value);
             }}
           />

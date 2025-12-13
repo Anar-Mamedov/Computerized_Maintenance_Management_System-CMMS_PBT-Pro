@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useFormContext } from "react-hook-form";
 import { CiImageOn } from "react-icons/ci";
 import { Typography } from "antd";
 
@@ -22,6 +23,7 @@ const wideCardClasses = "lg:w-auto lg:flex-1 lg:min-w-[700px]";
 const narrowCardClasses = "lg:w-auto lg:flex-[0_0_325px] lg:max-w-[325px]";
 
 export default function MainTabs() {
+  const { setValue } = useFormContext();
   const [isLokasyonModalOpen, setIsLokasyonModalOpen] = useState(false);
 
   return (
@@ -110,7 +112,12 @@ export default function MainTabs() {
         <div className="flex flex-row flex-wrap w-full gap-[10px]">
           <div className="flex flex-col items-start w-[calc(50%-5px)]">
             <Text type="secondary">{t("durum")}</Text>
-            <KodIDSelectbox name1="operasyonDurumu" kodID={32505} isRequired={false} />
+            <KodIDSelectbox
+              name1="operasyonDurumu"
+              kodID={32505}
+              isRequired={false}
+              onLabelChange={(label) => setValue("operasyonDurumuText", label ?? null)}
+            />
           </div>
           <div className="flex flex-col items-start w-[calc(50%-5px)]">
             <Text type="secondary">{t("seriNo")}</Text>
