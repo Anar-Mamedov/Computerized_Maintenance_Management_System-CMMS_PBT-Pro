@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Input, Modal, Table, message, Select, Spin, Popconfirm } from "antd";
+import { Button, Input, Modal, Table, message, Select, Spin, Popconfirm, Divider, Space } from "antd";
 import AxiosInstance from "../../api/http";
 import { useFormContext, Controller } from "react-hook-form";
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import PropTypes from "prop-types";
 
 export default function ModelEkleSelect({
@@ -106,6 +106,7 @@ export default function ModelEkleSelect({
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("Ekleme Başarılı.");
           fetch(); // Refresh the data
+          fetchData(); // Also refresh dropdown options
           setYeniMarka(""); // Clear input
           setIsMarkaEkleModalVisible(false);
         } else if (response.status_code === 401) {
@@ -171,7 +172,26 @@ export default function ModelEkleSelect({
                   fetchData(); // Fetch data when the dropdown is opened
                 }
               }}
-              dropdownRender={(menu) => <Spin spinning={loading}>{menu}</Spin>}
+              dropdownRender={(menu) => (
+                <Spin spinning={loading}>
+                  {menu}
+                  <Divider style={{ margin: "8px 0" }} />
+                  <div style={{ padding: "8px", textAlign: "center" }}>
+                    <Button
+                      type="link"
+                      icon={<PlusOutlined />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleModalToggle();
+                      }}
+                      style={{ width: "100%" }}
+                      disabled={!selectedMarkaID}
+                    >
+                      Ekle
+                    </Button>
+                  </div>
+                </Spin>
+              )}
               options={options.map((item) => ({
                 value: item.TB_MODEL_ID, // Use the ID as the value
                 label: item.MDL_MODEL, // Display the name in the dropdown
@@ -195,9 +215,6 @@ export default function ModelEkleSelect({
             />
           )}
         />
-        <Button onClick={handleModalToggle} disabled={!selectedMarkaID}>
-          +
-        </Button>
       </div>
 
       <Modal width="1200px" centered title="Model Ekle" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle} footer={null}>

@@ -440,7 +440,7 @@ export default function CreateDrawer({ onRefresh }) {
           Ekle
         </Button>
         <Drawer
-          width="1200px"
+          width="1300px"
           title={
             <div className="flex items-start flex-col">
               <Text type="secondary" className="font-light text-[12px]">

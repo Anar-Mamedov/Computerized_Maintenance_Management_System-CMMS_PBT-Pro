@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { Button, Drawer, Space, ConfigProvider, Modal, Spin, message, Typography } from "antd";
+import { Button, Drawer, Space, ConfigProvider, Modal, Spin, message, Typography, Tag } from "antd";
+import { QrcodeOutlined } from "@ant-design/icons";
 import tr_TR from "antd/es/locale/tr_TR";
 import AxiosInstance from "../../../api/http";
 import MainTabs from "./components/MainTabs/MainTabs";
@@ -8,6 +9,7 @@ import Tabs from "./components/Tabs/Tabs";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { t } from "i18next";
+import QRCodeGenerator from "../../../utils/components/QRCodeGenerator";
 
 const { Text } = Typography;
 
@@ -16,6 +18,7 @@ dayjs.extend(customParseFormat);
 export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(drawerVisible);
+  const [qrModalOpen, setQrModalOpen] = useState(false);
 
   const methods = useForm({
     defaultValues: {
@@ -577,13 +580,29 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       <ConfigProvider locale={tr_TR}>
         <Drawer
           destroyOnClose
-          width="1200px"
+          width="1350px"
           title={
-            <div className="flex items-start flex-col">
+            <div className="flex items-start flex-col gap-1">
               <Text type="secondary" className="font-light text-[12px]">
                 PBT PRO / {t("ekipmanSicilKarti")}
               </Text>
-              <Text>{watch("makineKodu")}</Text>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Text className="font-semibold">{watch("makineKodu")}</Text>
+                {watch("makineTanimi") && (
+                  <>
+                    <Text type="secondary">-</Text>
+                    <Text>{watch("makineTanimi")}</Text>
+                  </>
+                )}
+                <Tag color={watch("makineAktif") ? "green" : "red"}>
+                  {watch("makineAktif") ? "Aktif" : "Pasif"}
+                </Tag>
+                {watch("makineKalibrasyon") && <Tag color="blue">Kalibrasyon</Tag>}
+                {watch("kritikMakine") && <Tag color="red">Kritik Ekipman</Tag>}
+                {watch("makineGucKaynagi") && <Tag color="orange">Güç Kaynağı</Tag>}
+                {watch("makineIsBildirimi") && <Tag color="cyan">İş Bildirimi</Tag>}
+                {watch("makineOtonomBakim") && <Tag color="purple">Otonom Bakım</Tag>}
+              </div>
             </div>
           }
           placement="right"
@@ -592,6 +611,9 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           rootClassName="[&_.ant-drawer-content]:bg-[#f5f5f5] [&_.ant-drawer-body]:bg-[#f5f5f5] [&_.ant-drawer-header]:bg-white"
           extra={
             <Space>
+              <Button icon={<QrcodeOutlined />} onClick={() => setQrModalOpen(true)}>
+                QR Kod
+              </Button>
               <Button onClick={onClose}>İptal</Button>
               <Button type="submit" onClick={methods.handleSubmit(onSubmit)} style={{ backgroundColor: "#2bc770", borderColor: "#2bc770", color: "#ffffff" }}>
                 Güncelle
@@ -610,6 +632,14 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             </form>
           )}
         </Drawer>
+
+        <QRCodeGenerator
+          visible={qrModalOpen}
+          onClose={() => setQrModalOpen(false)}
+          value={`TB_MAKINE_ID: ${watch("secilenMakineID")}`}
+          fileName={`QR-${watch("makineKodu")}`}
+          title="Ekipman QR Kodu"
+        />
       </ConfigProvider>
     </FormProvider>
   );
