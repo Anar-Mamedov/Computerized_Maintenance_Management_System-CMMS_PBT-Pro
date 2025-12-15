@@ -31,7 +31,7 @@ export function FinansalBilgiler(props) {
             alignItems: "flex-start",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
             width: "100%",
-            maxWidth: "632px",
+            maxWidth: "667px",
           }}
         >
           <div style={{ paddingBottom: "10px", display: "inline-flex", flexDirection: "column", alignItems: "flex-start" }}>
@@ -39,28 +39,28 @@ export function FinansalBilgiler(props) {
             <Text type="secondary">{t("satinalinanFirmaVeFaturaBilgileri")}</Text>
           </div>
           <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", gap: "10px" }}>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "calc(50% - 5px)" }}>
               <Text type="secondary">{t("firma")}</Text>
               <FirmaTablo firmaFieldName="satinalmaFirma" firmaIdFieldName="satinalmaFirmaID" />
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "calc(50% - 5px)" }}>
               <Text type="secondary">{t("faturaNo")}</Text>
               <TextInput name="faturaNo" required={false} />
             </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "calc(50% - 5px)" }}>
               <Text type="secondary">{t("satinalmaTarihi")}</Text>
               <FullDatePicker name1="satinalmaTarihi" isRequired={false} />
             </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "calc(50% - 5px)" }}>
               <Text type="secondary">{t("faturaTarihi")}</Text>
               <FullDatePicker name1="faturaTarihi" isRequired={false} />
             </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "calc(50% - 5px)" }}>
               <Text type="secondary">{t("satinalmaFiyati")}</Text>
               <NumberInput name1="satinalmaFiyati" required={false} minNumber={0} />
             </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "calc(50% - 5px)" }}>
               <Text type="secondary">{t("faturaTutari")}</Text>
               <NumberInput name1="faturaTutari" required={false} minNumber={0} />
             </div>
@@ -77,7 +77,7 @@ export function FinansalBilgiler(props) {
             alignItems: "flex-start",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
             width: "100%",
-            maxWidth: "632px",
+            maxWidth: "667px",
           }}
         >
           <div style={{ paddingBottom: "10px", display: "inline-flex", flexDirection: "column", alignItems: "flex-start" }}>
@@ -85,19 +85,19 @@ export function FinansalBilgiler(props) {
             <Text type="secondary">{t("krediMiktariBaslamaVeBitisTarihiBilgileri")}</Text>
           </div>
           <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", gap: "10px" }}>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "calc(50% - 5px)" }}>
               <Text type="secondary">{t("krediMiktari")}</Text>
               <NumberInput name1="krediMiktari" required={false} minNumber={0} />
             </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "calc(50% - 5px)" }}>
               <Text type="secondary">{t("baslamaTarihi")}</Text>
               <FullDatePicker name1="krediBaslamaTarihi" isRequired={false} />
             </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "calc(50% - 5px)" }}>
               <Text type="secondary">{t("krediOrani(%Ay)")}</Text>
               <NumberInput name1="krediOrani" required={false} minNumber={0} />
             </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "calc(50% - 5px)" }}>
               <Text type="secondary">{t("bitisTarihi")}</Text>
               <FullDatePicker name1="krediBitisTarihi" isRequired={false} />
             </div>
