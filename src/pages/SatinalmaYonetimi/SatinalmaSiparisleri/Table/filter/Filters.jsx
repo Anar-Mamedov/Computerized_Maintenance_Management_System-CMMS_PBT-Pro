@@ -1,25 +1,25 @@
 import React from "react";
 import ConditionFilter from "./ConditionFilter";
-import LocationFilter from "./LocationFilter";
-import TypeFilter from "./TypeFilter";
 import CustomFilter from "./custom-filter/CustomFilter";
 import ZamanAraligi from "./ZamanAraligi";
 
 export default function Filters({ onChange, kelime }) {
   const [filters, setFilters] = React.useState({
-    durumId: [], // Başlangıç değeri boş array
+    durumId: [],
     baslangicTarihi: null,
     bitisTarihi: null,
     kelime: kelime || "",
+    FirmaID: 0,
+    MalzemeID: 0
   });
 
   React.useEffect(() => {
       onChange("filters", filters);
-    }, [filters, onChange]);
+  }, [filters, onChange]);
   
-    React.useEffect(() => {
+  React.useEffect(() => {
       setFilters((prev) => ({ ...prev, kelime: kelime }));
-    }, [kelime]);
+  }, [kelime]);
 
   return (
     <>
@@ -27,7 +27,7 @@ export default function Filters({ onChange, kelime }) {
         onSubmit={(newFilters) =>
           setFilters((state) => ({
             ...state,
-            ...newFilters, // durumId artık bir array olarak gelecek: [1, 2] gibi
+            ...newFilters,
           }))
         }
       />
@@ -36,18 +36,33 @@ export default function Filters({ onChange, kelime }) {
         onSubmit={(dateRange) =>
           setFilters((state) => ({
             ...state,
-            ...dateRange, // baslangicTarihi, bitisTarihi
+            ...dateRange,
           }))
         }
       />
 
       <CustomFilter
-        onSubmit={(newFilters) =>
-          setFilters((state) => ({
-            ...state,
-            ...newFilters, // kelime vb.
-          }))
-        }
+        onSubmit={(filterData) => {
+
+          setFilters((state) => {
+            const newState = { ...state };
+
+            if (!filterData || filterData === "") {
+               newState.FirmaID = 0;
+               newState.MalzemeID = 0;
+               return newState;
+            }
+
+            newState.FirmaID = filterData.Firma || 0;
+
+            newState.MalzemeID = filterData.Malzeme || 0;
+
+            if(filterData.baslangicTarihi) newState.baslangicTarihi = filterData.baslangicTarihi;
+            if(filterData.bitisTarihi) newState.bitisTarihi = filterData.bitisTarihi;
+
+            return newState;
+          });
+        }}
       />
     </>
   );

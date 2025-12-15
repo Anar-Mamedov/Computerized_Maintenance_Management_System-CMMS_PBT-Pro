@@ -52,6 +52,7 @@ const Breadcrumbs = () => {
     "/malzemeTransferOnayIslemleri": "Malzeme Transfer Onay İşlemleri",
     "/malzemeTalepleri": "Malzeme Talepleri",
     "/satinalmaSiparisleri": "Satınalma Siparişleri",
+    "/fiyatTeklifleri": "Fiyat Teklifleri",
     "/tedarikciFirmalar": "Tedarikçi Firmalar",
     "/satinalmaDashboard": "Satınalma Yönetici Paneli",
     "/isEmriAnalizi": "İş Emirleri Kontrol Ekranı",

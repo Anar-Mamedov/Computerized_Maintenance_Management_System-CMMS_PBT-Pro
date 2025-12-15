@@ -62,6 +62,7 @@ import MalzemeTanimlari from "./pages/Malzeme&DepoYonetimi/MalzemeTanimlari/Malz
 import MalzemeDepolari from "./pages/Malzeme&DepoYonetimi/MalzemeDepolari/MalzemeDepolari.jsx";
 import MalzemeTalepleri from "./pages/SatinalmaYonetimi/MalzemeTalepleri/MalzemeTalepleri.jsx";
 import SatinalmaSiparisleri from "./pages/SatinalmaYonetimi/SatinalmaSiparisleri/SatinalmaSiparisleri.jsx";
+import FiyatTeklfileri from "./pages/SatinalmaYonetimi/FiyatTeklifleri/FiyatTeklifleri.jsx";
 import DetarikciFirmalar from "./pages/SatinalmaYonetimi/FirmaTanimlari/FirmaTanimlari.jsx";
 import SatinalmaDashboard from "./pages/SatinalmaYonetimi/SatinalmaDashboard/SatinalmaDashboard.jsx";
 import AxiosInstance from "./api/http";
@@ -220,6 +221,7 @@ const rawItems = [
       ...(isOmegaMenu ? [] : [getItem("Satınalma Yönetici Paneli", "satinalmaDashboard", true)]),
       getItem("Malzeme Talepleri", "malzemeTalepleri", true),
       getItem("Satınalma Siparişleri", "satinalmaSiparisleri", true),
+      getItem("Fiyat Teklifleri", "fiyatTeklifleri", true),
       getItem("Tedarikçi Firmalar", "tedarikciFirmalar", true),
 
       // getItem("Team 2", "team2", true)
@@ -418,6 +420,7 @@ export default function App() {
           <Route path="/malzemeTransferOnayIslemleri" element={<Hazirlaniyor />} />
           <Route path="/malzemeTalepleri" element={<MalzemeTalepleri />} />
           <Route path="/satinalmaSiparisleri" element={<SatinalmaSiparisleri />} />
+          <Route path="/fiyatTeklifleri" element={<FiyatTeklfileri />} />
           <Route path="/tedarikciFirmalar" element={<DetarikciFirmalar />} />
           <Route path="/satinalmaDashboard" element={<SatinalmaDashboard />} />
           {/*<Route path="/kurallar" element={<Kurallar />} />*/}
