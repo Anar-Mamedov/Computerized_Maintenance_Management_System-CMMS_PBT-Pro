@@ -7,7 +7,7 @@ const { Text } = Typography;
 
 const containerClasses = "flex flex-wrap gap-[10px] mb-[10px] box-border";
 const cardBaseClasses = "bg-white p-[10px] border border-[#80808068] rounded-[5px] flex flex-col items-start shadow-[0_2px_8px_rgba(0,0,0,0.08)] w-full box-border min-w-0";
-const noteCardClasses = "lg:w-auto lg:flex-[1] lg:min-w-[340px] lg:max-w-[565px]";
+const noteCardClasses = "lg:flex-[1_1_calc((100%-10px)/2)] lg:min-w-[360px] lg:max-w-[720px]";
 
 function Notlar() {
   return (
