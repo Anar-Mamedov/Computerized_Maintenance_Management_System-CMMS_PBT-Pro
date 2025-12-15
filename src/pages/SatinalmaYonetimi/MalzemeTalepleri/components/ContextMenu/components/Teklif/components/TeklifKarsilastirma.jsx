@@ -21,7 +21,6 @@ const SimpleKodSelectbox = ({ kodID, value, onChange, disabled, style, placehold
   const [name, setName] = useState("");
   const inputRef = useRef(null);
 
-  // 1. DEĞİŞİKLİK: fetchData artık veriyi return ediyor
   const fetchData = async (force = false) => {
     if (!force && options.length > 0) return options;
     
@@ -30,7 +29,7 @@ const SimpleKodSelectbox = ({ kodID, value, onChange, disabled, style, placehold
       const response = await AxiosInstance.get(`KodList?grup=${kodID}`);
       if (response) {
         setOptions(response);
-        return response; // Veriyi döndür ki aşağıda kullanabilelim
+        return response; 
       }
       return [];
     } catch (error) {
@@ -49,7 +48,7 @@ const SimpleKodSelectbox = ({ kodID, value, onChange, disabled, style, placehold
 
   const addItem = (e) => {
     e.preventDefault();
-    const textToAdd = name.trim(); // Eklenen ismi değişkene alalım
+    const textToAdd = name.trim(); 
 
     if (textToAdd !== "") {
       if (options.some((option) => option.KOD_TANIM === textToAdd)) {
@@ -59,20 +58,12 @@ const SimpleKodSelectbox = ({ kodID, value, onChange, disabled, style, placehold
 
       setLoading(true);
       
-      // Post işlemi
       AxiosInstance.post(`AddKodList?entity=${textToAdd}&grup=${kodID}`)
         .then(async (response) => {
-            // API Hata vermediyse başarılı kabul ediyoruz
             message.success("Eklendi ve Seçildi.");
-            setName(""); // Inputu temizle
-
-            // 2. LİSTEYİ YENİLE VE YENİ LİSTEYİ AL
+            setName(""); 
             const guncelListe = await fetchData(true);
-
-            // 3. YENİ LİSTEDE AZ ÖNCE EKLEDİĞİMİZ İSMİ BUL
             const eklenenKayit = guncelListe.find(item => item.KOD_TANIM === textToAdd);
-
-            // 4. BULDUYSAK SEÇİLİ YAP
             if (eklenenKayit && onChange) {
                 onChange(eklenenKayit.TB_KOD_ID);
             }
@@ -128,7 +119,7 @@ const SimpleKodSelectbox = ({ kodID, value, onChange, disabled, style, placehold
 };
 
 // -----------------------------------------------------------------------
-
+// `teklifDurumlari` propunu artık kullanmıyoruz ama uyumluluk için parametrede bıraktım.
 const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disabled = false, onDurumGuncelle }) => {
   const [loading, setLoading] = useState(false);
   const [paketler, setPaketler] = useState([]);
@@ -141,7 +132,11 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   
   const aktifPaketIndex = Number(activeTab) - 1;
   const aktifPaket = paketler[aktifPaketIndex] || {};
-  const aktifPaketDurumID = teklifDurumlari?.find(d => d.teklifId === aktifPaket.id)?.durumID || null;
+  
+  // --- DEĞİŞİKLİK 1: Durumu artık paketin içinden okuyoruz ---
+  const aktifPaketDurumID = aktifPaket?.teklifBaslik?.teklifDurum ?? null;
+  // ----------------------------------------------------------
+
   const isDisabled = !(aktifPaketDurumID === 1 || aktifPaketDurumID === 4);
   const [siparislerimOpen, setSiparislerimOpen] = useState(false);
   const isSiparis = aktifPaketDurumID === 5;
@@ -156,6 +151,8 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   const [isSiparisModalOpen, setIsSiparisModalOpen] = useState(false);
   
   const [detayGosterilenPaket, setDetayGosterilenPaket] = useState(null);
+
+  const lastFetchedIds = useRef("");
   
   const DURUM_STYLES = {
     1: { text: "TEKLİFLER TOPLANIYOR", backgroundColor: "#e1f7d5", color: "#3c763d" },
@@ -178,29 +175,9 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   const componentStyle = { width: "90%" }; 
 
   useEffect(() => {
-    if (paketler.length === 0) return;
-    setPaketRenkleri(prev => {
-      const guncelRenkler = { ...prev };
-      paketler.forEach((paket, paketIndex) => {
-        if (!guncelRenkler[paketIndex]) {
-          guncelRenkler[paketIndex] = {};
-        }
-        (paket.firmaTotaller || []).forEach(firma => {
-          if (!guncelRenkler[paketIndex][firma.firmaId]) {
-            const min = 205; const max = 230;
-            const r = Math.floor(Math.random() * (max - min) + min);
-            const g = Math.floor(Math.random() * (max - min) + min);
-            const b = Math.floor(Math.random() * (max - min) + min);
-            guncelRenkler[paketIndex][firma.firmaId] = `rgb(${r}, ${g}, ${b})`;
-          }
-        });
-      });
-      return guncelRenkler;
-    });
-  }, [paketler]);
-
-  useEffect(() => {
-    if (teklifIds.length > 0) {
+    const currentIdsString = JSON.stringify(teklifIds);
+    if (teklifIds.length > 0 && lastFetchedIds.current !== currentIdsString) {
+      lastFetchedIds.current = currentIdsString;
       fetchAllTeklifler(teklifIds);
     }
   }, [teklifIds]);
@@ -219,68 +196,115 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   }, []);
 
   const fetchAllTeklifler = async (ids) => {
-    try {
-      setLoading(true);
-      if (!Array.isArray(ids)) ids = [ids];
-      const results = await Promise.all(
-        ids.map(async (id) => {
-          const res = await AxiosInstance.get(`/GetTeklifKarsilastirmaDetay?TeklifId=${id}`);
-          const data = res.data || {};
+  try {
+    setLoading(true);
+    if (!Array.isArray(ids)) ids = [ids];
+    
+    // 1. VERİLERİ ÇEK
+    const results = await Promise.all(
+      ids.map(async (id) => {
+        const res = await AxiosInstance.get(`/GetTeklifKarsilastirmaDetay?TeklifId=${id}`);
+        const backendData = res.data || {};
+        const data = backendData.data || backendData;
 
-          if (data.malzemeler) {
-            data.malzemeler = data.malzemeler.map((m) => ({
-              ...m,
-              firmalar: (m.firmalar || []).map((f) => ({
-                ...f,
-                miktar: Number(f.miktar ?? 0),
-                fiyat: Number(f.fiyat ?? 0),
-                tutar: Number(f.tutar ?? (Number(f.miktar ?? 0) * Number(f.fiyat ?? 0))),
-                secili: f.secili === true || f.secili === 1,
-              })),
-            }));
-          }
+        if (data.malzemeler) {
+          data.malzemeler = data.malzemeler.map((m) => ({
+            ...m,
+            firmalar: (m.firmalar || []).map((f) => ({
+              ...f,
+              miktar: Number(f.miktar ?? 0),
+              fiyat: Number(f.fiyat ?? 0),
+              tutar: Number(f.tutar ?? (Number(f.miktar ?? 0) * Number(f.fiyat ?? 0))),
+              secili: f.secili === true || f.secili === 1,
+            })),
+          }));
+        }
 
-          if (data.firmaTotaller) {
-            const detaylar = data.teklifDetaylar || [];
-            data.firmaTotaller = data.firmaTotaller.map(firma => {
-              const detay = detaylar.find(d => Number(d.TFD_CARI_ID) === Number(firma.firmaId));
-              const checkDate = (dateVal) => {
-                if (!dateVal || dateVal.startsWith("1900-01-01") || dateVal.startsWith("0001-01-01")) return null;
-                return dateVal;
-              };
+        if (data.firmaTotaller) {
+          const detaylar = data.teklifDetaylar || [];
+          data.firmaTotaller = data.firmaTotaller.map(firma => {
+            const detay = detaylar.find(d => Number(d.TFD_CARI_ID) === Number(firma.firmaId));
+            const checkDate = (dateVal) => {
+              if (!dateVal || dateVal.startsWith("1900-01-01") || dateVal.startsWith("0001-01-01")) return null;
+              return dateVal;
+            };
 
-              return {
-                ...firma,
-                indirimOrani: firma.indirimOran || 0, 
-                kdvOrani: firma.kdvOran ?? 0, 
-                kdvDurum: firma.kdvDurum || "Hariç",
-                teklifTarihi: checkDate(detay?.TFD_TEKLIF_TARIH),
-                gecerlilikTarihi: checkDate(detay?.TFD_GECERLILIK_TARIH),
-                teslimTarihi: checkDate(detay?.TFD_TESLIM_TARIH),
-                teslimYeri: detay?.TFD_TESLIM_YERI || "",
-                sevkSekli: Number(detay?.TFD_SEVK_SEKLI_ID) || null, 
-                odemeBilgisi: Number(detay?.TFD_ODEME_SEKLI_ID) || null,
-                yetkili: detay?.TFD_YETKILI || "",
-                telefon: detay?.TFD_TELEFON || "",
-                aciklama: detay?.TFD_ACIKLAMA || "",
-                toplamKDVtutar: firma.toplamKDVtutar || 0, 
-                toplamIndirim: firma.toplamIndirim || 0,
-                genelToplam: firma.genelToplam || 0
-              };
+            return {
+              ...firma,
+              indirimOrani: firma.indirimOran || 0,
+              kdvOrani: firma.kdvOran ?? 0,
+              kdvDurum: firma.kdvDurum || "Hariç",
+              teklifTarihi: checkDate(detay?.TFD_TEKLIF_TARIH),
+              gecerlilikTarihi: checkDate(detay?.TFD_GECERLILIK_TARIH),
+              teslimTarihi: checkDate(detay?.TFD_TESLIM_TARIH),
+              teslimYeri: detay?.TFD_TESLIM_YERI || "",
+              sevkSekli: Number(detay?.TFD_SEVK_SEKLI_ID) || null,
+              odemeBilgisi: Number(detay?.TFD_ODEME_SEKLI_ID) || null,
+              yetkili: detay?.TFD_YETKILI || "",
+              telefon: detay?.TFD_TELEFON || "",
+              aciklama: detay?.TFD_ACIKLAMA || "",
+              toplamKDVtutar: firma.toplamKDVtutar || 0,
+              toplamIndirim: firma.toplamIndirim || 0,
+              genelToplam: firma.genelToplam || 0
+            };
+          });
+          data.firmaTotaller = computeFirmaTotals(data.malzemeler, data.firmaTotaller);
+        }
+        return { id, ...(data || {}) };
+      })
+    );
+
+    // 2. RENKLERİ HESAPLA (State yerine burada hesaplıyoruz)
+    // Mevcut renkleri koruyup yenilerini ekleyeceğiz
+    let guncelRenkler = { ...paketRenkleri }; 
+    results.forEach((paket, paketIndex) => {
+      if (!guncelRenkler[paketIndex]) {
+        guncelRenkler[paketIndex] = {};
+      }
+      (paket.firmaTotaller || []).forEach(firma => {
+        if (!guncelRenkler[paketIndex][firma.firmaId]) {
+          const min = 205; const max = 230;
+          const r = Math.floor(Math.random() * (max - min) + min);
+          const g = Math.floor(Math.random() * (max - min) + min);
+          const b = Math.floor(Math.random() * (max - min) + min);
+          guncelRenkler[paketIndex][firma.firmaId] = `rgb(${r}, ${g}, ${b})`;
+        }
+      });
+    });
+
+    // 3. SEÇİLİ FİRMAYI HESAPLA
+    // Aktif tab'a göre paket seçimi
+    const currentPaketIndex = Number(activeTab) - 1;
+    const currentPaket = results[currentPaketIndex];
+    let fullSeciliFirmaId = null;
+
+    if (currentPaket && currentPaket.malzemeler && currentPaket.firmaTotaller) {
+        for (const firma of currentPaket.firmaTotaller) {
+            const isAllSelected = currentPaket.malzemeler.every((malzeme) => {
+                const firmaDetay = malzeme.firmalar.find((f) => f.firmaId === firma.firmaId);
+                return firmaDetay && (firmaDetay.secili === true || firmaDetay.secili === 1);
             });
-            data.firmaTotaller = computeFirmaTotals(data.malzemeler, data.firmaTotaller);
-          }
-          return { id, ...(data || {}) };
-        })
-      );
-      setPaketler(results);
-    } catch (err) {
-      console.error("Teklif detay hatası:", err);
-      message.error("Teklif detayları alınırken hata oluştu.");
-    } finally {
-      setLoading(false);
+            if (isAllSelected) {
+                fullSeciliFirmaId = firma.firmaId;
+                break;
+            }
+        }
     }
-  };
+
+    // 4. HEPSİNİ TEK SEFERDE GÜNCELLE (Batch Update)
+    setPaketRenkleri(guncelRenkler);
+    if (fullSeciliFirmaId !== null) {
+        setSelectedFirmaId(fullSeciliFirmaId);
+    }
+    setPaketler(results);
+
+  } catch (err) {
+    console.error("Teklif detay hatası:", err);
+    message.error("Teklif detayları alınırken hata oluştu.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {
@@ -462,31 +486,6 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
     );
   };
 
-  useEffect(() => {
-    if (!paketler || paketler.length === 0) return;
-
-    const currentPaketIndex = Number(activeTab) - 1;
-    const paket = paketler[currentPaketIndex];
-
-    if (!paket || !paket.malzemeler || !paket.firmaTotaller) return;
-
-    let fullSeciliFirmaId = null;
-    for (const firma of paket.firmaTotaller) {
-      const isAllSelected = paket.malzemeler.every((malzeme) => {
-        const firmaDetay = malzeme.firmalar.find((f) => f.firmaId === firma.firmaId);
-        return firmaDetay && (firmaDetay.secili === true || firmaDetay.secili === 1);
-      });
-
-      if (isAllSelected) {
-        fullSeciliFirmaId = firma.firmaId;
-        break;
-      }
-    }
-    if (selectedFirmaId !== fullSeciliFirmaId) {
-      setSelectedFirmaId(fullSeciliFirmaId);
-    }
-  }, [paketler, activeTab, selectedFirmaId]);
-
   const onOnayaGonder = async (paketId) => {
     const paket = paketler.find(p => p.teklifId === paketId || p.id === paketId || p.teklifBaslik?.teklifId === paketId);
     if (!paket) { message.error("Paket bulunamadı!"); return; }
@@ -500,6 +499,9 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
       if (response.data?.status_code === 200 || response.status === 200 || response.status_code === 201) {
         message.success("Teklif onaya gönderildi.");
         if (typeof onDurumGuncelle === "function") onDurumGuncelle({ teklifId: paketId, durumID: 2 });
+        // Durumu güncellemek için verileri tekrar çekebiliriz veya state'i manuel güncelleyebiliriz
+        const allIds = paketler.map(p => p.id || p.teklifBaslik?.teklifId);
+        fetchAllTeklifler(allIds);
       } else if (response.status === 401) message.error("Yetkiniz yok.");
       else message.error("İşlem Başarısız.");
     } catch (error) { console.error(error); message.error("Hata oluştu."); }
@@ -509,9 +511,10 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
     if (!paketler[paketIndex]) return;
     const paket = paketler[paketIndex];
 
-    // --- GÜVENLİK: KAYIT ÖNCESİ DURUM KONTROLÜ ---
-    // Eğer paket kilitli bir durumdaysa (Onaylandı, Sipariş vb.) API'ye istek atma
-    const currentDurumID = teklifDurumlari?.find(d => d.teklifId === paket.id)?.durumID || null;
+    // --- DEĞİŞİKLİK 3: Kayıt öncesi durum kontrolü ---
+    const currentDurumID = paket.teklifBaslik?.teklifDurum ?? null;
+    // ------------------------------------------------
+
     const isEditable = (currentDurumID === 1 || currentDurumID === 4);
 
     if (!isEditable) {
@@ -677,12 +680,19 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
       title={
         <span>
           Satınalma Teklif Kıyaslama -{" "}
-        <a 
-          onClick={() => setTalepModalOpen(true)} 
-          style={{ color: "#1890ff", textDecoration: "underline", cursor: "pointer" }}
-        >
-          {fisNo || ""}
-        </a>
+          <a 
+            onClick={() => setTalepModalOpen(true)} 
+            style={{ color: "#1890ff", textDecoration: "underline", cursor: "pointer" }}
+          >
+            {fisNo || ""}
+          </a>
+          
+          {aktifPaket?.teklifBaslik?.TalepLokasyon && (
+             <span style={{ fontWeight: 'normal', color: '#595959' }}>
+                {" "} - {aktifPaket.teklifBaslik.TalepLokasyon}
+             </span>
+          )}
+
         </span>
       }
       extra={
@@ -709,7 +719,6 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
             icon={<SaveOutlined />}
             style={{ backgroundColor: "#52c41a", borderColor: "#52c41a", color: "#fff" }}
             onClick={() => upsertTeklifKarsilastirma(aktifPaketIndex)}
-            disabled={disabled || isDisabled || saving}
             loading={saving}
           >
             Teklifi Kaydet
@@ -756,7 +765,12 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
         {paketler.map((paket, paketIndex) => {
           const malzemeler = paket.malzemeler || [];
           const firmalar = paket.firmaTotaller || [];
-          const durumID = teklifDurumlari?.find(d => d.teklifId === paket.id)?.durumID || null;
+
+          // --- DEĞİŞİKLİK 4: Tab başlığında durumu paketten oku ---
+          const durumID = paket.teklifBaslik?.teklifDurum ?? null;
+          // API'den gelen durum açıklamasını kullan, yoksa hardcoded listeye bak
+          const durumAciklama = paket.teklifBaslik?.STI_DURUM_ACIKLAMA || DURUM_STYLES[durumID]?.text || "";
+          // --------------------------------------------------------
 
           const isFirmaFullSelected = (firmaId) => {
             if (malzemeler.length === 0) return false;
@@ -821,7 +835,6 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
                   value={val}
                   style={{ width: "100%" }}
                   onChange={(v) => handleSecimChange(paketIndex, record.malzemeId, firma.firmaId, v)}
-                  disabled={isDisabled && !f?.secili}
                 >
                   <Option value="true"><span style={{ color: "green", fontWeight: "bold" }}>✓</span></Option>
                   <Option value="false"><span style={{ color: "red", fontWeight: "bold" }}>X</span></Option>
@@ -954,7 +967,7 @@ const dataSource = malzemeler.map((m) => ({ key: m.malzemeId, ...m }));
             <TabPane
               tab={
                 <div style={{ backgroundColor: DURUM_STYLES[durumID]?.backgroundColor || "#f0f0f0", color: DURUM_STYLES[durumID]?.color || "#000", padding: "4px 12px", borderRadius: 6, fontWeight: "bold" }}>
-                   {paket.teklifBaslik?.baslik || `Teklif ${paketIndex + 1}`} ({DURUM_STYLES[durumID]?.text || ""})
+                   {paket.teklifBaslik?.baslik || `Teklif ${paketIndex + 1}`} ({durumAciklama})
                 </div>
               }
               key={`${paketIndex + 1}`}
@@ -1008,8 +1021,8 @@ const dataSource = malzemeler.map((m) => ({ key: m.malzemeId, ...m }));
             {firmalar.map((firma, i) => (
                 <React.Fragment key={firma.firmaId}>
                     <Table.Summary.Cell colSpan={5} align="right" style={{ backgroundColor: paketRenkleri[paketIndex]?.[firma.firmaId] }}>
-                       {/* ...senin kdv içeriğin... */}
-                       <Space>
+                        {/* ...senin kdv içeriğin... */}
+                        <Space>
                           {/* ...Radio, InputNumber, Text kodların aynen kalacak... */}
                           <Radio.Group 
                               size="small" 
@@ -1029,7 +1042,7 @@ const dataSource = malzemeler.map((m) => ({ key: m.malzemeId, ...m }));
                               style={{ width: 60 }}
                           />
                           <Text>{Number(firma.kdvTutar).toLocaleString('tr-TR', {minimumFractionDigits: 2})}</Text>
-                       </Space>
+                        </Space>
                     </Table.Summary.Cell>
                     {/* YATAY BOŞLUK HÜCRESİ */}
                     {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
@@ -1063,7 +1076,6 @@ const dataSource = malzemeler.map((m) => ({ key: m.malzemeId, ...m }));
               <Input.TextArea
                 value={f.aciklama}
                 onChange={(e) => handleFirmaDetailChange(paketIndex, f.firmaId, 'aciklama', e.target.value)}
-                disabled={isDisabled}
                 autoSize={{ minRows: 1, maxRows: 3 }}
                 style={componentStyle}
               />

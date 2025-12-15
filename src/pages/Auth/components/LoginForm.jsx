@@ -138,6 +138,7 @@ export default function LoginForm() {
           malzemeTransferOnayIslemleri: response.KLL_WEB_MALTRANSONAY,
           malzemeTalepleri: true,
           satinalmaSiparisleri: true,
+          fiyatTeklifleri: true,
           tedarikciFirmalar: true,
           satinalmaDashboard: true,
           isEmriAnalizi: response.KLL_WEB_ISEMRI,
