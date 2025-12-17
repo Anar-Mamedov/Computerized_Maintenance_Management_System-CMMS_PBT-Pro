@@ -6,8 +6,6 @@ import FreeTextInput from "../../../../../../utils/components/FreeTextInput";
 import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
 import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
 import AtolyeTablo from "../../../../../../utils/components/AtolyeTablo";
-import MarkaEkleSelect from "../../../../../../utils/components/MarkaEkleSelect";
-import ModelEkleSelect from "../../../../../../utils/components/ModelEkleSelect";
 import SinifiTablo from "../../../../../../utils/components/SinifiTablo";
 import dayjs from "dayjs";
 
@@ -455,7 +453,7 @@ export default function MainTabs({ modalOpen }) {
               flexDirection: "column",
             }}
           >
-            <MarkaEkleSelect />
+            <KodIDSelectbox name1="marka" isRequired={false} kodID="13002" />
           </div>
         </div>
 
@@ -482,7 +480,7 @@ export default function MainTabs({ modalOpen }) {
               flexDirection: "column",
             }}
           >
-            <ModelEkleSelect />
+            <KodIDSelectbox name1="model" isRequired={false} kodID="13003" />
           </div>
         </div>
 

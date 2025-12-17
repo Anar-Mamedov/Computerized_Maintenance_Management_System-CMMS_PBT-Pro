@@ -13,7 +13,10 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
     const successStatuses = new Set([200, 201, 202]);
     try {
       const results = await Promise.allSettled(
-        rows.map((row) => AxiosInstance.get(`VehicleServices/DeleteVehicleService?sId=${row.key}&vId=${row.aracId}&pId=${row.bakimId}`)),
+        rows.map((row) => {
+          const stokId = row.TB_STOK_ID || row.key;
+          return AxiosInstance.get(`DeleteStok?StokID=${stokId}`);
+        })
       );
 
       const successes = results.filter((result) => result.status === "fulfilled" && successStatuses.has(result.value?.data?.statusCode)).length;

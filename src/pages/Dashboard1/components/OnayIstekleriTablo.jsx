@@ -13,6 +13,8 @@ import { MdCancel } from "react-icons/md";
 import { CSVLink } from "react-csv";
 import EditDrawer1 from "../../YardimMasasi/IsTalepleri/Update/EditDrawer.jsx";
 import EditDrawer from "../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer.jsx";
+import EditDrawer2 from "../../SatinalmaYonetimi/MalzemeTalepleri/Update/EditDrawer.jsx";
+import TeklifKarsilastirma from "../../SatinalmaYonetimi/MalzemeTalepleri/components/ContextMenu/components/Teklif/components/TeklifKarsilastirma.jsx";
 import TextArea from "antd/es/input/TextArea";
 
 const { Text } = Typography;
@@ -24,6 +26,10 @@ function LokasyonBazindaIsTalepleri(props) {
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
   const [editDrawerVisible, setEditDrawerVisible] = useState(false);
   const [editDrawerData, setEditDrawerData] = useState(null);
+  const [editDrawer2Visible, setEditDrawer2Visible] = useState(false);
+  const [editDrawer2Data, setEditDrawer2Data] = useState(null);
+  const [teklifModalVisible, setTeklifModalVisible] = useState(false);
+  const [teklifModalData, setTeklifModalData] = useState(null);
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const [isReddetModal, setIsReddetModal] = useState(false);
@@ -86,12 +92,18 @@ function LokasyonBazindaIsTalepleri(props) {
           const updatedRecord = { ...record, key: record.ONAY_TABLO_ID };
           // const updatedRecord = { ...record, key: 378 };
 
-          if (record.ONAY_ONYTANIM_ID === 2) {
-            setEditDrawer1Data(updatedRecord);
-            setEditDrawer1Visible(true);
-          } else if (record.ONAY_ONYTANIM_ID === 1) {
+          if (record.ONAY_ONYTANIM_ID === 1) {
             setEditDrawerData(updatedRecord);
             setEditDrawerVisible(true);
+          } else if (record.ONAY_ONYTANIM_ID === 2) {
+            setEditDrawer1Data(updatedRecord);
+            setEditDrawer1Visible(true);
+          } else if (record.ONAY_ONYTANIM_ID === 3) {
+            setEditDrawer2Data(updatedRecord);
+            setEditDrawer2Visible(true);
+          } else if (record.ONAY_ONYTANIM_ID === 4) {
+            setTeklifModalData(updatedRecord);
+            setTeklifModalVisible(true);
           }
         },
       }),
@@ -270,7 +282,7 @@ function LokasyonBazindaIsTalepleri(props) {
                 onDrawerClose={() => setEditDrawerVisible(false)}
                 drawerVisible={editDrawerVisible}
                 onRefresh={() => {
-                  /* Veri yenileme işlemi */
+                  fetchData();
                 }}
               />
             )}
@@ -280,12 +292,49 @@ function LokasyonBazindaIsTalepleri(props) {
                 onDrawerClose={() => setEditDrawer1Visible(false)}
                 drawerVisible={editDrawer1Visible}
                 onRefresh={() => {
-                  /* Veri yenileme işlemi */
+                  fetchData();
+                }}
+              />
+            )}
+            {editDrawer2Visible && (
+              <EditDrawer2
+                selectedRow={editDrawer2Data}
+                onDrawerClose={() => setEditDrawer2Visible(false)}
+                drawerVisible={editDrawer2Visible}
+                onRefresh={() => {
+                  fetchData();
                 }}
               />
             )}
           </Spin>
         </div>
+
+        <Modal
+          title="Teklif Karşılaştırma"
+          open={teklifModalVisible}
+          onCancel={() => {
+            setTeklifModalVisible(false);
+            setTeklifModalData(null);
+            fetchData();
+          }}
+          footer={null}
+          width="95vw"
+          style={{ top: 20 }}
+          destroyOnClose
+        >
+          {teklifModalData && (
+            <TeklifKarsilastirma
+              teklifIds={[teklifModalData.key]}
+              teklifDurumlari={[{ teklifId: teklifModalData.key, durumID: 2 }]}
+              fisNo={teklifModalData.ONAY_TABLO_KOD}
+              fisId={teklifModalData.key}
+              disabled={false}
+              onDurumGuncelle={() => {
+                fetchData();
+              }}
+            />
+          )}
+        </Modal>
 
         <Modal title="Reddetme İşlemi" open={isReddetModal} onCancel={handleReddetCancle} onOk={methods.handleSubmit(onSubmited)}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>
