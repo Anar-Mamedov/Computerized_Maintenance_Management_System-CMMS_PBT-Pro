@@ -25,22 +25,87 @@ export default function DepoLokasyon({
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
+  const [treeData, setTreeData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
+  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
 
   const columns = [
     {
       title: "Lokasyon",
       key: "lokasyonBilgisi",
-      render: (text, record) => <div>{record.LOK_TANIM}</div>,
+      render: (text, record) => <div>{record.LKY_TANIM}</div>,
     },
   ];
+
+  // Tree yapısını oluştur
+  const formatDataForTree = (data) => {
+    let nodes = {};
+    let tree = [];
+
+    data.forEach((item) => {
+      nodes[item.TB_DEPO_LOKASYON_ID] = {
+        ...item,
+        key: item.TB_DEPO_LOKASYON_ID,
+        children: [],
+      };
+    });
+
+    data.forEach((item) => {
+      if (item.LKY_PARENT_ID && item.LKY_PARENT_ID !== 0 && nodes[item.LKY_PARENT_ID]) {
+        nodes[item.LKY_PARENT_ID].children.push(nodes[item.TB_DEPO_LOKASYON_ID]);
+      } else {
+        tree.push(nodes[item.TB_DEPO_LOKASYON_ID]);
+      }
+    });
+
+    Object.values(nodes).forEach((node) => {
+      if (node.children.length === 0) {
+        delete node.children;
+      }
+    });
+
+    return tree;
+  };
 
   // Arama işlevi için
   const toLowerTurkish = (str) => {
     return str.replace(/İ/g, "i").replace(/I/g, "ı").toLowerCase();
   };
+
+  // Tree'de arama
+  const filterTree = useCallback((nodeList, searchTerm, path = []) => {
+    let isMatchFound = false;
+    let expandedKeys = [];
+
+    const lowerSearchTerm = toLowerTurkish(searchTerm);
+
+    const filtered = nodeList
+      .map((node) => {
+        let nodeMatch = toLowerTurkish(node.LKY_TANIM || "").includes(lowerSearchTerm);
+        let childrenMatch = false;
+        let filteredChildren = [];
+
+        if (node.children) {
+          const result = filterTree(node.children, lowerSearchTerm, path.concat(node.key));
+          childrenMatch = result.isMatch;
+          filteredChildren = result.filtered;
+          expandedKeys = expandedKeys.concat(result.expandedKeys);
+        }
+
+        if (nodeMatch || childrenMatch) {
+          isMatchFound = true;
+          expandedKeys = expandedKeys.concat(path);
+          return { ...node, children: childrenMatch ? filteredChildren : node.children };
+        }
+
+        return null;
+      })
+      .filter((node) => node !== null);
+
+    return { filtered, isMatch: isMatchFound, expandedKeys };
+  }, []);
 
   useEffect(() => {
     const timerId = setTimeout(() => {
@@ -52,15 +117,14 @@ export default function DepoLokasyon({
 
   useEffect(() => {
     if (debouncedSearchTerm) {
-      const lowerSearchTerm = toLowerTurkish(debouncedSearchTerm);
-      const filtered = data.filter((item) =>
-        toLowerTurkish(item.LOK_TANIM || "").includes(lowerSearchTerm)
-      );
-      setFilteredData(filtered);
+      const result = filterTree(treeData, debouncedSearchTerm);
+      setFilteredData(result.filtered);
+      setExpandedRowKeys(result.expandedKeys);
     } else {
-      setFilteredData(data);
+      setFilteredData(treeData);
+      setExpandedRowKeys([]);
     }
-  }, [debouncedSearchTerm, data]);
+  }, [debouncedSearchTerm, treeData, filterTree]);
 
   const fetchData = () => {
     if (!depoId) {
@@ -74,10 +138,14 @@ export default function DepoLokasyon({
         const dataArray = Array.isArray(response) ? response : response.data || [];
         const formattedData = dataArray.map((item) => ({
           ...item,
-          key: item.TB_LOKASYON_ID || item.key,
+          key: item.TB_DEPO_LOKASYON_ID || item.key,
         }));
         setData(formattedData);
-        setFilteredData(formattedData);
+
+        // Tree yapısını oluştur
+        const tree = formatDataForTree(formattedData);
+        setTreeData(tree);
+        setFilteredData(tree);
         setLoading(false);
       })
       .catch((error) => {
@@ -104,7 +172,7 @@ export default function DepoLokasyon({
   const handleModalOk = () => {
     const selectedData = data.find((item) => item.key === selectedRowKeys[0]);
     if (selectedData) {
-      setValue(lokasyonFieldName, selectedData.LOK_TANIM);
+      setValue(lokasyonFieldName, selectedData.LKY_TUM_YOL || selectedData.LKY_TANIM);
       setValue(lokasyonIdFieldName, selectedData.key);
       onSubmit && onSubmit(selectedData);
     }
@@ -188,6 +256,16 @@ export default function DepoLokasyon({
           columns={columns}
           dataSource={filteredData}
           loading={loading}
+          expandable={{
+            expandedRowKeys,
+            onExpand: (expanded, record) => {
+              if (expanded) {
+                setExpandedRowKeys([...expandedRowKeys, record.key]);
+              } else {
+                setExpandedRowKeys(expandedRowKeys.filter((key) => key !== record.key));
+              }
+            },
+          }}
           scroll={{
             y: "calc(100vh - 400px)",
           }}
