@@ -11,7 +11,7 @@ import FifoTablo from "../../../../../../utils/components/FifoTablo";
 import MalzemeTalepTablo from "../../../../../../utils/components/MalzemeTalepTablo";
 import StokMıktarTablo from "../../../../../../utils/components/StokMıktarTablo";
 import DepoTablo from "../../../../../../utils/components/DepoTablo";
-import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
+import DepoLokasyon from "../../../../../../utils/components/DepoLokasyon";
 import { Controller, useFormContext } from "react-hook-form";
 import { t } from "i18next";
 
@@ -134,7 +134,7 @@ function GenelBilgiler({ selectedRowID }) {
             <div style={{ display: "flex", alignItems: "center", width: "100%", gap: "10px", justifyContent: "space-between" }}>
               <Text>{t("depoLokasyonu")}</Text>
               <div style={{ width: "350px" }}>
-                <LokasyonTablo lokasyonFieldName="stkDepoLokasyon" lokasyonIdFieldName="stkDepoLokasyonID" isRequired={false} />
+                <DepoLokasyon depoId={watch("stkDepoID")} lokasyonFieldName="stkDepoLokasyon" lokasyonIdFieldName="stkDepoLokasyonID" isRequired={false} disabled={!watch("stkDepoID")} />
               </div>
             </div>
           </div>
