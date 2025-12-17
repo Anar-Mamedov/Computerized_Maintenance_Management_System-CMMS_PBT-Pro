@@ -1,9 +1,10 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Button, Popover, Typography } from "antd";
-import { ApartmentOutlined, DeleteOutlined, MoreOutlined, SwapOutlined } from "@ant-design/icons";
+import { ApartmentOutlined, DeleteOutlined, MoreOutlined, SwapOutlined, ToolOutlined } from "@ant-design/icons";
 import Sil from "./components/Sil";
 import DepoDurumModal from "../../../../../utils/components/DepoDurumModal";
 import MalzemeHareketleriModal from "../../../../../utils/components/MalzemeHareketleriModal";
+import KullanilanMakinelerModal from "../../../../../utils/components/KullanilanMakinelerModal";
 
 const { Text } = Typography;
 
@@ -76,6 +77,15 @@ export default function ContextMenu({ selectedRows = [], refreshTableData }) {
               iconColor="#1890ff"
               title="Malzeme Hareketleri"
               description="Seçili stok için giriş/çıkış hareketlerini görüntüler."
+            />
+            <KullanilanMakinelerModal
+              stokId={selectedStokId}
+              stokKod={selectedStokKod}
+              onOpenModal={hidePopover}
+              icon={<ToolOutlined />}
+              iconColor="#52c41a"
+              title="Kullanılan Makineler"
+              description="Seçili malzemenin hangi makinelerde kullanıldığını görüntüler."
             />
           </>
         )}
