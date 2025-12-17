@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState, useMemo, useRef } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message, Drawer } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -10,7 +10,8 @@ import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import EditDrawerTalep from "../../MalzemeTalepleri/Update/EditDrawer";
-import EditDrawerSiparis from "../../SatinalmaSiparisleri/Update/EditDrawer"
+import EditDrawerSiparis from "../../SatinalmaSiparisleri/Update/EditDrawer";
+import EditDrawerTeklif from "../../MalzemeTalepleri/components/ContextMenu/components/Teklif/components/TeklifKarsilastirma";
 import Filters from "./filter/Filters";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
@@ -138,6 +139,7 @@ const MainTable = () => {
   const [drawer, setDrawer] = useState({ visible: false, data: null });
   const [talepDrawer, setTalepDrawer] = useState({ visible: false, data: null });
   const [siparisDrawer, setSiparisDrawer] = useState({ visible: false, data: null });
+  const [teklifDrawer, setTeklifDrawer] = useState({ visible: false, data: null });
   const [selectedRows, setSelectedRows] = useState([]);
   const [xlsxLoading, setXlsxLoading] = useState(false);
   const [cardsData, setCardsData] = useState({});
@@ -357,43 +359,43 @@ const MainTable = () => {
       },
     },
     {
-  title: "Durum",
-  dataIndex: "durumAciklama",
-  key: "durumAciklama",
-  width: 150,
-  ellipsis: true,
-  visible: true,
-  render: (text) => {
-    let style = {
-      borderRadius: "12px",
-      padding: "2px 8px",
-      fontWeight: 500,
-      fontSize: "12px",
-    };
+      title: "Durum",
+      dataIndex: "durumAciklama",
+      key: "durumAciklama",
+      width: 150,
+      ellipsis: true,
+      visible: true,
+      render: (text) => {
+        let style = {
+          borderRadius: "12px",
+          padding: "2px 8px",
+          fontWeight: 500,
+          fontSize: "12px",
+        };
 
-    switch (text) {
-      case "Teklif Bekleniyor":
-        style = { ...style, backgroundColor: "#fff4d6", color: "#b8860b" }; // pastel sarı
-        break;
-      case "Karşılaştırma Aşamasında":
-        style = { ...style, backgroundColor: "#e0f7fa", color: "#00796b" }; // pastel turkuaz
-        break;
-      case "Tamamlandı":
-        style = { ...style, backgroundColor: "#eaeaeaff", color: "#949494ff" }; // pastel kırmızı/rose
-        break;
-      case "Reddedildi":
-        style = { ...style, backgroundColor: "#fde2e4", color: "#d64550" }; // pastel kırmızı/rose (KAPALI ile aynı)
-        break;
-      case "Sipariş Alındı":
-        style = { ...style, backgroundColor: "#e6f7ff", color: "#096dd9" }; // pastel açık mavi
-        break;
-      default:
-        style = { ...style, backgroundColor: "#f5f5f5", color: "#595959" }; // gri
-    }
+        switch (text) {
+          case "Teklif Bekleniyor":
+            style = { ...style, backgroundColor: "#fff4d6", color: "#b8860b" }; // pastel sarı
+          break;
+          case "Karşılaştırma Aşamasında":
+            style = { ...style, backgroundColor: "#e0f7fa", color: "#00796b" }; // pastel turkuaz
+          break;
+          case "Tamamlandı":
+            style = { ...style, backgroundColor: "#eaeaeaff", color: "#949494ff" }; // pastel kırmızı/rose
+          break;
+          case "Reddedildi":
+            style = { ...style, backgroundColor: "#fde2e4", color: "#d64550" }; // pastel kırmızı/rose (KAPALI ile aynı)
+          break;
+          case "Sipariş Alındı":
+            style = { ...style, backgroundColor: "#e6f7ff", color: "#096dd9" }; // pastel açık mavi
+          break;
+          default:
+          style = { ...style, backgroundColor: "#f5f5f5", color: "#595959" }; // gri
+        }
 
-    return <span style={style}>{text}</span>;
-  },
-},
+        return <span style={style}>{text}</span>;
+      },
+    },
     {
       title: "Lokasyon",
       dataIndex: "lokasyon",
@@ -656,7 +658,10 @@ const MainTable = () => {
   };
 
   const onRowClick = (record) => {
-    setDrawer({ visible: true, data: { ...record, key: record.teklifId } });
+    setTeklifDrawer({
+        visible: true, 
+        data: { ...record, key: record.teklifId } 
+    });
   };
 
   const onTalepNoClick = (record) => {
@@ -1084,6 +1089,26 @@ const MainTable = () => {
       <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
       <EditDrawerTalep selectedRow={talepDrawer.data} onDrawerClose={() => setTalepDrawer({ ...talepDrawer, visible: false })} drawerVisible={talepDrawer.visible} onRefresh={refreshTableData} />
       <EditDrawerSiparis selectedRow={siparisDrawer.data} onDrawerClose={() => setSiparisDrawer({ ...siparisDrawer, visible: false })} drawerVisible={siparisDrawer.visible} onRefresh={refreshTableData} />
+      <Drawer
+        title="Teklif Karşılaştırma ve Analiz"
+        width="100%"
+        placement="right"
+        onClose={() => setTeklifDrawer({ ...teklifDrawer, visible: false })}
+        open={teklifDrawer.visible}
+        destroyOnClose
+        styles={{ body: { padding: 0 } }}
+      >
+        {teklifDrawer.visible && teklifDrawer.data && (
+          <EditDrawerTeklif
+            teklifIds={[teklifDrawer.data.teklifId]} 
+            fisNo={teklifDrawer.data.talepNo} 
+            fisId={teklifDrawer.data.talepID} 
+            onDurumGuncelle={() => {
+               refreshTableData();
+            }}
+          />
+        )}
+      </Drawer>
 
       {editDrawer1Visible && (
         <EditDrawer1
