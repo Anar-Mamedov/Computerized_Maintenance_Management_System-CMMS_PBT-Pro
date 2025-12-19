@@ -1061,7 +1061,6 @@ const MainTable = () => {
             İndir
           </Button>
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
-          <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
         </div>
       </div>
       <Spin spinning={loading}>
