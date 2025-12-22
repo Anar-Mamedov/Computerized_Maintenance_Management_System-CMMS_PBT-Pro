@@ -7,12 +7,13 @@ import ContextMenu from "./components/ContextMenu/ContextMenu";
 import { t } from "i18next";
 import dayjs from "dayjs";
 
-const FiyatGirisleri = ({ selectedRowID }) => {
+const FiyatGirisleri = ({ selectedRowID, materialCode: materialCodeProp }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
+  const modalTitle = materialCodeProp ? `${t("fiyatGirisleri")} - ${materialCodeProp}` : t("fiyatGirisleri");
 
   const [drawer, setDrawer] = useState({
     visible: false,
@@ -124,7 +125,7 @@ const FiyatGirisleri = ({ selectedRowID }) => {
       <Button type="primary" onClick={showModal}>
         {t("fiyatGirisleri")}
       </Button>
-      <Modal title={t("fiyatGirisleri")} centered open={isModalOpen} onOk={handleOk} onCancel={handleCancel} width={800}>
+      <Modal title={modalTitle} centered open={isModalOpen} onOk={handleOk} onCancel={handleCancel} width={800}>
         <div style={{ display: "flex", gap: "10px", alignItems: "center", justifyContent: "flex-end", marginBottom: "10px" }}>
           <ContextMenu selectedRows={selectedRows} refreshTableData={onRefresh} />
           <CreateModal onRefresh={onRefresh} selectedRowID={selectedRowID} />
