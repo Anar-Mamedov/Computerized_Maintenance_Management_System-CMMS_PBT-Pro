@@ -137,7 +137,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
   const aktifPaketDurumID = aktifPaket?.teklifBaslik?.teklifDurum ?? null;
   // ----------------------------------------------------------
 
-  const isDisabled = !(aktifPaketDurumID === 1 || aktifPaketDurumID === 4);
+  const isDisabled = !(aktifPaketDurumID === 1 || aktifPaketDurumID === 4 || aktifPaketDurumID === 2);
   const [siparislerimOpen, setSiparislerimOpen] = useState(false);
   const isSiparis = aktifPaketDurumID === 5;
   const [talepModalOpen, setTalepModalOpen] = useState(false); 
@@ -515,7 +515,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
     const currentDurumID = paket.teklifBaslik?.teklifDurum ?? null;
     // ------------------------------------------------
 
-    const isEditable = (currentDurumID === 1 || currentDurumID === 4);
+    const isEditable = (currentDurumID === 1 || currentDurumID === 4 || currentDurumID === 2);
 
     if (!isEditable) {
         if(showMessage) message.warning("Bu teklif durumu nedeniyle değişiklikler kaydedilemez.");
@@ -540,12 +540,17 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
             const indirimOran = Number(firmaOzet.indirimOrani ?? 0);
             const satirIndirimTutar = satirBrutTutar * (indirimOran / 100);
             const satirNetTutar = satirBrutTutar - satirIndirimTutar;
+
             const kdvOran = Number(firmaOzet.kdvOrani ?? 0);
             const kdvDurumStr = firmaOzet.kdvDurum || "Hariç";
-            const kdvDahilHaric = kdvDurumStr === "Dahil" ? 1 : 0; 
+            const kdvDahilHaric = kdvDurumStr === "Dahil" ? 1 : 0;
+
             let satirKdvTutar = 0;
-            if (kdvDahilHaric === 1) satirKdvTutar = satirNetTutar - (satirNetTutar / (1 + (kdvOran / 100)));
-            else satirKdvTutar = satirNetTutar * (kdvOran / 100);
+            if (kdvDahilHaric === 1) {
+                satirKdvTutar = satirNetTutar - (satirNetTutar / (1 + (kdvOran / 100)));
+            } else {
+                satirKdvTutar = satirNetTutar * (kdvOran / 100);
+            }
             return {
               firmaId: f.firmaId || 0,
               miktar: miktar,
@@ -557,7 +562,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
               indirimOran: indirimOran,
               indirimTutar: Number(satirIndirimTutar.toFixed(2)),
               kdvOran: kdvOran,
-              kdvTutar: Number(satirKdvTutar.toFixed(2)), 
+              kdvTutar: Number(satirKdvTutar.toFixed(4)), 
               kdvDahilHaric: kdvDahilHaric
             };
         });
@@ -584,10 +589,34 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
     };
 
     try {
-      await AxiosInstance.post("/UpsertTeklifKarsilastirma", payload);
-      if (showMessage) message.success("Teklif başarıyla kaydedildi!");
-      setKaydedildi(true); setHasChanges(false);
-    } catch (err) { console.error(err); message.error("Hata oluştu."); }
+    setSaving(true);
+    const response = await AxiosInstance.post("/UpsertTeklifKarsilastirma", payload);
+
+    // --- API'DEN GELEN ÖZEL HATA MESAJI KONTROLÜ ---
+    // Eğer backend 200 dönüp body içinde has_error: true gönderiyorsa:
+    if (response.data?.has_error || response.has_error) {
+      const errorMsg = response.data?.status || response.status || "Bir hata oluştu.";
+      message.error(errorMsg); // "Bu teklif onay sürecindedir..." mesajı burada görünür
+      return; // İşlemi burada kesiyoruz
+    }
+
+    if (showMessage) message.success("Teklif başarıyla kaydedildi!");
+    setKaydedildi(true);
+    setHasChanges(false);
+    } catch (err) {
+    console.error("Kayıt Hatası:", err);
+    
+    // --- AXIOS CATCH BLOĞUNDA MESAJI YAKALAMA ---
+    // Eğer API 401 hatası fırlatıyorsa mesaj err.response içindedir
+    const serverMessage = err.response?.data?.status;
+    if (serverMessage) {
+      message.error(serverMessage);
+    } else {
+      message.error("Kaydedilirken bir hata oluştu.");
+    }
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleSecimChange = (paketIndex, malzemeId, firmaId, val) => {
@@ -731,7 +760,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
         borderColor: isSiparis ? "#fa8c16" : (showOnayaGonder ? "#2BC770" : "#00BBFF"),
         color: "#fff"
     }}
-    disabled={disabled || (!isSiparis && isDisabled && aktifPaketDurumID !== 3)}
+    disabled={disabled || (!isSiparis && (aktifPaketDurumID === 2 || (isDisabled && aktifPaketDurumID !== 3)))}
     onClick={() => {
         if (isSiparis) {
             setSiparislerimOpen(true);

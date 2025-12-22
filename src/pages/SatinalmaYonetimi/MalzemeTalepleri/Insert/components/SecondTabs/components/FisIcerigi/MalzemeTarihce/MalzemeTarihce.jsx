@@ -75,9 +75,9 @@ const MainTable = ({ selectedRowId, malzemeKod }) => {
 
   return (
     <>
-      <Button onClick={() => setIsModalVisible(true)}>Malzeme Tarihçesi</Button>
+      <Button onClick={() => setIsModalVisible(true)}>Fiyat Teklifleri</Button>
       <Modal
-        title={malzemeKod ? `Malzeme Tarihçesi - ${malzemeKod}` : "Malzeme Tarihçesi"}
+        title={malzemeKod ? `Fiyat Teklifleri - ${malzemeKod}` : "Fiyat Teklifleri"}
         centered
         width={800}
         open={isModalVisible}

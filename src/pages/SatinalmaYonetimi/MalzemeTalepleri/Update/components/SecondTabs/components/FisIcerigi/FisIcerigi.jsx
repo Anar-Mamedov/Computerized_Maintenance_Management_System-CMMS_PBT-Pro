@@ -654,21 +654,7 @@ function FisIcerigi({ modalOpen, disabled }) {
       key: "marka",
       width: 150,
       editable: false,
-      render: (text, record, index) => (
-        <Controller
-          name={`fisIcerigi.${index}.marka`}
-          control={control}
-          render={({ field }) => (
-            <div style={{ ...(disabled ? { pointerEvents: "none", opacity: 0.6 } : {}) }}>
-              <KodIDSelectbox
-                name1={`fisIcerigi.${index}.marka`}
-                kodID={13002}
-                isRequired={false}
-              />
-            </div>
-          )}
-        />
-      ),
+      render: (text, record) => record.marka || "-",
     },
     {
       title: "Model",
@@ -676,21 +662,7 @@ function FisIcerigi({ modalOpen, disabled }) {
       key: "Model",
       width: 150,
       editable: false,
-      render: (text, record, index) => (
-        <Controller
-          name={`fisIcerigi.${index}.Model`}
-          control={control}
-          render={({ field }) => (
-            <div style={{ ...(disabled ? { pointerEvents: "none", opacity: 0.6 } : {}) }}>
-              <KodIDSelectbox
-                name1={`fisIcerigi.${index}.Model`}
-                kodID={13003}
-                isRequired={false}
-              />
-            </div>
-          )}
-        />
-      ),
+      render: (text, record) => record.Model || "-",
     },
     {
       title: "İşlemler",
