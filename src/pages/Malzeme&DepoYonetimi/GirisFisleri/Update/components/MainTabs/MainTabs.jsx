@@ -8,6 +8,7 @@ import AxiosInstance from "../../../../../../api/http";
 import FirmaSelectBox from "../../../../../../utils/components/FirmaTablo";
 // import PlakaSelectBox from "../../../../../../../_root/components/PlakaSelectbox";
 import MakineTablo from "../../../../../../utils/components/Machina/MakineTablo";
+import MasrafMerkeziTablo from "../../../../../../utils/components/MasrafMerkeziTablo";
 import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
 import DepoSelectBox from "../../../../../../utils/components/DepoSelectBox";
 import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
@@ -355,7 +356,7 @@ export default function MainTabs({ modalOpen }) {
           </div>
         </div>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "300px" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "331px" }}>
         <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
           <div
             style={{
@@ -443,6 +444,42 @@ export default function MainTabs({ modalOpen }) {
           >
             <MakineTablo />
             {/* <PlakaSelectBox name1="plaka" isRequired={false} /> */}
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: "400px",
+            gap: "10px",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("masrafMerkezi")}</Text>
+          <div
+            style={{
+              display: "flex",
+              flexFlow: "column wrap",
+              alignItems: "flex-start",
+              width: "100%",
+              maxWidth: "220px",
+            }}
+          >
+            <MasrafMerkeziTablo
+              masrafMerkeziFieldName="masrafMerkezi"
+              masrafMerkeziIdFieldName="masrafMerkeziID"
+              onSubmit={(selectedData) => {
+                setValue("masrafMerkezi", selectedData.MAM_TANIM);
+                setValue("masrafMerkeziID", selectedData.key);
+                setTimeout(() => {
+                  setValue("masrafMerkezi", selectedData.MAM_TANIM, { shouldDirty: true });
+                  setValue("masrafMerkeziID", selectedData.key, { shouldDirty: true });
+                }, 100);
+              }}
+            />
           </div>
         </div>
       </div>

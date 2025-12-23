@@ -49,7 +49,7 @@ function GenelBilgiler({ selectedRowID }) {
                   />
                 </div>
               </div>
-              <FiyatGirisleri selectedRowID={selectedRowID} />
+              <FiyatGirisleri selectedRowID={selectedRowID} materialCode={watch("malzemeKod")} />
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "420px" }}>
               <Text>{t("cikisFiyati")}</Text>
@@ -198,7 +198,7 @@ function GenelBilgiler({ selectedRowID }) {
                 <Text style={{ fontSize: "14px", color: "#000000a4" }}>{t("fifoUygula")}</Text>
                 <Controller name="fifoUygula" control={control} render={({ field }) => <Switch {...field} />} />
               </div>
-              <FifoTablo selectedRowID={selectedRowID} />
+              <FifoTablo selectedRowID={selectedRowID} materialCode={watch("malzemeKod")} />
             </div>
           </div>
         </div>
@@ -267,7 +267,7 @@ function GenelBilgiler({ selectedRowID }) {
                   <NumberInput name1="stokMiktar" isRequired={false} minNumber={-1} readOnly={true} />
                 </div>
               </div>
-              <StokMıktarTablo selectedRowID={selectedRowID} />
+              <StokMıktarTablo selectedRowID={selectedRowID} materialCode={watch("malzemeKod")} />
             </div>
 
             <Divider style={{ margin: "8px 0" }} />
@@ -279,7 +279,7 @@ function GenelBilgiler({ selectedRowID }) {
                   <NumberInput name1="talepMiktar" isRequired={false} minNumber={-1} readOnly={true} />
                 </div>
               </div>
-              <MalzemeTalepTablo selectedRowID={selectedRowID} />
+              <MalzemeTalepTablo selectedRowID={selectedRowID} materialCode={watch("malzemeKod")} />
             </div>
           </div>
         </div>

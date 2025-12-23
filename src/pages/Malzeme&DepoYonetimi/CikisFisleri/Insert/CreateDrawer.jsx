@@ -180,6 +180,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
       siparisNoId: Number(data.siparisNoID) || -1,
       // proje: data.proje,
       projeId: Number(data.projeID) || -1,
+      masrafmerkezID: Number(data.masrafMerkeziID) || -1,
       araToplam: Number(data.totalAraToplam),
       indirimliToplam: Number(data.totalIndirim),
       kdvToplam: Number(data.totalKdvToplam),
@@ -341,7 +342,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
           {t("ekle")}
         </Button>
         <Modal
-          width="1300px"
+          width="1340px"
           centered
           title={t("yeniCikisFisi")}
           destroyOnClose

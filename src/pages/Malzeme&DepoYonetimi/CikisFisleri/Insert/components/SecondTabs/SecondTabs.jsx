@@ -48,6 +48,8 @@ const StyledTabs = styled(Tabs)`
 export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen }) {
   const { watch } = useFormContext();
   const [activeTabKey, setActiveTabKey] = useState("4"); // Default to the FisIcerigi tab
+  const fisIcerigi = watch("fisIcerigi");
+  const fisIcerigiCount = Array.isArray(fisIcerigi) ? fisIcerigi.length : 0;
 
   // Modify the onChange handler to update the active tab state
   const onChange = (key) => {
@@ -64,7 +66,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen })
     },*/
     {
       key: "4",
-      label: t("fisIcerigi"),
+      label: `${t("fisIcerigi")} (${fisIcerigiCount})`,
       children: <FisIcerigi modalOpen={modalOpen} />,
     },
 

@@ -21,7 +21,7 @@ const normalizeText = (text) => {
     .replace(/Ç/g, "C");
 };
 
-export default function MalzemeTalepTablo({ workshopSelectedId, onSubmit, selectedRowID }) {
+export default function MalzemeTalepTablo({ workshopSelectedId, onSubmit, selectedRowID, materialCode: materialCodeProp }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
@@ -29,6 +29,8 @@ export default function MalzemeTalepTablo({ workshopSelectedId, onSubmit, select
 
   const [searchTerm1, setSearchTerm1] = useState("");
   const [filteredData1, setFilteredData1] = useState([]);
+  const materialCode = materialCodeProp || (data.length ? data[0].STK_KOD : "");
+  const modalTitle = materialCode ? `Malzeme Talep Listesi - ${materialCode}` : "Malzeme Talep Listesi";
 
   const columns = [
     {
@@ -185,7 +187,7 @@ export default function MalzemeTalepTablo({ workshopSelectedId, onSubmit, select
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
-      <Modal width={1200} centered title="Malzeme Talep Listesi" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
+      <Modal width={1200} centered title={modalTitle} open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <Input placeholder="Arama..." value={searchTerm1} onChange={handleSearch1} style={{ width: "300px", marginBottom: "15px" }} />
         <Table
           rowSelection={{

@@ -29,6 +29,8 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
       makine: null,
       plaka: null,
       plakaID: null,
+      masrafMerkezi: null,
+      masrafMerkeziID: null,
       tarih: null,
       saat: null,
       islemTipi: null,
@@ -83,6 +85,8 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
           setValue("firmaID", item.firmaId);
           setValue("makine", item.aracName);
           setValue("makineID", item.aracId);
+          setValue("masrafMerkezi", item.masrafmerkezName);
+          setValue("masrafMerkeziID", item.masrafmerkezID);
           setValue("tarih", item.tarih ? (dayjs(item.tarih).isValid() ? dayjs(item.tarih) : null) : null);
           setValue("saat", item.saat ? (dayjs(item.saat, "HH:mm:ss").isValid() ? dayjs(item.saat, "HH:mm:ss") : null) : null);
           setValue("islemTipi", item.islemTipiName);
@@ -149,6 +153,8 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
               malzemePlaka: movement.mlzAracName,
               malzemeLokasyonID: movement.lokasyonId,
               malzemeLokasyon: movement.lokasyonName,
+              masrafMerkeziID: movement.masrafmerkezi,
+              masrafMerkezi: movement.masrafmerkeziName,
               aciklama: movement.aciklama,
               isPriceChanged: movement.isPriceChanged || false,
               isDeleted: false,
@@ -194,6 +200,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
       girisDepoSiraNo: Number(data.girisDeposuID) || -1,
       // lokasyon: data.lokasyon,
       lokasyonId: Number(data.lokasyonID) || -1,
+      masrafmerkezID: Number(data.masrafMerkeziID) || -1,
       siparisID: Number(data.siparisNoID) || -1,
       araToplam: Number(data.totalAraToplam),
       indirimliToplam: Number(data.totalIndirim),
@@ -250,6 +257,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
           mlzAracId: Number(item.malzemePlakaId),
           // lokasyon: item.malzemeLokasyon,
           lokasyonId: Number(item.malzemeLokasyonID),
+          masrafmerkezi: Number(item.masrafMerkeziID),
           aciklama: item.aciklama,
           gc: "G",
           fisTip: "MALZEME",
@@ -304,7 +312,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
         <Modal
-          width="1300px"
+          width="1340px"
           centered
           title={t("girisFisiGuncelle")}
           open={drawerVisible}

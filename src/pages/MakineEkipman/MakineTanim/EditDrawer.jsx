@@ -494,7 +494,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       MKN_KIRA_BITIS_TARIH: formatDateWithDayjs(data.kiraBitisTarihi),
       MKN_KIRA_SURE: data.kiraSuresi,
       MKN_KIRA_PERIYOD: data.kiraSuresiBirim ? data.kiraSuresiBirim.label ?? data.kiraSuresiBirim : null,
-      MKN_KIRA_SURE_BIRIM_KOD_ID: data.kiraSuresiBirimID,
+      // MKN_KIRA_SURE_BIRIM_KOD_ID: data.kiraSuresiBirimID,
       MKN_KIRA_TUTAR: data.kiraTutari,
       MKN_KIRA_ACIKLAMA: data.kiraAciklama,
       MKN_SATIS: data.satildi,
@@ -545,7 +545,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       .then((response) => {
         console.log("Data sent successfully:", response);
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
+          message.success("Güncelleme Başarılı.");
           setOpen(false);
           onRefresh();
           methods.reset();
@@ -553,7 +553,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
-          message.error("Ekleme Başarısız.");
+          message.error("Güncelleme Başarısız.");
         }
       })
       .catch((error) => {
@@ -597,9 +597,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
                     <Text>{watch("makineTanimi")}</Text>
                   </>
                 )}
-                <Tag color={watch("makineAktif") ? "green" : "red"}>
-                  {watch("makineAktif") ? "Aktif" : "Pasif"}
-                </Tag>
+                <Tag color={watch("makineAktif") ? "green" : "red"}>{watch("makineAktif") ? "Aktif" : "Pasif"}</Tag>
                 {statusLabel && <Tag color="default">{statusLabel}</Tag>}
                 {watch("makineKalibrasyon") && <Tag color="blue">Kalibrasyon</Tag>}
                 {watch("kritikMakine") && <Tag color="red">Kritik Ekipman</Tag>}
