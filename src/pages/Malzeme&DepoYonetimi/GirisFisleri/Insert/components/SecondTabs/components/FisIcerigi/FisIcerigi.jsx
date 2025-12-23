@@ -222,9 +222,12 @@ function FisIcerigi({ modalOpen }) {
 
   const lokasyon = watch("lokasyon");
   const lokasyonID = watch("lokasyonID");
+  const masrafMerkezi = watch("masrafMerkezi");
+  const masrafMerkeziID = watch("masrafMerkeziID");
 
   // Use ref to store previous lokasyon values to prevent unnecessary updates
   const prevLokasyonRef = useRef({ lokasyon: null, lokasyonID: null });
+  const prevMasrafMerkeziRef = useRef({ masrafMerkezi: null, masrafMerkeziID: null });
 
   // Function to update empty locations
   const updateEmptyLocations = useCallback(() => {
@@ -261,6 +264,36 @@ function FisIcerigi({ modalOpen }) {
     });
   }, [lokasyon, lokasyonID, replace]);
 
+  const updateEmptyMasrafMerkezleri = useCallback(() => {
+    if (!masrafMerkezi && !masrafMerkeziID) return;
+
+    setDataSource((currentDataSource) => {
+      if (currentDataSource.length === 0) return currentDataSource;
+
+      let hasChanges = false;
+      const updatedData = currentDataSource.map((item) => {
+        if (!item.masrafMerkezi || item.masrafMerkezi === "" || item.masrafMerkezi === null || item.masrafMerkezi === undefined) {
+          hasChanges = true;
+          return {
+            ...item,
+            masrafMerkezi: masrafMerkezi || "",
+            masrafMerkeziID: masrafMerkeziID || null,
+          };
+        }
+        return item;
+      });
+
+      if (hasChanges) {
+        setTimeout(() => {
+          replace(updatedData);
+        }, 0);
+        return updatedData;
+      }
+
+      return currentDataSource;
+    });
+  }, [masrafMerkezi, masrafMerkeziID, replace]);
+
   // Safely update fields with watched values - only update empty locations
   useEffect(() => {
     // Check if lokasyon values actually changed
@@ -278,6 +311,21 @@ function FisIcerigi({ modalOpen }) {
       console.error("Error in lokasyon useEffect:", error);
     }
   }, [lokasyon, lokasyonID, updateEmptyLocations]);
+
+  useEffect(() => {
+    const prevValues = prevMasrafMerkeziRef.current;
+    if (prevValues.masrafMerkezi === masrafMerkezi && prevValues.masrafMerkeziID === masrafMerkeziID) {
+      return;
+    }
+
+    prevMasrafMerkeziRef.current = { masrafMerkezi, masrafMerkeziID };
+
+    try {
+      updateEmptyMasrafMerkezleri();
+    } catch (error) {
+      console.error("Error in masraf merkezi useEffect:", error);
+    }
+  }, [masrafMerkezi, masrafMerkeziID, updateEmptyMasrafMerkezleri]);
 
   // Watch for birim changes and update dataSource
   useEffect(() => {
@@ -466,8 +514,8 @@ function FisIcerigi({ modalOpen }) {
           toplam,
           malzemeLokasyon: row.STK_LOKASYON || lokasyon || "",
           malzemeLokasyonID: row.STK_LOKASYON_ID || lokasyonID || null,
-          masrafMerkezi: row.STK_MASRAFMERKEZ || "",
-          masrafMerkeziID: row.STK_MASRAF_MERKEZI_ID || null,
+          masrafMerkezi: row.STK_MASRAFMERKEZ || masrafMerkezi || "",
+          masrafMerkeziID: row.STK_MASRAF_MERKEZI_ID || masrafMerkeziID || null,
           aciklama: "",
         };
 

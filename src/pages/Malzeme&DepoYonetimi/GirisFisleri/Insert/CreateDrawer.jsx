@@ -318,6 +318,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh, numarator =
       siparisID: Number(data.siparisNoID) || -1,
       // proje: data.proje,
       projeId: Number(data.projeID) || -1,
+      masrafmerkezID: Number(data.masrafMerkeziID) || -1,
       araToplam: Number(data.totalAraToplam),
       indirimliToplam: Number(data.totalIndirim),
       kdvToplam: Number(data.totalKdvToplam),
@@ -485,7 +486,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh, numarator =
           </Button>
         )}
         <Modal
-          width="1300px"
+          width="1340px"
           centered
           title={t("yeniGirisFisi")}
           destroyOnClose
