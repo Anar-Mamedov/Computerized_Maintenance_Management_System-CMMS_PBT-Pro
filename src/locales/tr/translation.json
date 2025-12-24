@@ -648,6 +648,7 @@
   "onayDurumu": "Onay Durumu",
   "isEmrineCevir": "İş Emrine Çevir",
   "fisOlustur": "Fiş Oluştur",
+  "fisOlusturAciklama": "Siparişten giriş fişi oluşturur.",
   "yeniCikisFisi": "Yeni Çıkış Fişi",
   "cikisFisiGuncelle": "Çıkış Fişi Güncelle",
   "yeniTransferFisi": "Yeni Transfer Fişi",

@@ -57,6 +57,7 @@
   "tabloAyarlari": "Table Settings",
   "tableInfiniteScroll": "Enable infinite scroll in tables",
   "kaydet": "Save",
+  "fisOlusturAciklama": "Creates a receipt slip from the order.",
   "depolamaBilgileri": "Storage Information",
   "bulunduguDepo": "Warehouse",
   "depoLokasyonu": "Warehouse Location",
