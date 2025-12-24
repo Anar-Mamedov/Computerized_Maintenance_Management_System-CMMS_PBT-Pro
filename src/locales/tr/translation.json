@@ -9,6 +9,8 @@
   "sayacBazliPeriyodikBakim": "Sayaç Bazlı Periyodik Bakım",
   "globalYes": "Evet",
   "globalNo": "Hayır",
+  "qrKod": "QR Kod",
+  "malzemeQrKodu": "Malzeme QR Kodu",
   "tedarikciler": "Tedarikçiler",
   "tedarikciKodu": "Tedarikçi Kodu",
   "tedarikciFirma": "Tedarikçi Firma",
