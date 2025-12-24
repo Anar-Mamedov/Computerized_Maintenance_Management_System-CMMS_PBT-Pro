@@ -9,6 +9,7 @@ import { DetayBilgi } from "./components/DetayBilgi.jsx";
 import { FinansalBilgiler } from "./components/FinansalBilgiler.jsx";
 import Ekipman from "./components/Ekipman/EkipmanListesiTablo.jsx";
 import Sayac from "./components/Sayac/Sayac.jsx";
+import MainTabs from "../MainTabs/MainTabs.jsx";
 
 import { t } from "i18next";
 
@@ -18,6 +19,7 @@ const contentContainerStyle = {
   borderRadius: "6px",
   border: "1px solid #D9D4D5",
   boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
+  marginBottom: "10px",
 };
 const tabBarContainerStyle = {
   backgroundColor: "#ffffff",
@@ -29,7 +31,7 @@ const tabBarContainerStyle = {
 };
 
 function Tablar({ selectedRowID, update }) {
-  const [activeKey, setActiveKey] = useState("1");
+  const [activeKey, setActiveKey] = useState("0");
   const { watch } = useFormContext();
   const watchedMakineId = watch("secilenMakineID");
   const effectiveMakineId = selectedRowID ?? watchedMakineId;
@@ -37,8 +39,17 @@ function Tablar({ selectedRowID, update }) {
   const tabs = useMemo(() => {
     const tabDefinitions = [
       {
+        key: "0",
+        label: t("genelBilgiler"),
+        render: () => (
+          <div>
+            <MainTabs />
+          </div>
+        ),
+      },
+      {
         key: "1",
-        label: t("ekipmanListesi"),
+        label: t("altEkipmanlar"),
         requiresUpdate: true,
         render: (currentKey) => (
           <div style={contentContainerStyle}>
@@ -52,7 +63,11 @@ function Tablar({ selectedRowID, update }) {
         key: "4",
         label: t("sayac"),
         requiresUpdate: true,
-        render: () => <Sayac selectedRowID={effectiveMakineId} />,
+        render: () => (
+          <div style={{ marginBottom: "10px" }}>
+            <Sayac selectedRowID={effectiveMakineId} />
+          </div>
+        ),
       },
       {
         key: "5",
@@ -67,12 +82,20 @@ function Tablar({ selectedRowID, update }) {
       {
         key: "6",
         label: t("ozelAlanlar"),
-        render: () => <OzelAlanlar />,
+        render: () => (
+          <div style={{ marginBottom: "10px" }}>
+            <OzelAlanlar />
+          </div>
+        ),
       },
       {
         key: "7",
         label: t("notlar"),
-        render: () => <Notlar />,
+        render: () => (
+          <div style={{ marginBottom: "10px" }}>
+            <Notlar />
+          </div>
+        ),
       },
       {
         key: "8",

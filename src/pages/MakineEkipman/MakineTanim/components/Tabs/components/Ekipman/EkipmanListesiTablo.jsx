@@ -325,7 +325,7 @@ export default function EkipmanListesiTablo({ isActive = false }) {
   }, []); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
 
   return (
-    <div style={{ marginBottom: "25px" }}>
+    <div>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
         <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTable} />
         <CreateModal kapali={kapali} onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />
