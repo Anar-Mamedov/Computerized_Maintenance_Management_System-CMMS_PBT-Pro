@@ -25,6 +25,7 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
   };
 
   const durumId = selectedRows.length === 1 ? selectedRows[0].SSP_DURUM_ID : null;
+  const isKapaliOrIptal = durumId === 3 || durumId === 4;
 
   // Ortak props
   const commonProps = {
@@ -77,7 +78,7 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
         {(durumId === 4 || durumId === 3) && <Ac {...commonProps} />}
 
         {/* Giriş Fişleri (Eğer tek satır seçiliyse) */}
-        {selectedRows.length === 1 && (
+        {selectedRows.length === 1 && !isKapaliOrIptal && (
           <GirisFisleri 
             selectedRows={selectedRows} 
             numarator={true} 

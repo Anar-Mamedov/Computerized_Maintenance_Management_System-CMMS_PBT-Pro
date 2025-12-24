@@ -54,6 +54,7 @@
   "sayac.fetchError": "Не удалось получить данные счётчиков.",
   "sayac.noSelection": "Машина не выбрана.",
   "sayac.emptyState": "Записи счётчиков не найдены.",
+  "fisOlusturAciklama": "Создает приходный ордер из заказа.",
   "depolamaBilgileri": "Информация о хранении",
   "bulunduguDepo": "Склад",
   "depoLokasyonu": "Локация склада",

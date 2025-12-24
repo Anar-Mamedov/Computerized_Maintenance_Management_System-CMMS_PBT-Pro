@@ -469,9 +469,33 @@ export default function CreateModal({ selectedLokasyonId, onRefresh, numarator =
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
         {numarator ? (
-          <Button onClick={showModal} type="text" style={{ paddingLeft: "0px" }}>
-            {t("fisOlustur")}
-          </Button>
+          <div
+            className="menu-item-hover"
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: "12px",
+              cursor: "pointer",
+              padding: "10px 12px",
+              transition: "background-color 0.3s",
+              width: "100%",
+            }}
+            onClick={showModal}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f5f5f5")}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+          >
+            <div>
+              <PlusOutlined style={{ color: "#2bc770", fontSize: "18px", marginTop: "4px" }} />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <span style={{ fontWeight: "500", color: "#262626", fontSize: "14px", lineHeight: "1.2" }}>
+                {t("fisOlustur")}
+              </span>
+              <span style={{ fontSize: "12px", color: "#8c8c8c", marginTop: "4px", lineHeight: "1.4" }}>
+                {t("fisOlusturAciklama")}
+              </span>
+            </div>
+          </div>
         ) : (
           <Button
             type="primary"
