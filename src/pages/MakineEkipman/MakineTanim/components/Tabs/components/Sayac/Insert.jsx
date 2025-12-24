@@ -15,7 +15,7 @@ const { Text } = Typography;
 
 dayjs.extend(customParseFormat);
 
-export default function Insert({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
+export default function Insert({ selectedRow, selectedMakineID = null, onDrawerClose, drawerVisible, onRefresh }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(drawerVisible);
   const skipConfirmRef = useRef(false);
@@ -84,17 +84,20 @@ export default function Insert({ selectedRow, onDrawerClose, drawerVisible, onRe
   };
 
   const onSubmit = (data) => {
+    const resolvedMakineId = toNumberOrNull(selectedMakineID ?? selectedRow?.MES_MAKINE_ID ?? selectedRow?.MES_REF_ID, 0);
+    const resolvedRefId = toNumberOrNull(selectedRow?.MES_REF_ID ?? selectedRow?.MES_MAKINE_ID ?? selectedMakineID, resolvedMakineId);
+
     const body = {
       TB_SAYAC_ID: 0,
       MES_TANIM: valueOrFallback(data.sayacTanim, ""),
-      MES_REF_ID: toNumberOrNull(selectedRow?.MES_REF_ID ?? selectedRow?.MES_MAKINE_ID, 0),
+      MES_REF_ID: resolvedRefId,
       MES_REF_GRUP: valueOrFallback(selectedRow?.MES_REF_GRUP, "MAKINE"),
       MES_BIRIM_KOD_ID: toNumberOrNull(data.sayacBirimiID ?? selectedRow?.MES_BIRIM_KOD_ID, 0),
       MES_TIP_KOD_ID: toNumberOrNull(data.sayacTipiID ?? selectedRow?.MES_TIP_KOD_ID, 0),
       MES_ACIKLAMA: valueOrFallback(data.aciklama, ""),
       MES_TAHMINI_ARTIS_DEGER: toNumberOrNull(data.artisDegeri ?? selectedRow?.MES_TAHMINI_ARTIS_DEGER, 0),
       MES_SANAL_SAYAC_BASLANGIC_TARIH: data.sanalSayac ? toIsoStringOrNull(data.baslangicTarihi ?? selectedRow?.MES_SANAL_SAYAC_BASLANGIC_TARIH) : null,
-      MES_MAKINE_ID: toNumberOrNull(selectedRow?.MES_MAKINE_ID ?? selectedRow?.MES_REF_ID, 0),
+      MES_MAKINE_ID: resolvedMakineId,
       /*  MES_OZEL_ALAN_1: valueOrFallback(selectedRow?.MES_OZEL_ALAN_1, null),
       MES_OZEL_ALAN_2: valueOrFallback(selectedRow?.MES_OZEL_ALAN_2, null),
       MES_OZEL_ALAN_3: valueOrFallback(selectedRow?.MES_OZEL_ALAN_3, null),
@@ -110,13 +113,20 @@ export default function Insert({ selectedRow, onDrawerClose, drawerVisible, onRe
     AxiosInstance.post("SayacUpsert", body)
       .then((response) => {
         console.log("Data sent successfully:", response);
-        if (response.status_code === 200 || response.status_code === 201) {
+        const hasSuccessCode = response?.status_code === 200 || response?.status_code === 201;
+        const hasNoError = response?.has_error === false || response?.has_error === undefined;
+
+        if (hasSuccessCode && hasNoError) {
           message.success("Ekleme Başarılı.");
           setOpen(false);
-          onRefresh();
+          if (typeof onRefresh === "function") {
+            onRefresh();
+          }
           reset();
-          onDrawerClose();
-        } else if (response.status_code === 401) {
+          if (typeof onDrawerClose === "function") {
+            onDrawerClose();
+          }
+        } else if (response?.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
           message.error("Ekleme Başarısız.");
