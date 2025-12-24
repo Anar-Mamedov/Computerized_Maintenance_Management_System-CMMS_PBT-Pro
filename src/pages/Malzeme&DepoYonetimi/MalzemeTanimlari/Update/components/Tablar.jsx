@@ -6,6 +6,7 @@ import DosyaUpload from "./Belgeler/DosyaUpload";
 import Resimler from "./Resimler/Resimler";
 import Aciklama from "./Aciklama";
 import Barkodlar from "./Barkodlar/Barkodlar";
+import Tedarikciler from "./Tedarikciler/Tedarikciler";
 import { t } from "i18next";
 
 function Tablar({ selectedRowID }) {
@@ -48,6 +49,9 @@ function Tablar({ selectedRowID }) {
         </Radio.Button>
         <Radio.Button className="custom-radio-button" value="6">
           {t("barkodlar")}
+        </Radio.Button>
+        <Radio.Button className="custom-radio-button" value="7">
+          {t("tedarikciler")}
         </Radio.Button>
       </Radio.Group>
       <style>
@@ -124,6 +128,7 @@ function Tablar({ selectedRowID }) {
       {tabKey === "4" && <Resimler selectedRowID={selectedRowID} />}
       {tabKey === "5" && <Aciklama />}
       {tabKey === "6" && <Barkodlar selectedRowID={selectedRowID} />}
+      {tabKey === "7" && <Tedarikciler selectedRowID={selectedRowID} />}
     </>
   );
 }
