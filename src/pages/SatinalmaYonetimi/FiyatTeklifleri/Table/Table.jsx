@@ -426,7 +426,7 @@ const MainTable = () => {
       },
     },
     {
-      title: "Satınalmacı",
+      title: "Satın Alan",
       dataIndex: "satinalmaci",
       key: "satinalmaci",
       width: 250,

@@ -64,7 +64,7 @@ import MalzemeTalepleri from "./pages/SatinalmaYonetimi/MalzemeTalepleri/Malzeme
 import SatinalmaSiparisleri from "./pages/SatinalmaYonetimi/SatinalmaSiparisleri/SatinalmaSiparisleri.jsx";
 import FiyatTeklfileri from "./pages/SatinalmaYonetimi/FiyatTeklifleri/FiyatTeklifleri.jsx";
 import DetarikciFirmalar from "./pages/SatinalmaYonetimi/FirmaTanimlari/FirmaTanimlari.jsx";
-import SatinalmaDashboard from "./pages/SatinalmaYonetimi/SatinalmaDashboard/SatinalmaDashboard.jsx";
+import SatinalmaDashboard from "./pages/SatinalmaYonetimi/Dashboard1/Dashboard.jsx";
 import AxiosInstance from "./api/http";
 
 // Malzemeler

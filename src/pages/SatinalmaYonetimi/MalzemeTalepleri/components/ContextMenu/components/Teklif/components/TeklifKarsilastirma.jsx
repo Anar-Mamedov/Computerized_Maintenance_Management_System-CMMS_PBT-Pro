@@ -78,10 +78,11 @@ const SimpleKodSelectbox = ({ kodID, value, onChange, disabled, style, placehold
 
   return (
     <Select
-      style={{ width: "100%", ...style }}
+      style={{ width: "100%", ...style }} 
       disabled={disabled}
       showSearch
       allowClear
+      size="small"
       placeholder={placeholder || "Seçiniz"}
       optionFilterProp="children"
       filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
@@ -95,16 +96,17 @@ const SimpleKodSelectbox = ({ kodID, value, onChange, disabled, style, placehold
       dropdownRender={(menu) => (
         <Spin spinning={loading}>
           {menu}
-          <Divider style={{ margin: "8px 0" }} />
+          <Divider style={{ margin: "4px 0" }} />
           <Space style={{ padding: "0 8px 4px" }}>
             <Input
               placeholder="Yeni ekle..."
               ref={inputRef}
               value={name}
+              size="small"
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => e.stopPropagation()} 
             />
-            <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
+            <Button type="text" size="small" icon={<PlusOutlined />} onClick={addItem}>
               Ekle
             </Button>
           </Space>
@@ -224,6 +226,21 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
           const detaylar = data.teklifDetaylar || [];
           data.firmaTotaller = data.firmaTotaller.map(firma => {
             const detay = detaylar.find(d => Number(d.TFD_CARI_ID) === Number(firma.firmaId));
+            const araToplam = (data.malzemeler || []).reduce((acc, m) => {
+        const f = (m.firmalar || []).find((x) => x.firmaId === firma.firmaId);
+        return acc + (Number(f?.tutar ?? 0));
+    }, 0);
+
+    const indirimTutar = firma.toplamIndirim || 0;
+    const matrah = araToplam - indirimTutar;
+    const kdvTutar = firma.toplamKDVtutar || 0;
+
+    // KDV oranını hesapla (Matrah 0 ise 0 dön, değilse hesapla)
+    let hesaplananKdvOrani = 0;
+    if (matrah > 0) {
+        // Sonucu yuvarlayalım (Örn: 19.9999 -> 20)
+        hesaplananKdvOrani = Math.round((kdvTutar / matrah) * 100);
+    }
             const checkDate = (dateVal) => {
               if (!dateVal || dateVal.startsWith("1900-01-01") || dateVal.startsWith("0001-01-01")) return null;
               return dateVal;
@@ -232,7 +249,7 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
             return {
               ...firma,
               indirimOrani: firma.indirimOran || 0,
-              kdvOrani: firma.kdvOran ?? 0,
+              kdvOrani: firma.kdvOran ?? hesaplananKdvOrani,
               kdvDurum: firma.kdvDurum || "Hariç",
               teklifTarihi: checkDate(detay?.TFD_TEKLIF_TARIH),
               gecerlilikTarihi: checkDate(detay?.TFD_GECERLILIK_TARIH),
@@ -839,477 +856,273 @@ const TeklifKarsilastirma = ({ teklifIds, teklifDurumlari, fisNo, fisId, disable
 
           const firmaColumns = (firma) => {
              const pastelColor = paketRenkleri[paketIndex]?.[firma.firmaId] || "#fff";
-             const cellStyle = getFirmaColumnStyle(firma.firmaId, false);
+             const isSelected = isFirmaFullSelected(firma.firmaId);
+             const isSingleFirma = firmalar.length === 1;
+             
+             // --- TEK FİRMA İÇİN GENİŞLİK SINIRLAMA ---
+             const colWidths = isSingleFirma ? 
+                { sec: 50, marka: 120, miktar: 80, fiyat: 100, tutar: 110 } : 
+                { sec: 60, marka: 100, miktar: 70, fiyat: 90, tutar: 90 };
 
-             const noBorderStyle = { ...cellStyle, borderLeft: 'none', borderRight: 'none' };
-             return [
-               {
+             const cellStyle = { 
+                backgroundColor: isSelected ? "#f6ffed" : pastelColor,
+                borderLeft: isSelected ? '2px solid #52c41a' : '1px solid #f0f0f0',
+                borderRight: isSelected ? '2px solid #52c41a' : '1px solid #f0f0f0'
+             };
+
+             return [{
                  title: (
                    <div style={{ backgroundColor: pastelColor, padding: "8px 0", borderRadius: 4, textAlign: "center" }}>
-                     <div>{firma.firmaTanim}  <Radio checked={selectedFirmaId === firma.firmaId} onClick={() => handleRadioClick(paketIndex, firma.firmaId)} disabled={isDisabled} /></div>
+                     <div>{firma.firmaTanim} <Radio checked={selectedFirmaId === firma.firmaId} onClick={() => handleRadioClick(paketIndex, firma.firmaId)} disabled={isDisabled} /></div>
                    </div>
                  ),
                  children: [
-          {
-            title: "Seç",
-            width: 60,
-            align: "center",
-            onCell: () => ({ style: { ...cellStyle, borderRight: 'none' } }), // Sol border var, sağ yok
-            render: (_, record) => {
-              const f = record.firmalar.find((x) => x.firmaId === firma.firmaId);
-              const val = f?.secili ? "true" : "false";
-              return (
-                <Select
-                  size="small"
-                  value={val}
-                  style={{ width: "100%" }}
-                  onChange={(v) => handleSecimChange(paketIndex, record.malzemeId, firma.firmaId, v)}
-                >
-                  <Option value="true"><span style={{ color: "green", fontWeight: "bold" }}>✓</span></Option>
-                  <Option value="false"><span style={{ color: "red", fontWeight: "bold" }}>X</span></Option>
-                </Select>
-              );
-            },
-          },
-          {
-            title: "Marka",
-            width: 100,
-            onCell: () => ({ style: noBorderStyle }), // Ortadaki kolon, border yok
-            render: (_, record) => {
-              const f = record.firmalar.find((x) => x.firmaId === firma.firmaId) || {};
-              return (
-                <Input
-                  size="small"
-                  value={f.marka}
-                  onChange={(e) => handleMarkaChange(paketIndex, e.target.value, record.malzemeId, firma.firmaId)}
-                  disabled={isDisabled && !f.secili}
-                />
-              );
-            },
-          },
-          {
-            title: "Miktar",
-            width: 70,
-            onCell: () => ({ style: noBorderStyle }),
-            render: (_, record) => {
-              const f = record.firmalar.find((x) => x.firmaId === firma.firmaId) || {};
-              return (
-                <InputNumber
-                  size="small"
-                  min={0}
-                  value={f.miktar}
-                  onChange={(v) => handleValueChange(paketIndex, record.malzemeId, firma.firmaId, "miktar", v)}
-                  disabled={isDisabled && !f.secili}
-                  style={{ width: "100%" }}
-                />
-              );
-            },
-          },
-          {
-            title: "Birim Fiyat",
-            width: 90,
-            onCell: () => ({ style: noBorderStyle }),
-            render: (_, record) => {
-              const f = record.firmalar.find((x) => x.firmaId === firma.firmaId) || {};
-              return (
-                <InputNumber
-                  size="small"
-                  min={0}
-                  value={f.fiyat}
-                  onChange={(v) => handleValueChange(paketIndex, record.malzemeId, firma.firmaId, "fiyat", v)}
-                  disabled={isDisabled && !f.secili}
-                  style={{ width: "100%" }}
-                />
-              );
-            },
-          },
-          {
-            title: "Tutar",
-            width: 90,
-            align: "right",
-            onCell: () => ({ style: { ...cellStyle, borderLeft: 'none' } }), // Sağ border var, sol yok
-            render: (_, record) => {
-              const f = record.firmalar.find((x) => x.firmaId === firma.firmaId) || {};
-              return (
-                <Text strong>
-                  {Number(f.tutar).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </Text>
-              );
-            },
-          },
-        ],
-      },
-    ];
-  };
+                   { title: "Seç", width: colWidths.sec, align: "center", onCell: () => ({ style: { ...cellStyle, borderRight: 'none' } }), render: (_, record) => {
+                      const f = record.firmalar.find((x) => x.firmaId === firma.firmaId);
+                      return <Select size="small" value={f?.secili ? "true" : "false"} style={{ width: "100%" }} onChange={(v) => handleSecimChange(paketIndex, record.malzemeId, firma.firmaId, v)}>
+                        <Option value="true"><span style={{ color: "green" }}>✓</span></Option>
+                        <Option value="false"><span style={{ color: "red" }}>X</span></Option>
+                      </Select>
+                   }},
+                   { title: "Marka", width: colWidths.marka, onCell: () => ({ style: { ...cellStyle, borderLeft: 'none', borderRight: 'none' } }), render: (_, record) => {
+                      const f = record.firmalar.find((x) => x.firmaId === firma.firmaId) || {};
+                      return <Input size="small" value={f.marka} onChange={(e) => handleMarkaChange(paketIndex, e.target.value, record.malzemeId, firma.firmaId)} disabled={isDisabled && !f.secili} />
+                   }},
+                   { title: "Miktar", width: colWidths.miktar, onCell: () => ({ style: { ...cellStyle, borderLeft: 'none', borderRight: 'none' } }), render: (_, record) => {
+                      const f = record.firmalar.find((x) => x.firmaId === firma.firmaId) || {};
+                      return <InputNumber size="small" min={0} value={f.miktar} onChange={(v) => handleValueChange(paketIndex, record.malzemeId, firma.firmaId, "miktar", v)} disabled={isDisabled && !f.secili} style={{ width: "100%" }} />
+                   }},
+                   { title: "Birim Fiyat", width: colWidths.fiyat, onCell: () => ({ style: { ...cellStyle, borderLeft: 'none', borderRight: 'none' } }), render: (_, record) => {
+                      const f = record.firmalar.find((x) => x.firmaId === firma.firmaId) || {};
+                      return <InputNumber size="small" min={0} value={f.fiyat} onChange={(v) => handleValueChange(paketIndex, record.malzemeId, firma.firmaId, "fiyat", v)} disabled={isDisabled && !f.secili} />
+                   }},
+                   { title: "Tutar", width: colWidths.tutar, align: "right", onCell: () => ({ style: { ...cellStyle, borderLeft: 'none' } }), render: (_, record) => {
+                      const f = record.firmalar.find((x) => x.firmaId === firma.firmaId) || {};
+                      return <Text strong>{Number(f.tutar).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}</Text>
+                   }}
+                 ]
+             }];
+          };
 
-  const columns = [
-    {
-      title: "MALZEME", // Başlık
-      key: "malzeme",
-      fixed: "left",
-      width: 250,
-      render: (_, r) => (
-        // --- BURASI GÖRSELDEKİ TASARIM ---
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-            {/* KOD KISMI: Gri kutucuk */}
-            <span style={{ 
-                backgroundColor: '#f5f5f5', 
-                color: '#595959', 
-                padding: '2px 6px', 
-                borderRadius: '4px', 
-                fontSize: '11px', 
-                marginBottom: '4px',
-                border: '1px solid #d9d9d9',
-                display: 'inline-block'
-            }}>
-                {r.malzemeKodu || r.stokKodu || "KOD"} {/* Backend'den gelen kod alanı */}
-            </span>
-            {/* İSİM KISMI: Kalın yazı */}
-            <Text strong style={{ fontSize: '13px', lineHeight: '1.2' }}>
-                {r.malzeme}
-            </Text>
-        </div>
-      ),
-    },
-    ...firmalar.flatMap((f, index) => {
-      const cols = firmaColumns(f);
-      // Firmalar arası boşluk
-      if (index < firmalar.length - 1) {
-        return [
-          ...cols,
-          {
-            title: "",
-            dataIndex: `spacer_${f.firmaId}`,
-            width: 15,
-            onHeaderCell: () => ({ style: { border: "none", background: "transparent" } }),
-            onCell: () => ({ style: { border: "none", background: "transparent" } }),
-          },
-        ];
-      }
-      return cols;
-    }),
-  ];
-
-const dataSource = malzemeler.map((m) => ({ key: m.malzemeId, ...m }));
+          const columns = [
+            {
+              title: "MALZEME", key: "malzeme", fixed: "left", width: 250,
+              render: (_, r) => (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                    <span style={{ backgroundColor: '#f5f5f5', color: '#595959', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', marginBottom: '4px', border: '1px solid #d9d9d9' }}>{r.malzemeKodu || r.stokKodu || "KOD"}</span>
+                    <Text strong style={{ fontSize: '13px', lineHeight: '1.2' }}>{r.malzeme}</Text>
+                </div>
+              ),
+            },
+            ...firmalar.flatMap((f, index) => {
+              const cols = firmaColumns(f);
+              if (index < firmalar.length - 1) {
+                return [...cols, { title: "", width: 15, onHeaderCell: () => ({ style: { border: "none", background: "transparent" } }), onCell: () => ({ style: { border: "none", background: "transparent" } }) }];
+              }
+              return cols;
+            }),
+          ];
 
           return (
-            <TabPane
-              tab={
-                <div style={{ backgroundColor: DURUM_STYLES[durumID]?.backgroundColor || "#f0f0f0", color: DURUM_STYLES[durumID]?.color || "#000", padding: "4px 12px", borderRadius: 6, fontWeight: "bold" }}>
+            <TabPane key={`${paketIndex + 1}`}
+              tab={<div style={{ backgroundColor: DURUM_STYLES[durumID]?.backgroundColor || "#f0f0f0", color: DURUM_STYLES[durumID]?.color || "#000", padding: "4px 12px", borderRadius: 6, fontWeight: "bold" }}>
                    {paket.teklifBaslik?.baslik || `Teklif ${paketIndex + 1}`} ({durumAciklama})
-                </div>
-              }
-              key={`${paketIndex + 1}`}
+              </div>}
             >
-               <Table
-  columns={columns}
-  dataSource={dataSource}
-  pagination={false}
-  bordered={false} // Kenarlık çakışmasını önlemek için false yapıp css ile yönetmek gerekebilir ama şimdilik böyle kalsın
-  scroll={{ x: "max-content" }}
-  summary={() => {
-    return (
+              {/* KAPSAYICI DIV: Tek firma varken genişliği sınırlıyor */}
+              <div style={{ width: firmalar.length === 1 ? "950px" : "100%", overflow: "hidden", marginRight: "auto" }}>
+                  <Table
+                    columns={columns}
+                    dataSource={malzemeler.map((m) => ({ key: m.malzemeId, ...m }))}
+                    pagination={false}
+                    bordered={false}
+                    scroll={{ x: firmalar.length === 1 ? undefined : "max-content", y: 'calc(100vh - 450px)' }}
+                    summary={() => (
+                      <>
+                        <Table.Summary.Row style={{ height: "20px", background: "transparent" }}>
+                             <Table.Summary.Cell index={0} colSpan={columns.length} style={{ border: "none" }} />
+                        </Table.Summary.Row>
+                        <Table.Summary.Row>
+                          <Table.Summary.Cell index={0}><Text strong>Ara Toplam</Text></Table.Summary.Cell>
+                          {firmalar.map((firma, i) => (
+                            <React.Fragment key={firma.firmaId}>
+                              <Table.Summary.Cell colSpan={5} align="right" style={{ backgroundColor: paketRenkleri[paketIndex]?.[firma.firmaId] }}>
+                                <Text strong>{Number(firma.araToplam).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}</Text>
+                              </Table.Summary.Cell>
+                              {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
+                            </React.Fragment>
+                          ))}
+                        </Table.Summary.Row>
+                        <Table.Summary.Row>
+                          <Table.Summary.Cell index={0}><Text strong>İndirim</Text></Table.Summary.Cell>
+                          {firmalar.map((firma, i) => (
+                            <React.Fragment key={firma.firmaId}>
+                              <Table.Summary.Cell colSpan={5} align="right" style={{ backgroundColor: paketRenkleri[paketIndex]?.[firma.firmaId] }}>
+                                {renderEditableSummaryCell(paketIndex, firma.firmaId, "indirimOrani", firma.indirimTutar ?? 0, firma.indirimOrani ?? 0)}
+                              </Table.Summary.Cell>
+                              {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
+                            </React.Fragment>
+                          ))}
+                        </Table.Summary.Row>
+                        <Table.Summary.Row>
+                            <Table.Summary.Cell index={0}><Text strong>Kdv</Text></Table.Summary.Cell>
+                            {firmalar.map((firma, i) => (
+                                <React.Fragment key={firma.firmaId}>
+                                    <Table.Summary.Cell colSpan={5} align="right" style={{ backgroundColor: paketRenkleri[paketIndex]?.[firma.firmaId] }}>
+                                        <Space>
+                                          <Radio.Group size="small" options={[{ label: 'H', value: 'Hariç' }, { label: 'D', value: 'Dahil' }]}
+                                              value={firma.kdvDurum} onChange={(e) => handleKdvDurumChange(paketIndex, firma.firmaId, e.target.value)} disabled={isDisabled} />
+                                          <InputNumber min={0} max={100} formatter={val => `% ${val}`} parser={val => val.replace('% ', '')}
+                                              value={firma.kdvOrani} onChange={(val) => handleKdvRateChange(paketIndex, firma.firmaId, val)} disabled={isDisabled} size="small" style={{ width: 60 }} />
+                                          <Text>{Number(firma.kdvTutar).toLocaleString('tr-TR', {minimumFractionDigits: 2})}</Text>
+                                        </Space>
+                                    </Table.Summary.Cell>
+                                    {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
+                                </React.Fragment>
+                            ))}
+                        </Table.Summary.Row>
+                        <Table.Summary.Row>
+                          <Table.Summary.Cell index={0}><Text strong>Genel Toplam</Text></Table.Summary.Cell>
+                          {firmalar.map((firma, i) => (
+                            <React.Fragment key={firma.firmaId}>
+                              <Table.Summary.Cell colSpan={5} align="right" style={{ backgroundColor: paketRenkleri[paketIndex]?.[firma.firmaId] }}>
+                                <Text strong style={{ fontSize: "1.1em" }}>{Number(firma.genelToplam).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}</Text>
+                              </Table.Summary.Cell>
+                              {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
+                            </React.Fragment>
+                          ))}
+                        </Table.Summary.Row>
+                        <Table.Summary.Row>
+                          <Table.Summary.Cell index={0}><Text strong>Açıklama</Text></Table.Summary.Cell>
+                          {firmalar.map((f, i) => (
+                            <React.Fragment key={f.firmaId}>
+                              <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
+                                <Input.TextArea value={f.aciklama} onChange={(e) => handleFirmaDetailChange(paketIndex, f.firmaId, 'aciklama', e.target.value)} autoSize={{ minRows: 1, maxRows: 3 }} style={componentStyle} />
+                              </Table.Summary.Cell>
+                              {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
+                            </React.Fragment>
+                          ))}
+                        </Table.Summary.Row>
+                        {detayGosterilenPaket === paketIndex && (
       <>
-        {/* 1. DİKEY BOŞLUK İÇİN BOŞ SATIR */}
-        <Table.Summary.Row style={{ height: "30px", background: "transparent" }}>
-             <Table.Summary.Cell index={0} colSpan={columns.length} style={{ border: "none" }} />
+        <Table.Summary.Row style={{ height: 10 }}>
+          <Table.Summary.Cell colSpan={columns.length} style={{ border: 'none', background: 'transparent' }} />
         </Table.Summary.Row>
 
-        {/* ARA TOPLAM SATIRI */}
-        <Table.Summary.Row>
-          <Table.Summary.Cell index={0}><Text strong>Ara Toplam</Text></Table.Summary.Cell>
-          {firmalar.map((firma, i) => (
-            <React.Fragment key={firma.firmaId}>
-              <Table.Summary.Cell colSpan={5} align="right" style={{ backgroundColor: paketRenkleri[paketIndex]?.[firma.firmaId] }}>
-                <Text strong>{Number(firma.araToplam).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}</Text>
-              </Table.Summary.Cell>
-              
-              {/* YATAY BOŞLUK HÜCRESİ (Son firma değilse ekle) */}
-              {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
-            </React.Fragment>
-          ))}
-        </Table.Summary.Row>
-
-        {/* İNDİRİM SATIRI */}
-        <Table.Summary.Row>
-          <Table.Summary.Cell index={0}><Text strong>İndirim</Text></Table.Summary.Cell>
-          {firmalar.map((firma, i) => (
-            <React.Fragment key={firma.firmaId}>
-              <Table.Summary.Cell colSpan={5} align="right" style={{ backgroundColor: paketRenkleri[paketIndex]?.[firma.firmaId] }}>
-                {renderEditableSummaryCell(paketIndex, firma.firmaId, "indirimOrani", firma.indirimTutar ?? 0, firma.indirimOrani ?? 0)}
-              </Table.Summary.Cell>
-               {/* YATAY BOŞLUK HÜCRESİ */}
-               {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
-            </React.Fragment>
-          ))}
-        </Table.Summary.Row>
-
-        {/* KDV SATIRI (Aynı mantıkla güncelle) */}
-        <Table.Summary.Row>
-            <Table.Summary.Cell index={0}><Text strong>Kdv</Text></Table.Summary.Cell>
-            {firmalar.map((firma, i) => (
-                <React.Fragment key={firma.firmaId}>
-                    <Table.Summary.Cell colSpan={5} align="right" style={{ backgroundColor: paketRenkleri[paketIndex]?.[firma.firmaId] }}>
-                        {/* ...senin kdv içeriğin... */}
-                        <Space>
-                          {/* ...Radio, InputNumber, Text kodların aynen kalacak... */}
-                          <Radio.Group 
-                              size="small" 
-                              options={[{ label: 'H', value: 'Hariç' }, { label: 'D', value: 'Dahil' }]}
-                              value={firma.kdvDurum}
-                              onChange={(e) => handleKdvDurumChange(paketIndex, firma.firmaId, e.target.value)}
-                              disabled={isDisabled}
-                          />
-                          <InputNumber
-                              min={0} max={100}
-                              formatter={val => `% ${val}`}
-                              parser={val => val.replace('% ', '')}
-                              value={firma.kdvOrani}
-                              onChange={(val) => handleKdvRateChange(paketIndex, firma.firmaId, val)}
-                              disabled={isDisabled}
-                              size="small"
-                              style={{ width: 60 }}
-                          />
-                          <Text>{Number(firma.kdvTutar).toLocaleString('tr-TR', {minimumFractionDigits: 2})}</Text>
-                        </Space>
-                    </Table.Summary.Cell>
-                    {/* YATAY BOŞLUK HÜCRESİ */}
-                    {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
-                </React.Fragment>
+        {/* 1. TARİH ALANLARI */}
+        {["teklifTarihi", "gecerlilikTarihi", "teslimTarihi"].map(field => (
+          <Table.Summary.Row key={field}>
+            <Table.Summary.Cell index={0}>
+              <Text strong>{field === "teklifTarihi" ? "Teklif Tarihi" : field === "gecerlilikTarihi" ? "Geçerlilik Tarihi" : "Teslim Tarihi"}</Text>
+            </Table.Summary.Cell>
+            {firmalar.map((f, i) => (
+              <React.Fragment key={f.firmaId}>
+                <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
+                  <DatePicker format="DD.MM.YYYY" value={f[field] ? dayjs(f[field]) : null} style={componentStyle} disabled={isDisabled}
+                    onChange={(d) => handleFirmaDetailChange(paketIndex, f.firmaId, field, d ? d.toISOString() : null)} />
+                </Table.Summary.Cell>
+                {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
+              </React.Fragment>
             ))}
-        </Table.Summary.Row>
+          </Table.Summary.Row>
+        ))}
 
-        {/* GENEL TOPLAM SATIRI */}
+        {/* 2. TESLİM YERİ */}
         <Table.Summary.Row>
-          <Table.Summary.Cell index={0}><Text strong>Genel Toplam</Text></Table.Summary.Cell>
-          {firmalar.map((firma, i) => (
-            <React.Fragment key={firma.firmaId}>
-              <Table.Summary.Cell colSpan={5} align="right" style={{ backgroundColor: paketRenkleri[paketIndex]?.[firma.firmaId] }}>
-                <Text strong style={{ fontSize: "1.1em" }}>
-                  {Number(firma.genelToplam).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}
-                </Text>
+          <Table.Summary.Cell index={0}><Text strong>Teslim Yeri</Text></Table.Summary.Cell>
+          {firmalar.map((f, i) => (
+            <React.Fragment key={f.firmaId}>
+              <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
+                <Input value={f.teslimYeri} style={componentStyle} disabled={isDisabled}
+                  onChange={(e) => handleFirmaDetailChange(paketIndex, f.firmaId, "teslimYeri", e.target.value)} />
               </Table.Summary.Cell>
-              {/* YATAY BOŞLUK HÜCRESİ */}
               {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
             </React.Fragment>
           ))}
         </Table.Summary.Row>
 
-        {/* AÇIKLAMA */}
-    <Table.Summary.Row>
-      <Table.Summary.Cell index={0}><Text strong>Açıklama</Text></Table.Summary.Cell>
-      {firmalar.map((f, i) => (
-        <React.Fragment key={f.firmaId}>
-          <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
-            <div style={cellWrapperStyle}>
-              <Input.TextArea
-                value={f.aciklama}
-                onChange={(e) => handleFirmaDetailChange(paketIndex, f.firmaId, 'aciklama', e.target.value)}
-                autoSize={{ minRows: 1, maxRows: 3 }}
-                style={componentStyle}
-              />
-            </div>
-          </Table.Summary.Cell>
-          {/* BOŞLUK HÜCRESİ */}
-          {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
-        </React.Fragment>
-      ))}
-    </Table.Summary.Row>
-
-      {detayGosterilenPaket === paketIndex && (
-  <>
-    {/* Detay başlığı ile üstteki toplamlar arasına minik bir boşluk */}
-    <Table.Summary.Row style={{ height: 10 }}>
-        <Table.Summary.Cell colSpan={columns.length} style={{ border: 'none', background: 'transparent' }} />
-    </Table.Summary.Row>
-
-    {/* TEKLİF TARİHİ */}
-    <Table.Summary.Row>
-      <Table.Summary.Cell index={0}><Text strong>Teklif Tarihi</Text></Table.Summary.Cell>
-      {firmalar.map((f, i) => (
-        <React.Fragment key={f.firmaId}>
-          <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
-            <div style={cellWrapperStyle}>
-              <DatePicker
-                format="DD.MM.YYYY"
-                value={f.teklifTarihi ? dayjs(f.teklifTarihi) : null}
-                onChange={(d) => handleFirmaDetailChange(paketIndex, f.firmaId, 'teklifTarihi', d ? d.toISOString() : null)}
+        {/* 3. SEVK ŞEKLİ */}
+        <Table.Summary.Row>
+  <Table.Summary.Cell index={0}><Text strong>Sevk Şekli</Text></Table.Summary.Cell>
+  {firmalar.map((f, i) => (
+    <React.Fragment key={f.firmaId}>
+      <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
+        <div style={cellWrapperStyle}>
+            <SimpleKodSelectbox 
+                kodID={13071} 
+                value={f.sevkSekli} 
                 disabled={isDisabled}
                 style={componentStyle}
-              />
-            </div>
-          </Table.Summary.Cell>
-          {/* BOŞLUK HÜCRESİ */}
-          {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
-        </React.Fragment>
-      ))}
-    </Table.Summary.Row>
+                placeholder="Seçiniz"
+                onChange={(val) => handleFirmaDetailChange(paketIndex, f.firmaId, "sevkSekli", val)} 
+            />
+        </div>
+      </Table.Summary.Cell>
+      {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
+    </React.Fragment>
+  ))}
+</Table.Summary.Row>
 
-    {/* GEÇERLİLİK TARİHİ */}
-    <Table.Summary.Row>
-      <Table.Summary.Cell index={0}><Text strong>Geçerlilik Tarihi</Text></Table.Summary.Cell>
-      {firmalar.map((f, i) => (
-        <React.Fragment key={f.firmaId}>
-          <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
-            <div style={cellWrapperStyle}>
-              <DatePicker
-                format="DD.MM.YYYY"
-                value={f.gecerlilikTarihi ? dayjs(f.gecerlilikTarihi) : null}
-                onChange={(d) => handleFirmaDetailChange(paketIndex, f.firmaId, 'gecerlilikTarihi', d ? d.toISOString() : null)}
+{/* 4. ÖDEME BİLGİSİ */}
+<Table.Summary.Row>
+  <Table.Summary.Cell index={0}><Text strong>Ödeme Bilgisi</Text></Table.Summary.Cell>
+  {firmalar.map((f, i) => (
+    <React.Fragment key={f.firmaId}>
+      <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
+        <div style={cellWrapperStyle}>
+            <SimpleKodSelectbox 
+                kodID={13071} 
+                value={f.odemeBilgisi} 
                 disabled={isDisabled}
                 style={componentStyle}
-              />
-            </div>
-          </Table.Summary.Cell>
-          {/* BOŞLUK HÜCRESİ */}
-          {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
-        </React.Fragment>
-      ))}
-    </Table.Summary.Row>
+                placeholder="Seçiniz"
+                onChange={(val) => handleFirmaDetailChange(paketIndex, f.firmaId, "odemeBilgisi", val)} 
+            />
+        </div>
+      </Table.Summary.Cell>
+      {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
+    </React.Fragment>
+  ))}
+</Table.Summary.Row>
 
-    {/* TESLİM TARİHİ */}
-    <Table.Summary.Row>
-      <Table.Summary.Cell index={0}><Text strong>Teslim Tarihi</Text></Table.Summary.Cell>
-      {firmalar.map((f, i) => (
-        <React.Fragment key={f.firmaId}>
-          <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
-            <div style={cellWrapperStyle}>
-              <DatePicker
-                format="DD.MM.YYYY"
-                value={f.teslimTarihi ? dayjs(f.teslimTarihi) : null}
-                onChange={(d) => handleFirmaDetailChange(paketIndex, f.firmaId, 'teslimTarihi', d ? d.toISOString() : null)}
-                disabled={isDisabled}
-                style={componentStyle}
-              />
-            </div>
-          </Table.Summary.Cell>
-          {/* BOŞLUK HÜCRESİ */}
-          {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
-        </React.Fragment>
-      ))}
-    </Table.Summary.Row>
+        {/* 5. YETKİLİ */}
+        <Table.Summary.Row>
+          <Table.Summary.Cell index={0}><Text strong>Yetkili</Text></Table.Summary.Cell>
+          {firmalar.map((f, i) => (
+            <React.Fragment key={f.firmaId}>
+              <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
+                <Input value={f.yetkili} style={componentStyle} disabled={isDisabled}
+                  onChange={(e) => handleFirmaDetailChange(paketIndex, f.firmaId, "yetkili", e.target.value)} />
+              </Table.Summary.Cell>
+              {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
+            </React.Fragment>
+          ))}
+        </Table.Summary.Row>
 
-    {/* TESLİM YERİ */}
-    <Table.Summary.Row>
-      <Table.Summary.Cell index={0}><Text strong>Teslim Yeri</Text></Table.Summary.Cell>
-      {firmalar.map((f, i) => (
-        <React.Fragment key={f.firmaId}>
-          <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
-            <div style={cellWrapperStyle}>
-              <Input
-                value={f.teslimYeri}
-                onChange={(e) => handleFirmaDetailChange(paketIndex, f.firmaId, "teslimYeri", e.target.value)}
-                disabled={isDisabled}
-                style={componentStyle}
-              />
-            </div>
-          </Table.Summary.Cell>
-          {/* BOŞLUK HÜCRESİ */}
-          {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
-        </React.Fragment>
-      ))}
-    </Table.Summary.Row>
-
-    {/* SEVK ŞEKLİ */}
-    <Table.Summary.Row>
-      <Table.Summary.Cell index={0}><Text strong>Sevk Şekli</Text></Table.Summary.Cell>
-      {firmalar.map((f, i) => (
-        <React.Fragment key={f.firmaId}>
-          <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
-            <div style={cellWrapperStyle}>
-              <div style={componentStyle}>
-                <SimpleKodSelectbox
-                  kodID={13071}
-                  value={f.sevkSekli}
-                  onChange={(val) => handleFirmaDetailChange(paketIndex, f.firmaId, "sevkSekli", val)}
-                  disabled={isDisabled}
-                  placeholder="Sevk Şekli Seç"
-                />
-              </div>
-            </div>
-          </Table.Summary.Cell>
-          {/* BOŞLUK HÜCRESİ */}
-          {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
-        </React.Fragment>
-      ))}
-    </Table.Summary.Row>
-
-    {/* ÖDEME BİLGİSİ */}
-    <Table.Summary.Row>
-      <Table.Summary.Cell index={0}><Text strong>Ödeme Bilgisi</Text></Table.Summary.Cell>
-      {firmalar.map((f, i) => (
-        <React.Fragment key={f.firmaId}>
-          <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
-            <div style={cellWrapperStyle}>
-              <div style={componentStyle}>
-                <SimpleKodSelectbox
-                  kodID={33021}
-                  value={f.odemeBilgisi}
-                  onChange={(val) => handleFirmaDetailChange(paketIndex, f.firmaId, "odemeBilgisi", val)}
-                  disabled={isDisabled}
-                  placeholder="Ödeme Bilgisi Seç"
-                />
-              </div>
-            </div>
-          </Table.Summary.Cell>
-          {/* BOŞLUK HÜCRESİ */}
-          {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
-        </React.Fragment>
-      ))}
-    </Table.Summary.Row>
-
-    {/* YETKİLİ */}
-    <Table.Summary.Row>
-      <Table.Summary.Cell index={0}><Text strong>Yetkili</Text></Table.Summary.Cell>
-      {firmalar.map((f, i) => (
-        <React.Fragment key={f.firmaId}>
-          <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
-            <div style={cellWrapperStyle}>
-              <Input
-                value={f.yetkili}
-                onChange={(e) => handleFirmaDetailChange(paketIndex, f.firmaId, "yetkili", e.target.value)}
-                disabled={isDisabled}
-                style={componentStyle}
-              />
-            </div>
-          </Table.Summary.Cell>
-          {/* BOŞLUK HÜCRESİ */}
-          {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
-        </React.Fragment>
-      ))}
-    </Table.Summary.Row>
-
-    {/* TELEFON */}
-    <Table.Summary.Row>
-      <Table.Summary.Cell index={0}><Text strong>Telefon</Text></Table.Summary.Cell>
-      {firmalar.map((f, i) => (
-        <React.Fragment key={f.firmaId}>
-          <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
-            <div style={cellWrapperStyle}>
-              <Input
-                value={f.telefon}
-                onChange={(e) => handleFirmaDetailChange(paketIndex, f.firmaId, "telefon", e.target.value)}
-                disabled={isDisabled}
-                style={componentStyle}
-              />
-            </div>
-          </Table.Summary.Cell>
-          {/* BOŞLUK HÜCRESİ */}
-          {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
-        </React.Fragment>
-      ))}
-    </Table.Summary.Row>
+        {/* 6. TELEFON */}
+        <Table.Summary.Row>
+          <Table.Summary.Cell index={0}><Text strong>Telefon</Text></Table.Summary.Cell>
+          {firmalar.map((f, i) => (
+            <React.Fragment key={f.firmaId}>
+              <Table.Summary.Cell colSpan={5} align="center" style={{ backgroundColor: paketRenkleri[paketIndex]?.[f.firmaId] }}>
+                <Input value={f.telefon} style={componentStyle} disabled={isDisabled}
+                  onChange={(e) => handleFirmaDetailChange(paketIndex, f.firmaId, "telefon", e.target.value)} />
+              </Table.Summary.Cell>
+              {i < firmalar.length - 1 && <Table.Summary.Cell index={0} style={{ background: "transparent", border: "none" }} />}
+            </React.Fragment>
+          ))}
+        </Table.Summary.Row>
+      </>
+    )}
   </>
 )}
-                        </>
-                    );
-                 }}
-               />
-               <div style={{ marginTop: 10, textAlign: 'right' }}>
-                   <a onClick={() => setDetayGosterilenPaket(detayGosterilenPaket === paketIndex ? null : paketIndex)}>
-                       {detayGosterilenPaket === paketIndex ? "Detayı Gizle" : "Detay Gör"}
-                   </a>
-               </div>
+                  />
+              </div>
+              <div style={{ marginTop: 10, textAlign: 'right' }}>
+                  <a onClick={() => setDetayGosterilenPaket(detayGosterilenPaket === paketIndex ? null : paketIndex)}>
+                      {detayGosterilenPaket === paketIndex ? "Detayı Gizle" : "Detay Gör"}
+                  </a>
+              </div>
             </TabPane>
           );
         })}
@@ -1342,16 +1155,24 @@ const dataSource = malzemeler.map((m) => ({ key: m.malzemeId, ...m }));
         }}
       />
       <TeklifiSipariseAktar
-        open={siparisModalOpen}
-        onCloseModal={() => setSiparisModalOpen(false)}
-        teklifId={selectedRow}
-        fisId={fisId}
-        onSiparisGuncelle={() => {
-            if (typeof onDurumGuncelle === "function") {
-               onDurumGuncelle({ teklifId: selectedRow, durumID: 5 });
-            }
-        }}
-      />
+  open={siparisModalOpen}
+  onCloseModal={() => setSiparisModalOpen(false)}
+  teklifId={selectedRow}
+  fisId={fisId}
+  onSiparisGuncelle={() => {
+    // 1. Parent'ı bilgilendir (varsa)
+    if (typeof onDurumGuncelle === "function") {
+      onDurumGuncelle({ teklifId: selectedRow, durumID: 5 });
+    }
+    // 2. KRİTİK NOKTA: Mevcut tablodaki verileri API'den tekrar çek
+    const allIds = paketler.map(p => p.id || p.teklifBaslik?.teklifId);
+    if (allIds.length) {
+      fetchAllTeklifler(allIds);
+    }
+    // 3. Modalı kapat
+    setSiparisModalOpen(false);
+  }}
+/>
       <Modal
   title="Siparişlerim"
   open={siparislerimOpen}
