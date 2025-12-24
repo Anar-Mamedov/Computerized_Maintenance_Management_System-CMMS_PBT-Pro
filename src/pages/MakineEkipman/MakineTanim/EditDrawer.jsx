@@ -629,7 +629,6 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             </Spin>
           ) : (
             <form onSubmit={methods.handleSubmit(onSubmit)}>
-              <MainTabs />
               <Tabs update={true} />
             </form>
           )}

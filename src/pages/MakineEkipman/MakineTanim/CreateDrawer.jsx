@@ -463,7 +463,6 @@ export default function CreateDrawer({ onRefresh }) {
           }
         >
           <form onSubmit={methods.handleSubmit(onSubmit)} className="w-full box-border">
-            <MainTabs />
             {/* <SecondTabs /> */}
             <Tabs />
             {/*  <Footer /> */}
