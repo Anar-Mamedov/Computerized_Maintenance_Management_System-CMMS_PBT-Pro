@@ -35,6 +35,12 @@ function Tablar({ selectedRowID }) {
         <Radio.Button className="custom-radio-button" value="1">
           {t("genelBilgiler")}
         </Radio.Button>
+        <Radio.Button className="custom-radio-button" value="6">
+          {t("barkodlar")}
+        </Radio.Button>
+        <Radio.Button className="custom-radio-button" value="7">
+          {t("tedarikciler")}
+        </Radio.Button>
         <Radio.Button className="custom-radio-button" value="2">
           {t("ozelAlanlar")}
         </Radio.Button>
@@ -46,12 +52,6 @@ function Tablar({ selectedRowID }) {
         </Radio.Button>
         <Radio.Button className="custom-radio-button" value="5">
           {t("aciklama")}
-        </Radio.Button>
-        <Radio.Button className="custom-radio-button" value="6">
-          {t("barkodlar")}
-        </Radio.Button>
-        <Radio.Button className="custom-radio-button" value="7">
-          {t("tedarikciler")}
         </Radio.Button>
       </Radio.Group>
       <style>
