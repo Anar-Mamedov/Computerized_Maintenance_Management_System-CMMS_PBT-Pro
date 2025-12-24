@@ -348,7 +348,7 @@ function Sayac({ selectedRowID = null }) {
     <div style={containerStyle}>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "10px", gap: "10px" }}>
         <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
-        <Insert refreshTableData={refreshTableData} selectedMakineID={selectedRowID} />
+        <Insert onRefresh={refreshTableData} selectedMakineID={selectedRowID} />
       </div>
 
       <Table
