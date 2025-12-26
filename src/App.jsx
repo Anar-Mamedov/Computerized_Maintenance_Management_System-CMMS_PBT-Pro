@@ -65,6 +65,7 @@ import SatinalmaSiparisleri from "./pages/SatinalmaYonetimi/SatinalmaSiparisleri
 import FiyatTeklfileri from "./pages/SatinalmaYonetimi/FiyatTeklifleri/FiyatTeklifleri.jsx";
 import DetarikciFirmalar from "./pages/SatinalmaYonetimi/FirmaTanimlari/FirmaTanimlari.jsx";
 import SatinalmaDashboard from "./pages/SatinalmaYonetimi/Dashboard1/Dashboard.jsx";
+import BakimKPIPano from "./pages/BakımVeArizaYonetimi/BakimKPIPano/BakimKPIPano.jsx";
 import AxiosInstance from "./api/http";
 
 // Malzemeler
@@ -246,6 +247,7 @@ const rawItems = [
     [
       getItem("Müdahale Süreleri Analizi", "mudaheleSuresi", true),
       getItem("Personel KPI Analizi", "analizler", true),
+      getItem("Bakım KPI Panosu", "bakimKpiPano", true),
 
       // getItem("Team 2", "team2", true)
     ],
@@ -423,6 +425,7 @@ export default function App() {
           <Route path="/fiyatTeklifleri" element={<FiyatTeklfileri />} />
           <Route path="/tedarikciFirmalar" element={<DetarikciFirmalar />} />
           <Route path="/satinalmaDashboard" element={<SatinalmaDashboard />} />
+          <Route path="/bakimKpiPano" element={<BakimKPIPano />} />
           {/*<Route path="/kurallar" element={<Kurallar />} />*/}
         </Route>
       </Routes>
