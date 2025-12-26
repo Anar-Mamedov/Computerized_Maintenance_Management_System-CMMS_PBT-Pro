@@ -2,7 +2,7 @@ import tr_TR from "antd/es/locale/tr_TR";
 import enUS from "antd/es/locale/en_US";
 import ruRU from "antd/es/locale/ru_RU";
 import azAZ from "antd/es/locale/az_AZ";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, QrcodeOutlined } from "@ant-design/icons";
 import { Button, Drawer, Space, ConfigProvider, Modal, message, Spin } from "antd";
 import React, { useEffect, useState, useTransition } from "react";
 import MainTabs from "./components/MainTabs/MainTabs";
@@ -11,6 +11,7 @@ import dayjs from "dayjs";
 import AxiosInstance from "../../../../api/http.jsx";
 import Tablar from "./components/Tablar.jsx";
 import { t } from "i18next";
+import QRCodeGenerator from "../../../../utils/components/QRCodeGenerator";
 
 // Add locale mapping
 const localeMap = {
@@ -24,6 +25,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   const [, startTransition] = useTransition();
   const [currentLocale, setCurrentLocale] = useState(tr_TR);
   const [loading, setLoading] = useState(false);
+  const [qrModalOpen, setQrModalOpen] = useState(false);
 
   const methods = useForm({
     defaultValues: {
@@ -368,6 +370,9 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   const extraButton = (
     <Space>
+      <Button icon={<QrcodeOutlined />} onClick={() => setQrModalOpen(true)}>
+        {t("qrKod")}
+      </Button>
       <Button onClick={onClose}>{t("iptal")}</Button>
       <Button
         type="submit"
@@ -400,6 +405,14 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             </form>
           )}
         </Drawer>
+
+        <QRCodeGenerator
+          visible={qrModalOpen}
+          onClose={() => setQrModalOpen(false)}
+          value={`TB_STOK_ID: ${selectedRow?.key}`}
+          fileName={`QR-${watch("malzemeKod")}`}
+          title={t("malzemeQrKodu")}
+        />
       </ConfigProvider>
     </FormProvider>
   );

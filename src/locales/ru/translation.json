@@ -12,6 +12,8 @@
   "resimBulunamadi": "Изображение не найдено",
   "globalYes": "Да",
   "globalNo": "Нет",
+  "qrKod": "QR-код",
+  "malzemeQrKodu": "QR-код материала",
   "tedarikciler": "Поставщики",
   "tedarikciKodu": "Код поставщика",
   "tedarikciFirma": "Компания-поставщик",

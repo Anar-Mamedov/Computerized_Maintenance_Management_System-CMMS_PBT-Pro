@@ -12,6 +12,8 @@
   "resimBulunamadi": "Image not found",
   "globalYes": "Yes",
   "globalNo": "No",
+  "qrKod": "QR Code",
+  "malzemeQrKodu": "Material QR Code",
   "tedarikciler": "Suppliers",
   "tedarikciKodu": "Supplier Code",
   "tedarikciFirma": "Supplier Company",
