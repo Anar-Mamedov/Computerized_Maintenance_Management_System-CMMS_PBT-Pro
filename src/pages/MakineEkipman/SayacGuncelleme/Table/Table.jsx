@@ -11,6 +11,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../api/http";
 import LocalizedDateText from "../../../../utils/components/LocalizedDateText.jsx";
 import ValidationNumberInput from "./components/ValidationNumberInput.jsx";
+import HistoryModal from "./components/HistoryModal.jsx";
 import Filters from "./filter/Filters.jsx";
 import "./ResizeStyle.css";
 
@@ -117,6 +118,8 @@ function MainTable() {
   const [validationStates, setValidationStates] = useState({});
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [historyRecord, setHistoryRecord] = useState(null);
   const rowValuesRef = useRef({});
   const validationStatesRef = useRef({});
   const selectedRowsRef = useRef({});
@@ -317,6 +320,16 @@ function MainTable() {
     },
     [formatNumber]
   );
+
+  const handleOpenHistory = useCallback((record) => {
+    setHistoryRecord(record);
+    setIsHistoryOpen(true);
+  }, []);
+
+  const handleCloseHistory = useCallback(() => {
+    setIsHistoryOpen(false);
+    setHistoryRecord(null);
+  }, []);
 
   const validateDifferentDateTimeValue = useCallback(
     async (record, dateValue, timeValue, yeniDeger) => {
@@ -737,6 +750,19 @@ function MainTable() {
           return calculateDifference(record, nextValue);
         },
       },
+      {
+        title: t("sayacGuncelleme.actions", { defaultValue: "İşlemler" }),
+        dataIndex: "actions",
+        key: "actions",
+        ellipsis: true,
+        width: 140,
+        visible: true,
+        render: (_, record) => (
+          <Button size="small" onClick={() => handleOpenHistory(record)}>
+            {t("sayacGuncelleme.viewHistory", { defaultValue: "Tarihçeyi Gör" })}
+          </Button>
+        ),
+      },
     ],
     [
       calculateDifference,
@@ -747,6 +773,7 @@ function MainTable() {
       formatText,
       getFieldName,
       getValues,
+      handleOpenHistory,
       performValidation,
       setValue,
       t,
@@ -1073,6 +1100,7 @@ function MainTable() {
           </DndContext>
         </div>
       </Modal>
+      <HistoryModal open={isHistoryOpen} onClose={handleCloseHistory} record={historyRecord} />
       <div
         style={{
           display: "flex",
