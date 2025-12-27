@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Button, Checkbox, DatePicker, Modal, Table, TimePicker, Typography, message } from "antd";
+import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
+import { Button, Checkbox, DatePicker, Modal, Table, TimePicker, Typography, message, Tooltip } from "antd";
 import { HolderOutlined, MenuOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 import { Controller, useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../api/http";
 import LocalizedDateText from "../../../../utils/components/LocalizedDateText.jsx";
-import NumberInput from "../../../../utils/components/NumberInput.jsx";
+import ValidationNumberInput from "./components/ValidationNumberInput.jsx";
 import Filters from "./filter/Filters.jsx";
 import "./ResizeStyle.css";
 
@@ -106,7 +106,7 @@ const normalizeIdList = (values = []) => values.map((value) => Number(value)).fi
 
 function MainTable() {
   const { t, i18n } = useTranslation();
-  const { control, setValue, watch } = useFormContext();
+  const { control, setValue, watch, setError, clearErrors } = useFormContext();
   const [appliedFilters, setAppliedFilters] = useState(DEFAULT_FILTERS);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [data, setData] = useState([]);
@@ -114,6 +114,9 @@ function MainTable() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
+  const [validationStates, setValidationStates] = useState({});
+  const validationTimeoutRef = useRef({});
+  const previousValuesRef = useRef({});
 
   const numberFormatter = useMemo(
     () =>
@@ -207,7 +210,7 @@ function MainTable() {
           key: item.SayacId ?? `${item.MakineId || "sayac"}-${index}`,
           girisTarihi: now,
           girisSaati: now,
-          yeniDeger: Number.isFinite(Number(item.GuncelDeger)) ? Number(item.GuncelDeger) : null,
+          yeniDeger: null,
         }));
 
         mapped.forEach((item) => {
@@ -215,6 +218,7 @@ function MainTable() {
           setValue(getFieldName(rowKey, "girisTarihi"), item.girisTarihi, { shouldDirty: false, shouldTouch: false });
           setValue(getFieldName(rowKey, "girisSaati"), item.girisSaati, { shouldDirty: false, shouldTouch: false });
           setValue(getFieldName(rowKey, "yeniDeger"), item.yeniDeger, { shouldDirty: false, shouldTouch: false });
+          previousValuesRef.current[rowKey] = item.yeniDeger;
         });
 
         setData(mapped);
@@ -250,14 +254,188 @@ function MainTable() {
       if (nextValue === "" || nextValue === null || nextValue === undefined) {
         return EMPTY_VALUE;
       }
-      const current = Number(record.GuncelDeger);
-      const next = Number(nextValue ?? record.yeniDeger);
-      if (!Number.isFinite(current) || !Number.isFinite(next)) {
+
+      const valNum = Number(nextValue);
+      if (Number.isNaN(valNum)) {
         return EMPTY_VALUE;
       }
-      return formatNumber(next - current);
+
+      const current = Number(record.GuncelDeger);
+      if (!Number.isFinite(current)) {
+        return EMPTY_VALUE;
+      }
+
+      const diff = valNum - current;
+      const sign = diff >= 0 ? "+" : "";
+      return `${sign}${formatNumber(diff)}`;
     },
     [formatNumber]
+  );
+
+  const isSameAsSystemDateTime = useCallback((dateValue, timeValue) => {
+    const now = dayjs();
+    if (!dateValue || !timeValue) {
+      return false;
+    }
+    const isSameDate = dayjs(dateValue).isSame(now, "day");
+    const isSameTime = dayjs(timeValue).format("HH:mm") === now.format("HH:mm");
+    return isSameDate && isSameTime;
+  }, []);
+
+  const validateSameDateTimeValue = useCallback(
+    (record, yeniDeger) => {
+      const guncelDeger = Number(record.GuncelDeger);
+      const yeniDegerNum = Number(yeniDeger);
+
+      if (!Number.isFinite(yeniDegerNum) || !Number.isFinite(guncelDeger)) {
+        return { isValid: true, color: undefined };
+      }
+
+      if (yeniDegerNum > guncelDeger) {
+        return { isValid: true, color: "green", message: t("sayacGuncelleme.updateable", { defaultValue: "Güncellenebilir" }) };
+      }
+
+      return {
+        isValid: false,
+        color: "red",
+        message: t("sayacGuncelleme.newValueMustBeGreater", { defaultValue: "Yeni değer güncel değerden büyük olmalıdır" }),
+      };
+    },
+    [t]
+  );
+
+  const validateDifferentDateTimeValue = useCallback(
+    async (record, dateValue, timeValue, yeniDeger) => {
+      if (!record.SayacId || yeniDeger === "" || yeniDeger === null || yeniDeger === undefined) {
+        return { isValid: true, color: undefined };
+      }
+
+      try {
+        const formattedDate = dayjs(dateValue).format("YYYY-MM-DDTHH:mm:ss");
+        const formattedTime = dayjs(timeValue).format("HH:mm");
+
+        const payload = {
+          SayacId: record.SayacId,
+          Tarih: formattedDate,
+          Saat: formattedTime,
+          YeniDeger: Number(yeniDeger),
+        };
+
+        const response = await AxiosInstance.post("CheckSayacGirisUygunlugu", payload);
+
+        if (response?.IsValid === true) {
+          return {
+            isValid: true,
+            color: "green",
+            message: response.Message || t("sayacGuncelleme.validEntry", { defaultValue: "Geçerli kayıt" }),
+          };
+        }
+
+        return {
+          isValid: false,
+          color: "red",
+          message: response?.Message || t("sayacGuncelleme.invalidEntry", { defaultValue: "Geçersiz kayıt" }),
+          minValidValue: response?.MinValidValue,
+          maxValidValue: response?.MaxValidValue,
+        };
+      } catch (error) {
+        console.error("Validation error:", error);
+        return {
+          isValid: false,
+          color: "red",
+          message: t("sayacGuncelleme.validationError", { defaultValue: "Doğrulama hatası" }),
+        };
+      }
+    },
+    [t]
+  );
+
+  const performValidation = useCallback(
+    async (record) => {
+      const rowKey = record.key;
+      const dateFieldName = getFieldName(rowKey, "girisTarihi");
+      const timeFieldName = getFieldName(rowKey, "girisSaati");
+      const valueFieldName = getFieldName(rowKey, "yeniDeger");
+
+      const dateValue = watch(dateFieldName);
+      const timeValue = watch(timeFieldName);
+      const yeniDeger = watch(valueFieldName);
+
+      if (yeniDeger === "" || yeniDeger === null || yeniDeger === undefined) {
+        clearErrors([dateFieldName, timeFieldName, valueFieldName]);
+
+        setData((prevData) =>
+          prevData.map((item) =>
+            item.key === rowKey ? { ...item, validationState: { isValid: true, color: undefined } } : item
+          )
+        );
+
+        setValidationStates((prev) => ({
+          ...prev,
+          [rowKey]: { isValid: true, color: undefined },
+        }));
+        return;
+      }
+
+      const isSameDateTime = isSameAsSystemDateTime(dateValue, timeValue);
+
+      if (isSameDateTime) {
+        const result = validateSameDateTimeValue(record, yeniDeger);
+
+        const newState = {
+          isValid: result.isValid,
+          color: result.color,
+          message: result.message,
+        };
+
+        if (result.isValid) {
+          clearErrors([dateFieldName, timeFieldName, valueFieldName]);
+        } else {
+          setError(valueFieldName, { type: "validation", message: result.message });
+          setError(dateFieldName, { type: "validation", message: result.message });
+          setError(timeFieldName, { type: "validation", message: result.message });
+        }
+
+        setData((prevData) =>
+          prevData.map((item) =>
+            item.key === rowKey ? { ...item, validationState: newState } : item
+          )
+        );
+
+        setValidationStates((prev) => ({
+          ...prev,
+          [rowKey]: newState,
+        }));
+      } else {
+        const result = await validateDifferentDateTimeValue(record, dateValue, timeValue, yeniDeger);
+
+        const newState = {
+          isValid: result.isValid,
+          color: result.color,
+          message: result.message,
+        };
+
+        if (result.isValid) {
+          clearErrors([dateFieldName, timeFieldName, valueFieldName]);
+        } else {
+          setError(valueFieldName, { type: "validation", message: result.message });
+          setError(dateFieldName, { type: "validation", message: result.message });
+          setError(timeFieldName, { type: "validation", message: result.message });
+        }
+
+        setData((prevData) =>
+          prevData.map((item) =>
+            item.key === rowKey ? { ...item, validationState: newState } : item
+          )
+        );
+
+        setValidationStates((prev) => ({
+          ...prev,
+          [rowKey]: newState,
+        }));
+      }
+    },
+    [getFieldName, watch, isSameAsSystemDateTime, validateSameDateTimeValue, validateDifferentDateTimeValue, setValidationStates, setError, clearErrors, setData]
   );
 
   const initialColumns = useMemo(
@@ -361,17 +539,34 @@ function MainTable() {
           const dateFieldName = getFieldName(record.key, "girisTarihi");
           const timeFieldName = getFieldName(record.key, "girisSaati");
           const currentTimeValue = watch(timeFieldName);
+          const validationState = record.validationState;
+
+          const datePickerStyle = {
+            flex: 1,
+            width: "100%",
+            ...(validationState?.color === "green" && {
+              borderColor: "#52c41a",
+              boxShadow: "0 0 0 2px rgba(82, 196, 26, 0.2)",
+            }),
+            ...(validationState?.color === "red" && {
+              borderColor: "#ff4d4f",
+              boxShadow: "0 0 0 2px rgba(255, 77, 79, 0.2)",
+            }),
+          };
+
+          const datePickerStatus = validationState?.color === "red" ? "error" : undefined;
 
           return (
             <Controller
               name={dateFieldName}
               control={control}
               rules={{ required: false }}
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <DatePicker
                   {...field}
                   format={dateFormat}
-                  style={{ flex: 1, width: "100%" }}
+                  style={datePickerStyle}
+                  status={datePickerStatus || (fieldState.error ? "error" : "")}
                   disabledDate={disableFutureDates}
                   onChange={(value) => {
                     field.onChange(value);
@@ -381,6 +576,16 @@ function MainTable() {
                     const now = dayjs();
                     if (value.isSame(now, "day") && dayjs.isDayjs(currentTimeValue) && currentTimeValue.isAfter(now)) {
                       setValue(timeFieldName, now, { shouldDirty: true, shouldTouch: true });
+                    }
+
+                    const yeniDegerValue = watch(getFieldName(record.key, "yeniDeger"));
+                    if (yeniDegerValue !== null && yeniDegerValue !== undefined && yeniDegerValue !== "") {
+                      if (validationTimeoutRef.current[record.key]) {
+                        clearTimeout(validationTimeoutRef.current[record.key]);
+                      }
+                      validationTimeoutRef.current[record.key] = setTimeout(() => {
+                        performValidation(record);
+                      }, 300);
                     }
                   }}
                 />
@@ -400,6 +605,22 @@ function MainTable() {
           const dateFieldName = getFieldName(record.key, "girisTarihi");
           const timeFieldName = getFieldName(record.key, "girisSaati");
           const entryDate = watch(dateFieldName);
+          const validationState = record.validationState;
+
+          const timePickerStyle = {
+            flex: 1,
+            width: "100%",
+            ...(validationState?.color === "green" && {
+              borderColor: "#52c41a",
+              boxShadow: "0 0 0 2px rgba(82, 196, 26, 0.2)",
+            }),
+            ...(validationState?.color === "red" && {
+              borderColor: "#ff4d4f",
+              boxShadow: "0 0 0 2px rgba(255, 77, 79, 0.2)",
+            }),
+          };
+
+          const timePickerStatus = validationState?.color === "red" ? "error" : undefined;
 
           const getDisabledTime = () => {
             if (!entryDate || !dayjs(entryDate).isSame(dayjs(), "day")) {
@@ -435,12 +656,13 @@ function MainTable() {
               name={timeFieldName}
               control={control}
               rules={{ required: false }}
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <TimePicker
                   {...field}
                   format={timeFormat}
                   needConfirm={false}
-                  style={{ flex: 1, width: "100%" }}
+                  style={timePickerStyle}
+                  status={timePickerStatus || (fieldState.error ? "error" : "")}
                   disabledTime={getDisabledTime}
                   onChange={(value) => {
                     field.onChange(value);
@@ -450,6 +672,16 @@ function MainTable() {
                     const now = dayjs();
                     if (entryDate && dayjs(entryDate).isSame(now, "day") && value.isAfter(now)) {
                       setValue(timeFieldName, now, { shouldDirty: true, shouldTouch: true });
+                    }
+
+                    const yeniDegerValue = watch(getFieldName(record.key, "yeniDeger"));
+                    if (yeniDegerValue !== null && yeniDegerValue !== undefined && yeniDegerValue !== "") {
+                      if (validationTimeoutRef.current[record.key]) {
+                        clearTimeout(validationTimeoutRef.current[record.key]);
+                      }
+                      validationTimeoutRef.current[record.key] = setTimeout(() => {
+                        performValidation(record);
+                      }, 300);
                     }
                   }}
                 />
@@ -465,14 +697,51 @@ function MainTable() {
         ellipsis: true,
         width: 150,
         visible: true,
-        render: (_, record) => <NumberInput name1={getFieldName(record.key, "yeniDeger")} minNumber={0} />,
+        render: (_, record) => {
+          const valueFieldName = getFieldName(record.key, "yeniDeger");
+          const validationState = record.validationState;
+          const currentValue = watch(valueFieldName);
+
+          const handleValueChange = () => {
+            previousValuesRef.current[record.key] = currentValue;
+          };
+
+          const handleValueBlur = () => {
+            const previousValue = previousValuesRef.current[record.key];
+            const newValue = watch(valueFieldName);
+
+            if (previousValue !== newValue) {
+              if (validationTimeoutRef.current[record.key]) {
+                clearTimeout(validationTimeoutRef.current[record.key]);
+              }
+              performValidation(record);
+              previousValuesRef.current[record.key] = newValue;
+            }
+          };
+
+          const content = (
+            <div onChange={handleValueChange} onBlur={handleValueBlur}>
+              <ValidationNumberInput name1={valueFieldName} minNumber={0} validationColor={validationState?.color} />
+            </div>
+          );
+
+          if (validationState?.message) {
+            return (
+              <Tooltip title={validationState.message} color={validationState.color === "green" ? "#52c41a" : "#ff4d4f"}>
+                {content}
+              </Tooltip>
+            );
+          }
+
+          return content;
+        },
       },
       {
         title: t("sayacGuncelleme.calculated", { defaultValue: "Calculated" }),
         dataIndex: "hesaplanan",
         key: "hesaplanan",
-        ellipsis: true,
-        width: 140,
+        ellipsis: false,
+        width: 300,
         visible: true,
         render: (_, record) => {
           const nextValue = watch(getFieldName(record.key, "yeniDeger"));
@@ -480,7 +749,7 @@ function MainTable() {
         },
       },
     ],
-    [calculateDifference, control, dateFormat, disableFutureDates, formatNumber, formatText, getFieldName, setValue, t, timeFormat, watch]
+    [calculateDifference, control, dateFormat, disableFutureDates, formatNumber, formatText, getFieldName, performValidation, setValue, t, timeFormat, watch]
   );
 
   const [columns, setColumns] = useState(() => {
@@ -704,6 +973,7 @@ function MainTable() {
       </div>
       <Table
         components={components}
+        rowKey="key"
         columns={filteredColumns}
         dataSource={data}
         loading={loading}
