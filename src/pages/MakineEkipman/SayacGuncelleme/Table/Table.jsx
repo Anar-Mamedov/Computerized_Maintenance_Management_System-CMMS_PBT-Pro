@@ -106,7 +106,7 @@ const normalizeIdList = (values = []) => values.map((value) => Number(value)).fi
 
 function MainTable() {
   const { t, i18n } = useTranslation();
-  const { control, setValue, watch, setError, clearErrors } = useFormContext();
+  const { control, setValue, watch, setError, clearErrors, getValues } = useFormContext();
   const [appliedFilters, setAppliedFilters] = useState(DEFAULT_FILTERS);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [data, setData] = useState([]);
@@ -115,6 +115,11 @@ function MainTable() {
   const [pageSize, setPageSize] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
   const [validationStates, setValidationStates] = useState({});
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const rowValuesRef = useRef({});
+  const validationStatesRef = useRef({});
+  const selectedRowsRef = useRef({});
   const validationTimeoutRef = useRef({});
   const previousValuesRef = useRef({});
 
@@ -191,6 +196,13 @@ function MainTable() {
     []
   );
 
+  const updateRowValues = useCallback((rowKey, updates) => {
+    rowValuesRef.current[rowKey] = {
+      ...(rowValuesRef.current[rowKey] || {}),
+      ...updates,
+    };
+  }, []);
+
   const fetchData = useCallback(
     async (page, size, state) => {
       setLoading(true);
@@ -205,13 +217,30 @@ function MainTable() {
           : list.length;
         const now = dayjs();
 
-        const mapped = list.map((item, index) => ({
-          ...item,
-          key: item.SayacId ?? `${item.MakineId || "sayac"}-${index}`,
-          girisTarihi: now,
-          girisSaati: now,
-          yeniDeger: null,
-        }));
+        const mapped = list.map((item, index) => {
+          const rowKey = item.SayacId ?? `${item.MakineId || "sayac"}-${index}`;
+          const storedValues = rowValuesRef.current[rowKey] || {};
+          const girisTarihi = storedValues.girisTarihi ?? now;
+          const girisSaati = storedValues.girisSaati ?? now;
+          const yeniDeger = storedValues.yeniDeger ?? null;
+          const validationState = validationStatesRef.current[rowKey];
+
+          rowValuesRef.current[rowKey] = {
+            ...storedValues,
+            girisTarihi,
+            girisSaati,
+            yeniDeger,
+          };
+
+          return {
+            ...item,
+            key: rowKey,
+            girisTarihi,
+            girisSaati,
+            yeniDeger,
+            validationState,
+          };
+        });
 
         mapped.forEach((item) => {
           const rowKey = item.key;
@@ -247,6 +276,15 @@ function MainTable() {
       ...DEFAULT_FILTERS,
       ...nextFilters,
     });
+  }, []);
+
+  const getRowValues = useCallback((rowKey, record) => {
+    const storedValues = rowValuesRef.current[rowKey] || {};
+    return {
+      girisTarihi: storedValues.girisTarihi ?? record.girisTarihi,
+      girisSaati: storedValues.girisSaati ?? record.girisSaati,
+      yeniDeger: storedValues.yeniDeger ?? record.yeniDeger,
+    };
   }, []);
 
   const calculateDifference = useCallback(
@@ -357,23 +395,35 @@ function MainTable() {
       const timeFieldName = getFieldName(rowKey, "girisSaati");
       const valueFieldName = getFieldName(rowKey, "yeniDeger");
 
-      const dateValue = watch(dateFieldName);
-      const timeValue = watch(timeFieldName);
-      const yeniDeger = watch(valueFieldName);
+      const storedValues = rowValuesRef.current[rowKey] || {};
+      const watchedDate = getValues(dateFieldName);
+      const watchedTime = getValues(timeFieldName);
+      const watchedValue = getValues(valueFieldName);
+      const dateValue = watchedDate !== undefined ? watchedDate : storedValues.girisTarihi ?? record.girisTarihi;
+      const timeValue = watchedTime !== undefined ? watchedTime : storedValues.girisSaati ?? record.girisSaati;
+      const yeniDeger = watchedValue !== undefined ? watchedValue : storedValues.yeniDeger ?? record.yeniDeger;
+
+      rowValuesRef.current[rowKey] = {
+        ...storedValues,
+        girisTarihi: dateValue,
+        girisSaati: timeValue,
+        yeniDeger,
+      };
 
       if (yeniDeger === "" || yeniDeger === null || yeniDeger === undefined) {
         clearErrors([dateFieldName, timeFieldName, valueFieldName]);
 
+        const clearedState = { isValid: true, color: undefined };
+
         setData((prevData) =>
-          prevData.map((item) =>
-            item.key === rowKey ? { ...item, validationState: { isValid: true, color: undefined } } : item
-          )
+          prevData.map((item) => (item.key === rowKey ? { ...item, validationState: clearedState } : item))
         );
 
         setValidationStates((prev) => ({
           ...prev,
-          [rowKey]: { isValid: true, color: undefined },
+          [rowKey]: clearedState,
         }));
+        validationStatesRef.current[rowKey] = clearedState;
         return;
       }
 
@@ -406,6 +456,8 @@ function MainTable() {
           ...prev,
           [rowKey]: newState,
         }));
+        validationStatesRef.current[rowKey] = newState;
+        return newState;
       } else {
         const result = await validateDifferentDateTimeValue(record, dateValue, timeValue, yeniDeger);
 
@@ -433,9 +485,11 @@ function MainTable() {
           ...prev,
           [rowKey]: newState,
         }));
+        validationStatesRef.current[rowKey] = newState;
+        return newState;
       }
     },
-    [getFieldName, watch, isSameAsSystemDateTime, validateSameDateTimeValue, validateDifferentDateTimeValue, setValidationStates, setError, clearErrors, setData]
+    [getFieldName, getValues, isSameAsSystemDateTime, validateSameDateTimeValue, validateDifferentDateTimeValue, setValidationStates, setError, clearErrors, setData]
   );
 
   const initialColumns = useMemo(
@@ -570,12 +624,14 @@ function MainTable() {
                   disabledDate={disableFutureDates}
                   onChange={(value) => {
                     field.onChange(value);
+                    updateRowValues(record.key, { girisTarihi: value });
                     if (!value) {
                       return;
                     }
                     const now = dayjs();
                     if (value.isSame(now, "day") && dayjs.isDayjs(currentTimeValue) && currentTimeValue.isAfter(now)) {
                       setValue(timeFieldName, now, { shouldDirty: true, shouldTouch: true });
+                      updateRowValues(record.key, { girisSaati: now });
                     }
 
                     const yeniDegerValue = watch(getFieldName(record.key, "yeniDeger"));
@@ -666,12 +722,14 @@ function MainTable() {
                   disabledTime={getDisabledTime}
                   onChange={(value) => {
                     field.onChange(value);
+                    updateRowValues(record.key, { girisSaati: value });
                     if (!value) {
                       return;
                     }
                     const now = dayjs();
                     if (entryDate && dayjs(entryDate).isSame(now, "day") && value.isAfter(now)) {
                       setValue(timeFieldName, now, { shouldDirty: true, shouldTouch: true });
+                      updateRowValues(record.key, { girisSaati: now });
                     }
 
                     const yeniDegerValue = watch(getFieldName(record.key, "yeniDeger"));
@@ -700,29 +758,42 @@ function MainTable() {
         render: (_, record) => {
           const valueFieldName = getFieldName(record.key, "yeniDeger");
           const validationState = record.validationState;
-          const currentValue = watch(valueFieldName);
 
-          const handleValueChange = () => {
-            previousValuesRef.current[record.key] = currentValue;
+          const handleValueChange = (nextValue) => {
+            previousValuesRef.current[record.key] = nextValue;
+            updateRowValues(record.key, { yeniDeger: nextValue });
+            if (validationTimeoutRef.current[record.key]) {
+              clearTimeout(validationTimeoutRef.current[record.key]);
+            }
+            if (nextValue === "" || nextValue === null || nextValue === undefined) {
+              performValidation(record);
+              return;
+            }
+            validationTimeoutRef.current[record.key] = setTimeout(() => {
+              performValidation(record);
+            }, 300);
           };
 
           const handleValueBlur = () => {
-            const previousValue = previousValuesRef.current[record.key];
-            const newValue = watch(valueFieldName);
-
-            if (previousValue !== newValue) {
-              if (validationTimeoutRef.current[record.key]) {
-                clearTimeout(validationTimeoutRef.current[record.key]);
-              }
-              performValidation(record);
-              previousValuesRef.current[record.key] = newValue;
+            const newValue = getValues(valueFieldName);
+            updateRowValues(record.key, { yeniDeger: newValue });
+            if (validationTimeoutRef.current[record.key]) {
+              clearTimeout(validationTimeoutRef.current[record.key]);
             }
+            performValidation(record);
+            previousValuesRef.current[record.key] = newValue;
           };
 
           const content = (
-            <div onChange={handleValueChange} onBlur={handleValueBlur}>
-              <ValidationNumberInput name1={valueFieldName} minNumber={0} validationColor={validationState?.color} />
-            </div>
+            <span style={{ display: "inline-block", width: "100%" }}>
+              <ValidationNumberInput
+                name1={valueFieldName}
+                minNumber={0}
+                validationColor={validationState?.color}
+                onValueChange={handleValueChange}
+                onValueBlur={handleValueBlur}
+              />
+            </span>
           );
 
           if (validationState?.message) {
@@ -749,7 +820,7 @@ function MainTable() {
         },
       },
     ],
-    [calculateDifference, control, dateFormat, disableFutureDates, formatNumber, formatText, getFieldName, performValidation, setValue, t, timeFormat, watch]
+    [calculateDifference, control, dateFormat, disableFutureDates, formatNumber, formatText, getFieldName, getValues, performValidation, setValue, t, timeFormat, updateRowValues, watch]
   );
 
   const [columns, setColumns] = useState(() => {
@@ -844,6 +915,125 @@ function MainTable() {
     localStorage.removeItem(STORAGE_KEYS.widths);
     window.location.reload();
   }
+
+  const updateSelectedRows = useCallback(
+    (nextKeys) => {
+      const nextMap = { ...selectedRowsRef.current };
+      data.forEach((row) => {
+        if (nextKeys.includes(row.key)) {
+          nextMap[row.key] = row;
+        } else {
+          delete nextMap[row.key];
+        }
+      });
+      selectedRowsRef.current = nextMap;
+    },
+    [data]
+  );
+
+  const handleRowSelectionChange = useCallback(
+    (nextKeys) => {
+      setSelectedRowKeys(nextKeys);
+      updateSelectedRows(nextKeys);
+    },
+    [updateSelectedRows]
+  );
+
+  useEffect(() => {
+    if (selectedRowKeys.length) {
+      updateSelectedRows(selectedRowKeys);
+    }
+  }, [data, selectedRowKeys, updateSelectedRows]);
+
+  const rowSelection = useMemo(
+    () => ({
+      type: "checkbox",
+      selectedRowKeys,
+      onChange: handleRowSelectionChange,
+      preserveSelectedRowKeys: true,
+    }),
+    [handleRowSelectionChange, selectedRowKeys]
+  );
+
+  const handleUpdate = useCallback(async () => {
+    if (!selectedRowKeys.length) {
+      message.warning(t("sayacGuncelleme.noSelection", { defaultValue: "Güncellemek için seçim yapın." }));
+      return;
+    }
+
+    const selectedRecords = selectedRowKeys.map((key) => selectedRowsRef.current[key]).filter(Boolean);
+    const rowsWithValue = selectedRecords.filter((record) => {
+      const rowValues = getRowValues(record.key, record);
+      return rowValues.yeniDeger !== "" && rowValues.yeniDeger !== null && rowValues.yeniDeger !== undefined;
+    });
+
+    if (!rowsWithValue.length) {
+      message.warning(t("sayacGuncelleme.noNewValue", { defaultValue: "Yeni değer girilmiş seçili kayıt bulunamadı." }));
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const validationResults = {};
+
+      for (const record of rowsWithValue) {
+        const result = await performValidation(record);
+        if (result) {
+          validationResults[record.key] = result;
+        }
+      }
+
+      const validRows = rowsWithValue.filter((record) => {
+        const state = validationResults[record.key] || validationStatesRef.current[record.key];
+        return state ? state.isValid !== false : true;
+      });
+
+      const payload = validRows
+        .map((record) => {
+          const rowValues = getRowValues(record.key, record);
+          const yeniDeger = rowValues.yeniDeger;
+
+          if (yeniDeger === "" || yeniDeger === null || yeniDeger === undefined) {
+            return null;
+          }
+
+          const yeniDegerNum = Number(yeniDeger);
+          if (!Number.isFinite(yeniDegerNum)) {
+            return null;
+          }
+
+          const guncelDeger = Number(record.GuncelDeger);
+          const artisDeger = Number.isFinite(guncelDeger) ? yeniDegerNum - guncelDeger : yeniDegerNum;
+          const girisTarihi = rowValues.girisTarihi ? dayjs(rowValues.girisTarihi) : dayjs();
+          const girisSaati = rowValues.girisSaati ? dayjs(rowValues.girisSaati) : dayjs();
+
+          return {
+            SayacId: record.SayacId,
+            LokasyonId: record.LokasyonId ?? record.LokasyonID,
+            MakineId: record.MakineId ?? record.MakineID,
+            Tarih: girisTarihi.format("YYYY-MM-DDTHH:mm:ss"),
+            Saat: girisSaati.format("HH:mm"),
+            OkunanDeger: yeniDegerNum,
+            ArtisDeger: artisDeger,
+            Aciklama: record.Aciklama || "",
+          };
+        })
+        .filter(Boolean);
+
+      if (!payload.length) {
+        message.warning(t("sayacGuncelleme.noValidRows", { defaultValue: "Gönderilecek geçerli kayıt bulunamadı." }));
+        return;
+      }
+
+      const response = await AxiosInstance.post("KaydetSeciliSayaclar", payload);
+      message.success(response?.message || t("sayacGuncelleme.saveSuccess", { defaultValue: "Sayaçlar güncellendi." }));
+    } catch (error) {
+      console.error("Failed to update selected counters:", error);
+      message.error(t("sayacGuncelleme.saveError", { defaultValue: "Sayaç güncelleme kayıtları gönderilemedi." }));
+    } finally {
+      setIsSaving(false);
+    }
+  }, [getRowValues, performValidation, selectedRowKeys, t]);
 
   return (
     <>
@@ -942,9 +1132,11 @@ function MainTable() {
         style={{
           display: "flex",
           justifyContent: "space-between",
+          alignItems: "center",
           marginBottom: "20px",
           gap: "10px",
           padding: "0 5px",
+          flexWrap: "wrap",
         }}
       >
         <div
@@ -953,7 +1145,7 @@ function MainTable() {
             gap: "10px",
             alignItems: "center",
             flexWrap: "wrap",
-            width: "100%",
+            flex: 1,
           }}
         >
           <Button
@@ -970,6 +1162,9 @@ function MainTable() {
           </Button>
           <Filters onApply={handleApplyFilters} initialValues={appliedFilters} />
         </div>
+        <Button type="primary" onClick={handleUpdate} loading={isSaving} style={{ marginLeft: "auto" }}>
+          {t("guncelle", { defaultValue: "Güncelle" })}
+        </Button>
       </div>
       <Table
         components={components}
@@ -977,6 +1172,7 @@ function MainTable() {
         columns={filteredColumns}
         dataSource={data}
         loading={loading}
+        rowSelection={rowSelection}
         pagination={{
           current: currentPage,
           pageSize,

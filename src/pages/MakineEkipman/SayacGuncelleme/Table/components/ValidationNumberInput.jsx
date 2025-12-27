@@ -3,7 +3,7 @@ import { InputNumber } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import { t } from "i18next";
 
-export default function ValidationNumberInput({ name1, isRequired, minNumber, maxNumber, readOnly, disabled = false, validationColor }) {
+export default function ValidationNumberInput({ name1, isRequired, minNumber, maxNumber, readOnly, disabled = false, validationColor, onValueChange, onValueBlur }) {
   const {
     control,
     formState: { errors },
@@ -57,6 +57,18 @@ export default function ValidationNumberInput({ name1, isRequired, minNumber, ma
             style={getInputStyle()}
             readOnly={readOnly ? true : false}
             disabled={disabled}
+            onChange={(value) => {
+              field.onChange(value);
+              if (onValueChange) {
+                onValueChange(value);
+              }
+            }}
+            onBlur={() => {
+              field.onBlur();
+              if (onValueBlur) {
+                onValueBlur();
+              }
+            }}
             formatter={(value) => {
               if (!value) return "";
               const [integerPart, decimalPart] = value.toString().split(".");
