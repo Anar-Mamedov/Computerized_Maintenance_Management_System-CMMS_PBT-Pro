@@ -76,6 +76,7 @@
   "sayacGuncelleme.historyUser": "Пользователь",
   "sayacGuncelleme.historyChartTitle": "Значение счётчика во времени",
   "sayacGuncelleme.historyChartSubtitle": "Тренд по последним записям",
+  "sayacGuncelleme.historyChartValueLabel": "Значение",
   "sayacGuncelleme.historyFetchError": "Не удалось загрузить историю счётчика.",
   "sayacGuncelleme.historyEmpty": "История не найдена.",
   "sayacGuncelleme.newValue": "Новое значение",

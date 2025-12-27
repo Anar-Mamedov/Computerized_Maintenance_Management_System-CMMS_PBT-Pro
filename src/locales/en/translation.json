@@ -76,6 +76,7 @@
   "sayacGuncelleme.historyUser": "User",
   "sayacGuncelleme.historyChartTitle": "Counter Value Over Time",
   "sayacGuncelleme.historyChartSubtitle": "Trend based on recent entries",
+  "sayacGuncelleme.historyChartValueLabel": "Value",
   "sayacGuncelleme.historyFetchError": "Failed to load counter history.",
   "sayacGuncelleme.historyEmpty": "No history records found.",
   "sayacGuncelleme.newValue": "New Value",

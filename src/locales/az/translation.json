@@ -76,6 +76,7 @@
   "sayacGuncelleme.historyUser": "İstifadəçi",
   "sayacGuncelleme.historyChartTitle": "Zaman üzrə Sayğac Dəyəri",
   "sayacGuncelleme.historyChartSubtitle": "Son qeydlər üzrə trend",
+  "sayacGuncelleme.historyChartValueLabel": "Dəyər",
   "sayacGuncelleme.historyFetchError": "Sayğac tarixçəsi yüklənə bilmədi.",
   "sayacGuncelleme.historyEmpty": "Tarixçə qeydi tapılmadı.",
   "sayacGuncelleme.newValue": "Yeni Dəyər",

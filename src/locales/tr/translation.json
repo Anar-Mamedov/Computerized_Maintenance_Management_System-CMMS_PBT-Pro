@@ -152,6 +152,7 @@
   "sayacGuncelleme.historyUser": "İşlem Yapan",
   "sayacGuncelleme.historyChartTitle": "Zaman İçinde Sayaç Değeri",
   "sayacGuncelleme.historyChartSubtitle": "Son kayıtlar üzerinden trend",
+  "sayacGuncelleme.historyChartValueLabel": "Değer",
   "sayacGuncelleme.historyFetchError": "Sayaç tarihçesi alınamadı.",
   "sayacGuncelleme.historyEmpty": "Tarihçe kaydı bulunamadı.",
   "sayacGuncelleme.newValue": "Yeni Değer",

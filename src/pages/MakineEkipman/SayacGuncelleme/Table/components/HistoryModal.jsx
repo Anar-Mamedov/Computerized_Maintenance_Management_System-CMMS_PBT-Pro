@@ -219,8 +219,20 @@ function HistoryModal({ open, onClose, record }) {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="label" tick={{ fontSize: 11 }} interval="preserveStartEnd" />
                   <YAxis tick={{ fontSize: 11 }} />
-                  <Tooltip contentStyle={{ fontSize: 12 }} labelStyle={{ fontSize: 12 }} />
-                  <Line type="monotone" dataKey="value" stroke="#1677ff" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 4 }} />
+                  <Tooltip
+                    contentStyle={{ fontSize: 12 }}
+                    labelStyle={{ fontSize: 12 }}
+                    formatter={(value, name) => [formatNumber(value), name]}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                    name={t("sayacGuncelleme.historyChartValueLabel", { defaultValue: "Değer" })}
+                    stroke="#1677ff"
+                    strokeWidth={2}
+                    dot={{ r: 3 }}
+                    activeDot={{ r: 4 }}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
