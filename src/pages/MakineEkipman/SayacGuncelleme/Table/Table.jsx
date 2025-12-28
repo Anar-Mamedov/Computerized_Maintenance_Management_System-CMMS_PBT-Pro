@@ -139,6 +139,8 @@ function MainTable() {
   const [xlsxLoading, setXlsxLoading] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [historyRecord, setHistoryRecord] = useState(null);
+  const [bulkEntryDate, setBulkEntryDate] = useState(null);
+  const [bulkEntryTime, setBulkEntryTime] = useState(null);
   const rowValuesRef = useRef({});
   const validationStatesRef = useRef({});
   const selectedRowsRef = useRef({});
@@ -531,6 +533,60 @@ function MainTable() {
     },
     [getFieldName, getValues, validateDifferentDateTimeValue, setValidationStates, setError, clearErrors, setData]
   );
+
+  const handleApplyBulkDateTime = useCallback(() => {
+    if (selectedRowKeys.length < 2) {
+      return;
+    }
+
+    if (!bulkEntryDate && !bulkEntryTime) {
+      message.warning(t("sayacGuncelleme.bulkMissing", { defaultValue: "Lütfen tarih ve/veya saat seçin." }));
+      return;
+    }
+
+    const nextDate = bulkEntryDate || null;
+    const nextTime = bulkEntryTime || null;
+
+    setData((prevData) =>
+      prevData.map((item) => {
+        if (!selectedRowKeys.includes(item.key)) {
+          return item;
+        }
+        return {
+          ...item,
+          ...(nextDate && { girisTarihi: nextDate }),
+          ...(nextTime && { girisSaati: nextTime }),
+        };
+      })
+    );
+
+    selectedRowKeys.forEach((rowKey) => {
+      const updates = {};
+      if (nextDate) {
+        updates.girisTarihi = nextDate;
+        setValue(getFieldName(rowKey, "girisTarihi"), nextDate, { shouldDirty: true, shouldTouch: true });
+      }
+      if (nextTime) {
+        updates.girisSaati = nextTime;
+        setValue(getFieldName(rowKey, "girisSaati"), nextTime, { shouldDirty: true, shouldTouch: true });
+      }
+      if (Object.keys(updates).length) {
+        updateRowValues(rowKey, updates);
+        if (rowDataRef.current[rowKey]) {
+          rowDataRef.current[rowKey] = {
+            ...rowDataRef.current[rowKey],
+            ...updates,
+          };
+        }
+      }
+
+      const record = selectedRowsRef.current[rowKey] || rowDataRef.current[rowKey];
+      const currentValue = rowValuesRef.current[rowKey]?.yeniDeger;
+      if (record && currentValue !== "" && currentValue !== null && currentValue !== undefined) {
+        performValidation(record);
+      }
+    });
+  }, [bulkEntryDate, bulkEntryTime, getFieldName, performValidation, selectedRowKeys, setValue, t, updateRowValues]);
 
   const initialColumns = useMemo(
     () => [
@@ -1312,6 +1368,35 @@ function MainTable() {
           </Button>
         </div>
       </div>
+      {selectedRowKeys.length > 1 && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: "16px",
+            gap: "10px",
+            padding: "0 5px",
+            flexWrap: "wrap",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+            <Text type="secondary">{t("sayacGuncelleme.bulkEntryLabel", { defaultValue: "Toplu Giriş Tarih/Saat:" })}</Text>
+            <DatePicker
+              value={bulkEntryDate}
+              format={dateFormat}
+              disabledDate={disableFutureDates}
+              onChange={(value) => setBulkEntryDate(value)}
+            />
+            <TimePicker
+              value={bulkEntryTime}
+              format={timeFormat}
+              needConfirm={false}
+              onChange={(value) => setBulkEntryTime(value)}
+            />
+            <Button onClick={handleApplyBulkDateTime}>{t("uygula", { defaultValue: "Uygula" })}</Button>
+          </div>
+        </div>
+      )}
       <Table
         components={components}
         rowKey="key"
