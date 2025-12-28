@@ -8,6 +8,8 @@ import { Resizable } from "react-resizable";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import { Controller, useFormContext } from "react-hook-form";
+import { SiMicrosoftexcel } from "react-icons/si";
+import * as XLSX from "xlsx";
 import AxiosInstance from "../../../../api/http";
 import LocalizedDateText from "../../../../utils/components/LocalizedDateText.jsx";
 import ValidationNumberInput from "./components/ValidationNumberInput.jsx";
@@ -105,6 +107,22 @@ const DraggableRow = ({ id, text, style, ...restProps }) => {
 
 const normalizeIdList = (values = []) => values.map((value) => Number(value)).filter((value) => Number.isFinite(value));
 
+const extractTextFromElement = (element) => {
+  if (typeof element === "string") {
+    return element;
+  }
+  if (Array.isArray(element)) {
+    return element.map((child) => extractTextFromElement(child)).join("");
+  }
+  if (React.isValidElement(element)) {
+    return extractTextFromElement(element.props.children);
+  }
+  if (element !== null && element !== undefined) {
+    return element.toString();
+  }
+  return "";
+};
+
 function MainTable() {
   const { t, i18n } = useTranslation();
   const { control, setValue, watch, setError, clearErrors, getValues } = useFormContext();
@@ -118,6 +136,7 @@ function MainTable() {
   const [validationStates, setValidationStates] = useState({});
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [xlsxLoading, setXlsxLoading] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [historyRecord, setHistoryRecord] = useState(null);
   const rowValuesRef = useRef({});
@@ -330,6 +349,77 @@ function MainTable() {
     setIsHistoryOpen(false);
     setHistoryRecord(null);
   }, []);
+
+  const getExportValue = useCallback(
+    (row, col) => {
+      const key = col.dataIndex;
+      if (!key) {
+        return "";
+      }
+
+      if (key === "actions") {
+        return "";
+      }
+
+      if (key === "MakineKodu") {
+        const codeText = formatText(row.MakineKodu);
+        const descriptionText = formatText(row.MakineTanim);
+        return descriptionText !== EMPTY_VALUE ? `${codeText} - ${descriptionText}` : codeText;
+      }
+
+      if (key === "SayacTanim") {
+        const counterText = formatText(row.SayacTanim);
+        const periodText = formatText(row.Periyot);
+        return periodText !== EMPTY_VALUE ? `${counterText} - ${periodText}` : counterText;
+      }
+
+      if (key === "GuncelDeger") {
+        const currentValueText = formatNumber(row.GuncelDeger);
+        const unitText = formatText(row.Birim);
+        return unitText !== EMPTY_VALUE ? `${currentValueText} - ${unitText}` : currentValueText;
+      }
+
+      if (key === "SonOkumaTarih") {
+        const dateText = row.SonOkumaTarih ? dayjs(row.SonOkumaTarih).format(dateFormat) : "";
+        const timeText = row.SonOkumaSaat ? String(row.SonOkumaSaat) : "";
+        if (dateText && timeText) {
+          return `${dateText} ${timeText}`;
+        }
+        return dateText || timeText || EMPTY_VALUE;
+      }
+
+      if (key === "girisTarihi" || key === "girisSaati" || key === "yeniDeger" || key === "hesaplanan") {
+        const rowValues = getRowValues(row.key, row);
+        if (key === "girisTarihi") {
+          if (!rowValues.girisTarihi) {
+            return EMPTY_VALUE;
+          }
+          return dayjs(rowValues.girisTarihi).format(dateFormat);
+        }
+        if (key === "girisSaati") {
+          if (!rowValues.girisSaati) {
+            return EMPTY_VALUE;
+          }
+          return dayjs(rowValues.girisSaati).format(timeFormat);
+        }
+        if (key === "yeniDeger") {
+          return formatNumber(rowValues.yeniDeger);
+        }
+        if (key === "hesaplanan") {
+          return calculateDifference(row, rowValues.yeniDeger);
+        }
+      }
+
+      const rawValue = row[key];
+      if (col.render) {
+        const rendered = col.render(rawValue, row);
+        return extractTextFromElement(rendered);
+      }
+
+      return rawValue !== null && rawValue !== undefined ? rawValue : EMPTY_VALUE;
+    },
+    [calculateDifference, dateFormat, formatNumber, formatText, getRowValues, timeFormat]
+  );
 
   const validateDifferentDateTimeValue = useCallback(
     async (record, dateValue, timeValue, yeniDeger) => {
@@ -845,6 +935,79 @@ function MainTable() {
 
   const filteredColumns = mergedColumns.filter((col) => col.visible);
 
+  const handleDownloadXLSX = useCallback(async () => {
+    setXlsxLoading(true);
+    try {
+      const payload = buildPayload(appliedFilters);
+      const initialPageSize = totalCount > 0 ? totalCount : 10;
+      let response = await AxiosInstance.post(`GetSayacGuncelleListesi?pagingDeger=1&pageSize=${initialPageSize}`, payload);
+
+      let list = Array.isArray(response?.data) ? response.data : [];
+      const totalRecordsValue = Number.isFinite(Number(response?.total_records))
+        ? Number(response.total_records)
+        : Number.isFinite(Number(response?.count))
+        ? Number(response.count)
+        : list.length;
+
+      if (totalRecordsValue > list.length) {
+        response = await AxiosInstance.post(`GetSayacGuncelleListesi?pagingDeger=1&pageSize=${totalRecordsValue}`, payload);
+        list = Array.isArray(response?.data) ? response.data : [];
+      }
+
+      if (!list.length) {
+        message.warning(t("kayitBulunamadi", { defaultValue: "No records found." }));
+        return;
+      }
+
+      const exportColumns = filteredColumns.filter((col) => col.dataIndex && col.dataIndex !== "actions");
+
+      const xlsxData = list.map((row) => {
+        const rowKey = row.SayacId ?? row.key;
+        const rowWithKey = { ...row, key: rowKey };
+        const xlsxRow = {};
+
+        exportColumns.forEach((col) => {
+          const header = extractTextFromElement(col.title);
+          xlsxRow[header] = getExportValue(rowWithKey, col);
+        });
+
+        return xlsxRow;
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(xlsxData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+      const headers = exportColumns.map((col) => ({
+        width: col.width,
+      }));
+
+      const scalingFactor = 0.8;
+      worksheet["!cols"] = headers.map((header) => ({
+        wpx: header.width ? header.width * scalingFactor : 120,
+      }));
+
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+      const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "table_data.xlsx");
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("XLSX indirme hatası:", error);
+      message.error(t("sayacGuncelleme.fetchError", { defaultValue: "Sayaç güncelleme listesi alınamadı." }));
+    } finally {
+      setXlsxLoading(false);
+    }
+  }, [appliedFilters, buildPayload, filteredColumns, getExportValue, t, totalCount]);
+
   const handleDragEnd = (event) => {
     const { active, over } = event;
     if (!over) {
@@ -1135,9 +1298,19 @@ function MainTable() {
           </Button>
           <Filters onApply={handleApplyFilters} initialValues={appliedFilters} />
         </div>
-        <Button type="primary" onClick={handleUpdate} loading={isSaving} style={{ marginLeft: "auto" }}>
-          {t("guncelle", { defaultValue: "Güncelle" })}
-        </Button>
+        <div style={{ display: "flex", gap: "10px", marginLeft: "auto" }}>
+          <Button
+            style={{ display: "flex", alignItems: "center" }}
+            onClick={handleDownloadXLSX}
+            loading={xlsxLoading}
+            icon={<SiMicrosoftexcel />}
+          >
+            {t("indir", { defaultValue: "İndir" })}
+          </Button>
+          <Button type="primary" onClick={handleUpdate} loading={isSaving}>
+            {t("guncelle", { defaultValue: "Güncelle" })}
+          </Button>
+        </div>
       </div>
       <Table
         components={components}
