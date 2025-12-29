@@ -142,6 +142,7 @@ export default function LoginForm() {
           tedarikciFirmalar: true,
           satinalmaDashboard: true,
           isEmriAnalizi: response.KLL_WEB_ISEMRI,
+          bakimKpiPano: true,
         };
         const userInfo = {
           userId: response.TB_KULLANICI_ID ?? null,

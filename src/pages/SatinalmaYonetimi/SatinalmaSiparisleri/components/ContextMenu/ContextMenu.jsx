@@ -75,7 +75,7 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
         {/* Duruma göre butonlar */}
         {(durumId === 1 || durumId === 5) && <Iptal {...commonProps} />}
         {durumId !== 3 && durumId !== 4 && <Kapat {...commonProps} />}
-        {(durumId === 4 || durumId === 3) && <Ac {...commonProps} />}
+        {(durumId === 3) && <Ac {...commonProps} />}
 
         {/* Giriş Fişleri (Eğer tek satır seçiliyse) */}
         {selectedRows.length === 1 && !isKapaliOrIptal && (
