@@ -218,7 +218,7 @@ export default function PeriyodikBakimlarTablo({ makineId, isActive = false }) {
       <Table
         rowKey={(record) => record?.TB_PERIYODIK_BAKIM_ID ?? record?.PBK_KOD}
         rowSelection={{
-          type: "radio",
+          type: "checkbox",
           selectedRowKeys,
           onChange: (keys, rows) => {
             setSelectedRowKeys(keys);
