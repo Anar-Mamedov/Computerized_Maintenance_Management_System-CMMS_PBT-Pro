@@ -9,6 +9,7 @@ import { DetayBilgi } from "./components/DetayBilgi.jsx";
 import { FinansalBilgiler } from "./components/FinansalBilgiler.jsx";
 import Ekipman from "./components/Ekipman/EkipmanListesiTablo.jsx";
 import Sayac from "./components/Sayac/Sayac.jsx";
+import PeriyodikBakimlarTablo from "./components/PeriyodikBakimlarTablo.jsx";
 import MainTabs from "../MainTabs/MainTabs.jsx";
 
 import { t } from "i18next";
@@ -73,9 +74,9 @@ function Tablar({ selectedRowID, update }) {
         key: "5",
         label: t("periyodikBakimlar", { defaultValue: "Periyodik Bakımlar" }),
         requiresUpdate: true,
-        render: () => (
+        render: (currentKey) => (
           <div style={contentContainerStyle}>
-            <span style={{ color: "#8c8c8c" }}>Periyodik bakım planları burada görüntülenecek.</span>
+            <PeriyodikBakimlarTablo makineId={effectiveMakineId} isActive={currentKey === "5"} />
           </div>
         ),
       },
