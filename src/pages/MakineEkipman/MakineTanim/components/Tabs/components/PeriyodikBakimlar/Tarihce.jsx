@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { Button, Modal, Table, Tag } from "antd";
+import { Modal, Table, Tag } from "antd";
 import { t } from "i18next";
 import AxiosInstance from "../../../../../../../api/http";
 
@@ -14,10 +14,14 @@ const formatDate = (value) => {
   }).format(date);
 };
 
-export default function Tarihce({ makineId }) {
+export default function Tarihce({ makineId, hidePopover, icon, iconColor, title, description }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState([]);
+  const isDisabled = !makineId;
+  const resolvedTitle = title || t("tarihce", { defaultValue: "Tarihçe" });
+  const resolvedDescription =
+    description || t("periyodikBakimTarihcesiAciklama", { defaultValue: "Seçili makineye ait periyodik bakım tarihçesini görüntüler." });
 
   const fetchHistory = useCallback(async () => {
     if (!makineId) return;
@@ -37,6 +41,7 @@ export default function Tarihce({ makineId }) {
     const nextVisible = !isModalVisible;
     setIsModalVisible(nextVisible);
     if (nextVisible) {
+      hidePopover?.();
       fetchHistory();
     }
   };
@@ -132,14 +137,28 @@ export default function Tarihce({ makineId }) {
   );
 
   return (
-    <div>
-      <Button
-        style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
+    <div style={isDisabled ? { display: "none" } : {}}>
+      <div
+        className="menu-item-hover"
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "12px",
+          cursor: "pointer",
+          padding: "10px 12px",
+          transition: "background-color 0.3s",
+          width: "100%",
+        }}
+        onMouseEnter={(event) => (event.currentTarget.style.backgroundColor = "#f5f5f5")}
+        onMouseLeave={(event) => (event.currentTarget.style.backgroundColor = "transparent")}
         onClick={handleModalToggle}
-        type="text"
       >
-        {t("tarihce", { defaultValue: "Tarihçe" })}
-      </Button>
+        <div>{icon && <span style={{ color: iconColor, fontSize: "18px", marginTop: "4px" }}>{icon}</span>}</div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <span style={{ fontWeight: "500", color: "#262626", fontSize: "14px", lineHeight: "1.2" }}>{resolvedTitle}</span>
+          <span style={{ fontSize: "12px", color: "#8c8c8c", marginTop: "4px", lineHeight: "1.4" }}>{resolvedDescription}</span>
+        </div>
+      </div>
       <Modal
         width={1200}
         centered

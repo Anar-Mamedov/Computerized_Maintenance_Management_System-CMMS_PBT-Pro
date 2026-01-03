@@ -1,14 +1,15 @@
 import React, { useState } from "react";
-import { Modal, message, Typography } from "antd";
+import { Modal, message } from "antd";
 import { FormProvider, useForm } from "react-hook-form";
 import { t } from "i18next";
 import AxiosInstance from "../../../../../../../api/http";
 import PeriyodikBakimIptalForm from "./PeriyodikBakimIptalForm.jsx";
 
-const { Text } = Typography;
-
-export default function PeriyodikBakimIptal({ selectedRows, refreshTableData, hidePopover, makineId }) {
+export default function PeriyodikBakimIptal({ selectedRows, refreshTableData, hidePopover, makineId, icon, iconColor, title, description }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const isDisabled = !selectedRows?.length;
+  const resolvedTitle = title || t("iptal", { defaultValue: "İptal" });
+  const resolvedDescription = description || t("iptalAciklama", { defaultValue: "Seçili bakım kaydını bir sonraki periyoda aktar." });
   const methods = useForm({
     defaultValues: {
       iptalNedeniID: null,
@@ -56,18 +57,37 @@ export default function PeriyodikBakimIptal({ selectedRows, refreshTableData, hi
   const handleModalToggle = () => {
     setIsModalOpen((prev) => !prev);
     if (!isModalOpen) {
+      hidePopover?.();
       reset();
     }
   };
 
   return (
     <FormProvider {...methods}>
-      <div>
-        <Text style={{ cursor: "pointer", color: "#ff4d4f" }} onClick={handleModalToggle}>
-          {t("iptal")}
-        </Text>
+      <div style={isDisabled ? { display: "none" } : {}}>
+        <div
+          className="menu-item-hover"
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: "12px",
+            cursor: "pointer",
+            padding: "10px 12px",
+            transition: "background-color 0.3s",
+            width: "100%",
+          }}
+          onMouseEnter={(event) => (event.currentTarget.style.backgroundColor = "#f5f5f5")}
+          onMouseLeave={(event) => (event.currentTarget.style.backgroundColor = "transparent")}
+          onClick={handleModalToggle}
+        >
+          <div>{icon && <span style={{ color: iconColor, fontSize: "18px", marginTop: "4px" }}>{icon}</span>}</div>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <span style={{ fontWeight: "500", color: "#262626", fontSize: "14px", lineHeight: "1.2" }}>{resolvedTitle}</span>
+            <span style={{ fontSize: "12px", color: "#8c8c8c", marginTop: "4px", lineHeight: "1.4" }}>{resolvedDescription}</span>
+          </div>
+        </div>
         <Modal
-          title={t("iptal")}
+          title={resolvedTitle}
           open={isModalOpen}
           onOk={methods.handleSubmit(handleSubmit)}
           onCancel={handleModalToggle}
