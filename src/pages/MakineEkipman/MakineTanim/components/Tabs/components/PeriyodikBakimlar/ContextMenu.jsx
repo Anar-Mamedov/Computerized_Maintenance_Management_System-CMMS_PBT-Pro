@@ -49,36 +49,32 @@ export default function ContextMenu({ selectedRows, refreshTableData, makineId }
   }, []);
 
   const content = useMemo(() => {
-    if (selectionCount < 1) {
-      return (
-        <div style={{ padding: "12px" }}>
-          <Text type="secondary">{t("islemIcinSecim", { defaultValue: "İşlem yapmak için en az bir satır seçin." })}</Text>
-        </div>
-      );
-    }
-
     return (
       <>
         <div style={baseHeaderStyle}>{t("bakimIslemleri", { defaultValue: "Bakım İşlemleri" })}</div>
-        {hasSingleSelection && (
-          <IleriTarihePlanla
-            selectedRows={selectedRows}
-            refreshTableData={refreshTableData}
-            hidePopover={hidePopover}
-            makineId={makineId}
-            icon={<CalendarOutlined />}
-            iconColor="#2563eb"
-          />
-        )}
-        {hasSingleSelection && (
-          <PeriyodikBakimIptal
-            selectedRows={selectedRows}
-            refreshTableData={refreshTableData}
-            hidePopover={hidePopover}
-            makineId={makineId}
-            icon={<CloseCircleOutlined />}
-            iconColor="#dc2626"
-          />
+        {hasSingleSelection ? (
+          <>
+            <IleriTarihePlanla
+              selectedRows={selectedRows}
+              refreshTableData={refreshTableData}
+              hidePopover={hidePopover}
+              makineId={makineId}
+              icon={<CalendarOutlined />}
+              iconColor="#2563eb"
+            />
+            <PeriyodikBakimIptal
+              selectedRows={selectedRows}
+              refreshTableData={refreshTableData}
+              hidePopover={hidePopover}
+              makineId={makineId}
+              icon={<CloseCircleOutlined />}
+              iconColor="#dc2626"
+            />
+          </>
+        ) : (
+          <div style={{ padding: "8px 12px" }}>
+            <Text type="secondary">{t("islemIcinSecim", { defaultValue: "İşlem yapmak için en az bir satır seçin." })}</Text>
+          </div>
         )}
 
         {makineId && (
@@ -94,7 +90,7 @@ export default function ContextMenu({ selectedRows, refreshTableData, makineId }
         )}
       </>
     );
-  }, [hasSingleSelection, hidePopover, makineId, refreshTableData, selectedRows, selectionCount, t]);
+  }, [hasSingleSelection, hidePopover, makineId, refreshTableData, selectedRows, t]);
 
   return (
     <Popover
