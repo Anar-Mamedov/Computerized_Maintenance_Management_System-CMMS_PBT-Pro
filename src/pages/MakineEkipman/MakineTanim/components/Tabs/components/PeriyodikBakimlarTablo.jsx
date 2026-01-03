@@ -3,6 +3,7 @@ import { Table, Tag } from "antd";
 import { t } from "i18next";
 import AxiosInstance from "../../../../../../api/http";
 import IsEmriEditDrawer from "../../../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer.jsx";
+import ContextMenu from "./PeriyodikBakimlar/ContextMenu.jsx";
 
 const formatDate = (value) => {
   if (!value) return "";
@@ -70,6 +71,8 @@ export default function PeriyodikBakimlarTablo({ makineId, isActive = false }) {
   const [total, setTotal] = useState(0);
   const [isEmriDrawerVisible, setIsEmriDrawerVisible] = useState(false);
   const [selectedIsEmriRow, setSelectedIsEmriRow] = useState(null);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
   const isMountedRef = useRef(true);
 
   const fetchList = useCallback(async () => {
@@ -209,8 +212,19 @@ export default function PeriyodikBakimlarTablo({ makineId, isActive = false }) {
 
   return (
     <>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "10px" }}>
+        <ContextMenu selectedRows={selectedRows} refreshTableData={fetchList} makineId={makineId} />
+      </div>
       <Table
         rowKey={(record) => record?.TB_PERIYODIK_BAKIM_ID ?? record?.PBK_KOD}
+        rowSelection={{
+          type: "radio",
+          selectedRowKeys,
+          onChange: (keys, rows) => {
+            setSelectedRowKeys(keys);
+            setSelectedRows(rows);
+          },
+        }}
         columns={columns}
         dataSource={rows}
         loading={loading}
