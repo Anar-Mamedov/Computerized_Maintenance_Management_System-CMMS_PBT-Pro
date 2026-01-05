@@ -20,14 +20,13 @@ export default function Tarihce({ makineId, hidePopover, icon, iconColor, title,
   const [rows, setRows] = useState([]);
   const isDisabled = !makineId;
   const resolvedTitle = title || t("tarihce", { defaultValue: "Tarihçe" });
-  const resolvedDescription =
-    description || t("periyodikBakimTarihcesiAciklama", { defaultValue: "Seçili makineye ait periyodik bakım tarihçesini görüntüler." });
+  const resolvedDescription = description || t("periyodikBakimTarihcesiAciklama", { defaultValue: "Seçili makineye ait periyodik bakım tarihçesini görüntüler." });
 
   const fetchHistory = useCallback(async () => {
     if (!makineId) return;
     setLoading(true);
     try {
-      const response = await AxiosInstance.get(`GetPeriyodikBakimTarihceByMakineId?makineId=${makineId}`);
+      const response = await AxiosInstance.get(`GetPeriyodikBakimTarihceBy?makineId=${makineId}`);
       setRows(response?.list || []);
     } catch (error) {
       console.error("Periyodik bakim tarihcesi alinmadi:", error);
