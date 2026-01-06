@@ -41,7 +41,7 @@ function Component3() {
       style={{
         width: "100%",
         height: "100%",
-        background: `url(${bg}), linear-gradient(rgb(27 17 92), #7A6FBE)`,
+        background: `url(${bg}), linear-gradient(#ff7e29, #ffad42)`,
         backgroundPosition: "inherit",
         backgroundSize: "cover",
         borderRadius: "5px",
