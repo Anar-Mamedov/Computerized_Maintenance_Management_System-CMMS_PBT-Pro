@@ -2,12 +2,21 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Button, Modal, Select, Typography } from "antd";
 import { BarChartOutlined, DollarOutlined, FileTextOutlined, InboxOutlined, TeamOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import localizedFormat from "dayjs/plugin/localizedFormat";
 import { useTranslation } from "react-i18next";
+import AxiosInstance from "../../../../../../../api/http";
 import OzetTab from "./components/OzetTab";
 import IsEmirleriTab from "./components/IsEmirleriTab";
 import MalzemeKullanimlariTab from "./components/MalzemeKullanimlariTab";
 import YapilanIsciliklerTab from "./components/YapilanIsciliklerTab";
 import MaliyetlerTab from "./components/MaliyetlerTab";
+
+import "dayjs/locale/tr";
+import "dayjs/locale/en";
+import "dayjs/locale/ru";
+import "dayjs/locale/az";
+
+dayjs.extend(localizedFormat);
 
 const { Text } = Typography;
 
@@ -30,10 +39,11 @@ const TIME_RANGE_OPTIONS = [
 ];
 
 export default function TarihceTablo({ selectedRows = [] }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [activeTab, setActiveTab] = useState(TAB_ITEMS[0].key);
   const [timeRange, setTimeRange] = useState("son3Ay");
+  const [generalInfo, setGeneralInfo] = useState(null);
 
   const selectedMachine = selectedRows[0] || {};
   const makineId = selectedMachine.TB_MAKINE_ID || selectedMachine.MKN_ID || selectedMachine.MakineId;
@@ -53,13 +63,70 @@ export default function TarihceTablo({ selectedRows = [] }) {
     setIsModalVisible(false);
   };
 
-  const headerText = [selectedMachine.MKN_KOD, selectedMachine.MKN_TANIM].filter(Boolean).join(" ");
-  const subtitleText = [selectedMachine.MKN_KOD, selectedMachine.MKN_LOKASYON, selectedMachine.MKN_TIP].filter(Boolean).join(" · ");
-  const locationText = selectedMachine.MKN_LOKASYON || "-";
-  const typeText = selectedMachine.MKN_TIP || "-";
-  const statusText = selectedMachine.MKN_DURUM || "-";
-  const lastMaintenance = selectedMachine.MKN_SON_BAKIM || selectedMachine.MKN_SON_BAKIM_TARIH || selectedMachine.MKN_SON_BAKIM_TARIHI || "-";
-  const nextMaintenance = selectedMachine.MKN_SONRAKI_BAKIM || selectedMachine.MKN_SONRAKI_BAKIM_TARIH || selectedMachine.MKN_SONRAKI_BAKIM_TARIHI || "-";
+  useEffect(() => {
+    if (!isModalVisible || !makineId) {
+      setGeneralInfo(null);
+      return;
+    }
+
+    let active = true;
+    const fetchGeneralInfo = async () => {
+      try {
+        const response = await AxiosInstance.get("GetMakineGenelBilgi", { params: { makineId } });
+        if (!active) return;
+        const info = response?.MakineBilgi || response?.Makine || response?.data || response || null;
+        setGeneralInfo(info);
+      } catch (error) {
+        if (active) {
+          setGeneralInfo(null);
+        }
+      }
+    };
+
+    fetchGeneralInfo();
+    return () => {
+      active = false;
+    };
+  }, [isModalVisible, makineId]);
+
+  const resolveValue = (...values) => values.find((value) => value !== undefined && value !== null && String(value).trim() !== "");
+
+  const headerCode = resolveValue(generalInfo?.Kod, generalInfo?.KOD, selectedMachine.MKN_KOD);
+  const headerName = resolveValue(generalInfo?.Tanim, generalInfo?.TANIM, selectedMachine.MKN_TANIM);
+  const headerText = [headerCode, headerName].filter(Boolean).join(" ");
+  const locationText = resolveValue(generalInfo?.Lokasyon, generalInfo?.LOKASYON, selectedMachine.MKN_LOKASYON) || "-";
+  const typeText = resolveValue(generalInfo?.Tip, generalInfo?.TIP, selectedMachine.MKN_TIP) || "-";
+  const statusText = resolveValue(generalInfo?.Durum, generalInfo?.DURUM, selectedMachine.MKN_DURUM) || "-";
+  const locale = i18n.language || "tr";
+  const formatDateValue = (value) => {
+    if (!value) return "-";
+    const parsed = dayjs(value);
+    if (!parsed.isValid()) return String(value);
+    return parsed.locale(locale).format("L");
+  };
+
+  const lastMaintenanceValue = resolveValue(
+    generalInfo?.SonBakimTarihi,
+    generalInfo?.SON_BAKIM_TARIHI,
+    generalInfo?.SonBakim,
+    generalInfo?.SON_BAKIM,
+    selectedMachine.MKN_SON_BAKIM,
+    selectedMachine.MKN_SON_BAKIM_TARIH,
+    selectedMachine.MKN_SON_BAKIM_TARIHI
+  );
+  const nextMaintenanceValue = resolveValue(
+    generalInfo?.SonrakiBakimTarihi,
+    generalInfo?.SONRAKI_BAKIM_TARIHI,
+    generalInfo?.SonrakiBakim,
+    generalInfo?.SONRAKI_BAKIM,
+    selectedMachine.MKN_SONRAKI_BAKIM,
+    selectedMachine.MKN_SONRAKI_BAKIM_TARIH,
+    selectedMachine.MKN_SONRAKI_BAKIM_TARIHI
+  );
+
+  const lastMaintenance = formatDateValue(lastMaintenanceValue);
+  const nextMaintenance = formatDateValue(nextMaintenanceValue);
+  const subtitleText = [headerCode, locationText, typeText].filter(Boolean).join(" · ");
 
   const dateRange = useMemo(() => {
     const today = dayjs();
