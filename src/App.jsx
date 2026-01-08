@@ -67,6 +67,10 @@ import FiyatTeklfileri from "./pages/SatinalmaYonetimi/FiyatTeklifleri/FiyatTekl
 import DetarikciFirmalar from "./pages/SatinalmaYonetimi/FirmaTanimlari/FirmaTanimlari.jsx";
 import SatinalmaDashboard from "./pages/SatinalmaYonetimi/Dashboard1/Dashboard.jsx";
 import BakimKpi from "./pages/Analizler/BakimKpiAnalizi/BakimKpiAnalizi.jsx";
+import YakitGirisleri from "./pages/YakitYonetimi/YakitGirisleri/YakitGirisleri.jsx";
+import YakitStoklari from "./pages/YakitYonetimi/YakitStoklari/YakitStoklari.jsx";
+import YakitHareketleri from "./pages/YakitYonetimi/YakitHareketleri/YakitHareketleri.jsx";
+import HizliYakitGirisi from "./pages/YakitYonetimi/HizliYakitGirisi/HizliYakitGirisi.jsx";
 import AxiosInstance from "./api/http";
 
 // Malzemeler
@@ -237,6 +241,20 @@ const rawItems = [
     [
       getItem("İş Talepleri", "isTalepleri", true),
       getItem("İş Talebi Kullanıcıları", "isTalebiKullanicilari", true),
+      // getItem("Team 2", "team2", true)
+    ],
+    false
+  ),
+  getItem(
+    "Yakıt Yönetimi",
+    "yakitYonetimi",
+    <ShoppingCartOutlined />,
+    [
+      getItem("Yakıt Girişleri", "yakitGirisleri", true),
+      getItem("Yakıt Stokları", "yakitStoklari", true),
+      getItem("Yakıt Hareketleri", "yakitHareketleri", true),
+      getItem("Hızlı Yakıt Girişi", "hizliYakitGirisi", true),
+
       // getItem("Team 2", "team2", true)
     ],
     false
@@ -427,6 +445,10 @@ export default function App() {
           <Route path="/tedarikciFirmalar" element={<DetarikciFirmalar />} />
           <Route path="/satinalmaDashboard" element={<SatinalmaDashboard />} />
           <Route path="/bakimKpi" element={<BakimKpi />} />
+          <Route path="/yakitGirisleri" element={<YakitGirisleri />} />
+          <Route path="/yakitStoklari" element={<YakitStoklari />} />
+          <Route path="/yakitHareketleri" element={<YakitHareketleri />} />
+          <Route path="/hizliYakitGirisi" element={<HizliYakitGirisi />} />
           {/*<Route path="/kurallar" element={<Kurallar />} />*/}
         </Route>
       </Routes>

@@ -143,6 +143,10 @@ export default function LoginForm() {
           satinalmaDashboard: true,
           isEmriAnalizi: response.KLL_WEB_ISEMRI,
           bakimKpi: true,
+          yakitGirisleri: true,
+          yakitStoklari: true,
+          yakitHareketleri: true,
+          hizliYakitGirisi: true,
         };
         const userInfo = {
           userId: response.TB_KULLANICI_ID ?? null,
