@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Pagination, Spin, Typography } from "antd";
+import { Pagination, Spin, Tag, Typography } from "antd";
 import {
   AlertOutlined,
   CalendarOutlined,
@@ -42,47 +42,63 @@ function TipTag({ label, color }) {
   if (normalized.includes("talep")) Icon = ClockCircleOutlined;
 
   return (
-    <span
+    <Tag
       style={{
         display: "inline-flex",
         alignItems: "center",
         gap: 8,
-        padding: "6px 12px",
-        borderRadius: 999,
-        border: `1px solid ${color || "#e5e7eb"}`,
-        background: color || "#f8fafc",
-        color: "#1f2937",
-        fontSize: 13,
-        fontWeight: 500,
+        padding: "4px 10px",
+        border: `1.2px solid ${color ? `${color}B3` : "#e5e7eb"}`,
+        backgroundColor: color ? `${color}33` : "#f8fafc",
+        color: color || "#1f2937",
+        fontSize: 12,
+        fontWeight: 600,
         whiteSpace: "nowrap",
+        maxWidth: "100%",
+        minWidth: 0,
+        marginInlineEnd: 0,
       }}
     >
       <Icon style={{ fontSize: 14 }} />
-      {label || "-"}
-    </span>
+      <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label || "-"}</span>
+    </Tag>
   );
 }
 
+function resolveStatusColor(label, fallbackColor) {
+  const normalized = (label || "").toLocaleLowerCase("tr");
+  if (normalized.includes("kapalı") || normalized.includes("kapali")) {
+    return "#ef4444";
+  }
+  if (normalized.includes("açık") || normalized.includes("acik")) {
+    return "#16a34a";
+  }
+  return fallbackColor;
+}
+
 function DurumTag({ label, color }) {
+  const resolvedColor = resolveStatusColor(label, color);
   return (
-    <span
+    <Tag
       style={{
         display: "inline-flex",
         alignItems: "center",
         gap: 8,
-        padding: "6px 12px",
-        borderRadius: 999,
-        border: `1px solid ${color || "#e5e7eb"}`,
-        background: color || "#f8fafc",
-        color: "#1f2937",
-        fontSize: 13,
-        fontWeight: 500,
+        padding: "4px 10px",
+        border: `1.2px solid ${resolvedColor ? `${resolvedColor}B3` : "#e5e7eb"}`,
+        backgroundColor: resolvedColor ? `${resolvedColor}33` : "#f8fafc",
+        color: resolvedColor || "#1f2937",
+        fontSize: 12,
+        fontWeight: 600,
         whiteSpace: "nowrap",
+        maxWidth: "100%",
+        minWidth: 0,
+        marginInlineEnd: 0,
       }}
     >
-      <span style={{ width: 8, height: 8, borderRadius: "50%", background: color || "#9ca3af" }} />
-      {label || "-"}
-    </span>
+      <span style={{ width: 8, height: 8, borderRadius: "50%", background: resolvedColor || "#9ca3af" }} />
+      <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label || "-"}</span>
+    </Tag>
   );
 }
 

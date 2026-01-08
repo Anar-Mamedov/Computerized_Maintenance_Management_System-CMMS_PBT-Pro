@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Pagination, Spin, Typography } from "antd";
+import { Pagination, Spin, Tag, Typography } from "antd";
 import { ClockCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import AxiosInstance from "../../../../../../../../api/http";
@@ -58,22 +58,24 @@ function TableCell({ children, align = "left" }) {
 
 function TypePill({ label }) {
   return (
-    <span
+    <Tag
       style={{
         display: "inline-flex",
         alignItems: "center",
-        padding: "6px 12px",
-        borderRadius: 999,
-        border: "1px solid #e2e8f0",
+        padding: "4px 10px",
+        borderColor: "#e2e8f0",
         background: "#f8fafc",
         color: "#475569",
-        fontSize: 13,
-        fontWeight: 500,
+        fontSize: 12,
+        fontWeight: 600,
         whiteSpace: "nowrap",
+        maxWidth: "100%",
+        minWidth: 0,
+        marginInlineEnd: 0,
       }}
     >
-      {label || "-"}
-    </span>
+      <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label || "-"}</span>
+    </Tag>
   );
 }
 

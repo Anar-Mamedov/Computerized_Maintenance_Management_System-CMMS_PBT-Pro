@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Pagination, Spin, Typography } from "antd";
+import { Pagination, Spin, Tag, Typography } from "antd";
 import { useTranslation } from "react-i18next";
 import AxiosInstance from "../../../../../../../../api/http";
 
@@ -8,6 +8,49 @@ const { Text } = Typography;
 function formatMoney(value) {
   const safeValue = Number.isFinite(value) ? value : 0;
   return safeValue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+
+function parseHexColor(value) {
+  if (typeof value !== "string") return null;
+  const cleaned = value.trim();
+  if (!cleaned.startsWith("#")) return null;
+  let hex = cleaned.slice(1);
+  if (hex.length === 3) {
+    hex = hex
+      .split("")
+      .map((char) => char + char)
+      .join("");
+  }
+  if (hex.length !== 6) return null;
+  const int = Number.parseInt(hex, 16);
+  if (Number.isNaN(int)) return null;
+  return {
+    r: (int >> 16) & 255,
+    g: (int >> 8) & 255,
+    b: int & 255,
+  };
+}
+
+function toRgb(color) {
+  return `rgb(${color.r}, ${color.g}, ${color.b})`;
+}
+
+function toRgba(color, alpha) {
+  return `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`;
+}
+
+function isLightColor(color) {
+  const luminance = (0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b) / 255;
+  return luminance > 0.7;
+}
+
+function darkenColor(color, amount) {
+  const factor = 1 - amount;
+  return {
+    r: Math.round(color.r * factor),
+    g: Math.round(color.g * factor),
+    b: Math.round(color.b * factor),
+  };
 }
 
 function Panel({ children }) {
@@ -85,23 +128,31 @@ function TableCell({ children, align = "left" }) {
 }
 
 function TypePill({ label, color }) {
+  const parsed = parseHexColor(color);
+  const lightColor = parsed ? isLightColor(parsed) : false;
+  const borderColor = parsed ? toRgb(lightColor ? darkenColor(parsed, 0.35) : parsed) : "#e2e8f0";
+  const backgroundColor = parsed ? toRgba(parsed, 0.75) : "#f8fafc";
+  const textColor = parsed ? (lightColor ? "#1f2937" : toRgb(parsed)) : "#475569";
+
   return (
-    <span
+    <Tag
       style={{
         display: "inline-flex",
         alignItems: "center",
-        padding: "6px 12px",
-        borderRadius: 999,
-        border: `1px solid ${color || "#e2e8f0"}`,
-        background: color || "#f8fafc",
-        color: "#475569",
-        fontSize: 13,
-        fontWeight: 500,
+        padding: "4px 10px",
+        border: `1.2px solid ${borderColor}`,
+        backgroundColor,
+        color: textColor,
+        fontSize: 12,
+        fontWeight: 600,
         whiteSpace: "nowrap",
+        maxWidth: "100%",
+        minWidth: 0,
+        marginInlineEnd: 0,
       }}
     >
-      {label || "-"}
-    </span>
+      <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label || "-"}</span>
+    </Tag>
   );
 }
 
