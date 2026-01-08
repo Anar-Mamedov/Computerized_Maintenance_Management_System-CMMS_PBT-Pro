@@ -4,6 +4,7 @@ import { BarChartOutlined, DollarOutlined, FileTextOutlined, InboxOutlined, Team
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import OzetTab from "./components/OzetTab";
+import IsEmirleriTab from "./components/IsEmirleriTab";
 
 const { Text } = Typography;
 
@@ -207,11 +208,9 @@ export default function TarihceTablo({ selectedRows = [] }) {
               />
             </div>
 
-            {activeTab === "ozet" ? (
-              <OzetTab makineId={makineId} startDate={startDate} endDate={endDate} />
-            ) : (
-              <div style={{ minHeight: 520 }} />
-            )}
+            {activeTab === "ozet" && <OzetTab makineId={makineId} startDate={startDate} endDate={endDate} />}
+            {activeTab === "isEmirleri" && <IsEmirleriTab makineId={makineId} startDate={startDate} endDate={endDate} />}
+            {activeTab !== "ozet" && activeTab !== "isEmirleri" && <div style={{ minHeight: 520 }} />}
           </div>
         </div>
       </Modal>
