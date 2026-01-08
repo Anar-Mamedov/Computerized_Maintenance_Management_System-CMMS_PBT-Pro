@@ -3,6 +3,7 @@ import { Pagination, Spin, Tag, Typography } from "antd";
 import { ClockCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import AxiosInstance from "../../../../../../../../api/http";
+import IsEmriEditDrawer from "../../../../../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer.jsx";
 
 const { Text } = Typography;
 
@@ -84,6 +85,8 @@ export default function YapilanIsciliklerTab({ makineId, startDate, endDate }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
+  const [isEmriDrawerVisible, setIsEmriDrawerVisible] = useState(false);
+  const [selectedIsEmriRow, setSelectedIsEmriRow] = useState(null);
   const pageSize = 10;
   const currency = t("paraBirimi", { defaultValue: "$" });
   const hourShort = t("saatKisaltma", { defaultValue: "sa" });
@@ -163,8 +166,16 @@ export default function YapilanIsciliklerTab({ makineId, startDate, endDate }) {
     );
   }
 
+  const openIsEmriDrawer = (id) => {
+    const parsedId = Number(id);
+    if (!Number.isFinite(parsedId) || parsedId <= 0) return;
+    setSelectedIsEmriRow({ key: parsedId });
+    setIsEmriDrawerVisible(true);
+  };
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+    <>
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       <Panel>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <Text style={{ fontSize: 16, fontWeight: 600 }}>{t("makineTarihce.yapilanIscilikler.baslik")}</Text>
@@ -194,6 +205,8 @@ export default function YapilanIsciliklerTab({ makineId, startDate, endDate }) {
 
           {pagedList.map((row, index) => {
             const description = row.IsTanimi || row.Aciklama || row.Konu || "-";
+            const isEmriId = Number(row.IsEmriId);
+            const canOpen = Number.isFinite(isEmriId) && isEmriId > 0;
             return (
               <div
                 key={`${row.KontrolListId}-${index}`}
@@ -207,7 +220,29 @@ export default function YapilanIsciliklerTab({ makineId, startDate, endDate }) {
               >
                 <TableCell>{row.Tarih || "-"}</TableCell>
                 <TableCell>
-                  <span style={{ color: "#0ea5e9", fontWeight: 500 }}>{row.IsEmriNo || "-"}</span>
+                  {canOpen ? (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event?.stopPropagation();
+                        openIsEmriDrawer(isEmriId);
+                      }}
+                      style={{
+                        border: "none",
+                        background: "transparent",
+                        color: "#0ea5e9",
+                        cursor: "pointer",
+                        padding: 0,
+                        fontSize: 14,
+                        textAlign: "left",
+                        fontWeight: 500,
+                      }}
+                    >
+                      {row.IsEmriNo || "-"}
+                    </button>
+                  ) : (
+                    <span>{row.IsEmriNo || "-"}</span>
+                  )}
                 </TableCell>
                 <TableCell>
                   <TypePill label={row.IsEmriTipi} />
@@ -252,6 +287,13 @@ export default function YapilanIsciliklerTab({ makineId, startDate, endDate }) {
           <Text>{t("makineTarihce.yapilanIscilikler.toplamMaliyet", { value: totalCostLabel })}</Text>
         </div>
       </Panel>
-    </div>
+      </div>
+      <IsEmriEditDrawer
+        selectedRow={selectedIsEmriRow}
+        onDrawerClose={() => setIsEmriDrawerVisible(false)}
+        drawerVisible={isEmriDrawerVisible}
+        onRefresh={() => {}}
+      />
+    </>
   );
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Pagination, Spin, Tag, Typography } from "antd";
 import { useTranslation } from "react-i18next";
 import AxiosInstance from "../../../../../../../../api/http";
+import IsEmriEditDrawer from "../../../../../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer.jsx";
 
 const { Text } = Typography;
 
@@ -162,6 +163,8 @@ export default function MaliyetlerTab({ makineId, startDate, endDate }) {
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState("all");
   const [page, setPage] = useState(1);
+  const [isEmriDrawerVisible, setIsEmriDrawerVisible] = useState(false);
+  const [selectedIsEmriRow, setSelectedIsEmriRow] = useState(null);
   const pageSize = 10;
   const currency = t("paraBirimi", { defaultValue: "$" });
 
@@ -242,8 +245,16 @@ export default function MaliyetlerTab({ makineId, startDate, endDate }) {
     );
   }
 
+  const openIsEmriDrawer = (id) => {
+    const parsedId = Number(id);
+    if (!Number.isFinite(parsedId) || parsedId <= 0) return;
+    setSelectedIsEmriRow({ key: parsedId });
+    setIsEmriDrawerVisible(true);
+  };
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+    <>
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(12, minmax(0, 1fr))", gap: 12 }}>
         <div style={{ gridColumn: "span 3" }}>
           <StatCard
@@ -332,35 +343,61 @@ export default function MaliyetlerTab({ makineId, startDate, endDate }) {
             <TableCell>{t("makineTarihce.maliyetler.sorumlu")}</TableCell>
           </div>
 
-          {pagedList.map((row, index) => (
-            <div
-              key={`${row.IsEmriId}-${index}`}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr 1fr 2fr 0.7fr 0.8fr 0.9fr 1fr",
-                borderBottom: index === filteredList.length - 1 ? "none" : "1px solid #e2e8f0",
-                alignItems: "center",
-                background: "#fff",
-                cursor: "pointer",
-              }}
-            >
-              <TableCell>{row.Tarih || "-"}</TableCell>
-              <TableCell>
-                <span style={{ color: "#0ea5e9", fontWeight: 500 }}>{row.IsEmriNo || "-"}</span>
-              </TableCell>
-              <TableCell>
-                <TypePill label={row.Tur} color={row.TurRenk} />
-              </TableCell>
-              <TableCell>{row.Aciklama || "-"}</TableCell>
-              <TableCell align="right">{Number.isFinite(row.Miktar) ? row.Miktar : "-"}</TableCell>
-              <TableCell>{row.Birim || "-"}</TableCell>
-              <TableCell align="right">
-                {currency}
-                {formatMoney(row.Tutar || 0)}
-              </TableCell>
-              <TableCell>{row.Sorumlu || "-"}</TableCell>
-            </div>
-          ))}
+          {pagedList.map((row, index) => {
+            const isEmriId = Number(row.IsEmriId);
+            const canOpen = Number.isFinite(isEmriId) && isEmriId > 0;
+            return (
+              <div
+                key={`${row.IsEmriId}-${index}`}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr 1fr 2fr 0.7fr 0.8fr 0.9fr 1fr",
+                  borderBottom: index === filteredList.length - 1 ? "none" : "1px solid #e2e8f0",
+                  alignItems: "center",
+                  background: "#fff",
+                  cursor: "pointer",
+                }}
+              >
+                <TableCell>{row.Tarih || "-"}</TableCell>
+                <TableCell>
+                  {canOpen ? (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event?.stopPropagation();
+                        openIsEmriDrawer(isEmriId);
+                      }}
+                      style={{
+                        border: "none",
+                        background: "transparent",
+                        color: "#0ea5e9",
+                        cursor: "pointer",
+                        padding: 0,
+                        fontSize: 14,
+                        textAlign: "left",
+                        fontWeight: 500,
+                      }}
+                    >
+                      {row.IsEmriNo || "-"}
+                    </button>
+                  ) : (
+                    <span>{row.IsEmriNo || "-"}</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <TypePill label={row.Tur} color={row.TurRenk} />
+                </TableCell>
+                <TableCell>{row.Aciklama || "-"}</TableCell>
+                <TableCell align="right">{Number.isFinite(row.Miktar) ? row.Miktar : "-"}</TableCell>
+                <TableCell>{row.Birim || "-"}</TableCell>
+                <TableCell align="right">
+                  {currency}
+                  {formatMoney(row.Tutar || 0)}
+                </TableCell>
+                <TableCell>{row.Sorumlu || "-"}</TableCell>
+              </div>
+            );
+          })}
 
           {filteredList.length === 0 && (
             <div style={{ padding: "16px", textAlign: "center" }}>
@@ -391,6 +428,13 @@ export default function MaliyetlerTab({ makineId, startDate, endDate }) {
           </Text>
         </div>
       </Panel>
-    </div>
+      </div>
+      <IsEmriEditDrawer
+        selectedRow={selectedIsEmriRow}
+        onDrawerClose={() => setIsEmriDrawerVisible(false)}
+        drawerVisible={isEmriDrawerVisible}
+        onRefresh={() => {}}
+      />
+    </>
   );
 }

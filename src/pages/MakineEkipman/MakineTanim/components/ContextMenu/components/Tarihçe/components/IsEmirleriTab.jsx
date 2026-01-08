@@ -9,6 +9,7 @@ import {
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import AxiosInstance from "../../../../../../../../api/http";
+import IsEmriEditDrawer from "../../../../../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer.jsx";
 
 const { Text } = Typography;
 
@@ -125,6 +126,8 @@ export default function IsEmirleriTab({ makineId, startDate, endDate }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
+  const [isEmriDrawerVisible, setIsEmriDrawerVisible] = useState(false);
+  const [selectedIsEmriRow, setSelectedIsEmriRow] = useState(null);
   const pageSize = 10;
   const currency = t("paraBirimi", { defaultValue: "$" });
   const hourShort = t("saatKisaltma", { defaultValue: "sa" });
@@ -208,8 +211,16 @@ export default function IsEmirleriTab({ makineId, startDate, endDate }) {
     );
   }
 
+  const openIsEmriDrawer = (id) => {
+    const parsedId = Number(id);
+    if (!Number.isFinite(parsedId) || parsedId <= 0) return;
+    setSelectedIsEmriRow({ key: parsedId });
+    setIsEmriDrawerVisible(true);
+  };
+
   return (
-    <Panel>
+    <>
+      <Panel>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
         <Text style={{ fontSize: 16, fontWeight: 600 }}>{t("makineTarihce.isEmirleri.baslik")}</Text>
         <Text type="secondary">
@@ -242,33 +253,44 @@ export default function IsEmirleriTab({ makineId, startDate, endDate }) {
           <TableCell>{t("makineTarihce.isEmirleri.sorumlu")}</TableCell>
         </div>
 
-        {pagedList.map((row, index) => (
-          <div
-            key={row.TB_ISEMRI_ID || index}
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1.1fr 1.2fr 1.2fr 1.3fr 1.1fr 0.7fr 0.8fr 0.9fr",
-              borderBottom: index === isEmirleri.length - 1 ? "none" : "1px solid #e2e8f0",
-              alignItems: "center",
-              background: "#fff",
-            }}
-          >
-            <TableCell>
-              <button
-                type="button"
-                style={{
-                  border: "none",
-                  background: "transparent",
-                  color: "#0ea5e9",
-                  cursor: "pointer",
-                  padding: 0,
-                  fontSize: 14,
-                  textAlign: "left",
-                }}
-              >
-                {row.ISM_ISEMRI_NO || "-"}
-              </button>
-            </TableCell>
+        {pagedList.map((row, index) => {
+          const isEmriId = Number(row.TB_ISEMRI_ID);
+          const canOpen = Number.isFinite(isEmriId) && isEmriId > 0;
+          return (
+            <div
+              key={row.TB_ISEMRI_ID || index}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1.1fr 1.2fr 1.2fr 1.3fr 1.1fr 0.7fr 0.8fr 0.9fr",
+                borderBottom: index === isEmirleri.length - 1 ? "none" : "1px solid #e2e8f0",
+                alignItems: "center",
+                background: "#fff",
+              }}
+            >
+              <TableCell>
+                {canOpen ? (
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event?.stopPropagation();
+                      openIsEmriDrawer(isEmriId);
+                    }}
+                    style={{
+                      border: "none",
+                      background: "transparent",
+                      color: "#0ea5e9",
+                      cursor: "pointer",
+                      padding: 0,
+                      fontSize: 14,
+                      textAlign: "left",
+                    }}
+                  >
+                    {row.ISM_ISEMRI_NO || "-"}
+                  </button>
+                ) : (
+                  <span>{row.ISM_ISEMRI_NO || "-"}</span>
+                )}
+              </TableCell>
             <TableCell>
               <TipTag label={row.Tip} color={row.TipRenk} />
             </TableCell>
@@ -285,7 +307,8 @@ export default function IsEmirleriTab({ makineId, startDate, endDate }) {
             </TableCell>
             <TableCell>{row.Sorumlu || "-"}</TableCell>
           </div>
-        ))}
+          );
+        })}
       </div>
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 12, gap: 12 }}>
@@ -308,6 +331,8 @@ export default function IsEmirleriTab({ makineId, startDate, endDate }) {
         </div>
       </div>
     </Panel>
+    <IsEmriEditDrawer selectedRow={selectedIsEmriRow} onDrawerClose={() => setIsEmriDrawerVisible(false)} drawerVisible={isEmriDrawerVisible} onRefresh={() => {}} />
+    </>
   );
 }
 
