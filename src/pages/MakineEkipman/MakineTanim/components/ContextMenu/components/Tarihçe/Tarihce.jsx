@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button, Modal, Select, Typography } from "antd";
 import { BarChartOutlined, DollarOutlined, FileTextOutlined, InboxOutlined, TeamOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
+import OzetTab from "./components/OzetTab";
 
 const { Text } = Typography;
 
@@ -30,6 +32,7 @@ export default function TarihceTablo({ selectedRows = [] }) {
   const [timeRange, setTimeRange] = useState("son3Ay");
 
   const selectedMachine = selectedRows[0] || {};
+  const makineId = selectedMachine.TB_MAKINE_ID || selectedMachine.MKN_ID || selectedMachine.MakineId;
 
   useEffect(() => {
     if (isModalVisible) {
@@ -56,6 +59,34 @@ export default function TarihceTablo({ selectedRows = [] }) {
   const nextMaintenance =
     selectedMachine.MKN_SONRAKI_BAKIM || selectedMachine.MKN_SONRAKI_BAKIM_TARIH || selectedMachine.MKN_SONRAKI_BAKIM_TARIHI || "-";
 
+  const dateRange = useMemo(() => {
+    const today = dayjs();
+    switch (timeRange) {
+      case "buHafta":
+        return { startDate: today.startOf("week"), endDate: today };
+      case "buAy":
+        return { startDate: today.startOf("month"), endDate: today };
+      case "gecenAy": {
+        const prev = today.subtract(1, "month");
+        return { startDate: prev.startOf("month"), endDate: prev.endOf("month") };
+      }
+      case "son6Ay":
+        return { startDate: today.subtract(6, "month"), endDate: today };
+      case "buYil":
+        return { startDate: today.startOf("year"), endDate: today };
+      case "gecenYil": {
+        const prev = today.subtract(1, "year");
+        return { startDate: prev.startOf("year"), endDate: prev.endOf("year") };
+      }
+      case "son3Ay":
+      default:
+        return { startDate: today.subtract(3, "month"), endDate: today };
+    }
+  }, [timeRange]);
+
+  const startDate = dateRange.startDate.format("YYYY-MM-DD");
+  const endDate = dateRange.endDate.format("YYYY-MM-DD");
+
   return (
     <div>
       <Button
@@ -66,7 +97,7 @@ export default function TarihceTablo({ selectedRows = [] }) {
         {t("tarihce")}
       </Button>
       <Modal
-        width={1200}
+        width={1600}
         centered
         destroyOnClose
         title={t("makineTarihce")}
@@ -176,7 +207,11 @@ export default function TarihceTablo({ selectedRows = [] }) {
               />
             </div>
 
-            <div style={{ minHeight: 520 }} />
+            {activeTab === "ozet" ? (
+              <OzetTab makineId={makineId} startDate={startDate} endDate={endDate} />
+            ) : (
+              <div style={{ minHeight: 520 }} />
+            )}
           </div>
         </div>
       </Modal>
