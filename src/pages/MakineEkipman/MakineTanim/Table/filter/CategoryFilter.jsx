@@ -4,10 +4,8 @@ import AxiosInstance from "../../../../../api/http";
 
 const { Option } = Select;
 
-const LocationFilter = ({ onSubmit }) => {
+const CategoryFilter = ({ onSubmit }) => {
   const [visible, setVisible] = useState(false);
-
-  // useeffect ile api den veri data cekip options a atayacagiz
   const [options, setOptions] = React.useState([]);
   const [filters, setFilters] = useState([]);
 
@@ -16,9 +14,13 @@ const LocationFilter = ({ onSubmit }) => {
   };
 
   React.useEffect(() => {
-    AxiosInstance.get("GetLokasyonList")
+    AxiosInstance.get("KodList?grup=32502")
       .then((response) => {
-        const options = response.map((option) => ({ key: option.TB_LOKASYON_ID, value: option.TB_LOKASYON_ID, label: option.LOK_TANIM }));
+        const options = response.map((option) => ({
+          key: option.TB_KOD_ID,
+          value: option.TB_KOD_ID,
+          label: option.KOD_TANIM,
+        }));
         setOptions(options);
       })
       .catch((error) => {
@@ -27,17 +29,12 @@ const LocationFilter = ({ onSubmit }) => {
   }, []);
 
   const handleSubmit = () => {
-    // Seçilen öğeleri başka bir bileşene iletmek için prop olarak gelen işlevi çağırın
     onSubmit(filters);
-
-    // Dropdown'ı gizle
     setVisible(false);
   };
 
   const handleCancelClick = () => {
-    // Seçimleri iptal etmek için seçilen öğeleri sıfırlayın
     setFilters([]);
-    // Dropdown'ı gizle
     setVisible(false);
     onSubmit("");
   };
@@ -52,7 +49,6 @@ const LocationFilter = ({ onSubmit }) => {
       </div>
       <div style={{ padding: "10px" }}>
         <Select mode="multiple" style={{ width: "100%" }} placeholder="Ara..." value={filters} onChange={handleChange} allowClear showArrow={false} optionFilterProp="children">
-          {/* Seçenekleri elle ekleyin */}
           {options.map((option) => (
             <Option key={option.key} value={option.value}>
               {option.label}
@@ -66,7 +62,7 @@ const LocationFilter = ({ onSubmit }) => {
   return (
     <Dropdown overlay={menu} placement="bottomLeft" trigger={["click"]} visible={visible} onVisibleChange={(v) => setVisible(v)}>
       <Button style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-        Lokasyon
+        Kategori
         <span
           style={{
             marginLeft: "5px",
@@ -87,4 +83,4 @@ const LocationFilter = ({ onSubmit }) => {
   );
 };
 
-export default LocationFilter;
+export default CategoryFilter;
