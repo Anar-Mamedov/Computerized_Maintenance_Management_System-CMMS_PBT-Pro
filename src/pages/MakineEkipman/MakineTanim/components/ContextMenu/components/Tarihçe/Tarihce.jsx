@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, Typography } from "antd";
+import { Button, Modal, Select, Typography } from "antd";
 import { BarChartOutlined, DollarOutlined, FileTextOutlined, InboxOutlined, TeamOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 
@@ -13,16 +13,28 @@ const TAB_ITEMS = [
   { key: "maliyetler", labelKey: "makineTarihce.tabMaliyetler", icon: DollarOutlined },
 ];
 
+const TIME_RANGE_OPTIONS = [
+  { value: "buHafta", labelKey: "timeRange.buHafta" },
+  { value: "buAy", labelKey: "timeRange.buAy" },
+  { value: "gecenAy", labelKey: "timeRange.gecenAy" },
+  { value: "son3Ay", labelKey: "timeRange.son3Ay" },
+  { value: "son6Ay", labelKey: "timeRange.son6Ay" },
+  { value: "buYil", labelKey: "timeRange.buYil" },
+  { value: "gecenYil", labelKey: "timeRange.gecenYil" },
+];
+
 export default function TarihceTablo({ selectedRows = [] }) {
   const { t } = useTranslation();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [activeTab, setActiveTab] = useState(TAB_ITEMS[0].key);
+  const [timeRange, setTimeRange] = useState("son3Ay");
 
   const selectedMachine = selectedRows[0] || {};
 
   useEffect(() => {
     if (isModalVisible) {
       setActiveTab(TAB_ITEMS[0].key);
+      setTimeRange("son3Ay");
     }
   }, [isModalVisible]);
 
@@ -35,6 +47,7 @@ export default function TarihceTablo({ selectedRows = [] }) {
   };
 
   const headerText = [selectedMachine.MKN_KOD, selectedMachine.MKN_TANIM].filter(Boolean).join(" ");
+  const subtitleText = [selectedMachine.MKN_KOD, selectedMachine.MKN_LOKASYON, selectedMachine.MKN_TIP].filter(Boolean).join(" · ");
   const locationText = selectedMachine.MKN_LOKASYON || "-";
   const typeText = selectedMachine.MKN_TIP || "-";
   const statusText = selectedMachine.MKN_DURUM || "-";
@@ -136,7 +149,35 @@ export default function TarihceTablo({ selectedRows = [] }) {
             </div>
           </div>
 
-          <div style={{ flex: 1, minHeight: 520 }} />
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 12 }}>
+            <div
+              style={{
+                background: "#fff",
+                border: "1px solid #e5e7eb",
+                borderRadius: 16,
+                padding: "12px 16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+              }}
+            >
+              <div>
+                <Text style={{ fontSize: 14, fontWeight: 600, display: "block" }}>{t("makineTarihce.genelDurum")}</Text>
+                <Text type="secondary" style={{ display: "block", marginTop: 2 }}>
+                  {subtitleText || "-"}
+                </Text>
+              </div>
+              <Select
+                value={timeRange}
+                onChange={setTimeRange}
+                style={{ minWidth: 140 }}
+                options={TIME_RANGE_OPTIONS.map((opt) => ({ value: opt.value, label: t(opt.labelKey) }))}
+              />
+            </div>
+
+            <div style={{ minHeight: 520 }} />
+          </div>
         </div>
       </Modal>
     </div>
