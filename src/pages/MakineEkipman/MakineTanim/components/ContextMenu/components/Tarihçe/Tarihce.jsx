@@ -7,6 +7,7 @@ import OzetTab from "./components/OzetTab";
 import IsEmirleriTab from "./components/IsEmirleriTab";
 import MalzemeKullanimlariTab from "./components/MalzemeKullanimlariTab";
 import YapilanIsciliklerTab from "./components/YapilanIsciliklerTab";
+import MaliyetlerTab from "./components/MaliyetlerTab";
 
 const { Text } = Typography;
 
@@ -214,9 +215,12 @@ export default function TarihceTablo({ selectedRows = [] }) {
             {activeTab === "isEmirleri" && <IsEmirleriTab makineId={makineId} startDate={startDate} endDate={endDate} />}
             {activeTab === "malzemeKullanimlari" && <MalzemeKullanimlariTab makineId={makineId} startDate={startDate} endDate={endDate} />}
             {activeTab === "yapilanIscilikler" && <YapilanIsciliklerTab makineId={makineId} startDate={startDate} endDate={endDate} />}
-            {activeTab !== "ozet" && activeTab !== "isEmirleri" && activeTab !== "malzemeKullanimlari" && activeTab !== "yapilanIscilikler" && (
-              <div style={{ minHeight: 520 }} />
-            )}
+            {activeTab === "maliyetler" && <MaliyetlerTab makineId={makineId} startDate={startDate} endDate={endDate} />}
+            {activeTab !== "ozet" &&
+              activeTab !== "isEmirleri" &&
+              activeTab !== "malzemeKullanimlari" &&
+              activeTab !== "yapilanIscilikler" &&
+              activeTab !== "maliyetler" && <div style={{ minHeight: 520 }} />}
           </div>
         </div>
       </Modal>
