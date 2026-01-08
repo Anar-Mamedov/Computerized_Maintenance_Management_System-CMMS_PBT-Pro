@@ -1,127 +1,179 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Table, Typography } from "antd";
-import { Controller, useFormContext } from "react-hook-form";
-import AxiosInstance from "../../../../../../../api/http";
-import Sekmeler from "./components/Sekmeler";
+import React, { useEffect, useState } from "react";
+import { Button, Modal, Typography } from "antd";
+import { BarChartOutlined, DollarOutlined, FileTextOutlined, InboxOutlined, TeamOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
-const { Text, Link } = Typography;
+const { Text } = Typography;
 
-export default function TarihceTablo({ workshopSelectedId, onSubmit, selectedRows }) {
-  const { control, watch, setValue } = useFormContext();
+const TAB_ITEMS = [
+  { key: "ozet", labelKey: "makineTarihce.tabOzet", icon: BarChartOutlined },
+  { key: "isEmirleri", labelKey: "makineTarihce.tabIsEmirleri", icon: FileTextOutlined },
+  { key: "malzemeKullanimlari", labelKey: "makineTarihce.tabMalzemeKullanimlari", icon: InboxOutlined },
+  { key: "yapilanIscilikler", labelKey: "makineTarihce.tabYapilanIscilikler", icon: TeamOutlined },
+  { key: "maliyetler", labelKey: "makineTarihce.tabMaliyetler", icon: DollarOutlined },
+];
+
+export default function TarihceTablo({ selectedRows = [] }) {
+  const { t } = useTranslation();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState(TAB_ITEMS[0].key);
 
-  // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
-
-  // Intl.DateTimeFormat kullanarak tarih formatlama
-  const formatDate = (date) => {
-    if (!date) return "";
-
-    // Örnek bir tarih formatla ve ay formatını belirle
-    const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
-    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
-
-    let monthFormat;
-    if (sampleFormatted.includes("January")) {
-      monthFormat = "long"; // Tam ad ("January")
-    } else if (sampleFormatted.includes("Jan")) {
-      monthFormat = "short"; // Üç harfli kısaltma ("Jan")
-    } else {
-      monthFormat = "2-digit"; // Sayısal gösterim ("01")
-    }
-
-    // Kullanıcı için tarihi formatla
-    const formatter = new Intl.DateTimeFormat(navigator.language, {
-      year: "numeric",
-      month: monthFormat,
-      day: "2-digit",
-    });
-    return formatter.format(new Date(date));
-  };
-
-  const formatTime = (time) => {
-    if (!time) return "";
-
-    try {
-      // Saati ve dakikayı parçalara ayır (varsayılan olarak "HH:MM:SS" veya "HH:MM" formatında beklenir)
-      const [hours, minutes] = time.split(":");
-
-      // Geçerli tarih ile birlikte bir Date nesnesi oluştur ve sadece saat ve dakika bilgilerini ayarla
-      const date = new Date();
-      date.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0);
-
-      // Kullanıcının lokal ayarlarına uygun olarak saat ve dakikayı formatla
-      // `hour12` seçeneğini belirtmeyerek Intl.DateTimeFormat'ın kullanıcının yerel ayarlarına göre otomatik seçim yapmasına izin ver
-      const formatter = new Intl.DateTimeFormat(navigator.language, {
-        hour: "numeric",
-        minute: "2-digit",
-        // hour12 seçeneği burada belirtilmiyor; böylece otomatik olarak kullanıcının sistem ayarlarına göre belirleniyor
-      });
-
-      // Formatlanmış saati döndür
-      return formatter.format(date);
-    } catch (error) {
-      console.error("Error formatting time:", error);
-      return ""; // Hata durumunda boş bir string döndür
-    }
-  };
-
-  // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
-
-  const handleModalToggle = () => {
-    setIsModalVisible((prev) => !prev);
-    if (!isModalVisible) {
-      fetch();
-      setSelectedRowKeys([]);
-    }
-  };
-
-  const handleModalOk = () => {
-    const selectedData = data.find((item) => item.key === selectedRowKeys[0]);
-    if (selectedData) {
-      onSubmit && onSubmit(selectedData);
-    }
-    setIsModalVisible(false);
-  };
-
-  useEffect(() => {
-    setSelectedRowKeys(workshopSelectedId ? [workshopSelectedId] : []);
-  }, [workshopSelectedId]);
+  const selectedMachine = selectedRows[0] || {};
 
   useEffect(() => {
     if (isModalVisible) {
-      // Tablodan seçilen kayıtların IST_KOD ve IST_TANIMI değerlerini birleştir ve / ile ayır
-      const istKodlarVeKonular = selectedRows.map((row) => `${row.IST_KOD} / ${row.IST_TANIMI}`).join(", ");
-      setValue("fisNo", istKodlarVeKonular); // "fisNo" alanını güncelle
+      setActiveTab(TAB_ITEMS[0].key);
     }
-  }, [isModalVisible, setValue, selectedRows]);
+  }, [isModalVisible]);
 
-  const onRowSelectChange = (selectedKeys) => {
-    setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
+  const handleModalToggle = () => {
+    setIsModalVisible((prev) => !prev);
   };
+
+  const handleModalOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const headerText = [selectedMachine.MKN_KOD, selectedMachine.MKN_TANIM].filter(Boolean).join(" ");
+  const locationText = selectedMachine.MKN_LOKASYON || "-";
+  const typeText = selectedMachine.MKN_TIP || "-";
+  const statusText = selectedMachine.MKN_DURUM || "-";
+  const lastMaintenance =
+    selectedMachine.MKN_SON_BAKIM || selectedMachine.MKN_SON_BAKIM_TARIH || selectedMachine.MKN_SON_BAKIM_TARIHI || "-";
+  const nextMaintenance =
+    selectedMachine.MKN_SONRAKI_BAKIM || selectedMachine.MKN_SONRAKI_BAKIM_TARIH || selectedMachine.MKN_SONRAKI_BAKIM_TARIHI || "-";
+
   return (
     <div>
       <Button
         style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
         onClick={handleModalToggle}
-        type="submit">
-        Tarihçe
+        type="text"
+      >
+        {t("tarihce")}
       </Button>
       <Modal
         width={1200}
         centered
         destroyOnClose
-        title="Makine Tarihçe"
+        title={t("makineTarihce")}
         open={isModalVisible}
         onOk={handleModalOk}
-        onCancel={handleModalToggle}>
-        <div>
-          <Sekmeler selectedRows={selectedRows} />
+        onCancel={handleModalToggle}
+        styles={{
+          content: { background: "#f5f5f5" },
+          header: { background: "#f5f5f5" },
+          body: { background: "#f5f5f5" },
+          footer: { background: "#f5f5f5" },
+        }}
+      >
+        <div style={{ display: "flex", gap: 18, alignItems: "flex-start" }}>
+          <div
+            style={{
+              width: 300,
+              background: "#fff",
+              border: "1px solid #e5e7eb",
+              borderRadius: 16,
+              boxShadow: "0 1px 3px rgba(15, 23, 42, 0.06)",
+            }}
+          >
+            <div style={{ padding: "18px 18px 14px", borderBottom: "1px solid #eef2f7" }}>
+              <Text style={{ fontSize: 16, fontWeight: 600, display: "block" }}>{headerText || "-"}</Text>
+              <Text type="secondary" style={{ display: "block", marginTop: 4 }}>
+                {t("lokasyon")}: {locationText}
+              </Text>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 14 }}>
+                <InfoBox label={t("tip")} value={typeText} />
+                <InfoBox label={t("durum")} value={statusText} />
+                <InfoBox label={t("sonBakim")} value={lastMaintenance} />
+                <InfoBox label={t("sonrakiBakim")} value={nextMaintenance} />
+              </div>
+            </div>
+            <div style={{ padding: 12, display: "flex", flexDirection: "column", gap: 10 }}>
+              {TAB_ITEMS.map((tab) => {
+                const isActive = activeTab === tab.key;
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    onClick={() => setActiveTab(tab.key)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      width: "100%",
+                      padding: "10px 12px",
+                      borderRadius: 12,
+                      border: isActive ? "1px solid #c7dbff" : "1px solid transparent",
+                      background: isActive ? "#eff6ff" : "transparent",
+                      color: isActive ? "#2563eb" : "#4b5563",
+                      fontSize: 14,
+                      fontWeight: isActive ? 600 : 500,
+                      textAlign: "left",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 34,
+                        height: 34,
+                        borderRadius: 10,
+                        background: isActive ? "#e0ecff" : "#f3f4f6",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: isActive ? "#2563eb" : "#9ca3af",
+                        fontSize: 16,
+                      }}
+                    >
+                      <Icon />
+                    </span>
+                    <span>{t(tab.labelKey)}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div style={{ flex: 1, minHeight: 520 }} />
         </div>
-        <div></div>
       </Modal>
+    </div>
+  );
+}
+
+function InfoBox({ label, value }) {
+  const safeValue = value || "-";
+  return (
+    <div
+      style={{
+        border: "1px solid #e5e7eb",
+        borderRadius: 10,
+        padding: "10px 12px",
+        background: "#fff",
+        minWidth: 0,
+        width: "100%",
+      }}
+    >
+      <Text type="secondary" style={{ fontSize: 11, display: "block" }}>
+        {label}
+      </Text>
+      <div
+        title={safeValue}
+        style={{
+          fontSize: 13,
+          fontWeight: 600,
+          display: "block",
+          whiteSpace: "nowrap",
+          textOverflow: "ellipsis",
+          overflow: "hidden",
+          maxWidth: "100%",
+          marginTop: 4,
+        }}
+      >
+        {safeValue}
+      </div>
     </div>
   );
 }
