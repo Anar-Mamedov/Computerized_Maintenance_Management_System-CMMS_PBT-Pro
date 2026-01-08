@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Spin, Typography } from "antd";
+import { Pagination, Spin, Typography } from "antd";
 import {
   AlertOutlined,
   CalendarOutlined,
@@ -108,6 +108,8 @@ export default function IsEmirleriTab({ makineId, startDate, endDate }) {
   const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
   const currency = t("paraBirimi", { defaultValue: "$" });
   const hourShort = t("saatKisaltma", { defaultValue: "sa" });
 
@@ -144,6 +146,10 @@ export default function IsEmirleriTab({ makineId, startDate, endDate }) {
 
   const isEmirleri = data?.IsEmirleri || [];
 
+  useEffect(() => {
+    setPage(1);
+  }, [isEmirleri.length]);
+
   const statusCounts = useMemo(() => {
     const counts = {
       tamamlanan: 0,
@@ -160,6 +166,11 @@ export default function IsEmirleriTab({ makineId, startDate, endDate }) {
     });
     return counts;
   }, [isEmirleri]);
+
+  const pagedList = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return isEmirleri.slice(startIndex, startIndex + pageSize);
+  }, [isEmirleri, page, pageSize]);
 
   if (loading) {
     return (
@@ -215,7 +226,7 @@ export default function IsEmirleriTab({ makineId, startDate, endDate }) {
           <TableCell>{t("makineTarihce.isEmirleri.sorumlu")}</TableCell>
         </div>
 
-        {isEmirleri.map((row, index) => (
+        {pagedList.map((row, index) => (
           <div
             key={row.TB_ISEMRI_ID || index}
             style={{
@@ -261,15 +272,23 @@ export default function IsEmirleriTab({ makineId, startDate, endDate }) {
         ))}
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 12 }}>
-        <Text type="secondary" style={{ fontSize: 12 }}>
-          {t("makineTarihce.isEmirleri.ipucu")}
-        </Text>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {statusCounts.tamamlanan > 0 && <StatusPill color="#dcfce7" text={t("makineTarihce.isEmirleri.tamamlanan")} value={statusCounts.tamamlanan} />}
-          {statusCounts.devamEden > 0 && <StatusPill color="#fef3c7" text={t("makineTarihce.isEmirleri.devamEden")} value={statusCounts.devamEden} />}
-          {statusCounts.bekleyen > 0 && <StatusPill color="#e2e8f0" text={t("makineTarihce.isEmirleri.bekleyen")} value={statusCounts.bekleyen} />}
-          {statusCounts.iptal > 0 && <StatusPill color="#fee2e2" text={t("makineTarihce.isEmirleri.iptal")} value={statusCounts.iptal} />}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 12, gap: 12 }}>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {t("makineTarihce.isEmirleri.ipucu")}
+          </Text>
+          <Pagination
+            current={page}
+            pageSize={pageSize}
+            total={isEmirleri.length}
+            onChange={setPage}
+            showSizeChanger={false}
+            size="small"
+          />
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {statusCounts.tamamlanan > 0 && <StatusPill color="#dcfce7" text={t("makineTarihce.isEmirleri.tamamlanan")} value={statusCounts.tamamlanan} />}
+            {statusCounts.devamEden > 0 && <StatusPill color="#fef3c7" text={t("makineTarihce.isEmirleri.devamEden")} value={statusCounts.devamEden} />}
+            {statusCounts.bekleyen > 0 && <StatusPill color="#e2e8f0" text={t("makineTarihce.isEmirleri.bekleyen")} value={statusCounts.bekleyen} />}
+            {statusCounts.iptal > 0 && <StatusPill color="#fee2e2" text={t("makineTarihce.isEmirleri.iptal")} value={statusCounts.iptal} />}
         </div>
       </div>
     </Panel>

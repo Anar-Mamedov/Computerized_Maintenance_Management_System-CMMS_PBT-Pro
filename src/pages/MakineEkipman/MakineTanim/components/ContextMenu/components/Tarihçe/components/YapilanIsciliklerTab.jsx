@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Spin, Typography } from "antd";
+import { Pagination, Spin, Typography } from "antd";
 import { ClockCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import AxiosInstance from "../../../../../../../../api/http";
@@ -81,6 +81,8 @@ export default function YapilanIsciliklerTab({ makineId, startDate, endDate }) {
   const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
   const currency = t("paraBirimi", { defaultValue: "$" });
   const hourShort = t("saatKisaltma", { defaultValue: "sa" });
   const minuteShort = t("dakikaKisaltma", { defaultValue: "dk" });
@@ -118,6 +120,10 @@ export default function YapilanIsciliklerTab({ makineId, startDate, endDate }) {
 
   const list = data?.IscilikListesi || [];
 
+  useEffect(() => {
+    setPage(1);
+  }, [list.length]);
+
   const totalDurationLabel = useMemo(() => {
     const totalHours = list.reduce((sum, row) => sum + (Number.isFinite(row.Sure) ? row.Sure : 0), 0);
     if (!totalHours) return "-";
@@ -129,6 +135,11 @@ export default function YapilanIsciliklerTab({ makineId, startDate, endDate }) {
     if (!totalCost) return "-";
     return `${currency}${formatMoney(totalCost)}`;
   }, [list, currency]);
+
+  const pagedList = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return list.slice(startIndex, startIndex + pageSize);
+  }, [list, page, pageSize]);
 
   if (loading) {
     return (
@@ -179,7 +190,7 @@ export default function YapilanIsciliklerTab({ makineId, startDate, endDate }) {
             <TableCell align="right">{t("makineTarihce.yapilanIscilikler.maliyet")}</TableCell>
           </div>
 
-          {list.map((row, index) => {
+          {pagedList.map((row, index) => {
             const description = row.IsTanimi || row.Aciklama || row.Konu || "-";
             return (
               <div
@@ -219,6 +230,16 @@ export default function YapilanIsciliklerTab({ makineId, startDate, endDate }) {
               <Text type="secondary">{t("makineTarihce.yapilanIscilikler.veriYok")}</Text>
             </div>
           )}
+        </div>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+          <Pagination
+            current={page}
+            pageSize={pageSize}
+            total={list.length}
+            onChange={setPage}
+            showSizeChanger={false}
+            size="small"
+          />
         </div>
       </Panel>
 

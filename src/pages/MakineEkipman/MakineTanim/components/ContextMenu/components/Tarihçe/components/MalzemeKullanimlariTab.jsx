@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Input, Spin, Typography } from "antd";
+import { Input, Pagination, Spin, Typography } from "antd";
 import { CalendarOutlined, DollarOutlined, InboxOutlined, SearchOutlined, SwapOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import AxiosInstance from "../../../../../../../../api/http";
@@ -94,6 +94,8 @@ export default function MalzemeKullanimlariTab({ makineId, startDate, endDate })
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
   const currency = t("paraBirimi", { defaultValue: "$" });
   const adetLabel = t("adet", { defaultValue: "adet" });
 
@@ -148,6 +150,15 @@ export default function MalzemeKullanimlariTab({ makineId, startDate, endDate })
       return fields.includes(lowered);
     });
   }, [materialList, query]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [query, materialList.length]);
+
+  const pagedList = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return filteredList.slice(startIndex, startIndex + pageSize);
+  }, [filteredList, page, pageSize]);
 
   const mostUsedParts = (data?.EnCokKullanilanMalzeme || "").split("\n").map((line) => line.trim()).filter(Boolean);
 
@@ -246,7 +257,7 @@ export default function MalzemeKullanimlariTab({ makineId, startDate, endDate })
             <TableCell>{t("makineTarihce.malzemeKullanimlari.isEmriNo")}</TableCell>
           </div>
 
-          {filteredList.map((row, index) => (
+          {pagedList.map((row, index) => (
             <div
               key={`${row.MalzemeKodu}-${index}`}
               style={{
@@ -307,6 +318,16 @@ export default function MalzemeKullanimlariTab({ makineId, startDate, endDate })
               <Text type="secondary">{t("makineTarihce.malzemeKullanimlari.veriYok")}</Text>
             </div>
           )}
+        </div>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+          <Pagination
+            current={page}
+            pageSize={pageSize}
+            total={filteredList.length}
+            onChange={setPage}
+            showSizeChanger={false}
+            size="small"
+          />
         </div>
       </Panel>
     </div>

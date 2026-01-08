@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Spin, Typography } from "antd";
+import { Pagination, Spin, Typography } from "antd";
 import { useTranslation } from "react-i18next";
 import AxiosInstance from "../../../../../../../../api/http";
 
@@ -110,6 +110,8 @@ export default function MaliyetlerTab({ makineId, startDate, endDate }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
   const currency = t("paraBirimi", { defaultValue: "$" });
 
   useEffect(() => {
@@ -155,6 +157,15 @@ export default function MaliyetlerTab({ makineId, startDate, endDate }) {
       return true;
     });
   }, [list, filter]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [filter, list.length]);
+
+  const pagedList = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return filteredList.slice(startIndex, startIndex + pageSize);
+  }, [filteredList, page, pageSize]);
 
   const totalCost = data?.ToplamMaliyet || 0;
   const totalCount = data?.ToplamKayit || 0;
@@ -270,7 +281,7 @@ export default function MaliyetlerTab({ makineId, startDate, endDate }) {
             <TableCell>{t("makineTarihce.maliyetler.sorumlu")}</TableCell>
           </div>
 
-          {filteredList.map((row, index) => (
+          {pagedList.map((row, index) => (
             <div
               key={`${row.IsEmriId}-${index}`}
               style={{
@@ -305,6 +316,16 @@ export default function MaliyetlerTab({ makineId, startDate, endDate }) {
               <Text type="secondary">{t("makineTarihce.maliyetler.veriYok")}</Text>
             </div>
           )}
+        </div>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+          <Pagination
+            current={page}
+            pageSize={pageSize}
+            total={filteredList.length}
+            onChange={setPage}
+            showSizeChanger={false}
+            size="small"
+          />
         </div>
       </Panel>
 
