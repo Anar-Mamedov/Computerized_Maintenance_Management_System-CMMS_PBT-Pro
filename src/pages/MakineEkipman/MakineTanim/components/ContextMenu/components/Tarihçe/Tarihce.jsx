@@ -98,7 +98,7 @@ export default function TarihceTablo({ selectedRows = [] }) {
         width={1600}
         centered
         destroyOnClose
-        title={t("ekipmanTarihce")}
+        title={t("ekipmanTarihcesi")}
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}

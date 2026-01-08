@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Spin, Typography } from "antd";
+import { Pagination, Spin, Typography } from "antd";
 import { useTranslation } from "react-i18next";
 import AxiosInstance from "../../../../../../../../api/http";
 
@@ -95,6 +95,8 @@ export default function OzetTab({ makineId, startDate, endDate }) {
   const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
   const hourShort = t("saatKisaltma", { defaultValue: "sa" });
 
   useEffect(() => {
@@ -134,6 +136,10 @@ export default function OzetTab({ makineId, startDate, endDate }) {
   const operasyon = data?.OperasyonDurumu || {};
   const parcaAnalizi = data?.ParcaAnalizi || [];
 
+  useEffect(() => {
+    setPage(1);
+  }, [parcaAnalizi.length]);
+
   const totalCost = useMemo(() => aylikMaliyetler.reduce((sum, item) => sum + (item.ToplamTutar || 0), 0), [aylikMaliyetler]);
   const averageCost = useMemo(() => (aylikMaliyetler.length ? totalCost / aylikMaliyetler.length : 0), [totalCost, aylikMaliyetler.length]);
   const trendCost = useMemo(() => {
@@ -143,6 +149,11 @@ export default function OzetTab({ makineId, startDate, endDate }) {
     if (prev === 0) return 0;
     return Math.round(((last - prev) / prev) * 100);
   }, [aylikMaliyetler]);
+
+  const pagedParcaAnalizi = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return parcaAnalizi.slice(startIndex, startIndex + pageSize);
+  }, [parcaAnalizi, page, pageSize]);
 
   if (loading) {
     return (
@@ -285,7 +296,7 @@ export default function OzetTab({ makineId, startDate, endDate }) {
             <div style={{ textAlign: "right" }}>{t("makineTarihce.ozet.tutar")}</div>
             <div style={{ textAlign: "right" }}>{t("makineTarihce.ozet.yuzde")}</div>
           </div>
-          {parcaAnalizi.map((row) => (
+          {pagedParcaAnalizi.map((row) => (
             <div
               key={row.MalzemeTipi}
               style={{
@@ -308,6 +319,16 @@ export default function OzetTab({ makineId, startDate, endDate }) {
               <Text type="secondary">{t("makineTarihce.ozet.veriYok", { defaultValue: "Veri bulunamadı." })}</Text>
             </div>
           )}
+        </div>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+          <Pagination
+            current={page}
+            pageSize={pageSize}
+            total={parcaAnalizi.length}
+            onChange={setPage}
+            showSizeChanger={false}
+            size="small"
+          />
         </div>
       </Panel>
     </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Spin, Typography } from "antd";
+import { Pagination, Spin, Tag, Typography } from "antd";
 import {
   AlertOutlined,
   CalendarOutlined,
@@ -9,6 +9,7 @@ import {
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import AxiosInstance from "../../../../../../../../api/http";
+import IsEmriEditDrawer from "../../../../../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer.jsx";
 
 const { Text } = Typography;
 
@@ -42,47 +43,63 @@ function TipTag({ label, color }) {
   if (normalized.includes("talep")) Icon = ClockCircleOutlined;
 
   return (
-    <span
+    <Tag
       style={{
         display: "inline-flex",
         alignItems: "center",
         gap: 8,
-        padding: "6px 12px",
-        borderRadius: 999,
-        border: `1px solid ${color || "#e5e7eb"}`,
-        background: color || "#f8fafc",
-        color: "#1f2937",
-        fontSize: 13,
-        fontWeight: 500,
+        padding: "4px 10px",
+        border: `1.2px solid ${color ? `${color}B3` : "#e5e7eb"}`,
+        backgroundColor: color ? `${color}33` : "#f8fafc",
+        color: color || "#1f2937",
+        fontSize: 12,
+        fontWeight: 600,
         whiteSpace: "nowrap",
+        maxWidth: "100%",
+        minWidth: 0,
+        marginInlineEnd: 0,
       }}
     >
       <Icon style={{ fontSize: 14 }} />
-      {label || "-"}
-    </span>
+      <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label || "-"}</span>
+    </Tag>
   );
 }
 
+function resolveStatusColor(label, fallbackColor) {
+  const normalized = (label || "").toLocaleLowerCase("tr");
+  if (normalized.includes("kapalı") || normalized.includes("kapali")) {
+    return "#ef4444";
+  }
+  if (normalized.includes("açık") || normalized.includes("acik")) {
+    return "#16a34a";
+  }
+  return fallbackColor;
+}
+
 function DurumTag({ label, color }) {
+  const resolvedColor = resolveStatusColor(label, color);
   return (
-    <span
+    <Tag
       style={{
         display: "inline-flex",
         alignItems: "center",
         gap: 8,
-        padding: "6px 12px",
-        borderRadius: 999,
-        border: `1px solid ${color || "#e5e7eb"}`,
-        background: color || "#f8fafc",
-        color: "#1f2937",
-        fontSize: 13,
-        fontWeight: 500,
+        padding: "4px 10px",
+        border: `1.2px solid ${resolvedColor ? `${resolvedColor}B3` : "#e5e7eb"}`,
+        backgroundColor: resolvedColor ? `${resolvedColor}33` : "#f8fafc",
+        color: resolvedColor || "#1f2937",
+        fontSize: 12,
+        fontWeight: 600,
         whiteSpace: "nowrap",
+        maxWidth: "100%",
+        minWidth: 0,
+        marginInlineEnd: 0,
       }}
     >
-      <span style={{ width: 8, height: 8, borderRadius: "50%", background: color || "#9ca3af" }} />
-      {label || "-"}
-    </span>
+      <span style={{ width: 8, height: 8, borderRadius: "50%", background: resolvedColor || "#9ca3af" }} />
+      <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label || "-"}</span>
+    </Tag>
   );
 }
 
@@ -108,6 +125,10 @@ export default function IsEmirleriTab({ makineId, startDate, endDate }) {
   const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [isEmriDrawerVisible, setIsEmriDrawerVisible] = useState(false);
+  const [selectedIsEmriRow, setSelectedIsEmriRow] = useState(null);
+  const pageSize = 10;
   const currency = t("paraBirimi", { defaultValue: "$" });
   const hourShort = t("saatKisaltma", { defaultValue: "sa" });
 
@@ -144,6 +165,10 @@ export default function IsEmirleriTab({ makineId, startDate, endDate }) {
 
   const isEmirleri = data?.IsEmirleri || [];
 
+  useEffect(() => {
+    setPage(1);
+  }, [isEmirleri.length]);
+
   const statusCounts = useMemo(() => {
     const counts = {
       tamamlanan: 0,
@@ -160,6 +185,11 @@ export default function IsEmirleriTab({ makineId, startDate, endDate }) {
     });
     return counts;
   }, [isEmirleri]);
+
+  const pagedList = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return isEmirleri.slice(startIndex, startIndex + pageSize);
+  }, [isEmirleri, page, pageSize]);
 
   if (loading) {
     return (
@@ -181,8 +211,16 @@ export default function IsEmirleriTab({ makineId, startDate, endDate }) {
     );
   }
 
+  const openIsEmriDrawer = (id) => {
+    const parsedId = Number(id);
+    if (!Number.isFinite(parsedId) || parsedId <= 0) return;
+    setSelectedIsEmriRow({ key: parsedId });
+    setIsEmriDrawerVisible(true);
+  };
+
   return (
-    <Panel>
+    <>
+      <Panel>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
         <Text style={{ fontSize: 16, fontWeight: 600 }}>{t("makineTarihce.isEmirleri.baslik")}</Text>
         <Text type="secondary">
@@ -215,33 +253,44 @@ export default function IsEmirleriTab({ makineId, startDate, endDate }) {
           <TableCell>{t("makineTarihce.isEmirleri.sorumlu")}</TableCell>
         </div>
 
-        {isEmirleri.map((row, index) => (
-          <div
-            key={row.TB_ISEMRI_ID || index}
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1.1fr 1.2fr 1.2fr 1.3fr 1.1fr 0.7fr 0.8fr 0.9fr",
-              borderBottom: index === isEmirleri.length - 1 ? "none" : "1px solid #e2e8f0",
-              alignItems: "center",
-              background: "#fff",
-            }}
-          >
-            <TableCell>
-              <button
-                type="button"
-                style={{
-                  border: "none",
-                  background: "transparent",
-                  color: "#0ea5e9",
-                  cursor: "pointer",
-                  padding: 0,
-                  fontSize: 14,
-                  textAlign: "left",
-                }}
-              >
-                {row.ISM_ISEMRI_NO || "-"}
-              </button>
-            </TableCell>
+        {pagedList.map((row, index) => {
+          const isEmriId = Number(row.TB_ISEMRI_ID);
+          const canOpen = Number.isFinite(isEmriId) && isEmriId > 0;
+          return (
+            <div
+              key={row.TB_ISEMRI_ID || index}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1.1fr 1.2fr 1.2fr 1.3fr 1.1fr 0.7fr 0.8fr 0.9fr",
+                borderBottom: index === isEmirleri.length - 1 ? "none" : "1px solid #e2e8f0",
+                alignItems: "center",
+                background: "#fff",
+              }}
+            >
+              <TableCell>
+                {canOpen ? (
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event?.stopPropagation();
+                      openIsEmriDrawer(isEmriId);
+                    }}
+                    style={{
+                      border: "none",
+                      background: "transparent",
+                      color: "#0ea5e9",
+                      cursor: "pointer",
+                      padding: 0,
+                      fontSize: 14,
+                      textAlign: "left",
+                    }}
+                  >
+                    {row.ISM_ISEMRI_NO || "-"}
+                  </button>
+                ) : (
+                  <span>{row.ISM_ISEMRI_NO || "-"}</span>
+                )}
+              </TableCell>
             <TableCell>
               <TipTag label={row.Tip} color={row.TipRenk} />
             </TableCell>
@@ -258,21 +307,32 @@ export default function IsEmirleriTab({ makineId, startDate, endDate }) {
             </TableCell>
             <TableCell>{row.Sorumlu || "-"}</TableCell>
           </div>
-        ))}
+          );
+        })}
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 12 }}>
-        <Text type="secondary" style={{ fontSize: 12 }}>
-          {t("makineTarihce.isEmirleri.ipucu")}
-        </Text>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {statusCounts.tamamlanan > 0 && <StatusPill color="#dcfce7" text={t("makineTarihce.isEmirleri.tamamlanan")} value={statusCounts.tamamlanan} />}
-          {statusCounts.devamEden > 0 && <StatusPill color="#fef3c7" text={t("makineTarihce.isEmirleri.devamEden")} value={statusCounts.devamEden} />}
-          {statusCounts.bekleyen > 0 && <StatusPill color="#e2e8f0" text={t("makineTarihce.isEmirleri.bekleyen")} value={statusCounts.bekleyen} />}
-          {statusCounts.iptal > 0 && <StatusPill color="#fee2e2" text={t("makineTarihce.isEmirleri.iptal")} value={statusCounts.iptal} />}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 12, gap: 12 }}>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {t("makineTarihce.isEmirleri.ipucu")}
+          </Text>
+          <Pagination
+            current={page}
+            pageSize={pageSize}
+            total={isEmirleri.length}
+            onChange={setPage}
+            showSizeChanger={false}
+            size="small"
+          />
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {statusCounts.tamamlanan > 0 && <StatusPill color="#dcfce7" text={t("makineTarihce.isEmirleri.tamamlanan")} value={statusCounts.tamamlanan} />}
+            {statusCounts.devamEden > 0 && <StatusPill color="#fef3c7" text={t("makineTarihce.isEmirleri.devamEden")} value={statusCounts.devamEden} />}
+            {statusCounts.bekleyen > 0 && <StatusPill color="#e2e8f0" text={t("makineTarihce.isEmirleri.bekleyen")} value={statusCounts.bekleyen} />}
+            {statusCounts.iptal > 0 && <StatusPill color="#fee2e2" text={t("makineTarihce.isEmirleri.iptal")} value={statusCounts.iptal} />}
         </div>
       </div>
     </Panel>
+    <IsEmriEditDrawer selectedRow={selectedIsEmriRow} onDrawerClose={() => setIsEmriDrawerVisible(false)} drawerVisible={isEmriDrawerVisible} onRefresh={() => {}} />
+    </>
   );
 }
 

@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Spin, Typography } from "antd";
+import { Pagination, Spin, Tag, Typography } from "antd";
 import { ClockCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import AxiosInstance from "../../../../../../../../api/http";
+import IsEmriEditDrawer from "../../../../../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer.jsx";
 
 const { Text } = Typography;
 
@@ -58,22 +59,24 @@ function TableCell({ children, align = "left" }) {
 
 function TypePill({ label }) {
   return (
-    <span
+    <Tag
       style={{
         display: "inline-flex",
         alignItems: "center",
-        padding: "6px 12px",
-        borderRadius: 999,
-        border: "1px solid #e2e8f0",
+        padding: "4px 10px",
+        borderColor: "#e2e8f0",
         background: "#f8fafc",
         color: "#475569",
-        fontSize: 13,
-        fontWeight: 500,
+        fontSize: 12,
+        fontWeight: 600,
         whiteSpace: "nowrap",
+        maxWidth: "100%",
+        minWidth: 0,
+        marginInlineEnd: 0,
       }}
     >
-      {label || "-"}
-    </span>
+      <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label || "-"}</span>
+    </Tag>
   );
 }
 
@@ -81,6 +84,10 @@ export default function YapilanIsciliklerTab({ makineId, startDate, endDate }) {
   const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [isEmriDrawerVisible, setIsEmriDrawerVisible] = useState(false);
+  const [selectedIsEmriRow, setSelectedIsEmriRow] = useState(null);
+  const pageSize = 10;
   const currency = t("paraBirimi", { defaultValue: "$" });
   const hourShort = t("saatKisaltma", { defaultValue: "sa" });
   const minuteShort = t("dakikaKisaltma", { defaultValue: "dk" });
@@ -118,6 +125,10 @@ export default function YapilanIsciliklerTab({ makineId, startDate, endDate }) {
 
   const list = data?.IscilikListesi || [];
 
+  useEffect(() => {
+    setPage(1);
+  }, [list.length]);
+
   const totalDurationLabel = useMemo(() => {
     const totalHours = list.reduce((sum, row) => sum + (Number.isFinite(row.Sure) ? row.Sure : 0), 0);
     if (!totalHours) return "-";
@@ -129,6 +140,11 @@ export default function YapilanIsciliklerTab({ makineId, startDate, endDate }) {
     if (!totalCost) return "-";
     return `${currency}${formatMoney(totalCost)}`;
   }, [list, currency]);
+
+  const pagedList = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return list.slice(startIndex, startIndex + pageSize);
+  }, [list, page, pageSize]);
 
   if (loading) {
     return (
@@ -150,8 +166,16 @@ export default function YapilanIsciliklerTab({ makineId, startDate, endDate }) {
     );
   }
 
+  const openIsEmriDrawer = (id) => {
+    const parsedId = Number(id);
+    if (!Number.isFinite(parsedId) || parsedId <= 0) return;
+    setSelectedIsEmriRow({ key: parsedId });
+    setIsEmriDrawerVisible(true);
+  };
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+    <>
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       <Panel>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <Text style={{ fontSize: 16, fontWeight: 600 }}>{t("makineTarihce.yapilanIscilikler.baslik")}</Text>
@@ -179,8 +203,10 @@ export default function YapilanIsciliklerTab({ makineId, startDate, endDate }) {
             <TableCell align="right">{t("makineTarihce.yapilanIscilikler.maliyet")}</TableCell>
           </div>
 
-          {list.map((row, index) => {
+          {pagedList.map((row, index) => {
             const description = row.IsTanimi || row.Aciklama || row.Konu || "-";
+            const isEmriId = Number(row.IsEmriId);
+            const canOpen = Number.isFinite(isEmriId) && isEmriId > 0;
             return (
               <div
                 key={`${row.KontrolListId}-${index}`}
@@ -194,7 +220,29 @@ export default function YapilanIsciliklerTab({ makineId, startDate, endDate }) {
               >
                 <TableCell>{row.Tarih || "-"}</TableCell>
                 <TableCell>
-                  <span style={{ color: "#0ea5e9", fontWeight: 500 }}>{row.IsEmriNo || "-"}</span>
+                  {canOpen ? (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event?.stopPropagation();
+                        openIsEmriDrawer(isEmriId);
+                      }}
+                      style={{
+                        border: "none",
+                        background: "transparent",
+                        color: "#0ea5e9",
+                        cursor: "pointer",
+                        padding: 0,
+                        fontSize: 14,
+                        textAlign: "left",
+                        fontWeight: 500,
+                      }}
+                    >
+                      {row.IsEmriNo || "-"}
+                    </button>
+                  ) : (
+                    <span>{row.IsEmriNo || "-"}</span>
+                  )}
                 </TableCell>
                 <TableCell>
                   <TypePill label={row.IsEmriTipi} />
@@ -220,6 +268,16 @@ export default function YapilanIsciliklerTab({ makineId, startDate, endDate }) {
             </div>
           )}
         </div>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+          <Pagination
+            current={page}
+            pageSize={pageSize}
+            total={list.length}
+            onChange={setPage}
+            showSizeChanger={false}
+            size="small"
+          />
+        </div>
       </Panel>
 
       <Panel>
@@ -229,6 +287,13 @@ export default function YapilanIsciliklerTab({ makineId, startDate, endDate }) {
           <Text>{t("makineTarihce.yapilanIscilikler.toplamMaliyet", { value: totalCostLabel })}</Text>
         </div>
       </Panel>
-    </div>
+      </div>
+      <IsEmriEditDrawer
+        selectedRow={selectedIsEmriRow}
+        onDrawerClose={() => setIsEmriDrawerVisible(false)}
+        drawerVisible={isEmriDrawerVisible}
+        onRefresh={() => {}}
+      />
+    </>
   );
 }

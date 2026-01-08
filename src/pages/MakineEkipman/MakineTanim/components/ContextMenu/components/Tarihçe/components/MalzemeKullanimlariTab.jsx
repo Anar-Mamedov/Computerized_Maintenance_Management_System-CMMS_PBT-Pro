@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Input, Spin, Typography } from "antd";
+import { Input, Pagination, Spin, Typography } from "antd";
 import { CalendarOutlined, DollarOutlined, InboxOutlined, SearchOutlined, SwapOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import AxiosInstance from "../../../../../../../../api/http";
+import IsEmriEditDrawer from "../../../../../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer.jsx";
 
 const { Text } = Typography;
 
@@ -94,6 +95,10 @@ export default function MalzemeKullanimlariTab({ makineId, startDate, endDate })
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [isEmriDrawerVisible, setIsEmriDrawerVisible] = useState(false);
+  const [selectedIsEmriRow, setSelectedIsEmriRow] = useState(null);
+  const pageSize = 10;
   const currency = t("paraBirimi", { defaultValue: "$" });
   const adetLabel = t("adet", { defaultValue: "adet" });
 
@@ -149,6 +154,15 @@ export default function MalzemeKullanimlariTab({ makineId, startDate, endDate })
     });
   }, [materialList, query]);
 
+  useEffect(() => {
+    setPage(1);
+  }, [query, materialList.length]);
+
+  const pagedList = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return filteredList.slice(startIndex, startIndex + pageSize);
+  }, [filteredList, page, pageSize]);
+
   const mostUsedParts = (data?.EnCokKullanilanMalzeme || "").split("\n").map((line) => line.trim()).filter(Boolean);
 
   if (loading) {
@@ -171,8 +185,16 @@ export default function MalzemeKullanimlariTab({ makineId, startDate, endDate })
     );
   }
 
+  const openIsEmriDrawer = (id) => {
+    const parsedId = Number(id);
+    if (!Number.isFinite(parsedId) || parsedId <= 0) return;
+    setSelectedIsEmriRow({ key: parsedId });
+    setIsEmriDrawerVisible(true);
+  };
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+    <>
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(12, minmax(0, 1fr))", gap: 12 }}>
         <div style={{ gridColumn: "span 3" }}>
           <StatCard
@@ -246,61 +268,87 @@ export default function MalzemeKullanimlariTab({ makineId, startDate, endDate })
             <TableCell>{t("makineTarihce.malzemeKullanimlari.isEmriNo")}</TableCell>
           </div>
 
-          {filteredList.map((row, index) => (
-            <div
-              key={`${row.MalzemeKodu}-${index}`}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1.1fr 1.6fr 1fr 0.7fr 0.7fr 0.9fr 0.9fr 0.9fr",
-                borderBottom: index === filteredList.length - 1 ? "none" : "1px solid #e2e8f0",
-                alignItems: "center",
-                background: "#fff",
-              }}
-            >
-              <TableCell>{row.Tarih || "-"}</TableCell>
-              <TableCell>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
-                  <span
-                    style={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: 10,
-                      background: "#f1f5f9",
-                      color: "#64748b",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <InboxOutlined />
-                  </span>
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, color: "#1f2937", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                      {row.MalzemeAdi || "-"}
+          {pagedList.map((row, index) => {
+            const isEmriId = Number(row.IsEmriId);
+            const canOpen = Number.isFinite(isEmriId) && isEmriId > 0;
+            return (
+              <div
+                key={`${row.MalzemeKodu}-${index}`}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1.1fr 1.6fr 1fr 0.7fr 0.7fr 0.9fr 0.9fr 0.9fr",
+                  borderBottom: index === filteredList.length - 1 ? "none" : "1px solid #e2e8f0",
+                  alignItems: "center",
+                  background: "#fff",
+                }}
+              >
+                <TableCell>{row.Tarih || "-"}</TableCell>
+                <TableCell>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+                    <span
+                      style={{
+                        width: 30,
+                        height: 30,
+                        borderRadius: 10,
+                        background: "#f1f5f9",
+                        color: "#64748b",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <InboxOutlined />
+                    </span>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontWeight: 600, color: "#1f2937", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {row.MalzemeAdi || "-"}
+                      </div>
+                      <Text type="secondary" style={{ fontSize: 12 }}>
+                        {row.MalzemeKodu || "-"}
+                      </Text>
                     </div>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      {row.MalzemeKodu || "-"}
-                    </Text>
                   </div>
-                </div>
-              </TableCell>
-              <TableCell>{row.Tip || "-"}</TableCell>
-              <TableCell align="right">{Number.isFinite(row.Miktar) ? row.Miktar : "-"}</TableCell>
-              <TableCell>{row.Birim || "-"}</TableCell>
-              <TableCell align="right">
-                {currency}
-                {formatMoney(row.BirimFiyat || 0)}
-              </TableCell>
-              <TableCell align="right">
-                {currency}
-                {formatMoney(row.ToplamTutar || 0)}
-              </TableCell>
-              <TableCell>
-                <span style={{ color: "#0ea5e9", fontWeight: 500 }}>{row.IsEmriNo || "-"}</span>
-              </TableCell>
-            </div>
-          ))}
+                </TableCell>
+                <TableCell>{row.Tip || "-"}</TableCell>
+                <TableCell align="right">{Number.isFinite(row.Miktar) ? row.Miktar : "-"}</TableCell>
+                <TableCell>{row.Birim || "-"}</TableCell>
+                <TableCell align="right">
+                  {currency}
+                  {formatMoney(row.BirimFiyat || 0)}
+                </TableCell>
+                <TableCell align="right">
+                  {currency}
+                  {formatMoney(row.ToplamTutar || 0)}
+                </TableCell>
+                <TableCell>
+                  {canOpen ? (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event?.stopPropagation();
+                        openIsEmriDrawer(isEmriId);
+                      }}
+                      style={{
+                        border: "none",
+                        background: "transparent",
+                        color: "#0ea5e9",
+                        cursor: "pointer",
+                        padding: 0,
+                        fontSize: 14,
+                        textAlign: "left",
+                        fontWeight: 500,
+                      }}
+                    >
+                      {row.IsEmriNo || "-"}
+                    </button>
+                  ) : (
+                    <span>{row.IsEmriNo || "-"}</span>
+                  )}
+                </TableCell>
+              </div>
+            );
+          })}
 
           {filteredList.length === 0 && (
             <div style={{ padding: "16px", textAlign: "center" }}>
@@ -308,7 +356,24 @@ export default function MalzemeKullanimlariTab({ makineId, startDate, endDate })
             </div>
           )}
         </div>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+          <Pagination
+            current={page}
+            pageSize={pageSize}
+            total={filteredList.length}
+            onChange={setPage}
+            showSizeChanger={false}
+            size="small"
+          />
+        </div>
       </Panel>
-    </div>
+      </div>
+      <IsEmriEditDrawer
+        selectedRow={selectedIsEmriRow}
+        onDrawerClose={() => setIsEmriDrawerVisible(false)}
+        drawerVisible={isEmriDrawerVisible}
+        onRefresh={() => {}}
+      />
+    </>
   );
 }
