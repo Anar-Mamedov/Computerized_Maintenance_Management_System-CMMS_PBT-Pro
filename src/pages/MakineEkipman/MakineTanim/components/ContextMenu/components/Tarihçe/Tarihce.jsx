@@ -58,10 +58,8 @@ export default function TarihceTablo({ selectedRows = [] }) {
   const locationText = selectedMachine.MKN_LOKASYON || "-";
   const typeText = selectedMachine.MKN_TIP || "-";
   const statusText = selectedMachine.MKN_DURUM || "-";
-  const lastMaintenance =
-    selectedMachine.MKN_SON_BAKIM || selectedMachine.MKN_SON_BAKIM_TARIH || selectedMachine.MKN_SON_BAKIM_TARIHI || "-";
-  const nextMaintenance =
-    selectedMachine.MKN_SONRAKI_BAKIM || selectedMachine.MKN_SONRAKI_BAKIM_TARIH || selectedMachine.MKN_SONRAKI_BAKIM_TARIHI || "-";
+  const lastMaintenance = selectedMachine.MKN_SON_BAKIM || selectedMachine.MKN_SON_BAKIM_TARIH || selectedMachine.MKN_SON_BAKIM_TARIHI || "-";
+  const nextMaintenance = selectedMachine.MKN_SONRAKI_BAKIM || selectedMachine.MKN_SONRAKI_BAKIM_TARIH || selectedMachine.MKN_SONRAKI_BAKIM_TARIHI || "-";
 
   const dateRange = useMemo(() => {
     const today = dayjs();
@@ -93,18 +91,14 @@ export default function TarihceTablo({ selectedRows = [] }) {
 
   return (
     <div>
-      <Button
-        style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
-        onClick={handleModalToggle}
-        type="text"
-      >
+      <Button style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }} onClick={handleModalToggle} type="text">
         {t("tarihce")}
       </Button>
       <Modal
         width={1600}
         centered
         destroyOnClose
-        title={t("makineTarihce")}
+        title={t("ekipmanTarihce")}
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}
@@ -216,11 +210,9 @@ export default function TarihceTablo({ selectedRows = [] }) {
             {activeTab === "malzemeKullanimlari" && <MalzemeKullanimlariTab makineId={makineId} startDate={startDate} endDate={endDate} />}
             {activeTab === "yapilanIscilikler" && <YapilanIsciliklerTab makineId={makineId} startDate={startDate} endDate={endDate} />}
             {activeTab === "maliyetler" && <MaliyetlerTab makineId={makineId} startDate={startDate} endDate={endDate} />}
-            {activeTab !== "ozet" &&
-              activeTab !== "isEmirleri" &&
-              activeTab !== "malzemeKullanimlari" &&
-              activeTab !== "yapilanIscilikler" &&
-              activeTab !== "maliyetler" && <div style={{ minHeight: 520 }} />}
+            {activeTab !== "ozet" && activeTab !== "isEmirleri" && activeTab !== "malzemeKullanimlari" && activeTab !== "yapilanIscilikler" && activeTab !== "maliyetler" && (
+              <div style={{ minHeight: 520 }} />
+            )}
           </div>
         </div>
       </Modal>
