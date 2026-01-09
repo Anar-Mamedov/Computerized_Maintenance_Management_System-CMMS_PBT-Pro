@@ -147,6 +147,7 @@ export default function LoginForm() {
           yakitStoklari: true,
           yakitHareketleri: true,
           hizliYakitGirisi: true,
+          yakitTanimlari: true,
         };
         const userInfo = {
           userId: response.TB_KULLANICI_ID ?? null,
