@@ -57,6 +57,10 @@ const Breadcrumbs = () => {
     "/satinalmaDashboard": "Satınalma Yönetici Paneli",
     "/isEmriAnalizi": "İş Emirleri Kontrol Ekranı",
     "/bakimKpi": "Bakım KPI Analizi",
+    "/yakitGirisleri": "Yakıt Girişleri",
+    "/yakitStoklari": "Yakıt Stokları",
+    "/yakitHareketleri": "Yakıt Hareketleri",
+    "hizliYakitGirisi": "Hızlı Yakıt Girişi",
 
     // Diğer route'lar için ekleyin...
   };
