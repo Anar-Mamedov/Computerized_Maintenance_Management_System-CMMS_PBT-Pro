@@ -122,6 +122,7 @@
   "makineTarihce.ozet.arizaSikligiMtbf": "Failure Frequency (MTBF)",
   "makineTarihce.ozet.onarimSuresiMttr": "Repair Time (MTTR)",
   "makineTarihce.ozet.bakimMaliyetleri": "Maintenance Costs",
+  "makineTarihce.ozet.durusSureleri": "Downtime Durations",
   "makineTarihce.ozet.aylaraGore": "(By month)",
   "makineTarihce.ozet.total": "Total",
   "makineTarihce.ozet.average": "Average",

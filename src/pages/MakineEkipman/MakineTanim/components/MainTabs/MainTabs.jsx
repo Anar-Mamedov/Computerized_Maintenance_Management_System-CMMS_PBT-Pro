@@ -112,12 +112,7 @@ export default function MainTabs() {
         <div className="flex flex-row flex-wrap w-full gap-[10px]">
           <div className="flex flex-col items-start w-[calc(50%-5px)]">
             <Text type="secondary">{t("durum")}</Text>
-            <KodIDSelectbox
-              name1="operasyonDurumu"
-              kodID={32505}
-              isRequired={false}
-              onLabelChange={(label) => setValue("operasyonDurumuText", label ?? null)}
-            />
+            <KodIDSelectbox name1="operasyonDurumu" kodID={32505} isRequired={false} onLabelChange={(label) => setValue("operasyonDurumuText", label ?? null)} />
           </div>
           <div className="flex flex-col items-start w-[calc(50%-5px)]">
             <Text type="secondary">{t("seriNo")}</Text>
@@ -148,8 +143,8 @@ export default function MainTabs() {
             <NumberInput name1="durusBirimMaliyeti" required={false} minNumber={0} />
           </div>
           <div className="flex flex-col items-start w-[calc(50%-5px)]">
-            <Text type="secondary">{t("planCalismaSuresi(saat/yil)")}</Text>
-            <NumberInput name1="planCalismaSuresi" required={false} minNumber={0} />
+            <Text type="secondary">{t("planCalismaSuresi(saat/gun)")}</Text>
+            <NumberInput name1="planCalismaSuresi" required={false} minNumber={0} maxNumber={24} />
           </div>
         </div>
       </div>
