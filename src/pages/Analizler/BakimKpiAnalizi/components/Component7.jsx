@@ -19,6 +19,7 @@ function MudaheleSuresiHistogram() {
   const [isLoading, setIsLoading] = useState(true);
   const { watch } = useFormContext();
 
+  // Varsayılan değerler
   const [cardData, setCardData] = useState({ Value: 0, Unit: "", Trend: 0 });
   const [chartData, setChartData] = useState([]);
 
@@ -29,15 +30,27 @@ function MudaheleSuresiHistogram() {
   const bitisTarihi = watch("bitisTarihi");
 
   const body = {
-    StartDate: baslangicTarihi 
-      ? dayjs(baslangicTarihi).format("YYYY-MM-DD") 
+    StartDate: baslangicTarihi
+      ? dayjs(baslangicTarihi).format("YYYY-MM-DD")
       : dayjs().subtract(1, "year").format("YYYY-MM-DD"),
-    EndDate: bitisTarihi 
-      ? dayjs(bitisTarihi).format("YYYY-MM-DD") 
+    EndDate: bitisTarihi
+      ? dayjs(bitisTarihi).format("YYYY-MM-DD")
       : dayjs().format("YYYY-MM-DD"),
-    MakineIds: Array.isArray(makineIds) ? makineIds : (makineIds ? [makineIds] : []),
-    LokasyonIds: Array.isArray(lokasyonIds) ? lokasyonIds : (lokasyonIds ? [lokasyonIds] : []),
-    MakineTipIds: Array.isArray(makineTipIds) ? makineTipIds : (makineTipIds ? [makineTipIds] : []),
+    MakineIds: Array.isArray(makineIds)
+      ? makineIds
+      : makineIds
+      ? [makineIds]
+      : [],
+    LokasyonIds: Array.isArray(lokasyonIds)
+      ? lokasyonIds
+      : lokasyonIds
+      ? [lokasyonIds]
+      : [],
+    MakineTipIds: Array.isArray(makineTipIds)
+      ? makineTipIds
+      : makineTipIds
+      ? [makineTipIds]
+      : [],
   };
 
   const fetchData = async () => {
@@ -61,36 +74,52 @@ function MudaheleSuresiHistogram() {
     fetchData();
   }, [lokasyonIds, makineIds, makineTipIds, baslangicTarihi, bitisTarihi]);
 
-  const trendColor = cardData?.Trend >= 0 ? "#52c41a" : "#f5222d";
-  const trendSign = cardData?.Trend > 0 ? "+" : "";
+  // --- RENK VE İŞARET MANTIĞI ---
+  const trendValue = cardData?.Trend ?? 0;
+  
+  // MTTR Mantığı: Süre düşerse (Negatif) İYİ (Yeşil), artarsa (Pozitif) KÖTÜ (Kırmızı)
+  const isGoodTrend = trendValue < 0; 
+  const trendColor = isGoodTrend ? "#52c41a" : "#f5222d"; 
+  
+  // Eğer pozitifse başına + koy, negatifse zaten veriden - gelir.
+  const trendSign = trendValue > 0 ? "+" : "";
 
   return (
     <div style={{ width: "100%", height: "100%", padding: "5px" }}>
       {isLoading ? (
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
           <Spin size="large" />
         </div>
       ) : (
         <Card
-          style={{ 
-            borderRadius: "16px", 
-            height: "100%", 
-            border: "1px solid #f0f0f0", 
-            display: "flex", 
+          style={{
+            borderRadius: "16px",
+            height: "100%",
+            border: "1px solid #f0f0f0",
+            display: "flex",
             flexDirection: "column",
-            overflow: "hidden" 
+            overflow: "hidden",
           }}
-          bodyStyle={{ 
-            flex: 1, 
-            display: "flex", 
-            flexDirection: "column", 
+          bodyStyle={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
             padding: "20px",
             height: "100%",
-            overflow: "hidden"
+            overflow: "hidden",
           }}
           title={
             <div>
-              <Text strong style={{ fontSize: "16px" }}>MTTR</Text>
+              <Text strong style={{ fontSize: "16px" }}>
+                MTTR
+              </Text>
               <br />
               <Text type="secondary" style={{ fontSize: 10 }}>
                 Ortalama Onarım Süresi • Formül: Toplam Onarım Süresi / Onarım Sayısı
@@ -109,10 +138,18 @@ function MudaheleSuresiHistogram() {
           >
             <div>
               <Title level={2} style={{ margin: 0 }}>
-                {cardData?.Value} <small style={{ fontSize: 14 }}>{cardData?.Unit}</small>
+                {cardData?.Value}{" "}
+                <small style={{ fontSize: 14 }}>{cardData?.Unit}</small>
               </Title>
-              <Text style={{ color: trendColor, fontSize: 11, fontWeight: "bold" }}>
-                {trendSign}%{cardData?.Trend} Önceki Döneme Göre
+              {/* Trend Kısmı */}
+              <Text
+                style={{
+                  color: trendColor,
+                  fontSize: 14, // Biraz büyüttüm daha net görünsün
+                  fontWeight: "bold",
+                }}
+              >
+                {trendSign}{trendValue}% Önceki Döneme Göre
               </Text>
             </div>
             <Text type="secondary" style={{ fontSize: 11 }}>
@@ -127,7 +164,14 @@ function MudaheleSuresiHistogram() {
                 <XAxis dataKey="Etiket" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
                 <Tooltip />
-                <Line type="monotone" dataKey="Deger" stroke="#27ae60" dot={{ r: 4 }} strokeWidth={2} name="MTTR" />
+                <Line
+                  type="monotone"
+                  dataKey="Deger"
+                  stroke="#27ae60"
+                  dot={{ r: 4 }}
+                  strokeWidth={2}
+                  name="MTTR"
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>

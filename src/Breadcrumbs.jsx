@@ -60,7 +60,8 @@ const Breadcrumbs = () => {
     "/yakitGirisleri": "Yakıt Girişleri",
     "/yakitStoklari": "Yakıt Stokları",
     "/yakitHareketleri": "Yakıt Hareketleri",
-    "hizliYakitGirisi": "Hızlı Yakıt Girişi",
+    "/hizliYakitGirisi": "Hızlı Yakıt Girişi",
+    "/yakitTanimlari": "Yakıt Tanımları",
 
     // Diğer route'lar için ekleyin...
   };
