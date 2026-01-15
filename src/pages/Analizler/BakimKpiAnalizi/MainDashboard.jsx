@@ -31,6 +31,7 @@ import AylikYakitTuketimleri from "./components/AylikYakitTuketimleri.jsx";
 import IsEmriZamanDagilimi from "./components/IsEmriZamanDagilimi.jsx";
 import PersonelBazindaIsGucu from "./components/PersonelBazindaIsGucu.jsx";
 import BolgelereGoreToplamMiktarDagilimi from "./components/BolgelereGoreToplamMiktarDagilimi.jsx";
+import ArizaDagilimi from "./components/ArizaDagilimi.jsx";
 import AylikMaliyetler from "./components/AylikMaliyetler.jsx";
 import AylikKM from "./components/AylikKM.jsx";
 import CustomDashboards from "./components/CustomDashboards.jsx";
@@ -54,6 +55,7 @@ const widgetTitles = {
   widget22: "Duruş Nedenleri Katkı",
   widget23: "Arıza Süresi Dağılımı",
   widget24: "Planlanan / Tamamlanan (Periyot Bazlı)",
+  widget25: "Arıza Dağılımı",
 };
 
 // BURASI DÜZENLENDİ: Üstte 2 (Genişlik 6), Altlarda 3 (Genişlik 4)
@@ -76,6 +78,8 @@ const defaultItems = [
   { id: "widget20", x: 0, y: 11, width: 4, height: 4, minW: 3, minH: 2 },
   { id: "widget23", x: 4, y: 11, width: 4, height: 4, minW: 3, minH: 2 },
   { id: "widget24", x: 8, y: 11, width: 4, height: 4, minW: 3, minH: 2 },
+
+  { id: "widget25", x: 0, y: 15, width: 4, height: 4, minW: 3, minH: 2 },
 ];
 
 // --- KPI Tablosu Verileri (Görselden Alındı) ---
@@ -180,6 +184,7 @@ function MainDashboard() {
     widget22: false,
     widget23: false,
     widget24: false,
+    widget25: false,
   });
 
   const methods = useForm({
@@ -447,6 +452,21 @@ function MainDashboard() {
               </FormProvider>
             );
             break;
+          case "widget25":
+            root.render(
+              <FormProvider {...methods}>
+                <I18nextProvider i18n={i18n}>
+                  <ConfigProvider locale={trTR}>
+                    <AppProvider>
+                      <BrowserRouter>
+                        <ArizaDagilimi />
+                      </BrowserRouter>
+                    </AppProvider>
+                  </ConfigProvider>
+                </I18nextProvider>
+              </FormProvider>
+            );
+            break;
           default:
             break;
         }
@@ -466,6 +486,7 @@ function MainDashboard() {
         widget22: false,
         widget23: false,
         widget24: false,
+        widget25: false,
       };
       newGridItems.forEach((item) => {
         if (Object.prototype.hasOwnProperty.call(newChecked, item.id)) {
@@ -496,6 +517,7 @@ function MainDashboard() {
         widget22: false,
         widget23: false,
         widget24: false,
+        widget25: false,
       };
       itemsToLoad.forEach((item) => {
         if (Object.prototype.hasOwnProperty.call(checked, item.id)) {
@@ -705,6 +727,9 @@ function MainDashboard() {
       </Checkbox>
       <Checkbox name="widget24" onChange={handleCheckboxChange} checked={checkedWidgets.widget24}>
         Planlanan / Tamamlanan (Periyot Bazlı)
+      </Checkbox>
+      <Checkbox name="widget25" onChange={handleCheckboxChange} checked={checkedWidgets.widget25}>
+        Arıza Dağılımı
       </Checkbox>
 
       <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>

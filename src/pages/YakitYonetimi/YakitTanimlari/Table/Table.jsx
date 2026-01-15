@@ -139,7 +139,7 @@ const MainTable = () => {
     // API'den veri çekme işlemi
     const fetchData = async () => {
       try {
-        const response = await AxiosInstance.get("OzelAlan?form=TALEP FİŞİ"); // API URL'niz
+        const response = await AxiosInstance.get("OzelAlan?form=YAKIT"); // API URL'niz
         localStorage.setItem("ozelAlanlar", JSON.stringify(response));
         setLabel(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
       } catch (error) {
@@ -480,7 +480,8 @@ const MainTable = () => {
 
   // Talep No için
   const onRowClick = (record) => {
-    setDrawer({ visible: true, data: { ...record, key: record.TB_STOK_FIS_ID } });
+    console.log("Tıklanan Satırın ID'si:", record.TB_STOK_ID); // Konsolda ID görüyor musun?
+    setDrawer({ visible: true, data: { ...record, key: record.TB_STOK_ID } });
   };
 
   const refreshTableData = useCallback(() => {
