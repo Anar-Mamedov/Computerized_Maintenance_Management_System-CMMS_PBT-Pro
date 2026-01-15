@@ -46,7 +46,20 @@ function StatCard({ title, value, subtitle, icon, borderColor, backgroundColor }
         <Text type="secondary" style={{ fontSize: 13 }}>
           {title}
         </Text>
-        <div style={{ fontSize: 20, fontWeight: 600, marginTop: 6, color: "#111827" }}>{value}</div>
+        <div
+          title={typeof value === "string" ? value : undefined}
+          style={{
+            fontSize: 20,
+            fontWeight: 600,
+            marginTop: 6,
+            color: "#111827",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {value}
+        </div>
         {subtitle ? (
           <Text type="secondary" style={{ fontSize: 12 }}>
             {subtitle}
@@ -91,7 +104,13 @@ function TableCell({ children, align = "left" }) {
 }
 
 export default function MalzemeKullanimlariTab({ makineId, startDate, endDate }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const formatDate = (date) => {
+    if (!date) return "-";
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return date;
+    return d.toLocaleDateString(i18n.language, { year: "numeric", month: "2-digit", day: "2-digit" });
+  };
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
@@ -139,17 +158,7 @@ export default function MalzemeKullanimlariTab({ makineId, startDate, endDate })
     if (!query) return materialList;
     const lowered = query.toLocaleLowerCase("tr");
     return materialList.filter((item) => {
-      const fields = [
-        item.MalzemeAdi,
-        item.MalzemeKodu,
-        item.Tip,
-        item.IsEmriNo,
-        item.IsEmriKonu,
-        item.IsEmriTip,
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLocaleLowerCase("tr");
+      const fields = [item.MalzemeAdi, item.MalzemeKodu, item.Tip, item.IsEmriNo, item.IsEmriKonu, item.IsEmriTip].filter(Boolean).join(" ").toLocaleLowerCase("tr");
       return fields.includes(lowered);
     });
   }, [materialList, query]);
@@ -163,7 +172,10 @@ export default function MalzemeKullanimlariTab({ makineId, startDate, endDate })
     return filteredList.slice(startIndex, startIndex + pageSize);
   }, [filteredList, page, pageSize]);
 
-  const mostUsedParts = (data?.EnCokKullanilanMalzeme || "").split("\n").map((line) => line.trim()).filter(Boolean);
+  const mostUsedParts = (data?.EnCokKullanilanMalzeme || "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
 
   if (loading) {
     return (
@@ -195,185 +207,171 @@ export default function MalzemeKullanimlariTab({ makineId, startDate, endDate })
   return (
     <>
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(12, minmax(0, 1fr))", gap: 12 }}>
-        <div style={{ gridColumn: "span 3" }}>
-          <StatCard
-            title={t("makineTarihce.malzemeKullanimlari.toplamMalzeme")}
-            value={`${data.ToplamAdet || 0} ${adetLabel}`}
-            icon={<InboxOutlined />}
-            borderColor="#bfdbfe"
-            backgroundColor="#eff6ff"
-          />
-        </div>
-        <div style={{ gridColumn: "span 3" }}>
-          <StatCard
-            title={t("makineTarihce.malzemeKullanimlari.toplamMaliyet")}
-            value={`${currency}${formatMoney(data.ToplamMaliyet || 0)}`}
-            icon={<DollarOutlined />}
-            borderColor="#bbf7d0"
-            backgroundColor="#ecfdf3"
-          />
-        </div>
-        <div style={{ gridColumn: "span 3" }}>
-          <StatCard
-            title={t("makineTarihce.malzemeKullanimlari.sonKullanim")}
-            value={data.SonKullanimTarihi || "-"}
-            icon={<CalendarOutlined />}
-            borderColor="#fde68a"
-            backgroundColor="#fef9c3"
-          />
-        </div>
-        <div style={{ gridColumn: "span 3" }}>
-          <StatCard
-            title={t("makineTarihce.malzemeKullanimlari.enCokKullanilan")}
-            value={mostUsedParts[0] || "-"}
-            subtitle={mostUsedParts[1]}
-            icon={<SwapOutlined />}
-            borderColor="#e2e8f0"
-            backgroundColor="#f8fafc"
-          />
-        </div>
-      </div>
-
-      <Panel>
-        <Input
-          placeholder={t("makineTarihce.malzemeKullanimlari.ara")}
-          prefix={<SearchOutlined />}
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          style={{ height: 44, borderRadius: 12, borderColor: "#e2e8f0" }}
-        />
-      </Panel>
-
-      <Panel>
-        <div style={{ border: "1px solid #e2e8f0", borderRadius: 14, overflow: "hidden" }}>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1.1fr 1.6fr 1fr 0.7fr 0.7fr 0.9fr 0.9fr 0.9fr",
-              background: "#f8fafc",
-              borderBottom: "1px solid #e2e8f0",
-              color: "#64748b",
-              fontSize: 13,
-              fontWeight: 600,
-            }}
-          >
-            <TableCell>{t("makineTarihce.malzemeKullanimlari.tarih")}</TableCell>
-            <TableCell>{t("makineTarihce.malzemeKullanimlari.malzeme")}</TableCell>
-            <TableCell>{t("makineTarihce.malzemeKullanimlari.tip")}</TableCell>
-            <TableCell align="right">{t("makineTarihce.malzemeKullanimlari.miktar")}</TableCell>
-            <TableCell>{t("makineTarihce.malzemeKullanimlari.birim")}</TableCell>
-            <TableCell align="right">{t("makineTarihce.malzemeKullanimlari.birimFiyat")}</TableCell>
-            <TableCell align="right">{t("makineTarihce.malzemeKullanimlari.toplam")}</TableCell>
-            <TableCell>{t("makineTarihce.malzemeKullanimlari.isEmriNo")}</TableCell>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(12, minmax(0, 1fr))", gap: 12 }}>
+          <div style={{ gridColumn: "span 3" }}>
+            <StatCard
+              title={t("makineTarihce.malzemeKullanimlari.toplamMalzeme")}
+              value={`${data.ToplamAdet || 0} ${adetLabel}`}
+              icon={<InboxOutlined />}
+              borderColor="#bfdbfe"
+              backgroundColor="#eff6ff"
+            />
           </div>
-
-          {pagedList.map((row, index) => {
-            const isEmriId = Number(row.IsEmriId);
-            const canOpen = Number.isFinite(isEmriId) && isEmriId > 0;
-            return (
-              <div
-                key={`${row.MalzemeKodu}-${index}`}
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1.1fr 1.6fr 1fr 0.7fr 0.7fr 0.9fr 0.9fr 0.9fr",
-                  borderBottom: index === filteredList.length - 1 ? "none" : "1px solid #e2e8f0",
-                  alignItems: "center",
-                  background: "#fff",
-                }}
-              >
-                <TableCell>{row.Tarih || "-"}</TableCell>
-                <TableCell>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
-                    <span
-                      style={{
-                        width: 30,
-                        height: 30,
-                        borderRadius: 10,
-                        background: "#f1f5f9",
-                        color: "#64748b",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                      }}
-                    >
-                      <InboxOutlined />
-                    </span>
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ fontWeight: 600, color: "#1f2937", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {row.MalzemeAdi || "-"}
-                      </div>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
-                        {row.MalzemeKodu || "-"}
-                      </Text>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>{row.Tip || "-"}</TableCell>
-                <TableCell align="right">{Number.isFinite(row.Miktar) ? row.Miktar : "-"}</TableCell>
-                <TableCell>{row.Birim || "-"}</TableCell>
-                <TableCell align="right">
-                  {currency}
-                  {formatMoney(row.BirimFiyat || 0)}
-                </TableCell>
-                <TableCell align="right">
-                  {currency}
-                  {formatMoney(row.ToplamTutar || 0)}
-                </TableCell>
-                <TableCell>
-                  {canOpen ? (
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        event?.stopPropagation();
-                        openIsEmriDrawer(isEmriId);
-                      }}
-                      style={{
-                        border: "none",
-                        background: "transparent",
-                        color: "#0ea5e9",
-                        cursor: "pointer",
-                        padding: 0,
-                        fontSize: 14,
-                        textAlign: "left",
-                        fontWeight: 500,
-                      }}
-                    >
-                      {row.IsEmriNo || "-"}
-                    </button>
-                  ) : (
-                    <span>{row.IsEmriNo || "-"}</span>
-                  )}
-                </TableCell>
-              </div>
-            );
-          })}
-
-          {filteredList.length === 0 && (
-            <div style={{ padding: "16px", textAlign: "center" }}>
-              <Text type="secondary">{t("makineTarihce.malzemeKullanimlari.veriYok")}</Text>
-            </div>
-          )}
+          <div style={{ gridColumn: "span 3" }}>
+            <StatCard
+              title={t("makineTarihce.malzemeKullanimlari.toplamMaliyet")}
+              value={`${currency}${formatMoney(data.ToplamMaliyet || 0)}`}
+              icon={<DollarOutlined />}
+              borderColor="#bbf7d0"
+              backgroundColor="#ecfdf3"
+            />
+          </div>
+          <div style={{ gridColumn: "span 3" }}>
+            <StatCard
+              title={t("makineTarihce.malzemeKullanimlari.sonKullanim")}
+              value={formatDate(data.SonKullanimTarihi)}
+              icon={<CalendarOutlined />}
+              borderColor="#fde68a"
+              backgroundColor="#fef9c3"
+            />
+          </div>
+          <div style={{ gridColumn: "span 3" }}>
+            <StatCard
+              title={t("makineTarihce.malzemeKullanimlari.enCokKullanilan")}
+              value={mostUsedParts[0] || "-"}
+              subtitle={mostUsedParts[1]}
+              icon={<SwapOutlined />}
+              borderColor="#e2e8f0"
+              backgroundColor="#f8fafc"
+            />
+          </div>
         </div>
-        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
-          <Pagination
-            current={page}
-            pageSize={pageSize}
-            total={filteredList.length}
-            onChange={setPage}
-            showSizeChanger={false}
-            size="small"
+
+        <Panel>
+          <Input
+            placeholder={t("makineTarihce.malzemeKullanimlari.ara")}
+            prefix={<SearchOutlined />}
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            style={{ height: 44, borderRadius: 12, borderColor: "#e2e8f0" }}
           />
-        </div>
-      </Panel>
+        </Panel>
+
+        <Panel>
+          <div style={{ border: "1px solid #e2e8f0", borderRadius: 14, overflow: "hidden" }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1.1fr 1.6fr 1fr 0.7fr 0.7fr 0.9fr 0.9fr 0.9fr",
+                background: "#f8fafc",
+                borderBottom: "1px solid #e2e8f0",
+                color: "#64748b",
+                fontSize: 13,
+                fontWeight: 600,
+              }}
+            >
+              <TableCell>{t("makineTarihce.malzemeKullanimlari.tarih")}</TableCell>
+              <TableCell>{t("makineTarihce.malzemeKullanimlari.malzeme")}</TableCell>
+              <TableCell>{t("makineTarihce.malzemeKullanimlari.tip")}</TableCell>
+              <TableCell align="right">{t("makineTarihce.malzemeKullanimlari.miktar")}</TableCell>
+              <TableCell>{t("makineTarihce.malzemeKullanimlari.birim")}</TableCell>
+              <TableCell align="right">{t("makineTarihce.malzemeKullanimlari.birimFiyat")}</TableCell>
+              <TableCell align="right">{t("makineTarihce.malzemeKullanimlari.toplam")}</TableCell>
+              <TableCell>{t("makineTarihce.malzemeKullanimlari.isEmriNo")}</TableCell>
+            </div>
+
+            {pagedList.map((row, index) => {
+              const isEmriId = Number(row.IsEmriId);
+              const canOpen = Number.isFinite(isEmriId) && isEmriId > 0;
+              return (
+                <div
+                  key={`${row.MalzemeKodu}-${index}`}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1.1fr 1.6fr 1fr 0.7fr 0.7fr 0.9fr 0.9fr 0.9fr",
+                    borderBottom: index === filteredList.length - 1 ? "none" : "1px solid #e2e8f0",
+                    alignItems: "center",
+                    background: "#fff",
+                  }}
+                >
+                  <TableCell>{row.Tarih || "-"}</TableCell>
+                  <TableCell>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+                      <span
+                        style={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: 10,
+                          background: "#f1f5f9",
+                          color: "#64748b",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <InboxOutlined />
+                      </span>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, color: "#1f2937", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.MalzemeAdi || "-"}</div>
+                        <Text type="secondary" style={{ fontSize: 12 }}>
+                          {row.MalzemeKodu || "-"}
+                        </Text>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>{row.Tip || "-"}</TableCell>
+                  <TableCell align="right">{Number.isFinite(row.Miktar) ? row.Miktar : "-"}</TableCell>
+                  <TableCell>{row.Birim || "-"}</TableCell>
+                  <TableCell align="right">
+                    {currency}
+                    {formatMoney(row.BirimFiyat || 0)}
+                  </TableCell>
+                  <TableCell align="right">
+                    {currency}
+                    {formatMoney(row.ToplamTutar || 0)}
+                  </TableCell>
+                  <TableCell>
+                    {canOpen ? (
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event?.stopPropagation();
+                          openIsEmriDrawer(isEmriId);
+                        }}
+                        style={{
+                          border: "none",
+                          background: "transparent",
+                          color: "#0ea5e9",
+                          cursor: "pointer",
+                          padding: 0,
+                          fontSize: 14,
+                          textAlign: "left",
+                          fontWeight: 500,
+                        }}
+                      >
+                        {row.IsEmriNo || "-"}
+                      </button>
+                    ) : (
+                      <span>{row.IsEmriNo || "-"}</span>
+                    )}
+                  </TableCell>
+                </div>
+              );
+            })}
+
+            {filteredList.length === 0 && (
+              <div style={{ padding: "16px", textAlign: "center" }}>
+                <Text type="secondary">{t("makineTarihce.malzemeKullanimlari.veriYok")}</Text>
+              </div>
+            )}
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+            <Pagination current={page} pageSize={pageSize} total={filteredList.length} onChange={setPage} showSizeChanger={false} size="small" />
+          </div>
+        </Panel>
       </div>
-      <IsEmriEditDrawer
-        selectedRow={selectedIsEmriRow}
-        onDrawerClose={() => setIsEmriDrawerVisible(false)}
-        drawerVisible={isEmriDrawerVisible}
-        onRefresh={() => {}}
-      />
+      <IsEmriEditDrawer selectedRow={selectedIsEmriRow} onDrawerClose={() => setIsEmriDrawerVisible(false)} drawerVisible={isEmriDrawerVisible} onRefresh={() => {}} />
     </>
   );
 }

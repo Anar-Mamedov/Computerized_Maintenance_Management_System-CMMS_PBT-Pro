@@ -119,6 +119,7 @@
   "makineTarihce.ozet.arizaSikligiMtbf": "Частота отказов (MTBF)",
   "makineTarihce.ozet.onarimSuresiMttr": "Время ремонта (MTTR)",
   "makineTarihce.ozet.bakimMaliyetleri": "Затраты на обслуживание",
+  "makineTarihce.ozet.durusSureleri": "Длительности простоев",
   "makineTarihce.ozet.aylaraGore": "(По месяцам)",
   "makineTarihce.ozet.total": "Итого",
   "makineTarihce.ozet.average": "Среднее",

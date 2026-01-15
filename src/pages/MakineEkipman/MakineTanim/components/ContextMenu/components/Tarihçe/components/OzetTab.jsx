@@ -10,6 +10,32 @@ function formatMoney(value) {
   return safeValue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 
+function formatExactValue(value) {
+  if (value === null || value === undefined) {
+    return "0";
+  }
+  if (typeof value === "string") {
+    return value;
+  }
+  if (Number.isFinite(value)) {
+    return String(value);
+  }
+  return "0";
+}
+
+function getMonthlyDurationValue(item) {
+  if (!item) {
+    return 0;
+  }
+  if (Number.isFinite(item.ToplamSure)) {
+    return item.ToplamSure;
+  }
+  if (Number.isFinite(item.ToplamTutar)) {
+    return item.ToplamTutar;
+  }
+  return 0;
+}
+
 function TrendBadge({ value }) {
   const safeValue = Number.isFinite(value) ? value : 0;
   const isUp = safeValue > 0;
@@ -60,8 +86,8 @@ function MiniMetric({ label, value, color, border }) {
   );
 }
 
-function SimpleBars({ items }) {
-  const max = Math.max(...items.map((item) => item.ToplamTutar || 0), 1);
+function SimpleBars({ items, getValue, getLabelValue, labelUnit }) {
+  const max = Math.max(1, ...items.map((item) => getValue(item)));
   return (
     <div
       style={{
@@ -75,14 +101,15 @@ function SimpleBars({ items }) {
       }}
     >
       {items.map((item) => {
-        const height = Math.round((item.ToplamTutar / max) * 100);
+        const height = Math.round((getValue(item) / max) * 100);
+        const labelValue = getLabelValue ? getLabelValue(item) : getValue(item);
         return (
           <div key={`${item.Ay}-${item.Yil}`} style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
             <div style={{ background: "#f3f4f6", borderRadius: 8, height: 120, display: "flex", alignItems: "flex-end" }}>
               <div style={{ width: "100%", height: `${height}%`, background: "#fbbf24", borderRadius: 8 }} />
             </div>
             <Text type="secondary" style={{ textAlign: "center", fontSize: 11 }}>
-              {item.Ay}
+              {item.Ay} ({formatExactValue(labelValue)} {labelUnit})
             </Text>
           </div>
         );
@@ -132,7 +159,7 @@ export default function OzetTab({ makineId, startDate, endDate }) {
 
   const bildirimler = data?.Bildirimler || {};
   const ariza = data?.ArizaIstatistikleri || {};
-  const aylikMaliyetler = data?.AylikMaliyetler || [];
+  const aylikDurusSureleri = data?.AylikDurusSureleri || data?.AylikMaliyetler || [];
   const operasyon = data?.OperasyonDurumu || {};
   const parcaAnalizi = data?.ParcaAnalizi || [];
 
@@ -140,15 +167,8 @@ export default function OzetTab({ makineId, startDate, endDate }) {
     setPage(1);
   }, [parcaAnalizi.length]);
 
-  const totalCost = useMemo(() => aylikMaliyetler.reduce((sum, item) => sum + (item.ToplamTutar || 0), 0), [aylikMaliyetler]);
-  const averageCost = useMemo(() => (aylikMaliyetler.length ? totalCost / aylikMaliyetler.length : 0), [totalCost, aylikMaliyetler.length]);
-  const trendCost = useMemo(() => {
-    if (aylikMaliyetler.length < 2) return 0;
-    const last = aylikMaliyetler[aylikMaliyetler.length - 1]?.ToplamTutar || 0;
-    const prev = aylikMaliyetler[aylikMaliyetler.length - 2]?.ToplamTutar || 0;
-    if (prev === 0) return 0;
-    return Math.round(((last - prev) / prev) * 100);
-  }, [aylikMaliyetler]);
+  const totalDuration = useMemo(() => aylikDurusSureleri.reduce((sum, item) => sum + getMonthlyDurationValue(item), 0), [aylikDurusSureleri]);
+  const averageDuration = useMemo(() => (aylikDurusSureleri.length ? totalDuration / aylikDurusSureleri.length : 0), [totalDuration, aylikDurusSureleri.length]);
 
   const pagedParcaAnalizi = useMemo(() => {
     const startIndex = (page - 1) * pageSize;
@@ -211,7 +231,7 @@ export default function OzetTab({ makineId, startDate, endDate }) {
         <Panel style={{ gridColumn: "span 7" }}>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
             <div>
-              <Text style={{ fontSize: 14, fontWeight: 600, display: "block" }}>{t("makineTarihce.ozet.bakimMaliyetleri")}</Text>
+              <Text style={{ fontSize: 14, fontWeight: 600, display: "block" }}>{t("makineTarihce.ozet.durusSureleri")}</Text>
               <Text type="secondary" style={{ fontSize: 12 }}>
                 {t("makineTarihce.ozet.aylaraGore")}
               </Text>
@@ -220,17 +240,16 @@ export default function OzetTab({ makineId, startDate, endDate }) {
               <Text type="secondary" style={{ fontSize: 11, display: "block" }}>
                 {t("makineTarihce.ozet.total")}
               </Text>
-              <div style={{ fontSize: 20, fontWeight: 600 }}>{formatMoney(totalCost)}</div>
-              <Text type="secondary" style={{ fontSize: 11 }}>
-                {t("makineTarihce.ozet.average")}: {formatMoney(averageCost)}
-              </Text>
-              <div style={{ marginTop: 6 }}>
-                <TrendBadge value={trendCost} />
+              <div style={{ fontSize: 20, fontWeight: 600 }}>
+                {formatMoney(totalDuration)} {hourShort}
               </div>
+              <Text type="secondary" style={{ fontSize: 11 }}>
+                {t("makineTarihce.ozet.average")}: {formatMoney(averageDuration)} {hourShort}
+              </Text>
             </div>
           </div>
           <div style={{ marginTop: 14 }}>
-            <SimpleBars items={aylikMaliyetler} />
+            <SimpleBars items={aylikDurusSureleri} getValue={getMonthlyDurationValue} getLabelValue={(item) => item?.ToplamTutar ?? 0} labelUnit={hourShort} />
           </div>
         </Panel>
 
@@ -321,14 +340,7 @@ export default function OzetTab({ makineId, startDate, endDate }) {
           )}
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
-          <Pagination
-            current={page}
-            pageSize={pageSize}
-            total={parcaAnalizi.length}
-            onChange={setPage}
-            showSizeChanger={false}
-            size="small"
-          />
+          <Pagination current={page} pageSize={pageSize} total={parcaAnalizi.length} onChange={setPage} showSizeChanger={false} size="small" />
         </div>
       </Panel>
     </div>
