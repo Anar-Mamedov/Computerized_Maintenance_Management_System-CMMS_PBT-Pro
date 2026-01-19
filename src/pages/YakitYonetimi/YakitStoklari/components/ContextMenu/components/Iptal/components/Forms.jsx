@@ -60,7 +60,7 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const { control, watch, setValue } = useFormContext();
 
-  const fisNo = selectedRows?.length === 1 ? selectedRows[0].SSP_SIPARIS_KODU : "";
+  const fisNo = selectedRows?.length === 1 ? selectedRows[0].SFS_FIS_NO : "";
 
   // Sil düğmesini gizlemek için koşullu stil
   const buttonStyle = iptalDisabled ? { display: "none" } : {};
@@ -114,8 +114,39 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
         control={control}
         render={({ field }) => (
           <Text {...field} style={{ fontSize: "14px", fontWeight: "600" }}>
-            Sipariş No: {fisNo || "-"}
+            Fiş No: {fisNo || "-"}
           </Text>
+        )}
+      />
+    </div>
+
+    {/* İptal Tarihi ve Saati */}
+    <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
+      <Text style={{ minWidth: "100px", fontSize: "14px" }}>İptal Tarihi:</Text>
+      <Controller
+        name="iptalTarihi"
+        control={control}
+        render={({ field }) => (
+          <DatePicker
+            {...field}
+            style={{ width: "180px" }}
+            disabled
+            format={localeDateFormat}
+            placeholder="Tarih seçiniz"
+          />
+        )}
+      />
+      <Controller
+        name="iptalSaati"
+        control={control}
+        render={({ field }) => (
+          <TimePicker
+            {...field}
+            style={{ width: "110px" }}
+            disabled
+            format={localeTimeFormat}
+            placeholder="Saat seçiniz"
+          />
         )}
       />
     </div>
@@ -123,14 +154,14 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
     {/* İptal Nedeni */}
     <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
       <Text style={{ minWidth: "100px", fontSize: "14px" }}>İptal Nedeni:</Text>
-      <KodIDSelectbox style={{ width: "150px" }} name1="nedenKodId" kodID={13113} isRequired={false} />
+      <KodIDSelectbox style={{ width: "300px" }} name1="NedenKodId" kodID={33020} isRequired={false} />
     </div>
 
     {/* Açıklama */}
     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
       <Text style={{ minWidth: "100px", fontSize: "14px" }}>Açıklama:</Text>
       <Controller
-        name="aciklama"
+        name="Aciklama"
         control={control}
         render={({ field }) => (
           <input

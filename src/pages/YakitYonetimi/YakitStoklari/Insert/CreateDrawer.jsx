@@ -1,30 +1,46 @@
 import tr_TR from "antd/es/locale/tr_TR";
-// import "@ant-design/v5-patch-for-react-19";
 import { PlusOutlined } from "@ant-design/icons";
 import { Button, Space, ConfigProvider, Modal, message } from "antd";
 import React, { useEffect, useState } from "react";
 import { t } from "i18next";
 import MainTabs from "./components/MainTabs/MainTabs";
-import { useForm, FormProvider } from "react-hook-form";
-import dayjs from "dayjs";
-import AxiosInstance from "../../../../api/http.jsx";
-import Footer from "../Footer";
 import SecondTabs from "./components/SecondTabs/SecondTabs.jsx";
-// import SecondTabs from "./components/secondTabs/secondTabs";
+import { useForm, FormProvider } from "react-hook-form";
+import AxiosInstance from "../../../../api/http.jsx";
 
-export default function CreateModal({ selectedLokasyonId, onRefresh }) {
+export default function CreateModal({ onRefresh }) {
   const [open, setOpen] = useState(false);
-  const [periyodikBakim, setPeriyodikBakim] = useState("");
 
+  // Form tanımları ve varsayılan değerler (Yeni JSON formatına göre)
+  const methods = useForm({
+    defaultValues: {
+      TB_DEPO_ID: 0,
+      DEP_KOD: "",
+      DEP_TANIM: "",
+      AKTIF: true,
+      LOKASYON_ID: null,
+      YAKIT_TIP_ID: null,
+      KAPASITE: 0,
+      KRITIK_MIKTAR: 0,
+      KRITIK_UYAR: true,
+      TELEFON: "",
+      ACIKLAMA: "",
+    },
+  });
+
+  const { setValue, reset, handleSubmit } = methods;
+
+  // Yakıt kodunu getiren fonksiyon
+  // Not: ModulKodu parametresini tank için uygun olanla (örn: 'TNK_KOD' veya 'DEP_KOD') değiştirebilirsin.
   const getFisNo = async () => {
     try {
-      const response = await AxiosInstance.get("ModulKoduGetir?modulKodu=SSP_SIPARIS_KODU");
+      const response = await AxiosInstance.get("ModulKoduGetir?modulKodu=TAN_KOD");
       if (response) {
-        setValue("siparisKodu", response);
+        setValue("DEP_KOD", response); // API'den dönen kodu DEP_KOD alanına set ediyoruz
       }
     } catch (error) {
-      console.error("Error fetching siparisKodu:", error);
-      message.error("Fiş numarası alınamadı!");
+      console.error("Error fetching DEP_KOD:", error);
+      message.error("Kod numarası alınamadı!");
     }
   };
 
@@ -35,13 +51,10 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
   useEffect(() => {
     if (open) {
       getFisNo();
-      setValue("tarih", dayjs());
-      setValue("saat", dayjs());
-
-      // Reset the fisIcerigi with a timeout to avoid focus errors
-      setTimeout(() => {
-        setValue("fisIcerigi", []);
-      }, 0);
+      // Yeni kayıt olduğu için ID 0 olmalı
+      setValue("TB_DEPO_ID", 0);
+      setValue("AKTIF", true);
+      setValue("KRITIK_UYAR", true); // Varsayılan true istenmiş olabilir
     }
   }, [open]);
 
@@ -52,248 +65,73 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
       okText: "Evet",
       cancelText: "Hayır",
       onOk: () => {
-        // First close the modal to avoid focus errors
         setOpen(false);
-
-        // Then reset the form with a slight delay
+        // Formu sıfırla
         setTimeout(() => {
-          methods.reset({
-            fisNo: null,
-            firma: null,
-            firmaID: null,
-            makineID: null,
-            makine: null,
-            tarih: null,
-            saat: null,
-            islemTipi: null,
-            islemTipiID: null,
-            girisDeposu: null,
-            girisDeposuID: null,
-            lokasyon: null,
-            lokasyonID: null,
-            siparisNo: null,
-            siparisNoID: null,
-            proje: null,
-            projeID: null,
-            totalAraToplam: null,
-            totalIndirim: null,
-            totalKdvToplam: null,
-            totalGenelToplam: null,
-            aciklama: null,
-            ozelAlan1: null,
-            ozelAlan2: null,
-            ozelAlan3: null,
-            ozelAlan4: null,
-            ozelAlan5: null,
-            ozelAlan6: null,
-            ozelAlan7: null,
-            ozelAlan8: null,
-            ozelAlan9: null,
-            ozelAlan9ID: null,
-            ozelAlan10: null,
-            ozelAlan10ID: null,
-            ozelAlan11: null,
-            ozelAlan12: null,
-            fisIcerigi: [],
+          reset({
+            TB_DEPO_ID: 0,
+            DEP_KOD: "",
+            DEP_TANIM: "",
+            AKTIF: true,
+            LOKASYON_ID: null,
+            YAKIT_TIP_ID: null,
+            KAPASITE: 0,
+            KRITIK_MIKTAR: 0,
+            KRITIK_UYAR: true,
+            TELEFON: "",
+            ACIKLAMA: "",
           });
         }, 100);
       },
-      onCancel: () => {
-        // Do nothing, continue from where the user left off
-      },
     });
   };
 
-  // back-end'e gönderilecek veriler
-
-  //* export
-  const methods = useForm({
-    defaultValues: {
-      fisNo: null,
-      firma: null,
-      firmaID: null,
-      makineID: null,
-      makine: null,
-      tarih: null,
-      saat: null,
-      islemTipi: null,
-      islemTipiID: null,
-      girisDeposu: null,
-      girisDeposuID: null,
-      lokasyon: null,
-      lokasyonID: null,
-      siparisNo: null,
-      siparisNoID: null,
-      proje: null,
-      projeID: null,
-      totalAraToplam: null,
-      totalIndirim: null,
-      totalKdvToplam: null,
-      totalGenelToplam: null,
-      aciklama: null,
-      ozelAlan1: null,
-      ozelAlan2: null,
-      ozelAlan3: null,
-      ozelAlan4: null,
-      ozelAlan5: null,
-      ozelAlan6: null,
-      ozelAlan7: null,
-      ozelAlan8: null,
-      ozelAlan9: null,
-      ozelAlan9ID: null,
-      ozelAlan10: null,
-      ozelAlan10ID: null,
-      ozelAlan11: null,
-      ozelAlan12: null,
-      fisIcerigi: [],
-    },
-  });
-
-  const formatDateWithDayjs = (dateString) => {
-    const formattedDate = dayjs(dateString);
-    return formattedDate.isValid() ? formattedDate.format("YYYY-MM-DD") : "";
-  };
-
-  const formatTimeWithDayjs = (timeObj) => {
-    const formattedTime = dayjs(timeObj);
-    return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
-  };
-
-  const { setValue, reset, watch } = methods;
-
-  //* export
   const onSubmit = (data) => {
-    if (!data?.fisIcerigi || data.fisIcerigi.length === 0) {
-      message.warning("Fiş içeriği boş, lütfen en az bir malzeme ekleyiniz.");
-      return;
-    }
-  
-  const Body = {
-    siparisId: Number(data.siparisId) || 0,
-    teklifId: Number(data.teklifId) || 0,
-    siparisKodu: data.siparisKodu || "",
-    siparisTarihi: formatDateWithDayjs(data.siparisTarihi),
-    teslimTarihi: formatDateWithDayjs(data.teslimTarihi),
-    firmaId: Number(data.firmaID) || 0,
-    siparisVerenId: Number(data.talepEdenPersonelId) || 0,
-    odemeSekliKodId: Number(data.odemeSekliKodId) || 0,
-    referansNo: data.referansNo || "",
-    teslimYeriKodId: Number(data.teslimYeriKodId) || 0,
-    projeId: Number(data.projeID) || 0,
-    oncelikId: Number(data.talepOncelikId) || 0,
-    sevkKodId: Number(data.sevkKodId) || 0,
-    sevkAdresiId: Number(data.sevkAdresiId) || 0,
-    nakliyeKodu: data.nakliyeKodu || "",
-    araToplam: Number(data.totalAraToplam) || 0,
-    indirimToplam: Number(data.totalIndirim) || 0,
-    kdvToplam: Number(data.totalKdvToplam) || 0,
-    genelToplam: Number(data.totalGenelToplam) || 0,
-    yuvarlamaToplami: Number(data.yuvarlamaToplami) || 0,
-    baslik: data.baslik || "",
-    aciklama: data.aciklama || "",
-    durumId: 1,
-    depoId: Number(data.depoID) || 0,
-    evrakNo: data.evrakNo || "",
-    lokasyonId: Number(data.lokasyonID) || 0,
-    adres1: data.adres1 || "",
-    adres2: data.adres2 || "",
-    postaKodu: data.postaKodu || "",
-    sehir: data.sehir || "",
-    ulke: data.ulke || "",
-    sinifId: Number(data.sinifId) || 0,
-    sinifName: data.sinifName || "",
-    sozlesmeId: Number(data.sozlesmeId) || 0,
-    atolyeId: Number(data.atolyeID) || 0,
-    masrafMerkeziId: Number(data.masrafMerkeziID) || 0,
-    duzenlemeTarih: formatDateWithDayjs(data.duzenlemeTarih),
-    duzenlemeSaat: formatTimeWithDayjs(data.duzenlemeSaat),
-    ozelAlan1: data.ozelAlan1 || "",
-    ozelAlan2: data.ozelAlan2 || "",
-    ozelAlan3: data.ozelAlan3 || "",
-    ozelAlan4: data.ozelAlan4 || "",
-    ozelAlan5: data.ozelAlan5 || "",
-    ozelAlan6: data.ozelAlan6 || "",
-    ozelAlan7: data.ozelAlan7 || "",
-    ozelAlan8: data.ozelAlan8 || "",
-    ozelAlan9: data.ozelAlan9 || "",
-    ozelAlan10: data.ozelAlan10 || "",
-    ozelAlanKodId11: Number(data.ozelAlanKodId11) || 0,
-    ozelAlanKodId12: Number(data.ozelAlanKodId12) || 0,
-    ozelAlanKodId13: Number(data.ozelAlanKodId13) || 0,
-    ozelAlanKodId14: Number(data.ozelAlanKodId14) || 0,
-    ozelAlanKodId15: Number(data.ozelAlanKodId15) || 0,
-    ozelAlan16: data.ozelAlan16 || "",
-    ozelAlan17: data.ozelAlan17 || "",
-    ozelAlan18: data.ozelAlan18 || "",
-    ozelAlan19: data.ozelAlan19 || "",
-    ozelAlan20: data.ozelAlan20 || "",
-    materialMovements: data.fisIcerigi?.map((item) => ({
-      detayId: Number(item.detayId) || 0,
-      siparisId: Number(data.siparisId) || 0,
-      stokId: Number(item.stokId) || 0,
-      miktar: Number(item.miktar) || 0,
-      birimFiyat: Number(item.birimFiyat) || 0,
-      kdvOran: Number(item.kdvOran) || 0,
-      kdvTutar: Number(item.kdvTutar) || 0,
-      otvOran: Number(item.otvOran) || 0,
-      otvTutar: Number(item.otvTutar) || 0,
-      indirimOran: Number(item.indirimOran) || 0,
-      indirimTutar: Number(item.indirimTutar) || 0,
-      kdvDahil: item.kdvDahil || "",
-      araToplam: Number(item.araToplam) || 0,
-      toplam: Number(item.toplam) || 0,
-      anaBirimMiktar: Number(item.anaBirimMiktar) || 0,
-      fisGridKonum: Number(item.fisGridKonum) || 0,
-      birimKodId: Number(item.birimKodId) || 0,
-      talepId: Number(item.talepId) || 0,
-      sinifId: Number(item.sinifId) || 0,
-      teklifFiyatId: Number(item.teklifFiyatId) || 0,
-      girenMiktar: Number(item.girenMiktar) || 0,
-      kalanMiktar: Number(item.kalanMiktar) || 0,
-      alternatifStokId: Number(item.alternatifStokId) || 0,
-      aciklama: item.aciklama || "",
-      isDeleted: false,
-    })) || [],
-  };
+    // JSON formatına uygun Body hazırlığı
+    const Body = {
+      TB_DEPO_ID: 0, // Yeni kayıt için her zaman 0
+      DEP_KOD: data.DEP_KOD || "",
+      DEP_TANIM: data.DEP_TANIM || "",
+      AKTIF: data.AKTIF ?? true,
+      LOKASYON_ID: Number(data.LOKASYON_ID) || 0,
+      YAKIT_TIP_ID: Number(data.yakitTipKodId) || 0,
+      KAPASITE: Number(data.KAPASITE) || 0,
+      KRITIK_MIKTAR: Number(data.KRITIK_MIKTAR) || 0,
+      KRITIK_UYAR: data.KRITIK_UYAR ?? false,
+      TELEFON: data.TELEFON || "",
+      ACIKLAMA: data.ACIKLAMA || "",
+    };
 
-  AxiosInstance.post("UpsertSatinalmaSiparis", Body)
-    .then((response) => {
-      if (response.status_code === 200 || response.status_code === 201) {
-        message.success("Ekleme Başarılı.");
-        setOpen(false);
-        onRefresh();
-        setTimeout(() => methods.reset(), 100);
-      } else if (response.data.statusCode === 401) {
-        message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
-      } else {
-        message.error("Ekleme Başarısız.");
-      }
-    })
-    .catch((error) => {
-      console.error("Error sending data:", error);
-      message.error("Başarısız Olundu.");
-    });
-};
-
-  useEffect(() => {
-    // Eğer selectedLokasyonId varsa ve geçerli bir değerse, formun default değerini güncelle
-    if (selectedLokasyonId !== undefined && selectedLokasyonId !== null) {
-      methods.reset({
-        ...methods.getValues(),
-        selectedLokasyonId: selectedLokasyonId,
+    // Yeni Endpoint: AddUpdateYakitTank
+    AxiosInstance.post("AddUpdateYakitTank", Body)
+      .then((response) => {
+        // Başarılı Durum (200 veya 201)
+        if (!response.has_error && (response.status_code === 200 || response.status_code === 201)) {
+          message.success(response.status || "Kayıt Başarılı.");
+          setOpen(false);
+          if (onRefresh) onRefresh();
+          setTimeout(() => methods.reset(), 100);
+        } 
+        // Validasyon Hatası (Örn: Aynı Kod Var - 400)
+        else if (response.has_error && response.status_code === 400) {
+          message.error(response.status || "Hatalı işlem.");
+        } 
+        // Yetki Hatası
+        else if (response.status_code === 401) {
+          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+        } 
+        // Genel Hata
+        else {
+          message.error("Kayıt Başarısız.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error sending data:", error);
+        message.error("Sunucu ile iletişim hatası oluştu.");
       });
-    }
-  }, [selectedLokasyonId, methods]);
 
-  const periyodikBilgisi = watch("periyodikBilgisi");
-
-  useEffect(() => {
-    if (periyodikBilgisi === true) {
-      setPeriyodikBakim("[Periyodik Bakım]");
-    } else {
-      setPeriyodikBakim("");
-    }
-  }, [periyodikBilgisi]);
+    console.log({ Body });
+  };
 
   return (
     <FormProvider {...methods}>
@@ -310,9 +148,9 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
           {t("ekle")}
         </Button>
         <Modal
-          width="1300px"
+          width="600px"
           centered
-          title={t("Satınalma Siparişi (Yeni Kayıt)")}
+          title={t("Yakıt Tankı (Yeni Kayıt)")}
           destroyOnClose
           open={open}
           onCancel={onClose}
@@ -337,7 +175,6 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
             <div>
               <MainTabs modalOpen={open} />
               <SecondTabs modalOpen={open} />
-              {/*<Footer />*/}
             </div>
           </form>
         </Modal>

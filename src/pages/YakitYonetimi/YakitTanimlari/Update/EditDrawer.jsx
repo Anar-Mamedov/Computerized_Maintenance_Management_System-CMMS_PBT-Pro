@@ -169,13 +169,16 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   }, [drawerVisible, selectedRow, setValue, AxiosInstance]);
 
   const onSubmit = (data) => {
+
+    const kayitId = selectedRow?.key || selectedRow?.TB_STOK_ID;
     // JSON formatına uygun Body
     const Body = {
-      TB_STOK_ID: Number(data.TB_STOK_ID),
+      TB_STOK_ID: Number(kayitId),
       YAKIT_KOD: data.kod,
       YAKIT_TANIM: data.tanim,
       TIP_ID: Number(data.tipID) || 0,
       BIRIM_ID: Number(data.birimID) || 0,
+      GRUP_ID: Number(data.grupID) || 0,
       GIRIS_FIYAT: Number(data.girisFiyati) || 0,
       CIKIS_FIYAT: Number(data.cikisFiyati) || 0,
       AKTIF: data.aktif,
