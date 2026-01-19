@@ -11,7 +11,6 @@ import {
   ToolOutlined,
   InboxOutlined,
   ShoppingCartOutlined,
-  CustomerServiceOutlined,
   BarChartOutlined,
   FileTextOutlined,
   SettingOutlined,
@@ -179,6 +178,7 @@ const rawItems = [
       // getItem("İş Emri", "isemri", true),
       getItem("Bakım İş Emirleri", "isEmri1", true),
       getItem("Periyodik Bakımlar", "periyodikBakimlar", true),
+      getItem("İş Talepleri", "isTalepleri", true),
       getItem("Otomatik İş Emirleri", "otomatikIsEmirleri", true),
       getItem("Planlama Takvimi", "planlamaTakvimi", true),
       getItem("İş Emirleri Kontrol Ekranı", "isEmriAnalizi", true),
@@ -235,17 +235,7 @@ const rawItems = [
     ],
     false
   ),
-  getItem(
-    "Yardım Masası",
-    "yardimMasasi",
-    <CustomerServiceOutlined />,
-    [
-      getItem("İş Talepleri", "isTalepleri", true),
-      getItem("İş Talebi Kullanıcıları", "isTalebiKullanicilari", true),
-      // getItem("Team 2", "team2", true)
-    ],
-    false
-  ),
+
   getItem(
     "Yakıt Yönetimi",
     "yakitYonetimi",
@@ -311,6 +301,7 @@ const rawItems = [
       getItem("Proje Tanımları", "projeTanimlari", true),
       getItem("Kullanıcı Tanımları", "kullaniciTanimlari", true),
       getItem("Rol Tanımları", "RolTanimlari1", true),
+      getItem("İş Talebi Kullanıcıları", "isTalebiKullanicilari", true),
       getItem("Ayarlar", "Ayarlar", undefined, undefined, false),
       // getItem("Team 2", "team2", true)
     ],
