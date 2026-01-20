@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { CiImageOn } from "react-icons/ci";
+
 import { Typography } from "antd";
 
 import { t } from "i18next";
@@ -22,8 +22,11 @@ const cardBaseClasses = "bg-white p-[10px] border border-[#80808068] rounded-[5p
 const wideCardClasses = "lg:w-auto lg:flex-1 lg:min-w-[700px]";
 const narrowCardClasses = "lg:w-auto lg:flex-[0_0_325px] lg:max-w-[325px]";
 
-export default function MainTabs() {
-  const { setValue } = useFormContext();
+import ResimCarousel from "../../../../../utils/components/Resim/ResimCarousel";
+
+export default function MainTabs({ refreshKey }) {
+  const { setValue, watch } = useFormContext();
+  const secilenMakineID = watch("secilenMakineID");
   const [isLokasyonModalOpen, setIsLokasyonModalOpen] = useState(false);
 
   return (
@@ -96,11 +99,8 @@ export default function MainTabs() {
           <Text type="secondary">{t("buEkipmanaOzelFotograflariInceleyin")}</Text>
         </div>
         <div className="flex flex-row flex-wrap w-full gap-[10px]">
-          <div className="w-full min-h-[180px] border-2 border-dashed border-[#d9d9d9] rounded-[6px] flex items-center justify-center bg-[#fafafa]">
-            <div className="flex flex-col items-center gap-[8px]">
-              <CiImageOn className="text-[28px] text-[#bfbfbf]" />
-              <Text type="secondary">{t("resimBulunamadi")}</Text>
-            </div>
+          <div className="w-full min-h-[180px] rounded-[6px] flex items-center justify-center bg-[#fafafa]">
+            <ResimCarousel makineID={secilenMakineID} refreshKey={refreshKey} />
           </div>
         </div>
       </div>

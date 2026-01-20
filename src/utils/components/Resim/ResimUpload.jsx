@@ -4,11 +4,15 @@ import { InboxOutlined, UserOutlined } from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../api/http";
 
-const ResimUpload = ({ selectedRowID, refGroup }) => {
+const ResimUpload = ({ selectedRowID, refGroup, onUploadSuccess }) => {
   const { watch } = useFormContext();
   const [imageUrls, setImageUrls] = useState([]);
   const [loadingImages, setLoadingImages] = useState(false);
   const [refreshImages, setRefreshImages] = useState(false); // Resim listesini yenilemek için kullanılacak
+
+  // Upload queue logic
+  const [uploadQueue, setUploadQueue] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Watch the 'kapali' field from the form
   const kapali = watch("kapali"); // Assuming 'kapali' is the name of the field in your form
@@ -41,27 +45,49 @@ const ResimUpload = ({ selectedRowID, refGroup }) => {
     }
   }, [selectedRowID, refreshImages]); // refreshImages değişikliklerini de takip eder
 
+  // Process the upload queue
+  useEffect(() => {
+    const processQueue = async () => {
+      if (isUploading || uploadQueue.length === 0) return;
+
+      const file = uploadQueue[0];
+      setIsUploading(true);
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        await AxiosInstance.post(`UploadPhoto?refid=${selectedRowID}&refgrup=${refGroup}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        message.success(`${file.name} başarıyla yüklendi.`);
+        setRefreshImages((prev) => !prev);
+        if (onUploadSuccess) {
+          onUploadSuccess();
+        }
+      } catch (error) {
+        console.error("Upload error:", error);
+        message.error(`${file.name} yükleme sırasında bir hata oluştu.`);
+      } finally {
+        // Remove the processed file from the queue
+        setUploadQueue((prev) => prev.slice(1));
+        setIsUploading(false);
+      }
+    };
+
+    processQueue();
+  }, [uploadQueue, isUploading, selectedRowID, refGroup, onUploadSuccess]);
+
   const draggerProps = {
     name: "file",
     multiple: true,
     showUploadList: false,
     beforeUpload: (file) => {
-      const formData = new FormData();
-      formData.append("file", file);
-      AxiosInstance.post(`UploadPhoto?refid=${selectedRowID}&refgrup=${refGroup}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-        .then(() => {
-          message.success(`${file.name} başarıyla yüklendi.`);
-          setRefreshImages((prev) => !prev); // Başarılı yüklemeden sonra resim listesini yenile
-        })
-        .catch(() => {
-          message.error(`${file.name} yükleme sırasında bir hata oluştu.`);
-        });
-
-      return false; // Yükleme işleminin varsayılan davranışını engeller
+      // Add file to queue instead of uploading immediately
+      setUploadQueue((prev) => [...prev, file]);
+      return false; // Prevent default upload behavior
     },
     onDrop: (e) => {
       console.log("Dropped files", e.dataTransfer.files);
@@ -108,6 +134,12 @@ const ResimUpload = ({ selectedRowID, refGroup }) => {
           Tek seferde bir veya birden fazla dosya yüklemeyi destekler. Şirket verileri veya diğer yasaklı dosyaların yüklenmesi kesinlikle yasaktır.
         </p>
       </Upload.Dragger>
+      {/* Show uploading status if queue is processing */}
+      {isUploading && (
+        <div style={{ marginTop: "10px", textAlign: "center" }}>
+          <Spin size="small" tip={`Yükleniyor... (${uploadQueue.length} kuyrukta)`} />
+        </div>
+      )}
     </div>
   );
 };

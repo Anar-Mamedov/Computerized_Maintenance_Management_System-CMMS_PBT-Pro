@@ -33,6 +33,7 @@ const tabBarContainerStyle = {
 
 function Tablar({ selectedRowID, update }) {
   const [activeKey, setActiveKey] = useState("0");
+  const [refreshKey, setRefreshKey] = useState(0);
   const { watch } = useFormContext();
   const watchedMakineId = watch("secilenMakineID");
   const effectiveMakineId = selectedRowID ?? watchedMakineId;
@@ -44,7 +45,7 @@ function Tablar({ selectedRowID, update }) {
         label: t("genelBilgiler"),
         render: () => (
           <div>
-            <MainTabs />
+            <MainTabs refreshKey={refreshKey} />
           </div>
         ),
       },
@@ -114,14 +115,14 @@ function Tablar({ selectedRowID, update }) {
         requiresUpdate: true,
         render: () => (
           <div style={contentContainerStyle}>
-            <ResimUpload selectedRowID={effectiveMakineId} refGroup={"MAKINE"} />
+            <ResimUpload selectedRowID={effectiveMakineId} refGroup={"MAKINE"} onUploadSuccess={() => setRefreshKey((prev) => prev + 1)} />
           </div>
         ),
       },
     ];
 
     return tabDefinitions.filter(({ requiresUpdate }) => update || !requiresUpdate);
-  }, [effectiveMakineId, t, update]);
+  }, [effectiveMakineId, t, update, refreshKey]);
 
   useEffect(() => {
     if (!tabs.some((tab) => tab.key === activeKey) && tabs.length > 0) {
