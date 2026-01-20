@@ -157,6 +157,7 @@ export default function LoginForm() {
           aylikPersonelPuantajlari: true,
           personelPuantajTakibi: true,
           operasyonTakibi: true,
+          yakitTanimlari: true,
         };
         const userInfo = {
           userId: response.TB_KULLANICI_ID ?? null,

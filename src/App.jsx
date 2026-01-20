@@ -66,6 +66,7 @@ import FiyatTeklfileri from "./pages/SatinalmaYonetimi/FiyatTeklifleri/FiyatTekl
 import DetarikciFirmalar from "./pages/SatinalmaYonetimi/FirmaTanimlari/FirmaTanimlari.jsx";
 import SatinalmaDashboard from "./pages/SatinalmaYonetimi/Dashboard1/Dashboard.jsx";
 import BakimKpi from "./pages/Analizler/BakimKpiAnalizi/BakimKpiAnalizi.jsx";
+import YakitTanimlari from "./pages/YakitYonetimi/YakitTanimlari/YakitTanimlari.jsx";
 import YakitGirisleri from "./pages/YakitYonetimi/YakitGirisleri/YakitGirisleri.jsx";
 import YakitStoklari from "./pages/YakitYonetimi/YakitStoklari/YakitStoklari.jsx";
 import YakitHareketleri from "./pages/YakitYonetimi/YakitHareketleri/YakitHareketleri.jsx";
@@ -271,6 +272,7 @@ const rawItems = [
     "yakitYonetimi",
     <ShoppingCartOutlined />,
     [
+      getItem("Yakıt Tanımları", "yakitTanimlari", true),
       getItem("Yakıt Girişleri", "yakitGirisleri", true),
       getItem("Yakıt Stokları", "yakitStoklari", true),
       getItem("Yakıt Hareketleri", "yakitHareketleri", true),
@@ -474,6 +476,7 @@ export default function App() {
           <Route path="/tedarikciFirmalar" element={<DetarikciFirmalar />} />
           <Route path="/satinalmaDashboard" element={<SatinalmaDashboard />} />
           <Route path="/bakimKpi" element={<BakimKpi />} />
+          <Route path="/yakitTanimlari" element={<YakitTanimlari />} />
           <Route path="/yakitGirisleri" element={<YakitGirisleri />} />
           <Route path="/yakitStoklari" element={<YakitStoklari />} />
           <Route path="/yakitHareketleri" element={<YakitHareketleri />} />
