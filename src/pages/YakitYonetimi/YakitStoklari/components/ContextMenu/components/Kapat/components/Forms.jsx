@@ -5,8 +5,6 @@ import styled from "styled-components";
 import IptalNedeni from "./IptalNedeni";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import KodIDSelectbox from "../../../../../../../../utils/components/KodIDSelectbox";
-
 dayjs.extend(customParseFormat);
 
 const { TextArea } = Input;
@@ -60,8 +58,6 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const { control, watch, setValue } = useFormContext();
 
-  const fisNo = selectedRows?.length === 1 ? selectedRows[0].SSP_SIPARIS_KODU : "";
-
   // Sil düğmesini gizlemek için koşullu stil
   const buttonStyle = iptalDisabled ? { display: "none" } : {};
 
@@ -106,47 +102,64 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
   // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın sonu
 
   return (
-  <div style={buttonStyle}>
-    {/* Fiş No */}
-    <div style={{ marginBottom: "10px", display: "flex", alignItems: "center", gap: "10px" }}>
-      <Controller
-        name="fisNo"
-        control={control}
-        render={({ field }) => (
-          <Text {...field} style={{ fontSize: "14px", fontWeight: "600" }}>
-            Sipariş No: {fisNo || "-"}
-          </Text>
-        )}
-      />
-    </div>
-
-    {/* İptal Nedeni */}
-    <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
-      <Text style={{ minWidth: "100px", fontSize: "14px" }}>İptal Nedeni:</Text>
-      <KodIDSelectbox style={{ width: "150px" }} name1="nedenKodId" kodID={13113} isRequired={false} />
-    </div>
-
-    {/* Açıklama */}
-    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-      <Text style={{ minWidth: "100px", fontSize: "14px" }}>Açıklama:</Text>
-      <Controller
-        name="aciklama"
-        control={control}
-        render={({ field }) => (
-          <input
-            {...field}
-            style={{
-              width: "300px",
-              padding: "4px 8px",
-              fontSize: "14px",
-              border: "1px solid #d9d9d9",
-              borderRadius: "4px",
-            }}
-            placeholder="Açıklama giriniz"
+    <div style={buttonStyle}>
+      <div style={{ marginBottom: "10px" }}>
+        <Controller
+          name="fisNo"
+          control={control}
+          render={({ field }) => (
+            <Text {...field} style={{ fontSize: "14px", fontWeight: "600" }}>
+              Fiş No: {field.value}
+            </Text>
+          )}
+        />
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          maxWidth: "422px",
+          gap: "10px",
+          width: "100%",
+          justifyContent: "space-between",
+          marginBottom: "10px",
+        }}
+      >
+        <Text style={{ fontSize: "14px" }}>Kapatma Tarihi:</Text>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            maxWidth: "300px",
+            minWidth: "300px",
+            gap: "10px",
+            width: "100%",
+          }}
+        >
+          <Controller
+            name="iptalTarihi"
+            control={control}
+            render={({ field }) => <DatePicker {...field} style={{ width: "180px" }} disabled format={localeDateFormat} placeholder="Tarih seçiniz" />}
           />
-        )}
-      />
+          <Controller
+            name="iptalSaati"
+            control={control}
+            render={({ field }) => (
+              <TimePicker {...field} changeOnScroll needConfirm={false} style={{ width: "110px" }} disabled format={localeTimeFormat} placeholder="Saat seçiniz" />
+            )}
+          />
+        </div>
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between" }}>
+        <Text>Sonuç:</Text>
+        <Controller
+          name="iptalNeden"
+          control={control}
+          render={({ field }) => <TextArea {...field} style={{ width: "100%", maxWidth: "350px" }} rows={4} placeholder="Sonuç Ekle" />}
+        />
+      </div>
     </div>
-  </div>
-);
+  );
 }

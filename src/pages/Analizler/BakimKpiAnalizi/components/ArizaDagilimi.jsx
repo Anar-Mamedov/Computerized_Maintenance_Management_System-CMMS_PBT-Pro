@@ -76,7 +76,7 @@ function ArizaKatkisi() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const response = await AxiosInstance.post("GetArizaKatkisiChart", body);
+        const response = await AxiosInstance.post("GetArizaDurusKatkisiChart", body);
         if (response.Data) {
             setData(response.Data);
         }

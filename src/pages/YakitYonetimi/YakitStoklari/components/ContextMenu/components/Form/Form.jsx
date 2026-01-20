@@ -29,7 +29,7 @@ const Form = ({ selectedRows }) => {
 
       try {
         // 2. ADIM: API isteğini atıyoruz
-        const response = await AxiosInstance.get(`GetRaporLink?formId=61&tabloId=${row.key}`);
+        const response = await AxiosInstance.get(`GetRaporLink?formId=12&tabloId=${row.key}`);
 
         // Axios genelde veriyi response.data içinde döner, senin yapına göre ikisini de kontrol ediyoruz.
         // Gelen JSON: { "status_code": 200, "raporLink": "..." }
@@ -66,10 +66,10 @@ const Form = ({ selectedRows }) => {
       </div>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <span style={{ fontWeight: '500', color: '#262626', fontSize: '14px', lineHeight: '1.2' }}>
-          Satınalma Sipariş Formu
+          Malzeme Talebi Formu
         </span>
         <span style={{ fontSize: '12px', color: '#8c8c8c', marginTop: '4px', lineHeight: '1.4' }}>
-          Seçili satınalma sipariş formunu PDF olarak açar.
+          Seçili malzeme talep formunu PDF olarak açar.
         </span>
       </div>
     </div>

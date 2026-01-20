@@ -15,6 +15,7 @@ import {
   FileTextOutlined,
   SettingOutlined,
   AppstoreOutlined,
+  FireOutlined,
 } from "@ant-design/icons";
 import Draggable from "react-draggable";
 // import Isemri from "./pages/DashboardAnalytics2/Isemri";
@@ -270,11 +271,11 @@ const rawItems = [
   getItem(
     "Yakıt Yönetimi",
     "yakitYonetimi",
-    <ShoppingCartOutlined />,
+    <FireOutlined />,
     [
       getItem("Yakıt Tanımları", "yakitTanimlari", true),
-      getItem("Yakıt Girişleri", "yakitGirisleri", true),
       getItem("Yakıt Stokları", "yakitStoklari", true),
+      getItem("Yakıt Girişleri", "yakitGirisleri", true),
       getItem("Yakıt Hareketleri", "yakitHareketleri", true),
       getItem("Hızlı Yakıt Girişi", "hizliYakitGirisi", true),
 
@@ -477,8 +478,8 @@ export default function App() {
           <Route path="/satinalmaDashboard" element={<SatinalmaDashboard />} />
           <Route path="/bakimKpi" element={<BakimKpi />} />
           <Route path="/yakitTanimlari" element={<YakitTanimlari />} />
-          <Route path="/yakitGirisleri" element={<YakitGirisleri />} />
           <Route path="/yakitStoklari" element={<YakitStoklari />} />
+          <Route path="/yakitGirisleri" element={<YakitGirisleri />} />
           <Route path="/yakitHareketleri" element={<YakitHareketleri />} />
           <Route path="/hizliYakitGirisi" element={<HizliYakitGirisi />} />
           {/*<Route path="/kurallar" element={<Kurallar />} />*/}

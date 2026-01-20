@@ -1,295 +1,301 @@
 import { CloseOutlined, FilterOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Col, Drawer, Row, Typography, Select, Space, Input, DatePicker, Spin } from "antd";
+import { Button, Col, Drawer, Row, Typography, Select, Space, Input, DatePicker } from "antd";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import "./style.css";
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
-import "dayjs/locale/tr";
+import "dayjs/locale/tr"; // For Turkish locale
 import weekOfYear from "dayjs/plugin/weekOfYear";
 import advancedFormat from "dayjs/plugin/advancedFormat";
-import AxiosInstance from "../../../../../../api/http"; // Axios yolunu kontrol et
 
 dayjs.extend(weekOfYear);
 dayjs.extend(advancedFormat);
-dayjs.locale("tr");
 
-const { Text } = Typography;
+dayjs.locale("tr"); // use Turkish locale
+
+const { Text, Link } = Typography;
 
 const StyledCloseOutlined = styled(CloseOutlined)`
-  svg { width: 10px; height: 10px; }
+  svg {
+    width: 10px;
+    height: 10px;
+  }
 `;
 
 const CloseButton = styled.div`
-  width: 20px; height: 20px; border-radius: 50%;
-  display: flex; justify-content: center; align-items: center;
-  background-color: #80808048; cursor: pointer;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #80808048;
+  cursor: pointer;
 `;
 
-// --- 1. TEDARİKÇİ (FİRMA) SELECT BİLEŞENİ ---
-const TedarikciSelect = ({ value, onChange }) => {
-  const [options, setOptions] = useState([]);
-  const [fetching, setFetching] = useState(false);
-
-  const fetchTedarikci = async () => {
-    setFetching(true);
-    try {
-      // Firma API'si
-      const response = await AxiosInstance.get(`GetTedarikciList?aktif=1&searchText=&pagingDeger=1&pageSize=500`);
-      const data = response.data || []; 
-      const mappedOptions = data.map((item) => ({
-        value: item.TB_CARI_ID, 
-        label: item.CAR_TANIM || item.CARI_ISIM, 
-      }));
-      setOptions(mappedOptions);
-    } catch (error) {
-      console.error("Tedarikçi çekme hatası:", error);
-    } finally {
-      setFetching(false);
-    }
-  };
-
-  useEffect(() => { fetchTedarikci(); }, []);
-
-  return (
-    <Select
-      labelInValue
-      showSearch
-      value={value && value.value ? value : undefined}
-      placeholder="Firma Ara..."
-      style={{ width: "100%" }}
-      filterOption={(input, option) => 
-        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-      }
-      onChange={onChange}
-      notFoundContent={fetching ? <Spin size="small" /> : null}
-      options={options}
-      loading={fetching}
-      allowClear
-    />
-  );
-};
-
-// --- 2. MALZEME SELECT BİLEŞENİ (INPUT DEĞİL, SELECT!) ---
-const MalzemeSelect = ({ value, onChange }) => {
-  const [options, setOptions] = useState([]);
-  const [fetching, setFetching] = useState(false);
-
-  const fetchMalzeme = async () => {
-    setFetching(true);
-    try {
-      // Senin verdiğin Malzeme API'si
-      // İstemci tarafında arama rahat olsun diye pageSize'ı 500 yaptım.
-      const response = await AxiosInstance.get(`Stok?modulNo=1&pagingDeger=1&pageSize=500&prm=&isAktif=1`);
-      
-      // API dönüş yapısına göre burayı ayarla (response.data veya response.data.list)
-      const data = response.Data || []; 
-      
-      const mappedOptions = data.map((item) => ({
-        value: item.TB_STOK_ID, // ID
-        label: item.STK_TANIM || item.STK_ISIM || item.STK_KOD, // Görünen İsim
-      }));
-      setOptions(mappedOptions);
-    } catch (error) {
-      console.error("Malzeme çekme hatası:", error);
-    } finally {
-      setFetching(false);
-    }
-  };
-
-  useEffect(() => { fetchMalzeme(); }, []);
-
-  return (
-    <Select
-      labelInValue
-      showSearch
-      value={value && value.value ? value : undefined}
-      placeholder="Malzeme Ara..."
-      style={{ width: "100%" }}
-      filterOption={(input, option) => 
-        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-      }
-      onChange={onChange}
-      notFoundContent={fetching ? <Spin size="small" /> : null}
-      options={options}
-      loading={fetching}
-      allowClear
-    />
-  );
-};
-
-// --- ANA BİLEŞEN ---
 export default function CustomFilter({ onSubmit }) {
-  const { watch } = useFormContext();
+  const {
+    control,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState([]);
   const [newObjectsAdded, setNewObjectsAdded] = useState(false);
   const [filtersExist, setFiltersExist] = useState(false);
-  const [inputValues, setInputValues] = useState({});
+  const [inputValues, setInputValues] = useState({}); // Input değerlerini saklamak için bir state kullanıyoruz
+  const [filters, setFilters] = useState({});
+  const [filterValues, setFilterValues] = useState({});
+
+  const [BasTarih, setBasTarih] = useState(null);
+  const [BitTarih, setBitTarih] = useState(null);
+
+  // selectboxtan seçilen tarihlerin watch edilmesi ve set edilmesi
+  const BasTarihSelected = watch("BasTarih");
+  const BitTarihSelected = watch("BitTarih");
+
+  useEffect(() => {
+    if (BasTarihSelected === null) {
+      setBasTarih(null);
+    } else {
+      setBasTarih(dayjs(BasTarihSelected));
+    }
+    if (BitTarihSelected === null) {
+      setBitTarih(null);
+    } else {
+      setBitTarih(dayjs(BitTarihSelected));
+    }
+  }, [BasTarihSelected, BitTarihSelected]);
+
+  useEffect(() => {
+    if ((BasTarih !== null && BitTarih !== null) || (BasTarih === null && BitTarih === null)) {
+      handleSubmit();
+    }
+  }, [BasTarih, BitTarih]);
+  // selectboxtan seçilen tarihlerin watch edilmesi ve set edilmesi sonu
+
+  // Create a state variable to store selected values for each row
   const [selectedValues, setSelectedValues] = useState({});
 
-  const [baslangicTarihi, setbaslangicTarihi] = useState(null);
-  const [bitisTarihi, setbitisTarihi] = useState(null);
-
-  const baslangicTarihiSelected = watch("baslangicTarihi");
-  const bitisTarihiSelected = watch("bitisTarihi");
-
-  useEffect(() => {
-    setbaslangicTarihi(baslangicTarihiSelected ? dayjs(baslangicTarihiSelected) : null);
-    setbitisTarihi(bitisTarihiSelected ? dayjs(bitisTarihiSelected) : null);
-  }, [baslangicTarihiSelected, bitisTarihiSelected]);
-
-  useEffect(() => {
-    if ((baslangicTarihi !== null && bitisTarihi !== null) || (baslangicTarihi === null && bitisTarihi === null)) {
-      if(open) handleSubmit(); 
-    }
-  }, [baslangicTarihi, bitisTarihi]);
-
-  const isFilterApplied = newObjectsAdded || filtersExist || baslangicTarihi || bitisTarihi;
+  // Tarih seçimi yapıldığında veya filtreler eklenip kaldırıldığında düğmenin stilini değiştirmek için bir durum
+  const isFilterApplied = newObjectsAdded || filtersExist || BasTarih || BitTarih;
 
   const handleSelectChange = (value, rowId) => {
-    setSelectedValues((prev) => ({ ...prev, [rowId]: value }));
-    // Tip değişince input değerini sıfırla
-    setInputValues(prev => ({ ...prev, [`input-${rowId}`]: "" }));
+    setSelectedValues((prevSelectedValues) => ({
+      ...prevSelectedValues,
+      [rowId]: value,
+    }));
   };
 
-  const showDrawer = () => setOpen(true);
-  const onClose = () => setOpen(false);
+  const showDrawer = () => {
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
 
   const handleSubmit = () => {
+    // Combine selected values, input values for each row, and date range
     const filterData = rows.reduce((acc, row) => {
-      const selectedKey = selectedValues[row.id] || ""; 
-      const inputValue = inputValues[`input-${row.id}`];
-
-      if (selectedKey && inputValue) {
-        // SELECT'ten gelen veri obje ({value: 1, label: 'A'}) olduğu için ID'yi ayıklıyoruz
-        if (typeof inputValue === 'object' && inputValue !== null && inputValue.value) {
-            acc[selectedKey] = inputValue.value; 
-        } else {
-            acc[selectedKey] = inputValue; // Normal text (eğer kalırsa)
-        }
+      const selectedValue = selectedValues[row.id] || "";
+      const inputValue = inputValues[`input-${row.id}`] || "";
+      if (selectedValue && inputValue) {
+        acc[selectedValue] = inputValue;
       }
       return acc;
     }, {});
 
-    if (baslangicTarihi) filterData.baslangicTarihi = baslangicTarihi.format("YYYY-MM-DD");
-    if (bitisTarihi) filterData.bitisTarihi = bitisTarihi.format("YYYY-MM-DD");
+    // Add date range to the filterData object if dates are selected
+    if (BasTarih) {
+      filterData.BasTarih = BasTarih.format("YYYY-MM-DD");
+    }
+    if (BitTarih) {
+      filterData.BitTarih = BitTarih.format("YYYY-MM-DD");
+    }
 
+    console.log(filterData);
+    // You can now submit or process the filterData object as needed.
     onSubmit(filterData);
     setOpen(false);
   };
 
   const handleCancelClick = (rowId) => {
-    setRows((prev) => prev.filter((row) => row.id !== rowId));
-    
-    const newInputValues = { ...inputValues };
-    delete newInputValues[`input-${rowId}`];
-    setInputValues(newInputValues);
+    setFilters({});
+    setRows((prevRows) => prevRows.filter((row) => row.id !== rowId));
 
-    const newSelectedValues = { ...selectedValues };
-    delete newSelectedValues[rowId];
-    setSelectedValues(newSelectedValues);
-
-    if (rows.length <= 1) { 
-        setFiltersExist(false);
-        setNewObjectsAdded(false);
-        onSubmit(""); 
-    } else {
-        setFiltersExist(true);
+    const filtersRemaining = rows.length > 1;
+    setFiltersExist(filtersRemaining);
+    if (!filtersRemaining) {
+      setNewObjectsAdded(false);
     }
+    onSubmit("");
   };
 
-  // Generic Input Handler: Hem Event (Input) hem Value (Select) destekler
-  const handleGenericInputChange = (valOrEvent, rowId) => {
-    let finalValue;
-    if (valOrEvent && valOrEvent.target) {
-        finalValue = valOrEvent.target.value;
-    } else {
-        finalValue = valOrEvent;
-    }
-    setInputValues((prev) => ({ ...prev, [`input-${rowId}`]: finalValue }));
+  const handleInputChange = (e, rowId) => {
+    setInputValues((prevInputValues) => ({
+      ...prevInputValues,
+      [`input-${rowId}`]: e.target.value,
+    }));
   };
 
   const handleAddFilterClick = () => {
     const newRow = { id: Date.now() };
-    setRows((prev) => [...prev, newRow]);
+    setRows((prevRows) => [...prevRows, newRow]);
+
     setNewObjectsAdded(true);
     setFiltersExist(true);
-    setInputValues((prev) => ({ ...prev, [`input-${newRow.id}`]: "" }));
+    setInputValues((prevInputValues) => ({
+      ...prevInputValues,
+      [newRow.id]: "", // Set an empty input value for the new row
+    }));
+  };
+
+  const onChange = (value) => {
+    console.log(`selected ${value}`);
+  };
+
+  const onSearch = (value) => {
+    console.log("search:", value);
   };
 
   return (
     <>
       <Button
         onClick={showDrawer}
-        style={{ display: "flex", alignItems: "center", backgroundColor: isFilterApplied ? "#EBF6FE" : "#fff" }}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          backgroundColor: isFilterApplied ? "#EBF6FE" : "#ffffffff",
+        }}
         className={isFilterApplied ? "#ff0000-dot-button" : ""}>
         <FilterOutlined />
         <span style={{ marginRight: "5px" }}>Filtreler</span>
         {isFilterApplied && <span className="blue-dot"></span>}
       </Button>
       <Drawer
-        extra={<Space><Button type="primary" onClick={handleSubmit}>Uygula</Button></Space>}
-        title={<span><FilterOutlined style={{ marginRight: "8px" }} /> Filtreler</span>}
-        placement="right" onClose={onClose} open={open}>
-        
+        extra={
+          <Space>
+            <Button type="primary" onClick={handleSubmit}>
+              Uygula
+            </Button>
+          </Space>
+        }
+        title={
+          <span>
+            <FilterOutlined style={{ marginRight: "8px" }} /> Filtreler
+          </span>
+        }
+        placement="right"
+        onClose={onClose}
+        open={open}>
         <div style={{ marginBottom: "20px", border: "1px solid #80808048", padding: "15px 10px", borderRadius: "8px" }}>
-          <div style={{ marginBottom: "10px" }}><Text style={{ fontSize: "14px" }}>Tarih Aralığı</Text></div>
+          <div style={{ marginBottom: "10px" }}>
+            <Text style={{ fontSize: "14px" }}>Tarih Aralığı</Text>
+          </div>
+
           <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
-            <DatePicker style={{ width: "100%" }} placeholder="Başlangıç" value={baslangicTarihi} onChange={setbaslangicTarihi} locale={dayjs.locale("tr")} />
-            <Text>-</Text>
-            <DatePicker style={{ width: "100%" }} placeholder="Bitiş" value={bitisTarihi} onChange={setbitisTarihi} locale={dayjs.locale("tr")} />
+            <DatePicker
+              style={{ width: "100%" }}
+              placeholder="Başlangıç Tarihi"
+              value={BasTarih}
+              onChange={setBasTarih}
+              locale={dayjs.locale("tr")}
+            />
+            <Text style={{ fontSize: "14px" }}>-</Text>
+            <DatePicker
+              style={{ width: "100%" }}
+              placeholder="Bitiş Tarihi"
+              value={BitTarih}
+              onChange={setBitTarih}
+              locale={dayjs.locale("tr")}
+            />
           </div>
         </div>
 
         {rows.map((row) => (
-          <Row key={row.id} style={{ marginBottom: "10px", border: "1px solid #80808048", padding: "15px 10px", borderRadius: "8px" }}>
+          <Row
+            key={row.id}
+            style={{
+              marginBottom: "10px",
+              border: "1px solid #80808048",
+              padding: "15px 10px",
+              borderRadius: "8px",
+            }}>
             <Col span={24}>
-              <Col span={24} style={{ marginBottom: "10px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <Col
+                span={24}
+                style={{
+                  marginBottom: "10px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}>
                 <Text>Yeni Filtre</Text>
-                <CloseButton onClick={() => handleCancelClick(row.id)}><StyledCloseOutlined /></CloseButton>
+                <CloseButton onClick={() => handleCancelClick(row.id)}>
+                  <StyledCloseOutlined />
+                </CloseButton>
               </Col>
               <Col span={24} style={{ marginBottom: "10px" }}>
-                {/* 1. SEÇİM TÜRÜNÜ BELİRLEME (Firma mı Malzeme mi) */}
                 <Select
                   style={{ width: "100%", marginBottom: "10px" }}
+                  showSearch
                   placeholder={`Seçim Yap`}
+                  optionFilterProp="children"
                   onChange={(value) => handleSelectChange(value, row.id)}
                   value={selectedValues[row.id] || undefined}
+                  onSearch={onSearch}
+                  filterOption={(input, option) => (option?.label || "").toLowerCase().includes(input.toLowerCase())}
                   options={[
-                    { value: "Firma", label: "Firma" },
-                    { value: "Malzeme", label: "Malzeme" },
+                    {
+                      value: "isk.ISK_ISIM",
+                      label: "Talep Eden",
+                    },
+                    {
+                      value: "kod_departman.KOD_TANIM",
+                      label: "Departman",
+                    },
+                    {
+                      value: "lok.LOK_TANIM",
+                      label: "Lokasyon",
+                    },
+                    {
+                      value: "kod_tip.KOD_TANIM",
+                      label: "Talep Tipi",
+                    },
+                    {
+                      value: "mkn.MKN_KOD",
+                      label: "Makine Kodu",
+                    },
+                    {
+                      value: "mkn.MKN_TANIM",
+                      label: "Makine Tanımı",
+                    },
                   ]}
                 />
-                
-                {/* 2. KOŞULLU RENDER KISMI */}
-                {selectedValues[row.id] === "Firma" ? (
-                    // FİRMA SEÇİLİRSE -> TedarikciSelect
-                    <TedarikciSelect 
-                        value={inputValues[`input-${row.id}`]}
-                        onChange={(val) => handleGenericInputChange(val, row.id)}
-                    />
-                ) : selectedValues[row.id] === "Malzeme" ? (
-                    // MALZEME SEÇİLİRSE -> MalzemeSelect (Input değil!)
-                    <MalzemeSelect 
-                        value={inputValues[`input-${row.id}`]}
-                        onChange={(val) => handleGenericInputChange(val, row.id)}
-                    />
-                ) : (
-                    // HİÇBİRİ SEÇİLMEDİYSE (Varsayılan Input)
-                    <Input
-                        placeholder="Arama Yap"
-                        value={inputValues[`input-${row.id}`] || ""}
-                        onChange={(e) => handleGenericInputChange(e, row.id)}
-                    />
-                )}
-                
+                <Input
+                  placeholder="Arama Yap"
+                  name={`input-${row.id}`} // Use a unique name for each input based on the row ID
+                  value={inputValues[`input-${row.id}`] || ""} // Use the corresponding input value
+                  onChange={(e) => handleInputChange(e, row.id)} // Pass the rowId to handleInputChange
+                />
               </Col>
             </Col>
           </Row>
         ))}
-        <Button type="primary" onClick={handleAddFilterClick} style={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "center" }}>
-          <PlusOutlined /> Filtre ekle
+        <Button
+          type="primary"
+          onClick={handleAddFilterClick}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            width: "100%",
+            justifyContent: "center",
+          }}>
+          <PlusOutlined />
+          Filtre ekle
         </Button>
       </Drawer>
     </>

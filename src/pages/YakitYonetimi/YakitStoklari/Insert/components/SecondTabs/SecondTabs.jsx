@@ -5,7 +5,10 @@ import { Controller, useFormContext } from "react-hook-form";
 import { t } from "i18next";
 import OzelAlanlar from "./components/OzelAlanlar/OzelAlanlar.jsx";
 import FisIcerigi from "./components/FisIcerigi/FisIcerigi.jsx";
-import SiparisDetay from "./components/SiparisDetay/SiparisDetayi.jsx";
+import Aciklama from "./components/Aciklama/Aciklama.jsx";
+import Belgeler from "../../../Update/components/Belgeler/DosyaUpload.jsx";
+import Resim from "../../../Update/components/Resimler/Resimler.jsx";
+import IletisimBilgileri from "./components/IletisimBilgileri/IletisimBilgileri.jsx";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -66,22 +69,42 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen })
     },*/
     {
       key: "4",
-      label: t("fisIcerigi"),
+      label: t("Detay Bilgileri"),
       children: <FisIcerigi modalOpen={modalOpen} />,
     },
 
     {
-      key: "7",
-      label: t("Sipariş Detayı"),
-      children: <SiparisDetay modalOpen={modalOpen} />,
+      key: "5",
+      label: t("İletişim Bilgileri"),
+      children: <IletisimBilgileri modalOpen={modalOpen} />,
     },
 
+    {
+      key: "6",
+      label: t("Ekli Belgeler"),
+      children: <Belgeler modalOpen={modalOpen} />,
+    },
+
+    {
+      key: "7",
+      label: t("Resimler"),
+      children: <Resim modalOpen={modalOpen} />,
+    },
+
+    {
+      key: "8",
+      label: "Açıklama",
+      // children: <SureBilgileri fieldRequirements={fieldRequirements} />,
+      children: <Aciklama />,
+    },
+    /*
     {
       key: "5",
       label: "Özel Alanlar",
       // children: <SureBilgileri fieldRequirements={fieldRequirements} />,
       children: <OzelAlanlar />,
     },
+    */
   ];
 
   return (
