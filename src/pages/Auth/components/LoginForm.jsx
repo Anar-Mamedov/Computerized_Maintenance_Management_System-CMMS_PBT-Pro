@@ -147,6 +147,16 @@ export default function LoginForm() {
           yakitStoklari: true,
           yakitHareketleri: true,
           hizliYakitGirisi: true,
+          operasyonYonetimi: true,
+          makinePuantajlari: true,
+          gunlukMakinePuantajGirisi: true,
+          aylikMakinePuantajlari: true,
+          makinePuantajTakibi: true,
+          personelPuantajlari: true,
+          gunlukPersonelPuantajGirisi: true,
+          aylikPersonelPuantajlari: true,
+          personelPuantajTakibi: true,
+          operasyonTakibi: true,
         };
         const userInfo = {
           userId: response.TB_KULLANICI_ID ?? null,
