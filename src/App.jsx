@@ -72,6 +72,7 @@ import YakitGirisleri from "./pages/YakitYonetimi/YakitGirisleri/YakitGirisleri.
 import YakitStoklari from "./pages/YakitYonetimi/YakitStoklari/YakitStoklari.jsx";
 import YakitHareketleri from "./pages/YakitYonetimi/YakitHareketleri/YakitHareketleri.jsx";
 import HizliYakitGirisi from "./pages/YakitYonetimi/HizliYakitGirisi/HizliYakitGirisi.jsx";
+import YoneticiDashboard from "./pages/YonetimDashboard/Dashboard.jsx";
 import AxiosInstance from "./api/http";
 
 // Malzemeler
@@ -153,6 +154,7 @@ const isOmegaMenu = menuHostname === "omegaerp.net" || menuHostname === "www.ome
 
 const rawItems = [
   getItem("Dashboard", "", <PieChartOutlined />),
+  getItem("Yönetim Dashboard", "yonetimDashboard", <PieChartOutlined />),
   // getItem("Option 1", "option1", <PieChartOutlined />),
   // getItem("Option 2", "option2", <DesktopOutlined />),
   getItem(
@@ -418,6 +420,7 @@ export default function App() {
         >
           {loginData?.Dashboard && <Route path="/" element={isOmega ? <SatinalmaDashboard /> : <Dashboard1 />} />}
           {/* <Route path="/isemri" element={<Isemri />} /> */}
+          <Route path="/yonetimDashboard" element={<YoneticiDashboard />} />
           <Route path="/isEmri1" element={<IsEmri />} />
           <Route path="/User" element={<ProfilEkrani />} />
           <Route path="/periyodikBakimlar" element={<PeriyodikBakimlar1 />} />
