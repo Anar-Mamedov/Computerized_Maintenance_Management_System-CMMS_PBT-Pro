@@ -158,6 +158,7 @@ export default function LoginForm() {
           personelPuantajTakibi: true,
           operasyonTakibi: true,
           yakitTanimlari: true,
+          yonetimDashboard: true,
         };
         const userInfo = {
           userId: response.TB_KULLANICI_ID ?? null,
