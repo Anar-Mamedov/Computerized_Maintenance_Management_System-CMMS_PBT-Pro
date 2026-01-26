@@ -73,6 +73,8 @@ import YakitStoklari from "./pages/YakitYonetimi/YakitStoklari/YakitStoklari.jsx
 import YakitHareketleri from "./pages/YakitYonetimi/YakitHareketleri/YakitHareketleri.jsx";
 import HizliYakitGirisi from "./pages/YakitYonetimi/HizliYakitGirisi/HizliYakitGirisi.jsx";
 import YoneticiDashboard from "./pages/YonetimDashboard/Dashboard.jsx";
+import MakinePuantaj from "./pages/MakineEkipman/MakinePuantaj/MakinePuantaj.jsx";
+import AylikMakinePuantaj from "./pages/MakineEkipman/MakinePuantaj/MakinePuantajAylik.jsx";
 import AxiosInstance from "./api/http";
 
 // Malzemeler
@@ -180,9 +182,9 @@ const rawItems = [
         "makinePuantajlari",
         "",
         [
-          getItem("Günlük Makine Puantaj Girişi", "gunlukMakinePuantajGirisi", true),
-          getItem("Aylık Makine Puantajları", "aylikMakinePuantajlari", true),
-          getItem("Makine Puantaj Takibi", "makinePuantajTakibi", true),
+          getItem("Günlük Ekipman Puantaj Girişi", "gunlukMakinePuantajGirisi", true),
+          getItem("Aylık Ekipman Puantajları", "aylikMakinePuantajlari", true),
+          getItem("Ekipman Puantaj Takibi", "makinePuantajTakibi", true),
         ],
         false
       ),
@@ -432,8 +434,8 @@ export default function App() {
           <Route path="/ekipmanVeritabani" element={<EkipmanVeritabani />} />
           <Route path="/durusTakibi" element={<DurusTakibi />} />
           <Route path="/sayacGuncelleme" element={<SayacGuncelleme />} />
-          <Route path="/gunlukMakinePuantajGirisi" element={<Hazirlaniyor />} />
-          <Route path="/aylikMakinePuantajlari" element={<Hazirlaniyor />} />
+          <Route path="/gunlukMakinePuantajGirisi" element={<MakinePuantaj />} />
+          <Route path="/aylikMakinePuantajlari" element={<AylikMakinePuantaj />} />
           <Route path="/makinePuantajTakibi" element={<Hazirlaniyor />} />
           <Route path="/gunlukPersonelPuantajGirisi" element={<Hazirlaniyor />} />
           <Route path="/aylikPersonelPuantajlari" element={<Hazirlaniyor />} />
@@ -485,6 +487,7 @@ export default function App() {
           <Route path="/yakitGirisleri" element={<YakitGirisleri />} />
           <Route path="/yakitHareketleri" element={<YakitHareketleri />} />
           <Route path="/hizliYakitGirisi" element={<HizliYakitGirisi />} />
+          <Route path="/makinePuantajlari" element={<MakinePuantaj />} />
           {/*<Route path="/kurallar" element={<Kurallar />} />*/}
         </Route>
       </Routes>

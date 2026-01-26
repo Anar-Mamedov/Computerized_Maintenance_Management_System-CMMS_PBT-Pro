@@ -63,6 +63,7 @@ const Breadcrumbs = () => {
     "/hizliYakitGirisi": "Hızlı Yakıt Girişi",
     "/yakitTanimlari": "Yakıt Tanımları",
     "/yonetimDashboard": "Yonetim Dashboard",
+    "/makinePuantajlari": "Makine Puantajları",
 
     // Diğer route'lar için ekleyin...
   };
