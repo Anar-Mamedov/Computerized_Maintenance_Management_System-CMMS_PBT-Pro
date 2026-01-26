@@ -5,6 +5,10 @@ import { Button, Checkbox, Popover, Typography, Switch, Tooltip, ConfigProvider,
 import { DownOutlined, QuestionCircleOutlined, ReloadOutlined } from "@ant-design/icons";
 import trTR from "antd/lib/locale/tr_TR";
 import { useForm, FormProvider } from "react-hook-form";
+import { createRoot } from "react-dom/client";
+import { AppProvider } from "./../../AppContext.jsx";
+
+// --- WIDGET IMPORTLARI ---
 import Component3 from "./components/Component3.jsx";
 import Component2 from "./components/Component2.jsx";
 import Component1 from "./components/Component1.jsx";
@@ -24,8 +28,6 @@ import CustomDashboards from "./components/CustomDashboards.jsx";
 import PersonelKPITablosu from "./components/PersonelKPITablosu.jsx";
 import IsEmriTipleri from "./components/IsEmriTipleri.jsx";
 import IsTalebiTipleri from "./components/IsTalebiTipleri.jsx";
-import { AppProvider } from "./../../AppContext.jsx";
-import { createRoot } from "react-dom/client";
 import OnayIstekleriTablo from "./components/OnayIstekleriTablo.jsx";
 import Component20 from "./components/Component20.jsx";
 import Component21 from "./components/Component21.jsx";
@@ -52,30 +54,37 @@ import Component41 from "./components/Component41.jsx";
 import Component42 from "./components/Component42.jsx";
 import Component43 from "./components/Component43.jsx";
 
+// --- YENİ EKLENEN HARİCİ DASHBOARDLAR ---
+// NOT: Bu dosya yollarını kendi proje yapına göre kontrol etmelisin.
+import SatinalmaDashboard from "../SatinalmaYonetimi/Dashboard1/Dashboard.jsx"; 
+import BakimDashboard from "../Analizler/BakimKpiAnalizi/BakimKpiAnalizi.jsx";
+
 import "./custom-gridstack.css"; 
 
 const { Text } = Typography;
+
+// Sadece bu tablar GridStack kullanır
+const GRID_TABS = ["yonetici", "operasyon", "makine"];
 
 const widgetTitles = {
   widget1: "Devam Eden İş Talepleri",
   widget2: "Açık İş Emirleri",
   widget3: "Düşük Stoklu Malzemeler",
   widget4: "Toplam Makine Sayısı",
-  widget5: "Özet Durum",
+  widget5: "Yıllık Maliyet Grafiği",
   widget6: "Lokasyon Bazında İş Talepleri ve İş Emirleri Dağılımı",
   widget7: "İş Emri Analizi",
   widget8: "Arızalı Makineler",
   widget9: "Makine Tiplerine Göre Envanter Dağılımı",
   widget10: "Tamamlanmış İş Talepleri ve İş Emirleri Oranları",
-  widget11: "Aylık Bakım Maliyetleri",
+  widget11: "Maliyet Kayıtları",
   widget12: "İş Emirlerinin Zaman Dağılımı",
   widget13: "Personel Bazında İş Gücü",
   widget14: "Toplam Harcanan İş Gücü",
-  widget15: "Personel KPI",
+  widget15: "Maliyet Dağılımı (Yıl İçinde)",
   widget16: "İş Emri Tipleri",
   widget17: "İş Talebi Tipleri",
   widget18: "Bekleyen Onaylarım",
-  widget19: "Bekleyen İş Talepleri",
   widget20: "Aktif Makine",
   widget21: "Aktif Personel",
   widget22: "Açık İş Emirleri",
@@ -103,31 +112,30 @@ const widgetTitles = {
 };
 
 const widgetDefaults = {
-  widget1: { width: 3, height: 1, minW: 3, minH: 1 },
-  widget2: { width: 3, height: 1, minW: 3, minH: 1 },
-  widget3: { width: 3, height: 1, minW: 3, minH: 1 },
-  widget4: { width: 3, height: 1, minW: 3, minH: 1 },
-  widget5: { width: 5, height: 3, minW: 3, minH: 2 },
+  widget1: { width: 3, height: 2, minW: 3, minH: 1 },
+  widget2: { width: 3, height: 2, minW: 3, minH: 1 },
+  widget3: { width: 3, height: 2, minW: 3, minH: 1 },
+  widget4: { width: 3, height: 2, minW: 3, minH: 1 },
+  widget5: { width: 7, height: 4, minW: 3, minH: 2 },
   widget16: { width: 5, height: 3, minW: 3, minH: 2 },
   widget10: { width: 7, height: 3, minW: 3, minH: 2 },
   widget17: { width: 5, height: 3, minW: 3, minH: 2 },
   widget7: { width: 7, height: 3, minW: 3, minH: 2 },
-  widget6: { width: 5, height: 3, minW: 3, minH: 2 },
-  widget11: { width: 7, height: 3, minW: 3, minH: 2 },
+  widget6: { width: 5, height: 4, minW: 3, minH: 2 },
+  widget11: { width: 7, height: 4, minW: 3, minH: 2 },
   widget8: { width: 5, height: 3, minW: 3, minH: 2 },
   widget13: { width: 7, height: 3, minW: 3, minH: 2 },
   widget9: { width: 7, height: 3, minW: 3, minH: 2 },
   widget14: { width: 5, height: 3, minW: 3, minH: 2 },
-  widget15: { width: 7, height: 3, minW: 3, minH: 2 },
+  widget15: { width: 5, height: 4, minW: 3, minH: 2 },
   widget12: { width: 12, height: 3, minW: 3, minH: 2 },
-  widget18: { width: 5, height: 3, minW: 3, minH: 2 },
-  widget19: { width: 3, height: 1, minW: 3, minH: 1 },
+  widget18: { width: 5, height: 4, minW: 3, minH: 2 },
   widget20: { width: 3, height: 1, minW: 3, minH: 1 },
   widget21: { width: 3, height: 1, minW: 3, minH: 1 },
   widget22: { width: 3, height: 1, minW: 3, minH: 1 },
   widget23: { width: 3, height: 1, minW: 3, minH: 1 },
-  widget24: { width: 5, height: 3, minW: 3, minH: 2 },
-  widget25: { width: 7, height: 3, minW: 3, minH: 2 },
+  widget24: { width: 5, height: 5, minW: 3, minH: 2 },
+  widget25: { width: 7, height: 5, minW: 3, minH: 2 },
   widget26: { width: 5, height: 3, minW: 3, minH: 2 },
   widget27: { width: 7, height: 3, minW: 3, minH: 2 },
   widget28: { width: 5, height: 3, minW: 3, minH: 2 },
@@ -148,45 +156,50 @@ const widgetDefaults = {
   widget43: { width: 6, height: 3, minW: 3, minH: 2 },
 };
 
-// KANKA: Yönetici sekmesinin en üstüne 5 tane kart koyduk.
-// Toplam genişlik 12 olduğu için genişlikleri (width) 2-3-2-3-2 şeklinde dağıttım ki sığsınlar.
 const tabConfigurations = {
   "yonetici": [
-    // --- ÜST SATIR (5 KART - Toplam 12 Birim) ---
-    // 2 + 3 + 2 + 3 + 2 = 12 (Tam Sığar)
-    
-    { id: "widget1", x: 0, y: 0, width: 2, height: 1, minW: 2, minH: 1 },  // 0-2 arası (2 birim)
-    { id: "widget2", x: 2, y: 0, width: 3, height: 1, minW: 2, minH: 1 },  // 2-5 arası (3 birim)
-    { id: "widget19", x: 5, y: 0, width: 2, height: 1, minW: 2, minH: 1 }, // 5-7 arası (2 birim)
-    { id: "widget3", x: 7, y: 0, width: 3, height: 1, minW: 2, minH: 1 },  // 7-10 arası (3 birim)
-    { id: "widget4", x: 10, y: 0, width: 2, height: 1, minW: 2, minH: 1 }, // 10-12 arası (2 birim)
+    // --- ÜST SATIR ---
+    { id: "widget1", x: 0, y: 0, width: 3, height: 2, minW: 2, minH: 1 },
+    { id: "widget2", x: 3, y: 0, width: 3, height: 2, minW: 2, minH: 1 },
+    { id: "widget3", x: 6, y: 0, width: 3, height: 2, minW: 2, minH: 1 },
+    { id: "widget4", x: 9, y: 0, width: 3, height: 2, minW: 2, minH: 1 },
 
-    // --- ALT SATIRLAR (Diğerleri aynı kalıyor) ---
-    { id: "widget5", x: 0, y: 1, ...widgetDefaults["widget5"] },
-    { id: "widget11", x: 5, y: 1, ...widgetDefaults["widget11"] },
-    { id: "widget15", x: 0, y: 4, ...widgetDefaults["widget15"] },
-    { id: "widget18", x: 7, y: 4, ...widgetDefaults["widget18"] },
+    { id: "widget11", x: 0, y: 5, ...widgetDefaults["widget11"] },
+    { id: "widget18", x: 7, y: 5, ...widgetDefaults["widget18"] },
 
-    // --- YENİ EKLENEN (EN ALT - GENİŞ) ---
-    // En Büyük 5 Tedarikçi (Tam boy yayılacak)
-    { id: "widget6", x: 0, y: 7, width: 10, height: 3, minW: 2, minH: 2 },
+    // --- ORTA SATIRLAR ---
+    { id: "widget5", x: 0, y: 5, ...widgetDefaults["widget5"] },
+    { id: "widget15", x: 7, y: 5, ...widgetDefaults["widget15"] },
+
+    // --- EN ALT SATIR (Footer) ---
+    { id: "widget6", x: 0, y: 50, width: 12, height: 3, minW: 2, minH: 2 },
   ],
   "operasyon": [
+    // --- 1. SATIR (ÜST KARTLAR) ---
     { id: "widget20", x: 0, y: 0, width: 3, height: 1, minW: 2, minH: 1 }, 
     { id: "widget21", x: 3, y: 0, width: 3, height: 1, minW: 2, minH: 1 }, 
     { id: "widget22", x: 6, y: 0, width: 3, height: 1, minW: 2, minH: 1 }, 
     { id: "widget23", x: 9, y: 0, width: 3, height: 1, minW: 2, minH: 1 },
     
-    { id: "widget24", x: 0, y: 1, ...widgetDefaults["widget24"] },
-    { id: "widget25", x: 5, y: 1, ...widgetDefaults["widget25"] },
-    { id: "widget26", x: 0, y: 4, ...widgetDefaults["widget26"] },
-    { id: "widget27", x: 7, y: 4, ...widgetDefaults["widget27"] },
+    // --- 2. SATIR ---
     { id: "widget28", x: 0, y: 1, ...widgetDefaults["widget28"] },
     { id: "widget29", x: 5, y: 1, ...widgetDefaults["widget29"] },
+
+    // --- 3. SATIR ---
     { id: "widget30", x: 0, y: 4, ...widgetDefaults["widget30"] },
-    { id: "widget31", x: 7, y: 4, ...widgetDefaults["widget31"] },
+    { id: "widget31", x: 5, y: 4, ...widgetDefaults["widget31"] },
+
+    // --- 4. SATIR (SONDAN BİR ÖNCE) ---
+    { id: "widget24", x: 0, y: 7, ...widgetDefaults["widget24"] },
+    { id: "widget25", x: 5, y: 7, ...widgetDefaults["widget25"] },
+
+    // --- 5. SATIR (EN ALT) ---
+    { id: "widget26", x: 0, y: 12, ...widgetDefaults["widget26"] },
+    { id: "widget27", x: 5, y: 12, ...widgetDefaults["widget27"] },
   ],
   "makine": [
+    // --- 1. SATIR (KÜÇÜK İSTATİSTİKLER) ---
+    // Her biri 2 birim genişlik. Toplam 12 birim.
     { id: "widget32", x: 0, y: 0, width: 2, height: 1, minW: 2, minH: 1 }, 
     { id: "widget33", x: 2, y: 0, width: 2, height: 1, minW: 2, minH: 1 }, 
     { id: "widget34", x: 4, y: 0, width: 2, height: 1, minW: 2, minH: 1 }, 
@@ -194,16 +207,23 @@ const tabConfigurations = {
     { id: "widget36", x: 8, y: 0, width: 2, height: 1, minW: 2, minH: 1 },
     { id: "widget37", x: 10, y: 0, width: 2, height: 1, minW: 2, minH: 1 },
 
-    { id: "widget38", x: 0, y: 1, ...widgetDefaults["widget38"] },
-    { id: "widget39", x: 4, y: 1, ...widgetDefaults["widget39"] },
-    { id: "widget40", x: 6, y: 4, ...widgetDefaults["widget40"] },
-    { id: "widget41", x: 8, y: 4, ...widgetDefaults["widget41"] },
-    { id: "widget42", x: 10, y: 1, ...widgetDefaults["widget42"] },
-    { id: "widget43", x: 12, y: 1, ...widgetDefaults["widget43"] },
-  ],
+    // --- 2. SATIR ---
+    // Y: 1'den başlar. Genişlikleri 6 olduğu için 0 ve 6. koordinata koyarız.
+    { id: "widget42", x: 0, y: 1, ...widgetDefaults["widget42"] }, // Sol
+    { id: "widget39", x: 6, y: 1, ...widgetDefaults["widget39"] }, // Sağ (Önceki x:4 yanlıştı, x:6 olmalı)
+
+    // --- 3. SATIR ---
+    // Y: 4'ten başlar (Üsttekiler h:3 olduğu için 1+3=4).
+    { id: "widget38", x: 0, y: 4, ...widgetDefaults["widget38"] }, // Sol
+    { id: "widget40", x: 6, y: 4, ...widgetDefaults["widget40"] }, // Sol
+
+    // --- 4. SATIR ---
+    // Y: 7'den başlar (4+3=7).
+    { id: "widget43", x: 0, y: 7, ...widgetDefaults["widget43"] }, // Sol
+    { id: "widget41", x: 6, y: 7, ...widgetDefaults["widget41"] }, // Sağ
+],
 };
 
-// Fallback için
 const defaultItems = tabConfigurations["yonetici"];
 
 function MainDashboard() {
@@ -217,7 +237,7 @@ function MainDashboard() {
     widget5: false, widget6: false, widget7: false, widget8: false,
     widget9: false, widget10: false, widget11: false, widget12: false,
     widget13: false, widget14: false, widget15: false, widget16: false,
-    widget17: false, widget18: false, widget19: false, widget20: false,
+    widget17: false, widget18: false, widget20: false,
     widget21: false, widget22: false, widget23: false, widget24: false,
     widget25: false, widget26: false, widget27: false, widget28: false,
     widget29: false, widget30: false, widget31: false, widget32: false,
@@ -231,7 +251,7 @@ function MainDashboard() {
   });
 
   const { setValue, watch, reset } = methods;
-  const selectedDashboard = watch("selectedDashboard");
+  const selectedDashboard = watch("selectedYoneticiDashboard");
 
   const getCurrentStorageKey = () => `${selectedDashboard || "dashboard"}_${activeTab}`;
 
@@ -259,11 +279,16 @@ function MainDashboard() {
     }
     setTimeout(() => {
       const gridItems = JSON.parse(localStorage.getItem(getCurrentStorageKey())) || [];
-      window.updateWidgets(gridItems);
+      if (window.updateWidgets) window.updateWidgets(gridItems);
     }, 50);
   };
 
   useEffect(() => {
+    // EĞER GRID TABI DEĞİLSE GRID INIT YAPMA
+    if (!GRID_TABS.includes(activeTab)) {
+        return;
+    }
+
     if (reorganize === undefined) {
       return;
     }
@@ -272,6 +297,9 @@ function MainDashboard() {
     if (gridContainer && gridContainer.gridstack) {
         gridContainer.gridstack.destroy(false);
     }
+
+    // Grid Container yoksa çık
+    if (!gridContainer) return;
 
     const grid = GridStack.init({
       float: reorganize,
@@ -326,94 +354,49 @@ function MainDashboard() {
 
         const root = createRoot(bodyEl);
         switch (item.id) {
-          case "widget1":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component1 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget2":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component2 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget3":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component3 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget4":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component4 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget5":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component5 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget6":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><LokasyonBazindaIsTalepleri /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget7":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><IsEmirleriOzetTablosu /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget8":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><ArizaliMakineler /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget9":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><MakineTiplerineGore /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget10":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><TamamlanmaOranlari /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget11":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><AylikBakimMaliyetleri /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget12":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><IsEmriZamanDagilimi /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget13":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><PersonelBazindaIsGucu /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget14":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><ToplamHarcananIsGucu /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget15":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><PersonelKPITablosu /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget16":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><IsEmriTipleri /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget17":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><IsTalebiTipleri /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget18":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><OnayIstekleriTablo /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget19":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component6 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget20":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component20 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget21":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component21 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget22":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component22 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget23":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component23 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget24":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component24 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget25":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component25 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget26":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component26 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget27":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component27 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget28":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component28 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget29":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component29 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget30":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component30 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget31":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component31 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget32":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component32 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget33":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component33 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget34":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component34 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget35":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component35 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget36":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component36 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget37":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component37 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget38":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component38 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget39":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component39 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget40":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component40 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget41":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component41 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget42":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component42 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget43":
-            root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component43 /></AppProvider></ConfigProvider></FormProvider>); break;
-          default:
-            break;
+          case "widget1": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component1 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget2": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component2 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget3": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component3 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget4": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component4 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget5": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component5 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget6": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><LokasyonBazindaIsTalepleri /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget7": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><IsEmirleriOzetTablosu /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget8": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><ArizaliMakineler /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget9": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><MakineTiplerineGore /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget10": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><TamamlanmaOranlari /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget11": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><AylikBakimMaliyetleri /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget12": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><IsEmriZamanDagilimi /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget13": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><PersonelBazindaIsGucu /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget14": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><ToplamHarcananIsGucu /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget15": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><PersonelKPITablosu /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget16": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><IsEmriTipleri /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget17": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><IsTalebiTipleri /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget18": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><OnayIstekleriTablo /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget20": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component20 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget21": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component21 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget22": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component22 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget23": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component23 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget24": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component24 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget25": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component25 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget26": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component26 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget27": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component27 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget28": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component28 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget29": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component29 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget30": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component30 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget31": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component31 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget32": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component32 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget33": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component33 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget34": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component34 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget35": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component35 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget36": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component36 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget37": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component37 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget38": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component38 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget39": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component39 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget40": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component40 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget41": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component41 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget42": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component42 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget43": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component43 /></AppProvider></ConfigProvider></FormProvider>); break;
+          default: break;
         }
       });
     };
@@ -424,7 +407,7 @@ function MainDashboard() {
         widget5: false, widget6: false, widget7: false, widget8: false,
         widget9: false, widget10: false, widget11: false, widget12: false,
         widget13: false, widget14: false, widget15: false, widget16: false,
-        widget17: false, widget18: false, widget19: false, widget20: false,
+        widget17: false, widget18: false, widget20: false,
         widget21: false, widget22: false, widget23: false, widget24: false,
         widget25: false, widget26: false, widget27: false, widget28: false,
         widget29: false, widget30: false, widget31: false, widget32: false,
@@ -551,6 +534,8 @@ function MainDashboard() {
     { key: 'yonetici', label: 'Yönetici Özeti' },
     { key: 'operasyon', label: 'Operasyon' },
     { key: 'makine', label: 'Makine' },
+    { key: 'satinalma', label: 'Satınalma' },
+    { key: 'bakim', label: 'Bakım' },
   ];
 
   return (
@@ -566,24 +551,27 @@ function MainDashboard() {
             >
               <CustomDashboards />
               
-              <div style={{ display: "flex", alignItems: "center", flexDirection: "row", gap: "10px" }}>
-                <Button type="text" onClick={rerenderWidgets}>
-                  <Text type="secondary" style={{ display: "flex", flexDirection: "row", gap: "5px", alignItems: "center" }}>
-                    <ReloadOutlined /> Verileri Yenile
-                  </Text>
-                </Button>
-                <Button style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "5px" }} onClick={handleRearrange}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path fill="" fillRule="evenodd" d="M18 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1h-1zm-1 7.5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zM5 17a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1H5zm5.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm6.5 0a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm-5.5-7.5a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1h-1zm-7.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1H5a1 1 0 01-1-1v-1zM10.5 5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1V5zM5 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1H5z" clipRule="evenodd"></path></svg>
-                  Yeniden Sırala
-                </Button>
-                <Popover content={content} title="Widgetları Yönet" trigger="click">
-                  <Button style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "5px" }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="widget"><path fill="" fillRule="evenodd" d="M17.5 2a1 1 0 01.894.553l3.5 7A1 1 0 0121 11h-7a1 1 0 01-.894-1.447l3.5-7A1 1 0 0117.5 2zm-1.882 7h3.764L17.5 5.236 15.618 9zM4 13a2 2 0 00-2 2v5a2 2 0 002 2h5a2 2 0 002-2v-5a2 2 0 00-2-2H4zm0 7v-5h5v5H4zm13.5-7a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM15 17.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0zM6.5 2a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM4 6.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0z" clipRule="evenodd"></path></svg>
-                    Widgetleri Yönet
-                    <DownOutlined style={{ marginLeft: "2px" }} />
-                  </Button>
-                </Popover>
-              </div>
+              {/* SADECE GRID OLAN SEKMELERDE TOOLBAR GÖSTER */}
+              {GRID_TABS.includes(activeTab) && (
+                  <div style={{ display: "flex", alignItems: "center", flexDirection: "row", gap: "10px" }}>
+                    <Button type="text" onClick={rerenderWidgets}>
+                      <Text type="secondary" style={{ display: "flex", flexDirection: "row", gap: "5px", alignItems: "center" }}>
+                        <ReloadOutlined /> Verileri Yenile
+                      </Text>
+                    </Button>
+                    <Button style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "5px" }} onClick={handleRearrange}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path fill="" fillRule="evenodd" d="M18 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1h-1zm-1 7.5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zM5 17a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1H5zm5.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm6.5 0a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm-5.5-7.5a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1h-1zm-7.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1H5a1 1 0 01-1-1v-1zM10.5 5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1V5zM5 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1H5z" clipRule="evenodd"></path></svg>
+                      Yeniden Sırala
+                    </Button>
+                    <Popover content={content} title="Widgetları Yönet" trigger="click">
+                      <Button style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "5px" }}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="widget"><path fill="" fillRule="evenodd" d="M17.5 2a1 1 0 01.894.553l3.5 7A1 1 0 0121 11h-7a1 1 0 01-.894-1.447l3.5-7A1 1 0 0117.5 2zm-1.882 7h3.764L17.5 5.236 15.618 9zM4 13a2 2 0 00-2 2v5a2 2 0 002 2h5a2 2 0 002-2v-5a2 2 0 00-2-2H4zm0 7v-5h5v5H4zm13.5-7a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM15 17.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0zM6.5 2a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM4 6.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0z" clipRule="evenodd"></path></svg>
+                        Widgetleri Yönet
+                        <DownOutlined style={{ marginLeft: "2px" }} />
+                      </Button>
+                    </Popover>
+                  </div>
+              )}
             </div>
 
             <div style={{ marginBottom: "15px", backgroundColor: "white", padding: "10px 20px 0 20px", borderRadius: "8px" }}>
@@ -591,8 +579,14 @@ function MainDashboard() {
             </div>
 
             <div style={{ overflow: "auto", height: "calc(100vh - 280px)" }}>
-              <div className="grid-stack">
-              </div>
+              {/* GRID İÇİN (YONETICI, OPERASYON, MAKINE) */}
+              {GRID_TABS.includes(activeTab) && (
+                 <div className="grid-stack"></div>
+              )}
+
+              {/* HARİCİ SAYFALAR İÇİN */}
+              {activeTab === 'satinalma' && <SatinalmaDashboard />}
+              {activeTab === 'bakim' && <BakimDashboard />}
             </div>
           </div>
         </AppProvider>

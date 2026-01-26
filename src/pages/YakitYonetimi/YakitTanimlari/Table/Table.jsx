@@ -401,11 +401,11 @@ const MainTable = () => {
     fetchEquipmentData(status);
   }, [status]); // status değiştiğinde yeniden veri çek
 
-  const fetchEquipmentData = async (currentStatus) => {
+  const fetchEquipmentData = async (status) => {
     try {
       setLoading(true);
       // ✅ API isteği parametre ile atılıyor (true/false)
-      const response = await AxiosInstance.get(`GetYakitList?aktif=${currentStatus}`);
+      const response = await AxiosInstance.get(`GetYakitList?aktif=${status}`);
 
       if (Array.isArray(response)) {
         const formattedData = response.map((item) => ({
@@ -500,7 +500,7 @@ const MainTable = () => {
     setSelectedRows([]);
 
     // Verileri yeniden çekmek için `fetchEquipmentData` fonksiyonunu çağır
-    fetchEquipmentData(body, currentPage);
+    fetchEquipmentData(body, currentPage, status);
     // Burada `body` ve `currentPage`'i güncellediğimiz için, bu değerlerin en güncel hallerini kullanarak veri çekme işlemi yapılır.
     // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
     // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
