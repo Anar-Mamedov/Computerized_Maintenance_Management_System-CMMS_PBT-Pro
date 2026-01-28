@@ -75,6 +75,7 @@ import HizliYakitGirisi from "./pages/YakitYonetimi/HizliYakitGirisi/HizliYakitG
 import YoneticiDashboard from "./pages/YonetimDashboard/Dashboard.jsx";
 import MakinePuantaj from "./pages/MakineEkipman/MakinePuantaj/MakinePuantaj.jsx";
 import AylikMakinePuantaj from "./pages/MakineEkipman/MakinePuantaj/MakinePuantajAylik.jsx";
+import YakitTuketimiAnalizi from "./pages/Analizler/YakitTuketimiAnalizi/YakitTuketimiAnalizi.jsx";
 import AxiosInstance from "./api/http";
 
 // Malzemeler
@@ -295,6 +296,7 @@ const rawItems = [
       getItem("Müdahale Süreleri Analizi", "mudaheleSuresi", true),
       getItem("Personel KPI Analizi", "analizler", true),
       getItem("Bakım KPI Analizi", "bakimKpi", true),
+      getItem("Yakıt Tüketimi Analizi", "yakitTuketimiAnalizi", true),
 
       // getItem("Team 2", "team2", true)
     ],
@@ -487,7 +489,7 @@ export default function App() {
           <Route path="/yakitGirisleri" element={<YakitGirisleri />} />
           <Route path="/yakitHareketleri" element={<YakitHareketleri />} />
           <Route path="/hizliYakitGirisi" element={<HizliYakitGirisi />} />
-          <Route path="/makinePuantajlari" element={<MakinePuantaj />} />
+          <Route path="/yakitTuketimiAnalizi" element={<YakitTuketimiAnalizi />} />
           {/*<Route path="/kurallar" element={<Kurallar />} />*/}
         </Route>
       </Routes>
