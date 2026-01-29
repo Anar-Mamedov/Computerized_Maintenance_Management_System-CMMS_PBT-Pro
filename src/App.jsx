@@ -157,7 +157,6 @@ const isOmegaMenu = menuHostname === "omegaerp.net" || menuHostname === "www.ome
 
 const rawItems = [
   getItem("Dashboard", "", <PieChartOutlined />),
-  getItem("Yönetim Dashboard", "yonetimDashboard", <PieChartOutlined />),
   // getItem("Option 1", "option1", <PieChartOutlined />),
   // getItem("Option 2", "option2", <DesktopOutlined />),
   getItem(
@@ -403,7 +402,7 @@ export default function App() {
             </ProtectedRoute>
           }
         >
-          {loginData?.Dashboard && <Route path="/" element={isOmega ? <SatinalmaDashboard /> : <Dashboard1 />} />}
+          {loginData?.Dashboard && <Route path="/" element={isOmega ? <YoneticiDashboard /> : <Dashboard1 />} />}
           {/* <Route path="/isemri" element={<Isemri />} /> */}
           <Route path="/yonetimDashboard" element={<YoneticiDashboard />} />
           <Route path="/isEmri1" element={<IsEmri />} />
