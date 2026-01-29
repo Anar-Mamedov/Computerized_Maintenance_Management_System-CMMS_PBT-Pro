@@ -72,6 +72,10 @@ import YakitGirisleri from "./pages/YakitYonetimi/YakitGirisleri/YakitGirisleri.
 import YakitStoklari from "./pages/YakitYonetimi/YakitStoklari/YakitStoklari.jsx";
 import YakitHareketleri from "./pages/YakitYonetimi/YakitHareketleri/YakitHareketleri.jsx";
 import HizliYakitGirisi from "./pages/YakitYonetimi/HizliYakitGirisi/HizliYakitGirisi.jsx";
+import YoneticiDashboard from "./pages/YonetimDashboard/Dashboard.jsx";
+import MakinePuantaj from "./pages/MakineEkipman/MakinePuantaj/MakinePuantaj.jsx";
+import AylikMakinePuantaj from "./pages/MakineEkipman/MakinePuantaj/MakinePuantajAylik.jsx";
+import YakitTuketimiAnalizi from "./pages/Analizler/YakitTuketimiAnalizi/YakitTuketimiAnalizi.jsx";
 import AxiosInstance from "./api/http";
 
 // Malzemeler
@@ -153,6 +157,7 @@ const isOmegaMenu = menuHostname === "omegaerp.net" || menuHostname === "www.ome
 
 const rawItems = [
   getItem("Dashboard", "", <PieChartOutlined />),
+  getItem("Yönetim Dashboard", "yonetimDashboard", <PieChartOutlined />),
   // getItem("Option 1", "option1", <PieChartOutlined />),
   // getItem("Option 2", "option2", <DesktopOutlined />),
   getItem(
@@ -272,6 +277,7 @@ const rawItems = [
       getItem("Müdahale Süreleri Analizi", "mudaheleSuresi", true),
       getItem("Personel KPI Analizi", "analizler", true),
       getItem("Bakım KPI Analizi", "bakimKpi", true),
+      getItem("Yakıt Tüketimi Analizi", "yakitTuketimiAnalizi", true),
 
       // getItem("Team 2", "team2", true)
     ],
@@ -399,6 +405,7 @@ export default function App() {
         >
           {loginData?.Dashboard && <Route path="/" element={isOmega ? <SatinalmaDashboard /> : <Dashboard1 />} />}
           {/* <Route path="/isemri" element={<Isemri />} /> */}
+          <Route path="/yonetimDashboard" element={<YoneticiDashboard />} />
           <Route path="/isEmri1" element={<IsEmri />} />
           <Route path="/User" element={<ProfilEkrani />} />
           <Route path="/periyodikBakimlar" element={<PeriyodikBakimlar1 />} />
@@ -410,8 +417,8 @@ export default function App() {
           <Route path="/ekipmanVeritabani" element={<EkipmanVeritabani />} />
           <Route path="/durusTakibi" element={<DurusTakibi />} />
           <Route path="/sayacGuncelleme" element={<SayacGuncelleme />} />
-          <Route path="/gunlukMakinePuantajGirisi" element={<Hazirlaniyor />} />
-          <Route path="/aylikMakinePuantajlari" element={<Hazirlaniyor />} />
+          <Route path="/gunlukMakinePuantajGirisi" element={<MakinePuantaj />} />
+          <Route path="/aylikMakinePuantajlari" element={<AylikMakinePuantaj />} />
           <Route path="/makinePuantajTakibi" element={<Hazirlaniyor />} />
           <Route path="/operasyonTakibi" element={<Hazirlaniyor />} />
           <Route path="/personelIzinleri" element={<Hazirlaniyor />} />
@@ -460,6 +467,7 @@ export default function App() {
           <Route path="/yakitGirisleri" element={<YakitGirisleri />} />
           <Route path="/yakitHareketleri" element={<YakitHareketleri />} />
           <Route path="/hizliYakitGirisi" element={<HizliYakitGirisi />} />
+          <Route path="/yakitTuketimiAnalizi" element={<YakitTuketimiAnalizi />} />
           {/*<Route path="/kurallar" element={<Kurallar />} />*/}
         </Route>
       </Routes>
