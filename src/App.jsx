@@ -173,28 +173,9 @@ const rawItems = [
     "operasyonYonetimi",
     <AppstoreOutlined />,
     [
-      getItem(
-        "Makine Puantajları",
-        "makinePuantajlari",
-        "",
-        [
-          getItem("Günlük Makine Puantaj Girişi", "gunlukMakinePuantajGirisi", true),
-          getItem("Aylık Makine Puantajları", "aylikMakinePuantajlari", true),
-          getItem("Makine Puantaj Takibi", "makinePuantajTakibi", true),
-        ],
-        false
-      ),
-      getItem(
-        "Personel Puantajları",
-        "personelPuantajlari",
-        "",
-        [
-          getItem("Günlük Personel Puantaj Girişi", "gunlukPersonelPuantajGirisi", true),
-          getItem("Aylık Personel Puantajları", "aylikPersonelPuantajlari", true),
-          getItem("Personel Puantaj Takibi", "personelPuantajTakibi", true),
-        ],
-        false
-      ),
+      getItem("Günlük Ekipman Puantaj Girişi", "gunlukMakinePuantajGirisi", true),
+      getItem("Aylık Ekipman Puantajları", "aylikMakinePuantajlari", true),
+      getItem("Ekipman Puantaj Takibi", "makinePuantajTakibi", true),
       getItem("Operasyon Takibi", "operasyonTakibi", true),
     ],
     false
@@ -432,9 +413,6 @@ export default function App() {
           <Route path="/gunlukMakinePuantajGirisi" element={<Hazirlaniyor />} />
           <Route path="/aylikMakinePuantajlari" element={<Hazirlaniyor />} />
           <Route path="/makinePuantajTakibi" element={<Hazirlaniyor />} />
-          <Route path="/gunlukPersonelPuantajGirisi" element={<Hazirlaniyor />} />
-          <Route path="/aylikPersonelPuantajlari" element={<Hazirlaniyor />} />
-          <Route path="/personelPuantajTakibi" element={<Hazirlaniyor />} />
           <Route path="/operasyonTakibi" element={<Hazirlaniyor />} />
           <Route path="/personelIzinleri" element={<Hazirlaniyor />} />
           <Route path="/personelNobetleri" element={<Hazirlaniyor />} />
