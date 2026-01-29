@@ -159,7 +159,6 @@ export default function LoginForm() {
           operasyonTakibi: true,
           yakitTanimlari: true,
           yonetimDashboard: true,
-          makinePuantajlari: true,
           yakitTuketimiAnalizi: true,
         };
         const userInfo = {
