@@ -4,7 +4,7 @@ import { DatePicker } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import { t } from "i18next";
 
-export default function FullDatePicker({ name1, isRequired = false, pickType = null, disabled = false }) {
+export default function FullDatePicker({ name1, isRequired = false, pickType = null, disabled = false, placeholder }) {
   const {
     control,
     formState: { errors },
@@ -34,6 +34,7 @@ export default function FullDatePicker({ name1, isRequired = false, pickType = n
             status={errors[name1] ? "error" : ""}
             style={{ flex: 1, width: "100%" }}
             disabled={disabled}
+            placeholder={placeholder}
           />
         )}
       />
@@ -46,4 +47,5 @@ FullDatePicker.propTypes = {
   name1: PropTypes.string.isRequired,
   isRequired: PropTypes.bool,
   pickType: PropTypes.string,
+  placeholder: PropTypes.string,
 };

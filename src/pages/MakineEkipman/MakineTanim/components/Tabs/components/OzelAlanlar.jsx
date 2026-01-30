@@ -183,7 +183,7 @@ function OzelAlanlar(props) {
               {customFieldNames?.OZL_OZEL_ALAN_11 || t("ozelAlan11")}
             </Text>
             <div style={{ width: "100%", maxWidth: "300px", minWidth: "300px" }}>
-              <KodIDSelectbox name1="ozelAlan11" isRequired={false} kodID="32530" />
+              <KodIDSelectbox name1="ozelAlan11" isRequired={false} kodID="32530" placeholder="" />
             </div>
           </div>
 
@@ -192,7 +192,7 @@ function OzelAlanlar(props) {
               {customFieldNames?.OZL_OZEL_ALAN_12 || t("ozelAlan12")}
             </Text>
             <div style={{ width: "100%", maxWidth: "300px", minWidth: "300px" }}>
-              <KodIDSelectbox name1="ozelAlan12" isRequired={false} kodID="32531" />
+              <KodIDSelectbox name1="ozelAlan12" isRequired={false} kodID="32531" placeholder="" />
             </div>
           </div>
 
@@ -201,7 +201,7 @@ function OzelAlanlar(props) {
               {customFieldNames?.OZL_OZEL_ALAN_13 || t("ozelAlan13")}
             </Text>
             <div style={{ width: "100%", maxWidth: "300px", minWidth: "300px" }}>
-              <KodIDSelectbox name1="ozelAlan13" isRequired={false} kodID="32532" />
+              <KodIDSelectbox name1="ozelAlan13" isRequired={false} kodID="32532" placeholder="" />
             </div>
           </div>
 
@@ -210,7 +210,7 @@ function OzelAlanlar(props) {
               {customFieldNames?.OZL_OZEL_ALAN_14 || t("ozelAlan14")}
             </Text>
             <div style={{ width: "100%", maxWidth: "300px", minWidth: "300px" }}>
-              <KodIDSelectbox name1="ozelAlan14" isRequired={false} kodID="32533" />
+              <KodIDSelectbox name1="ozelAlan14" isRequired={false} kodID="32533" placeholder="" />
             </div>
           </div>
 
@@ -219,7 +219,7 @@ function OzelAlanlar(props) {
               {customFieldNames?.OZL_OZEL_ALAN_15 || t("ozelAlan15")}
             </Text>
             <div style={{ width: "100%", maxWidth: "300px", minWidth: "300px" }}>
-              <KodIDSelectbox name1="ozelAlan15" isRequired={false} kodID="32534" />
+              <KodIDSelectbox name1="ozelAlan15" isRequired={false} kodID="32534" placeholder="" />
             </div>
           </div>
 

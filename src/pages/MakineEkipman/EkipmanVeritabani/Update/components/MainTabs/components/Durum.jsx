@@ -131,7 +131,6 @@ export default function Durum() {
               // style={{ maxWidth: "300px", width: "100%" }}
               showSearch
               allowClear
-              placeholder="Seçim Yapınız"
               optionFilterProp="children"
               filterOption={(input, option) => (option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false)}
               onDropdownVisibleChange={(open) => {
@@ -152,7 +151,7 @@ export default function Durum() {
                       padding: "0 8px 4px",
                     }}
                   >
-                    <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
+                    <Input ref={inputRef} value={name} onChange={onNameChange} />
                     <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
                       Ekle
                     </Button>

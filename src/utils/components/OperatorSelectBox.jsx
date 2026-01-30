@@ -26,7 +26,7 @@ const StyledDiv = styled.div`
   }
 `;
 
-export default function OperatorSelectBox({ name1, isRequired }) {
+export default function OperatorSelectBox({ name1, isRequired, placeholder }) {
   const {
     control,
     setValue,
@@ -48,6 +48,8 @@ export default function OperatorSelectBox({ name1, isRequired }) {
       setLoading(false);
     }
   };
+
+  const resolvedPlaceholder = placeholder ?? t("secimYapiniz");
 
   return (
     <StyledDiv
@@ -71,7 +73,7 @@ export default function OperatorSelectBox({ name1, isRequired }) {
             // style={{ maxWidth: "300px", width: "100%" }}
             showSearch
             allowClear
-            placeholder={t("secimYapiniz")}
+            placeholder={resolvedPlaceholder}
             optionFilterProp="children"
             filterOption={(input, option) => (option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false)}
             onDropdownVisibleChange={(open) => {
@@ -111,4 +113,5 @@ export default function OperatorSelectBox({ name1, isRequired }) {
 OperatorSelectBox.propTypes = {
   name1: PropTypes.string.isRequired,
   isRequired: PropTypes.bool,
+  placeholder: PropTypes.string,
 };

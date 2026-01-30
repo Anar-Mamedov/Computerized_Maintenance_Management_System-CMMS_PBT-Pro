@@ -50,11 +50,11 @@ export function FinansalBilgiler(props) {
             </div>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "calc(50% - 5px)" }}>
               <Text type="secondary">{t("satinalmaTarihi")}</Text>
-              <FullDatePicker name1="satinalmaTarihi" isRequired={false} />
+              <FullDatePicker name1="satinalmaTarihi" isRequired={false} placeholder="" />
             </div>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "calc(50% - 5px)" }}>
               <Text type="secondary">{t("faturaTarihi")}</Text>
-              <FullDatePicker name1="faturaTarihi" isRequired={false} />
+              <FullDatePicker name1="faturaTarihi" isRequired={false} placeholder="" />
             </div>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "calc(50% - 5px)" }}>
               <Text type="secondary">{t("satinalmaFiyati")}</Text>
@@ -91,7 +91,7 @@ export function FinansalBilgiler(props) {
             </div>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "calc(50% - 5px)" }}>
               <Text type="secondary">{t("baslamaTarihi")}</Text>
-              <FullDatePicker name1="krediBaslamaTarihi" isRequired={false} />
+              <FullDatePicker name1="krediBaslamaTarihi" isRequired={false} placeholder="" />
             </div>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "calc(50% - 5px)" }}>
               <Text type="secondary">{t("krediOrani(%Ay)")}</Text>
@@ -99,7 +99,7 @@ export function FinansalBilgiler(props) {
             </div>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "calc(50% - 5px)" }}>
               <Text type="secondary">{t("bitisTarihi")}</Text>
-              <FullDatePicker name1="krediBitisTarihi" isRequired={false} />
+              <FullDatePicker name1="krediBitisTarihi" isRequired={false} placeholder="" />
             </div>
           </div>
         </div>
@@ -133,11 +133,11 @@ export function FinansalBilgiler(props) {
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
             <Text type="secondary">{t("baslamaTarihi")}</Text>
-            <FullDatePicker name1="kiraBaslangicTarihi" isRequired={false} disabled={!watch("kiralik")} />
+            <FullDatePicker name1="kiraBaslangicTarihi" isRequired={false} disabled={!watch("kiralik")} placeholder="" />
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
             <Text type="secondary">{t("bitisTarihi")}</Text>
-            <FullDatePicker name1="kiraBitisTarihi" isRequired={false} disabled={!watch("kiralik")} />
+            <FullDatePicker name1="kiraBitisTarihi" isRequired={false} disabled={!watch("kiralik")} placeholder="" />
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
             <Text type="secondary">{t("kiraSuresi")}</Text>
@@ -146,7 +146,7 @@ export function FinansalBilgiler(props) {
                 <NumberInput name1="kiraSuresi" required={false} minNumber={0} disabled={!watch("kiralik")} />
               </div>
               <div style={{ width: "205px" }}>
-                <KodIDSelectbox name1="kiraSuresiBirim" kodID={32001} isRequired={false} disabled={!watch("kiralik")} />
+                <KodIDSelectbox name1="kiraSuresiBirim" kodID={32001} isRequired={false} disabled={!watch("kiralik")} placeholder="" />
               </div>
             </div>
           </div>
@@ -191,7 +191,7 @@ export function FinansalBilgiler(props) {
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
             <Text type="secondary">{t("satisTarihi")}</Text>
-            <FullDatePicker name1="satisTarihi" isRequired={false} disabled={!watch("satildi")} />
+            <FullDatePicker name1="satisTarihi" isRequired={false} disabled={!watch("satildi")} placeholder="" />
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "300px" }}>
             <Text type="secondary">{t("satisYeri")}</Text>

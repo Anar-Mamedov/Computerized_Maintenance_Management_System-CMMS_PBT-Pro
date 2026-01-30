@@ -46,27 +46,27 @@ export function DetayBilgi(props) {
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
             <Text type="secondary">{t("bakimGrubu")}</Text>
-            <KodIDSelectbox name1="bakimGrubu" kodID={32441} isRequired={false} style={{ width: "100%" }} />
+            <KodIDSelectbox name1="bakimGrubu" kodID={32441} isRequired={false} style={{ width: "100%" }} placeholder="" />
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
             <Text type="secondary">{t("arizaGrubu")}</Text>
-            <KodIDSelectbox name1="arizaGrubu" kodID={32402} isRequired={false} />
+            <KodIDSelectbox name1="arizaGrubu" kodID={32402} isRequired={false} placeholder="" />
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
             <Text type="secondary">{t("servisSaglayici")}</Text>
-            <KodIDSelectbox name1="servisSaglayici" kodID={32508} isRequired={false} />
+            <KodIDSelectbox name1="servisSaglayici" kodID={32508} isRequired={false} placeholder="" />
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
             <Text type="secondary">{t("servisSekli")}</Text>
-            <KodIDSelectbox name1="servisSekli" kodID={32509} isRequired={false} />
+            <KodIDSelectbox name1="servisSekli" kodID={32509} isRequired={false} placeholder="" />
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
             <Text type="secondary">{t("teknikSeviyesi")}</Text>
-            <KodIDSelectbox name1="teknikSeviyesi" kodID={32510} isRequired={false} />
+            <KodIDSelectbox name1="teknikSeviyesi" kodID={32510} isRequired={false} placeholder="" />
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
             <Text type="secondary">{t("fizikselDurumu")}</Text>
-            <KodIDSelectbox name1="fizikselDurumu" kodID={32511} isRequired={false} />
+            <KodIDSelectbox name1="fizikselDurumu" kodID={32511} isRequired={false} placeholder="" />
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
             <Text type="secondary">{t("oncelik")}</Text>
@@ -86,11 +86,11 @@ export function DetayBilgi(props) {
         <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", gap: "10px" }}>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
             <Text type="secondary">{t("kurulumTarihi")}</Text>
-            <FullDatePicker name1="kurulumTarihi" isRequired={false} />
+            <FullDatePicker name1="kurulumTarihi" isRequired={false} placeholder="" />
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
             <Text type="secondary">{t("isletimSistemi")}</Text>
-            <KodIDSelectbox name1="isletimSistemi" kodID={32513} isRequired={false} />
+            <KodIDSelectbox name1="isletimSistemi" kodID={32513} isRequired={false} placeholder="" />
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
             <Text type="secondary">{t("ipNo")}</Text>
@@ -103,7 +103,7 @@ export function DetayBilgi(props) {
                 <NumberInput name1="agirlik" required={false} minNumber={0} />
               </div>
               <div style={{ flex: "1 1 70%" }}>
-                <KodIDSelectbox name1="agirlikBirim" kodID={32001} isRequired={false} />
+                <KodIDSelectbox name1="agirlikBirim" kodID={32001} isRequired={false} placeholder="" />
               </div>
             </div>
           </div>
@@ -114,7 +114,7 @@ export function DetayBilgi(props) {
                 <NumberInput name1="hacim" required={false} minNumber={0} />
               </div>
               <div style={{ flex: "1 1 70%" }}>
-                <KodIDSelectbox name1="hacimBirim" kodID={32001} isRequired={false} />
+                <KodIDSelectbox name1="hacimBirim" kodID={32001} isRequired={false} placeholder="" />
               </div>
             </div>
           </div>
@@ -126,7 +126,7 @@ export function DetayBilgi(props) {
                 <NumberInput name1="kapasite" required={false} minNumber={0} />
               </div>
               <div style={{ flex: "1 1 70%" }}>
-                <KodIDSelectbox name1="kapasiteBirim" kodID={32001} isRequired={false} />
+                <KodIDSelectbox name1="kapasiteBirim" kodID={32001} isRequired={false} placeholder="" />
               </div>
             </div>
           </div>
@@ -138,7 +138,7 @@ export function DetayBilgi(props) {
                 <NumberInput name1="elektrikTuketimi" required={false} minNumber={0} />
               </div>
               <div style={{ flex: "1 1 70%" }}>
-                <KodIDSelectbox name1="elektrikTuketimiBirim" kodID={32001} isRequired={false} />
+                <KodIDSelectbox name1="elektrikTuketimiBirim" kodID={32001} isRequired={false} placeholder="" />
               </div>
             </div>
           </div>
@@ -169,32 +169,32 @@ export function DetayBilgi(props) {
         <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", gap: "10px" }}>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
             <Text type="secondary">{t("valfTipi")}</Text>
-            <KodIDSelectbox name1="valfTipi" kodID={32514} isRequired={false} />
+            <KodIDSelectbox name1="valfTipi" kodID={32514} isRequired={false} placeholder="" />
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
             <Text type="secondary">{t("valfBoyutu")}</Text>
-            <KodIDSelectbox name1="valfBoyutu" kodID={32515} isRequired={false} />
+            <KodIDSelectbox name1="valfBoyutu" kodID={32515} isRequired={false} placeholder="" />
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
             <Text type="secondary">{t("girisBoyutu")}</Text>
-            <KodIDSelectbox name1="girisBoyutu" kodID={32516} isRequired={false} />
+            <KodIDSelectbox name1="girisBoyutu" kodID={32516} isRequired={false} placeholder="" />
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
             <Text type="secondary">{t("cikisBoyutu")}</Text>
-            <KodIDSelectbox name1="cikisBoyutu" kodID={32517} isRequired={false} />
+            <KodIDSelectbox name1="cikisBoyutu" kodID={32517} isRequired={false} placeholder="" />
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
             <Text type="secondary">{t("konnektor")}</Text>
-            <KodIDSelectbox name1="konnektor" kodID={32518} isRequired={false} />
+            <KodIDSelectbox name1="konnektor" kodID={32518} isRequired={false} placeholder="" />
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
             <Text type="secondary">{t("ekipmanBasinc")}</Text>
-            <KodIDSelectbox name1="makineBasinc" kodID={32519} isRequired={false} />
+            <KodIDSelectbox name1="makineBasinc" kodID={32519} isRequired={false} placeholder="" />
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
@@ -204,7 +204,7 @@ export function DetayBilgi(props) {
                 <NumberInput name1="basincMiktar" required={false} minNumber={0} />
               </div>
               <div style={{ flex: "1 1 70%" }}>
-                <KodIDSelectbox name1="basincMiktarBirim" kodID={32001} isRequired={false} />
+                <KodIDSelectbox name1="basincMiktarBirim" kodID={32001} isRequired={false} placeholder="" />
               </div>
             </div>
           </div>

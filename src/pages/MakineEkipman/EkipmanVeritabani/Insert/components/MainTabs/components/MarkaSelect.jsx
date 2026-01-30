@@ -37,7 +37,6 @@ export default function MarkaSelect() {
             style={{ width: "250px" }}
             showSearch
             allowClear
-            placeholder="Seçim Yapınız"
             optionFilterProp="children"
             filterOption={(input, option) => (option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false)}
             onDropdownVisibleChange={(open) => {

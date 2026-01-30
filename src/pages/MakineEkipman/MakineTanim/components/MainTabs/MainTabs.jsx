@@ -69,26 +69,26 @@ export default function MainTabs({ refreshKey }) {
               {t("ekipmanTipi")}
               <span className="text-[#c90000]">*</span>
             </Text>
-            <KodIDSelectbox name1="makineTipi" kodID={32501} isRequired={true} />
+            <KodIDSelectbox name1="makineTipi" kodID={32501} isRequired={true} placeholder="" />
           </div>
           <div className="flex flex-col items-start w-[calc(50%-5px)]">
             <Text type="secondary">{t("kategori")}</Text>
-            <KodIDSelectbox name1="kategori" kodID={32502} isRequired={false} />
+            <KodIDSelectbox name1="kategori" kodID={32502} isRequired={false} placeholder="" />
           </div>
 
           <div className="flex flex-col items-start w-[calc(50%-5px)]">
             <Text type="secondary">{t("operator")}</Text>
-            <OperatorSelectBox name1="operator" isRequired={false} />
+            <OperatorSelectBox name1="operator" isRequired={false} placeholder="" />
           </div>
 
           <div className="flex flex-col items-start w-[calc(50%-5px)]">
             <Text type="secondary">{t("marka")}</Text>
-            <MarkaEkleSelect markaFieldName="marka" markaIdFieldName="markaID" />
+            <MarkaEkleSelect markaFieldName="marka" markaIdFieldName="markaID" placeholder="" />
           </div>
 
           <div className="flex flex-col items-start w-[calc(50%-5px)]">
             <Text type="secondary">{t("model")}</Text>
-            <ModelEkleSelect modelFieldName="model" modelIdFieldName="modelID" markaIdFieldName="markaID" />
+            <ModelEkleSelect modelFieldName="model" modelIdFieldName="modelID" markaIdFieldName="markaID" placeholder="" />
           </div>
         </div>
       </div>
@@ -112,7 +112,7 @@ export default function MainTabs({ refreshKey }) {
         <div className="flex flex-row flex-wrap w-full gap-[10px]">
           <div className="flex flex-col items-start w-[calc(50%-5px)]">
             <Text type="secondary">{t("durum")}</Text>
-            <KodIDSelectbox name1="operasyonDurumu" kodID={32505} isRequired={false} onLabelChange={(label) => setValue("operasyonDurumuText", label ?? null)} />
+            <KodIDSelectbox name1="operasyonDurumu" kodID={32505} isRequired={false} placeholder="" onLabelChange={(label) => setValue("operasyonDurumuText", label ?? null)} />
           </div>
           <div className="flex flex-col items-start w-[calc(50%-5px)]">
             <Text type="secondary">{t("seriNo")}</Text>
@@ -132,11 +132,11 @@ export default function MainTabs({ refreshKey }) {
           </div>
           <div className="flex flex-col items-start w-[calc(50%-5px)]">
             <Text type="secondary">{t("uretimYili")}</Text>
-            <FullDatePicker name1="uretimYili" isRequired={false} pickType="year" />
+            <FullDatePicker name1="uretimYili" isRequired={false} pickType="year" placeholder="" />
           </div>
           <div className="flex flex-col items-start w-[calc(50%-5px)]">
             <Text type="secondary">{t("garantiBitisTarihi")}</Text>
-            <FullDatePicker name1="garantiBitisTarihi" isRequired={false} />
+            <FullDatePicker name1="garantiBitisTarihi" isRequired={false} placeholder="" />
           </div>
           <div className="flex flex-col items-start w-[calc(50%-5px)]">
             <Text type="secondary">{t("durusBirimMaliyeti(ucret/saat)")}</Text>
