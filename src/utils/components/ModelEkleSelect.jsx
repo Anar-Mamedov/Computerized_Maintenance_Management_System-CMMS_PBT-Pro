@@ -12,6 +12,7 @@ export default function ModelEkleSelect({
   modelIdFieldName = "MakineModelID",
   markaIdFieldName = "MakineMarkaID",
   style = {},
+  placeholder = "Seçim Yapınız",
 }) {
   // useFormContext is replaced with useForm for local form state management
   const { control, setValue, watch } = useFormContext();
@@ -164,7 +165,7 @@ export default function ModelEkleSelect({
               disabled={!selectedMarkaID}
               showSearch
               allowClear
-              placeholder="Seçim Yapınız"
+              placeholder={placeholder}
               optionFilterProp="children"
               filterOption={(input, option) => (option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false)}
               onDropdownVisibleChange={(open) => {
@@ -267,4 +268,5 @@ ModelEkleSelect.propTypes = {
   modelIdFieldName: PropTypes.string,
   markaIdFieldName: PropTypes.string,
   style: PropTypes.object,
+  placeholder: PropTypes.string,
 };

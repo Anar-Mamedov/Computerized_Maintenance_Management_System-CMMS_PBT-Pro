@@ -29,7 +29,7 @@ const StyledDiv = styled.div`
   }
 `;
 
-export default function KodIDSelectbox({ name1, kodID, isRequired, disabled = false, style = {}, onLabelChange }) {
+export default function KodIDSelectbox({ name1, kodID, isRequired, disabled = false, style = {}, onLabelChange, placeholder = "Seçim Yapınız" }) {
   const {
     control,
     watch,
@@ -122,7 +122,7 @@ export default function KodIDSelectbox({ name1, kodID, isRequired, disabled = fa
             // style={{ maxWidth: "300px", width: "100%" }}
             showSearch
             allowClear
-            placeholder="Seçim Yapınız"
+            placeholder={placeholder}
             optionFilterProp="children"
             filterOption={(input, option) => (option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false)}
             onDropdownVisibleChange={(open) => {

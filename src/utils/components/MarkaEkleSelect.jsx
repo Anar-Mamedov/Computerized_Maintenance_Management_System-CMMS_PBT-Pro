@@ -5,7 +5,14 @@ import { useFormContext, Controller } from "react-hook-form";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import PropTypes from "prop-types";
 
-export default function MarkaEkleSelect({ workshopSelectedId, onSubmit, markaFieldName = "MakineMarka", markaIdFieldName = "MakineMarkaID", style = {} }) {
+export default function MarkaEkleSelect({
+  workshopSelectedId,
+  onSubmit,
+  markaFieldName = "MakineMarka",
+  markaIdFieldName = "MakineMarkaID",
+  style = {},
+  placeholder = "Seçim Yapınız",
+}) {
   // useFormContext is replaced with useForm for local form state management
   const { control, setValue } = useFormContext();
 
@@ -147,7 +154,7 @@ export default function MarkaEkleSelect({ workshopSelectedId, onSubmit, markaFie
               style={{ width: "100%", ...style }}
               showSearch
               allowClear
-              placeholder="Seçim Yapınız"
+              placeholder={placeholder}
               optionFilterProp="children"
               filterOption={(input, option) => (option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false)}
               onDropdownVisibleChange={(open) => {
@@ -248,4 +255,5 @@ MarkaEkleSelect.propTypes = {
   markaFieldName: PropTypes.string,
   markaIdFieldName: PropTypes.string,
   style: PropTypes.object,
+  placeholder: PropTypes.string,
 };
