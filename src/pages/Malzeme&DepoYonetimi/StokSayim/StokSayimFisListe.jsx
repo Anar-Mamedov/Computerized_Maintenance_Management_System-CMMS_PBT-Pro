@@ -108,22 +108,24 @@ export default function AntDStockCountList() {
 
   const columns = [
     {
-  title: "Sayım No",
-  dataIndex: "countNo",
-  key: "countNo",
-  render: (text, record) => (
-    <Text 
-      strong 
-      style={{ color: '#1890ff', cursor: 'pointer' }}
-      onClick={() => {
-        setSelectedReceipt(record);
-        setIsDetailOpen(true);
-      }}
-    >
-      {text}
-    </Text>
-  ),
-},
+      title: "Sayım No",
+      key: "countNo",
+      render: (_, record) => (
+        <Space direction="vertical" size={0}>
+          <Text 
+            strong 
+            style={{ color: '#1890ff', cursor: 'pointer', fontSize: '15px' }}
+            onClick={() => {
+              setSelectedReceipt(record);
+              setIsDetailOpen(true);
+            }}
+          >
+            {record.countNo}
+          </Text>
+          <Text type="secondary" style={{ fontSize: '12px' }}>{record.title}</Text>
+        </Space>
+      ),
+    },
     {
       title: "Durum",
       dataIndex: "state",
@@ -136,30 +138,74 @@ export default function AntDStockCountList() {
     },
     {
       title: "Depo",
-      dataIndex: "warehouse",
-      key: "warehouse",
-      icon: <EnvironmentOutlined />,
-    },
-    {
-      title: "Başlangıç / Bitiş",
-      key: "dates",
+      key: "warehouseKind",
       render: (_, record) => (
         <Space direction="vertical" size={0}>
-          <Text size="small"><HistoryOutlined /> {record.startedAt}</Text>
-          {record.endedAt && <Text type="secondary" size="small"><CheckCircleOutlined /> {record.endedAt}</Text>}
+          <Text strong><EnvironmentOutlined /> {record.warehouse}</Text>
         </Space>
       ),
     },
     {
-      title: "Kalem / Fark",
-      key: "counts",
-      align: "right",
+      title: "Tür",
+      key: "warehouseKind",
       render: (_, record) => (
-        <Space direction="vertical" align="end" size={0}>
-          <Text strong>{record.itemCount}</Text>
-          <Text type={record.diffCount > 0 ? "danger" : "success"}>
-            {record.diffCount > 0 ? `${record.diffCount} Fark` : "Tam Uyum"}
+        <Space direction="vertical" size={0}>
+          <Text strong><EnvironmentOutlined /> {record.kind}</Text>
+        </Space>
+      ),
+    },
+    {
+      title: "Başlangıç",
+      key: "dates",
+      render: (_, record) => (
+        <Space direction="vertical" size={0}>
+          <Text style={{ fontSize: '13px' }}>{record.startedAt}</Text>
+          <Text type="secondary" style={{ fontSize: '13px' }}>
+            {record.startedAt ? record.startedAt : "—"}
           </Text>
+        </Space>
+      ),
+    },
+    {
+      title: "Bitiş",
+      key: "dates",
+      render: (_, record) => (
+        <Space direction="vertical" size={0}>
+          <Text style={{ fontSize: '13px' }}>{record.endedAt}</Text>
+          <Text type="secondary" style={{ fontSize: '13px' }}>
+            {record.endedAt ? record.endedAt : "—"}
+          </Text>
+        </Space>
+      ),
+    },
+    {
+      title: "Kalem",
+      key: "counts",
+      render: (_, record) => (
+        <Space direction="vertical" size={0}>
+          <Text strong>{record.itemCount}</Text>
+        </Space>
+      ),
+    },
+    {
+      title: "Fark",
+      key: "counts",
+      render: (_, record) => (
+        <Space direction="vertical" size={0}>
+          <Text type={record.diffCount > 0 ? "danger" : "success"} style={{ fontSize: '12px' }}>
+            {record.diffCount > 0 ? `${record.diffCount} farklı kalem` : "tam uyum"}
+          </Text>
+        </Space>
+      ),
+    },
+    {
+      title: "Açan",
+      dataIndex: "createdBy",
+      key: "createdBy",
+      render: (text) => (
+        <Space>
+          <UserOutlined style={{ color: '#bfbfbf' }} />
+          <Text>{text}</Text>
         </Space>
       ),
     },
@@ -171,7 +217,9 @@ export default function AntDStockCountList() {
         record.state === "open" ? (
           <Button 
             danger 
-            size="small" 
+            type="primary"
+            ghost
+            size="middle" 
             onClick={() => {
               setTargetReceipt(record);
               setCloseModalVisible(true);
@@ -180,7 +228,7 @@ export default function AntDStockCountList() {
             Kapat
           </Button>
         ) : (
-          <Button icon={<EyeOutlined />} size="small">Görüntüle</Button>
+          <Button icon={<EyeOutlined />} size="middle">Görüntüle</Button>
         )
       ),
     },
@@ -194,8 +242,12 @@ export default function AntDStockCountList() {
   });
 
   return (
-    <div style={{ padding: 24, background: "#f5f5f5", minHeight: "100vh" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+    <div style={{ 
+      padding: "20px 2%", // Padding'i yüzdeye çevirdik, kenarlardan her zaman nefes alır
+      background: "#f0f2f5", 
+      minHeight: "100vh" 
+    }}>
+      <div style={{ maxWidth: 1800, margin: "0 auto", width: '100%' }}>
         
         {/* Üst Başlık Alanı */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>

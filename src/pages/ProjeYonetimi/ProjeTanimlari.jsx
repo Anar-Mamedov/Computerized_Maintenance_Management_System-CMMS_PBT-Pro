@@ -16,19 +16,14 @@ import {
   Col,
   Typography,
   Divider,
+  Modal
 } from "antd";
 import {
-  SearchOutlined,
-  DownloadOutlined,
-  MoreOutlined,
-  PlusOutlined,
-  ProjectOutlined,
-  DashboardOutlined,
-  DollarOutlined,
-  InfoCircleOutlined,
-  CheckCircleOutlined,
-  CalendarOutlined
+  SearchOutlined, DownloadOutlined, MoreOutlined, PlusOutlined,
+  CalendarOutlined, UserOutlined, EnvironmentOutlined, LinkOutlined,
+  ToolOutlined, TeamOutlined, DeploymentUnitOutlined, NodeIndexOutlined
 } from "@ant-design/icons";
+import ProjeGuncelleme from "./ProjeTanimlariGuncelleme";
 
 const { Text, Title } = Typography;
 
@@ -38,151 +33,222 @@ const { Text, Title } = Typography;
 const mockProjeler = [
   {
     key: "1",
-    id: "PRJ-0001",
     projeKodu: "PRJ0001",
     projeTanimi: "Havalimanı Proje İnşaatı",
-    projeTipi: "Altyapı",
-    firma: "Orjin Yazılım",
-    lokasyon: "Muğla, TR",
-    projeYoneticisi: "N. Kaya",
+    riskSkoru: "Risk - 78",
     projeDurumu: "Devam Ediyor",
     oncelik: "Kritik",
+    projeTipi: "Altyapı",
+    firma: "Orjin Yazılım",
+    lokasyon: "Türkiye / Muğla",
+    projeYoneticisi: "N. Kaya",
     baslamaTarihi: "2025-03-01",
     bitisTarihi: "2026-03-05",
+    fizikselYuzde: 40,
+    planlananYuzde: 48,
     paraBirimi: "EUR",
     butce: 3100000,
     harcama: 3015000,
     cpi: 1.01,
-    tamamlanmaYuzde: 40,
-    planlananYuzde: 48,
+    kaynaklar: { makine: 46, personel: 210, taseron: 9, wbs: 98 },
+    kurumsal: { masrafMerkezi: "MM-ALTY-001", bagliProje: "ANA-ALTY-2025" }
   },
   {
     key: "2",
-    id: "PRJ-0002",
     projeKodu: "PRJ0060",
     projeTanimi: "Kadıköy Çöp Toplama",
-    projeTipi: "Kent Temizliği",
-    firma: "Belediye İştiraki",
-    lokasyon: "İstanbul, TR",
-    projeYoneticisi: "M. Yıldırım",
+    riskSkoru: "İyi - 83",
     projeDurumu: "Devam Ediyor",
     oncelik: "Normal",
+    projeTipi: "Kent Temizliği",
+    firma: "Belediye İştiraki",
+    lokasyon: "Türkiye / İstanbul",
+    projeYoneticisi: "M. Yıldırım",
     baslamaTarihi: "2025-07-01",
-    bitisTarihi: "2025-12-31",
-    paraBirimi: "TRY",
-    butce: 1250000,
-    harcama: 1100000,
-    cpi: 1.12,
-    tamamlanmaYuzde: 23,
+    bitisTarihi: "2025-07-01",
+    fizikselYuzde: 23,
     planlananYuzde: 25,
+    paraBirimi: "TRY",
+    butce: 0,
+    harcama: 0,
+    cpi: 1.00,
+    kaynaklar: { makine: 12, personel: 65, taseron: 1, wbs: 12 },
+    kurumsal: { masrafMerkezi: "MM-KENT-004", bagliProje: "-" }
   }
 ];
 
 export default function AntDProjectList() {
   const [searchText, setSearchText] = useState("");
-  const [selectedProject, setSelectedProject] = useState(null);
-  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeProject, setActiveProject] = useState(null);
 
   const money = (val, cur) => `${val.toLocaleString("tr-TR")} ${cur}`;
 
   const columns = [
     {
-      title: "Proje Tanımı",
-      key: "project",
+      title: "Proje",
+      key: "proje",
       fixed: "left",
-      width: 280,
+      width: 350,
       render: (_, r) => (
-        <Space direction="vertical" size={0}>
-          <Text strong className="text-blue-600 cursor-pointer" onClick={() => { setSelectedProject(r); setDrawerVisible(true); }}>
-            {r.projeTanimi}
-          </Text>
-          <Text type="secondary" style={{ fontSize: 11 }}>{r.projeKodu} · {r.projeTipi}</Text>
-        </Space>
-      ),
-    },
-    {
-      title: "Durum",
-      dataIndex: "projeDurumu",
-      key: "status",
-      width: 130,
-      render: (st) => <Tag color={st === "Devam Ediyor" ? "processing" : "default"}>{st}</Tag>,
-    },
-    {
-      title: "Tarihler",
-      key: "dates",
-      width: 180,
-      render: (_, r) => (
-        <Space direction="vertical" size={0}>
-          <Text style={{ fontSize: 12 }}><CalendarOutlined /> {r.baslamaTarihi}</Text>
-          <Text type="secondary" style={{ fontSize: 12 }}><CheckCircleOutlined /> {r.bitisTarihi}</Text>
-        </Space>
-      ),
-    },
-    {
-      title: "İlerleme (Fiziksel / Plan)",
-      key: "progress",
-      width: 220,
-      render: (_, r) => (
-        <div style={{ width: 180 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-            <Text size="small" type="secondary">Fiziksel: {r.tamamlanmaYuzde}%</Text>
-            <Text size="small" strong>{r.planlananYuzde}%</Text>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {/* Üst Satır: Proje Adı ve Sağda Risk Skoru */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <Text 
+              strong 
+              style={{ color: '#111827', cursor: 'pointer', fontSize: '14px', lineHeight: '1.2' }}
+              onClick={() => {
+                setActiveProject(r);
+                setIsModalOpen(true);
+              }}
+            >
+              {r.projeTanimi}
+            </Text>
+            <Tag color={r.riskSkoru.includes("Risk") ? "orange" : "green"} bordered={false} style={{ fontSize: '11px', margin: 0 }}>
+              {r.riskSkoru}
+            </Tag>
           </div>
-          <Progress 
-            percent={r.tamamlanmaYuzde} 
-            success={{ percent: r.planlananYuzde }} 
-            size="small" 
-            showInfo={false}
-          />
+
+          {/* Orta Satır: Proje Kodu */}
+          <Text type="secondary" style={{ fontSize: '12px' }}>{r.projeKodu}</Text>
+
+          {/* Alt Satır: Etiketler (Durum - Öncelik - Tip) */}
+          <Space wrap size={[4, 0]} style={{ marginTop: '2px' }}>
+            <Tag color="blue" style={{ fontSize: '11px' }}>{r.projeDurumu}</Tag>
+            <Tag color="volcano" style={{ fontSize: '11px' }}>{r.oncelik}</Tag>
+            <Tag style={{ fontSize: '11px' }}>{r.projeTipi}</Tag>
+          </Space>
+
+          {/* En Alt: Firma ve Lokasyon */}
+          <Text type="secondary" style={{ fontSize: '11px', marginTop: '2px' }}>
+            {r.firma} • {r.lokasyon}
+          </Text>
         </div>
       ),
     },
     {
-      title: "Mali Durum",
-      key: "financial",
+      title: "Proje Yöneticisi",
+      dataIndex: "projeYoneticisi",
+      key: "pm",
+      width: 150,
+      render: (text) => (
+        <Space>
+          <UserOutlined style={{ color: '#bfbfbf' }} />
+          <Text style={{ fontSize: '13px' }}>{text}</Text>
+        </Space>
+      )
+    },
+    {
+      title: "Tarih",
+      key: "dates",
+      width: 200,
+      render: (_, r) => (
+        <div style={{ fontSize: '12px' }}>
+          <div><Text type="secondary">Başlangıç:</Text> {r.baslamaTarihi}</div>
+          <div><Text type="secondary">Bitiş:</Text> {r.bitisTarihi}</div>
+        </div>
+      ),
+    },
+    {
+      title: "Tamamlanma",
+      key: "progress",
       width: 200,
       render: (_, r) => {
-        const diff = r.harcama - r.butce;
+        const diff = r.fizikselYuzde - r.planlananYuzde;
         return (
-          <Space direction="vertical" size={0}>
-            <Text style={{ fontSize: 12 }}>Harcama: {money(r.harcama, r.paraBirimi)}</Text>
-            <Text type={diff > 0 ? "danger" : "success"} style={{ fontSize: 11 }}>
-              Sapma: {diff > 0 ? "+" : ""}{money(diff, r.paraBirimi)}
-            </Text>
-          </Space>
+          <div style={{ width: '100%', paddingRight: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+              <Text type="secondary" style={{ fontSize: '11px' }}>Fiziksel</Text>
+              <Text strong style={{ fontSize: '11px', color: diff < 0 ? '#ff4d4f' : '#52c41a' }}>
+                {diff === 0 ? "Planla aynı" : `${diff > 0 ? "+" : ""}${diff}%`}
+              </Text>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Progress 
+                percent={r.fizikselYuzde} 
+                strokeColor={r.fizikselYuzde < r.planlananYuzde ? '#1890ff' : '#52c41a'}
+                showInfo={false}
+                size={[100, 8]}
+              />
+              <Text strong style={{ fontSize: '13px' }}>{r.fizikselYuzde}%</Text>
+            </div>
+            <Text type="secondary" style={{ fontSize: '11px' }}>Planlanan: <Text strong style={{ fontSize: '11px' }}>{r.planlananYuzde}%</Text></Text>
+          </div>
         );
       },
     },
     {
-      title: "CPI",
-      dataIndex: "cpi",
-      key: "cpi",
-      width: 80,
-      render: (v) => <Tag color={v >= 1 ? "green" : "red"}>{v.toFixed(2)}</Tag>
+      title: "Bütçe",
+      key: "financial",
+      width: 220,
+      render: (_, r) => {
+        const sapma = r.harcama - r.butce;
+        return (
+          <div style={{ fontSize: '12px', lineHeight: '1.6' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Text type="secondary">Bütçe</Text>
+              <Text strong>{money(r.butce, r.paraBirimi)}</Text>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Text type="secondary">Harcama</Text>
+              <Text>{money(r.harcama, r.paraBirimi)}</Text>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Text type="secondary">Sapma</Text>
+              <Text strong style={{ color: sapma > 0 ? '#ff4d4f' : '#52c41a' }}>
+                {sapma > 0 ? "+" : ""}{money(sapma, r.paraBirimi)}
+              </Text>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #f0f0f0', marginTop: '4px' }}>
+              <Text type="secondary">CPI</Text>
+              <Text strong style={{ color: r.cpi >= 1 ? '#52c41a' : '#ff4d4f' }}>{r.cpi.toFixed(2)}</Text>
+            </div>
+          </div>
+        );
+      },
     },
     {
-      title: "İşlem",
-      key: "action",
-      fixed: "right",
-      width: 80,
-      align: "center",
+      title: "Kaynaklar",
+      key: "resources",
+      width: 150,
       render: (_, r) => (
-        <Dropdown menu={{ items: [{ key: '1', label: 'Düzenle' }, { key: '2', label: 'Rapor Al' }] }}>
-          <Button type="text" icon={<MoreOutlined />} />
-        </Dropdown>
-      ),
+        <Space direction="vertical" size={2}>
+          <Text style={{ fontSize: 12 }}><ToolOutlined /> Makine: <b>{r.kaynaklar.makine}</b></Text>
+          <Text style={{ fontSize: 12 }}><TeamOutlined /> Personel: <b>{r.kaynaklar.personel}</b></Text>
+          <Text style={{ fontSize: 12 }}><DeploymentUnitOutlined /> Taşeron: <b>{r.kaynaklar.taseron}</b></Text>
+          <Text style={{ fontSize: 12 }}><NodeIndexOutlined /> WBS: <b>{r.kaynaklar.wbs}</b></Text>
+        </Space>
+      )
     },
+    {
+      title: "Kurumsal",
+      key: "corporate",
+      width: 220,
+      render: (_, r) => (
+        <Space direction="vertical" size={2}>
+          <div><Text type="secondary" style={{ fontSize: 11 }}>Masraf Merkezi</Text><br/><Text strong>{r.kurumsal.masrafMerkezi}</Text></div>
+          <div><Text type="secondary" style={{ fontSize: 11 }}>Bağlı Proje</Text><br/><Text>{r.kurumsal.bagliProje}</Text></div>
+        </Space>
+      )
+    }
   ];
 
   return (
-    <div style={{ padding: 24, background: "#f5f7f9", minHeight: "100vh" }}>
-      <div style={{ maxWidth: 1400, margin: "0 auto" }}>
+    <div style={{ 
+      padding: "16px 20px", 
+      background: "#f0f2f5", 
+      height: "100vh", // Sayfayı ekran yüksekliğine sabitledik
+      overflow: "hidden", // Dışarıdan taşmayı engelledik
+      display: "flex",
+      flexDirection: "column"
+    }}>
+      {/* Ana kapsayıcı dev ekranlarda aşırı yayılmasın diye limitledik */}
+      <div style={{ maxWidth: 1920, margin: "0 auto", width: '100%' }}>
         
         {/* Header Alanı */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 15 }}>
           <div>
             <Title level={3} style={{ margin: 0 }}>Proje Tanımları</Title>
-            <Text type="secondary">Kurumsal proje portföyü ve performans takibi</Text>
           </div>
           <Space>
             <Button icon={<DownloadOutlined />}>Excel'e Aktar</Button>
@@ -195,22 +261,22 @@ export default function AntDProjectList() {
         <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
           <Col xs={24} sm={12} lg={6}>
             <Card bordered={false} style={{ borderLeft: '4px solid #1890ff' }}>
-              <Statistic title="Aktif Projeler" value={12} prefix={<ProjectOutlined />} />
+              <Statistic title="Aktif Projeler" value={12} />
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
             <Card bordered={false} style={{ borderLeft: '4px solid #722ed1' }}>
-              <Statistic title="Toplam Portföy Değeri" value={42.5} suffix="M ₺" prefix={<DollarOutlined />} />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card bordered={false} style={{ borderLeft: '4px solid #52c41a' }}>
-              <Statistic title="Ortalama Performans" value={88} suffix="%" prefix={<DashboardOutlined />} />
+              <Statistic title="Toplam Portföy Değeri" value={5.2} suffix="M ₺" />
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
             <Card bordered={false} style={{ borderLeft: '4px solid #f5222d' }}>
-              <Statistic title="Kritik Riskli" value={2} prefix={<InfoCircleOutlined />} />
+              <Statistic title="Toplam Harcama" value={3.4} suffix="M ₺" />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card bordered={false} style={{ borderLeft: '4px solid #52c41a' }}>
+              <Statistic title="Ortalama Tamamlanma" value={29} suffix="%" />
             </Card>
           </Col>
         </Row>
@@ -245,74 +311,52 @@ export default function AntDProjectList() {
         </Card>
 
         {/* Tablo Alanı */}
-        <Card bodyStyle={{ padding: 0 }} style={{ borderRadius: 12, overflow: 'hidden' }}>
+        <Card 
+          bodyStyle={{ padding: 0, height: "100%" }} 
+          style={{ 
+            borderRadius: 12, 
+            overflow: 'hidden', 
+            flex: "auto", // Kalan tüm boşluğu doldurur
+            display: "flex", 
+            flexDirection: "column" 
+          }}
+        >
           <Table 
             columns={columns} 
             dataSource={mockProjeler} 
-            pagination={{ pageSize: 10 }}
-            scroll={{ x: 1300, y: 'calc(100vh - 420px)' }}
+            pagination={{ 
+              pageSize: 10, 
+              size: "small",
+              showSizeChanger: true,
+              style: { margin: "12px 16px" }
+            }}
+            // Kanka boydan taşmayı önleyen sihirli değnek burası:
+            scroll={{ 
+              x: 1600, 
+              y: 'calc(100vh - 550px)' // Ekrana göre dinamik yükseklik
+            }}
             sticky
             size="middle"
+            bordered
           />
         </Card>
       </div>
 
-      {/* Hızlı Bakış Drawer */}
-      <Drawer
-        title="Proje Özet Bilgileri"
-        width={450}
-        onClose={() => setDrawerVisible(false)}
-        open={drawerVisible}
-        extra={
-          <Button type="primary" onClick={() => message.info("Detay sayfasına gidiliyor...")}>Tam Detay</Button>
-        }
+      <Modal
+        title={null} // Kendi header'ını kullandığı için null yaptık
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        width="95%" // Ekranın %95'ini kaplasın (Dinamik olması için)
+        style={{ top: 20 }}
+        footer={null} // Kendi butonlarını kullandığı için null yaptık
+        destroyOnClose // Kapandığında formu sıfırlasın
+        bodyStyle={{ padding: 0, height: '90vh', overflow: 'hidden' }}
       >
-        {selectedProject && (
-          <Space direction="vertical" style={{ width: '100%' }} size="large">
-            <Card size="small" title="Genel Durum" headStyle={{ background: '#fafafa' }}>
-              <Row align="middle" justify="space-between">
-                <Col><Statistic title="İlerleme" value={selectedProject.tamamlanmaYuzde} suffix="%" /></Col>
-                <Col><Statistic title="Sağlık Skoru" value={92} valueStyle={{ color: '#3f8600' }} /></Col>
-              </Row>
-              <Progress percent={selectedProject.tamamlanmaYuzde} status="active" />
-            </Card>
-
-            <div style={{ padding: '0 12px' }}>
-              <Divider orientation="left" style={{ fontSize: 12 }}>Proje Künyesi</Divider>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                <div>
-                  <Text type="secondary" size="small">Proje Kodu</Text>
-                  <div><Text strong>{selectedProject.projeKodu}</Text></div>
-                </div>
-                <div>
-                  <Text type="secondary" size="small">Yönetici</Text>
-                  <div><Text strong>{selectedProject.projeYoneticisi}</Text></div>
-                </div>
-                <div>
-                  <Text type="secondary" size="small">Başlangıç</Text>
-                  <div><Text>{selectedProject.baslamaTarihi}</Text></div>
-                </div>
-                <div>
-                  <Text type="secondary" size="small">Bitiş</Text>
-                  <div><Text>{selectedProject.bitisTarihi}</Text></div>
-                </div>
-              </div>
-            </div>
-
-            <Card size="small" title="Bütçe Analizi" headStyle={{ background: '#fafafa' }}>
-              <Statistic 
-                title="Güncel Harcama" 
-                value={selectedProject.harcama} 
-                suffix={selectedProject.paraBirimi}
-                valueStyle={{ color: selectedProject.harcama > selectedProject.butce ? '#cf1322' : '#3f8600' }}
-              />
-              <Text type="secondary" style={{ fontSize: 12 }}>Planlanan: {money(selectedProject.butce, selectedProject.paraBirimi)}</Text>
-            </Card>
-
-            <Button type="dashed" block icon={<MoreOutlined />}>WBS ve İş Kalemlerini Görüntüle</Button>
-          </Space>
-        )}
-      </Drawer>
+        <ProjeGuncelleme 
+            projectData={activeProject} 
+            onClose={() => setIsModalOpen(false)} 
+        />
+      </Modal>
     </div>
   );
 }

@@ -248,7 +248,7 @@ const rawItems = [
     false
   ),
   getItem(
-    "Satımalma Yönetimi",
+    "Satınalma Yönetimi",
     "satinalmaYonetimi",
     <ShoppingCartOutlined />,
     [

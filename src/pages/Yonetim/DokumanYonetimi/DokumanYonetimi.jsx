@@ -159,7 +159,11 @@ export default function DocumentHubAntD() {
   );
 
   return (
-    <div style={{ padding: 16, background: "#f5f7f9", minHeight: "100vh" }}>
+    <div style={{ 
+      padding: "min(2vw, 24px)", // Dinamik padding: Küçük ekranda azalır, büyükte sabitlenir
+      background: "#f0f2f5", 
+      minHeight: "100vh" 
+    }}>
       <Card bordered={false} bodyStyle={{ padding: "12px 24px" }} style={{ borderRadius: 12 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <Space size="middle">

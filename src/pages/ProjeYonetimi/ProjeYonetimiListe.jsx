@@ -1,48 +1,27 @@
 import React, { useState, useMemo } from "react";
 import {
-  Card,
-  Row,
-  Col,
-  Statistic,
-  Input,
-  Select,
-  Button,
-  Tag,
-  Progress,
-  Table,
-  Drawer,
-  Menu,
-  Modal,
-  Segmented,
-  Space,
-  Typography,
-  Divider,
+  Card, Row, Col, Statistic, Input, Select, Button, Tag, Progress, 
+  Table, Drawer, Menu, Modal, Segmented, Space, Typography, Divider, Tooltip
 } from "antd";
 import {
-  ProjectOutlined,
-  DashboardOutlined,
-  DollarOutlined,
-  SafetyCertificateOutlined,
-  VideoCameraOutlined,
-  SearchOutlined,
-  AppstoreOutlined,
-  BarsOutlined,
-  EnvironmentOutlined,
-  UserOutlined,
-  CalendarOutlined,
-  CloseOutlined,
+  ProjectOutlined, DashboardOutlined, DollarOutlined, SafetyCertificateOutlined,
+  VideoCameraOutlined, SearchOutlined, AppstoreOutlined, BarsOutlined,
+  EnvironmentOutlined, UserOutlined, CloseOutlined, TeamOutlined, 
+  ToolOutlined, PlusOutlined, DownloadOutlined
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 
 // -----------------------------
-// Mock Data (Önceki projenle uyumlu)
+// Mock Data (Zenginleştirilmiş)
 // -----------------------------
 const PROJECTS_DATA = [
   {
     id: "PRJ-001",
     code: "DRC HAVA ALANI",
+    name: "Havalimanı Proje İnşaatı",
     location: "DRC / Bölge-1",
+    customer: "ORE Mining",
     status: "Aktif",
     progress: 42,
     budget: 3200000,
@@ -56,11 +35,13 @@ const PROJECTS_DATA = [
   {
     id: "PRJ-118",
     code: "İSTANBUL ATIK SU",
+    name: "İstanbul Anadolu Atık Su Kanalı",
     location: "İstanbul, TR",
+    customer: "Rönesans İnşaat",
     status: "Aktif",
     progress: 65,
     budget: 2100000,
-    actual: 1680000,
+    actual: 2680000, // Sapma örneği için bütçe üstü
     currency: "EUR",
     machineCount: 52,
     personnelCount: 214,
@@ -70,6 +51,7 @@ const PROJECTS_DATA = [
   {
     id: "PRJ-044",
     code: "BURSA KAVŞAK",
+    name: "Bursa Köprülü Kavşak Projesi",
     location: "Bursa, TR",
     status: "Riskte",
     progress: 88,
@@ -84,20 +66,26 @@ const PROJECTS_DATA = [
 ];
 
 const SECTIONS = [
-  { key: "İşler", label: "İş Emirleri", icon: <DashboardOutlined /> },
-  { key: "Gelir", label: "Proje Gelirleri", icon: <DollarOutlined /> },
-  { key: "Makineler", label: "Makineler", icon: <ProjectOutlined /> },
-  { key: "Kameralar", label: "Kameralar", icon: <VideoCameraOutlined /> },
+  { key: "İşler", label: "İş Emirleri / WBS" },
+  { key: "Gelir", label: "Proje Gelirleri" },
+  { key: "Gider", label: "Proje Giderleri" },
+  { key: "Makineler", label: "Ekipman Listesi" },
+  { key: "Malzemeler", label: "Malzeme Listesi" },
+  { key: "Personel", label: "Personel" },
+  { key: "Akaryakıt", label: "Akaryakıt" },
+  { key: "Bakım Arıza", label: "Bakım Arıza" },
+  { key: "Lastik İşlemleri", label: "Lastik İşlemleri" },
+  { key: "Belgeler", label: "Belgeler" },
+  { key: "Kameralar", label: "Kameralar" },
 ];
 
-export default function AntDProjectManagement() {
+export default function OmegaProjectManagement() {
   const [view, setView] = useState("Kutular");
   const [selectedProject, setSelectedProject] = useState(null);
   const [activeMenu, setActiveMenu] = useState("İşler");
   const [cameraModalVisible, setCameraModalVisible] = useState(false);
   const [searchText, setSearchText] = useState("");
 
-  // Bütçe formatlayıcı
   const money = (val, cur) =>
     new Intl.NumberFormat("tr-TR", {
       style: "currency",
@@ -105,213 +93,229 @@ export default function AntDProjectManagement() {
       maximumFractionDigits: 0,
     }).format(val);
 
-  // Tablo Kolonları
-  const columns = [
-    { title: "Proje Kodu", dataIndex: "code", key: "code", render: (t) => <Text strong>{t}</Text> },
-    { title: "Lokasyon", dataIndex: "location", key: "location" },
-    {
-      title: "Durum",
-      dataIndex: "status",
-      key: "status",
-      render: (s) => (
-        <Tag color={s === "Aktif" ? "success" : "error"}>{s}</Tag>
-      ),
-    },
-    {
-      title: "İlerleme",
-      dataIndex: "progress",
-      key: "progress",
-      render: (p) => <Progress percent={p} size="small" />,
-    },
-    {
-      title: "Bütçe",
-      key: "budget",
-      render: (_, r) => money(r.budget, r.currency),
-    },
-    {
-      title: "İşlem",
-      key: "action",
-      render: (_, r) => (
-        <Button size="small" onClick={() => setSelectedProject(r)}>Detay</Button>
-      ),
-    },
-  ];
-
   return (
-    <div style={{ height: "100vh", display: "flex", flexDirection: "column", background: "#f5f7f9" }}>
+    <div style={{ height: "100vh", display: "flex", flexDirection: "column", background: "#f8fafc" }}>
       
-      {/* 1. SABİT HEADER */}
-      <div style={{ background: "#fff", padding: "16px 24px", borderBottom: "1px solid #d9d9d9", zIndex: 10 }}>
+      {/* 1. HEADER BAR */}
+      <div style={{ background: "#fff", padding: "16px 24px", borderBottom: "1px solid #e5e7eb", zIndex: 10 }}>
         <Row justify="space-between" align="middle">
           <Col>
             <Title level={4} style={{ margin: 0 }}>Proje Yönetimi</Title>
           </Col>
           <Col>
-            <Segmented
-              options={[
-                { label: "Kutular", value: "Kutular", icon: <AppstoreOutlined /> },
-                { label: "Liste", value: "Liste", icon: <BarsOutlined /> },
-              ]}
-              value={view}
-              onChange={setView}
-            />
+            <Space size="middle">
+              <Segmented
+                options={[
+                  { label: "Kutular", value: "Kutular", icon: <AppstoreOutlined /> },
+                  { label: "Liste", value: "Liste", icon: <BarsOutlined /> },
+                ]}
+                value={view}
+                onChange={setView}
+              />
+              <Button type="primary" icon={<PlusOutlined />} size="large">Yeni Proje</Button>
+            </Space>
           </Col>
         </Row>
       </div>
 
-      {/* 2. SCROLLABLE İÇERİK ALANI */}
+      {/* 2. İÇERİK ALANI */}
       <div style={{ flex: 1, overflowY: "auto", padding: "24px" }}>
         
-        {/* KPI Row */}
+        {/* KPI Özetleri */}
         <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
           <Col xs={24} sm={12} lg={6}>
-            <Card bordered={false} style={{ borderLeft: "4px solid #52c41a" }}>
-              <Statistic title="Aktif Projeler" value={12} prefix={<ProjectOutlined />} />
+            <Card bordered={false} style={{ borderLeft: "5px solid #52c41a", borderRadius: 12 }}>
+              <Statistic title="Aktif Projeler" value={12} />
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card bordered={false} style={{ borderLeft: "4px solid #1890ff" }}>
-              <Statistic title="Toplam Bütçe" value={8.4} precision={1} suffix="M $" prefix={<DollarOutlined />} />
+            <Card bordered={false} style={{ borderLeft: "5px solid #1890ff", borderRadius: 12 }}>
+              <Statistic title="Toplam Bütçe" value={8.4} suffix="M $" />
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card bordered={false} style={{ borderLeft: "4px solid #faad14" }}>
-              <Statistic title="Ort. İlerleme" value={54} suffix="%" prefix={<DashboardOutlined />} />
+            <Card bordered={false} style={{ borderLeft: "5px solid #faad14", borderRadius: 12 }}>
+              <Statistic title="Ort. İlerleme" value={54} suffix="%" />
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card bordered={false} style={{ borderLeft: "4px solid #ff4d4f" }}>
-              <Statistic title="Riskli Projeler" value={2} prefix={<SafetyCertificateOutlined />} />
+            <Card bordered={false} style={{ borderLeft: "5px solid #ff4d4f", borderRadius: 12 }}>
+              <Statistic title="Riskli Projeler" value={2} />
             </Card>
           </Col>
         </Row>
 
-        {/* Filtre Barı */}
-        <Card bordered={false} style={{ marginBottom: 24, borderRadius: 12 }}>
-          <Row gutter={16}>
-            <Col flex="auto">
-              <Input 
-                prefix={<SearchOutlined />} 
-                placeholder="Proje adı, müşteri veya kod ara..." 
-                allowClear
-                onChange={e => setSearchText(e.target.value)}
-              />
-            </Col>
-            <Col span={4}>
-              <Select placeholder="Durum Seç" style={{ width: "100%" }}>
-                <Select.Option value="Aktif">Aktif</Select.Option>
-                <Select.Option value="Riskte">Riskte</Select.Option>
-              </Select>
-            </Col>
-            <Col>
-              <Button type="primary">Filtrele</Button>
-            </Col>
-          </Row>
-        </Card>
-
         {/* Proje Görünümü */}
         {view === "Kutular" ? (
-          <Row gutter={[16, 16]}>
-            {PROJECTS_DATA.map((p) => (
-              <Col xs={24} sm={12} lg={8} key={p.id}>
-                <Card
-                  hoverable
-                  actions={[
-                    <VideoCameraOutlined key="cam" onClick={(e) => { e.stopPropagation(); setCameraModalVisible(true); }} />,
-                    <ProjectOutlined key="detail" onClick={() => setSelectedProject(p)} />,
-                  ]}
-                  style={{ borderRadius: 16, overflow: "hidden" }}
-                >
-                  <Card.Meta
-                    title={<div style={{ display: 'flex', justifyContent: 'space-between' }}>{p.code} <Tag color={p.status === "Aktif" ? "green" : "red"}>{p.status}</Tag></div>}
-                    description={<span><EnvironmentOutlined /> {p.location}</span>}
-                    style={{ marginBottom: 16 }}
-                  />
-                  <div style={{ marginTop: 20 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                      <Text type="secondary">İlerleme</Text>
-                      <Text strong>{p.progress}%</Text>
+          <Row gutter={[20, 20]}>
+            {PROJECTS_DATA.map((p) => {
+              const variance = p.actual - p.budget;
+              const variancePct = p.budget ? Math.round((variance / p.budget) * 100) : 0;
+
+              return (
+                <Col xs={24} md={12} xl={8} key={p.id}>
+                  <Card
+                    hoverable
+                    className="border-none shadow-sm transition-all"
+                    style={{ borderRadius: 24, position: 'relative', overflow: 'hidden' }}
+                    bodyStyle={{ padding: '24px' }}
+                    onClick={() => setSelectedProject(p)}
+                  >
+                    {/* SAĞ ÜST: KAMERA BUTONU */}
+                    <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10 }}>
+                      <Button 
+                        icon={<VideoCameraOutlined />} 
+                        className="h-10 w-10 border-black/5 bg-white shadow-sm flex items-center justify-center"
+                        style={{ borderRadius: 12 }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCameraModalVisible(true);
+                        }}
+                      />
                     </div>
-                    <Progress percent={p.progress} strokeColor={p.status === "Riskte" ? "#ff4d4f" : "#1890ff"} />
-                  </div>
-                  <Divider dashed style={{ margin: "16px 0" }} />
-                  <Row gutter={16}>
-                    <Col span={12}>
-                      <Statistic title="Bütçe" value={p.budget} valueStyle={{ fontSize: 14 }} suffix={p.currency} />
-                    </Col>
-                    <Col span={12}>
-                      <Statistic title="Gerçekleşen" value={p.actual} valueStyle={{ fontSize: 14, color: p.actual > p.budget ? '#cf1322' : '#3f8600' }} suffix={p.currency} />
-                    </Col>
-                  </Row>
-                </Card>
-              </Col>
-            ))}
+
+                    {/* ÜST BİLGİ */}
+                    <div style={{ display: 'flex', gap: 16, marginBottom: 24, paddingRight: 40 }}>
+                      <div style={{ width: 48, height: 48, background: '#f3f4f6', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <ProjectOutlined style={{ fontSize: 20, color: '#374151' }} />
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <Text strong style={{ fontSize: 16, display: 'block' }} className="truncate">{p.code}</Text>
+                        <Text type="secondary" style={{ fontSize: 13 }} className="truncate">
+                          <EnvironmentOutlined /> {p.location}
+                        </Text>
+                      </div>
+                    </div>
+
+                    {/* İLERLEME */}
+                    <div style={{ marginBottom: 24 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                        <Text style={{ fontSize: 13, color: '#6b7280' }}>İlerleme</Text>
+                        <Text strong style={{ fontSize: 14 }}>{p.progress}%</Text>
+                      </div>
+                      <Progress 
+                        percent={p.progress} 
+                        showInfo={false} 
+                        strokeWidth={8}
+                        strokeColor={p.status === "Riskte" ? "#f43f5e" : "#10b981"}
+                      />
+                    </div>
+
+                    {/* BÜTÇE KUTULARI */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+                      <div style={{ background: '#f8fafb', padding: '12px', borderRadius: 16, border: '1px solid #f1f5f9' }}>
+                        <Text type="secondary" style={{ fontSize: 10, fontWeight: 'bold', display: 'block' }}>BÜTÇE</Text>
+                        <Text strong style={{ fontSize: 14 }}>{money(p.budget, p.currency)}</Text>
+                      </div>
+                      <div style={{ background: '#f8fafb', padding: '12px', borderRadius: 16, border: '1px solid #f1f5f9' }}>
+                        <Text type="secondary" style={{ fontSize: 10, fontWeight: 'bold', display: 'block' }}>GERÇEKLEŞEN</Text>
+                        <Text strong style={{ fontSize: 14 }}>{money(p.actual, p.currency)}</Text>
+                      </div>
+                    </div>
+
+                    {/* SAPMA VE TARİH */}
+                    <div style={{ marginBottom: 16 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                        <Text type="secondary" style={{ fontSize: 13 }}>Sapma</Text>
+                        <Text strong style={{ color: variance > 0 ? "#f43f5e" : "#10b981", fontSize: 13 }}>
+                          {variance > 0 ? "+" : ""}{money(variance, p.currency)} ({variancePct}%)
+                        </Text>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Text type="secondary" style={{ fontSize: 13 }}>Tarih</Text>
+                        <Text strong style={{ fontSize: 13 }}>{p.start} → {p.end}</Text>
+                      </div>
+                    </div>
+
+                    <Divider style={{ margin: '16px 0' }} dashed />
+
+                    {/* ALT BİLGİ */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Space size="middle">
+                        <span style={{ fontSize: 12, color: '#6b7280' }}><ToolOutlined /> Makine: <Text strong>{p.machineCount}</Text></span>
+                        <span style={{ fontSize: 12, color: '#6b7280' }}><TeamOutlined /> Personel: <Text strong>{p.personnelCount}</Text></span>
+                      </Space>
+                      <Tag bordered={false} color={p.status === "Aktif" ? "success" : "error"} style={{ borderRadius: 8, fontWeight: 'bold' }}>
+                        {p.status.toUpperCase()}
+                      </Tag>
+                    </div>
+                  </Card>
+                </Col>
+              );
+            })}
           </Row>
         ) : (
-          <Table dataSource={PROJECTS_DATA} columns={columns} pagination={false} rowKey="id" />
+          <Card bodyStyle={{ padding: 0 }} style={{ borderRadius: 16, overflow: 'hidden' }}>
+            <Table 
+              dataSource={PROJECTS_DATA} 
+              columns={[
+                { title: 'Proje', dataIndex: 'code', key: 'code', render: (t) => <Text strong>{t}</Text> },
+                { title: 'İlerleme', dataIndex: 'progress', render: (p) => <Progress percent={p} size="small" /> },
+                { title: 'Bütçe', dataIndex: 'budget', render: (v, r) => money(v, r.currency) },
+                { title: 'Durum', dataIndex: 'status', render: (s) => <Tag color={s === "Aktif" ? "success" : "error"}>{s}</Tag> },
+                { title: 'İşlem', key: 'op', render: (_, r) => <Button size="small" onClick={() => setSelectedProject(r)}>Detay</Button> }
+              ]} 
+              pagination={false} 
+            />
+          </Card>
         )}
       </div>
 
       {/* 3. PROJE DETAY DRAWER */}
       <Drawer
         title={selectedProject ? `${selectedProject.code} - Detay Yönetimi` : ""}
-        placement="right"
-        width={1000}
+        width="min(95vw, 1100px)"
         onClose={() => setSelectedProject(null)}
         open={!!selectedProject}
-        extra={
-          <Space>
-            <Button icon={<CalendarOutlined />}>Takvim</Button>
-            <Button type="primary" icon={<CloseOutlined />} onClick={() => setSelectedProject(null)} danger />
-          </Space>
-        }
+        extra={<Button icon={<CloseOutlined />} onClick={() => setSelectedProject(null)} type="text" />}
       >
-        <Row gutter={24}>
-          <Col span={6}>
+        <div style={{ display: 'flex', height: '100%' }}>
+          <div style={{ width: 220, borderRight: '1px solid #f0f0f0', paddingRight: 16 }}>
             <Menu
               mode="inline"
               selectedKeys={[activeMenu]}
               onClick={(e) => setActiveMenu(e.key)}
               items={SECTIONS}
-              style={{ borderRight: 0 }}
+              style={{ border: 'none' }}
             />
-          </Col>
-          <Col span={18}>
-            <Title level={5}>{activeMenu} İçeriği</Title>
-            <div style={{ padding: 40, border: "2px dashed #d9d9d9", borderRadius: 12, textAlign: "center", background: "#fafafa" }}>
-              <Text type="secondary">{selectedProject?.code} projesi için {activeMenu} modülü yükleniyor...</Text>
-            </div>
-          </Col>
-        </Row>
+          </div>
+          <div style={{ flex: 1, paddingLeft: 24 }}>
+             <Title level={4}>{activeMenu} Modülü</Title>
+             <div style={{ padding: 40, border: '2px dashed #f0f0f0', borderRadius: 16, textAlign: 'center' }}>
+                <Text type="secondary">{activeMenu} içeriği burada yüklenecek.</Text>
+             </div>
+          </div>
+        </div>
       </Drawer>
 
-      {/* 4. KAMERA POPUP (MODAL) */}
+      {/* 4. KAMERA MODAL */}
       <Modal
         title="Canlı Saha Kameraları"
         open={cameraModalVisible}
         onCancel={() => setCameraModalVisible(false)}
         footer={null}
-        width={900}
+        width={1000}
         centered
+        bodyStyle={{ padding: 0 }}
       >
-        <Row gutter={16}>
-          <Col span={18}>
-            <div style={{ width: "100%", aspectVideo: "16/9", background: "#000", borderRadius: 8, display: 'grid', placeItems: 'center' }}>
-              <Text style={{ color: "#fff" }}>[ CANLI YAYIN: GİRİŞ KAPISI ]</Text>
-            </div>
-          </Col>
-          <Col span={6}>
+        <div style={{ display: 'flex', height: 550, background: '#000' }}>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ color: '#fff' }}>[ CANLI YAYIN SİNYALİ ]</Text>
+          </div>
+          <div style={{ width: 240, background: '#141414', borderLeft: '1px solid #333' }}>
+            <div style={{ padding: '16px', color: '#fff', borderBottom: '1px solid #333' }}>Kamera Listesi</div>
             <Menu
-              style={{ borderRadius: 8 }}
-              defaultSelectedKeys={['1']}
+              theme="dark"
+              mode="inline"
               items={[
-                { key: '1', icon: <VideoCameraOutlined />, label: 'Kamera 01' },
-                { key: '2', icon: <VideoCameraOutlined />, label: 'Kamera 02' },
-                { key: '3', icon: <VideoCameraOutlined />, label: 'Kamera 03' },
+                { key: '1', label: 'Ana Giriş Kapısı', icon: <VideoCameraOutlined /> },
+                { key: '2', label: 'Malzeme Sahası', icon: <VideoCameraOutlined /> },
+                { key: '3', label: 'Bakım Atölyesi', icon: <VideoCameraOutlined /> },
               ]}
+              defaultSelectedKeys={['1']}
             />
-          </Col>
-        </Row>
+          </div>
+        </div>
       </Modal>
     </div>
   );
