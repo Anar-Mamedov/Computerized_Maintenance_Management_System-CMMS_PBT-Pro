@@ -1,269 +1,255 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
-  Table,
-  Input,
-  Select,
-  Button,
-  Tag,
-  Progress,
-  Drawer,
-  Space,
-  Card,
-  Statistic,
-  Row,
-  Col,
-  InputNumber,
-  Typography,
-  message,
-  Divider,
-  Popconfirm,
+  Table, Input, Select, Button, Tag, Progress, Drawer, Space, Card,
+  Statistic, Row, Col, InputNumber, Typography, message, Divider, Checkbox, DatePicker
 } from "antd";
 import {
-  SearchOutlined,
-  DownloadOutlined,
-  FolderOpenOutlined,
-  FileTextOutlined,
-  PlusOutlined,
-  HistoryOutlined,
-  EditOutlined,
-  DeleteOutlined,
+  SearchOutlined, DownloadOutlined, FolderFilled, FileTextOutlined,
+  RightOutlined, CloseOutlined, HistoryOutlined
 } from "@ant-design/icons";
 
 const { Text, Title } = Typography;
 
-// ================== MOCK DATA ==================
-const PROJECTS = [
-  { id: "PRJ-2026-001", name: "Bursa Lojistik Merkez İnşaatı", client: "ACME Logistics" },
-  { id: "PRJ-2026-002", name: "Ankara Şantiye Altyapı İyileştirme", client: "Kamu Kurumu" },
-];
-
+// ================== VİDEO VE GÖRSEL VERİLERİ (BİREBİR) ==================
 const INITIAL_WBS = [
   {
-    id: "1",
     key: "1",
     code: "1",
-    name: "Mobilizasyon",
+    name: "MOBİLİZASYON",
+    risk: "Risk",
     unit: "ls",
     planned: 1,
     actual: 0.6,
+    count: "4 kayıt",
     children: [
-      { id: "1.1", key: "1.1", code: "1.1", name: "Şantiye Kurulumu", unit: "ls", planned: 1, actual: 0.8 },
-      { id: "1.2", key: "1.2", code: "1.2", name: "Geçici Tesisler", unit: "ls", planned: 1, actual: 0.4 },
-    ],
+      { key: "1.1", code: "1.1", name: "Şantiye Kurulumu", risk: "", unit: "ls", planned: 1, actual: 0.8, count: "1 kayıt" },
+      { key: "1.2", code: "1.2", name: "Geçici Tesisler", risk: "", unit: "ls", planned: 1, actual: 0.4, count: "1 kayıt" },
+      { key: "1.3", code: "1.3", name: "Personel Mobilizasyonu", risk: "", unit: "ls", planned: 1, actual: 0.5, count: "1 kayıt" },
+      { key: "1.4", code: "1.4", name: "Makine Sevkiyatı", risk: "", unit: "ls", planned: 1, actual: 0.7, count: "1 kayıt" },
+    ]
   },
-  {
-    id: "2",
-    key: "2",
-    code: "2",
-    name: "Hafriyat İşleri",
-    unit: "m3",
-    planned: 10000,
-    actual: 6500,
-    children: [
-      { id: "2.1", key: "2.1", code: "2.1", name: "Kazı", unit: "m3", planned: 7000, actual: 5200 },
-      { id: "2.2", key: "2.2", code: "2.2", name: "Dolgu", unit: "m3", planned: 3000, actual: 1300 },
-    ],
-  },
+  { key: "2", code: "2", name: "HAFRİYAT", risk: "Risk", unit: "m3", planned: 10000, actual: 6500, count: "4 kayıt" },
+  { key: "3", code: "3", name: "TEMEL VE BETONARME", risk: "Gecikmiş", unit: "m3", planned: 8000, actual: 3200, count: "3 kayıt" },
 ];
 
 export default function AntDWBSProgress() {
-  const [projectId, setProjectId] = useState(PROJECTS[0].id);
-  const [wbsData, setWbsData] = useState(INITIAL_WBS);
-  const [selectedNode, setSelectedNode] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [searchText, setSearchText] = useState("");
+  const [selectedNode, setSelectedNode] = useState(null);
 
-  // Durum Belirleyici
-  const getStatus = (pct) => {
-    if (pct >= 100) return <Tag color="success">Tamam</Tag>;
-    if (pct >= 75) return <Tag color="blue">Normal</Tag>;
-    if (pct >= 40) return <Tag color="warning">Risk</Tag>;
-    return <Tag color="error">Gecikmiş</Tag>;
-  };
-
-  // Tablo Kolonları
   const columns = [
     {
-      title: "WBS / İş Kalemi",
-      dataIndex: "name",
-      key: "name",
-      render: (text, record) => (
-        <Space>
-          {record.children ? <FolderOpenOutlined style={{ color: "#1890ff" }} /> : <FileTextOutlined />}
-          <Text strong={!!record.children}>{record.code} - {text}</Text>
+      title: "WBS",
+      key: "wbs_icon",
+      width: 120,
+      render: (_, r) => (
+        <Space size="small">
+          <Checkbox onClick={(e) => e.stopPropagation()} />
+          {/* Klasör ikonu sadece çocukları olanda mavi */}
+          <FolderFilled style={{ color: r.children ? '#1890ff' : '#bfbfbf', fontSize: 16 }} />
+          <Tag color="blue" style={{ borderRadius: 10, fontSize: 10, margin: 0, padding: '0 8px' }}>{r.count}</Tag>
         </Space>
+      )
+    },
+    {
+      title: "İş Kalemi",
+      key: "name",
+      render: (_, r) => (
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <Text strong style={{ color: '#003a8c', fontSize: 13 }}>{r.code} - {r.name}</Text>
+          {r.risk && <Text type="danger" style={{ fontSize: 10, fontWeight: 'bold' }}>{r.risk}</Text>}
+        </div>
       ),
     },
-    { title: "Birim", dataIndex: "unit", key: "unit", width: 80, align: "center" },
-    { title: "Planlanan", dataIndex: "planned", key: "planned", align: "right" },
-    { title: "Gerçekleşen", dataIndex: "actual", key: "actual", align: "right" },
+    { title: "Birim", dataIndex: "unit", key: "unit", width: 70 },
+    { title: "Planlanan", dataIndex: "planned", key: "planned", align: "right", render: v => v.toLocaleString('tr-TR') },
+    { title: "Gerçekleşen", dataIndex: "actual", key: "actual", align: "right", render: v => v.toLocaleString('tr-TR') },
     {
       title: "İlerleme",
       key: "progress",
-      width: 250,
+      width: 400,
       render: (_, r) => {
         const pct = Math.round((r.actual / r.planned) * 100) || 0;
         return (
-          <Space direction="vertical" style={{ width: "100%" }} size={0}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
-              <Text style={{ fontSize: 11 }}>{pct}%</Text>
-              {getStatus(pct)}
-            </div>
-            <Progress percent={pct} size="small" strokeColor={pct >= 100 ? "#52c41a" : "#1890ff"} />
-          </Space>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <Progress 
+              percent={pct} 
+              showInfo={false} 
+              strokeColor="#adc6ff" 
+              trailColor="#f0f2f5" 
+              strokeWidth={10} 
+              style={{ flex: 1 }} 
+            />
+            <Text strong style={{ minWidth: 45, textAlign: 'right' }}>{pct.toFixed(1)}%</Text>
+            <Text type="secondary" style={{ fontSize: 11, minWidth: 50 }}>{r.count}</Text>
+          </div>
         );
       },
-    },
-    {
-      title: "İşlem",
-      key: "action",
-      width: 100,
-      align: "center",
-      render: (_, r) => !r.children && (
-        <Button 
-          type="primary" 
-          ghost 
-          size="small" 
-          icon={<PlusOutlined />} 
-          onClick={() => { setSelectedNode(r); setDrawerOpen(true); }}
-        >
-          Giriş
-        </Button>
-      ),
     },
   ];
 
   return (
-    <div style={{ padding: 24, background: "#f5f7f9", minHeight: "100vh" }}>
-      <div style={{ maxWidth: 1400, margin: "0 auto" }}>
+    <div style={{ padding: "16px 24px", background: "#f0f2f5", height: "100vh", overflow: "hidden", display: 'flex', flexDirection: 'column' }}>
+      <div style={{ maxWidth: 1920, margin: "0 auto", width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
         
-        {/* Proje Bilgi Kartı */}
-        <Card bordered={false} style={{ borderRadius: 16, marginBottom: 16 }}>
-          <Row justify="space-between" align="middle">
-            <Col>
-              <Text type="secondary">AKTİF PROJE</Text>
-              <Title level={4} style={{ margin: 0 }}>
-                {PROJECTS.find(p => p.id === projectId)?.name}
-              </Title>
-              <Text size="small" type="secondary">Kodu: {projectId} • Müşteri: {PROJECTS.find(p => p.id === projectId)?.client}</Text>
-            </Col>
-            <Col>
-              <Select 
-                value={projectId} 
-                onChange={setProjectId} 
-                style={{ width: 300 }}
-                options={PROJECTS.map(p => ({ label: p.name, value: p.id }))}
-              />
-            </Col>
-          </Row>
-        </Card>
+        {/* Üst Başlık ve Proje Bilgisi */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
+          <div>
+            <Text type="secondary" style={{ fontSize: 12 }}>Aktif Proje</Text>
+            <Title level={4} style={{ margin: 0, fontWeight: 700 }}>Bursa Lojistik Merkez İnşaat Projesi</Title>
+            <Text type="secondary" style={{ fontSize: 13 }}>
+              Proje Kodu: <Text strong>PRJ-2026-001</Text> • Musteri: ACME Logistics A.Ş.
+            </Text>
+            <div style={{ color: '#8c8c8c', fontSize: 12, marginTop: 4 }}>2026-01-01 - 2026-12-31</div>
+          </div>
+          <Select defaultValue="1" style={{ width: 300 }} options={[{ value: '1', label: 'Bursa Lojistik Merkez İnşaat Projesi' }]} />
+        </div>
 
-        {/* KPI Paneli */}
-        
-        <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-          <Col span={6}>
-            <Card bordered={false} style={{ borderLeft: '4px solid #52c41a' }}>
-              <Statistic title="Genel Fiziksel İlerleme" value={48.2} suffix="%" />
-            </Card>
-          </Col>
-          <Col span={6}>
-            <Card bordered={false} style={{ borderLeft: '4px solid #1890ff' }}>
-              <Statistic title="Planlanan İlerleme" value={55} suffix="%" />
-            </Card>
-          </Col>
-          <Col span={6}>
-            <Card bordered={false} style={{ borderLeft: '4px solid #ff4d4f' }}>
-              <Statistic title="Sapma" value={-6.8} suffix="%" valueStyle={{ color: '#cf1322' }} />
-            </Card>
-          </Col>
-          <Col span={6}>
-            <Card bordered={false} style={{ borderLeft: '4px solid #faad14' }}>
-              <Statistic title="İş Kalemi Sayısı" value={142} />
-            </Card>
-          </Col>
+        {/* KPI KARTLARI (image_1f5de7.png Renkleri) */}
+        <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
+          {[
+            { t: "Fiziksel Ilerleme", v: 33.8, s: "%", c: "#52c41a", b: "#b7eb8f" },
+            { t: "Planlanan Ilerleme", v: 70, s: "%", c: "#1890ff", b: "#adc6ff" },
+            { t: "Sapma", v: -8.2, s: "%", c: "#ff4d4f", b: "#ffa39e" },
+            { t: "Leaf Is Kalemi", v: 27, s: "", c: "#faad14", b: "#ffe58f" }
+          ].map((item, i) => (
+            <Col span={6} key={i}>
+              <Card bordered={false} bodyStyle={{ padding: '16px 20px' }} style={{ border: `1px solid ${item.b}`, borderLeft: `6px solid ${item.c}`, borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <Statistic title={<Text type="secondary" style={{ fontSize: 12 }}>{item.t.toUpperCase()}</Text>} value={item.v} suffix={item.s} valueStyle={{ fontWeight: 800, color: item.t === "Sapma" ? item.c : '#1f1f1f' }} />
+              </Card>
+            </Col>
+          ))}
         </Row>
 
-        {/* Filtre ve Tablo */}
-        <Card bordered={false} style={{ borderRadius: 16 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-            <Input 
-              placeholder="WBS Kodu veya İş Kalemi ara..." 
-              prefix={<SearchOutlined />} 
-              style={{ width: 350 }}
-              onChange={e => setSearchText(e.target.value)}
-            />
-            <Button icon={<DownloadOutlined />}>Excel Export</Button>
+        {/* TABLO VE FİLTRE ALANI */}
+        <Card bodyStyle={{ padding: 0 }} style={{ borderRadius: 12, overflow: 'hidden', flex: 1, display: 'flex', flexDirection: 'column', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+          <div style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', background: '#fff', borderBottom: '1px solid #f0f0f0' }}>
+            <Input placeholder="WBS / Is kalemi ara..." prefix={<SearchOutlined />} style={{ width: 350, borderRadius: 8 }} />
+            <Button type="primary" icon={<DownloadOutlined />} style={{ background: '#001529', border: 'none', height: 36 }}>Excel Export</Button>
           </div>
-
           <Table 
             columns={columns} 
-            dataSource={wbsData} 
+            dataSource={INITIAL_WBS} 
             pagination={false}
-            scroll={{ y: 'calc(75vh - 420px)' }}
-            sticky
-            expandable={{ defaultExpandAllRows: true }}
+            onRow={(record) => ({
+              onClick: () => {
+                if (!record.children) {
+                  setSelectedNode(record);
+                  setDrawerOpen(true);
+                }
+              },
+            })}
+            expandable={{
+              expandIcon: ({ expanded, onExpand, record }) =>
+                record.children ? (
+                  <RightOutlined 
+                    style={{ fontSize: 10, cursor: 'pointer', transition: '0.2s', transform: expanded ? 'rotate(90deg)' : 'none', marginRight: 8 }} 
+                    onClick={e => onExpand(record, e)} 
+                  />
+                ) : null
+            }}
+            scroll={{ y: 'calc(100vh - 440px)' }}
+            className="wbs-table"
           />
         </Card>
       </div>
 
-      {/* İlerleme Giriş Drawer'ı */}
+      {/* VİDEODAKİ ALT DRAWER (İlerleme Girişi) */}
       <Drawer
-        title={selectedNode ? `${selectedNode.code} - ${selectedNode.name}` : "Detay"}
-        width={600}
+        placement="bottom"
+        height="55%"
         onClose={() => setDrawerOpen(false)}
         open={drawerOpen}
-        extra={
-          <Button type="primary" onClick={() => { message.success("İlerleme kaydedildi."); setDrawerOpen(false); }}>
-            Kaydet
-          </Button>
-        }
+        bodyStyle={{ padding: 0 }}
+        closeIcon={null}
+        maskStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.45)' }}
       >
-        {selectedNode && (
-          <Space direction="vertical" style={{ width: '100%' }} size="large">
-            <Row gutter={16}>
-              <Col span={12}>
-                <Card size="small" title="Mevcut Durum">
-                  <Statistic title="Gerçekleşen" value={selectedNode.actual} suffix={selectedNode.unit} />
-                  <Progress percent={Math.round((selectedNode.actual / selectedNode.planned) * 100)} />
-                </Card>
-              </Col>
-              <Col span={12}>
-                <Card size="small" title="Yeni Giriş">
-                  <Text size="small">Artış Miktarı ({selectedNode.unit})</Text>
-                  <InputNumber style={{ width: '100%', marginTop: 8 }} placeholder="0.00" />
-                </Card>
-              </Col>
-            </Row>
+        <div style={{ padding: '32px 48px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 32 }}>
+            <div>
+              <Title level={4} style={{ margin: 0, color: '#001529' }}>{selectedNode?.code} - {selectedNode?.name}</Title>
+              <Text type="secondary" style={{ fontSize: 14 }}>Bursa Lojistik Merkez İnşaat Projesi • PRJ-2026-001</Text>
+            </div>
+            <Button type="text" icon={<CloseOutlined style={{ fontSize: 20 }} />} onClick={() => setDrawerOpen(false)} />
+          </div>
 
-            <Divider orientation="left"><HistoryOutlined /> Giriş Geçmişi</Divider>
+          <Row gutter={64}>
+            {/* Sol Panel: Mevcut Durum */}
+            <Col span={10}>
+              <div style={{ marginBottom: 24 }}>
+                <Text type="secondary" style={{ display: 'block', marginBottom: 4 }}>PLANLANAN</Text>
+                <Title level={3} style={{ margin: 0 }}>{selectedNode?.planned} <small style={{ fontSize: 14, fontWeight: 400 }}>{selectedNode?.unit}</small></Title>
+              </div>
+              
+              <div style={{ marginBottom: 32 }}>
+                <Text type="secondary" style={{ display: 'block', marginBottom: 4 }}>GERÇEKLEŞEN</Text>
+                <Title level={3} style={{ margin: 0, color: '#52c41a' }}>{selectedNode?.actual} <small style={{ fontSize: 14, fontWeight: 400, color: '#8c8c8c' }}>{selectedNode?.unit}</small></Title>
+              </div>
+              
+              <Divider style={{ margin: '24px 0' }} />
+              
+              <div>
+  <Text strong style={{ display: 'block', marginBottom: 12, fontSize: 15 }}>
+    İlerleme Oranı
+  </Text> {/* <-- Buranın kapandığından emin ol */}
+  
+  <Progress 
+    percent={selectedNode ? Math.round((selectedNode.actual / selectedNode.planned) * 100) : 0} 
+    strokeWidth={16} 
+    strokeColor="#adc6ff"
+    status="active"
+  />
+</div>
+            </Col>
 
+            {/* Sağ Panel: Giriş Formu */}
+            <Col span={14} style={{ borderLeft: '1px solid #f0f0f0', paddingLeft: 48 }}>
+              <Title level={5} style={{ marginBottom: 24 }}>Günlük / Haftalık Ilerleme Girisi</Title>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>Artış Miktarı ({selectedNode?.unit})</Text>
+                  <InputNumber 
+                    style={{ width: '100%' }} 
+                    size="large" 
+                    placeholder="0.00" 
+                    min={0}
+                    addonAfter={selectedNode?.unit}
+                  />
+                </Col>
+                <Col span={12}>
+                  <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>Tarih</Text>
+                  <DatePicker style={{ width: '100%' }} size="large" defaultValue={null} />
+                </Col>
+                <Col span={24} style={{ marginTop: 16 }}>
+                  <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>Not / Açıklama</Text>
+                  <Input.TextArea rows={2} placeholder="İşle ilgili notunuzu giriniz..." />
+                </Col>
+              </Row>
+              <Button type="primary" size="large" block style={{ marginTop: 24, background: '#001529', height: 48, fontWeight: 600 }}>
+                ILERLEMEYI KAYDET
+              </Button>
+            </Col>
+          </Row>
+
+          <div style={{ marginTop: 40 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+              <HistoryOutlined style={{ color: '#1890ff' }} />
+              <Text strong style={{ fontSize: 16 }}>Giriş Geçmişi</Text>
+            </div>
             <Table 
-              size="small"
-              pagination={false}
-              dataSource={[
-                { key: '1', date: '01.02.2026', amount: 0.2, note: 'Saha teslimi yapıldı.' },
-                { key: '2', date: '30.01.2026', amount: 0.4, note: 'Ekipman mobilizasyonu.' },
-              ]}
+              size="middle"
+              dataSource={[{ key: '1', date: '02.02.2026 16:06', amount: '0.2', unit: selectedNode?.unit, note: 'Saha mobilizasyonu tamamlandı.' }]}
               columns={[
-                { title: 'Tarih', dataIndex: 'date', key: 'date' },
-                { title: 'Miktar', dataIndex: 'amount', key: 'amount', align: 'right' },
-                { title: 'Not', dataIndex: 'note', key: 'note', ellipsis: true },
-                { 
-                  title: 'İşlem', 
-                  key: 'op', 
-                  render: () => (
-                    <Space>
-                      <Button type="text" size="small" icon={<EditOutlined />} />
-                      <Popconfirm title="Silmek istediğinize emin misiniz?">
-                        <Button type="text" danger size="small" icon={<DeleteOutlined />} />
-                      </Popconfirm>
-                    </Space>
-                  ) 
-                },
+                { title: 'Tarih', dataIndex: 'date', width: 200 },
+                { title: 'Miktar', key: 'amount', width: 150, render: (_, r) => <Text strong>{r.amount} {r.unit}</Text> },
+                { title: 'Not', dataIndex: 'note' },
+                { title: 'İşlem', width: 100, align: 'right', render: () => <Button type="link">Düzenle</Button> }
               ]}
+              pagination={false}
+              bordered
+              style={{ borderRadius: 8, overflow: 'hidden' }}
             />
-          </Space>
-        )}
+          </div>
+        </div>
       </Drawer>
     </div>
   );

@@ -29,10 +29,10 @@ import {
 const { Text, Title } = Typography;
 
 const demoRows = [
-  { id: 1, key: 1, code: "MZ-00125", name: "Hidrolik Yağ 20L", unit: "Adet", systemQty: 120, countedQty: 118, unitCost: 920, location: "Merkez Depo" },
-  { id: 2, key: 2, code: "MZ-00456", name: "Yağ Filtresi", unit: "Adet", systemQty: 80, countedQty: 80, unitCost: 165, location: "Merkez Depo" },
-  { id: 3, key: 3, code: "MZ-00987", name: "Civata M12", unit: "Adet", systemQty: 1000, countedQty: 1020, unitCost: 2.75, location: "Atölye Depo" },
-];
+    { id: 1, key: 1, code: "MZ-00125", name: "Hidrolik Yağ 20L", unit: "Adet", systemQty: 120, countedQty: 118, unitCost: 920, location: "Merkez Depo" },
+    { id: 2, key: 2, code: "MZ-00456", name: "Yağ Filtresi", unit: "Adet", systemQty: 80, countedQty: 80, unitCost: 165, location: "Merkez Depo" },
+    { id: 3, key: 3, code: "MZ-00987", name: "Civata M12", unit: "Adet", systemQty: 1000, countedQty: 1020, unitCost: 2.75, location: "Atölye Depo" },
+  ];
 
 export default function StokSayimFisDetay({ visible, onClose, receiptData }) {
   const [searchText, setSearchText] = useState("");
@@ -41,9 +41,14 @@ export default function StokSayimFisDetay({ visible, onClose, receiptData }) {
     { title: "Malzeme", dataIndex: "code", key: "code", render: (t, r) => (
       <Space direction="vertical" size={0}>
         <Text strong>{t}</Text>
-        <Text type="secondary" style={{ fontSize: 12 }}>{r.name}</Text>
       </Space>
     )},
+    { title: "Adı", dataIndex: "code", key: "code", render: (t, r) => (
+      <Space direction="vertical" size={0}>
+        <Text style={{ fontSize: 12 }}>{r.name}</Text>
+      </Space>
+    )},
+    { title: "Birim", dataIndex: "unit", key: "unit", align: "right" },
     { title: "Sistem", dataIndex: "systemQty", key: "systemQty", align: "right" },
     { 
       title: "Sayılan", 
@@ -72,6 +77,20 @@ export default function StokSayimFisDetay({ visible, onClose, receiptData }) {
       }
     },
     { title: "Birim Maliyet", dataIndex: "unitCost", key: "unitCost", align: "right", render: (v) => `₺${v.toLocaleString('tr-TR')}` },
+    { 
+      title: "Fark Tutarı", 
+      key: "diffTotal", 
+      align: "right", 
+      render: (_, r) => {
+        const diff = r.countedQty - r.systemQty;
+        const total = diff * r.unitCost;
+        return (
+          <Text strong type={total < 0 ? "danger" : total > 0 ? "success" : ""}>
+            {total > 0 ? `+₺${total.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}` : `₺${total.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}`}
+          </Text>
+        );
+      } 
+    },
     { title: "Lokasyon", dataIndex: "location", key: "location" },
   ];
 

@@ -34,6 +34,7 @@ import {
   UserOutlined,
   LinkOutlined,
   TagOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 
 const { Text, Title } = Typography;
@@ -104,17 +105,32 @@ export default function AntDMediaGallery() {
   ];
 
   return (
-    <div style={{ padding: 24, background: "#f5f7f9", minHeight: "100vh" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+    <div style={{ 
+      padding: "min(24px, 2vw)", 
+      background: "#f0f2f5", 
+      minHeight: "100vh" 
+    }}>
+      {/* Container: Geniş ekranlarda çok yayılmasın diye max-width ekledik */}
+      <div style={{ maxWidth: 1920, margin: "0 auto", width: '100%' }}>
         
-        {/* Kontrol Paneli */}
-        <Card bordered={false} style={{ borderRadius: 16, marginBottom: 16 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
-            <Space size="middle">
+        {/* Üst Kontrol Paneli - Responsive Yapı */}
+        <Card 
+          bordered={false} 
+          style={{ borderRadius: 16, marginBottom: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+          bodyStyle={{ padding: '16px 24px' }}
+        >
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            flexWrap: 'wrap', 
+            gap: 16 
+          }}>
+            <Space size="middle" wrap>
               <Input
                 placeholder="Medya veya kayıt ara..."
                 prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
-                style={{ width: 300, borderRadius: 8 }}
+                style={{ width: 'clamp(200px, 25vw, 350px)', borderRadius: 8 }}
                 onChange={e => setSearchText(e.target.value)}
               />
               <Segmented
@@ -127,76 +143,96 @@ export default function AntDMediaGallery() {
               />
             </Space>
 
-            <Space>
-              {selectedRowKeys.length > 0 && <Text type="secondary">{selectedRowKeys.length} öğe seçili</Text>}
+            <Space wrap>
+              {selectedRowKeys.length > 0 && (
+                <Badge count={selectedRowKeys.length} overflowCount={999} style={{ backgroundColor: '#108ee9' }}>
+                   <Text type="secondary" style={{ marginRight: 8 }}>Seçili</Text>
+                </Badge>
+              )}
               <Dropdown menu={bulkMenu}>
                 <Button disabled={selectedRowKeys.length === 0} icon={<EllipsisOutlined />}>Toplu İşlemler</Button>
               </Dropdown>
-              <Button type="primary" icon={<PictureOutlined />}>Yeni Yükle</Button>
+              <Button type="primary" icon={<PictureOutlined />} size="large" style={{ borderRadius: 8 }}>
+                Yeni Yükle
+              </Button>
             </Space>
           </div>
         </Card>
 
-        {/* İçerik Alanı */}
-        {viewMode === "Grid" ? (
-          <Row gutter={[16, 16]}>
-            {filteredData.map(item => (
-              <Col xs={24} sm={12} md={8} lg={6} key={item.id}>
-                <Card
-                  hoverable
-                  bodyStyle={{ padding: 12 }}
-                  style={{ borderRadius: 12, overflow: 'hidden' }}
-                  cover={
-                    <div style={{ position: 'relative' }}>
-                      <Image
-                        alt={item.fileName}
-                        src={item.thumb}
-                        height={160}
-                        width="100%"
-                        style={{ objectFit: 'cover' }}
-                      />
-                      <Checkbox 
-                        style={{ position: 'absolute', top: 10, left: 10 }}
-                        checked={selectedRowKeys.includes(item.key)}
-                        onChange={(e) => {
-                          const nextKeys = e.target.checked 
-                            ? [...selectedRowKeys, item.key]
-                            : selectedRowKeys.filter(k => k !== item.key);
-                          setSelectedRowKeys(nextKeys);
-                        }}
-                      />
-                      <Tag color="black" style={{ position: 'absolute', top: 10, right: 0, margin: 0, opacity: 0.8 }}>
-                        {item.shotType}
-                      </Tag>
-                    </div>
-                  }
+        {/* İçerik Alanı - Dinamik Grid */}
+        <div style={{ 
+          height: 'calc(100vh - 200px)', // Ekran yüksekliğine göre içerik alanı
+          overflowY: 'auto', 
+          paddingRight: 4,
+          paddingBottom: 20
+        }}>
+          {viewMode === "Grid" ? (
+            <Row gutter={[16, 16]}>
+              {filteredData.map(item => (
+                <Col 
+                  xs={24}   // Mobilde 1 kart
+                  sm={12}   // Tablette 2 kart
+                  md={8}    // Küçük monitörde 3 kart
+                  lg={6}    // Standart monitörde 4 kart
+                  xl={4}    // Büyük (27") monitörde 6 kart
+                  xxl={3}   // UltraWide monitörde 8 kart
+                  key={item.id}
                 >
-                  <div onClick={() => { setActiveItem(item); setDrawerVisible(true); }}>
+                  <Card
+                    hoverable
+                    bodyStyle={{ padding: 12 }}
+                    style={{ borderRadius: 12, overflow: 'hidden', height: '100%' }}
+                    cover={
+                      <div style={{ position: 'relative', overflow: 'hidden', height: 180 }}>
+                        <Image
+                          alt={item.fileName}
+                          preview={false} // Kart üzerinden tıklayınca detay açılsın diye
+                          src={item.thumb}
+                          height="100%"
+                          width="100%"
+                          style={{ objectFit: 'cover' }}
+                        />
+                        <div style={{ position: 'absolute', top: 8, left: 8 }}>
+                          <Checkbox 
+                            checked={selectedRowKeys.includes(item.key)}
+                            onChange={(e) => {
+                              const nextKeys = e.target.checked 
+                                ? [...selectedRowKeys, item.key]
+                                : selectedRowKeys.filter(k => k !== item.key);
+                              setSelectedRowKeys(nextKeys);
+                            }}
+                          />
+                        </div>
+                        <Tag color="rgba(0,0,0,0.6)" style={{ position: 'absolute', bottom: 8, right: 4, margin: 0 }}>
+                          {item.shotType}
+                        </Tag>
+                      </div>
+                    }
+                    onClick={() => { setActiveItem(item); setDrawerVisible(true); }}
+                  >
                     <Text strong ellipsis style={{ display: 'block' }}>{item.fileName}</Text>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
                       <Text type="secondary" style={{ fontSize: 11 }}>{item.entityLabel}</Text>
                       <Text type="secondary" style={{ fontSize: 11 }}>{item.capturedAt}</Text>
                     </div>
-                  </div>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        ) : (
-          <Card bodyStyle={{ padding: 0 }} style={{ borderRadius: 16, overflow: 'hidden' }}>
-            <Table
-              rowSelection={{ selectedRowKeys, onChange: setSelectedRowKeys }}
-              columns={columns}
-              dataSource={filteredData}
-              pagination={{ pageSize: 12 }}
-              scroll={{ 
-    x: 1000,           // Genişlik sığmazsa yatay kaydır
-    y: "calc(100vh - 350px)" // Ekran yüksekliğine göre dikey kaydır
-  }}
-  sticky
-            />
-          </Card>
-        )}
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          ) : (
+            <Card bodyStyle={{ padding: 0 }} style={{ borderRadius: 16, overflow: 'hidden' }}>
+              <Table
+                rowSelection={{ selectedRowKeys, onChange: setSelectedRowKeys }}
+                columns={columns}
+                dataSource={filteredData}
+                pagination={{ pageSize: 20, showSizeChanger: true }}
+                size="middle"
+                scroll={{ x: 'max-content', y: 'calc(100vh - 380px)' }}
+                sticky
+              />
+            </Card>
+          )}
+        </div>
       </div>
 
       {/* Detay Drawer */}
