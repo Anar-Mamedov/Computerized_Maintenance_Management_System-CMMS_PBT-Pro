@@ -65,6 +65,13 @@ const Breadcrumbs = () => {
     "/yonetimDashboard": "Yonetim Dashboard",
     "/makinePuantajlari": "Makine Puantajları",
     "/yakitTuketimiAnalizi":"Yakıt Tüketimi Analizi",
+    "/stokSayimlariFisListe": "Stok Sayımları",
+    "/dokumanYonetimi": "Doküman Yönetimi",
+    "/resimYonetimi": "Resim Yönetimi",
+    "/ekipmanTransferi": "Ekipman Transferi",
+    "/projeTanimlari2": "Proje Tanımları",
+    "/projeYonetimiListe": "Proje Yönetimi",
+    "/projeIlerleme": "Proje İlerleme İşlemleri"
 
     // Diğer route'lar için ekleyin...
   };

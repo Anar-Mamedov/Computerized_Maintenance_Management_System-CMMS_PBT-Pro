@@ -16,6 +16,7 @@ import {
   SettingOutlined,
   AppstoreOutlined,
   FireOutlined,
+  CalculatorOutlined,
 } from "@ant-design/icons";
 import Draggable from "react-draggable";
 // import Isemri from "./pages/DashboardAnalytics2/Isemri";
@@ -76,6 +77,13 @@ import YoneticiDashboard from "./pages/YonetimDashboard/Dashboard.jsx";
 import MakinePuantaj from "./pages/MakineEkipman/MakinePuantaj/MakinePuantaj.jsx";
 import AylikMakinePuantaj from "./pages/MakineEkipman/MakinePuantaj/MakinePuantajAylik.jsx";
 import YakitTuketimiAnalizi from "./pages/Analizler/YakitTuketimiAnalizi/YakitTuketimiAnalizi.jsx";
+import StokSayimFisListe from "./pages/Malzeme&DepoYonetimi/StokSayim/StokSayimFisListe.jsx";
+import DokumanYonetimi from "./pages/Yonetim/DokumanYonetimi/DokumanYonetimi.jsx";
+import ResimYonetimi from "./pages/Yonetim/ResimYonetimi/ResimYonetimi.jsx";
+import EkipmanTransferi from "./pages/MakineEkipman/EkipmanTransfer/EkipmanTransfer.jsx";
+import ProjeTanimlari2 from "./pages/ProjeYonetimi/ProjeTanimlari.jsx";
+import ProjeYonetimListe from "./pages/ProjeYonetimi/ProjeYonetimiListe.jsx";
+import ProjeIlerleme from "./pages/ProjeYonetimi/ProjeIlerleme.jsx";
 import AxiosInstance from "./api/http";
 
 // Malzemeler
@@ -168,6 +176,7 @@ const rawItems = [
       getItem("Alt Ekipman Veritabanı", "ekipmanVeritabani", true),
       getItem("Duruş Takibi", "durusTakibi", true),
       getItem("Sayaç Güncellemeleri", "sayacGuncelleme", true),
+      getItem("Ekipman Transferi", "ekipmanTransferi", true),
       // getItem("Team 2", "team2", true)
     ],
     false
@@ -214,6 +223,7 @@ const rawItems = [
       getItem("Malzeme Girişleri", "malzemeGirisFisi", true),
       getItem("Malzeme Çıkışları", "malzemeCikisFisi", true),
       getItem("Malzeme Transferleri", "malzemeTransferFisi", true),
+      getItem("Stok Sayımları", "stokSayimlariFisListe", true),
       /*  getItem("Stok Sayımları", "stokSayimlari", true),
       getItem("Hızlı Maliyetlendirme", "hizliMaliyetlendirme", true),
       getItem("Malzeme Transfer Onay İşlemleri", "malzemeTransferOnayIslemleri", true), */
@@ -269,6 +279,19 @@ const rawItems = [
     false
   ),
   getItem(
+    "Proje Yönetimi",
+    "projeYonetimi",
+    <CalculatorOutlined />,
+    [
+      getItem("Proje Tanımları", "projeTanimlari2", true),
+      getItem("Proje İlerleme İşlemleri", "projeIlerleme", true),
+      getItem("Proje Yönetimi", "projeYonetimiListe", true),
+
+      // getItem("Team 2", "team2", true)
+    ],
+    false
+  ),
+  getItem(
     "Analizler",
     "analizler1",
     <BarChartOutlined />,
@@ -298,6 +321,8 @@ const rawItems = [
     "yonetim",
     <SettingOutlined />,
     [
+      getItem("Doküman Yönetimi", "dokumanYonetimi", true),
+      getItem("Resim Yönetimi", "resimYonetimi", true),
       getItem("Lokasyon Tanımları", "lokasyon", true),
       getItem("Vardiya Tanımları", "vardiyalar", true),
       getItem("Kod Yönetimi", "kodYonetimi", true),
@@ -467,6 +492,13 @@ export default function App() {
           <Route path="/yakitHareketleri" element={<YakitHareketleri />} />
           <Route path="/hizliYakitGirisi" element={<HizliYakitGirisi />} />
           <Route path="/yakitTuketimiAnalizi" element={<YakitTuketimiAnalizi />} />
+          <Route path="/stokSayimlariFisListe" element={<StokSayimFisListe />} />
+          <Route path="/dokumanYonetimi" element={<DokumanYonetimi />} />
+          <Route path="/resimYonetimi" element={<ResimYonetimi />} />
+          <Route path="/ekipmanTransferi" element={<EkipmanTransferi />} />
+          <Route path="/projeTanimlari2" element={<ProjeTanimlari2 />} />
+          <Route path="/projeYonetimiListe" element={<ProjeYonetimListe />} />
+          <Route path="/projeIlerleme" element={<ProjeIlerleme />} />
           {/*<Route path="/kurallar" element={<Kurallar />} />*/}
         </Route>
       </Routes>
