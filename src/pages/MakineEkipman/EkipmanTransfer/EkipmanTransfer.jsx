@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
   Table,
   Button,
@@ -15,19 +15,13 @@ import {
   Col,
   DatePicker,
   Form,
-  Checkbox,
   Dropdown,
-  message,
   Divider,
 } from "antd";
 import {
-  SwapOutlined,
   PlusOutlined,
   SearchOutlined,
   ArrowRightOutlined,
-  CheckCircleOutlined,
-  TruckOutlined,
-  InboxOutlined,
   EllipsisOutlined,
   InfoCircleOutlined,
   FilterOutlined,
@@ -36,7 +30,7 @@ import {
 
 const { Text, Title } = Typography;
 
-// -------------------- Mock Data --------------------
+// -------------------- Mock Data & Config --------------------
 const SITES = ["Şantiye A", "Şantiye B", "Şantiye C", "Merkez Depo"];
 
 const STATUS_CONFIG = {
@@ -48,69 +42,65 @@ const STATUS_CONFIG = {
 };
 
 const demoTransfers = [
-  {
-    key: "1",
-    id: "t1",
-    no: "TRF-2026-000128",
-    plannedDate: "2026-01-07",
-    sourceSite: "Şantiye A",
-    targetSite: "Şantiye B",
-    equipmentCount: 3,
-    status: "PENDING_APPROVAL",
-    requester: "Erhan Çevik",
-  },
-  {
-    key: "2",
-    id: "t2",
-    no: "TRF-2026-000127",
-    plannedDate: "2026-01-06",
-    sourceSite: "Şantiye B",
-    targetSite: "Merkez Depo",
-    equipmentCount: 5,
-    status: "APPROVED",
-    requester: "Ahmet Y.",
-  }
+  { key: "1", id: "t1", no: "TRF-2026-000128", plannedDate: "2026-01-07", sourceSite: "Şantiye A", targetSite: "Şantiye B", equipmentCount: 3, status: "PENDING_APPROVAL" },
+  { key: "2", id: "t2", no: "TRF-2026-000127", plannedDate: "2026-01-06", sourceSite: "Şantiye B", targetSite: "Merkez Depo", equipmentCount: 5, status: "APPROVED" },
 ];
 
 export default function AntDTransferManagement() {
   const [view, setView] = useState("LIST");
   const [currentStep, setCurrentStep] = useState(0);
-  const [searchText, setSearchText] = useState("");
-  const [isTransitModalOpen, setIsTransitModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTransfer, setSelectedTransfer] = useState(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [addForm] = Form.useForm();
 
-  // Kolon genişliklerini dinamik yönetmek için "width" değerleri ekledik
+  const showDetails = (record) => {
+    setSelectedTransfer(record);
+    setIsModalOpen(true);
+  };
+
   const columns = [
     {
-      title: "Transfer No",
-      dataIndex: "no",
-      key: "no",
-      width: 180,
-      render: (text) => <Text strong style={{ color: '#1890ff', cursor: 'pointer' }}>{text}</Text>,
-    },
+  title: "Transfer No",
+  dataIndex: "no",
+  key: "no",
+  fixed: 'left',
+  width: 160,
+  render: (text, record) => (
+    <Text 
+      strong 
+      style={{ color: '#1890ff', cursor: 'pointer' }} 
+      onClick={() => showDetails(record)}
+    >
+      {text}
+    </Text>
+  ),
+},
     {
-      title: "Planlanan Tarih",
+      title: "Tarih",
       dataIndex: "plannedDate",
       key: "plannedDate",
-      width: 150,
+      width: 120,
     },
     {
       title: "Güzergah",
       key: "route",
-      minWidth: 180,
+      minWidth: 250,
+      flex: 1, // Esnek genişlik
       render: (_, r) => (
         <Space split={<ArrowRightOutlined style={{ color: "#bfbfbf", fontSize: 12 }} />}>
-          <Tag color="default" style={{ borderRadius: 4 }}>{r.sourceSite}</Tag>
-          <Tag color="blue" style={{ borderRadius: 4 }}>{r.targetSite}</Tag>
+          <Tag color="default">{r.sourceSite}</Tag>
+          <Tag color="blue">{r.targetSite}</Tag>
         </Space>
       ),
     },
     {
-      title: "Ekipman",
+      title: "Adet",
       dataIndex: "equipmentCount",
       key: "equipmentCount",
       align: "center",
-      width: 100,
-      render: (count) => <Badge count={count} overflowCount={99} style={{ backgroundColor: '#108ee9' }} />,
+      width: 80,
+      render: (count) => <Badge count={count} showZero color="#108ee9" />,
     },
     {
       title: "Durum",
@@ -118,7 +108,7 @@ export default function AntDTransferManagement() {
       key: "status",
       width: 140,
       render: (st) => (
-        <Tag color={STATUS_CONFIG[st].color} style={{ borderRadius: 12, paddingInline: 12 }}>
+        <Tag color={STATUS_CONFIG[st].color} style={{ borderRadius: 12 }}>
           {STATUS_CONFIG[st].label}
         </Tag>
       ),
@@ -127,13 +117,10 @@ export default function AntDTransferManagement() {
       title: "İşlem",
       key: "action",
       align: "right",
-      width: 80,
+      fixed: 'right', // İşlemler her zaman sağda kalsın
+      width: 70,
       render: () => (
-        <Dropdown menu={{ items: [
-          { key: "1", label: "Detaylar", icon: <InfoCircleOutlined /> },
-          { key: "2", label: "Düzenle", icon: <PlusOutlined /> },
-          { key: "3", label: "İptal", danger: true }
-        ] }}>
+        <Dropdown menu={{ items: [{ key: "1", label: "Detay", icon: <InfoCircleOutlined /> }] }}>
           <Button type="text" icon={<EllipsisOutlined />} />
         </Dropdown>
       ),
@@ -142,133 +129,231 @@ export default function AntDTransferManagement() {
 
   return (
     <div style={{ 
-      padding: "min(2vw, 24px)", // Dinamik padding: Ekran küçüldükçe azalır
-      background: "#f0f2f5", 
-      minHeight: "100vh" 
+      background: "#ffffff", // Arka plan tamamen beyaz
+      minHeight: "100vh",
+      padding: "24px 0" // Sağ-sol padding'i iç konteynere bırakıyoruz
     }}>
-      {/* Ana konteyner dev ekranlarda çok yayılmasın diye limitlendi */}
-      <div style={{ maxWidth: 1600, margin: "0 auto", width: '100%' }}>
+      <div style={{ width: '95%', margin: "0 auto" }}>
         
         {view === "LIST" ? (
           <>
-            {/* Dinamik Header */}
-            <div style={{ 
-              display: "flex", 
-              justifyContent: "space-between", 
-              alignItems: "flex-end", 
-              marginBottom: 24,
-              flexWrap: "wrap",
-              gap: 16
-            }}>
-              <div>
-                <Title level={2} style={{ margin: 0, fontSize: 'clamp(20px, 2.5vw, 28px)' }}>Ekipman Transferleri</Title>
-                <Text type="secondary">Şantiyeler arası makine ve ekipman lojistik yönetimi</Text>
-              </div>
-              <Button type="primary" icon={<PlusOutlined />} size="large" shape="round" onClick={() => setView("WIZARD")}>
-                Yeni Transfer Talebi
-              </Button>
-            </div>
+            {/* Header */}
+            <Row justify="space-between" align="bottom" style={{ marginBottom: 32 }}>
+              <Col xs={24} md={16}>
+                <Title level={2} style={{ margin: 0 }}>Ekipman Transferleri</Title>
+              </Col>
+              <Col xs={24} md={8} style={{ textAlign: 'right', marginTop: 16 }}>
+                <Button 
+  type="primary" 
+  icon={<PlusOutlined />} 
+  size="large" 
+  onClick={() => setIsAddModalOpen(true)} // Modal'ı açar
+>
+  Ekle
+</Button>
+              </Col>
+            </Row>
 
-            {/* Filtre ve Tablo Kartı */}
-            <Card bordered={false} style={{ borderRadius: 16, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-              <div style={{ 
-                marginBottom: 20, 
-                display: 'flex', 
-                gap: 12, 
-                flexWrap: 'wrap',
-                justifyContent: 'space-between'
-              }}>
-                <Input
-                  placeholder="Transfer no veya şantiye ara..."
-                  prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
-                  style={{ width: 'clamp(250px, 30vw, 450px)', borderRadius: 8 }}
-                  onChange={e => setSearchText(e.target.value)}
-                />
-                <Space>
-                   <Button icon={<FilterOutlined />}>Gelişmiş Filtre</Button>
-                   <Button icon={<DownloadOutlined />}>Excel</Button>
-                </Space>
-              </div>
-
-              <Table
-                columns={columns}
-                dataSource={demoTransfers}
-                pagination={{ 
-                  pageSize: 12, 
-                  showSizeChanger: true,
-                  size: window.innerWidth < 1200 ? "small" : "default" 
-                }}
-                // En kritik kısım: Büyük ekranda tam sığar, küçükte yatay scroll çıkar
-                scroll={{ x: 1000, y: 'calc(100vh - 400px)' }}
-                sticky
-                size="middle"
-              />
+            {/* Filtre Alanı */}
+            <Card variant="borderless" style={{ marginBottom: 16, border: '1px solid #f0f0f0' }}>
+               <Row gutter={[16, 16]} align="middle">
+                 <Col xs={24} lg={12}>
+                    <Input
+                      placeholder="Hızlı arama..."
+                      prefix={<SearchOutlined />}
+                      size="large"
+                      style={{ borderRadius: 8 }}
+                    />
+                 </Col>
+                 <Col xs={24} lg={12} style={{ textAlign: 'right' }}>
+                    <Space>
+                      <Button icon={<FilterOutlined />}>Filtrele</Button>
+                      <Button icon={<DownloadOutlined />}>Dışa Aktar</Button>
+                    </Space>
+                 </Col>
+               </Row>
             </Card>
+
+            {/* Dinamik Tablo - x: 'max-content' her ekrana sığmasını sağlar */}
+            <Table
+              columns={columns}
+              dataSource={demoTransfers}
+              scroll={{ x: 'max-content' }} 
+              pagination={{ responsive: true, pageSize: 10 }}
+              style={{ border: '1px solid #f0f0f0', borderRadius: 8 }}
+            />
           </>
         ) : (
-          /* SİHİRBAZ GÖRÜNÜMÜ - Responsive Form */
-          <Card bordered={false} style={{ borderRadius: 16, minHeight: '60vh' }}>
-            <Button type="link" onClick={() => { setView("LIST"); setCurrentStep(0); }} style={{ padding: 0, marginBottom: 24 }}>
-              ← Transfer Listesine Dön
+          /* Transfer Sihirbazı */
+          <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+            <Button type="link" onClick={() => setView("LIST")} style={{ marginBottom: 16 }}>
+              ← Listeye Dön
             </Button>
-            
-            <div style={{ maxWidth: 800, margin: '0 auto' }}>
-              <Steps
-                current={currentStep}
-                style={{ marginBottom: 48 }}
-                items={[
-                  { title: "Genel Bilgiler" },
-                  { title: "Ekipman Seçimi" },
-                  { title: "Onay" },
-                ]}
-              />
-
-              <div style={{ background: '#fafafa', padding: 'min(5vw, 40px)', borderRadius: 12 }}>
-                {currentStep === 0 && (
-                  <Form layout="vertical">
-                    <Row gutter={24}>
-                      <Col xs={24} md={11}>
-                        <Form.Item label="Kaynak Şantiye" required>
-                          <Select placeholder="Nereden?" size="large" options={SITES.map(s => ({ label: s, value: s }))} />
-                        </Form.Item>
-                      </Col>
-                      <Col xs={24} md={2} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', paddingBlock: 10 }}>
-                        <ArrowRightOutlined style={{ transform: window.innerWidth < 768 ? 'rotate(90deg)' : 'none' }} />
-                      </Col>
-                      <Col xs={24} md={11}>
-                        <Form.Item label="Hedef Şantiye" required>
-                          <Select placeholder="Nereye?" size="large" options={SITES.map(s => ({ label: s, value: s }))} />
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                    <Form.Item label="Transfer Tarihi" required>
-                      <DatePicker style={{ width: '100%' }} size="large" />
-                    </Form.Item>
-                    <Divider />
-                    <Button type="primary" block size="large" onClick={() => setCurrentStep(1)}>
-                      Sonraki Adım: Ekipmanları Seç
-                    </Button>
-                  </Form>
-                )}
-                {/* Diğer step'ler buraya gelecek */}
-              </div>
-            </div>
-          </Card>
+            <Card title="Yeni Transfer Talebi Oluştur" bordered={false} style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+              <Steps current={currentStep} items={[{ title: "Konum" }, { title: "Ekipman" }, { title: "Onay" }]} style={{ marginBottom: 40 }} />
+              
+              <Form layout="vertical">
+                <Row gutter={24}>
+                  <Col xs={24} md={11}><Form.Item label="Kaynak"><Select options={SITES.map(s => ({label:s, value:s}))} /></Form.Item></Col>
+                  <Col xs={24} md={2} style={{ textAlign: 'center', alignSelf: 'center' }}><ArrowRightOutlined /></Col>
+                  <Col xs={24} md={11}><Form.Item label="Hedef"><Select options={SITES.map(s => ({label:s, value:s}))} /></Form.Item></Col>
+                </Row>
+                <Form.Item label="Planlanan Tarih"><DatePicker style={{ width: '100%' }} /></Form.Item>
+                <Divider />
+                <Button type="primary" size="large" block onClick={() => setCurrentStep(1)}>Devam Et</Button>
+              </Form>
+            </Card>
+          </div>
         )}
       </div>
-
-      {/* MODAL - Dinamik Genişlik */}
       <Modal
-        title="Sevkiyat Detayları"
-        open={isTransitModalOpen}
-        onCancel={() => setIsTransitModalOpen(false)}
-        width={window.innerWidth < 768 ? '95%' : 600}
-        centered
-      >
-        <Form layout="vertical">
-          {/* ... Modal içeriği aynı ... */}
-        </Form>
-      </Modal>
+  title="Transfer Fişi"
+  open={isModalOpen}
+  onCancel={() => setIsModalOpen(false)}
+  footer={[
+    <Button key="close" onClick={() => setIsModalOpen(false)}>Kapat</Button>
+  ]}
+  width={800}
+>
+  {selectedTransfer && (
+    <>
+      <Row justify="space-between" align="middle">
+        <Col>
+          <Text type="secondary">Transfer No</Text>
+          <Title level={4} style={{ margin: 0 }}>{selectedTransfer.no}</Title>
+          <Text type="secondary">
+            {selectedTransfer.sourceSite} → {selectedTransfer.targetSite} • Planlanan: {selectedTransfer.plannedDate}
+          </Text>
+        </Col>
+        <Col>
+          <Tag color={STATUS_CONFIG[selectedTransfer.status].color} style={{ borderRadius: 12 }}>
+            {STATUS_CONFIG[selectedTransfer.status].label}
+          </Tag>
+        </Col>
+      </Row>
+
+      <Table
+        style={{ marginTop: 20 }}
+        pagination={false}
+        dataSource={[
+          { key: '1', code: 'EXC-001', type: 'Ekskavatör', status: 'Aktif', site: 'Şantiye A' },
+          { key: '2', code: 'DZR-003', type: 'Dozer', status: 'Aktif', site: 'Şantiye A' },
+          { key: '3', code: 'CMP-021', type: 'Kompaktör', status: 'Transferde', site: 'Şantiye A' },
+        ]}
+        columns={[
+          { title: 'Kod', dataIndex: 'code', key: 'code' },
+          { title: 'Tip', dataIndex: 'type', key: 'type' },
+          { title: 'Durum', dataIndex: 'status', key: 'status' },
+          { title: 'Mevcut Şantiye', dataIndex: 'site', key: 'site' },
+          { title: 'Teslim', dataIndex: 'delivery', key: 'delivery', render: () => '—' },
+        ]}
+      />
+      
+      <Text type="secondary" style={{ fontSize: '12px', marginTop: 16, display: 'block' }}>
+        İpucu: Listede Transfer No üzerine tıklayarak fiş içindeki ekipmanları burada görebilirsiniz.
+      </Text>
+    </>
+  )}
+</Modal>
+<Modal
+  title="Yeni Transfer Talebi Oluştur"
+  open={isAddModalOpen}
+  onCancel={() => {
+    setIsAddModalOpen(false);
+    setCurrentStep(0); // Kapatıldığında adımı sıfırla
+    addForm.resetFields();
+  }}
+  footer={null} // Kendi butonlarımızı form içinde kullanacağız
+  width={700}
+>
+  <Steps 
+    current={currentStep} 
+    size="small"
+    items={[{ title: "Konum" }, { title: "Ekipman" }, { title: "Onay" }]} 
+    style={{ marginBottom: 32, marginTop: 16 }} 
+  />
+  
+  <Form 
+    form={addForm}
+    layout="vertical"
+  >
+    {currentStep === 0 && (
+  <>
+    <Row gutter={24} align="middle">
+      <Col span={11}>
+        <Form.Item name="source" label="Kaynak Şantiye" rules={[{ required: true, message: 'Lütfen kaynak seçin' }]}>
+          <Select placeholder="Seçiniz" options={SITES.map(s => ({ label: s, value: s }))} />
+        </Form.Item>
+      </Col>
+      <Col span={2} style={{ textAlign: 'center', marginTop: 8 }}>
+        <ArrowRightOutlined style={{ color: '#bfbfbf' }} />
+      </Col>
+      <Col span={11}>
+        <Form.Item name="target" label="Hedef Şantiye" rules={[{ required: true, message: 'Lütfen hedef seçin' }]}>
+          <Select placeholder="Seçiniz" options={SITES.map(s => ({ label: s, value: s }))} />
+        </Form.Item>
+      </Col>
+    </Row>
+
+    <Row gutter={24}>
+      <Col span={12}>
+        <Form.Item name="date" label="Planlanan Transfer Tarihi" rules={[{ required: true }]}>
+          <DatePicker style={{ width: '100%' }} />
+        </Form.Item>
+      </Col>
+      <Col span={12}>
+        <Form.Item name="reason" label="Transfer Nedeni" rules={[{ required: true, message: 'Lütfen bir neden seçin' }]}>
+          <Select placeholder="Neden Seçiniz">
+            <Select.Option value="arıza">Arıza / Bakım</Select.Option>
+            <Select.Option value="proje_bitiş">Proje Tamamlanması</Select.Option>
+            <Select.Option value="ihtiyaç">Operasyonel İhtiyaç</Select.Option>
+            <Select.Option value="yedek">Yedekleme</Select.Option>
+          </Select>
+        </Form.Item>
+      </Col>
+    </Row>
+
+    <Form.Item name="description" label="Açıklama">
+      <Input.TextArea 
+        rows={3} 
+        placeholder="Transferle ilgili eklemek istediğiniz notlar..." 
+        maxLength={200}
+        showCount
+      />
+    </Form.Item>
+    
+    <Divider />
+    <div style={{ textAlign: 'right' }}>
+      <Button type="primary" size="large" onClick={() => setCurrentStep(1)}>
+        Devam Et
+      </Button>
+    </div>
+  </>
+)}
+
+    {currentStep === 1 && (
+      <div style={{ textAlign: 'center', padding: '20px 0' }}>
+        <Text type="secondary">Ekipman seçim ekranı buraya gelecek...</Text>
+        <Divider />
+        <Space>
+          <Button onClick={() => setCurrentStep(0)}>Geri</Button>
+          <Button type="primary" onClick={() => setCurrentStep(2)}>Devam Et</Button>
+        </Space>
+      </div>
+    )}
+
+    {currentStep === 2 && (
+      <div style={{ textAlign: 'center', padding: '20px 0' }}>
+        <Text strong>Transfer talebi onaylanmaya hazır.</Text>
+        <Divider />
+        <Space>
+          <Button onClick={() => setCurrentStep(1)}>Geri</Button>
+          <Button type="primary" onClick={() => setIsAddModalOpen(false)}>Tamamla ve Gönder</Button>
+        </Space>
+      </div>
+    )}
+  </Form>
+</Modal>
     </div>
   );
 }
