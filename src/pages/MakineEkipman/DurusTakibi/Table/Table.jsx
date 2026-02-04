@@ -3,7 +3,7 @@ import ContextMenu from "../components/ContextMenu/ContextMenu";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import Filters from "./filter/Filters";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, message, ConfigProvider } from "antd";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, message, ConfigProvider, Row, Col, Card, Statistic } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -20,6 +20,10 @@ import enUS from "antd/lib/locale/en_US";
 import ruRU from "antd/lib/locale/ru_RU";
 import azAZ from "antd/lib/locale/az_AZ";
 
+import AylikTab from "./AylikTab";
+import YillikTab from "./YillikTab";
+import GrafikTab from "./GrafikTab";
+
 const localeMap = {
   tr: trTR,
   en: enUS,
@@ -30,6 +34,97 @@ const localeMap = {
 // Date/time formats are derived automatically via Intl based on browser locale
 
 const { Text } = Typography;
+
+const DurusIstatistikKartlari = ({ body }) => {
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const fetchStats = useCallback(async () => {
+    setLoading(true);
+    try {
+      const payload = {
+        // Dokümandaki format: "2026-01-01 00:00:00"
+        BaslangicTarih: body.filters?.BaslangicTarih || "2026-01-01 00:00:00",
+        BitisTarih: body.filters?.BitisTarih || "2026-01-31 23:59:59",
+      };
+
+      const response = await AxiosInstance.post("GetDurusIstatistik", payload);
+      if (response.status_code === 200) {
+        setStats(response.data);
+      }
+    } catch (error) {
+      console.error("İstatistik hatası:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [body.filters]);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
+
+  return (
+    <Spin spinning={loading}>
+      <Row gutter={[16, 16]} style={{ marginBottom: "20px" }}>
+        <Col xs={24} sm={12} md={6}>
+          <Card 
+            size="small" 
+            style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+            bodyStyle={{ padding: '20px 24px' }} // İç boşluğu artırarak kartı büyüttük
+          >
+            <Statistic 
+              title={<Text strong style={{ fontSize: '14px' }}>Toplam Duruş Süresi</Text>} 
+              value={stats?.toplam_durus_suresi || "-"}
+              valueStyle={{ fontSize: '24px' }} // Fontu büyüttük
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card 
+            size="small" 
+            style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+            bodyStyle={{ padding: '20px 24px' }}
+          >
+            <Statistic 
+              title={<Text strong style={{ fontSize: '14px' }}>Plansız Duruş Oranı</Text>} 
+              value={stats?.plansiz_durus_orani || 0}
+              precision={1}
+              suffix="%"
+              valueStyle={{ fontSize: '24px' }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card 
+            size="small" 
+            style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+            bodyStyle={{ padding: '20px 24px' }}
+          >
+            <Statistic 
+              title={<Text strong style={{ fontSize: '14px' }}>Ortalama Duruş Süresi</Text>} 
+              value={stats?.ortalama_durus_suresi || 0}
+              suffix={<small style={{ fontSize: '14px', marginLeft: '4px' }}>dk</small>}
+              valueStyle={{ fontSize: '24px' }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card 
+            size="small" 
+            style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+            bodyStyle={{ padding: '20px 24px' }}
+          >
+            <Statistic 
+              title={<Text strong style={{ fontSize: '14px' }}>En Çok Duruş Yapan</Text>} 
+              value={stats?.en_cok_durus_yapan || "-"}
+              valueStyle={{ fontSize: '18px', fontWeight: '700', color: '#1d39c4', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+            />
+          </Card>
+        </Col>
+      </Row>
+    </Spin>
+  );
+};
 
 const StyledButton = styled(Button)`
   display: flex;
@@ -134,6 +229,7 @@ DraggableRow.propTypes = {
 
 const DurusTakibi = () => {
   const formMethods = useForm();
+  const [activeTab, setActiveTab] = useState('detay');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -729,79 +825,125 @@ const DurusTakibi = () => {
             </div>
           </Modal>
 
-          {/* Table */}
-          <div
-            style={{
-              height: "calc(100vh - 200px)",
-            }}
-          >
-            {/* Toolbar */}
+          <DurusIstatistikKartlari body={body} searchTerm={searchTerm} />
+
+          <div style={{ height: "calc(100vh - 200px)" }}>
+            {/* Toolbar: Sol ve Sağ gruplar */}
             <div
               style={{
                 display: "flex",
                 flexWrap: "wrap",
                 justifyContent: "space-between",
+                alignItems: "center",
                 marginBottom: "15px",
                 gap: "10px",
+                width: "100%",
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  gap: "10px",
-                  alignItems: "center",
-                  width: "100%",
-                  maxWidth: "935px",
-                  flexWrap: "wrap",
-                }}
-              >
-                <StyledButton onClick={() => setIsModalVisible(true)}>
-                  <MenuOutlined />
-                </StyledButton>
-                <Input
-                  style={{ width: "250px" }}
-                  type="text"
-                  placeholder="Arama yap..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onPressEnter={handleSearch}
-                  // prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
-                  suffix={<SearchOutlined style={{ color: "#0091ff" }} onClick={handleSearch} />}
-                />
-
-                <Filters onChange={handleBodyChange} />
-                {/* <StyledButton onClick={handleSearch} icon={<SearchOutlined />} /> */}
-                {/* Other toolbar components */}
+              {/* SOL GRUP: Sadece 'detay' sekmesinde görünür */}
+              <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+                {activeTab === 'detay' && (
+                  <>
+                    <StyledButton onClick={() => setIsModalVisible(true)}>
+                      <MenuOutlined />
+                    </StyledButton>
+                    <Input
+                      style={{ width: "250px" }}
+                      placeholder="Arama yap..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onPressEnter={handleSearch}
+                      suffix={<SearchOutlined style={{ color: "#0091ff", cursor: 'pointer' }} onClick={handleSearch} />}
+                    />
+                    <Filters onChange={handleBodyChange} />
+                  </>
+                )}
               </div>
-              <div style={{ display: "flex", gap: "10px" }}>
-                <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
-                <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
+
+              {/* SAĞ GRUP (Sekmeler her zaman, ContextMenu ve Ekle sadece 'detay'da) */}
+              <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                <div style={{ display: "flex", gap: "5px" }}>
+                  <StyledButton onClick={() => setActiveTab('detay')} type={activeTab === 'detay' ? 'primary' : 'default'}>
+                    Detaylı
+                  </StyledButton>
+                  <StyledButton onClick={() => setActiveTab('aylik')} type={activeTab === 'aylik' ? 'primary' : 'default'}>
+                    Aylık
+                  </StyledButton>
+                  <StyledButton onClick={() => setActiveTab('yillik')} type={activeTab === 'yillik' ? 'primary' : 'default'}>
+                    Yıllık
+                  </StyledButton>
+                  <StyledButton onClick={() => setActiveTab('grafik')} type={activeTab === 'grafik' ? 'primary' : 'default'}>
+                    Grafik
+                  </StyledButton>
+                </div>
+                
+                {activeTab === 'detay' && (
+                  <>
+                    <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
+                    <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
+                  </>
+                )}
               </div>
             </div>
+
+            {/* İÇERİK ALANI: Sekmeye göre değişen kısım */}
             <Spin spinning={loading}>
-              <StyledTable
-                components={components}
-                rowSelection={rowSelection}
-                columns={filteredColumns}
-                dataSource={data}
-                pagination={{
-                  current: currentPage,
-                  total: totalCount,
-                  pageSize: pageSize,
-                  showTotal: (total) => `Toplam ${total}`,
-                  showSizeChanger: true,
-                  pageSizeOptions: ["10", "20", "50", "100"],
-                  showQuickJumper: true,
-                  onChange: handleTableChange,
-                  onShowSizeChange: (current, size) => {
-                    setPageSize(size);
-                    fetchData(1, size);
-                  },
-                }}
-                scroll={{ y: "calc(100vh - 335px)" }}
-              />
+              <div style={{ marginTop: '10px' }}>
+                {activeTab === 'detay' && (
+                  <StyledTable
+                    components={components}
+                    rowSelection={rowSelection}
+                    columns={filteredColumns}
+                    dataSource={data}
+                    pagination={{
+                      current: currentPage,
+                      total: totalCount,
+                      pageSize: pageSize,
+                      showTotal: (total) => `Toplam ${total}`,
+                      showSizeChanger: true,
+                      pageSizeOptions: ["10", "20", "50", "100"],
+                      onChange: handleTableChange,
+                    }}
+                    scroll={{ y: "calc(100vh - 430px)" }}
+                  />
+                )}
+
+                {activeTab === 'aylik' && (
+                  <AylikTab 
+                    rows={data} 
+                    search={searchTerm} 
+                    setSearch={setSearchTerm}
+                    year={new Date().getFullYear()}
+                    setYear={() => {}} 
+                    jobTypes={[]} 
+                    jobTypeFilter=""
+                    setJobTypeFilter={() => {}}
+                  />
+                )}
+
+                {activeTab === 'yillik' && (
+                  <YillikTab 
+                    rows={data} 
+                    search={searchTerm} 
+                    setSearch={setSearchTerm}
+                    jobTypes={[]} 
+                    jobTypeFilter=""
+                    setJobTypeFilter={() => {}}
+                  />
+                )}
+
+                {activeTab === 'grafik' && (
+                  <GrafikTab rows={data} />
+                )}
+              </div>
             </Spin>
-            <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
+
+            <EditDrawer 
+              selectedRow={drawer.data} 
+              onDrawerClose={() => setDrawer({ ...drawer, visible: false })} 
+              drawerVisible={drawer.visible} 
+              onRefresh={refreshTableData} 
+            />
           </div>
         </FormProvider>
       </ConfigProvider>
