@@ -112,7 +112,6 @@ export default function OmegaProjectManagement() {
                 value={view}
                 onChange={setView}
               />
-              <Button type="primary" icon={<PlusOutlined />} size="large">Yeni Proje</Button>
             </Space>
           </Col>
         </Row>

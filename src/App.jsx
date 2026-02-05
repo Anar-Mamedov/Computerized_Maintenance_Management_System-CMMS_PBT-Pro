@@ -285,7 +285,7 @@ const rawItems = [
     [
       getItem("Proje Tanımları", "projeTanimlari2", true),
       getItem("Proje İlerleme İşlemleri", "projeIlerleme", true),
-      getItem("Proje Yönetimi", "projeYonetimiListe", true),
+      ...(isOmegaMenu ? [] : [getItem("Proje Yönetimi", "projeYonetimiListe", true)]),
 
       // getItem("Team 2", "team2", true)
     ],
