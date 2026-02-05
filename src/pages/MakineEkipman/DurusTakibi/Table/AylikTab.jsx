@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Table, Card, Select, Input, Button, Space, Typography, message } from 'antd';
 import { SearchOutlined, DownloadOutlined } from '@ant-design/icons';
 import AxiosInstance from "../../../../api/http";
@@ -14,7 +14,25 @@ const AylikTab = ({ search, setSearch, year, setYear, jobTypeFilter }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const yearOptions = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    const startYear = 2010; // İstersen bunu daha eskiye çekebilirsin
+    const endYear = currentYear + 1; // Gelecek yılı da ekleyelim
+    const years = [];
+    for (let i = endYear; i >= startYear; i--) {
+      years.push(i);
+    }
+    return years;
+  }, []);
+
+  useEffect(() => {
+    if (!year) {
+      setYear(new Date().getFullYear());
+    }
+  }, [year, setYear]);
+
   const fetchData = useCallback(async () => {
+    if (!year) return; // Yıl yoksa boşuna istek atmasın
     setLoading(true);
     try {
       const payload = {
@@ -55,8 +73,16 @@ const AylikTab = ({ search, setSearch, year, setYear, jobTypeFilter }) => {
       <Card size="small">
         <Space wrap>
           <Input placeholder="Arama..." prefix={<SearchOutlined />} value={search} onChange={e => setSearch(e.target.value)} style={{ width: 200 }} />
-          <Select value={year} onChange={setYear} style={{ width: 90 }}>
-            {[2024, 2025, 2026].map(y => <Option key={y} value={y}>{y}</Option>)}
+          <Select 
+            value={year} 
+            onChange={setYear} 
+            style={{ width: 100 }}
+            placeholder="Yıl Seç"
+            showSearch // Kanka çok yıl olursa içinde arama da yapabilirsin
+          >
+            {yearOptions.map(y => (
+              <Option key={y} value={y}>{y}</Option>
+            ))}
           </Select>
           <Select value={groupBy} onChange={setGroupBy} style={{ width: 160 }}>
             <Option value="NEDEN">Duruş Nedenleri</Option>
