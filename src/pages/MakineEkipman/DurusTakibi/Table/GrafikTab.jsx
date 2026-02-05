@@ -1,19 +1,34 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Card, Row, Col, Spin, message } from 'antd';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { Card, Row, Col, Spin, message, Select, Space } from 'antd'; // Select ve Space eklendi
 import { Line, Column, Pie } from '@ant-design/plots';
 import AxiosInstance from "../../../../api/http";
 
-const GrafikTab = ({ search, year, jobTypeFilter }) => {
+const { Option } = Select;
+
+const GrafikTab = ({ search, year, setYear, jobTypeFilter }) => {
   const [loading, setLoading] = useState(false);
   const [charts, setCharts] = useState({ line_chart: [], bar_chart: [], pie_chart: [] });
 
+  // Kanka yılları dinamik oluşturuyoruz (2010'dan bugüne +1 yıl)
+  const yearOptions = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let i = currentYear + 1; i >= 2010; i--) {
+      years.push(i);
+    }
+    return years;
+  }, []);
+
   const fetchData = useCallback(async () => {
+    // Yıl seçili değilse istek atma kanka
+    if (!year) return;
+
     setLoading(true);
     try {
       const payload = {
         Yil: year,
         IsEmriTipleri: jobTypeFilter ? [Number(jobTypeFilter)] : [],
-        Gruplama: "NEDEN", // Dashboard genelde neden odaklıdır
+        Gruplama: "NEDEN", 
         VeriTipi: "SURE",
         Arama: search
       };
@@ -32,21 +47,36 @@ const GrafikTab = ({ search, year, jobTypeFilter }) => {
 
   return (
     <Spin spinning={loading}>
-      {/* Kanka buraya height kısıtlaması ve overflowY: 'auto' ekledim. 
-          Bu sayede ekran ne kadar küçük olursa olsun grafikler bu alan içinde scroll olur.
-      */}
-      <div style={{ height: 'calc(100vh - 350px)', overflowY: 'auto', padding: '16px' }}>
+      {/* Üst Kısım: Filtre Alanı */}
+      <div style={{ marginBottom: '16px', padding: '0 16px' }}>
+        <Space>
+          <span style={{ fontWeight: 600 }}>Rapor Yılı:</span>
+          <Select 
+            value={year} 
+            onChange={setYear} 
+            style={{ width: 120 }}
+            placeholder="Yıl Seçin"
+            showSearch
+          >
+            {yearOptions.map(y => (
+              <Option key={y} value={y}>{y}</Option>
+            ))}
+          </Select>
+        </Space>
+      </div>
+
+      <div style={{ height: 'calc(100vh - 400px)', overflowY: 'auto', padding: '0 16px 16px 16px' }}>
         <Row gutter={[16, 16]}>
           {/* Üst Sol: Aylık Trend */}
           <Col xs={24} lg={12}>
-            <Card title="Aylık Trend" size="small" className="shadow-sm" style={{ borderRadius: '12px' }}>
+            <Card title="Aylık Trend" size="small" style={{ borderRadius: '12px' }}>
               <Line 
-                data={charts.line_chart} 
+                data={charts.line_chart || []} 
                 xField="AyAdi" 
                 yField="Deger" 
                 smooth 
                 point={{ size: 5 }} 
-                height={280} // Yüksekliği sabitledik
+                height={280}
                 autoFit={true}
               />
             </Card>
@@ -54,9 +84,9 @@ const GrafikTab = ({ search, year, jobTypeFilter }) => {
 
           {/* Üst Sağ: Duruş Nedenleri */}
           <Col xs={24} lg={12}>
-            <Card title="Duruş Nedenleri (Top 10)" size="small" className="shadow-sm" style={{ borderRadius: '12px' }}>
+            <Card title="Duruş Nedenleri (Top 10)" size="small" style={{ borderRadius: '12px' }}>
               <Column 
-                data={charts.bar_chart} 
+                data={charts.bar_chart || []} 
                 xField="Etiket" 
                 yField="Deger" 
                 color="#d32029" 
@@ -69,19 +99,17 @@ const GrafikTab = ({ search, year, jobTypeFilter }) => {
 
           {/* Alt: Ekipman Dağılımı */}
           <Col span={24}>
-            <Card title="Ekipman Dağılımı (Top 10)" size="small" className="shadow-sm" style={{ borderRadius: '12px' }}>
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <Pie 
-                  data={charts.pie_chart} 
-                  angleField="Deger" 
-                  colorField="Etiket" 
-                  radius={0.8} 
-                  height={350}
-                  autoFit={true}
-                  label={{ type: 'outer', content: '{name}: {percentage}' }}
-                  legend={{ position: 'bottom' }}
-                />
-              </div>
+            <Card title="Ekipman Dağılımı (Top 10)" size="small" style={{ borderRadius: '12px' }}>
+              <Pie 
+                data={charts.pie_chart || []} 
+                angleField="Deger" 
+                colorField="Etiket" 
+                radius={0.8} 
+                height={350}
+                autoFit={true}
+                label={{ type: 'outer', content: '{name}: {percentage}' }}
+                legend={{ position: 'bottom' }}
+              />
             </Card>
           </Col>
         </Row>

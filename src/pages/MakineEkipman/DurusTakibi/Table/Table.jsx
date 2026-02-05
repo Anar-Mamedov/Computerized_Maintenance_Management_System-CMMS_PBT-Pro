@@ -35,17 +35,19 @@ const localeMap = {
 
 const { Text } = Typography;
 
-const DurusIstatistikKartlari = ({ body }) => {
+const DurusIstatistikKartlari = ({ body, searchTerm }) => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const fetchStats = useCallback(async () => {
     setLoading(true);
     try {
+      // Kanka, Filters componentinden gelen tüm filtreleri buraya yayıyoruz
       const payload = {
-        // Dokümandaki format: "2026-01-01 00:00:00"
-        BaslangicTarih: body.filters?.BaslangicTarih || "2026-01-01 00:00:00",
-        BitisTarih: body.filters?.BitisTarih || "2026-01-31 23:59:59",
+        Kelime: searchTerm, // Arama kelimesini ekledik
+        BaslangicTarih: body.filters?.baslangicTarih,
+        BitisTarih: body.filters?.BitisTarih,
+        ...body.filters?.customfilter
       };
 
       const response = await AxiosInstance.post("GetDurusIstatistik", payload);
@@ -57,7 +59,7 @@ const DurusIstatistikKartlari = ({ body }) => {
     } finally {
       setLoading(false);
     }
-  }, [body.filters]);
+  }, [body.filters, searchTerm]); // Filtreler değiştikçe tetiklenir
 
   useEffect(() => {
     fetchStats();
@@ -242,6 +244,9 @@ const DurusTakibi = () => {
     visible: false,
     data: null,
   });
+  const [aylikYil, setAylikYil] = useState(new Date().getFullYear());
+  const [grafikYil, setGrafikYil] = useState(new Date().getFullYear());
+  const [jobTypeFilter, setJobTypeFilter] = useState("");
 
   const [selectedRows, setSelectedRows] = useState([]);
 
@@ -909,17 +914,14 @@ const DurusTakibi = () => {
                 )}
 
                 {activeTab === 'aylik' && (
-                  <AylikTab 
-                    rows={data} 
-                    search={searchTerm} 
-                    setSearch={setSearchTerm}
-                    year={new Date().getFullYear()}
-                    setYear={() => {}} 
-                    jobTypes={[]} 
-                    jobTypeFilter=""
-                    setJobTypeFilter={() => {}}
-                  />
-                )}
+  <AylikTab 
+    search={searchTerm} 
+    setSearch={setSearchTerm}
+    year={aylikYil}        // Aylık için özel state
+    setYear={setAylikYil}   // Aylık için özel set
+    jobTypeFilter={jobTypeFilter}
+  />
+)}
 
                 {activeTab === 'yillik' && (
                   <YillikTab 
@@ -933,8 +935,13 @@ const DurusTakibi = () => {
                 )}
 
                 {activeTab === 'grafik' && (
-                  <GrafikTab rows={data} />
-                )}
+  <GrafikTab 
+    search={searchTerm}
+    year={grafikYil}       // Grafik için özel state
+    setYear={setGrafikYil}  // Grafik için özel set
+    jobTypeFilter={jobTypeFilter}
+  />
+)}
               </div>
             </Spin>
 
