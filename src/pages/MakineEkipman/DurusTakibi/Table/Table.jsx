@@ -119,7 +119,7 @@ const DurusIstatistikKartlari = ({ body, searchTerm }) => {
             <Statistic 
               title={<Text strong style={{ fontSize: '14px' }}>En Çok Duruş Yapan</Text>} 
               value={stats?.en_cok_durus_yapan || "-"}
-              valueStyle={{ fontSize: '18px', fontWeight: '700', color: '#1d39c4', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+              valueStyle={{ fontSize: '18px' }}
             />
           </Card>
         </Col>

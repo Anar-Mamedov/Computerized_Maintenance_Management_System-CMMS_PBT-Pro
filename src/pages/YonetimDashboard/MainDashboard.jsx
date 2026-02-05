@@ -58,6 +58,7 @@ import Component43 from "./components/Component43.jsx";
 // NOT: Bu dosya yollarını kendi proje yapına göre kontrol etmelisin.
 import SatinalmaDashboard from "../SatinalmaYonetimi/Dashboard1/Dashboard.jsx"; 
 import BakimDashboard from "../Analizler/BakimKpiAnalizi/BakimKpiAnalizi.jsx";
+import ProjeYonetimi from "../ProjeYonetimi/ProjeYonetimiListe.jsx";
 
 import "./custom-gridstack.css"; 
 
@@ -532,6 +533,7 @@ function MainDashboard() {
 
   const items = [
     { key: 'yonetici', label: 'Yönetici Özeti' },
+    { key: 'proje', label: 'Proje Yönetimi' },
     { key: 'operasyon', label: 'Operasyon' },
     { key: 'makine', label: 'Makine' },
     { key: 'satinalma', label: 'Satınalma' },
@@ -587,6 +589,7 @@ function MainDashboard() {
               {/* HARİCİ SAYFALAR İÇİN */}
               {activeTab === 'satinalma' && <SatinalmaDashboard />}
               {activeTab === 'bakim' && <BakimDashboard />}
+              {activeTab === 'proje' && <ProjeYonetimi />}
             </div>
           </div>
         </AppProvider>

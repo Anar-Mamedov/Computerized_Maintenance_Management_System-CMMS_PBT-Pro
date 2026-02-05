@@ -56,16 +56,29 @@ const AylikTab = ({ search, setSearch, year, setYear, jobTypeFilter }) => {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const columns = [
-    { title: 'Başlık', dataIndex: 'Baslik', key: 'Baslik', fixed: 'left', width: 150, render: (t) => t },
+    { title: 'Başlık', dataIndex: 'Baslik', key: 'Baslik', fixed: 'left', width: 150 },
     ...months.map(m => ({
       title: m,
       dataIndex: m,
       key: m,
       align: 'right',
-      width: 100,
-      render: (v) => v > 0 ? (metric === "MALIYET" ? `${v} TL` : `${v} ${metric === "SURE" ? "dk" : ""}`) : "-"
+      width: 120, // Süre formatı uzun olduğu için genişliği biraz artırdım kanka
+      render: (v) => {
+        if (!v || v === "-") return "-";
+        // Eğer metric maliyet ise ve API sadece sayı gönderirse TL ekle, 
+        // ama API süreyi "sa dk" gönderdiği için müdahale etmiyoruz
+        return v;
+      }
     })),
-    { title: 'Toplam', dataIndex: 'Toplam', key: 'Toplam', fixed: 'right', align: 'right', width: 120, render: (v) => <Text strong>{v}</Text> }
+    { 
+      title: 'Toplam', 
+      dataIndex: 'Toplam', 
+      key: 'Toplam', 
+      fixed: 'right', 
+      align: 'right', 
+      width: 130, 
+      render: (v) => <Text strong color="#1890ff">{v}</Text> 
+    }
   ];
 
   return (
@@ -106,6 +119,7 @@ const AylikTab = ({ search, setSearch, year, setYear, jobTypeFilter }) => {
         loading={loading} 
         scroll={{ x: 1300, y: 'calc(100vh - 520px)' }}
         bordered 
+        rowKey="Baslik"
         pagination={{
           pageSize: 15,
           showSizeChanger: true,

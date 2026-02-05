@@ -37,16 +37,25 @@ const YillikTab = ({ search, setSearch, year, jobTypeFilter }) => {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const columns = [
-    { title: 'Başlık', dataIndex: 'Baslik', key: 'Baslik', fixed: 'left', width: 160, render: (t) => t },
+    { title: 'Başlık', dataIndex: 'Baslik', key: 'Baslik', fixed: 'left', width: 160 },
+    // Kanka API'den gelen 'headers' dizisini (yılları) sütuna çeviriyoruz
     ...dynamicHeaders.map(yearHead => ({
       title: String(yearHead),
       dataIndex: String(yearHead),
       key: String(yearHead),
       align: 'right',
-      width: 110,
-      render: (v) => v || "-"
+      width: 130,
+      render: (v) => (v === null || v === undefined || v === "") ? "-" : v
     })),
-    { title: 'Toplam', dataIndex: 'Toplam', key: 'Toplam', fixed: 'right', align: 'right', width: 120, render: (v) => <Text strong>{v}</Text> }
+    { 
+      title: 'Toplam', 
+      dataIndex: 'Toplam', 
+      key: 'Toplam', 
+      fixed: 'right', 
+      align: 'right', 
+      width: 140, 
+      render: (v) => <Text strong style={{ color: '#cf1322' }}>{v}</Text> 
+    }
   ];
 
   return (
@@ -74,7 +83,8 @@ const YillikTab = ({ search, setSearch, year, jobTypeFilter }) => {
         columns={columns} 
         loading={loading} 
         scroll={{ x: 1200, y: 'calc(100vh - 520px)' }} // Dinamik dikey scroll eklendi
-        bordered 
+        bordered
+        rowKey="Baslik" 
         pagination={{
           pageSize: 15,
           showSizeChanger: true,
