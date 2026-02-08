@@ -115,7 +115,7 @@ function MalzemeTipSiparisGrafigi(props = {}) {
   );
 
   return (
-    <div style={{ width: "100%", height: "100%", borderRadius: "5px", backgroundColor: "white", display: "flex", flexDirection: "column", gap: "10px", border: "1px solid #f0f0f0" }}>
+    <div style={{ width: "100%", height: "150%", borderRadius: "5px", backgroundColor: "white", display: "flex", flexDirection: "column", gap: "10px", border: "1px solid #f0f0f0" }}>
       <div style={{ padding: "10px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
         <Text style={{ fontWeight: "500", fontSize: "17px" }}>Malzeme Tiplerine Göre Sipariş Dağılımı</Text>
         <Popover placement="bottom" content={content} trigger="click">
