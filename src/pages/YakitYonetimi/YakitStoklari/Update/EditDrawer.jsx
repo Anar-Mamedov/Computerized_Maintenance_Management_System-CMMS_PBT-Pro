@@ -37,9 +37,6 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       kritikUyar: false,    // KRITIK_UYAR (Checkbox)
       telefon: null,        // TELEFON
       aciklama: null,       // ACIKLAMA
-      
-      // Özel alanlar varsa kalabilir, yoksa silebilirsin
-      ozelAlan1: null, ozelAlan2: null,
     },
   });
 
@@ -62,21 +59,24 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           const item = response; 
 
           if (item) {
-            // Backend'den gelen verileri forma dolduruyoruz
             setValue("kod", item.DEP_KOD);
             setValue("tanim", item.DEP_TANIM);
             setValue("aktif", item.AKTIF);
-            
+            setValue("personelID", item.SORUMLU_PERSONEL_ID);
+            setValue("personelTanim", item.SORUMLU_PERSONEL_AD);
             setValue("lokasyonID", item.LOKASYON_ID);
-            setValue("lokasyonTanim", item.LOKASYON_TANIM); // Backend gönderiyorsa
-            
+            setValue("lokasyonTanim", item.LOKASYON_AD);
             setValue("yakitTipID", item.YAKIT_TIP_ID);
-            setValue("yakitTipTanim", item.YAKIT_TIP);      // Backend gönderiyorsa
-            
+            setValue("yakitTipTanim", item.YAKIT_TIP_AD);
             setValue("kapasite", item.KAPASITE);
+            setValue("mevcutMiktar", item.MEVCUT_MIKTAR);
+            setValue("dolulukOrani", item.DOLULUK_ORANI);
             setValue("kritikMiktar", item.KRITIK_MIKTAR);
             setValue("kritikUyar", item.KRITIK_UYAR);
             setValue("telefon", item.TELEFON);
+            setValue("fax", item.FAX);
+            setValue("email", item.EMAIL);
+            setValue("adres", item.ADRES);
             setValue("aciklama", item.ACIKLAMA);
           }
 
@@ -169,30 +169,21 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   );
 
   return (
-    <FormProvider {...methods}>
-      <ConfigProvider locale={currentLocale}>
-        <Drawer 
-          title={selectedRow ? t("Tank Güncelleme") : t("Yeni Tank Ekle")} 
-          placement="right" 
-          width="1200px" 
-          onClose={onClose} 
-          open={drawerVisible} 
-          extra={extraButton}
-        >
-          {loading ? (
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
-              <Spin size="large" />
-            </div>
-          ) : (
+      <FormProvider {...methods}>
+        <ConfigProvider locale={currentLocale}>
+          <Drawer
+            width="600px"
+            title={t("Tank Güncelleme")}
+            onClose={onClose} 
+            open={drawerVisible} 
+            extra={extraButton}
+          >
             <form onSubmit={methods.handleSubmit(onSubmit)}>
-              <div style={{ height: "calc(100vh - 110px)", overflowY: "auto" }}>
-                <MainTabs />
-                <Tablar selectedRowID={selectedRow?.key || selectedRow?.TB_DEPO_ID} />
-              </div>
+              <MainTabs modalOpen={open} />
+              <Tablar selectedRowID={selectedRow?.key || selectedRow?.TB_DEPO_ID} />
             </form>
-          )}
-        </Drawer>
-      </ConfigProvider>
-    </FormProvider>
-  );
+          </Drawer>
+        </ConfigProvider>
+      </FormProvider>
+    );
 }
