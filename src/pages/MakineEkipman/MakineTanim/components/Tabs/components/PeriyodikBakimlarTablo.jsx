@@ -4,6 +4,9 @@ import { t } from "i18next";
 import AxiosInstance from "../../../../../../api/http";
 import IsEmriEditDrawer from "../../../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer.jsx";
 import ContextMenu from "./PeriyodikBakimlar/ContextMenu.jsx";
+import SelectPeriyodikBakimModal from "./PeriyodikBakimlar/Insert/SelectPeriyodikBakimModal.jsx";
+import CreateModal from "./PeriyodikBakimlar/Insert/CreateModal.jsx";
+import HatirlatmaModal from "./PeriyodikBakimlar/HatirlatmaModal.jsx";
 
 const formatDate = (value) => {
   if (!value) return "";
@@ -75,6 +78,12 @@ export default function PeriyodikBakimlarTablo({ makineId, isActive = false }) {
   const [selectedRows, setSelectedRows] = useState([]);
   const isMountedRef = useRef(true);
 
+  const [modalData, setModalData] = useState([]);
+  const [modalDataInitialLength, setModalDataInitialLength] = useState(0);
+  const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
+  const [hatirlatmaModalVisible, setHatirlatmaModalVisible] = useState(false);
+  const [selectedHatirlatmaRow, setSelectedHatirlatmaRow] = useState(null);
+
   const fetchList = useCallback(async () => {
     if (!makineId) {
       if (isMountedRef.current) {
@@ -123,6 +132,16 @@ export default function PeriyodikBakimlarTablo({ makineId, isActive = false }) {
       key: "PBK_KOD",
       width: 150,
       ellipsis: true,
+      render: (value, record) => (
+        <a
+          onClick={() => {
+            setSelectedHatirlatmaRow(record);
+            setHatirlatmaModalVisible(true);
+          }}
+        >
+          {value}
+        </a>
+      ),
     },
     {
       title: t("periyodikBakim", { defaultValue: "Periyodik Bakım" }),
@@ -169,11 +188,7 @@ export default function PeriyodikBakimlarTablo({ makineId, isActive = false }) {
         const numericGun = Number(kalanGun);
         const tagStyle = isGunBased && Number.isFinite(numericGun) && numericGun < 0 ? kalanTagStyles.danger : kalanTagStyles.neutral;
 
-        return (
-          <Tag style={{ borderRadius: "999px", padding: "2px 10px", fontWeight: 500, ...tagStyle }}>
-            {kalanValue}
-          </Tag>
-        );
+        return <Tag style={{ borderRadius: "999px", padding: "2px 10px", fontWeight: 500, ...tagStyle }}>{kalanValue}</Tag>;
       },
     },
     {
@@ -210,10 +225,46 @@ export default function PeriyodikBakimlarTablo({ makineId, isActive = false }) {
     },
   ];
 
+  const handleSelectSubmit = (selectedItems) => {
+    if (selectedItems && selectedItems.length > 0) {
+      setModalData(selectedItems);
+      setModalDataInitialLength(selectedItems.length);
+      setIsCreateModalVisible(true);
+    }
+  };
+
+  const handleCreateModalClose = () => {
+    setIsCreateModalVisible(false);
+    setModalData((prevData) => {
+      const newData = prevData.slice(1);
+      if (newData.length > 0) {
+        setTimeout(() => {
+          setIsCreateModalVisible(true);
+        }, 300);
+      }
+      return newData;
+    });
+  };
+
+  const currentModalIndex = modalDataInitialLength - modalData.length + 1;
+
   return (
     <>
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "10px" }}>
+      <HatirlatmaModal visible={hatirlatmaModalVisible} onCancel={() => setHatirlatmaModalVisible(false)} data={selectedHatirlatmaRow} />
+      {modalData.length > 0 && (
+        <CreateModal
+          makineId={makineId}
+          visible={isCreateModalVisible}
+          onCancel={handleCreateModalClose}
+          data={modalData[0]}
+          currentModalIndex={currentModalIndex}
+          totalModals={modalDataInitialLength}
+          onRefresh={fetchList}
+        />
+      )}
+      <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
         <ContextMenu selectedRows={selectedRows} refreshTableData={fetchList} makineId={makineId} />
+        <SelectPeriyodikBakimModal makineId={makineId} onSubmit={handleSelectSubmit} />
       </div>
       <Table
         rowKey={(record) => record?.TB_PERIYODIK_BAKIM_ID ?? record?.PBK_KOD}
