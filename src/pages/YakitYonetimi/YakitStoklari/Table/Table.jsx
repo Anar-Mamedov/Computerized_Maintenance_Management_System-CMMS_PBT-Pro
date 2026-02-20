@@ -12,6 +12,7 @@ import EditDrawer from "../Update/EditDrawer";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
 import Filters from "./filter/Filters";
+import YakitIslemleri from "./YakitIslemleri/YakitIslemleri";
 import { useFormContext } from "react-hook-form";
 import { SiMicrosoftexcel } from "react-icons/si";
 import * as XLSX from "xlsx";
@@ -136,6 +137,7 @@ const MainTable = () => {
   const [xlsxLoading, setXlsxLoading] = useState(false);
   const [status, setStatus] = useState(-1);
   const [cardsData, setCardsData] = useState({});
+  const [yakitModalVisible, setYakitModalVisible] = useState(false);
 
   const [body, setBody] = useState({
     LokasyonIds: [],
@@ -934,21 +936,28 @@ const MainTable = () => {
           />
           <Filters kelime={searchTerm} onChange={handleBodyChange} />
           <Select
-  value={status}
-  onChange={(value) => setStatus(value)}
-  style={{ width: 120 }}
-  options={[
-    { value: -1, label: "Tümü" }, // Backend'e -1 gider
-    { value: 1, label: "Aktif" }, // Backend'e 1 gider
-    { value: 0, label: "Pasif" }, // Backend'e 0 gider
-  ]}
-/>
+            value={status}
+            onChange={(value) => setStatus(value)}
+            style={{ width: 120 }}
+            options={[
+              { value: -1, label: "Tümü" }, // Backend'e -1 gider
+              { value: 1, label: "Aktif" }, // Backend'e 1 gider
+              { value: 0, label: "Pasif" }, // Backend'e 0 gider
+            ]}
+          />
           {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
           <Button style={{ display: "flex", alignItems: "center" }} onClick={handleDownloadXLSX} loading={xlsxLoading} icon={<SiMicrosoftexcel />}>
             İndir
+          </Button>
+          <Button 
+            type="primary" // Öne çıkmasını istersen "primary" kalabilir, istemezsen silebilirsin kanka
+            style={{ display: "flex", alignItems: "center", backgroundColor: "#ff6d28", borderColor: "#ff6d28" }}
+            onClick={() => setYakitModalVisible(true)}
+          >
+            Yakıt İşlemleri
           </Button>
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
@@ -982,6 +991,11 @@ const MainTable = () => {
         onDrawerClose={() => setDrawer({ ...drawer, visible: false })} 
         drawerVisible={drawer.visible} 
         onRefresh={refreshTableData} 
+      />
+      <YakitIslemleri
+        visible={yakitModalVisible} 
+        onClose={() => setYakitModalVisible(false)} 
+        onRefresh={refreshTableData}
       />
 
       {editDrawer1Visible && (

@@ -9,6 +9,8 @@ import { useForm, FormProvider } from "react-hook-form";
 import AxiosInstance from "../../../../api/http.jsx";
 import Tablar from "./components/Tablar.jsx";
 import { t } from "i18next";
+import { InfoCircleOutlined } from "@ant-design/icons";
+import TankDetay from "../components/ContextMenu/components/TarihceOnayTablo.jsx";
 
 const localeMap = {
   tr: tr_TR,
@@ -21,6 +23,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   const [, startTransition] = useTransition();
   const [currentLocale, setCurrentLocale] = useState(tr_TR);
   const [loading, setLoading] = useState(false);
+  const [analizVisible, setAnalizVisible] = useState(false);
 
   const methods = useForm({
     defaultValues: {
@@ -37,9 +40,6 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       kritikUyar: false,    // KRITIK_UYAR (Checkbox)
       telefon: null,        // TELEFON
       aciklama: null,       // ACIKLAMA
-      
-      // Özel alanlar varsa kalabilir, yoksa silebilirsin
-      ozelAlan1: null, ozelAlan2: null,
     },
   });
 
@@ -62,21 +62,24 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           const item = response; 
 
           if (item) {
-            // Backend'den gelen verileri forma dolduruyoruz
             setValue("kod", item.DEP_KOD);
             setValue("tanim", item.DEP_TANIM);
             setValue("aktif", item.AKTIF);
-            
+            setValue("personelID", item.SORUMLU_PERSONEL_ID);
+            setValue("personelTanim", item.SORUMLU_PERSONEL_AD);
             setValue("lokasyonID", item.LOKASYON_ID);
-            setValue("lokasyonTanim", item.LOKASYON_TANIM); // Backend gönderiyorsa
-            
+            setValue("lokasyonTanim", item.LOKASYON_AD);
             setValue("yakitTipID", item.YAKIT_TIP_ID);
-            setValue("yakitTipTanim", item.YAKIT_TIP);      // Backend gönderiyorsa
-            
+            setValue("yakitTipTanim", item.YAKIT_TIP_AD);
             setValue("kapasite", item.KAPASITE);
+            setValue("mevcutMiktar", item.MEVCUT_MIKTAR);
+            setValue("dolulukOrani", item.DOLULUK_ORANI);
             setValue("kritikMiktar", item.KRITIK_MIKTAR);
             setValue("kritikUyar", item.KRITIK_UYAR);
             setValue("telefon", item.TELEFON);
+            setValue("fax", item.FAX);
+            setValue("email", item.EMAIL);
+            setValue("adres", item.ADRES);
             setValue("aciklama", item.ACIKLAMA);
           }
 
@@ -103,6 +106,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       DEP_TANIM: data.tanim,
       AKTIF: data.aktif,                    // true/false
       LOKASYON_ID: Number(data.lokasyonID) || 0,
+      SORUMLU_PERSONEL_ID: Number(data.PERSONELID) || 0,
       YAKIT_TIP_ID: Number(data.yakitTipID) || 0,
       KAPASITE: Number(data.kapasite) || 0,
       KRITIK_MIKTAR: Number(data.kritikMiktar) || 0,
@@ -111,7 +115,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       ACIKLAMA: data.aciklama
     };
 
-    AxiosInstance.post("/api/AddUpdateYakitTank", Body)
+    AxiosInstance.post("/AddUpdateYakitTank", Body)
       .then((response) => {
         // Backend standart dönüşü: status_code
         if (response.status_code === 200 || response.status_code === 201) {
@@ -153,6 +157,17 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   const extraButton = (
     <Space>
+      <Button 
+        icon={<InfoCircleOutlined />} 
+        onClick={() => setAnalizVisible(true)}
+        style={{
+          backgroundColor: "#1890ff",
+          borderColor: "#1890ff",
+          color: "#ffffff",
+        }}
+      >
+        {t("Detay")}
+      </Button>
       <Button onClick={onClose}>{t("iptal")}</Button>
       <Button
         type="submit"
@@ -171,27 +186,26 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   return (
     <FormProvider {...methods}>
       <ConfigProvider locale={currentLocale}>
-        <Drawer 
-          title={selectedRow ? t("Tank Güncelleme") : t("Yeni Tank Ekle")} 
-          placement="right" 
-          width="1200px" 
-          onClose={onClose} 
-          open={drawerVisible} 
+        <Drawer
+          width="600px"
+          title={t("Tank Güncelleme")}
+          onClose={onClose}
+          open={drawerVisible}
           extra={extraButton}
         >
-          {loading ? (
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
-              <Spin size="large" />
-            </div>
-          ) : (
+          <Spin spinning={loading}>
             <form onSubmit={methods.handleSubmit(onSubmit)}>
-              <div style={{ height: "calc(100vh - 110px)", overflowY: "auto" }}>
-                <MainTabs />
-                <Tablar selectedRowID={selectedRow?.key || selectedRow?.TB_DEPO_ID} />
-              </div>
+              <MainTabs modalOpen={open} />
+              <Tablar selectedRowID={selectedRow?.key || selectedRow?.TB_DEPO_ID} />
             </form>
-          )}
+          </Spin>
         </Drawer>
+
+        <TankDetay 
+          selectedRows={[selectedRow]} 
+          isExternalOpen={analizVisible} 
+          onExternalClose={() => setAnalizVisible(false)} 
+        />
       </ConfigProvider>
     </FormProvider>
   );

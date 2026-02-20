@@ -123,14 +123,14 @@ const widgetDefaults = {
   widget17: { width: 5, height: 3, minW: 3, minH: 2 },
   widget7: { width: 7, height: 3, minW: 3, minH: 2 },
   widget6: { width: 5, height: 4, minW: 3, minH: 2 },
-  widget11: { width: 7, height: 3, minW: 3, minH: 2 },
+  widget11: { width: 5, height: 3, minW: 3, minH: 2 },
   widget8: { width: 5, height: 3, minW: 3, minH: 2 },
   widget13: { width: 7, height: 3, minW: 3, minH: 2 },
   widget9: { width: 7, height: 3, minW: 3, minH: 2 },
   widget14: { width: 5, height: 3, minW: 3, minH: 2 },
   widget15: { width: 5, height: 3, minW: 3, minH: 2 },
   widget12: { width: 12, height: 3, minW: 3, minH: 2 },
-  widget18: { width: 5, height: 3, minW: 3, minH: 2 },
+  widget18: { width: 7, height: 3, minW: 3, minH: 2 },
   widget20: { width: 3, height: 1, minW: 3, minH: 1 },
   widget21: { width: 3, height: 1, minW: 3, minH: 1 },
   widget22: { width: 3, height: 1, minW: 3, minH: 1 },
@@ -165,11 +165,10 @@ const tabConfigurations = {
     { id: "widget3", x: 6, y: 0, width: 3, height: 1, minW: 2, minH: 1 },
     { id: "widget4", x: 9, y: 0, width: 3, height: 1, minW: 2, minH: 1 },
 
-    { id: "widget11", x: 0, y: 5, ...widgetDefaults["widget11"] },
-    { id: "widget18", x: 7, y: 5, ...widgetDefaults["widget18"] },
-
-    // --- ORTA SATIRLAR ---
     { id: "widget5", x: 0, y: 5, ...widgetDefaults["widget5"] },
+    { id: "widget11", x: 7, y: 5, ...widgetDefaults["widget11"] },
+
+    { id: "widget18", x: 0, y: 5, ...widgetDefaults["widget18"] },
     { id: "widget15", x: 7, y: 5, ...widgetDefaults["widget15"] },
 
     // --- EN ALT SATIR (Footer) ---

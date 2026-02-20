@@ -1,248 +1,186 @@
 import React from "react";
-import { Select, Input, Typography, Divider, InputNumber, Button } from "antd";
+import { Select, Input, Typography, Divider, InputNumber, Button, Checkbox } from "antd";
 import GirisFiyatiSelect from "./components/GirisFiyatiSelect";
 import CikisiyatiSelect from "./components/CikisiyatiSelect";
 import FiyatGirisleri from "./components/FiyatGirisleri/FiyatGirisleri";
+import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
 import { Controller, useFormContext } from "react-hook-form";
 import { t } from "i18next";
 
 const { Text } = Typography;
 
 function GenelBilgiler({ selectedRowID }) {
-  const {
-    control,
-    watch,
-    formState: { errors },
-  } = useFormContext();
+  const { control, watch } = useFormContext();
 
-  // Ortak Input Stili (Sol taraf için)
-  const inputStyle = { width: "100%" };
-
-  // --- 1. AYAR: Sağ taraftaki inputları kutuya sığacak şekilde küçülttük ---
-  const shortInputStyle = { width: "340px" }; 
+  // --- Anlık Değerleri İzleme (Tank görseli için) ---
+  const kapasite = watch("KAPASITE") || 0;
+  const mevcutMiktar = watch("MEVCUT_MIKTAR") || 0;
+  const kritikMiktar = watch("KRITIK_MIKTAR") || 0;
   
-  // Sol Panel Satır Stili
-  const leftRowStyle = {
-    display: "flex",
-    alignItems: "center",
-    marginBottom: "10px",
-    justifyContent: "space-between",
-  };
+  // Doluluk oranı hesabı
+  const dolulukOrani = kapasite > 0 ? (mevcutMiktar / kapasite) * 100 : 0;
+  const safeDoluluk = Math.min(100, Math.max(0, dolulukOrani));
+  
+  // Kritik uyarı rengi
+  const tankColor = mevcutMiktar <= kritikMiktar ? "#f5222d" : "#52c41a";
 
-  // Sağ Panel Satır Stili
-  const rightRowStyle = {
+  // --- Stiller ---
+  const LabelStyle = {
     display: "flex",
-    alignItems: "center",
-    marginBottom: "10px",
-    gap: "10px" // justify-content space-between kullandığımız için gap'e gerek kalmayabilir ama durabilir
-  };
-
-  // Label Stili
-  const labelStyle = {
-    width: "120px",
     fontSize: "14px",
-    color: "#444",
-    flexShrink: 0,
+    fontWeight: "600",
+    alignItems: "center",
+    minWidth: "120px",
   };
 
-  // Para birimi formatlayıcı
-  const currencyFormatter = (value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  const currencyParser = (value) => value.replace(/\s?₺|(,*)/g, "");
+  const InputContainerStyle = {
+    display: "flex",
+    width: "100%",
+    maxWidth: "300px",
+  };
+
+  const RowStyle = {
+    display: "flex",
+    alignItems: "center",
+    marginBottom: "15px",
+    gap: "10px",
+  };
 
   return (
-    <div style={{ display: "flex", flexDirection: "row", gap: "20px", flexWrap: "wrap" }}>
+    <div style={{ padding: "20px", display: "flex", gap: "40px", flexWrap: "wrap" }}>
       
-      {/* --- SOL PANEL: FİYAT BİLGİLERİ --- */}
+      {/* SOL TARA: TANK GÖRSELİ */}
       <div
         style={{
-          flex: 1, // Sol taraf kalan boşluğu doldursun
-          minWidth: "450px",
-          border: "1px solid #e8e8e8",
-          padding: "15px",
+          width: "150px",
+          height: "200px",
+          border: "1px solid #d9d9d9",
           borderRadius: "4px",
-          backgroundColor: "#fff",
+          backgroundColor: "#f5f5f5",
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-end", // Sıvıyı aşağıdan başlat
+          overflow: "hidden",
+          boxShadow: "inset 0 0 10px rgba(0,0,0,0.1)"
         }}
       >
-        <div style={{ marginBottom: "15px" }}>
-          <Text style={{ color: "#0062ff", fontWeight: "600", fontSize: "15px" }}>
-            {t("fiyatBilgileri")}
-          </Text>
+        {/* Üstteki Boşluk Kısmı (Görsel efekt için) */}
+        <div style={{ position: "absolute", top: 10, left: 0, width: "100%", textAlign: "center", zIndex: 2 }}>
+           {/* İstersen buraya depo adı vs yazılabilir */}
         </div>
 
-        {/* Giriş Fiyatı */}
-        <div style={leftRowStyle}>
-          <Text style={labelStyle}>{t("girisFiyati")}</Text>
-          <div style={{ display: "flex", gap: "10px", flex: 1 }}>
-            <div style={{ flex: 2 }}>
-              <GirisFiyatiSelect />
-            </div>
-            <div style={{ flex: 1 }}>
-              <Controller
-                name="girisFiyati"
-                control={control}
-                render={({ field }) => (
-                  <InputNumber
-                    {...field}
-                    style={inputStyle}
-                    disabled={watch("girisFiyatTuru") !== 6} 
-                    formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                    parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-                  />
-                )}
-              />
-            </div>
-          </div>
+        {/* Sıvı Kısmı */}
+        <div
+          style={{
+            height: `${dolulukOrani}%`,
+            backgroundColor: tankColor,
+            width: "100%",
+            transition: "height 0.5s ease-in-out, background-color 0.3s",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
         </div>
-
-        {/* Çıkış Fiyatı */}
-        <div style={leftRowStyle}>
-          <Text style={labelStyle}>{t("cikisFiyati")}</Text>
-          <div style={{ display: "flex", gap: "10px", flex: 1 }}>
-            <div style={{ flex: 2 }}>
-              <CikisiyatiSelect />
-            </div>
-            <div style={{ flex: 1 }}>
-              <Controller
-                name="cikisFiyati"
-                control={control}
-                render={({ field }) => (
-                  <InputNumber
-                    {...field}
-                    style={inputStyle}
-                    disabled={watch("cikisFiyatTuru") !== 6}
-                    formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                    parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-                  />
-                )}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* KDV */}
-        <div style={leftRowStyle}>
-          <Text style={labelStyle}>{t("Kdv (%)")}</Text>
-          <div style={{ display: "flex", gap: "10px", flex: 1 }}>
-            <div style={{ width: "80px" }}>
-                <Controller
-                    name="kdv"
-                    control={control}
-                    render={({ field }) => <InputNumber {...field} min={0} max={100} style={{ width: "100%" }} />}
-                />
-            </div>
-          </div>
-        </div>
-
-        {/* Buton */}
-        <div style={{ marginTop: "20px" }}>
-            <FiyatGirisleri selectedRowID={selectedRowID} materialCode={watch("malzemeKod")} style={{ width: '100%' }} /> 
+        
+        {/* Yüzde Yazısı (Ortada dursun diye absolute veriyoruz) */}
+        <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            fontWeight: 'bold',
+            fontSize: '18px',
+            color: dolulukOrani > 55 ? '#fff' : '#000', // Arka plan koyuysa yazı beyaz olsun
+            zIndex: 3
+        }}>
+            %{Math.round(safeDoluluk)}
         </div>
       </div>
 
-      {/* --- SAĞ PANEL: FİYAT ANALİZİ --- */}
-      <div
-        style={{
-          // --- 2. AYAR: flex: 1 yerine sabit genişlik veriyoruz ---
-          width: "600px",      // Kutuyu daralttık
-          minWidth: "350px",   // Küçüldüğünde bozulmasın
-          flex: "none",        // Esnemeyi kapattık
-          // --------------------------------------------------------
-          border: "1px solid #e8e8e8",
-          padding: "15px",
-          borderRadius: "4px",
-          backgroundColor: "#fff",
-          height: "fit-content" // İçerik kadar yükseklik
-        }}
-      >
-        <div style={{ marginBottom: "15px" }}>
-          <Text style={{ color: "#0062ff", fontWeight: "600", fontSize: "15px" }}>
-            {t("Fiyat Analizi")}
-          </Text>
+      {/* SAĞ TARAF: FORM ALANLARI */}
+      <div style={{ flex: 1, minWidth: "300px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        
+        {/* 1. Yakıt Tipi */}
+        <div style={RowStyle}>
+          <Text style={LabelStyle}>{t("Yakıt Tipi")}</Text>
+          <div style={InputContainerStyle}>
+            <KodIDSelectbox name1="yakitTipTanim" isRequired={true} kodID="35600" />
+          </div>
         </div>
 
-        <div style={rightRowStyle}>
-          <Text style={labelStyle}>{t("En Yüksek Fiyat")}</Text>
-          <Controller
-            name="enYuksekFiyat"
-            control={control}
-            render={({ field }) => (
-              <InputNumber
-                {...field}
-                readOnly
-                style={shortInputStyle}
-                formatter={currencyFormatter}
-                parser={currencyParser}
-              />
-            )}
-          />
+        {/* 2. Tank Kapasitesi */}
+        <div style={RowStyle}>
+          <Text style={LabelStyle}>{t("Tank Kapasitesi")}</Text>
+          <div style={InputContainerStyle}>
+            <Controller
+              name="kapasite"
+              control={control}
+              render={({ field }) => (
+                <InputNumber
+                  {...field}
+                  style={{ width: "100%" }}
+                  formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
+                  parser={(value) => value.replace(/\./g, "")}
+                  min={0}
+                />
+              )}
+            />
+          </div>
         </div>
 
-        <div style={rightRowStyle}>
-          <Text style={labelStyle}>{t("En Düşük Fiyat")}</Text>
-          <Controller
-            name="enDusukFiyat"
-            control={control}
-            render={({ field }) => (
-              <InputNumber
-                {...field}
-                readOnly
-                style={shortInputStyle}
-                formatter={currencyFormatter}
-                parser={currencyParser}
-              />
-            )}
-          />
+        {/* 3. Kritik Miktar ve Uyar Checkbox */}
+        <div style={RowStyle}>
+          <Text style={{ ...LabelStyle, color: "blue" }}>{t("Kritik Miktar")}</Text>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", width: "100%", maxWidth: "300px" }}>
+            <Controller
+              name="kritikMiktar"
+              control={control}
+              render={({ field }) => (
+                <InputNumber
+                  {...field}
+                  style={{ flex: 1 }}
+                  formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
+                  parser={(value) => value.replace(/\./g, "")}
+                  min={0}
+                />
+              )}
+            />
+            <Controller
+              name="kritikUyar"
+              control={control}
+              render={({ field }) => (
+                <Checkbox checked={field.value} {...field}>
+                  {t("Uyar")}
+                </Checkbox>
+              )}
+            />
+          </div>
         </div>
 
-        <div style={rightRowStyle}>
-          <Text style={labelStyle}>{t("Ortalama Fiyat")}</Text>
-          <Controller
-            name="ortalamaFiyat"
-            control={control}
-            render={({ field }) => (
-              <InputNumber
-                {...field}
-                readOnly
-                style={shortInputStyle}
-                formatter={currencyFormatter}
-                parser={currencyParser}
-              />
-            )}
-          />
-        </div>
-
-        <div style={rightRowStyle}>
-          <Text style={labelStyle}>{t("İlk Alış Fiyat")}</Text>
-          <Controller
-            name="ilkAlisFiyati"
-            control={control}
-            render={({ field }) => (
-              <InputNumber
-                {...field}
-                readOnly
-                style={shortInputStyle}
-                formatter={currencyFormatter}
-                parser={currencyParser}
-              />
-            )}
-          />
-        </div>
-
-        <div style={rightRowStyle}>
-          <Text style={labelStyle}>{t("Son Alış Fiyatı")}</Text>
-          <Controller
-            name="sonAlisFiyati"
-            control={control}
-            render={({ field }) => (
-              <InputNumber
-                {...field}
-                readOnly
-                style={shortInputStyle}
-                formatter={currencyFormatter}
-                parser={currencyParser}
-              />
-            )}
-          />
+        {/* 4. Yakıt Miktarı (Mevcut) - Sarı Arkaplanlı */}
+        <div style={{ ...RowStyle, marginTop: "20px" }}>
+          <Text style={LabelStyle}>{t("Yakıt Miktarı")}</Text>
+          <div style={InputContainerStyle}>
+            <Controller
+              name="mevcutMiktar"
+              control={control}
+              render={({ field }) => (
+                <InputNumber
+                  {...field}
+                  readOnly
+                  style={{ 
+                      width: "100%",
+                      fontWeight: "bold",
+                      color: "#000"
+                  }}
+                  formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
+                  parser={(value) => value.replace(/\./g, "")}
+                />
+              )}
+            />
+          </div>
         </div>
 
       </div>
