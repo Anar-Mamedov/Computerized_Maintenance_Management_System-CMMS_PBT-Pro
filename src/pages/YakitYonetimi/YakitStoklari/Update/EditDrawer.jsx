@@ -9,6 +9,8 @@ import { useForm, FormProvider } from "react-hook-form";
 import AxiosInstance from "../../../../api/http.jsx";
 import Tablar from "./components/Tablar.jsx";
 import { t } from "i18next";
+import { InfoCircleOutlined } from "@ant-design/icons";
+import TankDetay from "../components/ContextMenu/components/TarihceOnayTablo.jsx";
 
 const localeMap = {
   tr: tr_TR,
@@ -21,6 +23,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   const [, startTransition] = useTransition();
   const [currentLocale, setCurrentLocale] = useState(tr_TR);
   const [loading, setLoading] = useState(false);
+  const [analizVisible, setAnalizVisible] = useState(false);
 
   const methods = useForm({
     defaultValues: {
@@ -103,6 +106,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       DEP_TANIM: data.tanim,
       AKTIF: data.aktif,                    // true/false
       LOKASYON_ID: Number(data.lokasyonID) || 0,
+      SORUMLU_PERSONEL_ID: Number(data.PERSONELID) || 0,
       YAKIT_TIP_ID: Number(data.yakitTipID) || 0,
       KAPASITE: Number(data.kapasite) || 0,
       KRITIK_MIKTAR: Number(data.kritikMiktar) || 0,
@@ -111,7 +115,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       ACIKLAMA: data.aciklama
     };
 
-    AxiosInstance.post("/api/AddUpdateYakitTank", Body)
+    AxiosInstance.post("/AddUpdateYakitTank", Body)
       .then((response) => {
         // Backend standart dönüşü: status_code
         if (response.status_code === 200 || response.status_code === 201) {
@@ -153,6 +157,17 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   const extraButton = (
     <Space>
+      <Button 
+        icon={<InfoCircleOutlined />} 
+        onClick={() => setAnalizVisible(true)}
+        style={{
+          backgroundColor: "#1890ff",
+          borderColor: "#1890ff",
+          color: "#ffffff",
+        }}
+      >
+        {t("Detay")}
+      </Button>
       <Button onClick={onClose}>{t("iptal")}</Button>
       <Button
         type="submit"
@@ -169,21 +184,29 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   );
 
   return (
-      <FormProvider {...methods}>
-        <ConfigProvider locale={currentLocale}>
-          <Drawer
-            width="600px"
-            title={t("Tank Güncelleme")}
-            onClose={onClose} 
-            open={drawerVisible} 
-            extra={extraButton}
-          >
+    <FormProvider {...methods}>
+      <ConfigProvider locale={currentLocale}>
+        <Drawer
+          width="600px"
+          title={t("Tank Güncelleme")}
+          onClose={onClose}
+          open={drawerVisible}
+          extra={extraButton}
+        >
+          <Spin spinning={loading}>
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <MainTabs modalOpen={open} />
               <Tablar selectedRowID={selectedRow?.key || selectedRow?.TB_DEPO_ID} />
             </form>
-          </Drawer>
-        </ConfigProvider>
-      </FormProvider>
-    );
+          </Spin>
+        </Drawer>
+
+        <TankDetay 
+          selectedRows={[selectedRow]} 
+          isExternalOpen={analizVisible} 
+          onExternalClose={() => setAnalizVisible(false)} 
+        />
+      </ConfigProvider>
+    </FormProvider>
+  );
 }

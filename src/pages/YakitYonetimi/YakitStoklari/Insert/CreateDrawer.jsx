@@ -77,6 +77,7 @@ export default function CreateDrawer({ onRefresh }) {
       DEP_TANIM: data.DEP_TANIM || "",
       AKTIF: data.AKTIF ?? true,
       LOKASYON_ID: Number(data.LOKASYON_ID) || 0,
+      SORUMLU_PERSONEL_ID: Number(data.PERSONELID) || 0,
       YAKIT_TIP_ID: Number(data.yakitTipKodId) || 0,
       KAPASITE: Number(data.KAPASITE) || 0,
       KRITIK_MIKTAR: Number(data.KRITIK_MIKTAR) || 0,

@@ -83,8 +83,8 @@ export default function MainTabs() {
           <Text style={LabelStyle}>{t("Sorumlu Personel")}</Text>
           <div style={InputContainerStyle}>
             <PersonelTablo
-              name1="personelTanim" // API: SORUMLU_PERSONEL_AD
-              workshopSelectedId={watch("personelID")} // API: SORUMLU_PERSONEL_ID
+              name1="PERSONEL" // API: SORUMLU_PERSONEL_AD
+              workshopSelectedId={watch("PERSONELID")} // API: SORUMLU_PERSONEL_ID
               isRequired={false}
               // Not: PersonelTablo bileşeninin iç mantığına göre name1="personel" 
               // dersen personelID ve personel isimlerini otomatik setler.
