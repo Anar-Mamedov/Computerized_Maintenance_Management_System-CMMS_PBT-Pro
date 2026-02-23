@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message, Radio } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -116,6 +116,7 @@ const MainTable = () => {
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
   const [onayCheck, setOnayCheck] = useState(false);
+  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
 
   // edit drawer için
   const [drawer, setDrawer] = useState({
@@ -421,8 +422,9 @@ const MainTable = () => {
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
   const [body, setBody] = useState({
-    keyword: "",
-    filters: {},
+    parametre: "",
+    itemIndex: 3,
+    depoId: -1,
   });
 
   // ana tablo api isteği için kullanılan useEffect
@@ -441,8 +443,8 @@ const MainTable = () => {
 
     // Arama terimi değiştiğinde ve boş olduğunda API isteğini tetikle
     const timeout = setTimeout(() => {
-      if (searchTerm !== body.keyword) {
-        handleBodyChange("keyword", searchTerm);
+      if (searchTerm !== body.parametre) {
+        handleBodyChange("parametre", searchTerm);
         setCurrentPage(1); // Arama yapıldığında veya arama sıfırlandığında sayfa numarasını 1'e ayarla
         // setDrawer({ ...drawer, visible: false }); // Arama yapıldığında veya arama sıfırlandığında Drawer'ı kapat
       }
@@ -455,43 +457,132 @@ const MainTable = () => {
 
   // arama işlemi için kullanılan useEffect son
 
-  const fetchEquipmentData = async (body, page, size) => {
-    // body'nin undefined olması durumunda varsayılan değerler atanıyor
-    const { keyword = "", filters = {} } = body || {};
-    // page'in undefined olması durumunda varsayılan değer olarak 1 atanıyor
-    const currentPage = page || 1;
+  const formatDataForTable = useCallback((items) => {
+    const list = Array.isArray(items) ? items : [];
+
+    return list.map((item, index) => {
+      const treeNodeId = Number(item.TB_EKIPMAN_ID ?? item.MKA_TABLO_ID ?? item.id ?? item.RowIndex ?? index + 1);
+      return {
+        ...item,
+        EKP_KOD: item.EKP_KOD ?? item.kod ?? null,
+        EKP_TANIM: item.EKP_TANIM ?? item.tanim ?? null,
+        EKP_SERI_NO: item.EKP_SERI_NO ?? item.seriNo ?? null,
+        MKN_TANIM: item.MKN_TANIM ?? item.MAKINE_TANIM ?? item.makineTanim ?? null,
+        EKP_TIP: item.EKP_TIP ?? item.tipi ?? null,
+        EKP_DURUM: item.EKP_DURUM ?? item.EKP_HAREKET_SEKLI ?? item.hareketSekli ?? null,
+        EKP_MARKA: item.EKP_MARKA ?? item.marka ?? null,
+        EKP_MODEL: item.EKP_MODEL ?? item.model ?? null,
+        EKP_DEPO: item.EKP_DEPO ?? item.depo ?? null,
+        EKP_REVIZYON_TARIH: item.EKP_REVIZYON_TARIH ?? item.revizyonTarih ?? null,
+        EKP_GARANTI_BITIS_TARIH: item.EKP_GARANTI_BITIS_TARIH ?? item.garantiBitisTarih ?? null,
+        key: item.TB_EKIPMAN_ID ?? item.id ?? treeNodeId,
+        children: item.hasChild ? [] : undefined,
+      };
+    });
+  }, []);
+
+  const onTableRowExpand = (expanded, record) => {
+    setExpandedRowKeys((prevKeys) => {
+      if (expanded) {
+        return [...prevKeys, record.key];
+      } else {
+        return prevKeys.filter((key) => key !== record.key);
+      }
+    });
+
+    if (expanded && record.hasChild && record.children && record.children.length === 0) {
+      setLoading(true);
+
+      AxiosInstance.post(`GetEkipmanVeritabaniListe`, {
+        ItemIndex: body.itemIndex,
+        DepoId: body.depoId,
+        Parametre: body.parametre,
+        parentID: record.key,
+      })
+        .then((response) => {
+          if (response) {
+            const childrenDataList = Array.isArray(response) ? response : response.list || [];
+            const childrenData = formatDataForTable(childrenDataList);
+
+            const updateTreeData = (dataList) => {
+              return dataList.map((item) => {
+                if (item.key === record.key) {
+                  return { ...item, children: childrenData };
+                } else if (item.children) {
+                  return { ...item, children: updateTreeData(item.children) };
+                } else {
+                  return item;
+                }
+              });
+            };
+
+            setData((prevData) => updateTreeData(prevData));
+          }
+        })
+        .catch((error) => {
+          console.error("API Error:", error);
+          if (navigator.onLine) {
+            message.error("Hata Mesajı: " + error.message);
+          } else {
+            message.error("Internet Bağlantısı Mevcut Değil.");
+          }
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  };
+
+  const findRowsByKeys = useCallback((keys, treeData) => {
+    const keySet = new Set(keys.map((key) => String(key)));
+    const selected = [];
+
+    const traverse = (nodes) => {
+      nodes.forEach((node) => {
+        if (keySet.has(String(node.key))) {
+          selected.push(node);
+        }
+        if (node.children) {
+          traverse(node.children);
+        }
+      });
+    };
+
+    traverse(treeData || []);
+    return selected;
+  }, []);
+
+  const fetchEquipmentData = async (requestBody) => {
+    const { parametre = "", itemIndex = 3, depoId = -1 } = requestBody || {};
 
     try {
       setLoading(true);
-      // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.get(`GetEkipmanFullListWeb?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}`);
+      setExpandedRowKeys([]); // Reset expanded rows on root fetch
+      const response = await AxiosInstance.post(`GetEkipmanVeritabaniListe`, {
+        ItemIndex: itemIndex,
+        DepoId: depoId,
+        Parametre: parametre,
+        parentID: 0,
+      });
       if (response) {
-        // Toplam sayfa sayısını ayarla
-        setTotalPages(response.page);
-        setTotalDataCount(response.kayit_sayisi);
+        setTotalPages(response.page || 0);
+        setTotalDataCount(response.kayit_sayisi || 0);
 
-        // Gelen veriyi formatla ve state'e ata
-        const formattedData = response.list.map((item) => ({
-          ...item,
-          key: item.TB_EKIPMAN_ID,
-          // Diğer alanlarınız...
-        }));
-        setData(formattedData);
-        setLoading(false);
+        // Handle both object with 'list' property and direct array responses
+        const dataList = Array.isArray(response) ? response : response.list || [];
+        setData(formatDataForTable(dataList));
       } else {
         console.error("API response is not in expected format");
-        setLoading(false);
       }
     } catch (error) {
       console.error("Error in API request:", error);
-      setLoading(false);
       if (navigator.onLine) {
-        // İnternet bağlantısı var
         message.error("Hata Mesajı: " + error.message);
       } else {
-        // İnternet bağlantısı yok
         message.error("Internet Bağlantısı Mevcut Değil.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -522,7 +613,7 @@ const MainTable = () => {
       setValue("selectedLokasyonId", null);
     }
     // Seçilen satırların verisini bul
-    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
+    const newSelectedRows = findRowsByKeys(newSelectedRowKeys, data);
     setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
   };
 
@@ -560,11 +651,11 @@ const MainTable = () => {
     setSelectedRows([]);
 
     // Verileri yeniden çekmek için `fetchEquipmentData` fonksiyonunu çağır
-    fetchEquipmentData(body, currentPage);
+    fetchEquipmentData(body, currentPage, pageSize);
     // Burada `body` ve `currentPage`'i güncellediğimiz için, bu değerlerin en güncel hallerini kullanarak veri çekme işlemi yapılır.
     // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
     // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
-  }, [body, currentPage]); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
+  }, [body, currentPage, pageSize]); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
 
   // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
   const [columns, setColumns] = useState(() => {
@@ -825,6 +916,12 @@ const MainTable = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
+          <Radio.Group value={body.itemIndex} onChange={(e) => handleBodyChange("itemIndex", e.target.value)} optionType="button" buttonStyle="solid">
+            <Radio.Button value={0}>Stokta Bekleyen</Radio.Button>
+            <Radio.Button value={1}>Hurda Bekleyen</Radio.Button>
+            <Radio.Button value={2}>Makineye Bağlı</Radio.Button>
+            <Radio.Button value={3}>Tümü</Radio.Button>
+          </Radio.Group>
           {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>
@@ -839,22 +936,13 @@ const MainTable = () => {
           rowSelection={rowSelection}
           columns={filteredColumns}
           dataSource={data}
-          pagination={{
-            current: currentPage,
-            total: totalDataCount, // Toplam kayıt sayısı (sayfa başına kayıt sayısı ile çarpılır)
-            pageSize: pageSize,
-            defaultPageSize: 10,
-            showSizeChanger: true,
-            pageSizeOptions: ["10", "20", "50", "100"],
-            position: ["bottomRight"],
-            onChange: handleTableChange,
-            showTotal: (total, range) => `Toplam ${total}`, // Burada 'total' parametresi doğru kayıt sayısını yansıtacaktır
-            showQuickJumper: true,
-          }}
+          pagination={false}
           // onRow={onRowClick}
           scroll={{ y: "calc(100vh - 370px)" }}
           onChange={handleTableChange}
           rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
+          expandedRowKeys={expandedRowKeys}
+          onExpand={onTableRowExpand}
         />
       </Spin>
       <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
