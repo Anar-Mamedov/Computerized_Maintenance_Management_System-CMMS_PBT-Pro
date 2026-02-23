@@ -14,6 +14,7 @@ import ModelEkle from "./components/ModelEkle.jsx";
 import Durum from "./components/Durum.jsx";
 import Birim from "./components/Birim.jsx";
 import DepoTablo from "./components/DepoTablo.jsx";
+import EkipmanTablo from "../../../../../../utils/components/EkipmanTablo.jsx";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -178,6 +179,28 @@ export default function MainTabs() {
                   {error && <div style={{ color: "red" }}>{error.message}</div>}
                 </div>
               )}
+            />
+          </div>
+        </div>
+
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "450px", gap: "10px", width: "100%", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: "14px" }}>Ana Ekipman:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              maxWidth: "300px",
+              minWidth: "300px",
+              gap: "10px",
+              width: "100%",
+            }}
+          >
+            <EkipmanTablo
+              onSubmit={(selectedData) => {
+                setValue("anaEkipmanTanim", selectedData.EKP_TANIM || selectedData.tanim);
+                setValue("anaEkipmanID", selectedData.key);
+              }}
             />
           </div>
         </div>

@@ -63,6 +63,7 @@ export default function CreateDrawer({ onRefresh }) {
       EKP_MAKINE_ID: Number(data.MakineModelID),
       EKP_DURUM_KOD_ID: Number(data.durumID),
       EKP_AKTIF: data.aktif,
+      EKP_REF_ID: Number(data.anaEkipmanID) || 0,
     };
 
     // API'ye POST isteği gönder
