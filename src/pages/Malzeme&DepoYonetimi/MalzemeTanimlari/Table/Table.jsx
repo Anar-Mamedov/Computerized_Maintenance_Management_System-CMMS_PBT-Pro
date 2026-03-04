@@ -417,6 +417,20 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
         return a.STK_LOKASYON.localeCompare(b.STK_LOKASYON);
       },
     },
+    {
+      title: t("bulunduguDepo"),
+      dataIndex: "STK_DEPO",
+      key: "STK_DEPO",
+      width: 160,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_DEPO === null) return -1;
+        if (b.STK_DEPO === null) return 1;
+        return a.STK_DEPO.localeCompare(b.STK_DEPO);
+      },
+    },
 
     {
       title: t("malzemeSinifi"),
