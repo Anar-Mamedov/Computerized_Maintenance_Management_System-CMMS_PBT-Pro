@@ -1,14 +1,11 @@
-import React, { useState, createRef, useEffect } from "react";
+import React, { useState, createRef } from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import { Select, Typography, Divider, Spin, Button, Input, message, Space } from "antd";
+import { Select, Divider, Spin, Button, Input, message, Space } from "antd";
 import AxiosInstance from "../../api/http";
 import { PlusOutlined } from "@ant-design/icons";
 import styled from "styled-components";
 
 import { t } from "i18next";
-
-const { Text, Link } = Typography;
-const { Option } = Select;
 
 const StyledSelect = styled(Select)`
   @media (min-width: 600px) {
@@ -29,12 +26,24 @@ const StyledDiv = styled.div`
   }
 `;
 
-export default function KodIDSelectbox({ name1, kodID, isRequired, disabled = false, style = {}, onLabelChange, placeholder = "Seçim Yapınız" }) {
+export default function KodIDSelectbox({
+  name1,
+  kodID,
+  isRequired,
+  disabled = false,
+  style = {},
+  onLabelChange,
+  placeholder = "Seçim Yapınız",
+  mode,
+  maxTagCount,
+  maxTagTextLength,
+  maxTagPlaceholder,
+  onChange,
+  showDropdownAdd = true,
+}) {
   const {
     control,
-    watch,
     setValue,
-    getValues,
     formState: { errors },
   } = useFormContext();
   const [options, setOptions] = useState([]);
@@ -120,6 +129,10 @@ export default function KodIDSelectbox({ name1, kodID, isRequired, disabled = fa
             key={selectKey}
             style={{ ...style }}
             // style={{ maxWidth: "300px", width: "100%" }}
+            mode={mode}
+            maxTagCount={maxTagCount}
+            maxTagTextLength={maxTagTextLength}
+            maxTagPlaceholder={maxTagPlaceholder}
             showSearch
             allowClear
             placeholder={placeholder}
@@ -130,26 +143,32 @@ export default function KodIDSelectbox({ name1, kodID, isRequired, disabled = fa
                 fetchData(); // Fetch data when the dropdown is opened
               }
             }}
-            dropdownRender={(menu) => (
-              <Spin spinning={loading}>
-                {menu}
-                <Divider
-                  style={{
-                    margin: "8px 0",
-                  }}
-                />
-                <Space
-                  style={{
-                    padding: "0 8px 4px",
-                  }}
-                >
-                  <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
-                  <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
-                    Ekle
-                  </Button>
-                </Space>
-              </Spin>
-            )}
+            dropdownRender={(menu) => {
+              if (!showDropdownAdd) {
+                return <Spin spinning={loading}>{menu}</Spin>;
+              }
+
+              return (
+                <Spin spinning={loading}>
+                  {menu}
+                  <Divider
+                    style={{
+                      margin: "8px 0",
+                    }}
+                  />
+                  <Space
+                    style={{
+                      padding: "0 8px 4px",
+                    }}
+                  >
+                    <Input placeholder="" ref={inputRef} value={name} onChange={onNameChange} />
+                    <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
+                      Ekle
+                    </Button>
+                  </Space>
+                </Spin>
+              );
+            }}
             options={options.map((item) => ({
               value: item.TB_KOD_ID, // Use the ID as the value
               label: item.KOD_TANIM, // Display the name in the dropdown
@@ -159,6 +178,9 @@ export default function KodIDSelectbox({ name1, kodID, isRequired, disabled = fa
               setValue(`${name1}ID`, value);
               if (onLabelChange) {
                 onLabelChange(option?.label ?? null);
+              }
+              if (onChange) {
+                onChange(value, option);
               }
               field.onChange(value);
             }}

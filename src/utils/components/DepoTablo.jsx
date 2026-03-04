@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table, Input, Space } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
-import { SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined, PlusOutlined, CloseOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../api/http";
 
 // Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
@@ -23,9 +23,21 @@ const normalizeText = (text) => {
     .replace(/Ç/g, "C");
 };
 
-const DepoTablo = ({ workshopSelectedId, onSubmit, disabled, name1, isRequired }) => {
+const DepoTablo = ({
+  workshopSelectedId,
+  onSubmit,
+  disabled,
+  name1,
+  isRequired,
+  placeholder = "Seçim Yapınız",
+  style = {},
+  inputStyle = {},
+  showClearButton = true,
+  multiSelect = false,
+}) => {
   const {
     control,
+    watch,
     setValue,
     formState: { errors },
   } = useFormContext();
@@ -130,7 +142,7 @@ const DepoTablo = ({ workshopSelectedId, onSubmit, disabled, name1, isRequired }
       setCurrentPage(1);
       setSelectedRowKeys([]);
     }
-  }, [isModalVisible]);
+  }, [isModalVisible, fetchData]);
 
   // Sayfa değişikliğinde veri çekme
   const handlePageChange = (page) => {
@@ -140,47 +152,97 @@ const DepoTablo = ({ workshopSelectedId, onSubmit, disabled, name1, isRequired }
 
   // Modal onay işlemi
   const handleModalOk = () => {
-    const selectedData = data.find((item) => item.key === selectedRowKeys[0]);
-    if (selectedData) {
-      setValue(fieldName, selectedData.DEP_TANIM);
-      setValue(fieldIdName, selectedData.TB_DEPO_ID);
-      onSubmit && onSubmit(selectedData);
+    const selectedRows = data.filter((item) => selectedRowKeys.includes(item.key));
+
+    if (multiSelect) {
+      const selectedIds = selectedRows.map((item) => item.TB_DEPO_ID);
+      const selectedNames = selectedRows.map((item) => item.DEP_TANIM).filter(Boolean);
+
+      setValue(fieldName, selectedNames.join(", "));
+      setValue(fieldIdName, selectedIds);
+      onSubmit && onSubmit(selectedRows);
+    } else {
+      const selectedData = selectedRows[0];
+      if (selectedData) {
+        setValue(fieldName, selectedData.DEP_TANIM);
+        setValue(fieldIdName, selectedData.TB_DEPO_ID);
+        onSubmit && onSubmit(selectedData);
+      }
     }
+
     setIsModalVisible(false);
   };
 
   // Seçili firma ID'si değiştiğinde çalışacak effect
   useEffect(() => {
-    setSelectedRowKeys(workshopSelectedId ? [workshopSelectedId] : []);
-  }, [workshopSelectedId]);
+    if (multiSelect) {
+      setSelectedRowKeys(Array.isArray(workshopSelectedId) ? workshopSelectedId : []);
+    } else {
+      setSelectedRowKeys(workshopSelectedId ? [workshopSelectedId] : []);
+    }
+  }, [workshopSelectedId, multiSelect]);
 
   // Satır seçimi değiştiğinde çalışacak fonksiyon
   const onRowSelectChange = (selectedKeys) => {
-    setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
+    if (multiSelect) {
+      setSelectedRowKeys(selectedKeys);
+    } else {
+      setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
+    }
   };
 
   // Firma seçimini temizleme
   const handleMinusClick = () => {
     setValue(fieldName, "");
-    setValue(fieldIdName, "");
+    setValue(fieldIdName, multiSelect ? [] : "");
   };
 
+  const depoValue = watch(fieldName);
+  const hasDepoValue = Array.isArray(depoValue) ? depoValue.length > 0 : !!depoValue;
+
   return (
-    <div style={{ width: "100%" }}>
-      <div style={{ display: "flex", gap: "5px", width: "100%" }}>
+    <div style={{ width: "100%", ...style }}>
+      <div style={{ width: "100%" }}>
         <Controller
           name={fieldName}
           control={control}
           rules={isRequired ? { required: "Bu alan zorunludur" } : {}}
-          render={({ field }) => <Input {...field} status={errors[fieldName] ? "error" : ""} type="text" style={{ width: "100%", maxWidth: "630px" }} disabled />}
+          render={({ field }) => (
+            <Input
+              {...field}
+              status={errors[fieldName] ? "error" : ""}
+              type="text"
+              style={{ width: "100%", maxWidth: "630px", ...inputStyle }}
+              placeholder={placeholder}
+              readOnly
+              suffix={
+                hasDepoValue && showClearButton ? (
+                  <CloseOutlined
+                    style={{ color: "#8c8c8c", cursor: "pointer", fontSize: "12px" }}
+                    onClick={handleMinusClick}
+                  />
+                ) : (
+                  <PlusOutlined
+                    style={{ color: disabled ? "#d9d9d9" : "#0091ff", cursor: disabled ? "not-allowed" : "pointer", fontSize: "12px" }}
+                    onClick={disabled ? undefined : handleModalToggle}
+                  />
+                )
+              }
+            />
+          )}
         />
-        <Controller name={fieldIdName} control={control} render={({ field }) => <Input {...field} type="text" style={{ display: "none" }} />} />
-        <div style={{ display: "flex", gap: "5px" }}>
-          <Button disabled={disabled} onClick={handleModalToggle}>
-            +
-          </Button>
-          <Button onClick={handleMinusClick}> - </Button>
-        </div>
+        <Controller
+          name={fieldIdName}
+          control={control}
+          render={({ field }) => (
+            <Input
+              {...field}
+              value={Array.isArray(field.value) ? field.value.join(",") : field.value ?? ""}
+              type="text"
+              style={{ display: "none" }}
+            />
+          )}
+        />
       </div>
 
       <Modal title="Depo Tanımları" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle} width={1200} centered>
@@ -201,7 +263,7 @@ const DepoTablo = ({ workshopSelectedId, onSubmit, disabled, name1, isRequired }
           </Space.Compact>
           <Table
             rowSelection={{
-              type: "radio",
+              type: multiSelect ? "checkbox" : "radio",
               selectedRowKeys,
               onChange: onRowSelectChange,
             }}
