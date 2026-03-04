@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table, Input, Space } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
-import { SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined, PlusOutlined, CloseOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../api/http";
 
 // Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
@@ -37,6 +37,7 @@ const DepoTablo = ({
 }) => {
   const {
     control,
+    watch,
     setValue,
     formState: { errors },
   } = useFormContext();
@@ -196,9 +197,12 @@ const DepoTablo = ({
     setValue(fieldIdName, multiSelect ? [] : "");
   };
 
+  const depoValue = watch(fieldName);
+  const hasDepoValue = Array.isArray(depoValue) ? depoValue.length > 0 : !!depoValue;
+
   return (
     <div style={{ width: "100%", ...style }}>
-      <div style={{ display: "flex", gap: "5px", width: "100%" }}>
+      <div style={{ width: "100%" }}>
         <Controller
           name={fieldName}
           control={control}
@@ -210,7 +214,20 @@ const DepoTablo = ({
               type="text"
               style={{ width: "100%", maxWidth: "630px", ...inputStyle }}
               placeholder={placeholder}
-              disabled
+              readOnly
+              suffix={
+                hasDepoValue && showClearButton ? (
+                  <CloseOutlined
+                    style={{ color: "#8c8c8c", cursor: "pointer", fontSize: "12px" }}
+                    onClick={handleMinusClick}
+                  />
+                ) : (
+                  <PlusOutlined
+                    style={{ color: disabled ? "#d9d9d9" : "#0091ff", cursor: disabled ? "not-allowed" : "pointer", fontSize: "12px" }}
+                    onClick={disabled ? undefined : handleModalToggle}
+                  />
+                )
+              }
             />
           )}
         />
@@ -226,12 +243,6 @@ const DepoTablo = ({
             />
           )}
         />
-        <div style={{ display: "flex", gap: "5px" }}>
-          <Button disabled={disabled} onClick={handleModalToggle}>
-            +
-          </Button>
-          {showClearButton && <Button onClick={handleMinusClick}> - </Button>}
-        </div>
       </div>
 
       <Modal title="Depo Tanımları" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle} width={1200} centered>
