@@ -14,6 +14,7 @@ import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import dayjs from "dayjs";
 import AktifPasifHepsiSelect from "../../../../utils/components/AktifPasifHepsiSelect";
+import Filters from "./filter/Filters";
 
 import { t } from "i18next";
 
@@ -147,6 +148,8 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
   const [pageSize, setPageSize] = useState(10); // Başlangıçta sayfa başına 10 kayıt göster
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
+  const [sortField, setSortField] = useState(null);
+  const [sortOrder, setSortOrder] = useState(null);
 
   // edit drawer için
   const [drawer, setDrawer] = useState({
@@ -415,6 +418,20 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
         if (a.STK_LOKASYON === null) return -1;
         if (b.STK_LOKASYON === null) return 1;
         return a.STK_LOKASYON.localeCompare(b.STK_LOKASYON);
+      },
+    },
+    {
+      title: t("bulunduguDepo"),
+      dataIndex: "STK_DEPO",
+      key: "STK_DEPO",
+      width: 160,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+
+      sorter: (a, b) => {
+        if (a.STK_DEPO === null) return -1;
+        if (b.STK_DEPO === null) return 1;
+        return a.STK_DEPO.localeCompare(b.STK_DEPO);
       },
     },
 
@@ -889,8 +906,8 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
   // ana tablo api isteği için kullanılan useEffect
 
   useEffect(() => {
-    fetchEquipmentData(body, currentPage, pageSize);
-  }, [body, currentPage, pageSize]);
+    fetchEquipmentData(body, currentPage, pageSize, sortField, sortOrder);
+  }, [body, currentPage, pageSize, sortField, sortOrder]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
@@ -916,18 +933,41 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
 
   // arama işlemi için kullanılan useEffect son
 
-  const fetchEquipmentData = async (body, page, size) => {
+  const fetchEquipmentData = async (body, page, size, currentSortField, currentSortOrder) => {
     // body'nin undefined olması durumunda varsayılan değerler atanıyor
     const { keyword = "", filters = {}, isAktif = 1 } = body || {};
     // page'in undefined olması durumunda varsayılan değer olarak 1 atanıyor
     const currentPage = page || 1;
     const currentPageSize = size || pageSize;
+    const normalizedFilters = filters && typeof filters === "object" ? filters : {};
+
+    const stkTipIds = Array.isArray(normalizedFilters.stkTipIds) ? normalizedFilters.stkTipIds : [];
+    const stkGrupIds = Array.isArray(normalizedFilters.stkGrupIds) ? normalizedFilters.stkGrupIds : [];
+    const stkDepoIds = Array.isArray(normalizedFilters.stkDepoIds) ? normalizedFilters.stkDepoIds : [];
+
+    let sortParam = "";
+    if (currentSortField && currentSortOrder) {
+      const normalizedOrder = currentSortOrder === "ascend" ? "ASC" : "DESC";
+      sortParam = `&sortField=${currentSortField}&sortOrder=${normalizedOrder}`;
+    }
 
     try {
       setLoading(true);
 
       // islemTip değerine göre API URL'ini oluştur
       let apiUrl = `Stok?modulNo=1&pagingDeger=${currentPage}&pageSize=${currentPageSize}&prm=${keyword}&isAktif=${isAktif ?? -1}`;
+
+      if (stkTipIds.length > 0) {
+        apiUrl += `&stkTipIds=${stkTipIds.join(",")}`;
+      }
+
+      if (stkGrupIds.length > 0) {
+        apiUrl += `&stkGrupIds=${stkGrupIds.join(",")}`;
+      }
+
+      if (stkDepoIds.length > 0) {
+        apiUrl += `&stkDepoIds=${stkDepoIds.join(",")}`;
+      }
 
       if (islemTip === "C" || islemTip === "T") {
         // islemTip C veya T ise özel parametreler ekle
@@ -936,6 +976,8 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
         // islemTip null ise normal parametreler ekle
         apiUrl;
       }
+
+      apiUrl += sortParam;
 
       // API isteğini yap
       const response = await AxiosInstance.get(apiUrl);
@@ -989,6 +1031,20 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       const nextSize = pagination.pageSize || pageSize;
       setPageSize(nextSize);
       setCurrentPage(pagination.current || 1);
+
+      if (sorter && (sorter.field || sorter.columnKey)) {
+        const nextField = sorter.field || sorter.columnKey;
+        if (sorter.order) {
+          setSortField(nextField);
+          setSortOrder(sorter.order);
+        } else {
+          setSortField(null);
+          setSortOrder(null);
+        }
+      } else {
+        setSortField(null);
+        setSortOrder(null);
+      }
       return;
     }
 
@@ -1080,11 +1136,11 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
     selectedRowsMapRef.current.clear();
 
     // Verileri yeniden çekmek için `fetchEquipmentData` fonksiyonunu çağır
-    fetchEquipmentData(body, currentPage);
+    fetchEquipmentData(body, currentPage, pageSize, sortField, sortOrder);
     // Burada `body` ve `currentPage`'i güncellediğimiz için, bu değerlerin en güncel hallerini kullanarak veri çekme işlemi yapılır.
     // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
     // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
-  }, [body, currentPage]); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
+  }, [body, currentPage, pageSize, sortField, sortOrder]); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
 
   // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
   const [columns, setColumns] = useState(() => {
@@ -1162,13 +1218,18 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
     },
   };
 
-  const mergedColumns = columns.map((col) => ({
-    ...col,
-    onHeaderCell: (column) => ({
-      width: column.width,
-      onResize: handleResize(column.key),
-    }),
-  }));
+  const mergedColumns = columns.map((col) => {
+    const isSorted = sortField && (col.dataIndex === sortField || col.key === sortField);
+
+    return {
+      ...col,
+      sortOrder: col.sorter ? (isSorted ? sortOrder : null) : col.sortOrder,
+      onHeaderCell: (column) => ({
+        width: column.width,
+        onResize: handleResize(column.key),
+      }),
+    };
+  });
 
   // fitrelenmiş sütunları birleştiriyoruz ve sadece görünür olanları alıyoruz ve tabloya gönderiyoruz
 
@@ -1334,6 +1395,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
           <AktifPasifHepsiSelect style={{ width: 160 }} value={body.isAktif} onChange={(value) => handleBodyChange("isAktif", value)} />
+          <Filters onChange={handleBodyChange} />
         </div>
         {!isSelectionMode && (
           <div style={{ display: "flex", gap: "10px" }}>

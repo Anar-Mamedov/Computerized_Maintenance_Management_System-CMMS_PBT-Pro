@@ -1,251 +1,158 @@
-import { CloseOutlined, FilterOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Col, Drawer, Row, Typography, Select, Space, Input } from "antd";
-import React, { useState } from "react";
-import styled from "styled-components";
-import "./style.css";
+import { Select, Space } from "antd";
+import React, { useCallback, useRef, useState } from "react";
+import AxiosInstance from "../../../../../../api/http";
+import { t } from "i18next";
 
-const { Text, Link } = Typography;
-
-const StyledCloseOutlined = styled(CloseOutlined)`
-  svg {
-    width: 10px;
-    height: 10px;
-  }
-`;
-
-const CloseButton = styled.div`
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #80808048;
-  cursor: pointer;
-`;
+const createEmptyFilters = () => ({
+  stkTipIds: [],
+  stkDepoIds: [],
+  stkGrupIds: [],
+});
 
 export default function CustomFilter({ onSubmit }) {
-  const [open, setOpen] = useState(false);
-  const [rows, setRows] = useState([]);
-  const [newObjectsAdded, setNewObjectsAdded] = useState(false);
-  const [filtersExist, setFiltersExist] = useState(false);
-  const [inputValues, setInputValues] = useState({}); // Input değerlerini saklamak için bir state kullanıyoruz
-  const [filters, setFilters] = useState({});
-  const [filterValues, setFilterValues] = useState({});
+  const [filters, setFilters] = useState(createEmptyFilters());
 
-  // Create a state variable to store selected values for each row
-  const [selectedValues, setSelectedValues] = useState({});
+  const [tipLoading, setTipLoading] = useState(false);
+  const [depoLoading, setDepoLoading] = useState(false);
+  const [grupLoading, setGrupLoading] = useState(false);
 
-  const handleSelectChange = (value, rowId) => {
-    setSelectedValues((prevSelectedValues) => ({
-      ...prevSelectedValues,
-      [rowId]: value,
-    }));
-  };
+  const tipLoadingRef = useRef(false);
+  const depoLoadingRef = useRef(false);
+  const grupLoadingRef = useRef(false);
 
-  const showDrawer = () => {
-    setOpen(true);
-  };
+  const [tipOptions, setTipOptions] = useState([]);
+  const [depoOptions, setDepoOptions] = useState([]);
+  const [grupOptions, setGrupOptions] = useState([]);
 
-  const onClose = () => {
-    setOpen(false);
-  };
+  const fetchTipOptions = useCallback(async () => {
+    if (tipLoadingRef.current) return;
 
-  const handleSubmit = () => {
-    // Combine selected values and input values for each row
-    const rowData = rows.map((row) => ({
-      selectedValue: selectedValues[row.id] || "",
-      inputValue: inputValues[`input-${row.id}`] || "",
-    }));
-
-    // Filter out rows where both selectedValue and inputValue are empty
-    const filteredData = rowData.filter(({ selectedValue, inputValue }) => {
-      return selectedValue !== "" || inputValue !== "";
-    });
-
-    if (filteredData.length > 0) {
-      // Convert the filteredData array to the desired JSON format
-      const json = filteredData.reduce((acc, { selectedValue, inputValue }) => {
-        return {
-          ...acc,
-          [selectedValue]: inputValue,
-        };
-      }, {});
-
-      console.log(json);
-      // You can now submit or process the json object as needed.
-      onSubmit(json);
-    } else {
-      // Handle the case where there are no non-empty filters (optional)
-      console.log("No filters to submit.");
+    try {
+      tipLoadingRef.current = true;
+      setTipLoading(true);
+      const response = await AxiosInstance.get("KodList?grup=13005");
+      setTipOptions((response || []).map((item) => ({ value: item.TB_KOD_ID, label: item.KOD_TANIM })));
+    } catch (error) {
+      console.error("Tip filtre verileri yüklenirken hata oluştu:", error);
+    } finally {
+      tipLoadingRef.current = false;
+      setTipLoading(false);
     }
-  };
+  }, []);
 
-  const handleCancelClick = (rowId) => {
-    setFilters({});
-    setRows((prevRows) => prevRows.filter((row) => row.id !== rowId));
+  const fetchDepoOptions = useCallback(async () => {
+    if (depoLoadingRef.current) return;
 
-    const filtersRemaining = rows.length > 1;
-    setFiltersExist(filtersRemaining);
-    if (!filtersRemaining) {
-      setNewObjectsAdded(false);
+    try {
+      depoLoadingRef.current = true;
+      setDepoLoading(true);
+      const response = await AxiosInstance.get("GetDepo?DEP_MODUL_NO=1");
+      setDepoOptions(
+        (response || []).map((item) => ({
+          value: item.TB_DEPO_ID,
+          label: [item.DEP_KOD, item.DEP_TANIM].filter(Boolean).join(" - ") || item.DEP_TANIM || item.DEP_KOD || `${item.TB_DEPO_ID}`,
+        }))
+      );
+    } catch (error) {
+      console.error("Depo filtre verileri yüklenirken hata oluştu:", error);
+    } finally {
+      depoLoadingRef.current = false;
+      setDepoLoading(false);
     }
-    onSubmit("");
-  };
+  }, []);
 
-  const handleInputChange = (e, rowId) => {
-    setInputValues((prevInputValues) => ({
-      ...prevInputValues,
-      [`input-${rowId}`]: e.target.value,
-    }));
-  };
+  const fetchGrupOptions = useCallback(async () => {
+    if (grupLoadingRef.current) return;
 
-  const handleAddFilterClick = () => {
-    const newRow = { id: Date.now() };
-    setRows((prevRows) => [...prevRows, newRow]);
+    try {
+      grupLoadingRef.current = true;
+      setGrupLoading(true);
+      const response = await AxiosInstance.get("KodList?grup=13004");
+      setGrupOptions((response || []).map((item) => ({ value: item.TB_KOD_ID, label: item.KOD_TANIM })));
+    } catch (error) {
+      console.error("Grup filtre verileri yüklenirken hata oluştu:", error);
+    } finally {
+      grupLoadingRef.current = false;
+      setGrupLoading(false);
+    }
+  }, []);
 
-    setNewObjectsAdded(true);
-    setFiltersExist(true);
-    setInputValues((prevInputValues) => ({
-      ...prevInputValues,
-      [newRow.id]: "", // Set an empty input value for the new row
-    }));
-  };
-
-  const onChange = (value) => {
-    console.log(`selected ${value}`);
-  };
-
-  const onSearch = (value) => {
-    console.log("search:", value);
+  const handleFilterChange = (field, values) => {
+    const nextFilters = {
+      ...filters,
+      [field]: values || [],
+    };
+    setFilters(nextFilters);
+    onSubmit(nextFilters);
   };
 
   return (
-    <>
-      <Button
-        onClick={showDrawer}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          backgroundColor: newObjectsAdded || filtersExist ? "#EBF6FE" : "#ffffffff",
+    <Space size={10} wrap>
+      <Select
+        mode="multiple"
+        allowClear
+        showSearch
+        loading={tipLoading}
+        style={{ width: 170 }}
+        placeholder={t("malzemeTipi")}
+        value={filters.stkTipIds}
+        options={tipOptions}
+        maxTagCount="responsive"
+        maxTagTextLength={16}
+        maxTagPlaceholder={() => "..."}
+        optionFilterProp="label"
+        onOpenChange={(open) => {
+          if (open) {
+            fetchTipOptions();
+          }
         }}
-        className={newObjectsAdded ? "#ff0000-dot-button" : ""}
-      >
-        <FilterOutlined />
-        <span style={{ marginRight: "5px" }}>Filtreler</span>
-        {newObjectsAdded && <span className="blue-dot"></span>}
-      </Button>
-      <Drawer
-        extra={
-          <Space>
-            <Button type="primary" onClick={handleSubmit}>
-              Uygula
-            </Button>
-          </Space>
-        }
-        title={
-          <span>
-            <FilterOutlined style={{ marginRight: "8px" }} /> Filtreler
-          </span>
-        }
-        placement="right"
-        onClose={onClose}
-        open={open}
-      >
-        {rows.map((row) => (
-          <Row
-            key={row.id}
-            style={{
-              marginBottom: "10px",
-              border: "1px solid #80808048",
-              padding: "15px 10px",
-              borderRadius: "8px",
-            }}
-          >
-            <Col span={24}>
-              <Col
-                span={24}
-                style={{
-                  marginBottom: "10px",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Text>Yeni Filtre</Text>
-                <CloseButton onClick={() => handleCancelClick(row.id)}>
-                  <StyledCloseOutlined />
-                </CloseButton>
-              </Col>
-              <Col span={24} style={{ marginBottom: "10px" }}>
-                <Select
-                  style={{ width: "100%", marginBottom: "10px" }}
-                  showSearch
-                  placeholder={`Seçim Yap`}
-                  optionFilterProp="children"
-                  onChange={(value) => handleSelectChange(value, row.id)}
-                  value={selectedValues[row.id] || undefined}
-                  onSearch={onSearch}
-                  filterOption={(input, option) => (option?.label || "").toLowerCase().includes(input.toLowerCase())}
-                  options={[
-                    {
-                      value: "MKN_KOD",
-                      label: "Makine Kodu",
-                    },
-                    {
-                      value: "MKN_TANIM",
-                      label: "Makine Tanımı",
-                    },
-                    {
-                      value: "MKN_LOKASYON",
-                      label: "Lokasyon",
-                    },
-                    {
-                      value: "MKN_TIP",
-                      label: "Makine Tipi",
-                    },
-                    {
-                      value: "MKN_KATEGORI",
-                      label: "Kategori",
-                    },
-                    {
-                      value: "MKN_MARKA",
-                      label: "Marka",
-                    },
-                    {
-                      value: "MKN_MODEL",
-                      label: "Model",
-                    },
-                    {
-                      value: "MKN_SERI_NO",
-                      label: "Seri No",
-                    },
-                  ]}
-                />
-                <Input
-                  placeholder="Arama Yap"
-                  name={`input-${row.id}`} // Use a unique name for each input based on the row ID
-                  value={inputValues[`input-${row.id}`] || ""} // Use the corresponding input value
-                  onChange={(e) => handleInputChange(e, row.id)} // Pass the rowId to handleInputChange
-                />
-              </Col>
-            </Col>
-          </Row>
-        ))}
-        <Button
-          type="primary"
-          onClick={handleAddFilterClick}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            width: "100%",
-            justifyContent: "center",
-          }}
-        >
-          <PlusOutlined />
-          Filtre ekle
-        </Button>
-      </Drawer>
-    </>
+        onFocus={fetchTipOptions}
+        onChange={(values) => handleFilterChange("stkTipIds", values)}
+      />
+
+      <Select
+        mode="multiple"
+        allowClear
+        showSearch
+        loading={depoLoading}
+        style={{ width: 220 }}
+        placeholder={t("bulunduguDepo")}
+        value={filters.stkDepoIds}
+        options={depoOptions}
+        maxTagCount="responsive"
+        maxTagTextLength={16}
+        maxTagPlaceholder={() => "..."}
+        optionFilterProp="label"
+        onOpenChange={(open) => {
+          if (open) {
+            fetchDepoOptions();
+          }
+        }}
+        onFocus={fetchDepoOptions}
+        onChange={(values) => handleFilterChange("stkDepoIds", values)}
+      />
+
+      <Select
+        mode="multiple"
+        allowClear
+        showSearch
+        loading={grupLoading}
+        style={{ width: 170 }}
+        placeholder={t("malzemeGrubu")}
+        value={filters.stkGrupIds}
+        options={grupOptions}
+        maxTagCount="responsive"
+        maxTagTextLength={16}
+        maxTagPlaceholder={() => "..."}
+        optionFilterProp="label"
+        onOpenChange={(open) => {
+          if (open) {
+            fetchGrupOptions();
+          }
+        }}
+        onFocus={fetchGrupOptions}
+        onChange={(values) => handleFilterChange("stkGrupIds", values)}
+      />
+    </Space>
   );
 }

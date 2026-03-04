@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert, Modal, Spin, Table, Typography, Input, Button } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../api/http";
@@ -104,9 +104,12 @@ export default function DepoStokDurumlariModal({ depoId, depoKod, icon, iconColo
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [appliedSearchTerm, setAppliedSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
+  const [sortField, setSortField] = useState(null);
+  const [sortOrder, setSortOrder] = useState(null);
   const isMountedRef = useRef(true);
   const requestIdRef = useRef(0);
 
@@ -129,14 +132,20 @@ export default function DepoStokDurumlariModal({ depoId, depoKod, icon, iconColo
   }, []);
 
   const fetchData = useCallback(
-    async (searchText = "") => {
+    async (searchText = appliedSearchTerm) => {
       if (!depoId) return;
       const currentRequestId = requestIdRef.current + 1;
       requestIdRef.current = currentRequestId;
       setLoading(true);
       setError("");
       try {
-        const response = await AxiosInstance.get(`GetDepoStokDurumlari?depoId=${depoId}&pagingDeger=${currentPage}&pageSize=${pageSize}&prm=${searchText}`);
+        let sortParam = "";
+        if (sortField && sortOrder) {
+          const normalizedOrder = sortOrder === "ascend" ? "ASC" : "DESC";
+          sortParam = `&sortField=${sortField}&sortOrder=${normalizedOrder}`;
+        }
+
+        const response = await AxiosInstance.get(`GetDepoStokDurumlari?depoId=${depoId}&pagingDeger=${currentPage}&pageSize=${pageSize}&prm=${searchText}${sortParam}`);
 
         if (isMountedRef.current && requestIdRef.current === currentRequestId) {
           const payload = response?.data || [];
@@ -158,7 +167,7 @@ export default function DepoStokDurumlariModal({ depoId, depoKod, icon, iconColo
         }
       }
     },
-    [depoId, currentPage, pageSize]
+    [appliedSearchTerm, currentPage, depoId, pageSize, sortField, sortOrder]
   );
 
   useEffect(() => {
@@ -172,21 +181,50 @@ export default function DepoStokDurumlariModal({ depoId, depoKod, icon, iconColo
       setRows([]);
       setError("");
       setSearchTerm("");
+      setAppliedSearchTerm("");
       setCurrentPage(1);
+      setSortField(null);
+      setSortOrder(null);
     }
   }, [open]);
 
-  const handleTableChange = (pagination) => {
+  const handleTableChange = (pagination, _, sorter) => {
     setCurrentPage(pagination.current);
     setPageSize(pagination.pageSize);
+
+    if (sorter && (sorter.field || sorter.columnKey)) {
+      const nextField = sorter.field || sorter.columnKey;
+      if (sorter.order) {
+        setSortField(nextField);
+        setSortOrder(sorter.order);
+      } else {
+        setSortField(null);
+        setSortOrder(null);
+      }
+    } else {
+      setSortField(null);
+      setSortOrder(null);
+    }
   };
 
   const handleSearch = () => {
+    setAppliedSearchTerm(searchTerm);
     setCurrentPage(1);
-    fetchData(searchTerm);
   };
 
   const isDisabled = !depoId;
+  const tableColumns = useMemo(() => {
+    return defaultColumns.map((col) => {
+      const fieldName = col.dataIndex || col.key;
+      const isSorted = sortField && (sortField === fieldName || sortField === col.key);
+
+      return {
+        ...col,
+        sorter: true,
+        sortOrder: isSorted ? sortOrder : null,
+      };
+    });
+  }, [sortField, sortOrder]);
 
   return (
     <>
@@ -232,7 +270,7 @@ export default function DepoStokDurumlariModal({ depoId, depoKod, icon, iconColo
 
           <Spin spinning={loading}>
             <Table
-              columns={defaultColumns}
+              columns={tableColumns}
               dataSource={rows}
               pagination={{
                 current: currentPage,

@@ -15,6 +15,8 @@
   "makineTanimi": "Описание машины",
   "lokasyon": "Локация",
   "tip": "Тип",
+  "malzemeTipi": "Тип материала",
+  "malzemeGrubu": "Группа материала",
   "durum": "Статус",
   "sonBakim": "Последнее обслуживание",
   "sonrakiBakim": "Следующее обслуживание",
