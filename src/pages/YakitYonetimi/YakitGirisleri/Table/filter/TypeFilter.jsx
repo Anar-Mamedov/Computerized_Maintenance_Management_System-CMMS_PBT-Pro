@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Select, Button, Dropdown, Menu } from "antd";
 import AxiosInstance from "../../../../../api/http";
 
@@ -6,69 +6,58 @@ const { Option } = Select;
 
 const TypeFilter = ({ onSubmit }) => {
   const [visible, setVisible] = useState(false);
+  const [options, setOptions] = useState([]);
+  
+  // Seçilen ID'leri tutan state (Direkt array olarak tutuyoruz: [5098, 5099] gibi)
+  const [selectedIds, setSelectedIds] = useState([]);
 
-  // useeffect ile api den veri data cekip options a atayacagiz
-  const [options, setOptions] = React.useState([]);
-  const [filters, setFilters] = useState({});
-
-  const handleChange = (value) => {
-    // Create a copy of the current selected items
-    const selectedItemsCopy = { ...filters };
-
-    // Loop through all options
-    options.forEach((option) => {
-      const isSelected = selectedItemsCopy[option.key] !== undefined;
-
-      // If the option is already selected, and it's not in the new value, remove it
-      if (isSelected && !value.includes(option.value)) {
-        delete selectedItemsCopy[option.key];
-      }
-      // If the option is not selected and it's in the new value, add it
-      else if (!isSelected && value.includes(option.value)) {
-        selectedItemsCopy[option.key] = option.value;
-      }
-    });
-
-    // Update the filters state with the updated selection
-    setFilters(selectedItemsCopy);
-  };
-
-  React.useEffect(() => {
-    AxiosInstance.get("IsEmriTip")
+  // API'den veri çekme
+  useEffect(() => {
+    AxiosInstance.get("KodList?grup=35600")
       .then((response) => {
-        const options = response.map((option, index) => ({ key: index, value: option.IMT_TANIM }));
-        setOptions(options);
-
-        const definitions = response.map((option, index) => ({ index: index, value: option.IMT_DEFINITION }));
+        // API yanıtını selectbox formatına çeviriyoruz
+        const mappedOptions = response.map((item) => ({
+          key: item.TB_KOD_ID,
+          value: item.TB_KOD_ID,   // Value olarak ID tutuyoruz
+          label: item.KOD_TANIM,   // Ekranda Tanım gösteriyoruz
+        }));
+        setOptions(mappedOptions);
       })
       .catch((error) => {
         console.log("API Error:", error);
       });
   }, []);
 
-  const handleSubmit = () => {
-    // Seçilen öğeleri başka bir bileşene iletmek için prop olarak gelen işlevi çağırın
-    onSubmit(filters);
+  // Select değiştiğinde çalışır (Antd Select multiple modunda direkt array döner)
+  const handleChange = (values) => {
+    setSelectedIds(values);
+  };
 
-    // Seçilen öğeleri sıfırlayabiliriz
-    // setFilters({});
-    // Dropdown'ı gizle
+  // Uygula butonuna basınca
+  const handleSubmit = () => {
+    // Seçilen ID arrayini (örn: [5098, 5518]) üst bileşene gönder
+    onSubmit(selectedIds);
     setVisible(false);
   };
 
+  // İptal butonuna basınca
   const handleCancelClick = () => {
-    // Seçimleri iptal etmek için seçilen öğeleri sıfırlayın
-    setFilters({});
-    // Dropdown'ı gizle
+    setSelectedIds([]); // Seçimleri temizle
+    onSubmit([]);       // Boş array gönder
     setVisible(false);
-    onSubmit("");
   };
 
   const menu = (
     <Menu style={{ width: "300px" }}>
       <div
-        style={{ borderBottom: "1px solid #ccc", padding: "10px", display: "flex", justifyContent: "space-between" }}>
-        <Button onClick={handleCancelClick}>İptal</Button>
+        style={{
+          borderBottom: "1px solid #ccc",
+          padding: "10px",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <Button onClick={handleCancelClick}>Temizle</Button>
         <Button type="primary" onClick={handleSubmit}>
           Uygula
         </Button>
@@ -77,15 +66,18 @@ const TypeFilter = ({ onSubmit }) => {
         <Select
           mode="multiple"
           style={{ width: "100%" }}
-          placeholder="Ara..."
-          value={Object.values(filters)}
+          placeholder="Yakıt tipi ara..."
+          value={selectedIds} // State'i buraya bağlıyoruz
           onChange={handleChange}
           allowClear
-          showArrow={false}>
-          {/* Seçenekleri elle ekleyin */}
+          showArrow={false}
+          filterOption={(input, option) =>
+            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+          }
+        >
           {options.map((option) => (
             <Option key={option.key} value={option.value}>
-              {option.value}
+              {option.label}
             </Option>
           ))}
         </Select>
@@ -98,10 +90,11 @@ const TypeFilter = ({ onSubmit }) => {
       overlay={menu}
       placement="bottomLeft"
       trigger={["click"]}
-      visible={visible}
-      onVisibleChange={(v) => setVisible(v)}>
+      open={visible} // 'visible' yerine 'open' (Antd sürümüne göre değişebilir, eskisi visible'dı)
+      onOpenChange={(v) => setVisible(v)} // onVisibleChange yerine onOpenChange
+    >
       <Button style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-        İş Emri Tipi
+        Yakıt Tipi
         <span
           style={{
             marginLeft: "5px",
@@ -113,8 +106,10 @@ const TypeFilter = ({ onSubmit }) => {
             justifyContent: "center",
             alignItems: "center",
             color: "white",
-          }}>
-          {Object.keys(filters).length}{" "}
+            fontSize: "10px",
+          }}
+        >
+          {selectedIds.length}
         </span>
       </Button>
     </Dropdown>

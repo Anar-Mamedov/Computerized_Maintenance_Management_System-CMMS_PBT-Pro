@@ -181,6 +181,8 @@ const rawItems = [
     ],
     false
   ),
+  ...(isOmegaMenu 
+  ? [
   getItem(
     "Operasyon Yönetimi",
     "operasyonYonetimi",
@@ -192,7 +194,10 @@ const rawItems = [
       getItem("Operasyon Takibi", "operasyonTakibi", true),
     ],
     false
-  ),
+      )
+    ] 
+  : []
+),
   getItem(
     "Bakım Yönetimi",
     "bakim&ariza",
@@ -247,6 +252,8 @@ const rawItems = [
     ],
     false
   ),
+  ...(isOmegaMenu 
+  ? [
   getItem(
     "Satınalma Yönetimi",
     "satinalmaYonetimi",
@@ -261,23 +268,31 @@ const rawItems = [
       // getItem("Team 2", "team2", true)
     ],
     false
-  ),
+      )
+    ] 
+  : []
+),
 
-  getItem(
-    "Yakıt Yönetimi",
-    "yakitYonetimi",
-    <FireOutlined />,
-    [
-      getItem("Yakıt Tanımları", "yakitTanimlari", true),
-      getItem("Yakıt Stokları", "yakitStoklari", true),
-      getItem("Yakıt Girişleri", "yakitGirisleri", true),
-      getItem("Yakıt Hareketleri", "yakitHareketleri", true),
-      getItem("Hızlı Yakıt Girişi", "hizliYakitGirisi", true),
-
-      // getItem("Team 2", "team2", true)
-    ],
-    false
-  ),
+  ...(isOmegaMenu 
+  ? [
+      getItem(
+        "Yakıt Yönetimi",
+        "yakitYonetimi",
+        <FireOutlined />,
+        [
+          getItem("Yakıt Tanımları", "yakitTanimlari", true),
+          getItem("Yakıt Stokları", "yakitStoklari", true),
+          getItem("Yakıt Girişleri", "yakitGirisleri", true),
+          getItem("Yakıt Hareketleri", "yakitHareketleri", true),
+          getItem("Hızlı Yakıt Girişi", "hizliYakitGirisi", true),
+        ],
+        false
+      )
+    ] 
+  : []
+),
+...(isOmegaMenu 
+  ? [
   getItem(
     "Proje Yönetimi",
     "projeYonetimi",
@@ -290,7 +305,10 @@ const rawItems = [
       // getItem("Team 2", "team2", true)
     ],
     false
-  ),
+  )
+    ] 
+  : []
+),
   getItem(
     "Analizler",
     "analizler1",
@@ -441,10 +459,6 @@ export default function App() {
           <Route path="/ekipmanVeritabani" element={<EkipmanVeritabani />} />
           <Route path="/durusTakibi" element={<DurusTakibi />} />
           <Route path="/sayacGuncelleme" element={<SayacGuncelleme />} />
-          <Route path="/gunlukMakinePuantajGirisi" element={<MakinePuantaj />} />
-          <Route path="/aylikMakinePuantajlari" element={<AylikMakinePuantaj />} />
-          <Route path="/makinePuantajTakibi" element={<Hazirlaniyor />} />
-          <Route path="/operasyonTakibi" element={<Hazirlaniyor />} />
           <Route path="/personelIzinleri" element={<Hazirlaniyor />} />
           <Route path="/personelNobetleri" element={<Hazirlaniyor />} />
           <Route path="/personelCalismaPLani" element={<Hazirlaniyor />} />
@@ -480,25 +494,33 @@ export default function App() {
           <Route path="/stokSayimlari" element={<Hazirlaniyor />} />
           <Route path="/hizliMaliyetlendirme" element={<Hazirlaniyor />} />
           <Route path="/malzemeTransferOnayIslemleri" element={<Hazirlaniyor />} />
-          <Route path="/malzemeTalepleri" element={<MalzemeTalepleri />} />
-          <Route path="/satinalmaSiparisleri" element={<SatinalmaSiparisleri />} />
-          <Route path="/fiyatTeklifleri" element={<FiyatTeklfileri />} />
-          <Route path="/tedarikciFirmalar" element={<DetarikciFirmalar />} />
           <Route path="/satinalmaDashboard" element={<SatinalmaDashboard />} />
           <Route path="/bakimKpi" element={<BakimKpi />} />
-          <Route path="/yakitTanimlari" element={<YakitTanimlari />} />
-          <Route path="/yakitStoklari" element={<YakitStoklari />} />
-          <Route path="/yakitGirisleri" element={<YakitGirisleri />} />
-          <Route path="/yakitHareketleri" element={<YakitHareketleri />} />
-          <Route path="/hizliYakitGirisi" element={<HizliYakitGirisi />} />
-          <Route path="/yakitTuketimiAnalizi" element={<YakitTuketimiAnalizi />} />
           <Route path="/stokSayimlariFisListe" element={<StokSayimFisListe />} />
           <Route path="/dokumanYonetimi" element={<DokumanYonetimi />} />
           <Route path="/resimYonetimi" element={<ResimYonetimi />} />
           <Route path="/ekipmanTransferi" element={<EkipmanTransferi />} />
-          <Route path="/projeTanimlari2" element={<ProjeTanimlari2 />} />
-          <Route path="/projeYonetimiListe" element={<ProjeYonetimListe />} />
-          <Route path="/projeIlerleme" element={<ProjeIlerleme />} />
+          {isOmega && (
+            <>
+              <Route path="/gunlukMakinePuantajGirisi" element={<MakinePuantaj />} />
+              <Route path="/aylikMakinePuantajlari" element={<AylikMakinePuantaj />} />
+              <Route path="/makinePuantajTakibi" element={<Hazirlaniyor />} />
+              <Route path="/operasyonTakibi" element={<Hazirlaniyor />} />
+              <Route path="/malzemeTalepleri" element={<MalzemeTalepleri />} />
+              <Route path="/satinalmaSiparisleri" element={<SatinalmaSiparisleri />} />
+              <Route path="/fiyatTeklifleri" element={<FiyatTeklfileri />} />
+              <Route path="/tedarikciFirmalar" element={<DetarikciFirmalar />} />
+              <Route path="/yakitTanimlari" element={<YakitTanimlari />} />
+              <Route path="/yakitStoklari" element={<YakitStoklari />} />
+              <Route path="/yakitGirisleri" element={<YakitGirisleri />} />
+              <Route path="/yakitHareketleri" element={<YakitHareketleri />} />
+              <Route path="/hizliYakitGirisi" element={<HizliYakitGirisi />} />
+              <Route path="/yakitTuketimiAnalizi" element={<YakitTuketimiAnalizi />} />
+              <Route path="/projeTanimlari2" element={<ProjeTanimlari2 />} />
+              <Route path="/projeYonetimiListe" element={<ProjeYonetimListe />} />
+              <Route path="/projeIlerleme" element={<ProjeIlerleme />} />
+            </>
+          )}
           {/*<Route path="/kurallar" element={<Kurallar />} />*/}
         </Route>
       </Routes>
