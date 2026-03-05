@@ -1,24 +1,62 @@
 import React, { useCallback, useEffect, useState, useMemo, useRef } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Card, Tag, Space, Tooltip, Dropdown, Menu } from "antd";
-import { HolderOutlined, SearchOutlined, MenuOutlined, EditOutlined, DeleteOutlined, MoreOutlined, FileExcelOutlined } from "@ant-design/icons";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Progress, message, Card, Row, Col, Space, Popconfirm, Tag, Popover, Drawer, Select } from "antd";
+import { HolderOutlined, SearchOutlined, MenuOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Resizable } from "react-resizable";
-import "./ResizeStyle.css"; // Bu dosyanın projenizde olduğunu varsayıyorum
+import "./ResizeStyle.css";
+import AxiosInstance from "../../../../api/http";
+import CreateDrawer from "../Insert/CreateDrawer";
+import EditDrawer from "../Update/EditDrawer";
+import ContextMenu from "../components/ContextMenu/ContextMenu";
+import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
+import Filters from "./filter/Filters";
+import YakitIslemleri from "./YakitIslemleri/YakitIslemleri";
+import { useFormContext } from "react-hook-form";
+import { SiMicrosoftexcel } from "react-icons/si";
 import * as XLSX from "xlsx";
+import { t } from "i18next";
 import dayjs from "dayjs";
 
 const { Text } = Typography;
 
-// --- Yardımcı Fonksiyonlar ---
+// Function to extract text from React elements
+import { isValidElement } from "react";
+
+function extractTextFromElement(element) {
+  let text = "";
+  if (typeof element === "string") {
+    text = element;
+  } else if (Array.isArray(element)) {
+    text = element.map((child) => extractTextFromElement(child)).join("");
+  } else if (isValidElement(element)) {
+    text = extractTextFromElement(element.props.children);
+  } else if (element !== null && element !== undefined) {
+    text = element.toString();
+  }
+  return text;
+}
+
 const ResizableTitle = (props) => {
   const { onResize, width, ...restProps } = props;
+
+  // tabloyu genişletmek için kullanılan alanın stil özellikleri
+  const handleStyle = {
+    position: "absolute",
+    bottom: 0,
+    right: "-5px",
+    width: "20%",
+    height: "100%", // this is the area that is draggable, you can adjust it
+    zIndex: 2, // ensure it's above other elements
+    cursor: "col-resize",
+    padding: "0px",
+    backgroundSize: "0px",
+  };
 
   if (!width) {
     return <th {...restProps} />;
   }
-
   return (
     <Resizable
       width={width}
@@ -26,20 +64,16 @@ const ResizableTitle = (props) => {
       handle={
         <span
           className="react-resizable-handle"
-          onClick={(e) => e.stopPropagation()}
-          style={{
-            position: "absolute",
-            bottom: 0,
-            right: "-5px",
-            width: "10px",
-            height: "100%",
-            zIndex: 10,
-            cursor: "col-resize",
+          onClick={(e) => {
+            e.stopPropagation();
           }}
+          style={handleStyle}
         />
       }
       onResize={onResize}
-      draggableOpts={{ enableUserSelectHack: false }}
+      draggableOpts={{
+        enableUserSelectHack: false,
+      }}
     >
       <th {...restProps} />
     </Resizable>
@@ -57,342 +91,521 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
     display: "flex",
     alignItems: "center",
     gap: 8,
-    padding: "8px",
-    borderBottom: "1px solid #f0f0f0",
   };
 
   return (
     <div ref={setNodeRef} style={styleWithTransform} {...restProps} {...attributes}>
-      <div {...listeners} style={{ cursor: "grab", flexGrow: 1, display: "flex", alignItems: "center" }}>
-        <HolderOutlined style={{ marginRight: 8, color: "#999" }} />
+      {/* <Checkbox
+        checked={visible}
+        onChange={(e) => onVisibilityChange(index, e.target.checked)}
+        style={{ marginLeft: "auto" }}
+      /> */}
+      <div
+        {...listeners}
+        style={{
+          cursor: "grab",
+          flexGrow: 1,
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <HolderOutlined style={{ marginRight: 8 }} />
         {text}
       </div>
-      <Checkbox
-        checked={visible}
-        onChange={(e) => onVisibilityChange(text, e.target.checked)} // visible toggle için basit bir logic
-        onClick={(e) => e.stopPropagation()}
-      />
     </div>
   );
 };
 
-// --- Ana Bileşen ---
 const MainTable = () => {
+  // State definitions...
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const { setValue } = useFormContext();
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  
-  // İstatistik Kartları için State
-  const [cardsData, setCardsData] = useState({
-    TOPLAM_TUKETIM: 0,
-    TOPLAM_TUTAR: 0,
-    ORT_TUKETIM: 0,
-    TOPLAM_ISLEM: 0,
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTimeout, setSearchTimeout] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0); // Total pages
+  const [label, setLabel] = useState("Yükleniyor...");
+  const [totalDataCount, setTotalDataCount] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
+  const [editDrawer1Data, setEditDrawer1Data] = useState(null);
+  const [drawer, setDrawer] = useState({ visible: false, data: null });
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [xlsxLoading, setXlsxLoading] = useState(false);
+  const [status, setStatus] = useState(-1);
+  const [cardsData, setCardsData] = useState({});
+  const [yakitModalVisible, setYakitModalVisible] = useState(false);
+
+  const [body, setBody] = useState({
+    LokasyonIds: [],
+    YakitTipIds: [],
   });
 
-  // --- STATİK VERİ TANIMLAMASI ---
-  const dummyData = [
-    {
-      key: 1,
-      plaka: "34 HUU 670",
-      aracTipi: "Binek Araç",
-      tarih: "10.12.2025",
-      saat: "09:32",
-      yakitTipi: "Kurşunsuz",
-      miktar: 47.38,
-      tutar: 2579.37,
-      kmBasina: 0.00,
-      ortTuketim: 8.2,
-      kaynak: "OPET API",
-      fullDepo: "Full",
-      surucu: "Mevlüt Acar",
-      lokasyon: "İstanbul / Ümraniye",
-    },
-    {
-      key: 2,
-      plaka: "34 HSG 699",
-      aracTipi: "Binek Araç",
-      tarih: "10.12.2025",
-      saat: "11:05",
-      yakitTipi: "Kurşunsuz",
-      miktar: 43.21,
-      tutar: 2350.19,
-      kmBasina: 0.00,
-      ortTuketim: 7.9,
-      kaynak: "Manuel",
-      fullDepo: "Kısmi",
-      surucu: "Ahmet Yılmaz",
-      lokasyon: "İstanbul / Ataşehir",
-    },
-    {
-      key: 3,
-      plaka: "34 HRH 692",
-      aracTipi: "Binek Araç",
-      tarih: "10.12.2025",
-      saat: "14:18",
-      yakitTipi: "Dizel",
-      miktar: 66.93,
-      tutar: 3689.18,
-      kmBasina: 0.00,
-      ortTuketim: 9.1,
-      kaynak: "OPET API",
-      fullDepo: "Full",
-      surucu: "Murat Demir",
-      lokasyon: "İstanbul / Maltepe",
-    },
-  ];
-
-  // --- Kolon Tanımları (Senin istediğin yapı) ---
-  const initialColumns = [
-    {
-      title: "Plaka",
-      dataIndex: "plaka",
-      key: "plaka",
-      width: 150,
-      visible: true,
-      render: (text, record) => (
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <span style={{ fontWeight: 600, color: "#1890ff" }}>{text}</span>
-          <span style={{ fontSize: "11px", color: "#8c8c8c" }}>{record.aracTipi}</span>
-        </div>
-      ),
-    },
-    {
-      title: "Tarih",
-      dataIndex: "tarih",
-      key: "tarih",
-      width: 140,
-      visible: true,
-      render: (text, record) => (
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <span>{text}</span>
-          <span style={{ fontSize: "11px", color: "#8c8c8c" }}>{record.saat}</span>
-        </div>
-      ),
-      sorter: (a, b) => dayjs(`${a.tarih} ${a.saat}`).unix() - dayjs(`${b.tarih} ${b.saat}`).unix(),
-    },
-    {
-      title: "Yakıt Tipi",
-      dataIndex: "yakitTipi",
-      key: "yakitTipi",
-      width: 120,
-      visible: true,
-      render: (text) => (
-        <Tag color={text === "Dizel" ? "gold" : "green"}>{text}</Tag>
-      ),
-    },
-    {
-      title: "Miktar (L)",
-      dataIndex: "miktar",
-      key: "miktar",
-      width: 120,
-      visible: true,
-      render: (val) => <span style={{ fontWeight: 500 }}>{val.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} L</span>,
-      sorter: (a, b) => a.miktar - b.miktar,
-    },
-    {
-      title: "Tutar (₺)",
-      dataIndex: "tutar",
-      key: "tutar",
-      width: 130,
-      visible: true,
-      render: (val) => <span style={{ fontWeight: 600, color: "#333" }}>{val.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>,
-      sorter: (a, b) => a.tutar - b.tutar,
-    },
-    {
-      title: "km Başına",
-      dataIndex: "kmBasina",
-      key: "kmBasina",
-      width: 110,
-      visible: true,
-      render: (val) => <span>{val.toFixed(2)}</span>,
-    },
-    {
-      title: "Ort. Tük. (L/100km)",
-      dataIndex: "ortTuketim",
-      key: "ortTuketim",
-      width: 160,
-      visible: true,
-      render: (val) => (
-        <div style={{ width: "100%", display: "flex", alignItems: "center", gap: "5px" }}>
-            <span>{val}</span>
-            <div style={{ height: "4px", flex: 1, backgroundColor: "#e8e8e8", borderRadius: "2px", overflow: "hidden" }}>
-                <div style={{ height: "100%", width: `${Math.min(val * 8, 100)}%`, backgroundColor: val > 9 ? "#ff4d4f" : "#52c41a" }} />
-            </div>
-        </div>
-      ),
-    },
-    {
-      title: "Kaynak",
-      dataIndex: "kaynak",
-      key: "kaynak",
-      width: 120,
-      visible: true,
-      render: (text) => (
-        <Tag color={text === "OPET API" ? "blue" : "default"}>{text}</Tag>
-      ),
-    },
-    {
-      title: "Full Depo",
-      dataIndex: "fullDepo",
-      key: "fullDepo",
-      width: 100,
-      visible: true,
-      render: (text) => (
-          text === "Full" 
-            ? <Tag color="#87d068">Full</Tag> 
-            : <Tag color="#f50">Kısmi</Tag>
-      )
-    },
-    {
-      title: "Sürücü",
-      dataIndex: "surucu",
-      key: "surucu",
-      width: 150,
-      visible: true,
-    },
-    {
-      title: "Lokasyon",
-      dataIndex: "lokasyon",
-      key: "lokasyon",
-      width: 200,
-      visible: true,
-    }
-  ];
-
-  // --- Verileri Yükle (Simüle Edilmiş) ---
-  useEffect(() => {
-    setLoading(true);
-    // API isteği yerine dummyData'yı set ediyoruz.
-    // Gerçekçi görünmesi için ufak bir timeout ekleyebiliriz.
-    setTimeout(() => {
-        let filteredData = dummyData;
-
-        // Arama filtresi
-        if (searchTerm) {
-            filteredData = dummyData.filter(item => 
-                item.plaka.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.surucu.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.lokasyon.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-        }
-
-        setData(filteredData);
-        
-        // Kart verilerini hesapla
-        const toplamTuketim = filteredData.reduce((acc, curr) => acc + curr.miktar, 0);
-        const toplamTutar = filteredData.reduce((acc, curr) => acc + curr.tutar, 0);
-        const ortTuketim = filteredData.reduce((acc, curr) => acc + curr.ortTuketim, 0) / (filteredData.length || 1);
-
-        setCardsData({
-            TOPLAM_TUKETIM: toplamTuketim.toLocaleString('tr-TR', { maximumFractionDigits: 2 }) + " L",
-            TOPLAM_TUTAR: toplamTutar.toLocaleString('tr-TR', { maximumFractionDigits: 2 }) + " ₺",
-            ORT_TUKETIM: ortTuketim.toFixed(1) + " L/100km",
-            TOPLAM_ISLEM: filteredData.length
-        });
-
-        setLoading(false);
-    }, 500);
-  }, [searchTerm]); // searchTerm değişince yeniden filtrele
-
-  // --- İstatistik Kartları (Yeni Veriye Göre) ---
   const cardItems = useMemo(() => {
+    // Veri yoksa bile kart iskeletini koruyalım ki sayfa zıplamasın
+    const data = cardsData || {};
+
     return [
-      { title: "Toplam Yakıt (Litre)", value: cardsData.TOPLAM_TUKETIM, color: "#e6f7ff", iconColor: "#1890ff" },
-      { title: "Toplam Tutar (₺)", value: cardsData.TOPLAM_TUTAR, color: "#f6ffed", iconColor: "#52c41a" },
-      { title: "Anormal Tüketim", value: cardsData.ORT_TUKETIM, color: "#fff7e6", iconColor: "#fa8c16" },
-      { title: "Km Başına Maliyet ₺ / km", value: cardsData.TOPLAM_ISLEM, color: "#fff0f6", iconColor: "#eb2f96" },
+      { 
+        title: "Toplam Depo Sayısı", 
+        value: data.ToplamDepoSayisi ?? 0 
+      },
+      { 
+        title: "Toplam Yakıt Miktarı", 
+        // Sayıyı okunaklı hale getirdik (örn: 69.200 Lt)
+        value: `${Number(data.ToplamYakitMiktari || 0).toLocaleString('tr-TR')} Lt` 
+      },
+      { 
+        title: "Kritik Depo Sayısı", 
+        value: data.KritikDepoSayisi ?? 0,
+        // Kritik sayı 0'dan büyükse rengi kırmızımsı yapmak için style prop eklenebilir (render kısmında)
+        isCritical: (data.KritikDepoSayisi || 0) > 0 
+      },
+      { 
+        title: "Günlük Giriş Çıkış", 
+        value: data.GunlukGirisCikis || "0 / 0 L" 
+      },
     ];
   }, [cardsData]);
 
+  const fetchCards = useCallback(async () => {
+    try {
+      const res = await AxiosInstance.get("GetYakitTankOzet");
+      
+      // Dokümandaki gibi direkt obje dönüyorsa:
+      if (res) {
+        // Eğer API wrapper kullanıyorsa (res.data içindeyse) kontrolü:
+        const data = res.data || res; 
+        setCardsData(data);
+      } 
+    } catch (err) {
+      console.error("Kart verileri çekilemedi:", err);
+      // Hata durumunda boş obje set edelim
+      setCardsData({});
+    }
+  }, []);
 
-  // --- Sütun Yönetimi (LocalStorage & State) ---
+  useEffect(() => {
+    fetchCards();
+  }, [fetchCards]);
+
+  useEffect(() => {
+    // API'den veri çekme işlemi
+    const fetchData = async () => {
+      try {
+        const response = await AxiosInstance.get("OzelAlan?form=YAKIT"); // API URL'niz
+        localStorage.setItem("ozelAlanlar", JSON.stringify(response));
+        setLabel(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
+      } catch (error) {
+        console.error("API isteğinde hata oluştu:", error);
+        setLabel("Hata! Veri yüklenemedi."); // Hata durumunda kullanıcıya bilgi verme
+      }
+    };
+
+    fetchData();
+  }, [drawer.visible]);
+
+  const ozelAlanlar = JSON.parse(localStorage.getItem("ozelAlanlar"));
+
+  // Özel Alanların nameleri backend çekmek için api isteği sonu
+
+  const statusTag = (statusId) => {
+    switch (statusId) {
+      case 1:
+        return { color: "#ff5e00", text: "Onay Bekliyor" };
+      case 2:
+        return { color: "#00d300", text: "Onaylandı" };
+      case 3:
+        return { color: "#d10000", text: "Onaylanmadı" };
+      default:
+        return { color: "", text: "" }; // Diğer durumlar için boş değer
+    }
+  };
+
+  const initialColumns = [
+    {
+      title: "Depo Kodu",
+      dataIndex: "DEP_KOD",
+      key: "DEP_KOD",
+      width: 120,
+      ellipsis: true,
+      visible: true,
+      render: (text, record) => <a onClick={() => onRowClick(record)}>{text}</a>,
+      sorter: (a, b) => a.DEP_KOD?.localeCompare(b.DEP_KOD),
+    },
+    {
+      title: "Depo Tanımı",
+      dataIndex: "DEP_TANIM",
+      key: "DEP_TANIM",
+      width: 200,
+      ellipsis: true,
+      visible: true,
+      sorter: (a, b) => a.DEP_TANIM?.localeCompare(b.DEP_TANIM),
+    },
+    {
+      title: "Lokasyon",
+      dataIndex: "LOKASYON",
+      key: "LOKASYON",
+      width: 150,
+      ellipsis: true,
+      visible: true,
+      sorter: (a, b) => a.LOKASYON?.localeCompare(b.LOKASYON),
+    },
+    {
+      title: "Yakıt Türü",
+      dataIndex: "YAKIT_TURU",
+      key: "YAKIT_TURU",
+      width: 120,
+      visible: true,
+      sorter: (a, b) => a.YAKIT_TURU?.localeCompare(b.YAKIT_TURU),
+    },
+    {
+      title: "Kapasite",
+      dataIndex: "KAPASITE",
+      key: "KAPASITE",
+      width: 120,
+      visible: true,
+      render: (value) => <div style={{textAlign:'right'}}>{Number(value).toLocaleString('tr-TR')} Lt</div>,
+      sorter: (a, b) => a.KAPASITE - b.KAPASITE,
+    },
+    {
+      title: "Mevcut Miktar",
+      dataIndex: "MEVCUT_MIKTAR",
+      key: "MEVCUT_MIKTAR",
+      width: 150,
+      visible: true,
+      render: (value) => <div style={{textAlign:'right', fontWeight:'bold'}}>{Number(value).toLocaleString('tr-TR')} Lt</div>,
+      sorter: (a, b) => a.MEVCUT_MIKTAR - b.MEVCUT_MIKTAR,
+    },
+    {
+      title: "Doluluk",
+      dataIndex: "DOLULUK_ORANI",
+      key: "DOLULUK_ORANI",
+      width: 180,
+      visible: true,
+      render: (value, record) => {
+        // Renk belirleme: %20 altı kırmızı, diğerleri mavi/yeşil
+        let color = "#1890ff";
+        if (value < 20) color = "#ff4d4f";
+        else if (value > 90) color = "#52c41a";
+
+        return (
+          <Progress 
+            percent={value} 
+            size="small" 
+            strokeColor={color} 
+            format={percent => `${percent}%`}
+          />
+        );
+      },
+      sorter: (a, b) => a.DOLULUK_ORANI - b.DOLULUK_ORANI,
+    },
+    {
+      title: "Son Hareket",
+      dataIndex: "SON_HAREKET",
+      key: "SON_HAREKET",
+      width: 150,
+      visible: true,
+    },
+    {
+      title: "Durum",
+      dataIndex: "DURUM_TEXT",
+      key: "DURUM_TEXT",
+      width: 100,
+      visible: true,
+      render: (text, record) => {
+        let color = "default";
+        if (record.DURUM_CLASS === "success") color = "success";
+        if (record.DURUM_CLASS === "warning") color = "warning";
+        if (record.DURUM_CLASS === "danger") color = "error";
+        return <Tag color={color}>{text}</Tag>;
+      },
+    },
+    {
+      title: "Aktiflik",
+      dataIndex: "AKTIF",
+      key: "AKTIF",
+      width: 80,
+      visible: false,
+      render: (aktif) => (
+        <Tag color={aktif ? "green" : "red"}>{aktif ? "Aktif" : "Pasif"}</Tag>
+      ),
+    }
+  ];
+
+  // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
+
+  // Intl.DateTimeFormat kullanarak tarih formatlama
+  const formatDate = (date) => {
+    if (!date) return "";
+
+    // Örnek bir tarih formatla ve ay formatını belirle
+    const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
+
+    let monthFormat;
+    if (sampleFormatted.includes("January")) {
+      monthFormat = "long"; // Tam ad ("January")
+    } else if (sampleFormatted.includes("Jan")) {
+      monthFormat = "short"; // Üç harfli kısaltma ("Jan")
+    } else {
+      monthFormat = "2-digit"; // Sayısal gösterim ("01")
+    }
+
+    // Kullanıcı için tarihi formatla
+    const formatter = new Intl.DateTimeFormat(navigator.language, {
+      year: "numeric",
+      month: monthFormat,
+      day: "2-digit",
+    });
+    return formatter.format(new Date(date));
+  };
+
+  const formatTime = (time) => {
+    if (!time || time.trim() === "") return ""; // `trim` metodu ile baştaki ve sondaki boşlukları temizle
+
+    try {
+      // Saati ve dakikayı parçalara ayır, boşlukları temizle
+      const [hours, minutes] = time
+        .trim()
+        .split(":")
+        .map((part) => part.trim());
+
+      // Saat ve dakika değerlerinin geçerliliğini kontrol et
+      const hoursInt = parseInt(hours, 10);
+      const minutesInt = parseInt(minutes, 10);
+      if (isNaN(hoursInt) || isNaN(minutesInt) || hoursInt < 0 || hoursInt > 23 || minutesInt < 0 || minutesInt > 59) {
+        // throw new Error("Invalid time format"); // hata fırlatır ve uygulamanın çalışmasını durdurur
+        console.error("Invalid time format:", time);
+        // return time; // Hatalı formatı olduğu gibi döndür
+        return ""; // Hata durumunda boş bir string döndür
+      }
+
+      // Geçerli tarih ile birlikte bir Date nesnesi oluştur ve sadece saat ve dakika bilgilerini ayarla
+      const date = new Date();
+      date.setHours(hoursInt, minutesInt, 0);
+
+      // Kullanıcının lokal ayarlarına uygun olarak saat ve dakikayı formatla
+      // `hour12` seçeneğini belirtmeyerek Intl.DateTimeFormat'ın kullanıcının yerel ayarlarına göre otomatik seçim yapmasına izin ver
+      const formatter = new Intl.DateTimeFormat(navigator.language, {
+        hour: "numeric",
+        minute: "2-digit",
+        // hour12 seçeneği burada belirtilmiyor; böylece otomatik olarak kullanıcının sistem ayarlarına göre belirleniyor
+      });
+
+      // Formatlanmış saati döndür
+      return formatter.format(date);
+    } catch (error) {
+      console.error("Error formatting time:", error);
+      return ""; // Hata durumunda boş bir string döndür
+      // return time; // Hatalı formatı olduğu gibi döndür
+    }
+  };
+
+  // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
+
+  const handleBodyChange = useCallback((type, newIds) => {
+    setBody((prev) => ({
+      ...prev,
+      [type]: newIds,
+    }));
+    // Filtre değişince sayfayı başa alabilirsin istersen
+    // setCurrentPage(1); 
+  }, []);
+
+  // Status veya Body değiştiğinde veriyi çek
+  useEffect(() => {
+    fetchEquipmentData();
+  }, [status, body]); 
+
+  const fetchEquipmentData = async () => {
+    try {
+      setLoading(true);
+      
+      // Dokümana uygun Body hazırlama
+      const payload = {
+        LokasyonIds: body.LokasyonIds || [], // Array
+        YakitTipIds: body.YakitTipIds || [], // Array
+        Durum: status // 1, 0, -1
+      };
+
+      const response = await AxiosInstance.post(`GetYakitTankList`, payload);
+
+      if (Array.isArray(response)) {
+        const formattedData = response.map((item) => ({
+          ...item,
+          key: item.TB_DEPO_ID || item.TB_STOK_ID, // Key olarak ID kullan
+        }));
+        setData(formattedData);
+        setTotalDataCount(formattedData.length); // Client-side pagination için
+      } else {
+        console.error("API yanıtı beklenen formatta değil.", response);
+        setData([]);
+      }
+    } catch (error) {
+      console.error("Error in API request:", error);
+      message.error("Veri çekilemedi.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // --- Frontend Arama (Client-side Search) ---
+  const filteredData = useMemo(() => {
+    if (!searchTerm) return data;
+    const lowerSearch = searchTerm.toLowerCase();
+    return data.filter(
+      (item) =>
+        (item.DEP_KOD && item.DEP_KOD.toLowerCase().includes(lowerSearch)) ||
+        (item.DEP_TANIM && item.DEP_TANIM.toLowerCase().includes(lowerSearch)) ||
+        (item.LOKASYON && item.LOKASYON.toLowerCase().includes(lowerSearch))
+    );
+  }, [data, searchTerm]);
+
+  // sayfalama için kullanılan useEffect
+  const handleTableChange = (pagination) => {
+    setCurrentPage(pagination.current);
+    setPageSize(pagination.pageSize);
+  };
+  // sayfalama için kullanılan useEffect son
+
+  const onSelectChange = (newSelectedRowKeys) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+    if (newSelectedRowKeys.length > 0) {
+      setValue("selectedLokasyonId", newSelectedRowKeys[0]);
+    } else {
+      setValue("selectedLokasyonId", null);
+    }
+    // Seçilen satırların verisini bul
+    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
+    setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
+    console.log("Seçilen Satırlar:", newSelectedRows);
+  };
+
+  const rowSelection = {
+    type: "checkbox",
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+
+  // const onRowClick = (record) => {
+  //   return {
+  //     onClick: () => {
+  //       setDrawer({ visible: true, data: record });
+  //     },
+  //   };
+  // };
+
+  // Talep No için
+  const onRowClick = (record) => {
+    console.log("Tıklanan Satırın ID'si:", record.TB_STOK_ID); // Konsolda ID görüyor musun?
+    setDrawer({ visible: true, data: { ...record, key: record.TB_STOK_ID } });
+  };
+
+  const refreshTableData = useCallback(() => {
+    // Sayfa numarasını 1 yap
+    // setCurrentPage(1);
+
+    // `body` içerisindeki filtreleri ve arama terimini sıfırla
+    // setBody({
+    //   keyword: "",
+    //   filters: {},
+    // });
+    // setSearchTerm("");
+
+    // Tablodan seçilen kayıtların checkbox işaretini kaldır
+    setSelectedRowKeys([]);
+    setSelectedRows([]);
+
+    // Verileri yeniden çekmek için `fetchEquipmentData` fonksiyonunu çağır
+    fetchEquipmentData(body, currentPage);
+    fetchCards();
+    // Burada `body` ve `currentPage`'i güncellediğimiz için, bu değerlerin en güncel hallerini kullanarak veri çekme işlemi yapılır.
+    // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
+    // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
+  }, [body, currentPage]);
+
+  // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
   const [columns, setColumns] = useState(() => {
-    const savedOrder = localStorage.getItem("columnFuelOrder");
-    const savedVisibility = localStorage.getItem("columnFuelVisibility");
-    const savedWidths = localStorage.getItem("columnFuelWidths");
+    const savedOrder = localStorage.getItem("columnYakitGirisleriOrder");
+    const savedVisibility = localStorage.getItem("columnYakitGirisleriVisibility");
+    const savedWidths = localStorage.getItem("columnYakitGirisleriWidths");
 
     let order = savedOrder ? JSON.parse(savedOrder) : [];
     let visibility = savedVisibility ? JSON.parse(savedVisibility) : {};
     let widths = savedWidths ? JSON.parse(savedWidths) : {};
 
     initialColumns.forEach((col) => {
-      if (!order.includes(col.key)) order.push(col.key);
-      if (visibility[col.key] === undefined) visibility[col.key] = col.visible;
-      if (widths[col.key] === undefined) widths[col.key] = col.width;
+      if (!order.includes(col.key)) {
+        order.push(col.key);
+      }
+      if (visibility[col.key] === undefined) {
+        visibility[col.key] = col.visible;
+      }
+      if (widths[col.key] === undefined) {
+        widths[col.key] = col.width;
+      }
     });
+
+    localStorage.setItem("columnYakitGirisleriOrder", JSON.stringify(order));
+    localStorage.setItem("columnYakitGirisleriVisibility", JSON.stringify(visibility));
+    localStorage.setItem("columnYakitGirisleriWidths", JSON.stringify(widths));
 
     return order.map((key) => {
       const column = initialColumns.find((col) => col.key === key);
+      // Eğer column undefined ise (eski localStorage verisi yüzünden), null döndürüyoruz.
       return column ? { ...column, visible: visibility[key], width: widths[key] } : null;
-    }).filter(Boolean);
+    }).filter(Boolean); // Null değerleri diziden temizliyoruz.
   });
+  // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz sonu
 
+  // sütunları local storage'a kaydediyoruz
   useEffect(() => {
-    if (columns.length > 0) {
-        localStorage.setItem("columnFuelOrder", JSON.stringify(columns.map((col) => col.key)));
-        localStorage.setItem("columnFuelVisibility", JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.visible }), {})));
-        localStorage.setItem("columnFuelWidths", JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.width }), {})));
-    }
+    localStorage.setItem("columnYakitGirisleriOrder", JSON.stringify(columns.map((col) => col.key)));
+    localStorage.setItem(
+      "columnYakitGirisleriVisibility",
+      JSON.stringify(
+        columns.reduce(
+          (acc, col) => ({
+            ...acc,
+            [col.key]: col.visible,
+          }),
+          {}
+        )
+      )
+    );
+    localStorage.setItem(
+      "columnYakitGirisleriWidths",
+      JSON.stringify(
+        columns.reduce(
+          (acc, col) => ({
+            ...acc,
+            [col.key]: col.width,
+          }),
+          {}
+        )
+      )
+    );
   }, [columns]);
+  // sütunları local storage'a kaydediyoruz sonu
 
-  // Sütun Drag & Drop
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
-    if (active.id !== over.id) {
-      const oldIndex = columns.findIndex((col) => col.key === active.id);
-      const newIndex = columns.findIndex((col) => col.key === over.id);
-      setColumns((items) => arrayMove(items, oldIndex, newIndex));
-    }
-  };
+  // sütunların boyutlarını ayarlamak için kullanılan fonksiyon
+  const handleResize =
+    (key) =>
+    (_, { size }) => {
+      setColumns((prev) => prev.map((col) => (col.key === key ? { ...col, width: size.width } : col)));
+    };
 
-  const handleResize = (key) => (_, { size }) => {
-    setColumns((prev) => prev.map((col) => (col.key === key ? { ...col, width: size.width } : col)));
-  };
-
-  const toggleVisibility = (key, checked) => {
-    const newColumns = [...columns];
-    const index = newColumns.findIndex((col) => col.key === key);
-    if (index !== -1) {
-      newColumns[index].visible = checked;
-      setColumns(newColumns);
-    }
-  };
-
-  const resetColumns = () => {
-    localStorage.removeItem("columnFuelOrder");
-    localStorage.removeItem("columnFuelVisibility");
-    localStorage.removeItem("columnFuelWidths");
-    window.location.reload();
-  };
-
-  // Excel İndirme
-  const handleDownloadXLSX = () => {
-    const xlsxData = data.map((item) => ({
-      "Plaka": item.plaka,
-      "Tarih": `${item.tarih} ${item.saat}`,
-      "Yakıt Tipi": item.yakitTipi,
-      "Miktar (L)": item.miktar,
-      "Tutar (TL)": item.tutar,
-      "Kaynak": item.kaynak,
-      "Sürücü": item.surucu,
-      "Lokasyon": item.lokasyon
-    }));
-
-    const worksheet = XLSX.utils.json_to_sheet(xlsxData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Yakıt Listesi");
-    XLSX.writeFile(workbook, `Yakit_Verileri_${dayjs().format("DD_MM_YYYY")}.xlsx`);
-  };
-
-  // Ant Design Table Bileşenleri
   const components = {
-    header: { cell: ResizableTitle },
+    header: {
+      cell: ResizableTitle,
+    },
   };
 
-  const visibleColumns = columns.filter((col) => col.visible).map((col) => ({
+  const mergedColumns = columns.map((col) => ({
     ...col,
     onHeaderCell: (column) => ({
       width: column.width,
@@ -400,89 +613,385 @@ const MainTable = () => {
     }),
   }));
 
+  // fitrelenmiş sütunları birleştiriyoruz ve sadece görünür olanları alıyoruz ve tabloya gönderiyoruz
+
+  const filteredColumns = mergedColumns.filter((col) => col.visible);
+
+  // fitrelenmiş sütunları birleştiriyoruz ve sadece görünür olanları alıyoruz ve tabloya gönderiyoruz sonu
+
+  // sütunların sıralamasını değiştirmek için kullanılan fonksiyon
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      const oldIndex = columns.findIndex((column) => column.key === active.id);
+      const newIndex = columns.findIndex((column) => column.key === over.id);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        setColumns((columns) => arrayMove(columns, oldIndex, newIndex));
+      } else {
+        console.error(`Column with key ${active.id} or ${over.id} does not exist.`);
+      }
+    }
+  };
+
+  // sütunların sıralamasını değiştirmek için kullanılan fonksiyon sonu
+
+  // sütunların görünürlüğünü değiştirmek için kullanılan fonksiyon
+
+  const toggleVisibility = (key, checked) => {
+    const index = columns.findIndex((col) => col.key === key);
+    if (index !== -1) {
+      const newColumns = [...columns];
+      newColumns[index].visible = checked;
+      setColumns(newColumns);
+    } else {
+      console.error(`Column with key ${key} does not exist.`);
+    }
+  };
+
+  // sütunların görünürlüğünü değiştirmek için kullanılan fonksiyon sonu
+
+  // sütunları sıfırlamak için kullanılan fonksiyon
+
+  function resetColumns() {
+    localStorage.removeItem("columnOrder");
+    localStorage.removeItem("columnVisibility");
+    localStorage.removeItem("columnWidths");
+    localStorage.removeItem("ozelAlanlar");
+    window.location.reload();
+  }
+
+  // sütunları sıfırlamak için kullanılan fonksiyon sonu
+
+  // Function to handle CSV download
+  const handleDownloadXLSX = async () => {
+    try {
+      // İndirme işlemi başlıyor
+      setXlsxLoading(true);
+
+      // Body state'inden filtreleri alıyoruz
+      const { filters = {} } = body || {};
+
+      // ✅ API İsteği: GetMalzemeTalepleriExcel
+      // Filtreleri body olarak gönderiyoruz
+      const response = await AxiosInstance.post("GetMalzemeTalepleriExcel", filters);
+
+      // Gelen yanıtı kontrol et (Direkt array mi yoksa obje içinde mi?)
+      // Eğer ana tablo yapısına benziyorsa response.talep_listesi olabilir, 
+      // direkt liste dönüyorsa response kendisidir.
+      const dataToProcess = Array.isArray(response) 
+        ? response 
+        : (response?.talep_listesi || response?.items || []);
+
+      if (dataToProcess.length > 0) {
+        // Verileri işliyoruz
+        const xlsxData = dataToProcess.map((row) => {
+          let xlsxRow = {};
+          filteredColumns.forEach((col) => {
+            const key = col.dataIndex;
+            if (key) {
+              let value = row[key];
+
+              // Özel durumları ele alıyoruz (Formatlama işlemleri)
+              if (col.render) {
+                if (key === "DUZENLEME_TARIH" || key.endsWith("_TARIH") || key === "SFS_TARIH") {
+                  value = formatDate(value);
+                } else if (key === "DUZENLEME_SAAT" || key.endsWith("_SAAT") || key === "SFS_SAAT") {
+                  value = formatTime(value);
+                } else if (key === "GARANTI") {
+                  value = row.GARANTI ? "Evet" : "Hayır";
+                } else if (key === "TAMAMLANMA") {
+                  value = `${row.TAMAMLANMA}%`;
+                } else if (key === "SFS_DURUM") { // Durum metnini al
+                  value = row.SFS_DURUM; 
+                } else if (key === "ISM_ONAY_DURUM") {
+                  const { text } = statusTag(row.ISM_ONAY_DURUM);
+                  value = text;
+                } else if (key.startsWith("OZEL_ALAN_")) {
+                  value = row[key];
+                } else {
+                  // Diğer sütunlar için render fonksiyonundan metni çıkar
+                  // extractTextFromElement fonksiyonun zaten yukarıda tanımlıydı
+                  value = extractTextFromElement(col.render(row[key], row));
+                }
+              }
+
+              xlsxRow[extractTextFromElement(col.title)] = value;
+            }
+          });
+          return xlsxRow;
+        });
+
+        // XLSX dosyasını oluşturuyoruz
+        const worksheet = XLSX.utils.json_to_sheet(xlsxData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Yakıt Tanımları Listesi");
+
+        // Sütun genişliklerini ayarlıyoruz
+        const headers = filteredColumns
+          .map((col) => {
+            let label = extractTextFromElement(col.title);
+            return {
+              label: label,
+              key: col.dataIndex,
+              width: col.width, // Tablo sütun genişliği
+            };
+          })
+          .filter((col) => col.key);
+
+        const scalingFactor = 0.8; 
+
+        worksheet["!cols"] = headers.map((header) => ({
+          wpx: header.width ? header.width * scalingFactor : 100, 
+        }));
+
+        // İndirme işlemini başlatıyoruz
+        const excelBuffer = XLSX.write(workbook, {
+          bookType: "xlsx",
+          type: "array",
+        });
+        const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Malzeme_Talepleri_${dayjs().format("DD_MM_YYYY")}.xlsx`); // Dosya ismine tarih ekledim
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        setXlsxLoading(false);
+      } else {
+        message.warning("İndirilecek veri bulunamadı.");
+        setXlsxLoading(false);
+      }
+    } catch (error) {
+      setXlsxLoading(false);
+      console.error("XLSX indirme hatası:", error);
+      if (navigator.onLine) {
+        message.error("Hata Mesajı: " + error.message);
+      } else {
+        message.error("Internet Bağlantısı Mevcut Değil.");
+      }
+    }
+  };
+
   return (
-    <div style={{ padding: "20px", background: "#f5f5f5", minHeight: "100vh" }}>
-      {/* Sütun Yönetim Modalı */}
-      <Modal 
-        title="Sütun Yönetimi" 
-        open={isModalVisible} 
-        onOk={() => setIsModalVisible(false)} 
-        onCancel={() => setIsModalVisible(false)}
-        footer={[<Button key="reset" onClick={resetColumns}>Sıfırla</Button>, <Button key="ok" type="primary" onClick={() => setIsModalVisible(false)}>Tamam</Button>]}
-      >
-        <div style={{ display: "flex", gap: 20 }}>
-            <div style={{ flex: 1, border: "1px solid #eee", padding: 10, borderRadius: 5 }}>
-                <h4>Göster / Gizle</h4>
-                {columns.map(col => (
-                    <div key={col.key} style={{ marginBottom: 5 }}>
-                        <Checkbox checked={col.visible} onChange={(e) => toggleVisibility(col.key, e.target.checked)}>
-                            {col.title}
-                        </Checkbox>
-                    </div>
-                ))}
+    <>
+      <Modal title="Sütunları Yönet" centered width={800} open={isModalVisible} onOk={() => setIsModalVisible(false)} onCancel={() => setIsModalVisible(false)}>
+        <Text style={{ marginBottom: "15px" }}>Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını Ayarlayabilirsiniz.</Text>
+        <div
+          style={{
+            display: "flex",
+            width: "100%",
+            justifyContent: "center",
+            marginTop: "10px",
+          }}
+        >
+          <Button onClick={resetColumns} style={{ marginBottom: "15px" }}>
+            Sütunları Sıfırla
+          </Button>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div
+            style={{
+              width: "46%",
+              border: "1px solid #8080806e",
+              borderRadius: "8px",
+              padding: "10px",
+            }}
+          >
+            <div
+              style={{
+                marginBottom: "20px",
+                borderBottom: "1px solid #80808051",
+                padding: "8px 8px 12px 8px",
+              }}
+            >
+              <Text style={{ fontWeight: 600 }}>Sütunları Göster / Gizle</Text>
             </div>
-            <div style={{ flex: 1, border: "1px solid #eee", padding: 10, borderRadius: 5 }}>
-                <h4>Sıralama (Sürükle)</h4>
-                <DndContext sensors={useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }))} onDragEnd={handleDragEnd}>
-                    <SortableContext items={columns.map(c => c.key)} strategy={verticalListSortingStrategy}>
-                        {columns.filter(c => c.visible).map((col, index) => (
-                            <DraggableRow key={col.key} id={col.key} text={col.title} visible={col.visible} onVisibilityChange={toggleVisibility} />
-                        ))}
-                    </SortableContext>
-                </DndContext>
+            <div style={{ height: "400px", overflow: "auto" }}>
+              {initialColumns.map((col) => (
+                <div style={{ display: "flex", gap: "10px" }} key={col.key}>
+                  <Checkbox checked={columns.find((column) => column.key === col.key)?.visible || false} onChange={(e) => toggleVisibility(col.key, e.target.checked)} />
+                  {col.title}
+                </div>
+              ))}
             </div>
+          </div>
+
+          <DndContext
+            onDragEnd={handleDragEnd}
+            sensors={useSensors(
+              useSensor(PointerSensor),
+              useSensor(KeyboardSensor, {
+                coordinateGetter: sortableKeyboardCoordinates,
+              })
+            )}
+          >
+            <div
+              style={{
+                width: "46%",
+                border: "1px solid #8080806e",
+                borderRadius: "8px",
+                padding: "10px",
+              }}
+            >
+              <div
+                style={{
+                  marginBottom: "20px",
+                  borderBottom: "1px solid #80808051",
+                  padding: "8px 8px 12px 8px",
+                }}
+              >
+                <Text style={{ fontWeight: 600 }}>Sütunların Sıralamasını Ayarla</Text>
+              </div>
+              <div style={{ height: "400px", overflow: "auto" }}>
+                <SortableContext items={columns.filter((col) => col.visible).map((col) => col.key)} strategy={verticalListSortingStrategy}>
+                  {columns
+                    .filter((col) => col.visible)
+                    .map((col, index) => (
+                      <DraggableRow key={col.key} id={col.key} index={index} text={col.title} />
+                    ))}
+                </SortableContext>
+              </div>
+            </div>
+          </DndContext>
         </div>
       </Modal>
-
-      {/* İstatistik Kartları */}
       <div style={{ display: "flex", gap: "15px", marginBottom: "20px", flexWrap: "wrap" }}>
-        {cardItems.map((item, index) => (
-          <Card key={index} style={{ flex: 1, minWidth: "200px", borderRadius: "10px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }} bodyStyle={{ padding: "15px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
-                <div>
-                    <Text type="secondary" style={{ fontSize: "13px" }}>{item.title}</Text>
-                    <div style={{ fontSize: "24px", fontWeight: "700", color: "#333", marginTop: "5px" }}>{item.value}</div>
-                </div>
-            </div>
-          </Card>
-        ))}
+  {loading ? (
+    <div style={{ width: "100%", display: "flex", justifyContent: "center", padding: "20px" }}>
+       <Spin size="large" />
+    </div>
+  ) : cardItems.length > 0 ? (
+    cardItems.map((item, index) => (
+      <div
+        key={index}
+        style={{
+          flex: "1",
+          minWidth: "150px",
+          backgroundColor: "#fff",
+          padding: "20px",
+          borderRadius: "8px",
+          boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-start",
+          border: item.isCritical ? "1px solid red" : "none",
+        }}
+      >
+        <Text style={{ fontWeight: 600, fontSize: "14px", color: "#5C595C" }}>
+          {item.title}
+        </Text>
+        <Text
+          style={{
+            marginTop: "8px",
+            fontWeight: 700,
+            fontSize: "22px",
+            color: item.isCritical ? "#d32f2f" : "#1F1E1F",
+          }}
+        >
+          {item.value}
+        </Text>
       </div>
-
-      {/* Araç Çubuğu (Arama & Butonlar) */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px", background: "#fff", padding: "10px", borderRadius: "8px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
-        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-          <Button icon={<MenuOutlined />} onClick={() => setIsModalVisible(true)} />
-          <Input 
-            placeholder="Plaka, Sürücü veya Lokasyon ara..." 
-            prefix={<SearchOutlined style={{ color: "#bfbfbf" }} />} 
+    ))
+  ) : (
+    <div style={{ width: "100%", padding: "20px", textAlign: "center", color: "#999" }}>
+      Veri Yok
+    </div>
+  )}
+</div>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+          marginBottom: "20px",
+          gap: "10px",
+          padding: "0 5px",
+        }}
+      >
+        <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+          <Button
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0px 8px",
+              height: "32px",
+            }}
+            onClick={() => setIsModalVisible(true)}
+          >
+            <MenuOutlined />
+          </Button>
+          <Input
+            style={{ width: "250px" }}
+            type="text"
+            placeholder="Arama yap..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ width: 300 }}
+            prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
+          <Filters kelime={searchTerm} onChange={handleBodyChange} />
+          {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
+          <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
-            <Button icon={<FileExcelOutlined style={{ color: "green" }} />} onClick={handleDownloadXLSX}>Excel İndir</Button>
-            <Button type="primary">Yeni Kayıt</Button>
+          <Button style={{ display: "flex", alignItems: "center" }} onClick={handleDownloadXLSX} loading={xlsxLoading} icon={<SiMicrosoftexcel />}>
+            İndir
+          </Button>
+          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
+          <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
         </div>
       </div>
-
-      {/* Tablo */}
-      <div style={{ background: "#fff", padding: "0px", borderRadius: "8px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
+      <Spin spinning={loading}>
         <Table
           components={components}
-          columns={visibleColumns}
-          dataSource={data}
-          loading={loading}
-          pagination={{ defaultPageSize: 10, showSizeChanger: true, showTotal: (total) => `Toplam ${total} kayıt` }}
-          scroll={{ x: 1200, y: "calc(100vh - 350px)" }}
-          size="middle"
-          rowSelection={{
-            selectedRowKeys,
-            onChange: setSelectedRowKeys,
+          rowSelection={rowSelection}
+          columns={filteredColumns}
+          dataSource={filteredData}
+          pagination={{
+            current: currentPage,
+            total: totalDataCount,
+            pageSize: pageSize,
+            defaultPageSize: 10,
+            showSizeChanger: true,
+            pageSizeOptions: ["10", "20", "50", "100"],
+            position: ["bottomRight"],
+            onChange: handleTableChange,
+            showTotal: (total, range) => `Toplam ${total}`,
+            showQuickJumper: true,
+          }}
+          scroll={{ y: "calc(100vh - 450px)" }}
+          onChange={handleTableChange}
+          rowClassName={(record) => (record.SFS_TALEP_DURUM_ID === 0 ? "boldRow" : "")}
+        />
+      </Spin>
+      <EditDrawer 
+        selectedRow={drawer.data} 
+        onDrawerClose={() => setDrawer({ ...drawer, visible: false })} 
+        drawerVisible={drawer.visible} 
+        onRefresh={refreshTableData} 
+      />
+      <YakitIslemleri
+        visible={yakitModalVisible} 
+        onClose={() => setYakitModalVisible(false)} 
+        onRefresh={refreshTableData}
+      />
+
+      {editDrawer1Visible && (
+        <EditDrawer1
+          selectedRow={editDrawer1Data}
+          onDrawerClose={() => setEditDrawer1Visible(false)}
+          drawerVisible={editDrawer1Visible}
+          onRefresh={() => {
+            /* Veri yenileme işlemi */
           }}
         />
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 

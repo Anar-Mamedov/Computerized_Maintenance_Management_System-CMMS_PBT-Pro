@@ -1,10 +1,11 @@
-import React from "react";
-import { Typography, Input, InputNumber, Checkbox, Card } from "antd";
+import React, { useEffect, useState } from "react";
+import { Typography, Input, InputNumber, Checkbox, Select, Spin } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
-import KodIDSelectbox from "../../../../../../../../utils/components/KodIDSelectbox";
 import { t } from "i18next";
+import AxiosInstance from "../../../../../../../../api/http";
 
 const { Text } = Typography;
+const { Option } = Select;
 
 export default function SecondTabs() {
   const {
@@ -12,6 +13,25 @@ export default function SecondTabs() {
     watch,
     formState: { errors },
   } = useFormContext();
+  const [yakitListesi, setYakitListesi] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchYakitListesi = async () => {
+      setLoading(true);
+      try {
+        // API URL'ini kendi yapına göre düzenle
+        const response = await AxiosInstance.get("GetYakitList?aktif=true");
+        // Gelen veriyi state'e aktar
+        setYakitListesi(response || []); 
+      } catch (error) {
+        console.error("Yakıt listesi çekilirken hata oluştu:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchYakitListesi();
+  }, []);
 
   // --- Anlık Değerleri İzleme (Tank görseli için) ---
   const kapasite = watch("KAPASITE") || 100; // 0 bölünme hatası olmasın diye default 100
@@ -106,11 +126,29 @@ export default function SecondTabs() {
         <div style={RowStyle}>
           <Text style={LabelStyle}>{t("Yakıt Tipi")}</Text>
           <div style={InputContainerStyle}>
-            <KodIDSelectbox 
-              name1="yakitTipKodId"
-              kodID={35600}
-              isAsync={false}
-              placeholder="(Seçiniz)"
+            <Controller
+              name="yakitTipKodId" // Formda hangi key ile tutulacaksa
+              control={control}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  showSearch
+                  allowClear
+                  style={{ width: "100%" }}
+                  loading={loading}
+                  optionFilterProp="children"
+                  // Arama yaparken hem koda hem tanıma bakması için:
+                  filterOption={(input, option) =>
+                    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                  }
+                >
+                  {yakitListesi.map((item) => (
+                    <Option key={item.TB_STOK_ID} value={item.TB_STOK_ID}>
+                      {`${item.YAKIT_KOD} - ${item.YAKIT_TANIM}`}
+                    </Option>
+                  ))}
+                </Select>
+              )}
             />
           </div>
         </div>

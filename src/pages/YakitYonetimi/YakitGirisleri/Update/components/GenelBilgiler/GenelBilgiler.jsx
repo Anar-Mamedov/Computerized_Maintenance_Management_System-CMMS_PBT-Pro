@@ -1,28 +1,28 @@
 import React from "react";
-import { Typography, Input, InputNumber, Checkbox, Card } from "antd";
+import { Select, Input, Typography, Divider, InputNumber, Button, Checkbox } from "antd";
+import GirisFiyatiSelect from "./components/GirisFiyatiSelect";
+import CikisiyatiSelect from "./components/CikisiyatiSelect";
+import FiyatGirisleri from "./components/FiyatGirisleri/FiyatGirisleri";
+import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
 import { Controller, useFormContext } from "react-hook-form";
-import KodIDSelectbox from "../../../../../../../../utils/components/KodIDSelectbox";
 import { t } from "i18next";
 
 const { Text } = Typography;
 
-export default function SecondTabs() {
-  const {
-    control,
-    watch,
-    formState: { errors },
-  } = useFormContext();
+function GenelBilgiler({ selectedRowID }) {
+  const { control, watch } = useFormContext();
 
   // --- Anlık Değerleri İzleme (Tank görseli için) ---
-  const kapasite = watch("KAPASITE") || 100; // 0 bölünme hatası olmasın diye default 100
+  const kapasite = watch("KAPASITE") || 0;
   const mevcutMiktar = watch("MEVCUT_MIKTAR") || 0;
   const kritikMiktar = watch("KRITIK_MIKTAR") || 0;
   
-  // Yüzde Hesabı
-  const dolulukOrani = Math.min(100, Math.max(0, (mevcutMiktar / kapasite) * 100));
+  // Doluluk oranı hesabı
+  const dolulukOrani = kapasite > 0 ? (mevcutMiktar / kapasite) * 100 : 0;
+  const safeDoluluk = Math.min(100, Math.max(0, dolulukOrani));
   
-  // Renk Belirleme (Kritik miktarın altına düşerse kırmızı, yoksa yeşil)
-  const tankColor = mevcutMiktar <= kritikMiktar ? "#ff4d4f" : "#52c41a"; // Antd Red : Antd Green
+  // Kritik uyarı rengi
+  const tankColor = mevcutMiktar <= kritikMiktar ? "#f5222d" : "#52c41a";
 
   // --- Stiller ---
   const LabelStyle = {
@@ -95,7 +95,7 @@ export default function SecondTabs() {
             color: dolulukOrani > 55 ? '#fff' : '#000', // Arka plan koyuysa yazı beyaz olsun
             zIndex: 3
         }}>
-            %{Math.round(dolulukOrani)}
+            %{Math.round(safeDoluluk)}
         </div>
       </div>
 
@@ -106,12 +106,7 @@ export default function SecondTabs() {
         <div style={RowStyle}>
           <Text style={LabelStyle}>{t("Yakıt Tipi")}</Text>
           <div style={InputContainerStyle}>
-            <KodIDSelectbox 
-              name1="yakitTipKodId"
-              kodID={35600}
-              isAsync={false}
-              placeholder="(Seçiniz)"
-            />
+            <KodIDSelectbox name1="yakitTipTanim" isRequired={true} kodID="35600" />
           </div>
         </div>
 
@@ -120,7 +115,7 @@ export default function SecondTabs() {
           <Text style={LabelStyle}>{t("Tank Kapasitesi")}</Text>
           <div style={InputContainerStyle}>
             <Controller
-              name="KAPASITE"
+              name="kapasite"
               control={control}
               render={({ field }) => (
                 <InputNumber
@@ -140,7 +135,7 @@ export default function SecondTabs() {
           <Text style={{ ...LabelStyle, color: "blue" }}>{t("Kritik Miktar")}</Text>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", width: "100%", maxWidth: "300px" }}>
             <Controller
-              name="KRITIK_MIKTAR"
+              name="kritikMiktar"
               control={control}
               render={({ field }) => (
                 <InputNumber
@@ -153,7 +148,7 @@ export default function SecondTabs() {
               )}
             />
             <Controller
-              name="KRITIK_UYAR"
+              name="kritikUyar"
               control={control}
               render={({ field }) => (
                 <Checkbox checked={field.value} {...field}>
@@ -169,7 +164,7 @@ export default function SecondTabs() {
           <Text style={LabelStyle}>{t("Yakıt Miktarı")}</Text>
           <div style={InputContainerStyle}>
             <Controller
-              name="MEVCUT_MIKTAR"
+              name="mevcutMiktar"
               control={control}
               render={({ field }) => (
                 <InputNumber
@@ -192,3 +187,5 @@ export default function SecondTabs() {
     </div>
   );
 }
+
+export default GenelBilgiler;
