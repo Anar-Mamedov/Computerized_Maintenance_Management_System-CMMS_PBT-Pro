@@ -16,14 +16,9 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
   const hidePopover = () => {
     setVisible(false);
   };
-  // Silme işlemi için disable durumunu kontrol et
-  const isDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 4);
-  const iptalDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 2 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5);
-  const kapatDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5 || row.IST_DURUM_ID === 3);
-
   const content = (
     <div>
-      {/*{selectedRows.length >= 1 && <Sil selectedRows={selectedRows} refreshTableData={refreshTableData} disabled={isDisabled} hidePopover={hidePopover} />}*/}
+      {selectedRows.length >= 1 && <Sil selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
       {selectedRows.length >= 1 && <TopluLokasyon selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
     </div>
   );
