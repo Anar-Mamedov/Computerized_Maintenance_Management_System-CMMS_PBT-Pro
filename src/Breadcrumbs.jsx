@@ -1,96 +1,78 @@
 import { Breadcrumb } from "antd";
 import { Link, useLocation } from "react-router-dom";
+import { rawItems } from "./menuItems";
+
+// rawItems'dan parent-child ilişkisini otomatik oluşturur
+function buildHierarchy(items, parent = null, subParent = null) {
+  const map = {};
+  items.forEach((item) => {
+    if (item.children) {
+      // Alt grubu olan menü (Onay İşlemleri gibi nested group)
+      if (parent) {
+        // Bu bir sub-parent (örn: Yönetim > Onay İşlemleri)
+        buildHierarchyInto(map, item.children, parent, item.labelText);
+      } else {
+        // Bu bir parent (örn: Yönetim, Bakım Yönetimi)
+        buildHierarchyInto(map, item.children, item.labelText, null);
+      }
+    }
+  });
+  return map;
+}
+
+function buildHierarchyInto(map, children, parent, subParent) {
+  children.forEach((child) => {
+    if (child.children) {
+      // Nested group (örn: Onay İşlemleri)
+      buildHierarchyInto(map, child.children, parent, child.labelText);
+    } else if (child.key) {
+      map[child.key] = {
+        parent,
+        subParent,
+        label: child.labelText,
+      };
+    }
+  });
+}
+
+const menuHierarchy = buildHierarchy(rawItems);
 
 const Breadcrumbs = () => {
   const location = useLocation();
-  const pathSnippets = location.pathname.split("/").filter((i) => i);
-  const breadcrumbNameMap = {
-    "/": "Dashboard",
-    "/isEmri1": "İş Emirleri",
-    "/User": "Profil Ekranı",
-    "/periyodikBakimlar": "Periyodik Bakımlar",
-    "/otomatikIsEmirleri": "Otomatik İş Emirleri",
-    "/raporYonetimi": "Rapor Yönetimi",
-    "/analizler": "Analizler",
-    "/planlamaTakvimi": "Planlama Takvimi",
-    "/makine": "Ekipman Tanımları",
-    "/ekipmanVeritabani": "Alt Ekipman Veritabanı",
-    "/sayacGuncelleme": "Sayaç Güncelleme",
-    "/personelIzinleri": "Personel İzinleri",
-    "/personelNobetleri": "Personel Nöbetleri",
-    "/personelCalismaPLani": "Personel Çalışma Planı",
-    "/isTalebiKullanicilari": "İş Talebi Kullanıcıları",
-    "/formYonetimi": "Form Yönetimi",
-    "/kodYonetimi": "Kod Yönetimi",
-    "/otomatikKodlar": "Otomatik Kodlar",
-    "/servisOncelikSeviyeleri": "Servis Öncelik Seviyeleri",
-    "/isEmriTipleri": "İş Emri Tipleri",
-    "/onaylayicilar": "Onaylayıcılar",
-    "/rolTanimlari": "Rol Tanımları",
-    "/onayIslemleri": "Onay İşlemleri",
-    "/onayTanimlari": "Onay Tanımları",
-    "/projeTanimlari": "Proje Tanımları",
-    "/lokasyon": "Lokasyon Tanımları",
-    "/vardiyalar": "Vardiya Tanımları",
-    "/bakimTanimlari": "Bakım Planları",
-    "/arizaTanimlari": "Arıza Kodları",
-    "/atolye": "Atölye / Ekip Tanımları",
-    "/personeltanimlari": "Personel Tanımları",
-    "/isTalepleri": "İş Talepleri",
-    "/demo": "Demo",
-    "/userid": "User ID Control",
-    "/mudaheleSuresi": "Müdahale Süreleri Analizi",
-    "/kullaniciTanimlari": "Kullanıcı Tanımları",
-    "/RolTanimlari1": "Rol Tanımları",
-    "/malzemeTanimi": "Malzeme Tanımları",
-    "/malzemeDepolari": "Malzeme Depoları",
-    "/malzemeGirisFisi": "Malzeme Girişleri",
-    "/malzemeCikisFisi": "Malzeme Çıkışları",
-    "/malzemeTransferFisi": "Malzeme Transferleri",
-    "/stokSayimlari": "Stok Sayımları",
-    "/hizliMaliyetlendirme": "Hızlı Maliyetlendirme",
-    "/malzemeTransferOnayIslemleri": "Malzeme Transfer Onay İşlemleri",
-    "/malzemeTalepleri": "Malzeme Talepleri",
-    "/satinalmaSiparisleri": "Satınalma Siparişleri",
-    "/fiyatTeklifleri": "Fiyat Teklifleri",
-    "/tedarikciFirmalar": "Tedarikçi Firmalar",
-    "/satinalmaDashboard": "Satınalma Yönetici Paneli",
-    "/isEmriAnalizi": "İş Emirleri Kontrol Ekranı",
-    "/bakimKpi": "Bakım KPI Analizi",
-    "/yakitGirisleri": "Yakıt Girişleri",
-    "/yakitStoklari": "Yakıt Stokları",
-    "/yakitHareketleri": "Yakıt Hareketleri",
-    "/hizliYakitGirisi": "Hızlı Yakıt Girişi",
-    "/yakitTanimlari": "Yakıt Tanımları",
-    "/yonetimDashboard": "Yonetim Dashboard",
-    "/makinePuantajlari": "Makine Puantajları",
-    "/yakitTuketimiAnalizi":"Yakıt Tüketimi Analizi",
-    "/stokSayimlariFisListe": "Stok Sayımları",
-    "/dokumanYonetimi": "Doküman Yönetimi",
-    "/resimYonetimi": "Resim Yönetimi",
-    "/ekipmanTransferi": "Ekipman Transferi",
-    "/projeTanimlari2": "Proje Tanımları",
-    "/projeYonetimiListe": "Proje Yönetimi",
-    "/projeIlerleme": "Proje İlerleme İşlemleri"
-
-    // Diğer route'lar için ekleyin...
-  };
-
-  const breadcrumbItems = pathSnippets.map((_, index) => {
-    const url = `/${pathSnippets.slice(0, index + 1).join("/")}`;
-    return {
-      key: url,
-      title: <Link to={url}>{breadcrumbNameMap[url]}</Link>,
-    };
-  });
+  const pathKey = location.pathname.replace("/", "");
 
   const items = [
     {
       key: "home",
-      title: <Link to="/">{breadcrumbNameMap["/"]}</Link>,
+      title: <Link to="/">Ana Sayfa</Link>,
     },
-    ...breadcrumbItems,
   ];
+
+  const hierarchy = menuHierarchy[pathKey];
+
+  if (hierarchy) {
+    items.push({
+      key: "parent",
+      title: hierarchy.parent,
+    });
+
+    if (hierarchy.subParent) {
+      items.push({
+        key: "subParent",
+        title: hierarchy.subParent,
+      });
+    }
+
+    items.push({
+      key: "current",
+      title: hierarchy.label,
+    });
+  } else if (pathKey) {
+    items.push({
+      key: "current",
+      title: pathKey,
+    });
+  }
 
   return <Breadcrumb style={{ margin: "7px 0" }} items={items} />;
 };
