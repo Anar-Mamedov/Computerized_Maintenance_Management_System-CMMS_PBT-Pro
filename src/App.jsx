@@ -45,6 +45,7 @@ import Analizler from "./pages/PersonelYonetimi/PersonelKPI/Analizler.jsx";
 import Dashboard1 from "./pages/Dashboard1/Dashboard.jsx";
 import UserIdControl from "./pages/UserIdControl/UserIdControl.jsx";
 import IsEmriTipleri from "./pages/Yonetim/IsEmriTipleri/IsEmriTipleri.jsx";
+import KodYonetimi from "./pages/Yonetim/KodYonetimi/KodYonetimi.jsx";
 import Breadcrumbs from "./Breadcrumbs"; // Import the Breadcrumbs component
 import MudaheleSuresi from "./pages/Analizler/MudaheleAnalizi/MudaheleAnalizi.jsx";
 import IsEmriAnalizi from "./pages/Analizler/IsEmriAnalizi/IsEmriAnalizi.jsx";
@@ -426,7 +427,7 @@ export default function App() {
           <Route path="/isTalebiKullanicilari" element={<IsTalebiKullanicilari />} />
           <Route path="/raporYonetimi" element={<Hazirlaniyor />} />
           <Route path="/formYonetimi" element={<Hazirlaniyor />} />
-          <Route path="/kodYonetimi" element={<Hazirlaniyor />} />
+          <Route path="/kodYonetimi" element={<KodYonetimi />} />
           <Route path="/otomatikKodlar" element={<Hazirlaniyor />} />
           <Route path="/servisOncelikSeviyeleri" element={<Hazirlaniyor />} />
           <Route path="/isEmriTipleri" element={<IsEmriTipleri />} />
