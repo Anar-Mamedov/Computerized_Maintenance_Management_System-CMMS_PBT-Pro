@@ -79,6 +79,8 @@ export default function LoginForm() {
       };
 
       const response = await AxiosInstance.post("/login", payload);
+      console.log("Login API Response:", response);
+      // alert(JSON.stringify(response, null, 2));
       if (response.status_code === 401) {
         message.error("Kullanıcı adı ve ya şifre yanlıştır");
         return;
@@ -94,24 +96,81 @@ export default function LoginForm() {
           isTalepleri: response.KLL_ISTALEBI_KUL,
           Dashboard: response.KLL_WEB_DASHBOARD,
           hatirlatici: response.KLL_WEB_HATIR,
+
+          // Ekipman Yönetimi
           makine: response.KLL_WEB_MAKINE,
           ekipmanVeritabani: response.KLL_WEB_EKIPMAN,
           durusTakibi: response.KLL_WEB_EKIPMAN,
           sayacGuncelleme: response.KLL_WEB_SAYAC,
+          ekipmanTransferi: response.KLL_WEB_EKIPMAN,
+
+          // Operasyon Yönetimi (KLL_WEB_OPERASYON_MODUL false ise tüm grup gizlenir)
+          operasyonYonetimi: response.KLL_WEB_OPERASYON_MODUL ?? true,
+          gunlukMakinePuantajGirisi: response.KLL_WEB_OPERASYON_MODUL ?? true,
+          aylikMakinePuantajlari: response.KLL_WEB_OPERASYON_MODUL ?? true,
+          makinePuantajTakibi: response.KLL_WEB_OPERASYON_MODUL ?? true,
+          operasyonTakibi: response.KLL_WEB_OPERASYON_MODUL ?? true,
+
+          // Bakım Yönetimi
           bakimTanimlari: response.KLL_WEB_BAKIM,
           arizaTanimlari: response.KLL_WEB_ARIZA,
           isEmri1: response.KLL_WEB_ISEMRI,
           periyodikBakimlar: response.KLL_WEB_PBAKIM,
           otomatikIsEmirleri: response.KLL_WEB_OTOIS,
           planlamaTakvimi: response.KLL_WEB_PTAKVIM,
+          isEmriAnalizi: response.KLL_WEB_ISEMRI,
+
+          // Malzeme & Depo Yönetimi
+          malzemeTanimi: response.KLL_WEB_MALZEME,
+          malzemeDepolari: response.KLL_WEB_MALDEPO,
+          malzemeGirisFisi: response.KLL_WEB_MALGIRIS,
+          malzemeCikisFisi: response.KLL_WEB_MALCIKIS,
+          malzemeTransferFisi: response.KLL_WEB_TRANSFER,
+          stokSayimlariFisListe: response.KLL_WEB_STOKSAY,
+          stokSayimlari: response.KLL_WEB_STOKSAY,
+          hizliMaliyetlendirme: response.KLL_WEB_HIZLIMAL,
+          malzemeTransferOnayIslemleri: response.KLL_WEB_MALTRANSONAY,
+
+          // Personel Yönetimi
           atolye: response.KLL_WEB_ATOLYE,
           personeltanimlari: response.KLL_WEB_PERTANIM,
           personelIzinleri: response.KLL_WEB_PERIZIN,
           personelNobetleri: response.KLL_WEB_PERNOBET,
           personelCalismaPLani: response.KLL_WEB_PERPLAN,
           isTalebiKullanicilari: response.KLL_WEB_ISTKUL,
+
+          // Satınalma Yönetimi (KLL_WEB_SATINALMA_MODUL false ise tüm grup gizlenir)
+          satinalmaDashboard: response.KLL_WEB_SATINALMA_MODUL ?? true,
+          malzemeTalepleri: response.KLL_WEB_SATINALMA_MODUL ?? true,
+          satinalmaSiparisleri: response.KLL_WEB_SATINALMA_MODUL ?? true,
+          fiyatTeklifleri: response.KLL_WEB_SATINALMA_MODUL ?? true,
+          tedarikciFirmalar: response.KLL_WEB_SATINALMA_MODUL ?? true,
+
+          // Yakıt Yönetimi (KLL_WEB_YAKIT_MODUL false ise tüm grup gizlenir)
+          yakitTanimlari: response.KLL_WEB_YAKIT_MODUL ?? true,
+          yakitStoklari: response.KLL_WEB_YAKIT_MODUL ?? true,
+          yakitGirisleri: response.KLL_WEB_YAKIT_MODUL ?? true,
+          yakitHareketleri: response.KLL_WEB_YAKIT_MODUL ?? true,
+          hizliYakitGirisi: response.KLL_WEB_YAKIT_MODUL ?? true,
+
+          // Proje Yönetimi (KLL_WEB_PROJE_MODUL false ise tüm grup gizlenir)
+          projeTanimlari2: response.KLL_WEB_PROJE_MODUL ?? true,
+          projeIlerleme: response.KLL_WEB_PROJE_MODUL ?? true,
+          projeYonetimiListe: response.KLL_WEB_PROJE_MODUL ?? true,
+
+          // Analizler
+          analizler: response.KLL_WEB_ANALIZ,
+          mudaheleSuresi: response.KLL_WEB_MUDANALIZ,
+          bakimKpi: true,
+          yakitTuketimiAnalizi: true,
+
+          // Rapor & Formlar
           raporYonetimi: response.KLL_WEB_RAPOR,
           formYonetimi: response.KLL_WEB_FORM,
+
+          // Yönetim
+          dokumanYonetimi: true,
+          resimYonetimi: true,
           lokasyon: response.KLL_WEB_LOKASYON,
           vardiyalar: response.KLL_WEB_VARDIYA,
           kodYonetimi: response.KLL_WEB_KOD,
@@ -123,50 +182,12 @@ export default function LoginForm() {
           rolTanimlari: response.KLL_WEB_ONAY,
           onaylayicilar: response.KLL_WEB_ONAY,
           projeTanimlari: response.KLL_WEB_PROJE,
-          analizler: response.KLL_WEB_ANALIZ,
-          mudaheleSuresi: response.KLL_WEB_MUDANALIZ,
           kullaniciTanimlari: response.KLL_WEB_KULLANICI,
           RolTanimlari1: response.KLL_WEB_ROL,
           Ayarlar: response.KLL_WEB_AYARLAR,
-          malzemeTanimi: response.KLL_WEB_MALZEME,
-          malzemeDepolari: response.KLL_WEB_MALDEPO,
-          malzemeGirisFisi: response.KLL_WEB_MALGIRIS,
-          malzemeCikisFisi: response.KLL_WEB_MALCIKIS,
-          malzemeTransferFisi: response.KLL_WEB_TRANSFER,
-          stokSayimlari: response.KLL_WEB_STOKSAY,
-          hizliMaliyetlendirme: response.KLL_WEB_HIZLIMAL,
-          malzemeTransferOnayIslemleri: response.KLL_WEB_MALTRANSONAY,
-          malzemeTalepleri: true,
-          satinalmaSiparisleri: true,
-          fiyatTeklifleri: true,
-          tedarikciFirmalar: true,
-          satinalmaDashboard: true,
-          isEmriAnalizi: response.KLL_WEB_ISEMRI,
-          bakimKpi: true,
-          yakitGirisleri: true,
-          yakitStoklari: true,
-          yakitHareketleri: true,
-          hizliYakitGirisi: true,
-          operasyonYonetimi: true,
-          makinePuantajlari: true,
-          gunlukMakinePuantajGirisi: true,
-          aylikMakinePuantajlari: true,
-          makinePuantajTakibi: true,
-          personelPuantajlari: true,
-          gunlukPersonelPuantajGirisi: true,
-          aylikPersonelPuantajlari: true,
-          personelPuantajTakibi: true,
-          operasyonTakibi: true,
-          yakitTanimlari: true,
+
+          // Diğer
           yonetimDashboard: true,
-          yakitTuketimiAnalizi: true,
-          stokSayimlariFisListe: true,
-          dokumanYonetimi: true,
-          resimYonetimi: true,
-          ekipmanTransferi: true,
-          projeTanimlari2: true,
-          projeYonetimiListe: true,
-          projeIlerleme: true,
         };
         const userInfo = {
           userId: response.TB_KULLANICI_ID ?? null,
@@ -192,8 +213,9 @@ export default function LoginForm() {
           sessionStorage.setItem("login", JSON.stringify(login));
         }
 
-        const anar = localStorage.getItem("login") || sessionStorage.getItem("login");
-        console.log(anar);
+        console.log("Login data saved:", login);
+        console.log("operasyonYonetimi:", login.operasyonYonetimi);
+        console.log("KLL_WEB_OPERASYON_MODUL from response:", response.KLL_WEB_OPERASYON_MODUL);
         message.success("Giriş başarılı!");
         navigate("/");
         window.location.reload();

@@ -139,7 +139,7 @@ export const rawItems = [
       getItem("Müdahale Süreleri Analizi", "mudaheleSuresi", true),
       getItem("Personel KPI Analizi", "analizler", true),
       getItem("Bakım KPI Analizi", "bakimKpi", true),
-      getItem("Yakıt Tüketimi Analizi", "yakitTuketimiAnalizi", true),
+      // getItem("Yakıt Tüketimi Analizi", "yakitTuketimiAnalizi", true),
     ],
     false
   ),
