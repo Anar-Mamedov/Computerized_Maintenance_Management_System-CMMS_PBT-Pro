@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { Route, Routes, Link, useLocation, Outlet, Navigate } from "react-router-dom";
 import { Breadcrumb, Layout, Menu, theme, Button, Typography, Input, Modal } from "antd";
 import {
@@ -22,7 +22,7 @@ import Auth from "./pages/Auth/Auth";
 import logo from "../src/assets/images/logoBeyaz.png";
 import omegaLogo from "../src/assets/images/omega-logo.png";
 import Headers from "./pages/Headers/Headers";
-import { useRecoilState, RecoilRoot, useSetRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { userState } from "./state/userState";
 import PlanlamaTakvimi from "./pages/BakımVeArizaYonetimi/PlanlamaTakvimi/PlanlamaTakvimi";
 import OtomatikIsEmri from "./pages/BakımVeArizaYonetimi/OtomatikIsEmrileri/Index.jsx";
@@ -91,14 +91,9 @@ const { TextArea } = Input;
 
 const { Header, Content, Footer, Sider } = Layout;
 
-const loginData = JSON.parse(localStorage.getItem("login")) || JSON.parse(sessionStorage.getItem("login")) || {};
-
 import { rawItems } from "./menuItems";
 
-function filterItems(items) {
-  // LocalStorage'dan token kontrolü
-  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-
+function filterItems(items, loginData, token) {
   // Token yoksa, hiçbir filtreleme yapmadan tüm öğeleri döndür
   if (!token) {
     return items;
@@ -106,19 +101,38 @@ function filterItems(items) {
 
   // Token varsa, filtreleme işlemini gerçekleştir
   return items
+    .filter((item) => {
+      // Modül seviyesindeki yetkileri (grupları komple gizleme) kontrol et
+      // menuItems.jsx içerisinde tanımlanan modulePermissionKey'e göre kontrol sağlanır.
+      if (item.modulePermissionKey && loginData[item.modulePermissionKey] === false) {
+        return false;
+      }
+      return true;
+    })
     .map((item) => {
       // "Ana Sayfa" için özel durumu kontrol et
-      if (item.key === "" && item.label.props.children === "Ana Sayfa") {
+      if (item.key === "" && item.label?.props?.children === "Ana Sayfa") {
         return item; // "Ana Sayfa" her zaman görünür
       }
 
-      const filteredChildren = item.children ? filterItems(item.children).filter((child) => loginData[child.key]) : [];
+      const filteredChildren = item.children
+        ? filterItems(item.children, loginData, token).filter((child) => {
+            const permissionKeyToUse = child.modulePermissionKey || child.key;
+            return loginData[permissionKeyToUse] !== false;
+          })
+        : [];
       return {
         ...item,
         children: filteredChildren.length > 0 ? filteredChildren : undefined,
       };
     })
-    .filter((item) => item.children || loginData[item.key] || (item.key === "" && item.label.props.children === "Ana Sayfa"));
+    .filter((item) => {
+      if (item.children) return true;
+      if (item.key === "" && item.label?.props?.children === "Ana Sayfa") return true;
+
+      const permissionKeyToUse = item.modulePermissionKey || item.key;
+      return loginData[permissionKeyToUse] !== false;
+    });
 }
 
 function flattenMenuItems(items) {
@@ -148,6 +162,11 @@ function flattenMenuItems(items) {
 
 export default function App() {
   const [user, setUser] = useRecoilState(userState);
+
+  const loginData = useMemo(() => {
+    return JSON.parse(localStorage.getItem("login")) || JSON.parse(sessionStorage.getItem("login")) || {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   // Domain'e göre kontrol
   const hostname = window.location.hostname;
@@ -202,7 +221,7 @@ export default function App() {
   // localStorage'dan kullanıcı bilgilerini oku son
 
   return (
-    <RecoilRoot>
+    <>
       <Routes>
         <Route path="/auth" element={<Auth />} />
         <Route
@@ -213,7 +232,7 @@ export default function App() {
             </ProtectedRoute>
           }
         >
-          {loginData?.Dashboard && <Route path="/" element={isOmega ? <YoneticiDashboard /> : <Dashboard1 />} />}
+          {loginData?.KLL_WEB_DASHBOARD && <Route path="/" element={isOmega ? <YoneticiDashboard /> : <Dashboard1 />} />}
           {/* <Route path="/isemri" element={<Isemri />} /> */}
           <Route path="/yonetimDashboard" element={<YoneticiDashboard />} />
           <Route path="/isEmri1" element={<IsEmri />} />
@@ -288,7 +307,7 @@ export default function App() {
           {/*<Route path="/kurallar" element={<Kurallar />} />*/}
         </Route>
       </Routes>
-    </RecoilRoot>
+    </>
   );
 }
 
@@ -445,7 +464,7 @@ const BaseLayout = () => {
   );
 };
 
-const items = filterItems(rawItems);
+// const items = filterItems(rawItems); // moved to inside MenuWrapper
 
 // Ant Design Menu için gereksiz propları temizleyen fonksiyon
 function cleanItemsForMenu(items) {
@@ -465,6 +484,18 @@ const MenuWrapper = () => {
   const [openKeys, setOpenKeys] = useState([]);
   const [selectedMenuItem, setSelectedMenuItem] = useRecoilState(selectedMenuItemState);
   const setMenuItems = useSetRecoilState(menuItemsState);
+  const [user] = useRecoilState(userState);
+
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+  const loginData = useMemo(() => {
+    return JSON.parse(localStorage.getItem("login")) || JSON.parse(sessionStorage.getItem("login")) || {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  const items = useMemo(() => {
+    return filterItems(rawItems, loginData, token);
+  }, [loginData, token]);
+
   const [bounds, setBounds] = useState({
     left: 0,
     top: 0,
@@ -484,7 +515,7 @@ const MenuWrapper = () => {
 
   useEffect(() => {
     setMenuItems(flattenMenuItems(items));
-  }, [setMenuItems]);
+  }, [setMenuItems, items]);
 
   const onOpenChange = (keys) => {
     const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);

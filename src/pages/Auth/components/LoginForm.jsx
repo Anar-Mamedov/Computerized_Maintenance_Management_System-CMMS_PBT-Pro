@@ -79,8 +79,6 @@ export default function LoginForm() {
       };
 
       const response = await AxiosInstance.post("/login", payload);
-      console.log("Login API Response:", response);
-      // alert(JSON.stringify(response, null, 2));
       if (response.status_code === 401) {
         message.error("Kullanıcı adı ve ya şifre yanlıştır");
         return;
@@ -91,104 +89,6 @@ export default function LoginForm() {
           userResimID: response.resimId,
           userUnvan: response.KLL_UNVAN,
         });
-        const login = {
-          "": true,
-          isTalepleri: response.KLL_ISTALEBI_KUL,
-          Dashboard: response.KLL_WEB_DASHBOARD,
-          hatirlatici: response.KLL_WEB_HATIR,
-
-          // Ekipman Yönetimi
-          makine: response.KLL_WEB_MAKINE,
-          ekipmanVeritabani: response.KLL_WEB_EKIPMAN,
-          durusTakibi: response.KLL_WEB_EKIPMAN,
-          sayacGuncelleme: response.KLL_WEB_SAYAC,
-          ekipmanTransferi: response.KLL_WEB_EKIPMAN,
-
-          // Operasyon Yönetimi (KLL_WEB_OPERASYON_MODUL false ise tüm grup gizlenir)
-          operasyonYonetimi: response.KLL_WEB_OPERASYON_MODUL ?? true,
-          gunlukMakinePuantajGirisi: response.KLL_WEB_OPERASYON_MODUL ?? true,
-          aylikMakinePuantajlari: response.KLL_WEB_OPERASYON_MODUL ?? true,
-          makinePuantajTakibi: response.KLL_WEB_OPERASYON_MODUL ?? true,
-          operasyonTakibi: response.KLL_WEB_OPERASYON_MODUL ?? true,
-
-          // Bakım Yönetimi
-          bakimTanimlari: response.KLL_WEB_BAKIM,
-          arizaTanimlari: response.KLL_WEB_ARIZA,
-          isEmri1: response.KLL_WEB_ISEMRI,
-          periyodikBakimlar: response.KLL_WEB_PBAKIM,
-          otomatikIsEmirleri: response.KLL_WEB_OTOIS,
-          planlamaTakvimi: response.KLL_WEB_PTAKVIM,
-          isEmriAnalizi: response.KLL_WEB_ISEMRI,
-
-          // Malzeme & Depo Yönetimi
-          malzemeTanimi: response.KLL_WEB_MALZEME,
-          malzemeDepolari: response.KLL_WEB_MALDEPO,
-          malzemeGirisFisi: response.KLL_WEB_MALGIRIS,
-          malzemeCikisFisi: response.KLL_WEB_MALCIKIS,
-          malzemeTransferFisi: response.KLL_WEB_TRANSFER,
-          stokSayimlariFisListe: response.KLL_WEB_STOKSAY,
-          stokSayimlari: response.KLL_WEB_STOKSAY,
-          hizliMaliyetlendirme: response.KLL_WEB_HIZLIMAL,
-          malzemeTransferOnayIslemleri: response.KLL_WEB_MALTRANSONAY,
-
-          // Personel Yönetimi
-          atolye: response.KLL_WEB_ATOLYE,
-          personeltanimlari: response.KLL_WEB_PERTANIM,
-          personelIzinleri: response.KLL_WEB_PERIZIN,
-          personelNobetleri: response.KLL_WEB_PERNOBET,
-          personelCalismaPLani: response.KLL_WEB_PERPLAN,
-          isTalebiKullanicilari: response.KLL_WEB_ISTKUL,
-
-          // Satınalma Yönetimi (KLL_WEB_SATINALMA_MODUL false ise tüm grup gizlenir)
-          satinalmaDashboard: response.KLL_WEB_SATINALMA_MODUL ?? true,
-          malzemeTalepleri: response.KLL_WEB_SATINALMA_MODUL ?? true,
-          satinalmaSiparisleri: response.KLL_WEB_SATINALMA_MODUL ?? true,
-          fiyatTeklifleri: response.KLL_WEB_SATINALMA_MODUL ?? true,
-          tedarikciFirmalar: response.KLL_WEB_SATINALMA_MODUL ?? true,
-
-          // Yakıt Yönetimi (KLL_WEB_YAKIT_MODUL false ise tüm grup gizlenir)
-          yakitTanimlari: response.KLL_WEB_YAKIT_MODUL ?? true,
-          yakitStoklari: response.KLL_WEB_YAKIT_MODUL ?? true,
-          yakitGirisleri: response.KLL_WEB_YAKIT_MODUL ?? true,
-          yakitHareketleri: response.KLL_WEB_YAKIT_MODUL ?? true,
-          hizliYakitGirisi: response.KLL_WEB_YAKIT_MODUL ?? true,
-
-          // Proje Yönetimi (KLL_WEB_PROJE_MODUL false ise tüm grup gizlenir)
-          projeTanimlari2: response.KLL_WEB_PROJE_MODUL ?? true,
-          projeIlerleme: response.KLL_WEB_PROJE_MODUL ?? true,
-          projeYonetimiListe: response.KLL_WEB_PROJE_MODUL ?? true,
-
-          // Analizler
-          analizler: response.KLL_WEB_ANALIZ,
-          mudaheleSuresi: response.KLL_WEB_MUDANALIZ,
-          bakimKpi: true,
-          yakitTuketimiAnalizi: true,
-
-          // Rapor & Formlar
-          raporYonetimi: response.KLL_WEB_RAPOR,
-          formYonetimi: response.KLL_WEB_FORM,
-
-          // Yönetim
-          dokumanYonetimi: true,
-          resimYonetimi: true,
-          lokasyon: response.KLL_WEB_LOKASYON,
-          vardiyalar: response.KLL_WEB_VARDIYA,
-          kodYonetimi: response.KLL_WEB_KOD,
-          otomatikKodlar: response.KLL_WEB_OTOKOD,
-          servisOncelikSeviyeleri: response.KLL_WEB_SERVIS,
-          isEmriTipleri: response.KLL_WEB_ISEMRITIP,
-          onayIslemleri: response.KLL_WEB_ONAY,
-          onayTanimlari: response.KLL_WEB_ONAY,
-          rolTanimlari: response.KLL_WEB_ONAY,
-          onaylayicilar: response.KLL_WEB_ONAY,
-          projeTanimlari: response.KLL_WEB_PROJE,
-          kullaniciTanimlari: response.KLL_WEB_KULLANICI,
-          RolTanimlari1: response.KLL_WEB_ROL,
-          Ayarlar: response.KLL_WEB_AYARLAR,
-
-          // Diğer
-          yonetimDashboard: true,
-        };
         const userInfo = {
           userId: response.TB_KULLANICI_ID ?? null,
           userName: response.KLL_TANIM ?? null,
@@ -206,19 +106,17 @@ export default function LoginForm() {
         if (values.remember) {
           localStorage.setItem("token", response.AUTH_TOKEN);
           localStorage.setItem("user", JSON.stringify(userInfo));
-          localStorage.setItem("login", JSON.stringify(login));
+          localStorage.setItem("login", JSON.stringify(response));
         } else {
           sessionStorage.setItem("token", response.AUTH_TOKEN);
           sessionStorage.setItem("user", JSON.stringify(userInfo));
-          sessionStorage.setItem("login", JSON.stringify(login));
+          sessionStorage.setItem("login", JSON.stringify(response));
         }
 
-        console.log("Login data saved:", login);
-        console.log("operasyonYonetimi:", login.operasyonYonetimi);
-        console.log("KLL_WEB_OPERASYON_MODUL from response:", response.KLL_WEB_OPERASYON_MODUL);
+        const anar = localStorage.getItem("login") || sessionStorage.getItem("login");
+        console.log(anar);
         message.success("Giriş başarılı!");
         navigate("/");
-        window.location.reload();
       } else {
         message.error("Giriş başarısız!");
         console.error("Token not received from API");

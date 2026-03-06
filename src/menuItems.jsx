@@ -13,7 +13,7 @@ import {
   CalculatorOutlined,
 } from "@ant-design/icons";
 
-function getItem(labelText, key, icon, children, isClickable = true) {
+function getItem(labelText, key, icon, children, isClickable = true, modulePermissionKey = null) {
   return {
     key,
     icon,
@@ -21,6 +21,7 @@ function getItem(labelText, key, icon, children, isClickable = true) {
     label: isClickable ? <Link to={`/${key}`}>{labelText}</Link> : labelText,
     labelText,
     isClickable,
+    modulePermissionKey,
   };
 }
 
@@ -35,11 +36,11 @@ export const rawItems = [
     "makine&ekipman",
     <AppstoreOutlined />,
     [
-      getItem("Ekipman Tanımları", "makine", true),
-      getItem("Alt Ekipman Veritabanı", "ekipmanVeritabani", true),
-      getItem("Duruş Takibi", "durusTakibi", true),
-      getItem("Sayaç Güncellemeleri", "sayacGuncelleme", true),
-      getItem("Ekipman Transferi", "ekipmanTransferi", true),
+      getItem("Ekipman Tanımları", "makine", true, undefined, true, "KLL_WEB_MAKINE"),
+      getItem("Alt Ekipman Veritabanı", "ekipmanVeritabani", true, undefined, true, "KLL_WEB_EKIPMAN"),
+      getItem("Duruş Takibi", "durusTakibi", true, undefined, true, "KLL_WEB_EKIPMAN"),
+      getItem("Sayaç Güncellemeleri", "sayacGuncelleme", true, undefined, true, "KLL_WEB_SAYAC"),
+      getItem("Ekipman Transferi", "ekipmanTransferi", true, undefined, true),
     ],
     false
   ),
@@ -53,21 +54,22 @@ export const rawItems = [
       getItem("Ekipman Puantaj Takibi", "makinePuantajTakibi", true),
       getItem("Operasyon Takibi", "operasyonTakibi", true),
     ],
-    false
+    false,
+    "KLL_WEB_OPERASYON_MODUL"
   ),
   getItem(
     "Bakım Yönetimi",
     "bakim&ariza",
     <ToolOutlined />,
     [
-      getItem("Bakım Planları", "bakimTanimlari", true),
-      getItem("Arıza Kodları", "arizaTanimlari", true),
-      getItem("Bakım İş Emirleri", "isEmri1", true),
-      getItem("Periyodik Bakımlar", "periyodikBakimlar", true),
-      getItem("İş Talepleri", "isTalepleri", true),
-      getItem("Otomatik İş Emirleri", "otomatikIsEmirleri", true),
-      getItem("Planlama Takvimi", "planlamaTakvimi", true),
-      getItem("İş Emirleri Kontrol Ekranı", "isEmriAnalizi", true),
+      getItem("Bakım Planları", "bakimTanimlari", true, undefined, true, "KLL_WEB_BAKIM"),
+      getItem("Arıza Kodları", "arizaTanimlari", true, undefined, true, "KLL_WEB_ARIZA"),
+      getItem("Bakım İş Emirleri", "isEmri1", true, undefined, true, "KLL_WEB_ISEMRI"),
+      getItem("Periyodik Bakımlar", "periyodikBakimlar", true, undefined, true, "KLL_WEB_PBAKIM"),
+      getItem("İş Talepleri", "isTalepleri", true, undefined, true, "KLL_ISTALEBI_KUL"),
+      getItem("Otomatik İş Emirleri", "otomatikIsEmirleri", true, undefined, true, "KLL_WEB_OTOIS"),
+      getItem("Planlama Takvimi", "planlamaTakvimi", true, undefined, true, "KLL_WEB_PTAKVIM"),
+      getItem("İş Emirleri Kontrol Ekranı", "isEmriAnalizi", true, undefined, true, "KLL_WEB_ISEMRI"),
     ],
     false
   ),
@@ -76,11 +78,11 @@ export const rawItems = [
     "malzeme&depo",
     <InboxOutlined />,
     [
-      getItem("Malzeme Tanımıları", "malzemeTanimi", true),
-      getItem("Malzeme Depoları", "malzemeDepolari", true),
-      getItem("Malzeme Girişleri", "malzemeGirisFisi", true),
-      getItem("Malzeme Çıkışları", "malzemeCikisFisi", true),
-      getItem("Malzeme Transferleri", "malzemeTransferFisi", true),
+      getItem("Malzeme Tanımıları", "malzemeTanimi", true, undefined, true, "KLL_WEB_MALZEME"),
+      getItem("Malzeme Depoları", "malzemeDepolari", true, undefined, true, "KLL_WEB_MALDEPO"),
+      getItem("Malzeme Girişleri", "malzemeGirisFisi", true, undefined, true, "KLL_WEB_MALGIRIS"),
+      getItem("Malzeme Çıkışları", "malzemeCikisFisi", true, undefined, true, "KLL_WEB_MALCIKIS"),
+      getItem("Malzeme Transferleri", "malzemeTransferFisi", true, undefined, true, "KLL_WEB_TRANSFER"),
       getItem("Stok Sayımları", "stokSayimlariFisListe", true),
     ],
     false
@@ -90,11 +92,11 @@ export const rawItems = [
     "personelYonetimi",
     <TeamOutlined />,
     [
-      getItem("Atölye / Ekip Tanımları", "atolye", true),
-      getItem("Personel Tanımları", "personeltanimlari", true),
-      getItem("Personel İzinleri", "personelIzinleri", true),
-      getItem("Personel Nöbetleri", "personelNobetleri", true),
-      getItem("Personel Çalışma Planı", "personelCalismaPLani", true),
+      getItem("Atölye / Ekip Tanımları", "atolye", true, undefined, true, "KLL_WEB_ATOLYE"),
+      getItem("Personel Tanımları", "personeltanimlari", true, undefined, true, "KLL_WEB_PERTANIM"),
+      getItem("Personel İzinleri", "personelIzinleri", true, undefined, true, "KLL_WEB_PERIZIN"),
+      getItem("Personel Nöbetleri", "personelNobetleri", true, undefined, true, "KLL_WEB_PERNOBET"),
+      getItem("Personel Çalışma Planı", "personelCalismaPLani", true, undefined, true, "KLL_WEB_PERPLAN"),
     ],
     false
   ),
@@ -109,7 +111,8 @@ export const rawItems = [
       getItem("Fiyat Teklifleri", "fiyatTeklifleri", true),
       getItem("Tedarikçi Firmalar", "tedarikciFirmalar", true),
     ],
-    false
+    false,
+    "KLL_WEB_SATINALMA_MODUL"
   ),
   getItem(
     "Yakıt Yönetimi",
@@ -122,28 +125,29 @@ export const rawItems = [
       getItem("Yakıt Hareketleri", "yakitHareketleri", true),
       getItem("Hızlı Yakıt Girişi", "hizliYakitGirisi", true),
     ],
-    false
+    false,
+    "KLL_WEB_YAKIT_MODUL"
   ),
   getItem(
     "Proje Yönetimi",
     "projeYonetimi",
     <CalculatorOutlined />,
     [getItem("Proje Tanımları", "projeTanimlari2", true), getItem("Proje İlerleme İşlemleri", "projeIlerleme", true), getItem("Proje Yönetimi", "projeYonetimiListe", true)],
-    false
+    false,
+    "KLL_WEB_PROJE_MODUL"
   ),
   getItem(
     "Analizler",
     "analizler1",
     <BarChartOutlined />,
     [
-      getItem("Müdahale Süreleri Analizi", "mudaheleSuresi", true),
-      getItem("Personel KPI Analizi", "analizler", true),
+      getItem("Müdahale Süreleri Analizi", "mudaheleSuresi", true, undefined, true, "KLL_WEB_MUDANALIZ"),
+      getItem("Personel KPI Analizi", "analizler", true, undefined, true, "KLL_WEB_ANALIZ"),
       getItem("Bakım KPI Analizi", "bakimKpi", true),
-      // getItem("Yakıt Tüketimi Analizi", "yakitTuketimiAnalizi", true),
     ],
     false
   ),
-  getItem("Rapor & Formlar", "rapor&formlar", <FileTextOutlined />, [getItem("Rapor Yönetimi", "raporYonetimi", true)], false),
+  getItem("Rapor & Formlar", "rapor&formlar", <FileTextOutlined />, [getItem("Rapor Yönetimi", "raporYonetimi", true, undefined, true, "KLL_WEB_RAPOR")], false),
   getItem(
     "Yönetim",
     "yonetim",
@@ -151,24 +155,28 @@ export const rawItems = [
     [
       getItem("Doküman Yönetimi", "dokumanYonetimi", true),
       getItem("Resim Yönetimi", "resimYonetimi", true),
-      getItem("Lokasyon Tanımları", "lokasyon", true),
-      getItem("Vardiya Tanımları", "vardiyalar", true),
-      getItem("Kod Yönetimi", "kodYonetimi", true),
-      getItem("Otomatik Kodlar", "otomatikKodlar", true),
-      getItem("Servis Öncelik Seviyeleri", "servisOncelikSeviyeleri", true),
-      getItem("İş Emri Tipleri", "isEmriTipleri", true),
+      getItem("Lokasyon Tanımları", "lokasyon", true, undefined, true, "KLL_WEB_LOKASYON"),
+      getItem("Vardiya Tanımları", "vardiyalar", true, undefined, true, "KLL_WEB_VARDIYA"),
+      getItem("Kod Yönetimi", "kodYonetimi", true, undefined, true, "KLL_WEB_KOD"),
+      getItem("Otomatik Kodlar", "otomatikKodlar", true, undefined, true, "KLL_WEB_OTOKOD"),
+      getItem("Servis Öncelik Seviyeleri", "servisOncelikSeviyeleri", true, undefined, true, "KLL_WEB_SERVIS"),
+      getItem("İş Emri Tipleri", "isEmriTipleri", true, undefined, true, "KLL_WEB_ISEMRITIP"),
       getItem(
         "Onay İşlemleri",
         "onayIslemleri",
         "",
-        [getItem("Onay Tanımları", "onayTanimlari", true), getItem("Rol Tanımları", "rolTanimlari", true), getItem("Onaylayıcılar", "onaylayicilar", true)],
+        [
+          getItem("Onay Tanımları", "onayTanimlari", true, undefined, true, "KLL_WEB_ONAY"),
+          getItem("Rol Tanımları", "rolTanimlari", true, undefined, true, "KLL_WEB_ONAY"),
+          getItem("Onaylayıcılar", "onaylayicilar", true, undefined, true, "KLL_WEB_ONAY"),
+        ],
         false
       ),
-      getItem("Proje Tanımları", "projeTanimlari", true),
-      getItem("Kullanıcı Tanımları", "kullaniciTanimlari", true),
-      getItem("Rol Tanımları", "RolTanimlari1", true),
-      getItem("İş Talebi Kullanıcıları", "isTalebiKullanicilari", true),
-      getItem("Ayarlar", "Ayarlar", undefined, undefined, false),
+      getItem("Proje Tanımları", "projeTanimlari", true, undefined, true, "KLL_WEB_PROJE"),
+      getItem("Kullanıcı Tanımları", "kullaniciTanimlari", true, undefined, true, "KLL_WEB_KULLANICI"),
+      getItem("Rol Tanımları", "RolTanimlari1", true, undefined, true, "KLL_WEB_ROL"),
+      getItem("İş Talebi Kullanıcıları", "isTalebiKullanicilari", true, undefined, true, "KLL_WEB_ISTKUL"),
+      getItem("Ayarlar", "Ayarlar", undefined, undefined, false, "KLL_WEB_AYARLAR"),
     ],
     false
   ),
