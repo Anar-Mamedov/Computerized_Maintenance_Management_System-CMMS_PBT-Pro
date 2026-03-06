@@ -162,7 +162,7 @@ function TeslimAlinmamisSiparisler() {
 
   return (
     <ConfigProvider locale={trTR}>
-      <div style={{ width: "100%", height: "100%", borderRadius: "5px", backgroundColor: "white", display: "flex", flexDirection: "column", gap: "10px", border: "1px solid #f0f0f0" }}>
+      <div style={{ width: "100%", height: "150%", borderRadius: "5px", backgroundColor: "white", display: "flex", flexDirection: "column", gap: "10px", border: "1px solid #f0f0f0" }}>
         <div style={{ padding: "10px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <Text strong style={{ fontSize: "16px" }}>Teslim Alınmamış Siparişler</Text>
           <Popover placement="bottom" content={content} trigger="click">

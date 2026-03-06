@@ -4,6 +4,7 @@ import { MoreOutlined } from "@ant-design/icons";
 
 // Componentler
 import Sil from "./components/Sil";
+import DepoDetay from "./components/TarihceOnayTablo";
 
 const { Text } = Typography;
 
@@ -41,6 +42,7 @@ export default function ContextMenu({ selectedRows, refreshTableData }) {
         <>
           {/* Herhangi bir koşula bağlı olmadan Sil gösterilir (disabled false) */}
           <Sil {...commonProps} disabled={false} />
+          <DepoDetay {...commonProps} disabled={false} />
         </>
       )}
     </div>

@@ -9,7 +9,7 @@ import AxiosInstance from "../../../../../../../../../api/http";
 import KodIDSelectbox from "../../../../../../../../../utils/components/KodIDSelectbox";
 import LokasyonTablo from "../../../../../../../../../utils/components/LokasyonTablo";
 import ProjeTablo from "../../../../../../../../../utils/components/ProjeTablo";
-import PersonelTablo from "../../../../../PersonelTablo";
+import PersonelTablo from "../../../../../../components/PersonelTablo";
 import FirmaTablo from "../../../../../../../../../utils/components/FirmaTablo";
 import { PlusOutlined } from "@ant-design/icons";
 

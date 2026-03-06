@@ -1,53 +1,22 @@
 import React from "react";
-import ConditionFilter from "./ConditionFilter";
-import LocationFilter from "./LocationFilter";
-import TypeFilter from "./TypeFilter";
-import CustomFilter from "./custom-filter/CustomFilter";
-import ZamanAraligi from "./ZamanAraligi";
+import LocationFilter from "./LocationFilter"; // Import edilmiş ama aşağıda kullanılmamıştı
+import TankFilter from "./TankFilter";         // Import edilmiş ama aşağıda kullanılmamıştı
+import YakitFilter from "./YakitFilter";
 
-export default function Filters({ onChange, kelime }) {
-  const [filters, setFilters] = React.useState({
-    tabDurumID: [-1], // Kanka burayı array başlattım
-    BasTarih: null,
-    BitTarih: null,
-    Kelime: kelime || "",
-  });
-
-  React.useEffect(() => {
-    onChange("filters", filters);
-  }, [filters, onChange]);
-
-  React.useEffect(() => {
-    setFilters((prev) => ({ ...prev, Kelime: kelime }));
-  }, [kelime]);
+export default function Filters({ onChange }) {
 
   return (
     <>
-      <ConditionFilter
-        onSubmit={(newFilters) =>
-          setFilters((state) => ({
-            ...state,
-            ...newFilters, // tabDurumID artık array gelecek
-          }))
-        }
+      <LocationFilter
+        onSubmit={(newIds) => onChange("LokasyonIds", newIds)}
       />
 
-      <ZamanAraligi
-        onSubmit={(dateRange) =>
-          setFilters((state) => ({
-            ...state,
-            ...dateRange, 
-          }))
-        }
+      <TankFilter
+        onSubmit={(newIds) => onChange("DepoIds", newIds)}
       />
 
-      <CustomFilter
-        onSubmit={(newFilters) =>
-          setFilters((state) => ({
-            ...state,
-            ...newFilters, 
-          }))
-        }
+      <YakitFilter
+        onSubmit={(newIds) => onChange("YakitIds", newIds)}
       />
     </>
   );

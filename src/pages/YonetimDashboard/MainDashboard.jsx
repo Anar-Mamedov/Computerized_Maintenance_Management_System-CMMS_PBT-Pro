@@ -58,6 +58,7 @@ import Component43 from "./components/Component43.jsx";
 // NOT: Bu dosya yollarını kendi proje yapına göre kontrol etmelisin.
 import SatinalmaDashboard from "../SatinalmaYonetimi/Dashboard1/Dashboard.jsx"; 
 import BakimDashboard from "../Analizler/BakimKpiAnalizi/BakimKpiAnalizi.jsx";
+import ProjeYonetimi from "../ProjeYonetimi/ProjeYonetimiListe.jsx";
 
 import "./custom-gridstack.css"; 
 
@@ -116,20 +117,20 @@ const widgetDefaults = {
   widget2: { width: 3, height: 2, minW: 3, minH: 1 },
   widget3: { width: 3, height: 2, minW: 3, minH: 1 },
   widget4: { width: 3, height: 2, minW: 3, minH: 1 },
-  widget5: { width: 7, height: 4, minW: 3, minH: 2 },
+  widget5: { width: 7, height: 3, minW: 3, minH: 2 },
   widget16: { width: 5, height: 3, minW: 3, minH: 2 },
   widget10: { width: 7, height: 3, minW: 3, minH: 2 },
   widget17: { width: 5, height: 3, minW: 3, minH: 2 },
   widget7: { width: 7, height: 3, minW: 3, minH: 2 },
   widget6: { width: 5, height: 4, minW: 3, minH: 2 },
-  widget11: { width: 7, height: 4, minW: 3, minH: 2 },
+  widget11: { width: 5, height: 3, minW: 3, minH: 2 },
   widget8: { width: 5, height: 3, minW: 3, minH: 2 },
   widget13: { width: 7, height: 3, minW: 3, minH: 2 },
   widget9: { width: 7, height: 3, minW: 3, minH: 2 },
   widget14: { width: 5, height: 3, minW: 3, minH: 2 },
-  widget15: { width: 5, height: 4, minW: 3, minH: 2 },
+  widget15: { width: 5, height: 3, minW: 3, minH: 2 },
   widget12: { width: 12, height: 3, minW: 3, minH: 2 },
-  widget18: { width: 5, height: 4, minW: 3, minH: 2 },
+  widget18: { width: 7, height: 3, minW: 3, minH: 2 },
   widget20: { width: 3, height: 1, minW: 3, minH: 1 },
   widget21: { width: 3, height: 1, minW: 3, minH: 1 },
   widget22: { width: 3, height: 1, minW: 3, minH: 1 },
@@ -159,16 +160,15 @@ const widgetDefaults = {
 const tabConfigurations = {
   "yonetici": [
     // --- ÜST SATIR ---
-    { id: "widget1", x: 0, y: 0, width: 3, height: 2, minW: 2, minH: 1 },
-    { id: "widget2", x: 3, y: 0, width: 3, height: 2, minW: 2, minH: 1 },
-    { id: "widget3", x: 6, y: 0, width: 3, height: 2, minW: 2, minH: 1 },
-    { id: "widget4", x: 9, y: 0, width: 3, height: 2, minW: 2, minH: 1 },
+    { id: "widget1", x: 0, y: 0, width: 3, height: 1, minW: 2, minH: 1 },
+    { id: "widget2", x: 3, y: 0, width: 3, height: 1, minW: 2, minH: 1 },
+    { id: "widget3", x: 6, y: 0, width: 3, height: 1, minW: 2, minH: 1 },
+    { id: "widget4", x: 9, y: 0, width: 3, height: 1, minW: 2, minH: 1 },
 
-    { id: "widget11", x: 0, y: 5, ...widgetDefaults["widget11"] },
-    { id: "widget18", x: 7, y: 5, ...widgetDefaults["widget18"] },
-
-    // --- ORTA SATIRLAR ---
     { id: "widget5", x: 0, y: 5, ...widgetDefaults["widget5"] },
+    { id: "widget11", x: 7, y: 5, ...widgetDefaults["widget11"] },
+
+    { id: "widget18", x: 0, y: 5, ...widgetDefaults["widget18"] },
     { id: "widget15", x: 7, y: 5, ...widgetDefaults["widget15"] },
 
     // --- EN ALT SATIR (Footer) ---
@@ -532,6 +532,7 @@ function MainDashboard() {
 
   const items = [
     { key: 'yonetici', label: 'Yönetici Özeti' },
+    { key: 'proje', label: 'Proje Yönetimi' },
     { key: 'operasyon', label: 'Operasyon' },
     { key: 'makine', label: 'Makine' },
     { key: 'satinalma', label: 'Satınalma' },
@@ -587,6 +588,7 @@ function MainDashboard() {
               {/* HARİCİ SAYFALAR İÇİN */}
               {activeTab === 'satinalma' && <SatinalmaDashboard />}
               {activeTab === 'bakim' && <BakimDashboard />}
+              {activeTab === 'proje' && <ProjeYonetimi />}
             </div>
           </div>
         </AppProvider>
