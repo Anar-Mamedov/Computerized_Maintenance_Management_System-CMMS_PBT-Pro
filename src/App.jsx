@@ -2,20 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import { Route, Routes, Link, useLocation, Outlet, Navigate } from "react-router-dom";
 import { Breadcrumb, Layout, Menu, theme, Button, Typography, Input, Modal } from "antd";
 import {
-  DesktopOutlined,
-  FileOutlined,
-  PieChartOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
-  TeamOutlined,
-  ToolOutlined,
-  InboxOutlined,
-  ShoppingCartOutlined,
-  BarChartOutlined,
-  FileTextOutlined,
-  SettingOutlined,
-  AppstoreOutlined,
-  FireOutlined,
 } from "@ant-design/icons";
 import Draggable from "react-draggable";
 // import Isemri from "./pages/DashboardAnalytics2/Isemri";
@@ -98,16 +86,7 @@ const { Header, Content, Footer, Sider } = Layout;
 
 const loginData = JSON.parse(localStorage.getItem("login")) || JSON.parse(sessionStorage.getItem("login")) || {};
 
-function getItem(labelText, key, icon, children, isClickable = true) {
-  return {
-    key,
-    icon,
-    children,
-    label: isClickable ? <Link to={`/${key}`}>{labelText}</Link> : labelText,
-    labelText,
-    isClickable,
-  };
-}
+import { rawItems } from "./menuItems";
 
 function filterItems(items) {
   // LocalStorage'dan token kontrolü
@@ -152,182 +131,6 @@ function flattenMenuItems(items) {
   return result;
 }
 
-// Domain kontrolü menü için
-const menuHostname = window.location.hostname;
-const isOmegaMenu = menuHostname === "omegaerp.net" || menuHostname === "www.omegaerp.net";
-
-const rawItems = [
-  getItem("Dashboard", "", <PieChartOutlined />),
-  // getItem("Option 1", "option1", <PieChartOutlined />),
-  // getItem("Option 2", "option2", <DesktopOutlined />),
-  getItem(
-    "Ekipman Yönetimi",
-    "makine&ekipman",
-    <AppstoreOutlined />,
-    [
-      getItem("Ekipman Tanımları", "makine", true),
-      getItem("Alt Ekipman Veritabanı", "ekipmanVeritabani", true),
-      getItem("Duruş Takibi", "durusTakibi", true),
-      getItem("Sayaç Güncellemeleri", "sayacGuncelleme", true),
-      // getItem("Team 2", "team2", true)
-    ],
-    false
-  ),
-  getItem(
-    "Operasyon Yönetimi",
-    "operasyonYonetimi",
-    <AppstoreOutlined />,
-    [
-      getItem("Günlük Ekipman Puantaj Girişi", "gunlukMakinePuantajGirisi", true),
-      getItem("Aylık Ekipman Puantajları", "aylikMakinePuantajlari", true),
-      getItem("Ekipman Puantaj Takibi", "makinePuantajTakibi", true),
-      getItem("Operasyon Takibi", "operasyonTakibi", true),
-    ],
-    false
-  ),
-  getItem(
-    "Bakım Yönetimi",
-    "bakim&ariza",
-    <ToolOutlined />,
-    [
-      // getItem("Tom", "tom", true),
-      getItem("Bakım Planları", "bakimTanimlari", true),
-      getItem("Arıza Kodları", "arizaTanimlari", true),
-      // getItem("İş Emri", "isemri", true),
-      getItem("Bakım İş Emirleri", "isEmri1", true),
-      getItem("Periyodik Bakımlar", "periyodikBakimlar", true),
-      getItem("İş Talepleri", "isTalepleri", true),
-      getItem("Otomatik İş Emirleri", "otomatikIsEmirleri", true),
-      getItem("Planlama Takvimi", "planlamaTakvimi", true),
-      getItem("İş Emirleri Kontrol Ekranı", "isEmriAnalizi", true),
-      // getItem("Müdahale Süresi Analizi", "mudaheleSuresi", true),
-      // getItem("Alex", "alex", true)
-    ],
-    false
-  ),
-  getItem(
-    "Malzeme & Depo Yönetimi",
-    "malzeme&depo",
-    <InboxOutlined />,
-    [
-      getItem("Malzeme Tanımıları", "malzemeTanimi", true),
-      getItem("Malzeme Depoları", "malzemeDepolari", true),
-      getItem("Malzeme Girişleri", "malzemeGirisFisi", true),
-      getItem("Malzeme Çıkışları", "malzemeCikisFisi", true),
-      getItem("Malzeme Transferleri", "malzemeTransferFisi", true),
-      /*  getItem("Stok Sayımları", "stokSayimlari", true),
-      getItem("Hızlı Maliyetlendirme", "hizliMaliyetlendirme", true),
-      getItem("Malzeme Transfer Onay İşlemleri", "malzemeTransferOnayIslemleri", true), */
-      // getItem("Team 2", "team2", true)
-    ],
-    false
-  ),
-
-  getItem(
-    "Personel Yönetimi",
-    "personelYonetimi",
-    <TeamOutlined />,
-    [
-      getItem("Atölye / Ekip Tanımları", "atolye", true),
-      getItem("Personel Tanımları", "personeltanimlari", true),
-      getItem("Personel İzinleri", "personelIzinleri", true),
-      getItem("Personel Nöbetleri", "personelNobetleri", true),
-      getItem("Personel Çalışma Planı", "personelCalismaPLani", true),
-
-      // getItem("Team 2", "team2", true)
-    ],
-    false
-  ),
-  getItem(
-    "Satımalma Yönetimi",
-    "satinalmaYonetimi",
-    <ShoppingCartOutlined />,
-    [
-      ...(isOmegaMenu ? [] : [getItem("Satınalma Yönetici Paneli", "satinalmaDashboard", true)]),
-      getItem("Malzeme Talepleri", "malzemeTalepleri", true),
-      getItem("Satınalma Siparişleri", "satinalmaSiparisleri", true),
-      getItem("Fiyat Teklifleri", "fiyatTeklifleri", true),
-      getItem("Tedarikçi Firmalar", "tedarikciFirmalar", true),
-
-      // getItem("Team 2", "team2", true)
-    ],
-    false
-  ),
-
-  getItem(
-    "Yakıt Yönetimi",
-    "yakitYonetimi",
-    <FireOutlined />,
-    [
-      getItem("Yakıt Tanımları", "yakitTanimlari", true),
-      getItem("Yakıt Stokları", "yakitStoklari", true),
-      getItem("Yakıt Girişleri", "yakitGirisleri", true),
-      getItem("Yakıt Hareketleri", "yakitHareketleri", true),
-      getItem("Hızlı Yakıt Girişi", "hizliYakitGirisi", true),
-
-      // getItem("Team 2", "team2", true)
-    ],
-    false
-  ),
-  getItem(
-    "Analizler",
-    "analizler1",
-    <BarChartOutlined />,
-    [
-      getItem("Müdahale Süreleri Analizi", "mudaheleSuresi", true),
-      getItem("Personel KPI Analizi", "analizler", true),
-      getItem("Bakım KPI Analizi", "bakimKpi", true),
-      getItem("Yakıt Tüketimi Analizi", "yakitTuketimiAnalizi", true),
-
-      // getItem("Team 2", "team2", true)
-    ],
-    false
-  ),
-  getItem(
-    "Rapor & Formlar",
-    "rapor&formlar",
-    <FileTextOutlined />,
-    [
-      getItem("Rapor Yönetimi", "raporYonetimi", true),
-      // getItem("Form Yönetimi", "formYonetimi", true),
-      // getItem("Team 2", "team2", true)
-    ],
-    false
-  ),
-  getItem(
-    "Yönetim",
-    "yonetim",
-    <SettingOutlined />,
-    [
-      getItem("Lokasyon Tanımları", "lokasyon", true),
-      getItem("Vardiya Tanımları", "vardiyalar", true),
-      getItem("Kod Yönetimi", "kodYonetimi", true),
-      getItem("Otomatik Kodlar", "otomatikKodlar", true),
-      getItem("Servis Öncelik Seviyeleri", "servisOncelikSeviyeleri", true),
-      getItem("İş Emri Tipleri", "isEmriTipleri", true),
-      getItem(
-        "Onay İşlemleri",
-        "onayIslemleri",
-        "",
-        [
-          getItem("Onay Tanımları", "onayTanimlari", true),
-          getItem("Rol Tanımları", "rolTanimlari", true),
-          getItem("Onaylayıcılar", "onaylayicilar", true),
-          // getItem("Kurallar", "kurallar", true),
-        ],
-        false
-      ),
-      getItem("Proje Tanımları", "projeTanimlari", true),
-      getItem("Kullanıcı Tanımları", "kullaniciTanimlari", true),
-      getItem("Rol Tanımları", "RolTanimlari1", true),
-      getItem("İş Talebi Kullanıcıları", "isTalebiKullanicilari", true),
-      getItem("Ayarlar", "Ayarlar", undefined, undefined, false),
-      // getItem("Team 2", "team2", true)
-    ],
-    false
-  ),
-  // getItem("Files", "files", <FileOutlined />),
-];
 
 // const Option1Page = () => <div>Option 1 Content</div>;
 // const BillPage = () => <div>Bill is a cat.</div>;
