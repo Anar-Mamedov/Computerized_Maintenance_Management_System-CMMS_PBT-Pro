@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Form, Input, Typography, message, Spin, Checkbox, Modal } from "antd";
 import { UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
@@ -21,6 +21,18 @@ export default function LoginForm() {
   const [recaptchaToken, setRecaptchaToken] = useState(null); // reCAPTCHA token'ı için state
   const [isRecaptchaEnabled] = useState(true); // Toggle etmek için true/false yapın
   const [licenseModalVisible, setLicenseModalVisible] = useState(false);
+
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+
+  useEffect(() => {
+    if (token) {
+      navigate("/", { replace: true });
+    }
+  }, [navigate, token]);
+
+  if (token) {
+    return null; // Ekranın anlık görünmesini engellemek için boş render
+  }
 
   // Lisans kontrolü fonksiyonu
   const checkLicense = async () => {
@@ -116,7 +128,7 @@ export default function LoginForm() {
         const anar = localStorage.getItem("login") || sessionStorage.getItem("login");
         console.log(anar);
         message.success("Giriş başarılı!");
-        navigate("/");
+        navigate("/", { replace: true });
       } else {
         message.error("Giriş başarısız!");
         console.error("Token not received from API");
