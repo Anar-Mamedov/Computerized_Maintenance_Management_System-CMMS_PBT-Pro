@@ -8,9 +8,15 @@ import MainTabs from "./components/MainTabs/MainTabs";
 import Footer from "../Footer";
 import dayjs from "dayjs";
 
-export default function CreateDrawer({ onRefresh }) {
+export default function CreateDrawer({ onRefresh, isVisible, onDrawerClose }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isVisible !== undefined) {
+      setOpen(isVisible);
+    }
+  }, [isVisible]);
 
   const methods = useForm({
     defaultValues: {
@@ -73,6 +79,7 @@ export default function CreateDrawer({ onRefresh }) {
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("Ekleme Başarılı.");
           setOpen(false);
+          if (onDrawerClose) onDrawerClose();
           onRefresh();
           methods.reset();
         } else if (response.status_code === 401) {
@@ -99,6 +106,7 @@ export default function CreateDrawer({ onRefresh }) {
       cancelText: "Hayır",
       onOk: () => {
         setOpen(false);
+        if (onDrawerClose) onDrawerClose();
         methods.reset();
       },
     });
@@ -133,10 +141,12 @@ export default function CreateDrawer({ onRefresh }) {
   return (
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
-        <Button type="primary" onClick={showDrawer} style={{ display: "flex", alignItems: "center" }}>
-          <PlusOutlined />
-          Ekle
-        </Button>
+        {isVisible === undefined && (
+          <Button type="primary" onClick={showDrawer} style={{ display: "flex", alignItems: "center" }}>
+            <PlusOutlined />
+            Ekle
+          </Button>
+        )}
         <Drawer
           width="550px"
           title="Ekipman Tanımı Ekle"

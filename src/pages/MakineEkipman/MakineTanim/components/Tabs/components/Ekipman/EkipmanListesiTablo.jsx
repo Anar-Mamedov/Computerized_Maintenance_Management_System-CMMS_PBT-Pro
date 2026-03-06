@@ -3,7 +3,7 @@ import { Table } from "antd";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import AxiosInstance from "../../../../../../../api/http";
-import CreateModal from "./Insert/CreateModal";
+import EkleButton from "./Insert/EkleButton";
 import ContextMenu from "./components/ContextMenu/ContextMenu.jsx";
 import EditDrawer from "../../../../../EkipmanVeritabani/Update/EditDrawer.jsx";
 
@@ -23,35 +23,71 @@ export default function EkipmanListesiTablo({ isActive = false }) {
 
   const kapali = watch("kapali");
 
-  const buildTreeData = useCallback((items) => {
-    const nodes = {};
-    const tree = [];
+  const formatDataForTable = useCallback((items) => {
+    const list = Array.isArray(items) ? items : [];
 
-    items.forEach((item) => {
-      nodes[item.ID] = {
+    return list.map((item, index) => {
+      const treeNodeId = Number(item.TB_EKIPMAN_ID ?? item.id ?? item.RowIndex ?? index + 1);
+      return {
         ...item,
-        key: item.ID,
-        children: [],
+        KOD: item.EKP_KOD ?? item.kod ?? item.KOD ?? null,
+        TANIM: item.EKP_TANIM ?? item.tanim ?? item.TANIM ?? null,
+        TIP: item.EKP_TIP ?? item.tipi ?? item.TIP ?? null,
+        IMAGE: item.IMAGE ?? null, // Assuming IMAGE stays the same
+        key: item.TB_EKIPMAN_ID ?? item.id ?? treeNodeId,
+        children: item.hasChild ? [] : undefined,
       };
     });
-
-    items.forEach((item) => {
-      const parentId = Number(item.PARENT_ID);
-      if (parentId && nodes[parentId]) {
-        nodes[parentId].children.push(nodes[item.ID]);
-      } else {
-        tree.push(nodes[item.ID]);
-      }
-    });
-
-    Object.values(nodes).forEach((node) => {
-      if (node.children.length === 0) {
-        delete node.children;
-      }
-    });
-
-    return tree;
   }, []);
+
+  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
+
+  const onTableRowExpand = (expanded, record) => {
+    setExpandedRowKeys((prevKeys) => {
+      if (expanded) {
+        return [...prevKeys, record.key];
+      } else {
+        return prevKeys.filter((key) => key !== record.key);
+      }
+    });
+
+    if (expanded && record.hasChild && record.children && record.children.length === 0) {
+      setLoading(true);
+
+      AxiosInstance.post(`GetEkipmanVeritabaniListe`, {
+        ItemIndex: 3,
+        DepoId: -1,
+        Parametre: "",
+        parentID: record.key,
+      })
+        .then((response) => {
+          if (response) {
+            const childrenDataList = Array.isArray(response) ? response : response.list || [];
+            const childrenData = formatDataForTable(childrenDataList);
+
+            const updateTreeData = (dataList) => {
+              return dataList.map((item) => {
+                if (item.key === record.key) {
+                  return { ...item, children: childrenData };
+                } else if (item.children) {
+                  return { ...item, children: updateTreeData(item.children) };
+                } else {
+                  return item;
+                }
+              });
+            };
+
+            setData((prevData) => updateTreeData(prevData));
+          }
+        })
+        .catch((error) => {
+          console.error("API Error:", error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  };
 
   const findItemInTree = (key, tree) => {
     for (const item of tree) {
@@ -128,11 +164,19 @@ export default function EkipmanListesiTablo({ isActive = false }) {
   const fetch = useCallback(() => {
     if (isActive && secilenIsEmriID) {
       setLoading(true);
-      AxiosInstance.get(`GetEkipmanMakineListWeb?parametre=&MakineID=${secilenIsEmriID}`)
+      setExpandedRowKeys([]); // Reset expanded rows on root fetch
+      AxiosInstance.post(`GetEkipmanVeritabaniListe`, {
+        ItemIndex: 3,
+        DepoId: -1,
+        Parametre: "",
+        parentID: secilenIsEmriID,
+      })
         .then((response) => {
-          const list = Array.isArray(response?.list) ? response.list : [];
-          const tree = buildTreeData(list);
-          setData(tree);
+          if (response) {
+            const list = Array.isArray(response) ? response : response.list || [];
+            const tree = formatDataForTable(list);
+            setData(tree);
+          }
         })
         .catch((error) => {
           // Hata işleme
@@ -140,7 +184,7 @@ export default function EkipmanListesiTablo({ isActive = false }) {
         })
         .finally(() => setLoading(false));
     }
-  }, [buildTreeData, secilenIsEmriID, isActive]); // secilenIsEmriID değiştiğinde fetch fonksiyonunu güncelle
+  }, [formatDataForTable, secilenIsEmriID, isActive]); // secilenIsEmriID değiştiğinde fetch fonksiyonunu güncelle
 
   useEffect(() => {
     if (secilenIsEmriID || isActive) {
@@ -169,9 +213,9 @@ export default function EkipmanListesiTablo({ isActive = false }) {
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
         <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTable} />
-        <CreateModal kapali={kapali} onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />
+        <EkleButton kapali={kapali} onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />
       </div>
 
       <Table
@@ -184,6 +228,8 @@ export default function EkipmanListesiTablo({ isActive = false }) {
         dataSource={data}
         loading={loading}
         pagination={false}
+        expandedRowKeys={expandedRowKeys}
+        onExpand={onTableRowExpand}
         scroll={{
           // x: "auto",
           y: "calc(100vh - 360px)",

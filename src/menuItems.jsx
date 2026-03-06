@@ -43,22 +43,18 @@ export const rawItems = [
     ],
     false
   ),
-  ...(isOmegaMenu
-    ? [
-        getItem(
-          "Operasyon Yönetimi",
-          "operasyonYonetimi",
-          <AppstoreOutlined />,
-          [
-            getItem("Günlük Ekipman Puantaj Girişi", "gunlukMakinePuantajGirisi", true),
-            getItem("Aylık Ekipman Puantajları", "aylikMakinePuantajlari", true),
-            getItem("Ekipman Puantaj Takibi", "makinePuantajTakibi", true),
-            getItem("Operasyon Takibi", "operasyonTakibi", true),
-          ],
-          false
-        ),
-      ]
-    : []),
+  getItem(
+    "Operasyon Yönetimi",
+    "operasyonYonetimi",
+    <AppstoreOutlined />,
+    [
+      getItem("Günlük Ekipman Puantaj Girişi", "gunlukMakinePuantajGirisi", true),
+      getItem("Aylık Ekipman Puantajları", "aylikMakinePuantajlari", true),
+      getItem("Ekipman Puantaj Takibi", "makinePuantajTakibi", true),
+      getItem("Operasyon Takibi", "operasyonTakibi", true),
+    ],
+    false
+  ),
   getItem(
     "Bakım Yönetimi",
     "bakim&ariza",
@@ -102,55 +98,39 @@ export const rawItems = [
     ],
     false
   ),
-  ...(isOmegaMenu
-    ? [
-        getItem(
-          "Satınalma Yönetimi",
-          "satinalmaYonetimi",
-          <ShoppingCartOutlined />,
-          [
-            ...(isOmegaMenu ? [] : [getItem("Satınalma Yönetici Paneli", "satinalmaDashboard", true)]),
-            getItem("Malzeme Talepleri", "malzemeTalepleri", true),
-            getItem("Satınalma Siparişleri", "satinalmaSiparisleri", true),
-            getItem("Fiyat Teklifleri", "fiyatTeklifleri", true),
-            getItem("Tedarikçi Firmalar", "tedarikciFirmalar", true),
-          ],
-          false
-        ),
-      ]
-    : []),
-  ...(isOmegaMenu
-    ? [
-        getItem(
-          "Yakıt Yönetimi",
-          "yakitYonetimi",
-          <FireOutlined />,
-          [
-            getItem("Yakıt Tanımları", "yakitTanimlari", true),
-            getItem("Yakıt Stokları", "yakitStoklari", true),
-            getItem("Yakıt Girişleri", "yakitGirisleri", true),
-            getItem("Yakıt Hareketleri", "yakitHareketleri", true),
-            getItem("Hızlı Yakıt Girişi", "hizliYakitGirisi", true),
-          ],
-          false
-        ),
-      ]
-    : []),
-  ...(isOmegaMenu
-    ? [
-        getItem(
-          "Proje Yönetimi",
-          "projeYonetimi",
-          <CalculatorOutlined />,
-          [
-            getItem("Proje Tanımları", "projeTanimlari2", true),
-            getItem("Proje İlerleme İşlemleri", "projeIlerleme", true),
-            ...(isOmegaMenu ? [] : [getItem("Proje Yönetimi", "projeYonetimiListe", true)]),
-          ],
-          false
-        ),
-      ]
-    : []),
+  getItem(
+    "Satınalma Yönetimi",
+    "satinalmaYonetimi",
+    <ShoppingCartOutlined />,
+    [
+      getItem("Satınalma Yönetici Paneli", "satinalmaDashboard", true),
+      getItem("Malzeme Talepleri", "malzemeTalepleri", true),
+      getItem("Satınalma Siparişleri", "satinalmaSiparisleri", true),
+      getItem("Fiyat Teklifleri", "fiyatTeklifleri", true),
+      getItem("Tedarikçi Firmalar", "tedarikciFirmalar", true),
+    ],
+    false
+  ),
+  getItem(
+    "Yakıt Yönetimi",
+    "yakitYonetimi",
+    <FireOutlined />,
+    [
+      getItem("Yakıt Tanımları", "yakitTanimlari", true),
+      getItem("Yakıt Stokları", "yakitStoklari", true),
+      getItem("Yakıt Girişleri", "yakitGirisleri", true),
+      getItem("Yakıt Hareketleri", "yakitHareketleri", true),
+      getItem("Hızlı Yakıt Girişi", "hizliYakitGirisi", true),
+    ],
+    false
+  ),
+  getItem(
+    "Proje Yönetimi",
+    "projeYonetimi",
+    <CalculatorOutlined />,
+    [getItem("Proje Tanımları", "projeTanimlari2", true), getItem("Proje İlerleme İşlemleri", "projeIlerleme", true), getItem("Proje Yönetimi", "projeYonetimiListe", true)],
+    false
+  ),
   getItem(
     "Analizler",
     "analizler1",
@@ -163,15 +143,7 @@ export const rawItems = [
     ],
     false
   ),
-  getItem(
-    "Rapor & Formlar",
-    "rapor&formlar",
-    <FileTextOutlined />,
-    [
-      getItem("Rapor Yönetimi", "raporYonetimi", true),
-    ],
-    false
-  ),
+  getItem("Rapor & Formlar", "rapor&formlar", <FileTextOutlined />, [getItem("Rapor Yönetimi", "raporYonetimi", true)], false),
   getItem(
     "Yönetim",
     "yonetim",
@@ -189,11 +161,7 @@ export const rawItems = [
         "Onay İşlemleri",
         "onayIslemleri",
         "",
-        [
-          getItem("Onay Tanımları", "onayTanimlari", true),
-          getItem("Rol Tanımları", "rolTanimlari", true),
-          getItem("Onaylayıcılar", "onaylayicilar", true),
-        ],
+        [getItem("Onay Tanımları", "onayTanimlari", true), getItem("Rol Tanımları", "rolTanimlari", true), getItem("Onaylayıcılar", "onaylayicilar", true)],
         false
       ),
       getItem("Proje Tanımları", "projeTanimlari", true),

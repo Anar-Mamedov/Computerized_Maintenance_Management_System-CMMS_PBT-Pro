@@ -6,8 +6,14 @@ import { Controller, useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
 import dayjs from "dayjs";
 
-export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID, kapali }) {
+export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID, kapali, isVisible, onModalClose }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  useEffect(() => {
+    if (isVisible !== undefined) {
+      setIsModalVisible(isVisible);
+    }
+  }, [isVisible]);
   const [selectedIds, setSelectedIds] = useState([]);
   const methods = useForm({
     defaultValues: {
@@ -43,6 +49,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
           message.success("Ekleme Başarılı.");
           reset();
           setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
+          if (onModalClose) onModalClose();
           onRefresh();
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
@@ -63,6 +70,8 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     setIsModalVisible((prev) => !prev);
     if (!isModalVisible) {
       reset();
+    } else {
+      if (onModalClose) onModalClose();
     }
   };
 
@@ -83,9 +92,11 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
             marginBottom: "10px",
           }}
         >
-          <Button disabled={kapali} type="link" onClick={handleModalToggle}>
-            <PlusOutlined /> Yeni Kayıt
-          </Button>
+          {isVisible === undefined && (
+            <Button disabled={kapali} type="link" onClick={handleModalToggle}>
+              <PlusOutlined /> Yeni Kayıt
+            </Button>
+          )}
         </div>
 
         <Modal width="985px" title="Ekipman Ekle" destroyOnClose centered open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
