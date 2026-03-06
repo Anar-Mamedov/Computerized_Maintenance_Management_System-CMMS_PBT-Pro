@@ -16,8 +16,8 @@ const PageWrapper = styled.div`
 `;
 
 const Sidebar = styled.div`
-  width: 280px;
-  min-width: 280px;
+  width: 400px;
+  min-width: 400px;
   border-right: 1px solid #f0f0f0;
   display: flex;
   flex-direction: column;
@@ -269,8 +269,7 @@ export default function KodYonetimi() {
 
   // Filtrelenmiş gruplar
   const filteredGruplar = kodGruplari.filter(
-    (grup) =>
-      normalizeString(grup.KGP_TANIM).includes(normalizeString(grupSearchTerm)) || normalizeString(grup.KGP_KOD).includes(normalizeString(grupSearchTerm))
+    (grup) => normalizeString(grup.KGP_TANIM).includes(normalizeString(grupSearchTerm)) || normalizeString(grup.KGP_KOD).includes(normalizeString(grupSearchTerm))
   );
 
   // Filtrelenmiş kodlar
@@ -311,9 +310,7 @@ export default function KodYonetimi() {
       key: "actions",
       width: 50,
       align: "center",
-      render: (_, record) => (
-        <Button type="text" danger icon={<DeleteOutlined />} onClick={() => handleDelete(record)} />
-      ),
+      render: (_, record) => <Button type="text" danger icon={<DeleteOutlined />} onClick={() => handleDelete(record)} />,
     },
   ];
 
