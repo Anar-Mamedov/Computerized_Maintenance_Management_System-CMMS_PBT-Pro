@@ -4,7 +4,6 @@ import { Button, message, Popconfirm } from "antd";
 import { DeleteOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 
 export default function Sil({ selectedRows, refreshTableData, hidePopover }) {
-
   // Silme işlemini tetikleyecek fonksiyon
   const handleDelete = async () => {
     let isError = false;
@@ -13,16 +12,21 @@ export default function Sil({ selectedRows, refreshTableData, hidePopover }) {
       try {
         // Silme API isteğini gönder
         const response = await AxiosInstance.post(`DeleteLokasyonBy?lokasyonId=${row}`);
-        console.log("Silme işlemi başarılı:", response);
+        console.log("Silme işlemi yanıtı:", response);
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("İşlem Başarılı.");
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+          isError = true;
         } else {
-          message.error("Ekleme Başarısız.");
+          message.error(response.status || "İşlem Başarısız.");
+          isError = true;
         }
         // Burada başarılı silme işlemi sonrası yapılacak işlemler bulunabilir.
       } catch (error) {
+        isError = true;
+        const errorMessage = error.response?.data?.status || "Silme işlemi sırasında hata oluştu.";
+        message.error(errorMessage);
         console.error("Silme işlemi sırasında hata oluştu:", error);
       }
     }
@@ -32,7 +36,6 @@ export default function Sil({ selectedRows, refreshTableData, hidePopover }) {
       hidePopover(); // Silme işlemi başarılı olursa Popover'ı kapat
     }
   };
-
 
   return (
     <div>
