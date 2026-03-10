@@ -180,7 +180,12 @@ const MainTable = ({ setSelectedIds }) => {
   const ozelAlanlarEkipman = JSON.parse(localStorage.getItem("ozelAlanlarMakine"));
 
   // Özel Alanların nameleri backend çekmek için api isteği sonu
-  const initialColumns = useColumns({ label });
+  const initialColumns = useColumns({
+    label,
+    onOpenEdit: (record) => {
+      setDrawer({ visible: true, data: record });
+    },
+  });
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 

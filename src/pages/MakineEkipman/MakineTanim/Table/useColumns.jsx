@@ -48,14 +48,14 @@ const specialFieldConfigs = [
   ["OZL_OZEL_ALAN_20", "MKN_OZEL_ALAN_20"],
 ];
 
-export default function useColumns({ label }) {
+export default function useColumns({ label, onOpenEdit }) {
   return [
     createColumn("#", "key", { width: 100, visible: false }),
     createColumn("Belge", "MKN_BELGE_VAR", { width: 100, visible: false, render: renderBooleanIcon }),
     createColumn("Resim", "MKN_RESIM_VAR", { width: 100, visible: false, render: renderBooleanIcon }),
     createColumn("Periyodik Bakım", "MKN_PERIYODIK_BAKIM", { width: 100, visible: false, render: renderBooleanIcon }),
-    createColumn("Ekipman Kodu", "MKN_KOD", { width: 150, visible: true, render: (text) => <a>{text}</a> }),
-    createColumn("Ekipman Tanımı", "MKN_TANIM", { width: 250, visible: true, render: (text) => <a>{text}</a> }),
+    createColumn("Ekipman Kodu", "MKN_KOD", { width: 150, visible: true, render: (text, record) => <a onClick={() => onOpenEdit?.(record)}>{text}</a> }),
+    createColumn("Ekipman Tanımı", "MKN_TANIM", { width: 250, visible: true, render: (text, record) => <a onClick={() => onOpenEdit?.(record)}>{text}</a> }),
     createColumn("Aktif", "MKN_AKTIF", { width: 100, visible: false, render: renderBooleanIcon }),
     createColumn("Ekipman Durumu", "MKN_DURUM", { width: 150, visible: false }),
     createColumn("Lokasyon", "MKN_LOKASYON", { width: 150, visible: true }),
