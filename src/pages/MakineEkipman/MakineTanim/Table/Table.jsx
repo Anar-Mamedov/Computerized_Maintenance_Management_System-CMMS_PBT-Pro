@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
-import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { HolderOutlined, SearchOutlined, MenuOutlined } from "@ant-design/icons";
+import useColumns from "./useColumns";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -115,6 +116,8 @@ const MainTable = ({ setSelectedIds }) => {
   const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
   const [totalDataCount, setTotalDataCount] = useState(0); // Tüm veriyi tutan state
   const [pageSize, setPageSize] = useState(20); // Başlangıçta sayfa başına 20 kayıt göster
+  const [sortField, setSortField] = useState(null);
+  const [sortOrder, setSortOrder] = useState(null);
 
   // edit drawer için
   const [drawer, setDrawer] = useState({
@@ -177,972 +180,7 @@ const MainTable = ({ setSelectedIds }) => {
   const ozelAlanlarEkipman = JSON.parse(localStorage.getItem("ozelAlanlarMakine"));
 
   // Özel Alanların nameleri backend çekmek için api isteği sonu
-  const initialColumns = [
-    {
-      title: "#",
-      dataIndex: "key",
-      key: "key",
-      width: 100,
-      ellipsis: true,
-      visible: false, // Varsayılan olarak açık
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      sorter: (a, b) => a.key - b.key,
-    },
-    {
-      title: "Belge",
-      dataIndex: "MKN_BELGE_VAR",
-      key: "MKN_BELGE_VAR",
-      width: 100,
-      ellipsis: true,
-      visible: false, // Varsayılan olarak açık
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      sorter: (a, b) => (a.MKN_BELGE_VAR === b.MKN_BELGE_VAR ? 0 : a.MKN_BELGE_VAR ? -1 : 1),
-      render: (text) => <div style={{ textAlign: "center" }}>{text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}</div>,
-    },
-    {
-      title: "Resim",
-      dataIndex: "MKN_RESIM_VAR",
-      key: "MKN_RESIM_VAR",
-      width: 100,
-      ellipsis: true,
-      visible: false, // Varsayılan olarak açık
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      sorter: (a, b) => (a.MKN_RESIM_VAR === b.MKN_RESIM_VAR ? 0 : a.MKN_RESIM_VAR ? -1 : 1),
-      render: (text) => <div style={{ textAlign: "center" }}>{text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}</div>,
-    },
-    {
-      title: "Periyodik Bakım",
-      dataIndex: "MKN_PERIYODIK_BAKIM",
-      key: "MKN_PERIYODIK_BAKIM",
-      width: 100,
-      ellipsis: true,
-      visible: false, // Varsayılan olarak açık
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      sorter: (a, b) => (a.MKN_PERIYODIK_BAKIM === b.MKN_PERIYODIK_BAKIM ? 0 : a.MKN_PERIYODIK_BAKIM ? -1 : 1),
-      render: (text) => <div style={{ textAlign: "center" }}>{text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}</div>,
-    },
-    {
-      title: "Ekipman Kodu",
-      dataIndex: "MKN_KOD",
-      key: "MKN_KOD",
-      width: 150,
-      ellipsis: true,
-      visible: true, // Varsayılan olarak açık
-      render: (text) => <a>{text}</a>,
-      sorter: (a, b) => {
-        if (a.MKN_KOD === null) return -1;
-        if (b.MKN_KOD === null) return 1;
-        return a.MKN_KOD.localeCompare(b.MKN_KOD);
-      },
-    },
-    {
-      title: "Ekipman Tanımı",
-      dataIndex: "MKN_TANIM",
-      key: "MKN_TANIM",
-      width: 250,
-      ellipsis: true,
-      sorter: (a, b) => {
-        if (a.MKN_TANIM === null) return -1;
-        if (b.MKN_TANIM === null) return 1;
-        return a.MKN_TANIM.localeCompare(b.MKN_TANIM);
-      },
-      visible: true, // Varsayılan olarak açık
-      render: (text) => <a>{text}</a>,
-    },
-    {
-      title: "Aktif",
-      dataIndex: "MKN_AKTIF",
-      key: "MKN_AKTIF",
-      width: 100,
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false, // Varsayılan olarak açık
-      render: (text) => <div style={{ textAlign: "center" }}>{text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}</div>,
-      sorter: (a, b) => {
-        if (a.MKN_AKTIF === null) return -1;
-        if (b.MKN_AKTIF === null) return 1;
-        return a.MKN_AKTIF === b.MKN_AKTIF ? 0 : a.MKN_AKTIF ? -1 : 1;
-      },
-    },
-
-    {
-      title: "Ekipman Durumu",
-      dataIndex: "MKN_DURUM",
-      key: "MKN_DURUM",
-      width: 150,
-      ellipsis: true,
-      sorter: (a, b) => {
-        if (a.MKN_DURUM === null) return -1;
-        if (b.MKN_DURUM === null) return 1;
-        return a.MKN_DURUM.localeCompare(b.MKN_DURUM);
-      },
-      visible: false, // Varsayılan olarak açık
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-    },
-    // {
-    //   title: "Araç Tipi",
-    //   dataIndex: "MKN_ARAC_TIP",
-    //   key: "MKN_ARAC_TIP",
-    //   width: 100,
-    //   sorter: (a, b) => {
-    //     if (a.MKN_ARAC_TIP === null && b.MKN_ARAC_TIP === null) return 0;
-    //     if (a.MKN_ARAC_TIP === null) return 1;
-    //     if (b.MKN_ARAC_TIP === null) return -1;
-    //     return a.MKN_ARAC_TIP.localeCompare(b.MKN_ARAC_TIP);
-    //   },
-    //   ellipsis: true,
-    //   onCell: () => ({
-    //     onClick: (event) => {
-    //       event.stopPropagation();
-    //     },
-    //   }),
-    //   visible: false, // Varsayılan olarak açık
-    // },
-    {
-      title: "Lokasyon",
-      dataIndex: "MKN_LOKASYON",
-      key: "MKN_LOKASYON",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_LOKASYON === null && b.MKN_LOKASYON === null) return 0;
-        if (a.MKN_LOKASYON === null) return 1;
-        if (b.MKN_LOKASYON === null) return -1;
-        return a.MKN_LOKASYON.localeCompare(b.MKN_LOKASYON);
-      },
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true, // Varsayılan olarak açık
-    },
-    {
-      title: "Ekipman Tipi",
-      dataIndex: "MKN_TIP",
-      key: "MKN_TIP",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_TIP === null && b.MKN_TIP === null) return 0;
-        if (a.MKN_TIP === null) return 1;
-        if (b.MKN_TIP === null) return -1;
-        return a.MKN_TIP.localeCompare(b.MKN_TIP);
-      },
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true, // Varsayılan olarak açık
-    },
-    {
-      title: "Kategori",
-      dataIndex: "MKN_KATEGORI",
-      key: "MKN_KATEGORI",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_KATEGORI === null && b.MKN_KATEGORI === null) return 0;
-        if (a.MKN_KATEGORI === null) return 1;
-        if (b.MKN_KATEGORI === null) return -1;
-        return a.MKN_KATEGORI.localeCompare(b.MKN_KATEGORI);
-      },
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: "Marka",
-      dataIndex: "MKN_MARKA",
-      key: "MKN_MARKA",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_MARKA === null && b.MKN_MARKA === null) return 0;
-        if (a.MKN_MARKA === null) return 1;
-        if (b.MKN_MARKA === null) return -1;
-        return a.MKN_MARKA.localeCompare(b.MKN_MARKA);
-      },
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true, // Varsayılan olarak açık
-    },
-    {
-      title: "Model",
-      dataIndex: "MKN_MODEL",
-      key: "MKN_MODEL",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_MODEL === null && b.MKN_MODEL === null) return 0;
-        if (a.MKN_MODEL === null) return 1;
-        if (b.MKN_MODEL === null) return -1;
-        return a.MKN_MODEL.localeCompare(b.MKN_MODEL);
-      },
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: true, // Varsayılan olarak açık
-    },
-    {
-      title: "Master Ekipman Tanımı",
-      dataIndex: "MKN_MASTER_MAKINE_TANIM",
-      key: "MKN_MASTER_MAKINE_TANIM",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_MASTER_MAKINE_TANIM === null && b.MKN_MASTER_MAKINE_TANIM === null) return 0;
-        if (a.MKN_MASTER_MAKINE_TANIM === null) return 1;
-        if (b.MKN_MASTER_MAKINE_TANIM === null) return -1;
-        return a.MKN_MASTER_MAKINE_TANIM.localeCompare(b.MKN_MASTER_MAKINE_TANIM);
-      },
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: "Master Ekipman Kod",
-      dataIndex: "MKN_MASTER_MAKINE_KOD",
-      key: "MKN_MASTER_MAKINE_KOD",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_MASTER_MAKINE_KOD === null && b.MKN_MASTER_MAKINE_KOD === null) return 0;
-        if (a.MKN_MASTER_MAKINE_KOD === null) return 1;
-        if (b.MKN_MASTER_MAKINE_KOD === null) return -1;
-        return a.MKN_MASTER_MAKINE_KOD.localeCompare(b.MKN_MASTER_MAKINE_KOD);
-      },
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: "Çalışma Takvimi",
-      dataIndex: "MKN_TAKVIM",
-      key: "MKN_TAKVIM",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_TAKVIM === null && b.MKN_TAKVIM === null) return 0;
-        if (a.MKN_TAKVIM === null) return 1;
-        if (b.MKN_TAKVIM === null) return -1;
-        return a.MKN_TAKVIM.localeCompare(b.MKN_TAKVIM);
-      },
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: "Üretim Yılı",
-      dataIndex: "MKN_URETIM_YILI",
-      key: "MKN_URETIM_YILI",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_URETIM_YILI === null && b.MKN_URETIM_YILI === null) return 0;
-        if (a.MKN_URETIM_YILI === null) return 1;
-        if (b.MKN_URETIM_YILI === null) return -1;
-        return a.MKN_URETIM_YILI.localeCompare(b.MKN_URETIM_YILI);
-      },
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: "Masraf Merkezi",
-      dataIndex: "MKN_MASRAF_MERKEZ",
-      key: "MKN_MASRAF_MERKEZ",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_MASRAF_MERKEZ === null && b.MKN_MASRAF_MERKEZ === null) return 0;
-        if (a.MKN_MASRAF_MERKEZ === null) return 1;
-        if (b.MKN_MASRAF_MERKEZ === null) return -1;
-        return a.MKN_MASRAF_MERKEZ.localeCompare(b.MKN_MASRAF_MERKEZ);
-      },
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: "Sorumlu Atölye",
-      dataIndex: "MKN_ATOLYE",
-      key: "MKN_ATOLYE",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_ATOLYE === null && b.MKN_ATOLYE === null) return 0;
-        if (a.MKN_ATOLYE === null) return 1;
-        if (b.MKN_ATOLYE === null) return -1;
-        return a.MKN_ATOLYE.localeCompare(b.MKN_ATOLYE);
-      },
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: "Bakım Grubu",
-      dataIndex: "MKN_BAKIM_GRUP",
-      key: "MKN_BAKIM_GRUP",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_BAKIM_GRUP === null && b.MKN_BAKIM_GRUP === null) return 0;
-        if (a.MKN_BAKIM_GRUP === null) return 1;
-        if (b.MKN_BAKIM_GRUP === null) return -1;
-        return a.MKN_BAKIM_GRUP.localeCompare(b.MKN_BAKIM_GRUP);
-      },
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: "Arıza Grubu",
-      dataIndex: "MKN_ARIZA_GRUP",
-      key: "MKN_ARIZA_GRUP",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_ARIZA_GRUP === null && b.MKN_ARIZA_GRUP === null) return 0;
-        if (a.MKN_ARIZA_GRUP === null) return 1;
-        if (b.MKN_ARIZA_GRUP === null) return -1;
-        return a.MKN_ARIZA_GRUP.localeCompare(b.MKN_ARIZA_GRUP);
-      },
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: "Öncelik",
-      dataIndex: "MKN_ONCELIK",
-      key: "MKN_ONCELIK",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_ONCELIK === null && b.MKN_ONCELIK === null) return 0;
-        if (a.MKN_ONCELIK === null) return 1;
-        if (b.MKN_ONCELIK === null) return -1;
-        return a.MKN_ONCELIK.localeCompare(b.MKN_ONCELIK);
-      },
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: "Arıza Sıklığı (Gün)",
-      dataIndex: "ARIZA_SIKLIGI",
-      key: "ARIZA_SIKLIGI",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.ARIZA_SIKLIGI === null && b.ARIZA_SIKLIGI === null) return 0;
-        if (a.ARIZA_SIKLIGI === null) return 1;
-        if (b.ARIZA_SIKLIGI === null) return -1;
-        return a.ARIZA_SIKLIGI.localeCompare(b.ARIZA_SIKLIGI);
-      },
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: "Arıza Sayısı",
-      dataIndex: "ARIZA_SAYISI",
-      key: "ARIZA_SAYISI",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.ARIZA_SAYISI === null && b.ARIZA_SAYISI === null) return 0;
-        if (a.ARIZA_SAYISI === null) return 1;
-        if (b.ARIZA_SAYISI === null) return -1;
-        return a.ARIZA_SAYISI.localeCompare(b.ARIZA_SAYISI);
-      },
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: "Tam Lokasyon",
-      dataIndex: "MKN_LOKASYON_TUM_YOL",
-      key: "MKN_LOKASYON_TUM_YOL",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 300,
-      sorter: (a, b) => {
-        if (a.MKN_LOKASYON_TUM_YOL && b.MKN_LOKASYON_TUM_YOL) {
-          return a.MKN_LOKASYON_TUM_YOL.localeCompare(b.MKN_LOKASYON_TUM_YOL);
-        }
-        if (!a.MKN_LOKASYON_TUM_YOL && !b.MKN_LOKASYON_TUM_YOL) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_LOKASYON_TUM_YOL ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: "Ana Lokasyon",
-      dataIndex: "MKN_LOKASYON_TUM_YOL",
-      key: "ANA_LOKASYON",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 300,
-      sorter: (a, b) => {
-        if (a.MKN_LOKASYON_TUM_YOL && b.MKN_LOKASYON_TUM_YOL) {
-          return a.MKN_LOKASYON_TUM_YOL.localeCompare(b.MKN_LOKASYON_TUM_YOL);
-        }
-        if (!a.MKN_LOKASYON_TUM_YOL && !b.MKN_LOKASYON_TUM_YOL) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_LOKASYON_TUM_YOL ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      render: (text) => {
-        if (text === null) {
-          return null;
-        }
-        const parts = text.split("/");
-        return parts.length > 1 ? parts[0] : text;
-      }, // Add this line
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: "Seri No",
-      dataIndex: "MKN_SERI_NO",
-      key: "MKN_SERI_NO",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_SERI_NO === null && b.MKN_SERI_NO === null) return 0;
-        if (a.MKN_SERI_NO === null) return 1;
-        if (b.MKN_SERI_NO === null) return -1;
-        return a.MKN_SERI_NO.localeCompare(b.MKN_SERI_NO);
-      },
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: <div>{label.OZL_OZEL_ALAN_1}</div>,
-      dataIndex: "MKN_OZEL_ALAN_1",
-      key: "MKN_OZEL_ALAN_1",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_OZEL_ALAN_1 && b.MKN_OZEL_ALAN_1) {
-          return a.MKN_OZEL_ALAN_1.localeCompare(b.MKN_OZEL_ALAN_1);
-        }
-        if (!a.MKN_OZEL_ALAN_1 && !b.MKN_OZEL_ALAN_1) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_OZEL_ALAN_1 ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }),
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: <div>{label.OZL_OZEL_ALAN_2}</div>,
-      dataIndex: "MKN_OZEL_ALAN_2",
-      key: "MKN_OZEL_ALAN_2",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_OZEL_ALAN_2 && b.MKN_OZEL_ALAN_2) {
-          return a.MKN_OZEL_ALAN_2.localeCompare(b.MKN_OZEL_ALAN_2);
-        }
-        if (!a.MKN_OZEL_ALAN_2 && !b.MKN_OZEL_ALAN_2) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_OZEL_ALAN_2 ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: <div>{label.OZL_OZEL_ALAN_3}</div>,
-      dataIndex: "MKN_OZEL_ALAN_3",
-      key: "MKN_OZEL_ALAN_3",
-
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_OZEL_ALAN_3 && b.MKN_OZEL_ALAN_3) {
-          return a.MKN_OZEL_ALAN_3.localeCompare(b.MKN_OZEL_ALAN_3);
-        }
-        if (!a.MKN_OZEL_ALAN_3 && !b.MKN_OZEL_ALAN_3) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_OZEL_ALAN_3 ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: <div>{label.OZL_OZEL_ALAN_4}</div>,
-      dataIndex: "MKN_OZEL_ALAN_4",
-      key: "MKN_OZEL_ALAN_4",
-
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_OZEL_ALAN_4 && b.MKN_OZEL_ALAN_4) {
-          return a.MKN_OZEL_ALAN_4.localeCompare(b.MKN_OZEL_ALAN_4);
-        }
-        if (!a.MKN_OZEL_ALAN_4 && !b.MKN_OZEL_ALAN_4) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_OZEL_ALAN_4 ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: <div>{label.OZL_OZEL_ALAN_5}</div>,
-      dataIndex: "MKN_OZEL_ALAN_5",
-      key: "MKN_OZEL_ALAN_5",
-
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_OZEL_ALAN_5 && b.MKN_OZEL_ALAN_5) {
-          return a.MKN_OZEL_ALAN_5.localeCompare(b.MKN_OZEL_ALAN_5);
-        }
-        if (!a.MKN_OZEL_ALAN_5 && !b.MKN_OZEL_ALAN_5) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_OZEL_ALAN_5 ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: <div>{label.OZL_OZEL_ALAN_6}</div>,
-      dataIndex: "MKN_OZEL_ALAN_6",
-      key: "MKN_OZEL_ALAN_6",
-
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_OZEL_ALAN_6 && b.MKN_OZEL_ALAN_6) {
-          return a.MKN_OZEL_ALAN_6.localeCompare(b.MKN_OZEL_ALAN_6);
-        }
-        if (!a.MKN_OZEL_ALAN_6 && !b.MKN_OZEL_ALAN_6) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_OZEL_ALAN_6 ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: <div>{label.OZL_OZEL_ALAN_7}</div>,
-      dataIndex: "MKN_OZEL_ALAN_7",
-      key: "MKN_OZEL_ALAN_7",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_OZEL_ALAN_7 && b.MKN_OZEL_ALAN_7) {
-          return a.MKN_OZEL_ALAN_7.localeCompare(b.MKN_OZEL_ALAN_7);
-        }
-        if (!a.MKN_OZEL_ALAN_7 && !b.MKN_OZEL_ALAN_7) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_OZEL_ALAN_7 ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: <div>{label.OZL_OZEL_ALAN_8}</div>,
-      dataIndex: "MKN_OZEL_ALAN_8",
-      key: "MKN_OZEL_ALAN_8",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_OZEL_ALAN_8 && b.MKN_OZEL_ALAN_8) {
-          return a.MKN_OZEL_ALAN_8.localeCompare(b.MKN_OZEL_ALAN_8);
-        }
-        if (!a.MKN_OZEL_ALAN_8 && !b.MKN_OZEL_ALAN_8) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_OZEL_ALAN_8 ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: <div>{label.OZL_OZEL_ALAN_9}</div>,
-      dataIndex: "MKN_OZEL_ALAN_9",
-      key: "MKN_OZEL_ALAN_9",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_OZEL_ALAN_9 && b.MKN_OZEL_ALAN_9) {
-          return a.MKN_OZEL_ALAN_9.localeCompare(b.MKN_OZEL_ALAN_9);
-        }
-        if (!a.MKN_OZEL_ALAN_9 && !b.MKN_OZEL_ALAN_9) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_OZEL_ALAN_9 ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: <div>{label.OZL_OZEL_ALAN_10}</div>,
-      dataIndex: "MKN_OZEL_ALAN_10",
-      key: "MKN_OZEL_ALAN_10",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_OZEL_ALAN_10 && b.MKN_OZEL_ALAN_10) {
-          return a.MKN_OZEL_ALAN_10.localeCompare(b.MKN_OZEL_ALAN_10);
-        }
-        if (!a.MKN_OZEL_ALAN_10 && !b.MKN_OZEL_ALAN_10) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_OZEL_ALAN_10 ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: <div>{label.OZL_OZEL_ALAN_11}</div>,
-      dataIndex: "MKN_OZEL_ALAN_11_KOD_ID",
-      key: "MKN_OZEL_ALAN_11_KOD_ID",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_OZEL_ALAN_11_KOD_ID && b.MKN_OZEL_ALAN_11_KOD_ID) {
-          return a.MKN_OZEL_ALAN_11_KOD_ID.localeCompare(b.MKN_OZEL_ALAN_11_KOD_ID);
-        }
-        if (!a.MKN_OZEL_ALAN_11_KOD_ID && !b.MKN_OZEL_ALAN_11_KOD_ID) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_OZEL_ALAN_11_KOD_ID ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: <div>{label.OZL_OZEL_ALAN_12}</div>,
-      dataIndex: "MKN_OZEL_ALAN_12_KOD_ID",
-      key: "MKN_OZEL_ALAN_12_KOD_ID",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_OZEL_ALAN_12_KOD_ID && b.MKN_OZEL_ALAN_12_KOD_ID) {
-          return a.MKN_OZEL_ALAN_12_KOD_ID.localeCompare(b.MKN_OZEL_ALAN_12_KOD_ID);
-        }
-        if (!a.MKN_OZEL_ALAN_12_KOD_ID && !b.MKN_OZEL_ALAN_12_KOD_ID) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_OZEL_ALAN_12_KOD_ID ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: <div>{label.OZL_OZEL_ALAN_13}</div>,
-      dataIndex: "MKN_OZEL_ALAN_13_KOD_ID",
-      key: "MKN_OZEL_ALAN_13_KOD_ID",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_OZEL_ALAN_13_KOD_ID && b.MKN_OZEL_ALAN_13_KOD_ID) {
-          return a.MKN_OZEL_ALAN_13_KOD_ID.localeCompare(b.MKN_OZEL_ALAN_13_KOD_ID);
-        }
-        if (!a.MKN_OZEL_ALAN_13_KOD_ID && !b.MKN_OZEL_ALAN_13_KOD_ID) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_OZEL_ALAN_13_KOD_ID ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: <div>{label.OZL_OZEL_ALAN_14}</div>,
-      dataIndex: "MKN_OZEL_ALAN_14_KOD_ID",
-      key: "MKN_OZEL_ALAN_14_KOD_ID",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_OZEL_ALAN_14_KOD_ID && b.MKN_OZEL_ALAN_14_KOD_ID) {
-          return a.MKN_OZEL_ALAN_14_KOD_ID.localeCompare(b.MKN_OZEL_ALAN_14_KOD_ID);
-        }
-        if (!a.MKN_OZEL_ALAN_14_KOD_ID && !b.MKN_OZEL_ALAN_14_KOD_ID) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_OZEL_ALAN_14_KOD_ID ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: <div>{label.OZL_OZEL_ALAN_15}</div>,
-      dataIndex: "MKN_OZEL_ALAN_15_KOD_ID",
-      key: "MKN_OZEL_ALAN_15_KOD_ID",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_OZEL_ALAN_15_KOD_ID && b.MKN_OZEL_ALAN_15_KOD_ID) {
-          return a.MKN_OZEL_ALAN_15_KOD_ID.localeCompare(b.MKN_OZEL_ALAN_15_KOD_ID);
-        }
-        if (!a.MKN_OZEL_ALAN_15_KOD_ID && !b.MKN_OZEL_ALAN_15_KOD_ID) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_OZEL_ALAN_15_KOD_ID ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: <div>{label.OZL_OZEL_ALAN_16}</div>,
-      dataIndex: "MKN_OZEL_ALAN_16",
-      key: "MKN_OZEL_ALAN_16",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_OZEL_ALAN_16 && b.MKN_OZEL_ALAN_16) {
-          return a.MKN_OZEL_ALAN_16.localeCompare(b.MKN_OZEL_ALAN_16);
-        }
-        if (!a.MKN_OZEL_ALAN_16 && !b.MKN_OZEL_ALAN_16) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_OZEL_ALAN_16 ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: <div>{label.OZL_OZEL_ALAN_17}</div>,
-      dataIndex: "MKN_OZEL_ALAN_17",
-      key: "MKN_OZEL_ALAN_17",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_OZEL_ALAN_17 && b.MKN_OZEL_ALAN_17) {
-          return a.MKN_OZEL_ALAN_17.localeCompare(b.MKN_OZEL_ALAN_17);
-        }
-        if (!a.MKN_OZEL_ALAN_17 && !b.MKN_OZEL_ALAN_17) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_OZEL_ALAN_17 ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: <div>{label.OZL_OZEL_ALAN_18}</div>,
-      dataIndex: "MKN_OZEL_ALAN_18",
-      key: "MKN_OZEL_ALAN_18",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_OZEL_ALAN_18 && b.MKN_OZEL_ALAN_18) {
-          return a.MKN_OZEL_ALAN_18.localeCompare(b.MKN_OZEL_ALAN_18);
-        }
-        if (!a.MKN_OZEL_ALAN_18 && !b.MKN_OZEL_ALAN_18) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_OZEL_ALAN_18 ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: <div>{label.OZL_OZEL_ALAN_19}</div>,
-      dataIndex: "MKN_OZEL_ALAN_19",
-      key: "MKN_OZEL_ALAN_19",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_OZEL_ALAN_19 && b.MKN_OZEL_ALAN_19) {
-          return a.MKN_OZEL_ALAN_19.localeCompare(b.MKN_OZEL_ALAN_19);
-        }
-        if (!a.MKN_OZEL_ALAN_19 && !b.MKN_OZEL_ALAN_19) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_OZEL_ALAN_19 ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-    {
-      title: <div>{label.OZL_OZEL_ALAN_20}</div>,
-      dataIndex: "MKN_OZEL_ALAN_20",
-      key: "MKN_OZEL_ALAN_20",
-      ellipsis: true,
-      onCell: () => ({
-        onClick: (event) => {
-          event.stopPropagation();
-        },
-      }), // Enable ellipsis for overflowed content
-      width: 150,
-      sorter: (a, b) => {
-        if (a.MKN_OZEL_ALAN_20 && b.MKN_OZEL_ALAN_20) {
-          return a.MKN_OZEL_ALAN_20.localeCompare(b.MKN_OZEL_ALAN_20);
-        }
-        if (!a.MKN_OZEL_ALAN_20 && !b.MKN_OZEL_ALAN_20) {
-          return 0; // Both are null or undefined, consider them equal
-        }
-        return a.MKN_OZEL_ALAN_20 ? 1 : -1; // If a has a brand and b doesn't, a is considered greater, and vice versa
-      },
-      visible: false, // Varsayılan olarak açık
-    },
-
-    // Diğer kolonlarınız...
-  ];
+  const initialColumns = useColumns({ label });
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 
@@ -1223,8 +261,8 @@ const MainTable = ({ setSelectedIds }) => {
   // ana tablo api isteği için kullanılan useEffect
 
   useEffect(() => {
-    fetchEquipmentData(body, currentPage, pageSize);
-  }, [body, currentPage, pageSize]);
+    fetchEquipmentData(body, currentPage, pageSize, sortField, sortOrder);
+  }, [body, currentPage, pageSize, sortField, sortOrder]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
@@ -1249,16 +287,23 @@ const MainTable = ({ setSelectedIds }) => {
 
   // arama işlemi için kullanılan useEffect son
 
-  const fetchEquipmentData = async (body, page, size) => {
+  const fetchEquipmentData = async (body, page, size, currentSortField, currentSortOrder) => {
     // body'nin undefined olması durumunda varsayılan değerler atanıyor
     const { keyword = "", filters = {} } = body || {};
     // page'in undefined olması durumunda varsayılan değer olarak 1 atanıyor
     const currentPage = page || 1;
+    const currentPageSize = size || pageSize;
+
+    let sortParam = "";
+    if (currentSortField && currentSortOrder) {
+      const normalizedOrder = currentSortOrder === "ascend" ? "ASC" : "DESC";
+      sortParam = `&sortField=${currentSortField}&sortOrder=${normalizedOrder}`;
+    }
 
     try {
       setLoading(true);
       // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.post(`GetMakineFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}`, filters);
+      const response = await AxiosInstance.post(`GetMakineFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${currentPageSize}${sortParam}`, filters);
       if (response) {
         // Toplam sayfa sayısını ayarla
         setTotalPages(response.page);
@@ -1301,9 +346,34 @@ const MainTable = ({ setSelectedIds }) => {
 
   // sayfalama için kullanılan useEffect
   const handleTableChange = (pagination, filters, sorter, extra) => {
-    if (pagination) {
-      setCurrentPage(pagination.current);
-      setPageSize(pagination.pageSize); // pageSize güncellemesi
+    if (!pagination) return;
+
+    if (typeof pagination === "object") {
+      const nextSize = pagination.pageSize || pageSize;
+      setPageSize(nextSize);
+      setCurrentPage(pagination.current || 1);
+
+      if (sorter && (sorter.field || sorter.columnKey)) {
+        const nextField = sorter.field || sorter.columnKey;
+        if (sorter.order) {
+          setSortField(nextField);
+          setSortOrder(sorter.order);
+        } else {
+          setSortField(null);
+          setSortOrder(null);
+        }
+      } else {
+        setSortField(null);
+        setSortOrder(null);
+      }
+      return;
+    }
+
+    if (typeof pagination === "number") {
+      const nextPage = pagination || 1;
+      const nextSize = typeof filters === "number" ? filters : pageSize;
+      setPageSize(nextSize);
+      setCurrentPage(nextPage);
     }
   };
   // sayfalama için kullanılan useEffect son
@@ -1350,11 +420,11 @@ const MainTable = ({ setSelectedIds }) => {
     setSelectedRows([]);
 
     // Verileri yeniden çekmek için `fetchEquipmentData` fonksiyonunu çağır
-    fetchEquipmentData(body, currentPage);
+    fetchEquipmentData(body, currentPage, pageSize, sortField, sortOrder);
     // Burada `body` ve `currentPage`'i güncellediğimiz için, bu değerlerin en güncel hallerini kullanarak veri çekme işlemi yapılır.
     // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
     // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
-  }, [body, currentPage]); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
+  }, [body, currentPage, pageSize, sortField, sortOrder]); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
 
   // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
   const [columns, setColumns] = useState(() => {
@@ -1410,13 +480,19 @@ const MainTable = ({ setSelectedIds }) => {
     },
   };
 
-  const mergedColumns = columns.map((col) => ({
-    ...col,
-    onHeaderCell: (column) => ({
-      width: column.width,
-      onResize: handleResize(column.key),
-    }),
-  }));
+  const mergedColumns = columns.map((col) => {
+    const isSorted = sortField && (col.dataIndex === sortField || col.key === sortField);
+
+    return {
+      ...col,
+      sorter: col.sorter ? true : col.sorter,
+      sortOrder: col.sorter ? (isSorted ? sortOrder : null) : col.sortOrder,
+      onHeaderCell: (column) => ({
+        width: column.width,
+        onResize: handleResize(column.key),
+      }),
+    };
+  });
 
   // fitrelenmiş sütunları birleştiriyoruz ve sadece görünür olanları alıyoruz ve tabloya gönderiyoruz
 
