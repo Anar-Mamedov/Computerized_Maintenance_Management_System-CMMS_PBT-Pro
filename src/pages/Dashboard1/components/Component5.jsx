@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback, useRef } from "react";
-import { Modal, Typography, Spin, Table, Input, Select } from "antd";
+import { Modal, Typography, Spin, Table, Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../api/http.jsx";
 import ModalTablo from "../../YardimMasasi/IsTalepleri/Table/ModalTablo/ModalTablo.jsx";
@@ -156,10 +156,11 @@ function Component5(updateApi) {
     fetchKritikStoklar(nextPage, nextPageSize, kritikSearchTerm, kritikDurumTip, nextSortField, nextSortOrder);
   };
 
-  const handleDurumTipChange = (value) => {
-    setKritikDurumTip(value);
+  const handleDurumTipToggle = (tip) => {
+    const newValue = kritikDurumTip === tip ? "" : tip;
+    setKritikDurumTip(newValue);
     setKritikPagination((prev) => ({ ...prev, current: 1 }));
-    fetchKritikStoklar(1, kritikPagination.pageSize, kritikSearchTerm, value, kritikSortField, kritikSortOrder);
+    fetchKritikStoklar(1, kritikPagination.pageSize, kritikSearchTerm, newValue, kritikSortField, kritikSortOrder);
   };
 
   const handleKritikSearch = (value) => {
@@ -279,18 +280,21 @@ function Component5(updateApi) {
             label: "Toplam Kritik Stok",
             value: kritikModalSummary?.toplamKritikStok,
             background: "linear-gradient(135deg, #ff7875 0%, #ff4d4f 100%)",
+            filterTip: null,
           },
           {
             key: "min",
             label: "Minimum Stok Sayısı",
             value: kritikModalSummary?.minStokSayisi,
             background: "linear-gradient(135deg, #faad14 0%, #fadb14 100%)",
+            filterTip: "MIN",
           },
           {
             key: "max",
             label: "Maksimum Stok Sayısı",
             value: kritikModalSummary?.maxStokSayisi,
             background: "linear-gradient(135deg, #52c41a 0%, #73d13d 100%)",
+            filterTip: "MAX",
           },
         ]
       : [];
@@ -558,16 +562,6 @@ function Component5(updateApi) {
               prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
               allowClear
             />
-            <Select
-              style={{ width: "120px" }}
-              value={kritikDurumTip}
-              onChange={handleDurumTipChange}
-              options={[
-                { value: "", label: "Tümü" },
-                { value: "MAX", label: "Max." },
-                { value: "MIN", label: "Min." },
-              ]}
-            />
           </div>
           <Table
             columns={kritikColumns}
@@ -592,26 +586,33 @@ function Component5(updateApi) {
                 marginTop: "14px",
               }}
             >
-              {kritikSummaryItems.map((item) => (
-                <div
-                  key={item.key}
-                  style={{
-                    flex: "1 1 220px",
-                    minWidth: "220px",
-                    padding: "18px 20px",
-                    borderRadius: "12px",
-                    background: item.background,
-                    color: "#fff",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "8px",
-                    boxShadow: "0 12px 25px rgba(15, 23, 42, 0.18)",
-                  }}
-                >
-                  <Text style={{ fontSize: "13px", letterSpacing: "0.8px", textTransform: "uppercase", color: "rgba(255,255,255,0.85)" }}>{item.label}</Text>
-                  <Text style={{ fontSize: "28px", fontWeight: 700 }}>{typeof item.value === "number" ? kritikNumberFormatter.format(item.value) : "-"}</Text>
-                </div>
-              ))}
+              {kritikSummaryItems.map((item) => {
+                const isActive = item.filterTip && kritikDurumTip === item.filterTip;
+                return (
+                  <div
+                    key={item.key}
+                    onClick={item.filterTip ? () => handleDurumTipToggle(item.filterTip) : undefined}
+                    style={{
+                      flex: "1 1 220px",
+                      minWidth: "220px",
+                      padding: "18px 20px",
+                      borderRadius: "12px",
+                      background: item.background,
+                      color: "#fff",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "8px",
+                      boxShadow: "0 12px 25px rgba(15, 23, 42, 0.18)",
+                      cursor: item.filterTip ? "pointer" : "default",
+                      border: isActive ? "3px solid #1677ff" : "3px solid transparent",
+                      transition: "border 0.2s ease",
+                    }}
+                  >
+                    <Text style={{ fontSize: "13px", letterSpacing: "0.8px", textTransform: "uppercase", color: "rgba(255,255,255,0.85)" }}>{item.label}</Text>
+                    <Text style={{ fontSize: "28px", fontWeight: 700 }}>{typeof item.value === "number" ? kritikNumberFormatter.format(item.value) : "-"}</Text>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
