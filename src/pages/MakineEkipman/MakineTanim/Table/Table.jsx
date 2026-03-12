@@ -261,6 +261,7 @@ const MainTable = ({ setSelectedIds }) => {
   const [body, setBody] = useState({
     keyword: "",
     filters: {},
+    isActive: -1,
   });
 
   // ana tablo api isteği için kullanılan useEffect
@@ -294,7 +295,7 @@ const MainTable = ({ setSelectedIds }) => {
 
   const fetchEquipmentData = async (body, page, size, currentSortField, currentSortOrder) => {
     // body'nin undefined olması durumunda varsayılan değerler atanıyor
-    const { keyword = "", filters = {} } = body || {};
+    const { keyword = "", filters = {}, isActive = -1 } = body || {};
     // page'in undefined olması durumunda varsayılan değer olarak 1 atanıyor
     const currentPage = page || 1;
     const currentPageSize = size || pageSize;
@@ -308,7 +309,7 @@ const MainTable = ({ setSelectedIds }) => {
     try {
       setLoading(true);
       // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.post(`GetMakineFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${currentPageSize}${sortParam}`, filters);
+      const response = await AxiosInstance.post(`GetMakineFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${currentPageSize}&isAktif=${isActive}${sortParam}`, filters);
       if (response) {
         // Toplam sayfa sayısını ayarla
         setTotalPages(response.page);
