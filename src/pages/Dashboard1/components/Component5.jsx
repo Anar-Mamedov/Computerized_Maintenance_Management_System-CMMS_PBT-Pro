@@ -1,15 +1,19 @@
-import React, { useEffect, useMemo, useState, useCallback } from "react";
-import { Modal, Typography, Spin, Table } from "antd";
+import React, { useEffect, useMemo, useState, useCallback, useRef } from "react";
+import { Modal, Typography, Spin, Table, Input, Select } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../api/http.jsx";
 import ModalTablo from "../../YardimMasasi/IsTalepleri/Table/ModalTablo/ModalTablo.jsx";
 import MakineTablo from "./../../MakineEkipman/MakineTanim/Table/Table.jsx";
 import AcikIsEmrirleri from "../../BakımVeArizaYonetimi/IsEmri/Table/ModalTable/ModalTable.jsx";
 import EditDrawer from "../../Malzeme&DepoYonetimi/MalzemeTanimlari/Update/EditDrawer.jsx";
+import { useFormContext } from "react-hook-form";
 
 const { Text } = Typography;
 const DEFAULT_STATUS_FILTER = [0, 1];
 
 function Component5(updateApi) {
+  const { watch, setValue } = useFormContext();
+  const kritikStokModalTrigger = watch("kritikStokModalVisible");
   const [data, setData] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,6 +30,11 @@ function Component5(updateApi) {
     pageSize: 10,
     total: 0,
   });
+  const [kritikDurumTip, setKritikDurumTip] = useState("");
+  const [kritikSearchTerm, setKritikSearchTerm] = useState("");
+  const [kritikSortField, setKritikSortField] = useState(null);
+  const [kritikSortOrder, setKritikSortOrder] = useState(null);
+  const kritikSearchTimeout = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,6 +50,13 @@ function Component5(updateApi) {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (kritikStokModalTrigger) {
+      showKritikModal();
+      setValue("kritikStokModalVisible", false);
+    }
+  }, [kritikStokModalTrigger]);
+
   const showModal = (title, content) => {
     setModalTitle(title);
     setModalContent(content);
@@ -55,41 +71,57 @@ function Component5(updateApi) {
     setIsModalVisible(false);
   };
 
-  const fetchKritikStoklar = async () => {
-    setKritikModalLoading(true);
-    try {
-      const response = await AxiosInstance.get("GetKritikStoklar");
-      const rows = response?.data || [];
-      const summary = response?.ozet || null;
-      setKritikModalData(rows);
-      setKritikModalSummary(summary);
-      setKritikPagination((prev) => ({
-        ...prev,
-        total: rows.length,
-      }));
-    } catch (error) {
-      console.error("Failed to fetch critical stock data:", error);
-      setKritikModalData([]);
-      setKritikModalSummary(null);
-      setKritikPagination((prev) => ({
-        ...prev,
-        total: 0,
-      }));
-    } finally {
-      setKritikModalLoading(false);
-    }
-  };
+  const fetchKritikStoklar = useCallback(
+    async (page, pageSize, searchTerm, durumTip, sortField, sortOrder) => {
+      setKritikModalLoading(true);
+      try {
+        let url = `GetKritikStoklar?pagingDeger=${page}&pageSize=${pageSize}&prm=${encodeURIComponent(searchTerm || "")}`;
+        if (durumTip) {
+          url += `&durumTip=${durumTip}`;
+        }
+        if (sortField && sortOrder) {
+          const normalizedOrder = sortOrder === "ascend" ? "ASC" : "DESC";
+          url += `&sortField=${sortField}&sortOrder=${normalizedOrder}`;
+        }
+        const response = await AxiosInstance.get(url);
+        const rows = response?.data || [];
+        const summary = response?.ozet || null;
+        setKritikModalData(rows);
+        setKritikModalSummary(summary);
+        setKritikPagination((prev) => ({
+          ...prev,
+          total: response?.kayit_sayisi || rows.length,
+        }));
+      } catch (error) {
+        console.error("Failed to fetch critical stock data:", error);
+        setKritikModalData([]);
+        setKritikModalSummary(null);
+        setKritikPagination((prev) => ({
+          ...prev,
+          total: 0,
+        }));
+      } finally {
+        setKritikModalLoading(false);
+      }
+    },
+    []
+  );
 
   const showKritikModal = () => {
     setKritikPagination((prev) => ({
       ...prev,
       current: 1,
+      pageSize: 10,
     }));
     setKritikModalSummary(null);
     setEditDrawerVisible(false);
     setSelectedKritikRow(null);
+    setKritikDurumTip("");
+    setKritikSearchTerm("");
+    setKritikSortField(null);
+    setKritikSortOrder(null);
     setKritikModalVisible(true);
-    fetchKritikStoklar();
+    fetchKritikStoklar(1, 10, "", "", null, null);
   };
 
   const handleKritikModalClose = () => {
@@ -98,12 +130,47 @@ function Component5(updateApi) {
     setSelectedKritikRow(null);
   };
 
-  const handleKritikTableChange = (paginationInfo) => {
+  const handleKritikTableChange = (paginationInfo, _filters, sorter) => {
+    const nextPage = paginationInfo?.current || kritikPagination.current;
+    const nextPageSize = paginationInfo?.pageSize || kritikPagination.pageSize;
+    let nextSortField = kritikSortField;
+    let nextSortOrder = kritikSortOrder;
+
+    if (sorter && (sorter.field || sorter.columnKey)) {
+      if (sorter.order) {
+        nextSortField = sorter.field || sorter.columnKey;
+        nextSortOrder = sorter.order;
+      } else {
+        nextSortField = null;
+        nextSortOrder = null;
+      }
+    }
+
     setKritikPagination((prev) => ({
       ...prev,
-      current: paginationInfo?.current || prev.current,
-      pageSize: paginationInfo?.pageSize || prev.pageSize,
+      current: nextPage,
+      pageSize: nextPageSize,
     }));
+    setKritikSortField(nextSortField);
+    setKritikSortOrder(nextSortOrder);
+    fetchKritikStoklar(nextPage, nextPageSize, kritikSearchTerm, kritikDurumTip, nextSortField, nextSortOrder);
+  };
+
+  const handleDurumTipChange = (value) => {
+    setKritikDurumTip(value);
+    setKritikPagination((prev) => ({ ...prev, current: 1 }));
+    fetchKritikStoklar(1, kritikPagination.pageSize, kritikSearchTerm, value, kritikSortField, kritikSortOrder);
+  };
+
+  const handleKritikSearch = (value) => {
+    setKritikSearchTerm(value);
+    if (kritikSearchTimeout.current) {
+      clearTimeout(kritikSearchTimeout.current);
+    }
+    kritikSearchTimeout.current = setTimeout(() => {
+      setKritikPagination((prev) => ({ ...prev, current: 1 }));
+      fetchKritikStoklar(1, kritikPagination.pageSize, value, kritikDurumTip, kritikSortField, kritikSortOrder);
+    }, 500);
   };
 
   const handleEditDrawerClose = useCallback(() => {
@@ -129,6 +196,7 @@ function Component5(updateApi) {
         key: "STK_TANIM",
         width: 250,
         ellipsis: true,
+        sorter: true,
         render: (text, record) => (
           <Text
             ellipsis={{ tooltip: text }}
@@ -148,6 +216,7 @@ function Component5(updateApi) {
         key: "STK_TIP",
         ellipsis: true,
         width: 100,
+        sorter: true,
       },
       {
         title: "Birim",
@@ -155,6 +224,7 @@ function Component5(updateApi) {
         key: "STK_BIRIM",
         ellipsis: true,
         width: 100,
+        sorter: true,
       },
       {
         title: "Min. Miktar",
@@ -162,6 +232,7 @@ function Component5(updateApi) {
         key: "STK_MIN_MIKTAR",
         ellipsis: true,
         width: 100,
+        sorter: true,
       },
       {
         title: "Max. Miktar",
@@ -169,6 +240,7 @@ function Component5(updateApi) {
         key: "STK_MAX_MIKTAR",
         ellipsis: true,
         width: 100,
+        sorter: true,
       },
       {
         title: "Mevcut Miktar",
@@ -176,6 +248,7 @@ function Component5(updateApi) {
         key: "STK_MIKTAR",
         ellipsis: true,
         width: 100,
+        sorter: true,
       },
       {
         title: "Kritik Miktar",
@@ -183,6 +256,7 @@ function Component5(updateApi) {
         key: "STK_KRITIK_STOK_MIKTAR",
         ellipsis: true,
         width: 100,
+        sorter: true,
       },
       {
         title: "Durum",
@@ -475,6 +549,26 @@ function Component5(updateApi) {
         zIndex={900}
       >
         <div style={{ flex: 1, minHeight: 0 }}>
+          <div style={{ display: "flex", gap: "10px", marginBottom: "16px", alignItems: "center" }}>
+            <Input
+              style={{ width: "250px" }}
+              placeholder="Arama yap..."
+              value={kritikSearchTerm}
+              onChange={(e) => handleKritikSearch(e.target.value)}
+              prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
+              allowClear
+            />
+            <Select
+              style={{ width: "120px" }}
+              value={kritikDurumTip}
+              onChange={handleDurumTipChange}
+              options={[
+                { value: "", label: "Tümü" },
+                { value: "MAX", label: "Max." },
+                { value: "MIN", label: "Min." },
+              ]}
+            />
+          </div>
           <Table
             columns={kritikColumns}
             dataSource={kritikModalData}
@@ -522,7 +616,12 @@ function Component5(updateApi) {
           )}
         </div>
       </Modal>
-      <EditDrawer selectedRow={selectedKritikRow} drawerVisible={editDrawerVisible} onDrawerClose={handleEditDrawerClose} onRefresh={fetchKritikStoklar} />
+      <EditDrawer
+        selectedRow={selectedKritikRow}
+        drawerVisible={editDrawerVisible}
+        onDrawerClose={handleEditDrawerClose}
+        onRefresh={() => fetchKritikStoklar(kritikPagination.current, kritikPagination.pageSize, kritikSearchTerm, kritikDurumTip, kritikSortField, kritikSortOrder)}
+      />
     </div>
   );
 }
