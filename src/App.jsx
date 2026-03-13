@@ -72,6 +72,9 @@ import EkipmanTransferi from "./pages/MakineEkipman/EkipmanTransfer/EkipmanTrans
 import ProjeTanimlari2 from "./pages/ProjeYonetimi/ProjeTanimlari.jsx";
 import ProjeYonetimListe from "./pages/ProjeYonetimi/ProjeYonetimiListe.jsx";
 import ProjeIlerleme from "./pages/ProjeYonetimi/ProjeIlerleme.jsx";
+import OtomatikKodlar from "./pages/Yonetim/OtomatikKodlar/OtomatikKodlar.jsx";
+import ServisOncelikleri from "./pages/Yonetim/ServisOncelikleri/ServisOncelikleri.jsx";
+import PersonelIzinleri from "./pages/PersonelYonetimi/PersonelIzınYonetimi/PersonelIzinleriYonetimi.jsx";
 import AxiosInstance from "./api/http";
 
 // Malzemeler
@@ -247,15 +250,15 @@ export default function App() {
           <Route path="/durusTakibi" element={<DurusTakibi />} />
           <Route path="/sayacGuncelleme" element={<SayacGuncelleme />} />
           <Route path="/ekipmanTransferi" element={<EkipmanTransferi />} />
-          <Route path="/personelIzinleri" element={<Hazirlaniyor />} />
+          <Route path="/personelIzinleri" element={<PersonelIzinleri />} />
           <Route path="/personelNobetleri" element={<Hazirlaniyor />} />
           <Route path="/personelCalismaPLani" element={<Hazirlaniyor />} />
           <Route path="/isTalebiKullanicilari" element={<IsTalebiKullanicilari />} />
           <Route path="/raporYonetimi" element={<Hazirlaniyor />} />
           <Route path="/formYonetimi" element={<Hazirlaniyor />} />
           <Route path="/kodYonetimi" element={<KodYonetimi />} />
-          <Route path="/otomatikKodlar" element={<Hazirlaniyor />} />
-          <Route path="/servisOncelikSeviyeleri" element={<Hazirlaniyor />} />
+          <Route path="/otomatikKodlar" element={<OtomatikKodlar />} />
+          <Route path="/servisOncelikSeviyeleri" element={<ServisOncelikleri />} />
           <Route path="/isEmriTipleri" element={<IsEmriTipleri />} />
           <Route path="/projeTanimlari" element={<Hazirlaniyor />} />
           <Route path="/lokasyon" element={<LokasyonTanim />} />
