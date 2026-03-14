@@ -90,6 +90,25 @@ function Component3(props) {
   const columns = useMemo(
     () => [
       {
+        title: "Stok Kod",
+        dataIndex: "STK_KOD",
+        key: "STK_KOD",
+        ellipsis: true,
+        width: 100,
+        render: (text, record) => (
+          <Text
+            ellipsis={{ tooltip: text }}
+            style={{ color: "#1677ff", cursor: "pointer" }}
+            onClick={(event) => {
+              event.stopPropagation();
+              handleStockDrawerOpen(record);
+            }}
+          >
+            {text}
+          </Text>
+        ),
+      },
+      {
         title: "Stok Tanım",
         dataIndex: "STK_TANIM",
         key: "STK_TANIM",
