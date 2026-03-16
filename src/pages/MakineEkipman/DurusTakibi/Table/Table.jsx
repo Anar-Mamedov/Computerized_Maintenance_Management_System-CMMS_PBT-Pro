@@ -35,19 +35,19 @@ const localeMap = {
 
 const { Text } = Typography;
 
-const DurusIstatistikKartlari = ({ body, searchTerm }) => {
+const DurusIstatistikKartlari = ({ body, searchTerm, refreshTrigger, extraFilters }) => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const fetchStats = useCallback(async () => {
     setLoading(true);
     try {
-      // Kanka, Filters componentinden gelen tüm filtreleri buraya yayıyoruz
       const payload = {
-        Kelime: searchTerm, // Arama kelimesini ekledik
+        Kelime: searchTerm,
         BaslangicTarih: body.filters?.baslangicTarih,
         BitisTarih: body.filters?.BitisTarih,
-        ...body.filters?.customfilter
+        ...body.filters?.customfilter,
+        ...extraFilters // Aylık tabdan gelen filtreler burada payload'a yayılıyor
       };
 
       const response = await AxiosInstance.post("GetDurusIstatistik", payload);
@@ -59,7 +59,8 @@ const DurusIstatistikKartlari = ({ body, searchTerm }) => {
     } finally {
       setLoading(false);
     }
-  }, [body.filters, searchTerm]); // Filtreler değiştikçe tetiklenir
+    // KANKA DİKKAT: extraFilters veya refreshTrigger değiştiğinde bu fonksiyon re-create olur
+  }, [body.filters, searchTerm, refreshTrigger, extraFilters]); 
 
   useEffect(() => {
     fetchStats();
@@ -247,6 +248,8 @@ const DurusTakibi = () => {
   const [aylikYil, setAylikYil] = useState(new Date().getFullYear());
   const [grafikYil, setGrafikYil] = useState(new Date().getFullYear());
   const [jobTypeFilter, setJobTypeFilter] = useState("");
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [extraFilters, setExtraFilters] = useState({});
 
   const [selectedRows, setSelectedRows] = useState([]);
 
@@ -389,6 +392,14 @@ const DurusTakibi = () => {
       return "";
     }
   }, []);
+
+  const handleRefreshStats = useCallback((values) => {
+  if (values) {
+    // AylikTab'dan gelen { Yil, Gruplama, VeriTipi } objesini state'e atıyoruz
+    setExtraFilters(values);
+  }
+  setRefreshTrigger(prev => prev + 1);
+}, []);
 
   // Columns definition (adjust as needed)
   const initialColumns = useMemo(
@@ -830,7 +841,12 @@ const DurusTakibi = () => {
             </div>
           </Modal>
 
-          <DurusIstatistikKartlari body={body} searchTerm={searchTerm} />
+          <DurusIstatistikKartlari 
+  body={body} 
+  searchTerm={searchTerm} 
+  refreshTrigger={refreshTrigger}
+  extraFilters={extraFilters} // Bunu ekledik
+/>
 
           <div style={{ height: "calc(100vh - 200px)" }}>
             {/* Toolbar: Sol ve Sağ gruplar */}
@@ -917,9 +933,10 @@ const DurusTakibi = () => {
   <AylikTab 
     search={searchTerm} 
     setSearch={setSearchTerm}
-    year={aylikYil}        // Aylık için özel state
-    setYear={setAylikYil}   // Aylık için özel set
+    year={aylikYil}
+    setYear={setAylikYil}
     jobTypeFilter={jobTypeFilter}
+    onFilterChange={handleRefreshStats} // Değiştirildi: Artık değerleri yukarı taşıyor
   />
 )}
 
