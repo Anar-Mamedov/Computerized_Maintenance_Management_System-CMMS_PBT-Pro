@@ -73,6 +73,16 @@ function Component5() {
 
   const kritikColumns = useMemo(() => [
     {
+      title: "Stok Kod",
+      dataIndex: "STK_KOD",
+      key: "STK_KOD",
+      render: (text, record) => (
+        <Text style={{ color: "#1677ff", cursor: "pointer" }} onClick={() => handleEditDrawerOpen(record)}>
+          {text}
+        </Text>
+      ),
+    },
+    {
       title: "Stok Tanım",
       dataIndex: "STK_TANIM",
       key: "STK_TANIM",
