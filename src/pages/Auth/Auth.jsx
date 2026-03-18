@@ -39,8 +39,9 @@ export default function Auth() {
     axios
       .get(`${baseURL}/api/VeritabaniBaglantiKontrol`)
       .then((response) => {
-        if (response.data === true) {
+        if (response.data.baglantiDurumu === true) {
           localStorage.setItem("baseURL", baseURL);
+          localStorage.setItem("isEntraID", JSON.stringify(response.data.isEntraID));
           window.location.reload();
         } else {
           console.error("URL is not valid or server is not responding correctly.");
