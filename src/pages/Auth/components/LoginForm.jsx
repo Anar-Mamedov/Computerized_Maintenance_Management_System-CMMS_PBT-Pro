@@ -143,6 +143,7 @@ export default function LoginForm() {
 
   const handleClearBaseURL = () => {
     localStorage.removeItem("baseURL");
+    localStorage.removeItem("isEntraID");
     window.location.reload();
   };
 
