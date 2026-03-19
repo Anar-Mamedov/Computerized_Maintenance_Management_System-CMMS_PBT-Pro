@@ -68,7 +68,7 @@ export default function useColumns({ label, onOpenEdit }) {
     createColumn("Çalışma Takvimi", "MKN_TAKVIM", { width: 150, visible: false }),
     createColumn("Üretim Yılı", "MKN_URETIM_YILI", { width: 150, visible: false }),
     createColumn("Masraf Merkezi", "MKN_MASRAF_MERKEZ", { width: 150, visible: false }),
-    createColumn("Sorumlu Atölye", "MKN_ATOLYE", { width: 150, visible: false }),
+    createColumn("Sorumlu Atölye", "MKN_ATOLYE", { width: 150, visible: true }),
     createColumn("Bakım Grubu", "MKN_BAKIM_GRUP", { width: 150, visible: false }),
     createColumn("Arıza Grubu", "MKN_ARIZA_GRUP", { width: 150, visible: false }),
     createColumn("Öncelik", "MKN_ONCELIK", { width: 150, visible: false }),
