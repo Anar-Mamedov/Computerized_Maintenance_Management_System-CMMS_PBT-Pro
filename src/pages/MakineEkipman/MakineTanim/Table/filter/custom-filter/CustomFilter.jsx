@@ -1,19 +1,11 @@
 import { CloseOutlined, FilterOutlined, PlusOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Col,
-  Drawer,
-  Row,
-  Typography,
-  Select,
-  Space,
-  Input,
-} from "antd";
+import { Button, Col, Drawer, Row, Typography, Select, Space, Input, Spin } from "antd";
 import React, { useState } from "react";
 import styled from "styled-components";
 import "./style.css";
+import AxiosInstance from "../../../../../../api/http";
 
-const { Text, Link } = Typography;
+const { Text } = Typography;
 
 const StyledCloseOutlined = styled(CloseOutlined)`
   svg {
@@ -33,23 +25,95 @@ const CloseButton = styled.div`
   cursor: pointer;
 `;
 
+// ID bazlı selectbox kullanan filtre tipleri
+const ID_BASED_FILTERS = ["marka", "model", "atolye"];
+
 export default function CustomFilter({ onSubmit }) {
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState([]);
   const [newObjectsAdded, setNewObjectsAdded] = useState(false);
   const [filtersExist, setFiltersExist] = useState(false);
-  const [inputValues, setInputValues] = useState({}); // Input değerlerini saklamak için bir state kullanıyoruz
+  const [inputValues, setInputValues] = useState({});
   const [filters, setFilters] = useState({});
-  const [filterValues, setFilterValues] = useState({});
 
   // Create a state variable to store selected values for each row
   const [selectedValues, setSelectedValues] = useState({});
+
+  // ID bazlı filtreler için çoklu seçim değerleri
+  const [selectedIdValues, setSelectedIdValues] = useState({});
+
+  // Dropdown options cache
+  const [markaOptions, setMarkaOptions] = useState([]);
+  const [modelOptions, setModelOptions] = useState([]);
+  const [atolyeOptions, setAtolyeOptions] = useState([]);
+  const [loadingOptions, setLoadingOptions] = useState({});
+
+  const fetchMarkaOptions = async () => {
+    if (markaOptions.length > 0) return;
+    setLoadingOptions((prev) => ({ ...prev, marka: true }));
+    try {
+      const response = await AxiosInstance.get("GetMakineMarks");
+      if (response && response.Makine_Marka_List) {
+        setMarkaOptions(response.Makine_Marka_List);
+      }
+    } catch (error) {
+      console.error("Error fetching marka data:", error);
+    } finally {
+      setLoadingOptions((prev) => ({ ...prev, marka: false }));
+    }
+  };
+
+  const fetchModelOptions = async () => {
+    if (modelOptions.length > 0) return;
+    setLoadingOptions((prev) => ({ ...prev, model: true }));
+    try {
+      const response = await AxiosInstance.get("GetMakineModelByMarkaId?markaId=0");
+      if (response && response.Makine_Model_List) {
+        setModelOptions(response.Makine_Model_List);
+      }
+    } catch (error) {
+      console.error("Error fetching model data:", error);
+    } finally {
+      setLoadingOptions((prev) => ({ ...prev, model: false }));
+    }
+  };
+
+  const fetchAtolyeOptions = async () => {
+    if (atolyeOptions.length > 0) return;
+    setLoadingOptions((prev) => ({ ...prev, atolye: true }));
+    try {
+      const response = await AxiosInstance.get("AtolyeList");
+      if (response) {
+        setAtolyeOptions(response);
+      }
+    } catch (error) {
+      console.error("Error fetching atolye data:", error);
+    } finally {
+      setLoadingOptions((prev) => ({ ...prev, atolye: false }));
+    }
+  };
 
   const handleSelectChange = (value, rowId) => {
     setSelectedValues((prevSelectedValues) => ({
       ...prevSelectedValues,
       [rowId]: value,
     }));
+    // Filtre tipi değiştiğinde eski değerleri sıfırla
+    setInputValues((prev) => ({ ...prev, [`input-${rowId}`]: "" }));
+    setSelectedIdValues((prev) => ({ ...prev, [rowId]: [] }));
+
+    // ID bazlı filtrelerde verileri çek
+    if (value === "marka") {
+      fetchMarkaOptions();
+    } else if (value === "model") {
+      fetchModelOptions();
+    } else if (value === "atolye") {
+      fetchAtolyeOptions();
+    }
+  };
+
+  const handleIdValueChange = (values, rowId) => {
+    setSelectedIdValues((prev) => ({ ...prev, [rowId]: values }));
   };
 
   const showDrawer = () => {
@@ -61,19 +125,31 @@ export default function CustomFilter({ onSubmit }) {
   };
 
   const handleSubmit = () => {
-    // Combine selected values and input values for each row
-    const rowData = rows.map((row) => ({
-      selectedValue: selectedValues[row.id] || "",
-      inputValue: inputValues[`input-${row.id}`] || "",
-    }));
+    const rowData = rows.map((row) => {
+      const selectedValue = selectedValues[row.id] || "";
+      const isIdBased = ID_BASED_FILTERS.includes(selectedValue);
 
-    // Filter out rows where both selectedValue and inputValue are empty
+      if (isIdBased) {
+        return {
+          selectedValue,
+          inputValue: selectedIdValues[row.id] || [],
+          isIdBased: true,
+        };
+      }
+      return {
+        selectedValue,
+        inputValue: inputValues[`input-${row.id}`] || "",
+        isIdBased: false,
+      };
+    });
+
     const filteredData = rowData.filter(({ selectedValue, inputValue }) => {
-      return selectedValue !== "" || inputValue !== "";
+      if (!selectedValue) return false;
+      if (Array.isArray(inputValue)) return inputValue.length > 0;
+      return inputValue !== "";
     });
 
     if (filteredData.length > 0) {
-      // Convert the filteredData array to the desired JSON format
       const json = filteredData.reduce((acc, { selectedValue, inputValue }) => {
         return {
           ...acc,
@@ -81,12 +157,9 @@ export default function CustomFilter({ onSubmit }) {
         };
       }, {});
 
-      console.log(json);
-      // You can now submit or process the json object as needed.
       onSubmit(json);
     } else {
-      // Handle the case where there are no non-empty filters (optional)
-      console.log("No filters to submit.");
+      onSubmit("");
     }
     setOpen(false);
   };
@@ -118,17 +191,51 @@ export default function CustomFilter({ onSubmit }) {
     setFiltersExist(true);
     setInputValues((prevInputValues) => ({
       ...prevInputValues,
-      [newRow.id]: "", // Set an empty input value for the new row
+      [newRow.id]: "",
     }));
   };
 
-  const onChange = (value) => {
-    console.log(`selected ${value}`);
+  const getIdBasedOptions = (filterType) => {
+    if (filterType === "marka") {
+      return markaOptions.map((item) => ({
+        value: item.TB_MARKA_ID,
+        label: item.MRK_MARKA,
+      }));
+    } else if (filterType === "model") {
+      return modelOptions.map((item) => ({
+        value: item.TB_MODEL_ID,
+        label: item.MDL_MODEL,
+      }));
+    } else if (filterType === "atolye") {
+      return atolyeOptions
+        .filter((item) => item?.TB_ATOLYE_ID !== undefined && item?.TB_ATOLYE_ID !== null)
+        .map((item) => {
+          const name = item?.ATL_TANIM?.trim();
+          const code = item?.ATL_KOD?.trim();
+          const label = [code, name].filter(Boolean).join(" - ") || name || code || "";
+          return {
+            value: item.TB_ATOLYE_ID,
+            label,
+          };
+        });
+    }
+    return [];
   };
 
-  const onSearch = (value) => {
-    console.log("search:", value);
+  const isLoadingForFilter = (filterType) => {
+    if (filterType === "marka") return loadingOptions.marka;
+    if (filterType === "model") return loadingOptions.model;
+    if (filterType === "atolye") return loadingOptions.atolye;
+    return false;
   };
+
+  const fetchOptionsForFilter = (filterType) => {
+    if (filterType === "marka") fetchMarkaOptions();
+    else if (filterType === "model") fetchModelOptions();
+    else if (filterType === "atolye") fetchAtolyeOptions();
+  };
+
+  const isFilterApplied = newObjectsAdded || filtersExist;
 
   return (
     <>
@@ -137,14 +244,13 @@ export default function CustomFilter({ onSubmit }) {
         style={{
           display: "flex",
           alignItems: "center",
-          backgroundColor:
-            newObjectsAdded || filtersExist ? "#EBF6FE" : "#ffffffff",
+          backgroundColor: isFilterApplied ? "#EBF6FE" : "#ffffffff",
         }}
-        className={newObjectsAdded ? "#ff0000-dot-button" : ""}
+        className={isFilterApplied ? "#ff0000-dot-button" : ""}
       >
         <FilterOutlined />
         <span style={{ marginRight: "5px" }}>Filtreler</span>
-        {newObjectsAdded && <span className="blue-dot"></span>}
+        {isFilterApplied && <span className="blue-dot"></span>}
       </Button>
       <Drawer
         extra={
@@ -163,90 +269,107 @@ export default function CustomFilter({ onSubmit }) {
         onClose={onClose}
         open={open}
       >
-        {rows.map((row) => (
-          <Row
-            key={row.id}
-            style={{
-              marginBottom: "10px",
-              border: "1px solid #80808048",
-              padding: "15px 10px",
-              borderRadius: "8px",
-            }}
-          >
-            <Col span={24}>
-              <Col
-                span={24}
-                style={{
-                  marginBottom: "10px",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Text>Yeni Filtre</Text>
-                <CloseButton onClick={() => handleCancelClick(row.id)}>
-                  <StyledCloseOutlined />
-                </CloseButton>
+        {rows.map((row) => {
+          const currentFilterType = selectedValues[row.id];
+          const isIdBased = ID_BASED_FILTERS.includes(currentFilterType);
+
+          return (
+            <Row
+              key={row.id}
+              style={{
+                marginBottom: "10px",
+                border: "1px solid #80808048",
+                padding: "15px 10px",
+                borderRadius: "8px",
+              }}
+            >
+              <Col span={24}>
+                <Col
+                  span={24}
+                  style={{
+                    marginBottom: "10px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text>Yeni Filtre</Text>
+                  <CloseButton onClick={() => handleCancelClick(row.id)}>
+                    <StyledCloseOutlined />
+                  </CloseButton>
+                </Col>
+                <Col span={24} style={{ marginBottom: "10px" }}>
+                  <Select
+                    style={{ width: "100%", marginBottom: "10px" }}
+                    showSearch
+                    placeholder="Seçim Yap"
+                    optionFilterProp="children"
+                    onChange={(value) => handleSelectChange(value, row.id)}
+                    value={selectedValues[row.id] || undefined}
+                    filterOption={(input, option) => (option?.label || "").toLowerCase().includes(input.toLowerCase())}
+                    options={[
+                      {
+                        value: "mkn.MKN_KOD",
+                        label: "Makine Kodu",
+                      },
+                      {
+                        value: "mkn.MKN_TANIM",
+                        label: "Makine Tanımı",
+                      },
+                      {
+                        value: "marka",
+                        label: "Marka",
+                      },
+                      {
+                        value: "model",
+                        label: "Model",
+                      },
+                      {
+                        value: "mkn.MKN_SERI_NO",
+                        label: "Seri No",
+                      },
+                      {
+                        value: "atolye",
+                        label: "Atölye",
+                      },
+                    ]}
+                  />
+                  {/* Text bazlı filtreler için Input */}
+                  {currentFilterType && !isIdBased && (
+                    <Input
+                      placeholder="Arama Yap"
+                      name={`input-${row.id}`}
+                      value={inputValues[`input-${row.id}`] || ""}
+                      onChange={(e) => handleInputChange(e, row.id)}
+                    />
+                  )}
+                  {/* ID bazlı filtreler için çoklu seçim Select */}
+                  {currentFilterType && isIdBased && (
+                    <Select
+                      mode="multiple"
+                      style={{ width: "100%" }}
+                      showSearch
+                      allowClear
+                      placeholder="Seçim Yapınız"
+                      optionFilterProp="label"
+                      filterOption={(input, option) => (option?.label || "").toLowerCase().includes(input.toLowerCase())}
+                      value={selectedIdValues[row.id] || []}
+                      onChange={(values) => handleIdValueChange(values, row.id)}
+                      loading={isLoadingForFilter(currentFilterType)}
+                      notFoundContent={isLoadingForFilter(currentFilterType) ? <Spin size="small" /> : null}
+                      onDropdownVisibleChange={(dropdownOpen) => {
+                        if (dropdownOpen) {
+                          fetchOptionsForFilter(currentFilterType);
+                        }
+                      }}
+                      options={getIdBasedOptions(currentFilterType)}
+                    />
+                  )}
+                </Col>
               </Col>
-              <Col span={24} style={{ marginBottom: "10px" }}>
-                <Select
-                  style={{ width: "100%", marginBottom: "10px" }}
-                  showSearch
-                  placeholder={`Seçim Yap`}
-                  optionFilterProp="children"
-                  onChange={(value) => handleSelectChange(value, row.id)}
-                  value={selectedValues[row.id] || undefined}
-                  onSearch={onSearch}
-                  filterOption={(input, option) =>
-                    (option?.label || "")
-                      .toLowerCase()
-                      .includes(input.toLowerCase())
-                  }
-                  options={[
-                    {
-                      value: "mkn.MKN_KOD",
-                      label: "Makine Kodu",
-                    },
-                    {
-                      value: "mkn.MKN_TANIM",
-                      label: "Makine Tanımı",
-                    },
-                    {
-                      value: "lok.LOK_TANIM",
-                      label: "Lokasyon",
-                    },
-                    {
-                      value: "tip_kod.KOD_TANIM",
-                      label: "Makine Tipi",
-                    },
-                    {
-                      value: "kategori_kod.KOD_TANIM",
-                      label: "Kategori",
-                    },
-                    {
-                      value: "mrk.MKN_MARKA",
-                      label: "Marka",
-                    },
-                    {
-                      value: "mdl.MKN_MODEL",
-                      label: "Model",
-                    },
-                    {
-                      value: "mkn.MKN_SERI_NO",
-                      label: "Seri No",
-                    },
-                  ]}
-                />
-                <Input
-                  placeholder="Arama Yap"
-                  name={`input-${row.id}`} // Use a unique name for each input based on the row ID
-                  value={inputValues[`input-${row.id}`] || ""} // Use the corresponding input value
-                  onChange={(e) => handleInputChange(e, row.id)} // Pass the rowId to handleInputChange
-                />
-              </Col>
-            </Col>
-          </Row>
-        ))}
+            </Row>
+          );
+        })}
         <Button
           type="primary"
           onClick={handleAddFilterClick}
