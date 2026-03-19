@@ -165,6 +165,7 @@
   "makineTarihce.isEmirleri.bekleyen": "Waiting",
   "makineTarihce.isEmirleri.iptal": "Cancelled",
   "makineTarihce.isEmirleri.veriYok": "No data found.",
+  "makineTarihce.isEmirleri.toplamKayit": "Total Records: {{value}}",
   "makineTarihce.malzemeKullanimlari.toplamMalzeme": "Total Materials",
   "makineTarihce.malzemeKullanimlari.toplamMaliyet": "Total Cost",
   "makineTarihce.malzemeKullanimlari.sonKullanim": "Last Usage",

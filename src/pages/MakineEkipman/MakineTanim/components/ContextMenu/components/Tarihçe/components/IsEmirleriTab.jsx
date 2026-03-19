@@ -164,6 +164,8 @@ export default function IsEmirleriTab({ makineId, startDate, endDate }) {
   }, [makineId, startDate, endDate]);
 
   const isEmirleri = data?.IsEmirleri || [];
+  const parsedToplamKayitSayisi = Number(data?.ToplamKayitSayisi);
+  const toplamKayitSayisi = Number.isFinite(parsedToplamKayitSayisi) ? parsedToplamKayitSayisi : isEmirleri.length;
 
   useEffect(() => {
     setPage(1);
@@ -315,21 +317,26 @@ export default function IsEmirleriTab({ makineId, startDate, endDate }) {
           <Text type="secondary" style={{ fontSize: 12 }}>
             {t("makineTarihce.isEmirleri.ipucu")}
           </Text>
-          <Pagination
-            current={page}
-            pageSize={pageSize}
-            total={isEmirleri.length}
-            onChange={setPage}
-            showSizeChanger={false}
-            size="small"
-          />
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {statusCounts.tamamlanan > 0 && <StatusPill color="#dcfce7" text={t("makineTarihce.isEmirleri.tamamlanan")} value={statusCounts.tamamlanan} />}
-            {statusCounts.devamEden > 0 && <StatusPill color="#fef3c7" text={t("makineTarihce.isEmirleri.devamEden")} value={statusCounts.devamEden} />}
-            {statusCounts.bekleyen > 0 && <StatusPill color="#e2e8f0" text={t("makineTarihce.isEmirleri.bekleyen")} value={statusCounts.bekleyen} />}
-            {statusCounts.iptal > 0 && <StatusPill color="#fee2e2" text={t("makineTarihce.isEmirleri.iptal")} value={statusCounts.iptal} />}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: "auto" }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {statusCounts.tamamlanan > 0 && <StatusPill color="#dcfce7" text={t("makineTarihce.isEmirleri.tamamlanan")} value={statusCounts.tamamlanan} />}
+              {statusCounts.devamEden > 0 && <StatusPill color="#fef3c7" text={t("makineTarihce.isEmirleri.devamEden")} value={statusCounts.devamEden} />}
+              {statusCounts.bekleyen > 0 && <StatusPill color="#e2e8f0" text={t("makineTarihce.isEmirleri.bekleyen")} value={statusCounts.bekleyen} />}
+              {statusCounts.iptal > 0 && <StatusPill color="#fee2e2" text={t("makineTarihce.isEmirleri.iptal")} value={statusCounts.iptal} />}
+            </div>
+            <Text type="secondary" style={{ fontSize: 12, whiteSpace: "nowrap" }}>
+              {t("makineTarihce.isEmirleri.toplamKayit", { value: toplamKayitSayisi })}
+            </Text>
+            <Pagination
+              current={page}
+              pageSize={pageSize}
+              total={isEmirleri.length}
+              onChange={setPage}
+              showSizeChanger={false}
+              size="small"
+            />
+          </div>
         </div>
-      </div>
     </Panel>
     <IsEmriEditDrawer selectedRow={selectedIsEmriRow} onDrawerClose={() => setIsEmriDrawerVisible(false)} drawerVisible={isEmriDrawerVisible} onRefresh={() => {}} />
     </>
