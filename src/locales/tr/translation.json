@@ -792,6 +792,7 @@
   "makineTarihce.isEmirleri.bekleyen": "Bekleyen",
   "makineTarihce.isEmirleri.iptal": "İptal",
   "makineTarihce.isEmirleri.veriYok": "Veri bulunamadı.",
+  "makineTarihce.isEmirleri.toplamKayit": "Toplam Kayıt: {{value}}",
   "makineTarihce.malzemeKullanimlari.toplamMalzeme": "Toplam Malzeme",
   "makineTarihce.malzemeKullanimlari.toplamMaliyet": "Toplam Maliyet",
   "makineTarihce.malzemeKullanimlari.sonKullanim": "Son Kullanım",

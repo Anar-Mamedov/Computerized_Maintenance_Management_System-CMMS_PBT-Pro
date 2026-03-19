@@ -162,6 +162,7 @@
   "makineTarihce.isEmirleri.bekleyen": "Gözləyən",
   "makineTarihce.isEmirleri.iptal": "İmtina",
   "makineTarihce.isEmirleri.veriYok": "Məlumat tapılmadı.",
+  "makineTarihce.isEmirleri.toplamKayit": "Ümumi Qeyd: {{value}}",
   "makineTarihce.malzemeKullanimlari.toplamMalzeme": "Ümumi Material",
   "makineTarihce.malzemeKullanimlari.toplamMaliyet": "Ümumi Xərc",
   "makineTarihce.malzemeKullanimlari.sonKullanim": "Son İstifadə",
