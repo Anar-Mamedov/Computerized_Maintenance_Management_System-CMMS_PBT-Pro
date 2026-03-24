@@ -34,9 +34,9 @@ function GenelBilgiler({ selectedRowID }) {
   }, []);
 
   // --- Anlık Değerleri İzleme (Tank görseli için) ---
-  const kapasite = watch("KAPASITE") || 0;
-  const mevcutMiktar = watch("MEVCUT_MIKTAR") || 0;
-  const kritikMiktar = watch("KRITIK_MIKTAR") || 0;
+  const kapasite = watch("kapasite") || 0;       // KAPASITE değil, kapasite
+  const mevcutMiktar = watch("mevcutMiktar") || 0; 
+  const kritikMiktar = watch("kritikMiktar") || 0;
   
   // Doluluk oranı hesabı
   const dolulukOrani = kapasite > 0 ? (mevcutMiktar / kapasite) * 100 : 0;
@@ -93,17 +93,32 @@ function GenelBilgiler({ selectedRowID }) {
 
         {/* Sıvı Kısmı */}
         <div
-          style={{
-            height: `${dolulukOrani}%`,
-            backgroundColor: tankColor,
-            width: "100%",
-            transition: "height 0.5s ease-in-out, background-color 0.3s",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-        </div>
+  style={{
+    height: `${safeDoluluk}%`,
+    backgroundColor: tankColor,
+    width: "100%",
+    position: "relative",
+    // Fizik Animasyonu Buraya:
+    animation: "tankFillPhysics 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both",
+    transformOrigin: "bottom", // Dolum aşağıdan yukarı olsun
+    transition: "height 1s ease-in-out, background-color 0.5s",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden"
+  }}
+>
+  {/* Dalga Efekti (Opsiyonel: Daha canlı dursun diye üst kısma beyazımsı bir katman) */}
+  <div style={{
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '5px',
+    background: 'rgba(255,255,255,0.3)',
+    filter: 'blur(2px)'
+  }} />
+</div>
         
         {/* Yüzde Yazısı (Ortada dursun diye absolute veriyoruz) */}
         <div style={{
