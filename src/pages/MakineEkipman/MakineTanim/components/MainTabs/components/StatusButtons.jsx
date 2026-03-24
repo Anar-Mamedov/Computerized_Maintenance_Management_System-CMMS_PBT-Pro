@@ -14,6 +14,7 @@ function StatusButtons() {
     { name: "makineGucKaynagi", label: "gucKaynagi", color: "#722ed1" }, // purple-6
     { name: "makineIsBildirimi", label: "isBildirimi", color: "#1890ff" }, // blue-6
     { name: "makineOtonomBakim", label: "otonomBakim", color: "#13c2c2" }, // cyan-6
+    { name: "makineYakitKullanim", label: "yakitKullanir", color: "#eb2f96" }, // magenta-6
   ];
 
   const hexToRgba = (hex, alpha) => {

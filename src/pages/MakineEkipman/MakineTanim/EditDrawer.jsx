@@ -56,6 +56,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       makineGucKaynagi: false,
       makineIsBildirimi: false,
       makineOtonomBakim: false,
+      makineYakitKullanim: false,
 
       // detay bilgi sekmesi
       masrafMerkeziDetay: null,
@@ -145,6 +146,16 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       satisTutari: null,
       satisAciklama: null,
 
+      // yakit bilgileri sekmesi
+      makineYakitTipi: null,
+      makineYakitTipiID: null,
+      YakitDepoHacmi: null,
+      makineYakitSayacTakibi: false,
+      makineYakitSayacGuncellemesi: false,
+      ongorulenMin: null,
+      ongorulenMax: null,
+      gerceklesen: null,
+
       // ozel alanlar sekmesi
 
       ozelAlan1: null,
@@ -200,7 +211,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         setLoading(true); // Yükleme başladığında
         try {
           const response = await AxiosInstance.get(`GetMakineById?makineId=${selectedRow.key}`);
-          const data = Array.isArray(response) ? response : response?.data ?? [];
+          const data = Array.isArray(response) ? response : (response?.data ?? []);
           if (!data.length) {
             message.warning("Makine bilgisi bulunamadı.");
             setLoading(false);
@@ -252,7 +263,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("kritikMakine", normalizeBoolean(item.MKN_KRITIK_MAKINE));
           setValue("makineGucKaynagi", normalizeBoolean(item.MKN_GUC_KAYNAGI));
           setValue("makineIsBildirimi", normalizeBoolean(item.MKN_IS_TALEP));
-          // setValue("makineYakitKullanim", item.MKN_YAKIT_KULLANIM);
+          setValue("makineYakitKullanim", normalizeBoolean(item.MKN_YAKIT_KULLANIM));
           setValue("makineOtonomBakim", normalizeBoolean(item.MKN_OTONOM_BAKIM));
           // detay bilgi sekmesi
           setValue("masrafMerkeziDetay", trimIfString(item.MKN_MASRAF_MERKEZ));
@@ -351,14 +362,14 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("satisTutari", item.MKN_SATIS_FIYAT ?? null);
           setValue("satisAciklama", trimIfString(item.MKN_SATIS_ACIKLAMA));
           // Yakit Bilgileri sekmesi
-          // setValue("makineYakitTipi", item.MKN_YAKIT_TIP);
-          // setValue("makineYakitTipiID", item.MKN_YAKIT_TIP_ID);
-          // setValue("YakitDepoHacmi", item.MKN_YAKIT_DEPO_HACMI);
-          // setValue("makineYakitSayacTakibi", item.MKN_YAKIT_SAYAC_TAKIP);
-          // setValue("makineYakitSayacGuncellemesi", item.MKN_YAKIT_SAYAC_GUNCELLE);
-          // setValue("ongorulenMin", item.MKN_YAKIT_ONGORULEN_MIN);
-          // setValue("ongorulenMax", item.MKN_YAKIT_ONGORULEN_MAX);
-          // setValue("gerceklesen", item.MKN_YAKIT_GERCEKLESEN);
+          setValue("makineYakitTipi", item.MKN_YAKIT_TIPI ?? null);
+          setValue("makineYakitTipiID", item.MKN_YAKIT_TIP_ID ?? null);
+          setValue("YakitDepoHacmi", item.MKN_YAKIT_DEPO_HACMI ?? null);
+          setValue("makineYakitSayacTakibi", normalizeBoolean(item.MKN_YAKIT_SAYAC_TAKIP));
+          setValue("makineYakitSayacGuncellemesi", normalizeBoolean(item.MKN_YAKIT_SAYAC_GUNCELLE));
+          setValue("ongorulenMin", item.MKN_YAKIT_ONGORULEN_MIN ?? null);
+          setValue("ongorulenMax", item.MKN_YAKIT_ONGORULEN_MAX ?? null);
+          setValue("gerceklesen", item.MKN_YAKIT_GERCEKLESEN ?? null);
           // Özel Alanlar sekmesi
           setValue("ozelAlan1", trimIfString(item.MKN_OZEL_ALAN_1));
           setValue("ozelAlan2", trimIfString(item.MKN_OZEL_ALAN_2));
@@ -441,7 +452,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       MKN_KRITIK_MAKINE: data.kritikMakine,
       MKN_GUC_KAYNAGI: data.makineGucKaynagi,
       MKN_IS_TALEP: data.makineIsBildirimi,
-      // MKN_YAKIT_KULLANIM: data.makineYakitKullanim,
+      MKN_YAKIT_KULLANIM: data.makineYakitKullanim,
       MKN_OTONOM_BAKIM: data.makineOtonomBakim,
       MKN_MASRAF_MERKEZ_KOD_ID: data.masrafMerkeziIDDetay,
       MKN_ATOLYE_ID: data.atolyeID,
@@ -493,7 +504,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       MKN_KIRA_BASLANGIC_TARIH: formatDateWithDayjs(data.kiraBaslangicTarihi),
       MKN_KIRA_BITIS_TARIH: formatDateWithDayjs(data.kiraBitisTarihi),
       MKN_KIRA_SURE: data.kiraSuresi,
-      MKN_KIRA_PERIYOD: data.kiraSuresiBirim ? data.kiraSuresiBirim.label ?? data.kiraSuresiBirim : null,
+      MKN_KIRA_PERIYOD: data.kiraSuresiBirim ? (data.kiraSuresiBirim.label ?? data.kiraSuresiBirim) : null,
       // MKN_KIRA_SURE_BIRIM_KOD_ID: data.kiraSuresiBirimID,
       MKN_KIRA_TUTAR: data.kiraTutari,
       MKN_KIRA_ACIKLAMA: data.kiraAciklama,
@@ -504,13 +515,13 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       MKN_SATIS_FIYAT: data.satisTutari,
       MKN_SATIS_ACIKLAMA: data.satisAciklama,
       // Yakit Bilgileri sekmesi
-      // MKN_YAKIT_TIP_ID: data.makineYakitTipiID,
-      // MKN_YAKIT_DEPO_HACMI: data.YakitDepoHacmi,
-      // MKN_YAKIT_SAYAC_TAKIP: data.makineYakitSayacTakibi,
-      // MKN_YAKIT_SAYAC_GUNCELLE: data.makineYakitSayacGuncellemesi,
-      // MKN_YAKIT_ONGORULEN_MIN: data.ongorulenMin,
-      // MKN_YAKIT_ONGORULEN_MAX: data.ongorulenMax,
-      // MKN_YAKIT_GERCEKLESEN: data.gerceklesen,
+      MKN_YAKIT_TIP_ID: data.makineYakitTipiID,
+      MKN_YAKIT_DEPO_HACMI: data.YakitDepoHacmi,
+      MKN_YAKIT_SAYAC_TAKIP: data.makineYakitSayacTakibi,
+      MKN_YAKIT_SAYAC_GUNCELLE: data.makineYakitSayacGuncellemesi,
+      MKN_YAKIT_ONGORULEN_MIN: data.ongorulenMin,
+      MKN_YAKIT_ONGORULEN_MAX: data.ongorulenMax,
+      MKN_YAKIT_GERCEKLESEN: data.gerceklesen,
       MKN_OZEL_ALAN_1: data.ozelAlan1,
       MKN_OZEL_ALAN_2: data.ozelAlan2,
       MKN_OZEL_ALAN_3: data.ozelAlan3,
