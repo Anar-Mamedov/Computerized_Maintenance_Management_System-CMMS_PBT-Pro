@@ -11,6 +11,7 @@ import Ekipman from "./components/Ekipman/EkipmanListesiTablo.jsx";
 import Sayac from "./components/Sayac/Sayac.jsx";
 import PeriyodikBakimlarTablo from "./components/PeriyodikBakimlarTablo.jsx";
 import MainTabs from "../MainTabs/MainTabs.jsx";
+import YakitBilgileri from "./components/YakitBilgileri.jsx";
 
 import { t } from "i18next";
 
@@ -37,6 +38,7 @@ function Tablar({ selectedRowID, update }) {
   const { watch } = useFormContext();
   const watchedMakineId = watch("secilenMakineID");
   const effectiveMakineId = selectedRowID ?? watchedMakineId;
+  const yakitKullanim = watch("makineYakitKullanim");
 
   const tabs = useMemo(() => {
     const tabDefinitions = [
@@ -119,10 +121,24 @@ function Tablar({ selectedRowID, update }) {
           </div>
         ),
       },
+      {
+        key: "10",
+        label: t("yakitBilgileri"),
+        requiresYakit: true,
+        render: () => (
+          <div style={{ marginBottom: "10px" }}>
+            <YakitBilgileri />
+          </div>
+        ),
+      },
     ];
 
-    return tabDefinitions.filter(({ requiresUpdate }) => update || !requiresUpdate);
-  }, [effectiveMakineId, t, update, refreshKey]);
+    return tabDefinitions.filter(({ requiresUpdate, requiresYakit }) => {
+      if (requiresUpdate && !update) return false;
+      if (requiresYakit && !yakitKullanim) return false;
+      return true;
+    });
+  }, [effectiveMakineId, t, update, refreshKey, yakitKullanim]);
 
   useEffect(() => {
     if (!tabs.some((tab) => tab.key === activeKey) && tabs.length > 0) {
