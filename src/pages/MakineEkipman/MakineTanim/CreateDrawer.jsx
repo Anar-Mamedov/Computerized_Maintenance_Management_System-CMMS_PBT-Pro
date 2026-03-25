@@ -74,6 +74,7 @@ export default function CreateDrawer({ onRefresh }) {
       makineGucKaynagi: false,
       makineIsBildirimi: false,
       makineOtonomBakim: false,
+      makineYakitKullanim: false,
 
       // detay bilgi sekmesi
       masrafMerkeziDetay: null,
@@ -162,6 +163,16 @@ export default function CreateDrawer({ onRefresh }) {
       satisYeri: null,
       satisTutari: null,
       satisAciklama: null,
+
+      // yakit bilgileri sekmesi
+      makineYakitTipi: null,
+      makineYakitTipiID: null,
+      YakitDepoHacmi: null,
+      makineYakitSayacTakibi: false,
+      makineYakitSayacGuncellemesi: false,
+      ongorulenMin: null,
+      ongorulenMax: null,
+      gerceklesen: null,
 
       // ozel alanlar sekmesi
 
