@@ -262,7 +262,8 @@ export default function MainTabs({ modalOpen }) {
   // MakineTablo submit işlemini üst bileşende yakalamak için
   const handleMakineSubmit = (selectedData) => {
     if (!selectedData) return;
-    setValue("makine", selectedData.MKN_KOD || "");
+    setValue("makineKod", selectedData.MKN_KOD || "");
+    setValue("makine", selectedData.MKN_TANIM || "");
     setValue("makineID", selectedData.key || "");
     setValue("lokasyon1", selectedData.MKN_LOKASYON || "");
     setValue("lokasyon1ID", selectedData.MKN_LOKASYON_ID || "");
@@ -550,30 +551,58 @@ export default function MainTabs({ modalOpen }) {
         </div>
       </div>
       <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          width: "100%",
-          maxWidth: "660px",
-          gap: "10px",
-          flexDirection: "row",
-        }}
-      >
-        <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("makine")}</Text>
-        <div
-          style={{
-            display: "flex",
-            flexFlow: "column wrap",
-            alignItems: "flex-start",
-            width: "100%",
-            maxWidth: "520px",
-          }}
-        >
-          {isEmri ? <TextInput name="makine" isRequired={false} checked={true} /> : <MakineTablo onSubmit={handleMakineSubmit} suppressFormFields={true} />}
+  style={{
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+    maxWidth: "660px",
+    gap: "10px",
+    flexDirection: "row",
+  }}
+>
+  <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
+    {t("makine")}
+  </Text>
+
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center", // Yan yana hizalamak için
+      width: "100%",
+      maxWidth: "520px",
+      gap: "10px", // İki input arasındaki boşluk
+    }}
+  >
+    {isEmri ? (
+      <>
+        {/* Sol Tarafa Makine Kod */}
+        <div style={{ flex: 1 }}>
+          <TextInput 
+            name="makineKod" 
+            placeholder={t("makineKod")} 
+            isRequired={false} 
+            checked={true} 
+          />
         </div>
+        {/* Sağ Tarafa Makine Değeri/Tanımı */}
+        <div style={{ flex: 2 }}> {/* Sağ taraf biraz daha geniş olsun dersen flex değerini artırabilirsin */}
+          <TextInput 
+            name="makine" 
+            placeholder={t("makine")} 
+            isRequired={false} 
+            checked={true} 
+          />
+        </div>
+      </>
+    ) : (
+      <div style={{ width: "100%" }}>
+        <MakineTablo onSubmit={handleMakineSubmit} suppressFormFields={true} />
       </div>
+    )}
+  </div>
+</div>
 
       <div
         style={{

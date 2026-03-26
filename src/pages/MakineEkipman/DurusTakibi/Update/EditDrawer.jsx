@@ -88,6 +88,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
             const location = item.MKD_LOKASYON || {};
 
             setValue("makine", machine.MKN_TANIM || "");
+            setValue("makineKod", machine.MKN_KOD || "");
             setValue("makineID", machine.TB_MAKINE_ID ?? item.MKD_MAKINE_ID ?? null);
             setValue("lokasyon1", location.LOK_TANIM || "");
             setValue("lokasyon1ID", location.TB_LOKASYON_ID ?? item.MKD_LOKASYON_ID ?? null);

@@ -118,9 +118,9 @@ const DurusIstatistikKartlari = ({ body, searchTerm, refreshTrigger, extraFilter
             bodyStyle={{ padding: '20px 24px' }}
           >
             <Statistic 
-              title={<Text strong style={{ fontSize: '14px' }}>En Çok Duruş Yapan</Text>} 
-              value={stats?.en_cok_durus_yapan || "-"}
-              valueStyle={{ fontSize: '18px' }}
+              title={<Text strong style={{ fontSize: '14px' }}>En Çok Duruş Yapan / En Uzun Duran Ekipman</Text>} 
+              value={`${stats?.en_cok_durus_yapan || "-"} / ${stats?.en_uzun_duran_ekipman || "-"}`}
+              valueStyle={{ fontSize: '16px' }}
             />
           </Card>
         </Col>
