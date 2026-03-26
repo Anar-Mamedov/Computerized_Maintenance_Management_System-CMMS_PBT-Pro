@@ -17,6 +17,9 @@ export default function PersonelListesiTablo({ isActive }) {
   const [selectedRow, setSelectedRow] = useState(null);
 
   const kapali = watch("kapali");
+  const calismaSaat = Number(watch("calismaSaat") || 0);
+  const calismaDakika = Number(watch("calismaDakika") || 0);
+  const defaultCalismaSuresiDakika = calismaSaat * 60 + calismaDakika;
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 
@@ -245,7 +248,12 @@ export default function PersonelListesiTablo({ isActive }) {
     <div style={{ marginBottom: "25px" }}>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
         <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTable} />
-        <CreateModal kapali={kapali} onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} />
+        <CreateModal
+          kapali={kapali}
+          onRefresh={refreshTable}
+          secilenIsEmriID={secilenIsEmriID}
+          defaultCalismaSuresiDakika={defaultCalismaSuresiDakika}
+        />
       </div>
 
       <Table

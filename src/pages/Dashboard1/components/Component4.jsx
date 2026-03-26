@@ -75,7 +75,7 @@ function Component4(props) {
             <Text
               style={{ color: "white", fontSize: "15px", fontWeight: "400" }}
             >
-              Toplam Makine Sayısı
+              Toplam Ekipman Sayısı
             </Text>
           </div>
           <HistoryOutlined

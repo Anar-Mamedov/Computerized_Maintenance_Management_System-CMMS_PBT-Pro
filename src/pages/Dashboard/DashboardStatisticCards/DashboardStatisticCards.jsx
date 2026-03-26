@@ -141,7 +141,7 @@ export default function DashboardStatisticCards() {
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <div>
               <p>{data.MAKINE_SAYISI}</p>
-              <h2>Toplam Makine Sayısı</h2>
+              <h2>Toplam Ekipman Sayısı</h2>
             </div>
             <HistoryOutlined
               style={{ fontSize: "60px", color: "rgba(255,255,255,.8)" }}

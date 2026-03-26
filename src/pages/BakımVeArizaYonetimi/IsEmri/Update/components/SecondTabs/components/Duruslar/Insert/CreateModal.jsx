@@ -6,7 +6,17 @@ import { Controller, useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
 import dayjs from "dayjs";
 
-export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID, makineTanim, lokasyon, lokasyonID, makineID }) {
+export default function CreateModal({
+  workshopSelectedId,
+  onSubmit,
+  onRefresh,
+  secilenIsEmriID,
+  makineTanim,
+  lokasyon,
+  lokasyonID,
+  makineID,
+  defaultCalismaSuresiDakika,
+}) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   // message
   const [messageApi, contextHolder] = message.useMessage();
@@ -95,6 +105,9 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     setIsModalVisible((prev) => !prev);
     if (!isModalVisible) {
       reset();
+      if (defaultCalismaSuresiDakika > 0) {
+        setValue("sure", defaultCalismaSuresiDakika);
+      }
     }
   };
 
