@@ -15,6 +15,9 @@ export default function DuruslarListesiTablo({ isActive }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const { t } = useTranslation();
+  const calismaSaat = Number(watch("calismaSaat") || 0);
+  const calismaDakika = Number(watch("calismaDakika") || 0);
+  const defaultCalismaSuresiDakika = calismaSaat * 60 + calismaDakika;
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 
@@ -245,7 +248,15 @@ export default function DuruslarListesiTablo({ isActive }) {
             </Popconfirm>
           </div>
         )}
-        <CreateModal onRefresh={refreshTable} secilenIsEmriID={secilenIsEmriID} lokasyon={lokasyon} makineTanim={makineTanim} lokasyonID={lokasyonID} makineID={makineID} />
+        <CreateModal
+          onRefresh={refreshTable}
+          secilenIsEmriID={secilenIsEmriID}
+          lokasyon={lokasyon}
+          makineTanim={makineTanim}
+          lokasyonID={lokasyonID}
+          makineID={makineID}
+          defaultCalismaSuresiDakika={defaultCalismaSuresiDakika}
+        />
       </div>
 
       <Table

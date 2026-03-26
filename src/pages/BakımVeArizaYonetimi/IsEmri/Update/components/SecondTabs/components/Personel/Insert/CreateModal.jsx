@@ -6,7 +6,7 @@ import { Controller, useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
 import dayjs from "dayjs";
 
-export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID, kapali }) {
+export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID, kapali, defaultCalismaSuresiDakika }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const methods = useForm({
     defaultValues: {
@@ -89,6 +89,9 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     setIsModalVisible((prev) => !prev);
     if (!isModalVisible) {
       reset();
+      if (defaultCalismaSuresiDakika > 0) {
+        setValue("calismaSuresi", defaultCalismaSuresiDakika);
+      }
     }
   };
 
