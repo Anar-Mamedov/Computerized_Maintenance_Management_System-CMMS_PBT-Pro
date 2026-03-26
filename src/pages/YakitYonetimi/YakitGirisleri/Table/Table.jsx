@@ -140,36 +140,18 @@ const MainTable = () => {
   const [yakitModalVisible, setYakitModalVisible] = useState(false);
 
   const [body, setBody] = useState({
-    LokasyonIds: [],
-    YakitTipIds: [],
+    Arama: "",
+    KaynakTipi: "TUMU",
+    BaslangicTarihi: dayjs().subtract(7, 'day').startOf('day').toISOString(),
+    BitisTarihi: dayjs().endOf('day').toISOString(),
   });
 
-  const cardItems = useMemo(() => {
-    // Veri yoksa bile kart iskeletini koruyalım ki sayfa zıplamasın
-    const data = cardsData || {};
-
-    return [
-      { 
-        title: "Toplam Depo Sayısı", 
-        value: data.ToplamDepoSayisi ?? 0 
-      },
-      { 
-        title: "Toplam Yakıt Miktarı", 
-        // Sayıyı okunaklı hale getirdik (örn: 69.200 Lt)
-        value: `${Number(data.ToplamYakitMiktari || 0).toLocaleString('tr-TR')} Lt` 
-      },
-      { 
-        title: "Kritik Depo Sayısı", 
-        value: data.KritikDepoSayisi ?? 0,
-        // Kritik sayı 0'dan büyükse rengi kırmızımsı yapmak için style prop eklenebilir (render kısmında)
-        isCritical: (data.KritikDepoSayisi || 0) > 0 
-      },
-      { 
-        title: "Günlük Giriş Çıkış", 
-        value: data.GunlukGirisCikis || "0 / 0 L" 
-      },
-    ];
-  }, [cardsData]);
+  const cardItems = useMemo(() => [
+    { title: "Toplam Yakıt", value: `${cardsData.ToplamYakitLitre || 0} Lt` },
+    { title: "Toplam Tutar", value: `${Number(cardsData.ToplamTutar || 0).toLocaleString('tr-TR')} TL` },
+    { title: "Anormal Tüketim (Araç)", value: cardsData.AnormalTuketimAracSayisi || 0, isCritical: (cardsData.AnormalTuketimAracSayisi > 0) },
+    { title: "Km Başına Maliyet", value: `${cardsData.KmBasinaMaliyet || 0} TL` },
+  ], [cardsData]);
 
   const fetchCards = useCallback(async () => {
     try {
@@ -227,113 +209,94 @@ const MainTable = () => {
 
   const initialColumns = [
     {
-      title: "Depo Kodu",
-      dataIndex: "DEP_KOD",
-      key: "DEP_KOD",
+      title: "Plaka",
+      dataIndex: "Plaka",
+      key: "Plaka",
       width: 120,
       ellipsis: true,
       visible: true,
       render: (text, record) => <a onClick={() => onRowClick(record)}>{text}</a>,
-      sorter: (a, b) => a.DEP_KOD?.localeCompare(b.DEP_KOD),
+      sorter: (a, b) => a.Plaka?.localeCompare(b.Plaka),
     },
     {
-      title: "Depo Tanımı",
-      dataIndex: "DEP_TANIM",
-      key: "DEP_TANIM",
-      width: 200,
+      title: "Tarih",
+      dataIndex: "TarihSaat",
+      key: "TarihSaat",
+      width: 110,
       ellipsis: true,
-      visible: true,
-      sorter: (a, b) => a.DEP_TANIM?.localeCompare(b.DEP_TANIM),
+      sorter: (a, b) => {
+        if (a.TarihSaat === null) return -1;
+        if (b.TarihSaat === null) return 1;
+        return a.TarihSaat.localeCompare(b.TarihSaat);
+      },
+
+      visible: true, // Varsayılan olarak açık
+      render: (text) => {
+        if (!text) return "-";
+        
+        // Backend'den gelen "26.03.2026\n10:35:15" verisini parçalıyoruz
+        const parts = text.split("\n"); // [0] -> "26.03.2026", [1] -> "10:35:15"
+        
+        if (parts.length > 0) {
+          const datePart = parts[0];
+          // Saatin saniyelerini (10:35:15 -> 10:35) uçuruyoruz
+          const timePart = parts[1] ? parts[1].substring(0, 5) : ""; 
+          
+          return `${datePart} ${timePart}`;
+        }
+        
+        return text; // Beklenmedik bir format gelirse olduğu gibi bas
+      },
     },
     {
-      title: "Lokasyon",
-      dataIndex: "LOKASYON",
-      key: "LOKASYON",
-      width: 150,
-      ellipsis: true,
-      visible: true,
-      sorter: (a, b) => a.LOKASYON?.localeCompare(b.LOKASYON),
-    },
-    {
-      title: "Yakıt Türü",
-      dataIndex: "YAKIT_TURU",
-      key: "YAKIT_TURU",
+      title: "Yakıt Tipi",
+      dataIndex: "YakitTipi",
+      key: "YakitTipi",
       width: 120,
       visible: true,
-      sorter: (a, b) => a.YAKIT_TURU?.localeCompare(b.YAKIT_TURU),
+      render: (val) => <Tag color={val?.ColorClass === 'warning' ? 'orange' : 'blue'}>{val?.Text}</Tag>,
     },
     {
-      title: "Kapasite",
-      dataIndex: "KAPASITE",
-      key: "KAPASITE",
+      title: "Miktar (Lt)",
+      dataIndex: "Miktar",
+      key: "Miktar",
       width: 120,
       visible: true,
       render: (value) => <div style={{textAlign:'right'}}>{Number(value).toLocaleString('tr-TR')} Lt</div>,
-      sorter: (a, b) => a.KAPASITE - b.KAPASITE,
+      sorter: (a, b) => a.Miktar - b.Miktar,
     },
     {
-      title: "Mevcut Miktar",
-      dataIndex: "MEVCUT_MIKTAR",
-      key: "MEVCUT_MIKTAR",
-      width: 150,
+      title: "Tutar",
+      dataIndex: "Tutar",
+      key: "Tutar",
+      width: 200,
+      ellipsis: true,
       visible: true,
-      render: (value) => <div style={{textAlign:'right', fontWeight:'bold'}}>{Number(value).toLocaleString('tr-TR')} Lt</div>,
-      sorter: (a, b) => a.MEVCUT_MIKTAR - b.MEVCUT_MIKTAR,
+      sorter: (a, b) => a.Tutar?.localeCompare(b.Tutar),
     },
     {
-      title: "Doluluk",
-      dataIndex: "DOLULUK_ORANI",
-      key: "DOLULUK_ORANI",
-      width: 180,
-      visible: true,
-      render: (value, record) => {
-        // Renk belirleme: %20 altı kırmızı, diğerleri mavi/yeşil
-        let color = "#1890ff";
-        if (value < 20) color = "#ff4d4f";
-        else if (value > 90) color = "#52c41a";
-
-        return (
-          <Progress 
-            percent={value} 
-            size="small" 
-            strokeColor={color} 
-            format={percent => `${percent}%`}
-          />
-        );
-      },
-      sorter: (a, b) => a.DOLULUK_ORANI - b.DOLULUK_ORANI,
-    },
-    {
-      title: "Son Hareket",
-      dataIndex: "SON_HAREKET",
-      key: "SON_HAREKET",
+      title: "Kaynak",
+      dataIndex: "Kaynak",
+      key: "Kaynak",
       width: 150,
       visible: true,
     },
     {
-      title: "Durum",
-      dataIndex: "DURUM_TEXT",
-      key: "DURUM_TEXT",
-      width: 100,
+      title: "Sürücü",
+      dataIndex: "Surucu",
+      key: "Surucu",
+      width: 150,
       visible: true,
-      render: (text, record) => {
-        let color = "default";
-        if (record.DURUM_CLASS === "success") color = "success";
-        if (record.DURUM_CLASS === "warning") color = "warning";
-        if (record.DURUM_CLASS === "danger") color = "error";
-        return <Tag color={color}>{text}</Tag>;
-      },
     },
     {
-      title: "Aktiflik",
-      dataIndex: "AKTIF",
-      key: "AKTIF",
-      width: 80,
-      visible: false,
-      render: (aktif) => (
-        <Tag color={aktif ? "green" : "red"}>{aktif ? "Aktif" : "Pasif"}</Tag>
-      ),
-    }
+      title: "Lokasyon",
+      dataIndex: "Lokasyon",
+      key: "Lokasyon",
+      width: 150,
+      ellipsis: true,
+      visible: true,
+      sorter: (a, b) => a.Lokasyon?.localeCompare(b.Lokasyon),
+    },
   ];
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
@@ -419,39 +382,57 @@ const MainTable = () => {
   // Status veya Body değiştiğinde veriyi çek
   useEffect(() => {
     fetchEquipmentData();
-  }, [status, body]); 
+  }, [status, body, currentPage, pageSize]); 
 
   const fetchEquipmentData = async () => {
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
+    
+    // Dokümana uygun Body hazırlama
+    const payload = {
+      ...body,
+      Arama: searchTerm, // Dokümanda "Arama" olarak geçiyor
+    };
+
+    // Sayfalama parametreleri query string olarak eklenmiş, güzel.
+    const response = await AxiosInstance.post(
+      `GetAracYakitListesi?page=${currentPage}&pageSize=${pageSize}`, 
+      payload
+    );
+
+    // 1. DÜZELTME: has_error ve data kontrolü
+    if (response && !response.has_error && response.data) {
+      const { Liste, Ozetler, ToplamKayit } = response.data;
+
+      // 2. DÜZELTME: Id alanını key olarak kullanma
+      const formattedData = (Liste || []).map((item) => ({
+        ...item,
+        key: item.Id, // Dokümanda büyük "Id"
+      }));
+
+      setData(formattedData);
       
-      // Dokümana uygun Body hazırlama
-      const payload = {
-        LokasyonIds: body.LokasyonIds || [], // Array
-        YakitTipIds: body.YakitTipIds || [], // Array
-        Durum: status // 1, 0, -1
-      };
+      // 3. DÜZELTME: Toplam kayıt sayısını API'den gelen değer yap
+      setTotalDataCount(ToplamKayit || 0);
 
-      const response = await AxiosInstance.post(`GetYakitTankList`, payload);
-
-      if (Array.isArray(response)) {
-        const formattedData = response.map((item) => ({
-          ...item,
-          key: item.TB_DEPO_ID || item.TB_STOK_ID, // Key olarak ID kullan
-        }));
-        setData(formattedData);
-        setTotalDataCount(formattedData.length); // Client-side pagination için
-      } else {
-        console.error("API yanıtı beklenen formatta değil.", response);
-        setData([]);
+      // EĞER: Özet kartları da burada güncelliyorsan (isteğe bağlı)
+      if (Ozetler) {
+        setCardsData(Ozetler);
       }
-    } catch (error) {
-      console.error("Error in API request:", error);
-      message.error("Veri çekilemedi.");
-    } finally {
-      setLoading(false);
+
+    } else {
+      console.error("API hatası veya beklenmeyen format:", response);
+      setData([]);
+      setTotalDataCount(0);
+      message.warning(response?.message || "Veri formatı hatalı.");
     }
-  };
+  } catch (error) {
+    console.error("Error in API request:", error);
+    message.error("Sunucu bağlantı hatası.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   // --- Frontend Arama (Client-side Search) ---
   const filteredData = useMemo(() => {
@@ -501,8 +482,8 @@ const MainTable = () => {
 
   // Talep No için
   const onRowClick = (record) => {
-    console.log("Tıklanan Satırın ID'si:", record.TB_STOK_ID); // Konsolda ID görüyor musun?
-    setDrawer({ visible: true, data: { ...record, key: record.TB_STOK_ID } });
+    console.log("Tıklanan Satırın ID'si:", record.key ); // Konsolda ID görüyor musun?
+    setDrawer({ visible: true, data: { ...record, key: record.key  } });
   };
 
   const refreshTableData = useCallback(() => {

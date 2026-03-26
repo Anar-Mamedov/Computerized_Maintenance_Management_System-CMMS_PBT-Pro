@@ -74,12 +74,6 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen })
     },
 
     {
-      key: "5",
-      label: t("İletişim Bilgileri"),
-      children: <IletisimBilgileri modalOpen={modalOpen} />,
-    },
-
-    {
       key: "6",
       label: t("Ekli Belgeler"),
       children: <Belgeler modalOpen={modalOpen} />,
