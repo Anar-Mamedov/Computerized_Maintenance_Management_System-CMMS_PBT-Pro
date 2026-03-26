@@ -2,6 +2,7 @@ import React from "react";
 import { InputNumber } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import { t } from "i18next";
+import { formatNumberWithSeparators, getNumberSeparatorsByLanguage, parseLocalizedNumber } from "../numberLocale";
 
 export default function NumberInput({ name1, isRequired, minNumber, maxNumber, readOnly, disabled = false }) {
   const {
@@ -11,16 +12,7 @@ export default function NumberInput({ name1, isRequired, minNumber, maxNumber, r
 
   // Get language from localStorage
   const currentLang = localStorage.getItem("i18nextLng") || "en";
-
-  // Define decimal and thousand separators based on language
-  const separators = {
-    tr: { decimal: ",", thousand: "." },
-    en: { decimal: ".", thousand: "," },
-    ru: { decimal: ",", thousand: " " },
-    az: { decimal: ",", thousand: "." },
-  };
-
-  const { decimal, thousand } = separators[currentLang] || separators.en;
+  const { decimal } = getNumberSeparatorsByLanguage(currentLang);
 
   return (
     <>
@@ -37,20 +29,9 @@ export default function NumberInput({ name1, isRequired, minNumber, maxNumber, r
             style={{ width: "100%" }}
             readOnly={readOnly ? true : false}
             disabled={disabled}
-            formatter={(value) => {
-              if (!value) return "";
-              // Convert to string and split at decimal point
-              const [integerPart, decimalPart] = value.toString().split(".");
-              // Format integer part with thousand separator
-              const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousand);
-              // Return formatted number with appropriate decimal separator
-              return decimalPart ? `${formattedInteger}${decimal}${decimalPart}` : formattedInteger;
-            }}
-            parser={(value) => {
-              if (!value) return "";
-              // Remove thousand separators and convert decimal separator to standard format
-              return value.replace(new RegExp(`\\${thousand}`, "g"), "").replace(decimal, ".");
-            }}
+            formatter={(value) => formatNumberWithSeparators(value, currentLang)}
+            parser={(value) => parseLocalizedNumber(value, currentLang)}
+            decimalSeparator={decimal}
             step="0.01"
           />
         )}

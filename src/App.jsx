@@ -68,6 +68,7 @@ import YakitTuketimiAnalizi from "./pages/Analizler/YakitTuketimiAnalizi/YakitTu
 import StokSayimFisListe from "./pages/Malzeme&DepoYonetimi/StokSayim/StokSayimFisListe.jsx";
 import DokumanYonetimi from "./pages/Yonetim/DokumanYonetimi/DokumanYonetimi.jsx";
 import ResimYonetimi from "./pages/Yonetim/ResimYonetimi/ResimYonetimi.jsx";
+import EkipmanAylikCalismaSureleri from "./pages/Yonetim/EkipmanAylikCalismaSureleri/EkipmanAylikCalismaSureleri.jsx";
 import EkipmanTransferi from "./pages/MakineEkipman/EkipmanTransfer/EkipmanTransfer.jsx";
 import ProjeTanimlari2 from "./pages/ProjeYonetimi/ProjeTanimlari.jsx";
 import ProjeYonetimListe from "./pages/ProjeYonetimi/ProjeYonetimiListe.jsx";
@@ -260,6 +261,7 @@ export default function App() {
           <Route path="/projeTanimlari" element={<Hazirlaniyor />} />
           <Route path="/lokasyon" element={<LokasyonTanim />} />
           <Route path="/vardiyalar" element={<VardiyaTanim />} />
+          <Route path="/ekipmanAylikCalismaSureleri" element={<EkipmanAylikCalismaSureleri />} />
           <Route path="/bakimTanimlari" element={<BakimTanimlari />} />
           <Route path="/arizaTanimlari" element={<ArizaTanimlari />} />
           <Route path="/atolye" element={<AtolyeTanimlari />} />
