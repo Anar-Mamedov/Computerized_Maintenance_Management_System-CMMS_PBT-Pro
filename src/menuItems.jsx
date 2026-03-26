@@ -157,6 +157,7 @@ export const rawItems = [
       getItem("Resim Yönetimi", "resimYonetimi", true),
       getItem("Lokasyon Tanımları", "lokasyon", true, undefined, true, "KLL_WEB_LOKASYON"),
       getItem("Vardiya Tanımları", "vardiyalar", true, undefined, true, "KLL_WEB_VARDIYA"),
+      getItem("Ekipman Aylık Çalışma Süreleri", "ekipmanAylikCalismaSureleri", true),
       getItem("Kod Yönetimi", "kodYonetimi", true, undefined, true, "KLL_WEB_KOD"),
       getItem("Otomatik Kodlar", "otomatikKodlar", true, undefined, true, "KLL_WEB_OTOKOD"),
       getItem("Servis Öncelik Seviyeleri", "servisOncelikSeviyeleri", true, undefined, true, "KLL_WEB_SERVIS"),

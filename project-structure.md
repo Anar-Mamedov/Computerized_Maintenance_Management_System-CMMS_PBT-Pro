@@ -135,3 +135,13 @@ t("key"); // Çeviri anahtarı
 - **Loading states** ile kullanıcı deneyimi
 - **Error boundaries** ile hata sınırları
 - **Fallback UI** ile hata durumlarında alternatif görünüm
+
+## Yeni Modül Notu
+
+### Ekipman Aylık Çalışma Süreleri
+
+- Konum: `src/pages/Yonetim/EkipmanAylikCalismaSureleri/EkipmanAylikCalismaSureleri.jsx`
+- Amaç: Yıla göre aylık ekipman çalışma saatlerini kart görünümünde yönetmek (MTBF/MTTR için veri girişi).
+- API Akışı:
+  - `GET GetAylikCalismaListesi?yil={year}`: Seçilen yılın kayıtlarını getirir.
+  - `POST AddUpdateAylikCalisma`: Ay bazlı ekleme/güncelleme yapar (`TB_CALISMA_AYLIK_ID` 0 ise ekleme, doluysa güncelleme).
