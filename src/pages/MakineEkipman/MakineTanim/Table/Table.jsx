@@ -17,6 +17,7 @@ import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 
 const { Text } = Typography;
+const MAKINE_TABLE_SORT_STORAGE_KEY = "makineTableSortState";
 
 // Sütunların boyutlarını ayarlamak için kullanılan component
 
@@ -116,8 +117,22 @@ const MainTable = ({ setSelectedIds }) => {
   const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
   const [totalDataCount, setTotalDataCount] = useState(0); // Tüm veriyi tutan state
   const [pageSize, setPageSize] = useState(20); // Başlangıçta sayfa başına 20 kayıt göster
-  const [sortField, setSortField] = useState(null);
-  const [sortOrder, setSortOrder] = useState(null);
+  const [sortField, setSortField] = useState(() => {
+    try {
+      const savedSortState = JSON.parse(localStorage.getItem(MAKINE_TABLE_SORT_STORAGE_KEY) || "null");
+      return savedSortState?.field || null;
+    } catch (error) {
+      return null;
+    }
+  });
+  const [sortOrder, setSortOrder] = useState(() => {
+    try {
+      const savedSortState = JSON.parse(localStorage.getItem(MAKINE_TABLE_SORT_STORAGE_KEY) || "null");
+      return savedSortState?.order === "ascend" || savedSortState?.order === "descend" ? savedSortState.order : null;
+    } catch (error) {
+      return null;
+    }
+  });
 
   // edit drawer için
   const [drawer, setDrawer] = useState({
@@ -359,11 +374,12 @@ const MainTable = ({ setSelectedIds }) => {
       setPageSize(nextSize);
       setCurrentPage(pagination.current || 1);
 
-      if (sorter && (sorter.field || sorter.columnKey)) {
-        const nextField = sorter.field || sorter.columnKey;
-        if (sorter.order) {
+      const activeSorter = Array.isArray(sorter) ? sorter[0] : sorter;
+      if (activeSorter && (activeSorter.field || activeSorter.columnKey)) {
+        const nextField = activeSorter.field || activeSorter.columnKey;
+        if (activeSorter.order) {
           setSortField(nextField);
-          setSortOrder(sorter.order);
+          setSortOrder(activeSorter.order);
         } else {
           setSortField(null);
           setSortOrder(null);
@@ -473,6 +489,20 @@ const MainTable = ({ setSelectedIds }) => {
   }, [columns]);
   // sütunları local storage'a kaydediyoruz sonu
 
+  useEffect(() => {
+    if (sortField && sortOrder) {
+      localStorage.setItem(
+        MAKINE_TABLE_SORT_STORAGE_KEY,
+        JSON.stringify({
+          field: sortField,
+          order: sortOrder,
+        })
+      );
+    } else {
+      localStorage.removeItem(MAKINE_TABLE_SORT_STORAGE_KEY);
+    }
+  }, [sortField, sortOrder]);
+
   // sütunların boyutlarını ayarlamak için kullanılan fonksiyon
   const handleResize =
     (key) =>
@@ -545,6 +575,7 @@ const MainTable = ({ setSelectedIds }) => {
     localStorage.removeItem("columnVisibilityMakine");
     localStorage.removeItem("columnWidthsMakine");
     localStorage.removeItem("ozelAlanlarMakine");
+    localStorage.removeItem(MAKINE_TABLE_SORT_STORAGE_KEY);
     window.location.reload();
   }
 
