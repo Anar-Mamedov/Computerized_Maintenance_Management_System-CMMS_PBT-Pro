@@ -8,11 +8,13 @@ import Footer from "./components/Footer";
 import SecondTabs from "./components/SecondTabs/SecondTabs";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { t } from "i18next";
 
 dayjs.extend(customParseFormat);
 
 export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
   const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
   const [open, setOpen] = useState(drawerVisible);
   const [disabled, setDisabled] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
@@ -482,6 +484,42 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
   };
 
+  const idToWordMap = {
+    1: t("isEmriKapatma.alan.prosedur"),
+    2: t("isEmriKapatma.alan.makine"),
+    3: t("isEmriKapatma.alan.konu"),
+    4: t("isEmriKapatma.alan.tipi"),
+    5: t("isEmriKapatma.alan.proje"),
+    6: t("isEmriKapatma.alan.oncelik"),
+    7: t("isEmriKapatma.alan.atolye"),
+    8: t("isEmriKapatma.alan.sayac"),
+    9: t("isEmriKapatma.alan.aciklama"),
+    10: t("isEmriKapatma.alan.sozlesme"),
+    11: t("isEmriKapatma.alan.kapatmaMakineDurumu"),
+    12: t("isEmriKapatma.alan.firma"),
+    13: t("isEmriKapatma.alan.puan"),
+    14: t("isEmriKapatma.alan.ekipman"),
+    15: t("isEmriKapatma.alan.nedeni"),
+    16: t("isEmriKapatma.alan.referansNo"),
+    17: t("isEmriKapatma.alan.makineDurumu"),
+  };
+
+  const showRequestError = (error) => {
+    console.error("Error sending data:", error);
+    if (navigator.onLine) {
+      message.error("Hata Mesajı: " + error.message);
+    } else {
+      message.error("Internet Bağlantısı Mevcut Değil.");
+    }
+  };
+
+  const closeDrawerAndReset = () => {
+    setOpen(false);
+    onRefresh();
+    methods.reset();
+    onDrawerClose();
+  };
+
   const calismaSaat = watch("calismaSaat");
   const onayDurum = watch("onayDurum");
   const kapali = watch("kapali");
@@ -502,9 +540,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     }
   }, [calismaSaat, kapali, onayDurum, onayCheck]);
 
-  const onSubmit = (data) => {
-    // Form verilerini API'nin beklediği formata dönüştür
-    const Body = {
+  const buildUpdateBody = (data) => ({
       TB_ISEMRI_ID: data.secilenIsEmriID,
       ISM_ISEMRI_NO: data.isEmriNo,
       ISM_DUZENLEME_TARIH: formatDateWithDayjs(data.duzenlenmeTarihi),
@@ -589,36 +625,152 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       //Açıklama
       ISM_ACIKLAMA: data.isEmriAciklama,
       // Diğer alanlarınız...
-    };
+    });
 
-    // API'ye POST isteği gönder
-    AxiosInstance.post("UpdateIsEmri", Body)
-      .then((response) => {
-        console.log("Data sent successfully:", response);
-        if (response.status_code === 200 || response.status_code === 201) {
+  const updateIsEmri = async (data, { closeAfterSuccess = true, showSuccessMessage = true } = {}) => {
+    const body = buildUpdateBody(data);
+    try {
+      const response = await AxiosInstance.post("UpdateIsEmri", body);
+      if (response.status_code === 200 || response.status_code === 201) {
+        if (showSuccessMessage) {
           message.success("İşlem Başarılı.");
-          setOpen(false);
-          onRefresh();
-          methods.reset();
-          onDrawerClose();
-        } else if (response.status_code === 401) {
-          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
-        } else {
-          message.error("İşlem Başarısız.");
         }
-      })
-      .catch((error) => {
-        // Handle errors here, e.g.:
-        console.error("Error sending data:", error);
-        if (navigator.onLine) {
-          // İnternet bağlantısı var
-          message.error("Hata Mesajı: " + error.message);
-        } else {
-          // İnternet bağlantısı yok
-          message.error("Internet Bağlantısı Mevcut Değil.");
+        if (closeAfterSuccess) {
+          closeDrawerAndReset();
         }
-      });
-    console.log({ Body });
+        return true;
+      }
+      if (response.status_code === 401) {
+        message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+      } else {
+        message.error("İşlem Başarısız.");
+      }
+      return false;
+    } catch (error) {
+      showRequestError(error);
+      return false;
+    }
+  };
+
+  const checkRequiredFieldsBeforeClose = async (isEmriId) => {
+    try {
+      const response = await AxiosInstance.get(`CheckIsmFieldsForClose?isEmriId=${isEmriId}`);
+      if (response?.Durum === true) {
+        return true;
+      }
+
+      if (response?.TextArray?.length) {
+        message.error(
+          t("isEmriKapatma.ozelAlanEksikMesaj", {
+            fields: response.TextArray.join(",\n"),
+          })
+        );
+      }
+      if (response?.Idlist?.length) {
+        const words = response.Idlist.map(
+          (id) => idToWordMap[id] || t("isEmriKapatma.alan.bilinmeyenId")
+        );
+        message.error(
+          t("isEmriKapatma.genelAlanEksikMesaj", {
+            fields: words.join(",\n"),
+          })
+        );
+      }
+      if (response?.IsmIsNotPersonelTimeSet === true) {
+        message.error(t("isEmriKapatma.personelSureEksikMesaj"));
+      }
+      return false;
+    } catch (error) {
+      showRequestError(error);
+      return false;
+    }
+  };
+
+  const buildCloseBody = (data, isEmriId) => {
+    const closeDate = data.kapatmaTarihi || dayjs();
+    const closeTime = data.kapatmaSaati || dayjs();
+    const startDate = data.kapamaBaslamaTarihi || data.baslamaZamani;
+    const startTime = data.kapamaBaslamaSaati || data.baslamaZamaniSaati;
+    const endDate = data.kapamaBitisTarihi || data.bitisZamani;
+    const endTime = data.kapamaBitisSaati || data.bitisZamaniSaati;
+    const workHour = data.kapamaCalismaSaat ?? data.calismaSaat ?? 0;
+    const workMinute = data.kapamaCalismaDakika ?? data.calismaDakika ?? 0;
+
+    return [
+      {
+        TB_ISEMRI_ID: isEmriId,
+        ISM_BASLAMA_TARIH: formatDateWithDayjs(startDate),
+        ISM_BASLAMA_SAAT: formatTimeWithDayjs(startTime),
+        ISM_BITIS_TARIH: formatDateWithDayjs(endDate),
+        ISM_BITIS_SAAT: formatTimeWithDayjs(endTime),
+        ISM_SURE_CALISMA: workHour * 60 + workMinute,
+        ISM_SONUC_KOD_ID: data.kapamaSonucID,
+        ISM_KAPANMA_YDK_TARIH: formatDateWithDayjs(closeDate),
+        ISM_KAPANMA_YDK_SAAT: formatTimeWithDayjs(closeTime),
+        ISM_PUAN: data.kapamaBakimPuani,
+        ISM_KAPAT_MAKINE_DURUM_KOD_ID: data.kapamaMakineDurumuID,
+        ISM_SONUC: data.kapamaAciklama,
+      },
+    ];
+  };
+
+  const closeIsEmri = async (data) => {
+    const isEmriId = data.secilenIsEmriID || selectedRow?.key;
+    if (!isEmriId) {
+      message.error("İş emri bulunamadı.");
+      return false;
+    }
+
+    const canClose = await checkRequiredFieldsBeforeClose(isEmriId);
+    if (!canClose) {
+      return false;
+    }
+
+    const body = buildCloseBody(data, isEmriId);
+    try {
+      const response = await AxiosInstance.post("IsEmriKapat", body);
+      if (response.status_code === 200 || response.status_code === 201) {
+        return true;
+      }
+      if (response.status_code === 401) {
+        message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+      } else {
+        message.error("İş emri kapatma işlemi başarısız.");
+      }
+      return false;
+    } catch (error) {
+      showRequestError(error);
+      return false;
+    }
+  };
+
+  const onSubmit = async (data) => {
+    setActionLoading(true);
+    try {
+      await updateIsEmri(data);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const onSubmitAndClose = async (data) => {
+    setActionLoading(true);
+    try {
+      const updated = await updateIsEmri(data, { closeAfterSuccess: false, showSuccessMessage: false });
+      if (!updated) {
+        return;
+      }
+
+      const closed = await closeIsEmri(data);
+      if (!closed) {
+        return;
+      }
+
+      message.success("İş Emri Güncellendi ve Kapatıldı.");
+      closeDrawerAndReset();
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   const onClose = () => {
@@ -651,15 +803,19 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           open={open}
           extra={
             <Space>
+              <Button danger disabled={disabled || actionLoading} loading={actionLoading} onClick={methods.handleSubmit(onSubmitAndClose)}>
+                Kapat
+              </Button>
               <Button onClick={onClose}>İptal</Button>
               <Button
-                disabled={disabled}
+                disabled={disabled || actionLoading}
+                loading={actionLoading}
                 type="submit"
                 onClick={methods.handleSubmit(onSubmit)}
                 style={{
-                  backgroundColor: disabled ? "#d9d9d9" : "#2bc770",
-                  borderColor: disabled ? "#d9d9d9" : "#2bc770",
-                  color: disabled ? "black" : "#ffffff",
+                  backgroundColor: disabled || actionLoading ? "#d9d9d9" : "#2bc770",
+                  borderColor: disabled || actionLoading ? "#d9d9d9" : "#2bc770",
+                  color: disabled || actionLoading ? "black" : "#ffffff",
                 }}
               >
                 Güncelle
