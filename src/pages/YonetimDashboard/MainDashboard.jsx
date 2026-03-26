@@ -71,7 +71,7 @@ const widgetTitles = {
   widget1: "Devam Eden İş Talepleri",
   widget2: "Açık İş Emirleri",
   widget3: "Düşük Stoklu Malzemeler",
-  widget4: "Toplam Makine Sayısı",
+  widget4: "Toplam Ekipman Sayısı",
   widget5: "Yıllık Maliyet Grafiği",
   widget6: "Lokasyon Bazında İş Talepleri ve İş Emirleri Dağılımı",
   widget7: "İş Emri Analizi",

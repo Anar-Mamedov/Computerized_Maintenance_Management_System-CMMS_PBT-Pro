@@ -543,7 +543,7 @@ function Component5(updateApi) {
                   borderRadius: "50%",
                 }}
               ></div>
-              <Text> Toplam Makine Sayısı </Text>
+              <Text> Toplam Ekipman Sayısı </Text>
             </div>
 
             <Text
