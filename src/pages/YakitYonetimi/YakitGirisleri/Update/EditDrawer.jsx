@@ -4,13 +4,11 @@ import ruRU from "antd/es/locale/ru_RU";
 import azAZ from "antd/es/locale/az_AZ";
 import { Button, Drawer, Space, ConfigProvider, Modal, message, Spin } from "antd";
 import React, { useEffect, useState, useTransition } from "react";
-import MainTabs from "./components/MainTabs/MainTabs";
 import { useForm, FormProvider } from "react-hook-form";
 import AxiosInstance from "../../../../api/http.jsx";
 import Tablar from "./components/Tablar.jsx";
 import { t } from "i18next";
 import { InfoCircleOutlined } from "@ant-design/icons";
-import TankDetay from "../components/ContextMenu/components/TarihceOnayTablo.jsx";
 
 const localeMap = {
   tr: tr_TR,
@@ -35,8 +33,9 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       lokasyonTanim: null,  // (Selectbox için text)
       yakitTipID: null,     // YAKIT_TIP_ID
       yakitTipTanim: null,  // (Selectbox için text)
-      kapasite: null,       // KAPASITE
-      kritikMiktar: null,   // KRITIK_MIKTAR
+      kapasite: 0,          // KAPASITE
+      mevcutMiktar: 0,      // MIKTAR
+      kritikMiktar: 0,      // KRITIK_MIKTAR
       kritikUyar: false,    // KRITIK_UYAR (Checkbox)
       telefon: null,        // TELEFON
       aciklama: null,       // ACIKLAMA
@@ -47,89 +46,105 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   // --- VERİ ÇEKME İŞLEMİ (GET) ---
   useEffect(() => {
-    const handleDataFetchAndUpdate = async () => {
-      if (drawerVisible && selectedRow) {
+  const handleDataFetchAndUpdate = async () => {
+    if (drawerVisible && selectedRow) {
+      const kayitId = selectedRow.key || selectedRow.TB_YAKIT_HRK_ID;
+      if (!kayitId) return;
+
+      setLoading(true);
+      try {
+        const response = await AxiosInstance.get(`GetAracYakitById?id=${kayitId}`);
         
-        // Tabloda ID kolonu hangisi ise onu alıyoruz
-        const kayitId = selectedRow.key || selectedRow.TB_DEPO_ID; 
-        if (!kayitId) return;
+        // API yanıtı { has_error: false, data: { ... } } şeklinde olduğu için:
+        const item = response.data.data || response.data; 
 
-        setLoading(true);
-        try {
-          // NOT: Dokümanda GET endpoint yoktu, standart olarak bu isimde olduğunu varsayarak yazdım.
-          // Eğer farklıysa burayı düzeltmelisin: örn. `GetYakitTankById`
-          const response = await AxiosInstance.get(`GetYakitTankById?id=${kayitId}`);
-          const item = response; 
-
-          if (item) {
-            setValue("kod", item.DEP_KOD);
-            setValue("tanim", item.DEP_TANIM);
-            setValue("aktif", item.AKTIF);
-            setValue("personelID", item.SORUMLU_PERSONEL_ID);
-            setValue("personelTanim", item.SORUMLU_PERSONEL_AD);
-            setValue("lokasyonID", item.LOKASYON_ID);
-            setValue("lokasyonTanim", item.LOKASYON_AD);
-            setValue("yakitTipID", item.YAKIT_TIP_ID);
-            setValue("yakitTipTanim", item.YAKIT_TIP_AD);
-            setValue("kapasite", item.KAPASITE);
-            setValue("mevcutMiktar", item.MEVCUT_MIKTAR);
-            setValue("dolulukOrani", item.DOLULUK_ORANI);
-            setValue("kritikMiktar", item.KRITIK_MIKTAR);
-            setValue("kritikUyar", item.KRITIK_UYAR);
-            setValue("telefon", item.TELEFON);
-            setValue("fax", item.FAX);
-            setValue("email", item.EMAIL);
-            setValue("adres", item.ADRES);
-            setValue("aciklama", item.ACIKLAMA);
-          }
-
-          setLoading(false);
-        } catch (error) {
-          console.error("Veri çekilirken hata oluştu:", error);
-          setLoading(false);
+        if (item) {
+          // Temel Bilgiler
+          setValue("TB_YAKIT_HRK_ID", item.TB_YAKIT_HRK_ID);
+          setValue("MakineId", item.MakineId);
+          setValue("Tarih", item.Tarih);
+          setValue("Saat", item.Saat);
+          setValue("SonKm", item.SonKm);
+          setValue("AlinanKm", item.AlinanKm);
+          setValue("FarkKm", item.FarkKm);
+          setValue("Miktar", item.Miktar);
+          setValue("Fiyat", item.Fiyat);
+          setValue("Tutar", item.Tutar);
+          setValue("KdvTutar", item.KdvTutar);
+          setValue("IndirimOran", item.IndirimOran);
+          setValue("IndirimTutar", item.IndirimTutar);
+          setValue("StokKullanim", item.StokKullanim);
+          setValue("FullDepo", item.FullDepo);
+          setValue("YakitTipId", item.YakitTipId);
+          setValue("YakitTankId", item.YakitTankId);
+          setValue("IstasyonKodId", item.IstasyonKodId);
+          setValue("LokasyonId", item.LokasyonId);
+          setValue("ProjeId", item.ProjeId);
+          setValue("MasrafMerkeziId", item.MasrafMerkeziId);
+          setValue("PersonelId", item.PersonelId);
+          setValue("FirmaId", item.FirmaId);
+          setValue("VardiyaId", item.VardiyaId);
+          setValue("FaturaFisNo", item.FaturaFisNo);
+          setValue("FaturaTarihi", item.FaturaTarihi);
+          setValue("Aciklama", item.Aciklama);
         }
+      } catch (error) {
+        console.error("Veri çekilirken hata oluştu:", error);
+      } finally {
+        setLoading(false);
       }
-    };
+    }
+  };
 
-    handleDataFetchAndUpdate();
-  }, [drawerVisible, selectedRow, setValue]);
+  handleDataFetchAndUpdate();
+}, [drawerVisible, selectedRow, setValue]);
 
   // --- KAYDETME İŞLEMİ (POST - AddUpdateYakitTank) ---
   const onSubmit = (data) => {
-    // ID varsa Update (örneğin 18), yoksa Insert (0)
-    const kayitId = selectedRow?.key || selectedRow?.TB_DEPO_ID || 0;
-
-    // Dokümana uygun JSON Body
+    // Body'i tamamen senin JSON yapına göre kuruyoruz
     const Body = {
-      TB_DEPO_ID: Number(kayitId),          // 0: Yeni Kayıt, >0: Güncelleme
-      DEP_KOD: data.kod,
-      DEP_TANIM: data.tanim,
-      AKTIF: data.aktif,                    // true/false
-      LOKASYON_ID: Number(data.lokasyonID) || 0,
-      SORUMLU_PERSONEL_ID: Number(data.PERSONELID) || 0,
-      YAKIT_TIP_ID: Number(data.yakitTipID) || 0,
-      KAPASITE: Number(data.kapasite) || 0,
-      KRITIK_MIKTAR: Number(data.kritikMiktar) || 0,
-      KRITIK_UYAR: data.kritikUyar,         // true/false
-      TELEFON: data.telefon,
-      ACIKLAMA: data.aciklama
+      TB_YAKIT_HRK_ID: Number(data.TB_YAKIT_HRK_ID) || 0,
+      MakineId: Number(data.MakineId) || null,
+      Tarih: data.Tarih,
+      Saat: data.Saat,
+      SonKm: Number(data.SonKm) || 0,
+      AlinanKm: Number(data.AlinanKm) || 0,
+      FarkKm: Number(data.FarkKm) || 0,
+      Miktar: Number(data.Miktar) || 0,
+      Fiyat: Number(data.Fiyat) || 0,
+      Tutar: Number(data.Tutar) || 0,
+      KdvTutar: Number(data.KdvTutar) || 0,
+      IndirimOran: Number(data.IndirimOran) || 0,
+      IndirimTutar: Number(data.IndirimTutar) || 0,
+      StokKullanim: data.StokKullanim,
+      FullDepo: data.FullDepo,
+      YakitTipId: Number(data.YakitTipId) || null,
+      YakitTankId: data.StokKullanim ? (Number(data.YakitTankId) || null) : null,
+      IstasyonKodId: !data.StokKullanim ? (Number(data.IstasyonKodId) || null) : null,
+      LokasyonId: Number(data.LokasyonId) || null,
+      ProjeId: Number(data.ProjeId) || null,
+      MasrafMerkeziId: Number(data.MasrafMerkeziId) || null,
+      PersonelId: Number(data.PersonelId) || null,
+      FirmaId: Number(data.FirmaId) || null,
+      VardiyaId: Number(data.VardiyaId) || null,
+      FaturaFisNo: data.FaturaFisNo,
+      FaturaTarihi: data.FaturaTarihi,
+      Aciklama: data.Aciklama,
     };
 
-    AxiosInstance.post("/AddUpdateYakitTank", Body)
+    // NOT: Tank güncellemiyorsan endpoint ismini "AddUpdateAracYakit" gibi bir şeyle değiştirmen gerekebilir.
+    AxiosInstance.post("/AddUpdateAracYakit", Body)
       .then((response) => {
-        // Backend standart dönüşü: status_code
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("İşlem Başarılı.");
           onDrawerClose();
-          onRefresh(); // Tabloyu yenile
-        } else if (response.status_code === 401) {
-          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+          onRefresh();
         } else {
           message.error(response.status || "İşlem Başarısız.");
         }
       })
       .catch((error) => {
-        console.error("Error sending data:", error);
+        console.error("Error:", error);
         message.error("Sunucu hatası oluştu.");
       });
   };
@@ -157,17 +172,6 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   const extraButton = (
     <Space>
-      <Button 
-        icon={<InfoCircleOutlined />} 
-        onClick={() => setAnalizVisible(true)}
-        style={{
-          backgroundColor: "#1890ff",
-          borderColor: "#1890ff",
-          color: "#ffffff",
-        }}
-      >
-        {t("Detay")}
-      </Button>
       <Button onClick={onClose}>{t("iptal")}</Button>
       <Button
         type="submit"
@@ -187,7 +191,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     <FormProvider {...methods}>
       <ConfigProvider locale={currentLocale}>
         <Drawer
-          width="600px"
+          width="1200px"
           title={t("Tank Güncelleme")}
           onClose={onClose}
           open={drawerVisible}
@@ -195,17 +199,10 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         >
           <Spin spinning={loading}>
             <form onSubmit={methods.handleSubmit(onSubmit)}>
-              <MainTabs modalOpen={open} />
               <Tablar selectedRowID={selectedRow?.key || selectedRow?.TB_DEPO_ID} />
             </form>
           </Spin>
         </Drawer>
-
-        <TankDetay 
-          selectedRows={[selectedRow]} 
-          isExternalOpen={analizVisible} 
-          onExternalClose={() => setAnalizVisible(false)} 
-        />
       </ConfigProvider>
     </FormProvider>
   );

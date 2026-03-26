@@ -30,9 +30,10 @@ export default function CreateDrawer({ onRefresh }) {
       IstasyonKodId: null,
       LokasyonId: null,
       PersonelId: null,
+      FirmaId: null,
       FaturaFisNo: "",
       Aciklama: "",
-      // Validasyon için state'ler (Form içinde kullanılacak)
+      // Validasyon ve dinamik UI için yardımcı state'ler
       _maxKapasite: 0,
       _sayacZorunlu: false,
       _sayacBirimi: "KM"
@@ -57,34 +58,39 @@ export default function CreateDrawer({ onRefresh }) {
   };
 
   const onSubmit = (data) => {
-    // Kapasite Kontrolü (Frontend Validasyonu)
-    if (data._maxKapasite > 0 && data.Miktar > data._maxKapasite) {
-      message.error(`${t("Kapasite Aşımı!")} Maksimum: ${data._maxKapasite} L`);
-      return;
-    }
-
-    // Sayaç Kontrolü
-    if (data._sayacZorunlu && (!data.AlinanKm || data.AlinanKm <= data.SonKm)) {
-      message.error(t("Hata: Yeni girilen değer, aracın eski sayacından büyük olmalıdır!"));
-      return;
-    }
-
+    // Body'i tamamen senin JSON yapına göre kuruyoruz
     const Body = {
-      ...data,
-      Tarih: data.Tarih?.format("YYYY-MM-DDTHH:mm:ss"),
-      Saat: data.Saat?.format("HH:mm:ss"),
-      FaturaTarihi: data.Tarih?.format("YYYY-MM-DDTHH:mm:ss"), // Dokümana göre tarihle aynı set edildi
-      MakineId: Number(data.MakineId),
-      YakitTankId: data.StokKullanim ? Number(data.YakitTankId) : null,
-      Miktar: Number(data.Miktar),
-      Fiyat: Number(data.Fiyat),
-      Tutar: Number(data.Tutar),
-      AlinanKm: Number(data.AlinanKm),
-      SonKm: Number(data.SonKm),
-      FarkKm: Number(data.AlinanKm) - Number(data.SonKm)
+      TB_YAKIT_HRK_ID: Number(data.TB_YAKIT_HRK_ID) || 0,
+      MakineId: Number(data.MakineId) || null,
+      Tarih: data.Tarih ? dayjs(data.Tarih).format("YYYY-MM-DDT00:00:00") : null,
+      Saat: data.Saat ? dayjs(data.Saat).format("HH:mm:ss") : null,
+      SonKm: Number(data.SonKm) || 0,
+      AlinanKm: Number(data.AlinanKm) || 0,
+      FarkKm: Number(data.AlinanKm) - Number(data.SonKm),
+      Miktar: Number(data.Miktar) || 0,
+      Fiyat: Number(data.Fiyat) || 0,
+      Tutar: Number(data.Tutar) || 0,
+      KdvTutar: Number(data.KdvTutar) || 0,
+      IndirimOran: Number(data.IndirimOran) || 0,
+      IndirimTutar: Number(data.IndirimTutar) || 0,
+      StokKullanim: data.StokKullanim,
+      FullDepo: data.FullDepo,
+      YakitTipId: Number(data.YakitTipId) || null,
+      YakitTankId: data.StokKullanim ? (Number(data.YakitTankId) || null) : null,
+      IstasyonKodId: !data.StokKullanim ? (Number(data.IstasyonKodId) || null) : null,
+      LokasyonId: Number(data.LokasyonId) || null,
+      ProjeId: Number(data.ProjeId) || null,
+      MasrafMerkeziId: Number(data.MasrafMerkeziId) || null,
+      PersonelId: Number(data.PersonelId) || null,
+      FirmaId: Number(data.FirmaId) || null,
+      VardiyaId: Number(data.VardiyaId) || null,
+      FaturaFisNo: data.FaturaFisNo,
+      FaturaTarihi: data.FaturaTarihi,
+      Aciklama: data.Aciklama,
     };
 
-    AxiosInstance.post("AddAracYakit", Body)
+    // NOT: Tank güncellemiyorsan endpoint ismini "AddUpdateAracYakit" gibi bir şeyle değiştirmen gerekebilir.
+    AxiosInstance.post("AddUpdateAracYakit", Body)
       .then((response) => {
         if (!response.has_error) {
           message.success(t("Kayıt Başarılı."));

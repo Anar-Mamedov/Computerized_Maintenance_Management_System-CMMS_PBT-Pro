@@ -231,7 +231,22 @@ const MainTable = () => {
       },
 
       visible: true, // Varsayılan olarak açık
-      render: (text) => formatDate(text),
+      render: (text) => {
+        if (!text) return "-";
+        
+        // Backend'den gelen "26.03.2026\n10:35:15" verisini parçalıyoruz
+        const parts = text.split("\n"); // [0] -> "26.03.2026", [1] -> "10:35:15"
+        
+        if (parts.length > 0) {
+          const datePart = parts[0];
+          // Saatin saniyelerini (10:35:15 -> 10:35) uçuruyoruz
+          const timePart = parts[1] ? parts[1].substring(0, 5) : ""; 
+          
+          return `${datePart} ${timePart}`;
+        }
+        
+        return text; // Beklenmedik bir format gelirse olduğu gibi bas
+      },
     },
     {
       title: "Yakıt Tipi",
@@ -367,7 +382,7 @@ const MainTable = () => {
   // Status veya Body değiştiğinde veriyi çek
   useEffect(() => {
     fetchEquipmentData();
-  }, [status, body]); 
+  }, [status, body, currentPage, pageSize]); 
 
   const fetchEquipmentData = async () => {
   try {
@@ -467,8 +482,8 @@ const MainTable = () => {
 
   // Talep No için
   const onRowClick = (record) => {
-    console.log("Tıklanan Satırın ID'si:", record.TB_STOK_ID); // Konsolda ID görüyor musun?
-    setDrawer({ visible: true, data: { ...record, key: record.TB_STOK_ID } });
+    console.log("Tıklanan Satırın ID'si:", record.key ); // Konsolda ID görüyor musun?
+    setDrawer({ visible: true, data: { ...record, key: record.key  } });
   };
 
   const refreshTableData = useCallback(() => {
