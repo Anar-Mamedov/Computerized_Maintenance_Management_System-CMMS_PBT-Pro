@@ -192,7 +192,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       <ConfigProvider locale={currentLocale}>
         <Drawer
           width="1200px"
-          title={t("Tank Güncelleme")}
+          title={t("Yakıt Girişi Güncelleme")}
           onClose={onClose}
           open={drawerVisible}
           extra={extraButton}

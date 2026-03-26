@@ -7,6 +7,7 @@ import MakineTablo from "../../../Insert/components/SecondTabs/components/FisIce
 import AxiosInstance from "../../../../../../api/http";
 import FirmaTablo from "../../../../../../utils/components/FirmaTablo";
 import LokasyonSelect from "../../../../../../utils/components/LokasyonSelectbox";
+import PersonelSelect from "../../../../../../utils/components/PersonelSelectbox";
 import dayjs from "dayjs";
 
 const { Text, Title } = Typography;
@@ -23,9 +24,8 @@ export default function SecondTabs() {
   const watchLokasyonId = watch("LokasyonId");
   
   // API'den gelen gizli/bilgi alanları
-  const watchSayacBirimi = watch("_sayacBirimi") || "KM";
+  const watchSayacBirimi = watch("_sayacBirimi");
   const watchSayacZorunlu = watch("_sayacZorunlu");
-  const watchMaxKapasite = watch("_maxKapasite");
   const watchGuncelSayac = watch("_guncelSayacDegeri");
 
   // Hesaplamalar için izlenecek alanlar
@@ -35,18 +35,15 @@ export default function SecondTabs() {
   const watchFiyat = watch("Fiyat");
   const watchTutar = watch("Tutar");
   const watchFarkKm = watch("FarkKm");
-  const watchFullDepo = watch("FullDepo");
 
   // --- YENİ STATE'LER ---
   const [yakitTipleri, setYakitTipleri] = useState([]);
-  const [yakitTipleriLoading, setYakitTipleriLoading] = useState(false);
   
   const [yakitDepolari, setYakitDepolari] = useState([]);
   const [yakitDepolariLoading, setYakitDepolariLoading] = useState(false);
 
   // 1. Yakıt Tiplerini Çekme (Sayfa yüklendiğinde)
   useEffect(() => {
-    setYakitTipleriLoading(true);
     AxiosInstance.get(`GetYakitList?aktif=1`)
       .then((res) => {
         // Axios interceptor ayarlarına göre data bazen res'in içinde bazen direkt res olarak dönebilir.
@@ -54,7 +51,6 @@ export default function SecondTabs() {
         setYakitTipleri(list);
       })
       .catch(() => message.error(t("Yakıt tipleri alınamadı.")))
-      .finally(() => setYakitTipleriLoading(false));
   }, []);
 
   // 2. Yakıt Depolarını Çekme (Lokasyon, Yakıt Tipi veya Stok Kullanım değiştiğinde)
@@ -82,36 +78,17 @@ export default function SecondTabs() {
     }
   }, [watchStokKullanim, watchLokasyonId, watchYakitTipId, setValue]);
 
-  // Doküman Madde 2: Araç Seçildiğinde Ön Bilgi Çekme
-  useEffect(() => {
-    if (watchMakineId) {
-      AxiosInstance.get(`GetAracYakitGirisDurumu?makineId=${watchMakineId}`)
-        .then((res) => {
-          if (res.data) {
-            const d = res.data;
-            setValue("SonKm", d.SonAlinanKm);
-            setValue("_maxKapasite", d.DepoKapasitesi);
-            setValue("_sayacZorunlu", d.SayacTakibiZorunlu);
-            setValue("_sayacBirimi", d.SayacBirimi || "KM");
-            setValue("_guncelSayacDegeri", d.GuncelSayacDegeri);
-            setValue("AlinanKm", d.GuncelSayacDegeri);
-          }
-        })
-        .catch(() => message.error(t("Araç bilgileri alınamadı.")));
-    }
-  }, [watchMakineId, setValue]);
-
   // Fark KM Hesaplama
   useEffect(() => {
-    const son = Number(watchSonKm) || 0;
-    const alinan = Number(watchAlinanKm) || 0;
-    
-    if (alinan > son && son > 0) {
-      setValue("FarkKm", alinan - son);
-    } else {
-      setValue("FarkKm", null);
-    }
-  }, [watchSonKm, watchAlinanKm, setValue]);
+  const son = Number(watchSonKm) || 0;
+  const alinan = Number(watchAlinanKm) || 0;
+  
+  if (alinan >= son) {
+    setValue("FarkKm", alinan - son);
+  } else {
+    setValue("FarkKm", 0);
+  }
+}, [watchSonKm, watchAlinanKm, setValue]);
 
   // Tutar Hesaplama (Miktar ve Fiyat girildiğinde otomatik çarpar)
   useEffect(() => {
@@ -125,13 +102,6 @@ export default function SecondTabs() {
       }
     }
   }, [watchMiktar, watchFiyat, setValue, watchTutar]);
-
-  // Full Depo Seçildiğinde Kapasiteyi Miktara Basma
-  useEffect(() => {
-    if (watchFullDepo && watchMaxKapasite) {
-      setValue("Miktar", watchMaxKapasite);
-    }
-  }, [watchFullDepo, watchMaxKapasite, setValue]);
 
   // Otomatik Hesaplama Değişkenleri
   const fark = Number(watchFarkKm) || 0;
@@ -170,7 +140,7 @@ export default function SecondTabs() {
           </Col>
           <Col span={8}>
             <Text style={labelStyle}>{t("Sürücü / Personel")}</Text>
-            <KodIDSelectbox name1="PersonelId" kodID={456} />
+              <PersonelSelect fieldName="PersonelId" placeholder={t("Seçiniz")} mode="default" selectStyle={{ width: "100%", maxWidth: "600px"}}/>
           </Col>
           <Col span={8}>
             <Text style={labelStyle}>{t("Yakıt Tipi")}</Text>
@@ -402,7 +372,7 @@ export default function SecondTabs() {
               
               <Col span={24}>
                 <Text style={labelStyle}>{t("Lokasyon")}</Text>
-                <LokasyonSelect fieldName="LokasyonId" placeholder={t("Seçiniz")} mode="default" />
+                <LokasyonSelect fieldName="LokasyonId" placeholder={t("Seçiniz")} mode="default" selectStyle={{ width: "100%", maxWidth: "600px"}}/>
               </Col>
               <Col span={24}>
                 <Text style={labelStyle}>{t("Firma")}</Text>

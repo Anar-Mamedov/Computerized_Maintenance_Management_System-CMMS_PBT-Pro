@@ -7,6 +7,7 @@ import MakineTablo from "./MakineTablo";
 import AxiosInstance from "../../../../../../../../api/http";
 import FirmaTablo from "../../../../../../../../utils/components/FirmaTablo";
 import LokasyonSelect from "../../../../../../../../utils/components/LokasyonSelectbox";
+import PersonelSelect from "../../../../../../../../utils/components/PersonelSelectbox";
 import dayjs from "dayjs";
 
 const { Text, Title } = Typography;
@@ -170,7 +171,9 @@ export default function SecondTabs() {
           </Col>
           <Col span={8}>
             <Text style={labelStyle}>{t("Sürücü / Personel")}</Text>
-            <KodIDSelectbox name1="PersonelId" kodID={456} placeholder="Sürücü Seçiniz" />
+            <PersonelSelect
+              fieldName="PersonelId" placeholder={t("Seçiniz")} mode="default" selectStyle={{ width: "100%", maxWidth: "600px"}} 
+            />
           </Col>
           <Col span={8}>
             <Text style={labelStyle}>{t("Yakıt Tipi")}</Text>
@@ -417,9 +420,11 @@ export default function SecondTabs() {
                 />
               </Col>
               
-              <Col span={24}>
+              <Col span={24}> {/* Sütunu tam genişlik yapıyoruz (24 birim) */}
                 <Text style={labelStyle}>{t("Lokasyon")}</Text>
-                <LokasyonSelect fieldName="LokasyonId" placeholder={t("Seçiniz")} mode="default" />
+                  <LokasyonSelect 
+                    fieldName="LokasyonId" placeholder={t("Seçiniz")} mode="default" selectStyle={{ width: "100%", maxWidth: "600px"}} 
+                  />
               </Col>
               <Col span={24}>
                 <Text style={labelStyle}>{t("Firma")}</Text>
