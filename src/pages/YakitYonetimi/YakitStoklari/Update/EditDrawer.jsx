@@ -35,8 +35,9 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       lokasyonTanim: null,  // (Selectbox için text)
       yakitTipID: null,     // YAKIT_TIP_ID
       yakitTipTanim: null,  // (Selectbox için text)
-      kapasite: null,       // KAPASITE
-      kritikMiktar: null,   // KRITIK_MIKTAR
+      kapasite: 0,          // KAPASITE
+      mevcutMiktar: 0,      // MIKTAR
+      kritikMiktar: 0,      // KRITIK_MIKTAR
       kritikUyar: false,    // KRITIK_UYAR (Checkbox)
       telefon: null,        // TELEFON
       aciklama: null,       // ACIKLAMA

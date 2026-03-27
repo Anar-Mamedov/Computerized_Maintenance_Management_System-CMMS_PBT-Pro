@@ -8,16 +8,17 @@ const { Text } = Typography;
 
 const months = ["Oca", "Sub", "Mar", "Nis", "May", "Haz", "Tem", "Agu", "Eyl", "Eki", "Kas", "Ara"];
 
-const AylikTab = ({ search, setSearch, year, setYear, jobTypeFilter }) => {
+const AylikTab = ({ search, setSearch, year, setYear, jobTypeFilter, onFilterChange, body }) => {
   const [groupBy, setGroupBy] = useState("NEDEN");
   const [metric, setMetric] = useState("SURE");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // Yıl seçenekleri
   const yearOptions = useMemo(() => {
     const currentYear = new Date().getFullYear();
-    const startYear = 2010; // İstersen bunu daha eskiye çekebilirsin
-    const endYear = currentYear + 1; // Gelecek yılı da ekleyelim
+    const startYear = 2010;
+    const endYear = currentYear + 1;
     const years = [];
     for (let i = endYear; i >= startYear; i--) {
       years.push(i);
@@ -25,14 +26,16 @@ const AylikTab = ({ search, setSearch, year, setYear, jobTypeFilter }) => {
     return years;
   }, []);
 
+  // İlk yüklemede yıl yoksa setle
   useEffect(() => {
     if (!year) {
       setYear(new Date().getFullYear());
     }
   }, [year, setYear]);
 
+  // VERİ ÇEKME FONKSİYONU
   const fetchData = useCallback(async () => {
-    if (!year) return; // Yıl yoksa boşuna istek atmasın
+    if (!year) return;
     setLoading(true);
     try {
       const payload = {
@@ -53,7 +56,38 @@ const AylikTab = ({ search, setSearch, year, setYear, jobTypeFilter }) => {
     }
   }, [year, jobTypeFilter, groupBy, metric, search]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  // Sadece fetchData değiştiğinde (yani bağımlılıklar değiştiğinde) tabloyu güncelle
+  useEffect(() => { 
+    fetchData(); 
+  }, [fetchData]);
+
+  // --- KANKA KRİTİK NOKTA BURASI: Manuel Tetikleyiciler ---
+  const triggerCardUpdate = useCallback((valYear) => {
+    // Kanka seçilen yıla göre 1 Ocak ve 31 Aralık tarihlerini oluşturuyoruz
+    const startDate = `${valYear}-01-01`;
+    const endDate = `${valYear}-12-31`;
+
+    onFilterChange?.({ 
+      Kelime: search || "", 
+      baslangicTarih: startDate, 
+      bitisTarih: endDate 
+    });
+  }, [search, onFilterChange]); // body.filters bağımlılığını çıkardık çünkü artık manuel üretiyoruz
+
+  const handleYearChange = (val) => {
+    setYear(val);
+    triggerCardUpdate(val); // Yeni seçilen yıla göre 01.01 - 31.12 gönderir
+  };
+
+  const handleGroupByChange = (val) => {
+    setGroupBy(val);
+    triggerCardUpdate(year);
+  };
+
+  const handleMetricChange = (val) => {
+    setMetric(val);
+    triggerCardUpdate(year);
+  };
 
   const columns = [
     { title: 'Başlık', dataIndex: 'Baslik', key: 'Baslik', fixed: 'left', width: 150 },
@@ -62,13 +96,8 @@ const AylikTab = ({ search, setSearch, year, setYear, jobTypeFilter }) => {
       dataIndex: m,
       key: m,
       align: 'right',
-      width: 120, // Süre formatı uzun olduğu için genişliği biraz artırdım kanka
-      render: (v) => {
-        if (!v || v === "-") return "-";
-        // Eğer metric maliyet ise ve API sadece sayı gönderirse TL ekle, 
-        // ama API süreyi "sa dk" gönderdiği için müdahale etmiyoruz
-        return v;
-      }
+      width: 120,
+      render: (v) => (!v || v === "-") ? "-" : v
     })),
     { 
       title: 'Toplam', 
@@ -85,25 +114,40 @@ const AylikTab = ({ search, setSearch, year, setYear, jobTypeFilter }) => {
     <Space direction="vertical" size="middle" style={{ display: 'flex', width: '100%' }}>
       <Card size="small">
         <Space wrap>
-          <Input placeholder="Arama..." prefix={<SearchOutlined />} value={search} onChange={e => setSearch(e.target.value)} style={{ width: 200 }} />
+          <Input 
+            placeholder="Arama..." 
+            prefix={<SearchOutlined />} 
+            value={search} 
+            onChange={e => setSearch(e.target.value)} 
+            onPressEnter={() => triggerCardUpdate(year)} // Enter'a basınca kartları da güncelle
+            style={{ width: 200 }} 
+          />
           <Select 
             value={year} 
-            onChange={setYear} 
+            onChange={handleYearChange} // Değişti
             style={{ width: 100 }}
             placeholder="Yıl Seç"
-            showSearch // Kanka çok yıl olursa içinde arama da yapabilirsin
+            showSearch
           >
             {yearOptions.map(y => (
               <Option key={y} value={y}>{y}</Option>
             ))}
           </Select>
-          <Select value={groupBy} onChange={setGroupBy} style={{ width: 160 }}>
+          <Select 
+            value={groupBy} 
+            onChange={handleGroupByChange} // Değişti
+            style={{ width: 160 }}
+          >
             <Option value="NEDEN">Duruş Nedenleri</Option>
             <Option value="LOKASYON">Lokasyonlar</Option>
             <Option value="EKIPMANTIP">Ekipman Tipi</Option>
             <Option value="MARKA">Markalar</Option>
           </Select>
-          <Select value={metric} onChange={setMetric} style={{ width: 140 }}>
+          <Select 
+            value={metric} 
+            onChange={handleMetricChange} // Değişti
+            style={{ width: 140 }}
+          >
             <Option value="SURE">Süre (dk)</Option>
             <Option value="MALIYET">Maliyet</Option>
             <Option value="SAYI">Kayıt Sayısı</Option>
@@ -112,7 +156,6 @@ const AylikTab = ({ search, setSearch, year, setYear, jobTypeFilter }) => {
         </Space>
       </Card>
       
-      {/* Scroll ve Sayfalama Alanı */}
       <Table 
         dataSource={data} 
         columns={columns} 

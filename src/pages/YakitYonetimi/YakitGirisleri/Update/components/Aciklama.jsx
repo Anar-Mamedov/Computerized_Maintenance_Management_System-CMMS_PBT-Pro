@@ -16,7 +16,7 @@ function Aciklama() {
   } = useFormContext();
   return (
     <div>
-      <Controller name="aciklama" control={control} render={({ field }) => <TextArea {...field} rows={4} />} />
+      <Controller name="Aciklama" control={control} render={({ field }) => <TextArea {...field} rows={4} />} />
     </div>
   );
 }
