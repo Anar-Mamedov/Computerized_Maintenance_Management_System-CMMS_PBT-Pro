@@ -35,19 +35,31 @@ const localeMap = {
 
 const { Text } = Typography;
 
-const DurusIstatistikKartlari = ({ body, searchTerm, refreshTrigger, extraFilters }) => {
+const DurusIstatistikKartlari = ({ body, searchTerm }) => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
+  const enCokDurusTitle = "En Çok Duruş Yapan / En Uzun Duran Ekipman";
+
+  const enCokDurusValue = useMemo(() => {
+    const enCokDurusYapan = stats?.en_cok_durus_yapan;
+    const enUzunDuran = stats?.en_uzun_duran;
+
+    if (enCokDurusYapan && enUzunDuran) {
+      return `${enCokDurusYapan} / ${enUzunDuran}`;
+    }
+
+    return enCokDurusYapan || "-";
+  }, [stats]);
 
   const fetchStats = useCallback(async () => {
     setLoading(true);
     try {
+      // Kanka, Filters componentinden gelen tüm filtreleri buraya yayıyoruz
       const payload = {
-        Kelime: searchTerm,
+        Kelime: searchTerm, // Arama kelimesini ekledik
         BaslangicTarih: body.filters?.baslangicTarih,
         BitisTarih: body.filters?.BitisTarih,
-        ...body.filters?.customfilter,
-        ...extraFilters // Aylık tabdan gelen filtreler burada payload'a yayılıyor
+        ...body.filters?.customfilter
       };
 
       const response = await AxiosInstance.post("GetDurusIstatistik", payload);
@@ -59,8 +71,7 @@ const DurusIstatistikKartlari = ({ body, searchTerm, refreshTrigger, extraFilter
     } finally {
       setLoading(false);
     }
-    // KANKA DİKKAT: extraFilters veya refreshTrigger değiştiğinde bu fonksiyon re-create olur
-  }, [body.filters, searchTerm, refreshTrigger, extraFilters]); 
+  }, [body.filters, searchTerm]); // Filtreler değiştikçe tetiklenir
 
   useEffect(() => {
     fetchStats();
@@ -117,11 +128,16 @@ const DurusIstatistikKartlari = ({ body, searchTerm, refreshTrigger, extraFilter
             style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
             bodyStyle={{ padding: '20px 24px' }}
           >
-            <Statistic 
-              title={<Text strong style={{ fontSize: '14px' }}>En Çok Duruş Yapan / En Uzun Duran Ekipman</Text>} 
-              value={`${stats?.en_cok_durus_yapan || "-"} / ${stats?.en_uzun_duran_ekipman || "-"}`}
-              valueStyle={{ fontSize: '16px' }}
-            />
+            <Text
+              strong
+              style={{ fontSize: "14px", display: "block", maxWidth: "100%" }}
+              ellipsis={{ tooltip: enCokDurusTitle }}
+            >
+              {enCokDurusTitle}
+            </Text>
+            <Text style={{ fontSize: "18px", display: "block", marginTop: "8px", maxWidth: "100%" }} ellipsis={{ tooltip: enCokDurusValue }}>
+              {enCokDurusValue}
+            </Text>
           </Card>
         </Col>
       </Row>
@@ -248,8 +264,6 @@ const DurusTakibi = () => {
   const [aylikYil, setAylikYil] = useState(new Date().getFullYear());
   const [grafikYil, setGrafikYil] = useState(new Date().getFullYear());
   const [jobTypeFilter, setJobTypeFilter] = useState("");
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [extraFilters, setExtraFilters] = useState({});
 
   const [selectedRows, setSelectedRows] = useState([]);
 
@@ -392,14 +406,6 @@ const DurusTakibi = () => {
       return "";
     }
   }, []);
-
-  const handleRefreshStats = useCallback((values) => {
-  if (values) {
-    // AylikTab'dan gelen { Yil, Gruplama, VeriTipi } objesini state'e atıyoruz
-    setExtraFilters(values);
-  }
-  setRefreshTrigger(prev => prev + 1);
-}, []);
 
   // Columns definition (adjust as needed)
   const initialColumns = useMemo(
@@ -841,12 +847,7 @@ const DurusTakibi = () => {
             </div>
           </Modal>
 
-          <DurusIstatistikKartlari 
-  body={body} 
-  searchTerm={searchTerm} 
-  refreshTrigger={refreshTrigger}
-  extraFilters={extraFilters} // Bunu ekledik
-/>
+          <DurusIstatistikKartlari body={body} searchTerm={searchTerm} />
 
           <div style={{ height: "calc(100vh - 200px)" }}>
             {/* Toolbar: Sol ve Sağ gruplar */}
@@ -933,10 +934,9 @@ const DurusTakibi = () => {
   <AylikTab 
     search={searchTerm} 
     setSearch={setSearchTerm}
-    year={aylikYil}
-    setYear={setAylikYil}
+    year={aylikYil}        // Aylık için özel state
+    setYear={setAylikYil}   // Aylık için özel set
     jobTypeFilter={jobTypeFilter}
-    onFilterChange={handleRefreshStats} // Değiştirildi: Artık değerleri yukarı taşıyor
   />
 )}
 
