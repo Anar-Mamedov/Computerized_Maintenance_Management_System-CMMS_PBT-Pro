@@ -39,6 +39,14 @@ const DurusIstatistikKartlari = ({ body, searchTerm }) => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
   const enCokDurusTitle = "En Çok Duruş Yapan / En Uzun Duran Ekipman";
+  const statsCardStyle = { borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.06)", height: "108px", width: "100%" };
+  const statsCardBodyStyle = {
+    padding: "20px 24px",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+  };
 
   const enCokDurusValue = useMemo(() => {
     const enCokDurusYapan = stats?.en_cok_durus_yapan;
@@ -81,11 +89,7 @@ const DurusIstatistikKartlari = ({ body, searchTerm }) => {
     <Spin spinning={loading}>
       <Row gutter={[16, 16]} style={{ marginBottom: "20px" }}>
         <Col xs={24} sm={12} md={6}>
-          <Card 
-            size="small" 
-            style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
-            bodyStyle={{ padding: '20px 24px' }} // İç boşluğu artırarak kartı büyüttük
-          >
+          <Card size="small" style={statsCardStyle} bodyStyle={statsCardBodyStyle}>
             <Statistic 
               title={<Text strong style={{ fontSize: '14px' }}>Toplam Duruş Süresi</Text>} 
               value={stats?.toplam_durus_suresi || "-"}
@@ -94,11 +98,7 @@ const DurusIstatistikKartlari = ({ body, searchTerm }) => {
           </Card>
         </Col>
         <Col xs={24} sm={12} md={6}>
-          <Card 
-            size="small" 
-            style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
-            bodyStyle={{ padding: '20px 24px' }}
-          >
+          <Card size="small" style={statsCardStyle} bodyStyle={statsCardBodyStyle}>
             <Statistic 
               title={<Text strong style={{ fontSize: '14px' }}>Plansız Duruş Oranı</Text>} 
               value={stats?.plansiz_durus_orani || 0}
@@ -109,11 +109,7 @@ const DurusIstatistikKartlari = ({ body, searchTerm }) => {
           </Card>
         </Col>
         <Col xs={24} sm={12} md={6}>
-          <Card 
-            size="small" 
-            style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
-            bodyStyle={{ padding: '20px 24px' }}
-          >
+          <Card size="small" style={statsCardStyle} bodyStyle={statsCardBodyStyle}>
             <Statistic 
               title={<Text strong style={{ fontSize: '14px' }}>Ortalama Duruş Süresi</Text>} 
               value={stats?.ortalama_durus_suresi || 0}
@@ -123,11 +119,7 @@ const DurusIstatistikKartlari = ({ body, searchTerm }) => {
           </Card>
         </Col>
         <Col xs={24} sm={12} md={6}>
-          <Card 
-            size="small" 
-            style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
-            bodyStyle={{ padding: '20px 24px' }}
-          >
+          <Card size="small" style={statsCardStyle} bodyStyle={statsCardBodyStyle}>
             <Text
               strong
               style={{ fontSize: "14px", display: "block", maxWidth: "100%" }}
