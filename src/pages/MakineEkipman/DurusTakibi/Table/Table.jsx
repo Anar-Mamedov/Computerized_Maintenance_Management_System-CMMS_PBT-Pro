@@ -38,6 +38,18 @@ const { Text } = Typography;
 const DurusIstatistikKartlari = ({ body, searchTerm }) => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
+  const enCokDurusTitle = "En Çok Duruş Yapan / En Uzun Duran Ekipman";
+
+  const enCokDurusValue = useMemo(() => {
+    const enCokDurusYapan = stats?.en_cok_durus_yapan;
+    const enUzunDuran = stats?.en_uzun_duran;
+
+    if (enCokDurusYapan && enUzunDuran) {
+      return `${enCokDurusYapan} / ${enUzunDuran}`;
+    }
+
+    return enCokDurusYapan || "-";
+  }, [stats]);
 
   const fetchStats = useCallback(async () => {
     setLoading(true);
@@ -116,11 +128,16 @@ const DurusIstatistikKartlari = ({ body, searchTerm }) => {
             style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
             bodyStyle={{ padding: '20px 24px' }}
           >
-            <Statistic 
-              title={<Text strong style={{ fontSize: '14px' }}>En Çok Duruş Yapan</Text>} 
-              value={stats?.en_cok_durus_yapan || "-"}
-              valueStyle={{ fontSize: '18px' }}
-            />
+            <Text
+              strong
+              style={{ fontSize: "14px", display: "block", maxWidth: "100%" }}
+              ellipsis={{ tooltip: enCokDurusTitle }}
+            >
+              {enCokDurusTitle}
+            </Text>
+            <Text style={{ fontSize: "18px", display: "block", marginTop: "8px", maxWidth: "100%" }} ellipsis={{ tooltip: enCokDurusValue }}>
+              {enCokDurusValue}
+            </Text>
           </Card>
         </Col>
       </Row>
