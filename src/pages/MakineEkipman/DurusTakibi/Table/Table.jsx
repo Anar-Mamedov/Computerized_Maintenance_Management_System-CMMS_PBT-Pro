@@ -35,6 +35,44 @@ const localeMap = {
 
 const { Text } = Typography;
 
+const getFirstStatValue = (values = []) =>
+  values.find((value) => {
+    if (value === null || value === undefined) {
+      return false;
+    }
+    if (typeof value === "string") {
+      return value.trim().length > 0;
+    }
+    return true;
+  });
+
+const formatStatText = (value) => {
+  if (value === null || value === undefined) {
+    return "";
+  }
+
+  if (typeof value === "string") {
+    return value.trim();
+  }
+
+  if (typeof value === "number") {
+    return String(value);
+  }
+
+  if (typeof value === "object") {
+    const machineName = getFirstStatValue([value?.makine, value?.makina, value?.ekipman, value?.tanim, value?.ad, value?.name, value?.value]);
+    const duration = getFirstStatValue([value?.sure, value?.suresi, value?.durusSuresi, value?.durus_suresi, value?.dakika, value?.duration]);
+
+    if (machineName && duration) {
+      return `${machineName} (${duration})`;
+    }
+
+    return String(machineName || duration || "").trim();
+  }
+
+  return String(value);
+};
+
 const DurusIstatistikKartlari = ({ body, searchTerm }) => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -49,14 +87,39 @@ const DurusIstatistikKartlari = ({ body, searchTerm }) => {
   };
 
   const enCokDurusValue = useMemo(() => {
-    const enCokDurusYapan = stats?.en_cok_durus_yapan;
-    const enUzunDuran = stats?.en_uzun_duran;
+    const enCokDurusYapan = formatStatText(
+      getFirstStatValue([
+        stats?.en_cok_durus_yapan,
+        stats?.en_cok_duran,
+        stats?.en_cok_durus_yapan_makine,
+        stats?.en_cok_durus_yapan_ekipman,
+        stats?.enCokDurusYapan,
+        stats?.enCokDuran,
+        stats?.enCokDurusYapanMakine,
+        stats?.EN_COK_DURUS_YAPAN,
+        stats?.EN_COK_DURAN,
+        stats?.EN_COK_DURUS_YAPAN_MAKINE,
+        stats?.EN_COK_DURUS_YAPAN_EKIPMAN,
+      ])
+    );
+    const enUzunDuran = formatStatText(
+      getFirstStatValue([
+        stats?.en_uzun_duran,
+        stats?.en_uzun_duran_makine,
+        stats?.en_uzun_duran_ekipman,
+        stats?.enUzunDuran,
+        stats?.enUzunDuranMakine,
+        stats?.EN_UZUN_DURAN,
+        stats?.EN_UZUN_DURAN_MAKINE,
+        stats?.EN_UZUN_DURAN_EKIPMAN,
+      ])
+    );
 
     if (enCokDurusYapan && enUzunDuran) {
       return `${enCokDurusYapan} / ${enUzunDuran}`;
     }
 
-    return enCokDurusYapan || "-";
+    return enCokDurusYapan || enUzunDuran || "-";
   }, [stats]);
 
   const fetchStats = useCallback(async () => {
