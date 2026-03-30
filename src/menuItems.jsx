@@ -41,6 +41,7 @@ export const rawItems = [
       getItem("Duruş Takibi", "durusTakibi", true, undefined, true, "KLL_WEB_EKIPMAN"),
       getItem("Sayaç Güncellemeleri", "sayacGuncelleme", true, undefined, true, "KLL_WEB_SAYAC"),
       getItem("Ekipman Transferi", "ekipmanTransferi", true, undefined, true),
+      getItem("Amortisman Takibi", "amortisman", true, undefined, true),
     ],
     false
   ),
