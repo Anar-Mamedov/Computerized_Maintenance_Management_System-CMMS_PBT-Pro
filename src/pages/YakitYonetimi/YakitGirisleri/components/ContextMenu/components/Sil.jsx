@@ -15,13 +15,13 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
       try {
         // API İsteği: POST /api/DeleteYakitTank?id={id}
         const response = await AxiosInstance.post(
-          `DeleteYakitTank?id=${row.TB_DEPO_ID}`
+          `DeleteAracYakit?id=${row.Id}`
         );
 
         // Dokümana göre başarı kontrolü: status_code 200 ve has_error false
         if (response.status_code === 200 && !response.has_error) {
           // Başarılı mesajı 'status' alanından geliyor
-          message.success(response.status || "Yakıt tankı başarıyla silindi.");
+          message.success(response.status || "Yakıt girişi başarıyla silindi.");
         } 
         // Dokümana göre hata durumu: status_code 400 (Örn: Hareket varsa)
         else if (response.status_code === 400 || response.has_error) {

@@ -209,10 +209,10 @@ const MainTable = () => {
 
   const initialColumns = [
     {
-      title: "Plaka",
+      title: "Plaka / Ekipman Kod",
       dataIndex: "Plaka",
       key: "Plaka",
-      width: 120,
+      width: 250,
       ellipsis: true,
       visible: true,
       render: (text, record) => <a onClick={() => onRowClick(record)}>{text}</a>,
@@ -252,7 +252,7 @@ const MainTable = () => {
       title: "Yakıt Tipi",
       dataIndex: "YakitTipi",
       key: "YakitTipi",
-      width: 120,
+      width: 250,
       visible: true,
       render: (val) => <Tag color={val?.ColorClass === 'warning' ? 'orange' : 'blue'}>{val?.Text}</Tag>,
     },
@@ -269,7 +269,7 @@ const MainTable = () => {
       title: "Tutar",
       dataIndex: "Tutar",
       key: "Tutar",
-      width: 200,
+      width: 120,
       ellipsis: true,
       visible: true,
       sorter: (a, b) => a.Tutar?.localeCompare(b.Tutar),

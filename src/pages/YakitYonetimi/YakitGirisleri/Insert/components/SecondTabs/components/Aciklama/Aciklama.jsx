@@ -6,7 +6,7 @@ const { TextArea } = Input;
 const Aciklama = ({ control }) => {
   return (
     <Controller
-      name="aciklama"
+      name="Aciklama"
       control={control}
       render={({ field }) => (
         <TextArea
