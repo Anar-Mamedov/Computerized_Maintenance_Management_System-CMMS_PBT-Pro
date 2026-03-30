@@ -62,6 +62,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           // Temel Bilgiler
           setValue("TB_YAKIT_HRK_ID", item.TB_YAKIT_HRK_ID);
           setValue("MakineId", item.MakineId);
+          setValue("MakineKodu", item.MakineKodu);
           setValue("Tarih", item.Tarih);
           setValue("Saat", item.Saat);
           setValue("SonKm", item.SonKm);
@@ -78,11 +79,15 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("YakitTipId", item.YakitTipId);
           setValue("YakitTankId", item.YakitTankId);
           setValue("IstasyonKodId", item.IstasyonKodId);
+          setValue("IstasyonAdi", item.IstasyonAdi);
           setValue("LokasyonId", item.LokasyonId);
+          setValue("LokasyonTanimi", item.LokasyonTanimi);
           setValue("ProjeId", item.ProjeId);
           setValue("MasrafMerkeziId", item.MasrafMerkeziId);
           setValue("PersonelId", item.PersonelId);
+          setValue("PersonelAdi", item.PersonelAdi);
           setValue("FirmaId", item.FirmaId);
+          setValue("FirmaTanimi", item.FirmaTanimi);
           setValue("VardiyaId", item.VardiyaId);
           setValue("FaturaFisNo", item.FaturaFisNo);
           setValue("FaturaTarihi", item.FaturaTarihi);

@@ -161,7 +161,7 @@ export default function SecondTabs() {
         {/* 1. SATIR: Araç / Sürücü / Yakıt Tipi */}
         <Row gutter={[16, 16]}>
           <Col span={8}>
-            <Text style={labelStyle}>{t("Araç / Makine")}</Text>
+            <Text style={labelStyle}>{t("Araç / Ekipman")}</Text>
             <MakineTablo
             control={control}
             setValue={setValue}

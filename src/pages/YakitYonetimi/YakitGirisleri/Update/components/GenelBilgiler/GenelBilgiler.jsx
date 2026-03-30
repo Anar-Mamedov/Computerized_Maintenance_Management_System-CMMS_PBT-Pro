@@ -130,17 +130,17 @@ export default function SecondTabs() {
         {/* 1. SATIR: Araç / Sürücü / Yakıt Tipi */}
         <Row gutter={[16, 16]}>
           <Col span={8}>
-            <Text style={labelStyle}>{t("Araç / Makine")}</Text>
+            <Text style={labelStyle}>{t("Araç / Ekipman")}</Text>
             <MakineTablo
               control={control}
               setValue={setValue}
-              makineFieldName="MKN_KOD" // Tabloda görünen yazı
+              makineFieldName="MakineKodu" // Tabloda görünen yazı
               makineIdFieldName="MakineId" // Backend'e giden ID (PascalCase)
           />
           </Col>
           <Col span={8}>
             <Text style={labelStyle}>{t("Sürücü / Personel")}</Text>
-              <PersonelSelect fieldName="PersonelId" placeholder={t("Seçiniz")} mode="default" selectStyle={{ width: "100%", maxWidth: "600px"}}/>
+              <PersonelSelect fieldName="PersonelAdi" placeholder={t("Seçiniz")} mode="default" selectStyle={{ width: "100%", maxWidth: "600px"}}/>
           </Col>
           <Col span={8}>
             <Text style={labelStyle}>{t("Yakıt Tipi")}</Text>
@@ -372,18 +372,18 @@ export default function SecondTabs() {
               
               <Col span={24}>
                 <Text style={labelStyle}>{t("Lokasyon")}</Text>
-                <LokasyonSelect fieldName="LokasyonId" placeholder={t("Seçiniz")} mode="default" selectStyle={{ width: "100%", maxWidth: "600px"}}/>
+                <LokasyonSelect fieldName="LokasyonTanimi" placeholder={t("Seçiniz")} mode="default" selectStyle={{ width: "100%", maxWidth: "600px"}}/>
               </Col>
               <Col span={24}>
                 <Text style={labelStyle}>{t("Firma")}</Text>
-                <FirmaTablo firmaFieldName="FirmaAdi" firmaIdFieldName="FirmaId" />
+                <FirmaTablo firmaFieldName="FirmaTanimi" firmaIdFieldName="FirmaId" />
               </Col>
 
               <Col span={24}>
                 {!watchStokKullanim && (
                   <>
                     <Text style={labelStyle}>{t("İstasyon")}</Text>
-                    <KodIDSelectbox name1="IstasyonKodId" kodID={35690} placeholder="İstasyon Seçiniz" />
+                    <KodIDSelectbox name1="IstasyonAdi" kodID={35690} placeholder="İstasyon Seçiniz" />
                   </>
                 )}
               </Col>
