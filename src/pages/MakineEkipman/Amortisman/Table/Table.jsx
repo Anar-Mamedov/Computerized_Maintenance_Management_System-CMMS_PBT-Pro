@@ -135,34 +135,13 @@ const MainTable = () => {
   const cardItems = useMemo(() => {
     if (!cardsData || Object.keys(cardsData).length === 0) return [];
     return [
-      { title: "Ekipman Sayısı" },
-      { title: "Ekonomik Ömrünü Tamamlamamış" },
-      { title: "Ekonomik Ömrünü Tamamlamış" },
-      { title: "Toplam Net Değer" },
-      { title: "Toplam Değer Düşüşü" },
+      { title: "Ekipman Sayısı", value: cardsData?.EkipmanSayisi || 0 },
+      { title: "Ekonomik Ömrünü Tamamlamamış", value: cardsData?.EkonomikOmrunuTamamlamamis || 0 },
+      { title: "Ekonomik Ömrünü Tamamlamış", value: cardsData?.EkonomikOmrunuTamamlamis || 0 },
+      { title: "Toplam Net Değer", value: cardsData?.ToplamNetDeger?.toLocaleString() + " $" },
+      { title: "Toplam Değer Düşüşü", value: cardsData?.ToplamDegerDususu?.toLocaleString() + " $" },
     ];
   }, [cardsData]);
-
-  
-  const fetchCards = useCallback(async () => {
-    try {
-      const res = await AxiosInstance.get("");
-      if (res.status_code === 200 && res.data) {
-        setCardsData(res.data);
-      } else {
-        setCardsData({});
-      }
-    } catch (err) {
-      console.error(err);
-      setCardsData({});
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchCards();
-  }, [fetchCards]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -217,138 +196,124 @@ const MainTable = () => {
   };
 
   const initialColumns = [
-    {
-      title: "Ekipman",
-      dataIndex: "SFS_FIS_NO",
-      key: "SFS_FIS_NO",
-      width: 120,
-      ellipsis: true,
-      visible: true, // Varsayılan olarak açık
-      sorter: (a, b) => {
-        if (a.SFS_FIS_NO === null) return -1;
-        if (b.SFS_FIS_NO === null) return 1;
-        return a.SFS_FIS_NO.localeCompare(b.SFS_FIS_NO);
-      },
-    },
-    {
-      title: "Lokasyon",
-      dataIndex: "SFS_TALEP_SIPARIS_NO",
-      key: "SFS_TALEP_SIPARIS_NO",
-      width: 120,
-      ellipsis: true,
-      visible: true, // Varsayılan olarak açık
-      sorter: (a, b) => {
-        if (a.SFS_TALEP_SIPARIS_NO === null) return -1;
-        if (b.SFS_TALEP_SIPARIS_NO === null) return 1;
-        return a.SFS_TALEP_SIPARIS_NO.localeCompare(b.SFS_TALEP_SIPARIS_NO);
-      },
-    },
-    {
-      title: "Ekonomik Ömür",
-      dataIndex: "SFS_TARIH",
-      key: "SFS_TARIH",
-      width: 110,
-      ellipsis: true,
-      sorter: (a, b) => {
-        if (a.SFS_TARIH === null) return -1;
-        if (b.SFS_TARIH === null) return 1;
-        return a.SFS_TARIH.localeCompare(b.SFS_TARIH);
-      },
-
-      visible: true, // Varsayılan olarak açık
-      render: (text) => formatDate(text),
-    },
-    {
-      title: "Yaş",
-      dataIndex: "SFS_SAAT",
-      key: "SFS_SAAT",
-      width: 90,
-      ellipsis: true,
-      sorter: (a, b) => {
-        if (a.SFS_SAAT === null) return -1;
-        if (b.SFS_SAAT === null) return 1;
-        return a.SFS_SAAT.localeCompare(b.SFS_SAAT);
-      },
-
-      visible: true,
-      render: (text) => formatTime(text),
-    },
-    {
-      title: "Alım Bedeli",
-      dataIndex: "SFS_BASLIK",
-      key: "SFS_BASLIK",
-      width: 200,
-      ellipsis: true,
-
-      visible: true, // Varsayılan olarak açık
-      sorter: (a, b) => {
-        if (a.SFS_BASLIK === null && b.SFS_BASLIK === null) return 0;
-        if (a.SFS_BASLIK === null) return 1;
-        if (b.SFS_BASLIK === null) return -1;
-        return a.SFS_BASLIK.localeCompare(b.SFS_BASLIK);
-      },
-    },
-    {
-      title: "Değer Düşüşü",
-      dataIndex: "SFS_BASLIK",
-      key: "SFS_BASLIK",
-      width: 200,
-      ellipsis: true,
-
-      visible: true, // Varsayılan olarak açık
-      sorter: (a, b) => {
-        if (a.SFS_BASLIK === null && b.SFS_BASLIK === null) return 0;
-        if (a.SFS_BASLIK === null) return 1;
-        if (b.SFS_BASLIK === null) return -1;
-        return a.SFS_BASLIK.localeCompare(b.SFS_BASLIK);
-      },
-    },
-    {
-      title: "Salvage",
-      dataIndex: "SFS_TALEP_EDEN",
-      key: "SFS_TALEP_EDEN",
-      width: 150,
-      ellipsis: true,
-
-      visible: true, // Varsayılan olarak açık
-      sorter: (a, b) => {
-        if (a.SFS_TALEP_EDEN === null) return -1;
-        if (b.SFS_TALEP_EDEN === null) return 1;
-        return a.SFS_TALEP_EDEN.localeCompare(b.SFS_TALEP_EDEN);
-      },
-    },
-    {
-      title: "Scarp",
-      dataIndex: "SFS_TALEP_EDILEN",
-      key: "SFS_TALEP_EDILEN",
-      width: 150,
-      ellipsis: true,
-      sorter: (a, b) => {
-        if (a.SFS_TALEP_EDILEN === null) return -1;
-        if (b.SFS_TALEP_EDILEN === null) return 1;
-        return a.SFS_TALEP_EDILEN.localeCompare(b.SFS_TALEP_EDILEN);
-      },
-      visible: true, // Varsayılan olarak açık
-    },
-    {
-      title: "Net Değer",
-      dataIndex: "SFS_TALEP_NEDEN",
-      key: "SFS_TALEP_NEDEN",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.SFS_TALEP_NEDEN === null && b.SFS_TALEP_NEDEN === null) return 0;
-        if (a.SFS_TALEP_NEDEN === null) return 1;
-        if (b.SFS_TALEP_NEDEN === null) return -1;
-        return a.SFS_TALEP_NEDEN.localeCompare(b.SFS_TALEP_NEDEN);
-      },
-      ellipsis: true,
-
-      visible: true, // Varsayılan olarak açık
-    },
-    {
+  {
+    title: t("Ekipman"),
+    dataIndex: "EkipmanKodu",
+    key: "EkipmanKodu",
+    width: 300,
+    ellipsis: true,
+    visible: true,
+    render: (text, record) => (
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <span style={{ fontWeight: 600 }}>
+          {text}
+        </span>
+        <Text type="secondary" style={{ fontSize: "12px" }}>
+          {record.EkipmanTanimi || "-"}
+        </Text>
+        <Text type="secondary" style={{ fontSize: "11px", color: "#8c8c8c" }}>
+          {record.MakineTipTanimi || "-"}
+        </Text>
+      </div>
+    ),
+    sorter: (a, b) => a.EkipmanKodu.localeCompare(b.EkipmanKodu),
+  },
+  {
+    title: t("Lokasyon"),
+    dataIndex: "LokasyonTanimi",
+    key: "LokasyonTanimi",
+    width: 150,
+    ellipsis: true,
+    visible: true,
+    sorter: (a, b) => a.LokasyonTanimi.localeCompare(b.LokasyonTanimi),
+  },
+  {
+    title: t("Ekonomik Ömür"),
+    dataIndex: "EkonomikOmur",
+    key: "EkonomikOmur",
+    width: 130,
+    visible: true,
+  },
+  {
+    title: t("Yaş"),
+    dataIndex: "Yas",
+    key: "Yas",
+    width: 130,
+    ellipsis: true,
+    visible: true,
+    sorter: true,
+  },
+  {
+    title: t("Alım Bedeli"),
+    dataIndex: "AlimBedeli",
+    key: "AlimBedeli",
+    width: 130,
+    visible: true,
+  },
+  {
+    title: t("Değer Düşüşü"),
+    dataIndex: "DegerDususu",
+    key: "DegerDususu",
+    width: 220,
+    visible: true,
+    render: (val, record) => (
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <span style={{ fontWeight: 600 }}>
+          {val?.toLocaleString(undefined, { minimumFractionDigits: 2 })} $
+        </span>
+        <Text style={{ fontSize: "11px", color: "#8c8c8c" }}>
+          Ömre Kadar: {record.EkOmreKadarDususu?.toLocaleString()} $
+        </Text>
+        <Text style={{ fontSize: "11px", color: "#8c8c8c" }}>
+          Salvage Sonrası: {record.SalvageSonrasiDususu?.toLocaleString()} $
+        </Text>
+      </div>
+    ),
+  },
+  {
+    title: t("Net Değer"),
+    dataIndex: "NetDeger",
+    key: "NetDeger",
+    width: 130,
+    visible: true,
+    render: (val, record) => (
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <span style={{ fontWeight: 600 }}>
+          {val?.toLocaleString(undefined, { minimumFractionDigits: 2 })} $
+        </span>
+      </div>
+    ),
+  },
+  {
+    title: t("Salvage"),
+    dataIndex: "SalvageDegeri",
+    key: "SalvageDegeri",
+    width: 130,
+    ellipsis: true,
+    visible: true,
+    sorter: true,
+  },
+  {
+    title: t("Scrap"),
+    dataIndex: "ScrapDegeri",
+    key: "ScrapDegeri",
+    width: 220,
+    visible: true,
+    render: (val, record) => (
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <span style={{ fontWeight: 600 }}>
+          {val?.toLocaleString(undefined, { minimumFractionDigits: 2 })} $
+        </span>
+        <Text type="secondary" style={{ fontSize: "12px" }}>
+          {record.Agirlik} Kg
+        </Text>
+      </div>
+    ),
+  },
+  {
   title: "Durum",
-  dataIndex: "SFS_DURUM",
-  key: "SFS_DURUM",
+  dataIndex: "DurumText",
+  key: "DurumText",
   width: 150,
   ellipsis: true,
   visible: true,
@@ -361,32 +326,20 @@ const MainTable = () => {
     };
 
     switch (text) {
-      case "ONAYLANDI":
+      case "Ekonomik ömür içi":
         style = { ...style, backgroundColor: "#d4f8e8", color: "#207868" }; // pastel yeşil
         break;
-      case "ONAY BEKLİYOR":
+      case "Ekonomik ömür sonrası lineer düşüş":
         style = { ...style, backgroundColor: "#fff4d6", color: "#b8860b" }; // pastel sarı
         break;
-      case "ONAYLANMADI":
+      case "Eksik veri / kontrol gerekli":
         style = { ...style, backgroundColor: "#ffe0e0", color: "#b22222" }; // pastel kırmızı
         break;
-      case "SİPARİŞ":
+      case "Ekonomik ömür sonu / salvage":
         style = { ...style, backgroundColor: "#e6ecff", color: "#4056a1" }; // pastel mavi
         break;
-      case "AÇIK":
-        style = { ...style, backgroundColor: "#e1f7d5", color: "#3c763d" }; // açık yeşil
-        break;
-      case "TEKLİF":
-        style = { ...style, backgroundColor: "#e0f7fa", color: "#00796b" }; // pastel turkuaz
-        break;
-      case "KAPALI":
+      case "Scrap seviyesinde":
         style = { ...style, backgroundColor: "#eaeaeaff", color: "#949494ff" }; // pastel kırmızı/rose
-        break;
-      case "İPTAL":
-        style = { ...style, backgroundColor: "#fde2e4", color: "#d64550" }; // pastel kırmızı/rose (KAPALI ile aynı)
-        break;
-      case "KARŞILANIYOR":
-        style = { ...style, backgroundColor: "#e6f7ff", color: "#096dd9" }; // pastel açık mavi
         break;
       default:
         style = { ...style, backgroundColor: "#f5f5f5", color: "#595959" }; // gri
@@ -395,8 +348,7 @@ const MainTable = () => {
     return <span style={style}>{text}</span>;
   },
 }
-    // Diğer kolonlarınız...
-  ];
+];
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
 
@@ -470,10 +422,14 @@ const MainTable = () => {
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
   const [body, setBody] = useState({
-  filters: {
-    Kelime: "",
-  },
-});
+    filters: {
+      ProfilId: 1, // Zorunlu
+      LokasyonIds: [],
+      MakineTipIds: [],
+      DurumId: null,
+      Kelime: "", // Arama terimi için ekledik
+    },
+  });
 
   // ana tablo api isteği için kullanılan useEffect
 
@@ -508,51 +464,37 @@ useEffect(() => {
 
   // arama işlemi için kullanılan useEffect son
 
- const fetchEquipmentData = async (body, page, size) => {
-  const { keyword = "", filters = {} } = body || {};
-  const currentPage = page || 1;
+ const fetchEquipmentData = useCallback(async () => {
+    try {
+      setLoading(true);
+      // Payload dokümana göre oluşturuluyor
+      const payload = {
+        ProfilId: body.filters.ProfilId,
+        LokasyonIds: body.filters.LokasyonIds,
+        MakineTipIds: body.filters.MakineTipIds,
+        DurumId: body.filters.DurumId,
+        // Kelime backend'de karşılığı varsa eklenebilir, yoksa frontend filter yapılacak
+      };
 
-  try {
-    setLoading(true);
+      const response = await AxiosInstance.post("GetAmortismanRaporu", payload);
 
-    // API isteği (filters burada aslında requestBody olmalı)
-    const response = await AxiosInstance.post(
-      ``,
-      filters // <-- burada filters değil, düzgün body verisi bekleniyor olabilir
-    );
-
-    if (response.status_code === 401) {
-      message.error(t("buSayfayaErisimYetkinizBulunmamaktadir"));
-      return;
+      if (response.status_code === 200 && response.Data) {
+        // KPI'ları güncelle
+        setCardsData(response.Data.Kpi);
+        // Grid listesini güncelle (key olarak EkipmanId atıyoruz)
+        const formattedData = response.Data.GridList.map((item) => ({
+          ...item,
+          key: item.EkipmanId,
+        }));
+        setData(formattedData);
+      }
+    } catch (error) {
+      console.error("Rapor çekme hatası:", error);
+      message.error("Veriler yüklenirken bir hata oluştu.");
+    } finally {
+      setLoading(false);
     }
-
-    setTotalPages(response.page);
-    setTotalDataCount(response.kayit_sayisi);
-
-    // Listeyi talep_listesi olarak çek
-    const list = Array.isArray(response?.talep_listesi) ? response.talep_listesi : [];
-
-    if (!Array.isArray(list)) {
-      console.error("talep_listesi array değil!", list);
-    }
-
-    const formattedData = list.map((item) => ({
-      ...item,
-      key: item.TB_STOK_FIS_ID,
-    }));
-
-    setData(formattedData);
-    setLoading(false);
-  } catch (error) {
-    console.error("Error in API request:", error);
-    setLoading(false);
-    if (navigator.onLine) {
-      message.error("Hata Mesajı: " + error.message);
-    } else {
-      message.error("Internet Bağlantısı Mevcut Değil.");
-    }
-  }
-};
+  }, [body]);
   // filtreleme işlemi için kullanılan useEffect
   const handleBodyChange = useCallback((type, newBody) => {
   setBody((state) => ({
