@@ -25,20 +25,6 @@ export default function Filters({ onChange, kelime, selectedProfilId }) {
 
   return (
     <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-      
-      {/* LOKASYON FİLTRESİ */}
-      <LocationFilter
-        onSubmit={(selectedObj) => {
-          // selectedObj şuna benziyor: {0: "Bursa", 1: "İstanbul"}
-          // API ise ID listesi istiyor. Eğer value'lar ID ise:
-          const idArray = Object.values(selectedObj).map(val => Number(val));
-          
-          setFilters((state) => ({
-            ...state,
-            LokasyonIds: idArray.length > 0 ? idArray : [], 
-          }));
-        }}
-      />
 
       {/* DURUM FİLTRESİ (Condition) */}
       <ConditionFilter
@@ -58,6 +44,20 @@ export default function Filters({ onChange, kelime, selectedProfilId }) {
             MakineTipIds: selectedTypes // Array olarak gönderilmeli
           }))
         }
+      />
+
+      {/* LOKASYON FİLTRESİ */}
+      <LocationFilter
+        onSubmit={(selectedObj) => {
+          // selectedObj şuna benziyor: {0: "Bursa", 1: "İstanbul"}
+          // API ise ID listesi istiyor. Eğer value'lar ID ise:
+          const idArray = Object.values(selectedObj).map(val => Number(val));
+          
+          setFilters((state) => ({
+            ...state,
+            LokasyonIds: idArray.length > 0 ? idArray : [], 
+          }));
+        }}
       />
 
     </div>
