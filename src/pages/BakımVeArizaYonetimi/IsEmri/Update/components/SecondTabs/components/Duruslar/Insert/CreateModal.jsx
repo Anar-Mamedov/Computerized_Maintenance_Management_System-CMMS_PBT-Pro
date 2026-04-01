@@ -16,6 +16,10 @@ export default function CreateModal({
   lokasyonID,
   makineID,
   defaultCalismaSuresiDakika,
+  baslamaZamani,
+  baslamaZamaniSaati,
+  bitisZamani,
+  bitisZamaniSaati,
 }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   // message
@@ -108,6 +112,10 @@ export default function CreateModal({
       if (defaultCalismaSuresiDakika > 0) {
         setValue("sure", defaultCalismaSuresiDakika);
       }
+      setValue("baslangicTarihi", baslamaZamani ? dayjs(baslamaZamani) : null);
+      setValue("baslangicSaati", baslamaZamaniSaati ? dayjs(baslamaZamaniSaati) : null);
+      setValue("bitisTarihi", bitisZamani ? dayjs(bitisZamani) : null);
+      setValue("bitisSaati", bitisZamaniSaati ? dayjs(bitisZamaniSaati) : null);
     }
   };
 

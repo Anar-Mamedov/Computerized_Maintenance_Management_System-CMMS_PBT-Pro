@@ -205,6 +205,10 @@ export default function DuruslarListesiTablo({ isActive }) {
   const lokasyonID = watch("lokasyonID");
   const makineTanim = watch("makineTanim");
   const makineID = watch("makineID");
+  const baslamaZamani = watch("baslamaZamani");
+  const baslamaZamaniSaati = watch("baslamaZamaniSaati");
+  const bitisZamani = watch("bitisZamani");
+  const bitisZamaniSaati = watch("bitisZamaniSaati");
 
   const handleDelete = async () => {
     if (!selectedRowKeys.length) return;
@@ -256,6 +260,10 @@ export default function DuruslarListesiTablo({ isActive }) {
           lokasyonID={lokasyonID}
           makineID={makineID}
           defaultCalismaSuresiDakika={defaultCalismaSuresiDakika}
+          baslamaZamani={baslamaZamani}
+          baslamaZamaniSaati={baslamaZamaniSaati}
+          bitisZamani={bitisZamani}
+          bitisZamaniSaati={bitisZamaniSaati}
         />
       </div>
 
