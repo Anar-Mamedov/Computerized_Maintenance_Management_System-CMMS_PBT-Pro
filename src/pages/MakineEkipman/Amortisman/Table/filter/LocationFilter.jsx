@@ -9,34 +9,17 @@ const LocationFilter = ({ onSubmit }) => {
 
   // useeffect ile api den veri data cekip options a atayacagiz
   const [options, setOptions] = React.useState([]);
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState([]);
 
   const handleChange = (value) => {
-    // Create a copy of the current selected items
-    const selectedItemsCopy = { ...filters };
-
-    // Loop through all options
-    options.forEach((option) => {
-      const isSelected = selectedItemsCopy[option.key] !== undefined;
-
-      // If the option is already selected, and it's not in the new value, remove it
-      if (isSelected && !value.includes(option.value)) {
-        delete selectedItemsCopy[option.key];
-      }
-      // If the option is not selected and it's in the new value, add it
-      else if (!isSelected && value.includes(option.value)) {
-        selectedItemsCopy[option.key] = option.value;
-      }
-    });
-
-    // Update the filters state with the updated selection
-    setFilters(selectedItemsCopy);
+    setFilters(value);
   };
 
   React.useEffect(() => {
-    AxiosInstance.get("getLokasyonlar")
+    AxiosInstance.get("GetLokasyonList")
       .then((response) => {
-        setOptions(response.map((option, index) => ({ key: index, value: option })));
+        const options = response.map((option) => ({ key: option.TB_LOKASYON_ID, value: option.TB_LOKASYON_ID, label: option.LOK_TANIM }));
+        setOptions(options);
       })
       .catch((error) => {
         console.log("API Error:", error);
@@ -47,15 +30,13 @@ const LocationFilter = ({ onSubmit }) => {
     // Seçilen öğeleri başka bir bileşene iletmek için prop olarak gelen işlevi çağırın
     onSubmit(filters);
 
-    // Seçilen öğeleri sıfırlayabiliriz
-    // setFilters({});
     // Dropdown'ı gizle
     setVisible(false);
   };
 
   const handleCancelClick = () => {
     // Seçimleri iptal etmek için seçilen öğeleri sıfırlayın
-    setFilters({});
+    setFilters([]);
     // Dropdown'ı gizle
     setVisible(false);
     onSubmit("");
@@ -63,26 +44,18 @@ const LocationFilter = ({ onSubmit }) => {
 
   const menu = (
     <Menu style={{ width: "300px" }}>
-      <div
-        style={{ borderBottom: "1px solid #ccc", padding: "10px", display: "flex", justifyContent: "space-between" }}>
+      <div style={{ borderBottom: "1px solid #ccc", padding: "10px", display: "flex", justifyContent: "space-between" }}>
         <Button onClick={handleCancelClick}>İptal</Button>
         <Button type="primary" onClick={handleSubmit}>
           Uygula
         </Button>
       </div>
       <div style={{ padding: "10px" }}>
-        <Select
-          mode="multiple"
-          style={{ width: "100%" }}
-          placeholder="Ara..."
-          value={Object.values(filters)}
-          onChange={handleChange}
-          allowClear
-          showArrow={false}>
+        <Select mode="multiple" style={{ width: "100%" }} placeholder="Ara..." value={filters} onChange={handleChange} allowClear showArrow={false} optionFilterProp="children">
           {/* Seçenekleri elle ekleyin */}
           {options.map((option) => (
             <Option key={option.key} value={option.value}>
-              {option.value}
+              {option.label}
             </Option>
           ))}
         </Select>
@@ -91,12 +64,7 @@ const LocationFilter = ({ onSubmit }) => {
   );
 
   return (
-    <Dropdown
-      overlay={menu}
-      placement="bottomLeft"
-      trigger={["click"]}
-      visible={visible}
-      onVisibleChange={(v) => setVisible(v)}>
+    <Dropdown overlay={menu} placement="bottomLeft" trigger={["click"]} visible={visible} onVisibleChange={(v) => setVisible(v)}>
       <Button style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
         Lokasyon
         <span
@@ -110,8 +78,9 @@ const LocationFilter = ({ onSubmit }) => {
             justifyContent: "center",
             alignItems: "center",
             color: "white",
-          }}>
-          {Object.keys(filters).length}{" "}
+          }}
+        >
+          {filters.length}{" "}
         </span>
       </Button>
     </Dropdown>

@@ -14,6 +14,7 @@ export default function ContextMenu({ refreshTableData }) {
 
   const handleClose = () => {
     setIsModalOpen(false);
+    refreshTableData();
   };
 
   return (

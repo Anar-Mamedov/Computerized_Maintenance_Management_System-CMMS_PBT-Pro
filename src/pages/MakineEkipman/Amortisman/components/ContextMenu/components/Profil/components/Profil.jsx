@@ -106,20 +106,44 @@ const Profil = ({ open, onClose, updateData, onRefresh }) => {
 
   const onFinish = (values) => {
     setLoading(true);
-    // Not: KodIDSelectbox verileri methods.getValues() içinde tutuluyor olabilir 
-    // ama AntD Form.Item içinde olmadıkları için onFinish'e gelmeyebilir.
-    // O yüzden tüm verileri birleştiriyoruz:
-    const allValues = { ...methods.getValues(), ...values };
-    
-    const endpoint = updateData ? `UpdateAmortismanProfil` : `AddAmortismanProfil`;
-    
-    AxiosInstance.post(endpoint, { ...allValues, TB_AP_ID: updateData?.TB_AP_ID })
+
+    const methodsValues = methods.getValues();
+
+    const payload = {
+      TB_AP_ID: updateData?.TB_AP_ID || 0,
+      Varsayilan: values.Varsayilan || false,
+      Kod: values.Kod,
+      Ad: values.Ad,
+      Aciklama: values.Aciklama || "",
+      SalvageOrani: values.SalvageOrani || 0,
+      ScrapKatsayisi: values.ScrapKatsayisi || 0,
+      FizikselOmur: values.FizikselOmur || 0,
+      AmacKodId: methodsValues.AmacKodId || null,
+      YontemKodId: methodsValues.YontemKodId || null,
+      HurdaDegerYontemKodId: methodsValues.HurdaDegerYontemKodId || null,
+      YasHesaplamaKodId: methodsValues.YasHesaplamaKodId || null,
+      BaslangicKuralKodId: methodsValues.BaslangicKuralKodId || null,
+      AsgariDegerKuralKodId: methodsValues.AsgariDegerKuralKodId || null,
+      HesaplamaBazKodId: methodsValues.HesaplamaBazKodId || null,
+    };
+
+    AxiosInstance.post("AddUpdateAmortismanProfil", payload)
       .then((res) => {
-        if (!res.has_error) {
-          message.success("İşlem başarılı.");
-          onRefresh();
+        // HATA BURADAYDI: res?.data veya direkt res kontrolü yapıyoruz
+        // Genelde Axios interceptor'lar veriyi res.data olarak döndürür.
+        const responseData = res?.data || res; 
+
+        if (responseData && responseData.has_error) {
+          message.error(responseData.status || "Bir hata oluştu.");
+        } else if (responseData) {
+          message.success(responseData.status || "İşlem başarılı.");
+          onRefresh(); 
           onClose();
         }
+      })
+      .catch((err) => {
+        console.error("API Hatası:", err);
+        message.error("Bağlantı hatası oluştu.");
       })
       .finally(() => setLoading(false));
   };
@@ -132,13 +156,10 @@ const Profil = ({ open, onClose, updateData, onRefresh }) => {
       width={800}
       centered
       destroyOnClose
-      bodyStyle={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'auto', paddingRight: '8px' }}
+      styles={{ body: { maxHeight: 'calc(100vh - 200px)', overflowY: 'auto', paddingRight: '8px' } }}
       title={
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '95%' }}>
           <Title level={4} style={{ margin: 0 }}>{updateData ? "Profil Güncelleme" : "Yeni Profil"}</Title>
-          <Form.Item name="Varsayilan" valuePropName="checked" noStyle form={form}>
-            <Checkbox onChange={() => setIsFormTouched(true)}>Varsayılan</Checkbox>
-          </Form.Item>
         </div>
       }
     >
@@ -153,6 +174,18 @@ const Profil = ({ open, onClose, updateData, onRefresh }) => {
             style={{ marginTop: '20px' }}
             onValuesChange={() => setIsFormTouched(true)}
           >
+            <div style={{ 
+    display: 'flex', 
+    justifyContent: 'flex-end', 
+    alignItems: 'center', 
+    marginBottom: '16px',
+    padding: '0 4px' 
+  }}>
+    <Form.Item name="Varsayilan" valuePropName="checked" noStyle>
+      <Checkbox>Varsayılan</Checkbox>
+    </Form.Item>
+  </div>
+
             {/* --- GENEL BİLGİLER --- */}
             <div style={{ padding: '16px', border: '1px solid #f0f0f0', borderRadius: '8px', marginBottom: '16px' }}>
               <Text strong style={{ display: 'block', marginBottom: '12px' }}>Genel Bilgiler</Text>
@@ -232,7 +265,7 @@ const Profil = ({ open, onClose, updateData, onRefresh }) => {
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item label="Özel parametre kullanımı">
+                  <Form.Item label="Hesaplama Bazı">
                     <KodIDSelectbox name1="HesaplamaBazText" kodID={14366} placeholder="Seçiniz" />
                   </Form.Item>
                 </Col>
@@ -240,8 +273,7 @@ const Profil = ({ open, onClose, updateData, onRefresh }) => {
             </div>
 
             {/* --- FOOTER --- */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px' }}>
-              <Text type="secondary" style={{ fontSize: '11px' }}>Profil tanımları bu ekrandan yönetilir.</Text>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: '20px' }}>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <Button onClick={handleCancel}>Vazgeç</Button>
                 <Button 

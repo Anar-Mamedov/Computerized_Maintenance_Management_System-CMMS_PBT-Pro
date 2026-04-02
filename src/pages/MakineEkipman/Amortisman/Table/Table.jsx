@@ -91,11 +91,6 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
 
   return (
     <div ref={setNodeRef} style={styleWithTransform} {...restProps} {...attributes}>
-      {/* <Checkbox
-        checked={visible}
-        onChange={(e) => onVisibilityChange(index, e.target.checked)}
-        style={{ marginLeft: "auto" }}
-      /> */}
       <div
         {...listeners}
         style={{
@@ -231,8 +226,18 @@ const MainTable = () => {
     title: t("Ekonomik Ömür"),
     dataIndex: "EkonomikOmur",
     key: "EkonomikOmur",
-    width: 130,
+    width: 220,
     visible: true,
+    render: (val, record) => (
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <span style={{ fontWeight: 600 }}>
+          {val?.toLocaleString(undefined)}
+        </span>
+        <Text style={{ fontSize: "11px", color: "#8c8c8c" }}>
+          Fiziksel Ömür: {record.FizikselOmur?.toLocaleString()}
+        </Text>
+      </div>
+    ),
   },
   {
     title: t("Yaş"),
@@ -423,13 +428,35 @@ const MainTable = () => {
 
   const [body, setBody] = useState({
     filters: {
-      ProfilId: 1, // Zorunlu
+      ProfilId: null,
       LokasyonIds: [],
       MakineTipIds: [],
       DurumId: null,
       Kelime: "", // Arama terimi için ekledik
     },
   });
+
+  const fetchDefaultProfile = useCallback(async () => {
+    try {
+      const res = await AxiosInstance.get("GetAmortismanProfilList");
+      if (res && !res.has_error && Array.isArray(res.data)) {
+        const defaultProfile = res.data.find(p => p.Varsayilan === true);
+      
+        if (defaultProfile) {
+          handleBodyChange("filters", { 
+            ...body.filters, 
+            ProfilId: defaultProfile.TB_AP_ID 
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Varsayılan profil çekilemedi:", error);
+    }
+  }, [body.filters]);
+
+  useEffect(() => {
+    fetchDefaultProfile();
+  }, []);
 
   // ana tablo api isteği için kullanılan useEffect
 
@@ -473,7 +500,7 @@ useEffect(() => {
         LokasyonIds: body.filters.LokasyonIds,
         MakineTipIds: body.filters.MakineTipIds,
         DurumId: body.filters.DurumId,
-        // Kelime backend'de karşılığı varsa eklenebilir, yoksa frontend filter yapılacak
+        Kelime: body.filters.Kelime || "",
       };
 
       const response = await AxiosInstance.post("GetAmortismanRaporu", payload);
@@ -551,8 +578,7 @@ useEffect(() => {
     setSelectedRows([]);
 
     // Verileri yeniden çekmek için `fetchEquipmentData` fonksiyonunu çağır
-    fetchEquipmentData(body, currentPage);
-    fetchCards();
+    fetchDefaultProfile();
     // Burada `body` ve `currentPage`'i güncellediğimiz için, bu değerlerin en güncel hallerini kullanarak veri çekme işlemi yapılır.
     // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
     // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
