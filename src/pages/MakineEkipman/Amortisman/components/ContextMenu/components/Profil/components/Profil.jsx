@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Form, Input, Select, InputNumber, Checkbox, Row, Col, Button, Typography, Spin, message } from "antd";
-import { FormProvider, useForm } from "react-hook-form"; // react-hook-form'dan bunları ekledik
+import { Modal, Form, Input, InputNumber, Checkbox, Row, Col, Button, Typography, Spin, message } from "antd";
+import { FormProvider, useForm } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../api/http";
 import KodIDSelectbox from "../../../../../../../../utils/components/KodIDSelectbox";
 
@@ -12,8 +12,7 @@ const Profil = ({ open, onClose, updateData, onRefresh }) => {
   const [loading, setLoading] = useState(false);
   const [isFormTouched, setIsFormTouched] = useState(false);
 
-  // KodIDSelectbox'ın içindeki react-hook-form yapısını beslemek için:
-  const methods = useForm(); 
+  const methods = useForm();
 
   useEffect(() => {
     if (open) {
@@ -22,68 +21,93 @@ const Profil = ({ open, onClose, updateData, onRefresh }) => {
         fetchProfilDetail(updateData.TB_AP_ID);
       } else {
         form.resetFields();
-        methods.reset(); // react-hook-form'u sıfırla
+        methods.reset();
       }
     }
   }, [open, updateData, form, methods]);
 
   const fetchProfilDetail = (id) => {
-  setLoading(true);
-  AxiosInstance.get(`GetAmortismanProfilById?id=${id}`)
-    .then((res) => {
-      if (res && !res.has_error && res.data) {
-        const item = res.data;
+    setLoading(true);
+    AxiosInstance.get(`GetAmortismanProfilById?id=${id}`)
+      .then((res) => {
+        if (res && !res.has_error && res.data) {
+          const item = res.data;
 
-        // Ant Design Formu (Düz inputlar için)
-        form.setFieldsValue(item);
+          // 1. Ant Design Formu setle
+          form.setFieldsValue(item);
 
-        // KodIDSelectbox'lar için React Hook Form (methods) setleme işlemleri
-        // name1: Tanım (Görünen), name1 + "ID": KodID (Arka plan)
+          // 2. React Hook Form (KodIDSelectbox) setle
+          // DİKKAT: KodIDSelectbox içindeki mantık gereği `${name1}ID` şeklinde setliyoruz.
+          
+          methods.setValue("AmacText", item.AmacText);
+          methods.setValue("AmacTextID", item.AmacKodId); // KodIDSelectbox bunu bekliyor
 
-        // Amaç
-        methods.setValue("AmacText", item.AmacText); // Selectbox içinde "Muhasebe" yazar
-        methods.setValue("AmacKodId", item.AmacKodId); // Arka planda 5525 tutar
+          methods.setValue("YontemText", item.YontemText);
+          methods.setValue("YontemTextID", item.YontemKodId);
 
-        // Yöntem
-        methods.setValue("YontemText", item.YontemText);
-        methods.setValue("YontemKodId", item.YontemKodId);
+          methods.setValue("HurdaDegerYontemText", item.HurdaDegerYontemText);
+          methods.setValue("HurdaDegerYontemTextID", item.HurdaDegerYontemKodId);
 
-        // Kalıntı / Hurda Değer Yöntemi
-        methods.setValue("HurdaDegerYontemText", item.HurdaDegerYontemText);
-        methods.setValue("HurdaDegerYontemKodId", item.HurdaDegerYontemKodId);
+          methods.setValue("YasHesaplamaText", item.YasHesaplamaText);
+          methods.setValue("YasHesaplamaTextID", item.YasHesaplamaKodId);
 
-        // Yaş Hesaplama Tipi
-        methods.setValue("YasHesaplamaText", item.YasHesaplamaText);
-        methods.setValue("YasHesaplamaKodId", item.YasHesaplamaKodId);
+          methods.setValue("BaslangicKuralText", item.BaslangicKuralText);
+          methods.setValue("BaslangicKuralTextID", item.BaslangicKuralKodId);
 
-        // Başlangıç Tarihi Kuralı
-        methods.setValue("BaslangicKuralText", item.BaslangicKuralText);
-        methods.setValue("BaslangicKuralKodId", item.BaslangicKuralKodId);
+          methods.setValue("AsgariDegerKuralText", item.AsgariDegerKuralText);
+          methods.setValue("AsgariDegerKuralTextID", item.AsgariDegerKuralKodId);
 
-        // Asgari Net Değer Kuralı
-        methods.setValue("AsgariDegerKuralText", item.AsgariDegerKuralText);
-        methods.setValue("AsgariDegerKuralKodId", item.AsgariDegerKuralKodId);
+          methods.setValue("HesaplamaBazText", item.HesaplamaBazText);
+          methods.setValue("HesaplamaBazTextID", item.HesaplamaBazKodId);
+        }
+      })
+      .catch((err) => {
+        console.error("Detay hatası:", err);
+        message.error("Profil detayları yüklenemedi.");
+      })
+      .finally(() => setLoading(false));
+  };
 
-        // Özel Parametre Kullanımı
-        methods.setValue("HesaplamaBazText", item.HesaplamaBazText);
-        methods.setValue("HesaplamaBazKodId", item.HesaplamaBazKodId);
+  const onFinish = (values) => {
+    setLoading(true);
+    const methodsValues = methods.getValues();
 
-        // Diğer Standart Alanlar
-        methods.setValue("Ad", item.Ad);
-        methods.setValue("Kod", item.Kod);
-        methods.setValue("Aciklama", item.Aciklama);
-        methods.setValue("SalvageOrani", item.SalvageOrani);
-        methods.setValue("ScrapKatsayisi", item.ScrapKatsayisi);
-        methods.setValue("FizikselOmur", item.FizikselOmur);
-        methods.setValue("Varsayilan", item.Varsayilan);
-      }
-    })
-    .catch((err) => {
-      console.error("Detay hatası:", err);
-      message.error("Profil detayları yüklenemedi.");
-    })
-    .finally(() => setLoading(false));
-};
+    const payload = {
+      TB_AP_ID: updateData?.TB_AP_ID || 0,
+      Varsayilan: values.Varsayilan || false,
+      Kod: values.Kod,
+      Ad: values.Ad,
+      Aciklama: values.Aciklama || "",
+      SalvageOrani: values.SalvageOrani || 0,
+      ScrapKatsayisi: values.ScrapKatsayisi || 0,
+      FizikselOmur: values.FizikselOmur || 0,
+      
+      // KodIDSelectbox'tan gelen verileri alırken `${name1}ID` ismini kullanıyoruz
+      AmacKodId: methodsValues.AmacTextID || null,
+      YontemKodId: methodsValues.YontemTextID || null,
+      HurdaDegerYontemKodId: methodsValues.HurdaDegerYontemTextID || null,
+      YasHesaplamaKodId: methodsValues.YasHesaplamaTextID || null,
+      BaslangicKuralKodId: methodsValues.BaslangicKuralTextID || null,
+      AsgariDegerKuralKodId: methodsValues.AsgariDegerKuralTextID || null,
+      HesaplamaBazKodId: methodsValues.HesaplamaBazTextID || null,
+    };
+
+    AxiosInstance.post("AddUpdateAmortismanProfil", payload)
+      .then((res) => {
+        const responseData = res?.data || res;
+        if (responseData && responseData.has_error) {
+          message.error(responseData.status || "Bir hata oluştu.");
+        } else {
+          message.success("İşlem başarılı.");
+          onRefresh();
+          onClose();
+        }
+      })
+      .catch((err) => {
+        message.error("Bağlantı hatası.");
+      })
+      .finally(() => setLoading(false));
+  };
 
   const handleCancel = () => {
     if (isFormTouched) {
@@ -104,50 +128,6 @@ const Profil = ({ open, onClose, updateData, onRefresh }) => {
     }
   };
 
-  const onFinish = (values) => {
-    setLoading(true);
-
-    const methodsValues = methods.getValues();
-
-    const payload = {
-      TB_AP_ID: updateData?.TB_AP_ID || 0,
-      Varsayilan: values.Varsayilan || false,
-      Kod: values.Kod,
-      Ad: values.Ad,
-      Aciklama: values.Aciklama || "",
-      SalvageOrani: values.SalvageOrani || 0,
-      ScrapKatsayisi: values.ScrapKatsayisi || 0,
-      FizikselOmur: values.FizikselOmur || 0,
-      AmacKodId: methodsValues.AmacKodId || null,
-      YontemKodId: methodsValues.YontemKodId || null,
-      HurdaDegerYontemKodId: methodsValues.HurdaDegerYontemKodId || null,
-      YasHesaplamaKodId: methodsValues.YasHesaplamaKodId || null,
-      BaslangicKuralKodId: methodsValues.BaslangicKuralKodId || null,
-      AsgariDegerKuralKodId: methodsValues.AsgariDegerKuralKodId || null,
-      HesaplamaBazKodId: methodsValues.HesaplamaBazKodId || null,
-    };
-
-    AxiosInstance.post("AddUpdateAmortismanProfil", payload)
-      .then((res) => {
-        // HATA BURADAYDI: res?.data veya direkt res kontrolü yapıyoruz
-        // Genelde Axios interceptor'lar veriyi res.data olarak döndürür.
-        const responseData = res?.data || res; 
-
-        if (responseData && responseData.has_error) {
-          message.error(responseData.status || "Bir hata oluştu.");
-        } else if (responseData) {
-          message.success(responseData.status || "İşlem başarılı.");
-          onRefresh(); 
-          onClose();
-        }
-      })
-      .catch((err) => {
-        console.error("API Hatası:", err);
-        message.error("Bağlantı hatası oluştu.");
-      })
-      .finally(() => setLoading(false));
-  };
-
   return (
     <Modal
       open={open}
@@ -164,7 +144,6 @@ const Profil = ({ open, onClose, updateData, onRefresh }) => {
       }
     >
       <Spin spinning={loading}>
-        {/* ÖNEMLİ: KodIDSelectbox'ın çalışması için FormProvider şart */}
         <FormProvider {...methods}>
           <Form
             form={form}
@@ -174,17 +153,11 @@ const Profil = ({ open, onClose, updateData, onRefresh }) => {
             style={{ marginTop: '20px' }}
             onValuesChange={() => setIsFormTouched(true)}
           >
-            <div style={{ 
-    display: 'flex', 
-    justifyContent: 'flex-end', 
-    alignItems: 'center', 
-    marginBottom: '16px',
-    padding: '0 4px' 
-  }}>
-    <Form.Item name="Varsayilan" valuePropName="checked" noStyle>
-      <Checkbox>Varsayılan</Checkbox>
-    </Form.Item>
-  </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+              <Form.Item name="Varsayilan" valuePropName="checked" noStyle>
+                <Checkbox>Varsayılan</Checkbox>
+              </Form.Item>
+            </div>
 
             {/* --- GENEL BİLGİLER --- */}
             <div style={{ padding: '16px', border: '1px solid #f0f0f0', borderRadius: '8px', marginBottom: '16px' }}>
@@ -209,7 +182,7 @@ const Profil = ({ open, onClose, updateData, onRefresh }) => {
                   <Form.Item label="Yöntem">
                     <KodIDSelectbox name1="YontemText" kodID={14361} placeholder="Yöntem Seçiniz" />
                   </Form.Item>
-                  </Col>
+                </Col>
                 <Col span={24}>
                   <Form.Item label="Açıklama" name="Aciklama">
                     <TextArea rows={3} />
@@ -272,19 +245,16 @@ const Profil = ({ open, onClose, updateData, onRefresh }) => {
               </Row>
             </div>
 
-            {/* --- FOOTER --- */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: '20px' }}>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <Button onClick={handleCancel}>Vazgeç</Button>
-                <Button 
-                  type="primary" 
-                  loading={loading}
-                  onClick={() => form.submit()} 
-                  style={{ backgroundColor: "#2bc770", borderColor: "#2bc770", color: "#fff" }}
-                >
-                  {updateData ? "Güncelle" : "Kaydet"}
-                </Button>
-              </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px', gap: '8px' }}>
+              <Button onClick={handleCancel}>Vazgeç</Button>
+              <Button 
+                type="primary" 
+                loading={loading}
+                onClick={() => form.submit()} 
+                style={{ backgroundColor: "#2bc770", borderColor: "#2bc770" }}
+              >
+                {updateData ? "Güncelle" : "Kaydet"}
+              </Button>
             </div>
           </Form>
         </FormProvider>
