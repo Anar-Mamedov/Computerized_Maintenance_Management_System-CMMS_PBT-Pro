@@ -215,6 +215,11 @@ const Profil = ({ open, onClose, updateData, onRefresh }) => {
                     <KodIDSelectbox name1="HurdaDegerYontemText" kodID={14362} placeholder="Seçiniz" />
                   </Form.Item>
                 </Col>
+                <Col span={12}>
+                  <Form.Item label="Para Birimi">
+                    <KodIDSelectbox name1="ParaBirimiText" kodID={14362} placeholder="Seçiniz" />
+                  </Form.Item>
+                </Col>
               </Row>
             </div>
 
