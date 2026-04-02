@@ -2,11 +2,12 @@ import React from "react";
 import ConditionFilter from "./ConditionFilter";
 import LocationFilter from "./LocationFilter";
 import TypeFilter from "./TypeFilter";
+import ProfileFilter from "./ProfileFilter";
 import ZamanAraligi from "./ZamanAraligi";
 
 export default function Filters({ onChange, kelime, selectedProfilId }) {
   const [filters, setFilters] = React.useState({
-    ProfilId: selectedProfilId || 1, // Dokümana göre zorunlu
+    ProfilId: null, // Dokümana göre zorunlu
     LokasyonIds: [],                 // API [1, 5] formatında dizi bekliyor
     MakineTipIds: [],                // API [12, 14] formatında dizi bekliyor
     DurumId: null,                   // Tekil ID veya null
@@ -59,6 +60,16 @@ export default function Filters({ onChange, kelime, selectedProfilId }) {
           }));
         }}
       />
+
+      <ProfileFilter
+  onSubmit={(val) => {
+    // Önce kendi lokal state'ini güncelle
+    const newFilters = { ...filters, ProfilId: val };
+    setFilters(newFilters);
+    // BEKLEMEDEN direkt yukarıya da haber ver (useEffect'i bekleme)
+    onChange("filters", newFilters);
+  }}
+/>
 
     </div>
   );

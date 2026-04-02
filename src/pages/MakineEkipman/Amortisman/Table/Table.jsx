@@ -131,7 +131,7 @@ const MainTable = () => {
     if (!cardsData || Object.keys(cardsData).length === 0) return [];
     return [
       { title: "Ekipman Sayısı", value: cardsData?.EkipmanSayisi || 0 },
-      { title: "Ekonomik Ömrünü Tamamlamamış", value: cardsData?.EkonomikOmrunuTamamlamamis || 0 },
+      { title: ( <> Ekonomik Ömrünü <u style={{ textDecorationColor: "#5C595C" }}>Tamamlamamış</u> </> ), value: cardsData?.EkonomikOmrunuTamamlamamis || 0 },
       { title: "Ekonomik Ömrünü Tamamlamış", value: cardsData?.EkonomikOmrunuTamamlamis || 0 },
       { title: "Toplam Net Değer", value: cardsData?.ToplamNetDeger?.toLocaleString() + " $" },
       { title: "Toplam Değer Düşüşü", value: cardsData?.ToplamDegerDususu?.toLocaleString() + " $" },
@@ -254,6 +254,13 @@ const MainTable = () => {
     key: "AlimBedeli",
     width: 130,
     visible: true,
+    render: (val, record) => (
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <span style={{ fontWeight: 600 }}>
+          {val?.toLocaleString(undefined, { minimumFractionDigits: 2 })} $
+        </span>
+      </div>
+    ),
   },
   {
     title: t("Değer Düşüşü"),
@@ -294,9 +301,14 @@ const MainTable = () => {
     dataIndex: "SalvageDegeri",
     key: "SalvageDegeri",
     width: 130,
-    ellipsis: true,
     visible: true,
-    sorter: true,
+    render: (val, record) => (
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <span style={{ fontWeight: 600 }}>
+          {val?.toLocaleString(undefined, { minimumFractionDigits: 2 })} $
+        </span>
+      </div>
+    ),
   },
   {
     title: t("Scrap"),
@@ -464,11 +476,10 @@ const MainTable = () => {
 
 // ✅ API isteği
 useEffect(() => {
-  const params = JSON.stringify({ body, currentPage, pageSize });
-  if (lastRequestRef.current === params) return;
-  lastRequestRef.current = params;
-
-  fetchEquipmentData(body, currentPage, pageSize);
+  // Sadece ProfilId varsa istek at (Zorunlu alan olduğu için)
+  if (body.filters.ProfilId) {
+    fetchEquipmentData();
+  }
 }, [body, currentPage, pageSize]);
 
   // ana tablo api isteği için kullanılan useEffect son
