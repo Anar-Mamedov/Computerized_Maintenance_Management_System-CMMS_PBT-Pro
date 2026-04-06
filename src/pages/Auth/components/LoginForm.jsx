@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Button, Form, Input, Typography, message, Spin, Checkbox, Modal } from "antd";
 import { UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +10,7 @@ import ReCAPTCHA from "react-google-recaptcha"; // reCAPTCHA bileşenini import 
 import { useTranslation } from "react-i18next";
 
 const { Text } = Typography;
+const MICROSOFT_SSO_TOKEN_KEY = "microsoft_sso_token";
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ export default function LoginForm() {
       return false;
     }
   });
+  const microsoftTokenProcessedRef = useRef(false);
 
   const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 
@@ -130,19 +132,22 @@ export default function LoginForm() {
 
   useEffect(() => {
     const hash = window.location.hash;
-    if (!hash) {
-      return;
-    }
-
     const hashParams = new URLSearchParams(hash.replace(/^#/, ""));
-    const microsoftToken = hashParams.get("id_token") || hashParams.get("access_token");
+    const tokenFromHash = hashParams.get("id_token") || hashParams.get("access_token");
+    const tokenFromStorage = sessionStorage.getItem(MICROSOFT_SSO_TOKEN_KEY);
+    const microsoftToken = tokenFromHash || tokenFromStorage;
 
-    if (!microsoftToken) {
+    if (!microsoftToken || microsoftTokenProcessedRef.current) {
       return;
     }
 
-    // Token tekrar işlenmesin diye hash'i temizliyoruz.
-    window.history.replaceState({}, document.title, `${window.location.pathname}${window.location.search}`);
+    microsoftTokenProcessedRef.current = true;
+
+    if (tokenFromHash) {
+      // Token tekrar işlenmesin diye hash'i temizliyoruz.
+      window.history.replaceState({}, document.title, `${window.location.pathname}${window.location.search}`);
+    }
+    sessionStorage.removeItem(MICROSOFT_SSO_TOKEN_KEY);
 
     const remember = form.getFieldValue("remember") ?? true;
     completeMicrosoftLogin(microsoftToken, remember);

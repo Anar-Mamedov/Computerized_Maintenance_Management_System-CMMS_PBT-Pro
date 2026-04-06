@@ -15,6 +15,24 @@ import dayjs from "dayjs";
 import AxiosInstance from "./api/http.jsx";
 import "./index.css";
 
+const MICROSOFT_SSO_TOKEN_KEY = "microsoft_sso_token";
+
+const cacheMicrosoftTokenFromHash = () => {
+  const hash = window.location.hash;
+  if (!hash) {
+    return;
+  }
+
+  const hashParams = new URLSearchParams(hash.replace(/^#/, ""));
+  const microsoftToken = hashParams.get("id_token") || hashParams.get("access_token");
+
+  if (microsoftToken) {
+    sessionStorage.setItem(MICROSOFT_SSO_TOKEN_KEY, microsoftToken);
+  }
+};
+
+cacheMicrosoftTokenFromHash();
+
 // App component
 // const App = React.lazy(() => import("./App.jsx"));
 import App from "./App.jsx";

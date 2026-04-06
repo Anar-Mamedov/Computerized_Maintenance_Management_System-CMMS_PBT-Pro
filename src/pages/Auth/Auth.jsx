@@ -8,7 +8,7 @@ import LoginForm from "./components/LoginForm";
 import logo from "../../assets/images/logo.svg";
 import RegistrationForm from "./components/RegistrationForm";
 import axios from "axios";
-import AxiosInstance from "../../api/http";
+import AxiosInstance, { setApiBaseURL } from "../../api/http";
 
 const { Text, Link } = Typography;
 
@@ -28,6 +28,7 @@ export default function Auth() {
     const storedBaseURL = localStorage.getItem("baseURL");
     if (storedBaseURL) {
       setBaseURL(storedBaseURL);
+      setApiBaseURL(storedBaseURL);
       setTarget("login"); // Eğer baseURL kayıtlıysa, direkt login ekranı
     } else {
       setTarget("initial"); // Eğer kayıtlı değilse, baseURL kaydetme ekranı
@@ -35,14 +36,24 @@ export default function Auth() {
   }, []);
 
   const saveBaseURL = () => {
+    const sanitizedBaseURL = baseURL.trim().replace(/\/+$/, "");
+    if (!sanitizedBaseURL) {
+      setErrorMessage("Geçerli Bir Bağlantı Anahtarı Giriniz.");
+      return;
+    }
+
     setLoading(true);
     axios
-      .get(`${baseURL}/api/VeritabaniBaglantiKontrol`)
+      .get(`${sanitizedBaseURL}/api/VeritabaniBaglantiKontrol`)
       .then((response) => {
         if (response.data.baglantiDurumu === true) {
-          localStorage.setItem("baseURL", baseURL);
+          localStorage.setItem("baseURL", sanitizedBaseURL);
           localStorage.setItem("isEntraID", JSON.stringify(response.data.isEntraID));
-          window.location.reload();
+          setApiBaseURL(sanitizedBaseURL);
+          setBaseURL(sanitizedBaseURL);
+          setErrorMessage("");
+          setTarget("login");
+          setTarget1("login");
         } else {
           console.error("URL is not valid or server is not responding correctly.");
           setErrorMessage("Geçerli Bir Bağlantı Anahtarı Giriniz.");
@@ -50,6 +61,7 @@ export default function Auth() {
       })
       .catch((error) => {
         console.error("Error occurred while trying to reach the URL:", error);
+        setErrorMessage("Geçerli Bir Bağlantı Anahtarı Giriniz.");
       })
       .finally(() => setLoading(false));
   };
@@ -120,34 +132,70 @@ export default function Auth() {
 
   // Resimleri yüklemek için useEffect
   useEffect(() => {
-    if (baseURL) {
-      setLoadingImage(true);
-      const fetchImages = async () => {
-        try {
-          const responseLogo = await AxiosInstance.get(`ResimGetirById?id=1`, {
-            responseType: "blob",
-          });
-          const logoBlob = responseLogo;
-          setLogoUrl(URL.createObjectURL(logoBlob));
-        } catch (error) {
-          console.error("Error fetching logo image:", error);
-        }
+    if (!baseURL || target !== "login") {
+      return;
+    }
 
-        try {
-          const responseBackground = await AxiosInstance.get(`ResimGetirById?id=2`, {
-            responseType: "blob",
+    let isMounted = true;
+    setLoadingImage(true);
+
+    const fetchImages = async () => {
+      try {
+        const responseLogo = await AxiosInstance.get(`ResimGetirById?id=1`, {
+          responseType: "blob",
+        });
+
+        if (isMounted) {
+          setLogoUrl((prev) => {
+            if (prev) {
+              URL.revokeObjectURL(prev);
+            }
+            return URL.createObjectURL(responseLogo);
           });
-          const backgroundBlob = responseBackground;
-          setBackgroundImageUrl(URL.createObjectURL(backgroundBlob));
-        } catch (error) {
-          console.error("Error fetching background image:", error);
-        } finally {
+        }
+      } catch (error) {
+        console.error("Error fetching logo image:", error);
+      }
+
+      try {
+        const responseBackground = await AxiosInstance.get(`ResimGetirById?id=2`, {
+          responseType: "blob",
+        });
+
+        if (isMounted) {
+          setBackgroundImageUrl((prev) => {
+            if (prev) {
+              URL.revokeObjectURL(prev);
+            }
+            return URL.createObjectURL(responseBackground);
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching background image:", error);
+      } finally {
+        if (isMounted) {
           setLoadingImage(false);
         }
-      };
-      fetchImages();
-    }
-  }, [baseURL]);
+      }
+    };
+
+    fetchImages();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [baseURL, target]);
+
+  useEffect(() => {
+    return () => {
+      if (logoUrl) {
+        URL.revokeObjectURL(logoUrl);
+      }
+      if (backgroundImageUrl) {
+        URL.revokeObjectURL(backgroundImageUrl);
+      }
+    };
+  }, [logoUrl, backgroundImageUrl]);
 
   const handleBaseURLChange = (e) => {
     const url = e.target.value;
