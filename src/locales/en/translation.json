@@ -7,6 +7,7 @@
   "microsoftGirisBasarisiz": "Microsoft sign-in failed.",
   "microsoftGirisHata": "An error occurred during Microsoft sign-in.",
   "microsoftYonlendirmeAlinamadi": "Microsoft sign-in URL could not be retrieved.",
+  "microsoftGecersizToken": "No valid id_token was returned from Microsoft.",
   "mudaheleSuresiHistogrami": "Intervention Time Histogram",
   "aylikMudaheleSuresi": "Monthly Intervention Durations",
   "indir": "Download",

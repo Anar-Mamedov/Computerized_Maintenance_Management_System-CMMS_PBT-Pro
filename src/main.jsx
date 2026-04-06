@@ -18,18 +18,8 @@ import "./index.css";
 const MICROSOFT_SSO_TOKEN_KEY = "microsoft_sso_token";
 
 const getMicrosoftTokenFromLocation = () => {
-  const hash = window.location.hash;
-  const hashParams = new URLSearchParams(hash.replace(/^#/, ""));
-  const queryParams = new URLSearchParams(window.location.search);
-
-  return (
-    hashParams.get("id_token") ||
-    hashParams.get("access_token") ||
-    hashParams.get("code") ||
-    queryParams.get("id_token") ||
-    queryParams.get("access_token") ||
-    queryParams.get("code")
-  );
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  return hashParams.get("id_token");
 };
 
 const cacheMicrosoftTokenFromLocation = () => {

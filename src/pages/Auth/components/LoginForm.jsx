@@ -11,19 +11,17 @@ import { useTranslation } from "react-i18next";
 
 const { Text } = Typography;
 const MICROSOFT_SSO_TOKEN_KEY = "microsoft_sso_token";
-const MICROSOFT_QUERY_KEYS_TO_REMOVE = ["id_token", "access_token", "code", "state", "session_state"];
+const MICROSOFT_QUERY_KEYS_TO_REMOVE = ["id_token", "state", "session_state"];
+
+const isLikelyJwt = (token) => typeof token === "string" && token.split(".").length === 3;
 
 const getMicrosoftTokenFromLocation = () => {
   const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
-  const queryParams = new URLSearchParams(window.location.search);
-
-  const tokenFromHash = hashParams.get("id_token") || hashParams.get("access_token") || hashParams.get("code");
-  const tokenFromQuery = queryParams.get("id_token") || queryParams.get("access_token") || queryParams.get("code");
+  const tokenFromHash = hashParams.get("id_token");
 
   return {
     tokenFromHash,
-    tokenFromQuery,
-    token: tokenFromHash || tokenFromQuery,
+    token: tokenFromHash,
   };
 };
 
@@ -139,7 +137,7 @@ export default function LoginForm() {
   const handleMicrosoftRedirect = useCallback(async () => {
     setMicrosoftLoading(true);
     try {
-      const redirectUri = `${window.location.origin}`;
+      const redirectUri = `${window.location.origin}${window.location.pathname}`;
       const response = await AxiosInstance.get(`/GetMicrosoftLoginUrl?redirectUri=${encodeURIComponent(redirectUri)}`);
 
       if (response?.url) {
@@ -172,10 +170,16 @@ export default function LoginForm() {
   }, []);
 
   useEffect(() => {
-    const { tokenFromHash, tokenFromQuery, token: tokenFromLocation } = getMicrosoftTokenFromLocation();
+    const { tokenFromHash, token: tokenFromLocation } = getMicrosoftTokenFromLocation();
     const { error, description } = getMicrosoftErrorFromLocation();
     const tokenFromStorage = sessionStorage.getItem(MICROSOFT_SSO_TOKEN_KEY);
-    const microsoftToken = tokenFromLocation || tokenFromStorage;
+    const microsoftToken = tokenFromLocation || tokenFromStorage || "";
+
+    if (microsoftToken && !isLikelyJwt(microsoftToken)) {
+      sessionStorage.removeItem(MICROSOFT_SSO_TOKEN_KEY);
+      message.error(t("microsoftGecersizToken"));
+      return;
+    }
 
     if (!microsoftToken && error) {
       const errorText = description ? `${error}: ${decodeURIComponent(description)}` : error;
@@ -194,7 +198,7 @@ export default function LoginForm() {
       const isSuccessful = await completeMicrosoftLogin(microsoftToken, remember);
       if (isSuccessful) {
         sessionStorage.removeItem(MICROSOFT_SSO_TOKEN_KEY);
-        if (tokenFromHash || tokenFromQuery) {
+        if (tokenFromHash) {
           clearMicrosoftTokenFromUrl();
         }
       } else {
@@ -203,7 +207,7 @@ export default function LoginForm() {
     };
 
     runMicrosoftLogin();
-  }, [completeMicrosoftLogin, form]);
+  }, [completeMicrosoftLogin, form, t]);
 
   // Lisans kontrolü fonksiyonu
   const checkLicense = async () => {
