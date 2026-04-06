@@ -124,7 +124,7 @@ export default function LoginForm() {
         return false;
       } catch (error) {
         console.error("Microsoft login error:", error);
-        const apiMessage = error?.response?.data?.message || error?.response?.data?.error || error?.message;
+        const apiMessage = error?.response?.data?.status || error?.response?.data?.message || error?.response?.data?.error || error?.message;
         message.error(apiMessage || t("microsoftGirisHata"));
         return false;
       } finally {
