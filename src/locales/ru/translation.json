@@ -7,6 +7,7 @@
   "microsoftGirisBasarisiz": "Ошибка входа через Microsoft.",
   "microsoftGirisHata": "Во время входа через Microsoft произошла ошибка.",
   "microsoftYonlendirmeAlinamadi": "Не удалось получить ссылку входа Microsoft.",
+  "microsoftGecersizToken": "От Microsoft не получен корректный id_token.",
   "mudaheleSuresiHistogrami": "Гистограмма времени вмешательства",
   "aylikMudaheleSuresi": "Ежемесячное время вмешательства",
   "indir": "Скачать",

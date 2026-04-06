@@ -7,6 +7,7 @@
   "microsoftGirisBasarisiz": "Microsoft giriş əməliyyatı uğursuz oldu.",
   "microsoftGirisHata": "Microsoft giriş zamanı xəta baş verdi.",
   "microsoftYonlendirmeAlinamadi": "Microsoft giriş bağlantısı alına bilmədi.",
+  "microsoftGecersizToken": "Microsoft'dan etibarlı id_token alınmadı.",
   "mudaheleSuresiHistogrami": "Müdaxilə Müddəti Histogramı",
   "aylikMudaheleSuresi": "Aylıq Müdaxilə Müddətləri",
   "indir": "Yüklə",
