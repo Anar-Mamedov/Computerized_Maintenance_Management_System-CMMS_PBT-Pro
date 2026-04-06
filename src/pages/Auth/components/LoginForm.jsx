@@ -8,6 +8,7 @@ import { userState } from "../../../state/userState";
 import LanguageSelectbox from "../../components/Language/LanguageSelectbox";
 import ReCAPTCHA from "react-google-recaptcha"; // reCAPTCHA bileşenini import edin
 import { useTranslation } from "react-i18next";
+import "./LoginForm.css";
 
 const { Text } = Typography;
 const MICROSOFT_SSO_TOKEN_KEY = "microsoft_sso_token";
@@ -344,9 +345,15 @@ export default function LoginForm() {
           </Form.Item>
           {isEntraID && (
             <Form.Item>
-              <Button onClick={handleMicrosoftRedirect} style={{ width: "100%" }} disabled={loading || microsoftLoading}>
-                {microsoftLoading ? <Spin /> : t("microsoftIleGirisYap")}
-              </Button>
+              <button type="button" className="ms-login-btn" onClick={handleMicrosoftRedirect} disabled={loading || microsoftLoading}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21" aria-hidden="true">
+                  <rect x="1" y="1" width="9" height="9" fill="#f25022" />
+                  <rect x="11" y="1" width="9" height="9" fill="#7fba00" />
+                  <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
+                  <rect x="11" y="11" width="9" height="9" fill="#ffb900" />
+                </svg>
+                <span>{t("microsoftIleGirisYap")}</span>
+              </button>
             </Form.Item>
           )}
           <Form.Item>
