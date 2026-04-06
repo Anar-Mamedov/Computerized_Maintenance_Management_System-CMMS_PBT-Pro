@@ -11,6 +11,43 @@ import { useTranslation } from "react-i18next";
 
 const { Text } = Typography;
 const MICROSOFT_SSO_TOKEN_KEY = "microsoft_sso_token";
+const MICROSOFT_QUERY_KEYS_TO_REMOVE = ["id_token", "access_token", "code", "state", "session_state"];
+
+const getMicrosoftTokenFromLocation = () => {
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  const queryParams = new URLSearchParams(window.location.search);
+
+  const tokenFromHash = hashParams.get("id_token") || hashParams.get("access_token") || hashParams.get("code");
+  const tokenFromQuery = queryParams.get("id_token") || queryParams.get("access_token") || queryParams.get("code");
+
+  return {
+    tokenFromHash,
+    tokenFromQuery,
+    token: tokenFromHash || tokenFromQuery,
+  };
+};
+
+const getMicrosoftErrorFromLocation = () => {
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  const queryParams = new URLSearchParams(window.location.search);
+
+  const error = hashParams.get("error") || queryParams.get("error");
+  const description = hashParams.get("error_description") || queryParams.get("error_description");
+
+  return {
+    error,
+    description,
+  };
+};
+
+const clearMicrosoftTokenFromUrl = () => {
+  const url = new URL(window.location.href);
+  MICROSOFT_QUERY_KEYS_TO_REMOVE.forEach((key) => {
+    url.searchParams.delete(key);
+  });
+  url.hash = "";
+  window.history.replaceState({}, document.title, `${url.pathname}${url.search}`);
+};
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -81,13 +118,17 @@ export default function LoginForm() {
           handleSuccessfulLogin(response, remember);
           message.success(t("islemBasarili"));
           navigate("/", { replace: true });
-          return;
+          return true;
         }
 
-        message.error(t("microsoftGirisBasarisiz"));
+        const responseMessage = response?.message || response?.error || response?.status_message;
+        message.error(responseMessage || t("microsoftGirisBasarisiz"));
+        return false;
       } catch (error) {
         console.error("Microsoft login error:", error);
-        message.error(t("microsoftGirisHata"));
+        const apiMessage = error?.response?.data?.message || error?.response?.data?.error || error?.message;
+        message.error(apiMessage || t("microsoftGirisHata"));
+        return false;
       } finally {
         setMicrosoftLoading(false);
       }
@@ -131,26 +172,37 @@ export default function LoginForm() {
   }, []);
 
   useEffect(() => {
-    const hash = window.location.hash;
-    const hashParams = new URLSearchParams(hash.replace(/^#/, ""));
-    const tokenFromHash = hashParams.get("id_token") || hashParams.get("access_token");
+    const { tokenFromHash, tokenFromQuery, token: tokenFromLocation } = getMicrosoftTokenFromLocation();
+    const { error, description } = getMicrosoftErrorFromLocation();
     const tokenFromStorage = sessionStorage.getItem(MICROSOFT_SSO_TOKEN_KEY);
-    const microsoftToken = tokenFromHash || tokenFromStorage;
+    const microsoftToken = tokenFromLocation || tokenFromStorage;
+
+    if (!microsoftToken && error) {
+      const errorText = description ? `${error}: ${decodeURIComponent(description)}` : error;
+      message.error(errorText);
+      return;
+    }
 
     if (!microsoftToken || microsoftTokenProcessedRef.current) {
       return;
     }
 
     microsoftTokenProcessedRef.current = true;
-
-    if (tokenFromHash) {
-      // Token tekrar işlenmesin diye hash'i temizliyoruz.
-      window.history.replaceState({}, document.title, `${window.location.pathname}${window.location.search}`);
-    }
-    sessionStorage.removeItem(MICROSOFT_SSO_TOKEN_KEY);
-
     const remember = form.getFieldValue("remember") ?? true;
-    completeMicrosoftLogin(microsoftToken, remember);
+
+    const runMicrosoftLogin = async () => {
+      const isSuccessful = await completeMicrosoftLogin(microsoftToken, remember);
+      if (isSuccessful) {
+        sessionStorage.removeItem(MICROSOFT_SSO_TOKEN_KEY);
+        if (tokenFromHash || tokenFromQuery) {
+          clearMicrosoftTokenFromUrl();
+        }
+      } else {
+        microsoftTokenProcessedRef.current = false;
+      }
+    };
+
+    runMicrosoftLogin();
   }, [completeMicrosoftLogin, form]);
 
   // Lisans kontrolü fonksiyonu

@@ -38,10 +38,19 @@ AxiosInstance.interceptors.response.use(
 
 AxiosInstance.interceptors.request.use(function (request) {
   const user = JSON.parse(localStorage.getItem("user")) || JSON.parse(sessionStorage.getItem("user"));
-  request.headers.Authorization = `Bearer ${localStorage.getItem("token") || sessionStorage.getItem("token")}`;
+  const authToken = localStorage.getItem("token") || sessionStorage.getItem("token");
+
+  if (authToken) {
+    request.headers.Authorization = `Bearer ${authToken}`;
+  } else {
+    delete request.headers.Authorization;
+  }
+
   if (user) {
     // user objesi varsa
     request.headers["User-Id"] = user.userId; // User-Id başlığını ekliyoruz
+  } else {
+    delete request.headers["User-Id"];
   }
   // request.headers["User-Id"] = localStorage.getItem("userId");
   return request;
@@ -76,10 +85,19 @@ PdfAxiosInstance.interceptors.response.use(
 
 PdfAxiosInstance.interceptors.request.use(function (request) {
   const user = JSON.parse(localStorage.getItem("user")) || JSON.parse(sessionStorage.getItem("user"));
-  request.headers.Authorization = `Bearer ${localStorage.getItem("token") || sessionStorage.getItem("token")}`;
+  const authToken = localStorage.getItem("token") || sessionStorage.getItem("token");
+
+  if (authToken) {
+    request.headers.Authorization = `Bearer ${authToken}`;
+  } else {
+    delete request.headers.Authorization;
+  }
+
   if (user) {
     // user objesi varsa
     request.headers["User-Id"] = user.userId; // User-Id başlığını ekliyoruz
+  } else {
+    delete request.headers["User-Id"];
   }
   // request.headers["User-Id"] = localStorage.getItem("userId");
   return request;
