@@ -137,7 +137,7 @@ export default function LoginForm() {
   const handleMicrosoftRedirect = useCallback(async () => {
     setMicrosoftLoading(true);
     try {
-      const redirectUri = `${window.location.origin}${window.location.pathname}`;
+      const redirectUri = `${window.location.origin}`;
       const response = await AxiosInstance.get(`/GetMicrosoftLoginUrl?redirectUri=${encodeURIComponent(redirectUri)}`);
 
       if (response?.url) {
