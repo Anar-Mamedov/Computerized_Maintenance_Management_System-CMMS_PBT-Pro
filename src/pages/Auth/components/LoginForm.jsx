@@ -37,60 +37,66 @@ export default function LoginForm() {
     }
   }, [navigate, token]);
 
-  const handleSuccessfulLogin = useCallback((response, remember = true) => {
-    setUser({
-      userId: response.TB_KULLANICI_ID,
-      userName: response.KLL_TANIM,
-      userResimID: response.resimId,
-      userUnvan: response.KLL_UNVAN,
-    });
-
-    const userInfo = {
-      userId: response.TB_KULLANICI_ID ?? null,
-      userName: response.KLL_TANIM ?? null,
-      userResimID: response.resimId ?? null,
-      userUnvan: response.KLL_UNVAN ?? null,
-    };
-
-    if (remember) {
-      localStorage.setItem("token", response.AUTH_TOKEN);
-      localStorage.setItem("user", JSON.stringify(userInfo));
-      localStorage.setItem("login", JSON.stringify(response));
-    } else {
-      sessionStorage.setItem("token", response.AUTH_TOKEN);
-      sessionStorage.setItem("user", JSON.stringify(userInfo));
-      sessionStorage.setItem("login", JSON.stringify(response));
-    }
-  }, [setUser]);
-
-  const completeMicrosoftLogin = useCallback(async (accessToken, remember = true) => {
-    setMicrosoftLoading(true);
-
-    try {
-      const response = await AxiosInstance.post("/MicrosoftLogin", {
-        AccessToken: accessToken,
+  const handleSuccessfulLogin = useCallback(
+    (response, remember = true) => {
+      setUser({
+        userId: response.TB_KULLANICI_ID,
+        userName: response.KLL_TANIM,
+        userResimID: response.resimId,
+        userUnvan: response.KLL_UNVAN,
       });
 
-      if (response?.AUTH_TOKEN) {
-        handleSuccessfulLogin(response, remember);
-        message.success(t("islemBasarili"));
-        navigate("/", { replace: true });
-        return;
-      }
+      const userInfo = {
+        userId: response.TB_KULLANICI_ID ?? null,
+        userName: response.KLL_TANIM ?? null,
+        userResimID: response.resimId ?? null,
+        userUnvan: response.KLL_UNVAN ?? null,
+      };
 
-      message.error(t("microsoftGirisBasarisiz"));
-    } catch (error) {
-      console.error("Microsoft login error:", error);
-      message.error(t("microsoftGirisHata"));
-    } finally {
-      setMicrosoftLoading(false);
-    }
-  }, [handleSuccessfulLogin, navigate, t]);
+      if (remember) {
+        localStorage.setItem("token", response.AUTH_TOKEN);
+        localStorage.setItem("user", JSON.stringify(userInfo));
+        localStorage.setItem("login", JSON.stringify(response));
+      } else {
+        sessionStorage.setItem("token", response.AUTH_TOKEN);
+        sessionStorage.setItem("user", JSON.stringify(userInfo));
+        sessionStorage.setItem("login", JSON.stringify(response));
+      }
+    },
+    [setUser]
+  );
+
+  const completeMicrosoftLogin = useCallback(
+    async (accessToken, remember = true) => {
+      setMicrosoftLoading(true);
+
+      try {
+        const response = await AxiosInstance.post("/MicrosoftLogin", {
+          AccessToken: accessToken,
+        });
+
+        if (response?.AUTH_TOKEN) {
+          handleSuccessfulLogin(response, remember);
+          message.success(t("islemBasarili"));
+          navigate("/", { replace: true });
+          return;
+        }
+
+        message.error(t("microsoftGirisBasarisiz"));
+      } catch (error) {
+        console.error("Microsoft login error:", error);
+        message.error(t("microsoftGirisHata"));
+      } finally {
+        setMicrosoftLoading(false);
+      }
+    },
+    [handleSuccessfulLogin, navigate, t]
+  );
 
   const handleMicrosoftRedirect = useCallback(async () => {
     setMicrosoftLoading(true);
     try {
-      const redirectUri = `${window.location.origin}/auth`;
+      const redirectUri = `${window.location.origin}`;
       const response = await AxiosInstance.get(`/GetMicrosoftLoginUrl?redirectUri=${encodeURIComponent(redirectUri)}`);
 
       if (response?.url) {
