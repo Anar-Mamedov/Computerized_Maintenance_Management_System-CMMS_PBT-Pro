@@ -17,21 +17,30 @@ import "./index.css";
 
 const MICROSOFT_SSO_TOKEN_KEY = "microsoft_sso_token";
 
-const cacheMicrosoftTokenFromHash = () => {
+const getMicrosoftTokenFromLocation = () => {
   const hash = window.location.hash;
-  if (!hash) {
-    return;
-  }
-
   const hashParams = new URLSearchParams(hash.replace(/^#/, ""));
-  const microsoftToken = hashParams.get("id_token") || hashParams.get("access_token");
+  const queryParams = new URLSearchParams(window.location.search);
+
+  return (
+    hashParams.get("id_token") ||
+    hashParams.get("access_token") ||
+    hashParams.get("code") ||
+    queryParams.get("id_token") ||
+    queryParams.get("access_token") ||
+    queryParams.get("code")
+  );
+};
+
+const cacheMicrosoftTokenFromLocation = () => {
+  const microsoftToken = getMicrosoftTokenFromLocation();
 
   if (microsoftToken) {
     sessionStorage.setItem(MICROSOFT_SSO_TOKEN_KEY, microsoftToken);
   }
 };
 
-cacheMicrosoftTokenFromHash();
+cacheMicrosoftTokenFromLocation();
 
 // App component
 // const App = React.lazy(() => import("./App.jsx"));
