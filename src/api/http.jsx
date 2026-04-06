@@ -1,10 +1,14 @@
 import axios from "axios";
 
+const normalizeBaseURL = (url) => String(url || "").replace(/\/+$/, "");
+const createApiBaseURL = (url) => `${normalizeBaseURL(url)}/api/`;
+const createPdfBaseURL = (url) => `${normalizeBaseURL(url)}/FormRapor/`;
+
 // `localStorage`'dan baseURL alınıyor
 const baseURL = localStorage.getItem("baseURL") || import.meta.env.VITE_API_BASE_URL;
 
 const AxiosInstance = axios.create({
-  baseURL: `${baseURL}/api/`, // baseURL artık dinamik
+  baseURL: createApiBaseURL(baseURL), // baseURL artık dinamik
   // headers: {
   //   Authorization: import.meta.env.VITE_API_AUTHORIZATION,
   // },
@@ -45,7 +49,7 @@ AxiosInstance.interceptors.request.use(function (request) {
 
 // burdan sonrasini sil
 const PdfAxiosInstance = axios.create({
-  baseURL: `${baseURL}/FormRapor/`,
+  baseURL: createPdfBaseURL(baseURL),
   // headers: {
   //   Authorization: import.meta.env.VITE_API_AUTHORIZATION,
   // },
@@ -82,5 +86,16 @@ PdfAxiosInstance.interceptors.request.use(function (request) {
 });
 export { PdfAxiosInstance };
 // burdan qeder sil
+
+export const setApiBaseURL = (nextBaseURL) => {
+  const normalizedBaseURL = normalizeBaseURL(nextBaseURL);
+
+  if (!normalizedBaseURL) {
+    return;
+  }
+
+  AxiosInstance.defaults.baseURL = createApiBaseURL(normalizedBaseURL);
+  PdfAxiosInstance.defaults.baseURL = createPdfBaseURL(normalizedBaseURL);
+};
 
 export default AxiosInstance;
