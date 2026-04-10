@@ -1,26 +1,71 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Button, Form, Input, Typography, message, Spin, Checkbox, Modal } from "antd";
 import { UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import AxiosInstance from "../../../api/http";
 import { useSetRecoilState } from "recoil";
-import { userState, authTokenState } from "../../../state/userState";
-import { t } from "i18next";
+import { userState } from "../../../state/userState";
 import LanguageSelectbox from "../../components/Language/LanguageSelectbox";
 import ReCAPTCHA from "react-google-recaptcha"; // reCAPTCHA bileşenini import edin
 import { useTranslation } from "react-i18next";
+import "./LoginForm.css";
 
 const { Text } = Typography;
+const MICROSOFT_SSO_TOKEN_KEY = "microsoft_sso_token";
+const MICROSOFT_QUERY_KEYS_TO_REMOVE = ["id_token", "state", "session_state"];
+
+const isLikelyJwt = (token) => typeof token === "string" && token.split(".").length === 3;
+
+const getMicrosoftTokenFromLocation = () => {
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  const tokenFromHash = hashParams.get("id_token");
+
+  return {
+    tokenFromHash,
+    token: tokenFromHash,
+  };
+};
+
+const getMicrosoftErrorFromLocation = () => {
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  const queryParams = new URLSearchParams(window.location.search);
+
+  const error = hashParams.get("error") || queryParams.get("error");
+  const description = hashParams.get("error_description") || queryParams.get("error_description");
+
+  return {
+    error,
+    description,
+  };
+};
+
+const clearMicrosoftTokenFromUrl = () => {
+  const url = new URL(window.location.href);
+  MICROSOFT_QUERY_KEYS_TO_REMOVE.forEach((key) => {
+    url.searchParams.delete(key);
+  });
+  url.hash = "";
+  window.history.replaceState({}, document.title, `${url.pathname}${url.search}`);
+};
 
 export default function LoginForm() {
   const navigate = useNavigate();
   const setUser = useSetRecoilState(userState);
   const { t, i18n } = useTranslation(); // Initialize useTranslation
+  const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [microsoftLoading, setMicrosoftLoading] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState(null); // reCAPTCHA token'ı için state
   const [isRecaptchaEnabled] = useState(true); // Toggle etmek için true/false yapın
   const [licenseModalVisible, setLicenseModalVisible] = useState(false);
+  const [isEntraID, setIsEntraID] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("isEntraID") ?? "false") === true;
+    } catch (error) {
+      return false;
+    }
+  });
+  const microsoftTokenProcessedRef = useRef(false);
 
   const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 
@@ -30,9 +75,140 @@ export default function LoginForm() {
     }
   }, [navigate, token]);
 
-  if (token) {
-    return null; // Ekranın anlık görünmesini engellemek için boş render
-  }
+  const handleSuccessfulLogin = useCallback(
+    (response, remember = true) => {
+      setUser({
+        userId: response.TB_KULLANICI_ID,
+        userName: response.KLL_TANIM,
+        userResimID: response.resimId,
+        userUnvan: response.KLL_UNVAN,
+      });
+
+      const userInfo = {
+        userId: response.TB_KULLANICI_ID ?? null,
+        userName: response.KLL_TANIM ?? null,
+        userResimID: response.resimId ?? null,
+        userUnvan: response.KLL_UNVAN ?? null,
+      };
+
+      if (remember) {
+        localStorage.setItem("token", response.AUTH_TOKEN);
+        localStorage.setItem("user", JSON.stringify(userInfo));
+        localStorage.setItem("login", JSON.stringify(response));
+      } else {
+        sessionStorage.setItem("token", response.AUTH_TOKEN);
+        sessionStorage.setItem("user", JSON.stringify(userInfo));
+        sessionStorage.setItem("login", JSON.stringify(response));
+      }
+    },
+    [setUser]
+  );
+
+  const completeMicrosoftLogin = useCallback(
+    async (accessToken, remember = true) => {
+      setMicrosoftLoading(true);
+
+      try {
+        const response = await AxiosInstance.post("/MicrosoftLogin", {
+          AccessToken: accessToken,
+        });
+
+        if (response?.AUTH_TOKEN) {
+          handleSuccessfulLogin(response, remember);
+          message.success(t("islemBasarili"));
+          navigate("/", { replace: true });
+          return true;
+        }
+
+        const responseMessage = response?.message || response?.error || response?.status_message;
+        message.error(responseMessage || t("microsoftGirisBasarisiz"));
+        return false;
+      } catch (error) {
+        console.error("Microsoft login error:", error);
+        const apiMessage = error?.response?.data?.status || error?.response?.data?.message || error?.response?.data?.error || error?.message;
+        message.error(apiMessage || t("microsoftGirisHata"));
+        return false;
+      } finally {
+        setMicrosoftLoading(false);
+      }
+    },
+    [handleSuccessfulLogin, navigate, t]
+  );
+
+  const handleMicrosoftRedirect = useCallback(async () => {
+    setMicrosoftLoading(true);
+    try {
+      const redirectUri = `${window.location.origin}`;
+      const response = await AxiosInstance.get(`/GetMicrosoftLoginUrl?redirectUri=${encodeURIComponent(redirectUri)}`);
+
+      if (response?.url) {
+        window.location.href = response.url;
+        return;
+      }
+
+      message.error(t("microsoftYonlendirmeAlinamadi"));
+    } catch (error) {
+      console.error("Microsoft redirect url error:", error);
+      message.error(t("microsoftYonlendirmeAlinamadi"));
+    } finally {
+      setMicrosoftLoading(false);
+    }
+  }, [t]);
+
+  useEffect(() => {
+    const refreshEntraStatus = async () => {
+      try {
+        const response = await AxiosInstance.get("/VeritabaniBaglantiKontrol");
+        const status = response?.isEntraID === true;
+        setIsEntraID(status);
+        localStorage.setItem("isEntraID", JSON.stringify(status));
+      } catch (error) {
+        console.error("VeritabaniBaglantiKontrol error:", error);
+      }
+    };
+
+    refreshEntraStatus();
+  }, []);
+
+  useEffect(() => {
+    const { tokenFromHash, token: tokenFromLocation } = getMicrosoftTokenFromLocation();
+    const { error, description } = getMicrosoftErrorFromLocation();
+    const tokenFromStorage = sessionStorage.getItem(MICROSOFT_SSO_TOKEN_KEY);
+    const microsoftToken = tokenFromLocation || tokenFromStorage || "";
+
+    if (microsoftToken && !isLikelyJwt(microsoftToken)) {
+      sessionStorage.removeItem(MICROSOFT_SSO_TOKEN_KEY);
+      message.error(t("microsoftGecersizToken"));
+      return;
+    }
+
+    if (!microsoftToken && error) {
+      const errorText = description ? `${error}: ${decodeURIComponent(description)}` : error;
+      message.error(errorText);
+      return;
+    }
+
+    if (!microsoftToken || microsoftTokenProcessedRef.current) {
+      return;
+    }
+
+    microsoftTokenProcessedRef.current = true;
+    const remember = form.getFieldValue("remember") ?? true;
+
+    const runMicrosoftLogin = async () => {
+      const isSuccessful = await completeMicrosoftLogin(microsoftToken, remember);
+      if (isSuccessful) {
+        sessionStorage.removeItem(MICROSOFT_SSO_TOKEN_KEY);
+        if (tokenFromHash) {
+          clearMicrosoftTokenFromUrl();
+        }
+      } else {
+        microsoftTokenProcessedRef.current = false;
+      }
+    };
+
+    runMicrosoftLogin();
+  }, [completeMicrosoftLogin, form, t]);
 
   // Lisans kontrolü fonksiyonu
   const checkLicense = async () => {
@@ -95,35 +271,7 @@ export default function LoginForm() {
         message.error("Kullanıcı adı ve ya şifre yanlıştır");
         return;
       } else if (response.AUTH_TOKEN) {
-        setUser({
-          userId: response.TB_KULLANICI_ID,
-          userName: response.KLL_TANIM,
-          userResimID: response.resimId,
-          userUnvan: response.KLL_UNVAN,
-        });
-        const userInfo = {
-          userId: response.TB_KULLANICI_ID ?? null,
-          userName: response.KLL_TANIM ?? null,
-          userResimID: response.resimId ?? null,
-          userUnvan: response.KLL_UNVAN ?? null,
-          /* kullaniciName: response.KLL_PERSONEL?.PRS_ISIM ?? null,
-          kullaniciID: response.KLL_PERSONEL?.TB_PERSONEL_ID ?? null,
-          kullaniciLokasyon: response.KLL_PERSONEL?.PRS_LOKASYON ?? null,
-          kullaniciLokasyonID: response.KLL_PERSONEL?.PRS_LOKASYON_ID ?? null,
-          kullaniciDepartman: response.KLL_PERSONEL?.PRS_DEPARTMAN ?? null,
-          kullaniciDepartmanID: response.KLL_PERSONEL?.PRS_DEPARTMAN_ID ?? null,
-          kullaniciEmail: response.KLL_PERSONEL?.PRS_EMAIL ?? null,
-          kullaniciTelefon: response.KLL_PERSONEL?.PRS_TELEFON ?? null, */
-        };
-        if (values.remember) {
-          localStorage.setItem("token", response.AUTH_TOKEN);
-          localStorage.setItem("user", JSON.stringify(userInfo));
-          localStorage.setItem("login", JSON.stringify(response));
-        } else {
-          sessionStorage.setItem("token", response.AUTH_TOKEN);
-          sessionStorage.setItem("user", JSON.stringify(userInfo));
-          sessionStorage.setItem("login", JSON.stringify(response));
-        }
+        handleSuccessfulLogin(response, values.remember);
 
         const anar = localStorage.getItem("login") || sessionStorage.getItem("login");
         console.log(anar);
@@ -147,6 +295,10 @@ export default function LoginForm() {
     window.location.reload();
   };
 
+  if (token) {
+    return null; // Ekranın anlık görünmesini engellemek için boş render
+  }
+
   return (
     <div
       style={{
@@ -163,14 +315,13 @@ export default function LoginForm() {
           <LanguageSelectbox />
         </div>
 
-        <Form name="normal_login" className="login-form" initialValues={{ remember: true }} onFinish={onSubmit} style={{ width: "100%", marginTop: "20px" }}>
+        <Form form={form} name="normal_login" className="login-form" initialValues={{ remember: true }} onFinish={onSubmit} style={{ width: "100%", marginTop: "20px" }}>
           <Form.Item name="email" rules={[{ required: true, message: "Lütfen kullanıcı kodunuzu girin!" }]}>
             <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder={t("kullaniciKodu")} />
           </Form.Item>
           <Form.Item name="password">
             <Input.Password
               prefix={<LockOutlined className="site-form-item-icon" />}
-              type={showPassword ? "text" : "password"}
               placeholder={t("sifre")}
               iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
             />
@@ -188,12 +339,25 @@ export default function LoginForm() {
             </Form.Item>
           )}
           <Form.Item>
-            <Button type="primary" htmlType="submit" className="login-form-button" style={{ width: "100%" }} disabled={loading}>
+            <Button type="primary" htmlType="submit" className="login-form-button" style={{ width: "100%" }} disabled={loading || microsoftLoading}>
               {loading ? <Spin /> : t("girisYap")}
             </Button>
           </Form.Item>
+          {isEntraID && (
+            <Form.Item>
+              <button type="button" className="ms-login-btn" onClick={handleMicrosoftRedirect} disabled={loading || microsoftLoading}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21" aria-hidden="true">
+                  <rect x="1" y="1" width="9" height="9" fill="#f25022" />
+                  <rect x="11" y="1" width="9" height="9" fill="#7fba00" />
+                  <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
+                  <rect x="11" y="11" width="9" height="9" fill="#ffb900" />
+                </svg>
+                <span>{t("microsoftIleGirisYap")}</span>
+              </button>
+            </Form.Item>
+          )}
           <Form.Item>
-            <Button danger onClick={handleClearBaseURL} style={{ width: "100%" }}>
+            <Button danger onClick={handleClearBaseURL} style={{ width: "100%" }} disabled={loading || microsoftLoading}>
               {t("anahtariDegistir")}
             </Button>
           </Form.Item>
