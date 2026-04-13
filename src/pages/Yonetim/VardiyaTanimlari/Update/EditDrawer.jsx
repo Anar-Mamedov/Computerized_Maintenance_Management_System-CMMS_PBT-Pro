@@ -1,205 +1,151 @@
 import tr_TR from "antd/es/locale/tr_TR";
-import { PlusOutlined } from "@ant-design/icons";
-import { Button, Drawer, Space, ConfigProvider, Modal, message } from "antd";
-import React, { useEffect, useState, useTransition } from "react";
+import { Button, Drawer, Space, ConfigProvider, Modal, message, Spin } from "antd";
+import React, { useEffect, useState } from "react";
 import MainTabs from "./components/MainTabs/MainTabs";
-import { useForm, Controller, useFormContext, FormProvider, set } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
 import AxiosInstance from "../../../../api/http";
 import Footer from "../Footer";
-// import SecondTabs from "./components/SecondTabs/SecondTabs";
 
 export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
-  const [, startTransition] = useTransition();
-  const [open, setOpen] = useState(false);
-  const showDrawer = () => {
-    setOpen(true);
+  const [loading, setLoading] = useState(false);
+
+  const methods = useForm({
+    defaultValues: {
+      VardiyaTanimi: "",
+      TB_VARDIYA_ID: 0,
+      BaslamaSaati: dayjs("00:00", "HH:mm"),
+      BitisSaati: dayjs("00:00", "HH:mm"),
+      MolaSuresi: 0,
+      VardiyaTipiKodId: null,
+      LokasyonId: null,
+      ProjeId: null,
+      Varsayilan: false,
+      Renk: "#ffae00",
+      Aciklama: "",
+    },
+  });
+
+  const { setValue, reset, handleSubmit } = methods;
+
+  // Drawer açıldığında veriyi API'den çek
+  useEffect(() => {
+    const fetchData = async () => {
+      if (drawerVisible && selectedRow) {
+        setLoading(true);
+        try {
+          const response = await AxiosInstance.get(`GetVardiyaById?id=${selectedRow.key}`);
+          const item = response.data || response; // API yapınıza göre düzenleyin
+
+          // Form alanlarını doldur
+          setValue("TB_VARDIYA_ID", item.TB_VARDIYA_ID || selectedRow.key);
+          setValue("VardiyaTanimi", item.VardiyaTanimi);
+          setValue("BaslamaSaati", item.BaslamaSaati ? dayjs(`1970-01-01T${item.BaslamaSaati}`) : null);
+          setValue("BitisSaati", item.BitisSaati ? dayjs(`1970-01-01T${item.BitisSaati}`) : null);
+          setValue("MolaSuresi", item.MolaSuresi);
+          setValue("LokasyonId", item.LokasyonId);
+          setValue("LokasyonText", item.LokasyonText);
+          setValue("ProjeId", item.ProjeId);
+          setValue("ProjeText", item.ProjeText);
+          setValue("VardiyaTipiKodId", item.VardiyaTipiKodId);
+          setValue("VardiyaTipiText", item.VardiyaTipiText);
+          setValue("Varsayilan", item.Varsayilan);
+          setValue("Renk", item.Renk);
+          setValue("Aciklama", item.Aciklama);
+        } catch (error) {
+          console.error("Veri çekme hatası:", error);
+          message.error("Veriler yüklenirken bir hata oluştu.");
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+  }, [drawerVisible, selectedRow, setValue]);
+
+  const onSubmit = (data) => {
+    const Body = {
+      TB_VARDIYA_ID: Number(data.TB_VARDIYA_ID),
+      VardiyaTanimi: data.VardiyaTanimi,
+      BaslamaSaati: data.BaslamaSaati ? dayjs(data.BaslamaSaati).format("HH:mm") : "00:00",
+      BitisSaati: data.BitisSaati ? dayjs(data.BitisSaati).format("HH:mm") : "00:00",
+      MolaSuresi: Number(data.MolaSuresi) || 0,
+      LokasyonId: Number(data.LokasyonId) || null,
+      ProjeId: Number(data.ProjeId) || null,
+      VardiyaTipiKodId: Number(data.VardiyaTipiKodId) || null,
+      Varsayilan: Boolean(data.Varsayilan),
+      Renk: typeof data.Renk === "object" && data.Renk !== null 
+      ? (data.Renk.toHexString ? data.Renk.toHexString() : "#ffae00") 
+      : data.Renk,
+      Aciklama: data.Aciklama,
+    };
+
+    AxiosInstance.post("AddUpdateVardiya", Body)
+      .then((res) => {
+        const response = res.data || res;
+        if ([200, 201].includes(response.status_code)) {
+          message.success(response.message || "Güncelleme Başarılı.");
+          onRefresh();
+          onDrawerClose();
+          reset();
+        } else {
+          message.error(response.message || "İşlem başarısız.");
+        }
+      })
+      .catch((err) => {
+        console.error("Update error:", err);
+        message.error("Bir hata oluştu.");
+      });
   };
 
-  const showConfirmationModal = () => {
+  const onCancel = () => {
     Modal.confirm({
-      title: "İptal etmek istediğinden emin misin?",
+      title: "İptal etmek istediğinize emin misiniz?",
       content: "Kaydedilmemiş değişiklikler kaybolacaktır.",
       okText: "Evet",
       cancelText: "Hayır",
       onOk: () => {
-        onDrawerClose(); // Close the drawer
-        onRefresh();
         reset();
-      },
-      onCancel: () => {
-        // Do nothing, continue from where the user left off
+        onDrawerClose();
       },
     });
   };
 
-  const onClose = () => {
-    // Kullanıcı "İptal" düğmesine tıkladığında Modal'ı göster
-    showConfirmationModal();
-  };
-
-  // Drawer'ın kapatılma olayını ele al
-  const handleDrawerClose = () => {
-    // Kullanıcı çarpı işaretine veya dış alana tıkladığında Modal'ı göster
-    showConfirmationModal();
-  };
-
-  // back-end'e gönderilecek veriler
-
-  const handleClick = () => {
-    const values = methods.getValues();
-    console.log(onSubmit(values));
-  };
-
-  //* export
-  const methods = useForm({
-    defaultValues: {
-      vardiyaTanimi: "",
-      secilenVardiyaID: "",
-      vardiyaBaslangicSaati: dayjs("08:00", "HH:mm"),
-      vardiyaBitisSaati: dayjs("18:00", "HH:mm"),
-      vardiyaTipi: null,
-      vardiyaTipiID: "",
-      lokasyonTanim: "",
-      lokasyonID: "",
-      vardiyaProjeTanim: "",
-      vardiyaProjeID: "",
-      varsayilanVardiya: false,
-      gosterimRengi: "#ffae00",
-      vardiyaAciklama: "",
-    },
-  });
-
-  const formatDateWithDayjs = (dateString) => {
-    const formattedDate = dayjs(dateString);
-    return formattedDate.isValid() ? formattedDate.format("YYYY-MM-DD") : "";
-  };
-
-  const formatTimeWithDayjs = (timeObj) => {
-    const formattedTime = dayjs(timeObj);
-    return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
-  };
-
-  const { setValue, reset } = methods;
-
-  //* export
-  const onSubmit = (data) => {
-    const Body = {
-      TB_VARDIYA_ID: data.secilenVardiyaID,
-      VAR_TANIM: data.vardiyaTanimi,
-      VAR_VARDIYA_TIPI_KOD_ID: data.vardiyaTipiID,
-      VAR_LOKASYON_ID: data.lokasyonID,
-      VAR_PROJE_ID: data.vardiyaProjeID,
-      VAR_VARSAYILAN: data.varsayilanVardiya,
-      // VAR_RENK: data.gosterimRengi,
-      VAR_ACIKLAMA: data.vardiyaAciklama,
-      VAR_BASLAMA_SAATI: formatTimeWithDayjs(data.vardiyaBaslangicSaati),
-      VAR_BITIS_SAATI: formatTimeWithDayjs(data.vardiyaBitisSaati),
-
-      // add more fields as needed
-    };
-
-    // AxiosInstance.post("/api/endpoint", { Body }).then((response) => {
-    // handle response
-    // });
-
-    AxiosInstance.post("UpdateVardiya", Body)
-      .then((response) => {
-        // Handle successful response here, e.g.:
-        console.log("Data sent successfully:", response);
-        if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
-          onDrawerClose(); // Close the drawer
-          onRefresh();
-          reset();
-        } else if (response.status_code === 401) {
-          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
-        } else {
-          message.error("Ekleme Başarısız.");
-        }
-      })
-      .catch((error) => {
-        // Handle errors here, e.g.:
-        console.error("Error sending data:", error);
-        message.error("Başarısız Olundu.");
-      });
-    console.log({ Body });
-  };
-
-  useEffect(() => {
-    if (drawerVisible && selectedRow) {
-      // console.log("selectedRow", selectedRow);
-      // startTransition(() => {
-      // Object.keys(selectedRow).forEach((key) => {
-      //   console.log(key, selectedRow[key]);
-      //   setValue(key, selectedRow[key]);
-      setValue("secilenVardiyaID", selectedRow.key);
-      setValue("vardiyaTanimi", selectedRow.VAR_TANIM);
-      setValue("vardiyaBaslangicSaati", dayjs(`1970-01-01T${selectedRow.VAR_BASLAMA_SAATI}`));
-      setValue("vardiyaBitisSaati", dayjs(`1970-01-01T${selectedRow.VAR_BITIS_SAATI}`));
-      setValue("vardiyaTipi", selectedRow.VAR_VARDIYA_TIPI);
-      setValue("vardiyaTipiID", selectedRow.VAR_VARDIYA_TIPI_KOD_ID);
-      setValue("lokasyonTanim", selectedRow.VAR_LOKASYON);
-      setValue("lokasyonID", selectedRow.VAR_LOKASYON_ID);
-      setValue("vardiyaProjeTanim", selectedRow.VAR_PROJE);
-      setValue("vardiyaProjeID", selectedRow.VAR_PROJE_ID);
-      setValue("varsayilanVardiya", selectedRow.VAR_VARSAYILAN);
-      setValue("gosterimRengi", selectedRow.VAR_RENK);
-      setValue("vardiyaAciklama", selectedRow.VAR_ACIKLAMA);
-      // add more fields as needed
-
-      // });
-      // });
-    }
-  }, [selectedRow, setValue, drawerVisible]);
-
-  useEffect(() => {
-    if (!drawerVisible) {
-      reset(); // Drawer kapandığında formu sıfırla
-    }
-  }, [drawerVisible, reset]);
-
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)}>
-        <ConfigProvider locale={tr_TR}>
-          {/* <Button
-            type="primary"
-            onClick={showDrawer}
-            style={{
-              display: "flex",
-              alignItems: "center",
-            }}>
-            <PlusOutlined />
-            Ekle
-          </Button> */}
-          <Drawer
-            width="550px"
-            title="Kayıdı Güncelle"
-            placement={"right"}
-            onClose={handleDrawerClose}
-            open={drawerVisible}
-            extra={
-              <Space>
-                <Button onClick={onClose}>İptal</Button>
-                <Button
-                  type="submit"
-                  onClick={handleClick}
-                  style={{
-                    backgroundColor: "#2bc770",
-                    borderColor: "#2bc770",
-                    color: "#ffffff",
-                  }}>
-                  Güncelle
-                </Button>
-              </Space>
-            }>
-            <MainTabs />
-            {/* <SecondTabs /> */}
-            <Footer />
-          </Drawer>
-        </ConfigProvider>
-      </form>
+      <ConfigProvider locale={tr_TR}>
+        <Drawer
+          width="550px"
+          title="Vardiya Güncelle"
+          placement="right"
+          onClose={onCancel}
+          open={drawerVisible}
+          extra={
+            <Space>
+              <Button onClick={onCancel}>İptal</Button>
+              <Button
+                type="primary"
+                onClick={handleSubmit(onSubmit)}
+                style={{ backgroundColor: "#2bc770", borderColor: "#2bc770", color: "#fff" }}
+              >
+                Güncelle
+              </Button>
+            </Space>
+          }
+        >
+          {loading ? (
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+              <Spin size="large" />
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <MainTabs />
+              <Footer />
+            </form>
+          )}
+        </Drawer>
+      </ConfigProvider>
     </FormProvider>
   );
 }

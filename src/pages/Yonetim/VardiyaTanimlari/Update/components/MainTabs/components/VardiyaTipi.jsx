@@ -120,7 +120,7 @@ export default function VardiyaTipi() {
       {contextHolder}
       <Text style={{ fontSize: "14px", minWidth: "40px" }}>Vardiya Tipi:</Text>
       <Controller
-        name="vardiyaTipi"
+        name="VardiyaTipiText"
         control={control}
         render={({ field }) => (
           <StyledSelect
@@ -164,14 +164,14 @@ export default function VardiyaTipi() {
             }))}
             onChange={(value) => {
               // Seçilen değerin ID'sini NedeniID alanına set et
-              setValue("vardiyaTipiID", value);
+              setValue("VardiyaTipiKodId", value);
               field.onChange(value);
             }}
           />
         )}
       />
       <Controller
-        name="vardiyaTipiID"
+        name="VardiyaTipiKodId"
         control={control}
         render={({ field }) => (
           <Input
