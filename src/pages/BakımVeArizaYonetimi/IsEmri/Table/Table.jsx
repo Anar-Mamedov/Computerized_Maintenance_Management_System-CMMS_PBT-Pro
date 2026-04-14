@@ -127,6 +127,12 @@ const MainTable = () => {
   const [totalPages, setTotalPages] = useState(0); // Total pages
   const [label, setLabel] = useState("Yükleniyor...");
   const [totalDataCount, setTotalDataCount] = useState(0);
+  const [kpi, setKpi] = useState({
+    Toplam: { Sayi: 0, Acik: 0, Kapali: 0 },
+    Ariza: { Sayi: 0, Acik: 0, Kapali: 0 },
+    OnayBekleyen: { Sayi: 0, Acik: 0, Kapali: 0 },
+    BuHaftaKapanan: { Sayi: 0 },
+  });
   const [pageSize, setPageSize] = useState(20);
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
@@ -278,21 +284,16 @@ const MainTable = () => {
       title: "Tarih",
       dataIndex: "DUZENLEME_TARIH",
       key: "DUZENLEME_TARIH",
-      width: 110,
+      width: 130,
       ellipsis: true,
       sorter: true,
       visible: true, // Varsayılan olarak açık
-      render: (text) => formatDate(text),
-    },
-    {
-      title: "Saat",
-      dataIndex: "DUZENLEME_SAAT",
-      key: "DUZENLEME_SAAT",
-      width: 90,
-      ellipsis: true,
-      sorter: true,
-      visible: true, // Varsayılan olarak açık
-      render: (text) => formatTime(text),
+      render: (text, record) => (
+        <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
+          <span>{formatDate(text)}</span>
+          <span style={{ color: "#8c8c8c", fontSize: "12px" }}>{formatTime(record.DUZENLEME_SAAT)}</span>
+        </div>
+      ),
     },
     {
       title: "İş Emri Tipi",
@@ -399,19 +400,35 @@ const MainTable = () => {
       title: "Lokasyon",
       dataIndex: "LOKASYON",
       key: "LOKASYON",
-      width: 200,
+      width: 300,
       ellipsis: true,
       sorter: true,
       visible: true, // Varsayılan olarak açık
+      render: (text, record) => (
+        <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
+          <span style={{ fontWeight: 500 }}>{text}</span>
+          <span style={{ color: "#8c8c8c", fontSize: "12px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            {record.TAM_LOKASYON}
+          </span>
+        </div>
+      ),
     },
     {
-      title: "Makine Kodu",
+      title: "Ekipman",
       dataIndex: "MAKINE_KODU",
       key: "MAKINE_KODU",
-      width: 150,
+      width: 260,
       sorter: true,
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
+      render: (text, record) => (
+        <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
+          <span style={{ fontWeight: 500 }}>{text}</span>
+          <span style={{ color: "#8c8c8c", fontSize: "12px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            {record.MAKINE_TANIMI}
+          </span>
+        </div>
+      ),
     },
     {
       title: "Makine Tanımı",
@@ -420,7 +437,7 @@ const MainTable = () => {
       width: 300,
       sorter: true,
       ellipsis: true,
-      visible: true, // Varsayılan olarak açık
+      visible: false, // Ekipman sütununa taşındı
     },
     {
       title: "Planlanan Başlama Tarihi",
@@ -464,44 +481,34 @@ const MainTable = () => {
       render: (text) => formatTime(text),
     },
     {
-      title: "Başlama Tarihi",
+      title: "Başlama Zamanı",
       dataIndex: "BASLAMA_TARIH",
       key: "BASLAMA_TARIH",
-      width: 110,
+      width: 140,
       ellipsis: true,
       sorter: true,
       visible: true, // Varsayılan olarak kapalı
-      render: (text) => formatDate(text),
+      render: (text, record) => (
+        <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
+          <span>{formatDate(text)}</span>
+          <span style={{ color: "#8c8c8c", fontSize: "12px" }}>{formatTime(record.BASLAMA_SAAT)}</span>
+        </div>
+      ),
     },
     {
-      title: "Başlama Saati",
-      dataIndex: "BASLAMA_SAAT",
-      key: "BASLAMA_SAAT",
-      width: 90,
-      ellipsis: true,
-      sorter: true,
-      visible: true, // Varsayılan olarak kapalı
-      render: (text) => formatTime(text),
-    },
-    {
-      title: "Bitiş Tarihi",
+      title: "Bitiş Zamanı",
       dataIndex: "ISM_BITIS_TARIH",
       key: "ISM_BITIS_TARIH",
-      width: 110,
+      width: 140,
       ellipsis: true,
       sorter: true,
       visible: true, // Varsayılan olarak kapalı
-      render: (text) => formatDate(text),
-    },
-    {
-      title: "Bitiş Saati",
-      dataIndex: "ISM_BITIS_SAAT",
-      key: "ISM_BITIS_SAAT",
-      width: 90,
-      ellipsis: true,
-      sorter: true,
-      visible: true, // Varsayılan olarak kapalı
-      render: (text) => formatTime(text),
+      render: (text, record) => (
+        <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
+          <span>{formatDate(text)}</span>
+          <span style={{ color: "#8c8c8c", fontSize: "12px" }}>{formatTime(record.ISM_BITIS_SAAT)}</span>
+        </div>
+      ),
     },
     {
       title: "İş Süresi (dk.)",
@@ -641,24 +648,19 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
     },
     {
-      title: "Kapanış Tarihi",
+      title: "Kapanış Zamanı",
       dataIndex: "KAPANIS_TARIHI",
       key: "KAPANIS_TARIHI",
-      width: 110,
+      width: 140,
       ellipsis: true,
       sorter: true,
       visible: true, // Varsayılan olarak kapalı
-      render: (text) => formatDate(text),
-    },
-    {
-      title: "Kapanış Saati",
-      dataIndex: "KAPANIS_SAATI",
-      key: "KAPANIS_SAATI",
-      width: 150,
-      ellipsis: true,
-      sorter: true,
-      visible: false, // Varsayılan olarak kapalı
-      render: (text) => formatTime(text),
+      render: (text, record) => (
+        <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
+          <span>{formatDate(text)}</span>
+          <span style={{ color: "#8c8c8c", fontSize: "12px" }}>{formatTime(record.KAPANIS_SAATI)}</span>
+        </div>
+      ),
     },
     {
       title: "Takvim",
@@ -1114,6 +1116,14 @@ const MainTable = () => {
         // Toplam sayfa sayısını ayarla
         setTotalPages(response.page);
         setTotalDataCount(response.kayit_sayisi);
+        if (response.kpi) {
+          setKpi({
+            Toplam: response.kpi.Toplam || { Sayi: 0, Acik: 0, Kapali: 0 },
+            Ariza: response.kpi.Ariza || { Sayi: 0, Acik: 0, Kapali: 0 },
+            OnayBekleyen: response.kpi.OnayBekleyen || { Sayi: 0, Acik: 0, Kapali: 0 },
+            BuHaftaKapanan: response.kpi.BuHaftaKapanan || { Sayi: 0 },
+          });
+        }
 
         // Gelen veriyi formatla ve state'e ata
         const formattedData = response.list.map((item) => ({
@@ -1490,9 +1500,23 @@ const MainTable = () => {
                 marginBottom: "20px",
                 borderBottom: "1px solid #80808051",
                 padding: "8px 8px 12px 8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "10px",
               }}
             >
               <Text style={{ fontWeight: 600 }}>Sütunları Göster / Gizle</Text>
+              <Checkbox
+                checked={columns.length > 0 && columns.every((c) => c.visible)}
+                indeterminate={columns.some((c) => c.visible) && !columns.every((c) => c.visible)}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  setColumns((prev) => prev.map((col) => ({ ...col, visible: checked })));
+                }}
+              >
+                Tümünü Seç
+              </Checkbox>
             </div>
             <div style={{ height: "400px", overflow: "auto" }}>
               {initialColumns.map((col) => (
@@ -1543,6 +1567,55 @@ const MainTable = () => {
           </DndContext>
         </div>
       </Modal>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+          gap: "16px",
+          marginBottom: "20px",
+          padding: "0 5px",
+        }}
+      >
+        {[
+          {
+            title: "Toplam İş Emri",
+            value: kpi.Toplam?.Sayi ?? 0,
+            footer: `Açık: ${kpi.Toplam?.Acik ?? 0} | Kapalı: ${kpi.Toplam?.Kapali ?? 0}`,
+          },
+          {
+            title: "Arıza İş Emirleri",
+            value: kpi.Ariza?.Sayi ?? 0,
+            footer: `Açık: ${kpi.Ariza?.Acik ?? 0} | Kapalı: ${kpi.Ariza?.Kapali ?? 0}`,
+          },
+          {
+            title: "Onay Bekleyen İş Emirleri",
+            value: kpi.OnayBekleyen?.Sayi ?? 0,
+            footer: `Açık: ${kpi.OnayBekleyen?.Acik ?? 0} | Kapalı: ${kpi.OnayBekleyen?.Kapali ?? 0}`,
+          },
+          {
+            title: "Bu Hafta Kapanan İş Emirleri",
+            value: kpi.BuHaftaKapanan?.Sayi ?? 0,
+            footer: "Son 7 günde kapanan işler",
+          },
+        ].map((item) => (
+          <div
+            key={item.title}
+            style={{
+              border: "1px solid #e5e7eb",
+              borderRadius: "10px",
+              padding: "16px 20px",
+              background: "#ffffff",
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px",
+            }}
+          >
+            <div style={{ color: "#6b7280", fontSize: "13px" }}>{item.title}</div>
+            <div style={{ fontSize: "28px", fontWeight: 600, color: "#0f172a", lineHeight: 1 }}>{item.value}</div>
+            <div style={{ color: "#6b7280", fontSize: "12px" }}>{item.footer}</div>
+          </div>
+        ))}
+      </div>
       <div
         style={{
           display: "flex",
