@@ -138,6 +138,16 @@ export const rawItems = [
     "KLL_WEB_PROJE_MODUL"
   ),
   getItem(
+    "Firma ve Sözleşme Yönetimi",
+    "firmaVeSozlesmeYonetimi",
+    <ShoppingCartOutlined />,
+    [
+      getItem("Firma Sözleşmeleri", "firmaSozlesme", true),
+    ],
+    false,
+    "KLL_WEB_FIRMA_SOZLESME_MODUL"
+  ),
+  getItem(
     "Analizler",
     "analizler1",
     <BarChartOutlined />,

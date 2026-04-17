@@ -77,6 +77,7 @@ import OtomatikKodlar from "./pages/Yonetim/OtomatikKodlar/OtomatikKodlar.jsx";
 import ServisOncelikleri from "./pages/Yonetim/ServisOncelikleri/ServisOncelikleri.jsx";
 import PersonelIzinleri from "./pages/PersonelYonetimi/PersonelIzınYonetimi/PersonelIzinleriYonetimi.jsx";
 import Amortisman from "./pages/MakineEkipman/Amortisman/Amortisman.jsx";
+import FirmaSozlesmeleri from "./pages/FirmaVeSozlesmeYonetimi/FirmaSozlesmeleri/FirmaSozlesmeleri.jsx";
 import AxiosInstance from "./api/http";
 
 // Malzemeler
@@ -311,6 +312,7 @@ export default function App() {
           <Route path="/projeYonetimiListe" element={<ProjeYonetimListe />} />
           <Route path="/projeIlerleme" element={<ProjeIlerleme />} />
           <Route path="/amortisman" element={<Amortisman/>} />
+          <Route path="/firmaSozlesme" element={<FirmaSozlesmeleri />} />
           {/*<Route path="/kurallar" element={<Kurallar />} />*/}
         </Route>
       </Routes>
