@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Input, Typography, Tabs, message } from "antd";
+import { PlayCircleOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../api/http";
 import { Controller, useForm, FormProvider } from "react-hook-form";
 import dayjs from "dayjs";
 import AcilisNedeni from "./IsEmriAcma/AcilisNedeni.jsx";
 import DurumSelect from "./IsEmriAcma/DurumSelect.jsx";
+import MenuItem from "./MenuItem";
 
 const { Text, Link } = Typography;
 
@@ -82,9 +84,12 @@ export default function IsEmriSilme({ selectedRows, refreshTableData, disabled, 
   return (
     <FormProvider {...methods}>
       <div>
-        <Button type="submit" style={{ paddingLeft: "0px" }} onClick={handleModalToggle}>
-          İş Emrini Aç
-        </Button>
+        <MenuItem
+          icon={<PlayCircleOutlined />}
+          title="İş Emrini Aç"
+          description="Kapalı iş emrini yeniden aç."
+          onClick={handleModalToggle}
+        />
 
         <Modal width="500px" title="Seçili İş Emrini Aç" destroyOnClose centered open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
           <form onSubmit={methods.handleSubmit(onSubmited)}>

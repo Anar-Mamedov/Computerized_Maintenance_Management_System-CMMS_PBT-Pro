@@ -1,8 +1,9 @@
 import React, { useEffect } from "react";
 import AxiosInstance from "../../../../../../api/http";
-import { Button, message, Popconfirm } from "antd";
-import { DeleteOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import { message, Popconfirm } from "antd";
+import { QuestionCircleOutlined } from "@ant-design/icons";
 import { BsSendCheck } from "react-icons/bs";
+import MenuItem from "./MenuItem";
 
 export default function Sil({ selectedRows, refreshTableData, disabled, hidePopover }) {
   // selectedRows.forEach((row, index) => {
@@ -86,9 +87,11 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
           />
         }
       >
-        <Button style={{ paddingLeft: "0px", display: "flex", alignItems: "center" }} type="link" icon={<BsSendCheck />}>
-          Onaya Gönder
-        </Button>
+        <MenuItem
+          icon={<BsSendCheck />}
+          title="Onaya Gönder"
+          description="Seçili kaydı onay akışına gönder."
+        />
       </Popconfirm>
     </div>
   );
