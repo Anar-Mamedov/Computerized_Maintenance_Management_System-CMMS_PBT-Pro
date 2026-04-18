@@ -138,6 +138,8 @@ const MainTable = () => {
   const [pageSize, setPageSize] = useState(20);
   const [columnSearchTerm, setColumnSearchTerm] = useState("");
   const [buHaftaKapananActive, setBuHaftaKapananActive] = useState(false);
+  const [arizaActive, setArizaActive] = useState(false);
+  const [onayBekleyenActive, setOnayBekleyenActive] = useState(false);
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
   const [onayCheck, setOnayCheck] = useState({ ONY_AKTIF: 0, ONY_MANUEL: 0 });
@@ -1081,8 +1083,11 @@ const MainTable = () => {
   // ana tablo api isteği için kullanılan useEffect
 
   useEffect(() => {
-    fetchEquipmentData(body, currentPage, pageSize, sortField, sortOrder);
-  }, [body, currentPage, pageSize, sortField, sortOrder]);
+    const mergedFilters = { ...(body.filters || {}) };
+    if (arizaActive) mergedFilters.prosedurtipleri = [1];
+    if (onayBekleyenActive) mergedFilters.onaydurumlari = [1];
+    fetchEquipmentData({ ...body, filters: mergedFilters }, currentPage, pageSize, sortField, sortOrder);
+  }, [body, arizaActive, onayBekleyenActive, currentPage, pageSize, sortField, sortOrder]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
@@ -1612,11 +1617,23 @@ const MainTable = () => {
             title: "Arıza İş Emirleri",
             value: kpi.Ariza?.Sayi ?? 0,
             footer: `Açık: ${kpi.Ariza?.Acik ?? 0} | Kapalı: ${kpi.Ariza?.Kapali ?? 0}`,
+            clickable: true,
+            active: arizaActive,
+            onClick: () => {
+              setArizaActive((prev) => !prev);
+              setCurrentPage(1);
+            },
           },
           {
             title: "Onay Bekleyen İş Emirleri",
             value: kpi.OnayBekleyen?.Sayi ?? 0,
             footer: `Açık: ${kpi.OnayBekleyen?.Acik ?? 0} | Kapalı: ${kpi.OnayBekleyen?.Kapali ?? 0}`,
+            clickable: true,
+            active: onayBekleyenActive,
+            onClick: () => {
+              setOnayBekleyenActive((prev) => !prev);
+              setCurrentPage(1);
+            },
           },
           {
             title: "Bu Hafta Kapanan İş Emirleri",
