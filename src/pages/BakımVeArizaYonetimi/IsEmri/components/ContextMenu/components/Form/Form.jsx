@@ -1,6 +1,7 @@
 import React from "react";
-import { Button } from "antd";
+import { FileTextOutlined } from "@ant-design/icons";
 import { PdfAxiosInstance } from "../../../../../../../api/http";
+import MenuItem from "../MenuItem";
 
 const Form = ({ selectedRows }) => {
   const downloadPdf = async () => {
@@ -18,20 +19,12 @@ const Form = ({ selectedRows }) => {
   };
 
   return (
-    <div>
-      <Button
-        style={{
-          display: "flex",
-          padding: "0px 0px",
-          alignItems: "center",
-          justifyContent: "flex-start",
-        }}
-        type="submit"
-        onClick={downloadPdf}
-      >
-        İş Emri Formu İndir
-      </Button>
-    </div>
+    <MenuItem
+      icon={<FileTextOutlined />}
+      title="İş Emri Formları..."
+      description="PDF ve baskı formlarını görüntüle."
+      onClick={downloadPdf}
+    />
   );
 };
 

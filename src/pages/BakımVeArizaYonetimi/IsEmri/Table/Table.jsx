@@ -16,6 +16,7 @@ import { useFormContext } from "react-hook-form";
 import { SiMicrosoftexcel } from "react-icons/si";
 import * as XLSX from "xlsx";
 import { t } from "i18next";
+import dayjs from "dayjs";
 
 const { Text } = Typography;
 
@@ -134,6 +135,8 @@ const MainTable = () => {
     BuHaftaKapanan: { Sayi: 0 },
   });
   const [pageSize, setPageSize] = useState(20);
+  const [columnSearchTerm, setColumnSearchTerm] = useState("");
+  const [buHaftaKapananActive, setBuHaftaKapananActive] = useState(false);
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
   const [onayCheck, setOnayCheck] = useState({ ONY_AKTIF: 0, ONY_MANUEL: 0 });
@@ -407,9 +410,7 @@ const MainTable = () => {
       render: (text, record) => (
         <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
           <span style={{ fontWeight: 500 }}>{text}</span>
-          <span style={{ color: "#8c8c8c", fontSize: "12px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-            {record.TAM_LOKASYON}
-          </span>
+          <span style={{ color: "#8c8c8c", fontSize: "12px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{record.TAM_LOKASYON}</span>
         </div>
       ),
     },
@@ -424,9 +425,7 @@ const MainTable = () => {
       render: (text, record) => (
         <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
           <span style={{ fontWeight: 500 }}>{text}</span>
-          <span style={{ color: "#8c8c8c", fontSize: "12px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-            {record.MAKINE_TANIMI}
-          </span>
+          <span style={{ color: "#8c8c8c", fontSize: "12px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{record.MAKINE_TANIMI}</span>
         </div>
       ),
     },
@@ -1099,9 +1098,9 @@ const MainTable = () => {
     const currentPage = page || 1;
 
     // Sorting parametrelerini oluşturun
-    let sortParam = '';
+    let sortParam = "";
     if (sortField && sortOrder) {
-      sortParam = `&sortField=${sortField}&sortOrder=${sortOrder === 'ascend' ? 'ASC' : 'DESC'}`;
+      sortParam = `&sortField=${sortField}&sortOrder=${sortOrder === "ascend" ? "ASC" : "DESC"}`;
     }
 
     try {
@@ -1497,7 +1496,7 @@ const MainTable = () => {
           >
             <div
               style={{
-                marginBottom: "20px",
+                marginBottom: "10px",
                 borderBottom: "1px solid #80808051",
                 padding: "8px 8px 12px 8px",
                 display: "flex",
@@ -1518,13 +1517,23 @@ const MainTable = () => {
                 Tümünü Seç
               </Checkbox>
             </div>
-            <div style={{ height: "400px", overflow: "auto" }}>
-              {initialColumns.map((col) => (
-                <div style={{ display: "flex", gap: "10px" }} key={col.key}>
-                  <Checkbox checked={columns.find((column) => column.key === col.key)?.visible || false} onChange={(e) => toggleVisibility(col.key, e.target.checked)} />
-                  {col.title}
-                </div>
-              ))}
+            <Input
+              style={{ marginBottom: "10px" }}
+              placeholder="Sütun ara..."
+              prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
+              value={columnSearchTerm}
+              onChange={(e) => setColumnSearchTerm(e.target.value)}
+              allowClear
+            />
+            <div style={{ height: "360px", overflow: "auto" }}>
+              {initialColumns
+                .filter((col) => extractTextFromElement(col.title).toLowerCase().includes(columnSearchTerm.toLowerCase()))
+                .map((col) => (
+                  <div style={{ display: "flex", gap: "10px" }} key={col.key}>
+                    <Checkbox checked={columns.find((column) => column.key === col.key)?.visible || false} onChange={(e) => toggleVisibility(col.key, e.target.checked)} />
+                    {col.title}
+                  </div>
+                ))}
             </div>
           </div>
 
@@ -1572,7 +1581,7 @@ const MainTable = () => {
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
           gap: "16px",
-          marginBottom: "20px",
+          marginBottom: "10px",
           padding: "0 5px",
         }}
       >
@@ -1596,18 +1605,37 @@ const MainTable = () => {
             title: "Bu Hafta Kapanan İş Emirleri",
             value: kpi.BuHaftaKapanan?.Sayi ?? 0,
             footer: "Son 7 günde kapanan işler",
+            clickable: true,
+            active: buHaftaKapananActive,
+            onClick: () => {
+              setBuHaftaKapananActive((prev) => {
+                const nextActive = !prev;
+                if (nextActive) {
+                  setValue("startDate", dayjs().subtract(7, "day").startOf("day"));
+                  setValue("endDate", dayjs().endOf("day"));
+                } else {
+                  setValue("startDate", null);
+                  setValue("endDate", null);
+                }
+                return nextActive;
+              });
+            },
           },
         ].map((item) => (
           <div
             key={item.title}
+            onClick={item.onClick}
             style={{
-              border: "1px solid #e5e7eb",
+              border: `1px solid ${item.active ? "#0091ff" : "#e5e7eb"}`,
+              boxShadow: item.active ? "0 0 0 1px #0091ff" : "none",
               borderRadius: "10px",
               padding: "16px 20px",
               background: "#ffffff",
               display: "flex",
               flexDirection: "column",
               gap: "8px",
+              cursor: item.clickable ? "pointer" : "default",
+              transition: "border-color 0.2s, box-shadow 0.2s",
             }}
           >
             <div style={{ color: "#6b7280", fontSize: "13px" }}>{item.title}</div>
@@ -1621,9 +1649,12 @@ const MainTable = () => {
           display: "flex",
           flexWrap: "wrap",
           justifyContent: "space-between",
-          marginBottom: "20px",
+          marginBottom: "10px",
           gap: "10px",
-          padding: "0 5px",
+          padding: "12px 16px",
+          background: "#ffffff",
+          border: "1px solid #e5e7eb",
+          borderRadius: "10px",
         }}
       >
         <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
@@ -1661,28 +1692,38 @@ const MainTable = () => {
         </div>
       </div>
       <Spin spinning={loading}>
-        <Table
-          components={components}
-          rowSelection={rowSelection}
-          columns={filteredColumns}
-          dataSource={data}
-          pagination={{
-            current: currentPage,
-            total: totalDataCount, // Toplam kayıt sayısı (sayfa başına kayıt sayısı ile çarpılır)
-            pageSize: pageSize,
-            defaultPageSize: 20,
-            showSizeChanger: true,
-            pageSizeOptions: ["10", "20", "50", "100"],
-            position: ["bottomRight"],
-            onChange: handleTableChange,
-            showTotal: (total, range) => `Toplam ${total}`, // Burada 'total' parametresi doğru kayıt sayısını yansıtacaktır
-            showQuickJumper: true,
+        <div
+          style={{
+            background: "#ffffff",
+            border: "1px solid #e5e7eb",
+            borderRadius: "10px",
+            padding: "8px",
           }}
-          // onRow={onRowClick}
-          scroll={{ y: "calc(100vh - 370px)" }}
-          onChange={handleTableChange}
-          rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
-        />
+        >
+          <Table
+            components={components}
+            rowSelection={rowSelection}
+            columns={filteredColumns}
+            dataSource={data}
+            bordered
+            pagination={{
+              current: currentPage,
+              total: totalDataCount, // Toplam kayıt sayısı (sayfa başına kayıt sayısı ile çarpılır)
+              pageSize: pageSize,
+              defaultPageSize: 20,
+              showSizeChanger: true,
+              pageSizeOptions: ["10", "20", "50", "100"],
+              position: ["bottomRight"],
+              onChange: handleTableChange,
+              showTotal: (total, range) => `Toplam ${total}`, // Burada 'total' parametresi doğru kayıt sayısını yansıtacaktır
+              showQuickJumper: true,
+            }}
+            // onRow={onRowClick}
+            scroll={{ y: "calc(100vh - 450px)" }}
+            onChange={handleTableChange}
+            rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
+          />
+        </div>
       </Spin>
       <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
 

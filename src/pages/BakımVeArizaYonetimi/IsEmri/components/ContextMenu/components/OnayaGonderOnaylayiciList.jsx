@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import AxiosInstance from "../../../../../../api/http";
-import { Button, message, Popconfirm, Modal } from "antd";
-import { DeleteOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import { message, Popconfirm, Modal } from "antd";
+import { QuestionCircleOutlined } from "@ant-design/icons";
 import { BsSendCheck } from "react-icons/bs";
 import Onaylayicilar from "../../../../../OnayIslemleri/Onaylayicilar/Table/Table";
+import MenuItem from "./MenuItem";
 
 export default function OnayaGonderOnaylayiciList({ selectedRows, refreshTableData, disabled, hidePopover }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -66,9 +67,11 @@ export default function OnayaGonderOnaylayiciList({ selectedRows, refreshTableDa
           />
         }
       >
-        <Button style={{ paddingLeft: "0px", display: "flex", alignItems: "center" }} type="link" icon={<BsSendCheck />}>
-          Onaya Gönder
-        </Button>
+        <MenuItem
+          icon={<BsSendCheck />}
+          title="Onaya Gönder"
+          description="Onaylayıcı seçerek onay akışını başlat."
+        />
       </Popconfirm>
       <Modal
         title="Onaylayıcıları Seç"

@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import AxiosInstance from "../../../../../../api/http";
-import { Button, message, Popconfirm } from "antd";
+import { message, Popconfirm } from "antd";
 import { DeleteOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import MenuItem from "./MenuItem";
 
 export default function Sil({ selectedRows, refreshTableData, disabled, hidePopover }) {
   // selectedRows.forEach((row, index) => {
@@ -81,9 +82,12 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
           />
         }
       >
-        <Button style={{ paddingLeft: "0px" }} type="link" danger icon={<DeleteOutlined />}>
-          Sil
-        </Button>
+        <MenuItem
+          danger
+          icon={<DeleteOutlined />}
+          title="Sil"
+          description="Seçili iş emri kaydını sil."
+        />
       </Popconfirm>
     </div>
   );
