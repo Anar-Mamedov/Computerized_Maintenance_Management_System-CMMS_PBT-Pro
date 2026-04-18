@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState, useMemo } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
-import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message, Tooltip } from "antd";
+import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined, FileTextOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -11,6 +11,7 @@ import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import Filters from "./filter/Filters";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
+import NotEkleModal from "../components/ContextMenu/components/NotEkleModal";
 import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
 import { useFormContext } from "react-hook-form";
 import { SiMicrosoftexcel } from "react-icons/si";
@@ -148,6 +149,8 @@ const MainTable = () => {
   const [xlsxLoading, setXlsxLoading] = useState(false);
   const [sortField, setSortField] = useState(null);
   const [sortOrder, setSortOrder] = useState(null);
+  const [noteModalOpen, setNoteModalOpen] = useState(false);
+  const [noteModalRow, setNoteModalRow] = useState(null);
 
   function hexToRGBA(color, opacity) {
     // 1) Geçersiz parametreleri engelle
@@ -279,7 +282,21 @@ const MainTable = () => {
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
       render: (text, record) => (
-        <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
+        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          {record.ISM_DIS_NOT !== null && record.ISM_DIS_NOT !== undefined && record.ISM_DIS_NOT !== "" && (
+            <Tooltip title={record.ISM_DIS_NOT} placement="topLeft">
+              <FileTextOutlined
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setNoteModalRow(record);
+                  setNoteModalOpen(true);
+                }}
+                style={{ color: "#EAB308", cursor: "pointer", fontSize: "14px" }}
+              />
+            </Tooltip>
+          )}
+          <a onClick={() => onRowClick(record)}>{text}</a>
+        </div>
       ),
       sorter: true,
     },
@@ -1737,6 +1754,16 @@ const MainTable = () => {
           }}
         />
       )}
+
+      <NotEkleModal
+        open={noteModalOpen}
+        onClose={() => {
+          setNoteModalOpen(false);
+          setNoteModalRow(null);
+        }}
+        row={noteModalRow}
+        refreshTableData={refreshTableData}
+      />
     </>
   );
 };

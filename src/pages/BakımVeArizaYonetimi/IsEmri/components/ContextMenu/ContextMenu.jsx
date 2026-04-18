@@ -10,6 +10,7 @@ import Form from "./components/Form/Form";
 import Ac from "./components/Ac";
 import OnayaGonder from "./components/OnayaGonder.jsx";
 import OnayaGonderOnaylayiciList from "./components/OnayaGonderOnaylayiciList.jsx";
+import NotEkle from "./components/NotEkle.jsx";
 
 const { Text } = Typography;
 
@@ -62,8 +63,9 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
       : true);
 
   const showForm = selectedRows.length >= 1;
+  const showNotEkle = selectedRows.length === 1 && (selectedRows[0]?.ISM_DIS_NOT === null || selectedRows[0]?.ISM_DIS_NOT === undefined);
 
-  const hasTransferSection = showForm || showKapat;
+  const hasTransferSection = showForm || showNotEkle || showKapat;
   const hasExtraSection = showAc || showOnayaGonder || showOnayaGonderManuel || showSil;
 
   const selectedKod = selectedRows.length === 1 ? selectedRows[0]?.ISEMRI_NO : `${selectedRows.length} kayıt`;
@@ -82,6 +84,7 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
           <>
             <SectionLabel>Planlama ve Transfer</SectionLabel>
             {showForm && <Form selectedRows={selectedRows} />}
+            {showNotEkle && <NotEkle selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
             {showKapat && <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />}
           </>
         )}
