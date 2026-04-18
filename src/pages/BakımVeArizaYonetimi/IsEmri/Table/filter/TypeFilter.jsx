@@ -32,22 +32,14 @@ const TypeFilter = ({ onSubmit }) => {
   }, [open]); // open state'i değiştiğinde useEffect hook'unu tetikle
 
   const handleSubmit = () => {
-    const selectedOptionsObj = selectedValues.reduce((acc, currentValue) => {
-      const option = options.find((option) => option.value === currentValue);
-      if (option) {
-        acc[option.value] = option.label;
-      }
-      return acc;
-    }, {});
-
-    onSubmit(selectedOptionsObj);
+    onSubmit([...selectedValues]);
     setOpen(false);
   };
 
   const handleCancelClick = () => {
     setSelectedValues([]);
     setOpen(false);
-    onSubmit("");
+    onSubmit([]);
   };
 
   const content = (
