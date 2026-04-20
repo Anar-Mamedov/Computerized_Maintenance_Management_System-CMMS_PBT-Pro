@@ -146,10 +146,9 @@ const MainTable = () => {
   });
 
   const cardItems = useMemo(() => [
-    { title: "Toplam Sözleşme", value: cardsData.ToplamSozlesme || 0 },
-    { title: "Aktif Sözleşme", value: cardsData.AktifSozlesme || 0 },
-    { title: "Bu Ay Bitecek", value: cardsData.BuAyBitecek || 0, isCritical: cardsData.BuAyBitecek > 0 },
-    { title: "Toplam Tutar", value: `${Number(cardsData.ToplamTutar || 0).toLocaleString("tr-TR")} TL` },
+    { title: "Toplam Firma", value: cardsData.ToplamFirma || 0 },
+    { title: "Aktif", value: cardsData.Aktif || 0 },
+    { title: "Sözleşmeli", value: cardsData.Sozlesmeli || 0 },
   ], [cardsData]);
 
   useEffect(() => {
@@ -187,96 +186,93 @@ const MainTable = () => {
 
   const initialColumns = [
     {
-      title: "Sözleşme No",
-      dataIndex: "SozlesmeNo",
-      key: "SozlesmeNo",
+      title: "Plaka / Ekipman Kod",
+      dataIndex: "Plaka",
+      key: "Plaka",
       width: 250,
       ellipsis: true,
       visible: true,
       render: (text, record) => <a onClick={() => onRowClick(record)}>{text}</a>,
-      sorter: (a, b) => a.SozlesmeNo?.localeCompare(b.SozlesmeNo),
+      sorter: (a, b) => a.Plaka?.localeCompare(b.Plaka),
     },
     {
-      title: "Sözleşme Tanımı",
-      dataIndex: "SozlesmeTanimi",
-      key: "SozlesmeTanimi",
-      width: 250,
-      ellipsis: true,
-      visible: true,
-      render: (text, record) => <a onClick={() => onRowClick(record)}>{text}</a>,
-      sorter: (a, b) => a.SozlesmeTanimi?.localeCompare(b.SozlesmeTanimi),
-    },
-    {
-      title: "Başlama Tarihi",
-      dataIndex: "BaslamaTarihi",
-      key: "BaslamaTarihi",
-      width: 120,
+      title: "Tarih",
+      dataIndex: "TarihSaat",
+      key: "TarihSaat",
+      width: 110,
       ellipsis: true,
       sorter: (a, b) => {
-        if (a.BaslamaTarihi === null) return -1;
-        if (b.BaslamaTarihi === null) return 1;
-        return a.BaslamaTarihi.localeCompare(b.BaslamaTarihi);
+        if (a.TarihSaat === null) return -1;
+        if (b.TarihSaat === null) return 1;
+        return a.TarihSaat.localeCompare(b.TarihSaat);
       },
+
       visible: true, // Varsayılan olarak açık
+      render: (text) => {
+        if (!text) return "-";
+        
+        // Backend'den gelen "26.03.2026\n10:35:15" verisini parçalıyoruz
+        const parts = text.split("\n"); // [0] -> "26.03.2026", [1] -> "10:35:15"
+        
+        if (parts.length > 0) {
+          const datePart = parts[0];
+          // Saatin saniyelerini (10:35:15 -> 10:35) uçuruyoruz
+          const timePart = parts[1] ? parts[1].substring(0, 5) : ""; 
+          
+          return `${datePart} ${timePart}`;
+        }
+        
+        return text; // Beklenmedik bir format gelirse olduğu gibi bas
+      },
     },
     {
-      title: "Bitiş Tarihi",
-      dataIndex: "BitisTarihi",
-      key: "BitisTarihi",
+      title: "Yakıt Tipi",
+      dataIndex: "YakitTipi",
+      key: "YakitTipi",
+      width: 250,
+      visible: true,
+      render: (val) => <Tag color={val?.ColorClass === 'warning' ? 'orange' : 'blue'}>{val?.Text}</Tag>,
+    },
+    {
+      title: "Miktar (Lt)",
+      dataIndex: "Miktar",
+      key: "Miktar",
       width: 120,
-      ellipsis: true,
-      sorter: (a, b) => {
-        if (a.BitisTarihi === null) return -1;
-        if (b.BitisTarihi === null) return 1;
-        return a.BitisTarihi.localeCompare(b.BitisTarihi);
-      },
-      visible: true, // Varsayılan olarak açık
-    },
-    {
-      title: "Kalan Gün",
-      dataIndex: "KalanGun",
-      key: "KalanGun",
-      width: 250,
       visible: true,
-    },
-    {
-      title: "Firma Kodu",
-      dataIndex: "FirmaKodu",
-      key: "FirmaKodu",
-      width: 250,
-      visible: true,
-      sorter: (a, b) => a.FirmaKodu?.localeCompare(b.FirmaKodu),
-    },
-    {
-      title: "Firma Tanımı",
-      dataIndex: "FirmaTanimi",
-      key: "FirmaTanimi",
-      width: 250,
-      visible: true,
-      sorter: (a, b) => a.FirmaTanimi?.localeCompare(b.FirmaTanimi),
-    },
-    {
-      title: "Sektör",
-      dataIndex: "Sektor",
-      key: "Sektor",
-      width: 250,
-      visible: true,
-      sorter: (a, b) => a.Sektor?.localeCompare(b.Sektor),
-    },
-    {
-      title: "Sözleşme Tipi",
-      dataIndex: "SozlesmeTipi",
-      key: "SozlesmeTipi",
-      width: 250,
-      visible: true,
-      sorter: (a, b) => a.SozlesmeTipi?.localeCompare(b.SozlesmeTipi),
+      render: (value) => <div style={{textAlign:'right'}}>{Number(value).toLocaleString('tr-TR')} Lt</div>,
+      sorter: (a, b) => a.Miktar - b.Miktar,
     },
     {
       title: "Tutar",
       dataIndex: "Tutar",
       key: "Tutar",
-      width: 250,
+      width: 120,
+      ellipsis: true,
       visible: true,
+      sorter: (a, b) => a.Tutar?.localeCompare(b.Tutar),
+    },
+    {
+      title: "Kaynak",
+      dataIndex: "Kaynak",
+      key: "Kaynak",
+      width: 150,
+      visible: true,
+    },
+    {
+      title: "Sürücü",
+      dataIndex: "Surucu",
+      key: "Surucu",
+      width: 150,
+      visible: true,
+    },
+    {
+      title: "Lokasyon",
+      dataIndex: "Lokasyon",
+      key: "Lokasyon",
+      width: 150,
+      ellipsis: true,
+      visible: true,
+      sorter: (a, b) => a.Lokasyon?.localeCompare(b.Lokasyon),
     },
   ];
 
@@ -375,13 +371,13 @@ const MainTable = () => {
       };
 
       // Not: API query string ile sayfalama alıyorsa ekledim
-      const res = await AxiosInstance.post(`GetSozlesmeList?page=${currentPage}&pageSize=${pageSize}`, payload);
+      const res = await AxiosInstance.get(`GetFirmaListe?aktif=1&searchText=&page=${currentPage}&pageSize=${pageSize}`, payload);
 
       if (res && !res.has_error && res.Data) {
-        setData(res.Data.GridList || []);
-        setCardsData(res.Data.Kpi || {});
+        setData(res.Data.data || []);
+        setCardsData(res.Data.kpi || {});
         // Eğer API Toplam kaydı göndermiyorsa listenin uzunluğunu set ediyoruz
-        setTotalDataCount(res.Data.GridList?.length || 0);
+        setTotalDataCount(res.Data.data?.length || 0);
       }
     } catch (err) {
       message.error("Veriler yüklenirken bir hata oluştu.");
@@ -466,9 +462,9 @@ const MainTable = () => {
 
   // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
   const [columns, setColumns] = useState(() => {
-    const savedOrder = localStorage.getItem("columnFirmaSozlesmeleriOrder");
-    const savedVisibility = localStorage.getItem("columnFirmaSozlesmeleriVisibility");
-    const savedWidths = localStorage.getItem("columnFirmaSozlesmeleriWidths");
+    const savedOrder = localStorage.getItem("columnFirmaTanimlariOrder");
+    const savedVisibility = localStorage.getItem("columnFirmaTanimlariVisibility");
+    const savedWidths = localStorage.getItem("columnFirmaTanimlariWidths");
 
     let order = savedOrder ? JSON.parse(savedOrder) : [];
     let visibility = savedVisibility ? JSON.parse(savedVisibility) : {};
@@ -486,9 +482,9 @@ const MainTable = () => {
       }
     });
 
-    localStorage.setItem("columnFirmaSozlesmeleriOrder", JSON.stringify(order));
-    localStorage.setItem("columnFirmaSozlesmeleriVisibility", JSON.stringify(visibility));
-    localStorage.setItem("columnFirmaSozlesmeleriWidths", JSON.stringify(widths));
+    localStorage.setItem("columnFirmaTanimlariOrder", JSON.stringify(order));
+    localStorage.setItem("columnFirmaTanimlariVisibility", JSON.stringify(visibility));
+    localStorage.setItem("columnFirmaTanimlariWidths", JSON.stringify(widths));
 
     return order.map((key) => {
       const column = initialColumns.find((col) => col.key === key);
@@ -500,9 +496,9 @@ const MainTable = () => {
 
   // sütunları local storage'a kaydediyoruz
   useEffect(() => {
-    localStorage.setItem("columnFirmaSozlesmeleriOrder", JSON.stringify(columns.map((col) => col.key)));
+    localStorage.setItem("columnFirmaTanimlariOrder", JSON.stringify(columns.map((col) => col.key)));
     localStorage.setItem(
-      "columnFirmaSozlesmeleriVisibility",
+      "columnFirmaTanimlariVisibility",
       JSON.stringify(
         columns.reduce(
           (acc, col) => ({
@@ -514,7 +510,7 @@ const MainTable = () => {
       )
     );
     localStorage.setItem(
-      "columnFirmaSozlesmeleriWidths",
+      "columnFirmaTanimlariWidths",
       JSON.stringify(
         columns.reduce(
           (acc, col) => ({

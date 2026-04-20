@@ -143,6 +143,7 @@ export const rawItems = [
     <ShoppingCartOutlined />,
     [
       getItem("Firma Sözleşmeleri", "firmaSozlesme", true),
+      getItem("Firma Tanımları", "firmaTanimlari", true),
     ],
     false,
     "KLL_WEB_FIRMA_SOZLESME_MODUL"
