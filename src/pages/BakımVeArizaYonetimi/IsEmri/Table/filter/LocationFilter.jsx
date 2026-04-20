@@ -7,47 +7,38 @@ const { Option } = Select;
 const LocationFilter = ({ onSubmit }) => {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);
-  // filters state'ini bir obje olarak başlat
-  const [filters, setFilters] = useState({});
+  const [selectedValues, setSelectedValues] = useState([]);
 
-  const handleChange = (selectedValues) => {
-    // Seçilen değerlerin id'lerini kullanarak filters objesini güncelle
-    const newFilters = selectedValues.reduce((acc, currentValue) => {
-      const option = options.find((option) => option.value === currentValue);
-      if (option) {
-        acc[option.key] = option.value;
-      }
-      return acc;
-    }, {});
-    setFilters(newFilters);
+  const handleChange = (values) => {
+    setSelectedValues(values);
   };
 
   useEffect(() => {
-    if (open) {
-      AxiosInstance.get("getLokasyonlar")
+    if (open && options.length === 0) {
+      AxiosInstance.get("GetLokasyonList")
         .then((response) => {
-          // API'den gelen veriye göre options dizisini oluştur
-          const options = response.map((option, index) => ({
-            key: index.toString(), // Benzersiz bir key olarak index kullan
-            value: option, // Gösterilecek değer
+          const mapped = (response || []).map((item) => ({
+            key: item.TB_LOKASYON_ID,
+            value: item.TB_LOKASYON_ID,
+            label: item.LOK_TANIM,
           }));
-          setOptions(options);
+          setOptions(mapped);
         })
         .catch((error) => {
           console.log("API Error:", error);
         });
     }
-  }, [open]);
+  }, [open, options.length]);
 
   const handleSubmit = () => {
-    onSubmit(filters);
+    onSubmit([...selectedValues]);
     setOpen(false);
   };
 
   const handleCancelClick = () => {
-    setFilters({});
+    setSelectedValues([]);
     setOpen(false);
-    onSubmit("");
+    onSubmit([]);
   };
 
   const content = (
@@ -70,13 +61,15 @@ const LocationFilter = ({ onSubmit }) => {
           mode="multiple"
           style={{ width: "100%" }}
           placeholder="Ara..."
-          value={Object.values(filters)}
+          value={selectedValues}
           onChange={handleChange}
           allowClear
+          optionFilterProp="label"
+          showSearch
         >
           {options.map((option) => (
-            <Option key={option.key} value={option.value}>
-              {option.value}
+            <Option key={option.key} value={option.value} label={option.label}>
+              {option.label}
             </Option>
           ))}
         </Select>
@@ -114,7 +107,7 @@ const LocationFilter = ({ onSubmit }) => {
             color: "white",
           }}
         >
-          {Object.keys(filters).length}
+          {selectedValues.length}
         </div>
       </Button>
     </Popover>

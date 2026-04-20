@@ -334,6 +334,9 @@ const ProtectedRoute = ({ children }) => {
 const BaseLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileView, setMobileView] = useState(window.innerWidth < 768);
+  const location = useLocation();
+  const layoutExcludedPaths = ["/isEmri1"];
+  const isLayoutExcluded = layoutExcludedPaths.includes(location.pathname);
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -455,11 +458,11 @@ const BaseLayout = () => {
             <Breadcrumbs />
             <div
               style={{
-                padding: mobileView ? "24px 0px" : 24,
-                borderRadius: "16px",
+                padding: isLayoutExcluded ? 0 : mobileView ? "24px 0px" : 24,
+                borderRadius: isLayoutExcluded ? 0 : "16px",
                 minHeight: 360,
                 height: "calc(100vh - 132px)",
-                background: colorBgContainer,
+                background: isLayoutExcluded ? "transparent" : colorBgContainer,
               }}
             >
               <Outlet />

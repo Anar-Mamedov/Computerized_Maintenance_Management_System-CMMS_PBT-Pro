@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal, message, Typography, Alert } from "antd";
+import { StopOutlined } from "@ant-design/icons";
 import Forms from "./components/Forms";
 import { Controller, useForm, FormProvider } from "react-hook-form";
 import AxiosInstance from "../../../../../../../api/http";
 import dayjs from "dayjs";
+import MenuItem from "../MenuItem";
 
 const { Text } = Typography;
 
@@ -279,9 +281,13 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
   return (
     <FormProvider {...methods}>
       <div style={buttonStyle}>
-        <Button style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }} type="link" danger onClick={handleModalToggle}>
-          Seçili İş Emirlerini Kapat
-        </Button>
+        <MenuItem
+          danger
+          icon={<StopOutlined />}
+          title="Seçili İş Emirlerini Kapat"
+          description="Seçili kaydı tamamlandı olarak kapat."
+          onClick={handleModalToggle}
+        />
         <Modal
           key="modal"
           title={modalTitle}
