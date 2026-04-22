@@ -1,7 +1,10 @@
 // Table1.jsx
 
-import React, { useCallback, useEffect, useState, useMemo, useRef } from "react";
-import { Button, Checkbox, Spin, message, Popover, Pagination, Typography } from "antd";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Button, Input, Popover, Spin, Typography, message } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import { SiMicrosoftexcel } from "react-icons/si";
+import * as XLSX from "xlsx";
 import AxiosInstance from "../../../../api/http";
 import Filters from "./filter/Filters";
 import { useFormContext } from "react-hook-form";
@@ -9,429 +12,196 @@ import ContextMenu from "../components/ContextMenu/ContextMenu";
 import dayjs from "dayjs";
 import "dayjs/locale/tr";
 import weekOfYear from "dayjs/plugin/weekOfYear";
-import { FcOk, FcLeave, FcHighPriority, FcExpired, FcCancel, FcFlashAuto, FcPlanner, FcDisclaimer } from "react-icons/fc";
-import { VariableSizeGrid as Grid } from "react-window";
-import "./MainTable.css"; // CSS dosyanız
+import "./MainTable.css";
 
 const { Text } = Typography;
 
-// Extend dayjs with necessary plugins
 dayjs.locale("tr");
 dayjs.extend(weekOfYear);
 
-// Icon mapping
-const icons = {
-  Planlanan: <FcPlanner style={{ fontSize: "20px" }} />,
-  Yaklaşan: <FcExpired style={{ fontSize: "20px" }} />,
-  "Süresi Geçmiş": <FcHighPriority style={{ fontSize: "20px" }} />,
-  Yapılmadı: <FcCancel style={{ fontSize: "20px" }} />,
-  "Devam Eden": <FcFlashAuto style={{ fontSize: "20px" }} />,
-  "Zamanında Yapılan": <FcOk style={{ fontSize: "20px" }} />,
-  "Gecikmeli Yapılan": <FcLeave style={{ fontSize: "20px" }} />,
-  "İptal Edilen": <FcDisclaimer style={{ fontSize: "20px" }} />,
+// Statü renkleri (tr label → hex)
+const STATUSES = [
+  { key: "Planlanan", color: "#60a5fa" },
+  { key: "Yaklaşan", color: "#facc15" },
+  { key: "Süresi Geçmiş", color: "#ef4444" },
+  { key: "Yapılmadı", color: "#fb923c" },
+  { key: "Devam Eden", color: "#14b8a6" },
+  { key: "Zamanında Yapılan", color: "#22c55e" },
+  { key: "Gecikmeli Yapılan", color: "#f43f5e" },
+  { key: "İptal Edilen", color: "#9ca3af" },
+];
+
+const STATUS_COLOR = STATUSES.reduce((acc, s) => {
+  acc[s.key] = s.color;
+  return acc;
+}, {});
+
+const DAY_SHORT = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
+
+// Layout constants (virtualization için sabit yükseklikler)
+const LEFT_COL_W = 420;
+const DAY_COL_W = 44;
+const H_MONTH = 34;
+const H_WEEK = 28;
+const H_DAY = 40;
+const HEADER_H = H_MONTH + H_WEEK + H_DAY;
+const PARENT_ROW_H = 40;
+const CHILD_ROW_H = 44;
+const OVERSCAN = 8;
+
+// "PBK0184 - F1 - ŞERİTLEME ..." -> { kod, ad }
+const splitBakimTanim = (tanim) => {
+  if (!tanim) return { kod: "", ad: "" };
+  const idx = tanim.indexOf(" - ");
+  if (idx === -1) return { kod: "", ad: tanim };
+  return { kod: tanim.slice(0, idx).trim(), ad: tanim.slice(idx + 3).trim() };
 };
 
-// Helper function to get icons
-const getIconForValue = (value) => {
-  return icons[value] || value;
+// Hover popover içeriği
+const renderWoPopover = ({ bakimTanim, machineValue, statusText, dateLabel }) => {
+  const status = STATUSES.find((s) => s.key === statusText);
+  const { kod, ad } = splitBakimTanim(bakimTanim);
+  const title = ad || bakimTanim || "-";
+
+  return (
+    <div className="ptk-wo-popover">
+      <div className="ptk-wo-header">
+        <div className="ptk-wo-title-area">
+          <div className="ptk-wo-label">İŞ EMRİ</div>
+          <div className="ptk-wo-title" title={title}>
+            {title}
+          </div>
+        </div>
+        {status && (
+          <span className="ptk-wo-status-badge">
+            <span className="ptk-wo-status-dot" style={{ backgroundColor: status.color }} />
+            <span>{statusText}</span>
+          </span>
+        )}
+      </div>
+
+      <div className="ptk-wo-subrow">
+        <div className="ptk-wo-sub-item">
+          <span className="ptk-wo-muted">Tarih</span>
+          <span className="ptk-wo-strong">{dateLabel}</span>
+        </div>
+        {kod && <span className="ptk-wo-chip">{kod}</span>}
+      </div>
+
+      <div className="ptk-wo-grid">
+        <div className="ptk-wo-field">
+          <div className="ptk-wo-muted">Makine</div>
+          <div className="ptk-wo-value" title={machineValue}>
+            {machineValue || "-"}
+          </div>
+        </div>
+        <div className="ptk-wo-field">
+          <div className="ptk-wo-muted">Bakım Kodu</div>
+          <div className="ptk-wo-value">{kod || "-"}</div>
+        </div>
+        <div className="ptk-wo-field ptk-wo-field-wide">
+          <div className="ptk-wo-muted">Bakım</div>
+          <div className="ptk-wo-value" title={bakimTanim}>
+            {bakimTanim || "-"}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-// Helper function to generate columns and monthWeekDayMap
-const generateColumns = (startDate, endDate) => {
-  const columns = [
-    {
-      title: "Makine",
-      dataIndex: "machine",
-      key: "machine",
-      width: 200, // Sabit genişlik
-      fixed: "left",
-    },
-  ];
+// Tarih aralığından kolon/ay/hafta gruplarını üretir
+const buildDateGroups = (startDate, endDate) => {
+  if (!startDate || !endDate) return { dayCols: [], monthGroups: [], weekGroups: [] };
 
-  const monthWeekDayMap = []; // Ay ve hafta bilgilerini tutacağımız dizi
-
-  let currentDay = dayjs(startDate);
-  while (currentDay <= dayjs(endDate)) {
-    const month = currentDay.format("MMMM YYYY");
-    const week = `Hafta ${currentDay.week()}`;
-    const day = currentDay.format("dddd");
-    const formattedDay = currentDay.format("YYYY-MM-DD");
-
-    columns.push({
-      title: day,
-      dataIndex: formattedDay,
-      key: formattedDay,
-      width: 100, // Kolon genişliği sabit
+  const dayCols = [];
+  const start = dayjs(startDate);
+  const end = dayjs(endDate);
+  let cursor = start;
+  let idx = 0;
+  while (cursor.isBefore(end) || cursor.isSame(end, "day")) {
+    dayCols.push({
+      idx,
+      dt: cursor,
+      dataIndex: cursor.format("YYYY-MM-DD"),
+      dateLabel: cursor.format("DD.MM.YYYY"),
+      dayShort: DAY_SHORT[(cursor.day() + 6) % 7],
+      dayNum: cursor.format("DD"),
+      week: cursor.week(),
+      monthLabel: cursor.format("MMMM YYYY"),
     });
-
-    monthWeekDayMap.push({
-      month,
-      week,
-      day,
-      dataIndex: formattedDay,
-    });
-
-    currentDay = currentDay.add(1, "day");
+    cursor = cursor.add(1, "day");
+    idx++;
   }
 
-  return { columns, monthWeekDayMap };
-};
-
-// Header Component
-const Header = ({ columns, monthWeekDayMap }) => {
-  // Ayları gruplandırma
   const monthGroups = [];
-  let currentMonth = null;
-  let currentMonthStartIndex = 1; // İlk kolon makine adı olduğu için 1'den başlıyoruz
-  monthWeekDayMap.forEach((item, index) => {
-    const columnIndex = index + 1; // columns[0] 'machine' kolonudur
-    if (item.month !== currentMonth) {
-      if (currentMonth !== null) {
-        // Önceki ay grubunu ekle
-        monthGroups.push({
-          month: currentMonth,
-          startIndex: currentMonthStartIndex,
-          endIndex: columnIndex - 1,
-        });
-      }
-      currentMonth = item.month;
-      currentMonthStartIndex = columnIndex;
-    }
-  });
-  // Son ayı ekleme
-  if (currentMonth !== null) {
-    monthGroups.push({
-      month: currentMonth,
-      startIndex: currentMonthStartIndex,
-      endIndex: columns.length - 1,
-    });
+  for (let i = 0; i < dayCols.length; ) {
+    const m = dayCols[i].monthLabel;
+    let j = i;
+    while (j < dayCols.length && dayCols[j].monthLabel === m) j++;
+    monthGroups.push({ label: m, colSpan: j - i, startCol: i });
+    i = j;
   }
 
-  // Haftaları gruplandırma
   const weekGroups = [];
-  let currentWeek = null;
-  let currentWeekStartIndex = 1;
-  monthWeekDayMap.forEach((item, index) => {
-    const columnIndex = index + 1;
-    if (item.week !== currentWeek) {
-      if (currentWeek !== null) {
-        weekGroups.push({
-          week: currentWeek,
-          startIndex: currentWeekStartIndex,
-          endIndex: columnIndex - 1,
-        });
-      }
-      currentWeek = item.week;
-      currentWeekStartIndex = columnIndex;
-    }
-  });
-  // Son haftayı ekleme
-  if (currentWeek !== null) {
-    weekGroups.push({
-      week: currentWeek,
-      startIndex: currentWeekStartIndex,
-      endIndex: columns.length - 1,
-    });
+  for (let i = 0; i < dayCols.length; ) {
+    const w = dayCols[i].week;
+    let j = i;
+    while (j < dayCols.length && dayCols[j].week === w) j++;
+    weekGroups.push({ week: w, colSpan: j - i, startCol: i });
+    i = j;
   }
 
-  // Build gridTemplateColumns with safe access
-  const gridTemplateColumns =
-    columns.length > 0
-      ? `${columns[0].width}px ${columns
-          .slice(1)
-          .map((col) => `${col.width}px`)
-          .join(" ")}`
-      : "auto";
-
-  return (
-    <div
-      className="header-container"
-      style={{
-        display: "grid",
-        gridTemplateRows: "35px 35px 35px", // üç satır
-        gridTemplateColumns: gridTemplateColumns,
-        backgroundColor: "#fafafa",
-        borderBottom: "1px solid #f0f0f0",
-        position: "sticky",
-        top: 0,
-        zIndex: 2,
-      }}
-    >
-      {/* Makine Header Spanning Three Rows */}
-      <div
-        className="header-cell"
-        style={{
-          gridRow: "1 / span 3",
-          gridColumn: "1 / 2",
-          borderRight: "1px solid #f0f0f0",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontWeight: "bold",
-        }}
-      >
-        Makine
-      </div>
-
-      {/* Ay satırı */}
-      {monthGroups.map((group, index) => (
-        <div
-          key={`month-${index}`}
-          className="header-cell"
-          style={{
-            gridRow: "1 / 2",
-            gridColumn: `${group.startIndex + 1} / ${group.endIndex + 2}`,
-            borderRight: "1px solid #f0f0f0",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontWeight: "bold",
-          }}
-        >
-          {group.month}
-        </div>
-      ))}
-
-      {/* Haftalar satırı */}
-      {weekGroups.map((group, index) => (
-        <div
-          key={`week-${index}`}
-          className="header-cell"
-          style={{
-            gridRow: "2 / 3",
-            gridColumn: `${group.startIndex + 1} / ${group.endIndex + 2}`,
-            borderRight: "1px solid #f0f0f0",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontWeight: "bold",
-          }}
-        >
-          {group.week}
-        </div>
-      ))}
-
-      {/* Gün satırı */}
-      {monthWeekDayMap.map((item, index) => (
-        <div
-          key={`day-${index}`}
-          className="header-cell"
-          style={{
-            gridRow: "3 / 4",
-            gridColumn: `${index + 2} / ${index + 3}`,
-            borderRight: "1px solid #f0f0f0",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontWeight: "bold",
-          }}
-        >
-          {item.day}
-        </div>
-      ))}
-    </div>
-  );
+  return { dayCols, monthGroups, weekGroups };
 };
 
-// VirtualTable Component
-const VirtualTable = ({
-  columns,
-  dataSource,
-  width,
-  height,
-  checkedState,
-  handleCheckboxChange,
-  flattenedData,
-  currentPageData,
-  monthWeekDayMap,
-  totalTableWidth,
-  expandedKeys,
-  toggleExpand,
-}) => {
-  const gridRef = useRef();
-
-  const columnCount = columns.length;
-  const rowCount = currentPageData.length;
-
-  const getColumnWidthInternal = useCallback(
-    (index) => {
-      if (index < 0 || index >= columns.length) {
-        console.warn(`Index ${index} is out of bounds for columns array of length ${columns.length}`);
-        return 100; // Varsayılan genişlik
-      }
-      const { width } = columns[index];
-      return width || 100;
-    },
-    [columns]
-  );
-
-  const getRowHeight = useCallback(() => {
-    return 54; // Satır yüksekliği
-  }, []);
-
-  const itemData = useMemo(() => {
-    return {
-      columns,
-      checkedState,
-      handleCheckboxChange,
-      getIconForValue,
-      flattenedData,
-      dataToRender: currentPageData,
-      expandedKeys,
-      toggleExpand,
-    };
-  }, [columns, checkedState, handleCheckboxChange, flattenedData, currentPageData, expandedKeys, toggleExpand]);
-
-  // Header yüksekliği (3 satır)
-  const headerHeight = 35 * 3; // CSS'deki header satır yüksekliğine uyacak şekilde ayarlandı
-
-  // Tablo genişliğini hesaplıyoruz
-  const tableWidth = useMemo(() => {
-    return columns.reduce((total, column) => total + (column.width || 100), 0);
-  }, [columns]);
-
-  return (
-    <div style={{ width: "100%", height: "100%", overflowX: "auto" }}>
-      <div
-        style={{
-          width: tableWidth,
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        {/* Header */}
-        {columns.length > 0 && monthWeekDayMap.length > 0 && <Header columns={columns} monthWeekDayMap={monthWeekDayMap} />}
-
-        {/* Grid */}
-        <Grid
-          className="VirtualizedGrid"
-          ref={gridRef}
-          columnCount={columnCount}
-          columnWidth={getColumnWidthInternal}
-          height={height - headerHeight}
-          rowCount={rowCount}
-          rowHeight={getRowHeight}
-          width={tableWidth}
-          itemData={itemData}
-        >
-          {CellComponent}
-        </Grid>
-      </div>
-    </div>
-  );
-};
-
-// MainTable Component
 const MainTable = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [data, setData] = useState([]); // Tablo verileri
-  const [checkedState, setCheckedState] = useState({}); // Checkbox durumları
-  const [selectedCells, setSelectedCells] = useState([]); // Seçili hücre bilgileri
+  const [data, setData] = useState([]);
+  const [checkedState, setCheckedState] = useState({});
+  const [selectedCells, setSelectedCells] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [body, setBody] = useState({
-    keyword: "",
-    filters: {},
-  });
+  const [body, setBody] = useState({ keyword: "", filters: {} });
+  const [expandedKeys, setExpandedKeys] = useState({});
+  const [search, setSearch] = useState("");
+  const [selectedStatusKeys, setSelectedStatusKeys] = useState(() => STATUSES.map((s) => s.key));
+  const [xlsxLoading, setXlsxLoading] = useState(false);
 
-  // Genişletilmiş satırları tutan durum
-  const [expandedKeys, setExpandedKeys] = useState({}); // Başlangıçta boş
+  // Virtualization
+  const outerRef = useRef(null);
+  const [scrollTop, setScrollTop] = useState(0);
+  const [viewportH, setViewportH] = useState(600);
 
   const toggleExpand = useCallback((key) => {
-    setExpandedKeys((prevExpandedKeys) => ({
-      ...prevExpandedKeys,
-      [key]: !prevExpandedKeys[key],
-    }));
+    setExpandedKeys((prev) => ({ ...prev, [key]: !prev[key] }));
   }, []);
 
-  // Sayfalama için durumlar
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10); // Sayfa başına satır sayısı
-
-  // Table height state
-  const [tableHeight, setTableHeight] = useState(window.innerHeight - 200); // Düzeninize göre ayarlayın
-
-  // Ekran boyutu değiştiğinde tablo yüksekliğini güncelle
-  useEffect(() => {
-    const handleResize = () => {
-      setTableHeight(window.innerHeight - 200); // Düzeninize göre ayarlayın
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    // Temizlik
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+  const toggleStatus = useCallback((key) => {
+    setSelectedStatusKeys((prev) => {
+      const onlyThis = prev.length === 1 && prev[0] === key;
+      return onlyThis ? STATUSES.map((s) => s.key) : [key];
+    });
   }, []);
 
-  // Checkbox değişimini yönetme fonksiyonu
-  const handleCheckboxChange = useCallback(
-    (key, text, record, column) => {
-      setCheckedState((prevCheckedState) => {
-        const isSelected = prevCheckedState[key] || false;
-        const newCheckedState = {
-          ...prevCheckedState,
-          [key]: !isSelected,
-        };
+  const resetStatuses = useCallback(() => {
+    setSelectedStatusKeys(STATUSES.map((s) => s.key));
+  }, []);
 
-        // Seçili hücreleri güncelle
-        setSelectedCells((prevCells) => {
-          const makineID = record.key ? record.key.split("-").shift() : null;
-          const bakimID = record.key ? record.key.split("-")[1] : null;
-
-          // Makine değeri
-          const parentRecord = data.find((item) => item.key === record.parentKey);
-          const machineValue = record.isParent ? record.machine : parentRecord?.machine || "Kayıt bulunamadı";
-
-          // Tarih
-          const date = dayjs(column.dataIndex, "YYYY-MM-DD").format("DD.MM.YYYY");
-
-          const cellInfo = {
-            key,
-            machineValue,
-            recordMachine: record.machine,
-            status: text,
-            date,
-            makineID,
-            bakimID,
-          };
-
-          if (isSelected) {
-            // Hücreyi seçili hücrelerden çıkar
-            return prevCells.filter((cell) => cell.key !== key);
-          } else {
-            // Hücreyi seçili hücrelere ekle
-            return [...prevCells, cellInfo];
-          }
-        });
-
-        return newCheckedState;
-      });
-    },
-    [data]
+  const { dayCols, monthGroups, weekGroups } = useMemo(
+    () => buildDateGroups(startDate, endDate),
+    [startDate, endDate]
   );
 
-  // Kolonları oluştur
-  const { columns, monthWeekDayMap } = useMemo(() => {
-    return startDate && endDate ? generateColumns(startDate, endDate) : { columns: [], monthWeekDayMap: [] };
-  }, [startDate, endDate]);
+  useFormContext();
 
-  const totalTableWidth = useMemo(() => {
-    return columns.reduce((total, column) => total + (column.width || 100), 0);
-  }, [columns]);
-
-  const { setValue } = useFormContext();
-
-  // Veri çekme işlemi
   useEffect(() => {
     fetchEquipmentData(body);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [body]);
 
-  const fetchEquipmentData = async (body) => {
-    const { filters = {} } = body || {};
-
+  const fetchEquipmentData = async (requestBody) => {
+    const { filters = {} } = requestBody || {};
     setLoading(true);
 
     if (Object.keys(filters).length === 0) {
@@ -440,56 +210,50 @@ const MainTable = () => {
     }
 
     try {
-      const response = await AxiosInstance.post(`PeriyodikBakimPlanlamaTakvimi`, filters);
+      const response = await AxiosInstance.post("PeriyodikBakimPlanlamaTakvimi", filters);
       if (response) {
         const responseObject = JSON.parse(response);
 
-        const groupedData = responseObject.reduce((acc, item) => {
-          if (!acc[item.MAKINE_ID]) {
-            acc[item.MAKINE_ID] = {
-              key: item.MAKINE_ID ? item.MAKINE_ID.toString() : `makine-${item.MAKINE_TANIM}`,
+        const grouped = responseObject.reduce((acc, item) => {
+          const makineKey = item.MAKINE_ID ? item.MAKINE_ID.toString() : `makine-${item.MAKINE_TANIM}`;
+          if (!acc[makineKey]) {
+            acc[makineKey] = {
+              key: makineKey,
               machine: item.MAKINE_TANIM,
               isParent: true,
               children: [],
             };
           }
-          let child = {
+          const child = {
             key: `${item.MAKINE_ID}-${item.PBAKIM_ID}`,
             machine: item.BAKIM_TANIM,
-            parentKey: item.MAKINE_ID ? item.MAKINE_ID.toString() : `makine-${item.MAKINE_TANIM}`,
+            parentKey: makineKey,
             isParent: false,
           };
-          const startDateDayjs = dayjs(startDate);
-          const endDateDayjs = dayjs(endDate);
-          const daysDiff = endDateDayjs.diff(startDateDayjs, "day");
-
-          let currentDay = startDateDayjs;
+          const startD = dayjs(startDate);
+          const endD = dayjs(endDate);
+          const daysDiff = endD.diff(startD, "day");
+          let cursor = startD;
           for (let i = 1; i <= daysDiff + 1; i++) {
-            const day = currentDay.format("YYYY-MM-DD");
-            child[day] = item[i];
-            currentDay = currentDay.add(1, "day");
+            child[cursor.format("YYYY-MM-DD")] = item[i];
+            cursor = cursor.add(1, "day");
           }
-          acc[item.MAKINE_ID].children.push(child);
+          acc[makineKey].children.push(child);
           return acc;
         }, {});
-        const newData = Object.values(groupedData);
+
+        const newData = Object.values(grouped);
         setData(newData);
 
-        // Initialize all parent rows as expanded
-        const allParentKeys = newData.map((item) => item.key);
-        const initialExpandedKeys = {};
-        allParentKeys.forEach((key) => {
-          initialExpandedKeys[key] = true;
-        });
-        setExpandedKeys(initialExpandedKeys);
+        const initialExpanded = {};
+        newData.forEach((n) => (initialExpanded[n.key] = true));
+        setExpandedKeys(initialExpanded);
 
         setLoading(false);
       } else {
-        console.error("API response is not in expected format");
         setLoading(false);
       }
     } catch (error) {
-      console.error("Error in API request:", error);
       setLoading(false);
       if (navigator.onLine) {
         message.error("Hata Mesajı: " + error.message);
@@ -499,397 +263,456 @@ const MainTable = () => {
     }
   };
 
-  // Handle body changes from filters
   const handleBodyChange = useCallback((type, newBody) => {
     setStartDate(newBody.baslamaTarihi);
     setEndDate(newBody.bitisTarihi);
-    setBody((state) => ({
-      ...state,
-      [type]: newBody,
-    }));
+    setBody((state) => ({ ...state, [type]: newBody }));
   }, []);
 
-  // CSV indirme fonksiyonu
-  const downloadCSV = () => {
-    // CSV indirme fonksiyonunuz
-    // Örnek olarak:
-    const headers = columns.map((col) => `"${col.title}"`).join(",");
-    const rows = data
-      .flatMap((item) => {
-        if (item.isParent && item.children) {
-          return item.children.map((child) => {
-            const row = [`"${item.machine}"`, ...columns.slice(1).map((col) => `"${child[col.dataIndex] || ""}"`)];
-            return row.join(",");
-          });
-        }
-        return [];
+  const filteredData = useMemo(() => {
+    if (!search.trim()) return data;
+    const q = search.trim().toLowerCase();
+    return data
+      .map((m) => {
+        const machineMatch = (m.machine || "").toLowerCase().includes(q);
+        const childMatches = (m.children || []).filter((c) => (c.machine || "").toLowerCase().includes(q));
+        if (machineMatch) return m;
+        if (childMatches.length) return { ...m, children: childMatches };
+        return null;
       })
-      .join("\n");
+      .filter(Boolean);
+  }, [data, search]);
 
-    const csvContent = `${headers}\n${rows}`;
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "data.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const flattenedData = useMemo(() => {
+    const result = [];
+    filteredData.forEach((node) => {
+      result.push({ ...node, depth: 0 });
+      if (node.isParent && expandedKeys[node.key] && node.children?.length) {
+        node.children.forEach((c) => result.push({ ...c, depth: 1 }));
+      }
+    });
+    return result;
+  }, [filteredData, expandedKeys]);
+
+  // Satır ofsetleri (virtualization için)
+  const rowOffsets = useMemo(() => {
+    const offsets = [0];
+    let acc = 0;
+    for (let i = 0; i < flattenedData.length; i++) {
+      acc += flattenedData[i].isParent ? PARENT_ROW_H : CHILD_ROW_H;
+      offsets.push(acc);
+    }
+    return offsets;
+  }, [flattenedData]);
+
+  const totalBodyHeight = rowOffsets[rowOffsets.length - 1] || 0;
+  const totalWidth = LEFT_COL_W + dayCols.length * DAY_COL_W;
+
+  // Görünür satır aralığı (ikili arama)
+  const { startIdx, endIdx } = useMemo(() => {
+    const count = flattenedData.length;
+    if (!count) return { startIdx: 0, endIdx: 0 };
+
+    // startIdx: offsets[i+1] > scrollTop olan ilk i
+    let lo = 0;
+    let hi = count - 1;
+    let start = 0;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      if (rowOffsets[mid + 1] > scrollTop) {
+        start = mid;
+        hi = mid - 1;
+      } else {
+        lo = mid + 1;
+      }
+    }
+
+    // endIdx: offsets[i] >= scrollTop+viewportH olan ilk i
+    const bottom = scrollTop + viewportH;
+    lo = 0;
+    hi = count;
+    let end = count;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (rowOffsets[mid] >= bottom) {
+        end = mid;
+        hi = mid;
+      } else {
+        lo = mid + 1;
+      }
+    }
+
+    return {
+      startIdx: Math.max(0, start - OVERSCAN),
+      endIdx: Math.min(count, end + OVERSCAN),
+    };
+  }, [flattenedData.length, rowOffsets, scrollTop, viewportH]);
+
+  // Scroll takibi
+  useEffect(() => {
+    const el = outerRef.current;
+    if (!el) return undefined;
+    const onScroll = () => setScrollTop(el.scrollTop);
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Viewport yüksekliği (resize)
+  useEffect(() => {
+    const el = outerRef.current;
+    if (!el) return undefined;
+    const measure = () => {
+      if (outerRef.current) setViewportH(outerRef.current.clientHeight);
+    };
+    measure();
+    if (typeof ResizeObserver !== "undefined") {
+      const ro = new ResizeObserver(measure);
+      ro.observe(el);
+      return () => ro.disconnect();
+    }
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
+  // Veri/filtre değişince scroll başa al (yanlış pencere render etmemek için)
+  useEffect(() => {
+    if (outerRef.current) outerRef.current.scrollTop = 0;
+    setScrollTop(0);
+  }, [flattenedData.length]);
+
+  const handleCellClick = useCallback(
+    (cellKey, text, record, column) => {
+      setCheckedState((prev) => {
+        const isSelected = prev[cellKey] || false;
+        const next = { ...prev, [cellKey]: !isSelected };
+
+        setSelectedCells((prevCells) => {
+          const parts = record.key ? record.key.split("-") : [];
+          const makineID = parts[0] || null;
+          const bakimID = parts[1] || null;
+          const parentRecord = data.find((item) => item.key === record.parentKey);
+          const machineValue = record.isParent ? record.machine : parentRecord?.machine || "Kayıt bulunamadı";
+          const date = dayjs(column.dataIndex, "YYYY-MM-DD").format("DD.MM.YYYY");
+          const cellInfo = {
+            key: cellKey,
+            machineValue,
+            recordMachine: record.machine,
+            status: text,
+            date,
+            makineID,
+            bakimID,
+          };
+          return isSelected ? prevCells.filter((c) => c.key !== cellKey) : [...prevCells, cellInfo];
+        });
+
+        return next;
+      });
+    },
+    [data]
+  );
+
+  const handleDownloadXLSX = async () => {
+    try {
+      setXlsxLoading(true);
+
+      const xlsxData = data.flatMap((item) => {
+        if (!item.isParent || !item.children) return [];
+        return item.children.map((child) => {
+          const row = {
+            Makine: item.machine || "",
+            Bakım: child.machine || "",
+          };
+          dayCols.forEach((c) => {
+            row[c.dateLabel] = child[c.dataIndex] || "";
+          });
+          return row;
+        });
+      });
+
+      if (!xlsxData.length) {
+        message.warning("İndirilecek veri bulunamadı.");
+        setXlsxLoading(false);
+        return;
+      }
+
+      const worksheet = XLSX.utils.json_to_sheet(xlsxData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Planlama Takvimi");
+
+      worksheet["!cols"] = [
+        { wpx: 220 },
+        { wpx: 260 },
+        ...dayCols.map(() => ({ wpx: 85 })),
+      ];
+
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+      const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "planlama-takvimi.xlsx");
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setXlsxLoading(false);
+    } catch (error) {
+      setXlsxLoading(false);
+      console.error("XLSX indirme hatası:", error);
+      if (navigator.onLine) {
+        message.error("Hata Mesajı: " + error.message);
+      } else {
+        message.error("Internet Bağlantısı Mevcut Değil.");
+      }
+    }
   };
 
-  // Flatten data based on expanded keys
-  const flattenedData = useMemo(() => {
-    if (!data) return [];
-    const flatten = (nodes) => {
-      let result = [];
-      nodes.forEach((node) => {
-        result.push({ ...node, depth: 0 });
-        if (node.isParent && expandedKeys[node.key] && node.children && node.children.length > 0) {
-          node.children.forEach((child) => {
-            result.push({ ...child, depth: 1 });
-          });
-        }
-      });
-      return result;
-    };
-    return flatten(data);
-  }, [data, expandedKeys]);
+  const allStatusActive = selectedStatusKeys.length === STATUSES.length;
 
-  // Paginate data
-  const currentPageData = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    return flattenedData.slice(startIndex, startIndex + pageSize);
-  }, [flattenedData, currentPage, pageSize]);
-
-  // Cell component
-  const CellComponent = React.memo(function Cell({ columnIndex, rowIndex, style, data }) {
-    const { checkedState, handleCheckboxChange, getIconForValue, columns, dataToRender, flattenedData, expandedKeys, toggleExpand } = data;
-
-    const record = dataToRender[rowIndex];
-    if (!record) {
-      console.error(`No record found at rowIndex ${rowIndex}`);
-      return null;
-    }
-
-    const column = columns[columnIndex];
-    if (!column) {
-      console.error(`No column found at columnIndex ${columnIndex}`);
-      return null;
-    }
-
-    const dataIndex = column.dataIndex;
-    const text = record[dataIndex];
-
-    const key = record.key ? `${record.key}-${dataIndex}` : `row-${rowIndex}-col-${columnIndex}`;
-    const isChecked = checkedState[key] || false;
-
-    // Get machine value
-    const parentRecord = flattenedData.find((item) => item.key === record.parentKey);
-    const machineValue = record.isParent ? record.machine : parentRecord?.machine || "Kayıt bulunamadı";
-
-    const date = dayjs(dataIndex, "YYYY-MM-DD").format("DD.MM.YYYY");
-
-    // Apply class names based on conditions
-    const cellClassNames = ["virtual-table-cell", record.isParent ? "virtual-table-row-parent" : "virtual-table-row-child", isChecked ? "virtual-table-cell-checked" : ""]
-      .filter(Boolean)
-      .join(" ");
-
-    if (dataIndex === "machine") {
-      const indentation = (record.depth || 0) * 40; // Her derinlik için 40px girinti
-      return (
-        <div
-          style={{
-            ...style,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            paddingLeft: indentation,
-            boxSizing: "border-box",
-            borderBottom: "1px solid #f0f0f0",
-            borderRight: "1px solid #f0f0f0",
-            backgroundColor: record.isParent ? "#fafafa" : "white",
-            fontWeight: record.isParent ? "600" : "normal",
-          }}
-          className={cellClassNames}
-        >
-          {record.isParent && (
-            <div
-              onClick={() => toggleExpand(record.key)}
-              style={{
-                marginRight: 8,
-                marginLeft: 8,
-                border: "1px solid #80808091",
-                borderRadius: "5px",
-                padding: "0px 3px",
-                fontWeight: "300",
-                cursor: "pointer",
-              }}
-            >
-              {expandedKeys[record.key] ? "-" : "+"}
-            </div>
-          )}
-          <Text style={{ whiteSpace: "nowrap" }}>{record.machine}</Text>
-        </div>
-      );
-    } else if (text) {
-      return (
-        <div
-          style={{
-            ...style,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderBottom: "1px solid #f0f0f0",
-            borderRight: "1px solid #f0f0f0",
-            backgroundColor: isChecked ? "#188fff1d" : "white",
-          }}
-          className={cellClassNames}
-        >
-          <Popover
-            content={
-              <div>
-                {`Makine: ${machineValue}`}
-                <br />
-                {`Bakım: ${record.machine}`}
-                <br />
-                {`Durum: ${text}`}
-                <br />
-                {`Tarih: ${date}`}
-              </div>
-            }
-            title="Hücre Detayı"
-            trigger="hover"
-          >
-            <div
-              style={{
-                position: "relative",
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              onClick={() => handleCheckboxChange(key, text, record, column)}
-            >
-              <Checkbox
-                checked={isChecked}
-                style={{
-                  position: "absolute",
-                  top: 5,
-                  left: 5,
-                  zIndex: 1,
-                  opacity: 0,
-                }}
-              />
-              {getIconForValue(text)}
-            </div>
-          </Popover>
-        </div>
-      );
-    } else {
-      return <div style={style} className={cellClassNames}></div>;
-    }
-  });
+  // Görünür satır indeksleri
+  const visibleIndexes = [];
+  for (let i = startIdx; i < endIdx; i++) visibleIndexes.push(i);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "calc(100vh - 170px)",
-      }}
-    >
-      {/* Üstteki diğer bileşenler (filtreler, butonlar vs.) */}
+    <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 170px)" }}>
+      {/* Üst kontrol alanı */}
       <div
         style={{
           display: "flex",
           flexWrap: "wrap",
           justifyContent: "space-between",
-          marginBottom: "20px",
+          marginBottom: "12px",
           gap: "10px",
           padding: "0 5px",
         }}
       >
-        <Filters onChange={handleBodyChange} />
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+          <Filters onChange={handleBodyChange} />
+          <Input
+            prefix={<SearchOutlined style={{ color: "#9ca3af" }} />}
+            placeholder="Makine veya bakım ara..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            allowClear
+            style={{ width: 240 }}
+          />
+        </div>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <ContextMenu selectedCells={selectedCells} />
-          <Button onClick={downloadCSV} type="primary" style={{ marginBottom: "10px" }} disabled={!data || data.length === 0}>
-            CSV İndir
+          <Button
+            style={{ display: "flex", alignItems: "center" }}
+            onClick={handleDownloadXLSX}
+            loading={xlsxLoading}
+            disabled={!data || data.length === 0}
+            icon={<SiMicrosoftexcel />}
+          >
+            Excel'e Aktar
           </Button>
         </div>
       </div>
 
-      {/* Tabloyu saran kapsayıcı */}
-      <div style={{ overflow: "hidden", flex: "1 1 auto" }}>
-        <Spin spinning={loading}>
-          <VirtualTable
-            columns={columns}
-            dataSource={flattenedData}
-            width={totalTableWidth}
-            height={tableHeight}
-            checkedState={checkedState}
-            handleCheckboxChange={handleCheckboxChange}
-            flattenedData={flattenedData}
-            currentPageData={currentPageData}
-            monthWeekDayMap={monthWeekDayMap}
-            totalTableWidth={totalTableWidth}
-            expandedKeys={expandedKeys}
-            toggleExpand={toggleExpand}
-          />
-        </Spin>
+      {/* Durum legend chipleri */}
+      <div className="ptk-legend">
+        {STATUSES.map((s) => {
+          const active = selectedStatusKeys.includes(s.key);
+          return (
+            <button
+              key={s.key}
+              type="button"
+              className={`ptk-legend-chip ${active ? "is-active" : "is-muted"}`}
+              onClick={() => toggleStatus(s.key)}
+              title={
+                active && selectedStatusKeys.length === 1
+                  ? "Tekrar tıklarsan filtreyi kaldır"
+                  : "Tıkla: sadece bu durumu göster"
+              }
+            >
+              <span className="ptk-legend-dot" style={{ backgroundColor: s.color }} />
+              <span className="ptk-legend-label">{s.key}</span>
+            </button>
+          );
+        })}
+        {!allStatusActive && (
+          <button type="button" className="ptk-legend-reset" onClick={resetStatuses}>
+            Tümünü göster
+          </button>
+        )}
       </div>
 
-      {/* Sayfalama bileşeni */}
-      <Pagination
-        current={currentPage}
-        total={flattenedData.length}
-        pageSize={pageSize}
-        onChange={(page, newPageSize) => {
-          setCurrentPage(page);
-          if (newPageSize !== pageSize) {
-            setPageSize(newPageSize);
-          }
-        }}
-        showSizeChanger
-        pageSizeOptions={["10", "20", "50", "100"]}
-        onShowSizeChange={(current, size) => {
-          setPageSize(size);
-          setCurrentPage(1);
-        }}
-        style={{ marginTop: "10px", textAlign: "right", flexShrink: 0 }}
-      />
+      {/* Tablo (virtualized) */}
+      <div className="ptk-table-wrapper">
+        <Spin spinning={loading}>
+          <div ref={outerRef} className="ptk-v-outer">
+            {dayCols.length > 0 && (
+              <div className="ptk-v-inner" style={{ width: totalWidth, minHeight: HEADER_H + Math.max(totalBodyHeight, 80) }}>
+                {/* Header — CSS grid ile 3 satır, sticky top + sticky left-top */}
+                <div
+                  className="ptk-v-header"
+                  style={{
+                    gridTemplateColumns: `${LEFT_COL_W}px repeat(${dayCols.length}, ${DAY_COL_W}px)`,
+                    gridTemplateRows: `${H_MONTH}px ${H_WEEK}px ${H_DAY}px`,
+                  }}
+                >
+                  <div className="ptk-v-header-left" style={{ gridRow: "1 / 4", gridColumn: "1 / 2" }}>
+                    Makine / Bakım
+                  </div>
+                  {monthGroups.map((g, i) => (
+                    <div
+                      key={`m-${i}`}
+                      className="ptk-v-th-month"
+                      style={{
+                        gridRow: "1 / 2",
+                        gridColumn: `${2 + g.startCol} / ${2 + g.startCol + g.colSpan}`,
+                      }}
+                    >
+                      {g.label}
+                    </div>
+                  ))}
+                  {weekGroups.map((g, i) => (
+                    <div
+                      key={`w-${i}`}
+                      className="ptk-v-th-week"
+                      style={{
+                        gridRow: "2 / 3",
+                        gridColumn: `${2 + g.startCol} / ${2 + g.startCol + g.colSpan}`,
+                      }}
+                    >
+                      {g.week}. Hafta
+                    </div>
+                  ))}
+                  {dayCols.map((c, i) => (
+                    <div
+                      key={`d-${c.idx}`}
+                      className="ptk-v-th-day"
+                      style={{ gridRow: "3 / 4", gridColumn: `${2 + i} / ${3 + i}` }}
+                    >
+                      <div className="ptk-th-day-name">{c.dayShort}</div>
+                      <div className="ptk-th-day-num">{c.dayNum}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Body — absolute positioned virtualized rows */}
+                <div
+                  className="ptk-v-body"
+                  style={{ height: Math.max(totalBodyHeight, 80), width: totalWidth }}
+                >
+                  {visibleIndexes.map((i) => {
+                    const rec = flattenedData[i];
+                    if (!rec) return null;
+                    const top = rowOffsets[i];
+                    const height = rec.isParent ? PARENT_ROW_H : CHILD_ROW_H;
+
+                    if (rec.isParent) {
+                      const isOpen = !!expandedKeys[rec.key];
+                      return (
+                        <div
+                          key={rec.key}
+                          className="ptk-v-row ptk-v-parent"
+                          style={{ top, height, width: totalWidth }}
+                        >
+                          <div
+                            className="ptk-v-left ptk-v-parent-left"
+                            style={{ width: LEFT_COL_W, height }}
+                          >
+                            <button
+                              type="button"
+                              className="ptk-expand-btn"
+                              onClick={() => toggleExpand(rec.key)}
+                              aria-label={isOpen ? "Daralt" : "Genişlet"}
+                            >
+                              {isOpen ? "−" : "+"}
+                            </button>
+                            <Text className="ptk-parent-title">{rec.machine}</Text>
+                          </div>
+                          <div
+                            className="ptk-v-parent-filler"
+                            style={{ width: totalWidth - LEFT_COL_W, height }}
+                          />
+                        </div>
+                      );
+                    }
+
+                    const parentRecord = data.find((x) => x.key === rec.parentKey);
+                    const machineValue = parentRecord?.machine || "";
+
+                    return (
+                      <div
+                        key={rec.key}
+                        className="ptk-v-row ptk-v-child"
+                        style={{ top, height, width: totalWidth }}
+                      >
+                        <div
+                          className="ptk-v-left ptk-v-child-left"
+                          style={{ width: LEFT_COL_W, height }}
+                        >
+                          <span className="ptk-child-indent" />
+                          <Text className="ptk-child-title">{rec.machine}</Text>
+                        </div>
+                        {dayCols.map((c) => {
+                          const text = rec[c.dataIndex];
+                          const visible = text && selectedStatusKeys.includes(text);
+                          const cellKey = `${rec.key}-${c.dataIndex}`;
+                          const checked = !!checkedState[cellKey];
+
+                          return (
+                            <div
+                              key={c.idx}
+                              className={`ptk-v-cell ${visible ? "has-event" : ""} ${checked ? "is-checked" : ""}`}
+                              style={{ width: DAY_COL_W, height }}
+                              title={visible ? undefined : c.dateLabel}
+                              onClick={() => {
+                                if (visible) handleCellClick(cellKey, text, rec, { dataIndex: c.dataIndex });
+                              }}
+                            >
+                              {visible && (
+                                <Popover
+                                  trigger="hover"
+                                  placement="right"
+                                  mouseEnterDelay={0.1}
+                                  overlayClassName="ptk-wo-popover-overlay"
+                                  content={renderWoPopover({
+                                    bakimTanim: rec.machine,
+                                    machineValue,
+                                    statusText: text,
+                                    dateLabel: c.dateLabel,
+                                  })}
+                                >
+                                  <span
+                                    className="ptk-dot"
+                                    style={{ backgroundColor: STATUS_COLOR[text] || "#9ca3af" }}
+                                  >
+                                    <span className="ptk-dot-inner" />
+                                  </span>
+                                </Popover>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
+
+                  {!flattenedData.length && !loading && (
+                    <div className="ptk-empty-inline">Kayıt bulunamadı.</div>
+                  )}
+                </div>
+              </div>
+            )}
+            {dayCols.length === 0 && !loading && (
+              <div className="ptk-empty-inline" style={{ position: "static", padding: 28 }}>
+                Lütfen filtrelerden bir tarih aralığı seçin.
+              </div>
+            )}
+          </div>
+        </Spin>
+      </div>
     </div>
   );
 };
 
 export default MainTable;
-
-// Cell Component
-const CellComponent = React.memo(function Cell({ columnIndex, rowIndex, style, data }) {
-  const { checkedState, handleCheckboxChange, getIconForValue, columns, dataToRender, flattenedData, expandedKeys, toggleExpand } = data;
-
-  const record = dataToRender[rowIndex];
-  if (!record) {
-    console.error(`No record found at rowIndex ${rowIndex}`);
-    return null;
-  }
-
-  const column = columns[columnIndex];
-  if (!column) {
-    console.error(`No column found at columnIndex ${columnIndex}`);
-    return null;
-  }
-
-  const dataIndex = column.dataIndex;
-  const text = record[dataIndex];
-
-  const key = record.key ? `${record.key}-${dataIndex}` : `row-${rowIndex}-col-${columnIndex}`;
-  const isChecked = checkedState[key] || false;
-
-  // Get machine value
-  const parentRecord = flattenedData.find((item) => item.key === record.parentKey);
-  const machineValue = record.isParent ? record.machine : parentRecord?.machine || "Kayıt bulunamadı";
-
-  const date = dayjs(dataIndex, "YYYY-MM-DD").format("DD.MM.YYYY");
-
-  // Apply class names based on conditions
-  const cellClassNames = ["virtual-table-cell", record.isParent ? "virtual-table-row-parent" : "virtual-table-row-child", isChecked ? "virtual-table-cell-checked" : ""]
-    .filter(Boolean)
-    .join(" ");
-
-  if (dataIndex === "machine") {
-    const indentation = (record.depth || 0) * 40; // Her derinlik için 40px girinti
-    return (
-      <div
-        style={{
-          ...style,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "flex-start",
-          paddingLeft: indentation,
-          boxSizing: "border-box",
-          borderBottom: "1px solid #f0f0f0",
-          borderRight: "1px solid #f0f0f0",
-          backgroundColor: record.isParent ? "#fafafa" : "white",
-          fontWeight: record.isParent ? "600" : "normal",
-        }}
-        className={cellClassNames}
-      >
-        {record.isParent && (
-          <div
-            onClick={() => toggleExpand(record.key)}
-            style={{
-              marginRight: 8,
-              marginLeft: 8,
-              border: "1px solid #80808091",
-              borderRadius: "5px",
-              padding: "0px 3px",
-              fontWeight: "300",
-              cursor: "pointer",
-            }}
-          >
-            {expandedKeys[record.key] ? "-" : "+"}
-          </div>
-        )}
-        <Text style={{ whiteSpace: "nowrap" }}>{record.machine}</Text>
-      </div>
-    );
-  } else if (text) {
-    return (
-      <div
-        style={{
-          ...style,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          borderBottom: "1px solid #f0f0f0",
-          borderRight: "1px solid #f0f0f0",
-          backgroundColor: isChecked ? "#188fff1d" : "white",
-        }}
-        className={cellClassNames}
-      >
-        <Popover
-          content={
-            <div>
-              {`Makine: ${machineValue}`}
-              <br />
-              {`Bakım: ${record.machine}`}
-              <br />
-              {`Durum: ${text}`}
-              <br />
-              {`Tarih: ${date}`}
-            </div>
-          }
-          title="Hücre Detayı"
-          trigger="hover"
-        >
-          <div
-            style={{
-              position: "relative",
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-            onClick={() => handleCheckboxChange(key, text, record, column)}
-          >
-            <Checkbox
-              checked={isChecked}
-              style={{
-                position: "absolute",
-                top: 5,
-                left: 5,
-                zIndex: 1,
-                opacity: 0,
-              }}
-            />
-            {getIconForValue(text)}
-          </div>
-        </Popover>
-      </div>
-    );
-  } else {
-    return <div style={style} className={cellClassNames}></div>;
-  }
-});

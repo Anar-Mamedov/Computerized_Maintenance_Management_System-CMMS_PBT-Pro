@@ -89,9 +89,9 @@ export default function CustomFilter({ onSubmit1, isEmpty }) {
     atolyeID: "",
     bakimTanim: "",
     bakimID: "",
-    timeRange: "all",
-    startDate: null,
-    endDate: null,
+    timeRange: "thisMonth",
+    startDate: dayjs().startOf("month"),
+    endDate: dayjs().endOf("month"),
   };
 
   const methods = useForm({ defaultValues });
@@ -169,6 +169,12 @@ export default function CustomFilter({ onSubmit1, isEmpty }) {
     setValue("bakimTanim", "");
     setValue("bakimID", "");
   };
+
+  // İlk açılışta "Bu Ay" filtresi otomatik uygulanır
+  useEffect(() => {
+    onSubmit();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
