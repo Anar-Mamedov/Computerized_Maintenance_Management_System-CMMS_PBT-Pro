@@ -11,7 +11,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       siraNo: "",
       secilenID: "",
       isTanimi: "",
-      yapildi: false,
+      yapildi: 0,
       atolyeTanim: "",
       atolyeID: "",
       personelTanim: "",
@@ -35,7 +35,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       setValue("secilenID", selectedRow.key);
       setValue("siraNo", selectedRow.DKN_SIRANO);
       setValue("isTanimi", selectedRow.DKN_TANIM);
-      setValue("yapildi", selectedRow.DKN_YAPILDI);
+      setValue("yapildi", Number(selectedRow.DKN_YAPILDI || 0));
       setValue("atolyeTanim", selectedRow.DKN_ATOLYE_TANIM);
       setValue("atolyeID", selectedRow.DKN_YAPILDI_ATOLYE_ID);
       setValue("personelTanim", selectedRow.DKN_PERSONEL_ISIM);
@@ -77,7 +77,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
     const Body = {
       TB_ISEMRI_KONTROLLIST_ID: data.secilenID,
       DKN_SIRANO: data.siraNo,
-      DKN_YAPILDI: data.yapildi,
+      DKN_YAPILDI: Number(data.yapildi || 0),
       DKN_TANIM: data.isTanimi,
       // DKN_MALIYET: data.maliyet, // Maliyet diye bir alan yok frontda
       DKN_YAPILDI_PERSONEL_ID: data.personelID,
