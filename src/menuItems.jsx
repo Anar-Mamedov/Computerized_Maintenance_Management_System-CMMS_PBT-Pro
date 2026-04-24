@@ -121,10 +121,10 @@ export const rawItems = [
     <FireOutlined />,
     [
       getItem("Yakıt Tanımları", "yakitTanimlari", true),
-      getItem("Yakıt Stokları", "yakitStoklari", true),
-      getItem("Yakıt Girişleri", "yakitGirisleri", true),
+      getItem("Yakıt Depoları / Tanklar", "yakitStoklari", true),
+      getItem("Yakıt İşlemleri", "yakitGirisleri", true),
       getItem("Yakıt Hareketleri", "yakitHareketleri", true),
-      getItem("Hızlı Yakıt Girişi", "hizliYakitGirisi", true),
+      getItem("Hızlı Yakıt İşlemleri", "hizliYakitGirisi", true),
     ],
     false,
     "KLL_WEB_YAKIT_MODUL"
