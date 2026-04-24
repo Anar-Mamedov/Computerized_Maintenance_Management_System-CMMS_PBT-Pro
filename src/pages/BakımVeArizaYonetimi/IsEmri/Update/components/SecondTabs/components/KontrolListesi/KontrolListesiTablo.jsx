@@ -1,11 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Input, message, Select, Table } from "antd";
+import { Button, Input, message, Popconfirm, Popover, Select, Table, Typography } from "antd";
+import { DeleteOutlined, MoreOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import AxiosInstance from "../../../../../../../../api/http";
 import CreateModal from "./Insert/CreateModal";
 import EditModal from "./Update/EditModal";
+
+const { Text } = Typography;
 
 const ControlListWrapper = styled.div`
   margin-bottom: 25px;
@@ -58,6 +61,27 @@ const ControlListWrapper = styled.div`
     color: #30445f;
     font-weight: 500;
     box-shadow: 0 2px 5px rgba(18, 38, 63, 0.12);
+  }
+
+  .control-list-context-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    padding: 0 8px;
+    border-color: #2bc770 !important;
+    border-radius: 10px;
+    background-color: #2bc770 !important;
+    color: #fff !important;
+    box-shadow: 0 2px 5px rgba(18, 38, 63, 0.12);
+  }
+
+  .control-list-context-button:hover,
+  .control-list-context-button:focus,
+  .control-list-context-button:active {
+    border-color: #2bc770 !important;
+    background-color: #2bc770 !important;
+    color: #fff !important;
   }
 
   .control-list-table {
@@ -201,8 +225,11 @@ export default function KontrolListesiTablo({ isActive }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [bulkCompleting, setBulkCompleting] = useState(false);
+  const [actionVisible, setActionVisible] = useState(false);
   const { control, setValue, watch } = useFormContext();
   const [data, setData] = useState([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
@@ -325,9 +352,11 @@ export default function KontrolListesiTablo({ isActive }) {
       setLoading(true);
       AxiosInstance.get(`FetchIsEmriKontrolList?isemriID=${secilenIsEmriID}`)
         .then((response) => {
-          const responseData = Array.isArray(response) ? response : response?.data || [];
+          const responseData = Array.isArray(response) ? response : Array.isArray(response?.data) ? response.data : Array.isArray(response?.data?.data) ? response.data.data : [];
           const fetchedData = responseData.map(normalizeChecklistItem);
           setData(fetchedData);
+          setSelectedRowKeys([]);
+          setSelectedRows([]);
         })
         .catch((error) => {
           // Hata işleme
@@ -352,6 +381,40 @@ export default function KontrolListesiTablo({ isActive }) {
   const refreshTable = useCallback(() => {
     fetch(); // fetch fonksiyonu tabloyu yeniler
   }, [fetch]);
+
+  const onRowSelectChange = (selectedKeys, selectedRecords) => {
+    setSelectedRowKeys(selectedKeys);
+    setSelectedRows(selectedRecords);
+  };
+
+  const handleDeleteSelected = async () => {
+    let hasError = false;
+
+    for (const row of selectedRows) {
+      try {
+        const response = await AxiosInstance.post(`DeleteIsEmriKontrolList?id=${row.key}`);
+
+        if (response.status_code === 200 || response.status_code === 201) {
+          message.success(t("workOrder.controlList.deleteSuccess"));
+        } else if (response.status_code === 401) {
+          hasError = true;
+          message.error(t("workOrder.controlList.noPermission"));
+        } else {
+          hasError = true;
+          message.error(t("workOrder.controlList.deleteError"));
+        }
+      } catch (error) {
+        hasError = true;
+        console.error("Kontrol listesi silme işlemi sırasında hata oluştu:", error);
+        message.error(t("workOrder.controlList.deleteError"));
+      }
+    }
+
+    if (!hasError) {
+      setActionVisible(false);
+      refreshTable();
+    }
+  };
 
   const handleCompleteAll = async () => {
     const waitingRows = data.filter((item) => normalizeChecklistStatus(item.DKN_YAPILDI) !== 1);
@@ -390,6 +453,34 @@ export default function KontrolListesiTablo({ isActive }) {
           <p className="control-list-description">{t("workOrder.controlList.description")}</p>
         </div>
         <div className="control-list-actions">
+          {selectedRows.length >= 1 && (
+            <Popover
+              placement="bottom"
+              trigger="click"
+              open={actionVisible}
+              onOpenChange={setActionVisible}
+              content={
+                <Popconfirm
+                  title={t("workOrder.controlList.deleteTitle")}
+                  description={t("workOrder.controlList.deleteConfirm")}
+                  okText={t("workOrder.controlList.yes")}
+                  cancelText={t("workOrder.controlList.noAnswer")}
+                  disabled={kapali}
+                  icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+                  onConfirm={handleDeleteSelected}
+                >
+                  <Button disabled={kapali} type="link" danger icon={<DeleteOutlined />} style={{ paddingLeft: 0 }}>
+                    {t("workOrder.controlList.delete")}
+                  </Button>
+                </Popconfirm>
+              }
+            >
+              <Button className="control-list-context-button">
+                <Text style={{ color: "white", marginLeft: 3 }}>{selectedRows.length}</Text>
+                <MoreOutlined style={{ color: "white", fontSize: 20, margin: 0 }} />
+              </Button>
+            </Popover>
+          )}
           <Button className="control-list-button" disabled={kapali || !data.length} loading={bulkCompleting} onClick={handleCompleteAll}>
             {t("workOrder.controlList.completeAll")}
           </Button>
@@ -406,15 +497,25 @@ export default function KontrolListesiTablo({ isActive }) {
       </div>
       <div className="control-list-table">
         <Table
+          rowSelection={{
+            selectedRowKeys,
+            onChange: onRowSelectChange,
+          }}
           onRow={(record) => ({
-            onClick: () => onRowClick(record),
+            onClick: (event) => {
+              if (event.target.closest(".ant-table-selection-column, .ant-checkbox-wrapper, .ant-checkbox, .ant-select, button, input, textarea")) {
+                return;
+              }
+
+              onRowClick(record);
+            },
           })}
           columns={columns}
           dataSource={data}
           loading={loading}
           pagination={false}
           scroll={{
-            x: 900,
+            x: 940,
             y: "calc(100vh - 420px)",
           }}
         />

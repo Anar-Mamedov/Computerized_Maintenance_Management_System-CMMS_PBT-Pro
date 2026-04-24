@@ -1,12 +1,21 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs, message } from "antd";
+import React, { useState } from "react";
+import { Button, Modal, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../../api/http";
-import { Controller, useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
 import dayjs from "dayjs";
 
-export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID, kapali, defaultCalismaSuresiDakika }) {
+export default function CreateModal({
+  onRefresh,
+  secilenIsEmriID,
+  kapali,
+  defaultCalismaSuresiDakika,
+  triggerButtonText = "Yeni Kayıt",
+  triggerButtonType = "link",
+  triggerButtonClassName,
+  triggerContainerClassName,
+}) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const methods = useForm({
     defaultValues: {
@@ -30,7 +39,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     },
   });
 
-  const { setValue, reset, handleSubmit } = methods;
+  const { setValue, reset } = methods;
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
@@ -101,6 +110,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     <FormProvider {...methods}>
       <div>
         <div
+          className={triggerContainerClassName}
           style={{
             display: "flex",
             width: "100%",
@@ -108,8 +118,8 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
             marginBottom: "10px",
           }}
         >
-          <Button disabled={kapali} type="link" onClick={handleModalToggle}>
-            <PlusOutlined /> Yeni Kayıt
+          <Button disabled={kapali} type={triggerButtonType} className={triggerButtonClassName} onClick={handleModalToggle}>
+            <PlusOutlined /> {triggerButtonText}
           </Button>
         </div>
 
