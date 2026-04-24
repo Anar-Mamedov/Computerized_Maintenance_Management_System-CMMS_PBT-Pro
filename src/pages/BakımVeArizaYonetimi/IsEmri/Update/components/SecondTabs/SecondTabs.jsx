@@ -12,11 +12,11 @@ import AracGereclerListesiTablo from "./components/AracGerecler/AracGereclerList
 import SureBilgileri from "./components/SureBilgileri/SureBilgileri";
 import Maliyetler from "./components/Maliyetler/Maliyetler";
 import Notlar from "./components/Notlar/Notlar";
-import Aciklama from "./components/Aciklama/Aciklama";
 import ResimUpload from "./components/Resim/ResimUpload";
 import DosyaUpload from "./components/Dosya/DosyaUpload";
 import AxiosInstance from "../../../../../../api/http";
 import Forms from "./components/KapamaBilgileri/Forms.jsx";
+import DisServis from "./components/DisServis/DisServis";
 
 export default function SecondTabs({ refreshKey, fieldRequirements }) {
   const { watch } = useFormContext();
@@ -55,6 +55,11 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
       key: "1",
       label: "Detay Bilgiler",
       children: <DetayBilgiler fieldRequirements={fieldRequirements} />,
+    },
+    {
+      key: "16",
+      label: "Diş Servis",
+      children: <DisServis fieldRequirements={fieldRequirements} />,
     },
     {
       key: "2",
@@ -155,11 +160,6 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
       children: <Notlar fieldRequirements={fieldRequirements} />,
     },
     {
-      key: "12",
-      label: dataCount.IsEmriAciklamaVar === true ? `Açıklama *` : "Açıklama",
-      children: <Aciklama fieldRequirements={fieldRequirements} />,
-    },
-    {
       key: "13",
       label:
         dataCount.IsEmriDosyaSayisi >= 1
@@ -207,14 +207,14 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
         return fieldRequirements?.IMT_OZEL_ALAN_TAB;
       case "11":
         return fieldRequirements?.IMT_NOTLAR_TAB;
-      case "12":
-        return fieldRequirements?.IMT_ACIKLAMA_USTTAB || true; // This tab's visibility is dependent on a specific condition, with a fallback to false if undefined.
       case "13":
         return fieldRequirements?.IMT_DOSYA_USTTAB || true; // This tab's visibility is dependent on a specific condition, with a fallback to false if undefined.
       case "14":
         return fieldRequirements?.IMT_RESIM_USTTAB || true; // This tab's visibility is dependent on a specific condition, with a fallback to false if undefined.
       case "15":
         return kapali;
+      case "16":
+        return true;
       default:
         return false; // Default case to handle any unforeseen keys
     }

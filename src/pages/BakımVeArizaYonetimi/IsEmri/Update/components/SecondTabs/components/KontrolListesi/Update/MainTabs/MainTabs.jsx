@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs, DatePicker, TimePicker, InputNumber, Checkbox } from "antd";
+import { Button, Modal, Input, Typography, Tabs, DatePicker, TimePicker, InputNumber, Select } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import dayjs from "dayjs";
 import SertifikaTipi from "./components/SertifikaTipi";
@@ -58,11 +59,13 @@ const StyledTabs = styled(Tabs)`
 
 //styled components end
 export default function MainTabs() {
+  const { t } = useTranslation();
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const { control, watch, setValue } = useFormContext();
 
-  const yapildi = watch("yapildi");
+  const yapildi = Number(watch("yapildi") || 0);
+  const isStatusActive = yapildi !== 0;
 
   const handleAtolyeMinusClick = () => {
     setValue("atolyeTanim", "");
@@ -89,22 +92,16 @@ export default function MainTabs() {
   }, [setValue]);
 
   useEffect(() => {
-    if (!yapildi) {
+    if (!isStatusActive) {
       clearYapildi();
     }
-  }, [yapildi, clearYapildi]);
+  }, [isStatusActive, clearYapildi]);
 
   const items = [
     {
       key: "1",
       label: "Açıklama",
-      children: (
-        <Controller
-          name="aciklama"
-          control={control}
-          render={({ field }) => <TextArea {...field} disabled={!yapildi} rows={4} />}
-        />
-      ),
+      children: <Controller name="aciklama" control={control} render={({ field }) => <TextArea {...field} disabled={!isStatusActive} rows={4} />} />,
     },
   ];
 
@@ -226,7 +223,8 @@ export default function MainTabs() {
           gap: "10px",
           rowGap: "0px",
           marginBottom: "10px",
-        }}>
+        }}
+      >
         <Text style={{ fontSize: "14px" }}>Sıra no:</Text>
         <div
           style={{
@@ -237,7 +235,8 @@ export default function MainTabs() {
             minWidth: "300px",
             gap: "10px",
             width: "100%",
-          }}>
+          }}
+        >
           <Controller
             name="siraNo"
             control={control}
@@ -271,7 +270,8 @@ export default function MainTabs() {
           gap: "10px",
           rowGap: "0px",
           marginBottom: "10px",
-        }}>
+        }}
+      >
         <Text style={{ fontSize: "14px", fontWeight: "600" }}>İş Tanımı:</Text>
         <div
           style={{
@@ -282,7 +282,8 @@ export default function MainTabs() {
             minWidth: "300px",
             gap: "10px",
             width: "100%",
-          }}>
+          }}
+        >
           <Controller
             name="isTanimi"
             control={control}
@@ -302,15 +303,24 @@ export default function MainTabs() {
           top: "10px",
           left: "10px",
           background: "white",
-          width: "70px",
-        }}>
+          width: "155px",
+        }}
+      >
         <Controller
           name="yapildi"
           control={control}
           render={({ field }) => (
-            <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-              Yapıldı
-            </Checkbox>
+            <Select
+              {...field}
+              value={Number(field.value || 0)}
+              style={{ width: 150 }}
+              options={[
+                { value: 0, label: t("workOrder.controlList.waiting") },
+                { value: 1, label: t("workOrder.controlList.completed") },
+                { value: 2, label: t("workOrder.controlList.critical") },
+              ]}
+              onChange={(value) => field.onChange(value)}
+            />
           )}
         />
       </div>
@@ -323,7 +333,8 @@ export default function MainTabs() {
               justifyContent: "space-between",
               width: "100%",
               maxWidth: "435px",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px" }}>Atölye:</Text>
             <div
               style={{
@@ -332,7 +343,8 @@ export default function MainTabs() {
                 alignItems: "center",
                 justifyContent: "space-between",
                 width: "300px",
-              }}>
+              }}
+            >
               <Controller
                 name="atolyeTanim"
                 control={control}
@@ -356,7 +368,7 @@ export default function MainTabs() {
                   />
                 )}
               />
-              {yapildi ? (
+              {isStatusActive ? (
                 <AtolyeTablo
                   onSubmit={(selectedData) => {
                     setValue("atolyeTanim", selectedData.subject);
@@ -364,9 +376,9 @@ export default function MainTabs() {
                   }}
                 />
               ) : (
-                <Button disabled={!yapildi}>+</Button>
+                <Button disabled={!isStatusActive}>+</Button>
               )}
-              <Button disabled={!yapildi} onClick={handleAtolyeMinusClick}>
+              <Button disabled={!isStatusActive} onClick={handleAtolyeMinusClick}>
                 -
               </Button>
             </div>
@@ -380,7 +392,8 @@ export default function MainTabs() {
               justifyContent: "space-between",
               width: "100%",
               maxWidth: "435px",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px" }}>Personel:</Text>
             <div
               style={{
@@ -389,7 +402,8 @@ export default function MainTabs() {
                 alignItems: "center",
                 justifyContent: "space-between",
                 width: "300px",
-              }}>
+              }}
+            >
               <Controller
                 name="personelTanim"
                 control={control}
@@ -414,7 +428,7 @@ export default function MainTabs() {
                 )}
               />
 
-              {yapildi ? (
+              {isStatusActive ? (
                 <PersonelTablo
                   onSubmit={(selectedData) => {
                     setValue("personelTanim", selectedData.subject);
@@ -422,10 +436,10 @@ export default function MainTabs() {
                   }}
                 />
               ) : (
-                <Button disabled={!yapildi}>+</Button>
+                <Button disabled={!isStatusActive}>+</Button>
               )}
 
-              <Button disabled={!yapildi} onClick={handlePersonelMinusClick}>
+              <Button disabled={!isStatusActive} onClick={handlePersonelMinusClick}>
                 {" "}
                 -{" "}
               </Button>
@@ -442,7 +456,8 @@ export default function MainTabs() {
             width: "100%",
             justifyContent: "space-between",
             marginBottom: "10px",
-          }}>
+          }}
+        >
           <Text style={{ fontSize: "14px" }}>Başlangıç Zamanı:</Text>
           <div
             style={{
@@ -453,19 +468,12 @@ export default function MainTabs() {
               minWidth: "300px",
               gap: "10px",
               width: "100%",
-            }}>
+            }}
+          >
             <Controller
               name="baslangicTarihi"
               control={control}
-              render={({ field }) => (
-                <DatePicker
-                  {...field}
-                  disabled={!yapildi}
-                  style={{ width: "180px" }}
-                  format={localeDateFormat}
-                  placeholder="Tarih seçiniz"
-                />
-              )}
+              render={({ field }) => <DatePicker {...field} disabled={!isStatusActive} style={{ width: "180px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />}
             />
             <Controller
               name="baslangicSaati"
@@ -475,7 +483,7 @@ export default function MainTabs() {
                   {...field}
                   changeOnScroll
                   needConfirm={false}
-                  disabled={!yapildi}
+                  disabled={!isStatusActive}
                   style={{ width: "110px" }}
                   format={localeTimeFormat}
                   placeholder="Saat seçiniz"
@@ -498,7 +506,8 @@ export default function MainTabs() {
             width: "100%",
             justifyContent: "space-between",
             marginBottom: "10px",
-          }}>
+          }}
+        >
           <div
             style={{
               display: "flex",
@@ -506,7 +515,8 @@ export default function MainTabs() {
               width: "100%",
               maxWidth: "435px",
               justifyContent: "space-between",
-            }}>
+            }}
+          >
             <Text style={{ fontSize: "14px" }}>Bitiş Zamanı:</Text>
             <div
               style={{
@@ -517,19 +527,12 @@ export default function MainTabs() {
                 minWidth: "300px",
                 gap: "10px",
                 width: "100%",
-              }}>
+              }}
+            >
               <Controller
                 name="bitisTarihi"
                 control={control}
-                render={({ field }) => (
-                  <DatePicker
-                    {...field}
-                    disabled={!yapildi}
-                    style={{ width: "180px" }}
-                    format={localeDateFormat}
-                    placeholder="Tarih seçiniz"
-                  />
-                )}
+                render={({ field }) => <DatePicker {...field} disabled={!isStatusActive} style={{ width: "180px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />}
               />
               <Controller
                 name="bitisSaati"
@@ -539,7 +542,7 @@ export default function MainTabs() {
                     {...field}
                     changeOnScroll
                     needConfirm={false}
-                    disabled={!yapildi}
+                    disabled={!isStatusActive}
                     style={{ width: "110px" }}
                     format={localeTimeFormat}
                     placeholder="Saat seçiniz"
@@ -551,11 +554,7 @@ export default function MainTabs() {
 
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}>
             <Text style={{ fontSize: "14px" }}>Süre (dk):</Text>
-            <Controller
-              name="sure"
-              control={control}
-              render={({ field }) => <InputNumber {...field} disabled={!yapildi} min={0} style={{ width: "200px" }} />}
-            />
+            <Controller name="sure" control={control} render={({ field }) => <InputNumber {...field} disabled={!isStatusActive} min={0} style={{ width: "200px" }} />} />
           </div>
         </div>
         <StyledTabs defaultActiveKey="1" items={items} onChange={onChange} />

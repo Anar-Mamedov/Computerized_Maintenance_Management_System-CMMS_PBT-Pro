@@ -1,12 +1,20 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs, message, Spin } from "antd";
+import React, { useEffect, useState } from "react";
+import { Button, Modal, message, Spin } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../../api/http";
-import { Controller, useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
 import dayjs from "dayjs";
 
-export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID, kapali }) {
+export default function CreateModal({
+  onRefresh,
+  secilenIsEmriID,
+  kapali,
+  triggerButtonText = "Yeni Kayıt",
+  triggerButtonType = "link",
+  triggerButtonClassName,
+  triggerContainerClassName,
+}) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const methods = useForm({
@@ -14,7 +22,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       siraNo: "",
       secilenID: "",
       isTanimi: "",
-      yapildi: false,
+      yapildi: 0,
       atolyeTanim: "",
       atolyeID: "",
       personelTanim: "",
@@ -31,7 +39,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     },
   });
 
-  const { setValue, reset, handleSubmit, watch } = methods;
+  const { setValue, reset, watch } = methods;
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
@@ -49,7 +57,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     const Body = {
       TB_ISEMRI_KONTROLLIST_ID: 0,
       DKN_SIRANO: data.siraNo,
-      DKN_YAPILDI: data.yapildi,
+      DKN_YAPILDI: Number(data.yapildi || 0),
       DKN_TANIM: data.isTanimi,
       // DKN_MALIYET: data.maliyet, // Maliyet diye bir alan yok frontda
       DKN_YAPILDI_PERSONEL_ID: data.personelID,
@@ -128,9 +136,9 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
   return (
     <FormProvider {...methods}>
       <div>
-        <div style={{ display: "flex", width: "100%", justifyContent: "flex-end", marginBottom: "10px" }}>
-          <Button disabled={kapali} type="link" onClick={handleModalToggle}>
-            <PlusOutlined /> Yeni Kayıt
+        <div className={triggerContainerClassName} style={{ display: "flex", width: "100%", justifyContent: "flex-end", marginBottom: "10px" }}>
+          <Button disabled={kapali} type={triggerButtonType} className={triggerButtonClassName} onClick={handleModalToggle}>
+            <PlusOutlined /> {triggerButtonText}
           </Button>
         </div>
 
