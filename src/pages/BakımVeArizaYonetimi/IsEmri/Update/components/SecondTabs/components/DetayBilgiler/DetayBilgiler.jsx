@@ -75,25 +75,27 @@ export default function DetayBilgiler({ fieldRequirements }) {
   const kapali = watch("kapali"); // Assuming 'kapali' is the name of the field in your form
 
   const handleProsedurMinusClick = async () => {
-    try {
-      // API isteğini yap
-      const response = await AxiosInstance.get(`RevmoveProsedurFromIsEmri?isEmriId=${secilenIsEmriID}&isTanimId=${prosedurID}`);
-      // İsteğin başarılı olduğunu kontrol et
-      if ((response && response.status_code === 200) || response.status_code === 201) {
-        // Başarılı işlem mesajı veya başka bir işlem yap
-        message.success("İşlem Başarılı!");
-        console.log("İşlem başarılı.");
-      } else if (response.status_code === 401) {
-        message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
-      } else {
-        message.error("İşlem Başarısız!");
-        // Hata mesajı göster
-        console.error("Bir hata oluştu.");
+    if (secilenIsEmriID && prosedurID) {
+      try {
+        // API isteğini yap
+        const response = await AxiosInstance.get(`RevmoveProsedurFromIsEmri?isEmriId=${secilenIsEmriID}&isTanimId=${prosedurID}`);
+        // İsteğin başarılı olduğunu kontrol et
+        if ((response && response.status_code === 200) || response.status_code === 201) {
+          // Başarılı işlem mesajı veya başka bir işlem yap
+          message.success("İşlem Başarılı!");
+          console.log("İşlem başarılı.");
+        } else if (response.status_code === 401) {
+          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+        } else {
+          message.error("İşlem Başarısız!");
+          // Hata mesajı göster
+          console.error("Bir hata oluştu.");
+        }
+      } catch (error) {
+        // Hata yakalama
+        console.error("API isteği sırasında bir hata oluştu:", error);
+        message.error("Başarısız Olundu.");
       }
-    } catch (error) {
-      // Hata yakalama
-      console.error("API isteği sırasında bir hata oluştu:", error);
-      message.error("Başarısız Olundu.");
     }
 
     setValue("prosedur", "");
@@ -447,13 +449,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
             </div>
           </div>
           <div style={{ width: "100%", marginTop: "5px" }}>
-            <Controller
-              name="isEmriAciklama"
-              control={control}
-              render={({ field }) => (
-                <TextArea {...field} rows={3} style={{ width: "100%" }} placeholder="Açıklama" />
-              )}
-            />
+            <Controller name="isEmriAciklama" control={control} render={({ field }) => <TextArea {...field} rows={3} style={{ width: "100%" }} placeholder="Açıklama" />} />
           </div>
         </div>
 
