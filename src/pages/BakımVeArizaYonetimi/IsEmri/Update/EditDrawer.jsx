@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { Button, Drawer, Space, ConfigProvider, Modal, Spin, message } from "antd";
+import { QrcodeOutlined } from "@ant-design/icons";
 import tr_TR from "antd/es/locale/tr_TR";
 import AxiosInstance from "../../../../api/http";
 import MainTabs from "./components/MainTabs/MainTabs";
@@ -9,6 +10,7 @@ import SecondTabs from "./components/SecondTabs/SecondTabs";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { t } from "i18next";
+import QRCodeGenerator from "../../../../utils/components/QRCodeGenerator";
 
 dayjs.extend(customParseFormat);
 
@@ -19,6 +21,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   const [disabled, setDisabled] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [onayCheck, setOnayCheck] = useState(false);
+  const [qrModalOpen, setQrModalOpen] = useState(false);
+  const [assignmentRequestKey, setAssignmentRequestKey] = useState(0);
   // API'den gelen zorunluluk bilgilerini simüle eden bir örnek
   const [fieldRequirements, setFieldRequirements] = React.useState({
     // Varsayılan olarak zorunlu değil
@@ -769,6 +773,18 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     });
   };
 
+  const handlePrintWorkOrderForm = () => {
+    const baseURL = localStorage.getItem("baseURL");
+    const isEmriId = selectedRow?.key || methods.getValues("secilenIsEmriID");
+
+    if (!baseURL || !isEmriId) {
+      message.error("İş emri formu açılamadı.");
+      return;
+    }
+
+    window.open(`${baseURL}/FormRapor/GetFormByType?id=${isEmriId}&tipId=1`, "_blank");
+  };
+
   return (
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
@@ -785,6 +801,39 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           open={open}
           extra={
             <Space>
+              <Button icon={<QrcodeOutlined />} disabled={actionLoading} onClick={() => setQrModalOpen(true)}>
+                {t("qrKod")}
+              </Button>
+              <Button
+                disabled={actionLoading}
+                onClick={handlePrintWorkOrderForm}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  backgroundColor: "#f8fafc",
+                  borderColor: "#d9e0ea",
+                  color: "#4b5563",
+                }}
+              >
+                <span style={{ fontSize: "14px", lineHeight: 1 }}>🖨</span>
+                Yazdır
+              </Button>
+              <Button
+                disabled={actionLoading}
+                onClick={() => setAssignmentRequestKey((prevKey) => prevKey + 1)}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  backgroundColor: "#f8fafc",
+                  borderColor: "#d9e0ea",
+                  color: "#4b5563",
+                }}
+              >
+                <span style={{ fontSize: "14px", lineHeight: 1 }}>👷</span>
+                Atama
+              </Button>
               <Button danger disabled={disabled || actionLoading} loading={actionLoading} onClick={methods.handleSubmit(onSubmitAndClose)}>
                 Kapat
               </Button>
@@ -821,11 +870,19 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           ) : (
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <MainTabs disabled={disabled} isDisabled={isDisabled} fieldRequirements={fieldRequirements} />
-              <SecondTabs disabled={disabled} fieldRequirements={fieldRequirements} />
+              <SecondTabs disabled={disabled} fieldRequirements={fieldRequirements} assignmentRequestKey={assignmentRequestKey} />
               <Footer />
             </form>
           )}
         </Drawer>
+
+        <QRCodeGenerator
+          visible={qrModalOpen}
+          onClose={() => setQrModalOpen(false)}
+          value={`TB_ISEMRI_ID: ${watch("secilenIsEmriID") || selectedRow?.key || ""}`}
+          fileName={`QR-${watch("isEmriNo") || selectedRow?.key || "IsEmri"}`}
+          title="İş Emri QR Kodu"
+        />
       </ConfigProvider>
     </FormProvider>
   );
