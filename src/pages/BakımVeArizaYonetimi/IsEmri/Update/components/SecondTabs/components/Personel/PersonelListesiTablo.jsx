@@ -147,7 +147,7 @@ const normalizePersonnelItem = (item, index) => ({
   IDK_FAZLA_MESAI_VAR: normalizeBoolean(item.IDK_FAZLA_MESAI_VAR),
 });
 
-export default function PersonelListesiTablo({ isActive }) {
+export default function PersonelListesiTablo({ isActive, assignmentRequestKey }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const { watch } = useFormContext();
@@ -312,6 +312,7 @@ export default function PersonelListesiTablo({ isActive }) {
             onRefresh={refreshTable}
             secilenIsEmriID={secilenIsEmriID}
             defaultCalismaSuresiDakika={defaultCalismaSuresiDakika}
+            openRequestKey={assignmentRequestKey}
             triggerButtonText={t("workOrder.personnelList.addPersonnel")}
             triggerButtonType="default"
             triggerButtonClassName="personnel-list-add-button"

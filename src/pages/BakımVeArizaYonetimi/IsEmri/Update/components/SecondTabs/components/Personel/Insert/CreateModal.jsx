@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Modal, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../../api/http";
@@ -15,6 +15,7 @@ export default function CreateModal({
   triggerButtonType = "link",
   triggerButtonClassName,
   triggerContainerClassName,
+  openRequestKey,
 }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const methods = useForm({
@@ -103,6 +104,16 @@ export default function CreateModal({
       }
     }
   };
+
+  useEffect(() => {
+    if (openRequestKey && !kapali) {
+      reset();
+      if (defaultCalismaSuresiDakika > 0) {
+        setValue("calismaSuresi", defaultCalismaSuresiDakika);
+      }
+      setIsModalVisible(true);
+    }
+  }, [openRequestKey]);
 
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi sonu
 

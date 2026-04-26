@@ -18,7 +18,7 @@ import AxiosInstance from "../../../../../../api/http";
 import Forms from "./components/KapamaBilgileri/Forms.jsx";
 import DisServis from "./components/DisServis/DisServis";
 
-export default function SecondTabs({ refreshKey, fieldRequirements }) {
+export default function SecondTabs({ refreshKey, fieldRequirements, assignmentRequestKey }) {
   const { watch } = useFormContext();
   const [activeTabKey, setActiveTabKey] = useState("1"); // Default to the first tab
   const [dataCount, setDataCount] = useState([]);
@@ -49,6 +49,12 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
       fetchData(); // fetch fonksiyonunu çağırın
     }
   }, [secilenIsEmriID]); // secilenIsEmriID veya fetch fonksiyonu değiştiğinde useEffect'i tetikle
+
+  useEffect(() => {
+    if (assignmentRequestKey) {
+      setActiveTabKey("3");
+    }
+  }, [assignmentRequestKey]);
 
   const items = [
     {
@@ -84,6 +90,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
         <PersonelListesiTablo
           isActive={activeTabKey === "3"}
           fieldRequirements={fieldRequirements}
+          assignmentRequestKey={assignmentRequestKey}
         />
       ),
     },
@@ -223,7 +230,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
   return (
     <div>
       <Tabs
-        defaultActiveKey="1"
+        activeKey={activeTabKey}
         items={filteredItems}
         onChange={onChange}
       />

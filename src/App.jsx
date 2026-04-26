@@ -4,6 +4,7 @@ import { Breadcrumb, Layout, Menu, theme, Button, Typography, Input, Modal } fro
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import Draggable from "react-draggable";
 // import Isemri from "./pages/DashboardAnalytics2/Isemri";
@@ -395,7 +396,7 @@ const BaseLayout = () => {
               <img src={currentLogo} alt="Logo" style={logoStyle} />
               <Text style={{ color: "white", marginTop: "11px" }}>v. 1.7.5</Text>
             </div>
-            <MenuWrapper />
+            <MenuWrapper collapsed={collapsed} />
           </Sider>
         )) || (
           <Sider
@@ -420,7 +421,7 @@ const BaseLayout = () => {
               <img src={currentLogo} alt="Logo" style={logoStyle} />
               <Text style={{ color: "white", marginTop: "11px" }}>v. 1.7.5</Text>
             </div>
-            <MenuWrapper />
+            <MenuWrapper collapsed={collapsed} />
             <FloatButton /> {/*FloatButton ekranran görüntüsü alacak ve help deske göndericek*/}
           </Sider>
         )}
@@ -487,11 +488,48 @@ function cleanItemsForMenu(items) {
   });
 }
 
-const MenuWrapper = () => {
+const normalizeMenuSearchText = (value = "") => {
+  return value
+    .toLocaleLowerCase("tr-TR")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+};
+
+function filterMenuItemsBySearch(items, searchText) {
+  const normalizedSearch = normalizeMenuSearchText(searchText);
+
+  if (!normalizedSearch) {
+    return items;
+  }
+
+  return items
+    .map((item) => {
+      const labelMatches = normalizeMenuSearchText(item.labelText).includes(normalizedSearch);
+
+      if (labelMatches) {
+        return item;
+      }
+
+      const filteredChildren = item.children ? filterMenuItemsBySearch(item.children, searchText) : [];
+
+      if (filteredChildren.length > 0) {
+        return {
+          ...item,
+          children: filteredChildren,
+        };
+      }
+
+      return null;
+    })
+    .filter(Boolean);
+}
+
+const MenuWrapper = ({ collapsed }) => {
   const location = useLocation();
   const [disabled, setDisabled] = useState(true);
   const [open, setOpen] = useState(false);
   const [openKeys, setOpenKeys] = useState([]);
+  const [menuSearchText, setMenuSearchText] = useState("");
   const [selectedMenuItem, setSelectedMenuItem] = useRecoilState(selectedMenuItemState);
   const setMenuItems = useSetRecoilState(menuItemsState);
   const [user] = useRecoilState(userState);
@@ -505,6 +543,18 @@ const MenuWrapper = () => {
   const items = useMemo(() => {
     return filterItems(rawItems, loginData, token);
   }, [loginData, token]);
+
+  const filteredMenuItems = useMemo(() => {
+    return filterMenuItemsBySearch(items, menuSearchText);
+  }, [items, menuSearchText]);
+
+  const searchedOpenKeys = useMemo(() => {
+    if (!menuSearchText.trim()) {
+      return openKeys;
+    }
+
+    return filteredMenuItems.filter((item) => item.children?.length).map((item) => item.key);
+  }, [filteredMenuItems, menuSearchText, openKeys]);
 
   const [bounds, setBounds] = useState({
     left: 0,
@@ -573,17 +623,35 @@ const MenuWrapper = () => {
   };
 
   // Ant Design Menu'ye göndermeden önce gereksiz propları temizle
-  const cleanedItems = cleanItemsForMenu(items);
+  const cleanedItems = cleanItemsForMenu(filteredMenuItems);
 
   return (
     <div style={{ height: "calc(100vh - 115px)", overflow: "auto" }}>
+      {!collapsed && (
+        <div style={{ padding: "0 8px 10px" }}>
+          <Input
+            allowClear
+            prefix={<SearchOutlined style={{ color: "#9aa4b2" }} />}
+            placeholder="Menüde ara"
+            value={menuSearchText}
+            onChange={(event) => setMenuSearchText(event.target.value)}
+            style={{
+              height: 36,
+              borderRadius: 8,
+              backgroundColor: "#101b2a",
+              borderColor: "#243247",
+              color: "#e8eaed",
+            }}
+          />
+        </div>
+      )}
       <Menu
         theme="dark"
         defaultSelectedKeys={[location.pathname.split("/")[1]]}
         selectedKeys={[selectedMenuItem]}
         mode="inline"
         items={cleanedItems}
-        openKeys={openKeys}
+        openKeys={searchedOpenKeys}
         onOpenChange={onOpenChange}
         onClick={handleMenuClick}
       />

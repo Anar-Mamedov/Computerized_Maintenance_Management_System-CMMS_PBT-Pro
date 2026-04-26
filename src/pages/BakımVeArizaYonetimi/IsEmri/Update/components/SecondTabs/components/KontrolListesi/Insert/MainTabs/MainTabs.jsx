@@ -299,32 +299,49 @@ export default function MainTabs() {
       </div>
       <div
         style={{
-          position: "relative",
-          top: "10px",
-          left: "10px",
-          background: "white",
-          width: "155px",
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+          maxWidth: "450px",
+          gap: "10px",
+          rowGap: "0px",
+          marginBottom: "10px",
         }}
       >
-        <Controller
-          name="yapildi"
-          control={control}
-          render={({ field }) => (
-            <Select
-              {...field}
-              value={Number(field.value || 0)}
-              style={{ width: 150 }}
-              options={[
-                { value: 0, label: t("workOrder.controlList.waiting") },
-                { value: 1, label: t("workOrder.controlList.completed") },
-                { value: 2, label: t("workOrder.controlList.critical") },
-              ]}
-              onChange={(value) => field.onChange(value)}
-            />
-          )}
-        />
+        <Text style={{ fontSize: "14px" }}>Durum:</Text>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            maxWidth: "300px",
+            minWidth: "300px",
+            gap: "10px",
+            width: "100%",
+          }}
+        >
+          <Controller
+            name="yapildi"
+            control={control}
+            render={({ field }) => (
+              <Select
+                {...field}
+                value={Number(field.value || 0)}
+                style={{ width: 150 }}
+                options={[
+                  { value: 0, label: t("workOrder.controlList.waiting") },
+                  { value: 1, label: t("workOrder.controlList.completed") },
+                  { value: 2, label: t("workOrder.controlList.critical") },
+                ]}
+                onChange={(value) => field.onChange(value)}
+              />
+            )}
+          />
+        </div>
       </div>
-      <div style={{ border: "1px solid #ececec", padding: "15px" }}>
+      <div style={{ border: "1px solid #ececec", padding: "12px 15px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", marginBottom: "10px" }}>
           <StyledDivBottomLine
             style={{
