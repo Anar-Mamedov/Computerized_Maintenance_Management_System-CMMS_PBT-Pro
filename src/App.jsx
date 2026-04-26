@@ -627,11 +627,29 @@ const MenuWrapper = ({ collapsed }) => {
 
   return (
     <div style={{ height: "calc(100vh - 115px)", overflow: "auto" }}>
+      <style>{`
+        .sidebar-menu-search input::placeholder {
+          color: rgba(255, 255, 255, 0.45) !important;
+          opacity: 1;
+        }
+        .sidebar-menu-search .ant-input {
+          color: #ffffff !important;
+          background: transparent !important;
+        }
+        .sidebar-menu-search .ant-input-prefix,
+        .sidebar-menu-search .ant-input-clear-icon {
+          color: rgba(255, 255, 255, 0.9) !important;
+        }
+        .sidebar-menu-search .ant-input-clear-icon:hover {
+          color: #ffffff !important;
+        }
+      `}</style>
       {!collapsed && (
         <div style={{ padding: "0 8px 10px" }}>
           <Input
+            className="sidebar-menu-search"
             allowClear
-            prefix={<SearchOutlined style={{ color: "#9aa4b2" }} />}
+            prefix={<SearchOutlined />}
             placeholder="Menüde ara"
             value={menuSearchText}
             onChange={(event) => setMenuSearchText(event.target.value)}
