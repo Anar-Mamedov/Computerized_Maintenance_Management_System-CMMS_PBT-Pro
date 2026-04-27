@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Input, message, Popconfirm, Popover, Select, Table, Typography } from "antd";
+import { Button, Input, InputNumber, message, Popconfirm, Popover, Select, Table, Typography } from "antd";
 import { DeleteOutlined, MoreOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -119,7 +119,13 @@ const ControlListWrapper = styled.div`
   }
 
   .control-list-step {
+    cursor: pointer;
     font-weight: 600;
+  }
+
+  .control-list-step:hover {
+    color: #1464ff;
+    text-decoration: underline;
   }
 
   .control-list-field {
@@ -130,6 +136,23 @@ const ControlListWrapper = styled.div`
     background: #f9fbfe;
     color: #405574;
     line-height: 1.35;
+  }
+
+  .control-list-editable-field {
+    width: 100%;
+  }
+
+  .control-list-editable-field.ant-input,
+  .control-list-editable-field .ant-input-number-input {
+    color: #405574;
+  }
+
+  .control-list-editable-field.ant-input,
+  .control-list-editable-field.ant-input-number {
+    min-height: 33px;
+    border-color: #dbe4f0;
+    border-radius: 8px;
+    background: #f9fbfe;
   }
 
   .control-list-status .ant-select-selector {
@@ -241,11 +264,6 @@ export default function KontrolListesiTablo({ isActive }) {
     return value;
   };
 
-  const formatDuration = (value) => {
-    if (value === null || value === undefined || value === "") return "-";
-    return `${value} ${t("workOrder.controlList.minuteShort")}`;
-  };
-
   const getStatusOptions = () => [
     { value: 0, label: t("workOrder.controlList.waiting") },
     { value: 1, label: t("workOrder.controlList.completed") },
@@ -292,6 +310,47 @@ export default function KontrolListesiTablo({ isActive }) {
     }
   };
 
+  const updateChecklistInlineField = async (record, fieldName, value) => {
+    const nextRecord = {
+      ...record,
+      [fieldName]: value,
+    };
+
+    if (fieldName === "DKN_YAPILDI_SURE") {
+      nextRecord.Sure = value;
+    }
+
+    if (fieldName === "DKN_ACIKLAMA") {
+      nextRecord.Not = value;
+    }
+
+    const previousData = data;
+    setData((currentData) => currentData.map((item) => (item.key === record.key ? { ...item, ...nextRecord } : item)));
+
+    try {
+      const response = await AxiosInstance.post(`AddUpdateIsEmriKontrolList?isEmriId=${secilenIsEmriID}`, buildChecklistPayload(nextRecord));
+
+      if (response?.status_code && response.status_code !== 200 && response.status_code !== 201) {
+        setData(previousData);
+        message.error(t("workOrder.controlList.statusUpdateError"));
+      }
+    } catch (error) {
+      console.error("Kontrol listesi alan güncelleme hatası:", error);
+      setData(previousData);
+      message.error(t("workOrder.controlList.statusUpdateError"));
+    }
+  };
+
+  const handleInlineDurationChange = (record, value) => {
+    const nextValue = value ?? 0;
+    setData((currentData) => currentData.map((item) => (item.key === record.key ? { ...item, DKN_YAPILDI_SURE: nextValue, Sure: nextValue } : item)));
+  };
+
+  const handleInlineNoteChange = (record, event) => {
+    const nextValue = event.target.value;
+    setData((currentData) => currentData.map((item) => (item.key === record.key ? { ...item, DKN_ACIKLAMA: nextValue, Not: nextValue } : item)));
+  };
+
   const columns = [
     {
       title: t("workOrder.controlList.no"),
@@ -306,7 +365,11 @@ export default function KontrolListesiTablo({ isActive }) {
       key: "DKN_TANIM",
       width: 360,
       ellipsis: true,
-      render: (text) => <span className="control-list-step">{getEmptyText(text)}</span>,
+      render: (text, record) => (
+        <span className="control-list-step" onClick={() => onRowClick(record)}>
+          {getEmptyText(text)}
+        </span>
+      ),
     },
     {
       title: t("workOrder.controlList.status"),
@@ -337,13 +400,35 @@ export default function KontrolListesiTablo({ isActive }) {
       dataIndex: "DKN_YAPILDI_SURE",
       key: "DKN_YAPILDI_SURE",
       width: 130,
-      render: (text) => <div className="control-list-field">{formatDuration(text)}</div>,
+      render: (text, record) => (
+        <InputNumber
+          className="control-list-editable-field"
+          value={Number(text || 0)}
+          min={0}
+          disabled={kapali}
+          formatter={(value) => `${value ?? 0} ${t("workOrder.controlList.minuteShort")}`}
+          parser={(value) => Number(String(value || "0").replace(/\D/g, ""))}
+          onClick={(event) => event.stopPropagation()}
+          onChange={(value) => handleInlineDurationChange(record, value)}
+          onBlur={(event) => updateChecklistInlineField(record, "DKN_YAPILDI_SURE", Number(String(event.target.value || "0").replace(/\D/g, "")))}
+        />
+      ),
     },
     {
       title: t("workOrder.controlList.note"),
       dataIndex: "DKN_ACIKLAMA",
       key: "DKN_ACIKLAMA",
-      render: (text) => <div className="control-list-field">{getEmptyText(text)}</div>,
+      render: (text, record) => (
+        <Input
+          className="control-list-editable-field"
+          value={text || ""}
+          disabled={kapali}
+          placeholder="-"
+          onClick={(event) => event.stopPropagation()}
+          onChange={(event) => handleInlineNoteChange(record, event)}
+          onBlur={(event) => updateChecklistInlineField(record, "DKN_ACIKLAMA", event.target.value)}
+        />
+      ),
     },
   ];
 
@@ -501,15 +586,6 @@ export default function KontrolListesiTablo({ isActive }) {
             selectedRowKeys,
             onChange: onRowSelectChange,
           }}
-          onRow={(record) => ({
-            onClick: (event) => {
-              if (event.target.closest(".ant-table-selection-column, .ant-checkbox-wrapper, .ant-checkbox, .ant-select, button, input, textarea")) {
-                return;
-              }
-
-              onRowClick(record);
-            },
-          })}
           columns={columns}
           dataSource={data}
           loading={loading}
