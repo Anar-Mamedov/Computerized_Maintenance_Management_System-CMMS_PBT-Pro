@@ -302,8 +302,8 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 display: "flex",
                 // flexWrap: "wrap",
                 alignItems: "flex-start",
-                maxWidth: "300px",
-                minWidth: "300px",
+                maxWidth: "325px",
+                minWidth: "325px",
                 gap: "10px",
                 width: "100%",
               }}
@@ -350,14 +350,14 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
               justifyContent: "space-between",
             }}
           >
-            <Text style={{ fontSize: "14px", fontWeight: "600" }}>Düzenlenme Tarihi:</Text>
+            <Text style={{ fontSize: "14px", fontWeight: "600" }}>Düzenlenme:</Text>
             <div
               style={{
                 display: "flex",
                 flexWrap: "wrap",
                 alignItems: "center",
-                maxWidth: "300px",
-                minWidth: "300px",
+                maxWidth: "325px",
+                minWidth: "325px",
                 gap: "10px",
                 width: "100%",
               }}
@@ -372,7 +372,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                     disabled={!duzenlemeZamaniEditPermission}
                     status={error ? "error" : ""}
                     // disabled={!isDisabled}
-                    style={{ width: "180px" }}
+                    style={{ width: "205px" }}
                     format={localeDateFormat}
                     placeholder="Tarih seçiniz"
                   />
@@ -438,7 +438,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                   flexWrap: "wrap",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  width: "300px",
+                  width: "325px",
                 }}
               >
                 <Controller
@@ -450,7 +450,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                       {...field}
                       status={errors.isEmriDurum ? "error" : ""}
                       type="text" // Set the type to "text" for name input
-                      style={{ width: "255px" }}
+                      style={{ width: "280px" }}
                       disabled
                     />
                   )}
@@ -724,7 +724,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
             justifyContent: "center",
             alignItems: "center",
             width: "250px",
-            height: "260px",
+            height: "215px",
           }}
         >
           <ResimCarousel />

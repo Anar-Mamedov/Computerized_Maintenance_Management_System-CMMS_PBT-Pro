@@ -11,7 +11,7 @@ const CenteredDiv = styled.div`
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
-  height: 260px !important;
+  height: 215px !important;
 `;
 
 const ResimCarousel = () => {
@@ -77,7 +77,7 @@ const ResimCarousel = () => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          height: "260px",
+          height: "215px",
         }}
       >
         <Spin size="large" />
@@ -119,7 +119,7 @@ const ResimCarousel = () => {
               <Image
                 src={url}
                 alt={`Resim ${index}`}
-                style={{ width: "250px", height: "260px", objectFit: "cover" }}
+                style={{ width: "250px", height: "215px", objectFit: "cover" }}
               />
             </div>
           ))

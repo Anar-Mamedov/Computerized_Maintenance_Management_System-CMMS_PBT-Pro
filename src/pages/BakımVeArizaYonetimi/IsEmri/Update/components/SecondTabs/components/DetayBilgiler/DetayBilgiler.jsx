@@ -244,13 +244,14 @@ export default function DetayBilgiler({ fieldRequirements }) {
       }
     `}
       </style>
-      <div style={{ display: "flex", gap: "10px" }}>
+      <div style={{ display: "flex", alignItems: "stretch", gap: "10px" }}>
         <div
           style={{
             background: "#F3F8FE",
             border: "1px solid #E5EDF7",
             borderRadius: "10px",
             padding: "16px",
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             gap: "10px",
@@ -314,7 +315,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       flexWrap: "wrap",
                       alignItems: "center",
                       justifyContent: "space-between",
-                      width: "300px",
+                      width: "325px",
                     }}
                   >
                     <Controller
@@ -328,7 +329,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                           {...field}
                           status={errors.prosedur ? "error" : ""}
                           type="text" // Set the type to "text" for name input
-                          style={{ width: "215px" }}
+                          style={{ width: "240px" }}
                           disabled
                         />
                       )}
@@ -387,7 +388,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     style={{
                       display: "flex",
                       flexWrap: "wrap",
-                      maxWidth: "300px",
+                      maxWidth: "325px",
                       width: "100%",
                       flexDirection: "column",
                     }}
@@ -774,6 +775,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                 border: "1px solid #E5EDF7",
                 borderRadius: "10px",
                 padding: "16px",
+                height: "100%",
                 display: "flex",
                 flexDirection: "column",
                 gap: "10px",
@@ -1087,68 +1089,51 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   {errors.bitisZamaniSaati && <div style={{ color: "red", marginTop: "5px" }}>{errors.bitisZamaniSaati.message}</div>}
                 </div>
               </div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  flexWrap: "wrap",
-                }}
-              >
-                <StyledDivBottomLine
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+                <Text
                   style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    maxWidth: "480px",
+                    fontSize: "14px",
+                    fontWeight: fieldRequirements.calismaSuresi ? "600" : "normal",
                   }}
                 >
-                  <Text
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: fieldRequirements.calismaSuresi ? "600" : "normal",
-                    }}
-                  >
-                    Çalışma Süresi (Saat - dk):
-                  </Text>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      width: "300px",
-                    }}
-                  >
-                    <Controller
-                      name="calismaSaat"
-                      control={control}
-                      rules={{
-                        required: fieldRequirements.calismaSuresi ? "Alan Boş Bırakılamaz!" : false,
-                      }}
-                      render={({ field }) => (
-                        <InputNumber
-                          {...field}
-                          min={0}
-                          // max={24}
-                          status={errors.calismaSuresi ? "error" : ""}
-                          style={{ width: "145px" }}
-                        />
-                      )}
+                  Çalışma Süresi Saat:
+                </Text>
+                <Controller
+                  name="calismaSaat"
+                  control={control}
+                  rules={{
+                    required: fieldRequirements.calismaSuresi ? "Alan Boş Bırakılamaz!" : false,
+                  }}
+                  render={({ field }) => (
+                    <InputNumber
+                      {...field}
+                      min={0}
+                      // max={24}
+                      status={errors.calismaSuresi ? "error" : ""}
+                      style={{ width: "300px" }}
                     />
-                    <Controller
-                      name="calismaDakika"
-                      control={control}
-                      rules={{
-                        required: fieldRequirements.calismaDakika ? "Alan Boş Bırakılamaz!" : false,
-                      }}
-                      render={({ field }) => <InputNumber {...field} min={0} max={59} status={errors.calismaDakika ? "error" : ""} style={{ width: "145px" }} />}
-                    />
-                    {errors.calismaDakika && <div style={{ color: "red", marginTop: "5px" }}>{errors.calismaDakika.message}</div>}
-                  </div>
-                </StyledDivBottomLine>
+                  )}
+                />
               </div>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+                <Text
+                  style={{
+                    fontSize: "14px",
+                    fontWeight: fieldRequirements.calismaDakika ? "600" : "normal",
+                  }}
+                >
+                  Çalışma Süresi Dakika:
+                </Text>
+                <Controller
+                  name="calismaDakika"
+                  control={control}
+                  rules={{
+                    required: fieldRequirements.calismaDakika ? "Alan Boş Bırakılamaz!" : false,
+                  }}
+                  render={({ field }) => <InputNumber {...field} min={0} max={59} status={errors.calismaDakika ? "error" : ""} style={{ width: "300px" }} />}
+                />
+              </div>
+              {errors.calismaDakika && <div style={{ color: "red", marginTop: "5px" }}>{errors.calismaDakika.message}</div>}
             </div>
           </div>
         </div>

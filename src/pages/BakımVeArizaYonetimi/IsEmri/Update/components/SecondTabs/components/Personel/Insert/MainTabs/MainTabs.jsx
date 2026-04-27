@@ -344,7 +344,7 @@ export default function MainTabs() {
               style={{
                 border: "1px solid #ececec",
                 padding: "15px",
-                width: "325px",
+                width: "360px",
                 marginBottom: "10px",
               }}
             >
@@ -478,7 +478,7 @@ export default function MainTabs() {
                 style={{
                   border: "1px solid #ececec",
                   padding: "15px",
-                  width: "325px",
+                  width: "360px",
                   marginBottom: "10px",
                 }}
               >

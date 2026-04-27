@@ -60,11 +60,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements, assignmentRe
       label: "Detay Bilgiler",
       children: <DetayBilgiler fieldRequirements={fieldRequirements} />,
     },
-    {
-      key: "16",
-      label: "Dış Servis",
-      children: <DisServis fieldRequirements={fieldRequirements} />,
-    },
+
     {
       key: "2",
       label: dataCount.IsEmriKontrolListSayisi >= 1 ? `Kontrol Listesi (${dataCount.IsEmriKontrolListSayisi})` : "Kontrol Listesi",
@@ -84,6 +80,11 @@ export default function SecondTabs({ refreshKey, fieldRequirements, assignmentRe
       key: "5",
       label: dataCount.IsEmriDurusListSayisi >= 1 ? `Duruşlar (${dataCount.IsEmriDurusListSayisi})` : "Duruşlar",
       children: <DuruslarListesiTablo isActive={activeTabKey === "5"} fieldRequirements={fieldRequirements} />,
+    },
+    {
+      key: "16",
+      label: "Dış Servis",
+      children: <DisServis fieldRequirements={fieldRequirements} />,
     },
     {
       key: "6",
