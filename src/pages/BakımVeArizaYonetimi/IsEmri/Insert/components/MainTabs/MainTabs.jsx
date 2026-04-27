@@ -361,7 +361,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
               justifyContent: "space-between",
             }}
           >
-            <Text style={{ fontSize: "14px", fontWeight: "600" }}>Düzenlenme Tarihi:</Text>
+            <Text style={{ fontSize: "14px", fontWeight: "600" }}>Düzenlenme:</Text>
             <div
               style={{
                 display: "flex",

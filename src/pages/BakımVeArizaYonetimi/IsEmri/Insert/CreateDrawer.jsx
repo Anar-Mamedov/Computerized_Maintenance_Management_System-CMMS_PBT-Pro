@@ -421,7 +421,7 @@ export default function CreateDrawer({ onRefresh }) {
           Ekle
         </Button>
         <Drawer
-          width="1460px"
+          width="1500px"
           title={
             <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
               <div>İş Emri Ekle</div>
