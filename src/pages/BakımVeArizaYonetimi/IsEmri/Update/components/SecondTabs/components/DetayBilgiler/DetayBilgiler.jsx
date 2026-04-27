@@ -1089,49 +1089,62 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   {errors.bitisZamaniSaati && <div style={{ color: "red", marginTop: "5px" }}>{errors.bitisZamaniSaati.message}</div>}
                 </div>
               </div>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  maxWidth: "480px",
+                  gap: "10px",
+                  width: "100%",
+                  justifyContent: "space-between",
+                  marginTop: "auto",
+                }}
+              >
                 <Text
                   style={{
                     fontSize: "14px",
                     fontWeight: fieldRequirements.calismaSuresi ? "600" : "normal",
                   }}
                 >
-                  Çalışma Süresi Saat:
+                  Çalışma Süresi (sa-dk):
                 </Text>
-                <Controller
-                  name="calismaSaat"
-                  control={control}
-                  rules={{
-                    required: fieldRequirements.calismaSuresi ? "Alan Boş Bırakılamaz!" : false,
-                  }}
-                  render={({ field }) => (
-                    <InputNumber
-                      {...field}
-                      min={0}
-                      // max={24}
-                      status={errors.calismaSuresi ? "error" : ""}
-                      style={{ width: "300px" }}
-                    />
-                  )}
-                />
-              </div>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
-                <Text
+                <div
                   style={{
-                    fontSize: "14px",
-                    fontWeight: fieldRequirements.calismaDakika ? "600" : "normal",
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    maxWidth: "300px",
+                    minWidth: "300px",
+                    gap: "10px",
+                    width: "100%",
                   }}
                 >
-                  Çalışma Süresi Dakika:
-                </Text>
-                <Controller
-                  name="calismaDakika"
-                  control={control}
-                  rules={{
-                    required: fieldRequirements.calismaDakika ? "Alan Boş Bırakılamaz!" : false,
-                  }}
-                  render={({ field }) => <InputNumber {...field} min={0} max={59} status={errors.calismaDakika ? "error" : ""} style={{ width: "300px" }} />}
-                />
+                  <Controller
+                    name="calismaSaat"
+                    control={control}
+                    rules={{
+                      required: fieldRequirements.calismaSuresi ? "Alan Boş Bırakılamaz!" : false,
+                    }}
+                    render={({ field }) => (
+                      <InputNumber
+                        {...field}
+                        min={0}
+                        // max={24}
+                        status={errors.calismaSuresi ? "error" : ""}
+                        style={{ width: "145px" }}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="calismaDakika"
+                    control={control}
+                    rules={{
+                      required: fieldRequirements.calismaDakika ? "Alan Boş Bırakılamaz!" : false,
+                    }}
+                    render={({ field }) => <InputNumber {...field} min={0} max={59} status={errors.calismaDakika ? "error" : ""} style={{ width: "145px" }} />}
+                  />
+                </div>
               </div>
               {errors.calismaDakika && <div style={{ color: "red", marginTop: "5px" }}>{errors.calismaDakika.message}</div>}
             </div>
