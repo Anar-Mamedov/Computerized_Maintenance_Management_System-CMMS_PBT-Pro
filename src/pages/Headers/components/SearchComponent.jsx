@@ -44,7 +44,7 @@ const SearchComponent = () => {
       onSelect={handleSelect}
       onSearch={handleSearch}
     >
-      <Input placeholder="Menüde ara..." prefix={<SearchOutlined style={{ color: "#0091ff" }} />} />
+      <Input placeholder="Arama Yap..." prefix={<SearchOutlined style={{ color: "#0091ff" }} />} />
     </AutoComplete>
   );
 };
