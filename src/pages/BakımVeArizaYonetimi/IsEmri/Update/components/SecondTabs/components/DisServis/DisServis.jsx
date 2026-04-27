@@ -61,130 +61,128 @@ export default function DisServis({ fieldRequirements }) {
         }}
       >
         <div style={{ display: "flex", flexDirection: "column", gap: "10px", flex: "0 0 460px", maxWidth: "460px" }}>
-        <div style={{ marginBottom: "5px", width: "100%" }}>
-          <Text style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}>Diş Servis</Text>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-          <StyledDivBottomLine
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "480px",
-            }}
-          >
-            <Text style={{ fontSize: "14px", fontWeight: fieldRequirements?.firma ? "600" : "normal" }}>Firma:</Text>
-            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "300px" }}>
-              <Controller
-                name="firma"
-                control={control}
-                rules={{ required: fieldRequirements?.firma ? "Alan Boş Bırakılamaz!" : false }}
-                render={({ field }) => <Input {...field} status={errors.firma ? "error" : ""} type="text" style={{ width: "215px" }} disabled />}
-              />
-              <Controller name="firmaID" control={control} render={({ field }) => <Input {...field} type="text" style={{ display: "none" }} />} />
-              <FirmaTablo
-                onSubmit={(selectedData) => {
-                  setValue("firma", selectedData.subject);
-                  setValue("firmaID", selectedData.key);
-                }}
-              />
-              <Button onClick={handleFirmaMinusClick}> - </Button>
-              {errors.firma && <div style={{ color: "red", marginTop: "5px" }}>{errors.firma.message}</div>}
-            </div>
-          </StyledDivBottomLine>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-          <StyledDivBottomLine
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "480px",
-            }}
-          >
-            <Text style={{ fontSize: "14px", fontWeight: fieldRequirements?.sozlesme ? "600" : "normal" }}>Sözleşme:</Text>
-            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "300px" }}>
-              <Controller
-                name="sozlesme"
-                control={control}
-                rules={{ required: fieldRequirements?.sozlesme ? "Alan Boş Bırakılamaz!" : false }}
-                render={({ field }) => <Input {...field} status={errors.sozlesme ? "error" : ""} type="text" style={{ width: "215px" }} disabled />}
-              />
-              <Controller name="sozlesmeID" control={control} render={({ field }) => <Input {...field} type="text" style={{ display: "none" }} />} />
-              <SozlesmeTablo
-                onSubmit={(selectedData) => {
-                  setValue("sozlesme", selectedData.CAS_TANIM);
-                  setValue("sozlesmeID", selectedData.key);
-                }}
-              />
-              <Button onClick={handleSozlesmeMinusClick}> - </Button>
-              {errors.sozlesme && <div style={{ color: "red", marginTop: "5px" }}>{errors.sozlesme.message}</div>}
-            </div>
-          </StyledDivBottomLine>
-        </div>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "480px", gap: "10px", width: "100%", justifyContent: "space-between" }}>
-          <Text style={{ fontSize: "14px", fontWeight: fieldRequirements?.evrakNo ? "600" : "normal" }}>Evrak No/Tarihi:</Text>
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
-            <Controller
-              name="evrakNo"
-              control={control}
-              rules={{ required: fieldRequirements?.evrakNo ? "Alan Boş Bırakılamaz!" : false }}
-              render={({ field }) => <InputNumber {...field} min={0} status={errors.evrakNo ? "error" : ""} style={{ width: "145px" }} />}
-            />
-            <Controller
-              name="evrakTarihi"
-              control={control}
-              rules={{ required: fieldRequirements?.evrakTarihi ? "Alan Boş Bırakılamaz!" : false }}
-              render={({ field }) => (
-                <DatePicker {...field} status={errors.evrakTarihi ? "error" : ""} style={{ width: "145px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />
-              )}
-            />
-            {errors.evrakTarihi && <div style={{ color: "red", marginTop: "5px" }}>{errors.evrakTarihi.message}</div>}
+          <div style={{ marginBottom: "5px", width: "100%" }}>
+            <Text style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}>Dış Servis</Text>
           </div>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-          <StyledDivBottomLine
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-              width: "100%",
-              maxWidth: "480px",
-            }}
-          >
-            <Text style={{ fontSize: "14px", fontWeight: fieldRequirements?.maliyet ? "600" : "normal" }}>Maliyet:</Text>
-            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "300px", gap: "10px" }}>
-              <Controller
-                name="maliyet"
-                control={control}
-                rules={{ required: fieldRequirements?.maliyet ? "Alan Boş Bırakılamaz!" : false }}
-                render={({ field }) => <InputNumber {...field} min={0} status={errors.maliyet ? "error" : ""} style={{ width: "125px" }} />}
-              />
-              <div>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "480px",
+              }}
+            >
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements?.firma ? "600" : "normal" }}>Firma:</Text>
+              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "300px" }}>
                 <Controller
-                  name="garantiKapsami"
+                  name="firma"
                   control={control}
-                  render={({ field }) => (
-                    <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-                      Garanti Kapsamında
-                    </Checkbox>
-                  )}
+                  rules={{ required: fieldRequirements?.firma ? "Alan Boş Bırakılamaz!" : false }}
+                  render={({ field }) => <Input {...field} status={errors.firma ? "error" : ""} type="text" style={{ width: "215px" }} disabled />}
                 />
+                <Controller name="firmaID" control={control} render={({ field }) => <Input {...field} type="text" style={{ display: "none" }} />} />
+                <FirmaTablo
+                  onSubmit={(selectedData) => {
+                    setValue("firma", selectedData.subject);
+                    setValue("firmaID", selectedData.key);
+                  }}
+                />
+                <Button onClick={handleFirmaMinusClick}> - </Button>
+                {errors.firma && <div style={{ color: "red", marginTop: "5px" }}>{errors.firma.message}</div>}
               </div>
-              {errors.maliyet && <div style={{ color: "red", marginTop: "5px" }}>{errors.maliyet.message}</div>}
+            </StyledDivBottomLine>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "480px",
+              }}
+            >
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements?.sozlesme ? "600" : "normal" }}>Sözleşme:</Text>
+              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "300px" }}>
+                <Controller
+                  name="sozlesme"
+                  control={control}
+                  rules={{ required: fieldRequirements?.sozlesme ? "Alan Boş Bırakılamaz!" : false }}
+                  render={({ field }) => <Input {...field} status={errors.sozlesme ? "error" : ""} type="text" style={{ width: "215px" }} disabled />}
+                />
+                <Controller name="sozlesmeID" control={control} render={({ field }) => <Input {...field} type="text" style={{ display: "none" }} />} />
+                <SozlesmeTablo
+                  onSubmit={(selectedData) => {
+                    setValue("sozlesme", selectedData.CAS_TANIM);
+                    setValue("sozlesmeID", selectedData.key);
+                  }}
+                />
+                <Button onClick={handleSozlesmeMinusClick}> - </Button>
+                {errors.sozlesme && <div style={{ color: "red", marginTop: "5px" }}>{errors.sozlesme.message}</div>}
+              </div>
+            </StyledDivBottomLine>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "480px", gap: "10px", width: "100%", justifyContent: "space-between" }}>
+            <Text style={{ fontSize: "14px", fontWeight: fieldRequirements?.evrakNo ? "600" : "normal" }}>Evrak No/Tarihi:</Text>
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", maxWidth: "300px", minWidth: "300px", gap: "10px", width: "100%" }}>
+              <Controller
+                name="evrakNo"
+                control={control}
+                rules={{ required: fieldRequirements?.evrakNo ? "Alan Boş Bırakılamaz!" : false }}
+                render={({ field }) => <InputNumber {...field} min={0} status={errors.evrakNo ? "error" : ""} style={{ width: "145px" }} />}
+              />
+              <Controller
+                name="evrakTarihi"
+                control={control}
+                rules={{ required: fieldRequirements?.evrakTarihi ? "Alan Boş Bırakılamaz!" : false }}
+                render={({ field }) => (
+                  <DatePicker {...field} status={errors.evrakTarihi ? "error" : ""} style={{ width: "145px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />
+                )}
+              />
+              {errors.evrakTarihi && <div style={{ color: "red", marginTop: "5px" }}>{errors.evrakTarihi.message}</div>}
             </div>
-          </StyledDivBottomLine>
-        </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <StyledDivBottomLine
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "space-between",
+                width: "100%",
+                maxWidth: "480px",
+              }}
+            >
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements?.maliyet ? "600" : "normal" }}>Maliyet:</Text>
+              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", width: "300px", gap: "10px" }}>
+                <Controller
+                  name="maliyet"
+                  control={control}
+                  rules={{ required: fieldRequirements?.maliyet ? "Alan Boş Bırakılamaz!" : false }}
+                  render={({ field }) => <InputNumber {...field} min={0} status={errors.maliyet ? "error" : ""} style={{ width: "125px" }} />}
+                />
+                <div>
+                  <Controller
+                    name="garantiKapsami"
+                    control={control}
+                    render={({ field }) => (
+                      <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                        Garanti Kapsamında
+                      </Checkbox>
+                    )}
+                  />
+                </div>
+                {errors.maliyet && <div style={{ color: "red", marginTop: "5px" }}>{errors.maliyet.message}</div>}
+              </div>
+            </StyledDivBottomLine>
+          </div>
         </div>
         <div style={{ flex: "1 1 300px", display: "flex", flexDirection: "column" }}>
           <Controller
             name="disServisAciklama"
             control={control}
-            render={({ field }) => (
-              <TextArea {...field} placeholder="Açıklama" rows={8} style={{ width: "100%", height: "100%" }} />
-            )}
+            render={({ field }) => <TextArea {...field} placeholder="Açıklama" rows={8} style={{ width: "100%", height: "100%" }} />}
           />
         </div>
       </div>

@@ -1589,7 +1589,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   color: "#0062ff",
                 }}
               >
-                Diş Servis
+                Dış Servis
               </Text>
             </div>
             <div
