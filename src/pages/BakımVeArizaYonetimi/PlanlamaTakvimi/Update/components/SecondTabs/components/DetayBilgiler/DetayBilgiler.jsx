@@ -1,17 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Button,
-  Modal,
-  Input,
-  Typography,
-  Tabs,
-  DatePicker,
-  TimePicker,
-  Slider,
-  InputNumber,
-  Checkbox,
-  message,
-} from "antd";
+import { Button, Modal, Input, Typography, Tabs, DatePicker, TimePicker, Slider, InputNumber, Checkbox, message } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import dayjs from "dayjs";
@@ -88,9 +76,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
   const handleProsedurMinusClick = async () => {
     try {
       // API isteğini yap
-      const response = await AxiosInstance.get(
-        `RevmoveProsedurFromIsEmri?isEmriId=${secilenIsEmriID}&isTanimId=${prosedurID}`
-      );
+      const response = await AxiosInstance.get(`RevmoveProsedurFromIsEmri?isEmriId=${secilenIsEmriID}&isTanimId=${prosedurID}`);
       // İsteğin başarılı olduğunu kontrol et
       if ((response && response.status_code === 200) || response.status_code === 201) {
         // Başarılı işlem mesajı veya başka bir işlem yap
@@ -231,10 +217,10 @@ export default function DetayBilgiler({ fieldRequirements }) {
             flexDirection: "column",
             width: "100%",
             maxWidth: "875px",
-          }}>
+          }}
+        >
           <div>
-            <div
-              style={{ borderBottom: "1px solid #e8e8e8", marginBottom: "15px", paddingBottom: "5px", width: "100%" }}>
+            <div style={{ borderBottom: "1px solid #e8e8e8", marginBottom: "15px", paddingBottom: "5px", width: "100%" }}>
               <Text style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}>İş Bilgileri</Text>
             </div>
             <div style={{ display: "flex", gap: "10px", width: "100%" }}>
@@ -247,10 +233,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       justifyContent: "space-between",
                       width: "100%",
                       maxWidth: "450px",
-                    }}>
-                    <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.prosedur ? "600" : "normal" }}>
-                      Prosedür:
-                    </Text>
+                    }}
+                  >
+                    <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.prosedur ? "600" : "normal" }}>Prosedür:</Text>
                     <div
                       style={{
                         display: "flex",
@@ -258,7 +243,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                         alignItems: "center",
                         justifyContent: "space-between",
                         width: "300px",
-                      }}>
+                      }}
+                    >
                       <Controller
                         name="prosedur"
                         control={control}
@@ -299,9 +285,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                         {" "}
                         -{" "}
                       </Button>
-                      {errors.prosedur && (
-                        <div style={{ color: "red", marginTop: "5px" }}>{errors.prosedur.message}</div>
-                      )}
+                      {errors.prosedur && <div style={{ color: "red", marginTop: "5px" }}>{errors.prosedur.message}</div>}
                     </div>
                   </StyledDivBottomLine>
                 </div>
@@ -313,10 +297,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       alignItems: "flex-start",
                       justifyContent: "space-between",
                       width: "100%",
-                    }}>
-                    <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.konu ? "600" : "normal" }}>
-                      Konu:
-                    </Text>
+                    }}
+                  >
+                    <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.konu ? "600" : "normal" }}>Konu:</Text>
                     <div
                       style={{
                         display: "flex",
@@ -324,14 +307,13 @@ export default function DetayBilgiler({ fieldRequirements }) {
                         maxWidth: "300px",
                         width: "100%",
                         flexDirection: "column",
-                      }}>
+                      }}
+                    >
                       <Controller
                         name="konu"
                         control={control}
                         rules={{ required: fieldRequirements.konu ? "Alan Boş Bırakılamaz!" : false }}
-                        render={({ field }) => (
-                          <Input {...field} status={errors.konu ? "error" : ""} style={{ flex: 1 }} />
-                        )}
+                        render={({ field }) => <Input {...field} status={errors.konu ? "error" : ""} style={{ flex: 1 }} />}
                       />
                       {errors.konu && <div style={{ color: "red", marginTop: "5px" }}>{errors.konu.message}</div>}
                     </div>
@@ -345,10 +327,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       alignItems: "flex-start",
                       justifyContent: "space-between",
                       width: "100%",
-                    }}>
-                    <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.prosedurTipi ? "600" : "normal" }}>
-                      Tipi:
-                    </Text>
+                    }}
+                  >
+                    <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.prosedurTipi ? "600" : "normal" }}>Tipi:</Text>
                     <ProsedurTipi fieldRequirements={fieldRequirements} />
                   </StyledDivBottomLine>
                 </div>
@@ -360,10 +341,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       alignItems: "flex-start",
                       justifyContent: "space-between",
                       width: "100%",
-                    }}>
-                    <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.prosedurNedeni ? "600" : "normal" }}>
-                      Nedeni:
-                    </Text>
+                    }}
+                  >
+                    <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.prosedurNedeni ? "600" : "normal" }}>Nedeni:</Text>
                     <ProsedurNedeni fieldRequirements={fieldRequirements} />
                   </StyledDivBottomLine>
                 </div>
@@ -377,10 +357,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       justifyContent: "space-between",
                       width: "100%",
                       maxWidth: "450px",
-                    }}>
-                    <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.oncelikTanim ? "600" : "normal" }}>
-                      Öncelik:
-                    </Text>
+                    }}
+                  >
+                    <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.oncelikTanim ? "600" : "normal" }}>Öncelik:</Text>
                     <div
                       style={{
                         display: "flex",
@@ -388,7 +367,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                         alignItems: "center",
                         justifyContent: "space-between",
                         width: "300px",
-                      }}>
+                      }}
+                    >
                       <Controller
                         name="oncelikTanim"
                         control={control}
@@ -421,9 +401,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                         }}
                       />
                       <Button onClick={handleOncelikMinusClick}> - </Button>
-                      {errors.oncelikTanim && (
-                        <div style={{ color: "red", marginTop: "5px" }}>{errors.oncelikTanim.message}</div>
-                      )}
+                      {errors.oncelikTanim && <div style={{ color: "red", marginTop: "5px" }}>{errors.oncelikTanim.message}</div>}
                     </div>
                   </StyledDivBottomLine>
                 </div>
@@ -435,10 +413,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       justifyContent: "space-between",
                       width: "100%",
                       maxWidth: "450px",
-                    }}>
-                    <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.atolyeTanim ? "600" : "normal" }}>
-                      Atölye:
-                    </Text>
+                    }}
+                  >
+                    <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.atolyeTanim ? "600" : "normal" }}>Atölye:</Text>
                     <div
                       style={{
                         display: "flex",
@@ -446,7 +423,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                         alignItems: "center",
                         justifyContent: "space-between",
                         width: "300px",
-                      }}>
+                      }}
+                    >
                       <Controller
                         name="atolyeTanim"
                         control={control}
@@ -479,9 +457,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                         }}
                       />
                       <Button onClick={handleAtolyeMinusClick}> - </Button>
-                      {errors.atolyeTanim && (
-                        <div style={{ color: "red", marginTop: "5px" }}>{errors.atolyeTanim.message}</div>
-                      )}
+                      {errors.atolyeTanim && <div style={{ color: "red", marginTop: "5px" }}>{errors.atolyeTanim.message}</div>}
                     </div>
                   </StyledDivBottomLine>
                 </div>
@@ -493,10 +469,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       justifyContent: "space-between",
                       width: "100%",
                       maxWidth: "450px",
-                    }}>
-                    <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.takvimTanim ? "600" : "normal" }}>
-                      Takvim:
-                    </Text>
+                    }}
+                  >
+                    <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.takvimTanim ? "600" : "normal" }}>Takvim:</Text>
                     <div
                       style={{
                         display: "flex",
@@ -504,7 +479,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                         alignItems: "center",
                         justifyContent: "space-between",
                         width: "300px",
-                      }}>
+                      }}
+                    >
                       <Controller
                         name="takvimTanim"
                         control={control}
@@ -537,9 +513,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                         }}
                       />
                       <Button onClick={handleTakvimMinusClick}> - </Button>
-                      {errors.takvimTanim && (
-                        <div style={{ color: "red", marginTop: "5px" }}>{errors.takvimTanim.message}</div>
-                      )}
+                      {errors.takvimTanim && <div style={{ color: "red", marginTop: "5px" }}>{errors.takvimTanim.message}</div>}
                     </div>
                   </StyledDivBottomLine>
                 </div>
@@ -551,10 +525,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       justifyContent: "space-between",
                       width: "100%",
                       maxWidth: "450px",
-                    }}>
-                    <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.talimatTanim ? "600" : "normal" }}>
-                      Talimat:
-                    </Text>
+                    }}
+                  >
+                    <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.talimatTanim ? "600" : "normal" }}>Talimat:</Text>
                     <div
                       style={{
                         display: "flex",
@@ -562,7 +535,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                         alignItems: "center",
                         justifyContent: "space-between",
                         width: "300px",
-                      }}>
+                      }}
+                    >
                       <Controller
                         name="talimatTanim"
                         control={control}
@@ -595,9 +569,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                         }}
                       />
                       <Button onClick={handleTalimatMinusClick}> - </Button>
-                      {errors.talimatTanim && (
-                        <div style={{ color: "red", marginTop: "5px" }}>{errors.talimatTanim.message}</div>
-                      )}
+                      {errors.talimatTanim && <div style={{ color: "red", marginTop: "5px" }}>{errors.talimatTanim.message}</div>}
                     </div>
                   </StyledDivBottomLine>
                 </div>
@@ -607,8 +579,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
             <div style={{ display: "flex", gap: "10px", flexDirection: "column", width: "100%", maxWidth: "450px" }}>
-              <div
-                style={{ borderBottom: "1px solid #e8e8e8", marginBottom: "5px", paddingBottom: "5px", width: "100%" }}>
+              <div style={{ borderBottom: "1px solid #e8e8e8", marginBottom: "5px", paddingBottom: "5px", width: "100%" }}>
                 <Text style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}>İş Talebi</Text>
               </div>
               <div style={{ width: "100%", maxWidth: "450px" }}>
@@ -619,10 +590,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     alignItems: "flex-start",
                     justifyContent: "space-between",
                     width: "100%",
-                  }}>
-                  <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.isTalebiKodu ? "600" : "normal" }}>
-                    İş Talebi Kodu:
-                  </Text>
+                  }}
+                >
+                  <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.isTalebiKodu ? "600" : "normal" }}>İş Talebi Kodu:</Text>
                   <div
                     style={{
                       display: "flex",
@@ -630,18 +600,15 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       maxWidth: "300px",
                       width: "100%",
                       flexDirection: "column",
-                    }}>
+                    }}
+                  >
                     <Controller
                       name="isTalebiKodu"
                       control={control}
                       rules={{ required: fieldRequirements.isTalebiKodu ? "Alan Boş Bırakılamaz!" : false }}
-                      render={({ field }) => (
-                        <Input {...field} disabled status={errors.isTalebiKodu ? "error" : ""} style={{ flex: 1 }} />
-                      )}
+                      render={({ field }) => <Input {...field} disabled status={errors.isTalebiKodu ? "error" : ""} style={{ flex: 1 }} />}
                     />
-                    {errors.isTalebiKodu && (
-                      <div style={{ color: "red", marginTop: "5px" }}>{errors.isTalebiKodu.message}</div>
-                    )}
+                    {errors.isTalebiKodu && <div style={{ color: "red", marginTop: "5px" }}>{errors.isTalebiKodu.message}</div>}
                   </div>
                 </StyledDivBottomLine>
               </div>
@@ -653,10 +620,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     alignItems: "flex-start",
                     justifyContent: "space-between",
                     width: "100%",
-                  }}>
-                  <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.talepEden ? "600" : "normal" }}>
-                    Talep Eden:
-                  </Text>
+                  }}
+                >
+                  <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.talepEden ? "600" : "normal" }}>Talep Eden:</Text>
                   <div
                     style={{
                       display: "flex",
@@ -664,18 +630,15 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       maxWidth: "300px",
                       width: "100%",
                       flexDirection: "column",
-                    }}>
+                    }}
+                  >
                     <Controller
                       name="talepEden"
                       control={control}
                       rules={{ required: fieldRequirements.talepEden ? "Alan Boş Bırakılamaz!" : false }}
-                      render={({ field }) => (
-                        <Input {...field} disabled status={errors.talepEden ? "error" : ""} style={{ flex: 1 }} />
-                      )}
+                      render={({ field }) => <Input {...field} disabled status={errors.talepEden ? "error" : ""} style={{ flex: 1 }} />}
                     />
-                    {errors.talepEden && (
-                      <div style={{ color: "red", marginTop: "5px" }}>{errors.talepEden.message}</div>
-                    )}
+                    {errors.talepEden && <div style={{ color: "red", marginTop: "5px" }}>{errors.talepEden.message}</div>}
                   </div>
                 </StyledDivBottomLine>
               </div>
@@ -688,10 +651,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   gap: "10px",
                   width: "100%",
                   justifyContent: "space-between",
-                }}>
-                <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.isTalebiTarihi ? "600" : "normal" }}>
-                  Tarih:
-                </Text>
+                }}
+              >
+                <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.isTalebiTarihi ? "600" : "normal" }}>Tarih:</Text>
                 <div
                   style={{
                     display: "flex",
@@ -701,7 +663,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     minWidth: "300px",
                     gap: "10px",
                     width: "100%",
-                  }}>
+                  }}
+                >
                   <Controller
                     name="isTalebiTarihi"
                     control={control}
@@ -725,7 +688,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     render={({ field, fieldState: { error } }) => (
                       <TimePicker
                         {...field}
-                        changeOnScroll needConfirm={false}
+                        changeOnScroll
+                        needConfirm={false}
                         status={errors.isTalebiSaati ? "error" : ""}
                         // disabled={!isDisabled}
                         disabled
@@ -735,9 +699,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       />
                     )}
                   />
-                  {errors.isTalebiSaati && (
-                    <div style={{ color: "red", marginTop: "5px" }}>{errors.isTalebiSaati.message}</div>
-                  )}
+                  {errors.isTalebiSaati && <div style={{ color: "red", marginTop: "5px" }}>{errors.isTalebiSaati.message}</div>}
                 </div>
               </div>
               <div style={{ width: "100%", maxWidth: "910px" }}>
@@ -748,10 +710,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     alignItems: "flex-start",
                     justifyContent: "space-between",
                     width: "100%",
-                  }}>
-                  <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.aciklama ? "600" : "normal" }}>
-                    Açıklama:
-                  </Text>
+                  }}
+                >
+                  <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.aciklama ? "600" : "normal" }}>Açıklama:</Text>
                   <div
                     style={{
                       display: "flex",
@@ -760,14 +721,13 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       minWidth: "300px",
                       width: "100%",
                       flexDirection: "column",
-                    }}>
+                    }}
+                  >
                     <Controller
                       name="aciklama"
                       control={control}
                       rules={{ required: fieldRequirements.aciklama ? "Alan Boş Bırakılamaz!" : false }}
-                      render={({ field }) => (
-                        <TextArea {...field} status={errors.aciklama ? "error" : ""} rows={2} style={{ flex: 1 }} />
-                      )}
+                      render={({ field }) => <TextArea {...field} status={errors.aciklama ? "error" : ""} rows={2} style={{ flex: 1 }} />}
                     />
                     {errors.aciklama && <div style={{ color: "red", marginTop: "5px" }}>{errors.aciklama.message}</div>}
                   </div>
@@ -775,8 +735,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
               </div>
             </div>
             <div style={{ display: "flex", gap: "10px", flexDirection: "column", width: "100%", maxWidth: "415px" }}>
-              <div
-                style={{ borderBottom: "1px solid #e8e8e8", marginBottom: "5px", paddingBottom: "5px", width: "100%" }}>
+              <div style={{ borderBottom: "1px solid #e8e8e8", marginBottom: "5px", paddingBottom: "5px", width: "100%" }}>
                 <Text style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}>Detay Bilgiler</Text>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
@@ -787,10 +746,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     justifyContent: "space-between",
                     width: "100%",
                     maxWidth: "450px",
-                  }}>
-                  <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.masrafMerkezi ? "600" : "normal" }}>
-                    Masraf Merkezi:
-                  </Text>
+                  }}
+                >
+                  <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.masrafMerkezi ? "600" : "normal" }}>Masraf Merkezi:</Text>
                   <div
                     style={{
                       display: "flex",
@@ -798,7 +756,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       alignItems: "center",
                       justifyContent: "space-between",
                       width: "300px",
-                    }}>
+                    }}
+                  >
                     <Controller
                       name="masrafMerkezi"
                       control={control}
@@ -831,9 +790,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       }}
                     />
                     <Button onClick={handleMasrafMerkeziMinusClick}> - </Button>
-                    {errors.masrafMerkezi && (
-                      <div style={{ color: "red", marginTop: "5px" }}>{errors.masrafMerkezi.message}</div>
-                    )}
+                    {errors.masrafMerkezi && <div style={{ color: "red", marginTop: "5px" }}>{errors.masrafMerkezi.message}</div>}
                   </div>
                 </StyledDivBottomLine>
               </div>
@@ -845,10 +802,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     justifyContent: "space-between",
                     width: "100%",
                     maxWidth: "450px",
-                  }}>
-                  <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.proje ? "600" : "normal" }}>
-                    Proje:
-                  </Text>
+                  }}
+                >
+                  <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.proje ? "600" : "normal" }}>Proje:</Text>
                   <div
                     style={{
                       display: "flex",
@@ -856,7 +812,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       alignItems: "center",
                       justifyContent: "space-between",
                       width: "300px",
-                    }}>
+                    }}
+                  >
                     <Controller
                       name="proje"
                       control={control}
@@ -901,10 +858,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     alignItems: "flex-start",
                     justifyContent: "space-between",
                     width: "100%",
-                  }}>
-                  <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.referansNo ? "600" : "normal" }}>
-                    Referans No:
-                  </Text>
+                  }}
+                >
+                  <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.referansNo ? "600" : "normal" }}>Referans No:</Text>
                   <div
                     style={{
                       display: "flex",
@@ -912,18 +868,15 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       maxWidth: "300px",
                       width: "100%",
                       flexDirection: "column",
-                    }}>
+                    }}
+                  >
                     <Controller
                       name="referansNo"
                       control={control}
                       rules={{ required: fieldRequirements.referansNo ? "Alan Boş Bırakılamaz!" : false }}
-                      render={({ field }) => (
-                        <Input {...field} status={errors.referansNo ? "error" : ""} style={{ flex: 1 }} />
-                      )}
+                      render={({ field }) => <Input {...field} status={errors.referansNo ? "error" : ""} style={{ flex: 1 }} />}
                     />
-                    {errors.referansNo && (
-                      <div style={{ color: "red", marginTop: "5px" }}>{errors.referansNo.message}</div>
-                    )}
+                    {errors.referansNo && <div style={{ color: "red", marginTop: "5px" }}>{errors.referansNo.message}</div>}
                   </div>
                 </StyledDivBottomLine>
               </div>
@@ -935,10 +888,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     justifyContent: "space-between",
                     width: "100%",
                     maxWidth: "450px",
-                  }}>
-                  <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.tamamlanmaOranı ? "600" : "normal" }}>
-                    Tamamlanma %:
-                  </Text>
+                  }}
+                >
+                  <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.tamamlanmaOranı ? "600" : "normal" }}>Tamamlanma %:</Text>
                   <div
                     style={{
                       display: "flex",
@@ -946,29 +898,16 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       alignItems: "center",
                       justifyContent: "space-between",
                       width: "300px",
-                    }}>
+                    }}
+                  >
                     <Controller
                       name="tamamlanmaOranı"
                       control={control}
                       rules={{ required: fieldRequirements.tamamlanmaOranı ? "Alan Boş Bırakılamaz!" : false }}
-                      render={({ field }) => (
-                        <InputNumber
-                          {...field}
-                          min={0}
-                          max={100}
-                          status={errors.tamamlanmaOranı ? "error" : ""}
-                          style={{ width: "60px" }}
-                        />
-                      )}
+                      render={({ field }) => <InputNumber {...field} min={0} max={100} status={errors.tamamlanmaOranı ? "error" : ""} style={{ width: "60px" }} />}
                     />
-                    <Controller
-                      name="tamamlanmaOranı"
-                      control={control}
-                      render={({ field }) => <Slider {...field} style={{ width: "220px" }} />}
-                    />
-                    {errors.tamamlanmaOranı && (
-                      <div style={{ color: "red", marginTop: "5px" }}>{errors.tamamlanmaOranı.message}</div>
-                    )}
+                    <Controller name="tamamlanmaOranı" control={control} render={({ field }) => <Slider {...field} style={{ width: "220px" }} />} />
+                    {errors.tamamlanmaOranı && <div style={{ color: "red", marginTop: "5px" }}>{errors.tamamlanmaOranı.message}</div>}
                   </div>
                 </StyledDivBottomLine>
               </div>
@@ -982,7 +921,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
             gap: "15px",
             width: "100%",
             maxWidth: "480px",
-          }}>
+          }}
+        >
           <div
             style={{
               display: "flex",
@@ -990,9 +930,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
               flexDirection: "column",
               width: "100%",
               maxWidth: "480px",
-            }}>
-            <div
-              style={{ borderBottom: "1px solid #e8e8e8", marginBottom: "5px", paddingBottom: "5px", width: "100%" }}>
+            }}
+          >
+            <div style={{ borderBottom: "1px solid #e8e8e8", marginBottom: "5px", paddingBottom: "5px", width: "100%" }}>
               <Text style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}>Çalışma Süresi</Text>
             </div>
 
@@ -1005,10 +945,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                 gap: "10px",
                 width: "100%",
                 justifyContent: "space-between",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.planlananBaslama ? "600" : "normal" }}>
-                Planlanan Başlama:
-              </Text>
+              }}
+            >
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.planlananBaslama ? "600" : "normal" }}>Planlanan Başlama:</Text>
               <div
                 style={{
                   display: "flex",
@@ -1018,7 +957,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   minWidth: "300px",
                   gap: "10px",
                   width: "100%",
-                }}>
+                }}
+              >
                 <Controller
                   name="planlananBaslama"
                   control={control}
@@ -1041,7 +981,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   render={({ field, fieldState: { error } }) => (
                     <TimePicker
                       {...field}
-                      changeOnScroll needConfirm={false}
+                      changeOnScroll
+                      needConfirm={false}
                       status={errors.planlananBaslama ? "error" : ""}
                       // disabled={!isDisabled}
                       style={{ width: "110px" }}
@@ -1050,9 +991,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     />
                   )}
                 />
-                {errors.planlananBaslama && (
-                  <div style={{ color: "red", marginTop: "5px" }}>{errors.planlananBaslama.message}</div>
-                )}
+                {errors.planlananBaslama && <div style={{ color: "red", marginTop: "5px" }}>{errors.planlananBaslama.message}</div>}
               </div>
             </div>
             <div
@@ -1064,10 +1003,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                 gap: "10px",
                 width: "100%",
                 justifyContent: "space-between",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.planlananBitis ? "600" : "normal" }}>
-                Planlanan Bitiş:
-              </Text>
+              }}
+            >
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.planlananBitis ? "600" : "normal" }}>Planlanan Bitiş:</Text>
               <div
                 style={{
                   display: "flex",
@@ -1077,7 +1015,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   minWidth: "300px",
                   gap: "10px",
                   width: "100%",
-                }}>
+                }}
+              >
                 <Controller
                   name="planlananBitis"
                   control={control}
@@ -1100,7 +1039,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   render={({ field, fieldState: { error } }) => (
                     <TimePicker
                       {...field}
-                      changeOnScroll needConfirm={false}
+                      changeOnScroll
+                      needConfirm={false}
                       status={errors.planlananBitis ? "error" : ""}
                       // disabled={!isDisabled}
                       style={{ width: "110px" }}
@@ -1109,9 +1049,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     />
                   )}
                 />
-                {errors.planlananBitis && (
-                  <div style={{ color: "red", marginTop: "5px" }}>{errors.planlananBitis.message}</div>
-                )}
+                {errors.planlananBitis && <div style={{ color: "red", marginTop: "5px" }}>{errors.planlananBitis.message}</div>}
               </div>
             </div>
             <div
@@ -1123,10 +1061,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                 gap: "10px",
                 width: "100%",
                 justifyContent: "space-between",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.baslamaZamani ? "600" : "normal" }}>
-                Başlama Zamanı:
-              </Text>
+              }}
+            >
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.baslamaZamani ? "600" : "normal" }}>Başlama Zamanı:</Text>
               <div
                 style={{
                   display: "flex",
@@ -1136,7 +1073,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   minWidth: "300px",
                   gap: "10px",
                   width: "100%",
-                }}>
+                }}
+              >
                 <Controller
                   name="baslamaZamani"
                   control={control}
@@ -1159,7 +1097,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   render={({ field, fieldState: { error } }) => (
                     <TimePicker
                       {...field}
-                      changeOnScroll needConfirm={false}
+                      changeOnScroll
+                      needConfirm={false}
                       status={errors.baslamaZamaniSaati ? "error" : ""}
                       // disabled={!isDisabled}
                       style={{ width: "110px" }}
@@ -1168,9 +1107,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     />
                   )}
                 />
-                {errors.baslamaZamaniSaati && (
-                  <div style={{ color: "red", marginTop: "5px" }}>{errors.baslamaZamaniSaati.message}</div>
-                )}
+                {errors.baslamaZamaniSaati && <div style={{ color: "red", marginTop: "5px" }}>{errors.baslamaZamaniSaati.message}</div>}
               </div>
             </div>
             <div
@@ -1182,10 +1119,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                 gap: "10px",
                 width: "100%",
                 justifyContent: "space-between",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.bitisZamani ? "600" : "normal" }}>
-                Bitiş Zamanı:
-              </Text>
+              }}
+            >
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.bitisZamani ? "600" : "normal" }}>Bitiş Zamanı:</Text>
               <div
                 style={{
                   display: "flex",
@@ -1195,7 +1131,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   minWidth: "300px",
                   gap: "10px",
                   width: "100%",
-                }}>
+                }}
+              >
                 <Controller
                   name="bitisZamani"
                   control={control}
@@ -1218,7 +1155,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   render={({ field, fieldState: { error } }) => (
                     <TimePicker
                       {...field}
-                      changeOnScroll needConfirm={false}
+                      changeOnScroll
+                      needConfirm={false}
                       status={errors.bitisZamaniSaati ? "error" : ""}
                       // disabled={!isDisabled}
                       style={{ width: "110px" }}
@@ -1227,9 +1165,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     />
                   )}
                 />
-                {errors.bitisZamaniSaati && (
-                  <div style={{ color: "red", marginTop: "5px" }}>{errors.bitisZamaniSaati.message}</div>
-                )}
+                {errors.bitisZamaniSaati && <div style={{ color: "red", marginTop: "5px" }}>{errors.bitisZamaniSaati.message}</div>}
               </div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
@@ -1240,10 +1176,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   justifyContent: "space-between",
                   width: "100%",
                   maxWidth: "480px",
-                }}>
-                <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.calismaSuresi ? "600" : "normal" }}>
-                  Çalışma Süresi (Saat - dk):
-                </Text>
+                }}
+              >
+                <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.calismaSuresi ? "600" : "normal" }}>Çalışma Süresi (Saat - dk):</Text>
                 <div
                   style={{
                     display: "flex",
@@ -1251,7 +1186,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     alignItems: "center",
                     justifyContent: "space-between",
                     width: "300px",
-                  }}>
+                  }}
+                >
                   <Controller
                     name="calismaSaat"
                     control={control}
@@ -1270,19 +1206,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     name="calismaDakika"
                     control={control}
                     rules={{ required: fieldRequirements.calismaDakika ? "Alan Boş Bırakılamaz!" : false }}
-                    render={({ field }) => (
-                      <InputNumber
-                        {...field}
-                        min={0}
-                        max={59}
-                        status={errors.calismaDakika ? "error" : ""}
-                        style={{ width: "145px" }}
-                      />
-                    )}
+                    render={({ field }) => <InputNumber {...field} min={0} max={59} status={errors.calismaDakika ? "error" : ""} style={{ width: "145px" }} />}
                   />
-                  {errors.calismaDakika && (
-                    <div style={{ color: "red", marginTop: "5px" }}>{errors.calismaDakika.message}</div>
-                  )}
+                  {errors.calismaDakika && <div style={{ color: "red", marginTop: "5px" }}>{errors.calismaDakika.message}</div>}
                 </div>
               </StyledDivBottomLine>
             </div>
@@ -1294,10 +1220,10 @@ export default function DetayBilgiler({ fieldRequirements }) {
               flexDirection: "column",
               width: "100%",
               maxWidth: "480px",
-            }}>
-            <div
-              style={{ borderBottom: "1px solid #e8e8e8", marginBottom: "5px", paddingBottom: "5px", width: "100%" }}>
-              <Text style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}>Diş Servis</Text>
+            }}
+          >
+            <div style={{ borderBottom: "1px solid #e8e8e8", marginBottom: "5px", paddingBottom: "5px", width: "100%" }}>
+              <Text style={{ fontSize: "14px", fontWeight: "500", color: "#0062ff" }}>Dış Servis</Text>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
               <StyledDivBottomLine
@@ -1307,7 +1233,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   justifyContent: "space-between",
                   width: "100%",
                   maxWidth: "480px",
-                }}>
+                }}
+              >
                 <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.firma ? "600" : "normal" }}>Firma:</Text>
                 <div
                   style={{
@@ -1316,7 +1243,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     alignItems: "center",
                     justifyContent: "space-between",
                     width: "300px",
-                  }}>
+                  }}
+                >
                   <Controller
                     name="firma"
                     control={control}
@@ -1361,10 +1289,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   justifyContent: "space-between",
                   width: "100%",
                   maxWidth: "480px",
-                }}>
-                <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.sozlesme ? "600" : "normal" }}>
-                  Sözleşme:
-                </Text>
+                }}
+              >
+                <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.sozlesme ? "600" : "normal" }}>Sözleşme:</Text>
                 <div
                   style={{
                     display: "flex",
@@ -1372,7 +1299,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     alignItems: "center",
                     justifyContent: "space-between",
                     width: "300px",
-                  }}>
+                  }}
+                >
                   <Controller
                     name="sozlesme"
                     control={control}
@@ -1418,10 +1346,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                 gap: "10px",
                 width: "100%",
                 justifyContent: "space-between",
-              }}>
-              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.evrakNo ? "600" : "normal" }}>
-                Evrak No/Tarihi:
-              </Text>
+              }}
+            >
+              <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.evrakNo ? "600" : "normal" }}>Evrak No/Tarihi:</Text>
               <div
                 style={{
                   display: "flex",
@@ -1431,7 +1358,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   minWidth: "300px",
                   gap: "10px",
                   width: "100%",
-                }}>
+                }}
+              >
                 <Controller
                   name="evrakNo"
                   control={control}
@@ -1461,9 +1389,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     />
                   )}
                 />
-                {errors.evrakTarihi && (
-                  <div style={{ color: "red", marginTop: "5px" }}>{errors.evrakTarihi.message}</div>
-                )}
+                {errors.evrakTarihi && <div style={{ color: "red", marginTop: "5px" }}>{errors.evrakTarihi.message}</div>}
               </div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
@@ -1474,10 +1400,9 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   justifyContent: "space-between",
                   width: "100%",
                   maxWidth: "480px",
-                }}>
-                <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.maliyet ? "600" : "normal" }}>
-                  Maliyet:
-                </Text>
+                }}
+              >
+                <Text style={{ fontSize: "14px", fontWeight: fieldRequirements.maliyet ? "600" : "normal" }}>Maliyet:</Text>
                 <div
                   style={{
                     display: "flex",
@@ -1486,7 +1411,8 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     justifyContent: "space-between",
                     width: "300px",
                     gap: "10px",
-                  }}>
+                  }}
+                >
                   <Controller
                     name="maliyet"
                     control={control}

@@ -180,25 +180,27 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
       selectedData = data2.find((item) => item.key === selectedRowKeys2[0]);
     }
 
-    try {
-      // API isteğini yap
-      const response = await AxiosInstance.get(`AddProsedurPropertyToIsEmri?yeniIsTanimId=${selectedData.key}&isEmriId=${secilenIsEmriID}&eskiIsTanimId=${prosedurID}`);
-      // İsteğin başarılı olduğunu kontrol et
-      if ((response && response.status_code === 200) || response.status_code === 201) {
-        // Başarılı işlem mesajı veya başka bir işlem yap
-        message.success("İşlem Başarılı!");
-        console.log("İşlem başarılı.");
-      } else if (response.status_code === 401) {
-        message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
-      } else {
-        message.error("İşlem Başarısız!");
-        // Hata mesajı göster
-        console.error("Bir hata oluştu.");
+    if (selectedData && secilenIsEmriID) {
+      try {
+        // API isteğini yap
+        const response = await AxiosInstance.get(`AddProsedurPropertyToIsEmri?yeniIsTanimId=${selectedData.key}&isEmriId=${secilenIsEmriID}&eskiIsTanimId=${prosedurID}`);
+        // İsteğin başarılı olduğunu kontrol et
+        if ((response && response.status_code === 200) || response.status_code === 201) {
+          // Başarılı işlem mesajı veya başka bir işlem yap
+          message.success("İşlem Başarılı!");
+          console.log("İşlem başarılı.");
+        } else if (response.status_code === 401) {
+          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+        } else {
+          message.error("İşlem Başarısız!");
+          // Hata mesajı göster
+          console.error("Bir hata oluştu.");
+        }
+      } catch (error) {
+        // Hata yakalama
+        console.error("API isteği sırasında bir hata oluştu:", error);
+        message.error("Başarısız Olundu.");
       }
-    } catch (error) {
-      // Hata yakalama
-      console.error("API isteği sırasında bir hata oluştu:", error);
-      message.error("Başarısız Olundu.");
     }
 
     if (selectedData) {

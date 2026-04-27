@@ -108,7 +108,7 @@ export default function ProsedurTipi({ disabled, fieldRequirements }) {
               status={errors.prosedurTipi ? "error" : ""}
               disabled={disabled}
               key={selectKey}
-              style={{ width: "300px" }}
+              style={{ width: "325px" }}
               showSearch
               allowClear
               placeholder="Seçim Yapınız"

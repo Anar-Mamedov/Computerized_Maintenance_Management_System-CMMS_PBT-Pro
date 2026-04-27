@@ -12,13 +12,13 @@ import AracGereclerListesiTablo from "./components/AracGerecler/AracGereclerList
 import SureBilgileri from "./components/SureBilgileri/SureBilgileri";
 import Maliyetler from "./components/Maliyetler/Maliyetler";
 import Notlar from "./components/Notlar/Notlar";
-import Aciklama from "./components/Aciklama/Aciklama";
 import ResimUpload from "./components/Resim/ResimUpload";
 import DosyaUpload from "./components/Dosya/DosyaUpload";
 import AxiosInstance from "../../../../../../api/http";
 import Forms from "./components/KapamaBilgileri/Forms.jsx";
+import DisServis from "./components/DisServis/DisServis";
 
-export default function SecondTabs({ refreshKey, fieldRequirements }) {
+export default function SecondTabs({ refreshKey, fieldRequirements, assignmentRequestKey }) {
   const { watch } = useFormContext();
   const [activeTabKey, setActiveTabKey] = useState("1"); // Default to the first tab
   const [dataCount, setDataCount] = useState([]);
@@ -34,9 +34,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
 
   const fetchData = async () => {
     try {
-      const response = await AxiosInstance.get(
-        `GetIsEmriTabsCountById?isEmriId=${secilenIsEmriID}`
-      ); // API URL'niz
+      const response = await AxiosInstance.get(`GetIsEmriTabsCountById?isEmriId=${secilenIsEmriID}`); // API URL'niz
       setDataCount(response); // Örneğin, API'den dönen yanıt doğrudan etiket olacak
     } catch (error) {
       console.error("API isteğinde hata oluştu:", error);
@@ -50,63 +48,43 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
     }
   }, [secilenIsEmriID]); // secilenIsEmriID veya fetch fonksiyonu değiştiğinde useEffect'i tetikle
 
+  useEffect(() => {
+    if (assignmentRequestKey) {
+      setActiveTabKey("3");
+    }
+  }, [assignmentRequestKey]);
+
   const items = [
     {
       key: "1",
       label: "Detay Bilgiler",
       children: <DetayBilgiler fieldRequirements={fieldRequirements} />,
     },
+
     {
       key: "2",
-      label:
-        dataCount.IsEmriKontrolListSayisi >= 1
-          ? `Kontrol Listesi (${dataCount.IsEmriKontrolListSayisi})`
-          : "Kontrol Listesi",
-      children: (
-        <KontrolListesiTablo
-          isActive={activeTabKey === "2"}
-          fieldRequirements={fieldRequirements}
-        />
-      ),
+      label: dataCount.IsEmriKontrolListSayisi >= 1 ? `Kontrol Listesi (${dataCount.IsEmriKontrolListSayisi})` : "Kontrol Listesi",
+      children: <KontrolListesiTablo isActive={activeTabKey === "2"} fieldRequirements={fieldRequirements} />,
     },
     {
       key: "3",
-      label:
-        dataCount.IsEmriPersonelListSayisi >= 1
-          ? `Personel (${dataCount.IsEmriPersonelListSayisi})`
-          : "Personel",
-      children: (
-        <PersonelListesiTablo
-          isActive={activeTabKey === "3"}
-          fieldRequirements={fieldRequirements}
-        />
-      ),
+      label: dataCount.IsEmriPersonelListSayisi >= 1 ? `Personel (${dataCount.IsEmriPersonelListSayisi})` : "Personel",
+      children: <PersonelListesiTablo isActive={activeTabKey === "3"} fieldRequirements={fieldRequirements} assignmentRequestKey={assignmentRequestKey} />,
     },
     {
       key: "4",
-      label:
-        dataCount.IsEmriMalzemeListSayisi >= 1
-          ? `Malzeme (${dataCount.IsEmriMalzemeListSayisi})`
-          : "Malzeme",
-      children: (
-        <MalzemeListesiTablo
-          isActive={activeTabKey === "4"}
-          fieldRequirements={fieldRequirements}
-        />
-      ),
+      label: dataCount.IsEmriMalzemeListSayisi >= 1 ? `Malzeme (${dataCount.IsEmriMalzemeListSayisi})` : "Malzeme",
+      children: <MalzemeListesiTablo isActive={activeTabKey === "4"} fieldRequirements={fieldRequirements} />,
     },
     {
       key: "5",
-      label:
-        dataCount.IsEmriDurusListSayisi >= 1
-          ? `Duruşlar (${dataCount.IsEmriDurusListSayisi})`
-          : "Duruşlar",
-      children: (
-        <DuruslarListesiTablo
-          isActive={activeTabKey === "5"}
-          fieldRequirements={fieldRequirements}
-        />
-      ),
+      label: dataCount.IsEmriDurusListSayisi >= 1 ? `Duruşlar (${dataCount.IsEmriDurusListSayisi})` : "Duruşlar",
+      children: <DuruslarListesiTablo isActive={activeTabKey === "5"} fieldRequirements={fieldRequirements} />,
+    },
+    {
+      key: "16",
+      label: "Dış Servis",
+      children: <DisServis fieldRequirements={fieldRequirements} />,
     },
     {
       key: "6",
@@ -120,29 +98,13 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
     },
     {
       key: "8",
-      label:
-        dataCount.IsEmriOlcumListSayisi >= 1
-          ? `Ölçüm Değerleri (${dataCount.IsEmriOlcumListSayisi})`
-          : "Ölçüm Değerleri",
-      children: (
-        <OlcumDegerleriListesiTablo
-          isActive={activeTabKey === "8"}
-          fieldRequirements={fieldRequirements}
-        />
-      ),
+      label: dataCount.IsEmriOlcumListSayisi >= 1 ? `Ölçüm Değerleri (${dataCount.IsEmriOlcumListSayisi})` : "Ölçüm Değerleri",
+      children: <OlcumDegerleriListesiTablo isActive={activeTabKey === "8"} fieldRequirements={fieldRequirements} />,
     },
     {
       key: "9",
-      label:
-        dataCount.IsEmriAracGerevListSayisi >= 1
-          ? `Araç & Gereçler (${dataCount.IsEmriAracGerevListSayisi})`
-          : "Araç & Gereçler",
-      children: (
-        <AracGereclerListesiTablo
-          isActive={activeTabKey === "9"}
-          fieldRequirements={fieldRequirements}
-        />
-      ),
+      label: dataCount.IsEmriAracGerevListSayisi >= 1 ? `Araç & Gereçler (${dataCount.IsEmriAracGerevListSayisi})` : "Araç & Gereçler",
+      children: <AracGereclerListesiTablo isActive={activeTabKey === "9"} fieldRequirements={fieldRequirements} />,
     },
     {
       key: "10",
@@ -155,24 +117,13 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
       children: <Notlar fieldRequirements={fieldRequirements} />,
     },
     {
-      key: "12",
-      label: dataCount.IsEmriAciklamaVar === true ? `Açıklama *` : "Açıklama",
-      children: <Aciklama fieldRequirements={fieldRequirements} />,
-    },
-    {
       key: "13",
-      label:
-        dataCount.IsEmriDosyaSayisi >= 1
-          ? `Dosyalar (${dataCount.IsEmriDosyaSayisi})`
-          : "Dosyalar",
+      label: dataCount.IsEmriDosyaSayisi >= 1 ? `Dosyalar (${dataCount.IsEmriDosyaSayisi})` : "Dosyalar",
       children: <DosyaUpload fieldRequirements={fieldRequirements} />,
     },
     {
       key: "14",
-      label:
-        dataCount.IsEmriResimSayisi >= 1
-          ? `Resimler (${dataCount.IsEmriResimSayisi})`
-          : "Resimler",
+      label: dataCount.IsEmriResimSayisi >= 1 ? `Resimler (${dataCount.IsEmriResimSayisi})` : "Resimler",
       children: <ResimUpload fieldRequirements={fieldRequirements} />,
     },
     {
@@ -207,14 +158,14 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
         return fieldRequirements?.IMT_OZEL_ALAN_TAB;
       case "11":
         return fieldRequirements?.IMT_NOTLAR_TAB;
-      case "12":
-        return fieldRequirements?.IMT_ACIKLAMA_USTTAB || true; // This tab's visibility is dependent on a specific condition, with a fallback to false if undefined.
       case "13":
         return fieldRequirements?.IMT_DOSYA_USTTAB || true; // This tab's visibility is dependent on a specific condition, with a fallback to false if undefined.
       case "14":
         return fieldRequirements?.IMT_RESIM_USTTAB || true; // This tab's visibility is dependent on a specific condition, with a fallback to false if undefined.
       case "15":
         return kapali;
+      case "16":
+        return true;
       default:
         return false; // Default case to handle any unforeseen keys
     }
@@ -222,11 +173,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements }) {
 
   return (
     <div>
-      <Tabs
-        defaultActiveKey="1"
-        items={filteredItems}
-        onChange={onChange}
-      />
+      <Tabs activeKey={activeTabKey} items={filteredItems} onChange={onChange} />
     </div>
   );
 }

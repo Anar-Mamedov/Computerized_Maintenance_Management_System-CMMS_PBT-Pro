@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { Button, Drawer, Space, ConfigProvider, Modal, Spin, message } from "antd";
+import { QrcodeOutlined } from "@ant-design/icons";
 import tr_TR from "antd/es/locale/tr_TR";
 import AxiosInstance from "../../../../api/http";
 import MainTabs from "./components/MainTabs/MainTabs";
@@ -9,6 +10,7 @@ import SecondTabs from "./components/SecondTabs/SecondTabs";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { t } from "i18next";
+import QRCodeGenerator from "../../../../utils/components/QRCodeGenerator";
 
 dayjs.extend(customParseFormat);
 
@@ -19,6 +21,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   const [disabled, setDisabled] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [onayCheck, setOnayCheck] = useState(false);
+  const [qrModalOpen, setQrModalOpen] = useState(false);
+  const [assignmentRequestKey, setAssignmentRequestKey] = useState(0);
   // API'den gelen zorunluluk bilgilerini simüle eden bir örnek
   const [fieldRequirements, setFieldRequirements] = React.useState({
     // Varsayılan olarak zorunlu değil
@@ -59,20 +63,13 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       oncelikID: "",
       atolyeTanim: "",
       atolyeID: "",
-      takvimTanim: "",
-      takvimID: "",
       talimatTanim: "",
       talimatID: "",
-      isTalebiKodu: "",
-      talepEden: "",
-      isTalebiTarihi: "",
-      isTalebiSaati: "",
-      isTalebiAciklama: "",
+      disServisAciklama: "",
       masrafMerkezi: "",
       masrafMerkeziID: "",
       proje: "",
       projeID: "",
-      referansNo: "",
       tamamlanmaOranı: "",
       planlananBaslama: "",
       planlananBaslamaSaati: "",
@@ -142,6 +139,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       ozelAlan20: "",
       // Notlar
       notlar: "",
+      kontrolSonucNotu: "",
       //Açıklama
       isEmriAciklama: "",
       // ... Tüm default değerleriniz
@@ -343,21 +341,12 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("oncelikID", item.ISM_ONCELIK_ID);
           setValue("atolyeTanim", item.ATOLYE);
           setValue("atolyeID", item.ISM_ATOLYE_ID);
-          setValue("takvimTanim", item.TAKVIM);
-          setValue("takvimID", item.ISM_TAKVIM_ID);
           setValue("talimatTanim", item.TALIMAT);
           setValue("talimatID", item.ISM_TALIMAT_ID);
-          setValue("secilenTalepID", item.ISM_IS_TALEP_ID);
-          setValue("isTalebiKodu", item.IS_TALEP_NO);
-          setValue("talepEden", item.IS_TALEP_EDEN);
-          setValue("isTalebiTarihi", item.ISM_IS_TARIH ? (dayjs(item.ISM_IS_TARIH).isValid() ? dayjs(item.ISM_IS_TARIH) : null) : null);
-          setValue("isTalebiSaati", item.ISM_IS_SAAT ? (dayjs(item.ISM_IS_SAAT, "HH:mm:ss").isValid() ? dayjs(item.ISM_IS_SAAT, "HH:mm:ss") : null) : null);
-          setValue("isTalebiAciklama", item.ISM_IS_SONUC);
           setValue("masrafMerkezi", item.MASRAF_MERKEZI);
           setValue("masrafMerkeziID", item.ISM_MASRAF_MERKEZ_ID);
           setValue("proje", item.ISM_PROJE);
           setValue("projeID", item.ISM_PROJE_ID);
-          setValue("referansNo", item.ISM_REFERANS_NO);
           setValue("tamamlanmaOranı", item.TAMAMLANMA);
           setValue("planlananBaslama", item.PLAN_BASLAMA_TARIH ? (dayjs(item.PLAN_BASLAMA_TARIH).isValid() ? dayjs(item.PLAN_BASLAMA_TARIH) : null) : null);
           setValue(
@@ -449,6 +438,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
           // kapalı iş emri kapama bilgileri
           setValue("kapamaAciklama", item.ISM_SONUC);
+          setValue("kontrolSonucNotu", item.ISM_SONUC);
           setValue("kapamaSonucID", item.ISM_SONUC_KOD_ID);
           setValue("kapamaMakineDurumuID", item.ISM_KAPAT_MAKINE_DURUM_KOD_ID);
           setValue("kapamaMakineDurumu", item.ISM_KAPAT_MAKINE_DURUM);
@@ -541,91 +531,89 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   }, [calismaSaat, kapali, onayDurum, onayCheck]);
 
   const buildUpdateBody = (data) => ({
-      TB_ISEMRI_ID: data.secilenIsEmriID,
-      ISM_ISEMRI_NO: data.isEmriNo,
-      ISM_DUZENLEME_TARIH: formatDateWithDayjs(data.duzenlenmeTarihi),
-      ISM_DUZENLEME_SAAT: formatTimeWithDayjs(data.duzenlenmeSaati),
-      ISM_TIP_ID: data.isEmriTipiID,
-      ISM_DURUM_KOD_ID: data.isEmriDurumID,
-      ISM_BAGLI_ISEMRI_ID: data.bagliIsEmriID,
-      ISM_LOKASYON_ID: data.lokasyonID,
-      ISM_MAKINE_ID: data.makineID,
-      ISM_EKIPMAN_ID: data.ekipmanID,
-      ISM_MAKINE_DURUM_KOD_ID: data.makineDurumuID,
-      ISM_SAYAC_DEGER: data.sayac,
-      // Detay Bilgiler alanlari
-      ISM_REF_ID: data.prosedurID,
-      ISM_KONU: data.konu,
-      ISM_TIP_KOD_ID: data.prosedurTipiID,
-      ISM_NEDEN_KOD_ID: data.prosedurNedeniID,
-      ISM_ONCELIK_ID: data.oncelikID,
-      ISM_ATOLYE_ID: data.atolyeID,
-      ISM_TAKVIM_ID: data.takvimID,
-      ISM_TALIMAT_ID: data.talimatID,
-      ISM_IS_SONUC: data.isTalebiAciklama,
-      ISM_MASRAF_MERKEZ_ID: data.masrafMerkeziID,
-      ISM_PROJE_ID: data.projeID,
-      ISM_REFERANS_NO: data.referansNo,
-      ISM_TAMAMLANMA_ORAN: data.tamamlanmaOranı === "" ? 0 : data.tamamlanmaOranı,
-      ISM_PLAN_BASLAMA_TARIH: formatDateWithDayjs(data.planlananBaslama),
-      ISM_PLAN_BASLAMA_SAAT: formatTimeWithDayjs(data.planlananBaslamaSaati),
-      ISM_PLAN_BITIS_TARIH: formatDateWithDayjs(data.planlananBitis),
-      ISM_PLAN_BITIS_SAAT: formatTimeWithDayjs(data.planlananBitisSaati),
-      ISM_BASLAMA_TARIH: formatDateWithDayjs(data.baslamaZamani),
-      ISM_BASLAMA_SAAT: formatTimeWithDayjs(data.baslamaZamaniSaati),
-      ISM_BITIS_TARIH: formatDateWithDayjs(data.bitisZamani),
-      ISM_BITIS_SAAT: formatTimeWithDayjs(data.bitisZamaniSaati),
-      ISM_SURE_CALISMA: data.calismaSaat * 60 + data.calismaDakika,
-      ISM_FIRMA_ID: data.firmaID,
-      ISM_FIRMA_SOZLESME_ID: data.sozlesmeID,
-      ISM_EVRAK_NO: data.evrakNo,
-      ISM_EVRAK_TARIHI: formatDateWithDayjs(data.evrakTarihi),
-      // ISM_MALIYET_DISSERVIS: data.maliyet,
-      ISM_GARANTI_KAPSAMINDA: data.garantiKapsami,
-      // Süre Bilgileri tabı
-      ISM_SURE_MUDAHALE_LOJISTIK: data.lojistikSuresi,
-      ISM_SURE_MUDAHALE_SEYAHAT: data.seyahatSuresi,
-      ISM_SURE_MUDAHALE_ONAY: data.onaySuresi,
-      ISM_SURE_BEKLEME: data.beklemeSuresi,
-      ISM_SURE_MUDAHALE_DIGER: data.digerSuresi,
-      ISM_SURE_PLAN_MUDAHALE: data.mudahaleSuresi,
-      // IS_SURESI: data.calismaSuresi,
-      ISM_SURE_TOPLAM: data.toplamIsSuresi,
-      // Maliyetler tabı
-      ISM_MALIYET_MLZ: data.malzemeMaliyetiGercek,
-      ISM_MALIYET_PERSONEL: data.iscilikMaliyetiGercek,
-      ISM_MALIYET_DISSERVIS: data.maliyet,
-      ISM_MALIYET_DIGER: data.genelGiderlerGercek,
-      ISM_MALIYET_INDIRIM: data.indirimGercek,
-      ISM_MALIYET_KDV: data.kdvGercek,
-      ISM_MALIYET_TOPLAM: data.toplamMaliyetGercek,
-      // Özel alanlar
-      ISM_OZEL_ALAN_1: data.ozelAlan1,
-      ISM_OZEL_ALAN_2: data.ozelAlan2,
-      ISM_OZEL_ALAN_3: data.ozelAlan3,
-      ISM_OZEL_ALAN_4: data.ozelAlan4,
-      ISM_OZEL_ALAN_5: data.ozelAlan5,
-      ISM_OZEL_ALAN_6: data.ozelAlan6,
-      ISM_OZEL_ALAN_7: data.ozelAlan7,
-      ISM_OZEL_ALAN_8: data.ozelAlan8,
-      ISM_OZEL_ALAN_9: data.ozelAlan9,
-      ISM_OZEL_ALAN_10: data.ozelAlan10,
-      ISM_OZEL_ALAN_11_KOD_ID: data.ozelAlan11ID,
-      ISM_OZEL_ALAN_12_KOD_ID: data.ozelAlan12ID,
-      ISM_OZEL_ALAN_13_KOD_ID: data.ozelAlan13ID,
-      ISM_OZEL_ALAN_14_KOD_ID: data.ozelAlan14ID,
-      ISM_OZEL_ALAN_15_KOD_ID: data.ozelAlan15ID,
-      ISM_OZEL_ALAN_16: data.ozelAlan16,
-      ISM_OZEL_ALAN_17: data.ozelAlan17,
-      ISM_OZEL_ALAN_18: data.ozelAlan18,
-      ISM_OZEL_ALAN_19: data.ozelAlan19,
-      ISM_OZEL_ALAN_20: data.ozelAlan20,
-      // Notlar
-      ISM_MAKINE_GUVENLIK_NOTU: data.notlar,
-      //Açıklama
-      ISM_ACIKLAMA: data.isEmriAciklama,
-      // Diğer alanlarınız...
-    });
+    TB_ISEMRI_ID: data.secilenIsEmriID,
+    ISM_ISEMRI_NO: data.isEmriNo,
+    ISM_DUZENLEME_TARIH: formatDateWithDayjs(data.duzenlenmeTarihi),
+    ISM_DUZENLEME_SAAT: formatTimeWithDayjs(data.duzenlenmeSaati),
+    ISM_TIP_ID: data.isEmriTipiID,
+    ISM_DURUM_KOD_ID: data.isEmriDurumID,
+    ISM_BAGLI_ISEMRI_ID: data.bagliIsEmriID,
+    ISM_LOKASYON_ID: data.lokasyonID,
+    ISM_MAKINE_ID: data.makineID,
+    ISM_EKIPMAN_ID: data.ekipmanID,
+    ISM_MAKINE_DURUM_KOD_ID: data.makineDurumuID,
+    ISM_SAYAC_DEGER: data.sayac,
+    // Detay Bilgiler alanlari
+    ISM_REF_ID: data.prosedurID,
+    ISM_KONU: data.konu,
+    ISM_TIP_KOD_ID: data.prosedurTipiID,
+    ISM_NEDEN_KOD_ID: data.prosedurNedeniID,
+    ISM_ONCELIK_ID: data.oncelikID,
+    ISM_ATOLYE_ID: data.atolyeID,
+    ISM_TALIMAT_ID: data.talimatID,
+    ISM_MASRAF_MERKEZ_ID: data.masrafMerkeziID,
+    ISM_PROJE_ID: data.projeID,
+    ISM_TAMAMLANMA_ORAN: data.tamamlanmaOranı === "" ? 0 : data.tamamlanmaOranı,
+    ISM_PLAN_BASLAMA_TARIH: formatDateWithDayjs(data.planlananBaslama),
+    ISM_PLAN_BASLAMA_SAAT: formatTimeWithDayjs(data.planlananBaslamaSaati),
+    ISM_PLAN_BITIS_TARIH: formatDateWithDayjs(data.planlananBitis),
+    ISM_PLAN_BITIS_SAAT: formatTimeWithDayjs(data.planlananBitisSaati),
+    ISM_BASLAMA_TARIH: formatDateWithDayjs(data.baslamaZamani),
+    ISM_BASLAMA_SAAT: formatTimeWithDayjs(data.baslamaZamaniSaati),
+    ISM_BITIS_TARIH: formatDateWithDayjs(data.bitisZamani),
+    ISM_BITIS_SAAT: formatTimeWithDayjs(data.bitisZamaniSaati),
+    ISM_SURE_CALISMA: data.calismaSaat * 60 + data.calismaDakika,
+    ISM_FIRMA_ID: data.firmaID,
+    ISM_FIRMA_SOZLESME_ID: data.sozlesmeID,
+    ISM_EVRAK_NO: data.evrakNo,
+    ISM_EVRAK_TARIHI: formatDateWithDayjs(data.evrakTarihi),
+    // ISM_MALIYET_DISSERVIS: data.maliyet,
+    ISM_GARANTI_KAPSAMINDA: data.garantiKapsami,
+    // Süre Bilgileri tabı
+    ISM_SURE_MUDAHALE_LOJISTIK: data.lojistikSuresi,
+    ISM_SURE_MUDAHALE_SEYAHAT: data.seyahatSuresi,
+    ISM_SURE_MUDAHALE_ONAY: data.onaySuresi,
+    ISM_SURE_BEKLEME: data.beklemeSuresi,
+    ISM_SURE_MUDAHALE_DIGER: data.digerSuresi,
+    ISM_SURE_PLAN_MUDAHALE: data.mudahaleSuresi,
+    // IS_SURESI: data.calismaSuresi,
+    ISM_SURE_TOPLAM: data.toplamIsSuresi,
+    // Maliyetler tabı
+    ISM_MALIYET_MLZ: data.malzemeMaliyetiGercek,
+    ISM_MALIYET_PERSONEL: data.iscilikMaliyetiGercek,
+    ISM_MALIYET_DISSERVIS: data.maliyet,
+    ISM_MALIYET_DIGER: data.genelGiderlerGercek,
+    ISM_MALIYET_INDIRIM: data.indirimGercek,
+    ISM_MALIYET_KDV: data.kdvGercek,
+    ISM_MALIYET_TOPLAM: data.toplamMaliyetGercek,
+    // Özel alanlar
+    ISM_OZEL_ALAN_1: data.ozelAlan1,
+    ISM_OZEL_ALAN_2: data.ozelAlan2,
+    ISM_OZEL_ALAN_3: data.ozelAlan3,
+    ISM_OZEL_ALAN_4: data.ozelAlan4,
+    ISM_OZEL_ALAN_5: data.ozelAlan5,
+    ISM_OZEL_ALAN_6: data.ozelAlan6,
+    ISM_OZEL_ALAN_7: data.ozelAlan7,
+    ISM_OZEL_ALAN_8: data.ozelAlan8,
+    ISM_OZEL_ALAN_9: data.ozelAlan9,
+    ISM_OZEL_ALAN_10: data.ozelAlan10,
+    ISM_OZEL_ALAN_11_KOD_ID: data.ozelAlan11ID,
+    ISM_OZEL_ALAN_12_KOD_ID: data.ozelAlan12ID,
+    ISM_OZEL_ALAN_13_KOD_ID: data.ozelAlan13ID,
+    ISM_OZEL_ALAN_14_KOD_ID: data.ozelAlan14ID,
+    ISM_OZEL_ALAN_15_KOD_ID: data.ozelAlan15ID,
+    ISM_OZEL_ALAN_16: data.ozelAlan16,
+    ISM_OZEL_ALAN_17: data.ozelAlan17,
+    ISM_OZEL_ALAN_18: data.ozelAlan18,
+    ISM_OZEL_ALAN_19: data.ozelAlan19,
+    ISM_OZEL_ALAN_20: data.ozelAlan20,
+    // Notlar
+    ISM_MAKINE_GUVENLIK_NOTU: data.notlar,
+    ISM_SONUC: data.kontrolSonucNotu,
+    //Açıklama
+    ISM_ACIKLAMA: data.isEmriAciklama,
+    // Diğer alanlarınız...
+  });
 
   const updateIsEmri = async (data, { closeAfterSuccess = true, showSuccessMessage = true } = {}) => {
     const body = buildUpdateBody(data);
@@ -667,9 +655,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         );
       }
       if (response?.Idlist?.length) {
-        const words = response.Idlist.map(
-          (id) => idToWordMap[id] || t("isEmriKapatma.alan.bilinmeyenId")
-        );
+        const words = response.Idlist.map((id) => idToWordMap[id] || t("isEmriKapatma.alan.bilinmeyenId"));
         message.error(
           t("isEmriKapatma.genelAlanEksikMesaj", {
             fields: words.join(",\n"),
@@ -709,7 +695,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         ISM_KAPANMA_YDK_SAAT: formatTimeWithDayjs(closeTime),
         ISM_PUAN: data.kapamaBakimPuani,
         ISM_KAPAT_MAKINE_DURUM_KOD_ID: data.kapamaMakineDurumuID,
-        ISM_SONUC: data.kapamaAciklama,
+        ISM_SONUC: data.kontrolSonucNotu ?? data.kapamaAciklama,
       },
     ];
   };
@@ -787,6 +773,18 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     });
   };
 
+  const handlePrintWorkOrderForm = () => {
+    const baseURL = localStorage.getItem("baseURL");
+    const isEmriId = selectedRow?.key || methods.getValues("secilenIsEmriID");
+
+    if (!baseURL || !isEmriId) {
+      message.error("İş emri formu açılamadı.");
+      return;
+    }
+
+    window.open(`${baseURL}/FormRapor/GetFormByType?id=${isEmriId}&tipId=1`, "_blank");
+  };
+
   return (
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
@@ -803,6 +801,39 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           open={open}
           extra={
             <Space>
+              <Button icon={<QrcodeOutlined />} disabled={actionLoading} onClick={() => setQrModalOpen(true)}>
+                {t("qrKod")}
+              </Button>
+              <Button
+                disabled={actionLoading}
+                onClick={handlePrintWorkOrderForm}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  backgroundColor: "#f8fafc",
+                  borderColor: "#d9e0ea",
+                  color: "#4b5563",
+                }}
+              >
+                <span style={{ fontSize: "14px", lineHeight: 1 }}>🖨</span>
+                Yazdır
+              </Button>
+              <Button
+                disabled={actionLoading}
+                onClick={() => setAssignmentRequestKey((prevKey) => prevKey + 1)}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  backgroundColor: "#f8fafc",
+                  borderColor: "#d9e0ea",
+                  color: "#4b5563",
+                }}
+              >
+                <span style={{ fontSize: "14px", lineHeight: 1 }}>👷</span>
+                Atama
+              </Button>
               <Button danger disabled={disabled || actionLoading} loading={actionLoading} onClick={methods.handleSubmit(onSubmitAndClose)}>
                 Kapat
               </Button>
@@ -839,11 +870,19 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           ) : (
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <MainTabs disabled={disabled} isDisabled={isDisabled} fieldRequirements={fieldRequirements} />
-              <SecondTabs disabled={disabled} fieldRequirements={fieldRequirements} />
+              <SecondTabs disabled={disabled} fieldRequirements={fieldRequirements} assignmentRequestKey={assignmentRequestKey} />
               <Footer />
             </form>
           )}
         </Drawer>
+
+        <QRCodeGenerator
+          visible={qrModalOpen}
+          onClose={() => setQrModalOpen(false)}
+          value={`TB_ISEMRI_ID: ${watch("secilenIsEmriID") || selectedRow?.key || ""}`}
+          fileName={`QR-${watch("isEmriNo") || selectedRow?.key || "IsEmri"}`}
+          title="İş Emri QR Kodu"
+        />
       </ConfigProvider>
     </FormProvider>
   );

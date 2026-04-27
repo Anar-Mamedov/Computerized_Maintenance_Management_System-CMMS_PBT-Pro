@@ -186,7 +186,7 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
           style={{
             display: "flex",
             justifyContent: "space-between",
-            width: "300px",
+            width: "325px",
           }}
         >
           <Controller
@@ -199,7 +199,7 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
                 status={error ? "error" : ""}
                 disabled={kapali || fieldRequirements.disabled} // Disable the select based on the kapali field or external props
                 key={selectKey}
-                style={{ width: "265px" }}
+                style={{ width: "290px" }}
                 showSearch
                 // allowClear
                 placeholder="Seçim Yapınız"

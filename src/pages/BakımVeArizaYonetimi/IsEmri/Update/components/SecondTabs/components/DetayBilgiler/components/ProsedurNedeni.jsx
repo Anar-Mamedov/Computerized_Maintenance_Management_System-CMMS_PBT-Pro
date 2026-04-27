@@ -108,7 +108,7 @@ export default function ProsedurNedeni({ disabled, fieldRequirements }) {
               status={errors.prosedurNedeni ? "error" : ""}
               disabled={disabled}
               key={selectKey}
-              style={{ width: "300px" }}
+              style={{ width: "325px" }}
               showSearch
               allowClear
               placeholder="Seçim Yapınız"

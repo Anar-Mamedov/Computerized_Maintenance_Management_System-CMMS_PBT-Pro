@@ -133,6 +133,7 @@ const MainTable = ({
   makineIdFieldName = "makineID",
   disabled = false,
   onClear,
+  isRequired = false,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalVisible1, setIsModalVisible1] = useState(false);
@@ -1572,6 +1573,7 @@ const MainTable = ({
           <Controller
             name={makineFieldName}
             control={control}
+            rules={{ required: isRequired ? "Alan Boş Bırakılamaz!" : false }}
             render={({ field }) => (
               <Input
                 {...field}
@@ -1785,6 +1787,7 @@ MainTable.propTypes = {
   makineIdFieldName: PropTypes.string,
   disabled: PropTypes.bool,
   onClear: PropTypes.func,
+  isRequired: PropTypes.bool,
 };
 
 export default MainTable;
