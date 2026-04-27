@@ -438,7 +438,10 @@ export default function KontrolListesiTablo({ isActive }) {
       AxiosInstance.get(`FetchIsEmriKontrolList?isemriID=${secilenIsEmriID}`)
         .then((response) => {
           const responseData = Array.isArray(response) ? response : Array.isArray(response?.data) ? response.data : Array.isArray(response?.data?.data) ? response.data.data : [];
+          const kontrolNot = Array.isArray(response) ? "" : response?.kontrol_not ?? response?.data?.kontrol_not ?? "";
           const fetchedData = responseData.map(normalizeChecklistItem);
+          setValue("kontrolSonucNotu", kontrolNot);
+          setValue("kapamaAciklama", kontrolNot);
           setData(fetchedData);
           setSelectedRowKeys([]);
           setSelectedRows([]);
@@ -449,7 +452,7 @@ export default function KontrolListesiTablo({ isActive }) {
         })
         .finally(() => setLoading(false));
     }
-  }, [secilenIsEmriID, isActive]); // secilenIsEmriID değiştiğinde fetch fonksiyonunu güncelle
+  }, [secilenIsEmriID, isActive, setValue]); // secilenIsEmriID değiştiğinde fetch fonksiyonunu güncelle
 
   useEffect(() => {
     if (secilenIsEmriID) {
@@ -527,6 +530,30 @@ export default function KontrolListesiTablo({ isActive }) {
       message.error(t("workOrder.controlList.completeAllError"));
     } finally {
       setBulkCompleting(false);
+    }
+  };
+
+  const handleResultNoteBlur = async (value) => {
+    if (!secilenIsEmriID || kapali) {
+      return;
+    }
+
+    const payload = {
+      TB_ISEMRI_KONTROLLIST_ID: 0,
+      DKN_ISEMRI_ID: secilenIsEmriID,
+      DKN_TANIM: "",
+      ISM_KONTROL_SONUC_NOT: value || "",
+    };
+
+    try {
+      const response = await AxiosInstance.post(`AddUpdateIsEmriKontrolList?isEmriId=${secilenIsEmriID}`, payload);
+
+      if (response?.status_code && response.status_code !== 200 && response.status_code !== 201) {
+        message.error(t("workOrder.controlList.statusUpdateError"));
+      }
+    } catch (error) {
+      console.error("Kontrol sonuç notu güncelleme hatası:", error);
+      message.error(t("workOrder.controlList.statusUpdateError"));
     }
   };
 
@@ -610,6 +637,10 @@ export default function KontrolListesiTablo({ isActive }) {
               onChange={(event) => {
                 field.onChange(event);
                 setValue("kapamaAciklama", event.target.value);
+              }}
+              onBlur={(event) => {
+                field.onBlur();
+                handleResultNoteBlur(event.target.value);
               }}
             />
           )}
