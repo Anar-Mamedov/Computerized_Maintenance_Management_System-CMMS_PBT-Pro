@@ -505,6 +505,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   const closeDrawerAndReset = () => {
     setOpen(false);
+    setAssignmentRequestKey(0);
     onRefresh();
     methods.reset();
     onDrawerClose();
@@ -767,6 +768,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       cancelText: "Hayır",
       onOk: () => {
         setOpen(false);
+        setAssignmentRequestKey(0);
         reset();
         onDrawerClose();
       },
