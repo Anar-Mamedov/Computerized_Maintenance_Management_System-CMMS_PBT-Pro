@@ -357,6 +357,8 @@
   "workOrder.materialList.addMaterialTitle": "Add Material",
   "workOrder.materialList.editMaterialTitle": "Edit Material",
   "workOrder.materialList.addSelected": "Add Selected",
+  "workOrder.materialList.select": "Select",
+  "workOrder.materialList.selectMaterialName": "Select Material Name",
   "workOrder.materialList.chooseWarehouse": "Select a warehouse",
   "workOrder.materialList.chooseMaterial": "Please select material",
   "workOrder.materialList.materialNameRequired": "Material name is required.",
