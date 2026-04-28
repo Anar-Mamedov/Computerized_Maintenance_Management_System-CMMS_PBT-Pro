@@ -1003,6 +1003,8 @@
   "workOrder.materialList.addMaterialTitle": "Malzeme Ekle",
   "workOrder.materialList.editMaterialTitle": "Malzeme Güncelle",
   "workOrder.materialList.addSelected": "Seçilenleri Ekle",
+  "workOrder.materialList.select": "Seç",
+  "workOrder.materialList.selectMaterialName": "Malzeme Adı Seç",
   "workOrder.materialList.chooseWarehouse": "Depo seçiniz",
   "workOrder.materialList.chooseMaterial": "Lütfen malzeme seçin",
   "workOrder.materialList.materialNameRequired": "Malzeme adı zorunludur.",

@@ -361,6 +361,7 @@ export default function CreateDrawer({ onRefresh }) {
       ISM_EVRAK_TARIHI: formatDateWithDayjs(data.evrakTarihi),
       ISM_MALIYET_KDV: data.maliyet,
       ISM_GARANTI_KAPSAMINDA: data.garantiKapsami,
+      ISM_DISSERVIS_ACIKLAMA: data.disServisAciklama,
       ISM_ACIKLAMA: data.isEmriAciklama,
       ISM_WEB: true,
       // Diğer alanlarınız...

@@ -24,7 +24,7 @@ const buildInitialForm = (selectedRow) => ({
   stockId: selectedRow?.IDM_STOK_ID ?? selectedRow?.STOK_ID ?? null,
   warehouseId: selectedRow?.IDM_DEPO_ID ?? selectedRow?.DEPO_ID ?? null,
   stockDeduct: normalizeBoolean(selectedRow?.StoktanDusen ?? selectedRow?.IDM_STOK_DUS),
-  materialFromStock: normalizeBoolean(selectedRow?.IDM_MALZEME_STOKTAN ?? selectedRow?.StoktanDusen ?? selectedRow?.IDM_STOK_DUS),
+  materialFromStock: normalizeBoolean(selectedRow?.MalzemeStoktan ?? selectedRow?.IDM_MALZEME_STOKTAN ?? selectedRow?.StoktanDusen ?? selectedRow?.IDM_STOK_DUS),
 });
 
 export default function EditModal({ selectedRow, isModalVisible, onModalClose, onRefresh, secilenIsEmriID }) {
@@ -107,7 +107,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
     >
       <Form layout="vertical">
         <Form.Item label={t("workOrder.materialList.materialName")} required>
-          <Input value={form.materialName} onChange={(event) => updateField("materialName", event.target.value)} />
+          <Input value={form.materialName} disabled={form.materialFromStock} onChange={(event) => updateField("materialName", event.target.value)} />
         </Form.Item>
         <Form.Item label={t("workOrder.materialList.unit")}>
           <Input value={form.unit} onChange={(event) => updateField("unit", event.target.value)} />

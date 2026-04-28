@@ -377,6 +377,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("evrakTarihi", item.ISM_EVRAK_TARIHI ? (dayjs(item.ISM_EVRAK_TARIHI).isValid() ? dayjs(item.ISM_EVRAK_TARIHI) : null) : null);
           setValue("maliyet", item.ISM_MALIYET_DISSERVIS);
           setValue("garantiKapsami", item.GARANTI);
+          setValue("disServisAciklama", item.ISM_DISSERVIS_ACIKLAMA);
 
           // Süre Bilgileri tabı
           setValue("lojistikSuresi", item.ISM_SURE_MUDAHALE_LOJISTIK);
@@ -570,6 +571,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     ISM_EVRAK_TARIHI: formatDateWithDayjs(data.evrakTarihi),
     // ISM_MALIYET_DISSERVIS: data.maliyet,
     ISM_GARANTI_KAPSAMINDA: data.garantiKapsami,
+    ISM_DISSERVIS_ACIKLAMA: data.disServisAciklama,
     // Süre Bilgileri tabı
     ISM_SURE_MUDAHALE_LOJISTIK: data.lojistikSuresi,
     ISM_SURE_MUDAHALE_SEYAHAT: data.seyahatSuresi,
