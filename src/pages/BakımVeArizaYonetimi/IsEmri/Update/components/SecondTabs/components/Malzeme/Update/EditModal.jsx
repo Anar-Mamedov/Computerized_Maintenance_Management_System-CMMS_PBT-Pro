@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { Checkbox, Form, Input, InputNumber, message, Modal } from "antd";
 import { useTranslation } from "react-i18next";
+import { FormProvider, useForm } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../../api/http";
+import KodIDSelectbox from "../../../../../../../../../utils/components/KodIDSelectbox";
 
 const normalizeNumber = (value) => {
   const number = Number(value);
@@ -17,12 +19,14 @@ const normalizeBoolean = (value) => {
 const buildInitialForm = (selectedRow) => ({
   id: selectedRow?.TB_ISEMRI_MLZ_ID ?? selectedRow?.key ?? 0,
   materialName: selectedRow?.MalzemeAdi ?? selectedRow?.IDM_STOK_TANIM ?? "",
+  unitId: selectedRow?.BirimId ?? selectedRow?.BirimID ?? selectedRow?.BirimKodId ?? selectedRow?.IDM_BIRIM_KOD_ID ?? selectedRow?.STK_BIRIM_KOD_ID ?? null,
   unit: selectedRow?.Birim ?? selectedRow?.IDM_BIRIM ?? "",
   quantity: normalizeNumber(selectedRow?.Miktar ?? selectedRow?.IDM_MIKTAR),
   unitPrice: normalizeNumber(selectedRow?.BirimFiyat ?? selectedRow?.IDM_BIRIM_FIYAT),
   total: normalizeNumber(selectedRow?.Tutar ?? selectedRow?.IDM_TUTAR),
-  stockId: selectedRow?.IDM_STOK_ID ?? selectedRow?.STOK_ID ?? null,
-  warehouseId: selectedRow?.IDM_DEPO_ID ?? selectedRow?.DEPO_ID ?? null,
+  stockId: selectedRow?.StokId ?? selectedRow?.StokID ?? selectedRow?.IDM_STOK_ID ?? selectedRow?.STOK_ID ?? null,
+  warehouseId: selectedRow?.DepoId ?? selectedRow?.DepoID ?? selectedRow?.IDM_DEPO_ID ?? selectedRow?.DEPO_ID ?? null,
+  warehouseName: selectedRow?.Depo ?? selectedRow?.IDM_DEPO ?? "",
   stockDeduct: normalizeBoolean(selectedRow?.StoktanDusen ?? selectedRow?.IDM_STOK_DUS),
   materialFromStock: normalizeBoolean(selectedRow?.MalzemeStoktan ?? selectedRow?.IDM_MALZEME_STOKTAN ?? selectedRow?.StoktanDusen ?? selectedRow?.IDM_STOK_DUS),
 });
@@ -31,12 +35,23 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
   const { t } = useTranslation();
   const [form, setForm] = useState(buildInitialForm(selectedRow));
   const [saving, setSaving] = useState(false);
+  const unitMethods = useForm({
+    defaultValues: {
+      unitCode: null,
+      unitCodeID: "",
+    },
+  });
 
   useEffect(() => {
     if (isModalVisible && selectedRow) {
-      setForm(buildInitialForm(selectedRow));
+      const nextForm = buildInitialForm(selectedRow);
+      setForm(nextForm);
+      unitMethods.reset({
+        unitCode: nextForm.unitId ?? null,
+        unitCodeID: nextForm.unitId ?? "",
+      });
     }
-  }, [isModalVisible, selectedRow]);
+  }, [isModalVisible, selectedRow, unitMethods]);
 
   useEffect(() => {
     const quantity = normalizeNumber(form.quantity);
@@ -63,10 +78,10 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       IDM_ISEMRI_ID: secilenIsEmriID,
       IDM_STOK_ID: form.stockId,
       IDM_DEPO_ID: form.warehouseId,
+      IDM_BIRIM_KOD_ID: form.unitId,
       IDM_STOK_DUS: form.stockDeduct,
       IDM_MALZEME_STOKTAN: form.materialFromStock,
       IDM_STOK_TANIM: form.materialName,
-      IDM_BIRIM: form.unit,
       IDM_BIRIM_FIYAT: normalizeNumber(form.unitPrice),
       IDM_MIKTAR: normalizeNumber(form.quantity),
       IDM_TUTAR: normalizeNumber(form.total),
@@ -109,8 +124,25 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
         <Form.Item label={t("workOrder.materialList.materialName")} required>
           <Input value={form.materialName} disabled={form.materialFromStock} onChange={(event) => updateField("materialName", event.target.value)} />
         </Form.Item>
+        <Form.Item label={t("workOrder.materialList.warehouse")}>
+          <Input value={form.warehouseName} disabled />
+        </Form.Item>
         <Form.Item label={t("workOrder.materialList.unit")}>
-          <Input value={form.unit} onChange={(event) => updateField("unit", event.target.value)} />
+          {form.materialFromStock ? (
+            <Input value={form.unit} disabled />
+          ) : (
+            <FormProvider {...unitMethods}>
+              <KodIDSelectbox
+                name1="unitCode"
+                kodID={32001}
+                isRequired={false}
+                showDropdownAdd={false}
+                placeholder={t("workOrder.materialList.unit")}
+                onLabelChange={(label) => updateField("unit", label ?? "")}
+                onChange={(value) => updateField("unitId", value ?? null)}
+              />
+            </FormProvider>
+          )}
         </Form.Item>
         <Form.Item label={t("workOrder.materialList.quantity")}>
           <InputNumber min={0} style={{ width: "100%" }} value={form.quantity} onChange={(value) => updateField("quantity", value)} />
