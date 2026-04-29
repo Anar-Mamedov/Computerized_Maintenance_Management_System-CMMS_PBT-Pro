@@ -198,6 +198,7 @@ const normalizeMaterialItem = (item, index) => {
     BirimFiyat: unitPrice,
     Tutar: normalizeNumber(total),
     StoktanDusen: normalizeBoolean(item.StoktanDusen ?? item.IDM_STOK_DUS),
+    MalzemeStoktan: normalizeBoolean(item.MalzemeStoktan ?? item.IDM_MALZEME_STOKTAN),
   };
 };
 
