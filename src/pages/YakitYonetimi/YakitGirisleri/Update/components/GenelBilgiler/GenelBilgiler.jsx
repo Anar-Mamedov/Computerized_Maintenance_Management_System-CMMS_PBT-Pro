@@ -78,6 +78,23 @@ export default function SecondTabs() {
     }
   }, [watchStokKullanim, watchLokasyonId, watchYakitTipId, setValue]);
 
+  useEffect(() => {
+    if (watchMakineId) {
+      AxiosInstance.get(`GetAracYakitGirisDurumu?makineId=${watchMakineId}&isUpdate=true`)
+        .then((res) => {
+          if (res.data) {
+            const d = res.data;
+            setValue("_maxKapasite", d.DepoKapasitesi);
+            setValue("_sayacZorunlu", d.SayacTakibiZorunlu);
+            setValue("_sayacBirimi", d.SayacBirimi);
+            setValue("_guncelSayacDegeri", d.GuncelSayacDegeri);
+            setValue("AlinanKm", d.GuncelSayacDegeri);
+          }
+        })
+        .catch(() => message.error(t("Araç bilgileri alınamadı.")));
+    }
+  }, [watchMakineId, setValue]);
+
   // Fark KM Hesaplama
   useEffect(() => {
   const son = Number(watchSonKm) || 0;
@@ -139,10 +156,6 @@ export default function SecondTabs() {
           />
           </Col>
           <Col span={8}>
-            <Text style={labelStyle}>{t("Sürücü / Personel")}</Text>
-              <PersonelSelect fieldName="PersonelAdi" placeholder={t("Seçiniz")} mode="default" selectStyle={{ width: "100%", maxWidth: "600px"}}/>
-          </Col>
-          <Col span={8}>
             <Text style={labelStyle}>{t("Yakıt Tipi")}</Text>
             <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
               <div style={{ flex: 1 }}>
@@ -170,10 +183,6 @@ export default function SecondTabs() {
             />
             </div>
           </Col>
-        </Row>
-
-        {/* 2. SATIR: Tarih / Saat / Yakıt Deposu */}
-        <Row gutter={[16, 16]} style={{ marginTop: "15px" }}>
           <Col span={4}>
             <Text style={labelStyle}>{t("Tarih")}</Text>
             <Controller
@@ -204,6 +213,14 @@ export default function SecondTabs() {
                 />
               )}
             />
+          </Col>
+        </Row>
+
+        {/* 2. SATIR: Tarih / Saat / Yakıt Deposu */}
+        <Row gutter={[16, 16]} style={{ marginTop: "15px" }}>
+          <Col span={8}>
+            <Text style={labelStyle}>{t("Opertör / Personel")}</Text>
+              <PersonelSelect fieldName="PersonelAdi" placeholder={t("Seçiniz")} mode="default" selectStyle={{ width: "100%", maxWidth: "600px"}}/>
           </Col>
           <Col span={8}>
             {watchStokKullanim && (
@@ -245,10 +262,10 @@ export default function SecondTabs() {
         {/* 1. Sütun: Kilometre Bilgisi */}
         <Col span={8}>
           <div style={cardStyle}>
-            <Title level={5}>{t("Kilometre Bilgisi")}</Title>
+            <Title level={5}>{t("Sayaç Bilgisi")}</Title>
             <Row gutter={[8, 8]}>
               <Col span={12}>
-                <Text type="secondary" size="small">{t("Son Alınan")} ({watchSayacBirimi})</Text>
+                <Text type="secondary" style={labelStyle} size="small">{t("Son Alınan")} ({watchSayacBirimi})</Text>
                 <Controller
                   name="SonKm"
                   control={control}
@@ -256,7 +273,7 @@ export default function SecondTabs() {
                 />
               </Col>
               <Col span={12}>
-                <Text type="secondary" size="small">{t("Yakıtın Alındığı")} ({watchSayacBirimi})</Text>
+                <Text type="secondary" style={labelStyle} size="small">{t("Yakıtın Alındığı")} ({watchSayacBirimi})</Text>
                 <Controller
                   name="AlinanKm"
                   control={control}
@@ -270,13 +287,31 @@ export default function SecondTabs() {
                 />
               </Col>
               <Col span={12}>
-                <Text type="secondary" size="small">{t("Fark")} ({watchSayacBirimi})</Text>
+                <Text type="secondary" style={labelStyle} size="small">{t("Fark")} ({watchSayacBirimi})</Text>
                 <Controller
                   name="FarkKm"
                   control={control}
                   render={({ field }) => <InputNumber {...field} style={{ width: "100%" }} disabled />}
                 />
-                {/* Güncel Sayaç Bilgilendirme Alanı */}
+              </Col>
+            </Row>
+            <div style={{ marginTop: "15px", backgroundColor: "#fafafa", padding: "10px", borderRadius: "4px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: "5px" }}>
+                <div><Text size="small">Sayaç Tipi</Text><br /><b>{watchSayacBirimi}</b></div>
+                <div><Text size="small">Son Kullanım</Text><br /><b>{watchFarkKm}</b></div>
+                <div>
+                      {/* Şartlı Renk ve Metin Alanı */}
+                      <Text size="small" style={{ color: watchSayacZorunlu ? "#52c41a" : "#ff4d4f" }}>
+                        {t("Kontrol")}
+                      </Text>
+                      <br />
+                      <b style={{ color: watchSayacZorunlu ? "#52c41a" : "#ff4d4f" }}>
+                        {watchSayacZorunlu ? t("Uygun") : t("Uygun Değil")}
+                      </b>
+                    </div>
+              </div>
+            </div>
+            {/* Güncel Sayaç Bilgilendirme Alanı */}
                 {watchGuncelSayac !== undefined && watchGuncelSayac !== null && (
                   <div style={{ marginTop: '4px' }}>
                     <Text type="secondary" style={{ fontSize: '11px', color: '#1890ff' }}>
@@ -284,8 +319,6 @@ export default function SecondTabs() {
                     </Text>
                   </div>
                 )}
-              </Col>
-            </Row>
           </div>
         </Col>
 
@@ -307,7 +340,14 @@ export default function SecondTabs() {
                 <Controller
                   name="Fiyat"
                   control={control}
-                  render={({ field }) => <InputNumber {...field} style={{ width: "100%" }} />}
+                  render={({ field }) => <InputNumber
+                        {...field}
+                        style={{ width: "100%" }}
+                        step="0.01"             // Ok tuşlarıyla artış miktarını belirler
+                        stringMode              // Yüksek hassasiyetli sayılar için önerilir
+                        decimalSeparator=","    // Virgülü ayırıcı olarak kullanmanı sağlar
+                        changeOnWheel={false}   // Yanlışlıkla scroll yapınca sayının değişmesini engeller
+                      />}
                 />
               </Col>
               <Col span={12}>
@@ -315,7 +355,14 @@ export default function SecondTabs() {
                 <Controller
                   name="Tutar"
                   control={control}
-                  render={({ field }) => <InputNumber {...field} style={{ width: "100%" }} />}
+                  render={({ field }) => <InputNumber
+                        {...field}
+                        style={{ width: "100%" }}
+                        step="0.01"             // Ok tuşlarıyla artış miktarını belirler
+                        stringMode              // Yüksek hassasiyetli sayılar için önerilir
+                        decimalSeparator=","    // Virgülü ayırıcı olarak kullanmanı sağlar
+                        changeOnWheel={false}   // Yanlışlıkla scroll yapınca sayının değişmesini engeller
+                      />}
                 />
               </Col>
               <Col span={12} style={{ display: "flex", alignItems: "center", paddingTop: "25px" }}>
@@ -328,10 +375,9 @@ export default function SecondTabs() {
             </Row>
             
             <div style={{ marginTop: "15px", backgroundColor: "#fafafa", padding: "10px", borderRadius: "4px" }}>
-              <Text type="secondary" style={{ fontSize: "12px" }}>{t("Otomatik hesap")}</Text>
               <div style={{ display: "flex", justifyContent: "space-between", marginTop: "5px" }}>
                 <div><Text size="small">Maliyet / {watchSayacBirimi}</Text><br /><b>{kmBasiMaliyet}</b></div>
-                <div><Text size="small">Ort. tüketim</Text><br /><b>{ortTuketim}</b></div>
+                <div><Text size="small">Ort. tüketim</Text><br /><b>{ortTuketim} / 100 {watchSayacBirimi}</b></div>
                 <div>
                   <Text size="small" style={{ color: isAnomali ? "red" : "inherit" }}>Anomali</Text><br />
                   <b style={{ color: isAnomali ? "red" : "inherit" }}>{isAnomali ? "Var" : "Yok"}</b>
@@ -342,33 +388,36 @@ export default function SecondTabs() {
         </Col>
 
         {/* 3. Sütun: Belge & Konum */}
-        <Col span={8}>
-          <div style={cardStyle}>
-            <Title level={5}>{t("Belge & Konum")}</Title>
-            <Row gutter={[8, 8]}>
-              <Col span={24}>
-                <Text style={labelStyle}>{t("Fatura / Fiş No")}</Text>
-                <Controller
-                  name="FaturaFisNo"
-                  control={control}
-                  render={({ field }) => <Input {...field} />}
-                />
-              </Col>
-              <Col span={24}>
-                <Text style={labelStyle}>{t("Fatura / Fiş Tarihi")}</Text>
-                <Controller
-                  name="FaturaTarihi"
-                  control={control}
-                  render={({ field }) => (
-                    <DatePicker 
-                      {...field} 
-                      value={field.value ? dayjs(field.value) : null} 
-                      onChange={(date) => field.onChange(date ? date.toISOString() : null)}
-                      style={{ width: "100%" }} 
-                    />
-                  )}
-                />
-              </Col>
+        {/* 3. Sütun: Belge & Konum */}
+<Col span={8}>
+  <div style={cardStyle}>
+    <Title level={5}>{t("Belge & Konum")}</Title>
+    <Row gutter={[8, 8]}>
+      
+      {/* Fatura No ve Tarih Yan Yana */}
+      <Col span={12}>
+        <Text style={labelStyle}>{t("Fatura / Fiş No")}</Text>
+        <Controller
+          name="FaturaFisNo"
+          control={control}
+          render={({ field }) => <Input {...field} />}
+        />
+      </Col>
+      <Col span={12}>
+        <Text style={labelStyle}>{t("Fatura / Fiş Tarihi")}</Text>
+        <Controller
+          name="FaturaTarihi"
+          control={control}
+          render={({ field }) => (
+            <DatePicker 
+              {...field} 
+              value={field.value ? dayjs(field.value) : null} 
+              onChange={(date) => field.onChange(date ? date.toISOString() : null)}
+              style={{ width: "100%" }} 
+            />
+          )}
+        />
+      </Col>
               
               <Col span={24}>
                 <Text style={labelStyle}>{t("Lokasyon")}</Text>

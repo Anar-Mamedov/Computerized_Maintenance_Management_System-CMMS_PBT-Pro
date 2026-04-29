@@ -316,6 +316,19 @@ const MainTable = () => {
       ),
       sorter: (a, b) => (a.AKTIF === b.AKTIF ? 0 : a.AKTIF ? -1 : 1),
     },
+    {
+      title: "Kullanılan Ekipman",
+      dataIndex: "KULLANAN_ARAC_SAYISI",
+      key: "KULLANAN_ARAC_SAYISI",
+      width: 200,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+      sorter: (a, b) => {
+        if (a.KULLANAN_ARAC_SAYISI === null) return -1;
+        if (b.KULLANAN_ARAC_SAYISI === null) return 1;
+        return a.KULLANAN_ARAC_SAYISI.localeCompare(b.KULLANAN_ARAC_SAYISI);
+      },
+    },
 
     // Diğer kolonlarınız...
   ];

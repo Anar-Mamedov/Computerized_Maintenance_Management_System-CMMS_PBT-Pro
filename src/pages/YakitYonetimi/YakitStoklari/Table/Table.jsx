@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState, useMemo, useRef } from "react";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Progress, message, Card, Row, Col, Space, Popconfirm, Tag, Popover, Drawer, Select } from "antd";
-import { HolderOutlined, SearchOutlined, MenuOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { HolderOutlined, SearchOutlined, MenuOutlined, EditOutlined, DeleteOutlined, DownloadOutlined, UploadOutlined, ArrowsAltOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -12,7 +12,9 @@ import EditDrawer from "../Update/EditDrawer";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
 import Filters from "./filter/Filters";
-import YakitIslemleri from "./YakitIslemleri/YakitIslemleri";
+import YakitGiris from "./YakitIslemleri/YakitGiris";
+import YakitCikis from "./YakitIslemleri/YakitCikis";
+import YakitTransfer from "./YakitIslemleri/YakitTransfer";
 import { useFormContext } from "react-hook-form";
 import { SiMicrosoftexcel } from "react-icons/si";
 import * as XLSX from "xlsx";
@@ -137,7 +139,9 @@ const MainTable = () => {
   const [xlsxLoading, setXlsxLoading] = useState(false);
   const [status, setStatus] = useState(-1);
   const [cardsData, setCardsData] = useState({});
-  const [yakitModalVisible, setYakitModalVisible] = useState(false);
+  const [yakitGirisModalVisible, setYakitGirisModalVisible] = useState(false);
+  const [yakitCikisModalVisible, setYakitCikisModalVisible] = useState(false);
+  const [yakitTransferModalVisible, setYakitTransferModalVisible] = useState(false);
 
   const [body, setBody] = useState({
     LokasyonIds: [],
@@ -150,22 +154,22 @@ const MainTable = () => {
 
     return [
       { 
-        title: "Toplam Depo Sayısı", 
+        title: "Toplam Depo / Tank", 
         value: data.ToplamDepoSayisi ?? 0 
       },
       { 
-        title: "Toplam Yakıt Miktarı", 
+        title: "Toplam Stok (Lt.)", 
         // Sayıyı okunaklı hale getirdik (örn: 69.200 Lt)
         value: `${Number(data.ToplamYakitMiktari || 0).toLocaleString('tr-TR')} Lt` 
       },
       { 
-        title: "Kritik Depo Sayısı", 
+        title: "Kritik Seviye", 
         value: data.KritikDepoSayisi ?? 0,
         // Kritik sayı 0'dan büyükse rengi kırmızımsı yapmak için style prop eklenebilir (render kısmında)
         isCritical: (data.KritikDepoSayisi || 0) > 0 
       },
       { 
-        title: "Günlük Giriş Çıkış", 
+        title: "Günlük Giriş / Çıkış", 
         value: data.GunlukGirisCikis || "0 / 0 L" 
       },
     ];
@@ -237,7 +241,7 @@ const MainTable = () => {
       sorter: (a, b) => a.DEP_KOD?.localeCompare(b.DEP_KOD),
     },
     {
-      title: "Depo Tanımı",
+      title: "Depo / Tank Tanımı",
       dataIndex: "DEP_TANIM",
       key: "DEP_TANIM",
       width: 200,
@@ -255,7 +259,7 @@ const MainTable = () => {
       sorter: (a, b) => a.LOKASYON?.localeCompare(b.LOKASYON),
     },
     {
-      title: "Yakıt Türü",
+      title: "Yakıt Tipi",
       dataIndex: "YAKIT_TURU",
       key: "YAKIT_TURU",
       width: 120,
@@ -272,7 +276,7 @@ const MainTable = () => {
       sorter: (a, b) => a.KAPASITE - b.KAPASITE,
     },
     {
-      title: "Mevcut Miktar",
+      title: "Stok",
       dataIndex: "MEVCUT_MIKTAR",
       key: "MEVCUT_MIKTAR",
       width: 150,
@@ -302,6 +306,20 @@ const MainTable = () => {
         );
       },
       sorter: (a, b) => a.DOLULUK_ORANI - b.DOLULUK_ORANI,
+    },
+    {
+      title: "Günlük Giriş",
+      dataIndex: "GUNLUK_GIRIS",
+      key: "GUNLUK_GIRIS",
+      width: 150,
+      visible: true,
+    },
+    {
+      title: "Günlük Çıkış",
+      dataIndex: "GUNLUK_CIKIS",
+      key: "GUNLUK_CIKIS",
+      width: 150,
+      visible: true,
     },
     {
       title: "Son Hareket",
@@ -425,24 +443,26 @@ const MainTable = () => {
     try {
       setLoading(true);
       
-      // Dokümana uygun Body hazırlama
       const payload = {
-        LokasyonIds: body.LokasyonIds || [], // Array
-        YakitTipIds: body.YakitTipIds || [], // Array
-        Durum: status // 1, 0, -1
+        LokasyonIds: body.LokasyonIds || [],
+        YakitTipIds: body.YakitTipIds || [],
+        Durum: status 
       };
 
       const response = await AxiosInstance.post(`GetYakitTankList`, payload);
 
-      if (Array.isArray(response)) {
-        const formattedData = response.map((item) => ({
+      // DÜZELTME: API'den gelen response.data'yı kontrol ediyoruz
+      if (response && response.has_error === false && Array.isArray(response.data)) {
+        const formattedData = response.data.map((item) => ({
           ...item,
-          key: item.TB_DEPO_ID || item.TB_STOK_ID, // Key olarak ID kullan
+          // Senin verinde TB_DEPO_ID geliyor, onu key yapalım
+          key: item.TB_DEPO_ID || Math.random().toString(36), 
         }));
+        
         setData(formattedData);
-        setTotalDataCount(formattedData.length); // Client-side pagination için
+        setTotalDataCount(formattedData.length);
       } else {
-        console.error("API yanıtı beklenen formatta değil.", response);
+        console.error("API yanıtı beklenen formatta değil veya hata var.", response);
         setData([]);
       }
     } catch (error) {
@@ -501,7 +521,6 @@ const MainTable = () => {
 
   // Talep No için
   const onRowClick = (record) => {
-    console.log("Tıklanan Satırın ID'si:", record.TB_STOK_ID); // Konsolda ID görüyor musun?
     setDrawer({ visible: true, data: { ...record, key: record.TB_STOK_ID } });
   };
 
@@ -954,10 +973,27 @@ const MainTable = () => {
           </Button>
           <Button 
             type="primary" // Öne çıkmasını istersen "primary" kalabilir, istemezsen silebilirsin kanka
+            icon={<DownloadOutlined />}
             style={{ display: "flex", alignItems: "center", backgroundColor: "#ff6d28", borderColor: "#ff6d28" }}
-            onClick={() => setYakitModalVisible(true)}
+            onClick={() => setYakitGirisModalVisible(true)}
           >
-            Yakıt İşlemleri
+            Giriş
+          </Button>
+          <Button 
+            type="primary" // Öne çıkmasını istersen "primary" kalabilir, istemezsen silebilirsin kanka
+            icon={<UploadOutlined />}
+            style={{ display: "flex", alignItems: "center", backgroundColor: "#ff6d28", borderColor: "#ff6d28" }}
+            onClick={() => setYakitCikisModalVisible(true)}
+          >
+            Çıkış
+          </Button>
+          <Button 
+            type="primary" // Öne çıkmasını istersen "primary" kalabilir, istemezsen silebilirsin kanka
+            icon={<ArrowsAltOutlined />}
+            style={{ display: "flex", alignItems: "center", backgroundColor: "#ff6d28", borderColor: "#ff6d28" }}
+            onClick={() => setYakitTransferModalVisible(true)}
+          >
+            Transfer
           </Button>
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
@@ -992,9 +1028,19 @@ const MainTable = () => {
         drawerVisible={drawer.visible} 
         onRefresh={refreshTableData} 
       />
-      <YakitIslemleri
-        visible={yakitModalVisible} 
-        onClose={() => setYakitModalVisible(false)} 
+      <YakitGiris
+        visible={yakitGirisModalVisible} 
+        onClose={() => setYakitGirisModalVisible(false)} 
+        onRefresh={refreshTableData}
+      />
+      <YakitCikis
+        visible={yakitCikisModalVisible} 
+        onClose={() => setYakitCikisModalVisible(false)} 
+        onRefresh={refreshTableData}
+      />
+      <YakitTransfer
+        visible={yakitTransferModalVisible} 
+        onClose={() => setYakitTransferModalVisible(false)} 
         onRefresh={refreshTableData}
       />
 

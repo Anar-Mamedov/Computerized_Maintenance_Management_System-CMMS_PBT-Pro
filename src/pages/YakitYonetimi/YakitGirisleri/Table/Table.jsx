@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState, useMemo, useRef } from "react";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Progress, message, Card, Row, Col, Space, Popconfirm, Tag, Popover, Drawer, Select } from "antd";
-import { HolderOutlined, SearchOutlined, MenuOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { HolderOutlined, SearchOutlined, MenuOutlined, EditOutlined, DeleteOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -147,32 +147,11 @@ const MainTable = () => {
   });
 
   const cardItems = useMemo(() => [
-    { title: "Toplam Yakıt", value: `${cardsData.ToplamYakitLitre || 0} Lt` },
+    { title: "Toplam Çıkış", value: `${cardsData.ToplamCikisLitre || 0} Lt` },
     { title: "Toplam Tutar", value: `${Number(cardsData.ToplamTutar || 0).toLocaleString('tr-TR')} TL` },
-    { title: "Anormal Tüketim (Araç)", value: cardsData.AnormalTuketimAracSayisi || 0, isCritical: (cardsData.AnormalTuketimAracSayisi > 0) },
-    { title: "Km Başına Maliyet", value: `${cardsData.KmBasinaMaliyet || 0} TL` },
+    { title: "Anormal Tüketim", value: cardsData.AnormalTuketimKayitSayisi || 0, isCritical: (cardsData.AnormalTuketimKayitSayisi > 0) },
+    { title: "Ekipman Başına Maliyet", value: `${cardsData.EkipmanBasinaMaliyet || 0} TL` },
   ], [cardsData]);
-
-  const fetchCards = useCallback(async () => {
-    try {
-      const res = await AxiosInstance.get("GetYakitTankOzet");
-      
-      // Dokümandaki gibi direkt obje dönüyorsa:
-      if (res) {
-        // Eğer API wrapper kullanıyorsa (res.data içindeyse) kontrolü:
-        const data = res.data || res; 
-        setCardsData(data);
-      } 
-    } catch (err) {
-      console.error("Kart verileri çekilemedi:", err);
-      // Hata durumunda boş obje set edelim
-      setCardsData({});
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchCards();
-  }, [fetchCards]);
 
   useEffect(() => {
     // API'den veri çekme işlemi
@@ -209,52 +188,79 @@ const MainTable = () => {
 
   const initialColumns = [
     {
-      title: "Plaka / Ekipman Kod",
-      dataIndex: "Plaka",
-      key: "Plaka",
-      width: 250,
-      ellipsis: true,
-      visible: true,
-      render: (text, record) => <a onClick={() => onRowClick(record)}>{text}</a>,
-      sorter: (a, b) => a.Plaka?.localeCompare(b.Plaka),
-    },
+  title: "Ekipman / Araç",
+  dataIndex: "Ekipman", 
+  key: "Ekipman",
+  width: 300,
+  ellipsis: true,
+  visible: true,
+  render: (value, record) => (
+    <div style={{ display: "flex", flexDirection: "column", lineHeight: "1.2" }}>
+      <span style={{ fontWeight: 600 }}>
+        {/* value burada {Kod: "...", Adi: "..."} objesidir. 
+            Bu yüzden direkt {value} yazarsan patlar. 
+            Tıklama işlemini Kod üzerine alıyoruz: */}
+        <a onClick={() => onRowClick(record)}>
+          {value?.Kod || "-"}
+        </a>
+      </span>
+      <Text type="secondary" style={{ fontSize: "12px" }}>
+        {value?.Adi || "-"}
+      </Text>
+    </div>
+  ),
+  sorter: (a, b) => (a.Ekipman?.Kod || "").localeCompare(b.Ekipman?.Kod || ""),
+},
     {
-      title: "Tarih",
-      dataIndex: "TarihSaat",
-      key: "TarihSaat",
-      width: 110,
-      ellipsis: true,
-      sorter: (a, b) => {
-        if (a.TarihSaat === null) return -1;
-        if (b.TarihSaat === null) return 1;
-        return a.TarihSaat.localeCompare(b.TarihSaat);
-      },
+    title: "Tarih / Saat",
+    dataIndex: "TarihSaat",
+    key: "TarihSaat",
+    width: 110,
+    ellipsis: true,
+    visible: true,
+    sorter: (a, b) => (a.TarihSaat || "").localeCompare(b.TarihSaat || ""),
+    render: (text) => {
+      if (!text) return "-";
+      const parts = text.split("\n");
+      const datePart = parts[0];
+      const timePart = parts[1] ? parts[1].substring(0, 5) : "";
 
-      visible: true, // Varsayılan olarak açık
-      render: (text) => {
-        if (!text) return "-";
-        
-        // Backend'den gelen "26.03.2026\n10:35:15" verisini parçalıyoruz
-        const parts = text.split("\n"); // [0] -> "26.03.2026", [1] -> "10:35:15"
-        
-        if (parts.length > 0) {
-          const datePart = parts[0];
-          // Saatin saniyelerini (10:35:15 -> 10:35) uçuruyoruz
-          const timePart = parts[1] ? parts[1].substring(0, 5) : ""; 
-          
-          return `${datePart} ${timePart}`;
-        }
-        
-        return text; // Beklenmedik bir format gelirse olduğu gibi bas
-      },
+      return (
+        <div style={{ display: "flex", flexDirection: "column", lineHeight: "1.2" }}>
+          <span style={{ fontWeight: 600 }}>{datePart}</span>
+          <Text type="secondary" style={{ fontSize: "12px" }}>
+            {timePart || "-"}
+          </Text>
+        </div>
+      );
+    },
+  },
+    {
+    title: "Yakıt Tipi",
+    dataIndex: "YakitTipi",
+    key: "YakitTipi",
+    width: 120,
+    visible: true,
+    // Veri direkt string geldiği için val'ı direkt basıyoruz
+    render: (val) => <Tag color="blue">{val || "-"}</Tag>,
+  },
+    {
+      title: "Alınan Sayaç",
+      dataIndex: "AlinanSayac",
+      key: "AlinanSayac",
+      width: 80,
+      visible: true,
+      render: (value) => <div style={{textAlign:'right'}}>{Number(value).toLocaleString('tr-TR')}</div>,
+      sorter: (a, b) => a.AlinanSayac - b.AlinanSayac,
     },
     {
-      title: "Yakıt Tipi",
-      dataIndex: "YakitTipi",
-      key: "YakitTipi",
-      width: 250,
+      title: "Fark",
+      dataIndex: "Fark",
+      key: "Fark",
+      width: 120,
       visible: true,
-      render: (val) => <Tag color={val?.ColorClass === 'warning' ? 'orange' : 'blue'}>{val?.Text}</Tag>,
+      render: (value) => <div style={{textAlign:'right'}}>{Number(value).toLocaleString('tr-TR')}</div>,
+      sorter: (a, b) => a.Fark - b.Fark,
     },
     {
       title: "Miktar (Lt)",
@@ -266,6 +272,15 @@ const MainTable = () => {
       sorter: (a, b) => a.Miktar - b.Miktar,
     },
     {
+      title: "Fiyat",
+      dataIndex: "Fiyat",
+      key: "Fiyat",
+      width: 120,
+      ellipsis: true,
+      visible: true,
+      sorter: (a, b) => a.Fiyat?.localeCompare(b.Fiyat),
+    },
+    {
       title: "Tutar",
       dataIndex: "Tutar",
       key: "Tutar",
@@ -275,16 +290,30 @@ const MainTable = () => {
       sorter: (a, b) => a.Tutar?.localeCompare(b.Tutar),
     },
     {
-      title: "Kaynak",
-      dataIndex: "Kaynak",
-      key: "Kaynak",
+      title: "Stoktan Kullanım",
+      dataIndex: "StoktanKullanim",
+      key: "StoktanKullanim",
+      width: 130,
+      visible: true,
+      align: "center",
+      render: (value) =>
+        value ? (
+          <CheckOutlined style={{ color: "#52c41a", fontSize: "18px" }} />
+        ) : (
+          <CloseOutlined style={{ color: "#ff4d4f", fontSize: "18px" }} />
+        ),
+    },
+    {
+      title: "Yakıt Deposu",
+      dataIndex: "YakitDeposu",
+      key: "YakitDeposu",
       width: 150,
       visible: true,
     },
     {
-      title: "Sürücü",
-      dataIndex: "Surucu",
-      key: "Surucu",
+      title: "Operatör",
+      dataIndex: "Operator",
+      key: "Operator",
       width: 150,
       visible: true,
     },
@@ -292,10 +321,35 @@ const MainTable = () => {
       title: "Lokasyon",
       dataIndex: "Lokasyon",
       key: "Lokasyon",
-      width: 150,
-      ellipsis: true,
+      width: 200,
       visible: true,
-      sorter: (a, b) => a.Lokasyon?.localeCompare(b.Lokasyon),
+      render: (value) => (
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <span style={{ fontWeight: "500" }}>
+            {value?.Adi || "-"}
+          </span>
+          {value?.Yol && (
+            <span style={{ fontSize: "12px", color: "#8c8c8c" }}>
+              {value.Yol}
+            </span>
+          )}
+        </div>
+      ),
+      sorter: (a, b) => {
+        const adiA = a.Lokasyon?.Adi || "";
+        const adiB = b.Lokasyon?.Adi || "";
+        if (adiA !== adiB) {
+          return adiA.localeCompare(adiB);
+        }
+        return (a.Lokasyon?.Yol || "").localeCompare(b.Lokasyon?.Yol || "");
+      },
+    },
+    {
+      title: "Açıklama",
+      dataIndex: "Aciklama",
+      key: "Aciklama",
+      width: 150,
+      visible: false,
     },
   ];
 
@@ -503,7 +557,6 @@ const MainTable = () => {
 
     // Verileri yeniden çekmek için `fetchEquipmentData` fonksiyonunu çağır
     fetchEquipmentData(body, currentPage);
-    fetchCards();
     // Burada `body` ve `currentPage`'i güncellediğimiz için, bu değerlerin en güncel hallerini kullanarak veri çekme işlemi yapılır.
     // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
     // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.

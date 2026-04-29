@@ -120,7 +120,7 @@ export default function CreateDrawer({ onRefresh }) {
         </Button>
 
         <Drawer
-          width="600px"
+          width="800px"
           title={t("Yakıt Tankı (Yeni Kayıt)")}
           onClose={onClose}
           open={open}
