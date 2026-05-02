@@ -731,116 +731,71 @@ useEffect(() => {
 
   // Function to handle CSV download
   const handleDownloadXLSX = async () => {
-    try {
-      // İndirme işlemi başlıyor
-      setXlsxLoading(true);
-
-      // Body state'inden filtreleri alıyoruz
-      const { filters = {} } = body || {};
-
-      // ✅ API İsteği: GetMalzemeTalepleriExcel
-      // Filtreleri body olarak gönderiyoruz
-      const response = await AxiosInstance.post("GetMalzemeTalepleriExcel", filters);
-
-      // Gelen yanıtı kontrol et (Direkt array mi yoksa obje içinde mi?)
-      // Eğer ana tablo yapısına benziyorsa response.talep_listesi olabilir, 
-      // direkt liste dönüyorsa response kendisidir.
-      const dataToProcess = Array.isArray(response) 
-        ? response 
-        : (response?.talep_listesi || response?.items || []);
-
-      if (dataToProcess.length > 0) {
-        // Verileri işliyoruz
-        const xlsxData = dataToProcess.map((row) => {
-          let xlsxRow = {};
-          filteredColumns.forEach((col) => {
-            const key = col.dataIndex;
-            if (key) {
-              let value = row[key];
-
-              // Özel durumları ele alıyoruz (Formatlama işlemleri)
-              if (col.render) {
-                if (key === "DUZENLEME_TARIH" || key.endsWith("_TARIH") || key === "SFS_TARIH") {
-                  value = formatDate(value);
-                } else if (key === "DUZENLEME_SAAT" || key.endsWith("_SAAT") || key === "SFS_SAAT") {
-                  value = formatTime(value);
-                } else if (key === "GARANTI") {
-                  value = row.GARANTI ? "Evet" : "Hayır";
-                } else if (key === "TAMAMLANMA") {
-                  value = `${row.TAMAMLANMA}%`;
-                } else if (key === "SFS_DURUM") { // Durum metnini al
-                  value = row.SFS_DURUM; 
-                } else if (key === "ISM_ONAY_DURUM") {
-                  const { text } = statusTag(row.ISM_ONAY_DURUM);
-                  value = text;
-                } else if (key.startsWith("OZEL_ALAN_")) {
-                  value = row[key];
-                } else {
-                  // Diğer sütunlar için render fonksiyonundan metni çıkar
-                  // extractTextFromElement fonksiyonun zaten yukarıda tanımlıydı
-                  value = extractTextFromElement(col.render(row[key], row));
-                }
-              }
-
-              xlsxRow[extractTextFromElement(col.title)] = value;
-            }
-          });
-          return xlsxRow;
-        });
-
-        // XLSX dosyasını oluşturuyoruz
-        const worksheet = XLSX.utils.json_to_sheet(xlsxData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Talep Listesi");
-
-        // Sütun genişliklerini ayarlıyoruz
-        const headers = filteredColumns
-          .map((col) => {
-            let label = extractTextFromElement(col.title);
-            return {
-              label: label,
-              key: col.dataIndex,
-              width: col.width, // Tablo sütun genişliği
-            };
-          })
-          .filter((col) => col.key);
-
-        const scalingFactor = 0.8; 
-
-        worksheet["!cols"] = headers.map((header) => ({
-          wpx: header.width ? header.width * scalingFactor : 100, 
-        }));
-
-        // İndirme işlemini başlatıyoruz
-        const excelBuffer = XLSX.write(workbook, {
-          bookType: "xlsx",
-          type: "array",
-        });
-        const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", `Malzeme_Talepleri_${dayjs().format("DD_MM_YYYY")}.xlsx`); // Dosya ismine tarih ekledim
-        link.style.visibility = "hidden";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        setXlsxLoading(false);
-      } else {
-        message.warning("İndirilecek veri bulunamadı.");
-        setXlsxLoading(false);
-      }
-    } catch (error) {
-      setXlsxLoading(false);
-      console.error("XLSX indirme hatası:", error);
-      if (navigator.onLine) {
-        message.error("Hata Mesajı: " + error.message);
-      } else {
-        message.error("Internet Bağlantısı Mevcut Değil.");
-      }
+  try {
+    if (!body.filters.ProfilId) {
+      message.warning("Lütfen önce bir profil seçin.");
+      return;
     }
-  };
+
+    setXlsxLoading(true);
+
+    const payload = {
+      ProfilId: body.filters.ProfilId,
+      LokasyonIds: body.filters.LokasyonIds,
+      MakineTipIds: body.filters.MakineTipIds,
+      DurumId: body.filters.DurumId,
+      Kelime: body.filters.Kelime || "",
+    };
+
+    const response = await AxiosInstance.post("GetAmortismanRaporu", payload);
+    const dataToProcess = response.Data?.GridList || [];
+
+    if (dataToProcess.length > 0) {
+      // Veriyi Excel formatına göre kolonlara parçalıyoruz
+      const xlsxData = dataToProcess.map((item) => ({
+        "Ekipman Kodu": item.EkipmanKodu || "",
+        "Ekipman Tanımı": item.EkipmanTanimi || "",
+        "Makine Tipi": item.MakineTipTanimi || "",
+        "Lokasyon": item.LokasyonTanimi || "",
+        "Ekonomik Ömür": item.EkonomikOmur || 0,
+        "Fiziksel Ömür": item.FizikselOmur || 0,
+        "Yaş": item.Yas || 0,
+        "Alım Bedeli ($)": item.AlimBedeli || 0,
+        "Değer Düşüşü ($)": item.DegerDususu || 0,
+        "Ek Ömre Kadar Düşüş ($)": item.EkOmreKadarDususu || 0,
+        "Salvage Sonrası Düşüş ($)": item.SalvageSonrasiDususu || 0,
+        "Net Değer ($)": item.NetDeger || 0,
+        "Salvage Değeri ($)": item.SalvageDegeri || 0,
+        "Scrap Değeri ($)": item.ScrapDegeri || 0,
+        "Ağırlık (Kg)": item.Agirlik || 0,
+        "Durum": item.DurumText || "",
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(xlsxData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Amortisman Detaylı Rapor");
+
+      const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+      const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Amortisman_Detayli_Rapor_${dayjs().format("DD_MM_YYYY")}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      message.success("Excel başarıyla oluşturuldu.");
+    } else {
+      message.warning("İndirilecek veri bulunamadı.");
+    }
+  } catch (error) {
+    console.error("XLSX Hatası:", error);
+    message.error("Excel oluşturulurken bir hata meydana geldi.");
+  } finally {
+    setXlsxLoading(false);
+  }
+};
 
   return (
     <>

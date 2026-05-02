@@ -1,147 +1,170 @@
 import React from "react";
-import { Input, Typography } from "antd";
+import { Typography, Input, Switch, Row, Col, InputNumber } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
+import styled from "styled-components";
 
+const { Text } = Typography;
 const { TextArea } = Input;
 
-export default function MainTabs() {
-  const { control, watch } = useFormContext();
+// Kart tasarımı (Görseldeki Otomatik Kod Sistemi ve Kayıt Kilidi için)
+const SwitchCard = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  height: 100%;
+`;
 
-  // Durum takibi
-  const otomatikKod = watch("otomatikKod");
+const LabelContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const FormItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+  width: 100%;
+`;
+
+export default function MainTabs() {
+  const { control } = useFormContext();
 
   return (
-    <div className="space-y-8 px-4 py-6">
-      {/* Tanım - Tam Genişlik ve Belirgin */}
-      <div>
-        <label className="text-sm font-bold text-slate-700 uppercase tracking-widest ml-1">
+    <div style={{ padding: "10px" }}>
+      {/* GENEL TANIM */}
+      <FormItem>
+        <Text strong style={{ fontSize: "12px", color: "#4b5563", textTransform: "uppercase" }}>
           Genel Tanım
-        </label>
+        </Text>
         <Controller
-          name="tanim"
+          name="Tanim"
+          control={control}
+          render={({ field }) => <Input {...field} placeholder="" style={{ height: "40px", borderRadius: "8px" }} />}
+        />
+      </FormItem>
+
+      {/* ÖN EK - SIRA NO - BASAMAK */}
+      <Row gutter={16}>
+        <Col span={8}>
+          <FormItem>
+            <Text strong style={{ fontSize: "12px", color: "#4b5563", textTransform: "uppercase" }}>
+              Ön Ek
+            </Text>
+            <Controller
+              name="OnEk"
+              control={control}
+              render={({ field }) => <Input {...field} placeholder="Örn: MKN" style={{ height: "40px", borderRadius: "8px" }} />}
+            />
+          </FormItem>
+        </Col>
+        <Col span={8}>
+    <FormItem>
+      <Text strong style={{ fontSize: "12px", color: "#4b5563", textTransform: "uppercase" }}>
+        Sıra No
+      </Text>
+      <Controller
+        name="Numara"
+        control={control}
+        render={({ field }) => (
+          <InputNumber
+            {...field}
+            readOnly
+            style={{
+              width: "100%", // Kolonu tam kaplaması için
+              height: "40px",
+              borderRadius: "8px",
+              backgroundColor: "#f5f5f5",
+              display: "flex",
+              alignItems: "center",
+              cursor: "not-allowed"
+            }}
+          />
+        )}
+      />
+    </FormItem>
+  </Col>
+
+  <Col span={8}>
+    <FormItem>
+      <Text strong style={{ fontSize: "12px", color: "#4b5563", textTransform: "uppercase" }}>
+        Basamak
+      </Text>
+      <Controller
+        name="HaneSayisi"
+        control={control}
+        render={({ field }) => (
+          <InputNumber
+            {...field}
+            min={1} // Negatif basamak olmasın diye
+            max={20}
+            style={{
+              width: "100%",
+              height: "40px",
+              borderRadius: "8px",
+              display: "flex",
+              alignItems: "center"
+            }}
+          />
+        )}
+      />
+    </FormItem>
+  </Col>
+</Row>
+
+      {/* SWITCH CARDS */}
+      <Row gutter={16} style={{ marginBottom: "20px" }}>
+        <Col span={12}>
+          <SwitchCard>
+            <LabelContainer>
+              <Text strong style={{ fontSize: "14px" }}>Otomatik Kod Sistemi</Text>
+              <Text type="secondary" style={{ fontSize: "12px" }}>Sistem sonraki numarayı otomatik atar.</Text>
+            </LabelContainer>
+            <Controller
+              name="Aktif" // Veya ilgili boolean alan
+              control={control}
+              render={({ field }) => <Switch checked={field.value} onChange={field.onChange} />}
+            />
+          </SwitchCard>
+        </Col>
+        <Col span={12}>
+          <SwitchCard>
+            <LabelContainer>
+              <Text strong style={{ fontSize: "14px" }}>Kayıt Kilidi</Text>
+              <Text type="secondary" style={{ fontSize: "12px" }}>Bu kuralı düzenlemeye kapatır.</Text>
+            </LabelContainer>
+            <Controller
+              name="AlanKilit"
+              control={control}
+              render={({ field }) => <Switch checked={field.value} onChange={field.onChange} />}
+            />
+          </SwitchCard>
+        </Col>
+      </Row>
+
+      {/* KURAL AÇIKLAMASI */}
+      <FormItem>
+        <Text strong style={{ fontSize: "12px", color: "#4b5563", textTransform: "uppercase" }}>
+          Açıklama
+        </Text>
+        <Controller
+          name="Aciklama"
           control={control}
           render={({ field }) => (
-            <Input
-              {...field}
-              readOnly
-              className="mt-2 w-full cursor-not-allowed rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-base font-semibold text-slate-600 shadow-sm"
+            <TextArea 
+              {...field} 
+              rows={4} 
+              placeholder="Sistem yöneticileri için notlar..." 
+              style={{ borderRadius: "8px" }} 
             />
           )}
         />
-      </div>
-
-      {/* Üçlü Grid - Daha Büyük Inputlar */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div>
-          <label className="text-sm font-bold text-slate-700 uppercase tracking-widest ml-1">Ön Ek</label>
-          <Controller
-            name="onEk"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                onChange={(e) => field.onChange(e.target.value.toUpperCase())}
-                placeholder="Örn: MKN"
-                className="mt-2 w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-lg font-mono font-bold text-amber-600 focus:border-amber-500 shadow-sm"
-              />
-            )}
-          />
-        </div>
-
-        <div>
-          <label className="text-sm font-bold text-slate-700 uppercase tracking-widest ml-1">Sıra No</label>
-          <Controller
-            name="siraNo"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="number"
-                disabled={!otomatikKod}
-                className="mt-2 w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-lg font-bold disabled:bg-slate-100 shadow-sm"
-              />
-            )}
-          />
-        </div>
-
-        <div>
-          <label className="text-sm font-bold text-slate-700 uppercase tracking-widest ml-1">Basamak</label>
-          <Controller
-            name="basamak"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="number"
-                min={1}
-                className="mt-2 w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-lg font-bold shadow-sm"
-              />
-            )}
-          />
-        </div>
-      </div>
-
-      {/* Switch Paneli - Daha Geniş ve Belirgin Kartlar */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Otomatik Kod Kartı */}
-        <div className={`flex items-center justify-between rounded-2xl p-5 border-2 transition-all duration-300 shadow-md ${otomatikKod ? 'border-emerald-500 bg-emerald-50/30' : 'border-slate-200 bg-white'}`}>
-          <div className="pr-4">
-            <div className="text-base font-bold text-slate-800">Otomatik Kod Sistemi</div>
-            <div className="text-sm text-slate-500 mt-1 font-medium">Sistem sonraki numarayı otomatik atar.</div>
-          </div>
-          <Controller
-            name="otomatikKod"
-            control={control}
-            render={({ field }) => (
-              <button
-                type="button"
-                onClick={() => field.onChange(!field.value)}
-                className={`relative inline-flex h-8 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none ${field.value ? "bg-emerald-500" : "bg-slate-300"}`}
-              >
-                <span className={`pointer-events-none inline-block h-7 w-7 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ${field.value ? "translate-x-6" : "translate-x-0"}`} />
-              </button>
-            )}
-          />
-        </div>
-
-        {/* Kilitli Kartı */}
-        <Controller
-          name="kilitli"
-          control={control}
-          render={({ field }) => (
-            <div className={`flex items-center justify-between rounded-2xl p-5 border-2 transition-all duration-300 shadow-md ${field.value ? 'border-amber-500 bg-amber-50/30' : 'border-slate-200 bg-white'}`}>
-              <div className="pr-4">
-                <div className="text-base font-bold text-slate-800">Kayıt Kilidi</div>
-                <div className="text-sm text-slate-500 mt-1 font-medium">Bu kuralı düzenlemeye kapatır.</div>
-              </div>
-              <button
-                type="button"
-                onClick={() => field.onChange(!field.value)}
-                className={`relative inline-flex h-8 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none ${field.value ? "bg-amber-500" : "bg-slate-300"}`}
-              >
-                <span className={`pointer-events-none inline-block h-7 w-7 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ${field.value ? "translate-x-6" : "translate-x-0"}`} />
-              </button>
-            </div>
-          )}
-        />
-      </div>
-
-      {/* Açıklama - Geniş Metin Alanı */}
-      <div>
-        <label className="text-sm font-bold text-slate-700 uppercase tracking-widest ml-1">Kural Açıklaması</label>
-        <Controller
-          name="aciklama"
-          control={control}
-          render={({ field }) => (
-            <TextArea
-              {...field}
-              rows={5}
-              className="mt-2 w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-base focus:border-amber-500 shadow-sm"
-              placeholder="Sistem yöneticileri için notlar..."
-            />
-          )}
-        />
-      </div>
+      </FormItem>
     </div>
   );
 }

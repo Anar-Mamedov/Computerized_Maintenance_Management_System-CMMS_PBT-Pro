@@ -1,145 +1,166 @@
 import React from "react";
-import { Input, Typography, Tag, Checkbox } from "antd";
+import {
+  Typography,
+  Input,
+  Row,
+  Col,
+  Checkbox,
+  InputNumber,
+  Collapse,
+} from "antd";
 import { Controller, useFormContext } from "react-hook-form";
+import styled from "styled-components";
 
 const { Text } = Typography;
+const { TextArea } = Input;
+
+// Fotoğraftaki gri çerçeveli alt bölüm için stil
+const SettingsCard = styled.div`
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 20px;
+  background-color: #fafafa;
+`;
+
+const LabelText = styled(Text)`
+  font-size: 12px;
+  font-weight: 600;
+  color: #595959;
+  margin-bottom: 4px;
+  display: block;
+  text-transform: uppercase;
+`;
 
 export default function MainTabs() {
-  const { control, watch } = useFormContext();
-
-  // Durum takibi için watch kullanıyoruz
-  const aktif = watch("aktif");
-  const varsayilan = watch("varsayilan");
+  const { control } = useFormContext();
 
   return (
-    <div className="space-y-6 px-2 py-4">
-      {/* Üst Grup: Öncelik Kodu ve Bayrak */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div>
-          <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Öncelik Kodu</label>
+    <div style={{ padding: "10px", maxWidth: "600px" }}>
+      {/* Üst Kısım: Öncelik Kodu ve Bayrak */}
+      <Row gutter={[16, 16]}>
+        <Col span={12}>
+          <LabelText>Öncelik Kodu</LabelText>
           <Controller
-            name="kod"
+            name="Kod"
             control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                readOnly
-                className="mt-1 h-12 w-full rounded-xl border-2 border-slate-200 bg-slate-50 px-4 text-base font-bold text-slate-600 shadow-sm"
-              />
-            )}
+            render={({ field }) => <Input {...field} />}
           />
-        </div>
-
-        <div>
-          <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Bayrak (Emoji/Simge)</label>
+        </Col>
+        <Col span={12}>
+          <LabelText>Bayrak (Emoji/Simge)</LabelText>
           <Controller
             name="bayrak"
             control={control}
             render={({ field }) => (
-              <Input
-                {...field}
-                className="mt-1 h-12 w-full rounded-xl border-2 border-slate-200 px-4 text-2xl text-center shadow-sm focus:border-sky-500"
-                placeholder="Örn: 🔴"
-              />
+              <Input {...field} placeholder="Örn: 🔴" />
             )}
           />
-        </div>
-      </div>
+        </Col>
+      </Row>
 
-      {/* Tanım - Tam Genişlik */}
-      <div>
-        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Öncelik Tanımı</label>
-        <Controller
-          name="tanim"
-          control={control}
-          render={({ field }) => (
-            <Input
-              {...field}
-              className="mt-1 h-12 w-full rounded-xl border-2 border-slate-200 px-4 text-base font-semibold shadow-sm focus:border-sky-500"
-              placeholder="Öncelik adını buraya yazın..."
-            />
-          )}
-        />
-      </div>
+      {/* Öncelik Tanımı */}
+      <Row style={{ marginTop: "16px" }}>
+        <Col span={24}>
+          <LabelText>Öncelik Tanımı</LabelText>
+          <Controller
+            name="Tanim"
+            control={control}
+            render={({ field }) => (
+              <Input {...field} placeholder="Öncelik adını buraya yazın..." />
+            )}
+          />
+        </Col>
+      </Row>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-  {/* Aktif Durum Kartı */}<div className="pr-4">
-      <div className="text-sm font-bold text-slate-800">Aktif Durum</div>
-    </div>
-    <Controller
-      name="aktif"
-      control={control}
-      render={({ field }) => (
-        <Checkbox
-          className="scale-150 mr-2" // Daha belirgin olması için biraz büyüttüm
-          checked={field.value}
-          onChange={(e) => field.onChange(e.target.checked)}
-        />
-      )}
-    />
-
-  {/* Varsayılan Kartı */}<div className="pr-4">
-      <div className="text-sm font-bold text-slate-800">Varsayılan</div>
-    </div>
-    <Controller
-      name="varsayilan"
-      control={control}
-      render={({ field }) => (
-        <Checkbox
-          className="scale-150 mr-2"
-          checked={field.value}
-          onChange={(e) => field.onChange(e.target.checked)}
-        />
-      )}
-    />
-  </div>
-
-      {/* SLA Gelişmiş Süre Ayarları Paneli */}
-      <div className="rounded-2xl border-2 border-slate-100 bg-slate-50/50 p-5 space-y-5 shadow-inner">
-        
-        {/* Çözüm Süresi */}
-        <div>
-          <div className="flex justify-between items-center mb-2">
-            <h4 className="text-xs font-bold text-slate-700 uppercase tracking-tighter">Çözüm Süresi Ayarı</h4>
+      {/* Checkbox Alanları */}
+      <div style={{ marginTop: "20px" }}>
+        <Row align="middle" style={{ marginBottom: "10px" }}>
+          <Col span={8}>
+            <Text strong>Aktif Durum</Text>
+          </Col>
+          <Col span={4}>
             <Controller
-                name="cozum"
-                control={control}
-                render={({ field }) => <Tag color="blue" className="rounded-md font-bold px-3">{field.value}</Tag>}
-            />
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            <Input placeholder="Gün" className="h-10 rounded-lg border-slate-200 text-center font-bold" />
-            <Input placeholder="Saat" className="h-10 rounded-lg border-slate-200 text-center font-bold" />
-            <Input placeholder="Dakika" className="h-10 rounded-lg border-slate-200 text-center font-bold" />
-          </div>
-        </div>
-
-        {/* Gecikme ve Kritik Seviyeler */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="rounded-xl bg-white p-4 border border-slate-200 shadow-sm">
-            <h4 className="text-xs font-bold text-amber-600 mb-2 uppercase">Gecikme Seviyesi</h4>
-            <Controller
-              name="gecikme"
+              name="Aktif"
               control={control}
               render={({ field }) => (
-                <Input {...field} className="h-10 rounded-lg border-slate-200 font-bold text-center" />
+                <Checkbox
+                  checked={field.value}
+                  onChange={(e) => field.onChange(e.target.checked)}
+                />
               )}
             />
-          </div>
-
-          <div className="rounded-xl bg-white p-4 border border-slate-200 shadow-sm">
-            <h4 className="text-xs font-bold text-rose-600 mb-2 uppercase">Kritik Seviye</h4>
+          </Col>
+        </Row>
+        <Row align="middle">
+          <Col span={8}>
+            <Text strong>Varsayılan</Text>
+          </Col>
+          <Col span={4}>
             <Controller
-              name="kritik"
+              name="Varsayilan"
               control={control}
               render={({ field }) => (
-                <Input {...field} className="h-10 rounded-lg border-slate-200 font-bold text-center" />
+                <Checkbox
+                  checked={field.value}
+                  onChange={(e) => field.onChange(e.target.checked)}
+                />
               )}
             />
-          </div>
+          </Col>
+        </Row>
+      </div>
+
+      {/* Çözüm Süresi Ayarı Bölümü */}
+      <SettingsCard>
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px" }}>
+          <Text strong style={{ fontSize: "12px" }}>ÇÖZÜM SÜRESİ AYARI</Text>
+          <Text style={{ color: "#1890ff" }}>—</Text>
         </div>
 
-      </div>
+        <Row gutter={8}>
+          <Col span={8}>
+            <Controller
+              name="CozumGun"
+              control={control}
+              render={({ field }) => <Input {...field} placeholder="Gün" style={{ textAlign: "center" }} />}
+            />
+          </Col>
+          <Col span={8}>
+            <Controller
+              name="CozumSaat"
+              control={control}
+              render={({ field }) => <Input {...field} placeholder="Saat" style={{ textAlign: "center" }} />}
+            />
+          </Col>
+          <Col span={8}>
+            <Controller
+              name="CozumDakika"
+              control={control}
+              render={({ field }) => <Input {...field} placeholder="Dakika" style={{ textAlign: "center" }} />}
+            />
+          </Col>
+        </Row>
+
+        <Row gutter={16} style={{ marginTop: "16px" }}>
+          <Col span={12}>
+            <Text style={{ fontSize: "11px", fontWeight: "bold" }}>GECİKME SEVİYESİ</Text>
+            <Controller
+              name="GecikmeDakika"
+              control={control}
+              render={({ field }) => <Input {...field} style={{ marginTop: "4px" }} />}
+            />
+          </Col>
+          <Col span={12}>
+            <Text style={{ fontSize: "11px", fontWeight: "bold" }}>KRİTİK SEVİYE</Text>
+            <Controller
+              name="KritikDakika"
+              control={control}
+              render={({ field }) => <Input {...field} style={{ marginTop: "4px" }} />}
+            />
+          </Col>
+        </Row>
+      </SettingsCard>
     </div>
   );
 }

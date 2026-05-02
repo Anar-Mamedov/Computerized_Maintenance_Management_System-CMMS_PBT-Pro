@@ -226,21 +226,24 @@ const MainTable = () => {
   const initialColumns = [
     {
       title: "Vardiya Tanımı",
-      dataIndex: "VAR_TANIM",
-      key: "VAR_TANIM",
-      width: 200,
+      dataIndex: "VardiyaTanimi",
+      key: "VardiyaTanimi",
+      width: 120,
       ellipsis: true,
-      visible: true,
+      visible: true, // Varsayılan olarak açık
+      render: (text, record) => (
+        <a onClick={() => onRowClick(record)}>{text}</a> // Updated this line
+      ),
       sorter: (a, b) => {
-        if (a.VAR_TANIM == null || a.VAR_TANIM === "") return 1;
-        if (b.VAR_TANIM == null || b.VAR_TANIM === "") return -1;
-        return a.VAR_TANIM.toString().localeCompare(b.VAR_TANIM.toString());
+        if (a.VardiyaTanimi === null) return -1;
+        if (b.VardiyaTanimi === null) return 1;
+        return a.VardiyaTanimi.localeCompare(b.VardiyaTanimi);
       },
     },
     {
       title: "Başlangıç Saati",
-      dataIndex: "VAR_BASLAMA_SAATI",
-      key: "VAR_BASLAMA_SAATI",
+      dataIndex: "BaslamaSaati",
+      key: "BaslamaSaati",
       width: 200,
       ellipsis: true,
       visible: true,
@@ -249,11 +252,11 @@ const MainTable = () => {
         return dayjs(dateTime).format("HH:mm");
       },
       sorter: (a, b) => {
-        if (a.VAR_BASLAMA_SAATI == null || a.VAR_BASLAMA_SAATI === "") return 1;
-        if (b.VAR_BASLAMA_SAATI == null || b.VAR_BASLAMA_SAATI === "")
+        if (a.BaslamaSaati == null || a.BaslamaSaati === "") return 1;
+        if (b.BaslamaSaati == null || b.BaslamaSaati === "")
           return -1;
-        return dayjs(`1970-01-01 ${a.VAR_BASLAMA_SAATI}`).isBefore(
-          dayjs(`1970-01-01 ${b.VAR_BASLAMA_SAATI}`)
+        return dayjs(`1970-01-01 ${a.BaslamaSaati}`).isBefore(
+          dayjs(`1970-01-01 ${b.BaslamaSaati}`)
         )
           ? -1
           : 1;
@@ -261,8 +264,8 @@ const MainTable = () => {
     },
     {
       title: "Bitiş Saati",
-      dataIndex: "VAR_BITIS_SAATI",
-      key: "VAR_BITIS_SAATI",
+      dataIndex: "BitisSaati",
+      key: "BitisSaati",
       width: 200,
       ellipsis: true,
       visible: true,
@@ -271,10 +274,10 @@ const MainTable = () => {
         return dayjs(dateTime).format("HH:mm");
       },
       sorter: (a, b) => {
-        if (a.VAR_BITIS_SAATI == null || a.VAR_BITIS_SAATI === "") return 1;
-        if (b.VAR_BITIS_SAATI == null || b.VAR_BITIS_SAATI === "") return -1;
-        return dayjs(`1970-01-01 ${a.VAR_BITIS_SAATI}`).isBefore(
-          dayjs(`1970-01-01 ${b.VAR_BITIS_SAATI}`)
+        if (a.BitisSaati == null || a.BitisSaati === "") return 1;
+        if (b.BitisSaati == null || b.BitisSaati === "") return -1;
+        return dayjs(`1970-01-01 ${a.BitisSaati}`).isBefore(
+          dayjs(`1970-01-01 ${b.BitisSaati}`)
         )
           ? -1
           : 1;
@@ -282,56 +285,56 @@ const MainTable = () => {
     },
     {
       title: "Lokasyon Bilgisi",
-      dataIndex: "VAR_LOKASYON",
-      key: "VAR_LOKASYON",
+      dataIndex: "LokasyonText",
+      key: "LokasyonText",
       width: 200,
       ellipsis: true,
       visible: true,
       sorter: (a, b) => {
-        if (a.VAR_LOKASYON == null || a.VAR_LOKASYON === "") return 1;
-        if (b.VAR_LOKASYON == null || b.VAR_LOKASYON === "") return -1;
-        return a.VAR_LOKASYON.toString().localeCompare(
-          b.VAR_LOKASYON.toString()
+        if (a.LokasyonText == null || a.LokasyonText === "") return 1;
+        if (b.LokasyonText == null || b.LokasyonText === "") return -1;
+        return a.LokasyonText.toString().localeCompare(
+          b.LokasyonText.toString()
         );
       },
     },
     {
       title: "Proje Bilgisi",
-      dataIndex: "VAR_PROJE",
-      key: "VAR_PROJE",
+      dataIndex: "ProjeText",
+      key: "ProjeText",
       width: 200,
       ellipsis: true,
       visible: true,
       sorter: (a, b) => {
-        if (a.VAR_PROJE == null || a.VAR_PROJE === "") return 1;
-        if (b.VAR_PROJE == null || b.VAR_PROJE === "") return -1;
-        return a.VAR_PROJE.toString().localeCompare(b.VAR_PROJE.toString());
+        if (a.ProjeText == null || a.ProjeText === "") return 1;
+        if (b.ProjeText == null || b.ProjeText === "") return -1;
+        return a.ProjeText.toString().localeCompare(b.ProjeText.toString());
       },
     },
     {
       title: "Vardiya Tipi",
-      dataIndex: "VAR_VARDIYA_TIPI",
-      key: "VAR_VARDIYA_TIPI",
+      dataIndex: "VardiyaTipiText",
+      key: "VardiyaTipiText",
       width: 200,
       ellipsis: true,
       visible: true,
       sorter: (a, b) => {
-        if (a.VAR_VARDIYA_TIPI == null || a.VAR_VARDIYA_TIPI === "") return 1;
-        if (b.VAR_VARDIYA_TIPI == null || b.VAR_VARDIYA_TIPI === "") return -1;
-        return a.VAR_VARDIYA_TIPI.toString().localeCompare(
-          b.VAR_VARDIYA_TIPI.toString()
+        if (a.VardiyaTipiText == null || a.VardiyaTipiText === "") return 1;
+        if (b.VardiyaTipiText == null || b.VardiyaTipiText === "") return -1;
+        return a.VardiyaTipiText.toString().localeCompare(
+          b.VardiyaTipiText.toString()
         );
       },
     },
     {
       title: "Varsayılan",
-      dataIndex: "VAR_VARSAYILAN",
-      key: "VAR_VARSAYILAN",
+      dataIndex: "Varsayilan",
+      key: "Varsayilan",
       width: 200,
       ellipsis: true,
       visible: true,
       render: (text, record) => {
-        return record.VAR_VARSAYILAN ? (
+        return record.Varsayilan ? (
           <div style={{ display: "flex", justifyContent: "center" }}>
             <CheckOutlined style={{ color: "green" }} />
           </div>
@@ -342,9 +345,35 @@ const MainTable = () => {
         );
       },
       sorter: (a, b) => {
-        if (a.VAR_VARSAYILAN == null) return 1;
-        if (b.VAR_VARSAYILAN == null) return -1;
-        return a.VAR_VARSAYILAN - b.VAR_VARSAYILAN;
+        if (a.Varsayilan == null) return 1;
+        if (b.Varsayilan == null) return -1;
+        return a.Varsayilan - b.Varsayilan;
+      },
+    },
+    {
+      title: "Açıklama",
+      dataIndex: "Aciklama",
+      key: "Aciklama",
+      width: 200,
+      ellipsis: true,
+      visible: false,
+      sorter: (a, b) => {
+        if (a.Aciklama == null || a.Aciklama === "") return 1;
+        if (b.Aciklama == null || b.Aciklama === "") return -1;
+        return a.Aciklama.toString().localeCompare(b.Aciklama.toString());
+      },
+    },
+    {
+      title: "Mola Süresi",
+      dataIndex: "MolaSuresi",
+      key: "MolaSuresi",
+      width: 200,
+      ellipsis: true,
+      visible: false,
+      sorter: (a, b) => {
+        if (a.MolaSuresi == null || a.MolaSuresi === "") return 1;
+        if (b.MolaSuresi == null || b.MolaSuresi === "") return -1;
+        return a.MolaSuresi.toString().localeCompare(b.MolaSuresi.toString());
       },
     },
 
@@ -439,59 +468,25 @@ const MainTable = () => {
 
   // ana tablo api isteği için kullanılan useEffect son
 
-  const fetchEquipmentData = async () => {
+  const fetchEquipmentData = useCallback(async (word = "") => {
     try {
       setLoading(true);
-      // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.get(`GetVardiyaList`);
-      if (response) {
-        // Gelen veriyi formatla ve state'e ata
-        const formattedData = response.VARDIYA_LISTE.map((item) => ({
+      // Dokümana göre endpoint güncellendi: GetVardiyaList?kelime={arama_metni}
+      const response = await AxiosInstance.get(`GetVardiyaList?kelime=${word}`);
+      if (response && response.data) {
+        const formattedData = response.data.map((item) => ({
           ...item,
           key: item.TB_VARDIYA_ID,
-          // Diğer alanlarınız...
         }));
         setData(formattedData);
-        setLoading(false);
-      } else {
-        console.error("API response is not in expected format");
-        setLoading(false);
       }
     } catch (error) {
-      console.error("Error in API request:", error);
+      console.error("API Error:", error);
+      message.error(navigator.onLine ? `Hata: ${error.message}` : "İnternet bağlantısı yok.");
+    } finally {
       setLoading(false);
-      if (navigator.onLine) {
-        // İnternet bağlantısı var
-        message.error("Hata Mesajı: " + error.message);
-      } else {
-        // İnternet bağlantısı yok
-        message.error("Internet Bağlantısı Mevcut Değil.");
-      }
     }
-  };
-
-  const normalizeString = (str) => {
-    if (str === null) {
-      return "";
-    }
-    return str
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .replace(/ğ/gim, "g")
-      .replace(/ü/gim, "u")
-      .replace(/ş/gim, "s")
-      .replace(/ı/gim, "i")
-      .replace(/ö/gim, "o")
-      .replace(/ç/gim, "c");
-  };
-
-  useEffect(() => {
-    const filtered = data.filter((item) =>
-      normalizeString(item.VAR_TANIM).includes(normalizeString(searchTerm))
-    );
-    setFilteredData(filtered);
-  }, [searchTerm, data]);
+  }, []);
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -514,11 +509,10 @@ const MainTable = () => {
   };
 
   const onRowClick = (record) => {
-    return {
-      onClick: () => {
-        setDrawer({ visible: true, data: record });
-      },
-    };
+    setDrawer({ 
+      visible: true, 
+      data: { ...record, key: record.TB_VARDIYA_ID } 
+    });
   };
 
   const refreshTableData = useCallback(() => {
@@ -861,7 +855,6 @@ const MainTable = () => {
             showTotal: (total, range) => `Toplam ${total}`,
             showQuickJumper: true,
           }}
-          onRow={onRowClick}
           scroll={{ y: "calc(100vh - 370px)" }}
         />
       </Spin>

@@ -59,6 +59,9 @@ const Profil = ({ open, onClose, updateData, onRefresh }) => {
 
           methods.setValue("HesaplamaBazText", item.HesaplamaBazText);
           methods.setValue("HesaplamaBazTextID", item.HesaplamaBazKodId);
+          
+          methods.setValue("ParaBirimiText", item.ParaBirimiText);
+          methods.setValue("ParaBirimiTextID", item.ParaBirimiKodId);
         }
       })
       .catch((err) => {
@@ -90,6 +93,7 @@ const Profil = ({ open, onClose, updateData, onRefresh }) => {
       BaslangicKuralKodId: methodsValues.BaslangicKuralTextID || null,
       AsgariDegerKuralKodId: methodsValues.AsgariDegerKuralTextID || null,
       HesaplamaBazKodId: methodsValues.HesaplamaBazTextID || null,
+      ParaBirimiKodId: methodsValues.ParaBirimiTextID || null,
     };
 
     AxiosInstance.post("AddUpdateAmortismanProfil", payload)
@@ -213,6 +217,11 @@ const Profil = ({ open, onClose, updateData, onRefresh }) => {
                 <Col span={12}>
                   <Form.Item label="Kalıntı / hurda değer yöntemi">
                     <KodIDSelectbox name1="HurdaDegerYontemText" kodID={14362} placeholder="Seçiniz" />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label="Para Birimi">
+                    <KodIDSelectbox name1="ParaBirimiText" kodID={14367} placeholder="Seçiniz" />
                   </Form.Item>
                 </Col>
               </Row>

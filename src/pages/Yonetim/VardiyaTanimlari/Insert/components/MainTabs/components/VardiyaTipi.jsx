@@ -164,14 +164,14 @@ export default function VardiyaTipi() {
             }))}
             onChange={(value) => {
               // Seçilen değerin ID'sini NedeniID alanına set et
-              setValue("vardiyaTipiID", value);
+              setValue("VardiyaTipiKodId", value);
               field.onChange(value);
             }}
           />
         )}
       />
       <Controller
-        name="vardiyaTipiID"
+        name="VardiyaTipiKodId"
         control={control}
         render={({ field }) => (
           <Input

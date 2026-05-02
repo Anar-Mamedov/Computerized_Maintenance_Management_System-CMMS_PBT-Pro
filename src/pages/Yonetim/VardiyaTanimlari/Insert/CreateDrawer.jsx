@@ -35,25 +35,21 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
 
   const handleClick = () => {
     const values = methods.getValues();
-    console.log(onSubmit(values));
   };
 
   //* export
   const methods = useForm({
     defaultValues: {
-      vardiyaTanimi: "",
-      secilenVardiyaID: "",
-      vardiyaBaslangicSaati: dayjs("08:00", "HH:mm"),
-      vardiyaBitisSaati: dayjs("18:00", "HH:mm"),
-      vardiyaTipi: null,
-      vardiyaTipiID: "",
-      lokasyonTanim: "",
-      lokasyonID: "",
-      vardiyaProjeTanim: "",
-      vardiyaProjeID: "",
-      varsayilanVardiya: false,
-      gosterimRengi: "#ffae00",
-      vardiyaAciklama: "",
+      VardiyaTanimi: "",
+      BaslamaSaati: dayjs("00:00", "HH:mm"),
+      BitisSaati: dayjs("00:00", "HH:mm"),
+      MolaSuresi: 0,
+      VardiyaTipiKodId: null,
+      LokasyonId: null,
+      ProjeId: null,
+      Varsayilan: false,
+      Renk: "#ffae00",
+      Aciklama: "",
     },
   });
 
@@ -72,28 +68,28 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
   //* export
   const onSubmit = (data) => {
     const Body = {
-      VAR_TANIM: data.vardiyaTanimi,
-      VAR_VARDIYA_TIPI_KOD_ID: data.vardiyaTipiID,
-      VAR_LOKASYON_ID: data.lokasyonID,
-      VAR_PROJE_ID: data.vardiyaProjeID,
-      VAR_VARSAYILAN: data.varsayilanVardiya ? 1 : 0,
-      VAR_MOLA_SURESI: 1,
-      // VAR_RENK: data.gosterimRengi,
-      VAR_ACIKLAMA: data.vardiyaAciklama,
-      VAR_BASLAMA_SAATI: formatTimeWithDayjs(data.vardiyaBaslangicSaati),
-      VAR_BITIS_SAATI: formatTimeWithDayjs(data.vardiyaBitisSaati),
-
-      // add more fields as needed
+      TB_VARDIYA_ID: 0,
+      VardiyaTanimi: data.VardiyaTanimi,
+      BaslamaSaati: data.BaslamaSaati ? dayjs(data.BaslamaSaati).format("HH:mm") : "00:00",
+      BitisSaati: data.BitisSaati ? dayjs(data.BitisSaati).format("HH:mm") : "00:00",
+      MolaSuresi: Number(data.MolaSuresi) || 0,
+      LokasyonId: Number(data.LokasyonId) || null,
+      ProjeId: Number(data.ProjeId) || null,
+      VardiyaTipiKodId: Number(data.VardiyaTipiKodId) || null,
+      Varsayilan: Boolean(data.Varsayilan),
+      Renk: typeof data.Renk === "object" && data.Renk !== null 
+      ? (data.Renk.toHexString ? data.Renk.toHexString() : "#ffae00") 
+      : data.Renk,
+      Aciklama: data.Aciklama,
     };
 
     // AxiosInstance.post("/api/endpoint", { Body }).then((response) => {
     // handle response
     // });
 
-    AxiosInstance.post("AddVardiya", Body)
+    AxiosInstance.post("AddUpdateVardiya", Body)
       .then((response) => {
         // Handle successful response here, e.g.:
-        console.log("Data sent successfully:", response);
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("Ekleme Başarılı.");
           setOpen(false);
@@ -110,7 +106,6 @@ export default function CreateDrawer({ selectedLokasyonId, onRefresh }) {
         console.error("Error sending data:", error);
         message.error("Başarısız Olundu.");
       });
-    console.log({ Body });
   };
 
   useEffect(() => {

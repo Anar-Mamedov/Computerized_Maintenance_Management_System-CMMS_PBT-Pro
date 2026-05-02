@@ -121,10 +121,10 @@ export const rawItems = [
     <FireOutlined />,
     [
       getItem("Yakıt Tanımları", "yakitTanimlari", true),
-      getItem("Yakıt Stokları", "yakitStoklari", true),
-      getItem("Yakıt Girişleri", "yakitGirisleri", true),
+      getItem("Yakıt Depoları / Tanklar", "yakitStoklari", true),
+      getItem("Yakıt İşlemleri", "yakitGirisleri", true),
       getItem("Yakıt Hareketleri", "yakitHareketleri", true),
-      getItem("Hızlı Yakıt Girişi", "hizliYakitGirisi", true),
+      getItem("Hızlı Yakıt İşlemleri", "hizliYakitGirisi", true),
     ],
     false,
     "KLL_WEB_YAKIT_MODUL"
@@ -136,6 +136,17 @@ export const rawItems = [
     [getItem("Proje Tanımları", "projeTanimlari2", true), getItem("Proje İlerleme İşlemleri", "projeIlerleme", true), getItem("Proje Yönetimi", "projeYonetimiListe", true)],
     false,
     "KLL_WEB_PROJE_MODUL"
+  ),
+  getItem(
+    "Firma ve Sözleşme Yönetimi",
+    "firmaVeSozlesmeYonetimi",
+    <ShoppingCartOutlined />,
+    [
+      getItem("Firma Sözleşmeleri", "firmaSozlesme", true),
+      getItem("Firma Tanımları", "firmaTanimlari", true),
+    ],
+    false,
+    "KLL_WEB_FIRMA_SOZLESME_MODUL"
   ),
   getItem(
     "Analizler",

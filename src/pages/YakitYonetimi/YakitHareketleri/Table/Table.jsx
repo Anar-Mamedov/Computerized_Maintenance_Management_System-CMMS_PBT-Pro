@@ -136,10 +136,10 @@ const MainTable = () => {
   const [cardsData, setCardsData] = useState({});
 
   const [ozetler, setOzetler] = useState({
-    ToplamGirisMiktar: 0,
-    ToplamCikisMiktar: 0,
-    ToplamTransferMiktar: 0,
-    ToplamSarfMiktar: 0
+    ToplamIslemSayisi: 0,
+    ToplamSarfMiktari: 0,
+    AnomaliSuphesiKayit: 0,
+    GirisCikisMiktari: 0
   });
 
   const [body, setBody] = useState({
@@ -154,10 +154,10 @@ const MainTable = () => {
   });
 
   const cardItems = useMemo(() => [
-    { title: "Toplam Giriş", value: `${ozetler.ToplamGirisMiktar.toLocaleString('tr-TR')} L`, color: "success" },
-    { title: "Toplam Çıkış", value: `${ozetler.ToplamCikisMiktar.toLocaleString('tr-TR')} L`, color: "danger" },
-    { title: "Transfer", value: `${ozetler.ToplamTransferMiktar.toLocaleString('tr-TR')} L`, color: "primary" },
-    { title: "Sarf", value: `${ozetler.ToplamSarfMiktar.toLocaleString('tr-TR')} L`, color: "warning" },
+    { title: "Toplam İşlem Sayısı", value: `${ozetler.ToplamIslemSayisi.toLocaleString('tr-TR')}`, color: "success" },
+    { title: "Toplam Sarf Miktarı", value: `${ozetler.ToplamSarfMiktari.toLocaleString('tr-TR')}`, color: "danger" },
+    { title: "Anomali Şüphesi", value: `${ozetler.AnomaliSuphesiKayit.toLocaleString('tr-TR')}`, color: "primary" },
+    { title: "Giriş / Çıkış Miktarı", value: `${ozetler.GirisCikisMiktari.toLocaleString('tr-TR')}`, color: "warning" },
   ], [ozetler]);
 
   const fetchCards = useCallback(async () => {
@@ -216,34 +216,31 @@ const MainTable = () => {
 
   const initialColumns = [
     {
-      title: "Tarih/Saat",
-      dataIndex: "TarihSaat",
-      key: "TarihSaat",
-      width: 160, // Tarih ve saat yan yana geleceği için genişliği biraz artırdık
-      ellipsis: true,
-      visible: true,
-      sorter: (a, b) => {
-        if (!a.TarihSaat) return -1;
-        if (!b.TarihSaat) return 1;
-        return a.TarihSaat.localeCompare(b.TarihSaat);
-      },
-      render: (text) => {
-        if (!text) return "";
-    
-        // "2026-02-26 12:38:21" verisini boşluktan bölüyoruz
-        const [datePart, timePart] = text.split(" ");
-    
-        // Tarih formatla: 26.02.2026
-        const formattedDate = formatDate(datePart);
-    
-        // Saat formatla: 12:38 (Saniyeyi atar)
-        const formattedTime = formatTime(timePart);
-    
-        return `${formattedDate} / ${formattedTime}`;
-      },
+    title: "Tarih / Saat",
+    dataIndex: "TarihSaat",
+    key: "TarihSaat",
+    width: 110,
+    ellipsis: true,
+    visible: true,
+    sorter: (a, b) => (a.TarihSaat || "").localeCompare(b.TarihSaat || ""),
+    render: (text) => {
+      if (!text) return "-";
+      const parts = text.split("\n");
+      const datePart = parts[0];
+      const timePart = parts[1] ? parts[1].substring(0, 5) : "";
+
+      return (
+        <div style={{ display: "flex", flexDirection: "column", lineHeight: "1.2" }}>
+          <span style={{ fontWeight: 600 }}>{datePart}</span>
+          <Text type="secondary" style={{ fontSize: "12px" }}>
+            {timePart || "-"}
+          </Text>
+        </div>
+      );
     },
+  },
     {
-      title: "Tip",
+      title: "İşlem Tipi",
       dataIndex: "TipText",
       key: "TipText",
       width: 120,
@@ -277,7 +274,7 @@ const MainTable = () => {
       },
     },
     {
-      title: "Yakıt",
+      title: "Yakıt Tipi",
       dataIndex: "Yakit",
       key: "Yakit",
       width: 200,
@@ -286,58 +283,94 @@ const MainTable = () => {
       sorter: (a, b) => a.Yakit?.localeCompare(b.Yakit),
     },
     {
-      title: "Depo",
-      dataIndex: "Depo",
-      key: "Depo",
+      title: "Kaynak Depo",
+      dataIndex: "KaynakDepo",
+      key: "KaynakDepo",
       width: 150,
       ellipsis: true,
       visible: true,
-      sorter: (a, b) => a.Depo?.localeCompare(b.Depo),
+      sorter: (a, b) => a.KaynakDepo?.localeCompare(b.KaynakDepo),
     },
     {
-      title: "Hedef",
-      dataIndex: "Hedef",
-      key: "Hedef",
+      title: "Hedef Depo",
+      dataIndex: "HedefDepo",
+      key: "HedefDepo",
       width: 120,
       visible: true,
-      sorter: (a, b) => a.Hedef?.localeCompare(b.Hedef),
+      sorter: (a, b) => a.HedefDepo?.localeCompare(b.HedefDepo),
     },
     {
-      title: "Lokasyon",
-      dataIndex: "Lokasyon",
-      key: "Lokasyon",
-      width: 120,
-      visible: true,
-      sorter: (a, b) => a.Lokasyon?.localeCompare(b.Lokasyon),
-    },
+  title: "Ekipman / Araç",
+  dataIndex: "EkipmanKod", 
+  key: "EkipmanKod",
+  width: 300,
+  ellipsis: true,
+  visible: true,
+  render: (value, record) => (
+    <div style={{ display: "flex", flexDirection: "column", lineHeight: "1.2" }}>
+      <span style={{ fontWeight: 600 }}>
+          {value?.EkipmanKod || "-"}
+      </span>
+      <Text type="secondary" style={{ fontSize: "12px" }}>
+        {value?.EkipmanTanim || "-"}
+      </Text>
+    </div>
+  ),
+  sorter: (a, b) => (a.Ekipman?.Kod || "").localeCompare(b.Ekipman?.Kod || ""),
+},
     {
       title: "Miktar",
-      dataIndex: "Miktar",
-      key: "Miktar",
+      dataIndex: "MiktarFormatli",
+      key: "MiktarFormatli",
       width: 120,
       visible: true,
-      render: (value) => <div style={{textAlign:'right'}}>{Number(value).toLocaleString('tr-TR')} Lt</div>,
-      sorter: (a, b) => a.Miktar - b.Miktar,
     },
     {
-      title: "Birim",
-      dataIndex: "Birim",
-      key: "Birim",
+      title: "Birim Fiyat",
+      dataIndex: "BirimFiyatFormatli",
+      key: "BirimFiyatFormatli",
       width: 120,
       visible: true,
-      sorter: (a, b) => a.Birim?.localeCompare(b.Birim),
+      sorter: (a, b) => a.BirimFiyatFormatli?.localeCompare(b.BirimFiyatFormatli),
     },
     {
       title: "Tutar",
-      dataIndex: "Tutar",
-      key: "Tutar",
+      dataIndex: "TutarFormatli",
+      key: "TutarFormatli",
       width: 150,
       visible: true,
     },
     {
-      title: "Referans",
-      dataIndex: "Referans",
-      key: "Referans",
+      title: "Lokasyon",
+      dataIndex: "LokasyonTanim",
+      key: "LokasyonTanim",
+      width: 200,
+      visible: true,
+      render: (value) => (
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <span style={{ fontWeight: "500" }}>
+            {value?.LokasyonTanim || "-"}
+          </span>
+          {value?.LokasyonYol && (
+            <span style={{ fontSize: "12px", color: "#8c8c8c" }}>
+              {value.LokasyonYol}
+            </span>
+          )}
+        </div>
+      ),
+      sorter: (a, b) => {
+        const adiA = a.Lokasyon?.LokasyonTanim || "";
+        const adiB = b.Lokasyon?.LokasyonTanim || "";
+        if (adiA !== adiB) {
+          return adiA.localeCompare(adiB);
+        }
+        return (a.Lokasyon?.LokasyonYol || "").localeCompare(b.Lokasyon?.LokasyonYol || "");
+      },
+    },
+    {
+      title: "Açıklama",
+      dataIndex: "Aciklama",
+      key: "Aciklama",
       width: 150,
       visible: true,
     }
@@ -454,11 +487,6 @@ const MainTable = () => {
       setLoading(false);
     }
   }, [currentPage, pageSize, body, searchTerm]);
-
-  const onTabChange = (key) => {
-    setBody(prev => ({ ...prev, SekmeTipi: key }));
-    setCurrentPage(1); // Sekme değişince 1. sayfadan başla
-  };
 
   // --- Frontend Arama (Client-side Search) ---
   const filteredData = useMemo(() => {
@@ -688,9 +716,9 @@ const MainTable = () => {
     }
   };
 
-  const handleFilterChange = (type, newIds) => {
-    setBody(prev => ({ ...prev, [type]: newIds }));
-    setCurrentPage(1); // Filtre değişince 1. sayfaya dön
+  const handleFilterChange = (type, value) => {
+    setBody(prev => ({ ...prev, [type]: value }));
+    setCurrentPage(1); 
   };
 
   return (
@@ -820,17 +848,6 @@ const MainTable = () => {
     </div>
   )}
 </div>
-<Tabs
-        defaultActiveKey="TUMU"
-        onChange={onTabChange}
-        items={[
-          { label: "Tümü", key: "TUMU" },
-          { label: "Girişler", key: "GIRIS" },
-          { label: "Çıkışlar", key: "CIKIS" },
-          { label: "Transferler", key: "TRANSFER" },
-          { label: "Sarf", key: "SARF" },
-        ]}
-      />
       <div
         style={{
           display: "flex",

@@ -1,14 +1,34 @@
-import React from "react";
-import { Typography, Input, InputNumber, Checkbox } from "antd";
+import React, { useEffect, useState } from "react";
+import { Typography, Input, InputNumber, Checkbox, Select } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import { t } from "i18next";
 import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
-import PersonelTablo from "../../../../../../utils/components/PersonelTablo";
+import AxiosInstance from "../../../../../../api/http";
 
 const { Text } = Typography;
+const { Option } = Select;
 
 export default function MainTabs() {
   const { control, watch } = useFormContext();
+  const [yakitListesi, setYakitListesi] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+      const fetchYakitListesi = async () => {
+        setLoading(true);
+        try {
+          // API URL'ini kendi yapına göre düzenle
+          const response = await AxiosInstance.get("GetYakitList?aktif=true");
+          // Gelen veriyi state'e aktar
+          setYakitListesi(response || []); 
+        } catch (error) {
+          console.error("Yakıt listesi çekilirken hata oluştu:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchYakitListesi();
+    }, []);
 
   // --- Stiller ---
   const LabelStyle = {
@@ -16,7 +36,7 @@ export default function MainTabs() {
     fontSize: "14px",
     flexDirection: "row",
     alignItems: "center",
-    minWidth: "140px",
+    minWidth: "80px",
     fontWeight: 600,
   };
 
@@ -51,10 +71,8 @@ export default function MainTabs() {
               render={({ field }) => <Input {...field} placeholder={t("Depo Kodu")} />}
             />
           </div>
-        </div>
 
         {/* Depo Tanımı */}
-        <div style={RowStyle}>
           <Text style={LabelStyle}>{t("Depo Tanımı")}</Text>
           <div style={InputContainerStyle}>
             <Controller
@@ -67,6 +85,34 @@ export default function MainTabs() {
 
         {/* Lokasyon Seçimi */}
         <div style={RowStyle}>
+          <Text style={LabelStyle}>{t("Yakıt Tipi")}</Text>
+                  <div style={InputContainerStyle}>
+                    <Controller
+                      name="yakitTipTanim" // Formda hangi key ile tutulacaksa
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          showSearch
+                          allowClear
+                          style={{ width: "100%" }}
+                          loading={loading}
+                          optionFilterProp="children"
+                          // Arama yaparken hem koda hem tanıma bakması için:
+                          filterOption={(input, option) =>
+                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                          }
+                        >
+                          {yakitListesi.map((item) => (
+                            <Option key={item.TB_STOK_ID} value={item.TB_STOK_ID}>
+                              {`${item.YAKIT_KOD} - ${item.YAKIT_TANIM}`}
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    />
+                  </div>
+
           <Text style={LabelStyle}>{t("Lokasyon")}</Text>
           <div style={InputContainerStyle}>
             <LokasyonTablo
@@ -74,20 +120,6 @@ export default function MainTabs() {
               lokasyonIdFieldName="lokasyonID"
               workshopSelectedId={watch("lokasyonID")}
               isRequired={false}
-            />
-          </div>
-        </div>
-
-        {/* Sorumlu Personel */}
-        <div style={RowStyle}>
-          <Text style={LabelStyle}>{t("Sorumlu Personel")}</Text>
-          <div style={InputContainerStyle}>
-            <PersonelTablo
-              name1="PERSONEL" // API: SORUMLU_PERSONEL_AD
-              workshopSelectedId={watch("PERSONELID")} // API: SORUMLU_PERSONEL_ID
-              isRequired={false}
-              // Not: PersonelTablo bileşeninin iç mantığına göre name1="personel" 
-              // dersen personelID ve personel isimlerini otomatik setler.
             />
           </div>
         </div>

@@ -10,10 +10,82 @@ import Footer from "../Footer";
 // import SecondTabs from "./components/SecondTabs/SecondTabs";
 
 export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
-  const [, startTransition] = useTransition();
-  const [open, setOpen] = useState(false);
-  const showDrawer = () => {
-    setOpen(true);
+  // Loading state tanımı eksikti, eklendi
+  const [loading, setLoading] = useState(false);
+
+  const methods = useForm({
+    defaultValues: {
+      Tanim: "",
+      OnEk: "",
+      Numara: "",
+      HaneSayisi: "",
+      AlanKilit: false,
+      Aktif: false,
+      Aciklama: "",
+    },
+  });
+
+  const { setValue, reset, handleSubmit } = methods;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      // Sadece drawer açıldığında ve seçili satır olduğunda çalışır
+      if (drawerVisible && selectedRow) {
+        setLoading(true);
+        try {
+          const response = await AxiosInstance.get(`GetNumaratorById?id=${selectedRow.key}`);
+          const item = response.data || response; // Axios konfigürasyonunuza göre response.data gerekebilir
+
+          // Form alanlarını doldur
+          setValue("Tanim", item.Tanim);
+          setValue("OnEk", item.OnEk);
+          setValue("Numara", item.Numara);
+          setValue("HaneSayisi", item.HaneSayisi);
+          setValue("Aktif", item.Aktif);
+          setValue("AlanKilit", item.AlanKilit);
+          setValue("Aciklama", item.Aciklama);
+        } catch (error) {
+          console.error("Veri çekilirken hata oluştu:", error);
+          message.error("Veriler yüklenemedi.");
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+  }, [drawerVisible, selectedRow, setValue]);
+
+  // Form gönderimi
+  const onSubmit = (data) => {
+    const Body = {
+      // data.secilenNumaratorId yerine doğrudan selectedRow'dan gelen ID'yi kullanıyoruz
+      TB_NUMARATOR_ID: selectedRow?.key, 
+      Tanim: data.Tanim,
+      OnEk: data.OnEk,
+      Numara: data.Numara,
+      HaneSayisi: data.HaneSayisi,
+      Aktif: data.Aktif,
+      AlanKilit: data.AlanKilit,
+      Aciklama: data.Aciklama,
+    };
+
+    AxiosInstance.post("UpdateNumarator", Body)
+      .then((response) => {
+        // API response yapınıza göre kontrol edin (Genelde response.status veya response.data.status_code)
+        if (response.status_code === 200 || response.status_code === 201 || response.status === 200) {
+          message.success("Güncelleme Başarılı.");
+          onDrawerClose();
+          onRefresh();
+          reset();
+        } else {
+          message.error("Güncelleme Başarısız.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error sending data:", error);
+        message.error("Bir hata oluştu.");
+      });
   };
 
   const showConfirmationModal = () => {
@@ -23,141 +95,11 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       okText: "Evet",
       cancelText: "Hayır",
       onOk: () => {
-        onDrawerClose(); // Close the drawer
-        onRefresh();
+        onDrawerClose();
         reset();
-      },
-      onCancel: () => {
-        // Do nothing, continue from where the user left off
       },
     });
   };
-
-  const onClose = () => {
-    // Kullanıcı "İptal" düğmesine tıkladığında Modal'ı göster
-    showConfirmationModal();
-  };
-
-  // Drawer'ın kapatılma olayını ele al
-  const handleDrawerClose = () => {
-    // Kullanıcı çarpı işaretine veya dış alana tıkladığında Modal'ı göster
-    showConfirmationModal();
-  };
-
-  // back-end'e gönderilecek veriler
-
-  const handleClick = () => {
-    const values = methods.getValues();
-    console.log(onSubmit(values));
-  };
-
-  //* export
-  const methods = useForm({
-    defaultValues: {
-      vardiyaTanimi: "",
-      secilenVardiyaID: "",
-      vardiyaBaslangicSaati: dayjs("08:00", "HH:mm"),
-      vardiyaBitisSaati: dayjs("18:00", "HH:mm"),
-      vardiyaTipi: null,
-      vardiyaTipiID: "",
-      lokasyonTanim: "",
-      lokasyonID: "",
-      vardiyaProjeTanim: "",
-      vardiyaProjeID: "",
-      varsayilanVardiya: false,
-      gosterimRengi: "#ffae00",
-      vardiyaAciklama: "",
-    },
-  });
-
-  const formatDateWithDayjs = (dateString) => {
-    const formattedDate = dayjs(dateString);
-    return formattedDate.isValid() ? formattedDate.format("YYYY-MM-DD") : "";
-  };
-
-  const formatTimeWithDayjs = (timeObj) => {
-    const formattedTime = dayjs(timeObj);
-    return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
-  };
-
-  const { setValue, reset } = methods;
-
-  //* export
-  const onSubmit = (data) => {
-    const Body = {
-      TB_VARDIYA_ID: data.secilenVardiyaID,
-      VAR_TANIM: data.vardiyaTanimi,
-      VAR_VARDIYA_TIPI_KOD_ID: data.vardiyaTipiID,
-      VAR_LOKASYON_ID: data.lokasyonID,
-      VAR_PROJE_ID: data.vardiyaProjeID,
-      VAR_VARSAYILAN: data.varsayilanVardiya,
-      // VAR_RENK: data.gosterimRengi,
-      VAR_ACIKLAMA: data.vardiyaAciklama,
-      VAR_BASLAMA_SAATI: formatTimeWithDayjs(data.vardiyaBaslangicSaati),
-      VAR_BITIS_SAATI: formatTimeWithDayjs(data.vardiyaBitisSaati),
-
-      // add more fields as needed
-    };
-
-    // AxiosInstance.post("/api/endpoint", { Body }).then((response) => {
-    // handle response
-    // });
-
-    AxiosInstance.post("UpdateVardiya", Body)
-      .then((response) => {
-        // Handle successful response here, e.g.:
-        console.log("Data sent successfully:", response);
-        if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
-          onDrawerClose(); // Close the drawer
-          onRefresh();
-          reset();
-        } else if (response.status_code === 401) {
-          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
-        } else {
-          message.error("Ekleme Başarısız.");
-        }
-      })
-      .catch((error) => {
-        // Handle errors here, e.g.:
-        console.error("Error sending data:", error);
-        message.error("Başarısız Olundu.");
-      });
-    console.log({ Body });
-  };
-
-  useEffect(() => {
-    if (drawerVisible && selectedRow) {
-      // console.log("selectedRow", selectedRow);
-      // startTransition(() => {
-      // Object.keys(selectedRow).forEach((key) => {
-      //   console.log(key, selectedRow[key]);
-      //   setValue(key, selectedRow[key]);
-      setValue("secilenVardiyaID", selectedRow.key);
-      setValue("vardiyaTanimi", selectedRow.VAR_TANIM);
-      setValue("vardiyaBaslangicSaati", dayjs(`1970-01-01T${selectedRow.VAR_BASLAMA_SAATI}`));
-      setValue("vardiyaBitisSaati", dayjs(`1970-01-01T${selectedRow.VAR_BITIS_SAATI}`));
-      setValue("vardiyaTipi", selectedRow.VAR_VARDIYA_TIPI);
-      setValue("vardiyaTipiID", selectedRow.VAR_VARDIYA_TIPI_KOD_ID);
-      setValue("lokasyonTanim", selectedRow.VAR_LOKASYON);
-      setValue("lokasyonID", selectedRow.VAR_LOKASYON_ID);
-      setValue("vardiyaProjeTanim", selectedRow.VAR_PROJE);
-      setValue("vardiyaProjeID", selectedRow.VAR_PROJE_ID);
-      setValue("varsayilanVardiya", selectedRow.VAR_VARSAYILAN);
-      setValue("gosterimRengi", selectedRow.VAR_RENK);
-      setValue("vardiyaAciklama", selectedRow.VAR_ACIKLAMA);
-      // add more fields as needed
-
-      // });
-      // });
-    }
-  }, [selectedRow, setValue, drawerVisible]);
-
-  useEffect(() => {
-    if (!drawerVisible) {
-      reset(); // Drawer kapandığında formu sıfırla
-    }
-  }, [drawerVisible, reset]);
 
   return (
     <FormProvider {...methods}>
@@ -177,14 +119,14 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             width="550px"
             title="Kayıdı Güncelle"
             placement={"right"}
-            onClose={handleDrawerClose}
+            onClose={showConfirmationModal}
             open={drawerVisible}
             extra={
               <Space>
-                <Button onClick={onClose}>İptal</Button>
+                <Button onClick={showConfirmationModal}>İptal</Button>
                 <Button
                   type="submit"
-                  onClick={handleClick}
+                  onClick={handleSubmit(onSubmit)}
                   style={{
                     backgroundColor: "#2bc770",
                     borderColor: "#2bc770",

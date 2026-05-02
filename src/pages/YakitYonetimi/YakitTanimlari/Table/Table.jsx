@@ -254,20 +254,25 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak açık
     },
     {
-      title: "Stok Miktarı",
-      dataIndex: "STOK_MIKTAR",
-      key: "STOK_MIKTAR",
-      width: 150,
-      sorter: (a, b) => {
-        if (a.STOK_MIKTAR === null && b.STOK_MIKTAR === null) return 0;
-        if (a.STOK_MIKTAR === null) return 1;
-        if (b.STOK_MIKTAR === null) return -1;
-        return a.STOK_MIKTAR.localeCompare(b.STOK_MIKTAR);
-      },
-      ellipsis: true,
-
-      visible: true, // Varsayılan olarak açık
-    },
+  title: "Stok Miktarı",
+  dataIndex: "STOK_MIKTAR",
+  key: "STOK_MIKTAR",
+  width: 150,
+  ellipsis: true,
+  visible: true,
+  // Görüntüleme formatı: 5786 -> 5.786 Lt
+  render: (text) => {
+    if (text === null || text === undefined) return "-";
+    const formatted = Number(text).toLocaleString('tr-TR');
+    return `${formatted} Lt`;
+  },
+  // Sayısal sıralama mantığı
+  sorter: (a, b) => {
+    const valA = a.STOK_MIKTAR ?? 0;
+    const valB = b.STOK_MIKTAR ?? 0;
+    return valA - valB;
+  },
+},
     {
       title: "Giriş Fiyatı",
       dataIndex: "GIRIS_FIYAT",
@@ -310,6 +315,19 @@ const MainTable = () => {
         </Tag>
       ),
       sorter: (a, b) => (a.AKTIF === b.AKTIF ? 0 : a.AKTIF ? -1 : 1),
+    },
+    {
+      title: "Kullanılan Ekipman",
+      dataIndex: "KULLANAN_ARAC_SAYISI",
+      key: "KULLANAN_ARAC_SAYISI",
+      width: 200,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+      sorter: (a, b) => {
+        if (a.KULLANAN_ARAC_SAYISI === null) return -1;
+        if (b.KULLANAN_ARAC_SAYISI === null) return 1;
+        return a.KULLANAN_ARAC_SAYISI.localeCompare(b.KULLANAN_ARAC_SAYISI);
+      },
     },
 
     // Diğer kolonlarınız...

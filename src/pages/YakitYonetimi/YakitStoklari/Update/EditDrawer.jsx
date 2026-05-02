@@ -82,6 +82,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
             setValue("email", item.EMAIL);
             setValue("adres", item.ADRES);
             setValue("aciklama", item.ACIKLAMA);
+            setValue("sonHareket", item.SON_HAREKET);
+            setValue("durum", item.DURUM_TEXT);
           }
 
           setLoading(false);
@@ -158,17 +160,6 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   const extraButton = (
     <Space>
-      <Button 
-        icon={<InfoCircleOutlined />} 
-        onClick={() => setAnalizVisible(true)}
-        style={{
-          backgroundColor: "#1890ff",
-          borderColor: "#1890ff",
-          color: "#ffffff",
-        }}
-      >
-        {t("Detay")}
-      </Button>
       <Button onClick={onClose}>{t("iptal")}</Button>
       <Button
         type="submit"
@@ -188,7 +179,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     <FormProvider {...methods}>
       <ConfigProvider locale={currentLocale}>
         <Drawer
-          width="600px"
+          width="800px"
           title={t("Tank Güncelleme")}
           onClose={onClose}
           open={drawerVisible}

@@ -115,12 +115,12 @@ export default function MainTabs() {
             width: "100%",
           }}>
           <Controller
-            name="vardiyaTanimi"
+            name="VardiyaTanimi"
             control={control}
             render={({ field }) => <Input {...field} style={{ flex: 1 }} />}
           />
           <Controller
-            name="secilenVardiyaID"
+            name="TB_VARDIYA_ID"
             control={control}
             render={({ field }) => (
               <Input
@@ -145,13 +145,13 @@ export default function MainTabs() {
         <Text style={{ fontSize: "14px" }}>Çalışma Saatleri:</Text>
         <div style={{ display: "flex", justifyContent: "space-between", width: "300px" }}>
           <Controller
-            name="vardiyaBaslangicSaati"
+            name="BaslamaSaati"
             control={control}
             render={({ field }) => <TimePicker {...field}
                                                changeOnScroll needConfirm={false} style={{ width: "145px" }} format="HH:mm" />}
           />
           <Controller
-            name="vardiyaBitisSaati"
+            name="BitisSaati"
             control={control}
             render={({ field }) => <TimePicker {...field}
                                                changeOnScroll needConfirm={false} style={{ width: "145px" }} format="HH:mm" />}
@@ -190,7 +190,7 @@ export default function MainTabs() {
             gap: "3px",
           }}>
           <Controller
-            name="lokasyonTanim"
+            name="LokasyonText"
             control={control}
             render={({ field }) => (
               <Input
@@ -202,7 +202,7 @@ export default function MainTabs() {
             )}
           />
           <Controller
-            name="lokasyonID"
+            name="LokasyonId"
             control={control}
             render={({ field }) => (
               <Input
@@ -214,8 +214,8 @@ export default function MainTabs() {
           />
           <LokasyonTablo
             onSubmit={(selectedData) => {
-              setValue("lokasyonTanim", selectedData.LOK_TANIM);
-              setValue("lokasyonID", selectedData.key);
+              setValue("LokasyonText", selectedData.LOK_TANIM);
+              setValue("LokasyonId", selectedData.key);
             }}
           />
           <Button onClick={handleLokasyonMinusClick}> - </Button>
@@ -240,7 +240,7 @@ export default function MainTabs() {
               width: "300px",
             }}>
             <Controller
-              name="vardiyaProjeTanim"
+              name="ProjeText"
               control={control}
               render={({ field }) => (
                 <Input
@@ -252,7 +252,7 @@ export default function MainTabs() {
               )}
             />
             <Controller
-              name="vardiyaProjeID"
+              name="ProjeId"
               control={control}
               render={({ field }) => (
                 <Input
@@ -264,8 +264,8 @@ export default function MainTabs() {
             />
             <ProjeTablo
               onSubmit={(selectedData) => {
-                setValue("vardiyaProjeTanim", selectedData.subject);
-                setValue("vardiyaProjeID", selectedData.key);
+                setValue("ProjeText", selectedData.subject);
+                setValue("ProjeId", selectedData.key);
               }}
             />
             <Button onClick={handleProjeMinusClick}> - </Button>
@@ -282,7 +282,7 @@ export default function MainTabs() {
         <Text style={{ fontSize: "14px" }}>Varsayılan Vardiya:</Text>
 
         <Controller
-          name="varsayilanVardiya"
+          name="Varsayilan"
           control={control}
           render={({ field }) => (
             <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}></Checkbox>
@@ -299,7 +299,7 @@ export default function MainTabs() {
         }}>
         <Text style={{ fontSize: "14px" }}>Gösterim Rengi:</Text>
         <Controller
-          name="gosterimRengi"
+          name="Renk"
           control={control}
           render={({ field: { ref, ...rest } }) => (
             <ColorPicker {...rest} showText={(color) => <span>Renk Seçimi Yapın ({color.toHexString()})</span>} />
@@ -317,7 +317,7 @@ export default function MainTabs() {
         <Text style={{ fontSize: "14px" }}>Açıklama:</Text>
         <StyledDiv>
           <Controller
-            name="vardiyaAciklama"
+            name="Aciklama"
             control={control}
             render={({ field }) => (
               <TextArea
