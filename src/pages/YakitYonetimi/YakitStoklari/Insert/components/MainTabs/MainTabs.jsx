@@ -36,7 +36,7 @@ export default function MainTabs() {
     fontSize: "14px",
     flexDirection: "row",
     alignItems: "center",
-    minWidth: "80px",
+    minWidth: "100px",
     fontWeight: 600,
   };
 
@@ -61,57 +61,97 @@ export default function MainTabs() {
       {/* SOL KOLON */}
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", flex: 1, minWidth: "400px" }}>
         
-        {/* Depo Kodu */}
         <div style={RowStyle}>
-          <Text style={LabelStyle}>{t("Depo Kodu")}</Text>
-          <div style={InputContainerStyle}>
-            <Controller
-              name="DEP_KOD"
-              control={control}
-              render={({ field }) => <Input {...field} placeholder={t("Depo Kodu")} />}
-            />
-          </div>
+  <Text style={LabelStyle} strong>
+    {t("Depo Kodu")} <span style={{ color: "red" }}>*</span>
+  </Text>
+  <div style={InputContainerStyle}>
+    <Controller
+      name="DEP_KOD"
+      control={control}
+      rules={{ required: t("alanBosBirakilamaz") }} // Zorunlu
+      render={({ field, fieldState: { error } }) => (
+        <>
+          <Input 
+            {...field} 
+            status={error ? "error" : ""} 
+            placeholder={t("Depo Kodu")} 
+          />
+          {error && (
+            <small style={{ color: "red", fontSize: "14px", marginTop: "4px" }}>
+              {error.message}
+            </small>
+          )}
+        </>
+      )}
+    />
+  </div>
 
-        {/* Depo Tanımı */}
-          <Text style={LabelStyle}>{t("Depo Tanımı")}</Text>
-          <div style={InputContainerStyle}>
-            <Controller
-              name="DEP_TANIM"
-              control={control}
-              render={({ field }) => <Input {...field} placeholder={t("Tanım giriniz")} />}
-            />
-          </div>
-        </div>
+  {/* Depo Tanımı */}
+  <Text style={LabelStyle} strong>
+    {t("Depo Tanımı")} <span style={{ color: "red" }}>*</span>
+  </Text>
+  <div style={InputContainerStyle}>
+    <Controller
+      name="DEP_TANIM"
+      control={control}
+      rules={{ required: t("alanBosBirakilamaz") }} // Zorunlu
+      render={({ field, fieldState: { error } }) => (
+        <>
+          <Input 
+            {...field} 
+            status={error ? "error" : ""} 
+            placeholder={t("Tanım giriniz")} 
+          />
+          {error && (
+            <small style={{ color: "red", fontSize: "14px", marginTop: "4px" }}>
+              {error.message}
+            </small>
+          )}
+        </>
+      )}
+    />
+  </div>
+</div>
 
-        {/* Lokasyon Seçimi */}
         <div style={RowStyle}>
-          <Text style={LabelStyle}>{t("Yakıt Tipi")}</Text>
-                  <div style={InputContainerStyle}>
-                    <Controller
-                      name="yakitTipKodId" // Formda hangi key ile tutulacaksa
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          {...field}
-                          showSearch
-                          allowClear
-                          style={{ width: "100%" }}
-                          loading={loading}
-                          optionFilterProp="children"
-                          // Arama yaparken hem koda hem tanıma bakması için:
-                          filterOption={(input, option) =>
-                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                          }
-                        >
-                          {yakitListesi.map((item) => (
-                            <Option key={item.TB_STOK_ID} value={item.TB_STOK_ID}>
-                              {`${item.YAKIT_KOD} - ${item.YAKIT_TANIM}`}
-                            </Option>
-                          ))}
-                        </Select>
-                      )}
-                    />
-                  </div>
+  <Text style={LabelStyle} strong>
+    {t("Yakıt Tipi")} <span style={{ color: "red" }}>*</span>
+  </Text>
+  <div style={InputContainerStyle}>
+    <Controller
+      name="yakitTipKodId"
+      control={control}
+      rules={{ required: t("alanBosBirakilamaz") }} // Zorunlu
+      render={({ field, fieldState: { error } }) => (
+        <>
+          <Select
+            {...field}
+            showSearch
+            allowClear
+            status={error ? "error" : ""} // Hata durumunda kırmızı çerçeve
+            style={{ width: "100%" }}
+            loading={loading}
+            optionFilterProp="children"
+            filterOption={(input, option) =>
+              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+            }
+          >
+            {yakitListesi.map((item) => (
+              <Option key={item.TB_STOK_ID} value={item.TB_STOK_ID}>
+                {`${item.YAKIT_KOD} - ${item.YAKIT_TANIM}`}
+              </Option>
+            ))}
+          </Select>
+          {error && (
+            <small style={{ color: "red", fontSize: "14px", marginTop: "4px" }}>
+              {error.message}
+            </small>
+          )}
+        </>
+      )}
+    />
+  </div>
 
           <Text style={LabelStyle}>{t("Lokasyon")}</Text>
           <div style={InputContainerStyle}>

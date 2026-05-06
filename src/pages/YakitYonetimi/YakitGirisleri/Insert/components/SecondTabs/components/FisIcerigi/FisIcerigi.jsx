@@ -14,10 +14,16 @@ const { Text, Title } = Typography;
 const { TextArea } = Input;
 
 export default function SecondTabs() {
-  const { control, watch, setValue } = useFormContext();
+  const { 
+  control,
+  watch, 
+  setValue, 
+  formState: { errors } // <--- Eksik olan kısım tam olarak burası!
+} = useFormContext();
 
   const watchStokKullanim = watch("StokKullanim");
   const watchMakineId = watch("MakineId");
+  const watchMKN_KOD = watch("MKN_KOD");
   
   // API tetikleyicileri için izlenen alanlar
   const watchYakitTipId = watch("YakitTipId");
@@ -36,6 +42,7 @@ export default function SecondTabs() {
   const watchFiyat = watch("Fiyat");
   const watchTutar = watch("Tutar");
   const watchFarkKm = watch("FarkKm");
+  const watchSonAlinanKm = watch("SonAlinanKm");
   const watchFullDepo = watch("FullDepo");
 
   // --- YENİ STATE'LER ---
@@ -90,12 +97,12 @@ export default function SecondTabs() {
         .then((res) => {
           if (res.data) {
             const d = res.data;
-            setValue("SonKm", d.SonAlinanKm);
+            setValue("SonAlinanKm", d.SonAlinanKm);
             setValue("_maxKapasite", d.DepoKapasitesi);
             setValue("_sayacZorunlu", d.SayacTakibiZorunlu);
             setValue("_sayacBirimi", d.SayacBirimi);
             setValue("_guncelSayacDegeri", d.GuncelSayacDegeri);
-            setValue("YakitTipId", d.YakitTipId);
+            setValue("YakitTipId", d.YakitTipId, { shouldValidate: true });
           }
         })
         .catch(() => message.error(t("Araç bilgileri alınamadı.")));
@@ -161,130 +168,183 @@ export default function SecondTabs() {
         {/* 1. SATIR: Araç / Sürücü / Yakıt Tipi */}
         <Row gutter={[16, 16]}>
           <Col span={8}>
-            <Text style={labelStyle}>{t("Araç / Ekipman")}</Text>
-            <MakineTablo
-            control={control}
-            setValue={setValue}
-            makineFieldName="MKN_KOD" 
-            makineIdFieldName="MakineId" 
-          />
-          </Col>
+  <Text style={labelStyle} strong>
+    {t("Ekipman")} <span style={{ color: "red" }}>*</span>
+  </Text>
+  <Controller
+    name="MKN_KOD" // Bileşenin içindeki inputun bağlı olduğu isim
+    control={control}
+    rules={{ required: t("alanBosBirakilamaz") }}
+    render={({ fieldState: { error } }) => (
+      <>
+        <MakineTablo
+          control={control}
+          setValue={setValue}
+          makineFieldName="MKN_KOD"
+          makineIdFieldName="MakineId"
+          errors={errors} // Hata durumunu içeri paslıyoruz
+        />
+        {error && (
+          <small style={{ color: "red", fontSize: "14px", marginTop: "4px", display: "block" }}>
+            {error.message}
+          </small>
+        )}
+      </>
+    )}
+  />
+</Col>
           <Col span={8}>
-            <Text style={labelStyle}>{t("Yakıt Tipi")}</Text>
-            <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-              <div style={{ flex: 1 }}>
-                {/* YAKIT TİPİ GÜNCELLENDİ (JSON'a göre TB_STOK_ID ve YAKIT_TANIM eşleştirildi) */}
-                <Controller
-                  name="YakitTipId"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      showSearch
-                      allowClear
-                      loading={yakitTipleriLoading}
-                      placeholder={t("Seçiniz")}
-                      optionFilterProp="label"
-                      filterOption={(input, option) =>
-                        (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
-                      }
-                      options={yakitTipleri.map((item) => ({
-                        value: item.TB_STOK_ID, 
-                        label: item.YAKIT_TANIM, 
-                      }))}
-                      style={{ width: "100%" }}
-                    />
-                  )}
+    <Text style={labelStyle} strong>{t("Yakıt Tipi")} <span style={{ color: "red" }}>*</span></Text>
+    <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+        <div style={{ flex: 1 }}>
+          <Controller
+            name="YakitTipId"
+            control={control}
+            rules={{ required: t("alanBosBirakilamaz") }}
+            render={({ field, fieldState: { error } }) => (
+              <>
+                <Select
+                  {...field}
+                  showSearch
+                  allowClear
+                  status={error ? "error" : ""}
+                  loading={yakitTipleriLoading}
+                  placeholder={t("Seçiniz")}
+                  optionFilterProp="label"
+                  filterOption={(input, option) =>
+                    (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+                  }
+                  options={yakitTipleri.map((item) => ({
+                    value: item.TB_STOK_ID,
+                    label: item.YAKIT_TANIM,
+                  }))}
+                  style={{ width: "100%" }}
                 />
-              </div>
-              <Controller
-                name="StokKullanim"
-                control={control}
-                defaultValue={false}
-                render={({ field }) => (
-                  <Checkbox 
-                    {...field} 
-                    checked={field.value} 
-                    onChange={(e) => field.onChange(e.target.checked)}
-                    style={{ whiteSpace: "nowrap" }}
-                  >
-                    {t("Stoktan Kullanım")}
-                  </Checkbox>
+                {error && (
+                  <small style={{ color: "red", fontSize: "14px", marginTop: "4px", display: "block" }}>
+                    {error.message}
+                  </small>
                 )}
-              />
-            </div>
-          </Col>
-          <Col span={4}>
-            <Text style={labelStyle}>{t("Tarih")}</Text>
-            <Controller
-              name="Tarih"
-              control={control}
-              render={({ field }) => (
-                <DatePicker 
-                  {...field} 
-                  value={field.value ? dayjs(field.value) : null} 
-                  onChange={(date) => field.onChange(date ? date.toISOString() : null)}
-                  style={{ width: "100%" }} 
-                />
-              )}
-            />
-          </Col>
-          <Col span={4}>
-            <Text style={labelStyle}>{t("Saat")}</Text>
-            <Controller
-              name="Saat"
-              control={control}
-              render={({ field }) => (
-                <TimePicker 
-                  {...field} 
-                  value={field.value ? dayjs(field.value, "HH:mm") : null} 
-                  format="HH:mm" 
-                  onChange={(time) => field.onChange(time ? time.format("HH:mm:ss") : null)}
-                  style={{ width: "100%" }} 
-                />
-              )}
-            />
-          </Col>
-        </Row>
+              </>
+            )}
+          />
+        </div>
+      </div>
+    </div>
+  </Col>
+
+  <Col span={4}>
+    <Text style={labelStyle} strong>{t("Tarih")} <span style={{ color: "red" }}>*</span></Text>
+    <Controller
+      name="Tarih"
+      control={control}
+      rules={{ required: t("alanBosBirakilamaz") }}
+      render={({ field, fieldState: { error } }) => (
+        <>
+          <DatePicker
+            {...field}
+            status={error ? "error" : ""}
+            value={field.value ? dayjs(field.value) : null}
+            onChange={(date) => field.onChange(date ? date.toISOString() : null)}
+            style={{ width: "100%" }}
+          />
+          {error && (
+            <small style={{ color: "red", fontSize: "14px", marginTop: "4px", display: "block" }}>
+              {error.message}
+            </small>
+          )}
+        </>
+      )}
+    />
+  </Col>
+
+  <Col span={4}>
+    <Text style={labelStyle} strong>{t("Saat")} <span style={{ color: "red" }}>*</span></Text>
+    <Controller
+      name="Saat"
+      control={control}
+      rules={{ required: t("alanBosBirakilamaz") }}
+      render={({ field, fieldState: { error } }) => (
+        <>
+          <TimePicker
+            {...field}
+            status={error ? "error" : ""}
+            value={field.value ? dayjs(field.value, "HH:mm") : null}
+            format="HH:mm"
+            onChange={(time) => field.onChange(time ? time.format("HH:mm:ss") : null)}
+            style={{ width: "100%" }}
+          />
+          {error && (
+            <small style={{ color: "red", fontSize: "14px", marginTop: "4px", display: "block" }}>
+              {error.message}
+            </small>
+          )}
+        </>
+      )}
+    />
+  </Col>
+</Row>
 
         {/* 2. SATIR: Tarih / Saat / Yakıt Deposu */}
         <Row gutter={[16, 16]} style={{ marginTop: "15px" }}>
           <Col span={8}>
-            <Text style={labelStyle}>{t("Sürücü / Personel")}</Text>
+            <Text style={labelStyle}>{t("Operatör / Personel")}</Text>
             <PersonelSelect
               fieldName="PersonelId" placeholder={t("Seçiniz")} mode="default" selectStyle={{ width: "100%", maxWidth: "600px"}} 
             />
           </Col>
           <Col span={8}>
-            {watchStokKullanim && (
-              <>
-                <Text style={labelStyle}>{t("Yakıt Deposu")}</Text>
-                {/* YAKIT DEPOSU GÜNCELLENDİ */}
-                <Controller
-                  name="YakitTankId"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      showSearch
-                      allowClear
-                      loading={yakitDepolariLoading}
-                      placeholder={t("Depo Seçiniz")}
-                      optionFilterProp="label"
-                      filterOption={(input, option) =>
-                        (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
-                      }
-                      options={yakitDepolari.map((item) => ({
-                        value: item.TB_DEPO_ID || item.ID, // Backenddeki depo id alanı (Emin değilsen console.log atıp bakarsın kanka)
-                        label: item.DEP_TANIM || item.TANIM, // Backenddeki depo tanım alanı
-                      }))}
-                      style={{ width: "100%" }}
-                    />
-                  )}
-                />
-              </>
-            )}
-          </Col>
+  <Text style={labelStyle}>
+    <Controller
+          name="StokKullanim"
+          control={control}
+          defaultValue={true}
+          render={({ field }) => (
+            <Checkbox
+              {...field}
+              checked={field.value}
+              onChange={(e) => field.onChange(e.target.checked)}
+              style={{ whiteSpace: "nowrap" }}
+            >
+              {t("Stoktan Kullanım")}
+            </Checkbox>
+          )}
+        />
+  </Text>
+  <Controller
+    name="YakitTankId"
+    control={control}
+    render={({ field }) => (
+      <Select
+        {...field}
+        showSearch
+        allowClear
+        // Stok kullanımı seçili değilse veya yükleniyorsa disable et
+        disabled={!watchStokKullanim} 
+        loading={yakitDepolariLoading}
+        placeholder={t("Depo Seçiniz")}
+        optionFilterProp="label"
+        filterOption={(input, option) =>
+          (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+        }
+        options={yakitDepolari.map((item) => ({
+          value: item.TB_DEPO_ID || item.ID,
+          label: item.DEP_TANIM || item.TANIM,
+        }))}
+        style={{ width: "100%" }}
+      />
+    )}
+  />
+</Col>
+          <Col span={8}>
+                {!watchStokKullanim && (
+                  <>
+                    <Text style={labelStyle}>{t("İstasyon")}</Text>
+                    <KodIDSelectbox name1="IstasyonKodId" kodID={35690} placeholder="İstasyon Seçiniz" />
+                  </>
+                )}
+              </Col>
         </Row>
       </div>
 
@@ -328,22 +388,41 @@ export default function SecondTabs() {
                 />
               </Col>
             </Row>
-            <div style={{ marginTop: "15px", backgroundColor: "#fafafa", padding: "10px", borderRadius: "4px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginTop: "5px" }}>
-                <div><Text size="small">Sayaç Tipi</Text><br /><b>{watchSayacBirimi}</b></div>
-                <div><Text size="small">Son Kullanım</Text><br /><b>{watchFarkKm}</b></div>
-                <div>
-      {/* Şartlı Renk ve Metin Alanı */}
-      <Text size="small" style={{ color: watchSayacZorunlu ? "#52c41a" : "#ff4d4f" }}>
-        {t("Kontrol")}
-      </Text>
-      <br />
-      <b style={{ color: watchSayacZorunlu ? "#52c41a" : "#ff4d4f" }}>
-        {watchSayacZorunlu ? t("Uygun") : t("Uygun Değil")}
-      </b>
+           <div style={{ marginTop: "15px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px" }}>
+  <div style={{ padding: "8px", borderRadius: "6px", textAlign: "center", border: "1px solid #9D9E9D", overflow: "hidden" }}>
+    <Text size="small" type="secondary" style={{ fontSize: "10px", display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+      {t("Sayaç Tipi")}
+    </Text>
+    <div style={{ fontWeight: "bold", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+      {watchSayacBirimi || "—"}
     </div>
-              </div>
-            </div>
+  </div>
+
+  <div style={{ padding: "8px", borderRadius: "6px", textAlign: "center", border: "1px solid #9D9E9D", overflow: "hidden" }}>
+    <Text size="small" type="secondary" style={{ fontSize: "10px", display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+      {t("Son Kullanım")}
+    </Text>
+    <div style={{ fontWeight: "bold", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+      {watchSonAlinanKm || 0}
+    </div>
+  </div>
+
+  <div style={{ 
+    backgroundColor: watchSayacZorunlu ? "#f6ffed" : "#fff1f0", 
+    padding: "8px", 
+    borderRadius: "6px", 
+    textAlign: "center", 
+    border: watchSayacZorunlu ? "1px solid #b7eb8f" : "1px solid #ffa39e",
+    overflow: "hidden"
+  }}>
+    <Text size="small" type="secondary" style={{ fontSize: "10px", display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+      {t("Kontrol")}
+    </Text>
+    <div style={{ fontWeight: "bold", color: watchSayacZorunlu ? "#389e0d" : "#cf1322", whiteSpace: "nowrap" }}>
+      {watchSayacZorunlu ? t("Uygun") : t("Değil")}
+    </div>
+  </div>
+</div>
             {/* Güncel Sayaç Bilgilendirme Alanı */}
                 {watchGuncelSayac !== undefined && watchGuncelSayac !== null && (
                   <div style={{ marginTop: '4px' }}>
@@ -358,7 +437,7 @@ export default function SecondTabs() {
         {/* 2. Sütun: Yakıt / Tutar */}
         <Col span={8}>
           <div style={cardStyle}>
-            <Title level={5}>{t("Yakıt / Tutar")}</Title>
+            <Title level={5}>{t("Miktar ve Tutar")}</Title>
             <Row gutter={[8, 8]}>
               <Col span={12}>
                 <Text style={labelStyle}>{t("Miktar (lt)")} <span style={{ color: "red" }}>*</span></Text>
@@ -386,10 +465,9 @@ export default function SecondTabs() {
 />
               </Col>
               <Col span={12}>
-                <Text style={labelStyle}>{t("Tutar")} <span style={{ color: "red" }}>*</span></Text>
+                <Text style={labelStyle}>{t("Tutar")} </Text>
                 <Controller
                   name="Tutar"
-                  control={control}
                   render={({ field }) => (
     <InputNumber
       {...field}
@@ -411,23 +489,48 @@ export default function SecondTabs() {
               </Col>
             </Row>
             
-            <div style={{ marginTop: "15px", backgroundColor: "#fafafa", padding: "10px", borderRadius: "4px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginTop: "5px" }}>
-                <div><Text size="small">Maliyet / {watchSayacBirimi}</Text><br /><b>{kmBasiMaliyet}</b></div>
-                <div><Text size="small">Ort. tüketim</Text><br /><b>{ortTuketim} / 100 {watchSayacBirimi}</b></div>
-                <div>
-                  <Text size="small" style={{ color: isAnomali ? "red" : "inherit" }}>Anomali</Text><br />
-                  <b style={{ color: isAnomali ? "red" : "inherit" }}>{isAnomali ? "Var" : "Yok"}</b>
-                </div>
-              </div>
-            </div>
+            <div style={{ marginTop: "15px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px" }}>
+  <div style={{ padding: "8px", borderRadius: "6px", textAlign: "center", border: "1px solid #9D9E9D", overflow: "hidden" }}>
+    <Text size="small" type="secondary" style={{ fontSize: "10px", display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+      {t("Ort. Tüketim Tutarı")}
+    </Text>
+    <div style={{ fontWeight: "bold", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+      {kmBasiMaliyet}
+    </div>
+  </div>
+
+  <div style={{ padding: "8px", borderRadius: "6px", textAlign: "center", border: "1px solid #9D9E9D", overflow: "hidden" }}>
+    <Text size="small" type="secondary" style={{ fontSize: "10px", display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+      {t("Ort. Tüketim Miktarı")}
+    </Text>
+    <div style={{ fontWeight: "bold", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+      {ortTuketim}
+    </div>
+  </div>
+
+  <div style={{ 
+    backgroundColor: isAnomali ? "#fff1f0" : "#f6ffed", 
+    padding: "8px", 
+    borderRadius: "6px", 
+    textAlign: "center", 
+    border: isAnomali ? "1px solid #ffa39e" : "1px solid #b7eb8f",
+    overflow: "hidden"
+  }}>
+    <Text size="small" type="secondary" style={{ fontSize: "10px", display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+      {t("Anomali")}
+    </Text>
+    <div style={{ fontWeight: "bold", color: isAnomali ? "#cf1322" : "#389e0d", whiteSpace: "nowrap" }}>
+      {isAnomali ? t("Var") : t("Yok")}
+    </div>
+  </div>
+</div>
           </div>
         </Col>
 
         {/* 3. Sütun: Belge & Konum */}
         <Col span={8}>
   <div style={cardStyle}>
-    <Title level={5}>{t("Belge & Konum")}</Title>
+    <Title level={5}>{t("Belge ve Konum")}</Title>
     <Row gutter={[8, 8]}>
       {/* Yan yana gelmesi için span değerlerini 12 yaptık */}
       <Col span={12}>
@@ -439,7 +542,7 @@ export default function SecondTabs() {
         />
       </Col>
       <Col span={12}>
-        <Text style={labelStyle}>{t("Fatura / Fiş Tarihi")}</Text>
+        <Text style={labelStyle}>{t("Tarih")}</Text>
         <Controller
           name="FaturaTarihi"
           control={control}
@@ -463,15 +566,6 @@ export default function SecondTabs() {
               <Col span={24}>
                 <Text style={labelStyle}>{t("Firma")}</Text>
                 <FirmaTablo firmaFieldName="FirmaAdi" firmaIdFieldName="FirmaId" />
-              </Col>
-
-              <Col span={24}>
-                {!watchStokKullanim && (
-                  <>
-                    <Text style={labelStyle}>{t("İstasyon")}</Text>
-                    <KodIDSelectbox name1="IstasyonKodId" kodID={35690} placeholder="İstasyon Seçiniz" />
-                  </>
-                )}
               </Col>
             </Row>
           </div>

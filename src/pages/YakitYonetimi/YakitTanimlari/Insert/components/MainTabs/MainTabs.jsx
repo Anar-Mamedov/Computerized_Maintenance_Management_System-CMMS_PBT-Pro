@@ -59,58 +59,110 @@ export default function MainTabs({ modalOpen }) {
         </div>
 
         {/* Kod */}
-        <div style={RowStyle}>
-          <Text style={LabelStyle}>{t("Kod")}</Text>
-          <div style={InputContainerStyle}>
-            <Controller
-              name="yakitKod"
-              control={control}
-              render={({ field }) => (
-                <Input {...field} style={{ width: "100%" }} />
-              )}
-            />
-          </div>
-        </div>
+<div style={RowStyle}>
+  <Text style={LabelStyle} strong>
+    {t("Kod")} <span style={{ color: "red" }}>*</span>
+  </Text>
+  <div style={InputContainerStyle}>
+    <Controller
+      name="yakitKod"
+      control={control}
+      rules={{ required: t("Bu alan zorunludur") }}
+      render={({ field, fieldState: { error } }) => (
+        <>
+          <Input 
+            {...field} 
+            status={error ? "error" : ""} 
+            style={{ width: "100%" }} 
+          />
+          {error && (
+            <small style={{ 
+              color: "red", // Ant Design'ın standart hata kırmızısı
+              marginTop: "4px",
+              fontSize: "14px" 
+            }}>
+              {error.message}
+            </small>
+          )}
+        </>
+      )}
+    />
+  </div>
+  <Text style={{ fontSize: "13px", color: "#666" }}>{t("Aktif")}</Text>
+                  <Controller
+                    name="aktif"
+                    control={control}
+                    defaultValue={true}
+                    render={({ field }) => (
+                      <Switch 
+                        checked={field.value} 
+                        onChange={(checked) => field.onChange(checked)} 
+                      />
+                    )}
+                  />
+</div>
 
-        {/* Tanım */}
-        <div style={RowStyle}>
-          <Text style={LabelStyle}>{t("Tanım")}</Text>
-          <div style={InputContainerStyle}>
-            <Controller
-              name="yakitTanim"
-              control={control}
-              render={({ field }) => (
-                <Input {...field} style={{ width: "100%" }} />
-              )}
-            />
-          </div>
-        </div>
+{/* Tanım */}
+<div style={RowStyle}>
+  <Text style={LabelStyle} strong>
+    {t("Tanım")} <span style={{ color: "red" }}>*</span>
+  </Text>
+  <div style={InputContainerStyle}>
+    <Controller
+      name="yakitTanim"
+      control={control}
+      rules={{ required: t("alanBosBirakilamaz") }}
+      render={({ field, fieldState: { error } }) => (
+        <>
+          <Input 
+            {...field} 
+            status={error ? "error" : ""} 
+            style={{ width: "100%" }} 
+          />
+          {error && (
+            <small style={{ 
+              color: "red",
+              marginTop: "4px",
+              fontSize: "14px" 
+            }}>
+              {error.message}
+            </small>
+          )}
+        </>
+      )}
+    />
+  </div>
+</div>
 
         {/* Tip (Select) */}
-        <div style={RowStyle}>
-          <Text style={LabelStyle}>{t("Tip")}</Text>
-          <div style={InputContainerStyle}>
-            <KodIDSelectbox 
-                name1="yakitTipId" 
-                kodID={35600} 
-                isAsync={false}
-                placeholder="BENZİN / AKARYAKIT"
-            />
-          </div>
-        </div>
+<div style={RowStyle}>
+  <Text style={LabelStyle} strong>
+    {t("Tip")} <span style={{ color: "red" }}>*</span>
+  </Text>
+  <div style={InputContainerStyle}>
+    <KodIDSelectbox 
+        name1="yakitTipId" 
+        kodID={35600} 
+        isAsync={false}
+        isRequired={true} 
+    />
+  </div>
+</div>
 
-        {/* Birim (Select) */}
-        <div style={RowStyle}>
-          <Text style={LabelStyle}>{t("Birim")}</Text>
-          <div style={InputContainerStyle}>
-             <KodIDSelectbox 
-                name1="birimId" 
-                kodID={32001} 
-                isAsync={false}
-                placeholder="LT"
-            />
-          </div>
-        </div>
+{/* Birim (Select) */}
+<div style={RowStyle}>
+  <Text style={LabelStyle} strong>
+    {t("Birim")} <span style={{ color: "red" }}>*</span>
+  </Text>
+  <div style={InputContainerStyle}>
+     <KodIDSelectbox 
+        name1="birimId" 
+        kodID={32001} 
+        isAsync={false}
+        isRequired={true} 
+    />
+  </div>
+</div>
 
         {/* Grup (Select) */}
         <div style={RowStyle}>
@@ -120,7 +172,6 @@ export default function MainTabs({ modalOpen }) {
                 name1="grupId" 
                 kodID={35601} 
                 isAsync={false}
-                placeholder="(Seçiniz)"
             />
           </div>
         </div>
@@ -159,23 +210,6 @@ export default function MainTabs({ modalOpen }) {
                   )}
                 />
             </div>
-
-            {/* Aktif Switch (3. Kolon) - Sabit genişlikte ve inputtan ayrı */}
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: "80px" }}>
-                  <Text style={{ fontSize: "13px", color: "#666" }}>{t("Aktif")}</Text>
-                  <Controller
-                    name="aktif"
-                    control={control}
-                    defaultValue={true}
-                    render={({ field }) => (
-                      <Switch 
-                        checked={field.value} 
-                        onChange={(checked) => field.onChange(checked)} 
-                      />
-                    )}
-                  />
-            </div>
-
           </div>
         </div>
 

@@ -1,13 +1,25 @@
 import React, { useState, useEffect } from "react";
+import { Controller, useFormContext } from "react-hook-form";
 import { Modal, Button, Input, DatePicker, Select, Row, Col, Typography, message, InputNumber } from "antd";
 import dayjs from "dayjs";
 import AxiosInstance from "../../../../../api/http";
+import MakineTablo from "../../../YakitHareketleri/components/MakineTablo";
 
 const { Text, Title } = Typography;
 
 const YakitCikisModal = ({ visible, onClose, onRefresh }) => {
   const [loading, setLoading] = useState(false);
   const [depolar, setDepolar] = useState([]);
+  const { 
+    control,
+    watch, 
+    setValue, 
+    formState: { errors } // <--- Eksik olan kısım tam olarak burası!
+  } = useFormContext();
+
+  const watchMakineId = watch("MakineId");
+  const watchMKN_KOD = watch("MKN_KOD");
+
   const [formData, setFormData] = useState({
     TarihSaat: dayjs(),
     Miktar: 0,
@@ -20,27 +32,75 @@ const YakitCikisModal = ({ visible, onClose, onRefresh }) => {
   useEffect(() => {
     if (visible) {
       fetchDepoListesi();
-      setFormData({ TarihSaat: dayjs(), Miktar: 0, KaynakDepoId: null, MakineId: null, BelgeNo: "", Aciklama: "" });
+      setFormData({ TarihSaat: dayjs(), Miktar: 0, KaynakDepoId: null, BelgeNo: "", Aciklama: "" });
+      setValue("MakineId", null);
+      setValue("MKN_KOD", "");
     }
-  }, [visible]);
+  }, [visible, setValue]);
 
   const fetchDepoListesi = async () => {
-    try {
-      const res = await AxiosInstance.post("GetYakitTankList", { LokasyonIds: [], YakitTipIds: [], Durum: -1 });
-      if (res && Array.isArray(res)) {
-        setDepolar(res.map(item => ({ value: item.TB_DEPO_ID, label: `${item.DEP_KOD} (${item.DEP_TANIM})` })));
-      }
-    } catch (err) { message.error("Liste yüklenemedi."); }
-  };
+  try {
+    const res = await AxiosInstance.post("GetYakitTankList", { 
+      LokasyonIds: [], 
+      YakitTipIds: [], 
+      Durum: -1 
+    });
+
+    let list = [];
+
+    // 1. İhtimal: Axios standart (res.data.data)
+    if (res?.data?.data && Array.isArray(res.data.data)) {
+      list = res.data.data;
+    } 
+    // 2. İhtimal: Interceptor kullanılmış (res.data)
+    else if (res?.data && Array.isArray(res.data)) {
+      list = res.data;
+    }
+    // 3. İhtimal: Çok sadeleştirilmiş response (res)
+    else if (Array.isArray(res)) {
+      list = res;
+    }
+
+    if (list.length > 0) {
+      setDepolar(list.map(item => ({ 
+        value: item.TB_DEPO_ID, 
+        label: `${item.DEP_KOD} (${item.DEP_TANIM})` 
+      })));
+    } else {
+      console.warn("Liste boş veya yapılamadı:", res);
+    }
+    
+  } catch (err) { 
+    message.error("Tank listesi yüklenemedi."); 
+    console.error("Hata detayı:", err);
+  }
+};
 
   const handleSave = async () => {
-    if (formData.Miktar <= 0 || !formData.KaynakDepoId || !formData.MakineId) return message.error("Lütfen eksik alanları doldurunuz.");
+    // KONTROL: formData.MakineId yerine watchMakineId kullanıyoruz
+    if (formData.Miktar <= 0 || !formData.KaynakDepoId) {
+      return message.error("Lütfen eksik alanları doldurunuz.");
+    }
+
     setLoading(true);
     try {
-      await AxiosInstance.post("AddYakitIslemi", { ...formData, IslemTipi: "CIKIS", HedefDepoId: -1, TarihSaat: formData.TarihSaat.format("YYYY-MM-DDTHH:mm:ss") });
+      const payload = {
+        ...formData,
+        MakineId: watchMakineId, // Hook Form'dan gelen ID'yi alıyoruz
+        IslemTipi: "CIKIS",
+        HedefDepoId: -1,
+        TarihSaat: formData.TarihSaat.format("YYYY-MM-DDTHH:mm:ss")
+      };
+
+      await AxiosInstance.post("AddYakitIslemi", payload);
       message.success("Çıkış işlemi kaydedildi.");
-      onClose(); if (onRefresh) onRefresh();
-    } catch (error) { message.error("Hata oluştu."); } finally { setLoading(false); }
+      onClose(); 
+      if (onRefresh) onRefresh();
+    } catch (error) { 
+      message.error("Hata oluştu."); 
+    } finally { 
+      setLoading(false); 
+    }
   };
 
   return (
@@ -52,8 +112,12 @@ const YakitCikisModal = ({ visible, onClose, onRefresh }) => {
           <Select style={{ width: "100%", marginTop: "5px" }} placeholder="Seçiniz..." value={formData.KaynakDepoId} onChange={(val) => setFormData({...formData, KaynakDepoId: val})} options={depolar} />
         </Col>
         <Col span={24}><Text strong>Makine / Araç</Text>
-          <Select style={{ width: "100%", marginTop: "5px" }} placeholder="Seçiniz..." value={formData.MakineId} onChange={(val) => setFormData({...formData, MakineId: val})}
-            options={[{ value: 102, label: "Ekskavatör #E-12" }]} // Makineler APIsi eklenmeli
+          <MakineTablo
+                    control={control}
+                    setValue={setValue}
+                    makineFieldName="MKN_KOD"
+                    makineIdFieldName="MakineId"
+                    errors={errors} // Hata durumunu içeri paslıyoruz
           />
         </Col>
         <Col span={12}><Text strong>Tarih / Saat</Text>

@@ -24,13 +24,42 @@ const YakitGirisModal = ({ visible, onClose, onRefresh }) => {
   }, [visible]);
 
   const fetchDepoListesi = async () => {
-    try {
-      const res = await AxiosInstance.post("GetYakitTankList", { LokasyonIds: [], YakitTipIds: [], Durum: -1 });
-      if (res && Array.isArray(res)) {
-        setDepolar(res.map(item => ({ value: item.TB_DEPO_ID, label: `${item.DEP_KOD} (${item.DEP_TANIM})` })));
-      }
-    } catch (err) { message.error("Tank listesi yüklenemedi."); }
-  };
+  try {
+    const res = await AxiosInstance.post("GetYakitTankList", { 
+      LokasyonIds: [], 
+      YakitTipIds: [], 
+      Durum: -1 
+    });
+
+    let list = [];
+
+    // 1. İhtimal: Axios standart (res.data.data)
+    if (res?.data?.data && Array.isArray(res.data.data)) {
+      list = res.data.data;
+    } 
+    // 2. İhtimal: Interceptor kullanılmış (res.data)
+    else if (res?.data && Array.isArray(res.data)) {
+      list = res.data;
+    }
+    // 3. İhtimal: Çok sadeleştirilmiş response (res)
+    else if (Array.isArray(res)) {
+      list = res;
+    }
+
+    if (list.length > 0) {
+      setDepolar(list.map(item => ({ 
+        value: item.TB_DEPO_ID, 
+        label: `${item.DEP_KOD} (${item.DEP_TANIM})` 
+      })));
+    } else {
+      console.warn("Liste boş veya yapılamadı:", res);
+    }
+    
+  } catch (err) { 
+    message.error("Tank listesi yüklenemedi."); 
+    console.error("Hata detayı:", err);
+  }
+};
 
   const handleSave = async () => {
     if (formData.Miktar <= 0) return message.error("Lütfen miktar giriniz.");

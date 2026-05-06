@@ -60,20 +60,32 @@ export default function MainTabs({ modalOpen }) {
 
         {/* --- KOD ve AKTİF (YAN YANA) --- */}
         <div style={RowStyle}>
-          <Text style={LabelStyle}>{t("Kod")}</Text>
+          <Text style={LabelStyle} strong>{t("Kod")} <span style={{ color: "red" }}>*</span></Text>
           {/* InputContainerStyle'ı override edip row yapıyoruz */}
           <div style={{ ...InputContainerStyle, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
             
             {/* Kod Inputu */}
-            <div style={{ flex: 1, marginRight: "10px" }}>
-                <Controller
-                name="kod"
-                control={control}
-                render={({ field }) => (
-                    <Input {...field} style={{ width: "100%" }} />
-                )}
+<div style={{ flex: 1, marginRight: "10px" }}>
+    <Controller
+        name="kod"
+        control={control}
+        rules={{ required: t("alanBosBirakilamaz") }} // Zorunlu yapıldı
+        render={({ field, fieldState: { error } }) => (
+            <>
+                <Input 
+                    {...field} 
+                    status={error ? "error" : ""} 
+                    style={{ width: "100%" }} 
                 />
-            </div>
+                {error && (
+                    <small style={{ color: "red",fontSize: "14px", marginTop: "4px", display: "block" }}>
+                        {error.message}
+                    </small>
+                )}
+            </>
+        )}
+    />
+</div>
 
             {/* Aktif Switch */}
             <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
@@ -95,34 +107,48 @@ export default function MainTabs({ modalOpen }) {
         </div>
 
         {/* Tanım (STK_TANIM) */}
-        <div style={RowStyle}>
-          <Text style={LabelStyle}>{t("Tanım")}</Text>
-          <div style={InputContainerStyle}>
-            <Controller
-              name="tanim"
-              control={control}
-              render={({ field }) => (
-                <Input {...field} style={{ width: "100%" }} />
-              )}
-            />
-          </div>
-        </div>
+<div style={RowStyle}>
+    <Text style={LabelStyle} strong>{t("Tanım")} <span style={{ color: "red" }}>*</span></Text>
+    <div style={InputContainerStyle}>
+        <Controller
+            name="tanim"
+            control={control}
+            rules={{ required: t("alanBosBirakilamaz") }} // Zorunlu yapıldı
+            render={({ field, fieldState: { error } }) => (
+                <>
+                    <Input 
+                        {...field} 
+                        status={error ? "error" : ""} 
+                        style={{ width: "100%" }} 
+                    />
+                    {error && (
+                        <small style={{ color: "red",fontSize: "14px", marginTop: "4px", display: "block" }}>
+                            {error.message}
+                        </small>
+                    )}
+                </>
+            )}
+        />
+    </div>
+</div>
 
-        {/* Tip (STK_TIP_KOD_ID) */}
-        <div style={RowStyle}>
-          <Text style={LabelStyle}>{t("Tip")}</Text>
-          <div style={InputContainerStyle}>
-            <KodIDSelectbox name1="tip" isRequired={false} kodID="35600" />
-          </div>
-        </div>
+{/* Tip (STK_TIP_KOD_ID) */}
+<div style={RowStyle}>
+    <Text style={LabelStyle} strong>{t("Tip")} <span style={{ color: "red" }}>*</span></Text>
+    <div style={InputContainerStyle}>
+        {/* Bileşene dokunmadan isRequired={true} ile zorunlu yaptık */}
+        <KodIDSelectbox name1="tip" isRequired={true} kodID="35600" />
+    </div>
+</div>
 
-        {/* Birim (STK_BIRIM_KOD_ID) */}
-        <div style={RowStyle}>
-          <Text style={LabelStyle}>{t("Birim")}</Text>
-          <div style={InputContainerStyle}>
-            <KodIDSelectbox name1="birim" isRequired={false} kodID="32001" />
-          </div>
-        </div>
+{/* Birim (STK_BIRIM_KOD_ID) */}
+<div style={RowStyle}>
+    <Text style={LabelStyle} strong>{t("Birim")} <span style={{ color: "red" }}>*</span></Text>
+    <div style={InputContainerStyle}>
+        {/* Bileşene dokunmadan isRequired={true} ile zorunlu yaptık */}
+        <KodIDSelectbox name1="birim" isRequired={false} kodID="32001" />
+    </div>
+</div>
 
         {/* Grup (STK_GRUP_KOD_ID) */}
         <div style={RowStyle}>

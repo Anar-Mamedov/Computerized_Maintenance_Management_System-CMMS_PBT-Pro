@@ -15,6 +15,7 @@ export default function CreateDrawer({ onRefresh }) {
     defaultValues: {
       TB_YAKIT_HRK_ID: 0,
       MakineId: null,
+      MKN_KOD: "",
       Tarih: dayjs(),
       Saat: dayjs(),
       SonKm: 0,
@@ -23,7 +24,7 @@ export default function CreateDrawer({ onRefresh }) {
       Miktar: 0,
       Fiyat: 0,
       Tutar: 0,
-      StokKullanim: false,
+      StokKullanim: true,
       FullDepo: false,
       YakitTipId: null,
       YakitTankId: null,
@@ -36,7 +37,7 @@ export default function CreateDrawer({ onRefresh }) {
       // Validasyon ve dinamik UI için yardımcı state'ler
       _maxKapasite: 0,
       _sayacZorunlu: false,
-      _sayacBirimi: "KM"
+      _sayacBirimi: ""
     },
   });
 

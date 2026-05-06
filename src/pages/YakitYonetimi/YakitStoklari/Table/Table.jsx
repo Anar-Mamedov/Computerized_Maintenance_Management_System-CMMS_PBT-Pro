@@ -250,6 +250,14 @@ const MainTable = () => {
       sorter: (a, b) => a.DEP_TANIM?.localeCompare(b.DEP_TANIM),
     },
     {
+      title: "Yakıt Tipi",
+      dataIndex: "YAKIT_TURU",
+      key: "YAKIT_TURU",
+      width: 120,
+      visible: true,
+      sorter: (a, b) => a.YAKIT_TURU?.localeCompare(b.YAKIT_TURU),
+    },
+    {
       title: "Lokasyon",
       dataIndex: "LOKASYON",
       key: "LOKASYON",
@@ -257,14 +265,6 @@ const MainTable = () => {
       ellipsis: true,
       visible: true,
       sorter: (a, b) => a.LOKASYON?.localeCompare(b.LOKASYON),
-    },
-    {
-      title: "Yakıt Tipi",
-      dataIndex: "YAKIT_TURU",
-      key: "YAKIT_TURU",
-      width: 120,
-      visible: true,
-      sorter: (a, b) => a.YAKIT_TURU?.localeCompare(b.YAKIT_TURU),
     },
     {
       title: "Kapasite",
