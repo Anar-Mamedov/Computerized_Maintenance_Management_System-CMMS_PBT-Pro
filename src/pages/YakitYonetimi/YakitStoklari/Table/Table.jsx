@@ -1030,17 +1030,20 @@ const MainTable = () => {
       />
       <YakitGiris
         visible={yakitGirisModalVisible} 
-        onClose={() => setYakitGirisModalVisible(false)} 
+        onClose={() => setYakitGirisModalVisible(false)}
+        selectedRows={selectedRows} 
         onRefresh={refreshTableData}
       />
       <YakitCikis
         visible={yakitCikisModalVisible} 
-        onClose={() => setYakitCikisModalVisible(false)} 
+        onClose={() => setYakitCikisModalVisible(false)}
+        selectedRows={selectedRows} 
         onRefresh={refreshTableData}
       />
       <YakitTransfer
         visible={yakitTransferModalVisible} 
-        onClose={() => setYakitTransferModalVisible(false)} 
+        onClose={() => setYakitTransferModalVisible(false)}
+        selectedRows={selectedRows} 
         onRefresh={refreshTableData}
       />
 

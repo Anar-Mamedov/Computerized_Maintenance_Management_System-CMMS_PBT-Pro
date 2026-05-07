@@ -141,9 +141,9 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("cikanMiktar", item.STK_CIKAN_MIKTAR);
           setValue("stokMiktar", item.STK_MIKTAR);
           setValue("kdv", item.STK_KDV_ORAN);
-          setValue("girisFiyatTuru", Number(item.STK_GIRIS_FIYAT_SEKLI));
+          setValue("girisFiyatTuru", item.STK_GIRIS_FIYAT_SEKLI != null ? Number(item.STK_GIRIS_FIYAT_SEKLI) : null);
+          setValue("cikisFiyatTuru", item.STK_CIKIS_FIYAT_SEKLI != null ? Number(item.STK_CIKIS_FIYAT_SEKLI) : null);
           setValue("girisFiyati", item.STK_GIRIS_FIYAT_DEGERI);
-          setValue("cikisFiyatTuru", Number(item.STK_CIKIS_FIYAT_SEKLI));
           setValue("cikisFiyati", item.STK_CIKIS_FIYAT_DEGERI);
           setValue("aktif", item.STK_AKTIF);
 

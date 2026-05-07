@@ -5,7 +5,7 @@ import AxiosInstance from "../../../../../api/http";
 
 const { Text, Title } = Typography;
 
-const YakitGirisModal = ({ visible, onClose, onRefresh }) => {
+const YakitGirisModal = ({ visible, onClose, onRefresh, selectedRows }) => {
   const [loading, setLoading] = useState(false);
   const [depolar, setDepolar] = useState([]);
   const [formData, setFormData] = useState({
