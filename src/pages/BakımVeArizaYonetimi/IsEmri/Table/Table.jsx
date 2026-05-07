@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState, useMemo } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message, Tooltip } from "antd";
+import React, { useCallback, useEffect, useState, useMemo, useRef } from "react";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message, Tooltip, Select } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined, FileTextOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -138,6 +138,21 @@ const MainTable = () => {
     BuHaftaKapanan: { Sayi: 0 },
   });
   const [pageSize, setPageSize] = useState(20);
+  const [isScrollPageEnabled, setIsScrollPageEnabled] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+    try {
+      return localStorage.getItem("scroolPage") === "true";
+    } catch (error) {
+      return false;
+    }
+  });
+  const [hasMoreData, setHasMoreData] = useState(true);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const isFetchingMoreRef = useRef(false);
+  const tableWrapperRef = useRef(null);
+  const loadedRowKeysRef = useRef(new Set());
   const [columnSearchTerm, setColumnSearchTerm] = useState("");
   const [buHaftaKapananActive, setBuHaftaKapananActive] = useState(false);
   const [arizaActive, setArizaActive] = useState(false);
@@ -161,6 +176,34 @@ const MainTable = () => {
     (value) => formatNumberWithSeparators(value ?? 0, currentLang),
     [currentLang]
   );
+  const formattedTotalCount = useMemo(() => formatKpiNumber(totalDataCount), [formatKpiNumber, totalDataCount]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const handleStorageChange = (event) => {
+      if (event.key === "scroolPage") {
+        setIsScrollPageEnabled(event.newValue === "true");
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    setHasMoreData(true);
+    isFetchingMoreRef.current = false;
+    setIsFetchingMore(false);
+    setCurrentPage(1);
+    setData([]);
+    loadedRowKeysRef.current = new Set();
+  }, [isScrollPageEnabled]);
 
   function hexToRGBA(color, opacity) {
     // 1) Geçersiz parametreleri engelle
@@ -1128,8 +1171,15 @@ const MainTable = () => {
     const mergedFilters = { ...(body.filters || {}) };
     if (arizaActive) mergedFilters.prosedurtipleri = [1];
     if (onayBekleyenActive) mergedFilters.onaydurumlari = [1];
-    fetchEquipmentData({ ...body, filters: mergedFilters }, currentPage, pageSize, sortField, sortOrder);
-  }, [body, arizaActive, onayBekleyenActive, currentPage, pageSize, sortField, sortOrder]);
+    fetchEquipmentData({
+      body: { ...body, filters: mergedFilters },
+      page: currentPage,
+      size: pageSize,
+      sortField,
+      sortOrder,
+      append: isScrollPageEnabled && currentPage > 1,
+    });
+  }, [body, arizaActive, onayBekleyenActive, currentPage, pageSize, sortField, sortOrder, isScrollPageEnabled]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
@@ -1155,22 +1205,43 @@ const MainTable = () => {
 
   // arama işlemi için kullanılan useEffect son
 
-  const fetchEquipmentData = async (body, page, size, sortField, sortOrder) => {
-    // body'nin undefined olması durumunda varsayılan değerler atanıyor
-    const { keyword = "", filters = {} } = body || {};
-    // page'in undefined olması durumunda varsayılan değer olarak 1 atanıyor
-    const currentPage = page || 1;
+  const fetchEquipmentData = async ({ body: requestBody, page, size, sortField: currentSortField, sortOrder: currentSortOrder, append = false }) => {
+    const { keyword = "", filters = {} } = requestBody || {};
+    const targetPage = page || 1;
+    const targetSize = size || pageSize;
 
-    // Sorting parametrelerini oluşturun
-    let sortParam = "";
-    if (sortField && sortOrder) {
-      sortParam = `&sortField=${sortField}&sortOrder=${sortOrder === "ascend" ? "ASC" : "DESC"}`;
+    if (!append) {
+      loadedRowKeysRef.current = new Set();
     }
 
+    let sortParam = "";
+    if (currentSortField && currentSortOrder) {
+      sortParam = `&sortField=${currentSortField}&sortOrder=${currentSortOrder === "ascend" ? "ASC" : "DESC"}`;
+    }
+
+    const startLoading = () => {
+      if (append) {
+        if (!isFetchingMoreRef.current) {
+          isFetchingMoreRef.current = true;
+        }
+        setIsFetchingMore(true);
+      } else {
+        setLoading(true);
+      }
+    };
+
+    const stopLoading = () => {
+      if (append) {
+        isFetchingMoreRef.current = false;
+        setIsFetchingMore(false);
+      } else {
+        setLoading(false);
+      }
+    };
+
     try {
-      setLoading(true);
-      // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.post(`getIsEmriFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${size}${sortParam}`, filters);
+      startLoading();
+      const response = await AxiosInstance.post(`getIsEmriFullList?parametre=${keyword}&pagingDeger=${targetPage}&pageSize=${targetSize}${sortParam}`, filters);
       if (response) {
         if (response.status_code === 401) {
           message.error(t("buSayfayaErisimYetkinizBulunmamaktadir"));
@@ -1188,28 +1259,52 @@ const MainTable = () => {
           });
         }
 
-        // Gelen veriyi formatla ve state'e ata
         const formattedData = response.list.map((item) => ({
           ...item,
           key: item.TB_ISEMRI_ID,
-          // Diğer alanlarınız...
         }));
-        setData(formattedData);
-        setLoading(false);
+
+        const dedupedData = formattedData.filter((item) => {
+          if (!item || item.key === undefined || item.key === null) {
+            return true;
+          }
+          if (append && loadedRowKeysRef.current.has(item.key)) {
+            return false;
+          }
+          return true;
+        });
+
+        dedupedData.forEach((item) => {
+          if (item && item.key !== undefined && item.key !== null) {
+            loadedRowKeysRef.current.add(item.key);
+          }
+        });
+
+        setData((prevData) => (append ? [...prevData, ...dedupedData] : dedupedData));
+
+        const totalRecords = Number(response.kayit_sayisi) || 0;
+        const derivedTotalPages = totalRecords && targetSize ? Math.ceil(totalRecords / targetSize) : Number(response.page) || 0;
+
+        if (append && dedupedData.length === 0) {
+          setHasMoreData(false);
+        } else if (derivedTotalPages > 0) {
+          setHasMoreData(targetPage < derivedTotalPages);
+        } else {
+          setHasMoreData(dedupedData.length === targetSize);
+        }
       } else {
         console.error("API response is not in expected format");
-        setLoading(false);
+        setHasMoreData(false);
       }
     } catch (error) {
       console.error("Error in API request:", error);
-      setLoading(false);
       if (navigator.onLine) {
-        // İnternet bağlantısı var
         message.error("Hata Mesajı: " + error.message);
       } else {
-        // İnternet bağlantısı yok
         message.error("Internet Bağlantısı Mevcut Değil.");
       }
+    } finally {
+      stopLoading();
     }
   };
 
@@ -1219,24 +1314,44 @@ const MainTable = () => {
       ...state,
       [type]: newBody,
     }));
-    setCurrentPage(1); // Filtreleme yapıldığında sayfa numarasını 1'e ayarla
-  }, []);
+    setCurrentPage(1);
+    if (isScrollPageEnabled) {
+      setData([]);
+      setHasMoreData(true);
+      loadedRowKeysRef.current = new Set();
+    }
+  }, [isScrollPageEnabled]);
   // filtreleme işlemi için kullanılan useEffect son
 
   // sayfalama için kullanılan useEffect
-  const handleTableChange = (pagination, filters, sorter, extra) => {
-    if (pagination) {
+  const handleTableChange = (pagination, filters, sorter) => {
+    if (!isScrollPageEnabled && pagination) {
       setCurrentPage(pagination.current);
-      setPageSize(pagination.pageSize); // pageSize güncellemesi
+      setPageSize(pagination.pageSize);
     }
 
-    // Sorting bilgisini yakalayın
+    const resetScrollState = () => {
+      if (isScrollPageEnabled) {
+        setCurrentPage(1);
+        setData([]);
+        setHasMoreData(true);
+        isFetchingMoreRef.current = false;
+        setIsFetchingMore(false);
+        loadedRowKeysRef.current = new Set();
+      }
+    };
+
     if (sorter && sorter.field) {
-      setSortField(sorter.field);
-      setSortOrder(sorter.order); // 'ascend', 'descend' veya undefined
-    } else {
+      const nextOrder = sorter.order;
+      if (sortField !== sorter.field || sortOrder !== nextOrder) {
+        setSortField(sorter.field);
+        setSortOrder(nextOrder);
+        resetScrollState();
+      }
+    } else if (sortField !== null || sortOrder !== null) {
       setSortField(null);
       setSortOrder(null);
+      resetScrollState();
     }
   };
   // sayfalama için kullanılan useEffect son
@@ -1272,26 +1387,99 @@ const MainTable = () => {
   };
 
   const refreshTableData = useCallback(() => {
-    // Sayfa numarasını 1 yap
-    // setCurrentPage(1);
-
-    // `body` içerisindeki filtreleri ve arama terimini sıfırla
-    // setBody({
-    //   keyword: "",
-    //   filters: {},
-    // });
-    // setSearchTerm("");
-
-    // Tablodan seçilen kayıtların checkbox işaretini kaldır
     setSelectedRowKeys([]);
     setSelectedRows([]);
 
-    // Verileri yeniden çekmek için `fetchEquipmentData` fonksiyonunu çağır
-    fetchEquipmentData(body, currentPage, pageSize, sortField, sortOrder);
-    // Burada `body` ve `currentPage`'i güncellediğimiz için, bu değerlerin en güncel hallerini kullanarak veri çekme işlemi yapılır.
-    // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
-    // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
-  }, [body, currentPage, pageSize, sortField, sortOrder]);
+    const mergedFilters = { ...(body.filters || {}) };
+    if (arizaActive) mergedFilters.prosedurtipleri = [1];
+    if (onayBekleyenActive) mergedFilters.onaydurumlari = [1];
+
+    if (isScrollPageEnabled) {
+      setCurrentPage(1);
+      setData([]);
+      setHasMoreData(true);
+      isFetchingMoreRef.current = false;
+      setIsFetchingMore(false);
+      loadedRowKeysRef.current = new Set();
+      fetchEquipmentData({
+        body: { ...body, filters: mergedFilters },
+        page: 1,
+        size: pageSize,
+        sortField,
+        sortOrder,
+        append: false,
+      });
+    } else {
+      loadedRowKeysRef.current = new Set();
+      fetchEquipmentData({
+        body: { ...body, filters: mergedFilters },
+        page: currentPage,
+        size: pageSize,
+        sortField,
+        sortOrder,
+        append: false,
+      });
+    }
+  }, [body, currentPage, pageSize, sortField, sortOrder, arizaActive, onayBekleyenActive, isScrollPageEnabled]);
+
+  const handleScrollPageSizeChange = useCallback((value) => {
+    const numericValue = Number(value);
+    if (!numericValue || Number.isNaN(numericValue)) {
+      return;
+    }
+    setPageSize(numericValue);
+    setCurrentPage(1);
+    setData([]);
+    setHasMoreData(true);
+    isFetchingMoreRef.current = false;
+    setIsFetchingMore(false);
+    loadedRowKeysRef.current = new Set();
+  }, []);
+
+  const requestLoadMore = useCallback(() => {
+    if (!isScrollPageEnabled) {
+      return;
+    }
+    if (!hasMoreData || loading || isFetchingMoreRef.current) {
+      return;
+    }
+    if (totalPages && currentPage >= totalPages) {
+      setHasMoreData(false);
+      return;
+    }
+    isFetchingMoreRef.current = true;
+    setIsFetchingMore(true);
+    setCurrentPage((prev) => prev + 1);
+  }, [currentPage, hasMoreData, isScrollPageEnabled, loading, totalPages]);
+
+  useEffect(() => {
+    if (!isScrollPageEnabled) {
+      return;
+    }
+
+    const wrapper = tableWrapperRef.current;
+    if (!wrapper) {
+      return;
+    }
+
+    const tableBody = wrapper.querySelector(".ant-table-body");
+    if (!tableBody) {
+      return;
+    }
+
+    const handleScroll = () => {
+      const remainingScroll = tableBody.scrollHeight - tableBody.scrollTop - tableBody.clientHeight;
+      if (remainingScroll < 100) {
+        requestLoadMore();
+      }
+    };
+
+    tableBody.addEventListener("scroll", handleScroll);
+
+    return () => {
+      tableBody.removeEventListener("scroll", handleScroll);
+    };
+  }, [isScrollPageEnabled, requestLoadMore, data.length]);
 
   // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
   const [columns, setColumns] = useState(() => {
@@ -1767,8 +1955,9 @@ const MainTable = () => {
           <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
         </div>
       </div>
-      <Spin spinning={loading}>
+      <Spin spinning={loading || (isScrollPageEnabled && isFetchingMore)}>
         <div
+          ref={tableWrapperRef}
           style={{
             background: "#ffffff",
             border: "1px solid #e5e7eb",
@@ -1783,23 +1972,51 @@ const MainTable = () => {
             columns={filteredColumns}
             dataSource={data}
             bordered
-            pagination={{
-              current: currentPage,
-              total: totalDataCount, // Toplam kayıt sayısı (sayfa başına kayıt sayısı ile çarpılır)
-              pageSize: pageSize,
-              defaultPageSize: 20,
-              showSizeChanger: true,
-              pageSizeOptions: ["10", "20", "50", "100"],
-              position: ["bottomRight"],
-              onChange: handleTableChange,
-              showTotal: (total, range) => `Toplam ${total}`, // Burada 'total' parametresi doğru kayıt sayısını yansıtacaktır
-              showQuickJumper: true,
-            }}
+            pagination={
+              isScrollPageEnabled
+                ? false
+                : {
+                    current: currentPage,
+                    total: totalDataCount,
+                    pageSize: pageSize,
+                    defaultPageSize: 20,
+                    showSizeChanger: true,
+                    pageSizeOptions: ["10", "20", "50", "100"],
+                    position: ["bottomRight"],
+                    onChange: handleTableChange,
+                    showTotal: (total) => `Toplam ${total}`,
+                    showQuickJumper: true,
+                  }
+            }
             // onRow={onRowClick}
             scroll={{ y: "calc(100vh - 460px)" }}
             onChange={handleTableChange}
             rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
           />
+          {isScrollPageEnabled && (
+            <>
+              {!isFetchingMore && !hasMoreData && data.length > 0 && (
+                <div style={{ textAlign: "center", padding: "8px 0" }}>
+                  <Text type="secondary">Tüm kayıtlar yüklendi</Text>
+                </div>
+              )}
+              <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "8px", padding: "0 0 4px", marginTop: "20px" }}>
+                <Text type="secondary">Toplam {formattedTotalCount}</Text>
+                <Text>-</Text>
+                <Text strong>Sayfa başına</Text>
+                <Select
+                  value={pageSize}
+                  style={{ width: 120 }}
+                  onChange={handleScrollPageSizeChange}
+                  options={[
+                    { value: 20, label: "20" },
+                    { value: 50, label: "50" },
+                    { value: 100, label: "100" },
+                  ]}
+                />
+              </div>
+            </>
+          )}
         </div>
       </Spin>
       <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
