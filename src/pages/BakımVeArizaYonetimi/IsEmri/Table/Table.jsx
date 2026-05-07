@@ -318,10 +318,25 @@ const MainTable = () => {
       ),
     },
     {
+      title: "Ekipman",
+      dataIndex: "MAKINE_KODU",
+      key: "MAKINE_KODU",
+      width: 307,
+      sorter: true,
+      ellipsis: true,
+      visible: true, // Varsayılan olarak açık
+      render: (text, record) => (
+        <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
+          <span style={{ fontWeight: 500 }}>{text}</span>
+          <span style={{ color: "#8c8c8c", fontSize: "12px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{record.MAKINE_TANIMI}</span>
+        </div>
+      ),
+    },
+    {
       title: "İş Emri Tipi",
       dataIndex: "ISEMRI_TIP",
       key: "ISEMRI_TIP",
-      width: 180,
+      width: 173,
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
       sorter: true,
@@ -347,7 +362,7 @@ const MainTable = () => {
       title: "Konu",
       dataIndex: "KONU",
       key: "KONU",
-      width: 300,
+      width: 322,
       ellipsis: true,
       sorter: true,
       visible: true, // Varsayılan olarak açık
@@ -382,10 +397,93 @@ const MainTable = () => {
     },
 
     {
+      title: "Başlama Zamanı",
+      dataIndex: "BASLAMA_TARIH",
+      key: "BASLAMA_TARIH",
+      width: 131,
+      ellipsis: true,
+      sorter: true,
+      visible: true, // Varsayılan olarak kapalı
+      render: (text, record) => (
+        <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
+          <span>{formatDate(text)}</span>
+          <span style={{ color: "#8c8c8c", fontSize: "12px" }}>{formatTime(record.BASLAMA_SAAT)}</span>
+        </div>
+      ),
+    },
+    {
+      title: "Bitiş Zamanı",
+      dataIndex: "ISM_BITIS_TARIH",
+      key: "ISM_BITIS_TARIH",
+      width: 120,
+      ellipsis: true,
+      sorter: true,
+      visible: true, // Varsayılan olarak kapalı
+      render: (text, record) => (
+        <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
+          <span>{formatDate(text)}</span>
+          <span style={{ color: "#8c8c8c", fontSize: "12px" }}>{formatTime(record.ISM_BITIS_SAAT)}</span>
+        </div>
+      ),
+    },
+    {
+      title: "İş Süresi (dk.)",
+      dataIndex: "IS_SURESI",
+      key: "IS_SURESI",
+      width: 107,
+      ellipsis: true,
+      sorter: true,
+      visible: true, // Varsayılan olarak kapalı
+      render: (text) => (text > 0 ? text : null),
+    },
+
+    {
+      title: "Personel Adı",
+      dataIndex: "PERSONEL_ADI",
+      key: "PERSONEL_ADI",
+      width: 225,
+      ellipsis: true,
+      sorter: true,
+      visible: true, // Varsayılan olarak kapalı
+    },
+
+    {
+      title: "Lokasyon",
+      dataIndex: "LOKASYON",
+      key: "LOKASYON",
+      width: 397,
+      ellipsis: true,
+      sorter: true,
+      visible: true, // Varsayılan olarak açık
+      render: (text, record) => (
+        <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
+          <span style={{ fontWeight: 500 }}>{text}</span>
+          <span style={{ color: "#8c8c8c", fontSize: "12px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{record.TAM_LOKASYON}</span>
+        </div>
+      ),
+    },
+
+    {
+      title: "Kapanış Zamanı",
+      dataIndex: "KAPANIS_TARIHI",
+      key: "KAPANIS_TARIHI",
+      width: 115,
+      ellipsis: true,
+      sorter: true,
+      visible: true, // Varsayılan olarak kapalı
+      render: (text, record) => (
+        <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
+          <span>{formatDate(text)}</span>
+          <span style={{ color: "#8c8c8c", fontSize: "12px" }}>{formatTime(record.KAPANIS_SAATI)}</span>
+        </div>
+      ),
+    },
+
+    {
       title: "Onay Durumu",
       dataIndex: "ISM_ONAY_DURUM",
       key: "ISM_ONAY_DURUM",
-      width: 150,
+      width: 146,
       ellipsis: true,
       sorter: true,
       visible: true, // Varsayılan olarak açık
@@ -419,35 +517,42 @@ const MainTable = () => {
     },
 
     {
-      title: "Lokasyon",
-      dataIndex: "LOKASYON",
-      key: "LOKASYON",
-      width: 300,
+      title: "Tamamlama (%)",
+      dataIndex: "TAMAMLANMA",
+      key: "TAMAMLANMA",
+      width: 200,
       ellipsis: true,
       sorter: true,
-      visible: true, // Varsayılan olarak açık
-      render: (text, record) => (
-        <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
-          <span style={{ fontWeight: 500 }}>{text}</span>
-          <span style={{ color: "#8c8c8c", fontSize: "12px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{record.TAM_LOKASYON}</span>
-        </div>
-      ),
+      visible: true, // Varsayılan olarak kapalı
+      render: (text) => <Progress percent={text} steps={8} />,
     },
+
     {
-      title: "Ekipman",
-      dataIndex: "MAKINE_KODU",
-      key: "MAKINE_KODU",
-      width: 260,
-      sorter: true,
+      title: "Açıklama",
+      dataIndex: "ISM_ACIKLAMA",
+      key: "ISM_ACIKLAMA",
+      width: 400,
       ellipsis: true,
+      sorter: true,
       visible: true, // Varsayılan olarak açık
-      render: (text, record) => (
-        <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
-          <span style={{ fontWeight: 500 }}>{text}</span>
-          <span style={{ color: "#8c8c8c", fontSize: "12px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{record.MAKINE_TANIMI}</span>
-        </div>
+      render: (text) => (
+        <Tooltip title={<div style={{ whiteSpace: "pre-line" }}>{text}</div>} placement="topLeft">
+          <div
+            style={{
+              whiteSpace: "pre-line",
+              overflow: "hidden",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              lineHeight: 1.3,
+            }}
+          >
+            {text}
+          </div>
+        </Tooltip>
       ),
     },
+
     {
       title: "Makine Tanımı",
       dataIndex: "MAKINE_TANIMI",
@@ -498,56 +603,7 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
       render: (text) => formatTime(text),
     },
-    {
-      title: "Başlama Zamanı",
-      dataIndex: "BASLAMA_TARIH",
-      key: "BASLAMA_TARIH",
-      width: 140,
-      ellipsis: true,
-      sorter: true,
-      visible: true, // Varsayılan olarak kapalı
-      render: (text, record) => (
-        <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
-          <span>{formatDate(text)}</span>
-          <span style={{ color: "#8c8c8c", fontSize: "12px" }}>{formatTime(record.BASLAMA_SAAT)}</span>
-        </div>
-      ),
-    },
-    {
-      title: "Bitiş Zamanı",
-      dataIndex: "ISM_BITIS_TARIH",
-      key: "ISM_BITIS_TARIH",
-      width: 140,
-      ellipsis: true,
-      sorter: true,
-      visible: true, // Varsayılan olarak kapalı
-      render: (text, record) => (
-        <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
-          <span>{formatDate(text)}</span>
-          <span style={{ color: "#8c8c8c", fontSize: "12px" }}>{formatTime(record.ISM_BITIS_SAAT)}</span>
-        </div>
-      ),
-    },
-    {
-      title: "İş Süresi (dk.)",
-      dataIndex: "IS_SURESI",
-      key: "IS_SURESI",
-      width: 110,
-      ellipsis: true,
-      sorter: true,
-      visible: true, // Varsayılan olarak kapalı
-      render: (text) => (text > 0 ? text : null),
-    },
-    {
-      title: "Tamamlama (%)",
-      dataIndex: "TAMAMLANMA",
-      key: "TAMAMLANMA",
-      width: 200,
-      ellipsis: true,
-      sorter: true,
-      visible: true, // Varsayılan olarak kapalı
-      render: (text) => <Progress percent={text} steps={8} />,
-    },
+
     {
       title: "Garanti",
       dataIndex: "GARANTI",
@@ -665,21 +721,7 @@ const MainTable = () => {
       sorter: true,
       visible: false, // Varsayılan olarak kapalı
     },
-    {
-      title: "Kapanış Zamanı",
-      dataIndex: "KAPANIS_TARIHI",
-      key: "KAPANIS_TARIHI",
-      width: 140,
-      ellipsis: true,
-      sorter: true,
-      visible: true, // Varsayılan olarak kapalı
-      render: (text, record) => (
-        <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
-          <span>{formatDate(text)}</span>
-          <span style={{ color: "#8c8c8c", fontSize: "12px" }}>{formatTime(record.KAPANIS_SAATI)}</span>
-        </div>
-      ),
-    },
+
     {
       title: "Takvim",
       dataIndex: "TAKVIM",
@@ -749,15 +791,7 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak kapalı
       render: (text) => formatDate(text),
     },
-    {
-      title: "Personel Adı",
-      dataIndex: "PERSONEL_ADI",
-      key: "PERSONEL_ADI",
-      width: 180,
-      ellipsis: true,
-      sorter: true,
-      visible: true, // Varsayılan olarak kapalı
-    },
+
     {
       title: "Tam Lokasyon",
       dataIndex: "TAM_LOKASYON",
@@ -1735,6 +1769,7 @@ const MainTable = () => {
           }}
         >
           <Table
+            className="is-emri-table"
             components={components}
             rowSelection={rowSelection}
             columns={filteredColumns}
@@ -1753,7 +1788,7 @@ const MainTable = () => {
               showQuickJumper: true,
             }}
             // onRow={onRowClick}
-            scroll={{ y: "calc(100vh - 450px)" }}
+            scroll={{ y: "calc(100vh - 460px)" }}
             onChange={handleTableChange}
             rowClassName={(record) => (record.IST_DURUM_ID === 0 ? "boldRow" : "")}
           />
