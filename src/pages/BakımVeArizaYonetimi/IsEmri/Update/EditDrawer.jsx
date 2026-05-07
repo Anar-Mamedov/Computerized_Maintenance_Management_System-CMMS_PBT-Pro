@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { Button, Drawer, Space, ConfigProvider, Modal, Spin, message } from "antd";
+import { Button, Drawer, Space, ConfigProvider, Modal, Spin, message, Alert } from "antd";
 import { QrcodeOutlined } from "@ant-design/icons";
 import tr_TR from "antd/es/locale/tr_TR";
 import AxiosInstance from "../../../../api/http";
 import MainTabs from "./components/MainTabs/MainTabs";
 import Footer from "./components/Footer";
 import SecondTabs from "./components/SecondTabs/SecondTabs";
+import CloseForms from "./components/SecondTabs/components/KapamaBilgileri/Forms";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { t } from "i18next";
@@ -23,6 +24,10 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   const [onayCheck, setOnayCheck] = useState(false);
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [assignmentRequestKey, setAssignmentRequestKey] = useState(0);
+  const [closeModalOpen, setCloseModalOpen] = useState(false);
+  const [closeModalDisabled, setCloseModalDisabled] = useState(false);
+  const [closeErrorMessage, setCloseErrorMessage] = useState("");
+  const [closeErrorMessageShow, setCloseErrorMessageShow] = useState(false);
   // API'den gelen zorunluluk bilgilerini simüle eden bir örnek
   const [fieldRequirements, setFieldRequirements] = React.useState({
     // Varsayılan olarak zorunlu değil
@@ -506,6 +511,10 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   const closeDrawerAndReset = () => {
     setOpen(false);
+    setCloseModalOpen(false);
+    setCloseModalDisabled(false);
+    setCloseErrorMessage("");
+    setCloseErrorMessageShow(false);
     setAssignmentRequestKey(0);
     onRefresh();
     methods.reset();
@@ -643,35 +652,45 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     }
   };
 
-  const checkRequiredFieldsBeforeClose = async (isEmriId) => {
+  const checkRequiredFieldsBeforeClose = async (isEmriId, { showMessages = true } = {}) => {
     try {
       const response = await AxiosInstance.get(`CheckIsmFieldsForClose?isEmriId=${isEmriId}`);
       if (response?.Durum === true) {
-        return true;
+        return { canClose: true, errorMessage: "" };
       }
 
+      let errorMessage = "";
       if (response?.TextArray?.length) {
-        message.error(
-          t("isEmriKapatma.ozelAlanEksikMesaj", {
-            fields: response.TextArray.join(",\n"),
-          })
-        );
+        errorMessage += `${response.TextArray.join(",\n")}, `;
+        if (showMessages) {
+          message.error(
+            t("isEmriKapatma.ozelAlanEksikMesaj", {
+              fields: response.TextArray.join(",\n"),
+            })
+          );
+        }
       }
       if (response?.Idlist?.length) {
         const words = response.Idlist.map((id) => idToWordMap[id] || t("isEmriKapatma.alan.bilinmeyenId"));
-        message.error(
-          t("isEmriKapatma.genelAlanEksikMesaj", {
-            fields: words.join(",\n"),
-          })
-        );
+        errorMessage += `${words.join(",\n")}, `;
+        if (showMessages) {
+          message.error(
+            t("isEmriKapatma.genelAlanEksikMesaj", {
+              fields: words.join(",\n"),
+            })
+          );
+        }
       }
       if (response?.IsmIsNotPersonelTimeSet === true) {
-        message.error(t("isEmriKapatma.personelSureEksikMesaj"));
+        errorMessage += "Ekli Personele Süre Atanmamış";
+        if (showMessages) {
+          message.error(t("isEmriKapatma.personelSureEksikMesaj"));
+        }
       }
-      return false;
+      return { canClose: false, errorMessage: errorMessage.trim() };
     } catch (error) {
       showRequestError(error);
-      return false;
+      return { canClose: false, errorMessage: "" };
     }
   };
 
@@ -707,29 +726,29 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     const isEmriId = data.secilenIsEmriID || selectedRow?.key;
     if (!isEmriId) {
       message.error("İş emri bulunamadı.");
-      return false;
+      return { success: false, errorMessage: "" };
     }
 
-    const canClose = await checkRequiredFieldsBeforeClose(isEmriId);
-    if (!canClose) {
-      return false;
+    const validationResult = await checkRequiredFieldsBeforeClose(isEmriId);
+    if (!validationResult.canClose) {
+      return { success: false, errorMessage: validationResult.errorMessage };
     }
 
     const body = buildCloseBody(data, isEmriId);
     try {
       const response = await AxiosInstance.post("IsEmriKapat", body);
       if (response.status_code === 200 || response.status_code === 201) {
-        return true;
+        return { success: true, errorMessage: "" };
       }
       if (response.status_code === 401) {
         message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
       } else {
         message.error("İş emri kapatma işlemi başarısız.");
       }
-      return false;
+      return { success: false, errorMessage: "" };
     } catch (error) {
       showRequestError(error);
-      return false;
+      return { success: false, errorMessage: "" };
     }
   };
 
@@ -745,13 +764,21 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   const onSubmitAndClose = async (data) => {
     setActionLoading(true);
     try {
+      setCloseErrorMessage("");
+      setCloseErrorMessageShow(false);
+      setCloseModalDisabled(false);
       const updated = await updateIsEmri(data, { closeAfterSuccess: false, showSuccessMessage: false });
       if (!updated) {
         return;
       }
 
-      const closed = await closeIsEmri(data);
-      if (!closed) {
+      const closeResult = await closeIsEmri(data);
+      if (!closeResult.success) {
+        if (closeResult.errorMessage) {
+          setCloseErrorMessage(closeResult.errorMessage);
+          setCloseErrorMessageShow(true);
+          setCloseModalDisabled(true);
+        }
         return;
       }
 
@@ -775,6 +802,32 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         onDrawerClose();
       },
     });
+  };
+
+  const handleCloseModalToggle = async () => {
+    if (closeModalOpen) {
+      setCloseModalOpen(false);
+      setCloseModalDisabled(false);
+      setCloseErrorMessage("");
+      setCloseErrorMessageShow(false);
+      return;
+    }
+
+    const isEmriId = methods.getValues("secilenIsEmriID") || selectedRow?.key;
+    setCloseModalDisabled(false);
+    setCloseErrorMessage("");
+    setCloseErrorMessageShow(false);
+
+    if (isEmriId) {
+      const validationResult = await checkRequiredFieldsBeforeClose(isEmriId, { showMessages: false });
+      if (!validationResult.canClose) {
+        setCloseModalDisabled(true);
+        setCloseErrorMessage(validationResult.errorMessage);
+        setCloseErrorMessageShow(true);
+      }
+    }
+
+    setCloseModalOpen(true);
   };
 
   const handlePrintWorkOrderForm = () => {
@@ -838,7 +891,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
                 <span style={{ fontSize: "14px", lineHeight: 1 }}>👷</span>
                 Atama
               </Button>
-              <Button danger disabled={disabled || actionLoading} loading={actionLoading} onClick={methods.handleSubmit(onSubmitAndClose)}>
+              <Button danger disabled={disabled || actionLoading} loading={actionLoading} onClick={handleCloseModalToggle}>
                 Kapat
               </Button>
               <Button onClick={onClose}>İptal</Button>
@@ -887,6 +940,46 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           fileName={`QR-${watch("isEmriNo") || selectedRow?.key || "IsEmri"}`}
           title="İş Emri QR Kodu"
         />
+
+        <Modal
+          title={`İş Emri Kapatma - (${watch("isEmriNo") || selectedRow?.ISEMRI_NO || ""})`}
+          centered
+          destroyOnClose={false}
+          width={990}
+          zIndex={2100}
+          open={closeModalOpen}
+          onCancel={handleCloseModalToggle}
+          footer={[
+            <div key="footer" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+              <div style={{ width: "100%" }}>
+                {closeErrorMessageShow ? (
+                  <Alert
+                    style={{ fontWeight: 500, color: "red", textAlign: "left" }}
+                    message={`İş emrinde doldurulması gerekli zorunlu alanlar bulunmaktadır. (${closeErrorMessage})`}
+                    type="error"
+                    showIcon
+                  />
+                ) : null}
+              </div>
+              <div style={{ display: "flex", gap: "10px", marginLeft: "10px" }}>
+                <Button key="cancel" onClick={handleCloseModalToggle}>
+                  İptal
+                </Button>
+                <Button
+                  key="submit"
+                  type="primary"
+                  disabled={closeModalDisabled || actionLoading}
+                  loading={actionLoading}
+                  onClick={methods.handleSubmit(onSubmitAndClose)}
+                >
+                  Tamam
+                </Button>
+              </div>
+            </div>,
+          ]}
+        >
+          <CloseForms isModalOpen={closeModalOpen} selectedRows={selectedRow ? [selectedRow] : []} />
+        </Modal>
       </ConfigProvider>
     </FormProvider>
   );
