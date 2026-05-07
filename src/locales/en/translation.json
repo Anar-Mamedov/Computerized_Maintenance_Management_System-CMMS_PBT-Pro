@@ -302,6 +302,8 @@
   "workOrder.controlList.completed": "Completed",
   "workOrder.controlList.waiting": "Waiting",
   "workOrder.controlList.critical": "Critical",
+  "workOrder.controlList.inProgress": "In Progress",
+  "workOrder.controlList.failed": "Could Not Be Done",
   "workOrder.controlList.minuteShort": "min",
   "workOrder.controlList.allAlreadyCompleted": "All checklist steps are already completed.",
   "workOrder.controlList.completeAllSuccess": "All checklist steps were marked as completed.",

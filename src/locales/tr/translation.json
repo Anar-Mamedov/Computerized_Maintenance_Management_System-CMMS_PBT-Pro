@@ -948,6 +948,8 @@
   "workOrder.controlList.completed": "Tamamlandı",
   "workOrder.controlList.waiting": "Bekliyor",
   "workOrder.controlList.critical": "Kritik",
+  "workOrder.controlList.inProgress": "Devam Ediyor",
+  "workOrder.controlList.failed": "Yapılamadı",
   "workOrder.controlList.minuteShort": "dk",
   "workOrder.controlList.allAlreadyCompleted": "Tüm kontrol adımları zaten tamamlandı.",
   "workOrder.controlList.completeAllSuccess": "Tüm kontrol adımları tamamlandı olarak güncellendi.",

@@ -299,6 +299,8 @@
   "workOrder.controlList.completed": "Выполнено",
   "workOrder.controlList.waiting": "Ожидает",
   "workOrder.controlList.critical": "Критично",
+  "workOrder.controlList.inProgress": "Продолжается",
+  "workOrder.controlList.failed": "Не удалось выполнить",
   "workOrder.controlList.minuteShort": "мин",
   "workOrder.controlList.allAlreadyCompleted": "Все этапы уже выполнены.",
   "workOrder.controlList.completeAllSuccess": "Все этапы отмечены как выполненные.",
