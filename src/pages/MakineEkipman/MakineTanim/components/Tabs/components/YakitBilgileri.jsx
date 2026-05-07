@@ -4,7 +4,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import { t } from "i18next";
 import { DatabaseOutlined, BarChartOutlined } from "@ant-design/icons";
 import NumberInput from "../../../../../../utils/components/NumberInput";
-import YakitTipiSelectbox from "../../../../../../utils/components/YakitTipiSelectbox";
+import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
 
 const { Text } = Typography;
 
@@ -66,7 +66,7 @@ function YakitBilgileri() {
         <div style={rowStyle}>
           <Text style={labelStyle}>{t("yakitTipi")}</Text>
           <div style={{ flex: 1 }}>
-            <YakitTipiSelectbox name1="makineYakitTipi" isRequired={false} placeholder="" />
+            <KodIDSelectbox name1="makineYakitTipi" kodID={35600} isRequired={false} placeholder="" showDropdownAdd={false} />
           </div>
         </div>
 

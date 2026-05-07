@@ -12,3 +12,21 @@
     height: 100%;
     cursor: col-resize;
 }
+
+.is-emri-table .ant-table-thead > tr > th {
+    height: auto;
+    white-space: normal;
+}
+
+.is-emri-table .ant-table-thead > tr > th .ant-table-column-sorters {
+    align-items: center;
+}
+
+.is-emri-table .ant-table-thead > tr > th .ant-table-column-title {
+    line-height: 1.2;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
