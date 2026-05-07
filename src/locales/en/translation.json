@@ -380,6 +380,7 @@
   "workOrder.materialList.deleteSuccess": "Operation successful.",
   "workOrder.materialList.deleteError": "Delete operation failed.",
   "workOrder.materialList.noPermission": "You are not authorized to perform this action.",
+  "workOrder.downtime.endTimeCannotBeBeforeStartTime": "End time cannot be earlier than start time.",
   "": "",
   "": "",
   "": "",

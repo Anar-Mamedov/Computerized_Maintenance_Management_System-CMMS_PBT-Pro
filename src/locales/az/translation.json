@@ -377,6 +377,7 @@
   "workOrder.materialList.deleteSuccess": "Əməliyyat uğurludur.",
   "workOrder.materialList.deleteError": "Silmə əməliyyatı uğursuz oldu.",
   "workOrder.materialList.noPermission": "Bu əməliyyatı yerinə yetirmək səlahiyyətiniz yoxdur.",
+  "workOrder.downtime.endTimeCannotBeBeforeStartTime": "Bitiş vaxtı başlama vaxtından kiçik ola bilməz.",
   "": "",
   "": "",
   "": "",

@@ -1026,6 +1026,7 @@
   "workOrder.materialList.deleteSuccess": "İşlem Başarılı.",
   "workOrder.materialList.deleteError": "Silme işlemi başarısız.",
   "workOrder.materialList.noPermission": "Bu işlemi yapmaya yetkiniz bulunmamaktadır.",
+  "workOrder.downtime.endTimeCannotBeBeforeStartTime": "Bitiş zamanı başlangıç zamanından küçük olamaz.",
   "KLL_WEB_OPERASYON_MODUL": "Operasyon Yönetimi Modülü",
   "KLL_WEB_SATINALMA_MODUL": "Satınalma Yönetimi Modülü",
   "KLL_WEB_YAKIT_MODUL": "Yakit Yönetimi Modülü",

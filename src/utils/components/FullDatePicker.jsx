@@ -4,7 +4,7 @@ import { DatePicker } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import { t } from "i18next";
 
-export default function FullDatePicker({ name1, isRequired = false, pickType = null, disabled = false, placeholder }) {
+export default function FullDatePicker({ name1, isRequired = false, pickType = null, disabled = false, placeholder, ...pickerProps }) {
   const {
     control,
     formState: { errors },
@@ -19,6 +19,7 @@ export default function FullDatePicker({ name1, isRequired = false, pickType = n
     en: "MM/DD/YYYY",
   };
   const displayFormat = dateFormatMap[currentLang] || "YYYY-MM-DD";
+  const { onChange: customOnChange, style: customStyle, ...restPickerProps } = pickerProps;
 
   return (
     <>
@@ -29,12 +30,17 @@ export default function FullDatePicker({ name1, isRequired = false, pickType = n
         render={({ field }) => (
           <DatePicker
             {...field}
+            {...restPickerProps}
             picker={pickType}
             format={pickType == null ? displayFormat : undefined}
             status={errors[name1] ? "error" : ""}
-            style={{ flex: 1, width: "100%" }}
+            style={{ flex: 1, width: "100%", ...customStyle }}
             disabled={disabled}
             placeholder={placeholder}
+            onChange={(value, dateString) => {
+              field.onChange(value);
+              customOnChange?.(value, dateString);
+            }}
           />
         )}
       />
@@ -48,4 +54,5 @@ FullDatePicker.propTypes = {
   isRequired: PropTypes.bool,
   pickType: PropTypes.string,
   placeholder: PropTypes.string,
+  disabled: PropTypes.bool,
 };

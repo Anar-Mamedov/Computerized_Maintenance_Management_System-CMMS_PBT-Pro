@@ -377,6 +377,7 @@
   "workOrder.materialList.deleteSuccess": "Операция выполнена успешно.",
   "workOrder.materialList.deleteError": "Не удалось удалить запись.",
   "workOrder.materialList.noPermission": "У вас нет прав для выполнения этого действия.",
+  "workOrder.downtime.endTimeCannotBeBeforeStartTime": "Время окончания не может быть раньше времени начала.",
   "": "",
   "": "",
   "": "",
