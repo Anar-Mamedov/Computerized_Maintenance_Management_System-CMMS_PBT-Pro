@@ -21,6 +21,7 @@ import dayjs from "dayjs";
 import { formatNumberWithSeparators } from "../../../../utils/numberLocale";
 
 const { Text } = Typography;
+const EXCEL_FILE_NAME = "Bakım İş Emirleri.xlsx";
 
 // Function to extract text from React elements
 import { isValidElement } from "react";
@@ -1508,7 +1509,7 @@ const MainTable = () => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.setAttribute("href", url);
-        link.setAttribute("download", "table_data.xlsx");
+        link.setAttribute("download", EXCEL_FILE_NAME);
         link.style.visibility = "hidden";
         document.body.appendChild(link);
         link.click();
