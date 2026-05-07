@@ -578,6 +578,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                     makineFieldName="makine"
                     makineIdFieldName="makineID"
                     isRequired={fieldRequirements.makine}
+                    includeAtolyeFilter={false}
                     onSubmit={(selectedData) => {
                       setValue("makine", selectedData.MKN_KOD);
                       setValue("makineID", selectedData.key);
