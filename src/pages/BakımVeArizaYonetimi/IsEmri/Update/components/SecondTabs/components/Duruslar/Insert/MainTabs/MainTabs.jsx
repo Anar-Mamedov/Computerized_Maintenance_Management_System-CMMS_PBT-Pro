@@ -374,8 +374,7 @@ export default function MainTabs() {
                 display: "flex",
                 flexWrap: "wrap",
                 alignItems: "center",
-                maxWidth: "300px",
-                minWidth: "300px",
+                maxWidth: "270px",
                 gap: "10px",
                 width: "100%",
               }}
@@ -383,7 +382,7 @@ export default function MainTabs() {
               <Controller
                 name="baslangicTarihi"
                 control={control}
-                render={({ field }) => <DatePicker {...field} style={{ width: "180px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />}
+                render={({ field }) => <DatePicker {...field} style={{ width: "150px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />}
               />
               <Controller
                 name="baslangicSaati"
@@ -410,8 +409,7 @@ export default function MainTabs() {
                 display: "flex",
                 flexWrap: "wrap",
                 alignItems: "center",
-                maxWidth: "300px",
-                minWidth: "300px",
+                maxWidth: "270px",
                 gap: "10px",
                 width: "100%",
               }}
@@ -419,13 +417,12 @@ export default function MainTabs() {
               <Controller
                 name="bitisTarihi"
                 control={control}
-                render={({ field }) => <DatePicker {...field} style={{ width: "180px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />}
+                render={({ field }) => <DatePicker {...field} style={{ width: "150px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />}
               />
               <Controller
                 name="bitisSaati"
                 control={control}
-                render={({ field }) => <TimePicker {...field} changeOnScroll
-                                                   needConfirm={false} style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />}
+                render={({ field }) => <TimePicker {...field} changeOnScroll needConfirm={false} style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />}
               />
             </div>
           </div>
@@ -440,7 +437,7 @@ export default function MainTabs() {
             }}
           >
             <Text style={{ fontSize: "14px" }}>Duruş Süresi (dk):</Text>
-            <Controller name="sure" control={control} render={({ field }) => <InputNumber {...field} min={0} style={{ width: "300px" }} />} />
+            <Controller name="sure" control={control} render={({ field }) => <InputNumber {...field} min={0} style={{ width: "270px" }} />} />
           </div>
         </div>
         <div style={{ border: "1px solid #ececec", padding: "15px", marginBottom: "10px", maxWidth: "350px" }}>
