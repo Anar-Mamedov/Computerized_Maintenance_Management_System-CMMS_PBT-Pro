@@ -360,6 +360,7 @@
   "workOrder.materialList.addSelected": "Добавить выбранные",
   "workOrder.materialList.select": "Выбрать",
   "workOrder.materialList.selectMaterialName": "Выбрать название материала",
+  "workOrder.materialList.searchPlaceholder": "Поиск по списку...",
   "workOrder.materialList.chooseWarehouse": "Выберите склад",
   "workOrder.materialList.chooseMaterial": "Выберите материал",
   "workOrder.materialList.materialNameRequired": "Название материала обязательно.",

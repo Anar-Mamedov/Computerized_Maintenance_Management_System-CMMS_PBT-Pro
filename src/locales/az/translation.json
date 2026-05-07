@@ -360,6 +360,7 @@
   "workOrder.materialList.addSelected": "Seçilənləri Əlavə Et",
   "workOrder.materialList.select": "Seç",
   "workOrder.materialList.selectMaterialName": "Material Adı Seç",
+  "workOrder.materialList.searchPlaceholder": "Siyahıda axtar...",
   "workOrder.materialList.chooseWarehouse": "Anbar seçin",
   "workOrder.materialList.chooseMaterial": "Zəhmət olmasa material seçin",
   "workOrder.materialList.materialNameRequired": "Material adı məcburidir.",
