@@ -18,6 +18,7 @@ import { SiMicrosoftexcel } from "react-icons/si";
 import * as XLSX from "xlsx";
 import { t } from "i18next";
 import dayjs from "dayjs";
+import { formatNumberWithSeparators } from "../../../../utils/numberLocale";
 
 const { Text } = Typography;
 
@@ -153,6 +154,12 @@ const MainTable = () => {
   const [sortOrder, setSortOrder] = useState(null);
   const [noteModalOpen, setNoteModalOpen] = useState(false);
   const [noteModalRow, setNoteModalRow] = useState(null);
+  const currentLang = localStorage.getItem("i18nextLng") || "en";
+
+  const formatKpiNumber = useCallback(
+    (value) => formatNumberWithSeparators(value ?? 0, currentLang),
+    [currentLang]
+  );
 
   function hexToRGBA(color, opacity) {
     // 1) Geçersiz parametreleri engelle
@@ -1645,12 +1652,12 @@ const MainTable = () => {
           {
             title: "Toplam İş Emri",
             value: kpi.Toplam?.Sayi ?? 0,
-            footer: `Açık: ${kpi.Toplam?.Acik ?? 0} | Kapalı: ${kpi.Toplam?.Kapali ?? 0}`,
+            footer: `Açık: ${formatKpiNumber(kpi.Toplam?.Acik)} | Kapalı: ${formatKpiNumber(kpi.Toplam?.Kapali)}`,
           },
           {
             title: "Arıza İş Emirleri",
             value: kpi.Ariza?.Sayi ?? 0,
-            footer: `Açık: ${kpi.Ariza?.Acik ?? 0} | Kapalı: ${kpi.Ariza?.Kapali ?? 0}`,
+            footer: `Açık: ${formatKpiNumber(kpi.Ariza?.Acik)} | Kapalı: ${formatKpiNumber(kpi.Ariza?.Kapali)}`,
             clickable: true,
             active: arizaActive,
             onClick: () => {
@@ -1661,7 +1668,7 @@ const MainTable = () => {
           {
             title: "Onay Bekleyen İş Emirleri",
             value: kpi.OnayBekleyen?.Sayi ?? 0,
-            footer: `Açık: ${kpi.OnayBekleyen?.Acik ?? 0} | Kapalı: ${kpi.OnayBekleyen?.Kapali ?? 0}`,
+            footer: `Açık: ${formatKpiNumber(kpi.OnayBekleyen?.Acik)} | Kapalı: ${formatKpiNumber(kpi.OnayBekleyen?.Kapali)}`,
             clickable: true,
             active: onayBekleyenActive,
             onClick: () => {
@@ -1707,7 +1714,7 @@ const MainTable = () => {
             }}
           >
             <div style={{ color: "#6b7280", fontSize: "13px" }}>{item.title}</div>
-            <div style={{ fontSize: "28px", fontWeight: 600, color: "#0f172a", lineHeight: 1 }}>{item.value}</div>
+            <div style={{ fontSize: "28px", fontWeight: 600, color: "#0f172a", lineHeight: 1 }}>{formatKpiNumber(item.value)}</div>
             <div style={{ color: "#6b7280", fontSize: "12px" }}>{item.footer}</div>
           </div>
         ))}
