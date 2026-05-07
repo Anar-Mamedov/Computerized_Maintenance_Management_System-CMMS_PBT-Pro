@@ -614,6 +614,8 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                     ekipmanFieldName="ekipman"
                     ekipmanIdFieldName="ekipmanID"
                     isRequired={fieldRequirements.ekipman}
+                    requireMakineSelection={true}
+                    makineIdFieldName="makineID"
                     onSubmit={(selectedData) => {
                       setValue("ekipman", selectedData.EKP_KOD || selectedData.kod || "");
                       setValue("ekipmanID", selectedData.key);

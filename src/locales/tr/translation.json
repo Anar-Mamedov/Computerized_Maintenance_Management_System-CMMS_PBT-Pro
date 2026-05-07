@@ -101,6 +101,7 @@
   "sayac.noSelection": "Makine seçimi yapılmadı.",
   "sayac.emptyState": "Sayaç kaydı bulunmuyor.",
   "makineKodu": "Makine Kodu",
+  "onceMakineSeciniz": "Lütfen önce bir makine seçiniz.",
   "sonUygulananTarih": "Son Uygulanan Tarih",
   "planlananTarih": "Planlanan Tarih",
   "makineTanimi": "Makine Tanımı",

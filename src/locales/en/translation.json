@@ -17,6 +17,7 @@
   "dakikaKisaltma": "min",
   "makineKodu": "Machine Code",
   "makine": "Machine",
+  "onceMakineSeciniz": "Please select a machine first.",
   "makineTanimi": "Machine Description",
   "lokasyon": "Location",
   "tip": "Type",
