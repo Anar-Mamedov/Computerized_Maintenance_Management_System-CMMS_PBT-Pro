@@ -102,6 +102,7 @@
   "sayac.emptyState": "Sayaç kaydı bulunmuyor.",
   "makineKodu": "Makine Kodu",
   "onceMakineSeciniz": "Lütfen önce bir makine seçiniz.",
+  "onceIsEmriTipiSeciniz": "Lütfen önce bir iş emri tipi seçiniz.",
   "sonUygulananTarih": "Son Uygulanan Tarih",
   "planlananTarih": "Planlanan Tarih",
   "makineTanimi": "Makine Tanımı",

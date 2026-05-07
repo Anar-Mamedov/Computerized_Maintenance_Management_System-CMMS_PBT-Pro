@@ -1,43 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Table, Tabs, Input, Spin, message } from "antd";
-import { useFormContext, Controller } from "react-hook-form";
+import React, { useEffect, useMemo, useState } from "react";
+import { Button, Input, Modal, Spin, Table, message } from "antd";
+import { useFormContext } from "react-hook-form";
+import { t } from "i18next";
 import AxiosInstance from "../../../../../../../../../api/http";
-import styled from "styled-components";
 
-//styled components
-const StyledTabs = styled(Tabs)`
-  .ant-tabs-tab {
-    margin: 0 !important;
-    width: fit-content;
-    padding: 10px 15px;
-    justify-content: center;
-    background-color: rgba(230, 230, 230, 0.3);
-  }
-
-  .ant-tabs-tab-active {
-    background-color: #2bc77135;
-  }
-
-  .ant-tabs-nav .ant-tabs-tab-active .ant-tabs-tab-btn {
-    color: rgba(0, 0, 0, 0.88) !important;
-  }
-
-  .ant-tabs-tab:hover .ant-tabs-tab-btn {
-    color: rgba(0, 0, 0, 0.88) !important;
-  }
-
-  .ant-tabs-tab:not(:first-child) {
-    border-left: 1px solid #80808024;
-  }
-
-  .ant-tabs-ink-bar {
-    background: #2bc770;
-  }
-`;
-
-//styled components end
-
-// Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
 const normalizeText = (text) => {
   return text
     .normalize("NFD")
@@ -56,148 +22,131 @@ const normalizeText = (text) => {
     .replace(/Ç/g, "C");
 };
 
+const mapProcedureItem = (item) => ({
+  ...item,
+  key: item.id,
+  IST_KOD: item.kod ?? "",
+  IST_TANIM: item.tanim ?? "",
+  IST_TIP: item.IST_TIP ?? null,
+  IST_TIP_KOD_ID: item.IST_TIP_KOD_ID ?? null,
+  IST_NEDEN: item.IST_NEDEN ?? null,
+  IST_NEDEN_KOD_ID: item.IST_NEDEN_KOD_ID ?? null,
+});
+
 export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
-  const { control, setValue, watch } = useFormContext();
+  const { watch } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedRowKeys1, setSelectedRowKeys1] = useState([]);
-  const [selectedRowKeys2, setSelectedRowKeys2] = useState([]);
-  const [data1, setData1] = useState([]);
-  const [data2, setData2] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingData1, setLoadingData1] = useState(true);
-  const [loadingData2, setLoadingData2] = useState(true);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const [searchTerm1, setSearchTerm1] = useState("");
-  const [searchTerm2, setSearchTerm2] = useState("");
-  const [filteredData1, setFilteredData1] = useState([]);
-  const [filteredData2, setFilteredData2] = useState([]);
-
-  const prosedurTab = watch("prosedurTab");
-
-  const columns1 = [
-    {
-      title: "Arıza Kodu",
-      dataIndex: "IST_KOD",
-      key: "IST_KOD",
-      width: "70px",
-      ellipsis: true,
-    },
-    {
-      title: "Arıza Tanımı",
-      dataIndex: "IST_TANIM",
-      key: "IST_TANIM",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Arıza Tipi",
-      dataIndex: "IST_TIP",
-      key: "IST_TIP",
-      width: "150px",
-      ellipsis: true,
-    },
-    // Diğer sütun tanımları...
-  ];
-  const columns2 = [
-    {
-      title: "Bakım Kodu",
-      dataIndex: "IST_KOD",
-      key: "IST_KOD",
-      width: "70px",
-      ellipsis: true,
-    },
-    {
-      title: "Bakım Tanımı",
-      dataIndex: "IST_TANIM",
-      key: "IST_TANIM",
-      width: "150px",
-      ellipsis: true,
-    },
-    {
-      title: "Bakım Tipi",
-      dataIndex: "IST_TIP",
-      key: "IST_TIP",
-      width: "150px",
-      ellipsis: true,
-    },
-    // Diğer sütun tanımları...
-  ];
-
-  const fetch = useCallback(() => {
-    setLoading(true);
-    setLoadingData1(true);
-    setLoadingData2(true);
-
-    // İlk tablo verilerini çeken API isteği
-    AxiosInstance.get(`GetProsedur?tipId=1&atolyeId=${watch("atolyeID") || 0}`)
-      .then((response) => {
-        const fetchedData = response.PROSEDUR_LISTE.map((item) => ({
-          ...item,
-          key: item.TB_IS_TANIM_ID,
-        }));
-        setData1(fetchedData);
-      })
-      .catch((error) => console.error("API Error:", error))
-      .finally(() => setLoadingData1(false));
-
-    // İkinci tablo verilerini çeken API isteği
-    AxiosInstance.get(`GetProsedur?tipId=2&atolyeId=${watch("atolyeID") || 0}`)
-      .then((response) => {
-        const fetchedData = response.PROSEDUR_LISTE.map((item) => ({
-          ...item,
-          key: item.TB_IS_TANIM_ID,
-        }));
-        setData2(fetchedData);
-      })
-      .catch((error) => console.error("API Error:", error))
-      .finally(() => setLoadingData2(false));
-  }, []);
-
-  useEffect(() => {
-    if (!loadingData1 && !loadingData2) {
-      setLoading(false);
-    }
-  }, [loadingData1, loadingData2]);
-
-  const handleModalToggle = () => {
-    setIsModalVisible((prev) => !prev);
-    if (!isModalVisible) {
-      fetch();
-      setSelectedRowKeys1([]);
-      setSelectedRowKeys2([]);
-    }
-  };
-
+  const isEmriTipiID = watch("isEmriTipiID");
+  const makineID = watch("makineID");
+  const selectedOption = watch("selectedOption");
   const prosedurID = watch("prosedurID");
   const secilenIsEmriID = watch("secilenIsEmriID");
 
-  const handleModalOk = async () => {
-    let selectedData;
-    // Assuming only one set of row keys will be selected at a time.
-    if (selectedRowKeys1.length) {
-      selectedData = data1.find((item) => item.key === selectedRowKeys1[0]);
-    } else if (selectedRowKeys2.length) {
-      selectedData = data2.find((item) => item.key === selectedRowKeys2[0]);
+  const columns = [
+    {
+      title: "Prosedür Kodu",
+      dataIndex: "IST_KOD",
+      key: "IST_KOD",
+      width: 180,
+      ellipsis: true,
+    },
+    {
+      title: "Prosedür Tanımı",
+      dataIndex: "IST_TANIM",
+      key: "IST_TANIM",
+      ellipsis: true,
+    },
+  ];
+
+  const filteredData = useMemo(() => {
+    const normalizedSearchTerm = normalizeText(searchTerm).toLowerCase();
+    if (!normalizedSearchTerm) {
+      return data;
     }
+
+    return data.filter((item) => {
+      return [item.IST_KOD, item.IST_TANIM].some((value) => value && normalizeText(String(value)).toLowerCase().includes(normalizedSearchTerm));
+    });
+  }, [data, searchTerm]);
+
+  const fetchProcedures = async () => {
+    if (!isEmriTipiID) {
+      message.warning(t("onceIsEmriTipiSeciniz"));
+      return false;
+    }
+
+    if (selectedOption?.IMT_TIP_GRUP === 3 && !makineID) {
+      message.warning(t("onceMakineSeciniz"));
+      return false;
+    }
+
+    setLoading(true);
+    try {
+      const query = new URLSearchParams({
+        tipId: String(isEmriTipiID),
+      });
+
+      if (makineID) {
+        query.set("makineId", String(makineID));
+      }
+
+      const response = await AxiosInstance.get(`GetProsedur?${query.toString()}`);
+
+      if (response?.has_error) {
+        message.warning(response.message || response.error_message || t("islemBasarisiz"));
+        return false;
+      }
+
+      const fetchedData = Array.isArray(response?.PROSEDUR_LISTE) ? response.PROSEDUR_LISTE.map(mapProcedureItem) : [];
+      setData(fetchedData);
+      return true;
+    } catch (error) {
+      console.error("API Error:", error);
+      if (navigator.onLine) {
+        message.error("Hata Mesajı: " + error.message);
+      } else {
+        message.error("Internet Bağlantısı Mevcut Değil.");
+      }
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleModalToggle = async () => {
+    if (!isModalVisible) {
+      const loaded = await fetchProcedures();
+      if (!loaded) {
+        return;
+      }
+      setSelectedRowKeys([]);
+      setSearchTerm("");
+      setIsModalVisible(true);
+      return;
+    }
+
+    setIsModalVisible(false);
+  };
+
+  const handleModalOk = async () => {
+    const selectedData = data.find((item) => item.key === selectedRowKeys[0]);
 
     if (selectedData && secilenIsEmriID) {
       try {
-        // API isteğini yap
         const response = await AxiosInstance.get(`AddProsedurPropertyToIsEmri?yeniIsTanimId=${selectedData.key}&isEmriId=${secilenIsEmriID}&eskiIsTanimId=${prosedurID}`);
-        // İsteğin başarılı olduğunu kontrol et
         if ((response && response.status_code === 200) || response.status_code === 201) {
-          // Başarılı işlem mesajı veya başka bir işlem yap
           message.success("İşlem Başarılı!");
-          console.log("İşlem başarılı.");
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
           message.error("İşlem Başarısız!");
-          // Hata mesajı göster
-          console.error("Bir hata oluştu.");
         }
       } catch (error) {
-        // Hata yakalama
         console.error("API isteği sırasında bir hata oluştu:", error);
         message.error("Başarısız Olundu.");
       }
@@ -210,125 +159,28 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
   };
 
   useEffect(() => {
-    setSelectedRowKeys1(workshopSelectedId ? [workshopSelectedId] : []);
-    setSelectedRowKeys2(workshopSelectedId ? [workshopSelectedId] : []);
+    setSelectedRowKeys(workshopSelectedId ? [workshopSelectedId] : []);
   }, [workshopSelectedId]);
-
-  const onRowSelectChange1 = (selectedKeys) => {
-    setSelectedRowKeys1(selectedKeys.length ? [selectedKeys[0]] : []);
-  };
-
-  const onRowSelectChange2 = (selectedKeys) => {
-    setSelectedRowKeys2(selectedKeys.length ? [selectedKeys[0]] : []);
-  };
-
-  // Arama işlevselliği için handleSearch fonksiyonları
-  const handleSearch1 = (e) => {
-    const value = e.target.value;
-    setSearchTerm1(value);
-    const normalizedSearchTerm = normalizeText(value);
-    if (value) {
-      const filtered = data1.filter((item) =>
-        Object.keys(item).some((key) => item[key] && normalizeText(item[key].toString()).toLowerCase().includes(normalizedSearchTerm.toLowerCase()))
-      );
-      setFilteredData1(filtered);
-    } else {
-      setFilteredData1(data1);
-    }
-  };
-
-  const handleSearch2 = (e) => {
-    const value = e.target.value;
-    setSearchTerm2(value);
-    const normalizedSearchTerm = normalizeText(value);
-    if (value) {
-      const filtered = data2.filter((item) =>
-        Object.keys(item).some((key) => item[key] && normalizeText(item[key].toString()).toLowerCase().includes(normalizedSearchTerm.toLowerCase()))
-      );
-      setFilteredData2(filtered);
-    } else {
-      setFilteredData2(data2);
-    }
-  };
-
-  useEffect(() => {
-    if (!isModalVisible) {
-      setSearchTerm1("");
-      setSearchTerm2("");
-      setFilteredData1([]);
-      setFilteredData2([]);
-    }
-  }, [isModalVisible]);
-
-  // sekmelerin içerisindeki tablo bileşenleri
-
-  const tabItems = [
-    {
-      label: "Arıza Prosedürleri",
-      key: "1",
-      children: (
-        <div>
-          <Input placeholder="Arama..." value={searchTerm1} onChange={handleSearch1} style={{ width: "300px", marginBottom: "15px" }} />
-          <Table
-            rowSelection={{
-              type: "radio",
-              selectedRowKeys: selectedRowKeys1,
-              onChange: onRowSelectChange1,
-            }}
-            columns={columns1}
-            dataSource={filteredData1.length > 0 || searchTerm1 ? filteredData1 : data1}
-            loading={loading}
-            scroll={{
-              y: "calc(100vh - 360px)",
-            }}
-          />
-        </div>
-      ),
-    },
-    {
-      label: "Bakım Prosedürleri",
-      key: "2",
-      children: (
-        <div>
-          <Input placeholder="Arama..." value={searchTerm2} onChange={handleSearch2} style={{ width: "300px", marginBottom: "15px" }} />
-          <Table
-            rowSelection={{
-              type: "radio",
-              selectedRowKeys: selectedRowKeys2,
-              onChange: onRowSelectChange2,
-            }}
-            columns={columns2}
-            dataSource={filteredData2.length > 0 || searchTerm2 ? filteredData2 : data2}
-            loading={loading}
-            scroll={{
-              y: "calc(100vh - 360px)",
-            }}
-          />
-        </div>
-      ),
-    },
-  ];
-
-  // sekmelerin içerisindeki tablo bileşenleri sonu
-
-  // Filter tab items based on prosedurTab value
-  const visibleTabItems = tabItems.filter((tabItem) => {
-    // prosedurTab değeri '0' veya 0 ise, her iki sekme de gösterilmeli.
-    // Bu koşul direkt olarak true döndürerek her iki sekmeyi de dahil eder.
-    if (prosedurTab === 0 || prosedurTab === "0") {
-      return true;
-    } else {
-      // prosedurTab değeri '1' veya '2' ise, ilgili sekme gösterilmeli.
-      return tabItem.key === prosedurTab;
-    }
-  });
 
   return (
     <div>
       <Button onClick={handleModalToggle}> + </Button>
       <Modal width={1200} centered title="" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <Spin spinning={loading}>
-          <StyledTabs defaultActiveKey="1" items={visibleTabItems} />
+          <Input placeholder="Arama..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{ width: "300px", marginBottom: "15px" }} />
+          <Table
+            rowSelection={{
+              type: "radio",
+              selectedRowKeys,
+              onChange: (keys) => setSelectedRowKeys(keys.length ? [keys[0]] : []),
+            }}
+            columns={columns}
+            dataSource={filteredData}
+            loading={loading}
+            scroll={{
+              y: "calc(100vh - 360px)",
+            }}
+          />
         </Spin>
       </Modal>
     </div>

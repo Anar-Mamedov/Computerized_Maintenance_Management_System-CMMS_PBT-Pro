@@ -18,6 +18,7 @@
   "makineKodu": "Код машины",
   "makine": "Машина",
   "onceMakineSeciniz": "Пожалуйста, сначала выберите машину.",
+  "onceIsEmriTipiSeciniz": "Пожалуйста, сначала выберите тип наряда.",
   "makineTanimi": "Описание машины",
   "lokasyon": "Локация",
   "tip": "Тип",

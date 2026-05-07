@@ -18,6 +18,7 @@
   "makineKodu": "Machine Code",
   "makine": "Machine",
   "onceMakineSeciniz": "Please select a machine first.",
+  "onceIsEmriTipiSeciniz": "Please select a work order type first.",
   "makineTanimi": "Machine Description",
   "lokasyon": "Location",
   "tip": "Type",
