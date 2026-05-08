@@ -157,6 +157,7 @@ const MainTable = () => {
   const [buHaftaKapananActive, setBuHaftaKapananActive] = useState(false);
   const [arizaActive, setArizaActive] = useState(false);
   const [onayBekleyenActive, setOnayBekleyenActive] = useState(false);
+  const [toplamIsEmriCloseFilter, setToplamIsEmriCloseFilter] = useState(null);
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
   const [onayCheck, setOnayCheck] = useState({ ONY_AKTIF: 0, ONY_MANUEL: 0 });
@@ -177,6 +178,32 @@ const MainTable = () => {
     [currentLang]
   );
   const formattedTotalCount = useMemo(() => formatKpiNumber(totalDataCount), [formatKpiNumber, totalDataCount]);
+  const toplamIsEmriFilterLabel = useMemo(() => {
+    if (toplamIsEmriCloseFilter === 0) {
+      return "Açık iş emirleri";
+    }
+    if (toplamIsEmriCloseFilter === 1) {
+      return "Kapalı iş emirleri";
+    }
+    return "Tüm iş emirleri";
+  }, [toplamIsEmriCloseFilter]);
+
+  const buildMergedFilters = useCallback(
+    (baseFilters = {}) => {
+      const mergedFilters = { ...baseFilters };
+      if (arizaActive) mergedFilters.prosedurtipleri = [1];
+      if (onayBekleyenActive) mergedFilters.onaydurumlari = [1];
+
+      if (toplamIsEmriCloseFilter === 0 || toplamIsEmriCloseFilter === 1) {
+        mergedFilters.isClose = toplamIsEmriCloseFilter;
+      } else {
+        delete mergedFilters.isClose;
+      }
+
+      return mergedFilters;
+    },
+    [arizaActive, onayBekleyenActive, toplamIsEmriCloseFilter]
+  );
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -1168,18 +1195,15 @@ const MainTable = () => {
   // ana tablo api isteği için kullanılan useEffect
 
   useEffect(() => {
-    const mergedFilters = { ...(body.filters || {}) };
-    if (arizaActive) mergedFilters.prosedurtipleri = [1];
-    if (onayBekleyenActive) mergedFilters.onaydurumlari = [1];
     fetchEquipmentData({
-      body: { ...body, filters: mergedFilters },
+      body: { ...body, filters: buildMergedFilters(body.filters || {}) },
       page: currentPage,
       size: pageSize,
       sortField,
       sortOrder,
       append: isScrollPageEnabled && currentPage > 1,
     });
-  }, [body, arizaActive, onayBekleyenActive, currentPage, pageSize, sortField, sortOrder, isScrollPageEnabled]);
+  }, [body, buildMergedFilters, currentPage, pageSize, sortField, sortOrder, isScrollPageEnabled]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
@@ -1390,10 +1414,6 @@ const MainTable = () => {
     setSelectedRowKeys([]);
     setSelectedRows([]);
 
-    const mergedFilters = { ...(body.filters || {}) };
-    if (arizaActive) mergedFilters.prosedurtipleri = [1];
-    if (onayBekleyenActive) mergedFilters.onaydurumlari = [1];
-
     if (isScrollPageEnabled) {
       setCurrentPage(1);
       setData([]);
@@ -1402,7 +1422,7 @@ const MainTable = () => {
       setIsFetchingMore(false);
       loadedRowKeysRef.current = new Set();
       fetchEquipmentData({
-        body: { ...body, filters: mergedFilters },
+        body: { ...body, filters: buildMergedFilters(body.filters || {}) },
         page: 1,
         size: pageSize,
         sortField,
@@ -1412,7 +1432,7 @@ const MainTable = () => {
     } else {
       loadedRowKeysRef.current = new Set();
       fetchEquipmentData({
-        body: { ...body, filters: mergedFilters },
+        body: { ...body, filters: buildMergedFilters(body.filters || {}) },
         page: currentPage,
         size: pageSize,
         sortField,
@@ -1420,7 +1440,7 @@ const MainTable = () => {
         append: false,
       });
     }
-  }, [body, currentPage, pageSize, sortField, sortOrder, arizaActive, onayBekleyenActive, isScrollPageEnabled]);
+  }, [body, buildMergedFilters, currentPage, pageSize, sortField, sortOrder, isScrollPageEnabled]);
 
   const handleScrollPageSizeChange = useCallback((value) => {
     const numericValue = Number(value);
@@ -1623,7 +1643,7 @@ const MainTable = () => {
 
       // API'den verileri çekiyoruz
       const { keyword = "", filters = {} } = body || {};
-      const response = await AxiosInstance.post(`GetIsEmriFullListExcel?parametre=${keyword}`, filters);
+      const response = await AxiosInstance.post(`GetIsEmriFullListExcel?parametre=${keyword}`, buildMergedFilters(filters));
       if (response) {
         // Verileri işliyoruz
         const xlsxData = response.map((row) => {
@@ -1841,7 +1861,21 @@ const MainTable = () => {
           {
             title: "Toplam İş Emri",
             value: kpi.Toplam?.Sayi ?? 0,
-            footer: `Açık: ${formatKpiNumber(kpi.Toplam?.Acik)} | Kapalı: ${formatKpiNumber(kpi.Toplam?.Kapali)}`,
+            footer: `${toplamIsEmriFilterLabel} | Açık: ${formatKpiNumber(kpi.Toplam?.Acik)} | Kapalı: ${formatKpiNumber(kpi.Toplam?.Kapali)}`,
+            clickable: true,
+            active: toplamIsEmriCloseFilter !== null,
+            onClick: () => {
+              setToplamIsEmriCloseFilter((prev) => {
+                if (prev === null) {
+                  return 0;
+                }
+                if (prev === 0) {
+                  return 1;
+                }
+                return null;
+              });
+              setCurrentPage(1);
+            },
           },
           {
             title: "Arıza İş Emirleri",
