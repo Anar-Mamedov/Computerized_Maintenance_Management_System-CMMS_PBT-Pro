@@ -130,18 +130,25 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
     }
   };
 
-  const handleModalToggle = async () => {
-    if (!isModalVisible) {
-      const loaded = await fetchProcedures();
-      if (!loaded) {
-        return;
-      }
-      setSelectedRowKeys([]);
-      setSearchTerm("");
-      setIsModalVisible(true);
+  const handleModalOpen = () => {
+    if (!hasValidIsEmriTipi) {
+      message.warning(t("onceIsEmriTipiSeciniz"));
       return;
     }
 
+    if (selectedOption?.IMT_TIP_GRUP === 3 && !makineID) {
+      message.warning(t("onceMakineSeciniz"));
+      return;
+    }
+
+    setSelectedRowKeys([]);
+    setSearchTerm("");
+    setData([]);
+    setIsModalVisible(true);
+    fetchProcedures();
+  };
+
+  const handleModalClose = () => {
     setIsModalVisible(false);
   };
 
@@ -184,8 +191,8 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
 
   return (
     <div>
-      <Button onClick={handleModalToggle}> + </Button>
-      <Modal width={1200} centered title="" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
+      <Button onClick={handleModalOpen}> + </Button>
+      <Modal width={1200} centered title="" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalClose}>
         <Spin spinning={loading}>
           <Input placeholder="Arama..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{ width: "300px", marginBottom: "15px" }} />
           <Table
@@ -197,7 +204,6 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
             }}
             columns={columns}
             dataSource={filteredData}
-            loading={loading}
             scroll={{
               y: "calc(100vh - 360px)",
             }}
