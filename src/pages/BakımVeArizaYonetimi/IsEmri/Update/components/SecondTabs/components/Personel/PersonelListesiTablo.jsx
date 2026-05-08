@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Checkbox, Table } from "antd";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Checkbox, InputNumber, Table, message } from "antd";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
@@ -98,6 +98,10 @@ const PersonnelListWrapper = styled.div`
     font-weight: 600;
   }
 
+  .personnel-list-name-trigger {
+    cursor: pointer;
+  }
+
   .personnel-list-field {
     min-height: 33px;
     padding: 7px 12px;
@@ -107,6 +111,26 @@ const PersonnelListWrapper = styled.div`
     color: #405574;
     line-height: 1.35;
     box-shadow: 0 2px 5px rgba(18, 38, 63, 0.08);
+  }
+
+  .personnel-list-duration-input {
+    width: 100%;
+  }
+
+  .personnel-list-duration-input.ant-input-number {
+    border: 1px solid #dbe4f0;
+    border-radius: 8px;
+    background: #f9fbfe;
+    box-shadow: 0 2px 5px rgba(18, 38, 63, 0.08);
+  }
+
+  .personnel-list-duration-input.ant-input-number-disabled {
+    background: #f5f5f5;
+  }
+
+  .personnel-list-duration-input .ant-input-number-input {
+    color: #405574;
+    text-align: center;
   }
 
   .personnel-list-cost {
@@ -156,6 +180,8 @@ export default function PersonelListesiTablo({ isActive, assignmentRequestKey })
   const [selectedRows, setSelectedRows] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
+  const [savingDurationKeys, setSavingDurationKeys] = useState([]);
+  const durationBeforeEditRef = useRef({});
 
   const kapali = watch("kapali");
   const calismaSaat = Number(watch("calismaSaat") || 0);
@@ -166,11 +192,6 @@ export default function PersonelListesiTablo({ isActive, assignmentRequestKey })
   const getEmptyText = (value) => {
     if (value === null || value === undefined || value === "") return "-";
     return value;
-  };
-
-  const formatDuration = (value) => {
-    if (value === null || value === undefined || value === "") return "-";
-    return `${value} ${t("workOrder.personnelList.minuteShort")}`;
   };
 
   const formatOvertimeDuration = (value) => {
@@ -196,6 +217,102 @@ export default function PersonelListesiTablo({ isActive, assignmentRequestKey })
     return `${formattedAmount} TL`;
   };
 
+  const updateDurationValue = useCallback((rowKey, value) => {
+    setData((prevData) =>
+      prevData.map((item) =>
+        item.key === rowKey
+          ? {
+              ...item,
+              IDK_SURE: value ?? 0,
+            }
+          : item
+      )
+    );
+  }, []);
+
+  const createUpdateBody = useCallback((item) => {
+    return {
+      TB_ISEMRI_KAYNAK_ID: item.TB_ISEMRI_KAYNAK_ID,
+      IDK_REF_ID: item.IDK_PERSONEL_ID,
+      IDK_SURE: Number(item.IDK_SURE || 0),
+      IDK_SAAT_UCRETI: item.IDK_SAAT_UCRETI ?? "",
+      IDK_MALIYET: item.IDK_MALIYET ?? "",
+      IDK_FAZLA_MESAI_VAR: normalizeBoolean(item.IDK_FAZLA_MESAI_VAR),
+      IDK_FAZLA_MESAI_SURE: item.IDK_FAZLA_MESAI_SURE ?? "",
+      IDK_FAZLA_MESAI_SAAT_UCRETI: item.IDK_FAZLA_MESAI_SAAT_UCRETI ?? "",
+      IDK_MASRAF_MERKEZI_ID: item.IDK_MASRAF_MERKEZI_ID ?? "",
+      IDK_VARDIYA: item.IDK_VARDIYA ?? "",
+      IDK_ACIKLAMA: item.IDK_ACIKLAMA ?? "",
+      IDK_TARIH: item.IDK_TARIH ?? "",
+      IDK_SAAT: item.IDK_SAAT ?? "",
+    };
+  }, []);
+
+  const fetch = useCallback(() => {
+    if (isActive) {
+      setLoading(true);
+      AxiosInstance.get(`IsEmriPersonelList?isemriID=${secilenIsEmriID}`)
+        .then((response) => {
+          const responseData = Array.isArray(response) ? response : response?.data || [];
+          const fetchedData = responseData.map(normalizePersonnelItem);
+          setData(fetchedData);
+          setSelectedRowKeys([]);
+          setSelectedRows([]);
+        })
+        .catch((error) => {
+          console.error("API isteği sırasında hata oluştu:", error);
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [secilenIsEmriID, isActive]);
+
+  const refreshTable = useCallback(() => {
+    fetch();
+  }, [fetch]);
+
+  const handleDurationSave = useCallback(
+    async (rowKey) => {
+      const currentRow = data.find((item) => item.key === rowKey);
+      const initialValue = Number(durationBeforeEditRef.current[rowKey] ?? currentRow?.IDK_SURE ?? 0);
+
+      if (!currentRow) return;
+
+      const currentValue = Number(currentRow.IDK_SURE || 0);
+
+      if (currentValue === initialValue) {
+        return;
+      }
+
+      setSavingDurationKeys((prev) => [...prev, rowKey]);
+
+      try {
+        const response = await AxiosInstance.post(`AddUpdateIsEmriPersonel?isEmriId=${secilenIsEmriID}`, createUpdateBody(currentRow));
+
+        if (response?.status_code === 200 || response?.status_code === 201) {
+          message.success(t("islemBasarili"));
+          refreshTable();
+          durationBeforeEditRef.current[rowKey] = currentValue;
+          return;
+        }
+
+        if (response?.status_code === 401) {
+          message.error(t("workOrder.personnelList.noPermission"));
+        } else {
+          message.error(t("islemBasarisiz"));
+        }
+
+        updateDurationValue(rowKey, initialValue);
+      } catch (error) {
+        console.error("Personel süresi güncellenemedi:", error);
+        updateDurationValue(rowKey, initialValue);
+        message.error(t("islemBasarisiz"));
+      } finally {
+        setSavingDurationKeys((prev) => prev.filter((item) => item !== rowKey));
+      }
+    },
+    [createUpdateBody, data, refreshTable, secilenIsEmriID, t, updateDurationValue]
+  );
+
   const columns = [
     {
       title: t("workOrder.personnelList.no"),
@@ -210,7 +327,11 @@ export default function PersonelListesiTablo({ isActive, assignmentRequestKey })
       key: "IDK_ISIM",
       width: 300,
       ellipsis: true,
-      render: (text) => <span className="personnel-list-name">{getEmptyText(text)}</span>,
+      render: (text, record) => (
+        <span className="personnel-list-name personnel-list-name-trigger" onClick={() => onRowClick(record)}>
+          {getEmptyText(text)}
+        </span>
+      ),
     },
     {
       title: t("workOrder.personnelList.role"),
@@ -231,7 +352,29 @@ export default function PersonelListesiTablo({ isActive, assignmentRequestKey })
       dataIndex: "IDK_SURE",
       key: "IDK_SURE",
       width: 120,
-      render: (text) => <div className="personnel-list-field">{formatDuration(text)}</div>,
+      render: (text, record) => (
+        <div onClick={(event) => event.stopPropagation()} onMouseDown={(event) => event.stopPropagation()}>
+          <InputNumber
+            min={0}
+            precision={0}
+            controls={false}
+            value={Number(text || 0)}
+            disabled={kapali || savingDurationKeys.includes(record.key)}
+            className="personnel-list-duration-input"
+            formatter={(value) => (value === null || value === undefined || value === "" ? "" : `${value} ${t("workOrder.personnelList.minuteShort")}`)}
+            parser={(value) => (value || "").replace(/[^\d]/g, "")}
+            onFocus={(event) => {
+              event.stopPropagation();
+              durationBeforeEditRef.current[record.key] = Number(record.IDK_SURE || 0);
+            }}
+            onClick={(event) => event.stopPropagation()}
+            onKeyDown={(event) => event.stopPropagation()}
+            onChange={(value) => updateDurationValue(record.key, value)}
+            onPressEnter={(event) => event?.target?.blur?.()}
+            onBlur={() => handleDurationSave(record.key)}
+          />
+        </div>
+      ),
     },
     {
       title: t("workOrder.personnelList.overtime"),
@@ -259,28 +402,6 @@ export default function PersonelListesiTablo({ isActive, assignmentRequestKey })
       render: (text) => <div className="personnel-list-field personnel-list-cost">{formatCost(text)}</div>,
     },
   ];
-
-  const fetch = useCallback(() => {
-    if (isActive) {
-      setLoading(true);
-      AxiosInstance.get(`IsEmriPersonelList?isemriID=${secilenIsEmriID}`)
-        .then((response) => {
-          const responseData = Array.isArray(response) ? response : response?.data || [];
-          const fetchedData = responseData.map(normalizePersonnelItem);
-          setData(fetchedData);
-          setSelectedRowKeys([]);
-          setSelectedRows([]);
-        })
-        .catch((error) => {
-          console.error("API isteği sırasında hata oluştu:", error);
-        })
-        .finally(() => setLoading(false));
-    }
-  }, [secilenIsEmriID, isActive]);
-
-  const refreshTable = useCallback(() => {
-    fetch();
-  }, [fetch]);
 
   useEffect(() => {
     if (secilenIsEmriID) {
@@ -327,9 +448,6 @@ export default function PersonelListesiTablo({ isActive, assignmentRequestKey })
             selectedRowKeys,
             onChange: onRowSelectChange,
           }}
-          onRow={(record) => ({
-            onClick: () => onRowClick(record),
-          })}
           columns={columns}
           dataSource={data}
           loading={loading}

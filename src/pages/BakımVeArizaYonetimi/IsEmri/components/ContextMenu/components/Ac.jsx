@@ -1,14 +1,13 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs, message } from "antd";
+import React, { useState } from "react";
+import { message, Modal, Typography } from "antd";
 import { PlayCircleOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../api/http";
-import { Controller, useForm, FormProvider } from "react-hook-form";
-import dayjs from "dayjs";
+import { FormProvider, useForm } from "react-hook-form";
 import AcilisNedeni from "./IsEmriAcma/AcilisNedeni.jsx";
 import DurumSelect from "./IsEmriAcma/DurumSelect.jsx";
 import MenuItem from "./MenuItem";
 
-const { Text, Link } = Typography;
+const { Text } = Typography;
 
 export default function IsEmriSilme({ selectedRows, refreshTableData, disabled, hidePopover }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -23,17 +22,10 @@ export default function IsEmriSilme({ selectedRows, refreshTableData, disabled, 
     },
   });
 
-  const { setValue, reset, handleSubmit } = methods;
-
-  const formatDateWithDayjs = (dateString) => {
-    const formattedDate = dayjs(dateString);
-    return formattedDate.isValid() ? formattedDate.format("YYYY-MM-DD") : "";
-  };
-
-  const formatTimeWithDayjs = (timeObj) => {
-    const formattedTime = dayjs(timeObj);
-    return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
-  };
+  const { reset } = methods;
+  const acilisNedeniID = methods.watch("acilisNedeniID");
+  const isEmriDurum1ID = methods.watch("isEmriDurum1ID");
+  const isSubmitDisabled = !acilisNedeniID || !isEmriDurum1ID;
 
   // Modalı açma ve kapama işlevi
   const handleModalToggle = () => {
@@ -46,6 +38,11 @@ export default function IsEmriSilme({ selectedRows, refreshTableData, disabled, 
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi
 
   const onSubmited = (data) => {
+    if (!data.acilisNedeniID || !data.isEmriDurum1ID) {
+      message.error("Alan Boş Bırakılamaz");
+      return;
+    }
+
     // If selectedRows contains only one row
     const row = selectedRows[0];
 
@@ -91,7 +88,16 @@ export default function IsEmriSilme({ selectedRows, refreshTableData, disabled, 
           onClick={handleModalToggle}
         />
 
-        <Modal width="500px" title="Seçili İş Emrini Aç" destroyOnClose centered open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
+        <Modal
+          width="500px"
+          title="Seçili İş Emrini Aç"
+          destroyOnClose
+          centered
+          open={isModalVisible}
+          onOk={methods.handleSubmit(onSubmited)}
+          onCancel={handleModalToggle}
+          okButtonProps={{ disabled: isSubmitDisabled }}
+        >
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <div
               style={{
@@ -101,7 +107,7 @@ export default function IsEmriSilme({ selectedRows, refreshTableData, disabled, 
                 justifyContent: "space-between",
               }}
             >
-              <Text style={{ fontSize: "14px" }}>Açılış Nedeni:</Text>
+              <Text style={{ fontSize: "14px", fontWeight: 700 }}>Açılış Nedeni:</Text>
               <AcilisNedeni />
             </div>
             <div
@@ -112,7 +118,7 @@ export default function IsEmriSilme({ selectedRows, refreshTableData, disabled, 
                 justifyContent: "space-between",
               }}
             >
-              <Text style={{ fontSize: "14px" }}>Yeni Durum:</Text>
+              <Text style={{ fontSize: "14px", fontWeight: 700 }}>Yeni Durum:</Text>
               <DurumSelect />
             </div>
           </form>

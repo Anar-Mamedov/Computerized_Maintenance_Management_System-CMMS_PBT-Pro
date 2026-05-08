@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
-import { Button, InputNumber, message, Modal, Select, Table } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { Button, Input, InputNumber, message, Modal, Select, Table } from "antd";
+import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import AxiosInstance from "../../../../../../../../../../api/http";
+import { formatNumberWithSeparators, getNumberSeparatorsByLanguage, parseLocalizedNumber } from "../../../../../../../../../../utils/numberLocale";
 
 const normalizeNumber = (value) => {
   const number = Number(value);
@@ -46,7 +47,7 @@ const normalizeStockMaterial = (item) => {
 };
 
 export default function MalzemeTablo({ kapali, onRefresh, secilenIsEmriID, triggerButtonText, triggerButtonClassName, triggerContainerClassName }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [depotOptions, setDepotOptions] = useState([]);
   const [selectedDepotId, setSelectedDepotId] = useState();
@@ -54,9 +55,12 @@ export default function MalzemeTablo({ kapali, onRefresh, secilenIsEmriID, trigg
   const [selectedRows, setSelectedRows] = useState([]);
   const [quantities, setQuantities] = useState({});
   const [data, setData] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [loadingDepots, setLoadingDepots] = useState(false);
   const [loadingMaterials, setLoadingMaterials] = useState(false);
   const [saving, setSaving] = useState(false);
+  const currentLang = localStorage.getItem("i18nextLng") || i18n.language || "en";
+  const { decimal } = getNumberSeparatorsByLanguage(currentLang);
 
   const fetchDepots = useCallback(() => {
     setLoadingDepots(true);
@@ -112,6 +116,7 @@ export default function MalzemeTablo({ kapali, onRefresh, secilenIsEmriID, trigg
       setSelectedRows([]);
       setQuantities({});
       setData([]);
+      setSearchTerm("");
     }
   };
 
@@ -132,6 +137,23 @@ export default function MalzemeTablo({ kapali, onRefresh, secilenIsEmriID, trigg
   const updateQuantity = (record, value) => {
     setQuantities((currentQuantities) => ({ ...currentQuantities, [record.key]: normalizeNumber(value) }));
   };
+
+  const filteredData = useMemo(() => {
+    const normalizedSearch = searchTerm.trim().toLocaleLowerCase(currentLang);
+
+    if (!normalizedSearch) {
+      return data;
+    }
+
+    return data.filter((item) => {
+      const searchableText = [item.code, item.name, item.unit]
+        .filter(Boolean)
+        .join(" ")
+        .toLocaleLowerCase(currentLang);
+
+      return searchableText.includes(normalizedSearch);
+    });
+  }, [currentLang, data, searchTerm]);
 
   const handleSave = async () => {
     if (!selectedDepotId) {
@@ -216,6 +238,7 @@ export default function MalzemeTablo({ kapali, onRefresh, secilenIsEmriID, trigg
       key: "currentStock",
       width: 120,
       ellipsis: true,
+      render: (value) => formatNumberWithSeparators(value, currentLang),
     },
     {
       title: t("workOrder.materialList.unitPrice"),
@@ -223,13 +246,24 @@ export default function MalzemeTablo({ kapali, onRefresh, secilenIsEmriID, trigg
       key: "unitPrice",
       width: 130,
       ellipsis: true,
+      render: (value) => formatNumberWithSeparators(value, currentLang),
     },
     {
       title: t("workOrder.materialList.quantity"),
       dataIndex: "quantity",
       key: "quantity",
       width: 130,
-      render: (_, record) => <InputNumber min={0} style={{ width: "100%" }} value={quantities[record.key] || 1} onChange={(value) => updateQuantity(record, value)} />,
+      render: (_, record) => (
+        <InputNumber
+          min={0}
+          style={{ width: "100%" }}
+          value={quantities[record.key] || 1}
+          onChange={(value) => updateQuantity(record, value)}
+          formatter={(value) => formatNumberWithSeparators(value, currentLang)}
+          parser={(value) => parseLocalizedNumber(value, currentLang)}
+          decimalSeparator={decimal}
+        />
+      ),
     },
   ];
 
@@ -250,22 +284,33 @@ export default function MalzemeTablo({ kapali, onRefresh, secilenIsEmriID, trigg
         onOk={handleSave}
         onCancel={handleModalToggle}
       >
-        <Select
-          allowClear
-          showSearch
-          loading={loadingDepots}
-          value={selectedDepotId}
-          options={depotOptions}
-          optionFilterProp="label"
-          placeholder={t("workOrder.materialList.chooseWarehouse")}
-          style={{ width: 320, marginBottom: 12 }}
-          onChange={(value) => {
-            setSelectedDepotId(value);
-            setSelectedRowKeys([]);
-            setSelectedRows([]);
-            setQuantities({});
-          }}
-        />
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 12 }}>
+          <Select
+            allowClear
+            showSearch
+            loading={loadingDepots}
+            value={selectedDepotId}
+            options={depotOptions}
+            optionFilterProp="label"
+            placeholder={t("workOrder.materialList.chooseWarehouse")}
+            style={{ width: 320 }}
+            onChange={(value) => {
+              setSelectedDepotId(value);
+              setSelectedRowKeys([]);
+              setSelectedRows([]);
+              setQuantities({});
+              setSearchTerm("");
+            }}
+          />
+          <Input
+            allowClear
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            placeholder={t("workOrder.materialList.searchPlaceholder")}
+            prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
+            style={{ width: 320 }}
+          />
+        </div>
         <Table
           rowSelection={{
             selectedRowKeys,
@@ -277,7 +322,7 @@ export default function MalzemeTablo({ kapali, onRefresh, secilenIsEmriID, trigg
             position: ["bottomRight"],
           }}
           columns={columns}
-          dataSource={data}
+          dataSource={filteredData}
           loading={loadingMaterials}
           scroll={{
             x: 890,

@@ -32,6 +32,9 @@ const normalizeMaterial = (item) => ({
   key: item.TB_STOK_ID ?? item.Id ?? item.STOK_ID ?? item.STK_ID,
   code: item.STK_KOD ?? item.Kod ?? item.StokKod ?? "",
   name: item.STK_TANIM ?? item.MalzemeAdi ?? item.StokTanim ?? "",
+  unitId: item.STK_BIRIM_KOD_ID ?? item.BirimId ?? item.BirimID ?? item.BirimKodId ?? null,
+  unit: item.STK_BIRIM ?? item.Birim ?? "",
+  unitPrice: normalizeNumber(item.BirimFiyat ?? item.STK_GIRIS_FIYAT_DEGERI ?? item.STK_MALIYET ?? item.Fiyat),
 });
 
 export default function CreateModal({ kapali, onRefresh, secilenIsEmriID, triggerButtonText, triggerButtonType = "link", triggerButtonClassName, triggerContainerClassName }) {
@@ -99,6 +102,12 @@ export default function CreateModal({ kapali, onRefresh, secilenIsEmriID, trigge
     }
 
     updateField("materialName", selectedMaterial.name);
+    updateField("unit", selectedMaterial.unit ?? "");
+    updateField("unitPrice", selectedMaterial.unitPrice ?? 0);
+    unitMethods.reset({
+      unitCode: selectedMaterial.unit ?? null,
+      unitCodeID: selectedMaterial.unitId ?? "",
+    });
     setIsMaterialModalVisible(false);
   };
 

@@ -14,6 +14,8 @@ export default function EkipmanTablo({
   ekipmanFieldName = "anaEkipmanTanim",
   ekipmanIdFieldName = "anaEkipmanID",
   isRequired = false,
+  requireMakineSelection = false,
+  makineIdFieldName = "makineID",
 }) {
   const {
     control,
@@ -27,6 +29,7 @@ export default function EkipmanTablo({
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
+  const selectedMakineId = watch(makineIdFieldName);
 
   const columns = [
     {
@@ -64,6 +67,7 @@ export default function EkipmanTablo({
         DepoId: -1,
         Parametre: parameter,
         parentID: 0,
+        MakineId: Number(selectedMakineId) || -1,
       });
       if (response) {
         const dataList = Array.isArray(response) ? response : response.list || [];
@@ -98,6 +102,7 @@ export default function EkipmanTablo({
         DepoId: -1,
         Parametre: searchTerm, // Current search filter context
         parentID: record.key,
+        MakineId: Number(selectedMakineId) || -1,
       })
         .then((response) => {
           if (response) {
@@ -145,6 +150,11 @@ export default function EkipmanTablo({
   };
 
   const handleModalToggle = () => {
+    if (!isModalVisible && requireMakineSelection && !selectedMakineId) {
+      message.warning(t("onceMakineSeciniz"));
+      return;
+    }
+
     setIsModalVisible((prev) => !prev);
     if (!isModalVisible) {
       // Opening
@@ -185,6 +195,7 @@ export default function EkipmanTablo({
   };
 
   const ekipmanValue = watch(ekipmanFieldName);
+  const isSelectionDisabled = disabled || (requireMakineSelection && !selectedMakineId);
 
   return (
     <div style={{ width: "100%" }}>
@@ -205,8 +216,8 @@ export default function EkipmanTablo({
                   <CloseOutlined style={{ color: "#8c8c8c", cursor: "pointer", fontSize: "12px" }} onClick={handleLokasyonMinusClick} />
                 ) : (
                   <PlusOutlined
-                    style={{ color: disabled ? "#d9d9d9" : "#0091ff", cursor: disabled ? "not-allowed" : "pointer", fontSize: "12px" }}
-                    onClick={disabled ? undefined : handleModalToggle}
+                    style={{ color: isSelectionDisabled ? "#d9d9d9" : "#0091ff", cursor: isSelectionDisabled ? "not-allowed" : "pointer", fontSize: "12px" }}
+                    onClick={isSelectionDisabled ? undefined : handleModalToggle}
                   />
                 )
               }
@@ -259,4 +270,6 @@ EkipmanTablo.propTypes = {
   ekipmanFieldName: PropTypes.string,
   ekipmanIdFieldName: PropTypes.string,
   isRequired: PropTypes.bool,
+  requireMakineSelection: PropTypes.bool,
+  makineIdFieldName: PropTypes.string,
 };

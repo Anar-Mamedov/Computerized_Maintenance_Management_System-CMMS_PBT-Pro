@@ -134,6 +134,7 @@ const MainTable = ({
   disabled = false,
   onClear,
   isRequired = false,
+  includeAtolyeFilter = true,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalVisible1, setIsModalVisible1] = useState(false);
@@ -1303,8 +1304,9 @@ const MainTable = ({
     try {
       setLoading(true);
       // API isteğinde keyword ve currentPage kullanılıyor
+      const atolyeFilterQuery = includeAtolyeFilter ? `&atolyeId=${watch("atolyeID") || 0}` : "";
       const response = await AxiosInstance.post(
-        `GetMakineFullList?pagingDeger=${page}&pageSize=${size}&lokasyonId=${lokasyonID}&parametre=${keyword}&atolyeId=${watch("atolyeID") || 0}`,
+        `GetMakineFullList?pagingDeger=${page}&pageSize=${size}&lokasyonId=${lokasyonID}&parametre=${keyword}${atolyeFilterQuery}`,
         filters
       );
       if (response) {
@@ -1788,6 +1790,7 @@ MainTable.propTypes = {
   disabled: PropTypes.bool,
   onClear: PropTypes.func,
   isRequired: PropTypes.bool,
+  includeAtolyeFilter: PropTypes.bool,
 };
 
 export default MainTable;

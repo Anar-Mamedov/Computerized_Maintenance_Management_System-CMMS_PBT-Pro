@@ -578,6 +578,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                     makineFieldName="makine"
                     makineIdFieldName="makineID"
                     isRequired={fieldRequirements.makine}
+                    includeAtolyeFilter={false}
                     onSubmit={(selectedData) => {
                       setValue("makine", selectedData.MKN_KOD);
                       setValue("makineID", selectedData.key);
@@ -627,6 +628,8 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                     ekipmanFieldName="ekipman"
                     ekipmanIdFieldName="ekipmanID"
                     isRequired={fieldRequirements.ekipman}
+                    requireMakineSelection={true}
+                    makineIdFieldName="makineID"
                     onSubmit={(selectedData) => {
                       setValue("ekipman", selectedData.EKP_KOD || selectedData.kod || "");
                       setValue("ekipmanID", selectedData.key);

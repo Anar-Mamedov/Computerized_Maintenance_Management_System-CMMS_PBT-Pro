@@ -8,7 +8,6 @@ import PersonelListesiTablo from "./components/Personel/PersonelListesiTablo";
 import MalzemeListesiTablo from "./components/Malzeme/MalzemeListesiTablo";
 import DuruslarListesiTablo from "./components/Duruslar/DuruslarListesiTablo";
 import OlcumDegerleriListesiTablo from "./components/OlcumDegerleri/OlcumDegerleriListesiTablo";
-import AracGereclerListesiTablo from "./components/AracGerecler/AracGereclerListesiTablo";
 import SureBilgileri from "./components/SureBilgileri/SureBilgileri";
 import Maliyetler from "./components/Maliyetler/Maliyetler";
 import Notlar from "./components/Notlar/Notlar";
@@ -101,11 +100,11 @@ export default function SecondTabs({ refreshKey, fieldRequirements, assignmentRe
       label: dataCount.IsEmriOlcumListSayisi >= 1 ? `Ölçüm Değerleri (${dataCount.IsEmriOlcumListSayisi})` : "Ölçüm Değerleri",
       children: <OlcumDegerleriListesiTablo isActive={activeTabKey === "8"} fieldRequirements={fieldRequirements} />,
     },
-    {
-      key: "9",
-      label: dataCount.IsEmriAracGerevListSayisi >= 1 ? `Araç & Gereçler (${dataCount.IsEmriAracGerevListSayisi})` : "Araç & Gereçler",
-      children: <AracGereclerListesiTablo isActive={activeTabKey === "9"} fieldRequirements={fieldRequirements} />,
-    },
+    // {
+    //   key: "9",
+    //   label: dataCount.IsEmriAracGerevListSayisi >= 1 ? `Araç & Gereçler (${dataCount.IsEmriAracGerevListSayisi})` : "Araç & Gereçler",
+    //   children: <AracGereclerListesiTablo isActive={activeTabKey === "9"} fieldRequirements={fieldRequirements} />,
+    // },
     {
       key: "10",
       label: "Özel Alanlar",

@@ -268,6 +268,8 @@ export default function KontrolListesiTablo({ isActive }) {
     { value: 0, label: t("workOrder.controlList.waiting") },
     { value: 1, label: t("workOrder.controlList.completed") },
     { value: 2, label: t("workOrder.controlList.critical") },
+    { value: 3, label: t("workOrder.controlList.inProgress") },
+    { value: 4, label: t("workOrder.controlList.failed") },
   ];
 
   const buildChecklistPayload = (item, status = item.DKN_YAPILDI) => ({
