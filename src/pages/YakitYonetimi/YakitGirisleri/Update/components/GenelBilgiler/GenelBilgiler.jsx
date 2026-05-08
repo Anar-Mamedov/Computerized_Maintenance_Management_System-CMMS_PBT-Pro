@@ -160,21 +160,33 @@ export default function SecondTabs() {
           />
           </Col>
           <Col span={8}>
-            <Text style={labelStyle} strong>{t("Yakıt Tipi")} <span style={{ color: "red" }}>*</span></Text>
-            <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-              <div style={{ flex: 1 }}>
-                {/* YAKIT TİPİ GÜNCELLENDİ (JSON'a göre TB_STOK_ID ve YAKIT_TANIM eşleştirildi) */}
-                <Controller
-                name="YakitTipId"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    options={yakitTipleri.map(item => ({ value: item.TB_STOK_ID, label: item.YAKIT_TANIM }))}
-                    style={{ width: "100%" }}
+            <Text style={labelStyle} strong>
+              {t("Yakıt Tipi")} <span style={{ color: "red" }}>*</span>
+            </Text>
+            <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+                <div style={{ flex: 1 }}>
+                  <Controller
+                    name="YakitTipId"
+                    control={control}
+                    rules={{ required: t("alanBosBirakilamaz") }}
+                    render={({ fieldState: { error } }) => (
+                      <>
+                        <KodIDSelectbox
+                          name1="YakitTipAdi"
+                          kodID={35600}
+                          placeholder={t("Yakıt Tipi Seçiniz")}
+                          disabled={false}
+                        />
+                        {error && (
+                          <small style={{ color: "red", fontSize: "14px", marginTop: "4px", display: "block" }}>
+                            {error.message}
+                          </small>
+                        )}
+                      </>
+                    )}
                   />
-                )}
-              />
+                </div>
               </div>
             </div>
           </Col>

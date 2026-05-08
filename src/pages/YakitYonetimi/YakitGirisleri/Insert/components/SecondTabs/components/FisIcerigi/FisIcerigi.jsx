@@ -102,7 +102,8 @@ export default function SecondTabs() {
             setValue("_sayacZorunlu", d.SayacTakibiZorunlu);
             setValue("_sayacBirimi", d.SayacBirimi);
             setValue("_guncelSayacDegeri", d.GuncelSayacDegeri);
-            setValue("YakitTipId", d.YakitTipId, { shouldValidate: true });
+            setValue("YakitTipId", d.YakitTipId);
+            setValue("YakitTipAdi", d.YakitTipAdi);
           }
         })
         .catch(() => message.error(t("Araç bilgileri alınamadı.")));
@@ -194,45 +195,36 @@ export default function SecondTabs() {
   />
 </Col>
           <Col span={8}>
-    <Text style={labelStyle} strong>{t("Yakıt Tipi")} <span style={{ color: "red" }}>*</span></Text>
-    <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-        <div style={{ flex: 1 }}>
-          <Controller
-            name="YakitTipId"
-            control={control}
-            rules={{ required: t("alanBosBirakilamaz") }}
-            render={({ field, fieldState: { error } }) => (
-              <>
-                <Select
-                  {...field}
-                  showSearch
-                  allowClear
-                  status={error ? "error" : ""}
-                  loading={yakitTipleriLoading}
-                  placeholder={t("Seçiniz")}
-                  optionFilterProp="label"
-                  filterOption={(input, option) =>
-                    (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
-                  }
-                  options={yakitTipleri.map((item) => ({
-                    value: item.TB_STOK_ID,
-                    label: item.YAKIT_TANIM,
-                  }))}
-                  style={{ width: "100%" }}
-                />
-                {error && (
-                  <small style={{ color: "red", fontSize: "14px", marginTop: "4px", display: "block" }}>
-                    {error.message}
-                  </small>
-                )}
-              </>
-            )}
-          />
-        </div>
+  <Text style={labelStyle} strong>
+    {t("Yakıt Tipi")} <span style={{ color: "red" }}>*</span>
+  </Text>
+  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+      <div style={{ flex: 1 }}>
+        <Controller
+          name="YakitTipId"
+          control={control}
+          rules={{ required: t("alanBosBirakilamaz") }}
+          render={({ fieldState: { error } }) => (
+            <>
+              <KodIDSelectbox
+                name1="YakitTipAdi"
+                kodID={35600}
+                placeholder={t("Yakıt Tipi Seçiniz")}
+                disabled={false}
+              />
+              {error && (
+                <small style={{ color: "red", fontSize: "14px", marginTop: "4px", display: "block" }}>
+                  {error.message}
+                </small>
+              )}
+            </>
+          )}
+        />
       </div>
     </div>
-  </Col>
+  </div>
+</Col>
 
   <Col span={4}>
     <Text style={labelStyle} strong>{t("Tarih")} <span style={{ color: "red" }}>*</span></Text>

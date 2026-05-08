@@ -19,9 +19,22 @@ const YakitGirisModal = ({ visible, onClose, onRefresh, selectedRows }) => {
   useEffect(() => {
     if (visible) {
       fetchDepoListesi();
-      setFormData({ TarihSaat: dayjs(), Miktar: 0, HedefDepoId: null, BelgeNo: "", Aciklama: "" });
+
+      // --- KANKA KRİTİK NOKTA BURASI ---
+      // Eğer dışarıdan (tablodan) seçili satır gelmişse ID'yi al, yoksa null bırak
+      const initialDepoId = (selectedRows && selectedRows.length > 0) 
+        ? selectedRows[0].TB_DEPO_ID  // Tablodaki kolon adın neyse o (ID alanı)
+        : null;
+
+      setFormData({ 
+        TarihSaat: dayjs(), 
+        Miktar: 0, 
+        HedefDepoId: initialDepoId, // Otomatik seçim burada yapılıyor
+        BelgeNo: "", 
+        Aciklama: "" 
+      });
     }
-  }, [visible]);
+  }, [visible, selectedRows]);
 
   const fetchDepoListesi = async () => {
   try {
@@ -78,8 +91,17 @@ const YakitGirisModal = ({ visible, onClose, onRefresh, selectedRows }) => {
       footer={[<Button key="b" onClick={onClose}>Vazgeç</Button>, <Button key="s" type="primary" loading={loading} onClick={handleSave}>Kaydet</Button>]}
     >
       <Row gutter={[16, 16]}>
-        <Col span={24}><Text strong>Hedef Tank</Text>
-          <Select style={{ width: "100%", marginTop: "5px" }} placeholder="Seçiniz..." value={formData.HedefDepoId} onChange={(val) => setFormData({...formData, HedefDepoId: val})} options={depolar} />
+        <Col span={24}>
+          <Text strong>İşlem Yapılan Depo / Tank</Text>
+          <Select 
+            style={{ width: "100%", marginTop: "5px" }} 
+            placeholder="Seçiniz..." 
+            showSearch // Aramayı açtım, rahat bulursun
+            optionFilterProp="label"
+            value={formData.HedefDepoId} 
+            onChange={(val) => setFormData({...formData, HedefDepoId: val})} 
+            options={depolar} 
+          />
         </Col>
         <Col span={12}><Text strong>Tarih / Saat</Text>
           <DatePicker showTime style={{ width: "100%", marginTop: "5px" }} value={formData.TarihSaat} onChange={(val) => setFormData({...formData, TarihSaat: val})} format="DD.MM.YYYY HH:mm" />

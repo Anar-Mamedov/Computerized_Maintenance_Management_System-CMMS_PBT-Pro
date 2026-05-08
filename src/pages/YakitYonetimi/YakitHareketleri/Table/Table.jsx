@@ -301,22 +301,26 @@ const MainTable = () => {
     },
     {
   title: "Ekipman / Araç",
-  dataIndex: "EkipmanKod", 
+  dataIndex: "EkipmanKod", // JSON'daki field ismi
   key: "EkipmanKod",
   width: 300,
   ellipsis: true,
-  visible: true,
-  render: (value, record) => (
-    <div style={{ display: "flex", flexDirection: "column", lineHeight: "1.2" }}>
-      <span style={{ fontWeight: 600 }}>
-          {value?.EkipmanKod || "-"}
-      </span>
-      <Text type="secondary" style={{ fontSize: "12px" }}>
-        {value?.EkipmanTanim || "-"}
-      </Text>
-    </div>
-  ),
-  sorter: (a, b) => (a.Ekipman?.Kod || "").localeCompare(b.Ekipman?.Kod || ""),
+  render: (text, record) => {
+    // Eğer EkipmanKod "-" ise boş gösterelim veya sadece çizgiyi basalım
+    if (text === "-") return <Text type="secondary">-</Text>;
+    
+    return (
+      <div style={{ display: "flex", flexDirection: "column", lineHeight: "1.2" }}>
+        <span style={{ fontWeight: 600 }}>
+          {text} {/* JSON'daki EkipmanKod buraya text olarak düşer */}
+        </span>
+        <Text type="secondary" style={{ fontSize: "12px" }}>
+          {record.EkipmanTanim} {/* Tanımı record üzerinden alıyoruz */}
+        </Text>
+      </div>
+    );
+  },
+  sorter: (a, b) => (a.EkipmanKod || "").localeCompare(b.EkipmanKod || ""),
 },
     {
       title: "Miktar",

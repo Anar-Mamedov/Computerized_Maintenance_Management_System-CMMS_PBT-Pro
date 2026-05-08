@@ -493,17 +493,18 @@ const MainTable = () => {
   // sayfalama için kullanılan useEffect son
 
   const onSelectChange = (newSelectedRowKeys) => {
-    setSelectedRowKeys(newSelectedRowKeys);
-    if (newSelectedRowKeys.length > 0) {
-      setValue("selectedLokasyonId", newSelectedRowKeys[0]);
-    } else {
-      setValue("selectedLokasyonId", null);
-    }
-    // Seçilen satırların verisini bul
-    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
-    setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
-    console.log("Seçilen Satırlar:", newSelectedRows);
-  };
+  setSelectedRowKeys(newSelectedRowKeys);
+  
+  // Seçilen satırların tüm verisini bul
+  const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
+  setSelectedRows(newSelectedRows); 
+  
+  if (newSelectedRowKeys.length > 0) {
+    setValue("selectedLokasyonId", newSelectedRowKeys[0]);
+  } else {
+    setValue("selectedLokasyonId", null);
+  }
+};
 
   const rowSelection = {
     type: "checkbox",
