@@ -205,6 +205,16 @@ const MainTable = () => {
     [arizaActive, onayBekleyenActive, toplamIsEmriCloseFilter]
   );
 
+  const splitCloseFilterFromRequest = useCallback((filters = {}) => {
+    const requestFilters = { ...filters };
+    const isClose = requestFilters.isClose;
+    delete requestFilters.isClose;
+
+    const isCloseQuery = isClose === 0 || isClose === 1 ? `&isClose=${isClose}` : "";
+
+    return { requestFilters, isCloseQuery };
+  }, []);
+
   useEffect(() => {
     if (typeof window === "undefined") {
       return;
@@ -1233,6 +1243,7 @@ const MainTable = () => {
     const { keyword = "", filters = {} } = requestBody || {};
     const targetPage = page || 1;
     const targetSize = size || pageSize;
+    const { requestFilters, isCloseQuery } = splitCloseFilterFromRequest(filters);
 
     if (!append) {
       loadedRowKeysRef.current = new Set();
@@ -1265,7 +1276,10 @@ const MainTable = () => {
 
     try {
       startLoading();
-      const response = await AxiosInstance.post(`getIsEmriFullList?parametre=${keyword}&pagingDeger=${targetPage}&pageSize=${targetSize}${sortParam}`, filters);
+      const response = await AxiosInstance.post(
+        `getIsEmriFullList?parametre=${keyword}&pagingDeger=${targetPage}&pageSize=${targetSize}${sortParam}${isCloseQuery}`,
+        requestFilters
+      );
       if (response) {
         if (response.status_code === 401) {
           message.error(t("buSayfayaErisimYetkinizBulunmamaktadir"));
@@ -1643,7 +1657,9 @@ const MainTable = () => {
 
       // API'den verileri çekiyoruz
       const { keyword = "", filters = {} } = body || {};
-      const response = await AxiosInstance.post(`GetIsEmriFullListExcel?parametre=${keyword}`, buildMergedFilters(filters));
+      const mergedFilters = buildMergedFilters(filters);
+      const { requestFilters, isCloseQuery } = splitCloseFilterFromRequest(mergedFilters);
+      const response = await AxiosInstance.post(`GetIsEmriFullListExcel?parametre=${keyword}${isCloseQuery}`, requestFilters);
       if (response) {
         // Verileri işliyoruz
         const xlsxData = response.map((row) => {
