@@ -42,6 +42,10 @@ export default function IsEmriTipiSelect({ disabled, fieldRequirements }) {
     }
   };
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   const onNameChange = (e) => {
     setName(e.target.value);
   };

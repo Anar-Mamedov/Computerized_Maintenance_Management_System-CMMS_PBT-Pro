@@ -55,6 +55,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
   const selectedOption = watch("selectedOption");
   const prosedurID = watch("prosedurID");
   const secilenIsEmriID = watch("secilenIsEmriID");
+  const hasValidIsEmriTipi = isEmriTipiID !== null && isEmriTipiID !== undefined && isEmriTipiID !== "" && Number(isEmriTipiID) !== -1;
 
   const columns = [
     {
@@ -86,7 +87,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
   }, [data, searchTerm]);
 
   const fetchProcedures = async () => {
-    if (!isEmriTipiID) {
+    if (!hasValidIsEmriTipi) {
       message.warning(t("onceIsEmriTipiSeciniz"));
       return false;
     }
