@@ -4,6 +4,14 @@ import { useFormContext } from "react-hook-form";
 import { t } from "i18next";
 import AxiosInstance from "../../../../../../../../../api/http";
 
+const createProcedureRowKey = () => {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+
+  return `procedure-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+};
+
 const normalizeText = (text) => {
   return text
     .normalize("NFD")
@@ -24,13 +32,14 @@ const normalizeText = (text) => {
 
 const mapProcedureItem = (item) => ({
   ...item,
-  key: item.id,
-  IST_KOD: item.kod ?? "",
-  IST_TANIM: item.tanim ?? "",
-  IST_TIP: item.IST_TIP ?? null,
-  IST_TIP_KOD_ID: item.IST_TIP_KOD_ID ?? null,
-  IST_NEDEN: item.IST_NEDEN ?? null,
-  IST_NEDEN_KOD_ID: item.IST_NEDEN_KOD_ID ?? null,
+  key: createProcedureRowKey(),
+  backendId: item.TB_IS_TANIM_ID ?? item.id ?? null,
+  IST_KOD: String(item.IST_KOD ?? item.kod ?? "").trim(),
+  IST_TANIM: String(item.IST_TANIM ?? item.tanim ?? "").trim(),
+  IST_TIP: item.IST_TIP ?? item.ist_tip ?? null,
+  IST_TIP_KOD_ID: item.IST_TIP_KOD_ID ?? item.ist_tip_kod_id ?? null,
+  IST_NEDEN: item.IST_NEDEN ?? item.ist_neden ?? null,
+  IST_NEDEN_KOD_ID: item.IST_NEDEN_KOD_ID ?? item.ist_neden_kod_id ?? null,
 });
 
 export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
@@ -42,9 +51,6 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
   const [searchTerm, setSearchTerm] = useState("");
 
   const isEmriTipiID = watch("isEmriTipiID");
-  const makineID = watch("makineID");
-  const selectedOption = watch("selectedOption");
-
   const columns = [
     {
       title: "Prosedür Kodu",
@@ -52,12 +58,14 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
       key: "IST_KOD",
       width: 180,
       ellipsis: true,
+      render: (_, record) => record.IST_KOD || record.kod || "",
     },
     {
       title: "Prosedür Tanımı",
       dataIndex: "IST_TANIM",
       key: "IST_TANIM",
       ellipsis: true,
+      render: (_, record) => record.IST_TANIM || record.tanim || "",
     },
   ];
 
@@ -78,20 +86,11 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
       return false;
     }
 
-    if (selectedOption?.IMT_TIP_GRUP === 3 && !makineID) {
-      message.warning(t("onceMakineSeciniz"));
-      return false;
-    }
-
     setLoading(true);
     try {
       const query = new URLSearchParams({
         tipId: String(isEmriTipiID),
       });
-
-      if (makineID) {
-        query.set("makineId", String(makineID));
-      }
 
       const response = await AxiosInstance.get(`GetProsedur?${query.toString()}`);
 
@@ -141,8 +140,14 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
   };
 
   useEffect(() => {
-    setSelectedRowKeys(workshopSelectedId ? [workshopSelectedId] : []);
-  }, [workshopSelectedId]);
+    if (!workshopSelectedId) {
+      setSelectedRowKeys([]);
+      return;
+    }
+
+    const matchedRow = data.find((item) => item.backendId === workshopSelectedId);
+    setSelectedRowKeys(matchedRow ? [matchedRow.key] : []);
+  }, [data, workshopSelectedId]);
 
   return (
     <div>
@@ -151,6 +156,7 @@ export default function ProsedurTablo({ workshopSelectedId, onSubmit }) {
         <Spin spinning={loading}>
           <Input placeholder="Arama..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{ width: "300px", marginBottom: "15px" }} />
           <Table
+            rowKey="key"
             rowSelection={{
               type: "radio",
               selectedRowKeys,

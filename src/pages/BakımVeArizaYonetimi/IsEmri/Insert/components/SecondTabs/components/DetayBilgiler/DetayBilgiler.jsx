@@ -298,7 +298,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                       <ProsedurTablo
                         onSubmit={(selectedData) => {
                           setValue("prosedur", selectedData.IST_KOD);
-                          setValue("prosedurID", selectedData.key);
+                          setValue("prosedurID", selectedData.backendId ?? selectedData.key);
                           setValue("konu", selectedData.IST_TANIM);
                           setValue("prosedurTipi", selectedData.IST_TIP);
                           setValue("prosedurTipiID", selectedData.IST_TIP_KOD_ID);
