@@ -4,7 +4,7 @@ import { TimePicker } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import { t } from "i18next";
 
-export default function FullTimePicker({ name1, isRequired = false, disabled = false, format }) {
+export default function FullTimePicker({ name1, isRequired = false, disabled = false, format, ...pickerProps }) {
   const {
     control,
     formState: { errors },
@@ -18,6 +18,7 @@ export default function FullTimePicker({ name1, isRequired = false, disabled = f
     en: "hh:mm A",
   };
   const displayFormat = format || timeFormatMap[currentLang] || "HH:mm";
+  const { onChange: customOnChange, style: customStyle, ...restPickerProps } = pickerProps;
 
   return (
     <>
@@ -26,7 +27,19 @@ export default function FullTimePicker({ name1, isRequired = false, disabled = f
         control={control}
         rules={{ required: isRequired ? t("alanBosBirakilamaz") : false }}
         render={({ field }) => (
-          <TimePicker {...field} format={displayFormat} needConfirm={false} status={errors[name1] ? "error" : ""} style={{ flex: 1, width: "100%" }} disabled={disabled} />
+          <TimePicker
+            {...field}
+            {...restPickerProps}
+            format={displayFormat}
+            needConfirm={false}
+            status={errors[name1] ? "error" : ""}
+            style={{ flex: 1, width: "100%", ...customStyle }}
+            disabled={disabled}
+            onChange={(value, timeString) => {
+              field.onChange(value);
+              customOnChange?.(value, timeString);
+            }}
+          />
         )}
       />
       {errors[name1] && <div style={{ color: "red", marginTop: "5px" }}>{errors[name1].message}</div>}

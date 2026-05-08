@@ -186,8 +186,9 @@ export default function CreateDrawer({ onRefresh }) {
           if (defaultItem) {
             setValue("prosedurTab", defaultItem.IMT_CAGRILACAK_PROSEDUR);
             // varsayılan iş emri tipini set et
-            setValue("isEmriTipID", defaultItem.TB_ISEMRI_TIP_ID);
-            setValue("isEmriTipi", defaultItem.IMT_TANIM);
+            setValue("isEmriTipi", defaultItem.TB_ISEMRI_TIP_ID);
+            setValue("isEmriTipiID", defaultItem.TB_ISEMRI_TIP_ID);
+            setValue("selectedOption", defaultItem);
             // Eğer varsayılan obje bulunursa, form alanlarını set et
             setFieldRequirements({
               lokasyonTanim: defaultItem.IMT_LOKASYON,

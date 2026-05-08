@@ -32,6 +32,25 @@ export default function OzelAlanlar() {
   const { control, watch, setValue } = useFormContext();
   const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
   const [refreshTrigger, setRefreshTrigger] = useState(false);
+  const layoutStyle = {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "flex-start",
+    gap: "20px",
+    marginBottom: "20px",
+  };
+  const columnStyle = {
+    flex: "1 1 420px",
+    maxWidth: "450px",
+  };
+  const rowStyle = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+    maxWidth: "450px",
+    marginBottom: "10px",
+  };
 
   useEffect(() => {
     // API'den veri çekme işlemi
@@ -53,396 +72,64 @@ export default function OzelAlanlar() {
     setRefreshTrigger((prev) => !prev); // Toggle to trigger useEffect
   };
 
-  return (
-    <div style={{ display: "flex", marginBottom: "20px" }}>
-      <div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            marginBottom: "10px",
-          }}>
-          <OzelAlan1 label={label} onModalClose={triggerRefresh} />
-          <Controller
-            name="ozelAlan1"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ width: "250px" }}
-              />
-            )}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            marginBottom: "10px",
-          }}>
-          <OzelAlan2 label={label} onModalClose={triggerRefresh} />
-          <Controller
-            name="ozelAlan2"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ width: "250px" }}
-              />
-            )}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            marginBottom: "10px",
-          }}>
-          <OzelAlan3 label={label} onModalClose={triggerRefresh} />
-          <Controller
-            name="ozelAlan3"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ width: "250px" }}
-              />
-            )}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            marginBottom: "10px",
-          }}>
-          <OzelAlan4 label={label} onModalClose={triggerRefresh} />
-          <Controller
-            name="ozelAlan4"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ width: "250px" }}
-              />
-            )}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            marginBottom: "10px",
-          }}>
-          <OzelAlan5 label={label} onModalClose={triggerRefresh} />
-          <Controller
-            name="ozelAlan5"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ width: "250px" }}
-              />
-            )}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            marginBottom: "10px",
-          }}>
-          <OzelAlan6 label={label} onModalClose={triggerRefresh} />
-          <Controller
-            name="ozelAlan6"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ width: "250px" }}
-              />
-            )}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            marginBottom: "10px",
-          }}>
-          <OzelAlan7 label={label} onModalClose={triggerRefresh} />
-          <Controller
-            name="ozelAlan7"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ width: "250px" }}
-              />
-            )}
-          />
-        </div>
+  const renderFieldRow = (key, LabelComponent, inputNode) => (
+    <div key={key} style={rowStyle}>
+      <LabelComponent label={label} onModalClose={triggerRefresh} />
+      {inputNode}
+    </div>
+  );
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            marginBottom: "10px",
-          }}>
-          <OzelAlan8 label={label} onModalClose={triggerRefresh} />
-          <Controller
-            name="ozelAlan8"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ width: "250px" }}
-              />
-            )}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            marginBottom: "10px",
-          }}>
-          <OzelAlan9 label={label} onModalClose={triggerRefresh} />
-          <Controller
-            name="ozelAlan9"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ width: "250px" }}
-              />
-            )}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            marginBottom: "10px",
-          }}>
-          <OzelAlan10 label={label} onModalClose={triggerRefresh} />
-          <Controller
-            name="ozelAlan10"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text" // Set the type to "text" for name input
-                style={{ width: "250px" }}
-              />
-            )}
-          />
-        </div>
+  const renderTextInput = (name) => (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => (
+        <Input
+          {...field}
+          type="text"
+          style={{ width: "250px" }}
+        />
+      )}
+    />
+  );
+
+  const renderNumberInput = (name, extraProps = {}) => (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => <InputNumber {...field} style={{ width: "250px" }} {...extraProps} />}
+    />
+  );
+
+  return (
+    <div style={layoutStyle}>
+      <div style={columnStyle}>
+        {renderFieldRow("ozelAlan1", OzelAlan1, renderTextInput("ozelAlan1"))}
+        {renderFieldRow("ozelAlan2", OzelAlan2, renderTextInput("ozelAlan2"))}
+        {renderFieldRow("ozelAlan3", OzelAlan3, renderTextInput("ozelAlan3"))}
+        {renderFieldRow("ozelAlan4", OzelAlan4, renderTextInput("ozelAlan4"))}
+        {renderFieldRow("ozelAlan5", OzelAlan5, renderTextInput("ozelAlan5"))}
+        {renderFieldRow("ozelAlan6", OzelAlan6, renderTextInput("ozelAlan6"))}
+        {renderFieldRow("ozelAlan7", OzelAlan7, renderTextInput("ozelAlan7"))}
       </div>
-      <div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            marginBottom: "10px",
-          }}>
-          <OzelAlan11 label={label} onModalClose={triggerRefresh} />
-          <OzelAlanSelect11 />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            marginBottom: "10px",
-          }}>
-          <OzelAlan12 label={label} onModalClose={triggerRefresh} />
-          <OzelAlanSelect12 />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            marginBottom: "10px",
-          }}>
-          <OzelAlan13 label={label} onModalClose={triggerRefresh} />
-          <OzelAlanSelect13 />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            marginBottom: "10px",
-          }}>
-          <OzelAlan14 label={label} onModalClose={triggerRefresh} />
-          <OzelAlanSelect14 />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            marginBottom: "10px",
-          }}>
-          <OzelAlan15 label={label} onModalClose={triggerRefresh} />
-          <OzelAlanSelect15 />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            marginBottom: "10px",
-          }}>
-          <OzelAlan16 label={label} onModalClose={triggerRefresh} />
-          <Controller
-            name="ozelAlan16"
-            control={control}
-            render={({ field }) => (
-              <InputNumber
-                {...field}
-                type="text" // Set the type to "text" for name InputNumber
-                style={{ width: "250px" }}
-              />
-            )}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            marginBottom: "10px",
-          }}>
-          <OzelAlan17 label={label} onModalClose={triggerRefresh} />
-          <Controller
-            name="ozelAlan17"
-            control={control}
-            render={({ field }) => (
-              <InputNumber
-                {...field}
-                type="text" // Set the type to "text" for name InputNumber
-                style={{ width: "250px" }}
-              />
-            )}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            marginBottom: "10px",
-          }}>
-          <OzelAlan18 label={label} onModalClose={triggerRefresh} />
-          <Controller
-            name="ozelAlan18"
-            control={control}
-            render={({ field }) => (
-              <InputNumber
-                {...field}
-                type="text" // Set the type to "text" for name InputNumber
-                style={{ width: "250px" }}
-              />
-            )}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            marginBottom: "10px",
-          }}>
-          <OzelAlan19 label={label} onModalClose={triggerRefresh} />
-          <Controller
-            name="ozelAlan19"
-            control={control}
-            render={({ field }) => (
-              <InputNumber
-                {...field}
-                type="text" // Set the type to "text" for name InputNumber
-                style={{ width: "250px" }}
-              />
-            )}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            maxWidth: "450px",
-            marginBottom: "10px",
-          }}>
-          <OzelAlan20 label={label} onModalClose={triggerRefresh} />
-          <Controller
-            name="ozelAlan20"
-            control={control}
-            render={({ field }) => <InputNumber {...field} changeOnWheel={false} style={{ width: "250px" }} />}
-          />
-        </div>
+
+      <div style={columnStyle}>
+        {renderFieldRow("ozelAlan8", OzelAlan8, renderTextInput("ozelAlan8"))}
+        {renderFieldRow("ozelAlan9", OzelAlan9, renderTextInput("ozelAlan9"))}
+        {renderFieldRow("ozelAlan10", OzelAlan10, renderTextInput("ozelAlan10"))}
+        {renderFieldRow("ozelAlan11", OzelAlan11, <OzelAlanSelect11 />)}
+        {renderFieldRow("ozelAlan12", OzelAlan12, <OzelAlanSelect12 />)}
+        {renderFieldRow("ozelAlan13", OzelAlan13, <OzelAlanSelect13 />)}
+        {renderFieldRow("ozelAlan14", OzelAlan14, <OzelAlanSelect14 />)}
+      </div>
+
+      <div style={columnStyle}>
+        {renderFieldRow("ozelAlan15", OzelAlan15, <OzelAlanSelect15 />)}
+        {renderFieldRow("ozelAlan16", OzelAlan16, renderNumberInput("ozelAlan16"))}
+        {renderFieldRow("ozelAlan17", OzelAlan17, renderNumberInput("ozelAlan17"))}
+        {renderFieldRow("ozelAlan18", OzelAlan18, renderNumberInput("ozelAlan18"))}
+        {renderFieldRow("ozelAlan19", OzelAlan19, renderNumberInput("ozelAlan19"))}
+        {renderFieldRow("ozelAlan20", OzelAlan20, renderNumberInput("ozelAlan20", { changeOnWheel: false }))}
       </div>
     </div>
   );

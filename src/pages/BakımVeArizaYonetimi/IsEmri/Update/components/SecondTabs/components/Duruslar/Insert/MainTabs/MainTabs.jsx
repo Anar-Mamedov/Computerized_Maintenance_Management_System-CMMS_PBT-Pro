@@ -1,10 +1,13 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs, DatePicker, TimePicker, InputNumber, Checkbox } from "antd";
-import { Controller, set, useFormContext } from "react-hook-form";
+import React, { useEffect } from "react";
+import { Button, Modal, Input, Typography, Tabs, InputNumber, Checkbox } from "antd";
+import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import dayjs from "dayjs";
+import { t } from "i18next";
 import DurusNedeniSelect from "./components/DurusNedeniSelect";
 import ProjeTablo from "./components/ProjeTablo";
+import FullDatePicker from "../../../../../../../../../../utils/components/FullDatePicker.jsx";
+import FullTimePicker from "../../../../../../../../../../utils/components/FullTimePicker.jsx";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -56,9 +59,7 @@ const StyledTabs = styled(Tabs)`
 
 //styled components end
 export default function MainTabs() {
-  const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
-  const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
-  const { control, watch, setValue } = useFormContext();
+  const { control, watch, setValue, setError, clearErrors } = useFormContext();
 
   const handleProjeMinusClick = () => {
     setValue("proje", "");
@@ -73,108 +74,105 @@ export default function MainTabs() {
     },
   ];
 
-  // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
-
-  // Intl.DateTimeFormat kullanarak tarih formatlama
-  const formatDate = (date) => {
-    if (!date) return "";
-
-    // Örnek bir tarih formatla ve ay formatını belirle
-    const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
-    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
-
-    let monthFormat;
-    if (sampleFormatted.includes("January")) {
-      monthFormat = "long"; // Tam ad ("January")
-    } else if (sampleFormatted.includes("Jan")) {
-      monthFormat = "short"; // Üç harfli kısaltma ("Jan")
-    } else {
-      monthFormat = "2-digit"; // Sayısal gösterim ("01")
-    }
-
-    // Kullanıcı için tarihi formatla
-    const formatter = new Intl.DateTimeFormat(navigator.language, {
-      year: "numeric",
-      month: monthFormat,
-      day: "2-digit",
-    });
-    return formatter.format(new Date(date));
-  };
-
-  const formatTime = (time) => {
-    if (!time || time.trim() === "") return ""; // `trim` metodu ile baştaki ve sondaki boşlukları temizle
-
-    try {
-      // Saati ve dakikayı parçalara ayır, boşlukları temizle
-      const [hours, minutes] = time
-        .trim()
-        .split(":")
-        .map((part) => part.trim());
-
-      // Saat ve dakika değerlerinin geçerliliğini kontrol et
-      const hoursInt = parseInt(hours, 10);
-      const minutesInt = parseInt(minutes, 10);
-      if (isNaN(hoursInt) || isNaN(minutesInt) || hoursInt < 0 || hoursInt > 23 || minutesInt < 0 || minutesInt > 59) {
-        throw new Error("Invalid time format");
-      }
-
-      // Geçerli tarih ile birlikte bir Date nesnesi oluştur ve sadece saat ve dakika bilgilerini ayarla
-      const date = new Date();
-      date.setHours(hoursInt, minutesInt, 0);
-
-      // Kullanıcının lokal ayarlarına uygun olarak saat ve dakikayı formatla
-      // `hour12` seçeneğini belirtmeyerek Intl.DateTimeFormat'ın kullanıcının yerel ayarlarına göre otomatik seçim yapmasına izin ver
-      const formatter = new Intl.DateTimeFormat(navigator.language, {
-        hour: "numeric",
-        minute: "2-digit",
-        // hour12 seçeneği burada belirtilmiyor; böylece otomatik olarak kullanıcının sistem ayarlarına göre belirleniyor
-      });
-
-      // Formatlanmış saati döndür
-      return formatter.format(date);
-    } catch (error) {
-      console.error("Error formatting time:", error);
-      return ""; // Hata durumunda boş bir string döndür
-    }
-  };
-
-  // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
-
-  // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın
-
-  useEffect(() => {
-    // Format the date based on the user's locale
-    const dateFormatter = new Intl.DateTimeFormat(navigator.language);
-    const sampleDate = new Date(2021, 10, 21);
-    const formattedSampleDate = dateFormatter.format(sampleDate);
-    setLocaleDateFormat(formattedSampleDate.replace("2021", "YYYY").replace("21", "DD").replace("11", "MM"));
-
-    // Format the time based on the user's locale
-    const timeFormatter = new Intl.DateTimeFormat(navigator.language, { hour: "numeric", minute: "numeric" });
-    const sampleTime = new Date(2021, 10, 21, 13, 45); // Use a sample time, e.g., 13:45
-    const formattedSampleTime = timeFormatter.format(sampleTime);
-
-    // Check if the formatted time contains AM/PM, which implies a 12-hour format
-    const is12HourFormat = /AM|PM/.test(formattedSampleTime);
-    setLocaleTimeFormat(is12HourFormat ? "hh:mm A" : "HH:mm");
-  }, []);
-
-  // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın sonu
-
   // iki tarih ve saat arasında geçen süreyi hesaplamak için
 
   const watchFields = watch(["baslangicTarihi", "baslangicSaati", "bitisTarihi", "bitisSaati"]);
+  const [baslangicTarihi, baslangicSaati, bitisTarihi, bitisSaati] = watchFields;
+
+  const disableDatesAfter = (limitDate) => (current) => {
+    if (!limitDate || !current) {
+      return false;
+    }
+
+    return current.startOf("day").isAfter(dayjs(limitDate).startOf("day"));
+  };
+
+  const disableDatesBefore = (limitDate) => (current) => {
+    if (!limitDate || !current) {
+      return false;
+    }
+
+    return current.startOf("day").isBefore(dayjs(limitDate).startOf("day"));
+  };
+
+  const buildDisabledTimeBefore = (limitTime) => {
+    if (!limitTime) {
+      return {};
+    }
+
+    const limitHour = limitTime.hour();
+    const limitMinute = limitTime.minute();
+
+    return {
+      disabledHours: () => Array.from({ length: limitHour }, (_, index) => index),
+      disabledMinutes: (selectedHour) => {
+        if (selectedHour !== limitHour) {
+          return [];
+        }
+
+        return Array.from({ length: limitMinute }, (_, index) => index);
+      },
+    };
+  };
+
+  const buildDisabledTimeAfter = (limitTime) => {
+    if (!limitTime) {
+      return {};
+    }
+
+    const limitHour = limitTime.hour();
+    const limitMinute = limitTime.minute();
+
+    return {
+      disabledHours: () => Array.from({ length: 23 - limitHour }, (_, index) => limitHour + index + 1),
+      disabledMinutes: (selectedHour) => {
+        if (selectedHour !== limitHour) {
+          return [];
+        }
+
+        return Array.from({ length: 59 - limitMinute }, (_, index) => limitMinute + index + 1);
+      },
+    };
+  };
+
+  const getDisabledBaslangicTime = () => {
+    if (!baslangicTarihi || !bitisTarihi || !bitisSaati || !dayjs(baslangicTarihi).isSame(dayjs(bitisTarihi), "day")) {
+      return {};
+    }
+
+    return buildDisabledTimeAfter(bitisSaati);
+  };
+
+  const getDisabledBitisTime = () => {
+    if (!baslangicTarihi || !bitisTarihi || !baslangicSaati || !dayjs(baslangicTarihi).isSame(dayjs(bitisTarihi), "day")) {
+      return {};
+    }
+
+    return buildDisabledTimeBefore(baslangicSaati);
+  };
 
   useEffect(() => {
-    const [baslangicTarihi, baslangicSaati, bitisTarihi, bitisSaati] = watchFields;
     if (baslangicTarihi && baslangicSaati && bitisTarihi && bitisSaati) {
       const baslangicZamani = dayjs(baslangicTarihi).hour(baslangicSaati.hour()).minute(baslangicSaati.minute());
       const bitisZamani = dayjs(bitisTarihi).hour(bitisSaati.hour()).minute(bitisSaati.minute());
 
+      if (bitisZamani.isBefore(baslangicZamani)) {
+        setError("bitisTarihi", {
+          type: "validate",
+          message: t("workOrder.downtime.endTimeCannotBeBeforeStartTime"),
+        });
+        setValue("sure", 0);
+        return;
+      }
+
+      clearErrors("bitisTarihi");
       const sure = bitisZamani.diff(baslangicZamani, "minute");
-      setValue("sure", sure > 0 ? sure : 0);
+      setValue("sure", sure >= 0 ? sure : 0);
+      return;
     }
-  }, [watchFields, setValue]);
+
+    clearErrors("bitisTarihi");
+  }, [baslangicSaati, baslangicTarihi, bitisSaati, bitisTarihi, clearErrors, setError, setValue]);
 
   // iki tarih ve saat arasında geçen süreyi hesaplamak için sonu
 
@@ -374,22 +372,17 @@ export default function MainTabs() {
                 display: "flex",
                 flexWrap: "wrap",
                 alignItems: "center",
-                maxWidth: "300px",
-                minWidth: "300px",
+                maxWidth: "270px",
                 gap: "10px",
                 width: "100%",
               }}
             >
-              <Controller
-                name="baslangicTarihi"
-                control={control}
-                render={({ field }) => <DatePicker {...field} style={{ width: "180px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />}
-              />
-              <Controller
-                name="baslangicSaati"
-                control={control}
-                render={({ field }) => <TimePicker {...field} changeOnScroll needConfirm={false} style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />}
-              />
+              <div style={{ width: "150px" }}>
+                <FullDatePicker name1="baslangicTarihi" placeholder="" disabledDate={disableDatesAfter(bitisTarihi)} inputReadOnly />
+              </div>
+              <div style={{ width: "110px" }}>
+                <FullTimePicker name1="baslangicSaati" disabledTime={getDisabledBaslangicTime} inputReadOnly changeOnScroll />
+              </div>
             </div>
           </div>
           <div
@@ -410,23 +403,17 @@ export default function MainTabs() {
                 display: "flex",
                 flexWrap: "wrap",
                 alignItems: "center",
-                maxWidth: "300px",
-                minWidth: "300px",
+                maxWidth: "270px",
                 gap: "10px",
                 width: "100%",
               }}
             >
-              <Controller
-                name="bitisTarihi"
-                control={control}
-                render={({ field }) => <DatePicker {...field} style={{ width: "180px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />}
-              />
-              <Controller
-                name="bitisSaati"
-                control={control}
-                render={({ field }) => <TimePicker {...field} changeOnScroll
-                                                   needConfirm={false} style={{ width: "110px" }} format={localeTimeFormat} placeholder="Saat seçiniz" />}
-              />
+              <div style={{ width: "150px" }}>
+                <FullDatePicker name1="bitisTarihi" placeholder="" disabledDate={disableDatesBefore(baslangicTarihi)} inputReadOnly />
+              </div>
+              <div style={{ width: "110px" }}>
+                <FullTimePicker name1="bitisSaati" disabledTime={getDisabledBitisTime} inputReadOnly changeOnScroll />
+              </div>
             </div>
           </div>
           <div
@@ -439,8 +426,18 @@ export default function MainTabs() {
               justifyContent: "space-between",
             }}
           >
-            <Text style={{ fontSize: "14px" }}>Duruş Süresi (dk):</Text>
-            <Controller name="sure" control={control} render={({ field }) => <InputNumber {...field} min={0} style={{ width: "300px" }} />} />
+            <Text style={{ fontSize: "14px", fontWeight: "600" }}>Duruş Süresi (dk):</Text>
+            <Controller
+              name="sure"
+              control={control}
+              rules={{ required: t("alanBosBirakilamaz") }}
+              render={({ field, fieldState: { error } }) => (
+                <div style={{ width: "270px", display: "flex", flexDirection: "column", gap: "5px" }}>
+                  <InputNumber {...field} min={0} status={error ? "error" : ""} style={{ width: "100%" }} />
+                  {error && <div style={{ color: "red" }}>{error.message}</div>}
+                </div>
+              )}
+            />
           </div>
         </div>
         <div style={{ border: "1px solid #ececec", padding: "15px", marginBottom: "10px", maxWidth: "350px" }}>

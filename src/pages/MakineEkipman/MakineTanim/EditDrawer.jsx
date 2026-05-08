@@ -362,7 +362,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("satisTutari", item.MKN_SATIS_FIYAT ?? null);
           setValue("satisAciklama", trimIfString(item.MKN_SATIS_ACIKLAMA));
           // Yakit Bilgileri sekmesi
-          setValue("makineYakitTipi", item.MKN_YAKIT_TIPI ?? null);
+          setValue("makineYakitTipi", trimIfString(item.MKN_YAKIT_TIPI));
           setValue("makineYakitTipiID", item.MKN_YAKIT_TIP_ID ?? null);
           setValue("YakitDepoHacmi", item.MKN_YAKIT_DEPO_HACMI ?? null);
           setValue("makineYakitSayacTakibi", normalizeBoolean(item.MKN_YAKIT_SAYAC_TAKIP));
