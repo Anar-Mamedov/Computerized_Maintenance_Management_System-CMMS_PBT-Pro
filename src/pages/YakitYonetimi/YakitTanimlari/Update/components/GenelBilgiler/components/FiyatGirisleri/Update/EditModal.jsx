@@ -137,26 +137,28 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
     { value: "C", label: t("cikis") },
   ];
 
+  const ErrorMessage = ({ message }) => (
+  <div style={{ color: "#ff4d4f", fontSize: "12px", marginTop: "2px", textAlign: "right" }}>
+    {message}
+  </div>
+);
+
   return (
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
         <Modal
           width="500px"
           centered
-          title={t("malzemeGuncelleme")}
+          title={t("Yakıt Güncelleme")}
           open={drawerVisible}
           onCancel={onClose}
           footer={
             <Space>
               <Button onClick={onClose}>{t("iptal")}</Button>
               <Button
-                type="submit"
-                onClick={methods.handleSubmit(onSubmit)}
-                style={{
-                  backgroundColor: "#2bc770",
-                  borderColor: "#2bc770",
-                  color: "#ffffff",
-                }}
+                type="primary"
+                onClick={onSubmit}
+                style={{ backgroundColor: "#2bc770", borderColor: "#2bc770" }}
               >
                 {t("guncelle")}
               </Button>
@@ -164,73 +166,94 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
           }
         >
           {loading ? (
-            <div style={{ overflow: "auto", height: "calc(100vh - 150px)" }}>
-              <Spin
-                spinning={loading}
-                size="large"
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                {/* İçerik yüklenirken gösterilecek alan */}
-              </Spin>
+            <div style={{ display: "flex", justifyContent: "center", padding: "50px" }}>
+              <Spin size="large" />
             </div>
           ) : (
-            <form onSubmit={methods.handleSubmit(onSubmit)}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <form onSubmit={onSubmit}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+                
+                {/* TARİH */}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <Text style={{ fontWeight: "600" }}>{t("tarih")}</Text>
                   <Controller
                     name="tarih"
                     control={control}
-                    rules={{ required: t("tarihZorunlu") }}
+                    rules={{ required: t("Alan Boş Bırakılamaz") }}
                     render={({ field, fieldState: { error } }) => (
-                      <DatePicker {...field} status={error ? "error" : ""} style={{ width: "250px" }} needConfirm={false} placeholder={t("tarihSeciniz")} format="DD.MM.YYYY" />
+                      <div style={{ display: "flex", flexDirection: "column" }}>
+                        <DatePicker {...field} status={error ? "error" : ""} style={{ width: "250px" }} format="DD.MM.YYYY" placeholder={t("Tarih Seçiniz")} />
+                        {error && <ErrorMessage message={error.message} />}
+                      </div>
                     )}
                   />
                 </div>
+
+                {/* SAAT */}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <Text style={{ fontWeight: "600" }}>{t("saat")}</Text>
                   <Controller
                     name="saat"
                     control={control}
-                    rules={{ required: t("saatZorunlu") }}
+                    rules={{ required: t("Alan Boş Bırakılamaz") }}
                     render={({ field, fieldState: { error } }) => (
-                      <TimePicker {...field} status={error ? "error" : ""} style={{ width: "250px" }} needConfirm={false} placeholder={t("saatSeciniz")} format="HH:mm" />
+                      <div style={{ display: "flex", flexDirection: "column" }}>
+                        <TimePicker {...field} status={error ? "error" : ""} style={{ width: "250px" }} format="HH:mm" placeholder={t("Saat Seçiniz")} />
+                        {error && <ErrorMessage message={error.message} />}
+                      </div>
                     )}
                   />
                 </div>
+
+                {/* TUTAR (VİRGÜLLÜ GİRİŞ) */}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <Text style={{ fontWeight: "600" }}>{t("tutar")}</Text>
                   <Controller
                     name="tutar"
                     control={control}
-                    rules={{ required: t("tutarZorunlu") }}
+                    rules={{ required: t("Alan Boş Bırakılamaz") }}
                     render={({ field, fieldState: { error } }) => (
-                      <InputNumber {...field} status={error ? "error" : ""} style={{ width: "250px" }} placeholder={t("tutarGiriniz")} />
+                      <div style={{ display: "flex", flexDirection: "column" }}>
+                        <InputNumber
+                          {...field}
+                          status={error ? "error" : ""}
+                          style={{ width: "250px" }}
+                          placeholder={t("Tutar Giriniz")}
+                          decimalSeparator=","
+                          step="0.01"
+                          formatter={(value) => `${value}`.replace(".", ",")}
+                          parser={(value) => value.replace(",", ".")}
+                        />
+                        {error && <ErrorMessage message={error.message} />}
+                      </div>
                     )}
                   />
                 </div>
+
+                {/* TİPİ */}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <Text style={{ fontWeight: "600" }}>{t("tipi")}</Text>
+                  <Text style={{ fontWeight: "600" }}>{t("Tipi")}</Text>
                   <Controller
                     name="tipi"
                     control={control}
-                    rules={{ required: t("tipiZorunlu") }}
+                    rules={{ required: t("Alan Boş Bırakılamaz") }}
                     render={({ field, fieldState: { error } }) => (
-                      <Select {...field} status={error ? "error" : ""} placeholder={t("secimYapiniz")} allowClear options={options} style={{ width: "250px" }} />
+                      <div style={{ display: "flex", flexDirection: "column" }}>
+                        <Select {...field} status={error ? "error" : ""} options={options} style={{ width: "250px" }} placeholder={t("Seçim Yapınız")} />
+                        {error && <ErrorMessage message={error.message} />}
+                      </div>
                     )}
                   />
                 </div>
+
+                {/* AÇIKLAMA */}
                 <div style={{ display: "flex", alignItems: "start", justifyContent: "space-between" }}>
                   <Text>{t("aciklama")}</Text>
                   <Controller
                     name="aciklama"
                     control={control}
-                    render={({ field, fieldState: { error } }) => (
-                      <TextArea {...field} status={error ? "error" : ""} style={{ width: "250px" }} placeholder={t("aciklamaGiriniz")} />
+                    render={({ field }) => (
+                      <TextArea {...field} rows={3} style={{ width: "250px" }} placeholder={t("Açıklama Giriniz")} />
                     )}
                   />
                 </div>

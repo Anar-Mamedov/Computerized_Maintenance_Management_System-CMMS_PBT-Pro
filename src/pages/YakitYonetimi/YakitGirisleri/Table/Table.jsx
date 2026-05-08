@@ -188,7 +188,7 @@ const MainTable = () => {
 
   const initialColumns = [
     {
-  title: "Ekipman / Araç",
+  title: "Ekipman",
   dataIndex: "Ekipman", 
   key: "Ekipman",
   width: 300,
@@ -212,7 +212,7 @@ const MainTable = () => {
   sorter: (a, b) => (a.Ekipman?.Kod || "").localeCompare(b.Ekipman?.Kod || ""),
 },
     {
-    title: "Tarih / Saat",
+    title: "Tarih",
     dataIndex: "TarihSaat",
     key: "TarihSaat",
     width: 110,
@@ -263,7 +263,7 @@ const MainTable = () => {
       sorter: (a, b) => a.Fark - b.Fark,
     },
     {
-      title: "Miktar (Lt)",
+      title: "Miktar",
       dataIndex: "Miktar",
       key: "Miktar",
       width: 120,
@@ -304,13 +304,6 @@ const MainTable = () => {
         ),
     },
     {
-      title: "Yakıt Deposu",
-      dataIndex: "YakitDeposu",
-      key: "YakitDeposu",
-      width: 150,
-      visible: true,
-    },
-    {
       title: "Operatör",
       dataIndex: "Operator",
       key: "Operator",
@@ -343,6 +336,13 @@ const MainTable = () => {
         }
         return (a.Lokasyon?.Yol || "").localeCompare(b.Lokasyon?.Yol || "");
       },
+    },
+    {
+      title: "Yakıt Deposu",
+      dataIndex: "YakitDeposu",
+      key: "YakitDeposu",
+      width: 150,
+      visible: true,
     },
     {
       title: "Açıklama",

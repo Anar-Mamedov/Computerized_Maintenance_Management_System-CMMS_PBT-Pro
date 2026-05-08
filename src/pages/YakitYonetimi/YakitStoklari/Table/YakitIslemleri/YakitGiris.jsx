@@ -5,7 +5,7 @@ import AxiosInstance from "../../../../../api/http";
 
 const { Text, Title } = Typography;
 
-const YakitGirisModal = ({ visible, onClose, onRefresh }) => {
+const YakitGirisModal = ({ visible, onClose, onRefresh, selectedRows }) => {
   const [loading, setLoading] = useState(false);
   const [depolar, setDepolar] = useState([]);
   const [formData, setFormData] = useState({
@@ -19,18 +19,60 @@ const YakitGirisModal = ({ visible, onClose, onRefresh }) => {
   useEffect(() => {
     if (visible) {
       fetchDepoListesi();
-      setFormData({ TarihSaat: dayjs(), Miktar: 0, HedefDepoId: null, BelgeNo: "", Aciklama: "" });
+
+      // --- KANKA KRİTİK NOKTA BURASI ---
+      // Eğer dışarıdan (tablodan) seçili satır gelmişse ID'yi al, yoksa null bırak
+      const initialDepoId = (selectedRows && selectedRows.length > 0) 
+        ? selectedRows[0].TB_DEPO_ID  // Tablodaki kolon adın neyse o (ID alanı)
+        : null;
+
+      setFormData({ 
+        TarihSaat: dayjs(), 
+        Miktar: 0, 
+        HedefDepoId: initialDepoId, // Otomatik seçim burada yapılıyor
+        BelgeNo: "", 
+        Aciklama: "" 
+      });
     }
-  }, [visible]);
+  }, [visible, selectedRows]);
 
   const fetchDepoListesi = async () => {
-    try {
-      const res = await AxiosInstance.post("GetYakitTankList", { LokasyonIds: [], YakitTipIds: [], Durum: -1 });
-      if (res && Array.isArray(res)) {
-        setDepolar(res.map(item => ({ value: item.TB_DEPO_ID, label: `${item.DEP_KOD} (${item.DEP_TANIM})` })));
-      }
-    } catch (err) { message.error("Tank listesi yüklenemedi."); }
-  };
+  try {
+    const res = await AxiosInstance.post("GetYakitTankList", { 
+      LokasyonIds: [], 
+      YakitTipIds: [], 
+      Durum: -1 
+    });
+
+    let list = [];
+
+    // 1. İhtimal: Axios standart (res.data.data)
+    if (res?.data?.data && Array.isArray(res.data.data)) {
+      list = res.data.data;
+    } 
+    // 2. İhtimal: Interceptor kullanılmış (res.data)
+    else if (res?.data && Array.isArray(res.data)) {
+      list = res.data;
+    }
+    // 3. İhtimal: Çok sadeleştirilmiş response (res)
+    else if (Array.isArray(res)) {
+      list = res;
+    }
+
+    if (list.length > 0) {
+      setDepolar(list.map(item => ({ 
+        value: item.TB_DEPO_ID, 
+        label: `${item.DEP_KOD} (${item.DEP_TANIM})` 
+      })));
+    } else {
+      console.warn("Liste boş veya yapılamadı:", res);
+    }
+    
+  } catch (err) { 
+    message.error("Tank listesi yüklenemedi."); 
+    console.error("Hata detayı:", err);
+  }
+};
 
   const handleSave = async () => {
     if (formData.Miktar <= 0) return message.error("Lütfen miktar giriniz.");
@@ -49,8 +91,17 @@ const YakitGirisModal = ({ visible, onClose, onRefresh }) => {
       footer={[<Button key="b" onClick={onClose}>Vazgeç</Button>, <Button key="s" type="primary" loading={loading} onClick={handleSave}>Kaydet</Button>]}
     >
       <Row gutter={[16, 16]}>
-        <Col span={24}><Text strong>Hedef Tank</Text>
-          <Select style={{ width: "100%", marginTop: "5px" }} placeholder="Seçiniz..." value={formData.HedefDepoId} onChange={(val) => setFormData({...formData, HedefDepoId: val})} options={depolar} />
+        <Col span={24}>
+          <Text strong>İşlem Yapılan Depo / Tank</Text>
+          <Select 
+            style={{ width: "100%", marginTop: "5px" }} 
+            placeholder="Seçiniz..." 
+            showSearch // Aramayı açtım, rahat bulursun
+            optionFilterProp="label"
+            value={formData.HedefDepoId} 
+            onChange={(val) => setFormData({...formData, HedefDepoId: val})} 
+            options={depolar} 
+          />
         </Col>
         <Col span={12}><Text strong>Tarih / Saat</Text>
           <DatePicker showTime style={{ width: "100%", marginTop: "5px" }} value={formData.TarihSaat} onChange={(val) => setFormData({...formData, TarihSaat: val})} format="DD.MM.YYYY HH:mm" />

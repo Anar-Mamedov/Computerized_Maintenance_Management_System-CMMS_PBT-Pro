@@ -77,6 +77,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("StokKullanim", item.StokKullanim);
           setValue("FullDepo", item.FullDepo);
           setValue("YakitTipId", item.YakitTipId);
+          setValue("YakitTipAdi", item.YakitTipAdi);
           setValue("YakitTankId", item.YakitTankId);
           setValue("IstasyonKodId", item.IstasyonKodId);
           setValue("IstasyonAdi", item.IstasyonAdi);

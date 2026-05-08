@@ -250,6 +250,14 @@ const MainTable = () => {
       sorter: (a, b) => a.DEP_TANIM?.localeCompare(b.DEP_TANIM),
     },
     {
+      title: "Yakıt Tipi",
+      dataIndex: "YAKIT_TURU",
+      key: "YAKIT_TURU",
+      width: 120,
+      visible: true,
+      sorter: (a, b) => a.YAKIT_TURU?.localeCompare(b.YAKIT_TURU),
+    },
+    {
       title: "Lokasyon",
       dataIndex: "LOKASYON",
       key: "LOKASYON",
@@ -257,14 +265,6 @@ const MainTable = () => {
       ellipsis: true,
       visible: true,
       sorter: (a, b) => a.LOKASYON?.localeCompare(b.LOKASYON),
-    },
-    {
-      title: "Yakıt Tipi",
-      dataIndex: "YAKIT_TURU",
-      key: "YAKIT_TURU",
-      width: 120,
-      visible: true,
-      sorter: (a, b) => a.YAKIT_TURU?.localeCompare(b.YAKIT_TURU),
     },
     {
       title: "Kapasite",
@@ -493,17 +493,18 @@ const MainTable = () => {
   // sayfalama için kullanılan useEffect son
 
   const onSelectChange = (newSelectedRowKeys) => {
-    setSelectedRowKeys(newSelectedRowKeys);
-    if (newSelectedRowKeys.length > 0) {
-      setValue("selectedLokasyonId", newSelectedRowKeys[0]);
-    } else {
-      setValue("selectedLokasyonId", null);
-    }
-    // Seçilen satırların verisini bul
-    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
-    setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
-    console.log("Seçilen Satırlar:", newSelectedRows);
-  };
+  setSelectedRowKeys(newSelectedRowKeys);
+  
+  // Seçilen satırların tüm verisini bul
+  const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
+  setSelectedRows(newSelectedRows); 
+  
+  if (newSelectedRowKeys.length > 0) {
+    setValue("selectedLokasyonId", newSelectedRowKeys[0]);
+  } else {
+    setValue("selectedLokasyonId", null);
+  }
+};
 
   const rowSelection = {
     type: "checkbox",
@@ -1030,17 +1031,20 @@ const MainTable = () => {
       />
       <YakitGiris
         visible={yakitGirisModalVisible} 
-        onClose={() => setYakitGirisModalVisible(false)} 
+        onClose={() => setYakitGirisModalVisible(false)}
+        selectedRows={selectedRows} 
         onRefresh={refreshTableData}
       />
       <YakitCikis
         visible={yakitCikisModalVisible} 
-        onClose={() => setYakitCikisModalVisible(false)} 
+        onClose={() => setYakitCikisModalVisible(false)}
+        selectedRows={selectedRows} 
         onRefresh={refreshTableData}
       />
       <YakitTransfer
         visible={yakitTransferModalVisible} 
-        onClose={() => setYakitTransferModalVisible(false)} 
+        onClose={() => setYakitTransferModalVisible(false)}
+        selectedRows={selectedRows} 
         onRefresh={refreshTableData}
       />
 
