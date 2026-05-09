@@ -172,6 +172,10 @@ const MainTable = () => {
   const [noteModalOpen, setNoteModalOpen] = useState(false);
   const [noteModalRow, setNoteModalRow] = useState(null);
   const currentLang = localStorage.getItem("i18nextLng") || "en";
+  const handleOpenEditDrawer = useCallback((isEmriId) => {
+    if (!isEmriId) return;
+    setDrawer({ visible: true, data: { key: isEmriId } });
+  }, []);
 
   const formatKpiNumber = useCallback(
     (value) => formatNumberWithSeparators(value ?? 0, currentLang),
@@ -2002,7 +2006,7 @@ const MainTable = () => {
             İndir
           </Button>
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
-          <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
+          <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} onOpenEdit={handleOpenEditDrawer} />
         </div>
       </div>
       <Spin spinning={loading || (isScrollPageEnabled && isFetchingMore)}>
