@@ -47,7 +47,7 @@ export default function EditModal({ selectedRow, isModalVisible, onModalClose, o
       const nextForm = buildInitialForm(selectedRow);
       setForm(nextForm);
       unitMethods.reset({
-        unitCode: nextForm.unitId ?? null,
+        unitCode: nextForm.unit ?? null,
         unitCodeID: nextForm.unitId ?? "",
       });
     }

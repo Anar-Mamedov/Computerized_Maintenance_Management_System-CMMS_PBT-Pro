@@ -248,6 +248,7 @@ export default function MalzemeListesiTablo({ isActive }) {
       key: "Kod",
       width: 140,
       ellipsis: true,
+      render: (text) => getEmptyText(text),
     },
     {
       title: t("workOrder.materialList.materialName"),

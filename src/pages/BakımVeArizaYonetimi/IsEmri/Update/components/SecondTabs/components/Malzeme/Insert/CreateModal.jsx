@@ -9,6 +9,7 @@ import KodIDSelectbox from "../../../../../../../../../utils/components/KodIDSel
 
 const initialForm = {
   materialName: "",
+  stockId: null,
   unit: "",
   quantity: 1,
   unitPrice: 0,
@@ -28,14 +29,19 @@ const getResponseData = (response) => {
   return [];
 };
 
-const normalizeMaterial = (item) => ({
-  key: item.TB_STOK_ID ?? item.Id ?? item.STOK_ID ?? item.STK_ID,
-  code: item.STK_KOD ?? item.Kod ?? item.StokKod ?? "",
-  name: item.STK_TANIM ?? item.MalzemeAdi ?? item.StokTanim ?? "",
-  unitId: item.STK_BIRIM_KOD_ID ?? item.BirimId ?? item.BirimID ?? item.BirimKodId ?? null,
-  unit: item.STK_BIRIM ?? item.Birim ?? "",
-  unitPrice: normalizeNumber(item.BirimFiyat ?? item.STK_GIRIS_FIYAT_DEGERI ?? item.STK_MALIYET ?? item.Fiyat),
-});
+const normalizeMaterial = (item, index) => {
+  const stockId = item.TB_STOK_ID ?? item.Id ?? item.STOK_ID ?? item.STK_ID ?? null;
+
+  return {
+    key: `${stockId ?? "no-stock-id"}-${index}`,
+    stockId,
+    code: item.STK_KOD ?? item.Kod ?? item.StokKod ?? "",
+    name: item.STK_TANIM ?? item.MalzemeAdi ?? item.StokTanim ?? "",
+    unitId: item.STK_BIRIM_KOD_ID ?? item.BirimId ?? item.BirimID ?? item.BirimKodId ?? null,
+    unit: item.STK_BIRIM ?? item.Birim ?? "",
+    unitPrice: normalizeNumber(item.BirimFiyat ?? item.STK_GIRIS_FIYAT_DEGERI ?? item.STK_MALIYET ?? item.Fiyat),
+  };
+};
 
 export default function CreateModal({ kapali, onRefresh, secilenIsEmriID, triggerButtonText, triggerButtonType = "link", triggerButtonClassName, triggerContainerClassName }) {
   const { t } = useTranslation();
@@ -102,6 +108,7 @@ export default function CreateModal({ kapali, onRefresh, secilenIsEmriID, trigge
     }
 
     updateField("materialName", selectedMaterial.name);
+    updateField("stockId", selectedMaterial.stockId ?? null);
     updateField("unit", selectedMaterial.unit ?? "");
     updateField("unitPrice", selectedMaterial.unitPrice ?? 0);
     unitMethods.reset({
@@ -120,7 +127,7 @@ export default function CreateModal({ kapali, onRefresh, secilenIsEmriID, trigge
     const body = {
       TB_ISEMRI_MLZ_ID: 0,
       IDM_ISEMRI_ID: secilenIsEmriID,
-      IDM_STOK_ID: null,
+      IDM_STOK_ID: form.stockId,
       IDM_DEPO_ID: null,
       IDM_BIRIM_KOD_ID: Number(unitMethods.getValues("unitCodeID")) || null,
       IDM_STOK_DUS: false,
@@ -176,7 +183,14 @@ export default function CreateModal({ kapali, onRefresh, secilenIsEmriID, trigge
           <Form layout="vertical">
             <Form.Item label={t("workOrder.materialList.materialName")} required>
               <Input.Group compact>
-                <Input value={form.materialName} onChange={(event) => updateField("materialName", event.target.value)} style={{ width: "calc(100% - 40px)" }} />
+                <Input
+                  value={form.materialName}
+                  onChange={(event) => {
+                    updateField("materialName", event.target.value);
+                    updateField("stockId", null);
+                  }}
+                  style={{ width: "calc(100% - 40px)" }}
+                />
                 <Button icon={<SearchOutlined />} onClick={openMaterialSelectModal} />
               </Input.Group>
             </Form.Item>
