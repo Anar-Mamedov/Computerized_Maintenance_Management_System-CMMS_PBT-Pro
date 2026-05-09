@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import { Button, Table, message, Popconfirm } from "antd";
 import { CheckOutlined, CloseOutlined, DeleteOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
@@ -6,15 +7,153 @@ import AxiosInstance from "../../../../../../../../api/http";
 import CreateModal from "./Insert/CreateModal";
 import EditModal from "./Update/EditModal";
 import { useTranslation } from "react-i18next";
+import styled from "styled-components";
+import { formatNumberWithSeparators } from "../../../../../../../../utils/numberLocale";
+
+const DowntimeListWrapper = styled.div`
+  margin-bottom: 25px;
+  padding: 20px;
+  border: 1px solid #dbe4f0;
+  border-radius: 14px;
+  background: #fbfdff;
+
+  .downtime-list-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+
+  .downtime-list-title {
+    margin: 0 0 6px;
+    color: #1464ff;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .downtime-list-description {
+    margin: 0;
+    color: #5f7190;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .downtime-list-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .downtime-list-create-trigger {
+    margin: 0 !important;
+    width: auto !important;
+    justify-content: flex-start !important;
+  }
+
+  .downtime-list-add-button {
+    height: 36px;
+    border-color: #d8e2ef;
+    border-radius: 10px;
+    color: #30445f;
+    font-weight: 500;
+    box-shadow: 0 2px 5px rgba(18, 38, 63, 0.12);
+  }
+
+  .downtime-list-delete-button {
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  .downtime-list-table {
+    overflow: hidden;
+    border: 1px solid #dbe4f0;
+    border-radius: 14px;
+    background: #fff;
+  }
+
+  .ant-table {
+    background: transparent;
+  }
+
+  .ant-table-thead > tr > th {
+    border-bottom: 1px solid #e2eaf4;
+    background: #f8fbff !important;
+    color: #8ca0ba;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .ant-table-tbody > tr > td {
+    border-bottom: 1px solid #edf2f7;
+    color: #30445f;
+    font-size: 14px;
+  }
+
+  .ant-table-tbody > tr:last-child > td {
+    border-bottom: 0;
+  }
+
+  .ant-table-tbody > tr:hover > td {
+    background: #f8fbff !important;
+  }
+
+  .downtime-list-reason {
+    font-weight: 600;
+    color: #30445f;
+    cursor: pointer;
+  }
+
+  .downtime-list-field {
+    min-height: 33px;
+    padding: 7px 12px;
+    border: 1px solid #dbe4f0;
+    border-radius: 8px;
+    background: #f9fbfe;
+    color: #405574;
+    line-height: 1.35;
+    box-shadow: 0 2px 5px rgba(18, 38, 63, 0.08);
+  }
+
+  .downtime-list-checkbox-field {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+  }
+
+  .downtime-list-cost {
+    color: #006fbd;
+    font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    padding: 14px;
+
+    .downtime-list-header {
+      flex-direction: column;
+    }
+
+    .downtime-list-actions {
+      width: 100%;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+  }
+`;
 
 export default function DuruslarListesiTablo({ isActive }) {
   const [loading, setLoading] = useState(false);
-  const { control, watch, setValue } = useFormContext();
+  const { watch } = useFormContext();
   const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const { t } = useTranslation();
+  const currentLang = localStorage.getItem("i18nextLng") || "en";
   const calismaSaat = Number(watch("calismaSaat") || 0);
   const calismaDakika = Number(watch("calismaDakika") || 0);
   const defaultCalismaSuresiDakika = calismaSaat * 60 + calismaDakika;
@@ -88,75 +227,85 @@ export default function DuruslarListesiTablo({ isActive }) {
 
   const columns = [
     {
-      title: "Duruş Nedeni",
-      dataIndex: "MKD_NEDEN",
-      key: "MKD_NEDEN",
-      width: 150,
+      title: t("workOrder.downtimeList.no"),
+      dataIndex: "rowNo",
+      key: "rowNo",
+      width: 60,
       ellipsis: true,
     },
     {
-      title: "Planlı",
+      title: t("workOrder.downtimeList.reason"),
+      dataIndex: "MKD_NEDEN",
+      key: "MKD_NEDEN",
+      width: 220,
+      ellipsis: true,
+      render: (text, record) => (
+        <span className="downtime-list-reason" onClick={() => onRowClick(record)}>
+          {text || "-"}
+        </span>
+      ),
+    },
+    {
+      title: t("workOrder.downtimeList.planned"),
       dataIndex: "MKD_PLANLI",
       key: "MKD_PLANLI",
       width: 100,
       ellipsis: true,
-      render: (text, record) => {
-        return record.MKD_PLANLI ? (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <CheckOutlined style={{ color: "green" }} />
-          </div>
-        ) : (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <CloseOutlined style={{ color: "red" }} />
-          </div>
-        );
-      },
+      render: (text, record) => (
+        <div className="downtime-list-field downtime-list-checkbox-field">
+          {record.MKD_PLANLI ? <CheckOutlined style={{ color: "#52c41a" }} /> : <CloseOutlined style={{ color: "#ff4d4f" }} />}
+        </div>
+      ),
     },
     {
-      title: "Başlama Tarihi",
+      title: t("workOrder.downtimeList.startDate"),
       dataIndex: "MKD_BASLAMA_TARIH",
       key: "MKD_BASLAMA_TARIH",
-      width: 200,
+      width: 170,
       ellipsis: true,
-      render: (text) => formatDate(text),
+      render: (text) => <div className="downtime-list-field">{formatDate(text) || "-"}</div>,
     },
     {
-      title: "Başlama Saati",
+      title: t("workOrder.downtimeList.startTime"),
       dataIndex: "MKD_BASLAMA_SAAT",
       key: "MKD_BASLAMA_SAAT",
-      width: 200,
+      width: 170,
       ellipsis: true,
-      render: (text) => formatTime(text),
+      render: (text) => <div className="downtime-list-field">{formatTime(text) || "-"}</div>,
     },
     {
-      title: "Bitiş Tarihi",
+      title: t("workOrder.downtimeList.endDate"),
       dataIndex: "MKD_BITIS_TARIH",
       key: "MKD_BITIS_TARIH",
-      width: 200,
+      width: 170,
       ellipsis: true,
-      render: (text) => formatDate(text),
+      render: (text) => <div className="downtime-list-field">{formatDate(text) || "-"}</div>,
     },
     {
-      title: "Bitiş Saati",
+      title: t("workOrder.downtimeList.endTime"),
       dataIndex: "MKD_BITIS_SAAT",
       key: "MKD_BITIS_SAAT",
-      width: 200,
+      width: 170,
       ellipsis: true,
-      render: (text) => formatTime(text),
+      render: (text) => <div className="downtime-list-field">{formatTime(text) || "-"}</div>,
     },
     {
-      title: "Süre (dk.)",
+      title: t("workOrder.downtimeList.duration"),
       dataIndex: "MKD_SURE",
       key: "MKD_SURE",
-      width: 200,
+      width: 120,
       ellipsis: true,
+      render: (text) => <div className="downtime-list-field">{`${text || 0} ${t("workOrder.controlList.minuteShort")}`}</div>,
     },
     {
-      title: "Toplam Maliyet",
+      title: t("workOrder.downtimeList.totalCost"),
       dataIndex: "MKD_TOPLAM_MALIYET",
       key: "MKD_TOPLAM_MALIYET",
-      width: 200,
+      width: 170,
       ellipsis: true,
+      render: (text) => (
+        <div className="downtime-list-field downtime-list-cost">{`${formatNumberWithSeparators(text || 0, currentLang)} TL`}</div>
+      ),
     },
   ];
 
@@ -167,9 +316,10 @@ export default function DuruslarListesiTablo({ isActive }) {
       setLoading(true);
       AxiosInstance.get(`FetchIsEmriDurusList?isemriID=${secilenIsEmriID}&durusID=0`)
         .then((response) => {
-          const fetchedData = response.map((item) => ({
+          const fetchedData = response.map((item, index) => ({
             ...item,
             key: item.TB_MAKINE_DURUS_ID,
+            rowNo: index + 1,
           }));
           setData(fetchedData);
         })
@@ -234,10 +384,14 @@ export default function DuruslarListesiTablo({ isActive }) {
   };
 
   return (
-    <div style={{ marginBottom: "25px" }}>
-      <div style={{ display: "flex", justifySelf: "right" }}>
-        {selectedRowKeys.length > 0 && (
-          <div>
+    <DowntimeListWrapper>
+      <div className="downtime-list-header">
+        <div>
+          <h3 className="downtime-list-title">{t("workOrder.downtimeList.title")}</h3>
+          <p className="downtime-list-description">{t("workOrder.downtimeList.description")}</p>
+        </div>
+        <div className="downtime-list-actions">
+          {selectedRowKeys.length > 0 && (
             <Popconfirm
               title={t("silmeIslemi", "Silme İşlemi")}
               description={t("silmeOnayi", "Bu öğeyi silmek istediğinize emin misiniz?")}
@@ -246,44 +400,52 @@ export default function DuruslarListesiTablo({ isActive }) {
               cancelText={t("hayir", "Hayır")}
               icon={<QuestionCircleOutlined style={{ color: "red" }} />}
             >
-              <Button danger icon={<DeleteOutlined />}>
+              <Button danger icon={<DeleteOutlined />} className="downtime-list-delete-button">
                 {t("sil", "Sil")}
               </Button>
             </Popconfirm>
-          </div>
-        )}
-        <CreateModal
-          onRefresh={refreshTable}
-          secilenIsEmriID={secilenIsEmriID}
-          lokasyon={lokasyon}
-          makineTanim={makineTanim}
-          lokasyonID={lokasyonID}
-          makineID={makineID}
-          defaultCalismaSuresiDakika={defaultCalismaSuresiDakika}
-          baslamaZamani={baslamaZamani}
-          baslamaZamaniSaati={baslamaZamaniSaati}
-          bitisZamani={bitisZamani}
-          bitisZamaniSaati={bitisZamaniSaati}
-        />
+          )}
+          <CreateModal
+            kapali={watch("kapali")}
+            onRefresh={refreshTable}
+            secilenIsEmriID={secilenIsEmriID}
+            lokasyon={lokasyon}
+            makineTanim={makineTanim}
+            lokasyonID={lokasyonID}
+            makineID={makineID}
+            defaultCalismaSuresiDakika={defaultCalismaSuresiDakika}
+            baslamaZamani={baslamaZamani}
+            baslamaZamaniSaati={baslamaZamaniSaati}
+            bitisZamani={bitisZamani}
+            bitisZamaniSaati={bitisZamaniSaati}
+            triggerButtonText={t("workOrder.downtimeList.addRecord")}
+            triggerButtonType="default"
+            triggerButtonClassName="downtime-list-add-button"
+            triggerContainerClassName="downtime-list-create-trigger"
+          />
+        </div>
       </div>
 
-      <Table
-        rowSelection={{
-          type: "radio",
-          selectedRowKeys,
-          onChange: onRowSelectChange,
-        }}
-        onRow={(record) => ({
-          onClick: () => onRowClick(record),
-        })}
-        columns={columns}
-        dataSource={data}
-        loading={loading}
-        scroll={{
-          // x: "auto",
-          y: "calc(100vh - 360px)",
-        }}
-      />
+      <div className="downtime-list-table">
+        <Table
+          rowSelection={{
+            type: "radio",
+            selectedRowKeys,
+            onChange: onRowSelectChange,
+          }}
+          onRow={(record) => ({
+            onClick: () => onRowClick(record),
+          })}
+          columns={columns}
+          dataSource={data}
+          loading={loading}
+          pagination={false}
+          scroll={{
+            x: 1280,
+            y: "calc(100vh - 420px)",
+          }}
+        />
+      </div>
       {isModalVisible && (
         <EditModal
           selectedRow={selectedRow}
@@ -296,6 +458,10 @@ export default function DuruslarListesiTablo({ isActive }) {
           secilenIsEmriID={secilenIsEmriID}
         />
       )}
-    </div>
+    </DowntimeListWrapper>
   );
 }
+
+DuruslarListesiTablo.propTypes = {
+  isActive: PropTypes.bool,
+};

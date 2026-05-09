@@ -9,7 +9,7 @@ import SecondTabs from "./components/SecondTabs/SecondTabs";
 import Footer from "../Footer";
 import dayjs from "dayjs";
 
-export default function CreateDrawer({ onRefresh }) {
+export default function CreateDrawer({ onRefresh, onOpenEdit }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [disabled, setDisabled] = useState(false);
@@ -375,8 +375,11 @@ export default function CreateDrawer({ onRefresh }) {
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("İşlem Başarılı.");
           setOpen(false);
-          onRefresh();
+          onRefresh?.();
           methods.reset();
+          if (response?.id && onOpenEdit) {
+            onOpenEdit(response.id);
+          }
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {

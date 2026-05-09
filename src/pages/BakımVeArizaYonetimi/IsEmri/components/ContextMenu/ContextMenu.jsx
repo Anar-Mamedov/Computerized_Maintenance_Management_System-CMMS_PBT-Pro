@@ -2,15 +2,15 @@ import React, { useState } from "react";
 import { Button, Popover, Typography } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
 import Sil from "./components/Sil";
-import Iptal from "./components/Iptal/Iptal";
 import Kapat from "./components/Kapat/Kapat";
-import Parametreler from "./components/Parametreler/Parametreler";
 import TarihceTablo from "./components/TarihceTablo";
 import Form from "./components/Form/Form";
 import Ac from "./components/Ac";
 import OnayaGonder from "./components/OnayaGonder.jsx";
 import OnayaGonderOnaylayiciList from "./components/OnayaGonderOnaylayiciList.jsx";
 import NotEkle from "./components/NotEkle.jsx";
+import IleriTarihePlanla from "./components/IleriTarihePlanla.jsx";
+import AtolyeTransferi from "./components/AtolyeTransferi.jsx";
 
 const { Text } = Typography;
 
@@ -36,7 +36,6 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
   const hidePopover = () => setVisible(false);
 
   const isDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 4);
-  const iptalDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 2 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5);
   const kapatDisabled = selectedRows.some((row) => row.KAPALI === true);
 
   const showAc = selectedRows.length === 1 && selectedRows.every((row) => row.KAPALI === true);
@@ -64,9 +63,13 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
 
   const showForm = selectedRows.length >= 1;
   const showNotEkle = selectedRows.length === 1 && (selectedRows[0]?.ISM_DIS_NOT === null || selectedRows[0]?.ISM_DIS_NOT === undefined);
+  const showTarihce = selectedRows.length === 1;
+  const showIleriTarihePlanla = selectedRows.length === 1 && selectedRows.every((row) => row.KAPALI === false);
+  const showAtolyeTransferi = selectedRows.length === 1 && selectedRows.every((row) => row.KAPALI === false);
 
-  const hasTransferSection = showForm || showNotEkle || showKapat;
+  const hasTransferSection = showForm || showIleriTarihePlanla || showAtolyeTransferi || showNotEkle || showKapat;
   const hasExtraSection = showAc || showOnayaGonder || showOnayaGonderManuel || showSil;
+  const hasInfoSection = showTarihce;
 
   const selectedKod = selectedRows.length === 1 ? selectedRows[0]?.ISEMRI_NO : `${selectedRows.length} kayıt`;
 
@@ -84,6 +87,8 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
           <>
             <SectionLabel>Planlama ve Transfer</SectionLabel>
             {showForm && <Form selectedRows={selectedRows} />}
+            {showIleriTarihePlanla && <IleriTarihePlanla selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
+            {showAtolyeTransferi && <AtolyeTransferi selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
             {showNotEkle && <NotEkle selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
             {showKapat && <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />}
           </>
@@ -98,6 +103,13 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
               <OnayaGonderOnaylayiciList selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />
             )}
             {showSil && <Sil selectedRows={selectedRows} refreshTableData={refreshTableData} disabled={isDisabled} hidePopover={hidePopover} />}
+          </>
+        )}
+
+        {hasInfoSection && (
+          <>
+            <SectionLabel>Bilgi</SectionLabel>
+            {showTarihce && <TarihceTablo selectedRows={selectedRows} />}
           </>
         )}
       </div>

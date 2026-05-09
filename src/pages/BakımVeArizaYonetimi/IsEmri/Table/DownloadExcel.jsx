@@ -134,6 +134,10 @@ const MainTable = () => {
     data: null,
   });
   const [selectedRows, setSelectedRows] = useState([]);
+  const handleOpenEditDrawer = useCallback((isEmriId) => {
+    if (!isEmriId) return;
+    setDrawer({ visible: true, data: { key: isEmriId } });
+  }, []);
 
   function hexToRGBA(color, opacity) {
     // 1) Geçersiz parametreleri engelle
@@ -1613,7 +1617,7 @@ const MainTable = () => {
         <div style={{ display: "flex", gap: "10px" }}>
           <Button onClick={handleDownloadCSV}>CSV Olarak İndir</Button>
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
-          <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
+          <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} onOpenEdit={handleOpenEditDrawer} />
         </div>
       </div>
       <Spin spinning={loading}>

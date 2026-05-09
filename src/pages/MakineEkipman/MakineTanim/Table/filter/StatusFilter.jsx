@@ -1,9 +1,10 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import { Select } from "antd";
 import { t } from "i18next";
 
 const StatusFilter = ({ onSubmit }) => {
-  const [selectedValue, setSelectedValue] = useState(-1);
+  const [selectedValue, setSelectedValue] = useState(1);
 
   const options = [
     { value: -1, label: t("tumu") },
@@ -22,3 +23,7 @@ const StatusFilter = ({ onSubmit }) => {
 };
 
 export default StatusFilter;
+
+StatusFilter.propTypes = {
+  onSubmit: PropTypes.func,
+};
