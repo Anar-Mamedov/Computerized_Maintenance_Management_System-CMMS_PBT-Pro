@@ -1,16 +1,16 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs, message } from "antd";
+import React, { useEffect, useState } from "react";
+import PropTypes from "prop-types";
+import { Button, Modal, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../../../api/http";
-import { Controller, useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
 import dayjs from "dayjs";
 
 export default function CreateModal({
-  workshopSelectedId,
-  onSubmit,
   onRefresh,
   secilenIsEmriID,
+  kapali,
   makineTanim,
   lokasyon,
   lokasyonID,
@@ -20,10 +20,14 @@ export default function CreateModal({
   baslamaZamaniSaati,
   bitisZamani,
   bitisZamaniSaati,
+  triggerButtonText = "Yeni Kayıt",
+  triggerButtonType = "link",
+  triggerButtonClassName,
+  triggerContainerClassName,
 }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   // message
-  const [messageApi, contextHolder] = message.useMessage();
+  const [, contextHolder] = message.useMessage();
   // message end
   const methods = useForm({
     defaultValues: {
@@ -49,7 +53,7 @@ export default function CreateModal({
     },
   });
 
-  const { setValue, reset, handleSubmit, watch } = methods;
+  const { setValue, reset } = methods;
 
   const formatDateWithDayjs = (dateString) => {
     const formattedDate = dayjs(dateString);
@@ -132,9 +136,17 @@ export default function CreateModal({
     <FormProvider {...methods}>
       {contextHolder}
       <div>
-        <div style={{ display: "flex", width: "100%", justifyContent: "flex-end", marginBottom: "10px" }}>
-          <Button type="link" onClick={handleModalToggle}>
-            <PlusOutlined /> Yeni Kayıt
+        <div
+          className={triggerContainerClassName}
+          style={{
+            display: "flex",
+            width: "100%",
+            justifyContent: "flex-end",
+            marginBottom: "10px",
+          }}
+        >
+          <Button disabled={kapali} type={triggerButtonType} className={triggerButtonClassName} onClick={handleModalToggle}>
+            <PlusOutlined /> {triggerButtonText}
           </Button>
         </div>
 
@@ -147,3 +159,22 @@ export default function CreateModal({
     </FormProvider>
   );
 }
+
+CreateModal.propTypes = {
+  onRefresh: PropTypes.func,
+  secilenIsEmriID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  kapali: PropTypes.bool,
+  makineTanim: PropTypes.string,
+  lokasyon: PropTypes.string,
+  lokasyonID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  makineID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  defaultCalismaSuresiDakika: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  baslamaZamani: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  baslamaZamaniSaati: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  bitisZamani: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  bitisZamaniSaati: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  triggerButtonText: PropTypes.string,
+  triggerButtonType: PropTypes.string,
+  triggerButtonClassName: PropTypes.string,
+  triggerContainerClassName: PropTypes.string,
+};
