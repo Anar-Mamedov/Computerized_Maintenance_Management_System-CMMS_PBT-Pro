@@ -10,6 +10,7 @@ import OnayaGonder from "./components/OnayaGonder.jsx";
 import OnayaGonderOnaylayiciList from "./components/OnayaGonderOnaylayiciList.jsx";
 import NotEkle from "./components/NotEkle.jsx";
 import IleriTarihePlanla from "./components/IleriTarihePlanla.jsx";
+import AtolyeTransferi from "./components/AtolyeTransferi.jsx";
 
 const { Text } = Typography;
 
@@ -64,8 +65,9 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
   const showNotEkle = selectedRows.length === 1 && (selectedRows[0]?.ISM_DIS_NOT === null || selectedRows[0]?.ISM_DIS_NOT === undefined);
   const showTarihce = selectedRows.length === 1;
   const showIleriTarihePlanla = selectedRows.length === 1 && selectedRows.every((row) => row.KAPALI === false);
+  const showAtolyeTransferi = selectedRows.length === 1 && selectedRows.every((row) => row.KAPALI === false);
 
-  const hasTransferSection = showForm || showIleriTarihePlanla || showNotEkle || showKapat;
+  const hasTransferSection = showForm || showIleriTarihePlanla || showAtolyeTransferi || showNotEkle || showKapat;
   const hasExtraSection = showAc || showOnayaGonder || showOnayaGonderManuel || showSil;
   const hasInfoSection = showTarihce;
 
@@ -86,6 +88,7 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
             <SectionLabel>Planlama ve Transfer</SectionLabel>
             {showForm && <Form selectedRows={selectedRows} />}
             {showIleriTarihePlanla && <IleriTarihePlanla selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
+            {showAtolyeTransferi && <AtolyeTransferi selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
             {showNotEkle && <NotEkle selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
             {showKapat && <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />}
           </>
