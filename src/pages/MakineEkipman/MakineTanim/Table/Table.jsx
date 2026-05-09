@@ -276,7 +276,7 @@ const MainTable = ({ setSelectedIds }) => {
   const [body, setBody] = useState({
     keyword: "",
     filters: {},
-    isActive: -1,
+    isActive: 1,
   });
 
   // ana tablo api isteği için kullanılan useEffect
