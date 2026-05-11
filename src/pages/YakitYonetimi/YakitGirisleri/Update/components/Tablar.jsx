@@ -49,7 +49,7 @@ const StyledTabs = styled(Tabs)`
 
 //styled components end
 
-export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen }) {
+export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen, selectedRowID }) {
   const { watch } = useFormContext();
   const [activeTabKey, setActiveTabKey] = useState("4"); // Default to the FisIcerigi tab
 
@@ -75,13 +75,13 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen })
     {
       key: "6",
       label: t("Ekli Belgeler"),
-      children: <DosyaUpload modalOpen={modalOpen} />,
+      children: <DosyaUpload modalOpen={modalOpen} selectedRowID={selectedRowID} />,
     },
 
     {
       key: "7",
       label: t("Resimler"),
-      children: <Resimler modalOpen={modalOpen} />,
+      children: <Resimler modalOpen={modalOpen} selectedRowID={selectedRowID}/>,
     },
 
     {

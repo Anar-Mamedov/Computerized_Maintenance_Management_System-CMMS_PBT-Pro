@@ -79,6 +79,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen })
       children: <IletisimBilgileri modalOpen={modalOpen} />,
     },
 
+    /*
     {
       key: "6",
       label: t("Ekli Belgeler"),
@@ -90,6 +91,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen })
       label: t("Resimler"),
       children: <Resim modalOpen={modalOpen} />,
     },
+    */
 
     {
       key: "8",

@@ -73,7 +73,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen })
       children: <FisIcerigi modalOpen={modalOpen} />,
     },
 
-    {
+    /*{
       key: "6",
       label: t("Ekli Belgeler"),
       children: <Belgeler modalOpen={modalOpen} />,
@@ -84,6 +84,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen })
       label: t("Resimler"),
       children: <Resim modalOpen={modalOpen} />,
     },
+    */
 
     {
       key: "8",
