@@ -252,7 +252,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           ) : (
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <div style={{ height: "calc(100vh - 110px)", overflowY: "auto" }}>
-                <MainTabs />
+                <MainTabs selectedRowID={selectedRow?.key} />
                 <Tablar selectedRowID={selectedRow?.key} />
               </div>
             </form>

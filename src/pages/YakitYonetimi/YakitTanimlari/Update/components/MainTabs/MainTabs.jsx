@@ -1,13 +1,15 @@
-import React, { useEffect } from "react";
-import { Typography, Input, InputNumber, Switch, Button } from "antd"; 
+import React, { useState, useEffect } from "react";
+import { Typography, Input, InputNumber, Switch, Button, Modal } from "antd"; 
 import { Controller, useFormContext } from "react-hook-form";
 import { t } from "i18next";
-import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox"; 
+import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
+import StokMiktariList from "./components/StokMiktarıList"; 
 import { MoreOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
-export default function MainTabs({ modalOpen }) {
+export default function MainTabs({ modalOpen, selectedRowID }) {
+  const [isStokModalVisible, setIsStokModalVisible] = useState(false);
   const {
     control,
     setValue,
@@ -229,7 +231,7 @@ export default function MainTabs({ modalOpen }) {
                     />
                 )}
                 />
-                <Button icon={<MoreOutlined />} />
+                <Button icon={<MoreOutlined onClick={() => setIsStokModalVisible(true)} />} />
             </div>
           </div>
           <div style={{ minWidth: "80px", marginLeft: "10px" }}></div>
@@ -266,6 +268,20 @@ export default function MainTabs({ modalOpen }) {
         </div>
 
       </div>
+      <Modal
+        title={t("Stok Miktarı")}
+        open={isStokModalVisible}
+        onCancel={() => setIsStokModalVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setIsStokModalVisible(false)}>
+            {t("Kapat")}
+          </Button>
+        ]}
+        width={800}
+        destroyOnClose
+      >
+        <StokMiktariList stokId={selectedRowID} />
+      </Modal>
     </div>
   );
 }
