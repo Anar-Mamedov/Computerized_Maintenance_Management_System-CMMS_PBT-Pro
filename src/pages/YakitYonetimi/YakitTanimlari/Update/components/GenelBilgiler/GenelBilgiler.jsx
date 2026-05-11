@@ -78,18 +78,20 @@ function GenelBilgiler({ selectedRowID }) {
             </div>
             <div style={{ flex: 1 }}>
               <Controller
-                name="girisFiyati"
-                control={control}
-                render={({ field }) => (
-                  <InputNumber
-                    {...field}
-                    style={inputStyle}
-                    disabled={watch("girisFiyatTuru") !== 6} 
-                    formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                    parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-                  />
-                )}
-              />
+  name="girisFiyati"
+  control={control}
+  render={({ field }) => (
+    <InputNumber
+      {...field}
+      style={inputStyle}
+      // Tür 6 (Sabit Fiyat) değilse kutuyu kapat
+      disabled={watch("girisFiyatTuru") !== 6} 
+      formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+      parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+      onChange={(val) => field.onChange(val)} // Manuel onChange eklemek bazen RHF'te hayat kurtarır
+    />
+  )}
+/>
             </div>
           </div>
         </div>
@@ -121,17 +123,27 @@ function GenelBilgiler({ selectedRowID }) {
 
         {/* KDV */}
         <div style={leftRowStyle}>
-          <Text style={labelStyle}>{t("Kdv (%)")}</Text>
-          <div style={{ display: "flex", gap: "10px", flex: 1 }}>
-            <div style={{ width: "80px" }}>
-                <Controller
-                    name="kdv"
-                    control={control}
-                    render={({ field }) => <InputNumber {...field} min={0} max={100} style={{ width: "100%" }} />}
-                />
-            </div>
-          </div>
-        </div>
+  <Text style={labelStyle}>{t("Kdv (%)")}</Text>
+  <div style={{ display: "flex", gap: "10px", flex: 1 }}>
+    <div style={{ width: "100px" }}>
+        <Controller
+            name="kdv"
+            control={control}
+            render={({ field }) => (
+              <InputNumber 
+                {...field} 
+                min={0} 
+                max={100} 
+                style={{ width: "100%" }} 
+                placeholder="0"
+                // API'den null gelirse 0 göster
+                value={field.value ?? 0} 
+              />
+            )}
+        />
+    </div>
+  </div>
+</div>
 
         {/* Buton */}
         <div style={{ marginTop: "20px" }}>
