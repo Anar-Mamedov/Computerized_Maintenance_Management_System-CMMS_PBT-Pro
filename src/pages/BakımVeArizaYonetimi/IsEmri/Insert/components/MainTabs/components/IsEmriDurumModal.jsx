@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table, Checkbox, message } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../api/http";
 import { Controller, useFormContext } from "react-hook-form";
 import DurumSelect from "./DurumSelect";
@@ -93,7 +94,18 @@ export default function IsEmriDurumModal({ workshopSelectedId, onSubmit, fieldRe
   return (
     <div>
       {contextHolder}
-      <Button onClick={handleModalToggle}> + </Button>
+      <Button
+        style={{
+          width: "32px",
+          height: "32px",
+          padding: "0",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+        onClick={handleModalToggle}>
+        <PlusOutlined />
+      </Button>
       <Modal width={500} centered title="Durum" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <div
           style={{
