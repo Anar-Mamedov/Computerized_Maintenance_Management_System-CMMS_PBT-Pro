@@ -87,7 +87,7 @@ const DosyaUpload = ({ selectedRowID }) => {
   const fetchDosyaIds = async () => {
     try {
       setLoading(true);
-      const response = await AxiosInstance.get(`GetDosyaList?refId=${selectedRowID}&refGrup=STOK`);
+      const response = await AxiosInstance.get(`GetDosyaList?refId=${selectedRowID}&refGrup=YAKITDEPO`);
       const fetchedData = await Promise.all(
         response.map(async (item) => {
           try {
@@ -199,7 +199,7 @@ const DosyaUpload = ({ selectedRowID }) => {
     formData.append("file", file);
     formData.append("name", file.name);
 
-    AxiosInstance.post(`UploadFile?refid=${selectedRowID}&refgrup=STOK`, formData, {
+    AxiosInstance.post(`UploadFile?refid=${selectedRowID}&refgrup=YAKITDEPO`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     })
       .then(() => {

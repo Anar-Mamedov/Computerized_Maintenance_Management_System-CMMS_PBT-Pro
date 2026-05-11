@@ -140,7 +140,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("girenMiktar", item.STK_GIREN_MIKTAR);
           setValue("cikanMiktar", item.STK_CIKAN_MIKTAR);
           setValue("stokMiktar", item.STK_MIKTAR);
-          setValue("kdv", item.STK_KDV_ORAN);
+          setValue("kdv", item.STK_KDV_ORAN); // Burası doğru
           setValue("girisFiyatTuru", item.STK_GIRIS_FIYAT_SEKLI != null ? Number(item.STK_GIRIS_FIYAT_SEKLI) : null);
           setValue("cikisFiyatTuru", item.STK_CIKIS_FIYAT_SEKLI != null ? Number(item.STK_CIKIS_FIYAT_SEKLI) : null);
           setValue("girisFiyati", item.STK_GIRIS_FIYAT_DEGERI);
@@ -179,8 +179,11 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       TIP_ID: Number(data.tipID) || 0,
       BIRIM_ID: Number(data.birimID) || 0,
       GRUP_ID: Number(data.grupID) || 0,
+      GIRIS_FIYAT_SEKLI: Number(data.girisFiyatTuru) || 0,
       GIRIS_FIYAT: Number(data.girisFiyati) || 0,
+      CIKIS_FIYAT_SEKLI: Number(data.cikisFiyatTuru) || 0,
       CIKIS_FIYAT: Number(data.cikisFiyati) || 0,
+      KDV_ORAN: Number(data.kdv) || 0,
       AKTIF: data.aktif,
     };
 
@@ -252,7 +255,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           ) : (
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <div style={{ height: "calc(100vh - 110px)", overflowY: "auto" }}>
-                <MainTabs />
+                <MainTabs selectedRowID={selectedRow?.key} />
                 <Tablar selectedRowID={selectedRow?.key} />
               </div>
             </form>

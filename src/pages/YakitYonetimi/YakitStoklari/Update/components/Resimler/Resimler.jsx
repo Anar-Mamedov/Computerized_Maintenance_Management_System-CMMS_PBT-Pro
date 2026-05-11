@@ -16,7 +16,7 @@ const ResimUpload = ({ selectedRowID }) => {
   const fetchResimIds = async () => {
     try {
       setLoadingImages(true);
-      const [response1] = await Promise.all([AxiosInstance.get(`GetResimIds?RefId=${selectedRowID}&RefGrup=STOK`)]);
+      const [response1] = await Promise.all([AxiosInstance.get(`GetResimIds?RefId=${selectedRowID}&RefGrup=YAKITDEPO`)]);
       const resimIDler = [...response1]; // Her iki API'den gelen verileri birleştiriyoruz
       const urls = await Promise.all(
         resimIDler.map(async (id) => {
@@ -48,7 +48,7 @@ const ResimUpload = ({ selectedRowID }) => {
     beforeUpload: (file) => {
       const formData = new FormData();
       formData.append("file", file);
-      AxiosInstance.post(`UploadPhoto?refid=${selectedRowID}&refgrup=STOK`, formData, {
+      AxiosInstance.post(`UploadPhoto?refid=${selectedRowID}&refgrup=YAKITDEPO`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

@@ -12,9 +12,7 @@ import EditDrawer from "../Update/EditDrawer";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
 import Filters from "./filter/Filters";
-import YakitGiris from "./YakitIslemleri/YakitGiris";
-import YakitCikis from "./YakitIslemleri/YakitCikis";
-import YakitTransfer from "./YakitIslemleri/YakitTransfer";
+import YakitIslemleri from "./YakitIslemleri/YakitIslemleri";
 import { useFormContext } from "react-hook-form";
 import { SiMicrosoftexcel } from "react-icons/si";
 import * as XLSX from "xlsx";
@@ -139,9 +137,8 @@ const MainTable = () => {
   const [xlsxLoading, setXlsxLoading] = useState(false);
   const [status, setStatus] = useState(-1);
   const [cardsData, setCardsData] = useState({});
-  const [yakitGirisModalVisible, setYakitGirisModalVisible] = useState(false);
-  const [yakitCikisModalVisible, setYakitCikisModalVisible] = useState(false);
-  const [yakitTransferModalVisible, setYakitTransferModalVisible] = useState(false);
+  const [yakitIslemleriModalVisible, setYakitIslemleriModalVisible] = useState(false);
+  const [activeTab, setActiveTab] = useState("1");
 
   const [body, setBody] = useState({
     LokasyonIds: [],
@@ -972,33 +969,44 @@ const MainTable = () => {
           <Button style={{ display: "flex", alignItems: "center" }} onClick={handleDownloadXLSX} loading={xlsxLoading} icon={<SiMicrosoftexcel />}>
             İndir
           </Button>
-          <Button 
-            type="primary" // Öne çıkmasını istersen "primary" kalabilir, istemezsen silebilirsin kanka
-            icon={<DownloadOutlined />}
-            style={{ display: "flex", alignItems: "center", backgroundColor: "#ff6d28", borderColor: "#ff6d28" }}
-            onClick={() => setYakitGirisModalVisible(true)}
-          >
-            Giriş
-          </Button>
-          <Button 
-            type="primary" // Öne çıkmasını istersen "primary" kalabilir, istemezsen silebilirsin kanka
-            icon={<UploadOutlined />}
-            style={{ display: "flex", alignItems: "center", backgroundColor: "#ff6d28", borderColor: "#ff6d28" }}
-            onClick={() => setYakitCikisModalVisible(true)}
-          >
-            Çıkış
-          </Button>
-          <Button 
-            type="primary" // Öne çıkmasını istersen "primary" kalabilir, istemezsen silebilirsin kanka
-            icon={<ArrowsAltOutlined />}
-            style={{ display: "flex", alignItems: "center", backgroundColor: "#ff6d28", borderColor: "#ff6d28" }}
-            onClick={() => setYakitTransferModalVisible(true)}
-          >
-            Transfer
-          </Button>
-          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
-          <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
-        </div>
+  <Button 
+    type="primary"
+    icon={<DownloadOutlined />}
+    style={{ display: "flex", alignItems: "center", backgroundColor: "#ff6d28", borderColor: "#ff6d28" }}
+    onClick={() => {
+      setActiveTab("1"); // Giriş Sekmesi
+      setYakitIslemleriModalVisible(true);
+    }}
+  >
+    Giriş
+  </Button>
+  
+  <Button 
+    type="primary"
+    icon={<UploadOutlined />}
+    style={{ display: "flex", alignItems: "center", backgroundColor: "#ff6d28", borderColor: "#ff6d28" }}
+    onClick={() => {
+      setActiveTab("2"); // Çıkış Sekmesi
+      setYakitIslemleriModalVisible(true);
+    }}
+  >
+    Çıkış
+  </Button>
+  
+  <Button 
+    type="primary"
+    icon={<ArrowsAltOutlined />}
+    style={{ display: "flex", alignItems: "center", backgroundColor: "#ff6d28", borderColor: "#ff6d28" }}
+    onClick={() => {
+      setActiveTab("3"); // Transfer Sekmesi
+      setYakitIslemleriModalVisible(true);
+    }}
+  >
+    Transfer
+  </Button>
+  <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
+  <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
+</div>
       </div>
       <Spin spinning={loading}>
         <Table
@@ -1029,23 +1037,12 @@ const MainTable = () => {
         drawerVisible={drawer.visible} 
         onRefresh={refreshTableData} 
       />
-      <YakitGiris
-        visible={yakitGirisModalVisible} 
-        onClose={() => setYakitGirisModalVisible(false)}
-        selectedRows={selectedRows} 
+      <YakitIslemleri
+        visible={yakitIslemleriModalVisible} 
+        onClose={() => setYakitIslemleriModalVisible(false)}
+        defaultTab={activeTab} // Yeni eklediğimiz prop
         onRefresh={refreshTableData}
-      />
-      <YakitCikis
-        visible={yakitCikisModalVisible} 
-        onClose={() => setYakitCikisModalVisible(false)}
-        selectedRows={selectedRows} 
-        onRefresh={refreshTableData}
-      />
-      <YakitTransfer
-        visible={yakitTransferModalVisible} 
-        onClose={() => setYakitTransferModalVisible(false)}
-        selectedRows={selectedRows} 
-        onRefresh={refreshTableData}
+        selectedRows={selectedRows}
       />
 
       {editDrawer1Visible && (
