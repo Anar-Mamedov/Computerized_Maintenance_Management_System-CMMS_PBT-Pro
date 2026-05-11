@@ -148,8 +148,8 @@ const MainTable = () => {
     DepoIds: [],
     LokasyonIds: [],
     YakitIds: [],
-    BaslangicTarihi: null,
-    BitisTarihi: null,
+    BaslangicTarihi: dayjs().subtract(7, 'day').startOf('day').toISOString(),
+    BitisTarihi: dayjs().endOf('day').toISOString(),
     IsExcel: false
   });
 
