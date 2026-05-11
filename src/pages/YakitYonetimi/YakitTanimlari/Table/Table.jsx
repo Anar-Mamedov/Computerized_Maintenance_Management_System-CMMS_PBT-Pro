@@ -498,7 +498,6 @@ const MainTable = () => {
 
   // Talep No için
   const onRowClick = (record) => {
-    console.log("Tıklanan Satırın ID'si:", record.TB_STOK_ID); // Konsolda ID görüyor musun?
     setDrawer({ visible: true, data: { ...record, key: record.TB_STOK_ID } });
   };
 
