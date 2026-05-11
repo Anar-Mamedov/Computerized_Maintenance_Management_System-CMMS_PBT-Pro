@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Input, DatePicker, Select, Row, Col, Typography, message, InputNumber } from "antd";
+import { Button, Input, DatePicker, Select, Row, Col, Typography, message, InputNumber } from "antd";
 import dayjs from "dayjs";
 import AxiosInstance from "../../../../../api/http";
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
-const YakitGirisModal = ({ visible, onClose, onRefresh, selectedRows }) => {
+const YakitGiris = ({ onClose, onRefresh, selectedRows }) => {
   const [loading, setLoading] = useState(false);
   const [depolar, setDepolar] = useState([]);
   const [formData, setFormData] = useState({
@@ -17,106 +17,97 @@ const YakitGirisModal = ({ visible, onClose, onRefresh, selectedRows }) => {
   });
 
   useEffect(() => {
-    if (visible) {
-      fetchDepoListesi();
-
-      // --- KANKA KRİTİK NOKTA BURASI ---
-      // Eğer dışarıdan (tablodan) seçili satır gelmişse ID'yi al, yoksa null bırak
-      const initialDepoId = (selectedRows && selectedRows.length > 0) 
-        ? selectedRows[0].TB_DEPO_ID  // Tablodaki kolon adın neyse o (ID alanı)
-        : null;
-
-      setFormData({ 
-        TarihSaat: dayjs(), 
-        Miktar: 0, 
-        HedefDepoId: initialDepoId, // Otomatik seçim burada yapılıyor
-        BelgeNo: "", 
-        Aciklama: "" 
-      });
+    fetchDepoListesi();
+    if (selectedRows?.[0]) {
+      setFormData(prev => ({ ...prev, HedefDepoId: selectedRows[0].TB_DEPO_ID }));
     }
-  }, [visible, selectedRows]);
+  }, [selectedRows]);
 
   const fetchDepoListesi = async () => {
-  try {
-    const res = await AxiosInstance.post("GetYakitTankList", { 
-      LokasyonIds: [], 
-      YakitTipIds: [], 
-      Durum: -1 
-    });
-
-    let list = [];
-
-    // 1. İhtimal: Axios standart (res.data.data)
-    if (res?.data?.data && Array.isArray(res.data.data)) {
-      list = res.data.data;
-    } 
-    // 2. İhtimal: Interceptor kullanılmış (res.data)
-    else if (res?.data && Array.isArray(res.data)) {
-      list = res.data;
-    }
-    // 3. İhtimal: Çok sadeleştirilmiş response (res)
-    else if (Array.isArray(res)) {
-      list = res;
-    }
-
-    if (list.length > 0) {
-      setDepolar(list.map(item => ({ 
-        value: item.TB_DEPO_ID, 
-        label: `${item.DEP_KOD} (${item.DEP_TANIM})` 
-      })));
-    } else {
-      console.warn("Liste boş veya yapılamadı:", res);
-    }
-    
-  } catch (err) { 
-    message.error("Tank listesi yüklenemedi."); 
-    console.error("Hata detayı:", err);
-  }
-};
+    try {
+      const res = await AxiosInstance.post("GetYakitTankList", { LokasyonIds: [], YakitTipIds: [], Durum: -1 });
+      const list = Array.isArray(res?.data) ? res.data : (res?.data?.data || []);
+      setDepolar(list.map(item => ({ value: item.TB_DEPO_ID, label: `${item.DEP_KOD} (${item.DEP_TANIM})` })));
+    } catch (err) { message.error("Liste yüklenemedi."); }
+  };
 
   const handleSave = async () => {
-    if (formData.Miktar <= 0) return message.error("Lütfen miktar giriniz.");
-    if (!formData.HedefDepoId) return message.error("Hedef tank seçimi zorunludur.");
+    if (formData.Miktar <= 0 || !formData.HedefDepoId) return message.error("Zorunlu alanları doldurun!");
     setLoading(true);
     try {
-      await AxiosInstance.post("AddYakitIslemi", { ...formData, IslemTipi: "GIRIS", KaynakDepoId: -1, MakineId: -1, TarihSaat: formData.TarihSaat.format("YYYY-MM-DDTHH:mm:ss") });
-      message.success("Giriş işlemi kaydedildi.");
+      await AxiosInstance.post("AddYakitIslemi", { 
+        ...formData, 
+        IslemTipi: "GIRIS", 
+        KaynakDepoId: -1, 
+        MakineId: -1, 
+        TarihSaat: formData.TarihSaat.format("YYYY-MM-DDTHH:mm:ss") 
+      });
+      message.success("İşlem başarılı.");
+      onRefresh();
       onClose();
-      if (onRefresh) onRefresh();
-    } catch (error) { message.error("Hata oluştu."); } finally { setLoading(false); }
+    } catch (error) { message.error("Hata!"); } finally { setLoading(false); }
   };
 
   return (
-    <Modal title={<Title level={5}>Yakıt Giriş</Title>} open={visible} onCancel={onClose}
-      footer={[<Button key="b" onClick={onClose}>Vazgeç</Button>, <Button key="s" type="primary" loading={loading} onClick={handleSave}>Kaydet</Button>]}
-    >
+    <div style={{ padding: "16px 0" }}>
       <Row gutter={[16, 16]}>
-        <Col span={24}>
-          <Text strong>İşlem Yapılan Depo / Tank</Text>
+        <Col span={16}>
+          <Text strong>İşlem Yapılan Depo / Tank <span style={{color: 'red'}}>*</span></Text>
           <Select 
             style={{ width: "100%", marginTop: "5px" }} 
-            placeholder="Seçiniz..." 
-            showSearch // Aramayı açtım, rahat bulursun
-            optionFilterProp="label"
-            value={formData.HedefDepoId} 
-            onChange={(val) => setFormData({...formData, HedefDepoId: val})} 
             options={depolar} 
+            value={formData.HedefDepoId}
+            onChange={(val) => setFormData({...formData, HedefDepoId: val})}
+            showSearch
           />
         </Col>
-        <Col span={12}><Text strong>Tarih / Saat</Text>
-          <DatePicker showTime style={{ width: "100%", marginTop: "5px" }} value={formData.TarihSaat} onChange={(val) => setFormData({...formData, TarihSaat: val})} format="DD.MM.YYYY HH:mm" />
+        <Col span={8}>
+          <Text strong>Tarih / Saat <span style={{color: 'red'}}>*</span></Text>
+          <DatePicker 
+            showTime 
+            style={{ width: "100%", marginTop: "5px" }} 
+            value={formData.TarihSaat} 
+            onChange={(val) => setFormData({...formData, TarihSaat: val})} 
+          />
         </Col>
-        <Col span={12}><Text strong>Miktar (Litre)</Text>
-          <InputNumber style={{ width: "100%", marginTop: "5px" }} value={formData.Miktar} onChange={(val) => setFormData({...formData, Miktar: val})} />
+        <Col span={12}>
+          <Text strong>Miktar (Litre) <span style={{color: 'red'}}>*</span></Text>
+          <InputNumber 
+            style={{ width: "100%", marginTop: "5px" }} 
+            value={formData.Miktar} 
+            onChange={(val) => setFormData({...formData, Miktar: val})} 
+            placeholder="0"
+          />
         </Col>
-        <Col span={24}><Text strong>Belge No</Text>
-          <Input style={{ width: "100%", marginTop: "5px" }} placeholder="Fatura/İrsaliye" value={formData.BelgeNo} onChange={(e) => setFormData({...formData, BelgeNo: e.target.value})} />
+        <Col span={12}>
+          <Text strong>Belge No</Text>
+          <Input 
+            style={{ width: "100%", marginTop: "5px" }} 
+            placeholder="İrsaliye / Fatura" 
+            value={formData.BelgeNo} 
+            onChange={(e) => setFormData({...formData, BelgeNo: e.target.value})} 
+          />
         </Col>
-        <Col span={24}><Text strong>Açıklama</Text>
-          <Input.TextArea rows={2} style={{ marginTop: "5px" }} value={formData.Aciklama} onChange={(e) => setFormData({...formData, Aciklama: e.target.value})} />
+        <Col span={24}>
+          <Text strong>Açıklama</Text>
+          <Input.TextArea 
+            rows={2} 
+            style={{ marginTop: "5px" }} 
+            placeholder="Notlar..." 
+            value={formData.Aciklama} 
+            onChange={(e) => setFormData({...formData, Aciklama: e.target.value})} 
+          />
+        </Col>
+        {/* FOOTER BUTONLARI */}
+        <Col span={24} style={{ borderTop: "1px solid #f0f0f0", paddingTop: "15px", textAlign: "right" }}>
+          <Button onClick={onClose} style={{ marginRight: "10px" }}>Vazgeç</Button>
+          <Button type="primary" onClick={handleSave} loading={loading} style={{ backgroundColor: "#fa541c", borderColor: "#fa541c" }}>
+            Kaydet
+          </Button>
         </Col>
       </Row>
-    </Modal>
+    </div>
   );
 };
-export default YakitGirisModal;
+
+export default YakitGiris;
