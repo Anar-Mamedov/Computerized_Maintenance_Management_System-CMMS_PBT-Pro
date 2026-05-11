@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table, Checkbox, message, Input } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../api/http";
 import { Controller, set, useFormContext } from "react-hook-form";
 import DurumSelect from "./DurumSelect";
@@ -152,10 +153,17 @@ export default function IsEmriDurumModal({ workshopSelectedId, onSubmit, fieldRe
     <div>
       {contextHolder}
       <Button
+        style={{
+          width: "32px",
+          height: "32px",
+          padding: "0",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
         disabled={kapali} // Disable the select based on the kapali field or external props
         onClick={handleModalToggle}>
-        {" "}
-        +{" "}
+        <PlusOutlined />
       </Button>
       <Modal width={500} centered title="Durum" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
         <div
