@@ -464,7 +464,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                       {...field}
                       status={errors.isEmriDurum ? "error" : ""}
                       type="text" // Set the type to "text" for name input
-                      style={{ width: "255px" }}
+                      style={{ width: "265px" }}
                       disabled
                     />
                   )}
