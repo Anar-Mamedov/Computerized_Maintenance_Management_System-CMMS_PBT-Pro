@@ -73,14 +73,14 @@ export default function MakineSecim({
 
   const columns = [
     {
-      title: "Makine Kodu",
+      title: "Ekipman Kodu",
       dataIndex: "MKN_KOD",
       key: "MKN_KOD",
       width: 150,
       ellipsis: true,
     },
     {
-      title: "Makine Tanımı",
+      title: "Ekipman Tanımı",
       dataIndex: "MKN_TANIM",
       key: "MKN_TANIM",
       width: 250,
@@ -98,7 +98,7 @@ export default function MakineSecim({
       ),
     },
     {
-      title: "Makine Durumu",
+      title: "Ekipman Durumu",
       dataIndex: "MKN_DURUM",
       key: "MKN_DURUM",
       width: 150,
@@ -112,7 +112,7 @@ export default function MakineSecim({
       ellipsis: true,
     },
     {
-      title: "Makine Tipi",
+      title: "Ekipman Tipi",
       dataIndex: "MKN_TIP",
       key: "MKN_TIP",
       width: 150,

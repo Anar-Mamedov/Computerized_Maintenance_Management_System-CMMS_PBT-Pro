@@ -91,7 +91,7 @@ export default function ZamanAraligi({ onChange }) {
       render={({ field }) => (
         <Select
           {...field}
-          style={{ width: "140px" }}
+          style={{ width: "200px" }}
           placeholder="Tarih Seç"
           options={[
             { value: "all", label: "Tümü" },

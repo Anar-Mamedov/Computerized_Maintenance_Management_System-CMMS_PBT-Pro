@@ -291,7 +291,7 @@ export default function SecondTabs() {
     <Controller
           name="StokKullanim"
           control={control}
-          defaultValue={true}
+          defaultValue={false}
           render={({ field }) => (
             <Checkbox
               {...field}

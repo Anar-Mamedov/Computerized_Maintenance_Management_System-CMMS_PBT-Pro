@@ -24,7 +24,7 @@ export default function CreateDrawer({ onRefresh }) {
       Miktar: 0,
       Fiyat: 0,
       Tutar: 0,
-      StokKullanim: true,
+      StokKullanim: false,
       FullDepo: false,
       YakitTipId: null,
       YakitTankId: null,
