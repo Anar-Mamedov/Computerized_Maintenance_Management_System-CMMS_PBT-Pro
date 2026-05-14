@@ -131,6 +131,7 @@ const MainTable = ({
   // MasrafMerkeziTablo ile paralel: alan adlarını ve kontrolü prop ile al
   makineFieldName = "makine",
   makineIdFieldName = "makineID",
+  placeholder,
   disabled = false,
   onClear,
   isRequired = false,
@@ -1583,6 +1584,7 @@ const MainTable = ({
                 type="text"
                 style={{ width: "100%" }}
                 readOnly
+                placeholder={placeholder}
                 suffix={
                   makineValue ? (
                     <CloseOutlined
@@ -1787,6 +1789,7 @@ MainTable.propTypes = {
   suppressFormFields: PropTypes.bool,
   makineFieldName: PropTypes.string,
   makineIdFieldName: PropTypes.string,
+  placeholder: PropTypes.string,
   disabled: PropTypes.bool,
   onClear: PropTypes.func,
   isRequired: PropTypes.bool,

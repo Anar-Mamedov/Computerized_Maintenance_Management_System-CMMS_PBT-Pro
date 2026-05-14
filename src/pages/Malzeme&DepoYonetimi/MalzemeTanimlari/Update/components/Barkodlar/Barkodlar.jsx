@@ -14,6 +14,25 @@ const defaultValues = {
 
 const BARKOD_TIPI = "EAN13";
 const KONTROL_BITI = true;
+const getBarkodListPayload = (response) => {
+  if (Array.isArray(response)) {
+    return response;
+  }
+
+  if (Array.isArray(response?.data)) {
+    return response.data;
+  }
+
+  return [];
+};
+
+const getBarkodDetailPayload = (response) => {
+  if (response?.data && !Array.isArray(response.data)) {
+    return response.data;
+  }
+
+  return response ?? {};
+};
 
 function BarkodModal({ open, barkodId, stokId, onClose, onRefresh }) {
   const [loading, setLoading] = useState(false);
@@ -35,9 +54,10 @@ function BarkodModal({ open, barkodId, stokId, onClose, onRefresh }) {
       setLoading(true);
       try {
         const response = await AxiosInstance.get(`GetStokBarkodById?barkodID=${barkodId}`);
+        const barkod = getBarkodDetailPayload(response);
         reset({
-          barkodNo: response?.STB_BARKODNO ?? "",
-          aktif: response?.STB_AKTIF ?? true,
+          barkodNo: barkod?.STB_BARKODNO ?? "",
+          aktif: barkod?.STB_AKTIF ?? true,
         });
       } catch (error) {
         console.error("Barkod bilgisi çekilirken hata oluştu:", error);
@@ -230,6 +250,9 @@ export default function Barkodlar({ selectedRowID }) {
 
   const fetchBarkodList = async () => {
     if (!selectedRowID) {
+      setData([]);
+      setSelectedRowKeys([]);
+      setSelectedRows([]);
       return;
     }
 
@@ -238,10 +261,14 @@ export default function Barkodlar({ selectedRowID }) {
       const response = await AxiosInstance.get("GetStokBarkodList", {
         params: { stokId: selectedRowID },
       });
-      const mappedData = response.map((item) => ({
+      const mappedData = getBarkodListPayload(response).map((item, index) => ({
         ...item,
-        key: item.TB_STOK_BARKOD_ID,
+        clientKey: `${item.TB_STOK_BARKOD_ID ?? "barkod"}-${item.STB_STOK_ID ?? selectedRowID}-${index}`,
+        barkodId: item.TB_STOK_BARKOD_ID ?? null,
         barkodNo: item.STB_BARKODNO,
+        barkodTipi: item.STB_TIP ?? "-",
+        kontrolBiti: item.STB_KONTROL_BITI ?? false,
+        aktif: item.STB_AKTIF ?? false,
       }));
       setData(mappedData);
     } catch (error) {
@@ -264,7 +291,7 @@ export default function Barkodlar({ selectedRowID }) {
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
-    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
+    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.clientKey));
     setSelectedRows(newSelectedRows);
   };
 
@@ -273,7 +300,7 @@ export default function Barkodlar({ selectedRowID }) {
   };
 
   const handleOpenEdit = (record) => {
-    setModalState({ open: true, barkodId: record.key });
+    setModalState({ open: true, barkodId: record.barkodId });
   };
 
   const handleDelete = async () => {
@@ -284,7 +311,7 @@ export default function Barkodlar({ selectedRowID }) {
     let hasError = false;
     for (const row of selectedRows) {
       try {
-        const response = await AxiosInstance.get(`DeleteStokBarkod?barkodID=${row.key}`);
+        const response = await AxiosInstance.get(`DeleteStokBarkod?barkodID=${row.barkodId}`);
         if (![200, 201, 202].includes(response.status_code)) {
           hasError = true;
         }
@@ -308,12 +335,12 @@ export default function Barkodlar({ selectedRowID }) {
       return;
     }
 
-    const barkodId = selectedRows[0].key;
+    const barkodId = selectedRows[0].barkodId;
     setEtiketState({ open: true, loading: true, barkod: null });
 
     try {
       const response = await AxiosInstance.get(`GetStokBarkodById?barkodID=${barkodId}`);
-      setEtiketState({ open: true, loading: false, barkod: response });
+      setEtiketState({ open: true, loading: false, barkod: getBarkodDetailPayload(response) });
     } catch (error) {
       console.error("Barkod etiketi alınırken hata oluştu:", error);
       const fallbackBarkod = selectedRows[0]?.barkodNo;
@@ -333,6 +360,23 @@ export default function Barkodlar({ selectedRowID }) {
       key: "barkodNo",
       render: (text, record) => <a onClick={() => handleOpenEdit(record)}>{text}</a>,
     },
+    {
+      title: t("barkodTipi"),
+      dataIndex: "barkodTipi",
+      key: "barkodTipi",
+    },
+    {
+      title: "Kontrol Biti",
+      dataIndex: "kontrolBiti",
+      key: "kontrolBiti",
+      render: (value) => (value ? t("globalYes") : t("globalNo")),
+    },
+    {
+      title: t("aktif"),
+      dataIndex: "aktif",
+      key: "aktif",
+      render: (value) => (value ? t("globalYes") : t("globalNo")),
+    },
   ];
 
   return (
@@ -346,6 +390,7 @@ export default function Barkodlar({ selectedRowID }) {
       <Table
         columns={columns}
         dataSource={data}
+        rowKey="clientKey"
         rowSelection={{
           type: "checkbox",
           selectedRowKeys,

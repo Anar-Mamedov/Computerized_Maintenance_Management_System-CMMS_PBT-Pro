@@ -123,7 +123,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements, assignmentRe
     {
       key: "14",
       label: dataCount.IsEmriResimSayisi >= 1 ? `Resimler (${dataCount.IsEmriResimSayisi})` : "Resimler",
-      children: <ResimUpload fieldRequirements={fieldRequirements} />,
+      children: <ResimUpload fieldRequirements={fieldRequirements} onImagesChange={fetchData} />,
     },
     {
       key: "15",
