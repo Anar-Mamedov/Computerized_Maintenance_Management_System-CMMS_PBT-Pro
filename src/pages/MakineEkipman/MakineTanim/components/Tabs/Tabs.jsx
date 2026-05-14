@@ -117,7 +117,7 @@ function Tablar({ selectedRowID, update }) {
         requiresUpdate: true,
         render: () => (
           <div style={contentContainerStyle}>
-            <ResimUpload selectedRowID={effectiveMakineId} refGroup={"MAKINE"} onUploadSuccess={() => setRefreshKey((prev) => prev + 1)} />
+            <ResimUpload selectedRowID={effectiveMakineId} refGroup={"MAKINE"} onUploadSuccess={() => setRefreshKey((prev) => prev + 1)} allowDelete />
           </div>
         ),
       },
