@@ -1,7 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Table, Input } from "antd";
+import { Modal, Table, Input } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
+import { CloseOutlined, PlusOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../api/http";
+import { t } from "i18next";
+import PropTypes from "prop-types";
 
 // Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
 const normalizeText = (text) => {
@@ -22,12 +25,11 @@ const normalizeText = (text) => {
     .replace(/Ç/g, "C");
 };
 
-export default function AtolyeTablo({ workshopSelectedId, onSubmit, disabled, nameFields = { tanim: "atolyeTanim", id: "atolyeID" }, isRequired }) {
+export default function AtolyeTablo({ workshopSelectedId, onSubmit, disabled, nameFields = { tanim: "atolyeTanim", id: "atolyeID" }, isRequired, placeholder }) {
   const {
     control,
     watch,
     setValue,
-    getValues,
     formState: { errors },
   } = useFormContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -111,35 +113,45 @@ export default function AtolyeTablo({ workshopSelectedId, onSubmit, disabled, na
     setValue(nameFields.tanim, "");
     setValue(nameFields.id, "");
   };
+
+  const atolyeValue = watch(nameFields.tanim);
+
   return (
     <div style={{ width: "100%" }}>
       <div style={{ display: "flex", gap: "5px", width: "100%" }}>
         <Controller
           name={nameFields.tanim}
           control={control}
-          rules={isRequired ? { required: "Bu alan zorunludur" } : {}}
-          render={({ field }) => <Input {...field} status={errors[nameFields.tanim] ? "error" : ""} type="text" style={{ width: "100%", maxWidth: "630px" }} disabled />}
+          rules={isRequired ? { required: t("alanBosBirakilamaz") } : {}}
+          render={({ field }) => (
+            <Input
+              {...field}
+              status={errors[nameFields.tanim] ? "error" : ""}
+              type="text"
+              style={{ width: "100%" }}
+              readOnly
+              placeholder={placeholder}
+              suffix={
+                atolyeValue ? (
+                  <CloseOutlined style={{ color: "#8c8c8c", cursor: "pointer", fontSize: "12px" }} onClick={handleMinusClick} />
+                ) : (
+                  <PlusOutlined
+                    style={{ color: disabled ? "#d9d9d9" : "#0091ff", cursor: disabled ? "not-allowed" : "pointer", fontSize: "12px" }}
+                    onClick={disabled ? undefined : handleModalToggle}
+                  />
+                )
+              }
+            />
+          )}
         />
         <Controller
           name={nameFields.id}
           control={control}
-          render={({ field }) => (
-            <Input
-              {...field}
-              type="text" // Set the type to "text" for name input
-              style={{ display: "none" }}
-            />
-          )}
+          render={({ field }) => <Input {...field} type="text" style={{ display: "none" }} />}
         />
-        <div style={{ display: "flex", gap: "5px" }}>
-          <Button disabled={disabled} onClick={handleModalToggle}>
-            +
-          </Button>
-          <Button onClick={handleMinusClick}> - </Button>
-        </div>
       </div>
-      <Modal width={1200} centered title="Atölye Tanımları" open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
-        <Input placeholder="Arama..." value={searchTerm1} onChange={handleSearch1} style={{ width: "300px", marginBottom: "15px" }} />
+      <Modal width={1200} centered title={t("atolyeTanimlari", { defaultValue: "Atölye Tanımları" })} open={isModalVisible} onOk={handleModalOk} onCancel={handleModalToggle}>
+        <Input placeholder={t("arama", { defaultValue: "Arama..." })} value={searchTerm1} onChange={handleSearch1} style={{ width: "300px", marginBottom: "15px" }} />
         <Table
           rowSelection={{
             type: "radio",
@@ -154,3 +166,15 @@ export default function AtolyeTablo({ workshopSelectedId, onSubmit, disabled, na
     </div>
   );
 }
+
+AtolyeTablo.propTypes = {
+  workshopSelectedId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  onSubmit: PropTypes.func,
+  disabled: PropTypes.bool,
+  nameFields: PropTypes.shape({
+    tanim: PropTypes.string,
+    id: PropTypes.string,
+  }),
+  isRequired: PropTypes.bool,
+  placeholder: PropTypes.string,
+};
