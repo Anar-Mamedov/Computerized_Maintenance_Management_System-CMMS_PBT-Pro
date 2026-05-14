@@ -1,18 +1,59 @@
 import React, { useEffect, useState } from "react";
-import { Image, Spin, Upload, message } from "antd";
-import { InboxOutlined, UserOutlined } from "@ant-design/icons";
+import { Button, Image, Popconfirm, Spin, Upload, message } from "antd";
+import { CloseOutlined, InboxOutlined, QuestionCircleOutlined, UserOutlined } from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../api/http";
+import { t } from "i18next";
 
-const ResimUpload = ({ selectedRowID, refGroup, onUploadSuccess }) => {
+const imageCardStyle = {
+  position: "relative",
+  display: "inline-flex",
+  margin: "10px",
+};
+
+const imageStyle = {
+  height: "150px",
+  width: "150px",
+  objectFit: "cover",
+};
+
+const deleteButtonStyle = {
+  position: "absolute",
+  top: 6,
+  right: 6,
+  zIndex: 2,
+  minWidth: 24,
+  width: 24,
+  height: 24,
+  padding: 0,
+  borderRadius: "50%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  backgroundColor: "#ff4d4f",
+  borderColor: "#ff4d4f",
+};
+
+const revokeImageUrls = (items) => {
+  items.forEach((item) => {
+    if (item?.url) {
+      URL.revokeObjectURL(item.url);
+    }
+  });
+};
+
+const isDeleteSuccessful = (response) => response?.Durum === true || [200, 201, 202].includes(response?.status_code);
+
+const ResimUpload = ({ selectedRowID, refGroup, onUploadSuccess, allowDelete = false }) => {
   const { watch } = useFormContext();
-  const [imageUrls, setImageUrls] = useState([]);
+  const [imageItems, setImageItems] = useState([]);
   const [loadingImages, setLoadingImages] = useState(false);
   const [refreshImages, setRefreshImages] = useState(false); // Resim listesini yenilemek için kullanılacak
 
   // Upload queue logic
   const [uploadQueue, setUploadQueue] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [deletingImageId, setDeletingImageId] = useState(null);
 
   // Watch the 'kapali' field from the form
   const kapali = watch("kapali"); // Assuming 'kapali' is the name of the field in your form
@@ -22,15 +63,21 @@ const ResimUpload = ({ selectedRowID, refGroup, onUploadSuccess }) => {
       setLoadingImages(true);
       const [response1] = await Promise.all([AxiosInstance.get(`GetResimIds?RefId=${selectedRowID}&RefGrup=${refGroup}`)]);
       const resimIDler = [...response1]; // Her iki API'den gelen verileri birleştiriyoruz
-      const urls = await Promise.all(
+      const nextImageItems = await Promise.all(
         resimIDler.map(async (id) => {
           const resimResponse = await AxiosInstance.get(`ResimGetirById?id=${id}`, {
             responseType: "blob",
           });
-          return URL.createObjectURL(resimResponse); // Axios response objesinden blob data alınır
+          return {
+            id,
+            url: URL.createObjectURL(resimResponse),
+          };
         })
       );
-      setImageUrls(urls);
+      setImageItems((prev) => {
+        revokeImageUrls(prev);
+        return nextImageItems;
+      });
     } catch (error) {
       console.error("Resim ID'leri alınırken bir hata oluştu:", error);
       message.error("Resimler yüklenirken bir hata oluştu.");
@@ -44,6 +91,8 @@ const ResimUpload = ({ selectedRowID, refGroup, onUploadSuccess }) => {
       fetchResimIds();
     }
   }, [selectedRowID, refreshImages]); // refreshImages değişikliklerini de takip eder
+
+  useEffect(() => () => revokeImageUrls(imageItems), [imageItems]);
 
   // Process the upload queue
   useEffect(() => {
@@ -94,6 +143,27 @@ const ResimUpload = ({ selectedRowID, refGroup, onUploadSuccess }) => {
     },
   };
 
+  const handleDeleteImage = async (imageId) => {
+    try {
+      setDeletingImageId(imageId);
+      const response = await AxiosInstance.get(`ResimSil?resimID=${imageId}`);
+      if (isDeleteSuccessful(response)) {
+        message.success(t("islemBasarili"));
+        setRefreshImages((prev) => !prev);
+        if (onUploadSuccess) {
+          onUploadSuccess();
+        }
+      } else {
+        message.error(t("islemBasarisiz"));
+      }
+    } catch (error) {
+      console.error("Resim silinirken bir hata oluştu:", error);
+      message.error(t("islemBasarisiz"));
+    } finally {
+      setDeletingImageId(null);
+    }
+  };
+
   return (
     <div>
       {loadingImages ? (
@@ -108,18 +178,28 @@ const ResimUpload = ({ selectedRowID, refGroup, onUploadSuccess }) => {
           <Spin />
         </div>
       ) : (
-        imageUrls.map((url, index) => (
-          <Image
-            style={{
-              margin: "10px",
-              height: "150px",
-              width: "150px",
-              objectFit: "cover",
-            }}
-            key={index}
-            src={url}
-            fallback={<UserOutlined />}
-          />
+        imageItems.map((item) => (
+          <div key={item.id} style={imageCardStyle}>
+            {allowDelete && !kapali ? (
+              <Popconfirm
+                title={t("silmeOnayBaslik")}
+                description={t("silmeOnayMesaj")}
+                onConfirm={() => handleDeleteImage(item.id)}
+                okText={t("globalYes")}
+                cancelText={t("globalNo")}
+                icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+              >
+                <Button
+                  type="primary"
+                  danger
+                  icon={<CloseOutlined />}
+                  loading={deletingImageId === item.id}
+                  style={deleteButtonStyle}
+                />
+              </Popconfirm>
+            ) : null}
+            <Image style={imageStyle} src={item.url} fallback={<UserOutlined />} />
+          </div>
         ))
       )}
       <Upload.Dragger

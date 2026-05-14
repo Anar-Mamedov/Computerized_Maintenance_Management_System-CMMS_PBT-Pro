@@ -14,6 +14,7 @@ export default function LokasyonTablo({
   lokasyonFieldName = "lokasyonTanim",
   lokasyonIdFieldName = "lokasyonID",
   isRequired = false,
+  placeholder,
 }) {
   const {
     control,
@@ -234,6 +235,7 @@ export default function LokasyonTablo({
               type="text"
               style={{ width: "100%" }}
               readOnly
+              placeholder={placeholder}
               suffix={
                 lokasyonValue ? (
                   <CloseOutlined
@@ -298,4 +300,5 @@ LokasyonTablo.propTypes = {
   lokasyonFieldName: PropTypes.string,
   lokasyonIdFieldName: PropTypes.string,
   isRequired: PropTypes.bool,
+  placeholder: PropTypes.string,
 };
