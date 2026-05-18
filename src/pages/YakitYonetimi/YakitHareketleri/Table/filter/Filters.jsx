@@ -10,10 +10,7 @@ export default function Filters({ onChange }) {
   return (
     <>
       <ZamanAraligi
-        onSubmit={(dates) => {
-          onChange("BaslangicTarihi", dates.BaslangicTarihi);
-          onChange("BitisTarihi", dates.BitisTarihi);
-        }}
+        onChange={(type, value) => onChange(type, value)} 
       />
       <LocationFilter
         onSubmit={(newIds) => onChange("LokasyonIds", newIds)}

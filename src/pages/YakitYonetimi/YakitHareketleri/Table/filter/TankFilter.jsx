@@ -14,19 +14,23 @@ const TankFilter = ({ onSubmit }) => {
     const fetchOptions = async () => {
       try {
         setLoading(true);
-        // Senin paylaştığın API body yapısı
+
         const payload = {
           LokasyonIds: [],
           YakitTipIds: [],
-          Durum: -1
+          Durum: -1 
         };
 
+        // API isteği
         const response = await AxiosInstance.post(`GetYakitTankList`, payload);
 
-        if (Array.isArray(response)) {
-          const formatted = response.map((item) => ({
-            // Value olarak TB_DEPO_ID, etiket olarak Kod - Tanım
-            value: item.TB_DEPO_ID, 
+        // Düzenleme: API'den dönen response.data kontrol ediliyor
+        const tankList = response?.data || []; 
+        
+        if (Array.isArray(tankList)) {
+          const formatted = tankList.map((item) => ({
+            value: item.TB_DEPO_ID,
+            // JSON'daki DEP_KOD ve DEP_TANIM alanları birleştirildi
             label: `${item.DEP_KOD || ""} - ${item.DEP_TANIM || ""}`,
           }));
           setOptions(formatted);
@@ -77,12 +81,12 @@ const TankFilter = ({ onSubmit }) => {
           <Select
             mode="multiple"
             style={{ width: "100%" }}
-            placeholder="Depo ara veya seç..."
+            placeholder="Depo ara veya seçin..."
             value={selectedIds}
             onChange={(values) => setSelectedIds(values)}
             allowClear
             maxTagCount="responsive"
-            // Hem koda hem isme göre arama yapabilmesi için
+            // Arama filtresi: label içinde arama yapar
             filterOption={(input, option) =>
               option.children.toLowerCase().includes(input.toLowerCase())
             }
