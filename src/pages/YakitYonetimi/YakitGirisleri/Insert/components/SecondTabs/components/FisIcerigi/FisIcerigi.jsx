@@ -104,6 +104,8 @@ export default function SecondTabs() {
             setValue("_guncelSayacDegeri", d.GuncelSayacDegeri);
             setValue("YakitTipId", d.YakitTipId);
             setValue("YakitTipAdi", d.YakitTipAdi);
+            setValue("LokasyonId", d.LokasyonId);
+            setValue("LokasyonAdi", d.LokasyonAdi);
           }
         })
         .catch(() => message.error(t("Araç bilgileri alınamadı.")));
@@ -552,7 +554,7 @@ export default function SecondTabs() {
               <Col span={24}> {/* Sütunu tam genişlik yapıyoruz (24 birim) */}
                 <Text style={labelStyle}>{t("Lokasyon")}</Text>
                   <LokasyonSelect 
-                    fieldName="LokasyonId" placeholder={t("Seçiniz")} mode="default" selectStyle={{ width: "100%", maxWidth: "600px"}} 
+                    fieldName="LokasyonAdi" placeholder={t("Seçiniz")} mode="default" selectStyle={{ width: "100%", maxWidth: "600px"}} 
                   />
               </Col>
               <Col span={24}>

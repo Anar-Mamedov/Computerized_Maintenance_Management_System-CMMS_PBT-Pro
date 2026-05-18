@@ -148,38 +148,17 @@ const MainTable = () => {
     DepoIds: [],
     LokasyonIds: [],
     YakitIds: [],
-    BaslangicTarihi: dayjs().subtract(7, 'day').startOf('day').toISOString(),
-    BitisTarihi: dayjs().endOf('day').toISOString(),
+    BaslangicTarihi: null,
+    BitisTarihi: null,
     IsExcel: false
   });
 
   const cardItems = useMemo(() => [
-    { title: "Toplam İşlem Sayısı", value: `${ozetler.ToplamIslemSayisi.toLocaleString('tr-TR')}`, color: "success" },
-    { title: "Toplam Sarf Miktarı", value: `${ozetler.ToplamSarfMiktari.toLocaleString('tr-TR')}`, color: "danger" },
-    { title: "Anomali Şüphesi", value: `${ozetler.AnomaliSuphesiKayit.toLocaleString('tr-TR')}`, color: "primary" },
-    { title: "Giriş / Çıkış Miktarı", value: `${ozetler.GirisCikisMiktari.toLocaleString('tr-TR')}`, color: "warning" },
-  ], [ozetler]);
-
-  const fetchCards = useCallback(async () => {
-    try {
-      const res = await AxiosInstance.get("GetYakitTankOzet");
-      
-      // Dokümandaki gibi direkt obje dönüyorsa:
-      if (res) {
-        // Eğer API wrapper kullanıyorsa (res.data içindeyse) kontrolü:
-        const data = res.data || res; 
-        setCardsData(data);
-      } 
-    } catch (err) {
-      console.error("Kart verileri çekilemedi:", err);
-      // Hata durumunda boş obje set edelim
-      setCardsData({});
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchCards();
-  }, [fetchCards]);
+    { title: "Toplam İşlem Sayısı", value: `${ozetler.ToplamIslemSayisi.toLocaleString('tr-TR')}`, subText: ozetler?.SeciliZaman },
+    { title: "Toplam Sarf Miktarı", value: `${ozetler.ToplamSarfMiktari.toLocaleString('tr-TR')}`, subText: ozetler?.SeciliZaman },
+    { title: "Anomali Şüphesi", value: `${ozetler.AnomaliSuphesiKayit.toLocaleString('tr-TR')}`, subText: ozetler?.SeciliZaman },
+    { title: "Giriş / Çıkış Miktarı", value: `${ozetler.GirisCikisMiktari.toLocaleString('tr-TR')}`, subText: ozetler?.SeciliZaman },
+  ], [ozetler, cardsData]);
 
   useEffect(() => {
     // API'den veri çekme işlemi
@@ -554,7 +533,6 @@ const MainTable = () => {
 
     // Verileri yeniden çekmek için `fetchEquipmentData` fonksiyonunu çağır
     fetchEquipmentData(body, currentPage);
-    fetchCards();
     // Burada `body` ve `currentPage`'i güncellediğimiz için, bu değerlerin en güncel hallerini kullanarak veri çekme işlemi yapılır.
     // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
     // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
@@ -843,6 +821,11 @@ const MainTable = () => {
         >
           {item.value}
         </Text>
+        {item.subText && (
+      <span style={{ alignSelf: 'flex-end', fontSize: '12px', color: '#888', marginTop: '8px' }}>
+        {item.subText}
+      </span>
+    )}
       </div>
     ))
   ) : (
@@ -907,7 +890,7 @@ const MainTable = () => {
             showTotal: (total, range) => `Toplam ${total}`,
             showQuickJumper: true,
           }}
-          scroll={{ y: "calc(100vh - 450px)" }}
+          scroll={{ y: "calc(100vh - 500px)" }}
           onChange={handleTableChange}
           rowClassName={(record) => (record.SFS_TALEP_DURUM_ID === 0 ? "boldRow" : "")}
         />

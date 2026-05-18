@@ -142,15 +142,15 @@ const MainTable = () => {
   const [body, setBody] = useState({
     Arama: "",
     KaynakTipi: "TUMU",
-    BaslangicTarihi: dayjs().subtract(7, 'day').startOf('day').toISOString(),
-    BitisTarihi: dayjs().endOf('day').toISOString(),
+    BaslangicTarihi: null,
+    BitisTarihi: null,
   });
 
   const cardItems = useMemo(() => [
-    { title: "Toplam Çıkış", value: `${cardsData.ToplamCikisLitre || 0} Lt` },
-    { title: "Toplam Tutar", value: `${Number(cardsData.ToplamTutar || 0).toLocaleString('tr-TR')} TL` },
-    { title: "Anormal Tüketim", value: cardsData.AnormalTuketimKayitSayisi || 0, isCritical: (cardsData.AnormalTuketimKayitSayisi > 0) },
-    { title: "Ekipman Başına Maliyet", value: `${cardsData.EkipmanBasinaMaliyet || 0} TL` },
+    { title: "Toplam Çıkış", value: `${cardsData.ToplamCikisLitre || 0} Lt`, subText: cardsData.SeciliZaman },
+    { title: "Toplam Tutar", value: `${Number(cardsData.ToplamTutar || 0).toLocaleString('tr-TR')} TL`, subText: cardsData.SeciliZaman },
+    { title: "Anormal Tüketim", value: cardsData.AnormalTuketimKayitSayisi || 0, isCritical: (cardsData.AnormalTuketimKayitSayisi > 0), subText: cardsData.SeciliZaman },
+    { title: "Ekipman Başına Maliyet", value: `${cardsData.EkipmanBasinaMaliyet || 0} TL`, subText: cardsData.SeciliZaman },
   ], [cardsData]);
 
   useEffect(() => {
@@ -928,6 +928,11 @@ const MainTable = () => {
         >
           {item.value}
         </Text>
+        {item.subText && (
+      <span style={{ alignSelf: 'flex-end', fontSize: '12px', color: '#888', marginTop: '8px' }}>
+        {item.subText}
+      </span>
+    )}
       </div>
     ))
   ) : (
@@ -997,7 +1002,7 @@ const MainTable = () => {
             showTotal: (total, range) => `Toplam ${total}`,
             showQuickJumper: true,
           }}
-          scroll={{ y: "calc(100vh - 450px)" }}
+          scroll={{ y: "calc(100vh - 500px)" }}
           onChange={handleTableChange}
           rowClassName={(record) => (record.SFS_TALEP_DURUM_ID === 0 ? "boldRow" : "")}
         />
