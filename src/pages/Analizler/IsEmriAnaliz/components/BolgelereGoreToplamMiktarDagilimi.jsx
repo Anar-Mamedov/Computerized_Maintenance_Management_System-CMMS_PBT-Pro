@@ -1,79 +1,50 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Spin, Typography, Row, Col, Card } from "antd";
-import AxiosInstance from "../../../../api/http.jsx";
-import { useFormContext } from "react-hook-form";
-import dayjs from "dayjs";
 
 const { Text, Title } = Typography;
 
-function IsEmriOzetPaneli() {
-  const [data, setData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const { watch } = useFormContext();
+// Ana ekrandan (widget14) beslenecek şekilde propları içeriye alıyoruz kanka
+function IsEmriOzetPaneli({
+  personelVerimliligiSaat,
+  planlananBakimaUyumYuzde,
+  enYuksekMaliyetliIsEmriAd,
+  enYuksekMaliyetliTutar,
+  enUzunSurenIsEmriAd,
+  loading
+}) {
 
-  const lokasyonId = watch("locationIds");
-  const atolyeId = watch("atolyeIds");
-  const makineId = watch("makineIds");
-  const baslangicTarihi = watch("baslangicTarihi");
-  const bitisTarihi = watch("bitisTarihi");
-
-  const fetchData = async () => {
-    setIsLoading(true);
-    const body = {
-      LokasyonId: lokasyonId || "",
-      AtolyeId: atolyeId || "",
-      MakineId: makineId || "",
-      BaslangicTarih: baslangicTarihi ? dayjs(baslangicTarihi).format("YYYY-MM-DD") : "",
-      BitisTarih: bitisTarihi ? dayjs(bitisTarihi).format("YYYY-MM-DD") : "",
-    };
-
-    try {
-      // API endpoint'ini kendi backend yapına göre güncellemelisin
-      const response = await AxiosInstance.post(`GetIsEmriOzetStats`, body);
-      setData(response);
-    } catch (error) {
-      console.error("Veri çekme hatası:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, [lokasyonId, atolyeId, makineId, baslangicTarihi, bitisTarihi]);
-
-  // Fotoğraftaki her bir kartın şablonu
+  // Fotoğraftaki kart şablonu - Değerleri doğrudan proplardan besliyoruz
   const stats = [
     {
       title: "Ortalama Tamamlanma Süresi",
-      value: `${data?.OrtalamaTamamlanmaSuresi || 0} gün`,
+      value: "0 gün", // Burası ana dashboard datasında yoksa sabit kalabilir veya prop ekleyebilirsin kanka
       subText: "Toplam süre / iş emri",
     },
     {
       title: "Personel Verimliliği",
-      value: `${data?.PersonelVerimliligi || 0} saat`,
+      value: `${personelVerimliligiSaat || 0} saat`,
       subText: "Çalışma süresi / personel",
     },
     {
       title: "Planlanan Bakıma Uyum",
-      value: `%${data?.BakimUyum || 0}`,
+      value: `%${planlananBakimaUyumYuzde || 0}`,
       subText: "Zamanında tamamlanan",
     },
     {
       title: "Geciken İş Emri Sayısı",
-      value: data?.GecikenIsEmri || 0,
+      value: 0, // Burası da ana dashboard datasında yoksa sabit veya prop eklenebilir
       subText: "Planlanan bitiş aşıldı",
-      valueStyle: { color: "#cf1322" } // Gecikme olduğu için kırmızı tonu
+      valueStyle: { color: "#cf1322" }
     },
     {
       title: "En Yüksek Maliyetli İş Emri",
-      value: `₺${new Intl.NumberFormat('tr-TR').format(data?.EnYuksekMaliyet || 0)}`,
-      subText: data?.EnYuksekMaliyetAciklama || "Mekanik revizyon",
+      value: `₺${new Intl.NumberFormat('tr-TR').format(enYuksekMaliyetliTutar || 0)}`,
+      subText: enYuksekMaliyetliIsEmriAd || "Mekanik revizyon",
     },
     {
       title: "En Uzun Süren İş Emri",
-      value: `${data?.EnUzunSure || 0} saat`,
-      subText: data?.EnUzunSureAciklama || "Ana konveyör onarım",
+      value: "0 saat", // Ana dashboard verisine göre manipüle edebilirsin
+      subText: enUzunSurenIsEmriAd || "Ana konveyör onarım",
     },
   ];
 
@@ -83,7 +54,7 @@ function IsEmriOzetPaneli() {
         İş Emri Özet Paneli
       </Title>
       
-      {isLoading ? (
+      {loading ? (
         <div style={{ textAlign: "center", padding: "50px" }}><Spin size="large" /></div>
       ) : (
         <Row gutter={[16, 16]}>

@@ -1,64 +1,35 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 import { Spin, Typography, Radio, Dropdown, Button } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
-import AxiosInstance from "../../../../api/http.jsx";
-import { useFormContext } from "react-hook-form";
-import dayjs from "dayjs";
 
 const { Text } = Typography;
 
-// Grafik Renk Paleti (Fotoğraftakine benzer)
-const COLORS = ["#007bff", "#ff4d4f", "#ffc107", "#17a2b8", "#28a745"];
+// Grafik Renk Paleti
+const COLORS = ["#007bff", "#ff4d4f", "#ffc107", "#17a2b8", "#28a745", "#a463bf", "#6f42c1"];
 
-function IsEmriDagilimGrafigi() {
-  const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("Tip"); // 'Tip' veya 'Durum'
-  const { watch } = useFormContext();
+// Ana ekrandan tipDagilimi verisini ve loading durumunu prop olarak alıyoruz kanka
+function IsEmriDagilimGrafigi({ tipDagilimi, loading }) {
 
-  const filters = watch(); // Formdaki tüm filtreleri izle
-
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    const body = {
-      LokasyonId: filters.locationIds || "",
-      AtolyeId: filters.atolyeIds || "",
-      MakineId: filters.makineIds || "",
-      BaslangicTarih: filters.baslangicTarihi ? dayjs(filters.baslangicTarihi).format("YYYY-MM-DD") : "",
-      BitisTarih: filters.bitisTarihi ? dayjs(filters.bitisTarihi).format("YYYY-MM-DD") : "",
-      TabType: activeTab, // Backend'e hangi kırılımın istendiğini gönderiyoruz
-    };
-
-    try {
-      const response = await AxiosInstance.post(``, body);
-      // Gelen veriyi PieChart'ın anlayacağı 'name' ve 'value' formatına mapliyoruz
-      const formattedData = response.map((item) => ({
-        name: item.Etiket, // örn: "Arıza", "Bakım"
-        value: item.Adet,   // örn: 647
-        percentage: item.Yuzde, // örn: 41.4
-      }));
-      setData(formattedData);
-    } catch (error) {
-      console.error("Grafik verisi çekilemedi:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [filters, activeTab]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  // Gelen ham API verisini Recharts'ın anlayacağı 'name', 'value' ve 'percentage' formatına mapliyoruz
+  const chartData = React.useMemo(() => {
+    if (!tipDagilimi || !Array.isArray(tipDagilimi)) return [];
+    return tipDagilimi.map((item) => ({
+      name: item.TipAdi,        // örn: "PERİYODİK BAKIM"
+      value: item.Adet,          // örn: 3127
+      percentage: item.Yuzde,    // örn: 52.9
+    }));
+  }, [tipDagilimi]);
 
   // Sağ üstteki üç nokta menüsü
   const menuItems = [
-    { key: "1", label: "Verileri Yenile", onClick: fetchData },
+    { key: "1", label: "Verileri Yenile" },
     { key: "2", label: "İndir" },
     { key: "3", label: "Tam Ekran Aç" },
     { key: "4", label: "Bilgi" },
   ];
 
-  // Özel Label Çizimi (Fotoğraftaki "Arıza: 647 (41.4%)" yazıları için)
+  // Özel Label Çizimi ("PERİYODİK BAKIM: 3127 (%52.9)" yazıları için)
   const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, name, percentage }) => {
     const RADIAN = Math.PI / 180;
     const radius = outerRadius + 30;
@@ -76,7 +47,7 @@ function IsEmriDagilimGrafigi() {
     <div
       style={{
         width: "100%",
-        height: "400px", // İhtiyaca göre ayarlanabilir
+        height: "400px",
         borderRadius: "10px",
         backgroundColor: "white",
         display: "flex",
@@ -90,7 +61,7 @@ function IsEmriDagilimGrafigi() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <div style={{ width: "16px", height: "16px", backgroundColor: "#333", borderRadius: "3px" }} /> {/* Küçük ikon simgesi */}
+            <div style={{ width: "16px", height: "16px", backgroundColor: "#333", borderRadius: "3px" }} />
             <Text style={{ fontWeight: "600", fontSize: "16px" }}>İş Emri Dağılım Grafiği</Text>
           </div>
           <Text type="secondary" style={{ fontSize: "12px" }}>
@@ -99,7 +70,8 @@ function IsEmriDagilimGrafigi() {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <Radio.Group value={activeTab} onChange={(e) => setActiveTab(e.target.value)} size="small" buttonStyle="solid">
+          {/* Şu an sadece Tip listesi geldiği için default olarak Tip aktif duruyor */}
+          <Radio.Group value="Tip" size="small" buttonStyle="solid">
             <Radio.Button value="Tip">Tip</Radio.Button>
             <Radio.Button value="Durum">Durum</Radio.Button>
           </Radio.Group>
@@ -111,7 +83,7 @@ function IsEmriDagilimGrafigi() {
 
       {/* Grafik Alanı */}
       <div style={{ flex: 1, minHeight: 0 }}>
-        {isLoading ? (
+        {loading ? (
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
             <Spin />
           </div>
@@ -119,16 +91,16 @@ function IsEmriDagilimGrafigi() {
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                data={data}
+                data={chartData}
                 cx="50%"
                 cy="50%"
-                innerRadius={70} // Donut görünümü için
+                innerRadius={70}
                 outerRadius={100}
                 paddingAngle={5}
                 dataKey="value"
                 label={renderCustomizedLabel}
               >
-                {data.map((entry, index) => (
+                {chartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="none" />
                 ))}
               </Pie>

@@ -1,90 +1,45 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useMemo } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { Spin, Typography, Select, Dropdown, Button } from "antd";
 import { MoreOutlined, BarChartOutlined } from "@ant-design/icons";
-import AxiosInstance from "../../../../api/http.jsx";
-import { useFormContext } from "react-hook-form";
-import dayjs from "dayjs";
 
 const { Text } = Typography;
 
-const monthMap = {
-  January: "Oca",
-  February: "Şub",
-  March: "Mar",
-  April: "Nis",
-  May: "May",
-  June: "Haz",
-  July: "Tem",
-  August: "Ağu",
-  September: "Eyl",
-  October: "Eki",
-  November: "Kas",
-  December: "Ara",
-};
-
-function AylaraGoreIsEmriAnalizi() {
-  const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+// Ana ekrandan aylikTrendler listesini ve loading durumunu prop olarak alıyoruz kanka
+function AylaraGoreIsEmriAnalizi({ aylikTrendler, loading }) {
   const [metricType, setMetricType] = useState("Sayi"); // Sayi, Sure, Maliyet
-  const { watch } = useFormContext();
 
-  const lokasyonId = watch("locationIds");
-  const atolyeId = watch("atolyeIds");
-  const makineId = watch("makineIds");
-  const baslangicTarihi = watch("baslangicTarihi");
-  const bitisTarihi = watch("bitisTarihi");
-  
-  // Eğer formdan yıl gelmiyorsa içinde bulunduğumuz yılı default alalım
-  const [selectedYil, setSelectedYil] = useState(
-    baslangicTarihi ? dayjs(baslangicTarihi).year() : dayjs().year()
-  );
+  // Kullanıcının seçtiği filtreye göre veriyi anlık olarak grafiğin beklediği formata mapliyoruz
+  const chartData = useMemo(() => {
+    if (!aylikTrendler || !Array.isArray(aylikTrendler)) return [];
 
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    const body = {
-      LokasyonId: lokasyonId || "",
-      AtolyeId: atolyeId || "",
-      MakineId: makineId || "",
-      BaslangicTarih: baslangicTarihi ? dayjs(baslangicTarihi).format("YYYY-MM-DD") : "",
-      BitisTarih: bitisTarihi ? dayjs(bitisTarihi).format("YYYY-MM-DD") : "",
-      Yil: selectedYil,
-      MetricType: metricType, // Backend'e sayi mi, süre mi, maliyet mi istendiğini geçiyoruz
-    };
+    return aylikTrendler.map((item) => {
+      let grafikDegeri = 0;
 
-    try {
-      const response = await AxiosInstance.post(`GetAylaraGoreIsEmriAnaliziGraph`, body);
-      const formattedData = response.map((item) => ({
-        ...item,
-        Ay: monthMap[item.Ay] || item.Ay,
-        // Backend'den dinamik dönen değeri grafik için tek bir key'e eşitliyoruz
-        Deger: item.Deger || 0 
-      }));
-      setData(formattedData);
-    } catch (error) {
-      console.error("Grafik verisi çekilemedi:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [lokasyonId, atolyeId, makineId, baslangicTarihi, bitisTarihi, selectedYil, metricType]);
+      // Seçilen metriğe göre objeden doğru veriyi çekiyoruz kanka
+      if (metricType === "Sayi") {
+        grafikDegeri = item.AcilanIsEmri || 0;
+      } else if (metricType === "Sure") {
+        grafikDegeri = item.ToplamSureSaat || 0;
+      } else if (metricType === "Maliyet") {
+        grafikDegeri = item.ToplamMaliyet || 0;
+      }
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+      return {
+        Ay: item.AyAd, // Backend'den gelen "Oca", "Şub" vb. doğrudan kullanılıyor
+        Deger: grafikDegeri,
+      };
+    });
+  }, [aylikTrendler, metricType]);
 
   // Sağ üstteki üç nokta aksiyon menüsü
   const menuItems = [
-    { key: "refresh", label: "Verileri Yenile", onClick: fetchData },
-    { key: "year", label: "Yıl Seç", onClick: () => {
-      const yil = prompt("Lütfen yıl giriniz:", selectedYil);
-      if (yil && !isNaN(yil)) setSelectedYil(Number(yil));
-    }},
     { key: "download", label: "İndir" },
     { key: "fullscreen", label: "Tam Ekran Aç" },
     { key: "info", label: "Bilgi" },
   ];
 
-  // Barın tepesinde çıkan değerlerin tasarımı (Fotoğraftaki gibi tam ortalı ve net)
+  // Barın tepesinde çıkan değerlerin tasarımı (Tam ortalı ve metrik tipine uygun formatta)
   const renderCustomBarLabel = ({ x, y, width, value }) => {
     return (
       <text 
@@ -120,7 +75,7 @@ function AylaraGoreIsEmriAnalizi() {
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <BarChartOutlined style={{ fontSize: "18px", color: "#333" }} />
             <Text style={{ fontWeight: "600", fontSize: "16px" }}>
-              Aylara Göre İş Emri Sayıları ({selectedYil})
+              Aylara Göre İş Emri Analizi
             </Text>
           </div>
           <Text type="secondary" style={{ fontSize: "12px" }}>
@@ -148,13 +103,13 @@ function AylaraGoreIsEmriAnalizi() {
 
       {/* Grafik Çizim Alanı */}
       <div style={{ flex: 1, minHeight: 0 }}>
-        {isLoading ? (
+        {loading ? (
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
             <Spin />
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} margin={{ top: 25, right: 10, left: -15, bottom: 5 }}>
+            <BarChart data={chartData} margin={{ top: 25, right: 10, left: -15, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e8e8e8" />
               <XAxis 
                 dataKey="Ay" 
@@ -170,16 +125,15 @@ function AylaraGoreIsEmriAnalizi() {
               <Tooltip 
                 formatter={(value) => [
                   metricType === "Maliyet" ? `₺${value.toLocaleString("tr-TR")}` : `${value}`, 
-                  "Değer"
+                  metricType === "Sayi" ? "İş Emri Sayısı" : metricType === "Sure" ? "Toplam Süre (Saat)" : "Toplam Maliyet"
                 ]} 
               />
               <Bar 
                 dataKey="Deger" 
-                radius={[6, 6, 0, 0]} // Fotoğraftaki gibi üst köşeleri oval yapmak için
+                radius={[6, 6, 0, 0]} 
                 label={renderCustomBarLabel}
               >
-                {data.map((entry, index) => (
-                  // Fotoğraftaki o canlı mavi rengi buraya verdik
+                {chartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill="#1890ff" />
                 ))}
               </Bar>
