@@ -32,43 +32,54 @@ const ReminderItem = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #f5f5f5;
+  padding: 10px 12px;
+  margin: 6px 0;
+  border-radius: 6px;
+  border: 1px solid #f0f0f0;
+  background-color: #ffffff;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 
   &:hover {
-    background-color: #f0f0f0;
+    background-color: #fafafa;
+    border-color: #d9d9d9;
+    transform: translateX(4px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   }
 
   &:last-child {
-    border-bottom: none;
+    margin-bottom: 0;
   }
 `;
 
 const ColorBar = styled.div`
   width: 4px;
-  height: 16px;
+  height: 20px;
   border-radius: 2px;
   margin-right: 12px;
   background-color: ${(props) => {
-    if (props.isCritical) return "#ff4d4f";
-    if (props.isWarning) return "#faad14";
-    return "#1890ff";
+    if (props.isCritical) return "#ef4444"; // modern red (Kritik: 1)
+    if (props.isWarning) return "#f59e0b"; // modern orange/amber (Kritik: 2)
+    if (props.isInfo) return "#3b82f6"; // modern blue (Kritik: 3)
+    return "#10b981"; // modern green
   }};
 `;
 
 const BadgePill = styled.span`
-  padding: 2px 8px;
+  padding: 4px 10px;
   border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 11px;
+  font-weight: 600;
   color: white;
+  min-width: 28px;
+  text-align: center;
   background-color: ${(props) => {
-    if (props.isCritical) return "#ff4d4f";
-    if (props.isWarning) return "#faad14";
-    return "#1890ff";
+    if (props.isCritical) return "#ef4444";
+    if (props.isWarning) return "#f59e0b";
+    if (props.isInfo) return "#3b82f6";
+    return "#10b981";
   }};
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 `;
 
 const PopoverContent = styled.div`
@@ -114,7 +125,9 @@ export default function HatirlaticiPopover({ hatirlaticiData = null, loading = f
         return true;
       }
 
-      return group.Hatirlaticilar.some((item) => typeof item?.Aciklama2 !== "string");
+      return group.Hatirlaticilar.some((item) => {
+        return typeof item?.Baslik !== "string" && typeof item?.Aciklama2 !== "string";
+      });
     });
   }, [reminderGroups]);
 
@@ -130,17 +143,15 @@ export default function HatirlaticiPopover({ hatirlaticiData = null, loading = f
     setOpen(newOpen);
   };
 
-  const handleItemClick = (item) => {
+  const handleItemClick = (item, group) => {
     let contentComponent;
-    const title = item.Aciklama2;
+    const title = getItemDescription(item);
 
-    switch (item.SiraId) {
-      case 5:
-        contentComponent = <YaklasanPeriyodikBakimlar />;
-        break;
-      default:
-        contentComponent = null;
-        break;
+    // Group 2 is Bakım Yönetimi, SiraId 5 is Yaklaşan Periyodik Bakımlar
+    if (group?.GrupId === 2 && item.SiraId === 5) {
+      contentComponent = <YaklasanPeriyodikBakimlar />;
+    } else {
+      contentComponent = null;
     }
 
     if (contentComponent) {
@@ -156,42 +167,58 @@ export default function HatirlaticiPopover({ hatirlaticiData = null, loading = f
   };
 
   const getItemDescription = (item) => {
-    return typeof item?.Aciklama2 === "string" ? item.Aciklama2 : "";
+    return item?.Baslik || item?.Aciklama2 || item?.Aciklama || "";
+  };
+
+  const getItemSubDescription = (item) => {
+    // If Baslik is used for main description, Aciklama can be used for sub-description
+    if (item?.Baslik && item?.Aciklama) {
+      return item.Aciklama;
+    }
+    return "";
   };
 
   const getColorForItem = (item) => {
-    const description = getItemDescription(item);
-
-    // API'den gelen Kritik alanını kullan
     if (item.Kritik === 1) {
-      return { isCritical: true, isWarning: false };
+      return { isCritical: true, isWarning: false, isInfo: false };
+    }
+    if (item.Kritik === 2) {
+      return { isCritical: false, isWarning: true, isInfo: false };
+    }
+    if (item.Kritik === 3) {
+      return { isCritical: false, isWarning: false, isInfo: true };
     }
 
-    // Kritik durumlar için kırmızı
+    const description = getItemDescription(item);
+    // Fallback logic
     if (description.includes("Geçen") || description.includes("Arıza") || description.includes("Kritik")) {
-      return { isCritical: true, isWarning: false };
+      return { isCritical: true, isWarning: false, isInfo: false };
     }
-    // Uyarı durumları için sarı
     if (description.includes("Yaklaşan") || description.includes("Bekleyen")) {
-      return { isCritical: false, isWarning: true };
+      return { isCritical: false, isWarning: true, isInfo: false };
     }
-    // Normal durumlar için mavi
-    return { isCritical: false, isWarning: false };
+    return { isCritical: false, isWarning: false, isInfo: false };
   };
 
-  const renderReminderItem = (item, itemIndex) => {
+  const renderReminderItem = (item, itemIndex, group) => {
     try {
       const colors = getColorForItem(item);
       const description = getItemDescription(item) || t("hatirlatici.itemUnavailable");
+      const subDescription = getItemSubDescription(item);
       const itemKey = item?.SiraId ?? `item-${itemIndex}`;
 
       return (
-        <ReminderItem key={itemKey} onClick={() => handleItemClick(item)}>
-          <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
-            <ColorBar isCritical={colors.isCritical} isWarning={colors.isWarning} />
-            <span style={{ fontSize: "13px", color: "#333" }}>{description}</span>
+        <ReminderItem key={itemKey} onClick={() => handleItemClick(item, group)}>
+          <div style={{ display: "flex", alignItems: "center", flex: 1, marginRight: "8px" }}>
+            <ColorBar isCritical={colors.isCritical} isWarning={colors.isWarning} isInfo={colors.isInfo} />
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <span style={{ fontSize: "13px", color: "#262626", fontWeight: 500 }}>{description}</span>
+              {subDescription && (
+                <span style={{ fontSize: "11px", color: "#8c8c8c", marginTop: "2px" }}>{subDescription}</span>
+              )}
+            </div>
           </div>
-          <BadgePill isCritical={colors.isCritical} isWarning={colors.isWarning}>
+          <BadgePill isCritical={colors.isCritical} isWarning={colors.isWarning} isInfo={colors.isInfo}>
             {item?.Deger ?? 0}
           </BadgePill>
         </ReminderItem>
@@ -221,9 +248,9 @@ export default function HatirlaticiPopover({ hatirlaticiData = null, loading = f
       return (
         <StyledCard key={groupKey} title={`${groupTitle} (${totalCount})`} size="small">
           {items.length > 0 ? (
-            items.map((item, itemIndex) => renderReminderItem(item, itemIndex))
+            items.map((item, itemIndex) => renderReminderItem(item, itemIndex, group))
           ) : (
-            <div style={{ textAlign: "center", padding: "12px 0", color: "#999" }}>{t("hatirlatici.notFound")}</div>
+            <div style={{ textAlign: "center", padding: "12px 0", color: "#bfbfbf" }}>{t("hatirlatici.notFound")}</div>
           )}
         </StyledCard>
       );
@@ -241,7 +268,7 @@ export default function HatirlaticiPopover({ hatirlaticiData = null, loading = f
   const content = (
     <PopoverContent>
       <HeaderSection>
-        {t("hatirlatmalar")} ({hatirlaticiData?.toplam_hatirlatici || 0})
+        {t("hatirlatmalar")} ({hatirlaticiData?.genel_toplam ?? hatirlaticiData?.toplam_hatirlatici ?? hatirlaticiDataCount})
       </HeaderSection>
 
       {loading ? (
@@ -287,6 +314,7 @@ export default function HatirlaticiPopover({ hatirlaticiData = null, loading = f
 HatirlaticiPopover.propTypes = {
   hatirlaticiData: PropTypes.shape({
     toplam_hatirlatici: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    genel_toplam: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     data: PropTypes.arrayOf(
       PropTypes.shape({
         GrupId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
@@ -295,6 +323,8 @@ HatirlaticiPopover.propTypes = {
         Hatirlaticilar: PropTypes.arrayOf(
           PropTypes.shape({
             SiraId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+            Baslik: PropTypes.string,
+            Aciklama: PropTypes.string,
             Aciklama2: PropTypes.string,
             Deger: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
             Kritik: PropTypes.number,
