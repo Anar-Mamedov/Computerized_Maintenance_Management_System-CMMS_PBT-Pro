@@ -47,7 +47,7 @@ function IsEmriDagilimGrafigi({ tipDagilimi, loading }) {
     <div
       style={{
         width: "100%",
-        height: "400px",
+        height: "100%",
         borderRadius: "10px",
         backgroundColor: "white",
         display: "flex",

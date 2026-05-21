@@ -41,7 +41,7 @@ function AtolyelerIsEmriVeGecikme({ atolyeDagilimi, loading }) {
     <div
       style={{
         width: "100%",
-        height: "410px",
+        height: "100%",
         borderRadius: "10px",
         backgroundColor: "white",
         display: "flex",
