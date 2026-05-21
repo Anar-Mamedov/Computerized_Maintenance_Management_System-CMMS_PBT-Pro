@@ -125,7 +125,7 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
 
 // Sütunların sürüklenebilir olmasını sağlayan component sonu
 
-const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposuID = null }) => {
+const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposuID = null, hatirlaticiGrupId, hatirlaticiSiraId }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   let setValue;
 
@@ -907,7 +907,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
 
   useEffect(() => {
     fetchEquipmentData(body, currentPage, pageSize, sortField, sortOrder);
-  }, [body, currentPage, pageSize, sortField, sortOrder]);
+  }, [body, currentPage, pageSize, sortField, sortOrder, hatirlaticiGrupId, hatirlaticiSiraId]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
@@ -955,7 +955,11 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       setLoading(true);
 
       // islemTip değerine göre API URL'ini oluştur
-      let apiUrl = `Stok?modulNo=1&pagingDeger=${currentPage}&pageSize=${currentPageSize}&prm=${keyword}&isAktif=${isAktif ?? -1}`;
+      const baseApi = hatirlaticiGrupId ? "StokHatirlatici" : "Stok";
+      let apiUrl = `${baseApi}?modulNo=1&pagingDeger=${currentPage}&pageSize=${currentPageSize}&prm=${keyword}&isAktif=${isAktif ?? -1}`;
+      if (hatirlaticiGrupId) {
+        apiUrl += `&hatirlaticiGrupId=${hatirlaticiGrupId}&hatirlaticiSiraId=${hatirlaticiSiraId}`;
+      }
 
       if (stkTipIds.length > 0) {
         apiUrl += `&stkTipIds=${stkTipIds.join(",")}`;
