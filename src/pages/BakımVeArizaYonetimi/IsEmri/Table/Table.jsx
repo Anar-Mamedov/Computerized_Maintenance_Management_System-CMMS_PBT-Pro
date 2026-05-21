@@ -118,7 +118,7 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
   );
 };
 
-const MainTable = () => {
+const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
   // State definitions...
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
@@ -158,6 +158,12 @@ const MainTable = () => {
   const [arizaActive, setArizaActive] = useState(false);
   const [onayBekleyenActive, setOnayBekleyenActive] = useState(false);
   const [toplamIsEmriCloseFilter, setToplamIsEmriCloseFilter] = useState(null);
+
+  useEffect(() => {
+    if (hatirlaticiGrupId && hatirlaticiSiraId) {
+      setToplamIsEmriCloseFilter(0);
+    }
+  }, [hatirlaticiGrupId, hatirlaticiSiraId]);
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
   const [onayCheck, setOnayCheck] = useState({ ONY_AKTIF: 0, ONY_MANUEL: 0 });

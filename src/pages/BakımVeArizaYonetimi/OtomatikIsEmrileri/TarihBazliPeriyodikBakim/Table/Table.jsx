@@ -155,7 +155,7 @@ const baseToolbarStyles = {
   flexWrap: "wrap",
 };
 
-export default function MainTable() {
+export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
   const { setValue, watch } = useFormContext();
   const [messageApi, contextHolder] = message.useMessage();
   const [rows, setRows] = useState([]);
@@ -316,7 +316,10 @@ export default function MainTable() {
 
       try {
         setLoading(true);
-        const response = await AxiosInstance.post(`GetOtomatikIsEmirleri?pagingDeger=${page}&pageSize=${size}`, payload);
+        const endpoint = hatirlaticiGrupId
+          ? `GetOtomatikIsEmirleriHatirlatici?pagingDeger=${page}&pageSize=${size}&hatirlaticiGrupId=${hatirlaticiGrupId}&hatirlaticiSiraId=${hatirlaticiSiraId}`
+          : `GetOtomatikIsEmirleri?pagingDeger=${page}&pageSize=${size}`;
+        const response = await AxiosInstance.post(endpoint, payload);
         const list = Array.isArray(response?.liste) ? response.liste : [];
         const normalizedRows = list.map((item, index) => ({
           ...item,
@@ -339,7 +342,7 @@ export default function MainTable() {
         setLoading(false);
       }
     },
-    [appliedFilters, currentPage, pageSize, messageApi]
+    [appliedFilters, currentPage, pageSize, messageApi, hatirlaticiGrupId, hatirlaticiSiraId]
   );
 
   useEffect(() => {

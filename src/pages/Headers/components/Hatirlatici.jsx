@@ -5,6 +5,10 @@ import { FaRegCalendarAlt } from "react-icons/fa";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import YaklasanPeriyodikBakimlar from "./Tables/YaklasanPeriyodikBakimlar/PeryodikBakimlar.jsx";
+import MakineTanim from "../../MakineEkipman/MakineTanim/MakineTanim.jsx";
+import IsEmri from "../../BakımVeArizaYonetimi/IsEmri/IsEmri.jsx";
+import OtomatikIsEmirleri from "../../BakımVeArizaYonetimi/OtomatikIsEmrileri/Index.jsx";
+import MalzemeTanimlari from "../../Malzeme&DepoYonetimi/MalzemeTanimlari/MalzemeTanimlari.jsx";
 
 const StyledCard = styled(Card)`
   margin-bottom: 16px;
@@ -144,14 +148,41 @@ export default function HatirlaticiPopover({ hatirlaticiData = null, loading = f
   };
 
   const handleItemClick = (item, group) => {
-    let contentComponent;
+    let contentComponent = null;
     const title = getItemDescription(item);
+    const grupId = Number(group?.GrupId);
+    const siraId = Number(item?.SiraId);
 
-    // Group 2 is Bakım Yönetimi, SiraId 5 is Yaklaşan Periyodik Bakımlar
-    if (group?.GrupId === 2 && item.SiraId === 5) {
-      contentComponent = <YaklasanPeriyodikBakimlar />;
-    } else {
-      contentComponent = null;
+    if (grupId === 1) {
+      contentComponent = (
+        <MakineTanim 
+          hatirlaticiGrupId={grupId} 
+          hatirlaticiSiraId={siraId} 
+        />
+      );
+    } else if (grupId === 2) {
+      if (siraId === 1 || siraId === 2 || siraId === 8) {
+        contentComponent = (
+          <IsEmri 
+            hatirlaticiGrupId={grupId} 
+            hatirlaticiSiraId={siraId} 
+          />
+        );
+      } else {
+        contentComponent = (
+          <OtomatikIsEmirleri 
+            hatirlaticiGrupId={grupId} 
+            hatirlaticiSiraId={siraId} 
+          />
+        );
+      }
+    } else if (grupId === 3) {
+      contentComponent = (
+        <MalzemeTanimlari 
+          hatirlaticiGrupId={grupId} 
+          hatirlaticiSiraId={siraId} 
+        />
+      );
     }
 
     if (contentComponent) {

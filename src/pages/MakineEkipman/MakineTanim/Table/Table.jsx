@@ -104,7 +104,7 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
 
 // Sütunların sürüklenebilir olmasını sağlayan component sonu
 
-const MainTable = ({ setSelectedIds }) => {
+const MainTable = ({ setSelectedIds, hatirlaticiGrupId, hatirlaticiSiraId }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
   const [data, setData] = useState([]);
@@ -324,7 +324,9 @@ const MainTable = ({ setSelectedIds }) => {
     try {
       setLoading(true);
       // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.post(`GetMakineFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${currentPageSize}&isAktif=${isActive}${sortParam}`, filters);
+      const endpoint = hatirlaticiGrupId ? "GetMakineFullListHatirlatici" : "GetMakineFullList";
+      const hatirlaticiParams = hatirlaticiGrupId ? `&hatirlaticiGrupId=${hatirlaticiGrupId}&hatirlaticiSiraId=${hatirlaticiSiraId}` : "";
+      const response = await AxiosInstance.post(`${endpoint}?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${currentPageSize}&isAktif=${isActive}${sortParam}${hatirlaticiParams}`, filters);
       if (response) {
         // Toplam sayfa sayısını ayarla
         setTotalPages(response.page);
