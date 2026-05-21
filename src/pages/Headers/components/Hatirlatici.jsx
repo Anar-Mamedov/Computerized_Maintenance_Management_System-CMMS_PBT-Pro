@@ -1,23 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Button, Collapse, Popover, Badge, Spin, Modal, Card, Row, Col } from "antd";
-import { BellOutlined, RightOutlined } from "@ant-design/icons";
+import React, { useEffect, useMemo, useState } from "react";
+import PropTypes from "prop-types";
+import { Popover, Badge, Spin, Modal, Card, Alert } from "antd";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import styled from "styled-components";
+import { useTranslation } from "react-i18next";
 import YaklasanPeriyodikBakimlar from "./Tables/YaklasanPeriyodikBakimlar/PeryodikBakimlar.jsx";
-
-const StyledCollapse = styled(Collapse)`
-  .ant-collapse-content-box {
-    padding: 0px 10px !important;
-  }
-
-  .ant-collapse-header {
-    padding: 5px 10px !important;
-  }
-
-  .ant-collapse-header-text {
-    color: #0239de !important;
-  }
-`;
 
 const StyledCard = styled(Card)`
   margin-bottom: 16px;
@@ -111,20 +98,33 @@ const CardsGrid = styled.div`
   column-gap: 16px;
 `;
 
-export default function HatirlaticiPopover({ hatirlaticiData, loading, open, setOpen }) {
+export default function HatirlaticiPopover({ hatirlaticiData = null, loading = false, open = false, setOpen }) {
+  const { t } = useTranslation();
   const [hatirlaticiDataCount, setHatirlaticiDataCount] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalContent, setModalContent] = useState(null);
+  const reminderGroups = useMemo(() => {
+    return Array.isArray(hatirlaticiData?.data) ? hatirlaticiData.data : [];
+  }, [hatirlaticiData?.data]);
+
+  const hasInvalidReminderData = useMemo(() => {
+    return reminderGroups.some((group) => {
+      if (!Array.isArray(group?.Hatirlaticilar)) {
+        return true;
+      }
+
+      return group.Hatirlaticilar.some((item) => typeof item?.Aciklama2 !== "string");
+    });
+  }, [reminderGroups]);
 
   useEffect(() => {
-    if (hatirlaticiData?.data) {
-      const total = hatirlaticiData.data.reduce((acc, group) => {
-        return acc + group.ToplamKayit;
-      }, 0);
-      setHatirlaticiDataCount(total);
-    }
-  }, [hatirlaticiData]);
+    const total = reminderGroups.reduce((acc, group) => {
+      return acc + Number(group?.ToplamKayit || 0);
+    }, 0);
+
+    setHatirlaticiDataCount(total);
+  }, [reminderGroups]);
 
   const handleOpenChange = (newOpen) => {
     setOpen(newOpen);
@@ -155,55 +155,108 @@ export default function HatirlaticiPopover({ hatirlaticiData, loading, open, set
     setIsModalOpen(false);
   };
 
+  const getItemDescription = (item) => {
+    return typeof item?.Aciklama2 === "string" ? item.Aciklama2 : "";
+  };
+
   const getColorForItem = (item) => {
+    const description = getItemDescription(item);
+
     // API'den gelen Kritik alanını kullan
     if (item.Kritik === 1) {
       return { isCritical: true, isWarning: false };
     }
 
     // Kritik durumlar için kırmızı
-    if (item.Aciklama2.includes("Geçen") || item.Aciklama2.includes("Arıza") || item.Aciklama2.includes("Kritik")) {
+    if (description.includes("Geçen") || description.includes("Arıza") || description.includes("Kritik")) {
       return { isCritical: true, isWarning: false };
     }
     // Uyarı durumları için sarı
-    if (item.Aciklama2.includes("Yaklaşan") || item.Aciklama2.includes("Bekleyen")) {
+    if (description.includes("Yaklaşan") || description.includes("Bekleyen")) {
       return { isCritical: false, isWarning: true };
     }
     // Normal durumlar için mavi
     return { isCritical: false, isWarning: false };
   };
 
+  const renderReminderItem = (item, itemIndex) => {
+    try {
+      const colors = getColorForItem(item);
+      const description = getItemDescription(item) || t("hatirlatici.itemUnavailable");
+      const itemKey = item?.SiraId ?? `item-${itemIndex}`;
+
+      return (
+        <ReminderItem key={itemKey} onClick={() => handleItemClick(item)}>
+          <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
+            <ColorBar isCritical={colors.isCritical} isWarning={colors.isWarning} />
+            <span style={{ fontSize: "13px", color: "#333" }}>{description}</span>
+          </div>
+          <BadgePill isCritical={colors.isCritical} isWarning={colors.isWarning}>
+            {item?.Deger ?? 0}
+          </BadgePill>
+        </ReminderItem>
+      );
+    } catch (error) {
+      console.error("Hatırlatıcı kaydı render edilirken hata oluştu:", error, item);
+
+      return (
+        <Alert
+          key={`item-error-${itemIndex}`}
+          type="warning"
+          showIcon
+          message={t("hatirlatici.itemUnavailable")}
+          style={{ marginBottom: 8 }}
+        />
+      );
+    }
+  };
+
+  const renderReminderGroup = (group, groupIndex) => {
+    try {
+      const items = Array.isArray(group?.Hatirlaticilar) ? group.Hatirlaticilar : [];
+      const groupTitle = group?.GrupAdi || t("hatirlatici.unknownGroup");
+      const totalCount = Number(group?.ToplamKayit || items.length || 0);
+      const groupKey = group?.GrupId ?? `group-${groupIndex}`;
+
+      return (
+        <StyledCard key={groupKey} title={`${groupTitle} (${totalCount})`} size="small">
+          {items.length > 0 ? (
+            items.map((item, itemIndex) => renderReminderItem(item, itemIndex))
+          ) : (
+            <div style={{ textAlign: "center", padding: "12px 0", color: "#999" }}>{t("hatirlatici.notFound")}</div>
+          )}
+        </StyledCard>
+      );
+    } catch (error) {
+      console.error("Hatırlatıcı grubu render edilirken hata oluştu:", error, group);
+
+      return (
+        <StyledCard key={`group-error-${groupIndex}`} title={t("hatirlatici.unknownGroup")} size="small">
+          <Alert type="warning" showIcon message={t("hatirlatici.renderWarning")} />
+        </StyledCard>
+      );
+    }
+  };
+
   const content = (
     <PopoverContent>
-      <HeaderSection>Hatırlatıcı ({hatirlaticiData?.toplam_hatirlatici || 0})</HeaderSection>
+      <HeaderSection>
+        {t("hatirlatmalar")} ({hatirlaticiData?.toplam_hatirlatici || 0})
+      </HeaderSection>
 
       {loading ? (
         <div style={{ display: "flex", width: "100%", alignItems: "center", justifyContent: "center", padding: "40px" }}>
           <Spin size="large" />
         </div>
-      ) : hatirlaticiData?.data ? (
+      ) : reminderGroups.length > 0 ? (
         <CardsGrid>
-          {hatirlaticiData.data.map((group) => (
-            <StyledCard key={group.GrupId} title={`${group.GrupAdi} (${group.ToplamKayit})`} size="small">
-              {group.Hatirlaticilar.map((item) => {
-                const colors = getColorForItem(item);
-                return (
-                  <ReminderItem key={item.SiraId} onClick={() => handleItemClick(item)}>
-                    <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
-                      <ColorBar isCritical={colors.isCritical} isWarning={colors.isWarning} />
-                      <span style={{ fontSize: "13px", color: "#333" }}>{item.Aciklama2}</span>
-                    </div>
-                    <BadgePill isCritical={colors.isCritical} isWarning={colors.isWarning}>
-                      {item.Deger}
-                    </BadgePill>
-                  </ReminderItem>
-                );
-              })}
-            </StyledCard>
-          ))}
+          {hasInvalidReminderData && (
+            <Alert type="warning" showIcon message={t("hatirlatici.renderWarning")} style={{ marginBottom: 16, breakInside: "avoid" }} />
+          )}
+          {reminderGroups.map((group, groupIndex) => renderReminderGroup(group, groupIndex))}
         </CardsGrid>
       ) : (
-        <div style={{ textAlign: "center", padding: "20px", color: "#999" }}>Hatırlatıcı bulunamadı</div>
+        <div style={{ textAlign: "center", padding: "20px", color: "#999" }}>{t("hatirlatici.notFound")}</div>
       )}
     </PopoverContent>
   );
@@ -230,3 +283,27 @@ export default function HatirlaticiPopover({ hatirlaticiData, loading, open, set
     </>
   );
 }
+
+HatirlaticiPopover.propTypes = {
+  hatirlaticiData: PropTypes.shape({
+    toplam_hatirlatici: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    data: PropTypes.arrayOf(
+      PropTypes.shape({
+        GrupId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+        GrupAdi: PropTypes.string,
+        ToplamKayit: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+        Hatirlaticilar: PropTypes.arrayOf(
+          PropTypes.shape({
+            SiraId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+            Aciklama2: PropTypes.string,
+            Deger: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+            Kritik: PropTypes.number,
+          })
+        ),
+      })
+    ),
+  }),
+  loading: PropTypes.bool,
+  open: PropTypes.bool,
+  setOpen: PropTypes.func.isRequired,
+};
