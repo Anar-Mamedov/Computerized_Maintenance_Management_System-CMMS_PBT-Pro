@@ -59,7 +59,7 @@ function AylaraGoreIsEmriAnalizi({ aylikTrendler, loading }) {
     <div
       style={{
         width: "100%",
-        height: "420px",
+        height: "410px",
         borderRadius: "10px",
         backgroundColor: "white",
         display: "flex",

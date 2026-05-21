@@ -1,7 +1,7 @@
 import React from "react";
 import bg from "/images/bg-card.png";
 import { Spin, Typography } from "antd";
-import { SettingOutlined } from "@ant-design/icons";
+import { BorderInnerOutlined } from "@ant-design/icons";
 import { t } from "i18next";
 
 const { Text } = Typography;
@@ -47,7 +47,7 @@ function Component1({ apiData, loading }) {
         >
           {/* Sol Taraf: Metin İçerikleri */}
           <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
-            <Text style={{ fontWeight: "600", fontSize: "32px", color: "#1f1f1f" }}>
+            <Text style={{ fontWeight: "600", fontSize: "28px", color: "#1f1f1f" }}>
               {value !== null && value !== undefined ? (
                 <>
                   {Number(value).toLocaleString("tr-TR", {
@@ -67,7 +67,7 @@ function Component1({ apiData, loading }) {
 
           {/* Sağ Üst Köşe: İkon Alanı */}
           <div style={{ position: "absolute", top: "16px", right: "16px" }}>
-            <SettingOutlined style={{ fontSize: "22px", color: "#bfbfbf" }} />
+            <BorderInnerOutlined style={{ fontSize: "22px", color: "#bfbfbf" }} />
           </div>
         </div>
       )}

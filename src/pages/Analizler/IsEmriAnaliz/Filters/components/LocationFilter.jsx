@@ -1,73 +1,57 @@
 import React, { useState, useEffect } from "react";
 import { Select, Button, Popover, Spin } from "antd";
 import AxiosInstance from "../../../../../api/http";
-import { Controller, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 
 const { Option } = Select;
 
-const LocationFilter = ({ onSubmit }) => {
+const LocationFilter = () => {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);
-  const [selectedIds, setSelectedIds] = useState([]);
-  const [loading, setLoading] = useState(false); // Loading state
-  const {
-    control,
-    watch,
-    setValue,
-    getValues,
-    formState: { errors },
-  } = useFormContext();
+  const [loading, setLoading] = useState(false);
+  
+  const { setValue, watch } = useFormContext();
 
-  const handleChange = (selectedValues) => {
-    // Seçilen değerlerin id'lerini kullanarak selectedIds dizisini güncelle
-    const newSelectedIds = selectedValues
-      .map((value) => {
-        const option = options.find((option) => option.value === value);
-        return option ? option.key : null;
-      })
-      .filter((id) => id !== null); // null değerleri filtrele
-    setSelectedIds(newSelectedIds);
-  };
+  // Ana formda saklanan "LokasyonIds" dizisini anlık olarak izliyoruz kanka
+  const currentSelectedIds = watch("LokasyonIds") || [];
 
+  // Lokasyon listesini API'den çekiyoruz
   useEffect(() => {
     if (open) {
-      setLoading(true); // API isteği başladığında loading true yap
+      setLoading(true);
       AxiosInstance.get("GetLokasyonList")
         .then((response) => {
-          // API'den gelen veriye göre options dizisini oluştur
-          const options = response.map((item) => ({
-            key: item.TB_LOKASYON_ID.toString(), // ID değerini key olarak kullan
-            value: item.LOK_TANIM, // Gösterilecek değer
+          // Axios response kontrolü (response.data veya direkt response olabilir yapına göre)
+          const resData = response?.data || response;
+          const formattedOptions = resData.map((item) => ({
+            key: item.TB_LOKASYON_ID.toString(), // ID'yi string olarak tutuyoruz
+            value: item.LOK_TANIM,               // Ekranda görünecek metin
           }));
-          setOptions(options);
-          setLoading(false); // API isteği bittiğinde loading false yap
+          setOptions(formattedOptions);
         })
         .catch((error) => {
-          console.log("API Error:", error);
-          setLoading(false); // Hata durumunda da loading false yap
+          console.error("Lokasyon API Error:", error);
+        })
+        .finally(() => {
+          setLoading(false);
         });
     }
   }, [open]);
 
-  const handleSubmit = () => {
-    // console.log("Selected IDs:", selectedIds);
-
-    setOpen(false);
-    // onSubmit(selectedIds); // onSubmit ile id'leri gönder
+  // Ant Design Select seçimi değiştiğinde çalışacak temiz fonksiyon
+  const handleChange = (selectedKeys) => {
+    // Seçilen değerleri direkt ID array'i olarak yerel state yerine ana forma yazıyoruz
+    setValue("LokasyonIds", selectedKeys);
   };
 
-  useEffect(() => {
-    // Seçilen id'leri setValue ile ayarla
-    const selectedIdsString = selectedIds.join(",");
-    setValue("locationIds", selectedIdsString);
-  }, [selectedIds]);
+  const handleSubmit = () => {
+    setOpen(false);
+  };
 
   const handleCancelClick = () => {
-    setSelectedIds([]);
-    setValue("locationIds", "");
-    // console.log(watch("locationIds"));
+    // İptal edilirse forma boş array geçiyoruz, böylece payload temiz gidiyor
+    setValue("LokasyonIds", []);
     setOpen(false);
-    // onSubmit([]);
   };
 
   const content = (
@@ -90,10 +74,8 @@ const LocationFilter = ({ onSubmit }) => {
           mode="multiple"
           style={{ width: "100%" }}
           placeholder="Ara..."
-          value={selectedIds.map((id) => {
-            const option = options.find((option) => option.key === id);
-            return option ? option.value : "";
-          })}
+          // Select'in değer eşlemesini doğrudan ID (key) üzerinden yapıyoruz kanka
+          value={currentSelectedIds}
           onChange={handleChange}
           allowClear
           notFoundContent={
@@ -109,10 +91,11 @@ const LocationFilter = ({ onSubmit }) => {
                 <Spin size="small" />
               </div>
             ) : null
-          } // Spin burada gösterilecek
+          }
         >
           {options.map((option) => (
-            <Option key={option.key} value={option.value}>
+            // Key alanına ID, value alanına da ID basıyoruz ki onChange'de bize direkt ID array'i dönsün
+            <Option key={option.key} value={option.key}>
               {option.value}
             </Option>
           ))}
@@ -143,9 +126,10 @@ const LocationFilter = ({ onSubmit }) => {
             justifyContent: "center",
             alignItems: "center",
             color: "white",
+            fontSize: "11px"
           }}
         >
-          {selectedIds.length}
+          {currentSelectedIds.length}
         </div>
       </Button>
     </Popover>

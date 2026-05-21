@@ -26,7 +26,6 @@ import AylikMaliyetler from "./components/AylikMaliyetler.jsx";
 import AylikKM from "./components/AylikKM.jsx";
 import ArizaliMakineler from "./components/ArizaliMakineler.jsx";
 
-// Axios instance importunu buraya ekledik kanka
 import AxiosInstance from "../../../api/http.jsx";
 
 const { Text } = Typography;
@@ -36,15 +35,15 @@ const widgetTitles = {
   widget2: "Açık İş Emirleri",
   widget3: "Toplam İş Emri Maliyeti",
   widget4: "En Yavaş Müdahele Süresi",
-  widget5: "Müdahele Süresi Histogramı",
-  widget6: "İş Talebi Tipleri / Atölyeler",
   widget7: "Ortalama Çalışma Süresi",
-  widget11: "İş Emri Müdahele Süresi Tablosu",
-  widget14: "Aylık Müdahele Süresi Tablosu",
-  widget18: "Personel Müdahele Süresi",
+  widget14: "İş Emri Özet Paneli",
+  widget5: "Müdahele Süresi Histogramı",
   widget19: "Aylık Müdahele Süresi",
-  widget20: "3. Makine Arıza ve Müdahale Öncelik Analizi",
-  widget21: "4. Atölye Performans Karşılaştırması",
+  widget6: "İş Talebi Tipleri / Atölyeler",
+  widget18: "Personel Müdahele Süresi",
+  widget11: "İş Emri Müdahele Süresi Tablosu",
+  widget20: "2. İş Emirleri Maliyet ve Performans Analizi",
+  widget21: "3. Makine Arıza ve Müdahale Öncelik Analizi",
   widget22: "4. Atölye Performans Karşılaştırması",
 };
 
@@ -54,27 +53,40 @@ const defaultItems = [
   { id: "widget3", x: 4, y: 0, width: 2, height: 1, minW: 2, minH: 1 },
   { id: "widget4", x: 6, y: 0, width: 2, height: 1, minW: 2, minH: 1 },
   { id: "widget7", x: 8, y: 0, width: 4, height: 1, minW: 2, minH: 1 },
-  { id: "widget14", x: 0, y: 4, width: 12, height: 2, minW: 3, minH: 2 },
-  { id: "widget5", x: 0, y: 1, width: 6, height: 3, minW: 3, minH: 2 },
-  { id: "widget19", x: 6, y: 1, width: 6, height: 3, minW: 3, minH: 2 },
+  { id: "widget14", x: 0, y: 1, width: 12, height: 2, minW: 3, minH: 2 },
+  { id: "widget5", x: 0, y: 3, width: 6, height: 3, minW: 3, minH: 2 },
+  { id: "widget19", x: 6, y: 3, width: 6, height: 3, minW: 3, minH: 2 },
   { id: "widget6", x: 0, y: 6, width: 6, height: 4, minW: 3, minH: 2 },
   { id: "widget18", x: 6, y: 6, width: 6, height: 4, minW: 3, minH: 2 },
   { id: "widget11", x: 0, y: 10, width: 12, height: 3, minW: 3, minH: 2 },
-  { id: "widget20", x: 0, y: 10, width: 12, height: 3, minW: 3, minH: 2 },
-  { id: "widget21", x: 0, y: 10, width: 12, height: 3, minW: 3, minH: 2 },
-  { id: "widget22", x: 0, y: 10, width: 12, height: 3, minW: 3, minH: 2 },
+  { id: "widget20", x: 0, y: 13, width: 12, height: 3, minW: 3, minH: 2 },
+  { id: "widget21", x: 0, y: 16, width: 12, height: 3, minW: 3, minH: 2 },
+  { id: "widget22", x: 0, y: 19, width: 12, height: 3, minW: 3, minH: 2 },
 ];
 
 function MainDashboard() {
   const [reorganize, setReorganize] = useState();
   const [dashboardData, setDashboardData] = useState(null);
+  const [breakdownType, setBreakdownType] = useState("Tip"); // Backend'deki Kirilim1 ile senkronize
   const [listData, setListData] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [kirilim1, setKirilim1] = useState(1);
-  const [kirilim4, setKirilim4] = useState(4);
+  const [page1, setPage1] = useState(1);
+  const [pageSize1, setPageSize1] = useState(10);
+
+  // Tablo 2 (Liste2) için sayfalama
+  const [page2, setPage2] = useState(1);
+  const [pageSize2, setPageSize2] = useState(10);
+
+  // Tablo 3 (Liste3) için sayfalama
+  const [page3, setPage3] = useState(1);
+  const [pageSize3, setPageSize3] = useState(10);
+
+  // Tablo 4 (Liste4) için sayfalama
+  const [page4, setPage4] = useState(1);
+  const [pageSize4, setPageSize4] = useState(10);
+
+  const [kirilim4, setKirilim4] = useState(4); // Listeler API'sinin beklediği sabit veya dinamik değer
 
   const [checkedWidgets, setCheckedWidgets] = useState({
     widget1: false, widget2: false, widget3: false, widget4: false,
@@ -85,8 +97,8 @@ function MainDashboard() {
 
   const methods = useForm({
     defaultValues: {
-      BaslangicTarihi: "2026-01-01T00:00:00",
-      BitisTarihi: "2026-05-18T23:59:59",
+      BaslangicTarihi: null,
+      BitisTarihi: null,
       LokasyonIds: [],
       AtolyeIds: [],
       EkipmanIds: []
@@ -97,7 +109,7 @@ function MainDashboard() {
   const selectedDashboard = "IsEmriAnaliz";
   const currentFilters = watch();
 
-  // 1. Axios Yapısına Geçen Dashboard İstek Fonksiyonu
+  // 1. Dashboard API İstek Mekanizması
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
@@ -109,10 +121,7 @@ function MainDashboard() {
         EkipmanIds: currentFilters.EkipmanIds || [],
       };
 
-      // AxiosInstance post metodunu entegre ettik
       const response = await AxiosInstance.post("GetIsEmriAnalizDashboard", payload);
-      
-      // Axios veriyi doğrudan 'data' objesinde taşır
       setDashboardData(response?.data || null);
     } catch (error) {
       console.error("Dashboard API hatası:", error);
@@ -121,35 +130,91 @@ function MainDashboard() {
     }
   };
 
-  // 2. Axios Yapısına Geçen Liste İstek Fonksiyonu
-  const fetchListData = async () => {
-    try {
-      const payload = {
-        BaslangicTarihi: currentFilters.BaslangicTarihi,
-        BitisTarihi: currentFilters.BitisTarihi,
-        LokasyonIds: currentFilters.LokasyonIds || [],
-        AtolyeIds: currentFilters.AtolyeIds || [],
-        EkipmanIds: currentFilters.EkipmanIds || [],
-        Kirilim1: kirilim1,
-        Kirilim4: kirilim4
-      };
+  // 2. Listeler API İstek Mekanizması (Gönderdiğin tam payload kurgusuyla güncellendi)
+  const fetchListData = async (targetTable = "all") => {
+  setLoading(true);
+  try {
+    const payload = {
+      BaslangicTarihi: currentFilters.BaslangicTarihi,
+      BitisTarihi: currentFilters.BitisTarihi,
+      LokasyonIds: currentFilters.LokasyonIds || [],
+      AtolyeIds: currentFilters.AtolyeIds || [],
+      EkipmanIds: currentFilters.EkipmanIds || [],
+      Kirilim1: breakdownType, 
+      Kirilim4: kirilim4
+    };
 
-      // AxiosInstance query params ve post payload yapısı
-      const response = await AxiosInstance.post(`GetIsEmriAnalizListeler?page=${page}&pageSize=${pageSize}`, payload);
-      setListData(response?.data || null);
-    } catch (error) {
-      console.error("Listeler API hatası:", error);
+    // Hangi tablo istek attıysa onun page ve pageSize değerini URL'e basıyoruz
+    let activePage = page1;
+    let activePageSize = pageSize1;
+
+    if (targetTable === "table2") { activePage = page2; activePageSize = pageSize2; }
+    else if (targetTable === "table3") { activePage = page3; activePageSize = pageSize3; }
+    else if (targetTable === "table4") { activePage = page4; activePageSize = pageSize4; }
+
+    const response = await AxiosInstance.post(
+      `GetIsEmriAnalizListeler?page=${activePage}&pageSize=${activePageSize}`, 
+      payload
+    );
+
+    // Kritik Nokta: Eğer "all" (ilk açılış veya sorgula butonu) ise tüm listeleri güncelle.
+    // Eğer sadece bir tablo sayfa değiştirdiyse, state'in içindeki diğer tabloların verisi uçmasın diye 
+    // sadece ilgili listenin içeriğini override ediyoruz kanka.
+    if (targetTable === "all") {
+      setListData(response?.data?.data || response?.data || null);
+    } else {
+      setListData(prevData => ({
+        ...prevData,
+        // API'den dönen güncel datayı sadece ilgili listeye basıyoruz
+        ...(targetTable === "table1" && { Liste1: response?.data?.data?.Liste1 || response?.data?.Liste1 }),
+        ...(targetTable === "table2" && { Liste2: response?.data?.data?.Liste2 || response?.data?.Liste2 }),
+        ...(targetTable === "table3" && { Liste3: response?.data?.data?.Liste3 || response?.data?.Liste3 }),
+        ...(targetTable === "table4" && { Liste4: response?.data?.data?.Liste4 || response?.data?.Liste4 }),
+      }));
     }
-  };
+  } catch (error) {
+    console.error("Listeler API hatası:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
+  // Sorgula butonuna basıldığında tetiklenecek ana fonksiyon
   const handleQuery = () => {
     fetchDashboardData();
-    fetchListData();
+    fetchListData("all");
   };
 
+  // Sayfalama, tablo içi kırılım veya alt listeler değiştikçe istekleri tazele
+  useEffect(() => {
+  if (listData) fetchListData("table1");
+}, [page1, pageSize1]);
+
+// Tablo 2'in sayfası değiştiğinde sadece tablo 2'yi çek
+useEffect(() => {
+  if (listData) fetchListData("table2");
+}, [page2, pageSize2]);
+
+// Tablo 3'ün sayfası değiştiğinde sadece tablo 3'ü çek
+useEffect(() => {
+  if (listData) fetchListData("table3");
+}, [page3, pageSize3]);
+
+// Tablo 4'ün sayfası değiştiğinde sadece tablo 4'ü çek
+useEffect(() => {
+  if (listData) fetchListData("table4");
+}, [page4, pageSize4]);
+
+useEffect(() => {
+  setPage1(1); setPage2(1); setPage3(1); setPage4(1);
+  fetchListData("all");
+}, [breakdownType]);
+
+  // İlk açılışta verileri otomatik çek
   useEffect(() => {
     handleQuery();
-  }, [page, pageSize, kirilim1, kirilim4]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (dashboardData) {
@@ -356,7 +421,10 @@ function MainDashboard() {
                   <ConfigProvider locale={trTR}>
                     <AppProvider>
                       <BrowserRouter>
-                        <Component8 />
+                        <Component8
+                          atolyeDagilimi={dashboardData ? dashboardData.AtolyeDagilimi : null} 
+                          loading={loading}
+                        />
                       </BrowserRouter>
                     </AppProvider>
                   </ConfigProvider>
@@ -371,7 +439,20 @@ function MainDashboard() {
                   <ConfigProvider locale={trTR}>
                     <AppProvider>
                       <BrowserRouter>
-                        <IsEmriTable />
+                        <IsEmriTable
+                          listeData={listData ? listData.Liste1 : null} 
+                          loading={loading}
+                          breakdownType={breakdownType}
+                          onBreakdownTypeChange={(val) => setBreakdownType(val)}
+                          onRefresh={() => fetchListData("table1")}
+                          page={page1}
+                          pageSize={pageSize1}
+                          totalItems={listData?.TotalCount1 || 100} // Backend'den Liste1 için dönen total count
+                          onPageChange={(p, ps) => {
+                            setPage1(p);
+                            setPageSize1(ps);
+                          }}
+                        />
                       </BrowserRouter>
                     </AppProvider>
                   </ConfigProvider>
@@ -408,7 +489,10 @@ function MainDashboard() {
                   <ConfigProvider locale={trTR}>
                     <AppProvider>
                       <BrowserRouter>
-                        <LokasyonBazindaYakitTuketimleri />
+                        <LokasyonBazindaYakitTuketimleri
+                          aylikTrendler={dashboardData ? dashboardData.AylikTrendler : null} 
+                          loading={loading}
+                        />
                       </BrowserRouter>
                     </AppProvider>
                   </ConfigProvider>
@@ -441,7 +525,17 @@ function MainDashboard() {
                   <ConfigProvider locale={trTR}>
                     <AppProvider>
                       <BrowserRouter>
-                        <ArizaliMakineler />
+                        <ArizaliMakineler
+                          listeData={listData ? listData.Liste2 : null} 
+                          loading={loading}
+                          page={page2}
+                          pageSize={pageSize2}
+                          totalItems={listData?.TotalCount2 || 100} // Backend'den Liste2 için dönen total count
+                          onPageChange={(p, ps) => {
+                            setPage2(p);
+                            setPageSize2(ps);
+                          }}
+                        />
                       </BrowserRouter>
                     </AppProvider>
                   </ConfigProvider>
@@ -456,7 +550,17 @@ function MainDashboard() {
                   <ConfigProvider locale={trTR}>
                     <AppProvider>
                       <BrowserRouter>
-                        <AylikKM />
+                        <AylikKM
+                          listeData={listData ? listData.Liste3 : null} 
+                          loading={loading}
+                          page={page3}
+  pageSize={pageSize3}
+  totalItems={listData?.TotalCount3 || 100} // Backend'den Liste3 için dönen total count
+  onPageChange={(p, ps) => {
+    setPage3(p);
+    setPageSize3(ps);
+  }}
+                        />
                       </BrowserRouter>
                     </AppProvider>
                   </ConfigProvider>
@@ -471,7 +575,20 @@ function MainDashboard() {
                   <ConfigProvider locale={trTR}>
                     <AppProvider>
                       <BrowserRouter>
-                        <AylikMaliyetler />
+                        <AylikMaliyetler
+                          listeData={listData ? listData.Liste4 : null} 
+                          loading={loading}
+                          breakdownType={breakdownType}
+                          onBreakdownTypeChange={(val) => setBreakdownType(val)}
+                          onRefresh={() => fetchListData("table4")}
+                          page={page4}
+                          pageSize={pageSize4}
+                          totalItems={listData?.TotalCount4 || 100} // Backend'den Liste4 için dönen total count
+                          onPageChange={(p, ps) => {
+                            setPage4(p);
+                            setPageSize4(ps);
+                          }}
+                        />
                       </BrowserRouter>
                     </AppProvider>
                   </ConfigProvider>
@@ -532,7 +649,7 @@ function MainDashboard() {
     return () => {
       grid.off("change", saveLayout);
     };
-  }, [reorganize, selectedDashboard, dashboardData, loading]);
+  }, [reorganize, selectedDashboard, dashboardData, listData, loading, breakdownType, page1, pageSize1, page2, pageSize2, page3, pageSize3, page4, pageSize4]);
 
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
@@ -658,7 +775,7 @@ function MainDashboard() {
       <Checkbox name="widget5" onChange={handleCheckboxChange} checked={checkedWidgets.widget5}>Müdahele Süresi Histogramı</Checkbox>
       <Checkbox name="widget6" onChange={handleCheckboxChange} checked={checkedWidgets.widget6}>İş Talebi Tipleri / Atölyeler</Checkbox>
       <Checkbox name="widget11" onChange={handleCheckboxChange} checked={checkedWidgets.widget11}>İş Emri Müdahele Süresi Tablosu</Checkbox>
-      <Checkbox name="widget14" onChange={handleCheckboxChange} checked={checkedWidgets.widget14}>Aylık Müdahele Süresi Tablosu</Checkbox>
+      <Checkbox name="widget14" onChange={handleCheckboxChange} checked={checkedWidgets.widget14}>İş Emri Özet Paneli</Checkbox>
       <Checkbox name="widget18" onChange={handleCheckboxChange} checked={checkedWidgets.widget18}>Personel Müdahele Süresi</Checkbox>
       <Checkbox name="widget19" onChange={handleCheckboxChange} checked={checkedWidgets.widget19}>Aylık Müdahele Süresi</Checkbox>
       <Checkbox name="widget20" onChange={handleCheckboxChange} checked={checkedWidgets.widget20}>2. İş Emirleri Maliyet ve Performans Analizi</Checkbox>
