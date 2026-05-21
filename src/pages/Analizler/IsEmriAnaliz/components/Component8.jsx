@@ -1,55 +1,23 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React from "react";
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Spin, Typography, Dropdown, Button } from "antd";
 import { MoreOutlined, BuildOutlined } from "@ant-design/icons";
-import AxiosInstance from "../../../../api/http.jsx";
-import { useFormContext } from "react-hook-form";
-import dayjs from "dayjs";
 
 const { Text } = Typography;
 
-function AtolyelerIsEmriVeGecikme() {
-  const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const { watch } = useFormContext();
-
-  const lokasyonId = watch("locationIds");
-  const atolyeId = watch("atolyeIds");
-  const makineId = watch("makineIds");
-  const baslangicTarihi = watch("baslangicTarihi");
-  const bitisTarihi = watch("bitisTarihi");
-
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    const body = {
-      LokasyonId: lokasyonId || "",
-      AtolyeId: atolyeId || "",
-      MakineId: makineId || "",
-      BaslangicTarih: baslangicTarihi ? dayjs(baslangicTarihi).format("YYYY-MM-DD") : "",
-      BitisTarih: bitisTarihi ? dayjs(bitisTarihi).format("YYYY-MM-DD") : "",
-    };
-
-    try {
-      const response = await AxiosInstance.post(``, body);
-      const formattedData = response.map((item) => ({
-        AtolyeTanim: item.ATL_TANIM || "Belirsiz",
-        IsEmriSayisi: item.ToplamTalepSayisi || 0, // Sütun için veri
-        GecikmeOrani: item.GecikmeOrani || 0,      // Çizgi için veri (Örn: 18)
-      }));
-      setData(formattedData);
-    } catch (error) {
-      console.error("Grafik verisi çekilemedi:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [lokasyonId, atolyeId, makineId, baslangicTarihi, bitisTarihi]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+function AtolyelerIsEmriVeGecikme({ atolyeDagilimi, loading }) {
+  // Yeni JSON yapısındaki (AtolyeAd, IsEmriSayisi, GecikmeOrani) key'lerine göre eşleme yapıyoruz
+  const data = React.useMemo(() => {
+    if (!atolyeDagilimi || !Array.isArray(atolyeDagilimi)) return [];
+    return atolyeDagilimi.map((item) => ({
+      AtolyeTanim: item.AtolyeAd || "Belirsiz",
+      IsEmriSayisi: item.IsEmriSayisi || 0, // Sütun için veri
+      GecikmeOrani: item.GecikmeOrani || 0,  // Çizgi için veri
+    }));
+  }, [atolyeDagilimi]);
 
   const menuItems = [
-    { key: "refresh", label: "Verileri Yenile", onClick: fetchData },
+    { key: "refresh", label: "Verileri Yenile" },
     { key: "download", label: "İndir" },
     { key: "info", label: "Bilgi" },
   ];
@@ -73,7 +41,7 @@ function AtolyelerIsEmriVeGecikme() {
     <div
       style={{
         width: "100%",
-        height: "420px",
+        height: "410px",
         borderRadius: "10px",
         backgroundColor: "white",
         display: "flex",
@@ -104,7 +72,7 @@ function AtolyelerIsEmriVeGecikme() {
 
       {/* Grafik Alanı */}
       <div style={{ flex: 1, minHeight: 0 }}>
-        {isLoading ? (
+        {loading ? (
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
             <Spin />
           </div>
@@ -162,9 +130,9 @@ function AtolyelerIsEmriVeGecikme() {
                 type="monotone" 
                 dataKey="GecikmeOrani" 
                 name="Gecikme Oranı" 
-                stroke="#ffb703" // Fotoğraftaki altın sarısı/turuncu çizgi rengi
+                stroke="#ffb703" 
                 strokeWidth={3}
-                dot={{ r: 5, stroke: "#ffb703", strokeWidth: 2, fill: "#fff" }} // İçi boş yuvarlak nokta tasarımı
+                dot={{ r: 5, stroke: "#ffb703", strokeWidth: 2, fill: "#fff" }} 
                 activeDot={{ r: 7 }}
                 label={renderLineLabel}
               />

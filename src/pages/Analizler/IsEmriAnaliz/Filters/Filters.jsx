@@ -10,10 +10,10 @@ import MakineFilter from "./components/MakineFilter.jsx";
 function Filters(props) {
   return (
     <div style={{ display: "flex", gap: "10px" }}>
-      <LocationFilter />
-      <AtolyeFilter />
-      <MakineFilter />
-      <TarihFilter />
+      <LocationFilter name="LokasyonIds" />
+      <AtolyeFilter name="AtolyeIds" />
+      <MakineFilter name="EkipmanIds" />
+      <TarihFilter startName="BaslangicTarihi" endName="BitisTarihi" />
     </div>
   );
 }

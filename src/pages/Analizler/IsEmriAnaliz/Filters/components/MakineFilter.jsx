@@ -1,55 +1,34 @@
 import React, { useState, useEffect } from "react";
-import { Select, Button, Popover, Spin, Modal, Input } from "antd";
-import AxiosInstance from "../../../../../api/http.jsx";
-import { Controller, useFormContext } from "react-hook-form";
+import { Button, Popover, Modal, Input } from "antd";
+import { useFormContext } from "react-hook-form";
 import MakineTable from "../../../../MakineEkipman/MakineTanim/Table/Table.jsx";
 
-const { Option } = Select;
-
-const MakineFilter = ({ onSubmit }) => {
+const MakineFilter = () => {
   const [open, setOpen] = useState(false);
-  const [options, setOptions] = useState([]);
-  const [selectedIds, setSelectedIds] = useState([]);
-  const [loading, setLoading] = useState(false); // Loading state
-  const [isModalVisible, setIsModalVisible] = useState(false); // Modal visibility state
-  const {
-    control,
-    watch,
-    setValue,
-    getValues,
-    formState: { errors },
-  } = useFormContext();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const { setValue, watch } = useFormContext();
 
-  const handleChange = (selectedValues) => {
-    // Seçilen değerlerin id'lerini kullanarak selectedIds dizisini güncelle
-    const newSelectedIds = selectedValues
-      .map((value) => {
-        const option = options.find((option) => option.value === value);
-        return option ? option.key : null;
-      })
-      .filter((id) => id !== null); // null değerleri filtrele
-    setSelectedIds(newSelectedIds);
-  };
+  // Ana formdaki "EkipmanIds" array'ini dinliyoruz kanka
+  const currentSelectedIds = watch("EkipmanIds") || [];
+
+  // Modal içindeki tablodan seçilen ham nesne verilerini yerel state'te tutuyoruz
+  const [selectedObjects, setSelectedObjects] = useState([]);
+
+  // Seçilen nesneler değiştikçe ana formdaki "EkipmanIds" array'ini id'lerle besliyoruz
+  useEffect(() => {
+    // MakineTable'dan gelen nesnelerin benzersiz ID key'lerini çekiyoruz (Örn: TB_MAKINE_ID veya item.key)
+    const ids = selectedObjects.map((item) => (item.TB_MAKINE_ID || item.key || item.id)?.toString()).filter(Boolean);
+    setValue("EkipmanIds", ids);
+  }, [selectedObjects, setValue]);
 
   const handleSubmit = () => {
-    // console.log("Selected IDs:", selectedIds);
     setOpen(false);
-    // onSubmit(selectedIds); // onSubmit ile id'leri gönder
   };
 
-  useEffect(() => {
-    // Seçilen id'leri setValue ile ayarla
-    // Map selectedIds to their key values and join them with commas
-    const selectedIdsString = selectedIds.map((id) => id.key).join(",");
-    setValue("makineIds", selectedIdsString);
-  }, [selectedIds]);
-
   const handleCancelClick = () => {
-    setSelectedIds([]);
-    setValue("makineIds", "");
-    // console.log(watch("locationIds"));
+    setSelectedObjects([]);
+    setValue("EkipmanIds", []);
     setOpen(false);
-    // onSubmit([]);
   };
 
   const showModal = () => {
@@ -64,8 +43,8 @@ const MakineFilter = ({ onSubmit }) => {
     setIsModalVisible(false);
   };
 
-  // Map selectedIds to MKN_KOD values and join them with commas
-  const selectedMknKodString = selectedIds.map((id) => id.MKN_KOD).join(", ");
+  // Input içinde görünecek kod stringini güvenle oluşturuyoruz
+  const selectedMknKodString = selectedObjects.map((item) => item.MKN_KOD || item.value).filter(Boolean).join(", ");
 
   const content = (
     <div style={{ width: "300px" }}>
@@ -84,7 +63,7 @@ const MakineFilter = ({ onSubmit }) => {
       </div>
       <div style={{ padding: "10px" }}>
         <div style={{ display: "flex", gap: "10px" }}>
-          <Input disabled value={selectedMknKodString} />
+          <Input disabled value={selectedMknKodString} placeholder="Seçilen makineler..." />
           <Button onClick={showModal}>+</Button>
         </div>
       </div>
@@ -101,7 +80,6 @@ const MakineFilter = ({ onSubmit }) => {
             alignItems: "center",
             justifyContent: "center",
           }}
-          onClick={() => setOpen(!open)}
         >
           Ekipman
           <div
@@ -115,9 +93,10 @@ const MakineFilter = ({ onSubmit }) => {
               justifyContent: "center",
               alignItems: "center",
               color: "white",
+              fontSize: "11px"
             }}
           >
-            {selectedIds.length}
+            {currentSelectedIds.length}
           </div>
         </Button>
       </Popover>
@@ -128,9 +107,10 @@ const MakineFilter = ({ onSubmit }) => {
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalCancel}
-        zIndex={2000} // Ensure the modal is above the popover
+        zIndex={2000}
       >
-        <MakineTable setSelectedIds={setSelectedIds} />
+        {/* Tabloya yerel nesne setleme fonksiyonunu geçiyoruz */}
+        <MakineTable setSelectedIds={setSelectedObjects} />
       </Modal>
     </>
   );

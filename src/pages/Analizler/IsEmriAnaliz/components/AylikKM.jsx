@@ -1,86 +1,65 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Table, Spin, Typography, Select, Dropdown, Button, Tag } from "antd";
-import { MoreOutlined, PartitionOutlined } from "@ant-design/icons";
-import AxiosInstance from "../../../../api/http.jsx";
-import { useFormContext } from "react-hook-form";
-import dayjs from "dayjs";
+import React, { useMemo } from "react";
+import { Table, Spin, Typography, Tag } from "antd";
+import { PartitionOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
-function IsEmriDagilimVePerformansListesi() {
-  const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [breakdownType, setBreakdownType] = useState("Tip"); // Tip, Durum, Atolye vb.
-  const { watch } = useFormContext();
-
-  const lokasyonId = watch("locationIds1");
-  const atolyeId = watch("atolyeIds1");
-  const baslangicTarihi = watch("baslangicTarihi1");
-  const bitisTarihi = watch("bitisTarihi1");
-
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    const body = {
-      LokasyonId: lokasyonId || "",
-      AtolyeId: atolyeId || "",
-      BaslangicTarih: baslangicTarihi ? dayjs(baslangicTarihi).format("YYYY-MM-DD") : "",
-      BitisTarih: bitisTarihi ? dayjs(bitisTarihi).format("YYYY-MM-DD") : "",
-      BreakdownType: breakdownType, // Seçilen kırılıma göre backend'e bilgi geçiyoruz
-    };
-
-    try {
-      const response = await AxiosInstance.post(``, body);
-      const formattedData = response.map((item, index) => ({
-        key: index,
-        KrilimAdi: item.KrilimAdi || "Belirsiz",
-        IsEmriSayisi: item.IsEmriSayisi || 0,
-        ToplamCalisma: item.ToplamCalisma || 0,
-        ToplamMaliyet: item.ToplamMaliyet || 0,
-        OrtMaliyet: item.OrtMaliyet || 0,
-        OrtTamamlama: item.OrtTamamlama || 0,
-        EnYuksek: item.EnYuksek || 0,
-        EnDusuk: item.EnDusuk || 0,
-        Siklik: item.Siklik || "-",
-      }));
-      setData(formattedData);
-    } catch (error) {
-      console.error("Performans listesi verisi çekilemedi:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [lokasyonId, atolyeId, baslangicTarihi, bitisTarihi, breakdownType]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const menuItems = [
-    { key: "refresh", label: "Verileri Yenile", onClick: fetchData },
-    { key: "download", label: "Excel İndir" },
-    { key: "info", label: "Bilgi" },
-  ];
-
-  // Fotoğraftaki gibi esnek ve soft renkli kapsül tasarımları için yardımcı fonksiyonlar
-  const formatCurrency = (value) => `₺${new Intl.NumberFormat("tr-TR").format(value)}`;
+function MakineArizaVeOncelikAnalizi({ 
+  listeData, 
+  loading,
+  // Bağımsız sayfalama propları eklendi kanka
+  page,
+  pageSize,
+  totalItems,
+  onPageChange
+}) {
   
-  const getBreakdownLabel = () => {
-    if (breakdownType === "Tip") return "İş Emri Tipleri";
-    if (breakdownType === "Durum") return "Durumlar";
-    if (breakdownType === "Atolye") return "Atölyeler";
-    return "Kırılım Başlığı";
+  // Gelen JSON yapısındaki (Liste3) verilerini Ant Design Table formatına güvenle map'liyoruz
+  const data = useMemo(() => {
+    if (!listeData || !Array.isArray(listeData)) return [];
+    return listeData.map((item, index) => ({
+      key: index,
+      Makine: item.Makine || "Belirsiz",
+      SorunNedeni: item.SorunNedeni || "Belirtilmemiş",
+      ArizaSayisi: item.ArizaSayisi || "0",
+      ToplamMaliyet: item.ToplamMaliyet || "0,00",
+      ToplamIsSuresi: item.ToplamIsSuresi || "0 saat",
+      Siklik: item.Siklik || "-",
+      Oncelik: item.Oncelik || "Belirsiz",
+    }));
+  }, [listeData]);
+
+  // Para birimi formatlama helper'ı
+  const formatCurrencyString = (val) => {
+    if (!val) return "₺0,00";
+    if (String(val).includes("₺")) return val;
+    return `₺${val}`;
+  };
+
+  // Öncelik durumuna göre renk dönecek minik fonksiyon (Görseli desteklemek için)
+  const getOncelikColor = (oncelik) => {
+    if (String(oncelik).toLowerCase().includes("yüksek")) return "volcano";
+    if (String(oncelik).toLowerCase().includes("orta")) return "warning";
+    return "blue";
   };
 
   const columns = [
     {
-      title: getBreakdownLabel(),
-      dataIndex: "KrilimAdi",
-      key: "KrilimAdi",
+      title: "Makine",
+      dataIndex: "Makine",
+      key: "Makine",
       render: (text) => <Text style={{ fontWeight: "500" }}>{text}</Text>,
     },
     {
-      title: "İş Emri",
-      dataIndex: "IsEmriSayisi",
-      key: "IsEmriSayisi",
+      title: "Sorun Nedeni",
+      dataIndex: "SorunNedeni",
+      key: "SorunNedeni",
+      render: (text) => <Text type="secondary">{text}</Text>,
+    },
+    {
+      title: "Arıza Sayısı",
+      dataIndex: "ArizaSayisi",
+      key: "ArizaSayisi",
       align: "center",
       render: (value) => (
         <Tag color="blue" style={{ borderRadius: "10px", padding: "0 10px", border: "none", color: "#1890ff", backgroundColor: "#e6f7ff" }}>
@@ -89,54 +68,22 @@ function IsEmriDagilimVePerformansListesi() {
       ),
     },
     {
-      title: "Toplam Çalışma",
-      dataIndex: "ToplamCalisma",
-      key: "ToplamCalisma",
-      align: "center",
-      render: (value) => (
-        <Tag color="geekblue" style={{ borderRadius: "10px", padding: "0 10px", border: "none", color: "#2f54eb", backgroundColor: "#f0f5ff" }}>
-          {value} saat
-        </Tag>
-      ),
-    },
-    {
       title: "Toplam Maliyet",
       dataIndex: "ToplamMaliyet",
       key: "ToplamMaliyet",
       align: "right",
-      render: (value) => <Text style={{ fontWeight: "600" }}>{formatCurrency(value)}</Text>,
+      render: (value) => <Text style={{ fontWeight: "600" }}>{formatCurrencyString(value)}</Text>,
     },
     {
-      title: "Ort. Maliyet",
-      dataIndex: "OrtMaliyet",
-      key: "OrtMaliyet",
-      align: "right",
-      render: (value) => formatCurrency(value),
-    },
-    {
-      title: "Ort. Tamamlama",
-      dataIndex: "OrtTamamlama",
-      key: "OrtTamamlama",
+      title: "Toplam İş Süresi",
+      dataIndex: "ToplamIsSuresi",
+      key: "ToplamIsSuresi",
       align: "center",
       render: (value) => (
-        <Tag color="cyan" style={{ borderRadius: "10px", padding: "0 10px", border: "none", color: "#13c2c2", backgroundColor: "#e6fffb" }}>
-          {value} gün
+        <Tag color="geekblue" style={{ borderRadius: "10px", padding: "0 10px", border: "none", color: "#2f54eb", backgroundColor: "#f0f5ff" }}>
+          {value}
         </Tag>
       ),
-    },
-    {
-      title: "En Yüksek",
-      dataIndex: "EnYuksek",
-      key: "EnYuksek",
-      align: "right",
-      render: (value) => formatCurrency(value),
-    },
-    {
-      title: "En Düşük",
-      dataIndex: "EnDusuk",
-      key: "EnDusuk",
-      align: "right",
-      render: (value) => formatCurrency(value),
     },
     {
       title: "Sıklık",
@@ -145,6 +92,17 @@ function IsEmriDagilimVePerformansListesi() {
       align: "center",
       render: (value) => (
         <Tag color="purple" style={{ borderRadius: "10px", padding: "0 12px", border: "none", color: "#722ed1", backgroundColor: "#f9f0ff" }}>
+          {value}
+        </Tag>
+      ),
+    },
+    {
+      title: "Öncelik",
+      dataIndex: "Oncelik",
+      key: "Oncelik",
+      align: "center",
+      render: (value) => (
+        <Tag color={getOncelikColor(value)} style={{ borderRadius: "10px", padding: "0 12px", fontWeight: "500" }}>
           {value}
         </Tag>
       ),
@@ -179,22 +137,34 @@ function IsEmriDagilimVePerformansListesi() {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <Tag color="blue" variant="light" style={{ marginLeft: "5px", color: "#1890ff", borderColor: "#91d5ff" }}>
-              Öncelik
-            </Tag>
+          <Tag color="blue" style={{ marginLeft: "5px", color: "#1890ff", borderColor: "#91d5ff", backgroundColor: "#e6f7ff" }}>
+            Öncelik
+          </Tag>
         </div>
       </div>
 
       {/* Tablo Alanı */}
       <div style={{ width: "100%", overflowX: "auto" }}>
-        <Spin spinning={isLoading}>
+        <Spin spinning={loading}>
           <Table
             columns={columns}
             dataSource={data}
-            pagination={false}
             size="middle"
             bordered={false}
-            rowStyle={{ height: "50px" }}
+            pagination={{
+              current: page,
+              pageSize: pageSize,
+              total: totalItems || 0,
+              showSizeChanger: true,
+              pageSizeOptions: ["10", "20", "50", "100"],
+              position: ["bottomRight"],
+              size: "small",
+              onChange: (currentPage, currentPageSize) => {
+                if (onPageChange) {
+                  onPageChange(currentPage, currentPageSize);
+                }
+              }
+            }}
           />
         </Spin>
       </div>
@@ -202,4 +172,4 @@ function IsEmriDagilimVePerformansListesi() {
   );
 }
 
-export default IsEmriDagilimVePerformansListesi;
+export default MakineArizaVeOncelikAnalizi;

@@ -1,74 +1,26 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React from "react";
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Spin, Typography, Dropdown, Button } from "antd";
 import { MoreOutlined, DashboardOutlined } from "@ant-design/icons";
-import AxiosInstance from "../../../../api/http.jsx";
-import { useFormContext } from "react-hook-form";
-import dayjs from "dayjs";
 
 const { Text } = Typography;
 
-const monthMap = {
-  January: "Oca",
-  February: "Şub",
-  March: "Mar",
-  April: "Nis",
-  May: "May",
-  June: "Haz",
-  July: "Tem",
-  August: "Ağu",
-  September: "Eyl",
-  October: "Eki",
-  November: "Kas",
-  December: "Ara",
-};
+function IsEmirleriTrendGrafigi({ aylikTrendler, loading }) {
+  // 2026 yılı veya dinamik yıl takibi için (Gerekirse üst component'ten prop olarak da alınabilir)
+  const currentYear = new Date().getFullYear();
 
-function IsEmirleriTrendGrafigi() {
-  const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const { watch } = useFormContext();
-
-  const lokasyonId = watch("locationIds");
-  const atolyeId = watch("atolyeIds");
-  const makineId = watch("makineIds");
-  const baslangicTarihi = watch("baslangicTarihi");
-  const bitisTarihi = watch("bitisTarihi");
-  
-  const currentYear = baslangicTarihi ? dayjs(baslangicTarihi).year() : dayjs().year();
-
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    const body = {
-      LokasyonId: lokasyonId || "",
-      AtolyeId: atolyeId || "",
-      MakineId: makineId || "",
-      BaslangicTarih: baslangicTarihi ? dayjs(baslangicTarihi).format("YYYY-MM-DD") : "",
-      BitisTarih: bitisTarihi ? dayjs(bitisTarihi).format("YYYY-MM-DD") : "",
-      Yil: currentYear
-    };
-
-    try {
-      // Backend endpoint ismini kendi yapına göre güncelleyebilirsin kanka
-      const response = await AxiosInstance.post(``, body);
-      const formattedData = response.map((item) => ({
-        Ay: monthMap[item.Ay] || item.Ay,
-        AcilanIsEmri: item.AcilanAdet || 0,  // Bar sütun verisi
-        KapananIsEmri: item.KapananAdet || 0, // Çizgi verisi
-      }));
-      setData(formattedData);
-    } catch (error) {
-      console.error("Trend grafik verisi çekilemedi:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [lokasyonId, atolyeId, makineId, baslangicTarihi, bitisTarihi, currentYear]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  // Gelen veriyi (AyAd, AcilanIsEmri, KapananIsEmri) yapısına göre eşliyoruz
+  const data = React.useMemo(() => {
+    if (!aylikTrendler || !Array.isArray(aylikTrendler)) return [];
+    return aylikTrendler.map((item) => ({
+      Ay: item.AyAd || "Belirsiz",
+      AcilanIsEmri: item.AcilanIsEmri || 0,   // Bar sütun verisi
+      KapananIsEmri: item.KapananIsEmri || 0, // Çizgi verisi
+    }));
+  }, [aylikTrendler]);
 
   const menuItems = [
-    { key: "refresh", label: "Verileri Yenile", onClick: fetchData },
+    { key: "refresh", label: "Verileri Yenile" },
     { key: "download", label: "İndir" },
     { key: "info", label: "Bilgi" },
   ];
@@ -77,7 +29,7 @@ function IsEmirleriTrendGrafigi() {
     <div
       style={{
         width: "100%",
-        height: "420px",
+        height: "410px",
         borderRadius: "10px",
         backgroundColor: "white",
         display: "flex",
@@ -108,7 +60,7 @@ function IsEmirleriTrendGrafigi() {
 
       {/* Grafik Alanı */}
       <div style={{ flex: 1, minHeight: 0 }}>
-        {isLoading ? (
+        {loading ? (
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
             <Spin />
           </div>
@@ -151,9 +103,9 @@ function IsEmirleriTrendGrafigi() {
                 type="monotone" 
                 dataKey="KapananIsEmri" 
                 name="Kapanan İş Emri" 
-                stroke="#52c41a" // Fotoğraftaki canlı yeşil tonu
+                stroke="#52c41a" 
                 strokeWidth={3}
-                dot={{ r: 5, stroke: "#52c41a", strokeWidth: 2, fill: "#fff" }} // İçi beyaz, dışı yeşil noktalar
+                dot={{ r: 5, stroke: "#52c41a", strokeWidth: 2, fill: "#fff" }} 
                 activeDot={{ r: 7 }}
               />
             </ComposedChart>

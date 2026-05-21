@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { GridStack } from "gridstack";
 import "gridstack/dist/gridstack.css";
 import { Button, Checkbox, Popover, Typography, Switch, Tooltip, ConfigProvider } from "antd";
-import { DownOutlined, QuestionCircleOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
-import ReactDOM, { createRoot } from "react-dom/client";
+import { DownOutlined, QuestionCircleOutlined, ReloadOutlined } from "@ant-design/icons";
+import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { I18nextProvider } from "react-i18next";
 import i18n from "../../../utils/i18n.js";
@@ -16,29 +16,17 @@ import Component2 from "./components/Component2.jsx";
 import Component1 from "./components/Component1.jsx";
 import Component4 from "./components/Component4.jsx";
 import Component5 from "./components/Component5.jsx";
-import Component6 from "./components/Component6.jsx";
 import Component7 from "./components/Component7.jsx";
 import Component8 from "./components/Component8.jsx";
 import IsEmriTable from "./components/Table/Table.jsx";
-import LokasyonBazindaIsTalepleri from "./components/LokasyonBazindaIsTalepleri.jsx";
-import IsEmirleriOzetTablosu from "./components/IsEmirleriOzetTablosu.jsx";
-import MakineTiplerineGore from "./components/MakineTiplerineGore.jsx";
-import TamamlanmaOranlari from "./components/TamamlanmaOranlari.jsx";
-import YakitVerimliligi from "./components/YakitVerimliligi.jsx";
-import LokasyonBazindaYakitTuketimleri from "./components/LokasyonBazindaYakitTuketimleri.jsx";
 import AylikYakitTuketimleri from "./components/AylikYakitTuketimleri.jsx";
-import IsEmriZamanDagilimi from "./components/IsEmriZamanDagilimi.jsx";
-import PersonelBazindaIsGucu from "./components/PersonelBazindaIsGucu.jsx";
+import LokasyonBazindaYakitTuketimleri from "./components/LokasyonBazindaYakitTuketimleri.jsx";
 import BolgelereGoreToplamMiktarDagilimi from "./components/BolgelereGoreToplamMiktarDagilimi.jsx";
 import AylikMaliyetler from "./components/AylikMaliyetler.jsx";
 import AylikKM from "./components/AylikKM.jsx";
-import CustomDashboards from "./components/CustomDashboards.jsx";
-import PersonelKPITablosu from "./components/PersonelKPITablosu.jsx";
-import IsEmriTipleri from "./components/IsEmriTipleri.jsx";
-import IsTalebiTipleri from "./components/IsTalebiTipleri.jsx";
 import ArizaliMakineler from "./components/ArizaliMakineler.jsx";
 
-import "./custom-gridstack.css"; // Add this line to import your custom CSS
+import AxiosInstance from "../../../api/http.jsx";
 
 const { Text } = Typography;
 
@@ -47,17 +35,16 @@ const widgetTitles = {
   widget2: "Açık İş Emirleri",
   widget3: "Toplam İş Emri Maliyeti",
   widget4: "En Yavaş Müdahele Süresi",
-  widget5: "Müdahele Süresi Histogramı",
-  widget6: "İş Talebi Tipleri / Atölyeler",
   widget7: "Ortalama Çalışma Süresi",
-  widget11: "İş Emri Müdahele Süresi Tablosu",
-  widget14: "Aylık Müdahele Süresi Tablosu",
-  widget18: "Personel Müdahele Süresi",
+  widget14: "İş Emri Özet Paneli",
+  widget5: "Müdahele Süresi Histogramı",
   widget19: "Aylık Müdahele Süresi",
-  widget20: "3. Makine Arıza ve Müdahale Öncelik Analizi",
-  widget21: "4. Atölye Performans Karşılaştırması",
+  widget6: "İş Talebi Tipleri / Atölyeler",
+  widget18: "Personel Müdahele Süresi",
+  widget11: "İş Emri Müdahele Süresi Tablosu",
+  widget20: "2. İş Emirleri Maliyet ve Performans Analizi",
+  widget21: "3. Makine Arıza ve Müdahale Öncelik Analizi",
   widget22: "4. Atölye Performans Karşılaştırması",
-
 };
 
 const defaultItems = [
@@ -66,57 +53,184 @@ const defaultItems = [
   { id: "widget3", x: 4, y: 0, width: 2, height: 1, minW: 2, minH: 1 },
   { id: "widget4", x: 6, y: 0, width: 2, height: 1, minW: 2, minH: 1 },
   { id: "widget7", x: 8, y: 0, width: 4, height: 1, minW: 2, minH: 1 },
-  { id: "widget14", x: 0, y: 4, width: 12, height: 2, minW: 3, minH: 2 },
-  { id: "widget5", x: 0, y: 1, width: 6, height: 3, minW: 3, minH: 2 },
-  { id: "widget19", x: 6, y: 1, width: 6, height: 3, minW: 3, minH: 2 },
+  { id: "widget14", x: 0, y: 1, width: 12, height: 2, minW: 3, minH: 2 },
+  { id: "widget5", x: 0, y: 3, width: 6, height: 3, minW: 3, minH: 2 },
+  { id: "widget19", x: 6, y: 3, width: 6, height: 3, minW: 3, minH: 2 },
   { id: "widget6", x: 0, y: 6, width: 6, height: 4, minW: 3, minH: 2 },
   { id: "widget18", x: 6, y: 6, width: 6, height: 4, minW: 3, minH: 2 },
   { id: "widget11", x: 0, y: 10, width: 12, height: 3, minW: 3, minH: 2 },
-  { id: "widget20", x: 0, y: 10, width: 12, height: 3, minW: 3, minH: 2 },
-  { id: "widget21", x: 0, y: 10, width: 12, height: 3, minW: 3, minH: 2 },
-  { id: "widget22", x: 0, y: 10, width: 12, height: 3, minW: 3, minH: 2 },
+  { id: "widget20", x: 0, y: 13, width: 12, height: 3, minW: 3, minH: 2 },
+  { id: "widget21", x: 0, y: 16, width: 12, height: 3, minW: 3, minH: 2 },
+  { id: "widget22", x: 0, y: 19, width: 12, height: 3, minW: 3, minH: 2 },
 ];
 
 function MainDashboard() {
   const [reorganize, setReorganize] = useState();
-  const [updateApi, setUpdateApi] = useState(false);
+  const [dashboardData, setDashboardData] = useState(null);
+  const [breakdownType, setBreakdownType] = useState("Tip"); // Backend'deki Kirilim1 ile senkronize
+  const [listData, setListData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const [page1, setPage1] = useState(1);
+  const [pageSize1, setPageSize1] = useState(10);
+
+  // Tablo 2 (Liste2) için sayfalama
+  const [page2, setPage2] = useState(1);
+  const [pageSize2, setPageSize2] = useState(10);
+
+  // Tablo 3 (Liste3) için sayfalama
+  const [page3, setPage3] = useState(1);
+  const [pageSize3, setPageSize3] = useState(10);
+
+  // Tablo 4 (Liste4) için sayfalama
+  const [page4, setPage4] = useState(1);
+  const [pageSize4, setPageSize4] = useState(10);
+
+  const [kirilim4, setKirilim4] = useState(4); // Listeler API'sinin beklediği sabit veya dinamik değer
+
   const [checkedWidgets, setCheckedWidgets] = useState({
-    widget1: false,
-    widget2: false,
-    widget3: false,
-    widget4: false,
-    widget5: false,
-    widget6: false,
-    widget7: false,
-    widget11: false,
-    widget14: false,
-    widget18: false,
-    widget19: false,
-    widget20: false,
-    widget21: false,
-    widget22: false,
+    widget1: false, widget2: false, widget3: false, widget4: false,
+    widget5: false, widget6: false, widget7: false, widget11: false,
+    widget14: false, widget18: false, widget19: false, widget20: false,
+    widget21: false, widget22: false,
   });
 
   const methods = useForm({
     defaultValues: {
-      // ... Tüm default değerleriniz
+      BaslangicTarihi: null,
+      BitisTarihi: null,
+      LokasyonIds: [],
+      AtolyeIds: [],
+      EkipmanIds: []
     },
   });
 
-  const { setValue, watch, reset } = methods;
-
+  const { watch } = methods;
   const selectedDashboard = "IsEmriAnaliz";
+  const currentFilters = watch();
 
-  const updateApiTriger = async () => {
-    setUpdateApi(!updateApi);
+  // 1. Dashboard API İstek Mekanizması
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const payload = {
+        BaslangicTarihi: currentFilters.BaslangicTarihi,
+        BitisTarihi: currentFilters.BitisTarihi,
+        LokasyonIds: currentFilters.LokasyonIds || [],
+        AtolyeIds: currentFilters.AtolyeIds || [],
+        EkipmanIds: currentFilters.EkipmanIds || [],
+      };
+
+      const response = await AxiosInstance.post("GetIsEmriAnalizDashboard", payload);
+      setDashboardData(response?.data || null);
+    } catch (error) {
+      console.error("Dashboard API hatası:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // 2. Listeler API İstek Mekanizması (Gönderdiğin tam payload kurgusuyla güncellendi)
+  const fetchListData = async (targetTable = "all") => {
+  setLoading(true);
+  try {
+    const payload = {
+      BaslangicTarihi: currentFilters.BaslangicTarihi,
+      BitisTarihi: currentFilters.BitisTarihi,
+      LokasyonIds: currentFilters.LokasyonIds || [],
+      AtolyeIds: currentFilters.AtolyeIds || [],
+      EkipmanIds: currentFilters.EkipmanIds || [],
+      Kirilim1: breakdownType, 
+      Kirilim4: kirilim4
+    };
+
+    // Hangi tablo istek attıysa onun page ve pageSize değerini URL'e basıyoruz
+    let activePage = page1;
+    let activePageSize = pageSize1;
+
+    if (targetTable === "table2") { activePage = page2; activePageSize = pageSize2; }
+    else if (targetTable === "table3") { activePage = page3; activePageSize = pageSize3; }
+    else if (targetTable === "table4") { activePage = page4; activePageSize = pageSize4; }
+
+    const response = await AxiosInstance.post(
+      `GetIsEmriAnalizListeler?page=${activePage}&pageSize=${activePageSize}`, 
+      payload
+    );
+
+    // Kritik Nokta: Eğer "all" (ilk açılış veya sorgula butonu) ise tüm listeleri güncelle.
+    // Eğer sadece bir tablo sayfa değiştirdiyse, state'in içindeki diğer tabloların verisi uçmasın diye 
+    // sadece ilgili listenin içeriğini override ediyoruz kanka.
+    if (targetTable === "all") {
+      setListData(response?.data?.data || response?.data || null);
+    } else {
+      setListData(prevData => ({
+        ...prevData,
+        // API'den dönen güncel datayı sadece ilgili listeye basıyoruz
+        ...(targetTable === "table1" && { Liste1: response?.data?.data?.Liste1 || response?.data?.Liste1 }),
+        ...(targetTable === "table2" && { Liste2: response?.data?.data?.Liste2 || response?.data?.Liste2 }),
+        ...(targetTable === "table3" && { Liste3: response?.data?.data?.Liste3 || response?.data?.Liste3 }),
+        ...(targetTable === "table4" && { Liste4: response?.data?.data?.Liste4 || response?.data?.Liste4 }),
+      }));
+    }
+  } catch (error) {
+    console.error("Listeler API hatası:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+  // Sorgula butonuna basıldığında tetiklenecek ana fonksiyon
+  const handleQuery = () => {
+    fetchDashboardData();
+    fetchListData("all");
+  };
+
+  // Sayfalama, tablo içi kırılım veya alt listeler değiştikçe istekleri tazele
+  useEffect(() => {
+  if (listData) fetchListData("table1");
+}, [page1, pageSize1]);
+
+// Tablo 2'in sayfası değiştiğinde sadece tablo 2'yi çek
+useEffect(() => {
+  if (listData) fetchListData("table2");
+}, [page2, pageSize2]);
+
+// Tablo 3'ün sayfası değiştiğinde sadece tablo 3'ü çek
+useEffect(() => {
+  if (listData) fetchListData("table3");
+}, [page3, pageSize3]);
+
+// Tablo 4'ün sayfası değiştiğinde sadece tablo 4'ü çek
+useEffect(() => {
+  if (listData) fetchListData("table4");
+}, [page4, pageSize4]);
+
+useEffect(() => {
+  setPage1(1); setPage2(1); setPage3(1); setPage4(1);
+  fetchListData("all");
+}, [breakdownType]);
+
+  // İlk açılışta verileri otomatik çek
+  useEffect(() => {
+    handleQuery();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (dashboardData) {
+      const storedItems = JSON.parse(localStorage.getItem(selectedDashboard)) || defaultItems;
+      if (window.updateWidgets) {
+        window.updateWidgets(storedItems);
+      }
+    }
+  }, [dashboardData]);
 
   useEffect(() => {
     const reorganizeValue = localStorage.getItem("reorganizeMudaheleSuresiAnalizi");
     if (reorganizeValue !== null) {
       setReorganize(reorganizeValue === "true");
     } else {
-      setReorganize(false); // Or any other default value you want reorganize varsayılan değerini ayarla
+      setReorganize(false);
       localStorage.setItem("reorganizeMudaheleSuresiAnalizi", "false");
     }
   }, []);
@@ -136,21 +250,16 @@ function MainDashboard() {
   };
 
   useEffect(() => {
-    if (reorganize === undefined) {
-      return;
-    }
+    if (reorganize === undefined) return;
+
     const grid = GridStack.init({
       float: reorganize,
-      resizable: {
-        handles: "se, sw", // Enable resizing from bottom right and bottom left
-      },
-      column: 12, // 12 sütunlu grid yapısı
-      margin: 10, // Widgetler arasında 10px boşluk bırakır
+      resizable: { handles: "se, sw" },
+      column: 12,
+      margin: 10,
       minRow: 1,
-      cellHeight: "auto", // Widgetlerin otomatik yüksekliğini ayarla
-      draggable: {
-        handle: ".widget-header", // Dragging handle to move widgets
-      },
+      cellHeight: "auto",
+      draggable: { handle: ".widget-header" },
     });
 
     const saveLayout = () => {
@@ -193,7 +302,6 @@ function MainDashboard() {
 
         widgetEl.appendChild(headerEl);
         widgetEl.appendChild(bodyEl);
-
         grid.addWidget(widgetEl);
 
         const root = createRoot(bodyEl);
@@ -205,7 +313,10 @@ function MainDashboard() {
                   <ConfigProvider locale={trTR}>
                     <AppProvider>
                       <BrowserRouter>
-                        <Component1 />
+                        <Component1
+                          apiData={dashboardData ? dashboardData.ToplamIsEmri : null}
+                          loading={loading}
+                        />
                       </BrowserRouter>
                     </AppProvider>
                   </ConfigProvider>
@@ -220,7 +331,10 @@ function MainDashboard() {
                   <ConfigProvider locale={trTR}>
                     <AppProvider>
                       <BrowserRouter>
-                        <Component2 />
+                        <Component2
+                          apiData={dashboardData ? dashboardData.AcikIsEmirleri : null}
+                          loading={loading}
+                        />
                       </BrowserRouter>
                     </AppProvider>
                   </ConfigProvider>
@@ -235,7 +349,10 @@ function MainDashboard() {
                   <ConfigProvider locale={trTR}>
                     <AppProvider>
                       <BrowserRouter>
-                        <Component3 />
+                        <Component3
+                          apiData={dashboardData ? dashboardData.ToplamMaliyet : null}
+                          loading={loading}
+                        />
                       </BrowserRouter>
                     </AppProvider>
                   </ConfigProvider>
@@ -250,7 +367,10 @@ function MainDashboard() {
                   <ConfigProvider locale={trTR}>
                     <AppProvider>
                       <BrowserRouter>
-                        <Component4 />
+                        <Component4
+                          apiData={dashboardData ? dashboardData.OrtalamaKapanisSuresiGun : null}
+                          loading={loading}
+                        />
                       </BrowserRouter>
                     </AppProvider>
                   </ConfigProvider>
@@ -265,7 +385,10 @@ function MainDashboard() {
                   <ConfigProvider locale={trTR}>
                     <AppProvider>
                       <BrowserRouter>
-                        <Component5 />
+                        <Component5
+                          apiData={dashboardData ? dashboardData.GecikenIsEmirleri : null}
+                          loading={loading}
+                        />
                       </BrowserRouter>
                     </AppProvider>
                   </ConfigProvider>
@@ -280,7 +403,10 @@ function MainDashboard() {
                   <ConfigProvider locale={trTR}>
                     <AppProvider>
                       <BrowserRouter>
-                        <Component7 />
+                        <Component7
+                          tipDagilimi={dashboardData ? dashboardData.TipDagilimi : null} 
+                          loading={loading}
+                        />
                       </BrowserRouter>
                     </AppProvider>
                   </ConfigProvider>
@@ -295,7 +421,10 @@ function MainDashboard() {
                   <ConfigProvider locale={trTR}>
                     <AppProvider>
                       <BrowserRouter>
-                        <Component8 />
+                        <Component8
+                          atolyeDagilimi={dashboardData ? dashboardData.AtolyeDagilimi : null} 
+                          loading={loading}
+                        />
                       </BrowserRouter>
                     </AppProvider>
                   </ConfigProvider>
@@ -303,7 +432,6 @@ function MainDashboard() {
               </FormProvider>
             );
             break;
-
           case "widget11":
             root.render(
               <FormProvider {...methods}>
@@ -311,7 +439,20 @@ function MainDashboard() {
                   <ConfigProvider locale={trTR}>
                     <AppProvider>
                       <BrowserRouter>
-                        <IsEmriTable />
+                        <IsEmriTable
+                          listeData={listData ? listData.Liste1 : null} 
+                          loading={loading}
+                          breakdownType={breakdownType}
+                          onBreakdownTypeChange={(val) => setBreakdownType(val)}
+                          onRefresh={() => fetchListData("table1")}
+                          page={page1}
+                          pageSize={pageSize1}
+                          totalItems={listData?.TotalCount1 || 100} // Backend'den Liste1 için dönen total count
+                          onPageChange={(p, ps) => {
+                            setPage1(p);
+                            setPageSize1(ps);
+                          }}
+                        />
                       </BrowserRouter>
                     </AppProvider>
                   </ConfigProvider>
@@ -319,7 +460,6 @@ function MainDashboard() {
               </FormProvider>
             );
             break;
-
           case "widget14":
             root.render(
               <FormProvider {...methods}>
@@ -327,7 +467,14 @@ function MainDashboard() {
                   <ConfigProvider locale={trTR}>
                     <AppProvider>
                       <BrowserRouter>
-                        <BolgelereGoreToplamMiktarDagilimi />
+                        <BolgelereGoreToplamMiktarDagilimi
+                          personelVerimliligiSaat={dashboardData ? dashboardData.PersonelVerimliligiSaat : null}
+                          planlananBakimaUyumYuzde={dashboardData ? dashboardData.PlanlananBakimaUyumYuzde : null}
+                          enYuksekMaliyetliIsEmriAd={dashboardData ? dashboardData.EnYuksekMaliyetliIsEmriAd : null}
+                          enYuksekMaliyetliTutar={dashboardData ? dashboardData.EnYuksekMaliyetliTutar : null}
+                          enUzunSurenIsEmriAd={dashboardData ? dashboardData.EnUzunSurenIsEmriAd : null}
+                          loading={loading}
+                        />
                       </BrowserRouter>
                     </AppProvider>
                   </ConfigProvider>
@@ -335,7 +482,6 @@ function MainDashboard() {
               </FormProvider>
             );
             break;
-
           case "widget18":
             root.render(
               <FormProvider {...methods}>
@@ -343,7 +489,10 @@ function MainDashboard() {
                   <ConfigProvider locale={trTR}>
                     <AppProvider>
                       <BrowserRouter>
-                        <LokasyonBazindaYakitTuketimleri />
+                        <LokasyonBazindaYakitTuketimleri
+                          aylikTrendler={dashboardData ? dashboardData.AylikTrendler : null} 
+                          loading={loading}
+                        />
                       </BrowserRouter>
                     </AppProvider>
                   </ConfigProvider>
@@ -358,7 +507,10 @@ function MainDashboard() {
                   <ConfigProvider locale={trTR}>
                     <AppProvider>
                       <BrowserRouter>
-                        <AylikYakitTuketimleri />
+                        <AylikYakitTuketimleri
+                          aylikTrendler={dashboardData ? dashboardData.AylikTrendler : null} 
+                          loading={loading}
+                        />
                       </BrowserRouter>
                     </AppProvider>
                   </ConfigProvider>
@@ -373,7 +525,17 @@ function MainDashboard() {
                   <ConfigProvider locale={trTR}>
                     <AppProvider>
                       <BrowserRouter>
-                        <ArizaliMakineler />
+                        <ArizaliMakineler
+                          listeData={listData ? listData.Liste2 : null} 
+                          loading={loading}
+                          page={page2}
+                          pageSize={pageSize2}
+                          totalItems={listData?.TotalCount2 || 100} // Backend'den Liste2 için dönen total count
+                          onPageChange={(p, ps) => {
+                            setPage2(p);
+                            setPageSize2(ps);
+                          }}
+                        />
                       </BrowserRouter>
                     </AppProvider>
                   </ConfigProvider>
@@ -381,7 +543,6 @@ function MainDashboard() {
               </FormProvider>
             );
             break;
-
           case "widget21":
             root.render(
               <FormProvider {...methods}>
@@ -389,7 +550,17 @@ function MainDashboard() {
                   <ConfigProvider locale={trTR}>
                     <AppProvider>
                       <BrowserRouter>
-                        <AylikKM />
+                        <AylikKM
+                          listeData={listData ? listData.Liste3 : null} 
+                          loading={loading}
+                          page={page3}
+  pageSize={pageSize3}
+  totalItems={listData?.TotalCount3 || 100} // Backend'den Liste3 için dönen total count
+  onPageChange={(p, ps) => {
+    setPage3(p);
+    setPageSize3(ps);
+  }}
+                        />
                       </BrowserRouter>
                     </AppProvider>
                   </ConfigProvider>
@@ -404,7 +575,20 @@ function MainDashboard() {
                   <ConfigProvider locale={trTR}>
                     <AppProvider>
                       <BrowserRouter>
-                        <AylikMaliyetler />
+                        <AylikMaliyetler
+                          listeData={listData ? listData.Liste4 : null} 
+                          loading={loading}
+                          breakdownType={breakdownType}
+                          onBreakdownTypeChange={(val) => setBreakdownType(val)}
+                          onRefresh={() => fetchListData("table4")}
+                          page={page4}
+                          pageSize={pageSize4}
+                          totalItems={listData?.TotalCount4 || 100} // Backend'den Liste4 için dönen total count
+                          onPageChange={(p, ps) => {
+                            setPage4(p);
+                            setPageSize4(ps);
+                          }}
+                        />
                       </BrowserRouter>
                     </AppProvider>
                   </ConfigProvider>
@@ -412,7 +596,6 @@ function MainDashboard() {
               </FormProvider>
             );
             break;
-
           default:
             break;
         }
@@ -421,20 +604,10 @@ function MainDashboard() {
 
     const updateWidgets = (newGridItems) => {
       const newChecked = {
-        widget1: false,
-        widget2: false,
-        widget3: false,
-        widget4: false,
-        widget5: false,
-        widget6: false,
-        widget7: false,
-        widget11: false,
-        widget14: false,
-        widget18: false,
-        widget19: false,
-        widget20: false,
-        widget21: false,
-        widget22: false,
+        widget1: false, widget2: false, widget3: false, widget4: false,
+        widget5: false, widget6: false, widget7: false, widget11: false,
+        widget14: false, widget18: false, widget19: false, widget20: false,
+        widget21: false, widget22: false,
       };
       newGridItems.forEach((item) => {
         if (Object.prototype.hasOwnProperty.call(newChecked, item.id)) {
@@ -446,7 +619,6 @@ function MainDashboard() {
     };
 
     window.updateWidgets = updateWidgets;
-
     grid.engine.float = reorganize;
 
     const handleDashboardChange = () => {
@@ -454,20 +626,10 @@ function MainDashboard() {
       const itemsToLoad = storedItems.length > 0 ? storedItems : defaultItems;
 
       const checked = {
-        widget1: false,
-        widget2: false,
-        widget3: false,
-        widget4: false,
-        widget5: false,
-        widget6: false,
-        widget7: false,
-        widget11: false,
-        widget14: false,
-        widget18: false,
-        widget19: false,
-        widget20: false,
-        widget21: false,
-        widget22: false,
+        widget1: false, widget2: false, widget3: false, widget4: false,
+        widget5: false, widget6: false, widget7: false, widget11: false,
+        widget14: false, widget18: false, widget19: false, widget20: false,
+        widget21: false, widget22: false,
       };
       itemsToLoad.forEach((item) => {
         if (Object.prototype.hasOwnProperty.call(checked, item.id)) {
@@ -487,7 +649,7 @@ function MainDashboard() {
     return () => {
       grid.off("change", saveLayout);
     };
-  }, [reorganize, selectedDashboard]);
+  }, [reorganize, selectedDashboard, dashboardData, listData, loading, breakdownType, page1, pageSize1, page2, pageSize2, page3, pageSize3, page4, pageSize4]);
 
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
@@ -505,20 +667,16 @@ function MainDashboard() {
       }
     } else {
       const defaultItem = defaultItems.find((item) => item.id === name);
-
       const newPosition = findNextAvailablePosition(gridItems, defaultItem.width, defaultItem.height);
       const newWidget = {
         ...defaultItem,
         ...newPosition,
       };
-
       gridItems.push(newWidget);
     }
 
     gridItems = rearrangeWidgets(gridItems);
-
     localStorage.setItem(selectedDashboard, JSON.stringify(gridItems));
-
     window.updateWidgets(gridItems);
   };
 
@@ -541,7 +699,6 @@ function MainDashboard() {
         pos.y++;
       }
     }
-
     return { x: pos.x, y: pos.y };
   };
 
@@ -576,7 +733,6 @@ function MainDashboard() {
         pos.y++;
       }
     });
-
     return items;
   };
 
@@ -601,30 +757,9 @@ function MainDashboard() {
     window.updateWidgets(rearrangedItems);
   };
 
-  const rerenderWidgets = () => {
-    const gridItems = JSON.parse(localStorage.getItem(selectedDashboard)) || [];
-    window.updateWidgets(gridItems);
-  };
-
   const content = (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "10px",
-        // height: "calc(-200px + 100vh)",
-        maxHeight: "610px",
-        overflowY: "auto",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          gap: "5px",
-        }}
-      >
+    <div style={{ display: "flex", flexDirection: "column", gap: "10px", maxHeight: "610px", overflowY: "auto" }}>
+      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "5px" }}>
         <Switch checked={!reorganize} onChange={onChange} />
         <Tooltip title="Bu aktive edilirse widgetlar otomatik olarak boşlukları doldurur">
           <Text>
@@ -632,53 +767,23 @@ function MainDashboard() {
           </Text>
         </Tooltip>
       </div>
-      <Checkbox name="widget1" onChange={handleCheckboxChange} checked={checkedWidgets.widget1}>
-        Toplam Talep Sayısı
-      </Checkbox>
-      <Checkbox name="widget2" onChange={handleCheckboxChange} checked={checkedWidgets.widget2}>
-        Ortalama Müdahele Süresi
-      </Checkbox>
-      <Checkbox name="widget3" onChange={handleCheckboxChange} checked={checkedWidgets.widget3}>
-        En Hızlı Müdahele Süresi
-      </Checkbox>
-      <Checkbox name="widget4" onChange={handleCheckboxChange} checked={checkedWidgets.widget4}>
-        En Yavaş Müdahele Süresi
-      </Checkbox>
-      <Checkbox name="widget7" onChange={handleCheckboxChange} checked={checkedWidgets.widget7}>
-        Ortalama Çalışma Süresi
-      </Checkbox>
-      <Checkbox name="widget5" onChange={handleCheckboxChange} checked={checkedWidgets.widget5}>
-        Müdahele Süresi Histogramı
-      </Checkbox>
-      <Checkbox name="widget6" onChange={handleCheckboxChange} checked={checkedWidgets.widget6}>
-        İş Talebi Tipleri / Atölyeler
-      </Checkbox>
-      <Checkbox name="widget11" onChange={handleCheckboxChange} checked={checkedWidgets.widget11}>
-        İş Emri Müdahele Süresi Tablosu
-      </Checkbox>
-      <Checkbox name="widget14" onChange={handleCheckboxChange} checked={checkedWidgets.widget14}>
-        Aylık Müdahele Süresi Tablosu
-      </Checkbox>
-      <Checkbox name="widget18" onChange={handleCheckboxChange} checked={checkedWidgets.widget18}>
-        Personel Müdahele Süresi
-      </Checkbox>
-      <Checkbox name="widget19" onChange={handleCheckboxChange} checked={checkedWidgets.widget19}>
-        Aylık Müdahele Süresi
-      </Checkbox>
-      <Checkbox name="widget20" onChange={handleCheckboxChange} checked={checkedWidgets.widget20}>
-        2. İş Emirleri Maliyet ve Performans Analizi
-      </Checkbox>
-      <Checkbox name="widget21" onChange={handleCheckboxChange} checked={checkedWidgets.widget21}>
-        3. Makine Arıza ve Müdahale Öncelik Analizi
-      </Checkbox>
-      <Checkbox name="widget22" onChange={handleCheckboxChange} checked={checkedWidgets.widget22}>
-        4. Atölye Performans Karşılaştırması
-      </Checkbox>
+      <Checkbox name="widget1" onChange={handleCheckboxChange} checked={checkedWidgets.widget1}>Toplam Talep Sayısı</Checkbox>
+      <Checkbox name="widget2" onChange={handleCheckboxChange} checked={checkedWidgets.widget2}>Ortalama Müdahele Süresi</Checkbox>
+      <Checkbox name="widget3" onChange={handleCheckboxChange} checked={checkedWidgets.widget3}>En Hızlı Müdahele Süresi</Checkbox>
+      <Checkbox name="widget4" onChange={handleCheckboxChange} checked={checkedWidgets.widget4}>En Yavaş Müdahele Süresi</Checkbox>
+      <Checkbox name="widget7" onChange={handleCheckboxChange} checked={checkedWidgets.widget7}>Ortalama Çalışma Süresi</Checkbox>
+      <Checkbox name="widget5" onChange={handleCheckboxChange} checked={checkedWidgets.widget5}>Müdahele Süresi Histogramı</Checkbox>
+      <Checkbox name="widget6" onChange={handleCheckboxChange} checked={checkedWidgets.widget6}>İş Talebi Tipleri / Atölyeler</Checkbox>
+      <Checkbox name="widget11" onChange={handleCheckboxChange} checked={checkedWidgets.widget11}>İş Emri Müdahele Süresi Tablosu</Checkbox>
+      <Checkbox name="widget14" onChange={handleCheckboxChange} checked={checkedWidgets.widget14}>İş Emri Özet Paneli</Checkbox>
+      <Checkbox name="widget18" onChange={handleCheckboxChange} checked={checkedWidgets.widget18}>Personel Müdahele Süresi</Checkbox>
+      <Checkbox name="widget19" onChange={handleCheckboxChange} checked={checkedWidgets.widget19}>Aylık Müdahele Süresi</Checkbox>
+      <Checkbox name="widget20" onChange={handleCheckboxChange} checked={checkedWidgets.widget20}>2. İş Emirleri Maliyet ve Performans Analizi</Checkbox>
+      <Checkbox name="widget21" onChange={handleCheckboxChange} checked={checkedWidgets.widget21}>3. Makine Arıza ve Müdahale Öncelik Analizi</Checkbox>
+      <Checkbox name="widget22" onChange={handleCheckboxChange} checked={checkedWidgets.widget22}>4. Atölye Performans Karşılaştırması</Checkbox>
 
       <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-        <Button danger onClick={handleReset}>
-          Widgetları Sıfırla
-        </Button>
+        <Button danger onClick={handleReset}>Widgetları Sıfırla</Button>
       </div>
     </div>
   );
@@ -687,67 +792,26 @@ function MainDashboard() {
     <FormProvider {...methods}>
       <ConfigProvider locale={trTR}>
         <div className="App">
-          <div
-            style={{
-              width: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "10px",
-              marginBottom: "10px",
-            }}
-          >
+          <div style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", marginBottom: "10px" }}>
             <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "10px" }}>
               <Filters />
-              <Button type="primary" onClick={rerenderWidgets}>
+              <Button type="primary" onClick={handleQuery}>
                 <ReloadOutlined />
                 Sorgula
               </Button>
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                flexDirection: "row",
-                gap: "10px",
-              }}
-            >
-              <Button
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: "5px",
-                }}
-                onClick={handleRearrange}
-              >
+            <div style={{ display: "flex", alignItems: "center", flexDirection: "row", gap: "10px" }}>
+              <Button style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "5px" }} onClick={handleRearrange}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-                  <path
-                    fill=""
-                    fillRule="evenodd"
-                    d="M18 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1h-1zm-1 7.5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zM5 17a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1H5zm5.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm6.5 0a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm-5.5-7.5a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1h-1zm-7.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1H5a1 1 0 01-1-1v-1zM10.5 5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1V5zM5 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1H5z"
-                    clipRule="evenodd"
-                  ></path>
+                  <path fillRule="evenodd" d="M18 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1h-1zm-1 7.5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zM5 17a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1H5zm5.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm6.5 0a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm-5.5-7.5a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1h-1zm-7.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1H5a1 1 0 01-1-1v-1zM10.5 5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1V5zM5 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1H5z" clipRule="evenodd"></path>
                 </svg>
                 Yeniden Sırala
               </Button>
               <Popover content={content} title="Widgetları Yönet" trigger="click">
-                <Button
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: "5px",
-                  }}
-                >
+                <Button style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "5px" }}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="widget">
-                    <path
-                      fill=""
-                      fillRule="evenodd"
-                      d="M17.5 2a1 1 0 01.894.553l3.5 7A1 1 0 0121 11h-7a1 1 0 01-.894-1.447l3.5-7A1 1 0 0117.5 2zm-1.882 7h3.764L17.5 5.236 15.618 9zM4 13a2 2 0 00-2 2v5a2 2 0 002 2h5a2 2 0 002-2v-5a2 2 0 00-2-2H4zm0 7v-5h5v5H4zm13.5-7a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM15 17.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0zM6.5 2a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM4 6.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0z"
-                      clipRule="evenodd"
-                    ></path>
+                    <path fillRule="evenodd" d="M17.5 2a1 1 0 01.894.553l3.5 7A1 1 0 0121 11h-7a1 1 0 01-.894-1.447l3.5-7A1 1 0 0117.5 2zm-1.882 7h3.764L17.5 5.236 15.618 9zM4 13a2 2 0 00-2 2v5a2 2 0 002 2h5a2 2 0 002-2v-5a2 2 0 00-2-2H4zm0 7v-5h5v5H4zm13.5-7a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM15 17.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0zM6.5 2a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM4 6.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0z" clipRule="evenodd"></path>
                   </svg>
                   Widgetleri Yönet
                   <DownOutlined style={{ marginLeft: "2px" }} />

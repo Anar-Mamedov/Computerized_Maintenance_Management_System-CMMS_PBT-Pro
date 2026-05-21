@@ -1,73 +1,52 @@
 import React, { useState, useEffect } from "react";
 import { Select, Button, Popover, Spin } from "antd";
 import AxiosInstance from "../../../../../api/http";
-import { Controller, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 
 const { Option } = Select;
 
-const AtolyeFilter = ({ onSubmit }) => {
+const AtolyeFilter = () => {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);
-  const [selectedIds, setSelectedIds] = useState([]);
-  const [loading, setLoading] = useState(false); // Loading state
-  const {
-    control,
-    watch,
-    setValue,
-    getValues,
-    formState: { errors },
-  } = useFormContext();
+  const [loading, setLoading] = useState(false);
+  const { setValue, watch } = useFormContext();
 
-  const handleChange = (selectedValues) => {
-    // Seçilen değerlerin id'lerini kullanarak selectedIds dizisini güncelle
-    const newSelectedIds = selectedValues
-      .map((value) => {
-        const option = options.find((option) => option.value === value);
-        return option ? option.key : null;
-      })
-      .filter((id) => id !== null); // null değerleri filtrele
-    setSelectedIds(newSelectedIds);
-  };
+  // Ana formdaki "AtolyeIds" array'ini dinliyoruz kanka
+  const currentSelectedIds = watch("AtolyeIds") || [];
 
   useEffect(() => {
     if (open) {
-      setLoading(true); // API isteği başladığında loading true yap
+      setLoading(true);
       AxiosInstance.get("AtolyeList")
         .then((response) => {
-          // API'den gelen veriye göre options dizisini oluştur
-          const options = response.map((item) => ({
-            key: item.TB_ATOLYE_ID.toString(), // ID değerini key olarak kullan
-            value: `${item.ATL_KOD}, ${item.ATL_TANIM}`, // Gösterilecek değer
+          const resData = response?.data || response;
+          const formattedOptions = resData.map((item) => ({
+            key: item.TB_ATOLYE_ID.toString(),
+            value: `${item.ATL_KOD}, ${item.ATL_TANIM}`,
           }));
-          setOptions(options);
-          setLoading(false); // API isteği bittiğinde loading false yap
+          setOptions(formattedOptions);
         })
         .catch((error) => {
-          console.log("API Error:", error);
-          setLoading(false); // Hata durumunda da loading false yap
+          console.error("Atölye API Error:", error);
+        })
+        .finally(() => {
+          setLoading(false);
         });
     }
   }, [open]);
 
-  const handleSubmit = () => {
-    // console.log("Selected IDs:", selectedIds);
-
-    setOpen(false);
-    // onSubmit(selectedIds); // onSubmit ile id'leri gönder
+  const handleChange = (selectedKeys) => {
+    // Doğrudan ID'lerden oluşan array'i "AtolyeIds" alanına set ediyoruz
+    setValue("AtolyeIds", selectedKeys);
   };
 
-  useEffect(() => {
-    // Seçilen id'leri setValue ile ayarla
-    const selectedIdsString = selectedIds.join(",");
-    setValue("atolyeIds", selectedIdsString);
-  }, [selectedIds]);
+  const handleSubmit = () => {
+    setOpen(false);
+  };
 
   const handleCancelClick = () => {
-    setSelectedIds([]);
-    setValue("departmanIds", "");
-    // console.log(watch("locationIds"));
+    setValue("AtolyeIds", []);
     setOpen(false);
-    // onSubmit([]);
   };
 
   const content = (
@@ -90,29 +69,19 @@ const AtolyeFilter = ({ onSubmit }) => {
           mode="multiple"
           style={{ width: "100%" }}
           placeholder="Ara..."
-          value={selectedIds.map((id) => {
-            const option = options.find((option) => option.key === id);
-            return option ? option.value : "";
-          })}
+          value={currentSelectedIds}
           onChange={handleChange}
           allowClear
           notFoundContent={
             loading ? (
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "40px",
-                }}
-              >
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "40px" }}>
                 <Spin size="small" />
               </div>
             ) : null
-          } // Spin burada gösterilecek
+          }
         >
           {options.map((option) => (
-            <Option key={option.key} value={option.value}>
+            <Option key={option.key} value={option.key}>
               {option.value}
             </Option>
           ))}
@@ -123,14 +92,7 @@ const AtolyeFilter = ({ onSubmit }) => {
 
   return (
     <Popover content={content} trigger="click" open={open} onOpenChange={setOpen} placement="bottom">
-      <Button
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+      <Button style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
         Atölye
         <div
           style={{
@@ -143,9 +105,10 @@ const AtolyeFilter = ({ onSubmit }) => {
             justifyContent: "center",
             alignItems: "center",
             color: "white",
+            fontSize: "11px"
           }}
         >
-          {selectedIds.length}
+          {currentSelectedIds.length}
         </div>
       </Button>
     </Popover>

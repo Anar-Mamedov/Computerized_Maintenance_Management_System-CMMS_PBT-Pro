@@ -1,101 +1,99 @@
 import React, { useState, useEffect } from "react";
 import { Select, Button, Popover, Spin, DatePicker, Typography } from "antd";
-import { Controller, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
-import { t } from "i18next";
 
-const { Option } = Select;
 const { Text } = Typography;
 
 const TarihFilter = () => {
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false); // Loading state
-  const [startDate, setStartDate] = useState(null); // Normal React state
-  const [endDate, setEndDate] = useState(null); // Normal React state
-  const [timeRange, setTimeRange] = useState("all"); // Initial value is "all"
+  const [loading] = useState(false);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [timeRange, setTimeRange] = useState("all");
 
-  const { control, setValue } = useFormContext();
+  const { setValue } = useFormContext();
+
+  useEffect(() => {
+    // Form defaultValues katmanındaki büyük harfli "BaslangicTarihi" ve "BitisTarihi" alanlarına yazıyoruz kanka
+    setValue("BaslangicTarihi", startDate ? startDate.format("YYYY-MM-DDTHH:mm:ss") : null);
+    setValue("BitisTarihi", endDate ? endDate.format("YYYY-MM-DDTHH:mm:ss") : null);
+  }, [startDate, endDate, setValue]);
 
   const handleSubmit = () => {
     setOpen(false);
   };
 
-  useEffect(() => {
-    // React state'lerinden alınan değerleri react-hook-form ile set et
-    setValue("baslangicTarihi", startDate);
-    setValue("bitisTarihi", endDate);
-  }, [startDate, endDate]);
-
   const handleCancelClick = () => {
     setStartDate(null);
     setEndDate(null);
-    setTimeRange("all"); // Reset to "all"
-    setValue("baslangicTarihi", null);
-    setValue("bitisTarihi", null);
+    setTimeRange("all");
+    setValue("BaslangicTarihi", null);
+    setValue("BitisTarihi", null);
     setOpen(false);
   };
 
   const handleTimeRangeChange = (value) => {
-    let startDate = null;
-    let endDate = null;
+    let start = null;
+    let end = null;
 
     switch (value) {
       case "all":
-        startDate = null;
-        endDate = null;
+        start = dayjs("2026-01-01T00:00:00");
+        end = dayjs("2026-05-18T23:59:59");
         break;
       case "today":
-        startDate = dayjs().startOf("day");
-        endDate = dayjs().endOf("day");
+        start = dayjs().startOf("day");
+        end = dayjs().endOf("day");
         break;
       case "yesterday":
-        startDate = dayjs().subtract(1, "day").startOf("day");
-        endDate = dayjs().subtract(1, "day").endOf("day");
+        start = dayjs().subtract(1, "day").startOf("day");
+        end = dayjs().subtract(1, "day").endOf("day");
         break;
       case "thisWeek":
-        startDate = dayjs().startOf("week");
-        endDate = dayjs().endOf("week");
+        start = dayjs().startOf("week");
+        end = dayjs().endOf("week");
         break;
       case "lastWeek":
-        startDate = dayjs().subtract(1, "week").startOf("week");
-        endDate = dayjs().subtract(1, "week").endOf("week");
+        start = dayjs().subtract(1, "week").startOf("week");
+        end = dayjs().subtract(1, "week").endOf("week");
         break;
       case "thisMonth":
-        startDate = dayjs().startOf("month");
-        endDate = dayjs().endOf("month");
+        start = dayjs().startOf("month");
+        end = dayjs().endOf("month");
         break;
       case "lastMonth":
-        startDate = dayjs().subtract(1, "month").startOf("month");
-        endDate = dayjs().subtract(1, "month").endOf("month");
+        start = dayjs().subtract(1, "month").startOf("month");
+        end = dayjs().subtract(1, "month").endOf("month");
         break;
       case "thisYear":
-        startDate = dayjs().startOf("year");
-        endDate = dayjs().endOf("year");
+        start = dayjs().startOf("year");
+        end = dayjs().endOf("year");
         break;
       case "lastYear":
-        startDate = dayjs().subtract(1, "year").startOf("year");
-        endDate = dayjs().subtract(1, "year").endOf("year");
+        start = dayjs().subtract(1, "year").startOf("year");
+        end = dayjs().subtract(1, "year").endOf("year");
         break;
       case "last1Month":
-        startDate = dayjs().subtract(1, "month");
-        endDate = dayjs();
+        start = dayjs().subtract(1, "month");
+        end = dayjs();
         break;
       case "last3Months":
-        startDate = dayjs().subtract(3, "months");
-        endDate = dayjs();
+        start = dayjs().subtract(3, "months");
+        end = dayjs();
         break;
       case "last6Months":
-        startDate = dayjs().subtract(6, "months");
-        endDate = dayjs();
+        start = dayjs().subtract(6, "months");
+        end = dayjs();
         break;
       default:
-        startDate = null;
-        endDate = null;
+        start = null;
+        end = null;
     }
 
-    setStartDate(startDate);
-    setEndDate(endDate);
-    setTimeRange(value); // Set the selected time range
+    setStartDate(start);
+    setEndDate(end);
+    setTimeRange(value);
   };
 
   const content = (
@@ -116,24 +114,17 @@ const TarihFilter = () => {
 
       <div style={{ padding: "10px", display: "flex", flexDirection: "column", gap: "10px" }}>
         <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
-          <DatePicker style={{ width: "100%" }} placeholder="Başlangıç Tarihi" value={startDate} onChange={(date) => setStartDate(date)} locale={dayjs.locale("tr")} />
+          <DatePicker style={{ width: "100%" }} placeholder="Başlangıç Tarihi" value={startDate} onChange={(date) => setStartDate(date)} format="YYYY-MM-DD" />
           <Text style={{ fontSize: "14px" }}>-</Text>
-          <DatePicker style={{ width: "100%" }} placeholder="Bitiş Tarihi" value={endDate} onChange={(date) => setEndDate(date)} locale={dayjs.locale("tr")} />
+          <DatePicker style={{ width: "100%" }} placeholder="Bitiş Tarihi" value={endDate} onChange={(date) => setEndDate(date)} format="YYYY-MM-DD" />
         </div>
         <Select
           style={{ width: "100%" }}
-          value={timeRange} // Set the current value
+          value={timeRange}
           onChange={handleTimeRangeChange}
           notFoundContent={
             loading ? (
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "40px",
-                }}
-              >
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "40px" }}>
                 <Spin size="small" />
               </div>
             ) : null
@@ -159,14 +150,7 @@ const TarihFilter = () => {
 
   return (
     <Popover content={content} trigger="click" open={open} onOpenChange={setOpen} placement="bottom">
-      <Button
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+      <Button style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
           Tarih
           {(startDate || endDate) && (

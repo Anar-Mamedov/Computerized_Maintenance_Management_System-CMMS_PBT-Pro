@@ -1,67 +1,51 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useMemo } from "react";
 import { Table, Spin, Typography, Select, Dropdown, Button, Tag } from "antd";
 import { MoreOutlined, PartitionOutlined } from "@ant-design/icons";
-import AxiosInstance from "../../../../../api/http.jsx";
-import { useFormContext } from "react-hook-form";
-import dayjs from "dayjs";
 
 const { Text } = Typography;
 
-function IsEmriDagilimVePerformansListesi() {
-  const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [breakdownType, setBreakdownType] = useState("Tip"); // Tip, Durum, Atolye vb.
-  const { watch } = useFormContext();
-
-  const lokasyonId = watch("locationIds1");
-  const atolyeId = watch("atolyeIds1");
-  const baslangicTarihi = watch("baslangicTarihi1");
-  const bitisTarihi = watch("bitisTarihi1");
-
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    const body = {
-      LokasyonId: lokasyonId || "",
-      AtolyeId: atolyeId || "",
-      BaslangicTarih: baslangicTarihi ? dayjs(baslangicTarihi).format("YYYY-MM-DD") : "",
-      BitisTarih: bitisTarihi ? dayjs(bitisTarihi).format("YYYY-MM-DD") : "",
-      BreakdownType: breakdownType, // Seçilen kırılıma göre backend'e bilgi geçiyoruz
-    };
-
-    try {
-      const response = await AxiosInstance.post(``, body);
-      const formattedData = response.map((item, index) => ({
-        key: index,
-        KrilimAdi: item.KrilimAdi || "Belirsiz",
-        IsEmriSayisi: item.IsEmriSayisi || 0,
-        ToplamCalisma: item.ToplamCalisma || 0,
-        ToplamMaliyet: item.ToplamMaliyet || 0,
-        OrtMaliyet: item.OrtMaliyet || 0,
-        OrtTamamlama: item.OrtTamamlama || 0,
-        EnYuksek: item.EnYuksek || 0,
-        EnDusuk: item.EnDusuk || 0,
-        Siklik: item.Siklik || "-",
-      }));
-      setData(formattedData);
-    } catch (error) {
-      console.error("Performans listesi verisi çekilemedi:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [lokasyonId, atolyeId, baslangicTarihi, bitisTarihi, breakdownType]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+function IsEmriDagilimVePerformansListesi({ 
+  listeData, 
+  loading, 
+  breakdownType, 
+  onBreakdownTypeChange, 
+  onRefresh,
+  // Kanka sayfalama için üst bileşenden (MainDashboard) gelecek yeni proplar:
+  page,
+  pageSize,
+  totalItems,
+  onPageChange
+}) {
+  
+  // Gelen ham veriyi güvenli bir şekilde filtreleyip tabloya hazır hale getiriyoruz
+  const data = useMemo(() => {
+    if (!listeData || !Array.isArray(listeData)) return [];
+    
+    return listeData.map((item, index) => ({
+      key: index,
+      KrilimAdi: item.GrupAdi || "Belirsiz",
+      IsEmriSayisi: item.IsEmriSayisi || "0",
+      ToplamCalisma: item.ToplamCalisma || "0 saat",
+      ToplamMaliyet: item.ToplamMaliyet || "0,00",
+      OrtMaliyet: item.OrtMaliyet || "0,00",
+      OrtTamamlama: item.OrtTamamlama || "0,0 gün",
+      EnYuksek: item.EnYuksek || "0,00",
+      EnDusuk: item.EnDusuk || "0,00",
+      Siklik: item.Siklik || "-",
+    }));
+  }, [listeData]);
 
   const menuItems = [
-    { key: "refresh", label: "Verileri Yenile", onClick: fetchData },
+    { key: "refresh", label: "Verileri Yenile", onClick: onRefresh },
     { key: "download", label: "Excel İndir" },
     { key: "info", label: "Bilgi" },
   ];
 
-  // Fotoğraftaki gibi esnek ve soft renkli kapsül tasarımları için yardımcı fonksiyonlar
-  const formatCurrency = (value) => `₺${new Intl.NumberFormat("tr-TR").format(value)}`;
+  const formatCurrencyString = (val) => {
+    if (!val) return "₺0,00";
+    if (String(val).includes("₺")) return val;
+    return `₺${val}`;
+  };
   
   const getBreakdownLabel = () => {
     if (breakdownType === "Tip") return "İş Emri Tipleri";
@@ -95,7 +79,7 @@ function IsEmriDagilimVePerformansListesi() {
       align: "center",
       render: (value) => (
         <Tag color="geekblue" style={{ borderRadius: "10px", padding: "0 10px", border: "none", color: "#2f54eb", backgroundColor: "#f0f5ff" }}>
-          {value} saat
+          {value}
         </Tag>
       ),
     },
@@ -104,14 +88,14 @@ function IsEmriDagilimVePerformansListesi() {
       dataIndex: "ToplamMaliyet",
       key: "ToplamMaliyet",
       align: "right",
-      render: (value) => <Text style={{ fontWeight: "600" }}>{formatCurrency(value)}</Text>,
+      render: (value) => <Text style={{ fontWeight: "600" }}>{formatCurrencyString(value)}</Text>,
     },
     {
       title: "Ort. Maliyet",
       dataIndex: "OrtMaliyet",
       key: "OrtMaliyet",
       align: "right",
-      render: (value) => formatCurrency(value),
+      render: (value) => formatCurrencyString(value),
     },
     {
       title: "Ort. Tamamlama",
@@ -120,7 +104,7 @@ function IsEmriDagilimVePerformansListesi() {
       align: "center",
       render: (value) => (
         <Tag color="cyan" style={{ borderRadius: "10px", padding: "0 10px", border: "none", color: "#13c2c2", backgroundColor: "#e6fffb" }}>
-          {value} gün
+          {value}
         </Tag>
       ),
     },
@@ -129,14 +113,14 @@ function IsEmriDagilimVePerformansListesi() {
       dataIndex: "EnYuksek",
       key: "EnYuksek",
       align: "right",
-      render: (value) => formatCurrency(value),
+      render: (value) => formatCurrencyString(value),
     },
     {
       title: "En Düşük",
       dataIndex: "EnDusuk",
       key: "EnDusuk",
       align: "right",
-      render: (value) => formatCurrency(value),
+      render: (value) => formatCurrencyString(value),
     },
     {
       title: "Sıklık",
@@ -172,7 +156,7 @@ function IsEmriDagilimVePerformansListesi() {
             <Text style={{ fontWeight: "600", fontSize: "16px" }}>
               1. İş Emri Dağılım ve Performans Listesi
             </Text>
-            <Tag color="blue" variant="light" style={{ marginLeft: "5px", color: "#1890ff", borderColor: "#91d5ff" }}>
+            <Tag color="blue" style={{ marginLeft: "5px", color: "#1890ff", borderColor: "#91d5ff", backgroundColor: "#e6f7ff" }}>
               Kırılım Bazlı
             </Tag>
           </div>
@@ -185,7 +169,7 @@ function IsEmriDagilimVePerformansListesi() {
           <span style={{ fontSize: "13px", color: "#8c8c8c" }}>Kırılım</span>
           <Select
             value={breakdownType}
-            onChange={(value) => setBreakdownType(value)}
+            onChange={(value) => onBreakdownTypeChange && onBreakdownTypeChange(value)}
             style={{ width: 150 }}
             size="small"
             options={[
@@ -202,14 +186,27 @@ function IsEmriDagilimVePerformansListesi() {
 
       {/* Tablo Alanı */}
       <div style={{ width: "100%", overflowX: "auto" }}>
-        <Spin spinning={isLoading}>
+        <Spin spinning={loading}>
           <Table
             columns={columns}
             dataSource={data}
-            pagination={false}
             size="middle"
             bordered={false}
-            rowStyle={{ height: "50px" }}
+            // Kanka dinamik sayfalama ayarları tam burası:
+            pagination={{
+              current: page,
+              pageSize: pageSize,
+              total: totalItems || 0,
+              showSizeChanger: true,
+              pageSizeOptions: ["10", "20", "50", "100"],
+              position: ["bottomRight"],
+              size: "small",
+              onChange: (currentPage, currentPageSize) => {
+                if (onPageChange) {
+                  onPageChange(currentPage, currentPageSize);
+                }
+              }
+            }}
           />
         </Spin>
       </div>
