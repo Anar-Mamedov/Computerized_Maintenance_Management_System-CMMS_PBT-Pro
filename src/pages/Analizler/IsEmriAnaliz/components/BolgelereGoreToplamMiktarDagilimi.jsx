@@ -1,9 +1,8 @@
 import React from "react";
-import { Spin, Typography, Card } from "antd";
+import { Spin, Typography, Card, Tooltip } from "antd";
 
 const { Text } = Typography;
 
-// Ana ekrandan (widget14) beslenecek şekilde propları içeriye alıyoruz kanka
 function IsEmriOzetPaneli({
   personelVerimliligiSaat,
   planlananBakimaUyumYuzde,
@@ -80,7 +79,8 @@ function IsEmriOzetPaneli({
                   border: "1px solid #f0f0f0",
                   boxShadow: "none"
                 }}
-                bodyStyle={{ padding: "6px 10px" }} // Kanka dikey dolguyu kıstık, kartlar iyice ince şerit oldu
+                // Ant Design güncel pratiklerine uygun olarak bodyStyle, styles.body ile değiştirildi kanka
+                styles={{ body: { padding: "6px 10px" } }}
               >
                 <div style={{ display: "flex", flexDirection: "column", gap: "0px" }}>
                   {/* Üst Başlık */}
@@ -93,10 +93,12 @@ function IsEmriOzetPaneli({
                     {item.value}
                   </Text>
                   
-                  {/* Alt Açıklama */}
-                  <Text type="secondary" style={{ fontSize: "10px", color: "#bfbfbf", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                    {item.subText}
-                  </Text>
+                  {/* Alt Açıklama - Tooltip buraya eklendi kanka */}
+                  <Tooltip title={item.subText} placement="bottomLeft">
+                    <Text type="secondary" style={{ fontSize: "10px", color: "#bfbfbf", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", cursor: "help" }}>
+                      {item.subText}
+                    </Text>
+                  </Tooltip>
                 </div>
               </Card>
             </div>

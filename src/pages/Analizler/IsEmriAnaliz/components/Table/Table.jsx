@@ -10,7 +10,6 @@ function IsEmriDagilimVePerformansListesi({
   breakdownType, 
   onBreakdownTypeChange, 
   onRefresh,
-  // Kanka sayfalama için üst bileşenden (MainDashboard) gelecek yeni proplar:
   page,
   pageSize,
   totalItems,
@@ -48,9 +47,10 @@ function IsEmriDagilimVePerformansListesi({
   };
   
   const getBreakdownLabel = () => {
-    if (breakdownType === "Tip") return "İş Emri Tipleri";
-    if (breakdownType === "Durum") return "Durumlar";
-    if (breakdownType === "Atolye") return "Atölyeler";
+    if (breakdownType === 1) return "İş Emri Tipleri";
+    if (breakdownType === 2) return "Lokasyonlar";
+    if (breakdownType === 3) return "Ekipman Tipleri";
+    if (breakdownType === 4) return "Atölyeler";
     return "Kırılım Başlığı";
   };
 
@@ -173,9 +173,10 @@ function IsEmriDagilimVePerformansListesi({
             style={{ width: 150 }}
             size="small"
             options={[
-              { value: "Tip", label: "İş Emri Tipleri" },
-              { value: "Durum", label: "Durumlar" },
-              { value: "Atolye", label: "Atölyeler" },
+              { value: 1, label: "İş Emri Tipleri" },
+              { value: 2, label: "Lokasyon" },
+              { value: 3, label: "Ekipman Tipleri" },
+              { value: 4, label: "Atölyeler" },
             ]}
           />
           <Dropdown menu={{ items: menuItems }} trigger={["click"]}>

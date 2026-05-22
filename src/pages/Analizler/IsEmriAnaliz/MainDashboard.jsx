@@ -396,7 +396,8 @@ function MainDashboard() {
                     <AppProvider>
                       <BrowserRouter>
                         <Component7
-                          tipDagilimi={dashboardData ? dashboardData.TipDagilimi : null} 
+                          tipDagilimi={dashboardData ? dashboardData.TipDagilimi : null}
+                          durumDagilimi={dashboardData ? dashboardData.DurumDagilimi : null} 
                           loading={loading}
                         />
                       </BrowserRouter>

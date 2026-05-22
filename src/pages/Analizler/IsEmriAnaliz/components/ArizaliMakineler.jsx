@@ -91,7 +91,7 @@ function IsEmriMaliyetVePerformansAnalizi({
       render: (value) => formatCurrencyString(value),
     },
     {
-      title: "Ort. Süre",
+      title: "Ort. Tamamlanma",
       dataIndex: "OrtSure",
       key: "OrtSure",
       align: "center",

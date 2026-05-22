@@ -1,26 +1,45 @@
 import React, { useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { Spin, Typography, Radio, Dropdown, Button, Modal } from "antd";
-import { MoreOutlined, FullscreenOutlined, InfoCircleOutlined, DownloadOutlined } from "@ant-design/icons";
+import { MoreOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
 // Grafik Renk Paleti - Orijinal haliyle korundu
 const COLORS = ["#007bff", "#ff4d4f", "#ffc107", "#17a2b8", "#28a745", "#a463bf", "#6f42c1"];
 
-function IsEmriDagilimGrafigi({ tipDagilimi, loading }) {
+function IsEmriDagilimGrafigi({ tipDagilimi, durumDagilimi, loading }) {
   const [isFullModalVisible, setIsFullModalVisible] = useState(false);
   const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
+  
+  // Hangi tabın aktif olduğunu tutan state ("Tip" veya "Durum")
+  const [activeTab, setActiveTab] = useState("Tip");
 
-  // Gelen ham API verisini mapliyoruz
+  // Aktif sekmeye göre ham API verisini seçip mapliyoruz
   const chartData = React.useMemo(() => {
-    if (!tipDagilimi || !Array.isArray(tipDagilimi)) return [];
-    return tipDagilimi.map((item) => ({
-      name: item.TipAdi,        // örn: "PERİYODİK BAKIM"
-      value: item.Adet,          // örn: 3127
-      percentage: item.Yuzde,    // örn: 52.9
+    const rawData = activeTab === "Tip" ? tipDagilimi : durumDagilimi;
+    
+    if (!rawData || !Array.isArray(rawData)) return [];
+    
+    return rawData.map((item) => ({
+      name: item.TipAdi || item.DurumAdi || item.Adi || "", 
+      value: item.Adet || 0,         
+      percentage: item.Yuzde || 0,   
     }));
-  }, [tipDagilimi]);
+  }, [tipDagilimi, durumDagilimi, activeTab]);
+
+  // Hem ana ekranda hem modalda ortak kullanılacak seçici buton yapısı kanka
+  const renderTabSelector = () => (
+    <Radio.Group 
+      value={activeTab} 
+      onChange={(e) => setActiveTab(e.target.value)} 
+      size="small" 
+      buttonStyle="solid"
+    >
+      <Radio.Button value="Tip">Tip</Radio.Button>
+      <Radio.Button value="Durum">Durum</Radio.Button>
+    </Radio.Group>
+  );
 
   // Özel Label Çizimi - Orijinal hesaplama yapısı ve mesafesi tamamen korundu
   const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, name, percentage }) => {
@@ -92,10 +111,8 @@ function IsEmriDagilimGrafigi({ tipDagilimi, loading }) {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <Radio.Group value="Tip" size="small" buttonStyle="solid">
-            <Radio.Button value="Tip">Tip</Radio.Button>
-            <Radio.Button value="Durum">Durum</Radio.Button>
-          </Radio.Group>
+          {/* Fonksiyon haline getirdiğimiz seçiciyi burada çağırıyoruz */}
+          {renderTabSelector()}
           <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
             <Button type="text" icon={<MoreOutlined />} />
           </Dropdown>
@@ -115,7 +132,12 @@ function IsEmriDagilimGrafigi({ tipDagilimi, loading }) {
 
       {/* Tam Ekran Modalı kanka */}
       <Modal
-        title="İş Emri Dağılım Grafiği"
+        title={
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingRight: "30px" }}>
+            <span>İş Emri Dağılım Grafiği</span>
+            {renderTabSelector()}
+          </div>
+        }
         open={isFullModalVisible}
         onCancel={() => setIsFullModalVisible(false)}
         footer={null}
@@ -123,9 +145,8 @@ function IsEmriDagilimGrafigi({ tipDagilimi, loading }) {
         centered
         destroyOnClose
       >
-        {/* Geniş ekranda grafik ezilmesin diye yarıçapları biraz büyüterek render ediyoruz */}
-        <div style={{ height: "70vh", minHeight: "400px" }}>
-          {renderChart(80, 130)} 
+        <div style={{ height: "75vh", minHeight: "500px", paddingTop: "20px" }}>
+          {renderChart(100, 160)} 
         </div>
       </Modal>
 
