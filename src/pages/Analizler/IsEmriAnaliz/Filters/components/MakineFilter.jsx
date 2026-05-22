@@ -63,7 +63,7 @@ const MakineFilter = () => {
       </div>
       <div style={{ padding: "10px" }}>
         <div style={{ display: "flex", gap: "10px" }}>
-          <Input disabled value={selectedMknKodString} placeholder="Seçilen makineler..." />
+          <Input disabled value={selectedMknKodString} placeholder="Seçilen ekipmanlar..." />
           <Button onClick={showModal}>+</Button>
         </div>
       </div>
@@ -101,7 +101,7 @@ const MakineFilter = () => {
         </Button>
       </Popover>
       <Modal
-        title="Makine Seç"
+        title="Ekipman Seç"
         width={1200}
         destroyOnClose
         open={isModalVisible}

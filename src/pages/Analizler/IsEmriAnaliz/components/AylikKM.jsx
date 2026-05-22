@@ -45,7 +45,7 @@ function MakineArizaVeOncelikAnalizi({
 
   const columns = [
     {
-      title: "Makine",
+      title: "Ekipman",
       dataIndex: "Makine",
       key: "Makine",
       render: (text) => <Text style={{ fontWeight: "500" }}>{text}</Text>,
@@ -128,7 +128,7 @@ function MakineArizaVeOncelikAnalizi({
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <PartitionOutlined style={{ fontSize: "18px", color: "#333" }} />
             <Text style={{ fontWeight: "600", fontSize: "16px" }}>
-              3. Makine Arıza ve Müdahale Öncelik Analizi
+              3. Ekipman Arıza ve Müdahale Öncelik Analizi
             </Text>
           </div>
           <Text type="secondary" style={{ fontSize: "12px", display: "block", marginTop: "4px" }}>

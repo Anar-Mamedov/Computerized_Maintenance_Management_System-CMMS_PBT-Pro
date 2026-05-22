@@ -49,7 +49,7 @@ function IsEmriOzetPaneli({
   ];
 
   return (
-    <div style={{ padding: "10px", backgroundColor: "#ffffff", borderRadius: "8px", width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
+    <div style={{ padding: "10px", backgroundColor: "#ffffff", borderRadius: "8px", width: "100%", height: "auto", display: "flex", flexDirection: "column" }}>
       
       {/* Başlık Alanı */}
       <div style={{ marginBottom: "8px" }}>

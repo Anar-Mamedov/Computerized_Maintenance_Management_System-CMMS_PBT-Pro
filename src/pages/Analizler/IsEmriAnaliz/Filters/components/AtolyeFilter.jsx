@@ -68,10 +68,14 @@ const AtolyeFilter = () => {
         <Select
           mode="multiple"
           style={{ width: "100%" }}
+          showSearch
           placeholder="Ara..."
           value={currentSelectedIds}
           onChange={handleChange}
           allowClear
+          filterOption={(input, option) =>
+            option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+          }
           notFoundContent={
             loading ? (
               <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "40px" }}>

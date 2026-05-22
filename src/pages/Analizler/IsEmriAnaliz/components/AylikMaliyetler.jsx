@@ -48,17 +48,10 @@ function IsEmriDagilimVePerformansListesi({
     if (String(val).includes("₺")) return val;
     return `₺${val}`;
   };
-  
-  const getBreakdownLabel = () => {
-    if (breakdownType === "Tip") return "İş Emri Tipleri";
-    if (breakdownType === "Durum") return "Durumlar";
-    if (breakdownType === "Atolye") return "Atölyeler";
-    return "Kırılım Başlığı";
-  };
 
   const columns = [
     {
-      title: getBreakdownLabel(),
+      title: "Grup Adı",
       dataIndex: "GrupAdi",
       key: "GrupAdi",
       render: (text) => <Text style={{ fontWeight: "500" }}>{text}</Text>,
@@ -188,24 +181,6 @@ function IsEmriDagilimVePerformansListesi({
           <Text type="secondary" style={{ fontSize: "12px", display: "block", marginTop: "4px" }}>
             Atölyelerin iş yükü, gecikme, süre, maliyet ve verimlilik karşılaştırması
           </Text>
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span style={{ fontSize: "13px", color: "#8c8c8c" }}>Kırılım</span>
-          <Select
-            value={breakdownType}
-            onChange={(value) => onBreakdownTypeChange && onBreakdownTypeChange(value)}
-            style={{ width: 150 }}
-            size="small"
-            options={[
-              { value: "Tip", label: "İş Emri Tipleri" },
-              { value: "Durum", label: "Durumlar" },
-              { value: "Atolye", label: "Atölyeler" },
-            ]}
-          />
-          <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
-            <Button type="text" icon={<MoreOutlined />} />
-          </Dropdown>
         </div>
       </div>
 

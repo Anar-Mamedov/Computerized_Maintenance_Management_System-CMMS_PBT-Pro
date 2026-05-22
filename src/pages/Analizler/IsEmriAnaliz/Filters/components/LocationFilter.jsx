@@ -73,11 +73,15 @@ const LocationFilter = () => {
         <Select
           mode="multiple"
           style={{ width: "100%" }}
+          showSearch
           placeholder="Ara..."
           // Select'in değer eşlemesini doğrudan ID (key) üzerinden yapıyoruz kanka
           value={currentSelectedIds}
           onChange={handleChange}
           allowClear
+          filterOption={(input, option) =>
+            option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+          }
           notFoundContent={
             loading ? (
               <div
