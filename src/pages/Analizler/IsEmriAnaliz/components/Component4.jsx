@@ -14,7 +14,7 @@ function Component4({ apiData, loading }) {
       style={{
         width: "100%",
         height: "100%",
-        background: backgroundColor || `linear-gradient(rgba(245, 245, 245, 0.9), rgba(240, 240, 240, 0.9)), url(${bg})`,
+        background: backgroundColor || "#ffffff",
         backgroundPosition: "inherit",
         backgroundSize: "cover",
         borderRadius: "8px",

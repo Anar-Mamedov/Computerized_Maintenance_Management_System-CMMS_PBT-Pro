@@ -1,34 +1,31 @@
-import React from "react";
+import React, { useState } from "react";
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Spin, Typography, Dropdown, Button } from "antd";
-import { MoreOutlined, BuildOutlined } from "@ant-design/icons";
+import { Spin, Typography, Dropdown, Button, Modal } from "antd";
+import { MoreOutlined, BuildOutlined, FullscreenOutlined, InfoCircleOutlined, DownloadOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
 function AtolyelerIsEmriVeGecikme({ atolyeDagilimi, loading }) {
-  // Yeni JSON yapısındaki (AtolyeAd, IsEmriSayisi, GecikmeOrani) key'lerine göre eşleme yapıyoruz
+  const [isFullModalVisible, setIsFullModalVisible] = useState(false);
+  const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
+
+  // Yeni JSON yapısındaki verilere göre eşleme yapıyoruz
   const data = React.useMemo(() => {
     if (!atolyeDagilimi || !Array.isArray(atolyeDagilimi)) return [];
     return atolyeDagilimi.map((item) => ({
       AtolyeTanim: item.AtolyeAd || "Belirsiz",
-      IsEmriSayisi: item.IsEmriSayisi || 0, // Sütun için veri
-      GecikmeOrani: item.GecikmeOrani || 0,  // Çizgi için veri
+      IsEmriSayisi: item.IsEmriSayisi || 0,
+      GecikmeOrani: item.GecikmeOrani || 0,
     }));
   }, [atolyeDagilimi]);
 
-  const menuItems = [
-    { key: "refresh", label: "Verileri Yenile" },
-    { key: "download", label: "İndir" },
-    { key: "info", label: "Bilgi" },
-  ];
-
-  // Çizgi üzerindeki noktaların (Dot) tepesinde "%18" yazması için custom label
+  // Çizgi üzerindeki noktaların tepesinde yüzde yazması için custom label
   const renderLineLabel = ({ x, y, value }) => {
     return (
       <text
         x={x}
         y={y - 12}
-        fill="#874d00" // Kahverengi/Turuncu tonlu yazı rengi
+        fill="#874d00"
         textAnchor="middle"
         style={{ fontSize: "12px", fontWeight: "600" }}
       >
@@ -37,11 +34,83 @@ function AtolyelerIsEmriVeGecikme({ atolyeDagilimi, loading }) {
     );
   };
 
+  // Grafik yapısını fonksiyonlaştırdık, iki tarafta da (ana ekran & modal) ortak kullanılıyor kanka
+  const renderChart = (height = "100%") => (
+    <ResponsiveContainer width="100%" height={height}>
+      <ComposedChart data={data} margin={{ top: 20, right: -5, left: -15, bottom: 5 }}>
+        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e8e8e8" />
+        
+        <XAxis 
+          dataKey="AtolyeTanim" 
+          axisLine={{ stroke: "#b5b5b5" }}
+          tickLine={false}
+          tick={{ fill: "#666", fontSize: 13 }}
+        />
+        
+        {/* Sol Y Ekseni - İş Emri Sayısı */}
+        <YAxis 
+          yAxisId="left"
+          axisLine={{ stroke: "#b5b5b5" }}
+          tickLine={true}
+          tick={{ fill: "#666", fontSize: 12 }}
+        />
+        
+        {/* Sağ Y Ekseni - Gecikme Oranı (%) */}
+        <YAxis 
+          yAxisId="right" 
+          orientation="right" 
+          axisLine={{ stroke: "#b5b5b5" }}
+          tickLine={true}
+          tickFormatter={(value) => `%${value}`}
+          tick={{ fill: "#666", fontSize: 12 }}
+        />
+        
+        <Tooltip 
+          formatter={(value, name) => [
+            name === "Gecikme Oranı" ? `%${value}` : `${value} Adet`, 
+            name
+          ]} 
+        />
+        
+        <Legend verticalAlign="bottom" height={36} iconType="rect" />
+        
+        {/* İş Emri Sayısı (Sütun) */}
+        <Bar 
+          yAxisId="left" 
+          dataKey="IsEmriSayisi" 
+          name="İş Emri Sayısı" 
+          fill="#1890ff" 
+          barSize={55}
+        />
+        
+        {/* Gecikme Oranı (Çizgi) */}
+        <Line 
+          yAxisId="right" 
+          type="monotone" 
+          dataKey="GecikmeOrani" 
+          name="Gecikme Oranı" 
+          stroke="#ffb703" 
+          strokeWidth={3}
+          dot={{ r: 5, stroke: "#ffb703", strokeWidth: 2, fill: "#fff" }} 
+          activeDot={{ r: 7 }}
+          label={renderLineLabel}
+        />
+      </ComposedChart>
+    </ResponsiveContainer>
+  );
+
+  // Sadece İndir, Tam Ekran Aç ve Bilgi olacak şekilde menüyü kurguladık kanka
+  const menuItems = [
+    { key: "download", label: "İndir"},
+    { key: "full", label: "Tam Ekran Aç", onClick: () => setIsFullModalVisible(true) },
+    { key: "info", label: "Bilgi", onClick: () => setIsInfoModalVisible(true) },
+  ];
+
   return (
     <div
       style={{
         width: "100%",
-        height: "410px",
+        height: "100%",
         borderRadius: "10px",
         backgroundColor: "white",
         display: "flex",
@@ -77,69 +146,68 @@ function AtolyelerIsEmriVeGecikme({ atolyeDagilimi, loading }) {
             <Spin />
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={data} margin={{ top: 20, right: -5, left: -15, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e8e8e8" />
-              
-              <XAxis 
-                dataKey="AtolyeTanim" 
-                axisLine={{ stroke: "#b5b5b5" }}
-                tickLine={false}
-                tick={{ fill: "#666", fontSize: 13 }}
-              />
-              
-              {/* Sol Y Ekseni - İş Emri Sayısı */}
-              <YAxis 
-                yAxisId="left"
-                axisLine={{ stroke: "#b5b5b5" }}
-                tickLine={true}
-                tick={{ fill: "#666", fontSize: 12 }}
-              />
-              
-              {/* Sağ Y Ekseni - Gecikme Oranı (%) */}
-              <YAxis 
-                yAxisId="right" 
-                orientation="right" 
-                axisLine={{ stroke: "#b5b5b5" }}
-                tickLine={true}
-                tickFormatter={(value) => `%${value}`}
-                tick={{ fill: "#666", fontSize: 12 }}
-              />
-              
-              <Tooltip 
-                formatter={(value, name) => [
-                  name === "Gecikme Oranı" ? `%${value}` : `${value} Adet`, 
-                  name
-                ]} 
-              />
-              
-              <Legend verticalAlign="bottom" height={36} iconType="rect" />
-              
-              {/* İş Emri Sayısı (Sütun) */}
-              <Bar 
-                yAxisId="left" 
-                dataKey="IsEmriSayisi" 
-                name="İş Emri Sayısı" 
-                fill="#1890ff" 
-                barSize={55}
-              />
-              
-              {/* Gecikme Oranı (Çizgi) */}
-              <Line 
-                yAxisId="right" 
-                type="monotone" 
-                dataKey="GecikmeOrani" 
-                name="Gecikme Oranı" 
-                stroke="#ffb703" 
-                strokeWidth={3}
-                dot={{ r: 5, stroke: "#ffb703", strokeWidth: 2, fill: "#fff" }} 
-                activeDot={{ r: 7 }}
-                label={renderLineLabel}
-              />
-            </ComposedChart>
-          </ResponsiveContainer>
+          renderChart()
         )}
       </div>
+
+      {/* Tam Ekran Modalı kanka */}
+      <Modal
+        title="Atölyelere Göre İş Emri Sayısı ve Gecikme Oranı Analizi"
+        open={isFullModalVisible}
+        onCancel={() => setIsFullModalVisible(false)}
+        footer={null}
+        width="90%"
+        centered
+        destroyOnClose
+      >
+        <div style={{ height: "70vh", minHeight: "400px" }}>
+          {renderChart("100%")}
+        </div>
+      </Modal>
+
+      {/* Bilgi Modalı kanka */}
+      <Modal
+        title="Atölye Gecikme Analizi"
+        open={isInfoModalVisible}
+        onCancel={() => setIsInfoModalVisible(false)}
+        footer={[
+          <Button key="ok" type="primary" onClick={() => setIsInfoModalVisible(false)}>
+            Anladım
+          </Button>
+        ]}
+      >
+        <div style={{ padding: "10px 0" }}>
+          {/* İstediğin Analiz İçeriği Yapısı */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div>
+              <Text strong style={{ display: "block", marginBottom: "2px" }}>
+                Ne İşe Yarar?
+              </Text>
+              <Typography.Paragraph type="secondary" style={{ margin: 0, paddingLeft: "18px" }}>
+                Atölye bazlı iş yükü ve gecikmeleri gösterir.
+              </Typography.Paragraph>
+            </div>
+
+            <div>
+              <Text strong style={{ display: "block", marginBottom: "2px" }}>
+                Nasıl yorumlanır?
+              </Text>
+              <Typography.Paragraph type="secondary" style={{ margin: 0, paddingLeft: "18px" }}>
+                Yüksek gecikme = darboğaz veya kapasite problemi.
+              </Typography.Paragraph>
+            </div>
+
+            <div>
+              <Text strong style={{ display: "block", marginBottom: "2px" }}>
+                Ne yapmalısın?
+              </Text>
+              <Typography.Paragraph type="secondary" style={{ margin: 0, paddingLeft: "18px" }}>
+                İş dağılımını yeniden planla veya personel artır.
+              </Typography.Paragraph>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

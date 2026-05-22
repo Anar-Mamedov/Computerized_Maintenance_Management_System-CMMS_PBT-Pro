@@ -27,6 +27,7 @@ import AylikKM from "./components/AylikKM.jsx";
 import ArizaliMakineler from "./components/ArizaliMakineler.jsx";
 
 import AxiosInstance from "../../../api/http.jsx";
+import dayjs from "dayjs"; // Tarih formatlama için ekledik kanka
 
 const { Text } = Typography;
 
@@ -53,40 +54,34 @@ const defaultItems = [
   { id: "widget3", x: 4, y: 0, width: 2, height: 1, minW: 2, minH: 1 },
   { id: "widget4", x: 6, y: 0, width: 2, height: 1, minW: 2, minH: 1 },
   { id: "widget7", x: 8, y: 0, width: 4, height: 1, minW: 2, minH: 1 },
-  { id: "widget14", x: 0, y: 1, width: 12, height: 2, minW: 3, minH: 2 },
-  { id: "widget5", x: 0, y: 3, width: 6, height: 3, minW: 3, minH: 2 },
-  { id: "widget19", x: 6, y: 3, width: 6, height: 3, minW: 3, minH: 2 },
-  { id: "widget6", x: 0, y: 6, width: 6, height: 4, minW: 3, minH: 2 },
-  { id: "widget18", x: 6, y: 6, width: 6, height: 4, minW: 3, minH: 2 },
-  { id: "widget11", x: 0, y: 10, width: 12, height: 3, minW: 3, minH: 2 },
-  { id: "widget20", x: 0, y: 13, width: 12, height: 3, minW: 3, minH: 2 },
-  { id: "widget21", x: 0, y: 16, width: 12, height: 3, minW: 3, minH: 2 },
-  { id: "widget22", x: 0, y: 19, width: 12, height: 3, minW: 3, minH: 2 },
+  { id: "widget14", x: 0, y: 1, width: 12, height: 1, minW: 3, minH: 1 },
+  { id: "widget5", x: 0, y: 2, width: 6, height: 3, minW: 3, minH: 2 },
+  { id: "widget19", x: 6, y: 2, width: 6, height: 3, minW: 3, minH: 2 },
+  { id: "widget6", x: 0, y: 5, width: 6, height: 4, minW: 3, minH: 2 },
+  { id: "widget18", x: 6, y: 5, width: 6, height: 4, minW: 3, minH: 2 },
+  { id: "widget11", x: 0, y: 9, width: 12, height: 3, minW: 3, minH: 2 },
+  { id: "widget20", x: 0, y: 12, width: 12, height: 3, minW: 3, minH: 2 },
+  { id: "widget21", x: 0, y: 15, width: 12, height: 3, minW: 3, minH: 2 },
+  { id: "widget22", x: 0, y: 18, width: 12, height: 3, minW: 3, minH: 2 },
 ];
 
 function MainDashboard() {
   const [reorganize, setReorganize] = useState();
   const [dashboardData, setDashboardData] = useState(null);
-  const [breakdownType, setBreakdownType] = useState("Tip"); // Backend'deki Kirilim1 ile senkronize
+  const [breakdownType, setBreakdownType] = useState("Tip"); 
   const [listData, setListData] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const [page1, setPage1] = useState(1);
   const [pageSize1, setPageSize1] = useState(10);
-
-  // Tablo 2 (Liste2) için sayfalama
   const [page2, setPage2] = useState(1);
   const [pageSize2, setPageSize2] = useState(10);
-
-  // Tablo 3 (Liste3) için sayfalama
   const [page3, setPage3] = useState(1);
   const [pageSize3, setPageSize3] = useState(10);
-
-  // Tablo 4 (Liste4) için sayfalama
   const [page4, setPage4] = useState(1);
   const [pageSize4, setPageSize4] = useState(10);
 
-  const [kirilim4, setKirilim4] = useState(4); // Listeler API'sinin beklediği sabit veya dinamik değer
+  const [kirilim4, setKirilim4] = useState(4); 
 
   const [checkedWidgets, setCheckedWidgets] = useState({
     widget1: false, widget2: false, widget3: false, widget4: false,
@@ -95,6 +90,7 @@ function MainDashboard() {
     widget21: false, widget22: false,
   });
 
+  // TarihFilter bileşeni default olarak Son 3 Ayı buraya yazacak kanka
   const methods = useForm({
     defaultValues: {
       BaslangicTarihi: null,
@@ -130,91 +126,87 @@ function MainDashboard() {
     }
   };
 
-  // 2. Listeler API İstek Mekanizması (Gönderdiğin tam payload kurgusuyla güncellendi)
+  // 2. Listeler API İstek Mekanizması
   const fetchListData = async (targetTable = "all") => {
-  setLoading(true);
-  try {
-    const payload = {
-      BaslangicTarihi: currentFilters.BaslangicTarihi,
-      BitisTarihi: currentFilters.BitisTarihi,
-      LokasyonIds: currentFilters.LokasyonIds || [],
-      AtolyeIds: currentFilters.AtolyeIds || [],
-      EkipmanIds: currentFilters.EkipmanIds || [],
-      Kirilim1: breakdownType, 
-      Kirilim4: kirilim4
-    };
+    setLoading(true);
+    try {
+      const payload = {
+        BaslangicTarihi: currentFilters.BaslangicTarihi,
+        BitisTarihi: currentFilters.BitisTarihi,
+        LokasyonIds: currentFilters.LokasyonIds || [],
+        AtolyeIds: currentFilters.AtolyeIds || [],
+        EkipmanIds: currentFilters.EkipmanIds || [],
+        Kirilim1: breakdownType, 
+        Kirilim4: kirilim4
+      };
 
-    // Hangi tablo istek attıysa onun page ve pageSize değerini URL'e basıyoruz
-    let activePage = page1;
-    let activePageSize = pageSize1;
+      let activePage = page1;
+      let activePageSize = pageSize1;
 
-    if (targetTable === "table2") { activePage = page2; activePageSize = pageSize2; }
-    else if (targetTable === "table3") { activePage = page3; activePageSize = pageSize3; }
-    else if (targetTable === "table4") { activePage = page4; activePageSize = pageSize4; }
+      if (targetTable === "table2") { activePage = page2; activePageSize = pageSize2; }
+      else if (targetTable === "table3") { activePage = page3; activePageSize = pageSize3; }
+      else if (targetTable === "table4") { activePage = page4; activePageSize = pageSize4; }
 
-    const response = await AxiosInstance.post(
-      `GetIsEmriAnalizListeler?page=${activePage}&pageSize=${activePageSize}`, 
-      payload
-    );
+      const response = await AxiosInstance.post(
+        `GetIsEmriAnalizListeler?page=${activePage}&pageSize=${activePageSize}`, 
+        payload
+      );
 
-    // Kritik Nokta: Eğer "all" (ilk açılış veya sorgula butonu) ise tüm listeleri güncelle.
-    // Eğer sadece bir tablo sayfa değiştirdiyse, state'in içindeki diğer tabloların verisi uçmasın diye 
-    // sadece ilgili listenin içeriğini override ediyoruz kanka.
-    if (targetTable === "all") {
-      setListData(response?.data?.data || response?.data || null);
-    } else {
-      setListData(prevData => ({
-        ...prevData,
-        // API'den dönen güncel datayı sadece ilgili listeye basıyoruz
-        ...(targetTable === "table1" && { Liste1: response?.data?.data?.Liste1 || response?.data?.Liste1 }),
-        ...(targetTable === "table2" && { Liste2: response?.data?.data?.Liste2 || response?.data?.Liste2 }),
-        ...(targetTable === "table3" && { Liste3: response?.data?.data?.Liste3 || response?.data?.Liste3 }),
-        ...(targetTable === "table4" && { Liste4: response?.data?.data?.Liste4 || response?.data?.Liste4 }),
-      }));
+      if (targetTable === "all") {
+        setListData(response?.data?.data || response?.data || null);
+      } else {
+        setListData(prevData => ({
+          ...prevData,
+          ...(targetTable === "table1" && { Liste1: response?.data?.data?.Liste1 || response?.data?.Liste1 }),
+          ...(targetTable === "table2" && { Liste2: response?.data?.data?.Liste2 || response?.data?.Liste2 }),
+          ...(targetTable === "table3" && { Liste3: response?.data?.data?.Liste3 || response?.data?.Liste3 }),
+          ...(targetTable === "table4" && { Liste4: response?.data?.data?.Liste4 || response?.data?.Liste4 }),
+        }));
+      }
+    } catch (error) {
+      console.error("Listeler API hatası:", error);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("Listeler API hatası:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
-  // Sorgula butonuna basıldığında tetiklenecek ana fonksiyon
   const handleQuery = () => {
     fetchDashboardData();
     fetchListData("all");
   };
 
-  // Sayfalama, tablo içi kırılım veya alt listeler değiştikçe istekleri tazele
+  // KANKA KRİTİK DÜZELTME: Ekran ilk açıldığında TarihFilter'dan gelen default (Son 3 Ay) tarihlerini
+  // yakalayıp API isteklerini otomatik olarak o tarihlerle tetikliyoruz.
   useEffect(() => {
-  if (listData) fetchListData("table1");
-}, [page1, pageSize1]);
-
-// Tablo 2'in sayfası değiştiğinde sadece tablo 2'yi çek
-useEffect(() => {
-  if (listData) fetchListData("table2");
-}, [page2, pageSize2]);
-
-// Tablo 3'ün sayfası değiştiğinde sadece tablo 3'ü çek
-useEffect(() => {
-  if (listData) fetchListData("table3");
-}, [page3, pageSize3]);
-
-// Tablo 4'ün sayfası değiştiğinde sadece tablo 4'ü çek
-useEffect(() => {
-  if (listData) fetchListData("table4");
-}, [page4, pageSize4]);
-
-useEffect(() => {
-  setPage1(1); setPage2(1); setPage3(1); setPage4(1);
-  fetchListData("all");
-}, [breakdownType]);
-
-  // İlk açılışta verileri otomatik çek
-  useEffect(() => {
-    handleQuery();
+    if (currentFilters.BaslangicTarihi && currentFilters.BitisTarihi) {
+      handleQuery();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentFilters.BaslangicTarihi, currentFilters.BitisTarihi]);
+
+  // Sayfalama ve kırılım takipleri
+  useEffect(() => {
+    if (listData) fetchListData("table1");
+  }, [page1, pageSize1]);
+
+  useEffect(() => {
+    if (listData) fetchListData("table2");
+  }, [page2, pageSize2]);
+
+  useEffect(() => {
+    if (listData) fetchListData("table3");
+  }, [page3, pageSize3]);
+
+  useEffect(() => {
+    if (listData) fetchListData("table4");
+  }, [page4, pageSize4]);
+
+  useEffect(() => {
+    setPage1(1); setPage2(1); setPage3(1); setPage4(1);
+    if (currentFilters.BaslangicTarihi && currentFilters.BitisTarihi) {
+      fetchListData("all");
+    }
+  }, [breakdownType]);
 
   useEffect(() => {
     if (dashboardData) {
@@ -447,7 +439,7 @@ useEffect(() => {
                           onRefresh={() => fetchListData("table1")}
                           page={page1}
                           pageSize={pageSize1}
-                          totalItems={listData?.TotalCount1 || 100} // Backend'den Liste1 için dönen total count
+                          totalItems={listData?.TotalCount1 || 100} 
                           onPageChange={(p, ps) => {
                             setPage1(p);
                             setPageSize1(ps);
@@ -530,7 +522,7 @@ useEffect(() => {
                           loading={loading}
                           page={page2}
                           pageSize={pageSize2}
-                          totalItems={listData?.TotalCount2 || 100} // Backend'den Liste2 için dönen total count
+                          totalItems={listData?.TotalCount2 || 100} 
                           onPageChange={(p, ps) => {
                             setPage2(p);
                             setPageSize2(ps);
@@ -554,12 +546,12 @@ useEffect(() => {
                           listeData={listData ? listData.Liste3 : null} 
                           loading={loading}
                           page={page3}
-  pageSize={pageSize3}
-  totalItems={listData?.TotalCount3 || 100} // Backend'den Liste3 için dönen total count
-  onPageChange={(p, ps) => {
-    setPage3(p);
-    setPageSize3(ps);
-  }}
+                          pageSize={pageSize3}
+                          totalItems={listData?.TotalCount3 || 100} 
+                          onPageChange={(p, ps) => {
+                            setPage3(p);
+                            setPageSize3(ps);
+                          }}
                         />
                       </BrowserRouter>
                     </AppProvider>
@@ -583,7 +575,7 @@ useEffect(() => {
                           onRefresh={() => fetchListData("table4")}
                           page={page4}
                           pageSize={pageSize4}
-                          totalItems={listData?.TotalCount4 || 100} // Backend'den Liste4 için dönen total count
+                          totalItems={listData?.TotalCount4 || 100} 
                           onPageChange={(p, ps) => {
                             setPage4(p);
                             setPageSize4(ps);
@@ -757,6 +749,16 @@ useEffect(() => {
     window.updateWidgets(rearrangedItems);
   };
 
+  // Dinamik Tarih Metni Oluşturma Alanı kanka
+  const renderDateText = () => {
+    if (currentFilters.BaslangicTarihi && currentFilters.BitisTarihi) {
+      const start = dayjs(currentFilters.BaslangicTarihi).format("DD.MM.YYYY");
+      const end = dayjs(currentFilters.BitisTarihi).format("DD.MM.YYYY");
+      return `(${start} - ${end})`;
+    }
+    return "";
+  };
+
   const content = (
     <div style={{ display: "flex", flexDirection: "column", gap: "10px", maxHeight: "610px", overflowY: "auto" }}>
       <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "5px" }}>
@@ -795,10 +797,19 @@ useEffect(() => {
           <div style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", marginBottom: "10px" }}>
             <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "10px" }}>
               <Filters />
-              <Button type="primary" onClick={handleQuery}>
-                <ReloadOutlined />
-                Sorgula
-              </Button>
+              
+              {/* Tarih metnini ve sorgula butonunu yan yana alan sarmalayıcı */}
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <Button type="primary" onClick={handleQuery}>
+                  <ReloadOutlined />
+                  Sorgula
+                </Button>
+                {renderDateText() && (
+                  <Text type="secondary" style={{ fontSize: "12px", fontWeight: "500" }}>
+                    {renderDateText()}
+                  </Text>
+                )}
+              </div>
             </div>
 
             <div style={{ display: "flex", alignItems: "center", flexDirection: "row", gap: "10px" }}>
