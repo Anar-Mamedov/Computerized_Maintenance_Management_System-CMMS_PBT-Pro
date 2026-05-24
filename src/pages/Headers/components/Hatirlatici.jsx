@@ -113,7 +113,7 @@ const CardsGrid = styled.div`
   column-gap: 16px;
 `;
 
-export default function HatirlaticiPopover({ hatirlaticiData = null, loading = false, open = false, setOpen }) {
+export default function HatirlaticiPopover({ hatirlaticiData = null, loading = false, open = false, setOpen, hatirlaticiPinnable = false }) {
   const { t } = useTranslation();
   const [hatirlaticiDataCount, setHatirlaticiDataCount] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -319,22 +319,37 @@ export default function HatirlaticiPopover({ hatirlaticiData = null, loading = f
     </PopoverContent>
   );
 
+  const handleToggle = () => {
+    const currentOpen = localStorage.getItem("hatirlatici_panel_open") === "true";
+    const newOpen = !currentOpen;
+    localStorage.setItem("hatirlatici_panel_open", newOpen.toString());
+    window.dispatchEvent(new Event("hatirlatici_panel_open_changed"));
+  };
+
+  const calendarIcon = (
+    <Badge size="small" count={hatirlaticiDataCount}>
+      {loading ? <Spin /> : <FaRegCalendarAlt style={{ fontSize: "22px", cursor: "pointer" }} onClick={hatirlaticiPinnable ? handleToggle : undefined} />}
+    </Badge>
+  );
+
   return (
     <>
-      <Popover
-        content={content}
-        trigger="click"
-        open={open}
-        onOpenChange={handleOpenChange}
-        overlayStyle={{
-          width: "1200px",
-          maxWidth: "90vw",
-        }}
-      >
-        <Badge size="small" count={hatirlaticiDataCount}>
-          {loading ? <Spin /> : <FaRegCalendarAlt style={{ fontSize: "22px", cursor: "pointer" }} />}
-        </Badge>
-      </Popover>
+      {hatirlaticiPinnable ? (
+        calendarIcon
+      ) : (
+        <Popover
+          content={content}
+          trigger="click"
+          open={open}
+          onOpenChange={handleOpenChange}
+          overlayStyle={{
+            width: "1200px",
+            maxWidth: "90vw",
+          }}
+        >
+          {calendarIcon}
+        </Popover>
+      )}
       <Modal title={modalTitle} open={isModalOpen} width={1300} onCancel={handleModalClose} footer={null}>
         {modalContent}
       </Modal>
@@ -367,4 +382,5 @@ HatirlaticiPopover.propTypes = {
   loading: PropTypes.bool,
   open: PropTypes.bool,
   setOpen: PropTypes.func.isRequired,
+  hatirlaticiPinnable: PropTypes.bool,
 };

@@ -13,6 +13,17 @@ import RaporModal1 from "../Rapor&Formlar/RaporYonetimi/RaporTabs/components/Rap
 
 export default function Header() {
   const [hatirlaticiData, setHatirlaticiData] = useState(null);
+  const [hatirlaticiPinnable, setHatirlaticiPinnable] = useState(() => localStorage.getItem("hatirlatici_pinnable") === "true");
+
+  useEffect(() => {
+    const handlePinnableChange = () => {
+      setHatirlaticiPinnable(localStorage.getItem("hatirlatici_pinnable") === "true");
+    };
+    window.addEventListener("hatirlatici_pinnable_changed", handlePinnableChange);
+    return () => {
+      window.removeEventListener("hatirlatici_pinnable_changed", handlePinnableChange);
+    };
+  }, []);
   const [otomatikIsEmirleriListe, setOtomatikIsEmirleriListe] = useState(null);
   const [parametreler, setParametreler] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -326,7 +337,13 @@ export default function Header() {
           }}
         >
           <SearchComponent />
-          <Hatirlatici hatirlaticiData={hatirlaticiData} loading={loading} open={open} setOpen={setOpen} />
+          <Hatirlatici
+            hatirlaticiData={hatirlaticiData}
+            loading={loading}
+            open={open}
+            setOpen={setOpen}
+            hatirlaticiPinnable={hatirlaticiPinnable}
+          />
           <Bildirim reportResponse={reportResponse} setRaporModalVisible={setRaporModalVisible} updateReportData={updateReportData} />
           <Kullanici />
         </div>
