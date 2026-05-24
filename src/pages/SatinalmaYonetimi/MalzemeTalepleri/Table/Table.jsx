@@ -117,7 +117,7 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
   );
 };
 
-const MainTable = () => {
+const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
   // State definitions...
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
@@ -996,12 +996,12 @@ const MainTable = () => {
 
 // ✅ API isteği
 useEffect(() => {
-  const params = JSON.stringify({ body, currentPage, pageSize });
+  const params = JSON.stringify({ body, currentPage, pageSize, hatirlaticiGrupId, hatirlaticiSiraId });
   if (lastRequestRef.current === params) return;
   lastRequestRef.current = params;
 
   fetchEquipmentData(body, currentPage, pageSize);
-}, [body, currentPage, pageSize]);
+}, [body, currentPage, pageSize, hatirlaticiGrupId, hatirlaticiSiraId]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
@@ -1030,10 +1030,13 @@ useEffect(() => {
   try {
     setLoading(true);
 
+    const endpoint = hatirlaticiGrupId ? "GetMalzemeTalepleriHatirlatici" : "GetMalzemeTalepleri";
+    const hatirlaticiParams = hatirlaticiGrupId ? `&hatirlaticiGrupId=${hatirlaticiGrupId}&hatirlaticiSiraId=${hatirlaticiSiraId}` : "";
+
     // API isteği (filters burada aslında requestBody olmalı)
     const response = await AxiosInstance.post(
-      `GetMalzemeTalepleri?pagingDeger=${currentPage}&pageSize=${size}`,
-      filters // <-- burada filters değil, düzgün body verisi bekleniyor olabilir
+      `${endpoint}?pagingDeger=${currentPage}&pageSize=${size}${hatirlaticiParams}`,
+      filters
     );
 
     if (response.status_code === 401) {

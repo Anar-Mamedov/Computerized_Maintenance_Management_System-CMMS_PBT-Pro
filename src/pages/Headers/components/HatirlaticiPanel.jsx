@@ -11,6 +11,10 @@ import MakineTanim from "../../MakineEkipman/MakineTanim/MakineTanim.jsx";
 import IsEmri from "../../BakımVeArizaYonetimi/IsEmri/IsEmri.jsx";
 import OtomatikIsEmirleri from "../../BakımVeArizaYonetimi/OtomatikIsEmrileri/Index.jsx";
 import MalzemeTanimlari from "../../Malzeme&DepoYonetimi/MalzemeTanimlari/MalzemeTanimlari.jsx";
+import MalzemeTalepleri from "../../SatinalmaYonetimi/MalzemeTalepleri/MalzemeTalepleri.jsx";
+import SatinalmaSiparisleri from "../../SatinalmaYonetimi/SatinalmaSiparisleri/SatinalmaSiparisleri.jsx";
+import FiyatTeklifleri from "../../SatinalmaYonetimi/FiyatTeklifleri/FiyatTeklifleri.jsx";
+import FirmaSozlesmeleri from "../../FirmaVeSozlesmeYonetimi/FirmaSozlesmeleri/FirmaSozlesmeleri.jsx";
 
 const { Text } = Typography;
 
@@ -305,6 +309,16 @@ const HatirlaticiPanel = ({ open, onClose }) => {
       }
     } else if (grupId === 3) {
       contentComponent = <MalzemeTanimlari hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
+    } else if (grupId === 4) {
+      if (siraId === 1 || siraId === 4) {
+        contentComponent = <MalzemeTalepleri hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
+      } else if (siraId === 2) {
+        contentComponent = <SatinalmaSiparisleri hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
+      } else if (siraId === 3) {
+        contentComponent = <FiyatTeklifleri hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
+      } else if (siraId === 5) {
+        contentComponent = <FirmaSozlesmeleri hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
+      }
     }
 
     if (contentComponent) {
