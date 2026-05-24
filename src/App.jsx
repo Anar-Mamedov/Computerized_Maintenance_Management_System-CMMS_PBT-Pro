@@ -91,6 +91,7 @@ import TransferFisleri from "./pages/Malzeme&DepoYonetimi/TransferFisleri/Transf
 
 // Ayarlar
 import Ayarlar from "./pages/Yonetim/Ayarlar/Ayarlar.jsx";
+import HatirlaticiPanel from "./pages/Headers/components/HatirlaticiPanel.jsx";
 import { t } from "i18next";
 import { get } from "lodash";
 // import Kurallar from "./pages/OnayIslemleri/Kurallar/Kurallar.jsx";
@@ -346,6 +347,43 @@ const BaseLayout = () => {
     token: { colorBgContainer },
   } = theme.useToken();
 
+  const [hatirlaticiPinnable, setHatirlaticiPinnable] = useState(() => localStorage.getItem("hatirlatici_pinnable") === "true");
+  const [hatirlaticiOpen, setHatirlaticiOpen] = useState(() => {
+    return localStorage.getItem("hatirlatici_panel_open") === "true";
+  });
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const pinnable = localStorage.getItem("hatirlatici_pinnable") === "true";
+      setHatirlaticiPinnable(pinnable);
+      if (!pinnable) {
+        setHatirlaticiOpen(false);
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+
+    const handleCustomStorage = () => handleStorageChange();
+    window.addEventListener("hatirlatici_pinnable_changed", handleCustomStorage);
+
+    const handleToggleEvent = () => {
+      const openState = localStorage.getItem("hatirlatici_panel_open") === "true";
+      setHatirlaticiOpen(openState);
+    };
+    window.addEventListener("hatirlatici_panel_open_changed", handleToggleEvent);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("hatirlatici_pinnable_changed", handleCustomStorage);
+      window.removeEventListener("hatirlatici_panel_open_changed", handleToggleEvent);
+    };
+  }, []);
+
+  const handleHatirlaticiToggle = (openVal) => {
+    setHatirlaticiOpen(openVal);
+    localStorage.setItem("hatirlatici_panel_open", openVal.toString());
+    window.dispatchEvent(new Event("hatirlatici_panel_open_changed"));
+  };
+
   // Domain'e göre logo seçimi
   const hostname = window.location.hostname;
   const isOmega = hostname === "omegaerp.net" || hostname === "www.omegaerp.net";
@@ -459,20 +497,23 @@ const BaseLayout = () => {
             )}
             <Headers />
           </Header>
-          <Content style={{ margin: mobileView ? "0 0px" : "0 16px" }}>
-            <Breadcrumbs />
-            <div
-              style={{
-                padding: isLayoutExcluded ? 0 : mobileView ? "24px 0px" : 24,
-                borderRadius: isLayoutExcluded ? 0 : "16px",
-                minHeight: 360,
-                height: "calc(100vh - 132px)",
-                background: isLayoutExcluded ? "transparent" : colorBgContainer,
-              }}
-            >
-              <Outlet />
-            </div>
-          </Content>
+          <div style={{ display: "flex", flex: 1, overflow: "hidden", height: "calc(100vh - 112px)" }}>
+            <Content style={{ margin: mobileView ? "0 0px" : "0 16px", flex: 1, overflow: "auto" }}>
+              <Breadcrumbs />
+              <div
+                style={{
+                  padding: isLayoutExcluded ? 0 : mobileView ? "24px 0px" : 24,
+                  borderRadius: isLayoutExcluded ? 0 : "16px",
+                  minHeight: 360,
+                  height: "calc(100vh - 132px)",
+                  background: isLayoutExcluded ? "transparent" : colorBgContainer,
+                }}
+              >
+                <Outlet />
+              </div>
+            </Content>
+            {hatirlaticiPinnable && <HatirlaticiPanel open={hatirlaticiOpen} onClose={() => handleHatirlaticiToggle(false)} />}
+          </div>
 
           <Footer style={{ textAlign: "center", padding: "10px 50px" }}>Orjin {new Date().getFullYear()} - Design & Develop by Orjin Team</Footer>
         </Layout>

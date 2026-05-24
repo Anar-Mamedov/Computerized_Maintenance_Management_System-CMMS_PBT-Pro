@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Tabs } from "antd";
-import { HomeOutlined, SettingOutlined, ToolOutlined, DatabaseOutlined, CodeOutlined, CarOutlined, TableOutlined } from "@ant-design/icons";
+import { HomeOutlined, SettingOutlined, ToolOutlined, DatabaseOutlined, CodeOutlined, CarOutlined, TableOutlined, LayoutOutlined } from "@ant-design/icons";
 import styled from "styled-components";
 import { t } from "i18next";
 import FirmaBilgileri from "./FirmaBilgileri/FirmaBilgileri";
@@ -12,6 +12,7 @@ import OtomatikKodlar from "./OtomatikKodlar/OtomatikKodlar";
 import YakitIslemleri from "./YakitIslemleri/YakitIslemleri";
 import BakimVeArizaYonetimi from "./BakimVeArizaYonetimi/BakimVeArizaYonetimi";
 import TabloAyarlari from "./TabloAyarlari/TabloAyarlari";
+import AraYuzAyarlari from "./AraYuzAyarlari/AraYuzAyarlari";
 
 const StyledTabs = styled(Tabs)`
   .ant-tabs-tab-active {
@@ -98,6 +99,16 @@ function AyarlarTabs() {
         </div>
       ),
       children: activeKey === "7" && <TabloAyarlari />,
+    },
+    {
+      key: "8",
+      label: (
+        <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+          <LayoutOutlined />
+          <div style={{ paddingTop: "2px" }}>{t("araYuzAyarlari")}</div>
+        </div>
+      ),
+      children: activeKey === "8" && <AraYuzAyarlari />,
     },
     /* {
       key: "6",
