@@ -116,7 +116,7 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
   );
 };
 
-const MainTable = () => {
+const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
   // State definitions...
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
@@ -545,12 +545,12 @@ const MainTable = () => {
   const lastRequestRef = useRef(null);
   
   useEffect(() => {
-    const params = JSON.stringify({ body, currentPage, pageSize });
+    const params = JSON.stringify({ body, currentPage, pageSize, hatirlaticiGrupId, hatirlaticiSiraId });
     if (lastRequestRef.current === params) return;
     lastRequestRef.current = params;
   
     fetchEquipmentData(body, currentPage, pageSize);
-  }, [body, currentPage, pageSize]);
+  }, [body, currentPage, pageSize, hatirlaticiGrupId, hatirlaticiSiraId]);
 
 
   useEffect(() => {
@@ -588,8 +588,11 @@ const MainTable = () => {
   try {
     setLoading(true);
 
+    const endpoint = hatirlaticiGrupId ? "GetTeklifPaketListHatirlatici" : "GetTeklifPaketList";
+    const hatirlaticiParams = hatirlaticiGrupId ? `&hatirlaticiGrupId=${hatirlaticiGrupId}&hatirlaticiSiraId=${hatirlaticiSiraId}` : "";
+
     const response = await AxiosInstance.post(
-      `GetTeklifPaketList?pagingDeger=${currentPage}&pageSize=${size}`,
+      `${endpoint}?pagingDeger=${currentPage}&pageSize=${size}${hatirlaticiParams}`,
       filters
     );
 

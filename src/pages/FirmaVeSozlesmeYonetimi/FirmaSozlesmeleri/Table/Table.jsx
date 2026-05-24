@@ -116,7 +116,7 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
   );
 };
 
-const MainTable = () => {
+const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
   // State definitions...
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
@@ -363,7 +363,7 @@ const MainTable = () => {
   // Status veya Body değiştiğinde veriyi çek
   useEffect(() => {
     fetchEquipmentData();
-  }, [status, body, currentPage, pageSize]); 
+  }, [status, body, currentPage, pageSize, hatirlaticiGrupId, hatirlaticiSiraId]); 
 
   const fetchEquipmentData = useCallback(async () => {
     try {
@@ -374,8 +374,11 @@ const MainTable = () => {
         DurumId: body.DurumId,
       };
 
+      const endpoint = hatirlaticiGrupId ? "GetSozlesmeListHatirlatici" : "GetSozlesmeList";
+      const hatirlaticiParams = hatirlaticiGrupId ? `&hatirlaticiGrupId=${hatirlaticiGrupId}&hatirlaticiSiraId=${hatirlaticiSiraId}` : "";
+
       // Not: API query string ile sayfalama alıyorsa ekledim
-      const res = await AxiosInstance.post(`GetSozlesmeList?page=${currentPage}&pageSize=${pageSize}`, payload);
+      const res = await AxiosInstance.post(`${endpoint}?page=${currentPage}&pageSize=${pageSize}${hatirlaticiParams}`, payload);
 
       if (res && !res.has_error && res.Data) {
         setData(res.Data.GridList || []);
@@ -388,7 +391,7 @@ const MainTable = () => {
     } finally {
       setLoading(false);
     }
-  }, [searchTerm, body, currentPage, pageSize]);
+  }, [searchTerm, body, currentPage, pageSize, hatirlaticiGrupId, hatirlaticiSiraId]);
 
   // --- Frontend Arama (Client-side Search) ---
   const filteredData = useMemo(() => {
