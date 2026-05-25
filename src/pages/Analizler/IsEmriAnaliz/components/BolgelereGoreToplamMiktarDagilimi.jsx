@@ -29,7 +29,7 @@ function IsEmriOzetPaneli({
       subText: "Zamanında tamamlanan",
     },
     {
-      title: "Geciken İş Emri Sayısı",
+      title: "Geciken Periyodik Bakım Sayısı",
       value: "74", 
       subText: "Planlanan bitiş aşıldı",
     },

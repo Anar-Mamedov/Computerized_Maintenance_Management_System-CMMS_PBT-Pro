@@ -1,6 +1,6 @@
-import React, { useMemo } from "react";
-import { Table, Spin, Typography, Select, Dropdown, Button, Tag } from "antd";
-import { MoreOutlined, PartitionOutlined } from "@ant-design/icons";
+import React, { useMemo, useState } from "react";
+import { Table, Spin, Typography, Select, Dropdown, Button, Tag, Modal } from "antd";
+import { MoreOutlined, PartitionOutlined, FullscreenOutlined, InfoCircleOutlined, FileExcelOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
@@ -13,8 +13,12 @@ function IsEmriDagilimVePerformansListesi({
   page,
   pageSize,
   totalItems,
-  onPageChange
+  onPageChange,
+  onExportExcel // Üstten Excel indir fonksiyonu geçilirse diye hazır tutuldu kanka
 }) {
+  // Modal görünürlük state'leri kanka
+  const [isFullscreenModalVisible, setIsFullscreenModalVisible] = useState(false);
+  const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
   
   // Gelen ham veriyi güvenli bir şekilde filtreleyip tabloya hazır hale getiriyoruz
   const data = useMemo(() => {
@@ -34,11 +38,15 @@ function IsEmriDagilimVePerformansListesi({
     }));
   }, [listeData]);
 
-  const menuItems = [
-    { key: "refresh", label: "Verileri Yenile", onClick: onRefresh },
-    { key: "download", label: "Excel İndir" },
-    { key: "info", label: "Bilgi" },
-  ];
+  const calculatedTotal = useMemo(() => {
+    if (totalItems === undefined || totalItems === null || totalItems === 0) {
+      return data.length;
+    }
+    if (data.length < pageSize && totalItems > data.length) {
+      return data.length;
+    }
+    return totalItems;
+  }, [data.length, totalItems, pageSize]);
 
   const formatCurrencyString = (val) => {
     if (!val) return "₺0,00";
@@ -47,7 +55,7 @@ function IsEmriDagilimVePerformansListesi({
   };
   
   const getBreakdownLabel = () => {
-    if (breakdownType === 1) return "İş Emri Tipleri";
+    if (breakdownType === 1 || breakdownType === "Tip") return "İş Emri Tipleri";
     if (breakdownType === 2) return "Lokasyonlar";
     if (breakdownType === 3) return "Ekipman Tipleri";
     if (breakdownType === 4) return "Atölyeler";
@@ -98,7 +106,7 @@ function IsEmriDagilimVePerformansListesi({
       render: (value) => formatCurrencyString(value),
     },
     {
-      title: "Ort. Tamamlama",
+      title: "Ort. Tamamlanma",
       dataIndex: "OrtTamamlama",
       key: "OrtTamamlama",
       align: "center",
@@ -134,6 +142,49 @@ function IsEmriDagilimVePerformansListesi({
       ),
     },
   ];
+
+  // Kanka menü elemanlarını isteğine göre güncelledim
+  const menuItems = [
+    { 
+      key: "download", 
+      label: "Excel İndir",
+      onClick: () => { if (onExportExcel) onExportExcel(); else console.log("Excel indiriliyor..."); } 
+    },
+    { 
+      key: "fullscreen", 
+      label: "Tam Ekran Aç",
+      onClick: () => setIsFullscreenModalVisible(true) 
+    },
+    { 
+      key: "info", 
+      label: "Bilgi",
+      onClick: () => setIsInfoModalVisible(true) 
+    },
+  ];
+
+  // Tablo şablonunu çıkardım kanka, hem ana ekranda hem modalda ortak çizilsin diye
+  const renderTableContent = () => (
+    <Table
+      columns={columns}
+      dataSource={data}
+      size="middle"
+      bordered={false}
+      pagination={{
+        current: page,
+        pageSize: pageSize,
+        total: calculatedTotal, 
+        showSizeChanger: true,
+        pageSizeOptions: ["10", "20", "50", "100"],
+        position: ["bottomRight"],
+        size: "small",
+        onChange: (currentPage, currentPageSize) => {
+          if (onPageChange) {
+            onPageChange(currentPage, currentPageSize);
+          }
+        }
+      }}
+    />
+  );
 
   return (
     <div
@@ -179,8 +230,8 @@ function IsEmriDagilimVePerformansListesi({
               { value: 4, label: "Atölyeler" },
             ]}
           />
-          <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
-            <Button type="text" icon={<MoreOutlined />} />
+          <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
+            <Button type="text" icon={<MoreOutlined style={{ fontSize: "18px" }} />} />
           </Dropdown>
         </div>
       </div>
@@ -188,29 +239,69 @@ function IsEmriDagilimVePerformansListesi({
       {/* Tablo Alanı */}
       <div style={{ width: "100%", overflowX: "auto" }}>
         <Spin spinning={loading}>
-          <Table
-            columns={columns}
-            dataSource={data}
-            size="middle"
-            bordered={false}
-            // Kanka dinamik sayfalama ayarları tam burası:
-            pagination={{
-              current: page,
-              pageSize: pageSize,
-              total: totalItems || 0,
-              showSizeChanger: true,
-              pageSizeOptions: ["10", "20", "50", "100"],
-              position: ["bottomRight"],
-              size: "small",
-              onChange: (currentPage, currentPageSize) => {
-                if (onPageChange) {
-                  onPageChange(currentPage, currentPageSize);
-                }
-              }
-            }}
-          />
+          {renderTableContent()}
         </Spin>
       </div>
+
+      {/* 1. TAM EKRAN / BÜYÜT MODALI KANKA */}
+      <Modal
+        title={
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <PartitionOutlined />
+            <span>1. İş Emri Dağılım ve Performans Listesi (Genişletilmiş Görünüm)</span>
+          </div>
+        }
+        open={isFullscreenModalVisible}
+        onCancel={() => setIsFullscreenModalVisible(false)}
+        footer={null}
+        width="95%"
+        centered
+        destroyOnClose
+      >
+        <div style={{ paddingTop: "15px" }}>
+          <Spin spinning={loading}>
+            {renderTableContent()}
+          </Spin>
+        </div>
+      </Modal>
+
+      {/* 2. BİLGİ MODALI KANKA */}
+      <Modal
+        title={
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span>Dağılım Listesi</span>
+          </div>
+        }
+        open={isInfoModalVisible}
+        onCancel={() => setIsInfoModalVisible(false)}
+        footer={[
+          <Button key="close" type="primary" onClick={() => setIsInfoModalVisible(false)}>
+            Anladım
+          </Button>
+        ]}
+        centered
+      >
+        <div style={{ padding: "10px 0", display: "flex", flexDirection: "column", gap: "12px" }}>
+          <div>
+            <Text strong style={{ display: "block", marginBottom: "4px" }}>Ne işe yarar?</Text>
+            <Text type="secondary">
+              Kırılım bazlı iş yükü ve maliyet analizi yapar.
+            </Text>
+          </div>
+          <div>
+            <Text strong style={{ display: "block", marginBottom: "4px" }}>Nasıl Yorumlanmalı?</Text>
+            <Text type="secondary">
+              Yüksek adet + yüksek maliyet = kritik alan.
+            </Text>
+          </div>
+          <div>
+            <Text strong style={{ display: "block", marginBottom: "4px" }}>Ne yapmalısın?</Text>
+            <Text type="secondary">
+              Bu alanlara özel iyileştirme planı oluştur.
+            </Text>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
