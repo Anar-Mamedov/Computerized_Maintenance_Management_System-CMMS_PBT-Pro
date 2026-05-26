@@ -6,10 +6,11 @@ import { t } from "i18next";
 
 const { Text } = Typography;
 
-// Ana ekrandan gelen apiData (yani ToplamIsEmri) ve loading proplarını yakalıyoruz
-function Component5({ apiData, loading }) {
+// Kanka isEmriAd prop'unu buraya ekledik
+function Component5({ apiData, isEmriAd, loading }) {
 
-  const renderCard = (value, label, backgroundColor, unit, isLoading) => (
+  // subValue (isEmriAd) parametresini renderCard fonksiyonuna ekledik
+  const renderCard = (value, subValue, label, backgroundColor, unit, isLoading) => (
     <div
       style={{
         width: "100%",
@@ -47,20 +48,28 @@ function Component5({ apiData, loading }) {
         >
           {/* Sol Taraf: Metin İçerikleri */}
           <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
-            <Text style={{ fontWeight: "600", fontSize: "28px", color: "#1f1f1f" }}>
+            <Text style={{ fontWeight: "600", fontSize: "24px", color: "#1f1f1f", lineHeight: "1.2" }}>
               {value !== null && value !== undefined ? (
                 <>
                   {Number(value).toLocaleString("tr-TR", {
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 0,
                   })}
-                  {unit && <span style={{ fontSize: "18px", color: "#8c8c8c" }}> ({unit})</span>}
+                  {unit && <span style={{ fontSize: "16px", color: "#8c8c8c" }}> ({unit})</span>}
                 </>
               ) : (
                 "0"
               )}
+              
+              {/* Kanka apiData'nın yanına / işareti ile isEmriAd'ı buraya bastık */}
+              {subValue && (
+                <span style={{ fontSize: "16px", color: "#595959", fontWeight: "400" }}>
+                  {` / ${subValue}`}
+                </span>
+              )}
             </Text>
-            <Text style={{ color: "#8c8c8c", fontSize: "14px", fontWeight: "500", marginTop: "4px" }}>
+            
+            <Text style={{ color: "#8c8c8c", fontSize: "14px", fontWeight: "500", marginTop: "6px" }}>
               {label}
             </Text>
           </div>
@@ -72,11 +81,12 @@ function Component5({ apiData, loading }) {
   return (
     <div style={{ width: "100%", height: "100%" }}>
       {renderCard(
-        apiData, // Ana ekrandan gelen doğrudan ToplamIsEmri değeri
+        apiData, 
+        isEmriAd, // Buradan fonksiyona pasladık
         t("En Uzun Süren İş Emri"), 
         null, 
-        null, 
-        loading // Ana ekrandan gelen yükleniyor state'i
+        t("Saat"), // Null yerine istersen birim olarak Saat yazabilirsin, burayı eski haline (null) de çekebilirsin.
+        loading 
       )}
     </div>
   );

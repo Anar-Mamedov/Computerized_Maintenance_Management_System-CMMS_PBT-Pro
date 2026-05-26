@@ -60,8 +60,11 @@ function Component2({ apiData, loading }) {
                 "0"
               )}
             </Text>
-            <Text style={{ color: "#8c8c8c", fontSize: "14px", fontWeight: "500", marginTop: "4px" }}>
+            <Text style={{ color: "#8c8c8c", fontSize: "12px", fontWeight: "500", marginTop: "4px" }}>
               {label}
+            </Text>
+            <Text style={{ color: "#8c8c8c", fontSize: "11px", fontWeight: "500", marginTop: "4px" }}>
+              Çalışma süresi / personel
             </Text>
           </div>
         </div>

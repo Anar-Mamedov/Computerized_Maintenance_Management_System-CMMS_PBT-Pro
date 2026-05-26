@@ -47,7 +47,7 @@ function Component1({ apiData, loading }) {
         >
           {/* Sol Taraf: Metin İçerikleri */}
           <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
-            <Text style={{ fontWeight: "600", fontSize: "28px", color: "#1f1f1f" }}>
+            <Text style={{ fontWeight: "600", fontSize: "24px", color: "#1f1f1f" }}>
               {value !== null && value !== undefined ? (
                 <>
                   {Number(value).toLocaleString("tr-TR", {
@@ -60,8 +60,11 @@ function Component1({ apiData, loading }) {
                 "0"
               )}
             </Text>
-            <Text style={{ color: "#8c8c8c", fontSize: "14px", fontWeight: "500", marginTop: "4px" }}>
+            <Text style={{ color: "#8c8c8c", fontSize: "12px", fontWeight: "500", marginTop: "4px" }}>
               {label}
+            </Text>
+            <Text style={{ color: "#8c8c8c", fontSize: "11px", fontWeight: "500", marginTop: "4px" }}>
+              Çalışma süresi / personel
             </Text>
           </div>
         </div>
