@@ -157,6 +157,7 @@ export const rawItems = [
       getItem("Personel KPI Analizi", "analizler", true, undefined, true, "KLL_WEB_ANALIZ"),
       getItem("Bakım KPI Analizi", "bakimKpi", true),
       getItem("İş Emri Analizi", "isEmriAnaliz", true),
+      getItem("Ekipman Analizi", "ekipmanAnaliz", true),
     ],
     false
   ),
