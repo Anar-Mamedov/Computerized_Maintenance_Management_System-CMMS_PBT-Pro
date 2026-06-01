@@ -18,16 +18,21 @@ import Component4 from "./components/Component4.jsx";
 import Component5 from "./components/Component5.jsx";
 import Component7 from "./components/Component7.jsx";
 import Component8 from "./components/Component8.jsx";
+import Component9 from "./components/Component9.jsx";
+import Component10 from "./components/Component10.jsx";
+import Component11 from "./components/Component11.jsx";
+import Component12 from "./components/Component12.jsx";
+import Component13 from "./components/Component13.jsx";
+import Component14 from "./components/Component14.jsx";
 import IsEmriTable from "./components/Table/Table.jsx";
 import AylikYakitTuketimleri from "./components/AylikYakitTuketimleri.jsx";
 import LokasyonBazindaYakitTuketimleri from "./components/LokasyonBazindaYakitTuketimleri.jsx";
-import BolgelereGoreToplamMiktarDagilimi from "./components/BolgelereGoreToplamMiktarDagilimi.jsx";
 import AylikMaliyetler from "./components/AylikMaliyetler.jsx";
 import AylikKM from "./components/AylikKM.jsx";
 import ArizaliMakineler from "./components/ArizaliMakineler.jsx";
 
 import AxiosInstance from "../../../api/http.jsx";
-import dayjs from "dayjs"; // Tarih formatlama için ekledik kanka
+import dayjs from "dayjs";
 
 const { Text } = Typography;
 
@@ -37,7 +42,6 @@ const widgetTitles = {
   widget3: "Toplam İş Emri Maliyeti",
   widget4: "En Yavaş Müdahele Süresi",
   widget7: "Ortalama Çalışma Süresi",
-  widget14: "İş Emri Özet Paneli",
   widget5: "Müdahele Süresi Histogramı",
   widget19: "Aylık Müdahele Süresi",
   widget6: "İş Talebi Tipleri / Atölyeler",
@@ -46,15 +50,31 @@ const widgetTitles = {
   widget20: "2. İş Emirleri Maliyet ve Performans Analizi",
   widget21: "3. Makine Arıza ve Müdahale Öncelik Analizi",
   widget22: "4. Atölye Performans Karşılaştırması",
+  widget23: "Ortalama Tamamlanma Süresi",
+  widget24: "Personel Verimliliği",
+  widget25: "Planlanan Bakıma Uyum",
+  widget26: "Geciken İş Emri Sayısı",
+  widget27: "En Yüksek Maliyetli İş Emri",
+  widget28: "En Uzun Süren İş Emri",
 };
 
 const defaultItems = [
+  // 1. Satır KPI Kartları (Y geniğliği 1 olanlar kanka)
   { id: "widget1", x: 0, y: 0, width: 2, height: 1, minW: 2, minH: 1 },
   { id: "widget2", x: 2, y: 0, width: 2, height: 1, minW: 2, minH: 1 },
   { id: "widget3", x: 4, y: 0, width: 2, height: 1, minW: 2, minH: 1 },
   { id: "widget4", x: 6, y: 0, width: 2, height: 1, minW: 2, minH: 1 },
   { id: "widget7", x: 8, y: 0, width: 4, height: 1, minW: 2, minH: 1 },
-  { id: "widget14", x: 0, y: 1, width: 12, height: 1, minW: 3, minH: 1 },
+  
+  // KANKA DÜZELTME: Yeni eklediğin 6 kartın y koordinatlarını 1 yaptım ki üsttekilerle çakışmasın
+  { id: "widget23", x: 0, y: 1, width: 2, height: 1, minW: 2, minH: 1 },
+  { id: "widget24", x: 2, y: 1, width: 2, height: 1, minW: 2, minH: 1 },
+  { id: "widget25", x: 4, y: 1, width: 2, height: 1, minW: 2, minH: 1 },
+  { id: "widget26", x: 6, y: 1, width: 2, height: 1, minW: 2, minH: 1 },
+  { id: "widget27", x: 8, y: 1, width: 2, height: 1, minW: 2, minH: 1 },
+  { id: "widget28", x: 10, y: 1, width: 2, height: 1, minW: 2, minH: 1 },
+  
+  // Grafikler ve Tablolar (Alt satırlara kaydırıldı)
   { id: "widget5", x: 0, y: 2, width: 6, height: 3, minW: 3, minH: 2 },
   { id: "widget19", x: 6, y: 2, width: 6, height: 3, minW: 3, minH: 2 },
   { id: "widget6", x: 0, y: 5, width: 6, height: 4, minW: 3, minH: 2 },
@@ -86,11 +106,11 @@ function MainDashboard() {
   const [checkedWidgets, setCheckedWidgets] = useState({
     widget1: false, widget2: false, widget3: false, widget4: false,
     widget5: false, widget6: false, widget7: false, widget11: false,
-    widget14: false, widget18: false, widget19: false, widget20: false,
-    widget21: false, widget22: false,
+    widget18: false, widget19: false, widget20: false, widget21: false, 
+    widget22: false, widget23: false, widget24: false, widget25: false, 
+    widget26: false, widget27: false, widget28: false,
   });
 
-  // TarihFilter bileşeni default olarak Son 3 Ayı buraya yazacak kanka
   const methods = useForm({
     defaultValues: {
       BaslangicTarihi: null,
@@ -105,7 +125,6 @@ function MainDashboard() {
   const selectedDashboard = "IsEmriAnaliz";
   const currentFilters = watch();
 
-  // 1. Dashboard API İstek Mekanizması
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
@@ -122,11 +141,11 @@ function MainDashboard() {
     } catch (error) {
       console.error("Dashboard API hatası:", error);
     } finally {
+      setDashboardData(prev => prev); // Defensive bypass
       setLoading(false);
     }
   };
 
-  // 2. Listeler API İstek Mekanizması
   const fetchListData = async (targetTable = "all") => {
     setLoading(true);
     try {
@@ -152,15 +171,17 @@ function MainDashboard() {
         payload
       );
 
+      const responseData = response?.data?.data || response?.data;
+
       if (targetTable === "all") {
-        setListData(response?.data?.data || response?.data || null);
+        setListData(responseData || null);
       } else {
         setListData(prevData => ({
           ...prevData,
-          ...(targetTable === "table1" && { Liste1: response?.data?.data?.Liste1 || response?.data?.Liste1 }),
-          ...(targetTable === "table2" && { Liste2: response?.data?.data?.Liste2 || response?.data?.Liste2 }),
-          ...(targetTable === "table3" && { Liste3: response?.data?.data?.Liste3 || response?.data?.Liste3 }),
-          ...(targetTable === "table4" && { Liste4: response?.data?.data?.Liste4 || response?.data?.Liste4 }),
+          ...(targetTable === "table1" && { Liste1: responseData?.Liste1 || [], Liste1TotalCount: responseData?.Liste1TotalCount || 0 }),
+          ...(targetTable === "table2" && { Liste2: responseData?.Liste2 || [], Liste2TotalCount: responseData?.Liste2TotalCount || 0 }),
+          ...(targetTable === "table3" && { Liste3: responseData?.Liste3 || [], Liste3TotalCount: responseData?.Liste3TotalCount || 0 }),
+          ...(targetTable === "table4" && { Liste4: responseData?.Liste4 || [], Liste4TotalCount: responseData?.Liste4TotalCount || 0 }),
         }));
       }
     } catch (error) {
@@ -175,31 +196,16 @@ function MainDashboard() {
     fetchListData("all");
   };
 
-  // KANKA KRİTİK DÜZELTME: Ekran ilk açıldığında TarihFilter'dan gelen default (Son 3 Ay) tarihlerini
-  // yakalayıp API isteklerini otomatik olarak o tarihlerle tetikliyoruz.
   useEffect(() => {
     if (currentFilters.BaslangicTarihi && currentFilters.BitisTarihi) {
       handleQuery();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentFilters.BaslangicTarihi, currentFilters.BitisTarihi]);
 
-  // Sayfalama ve kırılım takipleri
-  useEffect(() => {
-    if (listData) fetchListData("table1");
-  }, [page1, pageSize1]);
-
-  useEffect(() => {
-    if (listData) fetchListData("table2");
-  }, [page2, pageSize2]);
-
-  useEffect(() => {
-    if (listData) fetchListData("table3");
-  }, [page3, pageSize3]);
-
-  useEffect(() => {
-    if (listData) fetchListData("table4");
-  }, [page4, pageSize4]);
+  useEffect(() => { if (listData) fetchListData("table1"); }, [page1, pageSize1]);
+  useEffect(() => { if (listData) fetchListData("table2"); }, [page2, pageSize2]);
+  useEffect(() => { if (listData) fetchListData("table3"); }, [page3, pageSize3]);
+  useEffect(() => { if (listData) fetchListData("table4"); }, [page4, pageSize4]);
 
   useEffect(() => {
     setPage1(1); setPage2(1); setPage3(1); setPage4(1);
@@ -300,293 +306,156 @@ function MainDashboard() {
         switch (item.id) {
           case "widget1":
             root.render(
-              <FormProvider {...methods}>
-                <I18nextProvider i18n={i18n}>
-                  <ConfigProvider locale={trTR}>
-                    <AppProvider>
-                      <BrowserRouter>
-                        <Component1
-                          apiData={dashboardData ? dashboardData.ToplamIsEmri : null}
-                          loading={loading}
-                        />
-                      </BrowserRouter>
-                    </AppProvider>
-                  </ConfigProvider>
-                </I18nextProvider>
-              </FormProvider>
+              <FormProvider {...methods}><I18nextProvider i18n={i18n}><ConfigProvider locale={trTR}><AppProvider><BrowserRouter>
+                <Component1 apiData={dashboardData ? dashboardData.ToplamIsEmri : null} loading={loading} />
+              </BrowserRouter></AppProvider></ConfigProvider></I18nextProvider></FormProvider>
             );
             break;
           case "widget2":
             root.render(
-              <FormProvider {...methods}>
-                <I18nextProvider i18n={i18n}>
-                  <ConfigProvider locale={trTR}>
-                    <AppProvider>
-                      <BrowserRouter>
-                        <Component2
-                          apiData={dashboardData ? dashboardData.AcikIsEmirleri : null}
-                          loading={loading}
-                        />
-                      </BrowserRouter>
-                    </AppProvider>
-                  </ConfigProvider>
-                </I18nextProvider>
-              </FormProvider>
+              <FormProvider {...methods}><I18nextProvider i18n={i18n}><ConfigProvider locale={trTR}><AppProvider><BrowserRouter>
+                <Component2 apiData={dashboardData ? dashboardData.AcikIsEmirleri : null} loading={loading} />
+              </BrowserRouter></AppProvider></ConfigProvider></I18nextProvider></FormProvider>
             );
             break;
           case "widget3":
             root.render(
-              <FormProvider {...methods}>
-                <I18nextProvider i18n={i18n}>
-                  <ConfigProvider locale={trTR}>
-                    <AppProvider>
-                      <BrowserRouter>
-                        <Component3
-                          apiData={dashboardData ? dashboardData.ToplamMaliyet : null}
-                          loading={loading}
-                        />
-                      </BrowserRouter>
-                    </AppProvider>
-                  </ConfigProvider>
-                </I18nextProvider>
-              </FormProvider>
+              <FormProvider {...methods}><I18nextProvider i18n={i18n}><ConfigProvider locale={trTR}><AppProvider><BrowserRouter>
+                <Component3 apiData={dashboardData ? dashboardData.ToplamMaliyet : null} loading={loading} />
+              </BrowserRouter></AppProvider></ConfigProvider></I18nextProvider></FormProvider>
             );
             break;
           case "widget4":
             root.render(
-              <FormProvider {...methods}>
-                <I18nextProvider i18n={i18n}>
-                  <ConfigProvider locale={trTR}>
-                    <AppProvider>
-                      <BrowserRouter>
-                        <Component4
-                          apiData={dashboardData ? dashboardData.OrtalamaKapanisSuresiGun : null}
-                          loading={loading}
-                        />
-                      </BrowserRouter>
-                    </AppProvider>
-                  </ConfigProvider>
-                </I18nextProvider>
-              </FormProvider>
+              <FormProvider {...methods}><I18nextProvider i18n={i18n}><ConfigProvider locale={trTR}><AppProvider><BrowserRouter>
+                <Component4 apiData={dashboardData ? dashboardData.OrtalamaKapanisSuresiGun : null} loading={loading} />
+              </BrowserRouter></AppProvider></ConfigProvider></I18nextProvider></FormProvider>
             );
             break;
           case "widget7":
             root.render(
-              <FormProvider {...methods}>
-                <I18nextProvider i18n={i18n}>
-                  <ConfigProvider locale={trTR}>
-                    <AppProvider>
-                      <BrowserRouter>
-                        <Component5
-                          apiData={dashboardData ? dashboardData.GecikenIsEmirleri : null}
-                          loading={loading}
-                        />
-                      </BrowserRouter>
-                    </AppProvider>
-                  </ConfigProvider>
-                </I18nextProvider>
-              </FormProvider>
+              <FormProvider {...methods}><I18nextProvider i18n={i18n}><ConfigProvider locale={trTR}><AppProvider><BrowserRouter>
+                <Component5 apiData={dashboardData ? dashboardData.GecikenIsEmirleri : null} loading={loading} />
+              </BrowserRouter></AppProvider></ConfigProvider></I18nextProvider></FormProvider>
             );
             break;
           case "widget5":
             root.render(
-              <FormProvider {...methods}>
-                <I18nextProvider i18n={i18n}>
-                  <ConfigProvider locale={trTR}>
-                    <AppProvider>
-                      <BrowserRouter>
-                        <Component7
-                          tipDagilimi={dashboardData ? dashboardData.TipDagilimi : null}
-                          durumDagilimi={dashboardData ? dashboardData.DurumDagilimi : null} 
-                          loading={loading}
-                        />
-                      </BrowserRouter>
-                    </AppProvider>
-                  </ConfigProvider>
-                </I18nextProvider>
-              </FormProvider>
+              <FormProvider {...methods}><I18nextProvider i18n={i18n}><ConfigProvider locale={trTR}><AppProvider><BrowserRouter>
+                <Component7 tipDagilimi={dashboardData ? dashboardData.TipDagilimi : null} durumDagilimi={dashboardData ? dashboardData.DurumDagilimi : null} loading={loading} />
+              </BrowserRouter></AppProvider></ConfigProvider></I18nextProvider></FormProvider>
             );
             break;
           case "widget6":
             root.render(
-              <FormProvider {...methods}>
-                <I18nextProvider i18n={i18n}>
-                  <ConfigProvider locale={trTR}>
-                    <AppProvider>
-                      <BrowserRouter>
-                        <Component8
-                          atolyeDagilimi={dashboardData ? dashboardData.AtolyeDagilimi : null} 
-                          loading={loading}
-                        />
-                      </BrowserRouter>
-                    </AppProvider>
-                  </ConfigProvider>
-                </I18nextProvider>
-              </FormProvider>
+              <FormProvider {...methods}><I18nextProvider i18n={i18n}><ConfigProvider locale={trTR}><AppProvider><BrowserRouter>
+                <Component8 atolyeDagilimi={dashboardData ? dashboardData.AtolyeDagilimi : null} loading={loading} />
+              </BrowserRouter></AppProvider></ConfigProvider></I18nextProvider></FormProvider>
             );
             break;
           case "widget11":
             root.render(
-              <FormProvider {...methods}>
-                <I18nextProvider i18n={i18n}>
-                  <ConfigProvider locale={trTR}>
-                    <AppProvider>
-                      <BrowserRouter>
-                        <IsEmriTable
-                          listeData={listData ? listData.Liste1 : null} 
-                          loading={loading}
-                          breakdownType={breakdownType}
-                          onBreakdownTypeChange={(val) => setBreakdownType(val)}
-                          onRefresh={() => fetchListData("table1")}
-                          page={page1}
-                          pageSize={pageSize1}
-                          totalItems={listData?.TotalCount1 || 100} 
-                          onPageChange={(p, ps) => {
-                            setPage1(p);
-                            setPageSize1(ps);
-                          }}
-                        />
-                      </BrowserRouter>
-                    </AppProvider>
-                  </ConfigProvider>
-                </I18nextProvider>
-              </FormProvider>
+              <FormProvider {...methods}><I18nextProvider i18n={i18n}><ConfigProvider locale={trTR}><AppProvider><BrowserRouter>
+                <IsEmriTable
+                  listeData={listData ? (breakdownType === "Tip" || breakdownType === 1 ? listData.Liste1 : listData.Liste2) : null} 
+                  loading={loading}
+                  breakdownType={breakdownType}
+                  onBreakdownTypeChange={(val) => setBreakdownType(val)}
+                  onRefresh={() => fetchListData("table1")}
+                  page={page1}
+                  pageSize={pageSize1}
+                  totalItems={listData ? (breakdownType === "Tip" || breakdownType === 1 ? listData.Liste1TotalCount : listData.Liste2TotalCount) : 0} 
+                  onPageChange={(p, ps) => { setPage1(p); setPageSize1(ps); }}
+                />
+              </BrowserRouter></AppProvider></ConfigProvider></I18nextProvider></FormProvider>
             );
             break;
-          case "widget14":
+
+          // KANKA YENİ KARTLARIN MAZONLARI (DOM ROOT RENDER YAPILARI) BURADA TOPARLANDI:
+          case "widget23":
             root.render(
-              <FormProvider {...methods}>
-                <I18nextProvider i18n={i18n}>
-                  <ConfigProvider locale={trTR}>
-                    <AppProvider>
-                      <BrowserRouter>
-                        <BolgelereGoreToplamMiktarDagilimi
-                          personelVerimliligiSaat={dashboardData ? dashboardData.PersonelVerimliligiSaat : null}
-                          planlananBakimaUyumYuzde={dashboardData ? dashboardData.PlanlananBakimaUyumYuzde : null}
-                          enYuksekMaliyetliIsEmriAd={dashboardData ? dashboardData.EnYuksekMaliyetliIsEmriAd : null}
-                          enYuksekMaliyetliTutar={dashboardData ? dashboardData.EnYuksekMaliyetliTutar : null}
-                          enUzunSurenIsEmriAd={dashboardData ? dashboardData.EnUzunSurenIsEmriAd : null}
-                          loading={loading}
-                        />
-                      </BrowserRouter>
-                    </AppProvider>
-                  </ConfigProvider>
-                </I18nextProvider>
-              </FormProvider>
+              <FormProvider {...methods}><I18nextProvider i18n={i18n}><ConfigProvider locale={trTR}><AppProvider><BrowserRouter>
+                <Component9 apiData={null} loading={loading} />
+              </BrowserRouter></AppProvider></ConfigProvider></I18nextProvider></FormProvider>
             );
             break;
+          case "widget24":
+            root.render(
+              <FormProvider {...methods}><I18nextProvider i18n={i18n}><ConfigProvider locale={trTR}><AppProvider><BrowserRouter>
+                <Component10 apiData={dashboardData ? dashboardData.PersonelVerimliligiSaat : null} loading={loading} />
+              </BrowserRouter></AppProvider></ConfigProvider></I18nextProvider></FormProvider>
+            );
+            break;
+          case "widget25":
+            root.render(
+              <FormProvider {...methods}><I18nextProvider i18n={i18n}><ConfigProvider locale={trTR}><AppProvider><BrowserRouter>
+                <Component11 apiData={dashboardData ? dashboardData.PlanlananBakimaUyumYuzde : null} loading={loading} />
+              </BrowserRouter></AppProvider></ConfigProvider></I18nextProvider></FormProvider>
+            );
+            break;
+          case "widget26":
+            root.render(
+              <FormProvider {...methods}><I18nextProvider i18n={i18n}><ConfigProvider locale={trTR}><AppProvider><BrowserRouter>
+                <Component12 apiData={null} loading={loading} />
+              </BrowserRouter></AppProvider></ConfigProvider></I18nextProvider></FormProvider>
+            );
+            break;
+          case "widget27":
+            root.render(
+              <FormProvider {...methods}><I18nextProvider i18n={i18n}><ConfigProvider locale={trTR}><AppProvider><BrowserRouter>
+                <Component13 
+                  apiData={dashboardData ? dashboardData.EnYuksekMaliyetliTutar : null} 
+                  isEmriAd={dashboardData ? dashboardData.EnYuksekMaliyetliIsEmriAd : null} // Kanka ad buraya eklendi
+                  loading={loading} 
+                />
+              </BrowserRouter></AppProvider></ConfigProvider></I18nextProvider></FormProvider>
+            );
+            break;
+          case "widget28":
+            root.render(
+              <FormProvider {...methods}><I18nextProvider i18n={i18n}><ConfigProvider locale={trTR}><AppProvider><BrowserRouter>
+                <Component14 
+                  apiData={dashboardData ? dashboardData.EnUzunSurenSaat : null} 
+                  isEmriAd={dashboardData ? dashboardData.EnUzunSurenIsEmriAd : null} // Kanka ad buraya eklendi
+                  loading={loading} 
+                />
+              </BrowserRouter></AppProvider></ConfigProvider></I18nextProvider></FormProvider>
+            );
+            break;
+
           case "widget18":
             root.render(
-              <FormProvider {...methods}>
-                <I18nextProvider i18n={i18n}>
-                  <ConfigProvider locale={trTR}>
-                    <AppProvider>
-                      <BrowserRouter>
-                        <LokasyonBazindaYakitTuketimleri
-                          aylikTrendler={dashboardData ? dashboardData.AylikTrendler : null} 
-                          loading={loading}
-                        />
-                      </BrowserRouter>
-                    </AppProvider>
-                  </ConfigProvider>
-                </I18nextProvider>
-              </FormProvider>
+              <FormProvider {...methods}><I18nextProvider i18n={i18n}><ConfigProvider locale={trTR}><AppProvider><BrowserRouter>
+                <LokasyonBazindaYakitTuketimleri aylikTrendler={dashboardData ? dashboardData.AylikTrendler : null} loading={loading} />
+              </BrowserRouter></AppProvider></ConfigProvider></I18nextProvider></FormProvider>
             );
             break;
           case "widget19":
             root.render(
-              <FormProvider {...methods}>
-                <I18nextProvider i18n={i18n}>
-                  <ConfigProvider locale={trTR}>
-                    <AppProvider>
-                      <BrowserRouter>
-                        <AylikYakitTuketimleri
-                          aylikTrendler={dashboardData ? dashboardData.AylikTrendler : null} 
-                          loading={loading}
-                        />
-                      </BrowserRouter>
-                    </AppProvider>
-                  </ConfigProvider>
-                </I18nextProvider>
-              </FormProvider>
+              <FormProvider {...methods}><I18nextProvider i18n={i18n}><ConfigProvider locale={trTR}><AppProvider><BrowserRouter>
+                <AylikYakitTuketimleri aylikTrendler={dashboardData ? dashboardData.AylikTrendler : null} loading={loading} />
+              </BrowserRouter></AppProvider></ConfigProvider></I18nextProvider></FormProvider>
             );
             break;
           case "widget20":
             root.render(
-              <FormProvider {...methods}>
-                <I18nextProvider i18n={i18n}>
-                  <ConfigProvider locale={trTR}>
-                    <AppProvider>
-                      <BrowserRouter>
-                        <ArizaliMakineler
-                          listeData={listData ? listData.Liste2 : null} 
-                          loading={loading}
-                          page={page2}
-                          pageSize={pageSize2}
-                          totalItems={listData?.TotalCount2 || 100} 
-                          onPageChange={(p, ps) => {
-                            setPage2(p);
-                            setPageSize2(ps);
-                          }}
-                        />
-                      </BrowserRouter>
-                    </AppProvider>
-                  </ConfigProvider>
-                </I18nextProvider>
-              </FormProvider>
+              <FormProvider {...methods}><I18nextProvider i18n={i18n}><ConfigProvider locale={trTR}><AppProvider><BrowserRouter>
+                <ArizaliMakineler listeData={listData ? listData.Liste2 : null} loading={loading} page={page2} pageSize={pageSize2} totalItems={listData ? listData.Liste2TotalCount : 0} onPageChange={(p, ps) => { setPage2(p); setPageSize2(ps); }} />
+              </BrowserRouter></AppProvider></ConfigProvider></I18nextProvider></FormProvider>
             );
             break;
           case "widget21":
             root.render(
-              <FormProvider {...methods}>
-                <I18nextProvider i18n={i18n}>
-                  <ConfigProvider locale={trTR}>
-                    <AppProvider>
-                      <BrowserRouter>
-                        <AylikKM
-                          listeData={listData ? listData.Liste3 : null} 
-                          loading={loading}
-                          page={page3}
-                          pageSize={pageSize3}
-                          totalItems={listData?.TotalCount3 || 100} 
-                          onPageChange={(p, ps) => {
-                            setPage3(p);
-                            setPageSize3(ps);
-                          }}
-                        />
-                      </BrowserRouter>
-                    </AppProvider>
-                  </ConfigProvider>
-                </I18nextProvider>
-              </FormProvider>
+              <FormProvider {...methods}><I18nextProvider i18n={i18n}><ConfigProvider locale={trTR}><AppProvider><BrowserRouter>
+                <AylikKM listeData={listData ? listData.Liste3 : null} loading={loading} page={page3} pageSize={pageSize3} totalItems={listData ? listData.Liste3TotalCount : 0} onPageChange={(p, ps) => { setPage3(p); setPageSize3(ps); }} />
+              </BrowserRouter></AppProvider></ConfigProvider></I18nextProvider></FormProvider>
             );
             break;
           case "widget22":
             root.render(
-              <FormProvider {...methods}>
-                <I18nextProvider i18n={i18n}>
-                  <ConfigProvider locale={trTR}>
-                    <AppProvider>
-                      <BrowserRouter>
-                        <AylikMaliyetler
-                          listeData={listData ? listData.Liste4 : null} 
-                          loading={loading}
-                          breakdownType={breakdownType}
-                          onBreakdownTypeChange={(val) => setBreakdownType(val)}
-                          onRefresh={() => fetchListData("table4")}
-                          page={page4}
-                          pageSize={pageSize4}
-                          totalItems={listData?.TotalCount4 || 100} 
-                          onPageChange={(p, ps) => {
-                            setPage4(p);
-                            setPageSize4(ps);
-                          }}
-                        />
-                      </BrowserRouter>
-                    </AppProvider>
-                  </ConfigProvider>
-                </I18nextProvider>
-              </FormProvider>
+              <FormProvider {...methods}><I18nextProvider i18n={i18n}><ConfigProvider locale={trTR}><AppProvider><BrowserRouter>
+                <AylikMaliyetler listeData={listData ? listData.Liste4 : null} loading={loading} breakdownType={breakdownType} onBreakdownTypeChange={(val) => setBreakdownType(val)} onRefresh={() => fetchListData("table4")} page={page4} pageSize={pageSize4} totalItems={listData ? listData.Liste4TotalCount : 0} onPageChange={(p, ps) => { setPage4(p); setPageSize4(ps); }} />
+              </BrowserRouter></AppProvider></ConfigProvider></I18nextProvider></FormProvider>
             );
             break;
           default:
@@ -599,8 +468,9 @@ function MainDashboard() {
       const newChecked = {
         widget1: false, widget2: false, widget3: false, widget4: false,
         widget5: false, widget6: false, widget7: false, widget11: false,
-        widget14: false, widget18: false, widget19: false, widget20: false,
-        widget21: false, widget22: false,
+        widget18: false, widget19: false, widget20: false, widget21: false, 
+        widget22: false, widget23: false, widget24: false, widget25: false, 
+        widget26: false, widget27: false, widget28: false,
       };
       newGridItems.forEach((item) => {
         if (Object.prototype.hasOwnProperty.call(newChecked, item.id)) {
@@ -621,8 +491,9 @@ function MainDashboard() {
       const checked = {
         widget1: false, widget2: false, widget3: false, widget4: false,
         widget5: false, widget6: false, widget7: false, widget11: false,
-        widget14: false, widget18: false, widget19: false, widget20: false,
-        widget21: false, widget22: false,
+        widget18: false, widget19: false, widget20: false, widget21: false, 
+        widget22: false, widget23: false, widget24: false, widget25: false, 
+        widget26: false, widget27: false, widget28: false,
       };
       itemsToLoad.forEach((item) => {
         if (Object.prototype.hasOwnProperty.call(checked, item.id)) {
@@ -750,7 +621,6 @@ function MainDashboard() {
     window.updateWidgets(rearrangedItems);
   };
 
-  // Dinamik Tarih Metni Oluşturma Alanı kanka
   const renderDateText = () => {
     if (currentFilters.BaslangicTarihi && currentFilters.BitisTarihi) {
       const start = dayjs(currentFilters.BaslangicTarihi).format("DD.MM.YYYY");
@@ -770,15 +640,23 @@ function MainDashboard() {
           </Text>
         </Tooltip>
       </div>
-      <Checkbox name="widget1" onChange={handleCheckboxChange} checked={checkedWidgets.widget1}>Toplam Talep Sayısı</Checkbox>
-      <Checkbox name="widget2" onChange={handleCheckboxChange} checked={checkedWidgets.widget2}>Ortalama Müdahele Süresi</Checkbox>
-      <Checkbox name="widget3" onChange={handleCheckboxChange} checked={checkedWidgets.widget3}>En Hızlı Müdahele Süresi</Checkbox>
+      <Checkbox name="widget1" onChange={handleCheckboxChange} checked={checkedWidgets.widget1}>Toplam İş Emri</Checkbox>
+      <Checkbox name="widget2" onChange={handleCheckboxChange} checked={checkedWidgets.widget2}>Açık İş Emirleri</Checkbox>
+      <Checkbox name="widget3" onChange={handleCheckboxChange} checked={checkedWidgets.widget3}>Toplam İş Emri Maliyeti</Checkbox>
       <Checkbox name="widget4" onChange={handleCheckboxChange} checked={checkedWidgets.widget4}>En Yavaş Müdahele Süresi</Checkbox>
       <Checkbox name="widget7" onChange={handleCheckboxChange} checked={checkedWidgets.widget7}>Ortalama Çalışma Süresi</Checkbox>
+      
+      {/* Popover Menüsüne Yeni Checkboxlar kanka */}
+      <Checkbox name="widget23" onChange={handleCheckboxChange} checked={checkedWidgets.widget23}>Ortalama Tamamlanma Süresi</Checkbox>
+      <Checkbox name="widget24" onChange={handleCheckboxChange} checked={checkedWidgets.widget24}>Personel Verimliliği</Checkbox>
+      <Checkbox name="widget25" onChange={handleCheckboxChange} checked={checkedWidgets.widget25}>Planlanan Bakıma Uyum</Checkbox>
+      <Checkbox name="widget26" onChange={handleCheckboxChange} checked={checkedWidgets.widget26}>Geciken İş Emri Sayısı</Checkbox>
+      <Checkbox name="widget27" onChange={handleCheckboxChange} checked={checkedWidgets.widget27}>En Yüksek Maliyetli İş Emri</Checkbox>
+      <Checkbox name="widget28" onChange={handleCheckboxChange} checked={checkedWidgets.widget28}>En Uzun Süren İş Emri</Checkbox>
+
       <Checkbox name="widget5" onChange={handleCheckboxChange} checked={checkedWidgets.widget5}>Müdahele Süresi Histogramı</Checkbox>
       <Checkbox name="widget6" onChange={handleCheckboxChange} checked={checkedWidgets.widget6}>İş Talebi Tipleri / Atölyeler</Checkbox>
       <Checkbox name="widget11" onChange={handleCheckboxChange} checked={checkedWidgets.widget11}>İş Emri Müdahele Süresi Tablosu</Checkbox>
-      <Checkbox name="widget14" onChange={handleCheckboxChange} checked={checkedWidgets.widget14}>İş Emri Özet Paneli</Checkbox>
       <Checkbox name="widget18" onChange={handleCheckboxChange} checked={checkedWidgets.widget18}>Personel Müdahele Süresi</Checkbox>
       <Checkbox name="widget19" onChange={handleCheckboxChange} checked={checkedWidgets.widget19}>Aylık Müdahele Süresi</Checkbox>
       <Checkbox name="widget20" onChange={handleCheckboxChange} checked={checkedWidgets.widget20}>2. İş Emirleri Maliyet ve Performans Analizi</Checkbox>
@@ -798,8 +676,6 @@ function MainDashboard() {
           <div style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", marginBottom: "10px" }}>
             <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "10px" }}>
               <Filters />
-              
-              {/* Tarih metnini ve sorgula butonunu yan yana alan sarmalayıcı */}
               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                 <Button type="primary" onClick={handleQuery}>
                   <ReloadOutlined />
@@ -816,7 +692,7 @@ function MainDashboard() {
             <div style={{ display: "flex", alignItems: "center", flexDirection: "row", gap: "10px" }}>
               <Button style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "5px" }} onClick={handleRearrange}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-                  <path fillRule="evenodd" d="M18 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1h-1zm-1 7.5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zM5 17a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1H5zm5.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm6.5 0a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm-5.5-7.5a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1h-1zm-7.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1H5a1 1 0 01-1-1v-1zM10.5 5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1V5zM5 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1H5z" clipRule="evenodd"></path>
+                  <path fillRule="evenodd" d="M18 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1h-1zm-1 7.5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zM5 17a1 1 0 00-1 1v1a1 1 0 005 1h1a1 1 0 001-1v-1a1 1 0 00-1-1H5zm5.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm6.5 0a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm-5.5-7.5a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1h-1zm-7.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1H5a1 1 0 01-1-1v-1zM10.5 5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1V5zM5 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1H5z" clipRule="evenodd"></path>
                 </svg>
                 Yeniden Sırala
               </Button>

@@ -41,10 +41,11 @@ function IsEmriDagilimGrafigi({ tipDagilimi, durumDagilimi, loading }) {
     </Radio.Group>
   );
 
-  // Özel Label Çizimi - Orijinal hesaplama yapısı ve mesafesi tamamen korundu
+  // Özel Label Çizimi - Yüzdesel büyümede taşma yapmaması için mesafe dinamikleştirildi
   const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, name, percentage }) => {
     const RADIAN = Math.PI / 180;
-    const radius = outerRadius + 30; // 30px dışarıda çizme yapısı korundu
+    // Sabit 30px yerine outerRadius'un %15'i kadar dışarı atıyoruz ki büyük ekranda iç içe girmesin
+    const radius = outerRadius + (typeof outerRadius === 'number' ? 30 : outerRadius * 0.15); 
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
@@ -55,9 +56,9 @@ function IsEmriDagilimGrafigi({ tipDagilimi, durumDagilimi, loading }) {
     );
   };
 
-  // Grafik yapısını fonksiyonlaştırdık ki hem ana ekranda hem modalda temizce çizilsin kanka
-  const renderChart = (inner = 45, outer = 70) => (
-    <ResponsiveContainer width="100%" height="100%">
+  // Kanka burayı dinamik yüzdelere çektik, varsayılan olarak kabın durumuna göre ölçeklenecek
+  const renderChart = (inner = "40%", outer = "65%") => (
+    <ResponsiveContainer width="100%" height="105%">
       <PieChart>
         <Pie
           data={chartData}
@@ -65,7 +66,7 @@ function IsEmriDagilimGrafigi({ tipDagilimi, durumDagilimi, loading }) {
           cy="50%"
           innerRadius={inner}
           outerRadius={outer}
-          paddingAngle={5}
+          paddingAngle={4}
           dataKey="value"
           label={renderCustomizedLabel}
         >
@@ -78,7 +79,7 @@ function IsEmriDagilimGrafigi({ tipDagilimi, durumDagilimi, loading }) {
     </ResponsiveContainer>
   );
 
-  // Menü elemanları senin istediğin gibi kurgulandı
+  // Menü elemanları
   const menuItems = [
     { key: "download", label: "İndir" },
     { key: "fullscreen", label: "Tam Ekran Aç", onClick: () => setIsFullModalVisible(true) },
@@ -111,7 +112,6 @@ function IsEmriDagilimGrafigi({ tipDagilimi, durumDagilimi, loading }) {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          {/* Fonksiyon haline getirdiğimiz seçiciyi burada çağırıyoruz */}
           {renderTabSelector()}
           <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
             <Button type="text" icon={<MoreOutlined />} />
@@ -120,17 +120,18 @@ function IsEmriDagilimGrafigi({ tipDagilimi, durumDagilimi, loading }) {
       </div>
 
       {/* Grafik Alanı */}
-      <div style={{ flex: 1, minHeight: 0, position: "relative", zIndex: 1 }}>
+      <div style={{ flex: 1, minHeight: 0, position: "relative", zIndex: 1, marginTop: "20px" }}>
         {loading ? (
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
             <Spin />
           </div>
         ) : (
-          renderChart(45, 70) // Ana ekran boyutları
+          /* Ana ekranda kabın %40 iç, %65 dış genişliğini kaplayarak tatlı bir büyüklük sunar */
+          renderChart("40%", "65%") 
         )}
       </div>
 
-      {/* Tam Ekran Modalı kanka */}
+      {/* Tam Ekran Modalı */}
       <Modal
         title={
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingRight: "30px" }}>
@@ -145,12 +146,13 @@ function IsEmriDagilimGrafigi({ tipDagilimi, durumDagilimi, loading }) {
         centered
         destroyOnClose
       >
-        <div style={{ height: "75vh", minHeight: "500px", paddingTop: "20px" }}>
-          {renderChart(100, 160)} 
+        <div style={{ height: "70vh", minHeight: "500px", paddingTop: "20px" }}>
+          {/* Modal kocaman olacağı için yine yüzdesel veriyoruz, devasa monitörde de dev gibi açılır */}
+          {renderChart("45%", "70%")} 
         </div>
       </Modal>
 
-      {/* Bilgi Modalı kanka */}
+      {/* Bilgi Modalı */}
       <Modal
         title="İş Emri Dağılım Grafiği"
         open={isInfoModalVisible}

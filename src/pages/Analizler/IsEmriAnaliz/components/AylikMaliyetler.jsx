@@ -1,21 +1,23 @@
-import React, { useMemo } from "react";
-import { Table, Spin, Typography, Select, Dropdown, Button, Tag } from "antd";
-import { MoreOutlined, PartitionOutlined } from "@ant-design/icons";
+import React, { useMemo, useState } from "react";
+import { Table, Spin, Typography, Dropdown, Button, Tag, Modal } from "antd";
+import { MoreOutlined, PartitionOutlined, FullscreenOutlined, InfoCircleOutlined, FileExcelOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
-function IsEmriDagilimVePerformansListesi({ 
+function AtolyePerformansKarsilastirmasi({ 
   listeData, 
   loading, 
   breakdownType, 
-  onBreakdownTypeChange, 
   onRefresh,
-  // Kanka 4. tabloya özel bağımsız sayfalama propları buraya eklendi:
   page,
   pageSize,
   totalItems,
-  onPageChange
+  onPageChange,
+  onExportExcel
 }) {
+  // Kanka modal görünürlük durumları
+  const [isFullscreenModalVisible, setIsFullscreenModalVisible] = useState(false);
+  const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
   
   // Gelen ham veriyi (Liste4 yapısına göre) güvenli bir şekilde map'liyoruz
   const data = useMemo(() => {
@@ -36,11 +38,16 @@ function IsEmriDagilimVePerformansListesi({
     }));
   }, [listeData]);
 
-  const menuItems = [
-    { key: "refresh", label: "Verileri Yenile", onClick: onRefresh },
-    { key: "download", label: "Excel İndir" },
-    { key: "info", label: "Bilgi" },
-  ];
+  // KANKA SAYFALAMA KORUMASI: API'den Liste4TotalCount (11) geleceği için 2 sayfa oluşturacak
+  const calculatedTotal = useMemo(() => {
+    if (totalItems === undefined || totalItems === null || totalItems === 0) {
+      return data.length;
+    }
+    if (data.length < pageSize && totalItems > data.length && page === 1) {
+      return data.length;
+    }
+    return totalItems;
+  }, [data.length, totalItems, pageSize, page]);
 
   // API'den gelen formatlı string para biriminin başına ₺ ekleyen fonksiyon
   const formatCurrencyString = (val) => {
@@ -153,6 +160,49 @@ function IsEmriDagilimVePerformansListesi({
     },
   ];
 
+  // 3 Nokta Aksiyon Menüsü Elemanları
+  const menuItems = [
+    {
+      key: "excel",
+      label: "Excel İndir",
+      onClick: () => { if (onExportExcel) onExportExcel(); else console.log("Excel indiriliyor..."); }
+    },
+    {
+      key: "fullscreen",
+      label: "Tam Ekran Aç",
+      onClick: () => setIsFullscreenModalVisible(true)
+    },
+    {
+      key: "info",
+      label: "Bilgi",
+      onClick: () => setIsInfoModalVisible(true)
+    }
+  ];
+
+  // Ortak tablo yapısı sarmalı
+  const renderTableContent = () => (
+    <Table
+      columns={columns}
+      dataSource={data}
+      size="middle"
+      bordered={false}
+      pagination={{
+        current: page,
+        pageSize: pageSize,
+        total: calculatedTotal, 
+        showSizeChanger: true,
+        pageSizeOptions: ["10", "20", "50", "100"],
+        position: ["bottomRight"],
+        size: "small",
+        onChange: (currentPage, currentPageSize) => {
+          if (onPageChange) {
+            onPageChange(currentPage, currentPageSize);
+          }
+        }
+      }}
+    />
+  );
+
   return (
     <div
       style={{
@@ -182,36 +232,83 @@ function IsEmriDagilimVePerformansListesi({
             Atölyelerin iş yükü, gecikme, süre, maliyet ve verimlilik karşılaştırması
           </Text>
         </div>
+
+        {/* Sağ Taraf: Aksiyon Butonu */}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
+            <Button type="text" icon={<MoreOutlined style={{ fontSize: "18px" }} />} />
+          </Dropdown>
+        </div>
       </div>
 
       {/* Tablo Alanı */}
       <div style={{ width: "100%", overflowX: "auto" }}>
         <Spin spinning={loading}>
-          <Table
-            columns={columns}
-            dataSource={data}
-            size="middle"
-            bordered={false}
-            // 4. Tablo için dinamik bağımsız sayfalama motoru:
-            pagination={{
-              current: page,
-              pageSize: pageSize,
-              total: totalItems || 0,
-              showSizeChanger: true,
-              pageSizeOptions: ["10", "20", "50", "100"],
-              position: ["bottomRight"],
-              size: "small",
-              onChange: (currentPage, currentPageSize) => {
-                if (onPageChange) {
-                  onPageChange(currentPage, currentPageSize);
-                }
-              }
-            }}
-          />
+          {renderTableContent()}
         </Spin>
       </div>
+
+      {/* 1. TAM EKRAN MODALI */}
+      <Modal
+        title={
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <PartitionOutlined />
+            <span>4. Atölye Performans Karşılaştırması (Genişletilmiş Görünüm)</span>
+          </div>
+        }
+        open={isFullscreenModalVisible}
+        onCancel={() => setIsFullscreenModalVisible(false)}
+        footer={null}
+        width="95%"
+        centered
+        destroyOnClose
+      >
+        <div style={{ paddingTop: "15px" }}>
+          <Spin spinning={loading}>
+            {renderTableContent()}
+          </Spin>
+        </div>
+      </Modal>
+
+      {/* 2. BİLGİ MODALI */}
+      <Modal
+        title={
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span>Performans Analizi</span>
+          </div>
+        }
+        open={isInfoModalVisible}
+        onCancel={() => setIsInfoModalVisible(false)}
+        footer={[
+          <Button key="close" type="primary" onClick={() => setIsInfoModalVisible(false)}>
+            Anladım
+          </Button>
+        ]}
+        centered
+      >
+        <div style={{ padding: "10px 0", display: "flex", flexDirection: "column", gap: "12px" }}>
+          <div>
+            <Text strong style={{ display: "block", marginBottom: "4px" }}>Ne işe yarar?</Text>
+            <Text type="secondary">
+              Atölye ve ekip performansını karşılaştırır.
+            </Text>
+          </div>
+          <div>
+            <Text strong style={{ display: "block", marginBottom: "4px" }}>Nasıl Yorumlanmalı?</Text>
+            <Text type="secondary">
+              Yüksek gecikme + düşük verimlilik = problem.
+            </Text>
+          </div>
+          <div>
+            <Text strong style={{ display: "block", marginBottom: "4px" }}>Ne Yapmalısın?</Text>
+            <Text type="secondary">
+              Süreç ve kaynak optimizasyonu yap.
+            </Text>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
 
-export default IsEmriDagilimVePerformansListesi;
+export default AtolyePerformansKarsilastirmasi;

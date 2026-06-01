@@ -146,6 +146,47 @@ function AylaraGoreIsEmriAnalizi({ aylikTrendler: ilkGelenVeri, loading: ilkLoad
       <Modal title={`Aylara Göre İş Emri Analizi - Detaylı Görünüm`} open={isFullModalVisible} onCancel={() => setIsFullModalVisible(false)} footer={null} width="90%" centered destroyOnClose>
         <div style={{ height: "70vh", minHeight: "400px" }}>{renderChart()}</div>
       </Modal>
+
+      {/* Bilgi Modalı */}
+            <Modal
+              title="Aylık İş Emri Analizi"
+              open={isInfoModalVisible}
+              onCancel={() => setIsInfoModalVisible(false)}
+              footer={[
+                <Button key="ok" type="primary" onClick={() => setIsInfoModalVisible(false)}>Anladım</Button>
+              ]}
+            >
+              <div style={{ padding: "10px 0" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  <div>
+                    <Text strong style={{ display: "block", marginBottom: "2px" }}>
+                      Ne işe yarar?
+                    </Text>
+                    <Typography.Paragraph type="secondary" style={{ margin: 0, paddingLeft: "18px" }}>
+                      Aylara göre iş yükü, süre veya maliyet trendini gösterir.
+                    </Typography.Paragraph>
+                  </div>
+      
+                  <div>
+                    <Text strong style={{ display: "block", marginBottom: "2px" }}>
+                      Nasıl yorumlanır?
+                    </Text>
+                    <Typography.Paragraph type="secondary" style={{ margin: 0, paddingLeft: "18px" }}>
+                      Ani artışlar operasyonel yoğunluk veya arıza artışı anlamına gelir.
+                    </Typography.Paragraph>
+                  </div>
+      
+                  <div>
+                    <Text strong style={{ display: "block", marginBottom: "2px" }}>
+                      Ne yapmalısın?
+                    </Text>
+                    <Typography.Paragraph type="secondary" style={{ margin: 0, paddingLeft: "18px" }}>
+                      Yoğun dönemler için kapasite planlaması yap.
+                    </Typography.Paragraph>
+                  </div>
+                </div>
+              </div>
+            </Modal>
     </div>
   );
 }
