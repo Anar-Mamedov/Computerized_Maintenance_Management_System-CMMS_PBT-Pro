@@ -5,12 +5,22 @@ import TypeFilter from "./TypeFilter";
 import CustomFilter from "./custom-filter/CustomFilter";
 import ZamanAraligi from "./ZamanAraligi";
 
-export default function Filters({ onChange, kelime }) {
-  const [filters, setFilters] = React.useState({
-    tabDurumID: [-1], // Kanka burayı array başlattım
-    BasTarih: null,
-    BitTarih: null,
-    Kelime: kelime || "",
+export default function Filters({ onChange, kelime, hatirlaticiGrupId, hatirlaticiSiraId }) {
+  const [filters, setFilters] = React.useState(() => {
+    let initialDurum = [-1];
+    if (hatirlaticiGrupId && hatirlaticiSiraId) {
+      if (Number(hatirlaticiSiraId) === 1) {
+        initialDurum = [1];
+      } else if (Number(hatirlaticiSiraId) === 4) {
+        initialDurum = [7];
+      }
+    }
+    return {
+      tabDurumID: initialDurum,
+      BasTarih: null,
+      BitTarih: null,
+      Kelime: kelime || "",
+    };
   });
 
   React.useEffect(() => {
@@ -30,6 +40,8 @@ export default function Filters({ onChange, kelime }) {
             ...newFilters, // tabDurumID artık array gelecek
           }))
         }
+        hatirlaticiGrupId={hatirlaticiGrupId}
+        hatirlaticiSiraId={hatirlaticiSiraId}
       />
 
       <ZamanAraligi

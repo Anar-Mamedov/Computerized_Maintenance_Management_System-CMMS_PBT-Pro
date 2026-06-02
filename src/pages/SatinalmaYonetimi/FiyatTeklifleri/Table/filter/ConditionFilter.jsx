@@ -3,10 +3,17 @@ import { Popover, Button, Select } from "antd";
 
 const { Option } = Select;
 
-const ConditionFilter = ({ onSubmit }) => {
+const ConditionFilter = ({ onSubmit, hatirlaticiGrupId, hatirlaticiSiraId }) => {
   const [visible, setVisible] = useState(false);
   const [options, setOptions] = useState([]);
-  const [selectedKeys, setSelectedKeys] = useState([]); // Array state
+  const [selectedKeys, setSelectedKeys] = useState(() => {
+    if (hatirlaticiGrupId && hatirlaticiSiraId) {
+      if (Number(hatirlaticiSiraId) === 3) {
+        return [5];
+      }
+    }
+    return [];
+  });
 
   useEffect(() => {
     // Durum listesi

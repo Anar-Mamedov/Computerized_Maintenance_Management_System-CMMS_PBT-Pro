@@ -868,9 +868,20 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
     },
   });
 
-  // ana tablo api isteği için kullanılan useEffect
-
   const lastRequestRef = useRef(null);
+
+  useEffect(() => {
+    if (hatirlaticiGrupId && hatirlaticiSiraId) {
+      if (Number(hatirlaticiSiraId) === 2) {
+        setBody((prev) => ({
+          ...prev,
+          filters: { ...prev.filters, durumId: [1] },
+        }));
+      }
+    }
+  }, [hatirlaticiGrupId, hatirlaticiSiraId]);
+
+  // ana tablo api isteği için kullanılan useEffect
   
   useEffect(() => {
     const params = JSON.stringify({ body, currentPage, pageSize, hatirlaticiGrupId, hatirlaticiSiraId });
@@ -907,12 +918,11 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
   try {
     setLoading(true);
 
-    const endpoint = hatirlaticiGrupId ? "GetSatinalmaSiparisListHatirlatici" : "GetSatinalmaSiparisList";
-    const hatirlaticiParams = hatirlaticiGrupId ? `&hatirlaticiGrupId=${hatirlaticiGrupId}&hatirlaticiSiraId=${hatirlaticiSiraId}` : "";
+    const endpoint = "GetSatinalmaSiparisList";
 
     // API isteği (filters burada aslında requestBody olmalı)
     const response = await AxiosInstance.post(
-      `${endpoint}?pagingDeger=${currentPage}&pageSize=${size}${hatirlaticiParams}`,
+      `${endpoint}?pagingDeger=${currentPage}&pageSize=${size}`,
       filters
     );
 

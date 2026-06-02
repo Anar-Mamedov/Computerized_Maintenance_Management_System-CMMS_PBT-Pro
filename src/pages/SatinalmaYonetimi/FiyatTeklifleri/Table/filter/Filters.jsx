@@ -3,14 +3,22 @@ import ConditionFilter from "./ConditionFilter";
 import CustomFilter from "./custom-filter/CustomFilter";
 import ZamanAraligi from "./ZamanAraligi";
 
-export default function Filters({ onChange, TeklifNo }) {
-  const [filters, setFilters] = React.useState({
-    TeklifNo: TeklifNo || "",
-    TalepNo: "",
-    DurumId: [],
-    Tedarikci: "",
-    Lokasyon: "",
-    Kelime: "",
+export default function Filters({ onChange, TeklifNo, hatirlaticiGrupId, hatirlaticiSiraId }) {
+  const [filters, setFilters] = React.useState(() => {
+    let initialDurum = [];
+    if (hatirlaticiGrupId && hatirlaticiSiraId) {
+      if (Number(hatirlaticiSiraId) === 3) {
+        initialDurum = [5];
+      }
+    }
+    return {
+      TeklifNo: TeklifNo || "",
+      TalepNo: "",
+      DurumId: initialDurum,
+      Tedarikci: "",
+      Lokasyon: "",
+      Kelime: "",
+    };
   });
 
   React.useEffect(() => {
@@ -30,6 +38,8 @@ export default function Filters({ onChange, TeklifNo }) {
             DurumId: selectedDurumlar.durumId, 
           }));
         }}
+        hatirlaticiGrupId={hatirlaticiGrupId}
+        hatirlaticiSiraId={hatirlaticiSiraId}
       />
 
       <CustomFilter

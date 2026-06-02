@@ -14,6 +14,8 @@ import SatinalmaSiparisleri from "../../SatinalmaYonetimi/SatinalmaSiparisleri/S
 import FiyatTeklifleri from "../../SatinalmaYonetimi/FiyatTeklifleri/FiyatTeklifleri.jsx";
 import FirmaSozlesmeleri from "../../FirmaVeSozlesmeYonetimi/FirmaSozlesmeleri/FirmaSozlesmeleri.jsx";
 
+import IsTalepleri from "../../YardimMasasi/IsTalepleri/IsTalepleri.jsx";
+
 const StyledCard = styled(Card)`
   margin-bottom: 16px;
   border-radius: 8px;
@@ -123,6 +125,7 @@ export default function HatirlaticiPopover({ hatirlaticiData = null, loading = f
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalContent, setModalContent] = useState(null);
+  const [modalSession, setModalSession] = useState(0);
   const reminderGroups = useMemo(() => {
     return Array.isArray(hatirlaticiData?.data) ? hatirlaticiData.data : [];
   }, [hatirlaticiData?.data]);
@@ -157,17 +160,29 @@ export default function HatirlaticiPopover({ hatirlaticiData = null, loading = f
     const grupId = Number(group?.GrupId);
     const siraId = Number(item?.SiraId);
 
+    const compKey = `reminder-content-${grupId}-${siraId}`;
+
     if (grupId === 1) {
       contentComponent = (
         <MakineTanim 
+          key={compKey}
           hatirlaticiGrupId={grupId} 
           hatirlaticiSiraId={siraId} 
         />
       );
     } else if (grupId === 2) {
-      if (siraId === 1 || siraId === 2 || siraId === 8) {
+      if (siraId === 1) {
+        contentComponent = (
+          <IsTalepleri 
+            key={compKey}
+            hatirlaticiGrupId={grupId} 
+            hatirlaticiSiraId={siraId} 
+          />
+        );
+      } else if (siraId === 2 || siraId === 8) {
         contentComponent = (
           <IsEmri 
+            key={compKey}
             hatirlaticiGrupId={grupId} 
             hatirlaticiSiraId={siraId} 
           />
@@ -175,6 +190,7 @@ export default function HatirlaticiPopover({ hatirlaticiData = null, loading = f
       } else {
         contentComponent = (
           <OtomatikIsEmirleri 
+            key={compKey}
             hatirlaticiGrupId={grupId} 
             hatirlaticiSiraId={siraId} 
           />
@@ -183,6 +199,7 @@ export default function HatirlaticiPopover({ hatirlaticiData = null, loading = f
     } else if (grupId === 3) {
       contentComponent = (
         <MalzemeTanimlari 
+          key={compKey}
           hatirlaticiGrupId={grupId} 
           hatirlaticiSiraId={siraId} 
         />
@@ -191,6 +208,7 @@ export default function HatirlaticiPopover({ hatirlaticiData = null, loading = f
       if (siraId === 1 || siraId === 4) {
         contentComponent = (
           <MalzemeTalepleri 
+            key={compKey}
             hatirlaticiGrupId={grupId} 
             hatirlaticiSiraId={siraId} 
           />
@@ -198,6 +216,7 @@ export default function HatirlaticiPopover({ hatirlaticiData = null, loading = f
       } else if (siraId === 2) {
         contentComponent = (
           <SatinalmaSiparisleri 
+            key={compKey}
             hatirlaticiGrupId={grupId} 
             hatirlaticiSiraId={siraId} 
           />
@@ -205,6 +224,7 @@ export default function HatirlaticiPopover({ hatirlaticiData = null, loading = f
       } else if (siraId === 3) {
         contentComponent = (
           <FiyatTeklifleri 
+            key={compKey}
             hatirlaticiGrupId={grupId} 
             hatirlaticiSiraId={siraId} 
           />
@@ -212,6 +232,7 @@ export default function HatirlaticiPopover({ hatirlaticiData = null, loading = f
       } else if (siraId === 5) {
         contentComponent = (
           <FirmaSozlesmeleri 
+            key={compKey}
             hatirlaticiGrupId={grupId} 
             hatirlaticiSiraId={siraId} 
           />
@@ -221,6 +242,7 @@ export default function HatirlaticiPopover({ hatirlaticiData = null, loading = f
 
     if (contentComponent) {
       setModalTitle(title);
+      setModalSession((prev) => prev + 1);
       setModalContent(contentComponent);
       setIsModalOpen(true);
       setOpen(false);
@@ -229,6 +251,8 @@ export default function HatirlaticiPopover({ hatirlaticiData = null, loading = f
 
   const handleModalClose = () => {
     setIsModalOpen(false);
+    setModalContent(null);
+    setModalTitle("");
   };
 
   const getItemDescription = (item) => {
@@ -384,8 +408,16 @@ export default function HatirlaticiPopover({ hatirlaticiData = null, loading = f
           {calendarIcon}
         </Popover>
       )}
-      <Modal title={modalTitle} open={isModalOpen} width={1300} onCancel={handleModalClose} footer={null}>
-        {modalContent}
+      <Modal
+        title={modalTitle}
+        open={isModalOpen}
+        width={1300}
+        onCancel={handleModalClose}
+        footer={null}
+        destroyOnClose
+        centered
+      >
+        {modalContent && React.cloneElement(modalContent, { key: `${modalContent.key || "content"}-${modalSession}` })}
       </Modal>
     </>
   );

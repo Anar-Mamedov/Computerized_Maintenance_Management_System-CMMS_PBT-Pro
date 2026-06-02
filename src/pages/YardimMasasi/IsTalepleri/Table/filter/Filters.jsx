@@ -5,13 +5,18 @@ import CustomFilter from "./custom-filter/CustomFilter";
 import ZamanAraligi from "./ZamanAraligi";
 import UserStatusFilter from "./UserStatusFilter";
 
-export default function Filters({ onChange }) {
-  const [filters, setFilters] = React.useState({
-    lokasyonlar: {},
-    isemritipleri: {},
-    durumlar: {},
-    onayDurumlari: {},
-    customfilters: {},
+export default function Filters({ onChange, hatirlaticiGrupId, hatirlaticiSiraId }) {
+  const [filters, setFilters] = React.useState(() => {
+    const initialDurumlar = (Number(hatirlaticiGrupId) === 2 && Number(hatirlaticiSiraId) === 1)
+      ? { key0: "1" }
+      : {};
+    return {
+      lokasyonlar: {},
+      isemritipleri: {},
+      durumlar: initialDurumlar,
+      onayDurumlari: {},
+      customfilters: {},
+    };
   });
 
   React.useEffect(() => {
@@ -21,7 +26,11 @@ export default function Filters({ onChange }) {
   return (
     <>
       {/* <TypeFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, isemritipleri: newFilters }))} /> */}
-      <ConditionFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, durumlar: newFilters }))} />
+      <ConditionFilter 
+        onSubmit={(newFilters) => setFilters((state) => ({ ...state, durumlar: newFilters }))} 
+        hatirlaticiGrupId={hatirlaticiGrupId}
+        hatirlaticiSiraId={hatirlaticiSiraId}
+      />
       <UserStatusFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, onayDurumlari: newFilters }))} />
       <ZamanAraligi />
       {/* <LocationFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, lokasyonlar: newFilters }))} /> */}
@@ -32,4 +41,6 @@ export default function Filters({ onChange }) {
 
 Filters.propTypes = {
   onChange: PropTypes.func.isRequired,
+  hatirlaticiGrupId: PropTypes.any,
+  hatirlaticiSiraId: PropTypes.any,
 };

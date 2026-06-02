@@ -984,15 +984,45 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
-  const [body, setBody] = useState({
-  filters: {
-    Kelime: "",
-  },
-});
+  const [body, setBody] = useState(() => {
+    let initialDurum = [-1];
+    if (hatirlaticiGrupId && hatirlaticiSiraId) {
+      if (Number(hatirlaticiSiraId) === 1) {
+        initialDurum = [1];
+      } else if (Number(hatirlaticiSiraId) === 4) {
+        initialDurum = [7];
+      }
+    }
+    return {
+      keyword: "",
+      filters: {
+        tabDurumID: initialDurum,
+        BasTarih: null,
+        BitTarih: null,
+        Kelime: "",
+      },
+    };
+  });
 
   // ana tablo api isteği için kullanılan useEffect
 
   const lastRequestRef = useRef(null);
+
+  useEffect(() => {
+    if (hatirlaticiGrupId && hatirlaticiSiraId) {
+      if (Number(hatirlaticiSiraId) === 1) {
+        setBody((prev) => ({
+          ...prev,
+          filters: { ...prev.filters, tabDurumID: [1] },
+        }));
+      } else if (Number(hatirlaticiSiraId) === 4) {
+        setBody((prev) => ({
+          ...prev,
+          filters: { ...prev.filters, tabDurumID: [7] },
+        }));
+      }
+    }
+  }, [hatirlaticiGrupId, hatirlaticiSiraId]);
 
 // ✅ API isteği
 useEffect(() => {
@@ -1030,12 +1060,11 @@ useEffect(() => {
   try {
     setLoading(true);
 
-    const endpoint = hatirlaticiGrupId ? "GetMalzemeTalepleriHatirlatici" : "GetMalzemeTalepleri";
-    const hatirlaticiParams = hatirlaticiGrupId ? `&hatirlaticiGrupId=${hatirlaticiGrupId}&hatirlaticiSiraId=${hatirlaticiSiraId}` : "";
+    const endpoint = "GetMalzemeTalepleri";
 
     // API isteği (filters burada aslında requestBody olmalı)
     const response = await AxiosInstance.post(
-      `${endpoint}?pagingDeger=${currentPage}&pageSize=${size}${hatirlaticiParams}`,
+      `${endpoint}?pagingDeger=${currentPage}&pageSize=${size}`,
       filters
     );
 
@@ -1073,12 +1102,17 @@ useEffect(() => {
 };
   // filtreleme işlemi için kullanılan useEffect
   const handleBodyChange = useCallback((type, newBody) => {
-  setBody((state) => ({
-    ...state,
-    [type]: newBody,
-  }));
-  setCurrentPage(1);
-}, []);
+    setBody((state) => {
+      if (JSON.stringify(state[type]) === JSON.stringify(newBody)) {
+        return state;
+      }
+      setCurrentPage(1);
+      return {
+        ...state,
+        [type]: newBody,
+      };
+    });
+  }, []);
   // filtreleme işlemi için kullanılan useEffect son
 
   // sayfalama için kullanılan useEffect
@@ -1547,7 +1581,12 @@ useEffect(() => {
             onChange={(e) => setSearchTerm(e.target.value)}
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
-           <Filters kelime={searchTerm} onChange={handleBodyChange} />
+           <Filters 
+             kelime={searchTerm} 
+             onChange={handleBodyChange} 
+             hatirlaticiGrupId={hatirlaticiGrupId}
+             hatirlaticiSiraId={hatirlaticiSiraId} 
+           />
           {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>

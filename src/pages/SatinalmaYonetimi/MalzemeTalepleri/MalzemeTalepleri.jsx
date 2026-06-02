@@ -4,7 +4,13 @@ import MainTable from "./Table/Table";
 import { FormProvider, useForm } from "react-hook-form";
 
 export default function PersonelTanimlari({ hatirlaticiGrupId, hatirlaticiSiraId }) {
-  const formMethods = useForm();
+  const formMethods = useForm({
+    defaultValues: {
+      timeRange: "all",
+      BasTarih: null,
+      BitTarih: null,
+    },
+  });
   return (
     <FormProvider {...formMethods}>
       <div>

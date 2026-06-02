@@ -4,7 +4,10 @@ import { Button, Checkbox, DatePicker, Input, Modal, Pagination, Space, Spin, Ta
 import { DownloadOutlined, EllipsisOutlined, MenuOutlined, SearchOutlined } from "@ant-design/icons";
 import { t } from "i18next";
 import dayjs from "dayjs";
+import isoWeek from "dayjs/plugin/isoWeek";
 import PropTypes from "prop-types";
+
+dayjs.extend(isoWeek);
 import * as XLSX from "xlsx";
 import AxiosInstance from "../../../../../api/http";
 import KodIDSelectbox from "../../../../../utils/components/KodIDSelectbox";
@@ -344,6 +347,53 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
     },
     [appliedFilters, currentPage, pageSize, messageApi, hatirlaticiGrupId, hatirlaticiSiraId]
   );
+
+  useEffect(() => {
+    if (hatirlaticiGrupId && hatirlaticiSiraId) {
+      let start = null;
+      let end = null;
+      let clearDate = true;
+
+      if (Number(hatirlaticiSiraId) === 5) {
+        // Yaklaşan (30 gün)
+        start = dayjs();
+        end = dayjs().add(30, "day");
+        clearDate = false;
+      } else if (Number(hatirlaticiSiraId) === 6) {
+        // Bu Ay
+        start = dayjs().startOf("month");
+        end = dayjs().endOf("month");
+        clearDate = false;
+      } else if (Number(hatirlaticiSiraId) === 7) {
+        // Bu Hafta
+        start = dayjs().startOf("isoWeek");
+        end = dayjs().endOf("isoWeek");
+        clearDate = false;
+      }
+
+      if (clearDate) {
+        setDraftFilters((prev) => ({
+          ...prev,
+          TarihAraligi: [],
+        }));
+        setAppliedFilters((prev) => ({
+          ...prev,
+          BaslangicTarih: null,
+          BitisTarih: null,
+        }));
+      } else if (start && end) {
+        setDraftFilters((prev) => ({
+          ...prev,
+          TarihAraligi: [start, end],
+        }));
+        setAppliedFilters((prev) => ({
+          ...prev,
+          BaslangicTarih: start.format(DATE_REQUEST_FORMAT),
+          BitisTarih: end.format(DATE_REQUEST_FORMAT),
+        }));
+      }
+    }
+  }, [hatirlaticiGrupId, hatirlaticiSiraId]);
 
   useEffect(() => {
     fetchTableData(currentPage, pageSize, appliedFilters);
