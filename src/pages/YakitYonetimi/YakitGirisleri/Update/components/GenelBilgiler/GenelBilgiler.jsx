@@ -492,9 +492,39 @@ export default function SecondTabs() {
       </Col>
               
               <Col span={24}>
-                <Text style={labelStyle}>{t("Lokasyon")}</Text>
-                <LokasyonSelect fieldName="LokasyonTanimi" placeholder={t("Seçiniz")} mode="default" selectStyle={{ width: "100%", maxWidth: "600px"}}/>
-              </Col>
+  <Text style={labelStyle}>{t("Lokasyon")}</Text>
+  <Controller
+    name="LokasyonId"
+    control={control}
+    render={({ field }) => {
+      // Formda kayıtlı olan LokasyonTanimi text bilgisini izle
+      const lokasyonTanim = watch("LokasyonTanimi");
+
+      // Eğer formda bir ID varsa, liste yüklenene kadar Ant Design'a göstereceği metni biz söylüyoruz
+      const selectValue = field.value 
+        ? { value: field.value, label: lokasyonTanim || String(field.value) }
+        : undefined;
+
+      return (
+        <LokasyonSelect
+          fieldName="LokasyonId"
+          placeholder={t("Seçiniz")}
+          mode="default"
+          selectStyle={{ width: "100%", maxWidth: "600px" }}
+          
+          // Değerleri nesne olarak sarmalayıp gönderiyoruz
+          {...field}
+          value={selectValue}
+          onChange={(val) => {
+            // Seçim değiştiğinde Ant Design'dan obje gelebilir (val.value), güvenli şekilde ID'yi alıyoruz
+            const targetId = val && typeof val === 'object' ? val.value : val;
+            field.onChange(targetId);
+          }}
+        />
+      );
+    }}
+  />
+</Col>
               <Col span={24}>
                 <Text style={labelStyle}>{t("Firma")}</Text>
                 <FirmaTablo firmaFieldName="FirmaTanimi" firmaIdFieldName="FirmaId" />

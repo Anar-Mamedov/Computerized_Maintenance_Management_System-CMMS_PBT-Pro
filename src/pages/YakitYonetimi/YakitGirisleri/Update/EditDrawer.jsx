@@ -29,7 +29,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       kod: null,            // DEP_KOD
       tanim: null,          // DEP_TANIM
       aktif: true,          // AKTIF
-      lokasyonID: null,     // LOKASYON_ID
+      LokasyonId: null,     // LOKASYON_ID
       lokasyonTanim: null,  // (Selectbox için text)
       yakitTipID: null,     // YAKIT_TIP_ID
       yakitTipTanim: null,  // (Selectbox için text)
@@ -81,7 +81,10 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("YakitTankId", item.YakitTankId);
           setValue("IstasyonKodId", item.IstasyonKodId);
           setValue("IstasyonAdi", item.IstasyonAdi);
-          setValue("LokasyonId", item.LokasyonId);
+          setValue("LokasyonId", {
+    value: item.LokasyonId,
+    label: item.LokasyonTanimi || String(item.LokasyonId)
+  });
           setValue("LokasyonTanimi", item.LokasyonTanimi);
           setValue("ProjeId", item.ProjeId);
           setValue("MasrafMerkeziId", item.MasrafMerkeziId);
@@ -107,7 +110,11 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   // --- KAYDETME İŞLEMİ (POST - AddUpdateYakitTank) ---
   const onSubmit = (data) => {
-    // Body'i tamamen senin JSON yapına göre kuruyoruz
+    
+    const selectedLokasyonId = data.LokasyonId && typeof data.LokasyonId === 'object'
+    ? data.LokasyonId.value 
+    : data.LokasyonId;
+
     const Body = {
       TB_YAKIT_HRK_ID: Number(data.TB_YAKIT_HRK_ID) || 0,
       MakineId: Number(data.MakineId) || null,
@@ -127,7 +134,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       YakitTipId: Number(data.YakitTipId) || null,
       YakitTankId: data.StokKullanim ? (Number(data.YakitTankId) || null) : null,
       IstasyonKodId: !data.StokKullanim ? (Number(data.IstasyonKodId) || null) : null,
-      LokasyonId: Number(data.LokasyonId) || null,
+      LokasyonId: Number(selectedLokasyonId) || null,
       ProjeId: Number(data.ProjeId) || null,
       MasrafMerkeziId: Number(data.MasrafMerkeziId) || null,
       PersonelId: Number(data.PersonelId) || null,

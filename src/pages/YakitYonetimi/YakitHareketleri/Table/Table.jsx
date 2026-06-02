@@ -442,7 +442,7 @@ const MainTable = () => {
   // Status veya Body değiştiğinde veriyi çek
   useEffect(() => {
     fetchEquipmentData();
-  }, [status, body]);
+  }, [status, body, currentPage, pageSize]);
   
   const fetchEquipmentData = useCallback(async () => {
     try {

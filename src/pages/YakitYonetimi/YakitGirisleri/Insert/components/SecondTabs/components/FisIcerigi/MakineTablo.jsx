@@ -174,7 +174,7 @@ export default function MakineSecim({
 
       <Modal
         width="1200px"
-        title="Makine Seçimi"
+        title="Ekipman Seçimi"
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}
