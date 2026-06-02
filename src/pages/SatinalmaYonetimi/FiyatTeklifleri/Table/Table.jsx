@@ -534,15 +534,36 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
   };
 
 
-  const [body, setBody] = useState({
-    filters: {
-      TeklifNo: "",
-      TalepNo: "",
-    },
+  const [body, setBody] = useState(() => {
+    let initialDurum = [];
+    if (hatirlaticiGrupId && hatirlaticiSiraId) {
+      if (Number(hatirlaticiSiraId) === 3) {
+        initialDurum = [5];
+      }
+    }
+    return {
+      filters: {
+        TeklifNo: "",
+        TalepNo: "",
+        DurumId: initialDurum,
+      },
+    };
   });
 
-
   const lastRequestRef = useRef(null);
+
+  useEffect(() => {
+    if (hatirlaticiGrupId && hatirlaticiSiraId) {
+      if (Number(hatirlaticiSiraId) === 3) {
+        setBody((prev) => ({
+          ...prev,
+          filters: { ...prev.filters, DurumId: [5] },
+        }));
+      }
+    }
+  }, [hatirlaticiGrupId, hatirlaticiSiraId]);
+
+  // ana tablo api isteği için kullanılan useEffect
   
   useEffect(() => {
     const params = JSON.stringify({ body, currentPage, pageSize, hatirlaticiGrupId, hatirlaticiSiraId });
@@ -588,11 +609,10 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
   try {
     setLoading(true);
 
-    const endpoint = hatirlaticiGrupId ? "GetTeklifPaketListHatirlatici" : "GetTeklifPaketList";
-    const hatirlaticiParams = hatirlaticiGrupId ? `&hatirlaticiGrupId=${hatirlaticiGrupId}&hatirlaticiSiraId=${hatirlaticiSiraId}` : "";
+    const endpoint = "GetTeklifPaketList";
 
     const response = await AxiosInstance.post(
-      `${endpoint}?pagingDeger=${currentPage}&pageSize=${size}${hatirlaticiParams}`,
+      `${endpoint}?pagingDeger=${currentPage}&pageSize=${size}`,
       filters
     );
 
@@ -629,11 +649,16 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
 };
 
   const handleBodyChange = useCallback((type, newBody) => {
-    setBody((state) => ({
-      ...state,
-      [type]: newBody,
-    }));
-    setCurrentPage(1);
+    setBody((state) => {
+      if (JSON.stringify(state[type]) === JSON.stringify(newBody)) {
+        return state;
+      }
+      setCurrentPage(1);
+      return {
+        ...state,
+        [type]: newBody,
+      };
+    });
   }, []);
   
     const handleTableChange = (pagination) => {
@@ -1057,7 +1082,12 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
             onChange={(e) => setSearchTermTalep(e.target.value)}
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
-          <Filters TeklifNo={searchTermTeklif} onChange={handleBodyChange} />
+          <Filters
+            TeklifNo={searchTermTeklif}
+            onChange={handleBodyChange}
+            hatirlaticiGrupId={hatirlaticiGrupId}
+            hatirlaticiSiraId={hatirlaticiSiraId}
+          />
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
           <Button style={{ display: "flex", alignItems: "center" }} onClick={handleDownloadXLSX} loading={xlsxLoading} icon={<SiMicrosoftexcel />}>

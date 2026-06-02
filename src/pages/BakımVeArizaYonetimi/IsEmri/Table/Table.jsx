@@ -155,13 +155,20 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
   const loadedRowKeysRef = useRef(new Set());
   const [columnSearchTerm, setColumnSearchTerm] = useState("");
   const [buHaftaKapananActive, setBuHaftaKapananActive] = useState(false);
-  const [arizaActive, setArizaActive] = useState(false);
+  const [arizaActive, setArizaActive] = useState(() => {
+    return Number(hatirlaticiGrupId) === 2 && Number(hatirlaticiSiraId) === 2;
+  });
   const [onayBekleyenActive, setOnayBekleyenActive] = useState(false);
-  const [toplamIsEmriCloseFilter, setToplamIsEmriCloseFilter] = useState(null);
+  const [toplamIsEmriCloseFilter, setToplamIsEmriCloseFilter] = useState(() => {
+    return (hatirlaticiGrupId && hatirlaticiSiraId) ? 0 : null;
+  });
 
   useEffect(() => {
     if (hatirlaticiGrupId && hatirlaticiSiraId) {
       setToplamIsEmriCloseFilter(0);
+      if (Number(hatirlaticiSiraId) === 2) {
+        setArizaActive(true);
+      }
     }
   }, [hatirlaticiGrupId, hatirlaticiSiraId]);
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
@@ -1358,16 +1365,21 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
 
   // filtreleme işlemi için kullanılan useEffect
   const handleBodyChange = useCallback((type, newBody) => {
-    setBody((state) => ({
-      ...state,
-      [type]: newBody,
-    }));
-    setCurrentPage(1);
-    if (isScrollPageEnabled) {
-      setData([]);
-      setHasMoreData(true);
-      loadedRowKeysRef.current = new Set();
-    }
+    setBody((state) => {
+      if (JSON.stringify(state[type]) === JSON.stringify(newBody)) {
+        return state;
+      }
+      setCurrentPage(1);
+      if (isScrollPageEnabled) {
+        setData([]);
+        setHasMoreData(true);
+        loadedRowKeysRef.current = new Set();
+      }
+      return {
+        ...state,
+        [type]: newBody,
+      };
+    });
   }, [isScrollPageEnabled]);
   // filtreleme işlemi için kullanılan useEffect son
 

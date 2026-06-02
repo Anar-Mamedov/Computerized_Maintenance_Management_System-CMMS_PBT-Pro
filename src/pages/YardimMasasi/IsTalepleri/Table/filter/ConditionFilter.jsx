@@ -3,10 +3,15 @@ import { Popover, Button, Select } from "antd";
 
 const { Option } = Select;
 
-const ConditionFilter = ({ onSubmit }) => {
+const ConditionFilter = ({ onSubmit, hatirlaticiGrupId, hatirlaticiSiraId }) => {
   const [visible, setVisible] = useState(false);
   const [options, setOptions] = React.useState([]);
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState(() => {
+    if (Number(hatirlaticiGrupId) === 2 && Number(hatirlaticiSiraId) === 1) {
+      return { 1: "Bekliyor" };
+    }
+    return {};
+  });
 
   const handleChange = (value) => {
     const selectedItemsCopy = { ...filters };

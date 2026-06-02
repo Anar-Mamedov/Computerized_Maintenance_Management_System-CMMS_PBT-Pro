@@ -123,7 +123,7 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
 
 // Sütunların sürüklenebilir olmasını sağlayan component sonu
 
-const MainTable = () => {
+const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
   const [data, setData] = useState([]);
@@ -898,16 +898,27 @@ const MainTable = () => {
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
-  const [body, setBody] = useState({
-    keyword: "",
-    filters: {},
+  const [body, setBody] = useState(() => {
+    const initialDurumlar = (Number(hatirlaticiGrupId) === 2 && Number(hatirlaticiSiraId) === 1)
+      ? { key0: "1" }
+      : {};
+    return {
+      keyword: "",
+      filters: {
+        lokasyonlar: {},
+        isemritipleri: {},
+        durumlar: initialDurumlar,
+        onayDurumlari: {},
+        customfilters: {},
+      },
+    };
   });
 
   // ana tablo api isteği için kullanılan useEffect
 
   useEffect(() => {
     fetchEquipmentData(body, currentPage, pageSize, sortField, sortOrder);
-  }, [body, currentPage, pageSize, sortField, sortOrder]);
+  }, [body, currentPage, pageSize, sortField, sortOrder, hatirlaticiGrupId, hatirlaticiSiraId]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
@@ -947,9 +958,10 @@ const MainTable = () => {
 
     try {
       setLoading(true);
+      const endpoint = "GetIsTalepFullList";
       // API isteğinde keyword ve currentPage kullanılıyor
       const response = await AxiosInstance.post(
-        `GetIsTalepFullList?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${normalizedPageSize}${sortParam}`,
+        `${endpoint}?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${normalizedPageSize}${sortParam}`,
         filters
       );
       if (response) {
@@ -988,11 +1000,16 @@ const MainTable = () => {
 
   // filtreleme işlemi için kullanılan useEffect
   const handleBodyChange = useCallback((type, newBody) => {
-    setBody((state) => ({
-      ...state,
-      [type]: newBody,
-    }));
-    setCurrentPage(1); // Filtreleme yapıldığında sayfa numarasını 1'e ayarla
+    setBody((state) => {
+      if (JSON.stringify(state[type]) === JSON.stringify(newBody)) {
+        return state;
+      }
+      setCurrentPage(1); // Filtreleme yapıldığında sayfa numarasını 1'e ayarla
+      return {
+        ...state,
+        [type]: newBody,
+      };
+    });
   }, []);
   // filtreleme işlemi için kullanılan useEffect son
 
@@ -1425,7 +1442,7 @@ const MainTable = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
-          <Filters onChange={handleBodyChange} />
+          <Filters onChange={handleBodyChange} hatirlaticiGrupId={hatirlaticiGrupId} hatirlaticiSiraId={hatirlaticiSiraId} />
           <Popover
             content={
               <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "360px" }}>

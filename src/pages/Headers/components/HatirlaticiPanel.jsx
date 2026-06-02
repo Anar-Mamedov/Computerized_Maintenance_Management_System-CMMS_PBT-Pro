@@ -15,6 +15,7 @@ import MalzemeTalepleri from "../../SatinalmaYonetimi/MalzemeTalepleri/MalzemeTa
 import SatinalmaSiparisleri from "../../SatinalmaYonetimi/SatinalmaSiparisleri/SatinalmaSiparisleri.jsx";
 import FiyatTeklifleri from "../../SatinalmaYonetimi/FiyatTeklifleri/FiyatTeklifleri.jsx";
 import FirmaSozlesmeleri from "../../FirmaVeSozlesmeYonetimi/FirmaSozlesmeleri/FirmaSozlesmeleri.jsx";
+import IsTalepleri from "../../YardimMasasi/IsTalepleri/IsTalepleri.jsx";
 
 const { Text } = Typography;
 
@@ -131,6 +132,7 @@ const HatirlaticiPanel = ({ open, onClose }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalContent, setModalContent] = useState(null);
+  const [modalSession, setModalSession] = useState(0);
 
   const [organize, setOrganize] = useState(() => localStorage.getItem("hatirlatici_organize") === "true");
   const [autoRefresh, setAutoRefresh] = useState(() => localStorage.getItem("hatirlatici_auto_refresh") === "true");
@@ -299,30 +301,35 @@ const HatirlaticiPanel = ({ open, onClose }) => {
     const grupId = Number(group?.GrupId);
     const siraId = Number(item?.SiraId);
 
+    const compKey = `reminder-content-${grupId}-${siraId}`;
+
     if (grupId === 1) {
-      contentComponent = <MakineTanim hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
+      contentComponent = <MakineTanim key={compKey} hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
     } else if (grupId === 2) {
-      if (siraId === 1 || siraId === 2 || siraId === 8) {
-        contentComponent = <IsEmri hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
+      if (siraId === 1) {
+        contentComponent = <IsTalepleri key={compKey} hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
+      } else if (siraId === 2 || siraId === 8) {
+        contentComponent = <IsEmri key={compKey} hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
       } else {
-        contentComponent = <OtomatikIsEmirleri hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
+        contentComponent = <OtomatikIsEmirleri key={compKey} hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
       }
     } else if (grupId === 3) {
-      contentComponent = <MalzemeTanimlari hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
+      contentComponent = <MalzemeTanimlari key={compKey} hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
     } else if (grupId === 4) {
       if (siraId === 1 || siraId === 4) {
-        contentComponent = <MalzemeTalepleri hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
+        contentComponent = <MalzemeTalepleri key={compKey} hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
       } else if (siraId === 2) {
-        contentComponent = <SatinalmaSiparisleri hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
+        contentComponent = <SatinalmaSiparisleri key={compKey} hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
       } else if (siraId === 3) {
-        contentComponent = <FiyatTeklifleri hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
+        contentComponent = <FiyatTeklifleri key={compKey} hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
       } else if (siraId === 5) {
-        contentComponent = <FirmaSozlesmeleri hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
+        contentComponent = <FirmaSozlesmeleri key={compKey} hatirlaticiGrupId={grupId} hatirlaticiSiraId={siraId} />;
       }
     }
 
     if (contentComponent) {
       setModalTitle(title);
+      setModalSession((prev) => prev + 1);
       setModalContent(contentComponent);
       setIsModalOpen(true);
     }
@@ -429,8 +436,20 @@ const HatirlaticiPanel = ({ open, onClose }) => {
         </PanelContent>
       </PanelWrapper>
 
-      <Modal title={modalTitle} open={isModalOpen} width={1300} onCancel={() => setIsModalOpen(false)} footer={null} destroyOnClose centered>
-        {modalContent}
+      <Modal
+        title={modalTitle}
+        open={isModalOpen}
+        width={1300}
+        onCancel={() => {
+          setIsModalOpen(false);
+          setModalContent(null);
+          setModalTitle("");
+        }}
+        footer={null}
+        destroyOnClose
+        centered
+      >
+        {modalContent && React.cloneElement(modalContent, { key: `${modalContent.key || "content"}-${modalSession}` })}
       </Modal>
     </>
   );
