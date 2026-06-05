@@ -6,21 +6,29 @@ import AxiosInstance from "../../../../api/http";
 
 export default function MakineSecim({
   control,
-  setValue, // bunu al
+  setValue,
   errors,
   disabled = false,
   makineFieldName = "MKN_KOD",
   makineIdFieldName = "TB_MAKINE_ID",
+  onMakinelerSecildi, // 🌟 Seçilen tüm satırları ana tabloya fırlatacak callback
 }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
+  
+  // 🌟 Çoklu seçim için state'i dizi (array) yapıyoruz
+  const [selectedRows, setSelectedRows] = useState([]); 
   const [totalCount, setTotalCount] = useState(0);
 
-  const handleModalToggle = () => setIsModalVisible(!isModalVisible);
+  const handleModalToggle = () => {
+    if (!isModalVisible) {
+      setSelectedRows([]); // Modal her açıldığında seçimleri temizle kanka
+    }
+    setIsModalVisible(!isModalVisible);
+  };
 
   useEffect(() => {
     if (isModalVisible) {
@@ -52,16 +60,28 @@ export default function MakineSecim({
     }
   }, [isModalVisible, searchTerm]);
 
+  // 🌟 Olayı radyo butonundan Checkbox'a çeviren kısım burası kanka:
   const rowSelection = {
-    type: "radio",
-    selectedRowKeys: selectedRow ? [selectedRow.TB_MAKINE_ID] : [],
-    onChange: (keys, rows) => setSelectedRow(rows[0]),
+    type: "checkbox", 
+    selectedRowKeys: selectedRows.map(row => row.TB_MAKINE_ID),
+    onChange: (keys, rows) => {
+      // Sayfalar arası geçişlerde veri kaybı olmasın diye seçilen satır nesnelerini tutuyoruz
+      setSelectedRows(rows); 
+    },
   };
 
   const handleModalOk = () => {
-    if (selectedRow) {
-      setValue(makineFieldName, selectedRow.MKN_KOD);
-      setValue(makineIdFieldName, selectedRow.TB_MAKINE_ID);
+    if (selectedRows && selectedRows.length > 0) {
+      // 🌟 HATAYI ENGELLEYEN KISIM: setValue fonksiyonu varsa tetikle, yoksa patlama
+      if (typeof setValue === "function") {
+        setValue(makineFieldName, selectedRows[0].MKN_KOD);
+        setValue(makineIdFieldName, selectedRows[0].TB_MAKINE_ID);
+      }
+
+      // 🌟 Seçilen tüm makineleri ana tabloya fırlatan callback
+      if (typeof onMakinelerSecildi === "function") {
+        onMakinelerSecildi(selectedRows);
+      }
     }
     setIsModalVisible(false);
   };
@@ -69,23 +89,14 @@ export default function MakineSecim({
   const handleClear = () => {
     setValue(makineFieldName, "");
     setValue(makineIdFieldName, "");
+    if (typeof onMakinelerSecildi === "function") {
+      onMakinelerSecildi([]); // Temizlenince ana tabloya boş dizi yolla
+    }
   };
 
   const columns = [
-    {
-      title: "Makine Kodu",
-      dataIndex: "MKN_KOD",
-      key: "MKN_KOD",
-      width: 150,
-      ellipsis: true,
-    },
-    {
-      title: "Makine Tanımı",
-      dataIndex: "MKN_TANIM",
-      key: "MKN_TANIM",
-      width: 250,
-      ellipsis: true,
-    },
+    { title: "Ekipman Kodu", dataIndex: "MKN_KOD", key: "MKN_KOD", width: 150, ellipsis: true },
+    { title: "Ekipman Tanımı", dataIndex: "MKN_TANIM", key: "MKN_TANIM", width: 250, ellipsis: true },
     {
       title: "Aktif",
       dataIndex: "MKN_AKTIF",
@@ -97,66 +108,30 @@ export default function MakineSecim({
         </div>
       ),
     },
-    {
-      title: "Makine Durumu",
-      dataIndex: "MKN_DURUM",
-      key: "MKN_DURUM",
-      width: 150,
-      ellipsis: true,
-    },
-    {
-      title: "Lokasyon",
-      dataIndex: "MKN_LOKASYON",
-      key: "MKN_LOKASYON",
-      width: 150,
-      ellipsis: true,
-    },
-    {
-      title: "Makine Tipi",
-      dataIndex: "MKN_TIP",
-      key: "MKN_TIP",
-      width: 150,
-      ellipsis: true,
-    },
-    {
-      title: "Kategori",
-      dataIndex: "MKN_KATEGORI",
-      key: "MKN_KATEGORI",
-      width: 150,
-      ellipsis: true,
-    },
-    {
-      title: "Marka",
-      dataIndex: "MKN_MARKA",
-      key: "MKN_MARKA",
-      width: 150,
-      ellipsis: true,
-    },
-    {
-      title: "Model",
-      dataIndex: "MKN_MODEL",
-      key: "MKN_MODEL",
-      width: 150,
-      ellipsis: true,
-    },
+    { title: "Ekipman Durumu", dataIndex: "MKN_DURUM", key: "MKN_DURUM", width: 150, ellipsis: true },
+    { title: "Lokasyon", dataIndex: "MKN_LOKASYON", key: "MKN_LOKASYON", width: 150, ellipsis: true },
+    { title: "Ekipman Tipi", dataIndex: "MKN_TIP", key: "MKN_TIP", width: 150, ellipsis: true },
+    { title: "Kategori", dataIndex: "MKN_KATEGORI", key: "MKN_KATEGORI", width: 150, ellipsis: true },
+    { title: "Marka", dataIndex: "MKN_MARKA", key: "MKN_MARKA", width: 150, ellipsis: true },
+    { title: "Model", dataIndex: "MKN_MODEL", key: "MKN_MODEL", width: 150, ellipsis: true },
   ];
 
   return (
     <div style={{ width: "100%" }}>
       <div style={{ display: "flex", gap: "5px", width: "100%" }}>
         <Controller
-  name={makineFieldName}
-  control={control}
-  render={({ field }) => (
-    <Input
-      {...field}
-      value={field.value || ""} // undefined değilse kullan, yoksa boş string
-      status={get(errors, makineFieldName) ? "error" : ""}
-      style={{ width: "100%", maxWidth: "630px" }}
-      disabled
-    />
-  )}
-/>
+          name={makineFieldName}
+          control={control}
+          render={({ field }) => (
+            <Input
+              {...field}
+              value={field.value || ""}
+              status={get(errors, makineFieldName) ? "error" : ""}
+              style={{ width: "100%", maxWidth: "630px" }}
+              disabled
+            />
+          )}
+        />
 
         <Controller
           name={makineIdFieldName}
@@ -174,7 +149,7 @@ export default function MakineSecim({
 
       <Modal
         width="1200px"
-        title="Makine Seçimi"
+        title="Ekipman Seçimi"
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalToggle}
@@ -182,7 +157,7 @@ export default function MakineSecim({
       >
         <Input
           style={{ width: "250px", marginBottom: "10px" }}
-          placeholder="Makine ara..."
+          placeholder="Ekipman ara..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
