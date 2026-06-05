@@ -876,6 +876,9 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
                 <span style={{ fontSize: "14px", lineHeight: 1 }}>🖨</span>
                 Yazdır
               </Button>
+              <Button danger disabled={disabled || actionLoading} loading={actionLoading} onClick={handleCloseModalToggle}>
+                {t("isEmriniKapat")}
+              </Button>
               <Button
                 disabled={actionLoading}
                 onClick={() => setAssignmentRequestKey((prevKey) => prevKey + 1)}
@@ -890,9 +893,6 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
               >
                 <span style={{ fontSize: "14px", lineHeight: 1 }}>👷</span>
                 Atama
-              </Button>
-              <Button danger disabled={disabled || actionLoading} loading={actionLoading} onClick={handleCloseModalToggle}>
-                Kapat
               </Button>
               <Button onClick={onClose}>İptal</Button>
               <Button

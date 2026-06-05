@@ -101,7 +101,7 @@ export default function MainTabs() {
     {
       key: "1",
       label: "Açıklama",
-      children: <Controller name="aciklama" control={control} render={({ field }) => <TextArea {...field} disabled={!isStatusActive} rows={4} />} />,
+      children: <Controller name="aciklama" control={control} render={({ field }) => <TextArea {...field} rows={4} />} />,
     },
   ];
 

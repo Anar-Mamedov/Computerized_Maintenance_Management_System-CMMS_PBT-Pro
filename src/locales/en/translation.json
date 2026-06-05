@@ -441,5 +441,6 @@
   "workOrder.downtime.endTimeCannotBeBeforeStartTime": "End time cannot be earlier than start time.",
   "araYuzAyarlari": "Interface Settings",
   "hatirlaticiPillenebilir": "Pinnable Reminder",
-  "hatirlaticiPillenebilirAciklama": "When enabled, the reminder panel can be pinned to the right side of the screen. When disabled, it is shown as a dropdown menu."
+  "hatirlaticiPillenebilirAciklama": "When enabled, the reminder panel can be pinned to the right side of the screen. When disabled, it is shown as a dropdown menu.",
+  "isEmriniKapat": "Close Work Order"
 }

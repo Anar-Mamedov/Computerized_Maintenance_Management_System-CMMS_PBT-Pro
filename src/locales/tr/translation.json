@@ -1091,5 +1091,6 @@
   "KLL_WEB_PROJE_MODUL": "Proje Yönetimi Modülü",
   "araYuzAyarlari": "Arayüz Ayarları",
   "hatirlaticiPillenebilir": "Hatırlatıcı Sabitlenebilir",
-  "hatirlaticiPillenebilirAciklama": "Açık olduğunda hatırlatıcı paneli ekranın sağ tarafına sabitlenebilir. Kapalı olduğunda açılır menü olarak gösterilir."
+  "hatirlaticiPillenebilirAciklama": "Açık olduğunda hatırlatıcı paneli ekranın sağ tarafına sabitlenebilir. Kapalı olduğunda açılır menü olarak gösterilir.",
+  "isEmriniKapat": "İş Emrini Kapat"
 }
