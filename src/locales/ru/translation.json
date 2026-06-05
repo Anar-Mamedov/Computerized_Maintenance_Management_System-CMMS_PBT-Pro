@@ -449,5 +449,8 @@
   "tab.uygulamaBilgileri": "Информация о применении",
   "tab.ekliBelgeler": "Прикрепленные документы",
   "tab.resimler": "Изображения",
-  "tab.aciklama": "Описание"
+  "tab.aciklama": "Описание",
+  "workOrder.filter.all": "Все наряды",
+  "workOrder.filter.open": "Открытые наряды",
+  "workOrder.filter.closed": "Закрытые наряды"
 }

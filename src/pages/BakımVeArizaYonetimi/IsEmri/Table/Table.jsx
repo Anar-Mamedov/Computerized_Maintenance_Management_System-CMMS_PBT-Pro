@@ -154,7 +154,6 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
   const tableWrapperRef = useRef(null);
   const loadedRowKeysRef = useRef(new Set());
   const [columnSearchTerm, setColumnSearchTerm] = useState("");
-  const [buHaftaKapananActive, setBuHaftaKapananActive] = useState(false);
   const [arizaActive, setArizaActive] = useState(() => {
     return Number(hatirlaticiGrupId) === 2 && Number(hatirlaticiSiraId) === 2;
   });
@@ -197,12 +196,12 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
   const formattedTotalCount = useMemo(() => formatKpiNumber(totalDataCount), [formatKpiNumber, totalDataCount]);
   const toplamIsEmriFilterLabel = useMemo(() => {
     if (toplamIsEmriCloseFilter === 0) {
-      return "Açık iş emirleri";
+      return t("workOrder.filter.open", "Açık iş emirleri");
     }
     if (toplamIsEmriCloseFilter === 1) {
-      return "Kapalı iş emirleri";
+      return t("workOrder.filter.closed", "Kapalı iş emirleri");
     }
-    return "Tüm iş emirleri";
+    return t("workOrder.filter.all", "Tüm iş emirleri");
   }, [toplamIsEmriCloseFilter]);
 
   const buildMergedFilters = useCallback(
@@ -1897,7 +1896,7 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
       >
         {[
           {
-            title: "Toplam İş Emri",
+            title: toplamIsEmriFilterLabel,
             value: kpi.Toplam?.Sayi ?? 0,
             footer: `${toplamIsEmriFilterLabel} | Açık: ${formatKpiNumber(kpi.Toplam?.Acik)} | Kapalı: ${formatKpiNumber(kpi.Toplam?.Kapali)}`,
             clickable: true,
@@ -1941,21 +1940,9 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
             title: "Bu Hafta Kapanan İş Emirleri",
             value: kpi.BuHaftaKapanan?.Sayi ?? 0,
             footer: "Son 7 günde kapanan işler",
-            clickable: true,
-            active: buHaftaKapananActive,
-            onClick: () => {
-              setBuHaftaKapananActive((prev) => {
-                const nextActive = !prev;
-                if (nextActive) {
-                  setValue("startDate", dayjs().subtract(7, "day").startOf("day"));
-                  setValue("endDate", dayjs().endOf("day"));
-                } else {
-                  setValue("startDate", null);
-                  setValue("endDate", null);
-                }
-                return nextActive;
-              });
-            },
+            clickable: false,
+            active: false,
+            onClick: undefined,
           },
         ].map((item) => (
           <div

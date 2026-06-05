@@ -452,5 +452,8 @@
   "tab.uygulamaBilgileri": "Application Information",
   "tab.ekliBelgeler": "Attached Documents",
   "tab.resimler": "Images",
-  "tab.aciklama": "Description"
+  "tab.aciklama": "Description",
+  "workOrder.filter.all": "All work orders",
+  "workOrder.filter.open": "Open work orders",
+  "workOrder.filter.closed": "Closed work orders"
 }

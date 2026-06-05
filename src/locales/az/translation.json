@@ -449,5 +449,8 @@
   "tab.uygulamaBilgileri": "Tətbiq Məlumatları",
   "tab.ekliBelgeler": "Əlavə Edilmiş Sənədlər",
   "tab.resimler": "Şəkillər",
-  "tab.aciklama": "Açıqlama"
+  "tab.aciklama": "Açıqlama",
+  "workOrder.filter.all": "Bütün iş əmrləri",
+  "workOrder.filter.open": "Açıq iş əmrləri",
+  "workOrder.filter.closed": "Bağlı iş əmrləri"
 }
