@@ -1102,5 +1102,8 @@
   "tab.uygulamaBilgileri": "Uygulama Bilgileri",
   "tab.ekliBelgeler": "Ekli Belgeler",
   "tab.resimler": "Resimler",
-  "tab.aciklama": "Açıklama"
+  "tab.aciklama": "Açıklama",
+  "workOrder.filter.all": "Tüm iş emirleri",
+  "workOrder.filter.open": "Açık iş emirleri",
+  "workOrder.filter.closed": "Kapalı iş emirleri"
 }
