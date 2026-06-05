@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Tabs } from "antd";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import AxiosInstance from "../../../../../../api/http";
 import KontrolListesiTablo from "./components/KontrolListesiEkle/KontrolListesiTablo";
 import Tablo from "./components/Malzemeler/Tablo";
 import Maliyetler from "./components/Maliyetler/Maliyetler";
@@ -12,10 +14,6 @@ import UygulamaBilgileri from "./components/UygulamaBilgileri/UygulamaBilgileri"
 import Aciklama from "./components/Aciklama/Aciklama";
 import ResimUpload from "./components/Resim/ResimUpload";
 import DosyaUpload from "./components/Dosya/DosyaUpload";
-
-const onChange = (key) => {
-  // console.log(key);
-};
 
 //styled components
 const StyledTabs = styled(Tabs)`
@@ -52,63 +50,114 @@ const StyledTabs = styled(Tabs)`
 
 export default function SecondTabs({ refreshKey }) {
   const { watch } = useFormContext();
+  const { t } = useTranslation();
+  const secilenBakimID = watch("secilenBakimID");
+
+  const [tabCounts, setTabCounts] = useState({
+    KontrolListSayisi: 0,
+    MalzemeListSayisi: 0,
+    PersonelListSayisi: 0,
+    OlcumListSayisi: 0,
+    ResimSayisi: 0,
+    DosyaSayisi: 0,
+    AciklamaVar: 0,
+  });
+
+  const fetchCounts = useCallback(() => {
+    if (secilenBakimID) {
+      AxiosInstance.get(`GetIsTanimTabsCountById?isTanimId=${secilenBakimID}`)
+        .then((response) => {
+          if (response && response.data) {
+            setTabCounts(response.data);
+          } else if (response) {
+            setTabCounts(response);
+          }
+        })
+        .catch((err) => {
+          console.error("Error fetching tab counts:", err);
+        });
+    }
+  }, [secilenBakimID]);
+
+  useEffect(() => {
+    fetchCounts();
+  }, [secilenBakimID, fetchCounts, refreshKey]);
+
+  const handleTabChange = (key) => {
+    fetchCounts();
+  };
 
   const items = [
     {
       key: "1",
-      label: "Kontrol Listesi",
+      label: tabCounts.KontrolListSayisi > 0 ? `${t("tab.kontrolListesi", "Kontrol Listesi")} (${tabCounts.KontrolListSayisi})` : t("tab.kontrolListesi", "Kontrol Listesi"),
       children: <KontrolListesiTablo />,
     },
     {
       key: "2",
-      label: "Malzemeler",
+      label: tabCounts.MalzemeListSayisi > 0 ? `${t("tab.malzemeler", "Malzemeler")} (${tabCounts.MalzemeListSayisi})` : t("tab.malzemeler", "Malzemeler"),
       children: <Tablo />,
     },
     {
       key: "3",
-      label: "Maliyetler",
+      label: t("tab.maliyetler", "Maliyetler"),
       children: <Maliyetler />,
     },
     // {
     //   key: "4",
-    //   label: "Ölçümler",
+    //   label: tabCounts.OlcumListSayisi > 0 ? `${t("tab.olcumler", "Ölçümler")} (${tabCounts.OlcumListSayisi})` : t("tab.olcumler", "Ölçümler"),
     //   children: <Olcumler />,
     // },
     {
       key: "5",
-      label: "Süre Bilgileri",
+      label: t("tab.sureBilgileri", "Süre Bilgileri"),
       children: <SureBilgileri />,
     },
     {
       key: "6",
-      label: "Özel Alanlar",
+      label: t("tab.ozelAlanlar", "Özel Alanlar"),
       children: <OzelAlanlar />,
     },
     {
       key: "7",
-      label: "Uygulama Bilgileri",
+      label: t("tab.uygulamaBilgileri", "Uygulama Bilgileri"),
       children: <UygulamaBilgileri />,
     },
     {
       key: "8",
-      label: "Ekli Belgeler",
+      label: tabCounts.DosyaSayisi > 0 ? `${t("tab.ekliBelgeler", "Ekli Belgeler")} (${tabCounts.DosyaSayisi})` : t("tab.ekliBelgeler", "Ekli Belgeler"),
       children: <DosyaUpload />,
     },
     {
       key: "9",
-      label: "Resimler",
+      label: tabCounts.ResimSayisi > 0 ? `${t("tab.resimler", "Resimler")} (${tabCounts.ResimSayisi})` : t("tab.resimler", "Resimler"),
       children: <ResimUpload />,
     },
     {
       key: "10",
-      label: "Açıklama",
+      label: (
+        <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+          {t("tab.aciklama", "Açıklama")}
+          {tabCounts.AciklamaVar === 1 && (
+            <span
+              style={{
+                width: "6px",
+                height: "6px",
+                backgroundColor: "#2bc770",
+                borderRadius: "50%",
+                display: "inline-block",
+              }}
+            />
+          )}
+        </span>
+      ),
       children: <Aciklama />,
     },
   ];
 
   return (
     <div>
-      <StyledTabs defaultActiveKey="1" items={items} onChange={onChange} />
+      <StyledTabs defaultActiveKey="1" items={items} onChange={handleTabChange} />
     </div>
   );
 }

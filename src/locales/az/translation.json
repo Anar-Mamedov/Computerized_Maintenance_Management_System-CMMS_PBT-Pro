@@ -439,5 +439,15 @@
   "araYuzAyarlari": "Arayüz Ayarları",
   "hatirlaticiPillenebilir": "Xatırladıcı Sabitlənə Bilər",
   "hatirlaticiPillenebilirAciklama": "Açıq olduqda xatırladıcı paneli ekranın sağ tərəfinə sabitlənə bilər. Bağlı olduqda açılan menyu olaraq göstərilir.",
-  "isEmriniKapat": "İş Əmrini Bağla"
+  "isEmriniKapat": "İş Əmrini Bağla",
+  "tab.kontrolListesi": "Kontrol Siyahısı",
+  "tab.malzemeler": "Materiallar",
+  "tab.maliyetler": "Xərclər",
+  "tab.olcumler": "Ölçmələr",
+  "tab.sureBilgileri": "Müddət Məlumatları",
+  "tab.ozelAlanlar": "Xüsusi Sahələr",
+  "tab.uygulamaBilgileri": "Tətbiq Məlumatları",
+  "tab.ekliBelgeler": "Əlavə Edilmiş Sənədlər",
+  "tab.resimler": "Şəkillər",
+  "tab.aciklama": "Açıqlama"
 }

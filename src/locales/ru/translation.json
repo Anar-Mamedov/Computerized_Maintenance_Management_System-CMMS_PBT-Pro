@@ -439,5 +439,15 @@
   "araYuzAyarlari": "Настройки интерфейса",
   "hatirlaticiPillenebilir": "Закрепляемое Напоминание",
   "hatirlaticiPillenebilirAciklama": "Когда включено, панель напоминаний можно закрепить в правой части экрана. Когда выключено, отображается как выпадающее меню.",
-  "isEmriniKapat": "Закрыть заказ-наряд"
+  "isEmriniKapat": "Закрыть заказ-наряд",
+  "tab.kontrolListesi": "Контрольный список",
+  "tab.malzemeler": "Материалы",
+  "tab.maliyetler": "Затраты",
+  "tab.olcumler": "Измерения",
+  "tab.sureBilgileri": "Информация о времени",
+  "tab.ozelAlanlar": "Специальные поля",
+  "tab.uygulamaBilgileri": "Информация о применении",
+  "tab.ekliBelgeler": "Прикрепленные документы",
+  "tab.resimler": "Изображения",
+  "tab.aciklama": "Описание"
 }

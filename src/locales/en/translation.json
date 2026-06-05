@@ -442,5 +442,15 @@
   "araYuzAyarlari": "Interface Settings",
   "hatirlaticiPillenebilir": "Pinnable Reminder",
   "hatirlaticiPillenebilirAciklama": "When enabled, the reminder panel can be pinned to the right side of the screen. When disabled, it is shown as a dropdown menu.",
-  "isEmriniKapat": "Close Work Order"
+  "isEmriniKapat": "Close Work Order",
+  "tab.kontrolListesi": "Checklist",
+  "tab.malzemeler": "Materials",
+  "tab.maliyetler": "Costs",
+  "tab.olcumler": "Measurements",
+  "tab.sureBilgileri": "Time Information",
+  "tab.ozelAlanlar": "Custom Fields",
+  "tab.uygulamaBilgileri": "Application Information",
+  "tab.ekliBelgeler": "Attached Documents",
+  "tab.resimler": "Images",
+  "tab.aciklama": "Description"
 }
