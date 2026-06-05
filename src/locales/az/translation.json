@@ -438,5 +438,6 @@
   "workOrder.downtime.endTimeCannotBeBeforeStartTime": "Bitiş vaxtı başlama vaxtından kiçik ola bilməz.",
   "araYuzAyarlari": "Arayüz Ayarları",
   "hatirlaticiPillenebilir": "Xatırladıcı Sabitlənə Bilər",
-  "hatirlaticiPillenebilirAciklama": "Açıq olduqda xatırladıcı paneli ekranın sağ tərəfinə sabitlənə bilər. Bağlı olduqda açılan menyu olaraq göstərilir."
+  "hatirlaticiPillenebilirAciklama": "Açıq olduqda xatırladıcı paneli ekranın sağ tərəfinə sabitlənə bilər. Bağlı olduqda açılan menyu olaraq göstərilir.",
+  "isEmriniKapat": "İş Əmrini Bağla"
 }
