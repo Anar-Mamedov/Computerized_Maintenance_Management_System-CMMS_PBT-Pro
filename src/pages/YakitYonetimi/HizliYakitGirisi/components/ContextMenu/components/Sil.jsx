@@ -12,33 +12,35 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
 
     for (const row of selectedRows) {
       try {
+        // Dokümana göre istek: POST /api/DeleteYakit?id=6012
+        // row içindeki ID alanı: TB_STOK_ID (Önceki JSON verisine göre)
         const response = await AxiosInstance.post(
-          `DeleteMalzemeTalep?fisID=${row.key}&fisDurumID=${row.SFS_TALEP_DURUM_ID}`
+          `DeleteYakit?id=${row.TB_STOK_ID}`
         );
 
         if (response.status_code === 200) {
-          message.success(response.message || "İşlem başarılı.");
+          message.success(response.message || "Silme işlemi başarılı.");
         } else {
           isError = true;
-          message.error(response.message || "İşlem başarısız.");
+          message.error(response.message || "Silme işlemi başarısız.");
         }
       } catch (error) {
         isError = true;
         console.error("Silme işlemi sırasında hata oluştu:", error);
-        message.error("Sunucu hatası.");
+        message.error("Sunucu hatası, silinemedi.");
       }
     }
 
     if (!isError) {
-      refreshTableData();
-      hidePopover();
+      refreshTableData(); // Tabloyu yenile
+      hidePopover();      // Menüyü kapat
     }
   };
 
   return (
     <Popconfirm
       title="Silme İşlemi"
-      description="Bu öğeyi silmek istediğinize emin misiniz?"
+      description="Bu yakıt kaydını silmek istediğinize emin misiniz?"
       onConfirm={handleDelete}
       okText="Evet"
       cancelText="Hayır"
@@ -47,16 +49,15 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
       <div
         className="menu-item-hover"
         style={{
-          ...buttonStyle, // Disabled kontrolü buraya eklendi
-          display: disabled ? 'none' : 'flex', // Disabled ise gizle, değilse flex
+          ...buttonStyle,
+          display: disabled ? 'none' : 'flex',
           alignItems: 'flex-start',
           gap: '12px',
           cursor: 'pointer',
-          padding: '10px 12px', // Tıklama alanını görseldeki gibi ferahlatmak için padding artırıldı
+          padding: '10px 12px',
           transition: 'background-color 0.3s',
-          width: '100%' // Menü içinde tam genişlik kaplaması için
+          width: '100%'
         }}
-        // Mouse üzerine gelince hafif gri olması için basit bir hover stili (CSS class yoksa diye inline ekleyebiliriz ama class varsa kalsın)
         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
       >
@@ -71,7 +72,7 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
             Sil
           </span>
           <span style={{ fontSize: '12px', color: '#8c8c8c', marginTop: '4px', lineHeight: '1.4' }}>
-            Talep kaydını kalıcı olarak siler. Geri alınamaz.
+            Yakıt kaydını kalıcı olarak siler. Geri alınamaz.
           </span>
         </div>
       </div>

@@ -2,10 +2,12 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Input, Tabs, Typography } from "antd";
 import styled from "styled-components";
 import { Controller, useFormContext } from "react-hook-form";
+import GenelBilgiler from "./GenelBilgiler/GenelBilgiler";
+import OzelAlanlar from "./OzelAlanlar/OzelAlanlar";
+import DosyaUpload from "./Belgeler/DosyaUpload";
+import Resimler from "./Resimler/Resimler";
+import Aciklama from "./Aciklama";
 import { t } from "i18next";
-import OzelAlanlar from "./components/OzelAlanlar/OzelAlanlar.jsx";
-import FisIcerigi from "./components/FisIcerigi/FisIcerigi.jsx";
-import Aciklama from "./components/Aciklama/Aciklama.jsx";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -47,7 +49,7 @@ const StyledTabs = styled(Tabs)`
 
 //styled components end
 
-export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen }) {
+export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen, selectedRowID }) {
   const { watch } = useFormContext();
   const [activeTabKey, setActiveTabKey] = useState("4"); // Default to the FisIcerigi tab
 
@@ -67,23 +69,29 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen })
     {
       key: "4",
       label: t("Detay Bilgileri"),
-      children: <FisIcerigi modalOpen={modalOpen} />,
+      children: <GenelBilgiler modalOpen={modalOpen} />,
     },
 
     {
       key: "5",
-      label: t("Ekli Belgeler"),
-      children: <FisIcerigi modalOpen={modalOpen} />,
+      label: t("Özel Alanlar"),
+      children: <OzelAlanlar modalOpen={modalOpen} />,
     },
 
     {
       key: "6",
-      label: t("Resimler"),
-      children: <FisIcerigi modalOpen={modalOpen} />,
+      label: t("Ekli Belgeler"),
+      children: <DosyaUpload modalOpen={modalOpen} selectedRowID={selectedRowID} />,
     },
 
     {
       key: "7",
+      label: t("Resimler"),
+      children: <Resimler modalOpen={modalOpen} selectedRowID={selectedRowID} />,
+    },
+
+    {
+      key: "8",
       label: "Açıklama",
       // children: <SureBilgileri fieldRequirements={fieldRequirements} />,
       children: <Aciklama />,

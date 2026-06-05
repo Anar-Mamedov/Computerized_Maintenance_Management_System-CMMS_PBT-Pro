@@ -1,24 +1,57 @@
 import React, { useCallback, useEffect, useState, useMemo, useRef } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Card, Tag, Space, Tooltip, Row, Col, DatePicker, InputNumber, Switch, Badge, Alert, Divider } from "antd";
-import { HolderOutlined, SearchOutlined, MenuOutlined, FileExcelOutlined, SaveOutlined, PlusOutlined, CopyOutlined, CalendarOutlined, ShopOutlined, DollarOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Progress, message, Card, Row, Col, Space, Popconfirm, Tag, Popover, Select, DatePicker, TimePicker, InputNumber } from "antd";
+import { HolderOutlined, SearchOutlined, MenuOutlined, EditOutlined, DeleteOutlined, CalendarOutlined, ClockCircleOutlined, DollarOutlined, SaveOutlined, RedoOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Resizable } from "react-resizable";
-import "./ResizeStyle.css"; 
+import "./ResizeStyle.css";
+import AxiosInstance from "../../../../api/http";
+import { useFormContext } from "react-hook-form";
+import { SiMicrosoftexcel } from "react-icons/si";
 import * as XLSX from "xlsx";
+import { t } from "i18next";
 import dayjs from "dayjs";
+import MakineTablo from "../components/MakineTablo";
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
-// --- Yardımcı Fonksiyonlar ---
+// Function to extract text from React elements
+import { isValidElement } from "react";
+
+function extractTextFromElement(element) {
+  let text = "";
+  if (typeof element === "string") {
+    text = element;
+  } else if (Array.isArray(element)) {
+    text = element.map((child) => extractTextFromElement(child)).join("");
+  } else if (isValidElement(element)) {
+    text = extractTextFromElement(element.props.children);
+  } else if (element !== null && element !== undefined) {
+    text = element.toString();
+  }
+  return text;
+}
+
 const ResizableTitle = (props) => {
   const { onResize, width, ...restProps } = props;
+
+  // tabloyu genişletmek için kullanılan alanın stil özellikleri
+  const handleStyle = {
+    position: "absolute",
+    bottom: 0,
+    right: "-5px",
+    width: "20%",
+    height: "100%", // this is the area that is draggable, you can adjust it
+    zIndex: 2, // ensure it's above other elements
+    cursor: "col-resize",
+    padding: "0px",
+    backgroundSize: "0px",
+  };
 
   if (!width) {
     return <th {...restProps} />;
   }
-
   return (
     <Resizable
       width={width}
@@ -26,20 +59,16 @@ const ResizableTitle = (props) => {
       handle={
         <span
           className="react-resizable-handle"
-          onClick={(e) => e.stopPropagation()}
-          style={{
-            position: "absolute",
-            bottom: 0,
-            right: "-5px",
-            width: "10px",
-            height: "100%",
-            zIndex: 10,
-            cursor: "col-resize",
+          onClick={(e) => {
+            e.stopPropagation();
           }}
+          style={handleStyle}
         />
       }
       onResize={onResize}
-      draggableOpts={{ enableUserSelectHack: false }}
+      draggableOpts={{
+        enableUserSelectHack: false,
+      }}
     >
       <th {...restProps} />
     </Resizable>
@@ -57,300 +86,646 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
     display: "flex",
     alignItems: "center",
     gap: 8,
-    padding: "8px",
-    borderBottom: "1px solid #f0f0f0",
   };
 
   return (
     <div ref={setNodeRef} style={styleWithTransform} {...restProps} {...attributes}>
-      <div {...listeners} style={{ cursor: "grab", flexGrow: 1, display: "flex", alignItems: "center" }}>
-        <HolderOutlined style={{ marginRight: 8, color: "#999" }} />
+      <div
+        {...listeners}
+        style={{
+          cursor: "grab",
+          flexGrow: 1,
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <HolderOutlined style={{ marginRight: 8 }} />
         {text}
       </div>
-      <Checkbox
-        checked={visible}
-        onChange={(e) => onVisibilityChange(text, e.target.checked)}
-        onClick={(e) => e.stopPropagation()}
-      />
     </div>
   );
 };
 
-// --- Ana Bileşen ---
 const MainTable = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  // State definitions...
+  const { control, setValue, formState: { errors } } = useFormContext();
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  
-  // Varsayılan Değerler State'i
-  const [defaults, setDefaults] = useState({
-      tarih: dayjs(),
-      istasyon: "",
-      birimFiyat: 0,
-      fullDepo: true
-  });
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedClock, setSelectedClock] = useState(null);
+  const [defaultPrice, setDefaultPrice] = useState("");
+  const [fuelTank, setFuelTank] = useState("");
+  const [checkedOne, setCheckedOne] = useState(false);
+  const [checkedTwo, setCheckedTwo] = useState(false);
+  const [searchTimeout, setSearchTimeout] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0); // Total pages
+  const [label, setLabel] = useState("Yükleniyor...");
+  const [totalDataCount, setTotalDataCount] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [xlsxLoading, setXlsxLoading] = useState(false);
+  const [status, setStatus] = useState(true);
 
-  // İstatistikler
-  const stats = useMemo(() => {
-      return {
-          hazir: data.filter(x => x.durum === "Hazır").length,
-          hatali: data.filter(x => x.durum === "Hatalı").length,
-          kaydedildi: data.filter(x => x.durum === "Kaydedildi").length,
-      }
-  }, [data]);
+  const [selectedMachines, setSelectedMachines] = useState([]);
 
-  // --- BAŞLANGIÇ VERİLERİ (6 Boş Satır) ---
-  useEffect(() => {
-      setLoading(true);
-      // 6 Adet boş taslak satırı oluşturuyoruz
-      const initialRows = Array.from({ length: 6 }).map((_, index) => ({
-          key: index + 1,
-          plaka: "",
-          tarih: null,
-          litre: null,
-          birimFiyat: null,
-          fullDepo: true, // Varsayılan true
-          istasyon: "",
-          not: "",
-          durum: "Taslak"
-      }));
-      setData(initialRows);
-      setLoading(false);
-  }, []);
+  const ekipmanOptions = [
+    { value: "MKN00005", label: "MKN00005 - CB-224E Asfalt Silindiri", tipi: "Asfalt Silindiri", yakit: "Motorin", lokasyon: "Gölet İnşaatı" }
+  ];
 
-  // --- Kolon Tanımları (Giriş Grid Yapısı) ---
+  const aktifEkipmanDetay = useMemo(() => {
+    return ekipmanOptions.find(e => e.value === selectedMachines) || { tipi: "-", yakit: "-", lokasyon: "-" };
+  }, [selectedMachines]);
+
+  const tutar = useMemo(() => {
+    return ((defaultPrice || 0) * (searchTerm ? parseFloat(searchTerm) : 0)).toFixed(2); // miktar için mevcut bir state ya da searchTerm kullanabilirsin
+  }, [searchTerm, defaultPrice]);
+
+  const [selectedProject, setSelectedProject] = useState(undefined);
+  const [selectedDriver, setSelectedDriver] = useState(undefined);
+  const [description, setDescription] = useState("");
+
+  const ozelAlanlar = JSON.parse(localStorage.getItem("ozelAlanlar"));
+
+  // Özel Alanların nameleri backend çekmek için api isteği sonu
+
+  const statusTag = (statusId) => {
+    switch (statusId) {
+      case 1:
+        return { color: "#ff5e00", text: "Onay Bekliyor" };
+      case 2:
+        return { color: "#00d300", text: "Onaylandı" };
+      case 3:
+        return { color: "#d10000", text: "Onaylanmadı" };
+      default:
+        return { color: "", text: "" }; // Diğer durumlar için boş değer
+    }
+  };
+
   const initialColumns = [
     {
-      title: "#",
-      dataIndex: "key",
-      key: "key",
-      width: 50,
+      title: "Ekipman Kodu / Tanımı",
+      dataIndex: "EKIPMAN_KOD",
+      key: "EKIPMAN_KOD",
+      width: 280,
       visible: true,
-      render: (text) => <span style={{color: '#999'}}>{text}</span>
+      render: (text, record) => {
+        if (record.isNewRow) {
+          return (
+            <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+              <MakineTablo
+                control={control}
+                errors={errors}
+                setValue={setValue}
+                makineFieldName="MKN_KOD_temp"
+                makineIdFieldName="TB_MAKINE_ID_temp"
+                onMakinelerSecildi={(secilenMakinelerDizisi) => {
+                  const yeniSatirlar = secilenMakinelerDizisi.map((makine, index) => ({
+                    key: `row_${Date.now()}_${index}_${makine.TB_MAKINE_ID}`,
+                    isNewRow: false, // Normal satır
+                    EKIPMAN_KOD: makine.MKN_KOD,
+                    EKIPMAN_TANIM: makine.MKN_TANIM,
+                    EKIPMAN_TIPI: makine.MKN_TIP || "-", 
+                    YAKIT_TIPI: "Motorin", 
+                    LOKASYON: makine.MKN_LOKASYON || "-",
+                    TARiH: dayjs().format("YYYY-MM-DD"), // Bugün varsayılan
+                    SAAT: dayjs().format("HH:mm"),       // Şu an varsayılan
+                    MiKTAR: 0,
+                    FiYAT: defaultPrice || 45.00,
+                    TUTAR: 0,
+                    FULL_DEPO: false,
+                    STOK_KULLANIM: false,
+                    PROJE: undefined,
+                    SURUCU: undefined,
+                    ACIKLAMA: ""
+                  }));
+                  setSelectedMachines(prev => [...prev, ...yeniSatirlar]);
+                }}
+              />
+            </div>
+          );
+        }
+
+        // 🌟 GÖRSELDEKİ GİBİ: Seçilen makinenin kodu input içinde kilitli (disabled) ve yanında butonlarıyla geliyor
+        return (
+          <div style={{ display: "flex", gap: "5px", width: "100%" }}>
+            <Input value={record.EKIPMAN_KOD} style={{ width: "100%" }} disabled />
+            <Button disabled>+</Button>
+            <Button onClick={() => {
+              // Satırı silme butonu (-)
+              setSelectedMachines(prev => prev.filter(item => item.key !== record.key));
+            }}>-</Button>
+          </div>
+        );
+      }
     },
     {
-      title: "Plaka",
-      dataIndex: "plaka",
-      key: "plaka",
+      title: "Ekipman Tipi",
+      dataIndex: "EKIPMAN_TIPI",
+      key: "EKIPMAN_TIPI",
       width: 120,
       visible: true,
-      render: (text, record) => (
-        <Input 
-            placeholder="34..." 
-            variant="borderless" 
-            style={{backgroundColor: '#fff', border: '1px solid #d9d9d9'}} 
-            value={text}
-            onChange={(e) => handleCellChange(record.key, 'plaka', e.target.value)}
-        />
-      ),
+      render: (text, record) => record.isNewRow ? "-" : <Input value={record.EKIPMAN_TIPI} disabled />
     },
     {
-      title: "Tarih/Saat",
-      dataIndex: "tarih",
-      key: "tarih",
+      title: "Yakıt Tipi",
+      dataIndex: "YAKIT_TIPI",
+      key: "YAKIT_TIPI",
+      width: 120,
+      visible: true,
+      render: (text, record) => record.isNewRow ? "-" : <Input value={record.YAKIT_TIPI} disabled />
+    },
+    {
+      title: "Tarih",
+      dataIndex: "TARiH",
+      key: "TARiH",
       width: 160,
       visible: true,
-      render: (val, record) => (
-        <DatePicker 
-            showTime 
-            format="DD.MM.YYYY HH:mm" 
-            placeholder="Seçiniz" 
-            style={{width: '100%'}} 
-            value={val}
-            onChange={(date) => handleCellChange(record.key, 'tarih', date)}
-        />
-      ),
+      render: (text, record) => {
+        if (record.isNewRow) return <DatePicker style={{ width: "100%" }} placeholder="Tarih seç" disabled />;
+        return (
+          <DatePicker
+            style={{ width: "100%" }}
+            format="DD.MM.YYYY"
+            value={record.TARiH ? dayjs(record.TARiH) : null}
+            onChange={(date, dateString) => {
+              setSelectedMachines(prev => prev.map(item => 
+                item.key === record.key ? { ...item, TARiH: dateString } : item
+              ));
+            }}
+          />
+        );
+      }
     },
     {
-      title: "Litre",
-      dataIndex: "litre",
-      key: "litre",
+      title: "Saat",
+      dataIndex: "SAAT",
+      key: "SAAT",
+      width: 130,
+      visible: true,
+      render: (text, record) => {
+        if (record.isNewRow) return <TimePicker style={{ width: "100%" }} placeholder="Zaman" disabled />;
+        return (
+          <TimePicker
+            style={{ width: "100%" }}
+            format="HH:mm"
+            value={record.SAAT ? dayjs(record.SAAT, "HH:mm") : null}
+            onChange={(time, timeString) => {
+              setSelectedMachines(prev => prev.map(item => 
+                item.key === record.key ? { ...item, SAAT: timeString } : item
+              ));
+            }}
+          />
+        );
+      }
+    },
+    {
+      title: "Son Alınan",
+      dataIndex: "SON_ALINAN",
+      key: "SON_ALINAN",
       width: 100,
       visible: true,
-      render: (val, record) => (
-        <InputNumber 
-            min={0} 
-            placeholder="0.00" 
-            style={{width: '100%'}} 
-            value={val}
-            onChange={(num) => handleCellChange(record.key, 'litre', num)}
-        />
-      ),
+      render: (text, record) => record.isNewRow ? "" : <Input value="795" disabled />
     },
     {
-      title: "Birim Fiyat",
-      dataIndex: "birimFiyat",
-      key: "birimFiyat",
-      width: 100,
+      title: "Birim",
+      dataIndex: "BiRiM",
+      key: "BiRiM",
+      width: 90,
       visible: true,
-      render: (val, record) => (
-        <InputNumber 
-            min={0} 
-            placeholder="0.00" 
-            style={{width: '100%'}} 
-            value={val}
-            onChange={(num) => handleCellChange(record.key, 'birimFiyat', num)}
-        />
-      ),
+      render: (text, record) => record.isNewRow ? "" : <Input value="saat" disabled />
     },
     {
-        title: "Tutar",
-        key: "tutar",
-        width: 110,
-        visible: true,
-        render: (_, record) => {
-            const tutar = (record.litre || 0) * (record.birimFiyat || 0);
-            return <span style={{fontWeight: 600}}>{tutar > 0 ? tutar.toLocaleString('tr-TR', {minimumFractionDigits: 2}) + " ₺" : "-"}</span>
-        }
+      title: "Miktar",
+      dataIndex: "MiKTAR",
+      key: "MiKTAR",
+      width: 140,
+      visible: true,
+      render: (text, record) => {
+        if (record.isNewRow) return <InputNumber style={{ width: "100%" }} disabled placeholder="0,00" />;
+        return (
+          <InputNumber
+            style={{ width: "100%", borderColor: "#ffcc00" }} // 🌟 Görseldeki sarı border
+            min={0}
+            value={record.MiKTAR}
+            onChange={(val) => {
+              setSelectedMachines(prev => prev.map(item => {
+                if (item.key === record.key) {
+                  const yeniTutar = ((val || 0) * (item.FiYAT || 0)).toFixed(2);
+                  return { ...item, MiKTAR: val, TUTAR: yeniTutar };
+                }
+                return item;
+              }));
+            }}
+          />
+        );
+      }
+    },
+    {
+      title: "Fiyat",
+      dataIndex: "FiYAT",
+      key: "FiYAT",
+      width: 140,
+      visible: true,
+      render: (text, record) => {
+        if (record.isNewRow) return <InputNumber style={{ width: "100%" }} disabled />;
+        return (
+          <InputNumber
+            style={{ width: "100%" }}
+            min={0}
+            value={record.FiYAT}
+            suffix={<DollarOutlined style={{ color: "#0091ff" }} />}
+            onChange={(val) => {
+              setSelectedMachines(prev => prev.map(item => {
+                if (item.key === record.key) {
+                  const yeniTutar = ((item.MiKTAR || 0) * (val || 0)).toFixed(2);
+                  return { ...item, FiYAT: val, TUTAR: yeniTutar };
+                }
+                return item;
+              }));
+            }}
+          />
+        );
+      }
+    },
+    {
+      title: "Tutar",
+      dataIndex: "TUTAR",
+      key: "TUTAR",
+      width: 140,
+      visible: true,
+      render: (text, record) => {
+        if (record.isNewRow) return <InputNumber style={{ width: "100%" }} disabled />;
+        return <InputNumber style={{ width: "100%" }} disabled value={record.TUTAR} />;
+      }
     },
     {
       title: "Full Depo",
-      dataIndex: "fullDepo",
-      key: "fullDepo",
+      dataIndex: "FULL_DEPO",
+      key: "FULL_DEPO",
       width: 90,
+      align: "center",
       visible: true,
-      render: (val, record) => (
-          <div style={{textAlign: 'center'}}>
-             <Checkbox 
-                checked={val} 
-                onChange={(e) => handleCellChange(record.key, 'fullDepo', e.target.checked)}
-             />
-             <div style={{fontSize: '10px', color: val ? 'green' : '#ccc'}}>{val ? 'Full' : 'Kısmi'}</div>
-          </div>
-      )
-    },
-    {
-      title: "Not",
-      dataIndex: "not",
-      key: "not",
-      width: 200,
-      visible: true,
-      render: (text, record) => (
-        <div style={{display: 'flex', flexDirection: 'column'}}>
-            <Input 
-                placeholder="Açıklama..." 
-                size="small" 
-                value={text}
-                onChange={(e) => handleCellChange(record.key, 'not', e.target.value)}
-            />
-            <span style={{fontSize: '10px', color: '#888', marginTop: 2}}>
-                İstasyon: {defaults.istasyon || "—"}
-            </span>
-        </div>
-      )
-    },
-    {
-      title: "Durum",
-      dataIndex: "durum",
-      key: "durum",
-      width: 100,
-      visible: true,
-      render: (text) => {
-          let color = "default";
-          if(text === "Hazır") color = "processing";
-          if(text === "Hatalı") color = "error";
-          if(text === "Kaydedildi") color = "success";
-          return <Tag color={color}>{text}</Tag>
+      render: (checked, record) => {
+        if (record.isNewRow) return <Checkbox disabled />;
+        return (
+          <Checkbox
+            checked={record.FULL_DEPO}
+            onChange={(e) => {
+              setSelectedMachines(prev => prev.map(item => 
+                item.key === record.key ? { ...item, FULL_DEPO: e.target.checked } : item
+              ));
+            }}
+          />
+        );
       }
-    }
+    },
+    {
+      title: "Stok Kullanım",
+      dataIndex: "STOK_KULLANIM",
+      key: "STOK_KULLANIM",
+      width: 110,
+      align: "center",
+      visible: true,
+      render: (checked, record) => {
+        if (record.isNewRow) return <Checkbox disabled />;
+        return (
+          <Checkbox
+            checked={record.STOK_KULLANIM}
+            onChange={(e) => {
+              setSelectedMachines(prev => prev.map(item => 
+                item.key === record.key ? { ...item, STOK_KULLANIM: e.target.checked } : item
+              ));
+            }}
+          />
+        );
+      }
+    },
+    {
+      title: "Yakıt Tankı",
+      dataIndex: "YAKIT_TANKI",
+      key: "YAKIT_TANKI",
+      width: 180,
+      visible: true,
+      render: (text, record) => {
+        if (record.isNewRow) return <Select style={{ width: "100%" }} disabled placeholder="Seçiniz" />;
+        return (
+          <Select
+            style={{ width: "100%" }}
+            value={record.YAKIT_TANKI || "secenek1"}
+            onChange={(val) => {
+              setSelectedMachines(prev => prev.map(item => 
+                item.key === record.key ? { ...item, YAKIT_TANKI: val } : item
+              ));
+            }}
+            options={[
+              { value: 'secenek1', label: 'Ana Tank' },
+              { value: 'secenek2', label: 'TAN0158-Benzin Depo' },
+            ]}
+          />
+        );
+      }
+    },
+    {
+      title: "Lokasyon",
+      dataIndex: "LOKASYON",
+      key: "LOKASYON",
+      width: 160,
+      visible: true,
+      render: (text, record) => record.isNewRow ? "-" : <Input value={record.LOKASYON} disabled />
+    },
+    {
+      title: "Proje",
+      dataIndex: "PROJE",
+      key: "PROJE",
+      width: 180,
+      visible: true,
+      render: (text, record) => {
+        if (record.isNewRow) return <Select style={{ width: "100%" }} disabled placeholder="Proje" />;
+        return (
+          <Select
+            showSearch
+            style={{ width: "100%" }}
+            placeholder="Proje Seçiniz..."
+            optionFilterProp="label"
+            value={record.PROJE}
+            onChange={(val) => {
+              setSelectedMachines(prev => prev.map(item => 
+                item.key === record.key ? { ...item, PROJE: val } : item
+              ));
+            }}
+            options={[
+              { value: "proje1", label: "Marmaray Projesi" },
+            ]}
+          />
+        );
+      }
+    },
+    {
+      title: "Sürücü / Operatör",
+      dataIndex: "SURUCU",
+      key: "SURUCU",
+      width: 180,
+      visible: true,
+      render: (text, record) => {
+        if (record.isNewRow) return <Select style={{ width: "100%" }} disabled placeholder="Sürücü" />;
+        return (
+          <Select
+            showSearch
+            style={{ width: "100%" }}
+            placeholder="Sürücü Seçiniz..."
+            optionFilterProp="label"
+            value={record.SURUCU}
+            onChange={(val) => {
+              setSelectedMachines(prev => prev.map(item => 
+                item.key === record.key ? { ...item, SURUCU: val } : item
+              ));
+            }}
+            options={[
+              { value: "surucu1", label: "Ahmet Yılmaz" },
+            ]}
+          />
+        );
+      }
+    },
+    {
+      title: "Açıklama",
+      dataIndex: "ACIKLAMA",
+      key: "ACIKLAMA",
+      width: 220,
+      visible: true,
+      render: (text, record) => {
+        if (record.isNewRow) return <Input disabled placeholder="Açıklama" />;
+        return (
+          <Input
+            placeholder="Açıklama giriniz..."
+            value={record.ACIKLAMA}
+            onChange={(e) => {
+              setSelectedMachines(prev => prev.map(item => 
+                item.key === record.key ? { ...item, ACIKLAMA: e.target.value } : item
+              ));
+            }}
+          />
+        );
+      }
+    },
   ];
 
-  // Hücre güncelleme fonksiyonu (Mock Logic)
-  const handleCellChange = (key, field, value) => {
-      const newData = data.map(item => {
-          if (item.key === key) {
-              const updatedItem = { ...item, [field]: value };
-              // Basit bir validasyon simülasyonu: Plaka ve Litre varsa "Hazır"
-              if (updatedItem.plaka && updatedItem.litre > 0) {
-                  updatedItem.durum = "Hazır";
-              } else {
-                  updatedItem.durum = "Taslak";
-              }
-              return updatedItem;
-          }
-          return item;
-      });
-      setData(newData);
+  // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
+
+  // Intl.DateTimeFormat kullanarak tarih formatlama
+  const formatDate = (date) => {
+    if (!date) return "";
+
+    // Örnek bir tarih formatla ve ay formatını belirle
+    const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
+    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
+
+    let monthFormat;
+    if (sampleFormatted.includes("January")) {
+      monthFormat = "long"; // Tam ad ("January")
+    } else if (sampleFormatted.includes("Jan")) {
+      monthFormat = "short"; // Üç harfli kısaltma ("Jan")
+    } else {
+      monthFormat = "2-digit"; // Sayısal gösterim ("01")
+    }
+
+    // Kullanıcı için tarihi formatla
+    const formatter = new Intl.DateTimeFormat(navigator.language, {
+      year: "numeric",
+      month: monthFormat,
+      day: "2-digit",
+    });
+    return formatter.format(new Date(date));
   };
 
-  // --- Sütun Yönetimi (LocalStorage & State) ---
+  const formatTime = (time) => {
+    if (!time || time.trim() === "") return ""; // `trim` metodu ile baştaki ve sondaki boşlukları temizle
+
+    try {
+      // Saati ve dakikayı parçalara ayır, boşlukları temizle
+      const [hours, minutes] = time
+        .trim()
+        .split(":")
+        .map((part) => part.trim());
+
+      // Saat ve dakika değerlerinin geçerliliğini kontrol et
+      const hoursInt = parseInt(hours, 10);
+      const minutesInt = parseInt(minutes, 10);
+      if (isNaN(hoursInt) || isNaN(minutesInt) || hoursInt < 0 || hoursInt > 23 || minutesInt < 0 || minutesInt > 59) {
+        // throw new Error("Invalid time format"); // hata fırlatır ve uygulamanın çalışmasını durdurur
+        console.error("Invalid time format:", time);
+        // return time; // Hatalı formatı olduğu gibi döndür
+        return ""; // Hata durumunda boş bir string döndür
+      }
+
+      // Geçerli tarih ile birlikte bir Date nesnesi oluştur ve sadece saat ve dakika bilgilerini ayarla
+      const date = new Date();
+      date.setHours(hoursInt, minutesInt, 0);
+
+      // Kullanıcının lokal ayarlarına uygun olarak saat ve dakikayı formatla
+      // `hour12` seçeneğini belirtmeyerek Intl.DateTimeFormat'ın kullanıcının yerel ayarlarına göre otomatik seçim yapmasına izin ver
+      const formatter = new Intl.DateTimeFormat(navigator.language, {
+        hour: "numeric",
+        minute: "2-digit",
+        // hour12 seçeneği burada belirtilmiyor; böylece otomatik olarak kullanıcının sistem ayarlarına göre belirleniyor
+      });
+
+      // Formatlanmış saati döndür
+      return formatter.format(date);
+    } catch (error) {
+      console.error("Error formatting time:", error);
+      return ""; // Hata durumunda boş bir string döndür
+      // return time; // Hatalı formatı olduğu gibi döndür
+    }
+  };
+
+  // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
+
+  const [body, setBody] = useState({
+    filters: {
+      Kelime: "",
+    },
+  });
+
+  // ana tablo api isteği için kullanılan useEffect
+
+  const lastRequestRef = useRef(null);
+
+  // Data veya searchTerm değiştiğinde tablo verisini günceller
+  const filteredData = useMemo(() => {
+    if (!searchTerm) {
+      return data;
+    }
+    const lowerSearch = searchTerm.toLowerCase();
+    return data.filter(
+      (item) =>
+        (item.YAKIT_KOD && item.YAKIT_KOD.toLowerCase().includes(lowerSearch)) ||
+        (item.YAKIT_TANIM && item.YAKIT_TANIM.toLowerCase().includes(lowerSearch))
+    );
+  }, [data, searchTerm]);
+
+  // sayfalama için kullanılan useEffect
+  const handleTableChange = (pagination) => {
+    if (pagination) {
+      setCurrentPage(pagination.current);
+      setPageSize(pagination.pageSize);
+    }
+  };
+  // sayfalama için kullanılan useEffect son
+
+  const onSelectChange = (newSelectedRowKeys) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+    if (newSelectedRowKeys.length > 0) {
+      setValue("selectedLokasyonId", newSelectedRowKeys[0]);
+    } else {
+      setValue("selectedLokasyonId", null);
+    }
+    // Seçilen satırların verisini bul
+    const newSelectedRows = data.filter((row) => newSelectedRowKeys.includes(row.key));
+    setSelectedRows(newSelectedRows); // Seçilen satırların verilerini state'e ata
+    console.log("Seçilen Satırlar:", newSelectedRows);
+  };
+
+  const refreshTableData = useCallback(() => {
+    // Sayfa numarasını 1 yap
+    // setCurrentPage(1);
+
+    // `body` içerisindeki filtreleri ve arama terimini sıfırla
+    // setBody({
+    //   keyword: "",
+    //   filters: {},
+    // });
+    // setSearchTerm("");
+
+    // Tablodan seçilen kayıtların checkbox işaretini kaldır
+    setSelectedRowKeys([]);
+    setSelectedRows([]);
+    // Burada `body` ve `currentPage`'i güncellediğimiz için, bu değerlerin en güncel hallerini kullanarak veri çekme işlemi yapılır.
+    // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
+    // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
+  }, [body, currentPage]);
+
+  // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
   const [columns, setColumns] = useState(() => {
-    const savedOrder = localStorage.getItem("columnBulkOrder");
-    const savedVisibility = localStorage.getItem("columnBulkVisibility");
-    const savedWidths = localStorage.getItem("columnBulkWidths");
+    const savedOrder = localStorage.getItem("columnHizliYakitGirisiOrder");
+    const savedVisibility = localStorage.getItem("columnYakitGirisiVisibility");
+    const savedWidths = localStorage.getItem("columnYakitGirisiWidths");
 
     let order = savedOrder ? JSON.parse(savedOrder) : [];
     let visibility = savedVisibility ? JSON.parse(savedVisibility) : {};
     let widths = savedWidths ? JSON.parse(savedWidths) : {};
 
     initialColumns.forEach((col) => {
-      if (!order.includes(col.key)) order.push(col.key);
-      if (visibility[col.key] === undefined) visibility[col.key] = col.visible;
-      if (widths[col.key] === undefined) widths[col.key] = col.width;
+      if (!order.includes(col.key)) {
+        order.push(col.key);
+      }
+      if (visibility[col.key] === undefined) {
+        visibility[col.key] = col.visible;
+      }
+      if (widths[col.key] === undefined) {
+        widths[col.key] = col.width;
+      }
     });
+
+    localStorage.setItem("columnYakitGirisiOrder", JSON.stringify(order));
+    localStorage.setItem("columnYakitGirisiVisibility", JSON.stringify(visibility));
+    localStorage.setItem("columnYakitGirisiWidths", JSON.stringify(widths));
 
     return order.map((key) => {
       const column = initialColumns.find((col) => col.key === key);
+      // Eğer column undefined ise (eski localStorage verisi yüzünden), null döndürüyoruz.
       return column ? { ...column, visible: visibility[key], width: widths[key] } : null;
-    }).filter(Boolean);
+    }).filter(Boolean); // Null değerleri diziden temizliyoruz.
   });
+  // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz sonu
 
+  // sütunları local storage'a kaydediyoruz
   useEffect(() => {
-    if (columns.length > 0) {
-        localStorage.setItem("columnBulkOrder", JSON.stringify(columns.map((col) => col.key)));
-        localStorage.setItem("columnBulkVisibility", JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.visible }), {})));
-        localStorage.setItem("columnBulkWidths", JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.width }), {})));
-    }
+    localStorage.setItem("columnYakitGirisiOrder", JSON.stringify(columns.map((col) => col.key)));
+    localStorage.setItem(
+      "columnYakitGirisiVisibility",
+      JSON.stringify(
+        columns.reduce(
+          (acc, col) => ({
+            ...acc,
+            [col.key]: col.visible,
+          }),
+          {}
+        )
+      )
+    );
+    localStorage.setItem(
+      "columnYakitGirisiWidths",
+      JSON.stringify(
+        columns.reduce(
+          (acc, col) => ({
+            ...acc,
+            [col.key]: col.width,
+          }),
+          {}
+        )
+      )
+    );
   }, [columns]);
+  // sütunları local storage'a kaydediyoruz sonu
 
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
-    if (active.id !== over.id) {
-      const oldIndex = columns.findIndex((col) => col.key === active.id);
-      const newIndex = columns.findIndex((col) => col.key === over.id);
-      setColumns((items) => arrayMove(items, oldIndex, newIndex));
-    }
-  };
-
-  const handleResize = (key) => (_, { size }) => {
-    setColumns((prev) => prev.map((col) => (col.key === key ? { ...col, width: size.width } : col)));
-  };
-
-  const toggleVisibility = (key, checked) => {
-    const newColumns = [...columns];
-    const index = newColumns.findIndex((col) => col.key === key);
-    if (index !== -1) {
-      newColumns[index].visible = checked;
-      setColumns(newColumns);
-    }
-  };
-
-  const resetColumns = () => {
-    localStorage.removeItem("columnBulkOrder");
-    localStorage.removeItem("columnBulkVisibility");
-    localStorage.removeItem("columnBulkWidths");
-    window.location.reload();
-  };
-
-  const handleDownloadXLSX = () => {
-    const ws = XLSX.utils.json_to_sheet(data.map(d => ({
-        Plaka: d.plaka,
-        Tarih: d.tarih ? dayjs(d.tarih).format("DD.MM.YYYY HH:mm") : "",
-        Litre: d.litre,
-        Fiyat: d.birimFiyat,
-        Tutar: (d.litre * d.birimFiyat),
-        Durum: d.durum
-    })));
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "TopluGiris");
-    XLSX.writeFile(wb, "toplu_giris.xlsx");
-  };
+  // sütunların boyutlarını ayarlamak için kullanılan fonksiyon
+  const handleResize =
+    (key) =>
+    (_, { size }) => {
+      setColumns((prev) => prev.map((col) => (col.key === key ? { ...col, width: size.width } : col)));
+    };
 
   const components = {
-    header: { cell: ResizableTitle },
+    header: {
+      cell: ResizableTitle,
+    },
   };
 
-  const visibleColumns = columns.filter((col) => col.visible).map((col) => ({
+  const mergedColumns = columns.map((col) => ({
     ...col,
     onHeaderCell: (column) => ({
       width: column.width,
@@ -358,148 +733,282 @@ const MainTable = () => {
     }),
   }));
 
+  // fitrelenmiş sütunları birleştiriyoruz ve sadece görünür olanları alıyoruz ve tabloya gönderiyoruz
+
+  const filteredColumns = mergedColumns.filter((col) => col.visible);
+
+  // fitrelenmiş sütunları birleştiriyoruz ve sadece görünür olanları alıyoruz ve tabloya gönderiyoruz sonu
+
+  // sütunların sıralamasını değiştirmek için kullanılan fonksiyon
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      const oldIndex = columns.findIndex((column) => column.key === active.id);
+      const newIndex = columns.findIndex((column) => column.key === over.id);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        setColumns((columns) => arrayMove(columns, oldIndex, newIndex));
+      } else {
+        console.error(`Column with key ${active.id} or ${over.id} does not exist.`);
+      }
+    }
+  };
+
+  // sütunların sıralamasını değiştirmek için kullanılan fonksiyon sonu
+
+  // sütunların görünürlüğünü değiştirmek için kullanılan fonksiyon
+
+  const toggleVisibility = (key, checked) => {
+    const index = columns.findIndex((col) => col.key === key);
+    if (index !== -1) {
+      const newColumns = [...columns];
+      newColumns[index].visible = checked;
+      setColumns(newColumns);
+    } else {
+      console.error(`Column with key ${key} does not exist.`);
+    }
+  };
+
+  // sütunların görünürlüğünü değiştirmek için kullanılan fonksiyon sonu
+
+  // sütunları sıfırlamak için kullanılan fonksiyon
+
+  function resetColumns() {
+    localStorage.removeItem("columnOrder");
+    localStorage.removeItem("columnVisibility");
+    localStorage.removeItem("columnWidths");
+    localStorage.removeItem("ozelAlanlar");
+    window.location.reload();
+  }
+
+  // sütunları sıfırlamak için kullanılan fonksiyon sonu
+
+  // Function to handle CSV download
+  const handleDownloadXLSX = async () => {
+    try {
+      // İndirme işlemi başlıyor
+      setXlsxLoading(true);
+
+      // Body state'inden filtreleri alıyoruz
+      const { filters = {} } = body || {};
+
+      // ✅ API İsteği: GetMalzemeTalepleriExcel
+      // Filtreleri body olarak gönderiyoruz
+      const response = await AxiosInstance.post("GetMalzemeTalepleriExcel", filters);
+
+      // Gelen yanıtı kontrol et (Direkt array mi yoksa obje içinde mi?)
+      // Eğer ana tablo yapısına benziyorsa response.talep_listesi olabilir, 
+      // direkt liste dönüyorsa response kendisidir.
+      const dataToProcess = Array.isArray(response) 
+        ? response 
+        : (response?.talep_listesi || response?.items || []);
+
+      if (dataToProcess.length > 0) {
+        // Verileri işliyoruz
+        const xlsxData = dataToProcess.map((row) => {
+          let xlsxRow = {};
+          filteredColumns.forEach((col) => {
+            const key = col.dataIndex;
+            if (key) {
+              let value = row[key];
+
+              // Özel durumları ele alıyoruz (Formatlama işlemleri)
+              if (col.render) {
+                if (key === "DUZENLEME_TARIH" || key.endsWith("_TARIH") || key === "SFS_TARIH") {
+                  value = formatDate(value);
+                } else if (key === "DUZENLEME_SAAT" || key.endsWith("_SAAT") || key === "SFS_SAAT") {
+                  value = formatTime(value);
+                } else if (key === "GARANTI") {
+                  value = row.GARANTI ? "Evet" : "Hayır";
+                } else if (key === "TAMAMLANMA") {
+                  value = `${row.TAMAMLANMA}%`;
+                } else if (key === "SFS_DURUM") { // Durum metnini al
+                  value = row.SFS_DURUM; 
+                } else if (key === "ISM_ONAY_DURUM") {
+                  const { text } = statusTag(row.ISM_ONAY_DURUM);
+                  value = text;
+                } else if (key.startsWith("OZEL_ALAN_")) {
+                  value = row[key];
+                } else {
+                  // Diğer sütunlar için render fonksiyonundan metni çıkar
+                  // extractTextFromElement fonksiyonun zaten yukarıda tanımlıydı
+                  value = extractTextFromElement(col.render(row[key], row));
+                }
+              }
+
+              xlsxRow[extractTextFromElement(col.title)] = value;
+            }
+          });
+          return xlsxRow;
+        });
+
+        // XLSX dosyasını oluşturuyoruz
+        const worksheet = XLSX.utils.json_to_sheet(xlsxData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Yakıt Tanımları Listesi");
+
+        // Sütun genişliklerini ayarlıyoruz
+        const headers = filteredColumns
+          .map((col) => {
+            let label = extractTextFromElement(col.title);
+            return {
+              label: label,
+              key: col.dataIndex,
+              width: col.width, // Tablo sütun genişliği
+            };
+          })
+          .filter((col) => col.key);
+
+        const scalingFactor = 0.8; 
+
+        worksheet["!cols"] = headers.map((header) => ({
+          wpx: header.width ? header.width * scalingFactor : 100, 
+        }));
+
+        // İndirme işlemini başlatıyoruz
+        const excelBuffer = XLSX.write(workbook, {
+          bookType: "xlsx",
+          type: "array",
+        });
+        const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Malzeme_Talepleri_${dayjs().format("DD_MM_YYYY")}.xlsx`); // Dosya ismine tarih ekledim
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        setXlsxLoading(false);
+      } else {
+        message.warning("İndirilecek veri bulunamadı.");
+        setXlsxLoading(false);
+      }
+    } catch (error) {
+      setXlsxLoading(false);
+      console.error("XLSX indirme hatası:", error);
+      if (navigator.onLine) {
+        message.error("Hata Mesajı: " + error.message);
+      } else {
+        message.error("Internet Bağlantısı Mevcut Değil.");
+      }
+    }
+  };
+
   return (
-    <div style={{ padding: "20px", background: "#f0f2f5", minHeight: "100vh" }}>
-      
-      {/* Sütun Modal */}
-      <Modal 
-        title="Sütun Yönetimi" 
-        open={isModalVisible} 
-        onOk={() => setIsModalVisible(false)} 
-        onCancel={() => setIsModalVisible(false)}
-        footer={[<Button key="reset" onClick={resetColumns}>Sıfırla</Button>, <Button key="ok" type="primary" onClick={() => setIsModalVisible(false)}>Tamam</Button>]}
+    <>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+          marginBottom: "20px",
+          gap: "10px",
+          padding: "0 5px",
+        }}
       >
-        <div style={{ display: "flex", gap: 20 }}>
-            <div style={{ flex: 1, border: "1px solid #eee", padding: 10, borderRadius: 5 }}>
-                <h4>Göster / Gizle</h4>
-                {columns.map(col => (
-                    <div key={col.key} style={{ marginBottom: 5 }}>
-                        <Checkbox checked={col.visible} onChange={(e) => toggleVisibility(col.key, e.target.checked)}>
-                            {col.title}
-                        </Checkbox>
-                    </div>
-                ))}
-            </div>
-            <div style={{ flex: 1, border: "1px solid #eee", padding: 10, borderRadius: 5 }}>
-                <h4>Sıralama (Sürükle)</h4>
-                <DndContext sensors={useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }))} onDragEnd={handleDragEnd}>
-                    <SortableContext items={columns.map(c => c.key)} strategy={verticalListSortingStrategy}>
-                        {columns.filter(c => c.visible).map((col, index) => (
-                            <DraggableRow key={col.key} id={col.key} text={col.title} visible={col.visible} onVisibilityChange={toggleVisibility} />
-                        ))}
-                    </SortableContext>
-                </DndContext>
-            </div>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+          <DatePicker
+            style={{ width: "250px" }}
+            placeholder="Tarih seçiniz..."
+            value={selectedDate ? dayjs(selectedDate) : null} 
+            onChange={(date, dateString) => {
+              setSelectedDate(dateString || ""); 
+            }}
+            suffixIcon={<CalendarOutlined style={{ color: "#0091ff" }} />}
+          />
+          <TimePicker
+            style={{ width: "250px" }}
+            placeholder="Saat seçiniz..."
+            format="HH:mm" // Kullanıcının göreceği ve state'e kaydolacak format (Örn: 14:30)
+            value={selectedClock ? dayjs(selectedClock, "HH:mm") : null}
+            onChange={(time, timeString) => {
+              setSelectedClock(timeString || "");
+            }}
+            suffixIcon={<ClockCircleOutlined style={{ color: "#0091ff" }} />}
+          />
+          <InputNumber
+            style={{ width: "250px" }}
+            placeholder="Varsayılan fiyat..."
+            value={defaultPrice}
+            onChange={(value) => setDefaultPrice(value)}
+            suffix={<DollarOutlined style={{ color: "#0091ff" }} />}
+          />
+          <Select
+            style={{ width: "250px" }}
+            placeholder="Yakıt Tankı Seçiniz..." // Arama yazısını güncelledik
+            value={fuelTank || undefined} // null veya "" yerine undefined vermek placeholder'ın görünmesini sağlar
+            onChange={(value) => setFuelTank(value)}
+            showSearch
+            optionFilterProp="label" // Yazarak ararken 'label' değerlerine göre filtreler
+            options={[
+              { value: 'secenek1', label: 'TAN0162-102 OKTAN BENZİN' },
+              { value: 'secenek2', label: 'TAN0158-Benzin Depo' },
+              { value: 'secenek3', label: 'TAN0161-DİZEL DEPO' },
+              { value: 'secenek4', label: 'TAN0167-DİZEL DEPO 2' },
+              { value: 'secenek5', label: 'TAN0160-LPG' },
+            ]}
+          />
+          <Checkbox 
+            checked={checkedOne} 
+            onChange={(e) => setCheckedOne(e.target.checked)}
+          >
+            Stoktan
+          </Checkbox>
+
+          <Checkbox 
+            checked={checkedTwo} 
+            onChange={(e) => setCheckedTwo(e.target.checked)}
+          >
+            Full Depo
+          </Checkbox>
         </div>
-      </Modal>
-
-      {/* --- Üst Panel: İstatistikler & Varsayılanlar --- */}
-      <Card bodyStyle={{padding: '12px 24px'}} style={{marginBottom: 15, borderRadius: 8}}>
-
-        {/* Varsayılan Ayarlar (BÜYÜK VE ORTALI) */}
-        <div style={{
-            display: 'flex', 
-            justifyContent: 'center', 
-            gap: 40, // Elemanlar arası boşluk arttırıldı
-            alignItems: 'center', 
-            background: '#fafafa', 
-            padding: '25px', // Padding arttırıldı
-            borderRadius: 12, 
-            border: '1px solid #e8e8e8'
-        }}>
-            
-            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5}}>
-                <Text strong style={{fontSize: 14, color: '#595959'}}><CalendarOutlined /> Tarih/Saat</Text>
-                <DatePicker 
-                    showTime 
-                    format="DD.MM HH:mm" 
-                    size="large" // BÜYÜTÜLDÜ
-                    allowClear={false}
-                    value={defaults.tarih}
-                    onChange={(d) => setDefaults({...defaults, tarih: d})}
-                    style={{width: 200}} // GENİŞLETİLDİ
-                />
-            </div>
-
-            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5}}>
-                <Text strong style={{fontSize: 14, color: '#595959'}}><ShopOutlined /> İstasyon</Text>
-                <Input 
-                    placeholder="Örn: Shell" 
-                    size="large" // BÜYÜTÜLDÜ
-                    value={defaults.istasyon}
-                    onChange={(e) => setDefaults({...defaults, istasyon: e.target.value})}
-                    style={{width: 180}} // GENİŞLETİLDİ
-                />
-            </div>
-
-             <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5}}>
-                <Text strong style={{fontSize: 14, color: '#595959'}}><DollarOutlined /> Birim Fiyat</Text>
-                <InputNumber 
-                    size="large" // BÜYÜTÜLDÜ
-                    min={0}
-                    value={defaults.birimFiyat}
-                    onChange={(v) => setDefaults({...defaults, birimFiyat: v})}
-                    style={{width: 140}} // GENİŞLETİLDİ
-                />
-            </div>
-
-            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5}}>
-                <Text strong style={{fontSize: 14, color: '#595959'}}><CheckCircleOutlined /> Full Depo</Text>
-                <div style={{height: 40, display: 'flex', alignItems: 'center'}}>
-                    <Switch 
-                        checkedChildren="EVET"
-                        unCheckedChildren="HAYIR"
-                        checked={defaults.fullDepo} 
-                        onChange={(c) => setDefaults({...defaults, fullDepo: c})}
-                    />
-                </div>
-            </div>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <Button 
+            type="default" 
+            icon={<RedoOutlined />} 
+            onClick={() => {
+              setSelectedDate("");
+              setSelectedClock("");
+              setDefaultPrice(null);
+              setFuelTank(undefined);
+              setCheckedOne(false);
+              setCheckedTwo(false);
+            }}
+          >
+            Yenile
+          </Button>
+    
+          <Button 
+            type="primary" 
+            icon={<SaveOutlined />} 
+            style={{ backgroundColor: "#39B83D" }} // İkon renginle uyumlu olsun diye mavi yaptık
+            onClick={() => {
+              console.log("Kaydediliyor...");
+            }}
+          >
+            Kaydet
+          </Button>
         </div>
-        
-        {/* Helper Text */}
-        <div style={{marginTop: 15, fontSize: 13, color: '#888', textAlign: 'center'}}>
-            <Space split="|">
-                <span>Excel’den paste: <b>Plaka → Tarih/Saat → Litre → Birim Fiyat → Full Depo</b> (Tab/Enter)</span>
-                <span>Enter: <b>Sonraki Hücre</b></span>
-                <span>Ctrl+D: <b>Kopyala</b></span>
-            </Space>
-        </div>
-      </Card>
-
-      {/* --- Araç Çubuğu --- */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-        <Space>
-           <Button type="dashed" icon={<PlusOutlined />}>Satır Ekle</Button>
-           <Button icon={<CopyOutlined />}>Varsayılanları Uygula</Button>
-        </Space>
-        <Space>
-           <Button icon={<MenuOutlined />} onClick={() => setIsModalVisible(true)}>Sütunlar</Button>
-           <Button icon={<FileExcelOutlined style={{color: 'green'}}/>} onClick={handleDownloadXLSX}>Excel</Button>
-           <Button type="primary" size="large" icon={<SaveOutlined />}>KAYDET</Button>
-        </Space>
       </div>
-
-      {/* --- Tablo --- */}
-      <div style={{ background: "#fff", borderRadius: "8px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", overflow: 'hidden' }}>
         <Table
           components={components}
-          columns={visibleColumns}
-          dataSource={data}
-          loading={loading}
-          pagination={false}
-          scroll={{ x: 1000, y: "calc(100vh - 500px)" }}
-          size="small"
-          bordered
+          columns={initialColumns}
+          dataSource={[{ key: "add-row", isNewRow: true }, ...selectedMachines, ...filteredData]}
+          pagination={{
+            defaultPageSize: 10,
+            showSizeChanger: true,
+            pageSizeOptions: ["10", "20", "50", "100"],
+            position: ["bottomRight"],
+            onChange: handleTableChange,
+            showTotal: (total, range) => `Toplam ${total}`,
+            showQuickJumper: true,
+          }}
+          scroll={{ y: "calc(100vh - 450px)" }}
+          onChange={handleTableChange}
         />
-        <div style={{padding: 10, background: '#fff9e6', borderTop: '1px solid #ffe58f', fontSize: 12}}>
-            <ul style={{margin: 0, paddingLeft: 20, color: '#fa8c16'}}>
-                <li><b>Not:</b> KM sütunu kaldırıldı. (Bu ekran “fiş girişi” gibi hızlı litre bazlı kayıt içindir.)</li>
-                <li>Kaydet: sadece <b>Hazır</b> ve <b>Uyarı</b> satırlarını kaydeder.</li>
-                <li>Varsayılanlar değişince: sadece dokunulmamış alanlar otomatik güncellenir.</li>
-            </ul>
-        </div>
-      </div>
-    </div>
+    </>
   );
 };
 
