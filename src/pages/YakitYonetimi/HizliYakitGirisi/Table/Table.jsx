@@ -13,6 +13,9 @@ import * as XLSX from "xlsx";
 import { t } from "i18next";
 import dayjs from "dayjs";
 import MakineTablo from "../components/MakineTablo";
+import LokasyonTablo from "../../../../utils/components/LokasyonTablo";
+import ProjeTablo from "../../../../utils/components/ProjeTablo";
+import PersonelTablo from "../../../../utils/components/PersonelTablo";
 
 const { Text } = Typography;
 
@@ -108,7 +111,7 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
 
 const MainTable = () => {
   // State definitions...
-  const { control, setValue, formState: { errors } } = useFormContext();
+  const { control, setValue, watch, formState: { errors } } = useFormContext();
   const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -143,9 +146,21 @@ const MainTable = () => {
     return ((defaultPrice || 0) * (searchTerm ? parseFloat(searchTerm) : 0)).toFixed(2); // miktar için mevcut bir state ya da searchTerm kullanabilirsin
   }, [searchTerm, defaultPrice]);
 
+  const [body, setBody] = useState({
+    filters: {
+      Kelime: "",
+    },
+    LokasyonIds: [],
+    YakitTipIds: []
+  });
+
   const [selectedProject, setSelectedProject] = useState(undefined);
   const [selectedDriver, setSelectedDriver] = useState(undefined);
   const [description, setDescription] = useState("");
+
+  const [yakitTanklari, setYakitTanklari] = useState([]);
+  const [tankLoading, setTankLoading] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
 
   const ozelAlanlar = JSON.parse(localStorage.getItem("ozelAlanlar"));
 
@@ -164,344 +179,550 @@ const MainTable = () => {
     }
   };
 
+  const fetchYakitTankData = async () => {
+    try {
+      setTankLoading(true);
+    
+      // Güvenli payload kontrolü
+      const payload = {
+        LokasyonIds: body?.LokasyonIds || [],
+        YakitTipIds: body?.YakitTipIds || [],
+        Durum: 1
+      };
+
+      const response = await AxiosInstance.post(`GetYakitTankList`, payload);
+
+      // Backend yapına göre response veya response.data üzerinden array kontrolü
+      if (response && response.has_error === false && Array.isArray(response.data)) {
+        // 🌟 Select bileşeninin okuyabilmesi için value ve label mapping'i yapıyoruz
+        const formattedOptions = response.data.map((item) => ({
+          value: item.TB_DEPO_ID, // Select seçtiğinde state'e ID'si düşecek
+          // Ekranda kod ve tanım beraber profesyonel dursun diye (Örn: TAN0162 - 102 OKTAN)
+          label: `${item.DEP_KOD || ""} - ${item.DEP_TANIM || ""}`.trim() || `Depo ID: ${item.TB_DEPO_ID}`,
+        }));
+      
+        setYakitTanklari(formattedOptions);
+      } else {
+        console.error("API yanıtı beklenen formatta değil veya hata var.", response);
+        setYakitTanklari([]);
+      }
+    } catch (error) {
+      console.error("Yakit tankı çekme hatası:", error);
+      message.error("Yakıt tankları listesi çekilemedi.");
+    } finally {
+      setTankLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchYakitTankData();
+  }, [body?.LokasyonIds, body?.YakitTipIds, status]);
+
+  const handleSaveTopluYakitGiris = async () => {
+    if (selectedMachines.length === 0) {
+      message.warning("Kaydedilecek ekipman kaydı bulunamadı.");
+      return;
+    }
+
+    try {
+      setSaveLoading(true);
+
+      // Yeni bir istek başlatıldığı için önce mevcut tüm açıklamalardaki hata yazılarını temizliyoruz kanka
+      const clearedMachines = selectedMachines.map(item => ({
+        ...item,
+        ACIKLAMA: item.ACIKLAMA.startsWith("HATA:") ? "" : item.ACIKLAMA
+      }));
+
+      // Backend'e gidecek payload array'ini hazırlıyoruz
+      const payload = clearedMachines.map((item, index) => ({
+        RowIndex: index + 1,
+        MakineKodu: item.EKIPMAN_KOD,
+        MakineId: item.EKIPMAN_ID,
+        Tarih: item.TARiH ? dayjs(item.TARiH).format("YYYY-MM-DD") : null,
+        Saat: item.SAAT || null,
+        SonAlinanKm: item.SON_ALINAN != null ? parseFloat(item.SON_ALINAN) : 0,
+        AlinanKm: item.YENI_ALINAN_KM != null ? parseFloat(item.YENI_ALINAN_KM) : 0, // Kullanıcının girdiği yeni KM
+        Miktar: item.MiKTAR != null ? parseFloat(item.MiKTAR) : 0,
+        Fiyat: item.FiYAT != null ? parseFloat(item.FiYAT) : 0,
+        Tutar: item.TUTAR != null ? parseFloat(item.TUTAR) : 0,
+        StokKullanim: !!item.STOK_KULLANIM,
+        DepoId: item.YAKIT_TANKI || null, // Seçilen yakıt tankı ID'si
+        YakitTipId: item.YAKIT_TIPI_ID || null, // Makine seçiminden gelen yakıt tip ID'si
+        IstasyonKodId: null, // Proje kapsamına göre statik ya da dinamik bağlanabilir
+        PersonelId: item.SURUCU_ID || null,
+        FullDepo: !!item.FULL_DEPO,
+        FirmaId: 1, // Örnek JSON'daki default firma ID
+        LokasyonId: item.LOKASYON_ID || null,
+        ProjeId: item.PROJE_ID || null,
+        Aciklama: item.ACIKLAMA || "",
+        FaturaNo: null,
+        FaturaTarihi: null
+      }));
+
+      const response = await AxiosInstance.post("AddTopluYakitGiris", payload);
+
+      if (response && response.has_error === false) {
+        message.success(response.status || "Kayıtlar başarıyla oluşturuldu.");
+        setSelectedMachines([]); // Başarılıysa tabloyu sıfırla kanka
+      } else if (response && response.has_error === true) {
+        message.error(response.status || "Bazı kayıtlarda hatalar tespit edildi.");
+        
+        // 🌟 Hata listesini satırlara dağıtma sihirli dokunuşu
+        if (Array.isArray(response.error_list)) {
+          setSelectedMachines(clearedMachines.map(item => {
+            // error_list içinden bu makine koduna ait bir hata var mı bakıyoruz
+            const bulunanHata = response.error_list.find(err => err.MakineKodu === item.EKIPMAN_KOD);
+            if (bulunanHata) {
+              return {
+                ...item,
+                // Açıklama alanının başına kırmızı uyarı maksatlı HATA ibaresi ekliyoruz
+                ACIKLAMA: `HATA: ${bulunanHata.HataMesaji}`
+              };
+            }
+            return item;
+          }));
+        }
+      }
+    } catch (error) {
+      console.error("Toplu kayıt esnasında hata oluştu:", error);
+      message.error(error.message || "Sistemsel bir hata oluştu.");
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
   const initialColumns = [
-    {
-      title: "Ekipman Kodu / Tanımı",
-      dataIndex: "EKIPMAN_KOD",
-      key: "EKIPMAN_KOD",
-      width: 280,
-      visible: true,
-      render: (text, record) => {
-        if (record.isNewRow) {
-          return (
-            <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-              <MakineTablo
+  {
+  title: "Ekipman Kodu / Tanımı",
+  dataIndex: "EKIPMAN_KOD",
+  key: "EKIPMAN_KOD",
+  width: 280,
+  visible: true,
+  fixed: "left",
+  render: (text, record) => {
+    if (record.isNewRow) {
+      return (
+        <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          <MakineTablo
                 control={control}
                 errors={errors}
                 setValue={setValue}
                 makineFieldName="MKN_KOD_temp"
                 makineIdFieldName="TB_MAKINE_ID_temp"
+                secilenMakineIdleri={selectedMachines.map(m => m.TB_MAKINE_ID || m.key?.split('_')[3])}
                 onMakinelerSecildi={(secilenMakinelerDizisi) => {
-                  const yeniSatirlar = secilenMakinelerDizisi.map((makine, index) => ({
-                    key: `row_${Date.now()}_${index}_${makine.TB_MAKINE_ID}`,
-                    isNewRow: false, // Normal satır
-                    EKIPMAN_KOD: makine.MKN_KOD,
-                    EKIPMAN_TANIM: makine.MKN_TANIM,
-                    EKIPMAN_TIPI: makine.MKN_TIP || "-", 
-                    YAKIT_TIPI: "Motorin", 
-                    LOKASYON: makine.MKN_LOKASYON || "-",
-                    TARiH: dayjs().format("YYYY-MM-DD"), // Bugün varsayılan
-                    SAAT: dayjs().format("HH:mm"),       // Şu an varsayılan
-                    MiKTAR: 0,
-                    FiYAT: defaultPrice || 45.00,
-                    TUTAR: 0,
-                    FULL_DEPO: false,
-                    STOK_KULLANIM: false,
-                    PROJE: undefined,
-                    SURUCU: undefined,
-                    ACIKLAMA: ""
-                  }));
-                  setSelectedMachines(prev => [...prev, ...yeniSatirlar]);
+                  const yeniSatirlar = secilenMakinelerDizisi.map((makine, index) => {
+                    const rowKey = `row_${Date.now()}_${index}_${makine.TB_MAKINE_ID}`;
+                    
+                    // Eğer makineden lokasyon geliyorsa form context'e de yazalım kanka
+                    if (makine.MKN_LOKASYON) {
+                      setValue(`LOK_TANIM_${rowKey}`, makine.MKN_LOKASYON);
+                      setValue(`LOK_ID_${rowKey}`, makine.MKN_LOKASYON_ID || "");
+                    }
+
+                    return {
+                      key: rowKey,
+                      isNewRow: false,
+                      EKIPMAN_ID: makine.TB_MAKINE_ID,
+                      EKIPMAN_KOD: makine.MKN_KOD,
+                      EKIPMAN_TANIM: makine.MKN_TANIM,
+                      EKIPMAN_TIPI: makine.MKN_TIP || "-", 
+                      YAKIT_TIPI: makine.MKN_YAKIT_TIPI || "-",
+                      LOKASYON: makine.MKN_LOKASYON || "", 
+                      LOKASYON_ID: makine.MKN_LOKASYON_ID || "",
+                      SON_ALINAN: makine.SON_ALINAN_KM,
+                      BIRIM: makine.SAYAC_BIRIM || "-",
+                      TARiH: dayjs().format("YYYY-MM-DD"),
+                      SAAT: dayjs().format("HH:mm"),
+                      MiKTAR: 0,
+                      FiYAT: defaultPrice || 0,
+                      TUTAR: 0,
+                      FULL_DEPO: checkedTwo,
+                      STOK_KULLANIM: checkedOne,
+                      YAKIT_TANKI: fuelTank || undefined,
+                      PROJE: undefined,
+                      PROJE_ID: undefined,
+                      SURUCU: undefined,
+                      ACIKLAMA: ""
+                    };
+                  });
+
+                  setSelectedMachines(prev => {
+                    const temizListe = prev.filter(item => !item.isNewRow);
+                    return [...temizListe, ...yeniSatirlar];
+                  });
+
+                  setValue("MKN_KOD_temp", "");
+                  setValue("TB_MAKINE_ID_temp", "");
                 }}
               />
-            </div>
-          );
-        }
+        </div>
+      );
+    }
 
-        // 🌟 GÖRSELDEKİ GİBİ: Seçilen makinenin kodu input içinde kilitli (disabled) ve yanında butonlarıyla geliyor
-        return (
-          <div style={{ display: "flex", gap: "5px", width: "100%" }}>
-            <Input value={record.EKIPMAN_KOD} style={{ width: "100%" }} disabled />
-            <Button disabled>+</Button>
-            <Button onClick={() => {
-              // Satırı silme butonu (-)
-              setSelectedMachines(prev => prev.filter(item => item.key !== record.key));
-            }}>-</Button>
-          </div>
-        );
-      }
-    },
-    {
-      title: "Ekipman Tipi",
-      dataIndex: "EKIPMAN_TIPI",
-      key: "EKIPMAN_TIPI",
-      width: 120,
-      visible: true,
-      render: (text, record) => record.isNewRow ? "-" : <Input value={record.EKIPMAN_TIPI} disabled />
-    },
-    {
-      title: "Yakıt Tipi",
-      dataIndex: "YAKIT_TIPI",
-      key: "YAKIT_TIPI",
-      width: 120,
-      visible: true,
-      render: (text, record) => record.isNewRow ? "-" : <Input value={record.YAKIT_TIPI} disabled />
-    },
-    {
-      title: "Tarih",
-      dataIndex: "TARiH",
-      key: "TARiH",
-      width: 160,
-      visible: true,
-      render: (text, record) => {
-        if (record.isNewRow) return <DatePicker style={{ width: "100%" }} placeholder="Tarih seç" disabled />;
-        return (
-          <DatePicker
-            style={{ width: "100%" }}
-            format="DD.MM.YYYY"
-            value={record.TARiH ? dayjs(record.TARiH) : null}
-            onChange={(date, dateString) => {
-              setSelectedMachines(prev => prev.map(item => 
-                item.key === record.key ? { ...item, TARiH: dateString } : item
-              ));
-            }}
-          />
-        );
-      }
-    },
-    {
-      title: "Saat",
-      dataIndex: "SAAT",
-      key: "SAAT",
+    return (
+      <div style={{ display: "flex", gap: "5px", width: "100%" }}>
+        <Input value={record.EKIPMAN_KOD} style={{ width: "100%" }} disabled />
+        <Button disabled>+</Button>
+        <Button onClick={() => {
+          setSelectedMachines(prev => prev.filter(item => item.key !== record.key));
+        }}>-</Button>
+      </div>
+    );
+  }
+},
+  {
+    title: "Ekipman Tipi",
+    dataIndex: "EKIPMAN_TIPI",
+    key: "EKIPMAN_TIPI",
+    width: 120,
+    visible: true,
+    fixed: "left", // 🌟 Sola sabitlendi
+    render: (text, record) => record.isNewRow ? "-" : <Input value={record.EKIPMAN_TIPI} disabled />
+  },
+  {
+    title: "Yakıt Tipi",
+    dataIndex: "YAKIT_TIPI",
+    key: "YAKIT_TIPI",
+    width: 120,
+    visible: true,
+    fixed: "left", // 🌟 Sola sabitlendi
+    render: (text, record) => record.isNewRow ? "-" : <Input value={record.YAKIT_TIPI} disabled />
+  },
+  {
+    title: "Tarih",
+    dataIndex: "TARiH",
+    key: "TARiH",
+    width: 160,
+    visible: true,
+    render: (text, record) => {
+      if (record.isNewRow) return <DatePicker style={{ width: "100%" }} placeholder="Tarih seç" />;
+      return (
+        <DatePicker
+          style={{ width: "100%" }}
+          format="DD.MM.YYYY"
+          value={record.TARiH ? dayjs(record.TARiH) : null}
+          onChange={(date, dateString) => {
+            setSelectedMachines(prev => prev.map(item => 
+              item.key === record.key ? { ...item, TARiH: dateString } : item
+            ));
+          }}
+        />
+      );
+    }
+  },
+  {
+    title: "Saat",
+    dataIndex: "SAAT",
+    key: "SAAT",
+    width: 130,
+    visible: true,
+    render: (text, record) => {
+      if (record.isNewRow) return <TimePicker style={{ width: "100%" }} placeholder="Zaman" />;
+      return (
+        <TimePicker
+          style={{ width: "100%" }}
+          format="HH:mm"
+          value={record.SAAT ? dayjs(record.SAAT, "HH:mm") : null}
+          onChange={(time, timeString) => {
+            setSelectedMachines(prev => prev.map(item => 
+              item.key === record.key ? { ...item, SAAT: timeString } : item
+            ));
+          }}
+        />
+      );
+    }
+  },
+  {
+  title: "Son Alınan",
+  dataIndex: "SON_ALINAN",
+  key: "SON_ALINAN",
+  width: 110, // Formatlı hali sığsın diye genişliği azıcık artırdım kanka
+  visible: true,
+  render: (text, record) => {
+    if (record.isNewRow) return "";
+    return (
+      <InputNumber
+        value={record.SON_ALINAN ?? 3000}
+        style={{ width: "100%" }}
+        disabled
+        // 🌟 Sayıyı yerel ayarlara göre noktayla ayırır (Örn: 3.000)
+        formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
+      />
+    );
+  }
+},
+{
+      title: "Yeni Alınan", // 🌟 JSON validasyonuna giden AlinanKm alanı için eklediğimiz yeni giriş kolonu
+      dataIndex: "YENI_ALINAN_KM",
+      key: "YENI_ALINAN_KM",
       width: 130,
       visible: true,
       render: (text, record) => {
-        if (record.isNewRow) return <TimePicker style={{ width: "100%" }} placeholder="Zaman" disabled />;
-        return (
-          <TimePicker
-            style={{ width: "100%" }}
-            format="HH:mm"
-            value={record.SAAT ? dayjs(record.SAAT, "HH:mm") : null}
-            onChange={(time, timeString) => {
-              setSelectedMachines(prev => prev.map(item => 
-                item.key === record.key ? { ...item, SAAT: timeString } : item
-              ));
-            }}
-          />
-        );
-      }
-    },
-    {
-      title: "Son Alınan",
-      dataIndex: "SON_ALINAN",
-      key: "SON_ALINAN",
-      width: 100,
-      visible: true,
-      render: (text, record) => record.isNewRow ? "" : <Input value="795" disabled />
-    },
-    {
-      title: "Birim",
-      dataIndex: "BiRiM",
-      key: "BiRiM",
-      width: 90,
-      visible: true,
-      render: (text, record) => record.isNewRow ? "" : <Input value="saat" disabled />
-    },
-    {
-      title: "Miktar",
-      dataIndex: "MiKTAR",
-      key: "MiKTAR",
-      width: 140,
-      visible: true,
-      render: (text, record) => {
-        if (record.isNewRow) return <InputNumber style={{ width: "100%" }} disabled placeholder="0,00" />;
-        return (
-          <InputNumber
-            style={{ width: "100%", borderColor: "#ffcc00" }} // 🌟 Görseldeki sarı border
-            min={0}
-            value={record.MiKTAR}
-            onChange={(val) => {
-              setSelectedMachines(prev => prev.map(item => {
-                if (item.key === record.key) {
-                  const yeniTutar = ((val || 0) * (item.FiYAT || 0)).toFixed(2);
-                  return { ...item, MiKTAR: val, TUTAR: yeniTutar };
-                }
-                return item;
-              }));
-            }}
-          />
-        );
-      }
-    },
-    {
-      title: "Fiyat",
-      dataIndex: "FiYAT",
-      key: "FiYAT",
-      width: 140,
-      visible: true,
-      render: (text, record) => {
         if (record.isNewRow) return <InputNumber style={{ width: "100%" }} disabled />;
         return (
           <InputNumber
-            style={{ width: "100%" }}
+            style={{ width: "100%", borderColor: "#0091ff" }}
             min={0}
-            value={record.FiYAT}
-            suffix={<DollarOutlined style={{ color: "#0091ff" }} />}
-            onChange={(val) => {
-              setSelectedMachines(prev => prev.map(item => {
-                if (item.key === record.key) {
-                  const yeniTutar = ((item.MiKTAR || 0) * (val || 0)).toFixed(2);
-                  return { ...item, FiYAT: val, TUTAR: yeniTutar };
-                }
-                return item;
-              }));
-            }}
-          />
-        );
-      }
-    },
-    {
-      title: "Tutar",
-      dataIndex: "TUTAR",
-      key: "TUTAR",
-      width: 140,
-      visible: true,
-      render: (text, record) => {
-        if (record.isNewRow) return <InputNumber style={{ width: "100%" }} disabled />;
-        return <InputNumber style={{ width: "100%" }} disabled value={record.TUTAR} />;
-      }
-    },
-    {
-      title: "Full Depo",
-      dataIndex: "FULL_DEPO",
-      key: "FULL_DEPO",
-      width: 90,
-      align: "center",
-      visible: true,
-      render: (checked, record) => {
-        if (record.isNewRow) return <Checkbox disabled />;
-        return (
-          <Checkbox
-            checked={record.FULL_DEPO}
-            onChange={(e) => {
-              setSelectedMachines(prev => prev.map(item => 
-                item.key === record.key ? { ...item, FULL_DEPO: e.target.checked } : item
-              ));
-            }}
-          />
-        );
-      }
-    },
-    {
-      title: "Stok Kullanım",
-      dataIndex: "STOK_KULLANIM",
-      key: "STOK_KULLANIM",
-      width: 110,
-      align: "center",
-      visible: true,
-      render: (checked, record) => {
-        if (record.isNewRow) return <Checkbox disabled />;
-        return (
-          <Checkbox
-            checked={record.STOK_KULLANIM}
-            onChange={(e) => {
-              setSelectedMachines(prev => prev.map(item => 
-                item.key === record.key ? { ...item, STOK_KULLANIM: e.target.checked } : item
-              ));
-            }}
-          />
-        );
-      }
-    },
-    {
-      title: "Yakıt Tankı",
-      dataIndex: "YAKIT_TANKI",
-      key: "YAKIT_TANKI",
-      width: 180,
-      visible: true,
-      render: (text, record) => {
-        if (record.isNewRow) return <Select style={{ width: "100%" }} disabled placeholder="Seçiniz" />;
-        return (
-          <Select
-            style={{ width: "100%" }}
-            value={record.YAKIT_TANKI || "secenek1"}
+            placeholder="Güncel Değer"
+            value={record.YENI_ALINAN_KM}
             onChange={(val) => {
               setSelectedMachines(prev => prev.map(item => 
-                item.key === record.key ? { ...item, YAKIT_TANKI: val } : item
+                item.key === record.key ? { ...item, YENI_ALINAN_KM: val } : item
               ));
             }}
-            options={[
-              { value: 'secenek1', label: 'Ana Tank' },
-              { value: 'secenek2', label: 'TAN0158-Benzin Depo' },
-            ]}
           />
         );
       }
     },
-    {
+  {
+    title: "Birim",
+    dataIndex: "BIRIM",
+    key: "BIRIM",
+    width: 90,
+    visible: true,
+    render: (text, record) => record.isNewRow ? "" : <Input value={record.BIRIM} disabled />
+  },
+  {
+    title: "Miktar",
+    dataIndex: "MiKTAR",
+    key: "MiKTAR",
+    width: 140,
+    visible: true,
+    render: (text, record) => {
+      if (record.isNewRow) return <InputNumber style={{ width: "100%" }} placeholder="0,00" />;
+      return (
+        <InputNumber
+          style={{ width: "100%", borderColor: "#ffcc00" }}
+          min={0}
+          value={record.MiKTAR}
+          onChange={(val) => {
+            setSelectedMachines(prev => prev.map(item => {
+              if (item.key === record.key) {
+                const yeniTutar = ((val || 0) * (item.FiYAT || 0)).toFixed(2);
+                return { ...item, MiKTAR: val, TUTAR: yeniTutar };
+              }
+              return item;
+            }));
+          }}
+        />
+      );
+    }
+  },
+  {
+  title: "Fiyat",
+  dataIndex: "FiYAT",
+  key: "FiYAT",
+  width: 140,
+  visible: true,
+  render: (text, record) => {
+    if (record.isNewRow) return <InputNumber style={{ width: "100%" }} />;
+    return (
+      <InputNumber
+        style={{ width: "100%" }}
+        min={0}
+        value={record.FiYAT}
+        suffix={<DollarOutlined style={{ color: "#0091ff" }} />}
+        
+        // 🌟 KURUŞ VE VİRGÜL AYARLARI BURASI
+        decimalSeparator="," // Ondalık işareti virgül olsun (Örn: 64,43)
+        step={0.01}          // Yukarı/aşağı butonları kuruş kuruş artsın
+        precision={2}        // Virgülden sonra kesinlikle 2 hane (kuruş) zorunlu olsun
+        
+        onChange={(val) => {
+          setSelectedMachines(prev => prev.map(item => {
+            if (item.key === record.key) {
+              // val float veya null gelebilir, 0 kontrolü yapıyoruz kanka
+              const gecerliFiyat = val || 0;
+              const gecerliMiktar = item.MiKTAR || 0;
+              
+              // Tutarı kuruşu kuruşuna çarparak hesaplayıp iki hane ondalık string yapıyoruz
+              const yeniTutar = (gecerliMiktar * gecerliFiyat).toFixed(2);
+              
+              return { ...item, FiYAT: gecerliFiyat, TUTAR: yeniTutar };
+            }
+            return item;
+          }));
+        }}
+      />
+    );
+  }
+},
+  {
+    title: "Tutar",
+    dataIndex: "TUTAR",
+    key: "TUTAR",
+    width: 140,
+    visible: true,
+    render: (text, record) => {
+      if (record.isNewRow) return <InputNumber style={{ width: "100%" }} />;
+      return <InputNumber style={{ width: "100%" }} disabled value={record.TUTAR} />;
+    }
+  },
+  {
+    title: "Full Depo",
+    dataIndex: "FULL_DEPO",
+    key: "FULL_DEPO",
+    width: 90,
+    align: "center",
+    visible: true,
+    render: (checked, record) => {
+      if (record.isNewRow) return <Checkbox />;
+      return (
+        <Checkbox
+          checked={record.FULL_DEPO}
+          onChange={(e) => {
+            setSelectedMachines(prev => prev.map(item => 
+              item.key === record.key ? { ...item, FULL_DEPO: e.target.checked } : item
+            ));
+          }}
+        />
+      );
+    }
+  },
+  {
+    title: "Stok Kullanım",
+    dataIndex: "STOK_KULLANIM",
+    key: "STOK_KULLANIM",
+    width: 110,
+    align: "center",
+    visible: true,
+    render: (checked, record) => {
+      if (record.isNewRow) return <Checkbox />;
+      return (
+        <Checkbox
+          checked={record.STOK_KULLANIM}
+          onChange={(e) => {
+            setSelectedMachines(prev => prev.map(item => 
+              item.key === record.key ? { ...item, STOK_KULLANIM: e.target.checked } : item
+            ));
+          }}
+        />
+      );
+    }
+  },
+  {
+  title: "Yakıt Tankı",
+  dataIndex: "YAKIT_TANKI",
+  key: "YAKIT_TANKI",
+  width: 180,
+  visible: true,
+  render: (text, record) => {
+    if (record.isNewRow) return <Select style={{ width: "100%" }} placeholder="Seçiniz" />;;
+    return (
+      <Select
+        style={{ width: "100%" }}
+        // 🌟 record'dan gelen güncel değeri okuyor (Hem yukardan toplu gelen hem de el ile seçilen)
+        value={record.YAKIT_TANKI || undefined} 
+        placeholder="Seçiniz"
+        showSearch
+        optionFilterProp="label"
+        options={yakitTanklari} 
+        onChange={(val) => {
+          // 🌟 SATIR BAZLI ÖZEL SEÇİM: Sadece tıklanan satırın tankını değiştirir
+          setSelectedMachines(prev => prev.map(item => 
+            item.key === record.key ? { ...item, YAKIT_TANKI: val } : item
+          ));
+        }}
+      />
+    );
+  }
+},
+  {
       title: "Lokasyon",
       dataIndex: "LOKASYON",
       key: "LOKASYON",
-      width: 160,
+      width: 220,
       visible: true,
-      render: (text, record) => record.isNewRow ? "-" : <Input value={record.LOKASYON} disabled />
+      render: (text, record) => {
+        if (record.isNewRow) return "-";
+
+        // Eğer makineden lokasyon gelmediyse, kullanıcı kendi seçebilsin diye LokasyonTablo componentini çağırıyoruz
+        return (
+          <LokasyonTablo
+            workshopSelectedId={record.LOKASYON_ID}
+            lokasyonFieldName={`LOK_TANIM_${record.key}`}
+            lokasyonIdFieldName={`LOK_ID_${record.key}`}
+            placeholder="Lokasyon Seçiniz"
+            onSubmit={(selectedData) => {
+              setSelectedMachines(prev => prev.map(item => 
+                item.key === record.key 
+                  ? { ...item, LOKASYON: selectedData.LOK_TANIM, LOKASYON_ID: selectedData.key } 
+                  : item
+              ));
+            }}
+            onClear={() => {
+              setSelectedMachines(prev => prev.map(item => 
+                item.key === record.key ? { ...item, LOKASYON: "", LOKASYON_ID: "" } : item
+              ));
+            }}
+          />
+        );
+      }
     },
     {
       title: "Proje",
       dataIndex: "PROJE",
       key: "PROJE",
-      width: 180,
-      visible: true,
-      render: (text, record) => {
-        if (record.isNewRow) return <Select style={{ width: "100%" }} disabled placeholder="Proje" />;
-        return (
-          <Select
-            showSearch
-            style={{ width: "100%" }}
-            placeholder="Proje Seçiniz..."
-            optionFilterProp="label"
-            value={record.PROJE}
-            onChange={(val) => {
-              setSelectedMachines(prev => prev.map(item => 
-                item.key === record.key ? { ...item, PROJE: val } : item
-              ));
-            }}
-            options={[
-              { value: "proje1", label: "Marmaray Projesi" },
-            ]}
-          />
-        );
-      }
-    },
-    {
-      title: "Sürücü / Operatör",
-      dataIndex: "SURUCU",
-      key: "SURUCU",
-      width: 180,
-      visible: true,
-      render: (text, record) => {
-        if (record.isNewRow) return <Select style={{ width: "100%" }} disabled placeholder="Sürücü" />;
-        return (
-          <Select
-            showSearch
-            style={{ width: "100%" }}
-            placeholder="Sürücü Seçiniz..."
-            optionFilterProp="label"
-            value={record.SURUCU}
-            onChange={(val) => {
-              setSelectedMachines(prev => prev.map(item => 
-                item.key === record.key ? { ...item, SURUCU: val } : item
-              ));
-            }}
-            options={[
-              { value: "surucu1", label: "Ahmet Yılmaz" },
-            ]}
-          />
-        );
-      }
-    },
-    {
-      title: "Açıklama",
-      dataIndex: "ACIKLAMA",
-      key: "ACIKLAMA",
       width: 220,
       visible: true,
       render: (text, record) => {
-        if (record.isNewRow) return <Input disabled placeholder="Açıklama" />;
+        if (record.isNewRow) return "-";
+        return (
+          <ProjeTablo
+            workshopSelectedId={record.PROJE_ID}
+            name1={`PROJE_${record.key}`} // Satırlar çakışmasın diye dinamik name verdik kanka
+            onSubmit={(selectedData) => {
+              setSelectedMachines(prev => prev.map(item => 
+                item.key === record.key 
+                  ? { ...item, PROJE: selectedData.PRJ_TANIM, PROJE_ID: selectedData.TB_PROJE_ID } 
+                  : item
+              ));
+            }}
+          />
+        );
+      }
+    },
+  {
+      title: "Sürücü / Operatör",
+      dataIndex: "SURUCU",
+      key: "SURUCU",
+      width: 220, // 🌟 Component butonları sığsın diye genişliği azıcık artırdım kanka
+      visible: true,
+      render: (text, record) => {
+        if (record.isNewRow) return "-";
+        return (
+          <PersonelTablo
+            workshopSelectedId={record.SURUCU_ID}
+            name1={`SURUCU_${record.key}`} // 🌟 Her satıra özel benzersiz name alanı
+            onSubmit={(selectedData) => {
+              setSelectedMachines(prev => prev.map(item => 
+                item.key === record.key 
+                  ? { ...item, SURUCU: selectedData.PRS_ISIM, SURUCU_ID: selectedData.TB_PERSONEL_ID } 
+                  : item
+              ));
+            }}
+          />
+        );
+      }
+    },
+  {
+      title: "Açıklama",
+      dataIndex: "ACIKLAMA",
+      key: "ACIKLAMA",
+      width: 280, // 🌟 Hata mesajı sığsın diye genişliği biraz daha açtım kanka
+      visible: true,
+      render: (text, record) => {
+        if (record.isNewRow) return "-";
+        
+        // Eğer açıklama API hatası içeriyorsa input rengini kırmızı yapıyoruz dikkat çekmesi için
+        const isError = record.ACIKLAMA?.startsWith("HATA:");
+        
         return (
           <Input
             placeholder="Açıklama giriniz..."
             value={record.ACIKLAMA}
+            style={isError ? { borderColor: "#ff4d4f", color: "#ff4d4f", backgroundColor: "#fff2f0" } : {}}
             onChange={(e) => {
               setSelectedMachines(prev => prev.map(item => 
                 item.key === record.key ? { ...item, ACIKLAMA: e.target.value } : item
@@ -582,14 +803,6 @@ const MainTable = () => {
     }
   };
 
-  // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
-
-  const [body, setBody] = useState({
-    filters: {
-      Kelime: "",
-    },
-  });
-
   // ana tablo api isteği için kullanılan useEffect
 
   const lastRequestRef = useRef(null);
@@ -630,23 +843,32 @@ const MainTable = () => {
   };
 
   const refreshTableData = useCallback(() => {
-    // Sayfa numarasını 1 yap
-    // setCurrentPage(1);
+  // 1. Üst taraftaki filtre ve varsayılan değerleri sıfırla
+  setSelectedDate("");
+  setSelectedClock("");
+  setDefaultPrice(null);
+  setFuelTank("");
+  setCheckedOne(false);
+  setCheckedTwo(false);
 
-    // `body` içerisindeki filtreleri ve arama terimini sıfırla
-    // setBody({
-    //   keyword: "",
-    //   filters: {},
-    // });
-    // setSearchTerm("");
+  // 2. Tablo verilerini ve seçilen makineleri temizle
+  setSelectedMachines([]);
+  setSelectedRowKeys([]);
+  setSelectedRows([]);
 
-    // Tablodan seçilen kayıtların checkbox işaretini kaldır
-    setSelectedRowKeys([]);
-    setSelectedRows([]);
-    // Burada `body` ve `currentPage`'i güncellediğimiz için, bu değerlerin en güncel hallerini kullanarak veri çekme işlemi yapılır.
-    // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
-    // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
-  }, [body, currentPage]);
+  // 3. Form Context (react-hook-form) alanlarını temizle
+  setValue("MKN_KOD_temp", "");
+  setValue("TB_MAKINE_ID_temp", "");
+
+  // 4. Eğer backend'den veri çekiyorsan arama terimini ve sayfayı sıfırla
+  setSearchTerm("");
+  setCurrentPage(1);
+  setBody({
+    filters: {
+      Kelime: "",
+    },
+  });
+}, [setValue]);
 
   // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
   const [columns, setColumns] = useState(() => {
@@ -910,7 +1132,7 @@ const MainTable = () => {
       >
         <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
           <DatePicker
-            style={{ width: "250px" }}
+            style={{ width: "200px" }}
             placeholder="Tarih seçiniz..."
             value={selectedDate ? dayjs(selectedDate) : null} 
             onChange={(date, dateString) => {
@@ -919,7 +1141,7 @@ const MainTable = () => {
             suffixIcon={<CalendarOutlined style={{ color: "#0091ff" }} />}
           />
           <TimePicker
-            style={{ width: "250px" }}
+            style={{ width: "200px" }}
             placeholder="Saat seçiniz..."
             format="HH:mm" // Kullanıcının göreceği ve state'e kaydolacak format (Örn: 14:30)
             value={selectedClock ? dayjs(selectedClock, "HH:mm") : null}
@@ -929,26 +1151,45 @@ const MainTable = () => {
             suffixIcon={<ClockCircleOutlined style={{ color: "#0091ff" }} />}
           />
           <InputNumber
-            style={{ width: "250px" }}
+            style={{ width: "200px" }}
             placeholder="Varsayılan fiyat..."
             value={defaultPrice}
-            onChange={(value) => setDefaultPrice(value)}
+            min={0}
+            decimalSeparator="," // Ondalık işareti virgül (Örn: 64,43)
+            step={0.01}          // Kuruş kuruş artsın
+            precision={2}        // Virgülden sonra 2 hane zorunlu
             suffix={<DollarOutlined style={{ color: "#0091ff" }} />}
+            onChange={(value) => {
+              const yeniVarsayilanFiyat = value || 0;
+              setDefaultPrice(yeniVarsayilanFiyat);
+              setSelectedMachines(prev => prev.map(item => {
+                const gecerliMiktar = item.MiKTAR || 0;
+                const yeniTutar = (gecerliMiktar * yeniVarsayilanFiyat).toFixed(2);
+                return { 
+                  ...item, 
+                  FiYAT: yeniVarsayilanFiyat, 
+                  TUTAR: yeniTutar 
+                };
+              }));
+            }}
           />
           <Select
-            style={{ width: "250px" }}
-            placeholder="Yakıt Tankı Seçiniz..." // Arama yazısını güncelledik
-            value={fuelTank || undefined} // null veya "" yerine undefined vermek placeholder'ın görünmesini sağlar
-            onChange={(value) => setFuelTank(value)}
+            style={{ width: "200px" }}
+            placeholder="Yakıt Tankı Seçiniz..."
+            value={fuelTank || undefined}
+            onChange={(value) => {
+              setFuelTank(value);
+              setSelectedMachines(prev => prev.map(item => {
+                return { 
+                  ...item, 
+                  YAKIT_TANKI: value
+                };
+              }));
+            }}
             showSearch
-            optionFilterProp="label" // Yazarak ararken 'label' değerlerine göre filtreler
-            options={[
-              { value: 'secenek1', label: 'TAN0162-102 OKTAN BENZİN' },
-              { value: 'secenek2', label: 'TAN0158-Benzin Depo' },
-              { value: 'secenek3', label: 'TAN0161-DİZEL DEPO' },
-              { value: 'secenek4', label: 'TAN0167-DİZEL DEPO 2' },
-              { value: 'secenek5', label: 'TAN0160-LPG' },
-            ]}
+            loading={tankLoading}
+            optionFilterProp="label"
+            options={yakitTanklari}
           />
           <Checkbox 
             checked={checkedOne} 
@@ -968,14 +1209,7 @@ const MainTable = () => {
           <Button 
             type="default" 
             icon={<RedoOutlined />} 
-            onClick={() => {
-              setSelectedDate("");
-              setSelectedClock("");
-              setDefaultPrice(null);
-              setFuelTank(undefined);
-              setCheckedOne(false);
-              setCheckedTwo(false);
-            }}
+            onClick={refreshTableData}
           >
             Yenile
           </Button>
@@ -983,10 +1217,9 @@ const MainTable = () => {
           <Button 
             type="primary" 
             icon={<SaveOutlined />} 
-            style={{ backgroundColor: "#39B83D" }} // İkon renginle uyumlu olsun diye mavi yaptık
-            onClick={() => {
-              console.log("Kaydediliyor...");
-            }}
+            style={{ backgroundColor: saveLoading ? undefined : "#39B83D" }} 
+            onClick={handleSaveTopluYakitGiris}
+            loading={saveLoading} // 🌟 İstek sürerken butonu kilitliyoruz
           >
             Kaydet
           </Button>
@@ -995,7 +1228,7 @@ const MainTable = () => {
         <Table
           components={components}
           columns={initialColumns}
-          dataSource={[{ key: "add-row", isNewRow: true }, ...selectedMachines, ...filteredData]}
+          dataSource={[...selectedMachines, { key: "dynamic-add-row", isNewRow: true }]}
           pagination={{
             defaultPageSize: 10,
             showSizeChanger: true,

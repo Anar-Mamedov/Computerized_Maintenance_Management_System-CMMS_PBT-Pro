@@ -9,23 +9,25 @@ export default function MakineSecim({
   setValue,
   errors,
   disabled = false,
-  makineFieldName = "MKN_KOD",
-  makineIdFieldName = "TB_MAKINE_ID",
-  onMakinelerSecildi, // 🌟 Seçilen tüm satırları ana tabloya fırlatacak callback
+  makineFieldName = "MKN_KOD_temp",
+  makineIdFieldName = "TB_MAKINE_ID_temp",
+  onMakinelerSecildi, // Seçilen tüm satırları ana tabloya fırlatacak callback
+  secilenMakineIdleri = [], // 🌟 Ana tablodaki mevcut makinelerin ID listesi (Dışlama için)
 }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
   
-  // 🌟 Çoklu seçim için state'i dizi (array) yapıyoruz
+  // Çoklu seçim için state
   const [selectedRows, setSelectedRows] = useState([]); 
   const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const handleModalToggle = () => {
     if (!isModalVisible) {
-      setSelectedRows([]); // Modal her açıldığında seçimleri temizle kanka
+      setSelectedRows([]); // Modal her açıldığında seçimleri temizle
+      setCurrentPage(1);   // Sayfayı 1'e çek
     }
     setIsModalVisible(!isModalVisible);
   };
@@ -34,51 +36,54 @@ export default function MakineSecim({
     if (isModalVisible) {
       setLoading(true);
 
+      // Dokümandaki formata uygun request body
       const payload = {
-        lokasyonlar: {},
-        isemritipleri: {},
-        durumlar: {},
-        customfilter: {},
+        Parametre: searchTerm,
+        PagingDeger: currentPage,
+        PageSize: 10,
+        EklenenMakineIds: secilenMakineIdleri || [], // 🌟 Seçili olanları backend'e gönderiyoruz ki gizlesin
       };
 
-      AxiosInstance.post(
-        `GetMakineFullList?parametre=${searchTerm}&pagingDeger=1&pageSize=10`,
-        payload
-      )
+      // 🌟 Yeni API Endpoint'i: GetYakitMakineList
+      AxiosInstance.post(`GetYakitMakineList`, payload)
         .then((res) => {
-          const items = res?.makine_listesi || [];
-          setData(items);
-          setFilteredData(items);
-          setTotalCount(res?.totalCount || 0);
+          // Backend'den hata dönmediyse listeyi state'e bas
+          if (res && !res.has_error) {
+            const items = res?.makine_listesi || [];
+            setData(items);
+            setTotalCount(res?.kayit_sayisi || 0);
+          } else {
+            clearTable();
+          }
         })
         .catch(() => {
-          setData([]);
-          setFilteredData([]);
-          setTotalCount(0);
+          clearTable();
         })
         .finally(() => setLoading(false));
     }
-  }, [isModalVisible, searchTerm]);
+  }, [isModalVisible, searchTerm, currentPage, secilenMakineIdleri]);
 
-  // 🌟 Olayı radyo butonundan Checkbox'a çeviren kısım burası kanka:
+  const clearTable = () => {
+    setData([]);
+    setTotalCount(0);
+  };
+
+  // Olayı radyo butonundan Checkbox'a çeviren kısım
   const rowSelection = {
     type: "checkbox", 
     selectedRowKeys: selectedRows.map(row => row.TB_MAKINE_ID),
     onChange: (keys, rows) => {
-      // Sayfalar arası geçişlerde veri kaybı olmasın diye seçilen satır nesnelerini tutuyoruz
       setSelectedRows(rows); 
     },
   };
 
   const handleModalOk = () => {
     if (selectedRows && selectedRows.length > 0) {
-      // 🌟 HATAYI ENGELLEYEN KISIM: setValue fonksiyonu varsa tetikle, yoksa patlama
       if (typeof setValue === "function") {
         setValue(makineFieldName, selectedRows[0].MKN_KOD);
         setValue(makineIdFieldName, selectedRows[0].TB_MAKINE_ID);
       }
 
-      // 🌟 Seçilen tüm makineleri ana tabloya fırlatan callback
       if (typeof onMakinelerSecildi === "function") {
         onMakinelerSecildi(selectedRows);
       }
@@ -87,13 +92,16 @@ export default function MakineSecim({
   };
 
   const handleClear = () => {
-    setValue(makineFieldName, "");
-    setValue(makineIdFieldName, "");
+    if (typeof setValue === "function") {
+      setValue(makineFieldName, "");
+      setValue(makineIdFieldName, "");
+    }
     if (typeof onMakinelerSecildi === "function") {
-      onMakinelerSecildi([]); // Temizlenince ana tabloya boş dizi yolla
+      onMakinelerSecildi([]); 
     }
   };
 
+  // Dokümandan dönen yeni alan isimlerine göre kolon başlıkları güncellendi
   const columns = [
     { title: "Ekipman Kodu", dataIndex: "MKN_KOD", key: "MKN_KOD", width: 150, ellipsis: true },
     { title: "Ekipman Tanımı", dataIndex: "MKN_TANIM", key: "MKN_TANIM", width: 250, ellipsis: true },
@@ -159,7 +167,10 @@ export default function MakineSecim({
           style={{ width: "250px", marginBottom: "10px" }}
           placeholder="Ekipman ara..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1); // Arama yapılınca sayfalama 1'e dönsün kanka
+          }}
           prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
         />
 
@@ -167,10 +178,17 @@ export default function MakineSecim({
           rowKey="TB_MAKINE_ID"
           rowSelection={rowSelection}
           columns={columns}
-          dataSource={filteredData}
+          dataSource={data}
           loading={loading}
-          pagination={false}
-          scroll={{ y: "calc(100vh - 400px)" }}
+          scroll={{ y: "calc(100vh - 450px)" }}
+          pagination={{
+            current: currentPage,
+            pageSize: 10,
+            total: totalCount,
+            showSizeChanger: false, // Dokümana göre sabit 10'arlı sayfalama
+            onChange: (page) => setCurrentPage(page),
+            showTotal: (total) => `Toplam ${total} Kayıt`,
+          }}
         />
       </Modal>
     </div>
