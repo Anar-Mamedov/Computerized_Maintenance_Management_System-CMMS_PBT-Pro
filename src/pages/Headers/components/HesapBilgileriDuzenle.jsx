@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Input, message, Modal, Typography } from "antd";
+import { Button, Input, message, Modal, Typography, Select } from "antd";
 import { useAppContext } from "../../../AppContext.jsx";
 import {
   Controller,
@@ -17,8 +17,11 @@ const HesapBilgileriDuzenle = ({
   accountEditModalOpen,
   accountEditModalClose,
 }) => {
-  const { userData1 } = useAppContext(); // AppContext'ten userData1 değerini alın
-  const { setIsButtonClicked } = useAppContext(); // AppContext'ten setIsButtonClicked fonksiyonunu alın
+  const { userData1, setIsButtonClicked, fetchActiveCurrency } = useAppContext(); // AppContext'ten values alın
+  
+  const [currencies, setCurrencies] = useState([]);
+  const [loadingCurrencies, setLoadingCurrencies] = useState(false);
+
   const methods = useForm({
     defaultValues: {
       KLL_TANIM: "",
@@ -36,11 +39,28 @@ const HesapBilgileriDuzenle = ({
       KLL_PERSONEL_ID: "",
       KLL_NEW_USER: "",
       KLL_DEGISTIRME_TARIH: "",
-      // Add other default values here
+      KLL_PARABIRIM: null,
     },
   });
 
   const { setValue, reset, handleSubmit, control } = methods;
+
+  useEffect(() => {
+    if (accountEditModalOpen) {
+      setLoadingCurrencies(true);
+      AxiosInstance.get("GetCurrencies")
+        .then((res) => {
+          const currencyList = res.data || (Array.isArray(res) ? res : []);
+          setCurrencies(currencyList);
+        })
+        .catch((err) => {
+          console.error("Error fetching currencies:", err);
+        })
+        .finally(() => {
+          setLoadingCurrencies(false);
+        });
+    }
+  }, [accountEditModalOpen]);
 
   useEffect(() => {
     if (accountEditModalOpen && userData1) {
@@ -59,6 +79,7 @@ const HesapBilgileriDuzenle = ({
       setValue("KLL_PERSONEL_ID", userData1?.KLL_PERSONEL_ID);
       setValue("KLL_NEW_USER", userData1?.KLL_NEW_USER);
       setValue("KLL_DEGISTIRME_TARIH", userData1?.KLL_DEGISTIRME_TARIH);
+      setValue("KLL_PARABIRIM", userData1?.KLL_PARABIRIM ? Number(userData1.KLL_PARABIRIM) : null);
     }
   }, [userData1, accountEditModalOpen, setValue]);
 
@@ -85,6 +106,7 @@ const HesapBilgileriDuzenle = ({
       KLL_PERSONEL_ID: data.KLL_PERSONEL_ID,
       KLL_NEW_USER: data.KLL_NEW_USER,
       KLL_DEGISTIRME_TARIH: data.KLL_DEGISTIRME_TARIH,
+      KLL_PARABIRIM: data.KLL_PARABIRIM,
     };
 
     AxiosInstance.post(`UpdateKullaniciProfile`, Body)
@@ -96,6 +118,7 @@ const HesapBilgileriDuzenle = ({
           reset();
           accountEditModalClose(); // Modal'ı kapat
           setIsButtonClicked((prev) => !prev); // Başarılı yüklemeden sonra resim listesini yenile
+          fetchActiveCurrency(); // Instantly update active currency globally
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
         } else {
@@ -251,6 +274,33 @@ const HesapBilgileriDuzenle = ({
                   <Input
                     {...field}
                     style={{ width: "100%", maxWidth: "300px" }}
+                  />
+                )}
+              />
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Text>Para Birimi:</Text>
+              <Controller
+                name="KLL_PARABIRIM"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    loading={loadingCurrencies}
+                    placeholder="Para Birimi Seçiniz"
+                    style={{ width: "100%", maxWidth: "300px" }}
+                    allowClear
+                    options={currencies.map((curr) => ({
+                      value: curr.CurrencyId,
+                      label: `${curr.Name} (${curr.Code} - ${curr.Symbol})`,
+                    }))}
                   />
                 )}
               />

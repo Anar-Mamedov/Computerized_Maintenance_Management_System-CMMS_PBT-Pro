@@ -7,15 +7,15 @@ import { userState, authTokenState } from "../../../state/userState"; // Atomlar
 import AxiosInstance from "../../../api/http";
 import { useAppContext } from "../../../AppContext";
 import HesapBilgileriDuzenle from "./HesapBilgileriDuzenle.jsx";
-import SifreDegistirme from "./SifreDegistirme.jsx"; // AppContext'ten useAppContext hook'unu alın
+import SifreDegistirme from "./SifreDegistirme.jsx";
+import i18n from "../../../utils/i18n";
 
 const { Text, Link } = Typography;
 
 export default function Header() {
   const [open, setOpen] = useState(false);
   const userData = useRecoilValue(userState); // userState atomunun değerini oku
-  const { isButtonClicked, setIsButtonClicked } = useAppContext(); // AppContext'ten isButtonClicked ve setIsButtonClicked'i alın
-  const { userData1, setUserData1 } = useAppContext(); // AppContext'ten userData1 ve setUserData1'i alın
+  const { isButtonClicked, setIsButtonClicked, userData1, setUserData1, fetchActiveCurrency } = useAppContext(); // AppContext'ten values alın
   const [imageUrl, setImageUrl] = useState(null); // Resim URL'sini saklamak için state tanımlayın
   const [loadingImage, setLoadingImage] = useState(false); // Yükleme durumu için yeni bir state
   const [isModalVisible, setIsModalVisible] = useState(false); // Modal'ın görünürlüğünü kontrol etmek için state
@@ -46,6 +46,8 @@ export default function Header() {
       if (response[0]?.KLL_NEW_USER === true) {
         setIsModalVisible2(true); // Kullanıcıya göre butonu gizle
       }
+      // Fetch active currency to keep symbol up-to-date
+      fetchActiveCurrency();
     } catch (error) {
       console.error("Error fetching user data:", error);
     }

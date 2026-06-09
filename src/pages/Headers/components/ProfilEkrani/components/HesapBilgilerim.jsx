@@ -274,6 +274,10 @@ function HesapBilgilerim(props) {
             <Text>{userData1?.PRS_ADRES || "Bilinmiyor"}</Text>
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
+            <Text type="secondary">Para Birimi</Text>
+            <Text>{userData1?.KLL_PARABIRIM_NAME ? `${userData1.KLL_PARABIRIM_NAME} (${userData1.KLL_PARABIRIM_SYMBOL || ""})` : "Belirtilmemiş"}</Text>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column" }}>
             <Text type="secondary">Açıklama</Text>
             <Text>{userData1?.PRS_ACIKLAMA || "Bilinmiyor"}</Text>
           </div>
