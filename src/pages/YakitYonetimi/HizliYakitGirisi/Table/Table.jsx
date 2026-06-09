@@ -116,8 +116,8 @@ const MainTable = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedClock, setSelectedClock] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(dayjs().format("YYYY-MM-DD"));
+  const [selectedClock, setSelectedClock] = useState(dayjs().format("HH:mm"));
   const [defaultPrice, setDefaultPrice] = useState("");
   const [fuelTank, setFuelTank] = useState("");
   const [checkedOne, setCheckedOne] = useState(false);
@@ -237,7 +237,7 @@ const MainTable = () => {
       const payload = clearedMachines.map((item, index) => ({
         RowIndex: index + 1,
         MakineKodu: item.EKIPMAN_KOD,
-        MakineId: item.EKIPMAN_ID,
+        MakineId: item.EKIPMAN_ID || item.TB_MAKINE_ID || (item.key?.startsWith("row_") ? parseFloat(item.key.split('_')[3]) : null),
         Tarih: item.TARiH ? dayjs(item.TARiH).format("YYYY-MM-DD") : null,
         Saat: item.SAAT || null,
         SonAlinanKm: item.SON_ALINAN != null ? parseFloat(item.SON_ALINAN) : 0,
@@ -323,6 +323,7 @@ const MainTable = () => {
                     return {
                       key: rowKey,
                       isNewRow: false,
+                      TB_MAKINE_ID: makine.TB_MAKINE_ID,
                       EKIPMAN_ID: makine.TB_MAKINE_ID,
                       EKIPMAN_KOD: makine.MKN_KOD,
                       EKIPMAN_TANIM: makine.MKN_TANIM,
@@ -332,8 +333,8 @@ const MainTable = () => {
                       LOKASYON_ID: makine.MKN_LOKASYON_ID || "",
                       SON_ALINAN: makine.SON_ALINAN_KM,
                       BIRIM: makine.SAYAC_BIRIM || "-",
-                      TARiH: dayjs().format("YYYY-MM-DD"),
-                      SAAT: dayjs().format("HH:mm"),
+                      TARiH: selectedDate || dayjs().format("YYYY-MM-DD"),
+                      SAAT: selectedClock || dayjs().format("HH:mm"),
                       MiKTAR: 0,
                       FiYAT: defaultPrice || 0,
                       TUTAR: 0,
@@ -844,8 +845,8 @@ const MainTable = () => {
 
   const refreshTableData = useCallback(() => {
   // 1. Üst taraftaki filtre ve varsayılan değerleri sıfırla
-  setSelectedDate("");
-  setSelectedClock("");
+  setSelectedDate(dayjs().format("YYYY-MM-DD"));
+  setSelectedClock(dayjs().format("HH:mm"));
   setDefaultPrice(null);
   setFuelTank("");
   setCheckedOne(false);
@@ -1192,18 +1193,28 @@ const MainTable = () => {
             options={yakitTanklari}
           />
           <Checkbox 
-            checked={checkedOne} 
-            onChange={(e) => setCheckedOne(e.target.checked)}
-          >
-            Stoktan
-          </Checkbox>
+  checked={checkedOne} 
+  onChange={(e) => {
+    const newVal = e.target.checked;
+    setCheckedOne(newVal);
+    // 🌟 Tüm satırların Stok Kullanım alanını güncelle
+    setSelectedMachines(prev => prev.map(item => ({ ...item, STOK_KULLANIM: newVal })));
+  }}
+>
+  Stoktan
+</Checkbox>
 
-          <Checkbox 
-            checked={checkedTwo} 
-            onChange={(e) => setCheckedTwo(e.target.checked)}
-          >
-            Full Depo
-          </Checkbox>
+<Checkbox 
+  checked={checkedTwo} 
+  onChange={(e) => {
+    const newVal = e.target.checked;
+    setCheckedTwo(newVal);
+    // 🌟 Tüm satırların Full Depo alanını güncelle
+    setSelectedMachines(prev => prev.map(item => ({ ...item, FULL_DEPO: newVal })));
+  }}
+>
+  Full Depo
+</Checkbox>
         </div>
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <Button 
