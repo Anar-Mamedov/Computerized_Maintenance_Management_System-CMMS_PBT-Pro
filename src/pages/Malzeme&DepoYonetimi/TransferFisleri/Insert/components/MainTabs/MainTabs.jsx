@@ -5,6 +5,7 @@ import styled from "styled-components";
 import dayjs from "dayjs";
 import { t } from "i18next";
 import AxiosInstance from "../../../../../../api/http";
+import ParaBirimiSecimi from "../../../../../../utils/components/ParaBirimiSecimi";
 import FirmaSelectBox from "../../../../../../utils/components/FirmaTablo";
 // import PlakaSelectBox from "../../../../../../../_root/components/PlakaSelectbox";
 import MakineTablo from "../../../../../../utils/components/Machina/MakineTablo";
@@ -536,6 +537,7 @@ export default function MainTabs({ modalOpen }) {
             <KodIDSelectbox name1="islemTipi" kodID={13006} isRequired={false} />
           </div>
         </div>
+        <ParaBirimiSecimi modalOpen={modalOpen} />
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "350px" }}>
         <div

@@ -60,6 +60,10 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
       ozelAlan10ID: null,
       ozelAlan11: null,
       ozelAlan12: null,
+      paraBirimiID: null,
+      paraBirimiKur: null,
+      genelToplamDovizli: null,
+      paraBirimiSymbol: null,
       fisIcerigi: [],
     },
   });
@@ -99,6 +103,10 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
           setValue("siparisNo", item.siparisKodu);
           setValue("lokasyon", item.lokasyonName);
           setValue("lokasyonID", item.lokasyonId);
+          setValue("paraBirimiID", item.paraBirimiId || null);
+          setValue("paraBirimiKur", item.paraBirimiKur ?? null);
+          setValue("genelToplamDovizli", item.genelToplamDovizli ?? null);
+          setValue("paraBirimiSymbol", item.paraBirimiSymbol ?? null);
           setTimeout(() => setValue("totalAraToplam", item.araToplam), 200);
           setTimeout(() => setValue("totalIndirim", item.indirimliToplam), 200);
           setTimeout(() => setValue("totalKdvToplam", item.kdvToplam), 200);
@@ -265,7 +273,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
     };
 
     // API'ye POST isteği gönder
-    AxiosInstance.post("UpsertMalzemeFisWithItems", Body)
+    AxiosInstance.post(`UpsertMalzemeFisWithItems?fisCur=${Number(data.paraBirimiID) || 0}`, Body)
       .then((response) => {
         console.log("Data sent successfully:", response);
         if (response.status_code === 200 || response.status_code === 201 || response.status_code === 202) {
