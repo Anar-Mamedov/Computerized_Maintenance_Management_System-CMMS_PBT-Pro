@@ -164,6 +164,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh, numarator =
             ozelAlan10ID: null,
             ozelAlan11: null,
             ozelAlan12: null,
+            paraBirimiID: null,
             fisIcerigi: [],
           });
         }, 100);
@@ -215,6 +216,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh, numarator =
       ozelAlan10ID: null,
       ozelAlan11: null,
       ozelAlan12: null,
+      paraBirimiID: null,
       fisIcerigi: [],
     },
   });
@@ -377,7 +379,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh, numarator =
         })) || [],
     };
 
-    AxiosInstance.post("UpsertMalzemeFisWithItems", Body)
+    AxiosInstance.post(`UpsertMalzemeFisWithItems?fisCur=${Number(data.paraBirimiID) || 0}`, Body)
       .then((response) => {
         // Handle successful response here, e.g.:
         console.log("Data sent successfully:", response);
@@ -428,6 +430,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh, numarator =
               ozelAlan10ID: null,
               ozelAlan11: null,
               ozelAlan12: null,
+              paraBirimiID: null,
               fisIcerigi: [],
             });
           }, 100);
