@@ -13,6 +13,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Resizable } from "react-resizable";
 import "./ResizeStyle.css";
 import AxiosInstance from "../../../../api/http";
+import { formatNumberWithSeparators } from "../../../../utils/numberLocale";
 import { FormProvider, useForm } from "react-hook-form";
 import styled from "styled-components";
 import dayjs from "dayjs";
@@ -250,6 +251,8 @@ const TransferFisleri = () => {
     fetchData(1, pageSize);
   }, [fetchData, pageSize]);
 
+  const currentLang = localStorage.getItem("i18nextLng") || "en";
+
   // Columns definition (adjust as needed)
   const initialColumns = useMemo(
     () => [
@@ -400,8 +403,50 @@ const TransferFisleri = () => {
           return a.SFS_GENEL_TOPLAM - b.SFS_GENEL_TOPLAM;
         },
       },
+      {
+        title: t("paraBirimiSecimi"),
+        dataIndex: "SFS_PARABIRIMI_ADI",
+        key: "SFS_PARABIRIMI_ADI",
+        width: 130,
+        ellipsis: true,
+        visible: true,
+        render: (text, record) => (text ? `${text}${record.SFS_PARABIRIMI_SYMBOL ? ` (${record.SFS_PARABIRIMI_SYMBOL})` : ""}` : ""),
+        sorter: (a, b) => {
+          if (a.SFS_PARABIRIMI_ADI === null) return -1;
+          if (b.SFS_PARABIRIMI_ADI === null) return 1;
+          return String(a.SFS_PARABIRIMI_ADI).localeCompare(String(b.SFS_PARABIRIMI_ADI));
+        },
+      },
+      {
+        title: t("kur"),
+        dataIndex: "SFS_PARABIRIMI_KUR",
+        key: "SFS_PARABIRIMI_KUR",
+        width: 110,
+        ellipsis: true,
+        visible: false,
+        render: (text) => (text != null ? formatNumberWithSeparators(text, currentLang) : ""),
+        sorter: (a, b) => {
+          if (a.SFS_PARABIRIMI_KUR === null) return -1;
+          if (b.SFS_PARABIRIMI_KUR === null) return 1;
+          return a.SFS_PARABIRIMI_KUR - b.SFS_PARABIRIMI_KUR;
+        },
+      },
+      {
+        title: t("genelToplamTL"),
+        dataIndex: "SFS_GENEL_TOPLAM_DOVIZLI",
+        key: "SFS_GENEL_TOPLAM_DOVIZLI",
+        width: 140,
+        ellipsis: true,
+        visible: true,
+        render: (text, record) => (text != null ? formatNumberWithSeparators(Number(text).toFixed(Number(record?.tutarFormat) || 2), currentLang) : ""),
+        sorter: (a, b) => {
+          if (a.SFS_GENEL_TOPLAM_DOVIZLI === null) return -1;
+          if (b.SFS_GENEL_TOPLAM_DOVIZLI === null) return 1;
+          return a.SFS_GENEL_TOPLAM_DOVIZLI - b.SFS_GENEL_TOPLAM_DOVIZLI;
+        },
+      },
     ],
-    []
+    [currentLang]
   );
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
@@ -595,7 +640,6 @@ const TransferFisleri = () => {
   };
 
   // Kullanıcının dilini localStorage'den alın
-  const currentLang = localStorage.getItem("i18nextLng") || "en";
   const currentLocale = localeMap[currentLang] || enUS;
 
   useEffect(() => {
