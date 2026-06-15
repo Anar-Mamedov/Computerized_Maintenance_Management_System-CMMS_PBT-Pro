@@ -14,6 +14,7 @@ import KodIDSelectbox from "../../../../../utils/components/KodIDSelectbox";
 import LokasyonTablo from "../../../../../utils/components/LokasyonTablo";
 import AtolyeTablo from "../../../../../utils/components/AtolyeTablo";
 import MakineTablo from "../../../../../utils/components/Machina/MakineTablo";
+import ContextMenu from "../components/ContextMenu/ContextMenu";
 
 const { RangePicker } = DatePicker;
 const { Text } = Typography;
@@ -166,6 +167,7 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
   const [exporting, setExporting] = useState(false);
   const [columnsModalOpen, setColumnsModalOpen] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [totalCount, setTotalCount] = useState(0);
@@ -326,15 +328,22 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
         const list = Array.isArray(response?.liste) ? response.liste : [];
         const normalizedRows = list.map((item, index) => ({
           ...item,
+          BakimID: item.TB_PERIYODIK_BAKIM_ID ?? item.BakimID,
+          MakineID: item.TB_MAKINE_ID ?? item.MakineID,
+          PlanlamaTarih: item.HEDEF_TAHMINI_TARIH ?? item.PBM_HEDEF_TARIH ?? item.PlanlamaTarih,
           clientKey: item.TB_PERIYODIK_BAKIM_MAKINE_ID ?? `${item.TB_PERIYODIK_BAKIM_ID || "pb"}-${item.TB_MAKINE_ID || "mk"}-${index}`,
         }));
 
         setRows(normalizedRows);
         setTotalCount(response?.kayit_sayisi ?? normalizedRows.length);
+        setSelectedRowKeys([]);
+        setSelectedRows([]);
       } catch (error) {
         console.error("Automatic work orders error:", error);
         setRows([]);
         setTotalCount(0);
+        setSelectedRowKeys([]);
+        setSelectedRows([]);
 
         if (navigator.onLine) {
           messageApi.error(`Hata Mesajı: ${error.message}`);
@@ -438,9 +447,10 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
   const rowSelection = useMemo(
     () => ({
       selectedRowKeys,
-      onChange: (keys, selectedRows) => {
+      onChange: (keys, selectedRowsList) => {
         setSelectedRowKeys(keys);
-        const selectedRow = selectedRows?.[0];
+        setSelectedRows(selectedRowsList);
+        const selectedRow = selectedRowsList?.[0];
         setValue("selectedOtomatikIsEmriId", selectedRow?.TB_PERIYODIK_BAKIM_ID ?? null);
         setValue("selectedPeriyodikBakimMakineId", selectedRow?.TB_PERIYODIK_BAKIM_MAKINE_ID ?? null);
       },
@@ -572,12 +582,7 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
             <Button icon={<DownloadOutlined />} loading={exporting} onClick={handleExport}>
               {t("indir")}
             </Button>
-            <Button
-              type="primary"
-              style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }}
-              icon={<EllipsisOutlined />}
-              onClick={handleRefresh}
-            />
+            <ContextMenu selectedRows={selectedRows} refreshTableData={handleRefresh} />
             <Button type="primary" onClick={applyFilters}>
               {t("uygula")}
             </Button>
