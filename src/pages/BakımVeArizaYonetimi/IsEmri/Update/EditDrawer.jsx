@@ -810,6 +810,23 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       setCloseModalDisabled(false);
       setCloseErrorMessage("");
       setCloseErrorMessageShow(false);
+      methods.unregister([
+        "kapamaBaslamaTarihi",
+        "kapamaBaslamaSaati",
+        "kapamaBitisTarihi",
+        "kapamaBitisSaati",
+        "kapamaCalismaSaat",
+        "kapamaCalismaDakika",
+        "kapamaSonuc",
+        "kapamaSonucID",
+        "kapatmaTarihi",
+        "kapatmaSaati",
+        "kapamaBakimPuani",
+        "kapamaMakineDurumu",
+        "kapamaMakineDurumuID",
+        "kapamaAciklama",
+        "fisNo",
+      ]);
       return;
     }
 
@@ -828,6 +845,38 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     }
 
     setCloseModalOpen(true);
+  };
+
+  const onUpdateBeforeClose = async (data) => {
+    setActionLoading(true);
+    try {
+      const updated = await updateIsEmri(data, { closeAfterSuccess: false, showSuccessMessage: false });
+      if (!updated) {
+        return;
+      }
+
+      const isEmriId = data.secilenIsEmriID || selectedRow?.key;
+      setCloseModalDisabled(false);
+      setCloseErrorMessage("");
+      setCloseErrorMessageShow(false);
+
+      if (isEmriId) {
+        const validationResult = await checkRequiredFieldsBeforeClose(isEmriId, { showMessages: false });
+        if (!validationResult.canClose) {
+          setCloseModalDisabled(true);
+          setCloseErrorMessage(validationResult.errorMessage);
+          setCloseErrorMessageShow(true);
+        }
+      }
+
+      setCloseModalOpen(true);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleCloseButtonClick = () => {
+    methods.handleSubmit(onUpdateBeforeClose)();
   };
 
   const handlePrintWorkOrderForm = () => {
@@ -876,7 +925,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
                 <span style={{ fontSize: "14px", lineHeight: 1 }}>🖨</span>
                 Yazdır
               </Button>
-              <Button danger disabled={disabled || actionLoading} loading={actionLoading} onClick={handleCloseModalToggle}>
+              <Button danger disabled={disabled || actionLoading} loading={actionLoading} onClick={handleCloseButtonClick}>
                 {t("isEmriniKapat")}
               </Button>
               <Button
@@ -944,7 +993,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         <Modal
           title={`İş Emri Kapatma - (${watch("isEmriNo") || selectedRow?.ISEMRI_NO || ""})`}
           centered
-          destroyOnClose={false}
+          destroyOnClose={true}
           width={990}
           zIndex={2100}
           open={closeModalOpen}
