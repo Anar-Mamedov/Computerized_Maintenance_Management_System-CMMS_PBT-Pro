@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
-import { Table, Button, Modal, Checkbox, Input, Spin, Tag, message } from "antd";
+import { Table, Button, Modal, Checkbox, Input, Spin, Tag, message, Popover } from "antd";
 import { useFormContext } from "react-hook-form";
 import { SearchOutlined, MenuOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../api/http.jsx";
@@ -13,6 +13,7 @@ import EditDrawer1 from "../../../../BakımVeArizaYonetimi/IsEmri/Update/EditDra
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import styled from "styled-components";
+import { t } from "i18next";
 
 dayjs.extend(customParseFormat);
 
@@ -44,6 +45,7 @@ export default function MainTable({ defaultStatusKeys = DEFAULT_STATUS_KEYS }) {
   const resolvedStatusKeys = useMemo(() => normalizeStatusKeys(defaultStatusKeys), [defaultStatusKeys]);
   const defaultStatusFilter = useMemo(() => buildStatusFilterObject(resolvedStatusKeys), [resolvedStatusKeys]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [assignPopoverOpen, setAssignPopoverOpen] = useState(false);
   const { setValue } = useFormContext();
   const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -1090,8 +1092,20 @@ export default function MainTable({ defaultStatusKeys = DEFAULT_STATUS_KEYS }) {
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
           <Filters onChange={handleBodyChange} defaultStatusKeys={resolvedStatusKeys} />
-          <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
-          <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
+          <Popover
+            content={
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "360px" }}>
+                <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
+                <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
+              </div>
+            }
+            trigger="click"
+            open={assignPopoverOpen}
+            onOpenChange={setAssignPopoverOpen}
+            placement="bottomLeft"
+          >
+            <Button>{t("isEmrineCevir")}</Button>
+          </Popover>
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
