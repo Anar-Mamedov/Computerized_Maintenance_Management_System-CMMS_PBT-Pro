@@ -37,7 +37,7 @@ const MainYakitModal = ({ visible, onClose, onRefresh, selectedRows, defaultTab 
     <Modal
       title={
         <div style={{ marginBottom: "10px" }}>
-          <Title level={5} style={{ margin: 0 }}>Stok Giriş İşlemi</Title>
+          <Title level={5} style={{ margin: 0 }}>Stok İşlemleri</Title>
           <Text type="secondary" style={{ fontSize: "12px" }}>
             Yakıt Depoları / Tanklar üzerinden hızlı stok işlemi
           </Text>
