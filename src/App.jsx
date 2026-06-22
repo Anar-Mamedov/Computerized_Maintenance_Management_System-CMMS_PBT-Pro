@@ -83,6 +83,7 @@ import FirmaTanimlari from "./pages/FirmaVeSozlesmeYonetimi/FirmaTanimlari/Firma
 import IsEmriAnaliz from "./pages/Analizler/IsEmriAnaliz/IsEmriAnaliz.jsx";
 import EkipmanAnaliz from "./pages/Analizler/EkipmanAnalizi/EkipmanAnaliz.jsx";
 import ArizaAnaliz from "./pages/Analizler/ArizaAnalizi/ArizaAnaliz.jsx";
+import PersonelCalismaPlani from "./pages/PersonelYonetimi/PersonelCalismaPlani/PersonelCalismaPlani.jsx";
 import AxiosInstance from "./api/http";
 
 // Malzemeler
@@ -261,7 +262,7 @@ export default function App() {
           <Route path="/ekipmanTransferi" element={<EkipmanTransferi />} />
           <Route path="/personelIzinleri" element={<PersonelIzinleri />} />
           <Route path="/personelNobetleri" element={<Hazirlaniyor />} />
-          <Route path="/personelCalismaPLani" element={<Hazirlaniyor />} />
+          <Route path="/personelCalismaPLani" element={<PersonelCalismaPlani />} />
           <Route path="/isTalebiKullanicilari" element={<IsTalebiKullanicilari />} />
           <Route path="/raporYonetimi" element={<Hazirlaniyor />} />
           <Route path="/formYonetimi" element={<Hazirlaniyor />} />
