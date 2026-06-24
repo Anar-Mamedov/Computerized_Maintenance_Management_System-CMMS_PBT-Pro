@@ -140,6 +140,9 @@ const MainTable = () => {
   const [body, setBody] = useState({
     ToplamIzinKaydi: 0,
     BelgeliKayit: 0,
+    filters: {
+      Arama: "",
+    },
   });
 
   const cardItems = useMemo(() => [
@@ -568,22 +571,23 @@ useEffect(() => {
 
       const res = await AxiosInstance.post("GetPersonelIzinListesi", payload);
 
-      if (res.status_code === 200 && !res.has_error) {
+      if (res && res.has_error === false) {
         // Özet verilerini set et
-        setBody({
-          ToplamIzinKaydi: res.data.ToplamIzinKaydi,
-          BelgeliKayit: res.data.BelgeliKayit,
-        });
+        setBody((prevBody) => ({
+          ...prevBody,
+          ToplamIzinKaydi: res.data?.ToplamIzinKaydi || 0,
+          BelgeliKayit: res.data?.BelgeliKayit || 0,
+        }));
 
         // Liste verilerini set et
-        const list = Array.isArray(res.data.Liste) ? res.data.Liste : [];
+        const list = Array.isArray(res.data?.Liste) ? res.data.Liste : [];
         const formattedData = list.map((item) => ({
           ...item,
           key: item.IzinId, // Unique ID olarak IzinId kullanıldı
         }));
 
         setData(formattedData);
-        setTotalDataCount(res.data.Liste.length); // Pagination dokümanda belirtilmemişse liste uzunluğu alınır
+        setTotalDataCount(list.length); // Pagination dokümanda belirtilmemişse liste uzunluğu alınır
       } else {
         message.error("Veriler alınırken bir hata oluştu.");
       }
