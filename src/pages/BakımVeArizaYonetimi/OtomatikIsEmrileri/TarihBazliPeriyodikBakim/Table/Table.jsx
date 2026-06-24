@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Button, Checkbox, DatePicker, Input, Modal, Pagination, Space, Spin, Table, Typography, message } from "antd";
-import { DownloadOutlined, EllipsisOutlined, MenuOutlined, SearchOutlined } from "@ant-design/icons";
+import { DownloadOutlined, MenuOutlined, SearchOutlined } from "@ant-design/icons";
 import { t } from "i18next";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
@@ -15,6 +15,7 @@ import LokasyonTablo from "../../../../../utils/components/LokasyonTablo";
 import AtolyeTablo from "../../../../../utils/components/AtolyeTablo";
 import MakineTablo from "../../../../../utils/components/Machina/MakineTablo";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
+import EditDrawer from "../../../PeriyodikBakimlar1/Update/EditDrawer";
 
 const { RangePicker } = DatePicker;
 const { Text } = Typography;
@@ -168,6 +169,10 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
   const [columnsModalOpen, setColumnsModalOpen] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [editDrawer, setEditDrawer] = useState({
+    visible: false,
+    data: null,
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [totalCount, setTotalCount] = useState(0);
@@ -427,6 +432,22 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
     fetchTableData(currentPage, pageSize, appliedFilters);
   }, [appliedFilters, currentPage, pageSize, fetchTableData]);
 
+  const handleRowOpen = useCallback((record) => {
+    const periyodikBakimId = record?.TB_PERIYODIK_BAKIM_ID ?? record?.BakimID;
+
+    if (!periyodikBakimId) {
+      return;
+    }
+
+    setEditDrawer({
+      visible: true,
+      data: {
+        ...record,
+        key: periyodikBakimId,
+      },
+    });
+  }, []);
+
   const handleExport = useCallback(() => {
     try {
       setExporting(true);
@@ -602,6 +623,16 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
               emptyText: t("veriYok", { defaultValue: "Veri Yok" }),
             }}
             rowClassName={() => "otomatik-is-emri-row"}
+            onRow={(record) => ({
+              onClick: (event) => {
+                if (event.target?.closest?.(".ant-table-selection-column, .ant-checkbox-wrapper, .ant-checkbox, input, button, a")) {
+                  return;
+                }
+
+                handleRowOpen(record);
+              },
+              style: { cursor: "pointer" },
+            })}
           />
         </Spin>
 
@@ -622,6 +653,17 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
           />
         </div>
       </div>
+      <EditDrawer
+        selectedRow={editDrawer.data}
+        onDrawerClose={() => setEditDrawer({ visible: false, data: null })}
+        drawerVisible={editDrawer.visible}
+        onRefresh={handleRefresh}
+      />
     </div>
   );
 }
+
+MainTable.propTypes = {
+  hatirlaticiGrupId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  hatirlaticiSiraId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+};
