@@ -1,43 +1,87 @@
-import React, { useEffect } from "react";
+import React from "react";
 import AxiosInstance from "../../../../../../api/http";
-import { Button } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import { message, Popconfirm } from "antd";
+import { DeleteOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 
 export default function Sil({ selectedRows, refreshTableData, disabled, hidePopover }) {
-  // selectedRows.forEach((row, index) => {
-  //   console.log(`Satır ${index + 1} ID: ${row.key}`);
-  //   // Eğer id değerleri farklı bir özellikte tutuluyorsa, row.key yerine o özelliği kullanın. Örneğin: row.id
-  // });
-
-  // Sil düğmesini gizlemek için koşullu stil
   const buttonStyle = disabled ? { display: "none" } : {};
 
-  // Silme işlemini tetikleyecek fonksiyon
   const handleDelete = async () => {
-    let isError = false;
-    // Seçili satırlar üzerinde döngü yaparak her birini sil
-    for (const row of selectedRows) {
+    const idsToDelete = selectedRows.map((row) => row.key || row.TB_IS_TANIM_ID);
+
+    if (idsToDelete.length === 0) {
+      message.warning("Lütfen silinecek kayıtları seçin.");
+      return;
+    }
+
+    let successCount = 0;
+    let errorCount = 0;
+
+    // API tek bir ID alır (POST /api/BakimArizaTanimSil?id={id}), seçili her kayıt için ayrı istek atılır
+    for (const id of idsToDelete) {
       try {
-        // Silme API isteğini gönder
-        const response = await AxiosInstance.post(`IsTalepSil?talepID=${row.key}`);
-        console.log("Silme işlemi başarılı:", response);
-        // Burada başarılı silme işlemi sonrası yapılacak işlemler bulunabilir.
+        const response = await AxiosInstance.post(`BakimArizaTanimSil?id=${id}`);
+
+        if (response?.has_error) {
+          // Kullanımda olan veya silinemeyen kayıtlar için backend uyarı döner
+          errorCount++;
+          message.warning(response.status || "Kayıt silinemedi.");
+        } else {
+          successCount++;
+        }
       } catch (error) {
-        console.error("Silme işlemi sırasında hata oluştu:", error);
+        errorCount++;
+        const errorMessage = error.response?.data?.status || "Sunucu hatası, silinemedi.";
+        message.error(errorMessage);
+        console.error("Silme hatası:", error);
       }
     }
-    // Tüm silme işlemleri tamamlandıktan sonra ve hata oluşmamışsa refreshTableData'i çağır
-    if (!isError) {
+
+    if (successCount > 0) {
+      message.success(`${successCount} adet bakım/arıza tanımı başarıyla silindi.`);
       refreshTableData();
-      hidePopover(); // Silme işlemi başarılı olursa Popover'ı kapat
+    }
+
+    if (errorCount === 0) {
+      hidePopover();
     }
   };
 
   return (
-    <div style={buttonStyle}>
-      <Button style={{ paddingLeft: "0px" }} type="text" danger icon={<DeleteOutlined />} onClick={handleDelete}>
-        Sil
-      </Button>
-    </div>
+    <Popconfirm
+      title="Silme İşlemi"
+      description={`${selectedRows.length} adet bakım/arıza tanımını silmek istediğinize emin misiniz?`}
+      onConfirm={handleDelete}
+      okText="Evet"
+      cancelText="Hayır"
+      icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+    >
+      <div
+        className="menu-item-hover"
+        style={{
+          ...buttonStyle,
+          display: disabled ? "none" : "flex",
+          alignItems: "flex-start",
+          gap: "12px",
+          cursor: "pointer",
+          padding: "10px 12px",
+          transition: "background-color 0.3s",
+          width: "100%",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f5f5f5")}
+        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+      >
+        <div>
+          <DeleteOutlined style={{ color: "#cf1322", fontSize: "18px", marginTop: "4px" }} />
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <span style={{ fontWeight: "500", color: "#262626", fontSize: "14px", lineHeight: "1.2" }}>Sil</span>
+          <span style={{ fontSize: "12px", color: "#8c8c8c", marginTop: "4px", lineHeight: "1.4" }}>
+            Seçili bakım/arıza tanımını kalıcı olarak siler.
+          </span>
+        </div>
+      </div>
+    </Popconfirm>
   );
 }
