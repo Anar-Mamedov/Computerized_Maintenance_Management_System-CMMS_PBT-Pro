@@ -9,8 +9,6 @@ import { useForm, FormProvider } from "react-hook-form";
 import AxiosInstance from "../../../../api/http.jsx";
 import Tablar from "./components/Tablar.jsx";
 import { t } from "i18next";
-import { InfoCircleOutlined } from "@ant-design/icons";
-import TankDetay from "../components/ContextMenu/components/TarihceOnayTablo.jsx";
 
 const localeMap = {
   tr: tr_TR,
@@ -23,23 +21,27 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   const [, startTransition] = useTransition();
   const [currentLocale, setCurrentLocale] = useState(tr_TR);
   const [loading, setLoading] = useState(false);
-  const [analizVisible, setAnalizVisible] = useState(false);
 
   const methods = useForm({
     defaultValues: {
-      // --- TANK (DEPO) BİLGİLERİ ---
-      kod: null,            // DEP_KOD
-      tanim: null,          // DEP_TANIM
-      aktif: true,          // AKTIF
-      lokasyonID: null,     // LOKASYON_ID
-      lokasyonTanim: null,  // (Selectbox için text)
-      yakitTipID: null,     // YAKIT_TIP_ID
-      yakitTipTanim: null,  // (Selectbox için text)
-      kapasite: null,       // KAPASITE
-      kritikMiktar: null,   // KRITIK_MIKTAR
-      kritikUyar: false,    // KRITIK_UYAR (Checkbox)
-      telefon: null,        // TELEFON
-      aciklama: null,       // ACIKLAMA
+      // --- MainTabs Bileşeni İsimlendirmeleri İle Birebir Eşitlendi ---
+      PIZ_PERSONEL_ID: null,
+      PersonelAd: null,
+      PersonelKod: null,
+      DepartmanTanim: null,
+      PIZ_IZIN_TANIM_ID: null,
+      PIZ_BASLAMA_TARIHI: null,
+      PIZ_BITIS_TARIHI: null,
+      PIZ_ISE_BASLAMA_TARIHI: null,
+      PIZ_SURE: null,
+      PIZ_ACIKLAMA: null,
+      PIZ_LOKASYON_ID: null,
+      LokasyonTanim: null,
+      PIZ_PROJE_ID: null,
+      ProjeTanim: null,
+      ONCEKI_IZIN_TARIHI: null,
+      ONCEKI_IZIN_NEDENI: null,
+      ONCEKI_IZIN_SURESI: null,
     },
   });
 
@@ -47,83 +49,90 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   // --- VERİ ÇEKME İŞLEMİ (GET) ---
   useEffect(() => {
-    const handleDataFetchAndUpdate = async () => {
-      if (drawerVisible && selectedRow) {
+  const handleDataFetchAndUpdate = async () => {
+    if (drawerVisible && selectedRow) {
+      const kayitId = selectedRow.key || selectedRow.TB_PERSONEL_IZIN_ID || selectedRow.IzinId; 
+      if (!kayitId) return;
+
+      setLoading(true);
+      try {
+        const response = await AxiosInstance.get(`GetPersonelIzinById?id=${kayitId}`);
         
-        // Tabloda ID kolonu hangisi ise onu alıyoruz
-        const kayitId = selectedRow.key || selectedRow.TB_DEPO_ID; 
-        if (!kayitId) return;
+        if (response && response.has_error === false && response.data) {
+          const item = response.data; 
 
-        setLoading(true);
-        try {
-          // NOT: Dokümanda GET endpoint yoktu, standart olarak bu isimde olduğunu varsayarak yazdım.
-          // Eğer farklıysa burayı düzeltmelisin: örn. `GetYakitTankById`
-          const response = await AxiosInstance.get(`GetYakitTankById?id=${kayitId}`);
-          const item = response; 
+          // 1. Standart Form State ve Sayısal ID Atamaları
+          setValue("PIZ_PERSONEL_ID", item.PIZ_PERSONEL_ID);
+          setValue("PIZ_IZIN_TANIM_ID", item.PIZ_IZIN_TANIM_ID);
+          setValue("PIZ_BASLAMA_TARIHI", item.PIZ_BASLAMA_TARIHI);
+          setValue("PIZ_BITIS_TARIHI", item.PIZ_BITIS_TARIHI);
+          setValue("PIZ_SURE", item.PIZ_SURE);
+          setValue("PIZ_ACIKLAMA", item.PIZ_ACIKLAMA);
+          setValue("PIZ_LOKASYON_ID", item.PIZ_LOKASYON_ID);
+          setValue("PIZ_PROJE_ID", item.PIZ_PROJE_ID);
 
-          if (item) {
-            setValue("kod", item.DEP_KOD);
-            setValue("tanim", item.DEP_TANIM);
-            setValue("aktif", item.AKTIF);
-            setValue("personelID", item.SORUMLU_PERSONEL_ID);
-            setValue("personelTanim", item.SORUMLU_PERSONEL_AD);
-            setValue("lokasyonID", item.LOKASYON_ID);
-            setValue("lokasyonTanim", item.LOKASYON_AD);
-            setValue("yakitTipID", item.YAKIT_TIP_ID);
-            setValue("yakitTipTanim", item.YAKIT_TIP_AD);
-            setValue("kapasite", item.KAPASITE);
-            setValue("mevcutMiktar", item.MEVCUT_MIKTAR);
-            setValue("dolulukOrani", item.DOLULUK_ORANI);
-            setValue("kritikMiktar", item.KRITIK_MIKTAR);
-            setValue("kritikUyar", item.KRITIK_UYAR);
-            setValue("telefon", item.TELEFON);
-            setValue("fax", item.FAX);
-            setValue("email", item.EMAIL);
-            setValue("adres", item.ADRES);
-            setValue("aciklama", item.ACIKLAMA);
-          }
+          // 2. PERSONEL SEÇİMİ (Kritik Nokta)
+          // PersonelTablo component'i name1="PIZ_PERSONEL_" prop'u yüzünden 
+          // direkt bu ismi input fieldName olarak kullanıyor:
+          setValue("PIZ_PERSONEL_", item.PersonelAd); 
 
-          setLoading(false);
-        } catch (error) {
-          console.error("Veri çekilirken hata oluştu:", error);
-          setLoading(false);
+          // 3. LOKASYON SEÇİMİ (Zaten çalışıyordu)
+          setValue("LOKASYON", item.LokasyonTanim); 
+
+          // 4. PROJE SEÇİMİ (Kritik Nokta)
+          // ProjeTablo component'i name1="PIZ_PROJE" prop'u yüzünden 
+          // direkt bu ismi input fieldName olarak kullanıyor:
+          setValue("PIZ_PROJE", item.ProjeTanim);
+
+          // 5. Formda İhtiyaç Duyulabilecek Diğer Yan Değerler (Disabled alanlar vs.)
+          setValue("PersonelAd", item.PersonelAd);
+          setValue("PersonelKod", item.PersonelKod);
+          setValue("DepartmanTanim", item.DepartmanTanim);
+          setValue("LokasyonTanim", item.LokasyonTanim);
+          setValue("ProjeTanim", item.ProjeTanim);
+
+          // 6. Önceki İzin Geçmişi Bilgileri
+          setValue("ONCEKI_IZIN_TARIHI", item.ONCEKI_IZIN_TARIHI || "");
+          setValue("ONCEKI_IZIN_NEDENI", item.ONCEKI_IZIN_NEDENI || "");
+          setValue("ONCEKI_IZIN_SURESI", item.ONCEKI_IZIN_SURESI || "");
+        } else {
+          message.error("İzin detayları yüklenemedi.");
         }
+        setLoading(false);
+      } catch (error) {
+        console.error("Veri çekilirken hata oluştu:", error);
+        message.error("Veri çekilirken bir hata oluştu.");
+        setLoading(false);
       }
-    };
+    }
+  };
 
-    handleDataFetchAndUpdate();
-  }, [drawerVisible, selectedRow, setValue]);
+  handleDataFetchAndUpdate();
+}, [drawerVisible, selectedRow, setValue]);
 
-  // --- KAYDETME İŞLEMİ (POST - AddUpdateYakitTank) ---
-  const onSubmit = (data) => {
-    // ID varsa Update (örneğin 18), yoksa Insert (0)
-    const kayitId = selectedRow?.key || selectedRow?.TB_DEPO_ID || 0;
+  // --- KAYDETME İŞLEMİ (POST) ---
+  const onSubmit = (formData) => {
+    const kayitId = selectedRow?.key || selectedRow?.TB_PERSONEL_IZIN_ID || selectedRow?.IzinId || 0;
 
-    // Dokümana uygun JSON Body
+    // Gönderilen veriler form objesinden çekiliyor (formData)
     const Body = {
-      TB_DEPO_ID: Number(kayitId),          // 0: Yeni Kayıt, >0: Güncelleme
-      DEP_KOD: data.kod,
-      DEP_TANIM: data.tanim,
-      AKTIF: data.aktif,                    // true/false
-      LOKASYON_ID: Number(data.lokasyonID) || 0,
-      SORUMLU_PERSONEL_ID: Number(data.PERSONELID) || 0,
-      YAKIT_TIP_ID: Number(data.yakitTipID) || 0,
-      KAPASITE: Number(data.kapasite) || 0,
-      KRITIK_MIKTAR: Number(data.kritikMiktar) || 0,
-      KRITIK_UYAR: data.kritikUyar,         // true/false
-      TELEFON: data.telefon,
-      ACIKLAMA: data.aciklama
+      TB_PERSONEL_IZIN_ID: Number(kayitId),
+      PIZ_PERSONEL_ID: formData.PIZ_PERSONEL_ID ? Number(formData.PIZ_PERSONEL_ID) : null,
+      PIZ_IZIN_TANIM_ID: formData.PIZ_IZIN_TANIM_ID ? Number(formData.PIZ_IZIN_TANIM_ID) : null,
+      PIZ_BASLAMA_TARIHI: formData.PIZ_BASLAMA_TARIHI ? formData.PIZ_BASLAMA_TARIHI.substring(0, 10) : null,
+      PIZ_BITIS_TARIHI: formData.PIZ_BITIS_TARIHI ? formData.PIZ_BITIS_TARIHI.substring(0, 10) : null,
+      PIZ_SURE: Number(formData.PIZ_SURE) || 0,
+      PIZ_ACIKLAMA: formData.PIZ_ACIKLAMA,
+      PIZ_LOKASYON_ID: formData.PIZ_LOKASYON_ID ? Number(formData.PIZ_LOKASYON_ID) : null,
+      PIZ_PROJE_ID: formData.PIZ_PROJE_ID ? Number(formData.PIZ_PROJE_ID) : null
     };
 
-    AxiosInstance.post("/AddUpdateYakitTank", Body)
+    AxiosInstance.post("AddUpdatePersonelIzin", Body)
       .then((response) => {
-        // Backend standart dönüşü: status_code
-        if (response.status_code === 200 || response.status_code === 201) {
-          message.success("İşlem Başarılı.");
+        if (response && response.has_error === false) {
+          message.success(response.status || "İşlem Başarılı.");
           onDrawerClose();
-          onRefresh(); // Tabloyu yenile
-        } else if (response.status_code === 401) {
-          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+          onRefresh();
         } else {
           message.error(response.status || "İşlem Başarısız.");
         }
@@ -160,7 +169,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       <Button onClick={onClose}>{t("iptal")}</Button>
       <Button
         type="submit"
-        onClick={methods.handleSubmit(onSubmit)}
+        onClick={handleSubmit(onSubmit)}
         style={{
           backgroundColor: "#2bc770",
           borderColor: "#2bc770",
@@ -176,24 +185,20 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     <FormProvider {...methods}>
       <ConfigProvider locale={currentLocale}>
         <Drawer
-          width="600px"
-          title={t("Güncelleme")}
+          width="1000px"
+          title={t("İzin Güncelleme")}
           onClose={onClose}
           open={drawerVisible}
           extra={extraButton}
         >
           <Spin spinning={loading}>
-            <form onSubmit={methods.handleSubmit(onSubmit)}>
-              <MainTabs modalOpen={open} />
+            {/* Form submit tetikleyicisi düzeltildi */}
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <MainTabs />
+              <Tablar modalOpen={drawerVisible} />
             </form>
           </Spin>
         </Drawer>
-
-        <TankDetay 
-          selectedRows={[selectedRow]} 
-          isExternalOpen={analizVisible} 
-          onExternalClose={() => setAnalizVisible(false)} 
-        />
       </ConfigProvider>
     </FormProvider>
   );

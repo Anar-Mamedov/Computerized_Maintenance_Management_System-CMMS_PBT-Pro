@@ -13,20 +13,27 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
     // Birden fazla seçim varsa döngüye girer
     for (const row of selectedRows) {
       try {
-        // API İsteği: POST /api/DeleteYakitTank?id={id}
+        // Tablodan gelebilecek izin ID varyasyonlarını yakalıyoruz
+        const kayitId = row.TB_PERSONEL_IZIN_ID || row.key || row.IzinId;
+        
+        if (!kayitId) {
+          console.warn("Silinecek izin ID'si bulunamadı:", row);
+          continue;
+        }
+
+        // API İsteği: POST /api/DeletePersonelIzin?id={id}
+        // Dokümana göre body boş bırakılmalıdır
         const response = await AxiosInstance.post(
-          `DeleteYakitTank?id=${row.TB_DEPO_ID}`
+          `DeletePersonelIzin?id=${kayitId}`,
+          {}
         );
 
-        // Dokümana göre başarı kontrolü: status_code 200 ve has_error false
-        if (response.status_code === 200 && !response.has_error) {
-          // Başarılı mesajı 'status' alanından geliyor
-          message.success(response.status || "Yakıt tankı başarıyla silindi.");
-        } 
-        // Dokümana göre hata durumu: status_code 400 (Örn: Hareket varsa)
-        else if (response.status_code === 400 || response.has_error) {
+        // Dokümana göre başarı kontrolü: has_error false olması yeterlidir
+        if (response && response.has_error === false) {
+          // Başarılı mesajı 'status' alanından geliyor ("Kayıt silindi.")
+          message.success(response.status || "İzin kaydı başarıyla silindi.");
+        } else {
           isError = true;
-          // Backend'den gelen özel hata mesajını (hareket var uyarısını) gösteriyoruz
           message.error(response.status || "Silme işlemi başarısız.");
         }
       } catch (error) {
@@ -36,17 +43,15 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
       }
     }
 
-    // Eğer hiç hata yoksa veya işlem bittiyse tabloyu yenile ve menüyü kapat
-    if (!isError) {
-      refreshTableData(); 
-      hidePopover();      
-    }
+    // Her durumda veya başarılı işlemler sonrasında tabloyu yenile ve menüyü kapat
+    refreshTableData(); 
+    hidePopover();      
   };
 
   return (
     <Popconfirm
       title="Silme İşlemi"
-      description="Bu yakıt tankını kaydını silmek istediğinize emin misiniz?"
+      description="Bu personel izin kaydını silmek istediğinize emin misiniz?"
       onConfirm={handleDelete}
       okText="Evet"
       cancelText="Hayır"
@@ -78,7 +83,7 @@ export default function Sil({ selectedRows, refreshTableData, disabled, hidePopo
             Sil
           </span>
           <span style={{ fontSize: '12px', color: '#8c8c8c', marginTop: '4px', lineHeight: '1.4' }}>
-            Yakıt tankını kalıcı olarak siler. Geri alınamaz.
+            Personel izin kaydını kalıcı olarak siler. Geri alınamaz.
           </span>
         </div>
       </div>

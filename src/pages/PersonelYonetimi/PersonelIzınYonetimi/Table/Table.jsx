@@ -140,6 +140,7 @@ const MainTable = () => {
   const [body, setBody] = useState({
     ToplamIzinKaydi: 0,
     BelgeliKayit: 0,
+    filters: {},
   });
 
   const cardItems = useMemo(() => [
@@ -393,7 +394,7 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak açık
     },
     {
-      title: "İzin Türü",
+      title: "İzin Tipi",
       dataIndex: "IzinTipClass",
       key: "IzinTipClass",
       width: 150,
@@ -462,6 +463,13 @@ const MainTable = () => {
   const formatDate = (date) => {
     if (!date) return "";
 
+    // JavaScript'in tarihi anlamlandırıp anlamlandıramayacağını kontrol edin
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) {
+      console.warn("Geçersiz tarih formatı algılandı:", date);
+      return date; // Eğer tarih çözümlenemezse (örn: "25.06.2026 - 30.06.2026" gibi bir aralıksa) doğrudan kendisini döndür
+    }
+
     // Örnek bir tarih formatla ve ay formatını belirle
     const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
     const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
@@ -481,7 +489,8 @@ const MainTable = () => {
       month: monthFormat,
       day: "2-digit",
     });
-    return formatter.format(new Date(date));
+    
+    return formatter.format(parsedDate); // Güvenli şekilde parse edilmiş tarihi gönderiyoruz
   };
 
   const formatTime = (time) => {
@@ -531,12 +540,10 @@ const MainTable = () => {
 
 // ✅ API isteği
 useEffect(() => {
-  const params = JSON.stringify({ body, currentPage, pageSize });
-  if (lastRequestRef.current === params) return;
-  lastRequestRef.current = params;
-
-  fetchEquipmentData(body, currentPage, pageSize);
-}, [body, currentPage, pageSize]);
+  // Sadece sayfa değiştiğinde veya body (kart verileri) değiştiğinde tetiklensin.
+  // Arama işlemlerini yukarıdaki debounced timeout hallediyor zaten.
+  fetchEquipmentData();
+}, [currentPage, pageSize]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
@@ -544,12 +551,15 @@ useEffect(() => {
   useEffect(() => {
   if (searchTimeout) clearTimeout(searchTimeout);
 
+  // Sayfa ilk açıldığında searchTerm "" (boş) olacağı için 
+  // ve fetchEquipmentData zaten ilk açılışta çalışacağı için burayı engelliyoruz.
+  if (searchTerm === "") return;
+
   const timeout = setTimeout(() => {
-    // burada doğru path: body.filters.Kelime
-    if (searchTerm !== body.filters.Arama) {
-      handleBodyChange("filters", { ...body.filters, Arama: searchTerm });
-      setCurrentPage(1);
-    }
+    // body.filters'ı kirletmek yerine doğrudan currentPage'i 1 yapıp 
+    // fetchEquipmentData'yı tetikleteceğiz.
+    setCurrentPage(1);
+    fetchEquipmentData(); 
   }, 2000);
 
   setSearchTimeout(timeout);
@@ -560,40 +570,39 @@ useEffect(() => {
 
  const fetchEquipmentData = useCallback(async () => {
   try {
-      setLoading(true);
-      const payload = {
-        Arama: searchTerm,
-        IzinTurId: null, // İhtiyaca göre filtreden beslenebilir
-      };
+    setLoading(true);
+    const payload = {
+      Arama: searchTerm, // Güncel arama terimi
+      IzinTurId: null,
+    };
 
-      const res = await AxiosInstance.post("GetPersonelIzinListesi", payload);
+    const res = await AxiosInstance.post("GetPersonelIzinListesi", payload);
 
-      if (res.status_code === 200 && !res.has_error) {
-        // Özet verilerini set et
-        setBody({
-          ToplamIzinKaydi: res.data.ToplamIzinKaydi,
-          BelgeliKayit: res.data.BelgeliKayit,
-        });
+    if (res && res.has_error === false) {
+      setBody({
+        ToplamIzinKaydi: res.data?.ToplamIzinKaydi || 0,
+        BelgeliKayit: res.data?.BelgeliKayit || 0,
+      });
 
-        // Liste verilerini set et
-        const list = Array.isArray(res.data.Liste) ? res.data.Liste : [];
-        const formattedData = list.map((item) => ({
-          ...item,
-          key: item.IzinId, // Unique ID olarak IzinId kullanıldı
-        }));
+      const list = Array.isArray(res.data?.Liste) ? res.data.Liste : [];
+      const formattedData = list.map((item) => ({
+        ...item,
+        key: item.IzinId,
+      }));
 
-        setData(formattedData);
-        setTotalDataCount(res.data.Liste.length); // Pagination dokümanda belirtilmemişse liste uzunluğu alınır
-      } else {
-        message.error("Veriler alınırken bir hata oluştu.");
-      }
-    } catch (err) {
-      console.error(err);
-      message.error("Bağlantı hatası!");
-    } finally {
-      setLoading(false);
+      setData(formattedData);
+      setTotalDataCount(list.length);
+    } else {
+      message.error("Veriler alınırken bir hata oluştu.");
     }
-  }, [searchTerm]);
+  } catch (err) {
+    console.error(err);
+    message.error("Bağlantı hatası!");
+  } finally {
+    setLoading(false);
+  }
+}, [searchTerm, currentPage, pageSize]);
+
   // filtreleme işlemi için kullanılan useEffect
   const handleBodyChange = useCallback((type, newBody) => {
   setBody((state) => ({
@@ -1067,7 +1076,6 @@ useEffect(() => {
             onChange={(e) => setSearchTerm(e.target.value)}
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
-           <Filters kelime={searchTerm} onChange={handleBodyChange} />
           {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>

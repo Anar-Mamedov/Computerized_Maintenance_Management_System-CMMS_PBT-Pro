@@ -5,6 +5,7 @@ import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import Filters from "./filter/Filters";
+import IsEmri from "../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer";
 import { useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
 import "dayjs/locale/tr";
@@ -28,9 +29,12 @@ const MainCalendar = () => {
   const [selectedAtolyes, setSelectedAtolyes] = useState([]);
   const [selectedLokasyons, setSelectedLokasyons] = useState([]);
 
-  const [personelOptions, setPersonelOptions] = useState([]);
-  const [atolyeOptions, setAtolyeOptions] = useState([]);
-  const [lokasyonOptions, setLokasyonOptions] = useState([]);
+  // --- Hangi Popover'ın Açık Olduğunu Tutacak Kritik State ---
+  const [visiblePopoverId, setVisiblePopoverId] = useState(null);
+
+  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
+  const [selectedIsEmriId, setSelectedIsEmriId] = useState(null);
+  const [selectedRowData, setSelectedRowData] = useState(null);
 
   const dateRange = useMemo(() => {
     let start = currentDate.startOf("month");
@@ -43,8 +47,8 @@ const MainCalendar = () => {
       start = currentDate.startOf("week");
       end = currentDate.endOf("week");
     } else if (calendarMode === "Work Week") {
-      start = currentDate.startOf("week").add(1, "day"); // Pazartesi
-      end = currentDate.startOf("week").add(5, "day");   // Cuma
+      start = currentDate.startOf("week").add(1, "day");
+      end = currentDate.startOf("week").add(5, "day");
     } else if (calendarMode === "Agenda") {
       start = currentDate.subtract(1, "month").startOf("month");
       end = currentDate.add(1, "month").endOf("month");
@@ -64,11 +68,9 @@ const MainCalendar = () => {
     }
   }, []);
 
-  // --- API İsteği ---
   const fetchCalendarData = useCallback(async () => {
     try {
       setLoading(true);
-      
       const payload = {
         StartDate: dateRange.StartDate,
         EndDate: dateRange.EndDate,
@@ -117,10 +119,38 @@ const MainCalendar = () => {
     });
   };
 
+  // --- İş Emri Açıldığında Popover'ı Kapatma Müdahalesi ---
+  const handleOpenIsEmri = useCallback((isEmriId, record = null) => {
+    if (isEmriId && isEmriId > 0) {
+      setVisiblePopoverId(null); // CRITICAL FIX: Açık olan Popover'ı anında kapatır!
+      setSelectedIsEmriId(isEmriId);
+      setSelectedRowData(record ? record : { ISEMRI_ID: isEmriId });
+      setIsEditDrawerOpen(true);
+    }
+  }, []);
+
   const renderPopoverContent = (item, config) => (
     <div style={{ maxWidth: 300, whiteSpace: "pre-wrap" }}>
       <p><strong>Personel:</strong> {item.IDK_PERSONEL}</p>
       <p><strong>Durum:</strong> <Tag color={config.color}>{config.text}</Tag></p>
+      
+      {item.ISEMRI_ID > 0 && item.ISEMRI_KOD && (
+        <p>
+          <strong>İş Emri Kodu:</strong>{" "}
+          <span 
+            onClick={() => handleOpenIsEmri(item.ISEMRI_ID, item)}
+            style={{ 
+              color: "#1890ff", 
+              cursor: "pointer", 
+              fontWeight: "bold",
+              textDecoration: "underline" 
+            }}
+          >
+            {item.ISEMRI_KOD}
+          </span>
+        </p>
+      )}
+
       <p><strong>Başlangıç:</strong> {dayjs(item.BASLAMA_TARIH).format("DD.MM.YYYY HH:mm")}</p>
       <p><strong>Bitiş:</strong> {dayjs(item.BITIS_TARIH).format("DD.MM.YYYY HH:mm")}</p>
       <hr style={{ border: "0.5px solid #f0f0f0", margin: "8px 0" }} />
@@ -138,7 +168,16 @@ const MainCalendar = () => {
           const config = getEventStatusConfig(item.IDK_DURUM);
           return (
             <li key={item.TB_ISEMRI_KAYNAK_ID} style={{ marginBottom: 2 }}>
-              <Popover content={renderPopoverContent(item, config)} title="Detay Bilgisi" trigger="click">
+              {/* CRITICAL FIX: Popover'ın open durumunu state'e bağlıyoruz */}
+              <Popover 
+                content={renderPopoverContent(item, config)} 
+                title="Detay Bilgisi" 
+                trigger="click"
+                open={visiblePopoverId === item.TB_ISEMRI_KAYNAK_ID}
+                onOpenChange={(visible) => {
+                  setVisiblePopoverId(visible ? item.TB_ISEMRI_KAYNAK_ID : null);
+                }}
+              >
                 <div style={{
                   backgroundColor: config.color + "15",
                   borderLeft: `3px solid ${config.color}`,
@@ -230,7 +269,17 @@ const MainCalendar = () => {
                   events.map((item) => {
                     const config = getEventStatusConfig(item.IDK_DURUM);
                     return (
-                      <Popover key={item.TB_ISEMRI_KAYNAK_ID} content={renderPopoverContent(item, config)} title="Detay Bilgisi" trigger="click">
+                      /* CRITICAL FIX: Custom View'lardaki Popover'ların open durumunu da state'e bağlıyoruz */
+                      <Popover 
+                        key={item.TB_ISEMRI_KAYNAK_ID} 
+                        content={renderPopoverContent(item, config)} 
+                        title="Detay Bilgisi" 
+                        trigger="click"
+                        open={visiblePopoverId === item.TB_ISEMRI_KAYNAK_ID}
+                        onOpenChange={(visible) => {
+                          setVisiblePopoverId(visible ? item.TB_ISEMRI_KAYNAK_ID : null);
+                        }}
+                      >
                         <div style={{
                           backgroundColor: config.color + "15",
                           borderLeft: `3px solid ${config.color}`,
@@ -258,7 +307,7 @@ const MainCalendar = () => {
 
   const handleNavigate = (direction) => {
     let amount = 1;
-    let unit = "month"; // Varsayılan Ay
+    let unit = "month"; 
 
     if (calendarMode === "Day") {
       unit = "day";
@@ -285,7 +334,7 @@ const MainCalendar = () => {
     <>
       <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", marginBottom: "20px", gap: "10px", padding: "0 5px" }}>
         <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
-          <Filters onChange={handleFilterChange} />
+          <Filters onChange={handleFilterChange} handleOpenIsEmri={handleOpenIsEmri} />
         </div>
 
         <div style={{ display: "flex", gap: "10px" }}>
@@ -371,6 +420,23 @@ const MainCalendar = () => {
           </Row>
         </div>
       </Modal>
+
+      {isEditDrawerOpen && (
+        <IsEmri
+          drawerVisible={isEditDrawerOpen}
+          onDrawerClose={() => {
+            setIsEditDrawerOpen(false);
+            setSelectedIsEmriId(null);
+            setSelectedRowData(null);
+            refreshCalendarData();
+          }}
+          onRefresh={refreshCalendarData}
+          selectedRow={{ 
+            ...selectedRowData, 
+            key: selectedRowData?.ISEMRI_ID 
+          }}
+        />
+      )}
     </>
   );
 };

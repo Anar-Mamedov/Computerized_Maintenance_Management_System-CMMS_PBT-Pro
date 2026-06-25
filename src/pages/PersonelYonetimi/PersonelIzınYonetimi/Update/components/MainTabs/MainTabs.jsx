@@ -1,151 +1,297 @@
-import React from "react";
-import { Typography, Input, Divider, Tag, Progress, Card, Row, Col } from "antd";
+import React, { useEffect, useState } from "react";
+import { Typography, Input, DatePicker, InputNumber, Select, message } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import { t } from "i18next";
-import { EnvironmentOutlined, HomeOutlined, PaperClipOutlined } from "@ant-design/icons";
+import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
 import PersonelTablo from "../../../../../../utils/components/PersonelTablo";
+import ProjeTablo from "../../../../../../utils/components/ProjeTablo";
+import dayjs from "dayjs";
+import AxiosInstance from "../../../../../../api/http";
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
+const { TextArea } = Input;
 
 export default function MainTabs() {
-  const { control, watch } = useFormContext();
+  const { control, watch, setValue } = useFormContext();
+  const [izinTanimlari, setIzinTanimlari] = useState([]);
+  const [selectLoading, setSelectLoading] = useState(false);
 
-  // Kart içi başlık stili
-  const labelHeaderStyle = {
-    color: "#8c8c8c",
-    fontSize: "12px",
-    textTransform: "uppercase",
-    marginBottom: "4px",
-    display: "block"
+  // Başlangıç ve bitiş tarihlerini izliyoruz
+  const baslamaTarihi = watch("PIZ_BASLAMA_TARIHI");
+  const bitisTarihi = watch("PIZ_BITIS_TARIHI");
+
+  // --- İzin Türleri Dropdown Verisini Çekme ---
+  useEffect(() => {
+    const fetchIzinTanimlari = async () => {
+      try {
+        setSelectLoading(true);
+        const res = await AxiosInstance.get("GetIzinTanimlari");
+        if (res && res.has_error === false) {
+          setIzinTanimlari(res.data || []);
+        } else {
+          message.error("İzin tanımları yüklenirken bir hata oluştu.");
+        }
+      } catch (err) {
+        console.error("İzin tanımları yükleme hatası:", err);
+      } finally {
+        setSelectLoading(false);
+      }
+    };
+
+    fetchIzinTanimlari();
+  }, []);
+
+  // --- Otomatik Gün Sayısı Hesaplama ---
+  useEffect(() => {
+    if (baslamaTarihi && bitisTarihi) {
+      const start = dayjs(baslamaTarihi, "YYYY-MM-DD");
+      const end = dayjs(bitisTarihi, "YYYY-MM-DD");
+
+      if (end.isAfter(start) || end.isSame(start)) {
+        const gunSayisi = end.diff(start, "day") + 1;
+        setValue("PIZ_SURE", gunSayisi);
+      } else {
+        setValue("PIZ_SURE", 0);
+      }
+    } else {
+      setValue("PIZ_SURE", 0);
+    }
+  }, [baslamaTarihi, bitisTarihi, setValue]);
+
+  // --- Stiller ---
+  const LabelStyle = {
+    display: "flex",
+    fontSize: "14px",
+    flexDirection: "row",
+    alignItems: "center",
+    minWidth: "140px",
+    fontWeight: 600,
   };
 
-  const itemBoxStyle = {
-    background: "#fff",
-    border: "1px solid #f0f0f0",
-    borderRadius: "8px",
-    padding: "12px 16px",
-    height: "100%",
+  const InputContainerStyle = {
     display: "flex",
     flexDirection: "column",
-    justifyContent: "center"
+    width: "100%",
+    maxWidth: "400px",
+  };
+
+  const RowStyle = {
+    display: "flex",
+    flexWrap: "nowrap",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: "10px",
+    gap: "15px",
   };
 
   return (
-    <div style={{ padding: "24px", background: "#f9fafb", borderRadius: "12px" }}>
-      
-      {/* ÜST KISIM: Profil ve Lokasyon Bilgisi */}
-      <div style={{ marginBottom: "24px", display: "flex", alignItems: "center", gap: "20px" }}>
-        <div style={{ width: "64px", height: "64px", borderRadius: "50%", background: "#fff", border: "1px solid #e8e8e8", display: "flex", justifyContent: "center", alignItems: "center", fontSize: "20px", fontWeight: "600", color: "#595959" }}>
-          MD
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: "40px",
+        width: "100%",
+        padding: "20px",
+      }}
+    >
+      {/* SOL KOLON - Güncel İzin Bilgileri */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px",
+          flex: 1,
+          minWidth: "300px",
+        }}
+      >
+        {/* 1. Personel Seçimi */}
+        <div style={RowStyle}>
+  <Text style={LabelStyle}>{t("Personel")}</Text>
+  <div style={InputContainerStyle}>
+    <PersonelTablo
+      name1="PIZ_PERSONEL_" // 👈 Buraya alt çizgiyi koyduk!
+      workshopSelectedId={watch("PIZ_PERSONEL_ID")} // Burası aynı kalıyor
+      isRequired={true}
+    />
+  </div>
+</div>
+
+        {/* 2. İzin Türü / Nedeni (Dropdown / Select Yapıldı) */}
+        <div style={RowStyle}>
+          <Text style={LabelStyle}>{t("İzin Nedeni / Türü")}</Text>
+          <div style={InputContainerStyle}>
+            <Controller
+              name="PIZ_IZIN_TANIM_ID"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  style={{ width: "100%" }}
+                  placeholder={t("İzin türü seçiniz")}
+                  loading={selectLoading}
+                  allowClear
+                  options={izinTanimlari.map((item) => ({
+                    value: item.Id, // API'den gelen gerçek sayısal ID (payload'a basılacak)
+                    label: item.Tanim, // Kullanıcının ekranda göreceği metin
+                  }))}
+                />
+              )}
+            />
+          </div>
         </div>
-        <div>
-          <Title level={4} style={{ margin: 0 }}>Murat Demir</Title>
-          <Text type="secondary">PRS 00008 • Mekanik Bakım • Teknisyen</Text>
-          <div style={{ marginTop: "8px", display: "flex", gap: "24px" }}>
-            <Text type="secondary"><EnvironmentOutlined /> Dalaman Havalimanı</Text>
-            <Text type="secondary"><HomeOutlined /> Ana Terminal</Text>
+
+        {/* 7. Lokasyon Seçimi */}
+        <div style={RowStyle}>
+          <Text style={LabelStyle}>{t("Lokasyon")}</Text>
+          <div style={InputContainerStyle}>
+            <LokasyonTablo
+              lokasyonFieldName="LOKASYON"
+              lokasyonIdFieldName="PIZ_LOKASYON_ID"
+              workshopSelectedId={watch("PIZ_LOKASYON_ID")}
+              isRequired={false}
+            />
+          </div>
+        </div>
+
+        {/* 8. Proje Seçimi */}
+        <div style={RowStyle}>
+          <Text style={LabelStyle}>{t("Proje")}</Text>
+          <div style={InputContainerStyle}>
+            <ProjeTablo
+              name1="PIZ_PROJE"
+              workshopSelectedId={watch("PIZ_PROJE_ID")}
+              isRequired={true}
+            />
           </div>
         </div>
       </div>
 
-      <Row gutter={[16, 16]}>
-        {/* SOL KOLON: İzin Bilgileri */}
-        <Col span={15}>
-          <Row gutter={[12, 12]}>
-            {/* İzin Türü */}
-            <Col span={12}>
-              <div style={itemBoxStyle}>
-                <Text style={labelHeaderStyle}>{t("İZİN TÜRÜ")}</Text>
-                <Text strong style={{ fontSize: "16px" }}>Evlilik İzni</Text>
-              </div>
-            </Col>
-            {/* İzin Süresi */}
-            <Col span={12}>
-              <div style={itemBoxStyle}>
-                <Text style={labelHeaderStyle}>{t("İZİN SÜRESİ")}</Text>
-                <Text strong style={{ fontSize: "16px" }}>8 gün</Text>
-              </div>
-            </Col>
-            {/* Başlangıç Tarihi */}
-            <Col span={12}>
-              <div style={itemBoxStyle}>
-                <Text style={labelHeaderStyle}>{t("BAŞLANGIÇ TARİHİ")}</Text>
-                <Text strong style={{ fontSize: "16px" }}>2026-03-17</Text>
-              </div>
-            </Col>
-            {/* Bitiş Tarihi */}
-            <Col span={12}>
-              <div style={itemBoxStyle}>
-                <Text style={labelHeaderStyle}>{t("BİTİŞ TARİHİ")}</Text>
-                <Text strong style={{ fontSize: "16px" }}>2026-03-24</Text>
-              </div>
-            </Col>
-            {/* Vekil Personel */}
-            <Col span={24}>
-              <div style={itemBoxStyle}>
-                <Text style={labelHeaderStyle}>{t("VEKİL PERSONEL")}</Text>
-                <PersonelTablo
-                  name1="vekilPersonel"
-                  workshopSelectedId={watch("vekilPersonelId")}
-                  isRequired={false}
+      {/* SAĞ KOLON - Geçmiş İzin Bilgileri ve Tarihler */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px",
+          flex: 1,
+          minWidth: "300px",
+          borderLeft: "1px solid #f0f0f0",
+          paddingLeft: "20px",
+        }}
+      >
+        {/* 3. İzin Başlangıç Tarihi */}
+        <div style={RowStyle}>
+          <Text style={LabelStyle}>{t("İzin Başlangıç")}</Text>
+          <div style={InputContainerStyle}>
+            <Controller
+              name="PIZ_BASLAMA_TARIHI"
+              control={control}
+              render={({ field: { value, onChange, ...fieldProps } }) => (
+                <DatePicker
+                  {...fieldProps}
+                  value={value ? dayjs(value, "YYYY-MM-DD") : null}
+                  onChange={(date) => onChange(date ? date.format("YYYY-MM-DD") : "")}
+                  style={{ width: "100%" }}
+                  format="DD.MM.YYYY"
+                  placeholder={t("Başlangıç tarihi seçin")}
                 />
-              </div>
-            </Col>
-            {/* Açıklama */}
-            <Col span={24}>
-              <div style={itemBoxStyle}>
-                <Text style={labelHeaderStyle}>{t("AÇIKLAMA")}</Text>
-                <Controller
-                  name="aciklama"
-                  control={control}
-                  render={({ field }) => (
-                    <Input.TextArea {...field} variant="borderless" style={{ padding: 0, fontWeight: 500 }} autoSize />
-                  )}
+              )}
+            />
+          </div>
+        </div>
+
+        {/* 4. İzin Bitiş Tarihi */}
+        <div style={RowStyle}>
+          <Text style={LabelStyle}>{t("İzin Bitiş")}</Text>
+          <div style={InputContainerStyle}>
+            <Controller
+              name="PIZ_BITIS_TARIHI"
+              control={control}
+              render={({ field: { value, onChange, ...fieldProps } }) => (
+                <DatePicker
+                  {...fieldProps}
+                  value={value ? dayjs(value, "YYYY-MM-DD") : null}
+                  onChange={(date) => onChange(date ? date.format("YYYY-MM-DD") : "")}
+                  style={{ width: "100%" }}
+                  format="DD.MM.YYYY"
+                  placeholder={t("Bitiş tarihi seçin")}
                 />
-              </div>
-            </Col>
-          </Row>
-        </Col>
+              )}
+            />
+          </div>
+        </div>
 
-        {/* SAĞ KOLON: İstatistikler ve Belgeler */}
-        <Col span={9}>
-          <Card size="small" title={<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span>{t("Önceki İzin Özeti")}</span>
-            <Tag color="default">Kalan 10 gün</Tag>
-          </div>} style={{ borderRadius: "12px", marginBottom: "16px" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <Text type="secondary">Son İzin Tarihi</Text>
-                <Text strong>2025-09-12</Text>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <Text type="secondary">Son İzin Türü</Text>
-                <Text strong>Yıllık İzin</Text>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <Text type="secondary">Son İzin Süresi</Text>
-                <Text strong>5 gün</Text>
-              </div>
-              <Divider style={{ margin: "12px 0" }} />
-              <div style={{ marginBottom: "4px" }}>
-                <Text type="secondary" style={{ fontSize: "12px" }}>Yıllık kullanım oranı</Text>
-                <span style={{ float: "right", fontWeight: "bold" }}>%29</span>
-              </div>
-              <Progress percent={29} showInfo={false} strokeColor="#1d39c4" size="small" />
-            </div>
-          </Card>
+        {/* 5. İzin Süresi (Gün) */}
+        <div style={RowStyle}>
+          <Text style={LabelStyle}>{t("İzin Süresi (Gün)")}</Text>
+          <div style={InputContainerStyle}>
+            <Controller
+              name="PIZ_SURE"
+              control={control}
+              render={({ field }) => (
+                <InputNumber
+                  {...field}
+                  min={0}
+                  style={{ width: "100%" }}
+                  disabled
+                />
+              )}
+            />
+          </div>
+        </div>
 
-          <Card size="small" style={{ borderRadius: "12px", borderStyle: "dashed", background: "#fafafa" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <PaperClipOutlined style={{ fontSize: "20px", color: "#8c8c8c" }} />
-              <div>
-                <Text strong style={{ display: "block" }}>Belge Durumu</Text>
-                <Text type="secondary" style={{ fontSize: "12px" }}>Bu kayda ait ek belge yüklenmiş.</Text>
-              </div>
-            </div>
-          </Card>
-        </Col>
-      </Row>
+        {/* 9. Önceki İzin Tarihi */}
+        <div style={RowStyle}>
+          <Text style={LabelStyle}>{t("Önceki İzin Tarihi")}</Text>
+          <div style={InputContainerStyle}>
+            <Controller
+              name="ONCEKI_IZIN_TARIHI"
+              control={control}
+              render={({ field: { value, onChange, ...field } }) => (
+                <Input
+                  {...field}
+                  value={value || ""}
+                  disabled
+                />
+              )}
+            />
+          </div>
+        </div>
+
+        {/* 10. Önceki İzin Nedeni */}
+        <div style={RowStyle}>
+          <Text style={LabelStyle}>{t("Önceki İzin Nedeni")}</Text>
+          <div style={InputContainerStyle}>
+            <Controller
+              name="ONCEKI_IZIN_NEDENI"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  disabled
+                />
+              )}
+            />
+          </div>
+        </div>
+
+        {/* 11. Önceki İzin Süresi */}
+        <div style={RowStyle}>
+          <Text style={LabelStyle}>{t("Önceki İzin Süresi")}</Text>
+          <div style={InputContainerStyle}>
+            <Controller
+              name="ONCEKI_IZIN_SURESI"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  disabled
+                />
+              )}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
