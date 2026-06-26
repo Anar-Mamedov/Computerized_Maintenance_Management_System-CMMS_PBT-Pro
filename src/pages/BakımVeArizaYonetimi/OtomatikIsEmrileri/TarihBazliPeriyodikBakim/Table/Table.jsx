@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState, isValidElement } from "react";
 import { useFormContext } from "react-hook-form";
-import { Button, Checkbox, DatePicker, Input, Modal, Pagination, Space, Spin, Table, Typography, message } from "antd";
-import { DownloadOutlined, HolderOutlined, MenuOutlined, SearchOutlined } from "@ant-design/icons";
+import { Button, Checkbox, Input, Modal, Pagination, Space, Spin, Table, Typography, message } from "antd";
+import { DownloadOutlined, FilterOutlined, HolderOutlined, MenuOutlined, SearchOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -15,14 +15,10 @@ dayjs.extend(isoWeek);
 import * as XLSX from "xlsx";
 import "./ResizeStyle.css";
 import AxiosInstance from "../../../../../api/http";
-import KodIDSelectbox from "../../../../../utils/components/KodIDSelectbox";
-import LokasyonTablo from "../../../../../utils/components/LokasyonTablo";
-import AtolyeTablo from "../../../../../utils/components/AtolyeTablo";
-import MakineTablo from "../../../../../utils/components/Machina/MakineTablo";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import EditDrawer from "../../../PeriyodikBakimlar1/Update/EditDrawer";
+import FilterDrawer from "./filter/FilterDrawer";
 
-const { RangePicker } = DatePicker;
 const { Text } = Typography;
 
 const COLUMN_ORDER_KEY = "otomatikIsEmirleriColumnOrder";
@@ -242,6 +238,7 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [columnsModalOpen, setColumnsModalOpen] = useState(false);
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [editDrawer, setEditDrawer] = useState({
@@ -260,6 +257,7 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
     EkipmanIds: [],
     EkipmanLabels: [],
     EkipmanTipIds: [],
+    PeriyodikBakimIds: [],
     TarihAraligi: createDefaultDateRange(),
   });
   const [appliedFilters, setAppliedFilters] = useState({
@@ -268,6 +266,7 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
     AtolyeIds: [],
     EkipmanIds: [],
     EkipmanTipIds: [],
+    PeriyodikBakimIds: [],
     BaslangicTarih: dayjs().startOf("month").format(DATE_REQUEST_FORMAT),
     BitisTarih: dayjs().endOf("month").format(DATE_REQUEST_FORMAT),
   });
@@ -500,6 +499,7 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
         AtolyeIds: Array.isArray(filters.AtolyeIds) ? filters.AtolyeIds : [],
         EkipmanIds: Array.isArray(filters.EkipmanIds) ? filters.EkipmanIds : [],
         EkipmanTipIds: Array.isArray(filters.EkipmanTipIds) ? filters.EkipmanTipIds : [],
+        PeriyodikBakimIds: Array.isArray(filters.PeriyodikBakimIds) ? filters.PeriyodikBakimIds : [],
         BaslangicTarih: filters.BaslangicTarih || null,
         BitisTarih: filters.BitisTarih || null,
         Kelime: filters.Kelime || "",
@@ -603,11 +603,29 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
       AtolyeIds: draftFilters.AtolyeIds || [],
       EkipmanIds: draftFilters.EkipmanIds || [],
       EkipmanTipIds: draftFilters.EkipmanTipIds || [],
+      PeriyodikBakimIds: draftFilters.PeriyodikBakimIds || [],
       BaslangicTarih: startDate ? dayjs(startDate).format(DATE_REQUEST_FORMAT) : null,
       BitisTarih: endDate ? dayjs(endDate).format(DATE_REQUEST_FORMAT) : null,
     });
     setCurrentPage(1);
   }, [draftFilters]);
+
+  // Filtreler panelindeki bir filtre uygulandı mı? (Filtreler butonundaki gösterge için)
+  const isFilterApplied = useMemo(() => {
+    return (
+      (appliedFilters.LokasyonIds?.length || 0) > 0 ||
+      (appliedFilters.AtolyeIds?.length || 0) > 0 ||
+      (appliedFilters.EkipmanIds?.length || 0) > 0 ||
+      (appliedFilters.EkipmanTipIds?.length || 0) > 0 ||
+      (appliedFilters.PeriyodikBakimIds?.length || 0) > 0
+    );
+  }, [appliedFilters]);
+
+  // Filtreler panelinden uygula: filtreleri uygula ve paneli kapat
+  const handleApplyFiltersFromDrawer = useCallback(() => {
+    applyFilters();
+    setFilterDrawerOpen(false);
+  }, [applyFilters]);
 
   const handleRefresh = useCallback(() => {
     fetchTableData(currentPage, pageSize, appliedFilters);
@@ -792,52 +810,16 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
               onPressEnter={applyFilters}
               prefix={<SearchOutlined style={{ color: "#98a2b3" }} />}
               placeholder={t("aramaYap", { defaultValue: "Arama Yap" })}
-              style={{ width: 150 }}
+              style={{ width: 200 }}
             />
 
-            <div style={{ width: 150 }}>
-              <MakineTablo
-                hideHeader={false}
-                suppressFormFields={false}
-                includeAtolyeFilter={false}
-                makineFieldName="filterEkipmanTanim"
-                makineIdFieldName="filterEkipmanID"
-                placeholder={t("ekipmanKodu", { defaultValue: "Ekipman Kodu" })}
-              />
-            </div>
-
-            <div style={{ width: 150 }}>
-              <LokasyonTablo
-                lokasyonFieldName="filterLokasyonTanim"
-                lokasyonIdFieldName="filterLokasyonID"
-                placeholder={t("lokasyon", { defaultValue: "Lokasyon" })}
-              />
-            </div>
-
-            <div style={{ width: 150 }}>
-              <AtolyeTablo nameFields={{ tanim: "filterAtolyeTanim", id: "filterAtolyeID" }} placeholder={t("atolye", { defaultValue: "Atölye" })} />
-            </div>
-
-            <div style={{ width: 132 }}>
-              <KodIDSelectbox
-                name1="filterEkipmanTipIds"
-                kodID={32501}
-                isRequired={false}
-                mode="multiple"
-                maxTagCount="responsive"
-                showDropdownAdd={false}
-                placeholder={t("ekipmanTipi", { defaultValue: "Ekipman Tipi" })}
-                style={{ width: "100%" }}
-              />
-            </div>
-
-            <RangePicker
-              allowClear
-              value={draftFilters.TarihAraligi}
-              format={DATE_DISPLAY_FORMAT}
-              style={{ width: 210 }}
-              onChange={(value) => handleFilterChange("TarihAraligi", value ?? [])}
-            />
+            <Button
+              icon={<FilterOutlined />}
+              onClick={() => setFilterDrawerOpen(true)}
+              style={{ backgroundColor: isFilterApplied ? "#EBF6FE" : undefined, borderColor: isFilterApplied ? "#1677ff" : undefined }}
+            >
+              {t("filtreler", { defaultValue: "Filtreler" })}
+            </Button>
           </div>
 
           <Space wrap>
@@ -901,6 +883,13 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
         onDrawerClose={() => setEditDrawer({ visible: false, data: null })}
         drawerVisible={editDrawer.visible}
         onRefresh={handleRefresh}
+      />
+      <FilterDrawer
+        open={filterDrawerOpen}
+        onClose={() => setFilterDrawerOpen(false)}
+        onApply={handleApplyFiltersFromDrawer}
+        draftFilters={draftFilters}
+        onFilterChange={handleFilterChange}
       />
     </div>
   );
