@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Table } from "antd";
+import { Button, Modal, Table, Popconfirm, message } from "antd";
+import { DeleteOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
 import AxiosInstance from "../../../../../../../../api/http";
 import dayjs from "dayjs";
@@ -119,7 +120,7 @@ export default function Tablo() {
   }, [secilenBakimID, fetch]); // secilenBakimID veya fetch fonksiyonu değiştiğinde useEffect'i tetikle
 
   const onRowSelectChange = (selectedKeys) => {
-    setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
+    setSelectedRowKeys(selectedKeys);
   };
 
   const onRowClick = (record) => {
@@ -131,12 +132,58 @@ export default function Tablo() {
     fetch(); // fetch fonksiyonu tabloyu yeniler
   }, [fetch]);
 
+  const handleDelete = async () => {
+    if (selectedRowKeys.length === 0) {
+      message.warning("Lütfen silinecek kayıtları seçin.");
+      return;
+    }
+
+    let successCount = 0;
+
+    // API tek bir ID alır (POST /api/IsTanimMlzSil?id={id}), seçili her kayıt için ayrı istek atılır
+    for (const id of selectedRowKeys) {
+      try {
+        const response = await AxiosInstance.post(`IsTanimMlzSil?id=${id}`);
+        if (response?.has_error) {
+          message.warning(response.status || "Malzeme kaydı silinemedi.");
+        } else {
+          successCount++;
+        }
+      } catch (error) {
+        const errorMessage = error.response?.data?.status || "Sunucu hatası, silinemedi.";
+        message.error(errorMessage);
+        console.error("Silme hatası:", error);
+      }
+    }
+
+    if (successCount > 0) {
+      message.success(`${successCount} adet malzeme kaydı başarıyla silindi.`);
+      setSelectedRowKeys([]);
+      refreshTable();
+    }
+  };
+
   return (
     <div>
-      <CreateModal onRefresh={refreshTable} secilenBakimID={secilenBakimID} />
+      <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "10px" }}>
+        <Popconfirm
+          title="Silme İşlemi"
+          description={`${selectedRowKeys.length} adet malzeme kaydını silmek istediğinize emin misiniz?`}
+          onConfirm={handleDelete}
+          okText="Evet"
+          cancelText="Hayır"
+          icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+          disabled={selectedRowKeys.length === 0}
+        >
+          <Button type="default" danger icon={<DeleteOutlined />} disabled={selectedRowKeys.length === 0} style={{ marginBottom: "10px" }}>
+            Sil
+          </Button>
+        </Popconfirm>
+        <CreateModal onRefresh={refreshTable} secilenBakimID={secilenBakimID} />
+      </div>
       <Table
         rowSelection={{
-          type: "radio",
+          type: "checkbox",
           selectedRowKeys,
           onChange: onRowSelectChange,
         }}

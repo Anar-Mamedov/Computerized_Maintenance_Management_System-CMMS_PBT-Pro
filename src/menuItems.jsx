@@ -96,7 +96,7 @@ export const rawItems = [
       getItem("Atölye / Ekip Tanımları", "atolye", true, undefined, true, "KLL_WEB_ATOLYE"),
       getItem("Personel Tanımları", "personeltanimlari", true, undefined, true, "KLL_WEB_PERTANIM"),
       getItem("Personel İzinleri", "personelIzinleri", true, undefined, true, "KLL_WEB_PERIZIN"),
-      getItem("Personel Nöbetleri", "personelNobetleri", true, undefined, true, "KLL_WEB_PERNOBET"),
+      // getItem("Personel Nöbetleri", "personelNobetleri", true, undefined, true, "KLL_WEB_PERNOBET"),
       getItem("Personel Çalışma Planı", "personelCalismaPLani", true, undefined, true, "KLL_WEB_PERPLAN"),
     ],
     false
@@ -141,10 +141,7 @@ export const rawItems = [
     "Firma ve Sözleşme Yönetimi",
     "firmaVeSozlesmeYonetimi",
     <ShoppingCartOutlined />,
-    [
-      getItem("Firma Sözleşmeleri", "firmaSozlesme", true),
-      getItem("Firma Tanımları", "firmaTanimlari", true),
-    ],
+    [getItem("Firma Sözleşmeleri", "firmaSozlesme", true), getItem("Firma Tanımları", "firmaTanimlari", true)],
     false,
     "KLL_WEB_FIRMA_SOZLESME_MODUL"
   ),

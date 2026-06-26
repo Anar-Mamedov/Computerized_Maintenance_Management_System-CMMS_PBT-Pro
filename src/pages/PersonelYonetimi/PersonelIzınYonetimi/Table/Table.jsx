@@ -140,7 +140,9 @@ const MainTable = () => {
   const [body, setBody] = useState({
     ToplamIzinKaydi: 0,
     BelgeliKayit: 0,
-    filters: {},
+    filters: {
+      Arama: "",
+    },
   });
 
   const cardItems = useMemo(() => [
@@ -326,7 +328,7 @@ const MainTable = () => {
       title: "Personel Ad",
       dataIndex: "PersonelAd",
       key: "PersonelAd",
-      width: 120,
+      width: 250,
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
       render: (text, record) => (
@@ -342,7 +344,7 @@ const MainTable = () => {
       title: "Personel Kod",
       dataIndex: "PersonelKod",
       key: "PersonelKod",
-      width: 120,
+      width: 250,
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
       sorter: (a, b) => {
@@ -412,7 +414,7 @@ const MainTable = () => {
       title: "Tarih",
       dataIndex: "TarihAraligi",
       key: "TarihAraligi",
-      width: 110,
+      width: 250,
       ellipsis: true,
       sorter: (a, b) => {
         if (a.TarihAraligi === null) return -1;
@@ -461,37 +463,44 @@ const MainTable = () => {
 
   // Intl.DateTimeFormat kullanarak tarih formatlama
   const formatDate = (date) => {
-    if (!date) return "";
+  if (!date) return "";
 
-    // JavaScript'in tarihi anlamlandırıp anlamlandıramayacağını kontrol edin
-    const parsedDate = new Date(date);
-    if (isNaN(parsedDate.getTime())) {
-      console.warn("Geçersiz tarih formatı algılandı:", date);
-      return date; // Eğer tarih çözümlenemezse (örn: "25.06.2026 - 30.06.2026" gibi bir aralıksa) doğrudan kendisini döndür
-    }
+  // 1. Durum: Eğer gelen veri bir tarih aralığı ise ("2026-06-25 - 2026-06-30")
+  if (typeof date === "string" && date.includes(" - ")) {
+    const [startDate, endDate] = date.split(" - ");
+    // İki tarihi de ayrı ayrı aynı fonksiyondan geçirip birleştiriyoruz
+    return `${formatDate(startDate)} - ${formatDate(endDate)}`;
+  }
 
-    // Örnek bir tarih formatla ve ay formatını belirle
-    const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
-    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
+  // JavaScript'in tarihi anlamlandırıp anlamlandıramayacağını kontrol edin
+  const parsedDate = new Date(date);
+  if (isNaN(parsedDate.getTime())) {
+    console.warn("Geçersiz tarih formatı algılandı:", date);
+    return date; 
+  }
 
-    let monthFormat;
-    if (sampleFormatted.includes("January")) {
-      monthFormat = "long"; // Tam ad ("January")
-    } else if (sampleFormatted.includes("Jan")) {
-      monthFormat = "short"; // Üç harfli kısaltma ("Jan")
-    } else {
-      monthFormat = "2-digit"; // Sayısal gösterim ("01")
-    }
+  // Örnek bir tarih formatla ve ay formatını belirle
+  const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
+  const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
 
-    // Kullanıcı için tarihi formatla
-    const formatter = new Intl.DateTimeFormat(navigator.language, {
-      year: "numeric",
-      month: monthFormat,
-      day: "2-digit",
-    });
-    
-    return formatter.format(parsedDate); // Güvenli şekilde parse edilmiş tarihi gönderiyoruz
-  };
+  let monthFormat;
+  if (sampleFormatted.includes("January")) {
+    monthFormat = "long"; // Tam ad ("January")
+  } else if (sampleFormatted.includes("Jan")) {
+    monthFormat = "short"; // Üç harfli kısaltma ("Jan")
+  } else {
+    monthFormat = "2-digit"; // Sayısal gösterim ("01")
+  }
+
+  // Kullanıcı için tarihi formatla
+  const formatter = new Intl.DateTimeFormat(navigator.language, {
+    year: "numeric",
+    month: monthFormat,
+    day: "2-digit",
+  });
+  
+  return formatter.format(parsedDate); 
+};
 
   const formatTime = (time) => {
     if (!time || time.trim() === "") return ""; // `trim` metodu ile baştaki ve sondaki boşlukları temizle
@@ -579,15 +588,18 @@ useEffect(() => {
     const res = await AxiosInstance.post("GetPersonelIzinListesi", payload);
 
     if (res && res.has_error === false) {
-      setBody({
+      // Özet verilerini set et (Önceki state yapısını koruyarak)
+      setBody((prevBody) => ({
+        ...prevBody,
         ToplamIzinKaydi: res.data?.ToplamIzinKaydi || 0,
         BelgeliKayit: res.data?.BelgeliKayit || 0,
-      });
+      }));
 
+      // Liste verilerini set et
       const list = Array.isArray(res.data?.Liste) ? res.data.Liste : [];
       const formattedData = list.map((item) => ({
         ...item,
-        key: item.IzinId,
+        key: item.IzinId, // Unique ID olarak IzinId kullanıldı
       }));
 
       setData(formattedData);
