@@ -3,7 +3,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { Button, Space, ConfigProvider, Drawer, Modal, message } from "antd";
 import React, { useEffect, useState } from "react";
 import { t } from "i18next";
-import MainTabs from "./components/MainTabs/MainTabs";
+import MainTabs from "./components/MainTabs/MainTabs.jsx";
 import SecondTabs from "./components/SecondTabs/SecondTabs.jsx";
 import { useForm, FormProvider } from "react-hook-form";
 import AxiosInstance from "../../../../api/http.jsx";

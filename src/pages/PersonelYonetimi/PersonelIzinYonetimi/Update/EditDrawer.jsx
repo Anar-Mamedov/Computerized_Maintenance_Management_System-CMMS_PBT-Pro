@@ -4,7 +4,7 @@ import ruRU from "antd/es/locale/ru_RU";
 import azAZ from "antd/es/locale/az_AZ";
 import { Button, Drawer, Space, ConfigProvider, Modal, message, Spin } from "antd";
 import React, { useEffect, useState, useTransition } from "react";
-import MainTabs from "./components/MainTabs/MainTabs";
+import MainTabs from "./components/MainTabs/MainTabs.jsx";
 import { useForm, FormProvider } from "react-hook-form";
 import AxiosInstance from "../../../../api/http.jsx";
 import Tablar from "./components/Tablar.jsx";
