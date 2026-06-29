@@ -1108,5 +1108,8 @@
   "tab.aciklama": "Açıklama",
   "workOrder.filter.all": "Tüm iş emirleri",
   "workOrder.filter.open": "Açık iş emirleri",
-  "workOrder.filter.closed": "Kapalı iş emirleri"
+  "workOrder.filter.closed": "Kapalı iş emirleri",
+  "teknisyenKaydiSecilemedi": "Teknisyen kaydı seçilemedi.",
+  "teknisyenKaydiBulunamadi": "Teknisyen kaydı bulunamadı.",
+  "teknisyenBilgileriAlinamadi": "Teknisyen bilgileri alınamadı."
 }

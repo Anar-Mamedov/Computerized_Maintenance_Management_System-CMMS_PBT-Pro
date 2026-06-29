@@ -18,6 +18,15 @@ const toDayjsDate = (value) => {
   if (!value) {
     return null;
   }
+
+  const formats = [DATE_REQUEST_FORMAT, DATE_DISPLAY_FORMAT];
+  for (const format of formats) {
+    const parsed = dayjs(value, format);
+    if (parsed.isValid()) {
+      return parsed;
+    }
+  }
+
   const parsed = dayjs(value);
   return parsed.isValid() ? parsed : null;
 };
@@ -26,12 +35,40 @@ const toDayjsTime = (value) => {
   if (!value) {
     return null;
   }
-  const parsed = dayjs(value, TIME_FORMAT);
-  if (parsed.isValid()) {
-    return parsed;
+
+  const formats = [TIME_FORMAT, "HH:mm:ss"];
+  for (const format of formats) {
+    const parsed = dayjs(value, format);
+    if (parsed.isValid()) {
+      return parsed;
+    }
   }
+
   const fallback = dayjs(value);
   return fallback.isValid() ? fallback : null;
+};
+
+const normalizeBoolean = (value) => {
+  if (typeof value === "boolean") {
+    return value;
+  }
+  if (typeof value === "number") {
+    return value === 1;
+  }
+  if (typeof value === "string") {
+    return value.toLowerCase() === "true" || value === "1";
+  }
+  return false;
+};
+
+const getResponseRecord = (response) => {
+  const responseData = response && Object.prototype.hasOwnProperty.call(response, "data") ? response.data : response;
+
+  if (Array.isArray(responseData)) {
+    return responseData[0] ?? null;
+  }
+
+  return responseData ?? null;
 };
 
 export default function TeknisyenListesi({ disabled }) {
@@ -46,6 +83,7 @@ export default function TeknisyenListesi({ disabled }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingId, setEditingId] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -65,8 +103,8 @@ export default function TeknisyenListesi({ disabled }) {
         const fetchedData = list.map((item) => ({
           ...item,
           key: item.TB_IS_TALEBI_TEKNISYEN_ID,
-          code: item.ITK_PERSONEL_ISIM,
-          subject: item.ITK_VARDIYA_TANIM,
+          code: item.ITK_PERSONEL_ISIM ?? item.TEKNISYEN_ADI,
+          subject: item.ITK_VARDIYA_TANIM ?? item.ITK_VARDIYA,
           workdays: item.ITK_SURE,
           description: item.ITK_SAAT_UCRETI,
           fifthcolumn: item.ITK_FAZLA_MESAI_VAR,
@@ -116,45 +154,87 @@ export default function TeknisyenListesi({ disabled }) {
     }
   }, [personelOptions]);
 
-  // Düzenlenen kaydın personel ID'sini çözer: önce olası ID alanları, yoksa isimden eşleştirir.
-  const resolvePersonelId = (record, opts) => {
+  const resolvePersonelId = (record) => {
     const direct = record.ITK_TEKNISYEN_ID ?? record.ITK_PERSONEL_ID ?? record.TB_PERSONEL_ID ?? record.ITK_REF_ID;
     if (direct !== undefined && direct !== null && direct !== "") {
       return direct;
     }
-    const isim = (record.ITK_PERSONEL_ISIM || "").trim().toLowerCase();
-    if (isim) {
-      const match = opts.find((o) => (o.name || "").trim().toLowerCase() === isim || (o.label || "").toLowerCase().includes(isim));
-      if (match) {
-        return match.value;
-      }
-    }
     return null;
+  };
+
+  const createPersonelOptionFromRecord = (record) => {
+    const personelId = resolvePersonelId(record);
+    if (personelId === null || personelId === undefined || personelId === "") {
+      return null;
+    }
+
+    const name = String(record.ITK_PERSONEL_ISIM ?? record.PRS_ISIM ?? record.PERSONEL_ISIM ?? record.TEKNISYEN_ADI ?? "").trim();
+    const code = String(record.ITK_PERSONEL_KOD ?? record.PRS_PERSONEL_KOD ?? record.PERSONEL_KOD ?? "").trim();
+
+    return {
+      value: personelId,
+      label: [code, name].filter(Boolean).join(" - ") || name || code || `#${personelId}`,
+      name,
+    };
+  };
+
+  const setTeknisyenFormValues = (record) => {
+    const personelOption = createPersonelOptionFromRecord(record);
+
+    if (personelOption) {
+      setPersonelOptions((prevOptions) => {
+        const exists = prevOptions.some((option) => String(option.value) === String(personelOption.value));
+        return exists ? prevOptions : [personelOption, ...prevOptions];
+      });
+    }
+
+    form.setFieldsValue({
+      ITK_TEKNISYEN_ID: resolvePersonelId(record),
+      ITK_BASLAMA_TARIHI: toDayjsDate(record.ITK_BASLAMA_TARIHI ?? record.ITK_TARIH),
+      ITK_BASLAMA_SAATI: toDayjsTime(record.ITK_BASLAMA_SAATI ?? record.ITK_SAAT),
+      ITK_SURE: record.ITK_SURE ?? null,
+      ITK_SAAT_UCRETI: record.ITK_SAAT_UCRETI ?? null,
+      ITK_MALIYET: record.ITK_MALIYET ?? null,
+      ITK_FAZLA_MESAI_VAR: normalizeBoolean(record.ITK_FAZLA_MESAI_VAR),
+    });
   };
 
   const openAddModal = () => {
     setEditingId(0);
     form.resetFields();
     form.setFieldsValue({ ITK_FAZLA_MESAI_VAR: false });
-    loadPersonelOptions();
     setIsModalVisible(true);
   };
 
   const openEditModal = async (record) => {
-    setEditingId(record.TB_IS_TALEBI_TEKNISYEN_ID || 0);
-    // Personel dışındaki alanları hemen doldur
-    form.setFieldsValue({
-      ITK_BASLAMA_TARIHI: toDayjsDate(record.ITK_BASLAMA_TARIHI ?? record.ITK_TARIH),
-      ITK_BASLAMA_SAATI: toDayjsTime(record.ITK_BASLAMA_SAATI ?? record.ITK_SAAT),
-      ITK_SURE: record.ITK_SURE ?? null,
-      ITK_SAAT_UCRETI: record.ITK_SAAT_UCRETI ?? null,
-      ITK_MALIYET: record.ITK_MALIYET ?? null,
-      ITK_FAZLA_MESAI_VAR: Boolean(record.ITK_FAZLA_MESAI_VAR),
-    });
+    const teknisyenId = record.TB_IS_TALEBI_TEKNISYEN_ID || record.key;
+    if (!teknisyenId) {
+      message.warning(t("teknisyenKaydiSecilemedi", { defaultValue: "Teknisyen kaydı seçilemedi." }));
+      return;
+    }
+
+    setEditingId(teknisyenId);
+    form.resetFields();
     setIsModalVisible(true);
-    // Personel listesi yüklendikten sonra personeli seç (etiketin görünmesi için)
-    const opts = await loadPersonelOptions();
-    form.setFieldsValue({ ITK_TEKNISYEN_ID: resolvePersonelId(record, opts) });
+    setDetailLoading(true);
+
+    try {
+      const response = await AxiosInstance.get(`GetIsTalepTeknisyen?id=${teknisyenId}`);
+      const detailRecord = getResponseRecord(response);
+
+      if (!detailRecord) {
+        message.warning(t("teknisyenKaydiBulunamadi", { defaultValue: "Teknisyen kaydı bulunamadı." }));
+        return;
+      }
+
+      setEditingId(detailRecord.TB_IS_TALEBI_TEKNISYEN_ID || teknisyenId);
+      setTeknisyenFormValues(detailRecord);
+    } catch (error) {
+      console.error("Teknisyen bilgileri alınamadı:", error);
+      message.error(t("teknisyenBilgileriAlinamadi", { defaultValue: "Teknisyen bilgileri alınamadı." }));
+    } finally {
+      setDetailLoading(false);
+    }
   };
 
   const closeModal = () => {
@@ -310,7 +390,8 @@ export default function TeknisyenListesi({ disabled }) {
         open={isModalVisible}
         onOk={handleSave}
         onCancel={closeModal}
-        confirmLoading={saving}
+        confirmLoading={saving || detailLoading}
+        okButtonProps={{ disabled: detailLoading }}
         okText={t("kaydet", { defaultValue: "Kaydet" })}
         cancelText={t("iptal", { defaultValue: "İptal" })}
         width={520}
@@ -330,6 +411,11 @@ export default function TeknisyenListesi({ disabled }) {
               placeholder={t("secimYapiniz", { defaultValue: "Seçim Yapınız" })}
               optionFilterProp="label"
               options={personelOptions}
+              onOpenChange={(open) => {
+                if (open) {
+                  loadPersonelOptions();
+                }
+              }}
               filterOption={(input, option) => (option?.label || "").toLowerCase().includes(input.toLowerCase())}
             />
           </Form.Item>

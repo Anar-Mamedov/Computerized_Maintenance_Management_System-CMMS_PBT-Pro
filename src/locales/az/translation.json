@@ -455,5 +455,8 @@
   "tab.aciklama": "Açıqlama",
   "workOrder.filter.all": "Bütün iş əmrləri",
   "workOrder.filter.open": "Açıq iş əmrləri",
-  "workOrder.filter.closed": "Bağlı iş əmrləri"
+  "workOrder.filter.closed": "Bağlı iş əmrləri",
+  "teknisyenKaydiSecilemedi": "Texnik qeydi seçilə bilmədi.",
+  "teknisyenKaydiBulunamadi": "Texnik qeydi tapılmadı.",
+  "teknisyenBilgileriAlinamadi": "Texnik məlumatları alına bilmədi."
 }

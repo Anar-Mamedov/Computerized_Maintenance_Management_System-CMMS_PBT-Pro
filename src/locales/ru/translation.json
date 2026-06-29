@@ -455,5 +455,8 @@
   "tab.aciklama": "Описание",
   "workOrder.filter.all": "Все наряды",
   "workOrder.filter.open": "Открытые наряды",
-  "workOrder.filter.closed": "Закрытые наряды"
+  "workOrder.filter.closed": "Закрытые наряды",
+  "teknisyenKaydiSecilemedi": "Не удалось выбрать запись техника.",
+  "teknisyenKaydiBulunamadi": "Запись техника не найдена.",
+  "teknisyenBilgileriAlinamadi": "Не удалось загрузить данные техника."
 }
