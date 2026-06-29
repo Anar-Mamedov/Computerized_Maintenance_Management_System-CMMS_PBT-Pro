@@ -1,7 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState, isValidElement } from "react";
 import { useFormContext } from "react-hook-form";
-import { Button, Checkbox, DatePicker, Input, Modal, Pagination, Space, Spin, Table, Typography, message } from "antd";
-import { DownloadOutlined, MenuOutlined, SearchOutlined } from "@ant-design/icons";
+import { Button, Checkbox, Input, Modal, Pagination, Space, Spin, Table, Typography, message } from "antd";
+import { DownloadOutlined, FilterOutlined, HolderOutlined, MenuOutlined, SearchOutlined } from "@ant-design/icons";
+import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
+import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { Resizable } from "react-resizable";
 import { t } from "i18next";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
@@ -9,20 +13,104 @@ import PropTypes from "prop-types";
 
 dayjs.extend(isoWeek);
 import * as XLSX from "xlsx";
+import "./ResizeStyle.css";
 import AxiosInstance from "../../../../../api/http";
-import KodIDSelectbox from "../../../../../utils/components/KodIDSelectbox";
-import LokasyonTablo from "../../../../../utils/components/LokasyonTablo";
-import AtolyeTablo from "../../../../../utils/components/AtolyeTablo";
-import MakineTablo from "../../../../../utils/components/Machina/MakineTablo";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import EditDrawer from "../../../PeriyodikBakimlar1/Update/EditDrawer";
+import FilterDrawer from "./filter/FilterDrawer";
 
-const { RangePicker } = DatePicker;
 const { Text } = Typography;
 
-const COLUMN_STORAGE_KEY = "otomatikIsEmirleriVisibleColumns";
+const COLUMN_ORDER_KEY = "otomatikIsEmirleriColumnOrder";
+const COLUMN_VISIBILITY_KEY = "otomatikIsEmirleriColumnVisibility";
+const COLUMN_WIDTHS_KEY = "otomatikIsEmirleriColumnWidths";
 const DATE_REQUEST_FORMAT = "YYYY-MM-DD";
 const DATE_DISPLAY_FORMAT = "DD.MM.YYYY";
+
+// React element içinden düz metni çıkartır (kolon başlığı arama/sürükleme listesi için)
+const extractTextFromElement = (element) => {
+  if (typeof element === "string") {
+    return element;
+  }
+  if (Array.isArray(element)) {
+    return element.map((child) => extractTextFromElement(child)).join("");
+  }
+  if (isValidElement(element)) {
+    return extractTextFromElement(element.props.children);
+  }
+  if (element !== null && element !== undefined) {
+    return String(element);
+  }
+  return "";
+};
+
+// Sütun genişliğini sürükleyerek ayarlamak için başlık hücresi
+const ResizableTitle = (props) => {
+  const { onResize, width, ...restProps } = props;
+
+  const handleStyle = {
+    position: "absolute",
+    bottom: 0,
+    right: "-5px",
+    width: "20%",
+    height: "100%",
+    zIndex: 2,
+    cursor: "col-resize",
+    padding: "0px",
+    backgroundSize: "0px",
+  };
+
+  if (!width) {
+    return <th {...restProps} />;
+  }
+
+  return (
+    <Resizable
+      width={width}
+      height={0}
+      handle={<span className="react-resizable-handle" onClick={(e) => e.stopPropagation()} style={handleStyle} />}
+      onResize={onResize}
+      draggableOpts={{ enableUserSelectHack: false }}
+    >
+      <th {...restProps} />
+    </Resizable>
+  );
+};
+
+// Modal içinde sütun sırasını sürükleyerek değiştirmek için satır
+const DraggableRow = ({ id, text, style, ...restProps }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const styleWithTransform = {
+    ...style,
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    backgroundColor: isDragging ? "#f0f0f0" : "",
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+  };
+
+  return (
+    <div ref={setNodeRef} style={styleWithTransform} {...restProps} {...attributes}>
+      <div {...listeners} style={{ cursor: "grab", flexGrow: 1, display: "flex", alignItems: "center" }}>
+        <HolderOutlined style={{ marginRight: 8 }} />
+        {text}
+      </div>
+    </div>
+  );
+};
+
+DraggableRow.propTypes = {
+  id: PropTypes.string.isRequired,
+  text: PropTypes.node,
+  style: PropTypes.object,
+};
+
+ResizableTitle.propTypes = {
+  onResize: PropTypes.func,
+  width: PropTypes.number,
+};
 
 const createDefaultDateRange = () => [dayjs().startOf("month"), dayjs().endOf("month")];
 
@@ -122,23 +210,6 @@ StatusPill.propTypes = {
   days: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
-const getDefaultVisibleColumns = (allColumns) => {
-  const saved = localStorage.getItem(COLUMN_STORAGE_KEY);
-
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
-      }
-    } catch (error) {
-      console.error("Column visibility parse error:", error);
-    }
-  }
-
-  return allColumns.map((column) => column.key);
-};
-
 const buildExcelData = (rows) =>
   rows.map((item) => ({
     [t("ekipman", { defaultValue: "Ekipman" })]: `${item.MKN_KOD || ""} ${item.MKN_TANIM || ""}`.trim(),
@@ -167,6 +238,7 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [columnsModalOpen, setColumnsModalOpen] = useState(false);
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [editDrawer, setEditDrawer] = useState({
@@ -185,6 +257,7 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
     EkipmanIds: [],
     EkipmanLabels: [],
     EkipmanTipIds: [],
+    PeriyodikBakimIds: [],
     TarihAraligi: createDefaultDateRange(),
   });
   const [appliedFilters, setAppliedFilters] = useState({
@@ -193,6 +266,7 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
     AtolyeIds: [],
     EkipmanIds: [],
     EkipmanTipIds: [],
+    PeriyodikBakimIds: [],
     BaslangicTarih: dayjs().startOf("month").format(DATE_REQUEST_FORMAT),
     BitisTarih: dayjs().endOf("month").format(DATE_REQUEST_FORMAT),
   });
@@ -301,9 +375,115 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
     []
   );
 
-  const [visibleColumnKeys, setVisibleColumnKeys] = useState(() => getDefaultVisibleColumns(tableColumns));
+  const [columnSearchTerm, setColumnSearchTerm] = useState("");
 
-  const visibleColumns = useMemo(() => tableColumns.filter((column) => visibleColumnKeys.includes(column.key)), [tableColumns, visibleColumnKeys]);
+  // Sütun sırası / görünürlüğü / genişliği localStorage'dan okunup state'e atılır
+  const [columns, setColumns] = useState(() => {
+    const savedOrder = localStorage.getItem(COLUMN_ORDER_KEY);
+    const savedVisibility = localStorage.getItem(COLUMN_VISIBILITY_KEY);
+    const savedWidths = localStorage.getItem(COLUMN_WIDTHS_KEY);
+
+    let order = [];
+    let visibility = {};
+    let widths = {};
+
+    try {
+      order = savedOrder ? JSON.parse(savedOrder) : [];
+    } catch (error) {
+      order = [];
+    }
+    try {
+      visibility = savedVisibility ? JSON.parse(savedVisibility) : {};
+    } catch (error) {
+      visibility = {};
+    }
+    try {
+      widths = savedWidths ? JSON.parse(savedWidths) : {};
+    } catch (error) {
+      widths = {};
+    }
+
+    // Yeni eklenmiş kolonları (storage'da olmayan) sona ekle ve varsayılanlarını ata
+    tableColumns.forEach((col) => {
+      if (!order.includes(col.key)) {
+        order.push(col.key);
+      }
+      if (visibility[col.key] === undefined) {
+        visibility[col.key] = col.visible !== false;
+      }
+      if (widths[col.key] === undefined) {
+        widths[col.key] = col.width;
+      }
+    });
+
+    // Artık var olmayan kolon anahtarlarını sıralamadan temizle
+    order = order.filter((key) => tableColumns.some((col) => col.key === key));
+
+    return order.map((key) => {
+      const column = tableColumns.find((col) => col.key === key);
+      return { ...column, visible: visibility[key], width: widths[key] };
+    });
+  });
+
+  // Sütun ayarlarını localStorage'a kaydet
+  useEffect(() => {
+    localStorage.setItem(COLUMN_ORDER_KEY, JSON.stringify(columns.map((col) => col.key)));
+    localStorage.setItem(COLUMN_VISIBILITY_KEY, JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.visible }), {})));
+    localStorage.setItem(COLUMN_WIDTHS_KEY, JSON.stringify(columns.reduce((acc, col) => ({ ...acc, [col.key]: col.width }), {})));
+  }, [columns]);
+
+  const columnSensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  // Sütun genişliğini günceller
+  const handleResize =
+    (key) =>
+    (_, { size }) => {
+      setColumns((prev) => prev.map((col) => (col.key === key ? { ...col, width: size.width } : col)));
+    };
+
+  const components = {
+    header: {
+      cell: ResizableTitle,
+    },
+  };
+
+  const mergedColumns = columns.map((col) => ({
+    ...col,
+    onHeaderCell: (column) => ({
+      width: column.width,
+      onResize: handleResize(column.key),
+    }),
+  }));
+
+  const filteredColumns = mergedColumns.filter((col) => col.visible);
+
+  // Sütun sırasını değiştirir
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = columns.findIndex((column) => column.key === active.id);
+      const newIndex = columns.findIndex((column) => column.key === over.id);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        setColumns((prev) => arrayMove(prev, oldIndex, newIndex));
+      }
+    }
+  };
+
+  // Sütun görünürlüğünü değiştirir
+  const toggleVisibility = (key, checked) => {
+    setColumns((prev) => prev.map((col) => (col.key === key ? { ...col, visible: checked } : col)));
+  };
+
+  // Sütun ayarlarını sıfırlar
+  const resetColumns = () => {
+    localStorage.removeItem(COLUMN_ORDER_KEY);
+    localStorage.removeItem(COLUMN_VISIBILITY_KEY);
+    localStorage.removeItem(COLUMN_WIDTHS_KEY);
+    setColumns(tableColumns.map((col) => ({ ...col, visible: col.visible !== false })));
+  };
 
   const handleFilterChange = useCallback((key, value) => {
     setDraftFilters((state) => ({
@@ -319,6 +499,7 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
         AtolyeIds: Array.isArray(filters.AtolyeIds) ? filters.AtolyeIds : [],
         EkipmanIds: Array.isArray(filters.EkipmanIds) ? filters.EkipmanIds : [],
         EkipmanTipIds: Array.isArray(filters.EkipmanTipIds) ? filters.EkipmanTipIds : [],
+        PeriyodikBakimIds: Array.isArray(filters.PeriyodikBakimIds) ? filters.PeriyodikBakimIds : [],
         BaslangicTarih: filters.BaslangicTarih || null,
         BitisTarih: filters.BitisTarih || null,
         Kelime: filters.Kelime || "",
@@ -422,11 +603,29 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
       AtolyeIds: draftFilters.AtolyeIds || [],
       EkipmanIds: draftFilters.EkipmanIds || [],
       EkipmanTipIds: draftFilters.EkipmanTipIds || [],
+      PeriyodikBakimIds: draftFilters.PeriyodikBakimIds || [],
       BaslangicTarih: startDate ? dayjs(startDate).format(DATE_REQUEST_FORMAT) : null,
       BitisTarih: endDate ? dayjs(endDate).format(DATE_REQUEST_FORMAT) : null,
     });
     setCurrentPage(1);
   }, [draftFilters]);
+
+  // Filtreler panelindeki bir filtre uygulandı mı? (Filtreler butonundaki gösterge için)
+  const isFilterApplied = useMemo(() => {
+    return (
+      (appliedFilters.LokasyonIds?.length || 0) > 0 ||
+      (appliedFilters.AtolyeIds?.length || 0) > 0 ||
+      (appliedFilters.EkipmanIds?.length || 0) > 0 ||
+      (appliedFilters.EkipmanTipIds?.length || 0) > 0 ||
+      (appliedFilters.PeriyodikBakimIds?.length || 0) > 0
+    );
+  }, [appliedFilters]);
+
+  // Filtreler panelinden uygula: filtreleri uygula ve paneli kapat
+  const handleApplyFiltersFromDrawer = useCallback(() => {
+    applyFilters();
+    setFilterDrawerOpen(false);
+  }, [applyFilters]);
 
   const handleRefresh = useCallback(() => {
     fetchTableData(currentPage, pageSize, appliedFilters);
@@ -459,11 +658,6 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
       setExporting(false);
     }
   }, [rows]);
-
-  const handleColumnVisibilityChange = useCallback((checkedValues) => {
-    setVisibleColumnKeys(checkedValues);
-    localStorage.setItem(COLUMN_STORAGE_KEY, JSON.stringify(checkedValues));
-  }, []);
 
   const rowSelection = useMemo(
     () => ({
@@ -517,19 +711,84 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
       {contextHolder}
 
       <Modal
-        width={720}
-        title={t("kolonlariDuzenle", { defaultValue: "Kolonları Düzenle" })}
+        title={t("sutunlariYonet", { defaultValue: "Sütunları Yönet" })}
+        centered
+        width={800}
         open={columnsModalOpen}
         onOk={() => setColumnsModalOpen(false)}
         onCancel={() => setColumnsModalOpen(false)}
       >
-        <Checkbox.Group style={{ width: "100%", display: "flex", flexDirection: "column", gap: 10 }} value={visibleColumnKeys} onChange={handleColumnVisibilityChange}>
-          {tableColumns.map((column) => (
-            <Checkbox key={column.key} value={column.key}>
-              {column.title}
-            </Checkbox>
-          ))}
-        </Checkbox.Group>
+        <Text style={{ marginBottom: "15px" }}>
+          {t("sutunGosterGizleSiralaAciklama", { defaultValue: "Aşağıdaki Ekranlardan Sütunları Göster / Gizle ve Sıralamalarını Ayarlayabilirsiniz." })}
+        </Text>
+        <div style={{ display: "flex", width: "100%", justifyContent: "center", marginTop: "10px" }}>
+          <Button onClick={resetColumns} style={{ marginBottom: "15px" }}>
+            {t("sutunlariSifirla", { defaultValue: "Sütunları Sıfırla" })}
+          </Button>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div style={{ width: "46%", border: "1px solid #8080806e", borderRadius: "8px", padding: "10px" }}>
+            <div
+              style={{
+                marginBottom: "10px",
+                borderBottom: "1px solid #80808051",
+                padding: "8px 8px 12px 8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "10px",
+              }}
+            >
+              <Text style={{ fontWeight: 600 }}>{t("sutunlariGosterGizle", { defaultValue: "Sütunları Göster / Gizle" })}</Text>
+              <Checkbox
+                checked={columns.length > 0 && columns.every((c) => c.visible)}
+                indeterminate={columns.some((c) => c.visible) && !columns.every((c) => c.visible)}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  setColumns((prev) => prev.map((col) => ({ ...col, visible: checked })));
+                }}
+              >
+                {t("tumunuSec", { defaultValue: "Tümünü Seç" })}
+              </Checkbox>
+            </div>
+            <Input
+              style={{ marginBottom: "10px" }}
+              placeholder={t("sutunAra", { defaultValue: "Sütun ara..." })}
+              prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
+              value={columnSearchTerm}
+              onChange={(e) => setColumnSearchTerm(e.target.value)}
+              allowClear
+            />
+            <div style={{ height: "360px", overflow: "auto" }}>
+              {tableColumns
+                .filter((col) => extractTextFromElement(col.title).toLowerCase().includes(columnSearchTerm.toLowerCase()))
+                .map((col) => (
+                  <div style={{ display: "flex", gap: "10px", marginBottom: "6px" }} key={col.key}>
+                    <Checkbox checked={columns.find((column) => column.key === col.key)?.visible || false} onChange={(e) => toggleVisibility(col.key, e.target.checked)} />
+                    {col.title}
+                  </div>
+                ))}
+            </div>
+          </div>
+
+          <DndContext onDragEnd={handleDragEnd} sensors={columnSensors}>
+            <div style={{ width: "46%", border: "1px solid #8080806e", borderRadius: "8px", padding: "10px" }}>
+              <div style={{ marginBottom: "20px", borderBottom: "1px solid #80808051", padding: "8px 8px 12px 8px" }}>
+                <Text style={{ fontWeight: 600 }}>{t("sutunlarinSiralamasiniAyarla", { defaultValue: "Sütunların Sıralamasını Ayarla" })}</Text>
+              </div>
+              <div style={{ height: "400px", overflow: "auto" }}>
+                <SortableContext items={columns.filter((col) => col.visible).map((col) => col.key)} strategy={verticalListSortingStrategy}>
+                  {columns
+                    .filter((col) => col.visible)
+                    .map((col) => (
+                      <DraggableRow key={col.key} id={col.key} text={col.title} />
+                    ))}
+                </SortableContext>
+              </div>
+            </div>
+          </DndContext>
+        </div>
       </Modal>
 
       <div
@@ -551,52 +810,16 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
               onPressEnter={applyFilters}
               prefix={<SearchOutlined style={{ color: "#98a2b3" }} />}
               placeholder={t("aramaYap", { defaultValue: "Arama Yap" })}
-              style={{ width: 150 }}
+              style={{ width: 200 }}
             />
 
-            <div style={{ width: 150 }}>
-              <MakineTablo
-                hideHeader={false}
-                suppressFormFields={false}
-                includeAtolyeFilter={false}
-                makineFieldName="filterEkipmanTanim"
-                makineIdFieldName="filterEkipmanID"
-                placeholder={t("ekipmanKodu", { defaultValue: "Ekipman Kodu" })}
-              />
-            </div>
-
-            <div style={{ width: 150 }}>
-              <LokasyonTablo
-                lokasyonFieldName="filterLokasyonTanim"
-                lokasyonIdFieldName="filterLokasyonID"
-                placeholder={t("lokasyon", { defaultValue: "Lokasyon" })}
-              />
-            </div>
-
-            <div style={{ width: 150 }}>
-              <AtolyeTablo nameFields={{ tanim: "filterAtolyeTanim", id: "filterAtolyeID" }} placeholder={t("atolye", { defaultValue: "Atölye" })} />
-            </div>
-
-            <div style={{ width: 132 }}>
-              <KodIDSelectbox
-                name1="filterEkipmanTipIds"
-                kodID={32501}
-                isRequired={false}
-                mode="multiple"
-                maxTagCount="responsive"
-                showDropdownAdd={false}
-                placeholder={t("ekipmanTipi", { defaultValue: "Ekipman Tipi" })}
-                style={{ width: "100%" }}
-              />
-            </div>
-
-            <RangePicker
-              allowClear
-              value={draftFilters.TarihAraligi}
-              format={DATE_DISPLAY_FORMAT}
-              style={{ width: 210 }}
-              onChange={(value) => handleFilterChange("TarihAraligi", value ?? [])}
-            />
+            <Button
+              icon={<FilterOutlined />}
+              onClick={() => setFilterDrawerOpen(true)}
+              style={{ backgroundColor: isFilterApplied ? "#EBF6FE" : undefined, borderColor: isFilterApplied ? "#1677ff" : undefined }}
+            >
+              {t("filtreler", { defaultValue: "Filtreler" })}
+            </Button>
           </div>
 
           <Space wrap>
@@ -613,12 +836,14 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
         <Spin spinning={loading}>
           <Table
             rowKey="clientKey"
+            components={components}
             rowSelection={rowSelection}
-            columns={visibleColumns}
+            columns={filteredColumns}
             dataSource={rows}
             size="middle"
+            bordered
             pagination={false}
-            scroll={{ x: 1650, y: "calc(100vh - 340px)" }}
+            scroll={{ x: filteredColumns.reduce((sum, col) => sum + (Number(col.width) || 150), 0) + 60, y: "calc(100vh - 340px)" }}
             locale={{
               emptyText: t("veriYok", { defaultValue: "Veri Yok" }),
             }}
@@ -658,6 +883,13 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
         onDrawerClose={() => setEditDrawer({ visible: false, data: null })}
         drawerVisible={editDrawer.visible}
         onRefresh={handleRefresh}
+      />
+      <FilterDrawer
+        open={filterDrawerOpen}
+        onClose={() => setFilterDrawerOpen(false)}
+        onApply={handleApplyFiltersFromDrawer}
+        draftFilters={draftFilters}
+        onFilterChange={handleFilterChange}
       />
     </div>
   );
