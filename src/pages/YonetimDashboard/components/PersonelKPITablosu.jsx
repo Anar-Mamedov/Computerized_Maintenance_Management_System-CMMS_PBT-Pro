@@ -1,44 +1,105 @@
-import React from "react";
-import { Typography, Progress, Tooltip } from "antd";
+import React, { useMemo, useState, useEffect } from "react";
+import { Typography, Progress, Tooltip, Spin, message } from "antd";
 import { RightCircleOutlined, PieChartOutlined } from "@ant-design/icons";
+import AxiosInstance from "../../../api/http";
 
 const { Text, Title } = Typography;
 
-// Statik Mock Veri (Prompt'taki veriler)
-const costDistributionData = [
-  {
-    name: "Yakıt",
-    amount: "₺50.200.000",
-    percentage: 45.8,
-    color: "#ff4d4f", // Kırmızı ton
-  },
-  {
-    name: "Bakım",
-    amount: "₺21.200.000",
-    percentage: 19.4,
-    color: "#1890ff", // Mavi ton
-  },
-  {
-    name: "Parça",
-    amount: "₺17.700.000",
-    percentage: 16.2,
-    color: "#faad14", // Turuncu/Altın ton
-  },
-  {
-    name: "Taşeron",
-    amount: "₺13.100.000",
-    percentage: 12.0,
-    color: "#13c2c2", // Turkuaz ton
-  },
-  {
-    name: "Diğer",
-    amount: "₺7.300.000",
-    percentage: 6.7,
-    color: "#722ed1", // Mor ton
-  },
-];
+// Renk haritası (API'den gelen GiderTipi isimlerine göre)
+const categoryColors = {
+  YAKIT: "#ff4d4f",   // Kırmızı ton
+  BAKIM: "#1890ff",   // Mavi ton
+  PARÇA: "#faad14",   // Turuncu/Altın ton
+  TAŞERON: "#13c2c2", // Turkuaz ton
+  DİĞER: "#722ed1",   // Mor ton
+};
 
-function PersonelKPITablosu() {
+// Arayüzde düzgün etiket göstermek için
+const categoryLabels = {
+  YAKIT: "Yakıt",
+  BAKIM: "Bakım",
+  PARÇA: "Parça",
+  TAŞERON: "Taşeron",
+  DİĞER: "Diğer",
+};
+
+const PersonelKPITablosu = ({
+  baslangicTarihi = "2026-01-01T00:00:00",
+  bitisTarihi = "2026-06-26T23:59:59",
+  lokasyonIds = [],
+}) => {
+  const [apiData, setApiData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // 1. API İstek Fonksiyonu
+  const fetchCostDistribution = async () => {
+    setLoading(true);
+    try {
+      const payload = {
+        BaslangicTarihi: baslangicTarihi,
+        BitisTarihi: bitisTarihi,
+        LokasyonIds: lokasyonIds,
+      };
+
+      const response = await AxiosInstance.post("GetCostDistribution", payload);
+
+      if (response?.status_code === 200 || response?.status === 200) {
+        const resData = response.data?.liste ? response.data : response;
+        setApiData(resData);
+      } else {
+        message.error("Maliyet dağılımı verileri alınırken bir hata oluştu.");
+      }
+    } catch (error) {
+      console.error("Maliyet Dağılımı API Hatası:", error);
+      message.error("Maliyet dağılımı sunucu hatası.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filtreler değiştikçe tetikle
+  useEffect(() => {
+    fetchCostDistribution();
+  }, [baslangicTarihi, bitisTarihi, JSON.stringify(lokasyonIds)]);
+
+  // 2. Verileri İşleme ve Yüzde Hesaplama Bölümü
+  const costDistributionData = useMemo(() => {
+    if (!apiData || !apiData.liste || apiData.liste.length === 0) return [];
+
+    // Önce genel toplamı bulalım ki yüzdeleri hesaplayabilelim
+    const total = apiData.liste.reduce((sum, item) => sum + (item.ToplamTutar || 0), 0);
+
+    if (total === 0) return [];
+
+    return apiData.liste.map((item) => {
+      const gTip = item.GiderTipi.toUpperCase();
+      const pct = ((item.ToplamTutar / total) * 100).toFixed(1); // Virgülden sonra tek hane (%45.8 gibi)
+
+      return {
+        name: categoryLabels[gTip] || item.GiderTipi,
+        amount: `₺${item.ToplamTutar.toLocaleString("tr-TR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
+        percentage: parseFloat(pct),
+        color: categoryColors[gTip] || "#8c8c8c",
+      };
+    }).sort((a, b) => b.percentage - a.percentage); // En yüksek paya sahip olanı en üste getirir
+  }, [apiData]);
+
+  if (loading) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%", minHeight: "300px", backgroundColor: "white", borderRadius: "10px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+        <Spin tip="Dağılım verileri yükleniyor..." />
+      </div>
+    );
+  }
+
+  if (costDistributionData.length === 0) {
+    return (
+      <div style={{ padding: "20px", height: "100%", minHeight: "300px", backgroundColor: "white", borderRadius: "10px", display: "flex", justifyContent: "center", alignItems: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+        <Text type="secondary">Belirtilen kriterlerde maliyet dağılımı bulunamadı.</Text>
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
@@ -57,24 +118,12 @@ function PersonelKPITablosu() {
       {/* --- HEADER --- */}
       <div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <div
-            style={{
-              backgroundColor: "#e6f7ff",
-              padding: "6px",
-              borderRadius: "6px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <PieChartOutlined style={{ color: "#1890ff", fontSize: "16px" }} />
-          </div>
           <Title level={4} style={{ margin: 0, color: "#1f1f1f", fontSize: "18px" }}>
-            Maliyet Dağılımı (Yıl İçinde)
+            Maliyet Dağılımı (Dönem İçi)
           </Title>
         </div>
         <Text type="secondary" style={{ fontSize: "13px", display: "block", marginTop: "5px" }}>
-          Ana maliyet kalemlerinin toplam içindeki payı ve hızlı karşılaştırma
+          Ana maliyet kalemlerinin toplam içindeki ayı ve hızlı karşılaştırma
         </Text>
       </div>
 
@@ -132,6 +181,6 @@ function PersonelKPITablosu() {
       </div>
     </div>
   );
-}
+};
 
 export default PersonelKPITablosu;

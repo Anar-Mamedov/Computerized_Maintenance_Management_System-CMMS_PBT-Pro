@@ -53,6 +53,7 @@ import Component40 from "./components/Component40.jsx";
 import Component41 from "./components/Component41.jsx";
 import Component42 from "./components/Component42.jsx";
 import Component43 from "./components/Component43.jsx";
+import Component44 from "./components/Component44.jsx";
 
 // --- YENİ EKLENEN HARİCİ DASHBOARDLAR ---
 // NOT: Bu dosya yollarını kendi proje yapına göre kontrol etmelisin.
@@ -65,7 +66,7 @@ import "./custom-gridstack.css";
 const { Text } = Typography;
 
 // Sadece bu tablar GridStack kullanır
-const GRID_TABS = ["yonetici", "operasyon", "makine"];
+const GRID_TABS = ["yonetici", "makine"];
 
 const widgetTitles = {
   widget1: "Devam Eden İş Talepleri",
@@ -86,18 +87,6 @@ const widgetTitles = {
   widget16: "İş Emri Tipleri",
   widget17: "İş Talebi Tipleri",
   widget18: "Bekleyen Onaylarım",
-  widget20: "Aktif Makine",
-  widget21: "Aktif Personel",
-  widget22: "Açık İş Emirleri",
-  widget23: "Duruşta Makine",
-  widget24: "İş Emirleri Durumu",
-  widget25: "Operasyon Maliyeti",
-  widget26: "Arıza Nedenleri Maliyetleri",
-  widget27: "En Büyük 5 Tedarikçi",
-  widget28: "Operasyon Trendleri",
-  widget29: "Kritik Uyarılar",
-  widget30: "Son Arızalar",
-  widget31: "Planlı Bakımlar",
   widget32: "Toplam Ekipman",
   widget33: "Aktif",
   widget34: "Bakımda",
@@ -110,6 +99,7 @@ const widgetTitles = {
   widget41: "Yaklaşan Periyodik Bakımlar",
   widget42: "Ortalama Kullanım",
   widget43: "Ortalama Kullanım",
+  widget44: "Lokasyon Performansı Özeti",
 };
 
 const widgetDefaults = {
@@ -117,32 +107,21 @@ const widgetDefaults = {
   widget2: { width: 3, height: 2, minW: 3, minH: 1 },
   widget3: { width: 3, height: 2, minW: 3, minH: 1 },
   widget4: { width: 3, height: 2, minW: 3, minH: 1 },
-  widget5: { width: 7, height: 3, minW: 3, minH: 2 },
+  widget5: { width: 6, height: 3, minW: 3, minH: 2 },
   widget16: { width: 5, height: 3, minW: 3, minH: 2 },
   widget10: { width: 7, height: 3, minW: 3, minH: 2 },
   widget17: { width: 5, height: 3, minW: 3, minH: 2 },
   widget7: { width: 7, height: 3, minW: 3, minH: 2 },
   widget6: { width: 5, height: 4, minW: 3, minH: 2 },
-  widget11: { width: 5, height: 3, minW: 3, minH: 2 },
+  widget44: { width: 5, height: 4, minW: 3, minH: 2 },
+  widget11: { width: 6, height: 3, minW: 3, minH: 2 },
   widget8: { width: 5, height: 3, minW: 3, minH: 2 },
   widget13: { width: 7, height: 3, minW: 3, minH: 2 },
   widget9: { width: 7, height: 3, minW: 3, minH: 2 },
   widget14: { width: 5, height: 3, minW: 3, minH: 2 },
-  widget15: { width: 5, height: 3, minW: 3, minH: 2 },
+  widget15: { width: 6, height: 3, minW: 3, minH: 2 },
   widget12: { width: 12, height: 3, minW: 3, minH: 2 },
-  widget18: { width: 7, height: 3, minW: 3, minH: 2 },
-  widget20: { width: 3, height: 1, minW: 3, minH: 1 },
-  widget21: { width: 3, height: 1, minW: 3, minH: 1 },
-  widget22: { width: 3, height: 1, minW: 3, minH: 1 },
-  widget23: { width: 3, height: 1, minW: 3, minH: 1 },
-  widget24: { width: 5, height: 5, minW: 3, minH: 2 },
-  widget25: { width: 7, height: 5, minW: 3, minH: 2 },
-  widget26: { width: 5, height: 3, minW: 3, minH: 2 },
-  widget27: { width: 7, height: 3, minW: 3, minH: 2 },
-  widget28: { width: 5, height: 3, minW: 3, minH: 2 },
-  widget29: { width: 7, height: 3, minW: 3, minH: 2 },
-  widget30: { width: 5, height: 3, minW: 3, minH: 2 },
-  widget31: { width: 7, height: 3, minW: 3, minH: 2 },
+  widget18: { width: 6, height: 3, minW: 3, minH: 2 },
   widget32: { width: 3, height: 1, minW: 3, minH: 1 },
   widget33: { width: 3, height: 1, minW: 3, minH: 1 },
   widget34: { width: 3, height: 1, minW: 3, minH: 1 },
@@ -171,31 +150,11 @@ const tabConfigurations = {
     { id: "widget18", x: 0, y: 5, ...widgetDefaults["widget18"] },
     { id: "widget15", x: 7, y: 5, ...widgetDefaults["widget15"] },
 
-    // --- EN ALT SATIR (Footer) ---
+    // --- ALT SATIR (Footer) ---
     { id: "widget6", x: 0, y: 50, width: 12, height: 3, minW: 2, minH: 2 },
-  ],
-  "operasyon": [
-    // --- 1. SATIR (ÜST KARTLAR) ---
-    { id: "widget20", x: 0, y: 0, width: 3, height: 1, minW: 2, minH: 1 }, 
-    { id: "widget21", x: 3, y: 0, width: 3, height: 1, minW: 2, minH: 1 }, 
-    { id: "widget22", x: 6, y: 0, width: 3, height: 1, minW: 2, minH: 1 }, 
-    { id: "widget23", x: 9, y: 0, width: 3, height: 1, minW: 2, minH: 1 },
-    
-    // --- 2. SATIR ---
-    { id: "widget28", x: 0, y: 1, ...widgetDefaults["widget28"] },
-    { id: "widget29", x: 5, y: 1, ...widgetDefaults["widget29"] },
 
-    // --- 3. SATIR ---
-    { id: "widget30", x: 0, y: 4, ...widgetDefaults["widget30"] },
-    { id: "widget31", x: 5, y: 4, ...widgetDefaults["widget31"] },
-
-    // --- 4. SATIR (SONDAN BİR ÖNCE) ---
-    { id: "widget24", x: 0, y: 7, ...widgetDefaults["widget24"] },
-    { id: "widget25", x: 5, y: 7, ...widgetDefaults["widget25"] },
-
-    // --- 5. SATIR (EN ALT) ---
-    { id: "widget26", x: 0, y: 12, ...widgetDefaults["widget26"] },
-    { id: "widget27", x: 5, y: 12, ...widgetDefaults["widget27"] },
+    // --- EN ALT SATIR (Footer) ---
+    { id: "widget44", x: 0, y: 50, width: 12, height: 3, minW: 2, minH: 2 },
   ],
   "makine": [
     // --- 1. SATIR (KÜÇÜK İSTATİSTİKLER) ---
@@ -237,13 +196,10 @@ function MainDashboard() {
     widget5: false, widget6: false, widget7: false, widget8: false,
     widget9: false, widget10: false, widget11: false, widget12: false,
     widget13: false, widget14: false, widget15: false, widget16: false,
-    widget17: false, widget18: false, widget20: false,
-    widget21: false, widget22: false, widget23: false, widget24: false,
-    widget25: false, widget26: false, widget27: false, widget28: false,
-    widget29: false, widget30: false, widget31: false, widget32: false,
+    widget17: false, widget18: false, widget32: false,
     widget33: false, widget34: false, widget35: false, widget36: false,
     widget37: false, widget38: false, widget39: false, widget40: false,
-    widget41: false, widget42: false, widget43: false,
+    widget41: false, widget42: false, widget43: false, widget44: false,
   });
 
   const methods = useForm({
@@ -372,18 +328,6 @@ function MainDashboard() {
           case "widget16": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><IsEmriTipleri /></AppProvider></ConfigProvider></FormProvider>); break;
           case "widget17": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><IsTalebiTipleri /></AppProvider></ConfigProvider></FormProvider>); break;
           case "widget18": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><OnayIstekleriTablo /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget20": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component20 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget21": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component21 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget22": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component22 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget23": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component23 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget24": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component24 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget25": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component25 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget26": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component26 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget27": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component27 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget28": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component28 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget29": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component29 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget30": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component30 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget31": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component31 /></AppProvider></ConfigProvider></FormProvider>); break;
           case "widget32": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component32 /></AppProvider></ConfigProvider></FormProvider>); break;
           case "widget33": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component33 /></AppProvider></ConfigProvider></FormProvider>); break;
           case "widget34": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component34 /></AppProvider></ConfigProvider></FormProvider>); break;
@@ -396,6 +340,7 @@ function MainDashboard() {
           case "widget41": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component41 /></AppProvider></ConfigProvider></FormProvider>); break;
           case "widget42": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component42 /></AppProvider></ConfigProvider></FormProvider>); break;
           case "widget43": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component43 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget44": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component44 /></AppProvider></ConfigProvider></FormProvider>); break;
           default: break;
         }
       });
@@ -407,13 +352,10 @@ function MainDashboard() {
         widget5: false, widget6: false, widget7: false, widget8: false,
         widget9: false, widget10: false, widget11: false, widget12: false,
         widget13: false, widget14: false, widget15: false, widget16: false,
-        widget17: false, widget18: false, widget20: false,
-        widget21: false, widget22: false, widget23: false, widget24: false,
-        widget25: false, widget26: false, widget27: false, widget28: false,
-        widget29: false, widget30: false, widget31: false, widget32: false,
+        widget17: false, widget18: false, widget32: false,
         widget33: false, widget34: false, widget35: false, widget36: false,
         widget37: false, widget38: false, widget39: false, widget40: false,
-        widget41: false, widget42: false, widget43: false,
+        widget41: false, widget42: false, widget43: false, widget44: false,
       };
       newGridItems.forEach((item) => {
         if (Object.prototype.hasOwnProperty.call(newChecked, item.id)) {
@@ -532,9 +474,8 @@ function MainDashboard() {
 
   const items = [
     { key: 'yonetici', label: 'Yönetici Özeti' },
-    { key: 'proje', label: 'Proje Yönetimi' },
-    { key: 'operasyon', label: 'Operasyon' },
-    { key: 'makine', label: 'Makine' },
+    //{ key: 'proje', label: 'Proje Yönetimi' },
+    //{ key: 'makine', label: 'Makine' },
     { key: 'satinalma', label: 'Satınalma' },
     { key: 'bakim', label: 'Bakım' },
   ];
@@ -580,7 +521,7 @@ function MainDashboard() {
             </div>
 
             <div style={{ overflow: "auto", height: "calc(100vh - 280px)" }}>
-              {/* GRID İÇİN (YONETICI, OPERASYON, MAKINE) */}
+              {/* GRID İÇİN (YONETICI, MAKINE) */}
               {GRID_TABS.includes(activeTab) && (
                  <div className="grid-stack"></div>
               )}
