@@ -7,6 +7,7 @@ import trTR from "antd/lib/locale/tr_TR";
 import { useForm, FormProvider } from "react-hook-form";
 import { createRoot } from "react-dom/client";
 import { AppProvider } from "./../../AppContext.jsx";
+import AxiosInstance from "../../api/http.jsx";
 
 // --- WIDGET IMPORTLARI ---
 import Component3 from "./components/Component3.jsx";
@@ -54,6 +55,12 @@ import Component41 from "./components/Component41.jsx";
 import Component42 from "./components/Component42.jsx";
 import Component43 from "./components/Component43.jsx";
 import Component44 from "./components/Component44.jsx";
+import ToplamCalismaSaati from "./components/ToplamCalismaSaati.jsx";
+import AcikIsEmirleri from "./components/AcikIsEmri.jsx";
+import ToplamSatinalmaMaliyeti from "./components/ToplamSatinalmaMaliyeti.jsx";
+import ToplamMalzemeMaliyeti from "./components/ToplamMalzemeMaliyeti.jsx";
+import KritikStokKalemi from "./components/KritikStokKalemi.jsx";
+import BekleyenOnaylar from "./components/BekleyenOnaylar.jsx";
 
 // --- YENİ EKLENEN HARİCİ DASHBOARDLAR ---
 // NOT: Bu dosya yollarını kendi proje yapına göre kontrol etmelisin.
@@ -69,10 +76,10 @@ const { Text } = Typography;
 const GRID_TABS = ["yonetici", "makine"];
 
 const widgetTitles = {
-  widget1: "Devam Eden İş Talepleri",
-  widget2: "Açık İş Emirleri",
-  widget3: "Düşük Stoklu Malzemeler",
-  widget4: "Toplam Ekipman Sayısı",
+  widget1: "Toplam Maliyet",
+  widget2: "Aktif Ekipman",
+  widget3: "Aktif Personel",
+  widget4: "Yakıt Tüketimi",
   widget5: "Yıllık Maliyet Grafiği",
   widget6: "Lokasyon Bazında İş Talepleri ve İş Emirleri Dağılımı",
   widget7: "İş Emri Analizi",
@@ -100,6 +107,12 @@ const widgetTitles = {
   widget42: "Ortalama Kullanım",
   widget43: "Ortalama Kullanım",
   widget44: "Lokasyon Performansı Özeti",
+  widget45: "Toplam Çalışma Saati",
+  widget46: "Açık İş Emri",
+  widget47: "Toplam Satınalma Maliyeti",
+  widget48: "Toplam Malzeme Maliyeti",
+  widget49: "Kritik Stok Kalemi",
+  widget50: "Bekleyen Onaylar",
 };
 
 const widgetDefaults = {
@@ -107,6 +120,12 @@ const widgetDefaults = {
   widget2: { width: 3, height: 2, minW: 3, minH: 1 },
   widget3: { width: 3, height: 2, minW: 3, minH: 1 },
   widget4: { width: 3, height: 2, minW: 3, minH: 1 },
+  widget45: { width: 3, height: 2, minW: 3, minH: 1 },
+  widget46: { width: 3, height: 2, minW: 3, minH: 1 },
+  widget47: { width: 3, height: 2, minW: 3, minH: 1 },
+  widget48: { width: 3, height: 2, minW: 3, minH: 1 },
+  widget49: { width: 3, height: 2, minW: 3, minH: 1 },
+  widget50: { width: 3, height: 2, minW: 3, minH: 1 },
   widget5: { width: 6, height: 3, minW: 3, minH: 2 },
   widget16: { width: 5, height: 3, minW: 3, minH: 2 },
   widget10: { width: 7, height: 3, minW: 3, minH: 2 },
@@ -139,10 +158,18 @@ const widgetDefaults = {
 const tabConfigurations = {
   "yonetici": [
     // --- ÜST SATIR ---
-    { id: "widget1", x: 0, y: 0, width: 3, height: 1, minW: 2, minH: 1 },
-    { id: "widget2", x: 3, y: 0, width: 3, height: 1, minW: 2, minH: 1 },
-    { id: "widget3", x: 6, y: 0, width: 3, height: 1, minW: 2, minH: 1 },
-    { id: "widget4", x: 9, y: 0, width: 3, height: 1, minW: 2, minH: 1 },
+    { id: "widget1", x: 0, y: 0, width: 2, height: 1, minW: 2, minH: 1 },
+    { id: "widget2", x: 2, y: 0, width: 2, height: 1, minW: 2, minH: 1 },
+    { id: "widget3", x: 4, y: 0, width: 2, height: 1, minW: 2, minH: 1 },
+    { id: "widget4", x: 6, y: 0, width: 2, height: 1, minW: 2, minH: 1 },
+    { id: "widget45", x: 8, y: 0, width: 4, height: 1, minW: 2, minH: 1 },
+
+    // --- 2. SATIR ÖZET KARTLAR (Görseldeki İkinci 5 Kart) ---
+    { id: "widget46", x: 0, y: 2, width: 2, height: 1, minW: 2, minH: 1 },
+    { id: "widget47", x: 2, y: 2, width: 2, height: 1, minW: 2, minH: 1 },
+    { id: "widget48", x: 4, y: 2, width: 2, height: 1, minW: 2, minH: 1 },
+    { id: "widget49", x: 6, y: 2, width: 2, height: 1, minW: 2, minH: 1 },
+    { id: "widget50", x: 8, y: 2, width: 4, height: 1, minW: 2, minH: 1 },
 
     { id: "widget5", x: 0, y: 5, ...widgetDefaults["widget5"] },
     { id: "widget11", x: 7, y: 5, ...widgetDefaults["widget11"] },
@@ -190,6 +217,7 @@ function MainDashboard() {
   const [reorganize, setReorganize] = useState();
   const [updateApi, setUpdateApi] = useState(false);
   const [activeTab, setActiveTab] = useState("yonetici"); 
+  const [loading, setLoading] = useState(false); 
 
   const [checkedWidgets, setCheckedWidgets] = useState({
     widget1: false, widget2: false, widget3: false, widget4: false,
@@ -200,16 +228,51 @@ function MainDashboard() {
     widget33: false, widget34: false, widget35: false, widget36: false,
     widget37: false, widget38: false, widget39: false, widget40: false,
     widget41: false, widget42: false, widget43: false, widget44: false,
+    widget45: false, widget46: false, widget47: false, widget48: false,
+    widget49: false, widget50: false,
   });
 
   const methods = useForm({
-    defaultValues: { },
+    defaultValues: {
+      summaryData: null
+    },
   });
 
   const { setValue, watch, reset } = methods;
   const selectedDashboard = watch("selectedYoneticiDashboard");
 
   const getCurrentStorageKey = () => `${selectedDashboard || "dashboard"}_${activeTab}`;
+
+  const fetchSummaryCards = async () => {
+    console.log("API İsteği atılıyor... Tab:", activeTab); // F12'de bunu kontrol et kanka
+    setLoading(true);
+    try {
+      // Endpoint yolunu projenin baseURL yapısına göre "/api/Dashboard/..." veya "Dashboard/..." olarak kontrol et
+      const response = await AxiosInstance.post("GetSummaryCards", {
+        BaslangicTarihi: "2026-01-01T00:00:00",
+        BitisTarihi: "2026-06-26T23:59:59",
+        LokasyonIds: []
+      });
+
+      const resData = response.data || response; 
+
+      if (resData && resData.Kartlar) {
+        console.log("API'den gelen veri:", resData.Kartlar);
+        setValue("summaryData", resData.Kartlar);
+        setValue("paraBirimi", resData.ParaBirimi);
+      }
+    } catch (error) {
+      console.error("Özet verileri çekilirken hata oluştu kanka:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (GRID_TABS.includes(activeTab)) {
+      fetchSummaryCards();
+    }
+  }, [updateApi, activeTab]);
 
   const updateApiTriger = async () => {
     setUpdateApi(!updateApi);
@@ -341,6 +404,12 @@ function MainDashboard() {
           case "widget42": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component42 /></AppProvider></ConfigProvider></FormProvider>); break;
           case "widget43": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component43 /></AppProvider></ConfigProvider></FormProvider>); break;
           case "widget44": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component44 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget45": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><ToplamCalismaSaati /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget46": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><AcikIsEmirleri /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget47": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><ToplamSatinalmaMaliyeti /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget48": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><ToplamMalzemeMaliyeti /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget49": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><KritikStokKalemi /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget50": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><BekleyenOnaylar /></AppProvider></ConfigProvider></FormProvider>); break;
           default: break;
         }
       });
@@ -356,6 +425,8 @@ function MainDashboard() {
         widget33: false, widget34: false, widget35: false, widget36: false,
         widget37: false, widget38: false, widget39: false, widget40: false,
         widget41: false, widget42: false, widget43: false, widget44: false,
+        widget45: false, widget46: false, widget47: false, widget48: false,
+        widget49: false, widget50: false,
       };
       newGridItems.forEach((item) => {
         if (Object.prototype.hasOwnProperty.call(newChecked, item.id)) {

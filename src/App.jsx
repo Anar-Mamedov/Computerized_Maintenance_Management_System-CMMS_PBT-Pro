@@ -245,7 +245,7 @@ export default function App() {
             </ProtectedRoute>
           }
         >
-          {loginData?.KLL_WEB_DASHBOARD && <Route path="/" element={isOmega ? <YoneticiDashboard /> : <Dashboard1 />} />}
+          {loginData?.KLL_WEB_DASHBOARD && <Route path="/" element={<YoneticiDashboard />} />}
           {/* <Route path="/isemri" element={<Isemri />} /> */}
           <Route path="/yonetimDashboard" element={<YoneticiDashboard />} />
           <Route path="/isEmri1" element={<IsEmri />} />
