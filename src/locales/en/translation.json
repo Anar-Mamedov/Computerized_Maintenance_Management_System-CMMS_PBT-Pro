@@ -458,5 +458,8 @@
   "tab.aciklama": "Description",
   "workOrder.filter.all": "All work orders",
   "workOrder.filter.open": "Open work orders",
-  "workOrder.filter.closed": "Closed work orders"
+  "workOrder.filter.closed": "Closed work orders",
+  "teknisyenKaydiSecilemedi": "Technician record could not be selected.",
+  "teknisyenKaydiBulunamadi": "Technician record was not found.",
+  "teknisyenBilgileriAlinamadi": "Technician details could not be loaded."
 }
