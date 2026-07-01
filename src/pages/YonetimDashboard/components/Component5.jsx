@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { Typography, Spin, message } from "antd";
+import { useFormContext } from "react-hook-form";
 import {
   BarChart,
   Bar,
@@ -32,13 +33,18 @@ const categoryLabels = {
   DİĞER: "Diğer",
 };
 
-const Component5 = ({ 
-  baslangicTarihi = "2026-01-01T00:00:00", 
-  bitisTarihi = "2026-06-26T23:59:59", 
-  lokasyonIds = [] 
-}) => {
+const Component5 = () => {
   const [apiData, setApiData] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // --- FORM CONTEXT BAĞLANTISI ---
+  // Üst barda yönettiğimiz filtre değerlerini anlık olarak watch ediyoruz
+  const { watch } = useFormContext();
+  
+  const baslangicTarihi = watch("filtreBaslangicTarihi");
+  const bitisTarihi = watch("filtreBitisTarihi");
+  const lokasyonIds = watch("filtreLokasyonIds");
+  const giderTipi = watch("filtreGiderTipi");
 
   // 1. API İstek Fonksiyonu
   const fetchMonthlyCosts = async () => {
@@ -47,12 +53,12 @@ const Component5 = ({
       const payload = {
         BaslangicTarihi: baslangicTarihi,
         BitisTarihi: bitisTarihi,
-        LokasyonIds: lokasyonIds,
+        LokasyonIds: lokasyonIds || [],
+        GiderTipi: giderTipi || "TÜMÜ" // Dokümandaki ortak şablona göre ekledik kanka
       };
       
       const response = await AxiosInstance.post("GetMonthlyCostGraph", payload);
       
-      // Axios interceptor yapısına göre güvenli veri okuma
       if (response?.status_code === 200 || response?.status === 200) {
         const resData = response.data?.liste ? response.data : response;
         setApiData(resData);
@@ -67,10 +73,12 @@ const Component5 = ({
     }
   };
 
-  // Filtreler veya tarihler değiştikçe API'yi tetikle
+  // Filtrelerden herhangi biri değiştiğinde API otomatik tekrar tetiklenir
   useEffect(() => {
-    fetchMonthlyCosts();
-  }, [baslangicTarihi, bitisTarihi, JSON.stringify(lokasyonIds)]);
+    if (baslangicTarihi && bitisTarihi) {
+      fetchMonthlyCosts();
+    }
+  }, [baslangicTarihi, bitisTarihi, JSON.stringify(lokasyonIds), giderTipi]);
 
   // 2. API verisini Recharts ve İstatistikler için işle
   const { chartData, stats, totalCost, categories } = useMemo(() => {
@@ -89,8 +97,7 @@ const Component5 = ({
         year: item.Yil,
       };
 
-      // Eğer o ay hiç maliyet yoksa grafik patlamasın diye boş array kontrolü
-      if (item.Maliyetler && Array. treasures !== null) {
+      if (item.Maliyetler && Array.isArray(item.Maliyetler)) {
         item.Maliyetler.forEach((maliyet) => {
           const catName = maliyet.Kategori.toUpperCase();
           const tutarDegeri = maliyet.Tutar || 0;
@@ -98,7 +105,6 @@ const Component5 = ({
           row[catName] = tutarDegeri;
           allCategories.add(catName);
 
-          // Toplamları hesapla
           categoryTotals[catName] = (categoryTotals[catName] || 0) + tutarDegeri;
           grandTotal += tutarDegeri;
         });
@@ -107,7 +113,6 @@ const Component5 = ({
       processedData.push(row);
     });
 
-    // Sol taraftaki istatistik listesini oluştur (Küsuratları yuvarlayarak temizledim)
     const formattedStats = Object.keys(categoryTotals).map((cat) => ({
       label: categoryLabels[cat] || cat,
       key: cat,
@@ -123,7 +128,6 @@ const Component5 = ({
     };
   }, [apiData]);
 
-  // Para birimi formatlayıcı (Tooltip ve Y Ekseni için)
   const currencyFormatter = (value) => {
     return `₺${value.toLocaleString("tr-TR", { maximumFractionDigits: 0 })}`;
   };
@@ -136,11 +140,10 @@ const Component5 = ({
     );
   }
 
-  // Grafik verisi boşsa koruma sağla
   if (chartData.length === 0) {
     return (
       <div style={{ padding: "4px 20px", height: "350px", backgroundColor: "white", borderRadius: "10px", display: "flex", justifyContent: "center", alignItems: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
-        <Text type="secondary">Belirtilen tarihler arasında maliyet verisi bulunamadı.</Text>
+        <Text type="secondary">Belirtilen kriterlerde maliyet verisi bulunamadı.</Text>
       </div>
     );
   }
@@ -185,12 +188,11 @@ const Component5 = ({
         </div>
       </div>
 
-      {/* İÇERİK KISMI (SOL: ÖZET, SAĞ: GRAFİK) */}
+      {/* İÇERİK KISMI */}
       <div style={{ display: "flex", flex: 1, gap: "20px", minHeight: 0 }}>
         
         {/* SOL: TOPLAM VE DETAYLAR */}
         <div style={{ width: "240px", display: "flex", flexDirection: "column", gap: "15px", overflowY: "auto" }}>
-          {/* Genel Toplam Kartı */}
           <div style={{ padding: "15px", backgroundColor: "#f9f9f9", borderRadius: "8px", borderLeft: "4px solid #1890ff" }}>
             <Text style={{ display: "block", color: "#8c8c8c", fontSize: "12px" }}>TOPLAM MALİYET</Text>
             <Text style={{ display: "block", fontSize: "20px", fontWeight: "700", color: "#262626", whiteSpace: "nowrap" }}>
@@ -198,7 +200,6 @@ const Component5 = ({
             </Text>
           </div>
 
-          {/* Alt Kırılımlar Listesi */}
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             {stats.map((stat, index) => (
               <div key={index} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "8px", borderBottom: "1px solid #f0f0f0" }}>
@@ -244,7 +245,6 @@ const Component5 = ({
                 formatter={(value) => categoryLabels[value] || value}
               />
               
-              {/* Dinamik Stacked Barlar */}
               {categories.map((category, idx) => {
                 const isFirst = idx === 0;
                 const isLast = idx === categories.length - 1;

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { GridStack } from "gridstack";
 import "gridstack/dist/gridstack.css";
-import { Button, Checkbox, Popover, Typography, Switch, Tooltip, ConfigProvider, Tabs } from "antd";
+import { Button, Checkbox, Popover, Typography, Switch, Tooltip, ConfigProvider, Tabs, DatePicker, Select, Space } from "antd";
 import { DownOutlined, QuestionCircleOutlined, ReloadOutlined } from "@ant-design/icons";
 import trTR from "antd/lib/locale/tr_TR";
 import { useForm, FormProvider } from "react-hook-form";
 import { createRoot } from "react-dom/client";
 import { AppProvider } from "./../../AppContext.jsx";
 import AxiosInstance from "../../api/http.jsx";
+import dayjs from "dayjs";
 
 // --- WIDGET IMPORTLARI ---
 import Component3 from "./components/Component3.jsx";
@@ -71,6 +72,7 @@ import ProjeYonetimi from "../ProjeYonetimi/ProjeYonetimiListe.jsx";
 import "./custom-gridstack.css"; 
 
 const { Text } = Typography;
+const { RangePicker } = DatePicker;
 
 // Sadece bu tablar GridStack kullanır
 const GRID_TABS = ["yonetici", "makine"];
@@ -234,24 +236,48 @@ function MainDashboard() {
 
   const methods = useForm({
     defaultValues: {
-      summaryData: null
+      summaryData: null,
+      selectedYoneticiDashboard: null,
+      paraBirimi: "TL",
+      // Yeni eklenen filtrelerin state yönetimi form içerisine gömüldü
+      filtreBaslangicTarihi: "2026-01-01T00:00:00",
+      filtreBitisTarihi: "2026-06-26T23:59:59",
+      filtreLokasyonIds: [],
+      filtreGiderTipi: "TÜMÜ"
     },
   });
 
   const { setValue, watch, reset } = methods;
   const selectedDashboard = watch("selectedYoneticiDashboard");
 
+  const filterBaslangic = watch("filtreBaslangicTarihi");
+  const filterBitis = watch("filtreBitisTarihi");
+  const filterLokasyonlar = watch("filtreLokasyonIds");
+  const filterGider = watch("filtreGiderTipi");
+
+  const [tempDates, setTempDates] = useState([dayjs("2026-01-01"), dayjs("2026-06-26")]);
+  const [tempLokasyonIds, setTempLokasyonIds] = useState([]);
+  const [tempGiderTipi, setTempGiderTipi] = useState("TÜMÜ");
+
   const getCurrentStorageKey = () => `${selectedDashboard || "dashboard"}_${activeTab}`;
 
+  const handleApplyFilters = () => {
+    // Geçici statelerdeki verileri topluca ana form state'ine basıp tetikliyoruz
+    setValue("filtreBaslangicTarihi", tempDates ? tempDates[0].startOf('day').format("YYYY-MM-DDTHH:mm:ss") : "2026-01-01T00:00:00", { shouldValidate: true });
+    setValue("filtreBitisTarihi", tempDates ? tempDates[1].endOf('day').format("YYYY-MM-DDTHH:mm:ss") : "2026-06-26T23:59:59", { shouldValidate: true });
+    setValue("filtreLokasyonIds", tempLokasyonIds, { shouldValidate: true });
+    setValue("filtreGiderTipi", tempGiderTipi, { shouldValidate: true });
+  }
+
   const fetchSummaryCards = async () => {
-    console.log("API İsteği atılıyor... Tab:", activeTab); // F12'de bunu kontrol et kanka
+    console.log("API İsteği atılıyor... Tab:", activeTab); 
     setLoading(true);
     try {
-      // Endpoint yolunu projenin baseURL yapısına göre "/api/Dashboard/..." veya "Dashboard/..." olarak kontrol et
       const response = await AxiosInstance.post("GetSummaryCards", {
-        BaslangicTarihi: "2026-01-01T00:00:00",
-        BitisTarihi: "2026-06-26T23:59:59",
-        LokasyonIds: []
+        BaslangicTarihi: filterBaslangic,
+        BitisTarihi: filterBitis,
+        LokasyonIds: filterLokasyonlar,
+        GiderTipi: filterGider
       });
 
       const resData = response.data || response; 
@@ -259,7 +285,7 @@ function MainDashboard() {
       if (resData && resData.Kartlar) {
         console.log("API'den gelen veri:", resData.Kartlar);
         setValue("summaryData", resData.Kartlar);
-        setValue("paraBirimi", resData.ParaBirimi);
+        setValue("paraBirimi", resData.ParaBirimi || "TL");
       }
     } catch (error) {
       console.error("Özet verileri çekilirken hata oluştu kanka:", error);
@@ -268,11 +294,12 @@ function MainDashboard() {
     }
   };
 
+  // Filtreler veya manuel trigger değiştiğinde API'yi tekrar çağırıyoruz
   useEffect(() => {
     if (GRID_TABS.includes(activeTab)) {
       fetchSummaryCards();
     }
-  }, [updateApi, activeTab]);
+  }, [updateApi, activeTab, filterBaslangic, filterBitis, filterLokasyonlar, filterGider]);
 
   const updateApiTriger = async () => {
     setUpdateApi(!updateApi);
@@ -589,6 +616,57 @@ function MainDashboard() {
 
             <div style={{ marginBottom: "15px", backgroundColor: "white", padding: "10px 20px 0 20px", borderRadius: "8px" }}>
                <Tabs defaultActiveKey="yonetici" items={items} onChange={(key) => setActiveTab(key)} />
+            </div>
+
+            {/* --- GLOBAL FİLTRE PANELİ (BUTONLU) --- */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", padding: "15px", backgroundColor: "white", borderRadius: "8px", marginBottom: "15px", alignItems: "flex-end" }}>
+              
+              <Space direction="vertical" size={2}>
+                <Text type="secondary" strong style={{ fontSize: "12px" }}>Tarih Aralığı</Text>
+                <RangePicker 
+                  value={tempDates}
+                  onChange={(dates) => setTempDates(dates)}
+                />
+              </Space>
+
+              <Space direction="vertical" size={2}>
+                <Text type="secondary" strong style={{ fontSize: "12px" }}>Lokasyonlar</Text>
+                <Select
+                  mode="multiple"
+                  style={{ width: "220px" }}
+                  placeholder="Tüm Lokasyonlar"
+                  maxTagCount="responsive"
+                  value={tempLokasyonIds}
+                  onChange={(value) => setTempLokasyonIds(value)}
+                  options={[
+                    { value: 85, label: "Lokasyon 85" },
+                    { value: 102, label: "Lokasyon 102" },
+                  ]}
+                />
+              </Space>
+
+              <Space direction="vertical" size={2}>
+                <Text type="secondary" strong style={{ fontSize: "12px" }}>Gider Tipi</Text>
+                <Select
+                  style={{ width: "150px" }}
+                  value={tempGiderTipi}
+                  onChange={(value) => setTempGiderTipi(value)}
+                  options={[
+                    { value: "TÜMÜ", label: "TÜMÜ" },
+                    { value: "BAKIM", label: "BAKIM" },
+                    { value: "SATINALMA", label: "SATINALMA" }
+                  ]}
+                />
+              </Space>
+
+              {/* --- UYGULA BUTONU --- */}
+              <Button 
+                type="primary" 
+                style={{ backgroundColor: "#2da44e", borderColor: "#2da44e", fontWeight: "600" }} 
+                onClick={handleApplyFilters}
+              >
+                Filtreleri Uygula
+              </Button>
             </div>
 
             <div style={{ overflow: "auto", height: "calc(100vh - 280px)" }}>
