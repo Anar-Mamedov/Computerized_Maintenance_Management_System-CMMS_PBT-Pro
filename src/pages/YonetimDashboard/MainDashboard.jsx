@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { GridStack } from "gridstack";
 import "gridstack/dist/gridstack.css";
-import { Button, Checkbox, Popover, Typography, Switch, Tooltip, ConfigProvider, Tabs } from "antd";
+import { Button, Checkbox, Popover, Typography, Switch, Tooltip, ConfigProvider, Tabs, DatePicker, Select, Space } from "antd";
 import { DownOutlined, QuestionCircleOutlined, ReloadOutlined } from "@ant-design/icons";
 import trTR from "antd/lib/locale/tr_TR";
 import { useForm, FormProvider } from "react-hook-form";
 import { createRoot } from "react-dom/client";
 import { AppProvider } from "./../../AppContext.jsx";
+import AxiosInstance from "../../api/http.jsx";
+import dayjs from "dayjs";
 
 // --- WIDGET IMPORTLARI ---
 import Component3 from "./components/Component3.jsx";
@@ -53,6 +55,13 @@ import Component40 from "./components/Component40.jsx";
 import Component41 from "./components/Component41.jsx";
 import Component42 from "./components/Component42.jsx";
 import Component43 from "./components/Component43.jsx";
+import Component44 from "./components/Component44.jsx";
+import ToplamCalismaSaati from "./components/ToplamCalismaSaati.jsx";
+import AcikIsEmirleri from "./components/AcikIsEmri.jsx";
+import ToplamSatinalmaMaliyeti from "./components/ToplamSatinalmaMaliyeti.jsx";
+import ToplamMalzemeMaliyeti from "./components/ToplamMalzemeMaliyeti.jsx";
+import KritikStokKalemi from "./components/KritikStokKalemi.jsx";
+import BekleyenOnaylar from "./components/BekleyenOnaylar.jsx";
 
 // --- YENİ EKLENEN HARİCİ DASHBOARDLAR ---
 // NOT: Bu dosya yollarını kendi proje yapına göre kontrol etmelisin.
@@ -63,15 +72,16 @@ import ProjeYonetimi from "../ProjeYonetimi/ProjeYonetimiListe.jsx";
 import "./custom-gridstack.css"; 
 
 const { Text } = Typography;
+const { RangePicker } = DatePicker;
 
 // Sadece bu tablar GridStack kullanır
-const GRID_TABS = ["yonetici", "operasyon", "makine"];
+const GRID_TABS = ["yonetici", "makine"];
 
 const widgetTitles = {
-  widget1: "Devam Eden İş Talepleri",
-  widget2: "Açık İş Emirleri",
-  widget3: "Düşük Stoklu Malzemeler",
-  widget4: "Toplam Ekipman Sayısı",
+  widget1: "Toplam Maliyet",
+  widget2: "Aktif Ekipman",
+  widget3: "Aktif Personel",
+  widget4: "Yakıt Tüketimi",
   widget5: "Yıllık Maliyet Grafiği",
   widget6: "Lokasyon Bazında İş Talepleri ve İş Emirleri Dağılımı",
   widget7: "İş Emri Analizi",
@@ -86,18 +96,6 @@ const widgetTitles = {
   widget16: "İş Emri Tipleri",
   widget17: "İş Talebi Tipleri",
   widget18: "Bekleyen Onaylarım",
-  widget20: "Aktif Makine",
-  widget21: "Aktif Personel",
-  widget22: "Açık İş Emirleri",
-  widget23: "Duruşta Makine",
-  widget24: "İş Emirleri Durumu",
-  widget25: "Operasyon Maliyeti",
-  widget26: "Arıza Nedenleri Maliyetleri",
-  widget27: "En Büyük 5 Tedarikçi",
-  widget28: "Operasyon Trendleri",
-  widget29: "Kritik Uyarılar",
-  widget30: "Son Arızalar",
-  widget31: "Planlı Bakımlar",
   widget32: "Toplam Ekipman",
   widget33: "Aktif",
   widget34: "Bakımda",
@@ -110,6 +108,13 @@ const widgetTitles = {
   widget41: "Yaklaşan Periyodik Bakımlar",
   widget42: "Ortalama Kullanım",
   widget43: "Ortalama Kullanım",
+  widget44: "Lokasyon Performansı Özeti",
+  widget45: "Toplam Çalışma Saati",
+  widget46: "Açık İş Emri",
+  widget47: "Toplam Satınalma Maliyeti",
+  widget48: "Toplam Malzeme Maliyeti",
+  widget49: "Kritik Stok Kalemi",
+  widget50: "Bekleyen Onaylar",
 };
 
 const widgetDefaults = {
@@ -117,32 +122,27 @@ const widgetDefaults = {
   widget2: { width: 3, height: 2, minW: 3, minH: 1 },
   widget3: { width: 3, height: 2, minW: 3, minH: 1 },
   widget4: { width: 3, height: 2, minW: 3, minH: 1 },
-  widget5: { width: 7, height: 3, minW: 3, minH: 2 },
+  widget45: { width: 3, height: 2, minW: 3, minH: 1 },
+  widget46: { width: 3, height: 2, minW: 3, minH: 1 },
+  widget47: { width: 3, height: 2, minW: 3, minH: 1 },
+  widget48: { width: 3, height: 2, minW: 3, minH: 1 },
+  widget49: { width: 3, height: 2, minW: 3, minH: 1 },
+  widget50: { width: 3, height: 2, minW: 3, minH: 1 },
+  widget5: { width: 6, height: 3, minW: 3, minH: 2 },
   widget16: { width: 5, height: 3, minW: 3, minH: 2 },
   widget10: { width: 7, height: 3, minW: 3, minH: 2 },
   widget17: { width: 5, height: 3, minW: 3, minH: 2 },
   widget7: { width: 7, height: 3, minW: 3, minH: 2 },
   widget6: { width: 5, height: 4, minW: 3, minH: 2 },
-  widget11: { width: 5, height: 3, minW: 3, minH: 2 },
+  widget44: { width: 5, height: 4, minW: 3, minH: 2 },
+  widget11: { width: 6, height: 3, minW: 3, minH: 2 },
   widget8: { width: 5, height: 3, minW: 3, minH: 2 },
   widget13: { width: 7, height: 3, minW: 3, minH: 2 },
   widget9: { width: 7, height: 3, minW: 3, minH: 2 },
   widget14: { width: 5, height: 3, minW: 3, minH: 2 },
-  widget15: { width: 5, height: 3, minW: 3, minH: 2 },
+  widget15: { width: 6, height: 3, minW: 3, minH: 2 },
   widget12: { width: 12, height: 3, minW: 3, minH: 2 },
-  widget18: { width: 7, height: 3, minW: 3, minH: 2 },
-  widget20: { width: 3, height: 1, minW: 3, minH: 1 },
-  widget21: { width: 3, height: 1, minW: 3, minH: 1 },
-  widget22: { width: 3, height: 1, minW: 3, minH: 1 },
-  widget23: { width: 3, height: 1, minW: 3, minH: 1 },
-  widget24: { width: 5, height: 5, minW: 3, minH: 2 },
-  widget25: { width: 7, height: 5, minW: 3, minH: 2 },
-  widget26: { width: 5, height: 3, minW: 3, minH: 2 },
-  widget27: { width: 7, height: 3, minW: 3, minH: 2 },
-  widget28: { width: 5, height: 3, minW: 3, minH: 2 },
-  widget29: { width: 7, height: 3, minW: 3, minH: 2 },
-  widget30: { width: 5, height: 3, minW: 3, minH: 2 },
-  widget31: { width: 7, height: 3, minW: 3, minH: 2 },
+  widget18: { width: 6, height: 3, minW: 3, minH: 2 },
   widget32: { width: 3, height: 1, minW: 3, minH: 1 },
   widget33: { width: 3, height: 1, minW: 3, minH: 1 },
   widget34: { width: 3, height: 1, minW: 3, minH: 1 },
@@ -160,10 +160,18 @@ const widgetDefaults = {
 const tabConfigurations = {
   "yonetici": [
     // --- ÜST SATIR ---
-    { id: "widget1", x: 0, y: 0, width: 3, height: 1, minW: 2, minH: 1 },
-    { id: "widget2", x: 3, y: 0, width: 3, height: 1, minW: 2, minH: 1 },
-    { id: "widget3", x: 6, y: 0, width: 3, height: 1, minW: 2, minH: 1 },
-    { id: "widget4", x: 9, y: 0, width: 3, height: 1, minW: 2, minH: 1 },
+    { id: "widget1", x: 0, y: 0, width: 2, height: 1, minW: 2, minH: 1 },
+    { id: "widget2", x: 2, y: 0, width: 2, height: 1, minW: 2, minH: 1 },
+    { id: "widget3", x: 4, y: 0, width: 2, height: 1, minW: 2, minH: 1 },
+    { id: "widget4", x: 6, y: 0, width: 2, height: 1, minW: 2, minH: 1 },
+    { id: "widget45", x: 8, y: 0, width: 4, height: 1, minW: 2, minH: 1 },
+
+    // --- 2. SATIR ÖZET KARTLAR (Görseldeki İkinci 5 Kart) ---
+    { id: "widget46", x: 0, y: 2, width: 2, height: 1, minW: 2, minH: 1 },
+    { id: "widget47", x: 2, y: 2, width: 2, height: 1, minW: 2, minH: 1 },
+    { id: "widget48", x: 4, y: 2, width: 2, height: 1, minW: 2, minH: 1 },
+    { id: "widget49", x: 6, y: 2, width: 2, height: 1, minW: 2, minH: 1 },
+    { id: "widget50", x: 8, y: 2, width: 4, height: 1, minW: 2, minH: 1 },
 
     { id: "widget5", x: 0, y: 5, ...widgetDefaults["widget5"] },
     { id: "widget11", x: 7, y: 5, ...widgetDefaults["widget11"] },
@@ -171,31 +179,11 @@ const tabConfigurations = {
     { id: "widget18", x: 0, y: 5, ...widgetDefaults["widget18"] },
     { id: "widget15", x: 7, y: 5, ...widgetDefaults["widget15"] },
 
-    // --- EN ALT SATIR (Footer) ---
+    // --- ALT SATIR (Footer) ---
     { id: "widget6", x: 0, y: 50, width: 12, height: 3, minW: 2, minH: 2 },
-  ],
-  "operasyon": [
-    // --- 1. SATIR (ÜST KARTLAR) ---
-    { id: "widget20", x: 0, y: 0, width: 3, height: 1, minW: 2, minH: 1 }, 
-    { id: "widget21", x: 3, y: 0, width: 3, height: 1, minW: 2, minH: 1 }, 
-    { id: "widget22", x: 6, y: 0, width: 3, height: 1, minW: 2, minH: 1 }, 
-    { id: "widget23", x: 9, y: 0, width: 3, height: 1, minW: 2, minH: 1 },
-    
-    // --- 2. SATIR ---
-    { id: "widget28", x: 0, y: 1, ...widgetDefaults["widget28"] },
-    { id: "widget29", x: 5, y: 1, ...widgetDefaults["widget29"] },
 
-    // --- 3. SATIR ---
-    { id: "widget30", x: 0, y: 4, ...widgetDefaults["widget30"] },
-    { id: "widget31", x: 5, y: 4, ...widgetDefaults["widget31"] },
-
-    // --- 4. SATIR (SONDAN BİR ÖNCE) ---
-    { id: "widget24", x: 0, y: 7, ...widgetDefaults["widget24"] },
-    { id: "widget25", x: 5, y: 7, ...widgetDefaults["widget25"] },
-
-    // --- 5. SATIR (EN ALT) ---
-    { id: "widget26", x: 0, y: 12, ...widgetDefaults["widget26"] },
-    { id: "widget27", x: 5, y: 12, ...widgetDefaults["widget27"] },
+    // --- EN ALT SATIR (Footer) ---
+    { id: "widget44", x: 0, y: 50, width: 12, height: 3, minW: 2, minH: 2 },
   ],
   "makine": [
     // --- 1. SATIR (KÜÇÜK İSTATİSTİKLER) ---
@@ -231,29 +219,87 @@ function MainDashboard() {
   const [reorganize, setReorganize] = useState();
   const [updateApi, setUpdateApi] = useState(false);
   const [activeTab, setActiveTab] = useState("yonetici"); 
+  const [loading, setLoading] = useState(false); 
 
   const [checkedWidgets, setCheckedWidgets] = useState({
     widget1: false, widget2: false, widget3: false, widget4: false,
     widget5: false, widget6: false, widget7: false, widget8: false,
     widget9: false, widget10: false, widget11: false, widget12: false,
     widget13: false, widget14: false, widget15: false, widget16: false,
-    widget17: false, widget18: false, widget20: false,
-    widget21: false, widget22: false, widget23: false, widget24: false,
-    widget25: false, widget26: false, widget27: false, widget28: false,
-    widget29: false, widget30: false, widget31: false, widget32: false,
+    widget17: false, widget18: false, widget32: false,
     widget33: false, widget34: false, widget35: false, widget36: false,
     widget37: false, widget38: false, widget39: false, widget40: false,
-    widget41: false, widget42: false, widget43: false,
+    widget41: false, widget42: false, widget43: false, widget44: false,
+    widget45: false, widget46: false, widget47: false, widget48: false,
+    widget49: false, widget50: false,
   });
 
   const methods = useForm({
-    defaultValues: { },
+    defaultValues: {
+      summaryData: null,
+      selectedYoneticiDashboard: null,
+      paraBirimi: "TL",
+      // Yeni eklenen filtrelerin state yönetimi form içerisine gömüldü
+      filtreBaslangicTarihi: "2026-01-01T00:00:00",
+      filtreBitisTarihi: "2026-06-26T23:59:59",
+      filtreLokasyonIds: [],
+      filtreGiderTipi: "TÜMÜ"
+    },
   });
 
   const { setValue, watch, reset } = methods;
   const selectedDashboard = watch("selectedYoneticiDashboard");
 
+  const filterBaslangic = watch("filtreBaslangicTarihi");
+  const filterBitis = watch("filtreBitisTarihi");
+  const filterLokasyonlar = watch("filtreLokasyonIds");
+  const filterGider = watch("filtreGiderTipi");
+
+  const [tempDates, setTempDates] = useState([dayjs("2026-01-01"), dayjs("2026-06-26")]);
+  const [tempLokasyonIds, setTempLokasyonIds] = useState([]);
+  const [tempGiderTipi, setTempGiderTipi] = useState("TÜMÜ");
+
   const getCurrentStorageKey = () => `${selectedDashboard || "dashboard"}_${activeTab}`;
+
+  const handleApplyFilters = () => {
+    // Geçici statelerdeki verileri topluca ana form state'ine basıp tetikliyoruz
+    setValue("filtreBaslangicTarihi", tempDates ? tempDates[0].startOf('day').format("YYYY-MM-DDTHH:mm:ss") : "2026-01-01T00:00:00", { shouldValidate: true });
+    setValue("filtreBitisTarihi", tempDates ? tempDates[1].endOf('day').format("YYYY-MM-DDTHH:mm:ss") : "2026-06-26T23:59:59", { shouldValidate: true });
+    setValue("filtreLokasyonIds", tempLokasyonIds, { shouldValidate: true });
+    setValue("filtreGiderTipi", tempGiderTipi, { shouldValidate: true });
+  }
+
+  const fetchSummaryCards = async () => {
+    console.log("API İsteği atılıyor... Tab:", activeTab); 
+    setLoading(true);
+    try {
+      const response = await AxiosInstance.post("GetSummaryCards", {
+        BaslangicTarihi: filterBaslangic,
+        BitisTarihi: filterBitis,
+        LokasyonIds: filterLokasyonlar,
+        GiderTipi: filterGider
+      });
+
+      const resData = response.data || response; 
+
+      if (resData && resData.Kartlar) {
+        console.log("API'den gelen veri:", resData.Kartlar);
+        setValue("summaryData", resData.Kartlar);
+        setValue("paraBirimi", resData.ParaBirimi || "TL");
+      }
+    } catch (error) {
+      console.error("Özet verileri çekilirken hata oluştu kanka:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filtreler veya manuel trigger değiştiğinde API'yi tekrar çağırıyoruz
+  useEffect(() => {
+    if (GRID_TABS.includes(activeTab)) {
+      fetchSummaryCards();
+    }
+  }, [updateApi, activeTab, filterBaslangic, filterBitis, filterLokasyonlar, filterGider]);
 
   const updateApiTriger = async () => {
     setUpdateApi(!updateApi);
@@ -372,18 +418,6 @@ function MainDashboard() {
           case "widget16": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><IsEmriTipleri /></AppProvider></ConfigProvider></FormProvider>); break;
           case "widget17": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><IsTalebiTipleri /></AppProvider></ConfigProvider></FormProvider>); break;
           case "widget18": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><OnayIstekleriTablo /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget20": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component20 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget21": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component21 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget22": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component22 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget23": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component23 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget24": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component24 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget25": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component25 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget26": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component26 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget27": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component27 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget28": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component28 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget29": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component29 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget30": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component30 /></AppProvider></ConfigProvider></FormProvider>); break;
-          case "widget31": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component31 /></AppProvider></ConfigProvider></FormProvider>); break;
           case "widget32": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component32 /></AppProvider></ConfigProvider></FormProvider>); break;
           case "widget33": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component33 /></AppProvider></ConfigProvider></FormProvider>); break;
           case "widget34": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component34 /></AppProvider></ConfigProvider></FormProvider>); break;
@@ -396,6 +430,13 @@ function MainDashboard() {
           case "widget41": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component41 /></AppProvider></ConfigProvider></FormProvider>); break;
           case "widget42": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component42 /></AppProvider></ConfigProvider></FormProvider>); break;
           case "widget43": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component43 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget44": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><Component44 /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget45": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><ToplamCalismaSaati /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget46": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><AcikIsEmirleri /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget47": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><ToplamSatinalmaMaliyeti /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget48": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><ToplamMalzemeMaliyeti /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget49": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><KritikStokKalemi /></AppProvider></ConfigProvider></FormProvider>); break;
+          case "widget50": root.render(<FormProvider {...methods}><ConfigProvider locale={trTR}><AppProvider><BekleyenOnaylar /></AppProvider></ConfigProvider></FormProvider>); break;
           default: break;
         }
       });
@@ -407,13 +448,12 @@ function MainDashboard() {
         widget5: false, widget6: false, widget7: false, widget8: false,
         widget9: false, widget10: false, widget11: false, widget12: false,
         widget13: false, widget14: false, widget15: false, widget16: false,
-        widget17: false, widget18: false, widget20: false,
-        widget21: false, widget22: false, widget23: false, widget24: false,
-        widget25: false, widget26: false, widget27: false, widget28: false,
-        widget29: false, widget30: false, widget31: false, widget32: false,
+        widget17: false, widget18: false, widget32: false,
         widget33: false, widget34: false, widget35: false, widget36: false,
         widget37: false, widget38: false, widget39: false, widget40: false,
-        widget41: false, widget42: false, widget43: false,
+        widget41: false, widget42: false, widget43: false, widget44: false,
+        widget45: false, widget46: false, widget47: false, widget48: false,
+        widget49: false, widget50: false,
       };
       newGridItems.forEach((item) => {
         if (Object.prototype.hasOwnProperty.call(newChecked, item.id)) {
@@ -532,9 +572,8 @@ function MainDashboard() {
 
   const items = [
     { key: 'yonetici', label: 'Yönetici Özeti' },
-    { key: 'proje', label: 'Proje Yönetimi' },
-    { key: 'operasyon', label: 'Operasyon' },
-    { key: 'makine', label: 'Makine' },
+    //{ key: 'proje', label: 'Proje Yönetimi' },
+    //{ key: 'makine', label: 'Makine' },
     { key: 'satinalma', label: 'Satınalma' },
     { key: 'bakim', label: 'Bakım' },
   ];
@@ -579,8 +618,59 @@ function MainDashboard() {
                <Tabs defaultActiveKey="yonetici" items={items} onChange={(key) => setActiveTab(key)} />
             </div>
 
+            {/* --- GLOBAL FİLTRE PANELİ (BUTONLU) --- */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", padding: "15px", backgroundColor: "white", borderRadius: "8px", marginBottom: "15px", alignItems: "flex-end" }}>
+              
+              <Space direction="vertical" size={2}>
+                <Text type="secondary" strong style={{ fontSize: "12px" }}>Tarih Aralığı</Text>
+                <RangePicker 
+                  value={tempDates}
+                  onChange={(dates) => setTempDates(dates)}
+                />
+              </Space>
+
+              <Space direction="vertical" size={2}>
+                <Text type="secondary" strong style={{ fontSize: "12px" }}>Lokasyonlar</Text>
+                <Select
+                  mode="multiple"
+                  style={{ width: "220px" }}
+                  placeholder="Tüm Lokasyonlar"
+                  maxTagCount="responsive"
+                  value={tempLokasyonIds}
+                  onChange={(value) => setTempLokasyonIds(value)}
+                  options={[
+                    { value: 85, label: "Lokasyon 85" },
+                    { value: 102, label: "Lokasyon 102" },
+                  ]}
+                />
+              </Space>
+
+              <Space direction="vertical" size={2}>
+                <Text type="secondary" strong style={{ fontSize: "12px" }}>Gider Tipi</Text>
+                <Select
+                  style={{ width: "150px" }}
+                  value={tempGiderTipi}
+                  onChange={(value) => setTempGiderTipi(value)}
+                  options={[
+                    { value: "TÜMÜ", label: "TÜMÜ" },
+                    { value: "BAKIM", label: "BAKIM" },
+                    { value: "SATINALMA", label: "SATINALMA" }
+                  ]}
+                />
+              </Space>
+
+              {/* --- UYGULA BUTONU --- */}
+              <Button 
+                type="primary" 
+                style={{ backgroundColor: "#2da44e", borderColor: "#2da44e", fontWeight: "600" }} 
+                onClick={handleApplyFilters}
+              >
+                Filtreleri Uygula
+              </Button>
+            </div>
+
             <div style={{ overflow: "auto", height: "calc(100vh - 280px)" }}>
-              {/* GRID İÇİN (YONETICI, OPERASYON, MAKINE) */}
+              {/* GRID İÇİN (YONETICI, MAKINE) */}
               {GRID_TABS.includes(activeTab) && (
                  <div className="grid-stack"></div>
               )}

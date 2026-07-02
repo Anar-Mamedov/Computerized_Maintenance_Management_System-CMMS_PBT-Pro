@@ -76,7 +76,7 @@ import ProjeYonetimListe from "./pages/ProjeYonetimi/ProjeYonetimiListe.jsx";
 import ProjeIlerleme from "./pages/ProjeYonetimi/ProjeIlerleme.jsx";
 import OtomatikKodlar from "./pages/Yonetim/OtomatikKodlar/OtomatikKodlar.jsx";
 import ServisOncelikleri from "./pages/Yonetim/ServisOncelikleri/ServisOncelikleri.jsx";
-import PersonelIzinleri from "./pages/PersonelYonetimi/PersonelIzınYonetimi/PersonelIzinleriYonetimi.jsx";
+import PersonelIzinleri from "./pages/PersonelYonetimi/PersonelIzinYonetimi/PersonelIzinleriYonetimi.jsx";
 import Amortisman from "./pages/MakineEkipman/Amortisman/Amortisman.jsx";
 import FirmaSozlesmeleri from "./pages/FirmaVeSozlesmeYonetimi/FirmaSozlesmeleri/FirmaSozlesmeleri.jsx";
 import FirmaTanimlari from "./pages/FirmaVeSozlesmeYonetimi/FirmaTanimlari/FirmaTanimlari.jsx";
@@ -246,6 +246,7 @@ export default function App() {
           }
         >
           {loginData?.KLL_WEB_DASHBOARD && <Route path="/" element={isOmega ? <YoneticiDashboard /> : <Dashboard1 />} />}
+          
           {/* <Route path="/isemri" element={<Isemri />} /> */}
           <Route path="/yonetimDashboard" element={<YoneticiDashboard />} />
           <Route path="/isEmri1" element={<IsEmri />} />

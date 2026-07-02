@@ -3,12 +3,8 @@ import { Input, Tabs, Typography } from "antd";
 import styled from "styled-components";
 import { Controller, useFormContext } from "react-hook-form";
 import { t } from "i18next";
-import OzelAlanlar from "./components/OzelAlanlar/OzelAlanlar.jsx";
-import FisIcerigi from "./components/FisIcerigi/FisIcerigi.jsx";
-import Aciklama from "./components/Aciklama/Aciklama.jsx";
-import Belgeler from "../../../Update/components/Belgeler/DosyaUpload.jsx";
-import Resim from "../../../Update/components/Resimler/Resimler.jsx";
-import IletisimBilgileri from "./components/IletisimBilgileri/IletisimBilgileri.jsx";
+import DosyaUpload from "./Belgeler/DosyaUpload";
+import Aciklama from "./Aciklama";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -68,29 +64,11 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen })
       children: <Sigorta fieldRequirements={fieldRequirements} />,
     },*/
     {
-      key: "4",
-      label: t("Detay Bilgileri"),
-      children: <FisIcerigi modalOpen={modalOpen} />,
-    },
-
-    {
-      key: "5",
-      label: t("İletişim Bilgileri"),
-      children: <IletisimBilgileri modalOpen={modalOpen} />,
-    },
-
-    {
       key: "6",
       label: t("Ekli Belgeler"),
-      children: <Belgeler modalOpen={modalOpen} />,
+      children: <DosyaUpload modalOpen={modalOpen} />,
     },
-
-    {
-      key: "7",
-      label: t("Resimler"),
-      children: <Resim modalOpen={modalOpen} />,
-    },
-
+    
     {
       key: "8",
       label: "Açıklama",

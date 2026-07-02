@@ -1,68 +1,92 @@
-import React from "react";
-import { Typography, Tag, Tooltip } from "antd";
-import { ShopOutlined, ArrowUpOutlined, ArrowDownOutlined, WarningOutlined } from "@ant-design/icons";
+import React, { useMemo, useState, useEffect } from "react";
+import { Typography, Spin, message } from "antd";
+import { ShopOutlined, WarningOutlined } from "@ant-design/icons";
+import AxiosInstance from "../../../api/http";
 
 const { Text, Title } = Typography;
 
-// Mock Veri: En Büyük 5 Tedarikçi
-const topSuppliersData = [
-  {
-    name: "Tedarikçi A",
-    amount: "₺3.150.000",
-    change: 8, // +8%
-    key: 1,
-  },
-  {
-    name: "Tedarikçi B",
-    amount: "₺2.720.000",
-    change: 5, // +5%
-    key: 2,
-  },
-  {
-    name: "Tedarikçi C",
-    amount: "₺2.120.000",
-    change: -2, // -2%
-    key: 3,
-  },
-  {
-    name: "Tedarikçi D",
-    amount: "₺1.760.000",
-    change: 4, // +4%
-    key: 4,
-  },
-  {
-    name: "Tedarikçi E",
-    amount: "₺1.440.000",
-    change: 1, // +1%
-    key: 5,
-  },
-];
+const LokasyonBazindaIsTalepleri = ({
+  baslangicTarihi = "2026-01-01T00:00:00",
+  bitisTarihi = "2026-06-26T23:59:59",
+  lokasyonIds = [],
+}) => {
+  const [apiData, setApiData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-function LokasyonBazindaIsTalepleri() {
-  
-  // Değişim oranına göre renk ve ikon belirleme fonksiyonu
-  const getChangeTag = (change) => {
-    const isPositive = change > 0;
-    return (
-      <Tag
-        color={isPositive ? "success" : "error"}
-        style={{
-          margin: 0,
-          borderRadius: "12px",
-          padding: "0 8px",
-          display: "flex",
-          alignItems: "center",
-          gap: "4px",
-          border: "none",
-          backgroundColor: isPositive ? "#f6ffed" : "#fff1f0",
-          color: isPositive ? "#389e0d" : "#cf1322",
-        }}
-      >
-        {isPositive ? <ArrowUpOutlined style={{ fontSize: "10px" }} /> : <ArrowDownOutlined style={{ fontSize: "10px" }} />}
-        <span style={{ fontWeight: "600", fontSize: "12px" }}>%{Math.abs(change)}</span>
-      </Tag>
-    );
+  // 1. API İstek Fonksiyonu
+  const fetchTopSuppliers = async () => {
+    setLoading(true);
+    try {
+      const payload = {
+        BaslangicTarihi: baslangicTarihi,
+        BitisTarihi: bitisTarihi,
+        LokasyonIds: lokasyonIds,
+      };
+
+      const response = await AxiosInstance.post("GetTopSuppliers", payload);
+
+      // API dokümanına göre liste root altındaki "data" array'inde geliyor
+      if (response?.status_code === 200 || response?.status === 200) {
+        const resData = response.data ? response.data : response;
+        setApiData(resData);
+      } else {
+        message.error("Tedarikçi verileri alınırken bir hata oluştu.");
+      }
+    } catch (error) {
+      console.error("Tedarikçi API Hatası:", error);
+      message.error("Tedarikçi verileri sunucu hatası.");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // Filtreler değiştikçe tetikle
+  useEffect(() => {
+    fetchTopSuppliers();
+  }, [baslangicTarihi, bitisTarihi, JSON.stringify(lokasyonIds)]);
+
+  // 2. Verileri İşleme ve Yoğunlaşma Riski Hesaplama
+  const { suppliersList, riskPercentage } = useMemo(() => {
+    if (!apiData || !apiData.data || apiData.data.length === 0) {
+      return { suppliersList: [], riskPercentage: 0 };
+    }
+
+    // Gelen veriyi en yüksek tutardan aşağıya doğru sıralayalım
+    const sortedData = [...apiData.data].sort((a, b) => (b.ToplamTutar || 0) - (a.ToplamTutar || 0));
+
+    // Genel toplamı ve ilk 2 firmanın toplamını bulalım
+    const generalTotal = sortedData.reduce((sum, item) => sum + (item.ToplamTutar || 0), 0);
+    const topTwoTotal = sortedData.slice(0, 2).reduce((sum, item) => sum + (item.ToplamTutar || 0), 0);
+
+    const calculatedRisk = generalTotal > 0 ? ((topTwoTotal / generalTotal) * 100).toFixed(0) : 0;
+
+    const formattedList = sortedData.map((item, index) => ({
+      key: index + 1,
+      name: item.FirmaAdi || "Bilinmeyen Tedarikçi",
+      amount: `₺${(item.ToplamTutar || 0).toLocaleString("tr-TR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
+    }));
+
+    return {
+      suppliersList: formattedList,
+      riskPercentage: calculatedRisk,
+    };
+  }, [apiData]);
+
+  if (loading) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%", minHeight: "350px", backgroundColor: "white", borderRadius: "10px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+        <Spin tip="Tedarikçi verileri yükleniyor..." />
+      </div>
+    );
+  }
+
+  if (suppliersList.length === 0) {
+    return (
+      <div style={{ padding: "20px", height: "100%", minHeight: "350px", backgroundColor: "white", borderRadius: "10px", display: "flex", justifyContent: "center", alignItems: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+        <Text type="secondary">Belirtilen tarihler arasında tedarikçi verisi bulunamadı.</Text>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -82,24 +106,12 @@ function LokasyonBazindaIsTalepleri() {
       {/* --- HEADER --- */}
       <div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <div
-            style={{
-              backgroundColor: "#fff7e6",
-              padding: "6px",
-              borderRadius: "6px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <ShopOutlined style={{ color: "#fa8c16", fontSize: "16px" }} />
-          </div>
           <Title level={4} style={{ margin: 0, color: "#1f1f1f", fontSize: "18px" }}>
-            En Büyük 5 Tedarikçi
+            En Büyük Tedarikçiler
           </Title>
         </div>
         <Text type="secondary" style={{ fontSize: "13px", display: "block", marginTop: "5px" }}>
-          Harcama yoğunlaşması ve hızlı değişim göstergesi
+          Harcama yoğunlaşması ve ana tedarikçi dağılımı
         </Text>
       </div>
 
@@ -108,14 +120,11 @@ function LokasyonBazindaIsTalepleri() {
         
         {/* Liste Başlıkları */}
         <div style={{ display: "flex", justifyContent: "space-between", padding: "0 10px 8px 10px", borderBottom: "1px solid #f0f0f0", marginBottom: "8px" }}>
-           <Text type="secondary" style={{ fontSize: "11px", fontWeight: "600" }}>TEDARİKÇİ</Text>
-           <div style={{ display: "flex", gap: "30px" }}>
-             <Text type="secondary" style={{ fontSize: "11px", fontWeight: "600" }}>TUTAR</Text>
-             <Text type="secondary" style={{ fontSize: "11px", fontWeight: "600", minWidth: "55px", textAlign:"right" }}>DEĞİŞİM</Text>
-           </div>
+          <Text type="secondary" style={{ fontSize: "11px", fontWeight: "600" }}>TEDARİKÇİ</Text>
+          <Text type="secondary" style={{ fontSize: "11px", fontWeight: "600", paddingRight: "10px" }}>TUTAR</Text>
         </div>
 
-        {topSuppliersData.map((item) => (
+        {suppliersList.map((item) => (
           <div
             key={item.key}
             style={{
@@ -130,20 +139,21 @@ function LokasyonBazindaIsTalepleri() {
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#fafafa")}
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
           >
-            {/* İsim */}
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <div style={{ width: "24px", height: "24px", borderRadius: "50%", backgroundColor: "#f0f0f0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: "bold", color: "#8c8c8c" }}>
-                    {item.key}
-                </div>
-                <Text strong style={{ color: "#434343", fontSize: "13px" }}>{item.name}</Text>
+            {/* Sıra No ve Firma İsmi */}
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, minWidth: 0 }}>
+              <div style={{ width: "24px", height: "24px", borderRadius: "50%", backgroundColor: "#f0f0f0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: "bold", color: "#8c8c8c", flexShrink: 0 }}>
+                {item.key}
+              </div>
+              <Text strong ellipsis style={{ color: "#434343", fontSize: "13px" }}>
+                {item.name}
+              </Text>
             </div>
 
-            {/* Tutar ve Değişim */}
-            <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-              <Text strong style={{ fontSize: "13px" }}>{item.amount}</Text>
-              <div style={{ minWidth: "60px", display: "flex", justifyContent: "flex-end" }}>
-                  {getChangeTag(item.change)}
-              </div>
+            {/* Tutar */}
+            <div style={{ display: "flex", alignItems: "center", paddingRight: "10px" }}>
+              <Text strong style={{ fontSize: "13px", whiteSpace: "nowrap" }}>
+                {item.amount}
+              </Text>
             </div>
           </div>
         ))}
@@ -161,21 +171,21 @@ function LokasyonBazindaIsTalepleri() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-             <WarningOutlined style={{ color: "#faad14" }} />
-             <Text style={{ fontSize: "12px", color: "#595959", fontWeight: "500" }}>
-                Yoğunlaşma riski:
-             </Text>
+          <WarningOutlined style={{ color: "#faad14" }} />
+          <Text style={{ fontSize: "12px", color: "#595959", fontWeight: "500" }}>
+            Yoğunlaşma riski:
+          </Text>
         </div>
         <Text type="secondary" style={{ fontSize: "11px", marginLeft: "20px" }}>
-            İlk 2 tedarikçi toplam harcamanın <strong style={{ color: "#595959" }}>~%31</strong>’i
+          İlk 2 tedarikçi toplam harcamanın <strong style={{ color: "#434343" }}>~%{riskPercentage}</strong>’ini oluşturuyor.
         </Text>
         
         <div style={{ marginTop: "5px", textAlign: "right" }}>
-            <a href="#" style={{ fontSize: "12px", color: "#1890ff" }}>Satınalma Detayı &rarr;</a>
+          <a href="#" style={{ fontSize: "12px", color: "#1890ff" }}>Satınalma Detayı &rarr;</a>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default LokasyonBazindaIsTalepleri;

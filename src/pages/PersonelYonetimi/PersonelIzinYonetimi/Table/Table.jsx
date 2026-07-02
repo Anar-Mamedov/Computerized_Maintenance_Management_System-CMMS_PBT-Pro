@@ -328,7 +328,7 @@ const MainTable = () => {
       title: "Personel Ad",
       dataIndex: "PersonelAd",
       key: "PersonelAd",
-      width: 120,
+      width: 250,
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
       render: (text, record) => (
@@ -344,7 +344,7 @@ const MainTable = () => {
       title: "Personel Kod",
       dataIndex: "PersonelKod",
       key: "PersonelKod",
-      width: 120,
+      width: 250,
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
       sorter: (a, b) => {
@@ -396,7 +396,7 @@ const MainTable = () => {
       visible: false, // Varsayılan olarak açık
     },
     {
-      title: "İzin Türü",
+      title: "İzin Tipi",
       dataIndex: "IzinTipClass",
       key: "IzinTipClass",
       width: 150,
@@ -414,7 +414,7 @@ const MainTable = () => {
       title: "Tarih",
       dataIndex: "TarihAraligi",
       key: "TarihAraligi",
-      width: 110,
+      width: 250,
       ellipsis: true,
       sorter: (a, b) => {
         if (a.TarihAraligi === null) return -1;
@@ -463,29 +463,44 @@ const MainTable = () => {
 
   // Intl.DateTimeFormat kullanarak tarih formatlama
   const formatDate = (date) => {
-    if (!date) return "";
+  if (!date) return "";
 
-    // Örnek bir tarih formatla ve ay formatını belirle
-    const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
-    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
+  // 1. Durum: Eğer gelen veri bir tarih aralığı ise ("2026-06-25 - 2026-06-30")
+  if (typeof date === "string" && date.includes(" - ")) {
+    const [startDate, endDate] = date.split(" - ");
+    // İki tarihi de ayrı ayrı aynı fonksiyondan geçirip birleştiriyoruz
+    return `${formatDate(startDate)} - ${formatDate(endDate)}`;
+  }
 
-    let monthFormat;
-    if (sampleFormatted.includes("January")) {
-      monthFormat = "long"; // Tam ad ("January")
-    } else if (sampleFormatted.includes("Jan")) {
-      monthFormat = "short"; // Üç harfli kısaltma ("Jan")
-    } else {
-      monthFormat = "2-digit"; // Sayısal gösterim ("01")
-    }
+  // JavaScript'in tarihi anlamlandırıp anlamlandıramayacağını kontrol edin
+  const parsedDate = new Date(date);
+  if (isNaN(parsedDate.getTime())) {
+    console.warn("Geçersiz tarih formatı algılandı:", date);
+    return date; 
+  }
 
-    // Kullanıcı için tarihi formatla
-    const formatter = new Intl.DateTimeFormat(navigator.language, {
-      year: "numeric",
-      month: monthFormat,
-      day: "2-digit",
-    });
-    return formatter.format(new Date(date));
-  };
+  // Örnek bir tarih formatla ve ay formatını belirle
+  const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
+  const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
+
+  let monthFormat;
+  if (sampleFormatted.includes("January")) {
+    monthFormat = "long"; // Tam ad ("January")
+  } else if (sampleFormatted.includes("Jan")) {
+    monthFormat = "short"; // Üç harfli kısaltma ("Jan")
+  } else {
+    monthFormat = "2-digit"; // Sayısal gösterim ("01")
+  }
+
+  // Kullanıcı için tarihi formatla
+  const formatter = new Intl.DateTimeFormat(navigator.language, {
+    year: "numeric",
+    month: monthFormat,
+    day: "2-digit",
+  });
+  
+  return formatter.format(parsedDate); 
+};
 
   const formatTime = (time) => {
     if (!time || time.trim() === "") return ""; // `trim` metodu ile baştaki ve sondaki boşlukları temizle
@@ -534,12 +549,10 @@ const MainTable = () => {
 
 // ✅ API isteği
 useEffect(() => {
-  const params = JSON.stringify({ body, currentPage, pageSize });
-  if (lastRequestRef.current === params) return;
-  lastRequestRef.current = params;
-
-  fetchEquipmentData(body, currentPage, pageSize);
-}, [body, currentPage, pageSize]);
+  // Sadece sayfa değiştiğinde veya body (kart verileri) değiştiğinde tetiklensin.
+  // Arama işlemlerini yukarıdaki debounced timeout hallediyor zaten.
+  fetchEquipmentData();
+}, [currentPage, pageSize]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
@@ -547,12 +560,15 @@ useEffect(() => {
   useEffect(() => {
   if (searchTimeout) clearTimeout(searchTimeout);
 
+  // Sayfa ilk açıldığında searchTerm "" (boş) olacağı için 
+  // ve fetchEquipmentData zaten ilk açılışta çalışacağı için burayı engelliyoruz.
+  if (searchTerm === "") return;
+
   const timeout = setTimeout(() => {
-    // burada doğru path: body.filters.Kelime
-    if (searchTerm !== body.filters.Arama) {
-      handleBodyChange("filters", { ...body.filters, Arama: searchTerm });
-      setCurrentPage(1);
-    }
+    // body.filters'ı kirletmek yerine doğrudan currentPage'i 1 yapıp 
+    // fetchEquipmentData'yı tetikleteceğiz.
+    setCurrentPage(1);
+    fetchEquipmentData(); 
   }, 2000);
 
   setSearchTimeout(timeout);
@@ -563,41 +579,42 @@ useEffect(() => {
 
  const fetchEquipmentData = useCallback(async () => {
   try {
-      setLoading(true);
-      const payload = {
-        Arama: searchTerm,
-        IzinTurId: null, // İhtiyaca göre filtreden beslenebilir
-      };
+    setLoading(true);
+    const payload = {
+      Arama: searchTerm, // Güncel arama terimi
+      IzinTurId: null,
+    };
 
-      const res = await AxiosInstance.post("GetPersonelIzinListesi", payload);
+    const res = await AxiosInstance.post("GetPersonelIzinListesi", payload);
 
-      if (res && res.has_error === false) {
-        // Özet verilerini set et
-        setBody((prevBody) => ({
-          ...prevBody,
-          ToplamIzinKaydi: res.data?.ToplamIzinKaydi || 0,
-          BelgeliKayit: res.data?.BelgeliKayit || 0,
-        }));
+    if (res && res.has_error === false) {
+      // Özet verilerini set et (Önceki state yapısını koruyarak)
+      setBody((prevBody) => ({
+        ...prevBody,
+        ToplamIzinKaydi: res.data?.ToplamIzinKaydi || 0,
+        BelgeliKayit: res.data?.BelgeliKayit || 0,
+      }));
 
-        // Liste verilerini set et
-        const list = Array.isArray(res.data?.Liste) ? res.data.Liste : [];
-        const formattedData = list.map((item) => ({
-          ...item,
-          key: item.IzinId, // Unique ID olarak IzinId kullanıldı
-        }));
+      // Liste verilerini set et
+      const list = Array.isArray(res.data?.Liste) ? res.data.Liste : [];
+      const formattedData = list.map((item) => ({
+        ...item,
+        key: item.IzinId, // Unique ID olarak IzinId kullanıldı
+      }));
 
-        setData(formattedData);
-        setTotalDataCount(list.length); // Pagination dokümanda belirtilmemişse liste uzunluğu alınır
-      } else {
-        message.error("Veriler alınırken bir hata oluştu.");
-      }
-    } catch (err) {
-      console.error(err);
-      message.error("Bağlantı hatası!");
-    } finally {
-      setLoading(false);
+      setData(formattedData);
+      setTotalDataCount(list.length);
+    } else {
+      message.error("Veriler alınırken bir hata oluştu.");
     }
-  }, [searchTerm]);
+  } catch (err) {
+    console.error(err);
+    message.error("Bağlantı hatası!");
+  } finally {
+    setLoading(false);
+  }
+}, [searchTerm, currentPage, pageSize]);
+
   // filtreleme işlemi için kullanılan useEffect
   const handleBodyChange = useCallback((type, newBody) => {
   setBody((state) => ({
@@ -1071,7 +1088,6 @@ useEffect(() => {
             onChange={(e) => setSearchTerm(e.target.value)}
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
-           <Filters kelime={searchTerm} onChange={handleBodyChange} />
           {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>

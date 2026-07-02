@@ -1,5 +1,6 @@
-import React, { useMemo } from "react";
-import { Typography } from "antd";
+import React, { useMemo, useState, useEffect } from "react";
+import { Typography, Spin, message } from "antd";
+import { useFormContext } from "react-hook-form";
 import {
   BarChart,
   Bar,
@@ -10,39 +11,144 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import AxiosInstance from "../../../api/http";
 
 const { Text, Title } = Typography;
 
-// Mock Grafik Verisi (Aylık Dağılım)
-const chartData = [
-  { name: "Oca", Yakıt: 4.2, Bakım: 1.8, Parça: 1.5, Taşeron: 1.1, Diğer: 0.6 },
-  { name: "Şub", Yakıt: 4.1, Bakım: 1.7, Parça: 1.4, Taşeron: 1.0, Diğer: 0.5 },
-  { name: "Mar", Yakıt: 4.3, Bakım: 1.9, Parça: 1.6, Taşeron: 1.2, Diğer: 0.7 },
-  { name: "Nis", Yakıt: 4.0, Bakım: 1.6, Parça: 1.3, Taşeron: 1.1, Diğer: 0.6 },
-  { name: "May", Yakıt: 4.5, Bakım: 2.0, Parça: 1.7, Taşeron: 1.3, Diğer: 0.8 },
-  { name: "Haz", Yakıt: 4.8, Bakım: 2.1, Parça: 1.8, Taşeron: 1.4, Diğer: 0.9 },
-  { name: "Tem", Yakıt: 5.0, Bakım: 2.2, Parça: 1.9, Taşeron: 1.5, Diğer: 1.0 }, // Yazın artış
-  { name: "Ağu", Yakıt: 4.9, Bakım: 2.1, Parça: 1.8, Taşeron: 1.4, Diğer: 0.8 },
-  { name: "Eyl", Yakıt: 4.4, Bakım: 1.8, Parça: 1.5, Taşeron: 1.1, Diğer: 0.6 },
-  { name: "Eki", Yakıt: 4.1, Bakım: 1.7, Parça: 1.4, Taşeron: 1.0, Diğer: 0.5 },
-  { name: "Kas", Yakıt: 3.9, Bakım: 1.5, Parça: 1.2, Taşeron: 0.9, Diğer: 0.4 },
-  { name: "Ara", Yakıt: 3.8, Bakım: 1.4, Parça: 1.1, Taşeron: 0.8, Diğer: 0.3 },
-];
+// Renk haritası (API'den gelen kategori isimlerine göre)
+const categoryColors = {
+  YAKIT: "#8884d8",
+  BAKIM: "#82ca9d",
+  PARÇA: "#ffc658",
+  TAŞERON: "#ff8042",
+  DİĞER: "#0088FE",
+};
 
-// Sol Taraf İstatistik Verileri
-const stats = [
-  { label: "Yakıt", value: "₺50.200.000", color: "#8884d8" },
-  { label: "Bakım", value: "₺21.200.000", color: "#82ca9d" },
-  { label: "Parça", value: "₺17.700.000", color: "#ffc658" },
-  { label: "Taşeron", value: "₺13.100.000", color: "#ff8042" },
-  { label: "Diğer", value: "₺7.300.000", color: "#0088FE" },
-];
+// Kategori etiketlerini düzgün göstermek için
+const categoryLabels = {
+  YAKIT: "Yakıt",
+  BAKIM: "Bakım",
+  PARÇA: "Parça",
+  TAŞERON: "Taşeron",
+  DİĞER: "Diğer",
+};
 
 const Component5 = () => {
-  // Para birimi formatlayıcı (Tooltip için)
-  const currencyFormatter = (value) => {
-    return `₺${(value * 1000000).toLocaleString("tr-TR", { maximumFractionDigits: 0 })}`;
+  const [apiData, setApiData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // --- FORM CONTEXT BAĞLANTISI ---
+  // Üst barda yönettiğimiz filtre değerlerini anlık olarak watch ediyoruz
+  const { watch } = useFormContext();
+  
+  const baslangicTarihi = watch("filtreBaslangicTarihi");
+  const bitisTarihi = watch("filtreBitisTarihi");
+  const lokasyonIds = watch("filtreLokasyonIds");
+  const giderTipi = watch("filtreGiderTipi");
+
+  // 1. API İstek Fonksiyonu
+  const fetchMonthlyCosts = async () => {
+    setLoading(true);
+    try {
+      const payload = {
+        BaslangicTarihi: baslangicTarihi,
+        BitisTarihi: bitisTarihi,
+        LokasyonIds: lokasyonIds || [],
+        GiderTipi: giderTipi || "TÜMÜ" // Dokümandaki ortak şablona göre ekledik kanka
+      };
+      
+      const response = await AxiosInstance.post("GetMonthlyCostGraph", payload);
+      
+      if (response?.status_code === 200 || response?.status === 200) {
+        const resData = response.data?.liste ? response.data : response;
+        setApiData(resData);
+      } else {
+        message.error("Maliyet verileri alınırken bir hata oluştu.");
+      }
+    } catch (error) {
+      console.error("Maliyet Grafiği API Hatası:", error);
+      message.error("Sunucuya bağlanılamadı.");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // Filtrelerden herhangi biri değiştiğinde API otomatik tekrar tetiklenir
+  useEffect(() => {
+    if (baslangicTarihi && bitisTarihi) {
+      fetchMonthlyCosts();
+    }
+  }, [baslangicTarihi, bitisTarihi, JSON.stringify(lokasyonIds), giderTipi]);
+
+  // 2. API verisini Recharts ve İstatistikler için işle
+  const { chartData, stats, totalCost, categories } = useMemo(() => {
+    if (!apiData || !apiData.liste || apiData.liste.length === 0) {
+      return { chartData: [], stats: [], totalCost: 0, categories: [] };
+    }
+
+    const processedData = [];
+    const categoryTotals = {};
+    const allCategories = new Set();
+    let grandTotal = 0;
+
+    apiData.liste.forEach((item) => {
+      const row = {
+        name: item.AyLabel,
+        year: item.Yil,
+      };
+
+      if (item.Maliyetler && Array.isArray(item.Maliyetler)) {
+        item.Maliyetler.forEach((maliyet) => {
+          const catName = maliyet.Kategori.toUpperCase();
+          const tutarDegeri = maliyet.Tutar || 0;
+
+          row[catName] = tutarDegeri;
+          allCategories.add(catName);
+
+          categoryTotals[catName] = (categoryTotals[catName] || 0) + tutarDegeri;
+          grandTotal += tutarDegeri;
+        });
+      }
+
+      processedData.push(row);
+    });
+
+    const formattedStats = Object.keys(categoryTotals).map((cat) => ({
+      label: categoryLabels[cat] || cat,
+      key: cat,
+      value: `₺${categoryTotals[cat].toLocaleString("tr-TR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
+      color: categoryColors[cat] || "#999999",
+    }));
+
+    return {
+      chartData: processedData,
+      stats: formattedStats,
+      totalCost: grandTotal,
+      categories: Array.from(allCategories),
+    };
+  }, [apiData]);
+
+  const currencyFormatter = (value) => {
+    return `₺${value.toLocaleString("tr-TR", { maximumFractionDigits: 0 })}`;
+  };
+
+  if (loading) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "350px", backgroundColor: "white", borderRadius: "10px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+        <Spin tip="Maliyet verileri yükleniyor..." />
+      </div>
+    );
+  }
+
+  if (chartData.length === 0) {
+    return (
+      <div style={{ padding: "4px 20px", height: "350px", backgroundColor: "white", borderRadius: "10px", display: "flex", justifyContent: "center", alignItems: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+        <Text type="secondary">Belirtilen kriterlerde maliyet verisi bulunamadı.</Text>
+      </div>
+    );
+  }
+
+  const activeYear = chartData[0]?.year || 2026;
 
   return (
     <div
@@ -62,7 +168,7 @@ const Component5 = () => {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
             <Title level={4} style={{ margin: 0, color: "#1f1f1f" }}>
-              Yıllık Maliyet Grafiği
+              Yıllık Maliyet Dağılımı Grafiği
             </Title>
             <Text type="secondary" style={{ fontSize: "13px" }}>
               Aylara göre maliyet dağılımı (Yakıt/Bakım/Parça/Taşeron/Diğer)
@@ -77,46 +183,43 @@ const Component5 = () => {
               color: "#595959",
             }}
           >
-            2025
+            {activeYear}
           </div>
         </div>
       </div>
 
-      {/* İÇERİK KISMI (SOL: ÖZET, SAĞ: GRAFİK) */}
+      {/* İÇERİK KISMI */}
       <div style={{ display: "flex", flex: 1, gap: "20px", minHeight: 0 }}>
         
         {/* SOL: TOPLAM VE DETAYLAR */}
-        
-        <div style={{ width: "220px", display: "flex", flexDirection: "column", gap: "15px", overflowY: "auto" }}>
-          {/* Genel Toplam Kartı */}
+        <div style={{ width: "240px", display: "flex", flexDirection: "column", gap: "15px", overflowY: "auto" }}>
           <div style={{ padding: "15px", backgroundColor: "#f9f9f9", borderRadius: "8px", borderLeft: "4px solid #1890ff" }}>
             <Text style={{ display: "block", color: "#8c8c8c", fontSize: "12px" }}>TOPLAM MALİYET</Text>
-            <Text style={{ display: "block", fontSize: "24px", fontWeight: "700", color: "#262626" }}>
-              ₺109.500.000
+            <Text style={{ display: "block", fontSize: "20px", fontWeight: "700", color: "#262626", whiteSpace: "nowrap" }}>
+              ₺{totalCost.toLocaleString("tr-TR", { maximumFractionDigits: 0 })}
             </Text>
           </div>
 
-          {/* Alt Kırılımlar Listesi */}
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             {stats.map((stat, index) => (
               <div key={index} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "8px", borderBottom: "1px solid #f0f0f0" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <div style={{ width: "10px", height: "10px", borderRadius: "50%", backgroundColor: stat.color }}></div>
+                  <div style={{ width: "10px", height: "10px", borderRadius: "50%", backgroundColor: stat.color, flexShrink: 0 }}></div>
                   <Text style={{ color: "#595959" }}>{stat.label}</Text>
                 </div>
-                <Text strong>{stat.value}</Text>
+                <Text strong style={{ fontSize: "13px" }}>{stat.value}</Text>
               </div>
             ))}
           </div>
         </div>
 
         {/* SAĞ: GRAFİK ALANI */}
-        <div style={{ flex: 1, minHeight: "250px" }}>
+        <div style={{ flex: 1, minHeight: "100%" }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={chartData}
-              margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-              barSize={20}
+              margin={{ top: 10, right: 10, left: 15, bottom: 0 }}
+              barSize={24}
             >
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e8e8e8" />
               <XAxis 
@@ -130,30 +233,34 @@ const Component5 = () => {
                 axisLine={false} 
                 tickLine={false} 
                 tick={{ fill: "#8c8c8c", fontSize: 12 }} 
-                tickFormatter={(value) => `${value}M`} 
+                tickFormatter={(value) => value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value} 
               />
               <Tooltip 
                 cursor={{ fill: "rgba(0,0,0,0.02)" }}
-                formatter={(value) => [currencyFormatter(value), ""]}
+                formatter={(value, name) => [currencyFormatter(value), categoryLabels[name] || name]}
                 contentStyle={{ borderRadius: "8px", border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}
               />
-              <Legend wrapperStyle={{ paddingTop: "10px" }} />
+              <Legend 
+                wrapperStyle={{ paddingTop: "15px" }} 
+                formatter={(value) => categoryLabels[value] || value}
+              />
               
-              {/* Stacked Barlar */}
-              <Bar dataKey="Yakıt" stackId="a" fill="#8884d8" radius={[0, 0, 4, 4]} />
-              <Bar dataKey="Bakım" stackId="a" fill="#82ca9d" />
-              <Bar dataKey="Parça" stackId="a" fill="#ffc658" />
-              <Bar dataKey="Taşeron" stackId="a" fill="#ff8042" />
-              <Bar dataKey="Diğer" stackId="a" fill="#0088FE" radius={[4, 4, 0, 0]} />
+              {categories.map((category, idx) => {
+                const isFirst = idx === 0;
+                const isLast = idx === categories.length - 1;
+                return (
+                  <Bar 
+                    key={category}
+                    dataKey={category} 
+                    stackId="a" 
+                    fill={categoryColors[category] || "#999999"} 
+                    radius={isLast ? [4, 4, 0, 0] : isFirst ? [0, 0, 4, 4] : [0, 0, 0, 0]}
+                  />
+                );
+              })}
             </BarChart>
           </ResponsiveContainer>
         </div>
-      </div>
-      
-      <div style={{ marginTop: "10px", textAlign: "right" }}>
-        <Text type="secondary" style={{ fontSize: "11px", fontStyle: "italic" }}>
-          * Not: Grafik mock veridir. Gerçekte maliyet kayıtlarından aylık toplamlar ile beslenir.
-        </Text>
       </div>
     </div>
   );
