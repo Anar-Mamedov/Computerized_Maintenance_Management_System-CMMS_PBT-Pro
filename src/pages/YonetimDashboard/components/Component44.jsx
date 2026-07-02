@@ -1,26 +1,45 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Typography, Table, Spin, message } from "antd";
-import { DashboardOutlined, RightCircleOutlined } from "@ant-design/icons";
+import { RightCircleOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../api/http";
 
 const { Text, Title } = Typography;
 
-const LokasyonBazindaIsTalepleri = ({
-  baslangicTarihi = "2026-01-01T00:00:00",
-  bitisTarihi = "2026-06-26T23:59:59",
-  lokasyonIds = [],
-}) => {
+const LokasyonBazindaIsTalepleri = () => {
   const [apiData, setApiData] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // --- GLOBAL FİLTRE DİNLEYİCİSİ ---
+  // Üst bardaki filtre değişimlerini window üzerinden yakalıyoruz kanka
+  const [globalFilters, setGlobalFilters] = useState({
+    baslangicTarihi: window.globalFilters?.baslangicTarihi || "2026-01-01T00:00:00",
+    bitisTarihi: window.globalFilters?.bitisTarihi || "2026-06-26T23:59:59",
+    lokasyonIds: window.globalFilters?.lokasyonIds || [],
+  });
+
+  useEffect(() => {
+    const handleFilterUpdate = () => {
+      if (window.globalFilters) {
+        setGlobalFilters({
+          baslangicTarihi: window.globalFilters.baslangicTarihi,
+          bitisTarihi: window.globalFilters.bitisTarihi,
+          lokasyonIds: window.globalFilters.lokasyonIds,
+        });
+      }
+    };
+
+    window.addEventListener("globalFilterChanged", handleFilterUpdate);
+    return () => window.removeEventListener("globalFilterChanged", handleFilterUpdate);
+  }, []);
 
   // 1. API İstek Fonksiyonu
   const fetchLocationPerformance = async () => {
     setLoading(true);
     try {
       const payload = {
-        BaslangicTarihi: baslangicTarihi,
-        BitisTarihi: bitisTarihi,
-        LokasyonIds: lokasyonIds,
+        BaslangicTarihi: globalFilters.baslangicTarihi,
+        BitisTarihi: globalFilters.bitisTarihi,
+        LokasyonIds: globalFilters.lokasyonIds,
       };
 
       const response = await AxiosInstance.post("GetLocationPerformanceTable", payload);
@@ -44,11 +63,12 @@ const LokasyonBazindaIsTalepleri = ({
     }
   };
 
+  // Global filtrelerden biri değiştiğinde API isteği tetiklenir kanka
   useEffect(() => {
     fetchLocationPerformance();
-  }, [baslangicTarihi, bitisTarihi, JSON.stringify(lokasyonIds)]);
+  }, [globalFilters.baslangicTarihi, globalFilters.bitisTarihi, JSON.stringify(globalFilters.lokasyonIds)]);
 
-  // Tablo Kolon Tanımlamaları - Performans odaklı yeni verilere göre esnek ayarlandı
+  // Tablo Kolon Tanımlamaları
   const columns = [
     {
       title: "Lokasyon Adı",
@@ -108,10 +128,8 @@ const LokasyonBazindaIsTalepleri = ({
       key: item.LokasyonAdi ? `${item.LokasyonAdi}-${index}` : `lokasyon-${index}`,
     }));
 
-    // Tüm lokasyonların toplam maliyetini hesapla
     const total = formatted.reduce((sum, item) => sum + (item.ToplamMaliyet || 0), 0);
 
-    // En maliyetli lokasyonu bul
     const sorted = [...formatted].sort((a, b) => (b.ToplamMaliyet || 0) - (a.ToplamMaliyet || 0));
     const highestLocationName = sorted[0]?.LokasyonAdi || "-";
 

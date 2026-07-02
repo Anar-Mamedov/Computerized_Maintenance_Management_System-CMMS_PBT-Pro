@@ -16,7 +16,6 @@ import AxiosInstance from "../../../api/http";
 
 const { Text, Title } = Typography;
 
-// Buton değerlerini API'nin beklediği string formatına doğru eşlemek için map
 const filterMapping = {
   "Tümü": null,
   "Yakıt": "YAKIT",
@@ -26,20 +25,37 @@ const filterMapping = {
   "Diğer": "DİĞER",
 };
 
-// Görseldeki dinamik bar renkleri (Sırasıyla Mor, Kırmızı, Yeşil, Mavi vb.)
 const BAR_COLORS = ["#722ed1", "#ff4d4f", "#52c41a", "#1890ff", "#faad14", "#13c2c2"];
 
-const AylikBakimMaliyetleri = ({
-  baslangicTarihi = "2026-01-01T00:00:00",
-  bitisTarihi = "2026-06-26T23:59:59",
-  lokasyonIds = [],
-}) => {
+const AylikBakimMaliyetleri = () => {
   const [searchText, setSearchText] = useState("");
   const [activeFilter, setActiveFilter] = useState("Tümü");
   const [apiData, setApiData] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Filtreleme Seçenekleri (Görseldeki gibi tam olarak yazıldı)
+  // --- GLOBAL FİLTRE DİNLEYİCİSİ ---
+  // MainDashboard'dan gelen global filtreleri yerel state'e alıyoruz kanka
+  const [globalFilters, setGlobalFilters] = useState({
+    baslangicTarihi: window.globalFilters?.baslangicTarihi || "2026-01-01T00:00:00",
+    bitisTarihi: window.globalFilters?.bitisTarihi || "2026-06-26T23:59:59",
+    lokasyonIds: window.globalFilters?.lokasyonIds || [],
+  });
+
+  useEffect(() => {
+    const handleFilterUpdate = () => {
+      if (window.globalFilters) {
+        setGlobalFilters({
+          baslangicTarihi: window.globalFilters.baslangicTarihi,
+          bitisTarihi: window.globalFilters.bitisTarihi,
+          lokasyonIds: window.globalFilters.lokasyonIds,
+        });
+      }
+    };
+
+    window.addEventListener("globalFilterChanged", handleFilterUpdate);
+    return () => window.removeEventListener("globalFilterChanged", handleFilterUpdate);
+  }, []);
+
   const filterOptions = ["Tümü", "Yakıt", "Bakım", "Parça", "Taşeron", "Diğer"];
 
   // 1. API İstek Fonksiyonu
@@ -47,9 +63,9 @@ const AylikBakimMaliyetleri = ({
     setLoading(true);
     try {
       const payload = {
-        BaslangicTarihi: baslangicTarihi,
-        BitisTarihi: bitisTarihi,
-        LokasyonIds: lokasyonIds,
+        BaslangicTarihi: globalFilters.baslangicTarihi,
+        BitisTarihi: globalFilters.bitisTarihi,
+        LokasyonIds: globalFilters.lokasyonIds,
         GiderTipi: filterMapping[activeFilter],
       };
 
@@ -74,9 +90,10 @@ const AylikBakimMaliyetleri = ({
     }
   };
 
+  // Hem kendi buton filtreleri (activeFilter) hem de üstteki global filtreler değiştiğinde tetikleniyor
   useEffect(() => {
     fetchLocationCosts();
-  }, [baslangicTarihi, bitisTarihi, JSON.stringify(lokasyonIds), activeFilter]);
+  }, [globalFilters.baslangicTarihi, globalFilters.bitisTarihi, JSON.stringify(globalFilters.lokasyonIds), activeFilter]);
 
   // 2. Recharts Grafik Verisi Hazırlama ve Filtreleme
   const chartData = useMemo(() => {
@@ -91,24 +108,6 @@ const AylikBakimMaliyetleri = ({
         value: item.ToplamTutar || 0,
       }));
   }, [apiData, searchText]);
-
-  // Grafik üzerindeki barların tepe değerlerini formatlama (Örn: 2.410.000 ₺)
-  const renderCustomizedLabel = (props) => {
-    const { x, y, width, value } = props;
-    const formattedValue = `${value.toLocaleString("tr-TR")} ₺`;
-    return (
-      <text
-        x={x + width / 2}
-        y={y - 12}
-        fill="#1f1f1f"
-        textAnchor="middle"
-        dominantBaseline="bottom"
-        style={{ fontSize: "13px", fontWeight: "700" }}
-      >
-        {formattedValue}
-      </text>
-    );
-  };
 
   return (
     <div
@@ -126,17 +125,17 @@ const AylikBakimMaliyetleri = ({
         boxSizing: "border-box",
       }}
     >
-      {/* --- HEADER (Görseldeki İkon ve Alt Metin Yapısı) --- */}
+      {/* --- HEADER --- */}
       <div style={{ flexShrink: 0, marginBottom: "8px" }}>
-          <Title level={4} style={{ margin: 0, color: "#1f1f1f", fontSize: "18px", fontWeight: "600" }}>
-            Lokasyon Bazlı Maliyet
-          </Title>
+        <Title level={4} style={{ margin: 0, color: "#1f1f1f", fontSize: "18px", fontWeight: "600" }}>
+          Lokasyon Bazlı Maliyet
+        </Title>
         <Text type="secondary" style={{ fontSize: "13px", display: "block", marginTop: "4px" }}>
           Maliyet lokasyon, makine türü (yakıt, bakım, parça, taşeron) ile dağılım
         </Text>
       </div>
 
-      {/* --- TOOLBAR (Filtre Butonları) --- */}
+      {/* --- TOOLBAR --- */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "15px", marginBottom: "4px", flexShrink: 0 }}>
         <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "4px" }}>
           {filterOptions.map((option) => (
@@ -160,56 +159,53 @@ const AylikBakimMaliyetleri = ({
       </div>
 
       {/* --- GRAFİK ALANI --- */}
-<div style={{ flex: 1, minHeight: 0, width: "100%", position: "relative" }}>
-  {loading ? (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
-      <Spin tip="Veriler güncelleniyor..." />
-    </div>
-  ) : chartData.length === 0 ? (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
-      <Text type="secondary">Maliyet verisi bulunamadı.</Text>
-    </div>
-  ) : (
-    <ResponsiveContainer width="100%" height="100%">
-      <BarChart
-        data={chartData}
-        // Alt marjı 25'e çıkararak isimlerin (Bursa, İzmir vb.) aşağıya taşmasını engelledik
-        margin={{ top: 25, right: 20, left: 20, bottom: 25 }}
-        barSize={40} // 65 çok kalın olup tabana baskı yapıyordu, ideal 40-45 arasına çektik
-      >
-        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-        <XAxis
-          dataKey="name"
-          axisLine={false}
-          tickLine={false}
-          tick={{ fill: "#595959", fontSize: 12 }}
-          dy={10} // Yazıları barın dibinden 10px aşağı kaydırır
-        />
-        {/* dataMax korumasını yumuşattık, böylece grafik tavanı zorlamayıp yukarı doğru esneyecek */}
-        <YAxis hide domain={[0, "dataMax + 5000"]} />
-        
-        <Tooltip
-          cursor={{ fill: "rgba(0,0,0,0.01)" }}
-          formatter={(value) => [`₺${value.toLocaleString("tr-TR")}`, "Maliyet"]}
-          contentStyle={{ borderRadius: "8px", border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
-        />
-        
-        <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-          {chartData.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={BAR_COLORS[index % BAR_COLORS.length]} />
-          ))}
-          {/* Custom label yerine Recharts'ın kendi performanslı yapısıyla tam barın üstüne (top) konumlandırdık */}
-          <LabelList 
-            dataKey="value" 
-            position="top"
-            offset={8} // Bar ile yazı arasındaki boşluk
-            formatter={(value) => `₺${value.toLocaleString("tr-TR")}`}
-            style={{ fontSize: "11px", fontWeight: "700", fill: "#1f1f1f" }}
-          />
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
-  )}
+      <div style={{ flex: 1, minHeight: 0, width: "100%", position: "relative" }}>
+        {loading ? (
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+            <Spin tip="Veriler güncelleniyor..." />
+          </div>
+        ) : chartData.length === 0 ? (
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+            <Text type="secondary">Maliyet verisi bulunamadı.</Text>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={chartData}
+              margin={{ top: 25, right: 20, left: 20, bottom: 25 }}
+              barSize={40}
+            >
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+              <XAxis
+                dataKey="name"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#595959", fontSize: 12 }}
+                dy={10}
+              />
+              <YAxis hide domain={[0, "dataMax + 5000"]} />
+              
+              <Tooltip
+                cursor={{ fill: "rgba(0,0,0,0.01)" }}
+                formatter={(value) => [`₺${value.toLocaleString("tr-TR")}`, "Maliyet"]}
+                contentStyle={{ borderRadius: "8px", border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
+              />
+              
+              <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={BAR_COLORS[index % BAR_COLORS.length]} />
+                ))}
+                <LabelList 
+                  dataKey="value" 
+                  position="top"
+                  offset={8}
+                  formatter={(value) => `₺${value.toLocaleString("tr-TR")}`}
+                  style={{ fontSize: "11px", fontWeight: "700", fill: "#1f1f1f" }}
+                />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );

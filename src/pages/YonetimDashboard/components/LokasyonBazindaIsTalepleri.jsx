@@ -1,26 +1,45 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Typography, Table, Tag, Spin, message } from "antd";
-import { AlertOutlined, RightCircleOutlined } from "@ant-design/icons";
+import { RightCircleOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../api/http";
 
 const { Text, Title } = Typography;
 
-const LokasyonBazindaIsTalepleri = ({
-  baslangicTarihi = "2026-01-01T00:00:00",
-  bitisTarihi = "2026-06-26T23:59:59",
-  lokasyonIds = [],
-}) => {
+const LokasyonBazindaIsTalepleri = () => {
   const [apiData, setApiData] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // --- GLOBAL FİLTRE DİNLEYİCİSİ ---
+  // Üst bardaki filtre değişimlerini window seviyesinden anlık yakalıyoruz kanka
+  const [globalFilters, setGlobalFilters] = useState({
+    baslangicTarihi: window.globalFilters?.baslangicTarihi || "2026-01-01T00:00:00",
+    bitisTarihi: window.globalFilters?.bitisTarihi || "2026-06-26T23:59:59",
+    lokasyonIds: window.globalFilters?.lokasyonIds || [],
+  });
+
+  useEffect(() => {
+    const handleFilterUpdate = () => {
+      if (window.globalFilters) {
+        setGlobalFilters({
+          baslangicTarihi: window.globalFilters.baslangicTarihi,
+          bitisTarihi: window.globalFilters.bitisTarihi,
+          lokasyonIds: window.globalFilters.lokasyonIds,
+        });
+      }
+    };
+
+    window.addEventListener("globalFilterChanged", handleFilterUpdate);
+    return () => window.removeEventListener("globalFilterChanged", handleFilterUpdate);
+  }, []);
 
   // 1. API İstek Fonksiyonu
   const fetchTopCostEquipments = async () => {
     setLoading(true);
     try {
       const payload = {
-        BaslangicTarihi: baslangicTarihi,
-        BitisTarihi: bitisTarihi,
-        LokasyonIds: lokasyonIds,
+        BaslangicTarihi: globalFilters.baslangicTarihi,
+        BitisTarihi: globalFilters.bitisTarihi,
+        LokasyonIds: globalFilters.lokasyonIds,
       };
 
       const response = await AxiosInstance.post("GetTopCostEquipments", payload);
@@ -44,11 +63,12 @@ const LokasyonBazindaIsTalepleri = ({
     }
   };
 
+  // Global filtrelerden herhangi biri değiştiğinde API isteği tekrarlanır
   useEffect(() => {
     fetchTopCostEquipments();
-  }, [baslangicTarihi, bitisTarihi, JSON.stringify(lokasyonIds)]);
+  }, [globalFilters.baslangicTarihi, globalFilters.bitisTarihi, JSON.stringify(globalFilters.lokasyonIds)]);
 
-  // Tablo Kolon Tanımlamaları - Monitör esnekliği için yüzdesel genişlikler verildi
+  // Tablo Kolon Tanımlamaları
   const columns = [
     {
       title: "Kod / Tanım",
@@ -121,10 +141,8 @@ const LokasyonBazindaIsTalepleri = ({
       key: item.EkipmanKodu ? `${item.EkipmanKodu}-${index}` : `ekipman-${index}`,
     }));
 
-    // Toplam maliyeti hesapla
     const total = formatted.reduce((sum, item) => sum + (item.ToplamMaliyet || 0), 0);
 
-    // En yüksek maliyetli ekipmanı bul (Sıralı gelmeme ihtimaline karşı kontrol)
     const sorted = [...formatted].sort((a, b) => (b.ToplamMaliyet || 0) - (a.ToplamMaliyet || 0));
     const highestName = sorted[0] ? `${sorted[0].EkipmanKodu} (${sorted[0].EkipmanTanimi})` : "-";
 
@@ -141,7 +159,7 @@ const LokasyonBazindaIsTalepleri = ({
         width: "100%",
         height: "430px",
         minHeight: "100%",
-        maxHeight: "calc(100vh - 40px)", // Farklı ekranlarda viewport yüksekliğine tam uyum sağlar
+        maxHeight: "calc(100vh - 40px)",
         backgroundColor: "white",
         borderRadius: "10px",
         padding: "20px",
@@ -163,7 +181,6 @@ const LokasyonBazindaIsTalepleri = ({
       </div>
 
       {/* --- TABLE CONTENT --- */}
-      {/* Esnek orta katman: flex: 1 sayesinde alt ve üst alanları sabit tutup, kalan tüm alanı monitöre göre doldurur */}
       <div style={{ flex: 1, position: "relative", width: "100%" }}>
         {loading ? (
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
@@ -176,7 +193,6 @@ const LokasyonBazindaIsTalepleri = ({
             pagination={false}
             size="middle"
             rowKey="key"
-            // İçerideki tablo dikey scroll alanını dinamik bırakır, başlıklar çakılı kalır
             scroll={{ y: 220 }}
             style={{ height: "100%" }}
             locale={{ emptyText: "Belirtilen kriterlerde ekipman maliyet kaydı bulunamadı." }}

@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { Typography, Progress, Tooltip, Spin, message } from "antd";
-import { RightCircleOutlined, PieChartOutlined } from "@ant-design/icons";
+import { RightCircleOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../api/http";
 
 const { Text, Title } = Typography;
@@ -23,22 +23,41 @@ const categoryLabels = {
   DİĞER: "Diğer",
 };
 
-const PersonelKPITablosu = ({
-  baslangicTarihi = "2026-01-01T00:00:00",
-  bitisTarihi = "2026-06-26T23:59:59",
-  lokasyonIds = [],
-}) => {
+const PersonelKPITablosu = () => {
   const [apiData, setApiData] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // --- GLOBAL FİLTRE DİNLEYİCİSİ ---
+  // Kanka, pencere seviyesindeki global filtreleri state'e bağlıyoruz
+  const [globalFilters, setGlobalFilters] = useState({
+    baslangicTarihi: window.globalFilters?.baslangicTarihi || "2026-01-01T00:00:00",
+    bitisTarihi: window.globalFilters?.bitisTarihi || "2026-06-26T23:59:59",
+    lokasyonIds: window.globalFilters?.lokasyonIds || [],
+  });
+
+  useEffect(() => {
+    const handleFilterUpdate = () => {
+      if (window.globalFilters) {
+        setGlobalFilters({
+          baslangicTarihi: window.globalFilters.baslangicTarihi,
+          bitisTarihi: window.globalFilters.bitisTarihi,
+          lokasyonIds: window.globalFilters.lokasyonIds,
+        });
+      }
+    };
+
+    window.addEventListener("globalFilterChanged", handleFilterUpdate);
+    return () => window.removeEventListener("globalFilterChanged", handleFilterUpdate);
+  }, []);
 
   // 1. API İstek Fonksiyonu
   const fetchCostDistribution = async () => {
     setLoading(true);
     try {
       const payload = {
-        BaslangicTarihi: baslangicTarihi,
-        BitisTarihi: bitisTarihi,
-        LokasyonIds: lokasyonIds,
+        BaslangicTarihi: globalFilters.baslangicTarihi,
+        BitisTarihi: globalFilters.bitisTarihi,
+        LokasyonIds: globalFilters.lokasyonIds,
       };
 
       const response = await AxiosInstance.post("GetCostDistribution", payload);
@@ -57,23 +76,21 @@ const PersonelKPITablosu = ({
     }
   };
 
-  // Filtreler değiştikçe tetikle
+  // Global filtrelerden biri değiştiğinde API tetiklenir kanka
   useEffect(() => {
     fetchCostDistribution();
-  }, [baslangicTarihi, bitisTarihi, JSON.stringify(lokasyonIds)]);
+  }, [globalFilters.baslangicTarihi, globalFilters.bitisTarihi, JSON.stringify(globalFilters.lokasyonIds)]);
 
   // 2. Verileri İşleme ve Yüzde Hesaplama Bölümü
   const costDistributionData = useMemo(() => {
     if (!apiData || !apiData.liste || apiData.liste.length === 0) return [];
 
-    // Önce genel toplamı bulalım ki yüzdeleri hesaplayabilelim
     const total = apiData.liste.reduce((sum, item) => sum + (item.ToplamTutar || 0), 0);
-
     if (total === 0) return [];
 
     return apiData.liste.map((item) => {
       const gTip = item.GiderTipi.toUpperCase();
-      const pct = ((item.ToplamTutar / total) * 100).toFixed(1); // Virgülden sonra tek hane (%45.8 gibi)
+      const pct = ((item.ToplamTutar / total) * 100).toFixed(1);
 
       return {
         name: categoryLabels[gTip] || item.GiderTipi,
@@ -81,7 +98,7 @@ const PersonelKPITablosu = ({
         percentage: parseFloat(pct),
         color: categoryColors[gTip] || "#8c8c8c",
       };
-    }).sort((a, b) => b.percentage - a.percentage); // En yüksek paya sahip olanı en üste getirir
+    }).sort((a, b) => b.percentage - a.percentage);
   }, [apiData]);
 
   if (loading) {
@@ -123,7 +140,7 @@ const PersonelKPITablosu = ({
           </Title>
         </div>
         <Text type="secondary" style={{ fontSize: "13px", display: "block", marginTop: "5px" }}>
-          Ana maliyet kalemlerinin toplam içindeki ayı ve hızlı karşılaştırma
+          Ana maliyet kalemlerinin toplam içindeki payı ve hızlı karşılaştırma
         </Text>
       </div>
 
@@ -131,7 +148,6 @@ const PersonelKPITablosu = ({
       <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: "18px", paddingRight: "5px" }}>
         {costDistributionData.map((item, index) => (
           <div key={index}>
-            {/* Üst Satır: İsim ve Tutar */}
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
               <Text strong style={{ color: "#434343", fontSize: "14px" }}>
                 {item.name}
@@ -141,7 +157,6 @@ const PersonelKPITablosu = ({
               </Text>
             </div>
 
-            {/* Orta: Progress Bar */}
             <Tooltip title={`Toplam içindeki payı: %${item.percentage}`}>
               <Progress
                 percent={item.percentage}
@@ -153,7 +168,6 @@ const PersonelKPITablosu = ({
               />
             </Tooltip>
 
-            {/* Alt Satır: Yüzdelik Pay */}
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
               <Text type="secondary" style={{ fontSize: "12px" }}>
                 Pay: <span style={{ color: item.color, fontWeight: "600" }}>%{item.percentage}</span>

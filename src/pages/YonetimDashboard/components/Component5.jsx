@@ -37,28 +37,38 @@ const Component5 = () => {
   const [apiData, setApiData] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // --- FORM CONTEXT BAĞLANTISI ---
-  // Üst barda yönettiğimiz filtre değerlerini anlık olarak watch ediyoruz
-  const { watch } = useFormContext();
-  
-  const baslangicTarihi = watch("filtreBaslangicTarihi");
-  const bitisTarihi = watch("filtreBitisTarihi");
-  const lokasyonIds = watch("filtreLokasyonIds");
-  const giderTipi = watch("filtreGiderTipi");
+  // Filtreleri yerel state'e taşıyoruz
+  const [filters, setFilters] = useState({
+    baslangicTarihi: window.globalFilters?.baslangicTarihi || "2026-01-01T00:00:00",
+    bitisTarihi: window.globalFilters?.bitisTarihi || "2026-06-26T23:59:59",
+    lokasyonIds: window.globalFilters?.lokasyonIds || [],
+    giderTipi: window.globalFilters?.giderTipi || "TÜMÜ",
+  });
 
-  // 1. API İstek Fonksiyonu
+  // Event Listener ile üst barda filtre uygulandığında state'i güncelle
+  useEffect(() => {
+    const handleFilterUpdate = () => {
+      if (window.globalFilters) {
+        setFilters({ ...window.globalFilters });
+      }
+    };
+
+    window.addEventListener("globalFilterChanged", handleFilterUpdate);
+    return () => window.removeEventListener("globalFilterChanged", handleFilterUpdate);
+  }, []);
+
+  // API İstek Fonksiyonu
   const fetchMonthlyCosts = async () => {
     setLoading(true);
     try {
       const payload = {
-        BaslangicTarihi: baslangicTarihi,
-        BitisTarihi: bitisTarihi,
-        LokasyonIds: lokasyonIds || [],
-        GiderTipi: giderTipi || "TÜMÜ" // Dokümandaki ortak şablona göre ekledik kanka
+        BaslangicTarihi: filters.baslangicTarihi,
+        BitisTarihi: filters.bitisTarihi,
+        LokasyonIds: filters.lokasyonIds,
+        GiderTipi: filters.giderTipi
       };
       
       const response = await AxiosInstance.post("GetMonthlyCostGraph", payload);
-      
       if (response?.status_code === 200 || response?.status === 200) {
         const resData = response.data?.liste ? response.data : response;
         setApiData(resData);
@@ -67,18 +77,17 @@ const Component5 = () => {
       }
     } catch (error) {
       console.error("Maliyet Grafiği API Hatası:", error);
-      message.error("Sunucuya bağlanılamadı.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Filtrelerden herhangi biri değiştiğinde API otomatik tekrar tetiklenir
+  // Filtrelerden herhangi biri değiştiğinde API tetiklenir
   useEffect(() => {
-    if (baslangicTarihi && bitisTarihi) {
+    if (filters.baslangicTarihi && filters.bitisTarihi) {
       fetchMonthlyCosts();
     }
-  }, [baslangicTarihi, bitisTarihi, JSON.stringify(lokasyonIds), giderTipi]);
+  }, [filters.baslangicTarihi, filters.bitisTarihi, JSON.stringify(filters.lokasyonIds), filters.giderTipi]);
 
   // 2. API verisini Recharts ve İstatistikler için işle
   const { chartData, stats, totalCost, categories } = useMemo(() => {

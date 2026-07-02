@@ -219,7 +219,9 @@ function MainDashboard() {
   const [reorganize, setReorganize] = useState();
   const [updateApi, setUpdateApi] = useState(false);
   const [activeTab, setActiveTab] = useState("yonetici"); 
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
+  const [lokasyonOptions, setLokasyonOptions] = useState([]);
+const [lokasyonLoading, setLoadingLokasyon] = useState(false);
 
   const [checkedWidgets, setCheckedWidgets] = useState({
     widget1: false, widget2: false, widget3: false, widget4: false,
@@ -261,13 +263,54 @@ function MainDashboard() {
 
   const getCurrentStorageKey = () => `${selectedDashboard || "dashboard"}_${activeTab}`;
 
-  const handleApplyFilters = () => {
-    // Geçici statelerdeki verileri topluca ana form state'ine basıp tetikliyoruz
-    setValue("filtreBaslangicTarihi", tempDates ? tempDates[0].startOf('day').format("YYYY-MM-DDTHH:mm:ss") : "2026-01-01T00:00:00", { shouldValidate: true });
-    setValue("filtreBitisTarihi", tempDates ? tempDates[1].endOf('day').format("YYYY-MM-DDTHH:mm:ss") : "2026-06-26T23:59:59", { shouldValidate: true });
-    setValue("filtreLokasyonIds", tempLokasyonIds, { shouldValidate: true });
-    setValue("filtreGiderTipi", tempGiderTipi, { shouldValidate: true });
+  const fetchLokasyonListesi = async () => {
+  setLoadingLokasyon(true);
+  try {
+    const response = await AxiosInstance.get("GetLocations");
+    const resData = response.data || response;
+
+    if (Array.isArray(resData)) {
+      // array sırasını (index) ID olarak kullanıyoruz
+      const mappedOptions = resData.map((lokasyonAdi, index) => ({
+        value: index,        // API'ye ve state'e gidecek ID (0, 1, 2...)
+        label: lokasyonAdi,   // Ekranda kullanıcının göreceği isim
+      }));
+      setLokasyonOptions(mappedOptions);
+    }
+  } catch (error) {
+    console.error("Lokasyon listesi çekilirken hata oluştu kanka:", error);
+  } finally {
+    setLoadingLokasyon(false);
   }
+};
+
+// Bileşen ilk açıldığında lokasyonları doldur
+useEffect(() => {
+  fetchLokasyonListesi();
+}, []);
+
+  const handleApplyFilters = () => {
+  const baslangic = tempDates ? tempDates[0].startOf('day').format("YYYY-MM-DDTHH:mm:ss") : "2026-01-01T00:00:00";
+  const bitis = tempDates ? tempDates[1].endOf('day').format("YYYY-MM-DDTHH:mm:ss") : "2026-06-26T23:59:59";
+  const lokasyonlar = tempLokasyonIds;
+  const gider = tempGiderTipi;
+
+  // Ana form state'ine yazım
+  setValue("filtreBaslangicTarihi", baslangic, { shouldValidate: true });
+  setValue("filtreBitisTarihi", bitis, { shouldValidate: true });
+  setValue("filtreLokasyonIds", lokasyonlar, { shouldValidate: true });
+  setValue("filtreGiderTipi", gider, { shouldValidate: true });
+
+  // --- GRID ALTINDAKİ BAĞIMSIZ COMPONENTLER İÇİN WINDOW EVENTİ ---
+  window.globalFilters = {
+    baslangicTarihi: baslangic,
+    bitisTarihi: bitis,
+    lokasyonIds: lokasyonlar,
+    giderTipi: gider
+  };
+  // Custom event tetikliyoruz ki componentler filtrenin değiştiğini anlasın
+  window.dispatchEvent(new Event("globalFilterChanged"));
+};
 
   const fetchSummaryCards = async () => {
     console.log("API İsteği atılıyor... Tab:", activeTab); 
@@ -630,20 +673,23 @@ function MainDashboard() {
               </Space>
 
               <Space direction="vertical" size={2}>
-                <Text type="secondary" strong style={{ fontSize: "12px" }}>Lokasyonlar</Text>
-                <Select
-                  mode="multiple"
-                  style={{ width: "220px" }}
-                  placeholder="Tüm Lokasyonlar"
-                  maxTagCount="responsive"
-                  value={tempLokasyonIds}
-                  onChange={(value) => setTempLokasyonIds(value)}
-                  options={[
-                    { value: 85, label: "Lokasyon 85" },
-                    { value: 102, label: "Lokasyon 102" },
-                  ]}
-                />
-              </Space>
+  <Text type="secondary" strong style={{ fontSize: "12px" }}>Lokasyonlar</Text>
+  <Select
+    mode="multiple"
+    style={{ width: "220px" }}
+    placeholder="Tüm Lokasyonlar"
+    maxTagCount="responsive"
+    loading={lokasyonLoading}
+    value={tempLokasyonIds}
+    onChange={(value) => setTempLokasyonIds(value)} // Buraya artık sadece index array'i gelir
+    options={lokasyonOptions}
+    allowClear
+    showSearch
+    filterOption={(input, option) =>
+      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+    }
+  />
+</Space>
 
               <Space direction="vertical" size={2}>
                 <Text type="secondary" strong style={{ fontSize: "12px" }}>Gider Tipi</Text>
