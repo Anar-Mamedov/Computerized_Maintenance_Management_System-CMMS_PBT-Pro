@@ -29,7 +29,7 @@ const SectionLabel = ({ children }) => (
   </div>
 );
 
-export default function ContextMenu({ selectedRows, refreshTableData, onayCheck }) {
+export default function ContextMenu({ selectedRows, refreshTableData, onayCheck, onOpenControlList }) {
   const [visible, setVisible] = useState(false);
 
   const handleVisibleChange = (v) => setVisible(v);
@@ -90,7 +90,9 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
             {showIleriTarihePlanla && <IleriTarihePlanla selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
             {showAtolyeTransferi && <AtolyeTransferi selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
             {showNotEkle && <NotEkle selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
-            {showKapat && <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />}
+            {showKapat && (
+              <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} hidePopover={hidePopover} onOpenControlList={onOpenControlList} />
+            )}
           </>
         )}
 

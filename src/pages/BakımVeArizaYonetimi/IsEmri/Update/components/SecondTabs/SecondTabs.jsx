@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Tabs } from "antd";
 import { useFormContext } from "react-hook-form";
 import DetayBilgiler from "./components/DetayBilgiler/DetayBilgiler";
@@ -17,9 +17,9 @@ import AxiosInstance from "../../../../../../api/http";
 import Forms from "./components/KapamaBilgileri/Forms.jsx";
 import DisServis from "./components/DisServis/DisServis";
 
-export default function SecondTabs({ refreshKey, fieldRequirements, assignmentRequestKey }) {
+export default function SecondTabs({ fieldRequirements, assignmentRequestKey, initialActiveTabKey }) {
   const { watch } = useFormContext();
-  const [activeTabKey, setActiveTabKey] = useState("1"); // Default to the first tab
+  const [activeTabKey, setActiveTabKey] = useState(initialActiveTabKey || "1"); // Default to the first tab
   const [dataCount, setDataCount] = useState([]);
 
   // Modify the onChange handler to update the active tab state
@@ -30,6 +30,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements, assignmentRe
   const kapali = watch("kapali");
 
   const secilenIsEmriID = watch("secilenIsEmriID");
+  const controlListRequestKey = watch("controlListRequestKey");
 
   const fetchData = async () => {
     try {
@@ -52,6 +53,18 @@ export default function SecondTabs({ refreshKey, fieldRequirements, assignmentRe
       setActiveTabKey("3");
     }
   }, [assignmentRequestKey]);
+
+  useEffect(() => {
+    if (initialActiveTabKey) {
+      setActiveTabKey(initialActiveTabKey);
+    }
+  }, [initialActiveTabKey]);
+
+  useEffect(() => {
+    if (controlListRequestKey) {
+      setActiveTabKey("2");
+    }
+  }, [controlListRequestKey]);
 
   const items = [
     {
@@ -138,7 +151,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements, assignmentRe
       case "1":
         return fieldRequirements?.IMT_DETAY_TAB || true;
       case "2":
-        return fieldRequirements?.IMT_KONTROL_TAB;
+        return fieldRequirements?.IMT_KONTROL_TAB || controlListRequestKey > 0 || initialActiveTabKey === "2";
       case "3":
         return fieldRequirements?.IMT_PERSONEL_TAB;
       case "4":

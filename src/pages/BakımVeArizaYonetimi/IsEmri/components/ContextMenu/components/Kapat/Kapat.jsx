@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, message, Typography, Alert } from "antd";
+import { Button, Modal, message, Alert } from "antd";
 import { StopOutlined } from "@ant-design/icons";
 import Forms from "./components/Forms";
-import { Controller, useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import AxiosInstance from "../../../../../../../api/http";
 import dayjs from "dayjs";
 import MenuItem from "../MenuItem";
+import { t } from "i18next";
 
-const { Text } = Typography;
-
-export default function Iptal({ selectedRows, refreshTableData, kapatDisabled }) {
+export default function Iptal({ selectedRows, refreshTableData, kapatDisabled, hidePopover, onOpenControlList }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [errorMessageShow, setErrorMessageShow] = useState(false);
+  const [controlWarningModalOpen, setControlWarningModalOpen] = useState(false);
+  const [pendingCloseCheckResult, setPendingCloseCheckResult] = useState(null);
   const methods = useForm({
     defaultValues: {
       baslamaTarihi: null,
@@ -34,7 +35,7 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
       // Add other default values here
     },
   });
-  const { setValue, reset, handleSubmit } = methods;
+  const { setValue, reset } = methods;
 
   useEffect(() => {
     if (isModalOpen && selectedRows.length === 1) {
@@ -85,6 +86,56 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
     15: "Nedeni",
     16: "Referans No",
     17: "Makine Durumu",
+  };
+
+  const buildCloseValidationError = (response) => {
+    let errorMsg = "";
+    if (response.TextArray && response.TextArray.length > 0) {
+      errorMsg += `${response.TextArray.join(",\n")}, `;
+    }
+    if (response.Idlist && response.Idlist.length > 0) {
+      const words = response.Idlist.map((id) => idToWordMap[id] || "Bilinmeyen ID");
+      errorMsg += `${words.join(",\n")}, `;
+    }
+    if (response.IsmIsNotPersonelTimeSet === true) {
+      errorMsg += `Ekli Personele Süre Atanmamış`;
+    }
+    return errorMsg;
+  };
+
+  const openCloseModalWithCheckResult = (response) => {
+    if (response.Durum === false) {
+      setErrorMessageShow(true);
+      setErrorMessage(buildCloseValidationError(response));
+      setDisabled(true);
+    } else if (response.Durum === true) {
+      setErrorMessageShow(false);
+      setDisabled(false);
+      reset();
+    } else {
+      message.error("İşlem Başarısız.");
+      return;
+    }
+
+    setIsModalOpen(true);
+  };
+
+  const handleGoToControlList = () => {
+    setControlWarningModalOpen(false);
+    setPendingCloseCheckResult(null);
+    hidePopover?.();
+    onOpenControlList?.(selectedRows[0]);
+  };
+
+  const handleContinueCloseDespiteControl = () => {
+    if (!pendingCloseCheckResult) {
+      setControlWarningModalOpen(false);
+      return;
+    }
+
+    setControlWarningModalOpen(false);
+    openCloseModalWithCheckResult(pendingCloseCheckResult);
+    setPendingCloseCheckResult(null);
   };
 
   const onSubmited = (data) => {
@@ -219,39 +270,25 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
   };
 
   const handleModalToggle = () => {
-    if (!isModalOpen) {
-      reset();
+    if (isModalOpen) {
+      setIsModalOpen(false);
+      return;
     }
+
+    reset();
+
     if (selectedRows.length === 1) {
       AxiosInstance.get(`CheckIsmFieldsForClose?isEmriId=${selectedRows[0].key}`)
         .then((response) => {
           console.log("Data sent successfully:", response);
 
-          if (response.Durum === false) {
-            setErrorMessageShow(true);
-            let errorMsg = "";
-            if (response.TextArray && response.TextArray.length > 0) {
-              errorMsg += `${response.TextArray.join(",\n")}, `;
-            }
-            if (response.Idlist && response.Idlist.length > 0) {
-              const words = response.Idlist.map((id) => idToWordMap[id] || "Bilinmeyen ID");
-              errorMsg += `${words.join(",\n")}, `;
-            }
-            if (response.IsmIsNotPersonelTimeSet === true) {
-              errorMsg += `Ekli Personele Süre Atanmamış`;
-            }
-            setErrorMessage(errorMsg);
-            setDisabled(true);
-          } else if (response.Durum === true) {
-            setErrorMessageShow(false);
-            setDisabled(false);
-            if (!isModalOpen) {
-              reset();
-            }
-          } else {
-            message.error("İşlem Başarısız.");
+          if (response.KontrolDurum === true && onOpenControlList) {
+            setPendingCloseCheckResult(response);
+            setControlWarningModalOpen(true);
+            return;
           }
-          setIsModalOpen((prev) => !prev);
+
+          openCloseModalWithCheckResult(response);
         })
         .catch((error) => {
           // Handle errors here, e.g.:
@@ -333,6 +370,24 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
               showIcon
             /> */}
           </form>
+        </Modal>
+        <Modal
+          title={t("isEmriKapatma.kontrolUyariBaslik")}
+          centered
+          zIndex={2200}
+          open={controlWarningModalOpen}
+          closable={false}
+          maskClosable={false}
+          footer={[
+            <Button key="control-list" onClick={handleGoToControlList}>
+              {t("isEmriKapatma.kontroleGit")}
+            </Button>,
+            <Button key="continue-close" danger type="primary" onClick={handleContinueCloseDespiteControl}>
+              {t("isEmriKapatma.yineDeKapat")}
+            </Button>,
+          ]}
+        >
+          <Alert message={t("isEmriKapatma.tamamlanmamisKontrolUyari")} type="warning" showIcon />
         </Modal>
       </div>
     </FormProvider>
