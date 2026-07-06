@@ -163,6 +163,24 @@ const ControlListWrapper = styled.div`
     box-shadow: 0 2px 5px rgba(18, 38, 63, 0.08);
   }
 
+  .control-list-status-completed .ant-select-selector {
+    border-color: #b7ebc6 !important;
+    background: #f0fff4 !important;
+    color: #15803d !important;
+  }
+
+  .control-list-status-pending .ant-select-selector {
+    border-color: #fecaca !important;
+    background: #fff5f5 !important;
+    color: #b42318 !important;
+  }
+
+  .control-list-status-completed .ant-select-selection-item,
+  .control-list-status-pending .ant-select-selection-item {
+    color: inherit !important;
+    font-weight: 600;
+  }
+
   .control-result-note {
     margin-top: 16px;
     padding: 16px;
@@ -378,17 +396,22 @@ export default function KontrolListesiTablo({ isActive }) {
       dataIndex: "DKN_YAPILDI",
       key: "DKN_YAPILDI",
       width: 170,
-      render: (text, record) => (
-        <Select
-          className="control-list-status"
-          value={normalizeChecklistStatus(text)}
-          disabled={kapali}
-          style={{ width: "100%" }}
-          options={getStatusOptions()}
-          onClick={(event) => event.stopPropagation()}
-          onChange={(value) => handleStatusChange(record, value)}
-        />
-      ),
+      render: (text, record) => {
+        const status = normalizeChecklistStatus(text);
+        const statusClassName = status === 1 ? "control-list-status-completed" : "control-list-status-pending";
+
+        return (
+          <Select
+            className={`control-list-status ${statusClassName}`}
+            value={status}
+            disabled={kapali}
+            style={{ width: "100%" }}
+            options={getStatusOptions()}
+            onClick={(event) => event.stopPropagation()}
+            onChange={(value) => handleStatusChange(record, value)}
+          />
+        );
+      },
     },
     {
       title: t("workOrder.controlList.personnel"),

@@ -15,7 +15,7 @@ import QRCodeGenerator from "../../../../utils/components/QRCodeGenerator";
 
 dayjs.extend(customParseFormat);
 
-export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
+export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh, initialSecondTabKey }) {
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [open, setOpen] = useState(drawerVisible);
@@ -28,6 +28,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   const [closeModalDisabled, setCloseModalDisabled] = useState(false);
   const [closeErrorMessage, setCloseErrorMessage] = useState("");
   const [closeErrorMessageShow, setCloseErrorMessageShow] = useState(false);
+  const [controlWarningModalOpen, setControlWarningModalOpen] = useState(false);
+  const [pendingCloseValidationResult, setPendingCloseValidationResult] = useState(null);
   // API'den gelen zorunluluk bilgilerini simüle eden bir örnek
   const [fieldRequirements, setFieldRequirements] = React.useState({
     // Varsayılan olarak zorunlu değil
@@ -516,6 +518,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     setCloseModalDisabled(false);
     setCloseErrorMessage("");
     setCloseErrorMessageShow(false);
+    setControlWarningModalOpen(false);
+    setPendingCloseValidationResult(null);
     setAssignmentRequestKey(0);
     onRefresh();
     methods.reset();
@@ -656,8 +660,9 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   const checkRequiredFieldsBeforeClose = async (isEmriId, { showMessages = true } = {}) => {
     try {
       const response = await AxiosInstance.get(`CheckIsmFieldsForClose?isEmriId=${isEmriId}`);
+      const hasIncompleteControl = response?.KontrolDurum === true;
       if (response?.Durum === true) {
-        return { canClose: true, errorMessage: "" };
+        return { canClose: true, errorMessage: "", hasIncompleteControl };
       }
 
       let errorMessage = "";
@@ -688,11 +693,43 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           message.error(t("isEmriKapatma.personelSureEksikMesaj"));
         }
       }
-      return { canClose: false, errorMessage: errorMessage.trim() };
+      return { canClose: false, errorMessage: errorMessage.trim(), hasIncompleteControl };
     } catch (error) {
       showRequestError(error);
-      return { canClose: false, errorMessage: "" };
+      return { canClose: false, errorMessage: "", hasIncompleteControl: false };
     }
+  };
+
+  const openCloseModalWithValidationResult = (validationResult) => {
+    setCloseModalDisabled(false);
+    setCloseErrorMessage("");
+    setCloseErrorMessageShow(false);
+
+    if (validationResult && !validationResult.canClose) {
+      setCloseModalDisabled(true);
+      setCloseErrorMessage(validationResult.errorMessage);
+      setCloseErrorMessageShow(true);
+    }
+
+    setCloseModalOpen(true);
+  };
+
+  const handleGoToControlList = () => {
+    setControlWarningModalOpen(false);
+    setPendingCloseValidationResult(null);
+    setValue("controlListRequestKey", (methods.getValues("controlListRequestKey") || 0) + 1);
+  };
+
+  const handleContinueCloseDespiteControl = () => {
+    const validationResult = pendingCloseValidationResult || {
+      canClose: true,
+      errorMessage: "",
+      hasIncompleteControl: false,
+    };
+
+    setControlWarningModalOpen(false);
+    setPendingCloseValidationResult(null);
+    openCloseModalWithValidationResult(validationResult);
   };
 
   const buildCloseBody = (data, isEmriId) => {
@@ -838,11 +875,13 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
     if (isEmriId) {
       const validationResult = await checkRequiredFieldsBeforeClose(isEmriId, { showMessages: false });
-      if (!validationResult.canClose) {
-        setCloseModalDisabled(true);
-        setCloseErrorMessage(validationResult.errorMessage);
-        setCloseErrorMessageShow(true);
+      if (validationResult.hasIncompleteControl) {
+        setPendingCloseValidationResult(validationResult);
+        setControlWarningModalOpen(true);
+        return;
       }
+      openCloseModalWithValidationResult(validationResult);
+      return;
     }
 
     setCloseModalOpen(true);
@@ -865,16 +904,18 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       setCloseErrorMessage("");
       setCloseErrorMessageShow(false);
 
+      let validationResult = { canClose: true, errorMessage: "", hasIncompleteControl: false };
       if (isEmriId) {
-        const validationResult = await checkRequiredFieldsBeforeClose(isEmriId, { showMessages: false });
-        if (!validationResult.canClose) {
-          setCloseModalDisabled(true);
-          setCloseErrorMessage(validationResult.errorMessage);
-          setCloseErrorMessageShow(true);
-        }
+        validationResult = await checkRequiredFieldsBeforeClose(isEmriId, { showMessages: false });
       }
 
-      setCloseModalOpen(true);
+      if (validationResult.hasIncompleteControl) {
+        setPendingCloseValidationResult(validationResult);
+        setControlWarningModalOpen(true);
+        return;
+      }
+
+      openCloseModalWithValidationResult(validationResult);
     } finally {
       setActionLoading(false);
     }
@@ -981,7 +1022,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           ) : (
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <MainTabs disabled={disabled} isDisabled={isDisabled} fieldRequirements={fieldRequirements} />
-              <SecondTabs disabled={disabled} fieldRequirements={fieldRequirements} assignmentRequestKey={assignmentRequestKey} />
+              <SecondTabs disabled={disabled} fieldRequirements={fieldRequirements} assignmentRequestKey={assignmentRequestKey} initialActiveTabKey={initialSecondTabKey} />
               <Footer />
             </form>
           )}
@@ -1033,6 +1074,25 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           ]}
         >
           <CloseForms isModalOpen={closeModalOpen} selectedRows={selectedRow ? [selectedRow] : []} />
+        </Modal>
+
+        <Modal
+          title={t("isEmriKapatma.kontrolUyariBaslik")}
+          centered
+          zIndex={2200}
+          open={controlWarningModalOpen}
+          closable={false}
+          maskClosable={false}
+          footer={[
+            <Button key="control-list" onClick={handleGoToControlList}>
+              {t("isEmriKapatma.kontroleGit")}
+            </Button>,
+            <Button key="continue-close" danger type="primary" onClick={handleContinueCloseDespiteControl}>
+              {t("isEmriKapatma.yineDeKapat")}
+            </Button>,
+          ]}
+        >
+          <Alert message={t("isEmriKapatma.tamamlanmamisKontrolUyari")} type="warning" showIcon />
         </Modal>
       </ConfigProvider>
     </FormProvider>

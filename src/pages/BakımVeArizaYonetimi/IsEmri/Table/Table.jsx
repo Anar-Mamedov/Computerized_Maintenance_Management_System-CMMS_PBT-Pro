@@ -176,6 +176,7 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
   const [drawer, setDrawer] = useState({
     visible: false,
     data: null,
+    initialSecondTabKey: null,
   });
   const [selectedRows, setSelectedRows] = useState([]);
   const [xlsxLoading, setXlsxLoading] = useState(false);
@@ -184,9 +185,14 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
   const [noteModalOpen, setNoteModalOpen] = useState(false);
   const [noteModalRow, setNoteModalRow] = useState(null);
   const currentLang = localStorage.getItem("i18nextLng") || "en";
-  const handleOpenEditDrawer = useCallback((isEmriId) => {
+  const handleOpenEditDrawer = useCallback((isEmriId, initialSecondTabKey = null) => {
     if (!isEmriId) return;
-    setDrawer({ visible: true, data: { key: isEmriId } });
+    setDrawer({ visible: true, data: { key: isEmriId }, initialSecondTabKey });
+  }, []);
+
+  const handleOpenControlList = useCallback((row) => {
+    if (!row?.key) return;
+    setDrawer({ visible: true, data: row, initialSecondTabKey: "2" });
   }, []);
 
   const formatKpiNumber = useCallback(
@@ -1442,7 +1448,7 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
   // };
 
   const onRowClick = (record) => {
-    setDrawer({ visible: true, data: record });
+    setDrawer({ visible: true, data: record, initialSecondTabKey: null });
   };
 
   const refreshTableData = useCallback(() => {
@@ -2010,7 +2016,7 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
           <Button style={{ display: "flex", alignItems: "center" }} onClick={handleDownloadXLSX} loading={xlsxLoading} icon={<SiMicrosoftexcel />}>
             İndir
           </Button>
-          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} />
+          <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} onayCheck={onayCheck} onOpenControlList={handleOpenControlList} />
           <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} onOpenEdit={handleOpenEditDrawer} />
         </div>
       </div>
@@ -2078,7 +2084,13 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
           )}
         </div>
       </Spin>
-      <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ ...drawer, visible: false })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
+      <EditDrawer
+        selectedRow={drawer.data}
+        onDrawerClose={() => setDrawer({ ...drawer, visible: false, initialSecondTabKey: null })}
+        drawerVisible={drawer.visible}
+        onRefresh={refreshTableData}
+        initialSecondTabKey={drawer.initialSecondTabKey}
+      />
 
       {editDrawer1Visible && (
         <EditDrawer1
