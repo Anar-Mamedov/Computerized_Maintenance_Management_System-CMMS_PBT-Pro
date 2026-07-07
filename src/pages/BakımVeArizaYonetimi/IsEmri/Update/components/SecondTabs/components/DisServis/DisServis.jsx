@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Button, Input, InputNumber, DatePicker, Typography, Checkbox } from "antd";
+import React from "react";
+import { Button, Input, InputNumber, Typography, Checkbox } from "antd";
 
 const { TextArea } = Input;
 import { Controller, useFormContext } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import FirmaTablo from "../DetayBilgiler/components/FirmaTablo";
 import SozlesmeTablo from "../DetayBilgiler/components/SozlesmeTablo";
+import FullDatePicker from "../../../../../../../../utils/components/FullDatePicker";
 
 const { Text } = Typography;
 
@@ -20,20 +22,12 @@ const StyledDivBottomLine = styled.div`
 `;
 
 export default function DisServis({ fieldRequirements }) {
+  const { t } = useTranslation();
   const {
     control,
     setValue,
     formState: { errors },
   } = useFormContext();
-
-  const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY");
-
-  useEffect(() => {
-    const dateFormatter = new Intl.DateTimeFormat(navigator.language);
-    const sampleDate = new Date(2021, 10, 21);
-    const formattedSampleDate = dateFormatter.format(sampleDate);
-    setLocaleDateFormat(formattedSampleDate.replace("2021", "YYYY").replace("21", "DD").replace("11", "MM"));
-  }, []);
 
   const handleFirmaMinusClick = () => {
     setValue("firma", "");
@@ -133,13 +127,12 @@ export default function DisServis({ fieldRequirements }) {
                 rules={{ required: fieldRequirements?.evrakNo ? "Alan Boş Bırakılamaz!" : false }}
                 render={({ field }) => <InputNumber {...field} min={0} status={errors.evrakNo ? "error" : ""} style={{ width: "145px" }} />}
               />
-              <Controller
-                name="evrakTarihi"
-                control={control}
+              <FullDatePicker
+                name1="evrakTarihi"
                 rules={{ required: fieldRequirements?.evrakTarihi ? "Alan Boş Bırakılamaz!" : false }}
-                render={({ field }) => (
-                  <DatePicker {...field} status={errors.evrakTarihi ? "error" : ""} style={{ width: "145px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />
-                )}
+                style={{ flex: "none", width: "145px" }}
+                placeholder={t("workOrder.detail.selectDate")}
+                showError={false}
               />
               {errors.evrakTarihi && <div style={{ color: "red", marginTop: "5px" }}>{errors.evrakTarihi.message}</div>}
             </div>
