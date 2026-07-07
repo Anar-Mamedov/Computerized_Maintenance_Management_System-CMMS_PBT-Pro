@@ -1,11 +1,14 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Button, Modal, Input, Typography, Tabs, DatePicker, TimePicker, Slider, InputNumber, message } from "antd";
+import React, { useEffect, useRef, useState } from "react";
+import { Button, Modal, Input, Typography, Tabs, Slider, InputNumber, message } from "antd";
 import { ClockCircleOutlined } from "@ant-design/icons";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import dayjs from "dayjs";
 import { useAppContext } from "../../../../../../../../AppContext"; // Context hook'unu import edin
 import AxiosInstance from "../../../../../../../../api/http";
+import FullDatePicker from "../../../../../../../../utils/components/FullDatePicker";
+import FullTimePicker from "../../../../../../../../utils/components/FullTimePicker";
 import ProsedurTablo from "./components/ProsedurTablo";
 import ProsedurTipi from "./components/ProsedurTipi";
 import ProsedurNedeni from "./components/ProsedurNedeni";
@@ -43,6 +46,7 @@ function usePrevious(value) {
 // iş emri selectboxu sayfa ilk defa render olduğunda prosedür ve sonraki 3 fieldin değerlerini sıfırlamasın diye ilk renderdeki durumu tutması için son
 
 export default function DetayBilgiler({ fieldRequirements }) {
+  const { t } = useTranslation();
   const {
     control,
     watch,
@@ -52,8 +56,6 @@ export default function DetayBilgiler({ fieldRequirements }) {
   } = useFormContext();
   const { selectedOption } = useAppContext(); // Context'ten seçilen opsiyonu al iş emri tipi selectboxu değiştiğinde prosedürü sıfırlaması için
   const previousSelectedOption = usePrevious(selectedOption); // Önceki seçilen opsiyonu al iş emri tipi selectboxu değiştiğinde prosedürü sıfırlaması için
-  const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
-  const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const [baslamaZamaniEditPermission, setBaslamaZamaniEditPermission] = useState(false);
   const [bitisZamaniEditPermission, setBitisZamaniEditPermission] = useState(false);
 
@@ -135,32 +137,6 @@ export default function DetayBilgiler({ fieldRequirements }) {
     setValue("proje", "");
     setValue("projeID", "");
   };
-
-  // date picker için tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
-
-  // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın
-
-  useEffect(() => {
-    // Format the date based on the user's locale
-    const dateFormatter = new Intl.DateTimeFormat(navigator.language);
-    const sampleDate = new Date(2021, 10, 21);
-    const formattedSampleDate = dateFormatter.format(sampleDate);
-    setLocaleDateFormat(formattedSampleDate.replace("2021", "YYYY").replace("21", "DD").replace("11", "MM"));
-
-    // Format the time based on the user's locale
-    const timeFormatter = new Intl.DateTimeFormat(navigator.language, {
-      hour: "numeric",
-      minute: "numeric",
-    });
-    const sampleTime = new Date(2021, 10, 21, 13, 45); // Use a sample time, e.g., 13:45
-    const formattedSampleTime = timeFormatter.format(sampleTime);
-
-    // Check if the formatted time contains AM/PM, which implies a 12-hour format
-    const is12HourFormat = /AM|PM/.test(formattedSampleTime);
-    setLocaleTimeFormat(is12HourFormat ? "hh:mm A" : "HH:mm");
-  }, []);
-
-  // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın sonu
 
   //! Başlama Tarihi ve saati ile Bitiş Tarihi ve saati arasındaki farkı hesaplama
 
@@ -794,7 +770,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     color: "#0062ff",
                   }}
                 >
-                  Çalışma Süresi
+                  {t("workOrder.detail.workDuration")}
                 </Text>
               </div>
 
@@ -815,7 +791,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     fontWeight: fieldRequirements.planlananBaslama ? "600" : "normal",
                   }}
                 >
-                  Planlanan Başlama:
+                  {t("workOrder.detail.plannedStart")}:
                 </Text>
                 <div
                   style={{
@@ -828,43 +804,24 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     width: "100%",
                   }}
                 >
-                  <Controller
-                    name="planlananBaslama"
-                    control={control}
-                    rules={{
-                      required: fieldRequirements.planlananBaslama ? "Alan Boş Bırakılamaz!" : false,
-                    }}
-                    render={({ field, fieldState: { error } }) => (
-                      <DatePicker
-                        {...field}
-                        status={errors.planlananBaslama ? "error" : ""}
-                        // disabled={!isDisabled}
-                        style={{ width: "180px" }}
-                        format={localeDateFormat}
-                        placeholder="Tarih seçiniz"
-                      />
-                    )}
+                  <FullDatePicker
+                    name1="planlananBaslama"
+                    isRequired={fieldRequirements.planlananBaslama}
+                    placeholder={t("workOrder.detail.selectDate")}
+                    showError={false}
+                    style={{ flex: "0 0 auto", width: "180px" }}
                   />
-                  <Controller
-                    name="planlananBaslamaSaati"
-                    control={control}
-                    rules={{
-                      required: fieldRequirements.planlananBaslama ? "Alan Boş Bırakılamaz!" : false,
-                    }}
-                    render={({ field, fieldState: { error } }) => (
-                      <TimePicker
-                        {...field}
-                        changeOnScroll
-                        needConfirm={false}
-                        status={errors.planlananBaslama ? "error" : ""}
-                        // disabled={!isDisabled}
-                        style={{ width: "110px" }}
-                        format={localeTimeFormat}
-                        placeholder="Saat seçiniz"
-                      />
-                    )}
+                  <FullTimePicker
+                    name1="planlananBaslamaSaati"
+                    isRequired={fieldRequirements.planlananBaslama}
+                    changeOnScroll
+                    placeholder={t("workOrder.detail.selectTime")}
+                    showError={false}
+                    style={{ flex: "0 0 auto", width: "110px" }}
                   />
-                  {errors.planlananBaslama && <div style={{ color: "red", marginTop: "5px" }}>{errors.planlananBaslama.message}</div>}
+                  {(errors.planlananBaslama || errors.planlananBaslamaSaati) && (
+                    <div style={{ color: "red", marginTop: "5px" }}>{(errors.planlananBaslama || errors.planlananBaslamaSaati).message}</div>
+                  )}
                 </div>
               </div>
               <div
@@ -884,7 +841,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     fontWeight: fieldRequirements.planlananBitis ? "600" : "normal",
                   }}
                 >
-                  Planlanan Bitiş:
+                  {t("workOrder.detail.plannedEnd")}:
                 </Text>
                 <div
                   style={{
@@ -897,43 +854,24 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     width: "100%",
                   }}
                 >
-                  <Controller
-                    name="planlananBitis"
-                    control={control}
-                    rules={{
-                      required: fieldRequirements.planlananBitis ? "Alan Boş Bırakılamaz!" : false,
-                    }}
-                    render={({ field, fieldState: { error } }) => (
-                      <DatePicker
-                        {...field}
-                        status={errors.planlananBitis ? "error" : ""}
-                        // disabled={!isDisabled}
-                        style={{ width: "180px" }}
-                        format={localeDateFormat}
-                        placeholder="Tarih seçiniz"
-                      />
-                    )}
+                  <FullDatePicker
+                    name1="planlananBitis"
+                    isRequired={fieldRequirements.planlananBitis}
+                    placeholder={t("workOrder.detail.selectDate")}
+                    showError={false}
+                    style={{ flex: "0 0 auto", width: "180px" }}
                   />
-                  <Controller
-                    name="planlananBitisSaati"
-                    control={control}
-                    rules={{
-                      required: fieldRequirements.planlananBitis ? "Alan Boş Bırakılamaz!" : false,
-                    }}
-                    render={({ field, fieldState: { error } }) => (
-                      <TimePicker
-                        {...field}
-                        changeOnScroll
-                        needConfirm={false}
-                        status={errors.planlananBitis ? "error" : ""}
-                        // disabled={!isDisabled}
-                        style={{ width: "110px" }}
-                        format={localeTimeFormat}
-                        placeholder="Saat seçiniz"
-                      />
-                    )}
+                  <FullTimePicker
+                    name1="planlananBitisSaati"
+                    isRequired={fieldRequirements.planlananBitis}
+                    changeOnScroll
+                    placeholder={t("workOrder.detail.selectTime")}
+                    showError={false}
+                    style={{ flex: "0 0 auto", width: "110px" }}
                   />
-                  {errors.planlananBitis && <div style={{ color: "red", marginTop: "5px" }}>{errors.planlananBitis.message}</div>}
+                  {(errors.planlananBitis || errors.planlananBitisSaati) && (
+                    <div style={{ color: "red", marginTop: "5px" }}>{(errors.planlananBitis || errors.planlananBitisSaati).message}</div>
+                  )}
                 </div>
               </div>
               <div
@@ -953,7 +891,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     fontWeight: fieldRequirements.baslamaZamani ? "600" : "normal",
                   }}
                 >
-                  Başlama Zamanı:
+                  {t("workOrder.detail.startTime")}:
                 </Text>
                 <div
                   style={{
@@ -967,50 +905,31 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                    <Controller
-                      name="baslamaZamani"
-                      control={control}
-                      rules={{
-                        required: fieldRequirements.baslamaZamani ? "Alan Boş Bırakılamaz!" : false,
-                      }}
-                      render={({ field, fieldState: { error } }) => (
-                        <DatePicker
-                          {...field}
-                          disabled={!baslamaZamaniEditPermission}
-                          status={errors.baslamaZamani ? "error" : ""}
-                          // disabled={!isDisabled}
-                          style={{ width: "145px" }}
-                          format={localeDateFormat}
-                          placeholder="Tarih seçiniz"
-                        />
-                      )}
+                    <FullDatePicker
+                      name1="baslamaZamani"
+                      isRequired={fieldRequirements.baslamaZamani}
+                      disabled={!baslamaZamaniEditPermission}
+                      placeholder={t("workOrder.detail.selectDate")}
+                      showError={false}
+                      style={{ flex: "0 0 auto", width: "145px" }}
                     />
-                    <Controller
-                      name="baslamaZamaniSaati"
-                      control={control}
-                      rules={{
-                        required: fieldRequirements.baslamaZamaniSaati ? "Alan Boş Bırakılamaz!" : false,
-                      }}
-                      render={({ field, fieldState: { error } }) => (
-                        <TimePicker
-                          {...field}
-                          disabled={!baslamaZamaniEditPermission}
-                          changeOnScroll
-                          needConfirm={false}
-                          status={errors.baslamaZamaniSaati ? "error" : ""}
-                          // disabled={!isDisabled}
-                          style={{ width: "100px" }}
-                          format={localeTimeFormat}
-                          placeholder="Saat seçiniz"
-                        />
-                      )}
+                    <FullTimePicker
+                      name1="baslamaZamaniSaati"
+                      isRequired={fieldRequirements.baslamaZamaniSaati}
+                      disabled={!baslamaZamaniEditPermission}
+                      changeOnScroll
+                      placeholder={t("workOrder.detail.selectTime")}
+                      showError={false}
+                      style={{ flex: "0 0 auto", width: "100px" }}
                     />
 
                     <Button type="primary" onClick={setBaslamaZamani}>
                       <ClockCircleOutlined />
                     </Button>
                   </div>
-                  {errors.baslamaZamaniSaati && <div style={{ color: "red", marginTop: "5px" }}>{errors.baslamaZamaniSaati.message}</div>}
+                  {(errors.baslamaZamani || errors.baslamaZamaniSaati) && (
+                    <div style={{ color: "red", marginTop: "5px" }}>{(errors.baslamaZamani || errors.baslamaZamaniSaati).message}</div>
+                  )}
                 </div>
               </div>
               <div
@@ -1030,7 +949,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     fontWeight: fieldRequirements.bitisZamani ? "600" : "normal",
                   }}
                 >
-                  Bitiş Zamanı:
+                  {t("workOrder.detail.endTime")}:
                 </Text>
                 <div
                   style={{
@@ -1044,49 +963,30 @@ export default function DetayBilgiler({ fieldRequirements }) {
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                    <Controller
-                      name="bitisZamani"
-                      control={control}
-                      rules={{
-                        required: fieldRequirements.bitisZamani ? "Alan Boş Bırakılamaz!" : false,
-                      }}
-                      render={({ field, fieldState: { error } }) => (
-                        <DatePicker
-                          {...field}
-                          disabled={!bitisZamaniEditPermission}
-                          status={errors.bitisZamani ? "error" : ""}
-                          // disabled={!isDisabled}
-                          style={{ width: "145px" }}
-                          format={localeDateFormat}
-                          placeholder="Tarih seçiniz"
-                        />
-                      )}
+                    <FullDatePicker
+                      name1="bitisZamani"
+                      isRequired={fieldRequirements.bitisZamani}
+                      disabled={!bitisZamaniEditPermission}
+                      placeholder={t("workOrder.detail.selectDate")}
+                      showError={false}
+                      style={{ flex: "0 0 auto", width: "145px" }}
                     />
-                    <Controller
-                      name="bitisZamaniSaati"
-                      control={control}
-                      rules={{
-                        required: fieldRequirements.bitisZamaniSaati ? "Alan Boş Bırakılamaz!" : false,
-                      }}
-                      render={({ field, fieldState: { error } }) => (
-                        <TimePicker
-                          {...field}
-                          disabled={!bitisZamaniEditPermission}
-                          changeOnScroll
-                          needConfirm={false}
-                          status={errors.bitisZamaniSaati ? "error" : ""}
-                          // disabled={!isDisabled}
-                          style={{ width: "100px" }}
-                          format={localeTimeFormat}
-                          placeholder="Saat seçiniz"
-                        />
-                      )}
+                    <FullTimePicker
+                      name1="bitisZamaniSaati"
+                      isRequired={fieldRequirements.bitisZamaniSaati}
+                      disabled={!bitisZamaniEditPermission}
+                      changeOnScroll
+                      placeholder={t("workOrder.detail.selectTime")}
+                      showError={false}
+                      style={{ flex: "0 0 auto", width: "100px" }}
                     />
                     <Button type="primary" onClick={setBitisZamani} disabled={!baslamaZamani || !baslamaZamaniSaati}>
                       <ClockCircleOutlined />
                     </Button>
                   </div>
-                  {errors.bitisZamaniSaati && <div style={{ color: "red", marginTop: "5px" }}>{errors.bitisZamaniSaati.message}</div>}
+                  {(errors.bitisZamani || errors.bitisZamaniSaati) && (
+                    <div style={{ color: "red", marginTop: "5px" }}>{(errors.bitisZamani || errors.bitisZamaniSaati).message}</div>
+                  )}
                 </div>
               </div>
               <div
@@ -1107,7 +1007,7 @@ export default function DetayBilgiler({ fieldRequirements }) {
                     fontWeight: fieldRequirements.calismaSuresi ? "600" : "normal",
                   }}
                 >
-                  Çalışma Süresi (sa-dk):
+                  {t("workOrder.detail.workDurationShort")}:
                 </Text>
                 <div
                   style={{

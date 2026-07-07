@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Drawer, Typography, Button, Input, Select, DatePicker, TimePicker, Row, Col, Checkbox, ColorPicker } from "antd";
+import { Drawer, Typography, Button, Input, Select, Row, Col, Checkbox, ColorPicker } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
 import dayjs from "dayjs";
@@ -10,6 +11,8 @@ import IsEmriTipiSelect from "./components/IsEmriTipiSelect";
 import MakineDurumu from "./components/MakineDurumu";
 import MakineTablo from "../../../../../../utils/components/Machina/MakineTablo";
 import EkipmanTablo from "../../../../../../utils/components/EkipmanTablo";
+import FullDatePicker from "../../../../../../utils/components/FullDatePicker";
+import FullTimePicker from "../../../../../../utils/components/FullTimePicker";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -60,9 +63,8 @@ const StyledDivMedia = styled.div`
 `;
 
 export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) {
-  const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
-  const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const [duzenlemeZamaniEditPermission, setDuzenlemeZamaniEditPermission] = useState(false);
+  const { t } = useTranslation();
   const {
     control,
     watch,
@@ -72,16 +74,16 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
 
   // duzenlenmeTarihi ve duzenlenmeSaati alanlarının boş ve ye sistem tarih ve saatinden büyük olup olmadığını kontrol etmek için bir fonksiyon
 
-  const validateDateTime = (value) => {
+  const validateDateTime = () => {
     const date = watch("duzenlenmeTarihi");
     const time = watch("duzenlenmeSaati");
     if (!date || !time) {
-      return "Alan Boş Bırakılamaz!";
+      return t("workOrder.validation.required");
     }
     const currentTime = dayjs();
     const inputDateTime = dayjs(`${dayjs(date).format("YYYY-MM-DD")} ${dayjs(time).format("HH:mm")}`);
     if (inputDateTime.isAfter(currentTime)) {
-      return "Düzenlenme tarihi ve saati mevcut tarih ve saatten büyük olamaz";
+      return t("workOrder.validation.arrangementDateTimeFuture");
     }
     return true;
   };
@@ -181,68 +183,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
     return formatter.format(new Date(date));
   };
 
-  const formatTime = (time) => {
-    if (!time || time.trim() === "") return ""; // `trim` metodu ile baştaki ve sondaki boşlukları temizle
-
-    try {
-      // Saati ve dakikayı parçalara ayır, boşlukları temizle
-      const [hours, minutes] = time
-        .trim()
-        .split(":")
-        .map((part) => part.trim());
-
-      // Saat ve dakika değerlerinin geçerliliğini kontrol et
-      const hoursInt = parseInt(hours, 10);
-      const minutesInt = parseInt(minutes, 10);
-      if (isNaN(hoursInt) || isNaN(minutesInt) || hoursInt < 0 || hoursInt > 23 || minutesInt < 0 || minutesInt > 59) {
-        throw new Error("Invalid time format");
-      }
-
-      // Geçerli tarih ile birlikte bir Date nesnesi oluştur ve sadece saat ve dakika bilgilerini ayarla
-      const date = new Date();
-      date.setHours(hoursInt, minutesInt, 0);
-
-      // Kullanıcının lokal ayarlarına uygun olarak saat ve dakikayı formatla
-      // `hour12` seçeneğini belirtmeyerek Intl.DateTimeFormat'ın kullanıcının yerel ayarlarına göre otomatik seçim yapmasına izin ver
-      const formatter = new Intl.DateTimeFormat(navigator.language, {
-        hour: "numeric",
-        minute: "2-digit",
-        // hour12 seçeneği burada belirtilmiyor; böylece otomatik olarak kullanıcının sistem ayarlarına göre belirleniyor
-      });
-
-      // Formatlanmış saati döndür
-      return formatter.format(date);
-    } catch (error) {
-      console.error("Error formatting time:", error);
-      return ""; // Hata durumunda boş bir string döndür
-    }
-  };
-
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
-
-  // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın
-
-  useEffect(() => {
-    // Format the date based on the user's locale
-    const dateFormatter = new Intl.DateTimeFormat(navigator.language);
-    const sampleDate = new Date(2021, 10, 21);
-    const formattedSampleDate = dateFormatter.format(sampleDate);
-    setLocaleDateFormat(formattedSampleDate.replace("2021", "YYYY").replace("21", "DD").replace("11", "MM"));
-
-    // Format the time based on the user's locale
-    const timeFormatter = new Intl.DateTimeFormat(navigator.language, {
-      hour: "numeric",
-      minute: "numeric",
-    });
-    const sampleTime = new Date(2021, 10, 21, 13, 45); // Use a sample time, e.g., 13:45
-    const formattedSampleTime = timeFormatter.format(sampleTime);
-
-    // Check if the formatted time contains AM/PM, which implies a 12-hour format
-    const is12HourFormat = /AM|PM/.test(formattedSampleTime);
-    setLocaleTimeFormat(is12HourFormat ? "hh:mm A" : "HH:mm");
-  }, []);
-
-  // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın sonu
 
   useEffect(() => {
     try {
@@ -361,7 +302,7 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
               justifyContent: "space-between",
             }}
           >
-            <Text style={{ fontSize: "14px", fontWeight: "600" }}>Düzenlenme:</Text>
+            <Text style={{ fontSize: "14px", fontWeight: "600" }}>{t("workOrder.main.arrangementDateTime")}:</Text>
             <div
               style={{
                 display: "flex",
@@ -373,43 +314,22 @@ export default function MainTabs({ drawerOpen, isDisabled, fieldRequirements }) 
                 width: "100%",
               }}
             >
-              <Controller
-                name="duzenlenmeTarihi"
-                control={control}
+              <FullDatePicker
+                name1="duzenlenmeTarihi"
                 rules={{ validate: validateDateTime }}
-                render={({ field, fieldState: { error } }) => (
-                  <DatePicker
-                    {...field}
-                    disabled={!duzenlemeZamaniEditPermission}
-                    status={error ? "error" : ""}
-                    style={{ width: "180px" }}
-                    format={localeDateFormat}
-                    placeholder="Tarih seçiniz"
-                  />
-                )}
+                disabled={!duzenlemeZamaniEditPermission}
+                style={{ flex: "none", width: "180px" }}
+                placeholder={t("workOrder.detail.selectDate")}
+                showError={false}
               />
-              {/*{errors.duzenlenmeTarihi && (*/}
-              {/*  <div style={{ color: "red" }}>*/}
-              {/*    {errors.duzenlenmeTarihi.message}*/}
-              {/*  </div>*/}
-              {/*)}*/}
-
-              <Controller
-                name="duzenlenmeSaati"
-                control={control}
+              <FullTimePicker
+                name1="duzenlenmeSaati"
                 rules={{ validate: validateDateTime }}
-                render={({ field, fieldState: { error } }) => (
-                  <TimePicker
-                    {...field}
-                    disabled={!duzenlemeZamaniEditPermission}
-                    changeOnScroll
-                    needConfirm={false}
-                    status={error ? "error" : ""}
-                    style={{ width: "110px" }}
-                    format={localeTimeFormat}
-                    placeholder="Saat seçiniz"
-                  />
-                )}
+                disabled={!duzenlemeZamaniEditPermission}
+                changeOnScroll
+                style={{ flex: "none", width: "110px" }}
+                placeholder={t("workOrder.detail.selectTime")}
+                showError={false}
               />
               {errors.duzenlenmeSaati && <div style={{ color: "red" }}>{errors.duzenlenmeSaati.message}</div>}
             </div>

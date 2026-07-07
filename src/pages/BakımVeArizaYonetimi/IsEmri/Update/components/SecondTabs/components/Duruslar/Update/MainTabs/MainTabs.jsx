@@ -366,7 +366,7 @@ export default function MainTabs() {
               marginBottom: "10px",
             }}
           >
-            <Text style={{ fontSize: "14px" }}>Başlangıç Zamanı:</Text>
+            <Text style={{ fontSize: "14px" }}>{t("workOrder.detail.startTime")}:</Text>
             <div
               style={{
                 display: "flex",
@@ -378,10 +378,10 @@ export default function MainTabs() {
               }}
             >
               <div style={{ width: "150px" }}>
-                <FullDatePicker name1="baslangicTarihi" placeholder="" disabledDate={disableDatesAfter(bitisTarihi)} inputReadOnly />
+                <FullDatePicker name1="baslangicTarihi" placeholder={t("workOrder.detail.selectDate")} disabledDate={disableDatesAfter(bitisTarihi)} />
               </div>
               <div style={{ width: "110px" }}>
-                <FullTimePicker name1="baslangicSaati" disabledTime={getDisabledBaslangicTime} inputReadOnly changeOnScroll />
+                <FullTimePicker name1="baslangicSaati" disabledTime={getDisabledBaslangicTime} changeOnScroll placeholder={t("workOrder.detail.selectTime")} />
               </div>
             </div>
           </div>
@@ -397,7 +397,7 @@ export default function MainTabs() {
               marginBottom: "10px",
             }}
           >
-            <Text style={{ fontSize: "14px" }}>Bitiş Zamanı:</Text>
+            <Text style={{ fontSize: "14px" }}>{t("workOrder.detail.endTime")}:</Text>
             <div
               style={{
                 display: "flex",
@@ -409,10 +409,10 @@ export default function MainTabs() {
               }}
             >
               <div style={{ width: "150px" }}>
-                <FullDatePicker name1="bitisTarihi" placeholder="" disabledDate={disableDatesBefore(baslangicTarihi)} inputReadOnly />
+                <FullDatePicker name1="bitisTarihi" placeholder={t("workOrder.detail.selectDate")} disabledDate={disableDatesBefore(baslangicTarihi)} />
               </div>
               <div style={{ width: "110px" }}>
-                <FullTimePicker name1="bitisSaati" disabledTime={getDisabledBitisTime} inputReadOnly changeOnScroll />
+                <FullTimePicker name1="bitisSaati" disabledTime={getDisabledBitisTime} changeOnScroll placeholder={t("workOrder.detail.selectTime")} />
               </div>
             </div>
           </div>

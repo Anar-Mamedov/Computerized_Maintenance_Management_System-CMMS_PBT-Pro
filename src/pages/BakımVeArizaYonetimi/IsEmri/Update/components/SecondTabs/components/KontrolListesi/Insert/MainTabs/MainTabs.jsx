@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Button, Modal, Input, Typography, DatePicker, TimePicker, InputNumber, Select } from "antd";
+import React, { useCallback, useEffect } from "react";
+import { Button, Modal, Input, Typography, InputNumber, Select } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
@@ -8,6 +8,8 @@ import SertifikaTipi from "./components/SertifikaTipi";
 import AtolyeTablo from "./components/AtolyeTablo";
 import PersonelTablo from "./components/PersonelTablo";
 import VardiyaSelect from "./components/VardiyaSelect";
+import FullDatePicker from "../../../../../../../../../../utils/components/FullDatePicker.jsx";
+import FullTimePicker from "../../../../../../../../../../utils/components/FullTimePicker.jsx";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -24,8 +26,6 @@ const StyledDivBottomLine = styled.div`
 
 export default function MainTabs() {
   const { t } = useTranslation();
-  const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
-  const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const { control, watch, setValue } = useFormContext();
 
   const yapildi = Number(watch("yapildi") || 0);
@@ -60,94 +60,6 @@ export default function MainTabs() {
       clearYapildi();
     }
   }, [isStatusActive, clearYapildi]);
-
-  // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için
-
-  // Intl.DateTimeFormat kullanarak tarih formatlama
-  const formatDate = (date) => {
-    if (!date) return "";
-
-    // Örnek bir tarih formatla ve ay formatını belirle
-    const sampleDate = new Date(2021, 0, 21); // Ocak ayı için örnek bir tarih
-    const sampleFormatted = new Intl.DateTimeFormat(navigator.language).format(sampleDate);
-
-    let monthFormat;
-    if (sampleFormatted.includes("January")) {
-      monthFormat = "long"; // Tam ad ("January")
-    } else if (sampleFormatted.includes("Jan")) {
-      monthFormat = "short"; // Üç harfli kısaltma ("Jan")
-    } else {
-      monthFormat = "2-digit"; // Sayısal gösterim ("01")
-    }
-
-    // Kullanıcı için tarihi formatla
-    const formatter = new Intl.DateTimeFormat(navigator.language, {
-      year: "numeric",
-      month: monthFormat,
-      day: "2-digit",
-    });
-    return formatter.format(new Date(date));
-  };
-
-  const formatTime = (time) => {
-    if (!time || time.trim() === "") return ""; // `trim` metodu ile baştaki ve sondaki boşlukları temizle
-
-    try {
-      // Saati ve dakikayı parçalara ayır, boşlukları temizle
-      const [hours, minutes] = time
-        .trim()
-        .split(":")
-        .map((part) => part.trim());
-
-      // Saat ve dakika değerlerinin geçerliliğini kontrol et
-      const hoursInt = parseInt(hours, 10);
-      const minutesInt = parseInt(minutes, 10);
-      if (isNaN(hoursInt) || isNaN(minutesInt) || hoursInt < 0 || hoursInt > 23 || minutesInt < 0 || minutesInt > 59) {
-        throw new Error("Invalid time format");
-      }
-
-      // Geçerli tarih ile birlikte bir Date nesnesi oluştur ve sadece saat ve dakika bilgilerini ayarla
-      const date = new Date();
-      date.setHours(hoursInt, minutesInt, 0);
-
-      // Kullanıcının lokal ayarlarına uygun olarak saat ve dakikayı formatla
-      // `hour12` seçeneğini belirtmeyerek Intl.DateTimeFormat'ın kullanıcının yerel ayarlarına göre otomatik seçim yapmasına izin ver
-      const formatter = new Intl.DateTimeFormat(navigator.language, {
-        hour: "numeric",
-        minute: "2-digit",
-        // hour12 seçeneği burada belirtilmiyor; böylece otomatik olarak kullanıcının sistem ayarlarına göre belirleniyor
-      });
-
-      // Formatlanmış saati döndür
-      return formatter.format(date);
-    } catch (error) {
-      console.error("Error formatting time:", error);
-      return ""; // Hata durumunda boş bir string döndür
-    }
-  };
-
-  // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
-
-  // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın
-
-  useEffect(() => {
-    // Format the date based on the user's locale
-    const dateFormatter = new Intl.DateTimeFormat(navigator.language);
-    const sampleDate = new Date(2021, 10, 21);
-    const formattedSampleDate = dateFormatter.format(sampleDate);
-    setLocaleDateFormat(formattedSampleDate.replace("2021", "YYYY").replace("21", "DD").replace("11", "MM"));
-
-    // Format the time based on the user's locale
-    const timeFormatter = new Intl.DateTimeFormat(navigator.language, { hour: "numeric", minute: "numeric" });
-    const sampleTime = new Date(2021, 10, 21, 13, 45); // Use a sample time, e.g., 13:45
-    const formattedSampleTime = timeFormatter.format(sampleTime);
-
-    // Check if the formatted time contains AM/PM, which implies a 12-hour format
-    const is12HourFormat = /AM|PM/.test(formattedSampleTime);
-    setLocaleTimeFormat(is12HourFormat ? "hh:mm A" : "HH:mm");
-  }, []);
-
-  // tarih formatlamasını kullanıcının yerel tarih formatına göre ayarlayın sonu
 
   // iki tarih ve saat arasında geçen süreyi hesaplamak için
 
@@ -427,7 +339,7 @@ export default function MainTabs() {
             marginBottom: "10px",
           }}
         >
-          <Text style={{ fontSize: "14px" }}>Başlangıç Zamanı:</Text>
+          <Text style={{ fontSize: "14px" }}>{t("workOrder.detail.startTime")}:</Text>
           <div
             style={{
               display: "flex",
@@ -439,25 +351,13 @@ export default function MainTabs() {
               width: "100%",
             }}
           >
-            <Controller
-              name="baslangicTarihi"
-              control={control}
-              render={({ field }) => <DatePicker {...field} disabled={!isStatusActive} style={{ width: "180px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />}
-            />
-            <Controller
-              name="baslangicSaati"
-              control={control}
-              render={({ field }) => (
-                <TimePicker
-                  {...field}
-                  changeOnScroll
-                  needConfirm={false}
-                  disabled={!isStatusActive}
-                  style={{ width: "110px" }}
-                  format={localeTimeFormat}
-                  placeholder="Saat seçiniz"
-                />
-              )}
+            <FullDatePicker name1="baslangicTarihi" disabled={!isStatusActive} style={{ flex: "none", width: "180px" }} placeholder={t("workOrder.detail.selectDate")} />
+            <FullTimePicker
+              name1="baslangicSaati"
+              changeOnScroll
+              disabled={!isStatusActive}
+              style={{ flex: "none", width: "110px" }}
+              placeholder={t("workOrder.detail.selectTime")}
             />
           </div>
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}>
@@ -486,7 +386,7 @@ export default function MainTabs() {
               justifyContent: "space-between",
             }}
           >
-            <Text style={{ fontSize: "14px" }}>Bitiş Zamanı:</Text>
+            <Text style={{ fontSize: "14px" }}>{t("workOrder.detail.endTime")}:</Text>
             <div
               style={{
                 display: "flex",
@@ -498,25 +398,13 @@ export default function MainTabs() {
                 width: "100%",
               }}
             >
-              <Controller
-                name="bitisTarihi"
-                control={control}
-                render={({ field }) => <DatePicker {...field} disabled={!isStatusActive} style={{ width: "180px" }} format={localeDateFormat} placeholder="Tarih seçiniz" />}
-              />
-              <Controller
-                name="bitisSaati"
-                control={control}
-                render={({ field }) => (
-                  <TimePicker
-                    {...field}
-                    changeOnScroll
-                    needConfirm={false}
-                    disabled={!isStatusActive}
-                    style={{ width: "110px" }}
-                    format={localeTimeFormat}
-                    placeholder="Saat seçiniz"
-                  />
-                )}
+              <FullDatePicker name1="bitisTarihi" disabled={!isStatusActive} style={{ flex: "none", width: "180px" }} placeholder={t("workOrder.detail.selectDate")} />
+              <FullTimePicker
+                name1="bitisSaati"
+                changeOnScroll
+                disabled={!isStatusActive}
+                style={{ flex: "none", width: "110px" }}
+                placeholder={t("workOrder.detail.selectTime")}
               />
             </div>
           </div>
