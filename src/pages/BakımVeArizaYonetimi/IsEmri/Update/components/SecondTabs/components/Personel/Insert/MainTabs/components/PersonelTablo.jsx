@@ -21,7 +21,7 @@ const normalizeText = (text) => {
     .replace(/Ç/g, "C");
 };
 
-export default function PersonelTablo({ workshopSelectedId, onSubmit }) {
+export default function PersonelTablo({ workshopSelectedId, selectedPersoneller = [], onSubmit }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([]);
@@ -94,28 +94,40 @@ export default function PersonelTablo({ workshopSelectedId, onSubmit }) {
       .finally(() => setLoading(false));
   }, []);
 
+  const getInitialSelectedRowKeys = useCallback(() => {
+    if (Array.isArray(selectedPersoneller) && selectedPersoneller.length > 0) {
+      return selectedPersoneller.map((personel) => personel.key);
+    }
+
+    return workshopSelectedId ? [workshopSelectedId] : [];
+  }, [selectedPersoneller, workshopSelectedId]);
+
   const handleModalToggle = () => {
     setIsModalVisible((prev) => !prev);
     if (!isModalVisible) {
       fetch();
-      setSelectedRowKeys([]);
+      setSearchTerm1("");
+      setFilteredData1([]);
+      setSelectedRowKeys(getInitialSelectedRowKeys());
     }
   };
 
   const handleModalOk = () => {
-    const selectedData = data.find((item) => item.key === selectedRowKeys[0]);
-    if (selectedData) {
+    const dataByKey = new Map(data.map((item) => [String(item.key), item]));
+    const selectedData = selectedRowKeys.map((key) => dataByKey.get(String(key))).filter(Boolean);
+
+    if (selectedData.length > 0) {
       onSubmit && onSubmit(selectedData);
     }
     setIsModalVisible(false);
   };
 
   useEffect(() => {
-    setSelectedRowKeys(workshopSelectedId ? [workshopSelectedId] : []);
-  }, [workshopSelectedId]);
+    setSelectedRowKeys(getInitialSelectedRowKeys());
+  }, [getInitialSelectedRowKeys]);
 
   const onRowSelectChange = (selectedKeys) => {
-    setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
+    setSelectedRowKeys(selectedKeys);
   };
 
   // Arama işlevselliği için handleSearch fonksiyonları
@@ -158,9 +170,10 @@ export default function PersonelTablo({ workshopSelectedId, onSubmit }) {
         />
         <Table
           rowSelection={{
-            type: "radio",
+            type: "checkbox",
             selectedRowKeys,
             onChange: onRowSelectChange,
+            preserveSelectedRowKeys: true,
           }}
           columns={columns}
           dataSource={

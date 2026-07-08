@@ -78,6 +78,7 @@ export default function MainTabs() {
   } = useFormContext();
 
   const fazlaMesai = watch("fazlaMesai");
+  const selectedPersoneller = watch("selectedPersoneller") || [];
 
   const handleMasrafMerkeziMinusClick = () => {
     setValue("masrafMerkezi", "");
@@ -87,6 +88,17 @@ export default function MainTabs() {
   const handlePersonelMinusClick = () => {
     setValue("personelTanim", "");
     setValue("personelID", "");
+    setValue("selectedPersoneller", []);
+  };
+
+  const handlePersonelSelect = (selectedData) => {
+    const selectedList = Array.isArray(selectedData) ? selectedData : selectedData ? [selectedData] : [];
+    const selectedNames = selectedList.map((personel) => personel.subject).join(", ");
+    const selectedIds = selectedList.map((personel) => personel.key).join(",");
+
+    setValue("selectedPersoneller", selectedList);
+    setValue("personelTanim", selectedNames, { shouldValidate: true });
+    setValue("personelID", selectedIds);
   };
 
   const clearfazlaMesai = useCallback(() => {
@@ -196,13 +208,14 @@ export default function MainTabs() {
                 <Controller
                   name="personelTanim"
                   control={control}
-                  rules={{ required: "Alan Boş Bırakılamaz!" }}
-                  render={({ field, fieldState: { error } }) => (
+                  rules={{ required: t("workOrder.validation.required") }}
+                  render={({ field }) => (
                     <Input
                       {...field}
                       status={errors.personelTanim ? "error" : ""}
                       type="text" // Set the type to "text" for name input
                       style={{ width: "215px" }}
+                      title={field.value}
                       disabled
                     />
                   )}
@@ -218,12 +231,8 @@ export default function MainTabs() {
                     />
                   )}
                 />
-                <PersonelTablo
-                  onSubmit={(selectedData) => {
-                    setValue("personelTanim", selectedData.subject);
-                    setValue("personelID", selectedData.key);
-                  }}
-                />
+                <Controller name="selectedPersoneller" control={control} render={() => null} />
+                <PersonelTablo selectedPersoneller={selectedPersoneller} onSubmit={handlePersonelSelect} />
                 <Button onClick={handlePersonelMinusClick}> - </Button>
                 {errors.personelTanim && (
                   <div style={{ color: "red", marginTop: "10px" }}>

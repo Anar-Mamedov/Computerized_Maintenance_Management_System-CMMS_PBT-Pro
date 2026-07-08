@@ -5,6 +5,7 @@ import AxiosInstance from "../../../../../../../../../api/http";
 import { useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs";
 import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 
 export default function CreateModal({
   onRefresh,
@@ -17,13 +18,16 @@ export default function CreateModal({
   triggerContainerClassName,
   openRequestKey,
 }) {
+  const { t } = useTranslation();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const lastHandledOpenRequestKey = useRef(0);
   const methods = useForm({
     defaultValues: {
       secilenID: "",
       personelTanim: "",
       personelID: "",
+      selectedPersoneller: [],
       calismaSuresi: "",
       saatUcreti: "",
       maliyet: "",
@@ -55,48 +59,82 @@ export default function CreateModal({
 
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi
 
-  const onSubmited = (data) => {
-    const Body = {
-      TB_ISEMRI_KAYNAK_ID: 0,
-      IDK_REF_ID: data.personelID,
-      IDK_SURE: data.calismaSuresi,
-      IDK_SAAT_UCRETI: data.saatUcreti,
-      IDK_MALIYET: data.maliyet,
-      IDK_FAZLA_MESAI_VAR: data.fazlaMesai,
-      IDK_FAZLA_MESAI_SURE: data.mesaiSuresi,
-      IDK_FAZLA_MESAI_SAAT_UCRETI: data.mesaiUcreti,
-      IDK_MASRAF_MERKEZI_ID: data.masrafMerkeziID,
-      IDK_VARDIYA: data.vardiyaID,
-      IDK_ACIKLAMA: data.aciklama,
-      IDK_TARIH: formatDateWithDayjs(data.personelBaslamaZamani),
-      IDK_SAAT: formatTimeWithDayjs(data.personelBaslamaSaati),
-    };
+  const getSelectedPersoneller = (data) => {
+    if (Array.isArray(data.selectedPersoneller) && data.selectedPersoneller.length > 0) {
+      return data.selectedPersoneller.filter((personel) => personel?.key);
+    }
 
-    AxiosInstance.post(`AddUpdateIsEmriPersonel?isEmriId=${secilenIsEmriID}`, Body)
-      .then((response) => {
-        console.log("Data sent successfully:", response);
+    if (data.personelID) {
+      const personelNames = String(data.personelTanim || "").split(",");
+      return String(data.personelID)
+        .split(",")
+        .filter(Boolean)
+        .map((personelId, index) => ({
+          key: personelId,
+          subject: personelNames[index]?.trim() || "",
+        }));
+    }
 
-        if (response.status_code === 200 || response.status_code === 201) {
-          message.success("İşlem Başarılı.");
-          reset();
-          setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
-          onRefresh();
-        } else if (response.status_code === 401) {
-          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
-        } else {
-          message.error("Ekleme Başarısız.");
-        }
-      })
-      .catch((error) => {
-        // Handle errors here, e.g.:
-        console.error("Error sending data:", error);
-        message.error("Başarısız Olundu.");
-      });
+    return [];
+  };
 
-    console.log({ Body });
+  const createBody = (data, personelId) => ({
+    TB_ISEMRI_KAYNAK_ID: 0,
+    IDK_REF_ID: personelId,
+    IDK_SURE: data.calismaSuresi,
+    IDK_SAAT_UCRETI: data.saatUcreti,
+    IDK_MALIYET: data.maliyet,
+    IDK_FAZLA_MESAI_VAR: data.fazlaMesai,
+    IDK_FAZLA_MESAI_SURE: data.mesaiSuresi,
+    IDK_FAZLA_MESAI_SAAT_UCRETI: data.mesaiUcreti,
+    IDK_MASRAF_MERKEZI_ID: data.masrafMerkeziID,
+    IDK_VARDIYA: data.vardiyaID,
+    IDK_ACIKLAMA: data.aciklama,
+    IDK_TARIH: formatDateWithDayjs(data.personelBaslamaZamani),
+    IDK_SAAT: formatTimeWithDayjs(data.personelBaslamaSaati),
+  });
+
+  const onSubmited = async (data) => {
+    if (submitting) return;
+
+    const selectedPersoneller = getSelectedPersoneller(data);
+
+    if (selectedPersoneller.length === 0) {
+      message.error(t("workOrder.validation.required"));
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const responses = await Promise.all(
+        selectedPersoneller.map((personel) => AxiosInstance.post(`AddUpdateIsEmriPersonel?isEmriId=${secilenIsEmriID}`, createBody(data, personel.key)))
+      );
+
+      const hasUnauthorizedResponse = responses.some((response) => response?.status_code === 401);
+      const allRequestsSuccessful = responses.every((response) => response?.status_code === 200 || response?.status_code === 201);
+
+      if (allRequestsSuccessful) {
+        message.success(t("islemBasarili"));
+        reset();
+        setIsModalVisible(false);
+        onRefresh();
+      } else if (hasUnauthorizedResponse) {
+        message.error(t("workOrder.personnelList.noPermission"));
+      } else {
+        message.error(t("islemBasarisiz"));
+      }
+    } catch (error) {
+      console.error("Error sending data:", error);
+      message.error(t("islemBasarisiz"));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleModalToggle = () => {
+    if (submitting) return;
+
     setIsModalVisible((prev) => !prev);
     if (!isModalVisible) {
       reset();
@@ -131,12 +169,22 @@ export default function CreateModal({
             marginBottom: "10px",
           }}
         >
-          <Button disabled={kapali} type={triggerButtonType} className={triggerButtonClassName} onClick={handleModalToggle}>
+          <Button disabled={kapali || submitting} type={triggerButtonType} className={triggerButtonClassName} onClick={handleModalToggle}>
             <PlusOutlined /> {triggerButtonText}
           </Button>
         </div>
 
-        <Modal width="985px" title="Personel Ekle" destroyOnClose centered open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
+        <Modal
+          width="985px"
+          title="Personel Ekle"
+          destroyOnClose
+          centered
+          open={isModalVisible}
+          onOk={methods.handleSubmit(onSubmited)}
+          onCancel={handleModalToggle}
+          confirmLoading={submitting}
+          cancelButtonProps={{ disabled: submitting }}
+        >
           <form onSubmit={methods.handleSubmit(onSubmited)}>
             <MainTabs />
           </form>
