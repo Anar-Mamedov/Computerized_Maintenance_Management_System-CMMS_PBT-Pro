@@ -199,6 +199,14 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
     (value) => formatNumberWithSeparators(value ?? 0, currentLang),
     [currentLang]
   );
+  const isTruthyValue = useCallback((value) => {
+    const normalizedValue = String(value).toLowerCase();
+    return value === true || value === 1 || normalizedValue === "true" || normalizedValue === "1";
+  }, []);
+  const formatListNumber = useCallback(
+    (value) => formatNumberWithSeparators(value ?? 0, currentLang),
+    [currentLang]
+  );
   const formattedTotalCount = useMemo(() => formatKpiNumber(totalDataCount), [formatKpiNumber, totalDataCount]);
   const toplamIsEmriFilterLabel = useMemo(() => {
     if (toplamIsEmriCloseFilter === 0) {
@@ -545,6 +553,30 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
       sorter: true,
       visible: true, // Varsayılan olarak kapalı
       render: (text) => (text > 0 ? text : null),
+    },
+    {
+      title: t("workOrder.list.downtime"),
+      dataIndex: "DURUS",
+      key: "DURUS",
+      width: 95,
+      ellipsis: true,
+      sorter: true,
+      visible: true,
+      render: (text) => (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+          {isTruthyValue(text) ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}
+        </div>
+      ),
+    },
+    {
+      title: t("workOrder.list.totalDowntimeDuration"),
+      dataIndex: "TOPLAM_DURUS_SURE",
+      key: "TOPLAM_DURUS_SURE",
+      width: 150,
+      ellipsis: true,
+      sorter: true,
+      visible: true,
+      render: (text) => formatListNumber(text),
     },
 
     {
@@ -1704,6 +1736,8 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
                   value = formatTime(value);
                 } else if (key === "GARANTI") {
                   value = row.GARANTI ? "Evet" : "Hayır";
+                } else if (key === "DURUS") {
+                  value = isTruthyValue(row.DURUS) ? "true" : "false";
                 } else if (key === "TAMAMLANMA") {
                   value = `${row.TAMAMLANMA}%`;
                 } else if (key === "DURUM") {

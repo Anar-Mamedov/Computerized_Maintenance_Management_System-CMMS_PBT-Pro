@@ -463,6 +463,8 @@
   "workOrder.filter.all": "All work orders",
   "workOrder.filter.open": "Open work orders",
   "workOrder.filter.closed": "Closed work orders",
+  "workOrder.list.downtime": "Downtime",
+  "workOrder.list.totalDowntimeDuration": "Downtime Duration (min.)",
   "workOrder.main.arrangementDateTime": "Issued",
   "workOrder.validation.required": "This field cannot be empty.",
   "workOrder.validation.arrangementDateTimeFuture": "Issued date and time cannot be later than the current date and time.",

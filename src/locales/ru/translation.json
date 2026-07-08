@@ -460,6 +460,8 @@
   "workOrder.filter.all": "Все наряды",
   "workOrder.filter.open": "Открытые наряды",
   "workOrder.filter.closed": "Закрытые наряды",
+  "workOrder.list.downtime": "Простой",
+  "workOrder.list.totalDowntimeDuration": "Длительность простоя (мин.)",
   "workOrder.main.arrangementDateTime": "Оформлено",
   "workOrder.validation.required": "Это поле не может быть пустым.",
   "workOrder.validation.arrangementDateTimeFuture": "Дата и время оформления не могут быть позже текущих даты и времени.",

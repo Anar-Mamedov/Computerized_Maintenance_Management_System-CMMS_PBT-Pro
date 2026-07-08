@@ -1113,6 +1113,8 @@
   "workOrder.filter.all": "Tüm iş emirleri",
   "workOrder.filter.open": "Açık iş emirleri",
   "workOrder.filter.closed": "Kapalı iş emirleri",
+  "workOrder.list.downtime": "Duruş",
+  "workOrder.list.totalDowntimeDuration": "Duruş Süresi (dk.)",
   "workOrder.main.arrangementDateTime": "Düzenlenme",
   "workOrder.validation.required": "Alan Boş Bırakılamaz!",
   "workOrder.validation.arrangementDateTimeFuture": "Düzenlenme tarihi ve saati mevcut tarih ve saatten büyük olamaz",

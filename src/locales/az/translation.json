@@ -460,6 +460,8 @@
   "workOrder.filter.all": "Bütün iş əmrləri",
   "workOrder.filter.open": "Açıq iş əmrləri",
   "workOrder.filter.closed": "Bağlı iş əmrləri",
+  "workOrder.list.downtime": "Dayanma",
+  "workOrder.list.totalDowntimeDuration": "Dayanma Müddəti (dq.)",
   "workOrder.main.arrangementDateTime": "Tərtib edilmə",
   "workOrder.validation.required": "Bu sahə boş buraxıla bilməz.",
   "workOrder.validation.arrangementDateTimeFuture": "Tərtib edilmə tarixi və saatı cari tarix və saatdan böyük ola bilməz.",
