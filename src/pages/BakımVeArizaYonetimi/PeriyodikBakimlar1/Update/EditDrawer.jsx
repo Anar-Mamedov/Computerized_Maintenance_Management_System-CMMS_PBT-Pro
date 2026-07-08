@@ -25,6 +25,8 @@ const normalizePeriodSignatureValue = (value) => {
 
 const isEnabledPeriodValue = (value) => normalizePeriodSignatureValue(value) === "true";
 
+const normalizeOtelemeKuraliValue = (value) => (Number(value) === 1 ? 1 : 0);
+
 const createPeriodSignature = (source = {}) => {
   const tarihBazliIzle = isEnabledPeriodValue(source.PBK_TARIH_BAZLI_IZLE);
   const sayacBazliIzle = isEnabledPeriodValue(source.PBK_SAYAC_BAZLI_IZLE);
@@ -166,6 +168,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       herAy: 1,
       yilGroup: 1,
       herYil: 1,
+      PBK_OTELEME_KURALI: 0,
     },
   });
 
@@ -264,6 +267,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       PBK_BITIS_DONEM2: null,
       PBK_TARIH_BITIS: null,
       PBK_TARIH_BASLANGIC_TARIHI: null, //??
+      PBK_OTELEME_KURALI: normalizeOtelemeKuraliValue(data.PBK_OTELEME_KURALI),
     };
 
     // Handle tarihSayacBakim and activeTab logic
@@ -477,6 +481,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("ozelAlan9", item.PBK_OZEL_ALAN_9);
           setValue("ozelAlan10", item.PBK_OZEL_ALAN_10);
           setValue("aciklama", item.PBK_ACIKLAMA);
+          setValue("PBK_OTELEME_KURALI", normalizeOtelemeKuraliValue(item.PBK_OTELEME_KURALI));
           if (item.PBK_TARIH_BAZLI_IZLE == true && item.PBK_SAYAC_BAZLI_IZLE == true) {
             setValue("tarihSayacBakim", "b");
             setValue("periyotBilgiDurum", 3);
