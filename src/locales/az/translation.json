@@ -34,6 +34,8 @@
   "resimBulunamadi": "Şəkil tapılmadı",
   "globalYes": "Bəli",
   "globalNo": "Xeyr",
+  "periodicMaintenance.updateTargetDates.title": "Periyot Dəyişikliyi",
+  "periodicMaintenance.updateTargetDates.content": "Bağlı avadanlıqların hədəf tarixləri yeni periyoda görə yenilənsin?",
   "qrKod": "QR Kod",
   "malzemeQrKodu": "Materialın QR Kodu",
   "tedarikciler": "Təchizatçılar",

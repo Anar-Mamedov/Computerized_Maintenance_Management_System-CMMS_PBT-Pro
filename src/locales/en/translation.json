@@ -34,6 +34,8 @@
   "resimBulunamadi": "Image not found",
   "globalYes": "Yes",
   "globalNo": "No",
+  "periodicMaintenance.updateTargetDates.title": "Period Change",
+  "periodicMaintenance.updateTargetDates.content": "Do you want to update the target dates of linked equipment according to the new period?",
   "qrKod": "QR Code",
   "malzemeQrKodu": "Material QR Code",
   "tedarikciler": "Suppliers",

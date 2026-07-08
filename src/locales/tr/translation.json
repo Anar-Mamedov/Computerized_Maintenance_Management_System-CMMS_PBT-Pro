@@ -22,6 +22,8 @@
   "sayacBazliPeriyodikBakim": "Sayaç Bazlı Periyodik Bakım",
   "globalYes": "Evet",
   "globalNo": "Hayır",
+  "periodicMaintenance.updateTargetDates.title": "Periyot Değişikliği",
+  "periodicMaintenance.updateTargetDates.content": "Bağlı ekipmanların hedef tarihleri yeni periyoda göre güncellensin mi?",
   "qrKod": "QR Kod",
   "malzemeQrKodu": "Malzeme QR Kodu",
   "tedarikciler": "Tedarikçiler",

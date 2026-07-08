@@ -1,19 +1,68 @@
 import tr_TR from "antd/es/locale/tr_TR";
 import { Button, Drawer, Space, ConfigProvider, Modal, message, Spin } from "antd";
  
-import React, { useEffect, useState, useTransition } from "react";
+import React, { useEffect, useRef, useState, useTransition } from "react";
 import { useForm, FormProvider } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 import AxiosInstance from "../../../../api/http";
 import Footer from "./components/Footer";
 import SecondTabs from "./components/SecondTabs/SecondTabs";
 import MainTabs1 from "./components/MainTabs/MainTabs1";
 
+const normalizePeriodSignatureValue = (value) => {
+  if (value === null || value === undefined) return "";
+  if (Array.isArray(value)) return value.map(normalizePeriodSignatureValue).join("");
+
+  const stringValue = String(value).trim();
+  const lowerValue = stringValue.toLowerCase();
+
+  if (value === true || value === 1 || lowerValue === "true" || lowerValue === "1") return "true";
+  if (value === false || value === 0 || lowerValue === "false" || lowerValue === "0") return "false";
+
+  return stringValue.replace(/,/g, "");
+};
+
+const isEnabledPeriodValue = (value) => normalizePeriodSignatureValue(value) === "true";
+
+const createPeriodSignature = (source = {}) => {
+  const tarihBazliIzle = isEnabledPeriodValue(source.PBK_TARIH_BAZLI_IZLE);
+  const sayacBazliIzle = isEnabledPeriodValue(source.PBK_SAYAC_BAZLI_IZLE);
+  const tarihPeriyot = normalizePeriodSignatureValue(source.PBK_TARIH_YINELEME_PERIYOT);
+
+  const signature = {
+    PBK_TARIH_BAZLI_IZLE: tarihBazliIzle,
+    PBK_SAYAC_BAZLI_IZLE: sayacBazliIzle,
+  };
+
+  if (tarihBazliIzle) {
+    signature.PBK_TARIH_YINELEME_PERIYOT = tarihPeriyot;
+    signature.PBK_TARIH_YINELEME_SIKLIK = normalizePeriodSignatureValue(source.PBK_TARIH_YINELEME_SIKLIK);
+
+    if (["AY2", "AY3", "YIL2"].includes(tarihPeriyot)) {
+      signature.PBK_TARIH_AY_GUNLER = normalizePeriodSignatureValue(source.PBK_TARIH_AY_GUNLER);
+    }
+
+    if (["HAFTA", "AY3"].includes(tarihPeriyot)) {
+      signature.PBK_TARIH_HAFTA_GUNLER = normalizePeriodSignatureValue(source.PBK_TARIH_HAFTA_GUNLER);
+    }
+  }
+
+  if (sayacBazliIzle) {
+    signature.PBK_SAYAC_YINELEME_SIKLIK = normalizePeriodSignatureValue(source.PBK_SAYAC_YINELEME_SIKLIK);
+    signature.PBK_SAYAC_BIRIM_KOD_ID = normalizePeriodSignatureValue(source.PBK_SAYAC_BIRIM_KOD_ID);
+  }
+
+  return JSON.stringify(signature);
+};
+
 export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, onRefresh }) {
+  const { t } = useTranslation();
   const [startTransition] = useTransition();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [count, setCount] = useState();
+  const originalPeriodSignatureRef = useRef(null);
   const showDrawer = () => {
     setOpen(true);
   };
@@ -131,6 +180,18 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
   };
 
   const { setValue, reset, watch } = methods;
+
+  const askTargetDateUpdateConfirmation = () =>
+    new Promise((resolve) => {
+      Modal.confirm({
+        title: t("periodicMaintenance.updateTargetDates.title"),
+        content: t("periodicMaintenance.updateTargetDates.content"),
+        okText: t("globalYes"),
+        cancelText: t("globalNo"),
+        onOk: () => resolve(true),
+        onCancel: () => resolve(false),
+      });
+    });
 
   //* export
   const onSubmit = async (data) => {
@@ -329,7 +390,14 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
     Body.PBK_TARIH_BASLANGIC_TARIHI = data.peryodikBakimBaslangicTarihi ? dayjs(data.peryodikBakimBaslangicTarihi).format("YYYY-MM-DD") : null;
 
     try {
-      const response = await AxiosInstance.post("PeriyodikBakimKaydetGuncelle", Body);
+      let hedefTarihleriGuncelle = false;
+      const periodChanged = originalPeriodSignatureRef.current && originalPeriodSignatureRef.current !== createPeriodSignature(Body);
+
+      if (periodChanged) {
+        hedefTarihleriGuncelle = await askTargetDateUpdateConfirmation();
+      }
+
+      const response = await AxiosInstance.post(`PeriyodikBakimKaydetGuncelle?HedefTarihleriGuncelle=${hedefTarihleriGuncelle}`, Body);
       // Handle successful response here, e.g.:
       console.log("Data sent successfully:", response);
       if (response.status_code === 200 || response.status_code === 201) {
@@ -358,6 +426,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
         try {
           const response = await AxiosInstance.get(`PeriyodikBakimDetayByBakim?BakimId=${selectedRow.key}`);
           const item = response[0]; // Veri dizisinin ilk elemanını al
+          originalPeriodSignatureRef.current = createPeriodSignature(item);
           // Form alanlarını set et
           setValue("secilenBakimID", selectedRow.key);
           setValue("bakimKodu", item.PBK_KOD);
@@ -541,6 +610,7 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
 
   useEffect(() => {
     if (!drawerVisible) {
+      originalPeriodSignatureRef.current = null;
       reset(); // Drawer kapandığında formu sıfırla
     }
   }, [drawerVisible, reset]);
