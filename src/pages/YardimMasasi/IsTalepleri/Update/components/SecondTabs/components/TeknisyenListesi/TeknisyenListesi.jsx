@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, DatePicker, Form, InputNumber, Modal, Popconfirm, Select, Switch, Table, TimePicker, message } from "antd";
+import { Button, DatePicker, Form, InputNumber, Modal, Popconfirm, Select, Spin, Switch, Table, TimePicker, message } from "antd";
 import { CheckOutlined, CloseOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { t } from "i18next";
 import dayjs from "dayjs";
@@ -13,6 +13,11 @@ dayjs.extend(customParseFormat);
 const DATE_REQUEST_FORMAT = "YYYY-MM-DD";
 const DATE_DISPLAY_FORMAT = "DD.MM.YYYY";
 const TIME_FORMAT = "HH:mm";
+const PERSONEL_LOADING_CONTENT = (
+  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", padding: "8px 0" }}>
+    <Spin size="small" />
+  </div>
+);
 
 const toDayjsDate = (value) => {
   if (!value) {
@@ -126,9 +131,7 @@ export default function TeknisyenListesi({ disabled }) {
   }, [fetchTeknisyenler]);
 
   const loadPersonelOptions = useCallback(async () => {
-    if (personelOptions.length > 0) {
-      return personelOptions;
-    }
+    setPersonelOptions([]);
     setPersonelLoading(true);
     try {
       const response = await AxiosInstance.get("Personel");
@@ -152,7 +155,7 @@ export default function TeknisyenListesi({ disabled }) {
     } finally {
       setPersonelLoading(false);
     }
-  }, [personelOptions]);
+  }, []);
 
   const resolvePersonelId = (record) => {
     const direct = record.ITK_TEKNISYEN_ID ?? record.ITK_PERSONEL_ID ?? record.TB_PERSONEL_ID ?? record.ITK_REF_ID;
@@ -411,7 +414,8 @@ export default function TeknisyenListesi({ disabled }) {
               placeholder={t("secimYapiniz", { defaultValue: "Seçim Yapınız" })}
               optionFilterProp="label"
               options={personelOptions}
-              onOpenChange={(open) => {
+              notFoundContent={personelLoading ? PERSONEL_LOADING_CONTENT : undefined}
+              onDropdownVisibleChange={(open) => {
                 if (open) {
                   loadPersonelOptions();
                 }
