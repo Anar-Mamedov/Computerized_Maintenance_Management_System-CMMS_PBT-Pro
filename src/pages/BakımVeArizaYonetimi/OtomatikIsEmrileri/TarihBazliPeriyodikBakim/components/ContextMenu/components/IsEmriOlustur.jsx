@@ -1,16 +1,15 @@
-import React, { useEffect } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import AxiosInstance from "../../../../../../../api/http";
-import { Button, message, Popconfirm, Typography } from "antd";
-import { DeleteOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import { message, Typography } from "antd";
 import { t } from "i18next";
 
 const { Text } = Typography;
 
-export default function Sil({ selectedRows, refreshTableData, hidePopover }) {
-  // Silme işlemini tetikleyecek fonksiyon
-  const handleDelete = async () => {
-    let isError = false;
-    // Seçili satırlar üzerinde döngü yaparak her birini sil
+export default function IsEmriOlustur({ selectedRows, refreshTableData, hidePopover, onWorkOrderCreated }) {
+  const handleCreate = async () => {
+    let createdWorkOrder = null;
+
     for (const row of selectedRows) {
       try {
         const body = {
@@ -18,38 +17,45 @@ export default function Sil({ selectedRows, refreshTableData, hidePopover }) {
           MakineId: row.MakineID,
           Tarih: row.PlanlamaTarih,
         };
-        // Silme API isteğini gönder
+
         const response = await AxiosInstance.post(`IsEmriOlustur`, body);
         console.log("İşlem başarılı:", response);
         if (response.status_code === 200 || response.status_code === 201) {
-          message.success("İşlem Başarılı.");
-          isError = false;
+          message.success(t("islemBasarili"));
+          createdWorkOrder = {
+            id: response.IsEmriId,
+            code: response.IsEmriNo,
+          };
         } else if (response.status_code === 401) {
-          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
-          isError = true;
+          message.error(t("workOrder.planLater.noPermission"));
         } else {
-          message.error("İşlem Başarısız.");
-          isError = true;
+          message.error(t("islemBasarisiz"));
         }
-        // Burada başarılı silme işlemi sonrası yapılacak işlemler bulunabilir.
       } catch (error) {
-        console.error("Silme işlemi sırasında hata oluştu:", error);
-        message.error("İşlem Başarısız.");
-        isError = true;
+        console.error("İş emri oluşturulurken hata oluştu:", error);
+        message.error(t("islemBasarisiz"));
       }
     }
-    // Tüm silme işlemleri tamamlandıktan sonra ve hata oluşmamışsa refreshTableData'i çağır
-    if (!isError) {
+
+    if (createdWorkOrder?.id) {
       refreshTableData();
-      hidePopover(); // Silme işlemi başarılı olursa Popover'ı kapat
+      hidePopover();
+      onWorkOrderCreated(createdWorkOrder);
     }
   };
 
   return (
     <div>
-      <Text style={{ cursor: "pointer" }} onClick={handleDelete}>
+      <Text style={{ cursor: "pointer" }} onClick={handleCreate}>
         {t("isEmriOlustur")}
       </Text>
     </div>
   );
 }
+
+IsEmriOlustur.propTypes = {
+  selectedRows: PropTypes.arrayOf(PropTypes.object).isRequired,
+  refreshTableData: PropTypes.func.isRequired,
+  hidePopover: PropTypes.func.isRequired,
+  onWorkOrderCreated: PropTypes.func.isRequired,
+};

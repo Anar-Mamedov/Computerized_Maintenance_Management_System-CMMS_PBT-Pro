@@ -17,6 +17,7 @@ import "./ResizeStyle.css";
 import AxiosInstance from "../../../../../api/http";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import EditDrawer from "../../../PeriyodikBakimlar1/Update/EditDrawer";
+import WorkOrderEditDrawer from "../../../IsEmri/Update/EditDrawer";
 import FilterDrawer from "./filter/FilterDrawer";
 
 const { Text } = Typography;
@@ -242,6 +243,10 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [editDrawer, setEditDrawer] = useState({
+    visible: false,
+    data: null,
+  });
+  const [workOrderDrawer, setWorkOrderDrawer] = useState({
     visible: false,
     data: null,
   });
@@ -647,6 +652,16 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
     });
   }, []);
 
+  const handleWorkOrderCreated = useCallback(({ id, code }) => {
+    setWorkOrderDrawer({
+      visible: true,
+      data: {
+        key: id,
+        ISEMRI_NO: code,
+      },
+    });
+  }, []);
+
   const handleExport = useCallback(() => {
     try {
       setExporting(true);
@@ -826,7 +841,7 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
             <Button icon={<DownloadOutlined />} loading={exporting} onClick={handleExport}>
               {t("indir")}
             </Button>
-            <ContextMenu selectedRows={selectedRows} refreshTableData={handleRefresh} />
+            <ContextMenu selectedRows={selectedRows} refreshTableData={handleRefresh} onWorkOrderCreated={handleWorkOrderCreated} />
             <Button type="primary" onClick={applyFilters}>
               {t("uygula")}
             </Button>
@@ -882,6 +897,12 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
         selectedRow={editDrawer.data}
         onDrawerClose={() => setEditDrawer({ visible: false, data: null })}
         drawerVisible={editDrawer.visible}
+        onRefresh={handleRefresh}
+      />
+      <WorkOrderEditDrawer
+        selectedRow={workOrderDrawer.data}
+        onDrawerClose={() => setWorkOrderDrawer({ visible: false, data: null })}
+        drawerVisible={workOrderDrawer.visible}
         onRefresh={handleRefresh}
       />
       <FilterDrawer

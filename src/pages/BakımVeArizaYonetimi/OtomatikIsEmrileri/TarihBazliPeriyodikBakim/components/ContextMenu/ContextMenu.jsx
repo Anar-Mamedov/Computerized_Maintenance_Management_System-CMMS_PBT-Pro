@@ -1,14 +1,14 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import { Button, Popover, Typography } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
-import Sil from "./components/Sil";
 import IsEmriOlustur from "./components/IsEmriOlustur.jsx";
 import PeriyodikBakimIptal from "./components/PeriyodikBakimIptal/PeriyodikBakimIptal.jsx";
 import IleriTarihePlanla from "./components/IleriTarihePlanla/IleriTarihePlanla.jsx";
 
-const { Text, Link } = Typography;
+const { Text } = Typography;
 
-export default function ContextMenu({ selectedRows, refreshTableData, onayCheck }) {
+export default function ContextMenu({ selectedRows, refreshTableData, onWorkOrderCreated }) {
   const [visible, setVisible] = useState(false);
 
   const handleVisibleChange = (visible) => {
@@ -21,7 +21,14 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
 
   const content = (
     <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-      {selectedRows.length >= 1 && <IsEmriOlustur selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
+      {selectedRows.length >= 1 && (
+        <IsEmriOlustur
+          selectedRows={selectedRows}
+          refreshTableData={refreshTableData}
+          hidePopover={hidePopover}
+          onWorkOrderCreated={onWorkOrderCreated}
+        />
+      )}
 
       {selectedRows.length == 1 && <IleriTarihePlanla selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
 
@@ -51,3 +58,9 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
     </Popover>
   );
 }
+
+ContextMenu.propTypes = {
+  selectedRows: PropTypes.arrayOf(PropTypes.object).isRequired,
+  refreshTableData: PropTypes.func.isRequired,
+  onWorkOrderCreated: PropTypes.func.isRequired,
+};
