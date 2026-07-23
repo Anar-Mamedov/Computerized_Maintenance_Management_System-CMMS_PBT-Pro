@@ -184,6 +184,7 @@ export default function App() {
   // Domain'e göre kontrol
   const hostname = window.location.hostname;
   const isOmega = hostname === "omegaerp.net" || hostname === "www.omegaerp.net";
+  const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1";
 
   // Lisans kontrolü fonksiyonu
   const checkLicenseExpiry = async () => {
@@ -248,6 +249,7 @@ export default function App() {
           {loginData?.KLL_WEB_DASHBOARD && <Route path="/" element={isOmega ? <YoneticiDashboard /> : <Dashboard1 />} />}
           
           {/* <Route path="/isemri" element={<Isemri />} /> */}
+          {isLocalhost && <Route path="/omegaDash" element={<YoneticiDashboard />} />}
           <Route path="/yonetimDashboard" element={<YoneticiDashboard />} />
           <Route path="/isEmri1" element={<IsEmri />} />
           <Route path="/User" element={<ProfilEkrani />} />
