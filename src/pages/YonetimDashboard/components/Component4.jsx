@@ -1,13 +1,13 @@
 import React from "react";
 import bg from "../../../assets/images/bg-card.png";
 import { Typography, Spin } from "antd";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 
 const { Text } = Typography;
 
 function Component4() {
-  const { watch } = useFormContext();
-  const summaryData = watch("summaryData");
+  const { control } = useFormContext();
+  const summaryData = useWatch({ control, name: "summaryData" });
 
   return (
     <div style={{ width: "100%", height: "100%", background: `url(${bg}), linear-gradient(rgb(27 17 92), #7A6FBE)`, backgroundSize: "cover", borderRadius: "5px", padding: "15px" }}>

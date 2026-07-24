@@ -1,17 +1,17 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Typography, Table, Tag, Spin, message } from "antd";
 import { AlertOutlined, RightCircleOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../api/http";
+import useDashboardFilters from "./useDashboardFilters";
 
 const { Text, Title } = Typography;
 
-const LokasyonBazindaIsTalepleri = ({
-  baslangicTarihi = "2026-01-01T00:00:00",
-  bitisTarihi = "2026-06-26T23:59:59",
-  lokasyonIds = [],
-}) => {
+const LokasyonBazindaIsTalepleri = () => {
+  const { baslangicTarihi, bitisTarihi, lokasyonIds, giderTipi } = useDashboardFilters();
   const [apiData, setApiData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [tableScrollY, setTableScrollY] = useState(180);
+  const tableContainerRef = useRef(null);
 
   // 1. API İstek Fonksiyonu
   const fetchTopCostEquipments = async () => {
@@ -21,6 +21,7 @@ const LokasyonBazindaIsTalepleri = ({
         BaslangicTarihi: baslangicTarihi,
         BitisTarihi: bitisTarihi,
         LokasyonIds: lokasyonIds,
+        GiderTipi: giderTipi,
       };
 
       const response = await AxiosInstance.post("GetTopCostEquipments", payload);
@@ -46,7 +47,22 @@ const LokasyonBazindaIsTalepleri = ({
 
   useEffect(() => {
     fetchTopCostEquipments();
-  }, [baslangicTarihi, bitisTarihi, JSON.stringify(lokasyonIds)]);
+  }, [baslangicTarihi, bitisTarihi, JSON.stringify(lokasyonIds), giderTipi]);
+
+  useEffect(() => {
+    const tableContainer = tableContainerRef.current;
+    if (!tableContainer) return undefined;
+
+    const updateTableScrollHeight = () => {
+      setTableScrollY(Math.max(tableContainer.clientHeight - 40, 120));
+    };
+
+    updateTableScrollHeight();
+    const resizeObserver = new ResizeObserver(updateTableScrollHeight);
+    resizeObserver.observe(tableContainer);
+
+    return () => resizeObserver.disconnect();
+  }, []);
 
   // Tablo Kolon Tanımlamaları - Monitör esnekliği için yüzdesel genişlikler verildi
   const columns = [
@@ -139,16 +155,17 @@ const LokasyonBazindaIsTalepleri = ({
     <div
       style={{
         width: "100%",
-        height: "430px",
-        minHeight: "100%",
-        maxHeight: "calc(100vh - 40px)", // Farklı ekranlarda viewport yüksekliğine tam uyum sağlar
+        height: "100%",
+        minHeight: 0,
+        maxHeight: "100%",
+        overflow: "hidden",
         backgroundColor: "white",
         borderRadius: "10px",
-        padding: "20px",
+        padding: "12px 16px",
         display: "flex",
         flexDirection: "column",
         boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-        gap: "15px",
+        gap: "8px",
         border: "1px solid #f0f0f0",
         boxSizing: "border-box",
       }}
@@ -164,7 +181,7 @@ const LokasyonBazindaIsTalepleri = ({
 
       {/* --- TABLE CONTENT --- */}
       {/* Esnek orta katman: flex: 1 sayesinde alt ve üst alanları sabit tutup, kalan tüm alanı monitöre göre doldurur */}
-      <div style={{ flex: 1, position: "relative", width: "100%" }}>
+      <div ref={tableContainerRef} style={{ flex: 1, minHeight: 0, overflow: "hidden", position: "relative", width: "100%" }}>
         {loading ? (
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
             <Spin tip="Ekipman maliyetleri yükleniyor..." />
@@ -174,11 +191,9 @@ const LokasyonBazindaIsTalepleri = ({
             columns={columns}
             dataSource={tableData}
             pagination={false}
-            size="middle"
+            size="small"
             rowKey="key"
-            // İçerideki tablo dikey scroll alanını dinamik bırakır, başlıklar çakılı kalır
-            scroll={{ y: 220 }}
-            style={{ height: "100%" }}
+            scroll={{ y: tableScrollY }}
             locale={{ emptyText: "Belirtilen kriterlerde ekipman maliyet kaydı bulunamadı." }}
           />
         )}
@@ -188,7 +203,7 @@ const LokasyonBazindaIsTalepleri = ({
       <div
         style={{
           marginTop: "auto",
-          paddingTop: "12px",
+          paddingTop: "8px",
           borderTop: "1px solid #f0f0f0",
           display: "flex",
           justifyContent: "space-between",

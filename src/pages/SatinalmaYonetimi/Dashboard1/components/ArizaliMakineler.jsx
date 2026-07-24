@@ -126,7 +126,7 @@ function MalzemeKullanimAnalizi() {
 
   return (
     <ConfigProvider locale={trTR}>
-      <div style={{ width: "100%", height: "150%", borderRadius: "5px", backgroundColor: "white", display: "flex", flexDirection: "column", gap: "10px", border: "1px solid #f0f0f0" }}>
+      <div style={{ width: "100%", height: "100%", minHeight: 0, overflow: "hidden", borderRadius: "5px", backgroundColor: "white", display: "flex", flexDirection: "column", gap: "10px", border: "1px solid #f0f0f0" }}>
         
         <div style={{ padding: "10px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <Text strong style={{ fontSize: "16px" }}>Yıllık Malzeme Kullanım Analizi</Text>
@@ -135,7 +135,7 @@ function MalzemeKullanimAnalizi() {
           </Popover>
         </div>
 
-        <div style={{ padding: "0 10px 10px 10px", flex: 1, display: "flex", flexDirection: "column", gap: "10px" }}>
+        <div style={{ padding: "0 10px 10px 10px", flex: 1, minHeight: 0, overflow: "hidden", display: "flex", flexDirection: "column", gap: "10px" }}>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <Input placeholder="Malzeme tipi ara..." value={searchTerm} onChange={handleSearch} style={{ width: "250px" }} />
             <CSVLink data={filteredData} headers={csvHeaders} filename="malzeme_kullanim_analizi.csv">
@@ -148,8 +148,13 @@ function MalzemeKullanimAnalizi() {
             dataSource={filteredData}
             loading={isLoading}
             size="small"
-            scroll={{ x: 800, y: 400 }}
-            pagination={{ defaultPageSize: 5, showSizeChanger: true, showTotal: (total) => `Toplam ${total} kayıt` }}
+            scroll={{ x: 800 }}
+            pagination={{
+              defaultPageSize: 5,
+              showSizeChanger: true,
+              showTotal: (total) => `Toplam ${total} kayıt`,
+              style: { margin: "8px 0 0" },
+            }}
           />
         </div>
 

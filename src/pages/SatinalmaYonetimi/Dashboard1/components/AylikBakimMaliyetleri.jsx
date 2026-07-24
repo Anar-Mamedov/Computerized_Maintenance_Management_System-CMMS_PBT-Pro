@@ -133,7 +133,7 @@ function YillikHarcamaGrafigi(props = {}) {
   );
 
   return (
-    <div style={{ width: "100%", height: "150%", borderRadius: "5px", backgroundColor: "white", display: "flex", flexDirection: "column", gap: "10px", border: "1px solid #f0f0f0" }}>
+    <div style={{ width: "100%", height: "100%", borderRadius: "5px", backgroundColor: "white", display: "flex", flexDirection: "column", gap: "10px", border: "1px solid #f0f0f0" }}>
       <div style={{ padding: "10px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
         <Text style={{ fontWeight: "500", fontSize: "17px" }}>
           Yıllık Harcama Grafiği {baslamaTarihi && ` (${baslamaTarihi})`}
@@ -146,7 +146,7 @@ function YillikHarcamaGrafigi(props = {}) {
       </div>
 
       {isLoading ? <Spin /> : (
-        <div style={{ flex: 1, padding: "10px", minHeight: "300px" }}>
+        <div style={{ flex: 1, padding: "10px", minHeight: 0 }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />

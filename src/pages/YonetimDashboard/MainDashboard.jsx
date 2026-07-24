@@ -76,6 +76,8 @@ const { RangePicker } = DatePicker;
 
 // Sadece bu tablar GridStack kullanır
 const GRID_TABS = ["yonetici", "makine"];
+const DASHBOARD_HEADER_ACTIONS_ID = "yonetim-dashboard-header-actions";
+const SCROLLABLE_TABLE_WIDGETS = new Set(["widget6", "widget44"]);
 
 const widgetTitles = {
   widget1: "Toplam Maliyet",
@@ -247,7 +249,7 @@ function MainDashboard() {
     },
   });
 
-  const { setValue, watch, reset } = methods;
+  const { setValue, watch, reset, getValues } = methods;
   const selectedDashboard = watch("selectedYoneticiDashboard");
 
   const filterBaslangic = watch("filtreBaslangicTarihi");
@@ -262,12 +264,14 @@ function MainDashboard() {
   const getCurrentStorageKey = () => `${selectedDashboard || "dashboard"}_${activeTab}`;
 
   const handleApplyFilters = () => {
-    // Geçici statelerdeki verileri topluca ana form state'ine basıp tetikliyoruz
-    setValue("filtreBaslangicTarihi", tempDates ? tempDates[0].startOf('day').format("YYYY-MM-DDTHH:mm:ss") : "2026-01-01T00:00:00", { shouldValidate: true });
-    setValue("filtreBitisTarihi", tempDates ? tempDates[1].endOf('day').format("YYYY-MM-DDTHH:mm:ss") : "2026-06-26T23:59:59", { shouldValidate: true });
-    setValue("filtreLokasyonIds", tempLokasyonIds, { shouldValidate: true });
-    setValue("filtreGiderTipi", tempGiderTipi, { shouldValidate: true });
-  }
+    reset({
+      ...getValues(),
+      filtreBaslangicTarihi: tempDates ? tempDates[0].startOf('day').format("YYYY-MM-DDTHH:mm:ss") : "2026-01-01T00:00:00",
+      filtreBitisTarihi: tempDates ? tempDates[1].endOf('day').format("YYYY-MM-DDTHH:mm:ss") : "2026-06-26T23:59:59",
+      filtreLokasyonIds: tempLokasyonIds,
+      filtreGiderTipi: tempGiderTipi,
+    });
+  };
 
   const fetchSummaryCards = async () => {
     console.log("API İsteği atılıyor... Tab:", activeTab); 
@@ -373,15 +377,22 @@ function MainDashboard() {
     const loadWidgets = (items) => {
       grid.removeAll();
       items.forEach((item) => {
+        const shouldRestoreTableHeight = SCROLLABLE_TABLE_WIDGETS.has(item.id) && item.minH >= 4;
+        const widgetHeight = shouldRestoreTableHeight
+          ? 3
+          : item.height;
+        const widgetMinHeight = shouldRestoreTableHeight
+          ? 2
+          : item.minH;
         const widgetEl = document.createElement("div");
         widgetEl.className = "grid-stack-item";
         widgetEl.id = item.id;
         widgetEl.setAttribute("gs-w", item.width);
-        widgetEl.setAttribute("gs-h", item.height);
+        widgetEl.setAttribute("gs-h", widgetHeight);
         widgetEl.setAttribute("gs-x", item.x);
         widgetEl.setAttribute("gs-y", item.y);
         widgetEl.setAttribute("gs-min-w", item.minW);
-        widgetEl.setAttribute("gs-min-h", item.minH);
+        widgetEl.setAttribute("gs-min-h", widgetMinHeight);
 
         const contentEl = document.createElement("div");
         contentEl.className = "grid-stack-item-content";
@@ -582,17 +593,31 @@ function MainDashboard() {
     <FormProvider {...methods}>
       <ConfigProvider locale={trTR}>
         <AppProvider>
-          <div className="App">
+          <div
+            className="App"
+            style={{
+              height: "100%",
+              minHeight: 0,
+              display: "flex",
+              flexDirection: "column",
+              overflow: "hidden",
+            }}
+          >
             <div
               style={{
                 width: "100%", display: "flex", alignItems: "center",
                 justifyContent: "space-between", gap: "10px", marginBottom: "10px",
+                flexShrink: 0,
               }}
             >
-              <CustomDashboards />
-              
-              {/* SADECE GRID OLAN SEKMELERDE TOOLBAR GÖSTER */}
-              {GRID_TABS.includes(activeTab) && (
+              <div style={{ display: "flex", alignItems: "center", gap: "28px" }}>
+                <CustomDashboards />
+                <Tabs activeKey={activeTab} items={items} onChange={(key) => setActiveTab(key)} tabBarStyle={{ margin: 0 }} />
+              </div>
+
+              <div id={DASHBOARD_HEADER_ACTIONS_ID}>
+                {/* SADECE GRID OLAN SEKMELERDE TOOLBAR GÖSTER */}
+                {GRID_TABS.includes(activeTab) && (
                   <div style={{ display: "flex", alignItems: "center", flexDirection: "row", gap: "10px" }}>
                     <Button type="text" onClick={rerenderWidgets}>
                       <Text type="secondary" style={{ display: "flex", flexDirection: "row", gap: "5px", alignItems: "center" }}>
@@ -611,74 +636,86 @@ function MainDashboard() {
                       </Button>
                     </Popover>
                   </div>
+                )}
+              </div>
+            </div>
+
+            <div
+              style={{
+                flex: 1,
+                minHeight: 0,
+                overflowY: "auto",
+                overflowX: "hidden",
+                overscrollBehavior: "contain",
+                scrollbarGutter: "stable",
+              }}
+            >
+              {/* --- GLOBAL FİLTRE PANELİ (BUTONLU) --- */}
+              {activeTab === "yonetici" && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", padding: "15px", backgroundColor: "white", borderRadius: "8px", marginBottom: "15px", alignItems: "flex-end" }}>
+                  <Space direction="vertical" size={2}>
+                    <Text type="secondary" strong style={{ fontSize: "12px" }}>Tarih Aralığı</Text>
+                    <RangePicker
+                      value={tempDates}
+                      onChange={(dates) => setTempDates(dates)}
+                    />
+                  </Space>
+
+                  <Space direction="vertical" size={2}>
+                    <Text type="secondary" strong style={{ fontSize: "12px" }}>Lokasyonlar</Text>
+                    <Select
+                      mode="multiple"
+                      style={{ width: "220px" }}
+                      placeholder="Tüm Lokasyonlar"
+                      maxTagCount="responsive"
+                      value={tempLokasyonIds}
+                      onChange={(value) => setTempLokasyonIds(value)}
+                      options={[
+                        { value: 85, label: "Lokasyon 85" },
+                        { value: 102, label: "Lokasyon 102" },
+                      ]}
+                    />
+                  </Space>
+
+                  <Space direction="vertical" size={2}>
+                    <Text type="secondary" strong style={{ fontSize: "12px" }}>Gider Tipi</Text>
+                    <Select
+                      style={{ width: "150px" }}
+                      value={tempGiderTipi}
+                      onChange={(value) => setTempGiderTipi(value)}
+                      options={[
+                        { value: "TÜMÜ", label: "TÜMÜ" },
+                        { value: "YAKIT", label: "YAKIT" },
+                        { value: "BAKIM", label: "BAKIM" },
+                        { value: "PARÇA", label: "PARÇA" },
+                        { value: "TAŞERON", label: "TAŞERON" },
+                        { value: "DİĞER", label: "DİĞER" },
+                      ]}
+                    />
+                  </Space>
+
+                  {/* --- UYGULA BUTONU --- */}
+                  <Button
+                    type="primary"
+                    style={{ backgroundColor: "#2da44e", borderColor: "#2da44e", fontWeight: "600" }}
+                    onClick={handleApplyFilters}
+                  >
+                    Filtreleri Uygula
+                  </Button>
+                </div>
               )}
-            </div>
 
-            <div style={{ marginBottom: "15px", backgroundColor: "white", padding: "10px 20px 0 20px", borderRadius: "8px" }}>
-               <Tabs defaultActiveKey="yonetici" items={items} onChange={(key) => setActiveTab(key)} />
-            </div>
+              <div>
+                {/* GRID İÇİN (YONETICI, MAKINE) */}
+                {GRID_TABS.includes(activeTab) && (
+                   <div className="grid-stack"></div>
+                )}
 
-            {/* --- GLOBAL FİLTRE PANELİ (BUTONLU) --- */}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", padding: "15px", backgroundColor: "white", borderRadius: "8px", marginBottom: "15px", alignItems: "flex-end" }}>
-              
-              <Space direction="vertical" size={2}>
-                <Text type="secondary" strong style={{ fontSize: "12px" }}>Tarih Aralığı</Text>
-                <RangePicker 
-                  value={tempDates}
-                  onChange={(dates) => setTempDates(dates)}
-                />
-              </Space>
-
-              <Space direction="vertical" size={2}>
-                <Text type="secondary" strong style={{ fontSize: "12px" }}>Lokasyonlar</Text>
-                <Select
-                  mode="multiple"
-                  style={{ width: "220px" }}
-                  placeholder="Tüm Lokasyonlar"
-                  maxTagCount="responsive"
-                  value={tempLokasyonIds}
-                  onChange={(value) => setTempLokasyonIds(value)}
-                  options={[
-                    { value: 85, label: "Lokasyon 85" },
-                    { value: 102, label: "Lokasyon 102" },
-                  ]}
-                />
-              </Space>
-
-              <Space direction="vertical" size={2}>
-                <Text type="secondary" strong style={{ fontSize: "12px" }}>Gider Tipi</Text>
-                <Select
-                  style={{ width: "150px" }}
-                  value={tempGiderTipi}
-                  onChange={(value) => setTempGiderTipi(value)}
-                  options={[
-                    { value: "TÜMÜ", label: "TÜMÜ" },
-                    { value: "BAKIM", label: "BAKIM" },
-                    { value: "SATINALMA", label: "SATINALMA" }
-                  ]}
-                />
-              </Space>
-
-              {/* --- UYGULA BUTONU --- */}
-              <Button 
-                type="primary" 
-                style={{ backgroundColor: "#2da44e", borderColor: "#2da44e", fontWeight: "600" }} 
-                onClick={handleApplyFilters}
-              >
-                Filtreleri Uygula
-              </Button>
-            </div>
-
-            <div style={{ overflow: "auto", height: "calc(100vh - 280px)" }}>
-              {/* GRID İÇİN (YONETICI, MAKINE) */}
-              {GRID_TABS.includes(activeTab) && (
-                 <div className="grid-stack"></div>
-              )}
-
-              {/* HARİCİ SAYFALAR İÇİN */}
-              {activeTab === 'satinalma' && <SatinalmaDashboard />}
-              {activeTab === 'bakim' && <BakimDashboard />}
-              {activeTab === 'proje' && <ProjeYonetimi />}
+                {/* HARİCİ SAYFALAR İÇİN */}
+                {activeTab === 'satinalma' && <SatinalmaDashboard embedded toolbarContainerId={DASHBOARD_HEADER_ACTIONS_ID} />}
+                {activeTab === 'bakim' && <BakimDashboard embedded />}
+                {activeTab === 'proje' && <ProjeYonetimi />}
+              </div>
             </div>
           </div>
         </AppProvider>

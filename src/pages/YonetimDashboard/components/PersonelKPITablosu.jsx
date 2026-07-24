@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from "react";
 import { Typography, Progress, Tooltip, Spin, message } from "antd";
 import { RightCircleOutlined, PieChartOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../api/http";
+import useDashboardFilters from "./useDashboardFilters";
 
 const { Text, Title } = Typography;
 
@@ -23,11 +24,8 @@ const categoryLabels = {
   DİĞER: "Diğer",
 };
 
-const PersonelKPITablosu = ({
-  baslangicTarihi = "2026-01-01T00:00:00",
-  bitisTarihi = "2026-06-26T23:59:59",
-  lokasyonIds = [],
-}) => {
+const PersonelKPITablosu = () => {
+  const { baslangicTarihi, bitisTarihi, lokasyonIds, giderTipi } = useDashboardFilters();
   const [apiData, setApiData] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -39,19 +37,27 @@ const PersonelKPITablosu = ({
         BaslangicTarihi: baslangicTarihi,
         BitisTarihi: bitisTarihi,
         LokasyonIds: lokasyonIds,
+        GiderTipi: giderTipi,
       };
 
       const response = await AxiosInstance.post("GetCostDistribution", payload);
 
-      if (response?.status_code === 200 || response?.status === 200) {
-        const resData = response.data?.liste ? response.data : response;
+      const resData = response?.liste
+        ? response
+        : response?.data?.liste
+          ? response.data
+          : null;
+
+      if (resData) {
         setApiData(resData);
       } else {
+        setApiData({ liste: [] });
         message.error("Maliyet dağılımı verileri alınırken bir hata oluştu.");
       }
     } catch (error) {
       console.error("Maliyet Dağılımı API Hatası:", error);
       message.error("Maliyet dağılımı sunucu hatası.");
+      setApiData({ liste: [] });
     } finally {
       setLoading(false);
     }
@@ -60,7 +66,7 @@ const PersonelKPITablosu = ({
   // Filtreler değiştikçe tetikle
   useEffect(() => {
     fetchCostDistribution();
-  }, [baslangicTarihi, bitisTarihi, JSON.stringify(lokasyonIds)]);
+  }, [baslangicTarihi, bitisTarihi, JSON.stringify(lokasyonIds), giderTipi]);
 
   // 2. Verileri İşleme ve Yüzde Hesaplama Bölümü
   const costDistributionData = useMemo(() => {

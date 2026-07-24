@@ -5,6 +5,7 @@ import { Button, Checkbox, Popover, Typography, Switch, Tooltip, ConfigProvider 
 import { DownOutlined, QuestionCircleOutlined, ReloadOutlined } from "@ant-design/icons";
 import trTR from "antd/lib/locale/tr_TR";
 import { useForm, FormProvider } from "react-hook-form";
+import { createPortal } from "react-dom";
 import Component3 from "./components/Component3.jsx";
 import Component2 from "./components/Component2.jsx";
 import Component4 from "./components/Component4.jsx";
@@ -19,6 +20,7 @@ import IsEmriTipleri from "./components/IsEmriTipleri.jsx";
 import { AppProvider } from "./../../../AppContext.jsx";
 import { createRoot } from "react-dom/client";
 import OnayIstekleriTablo from "./components/OnayIstekleriTablo.jsx";
+import PropTypes from "prop-types";
 
 import "./custom-gridstack.css"; // Add this line to import your custom CSS
 
@@ -65,7 +67,7 @@ const defaultItems = [
   { id: "widget9", x: 5, y: 13, ...widgetDefaults["widget9"] },
 ];
 
-function MainDashboard() {
+function MainDashboard({ embedded = false, toolbarContainerId }) {
   const [gridInstance, setGridInstance] = useState(null);
   const [reorganize, setReorganize] = useState();
   const [updateApi, setUpdateApi] = useState(false);
@@ -571,87 +573,99 @@ function MainDashboard() {
     </div>
   );
 
+  const toolbarActions = (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        flexDirection: "row",
+        gap: "10px",
+      }}
+    >
+      <Button type="text" onClick={rerenderWidgets}>
+        <Text
+          type="secondary"
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            gap: "5px",
+            alignItems: "center",
+          }}
+        >
+          <ReloadOutlined />
+          Verileri Yenile
+        </Text>
+      </Button>
+      <Button
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          gap: "5px",
+        }}
+        onClick={handleRearrange}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+          <path
+            fill=""
+            fillRule="evenodd"
+            d="M18 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1h-1zm-1 7.5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zM5 17a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1H5zm5.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm6.5 0a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm-5.5-7.5a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1h-1zm-7.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1H5a1 1 0 01-1-1v-1zM10.5 5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1V5zM5 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1h-1z"
+            clipRule="evenodd"
+          ></path>
+        </svg>
+        Yeniden Sırala
+      </Button>
+      <Popover content={content} title="Widgetları Yönet" trigger="click">
+        <Button
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: "5px",
+          }}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="widget">
+            <path
+              fill=""
+              fillRule="evenodd"
+              d="M17.5 2a1 1 0 01.894.553l3.5 7A1 1 0 0121 11h-7a1 1 0 01-.894-1.447l3.5-7A1 1 0 0117.5 2zm-1.882 7h3.764L17.5 5.236 15.618 9zM4 13a2 2 0 00-2 2v5a2 2 0 002 2h5a2 2 0 002-2v-5a2 2 0 00-2-2H4zm0 7v-5h5v5H4zm13.5-7a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM15 17.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0zM6.5 2a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM4 6.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0z"
+              clipRule="evenodd"
+            ></path>
+          </svg>
+          Widgetleri Yönet
+          <DownOutlined style={{ marginLeft: "2px" }} />
+        </Button>
+      </Popover>
+    </div>
+  );
+
+  const toolbarContainer =
+    embedded && toolbarContainerId && typeof document !== "undefined"
+      ? document.getElementById(toolbarContainerId)
+      : null;
+
   return (
     <FormProvider {...methods}>
       <ConfigProvider locale={trTR}>
         <AppProvider>
           <div className="App">
-            <div
-              style={{
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: "10px",
-                marginBottom: "10px",
-              }}
-            >
-              <CustomDashboards />
+            {embedded && toolbarContainer && createPortal(toolbarActions, toolbarContainer)}
+            {!embedded && (
               <div
                 style={{
+                  width: "100%",
                   display: "flex",
                   alignItems: "center",
-                  flexDirection: "row",
+                  justifyContent: "space-between",
                   gap: "10px",
+                  marginBottom: "10px",
                 }}
               >
-                <Button type="text" onClick={rerenderWidgets}>
-                  <Text
-                    type="secondary"
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      gap: "5px",
-                      alignItems: "center",
-                    }}
-                  >
-                    <ReloadOutlined />
-                    Verileri Yenile
-                  </Text>
-                </Button>
-                <Button
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: "5px",
-                  }}
-                  onClick={handleRearrange}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-                    <path
-                      fill=""
-                      fillRule="evenodd"
-                      d="M18 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1h-1zm-1 7.5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zM5 17a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1H5zm5.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm6.5 0a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1v-1zm-5.5-7.5a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 00-1-1h-1zm-7.5 1a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1H5a1 1 0 01-1-1v-1zM10.5 5a1 1 0 011-1h1a1 1 0 011 1v1a1 1 0 01-1 1h-1a1 1 0 01-1-1V5zM5 4a1 1 0 00-1 1v1a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1H5z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
-                  Yeniden Sırala
-                </Button>
-                <Popover content={content} title="Widgetları Yönet" trigger="click">
-                  <Button
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: "5px",
-                    }}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="widget">
-                      <path
-                        fill=""
-                        fillRule="evenodd"
-                        d="M17.5 2a1 1 0 01.894.553l3.5 7A1 1 0 0121 11h-7a1 1 0 01-.894-1.447l3.5-7A1 1 0 0117.5 2zm-1.882 7h3.764L17.5 5.236 15.618 9zM4 13a2 2 0 00-2 2v5a2 2 0 002 2h5a2 2 0 002-2v-5a2 2 0 00-2-2H4zm0 7v-5h5v5H4zm13.5-7a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM15 17.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0zM6.5 2a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM4 6.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0z"
-                        clipRule="evenodd"
-                      ></path>
-                    </svg>
-                    Widgetleri Yönet
-                    <DownOutlined style={{ marginLeft: "2px" }} />
-                  </Button>
-                </Popover>
+                <CustomDashboards />
+                {toolbarActions}
               </div>
-            </div>
-            <div style={{ overflow: "auto", height: "calc(100vh - 210px)" }}>
+            )}
+            <div style={embedded ? undefined : { overflow: "auto", height: "calc(100vh - 210px)" }}>
               <div className="grid-stack">
                 <div className="grid-stack-item border-dark" id="widget2">
                   <div className="grid-stack-item-content">
@@ -727,5 +741,10 @@ function MainDashboard() {
     </FormProvider>
   );
 }
+
+MainDashboard.propTypes = {
+  embedded: PropTypes.bool,
+  toolbarContainerId: PropTypes.string,
+};
 
 export default MainDashboard;

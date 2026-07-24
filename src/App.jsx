@@ -351,6 +351,7 @@ const BaseLayout = () => {
   const location = useLocation();
   const layoutExcludedPaths = ["/isEmri1"];
   const isLayoutExcluded = layoutExcludedPaths.includes(location.pathname);
+  const hasFixedDashboardHeader = location.pathname === "/omegaDash";
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -506,7 +507,13 @@ const BaseLayout = () => {
             <Headers />
           </Header>
           <div style={{ display: "flex", flex: 1, overflow: "hidden", height: "calc(100vh - 112px)" }}>
-            <Content style={{ margin: mobileView ? "0 0px" : "0 16px", flex: 1, overflow: "auto" }}>
+            <Content
+              style={{
+                margin: mobileView ? "0 0px" : "0 16px",
+                flex: 1,
+                overflow: hasFixedDashboardHeader ? "hidden" : "auto",
+              }}
+            >
               <Breadcrumbs />
               <div
                 style={{

@@ -9,6 +9,7 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "../../../utils/i18n.js";
 import trTR from "antd/lib/locale/tr_TR";
 import { useForm, FormProvider } from "react-hook-form";
+import PropTypes from "prop-types";
 import { AppProvider } from "../../../AppContext.jsx";
 import Filters from "./Filters/Filters.jsx";
 import Component3 from "./components/Component3.jsx";
@@ -168,7 +169,7 @@ const kpiColumns = [
   },
 ];
 
-function MainDashboard() {
+function MainDashboard({ embedded = false }) {
   const [reorganize, setReorganize] = useState();
   const [updateApi, setUpdateApi] = useState(false);
   const [isKpiModalOpen, setIsKpiModalOpen] = useState(false);
@@ -827,7 +828,7 @@ function MainDashboard() {
           </Modal>
 
           {/* GRIDSTACK ALANI */}
-          <div style={{ overflow: "auto", height: "calc(100vh - 270px)" }}> {/* Yükseklik biraz daha kısıldı çünkü bar eklendi */}
+          <div style={embedded ? undefined : { overflow: "auto", height: "calc(100vh - 270px)" }}> {/* Yükseklik biraz daha kısıldı çünkü bar eklendi */}
             <div className="grid-stack"></div>
           </div>
         </div>
@@ -837,5 +838,9 @@ function MainDashboard() {
     </FormProvider>
   );
 }
+
+MainDashboard.propTypes = {
+  embedded: PropTypes.bool,
+};
 
 export default MainDashboard;

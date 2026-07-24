@@ -2,15 +2,15 @@ import React from "react";
 import bg from "../../../assets/images/bg-card.png";
 import { Typography, Spin } from "antd";
 // --- react-hook-form IMPORTU ---
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 
 const { Text } = Typography;
 
 function Component1() {
   // --- FORM CONTEXT'TEN VERİLERİ ÇEKİYORUZ ---
-  const { watch } = useFormContext();
-  const summaryData = watch("summaryData");
-  const paraBirimi = watch("paraBirimi");
+  const { control } = useFormContext();
+  const summaryData = useWatch({ control, name: "summaryData" });
+  const paraBirimi = useWatch({ control, name: "paraBirimi" });
 
   return (
     <div

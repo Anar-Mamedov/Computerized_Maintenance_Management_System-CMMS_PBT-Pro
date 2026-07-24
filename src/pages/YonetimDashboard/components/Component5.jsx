@@ -54,20 +54,27 @@ const Component5 = () => {
         BaslangicTarihi: baslangicTarihi,
         BitisTarihi: bitisTarihi,
         LokasyonIds: lokasyonIds || [],
-        GiderTipi: giderTipi || "TÜMÜ" // Dokümandaki ortak şablona göre ekledik kanka
+        GiderTipi: giderTipi || "TÜMÜ",
       };
       
       const response = await AxiosInstance.post("GetMonthlyCostGraph", payload);
       
-      if (response?.status_code === 200 || response?.status === 200) {
-        const resData = response.data?.liste ? response.data : response;
+      const resData = response?.liste
+        ? response
+        : response?.data?.liste
+          ? response.data
+          : null;
+
+      if (resData) {
         setApiData(resData);
       } else {
+        setApiData({ liste: [] });
         message.error("Maliyet verileri alınırken bir hata oluştu.");
       }
     } catch (error) {
       console.error("Maliyet Grafiği API Hatası:", error);
       message.error("Sunucuya bağlanılamadı.");
+      setApiData({ liste: [] });
     } finally {
       setLoading(false);
     }

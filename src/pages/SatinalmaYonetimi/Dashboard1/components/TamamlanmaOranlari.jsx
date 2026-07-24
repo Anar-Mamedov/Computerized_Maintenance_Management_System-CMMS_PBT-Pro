@@ -115,7 +115,7 @@ function MalzemeTipSiparisGrafigi(props = {}) {
   );
 
   return (
-    <div style={{ width: "100%", height: "150%", borderRadius: "5px", backgroundColor: "white", display: "flex", flexDirection: "column", gap: "10px", border: "1px solid #f0f0f0" }}>
+    <div style={{ width: "100%", height: "100%", borderRadius: "5px", backgroundColor: "white", display: "flex", flexDirection: "column", gap: "10px", border: "1px solid #f0f0f0" }}>
       <div style={{ padding: "10px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
         <Text style={{ fontWeight: "500", fontSize: "17px" }}>Malzeme Tiplerine Göre Sipariş Dağılımı</Text>
         <Popover placement="bottom" content={content} trigger="click">
@@ -124,7 +124,7 @@ function MalzemeTipSiparisGrafigi(props = {}) {
       </div>
 
       {isLoading ? <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px' }}><Spin /></div> : (
-        <div style={{ flex: 1, padding: "10px", minHeight: "350px" }}>
+        <div style={{ flex: 1, padding: "10px", minHeight: 0 }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
               <CartesianGrid strokeDasharray="3 3" />

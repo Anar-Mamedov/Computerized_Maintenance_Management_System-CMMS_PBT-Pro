@@ -13,12 +13,13 @@ import {
   LabelList,
 } from "recharts";
 import AxiosInstance from "../../../api/http";
+import useDashboardFilters from "./useDashboardFilters";
 
 const { Text, Title } = Typography;
 
 // Buton değerlerini API'nin beklediği string formatına doğru eşlemek için map
 const filterMapping = {
-  "Tümü": null,
+  "Tümü": "TÜMÜ",
   "Yakıt": "YAKIT",
   "Bakım": "BAKIM",
   "Parça": "PARÇA",
@@ -26,14 +27,15 @@ const filterMapping = {
   "Diğer": "DİĞER",
 };
 
+const filterLabels = Object.fromEntries(
+  Object.entries(filterMapping).map(([label, value]) => [value, label])
+);
+
 // Görseldeki dinamik bar renkleri (Sırasıyla Mor, Kırmızı, Yeşil, Mavi vb.)
 const BAR_COLORS = ["#722ed1", "#ff4d4f", "#52c41a", "#1890ff", "#faad14", "#13c2c2"];
 
-const AylikBakimMaliyetleri = ({
-  baslangicTarihi = "2026-01-01T00:00:00",
-  bitisTarihi = "2026-06-26T23:59:59",
-  lokasyonIds = [],
-}) => {
+const AylikBakimMaliyetleri = () => {
+  const { baslangicTarihi, bitisTarihi, lokasyonIds, giderTipi } = useDashboardFilters();
   const [searchText, setSearchText] = useState("");
   const [activeFilter, setActiveFilter] = useState("Tümü");
   const [apiData, setApiData] = useState(null);
@@ -41,6 +43,10 @@ const AylikBakimMaliyetleri = ({
 
   // Filtreleme Seçenekleri (Görseldeki gibi tam olarak yazıldı)
   const filterOptions = ["Tümü", "Yakıt", "Bakım", "Parça", "Taşeron", "Diğer"];
+
+  useEffect(() => {
+    setActiveFilter(filterLabels[giderTipi] || "Tümü");
+  }, [giderTipi]);
 
   // 1. API İstek Fonksiyonu
   const fetchLocationCosts = async () => {
@@ -50,7 +56,7 @@ const AylikBakimMaliyetleri = ({
         BaslangicTarihi: baslangicTarihi,
         BitisTarihi: bitisTarihi,
         LokasyonIds: lokasyonIds,
-        GiderTipi: filterMapping[activeFilter],
+        GiderTipi: filterMapping[activeFilter] || "TÜMÜ",
       };
 
       const response = await AxiosInstance.post("GetLocationCosts", payload);

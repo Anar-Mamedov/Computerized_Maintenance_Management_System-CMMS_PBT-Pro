@@ -36,6 +36,13 @@
     position: absolute;
 }
 
+#widget6 .widget-body,
+#widget6 .grid-stack-item-content,
+#widget44 .widget-body,
+#widget44 .grid-stack-item-content {
+    overflow-y: hidden;
+}
+
 
 
 /*.grid-stack-item > :first-child {*/

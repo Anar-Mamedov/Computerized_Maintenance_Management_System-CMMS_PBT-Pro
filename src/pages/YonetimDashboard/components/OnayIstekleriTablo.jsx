@@ -2,15 +2,13 @@ import React, { useMemo, useState, useEffect } from "react";
 import { Typography, Spin, message } from "antd";
 import { ShopOutlined, WarningOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../api/http";
+import useDashboardFilters from "./useDashboardFilters";
 
 const { Text, Title } = Typography;
 
-const LokasyonBazindaIsTalepleri = ({
-  baslangicTarihi = "2026-01-01T00:00:00",
-  bitisTarihi = "2026-06-26T23:59:59",
-  lokasyonIds = [],
-}) => {
-  const [apiData, setApiData] = useState(null);
+const LokasyonBazindaIsTalepleri = () => {
+  const { baslangicTarihi, bitisTarihi, lokasyonIds, giderTipi } = useDashboardFilters();
+  const [apiData, setApiData] = useState([]);
   const [loading, setLoading] = useState(false);
 
   // 1. API İstek Fonksiyonu
@@ -21,20 +19,29 @@ const LokasyonBazindaIsTalepleri = ({
         BaslangicTarihi: baslangicTarihi,
         BitisTarihi: bitisTarihi,
         LokasyonIds: lokasyonIds,
+        GiderTipi: giderTipi,
       };
 
       const response = await AxiosInstance.post("GetTopSuppliers", payload);
 
-      // API dokümanına göre liste root altındaki "data" array'inde geliyor
-      if (response?.status_code === 200 || response?.status === 200) {
-        const resData = response.data ? response.data : response;
-        setApiData(resData);
+      const suppliers = Array.isArray(response)
+        ? response
+        : Array.isArray(response?.data)
+          ? response.data
+          : Array.isArray(response?.data?.data)
+            ? response.data.data
+            : [];
+
+      if (response?.status_code === 200 || response?.status === 200 || suppliers.length > 0) {
+        setApiData(suppliers);
       } else {
+        setApiData([]);
         message.error("Tedarikçi verileri alınırken bir hata oluştu.");
       }
     } catch (error) {
       console.error("Tedarikçi API Hatası:", error);
       message.error("Tedarikçi verileri sunucu hatası.");
+      setApiData([]);
     } finally {
       setLoading(false);
     }
@@ -43,16 +50,16 @@ const LokasyonBazindaIsTalepleri = ({
   // Filtreler değiştikçe tetikle
   useEffect(() => {
     fetchTopSuppliers();
-  }, [baslangicTarihi, bitisTarihi, JSON.stringify(lokasyonIds)]);
+  }, [baslangicTarihi, bitisTarihi, JSON.stringify(lokasyonIds), giderTipi]);
 
   // 2. Verileri İşleme ve Yoğunlaşma Riski Hesaplama
   const { suppliersList, riskPercentage } = useMemo(() => {
-    if (!apiData || !apiData.data || apiData.data.length === 0) {
+    if (!Array.isArray(apiData) || apiData.length === 0) {
       return { suppliersList: [], riskPercentage: 0 };
     }
 
     // Gelen veriyi en yüksek tutardan aşağıya doğru sıralayalım
-    const sortedData = [...apiData.data].sort((a, b) => (b.ToplamTutar || 0) - (a.ToplamTutar || 0));
+    const sortedData = [...apiData].sort((a, b) => (b.ToplamTutar || 0) - (a.ToplamTutar || 0));
 
     // Genel toplamı ve ilk 2 firmanın toplamını bulalım
     const generalTotal = sortedData.reduce((sum, item) => sum + (item.ToplamTutar || 0), 0);
