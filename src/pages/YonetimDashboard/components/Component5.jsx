@@ -141,7 +141,7 @@ const Component5 = () => {
 
   if (loading) {
     return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "350px", backgroundColor: "white", borderRadius: "10px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%", backgroundColor: "white", borderRadius: "10px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
         <Spin tip="Maliyet verileri yükleniyor..." />
       </div>
     );
@@ -149,7 +149,7 @@ const Component5 = () => {
 
   if (chartData.length === 0) {
     return (
-      <div style={{ padding: "4px 20px", height: "350px", backgroundColor: "white", borderRadius: "10px", display: "flex", justifyContent: "center", alignItems: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+      <div style={{ padding: "4px 20px", height: "100%", boxSizing: "border-box", backgroundColor: "white", borderRadius: "10px", display: "flex", justifyContent: "center", alignItems: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
         <Text type="secondary">Belirtilen kriterlerde maliyet verisi bulunamadı.</Text>
       </div>
     );
