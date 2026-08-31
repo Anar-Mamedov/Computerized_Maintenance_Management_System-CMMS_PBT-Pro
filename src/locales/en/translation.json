@@ -499,6 +499,7 @@
   "varsayilanSiralamayaDon": "Reset To Default Order",
   "widgetYonetimAciklama": "You can hide widgets, make them visible again and reorder them by dragging the handle. Your preferences are stored in your browser.",
   "varsayilanGenislik": "Default width: 12/12 columns",
+  "widgetGenisligi": "Width: {{span}}/24 columns",
   "suruklemeTutamaci": "Drag handle",
   "widgetMenusu": "widget menu",
   "buyut": "Expand",

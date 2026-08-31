@@ -496,6 +496,7 @@
   "varsayilanSiralamayaDon": "Standart Sıralamaya Qayıt",
   "widgetYonetimAciklama": "Widgetləri gizlədə, yenidən görünən edə və tutacaqdan sürüşdürərək sıralaya bilərsiniz. Seçimləriniz brauzerinizdə saxlanılır.",
   "varsayilanGenislik": "Standart en: 12/12 sütun",
+  "widgetGenisligi": "En: {{span}}/24 sütun",
   "suruklemeTutamaci": "Sürüşdürmə tutacağı",
   "widgetMenusu": "widget menyusu",
   "buyut": "Böyüt",

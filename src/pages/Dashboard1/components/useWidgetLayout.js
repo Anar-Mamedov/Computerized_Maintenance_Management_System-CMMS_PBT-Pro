@@ -1,14 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
 
-const STORAGE_KEY = "dashboardV2WidgetLayout";
+// Widget anahtarları değiştikçe sürüm artırılır; eski kayıtlar okunmaz ve
+// kullanıcı yeni varsayılan sıralamayla başlar.
+const STORAGE_KEY = "dashboardV2WidgetLayout.v3";
 
-/** Dashboard'daki widget satırlarının varsayılan sırası. */
+/** Dashboard'daki widget'ların varsayılan sırası. */
 export const DEFAULT_WIDGET_ORDER = [
-  "kpi",
-  "actionCompleted",
-  "typeCosts",
-  "paretoTopEquipment",
-  "recurringUpcoming",
+  "kpiBekleyenIsTalepleri",
+  "kpiAcikIsEmirleri",
+  "kpiKritikStoklar",
+  "kpiAcikArizaIsEmirleri",
+  "actionCenter",
+  "completedWorkOrders",
+  "workOrderTypePerformance",
+  "monthlyMaintenanceCosts",
+  "failurePareto",
+  "topFailureEquipment",
+  "recurringFailures",
+  "upcomingMaintenances",
   "personnelKpi",
   "performanceSummary",
   "timeDistribution",

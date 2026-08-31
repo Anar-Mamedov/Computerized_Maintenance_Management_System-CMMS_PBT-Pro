@@ -7,10 +7,10 @@ import { LuGripVertical } from "react-icons/lu";
 import { COLORS } from "./theme";
 
 /**
- * Dashboard satırlarını "Yeniden Sırala" modunda sürüklenebilir hale getirir.
+ * Tek bir dashboard widget'ını "Yeniden Sırala" modunda sürüklenebilir hale getirir.
  * Mod kapalıyken içerik olduğu gibi render edilir.
  */
-export default function SortableWidgetRow({ id, reorderMode, children }) {
+export default function SortableWidget({ id, reorderMode, children }) {
   const { t } = useTranslation();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled: !reorderMode });
 
@@ -24,6 +24,7 @@ export default function SortableWidgetRow({ id, reorderMode, children }) {
         transition,
         opacity: isDragging ? 0.5 : 1,
         position: "relative",
+        height: "100%",
         outline: `1px dashed ${COLORS.blue}`,
         outlineOffset: 4,
         borderRadius: 12,
@@ -56,7 +57,7 @@ export default function SortableWidgetRow({ id, reorderMode, children }) {
   );
 }
 
-SortableWidgetRow.propTypes = {
+SortableWidget.propTypes = {
   id: PropTypes.string.isRequired,
   reorderMode: PropTypes.bool,
   children: PropTypes.node,

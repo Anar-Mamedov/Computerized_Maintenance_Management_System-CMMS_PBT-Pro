@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import MainDashboard from "./MainDashboard.jsx";
 import DashboardProvider from "./components/DashboardProvider.jsx";
 import ActionCenterProvider from "./components/ActionCenterProvider.jsx";
+import KpiCardsProvider from "./components/KpiCardsProvider.jsx";
 import "./dashboard.css";
 
 export default function Dashboard() {
@@ -22,7 +23,9 @@ export default function Dashboard() {
     <FormProvider {...formMethods}>
       <DashboardProvider>
         <ActionCenterProvider>
-          <MainDashboard />
+          <KpiCardsProvider>
+            <MainDashboard />
+          </KpiCardsProvider>
         </ActionCenterProvider>
       </DashboardProvider>
     </FormProvider>

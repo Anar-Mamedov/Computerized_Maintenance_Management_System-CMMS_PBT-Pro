@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 import { LuGripVertical, LuRotateCcw } from "react-icons/lu";
 import { COLORS } from "./theme";
 
-function SortableWidgetRow({ id, title, visible, onToggle }) {
+function SortableWidgetRow({ id, title, span, visible, onToggle }) {
   const { t } = useTranslation();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
@@ -35,7 +35,7 @@ function SortableWidgetRow({ id, title, visible, onToggle }) {
       </span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 13, fontWeight: 500, color: COLORS.text }}>{title}</div>
-        <div style={{ fontSize: 12, color: COLORS.muted }}>{t("varsayilanGenislik")}</div>
+        <div style={{ fontSize: 12, color: COLORS.muted }}>{t("widgetGenisligi", { span })}</div>
       </div>
       <Switch size="small" checked={visible} onChange={(checked) => onToggle(id, checked)} />
     </div>
@@ -45,11 +45,12 @@ function SortableWidgetRow({ id, title, visible, onToggle }) {
 SortableWidgetRow.propTypes = {
   id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
+  span: PropTypes.number,
   visible: PropTypes.bool,
   onToggle: PropTypes.func.isRequired,
 };
 
-export default function WidgetManagerDrawer({ open, onClose, order, hidden, widgetTitles, onReorder, onToggleVisibility, onReset }) {
+export default function WidgetManagerDrawer({ open, onClose, order, hidden, widgetTitles, widgetSpans, onReorder, onToggleVisibility, onReset }) {
   const { t } = useTranslation();
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
@@ -80,7 +81,7 @@ export default function WidgetManagerDrawer({ open, onClose, order, hidden, widg
       <DndContext sensors={sensors} collisionDetection={closestCenter} modifiers={[restrictToVerticalAxis, restrictToParentElement]} onDragEnd={handleDragEnd}>
         <SortableContext items={order} strategy={verticalListSortingStrategy}>
           {order.map((key) => (
-            <SortableWidgetRow key={key} id={key} title={widgetTitles[key]} visible={!hidden.includes(key)} onToggle={onToggleVisibility} />
+            <SortableWidgetRow key={key} id={key} title={widgetTitles[key]} span={widgetSpans[key]} visible={!hidden.includes(key)} onToggle={onToggleVisibility} />
           ))}
         </SortableContext>
       </DndContext>
@@ -94,6 +95,7 @@ WidgetManagerDrawer.propTypes = {
   order: PropTypes.array.isRequired,
   hidden: PropTypes.array.isRequired,
   widgetTitles: PropTypes.object.isRequired,
+  widgetSpans: PropTypes.object.isRequired,
   onReorder: PropTypes.func.isRequired,
   onToggleVisibility: PropTypes.func.isRequired,
   onReset: PropTypes.func.isRequired,
