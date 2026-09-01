@@ -352,6 +352,8 @@ const BaseLayout = () => {
   const layoutExcludedPaths = ["/isEmri1"];
   const isLayoutExcluded = layoutExcludedPaths.includes(location.pathname);
   const hasFixedDashboardHeader = location.pathname === "/omegaDash";
+  // Dashboard ekraninda breadcrumb gosterilmez; bosalan alani icerik kaplar.
+  const isDashboardRoute = location.pathname === "/";
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -514,13 +516,15 @@ const BaseLayout = () => {
                 overflow: hasFixedDashboardHeader ? "hidden" : "auto",
               }}
             >
-              <Breadcrumbs />
+              {!isDashboardRoute && <Breadcrumbs />}
               <div
                 style={{
                   padding: isLayoutExcluded ? 0 : mobileView ? "24px 0px" : 24,
                   borderRadius: isLayoutExcluded ? 0 : "16px",
                   minHeight: 360,
-                  height: "calc(100vh - 132px)",
+                  // Dashboard rotasinda breadcrumb yerine yanlardaki ile ayni 16px ust bosluk birakilir.
+                  marginTop: isDashboardRoute ? 16 : 0,
+                  height: isDashboardRoute ? "calc(100vh - 112px)" : "calc(100vh - 132px)",
                   background: isLayoutExcluded ? "transparent" : colorBgContainer,
                 }}
               >

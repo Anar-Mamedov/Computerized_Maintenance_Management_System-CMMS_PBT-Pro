@@ -51,7 +51,7 @@ function RolSelectBox() {
               setValue("rolSelectID", value ?? null); // Set ID to rolSelectID
             }}
             value={field.value ?? null}
-            filterOption={(input, option) => option.label.toLowerCase().includes(input.toLowerCase())}
+            filterOption={(input, option) => (option?.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false)}
           />
         )}
       />
