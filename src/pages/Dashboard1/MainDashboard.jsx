@@ -17,6 +17,7 @@ import UpcomingMaintenances from "./components/UpcomingMaintenances";
 import PersonnelKpi from "./components/PersonnelKpi";
 import PerformanceSummary from "./components/PerformanceSummary";
 import WorkOrderTimeDistribution from "./components/WorkOrderTimeDistribution";
+import PendingApprovals from "./components/PendingApprovals";
 import InventoryDistribution from "./components/InventoryDistribution";
 import WidgetManagerDrawer from "./components/WidgetManagerDrawer";
 import SortableWidget from "./components/SortableWidget";
@@ -41,6 +42,7 @@ const WIDGET_LAYOUT = {
   personnelKpi: { span: 24, col: { xs: 24 } },
   performanceSummary: { span: 24, col: { xs: 24 } },
   timeDistribution: { span: 24, col: { xs: 24 } },
+  pendingApprovals: { span: 24, col: { xs: 24 } },
   inventoryDistribution: { span: 24, col: { xs: 24 } },
 };
 
@@ -71,6 +73,7 @@ export default function MainDashboard() {
       personnelKpi: t("personelKpi"),
       performanceSummary: t("bakimPerformansiOzeti"),
       timeDistribution: t("acilanIsEmirlerininZamanDagilimi"),
+      pendingApprovals: t("bekleyenOnaylarim"),
       inventoryDistribution: t("makineTiplerineGoreEnvanterDagilimi"),
     }),
     [t]
@@ -93,6 +96,7 @@ export default function MainDashboard() {
       personnelKpi: <PersonnelKpi onHide={() => hideWidget("personnelKpi")} />,
       performanceSummary: <PerformanceSummary />,
       timeDistribution: <WorkOrderTimeDistribution onHide={() => hideWidget("timeDistribution")} />,
+      pendingApprovals: <PendingApprovals onHide={() => hideWidget("pendingApprovals")} />,
       inventoryDistribution: <InventoryDistribution onHide={() => hideWidget("inventoryDistribution")} />,
     }),
     [hideWidget]

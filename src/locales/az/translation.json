@@ -609,5 +609,20 @@
   "satirOrani": " · {{rows}} sətir",
   "aktifEnvanterinTipVeDurumDagilimi": "Aktiv inventarın tip və status paylanması",
   "durumDagilimi": "Status Paylanması",
-  "ekipmanListesineGit": "Avadanlıq Siyahısına Get"
+  "ekipmanListesineGit": "Avadanlıq Siyahısına Get",
+  "bekleyenOnaylarim": "Gözləyən Təsdiqlərim",
+  "onayiniziBekleyenKayitlar": "Təsdiqinizi gözləyən qeydlər",
+  "bekleyen": "Gözləyən",
+  "onayTipi": "Təsdiq Tipi",
+  "islem": "Əməliyyat",
+  "onayla": "Təsdiqlə",
+  "reddet": "Rədd Et",
+  "reddetmeIslemi": "Rədd Etmə",
+  "vazgec": "İmtina",
+  "bekleyenOnayYok": "Gözləyən təsdiq yoxdur",
+  "buIslemeYetkinizYok": "Bu əməliyyatı etmək səlahiyyətiniz yoxdur.",
+  "teklifKarsilastirma": "Təklif Müqayisəsi",
+  "aciklama": "Açıqlama",
+  "alanBosBirakilamaz": "Bu sahə boş buraxıla bilməz",
+  "kod": "Kod"
 }

@@ -609,5 +609,20 @@
   "satirOrani": " · {{rows}} строк",
   "aktifEnvanterinTipVeDurumDagilimi": "Распределение активного оборудования по типу и статусу",
   "durumDagilimi": "Распределение по статусу",
-  "ekipmanListesineGit": "Перейти к списку оборудования"
+  "ekipmanListesineGit": "Перейти к списку оборудования",
+  "bekleyenOnaylarim": "Мои ожидающие согласования",
+  "onayiniziBekleyenKayitlar": "Записи, ожидающие вашего согласования",
+  "bekleyen": "Ожидает",
+  "onayTipi": "Тип согласования",
+  "islem": "Действие",
+  "onayla": "Согласовать",
+  "reddet": "Отклонить",
+  "reddetmeIslemi": "Отклонение",
+  "vazgec": "Отмена",
+  "bekleyenOnayYok": "Нет ожидающих согласований",
+  "buIslemeYetkinizYok": "У вас нет прав на это действие.",
+  "teklifKarsilastirma": "Сравнение предложений",
+  "aciklama": "Описание",
+  "alanBosBirakilamaz": "Поле не может быть пустым",
+  "kod": "Код"
 }

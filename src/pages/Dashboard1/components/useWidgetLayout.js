@@ -21,6 +21,7 @@ export const DEFAULT_WIDGET_ORDER = [
   "personnelKpi",
   "performanceSummary",
   "timeDistribution",
+  "pendingApprovals",
   "inventoryDistribution",
 ];
 

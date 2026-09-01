@@ -612,5 +612,20 @@
   "satirOrani": " · {{rows}} rows",
   "aktifEnvanterinTipVeDurumDagilimi": "Type and status distribution of active inventory",
   "durumDagilimi": "Status Distribution",
-  "ekipmanListesineGit": "Go To Equipment List"
+  "ekipmanListesineGit": "Go To Equipment List",
+  "bekleyenOnaylarim": "My Pending Approvals",
+  "onayiniziBekleyenKayitlar": "Records awaiting your approval",
+  "bekleyen": "Pending",
+  "onayTipi": "Approval Type",
+  "islem": "Action",
+  "onayla": "Approve",
+  "reddet": "Reject",
+  "reddetmeIslemi": "Rejection",
+  "vazgec": "Cancel",
+  "bekleyenOnayYok": "No pending approvals",
+  "buIslemeYetkinizYok": "You are not authorised to perform this action.",
+  "teklifKarsilastirma": "Quotation Comparison",
+  "aciklama": "Description",
+  "alanBosBirakilamaz": "This field cannot be left empty",
+  "kod": "Code"
 }

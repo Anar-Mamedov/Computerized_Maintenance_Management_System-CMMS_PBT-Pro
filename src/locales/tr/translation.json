@@ -1249,5 +1249,17 @@
   "satirOrani": " · {{rows}} sıra",
   "aktifEnvanterinTipVeDurumDagilimi": "Aktif envanterin tip ve durum dağılımı",
   "durumDagilimi": "Durum Dağılımı",
-  "ekipmanListesineGit": "Ekipman Listesine Git"
+  "ekipmanListesineGit": "Ekipman Listesine Git",
+  "bekleyenOnaylarim": "Bekleyen Onaylarım",
+  "onayiniziBekleyenKayitlar": "Onayınızı bekleyen kayıtlar",
+  "bekleyen": "Bekleyen",
+  "onayTipi": "Onay Tipi",
+  "islem": "İşlem",
+  "onayla": "Onayla",
+  "reddet": "Reddet",
+  "reddetmeIslemi": "Reddetme İşlemi",
+  "vazgec": "Vazgeç",
+  "bekleyenOnayYok": "Bekleyen onay yok",
+  "buIslemeYetkinizYok": "Bu işlemi yapmaya yetkiniz bulunmamaktadır.",
+  "teklifKarsilastirma": "Teklif Karşılaştırma"
 }
