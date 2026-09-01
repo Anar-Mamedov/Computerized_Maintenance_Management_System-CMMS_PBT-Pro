@@ -22,6 +22,8 @@ export const COLORS = {
   purple: "#7A5AF8",
   purpleSoft: "#EFEBFE",
   teal: "#13B8B2",
+  // Durum dağılımı çubuğunda "Pasif" segmenti: üzerindeki koyu yazının okunabildiği nötr gri.
+  neutral: "#C3CAD6",
   averageLine: "#D9E3F1",
 };
 

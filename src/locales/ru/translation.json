@@ -606,5 +606,8 @@
   "yuksekligiAyarla": "Изменить высоту",
   "boyutuAyarla": "Изменить размер",
   "boyutuSifirla": "Сбросить размер",
-  "satirOrani": " · {{rows}} строк"
+  "satirOrani": " · {{rows}} строк",
+  "aktifEnvanterinTipVeDurumDagilimi": "Распределение активного оборудования по типу и статусу",
+  "durumDagilimi": "Распределение по статусу",
+  "ekipmanListesineGit": "Перейти к списку оборудования"
 }

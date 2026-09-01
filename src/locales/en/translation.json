@@ -609,5 +609,8 @@
   "yuksekligiAyarla": "Adjust height",
   "boyutuAyarla": "Adjust size",
   "boyutuSifirla": "Reset size",
-  "satirOrani": " · {{rows}} rows"
+  "satirOrani": " · {{rows}} rows",
+  "aktifEnvanterinTipVeDurumDagilimi": "Type and status distribution of active inventory",
+  "durumDagilimi": "Status Distribution",
+  "ekipmanListesineGit": "Go To Equipment List"
 }

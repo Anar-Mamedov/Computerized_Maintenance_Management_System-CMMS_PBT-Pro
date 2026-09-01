@@ -1246,5 +1246,8 @@
   "yuksekligiAyarla": "Yüksekliği ayarla",
   "boyutuAyarla": "Boyutu ayarla",
   "boyutuSifirla": "Boyutu sıfırla",
-  "satirOrani": " · {{rows}} sıra"
+  "satirOrani": " · {{rows}} sıra",
+  "aktifEnvanterinTipVeDurumDagilimi": "Aktif envanterin tip ve durum dağılımı",
+  "durumDagilimi": "Durum Dağılımı",
+  "ekipmanListesineGit": "Ekipman Listesine Git"
 }
