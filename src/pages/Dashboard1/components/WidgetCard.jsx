@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { Button, Dropdown, Modal, Result, Spin, Typography } from "antd";
 import { useTranslation } from "react-i18next";
 import { LuArrowRight, LuDownload, LuExpand, LuMoreVertical, LuEyeOff, LuRefreshCw } from "react-icons/lu";
+import { useWidgetSize } from "./widgetSizeContext";
 import { CARD_HEADER_STYLE, CARD_STYLE, CARD_SUBTITLE_STYLE, CARD_TITLE_STYLE, COLORS } from "./theme";
 
 const { Text } = Typography;
@@ -13,6 +14,7 @@ const { Text } = Typography;
  */
 export default function WidgetCard({ title, subtitle, extra, loading = false, hasError = false, bodyPadding = 16, footer, onRefresh, onDownload, onDetail, onHide, children }) {
   const { t } = useTranslation();
+  const { stretch } = useWidgetSize();
   const [expanded, setExpanded] = useState(false);
 
   const menuItems = [
@@ -70,7 +72,11 @@ export default function WidgetCard({ title, subtitle, extra, loading = false, ha
     <>
       <section style={{ ...CARD_STYLE, height: "100%", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         {header}
-        <div style={{ padding: bodyPadding, flex: 1, minWidth: 0 }}>
+        {/* Yukseklik elle ayarlandiginda govde kalan alani doldurur ve tasan icerik kendi icinde kayar. */}
+        <div
+          className={stretch ? "pbt-widget-body pbt-widget-body-stretch" : "pbt-widget-body"}
+          style={{ padding: bodyPadding, flex: 1, minWidth: 0, ...(stretch ? { minHeight: 0, display: "flex", flexDirection: "column", overflow: "auto" } : {}) }}
+        >
           {expanded ? <div style={{ minHeight: 160 }} /> : <Spin spinning={loading}>{content}</Spin>}
         </div>
         {footer ? <div style={{ borderTop: `1px solid ${COLORS.border}`, padding: "10px 16px" }}>{footer}</div> : null}

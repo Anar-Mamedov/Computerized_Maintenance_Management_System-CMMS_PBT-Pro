@@ -494,7 +494,7 @@
   "siralamayiBitir": "Sıralamanı Bitir",
   "widgetleriYonet": "Widgetləri İdarə Et",
   "varsayilanSiralamayaDon": "Standart Sıralamaya Qayıt",
-  "widgetYonetimAciklama": "Widgetləri gizlədə, yenidən görünən edə və tutacaqdan sürüşdürərək sıralaya bilərsiniz. Seçimləriniz brauzerinizdə saxlanılır.",
+  "widgetYonetimAciklama": "Widgetləri gizlədə, yenidən görünən edə və tutacaqdan sürüşdürərək sıralaya bilərsiniz. \"Yenidən Sırala\" rejimində widget kənarlarından ölçüsünü də dəyişə bilərsiniz. Seçimləriniz brauzerinizdə saxlanılır.",
   "varsayilanGenislik": "Standart en: 12/12 sütun",
   "widgetGenisligi": "En: {{span}}/24 sütun",
   "suruklemeTutamaci": "Sürüşdürmə tutacağı",
@@ -600,5 +600,11 @@
   "toplamAdet": "Ümumi Say",
   "toplamEkipman": "Ümumi Avadanlıq",
   "aktif": "Aktiv",
-  "pasif": "Passiv"
+  "pasif": "Passiv",
+  "kolonOrani": "{{span}}/24",
+  "genisligiAyarla": "Eni tənzimlə",
+  "yuksekligiAyarla": "Hündürlüyü tənzimlə",
+  "boyutuAyarla": "Ölçünü tənzimlə",
+  "boyutuSifirla": "Ölçünü sıfırla",
+  "satirOrani": " · {{rows}} sətir"
 }

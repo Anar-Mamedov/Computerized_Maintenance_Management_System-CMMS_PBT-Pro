@@ -12,7 +12,7 @@ import { navigateToTarget } from "./navigation";
 import { CARD_STYLE, COLORS, TONES } from "./theme";
 
 // Her kart ayrı bir widget'tır. Alt satır Aksiyon Merkezi verisinden türetilir; her parça birebir o kalemin adedidir.
-export const KPI_CARD_DEFINITIONS = {
+const KPI_CARD_DEFINITIONS = {
   kpiBekleyenIsTalepleri: {
     apiKey: "BekleyenIsTalepleri",
     labelKey: "bekleyenIsTalepleri",

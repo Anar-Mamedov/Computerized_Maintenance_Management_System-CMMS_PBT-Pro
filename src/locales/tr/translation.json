@@ -1145,7 +1145,7 @@
   "siralamayiBitir": "Sıralamayı Bitir",
   "widgetleriYonet": "Widgetleri Yönet",
   "varsayilanSiralamayaDon": "Varsayılan Sıralamaya Dön",
-  "widgetYonetimAciklama": "Widgetları gizleyebilir, yeniden görünür yapabilir ve tutamaçtan sürükleyerek sıralayabilirsiniz. Tercihleriniz tarayıcınızda saklanır.",
+  "widgetYonetimAciklama": "Widgetları gizleyebilir, yeniden görünür yapabilir ve tutamaçtan sürükleyerek sıralayabilirsiniz. \"Yeniden Sırala\" modunda widget kenarlarından boyutlarını da değiştirebilirsiniz. Tercihleriniz tarayıcınızda saklanır.",
   "varsayilanGenislik": "Varsayılan genişlik: 12/12 kolon",
   "widgetGenisligi": "Genişlik: {{span}}/24 kolon",
   "suruklemeTutamaci": "Sürükleme tutamacı",
@@ -1240,5 +1240,11 @@
   "aktifArizaliPasifDagilimi": "Aktif, arızalı ve pasif ekipman dağılımı",
   "arizali": "Arızalı",
   "toplamAdet": "Toplam Adet",
-  "toplamEkipman": "Toplam Ekipman"
+  "toplamEkipman": "Toplam Ekipman",
+  "kolonOrani": "{{span}}/24",
+  "genisligiAyarla": "Genişliği ayarla",
+  "yuksekligiAyarla": "Yüksekliği ayarla",
+  "boyutuAyarla": "Boyutu ayarla",
+  "boyutuSifirla": "Boyutu sıfırla",
+  "satirOrani": " · {{rows}} sıra"
 }

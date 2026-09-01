@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Col, Grid, Row } from "antd";
 import { DndContext, PointerSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core";
 import { restrictToFirstScrollableAncestor } from "@dnd-kit/modifiers";
@@ -21,6 +21,7 @@ import InventoryDistribution from "./components/InventoryDistribution";
 import WidgetManagerDrawer from "./components/WidgetManagerDrawer";
 import SortableWidget from "./components/SortableWidget";
 import useWidgetLayout from "./components/useWidgetLayout";
+import { WidgetSizeContext } from "./components/widgetSizeContext";
 import { ROW_GUTTER } from "./components/theme";
 
 // Her widget tek başına sürüklenir. `col` antd Col kırılımları, `span` yönetim çekmecesinde gösterilen genişliktir.
@@ -43,11 +44,9 @@ const WIDGET_LAYOUT = {
   inventoryDistribution: { span: 24, col: { xs: 24 } },
 };
 
-const WIDGET_SPANS = Object.fromEntries(Object.entries(WIDGET_LAYOUT).map(([key, { span }]) => [key, span]));
-
 export default function MainDashboard() {
   const { t } = useTranslation();
-  const { order, hidden, setOrder, toggleVisibility, hideWidget, resetLayout } = useWidgetLayout();
+  const { order, hidden, spans, heights, setOrder, toggleVisibility, hideWidget, setWidgetSize, resetWidgetSize, resetLayout } = useWidgetLayout();
   const [reorderMode, setReorderMode] = useState(false);
   const [widgetManagerOpen, setWidgetManagerOpen] = useState(false);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
@@ -101,6 +100,26 @@ export default function MainDashboard() {
 
   const visibleOrder = order.filter((key) => !hidden.includes(key));
 
+  // Kullanici bir widget'i yeniden boyutlandirdiysa lg ve ustu kirilimlarda o genislik kullanilir.
+  const effectiveSpans = useMemo(
+    () => Object.fromEntries(Object.keys(WIDGET_LAYOUT).map((key) => [key, spans[key] ?? WIDGET_LAYOUT[key].span])),
+    [spans]
+  );
+
+  const stretchValues = useMemo(
+    () => Object.fromEntries(Object.keys(WIDGET_LAYOUT).map((key) => [key, { stretch: Boolean(heights[key]) }])),
+    [heights]
+  );
+
+  const colPropsFor = useCallback(
+    (key) => {
+      const base = WIDGET_LAYOUT[key].col;
+      const span = spans[key];
+      return span ? { ...base, lg: span, xl: span, xxl: span } : base;
+    },
+    [spans]
+  );
+
   const handleDragEnd = ({ active, over }) => {
     if (!over || active.id === over.id) return;
     const oldIndex = order.indexOf(active.id);
@@ -137,10 +156,23 @@ export default function MainDashboard() {
             {/* Widget'lar tek bir akış içinde dizilir; genişlikleri toplandıkça satırlar kendiliğinden oluşur. */}
             <Row gutter={reorderMode ? [ROW_GUTTER[0], 22] : ROW_GUTTER}>
               {visibleOrder.map((key) => (
-                <Col key={key} {...WIDGET_LAYOUT[key].col}>
-                  <SortableWidget id={key} reorderMode={reorderMode}>
-                    {widgets[key]}
-                  </SortableWidget>
+                <Col key={key} {...colPropsFor(key)}>
+                  {/* Yukseklik ayarlandiysa sarmalayiciya uygulanir; widget karti bu yuksekligi doldurur. */}
+                  <WidgetSizeContext.Provider value={stretchValues[key]}>
+                    <div style={{ height: heights[key] || undefined }}>
+                      <SortableWidget
+                        id={key}
+                        reorderMode={reorderMode}
+                        span={effectiveSpans[key]}
+                        height={heights[key]}
+                        isResized={Boolean(spans[key] || heights[key])}
+                        onResize={setWidgetSize}
+                        onResetSize={resetWidgetSize}
+                      >
+                        {widgets[key]}
+                      </SortableWidget>
+                    </div>
+                  </WidgetSizeContext.Provider>
                 </Col>
               ))}
             </Row>
@@ -154,7 +186,7 @@ export default function MainDashboard() {
         order={order}
         hidden={hidden}
         widgetTitles={widgetTitles}
-        widgetSpans={WIDGET_SPANS}
+        widgetSpans={effectiveSpans}
         onReorder={setOrder}
         onToggleVisibility={toggleVisibility}
         onReset={resetLayout}

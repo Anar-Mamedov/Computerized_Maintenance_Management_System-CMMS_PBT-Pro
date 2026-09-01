@@ -10,10 +10,12 @@ import { navigateToTarget } from "./navigation";
 import downloadCsv from "./downloadCsv";
 import { formatCompactCurrency, formatCurrency } from "./formatters";
 import WidgetCard from "./WidgetCard";
+import { useWidgetSize } from "./widgetSizeContext";
 import { COLORS } from "./theme";
 
 export default function MonthlyMaintenanceCosts({ onHide }) {
   const { t, i18n } = useTranslation();
+  const { stretch } = useWidgetSize();
   const navigate = useNavigate();
   const { filters, baslangicTarihi } = useDashboard();
   const { data, loading, hasError, reload } = useWidgetData("GetDashboardV2MonthlyMaintenanceCosts");
@@ -41,7 +43,7 @@ export default function MonthlyMaintenanceCosts({ onHide }) {
       onDetail={() => navigateToTarget(navigate, "is-emri", {}, filters)}
       onHide={onHide}
     >
-      <ResponsiveContainer width="100%" height={286}>
+      <ResponsiveContainer width="100%" height={stretch ? "100%" : 286} minHeight={160}>
         <BarChart data={rows} margin={{ top: 24, right: 8, left: 8, bottom: 8 }}>
           <CartesianGrid stroke={COLORS.border} vertical={false} />
           <XAxis dataKey="AyAdi" tick={{ fill: COLORS.muted, fontSize: 11 }} angle={-35} textAnchor="end" height={54} interval={0} axisLine={{ stroke: COLORS.border }} tickLine={false} />

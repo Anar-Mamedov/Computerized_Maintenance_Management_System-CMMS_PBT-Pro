@@ -10,10 +10,12 @@ import { useDashboard } from "./dashboardContext";
 import { navigateToTarget } from "./navigation";
 import downloadCsv from "./downloadCsv";
 import WidgetCard from "./WidgetCard";
+import { useWidgetSize } from "./widgetSizeContext";
 import { COLORS } from "./theme";
 
 export default function CompletedWorkOrders({ onHide }) {
   const { t, i18n } = useTranslation();
+  const { stretch } = useWidgetSize();
   const navigate = useNavigate();
   const { filters, baslangicTarihi } = useDashboard();
   const { data, loading, hasError, reload } = useWidgetData("GetDashboardV2CompletedWorkOrdersAndRequests");
@@ -45,7 +47,7 @@ export default function CompletedWorkOrders({ onHide }) {
       onDetail={() => navigateToTarget(navigate, "is-emri", { isClose: 1 }, filters)}
       onHide={onHide}
     >
-      <ResponsiveContainer width="100%" height={286}>
+      <ResponsiveContainer width="100%" height={stretch ? "100%" : 286} minHeight={160}>
         <BarChart data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
           <CartesianGrid stroke={COLORS.border} vertical={false} />
           <XAxis dataKey="AyAdi" tick={{ fill: COLORS.muted, fontSize: 11 }} angle={-35} textAnchor="end" height={54} interval={0} axisLine={{ stroke: COLORS.border }} tickLine={false} />

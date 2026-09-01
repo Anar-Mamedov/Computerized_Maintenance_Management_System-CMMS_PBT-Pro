@@ -22,3 +22,56 @@
 .pbt-row:hover {
   background: #f5f8fd !important;
 }
+
+/* Yeniden boyutlandırma: yüksekliği elle ayarlanan widget'ta gövde ve Spin sarmalayıcıları
+   kalan alanı doldurur, böylece grafikler yeni yüksekliğe uyar. */
+.pbt-widget-body-stretch > .ant-spin-nested-loading,
+.pbt-widget-body-stretch > .ant-spin-nested-loading > .ant-spin-container {
+  height: 100%;
+  min-height: 0;
+}
+
+.pbt-widget-body-stretch > .ant-spin-nested-loading > .ant-spin-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Yeniden sıralama modundaki boyutlandırma tutamaçları: normalde görünmez, üzerine
+   gelindiğinde kesikli çerçevenin ilgili kenarı belirginleşir. */
+.pbt-resize-handle::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  background: #1677ff;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.pbt-resize-handle-x::after {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 3px;
+  transform: translateX(-50%);
+}
+
+.pbt-resize-handle-y::after {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 3px;
+  transform: translateY(-50%);
+}
+
+.pbt-resize-handle:hover::after {
+  opacity: 1;
+}
+
+.pbt-resize-corner {
+  background: #ffffff;
+  transition: background 0.15s ease;
+}
+
+.pbt-resize-corner:hover {
+  background: #1677ff;
+}

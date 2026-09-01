@@ -11,12 +11,14 @@ import { navigateToTarget } from "./navigation";
 import downloadCsv from "./downloadCsv";
 import { formatAxisNumber } from "./formatters";
 import WidgetCard from "./WidgetCard";
+import { useWidgetSize } from "./widgetSizeContext";
 import { COLORS } from "./theme";
 
 const DATE_DISPLAY_FORMAT = "DD.MM.YYYY";
 
 export default function WorkOrderTimeDistribution({ onHide }) {
   const { t, i18n } = useTranslation();
+  const { stretch } = useWidgetSize();
   const navigate = useNavigate();
   const { filters, baslangicTarihi, bitisTarihi } = useDashboard();
   const [gorunum, setGorunum] = useState("HAFTALIK");
@@ -54,7 +56,7 @@ export default function WorkOrderTimeDistribution({ onHide }) {
       onHide={onHide}
       extra={<Segmented size="small" value={gorunum} onChange={setGorunum} options={gorunumSecenekleri} />}
     >
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height={stretch ? "100%" : 300} minHeight={160}>
         <LineChart data={rows} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
           <CartesianGrid stroke={COLORS.border} vertical={false} />
           <XAxis
