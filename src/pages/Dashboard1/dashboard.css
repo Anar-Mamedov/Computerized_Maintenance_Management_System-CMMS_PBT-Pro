@@ -23,15 +23,13 @@
   background: #f5f8fd !important;
 }
 
-/* Yeniden boyutlandırma: yüksekliği elle ayarlanan widget'ta gövde ve Spin sarmalayıcıları
-   kalan alanı doldurur, böylece grafikler yeni yüksekliğe uyar. */
-.pbt-widget-body-stretch > .ant-spin-nested-loading,
-.pbt-widget-body-stretch > .ant-spin-nested-loading > .ant-spin-container {
-  height: 100%;
+/* Widget gövdesi dikey bir flex kolonudur. antd Spin, içeriği kendi sarmalayıcılarına aldığı
+   için bu sarmalayıcıların da esnemesi gerekir; aksi halde tablo kartta kalan boşluğu
+   dolduramaz ve altında boşluk kalır. */
+.pbt-widget-body > .ant-spin-nested-loading,
+.pbt-widget-body > .ant-spin-nested-loading > .ant-spin-container {
+  flex: 1 1 auto;
   min-height: 0;
-}
-
-.pbt-widget-body-stretch > .ant-spin-nested-loading > .ant-spin-container {
   display: flex;
   flex-direction: column;
 }

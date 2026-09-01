@@ -107,7 +107,7 @@ export default function MainDashboard() {
   );
 
   const stretchValues = useMemo(
-    () => Object.fromEntries(Object.keys(WIDGET_LAYOUT).map((key) => [key, { stretch: Boolean(heights[key]) }])),
+    () => Object.fromEntries(Object.keys(WIDGET_LAYOUT).map((key) => [key, { stretch: Boolean(heights[key]), height: heights[key] ?? null }])),
     [heights]
   );
 
@@ -157,9 +157,9 @@ export default function MainDashboard() {
             <Row gutter={reorderMode ? [ROW_GUTTER[0], 22] : ROW_GUTTER}>
               {visibleOrder.map((key) => (
                 <Col key={key} {...colPropsFor(key)}>
-                  {/* Yukseklik ayarlandiysa sarmalayiciya uygulanir; widget karti bu yuksekligi doldurur. */}
+                  {/* Elle yukseklik verilmediyse kart satirdaki en uzun widget kadar uzar (height:100%). */}
                   <WidgetSizeContext.Provider value={stretchValues[key]}>
-                    <div style={{ height: heights[key] || undefined }}>
+                    <div style={{ height: heights[key] || "100%" }}>
                       <SortableWidget
                         id={key}
                         reorderMode={reorderMode}

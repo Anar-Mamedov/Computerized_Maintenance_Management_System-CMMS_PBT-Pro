@@ -9,6 +9,7 @@ import useWidgetData from "./useWidgetData";
 import { useDashboard } from "./dashboardContext";
 import { navigateToTarget } from "./navigation";
 import downloadCsv from "./downloadCsv";
+import useAutoTableScroll, { TABLE_FILL_INNER } from "./useAutoTableScroll";
 import WidgetCard from "./WidgetCard";
 import { COLORS } from "./theme";
 
@@ -22,6 +23,7 @@ const COUNTER_DEFINITIONS = [
 export default function UpcomingMaintenances({ onHide }) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const { containerRef, scrollY, wrapperStyle } = useAutoTableScroll(260);
   const { filters } = useDashboard();
   const { data, loading, hasError, reload } = useWidgetData("GetDashboardV2UpcomingMaintenances");
 
@@ -58,7 +60,11 @@ export default function UpcomingMaintenances({ onHide }) {
       key: "kalanGun",
       align: "center",
       width: 130,
-      render: (value) => <span style={{ display: "inline-block", padding: "3px 10px", borderRadius: 7, fontSize: 12.5, fontWeight: 500, color: COLORS.blue, background: COLORS.blueTint }}>{value}</span>,
+      render: (value) => (
+        <span style={{ display: "inline-block", padding: "3px 10px", borderRadius: 7, fontSize: 12.5, fontWeight: 500, color: COLORS.blue, background: COLORS.blueTint }}>
+          {value}
+        </span>
+      ),
     },
     {
       title: "",
@@ -93,23 +99,36 @@ export default function UpcomingMaintenances({ onHide }) {
             type="button"
             className="pbt-row"
             onClick={() => navigateToTarget(navigate, "periyodik-bakim", { durum }, filters)}
-            style={{ border: `1px solid ${COLORS.border}`, borderLeft: `3px solid ${color}`, borderRadius: 10, background, padding: "10px 12px", cursor: "pointer", textAlign: "left" }}
+            style={{
+              border: `1px solid ${COLORS.border}`,
+              borderLeft: `3px solid ${color}`,
+              borderRadius: 10,
+              background,
+              padding: "10px 12px",
+              cursor: "pointer",
+              textAlign: "left",
+            }}
           >
             <div style={{ fontSize: 22, fontWeight: 700, color, lineHeight: 1.2 }}>{formatNumberWithSeparators(sayaclar[key] ?? 0, i18n.language)}</div>
             <div style={{ fontSize: 12, color: COLORS.muted }}>{t(labelKey)}</div>
           </button>
         ))}
       </div>
-      <Table
-        size="small"
-        rowKey="clientKey"
-        columns={columns}
-        dataSource={rows}
-        pagination={false}
-        scroll={{ y: 220 }}
-        locale={{ emptyText: t("veriYok") }}
-        onRow={(record) => ({ style: { cursor: "pointer" }, onClick: () => navigateToTarget(navigate, record.TargetPage, record.FilterParams, filters) })}
-      />
+      {/* Tablo kartta kalan alanı doldurur; kaydırma yüksekliği dış kutudan ölçülür. */}
+      <div style={wrapperStyle}>
+        <div ref={containerRef} style={TABLE_FILL_INNER}>
+          <Table
+            size="small"
+            rowKey="clientKey"
+            columns={columns}
+            dataSource={rows}
+            pagination={false}
+            scroll={{ y: scrollY }}
+            locale={{ emptyText: t("veriYok") }}
+            onRow={(record) => ({ style: { cursor: "pointer" }, onClick: () => navigateToTarget(navigate, record.TargetPage, record.FilterParams, filters) })}
+          />
+        </div>
+      </div>
     </WidgetCard>
   );
 }

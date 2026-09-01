@@ -75,7 +75,7 @@ export default function WidgetCard({ title, subtitle, extra, loading = false, ha
         {/* Yukseklik elle ayarlandiginda govde kalan alani doldurur ve tasan icerik kendi icinde kayar. */}
         <div
           className={stretch ? "pbt-widget-body pbt-widget-body-stretch" : "pbt-widget-body"}
-          style={{ padding: bodyPadding, flex: 1, minWidth: 0, ...(stretch ? { minHeight: 0, display: "flex", flexDirection: "column", overflow: "auto" } : {}) }}
+          style={{ padding: bodyPadding, flex: 1, minWidth: 0, minHeight: 0, display: "flex", flexDirection: "column", ...(stretch ? { overflow: "auto" } : {}) }}
         >
           {expanded ? <div style={{ minHeight: 160 }} /> : <Spin spinning={loading}>{content}</Spin>}
         </div>

@@ -9,12 +9,14 @@ import { useDashboard } from "./dashboardContext";
 import { navigateToTarget } from "./navigation";
 import downloadCsv from "./downloadCsv";
 import { formatPercent } from "./formatters";
+import useAutoTableScroll, { TABLE_FILL_INNER } from "./useAutoTableScroll";
 import WidgetCard from "./WidgetCard";
 import { COLORS } from "./theme";
 
 export default function InventoryDistribution({ onHide }) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const { containerRef, scrollY, wrapperStyle } = useAutoTableScroll(320);
   const { filters } = useDashboard();
   const { data, loading, hasError, reload } = useWidgetData("GetDashboardV2InventoryDistribution");
 
@@ -82,16 +84,21 @@ export default function InventoryDistribution({ onHide }) {
         </Button>
       }
     >
-      <Table
-        size="small"
-        rowKey="clientKey"
-        columns={columns}
-        dataSource={rows}
-        pagination={false}
-        scroll={{ y: 280 }}
-        locale={{ emptyText: t("veriYok") }}
-        onRow={(record) => ({ style: { cursor: "pointer" }, onClick: () => navigateToTarget(navigate, record.TargetPage, record.FilterParams, filters) })}
-      />
+      {/* Tablo kartta kalan alanı doldurur; kaydırma yüksekliği dış kutudan ölçülür. */}
+      <div style={wrapperStyle}>
+        <div ref={containerRef} style={TABLE_FILL_INNER}>
+          <Table
+            size="small"
+            rowKey="clientKey"
+            columns={columns}
+            dataSource={rows}
+            pagination={false}
+            scroll={{ y: scrollY }}
+            locale={{ emptyText: t("veriYok") }}
+            onRow={(record) => ({ style: { cursor: "pointer" }, onClick: () => navigateToTarget(navigate, record.TargetPage, record.FilterParams, filters) })}
+          />
+        </div>
+      </div>
     </WidgetCard>
   );
 }

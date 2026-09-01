@@ -11,6 +11,7 @@ import { useDashboard, toApiEnd, toApiStart } from "./dashboardContext";
 import { navigateToTarget } from "./navigation";
 import downloadCsv from "./downloadCsv";
 import WidgetDateRange from "./WidgetDateRange";
+import useAutoTableScroll, { TABLE_FILL_INNER } from "./useAutoTableScroll";
 import WidgetCard from "./WidgetCard";
 import { COLORS } from "./theme";
 
@@ -20,6 +21,7 @@ const END_FIELD = "tekrarlayanArizaBitisTarihi";
 export default function RecurringFailures({ onHide }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { containerRef, scrollY, wrapperStyle } = useAutoTableScroll(272);
   const { filters } = useDashboard();
   const { watch } = useFormContext();
   const [donem, setDonem] = useState("90GUN");
@@ -112,19 +114,24 @@ export default function RecurringFailures({ onHide }) {
           <WidgetDateRange startFieldName={START_FIELD} endFieldName={END_FIELD} />
         </div>
       ) : null}
-      <Table
-        size="small"
-        rowKey="clientKey"
-        columns={columns}
-        dataSource={rows}
-        pagination={false}
-        scroll={{ y: 232 }}
-        locale={{ emptyText: t("veriYok") }}
-        onRow={(record) => ({
-          style: { cursor: "pointer" },
-          onClick: () => navigateToTarget(navigate, "is-emri", { makineId: record.EkipmanId, nedenId: record.NedenKodId, tipGrup: 1 }, filters),
-        })}
-      />
+      {/* Tablo kartta kalan alanı doldurur; kaydırma yüksekliği dış kutudan ölçülür. */}
+      <div style={wrapperStyle}>
+        <div ref={containerRef} style={TABLE_FILL_INNER}>
+          <Table
+            size="small"
+            rowKey="clientKey"
+            columns={columns}
+            dataSource={rows}
+            pagination={false}
+            scroll={{ y: scrollY }}
+            locale={{ emptyText: t("veriYok") }}
+            onRow={(record) => ({
+              style: { cursor: "pointer" },
+              onClick: () => navigateToTarget(navigate, "is-emri", { makineId: record.EkipmanId, nedenId: record.NedenKodId, tipGrup: 1 }, filters),
+            })}
+          />
+        </div>
+      </div>
     </WidgetCard>
   );
 }
