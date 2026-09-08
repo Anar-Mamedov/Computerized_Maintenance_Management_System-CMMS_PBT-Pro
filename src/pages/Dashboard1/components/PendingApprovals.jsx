@@ -148,6 +148,7 @@ export default function PendingApprovals({ onHide }) {
     <WidgetCard
       title={t("bekleyenOnaylarim")}
       subtitle={t("onayiniziBekleyenKayitlar")}
+      fillHeight
       loading={loading}
       hasError={hasError}
       bodyPadding={0}

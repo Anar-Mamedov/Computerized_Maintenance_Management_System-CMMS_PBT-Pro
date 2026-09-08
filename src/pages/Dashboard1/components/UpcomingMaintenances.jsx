@@ -79,6 +79,7 @@ export default function UpcomingMaintenances({ onHide }) {
     <WidgetCard
       title={t("yaklasanBakimlar")}
       subtitle={t("planlananBakimVeKontroller")}
+      fillHeight
       loading={loading}
       hasError={hasError}
       bodyPadding={12}

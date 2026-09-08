@@ -27,6 +27,8 @@ export const TABLE_FILL_INNER = { position: "absolute", inset: 0, overflow: "hid
  */
 export default function useAutoTableScroll(naturalHeight = 260, minHeight = 96) {
   const containerRef = useRef(null);
+  const observerRef = useRef(null);
+  const frameRef = useRef(0);
   const [scrollY, setScrollY] = useState(Math.max(naturalHeight - HEADER_TAHMINI, minHeight));
   // Widget elle yeniden boyutlandırıldığında bu değer değişir ve bileşen yeniden render
   // olur; aşağıdaki layout effect de ölçümü tazeler.
@@ -49,23 +51,42 @@ export default function useAutoTableScroll(naturalHeight = 260, minHeight = 96) 
   // tablo kendini günceller.
   useLayoutEffect(olc);
 
+  // Kutu ref olarak bir fonksiyon alır: tablo başka bir yere taşındığında (widget "Büyüt"
+  // modalı gibi) gözlemci yeni düğüme bağlanır ve yükseklik hemen yeniden ölçülür.
+  // Sabit bir ref nesnesi kullanılsaydı ölçüm, taşınmayı tetikleyen bileşen bu hook'u
+  // çağıran bileşen olmadığı için eski değerde kalırdı.
+  const containerCallbackRef = useCallback(
+    (node) => {
+      observerRef.current?.disconnect();
+      observerRef.current = null;
+      cancelAnimationFrame(frameRef.current);
+      containerRef.current = node;
+      if (!node) return;
+
+      const observer = new ResizeObserver(olc);
+      observer.observe(node);
+      observerRef.current = observer;
+
+      // Kutu bağlandığı anda kapsayıcısı (örneğin açılmakta olan modal) henüz
+      // yerleşmemiş olabilir; bu yüzden ilk boyamadan sonra bir kez daha ölçülür.
+      olc();
+      frameRef.current = requestAnimationFrame(olc);
+    },
+    [olc]
+  );
+
   // ResizeObserver bazı bağlamlarda (arka plandaki sekme) tetiklenmediği için
   // pencere yeniden boyutlandırma olayı da ayrıca dinlenir.
   useEffect(() => {
-    const container = containerRef.current;
     window.addEventListener("resize", olc);
-
-    const observer = new ResizeObserver(olc);
-    if (container) observer.observe(container);
-
     return () => {
       window.removeEventListener("resize", olc);
-      observer.disconnect();
+      cancelAnimationFrame(frameRef.current);
     };
   }, [olc]);
 
   // Esnek taban: kart doğal yüksekliğindeyken bu değeri alır, uzayınca büyür, daralınca küçülür.
   const wrapperStyle = useMemo(() => ({ position: "relative", flex: `1 1 ${naturalHeight}px`, minHeight: 0 }), [naturalHeight]);
 
-  return { containerRef, scrollY, wrapperStyle };
+  return { containerRef: containerCallbackRef, scrollY, wrapperStyle };
 }
