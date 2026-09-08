@@ -74,7 +74,7 @@ export default function MainDashboard() {
       performanceSummary: t("bakimPerformansiOzeti"),
       timeDistribution: t("acilanIsEmirlerininZamanDagilimi"),
       pendingApprovals: t("bekleyenOnaylarim"),
-      inventoryDistribution: t("makineTiplerineGoreEnvanterDagilimi"),
+      inventoryDistribution: t("ekipmanTiplerineGoreEnvanterDagilimi"),
     }),
     [t]
   );

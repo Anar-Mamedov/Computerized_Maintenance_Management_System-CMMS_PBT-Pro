@@ -32,6 +32,7 @@ import RaporYonetimi from "./pages/Rapor&Formlar/RaporYonetimi/RaporYonetimi.jsx
 import ProfilEkrani from "./pages/Headers/components/ProfilEkrani/ProfilEkrani.jsx";
 import Analizler from "./pages/PersonelYonetimi/PersonelKPI/Analizler.jsx";
 import Dashboard1 from "./pages/Dashboard1/Dashboard.jsx";
+import { COLORS as DASHBOARD_COLORS } from "./pages/Dashboard1/components/theme";
 import UserIdControl from "./pages/UserIdControl/UserIdControl.jsx";
 import IsEmriTipleri from "./pages/Yonetim/IsEmriTipleri/IsEmriTipleri.jsx";
 import KodYonetimi from "./pages/Yonetim/KodYonetimi/KodYonetimi.jsx";
@@ -508,7 +509,8 @@ const BaseLayout = () => {
             )}
             <Headers />
           </Header>
-          <div style={{ display: "flex", flex: 1, overflow: "hidden", height: "calc(100vh - 112px)" }}>
+          {/* Dashboard rotasinda icerik alaninin tamami gri; beyaz widget kartlari zeminden ayrisir. */}
+          <div style={{ display: "flex", flex: 1, overflow: "hidden", height: "calc(100vh - 112px)", background: isDashboardRoute ? DASHBOARD_COLORS.page : undefined }}>
             <Content
               style={{
                 margin: mobileView ? "0 0px" : "0 16px",
@@ -525,7 +527,7 @@ const BaseLayout = () => {
                   // Dashboard rotasinda breadcrumb yerine yanlardaki ile ayni 16px ust bosluk birakilir.
                   marginTop: isDashboardRoute ? 16 : 0,
                   height: isDashboardRoute ? "calc(100vh - 112px)" : "calc(100vh - 132px)",
-                  background: isLayoutExcluded ? "transparent" : colorBgContainer,
+                  background: isLayoutExcluded || isDashboardRoute ? "transparent" : colorBgContainer,
                 }}
               >
                 <Outlet />

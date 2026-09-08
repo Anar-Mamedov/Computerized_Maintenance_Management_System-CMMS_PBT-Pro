@@ -95,6 +95,7 @@ export default function RecurringFailures({ onHide }) {
     <WidgetCard
       title={t("tekrarlayanArizalar")}
       subtitle={t("tekrarlayanArizalarAciklama")}
+      fillHeight
       loading={loading}
       hasError={hasError}
       bodyPadding={donem === "OZEL" ? "12px 0 0" : 0}

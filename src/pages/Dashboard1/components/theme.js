@@ -3,6 +3,8 @@
 
 export const COLORS = {
   surface: "#FFFFFF",
+  // Widget'larin uzerinde durdugu zemin; beyaz kartlarin sinirlarini belirginlestirir.
+  page: "#F2F4F8",
   border: "#E4E9F0",
   text: "#172033",
   muted: "#667085",
@@ -54,6 +56,15 @@ export const CARD_SUBTITLE_STYLE = {
   color: COLORS.muted,
   marginTop: 2,
 };
+
+/**
+ * Grafik kutusu: kartta doğal yüksekliğini alır, yer varsa (örneğin "Büyüt" modalı)
+ * kalan alanı doldurur. Tablolardaki `wrapperStyle` ile aynı mantık.
+ */
+export const grafikKutusuStili = (dogalYukseklik) => ({ position: "relative", flex: `1 1 ${dogalYukseklik}px`, minHeight: 160 });
+
+/** Grafiğin yerleştirildiği iç kutu; yüksekliğini tamamen dış kutudan alır. */
+export const CHART_FILL_INNER = { position: "absolute", inset: 0, overflow: "hidden" };
 
 export const ROW_GUTTER = [12, 12];
 

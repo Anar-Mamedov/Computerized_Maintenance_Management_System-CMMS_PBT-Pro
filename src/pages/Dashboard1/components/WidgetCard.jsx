@@ -8,11 +8,38 @@ import { CARD_HEADER_STYLE, CARD_STYLE, CARD_SUBTITLE_STYLE, CARD_TITLE_STYLE, C
 
 const { Text } = Typography;
 
+// Buyutulmus gorunumun govdesi. Yuksekligini dis kutudan alan tablolar (useAutoTableScroll)
+// ancak bir flex kolonu icinde yer kaplar; modal govdesi kendi haline birakildiginda bu
+// tablolar sifir yuksekliğe cokuyordu.
+const MODAL_BODY_STYLE = {
+  display: "flex",
+  flexDirection: "column",
+  minWidth: 0,
+  overflow: "auto",
+};
+
+// Modalin ekranda kaplayabilecegi en fazla yukseklik; ustunde baslik ve alt bilgi icin yer kalir.
+const MODAL_YUKSEKLIK_SINIRI = "calc(100vh - 200px)";
+
 /**
  * Tüm dashboard widget'larının ortak kart kabuğu.
  * Başlık, açıklama, sağ üst aksiyon alanı ve widget menüsünü yönetir.
  */
-export default function WidgetCard({ title, subtitle, extra, loading = false, hasError = false, bodyPadding = 16, footer, onRefresh, onDownload, onDetail, onHide, children }) {
+export default function WidgetCard({
+  title,
+  subtitle,
+  extra,
+  loading = false,
+  hasError = false,
+  bodyPadding = 16,
+  fillHeight = false,
+  footer,
+  onRefresh,
+  onDownload,
+  onDetail,
+  onHide,
+  children,
+}) {
   const { t } = useTranslation();
   const { stretch } = useWidgetSize();
   const [expanded, setExpanded] = useState(false);
@@ -83,7 +110,14 @@ export default function WidgetCard({ title, subtitle, extra, loading = false, ha
       </section>
 
       <Modal open={expanded} onCancel={() => setExpanded(false)} title={title} width="90%" footer={null} destroyOnClose style={{ top: 24 }}>
-        <Spin spinning={loading}>{expanded ? content : null}</Spin>
+        {/* Yuksekligini dis kutudan alan icerikler modalin tamamini doldurur; dogal
+            yukseklikli icerikler ise kendi boyunda kalir, altlarinda bosluk olusmaz. */}
+        <div
+          className="pbt-widget-body"
+          style={{ ...MODAL_BODY_STYLE, ...(fillHeight ? { height: MODAL_YUKSEKLIK_SINIRI } : { maxHeight: MODAL_YUKSEKLIK_SINIRI }) }}
+        >
+          <Spin spinning={loading}>{expanded ? content : null}</Spin>
+        </div>
         {footer ? <div style={{ borderTop: `1px solid ${COLORS.border}`, paddingTop: 10, marginTop: 10 }}>{footer}</div> : null}
       </Modal>
     </>
@@ -97,6 +131,7 @@ WidgetCard.propTypes = {
   loading: PropTypes.bool,
   hasError: PropTypes.bool,
   bodyPadding: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  fillHeight: PropTypes.bool,
   footer: PropTypes.node,
   onRefresh: PropTypes.func,
   onDownload: PropTypes.func,

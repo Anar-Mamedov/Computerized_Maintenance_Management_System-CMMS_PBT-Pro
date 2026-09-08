@@ -10,12 +10,10 @@ import { useDashboard } from "./dashboardContext";
 import { navigateToTarget } from "./navigation";
 import downloadCsv from "./downloadCsv";
 import WidgetCard from "./WidgetCard";
-import { useWidgetSize } from "./widgetSizeContext";
-import { COLORS } from "./theme";
+import { CHART_FILL_INNER, COLORS, grafikKutusuStili } from "./theme";
 
 export default function CompletedWorkOrders({ onHide }) {
   const { t, i18n } = useTranslation();
-  const { stretch } = useWidgetSize();
   const navigate = useNavigate();
   const { filters, baslangicTarihi } = useDashboard();
   const { data, loading, hasError, reload } = useWidgetData("GetDashboardV2CompletedWorkOrdersAndRequests");
@@ -40,6 +38,7 @@ export default function CompletedWorkOrders({ onHide }) {
     <WidgetCard
       title={`${t("tamamlanmisIsTalepleriVeIsEmirleri")} (${yil})`}
       subtitle={t("tamamlanmaTarihineGoreHesaplanir")}
+      fillHeight
       loading={loading}
       hasError={hasError}
       onRefresh={reload}
@@ -47,26 +46,48 @@ export default function CompletedWorkOrders({ onHide }) {
       onDetail={() => navigateToTarget(navigate, "is-emri", { isClose: 1 }, filters)}
       onHide={onHide}
     >
-      <ResponsiveContainer width="100%" height={stretch ? "100%" : 286} minHeight={160}>
-        <BarChart data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
-          <CartesianGrid stroke={COLORS.border} vertical={false} />
-          <XAxis dataKey="AyAdi" tick={{ fill: COLORS.muted, fontSize: 11 }} angle={-35} textAnchor="end" height={54} interval={0} axisLine={{ stroke: COLORS.border }} tickLine={false} />
-          <YAxis tick={{ fill: COLORS.muted, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(value) => formatNumberWithSeparators(value, i18n.language)} />
-          <Tooltip formatter={(value) => formatNumberWithSeparators(value, i18n.language)} />
-          <Legend iconType="circle" iconSize={8} verticalAlign="top" align="right" height={26} wrapperStyle={{ fontSize: 12, color: COLORS.muted }} />
-          <Bar dataKey="IsEmriSayisi" stackId="tamamlanan" name={t("isEmri")} fill={COLORS.blue} isAnimationActive={false} cursor="pointer" onClick={(payload) => handleBarClick(payload?.payload, "isEmri")} />
-          <Bar
-            dataKey="IsTalebiSayisi"
-            stackId="tamamlanan"
-            name={t("isTalebi")}
-            fill={COLORS.teal}
-            radius={[4, 4, 0, 0]}
-            isAnimationActive={false}
-            cursor="pointer"
-            onClick={(payload) => handleBarClick(payload?.payload, "isTalebi")}
-          />
-        </BarChart>
-      </ResponsiveContainer>
+      {/* Grafik kartta kalan alanı doldurur; yüksekliği dış kutudan gelir. */}
+      <div style={grafikKutusuStili(286)}>
+        <div style={CHART_FILL_INNER}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
+              <CartesianGrid stroke={COLORS.border} vertical={false} />
+              <XAxis
+                dataKey="AyAdi"
+                tick={{ fill: COLORS.muted, fontSize: 11 }}
+                angle={-35}
+                textAnchor="end"
+                height={54}
+                interval={0}
+                axisLine={{ stroke: COLORS.border }}
+                tickLine={false}
+              />
+              <YAxis tick={{ fill: COLORS.muted, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(value) => formatNumberWithSeparators(value, i18n.language)} />
+              <Tooltip formatter={(value) => formatNumberWithSeparators(value, i18n.language)} />
+              <Legend iconType="circle" iconSize={8} verticalAlign="top" align="right" height={26} wrapperStyle={{ fontSize: 12, color: COLORS.muted }} />
+              <Bar
+                dataKey="IsEmriSayisi"
+                stackId="tamamlanan"
+                name={t("isEmri")}
+                fill={COLORS.blue}
+                isAnimationActive={false}
+                cursor="pointer"
+                onClick={(payload) => handleBarClick(payload?.payload, "isEmri")}
+              />
+              <Bar
+                dataKey="IsTalebiSayisi"
+                stackId="tamamlanan"
+                name={t("isTalebi")}
+                fill={COLORS.teal}
+                radius={[4, 4, 0, 0]}
+                isAnimationActive={false}
+                cursor="pointer"
+                onClick={(payload) => handleBarClick(payload?.payload, "isTalebi")}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
     </WidgetCard>
   );
 }

@@ -97,13 +97,13 @@ export default function InventoryDistribution({ onHide }) {
   const handleDownload = () =>
     downloadCsv(
       "makine-tipi-envanter-dagilimi",
-      [t("makineTipi"), t("aktif"), t("arizali"), t("pasif"), t("adet"), t("pay")],
+      [t("ekipmanTipi"), t("aktif"), t("arizali"), t("pasif"), t("adet"), t("pay")],
       rows.map((row) => [row.MakineTipi, row.AktifSayisi, row.ArizaliSayisi, row.PasifSayisi, row.ToplamAdet, formatPercent(row.Pay, i18n.language)])
     );
 
   const columns = [
     {
-      title: t("makineTipi"),
+      title: t("ekipmanTipi"),
       dataIndex: "MakineTipi",
       key: "makineTipi",
       width: "22%",
@@ -141,8 +141,9 @@ export default function InventoryDistribution({ onHide }) {
 
   return (
     <WidgetCard
-      title={t("makineTiplerineGoreEnvanterDagilimi")}
+      title={t("ekipmanTiplerineGoreEnvanterDagilimi")}
       subtitle={t("aktifEnvanterinTipVeDurumDagilimi")}
+      fillHeight
       loading={loading}
       hasError={hasError}
       bodyPadding={0}
