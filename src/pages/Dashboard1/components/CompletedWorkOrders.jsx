@@ -19,7 +19,7 @@ export default function CompletedWorkOrders({ onHide }) {
   const { data, loading, hasError, reload } = useWidgetData("GetDashboardV2CompletedWorkOrdersAndRequests");
 
   const rows = useMemo(() => data?.data || [], [data]);
-  const yil = dayjs(baslangicTarihi).format("YYYY");
+  const yil = baslangicTarihi ? dayjs(baslangicTarihi).format("YYYY") : "";
 
   const handleDownload = () =>
     downloadCsv(
@@ -36,7 +36,7 @@ export default function CompletedWorkOrders({ onHide }) {
 
   return (
     <WidgetCard
-      title={`${t("tamamlanmisIsTalepleriVeIsEmirleri")} (${yil})`}
+      title={yil ? `${t("tamamlanmisIsTalepleriVeIsEmirleri")} (${yil})` : t("tamamlanmisIsTalepleriVeIsEmirleri")}
       subtitle={t("tamamlanmaTarihineGoreHesaplanir")}
       fillHeight
       loading={loading}

@@ -1,12 +1,11 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { Button, Space } from "antd";
-import { SwapRightOutlined } from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 import { LuLayoutGrid, LuRefreshCw } from "react-icons/lu";
-import FullDatePicker from "../../../utils/components/FullDatePicker";
+import DateRangeFilter from "./DateRangeFilter";
 import LokasyonTablo from "../../../utils/components/LokasyonTablo";
 import EkipmanFilterSelect from "./EkipmanFilterSelect";
 import { useDashboard } from "./dashboardContext";
@@ -21,16 +20,17 @@ export default function FilterBar({ onOpenWidgetManager }) {
   const formBitis = watch("dashboardBitisTarihi");
 
   // Form üzerindeki tarih seçimleri dashboard filtre state'ine aktarılır.
+  // "Tümü" seçiminde tarihler boşalır; bu yüzden boş değer de aktarılmalıdır.
   useEffect(() => {
-    if (formBaslangic && !dayjs(formBaslangic).isSame(baslangicTarihi, "day")) {
-      setBaslangicTarihi(formBaslangic);
-    }
+    if (formBaslangic === undefined) return;
+    const ayni = formBaslangic ? dayjs(formBaslangic).isSame(baslangicTarihi, "day") : !baslangicTarihi;
+    if (!ayni) setBaslangicTarihi(formBaslangic || null);
   }, [formBaslangic, baslangicTarihi, setBaslangicTarihi]);
 
   useEffect(() => {
-    if (formBitis && !dayjs(formBitis).isSame(bitisTarihi, "day")) {
-      setBitisTarihi(formBitis);
-    }
+    if (formBitis === undefined) return;
+    const ayni = formBitis ? dayjs(formBitis).isSame(bitisTarihi, "day") : !bitisTarihi;
+    if (!ayni) setBitisTarihi(formBitis || null);
   }, [formBitis, bitisTarihi, setBitisTarihi]);
 
   return (
@@ -39,15 +39,7 @@ export default function FilterBar({ onOpenWidgetManager }) {
         <h1 style={{ fontSize: 20, fontWeight: 700, color: COLORS.text, margin: 0, lineHeight: 1.3 }}>{t("dashboard")}</h1>
         <div style={{ marginTop: 10 }}>
           <Space wrap size={8}>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 6, width: 290 }}>
-              <span style={{ flex: 1, minWidth: 0 }}>
-                <FullDatePicker name1="dashboardBaslangicTarihi" showError={false} allowClear={false} placeholder={t("baslangicTarihi")} />
-              </span>
-              <SwapRightOutlined style={{ color: COLORS.muted, flexShrink: 0 }} />
-              <span style={{ flex: 1, minWidth: 0 }}>
-                <FullDatePicker name1="dashboardBitisTarihi" showError={false} allowClear={false} placeholder={t("bitisTarihi")} />
-              </span>
-            </span>
+            <DateRangeFilter />
             <span style={{ display: "inline-block", width: 232 }}>
               <LokasyonTablo
                 lokasyonFieldName="dashboardLokasyonTanim"

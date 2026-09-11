@@ -20,7 +20,7 @@ export default function MonthlyMaintenanceCosts({ onHide }) {
   const paraBirimi = t("paraBirimi");
 
   const rows = useMemo(() => data?.data || [], [data]);
-  const yil = dayjs(baslangicTarihi).format("YYYY");
+  const yil = baslangicTarihi ? dayjs(baslangicTarihi).format("YYYY") : "";
   const kisaPara = (value) => formatCompactCurrency(value, i18n.language, paraBirimi, t);
 
   const handleDownload = () =>
@@ -32,7 +32,7 @@ export default function MonthlyMaintenanceCosts({ onHide }) {
 
   return (
     <WidgetCard
-      title={`${t("aylikBakimMaliyetleri")} (${yil})`}
+      title={yil ? `${t("aylikBakimMaliyetleri")} (${yil})` : t("aylikBakimMaliyetleri")}
       subtitle={t("tutarlarParaBirimiCinsindendir", { paraBirimi })}
       fillHeight
       loading={loading}

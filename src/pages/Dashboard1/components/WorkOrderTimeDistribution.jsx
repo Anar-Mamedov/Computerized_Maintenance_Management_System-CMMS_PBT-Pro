@@ -40,7 +40,8 @@ export default function WorkOrderTimeDistribution({ onHide }) {
       rows.map((row) => [row.PeriyotEtiketi, row.IsEmriSayisi])
     );
 
-  const baslik = `${t("acilanIsEmirlerininZamanDagilimi")} (${dayjs(baslangicTarihi).format(DATE_DISPLAY_FORMAT)} / ${dayjs(bitisTarihi).format(DATE_DISPLAY_FORMAT)})`;
+  const tarihAraligi = baslangicTarihi && bitisTarihi ? `${dayjs(baslangicTarihi).format(DATE_DISPLAY_FORMAT)} / ${dayjs(bitisTarihi).format(DATE_DISPLAY_FORMAT)}` : "";
+  const baslik = tarihAraligi ? `${t("acilanIsEmirlerininZamanDagilimi")} (${tarihAraligi})` : t("acilanIsEmirlerininZamanDagilimi");
 
   return (
     <WidgetCard

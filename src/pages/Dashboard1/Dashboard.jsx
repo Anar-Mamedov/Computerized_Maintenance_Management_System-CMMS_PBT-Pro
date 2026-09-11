@@ -12,6 +12,8 @@ export default function Dashboard() {
     defaultValues: {
       dashboardBaslangicTarihi: dayjs().startOf("year"),
       dashboardBitisTarihi: dayjs().endOf("year"),
+      dashboardTaslakBaslangicTarihi: dayjs().startOf("year"),
+      dashboardTaslakBitisTarihi: dayjs().endOf("year"),
       dashboardLokasyonTanim: "",
       dashboardLokasyonID: "",
       tekrarlayanArizaBaslangicTarihi: dayjs().subtract(90, "day"),
