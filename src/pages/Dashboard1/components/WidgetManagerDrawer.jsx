@@ -1,12 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Button, Drawer, Switch } from "antd";
+import { Button, Drawer, Space, Switch } from "antd";
 import { DndContext, PointerSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core";
 import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useTranslation } from "react-i18next";
-import { LuGripVertical, LuRotateCcw } from "react-icons/lu";
+import { LuArrowDownUp, LuGripVertical, LuRotateCcw } from "react-icons/lu";
 import { COLORS } from "./theme";
 
 function SortableWidgetRow({ id, title, span, visible, onToggle }) {
@@ -50,7 +50,7 @@ SortableWidgetRow.propTypes = {
   onToggle: PropTypes.func.isRequired,
 };
 
-export default function WidgetManagerDrawer({ open, onClose, order, hidden, widgetTitles, widgetSpans, onReorder, onToggleVisibility, onReset }) {
+export default function WidgetManagerDrawer({ open, onClose, order, hidden, widgetTitles, widgetSpans, onReorder, onToggleVisibility, onReset, reorderMode, onToggleReorder }) {
   const { t } = useTranslation();
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
@@ -72,9 +72,14 @@ export default function WidgetManagerDrawer({ open, onClose, order, hidden, widg
       width={420}
       title={t("widgetleriYonet")}
       extra={
-        <Button size="small" icon={<LuRotateCcw size={13} />} onClick={onReset}>
-          {t("varsayilanSiralamayaDon")}
-        </Button>
+        <Space size={8}>
+          <Button size="small" icon={<LuArrowDownUp size={13} />} type={reorderMode ? "primary" : "default"} onClick={onToggleReorder}>
+            {reorderMode ? t("bitir") : t("duzenle")}
+          </Button>
+          <Button size="small" icon={<LuRotateCcw size={13} />} onClick={onReset}>
+            {t("varsayilan")}
+          </Button>
+        </Space>
       }
     >
       <p style={{ fontSize: 12.5, color: COLORS.muted, marginTop: 0 }}>{t("widgetYonetimAciklama")}</p>
@@ -99,4 +104,6 @@ WidgetManagerDrawer.propTypes = {
   onReorder: PropTypes.func.isRequired,
   onToggleVisibility: PropTypes.func.isRequired,
   onReset: PropTypes.func.isRequired,
+  reorderMode: PropTypes.bool,
+  onToggleReorder: PropTypes.func.isRequired,
 };

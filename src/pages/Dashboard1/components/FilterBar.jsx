@@ -1,23 +1,21 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
-import { Button, Space, Tag } from "antd";
+import { Button, Space } from "antd";
 import { SwapRightOutlined } from "@ant-design/icons";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
-import { LuArrowDownUp, LuLayoutGrid, LuRefreshCw } from "react-icons/lu";
+import { LuLayoutGrid, LuRefreshCw } from "react-icons/lu";
 import FullDatePicker from "../../../utils/components/FullDatePicker";
-import LokasyonFilterSelect from "./LokasyonFilterSelect";
+import LokasyonTablo from "../../../utils/components/LokasyonTablo";
 import EkipmanFilterSelect from "./EkipmanFilterSelect";
 import { useDashboard } from "./dashboardContext";
 import { COLORS } from "./theme";
 
-const DATE_DISPLAY_FORMAT = "DD.MM.YYYY";
-
-export default function FilterBar({ reorderMode, onToggleReorder, onOpenWidgetManager }) {
+export default function FilterBar({ onOpenWidgetManager }) {
   const { t } = useTranslation();
   const { watch } = useFormContext();
-  const { baslangicTarihi, bitisTarihi, lokasyonIds, ekipmanIds, setBaslangicTarihi, setBitisTarihi, setLokasyonIds, setEkipmanIds, refresh, sonGuncelleme } = useDashboard();
+  const { baslangicTarihi, bitisTarihi, ekipmanIds, setBaslangicTarihi, setBitisTarihi, setLokasyonIds, setEkipmanIds, refresh, sonGuncelleme } = useDashboard();
 
   const formBaslangic = watch("dashboardBaslangicTarihi");
   const formBitis = watch("dashboardBitisTarihi");
@@ -35,8 +33,6 @@ export default function FilterBar({ reorderMode, onToggleReorder, onOpenWidgetMa
     }
   }, [formBitis, bitisTarihi, setBitisTarihi]);
 
-  const araligiEtiketi = `${dayjs(baslangicTarihi).format(DATE_DISPLAY_FORMAT)} – ${dayjs(bitisTarihi).format(DATE_DISPLAY_FORMAT)}`;
-
   return (
     <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap", marginBottom: 14 }}>
       <div>
@@ -52,9 +48,16 @@ export default function FilterBar({ reorderMode, onToggleReorder, onOpenWidgetMa
                 <FullDatePicker name1="dashboardBitisTarihi" showError={false} allowClear={false} placeholder={t("bitisTarihi")} />
               </span>
             </span>
-            <LokasyonFilterSelect value={lokasyonIds} onChange={setLokasyonIds} />
+            <span style={{ display: "inline-block", width: 232 }}>
+              <LokasyonTablo
+                lokasyonFieldName="dashboardLokasyonTanim"
+                lokasyonIdFieldName="dashboardLokasyonID"
+                placeholder={t("tumLokasyonlar")}
+                onSubmit={(selectedData) => setLokasyonIds([selectedData.key])}
+                onClear={() => setLokasyonIds([])}
+              />
+            </span>
             <EkipmanFilterSelect value={ekipmanIds} onChange={setEkipmanIds} />
-            <Tag style={{ color: COLORS.muted }}>{araligiEtiketi}</Tag>
           </Space>
         </div>
       </div>
@@ -66,9 +69,6 @@ export default function FilterBar({ reorderMode, onToggleReorder, onOpenWidgetMa
         <Button icon={<LuRefreshCw size={14} />} onClick={refresh}>
           {t("verileriYenile")}
         </Button>
-        <Button icon={<LuArrowDownUp size={14} />} type={reorderMode ? "primary" : "default"} onClick={onToggleReorder}>
-          {reorderMode ? t("siralamayiBitir") : t("yenidenSirala")}
-        </Button>
         <Button icon={<LuLayoutGrid size={14} />} onClick={onOpenWidgetManager}>
           {t("widgetleriYonet")}
         </Button>
@@ -78,7 +78,5 @@ export default function FilterBar({ reorderMode, onToggleReorder, onOpenWidgetMa
 }
 
 FilterBar.propTypes = {
-  reorderMode: PropTypes.bool,
-  onToggleReorder: PropTypes.func.isRequired,
   onOpenWidgetManager: PropTypes.func.isRequired,
 };

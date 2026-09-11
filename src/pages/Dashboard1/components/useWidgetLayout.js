@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 
 // Widget anahtarları veya kayıt şeması değiştikçe sürüm artırılır; eski kayıtlar
 // okunmaz ve kullanıcı yeni varsayılanlarla başlar.
-const STORAGE_KEY = "dashboardV2WidgetLayout.v4";
+const STORAGE_KEY = "dashboardV2WidgetLayout.v5";
 
 /** Dashboard'daki widget'ların varsayılan sırası. */
 export const DEFAULT_WIDGET_ORDER = [
@@ -12,21 +12,21 @@ export const DEFAULT_WIDGET_ORDER = [
   "kpiAcikArizaIsEmirleri",
   "actionCenter",
   "completedWorkOrders",
+  "upcomingMaintenances",
   "workOrderTypePerformance",
+  "topFailureEquipment",
   "monthlyMaintenanceCosts",
   "failurePareto",
-  "topFailureEquipment",
   "recurringFailures",
-  "upcomingMaintenances",
-  "personnelKpi",
   "performanceSummary",
-  "timeDistribution",
+  "personnelKpi",
   "pendingApprovals",
   "inventoryDistribution",
+  "timeDistribution",
 ];
 
-// Referans tasarımda yer almadığı için varsayılan olarak kapalı gelen widget'lar.
-export const DEFAULT_HIDDEN_WIDGETS = ["inventoryDistribution"];
+// Varsayılan yerleşimde tüm widget'lar açık gelir; kullanıcı dilediğini gizleyebilir.
+export const DEFAULT_HIDDEN_WIDGETS = [];
 
 /** Yeniden boyutlandırmada izin verilen sınırlar. */
 export const MIN_WIDGET_SPAN = 4;

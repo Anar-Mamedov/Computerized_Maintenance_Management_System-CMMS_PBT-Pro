@@ -70,6 +70,8 @@ export default function EkipmanFilterSelect({ value, onChange }) {
       placeholder={t("ekipmanKodAdVeyaTip")}
       maxTagCount="responsive"
       style={{ width: 258 }}
+      popupMatchSelectWidth={false}
+      dropdownStyle={{ maxWidth: 520 }}
     />
   );
 }

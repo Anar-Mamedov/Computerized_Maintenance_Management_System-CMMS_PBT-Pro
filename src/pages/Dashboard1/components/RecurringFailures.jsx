@@ -60,6 +60,7 @@ export default function RecurringFailures({ onHide }) {
       title: t("ekipman"),
       dataIndex: "EkipmanEtiketi",
       key: "ekipman",
+      width: "40%",
       render: (value, record) => (
         <span>
           <span style={{ color: COLORS.text, fontWeight: 600 }}>{record.EkipmanTanimi}</span>
@@ -67,19 +68,21 @@ export default function RecurringFailures({ onHide }) {
         </span>
       ),
     },
-    { title: t("arizaNedeni"), dataIndex: "ArizaNedeni", key: "arizaNedeni" },
+    { title: t("arizaNedeni"), dataIndex: "ArizaNedeni", key: "arizaNedeni", width: "26%" },
     {
       title: t("sonTekrar"),
       dataIndex: "SonTekrarTarihiFormatli",
       key: "sonTekrar",
+      width: 112,
       render: (value, record) => value || (record.SonTekrarTarihi ? dayjs(record.SonTekrarTarihi).format("DD.MM.YYYY") : ""),
     },
-    { title: t("toplamDurus"), dataIndex: "ToplamDurusSuresiFormatli", key: "toplamDurus", align: "right" },
+    { title: t("toplamDurus"), dataIndex: "ToplamDurusSuresiFormatli", key: "toplamDurus", align: "right", width: 120 },
     {
       title: t("tekrarSayisi"),
       dataIndex: "TekrarSayisiFormatli",
       key: "tekrarSayisi",
       align: "right",
+      width: 128,
       render: (value) => (
         <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
           <Tag color="red" style={{ borderRadius: 999, marginInlineEnd: 0 }}>

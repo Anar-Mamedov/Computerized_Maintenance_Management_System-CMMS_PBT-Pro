@@ -33,17 +33,17 @@ const WIDGET_LAYOUT = {
   kpiAcikArizaIsEmirleri: { span: 6, col: { xs: 24, sm: 12, xl: 6 } },
   actionCenter: { span: 10, col: { xs: 24, lg: 10 } },
   completedWorkOrders: { span: 14, col: { xs: 24, lg: 14 } },
-  workOrderTypePerformance: { span: 12, col: { xs: 24, lg: 12 } },
-  monthlyMaintenanceCosts: { span: 12, col: { xs: 24, lg: 12 } },
-  failurePareto: { span: 12, col: { xs: 24, lg: 12 } },
-  topFailureEquipment: { span: 12, col: { xs: 24, lg: 12 } },
-  recurringFailures: { span: 14, col: { xs: 24, lg: 14 } },
   upcomingMaintenances: { span: 10, col: { xs: 24, lg: 10 } },
-  personnelKpi: { span: 24, col: { xs: 24 } },
+  workOrderTypePerformance: { span: 14, col: { xs: 24, lg: 14 } },
+  topFailureEquipment: { span: 10, col: { xs: 24, lg: 10 } },
+  monthlyMaintenanceCosts: { span: 14, col: { xs: 24, lg: 14 } },
+  failurePareto: { span: 10, col: { xs: 24, lg: 10 } },
+  recurringFailures: { span: 14, col: { xs: 24, lg: 14 } },
   performanceSummary: { span: 24, col: { xs: 24 } },
+  personnelKpi: { span: 24, col: { xs: 24 } },
+  pendingApprovals: { span: 10, col: { xs: 24, lg: 10 } },
+  inventoryDistribution: { span: 14, col: { xs: 24, lg: 14 } },
   timeDistribution: { span: 24, col: { xs: 24 } },
-  pendingApprovals: { span: 24, col: { xs: 24 } },
-  inventoryDistribution: { span: 24, col: { xs: 24 } },
 };
 
 export default function MainDashboard() {
@@ -135,7 +135,13 @@ export default function MainDashboard() {
     setOrder(nextOrder);
   };
 
-  const filtreCubugu = <FilterBar reorderMode={reorderMode} onToggleReorder={() => setReorderMode((previous) => !previous)} onOpenWidgetManager={() => setWidgetManagerOpen(true)} />;
+  // Duzenle modu widget yonetimi cekmecesinden acilir; surukleme dashboard uzerinde yapildigi icin cekmece kapatilir.
+  const handleToggleReorder = () => {
+    setReorderMode((previous) => !previous);
+    setWidgetManagerOpen(false);
+  };
+
+  const filtreCubugu = <FilterBar onOpenWidgetManager={() => setWidgetManagerOpen(true)} />;
 
   return (
     // Sayfa yüksekliği sabit; sadece widget listesi kendi içinde kayar, filtre çubuğu ve arka plan sabit kalır.
@@ -194,6 +200,8 @@ export default function MainDashboard() {
         onReorder={setOrder}
         onToggleVisibility={toggleVisibility}
         onReset={resetLayout}
+        reorderMode={reorderMode}
+        onToggleReorder={handleToggleReorder}
       />
     </div>
   );
