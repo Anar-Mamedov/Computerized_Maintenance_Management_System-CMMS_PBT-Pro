@@ -513,20 +513,27 @@ const BaseLayout = () => {
           <div style={{ display: "flex", flex: 1, overflow: "hidden", height: "calc(100vh - 112px)", background: isDashboardRoute ? DASHBOARD_COLORS.page : undefined }}>
             <Content
               style={{
-                margin: mobileView ? "0 0px" : "0 16px",
+                margin: mobileView ? "0 0px" : isDashboardRoute ? "0 8px" : "0 16px",
                 flex: 1,
-                overflow: hasFixedDashboardHeader ? "hidden" : "auto",
+                // Dashboard rotasinda kaydirma yalnizca widget listesinin kendi icinde olur,
+                // bu yuzden icerik alani kendi kaydirma cubugunu acmaz.
+                overflow: hasFixedDashboardHeader || isDashboardRoute ? "hidden" : "auto",
               }}
             >
               {!isDashboardRoute && <Breadcrumbs />}
               <div
                 style={{
-                  padding: isLayoutExcluded ? 0 : mobileView ? "24px 0px" : 24,
+                  // Dashboard rotasinda widget'lar zaten kendi cerceveli kartlarinda durdugu icin
+                  // sayfa kenarlarinda genis bosluga gerek yok; bu yuzden daha dar bir padding kullanilir.
+                  // Dashboard rotasinda alt padding yoktur; widget listesi footer'a bitisik biter.
+                  padding: isLayoutExcluded ? 0 : isDashboardRoute ? (mobileView ? "12px 0px 0" : "12px 8px 0") : mobileView ? "24px 0px" : 24,
                   borderRadius: isLayoutExcluded ? 0 : "16px",
                   minHeight: 360,
-                  // Dashboard rotasinda breadcrumb yerine yanlardaki ile ayni 16px ust bosluk birakilir.
-                  marginTop: isDashboardRoute ? 16 : 0,
-                  height: isDashboardRoute ? "calc(100vh - 112px)" : "calc(100vh - 132px)",
+                  // Bu yukseklik sabit kalmali: MainDashboard kokundeki height:100% ve onun altindaki
+                  // kaydirma alani yuzde zinciriyle buradan beslenir, kaldirilirsa liste kaydirilamaz olur.
+                  // Dashboard'da 100px kullanilir; Header (64px) + Footer (42px) toplamindan bilerek 6px azdir,
+                  // boylece widget alani footer'a tam bitisik biter. Footer yuksekligi degisirse bu deger de ayarlanmali.
+                  height: isDashboardRoute ? "calc(100vh - 100px)" : "calc(100vh - 132px)",
                   background: isLayoutExcluded || isDashboardRoute ? "transparent" : colorBgContainer,
                 }}
               >

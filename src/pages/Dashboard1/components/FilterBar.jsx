@@ -34,25 +34,20 @@ export default function FilterBar({ onOpenWidgetManager }) {
   }, [formBitis, bitisTarihi, setBitisTarihi]);
 
   return (
-    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap", marginBottom: 14 }}>
-      <div>
-        <h1 style={{ fontSize: 20, fontWeight: 700, color: COLORS.text, margin: 0, lineHeight: 1.3 }}>{t("dashboard")}</h1>
-        <div style={{ marginTop: 10 }}>
-          <Space wrap size={8}>
-            <DateRangeFilter />
-            <span style={{ display: "inline-block", width: 232 }}>
-              <LokasyonTablo
-                lokasyonFieldName="dashboardLokasyonTanim"
-                lokasyonIdFieldName="dashboardLokasyonID"
-                placeholder={t("tumLokasyonlar")}
-                onSubmit={(selectedData) => setLokasyonIds([selectedData.key])}
-                onClear={() => setLokasyonIds([])}
-              />
-            </span>
-            <EkipmanFilterSelect value={ekipmanIds} onChange={setEkipmanIds} />
-          </Space>
-        </div>
-      </div>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap", marginBottom: 10 }}>
+      <Space wrap size={8}>
+        <DateRangeFilter />
+        <span style={{ display: "inline-block", width: 232 }}>
+          <LokasyonTablo
+            lokasyonFieldName="dashboardLokasyonTanim"
+            lokasyonIdFieldName="dashboardLokasyonID"
+            placeholder={t("tumLokasyonlar")}
+            onSubmit={(selectedData) => setLokasyonIds([selectedData.key])}
+            onClear={() => setLokasyonIds([])}
+          />
+        </span>
+        <EkipmanFilterSelect value={ekipmanIds} onChange={setEkipmanIds} />
+      </Space>
 
       <Space wrap size={8}>
         <span style={{ fontSize: 12.5, color: COLORS.muted }}>

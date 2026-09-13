@@ -146,7 +146,7 @@ export default function MainDashboard() {
   return (
     // Sayfa yüksekliği sabit; sadece widget listesi kendi içinde kayar, filtre çubuğu ve arka plan sabit kalır.
     <div style={{ height: "100%", minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-      {filtreCubuguSabit && <div style={{ flexShrink: 0, padding: "0 4px" }}>{filtreCubugu}</div>}
+      {filtreCubuguSabit && <div style={{ flexShrink: 0, padding: "0 2px" }}>{filtreCubugu}</div>}
 
       {/* Yeniden sirala modunda satirlarin kesikli cercevesi ve tutamaci kutunun disina tastigi icin ekstra bosluk birakilir. */}
       <div
@@ -157,7 +157,7 @@ export default function MainDashboard() {
           overflowX: "hidden",
           overscrollBehavior: "contain",
           scrollbarGutter: "stable",
-          padding: reorderMode ? "16px 8px" : "0 4px 16px",
+          padding: reorderMode ? "16px 8px" : "0 2px",
         }}
       >
         {!filtreCubuguSabit && filtreCubugu}
