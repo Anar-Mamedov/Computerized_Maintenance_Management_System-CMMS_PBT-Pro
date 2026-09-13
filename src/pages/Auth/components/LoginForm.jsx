@@ -1,16 +1,14 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Button, Form, Input, Typography, message, Spin, Checkbox, Modal } from "antd";
-import { UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
+import { Button, Form, Input, message, Checkbox, Modal } from "antd";
+import { UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone, ArrowRightOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import AxiosInstance from "../../../api/http";
 import { useSetRecoilState } from "recoil";
 import { userState } from "../../../state/userState";
-import LanguageSelectbox from "../../components/Language/LanguageSelectbox";
 import ReCAPTCHA from "react-google-recaptcha"; // reCAPTCHA bileşenini import edin
 import { useTranslation } from "react-i18next";
 import "./LoginForm.css";
 
-const { Text } = Typography;
 const MICROSOFT_SSO_TOKEN_KEY = "microsoft_sso_token";
 const MICROSOFT_QUERY_KEYS_TO_REMOVE = ["id_token", "state", "session_state"];
 
@@ -300,68 +298,62 @@ export default function LoginForm() {
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        width: "400px",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      <div style={{ width: "100%" }}>
-        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-          <Text style={{ fontSize: "20px" }}>{t("girisYap")}</Text>
-          <LanguageSelectbox />
-        </div>
+    <div className="login-form-wrapper">
+      <h1 className="login-title">{t("hesabinizaGirisYapin")}</h1>
+      <p className="login-subtitle">{t("girisEkraniAltBaslik")}</p>
 
-        <Form form={form} name="normal_login" className="login-form" initialValues={{ remember: true }} onFinish={onSubmit} style={{ width: "100%", marginTop: "20px" }}>
-          <Form.Item name="email" rules={[{ required: true, message: "Lütfen kullanıcı kodunuzu girin!" }]}>
-            <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder={t("kullaniciKodu")} />
-          </Form.Item>
-          <Form.Item name="password">
-            <Input.Password
-              prefix={<LockOutlined className="site-form-item-icon" />}
-              placeholder={t("sifre")}
-              iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-            />
-          </Form.Item>
-          <Form.Item name="remember" valuePropName="checked" label={null}>
-            <Checkbox>{t("beniHatirla")}</Checkbox>
-          </Form.Item>
-          {isRecaptchaEnabled && (
-            <Form.Item>
+      <Form form={form} name="normal_login" layout="vertical" className="login-form" initialValues={{ remember: true }} onFinish={onSubmit}>
+        <Form.Item name="email" label={t("kullaniciAdi")} rules={[{ required: true, message: t("lutfenKullaniciAdiniziGirin") }]}>
+          <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder={t("kullaniciAdi")} autoComplete="username" />
+        </Form.Item>
+        <Form.Item name="password" label={t("sifre")}>
+          <Input.Password
+            prefix={<LockOutlined className="site-form-item-icon" />}
+            placeholder={t("sifre")}
+            autoComplete="current-password"
+            iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+          />
+        </Form.Item>
+        <Form.Item name="remember" valuePropName="checked" label={null} className="login-remember">
+          <Checkbox>{t("beniHatirla")}</Checkbox>
+        </Form.Item>
+        {isRecaptchaEnabled && (
+          <Form.Item>
+            <div className="login-recaptcha">
               <ReCAPTCHA
                 sitekey="6LdF_QAqAAAAAK7vusKLAVNVvf4o_vLu66azz_S8" // Google reCAPTCHA site anahtarınızı buraya ekleyin
-                onChange={(token) => setRecaptchaToken(token)}
+                onChange={(recaptchaValue) => setRecaptchaToken(recaptchaValue)}
                 hl={i18n.language} // Set language based on i18n
               />
-            </Form.Item>
-          )}
-          <Form.Item>
-            <Button type="primary" htmlType="submit" className="login-form-button" style={{ width: "100%" }} disabled={loading || microsoftLoading}>
-              {loading ? <Spin /> : t("girisYap")}
-            </Button>
+            </div>
           </Form.Item>
-          {isEntraID && (
-            <Form.Item>
-              <button type="button" className="ms-login-btn" onClick={handleMicrosoftRedirect} disabled={loading || microsoftLoading}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21" aria-hidden="true">
-                  <rect x="1" y="1" width="9" height="9" fill="#f25022" />
-                  <rect x="11" y="1" width="9" height="9" fill="#7fba00" />
-                  <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
-                  <rect x="11" y="11" width="9" height="9" fill="#ffb900" />
-                </svg>
-                <span>{t("microsoftIleGirisYap")}</span>
-              </button>
-            </Form.Item>
-          )}
+        )}
+        <Form.Item className="login-submit-item">
+          <Button type="primary" htmlType="submit" className="login-form-button" block loading={loading} disabled={microsoftLoading}>
+            <span>{t("girisYap")}</span>
+            <ArrowRightOutlined />
+          </Button>
+        </Form.Item>
+        {isEntraID && (
           <Form.Item>
-            <Button danger onClick={handleClearBaseURL} style={{ width: "100%" }} disabled={loading || microsoftLoading}>
-              {t("anahtariDegistir")}
-            </Button>
+            <button type="button" className="ms-login-btn" onClick={handleMicrosoftRedirect} disabled={loading || microsoftLoading}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21" aria-hidden="true">
+                <rect x="1" y="1" width="9" height="9" fill="#f25022" />
+                <rect x="11" y="1" width="9" height="9" fill="#7fba00" />
+                <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
+                <rect x="11" y="11" width="9" height="9" fill="#ffb900" />
+              </svg>
+              <span>{t("microsoftIleGirisYap")}</span>
+            </button>
           </Form.Item>
-        </Form>
+        )}
+      </Form>
+
+      <div className="login-license">
+        <span>{t("lisansAnahtarinizMiDegisti")}</span>
+        <button type="button" className="login-license-link" onClick={handleClearBaseURL} disabled={loading || microsoftLoading}>
+          {t("anahtariDegistir")}
+        </button>
       </div>
 
       {/* Lisans Süresi Bitmiş Modal */}

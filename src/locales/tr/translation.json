@@ -1265,5 +1265,12 @@
   "vazgec": "Vazgeç",
   "bekleyenOnayYok": "Bekleyen onay yok",
   "buIslemeYetkinizYok": "Bu işlemi yapmaya yetkiniz bulunmamaktadır.",
-  "teklifKarsilastirma": "Teklif Karşılaştırma"
+  "teklifKarsilastirma": "Teklif Karşılaştırma",
+  "hesabinizaGirisYapin": "Hesabınıza giriş yapın",
+  "girisEkraniAltBaslik": "Kurumsal varlık ve bakım yönetiminize güvenle devam edin.",
+  "kurumsalVarlikBakimYonetimi": "Kurumsal Varlık & Bakım Yönetimi",
+  "kullaniciAdi": "Kullanıcı adı",
+  "lutfenKullaniciAdiniziGirin": "Lütfen kullanıcı adınızı girin!",
+  "lisansAnahtarinizMiDegisti": "Lisans anahtarınız mı değişti?",
+  "yazilimTeknolojisidir": "Yazılım teknolojisidir."
 }

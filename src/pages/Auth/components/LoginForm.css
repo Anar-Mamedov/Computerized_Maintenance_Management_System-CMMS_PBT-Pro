@@ -1,30 +1,215 @@
+.login-form-wrapper {
+  width: 100%;
+}
+
+.login-title {
+  margin: 0 0 8px;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #0f172a;
+}
+
+.login-subtitle {
+  margin: 0 0 28px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #64748b;
+}
+
+.login-form .ant-form-item {
+  margin-bottom: 18px;
+}
+
+.login-form .ant-form-item-label {
+  padding-bottom: 6px;
+}
+
+.login-form .ant-form-item-label > label {
+  height: auto;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.login-form .ant-form-item-label > label::after {
+  content: none;
+}
+
+.login-form .ant-form-item-required::before {
+  display: none !important;
+}
+
+.login-form .ant-input-affix-wrapper {
+  height: 54px;
+  padding: 0 16px;
+  background-color: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.login-form .ant-input-affix-wrapper:hover {
+  border-color: #cbd5e1;
+}
+
+.login-form .ant-input-affix-wrapper-focused,
+.login-form .ant-input-affix-wrapper:focus-within {
+  border-color: var(--auth-primary);
+  box-shadow: 0 0 0 4px var(--auth-ring);
+}
+
+.login-form .ant-input-affix-wrapper-status-error {
+  border-color: #ef4444;
+}
+
+.login-form .ant-form-item-explain {
+  padding-top: 5px;
+  padding-bottom: 3px;
+  font-size: 12.5px;
+}
+
+.login-form .ant-input-affix-wrapper .ant-input {
+  font-size: 15px;
+  color: #0f172a;
+}
+
+/* Tarayıcı otomatik doldurma yaptığında input'a kendi mavi arka planını basıyor;
+   dış sarmalayıcının iç boşluğu beyaz kaldığı için alan iki renkli görünüyordu.
+   İçe gölge ile input yüzeyi beyaza sabitleniyor, uzun transition ise Chrome'un
+   odaklanma anında arka planı geri boyamasını engelliyor. */
+.login-form .ant-input-affix-wrapper input:-webkit-autofill,
+.login-form .ant-input-affix-wrapper input:-webkit-autofill:hover,
+.login-form .ant-input-affix-wrapper input:-webkit-autofill:focus,
+.login-form .ant-input-affix-wrapper input:-webkit-autofill:active {
+  -webkit-text-fill-color: #0f172a;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+  box-shadow: 0 0 0 1000px #ffffff inset;
+  caret-color: #0f172a;
+  transition:
+    background-color 600000s 0s,
+    color 600000s 0s;
+}
+
+.login-form .ant-input-affix-wrapper input:autofill {
+  -webkit-text-fill-color: #0f172a;
+  box-shadow: 0 0 0 1000px #ffffff inset;
+  caret-color: #0f172a;
+}
+
+.login-form .site-form-item-icon {
+  margin-right: 4px;
+  font-size: 17px;
+  color: #94a3b8;
+}
+
+.login-form .ant-input-password-icon {
+  font-size: 16px;
+  color: #94a3b8;
+}
+
+.login-remember.ant-form-item {
+  margin-bottom: 18px;
+}
+
+.login-remember .ant-form-item-control-input {
+  min-height: auto;
+}
+
+.login-form .ant-checkbox-wrapper {
+  font-size: 14px;
+  color: #475569;
+}
+
+/* reCAPTCHA widget'i kendi çerçevesini iframe içinde çizer; dışına ikinci bir
+   çerçeve koymamak için burada sadece hizalama yapılır. */
+.login-recaptcha {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.login-submit-item.ant-form-item {
+  margin-bottom: 16px;
+}
+
+.login-form .login-form-button {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 10px;
+  box-shadow: 0 12px 24px -10px color-mix(in srgb, var(--auth-primary) 75%, transparent);
+}
+
+.login-form .login-form-button .anticon-arrow-right {
+  font-size: 15px;
+}
+
+.login-license {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.login-license-link {
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: #475569;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.login-license-link:hover:not(:disabled) {
+  color: var(--auth-primary);
+}
+
+.login-license-link:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .ms-login-btn {
   width: 100%;
+  height: 52px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background-color: #ffffff;
-  color: #5e5e5e;
-  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: #334155;
   font-size: 15px;
   font-weight: 600;
-  border: 1px solid #8c8c8c;
-  border-radius: 2px;
-  padding: 10px 24px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0 24px;
   cursor: pointer;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
   gap: 12px;
   text-decoration: none;
 }
 
 .ms-login-btn:hover {
-  background-color: #f3f2f1;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
 }
 
 .ms-login-btn:active {
-  background-color: #edebe9;
-  box-shadow: none;
+  background-color: #f1f5f9;
 }
 
 .ms-login-btn:disabled {
@@ -34,4 +219,10 @@
 
 .ms-login-btn svg {
   flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .login-title {
+    font-size: 26px;
+  }
 }

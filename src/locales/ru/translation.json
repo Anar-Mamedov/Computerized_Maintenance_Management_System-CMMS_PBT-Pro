@@ -631,5 +631,13 @@
   "teklifKarsilastirma": "Сравнение предложений",
   "aciklama": "Описание",
   "alanBosBirakilamaz": "Поле не может быть пустым",
-  "kod": "Код"
+  "kod": "Код",
+  "hesabinizaGirisYapin": "Войдите в свою учётную запись",
+  "girisEkraniAltBaslik": "Безопасно продолжите управление корпоративными активами и обслуживанием.",
+  "kurumsalVarlikBakimYonetimi": "Управление корпоративными активами и обслуживанием",
+  "kullaniciAdi": "Имя пользователя",
+  "lutfenKullaniciAdiniziGirin": "Пожалуйста, введите имя пользователя!",
+  "lisansAnahtarinizMiDegisti": "Ваш лицензионный ключ изменился?",
+  "yazilimTeknolojisidir": "Программная технология.",
+  "beniHatirla": "Запомнить меня"
 }

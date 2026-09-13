@@ -1,0 +1,109 @@
+.auth-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  max-width: 800px;
+  height: 100vh;
+  padding: 28px 40px 24px;
+  overflow-y: auto;
+  background: linear-gradient(150deg, #f6f8fb 0%, #ffffff 32%, #ffffff 100%);
+}
+
+.auth-panel-header {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: flex-end;
+}
+
+.auth-language {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.auth-language-icon {
+  font-size: 16px;
+  color: #64748b;
+}
+
+/* Dil seçici Auth ekranında sade görünür: seçili satırda bayrak yerine küre ikonu
+   kullanılır, açılır listede bayraklar olduğu gibi kalır. Genişlik bileşenin
+   kendi ölçüsünde bırakılır; aksi halde açılır listede uzun dil adları kırpılıyor. */
+.auth-language .ant-select-selection-item img {
+  display: none;
+}
+
+.auth-language .ant-select-selection-item {
+  font-weight: 500;
+  color: #334155;
+}
+
+.auth-panel-body {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 32px 0;
+}
+
+.auth-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 430px;
+}
+
+.auth-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 36px;
+}
+
+.auth-brand-logo {
+  width: 180px;
+  height: auto;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.auth-brand-subtitle {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.auth-panel-footer {
+  display: flex;
+  flex-shrink: 0;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.auth-footer-brand {
+  font-weight: 700;
+  color: var(--auth-primary);
+}
+
+@media (max-width: 640px) {
+  .auth-panel {
+    padding: 20px 20px 16px;
+  }
+
+  .auth-panel-footer {
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+}

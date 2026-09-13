@@ -1,18 +1,27 @@
 // Fotoğrafı içe aktarın
 import React, { useEffect, useState } from "react";
-import { Button, Form, Input, Space, Spin, Typography } from "antd";
-import { UserAddOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Space, Spin, Typography, theme } from "antd";
+import { UserAddOutlined, GlobalOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 import backgroundImage from "../../assets/images/login.jpg";
 import backgroundBaseURL from "../../assets/images/backgroundBaseURL.webp";
 import LoginForm from "./components/LoginForm";
 import logo from "../../assets/images/logo.svg";
 import RegistrationForm from "./components/RegistrationForm";
+import LanguageSelectbox from "../components/Language/LanguageSelectbox";
 import axios from "axios";
 import AxiosInstance, { setApiBaseURL } from "../../api/http";
+import "./Auth.css";
 
 const { Text, Link } = Typography;
 
+const hostname = window.location.hostname;
+const isOmega = hostname === "omegaerp.net" || hostname === "www.omegaerp.net";
+const brandName = isOmega ? "Omega" : "PBT PRO";
+
 export default function Auth() {
+  const { t, i18n } = useTranslation();
+  const { token: themeToken } = theme.useToken();
   const [target, setTarget] = React.useState("login"); // login veya register
   const [target1, setTarget1] = React.useState("login"); // login veya register
   const [baseURL, setBaseURL] = useState("");
@@ -85,26 +94,6 @@ export default function Auth() {
     top: 0,
     left: 0,
     zIndex: -1,
-  };
-
-  // Beyaz alan için stil tanımlaması
-  const whiteAreaStyle = {
-    backgroundColor: "white",
-    height: "100vh",
-    width: "100vw", // Genişlik ve yükseklik 100vw ve 100vh olacak
-    maxWidth: "800px",
-    position: "fixed", // Sabit pozisyon, içerik kaydırılsa bile sol tarafta sabit kalır
-    left: 0,
-    top: 0,
-    zIndex: 1, // İçerikle çakışmaması için arka plandan öne alır
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  };
-
-  const logoStyle = {
-    width: "200px", // Genişliği sabit tutun
-    marginBottom: "50px", // Aşağıda 20 piksellik boşluk bırakın
   };
 
   const formStyle = {
@@ -274,44 +263,42 @@ export default function Auth() {
       );
     } else if (target === "login") {
       return (
-        <div style={whiteAreaStyle}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              width: "400px",
-              height: "700px",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <div>
-              {loadingImage && <Spin />}
-              <img
-                src={logoUrl}
-                alt="Logo"
-                style={{
-                  ...logoStyle,
-                  visibility: loadingImage ? "hidden" : "visible",
-                }}
-              />
+        <div
+          className="auth-panel"
+          style={{
+            "--auth-primary": themeToken.colorPrimary,
+            "--auth-primary-hover": themeToken.colorPrimaryHover,
+            "--auth-ring": themeToken.controlOutline,
+          }}
+        >
+          <div className="auth-panel-header">
+            <div className="auth-language">
+              <GlobalOutlined className="auth-language-icon" />
+              <LanguageSelectbox />
             </div>
-            {target1 === "login" ? <LoginForm /> : <RegistrationForm />}
-            {/* <Text type="secondary" style={{ fontSize: "14px", marginBottom: "20px" }}>
-              ve ya
-            </Text>
-            <Button
-              style={{
-                zIndex: "10",
-                width: "100%",
-                backgroundColor: "rgb(43, 199, 112)",
-                borderColor: "rgb(43, 199, 112)",
-                color: "white",
-              }}
-              onClick={toggleTarget}>
-              {target1 === "login" ? <UserAddOutlined /> : null}
-              {target1 === "login" ? "Kayıt Ol" : "Giriş Yap"}
-            </Button> */}
+          </div>
+
+          <div className="auth-panel-body">
+            <div className="auth-content">
+              <div className="auth-brand">
+                {loadingImage ? <Spin /> : logoUrl && <img src={logoUrl} alt={brandName} className="auth-brand-logo" />}
+                {/* lang: CSS uppercase dönüşümünün Türkçe/Azerbaycan "i -> İ" kuralını uygulaması için gerekli. */}
+                <span className="auth-brand-subtitle" lang={i18n.language}>
+                  {t("kurumsalVarlikBakimYonetimi")}
+                </span>
+              </div>
+
+              {target1 === "login" ? <LoginForm /> : <RegistrationForm />}
+            </div>
+          </div>
+
+          <div className="auth-panel-footer">
+            <span>
+              © {new Date().getFullYear()} {brandName}
+            </span>
+            <span>
+              <span className="auth-footer-brand">Orjin</span> {t("yazilimTeknolojisidir")}
+            </span>
           </div>
         </div>
       );

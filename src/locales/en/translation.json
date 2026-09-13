@@ -634,5 +634,13 @@
   "teklifKarsilastirma": "Quotation Comparison",
   "aciklama": "Description",
   "alanBosBirakilamaz": "This field cannot be left empty",
-  "kod": "Code"
+  "kod": "Code",
+  "hesabinizaGirisYapin": "Sign in to your account",
+  "girisEkraniAltBaslik": "Securely continue with your enterprise asset and maintenance management.",
+  "kurumsalVarlikBakimYonetimi": "Enterprise Asset & Maintenance Management",
+  "kullaniciAdi": "Username",
+  "lutfenKullaniciAdiniziGirin": "Please enter your username!",
+  "lisansAnahtarinizMiDegisti": "Has your license key changed?",
+  "yazilimTeknolojisidir": "Software technology.",
+  "beniHatirla": "Remember me"
 }

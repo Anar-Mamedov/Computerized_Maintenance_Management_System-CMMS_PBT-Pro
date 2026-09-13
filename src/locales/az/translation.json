@@ -631,5 +631,13 @@
   "teklifKarsilastirma": "Təklif Müqayisəsi",
   "aciklama": "Açıqlama",
   "alanBosBirakilamaz": "Bu sahə boş buraxıla bilməz",
-  "kod": "Kod"
+  "kod": "Kod",
+  "hesabinizaGirisYapin": "Hesabınıza daxil olun",
+  "girisEkraniAltBaslik": "Korporativ aktiv və texniki xidmət idarəetmənizə təhlükəsiz davam edin.",
+  "kurumsalVarlikBakimYonetimi": "Korporativ Aktiv və Texniki Xidmət İdarəetməsi",
+  "kullaniciAdi": "İstifadəçi adı",
+  "lutfenKullaniciAdiniziGirin": "Zəhmət olmasa istifadəçi adınızı daxil edin!",
+  "lisansAnahtarinizMiDegisti": "Lisenziya açarınız dəyişdi?",
+  "yazilimTeknolojisidir": "Proqram təminatı texnologiyasıdır.",
+  "beniHatirla": "Məni xatırla"
 }
