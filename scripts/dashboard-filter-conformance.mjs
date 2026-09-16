@@ -89,7 +89,10 @@ const IS_TALEP_MOUNT_FILTERS = { lokasyonlar: {}, isemritipleri: {}, durumlar: {
 const SCREEN_MODELS = {
   // src/pages/BakımVeArizaYonetimi/IsEmri/Table/Table.jsx
   "is-emri": ({ filters, isClose }, merge) => {
-    const merged = merge(IS_EMRI_MOUNT_FILTERS, filters);
+    // Ekran /isEmri1 icin tarih araligini tekil "customfilter" anahtarinda alir.
+    const { customfilters, ...kalan } = filters;
+    const ekranFiltreleri = customfilters ? { ...kalan, customfilter: customfilters } : kalan;
+    const merged = merge(IS_EMRI_MOUNT_FILTERS, ekranFiltreleri);
     if (isClose === 0 || isClose === 1) merged.isClose = isClose;
 
     // splitCloseFilterFromRequest: isClose gövdeden çıkarılıp query'ye taşınıyor.
@@ -230,7 +233,7 @@ const DOC_CASES = [
   { no: 11, bolum: "3 · Tamamlananlar", baslik: "Mart 2026 kapatılan iş emirleri", target: "is-emri",
     widget: { isClose: 1, customfilters: MARCH },
     expect: { endpoint: "GetIsEmriFullList", pageSize: 10,
-      body: { isClose: 1, customfilters: MARCH, lokasyonlar: [1, 5], atolyeler: [3], makineler: [101] } } },
+      body: { isClose: 1, customfilter: MARCH, lokasyonlar: [1, 5], atolyeler: [3], makineler: [101] } } },
 
   { no: 12, bolum: "3 · Tamamlananlar", baslik: "Mart 2026 tamamlanan iş talepleri", target: "is-talebi",
     widget: { durumlar: [2], customfilters: MARCH },
@@ -241,25 +244,25 @@ const DOC_CASES = [
   { no: 13, bolum: "4 · İş Emri Tipi", baslik: "Belirli iş emri tipi", target: "is-emri",
     widget: { isemritipleri: [2] },
     expect: { endpoint: "GetIsEmriFullList", pageSize: 10,
-      body: { isemritipleri: [2], lokasyonlar: [1, 5], atolyeler: [3], makineler: [101], customfilters: DASHBOARD_TARIH } } },
+      body: { isemritipleri: [2], lokasyonlar: [1, 5], atolyeler: [3], makineler: [101], customfilter: DASHBOARD_TARIH } } },
 
   // --- BÖLÜM 5: Aylık bakım maliyetleri
   { no: 14, bolum: "5 · Aylık Maliyet", baslik: "Şubat 2026 maliyetli iş emirleri", target: "is-emri",
     widget: { customfilters: { startDate: "2026-02-01", endDate: "2026-02-28" } },
     expect: { endpoint: "GetIsEmriFullList", pageSize: 10,
-      body: { customfilters: { startDate: "2026-02-01", endDate: "2026-02-28" }, lokasyonlar: [1, 5], atolyeler: [3], makineler: [101] } } },
+      body: { customfilter: { startDate: "2026-02-01", endDate: "2026-02-28" }, lokasyonlar: [1, 5], atolyeler: [3], makineler: [101] } } },
 
   // --- BÖLÜM 6: Pareto
   { no: 15, bolum: "6 · Arıza Pareto", baslik: "Kök nedene göre arızalar", target: "is-emri",
     widget: { prosedurtipleri: [1], nedenler: [14] },
     expect: { endpoint: "GetIsEmriFullList", pageSize: 10,
-      body: { prosedurtipleri: [1], nedenler: [14], lokasyonlar: [1, 5], atolyeler: [3], makineler: [101], customfilters: DASHBOARD_TARIH } } },
+      body: { prosedurtipleri: [1], nedenler: [14], lokasyonlar: [1, 5], atolyeler: [3], makineler: [101], customfilter: DASHBOARD_TARIH } } },
 
   // --- BÖLÜM 7: En çok arızalanan ekipman
   { no: 16, bolum: "7 · Top Ekipman", baslik: "Ekipmanın arıza iş emirleri", target: "is-emri",
     widget: { prosedurtipleri: [1], makineler: [42] },
     expect: { endpoint: "GetIsEmriFullList", pageSize: 10,
-      body: { prosedurtipleri: [1], makineler: [42], lokasyonlar: [1, 5], atolyeler: [3], customfilters: DASHBOARD_TARIH } } },
+      body: { prosedurtipleri: [1], makineler: [42], lokasyonlar: [1, 5], atolyeler: [3], customfilter: DASHBOARD_TARIH } } },
 
   { no: 17, bolum: "7 · Top Ekipman", baslik: "Ekipmanı makine sayfasında açma", target: "makine",
     widget: { makineler: [42] },
@@ -272,13 +275,13 @@ const DOC_CASES = [
     widget: { prosedurtipleri: [1], makineler: [18], nedenler: [7], startDate: "2026-06-18", endDate: "2026-09-16" },
     expect: { endpoint: "GetIsEmriFullList", pageSize: 10,
       body: { prosedurtipleri: [1], makineler: [18], nedenler: [7], lokasyonlar: [1, 5], atolyeler: [3],
-        customfilters: { startDate: "2026-06-18", endDate: "2026-09-16" } } } },
+        customfilter: { startDate: "2026-06-18", endDate: "2026-09-16" } } } },
 
   { no: "18b", bolum: "8 · Tekrarlayan Arıza", baslik: "Tekrarlayan arıza (widget'ın eski alan adları)", target: "is-emri",
     widget: { makineId: 18, nedenId: 7, tipGrup: 1, startDate: "2026-06-18", endDate: "2026-09-16" },
     expect: { endpoint: "GetIsEmriFullList", pageSize: 10,
       body: { prosedurtipleri: [1], makineler: [18], nedenler: [7], lokasyonlar: [1, 5], atolyeler: [3],
-        customfilters: { startDate: "2026-06-18", endDate: "2026-09-16" } } } },
+        customfilter: { startDate: "2026-06-18", endDate: "2026-09-16" } } } },
 
   // --- BÖLÜM 9: Yaklaşan periyodik bakımlar
   { no: 19, options: ANLIK, bolum: "9 · Yaklaşan Bakım", baslik: "Yaklaşan bakım satırı", target: "periyodik-bakim",
@@ -295,13 +298,13 @@ const DOC_CASES = [
     widget: { personeller: [12], startDate: "2026-09-01", endDate: "2026-09-30" },
     expect: { endpoint: "GetIsEmriFullList", pageSize: 10,
       body: { personeller: [12], lokasyonlar: [1, 5], atolyeler: [3], makineler: [101],
-        customfilters: { startDate: "2026-09-01", endDate: "2026-09-30" } } } },
+        customfilter: { startDate: "2026-09-01", endDate: "2026-09-30" } } } },
 
   // --- BÖLÜM 11: Süre dağılımı
   { no: 22, bolum: "11 · Süre Dağılımı", baslik: "Hafta 12 iş emirleri", target: "is-emri",
     widget: { customfilters: { startDate: "2026-03-16", endDate: "2026-03-22" } },
     expect: { endpoint: "GetIsEmriFullList", pageSize: 10,
-      body: { customfilters: { startDate: "2026-03-16", endDate: "2026-03-22" }, lokasyonlar: [1, 5], atolyeler: [3], makineler: [101] } } },
+      body: { customfilter: { startDate: "2026-03-16", endDate: "2026-03-22" }, lokasyonlar: [1, 5], atolyeler: [3], makineler: [101] } } },
 
   // --- BÖLÜM 12: Envanter dağılımı
   { no: 23, options: ANLIK, bolum: "12 · Envanter", baslik: "Aktif ekipmanlar", target: "makine",
@@ -409,13 +412,8 @@ function runCase(testCase, modules) {
 
   // Dökümanda olmayıp ekranın fazladan gönderdiği anlamlı filtreler.
   const expectedFields = new Set([...Object.keys(testCase.expect.body || {}), ...Object.keys(testCase.expect.query || {})]);
-  // /isEmri1 ekraninin kendi tarih filtresi "customfilter" (tekil) anahtarini uretiyor; hangisinin
-  // okundugu backend'den teyit edilene kadar iki anahtar da ayni icerikle gonderiliyor.
-  const customfiltersBeklendi = expectedFields.has("customfilters");
-
   const extras = Object.entries(actual.body || {})
     .filter(([field, value]) => {
-      if (field === "customfilter" && customfiltersBeklendi) return false;
       if (expectedFields.has(field)) return false;
       if (value === null || value === undefined) return false;
       if (Array.isArray(value)) return value.length > 0;

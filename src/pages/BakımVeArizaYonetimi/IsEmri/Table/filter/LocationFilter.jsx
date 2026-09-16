@@ -4,10 +4,15 @@ import AxiosInstance from "../../../../../api/http";
 
 const { Option } = Select;
 
-const LocationFilter = ({ onSubmit }) => {
+const LocationFilter = ({ onSubmit, baslangicIds }) => {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);
-  const [selectedValues, setSelectedValues] = useState([]);
+  const [selectedValues, setSelectedValues] = useState(() => (Array.isArray(baslangicIds) ? baslangicIds : []));
+
+  // Dashboard'dan gelindiginde secim disaridan gelir.
+  useEffect(() => {
+    setSelectedValues(Array.isArray(baslangicIds) ? baslangicIds : []);
+  }, [baslangicIds]);
 
   const handleChange = (values) => {
     setSelectedValues(values);

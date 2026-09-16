@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useForm, Controller, useFormContext } from "react-hook-form";
 import { Typography, Select } from "antd";
+import { t } from "i18next";
 import dayjs from "dayjs";
 import "dayjs/locale/tr"; // For Turkish locale
 import weekOfYear from "dayjs/plugin/weekOfYear";
@@ -37,6 +38,10 @@ export default function ZamanAraligi() {
   const handleTimeRangeChange = (value) => {
     let startDate;
     let endDate;
+
+    // Dashboard'dan gelen tarih araligi hazir seceneklerden birine denk gelmiyor;
+    // bu modda tarihler disaridan set edildigi icin buradan sifirlanmamali.
+    if (value === "custom") return;
 
     switch (value) {
       case "all":
@@ -107,6 +112,7 @@ export default function ZamanAraligi() {
             style={{ width: "130px" }}
             placeholder="Seçim Yap"
             options={[
+              { value: "custom", label: t("ozelTarih", "Özel Tarih") },
               { value: "all", label: "Tümü" },
               { value: "today", label: "Bugün" },
               { value: "yesterday", label: "Dün" },

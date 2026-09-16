@@ -5,7 +5,16 @@ import TypeFilter from "./TypeFilter";
 import CustomFilter from "./custom-filter/CustomFilter";
 import ZamanAraligi from "./ZamanAraligi";
 
-export default function Filters({ onChange }) {
+/**
+ * Ekipman cekmecede ID bazli secildigi icin serbest metin filtreleriyle ayni yere degil,
+ * liste API'sinin kok seviyesindeki `makineler` alanina yazilir.
+ */
+const customFiltreyiAyikla = (drawerFiltreleri) => {
+  const { makineler, ...serbestMetinler } = drawerFiltreleri || {};
+  return { makineler: makineler || [], customfilter: serbestMetinler };
+};
+
+export default function Filters({ onChange, baslangicLokasyonIds, baslangicMakineIds }) {
   const [filters, setFilters] = React.useState({
     lokasyonlar: {},
     isemritipleri: {},
@@ -30,14 +39,16 @@ export default function Filters({ onChange }) {
         }
       />
       <LocationFilter
+        baslangicIds={baslangicLokasyonIds}
         onSubmit={(newFilters) =>
           setFilters((state) => ({ ...state, lokasyonlar: newFilters }))
         }
       />
       <ZamanAraligi />
       <CustomFilter
+        baslangicMakineIds={baslangicMakineIds}
         onSubmit={(newFilters) =>
-          setFilters((state) => ({ ...state, customfilter: newFilters }))
+          setFilters((state) => ({ ...state, ...customFiltreyiAyikla(newFilters) }))
         }
       />
     </>

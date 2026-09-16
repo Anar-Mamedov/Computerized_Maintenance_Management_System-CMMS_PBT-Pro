@@ -1,7 +1,7 @@
 import { CloseOutlined, FilterOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Col, Drawer, Row, Typography, Select, Space, Input, DatePicker } from "antd";
 import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
-import EkipmanSelect from "./EkipmanSelect";
+import EkipmanFilterSelectbox from "../../../../../../utils/components/EkipmanFilterSelectbox";
 import AxiosInstance from "../../../../../../api/http";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
@@ -364,7 +364,7 @@ export default function CustomFilter({ onSubmit, baslangicLokasyonIds, baslangic
                   />
                 ) : selectedValues[row.id] === EKIPMAN_ALANI ? (
                   // Ekipman dashboard'daki gibi aranabilir selectbox; secim TB_MAKINE_ID uzerinden tutulur.
-                  <EkipmanSelect value={idValues[row.id] || []} onChange={(ids) => setIdValues((state) => ({ ...state, [row.id]: ids }))} />
+                  <EkipmanFilterSelectbox value={idValues[row.id] || []} onChange={(ids) => setIdValues((state) => ({ ...state, [row.id]: ids }))} />
                 ) : (
                   <Input
                     placeholder="Arama Yap"

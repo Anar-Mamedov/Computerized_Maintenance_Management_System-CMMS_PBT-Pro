@@ -2,14 +2,14 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { Select } from "antd";
 import { t } from "i18next";
-import AxiosInstance from "../../../../../../api/http";
-import useDebounce from "../../../../../../hooks/useDebounce";
+import AxiosInstance from "../../api/http";
+import useDebounce from "../../hooks/useDebounce";
 
 /**
  * Ekipman seçimi. Dashboard'daki ekipman filtresiyle aynı davranış:
  * arama sunucu tarafında yapılır ve seçim `TB_MAKINE_ID` üzerinden ID bazlı tutulur.
  */
-export default function EkipmanSelect({ value, onChange }) {
+export default function EkipmanFilterSelectbox({ value, onChange }) {
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -79,7 +79,7 @@ export default function EkipmanSelect({ value, onChange }) {
   );
 }
 
-EkipmanSelect.propTypes = {
+EkipmanFilterSelectbox.propTypes = {
   value: PropTypes.array,
   onChange: PropTypes.func.isRequired,
 };

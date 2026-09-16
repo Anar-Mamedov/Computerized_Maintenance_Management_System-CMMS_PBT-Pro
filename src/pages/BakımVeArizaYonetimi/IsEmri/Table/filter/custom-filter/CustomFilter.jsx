@@ -18,6 +18,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/tr"; // For Turkish locale
 import weekOfYear from "dayjs/plugin/weekOfYear";
 import advancedFormat from "dayjs/plugin/advancedFormat";
+import EkipmanFilterSelectbox from "../../../../../../utils/components/EkipmanFilterSelectbox";
 
 dayjs.extend(weekOfYear);
 dayjs.extend(advancedFormat);
@@ -25,6 +26,10 @@ dayjs.extend(advancedFormat);
 dayjs.locale("tr"); // use Turkish locale
 
 const { Text, Link } = Typography;
+
+// Bu alan serbest metin degil, ID bazli secim yapar; degeri liste API'sinin
+// kok seviyedeki `makineler` alanina tasinir.
+const EKIPMAN_ALANI = "makineler";
 
 const StyledCloseOutlined = styled(CloseOutlined)`
   svg {
@@ -44,7 +49,7 @@ const CloseButton = styled.div`
   cursor: pointer;
 `;
 
-export default function CustomFilter({ onSubmit }) {
+export default function CustomFilter({ onSubmit, baslangicMakineIds }) {
   const {
     control,
     watch,
@@ -91,6 +96,8 @@ export default function CustomFilter({ onSubmit }) {
 
   // Create a state variable to store selected values for each row
   const [selectedValues, setSelectedValues] = useState({});
+  // Ekipman satiri serbest metin yerine ID tutar.
+  const [idValues, setIdValues] = useState({});
 
   // Tarih seçimi yapıldığında veya filtreler eklenip kaldırıldığında düğmenin stilini değiştirmek için bir durum
   const isFilterApplied =
@@ -115,6 +122,16 @@ export default function CustomFilter({ onSubmit }) {
     // Combine selected values, input values for each row, and date range
     const filterData = rows.reduce((acc, row) => {
       const selectedValue = selectedValues[row.id] || "";
+
+      // Ekipman satiri ID dizisi uretir; birden fazla satir varsa birlestirilir.
+      if (selectedValue === EKIPMAN_ALANI) {
+        const ids = idValues[row.id] || [];
+        if (ids.length) {
+          acc[selectedValue] = [...new Set([...(acc[selectedValue] || []), ...ids])];
+        }
+        return acc;
+      }
+
       const inputValue = inputValues[`input-${row.id}`] || "";
       if (selectedValue && inputValue) {
         acc[selectedValue] = inputValue;
@@ -137,6 +154,11 @@ export default function CustomFilter({ onSubmit }) {
   };
 
   const handleCancelClick = (rowId) => {
+    setIdValues((state) => {
+      const kalan = { ...state };
+      delete kalan[rowId];
+      return kalan;
+    });
     setFilters({});
     setRows((prevRows) => prevRows.filter((row) => row.id !== rowId));
 
@@ -154,6 +176,22 @@ export default function CustomFilter({ onSubmit }) {
       [`input-${rowId}`]: e.target.value,
     }));
   };
+
+  // Dashboard widget'indan gelindiginde ekipman filtresi URL'den gelir;
+  // bunun icin otomatik bir filtre satiri acilip secim isaretlenir.
+  const makineAnahtari = JSON.stringify(baslangicMakineIds || []);
+
+  useEffect(() => {
+    const makineIds = JSON.parse(makineAnahtari);
+    if (!makineIds.length) return;
+
+    const satirId = "dashboard-ekipman";
+    setRows((prevRows) => [{ id: satirId }, ...prevRows.filter((row) => row.id !== satirId)]);
+    setSelectedValues((state) => ({ ...state, [satirId]: EKIPMAN_ALANI }));
+    setIdValues((state) => ({ ...state, [satirId]: makineIds }));
+    setFiltersExist(true);
+    setNewObjectsAdded(true);
+  }, [makineAnahtari]);
 
   const handleAddFilterClick = () => {
     const newRow = { id: Date.now() };
@@ -362,7 +400,7 @@ export default function CustomFilter({ onSubmit }) {
                       label: "Makine Tip",
                     },
                     {
-                      value: "ekp.EKP_TANIM",
+                      value: EKIPMAN_ALANI,
                       label: "Ekipman",
                     },
                     {
@@ -523,12 +561,17 @@ export default function CustomFilter({ onSubmit }) {
                     },
                   ]}
                 />
-                <Input
-                  placeholder="Arama Yap"
-                  name={`input-${row.id}`} // Use a unique name for each input based on the row ID
-                  value={inputValues[`input-${row.id}`] || ""} // Use the corresponding input value
-                  onChange={(e) => handleInputChange(e, row.id)} // Pass the rowId to handleInputChange
-                />
+                {selectedValues[row.id] === EKIPMAN_ALANI ? (
+                  // Ekipman dashboard'daki gibi aranabilir selectbox; secim TB_MAKINE_ID uzerinden tutulur.
+                  <EkipmanFilterSelectbox value={idValues[row.id] || []} onChange={(ids) => setIdValues((state) => ({ ...state, [row.id]: ids }))} />
+                ) : (
+                  <Input
+                    placeholder="Arama Yap"
+                    name={`input-${row.id}`} // Use a unique name for each input based on the row ID
+                    value={inputValues[`input-${row.id}`] || ""} // Use the corresponding input value
+                    onChange={(e) => handleInputChange(e, row.id)} // Pass the rowId to handleInputChange
+                  />
+                )}
               </Col>
             </Col>
           </Row>

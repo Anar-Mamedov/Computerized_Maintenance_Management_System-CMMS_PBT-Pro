@@ -166,14 +166,11 @@ const EMPTY_RESULT = { active: false, filters: {}, isClose: null, isAktif: null 
 const SCREEN_FIELD_ALIASES = {
   "/makine": { atolyeler: "atolye" },
   "/isTalepleri": { onaydurumlari: "onayDurumlari" },
+  // /isEmri1 ekraninin kendi tarih filtresi tekil "customfilter" anahtarini uretiyor
+  // (filter/custom-filter/CustomFilter.jsx). Is talebi ekrani ise cogul kullaniyor.
+  // Her ekrana yalnizca kendi kullandigi anahtar gonderilir.
+  "/isEmri1": { customfilters: "customfilter" },
 };
-
-/**
- * /isEmri1 ekraninin kendi tarih filtresi "customfilter" (tekil) anahtarini uretiyor,
- * is talebi ekrani ise "customfilters" (cogul). Tekil anahtar yalnizca onu kullanan ekrana
- * eklenir; kullanmayan ekrana gonderilmesi sonucu bozabiliyor.
- */
-const TEKIL_CUSTOMFILTER_KULLANAN_EKRANLAR = ["/isEmri1"];
 
 /** Kanonik alan adlarini hedef ekranin bekledigi adlara cevirir. */
 const applyScreenAliases = (filters, route) => {
@@ -202,12 +199,6 @@ export function useDashboardFilterParams(expectedPath) {
     if (expectedPath && pathname !== expectedPath) return EMPTY_RESULT;
 
     const okunan = readDashboardFilterParams(search);
-    const filters = applyScreenAliases(okunan.filters, expectedPath);
-
-    if (filters.customfilters && TEKIL_CUSTOMFILTER_KULLANAN_EKRANLAR.includes(expectedPath)) {
-      filters.customfilter = filters.customfilters;
-    }
-
-    return { ...okunan, filters };
+    return { ...okunan, filters: applyScreenAliases(okunan.filters, expectedPath) };
   }, [expectedPath, pathname, search]);
 }

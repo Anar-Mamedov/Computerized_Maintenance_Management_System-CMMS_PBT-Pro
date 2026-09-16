@@ -1291,6 +1291,21 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
     setCurrentPage(1);
   }, [dashboardFilters]);
 
+  // Dashboard'dan gelen tarih araligini ekranin kendi tarih alanlarina da yaz ki
+  // "Filtreler" cekmecesindeki tarih inputlari bos gorunmesin ve kullanici degistirebilsin.
+  const dashboardTarihAraligi = dashboardFilters.customfilter;
+  const dashboardBaslangic = dashboardTarihAraligi?.startDate || null;
+  const dashboardBitis = dashboardTarihAraligi?.endDate || null;
+
+  useEffect(() => {
+    if (!dashboardBaslangic && !dashboardBitis) return;
+
+    // timeRange "custom" oldugunda ZamanAraligi tarihleri sifirlamiyor.
+    setValue("timeRange", "custom");
+    setValue("startDate", dashboardBaslangic ? dayjs(dashboardBaslangic) : null);
+    setValue("endDate", dashboardBitis ? dayjs(dashboardBitis) : null);
+  }, [dashboardBaslangic, dashboardBitis, setValue]);
+
   // ana tablo api isteği için kullanılan useEffect son
 
   // arama işlemi için kullanılan useEffect
@@ -2064,7 +2079,11 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
             onChange={(e) => setSearchTerm(e.target.value)}
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
-          <Filters onChange={handleBodyChange} />
+          <Filters
+            onChange={handleBodyChange}
+            baslangicLokasyonIds={dashboardFilters.lokasyonlar}
+            baslangicMakineIds={dashboardFilters.makineler}
+          />
           {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}
         </div>
