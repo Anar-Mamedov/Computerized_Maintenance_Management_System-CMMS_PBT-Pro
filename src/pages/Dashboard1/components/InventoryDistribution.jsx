@@ -107,7 +107,7 @@ export default function InventoryDistribution({ onHide }) {
   const toplamEkipman = data?.ToplamEkipman;
   const listeHedefi = data?.TargetPageListe || "makine";
 
-  const goToList = () => navigateToTarget(navigate, listeHedefi, {}, filters, { tarihAraligiUygula: false });
+  const goToList = () => navigateToTarget(navigate, listeHedefi, {}, filters);
 
   // Rehber 23/24/25: Aktif, Arizali ve Pasif sutunlari ayri hedefler. Satirin geneli tipin tamamini acar.
   const handleSegmentClick = (row, segmentFiltresi) =>
@@ -115,8 +115,7 @@ export default function InventoryDistribution({ onHide }) {
       navigate,
       row.TargetPage || listeHedefi,
       { ...segmentFiltresi, ...(row.MakineTipId ? { makinetip: [row.MakineTipId] } : {}) },
-      filters,
-      { tarihAraligiUygula: false }
+      filters
     );
 
   const handleDownload = () =>
@@ -206,7 +205,7 @@ export default function InventoryDistribution({ onHide }) {
             pagination={false}
             scroll={{ y: scrollY }}
             locale={{ emptyText: t("veriYok") }}
-            onRow={(record) => ({ style: { cursor: "pointer" }, onClick: () => navigateToTarget(navigate, record.TargetPage || listeHedefi, { ...(record.MakineTipId ? { makinetip: [record.MakineTipId] } : {}), ...record.FilterParams }, filters, { tarihAraligiUygula: false }) })}
+            onRow={(record) => ({ style: { cursor: "pointer" }, onClick: () => navigateToTarget(navigate, record.TargetPage || listeHedefi, { ...(record.MakineTipId ? { makinetip: [record.MakineTipId] } : {}), ...record.FilterParams }, filters) })}
           />
         </div>
       </div>

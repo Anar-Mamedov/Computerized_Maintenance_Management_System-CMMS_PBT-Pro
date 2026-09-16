@@ -1275,5 +1275,11 @@
   "yazilimTeknolojisidir": "Yazılım teknolojisidir.",
   "filtreler": "Filtreler",
   "temizle": "Temizle",
-  "tarihAraligi": "Tarih Aralığı"
+  "tarihAraligi": "Tarih Aralığı",
+  "geciken": "Geciken",
+  "yeniFiltre": "Yeni Filtre",
+  "filtreEkle": "Filtre ekle",
+  "secimYap": "Seçim Yap",
+  "evet": "Evet",
+  "hayir": "Hayır"
 }

@@ -65,7 +65,7 @@ export default function ActionCenter({ onHide }) {
                 key={item.Key}
                 type="button"
                 className="pbt-row"
-                onClick={tiklanabilirMi(item) ? () => navigateToTarget(navigate, item.TargetPage, item.FilterParams, filters, { tarihAraligiUygula: false }) : undefined}
+                onClick={tiklanabilirMi(item) ? () => navigateToTarget(navigate, item.TargetPage, item.FilterParams, filters) : undefined}
                 style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 10px", border: "none", background: "transparent", cursor: "pointer", textAlign: "left", borderRadius: 8 }}
               >
                 <span style={{ width: 28, height: 28, borderRadius: 8, background: soft, color: main, display: "grid", placeItems: "center", flexShrink: 0 }}>

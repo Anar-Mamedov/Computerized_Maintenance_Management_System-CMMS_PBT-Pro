@@ -101,10 +101,10 @@ export default function UpcomingMaintenances({ onHide }) {
       bodyPadding={12}
       onRefresh={reload}
       onDownload={rows.length ? handleDownload : undefined}
-      onDetail={() => navigateToTarget(navigate, takvimHedefi, {}, filters, { tarihAraligiUygula: false })}
+      onDetail={() => navigateToTarget(navigate, takvimHedefi, {}, filters)}
       onHide={onHide}
       footer={
-        <Button type="link" size="small" style={{ paddingLeft: 0 }} onClick={() => navigateToTarget(navigate, takvimHedefi, {}, filters, { tarihAraligiUygula: false })}>
+        <Button type="link" size="small" style={{ paddingLeft: 0 }} onClick={() => navigateToTarget(navigate, takvimHedefi, {}, filters)}>
           {t("bakimTakviminiGor")}
         </Button>
       }
@@ -115,7 +115,7 @@ export default function UpcomingMaintenances({ onHide }) {
             key={key}
             type="button"
             className="pbt-row"
-            onClick={() => navigateToTarget(navigate, "periyodik-bakim", sayacFiltresi(durum), filters, { tarihAraligiUygula: false })}
+            onClick={() => navigateToTarget(navigate, "periyodik-bakim", sayacFiltresi(durum), filters)}
             style={{
               border: `1px solid ${COLORS.border}`,
               borderLeft: `3px solid ${color}`,
@@ -142,7 +142,7 @@ export default function UpcomingMaintenances({ onHide }) {
             pagination={false}
             scroll={{ y: scrollY }}
             locale={{ emptyText: t("veriYok") }}
-            onRow={(record) => ({ style: { cursor: "pointer" }, onClick: () => navigateToTarget(navigate, record.TargetPage || "periyodik-bakim", { ...(record.PbakimMakineId ? { makineler: [record.PbakimMakineId] } : {}), ...record.FilterParams }, filters, { tarihAraligiUygula: false }) })}
+            onRow={(record) => ({ style: { cursor: "pointer" }, onClick: () => navigateToTarget(navigate, record.TargetPage || "periyodik-bakim", { ...(record.PbakimMakineId ? { makineler: [record.PbakimMakineId] } : {}), ...record.FilterParams }, filters) })}
           />
         </div>
       </div>

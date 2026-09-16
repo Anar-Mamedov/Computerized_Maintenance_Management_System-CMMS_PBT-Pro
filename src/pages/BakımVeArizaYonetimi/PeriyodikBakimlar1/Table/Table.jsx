@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
@@ -8,12 +8,14 @@ import { Resizable } from "react-resizable";
 import "./ResizeStyle.css";
 import AxiosInstance from "../../../../api/http";
 import { useDashboardFilterParams } from "../../../../utils/dashboardFilterParams";
+import FiltreCekmecesi from "../../../../utils/components/FiltreCekmecesi";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import { useFormContext } from "react-hook-form";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { t } from "i18next";
 
 const { Text } = Typography;
 
@@ -106,21 +108,66 @@ const MainTable = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
   // Dashboard widget'indan gelindiyse widget'in filtreleri URL uzerinden tasinir.
-  const { active: dashboardActive, filters: dashboardFilters } = useDashboardFilterParams("/periyodikBakimlar");
+  const { filters: dashboardFilters } = useDashboardFilterParams("/periyodikBakimlar");
+  // Cekmeceden gelen filtreler; dashboard degerleri bunlara baslangic degeri olarak yerlesir.
+  const [ekranFiltreleri, setEkranFiltreleri] = useState({});
+
+  // Filtreli liste ucu yalnizca gercekten bir filtre varken kullanilir.
+  const aktifFiltreler = useMemo(() => {
+    const birlesik = { ...ekranFiltreleri };
+    Object.keys(birlesik).forEach((anahtar) => {
+      const deger = birlesik[anahtar];
+      const bos = deger === null || deger === undefined || deger === "" || (Array.isArray(deger) && !deger.length) || (typeof deger === "object" && !Array.isArray(deger) && !Object.keys(deger).length);
+      if (bos) delete birlesik[anahtar];
+    });
+    return birlesik;
+  }, [ekranFiltreleri]);
+
+
+  // Filtre cekmecesinde secilebilecek alanlar (tarih araligi cekmecede sabittir).
+  const filtreAlanlari = useMemo(
+    () => [
+      {
+        value: "durum",
+        label: t("durum"),
+        tip: "select",
+        secenekler: [
+          { value: "geciken", label: t("geciken") },
+          { value: "bugun", label: t("bugun") },
+          { value: "buHafta", label: t("buHafta") },
+          { value: "buAy", label: t("buAy") },
+        ],
+      },
+      { value: "lokasyonlar", label: t("lokasyon"), tip: "lokasyon" },
+      { value: "atolyeler", label: t("atolye"), tip: "atolye" },
+      { value: "makineler", label: t("ekipman"), tip: "ekipman" },
+    ],
+    []
+  );
+
+  // Dashboard'dan gelenler cekmecenin baslangic degerleri olur.
+  const cekmeceBaslangici = useMemo(
+    () => ({
+      durum: dashboardFilters.durum,
+      lokasyonlar: dashboardFilters.lokasyonlar,
+      atolyeler: dashboardFilters.atolyeler,
+      makineler: dashboardFilters.makineler,
+      startDate: dashboardFilters.customfilters?.startDate,
+      endDate: dashboardFilters.customfilters?.endDate,
+    }),
+    [dashboardFilters]
+  );
   const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchTimeout, setSearchTimeout] = useState(null);
-  const [filteredData, setFilteredData] = useState([]);
   // Dashboard filtresiyle gelindiginde sayfalama server-side calisir.
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalDataCount, setTotalDataCount] = useState(0);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
-  // GetPBakimFullList gercekten kullanildiysa true; fallback'e dusuldugunde false kalir.
-  const [sunucuSayfalamasi, setSunucuSayfalamasi] = useState(false);
   const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
 
   // edit drawer için
@@ -673,12 +720,12 @@ const MainTable = () => {
 
   useEffect(() => {
     fetchEquipmentData(currentPage, pageSize);
-  }, [dashboardActive, dashboardFilters, currentPage, pageSize, debouncedSearchTerm, refreshKey]);
+  }, [aktifFiltreler, currentPage, pageSize, debouncedSearchTerm, refreshKey]);
 
   // Dashboard filtresi degisince daralan sonuc kumesinde eski sayfada kalinmasin.
   useEffect(() => {
     setCurrentPage(1);
-  }, [dashboardFilters]);
+  }, [aktifFiltreler]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
@@ -688,7 +735,7 @@ const MainTable = () => {
     if (Array.isArray(response)) return response;
     if (!response || typeof response !== "object") return [];
 
-    const knownListKeys = ["list", "periyodik_bakim_listesi", "pbakim_listesi", "periyodikBakimList", "Data", "makine_listesi"];
+    const knownListKeys = ["list", "periyodik_bakim_listesi", "pbakim_listesi", "periyodikBakimList", "Data"];
     const matchedKey = knownListKeys.find((key) => Array.isArray(response[key]));
 
     return matchedKey ? response[matchedKey] : [];
@@ -707,46 +754,13 @@ const MainTable = () => {
     try {
       setLoading(true);
 
-      if (dashboardActive) {
-        // Dashboard'dan filtreyle gelindiginde rehber dokumanindaki sayfali istek kullanilir.
-        const rawResponse = await AxiosInstance.post(`GetPBakimFullList?pagingDeger=${page}&pageSize=${size}&parametre=${debouncedSearchTerm}`, dashboardFilters);
-        const list = extractPBakimList(rawResponse);
+      // Liste her zaman sayfali + filtreli uctan gelir; arama ve filtreler sunucuda uygulanir.
+      const rawResponse = await AxiosInstance.post(`GetPBakimFullList?pagingDeger=${page}&pageSize=${size}&parametre=${debouncedSearchTerm}`, aktifFiltreler);
+      const list = extractPBakimList(rawResponse);
 
-        // GetPBakimFullList'in bu ekrandaki sozlesmesi backend'den henuz teyit edilmedi; repodaki diger
-        // kullanimi MAKINE listesi donduruyor. Donen kayitlar periyodik bakim gibi gorunmuyorsa bos/bozuk
-        // tablo gostermek yerine calistigi kanitli uca geri donuyoruz.
-        const periyodikBakimGibi = list.length === 0 || list.some((item) => item?.TB_PERIYODIK_BAKIM_ID !== undefined);
-
-        if (periyodikBakimGibi && list.length > 0) {
-          setSunucuSayfalamasi(true);
-          setData(list.map((item) => ({ ...item, key: item.TB_PERIYODIK_BAKIM_ID })));
-          setTotalDataCount(extractTotalCount(rawResponse, list.length));
-          setLoading(false);
-          return;
-        }
-
-        if (!periyodikBakimGibi) {
-          console.warn("GetPBakimFullList periyodik bakim kaydi dondurmedi; filtresiz PeriyodikBakimList'e donuluyor.");
-        }
-      }
-
-      // API isteğinde keyword ve currentPage kullanılıyor
-      setSunucuSayfalamasi(false);
-      const response = await AxiosInstance.get(`PeriyodikBakimList`);
-      if (response) {
-        // Gelen veriyi formatla ve state'e ata
-        const formattedData = response.map((item) => ({
-          ...item,
-          key: item.TB_PERIYODIK_BAKIM_ID,
-          // Diğer alanlarınız...
-        }));
-        setData(formattedData);
-        setTotalDataCount(formattedData.length);
-        setLoading(false);
-      } else {
-        console.error("API response is not in expected format");
-        setLoading(false);
-      }
+      setData(list.map((item) => ({ ...item, key: item.TB_PERIYODIK_BAKIM_ID })));
+      setTotalDataCount(extractTotalCount(rawResponse, list.length));
+      setLoading(false);
     } catch (error) {
       console.error("Error in API request:", error);
       setLoading(false);
@@ -760,41 +774,15 @@ const MainTable = () => {
     }
   };
 
-  const normalizeString = (str) => {
-    if (str === null) {
-      return "";
-    }
-    return str
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .replace(/ğ/gim, "g")
-      .replace(/ü/gim, "u")
-      .replace(/ş/gim, "s")
-      .replace(/ı/gim, "i")
-      .replace(/ö/gim, "o")
-      .replace(/ç/gim, "c");
-  };
-
+  // Arama API'ye gidiyor; terimi debounce edip ilk sayfaya doneriz.
   useEffect(() => {
-    // Sunucu sayfalamasi devredeyken arama API'ye parametre olarak gidiyor, client-side suzme yapilmaz.
-    if (sunucuSayfalamasi) return;
-
-    const filtered = data.filter((item) => normalizeString(item.PBK_TANIM).includes(normalizeString(searchTerm)));
-    setFilteredData(filtered);
-  }, [searchTerm, data, sunucuSayfalamasi]);
-
-  // Dashboard modunda arama API'ye gidiyor; terimi debounce edip ilk sayfaya doneriz.
-  useEffect(() => {
-    if (!dashboardActive) return undefined;
-
     const timeout = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
       setCurrentPage(1);
     }, 500);
 
     return () => clearTimeout(timeout);
-  }, [searchTerm, dashboardActive]);
+  }, [searchTerm]);
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -1081,6 +1069,8 @@ const MainTable = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
+          {/* Filtre çekmecesi her ekranda arama kutusunun yanında, solda hizalı durur. */}
+          <FiltreCekmecesi alanlar={filtreAlanlari} baslangicFiltreleri={cekmeceBaslangici} onSubmit={setEkranFiltreleri} />
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
@@ -1092,21 +1082,20 @@ const MainTable = () => {
           components={components}
           rowSelection={rowSelection}
           columns={filteredColumns}
-          dataSource={!sunucuSayfalamasi && searchTerm ? filteredData : data}
+          dataSource={data}
           pagination={{
-            // Sunucu sayfalamasi yalnizca GetPBakimFullList yolu gercekten kullanildiginda devrede olur.
-            ...(sunucuSayfalamasi ? { current: currentPage, pageSize, total: totalDataCount } : { defaultPageSize: pageSize }),
+            current: currentPage,
+            pageSize,
+            total: totalDataCount,
             showSizeChanger: true,
             pageSizeOptions: ["10", "20", "50", "100"],
             position: ["bottomRight"],
             showTotal: (total) => `Toplam ${total}`,
             showQuickJumper: true,
-            onChange: dashboardActive
-              ? (page, size) => {
-                  setCurrentPage(page);
-                  setPageSize(size);
-                }
-              : undefined,
+            onChange: (page, size) => {
+              setCurrentPage(page);
+              setPageSize(size);
+            },
           }}
           onRow={onRowClick}
           scroll={{ y: "calc(100vh - 370px)" }}

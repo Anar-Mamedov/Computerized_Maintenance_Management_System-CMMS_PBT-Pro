@@ -645,5 +645,11 @@
   "beniHatirla": "Remember me",
   "filtreler": "Filters",
   "temizle": "Clear",
-  "tarihAraligi": "Date Range"
+  "tarihAraligi": "Date Range",
+  "geciken": "Overdue",
+  "yeniFiltre": "New Filter",
+  "filtreEkle": "Add filter",
+  "secimYap": "Make a selection",
+  "evet": "Yes",
+  "hayir": "No"
 }

@@ -67,8 +67,8 @@ export default function PerformanceSummary() {
               key={key}
               role={tiklanabilir ? "button" : undefined}
               tabIndex={tiklanabilir ? 0 : undefined}
-              onClick={tiklanabilir ? () => navigateToTarget(navigate, targetPage, filterParams, filters, { tarihAraligiUygula: false }) : undefined}
-              onKeyDown={tiklanabilir ? (event) => event.key === "Enter" && navigateToTarget(navigate, targetPage, filterParams, filters, { tarihAraligiUygula: false }) : undefined}
+              onClick={tiklanabilir ? () => navigateToTarget(navigate, targetPage, filterParams, filters) : undefined}
+              onKeyDown={tiklanabilir ? (event) => event.key === "Enter" && navigateToTarget(navigate, targetPage, filterParams, filters) : undefined}
               style={{ display: "inline-flex", alignItems: "center", gap: 8, cursor: tiklanabilir ? "pointer" : "default" }}
             >
               <span style={{ width: 22, height: 22, borderRadius: 6, background, color, display: "grid", placeItems: "center" }}>

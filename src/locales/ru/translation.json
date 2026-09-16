@@ -642,5 +642,11 @@
   "beniHatirla": "Запомнить меня",
   "filtreler": "Фильтры",
   "temizle": "Очистить",
-  "tarihAraligi": "Диапазон дат"
+  "tarihAraligi": "Диапазон дат",
+  "geciken": "Просроченный",
+  "yeniFiltre": "Новый фильтр",
+  "filtreEkle": "Добавить фильтр",
+  "secimYap": "Сделайте выбор",
+  "evet": "Да",
+  "hayir": "Нет"
 }

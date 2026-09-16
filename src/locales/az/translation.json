@@ -642,5 +642,11 @@
   "beniHatirla": "Məni xatırla",
   "filtreler": "Filtrlər",
   "temizle": "Təmizlə",
-  "tarihAraligi": "Tarix Aralığı"
+  "tarihAraligi": "Tarix Aralığı",
+  "geciken": "Gecikən",
+  "yeniFiltre": "Yeni Filtr",
+  "filtreEkle": "Filtr əlavə et",
+  "secimYap": "Seçim edin",
+  "evet": "Bəli",
+  "hayir": "Xeyr"
 }
