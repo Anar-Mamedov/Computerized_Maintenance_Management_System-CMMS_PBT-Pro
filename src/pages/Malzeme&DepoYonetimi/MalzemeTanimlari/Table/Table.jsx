@@ -987,26 +987,32 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
         apiUrl += `&stkDepoIds=${stkDepoIds.join(",")}`;
       }
 
-      // Dashboard'dan gelen filtreler (ör. Kritik Stoklar kartinin FilterParams'indaki kritik:true)
-      // query parametresi olarak eklenir. Stok listesi GET oldugu icin govde yok.
-      // customfilters ve customfilter ayni icerigi tasiyor; tarih yalnizca bir kez eklenir.
-      const tarihAraligi = dashboardFilters?.customfilters || dashboardFilters?.customfilter;
-      if (tarihAraligi?.startDate) apiUrl += `&startDate=${encodeURIComponent(tarihAraligi.startDate)}`;
-      if (tarihAraligi?.endDate) apiUrl += `&endDate=${encodeURIComponent(tarihAraligi.endDate)}`;
+      // Kritik malzeme filtresi cekmeceden gelir; dashboard degeri yalnizca baslangic degeridir.
+      if (normalizedFilters.kritik === true) {
+        apiUrl += `&kritik=true`;
+      }
 
-      Object.entries(dashboardFilters || {}).forEach(([alan, deger]) => {
-        if (deger === null || deger === undefined || deger === "") return;
-        if (alan === "customfilters" || alan === "customfilter") return;
+      // Lokasyon, ekipman ve tarih araligi ekranin kendi filtre kontrollerinden gelir;
+      // dashboard degerleri bu kontrollere baslangic degeri olarak yerlesir.
+      const lokasyonIds = Array.isArray(normalizedFilters.lokasyonlar) ? normalizedFilters.lokasyonlar : [];
+      const makineIds = Array.isArray(normalizedFilters.makineler) ? normalizedFilters.makineler : [];
+      const tarihAraligi = normalizedFilters.customfilters || {};
 
-        if (Array.isArray(deger)) {
-          if (deger.length) apiUrl += `&${alan}=${deger.join(",")}`;
-          return;
-        }
+      if (lokasyonIds.length > 0) {
+        apiUrl += `&lokasyonlar=${lokasyonIds.join(",")}`;
+      }
 
-        if (typeof deger === "object") return;
+      if (makineIds.length > 0) {
+        apiUrl += `&makineler=${makineIds.join(",")}`;
+      }
 
-        apiUrl += `&${alan}=${encodeURIComponent(String(deger))}`;
-      });
+      if (tarihAraligi.startDate) {
+        apiUrl += `&startDate=${encodeURIComponent(tarihAraligi.startDate)}`;
+      }
+
+      if (tarihAraligi.endDate) {
+        apiUrl += `&endDate=${encodeURIComponent(tarihAraligi.endDate)}`;
+      }
 
       if (islemTip === "C" || islemTip === "T") {
         // islemTip C veya T ise özel parametreler ekle
@@ -1434,7 +1440,14 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
           <AktifPasifHepsiSelect style={{ width: 160 }} value={body.isAktif} onChange={(value) => handleBodyChange("isAktif", value)} />
-          <Filters onChange={handleBodyChange} />
+          <Filters
+            onChange={handleBodyChange}
+            baslangicLokasyonIds={dashboardFilters.lokasyonlar}
+            baslangicMakineIds={dashboardFilters.makineler}
+            baslangicTarihi={dashboardFilters.customfilters?.startDate}
+            bitisTarihi={dashboardFilters.customfilters?.endDate}
+            baslangicKritik={dashboardFilters.kritik === true}
+          />
         </div>
         {!isSelectionMode && (
           <div style={{ display: "flex", gap: "10px" }}>

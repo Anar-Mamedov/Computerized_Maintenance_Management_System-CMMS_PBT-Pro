@@ -1,6 +1,7 @@
 import { Space } from "antd";
 import React, { useEffect, useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import PropTypes from "prop-types";
 import DepoTablo from "../../../../../../utils/components/DepoTablo";
 import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
 import { t } from "i18next";
@@ -84,3 +85,7 @@ export default function CustomFilter({ onSubmit }) {
     </FormProvider>
   );
 }
+
+CustomFilter.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+};

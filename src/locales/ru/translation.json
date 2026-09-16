@@ -639,5 +639,8 @@
   "lutfenKullaniciAdiniziGirin": "Пожалуйста, введите имя пользователя!",
   "lisansAnahtarinizMiDegisti": "Ваш лицензионный ключ изменился?",
   "yazilimTeknolojisidir": "Программная технология.",
-  "beniHatirla": "Запомнить меня"
+  "beniHatirla": "Запомнить меня",
+  "filtreler": "Фильтры",
+  "temizle": "Очистить",
+  "tarihAraligi": "Диапазон дат"
 }

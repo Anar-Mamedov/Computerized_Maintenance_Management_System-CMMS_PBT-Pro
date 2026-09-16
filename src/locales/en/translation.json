@@ -642,5 +642,8 @@
   "lutfenKullaniciAdiniziGirin": "Please enter your username!",
   "lisansAnahtarinizMiDegisti": "Has your license key changed?",
   "yazilimTeknolojisidir": "Software technology.",
-  "beniHatirla": "Remember me"
+  "beniHatirla": "Remember me",
+  "filtreler": "Filters",
+  "temizle": "Clear",
+  "tarihAraligi": "Date Range"
 }

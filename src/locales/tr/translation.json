@@ -1272,5 +1272,8 @@
   "kullaniciAdi": "Kullanıcı adı",
   "lutfenKullaniciAdiniziGirin": "Lütfen kullanıcı adınızı girin!",
   "lisansAnahtarinizMiDegisti": "Lisans anahtarınız mı değişti?",
-  "yazilimTeknolojisidir": "Yazılım teknolojisidir."
+  "yazilimTeknolojisidir": "Yazılım teknolojisidir.",
+  "filtreler": "Filtreler",
+  "temizle": "Temizle",
+  "tarihAraligi": "Tarih Aralığı"
 }

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Modal, Table, Input, message } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 import { SearchOutlined, PlusOutlined, CloseOutlined } from "@ant-design/icons";
@@ -28,6 +28,8 @@ export default function LokasyonTablo({
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [treeData, setTreeData] = useState([]);
+  // Disaridan gelen secimlerin adlarini cozmek icin bir kez cekilen duz lokasyon listesi.
+  const lokasyonListesiRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
@@ -217,6 +219,41 @@ export default function LokasyonTablo({
     }
     setSelectedRowKeys(workshopSelectedId ? [workshopSelectedId] : []);
   }, [workshopSelectedId]);
+
+  // Coklu modda secim disaridan gelebiliyor (ornegin dashboard filtresi). Agac verisi yalnizca
+  // modal acilinca cekildigi icin, modal hic acilmadan da secili lokasyonlarin adlari gorunsun
+  // diye liste bir kez cekilip girise yaziliyor.
+  const disaridanSecilenAnahtar = Array.isArray(workshopSelectedId) ? workshopSelectedId.join(",") : "";
+
+  useEffect(() => {
+    if (!multiple || !disaridanSecilenAnahtar) return undefined;
+
+    const ids = disaridanSecilenAnahtar.split(",").map(Number);
+    let iptal = false;
+
+    const adlariYaz = (liste) => {
+      const adlar = (liste || []).filter((item) => ids.includes(item.TB_LOKASYON_ID)).map((item) => item.LOK_TANIM);
+      if (adlar.length) setValue(lokasyonFieldName, adlar.join(", "));
+    };
+
+    if (lokasyonListesiRef.current) {
+      adlariYaz(lokasyonListesiRef.current);
+      return undefined;
+    }
+
+    AxiosInstance.get("GetLokasyonList")
+      .then((response) => {
+        if (iptal) return;
+        const liste = response?.data || response || [];
+        lokasyonListesiRef.current = liste;
+        adlariYaz(liste);
+      })
+      .catch((error) => console.error("Lokasyon adları çözülemedi:", error));
+
+    return () => {
+      iptal = true;
+    };
+  }, [multiple, disaridanSecilenAnahtar, lokasyonFieldName, setValue]);
 
   const onRowSelectChange = (selectedKeys) => {
     if (multiple) {

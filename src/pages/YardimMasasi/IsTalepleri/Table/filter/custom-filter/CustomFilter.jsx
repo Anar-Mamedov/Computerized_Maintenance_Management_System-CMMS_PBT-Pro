@@ -2,7 +2,6 @@ import { CloseOutlined, FilterOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Col, Drawer, Row, Typography, Select, Space, Input, DatePicker } from "antd";
 import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
 import EkipmanFilterSelectbox from "../../../../../../utils/components/EkipmanFilterSelectbox";
-import AxiosInstance from "../../../../../../api/http";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import "./style.css";
@@ -185,15 +184,8 @@ export default function CustomFilter({ onSubmit, baslangicLokasyonIds, baslangic
       yeniSatirlar.push({ id: satirId });
       yeniSecimler[satirId] = LOKASYON_ALANI;
       yeniIdler[satirId] = lokasyonIds;
+      // Secili lokasyonlarin adlarini LokasyonTablo kendisi cozup yaziyor.
       setValue(`customFiltreLokasyonID-${satirId}`, lokasyonIds);
-
-      // Modal acilmadan da secili lokasyonun adi gorunsun.
-      AxiosInstance.get("GetLokasyonList")
-        .then((response) => {
-          const adlar = (response || []).filter((item) => lokasyonIds.includes(item.TB_LOKASYON_ID)).map((item) => item.LOK_TANIM);
-          if (adlar.length) setValue(`customFiltreLokasyonTanim-${satirId}`, adlar.join(", "));
-        })
-        .catch((error) => console.error("Lokasyon adı çözülemedi:", error));
     }
 
     if (makineIds.length) {
