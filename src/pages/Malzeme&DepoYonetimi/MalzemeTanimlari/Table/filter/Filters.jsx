@@ -9,31 +9,22 @@ const EMPTY_FILTERS = {
   stkTipIds: [],
   stkDepoIds: [],
   stkGrupIds: [],
-  lokasyonlar: [],
-  makineler: [],
-  customfilters: {},
 };
 
-export default function Filters({ onChange, baslangicLokasyonIds, baslangicMakineIds, baslangicTarihi, bitisTarihi, baslangicKritik }) {
+export default function Filters({ onChange, baslangicKritik, baslangicStoktaYok }) {
   // Filtre cekmecesinde secilebilecek alanlar (tarih araligi cekmecede sabittir).
+  // Rehber dökümanında stok listesi lokasyon/ekipman/tarih filtresi almıyor; yalnızca kritik seviye var.
   const filtreAlanlari = React.useMemo(
     () => [
-      { value: "lokasyonlar", label: t("lokasyon"), tip: "lokasyon" },
-      { value: "makineler", label: t("ekipman"), tip: "ekipman" },
       { value: "kritik", label: t("kritikMalzeme"), tip: "select", secenekler: [{ value: true, label: t("evet") }, { value: false, label: t("hayir") }] },
+      { value: "stoktaYok", label: t("stoktaYok"), tip: "select", secenekler: [{ value: true, label: t("evet") }, { value: false, label: t("hayir") }] },
     ],
     []
   );
 
   const cekmeceBaslangici = React.useMemo(
-    () => ({
-      lokasyonlar: baslangicLokasyonIds,
-      makineler: baslangicMakineIds,
-      ...(baslangicKritik ? { kritik: true } : {}),
-      startDate: baslangicTarihi,
-      endDate: bitisTarihi,
-    }),
-    [baslangicLokasyonIds, baslangicMakineIds, baslangicKritik, baslangicTarihi, bitisTarihi]
+    () => ({ ...(baslangicKritik ? { kritik: true } : {}), ...(baslangicStoktaYok ? { stoktaYok: true } : {}) }),
+    [baslangicKritik, baslangicStoktaYok]
   );
 
   const [filters, setFilters] = React.useState({ ...EMPTY_FILTERS });
@@ -52,10 +43,9 @@ export default function Filters({ onChange, baslangicLokasyonIds, baslangicMakin
       {/* Cekmecedeki filtreler: tarih araligi sabit, digerleri "Filtre ekle" satirlarinda */}
       <FiltreCekmecesi
         alanlar={filtreAlanlari}
+        tarihAraligiGoster={false}
         baslangicFiltreleri={cekmeceBaslangici}
-        onSubmit={(cekmeceFiltreleri) =>
-          setFilters((state) => ({ ...state, lokasyonlar: [], makineler: [], kritik: false, customfilters: {}, ...(cekmeceFiltreleri || {}) }))
-        }
+        onSubmit={(cekmeceFiltreleri) => setFilters((state) => ({ ...state, kritik: false, stoktaYok: false, ...(cekmeceFiltreleri || {}) }))}
       />
     </>
   );
@@ -63,9 +53,6 @@ export default function Filters({ onChange, baslangicLokasyonIds, baslangicMakin
 
 Filters.propTypes = {
   onChange: PropTypes.func.isRequired,
-  baslangicLokasyonIds: PropTypes.array,
-  baslangicMakineIds: PropTypes.array,
-  baslangicTarihi: PropTypes.string,
-  bitisTarihi: PropTypes.string,
   baslangicKritik: PropTypes.bool,
+  baslangicStoktaYok: PropTypes.bool,
 };

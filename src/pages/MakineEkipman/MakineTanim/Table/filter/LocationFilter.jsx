@@ -1,15 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Select, Button, Dropdown, Menu } from "antd";
 import AxiosInstance from "../../../../../api/http";
 
 const { Option } = Select;
 
-const LocationFilter = ({ onSubmit }) => {
+const LocationFilter = ({ onSubmit, baslangicIds }) => {
   const [visible, setVisible] = useState(false);
 
   // useeffect ile api den veri data cekip options a atayacagiz
   const [options, setOptions] = React.useState([]);
-  const [filters, setFilters] = useState([]);
+  const [filters, setFilters] = useState(() => (Array.isArray(baslangicIds) ? baslangicIds : []));
+
+  // Dashboard'dan gelindiginde secim disaridan gelir.
+  useEffect(() => {
+    setFilters(Array.isArray(baslangicIds) ? baslangicIds : []);
+  }, [baslangicIds]);
 
   const handleChange = (value) => {
     setFilters(value);

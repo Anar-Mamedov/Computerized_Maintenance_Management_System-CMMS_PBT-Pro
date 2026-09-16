@@ -229,6 +229,17 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
     return t("workOrder.filter.all", "Tüm iş emirleri");
   }, [toplamIsEmriCloseFilter]);
 
+  // Dashboard'dan gelen ID bazli filtreler cekmecede onceden secili gelir.
+  const cekmeceBaslangici = useMemo(
+    () => ({
+      makineler: dashboardFilters.makineler,
+      atolyeler: dashboardFilters.atolyeler,
+      nedenler: dashboardFilters.nedenler,
+      personeller: dashboardFilters.personeller,
+    }),
+    [dashboardFilters]
+  );
+
   const buildMergedFilters = useCallback(
     (baseFilters = {}) => {
       // Dashboard filtreleri alta serilir; kullanici ekranda ayni alani doldurursa ekranin secimi kazanir.
@@ -2082,7 +2093,7 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
           <Filters
             onChange={handleBodyChange}
             baslangicLokasyonIds={dashboardFilters.lokasyonlar}
-            baslangicMakineIds={dashboardFilters.makineler}
+            baslangicIdFiltreleri={cekmeceBaslangici}
           />
           {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}

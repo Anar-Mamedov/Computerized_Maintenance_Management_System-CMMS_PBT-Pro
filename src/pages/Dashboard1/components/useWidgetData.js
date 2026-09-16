@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import AxiosInstance from "../../../api/http";
 import { useDashboard } from "./dashboardContext";
+import { widgetFiltreKapsamasiniDenetle } from "./filtreKapsamaDenetimi";
 
 /**
  * Dashboard V2 endpointleri için ortak veri çekme hook'u.
@@ -31,6 +32,11 @@ export default function useWidgetData(endpoint, extraBody) {
         });
         if (requestIdRef.current === requestId) {
           setData(response);
+
+          // Gelistirme modunda: yanittaki her FilterParams alani hedef ekrana ulasiyor mu?
+          if (import.meta.env.DEV) {
+            widgetFiltreKapsamasiniDenetle(endpoint, response, filters);
+          }
         }
       } catch (error) {
         console.error(`${endpoint} verisi alınamadı:`, error);

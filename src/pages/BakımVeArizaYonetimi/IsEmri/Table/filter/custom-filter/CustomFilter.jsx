@@ -19,6 +19,9 @@ import "dayjs/locale/tr"; // For Turkish locale
 import weekOfYear from "dayjs/plugin/weekOfYear";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import EkipmanFilterSelectbox from "../../../../../../utils/components/EkipmanFilterSelectbox";
+import AtolyeFilterSelectbox from "../../../../../../utils/components/AtolyeFilterSelectbox";
+import KodFilterSelectbox from "../../../../../../utils/components/KodFilterSelectbox";
+import PersonelFilterSelectbox from "../../../../../../utils/components/PersonelFilterSelectbox";
 
 dayjs.extend(weekOfYear);
 dayjs.extend(advancedFormat);
@@ -30,6 +33,12 @@ const { Text, Link } = Typography;
 // Bu alan serbest metin degil, ID bazli secim yapar; degeri liste API'sinin
 // kok seviyedeki `makineler` alanina tasinir.
 const EKIPMAN_ALANI = "makineler";
+const ATOLYE_ALANI = "atolyeler";
+const NEDEN_ALANI = "nedenler";
+const PERSONEL_ALANI = "personeller";
+// Duruş/arıza nedeni kod grubu (DurusNedeniSelect ile aynı kaynak).
+const NEDEN_KOD_GRUBU = 32300;
+const ID_BAZLI_ALANLAR = [EKIPMAN_ALANI, ATOLYE_ALANI, NEDEN_ALANI, PERSONEL_ALANI];
 
 const StyledCloseOutlined = styled(CloseOutlined)`
   svg {
@@ -49,7 +58,7 @@ const CloseButton = styled.div`
   cursor: pointer;
 `;
 
-export default function CustomFilter({ onSubmit, baslangicMakineIds }) {
+export default function CustomFilter({ onSubmit, baslangicIdFiltreleri }) {
   const {
     control,
     watch,
@@ -123,8 +132,8 @@ export default function CustomFilter({ onSubmit, baslangicMakineIds }) {
     const filterData = rows.reduce((acc, row) => {
       const selectedValue = selectedValues[row.id] || "";
 
-      // Ekipman satiri ID dizisi uretir; birden fazla satir varsa birlestirilir.
-      if (selectedValue === EKIPMAN_ALANI) {
+      // ID bazli alanlar dizi uretir; ayni alanda birden fazla satir varsa birlestirilir.
+      if (ID_BAZLI_ALANLAR.includes(selectedValue)) {
         const ids = idValues[row.id] || [];
         if (ids.length) {
           acc[selectedValue] = [...new Set([...(acc[selectedValue] || []), ...ids])];
@@ -177,21 +186,34 @@ export default function CustomFilter({ onSubmit, baslangicMakineIds }) {
     }));
   };
 
-  // Dashboard widget'indan gelindiginde ekipman filtresi URL'den gelir;
-  // bunun icin otomatik bir filtre satiri acilip secim isaretlenir.
-  const makineAnahtari = JSON.stringify(baslangicMakineIds || []);
+  // Dashboard widget'indan gelindiginde ID bazli filtreler URL'den gelir;
+  // her biri icin otomatik bir filtre satiri acilip secim isaretlenir.
+  const baslangicAnahtari = JSON.stringify(baslangicIdFiltreleri || {});
 
   useEffect(() => {
-    const makineIds = JSON.parse(makineAnahtari);
-    if (!makineIds.length) return;
+    const gelen = JSON.parse(baslangicAnahtari);
+    const yeniSatirlar = [];
+    const yeniSecimler = {};
+    const yeniIdler = {};
 
-    const satirId = "dashboard-ekipman";
-    setRows((prevRows) => [{ id: satirId }, ...prevRows.filter((row) => row.id !== satirId)]);
-    setSelectedValues((state) => ({ ...state, [satirId]: EKIPMAN_ALANI }));
-    setIdValues((state) => ({ ...state, [satirId]: makineIds }));
+    ID_BAZLI_ALANLAR.forEach((alan) => {
+      const ids = gelen[alan];
+      if (!Array.isArray(ids) || !ids.length) return;
+
+      const satirId = `dashboard-${alan}`;
+      yeniSatirlar.push({ id: satirId });
+      yeniSecimler[satirId] = alan;
+      yeniIdler[satirId] = ids;
+    });
+
+    if (!yeniSatirlar.length) return;
+
+    setRows((prevRows) => [...yeniSatirlar, ...prevRows.filter((row) => !String(row.id).startsWith("dashboard-"))]);
+    setSelectedValues((state) => ({ ...state, ...yeniSecimler }));
+    setIdValues((state) => ({ ...state, ...yeniIdler }));
     setFiltersExist(true);
     setNewObjectsAdded(true);
-  }, [makineAnahtari]);
+  }, [baslangicAnahtari]);
 
   const handleAddFilterClick = () => {
     const newRow = { id: Date.now() };
@@ -404,6 +426,18 @@ export default function CustomFilter({ onSubmit, baslangicMakineIds }) {
                       label: "Ekipman",
                     },
                     {
+                      value: ATOLYE_ALANI,
+                      label: "Atölye (seçimli)",
+                    },
+                    {
+                      value: NEDEN_ALANI,
+                      label: "Arıza Nedeni",
+                    },
+                    {
+                      value: PERSONEL_ALANI,
+                      label: "Personel",
+                    },
+                    {
                       value: "kod_is_tip.KOD_TANIM",
                       label: "İş Tipi",
                     },
@@ -564,6 +598,12 @@ export default function CustomFilter({ onSubmit, baslangicMakineIds }) {
                 {selectedValues[row.id] === EKIPMAN_ALANI ? (
                   // Ekipman dashboard'daki gibi aranabilir selectbox; secim TB_MAKINE_ID uzerinden tutulur.
                   <EkipmanFilterSelectbox value={idValues[row.id] || []} onChange={(ids) => setIdValues((state) => ({ ...state, [row.id]: ids }))} />
+                ) : selectedValues[row.id] === ATOLYE_ALANI ? (
+                  <AtolyeFilterSelectbox value={idValues[row.id] || []} onChange={(ids) => setIdValues((state) => ({ ...state, [row.id]: ids }))} />
+                ) : selectedValues[row.id] === NEDEN_ALANI ? (
+                  <KodFilterSelectbox kodGrubu={NEDEN_KOD_GRUBU} placeholder="Arıza Nedeni" value={idValues[row.id] || []} onChange={(ids) => setIdValues((state) => ({ ...state, [row.id]: ids }))} />
+                ) : selectedValues[row.id] === PERSONEL_ALANI ? (
+                  <PersonelFilterSelectbox value={idValues[row.id] || []} onChange={(ids) => setIdValues((state) => ({ ...state, [row.id]: ids }))} />
                 ) : (
                   <Input
                     placeholder="Arama Yap"

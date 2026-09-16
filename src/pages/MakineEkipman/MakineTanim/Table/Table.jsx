@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined } from "@ant-design/icons";
 import useColumns from "./useColumns";
@@ -117,6 +117,18 @@ const MainTable = ({ setSelectedIds, hatirlaticiGrupId, hatirlaticiSiraId }) => 
 
   // Alan adi cevrimi (atolyeler -> atolye) useDashboardFilterParams icinde route'a gore yapiliyor.
   const buildMakineFilters = useCallback((baseFilters = {}) => mergeDashboardFilters(baseFilters, dashboardFilters), [dashboardFilters]);
+
+  // Dashboard'dan gelenler ekranin kendi filtre kontrollerine baslangic degeri olur.
+  const cekmeceBaslangici = useMemo(
+    () => ({
+      lokasyonlar: dashboardFilters.lokasyonlar,
+      makinetip: dashboardFilters.makinetip,
+      atolye: dashboardFilters.atolye,
+      makineler: dashboardFilters.makineler,
+      ...(dashboardFilters.arizali === true ? { arizali: true } : {}),
+    }),
+    [dashboardFilters]
+  );
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
   const [data, setData] = useState([]);
@@ -726,7 +738,7 @@ const MainTable = ({ setSelectedIds, hatirlaticiGrupId, hatirlaticiSiraId }) => 
             onChange={(e) => setSearchTerm(e.target.value)}
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
-          <Filters onChange={handleBodyChange} />
+          <Filters onChange={handleBodyChange} baslangicFiltreleri={cekmeceBaslangici} />
           {/*<TeknisyenSubmit*/}
           {/*  selectedRows={selectedRows}*/}
           {/*  refreshTableData={refreshTableData}*/}

@@ -10,11 +10,18 @@ import ZamanAraligi from "./ZamanAraligi";
  * liste API'sinin kok seviyesindeki `makineler` alanina yazilir.
  */
 const customFiltreyiAyikla = (drawerFiltreleri) => {
-  const { makineler, ...serbestMetinler } = drawerFiltreleri || {};
-  return { makineler: makineler || [], customfilter: serbestMetinler };
+  const { makineler, atolyeler, nedenler, personeller, ...serbestMetinler } = drawerFiltreleri || {};
+
+  return {
+    makineler: makineler || [],
+    atolyeler: atolyeler || [],
+    nedenler: nedenler || [],
+    personeller: personeller || [],
+    customfilter: serbestMetinler,
+  };
 };
 
-export default function Filters({ onChange, baslangicLokasyonIds, baslangicMakineIds }) {
+export default function Filters({ onChange, baslangicLokasyonIds, baslangicIdFiltreleri }) {
   const [filters, setFilters] = React.useState({
     lokasyonlar: {},
     isemritipleri: {},
@@ -46,7 +53,7 @@ export default function Filters({ onChange, baslangicLokasyonIds, baslangicMakin
       />
       <ZamanAraligi />
       <CustomFilter
-        baslangicMakineIds={baslangicMakineIds}
+        baslangicIdFiltreleri={baslangicIdFiltreleri}
         onSubmit={(newFilters) =>
           setFilters((state) => ({ ...state, ...customFiltreyiAyikla(newFilters) }))
         }

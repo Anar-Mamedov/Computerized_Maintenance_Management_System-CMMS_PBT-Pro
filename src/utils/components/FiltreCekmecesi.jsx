@@ -41,7 +41,7 @@ const toGunFormati = (value) => {
  *   { value: "durum", label: "Durum", tip: "select", secenekler: [{ value, label }] }
  *   { value: "pbk.PBK_TANIM", label: "Bakım Tanımı", tip: "metin" }
  */
-export default function FiltreCekmecesi({ alanlar, baslangicFiltreleri, onSubmit }) {
+export default function FiltreCekmecesi({ alanlar, baslangicFiltreleri, onSubmit, tarihAraligiGoster = true }) {
   const [open, setOpen] = useState(false);
   const [satirlar, setSatirlar] = useState([]);
   const [satirAlanlari, setSatirAlanlari] = useState({});
@@ -251,7 +251,8 @@ export default function FiltreCekmecesi({ alanlar, baslangicFiltreleri, onSubmit
         }
       >
         <FormProvider {...methods}>
-          {/* Tarih aralığı her zaman görünür; diğer filtreler satır olarak eklenir. */}
+          {/* Tarih aralığı, hedef listenin desteklediği ekranlarda üstte sabit durur. */}
+          {tarihAraligiGoster ? (
           <div style={TARIH_KUTUSU_STILI}>
             <div style={{ marginBottom: "10px" }}>
               <Text style={{ fontSize: "14px" }}>{t("tarihAraligi")}</Text>
@@ -262,6 +263,7 @@ export default function FiltreCekmecesi({ alanlar, baslangicFiltreleri, onSubmit
               <FullDatePicker name1="cekmeceBitisTarihi" placeholder={t("bitisTarihi")} style={{ width: "100%" }} />
             </div>
           </div>
+          ) : null}
 
           {satirlar.map((satir) => (
             <Row key={satir.id} style={KUTU_STILI}>
@@ -310,4 +312,5 @@ FiltreCekmecesi.propTypes = {
   ).isRequired,
   baslangicFiltreleri: PropTypes.object,
   onSubmit: PropTypes.func.isRequired,
+  tarihAraligiGoster: PropTypes.bool,
 };

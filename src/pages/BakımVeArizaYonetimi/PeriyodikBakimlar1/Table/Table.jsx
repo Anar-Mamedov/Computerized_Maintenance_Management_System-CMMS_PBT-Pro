@@ -152,8 +152,6 @@ const MainTable = () => {
       lokasyonlar: dashboardFilters.lokasyonlar,
       atolyeler: dashboardFilters.atolyeler,
       makineler: dashboardFilters.makineler,
-      startDate: dashboardFilters.customfilters?.startDate,
-      endDate: dashboardFilters.customfilters?.endDate,
     }),
     [dashboardFilters]
   );
@@ -1070,7 +1068,7 @@ const MainTable = () => {
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
           {/* Filtre çekmecesi her ekranda arama kutusunun yanında, solda hizalı durur. */}
-          <FiltreCekmecesi alanlar={filtreAlanlari} baslangicFiltreleri={cekmeceBaslangici} onSubmit={setEkranFiltreleri} />
+          <FiltreCekmecesi alanlar={filtreAlanlari} tarihAraligiGoster={false} baslangicFiltreleri={cekmeceBaslangici} onSubmit={setEkranFiltreleri} />
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />

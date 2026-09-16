@@ -992,27 +992,10 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
         apiUrl += `&kritik=true`;
       }
 
-      // Lokasyon, ekipman ve tarih araligi ekranin kendi filtre kontrollerinden gelir;
-      // dashboard degerleri bu kontrollere baslangic degeri olarak yerlesir.
-      const lokasyonIds = Array.isArray(normalizedFilters.lokasyonlar) ? normalizedFilters.lokasyonlar : [];
-      const makineIds = Array.isArray(normalizedFilters.makineler) ? normalizedFilters.makineler : [];
-      const tarihAraligi = normalizedFilters.customfilters || {};
-
-      if (lokasyonIds.length > 0) {
-        apiUrl += `&lokasyonlar=${lokasyonIds.join(",")}`;
+      if (normalizedFilters.stoktaYok === true) {
+        apiUrl += `&stoktaYok=true`;
       }
 
-      if (makineIds.length > 0) {
-        apiUrl += `&makineler=${makineIds.join(",")}`;
-      }
-
-      if (tarihAraligi.startDate) {
-        apiUrl += `&startDate=${encodeURIComponent(tarihAraligi.startDate)}`;
-      }
-
-      if (tarihAraligi.endDate) {
-        apiUrl += `&endDate=${encodeURIComponent(tarihAraligi.endDate)}`;
-      }
 
       if (islemTip === "C" || islemTip === "T") {
         // islemTip C veya T ise özel parametreler ekle
@@ -1442,11 +1425,8 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
           <AktifPasifHepsiSelect style={{ width: 160 }} value={body.isAktif} onChange={(value) => handleBodyChange("isAktif", value)} />
           <Filters
             onChange={handleBodyChange}
-            baslangicLokasyonIds={dashboardFilters.lokasyonlar}
-            baslangicMakineIds={dashboardFilters.makineler}
-            baslangicTarihi={dashboardFilters.customfilters?.startDate}
-            bitisTarihi={dashboardFilters.customfilters?.endDate}
             baslangicKritik={dashboardFilters.kritik === true}
+            baslangicStoktaYok={dashboardFilters.stoktaYok === true}
           />
         </div>
         {!isSelectionMode && (

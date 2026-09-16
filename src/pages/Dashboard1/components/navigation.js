@@ -1,4 +1,5 @@
 // API'lerin döndürdüğü TargetPage değerlerinin uygulama route'larına eşlenmesi.
+import dayjs from "dayjs";
 import { BOOLEAN_KEYS, DATE_KEYS, ID_LIST_KEYS, NUMBER_KEYS, TEXT_KEYS } from "../../../utils/dashboardFilterParams";
 
 const TARGET_PAGE_ROUTES = {
@@ -10,6 +11,19 @@ const TARGET_PAGE_ROUTES = {
   makine: "/makine",
 };
 
+/**
+ * Hedef listelerin rehber dökümanına göre kabul ettiği dashboard üst filtreleri.
+ * Dökümanda karşılığı olmayan bir filtreyi göndermek hem gereksiz hem yanıltıcı olur:
+ * stok listesi lokasyon/ekipman/tarih almıyor; makine ve periyodik bakım listeleri tarih almıyor.
+ */
+const HEDEF_GLOBAL_DESTEGI = {
+  "is-talebi": { ekipmanKirilimi: true, tarih: true },
+  "is-emri": { ekipmanKirilimi: true, tarih: true },
+  makine: { ekipmanKirilimi: true, tarih: false },
+  "periyodik-bakim": { ekipmanKirilimi: true, tarih: false },
+  stok: { ekipmanKirilimi: false, tarih: false },
+};
+
 // Hatırlatıcılar ayrı bir sayfa değil, sağdaki panel üzerinden açılır.
 const openHatirlaticiPanel = () => {
   localStorage.setItem("hatirlatici_panel_open", "true");
@@ -17,9 +31,11 @@ const openHatirlaticiPanel = () => {
 };
 
 // Widget'lardan ve API'den gelen eski/kısa alan adlarının liste API'lerindeki karşılıkları.
-const FIELD_ALIASES = {
+export const FIELD_ALIASES = {
   // GetDashboardV2Cards "durumIds" dondururken hedef GetIsTalepFullList "durumlar" bekliyor.
   durumids: "durumlar",
+  // Ariza is emirleri; rehberde geriye donuk uyumluluk icin de tanimli.
+  tipgrup: "prosedurtipleri",
   makineid: "makineler",
   makineids: "makineler",
   ekipmanid: "makineler",
@@ -46,8 +62,33 @@ const FIELD_ALIASES = {
   bitistarihi: "endDate",
 };
 
+/**
+ * Bazı widget'lar dönemi tarih aralığı yerine ay numarası (`ay`) ya da periyot indeksi
+ * (`periyot` + `gorunum`) olarak döndürüyor. Hedef listeler tarih aralığı beklediği için
+ * anlamı kesin olanlar (ay, aylık periyot) aralığa çevrilir; alanın kendisi de korunur.
+ */
+const donemiTariheCevir = (merged, yil) => {
+  const ay = Number(merged.ay ?? (String(merged.gorunum || "").toLowerCase().startsWith("ay") ? merged.periyot : undefined));
+  if (!Number.isInteger(ay) || ay < 1 || ay > 12) return;
+
+  const baslangic = dayjs(`${yil}-${String(ay).padStart(2, "0")}-01`);
+  if (!baslangic.isValid()) return;
+
+  merged.startDate = baslangic.format("YYYY-MM-DD");
+  merged.endDate = baslangic.endOf("month").format("YYYY-MM-DD");
+};
+
 /** "2026-01-01T00:00:00" -> "2026-01-01" (liste API'leri gün bazlı bekliyor). */
 const toGunFormati = (value) => (value ? String(value).split("T")[0] : null);
+
+/**
+ * Aynı alan adı hedefe göre farklı anlama gelebiliyor:
+ * iş emri tipi performansında `tipId` iş emri tipini, envanter dağılımında makine tipini ifade ediyor.
+ */
+export const HEDEFE_OZEL_ALAN_ADLARI = {
+  "is-emri": { tipid: "isemritipleri" },
+  makine: { tipid: "makinetip" },
+};
 
 const ARRAY_TARGET_KEYS = new Set(ID_LIST_KEYS);
 const DATE_TARGET_KEYS = new Set(DATE_KEYS);
@@ -74,20 +115,14 @@ const toIdList = (value) => {
 };
 
 /** Widget filtrelerini liste API'si sözlüğüne çevirip düz bir nesneye toplar. */
-const normalizeFilterParams = (filterParams) => {
+const normalizeFilterParams = (filterParams, targetPage) => {
+  const hedefeOzel = HEDEFE_OZEL_ALAN_ADLARI[targetPage] || {};
   const normalized = {};
 
   const assign = (key, value) => {
     if (value === null || value === undefined || value === "") return;
 
-    // Arıza iş emirleri geriye dönük olarak tipGrup ile geliyor; karşılığı prosedurtipleri listesidir.
-    if (String(key).toLowerCase() === "tipgrup") {
-      const ids = toIdList(value);
-      if (ids.length) normalized.prosedurtipleri = ids;
-      return;
-    }
-
-    const field = resolveFieldName(key);
+    const field = hedefeOzel[String(key).toLowerCase()] || resolveFieldName(key);
     if (!field) return;
 
     if (ARRAY_TARGET_KEYS.has(field)) {
@@ -120,13 +155,14 @@ const normalizeFilterParams = (filterParams) => {
 
 /** Dashboard üst filtrelerini widget filtreleriyle birleştirip query string üretir. */
 const buildSearchParams = (targetPage, filterParams, globalFilters, options) => {
-  const merged = normalizeFilterParams(filterParams);
+  const merged = normalizeFilterParams(filterParams, targetPage);
 
   // Makine sayfasına belirli bir ekipmanı açmak için gidiliyorsa (rehber madde 17) üst filtre eklenmez;
   // lokasyon/atölye kısıtı o kaydı listeden düşürebilir. Tip kırılımına gidişte (madde 23-25) eklenir.
   const belirliEkipmanaGidis = targetPage === "makine" && Boolean(merged.makineler?.length);
 
-  const ekipmanKirilimiDesteklenir = true;
+  const destek = HEDEF_GLOBAL_DESTEGI[targetPage] || {};
+  const ekipmanKirilimiDesteklenir = Boolean(destek.ekipmanKirilimi);
 
   // Widget kendi ekipman/lokasyon kırılımını verdiyse o korunur, aksi halde üst filtre uygulanır.
   const ustFiltreEklenir = !belirliEkipmanaGidis && ekipmanKirilimiDesteklenir;
@@ -141,12 +177,18 @@ const buildSearchParams = (targetPage, filterParams, globalFilters, options) => 
     merged.makineler = globalFilters.EkipmanIds;
   }
 
+  // Ay/periyot bilgisi tarih aralığına çevrilir (widget kendi dönemini vermiş sayılır).
+  if (!merged.startDate && !merged.endDate) {
+    const yil = dayjs(globalFilters?.BaslangicTarihi || undefined).year();
+    donemiTariheCevir(merged, yil);
+  }
+
   // Tarih aralığı: widget kendi dönemini verdiyse (ör. Mart çubuğu) o kazanır,
   // vermediyse dashboard üst barındaki tarih aralığı taşınır.
   // Anlık/birikmiş veri gösteren widget'lar (KPI kartları, aksiyon merkezi, envanter) tarih aralığı
   // uygulanmasını istemez; onlar tarihAraligiUygula=false geçer, aksi halde liste sayısı karttan düşük çıkar.
   // Belirli bir kaydı açmaya giderken tarih kısıtı da o kaydı listeden düşürebilir.
-  const tarihAraligiUygula = options?.tarihAraligiUygula !== false && !belirliEkipmanaGidis;
+  const tarihAraligiUygula = options?.tarihAraligiUygula !== false && !belirliEkipmanaGidis && Boolean(destek.tarih);
   if (tarihAraligiUygula && !merged.startDate && !merged.endDate) {
     const baslangic = toGunFormati(globalFilters?.BaslangicTarihi);
     const bitis = toGunFormati(globalFilters?.BitisTarihi);
