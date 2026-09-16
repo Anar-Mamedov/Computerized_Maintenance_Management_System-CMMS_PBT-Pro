@@ -30,10 +30,9 @@ export default function WorkOrderTimeDistribution({ onHide }) {
     const satir = state?.activePayload?.[0]?.payload;
     if (!satir) return;
 
-    const periyotAraligi =
-      satir.PeriyotBaslangic && satir.PeriyotBitis ? { startDate: satir.PeriyotBaslangic, endDate: satir.PeriyotBitis } : {};
-
-    navigateToTarget(navigate, satir.TargetPage || "is-emri", { ...periyotAraligi, ...satir.FilterParams }, filters);
+    // Rehber madde 5: backend her periyodun tarih araligini FilterParams.customfilter icinde
+    // hazir donduruyor; eskiden bekledigimiz PeriyotBaslangic/PeriyotBitis alanlari artik gelmiyor.
+    navigateToTarget(navigate, satir.TargetPage || "is-emri", satir.FilterParams, filters);
   };
 
   const rows = useMemo(() => data?.Data || [], [data]);

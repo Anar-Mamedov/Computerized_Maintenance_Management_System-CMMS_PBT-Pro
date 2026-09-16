@@ -6,7 +6,9 @@ const TARGET_PAGE_ROUTES = {
   "is-talebi": "/isTalepleri",
   "is-emri": "/isEmri1",
   stok: "/malzemeTanimi",
-  "periyodik-bakim": "/periyodikBakimlar",
+  // Periyodik bakim tiklamalari artik tanim ekranina degil otomatik is emirleri listesine gider
+  // (rehber madde 1): GetPBakimFullList makine sablonu secim modali icindir, is emri listesi degildir.
+  "otomatik-is-emirleri": "/otomatikIsEmirleri",
   "bakim-takvimi": "/planlamaTakvimi",
   makine: "/makine",
 };
@@ -14,13 +16,16 @@ const TARGET_PAGE_ROUTES = {
 /**
  * Hedef listelerin rehber dökümanına göre kabul ettiği dashboard üst filtreleri.
  * Dökümanda karşılığı olmayan bir filtreyi göndermek hem gereksiz hem yanıltıcı olur:
- * stok listesi lokasyon/ekipman/tarih almıyor; makine ve periyodik bakım listeleri tarih almıyor.
+ * stok listesi lokasyon/ekipman/tarih almıyor; makine ve otomatik iş emirleri listeleri tarih almıyor.
  */
 const HEDEF_GLOBAL_DESTEGI = {
   "is-talebi": { ekipmanKirilimi: true, tarih: true },
   "is-emri": { ekipmanKirilimi: true, tarih: true },
   makine: { ekipmanKirilimi: true, tarih: false },
-  "periyodik-bakim": { ekipmanKirilimi: true, tarih: false },
+  // Otomatik is emirleri listesi lokasyon/atolye/ekipman kirilimini kabul ediyor.
+  // Tarih araligi gonderilmez: rehberdeki govde yalnizca "durum" tasiyor ve backend
+  // taninan bir durum geldiginde tarih araligini zaten yok sayiyor.
+  "otomatik-is-emirleri": { ekipmanKirilimi: true, tarih: false },
   stok: { ekipmanKirilimi: false, tarih: false },
 };
 

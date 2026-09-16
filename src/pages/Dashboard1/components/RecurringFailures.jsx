@@ -25,7 +25,8 @@ export default function RecurringFailures({ onHide }) {
   const { containerRef, scrollY, wrapperStyle } = useAutoTableScroll(272);
   const { filters } = useDashboard();
   const { watch } = useFormContext();
-  const [donem, setDonem] = useState("90GUN");
+  // Rehber madde 4: varsayilan donem "Bu Yil". Backend de ayni varsayilani kullaniyor.
+  const [donem, setDonem] = useState("BUYIL");
 
   const ozelBaslangic = watch(START_FIELD);
   const ozelBitis = watch(END_FIELD);
@@ -139,7 +140,7 @@ export default function RecurringFailures({ onHide }) {
             locale={{ emptyText: t("veriYok") }}
             onRow={(record) => ({
               style: { cursor: "pointer" },
-              onClick: () => navigateToTarget(navigate, "is-emri", { makineId: record.EkipmanId, nedenId: record.NedenKodId, tipGrup: 1, ...widgetTarihAraligi }, filters, tarihSecenegi),
+              onClick: () => navigateToTarget(navigate, record.TargetPage || "is-emri", record.FilterParams, filters, tarihSecenegi),
             })}
           />
         </div>

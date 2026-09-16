@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState, isValidElement } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState, isValidElement } from "react";
 import { useFormContext } from "react-hook-form";
 import { Button, Checkbox, Input, Modal, Pagination, Space, Spin, Table, Typography, message } from "antd";
 import { DownloadOutlined, FilterOutlined, HolderOutlined, MenuOutlined, SearchOutlined } from "@ant-design/icons";
@@ -19,6 +19,7 @@ import ContextMenu from "../components/ContextMenu/ContextMenu";
 import EditDrawer from "../../../PeriyodikBakimlar1/Update/EditDrawer";
 import WorkOrderEditDrawer from "../../../IsEmri/Update/EditDrawer";
 import FilterDrawer from "./filter/FilterDrawer";
+import { useDashboardFilterParams } from "../../../../../utils/dashboardFilterParams";
 
 const { Text } = Typography;
 
@@ -114,6 +115,28 @@ ResizableTitle.propTypes = {
 };
 
 const createDefaultDateRange = () => [dayjs().startOf("month"), dayjs().endOf("month")];
+
+/**
+ * Dashboard'dan URL ile gelen filtreleri GetOtomatikIsEmirleri govdesinin alan adlarina cevirir.
+ * Rehber madde 1: periyodik bakim tiklamalari bu ekrana "durum" (geciken/yaklasan/bugun...) ile gelir.
+ */
+const dashboardFiltreleriniCevir = (dashboardFilters) => {
+  const tarihler = dashboardFilters.customfilters || {};
+  const baslangic = tarihler.startDate ? dayjs(tarihler.startDate) : null;
+  const bitis = tarihler.endDate ? dayjs(tarihler.endDate) : null;
+
+  return {
+    Durum: dashboardFilters.durum || "",
+    LokasyonIds: dashboardFilters.lokasyonlar || [],
+    AtolyeIds: dashboardFilters.atolyeler || [],
+    EkipmanIds: dashboardFilters.makineler || [],
+    EkipmanTipIds: dashboardFilters.makinetip || [],
+    PeriyodikBakimIds: dashboardFilters.pbakimId ? [dashboardFilters.pbakimId] : [],
+    // Dashboard tarih vermediyse ekranin varsayilan "bu ay" araligi temizlenir; aksi halde
+    // "geciken" gibi gecmise donuk bir durum sessizce bu aya daraltilmis olurdu.
+    TarihAraligi: baslangic && bitis ? [baslangic, bitis] : [],
+  };
+};
 
 const formatDate = (value) => {
   if (!value) {
@@ -250,6 +273,14 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
     visible: false,
     data: null,
   });
+  // Dashboard'dan gelen filtreler; ekranin kendi secimleri bunlarin uzerine yazar.
+  // expectedPath verildigi icin bu tablo baska ekranlarda modal olarak kullanildiginda filtre almaz.
+  const { active: dashboardAktif, filters: dashboardFilters } = useDashboardFilterParams("/otomatikIsEmirleri");
+  const dashboardTemeli = useMemo(() => dashboardFiltreleriniCevir(dashboardFilters), [dashboardFilters]);
+  // Baslangic degerleri dogrudan dashboard'dan kurulur; aksi halde ekran once kendi
+  // varsayilanlariyla bir istek atip hemen ardindan dogru filtrelerle ikinci kez atardi.
+  const dashboardBaslangiciRef = useRef(dashboardAktif ? dashboardTemeli : null);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [totalCount, setTotalCount] = useState(0);
@@ -262,18 +293,24 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
     EkipmanIds: [],
     EkipmanLabels: [],
     EkipmanTipIds: [],
-    PeriyodikBakimIds: [],
-    TarihAraligi: createDefaultDateRange(),
+    PeriyodikBakimIds: dashboardBaslangiciRef.current?.PeriyodikBakimIds || [],
+    TarihAraligi: dashboardBaslangiciRef.current ? dashboardBaslangiciRef.current.TarihAraligi : createDefaultDateRange(),
   });
-  const [appliedFilters, setAppliedFilters] = useState({
-    Kelime: "",
-    LokasyonIds: [],
-    AtolyeIds: [],
-    EkipmanIds: [],
-    EkipmanTipIds: [],
-    PeriyodikBakimIds: [],
-    BaslangicTarih: dayjs().startOf("month").format(DATE_REQUEST_FORMAT),
-    BitisTarih: dayjs().endOf("month").format(DATE_REQUEST_FORMAT),
+  const [appliedFilters, setAppliedFilters] = useState(() => {
+    const dashboarddan = dashboardBaslangiciRef.current;
+    const [baslangic, bitis] = dashboarddan ? dashboarddan.TarihAraligi : createDefaultDateRange();
+
+    return {
+      Kelime: "",
+      LokasyonIds: dashboarddan?.LokasyonIds || [],
+      AtolyeIds: dashboarddan?.AtolyeIds || [],
+      EkipmanIds: dashboarddan?.EkipmanIds || [],
+      EkipmanTipIds: dashboarddan?.EkipmanTipIds || [],
+      PeriyodikBakimIds: dashboarddan?.PeriyodikBakimIds || [],
+      BaslangicTarih: baslangic ? dayjs(baslangic).format(DATE_REQUEST_FORMAT) : null,
+      BitisTarih: bitis ? dayjs(bitis).format(DATE_REQUEST_FORMAT) : null,
+      Durum: dashboarddan?.Durum || "",
+    };
   });
   const filterLokasyonId = watch("filterLokasyonID");
   const filterLokasyonTanim = watch("filterLokasyonTanim");
@@ -510,6 +547,11 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
         Kelime: filters.Kelime || "",
       };
 
+      // Dashboard'dan gelen donem kapsami (geciken / yaklasan / bugun / buHafta / buAy).
+      if (filters.Durum) {
+        payload.durum = filters.Durum;
+      }
+
       try {
         setLoading(true);
         const endpoint = hatirlaticiGrupId
@@ -595,6 +637,36 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
     }
   }, [hatirlaticiGrupId, hatirlaticiSiraId]);
 
+  // Dashboard'dan gelindiginde ekran URL'deki filtrelerle acilir.
+  // Ilk acilis zaten baslangic degerleriyle kuruldugu icin burada yalnizca sonraki
+  // URL degisiklikleri (ayni ekranda kalip baska bir widget'tan gelinmesi) ele alinir.
+  // Cekmecedeki form alanlariyla surulen filtreler asagidaki watch efektlerinde islenir.
+  useEffect(() => {
+    if (!dashboardAktif) return;
+    if (dashboardBaslangiciRef.current === dashboardTemeli) return;
+    dashboardBaslangiciRef.current = dashboardTemeli;
+
+    const [baslangic, bitis] = dashboardTemeli.TarihAraligi;
+
+    setDraftFilters((state) => ({
+      ...state,
+      PeriyodikBakimIds: dashboardTemeli.PeriyodikBakimIds,
+      TarihAraligi: dashboardTemeli.TarihAraligi,
+    }));
+    setAppliedFilters((state) => ({
+      ...state,
+      LokasyonIds: dashboardTemeli.LokasyonIds,
+      AtolyeIds: dashboardTemeli.AtolyeIds,
+      EkipmanIds: dashboardTemeli.EkipmanIds,
+      EkipmanTipIds: dashboardTemeli.EkipmanTipIds,
+      PeriyodikBakimIds: dashboardTemeli.PeriyodikBakimIds,
+      BaslangicTarih: baslangic ? baslangic.format(DATE_REQUEST_FORMAT) : null,
+      BitisTarih: bitis ? bitis.format(DATE_REQUEST_FORMAT) : null,
+      Durum: dashboardTemeli.Durum,
+    }));
+    setCurrentPage(1);
+  }, [dashboardAktif, dashboardTemeli]);
+
   useEffect(() => {
     fetchTableData(currentPage, pageSize, appliedFilters);
   }, [currentPage, pageSize, appliedFilters, fetchTableData]);
@@ -611,9 +683,11 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
       PeriyodikBakimIds: draftFilters.PeriyodikBakimIds || [],
       BaslangicTarih: startDate ? dayjs(startDate).format(DATE_REQUEST_FORMAT) : null,
       BitisTarih: endDate ? dayjs(endDate).format(DATE_REQUEST_FORMAT) : null,
+      // Donem kapsaminin cekmecede karsiligi yok; kullanici filtre uygularken kaybolmamali.
+      Durum: dashboardTemeli.Durum,
     });
     setCurrentPage(1);
-  }, [draftFilters]);
+  }, [draftFilters, dashboardTemeli]);
 
   // Filtreler panelindeki bir filtre uygulandı mı? (Filtreler butonundaki gösterge için)
   const isFilterApplied = useMemo(() => {
@@ -691,35 +765,35 @@ export default function MainTable({ hatirlaticiGrupId, hatirlaticiSiraId }) {
   useEffect(() => {
     setDraftFilters((state) => ({
       ...state,
-      LokasyonIds: filterLokasyonId ? [filterLokasyonId] : [],
+      LokasyonIds: filterLokasyonId ? [filterLokasyonId] : dashboardTemeli.LokasyonIds,
       LokasyonLabels: filterLokasyonTanim ? [filterLokasyonTanim] : [],
     }));
     setValue("lokasyonID", filterLokasyonId || "");
-  }, [filterLokasyonId, filterLokasyonTanim, setValue]);
+  }, [filterLokasyonId, filterLokasyonTanim, setValue, dashboardTemeli]);
 
   useEffect(() => {
     setDraftFilters((state) => ({
       ...state,
-      AtolyeIds: filterAtolyeId ? [filterAtolyeId] : [],
+      AtolyeIds: filterAtolyeId ? [filterAtolyeId] : dashboardTemeli.AtolyeIds,
       AtolyeLabels: filterAtolyeTanim ? [filterAtolyeTanim] : [],
     }));
     setValue("atolyeID", filterAtolyeId || "");
-  }, [filterAtolyeId, filterAtolyeTanim, setValue]);
+  }, [filterAtolyeId, filterAtolyeTanim, setValue, dashboardTemeli]);
 
   useEffect(() => {
     setDraftFilters((state) => ({
       ...state,
-      EkipmanIds: filterEkipmanId ? [filterEkipmanId] : [],
+      EkipmanIds: filterEkipmanId ? [filterEkipmanId] : dashboardTemeli.EkipmanIds,
       EkipmanLabels: filterEkipmanTanim ? [filterEkipmanTanim] : [],
     }));
-  }, [filterEkipmanId, filterEkipmanTanim]);
+  }, [filterEkipmanId, filterEkipmanTanim, dashboardTemeli]);
 
   useEffect(() => {
     setDraftFilters((state) => ({
       ...state,
-      EkipmanTipIds: Array.isArray(filterEkipmanTipIds) ? filterEkipmanTipIds : [],
+      EkipmanTipIds: filterEkipmanTipIds?.length ? filterEkipmanTipIds : dashboardTemeli.EkipmanTipIds,
     }));
-  }, [filterEkipmanTipIds]);
+  }, [filterEkipmanTipIds, dashboardTemeli]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>

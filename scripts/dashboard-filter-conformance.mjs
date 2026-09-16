@@ -135,13 +135,18 @@ const SCREEN_MODELS = {
     };
   },
 
-  // src/pages/BakımVeArizaYonetimi/PeriyodikBakimlar1/Table/Table.jsx
-  "periyodik-bakim": ({ filters }) => ({
-    method: "POST",
-    endpoint: "GetPBakimFullList",
-    query: { pagingDeger: 1, pageSize: 10, parametre: "" },
-    body: filters,
-  }),
+  // src/pages/BakımVeArizaYonetimi/OtomatikIsEmrileri/TarihBazliPeriyodikBakim/Table/Table.jsx
+  "otomatik-is-emirleri": ({ filters }) => {
+    const { customfilters, ...digerleri } = filters;
+
+    return {
+      method: "POST",
+      endpoint: "GetOtomatikIsEmirleri",
+      query: { pagingDeger: 1, pageSize: 20 },
+      // Ekran customfilters icindeki tarihleri BaslangicTarih/BitisTarih olarak duzlestirip gonderiyor.
+      body: { ...digerleri, ...(customfilters || {}) },
+    };
+  },
 
   // src/pages/Malzeme&DepoYonetimi/MalzemeTanimlari/Table/Table.jsx
   stok: ({ isAktif }) => ({
@@ -201,9 +206,9 @@ const DOC_CASES = [
       body: { isClose: 0, prosedurtipleri: [1], lokasyonlar: [1, 5], atolyeler: [3], makineler: [101] } } },
 
   // --- BÖLÜM 2: Aksiyon merkezi
-  { no: 5, options: ANLIK, bolum: "2 · Aksiyon Merkezi", baslik: "Geciken Periyodik Bakımlar", target: "periyodik-bakim",
+  { no: 5, options: ANLIK, bolum: "2 · Aksiyon Merkezi", baslik: "Geciken Periyodik Bakımlar", target: "otomatik-is-emirleri",
     widget: { durum: "geciken" },
-    expect: { endpoint: "GetPBakimFullList", pageSize: 10,
+    expect: { endpoint: "GetOtomatikIsEmirleri", pageSize: 20,
       body: { durum: "geciken", lokasyonlar: [1, 5], atolyeler: [3], makineler: [101] } } },
 
   { no: 6, options: ANLIK, bolum: "2 · Aksiyon Merkezi", baslik: "Onay Bekleyen İş Talepleri", target: "is-talebi",
@@ -285,10 +290,15 @@ const DOC_CASES = [
         customfilter: { startDate: "2026-06-18", endDate: "2026-09-16" } } } },
 
   // --- BÖLÜM 9: Yaklaşan periyodik bakımlar
-  { no: 19, options: ANLIK, bolum: "9 · Yaklaşan Bakım", baslik: "Yaklaşan bakım satırı", target: "periyodik-bakim",
-    widget: { makineler: [25] },
-    expect: { endpoint: "GetPBakimFullList", pageSize: 10,
-      body: { makineler: [25], lokasyonlar: [1, 5], atolyeler: [3] } } },
+  { no: 19, options: ANLIK, bolum: "9 · Yaklaşan Bakım", baslik: "Yaklaşan bakım satırı", target: "otomatik-is-emirleri",
+    widget: { durum: "yaklasan", makineId: 25, pbakimId: 40 },
+    expect: { endpoint: "GetOtomatikIsEmirleri", pageSize: 20,
+      body: { durum: "yaklasan", makineler: [25], pbakimId: 40, lokasyonlar: [1, 5], atolyeler: [3] } } },
+
+  { no: 19.1, options: ANLIK, bolum: "9 · Yaklaşan Bakım", baslik: "Sayaç kutusu (bugün)", target: "otomatik-is-emirleri",
+    widget: { durum: "bugun" },
+    expect: { endpoint: "GetOtomatikIsEmirleri", pageSize: 20,
+      body: { durum: "bugun", lokasyonlar: [1, 5], atolyeler: [3], makineler: [101] } } },
 
   { no: 20, options: ANLIK, bolum: "9 · Yaklaşan Bakım", baslik: "Bakım takvimini aç", target: "bakim-takvimi",
     widget: {}, expect: { navigateOnly: true } },
@@ -324,9 +334,9 @@ const DOC_CASES = [
       body: { isAktif: 0, makinetip: [5], lokasyonlar: [1, 5], atolye: [3] } } },
 
   // --- BÖLÜM 13: Performans özeti
-  { no: 26, options: ANLIK, bolum: "13 · Performans Özeti", baslik: "Geciken periyodik bakım kutusu", target: "periyodik-bakim",
+  { no: 26, options: ANLIK, bolum: "13 · Performans Özeti", baslik: "Geciken periyodik bakım kutusu", target: "otomatik-is-emirleri",
     widget: { durum: "geciken" },
-    expect: { endpoint: "GetPBakimFullList", pageSize: 10,
+    expect: { endpoint: "GetOtomatikIsEmirleri", pageSize: 20,
       body: { durum: "geciken", lokasyonlar: [1, 5], atolyeler: [3], makineler: [101] } } },
 
   { no: 27, options: ANLIK, bolum: "13 · Performans Özeti", baslik: "En yüksek iş yükü ekibi", target: "is-emri",

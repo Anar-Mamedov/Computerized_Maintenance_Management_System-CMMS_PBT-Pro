@@ -17,7 +17,8 @@ const EKRANIN_TASIDIGI_ALANLAR = {
   "is-emri": "*",
   "is-talebi": "*",
   makine: "*",
-  "periyodik-bakim": "*",
+  // Otomatik is emirleri listesi GetOtomatikIsEmirleri govdesine yalnizca bu alanlari yaziyor.
+  "otomatik-is-emirleri": ["durum", "lokasyonlar", "atolyeler", "makineler", "makinetip", "pbakimId", "startDate", "endDate"],
   // Stok listesi GET; ekran query'ye yalnızca bu alanları yazıyor.
   stok: ["isAktif", "kritik", "stoktaYok"],
   // Sağ panel açılıyor, liste API'si yok.
@@ -142,10 +143,16 @@ export function widgetFiltreKapsamasiniDenetle(endpoint, response, globalFilters
 
     const cozulen = url === null ? { filters: {}, isClose: null, isAktif: null } : readDashboardFilterParams(url.includes("?") ? url.split("?")[1] : "");
 
-    alanlar.forEach((alan) => {
+    const alaniDenetle = (alan, deger) => {
       // null/undefined deger "kisit yok" anlamina gelir (or. Toplam satirinda isClose: null).
-      const deger = oge.filtreler[alan];
       if (deger === null || deger === undefined) return;
+
+      // customfilter/customfilters gibi sarmalayici nesneler hedefe kendi adiyla degil,
+      // icindeki alanlarla (startDate/endDate) tasiniyor; denetim de icerigine bakmali.
+      if (typeof deger === "object" && !Array.isArray(deger)) {
+        Object.entries(deger).forEach(([icAlan, icDeger]) => alaniDenetle(icAlan, icDeger));
+        return;
+      }
 
       const sonuc = alanUlasiyorMu(alan, deger, cozulen, oge.hedef);
       if (sonuc.ulasti) return;
@@ -158,7 +165,9 @@ export function widgetFiltreKapsamasiniDenetle(endpoint, response, globalFilters
         deger: JSON.stringify(deger),
         sebep: sonuc.sebep,
       });
-    });
+    };
+
+    alanlar.forEach((alan) => alaniDenetle(alan, oge.filtreler[alan]));
   });
 
   if (bulgular.length) {
