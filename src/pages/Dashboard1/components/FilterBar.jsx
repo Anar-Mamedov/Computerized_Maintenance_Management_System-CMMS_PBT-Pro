@@ -14,7 +14,7 @@ import { COLORS } from "./theme";
 export default function FilterBar({ onOpenWidgetManager }) {
   const { t } = useTranslation();
   const { watch } = useFormContext();
-  const { baslangicTarihi, bitisTarihi, ekipmanIds, setBaslangicTarihi, setBitisTarihi, setLokasyonIds, setEkipmanIds, refresh, sonGuncelleme } = useDashboard();
+  const { baslangicTarihi, bitisTarihi, lokasyonIds, ekipmanIds, setBaslangicTarihi, setBitisTarihi, setLokasyonIds, setEkipmanIds, refresh, sonGuncelleme } = useDashboard();
 
   const formBaslangic = watch("dashboardBaslangicTarihi");
   const formBitis = watch("dashboardBitisTarihi");
@@ -39,10 +39,12 @@ export default function FilterBar({ onOpenWidgetManager }) {
         <DateRangeFilter />
         <span style={{ display: "inline-block", width: 232 }}>
           <LokasyonTablo
+            multiple
+            workshopSelectedId={lokasyonIds}
             lokasyonFieldName="dashboardLokasyonTanim"
             lokasyonIdFieldName="dashboardLokasyonID"
             placeholder={t("tumLokasyonlar")}
-            onSubmit={(selectedData) => setLokasyonIds([selectedData.key])}
+            onSubmit={(secilenler) => setLokasyonIds(secilenler.map((item) => item.key))}
             onClear={() => setLokasyonIds([])}
           />
         </span>

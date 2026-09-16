@@ -48,7 +48,7 @@ export default function WorkOrderTypePerformance({ onHide }) {
   const rows = useMemo(() => (data?.data || []).map((row, index) => ({ ...row, clientKey: `tip-${row.IsEmriTipId}-${index}` })), [data]);
   const genelToplam = data?.genel_toplam;
 
-  const goToDetail = () => navigateToTarget(navigate, "is-emri", {}, filters);
+  const goToDetail = () => navigateToTarget(navigate, data?.TargetPage || "is-emri", data?.FilterParams || {}, filters);
 
   const handleDownload = () =>
     downloadCsv(
@@ -81,7 +81,7 @@ export default function WorkOrderTypePerformance({ onHide }) {
           style={{ color: COLORS.red, cursor: "pointer" }}
           onClick={(event) => {
             event.stopPropagation();
-            navigateToTarget(navigate, record.TargetPage, record.FilterParamsAcik, filters);
+            navigateToTarget(navigate, record.TargetPage || "is-emri", { ...record.FilterParams, ...record.FilterParamsAcik, isClose: 0 }, filters);
           }}
         >
           {formatNumberWithSeparators(value, i18n.language)}
@@ -134,7 +134,7 @@ export default function WorkOrderTypePerformance({ onHide }) {
         columns={columns}
         dataSource={rows}
         pagination={false}
-        onRow={(record) => ({ style: { cursor: "pointer" }, onClick: () => navigateToTarget(navigate, record.TargetPage, record.FilterParams, filters) })}
+        onRow={(record) => ({ style: { cursor: "pointer" }, onClick: () => navigateToTarget(navigate, record.TargetPage || "is-emri", record.FilterParams, filters) })}
         summary={() => renderGenelToplamSatiri({ genelToplam, language: i18n.language, paraBirimi, t })}
       />
     </WidgetCard>

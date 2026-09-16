@@ -1,5 +1,8 @@
 import { CloseOutlined, FilterOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Col, Drawer, Row, Typography, Select, Space, Input, DatePicker } from "antd";
+import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
+import EkipmanSelect from "./EkipmanSelect";
+import AxiosInstance from "../../../../../../api/http";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import "./style.css";
@@ -15,6 +18,11 @@ dayjs.extend(advancedFormat);
 dayjs.locale("tr"); // use Turkish locale
 
 const { Text, Link } = Typography;
+
+// Bu iki alan serbest metin degil, ID bazli secim yapar; degerleri liste API'sinin
+// kok seviyedeki `lokasyonlar` / `makineler` alanlarina tasinir.
+const LOKASYON_ALANI = "lokasyonlar";
+const EKIPMAN_ALANI = "makineler";
 
 const StyledCloseOutlined = styled(CloseOutlined)`
   svg {
@@ -34,7 +42,7 @@ const CloseButton = styled.div`
   cursor: pointer;
 `;
 
-export default function CustomFilter({ onSubmit }) {
+export default function CustomFilter({ onSubmit, baslangicLokasyonIds, baslangicMakineIds }) {
   const {
     control,
     watch,
@@ -78,6 +86,8 @@ export default function CustomFilter({ onSubmit }) {
 
   // Create a state variable to store selected values for each row
   const [selectedValues, setSelectedValues] = useState({});
+  // Lokasyon ve ekipman satirlari serbest metin yerine ID tutar.
+  const [idValues, setIdValues] = useState({});
 
   // Tarih seçimi yapıldığında veya filtreler eklenip kaldırıldığında düğmenin stilini değiştirmek için bir durum
   const isFilterApplied = newObjectsAdded || filtersExist || startDate || endDate;
@@ -101,6 +111,16 @@ export default function CustomFilter({ onSubmit }) {
     // Combine selected values, input values for each row, and date range
     const filterData = rows.reduce((acc, row) => {
       const selectedValue = selectedValues[row.id] || "";
+
+      // Lokasyon/ekipman satirlari ID dizisi uretir; ayni alanda birden fazla satir varsa birlestirilir.
+      if (selectedValue === LOKASYON_ALANI || selectedValue === EKIPMAN_ALANI) {
+        const ids = idValues[row.id] || [];
+        if (ids.length) {
+          acc[selectedValue] = [...new Set([...(acc[selectedValue] || []), ...ids])];
+        }
+        return acc;
+      }
+
       const inputValue = inputValues[`input-${row.id}`] || "";
       if (selectedValue && inputValue) {
         acc[selectedValue] = inputValue;
@@ -124,6 +144,11 @@ export default function CustomFilter({ onSubmit }) {
 
   const handleCancelClick = (rowId) => {
     setFilters({});
+    setIdValues((state) => {
+      const kalan = { ...state };
+      delete kalan[rowId];
+      return kalan;
+    });
     setRows((prevRows) => prevRows.filter((row) => row.id !== rowId));
 
     const filtersRemaining = rows.length > 1;
@@ -140,6 +165,53 @@ export default function CustomFilter({ onSubmit }) {
       [`input-${rowId}`]: e.target.value,
     }));
   };
+
+  // Dashboard widget'indan gelindiginde lokasyon ve ekipman filtreleri URL'den gelir.
+  // Bu degerler icin otomatik olarak birer filtre satiri acilip secimleri isaretlenir.
+  const lokasyonAnahtari = JSON.stringify(baslangicLokasyonIds || []);
+  const makineAnahtari = JSON.stringify(baslangicMakineIds || []);
+
+  useEffect(() => {
+    const lokasyonIds = JSON.parse(lokasyonAnahtari);
+    const makineIds = JSON.parse(makineAnahtari);
+    if (!lokasyonIds.length && !makineIds.length) return;
+
+    const yeniSatirlar = [];
+    const yeniSecimler = {};
+    const yeniIdler = {};
+
+    if (lokasyonIds.length) {
+      const satirId = "dashboard-lokasyon";
+      yeniSatirlar.push({ id: satirId });
+      yeniSecimler[satirId] = LOKASYON_ALANI;
+      yeniIdler[satirId] = lokasyonIds;
+      setValue(`customFiltreLokasyonID-${satirId}`, lokasyonIds);
+
+      // Modal acilmadan da secili lokasyonun adi gorunsun.
+      AxiosInstance.get("GetLokasyonList")
+        .then((response) => {
+          const adlar = (response || []).filter((item) => lokasyonIds.includes(item.TB_LOKASYON_ID)).map((item) => item.LOK_TANIM);
+          if (adlar.length) setValue(`customFiltreLokasyonTanim-${satirId}`, adlar.join(", "));
+        })
+        .catch((error) => console.error("Lokasyon adı çözülemedi:", error));
+    }
+
+    if (makineIds.length) {
+      const satirId = "dashboard-ekipman";
+      yeniSatirlar.push({ id: satirId });
+      yeniSecimler[satirId] = EKIPMAN_ALANI;
+      yeniIdler[satirId] = makineIds;
+    }
+
+    setRows((prevRows) => {
+      const korunanlar = prevRows.filter((row) => !String(row.id).startsWith("dashboard-"));
+      return [...yeniSatirlar, ...korunanlar];
+    });
+    setSelectedValues((state) => ({ ...state, ...yeniSecimler }));
+    setIdValues((state) => ({ ...state, ...yeniIdler }));
+    setFiltersExist(true);
+    setNewObjectsAdded(true);
+  }, [lokasyonAnahtari, makineAnahtari, setValue]);
 
   const handleAddFilterClick = () => {
     const newRow = { id: Date.now() };
@@ -258,8 +330,12 @@ export default function CustomFilter({ onSubmit }) {
                       label: "Departman",
                     },
                     {
-                      value: "lok.LOK_TANIM",
+                      value: LOKASYON_ALANI,
                       label: "Lokasyon",
+                    },
+                    {
+                      value: EKIPMAN_ALANI,
+                      label: "Ekipman",
                     },
                     {
                       value: "kod_tip.KOD_TANIM",
@@ -275,12 +351,28 @@ export default function CustomFilter({ onSubmit }) {
                     },
                   ]}
                 />
-                <Input
-                  placeholder="Arama Yap"
-                  name={`input-${row.id}`} // Use a unique name for each input based on the row ID
-                  value={inputValues[`input-${row.id}`] || ""} // Use the corresponding input value
-                  onChange={(e) => handleInputChange(e, row.id)} // Pass the rowId to handleInputChange
-                />
+                {selectedValues[row.id] === LOKASYON_ALANI ? (
+                  // Lokasyon modal olarak acilir; secim TB_LOKASYON_ID uzerinden tutulur.
+                  <LokasyonTablo
+                    multiple
+                    workshopSelectedId={idValues[row.id] || []}
+                    lokasyonFieldName={`customFiltreLokasyonTanim-${row.id}`}
+                    lokasyonIdFieldName={`customFiltreLokasyonID-${row.id}`}
+                    placeholder="Lokasyon Seçin"
+                    onSubmit={(secilenler) => setIdValues((state) => ({ ...state, [row.id]: secilenler.map((item) => item.key) }))}
+                    onClear={() => setIdValues((state) => ({ ...state, [row.id]: [] }))}
+                  />
+                ) : selectedValues[row.id] === EKIPMAN_ALANI ? (
+                  // Ekipman dashboard'daki gibi aranabilir selectbox; secim TB_MAKINE_ID uzerinden tutulur.
+                  <EkipmanSelect value={idValues[row.id] || []} onChange={(ids) => setIdValues((state) => ({ ...state, [row.id]: ids }))} />
+                ) : (
+                  <Input
+                    placeholder="Arama Yap"
+                    name={`input-${row.id}`} // Use a unique name for each input based on the row ID
+                    value={inputValues[`input-${row.id}`] || ""} // Use the corresponding input value
+                    onChange={(e) => handleInputChange(e, row.id)} // Pass the rowId to handleInputChange
+                  />
+                )}
               </Col>
             </Col>
           </Row>

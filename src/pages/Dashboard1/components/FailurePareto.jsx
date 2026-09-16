@@ -99,7 +99,7 @@ export default function FailurePareto({ onHide }) {
         dataSource={rows}
         pagination={false}
         locale={{ emptyText: t("veriYok") }}
-        onRow={(record) => ({ style: { cursor: "pointer" }, onClick: () => navigateToTarget(navigate, record.TargetPage, record.FilterParams, filters) })}
+        onRow={(record) => ({ style: { cursor: "pointer" }, onClick: () => navigateToTarget(navigate, record.TargetPage || "is-emri", { prosedurtipleri: [1], nedenler: [record.NedenKodId], ...record.FilterParams }, filters) })}
       />
     </WidgetCard>
   );

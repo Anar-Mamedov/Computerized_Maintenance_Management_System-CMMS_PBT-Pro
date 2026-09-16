@@ -7,7 +7,7 @@ import { LuAlertTriangle, LuBellOff, LuChevronRight, LuClock, LuPackageX, LuPaus
 import { formatNumberWithSeparators } from "../../../utils/numberLocale";
 import { useDashboard } from "./dashboardContext";
 import { useActionCenter } from "./actionCenterContext";
-import { navigateToTarget } from "./navigation";
+import { isNavigableTarget, navigateToTarget } from "./navigation";
 import downloadCsv from "./downloadCsv";
 import WidgetCard from "./WidgetCard";
 import { COLORS, TONES } from "./theme";
@@ -20,6 +20,21 @@ const ITEM_STYLES = {
   KRITIK_ACIK_ARIZA: { tone: "red", Icon: LuAlertTriangle },
   SURESI_GECEN_HATIRLATICI: { tone: "purple", Icon: LuBellOff },
   DURUSU_DEVAM_EDEN_ISEMRI: { tone: "green", Icon: LuPause },
+};
+
+/**
+ * Hatirlatici hedefi sag paneli aciyor, ama panel yalnizca "hatirlatici_pinnable" ayari acikken
+ * render ediliyor. Ayar kapaliyken satir tiklanabilir gorunup hicbir sey yapmasin diye kontrol ediliyor.
+ */
+const tiklanabilirMi = (item) => {
+  if (!isNavigableTarget(item?.TargetPage)) return false;
+  if (item.TargetPage !== "hatirlatici") return true;
+
+  try {
+    return localStorage.getItem("hatirlatici_pinnable") === "true";
+  } catch (error) {
+    return false;
+  }
 };
 
 export default function ActionCenter({ onHide }) {
@@ -50,7 +65,7 @@ export default function ActionCenter({ onHide }) {
                 key={item.Key}
                 type="button"
                 className="pbt-row"
-                onClick={() => navigateToTarget(navigate, item.TargetPage, item.FilterParams, filters)}
+                onClick={tiklanabilirMi(item) ? () => navigateToTarget(navigate, item.TargetPage, item.FilterParams, filters, { tarihAraligiUygula: false }) : undefined}
                 style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 10px", border: "none", background: "transparent", cursor: "pointer", textAlign: "left", borderRadius: 8 }}
               >
                 <span style={{ width: 28, height: 28, borderRadius: 8, background: soft, color: main, display: "grid", placeItems: "center", flexShrink: 0 }}>

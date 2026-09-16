@@ -8,6 +8,7 @@ import { formatNumberWithSeparators } from "../../../utils/numberLocale";
 import useWidgetData from "./useWidgetData";
 import { useDashboard } from "./dashboardContext";
 import { navigateToTarget } from "./navigation";
+import { HAZIR_ARALIKLAR } from "./dateRanges";
 import downloadCsv from "./downloadCsv";
 import useAutoTableScroll, { TABLE_FILL_INNER } from "./useAutoTableScroll";
 import WidgetCard from "./WidgetCard";
@@ -19,6 +20,21 @@ const COUNTER_DEFINITIONS = [
   { key: "BuHafta", labelKey: "buHafta", color: COLORS.green, background: COLORS.greenSoft, durum: "buHafta" },
   { key: "BuAy", labelKey: "buAy", color: COLORS.blue, background: "#F6F4FF", durum: "buAy" },
 ];
+
+/**
+ * Sayac kutulari "bugun / buHafta / buAy" penceresini temsil ediyor. Bu metin degerlerinin
+ * liste API'sinde karsiligi oldugu dogrulanmadigi icin gercek tarih araligina cevrilip
+ * gonderiliyor; `durum` da geriye donuk uyumluluk icin birlikte tasiniyor.
+ */
+const sayacFiltresi = (durum) => {
+  const aralikUret = HAZIR_ARALIKLAR[durum];
+  if (!aralikUret) return { durum };
+
+  const [baslangic, bitis] = aralikUret();
+  if (!baslangic || !bitis) return { durum };
+
+  return { durum, startDate: baslangic.format("YYYY-MM-DD"), endDate: bitis.format("YYYY-MM-DD") };
+};
 
 export default function UpcomingMaintenances({ onHide }) {
   const { t, i18n } = useTranslation();
@@ -85,10 +101,10 @@ export default function UpcomingMaintenances({ onHide }) {
       bodyPadding={12}
       onRefresh={reload}
       onDownload={rows.length ? handleDownload : undefined}
-      onDetail={() => navigateToTarget(navigate, takvimHedefi, {}, filters)}
+      onDetail={() => navigateToTarget(navigate, takvimHedefi, {}, filters, { tarihAraligiUygula: false })}
       onHide={onHide}
       footer={
-        <Button type="link" size="small" style={{ paddingLeft: 0 }} onClick={() => navigateToTarget(navigate, takvimHedefi, {}, filters)}>
+        <Button type="link" size="small" style={{ paddingLeft: 0 }} onClick={() => navigateToTarget(navigate, takvimHedefi, {}, filters, { tarihAraligiUygula: false })}>
           {t("bakimTakviminiGor")}
         </Button>
       }
@@ -99,7 +115,7 @@ export default function UpcomingMaintenances({ onHide }) {
             key={key}
             type="button"
             className="pbt-row"
-            onClick={() => navigateToTarget(navigate, "periyodik-bakim", { durum }, filters)}
+            onClick={() => navigateToTarget(navigate, "periyodik-bakim", sayacFiltresi(durum), filters, { tarihAraligiUygula: false })}
             style={{
               border: `1px solid ${COLORS.border}`,
               borderLeft: `3px solid ${color}`,
@@ -126,7 +142,7 @@ export default function UpcomingMaintenances({ onHide }) {
             pagination={false}
             scroll={{ y: scrollY }}
             locale={{ emptyText: t("veriYok") }}
-            onRow={(record) => ({ style: { cursor: "pointer" }, onClick: () => navigateToTarget(navigate, record.TargetPage, record.FilterParams, filters) })}
+            onRow={(record) => ({ style: { cursor: "pointer" }, onClick: () => navigateToTarget(navigate, record.TargetPage || "periyodik-bakim", { ...(record.PbakimMakineId ? { makineler: [record.PbakimMakineId] } : {}), ...record.FilterParams }, filters, { tarihAraligiUygula: false }) })}
           />
         </div>
       </div>

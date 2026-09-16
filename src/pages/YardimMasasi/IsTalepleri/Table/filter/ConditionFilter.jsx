@@ -3,10 +3,27 @@ import { Popover, Button, Select } from "antd";
 
 const { Option } = Select;
 
-const ConditionFilter = ({ onSubmit, hatirlaticiGrupId, hatirlaticiSiraId }) => {
+const ConditionFilter = ({ onSubmit, hatirlaticiGrupId, hatirlaticiSiraId, baslangicDurumIds }) => {
   const [visible, setVisible] = useState(false);
   const [options, setOptions] = React.useState([]);
+  // Durum kodlarinin etiketleri; asagidaki hardcodedOptions ile ayni kaynak.
+  const DURUM_ETIKETLERI = {
+    0: "Açık",
+    1: "Bekliyor",
+    2: "Planlandı",
+    3: "Devam Ediyor",
+    4: "Kapandı",
+    5: "İptal Edildi",
+    6: "Onay Bekliyor",
+    7: "Onaylandı",
+    8: "Onaylanmadı",
+  };
+
   const [filters, setFilters] = useState(() => {
+    // Dashboard'dan gelindiyse o durumlar kutuda onceden secili gorunur.
+    if (Array.isArray(baslangicDurumIds) && baslangicDurumIds.length) {
+      return baslangicDurumIds.reduce((acc, id) => (DURUM_ETIKETLERI[id] ? { ...acc, [id]: DURUM_ETIKETLERI[id] } : acc), {});
+    }
     if (Number(hatirlaticiGrupId) === 2 && Number(hatirlaticiSiraId) === 1) {
       return { 1: "Bekliyor" };
     }

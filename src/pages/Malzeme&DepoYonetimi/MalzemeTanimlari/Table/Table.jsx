@@ -7,6 +7,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Resizable } from "react-resizable";
 import "./ResizeStyle.css";
 import AxiosInstance from "../../../../api/http";
+import { useDashboardFilterParams } from "../../../../utils/dashboardFilterParams";
 import { useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
@@ -41,6 +42,10 @@ const CustomTable = styled(Table)`
 `;
 
 // Sütunların boyutlarını ayarlamak için kullanılan component
+
+// Hatirlatici panelinde ayni tablo uygulama kabugunda render edildigi icin pathname hala
+// dashboard'dan gelinen route olabiliyor. O modda dashboard filtresi uygulanmamali.
+const DASHBOARD_FILTRESIZ = { active: false, filters: {}, isClose: null, isAktif: null, pageSize: null };
 
 const ResizableTitle = (props) => {
   const { onResize, width, ...restProps } = props;
@@ -126,6 +131,10 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
 // Sütunların sürüklenebilir olmasını sağlayan component sonu
 
 const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposuID = null, hatirlaticiGrupId, hatirlaticiSiraId }) => {
+  // Stok listesi dashboard filtrelerinden yalnizca aktiflik durumunu uygulayabiliyor.
+  const dashboardParams = useDashboardFilterParams("/malzemeTanimi");
+  const hatirlaticiModu = Boolean(hatirlaticiGrupId);
+  const { filters: dashboardFilters, isAktif: dashboardIsAktif } = hatirlaticiModu ? DASHBOARD_FILTRESIZ : dashboardParams;
   const [isModalVisible, setIsModalVisible] = useState(false);
   let setValue;
 
@@ -897,17 +906,22 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
-  const [body, setBody] = useState({
+  const [body, setBody] = useState(() => ({
     keyword: "",
     filters: {},
-    isAktif: 1,
-  });
+    isAktif: dashboardIsAktif === 0 || dashboardIsAktif === 1 ? dashboardIsAktif : 1,
+  }));
 
   // ana tablo api isteği için kullanılan useEffect
 
   useEffect(() => {
     fetchEquipmentData(body, currentPage, pageSize, sortField, sortOrder);
-  }, [body, currentPage, pageSize, sortField, sortOrder, hatirlaticiGrupId, hatirlaticiSiraId]);
+  }, [body, currentPage, pageSize, sortField, sortOrder, hatirlaticiGrupId, hatirlaticiSiraId, dashboardFilters]);
+
+  // Dashboard filtresi degisince daralan sonuc kumesinde eski sayfada kalinmasin.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [dashboardFilters]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
@@ -972,6 +986,27 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       if (stkDepoIds.length > 0) {
         apiUrl += `&stkDepoIds=${stkDepoIds.join(",")}`;
       }
+
+      // Dashboard'dan gelen filtreler (ör. Kritik Stoklar kartinin FilterParams'indaki kritik:true)
+      // query parametresi olarak eklenir. Stok listesi GET oldugu icin govde yok.
+      // customfilters ve customfilter ayni icerigi tasiyor; tarih yalnizca bir kez eklenir.
+      const tarihAraligi = dashboardFilters?.customfilters || dashboardFilters?.customfilter;
+      if (tarihAraligi?.startDate) apiUrl += `&startDate=${encodeURIComponent(tarihAraligi.startDate)}`;
+      if (tarihAraligi?.endDate) apiUrl += `&endDate=${encodeURIComponent(tarihAraligi.endDate)}`;
+
+      Object.entries(dashboardFilters || {}).forEach(([alan, deger]) => {
+        if (deger === null || deger === undefined || deger === "") return;
+        if (alan === "customfilters" || alan === "customfilter") return;
+
+        if (Array.isArray(deger)) {
+          if (deger.length) apiUrl += `&${alan}=${deger.join(",")}`;
+          return;
+        }
+
+        if (typeof deger === "object") return;
+
+        apiUrl += `&${alan}=${encodeURIComponent(String(deger))}`;
+      });
 
       if (islemTip === "C" || islemTip === "T") {
         // islemTip C veya T ise özel parametreler ekle

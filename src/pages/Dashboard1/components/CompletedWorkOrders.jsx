@@ -30,8 +30,8 @@ export default function CompletedWorkOrders({ onHide }) {
 
   const handleBarClick = (payload, seri) => {
     if (!payload) return;
-    if (seri === "isEmri") navigateToTarget(navigate, payload.TargetPageIsEmri, payload.FilterParamsIsEmri, filters);
-    else navigateToTarget(navigate, payload.TargetPageIsTalep, payload.FilterParamsIsTalep, filters);
+    if (seri === "isEmri") navigateToTarget(navigate, payload.TargetPageIsEmri || "is-emri", payload.FilterParamsIsEmri, filters);
+    else navigateToTarget(navigate, payload.TargetPageIsTalep || "is-talebi", payload.FilterParamsIsTalep, filters);
   };
 
   return (
@@ -43,7 +43,7 @@ export default function CompletedWorkOrders({ onHide }) {
       hasError={hasError}
       onRefresh={reload}
       onDownload={rows.length ? handleDownload : undefined}
-      onDetail={() => navigateToTarget(navigate, "is-emri", { isClose: 1 }, filters)}
+      onDetail={() => navigateToTarget(navigate, "is-emri", { isClose: 1, ...(data?.TargetPage ? {} : {}) }, filters)}
       onHide={onHide}
     >
       {/* Grafik kartta kalan alanı doldurur; yüksekliği dış kutudan gelir. */}

@@ -8,6 +8,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Resizable } from "react-resizable";
 import "./ResizeStyle.css";
 import AxiosInstance from "../../../../api/http";
+import { mergeDashboardFilters, useDashboardFilterParams } from "../../../../utils/dashboardFilterParams";
 import CreateDrawer from "../CreateDrawer";
 import EditDrawer from "../EditDrawer";
 import Filters from "./filter/Filters";
@@ -20,6 +21,10 @@ const { Text } = Typography;
 const MAKINE_TABLE_SORT_STORAGE_KEY = "makineTableSortState";
 
 // Sütunların boyutlarını ayarlamak için kullanılan component
+
+// Hatirlatici panelinde ayni tablo uygulama kabugunda render edildigi icin pathname hala
+// dashboard'dan gelinen route olabiliyor. O modda dashboard filtresi uygulanmamali.
+const DASHBOARD_FILTRESIZ = { active: false, filters: {}, isClose: null, isAktif: null, pageSize: null };
 
 const ResizableTitle = (props) => {
   const { onResize, width, ...restProps } = props;
@@ -105,6 +110,13 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
 // Sütunların sürüklenebilir olmasını sağlayan component sonu
 
 const MainTable = ({ setSelectedIds, hatirlaticiGrupId, hatirlaticiSiraId }) => {
+  // Dashboard widget'indan gelindiyse widget'in filtreleri URL uzerinden tasinir.
+  const dashboardParams = useDashboardFilterParams("/makine");
+  const hatirlaticiModu = Boolean(hatirlaticiGrupId);
+  const { filters: dashboardFilters, isAktif: dashboardIsAktif } = hatirlaticiModu ? DASHBOARD_FILTRESIZ : dashboardParams;
+
+  // Alan adi cevrimi (atolyeler -> atolye) useDashboardFilterParams icinde route'a gore yapiliyor.
+  const buildMakineFilters = useCallback((baseFilters = {}) => mergeDashboardFilters(baseFilters, dashboardFilters), [dashboardFilters]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
   const [data, setData] = useState([]);
@@ -273,17 +285,25 @@ const MainTable = ({ setSelectedIds, hatirlaticiGrupId, hatirlaticiSiraId }) => 
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
-  const [body, setBody] = useState({
+  const [body, setBody] = useState(() => ({
     keyword: "",
     filters: {},
-    isActive: 1,
-  });
+    isActive: dashboardIsAktif === 0 || dashboardIsAktif === 1 ? dashboardIsAktif : 1,
+  }));
 
   // ana tablo api isteği için kullanılan useEffect
 
   useEffect(() => {
     fetchEquipmentData(body, currentPage, pageSize, sortField, sortOrder);
-  }, [body, currentPage, pageSize, sortField, sortOrder]);
+  }, [body, currentPage, pageSize, sortField, sortOrder, buildMakineFilters]);
+
+  // Dashboard filtresi degisince daralan sonuc kumesinde eski sayfada kalinmasin.
+  useEffect(() => {
+    setCurrentPage(1);
+    if (dashboardIsAktif === 0 || dashboardIsAktif === 1) {
+      setBody((state) => (state.isActive === dashboardIsAktif ? state : { ...state, isActive: dashboardIsAktif }));
+    }
+  }, [dashboardFilters, dashboardIsAktif]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
@@ -326,7 +346,7 @@ const MainTable = ({ setSelectedIds, hatirlaticiGrupId, hatirlaticiSiraId }) => 
       // API isteğinde keyword ve currentPage kullanılıyor
       const endpoint = hatirlaticiGrupId ? "GetMakineFullListHatirlatici" : "GetMakineFullList";
       const hatirlaticiParams = hatirlaticiGrupId ? `&hatirlaticiGrupId=${hatirlaticiGrupId}&hatirlaticiSiraId=${hatirlaticiSiraId}` : "";
-      const response = await AxiosInstance.post(`${endpoint}?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${currentPageSize}&isAktif=${isActive}${sortParam}${hatirlaticiParams}`, filters);
+      const response = await AxiosInstance.post(`${endpoint}?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${currentPageSize}&isAktif=${isActive}${sortParam}${hatirlaticiParams}`, buildMakineFilters(filters));
       if (response) {
         // Toplam sayfa sayısını ayarla
         setTotalPages(response.page);

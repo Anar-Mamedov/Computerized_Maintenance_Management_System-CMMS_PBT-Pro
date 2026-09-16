@@ -15,6 +15,8 @@ export default function LokasyonTablo({
   lokasyonIdFieldName = "lokasyonID",
   isRequired = false,
   placeholder,
+  // Coklu secim yalnizca isteyen ekranlarda acilir; varsayilan tekli secim davranisi korunur.
+  multiple = false,
 }) {
   const {
     control,
@@ -186,6 +188,19 @@ export default function LokasyonTablo({
   };
 
   const handleModalOk = () => {
+    if (multiple) {
+      const secilenler = selectedRowKeys.map((key) => findItemInTree(key, treeData)).filter(Boolean);
+
+      setValue(lokasyonFieldName, secilenler.map((item) => item.LOK_TANIM).join(", "));
+      setValue(
+        lokasyonIdFieldName,
+        secilenler.map((item) => item.key)
+      );
+      onSubmit && onSubmit(secilenler);
+      setIsModalVisible(false);
+      return;
+    }
+
     const selectedData = findItemInTree(selectedRowKeys[0], treeData);
     if (selectedData) {
       setValue(lokasyonFieldName, selectedData.LOK_TANIM);
@@ -196,17 +211,25 @@ export default function LokasyonTablo({
   };
 
   useEffect(() => {
+    if (Array.isArray(workshopSelectedId)) {
+      setSelectedRowKeys(workshopSelectedId);
+      return;
+    }
     setSelectedRowKeys(workshopSelectedId ? [workshopSelectedId] : []);
   }, [workshopSelectedId]);
 
   const onRowSelectChange = (selectedKeys) => {
+    if (multiple) {
+      setSelectedRowKeys(selectedKeys);
+      return;
+    }
     setSelectedRowKeys(selectedKeys.length ? [selectedKeys[0]] : []);
   };
 
   // parentler seçilemesin diye
 
   const rowSelection = {
-    type: "radio",
+    type: multiple ? "checkbox" : "radio",
     selectedRowKeys,
     onChange: onRowSelectChange,
   };
@@ -293,7 +316,7 @@ export default function LokasyonTablo({
 }
 
 LokasyonTablo.propTypes = {
-  workshopSelectedId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  workshopSelectedId: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   onSubmit: PropTypes.func,
   onClear: PropTypes.func,
   disabled: PropTypes.bool,
@@ -301,4 +324,5 @@ LokasyonTablo.propTypes = {
   lokasyonIdFieldName: PropTypes.string,
   isRequired: PropTypes.bool,
   placeholder: PropTypes.string,
+  multiple: PropTypes.bool,
 };

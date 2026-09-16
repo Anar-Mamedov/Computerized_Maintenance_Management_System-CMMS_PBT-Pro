@@ -9,6 +9,7 @@ import { LuChevronRight } from "react-icons/lu";
 import useWidgetData from "./useWidgetData";
 import { useDashboard, toApiEnd, toApiStart } from "./dashboardContext";
 import { navigateToTarget } from "./navigation";
+import { donemdenTarihAraligi } from "./dateRanges";
 import downloadCsv from "./downloadCsv";
 import WidgetDateRange from "./WidgetDateRange";
 import useAutoTableScroll, { TABLE_FILL_INNER } from "./useAutoTableScroll";
@@ -36,6 +37,13 @@ export default function RecurringFailures({ onHide }) {
 
   const { data, loading, hasError, reload } = useWidgetData("GetDashboardV2RecurringFailures", extraBody);
 
+  // Bu widget dashboard'un üst tarih filtresini değil kendi dönemini kullanıyor; hedef ekrana da o taşınır.
+  const widgetTarihAraligi = useMemo(() => donemdenTarihAraligi(donem, ozelBaslangic, ozelBitis), [donem, ozelBaslangic, ozelBitis]);
+
+  // Ozel donemde tarihler henuz girilmemisse widget "tum zamanlar" gosteriyor;
+  // bu durumda dashboard'un genis araligi hedefe sizmamali.
+  const tarihSecenegi = Object.keys(widgetTarihAraligi).length ? undefined : { tarihAraligiUygula: false };
+
   const rows = useMemo(() => (data?.data || []).map((row, index) => ({ ...row, clientKey: `tekrar-${row.EkipmanId}-${row.NedenKodId}-${index}` })), [data]);
 
   const donemSecenekleri = [
@@ -46,7 +54,7 @@ export default function RecurringFailures({ onHide }) {
     { value: "OZEL", label: t("ozelTarih") },
   ];
 
-  const goToDetail = () => navigateToTarget(navigate, "is-emri", { tipGrup: 1 }, filters);
+  const goToDetail = () => navigateToTarget(navigate, "is-emri", { tipGrup: 1, ...widgetTarihAraligi }, filters, tarihSecenegi);
 
   const handleDownload = () =>
     downloadCsv(
@@ -131,7 +139,7 @@ export default function RecurringFailures({ onHide }) {
             locale={{ emptyText: t("veriYok") }}
             onRow={(record) => ({
               style: { cursor: "pointer" },
-              onClick: () => navigateToTarget(navigate, "is-emri", { makineId: record.EkipmanId, nedenId: record.NedenKodId, tipGrup: 1 }, filters),
+              onClick: () => navigateToTarget(navigate, "is-emri", { makineId: record.EkipmanId, nedenId: record.NedenKodId, tipGrup: 1, ...widgetTarihAraligi }, filters, tarihSecenegi),
             })}
           />
         </div>

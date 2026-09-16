@@ -24,6 +24,18 @@ export default function WorkOrderTimeDistribution({ onHide }) {
   const extraBody = useMemo(() => ({ Gorunum: gorunum }), [gorunum]);
   const { data, loading, hasError, reload } = useWidgetData("GetDashboardV2WorkOrderTimeDistribution", extraBody);
 
+  // recharts'ta <Line onClick> veri satiriyla cagrilmiyor (yalnizca Curve'e gecer),
+  // bu yuzden tiklama grafik seviyesinde activePayload uzerinden ele aliniyor.
+  const handleNoktaTiklama = (state) => {
+    const satir = state?.activePayload?.[0]?.payload;
+    if (!satir) return;
+
+    const periyotAraligi =
+      satir.PeriyotBaslangic && satir.PeriyotBitis ? { startDate: satir.PeriyotBaslangic, endDate: satir.PeriyotBitis } : {};
+
+    navigateToTarget(navigate, satir.TargetPage || "is-emri", { ...periyotAraligi, ...satir.FilterParams }, filters);
+  };
+
   const rows = useMemo(() => data?.Data || [], [data]);
   const donemOrtalamasi = data?.DonemOrtalamasi;
 
@@ -60,7 +72,7 @@ export default function WorkOrderTimeDistribution({ onHide }) {
       <div style={grafikKutusuStili(300)}>
         <div style={CHART_FILL_INNER}>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={rows} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
+            <LineChart data={rows} margin={{ top: 8, right: 16, left: 0, bottom: 8 }} onClick={handleNoktaTiklama}>
               <CartesianGrid stroke={COLORS.border} vertical={false} />
               <XAxis
                 dataKey="PeriyotEtiketi"
@@ -93,7 +105,6 @@ export default function WorkOrderTimeDistribution({ onHide }) {
                 isAnimationActive={false}
                 dot={{ r: 3, fill: COLORS.blue }}
                 activeDot={{ r: 5, cursor: "pointer" }}
-                onClick={(payload) => payload?.payload && navigateToTarget(navigate, payload.payload.TargetPage, payload.payload.FilterParams, filters)}
               />
               {/* Ortalama çizgisi ReferenceLine ile çizilir; bu veri taşımayan seri yalnızca göstergede yer alması içindir. */}
               <Line

@@ -67,7 +67,7 @@ export default function MonthlyMaintenanceCosts({ onHide }) {
                 radius={[4, 4, 0, 0]}
                 isAnimationActive={false}
                 cursor="pointer"
-                onClick={(payload) => payload?.payload && navigateToTarget(navigate, payload.payload.TargetPage, payload.payload.FilterParams, filters)}
+                onClick={(payload) => payload?.payload && navigateToTarget(navigate, payload.payload.TargetPage || "is-emri", payload.payload.FilterParams, filters)}
               >
                 <LabelList dataKey="ToplamMaliyet" position="top" formatter={kisaPara} fill={COLORS.muted} fontSize={10.5} />
               </Bar>

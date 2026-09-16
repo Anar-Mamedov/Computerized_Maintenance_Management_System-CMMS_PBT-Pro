@@ -19,6 +19,14 @@ export default function TopFailureEquipment({ onHide }) {
   const { filters } = useDashboard();
   const { data, loading, hasError, reload } = useWidgetData("GetDashboardV2TopFailureEquipment");
 
+  // Rehber madde 16: ariza sayisi/satir -> o ekipmanin ariza is emirleri.
+  const arizaListesineGit = (row) =>
+    navigateToTarget(navigate, row.TargetPage || "is-emri", { prosedurtipleri: [1], makineler: [row.EkipmanId], ...row.FilterParams }, filters);
+
+  // Rehber madde 17: ekipman adi -> makine sayfasinda o kaydi acar.
+  const makineSayfasinaGit = (row) =>
+    navigateToTarget(navigate, row.TargetPageMakine || "makine", row.FilterParamsMakine || { makineler: [row.EkipmanId] }, filters);
+
   const rows = useMemo(() => data?.data || [], [data]);
   const enBuyukArizaSayisi = useMemo(() => rows.reduce((max, row) => Math.max(max, Number(row.ArizaSayisi) || 0), 0), [rows]);
 
@@ -46,11 +54,17 @@ export default function TopFailureEquipment({ onHide }) {
       ) : (
         <div>
           {rows.map((row) => (
-            <button
+            <div
               key={`ekipman-${row.EkipmanId}-${row.Sira}`}
-              type="button"
               className="pbt-row"
-              onClick={() => navigateToTarget(navigate, row.TargetPage, row.FilterParams, filters)}
+              role="button"
+              tabIndex={0}
+              onClick={() => arizaListesineGit(row)}
+              onKeyDown={(event) => {
+                if (event.key !== "Enter" && event.key !== " ") return;
+                event.preventDefault();
+                arizaListesineGit(row);
+              }}
               style={{
                 width: "100%",
                 display: "grid",
@@ -66,7 +80,23 @@ export default function TopFailureEquipment({ onHide }) {
               }}
             >
               <span style={{ fontSize: 12, color: COLORS.muted, fontWeight: 600 }}>{row.Sira}</span>
-              <span style={{ fontSize: 13, color: COLORS.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={row.EkipmanEtiketi}>
+              {/* Rehber madde 17: ekipman adi makine sayfasini acar (madde 16 ariza listesi satirin genelinde). */}
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  makineSayfasinaGit(row);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key !== "Enter" && event.key !== " ") return;
+                  event.preventDefault();
+                  event.stopPropagation();
+                  makineSayfasinaGit(row);
+                }}
+                style={{ fontSize: 13, color: COLORS.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", cursor: "pointer", textDecoration: "underline dotted" }}
+                title={row.EkipmanEtiketi}
+              >
                 {row.EkipmanEtiketi}
               </span>
               <span style={{ fontSize: 13, fontWeight: 600, color: COLORS.text, textAlign: "right" }}>{formatNumberWithSeparators(row.ArizaSayisi, i18n.language)}</span>
@@ -75,7 +105,7 @@ export default function TopFailureEquipment({ onHide }) {
                 <span style={{ display: "block", width: `${enBuyukArizaSayisi ? (Number(row.ArizaSayisi) / enBuyukArizaSayisi) * 100 : 0}%`, height: 6, borderRadius: 4, background: COLORS.red }} />
               </span>
               <LuChevronRight size={14} color={COLORS.muted} />
-            </button>
+            </div>
           ))}
         </div>
       )}

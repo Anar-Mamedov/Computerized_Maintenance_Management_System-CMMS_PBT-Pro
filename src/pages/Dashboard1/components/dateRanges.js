@@ -15,3 +15,37 @@ export const HAZIR_ARALIKLAR = {
   son3Ay: () => [dayjs().subtract(3, "month"), dayjs()],
   son6Ay: () => [dayjs().subtract(6, "month"), dayjs()],
 };
+
+/** Widget'ların kendi dönem seçicilerindeki kodları [başlangıç, bitiş] aralığına çevirir. */
+const WIDGET_DONEM_ARALIKLARI = {
+  "30GUN": () => [dayjs().subtract(30, "day").startOf("day"), dayjs().endOf("day")],
+  "60GUN": () => [dayjs().subtract(60, "day").startOf("day"), dayjs().endOf("day")],
+  "90GUN": () => [dayjs().subtract(90, "day").startOf("day"), dayjs().endOf("day")],
+  BUHAFTA: () => HAZIR_ARALIKLAR.buHafta(),
+  BUAY: () => HAZIR_ARALIKLAR.buAy(),
+  GECENAY: () => HAZIR_ARALIKLAR.gecenAy(),
+  SON3AY: () => HAZIR_ARALIKLAR.son3Ay(),
+  BUYIL: () => HAZIR_ARALIKLAR.buYil(),
+};
+
+/**
+ * Widget'ın kendi dönem seçimini hedef liste ekranının beklediği startDate/endDate'e çevirir.
+ * Bu widget'lar dashboard'un üst tarih filtresini değil kendi dönemlerini kullandığı için,
+ * tıklanınca hedef ekrana da kendi dönemleri taşınmalıdır.
+ */
+export const donemdenTarihAraligi = (donem, ozelBaslangic, ozelBitis) => {
+  if (donem === "OZEL") {
+    const baslangic = ozelBaslangic ? dayjs(ozelBaslangic) : null;
+    const bitis = ozelBitis ? dayjs(ozelBitis) : null;
+    return {
+      ...(baslangic?.isValid() ? { startDate: baslangic.format("YYYY-MM-DD") } : {}),
+      ...(bitis?.isValid() ? { endDate: bitis.format("YYYY-MM-DD") } : {}),
+    };
+  }
+
+  const aralikUret = WIDGET_DONEM_ARALIKLARI[donem];
+  if (!aralikUret) return {};
+
+  const [baslangic, bitis] = aralikUret();
+  return { startDate: baslangic.format("YYYY-MM-DD"), endDate: bitis.format("YYYY-MM-DD") };
+};

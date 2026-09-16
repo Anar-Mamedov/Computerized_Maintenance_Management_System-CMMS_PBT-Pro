@@ -7,6 +7,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Resizable } from "react-resizable";
 import "./ResizeStyle.css";
 import AxiosInstance from "../../../../api/http";
+import { mergeDashboardFilters, useDashboardFilterParams } from "../../../../utils/dashboardFilterParams";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import Filters from "./filter/Filters";
@@ -39,6 +40,10 @@ function extractTextFromElement(element) {
 }
 
 // Sütunların boyutlarını ayarlamak için kullanılan component
+
+// Hatirlatici panelinde ayni tablo uygulama kabugunda render edildigi icin pathname hala
+// dashboard'dan gelinen route olabiliyor. O modda dashboard filtresi uygulanmamali.
+const DASHBOARD_FILTRESIZ = { active: false, filters: {}, isClose: null, isAktif: null, pageSize: null };
 
 const ResizableTitle = (props) => {
   const { onResize, width, ...restProps } = props;
@@ -124,6 +129,10 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
 // Sütunların sürüklenebilir olmasını sağlayan component sonu
 
 const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
+  // Dashboard widget'indan gelindiyse widget'in filtreleri URL uzerinden tasinir.
+  const dashboardParams = useDashboardFilterParams("/isTalepleri");
+  const hatirlaticiModu = Boolean(hatirlaticiGrupId && hatirlaticiSiraId);
+  const { filters: dashboardFilters } = hatirlaticiModu ? DASHBOARD_FILTRESIZ : dashboardParams;
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
   const [data, setData] = useState([]);
@@ -918,7 +927,27 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
 
   useEffect(() => {
     fetchEquipmentData(body, currentPage, pageSize, sortField, sortOrder);
-  }, [body, currentPage, pageSize, sortField, sortOrder, hatirlaticiGrupId, hatirlaticiSiraId]);
+  }, [body, currentPage, pageSize, sortField, sortOrder, hatirlaticiGrupId, hatirlaticiSiraId, dashboardFilters]);
+
+  // Dashboard filtresi degisince daralan sonuc kumesinde eski sayfada kalinmasin.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [dashboardFilters]);
+
+  // Dashboard'dan gelen tarih araligini ekranin kendi tarih alanlarina da yaz ki
+  // "Filtreler" cekmecesindeki tarih inputlari bos gorunmesin ve kullanici degistirebilsin.
+  const dashboardTarihAraligi = dashboardFilters.customfilters || dashboardFilters.customfilter;
+  const dashboardBaslangic = dashboardTarihAraligi?.startDate || null;
+  const dashboardBitis = dashboardTarihAraligi?.endDate || null;
+
+  useEffect(() => {
+    if (!dashboardBaslangic && !dashboardBitis) return;
+
+    // timeRange "custom" oldugunda ZamanAraligi tarihleri sifirlamiyor.
+    setValue("timeRange", "custom");
+    setValue("startDate", dashboardBaslangic ? dayjs(dashboardBaslangic) : null);
+    setValue("endDate", dashboardBitis ? dayjs(dashboardBitis) : null);
+  }, [dashboardBaslangic, dashboardBitis, setValue]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
@@ -962,7 +991,7 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
       // API isteğinde keyword ve currentPage kullanılıyor
       const response = await AxiosInstance.post(
         `${endpoint}?parametre=${keyword}&pagingDeger=${currentPage}&pageSize=${normalizedPageSize}${sortParam}`,
-        filters
+        mergeDashboardFilters(filters, dashboardFilters)
       );
       if (response) {
         if (response.status_code === 401) {
@@ -1207,7 +1236,7 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
       setXlsxLoading(true);
 
       const { keyword = "", filters = {} } = body || {};
-      const response = await AxiosInstance.post(`GetIsTalepFullListWithExcel?parametre=${keyword}`, filters);
+      const response = await AxiosInstance.post(`GetIsTalepFullListWithExcel?parametre=${keyword}`, mergeDashboardFilters(filters, dashboardFilters));
       if (response) {
         const list = Array.isArray(response) ? response : Array.isArray(response?.is_talep_listesi) ? response.is_talep_listesi : [];
 
@@ -1442,7 +1471,14 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
             onChange={(e) => setSearchTerm(e.target.value)}
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
-          <Filters onChange={handleBodyChange} hatirlaticiGrupId={hatirlaticiGrupId} hatirlaticiSiraId={hatirlaticiSiraId} />
+          <Filters
+            onChange={handleBodyChange}
+            hatirlaticiGrupId={hatirlaticiGrupId}
+            hatirlaticiSiraId={hatirlaticiSiraId}
+            baslangicDurumIds={dashboardFilters.durumlar}
+            baslangicLokasyonIds={dashboardFilters.lokasyonlar}
+            baslangicMakineIds={dashboardFilters.makineler}
+          />
           <Popover
             content={
               <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "360px" }}>

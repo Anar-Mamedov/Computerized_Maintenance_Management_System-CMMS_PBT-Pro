@@ -19,6 +19,7 @@ import * as XLSX from "xlsx";
 import { t } from "i18next";
 import dayjs from "dayjs";
 import { formatNumberWithSeparators } from "../../../../utils/numberLocale";
+import { mergeDashboardFilters, useDashboardFilterParams } from "../../../../utils/dashboardFilterParams";
 
 const { Text } = Typography;
 const EXCEL_FILE_NAME = "Bakım İş Emirleri.xlsx";
@@ -39,6 +40,10 @@ function extractTextFromElement(element) {
   }
   return text;
 }
+
+// Hatirlatici panelinde ayni tablo uygulama kabugunda render edildigi icin pathname hala
+// dashboard'dan gelinen route olabiliyor. O modda dashboard filtresi uygulanmamali.
+const DASHBOARD_FILTRESIZ = { active: false, filters: {}, isClose: null, isAktif: null, pageSize: null };
 
 const ResizableTitle = (props) => {
   const { onResize, width, ...restProps } = props;
@@ -119,6 +124,10 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
 };
 
 const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
+  // Dashboard widget'indan gelindiyse widget'in filtreleri URL uzerinden tasinir.
+  const dashboardParams = useDashboardFilterParams("/isEmri1");
+  const hatirlaticiModu = Boolean(hatirlaticiGrupId && hatirlaticiSiraId);
+  const { filters: dashboardFilters, isClose: dashboardIsClose } = hatirlaticiModu ? DASHBOARD_FILTRESIZ : dashboardParams;
   // State definitions...
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
@@ -155,10 +164,12 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
   const loadedRowKeysRef = useRef(new Set());
   const [columnSearchTerm, setColumnSearchTerm] = useState("");
   const [arizaActive, setArizaActive] = useState(() => {
+    if (dashboardFilters.prosedurtipleri?.includes(1)) return true;
     return Number(hatirlaticiGrupId) === 2 && Number(hatirlaticiSiraId) === 2;
   });
-  const [onayBekleyenActive, setOnayBekleyenActive] = useState(false);
+  const [onayBekleyenActive, setOnayBekleyenActive] = useState(() => Boolean(dashboardFilters.onaydurumlari?.includes(1)));
   const [toplamIsEmriCloseFilter, setToplamIsEmriCloseFilter] = useState(() => {
+    if (dashboardIsClose === 0 || dashboardIsClose === 1) return dashboardIsClose;
     return (hatirlaticiGrupId && hatirlaticiSiraId) ? 0 : null;
   });
 
@@ -220,9 +231,15 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
 
   const buildMergedFilters = useCallback(
     (baseFilters = {}) => {
-      const mergedFilters = { ...baseFilters };
+      // Dashboard filtreleri alta serilir; kullanici ekranda ayni alani doldurursa ekranin secimi kazanir.
+      const mergedFilters = mergeDashboardFilters(baseFilters, dashboardFilters);
+
+      // Kart kapatildiginda dashboard'dan gelen ayni kisit da kalkmali; aksi halde kart soner ama liste degismez.
       if (arizaActive) mergedFilters.prosedurtipleri = [1];
+      else delete mergedFilters.prosedurtipleri;
+
       if (onayBekleyenActive) mergedFilters.onaydurumlari = [1];
+      else delete mergedFilters.onaydurumlari;
 
       if (toplamIsEmriCloseFilter === 0 || toplamIsEmriCloseFilter === 1) {
         mergedFilters.isClose = toplamIsEmriCloseFilter;
@@ -232,7 +249,7 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
 
       return mergedFilters;
     },
-    [arizaActive, onayBekleyenActive, toplamIsEmriCloseFilter]
+    [arizaActive, dashboardFilters, onayBekleyenActive, toplamIsEmriCloseFilter]
   );
 
   const splitCloseFilterFromRequest = useCallback((filters = {}) => {
@@ -1268,6 +1285,11 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
       append: isScrollPageEnabled && currentPage > 1,
     });
   }, [body, buildMergedFilters, currentPage, pageSize, sortField, sortOrder, isScrollPageEnabled]);
+
+  // Dashboard filtresi degisince daralan sonuc kumesinde eski sayfada kalinmasin.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [dashboardFilters]);
 
   // ana tablo api isteği için kullanılan useEffect son
 

@@ -10,6 +10,7 @@ import useDebounce from "../../../hooks/useDebounce";
 import useWidgetData from "./useWidgetData";
 import { useDashboard, toApiEnd, toApiStart } from "./dashboardContext";
 import { navigateToTarget } from "./navigation";
+import { donemdenTarihAraligi } from "./dateRanges";
 import downloadCsv from "./downloadCsv";
 import WidgetDateRange from "./WidgetDateRange";
 import WidgetCard from "./WidgetCard";
@@ -37,6 +38,13 @@ export default function PersonnelKpi({ onHide }) {
   }, [donem, debouncedAramaMetni, ozelBaslangic, ozelBitis]);
 
   const { data, loading, hasError, reload } = useWidgetData("GetDashboardV2PersonnelKpi", extraBody);
+
+  // Bu widget dashboard'un üst tarih filtresini değil kendi dönemini kullanıyor; hedef ekrana da o taşınır.
+  const widgetTarihAraligi = useMemo(() => donemdenTarihAraligi(donem, ozelBaslangic, ozelBitis), [donem, ozelBaslangic, ozelBitis]);
+
+  // Ozel donemde tarihler henuz girilmemisse widget "tum zamanlar" gosteriyor;
+  // bu durumda dashboard'un genis araligi hedefe sizmamali.
+  const tarihSecenegi = Object.keys(widgetTarihAraligi).length ? undefined : { tarihAraligiUygula: false };
 
   const rows = useMemo(() => (data?.data || []).map((row, index) => ({ ...row, clientKey: `personel-${row.PersonelId}-${index}` })), [data]);
 
@@ -76,7 +84,7 @@ export default function PersonnelKpi({ onHide }) {
           style={{ cursor: "pointer" }}
           onClick={(event) => {
             event.stopPropagation();
-            navigateToTarget(navigate, record.TargetPage, record.FilterParamsKapali, filters);
+            navigateToTarget(navigate, record.TargetPage || "is-emri", { ...(record.FilterParamsKapali || { ...record.FilterParams, isClose: 1 }), ...widgetTarihAraligi }, filters, tarihSecenegi);
           }}
         >
           {formatNumberWithSeparators(value, i18n.language)}
@@ -94,7 +102,7 @@ export default function PersonnelKpi({ onHide }) {
           style={{ color: COLORS.red, cursor: "pointer" }}
           onClick={(event) => {
             event.stopPropagation();
-            navigateToTarget(navigate, record.TargetPage, record.FilterParamsAcik, filters);
+            navigateToTarget(navigate, record.TargetPage || "is-emri", { ...(record.FilterParamsAcik || { ...record.FilterParams, isClose: 0 }), ...widgetTarihAraligi }, filters, tarihSecenegi);
           }}
         >
           {formatNumberWithSeparators(value, i18n.language)}
@@ -126,7 +134,7 @@ export default function PersonnelKpi({ onHide }) {
       bodyPadding={0}
       onRefresh={reload}
       onDownload={rows.length ? handleDownload : undefined}
-      onDetail={() => navigateToTarget(navigate, "is-emri", {}, filters)}
+      onDetail={() => navigateToTarget(navigate, "is-emri", { ...widgetTarihAraligi }, filters, tarihSecenegi)}
       onHide={onHide}
       extra={
         <Space size={8} wrap>
@@ -158,7 +166,7 @@ export default function PersonnelKpi({ onHide }) {
         dataSource={rows}
         pagination={{ pageSize: 8, size: "small", hideOnSinglePage: true }}
         locale={{ emptyText: t("veriYok") }}
-        onRow={(record) => ({ style: { cursor: "pointer" }, onClick: () => navigateToTarget(navigate, record.TargetPage, record.FilterParams, filters) })}
+        onRow={(record) => ({ style: { cursor: "pointer" }, onClick: () => navigateToTarget(navigate, record.TargetPage || "is-emri", { personeller: [record.PersonelId], ...record.FilterParams, ...widgetTarihAraligi }, filters, tarihSecenegi) })}
       />
     </WidgetCard>
   );

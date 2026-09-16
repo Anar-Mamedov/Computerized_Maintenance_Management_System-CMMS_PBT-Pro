@@ -16,9 +16,10 @@ import { COLORS } from "./theme";
 
 // Durum dağılımı çubuğunun segmentleri; sıra, çubuktaki soldan sağa dizilimi belirler.
 const DURUM_SEGMENTLERI = [
-  { key: "AktifSayisi", labelKey: "aktif", color: COLORS.teal, textColor: COLORS.surface },
-  { key: "ArizaliSayisi", labelKey: "arizali", color: COLORS.red, textColor: COLORS.surface },
-  { key: "PasifSayisi", labelKey: "pasif", color: COLORS.neutral, textColor: COLORS.text },
+  // filtre: rehber dokumanindaki 23, 24 ve 25. maddelerin hedef govdeleri.
+  { key: "AktifSayisi", labelKey: "aktif", color: COLORS.teal, textColor: COLORS.surface, filtre: { isAktif: 1 } },
+  { key: "ArizaliSayisi", labelKey: "arizali", color: COLORS.red, textColor: COLORS.surface, filtre: { isAktif: 1, arizali: true } },
+  { key: "PasifSayisi", labelKey: "pasif", color: COLORS.neutral, textColor: COLORS.text, filtre: { isAktif: 0 } },
 ];
 
 // Segment daralsa da içindeki sayı okunabilir kalsın diye taban genişlik verilir.
@@ -26,7 +27,7 @@ const SEGMENT_MIN_GENISLIK = 34;
 const CUBUK_YUKSEKLIGI = 34;
 
 /** Bir satırın aktif/arızalı/pasif dağılımını tek bir yığılmış çubukta gösterir. */
-function DurumCubugu({ row, language, t }) {
+function DurumCubugu({ row, language, t, onSegmentClick }) {
   const segmentler = DURUM_SEGMENTLERI.filter(({ key }) => Number(row[key]) > 0);
 
   if (segmentler.length === 0) {
@@ -35,11 +36,24 @@ function DurumCubugu({ row, language, t }) {
 
   return (
     <div style={{ display: "flex", height: CUBUK_YUKSEKLIGI, borderRadius: 8, overflow: "hidden", background: COLORS.track }}>
-      {segmentler.map(({ key, labelKey, color, textColor }) => (
+      {segmentler.map(({ key, labelKey, color, textColor, filtre }) => (
         <div
           key={key}
+          role="button"
+          tabIndex={0}
           title={`${t(labelKey)}: ${formatNumberWithSeparators(row[key], language)}`}
+          onClick={(event) => {
+            event.stopPropagation();
+            onSegmentClick(row, filtre);
+          }}
+          onKeyDown={(event) => {
+            if (event.key !== "Enter" && event.key !== " ") return;
+            event.preventDefault();
+            event.stopPropagation();
+            onSegmentClick(row, filtre);
+          }}
           style={{
+            cursor: "pointer",
             flex: `${row[key]} 1 0`,
             minWidth: SEGMENT_MIN_GENISLIK,
             background: color,
@@ -61,6 +75,7 @@ DurumCubugu.propTypes = {
   row: PropTypes.object.isRequired,
   language: PropTypes.string,
   t: PropTypes.func.isRequired,
+  onSegmentClick: PropTypes.func.isRequired,
 };
 
 /** Çubuk renklerinin ne anlama geldiğini gösteren açıklama satırı. */
@@ -92,7 +107,17 @@ export default function InventoryDistribution({ onHide }) {
   const toplamEkipman = data?.ToplamEkipman;
   const listeHedefi = data?.TargetPageListe || "makine";
 
-  const goToList = () => navigateToTarget(navigate, listeHedefi, {}, filters);
+  const goToList = () => navigateToTarget(navigate, listeHedefi, {}, filters, { tarihAraligiUygula: false });
+
+  // Rehber 23/24/25: Aktif, Arizali ve Pasif sutunlari ayri hedefler. Satirin geneli tipin tamamini acar.
+  const handleSegmentClick = (row, segmentFiltresi) =>
+    navigateToTarget(
+      navigate,
+      row.TargetPage || listeHedefi,
+      { ...segmentFiltresi, ...(row.MakineTipId ? { makinetip: [row.MakineTipId] } : {}) },
+      filters,
+      { tarihAraligiUygula: false }
+    );
 
   const handleDownload = () =>
     downloadCsv(
@@ -112,7 +137,7 @@ export default function InventoryDistribution({ onHide }) {
     {
       title: t("durumDagilimi"),
       key: "durumDagilimi",
-      render: (value, record) => <DurumCubugu row={record} language={i18n.language} t={t} />,
+      render: (value, record) => <DurumCubugu row={record} language={i18n.language} t={t} onSegmentClick={handleSegmentClick} />,
     },
     {
       title: t("adet"),
@@ -181,7 +206,7 @@ export default function InventoryDistribution({ onHide }) {
             pagination={false}
             scroll={{ y: scrollY }}
             locale={{ emptyText: t("veriYok") }}
-            onRow={(record) => ({ style: { cursor: "pointer" }, onClick: () => navigateToTarget(navigate, record.TargetPage, record.FilterParams, filters) })}
+            onRow={(record) => ({ style: { cursor: "pointer" }, onClick: () => navigateToTarget(navigate, record.TargetPage || listeHedefi, { ...(record.MakineTipId ? { makinetip: [record.MakineTipId] } : {}), ...record.FilterParams }, filters, { tarihAraligiUygula: false }) })}
           />
         </div>
       </div>

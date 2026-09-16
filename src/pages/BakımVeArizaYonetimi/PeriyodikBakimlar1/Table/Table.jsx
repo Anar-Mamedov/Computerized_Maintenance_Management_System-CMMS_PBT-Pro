@@ -7,6 +7,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Resizable } from "react-resizable";
 import "./ResizeStyle.css";
 import AxiosInstance from "../../../../api/http";
+import { useDashboardFilterParams } from "../../../../utils/dashboardFilterParams";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
@@ -104,12 +105,22 @@ const DraggableRow = ({ id, text, index, moveRow, className, style, visible, onV
 const MainTable = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
+  // Dashboard widget'indan gelindiyse widget'in filtreleri URL uzerinden tasinir.
+  const { active: dashboardActive, filters: dashboardFilters } = useDashboardFilterParams("/periyodikBakimlar");
   const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchTimeout, setSearchTimeout] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
+  // Dashboard filtresiyle gelindiginde sayfalama server-side calisir.
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalDataCount, setTotalDataCount] = useState(0);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [refreshKey, setRefreshKey] = useState(0);
+  // GetPBakimFullList gercekten kullanildiysa true; fallback'e dusuldugunde false kalir.
+  const [sunucuSayfalamasi, setSunucuSayfalamasi] = useState(false);
   const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
 
   // edit drawer için
@@ -661,15 +672,66 @@ const MainTable = () => {
   // ana tablo api isteği için kullanılan useEffect
 
   useEffect(() => {
-    fetchEquipmentData();
-  }, []);
+    fetchEquipmentData(currentPage, pageSize);
+  }, [dashboardActive, dashboardFilters, currentPage, pageSize, debouncedSearchTerm, refreshKey]);
+
+  // Dashboard filtresi degisince daralan sonuc kumesinde eski sayfada kalinmasin.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [dashboardFilters]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
-  const fetchEquipmentData = async () => {
+  // GetPBakimFullList'in liste ve toplam alanlari backend surumune gore degisebildigi icin
+  // bilinen alan adlari sirayla denenir.
+  const extractPBakimList = (response) => {
+    if (Array.isArray(response)) return response;
+    if (!response || typeof response !== "object") return [];
+
+    const knownListKeys = ["list", "periyodik_bakim_listesi", "pbakim_listesi", "periyodikBakimList", "Data", "makine_listesi"];
+    const matchedKey = knownListKeys.find((key) => Array.isArray(response[key]));
+
+    return matchedKey ? response[matchedKey] : [];
+  };
+
+  const extractTotalCount = (response, fallback) => {
+    if (!response || typeof response !== "object" || Array.isArray(response)) return fallback;
+
+    const knownCountKeys = ["kayit_sayisi", "TotalCount", "toplam_kayit", "totalCount"];
+    const matchedKey = knownCountKeys.find((key) => Number.isFinite(Number(response[key])));
+
+    return matchedKey ? Number(response[matchedKey]) : fallback;
+  };
+
+  const fetchEquipmentData = async (page = currentPage, size = pageSize) => {
     try {
       setLoading(true);
+
+      if (dashboardActive) {
+        // Dashboard'dan filtreyle gelindiginde rehber dokumanindaki sayfali istek kullanilir.
+        const rawResponse = await AxiosInstance.post(`GetPBakimFullList?pagingDeger=${page}&pageSize=${size}&parametre=${debouncedSearchTerm}`, dashboardFilters);
+        const list = extractPBakimList(rawResponse);
+
+        // GetPBakimFullList'in bu ekrandaki sozlesmesi backend'den henuz teyit edilmedi; repodaki diger
+        // kullanimi MAKINE listesi donduruyor. Donen kayitlar periyodik bakim gibi gorunmuyorsa bos/bozuk
+        // tablo gostermek yerine calistigi kanitli uca geri donuyoruz.
+        const periyodikBakimGibi = list.length === 0 || list.some((item) => item?.TB_PERIYODIK_BAKIM_ID !== undefined);
+
+        if (periyodikBakimGibi && list.length > 0) {
+          setSunucuSayfalamasi(true);
+          setData(list.map((item) => ({ ...item, key: item.TB_PERIYODIK_BAKIM_ID })));
+          setTotalDataCount(extractTotalCount(rawResponse, list.length));
+          setLoading(false);
+          return;
+        }
+
+        if (!periyodikBakimGibi) {
+          console.warn("GetPBakimFullList periyodik bakim kaydi dondurmedi; filtresiz PeriyodikBakimList'e donuluyor.");
+        }
+      }
+
       // API isteğinde keyword ve currentPage kullanılıyor
+      setSunucuSayfalamasi(false);
       const response = await AxiosInstance.get(`PeriyodikBakimList`);
       if (response) {
         // Gelen veriyi formatla ve state'e ata
@@ -679,6 +741,7 @@ const MainTable = () => {
           // Diğer alanlarınız...
         }));
         setData(formattedData);
+        setTotalDataCount(formattedData.length);
         setLoading(false);
       } else {
         console.error("API response is not in expected format");
@@ -714,9 +777,24 @@ const MainTable = () => {
   };
 
   useEffect(() => {
+    // Sunucu sayfalamasi devredeyken arama API'ye parametre olarak gidiyor, client-side suzme yapilmaz.
+    if (sunucuSayfalamasi) return;
+
     const filtered = data.filter((item) => normalizeString(item.PBK_TANIM).includes(normalizeString(searchTerm)));
     setFilteredData(filtered);
-  }, [searchTerm, data]);
+  }, [searchTerm, data, sunucuSayfalamasi]);
+
+  // Dashboard modunda arama API'ye gidiyor; terimi debounce edip ilk sayfaya doneriz.
+  useEffect(() => {
+    if (!dashboardActive) return undefined;
+
+    const timeout = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+      setCurrentPage(1);
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [searchTerm, dashboardActive]);
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -759,8 +837,10 @@ const MainTable = () => {
     setSelectedRowKeys([]);
     setSelectedRows([]);
 
-    // Verileri yeniden çekmek için `fetchEquipmentData` fonksiyonunu çağır
-    fetchEquipmentData();
+    // Verileri yeniden çekmek için ana veri effect'ini tetikle.
+    // Dogrudan fetchEquipmentData() cagirmak, bu useCallback'in bos bagimlilik listesi yuzunden
+    // eski sayfa/arama degerlerini kullanirdi.
+    setRefreshKey((previous) => previous + 1);
     // Burada `body` ve `currentPage`'i güncellediğimiz için, bu değerlerin en güncel hallerini kullanarak veri çekme işlemi yapılır.
     // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
     // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
@@ -1012,14 +1092,21 @@ const MainTable = () => {
           components={components}
           rowSelection={rowSelection}
           columns={filteredColumns}
-          dataSource={searchTerm ? filteredData : data}
+          dataSource={!sunucuSayfalamasi && searchTerm ? filteredData : data}
           pagination={{
-            defaultPageSize: 10,
+            // Sunucu sayfalamasi yalnizca GetPBakimFullList yolu gercekten kullanildiginda devrede olur.
+            ...(sunucuSayfalamasi ? { current: currentPage, pageSize, total: totalDataCount } : { defaultPageSize: pageSize }),
             showSizeChanger: true,
             pageSizeOptions: ["10", "20", "50", "100"],
             position: ["bottomRight"],
-            showTotal: (total, range) => `Toplam ${total}`,
+            showTotal: (total) => `Toplam ${total}`,
             showQuickJumper: true,
+            onChange: dashboardActive
+              ? (page, size) => {
+                  setCurrentPage(page);
+                  setPageSize(size);
+                }
+              : undefined,
           }}
           onRow={onRowClick}
           scroll={{ y: "calc(100vh - 370px)" }}
