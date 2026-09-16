@@ -912,6 +912,12 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
     isAktif: dashboardIsAktif === 0 || dashboardIsAktif === 1 ? dashboardIsAktif : 1,
   }));
 
+  // Ekran acilirken filtreler birkac adimda yerlestigi icin ust uste istek atiliyor.
+  // Yanitlar atildiklari sirayla donmuyor: eski ve filtresiz bir yanit, sonradan atilan
+  // dogru filtreli yanitin uzerine yazabiliyordu (dashboard'dan gelince 21 yerine 2028
+  // gosteriyordu). Bu yuzden yalnizca en son istegin yaniti ekrana islenir.
+  const istekSirasiRef = useRef(0);
+
   // ana tablo api isteği için kullanılan useEffect
 
   useEffect(() => {
@@ -948,6 +954,10 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
   // arama işlemi için kullanılan useEffect son
 
   const fetchEquipmentData = async (body, page, size, currentSortField, currentSortOrder) => {
+    istekSirasiRef.current += 1;
+    const istekSirasi = istekSirasiRef.current;
+    const guncelMi = () => istekSirasi === istekSirasiRef.current;
+
     // body'nin undefined olması durumunda varsayılan değerler atanıyor
     const { keyword = "", filters = {}, isAktif = 1 } = body || {};
     // page'in undefined olması durumunda varsayılan değer olarak 1 atanıyor
@@ -1010,6 +1020,9 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       // API isteğini yap
       const response = await AxiosInstance.get(apiUrl);
 
+      // Bu istek daha yenisi tarafindan gecildiyse yaniti ekrana islemeyiz.
+      if (!guncelMi()) return;
+
       if (response) {
         // Toplam sayfa sayısını ayarla
         setTotalPages(response.page);
@@ -1028,6 +1041,8 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
         setLoading(false);
       }
     } catch (error) {
+      if (!guncelMi()) return;
+
       console.error("Error in API request:", error);
       setLoading(false);
       if (navigator.onLine) {
