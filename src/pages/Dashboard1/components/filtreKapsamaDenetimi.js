@@ -1,4 +1,4 @@
-import { FIELD_ALIASES, HEDEFE_OZEL_ALAN_ADLARI, navigateToTarget } from "./navigation";
+import { FIELD_ALIASES, HEDEFE_OZEL_ALAN_ADLARI, buildTargetUrl } from "./navigation";
 import { readDashboardFilterParams } from "../../../utils/dashboardFilterParams";
 
 /**
@@ -129,13 +129,14 @@ export function widgetFiltreKapsamasiniDenetle(endpoint, response, globalFilters
     const alanlar = Object.keys(oge.filtreler || {});
     if (!alanlar.length) return;
 
+    // Denetim yalnızca gözlem yapar: buildTargetUrl yan etkisizdir.
+    // navigateToTarget çağrılsaydı "hatirlatici" hedefi her veri yenilemesinde
+    // hatırlatıcı panelini açardı.
     let url = null;
     try {
-      navigateToTarget((deger) => {
-        url = deger;
-      }, oge.hedef, oge.filtreler, globalFilters);
+      url = buildTargetUrl(oge.hedef, oge.filtreler, globalFilters);
     } catch (error) {
-      bulgular.push({ ...oge, alan: "(tümü)", sebep: `navigateToTarget hata verdi: ${error?.message}` });
+      bulgular.push({ ...oge, alan: "(tümü)", sebep: `URL üretilemedi: ${error?.message}` });
       return;
     }
 

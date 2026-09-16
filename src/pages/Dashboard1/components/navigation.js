@@ -24,10 +24,21 @@ const HEDEF_GLOBAL_DESTEGI = {
   stok: { ekipmanKirilimi: false, tarih: false },
 };
 
-// Hatırlatıcılar ayrı bir sayfa değil, sağdaki panel üzerinden açılır.
+// Hatırlatıcılar ayrı bir sayfa değil; zil ikonundaki popover ya da ayarlardan
+// açıldıysa sabitlenmiş yan panel üzerinden gösterilir.
+//
+// Sabitlenmiş panelin açık/kapalı durumu bir kullanıcı tercihidir, localStorage'da saklanır.
+// Popover ise saklanmaz: kalıcı bayrak yazılsaydı bayrağı kimse temizlemediği için
+// dashboard'a her dönüşte hatırlatıcı ekranı kendiliğinden açılırdı. Bu yüzden popover
+// isteği tek seferlik bir olay olarak yayınlanır.
 const openHatirlaticiPanel = () => {
-  localStorage.setItem("hatirlatici_panel_open", "true");
-  window.dispatchEvent(new Event("hatirlatici_panel_open_changed"));
+  if (localStorage.getItem("hatirlatici_pinnable") === "true") {
+    localStorage.setItem("hatirlatici_panel_open", "true");
+    window.dispatchEvent(new Event("hatirlatici_panel_open_changed"));
+    return;
+  }
+
+  window.dispatchEvent(new Event("hatirlatici_panel_ac"));
 };
 
 // Widget'lardan ve API'den gelen eski/kısa alan adlarının liste API'lerindeki karşılıkları.
@@ -210,15 +221,26 @@ const buildSearchParams = (targetPage, filterParams, globalFilters, options) => 
 
 export const isNavigableTarget = (targetPage) => targetPage === "hatirlatici" || Boolean(TARGET_PAGE_ROUTES[targetPage]);
 
+/**
+ * Hedef ekranın URL'sini üretir; yan etkisi yoktur.
+ * Yönlendirme yapmadan yalnızca sonucu görmek isteyenler (kapsama denetimi, uyum testi)
+ * bunu kullanmalıdır — navigateToTarget çağrılsaydı hatırlatıcı paneli de açılırdı.
+ * Yönlendirme yerine panel açan hedefler için null döner.
+ */
+export const buildTargetUrl = (targetPage, filterParams, globalFilters, options) => {
+  const route = TARGET_PAGE_ROUTES[targetPage];
+  if (!route) return null;
+
+  const search = buildSearchParams(targetPage, filterParams, globalFilters, options);
+  return search ? `${route}?${search}` : route;
+};
+
 export const navigateToTarget = (navigate, targetPage, filterParams, globalFilters, options) => {
   if (targetPage === "hatirlatici") {
     openHatirlaticiPanel();
     return;
   }
 
-  const route = TARGET_PAGE_ROUTES[targetPage];
-  if (!route) return;
-
-  const search = buildSearchParams(targetPage, filterParams, globalFilters, options);
-  navigate(search ? `${route}?${search}` : route);
+  const url = buildTargetUrl(targetPage, filterParams, globalFilters, options);
+  if (url) navigate(url);
 };

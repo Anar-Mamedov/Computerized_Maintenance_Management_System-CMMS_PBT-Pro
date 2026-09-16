@@ -28,6 +28,18 @@ export default function Header() {
   const [parametreler, setParametreler] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+
+  // Dashboard aksiyon merkezindeki "Süresi Geçen Hatırlatıcılar" satırı hatırlatıcı ekranını açar.
+  // Sabitlenebilir yan panel kapalıysa (varsayılan) zil popover'ı açılır ki tıklama boşa gitmesin.
+  // Olay tek seferliktir; kalıcı bir durum okunmaz, böylece popover kapatılıp dashboard'a
+  // dönüldüğünde kendiliğinden yeniden açılmaz.
+  useEffect(() => {
+    const handlePanelOpen = () => setOpen(true);
+
+    window.addEventListener("hatirlatici_panel_ac", handlePanelOpen);
+    return () => window.removeEventListener("hatirlatici_panel_ac", handlePanelOpen);
+  }, []);
+
   const [reportResponse, setReportResponse] = useState([]);
   const [raporModalVisible, setRaporModalVisible] = useState(false);
   const [kullaniciData, setKullaniciData] = useState(null);

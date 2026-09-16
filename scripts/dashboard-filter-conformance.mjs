@@ -1,8 +1,9 @@
+/* eslint-env node */
 /**
  * Dashboard V2 — Tıklama & Hedef Liste İstekleri conformance testi.
  *
  * Rehber dökümanındaki 27 tıklama noktasının her biri için:
- *   1. Dashboard'un navigateToTarget'i ile URL üretilir,
+ *   1. Dashboard'un buildTargetUrl'i ile URL üretilir,
  *   2. Hedef ekranın URL'den okuduğu filtreler çözülür,
  *   3. O ekranın kodunun gerçekte atacağı istek (endpoint + query + body) modellenir,
  *   4. Dökümandaki beklenen istekle satır satır karşılaştırılır.
@@ -48,7 +49,7 @@ async function loadAppModules() {
     plugins: [stubReactPlugin],
     stdin: {
       contents: `
-        export { navigateToTarget, isNavigableTarget } from "./src/pages/Dashboard1/components/navigation.js";
+        export { buildTargetUrl, isNavigableTarget } from "./src/pages/Dashboard1/components/navigation.js";
         export { readDashboardFilterParams, mergeDashboardFilters } from "./src/utils/dashboardFilterParams.js";
       `,
       resolveDir: process.cwd(),
@@ -370,17 +371,17 @@ function checkField(field, expectedValue, actual) {
 }
 
 function runCase(testCase, modules) {
-  const { navigateToTarget, readDashboardFilterParams, mergeDashboardFilters } = modules;
+  const { buildTargetUrl, readDashboardFilterParams, mergeDashboardFilters } = modules;
 
-  let url = null;
-  navigateToTarget((value) => { url = value; }, testCase.target, testCase.widget, DASHBOARD_FILTERS, testCase.options);
-
+  // Panel hedefleri yönlendirme üretmez; URL üretmeyi hiç denemeden ayrılıyoruz.
   if (testCase.expect.panel) {
     return { ...testCase, url: "(hatırlatıcı paneli açılır)", status: "skip", fields: [], extras: [], notes: ["Liste API'si yok — sağ panel açılıyor."] };
   }
 
+  const url = buildTargetUrl(testCase.target, testCase.widget, DASHBOARD_FILTERS, testCase.options);
+
   if (url === null) {
-    return { ...testCase, url: "(yönlendirme yok)", status: "fail", fields: [], extras: [], notes: ["navigateToTarget hiçbir route üretmedi."] };
+    return { ...testCase, url: "(yönlendirme yok)", status: "fail", fields: [], extras: [], notes: ["buildTargetUrl hiçbir route üretmedi."] };
   }
 
   const search = url.includes("?") ? url.split("?")[1] : "";

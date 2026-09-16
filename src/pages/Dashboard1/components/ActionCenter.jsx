@@ -22,20 +22,8 @@ const ITEM_STYLES = {
   DURUSU_DEVAM_EDEN_ISEMRI: { tone: "green", Icon: LuPause },
 };
 
-/**
- * Hatirlatici hedefi sag paneli aciyor, ama panel yalnizca "hatirlatici_pinnable" ayari acikken
- * render ediliyor. Ayar kapaliyken satir tiklanabilir gorunup hicbir sey yapmasin diye kontrol ediliyor.
- */
-const tiklanabilirMi = (item) => {
-  if (!isNavigableTarget(item?.TargetPage)) return false;
-  if (item.TargetPage !== "hatirlatici") return true;
-
-  try {
-    return localStorage.getItem("hatirlatici_pinnable") === "true";
-  } catch (error) {
-    return false;
-  }
-};
+// Hedefi tanimsiz satirlar tiklanabilir gorunmesin.
+const tiklanabilirMi = (item) => isNavigableTarget(item?.TargetPage);
 
 export default function ActionCenter({ onHide }) {
   const { t, i18n } = useTranslation();
