@@ -1,31 +1,30 @@
-import React from "react";
+import React, { useState } from "react";
+import PropTypes from "prop-types";
 import { FileTextOutlined } from "@ant-design/icons";
-import { PdfAxiosInstance } from "../../../../../../../api/http";
+import { useTranslation } from "react-i18next";
 import MenuItem from "../MenuItem";
+import IsEmriFormlariModal from "./IsEmriFormlariModal";
 
 const Form = ({ selectedRows }) => {
-  const downloadPdf = async () => {
-    try {
-      const baseURL = localStorage.getItem("baseURL");
-      selectedRows.forEach(async (row) => {
-        window.open(
-          `${baseURL}/FormRapor/GetFormByType?id=${row.key}&tipId=1`,
-          "_blank"
-        );
-      });
-    } catch (error) {
-      console.error("PDF indirme hatası:", error);
-    }
-  };
+  const { t } = useTranslation();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const selectedRow = selectedRows?.[0];
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
   return (
-    <MenuItem
-      icon={<FileTextOutlined />}
-      title="İş Emri Formları..."
-      description="PDF ve baskı formlarını görüntüle."
-      onClick={downloadPdf}
-    />
+    <>
+      <MenuItem icon={<FileTextOutlined />} title={t("workOrder.forms.menuTitle")} description={t("workOrder.forms.menuDescription")} onClick={openModal} />
+
+      <IsEmriFormlariModal open={isModalOpen} onClose={closeModal} isEmriId={selectedRow?.key} isEmriNo={selectedRow?.ISEMRI_NO} />
+    </>
   );
+};
+
+Form.propTypes = {
+  selectedRows: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default Form;
