@@ -1,0 +1,631 @@
+/*
+ * Ekipman Listesi ekraninin tasarim tokenlari (equipment-central tasarimi).
+ * Marka rengi (--ek-brand, --ek-brand-soft) uygulama temasindan inline verilir; boylece Omega temasi da calisir.
+ * Modal, cekmece ve acilir menuler body'ye portal edildigi icin ayni tokenlar .ek-tokenlar sinifinda da tanimlidir.
+ */
+.ekipman-listesi,
+.ek-tokenlar {
+  --ek-bg: #f8fafc;
+  --ek-fg: #2b2c2f;
+  --ek-card: #ffffff;
+  --ek-muted: #6e7075;
+  --ek-subtle: #8e9196;
+  --ek-accent: #f4f6f8;
+  --ek-graphite: #2e3034;
+  --ek-border: #e2e3e6;
+  --ek-neutral-soft: #eff0f2;
+  --ek-success: #0a693c;
+  --ek-success-soft: #dcf9e5;
+  --ek-warning: #995600;
+  --ek-warning-soft: #ffeed1;
+  --ek-danger: #b63132;
+  --ek-danger-soft: #ffe9e6;
+  --ek-action-green: #1c804c;
+  --ek-shadow: 0 1px 2px 0 rgba(28, 30, 36, 0.05);
+  --ek-brand-border: color-mix(in srgb, var(--ek-brand) 20%, transparent);
+  /*
+   * Uygulamada html font-size 12px (1rem = 12px, src/index.css). Tasarim 16px tabanli oldugu icin
+   * bu ekranda kullanilan Tailwind olculeri (h-9, p-3, text-sm, rounded-md...) piksele sabitlenir;
+   * aksi halde hepsi %25 kucuk cizilir. Tailwind v4 bu olculeri asagidaki degiskenlerden okur.
+   */
+  --spacing: 4px;
+  --text-sm: 14px;
+  --text-sm--line-height: 20px;
+  --text-2xl: 24px;
+  --text-2xl--line-height: 32px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --container-xs: 320px;
+  color: var(--ek-fg);
+}
+
+.ekipman-listesi {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/*
+ * Genis ekran: baslik, KPI ve arac cubugu sabit kalir; yalnizca tablo govdesi (ya da kart izgarasi) kayar.
+ * Liste kartinin asgari yuksekligi ~5 satirlik govdeyi korur; ekran bundan kisaysa sayfa yalnizca
+ * aradaki fark kadar kayar (kaydirma cubugu yeri sabit tutulur, tablo olculeri bozulmasin).
+ */
+.ekipman-listesi--sabit {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.ekipman-listesi--sabit > * {
+  flex-shrink: 0;
+}
+
+.ekipman-listesi--sabit > .ek-liste-karti {
+  display: flex;
+  min-height: 420px;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+/* Dar ekran: sabit ust bolum dikey alanin cogunu yiyecegi icin sayfa kendi icinde kayar. */
+.ekipman-listesi--kayan {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* Kaydirma cubugu veri gelince belirip genisligi degistirmesin; aksi halde sticky tablo basligi eski olcude kalir. */
+  scrollbar-gutter: stable;
+}
+
+/* ---------- Ortak kutular ---------- */
+
+.ek-kart {
+  background: var(--ek-card);
+  border: 1px solid var(--ek-border);
+  border-radius: 8px;
+  box-shadow: var(--ek-shadow);
+}
+
+.ek-btn {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--ek-border);
+  border-radius: 6px;
+  background: var(--ek-card);
+  color: var(--ek-fg);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.ek-btn:hover {
+  background: var(--ek-accent);
+}
+
+.ek-btn:focus-visible,
+.ek-ikon-btn:focus-visible,
+.ek-sayfa-btn:focus-visible,
+.ek-kpi:focus-visible,
+.ek-link:focus-visible {
+  outline: 2px solid var(--ek-brand);
+  outline-offset: 1px;
+}
+
+.ek-ikon-btn {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--ek-border);
+  border-radius: 6px;
+  background: var(--ek-card);
+  color: var(--ek-muted);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.ek-ikon-btn:hover {
+  background: var(--ek-accent);
+}
+
+.ek-ikon-btn--islem {
+  border: none;
+  background: var(--ek-action-green);
+  color: #ffffff;
+}
+
+.ek-ikon-btn--islem:hover {
+  background: var(--ek-action-green);
+  opacity: 0.9;
+}
+
+.ek-ikon-btn--islem:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.ek-ikon-btn--kucuk {
+  width: 28px;
+  height: 28px;
+}
+
+.ek-sayac {
+  display: inline-flex;
+  min-width: 20px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--ek-neutral-soft);
+  color: var(--ek-subtle);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.ek-sayac--aktif {
+  background: var(--ek-brand);
+  color: #ffffff;
+}
+
+.ek-link {
+  padding: 0;
+  border: none;
+  border-radius: 2px;
+  background: none;
+  color: var(--ek-brand);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.ek-link:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Rozetler ---------- */
+
+.ek-rozet {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.ek-rozet--brand {
+  border-color: var(--ek-brand-border);
+  background: var(--ek-brand-soft);
+  color: var(--ek-brand);
+}
+
+.ek-rozet--success {
+  border-color: color-mix(in srgb, var(--ek-success) 20%, transparent);
+  background: var(--ek-success-soft);
+  color: var(--ek-success);
+}
+
+.ek-rozet--warning {
+  border-color: color-mix(in srgb, var(--ek-warning) 20%, transparent);
+  background: var(--ek-warning-soft);
+  color: var(--ek-warning);
+}
+
+.ek-rozet--danger {
+  border-color: color-mix(in srgb, var(--ek-danger) 20%, transparent);
+  background: var(--ek-danger-soft);
+  color: var(--ek-danger);
+}
+
+.ek-rozet--neutral {
+  border-color: var(--ek-border);
+  background: var(--ek-neutral-soft);
+  color: var(--ek-subtle);
+}
+
+/* ---------- KPI kartlari ---------- */
+
+.ek-kpi {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid var(--ek-border);
+  border-radius: 8px;
+  background: var(--ek-card);
+  box-shadow: var(--ek-shadow);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  transition: border-color 0.15s ease;
+}
+
+button.ek-kpi {
+  cursor: pointer;
+}
+
+button.ek-kpi:hover {
+  border-color: color-mix(in srgb, var(--ek-subtle) 50%, transparent);
+}
+
+.ek-kpi--aktif,
+button.ek-kpi--aktif:hover {
+  border-color: var(--ek-brand);
+  background: color-mix(in srgb, var(--ek-brand-soft) 40%, var(--ek-card));
+}
+
+/* ---------- Aktif filtre cipleri ---------- */
+
+.ek-cip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border: 1px solid var(--ek-border);
+  border-radius: 6px;
+  background: var(--ek-card);
+  color: var(--ek-muted);
+  font-size: 11px;
+}
+
+.ek-cip button {
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--ek-subtle);
+  cursor: pointer;
+}
+
+.ek-cip button:hover {
+  color: var(--ek-fg);
+}
+
+/* ---------- Tablo ---------- */
+
+.ek-tablo .ant-table {
+  color: var(--ek-fg);
+}
+
+.ek-tablo .ant-table-thead > tr > th {
+  padding: 10px 12px !important;
+  background: var(--ek-card) !important;
+  border-bottom: 1px solid var(--ek-border) !important;
+  color: var(--ek-muted);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Kolon sinirlari yalnizca basligin uzerine gelince gorunur: genislik, sinirdaki tutamactan surulerek degisir. */
+.ek-tablo .ant-table-thead > tr > th::before {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.ek-tablo .ant-table-thead > tr:hover > th::before {
+  opacity: 1;
+}
+
+/* Yalnizca veri satirlari: antd'nin gizli olcum satiri (ant-table-measure-row) dolgu alirsa basligin altinda bosluk olusur. */
+.ek-tablo .ant-table-tbody > tr.ant-table-row > td {
+  padding: 10px 12px !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--ek-border) 70%, transparent);
+  font-size: 13px;
+}
+
+.ek-tablo .ant-table-tbody > tr.ant-table-row:hover > td,
+.ek-tablo .ant-table-tbody > tr.ant-table-row > td.ant-table-cell-row-hover {
+  background: var(--ek-accent) !important;
+}
+
+.ek-tablo .ant-table-tbody > tr.ant-table-row-selected > td {
+  background: color-mix(in srgb, var(--ek-brand-soft) 40%, var(--ek-card)) !important;
+}
+
+.ek-tablo .ant-table-tbody > tr.ant-table-row-selected > td.ant-table-cell-fix-left {
+  background: var(--ek-brand-soft) !important;
+}
+
+.ek-tablo .ant-table-tbody > tr.ant-table-row:last-child > td {
+  border-bottom: none;
+}
+
+.ek-sirala {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Siralama ikonu yalnizca gorunurken yer kaplar; boylece dar kolonda baslik bosuna kisalmaz. */
+.ek-sirala-ikon {
+  width: 0;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.ek-sirala:hover .ek-sirala-ikon,
+.ek-sirala:focus-visible .ek-sirala-ikon,
+.ek-sirala-ikon--aktif {
+  width: 14px;
+  margin-left: 6px;
+}
+
+.ek-sirala:hover .ek-sirala-ikon,
+.ek-sirala:focus-visible .ek-sirala-ikon {
+  opacity: 0.6;
+}
+
+.ek-sirala-ikon--aktif,
+.ek-sirala:hover .ek-sirala-ikon--aktif,
+.ek-sirala:focus-visible .ek-sirala-ikon--aktif {
+  color: var(--ek-fg);
+  opacity: 1;
+}
+
+/* Daraltilan kolonda baslik tasmaz, "..." ile kisalir. */
+.ek-baslik-metin {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ek-ekipman-btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ek-ekipman-btn:hover .ek-ekipman-kod {
+  text-decoration: underline;
+}
+
+/* ---------- Kartlar gorunumu ---------- */
+
+.ek-ekipman-karti {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  border: 1px solid var(--ek-border);
+  border-radius: 8px;
+  background: var(--ek-card);
+  box-shadow: var(--ek-shadow);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.ek-ekipman-karti:hover {
+  border-color: color-mix(in srgb, var(--ek-subtle) 50%, transparent);
+}
+
+.ek-ekipman-karti--secili,
+.ek-ekipman-karti--secili:hover {
+  border-color: var(--ek-brand);
+}
+
+.ek-ekipman-karti:focus-visible {
+  outline: 2px solid var(--ek-brand);
+  outline-offset: 1px;
+}
+
+/* ---------- Sayfalama ---------- */
+
+.ek-sayfa-btn {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ek-border);
+  border-radius: 6px;
+  background: var(--ek-card);
+  color: var(--ek-muted);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.ek-sayfa-btn:hover:not(:disabled) {
+  background: var(--ek-accent);
+}
+
+.ek-sayfa-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.ek-sayfa-btn--aktif,
+.ek-sayfa-btn--aktif:hover:not(:disabled) {
+  border-color: var(--ek-graphite);
+  background: var(--ek-graphite);
+  color: #ffffff;
+}
+
+/* ---------- Arac cubugu kontrolleri (tasarimda 36px yukseklik) ---------- */
+
+.ekipman-listesi .ek-arama.ant-input-affix-wrapper {
+  height: 36px;
+  font-size: 13px;
+}
+
+.ekipman-listesi .ek-kayit-durumu.ant-select-single {
+  height: 36px;
+  font-size: 13px;
+}
+
+.ekipman-listesi .ek-ekle .ant-btn {
+  height: 36px;
+  font-size: 13px;
+}
+
+/* Global filtre bilesenleri (LokasyonTablo, KodFilterSelectbox) degistirilmeden arac cubugu yuksekligine uyar. */
+.ekipman-listesi .ek-filtre-kontrolu .ant-input-affix-wrapper {
+  height: 36px;
+  font-size: 13px;
+}
+
+.ekipman-listesi .ek-filtre-kontrolu .ant-select-multiple .ant-select-selector {
+  min-height: 36px;
+  font-size: 13px;
+}
+
+/* ---------- Islem menuleri ---------- */
+
+.ek-islem-menusu .ant-dropdown-menu {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.ek-islem-menusu .ant-dropdown-menu-item {
+  align-items: flex-start !important;
+  padding: 8px !important;
+}
+
+.ek-islem-menusu .ant-dropdown-menu-item .ek-menu-ikon {
+  margin-top: 2px;
+  color: var(--ek-brand);
+}
+
+.ek-islem-menusu .ant-dropdown-menu-item-danger .ek-menu-ikon,
+.ek-islem-menusu .ant-dropdown-menu-item-danger:hover .ek-menu-ikon {
+  color: inherit;
+}
+
+.ek-islem-menusu .ant-dropdown-menu-item-group-title {
+  padding: 4px 8px !important;
+  color: var(--ek-subtle) !important;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+}
+
+.ek-islem-menusu .ek-menu-basligi > .ant-dropdown-menu-item-group-title {
+  padding: 6px 8px 2px !important;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: normal;
+}
+
+.ek-islem-menusu .ant-dropdown-menu-item-divider {
+  margin: 4px 0 !important;
+}
+
+/* ---------- Gorunum secici ---------- */
+
+.ek-gorunum-btn {
+  display: inline-flex;
+  height: 32px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 5px;
+  background: none;
+  color: var(--ek-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.ek-gorunum-btn:hover {
+  background: var(--ek-accent);
+  color: var(--ek-fg);
+}
+
+.ek-gorunum-btn--aktif,
+.ek-gorunum-btn--aktif:hover {
+  background: var(--ek-graphite);
+  color: #ffffff;
+}
+
+/* ---------- Modal ic bilesenleri ---------- */
+
+.ek-secim-bilgisi {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--ek-brand-border);
+  border-radius: 6px;
+  background: var(--ek-brand-soft);
+}
+
+.ek-segment {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--ek-border);
+  border-radius: 6px;
+  background: var(--ek-card);
+}
+
+.ek-segment button {
+  height: 28px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 5px;
+  background: none;
+  color: var(--ek-muted);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.ek-segment button:hover {
+  background: var(--ek-accent);
+}
+
+.ek-segment button.ek-segment--aktif {
+  background: var(--ek-graphite);
+  color: #ffffff;
+}
+
+/* ---------- Filtre cekmecesi (eski tasarim) ---------- */
+
+.ek-filtre-cekmecesi .ant-drawer-content-wrapper {
+  max-width: 100vw;
+}
+
+/* Satirdaki yuvarlak kapatma dugmesi; olculeri eski filtre cekmecesiyle ayni. */
+.ek-filtre-kapat {
+  display: flex;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: #80808048;
+  color: inherit;
+  cursor: pointer;
+}
+
+.ek-filtre-kapat svg {
+  width: 10px;
+  height: 10px;
+}

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import { Button, Modal, Input, Typography, Tabs, message, Spin } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import AxiosInstance from "../../../../../../../api/http";
@@ -9,9 +10,11 @@ import dayjs from "dayjs";
 const { Text, Link } = Typography;
 const { TextArea } = Input;
 
-export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID }) {
+// open/onClose verilirse modal disaridan (Ekipman Listesi islem menusu) acilir ve kendi dugmesi gosterilmez.
+export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID, open, onClose }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const kontrollu = open !== undefined;
   const methods = useForm({
     defaultValues: {
       rolTanim: "",
@@ -49,6 +52,7 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
           message.success("Ekleme Başarılı.");
           reset();
           setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
+          onClose?.();
           onRefresh();
         } else if (response.status_code === 401) {
           message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
@@ -66,6 +70,10 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
   };
 
   const handleModalToggle = () => {
+    if (kontrollu) {
+      onClose?.();
+      return;
+    }
     setIsModalVisible((prev) => !prev);
     if (!isModalVisible) {
       reset();
@@ -75,16 +83,28 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     }
   };
 
+  useEffect(() => {
+    if (!kontrollu) return;
+    setIsModalVisible(open);
+    if (open) {
+      reset();
+      setValue("tarih", dayjs());
+      setValue("saat", dayjs());
+    }
+  }, [kontrollu, open, reset, setValue]);
+
   // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi sonu
 
   return (
     <FormProvider {...methods}>
       <div>
-        <div style={{ display: "flex", width: "100%", justifyContent: "flex-end" }}>
-          <Button style={{ paddingLeft: "0px" }} type="submit" onClick={handleModalToggle}>
-            Toplu Lokasyon Düzenle
-          </Button>
-        </div>
+        {!kontrollu && (
+          <div style={{ display: "flex", width: "100%", justifyContent: "flex-end" }}>
+            <Button style={{ paddingLeft: "0px" }} type="submit" onClick={handleModalToggle}>
+              Toplu Lokasyon Düzenle
+            </Button>
+          </div>
+        )}
 
         <Modal width="800px" title="Toplu Lokasyon Değişimi" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
           {loading ? (
@@ -101,3 +121,12 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
     </FormProvider>
   );
 }
+
+CreateModal.propTypes = {
+  workshopSelectedId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  onSubmit: PropTypes.func,
+  onRefresh: PropTypes.func,
+  secilenIsEmriID: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  open: PropTypes.bool,
+  onClose: PropTypes.func,
+};
