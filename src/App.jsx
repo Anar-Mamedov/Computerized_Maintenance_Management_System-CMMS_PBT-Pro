@@ -350,7 +350,8 @@ const BaseLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileView, setMobileView] = useState(window.innerWidth < 768);
   const location = useLocation();
-  const layoutExcludedPaths = ["/isEmri1"];
+  // Bu rotalarda icerik sarmalayicisi beyaz zemin ve padding vermez; Ekipman Listesi (/makine) kendi kartlarini cizer.
+  const layoutExcludedPaths = ["/isEmri1", "/makine"];
   const isLayoutExcluded = layoutExcludedPaths.includes(location.pathname);
   const hasFixedDashboardHeader = location.pathname === "/omegaDash";
   // Dashboard ekraninda breadcrumb gosterilmez; bosalan alani icerik kaplar.

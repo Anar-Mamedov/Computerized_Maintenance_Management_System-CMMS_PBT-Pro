@@ -51,6 +51,7 @@ async function loadAppModules() {
       contents: `
         export { buildTargetUrl, isNavigableTarget } from "./src/pages/Dashboard1/components/navigation.js";
         export { readDashboardFilterParams, mergeDashboardFilters } from "./src/utils/dashboardFilterParams.js";
+        export { dashboardFiltreleriniCevir, listeGovdesiOlustur } from "./src/pages/MakineEkipman/MakineTanim/EkipmanListesi/listeIstegi.js";
       `,
       resolveDir: process.cwd(),
       sourcefile: "conformance-entry.js",
@@ -116,24 +117,22 @@ const SCREEN_MODELS = {
     body: merge(IS_TALEP_MOUNT_FILTERS, filters),
   }),
 
-  // src/pages/MakineEkipman/MakineTanim/Table/Table.jsx
-  makine: ({ filters, isAktif }, merge) => {
-    const { atolyeler, ...rest } = filters;
-    const normalized = atolyeler?.length ? { ...rest, atolye: atolyeler } : rest;
-
-    return {
-      method: "POST",
-      endpoint: "GetMakineFullList",
-      query: {
-        parametre: "",
-        pagingDeger: 1,
-        pageSize: 20,
-        // body.isActive query'ye taşınıyor; URL'de isAktif yoksa ekranın varsayılanı 1.
-        isAktif: isAktif === 0 || isAktif === 1 ? isAktif : 1,
-      },
-      body: merge({}, normalized),
-    };
-  },
+  // src/pages/MakineEkipman/MakineTanim/EkipmanListesi — govde ekranin kullandigi fonksiyonlarla kurulur
+  // (listeIstegi.js); model ayri bir kopya tutmaz.
+  makine: ({ filters, isAktif }, merge, { dashboardFiltreleriniCevir, listeGovdesiOlustur }) => ({
+    method: "POST",
+    endpoint: "GetEkipmanFullList",
+    query: {},
+    body: listeGovdesiOlustur({
+      filtreler: dashboardFiltreleriniCevir(filters),
+      arama: "",
+      // URL'de isAktif yoksa ekranin varsayilani 1.
+      isAktif: isAktif === 0 || isAktif === 1 ? isAktif : 1,
+      siralama: { field: "MKN_KOD", order: "ASC" },
+      sayfa: 1,
+      sayfaBoyutu: 20,
+    }),
+  }),
 
   // src/pages/BakımVeArizaYonetimi/OtomatikIsEmrileri/TarihBazliPeriyodikBakim/Table/Table.jsx
   "otomatik-is-emirleri": ({ filters }) => {
@@ -270,10 +269,12 @@ const DOC_CASES = [
     expect: { endpoint: "GetIsEmriFullList", pageSize: 10,
       body: { prosedurtipleri: [1], makineler: [42], lokasyonlar: [1, 5], atolyeler: [3], customfilter: DASHBOARD_TARIH } } },
 
+  // Makine hedefleri Ekipman Listesi rehberiyle GetEkipmanFullList'e tasindi; alan adlari o rehbere gore.
+  // Ekipman ID filtresi rehberde yok; swagger'daki EkipmanFiltreModel.EkipmanIds alanina gider.
   { no: 17, bolum: "7 · Top Ekipman", baslik: "Ekipmanı makine sayfasında açma", target: "makine",
     widget: { makineler: [42] },
-    expect: { endpoint: "GetMakineFullList", pageSize: 10,
-      body: { makineler: [42] } } },
+    expect: { endpoint: "GetEkipmanFullList", pageSize: 10,
+      body: { ekipmanIds: [42] } } },
 
   // --- BÖLÜM 8: Tekrarlayan arızalar
   // Widget kendi dönem seçicisini (Son 90 Gün vb.) hedefe taşır; örnekte 01.06-31.08 varsayıldı.
@@ -320,18 +321,18 @@ const DOC_CASES = [
   // --- BÖLÜM 12: Envanter dağılımı
   { no: 23, options: ANLIK, bolum: "12 · Envanter", baslik: "Aktif ekipmanlar", target: "makine",
     widget: { isAktif: 1, makinetip: [5] },
-    expect: { endpoint: "GetMakineFullList", pageSize: 10,
-      body: { isAktif: 1, makinetip: [5], lokasyonlar: [1, 5], atolye: [3] } } },
+    expect: { endpoint: "GetEkipmanFullList", pageSize: 10,
+      body: { isAktif: 1, makineTipIds: [5], lokasyonIds: [1, 5], atolyeIds: [3] } } },
 
   { no: 24, options: ANLIK, bolum: "12 · Envanter", baslik: "Arızalı ekipmanlar", target: "makine",
     widget: { isAktif: 1, arizali: true, makinetip: [5] },
-    expect: { endpoint: "GetMakineFullList", pageSize: 10,
-      body: { isAktif: 1, arizali: true, makinetip: [5], lokasyonlar: [1, 5], atolye: [3] } } },
+    expect: { endpoint: "GetEkipmanFullList", pageSize: 10,
+      body: { isAktif: 1, arizali: true, makineTipIds: [5], lokasyonIds: [1, 5], atolyeIds: [3] } } },
 
   { no: 25, options: ANLIK, bolum: "12 · Envanter", baslik: "Pasif ekipmanlar", target: "makine",
     widget: { isAktif: 0, makinetip: [5] },
-    expect: { endpoint: "GetMakineFullList", pageSize: 10,
-      body: { isAktif: 0, makinetip: [5], lokasyonlar: [1, 5], atolye: [3] } } },
+    expect: { endpoint: "GetEkipmanFullList", pageSize: 10,
+      body: { isAktif: 0, makineTipIds: [5], lokasyonIds: [1, 5], atolyeIds: [3] } } },
 
   // --- BÖLÜM 13: Performans özeti
   { no: 26, options: ANLIK, bolum: "13 · Performans Özeti", baslik: "Geciken periyodik bakım kutusu", target: "otomatik-is-emirleri",
@@ -380,6 +381,9 @@ function checkField(field, expectedValue, actual) {
   };
 }
 
+// Govdede giden ama filtre olmayan istek alanlari (sayfalama, siralama, KPI); "ek alan" sayilmaz.
+const ISTEK_ALANLARI = new Set(["page", "pageSize", "parametre", "sortField", "sortOrder", "includeKpi"]);
+
 function runCase(testCase, modules) {
   const { buildTargetUrl, readDashboardFilterParams, mergeDashboardFilters } = modules;
 
@@ -401,7 +405,7 @@ function runCase(testCase, modules) {
   }
 
   const parsed = readDashboardFilterParams(search);
-  const actual = SCREEN_MODELS[testCase.target](parsed, mergeDashboardFilters);
+  const actual = SCREEN_MODELS[testCase.target](parsed, mergeDashboardFilters, modules);
 
   const notes = [];
   const fields = [];
@@ -425,7 +429,7 @@ function runCase(testCase, modules) {
   const expectedFields = new Set([...Object.keys(testCase.expect.body || {}), ...Object.keys(testCase.expect.query || {})]);
   const extras = Object.entries(actual.body || {})
     .filter(([field, value]) => {
-      if (expectedFields.has(field)) return false;
+      if (expectedFields.has(field) || ISTEK_ALANLARI.has(field)) return false;
       if (value === null || value === undefined) return false;
       if (Array.isArray(value)) return value.length > 0;
       if (typeof value === "object") return Object.keys(value).length > 0;

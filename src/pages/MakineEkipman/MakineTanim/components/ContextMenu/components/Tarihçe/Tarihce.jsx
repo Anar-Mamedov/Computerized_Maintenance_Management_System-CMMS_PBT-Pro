@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import PropTypes from "prop-types";
 import { Button, Modal, Select, Typography } from "antd";
 import { BarChartOutlined, DollarOutlined, FileTextOutlined, InboxOutlined, TeamOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -38,15 +39,21 @@ const TIME_RANGE_OPTIONS = [
   { value: "gecenYil", labelKey: "timeRange.gecenYil" },
 ];
 
-export default function TarihceTablo({ selectedRows = [] }) {
+// open/onClose verilirse modal disaridan (Ekipman Listesi islem menusu) acilir ve kendi dugmesi gosterilmez.
+export default function TarihceTablo({ selectedRows = [], open, onClose }) {
   const { t, i18n } = useTranslation();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [activeTab, setActiveTab] = useState(TAB_ITEMS[0].key);
   const [timeRange, setTimeRange] = useState("son3Ay");
   const [generalInfo, setGeneralInfo] = useState(null);
+  const kontrollu = open !== undefined;
 
   const selectedMachine = selectedRows[0] || {};
   const makineId = selectedMachine.TB_MAKINE_ID || selectedMachine.MKN_ID || selectedMachine.MakineId;
+
+  useEffect(() => {
+    if (kontrollu) setIsModalVisible(open);
+  }, [kontrollu, open]);
 
   useEffect(() => {
     if (isModalVisible) {
@@ -56,10 +63,18 @@ export default function TarihceTablo({ selectedRows = [] }) {
   }, [isModalVisible]);
 
   const handleModalToggle = () => {
+    if (kontrollu) {
+      onClose?.();
+      return;
+    }
     setIsModalVisible((prev) => !prev);
   };
 
   const handleModalOk = () => {
+    if (kontrollu) {
+      onClose?.();
+      return;
+    }
     setIsModalVisible(false);
   };
 
@@ -158,9 +173,11 @@ export default function TarihceTablo({ selectedRows = [] }) {
 
   return (
     <div>
-      <Button style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }} onClick={handleModalToggle} type="text">
-        {t("tarihce")}
-      </Button>
+      {!kontrollu && (
+        <Button style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }} onClick={handleModalToggle} type="text">
+          {t("tarihce")}
+        </Button>
+      )}
       <Modal
         width={1600}
         centered
@@ -286,6 +303,12 @@ export default function TarihceTablo({ selectedRows = [] }) {
     </div>
   );
 }
+
+TarihceTablo.propTypes = {
+  selectedRows: PropTypes.arrayOf(PropTypes.object),
+  open: PropTypes.bool,
+  onClose: PropTypes.func,
+};
 
 function InfoBox({ label, value }) {
   const safeValue = value || "-";

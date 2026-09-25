@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import { useForm, FormProvider } from "react-hook-form";
 import { Button, Drawer, Space, ConfigProvider, Modal, message, Alert, Spin } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
@@ -9,9 +10,16 @@ import SecondTabs from "./components/SecondTabs/SecondTabs";
 import Footer from "../Footer";
 import dayjs from "dayjs";
 
-export default function CreateDrawer({ onRefresh, onOpenEdit }) {
+// acik/onKapat verilirse cekmece baska bir ekrandan (ör. Ekipman Listesi) kontrollu acilir ve kendi "Ekle" dugmesi gosterilmez.
+// varsayilanDegerler: acilista forma yazilacak alanlar (ör. secili makine ve lokasyonu).
+export default function CreateDrawer({ onRefresh, onOpenEdit, acik, onKapat, varsayilanDegerler }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const kontrollu = acik !== undefined;
+
+  useEffect(() => {
+    if (kontrollu) setOpen(acik);
+  }, [kontrollu, acik]);
   const [disabled, setDisabled] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [addButtonStatus, setAddButtonStatus] = useState(false);
@@ -123,6 +131,12 @@ export default function CreateDrawer({ onRefresh, onOpenEdit }) {
   });
 
   const { setValue, reset, watch } = methods;
+
+  useEffect(() => {
+    if (open && varsayilanDegerler) {
+      Object.entries(varsayilanDegerler).forEach(([alan, deger]) => setValue(alan, deger));
+    }
+  }, [open, varsayilanDegerler, setValue]);
 
   const isEmriNo = watch("isEmriNo");
 
@@ -375,6 +389,7 @@ export default function CreateDrawer({ onRefresh, onOpenEdit }) {
         if (response.status_code === 200 || response.status_code === 201) {
           message.success("İşlem Başarılı.");
           setOpen(false);
+          onKapat?.();
           onRefresh?.();
           methods.reset();
           if (response?.id && onOpenEdit) {
@@ -414,6 +429,7 @@ export default function CreateDrawer({ onRefresh, onOpenEdit }) {
       onOk: () => {
         setOpen(false);
         methods.reset();
+        onKapat?.();
       },
     });
   };
@@ -421,10 +437,12 @@ export default function CreateDrawer({ onRefresh, onOpenEdit }) {
   return (
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
-        <Button type="primary" onClick={showDrawer} style={{ display: "flex", alignItems: "center" }}>
-          <PlusOutlined />
-          Ekle
-        </Button>
+        {!kontrollu && (
+          <Button type="primary" onClick={showDrawer} style={{ display: "flex", alignItems: "center" }}>
+            <PlusOutlined />
+            Ekle
+          </Button>
+        )}
         <Drawer
           width="1500px"
           title={
@@ -485,3 +503,11 @@ export default function CreateDrawer({ onRefresh, onOpenEdit }) {
     </FormProvider>
   );
 }
+
+CreateDrawer.propTypes = {
+  onRefresh: PropTypes.func,
+  onOpenEdit: PropTypes.func,
+  acik: PropTypes.bool,
+  onKapat: PropTypes.func,
+  varsayilanDegerler: PropTypes.object,
+};
