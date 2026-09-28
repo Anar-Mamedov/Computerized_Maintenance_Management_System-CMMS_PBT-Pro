@@ -704,8 +704,31 @@ const MenuWrapper = ({ collapsed }) => {
   const cleanedItems = cleanItemsForMenu(filteredMenuItems);
 
   return (
-    <div style={{ height: "calc(100vh - 115px)", overflow: "auto" }}>
+    <div className="sidebar-menu-container" style={{ height: "calc(100vh - 115px)", overflow: "auto" }}>
       <style>{`
+        /* Menu kaydirma cubugu ince ve gizlidir; fare menu alanina gelince gorunur (ATS ile ayni). */
+        .sidebar-menu-container {
+          scrollbar-width: thin;
+          scrollbar-color: transparent transparent;
+          transition: scrollbar-color 0.2s ease;
+        }
+        .sidebar-menu-container:hover {
+          scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+        }
+        .sidebar-menu-container::-webkit-scrollbar {
+          width: 6px;
+        }
+        .sidebar-menu-container::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .sidebar-menu-container::-webkit-scrollbar-thumb {
+          background-color: transparent;
+          border-radius: 3px;
+          transition: background-color 0.2s ease;
+        }
+        .sidebar-menu-container:hover::-webkit-scrollbar-thumb {
+          background-color: rgba(148, 163, 184, 0.35);
+        }
         .sidebar-menu-search input::placeholder {
           color: rgba(255, 255, 255, 0.45) !important;
           opacity: 1;
