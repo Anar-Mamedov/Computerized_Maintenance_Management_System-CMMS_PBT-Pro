@@ -78,7 +78,8 @@ EkipmanKarti.propTypes = {
 
 /**
  * Kartlar gorunumu; secim ve islemler liste gorunumuyle ortaktir.
- * `govdeKayar` iken yalnizca kart izgarasi kendi icinde kayar.
+ * `govdeKayar` iken yalnizca kart izgarasi kendi icinde kayar. Izgaranin esnek tabani 0px'tir (flex-1'deki 0% degil);
+ * boylece liste kartinin asgari yuksekligi izgaranin icerigine gore buyumez, izgara tamamen kaybolana kadar kuculur.
  */
 export default function EkipmanKartlari({ satirlar, yukleniyor, seciliAnahtarlar, onSecimDegistir, onDetay, onIslem, govdeKayar }) {
   const { t } = useTranslation();
@@ -88,7 +89,7 @@ export default function EkipmanKartlari({ satirlar, yukleniyor, seciliAnahtarlar
   };
 
   return (
-    <div className={govdeKayar ? "min-h-0 flex-1 overflow-y-auto overscroll-contain" : ""}>
+    <div className={govdeKayar ? "min-h-0 grow basis-0 overflow-y-auto overscroll-contain" : ""}>
       <Spin spinning={yukleniyor}>
         {satirlar.length === 0 ? (
           <div className="py-10">

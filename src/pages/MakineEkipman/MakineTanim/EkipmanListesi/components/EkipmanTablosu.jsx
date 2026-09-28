@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { Empty, Table } from "antd";
 import { useTranslation } from "react-i18next";
@@ -79,7 +79,7 @@ const hucreIcerigi = (kolon, satir, onDetay, dil) => {
 
 const TABLO_BILESENLERI = { header: { cell: BoyutlanabilirBaslik } };
 const SECIM_KOLONU_GENISLIGI = 40;
-// Tablo alaninin esnek tabani; kartta daha fazla yer varsa buyur, azsa kuculur.
+// Ilk olcume kadar kullanilan tahmini tablo alani yuksekligi; sonra alan kartta kalan boslugu doldurur.
 const DOGAL_TABLO_YUKSEKLIGI = 480;
 
 /**
@@ -92,7 +92,44 @@ export default function EkipmanTablosu({ satirlar, yukleniyor, seciliAnahtarlar,
   const { t, i18n } = useTranslation();
   // Sag tiklanan satir; menu yalnizca bir satir uzerinde acilir.
   const [menuSatiri, setMenuSatiri] = useState(null);
-  const { containerRef, scrollY, wrapperStyle } = useAutoTableScroll(DOGAL_TABLO_YUKSEKLIGI);
+  // Hook govdeyi kutuya tam sigdirir (asgari 0); alt sinir asagidaki asgari yukseklikten gelir.
+  const { containerRef, scrollY, wrapperStyle } = useAutoTableScroll(DOGAL_TABLO_YUKSEKLIGI, 0);
+  const tabloKutusu = useRef(null);
+  const [asgariYukseklik, setAsgariYukseklik] = useState(0);
+
+  // Hook'un olctugu kutu, asgari yuksekligi olcmek icin burada da tutulur. Ref Dropdown'in dogrudan cocuguna verilmez:
+  // Dropdown ref'leri birlestirirken (rc-util useComposeRef) sonradan eklenen ya da degisen ref'i baglamayabilir.
+  const tabloKutusuRef = useCallback(
+    (node) => {
+      tabloKutusu.current = node;
+      containerRef(node);
+    },
+    [containerRef]
+  );
+
+  // Ekran kisaldikca tablo, baslik + ilk iki satir (varsa yatay kaydirma cubuguyla) gorunene kadar kuculur;
+  // daha kisa ekranda sayfa kayar. Satirlar, kolonlar ya da kutunun boyutu degisince yeniden olculur.
+  useLayoutEffect(() => {
+    const kutu = tabloKutusu.current;
+    if (!kutu) return undefined;
+
+    const olc = () => {
+      const baslik = kutu.querySelector(".ant-table-thead")?.offsetHeight ?? 0;
+      const govde = kutu.querySelector(".ant-table-body");
+      const yatayCubuk = govde ? govde.offsetHeight - govde.clientHeight : 0;
+      // Veri yoksa "kayit bulunamadi" satiri olculur.
+      const ilkIkiSatir = [...kutu.querySelectorAll(".ant-table-tbody > tr:not(.ant-table-measure-row)")].slice(0, 2);
+      setAsgariYukseklik(ilkIkiSatir.reduce((toplam, satir) => toplam + satir.offsetHeight, baslik + yatayCubuk));
+    };
+
+    olc();
+    const gozlemci = new ResizeObserver(olc);
+    gozlemci.observe(kutu);
+    return () => gozlemci.disconnect();
+  }, [satirlar, gorunurKolonlar, govdeKayar]);
+
+  // Esnek taban 0: kartin asgari yuksekligi dogal yukseklikten degil, bu asgari yukseklik + sayfalamadan olusur.
+  const alanStili = { ...wrapperStyle, flexBasis: 0, minHeight: asgariYukseklik };
 
   const kolonlar = useMemo(
     () =>
@@ -156,8 +193,8 @@ export default function EkipmanTablosu({ satirlar, yukleniyor, seciliAnahtarlar,
       onIslem={onIslem}
     >
       {govdeKayar ? (
-        <div style={wrapperStyle}>
-          <div ref={containerRef} style={TABLE_FILL_INNER}>
+        <div style={alanStili}>
+          <div ref={tabloKutusuRef} style={TABLE_FILL_INNER}>
             {tablo}
           </div>
         </div>

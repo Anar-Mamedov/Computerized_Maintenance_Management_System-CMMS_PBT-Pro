@@ -48,8 +48,8 @@
 
 /*
  * Genis ekran: baslik, KPI ve arac cubugu sabit kalir; yalnizca tablo govdesi (ya da kart izgarasi) kayar.
- * Liste kartinin asgari yuksekligi ~5 satirlik govdeyi korur; ekran bundan kisaysa sayfa yalnizca
- * aradaki fark kadar kayar (kaydirma cubugu yeri sabit tutulur, tablo olculeri bozulmasin).
+ * Ekran kisaldikca liste karti, tabloda baslik + iki satir kalana kadar kuculur (Kartlar'da izgara sifira kadar).
+ * Daha kisa ekranda sayfa kayar (kaydirma cubugu yeri sabit tutulur, tablo olculeri bozulmasin).
  */
 .ekipman-listesi--sabit {
   overflow-y: auto;
@@ -63,7 +63,6 @@
 
 .ekipman-listesi--sabit > .ek-liste-karti {
   display: flex;
-  min-height: 420px;
   flex: 1 1 auto;
   flex-direction: column;
 }

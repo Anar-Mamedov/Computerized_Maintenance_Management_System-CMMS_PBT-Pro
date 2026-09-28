@@ -63,14 +63,14 @@ export const rawItems = [
     "bakim&ariza",
     <ToolOutlined />,
     [
-      getItem("Bakım Planları", "bakimTanimlari", true, undefined, true, "KLL_WEB_BAKIM"),
-      getItem("Arıza Kodları", "arizaTanimlari", true, undefined, true, "KLL_WEB_ARIZA"),
-      getItem("Bakım İş Emirleri", "isEmri1", true, undefined, true, "KLL_WEB_ISEMRI"),
+      getItem("Bakım Tanımları", "bakimTanimlari", true, undefined, true, "KLL_WEB_BAKIM"),
+      getItem("Arıza Tanımları", "arizaTanimlari", true, undefined, true, "KLL_WEB_ARIZA"),
       getItem("Periyodik Bakımlar", "periyodikBakimlar", true, undefined, true, "KLL_WEB_PBAKIM"),
       getItem("İş Talepleri", "isTalepleri", true, undefined, true, "KLL_ISTALEBI_KUL"),
+      getItem("İş Emirleri", "isEmri1", true, undefined, true, "KLL_WEB_ISEMRI"),
       getItem("Otomatik İş Emirleri", "otomatikIsEmirleri", true, undefined, true, "KLL_WEB_OTOIS"),
       getItem("Planlama Takvimi", "planlamaTakvimi", true, undefined, true, "KLL_WEB_PTAKVIM"),
-      getItem("İş Emirleri Kontrol Ekranı", "isEmriAnalizi", true, undefined, true, "KLL_WEB_ISEMRI"),
+      getItem("İş Emirleri Kontrolü", "isEmriAnalizi", true, undefined, true, "KLL_WEB_ISEMRI"),
     ],
     false
   ),

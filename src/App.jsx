@@ -353,6 +353,8 @@ const BaseLayout = () => {
   // Bu rotalarda icerik sarmalayicisi beyaz zemin ve padding vermez; Ekipman Listesi (/makine) kendi kartlarini cizer.
   const layoutExcludedPaths = ["/isEmri1", "/makine"];
   const isLayoutExcluded = layoutExcludedPaths.includes(location.pathname);
+  // Ekipman Listesi kisa pencerede kendi icinde kayar; sarmalayici 360px'te kalirsa footer ekranin disina itilir.
+  const isEkipmanListesi = location.pathname === "/makine";
   const hasFixedDashboardHeader = location.pathname === "/omegaDash";
   // Dashboard ekraninda breadcrumb gosterilmez; bosalan alani icerik kaplar.
   const isDashboardRoute = location.pathname === "/";
@@ -529,7 +531,7 @@ const BaseLayout = () => {
                   // Dashboard rotasinda alt padding yoktur; widget listesi footer'a bitisik biter.
                   padding: isLayoutExcluded ? 0 : isDashboardRoute ? (mobileView ? "12px 0px 0" : "12px 8px 0") : mobileView ? "24px 0px" : 24,
                   borderRadius: isLayoutExcluded ? 0 : "16px",
-                  minHeight: 360,
+                  minHeight: isEkipmanListesi ? 0 : 360,
                   // Bu yukseklik sabit kalmali: MainDashboard kokundeki height:100% ve onun altindaki
                   // kaydirma alani yuzde zinciriyle buradan beslenir, kaldirilirsa liste kaydirilamaz olur.
                   // Dashboard'da 100px kullanilir; Header (64px) + Footer (42px) toplamindan bilerek 6px azdir,
