@@ -12,8 +12,15 @@ import AxiosInstance from "../../../../api/http.jsx";
 import SecondTabs from "./components/SecondTabs/SecondTabs.jsx";
 // import SecondTabs from "./components/secondTabs/secondTabs";
 
-export default function CreateModal({ selectedLokasyonId, onRefresh }) {
+// acik/onKapat verilirse modal baska bir ekrandan (ör. Ekipman Karti > Durus Baslat) kontrollu acilir ve kendi "Ekle" dugmesi gosterilmez.
+// varsayilanMakineler: acilista durus listesine eklenecek makineler (FisIcerigi satir bicimi).
+export default function CreateModal({ selectedLokasyonId, onRefresh, acik, onKapat, varsayilanMakineler }) {
   const [open, setOpen] = useState(false);
+  const kontrollu = acik !== undefined;
+
+  useEffect(() => {
+    if (kontrollu) setOpen(acik);
+  }, [kontrollu, acik]);
 
   const showModal = () => {
     setOpen(true);
@@ -23,10 +30,10 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
     if (open) {
       // Reset the fisIcerigi with a timeout to avoid focus errors
       setTimeout(() => {
-        setValue("fisIcerigi", []);
+        setValue("fisIcerigi", varsayilanMakineler ?? []);
       }, 0);
     }
-  }, [open]);
+  }, [open, varsayilanMakineler]);
 
   const onClose = () => {
     Modal.confirm({
@@ -37,6 +44,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
       onOk: () => {
         // First close the modal to avoid focus errors
         setOpen(false);
+        onKapat?.();
 
         // Then reset the form with a slight delay
         setTimeout(() => {
@@ -128,6 +136,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
 
           // First close the modal to avoid focus errors
           setOpen(false);
+          onKapat?.();
           onRefresh();
 
           // Then reset the form with a slight delay
@@ -178,17 +187,19 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
   return (
     <FormProvider {...methods}>
       <ConfigProvider locale={tr_TR}>
-        <Button
-          type="primary"
-          onClick={showModal}
-          style={{
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <PlusOutlined />
-          {t("ekle")}
-        </Button>
+        {!kontrollu && (
+          <Button
+            type="primary"
+            onClick={showModal}
+            style={{
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <PlusOutlined />
+            {t("ekle")}
+          </Button>
+        )}
         <Modal
           width="710px"
           centered
@@ -225,3 +236,11 @@ export default function CreateModal({ selectedLokasyonId, onRefresh }) {
     </FormProvider>
   );
 }
+
+CreateModal.propTypes = {
+  selectedLokasyonId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  onRefresh: PropTypes.func,
+  acik: PropTypes.bool,
+  onKapat: PropTypes.func,
+  varsayilanMakineler: PropTypes.arrayOf(PropTypes.object),
+};

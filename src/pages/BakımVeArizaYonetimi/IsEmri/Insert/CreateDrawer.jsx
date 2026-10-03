@@ -194,8 +194,9 @@ export default function CreateDrawer({ onRefresh, onOpenEdit, acik, onKapat, var
         try {
           const response = await AxiosInstance.get(`IsEmriTip`);
 
-          // "IMT_VARSAYILAN": true olan objeyi bul
-          const defaultItem = response.find((item) => item.IMT_VARSAYILAN === true);
+          // Disaridan tip verildiyse (ör. Ekipman Karti > Ariza Bildir) o tip, yoksa "IMT_VARSAYILAN": true olan tip secilir
+          const istenenTipId = varsayilanDegerler?.isEmriTipiID;
+          const defaultItem = response.find((item) => (istenenTipId ? item.TB_ISEMRI_TIP_ID === istenenTipId : item.IMT_VARSAYILAN === true));
 
           if (defaultItem) {
             setValue("prosedurTab", defaultItem.IMT_CAGRILACAK_PROSEDUR);
@@ -243,7 +244,7 @@ export default function CreateDrawer({ onRefresh, onOpenEdit, acik, onKapat, var
     };
 
     handleDefaultRequirementsFetch();
-  }, [open, setValue, methods.reset]);
+  }, [open, setValue, methods.reset, varsayilanDegerler]);
 
   // iş emri tipine göre zorunlu alanları belirleme son
 

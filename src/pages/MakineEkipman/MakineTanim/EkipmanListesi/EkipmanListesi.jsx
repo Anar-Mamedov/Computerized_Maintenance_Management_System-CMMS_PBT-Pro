@@ -10,7 +10,7 @@ import EkipmanKartlari from "./components/EkipmanKartlari";
 import Sayfalama from "./components/Sayfalama";
 import KolonAyarlari from "./components/KolonAyarlari";
 import IslemModallari from "./components/islemler/IslemModallari";
-import EditDrawer from "../EditDrawer";
+import EkipmanKarti from "./EkipmanKarti/EkipmanKarti";
 import QRCodeGenerator from "../../../../utils/components/QRCodeGenerator";
 import useEkipmanListesi from "./useEkipmanListesi";
 import useFiltreSecenekleri from "./useFiltreSecenekleri";
@@ -59,9 +59,6 @@ export default function EkipmanListesi() {
   }, [satirlar]);
 
   const seciliSatirlar = useMemo(() => satirlar.filter((satir) => seciliAnahtarlar.includes(satir.clientKey)), [satirlar, seciliAnahtarlar]);
-
-  // EditDrawer ekipman ID'sini `key` alanindan okur; nesne her render'da yeniden olusmasin diye sabitlenir.
-  const detayKaydi = useMemo(() => (detaySatiri ? { ...detaySatiri, key: detaySatiri.TB_MAKINE_ID } : null), [detaySatiri]);
 
   const gorunumuDegistir = (yeniGorunum) => {
     setGorunum(yeniGorunum);
@@ -179,7 +176,7 @@ export default function EkipmanListesi() {
         onKapat={() => setKolonAyarlariAcik(false)}
       />
       <IslemModallari aktifIslem={aktifIslem} onKapat={() => setAktifIslem(null)} onTamamlandi={islemTamamlandi} />
-      <EditDrawer selectedRow={detayKaydi} drawerVisible={Boolean(detayKaydi)} onDrawerClose={() => setDetaySatiri(null)} onRefresh={yenile} />
+      <EkipmanKarti makineId={detaySatiri?.TB_MAKINE_ID ?? null} acik={Boolean(detaySatiri)} onKapat={() => setDetaySatiri(null)} onKaydedildi={yenile} />
       <QRCodeGenerator
         visible={Boolean(qrSatiri)}
         onClose={() => setQrSatiri(null)}
