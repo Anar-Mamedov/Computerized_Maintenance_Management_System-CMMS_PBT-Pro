@@ -31,6 +31,10 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled, h
       makineDurumu: null,
       makineDurumuID: "",
       aciklama: "",
+      kokNeden: null,
+      kokNedenID: "",
+      yapilanIslem: "",
+      tekrariOnleyiciFaaliyet: "",
 
       // Add other default values here
     },

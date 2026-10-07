@@ -2,6 +2,8 @@ import React from "react";
 import { Tabs, Input, Typography } from "antd";
 import styled from "styled-components";
 import { useFormContext, Controller } from "react-hook-form";
+import { t } from "i18next";
+import CozumKokNeden from "./CozumKokNeden";
 
 const { TextArea } = Input;
 const { Text, Link } = Typography;
@@ -61,8 +63,8 @@ export default function SecondTabs({ refreshKey, disabled }) {
     },
     {
       key: "2",
-      label: "Çözüm Bilgisi",
-      children: "Çözüm Bilgisi",
+      label: t("isEmriKapatma.cozumVeKokNeden"),
+      children: <CozumKokNeden />,
     },
   ];
 
