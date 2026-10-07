@@ -744,7 +744,7 @@
   "ekipmanListesi.islemler.lokasyonDegistirAciklama": "Массово меняет локацию выбранного оборудования.",
   "ekipmanListesi.islemler.sigorta": "Страховые записи",
   "ekipmanListesi.islemler.sigortaAciklama": "Показывает полисы и даты продления.",
-  "ekipmanListesi.islemler.tarihce": "История машины",
+  "ekipmanListesi.islemler.tarihce": "История оборудования",
   "ekipmanListesi.islemler.tarihceAciklama": "Показывает историю нарядов, материалов и затрат.",
   "ekipmanListesi.islemler.sil": "Удалить",
   "ekipmanListesi.islemler.silAciklama": "Удаляет выбранное оборудование.",

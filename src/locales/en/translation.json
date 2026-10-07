@@ -747,7 +747,7 @@
   "ekipmanListesi.islemler.lokasyonDegistirAciklama": "Changes the location of the selected equipment in bulk.",
   "ekipmanListesi.islemler.sigorta": "Insurance Records",
   "ekipmanListesi.islemler.sigortaAciklama": "Shows policies and renewal dates.",
-  "ekipmanListesi.islemler.tarihce": "Machine History",
+  "ekipmanListesi.islemler.tarihce": "Equipment History",
   "ekipmanListesi.islemler.tarihceAciklama": "Shows work order, material and cost history.",
   "ekipmanListesi.islemler.sil": "Delete",
   "ekipmanListesi.islemler.silAciklama": "Deletes the selected equipment.",
