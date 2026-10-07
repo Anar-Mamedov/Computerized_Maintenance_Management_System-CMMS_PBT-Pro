@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { Button, Checkbox, Form, Input, InputNumber, message, Modal, Table } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
@@ -44,14 +44,17 @@ const normalizeMaterial = (item, index) => {
 };
 
 export default function CreateModal({ kapali, onRefresh, secilenIsEmriID, triggerButtonText, triggerButtonType = "link", triggerButtonClassName, triggerContainerClassName }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isMaterialModalVisible, setIsMaterialModalVisible] = useState(false);
   const [form, setForm] = useState(initialForm);
   const [materialData, setMaterialData] = useState([]);
   const [materialLoading, setMaterialLoading] = useState(false);
   const [selectedMaterialRowKeys, setSelectedMaterialRowKeys] = useState([]);
+  const [materialSearchTerm, setMaterialSearchTerm] = useState("");
+  const [materialPage, setMaterialPage] = useState(1);
   const [saving, setSaving] = useState(false);
+  const currentLang = localStorage.getItem("i18nextLng") || i18n.language || "en";
   const unitMethods = useForm({
     defaultValues: {
       unitCode: null,
@@ -83,9 +86,25 @@ export default function CreateModal({ kapali, onRefresh, secilenIsEmriID, trigge
     setForm((currentForm) => ({ ...currentForm, [field]: value }));
   };
 
+  const filteredMaterialData = useMemo(() => {
+    const normalizedSearch = materialSearchTerm.trim().toLocaleLowerCase(currentLang);
+
+    if (!normalizedSearch) {
+      return materialData;
+    }
+
+    return materialData.filter((item) => {
+      const searchableText = [item.code, item.name].filter(Boolean).join(" ").toLocaleLowerCase(currentLang);
+
+      return searchableText.includes(normalizedSearch);
+    });
+  }, [currentLang, materialData, materialSearchTerm]);
+
   const openMaterialSelectModal = () => {
     setIsMaterialModalVisible(true);
     setSelectedMaterialRowKeys([]);
+    setMaterialSearchTerm("");
+    setMaterialPage(1);
     setMaterialLoading(true);
 
     AxiosInstance.get("GetDepoStok?depoID=0&stoklu=false")
@@ -231,6 +250,17 @@ export default function CreateModal({ kapali, onRefresh, secilenIsEmriID, trigge
         onOk={handleMaterialSelect}
         onCancel={() => setIsMaterialModalVisible(false)}
       >
+        <Input
+          allowClear
+          value={materialSearchTerm}
+          onChange={(event) => {
+            setMaterialSearchTerm(event.target.value);
+            setMaterialPage(1);
+          }}
+          placeholder={t("workOrder.materialList.searchPlaceholder")}
+          prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
+          style={{ width: 320, marginBottom: 12 }}
+        />
         <Table
           rowSelection={{
             type: "radio",
@@ -238,6 +268,8 @@ export default function CreateModal({ kapali, onRefresh, secilenIsEmriID, trigge
             onChange: (selectedKeys) => setSelectedMaterialRowKeys(selectedKeys.length ? [selectedKeys[0]] : []),
           }}
           pagination={{
+            current: materialPage,
+            onChange: (page) => setMaterialPage(page),
             defaultPageSize: 10,
             showSizeChanger: false,
             position: ["bottomRight"],
@@ -257,7 +289,7 @@ export default function CreateModal({ kapali, onRefresh, secilenIsEmriID, trigge
               ellipsis: true,
             },
           ]}
-          dataSource={materialData}
+          dataSource={filteredMaterialData}
           loading={materialLoading}
           scroll={{ y: "calc(100vh - 360px)" }}
         />
