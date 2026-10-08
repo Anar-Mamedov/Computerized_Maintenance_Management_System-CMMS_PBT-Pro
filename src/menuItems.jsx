@@ -11,6 +11,7 @@ import {
   AppstoreOutlined,
   FireOutlined,
   CalculatorOutlined,
+  CarOutlined,
 } from "@ant-design/icons";
 
 function getItem(labelText, key, icon, children, isClickable = true, modulePermissionKey = null) {
@@ -128,6 +129,18 @@ export const rawItems = [
     ],
     false,
     "KLL_WEB_YAKIT_MODUL"
+  ),
+  getItem(
+    "Lastik Yönetimi",
+    "lastikYonetimi",
+    <CarOutlined />,
+    [
+      getItem("Lastik İşlemleri", "lastikIslemleri", true),
+      getItem("Lastik Envanteri", "lastikEnvanteri", true),
+      getItem("Lastik Tanımları", "lastikTanimlari", true),
+      getItem("Aks Tanımları", "aksTanimlari", true),
+    ],
+    false
   ),
   getItem(
     "Proje Yönetimi",

@@ -1,0 +1,585 @@
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Typography, message, InputNumber, Input, DatePicker, Button, Modal } from "antd";
+import PropTypes from "prop-types";
+import AxleListSelect from "./AxleListSelect";
+import PositionListSelect from "./PositionListSelect";
+import KodIDSelectbox from "../../../../../components/KodIDSelectbox";
+import LastikMarka from "../../../../../components/LastikMarka";
+import LastikModel from "../../../../../components/LastikModel";
+import NumberInput from "../../../../../components/form/inputs/NumberInput";
+import AxiosInstance from "../../../../../api/http";
+import { t } from "i18next";
+import { Controller, FormProvider, useForm } from "react-hook-form";
+import dayjs from "dayjs";
+// Import locale data for DatePicker
+import enUS from "antd/lib/date-picker/locale/en_US";
+import trTR from "antd/lib/date-picker/locale/tr_TR";
+import ruRU from "antd/lib/date-picker/locale/ru_RU";
+import azAZ from "antd/lib/date-picker/locale/az_AZ";
+
+// Function to get DatePicker locale based on i18next language
+const getDatePickerLocale = () => {
+  const lang = localStorage.getItem("i18nextLng") || "en";
+  switch (lang) {
+    case "tr":
+      return trTR;
+    case "ru":
+      return ruRU;
+    case "az":
+      return azAZ;
+    default:
+      return enUS;
+  }
+};
+
+const { Text } = Typography;
+const { TextArea } = Input;
+
+export default function LastikTak({
+  aracId,
+  wheelInfo,
+  axleList,
+  positionList,
+  shouldOpenModal,
+  onModalClose,
+  showAddButton = true,
+  refreshList,
+  tireData,
+  fromLastikEnvanteri = false,
+}) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const methods = useForm({
+    defaultValues: {
+      lastik: null,
+      lastikID: null,
+      selectedAxle: null,
+      selectedPosition: null,
+      lastikTip: null,
+      lastikEbat: null,
+      lastikTipID: null,
+      lastikEbatID: null,
+      seriNo: "",
+      lastikOmru: 0,
+      marka: null,
+      markaID: null,
+      model: null,
+      modelID: null,
+      disDerinligi: 0,
+      basinc: 0,
+      montajKm: 0,
+      montajTarihi: null,
+      tutar: 0,
+      lastikAciklama: null,
+    },
+    mode: "onChange",
+  });
+
+  const { control, setValue, watch } = methods;
+
+  const selectedAxle = watch("selectedAxle");
+  const selectedPosition = watch("selectedPosition");
+
+  const effectiveAxleList = useMemo(() => {
+    if (!fromLastikEnvanteri) {
+      return axleList;
+    }
+    return selectedAxle ? [selectedAxle] : [];
+  }, [fromLastikEnvanteri, axleList, selectedAxle]);
+
+  const effectivePositionList = useMemo(() => {
+    if (!fromLastikEnvanteri) {
+      return positionList;
+    }
+    return selectedPosition ? [selectedPosition] : [];
+  }, [fromLastikEnvanteri, positionList, selectedPosition]);
+
+  const fetchTireData = useCallback(async (siraNo) => {
+    try {
+      const response = await AxiosInstance.get(`TyreOperation/GetTyreOperationById?id=${siraNo}`);
+      const data = response?.data;
+      if (data) {
+        setValue("lastik", data.lastikTanim);
+        setValue("lastikID", data.lastikSiraNo);
+        setValue("selectedAxle", data.aksPozisyon);
+        setValue("selectedPosition", data.pozisyonNo);
+        setValue("lastikTip", data.tip);
+        setValue("lastikEbat", data.ebat);
+        setValue("lastikTipID", data.tipKodId);
+        setValue("lastikEbatID", data.ebatKodId);
+        setValue("seriNo", data.seriNo);
+        setValue("lastikOmru", data.tahminiOmurKm);
+
+        // First set marka and markaID
+        setValue("marka", data.lastikMarka);
+        setValue("markaID", data.lastikMarkaId);
+
+        // Then set model and modelID after a small delay to ensure marka is set first
+        setTimeout(() => {
+          setValue("model", data.lastikModel);
+          setValue("modelID", data.lastikModelId);
+        }, 100);
+
+        setValue("disDerinligi", data.disDerinligi);
+        setValue("basinc", data.basinc);
+        setValue("montajKm", data.takildigiKm);
+        setValue("montajTarihi", data.takilmaTarih ? dayjs(data.takilmaTarih).format("YYYY-MM-DD") : null);
+        setValue("tutar", data.tutar ?? 0);
+        setValue("lastikAciklama", data.aciklama);
+      }
+    } catch (error) {
+      console.error("Error fetching tire data:", error);
+      message.error(t("lastikVerileriAlinamadi"));
+    }
+  }, [setValue]);
+
+  // Listen for external modal trigger
+  useEffect(() => {
+    if (shouldOpenModal) {
+      setIsModalOpen(true);
+    }
+  }, [shouldOpenModal]);
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    methods.reset();
+    onModalClose?.();
+  };
+
+  useEffect(() => {
+    if (wheelInfo?.axlePosition) {
+      setValue("selectedAxle", wheelInfo.axlePosition);
+      setValue("selectedPosition", wheelInfo.wheelPosition);
+    }
+  }, [wheelInfo, setValue]);
+
+  useEffect(() => {
+    if (tireData?.siraNo) {
+      fetchTireData(tireData.siraNo);
+    }
+  }, [tireData, fetchTireData]);
+
+  const createRequestBody = (data) => ({
+    siraNo: tireData?.siraNo,
+    seriNo: data.seriNo,
+    aracId: aracId,
+    lastikSiraNo: data.lastikID,
+    aksPozisyon: data.selectedAxle,
+    pozisyonNo: data.selectedPosition,
+    tahminiOmurKm: data.lastikOmru,
+    ebatKodId: Number(data.lastikEbatID),
+    tipKodId: Number(data.lastikTipID),
+    lastikModelId: Number(data.modelID),
+    lastikMarkaId: Number(data.markaID),
+    /* disDerinligi: data.disDerinligi,
+    basinc: data.basinc, */
+    aciklama: data.lastikAciklama,
+    tutar: Number(data.tutar || 0),
+    takildigiKm: data.montajKm,
+    takilmaTarih: data.montajTarihi,
+    durumId: 1,
+    islemTipId: 2,
+  });
+
+  const handleApiCall = async (data) => {
+    try {
+      const response = await AxiosInstance.post("TyreOperation/UpdateTyreOperation", createRequestBody(data));
+      const statusCode = response?.data?.statusCode;
+
+      if (statusCode === 200 || statusCode === 201 || statusCode === 202) {
+        message.success("Güncelleme Başarılı.");
+        await refreshList?.();
+        return true;
+      } else if (statusCode === 401) {
+        message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
+      } else {
+        message.error("İşlem Başarısız.");
+      }
+      return false;
+    } catch (error) {
+      console.error("Error sending data:", error);
+      if (navigator.onLine) {
+        message.error("Hata Mesajı: " + error.message);
+      } else {
+        message.error("Internet Bağlantısı Mevcut Değil.");
+      }
+      return false;
+    }
+  };
+
+  const onSubmit = async (data) => {
+    const success = await handleApiCall(data);
+    if (success) {
+      methods.reset();
+      handleCloseModal();
+    }
+  };
+
+  const validateSeriNo = async (value) => {
+    if (!value) return true;
+    try {
+      const response = await AxiosInstance.post("TableCodeItem/IsCodeItemExist", {
+        tableName: "Lastik",
+        code: value,
+      });
+
+      if (response?.data?.status === true) {
+        return t("seriNumarasiBenzersizDegildir");
+      }
+      return true;
+    } catch (error) {
+      console.error("Error checking seriNo uniqueness:", error);
+      return t("seriNumarasiKontroluSirasindaHataOlustu");
+    }
+  };
+
+  return (
+    <>
+      {showAddButton && (
+        <Button type="link" onClick={handleOpenModal}>
+          {t("add")}
+        </Button>
+      )}
+
+      <Modal title={t("lastikStokKarti")} open={isModalOpen} onCancel={handleCloseModal} footer={null} width={800}>
+        <FormProvider {...methods}>
+          <form>
+            <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+              <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "350px" }}>
+                    <Text>
+                      {t("lastik")}
+                      <span style={{ color: "red" }}>*</span>
+                    </Text>
+                    <div style={{ width: "250px" }}>
+                      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: "5px", width: "100%" }}>
+                        <Controller
+                          name="lastik"
+                          control={control}
+                          rules={{
+                            required: {
+                              value: true,
+                              message: t("alanBosBirakilamaz"),
+                            },
+                          }}
+                          render={({ field, fieldState: { error } }) => (
+                            <Input
+                              {...field}
+                              status={error ? "error" : ""}
+                              placeholder={t("lastikSeciniz")}
+                              disabled
+                              style={{
+                                width: "100%",
+                              }}
+                            />
+                          )}
+                        />
+                        {/* <StoksuzLastikTablo
+                          onSubmit={(selectedData) => {
+                            // Set the lastik input value
+                            setValue("lastik", selectedData.tanim);
+                            setValue("lastikID", selectedData.siraNo);
+
+                            // Set other related form fields
+                            setValue("lastikOmru", selectedData.lastikOmru);
+                            setValue("markaID", selectedData.markaId);
+                            setValue("marka", selectedData.marka);
+                            
+                            // Set model and modelID after a small delay to ensure marka is set first
+                            setTimeout(() => {
+                              setValue("modelID", selectedData.modelId);
+                              setValue("model", selectedData.model);
+                            }, 100);
+                            
+                            setValue("lastikEbatID", selectedData.ebatKodId);
+                            setValue("lastikEbat", selectedData.ebat);
+                            setValue("lastikTipID", selectedData.tipKodId);
+                            setValue("lastikTip", selectedData.tip);
+                            setValue("disDerinligi", selectedData.disDerinlik);
+                            setValue("basinc", selectedData.basinc);
+                          }}
+                          onClear={() => {
+                            // Clear all tire-related fields
+                            setValue("lastik", null);
+                            setValue("lastikID", null);
+                            setValue("lastikOmru", 0);
+                            setValue("markaID", null);
+                            setValue("marka", null);
+                            setValue("modelID", null);
+                            setValue("model", null);
+                            setValue("lastikEbatID", null);
+                            setValue("lastikEbat", null);
+                            setValue("lastikTipID", null);
+                            setValue("lastikTip", null);
+                            setValue("disDerinligi", 0);
+                            setValue("basinc", 0);
+                          }}
+                        /> */}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "350px" }}>
+                    <Text>
+                      {t("seriNo")}
+                      <span style={{ color: "red" }}>*</span>
+                    </Text>
+                    <div style={{ width: "250px" }}>
+                      <Controller
+                        name="seriNo"
+                        control={control}
+                        rules={{
+                          required: {
+                            value: true,
+                            message: t("alanBosBirakilamaz"),
+                          },
+                        }}
+                        render={({ field, fieldState: { error } }) => (
+                          <>
+                            <Input
+                              {...field}
+                              status={error ? "error" : ""}
+                              style={{
+                                width: "100%",
+                              }}
+                              onBlur={async (e) => {
+                                field.onBlur(e);
+                                const result = await validateSeriNo(e.target.value);
+                                if (result !== true) {
+                                  methods.setError("seriNo", { message: result });
+                                } else {
+                                  methods.clearErrors("seriNo");
+                                }
+                              }}
+                            />
+                            {error && <div style={{ color: "red" }}>{error.message}</div>}
+                          </>
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "350px" }}>
+                    <Text>{t("lastikOmru")}</Text>
+                    <div style={{ width: "250px" }}>
+                      <Controller
+                        name="lastikOmru"
+                        control={control}
+                        render={({ field }) => (
+                          <InputNumber
+                            {...field}
+                            min={0}
+                            suffix="KM"
+                            style={{
+                              width: "100%",
+                            }}
+                          />
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "350px" }}>
+                    <Text>{t("marka")}</Text>
+                    <div style={{ width: "250px" }}>
+                      <LastikMarka name1="marka" isRequired={false} allowAdd />
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "350px" }}>
+                    <Text>{t("model")}</Text>
+                    <div style={{ width: "250px" }}>
+                      <LastikModel name1="model" isRequired={false} watchName="marka" allowAdd />
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "350px" }}>
+                    <Text>{t("ebat")}</Text>
+                    <div style={{ width: "250px" }}>
+                      <KodIDSelectbox name1="lastikEbat" isRequired={false} kodID="702" />
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "350px" }}>
+                    <Text>{t("tip")}</Text>
+                    <div style={{ width: "250px" }}>
+                      <KodIDSelectbox name1="lastikTip" isRequired={false} kodID="705" />
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "350px" }}>
+                    <Text>{t("tutar")}</Text>
+                    <div style={{ width: "250px" }}>
+                      <NumberInput name="tutar" min={0} />
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {/*   <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "350px" }}>
+                    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "180px" }}>
+                      <Text>{t("disDerinligi")}</Text>
+                      <div style={{ width: "80px" }}>
+                        <Controller
+                          name="disDerinligi"
+                          control={control}
+                          render={({ field }) => (
+                            <InputNumber
+                              {...field}
+                              min={0}
+                              precision={2}
+                              step={0.01}
+                              decimalSeparator={getDecimalSeparator()}
+                              style={{
+                                width: "100%",
+                              }}
+                            />
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "160px" }}>
+                      <Text>{t("basinc")}</Text>
+                      <div style={{ width: "90px" }}>
+                        <Controller
+                          name="basinc"
+                          control={control}
+                          render={({ field }) => (
+                            <InputNumber
+                              {...field}
+                              min={0}
+                              suffix="psi"
+                              style={{
+                                width: "100%",
+                              }}
+                            />
+                          )}
+                        />
+                      </div>
+                    </div>
+                  </div> */}
+
+                  <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "350px" }}>
+                    <Text>
+                      {t("axle")}
+                      <span style={{ color: "red" }}>*</span>
+                    </Text>
+                    <div style={{ width: "250px" }}>
+                      <AxleListSelect axleList={effectiveAxleList} disabled={fromLastikEnvanteri} />
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "350px" }}>
+                    <Text>
+                      {t("position")}
+                      <span style={{ color: "red" }}>*</span>
+                    </Text>
+                    <div style={{ width: "250px" }}>
+                      <PositionListSelect positionList={effectivePositionList} disabled={fromLastikEnvanteri} />
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "350px" }}>
+                    <Text>{t("montajKm")}</Text>
+                    <div style={{ width: "250px" }}>
+                      <Controller
+                        name="montajKm"
+                        control={control}
+                        render={({ field }) => (
+                          <InputNumber
+                            {...field}
+                            min={0}
+                            disabled={fromLastikEnvanteri}
+                            suffix="KM"
+                            style={{
+                              width: "100%",
+                            }}
+                          />
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "row", alignItems: "start", justifyContent: "space-between", width: "350px" }}>
+                    <Text>
+                      {t("montajTarihi")}
+                      <span style={{ color: "red" }}>*</span>
+                    </Text>
+                    <div style={{ width: "250px" }}>
+                      <Controller
+                        name="montajTarihi"
+                        control={control}
+                        rules={{
+                          required: {
+                            value: true,
+                            message: t("alanBosBirakilamaz"),
+                          },
+                        }}
+                        render={({ field, fieldState: { error } }) => (
+                          <>
+                            <DatePicker
+                              {...field}
+                              disabled={fromLastikEnvanteri}
+                              style={{ width: "100%" }}
+                              format="DD.MM.YYYY"
+                              placeholder={t("montajTarihi")}
+                              allowClear={true}
+                              status={error ? "error" : ""}
+                              value={field.value ? dayjs(field.value) : null}
+                              onChange={(date) => {
+                                field.onChange(date ? date.format("YYYY-MM-DD") : null);
+                              }}
+                              locale={getDatePickerLocale()}
+                            />
+                            {error && <div style={{ color: "red" }}>{error.message}</div>}
+                          </>
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "row", alignItems: "start", justifyContent: "space-between", width: "350px" }}>
+                    <Text>{t("aciklama")}</Text>
+                    <div style={{ width: "250px" }}>
+                      <Controller name="lastikAciklama" control={control} render={({ field }) => <TextArea {...field} rows={4} disabled={fromLastikEnvanteri} />} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "20px" }}>
+                <Button type="primary" onClick={methods.handleSubmit(onSubmit)}>
+                  {t("guncelle")}
+                </Button>
+              </div>
+            </div>
+          </form>
+        </FormProvider>
+      </Modal>
+    </>
+  );
+}
+
+LastikTak.propTypes = {
+  aracId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  axleList: PropTypes.arrayOf(PropTypes.any),
+  fromLastikEnvanteri: PropTypes.bool,
+  onModalClose: PropTypes.func,
+  positionList: PropTypes.arrayOf(PropTypes.any),
+  refreshList: PropTypes.func,
+  shouldOpenModal: PropTypes.bool,
+  showAddButton: PropTypes.bool,
+  tireData: PropTypes.shape({
+    siraNo: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  }),
+  wheelInfo: PropTypes.shape({
+    axlePosition: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    wheelPosition: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  }),
+};

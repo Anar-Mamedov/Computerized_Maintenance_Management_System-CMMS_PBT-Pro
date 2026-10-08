@@ -85,6 +85,10 @@ import IsEmriAnaliz from "./pages/Analizler/IsEmriAnaliz/IsEmriAnaliz.jsx";
 import EkipmanAnaliz from "./pages/Analizler/EkipmanAnalizi/EkipmanAnaliz.jsx";
 import ArizaAnaliz from "./pages/Analizler/ArizaAnalizi/ArizaAnaliz.jsx";
 import PersonelCalismaPlani from "./pages/PersonelYonetimi/PersonelCalismaPlani/PersonelCalismaPlani.jsx";
+import LastikIslemleri from "./pages/LastikYonetimi/LastikIslemleri/LastikIslemleri.jsx";
+import LastikEnvanteri from "./pages/LastikYonetimi/LastikEnvanteri/LastikEnvanteri.jsx";
+import LastikTanim from "./pages/LastikYonetimi/LastikTanim/LastikTanim.jsx";
+import Axle from "./pages/LastikYonetimi/Axle/Axle.jsx";
 import AxiosInstance from "./api/http";
 
 // Malzemeler
@@ -328,6 +332,10 @@ export default function App() {
           <Route path="/isEmriAnaliz" element={<IsEmriAnaliz />} />
           <Route path="/ekipmanAnaliz" element={<EkipmanAnaliz />} />
           <Route path="/arizaAnaliz" element={<ArizaAnaliz />} />
+          <Route path="/lastikIslemleri" element={<LastikIslemleri />} />
+          <Route path="/lastikEnvanteri" element={<LastikEnvanteri />} />
+          <Route path="/lastikTanimlari" element={<LastikTanim />} />
+          <Route path="/aksTanimlari" element={<Axle />} />
           {/*<Route path="/kurallar" element={<Kurallar />} />*/}
         </Route>
       </Routes>
