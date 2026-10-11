@@ -1,0 +1,57 @@
+.ptk-bakim-islemleri {
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+}
+
+.ptk-bakim-islemleri__oge {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ptk-bakim-islemleri__oge:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.ptk-bakim-islemleri__oge:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.ptk-bakim-islemleri__ikon {
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: #16a34a;
+}
+
+.ptk-bakim-islemleri__baslik {
+  display: block;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.ptk-bakim-islemleri__aciklama {
+  display: block;
+  font-size: 12px;
+  line-height: 18px;
+  color: #6b7280;
+}
+
+.ptk-bakim-islemleri__oge.is-tehlikeli .ptk-bakim-islemleri__ikon,
+.ptk-bakim-islemleri__oge.is-tehlikeli .ptk-bakim-islemleri__baslik {
+  color: #ef4444;
+}
+
+.ptk-bakim-islemleri__ayrac {
+  height: 1px;
+  margin: 4px 0;
+  background: rgba(0, 0, 0, 0.06);
+}

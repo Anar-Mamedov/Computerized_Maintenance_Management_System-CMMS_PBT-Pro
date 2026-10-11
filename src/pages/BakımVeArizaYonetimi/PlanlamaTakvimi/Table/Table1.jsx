@@ -9,7 +9,6 @@ import AxiosInstance from "../../../../api/http";
 import Filters from "./filter/Filters";
 import { useFormContext } from "react-hook-form";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
-import HucreMenusu from "../components/HucreMenusu/HucreMenusu";
 import dayjs from "dayjs";
 import "dayjs/locale/tr";
 import weekOfYear from "dayjs/plugin/weekOfYear";
@@ -168,7 +167,6 @@ const MainTable = () => {
   const [search, setSearch] = useState("");
   const [selectedStatusKeys, setSelectedStatusKeys] = useState(() => STATUSES.map((s) => s.key));
   const [xlsxLoading, setXlsxLoading] = useState(false);
-  const [hucreMenusu, setHucreMenusu] = useState(null);
 
   // Virtualization
   const outerRef = useRef(null);
@@ -401,6 +399,7 @@ const MainTable = () => {
             recordMachine: record.machine,
             status: text,
             date,
+            tarih: column.dataIndex,
             makineID,
             bakimID,
           };
@@ -412,6 +411,13 @@ const MainTable = () => {
     },
     [data]
   );
+
+  // Bakim islemi bitince secim temizlenir ve takvim yeniden yuklenir.
+  const handleBakimIslemiTamamlandi = () => {
+    setCheckedState({});
+    setSelectedCells([]);
+    fetchEquipmentData(body);
+  };
 
   const handleDownloadXLSX = async () => {
     try {
@@ -504,7 +510,7 @@ const MainTable = () => {
           />
         </div>
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-          <ContextMenu selectedCells={selectedCells} />
+          <ContextMenu selectedCells={selectedCells} onBakimIslemiTamamlandi={handleBakimIslemiTamamlandi} />
           <Button
             style={{ display: "flex", alignItems: "center" }}
             onClick={handleDownloadXLSX}
@@ -670,12 +676,6 @@ const MainTable = () => {
                               onClick={() => {
                                 if (visible) handleCellClick(cellKey, text, rec, { dataIndex: c.dataIndex });
                               }}
-                              onContextMenu={(e) => {
-                                if (!visible) return;
-                                e.preventDefault();
-                                const [makineId, bakimId] = rec.key.split("-");
-                                setHucreMenusu({ x: e.clientX, y: e.clientY, makineId, bakimId, bakimTanim: rec.machine, tarih: c.dataIndex });
-                              }}
                             >
                               {visible && (
                                 <Popover
@@ -719,8 +719,6 @@ const MainTable = () => {
           </div>
         </Spin>
       </div>
-
-      <HucreMenusu hucre={hucreMenusu} onKapat={() => setHucreMenusu(null)} onTamamlandi={() => fetchEquipmentData(body)} />
     </div>
   );
 };

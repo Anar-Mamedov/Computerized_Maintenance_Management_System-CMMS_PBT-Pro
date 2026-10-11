@@ -8,10 +8,8 @@ import Parametreler from "./components/Parametreler/Parametreler";
 import TarihceTablo from "./components/TarihceTablo";
 import Form from "./components/Form/Form";
 import DownloadCSV from "./components/DownloadCSV/DownloadCSV";
-import IsEmriOlustur from "./components/IsEmriOlustur/IsEmriOlustur.jsx";
-import IleriTarihePlanla from "./components/IleriTarihePlanla/IleriTarihePlanla.jsx";
-import PeryodikBakimIptali from "./components/PeryodikBakimIptali/PeryodikBakimIptali.jsx";
-import MalzemeIhtiyaci from "./components/MalzemeIhtiyaci/MalzemeIhtiyaci.jsx";
+import BakimIslemleri from "./components/BakimIslemleri/BakimIslemleri.jsx";
+import BakimIslemModali from "./components/BakimIslemleri/BakimIslemModali.jsx";
 import PersonelIhtiyaci from "./components/PersonelIhtiyaci/PersonelIhtiyaci.jsx";
 import PeryodikBakimDetayi from "./components/PeryodikBakimDetayi/PeryodikBakimDetayi.jsx";
 import MakineDetayi from "./components/MakineDetayi/MakineDetayi.jsx";
@@ -23,8 +21,10 @@ export default function ContextMenu({
   selectedRows,
   refreshTableData,
   selectedCells,
+  onBakimIslemiTamamlandi,
 }) {
   const [visible, setVisible] = useState(false);
+  const [bakimModali, setBakimModali] = useState(null);
 
   const handleVisibleChange = (visible) => {
     setVisible(visible);
@@ -32,6 +32,16 @@ export default function ContextMenu({
 
   const hidePopover = () => {
     setVisible(false);
+  };
+
+  const bakimIslemiSecildi = (modal) => {
+    setVisible(false);
+    setBakimModali(modal);
+  };
+
+  const bakimIslemiTamamlandi = () => {
+    setBakimModali(null);
+    onBakimIslemiTamamlandi();
   };
   // Silme işlemi için disable durumunu kontrol et
   // const isDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 4);
@@ -59,10 +69,7 @@ export default function ContextMenu({
       {selectedRows.length >= 1 && <DownloadCSV selectedRows={selectedRows} />} */}
       {selectedCells.length >= 1 && (
         <>
-          <IsEmriOlustur selectedCells={selectedCells} />
-          <IleriTarihePlanla selectedCells={selectedCells} />
-          <PeryodikBakimIptali selectedCells={selectedCells} />
-          <MalzemeIhtiyaci selectedCells={selectedCells} />
+          <BakimIslemleri selectedCells={selectedCells} onSec={bakimIslemiSecildi} />
           <PersonelIhtiyaci selectedCells={selectedCells} />
           <PeryodikBakimDetayi selectedCells={selectedCells} />
           <MakineDetayi selectedCells={selectedCells} />
@@ -72,33 +79,36 @@ export default function ContextMenu({
     </div>
   );
   return (
-    <Popover
-      placement="bottom"
-      content={content}
-      trigger="click"
-      open={visible}
-      onOpenChange={handleVisibleChange}
-    >
-      <Button
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "0px 5px",
-          backgroundColor: "#2BC770",
-          borderColor: "#2BC770",
-          height: "32px",
-        }}
+    <>
+      <Popover
+        placement="bottom"
+        content={content}
+        trigger="click"
+        open={visible}
+        onOpenChange={handleVisibleChange}
       >
-        {selectedCells.length >= 1 && (
-          <Text style={{ color: "white", marginLeft: "3px" }}>
-            {selectedCells.length}
-          </Text>
-        )}
-        <MoreOutlined
-          style={{ color: "white", fontSize: "20px", margin: "0" }}
-        />
-      </Button>
-    </Popover>
+        <Button
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "0px 5px",
+            backgroundColor: "#2BC770",
+            borderColor: "#2BC770",
+            height: "32px",
+          }}
+        >
+          {selectedCells.length >= 1 && (
+            <Text style={{ color: "white", marginLeft: "3px" }}>
+              {selectedCells.length}
+            </Text>
+          )}
+          <MoreOutlined
+            style={{ color: "white", fontSize: "20px", margin: "0" }}
+          />
+        </Button>
+      </Popover>
+      <BakimIslemModali modal={bakimModali} onKapat={() => setBakimModali(null)} onTamamlandi={bakimIslemiTamamlandi} />
+    </>
   );
 }
