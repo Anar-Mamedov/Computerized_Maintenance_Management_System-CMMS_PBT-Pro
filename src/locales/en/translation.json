@@ -1393,5 +1393,13 @@
   "eklemeBasarisiz": "Addition failed.",
   "buIslemiYapmayaYetkinizBulunmamaktadir": "You are not authorized to perform this operation.",
   "lastikListesi": "Tire List",
-  "silmeIslemi": "Delete Operation"
+  "silmeIslemi": "Delete Operation",
+  "planlamaTakvimi.menu.isEmriOlustur": "Create Work Order",
+  "planlamaTakvimi.menu.isEmriOlusturAciklama": "Creates a work order from the selected maintenance.",
+  "planlamaTakvimi.menu.ileriTarihePlanla": "Reschedule to Later Date",
+  "planlamaTakvimi.menu.ileriTarihePlanlaAciklama": "Moves the selected maintenance date forward.",
+  "planlamaTakvimi.menu.malzemeIhtiyaci": "Material Requirement",
+  "planlamaTakvimi.menu.malzemeIhtiyaciAciklama": "Creates a material request for the maintenance.",
+  "planlamaTakvimi.menu.bakimIptal": "Cancel Periodic Maintenance",
+  "planlamaTakvimi.menu.bakimIptalAciklama": "Cancels the selected periodic maintenance plan."
 }

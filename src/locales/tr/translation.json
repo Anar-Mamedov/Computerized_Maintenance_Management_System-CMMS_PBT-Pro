@@ -1996,5 +1996,13 @@
   "buIslemiYapmayaYetkinizBulunmamaktadir": "Bu işlemi yapmaya yetkiniz bulunmamaktadır.",
   "lastikListesi": "Lastik Listesi",
   "lokasyonSec": "Lokasyon Seç",
-  "lokasyonlarSec": "Lokasyonlar Seç"
+  "lokasyonlarSec": "Lokasyonlar Seç",
+  "planlamaTakvimi.menu.isEmriOlustur": "İş Emri Oluştur",
+  "planlamaTakvimi.menu.isEmriOlusturAciklama": "Seçili bakımdan iş emri oluşturur.",
+  "planlamaTakvimi.menu.ileriTarihePlanla": "İleri Tarihe Planla",
+  "planlamaTakvimi.menu.ileriTarihePlanlaAciklama": "Seçili bakım tarihini ileri alır.",
+  "planlamaTakvimi.menu.malzemeIhtiyaci": "Malzeme İhtiyacı",
+  "planlamaTakvimi.menu.malzemeIhtiyaciAciklama": "Bakım için malzeme talebi oluşturur.",
+  "planlamaTakvimi.menu.bakimIptal": "Periyodik Bakım İptal",
+  "planlamaTakvimi.menu.bakimIptalAciklama": "Seçili periyodik bakım planını iptal eder."
 }

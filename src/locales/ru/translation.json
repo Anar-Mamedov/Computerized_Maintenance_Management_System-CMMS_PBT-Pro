@@ -1307,5 +1307,13 @@
   "aramaYap": "Поиск...",
   "sutunlarYonetAciklama": "На экранах ниже вы можете показать / скрыть столбцы и настроить их порядок.",
   "silmeIslemi": "Операция Удаления",
-  "lokasyonlar": "Местоположения"
+  "lokasyonlar": "Местоположения",
+  "planlamaTakvimi.menu.isEmriOlustur": "Создать наряд",
+  "planlamaTakvimi.menu.isEmriOlusturAciklama": "Создаёт наряд по выбранному обслуживанию.",
+  "planlamaTakvimi.menu.ileriTarihePlanla": "Перенести на более позднюю дату",
+  "planlamaTakvimi.menu.ileriTarihePlanlaAciklama": "Переносит дату выбранного обслуживания вперёд.",
+  "planlamaTakvimi.menu.malzemeIhtiyaci": "Потребность в материалах",
+  "planlamaTakvimi.menu.malzemeIhtiyaciAciklama": "Создаёт заявку на материалы для обслуживания.",
+  "planlamaTakvimi.menu.bakimIptal": "Отменить периодическое обслуживание",
+  "planlamaTakvimi.menu.bakimIptalAciklama": "Отменяет выбранный план периодического обслуживания."
 }

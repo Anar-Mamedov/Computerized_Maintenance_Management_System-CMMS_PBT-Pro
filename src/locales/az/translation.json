@@ -1311,5 +1311,13 @@
   "kritik": "Kritik",
   "aramaYap": "Axtarış...",
   "sutunlarYonetAciklama": "Aşağıdakı ekranlardan sütunları göstərə / gizlədə və sıralamalarını tənzimləyə bilərsiniz.",
-  "silmeIslemi": "Silmə Əməliyyatı"
+  "silmeIslemi": "Silmə Əməliyyatı",
+  "planlamaTakvimi.menu.isEmriOlustur": "İş Əmri Yarat",
+  "planlamaTakvimi.menu.isEmriOlusturAciklama": "Seçilmiş baxımdan iş əmri yaradır.",
+  "planlamaTakvimi.menu.ileriTarihePlanla": "İrəli Tarixə Planla",
+  "planlamaTakvimi.menu.ileriTarihePlanlaAciklama": "Seçilmiş baxım tarixini irəli çəkir.",
+  "planlamaTakvimi.menu.malzemeIhtiyaci": "Material Ehtiyacı",
+  "planlamaTakvimi.menu.malzemeIhtiyaciAciklama": "Baxım üçün material tələbi yaradır.",
+  "planlamaTakvimi.menu.bakimIptal": "Periodik Baxımı Ləğv Et",
+  "planlamaTakvimi.menu.bakimIptalAciklama": "Seçilmiş periodik baxım planını ləğv edir."
 }
