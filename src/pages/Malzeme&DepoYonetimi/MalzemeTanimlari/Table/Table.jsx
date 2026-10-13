@@ -16,6 +16,8 @@ import EditDrawer from "../Update/EditDrawer";
 import dayjs from "dayjs";
 import AktifPasifHepsiSelect from "../../../../utils/components/AktifPasifHepsiSelect";
 import Filters from "./filter/Filters";
+import { SiMicrosoftexcel } from "react-icons/si";
+import { malzemeListesiniExceleAktar } from "./excelAktar";
 
 import { t } from "i18next";
 
@@ -148,6 +150,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
   const [data, setData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [xlsxLoading, setXlsxLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchTimeout, setSearchTimeout] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -953,69 +956,76 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
 
   // arama işlemi için kullanılan useEffect son
 
-  const fetchEquipmentData = async (body, page, size, currentSortField, currentSortOrder) => {
-    istekSirasiRef.current += 1;
-    const istekSirasi = istekSirasiRef.current;
-    const guncelMi = () => istekSirasi === istekSirasiRef.current;
-
+  // Liste ve Excel'e aktarma ayni arama, filtre ve siralamayla istek atsin diye parametreler tek yerde olusturulur.
+  const stokFiltreParametreleri = (body, currentSortField, currentSortOrder) => {
     // body'nin undefined olması durumunda varsayılan değerler atanıyor
     const { keyword = "", filters = {}, isAktif = 1 } = body || {};
-    // page'in undefined olması durumunda varsayılan değer olarak 1 atanıyor
-    const currentPage = page || 1;
-    const currentPageSize = size || pageSize;
     const normalizedFilters = filters && typeof filters === "object" ? filters : {};
 
     const stkTipIds = Array.isArray(normalizedFilters.stkTipIds) ? normalizedFilters.stkTipIds : [];
     const stkGrupIds = Array.isArray(normalizedFilters.stkGrupIds) ? normalizedFilters.stkGrupIds : [];
     const stkDepoIds = Array.isArray(normalizedFilters.stkDepoIds) ? normalizedFilters.stkDepoIds : [];
 
-    let sortParam = "";
+    let parametreler = `prm=${keyword}&isAktif=${isAktif ?? -1}`;
+
+    if (stkTipIds.length > 0) {
+      parametreler += `&stkTipIds=${stkTipIds.join(",")}`;
+    }
+
+    if (stkGrupIds.length > 0) {
+      parametreler += `&stkGrupIds=${stkGrupIds.join(",")}`;
+    }
+
+    if (stkDepoIds.length > 0) {
+      parametreler += `&stkDepoIds=${stkDepoIds.join(",")}`;
+    }
+
+    // Kritik malzeme filtresi cekmeceden gelir; dashboard degeri yalnizca baslangic degeridir.
+    if (normalizedFilters.kritik === true) {
+      parametreler += `&kritik=true`;
+    }
+
+    if (normalizedFilters.stoktaYok === true) {
+      parametreler += `&stoktaYok=true`;
+    }
+
     if (currentSortField && currentSortOrder) {
       const normalizedOrder = currentSortOrder === "ascend" ? "ASC" : "DESC";
-      sortParam = `&sortField=${currentSortField}&sortOrder=${normalizedOrder}`;
+      parametreler += `&sortField=${currentSortField}&sortOrder=${normalizedOrder}`;
     }
+
+    return parametreler;
+  };
+
+  const stokListesiUrl = (body, page, size, currentSortField, currentSortOrder) => {
+    // page'in undefined olması durumunda varsayılan değer olarak 1 atanıyor
+    const currentPage = page || 1;
+    const currentPageSize = size || pageSize;
+
+    // islemTip değerine göre API URL'ini oluştur
+    const baseApi = hatirlaticiGrupId ? "StokHatirlatici" : "Stok";
+    let apiUrl = `${baseApi}?modulNo=1&pagingDeger=${currentPage}&pageSize=${currentPageSize}&${stokFiltreParametreleri(body, currentSortField, currentSortOrder)}`;
+    if (hatirlaticiGrupId) {
+      apiUrl += `&hatirlaticiGrupId=${hatirlaticiGrupId}&hatirlaticiSiraId=${hatirlaticiSiraId}`;
+    }
+
+    if (islemTip === "C" || islemTip === "T") {
+      // islemTip C veya T ise özel parametreler ekle
+      apiUrl += `&islemTip=${islemTip}&depoId=${deposuID || 1}`;
+    }
+
+    return apiUrl;
+  };
+
+  const fetchEquipmentData = async (body, page, size, currentSortField, currentSortOrder) => {
+    istekSirasiRef.current += 1;
+    const istekSirasi = istekSirasiRef.current;
+    const guncelMi = () => istekSirasi === istekSirasiRef.current;
 
     try {
       setLoading(true);
 
-      // islemTip değerine göre API URL'ini oluştur
-      const baseApi = hatirlaticiGrupId ? "StokHatirlatici" : "Stok";
-      let apiUrl = `${baseApi}?modulNo=1&pagingDeger=${currentPage}&pageSize=${currentPageSize}&prm=${keyword}&isAktif=${isAktif ?? -1}`;
-      if (hatirlaticiGrupId) {
-        apiUrl += `&hatirlaticiGrupId=${hatirlaticiGrupId}&hatirlaticiSiraId=${hatirlaticiSiraId}`;
-      }
-
-      if (stkTipIds.length > 0) {
-        apiUrl += `&stkTipIds=${stkTipIds.join(",")}`;
-      }
-
-      if (stkGrupIds.length > 0) {
-        apiUrl += `&stkGrupIds=${stkGrupIds.join(",")}`;
-      }
-
-      if (stkDepoIds.length > 0) {
-        apiUrl += `&stkDepoIds=${stkDepoIds.join(",")}`;
-      }
-
-      // Kritik malzeme filtresi cekmeceden gelir; dashboard degeri yalnizca baslangic degeridir.
-      if (normalizedFilters.kritik === true) {
-        apiUrl += `&kritik=true`;
-      }
-
-      if (normalizedFilters.stoktaYok === true) {
-        apiUrl += `&stoktaYok=true`;
-      }
-
-
-      if (islemTip === "C" || islemTip === "T") {
-        // islemTip C veya T ise özel parametreler ekle
-        apiUrl += `&islemTip=${islemTip}&depoId=${deposuID || 1}`;
-      } else {
-        // islemTip null ise normal parametreler ekle
-        apiUrl;
-      }
-
-      apiUrl += sortParam;
+      const apiUrl = stokListesiUrl(body, page, size, currentSortField, currentSortOrder);
 
       // API isteğini yap
       const response = await AxiosInstance.get(apiUrl);
@@ -1052,6 +1062,25 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
         // İnternet bağlantısı yok
         message.error("Internet Bağlantısı Mevcut Değil.");
       }
+    }
+  };
+
+  // Ekrandaki arama, filtre ve siralamayla eslesen tum malzemeler sayfalamasiz Excel ucundan tek istekte cekilir (Is Emri'ndeki gibi).
+  const handleDownloadXLSX = async () => {
+    setXlsxLoading(true);
+    try {
+      const response = await AxiosInstance.get(`GetStokExcelList?modulNo=1&${stokFiltreParametreleri(body, sortField, sortOrder)}`);
+      const kayitlar = Array.isArray(response) ? response : Array.isArray(response?.Data) ? response.Data : [];
+      if (kayitlar.length === 0) {
+        message.warning(t("malzemeListesiExcelVeriYok"));
+        return;
+      }
+      malzemeListesiniExceleAktar(kayitlar, filteredColumns, t);
+    } catch (error) {
+      console.error("Malzeme listesi Excel'e aktarılamadı:", error);
+      message.error(t("hataOlustu"));
+    } finally {
+      setXlsxLoading(false);
     }
   };
 
@@ -1446,6 +1475,9 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
         </div>
         {!isSelectionMode && (
           <div style={{ display: "flex", gap: "10px" }}>
+            <StyledButton onClick={handleDownloadXLSX} loading={xlsxLoading} icon={<SiMicrosoftexcel />}>
+              {t("indir")}
+            </StyledButton>
             <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
             <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} onOpenEdit={handleOpenEditDrawer} />
           </div>

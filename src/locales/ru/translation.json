@@ -11,6 +11,8 @@
   "mudaheleSuresiHistogrami": "Гистограмма времени вмешательства",
   "aylikMudaheleSuresi": "Ежемесячное время вмешательства",
   "indir": "Скачать",
+  "malzemeListesiExcelDosyaAdi": "Список материалов",
+  "malzemeListesiExcelVeriYok": "Нет материалов для экспорта в Excel.",
   "uygula": "Применить",
   "paraBirimi": "₺",
   "paraBirimiSecimi": "Валюта",

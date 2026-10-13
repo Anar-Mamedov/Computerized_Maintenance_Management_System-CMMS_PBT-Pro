@@ -11,6 +11,8 @@
   "mudaheleSuresiHistogrami": "Müdahale Süresi Histogramı",
   "aylikMudaheleSuresi": "Aylık Müdahale Süreleri",
   "indir": "İndir",
+  "malzemeListesiExcelDosyaAdi": "Malzeme Listesi",
+  "malzemeListesiExcelVeriYok": "Excel'e aktarılacak malzeme bulunamadı.",
   "uygula": "Uygula",
   "paraBirimi": "₺",
   "paraBirimiSecimi": "Para Birimi",

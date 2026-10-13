@@ -11,6 +11,8 @@
   "mudaheleSuresiHistogrami": "Intervention Time Histogram",
   "aylikMudaheleSuresi": "Monthly Intervention Durations",
   "indir": "Download",
+  "malzemeListesiExcelDosyaAdi": "Material List",
+  "malzemeListesiExcelVeriYok": "No materials found to export to Excel.",
   "uygula": "Apply",
   "paraBirimi": "₺",
   "paraBirimiSecimi": "Currency",

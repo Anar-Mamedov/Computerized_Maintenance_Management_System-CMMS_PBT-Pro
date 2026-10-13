@@ -11,6 +11,8 @@
   "mudaheleSuresiHistogrami": "Müdaxilə Müddəti Histogramı",
   "aylikMudaheleSuresi": "Aylıq Müdaxilə Müddətləri",
   "indir": "Yüklə",
+  "malzemeListesiExcelDosyaAdi": "Material Siyahısı",
+  "malzemeListesiExcelVeriYok": "Excel-ə ixrac ediləcək material tapılmadı.",
   "uygula": "Tətbiq et",
   "paraBirimi": "₺",
   "paraBirimiSecimi": "Valyuta",
