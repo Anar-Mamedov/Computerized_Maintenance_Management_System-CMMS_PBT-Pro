@@ -164,7 +164,7 @@ export default function Sayaclar({ makineId, veri, aktif = false, onVeriDegisti 
         onOnay={sil}
         onKapat={modaliKapat}
       />
-      <SayacHareketleriModali acik={acikModal === "hareketler"} sayac={islemSayaci} onKapat={modaliKapat} />
+      <SayacHareketleriModali acik={acikModal === "hareketler"} sayac={islemSayaci} onKapat={modaliKapat} onSilindi={veriyiYenile} />
       <SayacOkumaModali
         acik={acikModal === "okuma"}
         makineId={makineId}

@@ -1282,6 +1282,8 @@
   "ekipmanKarti.sayac.alanZorunlu": "Bu sahə boş buraxıla bilməz.",
   "ekipmanKarti.sayac.silOnayMesajCoklu": "Seçilmiş {{sayi}} sayğac silinəcək. Bu əməliyyat geri qaytarıla bilməz.",
   "ekipmanKarti.sayac.kismenSilindi": "{{toplam}} sayğacdan {{basarili}} ədədi silindi.",
+  "ekipmanKarti.sayac.hareketSilOnayMesajCoklu": "Seçilmiş {{sayi}} sayğac hərəkəti silinəcək. Bu əməliyyat geri qaytarıla bilməz.",
+  "ekipmanKarti.sayac.hareketKismenSilindi": "{{toplam}} sayğac hərəkətindən {{basarili}} ədədi silindi.",
   "ekipmanKarti.sayac.zatenVarsayilan": "Seçilmiş sayğac artıq standartdır.",
   "ekipmanKarti.sayac.varsayilanYapildi": "Sayğac standart edildi.",
   "ekipmanKarti.sayac.bilgiAlinamadi": "Sayğac məlumatı əldə edilə bilmədi.",

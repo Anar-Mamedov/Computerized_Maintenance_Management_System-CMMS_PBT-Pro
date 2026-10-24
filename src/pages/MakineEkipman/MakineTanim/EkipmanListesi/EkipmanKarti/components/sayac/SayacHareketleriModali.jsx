@@ -4,31 +4,37 @@ import dayjs from "dayjs";
 import { message } from "antd";
 import { FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { LuSearch } from "react-icons/lu";
+import { LuSearch, LuTrash2 } from "react-icons/lu";
 import Alan from "../ortak/Alan";
 import KartModali from "../ortak/KartModali";
 import KartTablosu from "../ortak/KartTablosu";
 import ModalDugmeleri from "../ortak/ModalDugmeleri";
+import OnayModali from "../ortak/OnayModali";
 import Rozet from "../ortak/Rozet";
 import FullDatePicker from "../../../../../../../utils/components/FullDatePicker";
 import LocalizedDateText from "../../../../../../../utils/components/LocalizedDateText";
 import { basariliMi } from "../../../ekipmanService";
-import { getSayacHareketleri, hataMesaji, listeyiAl, yanitHatasi } from "../../ekipmanKartiService";
+import { getSayacHareketleri, hataMesaji, listeyiAl, silSayacHareketi, yanitHatasi } from "../../ekipmanKartiService";
 import { anahtarEkle, apiTarihi, bosIse, buyukHarf, sayiMetni } from "../../yardimcilar";
 
 const hareketTipiRozeti = (tip) => (tip ? <Rozet ton={tip === "SIFIRLAMA" ? "uyari" : "notr"}>{tip}</Rozet> : "—");
 
 const solukMetin = (deger) => <span className="ek-kart-soluk">{bosIse(deger)}</span>;
 
-/** Sayac Hareketleri: secili sayacin okuma kayitlari. Acilista son 3 ay listelenir. */
-export default function SayacHareketleriModali({ acik, sayac, onKapat }) {
+/** Sayac Hareketleri: secili sayacin okuma kayitlari. Acilista son 3 ay listelenir; secilen kayitlar silinebilir. */
+export default function SayacHareketleriModali({ acik, sayac, onKapat, onSilindi }) {
   const { t, i18n } = useTranslation();
   const methods = useForm({ defaultValues: { basTarih: null, bitTarih: null } });
-  const { reset, handleSubmit } = methods;
+  const { reset, handleSubmit, getValues } = methods;
   const [kayitlar, setKayitlar] = useState([]);
   const [yukleniyor, setYukleniyor] = useState(false);
+  const [seciliAnahtarlar, setSeciliAnahtarlar] = useState([]);
+  const [silOnayAcik, setSilOnayAcik] = useState(false);
+  const [siliniyor, setSiliniyor] = useState(false);
   const istekSirasiRef = useRef(0);
   const sayacId = sayac?.sayacId ?? null;
+
+  const seciliKayitlar = useMemo(() => kayitlar.filter((kayit) => seciliAnahtarlar.includes(kayit.clientKey)), [kayitlar, seciliAnahtarlar]);
 
   // Yalnizca en son istegin yaniti yazilir (tarih araligi hizli degistirilirse).
   const hareketleriGetir = useCallback(
@@ -38,6 +44,7 @@ export default function SayacHareketleriModali({ acik, sayac, onKapat }) {
       const guncelMi = () => istekSirasi === istekSirasiRef.current;
 
       setYukleniyor(true);
+      setSeciliAnahtarlar([]);
       try {
         const yanit = await getSayacHareketleri({ sayacId, basTarih: apiTarihi(basTarih), bitTarih: apiTarihi(bitTarih) });
         if (!guncelMi()) return;
@@ -68,6 +75,34 @@ export default function SayacHareketleriModali({ acik, sayac, onKapat }) {
   }, [acik, sayacId, reset, hareketleriGetir]);
 
   const listele = handleSubmit(({ basTarih, bitTarih }) => hareketleriGetir(basTarih, bitTarih));
+
+  // Secili hareketler sirayla silinir (API'ye satir anahtari degil TB_SAYAC_OKUMA_ID gider); sonuc tek bildirimle gosterilir.
+  const sil = async () => {
+    setSiliniyor(true);
+    let basarili = 0;
+    let sonHata = t("ekipmanKarti.islemBasarisiz");
+    for (const kayit of seciliKayitlar) {
+      try {
+        const yanit = await silSayacHareketi(kayit.TB_SAYAC_OKUMA_ID);
+        if (basariliMi(yanit)) basarili += 1;
+        else sonHata = yanitHatasi(yanit, t);
+      } catch (hata) {
+        console.error("Sayac hareketi silinemedi:", hata);
+        sonHata = hataMesaji(hata, t("ekipmanKarti.islemBasarisiz"));
+      }
+    }
+    setSiliniyor(false);
+    setSilOnayAcik(false);
+
+    if (basarili === seciliKayitlar.length) message.success(t("ekipmanKarti.silindi"));
+    else if (basarili > 0) message.warning(t("ekipmanKarti.sayac.hareketKismenSilindi", { basarili, toplam: seciliKayitlar.length }));
+    else message.error(sonHata);
+    if (basarili > 0) {
+      const { basTarih, bitTarih } = getValues();
+      hareketleriGetir(basTarih, bitTarih);
+      onSilindi?.();
+    }
+  };
 
   const kolonlar = useMemo(() => {
     const dil = i18n.language;
@@ -117,10 +152,31 @@ export default function SayacHareketleriModali({ acik, sayac, onKapat }) {
               <LuSearch size={14} />
               {t("ekipmanKarti.listele")}
             </button>
+            <button type="button" className="ek-kart-btn ek-kart-btn--tehlikeli ml-auto" onClick={() => setSilOnayAcik(true)} disabled={yukleniyor || !seciliKayitlar.length}>
+              <LuTrash2 size={14} />
+              {t("ekipmanKarti.sil")}
+            </button>
           </div>
-          <KartTablosu ic rowKey="clientKey" columns={kolonlar} dataSource={kayitlar} loading={yukleniyor} />
+          <KartTablosu
+            ic
+            rowKey="clientKey"
+            columns={kolonlar}
+            dataSource={kayitlar}
+            loading={yukleniyor}
+            rowSelection={{ columnWidth: 36, selectedRowKeys: seciliAnahtarlar, onChange: (anahtarlar) => setSeciliAnahtarlar(anahtarlar) }}
+          />
         </div>
       </FormProvider>
+      <OnayModali
+        acik={silOnayAcik}
+        baslik={t("ekipmanKarti.silOnayBaslik")}
+        mesaj={seciliKayitlar.length > 1 ? t("ekipmanKarti.sayac.hareketSilOnayMesajCoklu", { sayi: seciliKayitlar.length }) : t("ekipmanKarti.silOnayMesaj")}
+        onayMetni={t("ekipmanKarti.sil")}
+        tehlikeli
+        yukleniyor={siliniyor}
+        onOnay={sil}
+        onKapat={() => setSilOnayAcik(false)}
+      />
     </KartModali>
   );
 }
@@ -132,4 +188,5 @@ SayacHareketleriModali.propTypes = {
     tanim: PropTypes.string,
   }),
   onKapat: PropTypes.func.isRequired,
+  onSilindi: PropTypes.func,
 };

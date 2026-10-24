@@ -88,6 +88,9 @@ export const varsayilanYapSayac = (sayacId) => AxiosInstance.post("SayacVarsayil
 /** Dokumanda: GetSayacOkumaList (baslangicTarih / bitisTarih). Tarihler YYYY-MM-DD. */
 export const getSayacHareketleri = ({ sayacId, basTarih, bitTarih }) => AxiosInstance.get("GetSayacHareketleri", { params: { sayacId, basTarih, bitTarih } });
 
+/** Dokumanda: SayacSil. POST'tur ama govde bostur; hareket ID'si query string ile gider. */
+export const silSayacHareketi = (sayacHareketId) => AxiosInstance.post("SayacSil", null, { params: { sayachareketID: sayacHareketId } });
+
 /* ---------- Periyodik bakimlar ---------- */
 
 /** Yanit: { list: [], count } */

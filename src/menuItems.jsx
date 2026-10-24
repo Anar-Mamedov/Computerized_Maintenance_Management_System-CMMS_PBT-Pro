@@ -140,7 +140,8 @@ export const rawItems = [
       getItem("Lastik Tanımları", "lastikTanimlari", true),
       getItem("Aks Tanımları", "aksTanimlari", true),
     ],
-    false
+    false,
+    "KLL_WEB_LASTIK_MODUL"
   ),
   getItem(
     "Proje Yönetimi",

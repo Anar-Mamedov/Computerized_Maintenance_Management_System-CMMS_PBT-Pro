@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, Progress, message } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
@@ -727,7 +727,7 @@ const MainTable = () => {
 
   // ana tablo api isteği için kullanılan useEffect son
 
-  // GetPBakimFullList'in liste ve toplam alanlari backend surumune gore degisebildigi icin
+  // GetPBakimTanimList / GetPBakimFullList'in liste ve toplam alanlari backend surumune gore degisebildigi icin
   // bilinen alan adlari sirayla denenir.
   const extractPBakimList = (response) => {
     if (Array.isArray(response)) return response;
@@ -748,18 +748,33 @@ const MainTable = () => {
     return matchedKey ? Number(response[matchedKey]) : fallback;
   };
 
+  // Iki farkli uc farkli surede donebildigi icin (ör. dashboard'dan gelince once filtresiz GET, sonra filtreli POST)
+  // yalnizca en son istegin yaniti ekrana islenir.
+  const istekSirasiRef = useRef(0);
+
   const fetchEquipmentData = async (page = currentPage, size = pageSize) => {
+    istekSirasiRef.current += 1;
+    const istekSirasi = istekSirasiRef.current;
+    const guncelMi = () => istekSirasi === istekSirasiRef.current;
+
     try {
       setLoading(true);
 
-      // Liste her zaman sayfali + filtreli uctan gelir; arama ve filtreler sunucuda uygulanir.
-      const rawResponse = await AxiosInstance.post(`GetPBakimFullList?pagingDeger=${page}&pageSize=${size}&parametre=${debouncedSearchTerm}`, aktifFiltreler);
+      // Filtre yokken liste tanim ucundan (GET GetPBakimTanimList) gelir. Filtre cekmecesi veya dashboard filtresi
+      // aktifken filtreleri govdede alan GetPBakimFullList kullanilir. Arama ve sayfalama her iki ucta da sunucuda uygulanir.
+      const filtreVar = Object.keys(aktifFiltreler).length > 0;
+      const rawResponse = filtreVar
+        ? await AxiosInstance.post(`GetPBakimFullList?pagingDeger=${page}&pageSize=${size}&parametre=${debouncedSearchTerm}`, aktifFiltreler)
+        : await AxiosInstance.get(`GetPBakimTanimList?pagingDeger=${page}&pageSize=${size}&parametre=${debouncedSearchTerm}`);
+      if (!guncelMi()) return;
       const list = extractPBakimList(rawResponse);
 
       setData(list.map((item) => ({ ...item, key: item.TB_PERIYODIK_BAKIM_ID })));
       setTotalDataCount(extractTotalCount(rawResponse, list.length));
       setLoading(false);
     } catch (error) {
+      if (!guncelMi()) return;
+
       console.error("Error in API request:", error);
       setLoading(false);
       if (navigator.onLine) {

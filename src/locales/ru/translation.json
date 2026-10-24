@@ -1282,6 +1282,8 @@
   "ekipmanKarti.sayac.alanZorunlu": "Это поле не может быть пустым.",
   "ekipmanKarti.sayac.silOnayMesajCoklu": "Выбранные счётчики ({{sayi}}) будут удалены. Это действие нельзя отменить.",
   "ekipmanKarti.sayac.kismenSilindi": "Удалено счётчиков: {{basarili}} из {{toplam}}.",
+  "ekipmanKarti.sayac.hareketSilOnayMesajCoklu": "Выбранные записи счётчика ({{sayi}}) будут удалены. Это действие нельзя отменить.",
+  "ekipmanKarti.sayac.hareketKismenSilindi": "Удалено записей счётчика: {{basarili}} из {{toplam}}.",
   "ekipmanKarti.sayac.zatenVarsayilan": "Выбранный счётчик уже используется по умолчанию.",
   "ekipmanKarti.sayac.varsayilanYapildi": "Счётчик установлен по умолчанию.",
   "ekipmanKarti.sayac.bilgiAlinamadi": "Не удалось получить данные счётчика.",

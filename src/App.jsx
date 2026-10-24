@@ -111,6 +111,9 @@ const { Header, Content, Footer, Sider } = Layout;
 
 import { rawItems } from "./menuItems";
 
+// Bu modüller yalnızca yetki açıkça true ise gösterilir (false veya null/undefined ise gizlenir).
+const STRICT_MODULE_PERMISSION_KEYS = ["KLL_WEB_LASTIK_MODUL"];
+
 function filterItems(items, loginData, token) {
   // Token yoksa, hiçbir filtreleme yapmadan tüm öğeleri döndür
   if (!token) {
@@ -123,6 +126,9 @@ function filterItems(items, loginData, token) {
       // Modül seviyesindeki yetkileri (grupları komple gizleme) kontrol et
       // menuItems.jsx içerisinde tanımlanan modulePermissionKey'e göre kontrol sağlanır.
       if (item.modulePermissionKey && loginData[item.modulePermissionKey] === false) {
+        return false;
+      }
+      if (STRICT_MODULE_PERMISSION_KEYS.includes(item.modulePermissionKey) && loginData[item.modulePermissionKey] !== true) {
         return false;
       }
       return true;
@@ -332,10 +338,14 @@ export default function App() {
           <Route path="/isEmriAnaliz" element={<IsEmriAnaliz />} />
           <Route path="/ekipmanAnaliz" element={<EkipmanAnaliz />} />
           <Route path="/arizaAnaliz" element={<ArizaAnaliz />} />
-          <Route path="/lastikIslemleri" element={<LastikIslemleri />} />
-          <Route path="/lastikEnvanteri" element={<LastikEnvanteri />} />
-          <Route path="/lastikTanimlari" element={<LastikTanim />} />
-          <Route path="/aksTanimlari" element={<Axle />} />
+          {loginData?.KLL_WEB_LASTIK_MODUL === true && (
+            <>
+              <Route path="/lastikIslemleri" element={<LastikIslemleri />} />
+              <Route path="/lastikEnvanteri" element={<LastikEnvanteri />} />
+              <Route path="/lastikTanimlari" element={<LastikTanim />} />
+              <Route path="/aksTanimlari" element={<Axle />} />
+            </>
+          )}
           {/*<Route path="/kurallar" element={<Kurallar />} />*/}
         </Route>
       </Routes>

@@ -1900,6 +1900,8 @@
   "ekipmanKarti.sayac.alanZorunlu": "Bu alan boş bırakılamaz.",
   "ekipmanKarti.sayac.silOnayMesajCoklu": "Seçili {{sayi}} sayaç silinecek. Bu işlem geri alınamaz.",
   "ekipmanKarti.sayac.kismenSilindi": "{{toplam}} sayaçtan {{basarili}} tanesi silindi.",
+  "ekipmanKarti.sayac.hareketSilOnayMesajCoklu": "Seçili {{sayi}} sayaç hareketi silinecek. Bu işlem geri alınamaz.",
+  "ekipmanKarti.sayac.hareketKismenSilindi": "{{toplam}} sayaç hareketinden {{basarili}} tanesi silindi.",
   "ekipmanKarti.sayac.zatenVarsayilan": "Seçili sayaç zaten varsayılan.",
   "ekipmanKarti.sayac.varsayilanYapildi": "Sayaç varsayılan yapıldı.",
   "ekipmanKarti.sayac.bilgiAlinamadi": "Sayaç bilgisi alınamadı.",

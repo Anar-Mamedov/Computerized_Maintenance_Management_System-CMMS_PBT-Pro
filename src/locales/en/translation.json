@@ -1284,6 +1284,8 @@
   "ekipmanKarti.sayac.alanZorunlu": "This field cannot be left blank.",
   "ekipmanKarti.sayac.silOnayMesajCoklu": "{{sayi}} selected counters will be deleted. This action cannot be undone.",
   "ekipmanKarti.sayac.kismenSilindi": "{{basarili}} of {{toplam}} counters were deleted.",
+  "ekipmanKarti.sayac.hareketSilOnayMesajCoklu": "{{sayi}} selected counter movements will be deleted. This action cannot be undone.",
+  "ekipmanKarti.sayac.hareketKismenSilindi": "{{basarili}} of {{toplam}} counter movements were deleted.",
   "ekipmanKarti.sayac.zatenVarsayilan": "The selected counter is already the default.",
   "ekipmanKarti.sayac.varsayilanYapildi": "The counter has been set as default.",
   "ekipmanKarti.sayac.bilgiAlinamadi": "Counter information could not be retrieved.",

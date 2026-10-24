@@ -663,6 +663,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
+      sorter: true,
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_2 ? ozelAlanlar.OZL_OZEL_ALAN_2 : label && label.OZL_OZEL_ALAN_2}</div>,
@@ -672,6 +673,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
+      sorter: true,
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_3 ? ozelAlanlar.OZL_OZEL_ALAN_3 : label && label.OZL_OZEL_ALAN_3}</div>,
@@ -681,6 +683,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
+      sorter: true,
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_4 ? ozelAlanlar.OZL_OZEL_ALAN_4 : label && label.OZL_OZEL_ALAN_4}</div>,
@@ -690,6 +693,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
+      sorter: true,
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_5 ? ozelAlanlar.OZL_OZEL_ALAN_5 : label && label.OZL_OZEL_ALAN_5}</div>,
@@ -699,6 +703,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
+      sorter: true,
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_6 ? ozelAlanlar.OZL_OZEL_ALAN_6 : label && label.OZL_OZEL_ALAN_6}</div>,
@@ -708,6 +713,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
+      sorter: true,
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_7 ? ozelAlanlar.OZL_OZEL_ALAN_7 : label && label.OZL_OZEL_ALAN_7}</div>,
@@ -717,6 +723,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
+      sorter: true,
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_8 ? ozelAlanlar.OZL_OZEL_ALAN_8 : label && label.OZL_OZEL_ALAN_8}</div>,
@@ -726,6 +733,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
+      sorter: true,
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_9 ? ozelAlanlar.OZL_OZEL_ALAN_9 : label && label.OZL_OZEL_ALAN_9}</div>,
@@ -735,6 +743,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
+      sorter: true,
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_10 ? ozelAlanlar.OZL_OZEL_ALAN_10 : label && label.OZL_OZEL_ALAN_10}</div>,
@@ -744,6 +753,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
+      sorter: true,
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_11 ? ozelAlanlar.OZL_OZEL_ALAN_11 : label && label.OZL_OZEL_ALAN_11}</div>,
@@ -753,6 +763,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
+      sorter: true,
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_12 ? ozelAlanlar.OZL_OZEL_ALAN_12 : label && label.OZL_OZEL_ALAN_12}</div>,
@@ -762,6 +773,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
+      sorter: true,
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_13 ? ozelAlanlar.OZL_OZEL_ALAN_13 : label && label.OZL_OZEL_ALAN_13}</div>,
@@ -771,6 +783,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
+      sorter: true,
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_14 ? ozelAlanlar.OZL_OZEL_ALAN_14 : label && label.OZL_OZEL_ALAN_14}</div>,
@@ -780,6 +793,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
+      sorter: true,
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_15 ? ozelAlanlar.OZL_OZEL_ALAN_15 : label && label.OZL_OZEL_ALAN_15}</div>,
@@ -789,6 +803,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
+      sorter: true,
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_16 ? ozelAlanlar.OZL_OZEL_ALAN_16 : label && label.OZL_OZEL_ALAN_16}</div>,
@@ -798,6 +813,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
+      sorter: true,
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_17 ? ozelAlanlar.OZL_OZEL_ALAN_17 : label && label.OZL_OZEL_ALAN_17}</div>,
@@ -807,6 +823,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
+      sorter: true,
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_18 ? ozelAlanlar.OZL_OZEL_ALAN_18 : label && label.OZL_OZEL_ALAN_18}</div>,
@@ -816,6 +833,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
+      sorter: true,
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_19 ? ozelAlanlar.OZL_OZEL_ALAN_19 : label && label.OZL_OZEL_ALAN_19}</div>,
@@ -825,6 +843,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
+      sorter: true,
     },
     {
       title: <div>{ozelAlanlar && ozelAlanlar.OZL_OZEL_ALAN_20 ? ozelAlanlar.OZL_OZEL_ALAN_20 : label && label.OZL_OZEL_ALAN_20}</div>,
@@ -834,6 +853,7 @@ const Sigorta = ({ onRowSelect, isSelectionMode = false, islemTip = null, deposu
       ellipsis: true,
 
       visible: false, // Varsayılan olarak kapalı
+      sorter: true,
     },
     // Diğer kolonlarınız...
   ];
