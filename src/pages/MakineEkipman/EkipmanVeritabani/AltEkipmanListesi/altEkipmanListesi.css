@@ -1,0 +1,403 @@
+/*
+ * Alt Ekipman Veritabani ekraninin stilleri. Marka rengi (--ae-marka) uygulama temasindan inline verilir
+ * (Omega turuncusu korunur). Uygulamada html font-size 12px oldugu icin olculer rem degil piksel yazilir.
+ */
+.alt-ekipman-listesi {
+  --ae-fg: #2b2c2f;
+  --ae-card: #ffffff;
+  --ae-muted: #6e7075;
+  --ae-subtle: #8e9196;
+  --ae-border: #e2e3e6;
+  --ae-accent: #f4f6f8;
+  --ae-shadow: 0 1px 2px 0 rgba(28, 30, 36, 0.05);
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  color: var(--ae-fg);
+}
+
+/* ---------- Sayfa yerlesimi (RULES.md kural 14) ---------- */
+
+.alt-ekipman-listesi--sabit > * {
+  flex-shrink: 0;
+}
+
+.alt-ekipman-listesi--sabit > .ae-liste-karti {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.ae-kart {
+  border: 1px solid var(--ae-border);
+  border-radius: 8px;
+  background: var(--ae-card);
+  box-shadow: var(--ae-shadow);
+}
+
+.ae-soluk {
+  color: var(--ae-subtle);
+}
+
+.ae-kalin {
+  font-weight: 600;
+}
+
+.ae-kucuk {
+  font-size: 11px;
+}
+
+.ae-yazi {
+  color: var(--ae-fg);
+}
+
+.ae-marka-metni {
+  color: var(--ae-marka, #1677ff);
+}
+
+.ae-tasan {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ae-tasan-kap {
+  min-width: 0;
+}
+
+.ae-link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--ae-marka, #1677ff);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ae-link:hover {
+  text-decoration: underline;
+}
+
+/* Ekipman kodu kolonda bolunmez; sigmazsa "..." ile kisalir. */
+.ae-tablo .ae-link {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ae-ikon-btn {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--ae-muted);
+  cursor: pointer;
+}
+
+.ae-ikon-btn:hover {
+  background: var(--ae-accent);
+}
+
+/* ---------- Baslik ---------- */
+
+.ae-baslik {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ae-baslik h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.ae-baslik p {
+  margin: 2px 0 0;
+  font-size: 13px;
+}
+
+.ae-baslik-dugmeleri {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ae-baslik-dugmeleri .ant-btn,
+.ae-baslik-dugmeleri .ant-segmented-item-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ae-yesil-btn.ant-btn:not(:disabled) {
+  border-color: #2bc770;
+  background: #2bc770;
+  color: #ffffff;
+}
+
+/* Tasarimdaki gibi secim yokken soluk yesil kalir. */
+.ae-yesil-btn.ant-btn:disabled {
+  border-color: #bfe9cf;
+  background: #bfe9cf;
+  color: #ffffff;
+}
+
+.ae-yesil-btn.ant-btn:not(:disabled):hover {
+  border-color: #2bc770 !important;
+  background: #2bc770 !important;
+  color: #ffffff !important;
+  opacity: 0.9;
+}
+
+/* ---------- KPI kartlari ---------- */
+
+.ae-kpi-izgarasi {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ae-kpi {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.ae-kpi:hover {
+  border-color: color-mix(in srgb, var(--ae-subtle) 50%, transparent);
+}
+
+.ae-kpi--aktif,
+.ae-kpi--aktif:hover {
+  border-color: var(--ae-marka, #1677ff);
+  box-shadow: 0 0 0 1px var(--ae-marka, #1677ff);
+}
+
+.ae-kpi-ikon {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.ae-kpi-ikon--toplam {
+  background: #e8efff;
+  color: #2f54eb;
+}
+
+.ae-kpi-ikon--stok {
+  background: #fff4e0;
+  color: #d97706;
+}
+
+.ae-kpi-ikon--bagli {
+  background: #e3f7ea;
+  color: #16a34a;
+}
+
+.ae-kpi-ikon--hurda {
+  background: #ffe9e6;
+  color: #dc2626;
+}
+
+.ae-kpi-metin {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.ae-kpi-deger {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@media (max-width: 900px) {
+  .ae-kpi-izgarasi {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Filtreler ve sekmeler ---------- */
+
+.ae-filtre-karti {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 12px;
+}
+
+.ae-filtre-cubugu {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.ae-filtre {
+  width: 125px;
+}
+
+.ae-filtre--arama {
+  min-width: 180px;
+  flex: 1 1 200px;
+}
+
+.ae-filtre-cubugu > .ant-btn {
+  display: inline-flex;
+  align-items: center;
+}
+
+.ae-gelismis {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--ae-accent);
+}
+
+.ae-gelismis-alan {
+  display: flex;
+  width: 320px;
+  max-width: 100%;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ae-sekmeler {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--ae-border);
+}
+
+.ae-sekme {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: var(--ae-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.ae-sekme:hover {
+  background: var(--ae-accent);
+}
+
+.ae-sekme--aktif,
+.ae-sekme--aktif:hover {
+  background: var(--ae-marka, #1677ff);
+  color: #ffffff;
+}
+
+.ae-sekme--aktif .ae-sekme-sayi {
+  opacity: 0.85;
+}
+
+/* ---------- Secim bandi ---------- */
+
+.ae-secim-bandi {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 10px 14px;
+  border: 1px solid color-mix(in srgb, var(--ae-marka, #1677ff) 25%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--ae-marka, #1677ff) 7%, #ffffff);
+  font-size: 13px;
+}
+
+.ae-secim-temizle {
+  margin-left: auto;
+}
+
+/* ---------- Tablolar ---------- */
+
+.ae-tablo .ant-table-thead > tr > th {
+  padding: 10px 12px !important;
+  background: #fafbfc !important;
+  color: var(--ae-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* Yalnizca veri satirlari: antd'nin gizli olcum satiri dolgu alirsa basligin altinda bosluk olusur. */
+.ae-tablo .ant-table-tbody > tr.ant-table-row > td {
+  padding: 8px 12px !important;
+  font-size: 13px;
+}
+
+.ae-tablo .ant-table-tbody > tr.ae-grup-satiri > td {
+  background: #fbfbfc;
+}
+
+.ae-grup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ae-grup-ikon {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--ae-marka, #1677ff) 12%, #ffffff);
+  color: var(--ae-marka, #1677ff);
+}
+
+.ae-rozet {
+  margin-inline-end: 0;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 20px;
+}
+
+.ae-sayfalama {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--ae-border);
+}
+
+.ae-islem-menusu .ant-dropdown-menu {
+  min-width: 190px;
+}

@@ -1,14 +1,7 @@
 import React from "react";
-import MainTable from "./Table/Table";
-import { FormProvider, useForm } from "react-hook-form";
+import AltEkipmanListesi from "./AltEkipmanListesi/AltEkipmanListesi";
 
-export default function BakimTanimlari() {
-  const formMethods = useForm();
-  return (
-    <FormProvider {...formMethods}>
-      <div>
-        <MainTable />
-      </div>
-    </FormProvider>
-  );
+/** Alt Ekipman Veritabani (/ekipmanVeritabani): liste / agac gorunumlu yeni ekran. */
+export default function EkipmanVeritabani() {
+  return <AltEkipmanListesi />;
 }

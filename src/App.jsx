@@ -374,7 +374,7 @@ const BaseLayout = () => {
   const layoutExcludedPaths = ["/isEmri1", "/makine"];
   const isLayoutExcluded = layoutExcludedPaths.includes(location.pathname);
   // Bu liste ekranlari kisa pencerede kendi icinde kayar (RULES.md kural 14); sarmalayici 360px'te kalirsa footer ekranin disina itilir.
-  const kendiIcindeKayanListeler = ["/makine", "/ekipmanTransferi", "/sayacHareketleri"];
+  const kendiIcindeKayanListeler = ["/makine", "/ekipmanTransferi", "/sayacHareketleri", "/ekipmanVeritabani"];
   const isKendiIcindeKayanListe = kendiIcindeKayanListeler.includes(location.pathname);
   const hasFixedDashboardHeader = location.pathname === "/omegaDash";
   // Dashboard ekraninda breadcrumb gosterilmez; bosalan alani icerik kaplar.
