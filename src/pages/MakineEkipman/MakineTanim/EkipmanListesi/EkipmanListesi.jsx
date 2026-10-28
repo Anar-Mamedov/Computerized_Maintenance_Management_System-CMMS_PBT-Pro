@@ -46,6 +46,7 @@ export default function EkipmanListesi() {
   const [excelHazirlaniyor, setExcelHazirlaniyor] = useState(false);
   const [aktifIslem, setAktifIslem] = useState(null);
   const [detaySatiri, setDetaySatiri] = useState(null);
+  const [yeniEkipmanAcik, setYeniEkipmanAcik] = useState(false);
   const [qrSatiri, setQrSatiri] = useState(null);
 
   // Cip etiketleri icin secenekler; gelismis filtrelerinkiler cekmece acilinca ya da dashboard'dan secili geldiginde yuklenir.
@@ -132,7 +133,7 @@ export default function EkipmanListesi() {
           onIslem={islemYap}
           onExcel={exceleAktarTiklandi}
           onKolonAyarlari={() => setKolonAyarlariAcik(true)}
-          onEkipmanEklendi={yenile}
+          onYeniEkipman={() => setYeniEkipmanAcik(true)}
         />
         <AktifFiltreler filtreler={filtreler} secenekler={secenekler} onFiltreDegistir={filtreleriGuncelle} onTumunuTemizle={liste.filtreleriTemizle} />
       </div>
@@ -176,7 +177,16 @@ export default function EkipmanListesi() {
         onKapat={() => setKolonAyarlariAcik(false)}
       />
       <IslemModallari aktifIslem={aktifIslem} onKapat={() => setAktifIslem(null)} onTamamlandi={islemTamamlandi} />
-      <EkipmanKarti makineId={detaySatiri?.TB_MAKINE_ID ?? null} acik={Boolean(detaySatiri)} onKapat={() => setDetaySatiri(null)} onKaydedildi={yenile} />
+      {/* Kayda tiklaninca mevcut ekipman, "Ekle" ile yeni ekipman (makineId olmadan) ayni kartta acilir. */}
+      <EkipmanKarti
+        makineId={detaySatiri?.TB_MAKINE_ID ?? null}
+        acik={Boolean(detaySatiri) || yeniEkipmanAcik}
+        onKapat={() => {
+          setDetaySatiri(null);
+          setYeniEkipmanAcik(false);
+        }}
+        onKaydedildi={yenile}
+      />
       <QRCodeGenerator
         visible={Boolean(qrSatiri)}
         onClose={() => setQrSatiri(null)}

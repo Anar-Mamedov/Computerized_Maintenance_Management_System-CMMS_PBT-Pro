@@ -10,8 +10,9 @@ import QRCodeGenerator from "../../../../../utils/components/QRCodeGenerator";
 import useTemaDegiskenleri from "../useTemaDegiskenleri";
 import useSekmeVerileri from "./useSekmeVerileri";
 import { basariliMi } from "../ekipmanService";
-import { getMakine, guncelleMakine, hataMesaji, kaydetAracRuhsati, kaydiAl } from "./ekipmanKartiService";
-import { VARSAYILAN_DEGERLER, makineFormDegerleri, makineGuncellemeGovdesi, ruhsatGovdesi } from "./formAlanlari";
+import { ekleMakine, getMakine, getYeniMakineKodu, guncelleMakine, hataMesaji, kaydetAracRuhsati, kaydiAl } from "./ekipmanKartiService";
+import { VARSAYILAN_DEGERLER, makineEklemeGovdesi, makineFormDegerleri, makineGuncellemeGovdesi, ruhsatGovdesi } from "./formAlanlari";
+import { metinYaDaNull } from "./yardimcilar";
 import { ILK_SEKME, SEKMELER } from "./sekmeler";
 import "./ekipmanKarti.css";
 
@@ -29,14 +30,19 @@ const KART_TEMASI = {
 const MASKE_STILI = { backgroundColor: "rgba(16, 24, 40, 0.1)" };
 const GOVDE_STILI = { padding: 0, display: "flex", flexDirection: "column", background: "var(--ek-k-zemin)" };
 
+// Yeni ekipmanda henuz GetMakineById kaydi yoktur; sekmeler bos kayitla cizilir.
+const YENI_KAYIT = {};
+
 /**
  * Ekipman Sicil Karti (tasarim: pbt-core.lovable.app). Ekipman listesinde bir kayda tiklaninca acilir.
  * Genel, detay, finansal, yakit, ozel alan, not ve ruhsat alanlari tek formdadir; "Guncelle" UpdateMakine'ye
  * (Arac sekmesi acildiysa SaveAracRuhsat'a da) gonderir. Liste sekmelerindeki islemler aninda kaydedilir;
  * bunlardan biri yapildiysa kart kapanirken ekipman listesi de yenilenir.
+ * `makineId` verilmeden acilirsa yeni ekipman ekleme kartidir: kayit gerektiren sekmeler gizlenir, "Kaydet" AddMakine'ye gonderir.
  */
 export default function EkipmanKarti({ makineId, acik, onKapat, onKaydedildi }) {
   const { t } = useTranslation();
+  const yeniKayit = !makineId;
   const temaDegiskenleri = useTemaDegiskenleri();
   const ekranlar = Grid.useBreakpoint();
   const [yukleniyor, setYukleniyor] = useState(false);
@@ -56,6 +62,32 @@ export default function EkipmanKarti({ makineId, acik, onKapat, onKaydedildi }) 
 
   const { altEkipmanlar, sayaclar, bakimlar } = useSekmeVerileri(acik ? makineId : null);
   const sekmeVerileri = { altEkipmanlar, sayaclar, bakimlar };
+
+  // Yeni ekipman: form bosaltilir ve otomatik ekipman kodu yazilir (kod alinamazsa elle girilir).
+  useEffect(() => {
+    if (!acik || makineId) return undefined;
+
+    let iptal = false;
+    const hazirla = async () => {
+      setYukleniyor(true);
+      setAktifSekme(ILK_SEKME);
+      let kod = null;
+      try {
+        kod = metinYaDaNull(await getYeniMakineKodu());
+      } catch (hata) {
+        console.error("Yeni ekipman kodu alinamadi:", hata);
+      }
+      if (iptal) return;
+      reset({ ...VARSAYILAN_DEGERLER, makineKodu: typeof kod === "string" ? kod : null });
+      setMakineKaydi(YENI_KAYIT);
+      setYukleniyor(false);
+    };
+
+    hazirla();
+    return () => {
+      iptal = true;
+    };
+  }, [acik, makineId, reset]);
 
   useEffect(() => {
     if (!acik || !makineId) return undefined;
@@ -90,7 +122,7 @@ export default function EkipmanKarti({ makineId, acik, onKapat, onKaydedildi }) 
 
   // Arac / Yakit sekmeleri ilgili ozellik isaretliyken gorunur; liste sekmelerinin kayit sayisi basliga yazilir.
   const kosullar = { arac, makineYakitKullanim: yakitKullanir };
-  const sekmeler = SEKMELER.filter((sekme) => !sekme.kosul || kosullar[sekme.kosul]).map((sekme) => ({
+  const sekmeler = SEKMELER.filter((sekme) => (!sekme.kosul || kosullar[sekme.kosul]) && !(yeniKayit && sekme.kayitGerekli)).map((sekme) => ({
     key: sekme.key,
     etiket: t(sekme.etiketKey),
     sayi: sekme.sayi && !sekmeVerileri[sekme.sayi].yukleniyor ? sekmeVerileri[sekme.sayi].kayitlar.length : undefined,
@@ -122,7 +154,30 @@ export default function EkipmanKarti({ makineId, acik, onKapat, onKaydedildi }) 
     kapat();
   };
 
+  const yeniKaydiEkle = async (veri) => {
+    setKaydediliyor(true);
+    try {
+      const yanit = await ekleMakine(makineEklemeGovdesi(veri));
+      if (!basariliMi(yanit)) {
+        message.error(yanit?.status_code === 401 ? t("ekipmanKarti.yetkiYok") : yanit?.message || t("ekipmanKarti.eklemeBasarisiz"));
+        return;
+      }
+      message.success(t("ekipmanKarti.eklendi"));
+      veriDegistiRef.current = true;
+      kapat();
+    } catch (hata) {
+      console.error("Ekipman eklenemedi:", hata);
+      message.error(hataMesaji(hata, t("ekipmanKarti.eklemeBasarisiz")));
+    } finally {
+      setKaydediliyor(false);
+    }
+  };
+
   const kaydet = async (veri) => {
+    if (yeniKayit) {
+      await yeniKaydiEkle(veri);
+      return;
+    }
     setKaydediliyor(true);
     try {
       const yanit = await guncelleMakine(makineGuncellemeGovdesi(veri));
@@ -174,6 +229,7 @@ export default function EkipmanKarti({ makineId, acik, onKapat, onKaydedildi }) 
             sekmeler={sekmeler}
             aktifSekme={aktifSekme}
             onSekmeDegistir={setAktifSekme}
+            yeniKayit={yeniKayit}
             kaydediliyor={kaydediliyor}
             yukleniyor={yukleniyor || !makineKaydi}
             onKapat={kapatmayiIste}

@@ -201,6 +201,13 @@
   background: color-mix(in srgb, var(--ek-brand) 90%, transparent);
 }
 
+/* Yesil "⋮" islem dugmesiyle ayni yukseklik */
+.ek-kart-btn--kucuk {
+  height: 32px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+
 .ek-kart-btn--tehlikeli {
   border-color: transparent;
   background: var(--ek-k-hata);

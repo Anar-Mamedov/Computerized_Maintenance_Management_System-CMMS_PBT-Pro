@@ -119,8 +119,10 @@ export default function Sayaclar({ makineId, veri, aktif = false, onVeriDegisti 
     veri.yenile();
   };
 
+  const yeniOgesi = { key: "yeni", etiket: t("ekipmanKarti.yeniKayit"), kisayol: "F4", ikon: <LuPlus size={IKON_BOYUTU} />, onClick: () => modalAc("tanim") };
+
   const menuOgeleri = [
-    { key: "yeni", etiket: t("ekipmanKarti.yeniKayit"), kisayol: "F4", ikon: <LuPlus size={IKON_BOYUTU} />, onClick: () => modalAc("tanim") },
+    yeniOgesi,
     { key: "degistir", etiket: t("ekipmanKarti.degistir"), kisayol: "F7", ikon: <LuPencil size={IKON_BOYUTU} />, onClick: () => tekKayitlaAc("tanim") },
     { key: "sil", etiket: t("ekipmanKarti.sil"), kisayol: "F9", ikon: <LuTrash2 size={IKON_BOYUTU} />, tehlikeli: true, onClick: silmeyiIste },
     { tip: "ayrac" },
@@ -136,7 +138,7 @@ export default function Sayaclar({ makineId, veri, aktif = false, onVeriDegisti 
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <IslemMenusu ogeler={menuOgeleri} aktif={aktif && acikModal === null} />
+        <IslemMenusu ogeler={menuOgeleri} ekle={yeniOgesi} aktif={aktif && acikModal === null} />
       </div>
       <KartTablosu
         rowKey="clientKey"

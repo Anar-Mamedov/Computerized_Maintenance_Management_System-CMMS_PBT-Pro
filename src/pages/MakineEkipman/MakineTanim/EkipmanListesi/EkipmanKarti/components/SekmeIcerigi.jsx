@@ -76,7 +76,8 @@ export default function SekmeIcerigi({ aktifSekme, makineId, makineKaydi, sekmeV
 
 SekmeIcerigi.propTypes = {
   aktifSekme: PropTypes.string.isRequired,
-  makineId: PropTypes.number.isRequired,
+  /** Yeni ekipman eklenirken null'dir; o durumda yalnizca kayit gerektirmeyen sekmeler acilir. */
+  makineId: PropTypes.number,
   makineKaydi: PropTypes.object.isRequired,
   sekmeVerileri: PropTypes.shape({
     altEkipmanlar: listeVerisiTipi.isRequired,

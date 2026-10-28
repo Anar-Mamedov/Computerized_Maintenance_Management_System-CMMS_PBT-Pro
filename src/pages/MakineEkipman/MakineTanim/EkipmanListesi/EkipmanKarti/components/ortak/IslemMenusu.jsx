@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { Dropdown } from "antd";
 import { useTranslation } from "react-i18next";
+import { LuPlus } from "react-icons/lu";
 import useTemaDegiskenleri from "../../../useTemaDegiskenleri";
 
 // Odak cekmecenin disindaysa (ör. acik bir modalda) kisayollar calismaz.
@@ -25,12 +26,45 @@ const menuOgesi = (oge) => ({
   ),
 });
 
+/** Islem menusunun yanindaki "Ekle" dugmesi. Ogenin alt secenekleri varsa (ör. Stoktan Ekle / Yeni Ekipman) tiklayinca onlar acilir. */
+function EkleDugmesi({ oge }) {
+  const { t } = useTranslation();
+  const temaDegiskenleri = useTemaDegiskenleri();
+
+  if (!oge.altOgeler) {
+    return (
+      <button type="button" className="ek-kart-btn ek-kart-btn--birincil ek-kart-btn--kucuk" onClick={oge.onClick}>
+        <LuPlus size={14} />
+        {t("ekipmanKarti.ekle")}
+      </button>
+    );
+  }
+
+  const secildi = ({ key }) => oge.altOgeler.find((alt) => alt.key === key)?.onClick?.();
+
+  return (
+    <Dropdown
+      trigger={["click"]}
+      placement="bottomRight"
+      overlayClassName="ek-sicil ek-kart-menu"
+      overlayStyle={{ ...temaDegiskenleri, minWidth: 220 }}
+      menu={{ items: oge.altOgeler.map(menuOgesi), onClick: secildi }}
+    >
+      <button type="button" className="ek-kart-btn ek-kart-btn--birincil ek-kart-btn--kucuk" aria-haspopup="menu">
+        <LuPlus size={14} />
+        {t("ekipmanKarti.ekle")}
+      </button>
+    </Dropdown>
+  );
+}
+
 /**
  * Sekmelerin yesil "⋮" islem menusu.
  * Ogeler: { key, etiket, onClick, kisayol?, ikon?, devreDisi?, tehlikeli?, altOgeler? } ya da { tip: "ayrac" }.
+ * `ekle` verilirse menunun soluna ayni ekleme islemini yapan "Ekle" dugmesi konur.
  * `aktif` iken (sekme gorunur ve uzerinde modal yok) menudeki F4 / F5 / F7 / F9 kisayollari klavyeden de calisir.
  */
-export default function IslemMenusu({ ogeler, aktif = false }) {
+export default function IslemMenusu({ ogeler, ekle, aktif = false }) {
   const { t } = useTranslation();
   const temaDegiskenleri = useTemaDegiskenleri();
   const [acik, setAcik] = useState(false);
@@ -73,19 +107,22 @@ export default function IslemMenusu({ ogeler, aktif = false }) {
   };
 
   return (
-    <Dropdown
-      trigger={["click"]}
-      placement="bottomRight"
-      open={acik}
-      onOpenChange={setAcik}
-      overlayClassName="ek-sicil ek-kart-menu"
-      overlayStyle={{ ...temaDegiskenleri, minWidth: 240 }}
-      menu={{ items: menuOgeleri, onClick: tiklandi }}
-    >
-      <button type="button" className="ek-kart-islem-btn" aria-label={t("ekipmanKarti.islemler")} aria-haspopup="menu" aria-expanded={acik}>
-        <span className="ek-kart-islem-btn__nokta">⋮</span>
-      </button>
-    </Dropdown>
+    <div className="flex items-center gap-2">
+      {ekle && <EkleDugmesi oge={ekle} />}
+      <Dropdown
+        trigger={["click"]}
+        placement="bottomRight"
+        open={acik}
+        onOpenChange={setAcik}
+        overlayClassName="ek-sicil ek-kart-menu"
+        overlayStyle={{ ...temaDegiskenleri, minWidth: 240 }}
+        menu={{ items: menuOgeleri, onClick: tiklandi }}
+      >
+        <button type="button" className="ek-kart-islem-btn" aria-label={t("ekipmanKarti.islemler")} aria-haspopup="menu" aria-expanded={acik}>
+          <span className="ek-kart-islem-btn__nokta">⋮</span>
+        </button>
+      </Dropdown>
+    </div>
   );
 }
 
@@ -100,7 +137,18 @@ const ogeTipi = PropTypes.shape({
   tip: PropTypes.oneOf(["ayrac"]),
 });
 
+/** Ekleme ogesi: dogrudan islem (onClick) ya da alt secenekler (altOgeler). */
+const ekleOgesiTipi = PropTypes.shape({
+  onClick: PropTypes.func,
+  altOgeler: PropTypes.arrayOf(ogeTipi),
+});
+
+EkleDugmesi.propTypes = {
+  oge: ekleOgesiTipi.isRequired,
+};
+
 IslemMenusu.propTypes = {
   ogeler: PropTypes.arrayOf(PropTypes.oneOfType([ogeTipi, PropTypes.shape({ altOgeler: PropTypes.arrayOf(ogeTipi) })])).isRequired,
+  ekle: ekleOgesiTipi,
   aktif: PropTypes.bool,
 };

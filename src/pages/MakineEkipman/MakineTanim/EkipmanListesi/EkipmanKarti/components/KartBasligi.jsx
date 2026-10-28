@@ -5,8 +5,8 @@ import { useTranslation } from "react-i18next";
 import { LuLoader2, LuQrCode, LuX } from "react-icons/lu";
 import Rozet from "./ortak/Rozet";
 
-/** Cekmecenin sabit ust bolumu: yol, ekipman kodu / tanimi / rozetler, dugmeler ve sekme cubugu. */
-export default function KartBasligi({ sekmeler, aktifSekme, onSekmeDegistir, kaydediliyor, yukleniyor, onKapat, onQr, onGuncelle }) {
+/** Cekmecenin sabit ust bolumu: yol, ekipman kodu / tanimi / rozetler, dugmeler ve sekme cubugu. Yeni kayitta QR yoktur, dugme "Kaydet"tir. */
+export default function KartBasligi({ sekmeler, aktifSekme, onSekmeDegistir, yeniKayit = false, kaydediliyor, yukleniyor, onKapat, onQr, onGuncelle }) {
   const { t } = useTranslation();
   const { watch } = useFormContext();
   const [kod, tanim, aktif, durum] = watch(["makineKodu", "makineTanimi", "makineAktif", "operasyonDurumuText"]);
@@ -36,16 +36,18 @@ export default function KartBasligi({ sekmeler, aktifSekme, onSekmeDegistir, kay
           )}
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <button type="button" className="ek-kart-btn" onClick={onQr} disabled={yukleniyor}>
-            <LuQrCode size={14} />
-            {t("ekipmanKarti.qrKod")}
-          </button>
+          {!yeniKayit && (
+            <button type="button" className="ek-kart-btn" onClick={onQr} disabled={yukleniyor}>
+              <LuQrCode size={14} />
+              {t("ekipmanKarti.qrKod")}
+            </button>
+          )}
           <button type="button" className="ek-kart-btn" onClick={onKapat}>
             {t("ekipmanKarti.iptal")}
           </button>
           <button type="button" className="ek-kart-btn ek-kart-btn--birincil" onClick={onGuncelle} disabled={yukleniyor || kaydediliyor}>
             {kaydediliyor && <LuLoader2 size={14} className="animate-spin" />}
-            {t("ekipmanKarti.guncelle")}
+            {yeniKayit ? t("ekipmanKarti.kaydet") : t("ekipmanKarti.guncelle")}
           </button>
         </div>
       </div>
@@ -73,6 +75,7 @@ KartBasligi.propTypes = {
   sekmeler: PropTypes.arrayOf(PropTypes.shape({ key: PropTypes.string.isRequired, etiket: PropTypes.string.isRequired, sayi: PropTypes.number })).isRequired,
   aktifSekme: PropTypes.string.isRequired,
   onSekmeDegistir: PropTypes.func.isRequired,
+  yeniKayit: PropTypes.bool,
   kaydediliyor: PropTypes.bool,
   yukleniyor: PropTypes.bool,
   onKapat: PropTypes.func.isRequired,

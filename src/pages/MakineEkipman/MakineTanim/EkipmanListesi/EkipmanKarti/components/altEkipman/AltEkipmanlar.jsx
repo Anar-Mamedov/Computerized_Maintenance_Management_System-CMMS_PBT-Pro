@@ -58,15 +58,17 @@ export default function AltEkipmanlar({ makineId, veri, aktif, onVeriDegisti }) 
     setKapaliGruplar((onceki) => (onceki.includes(anahtar) ? onceki.filter((kapali) => kapali !== anahtar) : [...onceki, anahtar]));
   };
 
+  const ekleOgesi = {
+    key: "ekle",
+    etiket: t("ekipmanKarti.altEkipman.ekle"),
+    altOgeler: [
+      { key: "stoktanEkle", etiket: t("ekipmanKarti.altEkipman.stoktanEkle"), onClick: () => setModal({ tur: "stoktanEkle" }) },
+      { key: "yeniEkipman", etiket: t("ekipmanKarti.altEkipman.yeniEkipmanStoksuz"), onClick: () => setModal({ tur: "yeniEkipman" }) },
+    ],
+  };
+
   const ogeler = [
-    {
-      key: "ekle",
-      etiket: t("ekipmanKarti.altEkipman.ekle"),
-      altOgeler: [
-        { key: "stoktanEkle", etiket: t("ekipmanKarti.altEkipman.stoktanEkle"), onClick: () => setModal({ tur: "stoktanEkle" }) },
-        { key: "yeniEkipman", etiket: t("ekipmanKarti.altEkipman.yeniEkipmanStoksuz"), onClick: () => setModal({ tur: "yeniEkipman" }) },
-      ],
-    },
+    ekleOgesi,
     { key: "degistir", etiket: t("ekipmanKarti.degistir"), kisayol: "F7", onClick: () => tekKayitIleAc("duzenle") },
     {
       key: "cikart",
@@ -118,7 +120,7 @@ export default function AltEkipmanlar({ makineId, veri, aktif, onVeriDegisti }) 
     <>
       <div className="space-y-4">
         <div className="flex justify-end">
-          <IslemMenusu ogeler={ogeler} aktif={aktif && !modal} />
+          <IslemMenusu ogeler={ogeler} ekle={ekleOgesi} aktif={aktif && !modal} />
         </div>
         {icerigiCiz()}
       </div>

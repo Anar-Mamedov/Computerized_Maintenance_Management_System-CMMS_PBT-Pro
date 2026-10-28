@@ -436,6 +436,13 @@ export const makineGuncellemeGovdesi = (veri) => ({
   MKN_GENEL_NOT: veri.makineGenelNot,
 });
 
+/** Form -> AddMakine govdesi: guncelleme govdesiyle ayni alanlar, kayit ID'si olmadan. */
+export const makineEklemeGovdesi = (veri) => {
+  const govde = makineGuncellemeGovdesi(veri);
+  delete govde.TB_MAKINE_ID;
+  return govde;
+};
+
 /** GetAracRuhsatByMakineId kaydi -> ruhsat alanlari. */
 export const ruhsatFormDegerleri = (kayit) => ({
   aracId: kayit.TB_ARAC_ID ?? null,

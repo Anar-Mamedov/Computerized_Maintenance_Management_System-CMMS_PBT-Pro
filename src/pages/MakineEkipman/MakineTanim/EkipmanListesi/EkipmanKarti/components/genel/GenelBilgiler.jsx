@@ -112,16 +112,20 @@ export default function GenelBilgiler({ makineId, makineKaydi, resimSurumu, onVe
         <Bolum baslik={t("ekipmanKarti.genel.durumOzellikler")} altBaslik={t("ekipmanKarti.genel.durumOzelliklerAciklama")}>
           <DurumOzellikler />
         </Bolum>
-        <Bolum baslik={t("ekipmanKarti.genel.hizliIslemler")} altBaslik={t("ekipmanKarti.genel.hizliIslemlerAciklama")}>
-          <HizliIslemler makineId={makineId} makineKaydi={makineKaydi} onVeriDegisti={onVeriDegisti} />
-        </Bolum>
+        {/* Hizli islemler kayitli ekipman uzerinde calisir; yeni ekipman eklenirken gosterilmez. */}
+        {Boolean(makineId) && (
+          <Bolum baslik={t("ekipmanKarti.genel.hizliIslemler")} altBaslik={t("ekipmanKarti.genel.hizliIslemlerAciklama")}>
+            <HizliIslemler makineId={makineId} makineKaydi={makineKaydi} onVeriDegisti={onVeriDegisti} />
+          </Bolum>
+        )}
       </aside>
     </div>
   );
 }
 
 GenelBilgiler.propTypes = {
-  makineId: PropTypes.number.isRequired,
+  /** Yeni ekipman eklenirken null'dir. */
+  makineId: PropTypes.number,
   makineKaydi: PropTypes.shape({
     MKN_MARKA_KOD_ID: PropTypes.number,
     MKN_MODEL: PropTypes.string,

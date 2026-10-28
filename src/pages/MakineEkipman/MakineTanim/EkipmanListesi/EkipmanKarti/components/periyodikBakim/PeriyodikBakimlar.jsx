@@ -76,8 +76,10 @@ export default function PeriyodikBakimlar({ makineId, veri, aktif, onVeriDegisti
     setModal({ tur: "isEmri", kayit });
   };
 
+  const yeniOgesi = { key: "yeni", etiket: t("ekipmanKarti.yeniKayit"), kisayol: "F4", ikon: <LuPlus size={14} />, onClick: () => setModal({ tur: "ekle" }) };
+
   const ogeler = [
-    { key: "yeni", etiket: t("ekipmanKarti.yeniKayit"), kisayol: "F4", ikon: <LuPlus size={14} />, onClick: () => setModal({ tur: "ekle" }) },
+    yeniOgesi,
     { key: "incele", etiket: t("ekipmanKarti.incele"), kisayol: "F7", ikon: <LuPencil size={14} />, onClick: tekKayitla((kayit) => setModal({ tur: "duzenle", kayit })) },
     { key: "sil", etiket: t("ekipmanKarti.sil"), kisayol: "F9", ikon: <LuTrash2 size={14} />, tehlikeli: true, onClick: seciliKayitlarla("sil") },
     { tip: "ayrac" },
@@ -106,7 +108,7 @@ export default function PeriyodikBakimlar({ makineId, veri, aktif, onVeriDegisti
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <IslemMenusu ogeler={ogeler} aktif={aktif && !modal && !isEmriSatiri} />
+        <IslemMenusu ogeler={ogeler} ekle={yeniOgesi} aktif={aktif && !modal && !isEmriSatiri} />
       </div>
       <KartTablosu
         className="[&_td]:align-top"

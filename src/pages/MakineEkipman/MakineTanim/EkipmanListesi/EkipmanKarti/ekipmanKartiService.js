@@ -32,6 +32,11 @@ export const getMakine = (makineId) => AxiosInstance.get("GetMakineById", { para
 
 export const guncelleMakine = (govde) => AxiosInstance.post("UpdateMakine", govde);
 
+/** Yeni ekipman icin otomatik kod (yanit: kod metni). */
+export const getYeniMakineKodu = () => AxiosInstance.get("MakineKodGetir");
+
+export const ekleMakine = (govde) => AxiosInstance.post("AddMakine", govde);
+
 /** Is emri tipleri; ariza tipi IMT_TIP_ARIZA ile isaretlidir (Ariza Bildir). Dokumandaki IsEmriAdd ucu backend'de yok;
  * is emri mevcut Is Emri Ekle cekmecesiyle (POST IsEmri?isWeb=true) acilir. */
 export const getIsEmriTipleri = () => AxiosInstance.get("IsEmriTip");

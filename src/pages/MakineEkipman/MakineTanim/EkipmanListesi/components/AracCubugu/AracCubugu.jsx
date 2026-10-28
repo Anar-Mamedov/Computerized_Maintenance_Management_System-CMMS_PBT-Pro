@@ -1,5 +1,7 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
+import { Button } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import { FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { LuSlidersHorizontal } from "react-icons/lu";
@@ -7,7 +9,6 @@ import AramaKutusu from "./AramaKutusu";
 import GorunumSecici from "./GorunumSecici";
 import SayfaMenusu from "./SayfaMenusu";
 import IslemlerMenusu from "../islemler/IslemlerMenusu";
-import CreateDrawer from "../../../CreateDrawer";
 import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
 import KodFilterSelectbox from "../../../../../../utils/components/KodFilterSelectbox";
 import AktifPasifHepsiSelect from "../../../../../../utils/components/AktifPasifHepsiSelect";
@@ -34,7 +35,7 @@ export default function AracCubugu({
   onIslem,
   onExcel,
   onKolonAyarlari,
-  onEkipmanEklendi,
+  onYeniEkipman,
 }) {
   const { t } = useTranslation();
   const gelismisSayisi = gelismisFiltreSayisi(filtreler);
@@ -94,8 +95,11 @@ export default function AracCubugu({
       <div className="ml-auto flex shrink-0 items-center gap-2">
         <GorunumSecici gorunum={gorunum} onGorunumDegistir={onGorunumDegistir} />
         <IslemlerMenusu seciliSatirlar={seciliSatirlar} onIslem={onIslem} />
+        {/* Yeni ekipman, kayit detayiyla ayni Ekipman Sicil Karti'nda acilir (EkipmanListesi). */}
         <div className="ek-ekle">
-          <CreateDrawer onRefresh={onEkipmanEklendi} />
+          <Button type="primary" icon={<PlusOutlined />} onClick={onYeniEkipman}>
+            {t("ekle")}
+          </Button>
         </div>
       </div>
     </div>
@@ -128,5 +132,5 @@ AracCubugu.propTypes = {
   onIslem: PropTypes.func.isRequired,
   onExcel: PropTypes.func.isRequired,
   onKolonAyarlari: PropTypes.func.isRequired,
-  onEkipmanEklendi: PropTypes.func.isRequired,
+  onYeniEkipman: PropTypes.func.isRequired,
 };
