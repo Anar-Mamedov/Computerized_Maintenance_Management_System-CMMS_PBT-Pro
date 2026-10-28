@@ -58,6 +58,7 @@ export default function AltEkipmanlar({ makineId, veri, aktif, onVeriDegisti }) 
     setKapaliGruplar((onceki) => (onceki.includes(anahtar) ? onceki.filter((kapali) => kapali !== anahtar) : [...onceki, anahtar]));
   };
 
+  // Ekleme secenekleri yalnizca menunun yanindaki "Ekle" dugmesindedir; "⋮" menusunde tekrar edilmez.
   const ekleOgesi = {
     key: "ekle",
     etiket: t("ekipmanKarti.altEkipman.ekle"),
@@ -68,7 +69,6 @@ export default function AltEkipmanlar({ makineId, veri, aktif, onVeriDegisti }) 
   };
 
   const ogeler = [
-    ekleOgesi,
     { key: "degistir", etiket: t("ekipmanKarti.degistir"), kisayol: "F7", onClick: () => tekKayitIleAc("duzenle") },
     {
       key: "cikart",

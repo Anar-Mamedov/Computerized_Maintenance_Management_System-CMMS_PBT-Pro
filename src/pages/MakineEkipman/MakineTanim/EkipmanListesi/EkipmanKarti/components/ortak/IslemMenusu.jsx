@@ -61,7 +61,7 @@ function EkleDugmesi({ oge }) {
 /**
  * Sekmelerin yesil "⋮" islem menusu.
  * Ogeler: { key, etiket, onClick, kisayol?, ikon?, devreDisi?, tehlikeli?, altOgeler? } ya da { tip: "ayrac" }.
- * `ekle` verilirse menunun soluna ayni ekleme islemini yapan "Ekle" dugmesi konur.
+ * `ekle` verilirse menunun sagina ayni ekleme islemini yapan "Ekle" dugmesi konur.
  * `aktif` iken (sekme gorunur ve uzerinde modal yok) menudeki F4 / F5 / F7 / F9 kisayollari klavyeden de calisir.
  */
 export default function IslemMenusu({ ogeler, ekle, aktif = false }) {
@@ -108,7 +108,6 @@ export default function IslemMenusu({ ogeler, ekle, aktif = false }) {
 
   return (
     <div className="flex items-center gap-2">
-      {ekle && <EkleDugmesi oge={ekle} />}
       <Dropdown
         trigger={["click"]}
         placement="bottomRight"
@@ -122,6 +121,7 @@ export default function IslemMenusu({ ogeler, ekle, aktif = false }) {
           <span className="ek-kart-islem-btn__nokta">⋮</span>
         </button>
       </Dropdown>
+      {ekle && <EkleDugmesi oge={ekle} />}
     </div>
   );
 }
