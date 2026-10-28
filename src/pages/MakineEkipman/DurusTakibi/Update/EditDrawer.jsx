@@ -207,7 +207,7 @@ export default function EditModal({ selectedRow, onDrawerClose, drawerVisible, o
         <Modal
           width="710px"
           centered
-          title={t("makineDurusGuncelle")}
+          title={t("ekipmanDurusGuncelle")}
           open={drawerVisible}
           onCancel={onClose}
           footer={

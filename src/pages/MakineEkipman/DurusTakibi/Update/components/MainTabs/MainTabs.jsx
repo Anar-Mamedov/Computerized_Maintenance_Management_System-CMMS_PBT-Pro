@@ -563,7 +563,7 @@ export default function MainTabs({ modalOpen }) {
   }}
 >
   <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>
-    {t("makine")}
+    {t("ekipman")}
   </Text>
 
   <div
@@ -581,7 +581,7 @@ export default function MainTabs({ modalOpen }) {
         <div style={{ flex: 1 }}>
           <TextInput 
             name="makineKod" 
-            placeholder={t("makineKod")} 
+            placeholder={t("ekipmanKodu")}
             isRequired={false} 
             checked={true} 
           />
@@ -590,7 +590,7 @@ export default function MainTabs({ modalOpen }) {
         <div style={{ flex: 2 }}> {/* Sağ taraf biraz daha geniş olsun dersen flex değerini artırabilirsin */}
           <TextInput 
             name="makine" 
-            placeholder={t("makine")} 
+            placeholder={t("ekipman")}
             isRequired={false} 
             checked={true} 
           />

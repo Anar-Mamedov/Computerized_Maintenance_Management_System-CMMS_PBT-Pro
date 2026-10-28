@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, Row, Col, Spin, message, Select, Space } from 'antd'; // Select ve Space eklendi
-import { Line, Column, Pie } from '@ant-design/plots';
+import { Line, Column } from '@ant-design/plots';
 import AxiosInstance from "../../../../api/http";
 
 const { Option } = Select;
@@ -93,22 +93,6 @@ const GrafikTab = ({ search, year, setYear, jobTypeFilter }) => {
                 height={280}
                 autoFit={true}
                 label={{ position: 'top', style: { fill: '#666' } }}
-              />
-            </Card>
-          </Col>
-
-          {/* Alt: Ekipman Dağılımı */}
-          <Col span={24}>
-            <Card title="Ekipman Dağılımı (Top 10)" size="small" style={{ borderRadius: '12px' }}>
-              <Pie 
-                data={charts.pie_chart || []} 
-                angleField="Deger" 
-                colorField="Etiket" 
-                radius={0.8} 
-                height={350}
-                autoFit={true}
-                label={{ type: 'outer', content: '{name}: {percentage}' }}
-                legend={{ position: 'bottom' }}
               />
             </Card>
           </Col>

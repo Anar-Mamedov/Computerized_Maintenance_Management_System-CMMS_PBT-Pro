@@ -64,7 +64,7 @@ export default function SecondTabs({ refreshKey, fieldRequirements, modalOpen })
     },*/
     {
       key: "4",
-      label: t("makineListesi"),
+      label: t("ekipmanListesi"),
       children: <FisIcerigi modalOpen={modalOpen} />,
     },
 

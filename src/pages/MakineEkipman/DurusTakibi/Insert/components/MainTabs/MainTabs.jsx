@@ -468,7 +468,7 @@ export default function MainTabs({ modalOpen }) {
               flexDirection: "row",
             }}
           >
-            <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("makine")}</Text>
+            <Text style={{ display: "flex", fontSize: "14px", flexDirection: "row" }}>{t("ekipman")}</Text>
             <div
               style={{
                 display: "flex",

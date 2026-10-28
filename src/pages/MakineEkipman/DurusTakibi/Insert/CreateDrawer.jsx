@@ -203,7 +203,7 @@ export default function CreateModal({ selectedLokasyonId, onRefresh, acik, onKap
         <Modal
           width="710px"
           centered
-          title={t("hizliMakineDurusGirisi")}
+          title={t("hizliEkipmanDurusGirisi")}
           destroyOnClose
           open={open}
           onCancel={onClose}

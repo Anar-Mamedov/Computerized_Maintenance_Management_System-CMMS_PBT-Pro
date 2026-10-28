@@ -15,6 +15,8 @@ import { FormProvider, useForm } from "react-hook-form";
 import styled from "styled-components";
 import { t } from "i18next";
 import PropTypes from "prop-types";
+import { useTranslation } from "react-i18next";
+import { formatNumberWithSeparators } from "../../../../utils/numberLocale";
 import trTR from "antd/lib/locale/tr_TR";
 import enUS from "antd/lib/locale/en_US";
 import ruRU from "antd/lib/locale/ru_RU";
@@ -33,7 +35,16 @@ const localeMap = {
 
 // Date/time formats are derived automatically via Intl based on browser locale
 
+// Kolon ayarlari. Ekipman ve tarih/saat kolonlari birlestirildiginde yeni varsayilan siralama ve
+// genisliklerin herkese uygulanmasi icin anahtarlar "_v2" ile yenilendi.
+const KOLON_SIRASI_ANAHTARI = "columnOrderDurusTakibi_v2";
+const KOLON_GORUNURLUGU_ANAHTARI = "columnVisibilityDurusTakibi_v2";
+const KOLON_GENISLIKLERI_ANAHTARI = "columnWidthsDurusTakibi_v2";
+
 const { Text } = Typography;
+
+/** "1088016 saat 10 dk" gibi metindeki sayilar dile gore ayraclarla yazilir: "1.088.016 saat 10 dk". */
+const sureMetni = (deger, dil) => String(deger).replace(/\d+/g, (sayi) => formatNumberWithSeparators(sayi, dil));
 
 const getFirstStatValue = (values = []) =>
   values.find((value) => {
@@ -74,6 +85,7 @@ const formatStatText = (value) => {
 };
 
 const DurusIstatistikKartlari = ({ body, searchTerm }) => {
+  const { i18n } = useTranslation();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
   const enCokDurusTitle = "En Çok Duruş Yapan / En Uzun Duran Ekipman";
@@ -156,6 +168,7 @@ const DurusIstatistikKartlari = ({ body, searchTerm }) => {
             <Statistic 
               title={<Text strong style={{ fontSize: '14px' }}>Toplam Duruş Süresi</Text>} 
               value={stats?.toplam_durus_suresi || "-"}
+              formatter={(deger) => sureMetni(deger, i18n.language)}
               valueStyle={{ fontSize: '24px' }} // Fontu büyüttük
             />
           </Card>
@@ -165,7 +178,7 @@ const DurusIstatistikKartlari = ({ body, searchTerm }) => {
             <Statistic 
               title={<Text strong style={{ fontSize: '14px' }}>Plansız Duruş Oranı</Text>} 
               value={stats?.plansiz_durus_orani || 0}
-              precision={1}
+              formatter={(deger) => formatNumberWithSeparators(Math.round(Number(deger) * 10) / 10, i18n.language)}
               suffix="%"
               valueStyle={{ fontSize: '24px' }}
             />
@@ -176,6 +189,7 @@ const DurusIstatistikKartlari = ({ body, searchTerm }) => {
             <Statistic 
               title={<Text strong style={{ fontSize: '14px' }}>Ortalama Duruş Süresi</Text>} 
               value={stats?.ortalama_durus_suresi || 0}
+              formatter={(deger) => formatNumberWithSeparators(deger, i18n.language)}
               suffix={<small style={{ fontSize: '14px', marginLeft: '4px' }}>dk</small>}
               valueStyle={{ fontSize: '24px' }}
             />
@@ -209,6 +223,19 @@ const StyledButton = styled(Button)`
 `;
 
 const StyledTable = styled(Table)``;
+
+/** Tarih (kalin) ustte, saat altta. */
+const TarihSaat = ({ tarih, saat }) => (
+  <div className="flex flex-col">
+    <span className="font-semibold">{tarih}</span>
+    {saat && <span>{saat}</span>}
+  </div>
+);
+
+TarihSaat.propTypes = {
+  tarih: PropTypes.string,
+  saat: PropTypes.string,
+};
 
 // Sütunların boyutlarını ayarlamak için kullanılan component
 
@@ -480,30 +507,25 @@ const DurusTakibi = () => {
         },
       },
       {
-        title: t("makineKodu"),
+        // Ekipman tek sutundur: kod (kalin, kaydi acar) ustte, tanim altta.
+        title: t("ekipman"),
         dataIndex: "MKN_KOD",
         key: "MKN_KOD",
-        width: 140,
+        width: 260,
         ellipsis: true,
         visible: true,
-        render: (text, record) => <a onClick={() => onRowClick(record)}>{text}</a>,
+        render: (text, record) => (
+          <div className="flex min-w-0 flex-col">
+            <a className="truncate font-semibold" onClick={() => onRowClick(record)}>
+              {text}
+            </a>
+            <span className="truncate">{record.MKN_TANIM}</span>
+          </div>
+        ),
         sorter: (a, b) => {
           if (a.MKN_KOD === null) return -1;
           if (b.MKN_KOD === null) return 1;
           return String(a.MKN_KOD).localeCompare(String(b.MKN_KOD));
-        },
-      },
-      {
-        title: t("makineTanimi"),
-        dataIndex: "MKN_TANIM",
-        key: "MKN_TANIM",
-        width: 220,
-        ellipsis: true,
-        visible: true,
-        sorter: (a, b) => {
-          if (a.MKN_TANIM === null) return -1;
-          if (b.MKN_TANIM === null) return 1;
-          return String(a.MKN_TANIM).localeCompare(String(b.MKN_TANIM));
         },
       },
       {
@@ -531,21 +553,7 @@ const DurusTakibi = () => {
           if (b.MKD_BASLAMA_TARIH === null) return 1;
           return String(a.MKD_BASLAMA_TARIH).localeCompare(String(b.MKD_BASLAMA_TARIH));
         },
-        render: (text) => formatDate(text),
-      },
-      {
-        title: t("baslamaSaati"),
-        dataIndex: "MKD_BASLAMA_SAAT",
-        key: "MKD_BASLAMA_SAAT",
-        width: 120,
-        ellipsis: true,
-        visible: true,
-        sorter: (a, b) => {
-          if (a.MKD_BASLAMA_SAAT === null) return -1;
-          if (b.MKD_BASLAMA_SAAT === null) return 1;
-          return String(a.MKD_BASLAMA_SAAT).localeCompare(String(b.MKD_BASLAMA_SAAT));
-        },
-        render: (text) => formatTime(text),
+        render: (text, record) => <TarihSaat tarih={formatDate(text)} saat={formatTime(record.MKD_BASLAMA_SAAT)} />,
       },
       {
         title: t("bitisTarihi"),
@@ -559,21 +567,7 @@ const DurusTakibi = () => {
           if (b.MKD_BITIS_TARIH === null) return 1;
           return String(a.MKD_BITIS_TARIH).localeCompare(String(b.MKD_BITIS_TARIH));
         },
-        render: (text) => formatDate(text),
-      },
-      {
-        title: t("bitisSaati"),
-        dataIndex: "MKD_BITIS_SAAT",
-        key: "MKD_BITIS_SAAT",
-        width: 120,
-        ellipsis: true,
-        visible: true,
-        sorter: (a, b) => {
-          if (a.MKD_BITIS_SAAT === null) return -1;
-          if (b.MKD_BITIS_SAAT === null) return 1;
-          return String(a.MKD_BITIS_SAAT).localeCompare(String(b.MKD_BITIS_SAAT));
-        },
-        render: (text) => formatTime(text),
+        render: (text, record) => <TarihSaat tarih={formatDate(text)} saat={formatTime(record.MKD_BITIS_SAAT)} />,
       },
       {
         title: t("sureDakika"),
@@ -664,11 +658,12 @@ const DurusTakibi = () => {
 
   // Manage columns from localStorage or default
   const [columns, setColumns] = useState(() => {
-    const savedOrder = localStorage.getItem("columnOrderDurusTakibi");
-    const savedVisibility = localStorage.getItem("columnVisibilityDurusTakibi");
-    const savedWidths = localStorage.getItem("columnWidthsDurusTakibi");
+    const savedOrder = localStorage.getItem(KOLON_SIRASI_ANAHTARI);
+    const savedVisibility = localStorage.getItem(KOLON_GORUNURLUGU_ANAHTARI);
+    const savedWidths = localStorage.getItem(KOLON_GENISLIKLERI_ANAHTARI);
 
-    let order = savedOrder ? JSON.parse(savedOrder) : [];
+    // Kaldirilmis kolonlarin kayitli anahtarlari atlanir.
+    let order = savedOrder ? JSON.parse(savedOrder).filter((key) => initialColumns.some((col) => col.key === key)) : [];
     let visibility = savedVisibility ? JSON.parse(savedVisibility) : {};
     let widths = savedWidths ? JSON.parse(savedWidths) : {};
 
@@ -684,9 +679,9 @@ const DurusTakibi = () => {
       }
     });
 
-    localStorage.setItem("columnOrderDurusTakibi", JSON.stringify(order));
-    localStorage.setItem("columnVisibilityDurusTakibi", JSON.stringify(visibility));
-    localStorage.setItem("columnWidthsDurusTakibi", JSON.stringify(widths));
+    localStorage.setItem(KOLON_SIRASI_ANAHTARI, JSON.stringify(order));
+    localStorage.setItem(KOLON_GORUNURLUGU_ANAHTARI, JSON.stringify(visibility));
+    localStorage.setItem(KOLON_GENISLIKLERI_ANAHTARI, JSON.stringify(widths));
 
     return order.map((key) => {
       const column = initialColumns.find((col) => col.key === key);
@@ -696,9 +691,9 @@ const DurusTakibi = () => {
 
   // Save columns to localStorage
   useEffect(() => {
-    localStorage.setItem("columnOrderDurusTakibi", JSON.stringify(columns.map((col) => col.key)));
+    localStorage.setItem(KOLON_SIRASI_ANAHTARI, JSON.stringify(columns.map((col) => col.key)));
     localStorage.setItem(
-      "columnVisibilityDurusTakibi",
+      KOLON_GORUNURLUGU_ANAHTARI,
       JSON.stringify(
         columns.reduce(
           (acc, col) => ({
@@ -710,7 +705,7 @@ const DurusTakibi = () => {
       )
     );
     localStorage.setItem(
-      "columnWidthsDurusTakibi",
+      KOLON_GENISLIKLERI_ANAHTARI,
       JSON.stringify(
         columns.reduce(
           (acc, col) => ({
@@ -775,9 +770,9 @@ const DurusTakibi = () => {
 
   // Reset columns
   const resetColumns = () => {
-    localStorage.removeItem("columnOrderDurusTakibi");
-    localStorage.removeItem("columnVisibilityDurusTakibi");
-    localStorage.removeItem("columnWidthsDurusTakibi");
+    localStorage.removeItem(KOLON_SIRASI_ANAHTARI);
+    localStorage.removeItem(KOLON_GORUNURLUGU_ANAHTARI);
+    localStorage.removeItem(KOLON_GENISLIKLERI_ANAHTARI);
     window.location.reload();
   };
 

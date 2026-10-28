@@ -34,13 +34,13 @@ function FisIcerigi({ modalOpen }) {
       const newRows = selectedRows.filter((row) => !existingMakineIds.has(row.TB_MAKINE_ID || row.key));
 
       if (newRows.length === 0) {
-        message.warning("Seçilen makineler zaten tabloda mevcut.");
+        message.warning(t("durusTakibi.ekipmanlarZatenMevcut"));
         setIsModalVisible(false);
         return;
       }
 
       if (newRows.length < selectedRows.length) {
-        message.info(`${selectedRows.length - newRows.length} makine zaten tabloda mevcut olduğu için eklenmedi.`);
+        message.info(t("durusTakibi.ekipmanZatenMevcutEklenmedi", { sayi: selectedRows.length - newRows.length }));
       }
 
       newRows.forEach((row) => {
@@ -59,7 +59,7 @@ function FisIcerigi({ modalOpen }) {
       setIsModalVisible(false);
     } catch (error) {
       console.error("Error in handleMakineSelect:", error);
-      message.error("Makine eklenirken bir hata oluştu.");
+      message.error(t("durusTakibi.ekipmanEklemeHatasi"));
       setIsModalVisible(false);
     }
   };
@@ -78,7 +78,7 @@ function FisIcerigi({ modalOpen }) {
 
   const defaultColumns = [
     {
-      title: t("makineKodu"),
+      title: t("ekipmanKodu"),
       dataIndex: "makineKodu",
       key: "makineKodu",
       width: 150,
@@ -86,7 +86,7 @@ function FisIcerigi({ modalOpen }) {
       visible: true,
     },
     {
-      title: t("makineTanimi"),
+      title: t("ekipmanTanimi"),
       dataIndex: "makineTanimi",
       key: "makineTanimi",
       width: 220,
@@ -102,7 +102,7 @@ function FisIcerigi({ modalOpen }) {
       visible: true,
     },
     {
-      title: t("makineTipi"),
+      title: t("ekipmanTipi"),
       dataIndex: "makineTipi",
       key: "makineTipi",
       width: 220,
