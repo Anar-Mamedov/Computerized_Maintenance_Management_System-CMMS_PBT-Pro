@@ -1,18 +1,36 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Table, Card, Select, Input, Button, Space, Typography, message } from 'antd';
-import { SearchOutlined, DownloadOutlined } from '@ant-design/icons';
+import { Table, Card, Select, Button, Space, Typography, message } from 'antd';
+import { DownloadOutlined } from '@ant-design/icons';
+import { useTranslation } from "react-i18next";
 import AxiosInstance from "../../../../api/http";
+import { pivotSatirlari, pivotuExceleAktar } from "./durusExcel";
 
 const { Option } = Select;
 const { Text } = Typography;
 
 const months = ["Oca", "Sub", "Mar", "Nis", "May", "Haz", "Tem", "Agu", "Eyl", "Eki", "Kas", "Ara"];
 
-const AylikTab = ({ search, setSearch, year, setYear, jobTypeFilter, onFilterChange, body }) => {
+// `filtreler`: ust cubuktaki ortak filtreler (sure tarihleri, ekipman, ekipman tipi, lokasyon, durus nedeni).
+const AylikTab = ({ search, year, setYear, jobTypeFilter, onFilterChange, filtreler }) => {
+  const { t } = useTranslation();
   const [groupBy, setGroupBy] = useState("NEDEN");
   const [metric, setMetric] = useState("SURE");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [indiriliyor, setIndiriliyor] = useState(false);
+
+  // Tablo ve "İndir" ayni govdeyle istenir.
+  const istekGovdesi = useMemo(
+    () => ({
+      Yil: year,
+      IsEmriTipleri: jobTypeFilter ? [Number(jobTypeFilter)] : [],
+      Gruplama: groupBy,
+      VeriTipi: metric,
+      Arama: search,
+      ...filtreler,
+    }),
+    [year, jobTypeFilter, groupBy, metric, search, filtreler]
+  );
 
   // Yıl seçenekleri
   const yearOptions = useMemo(() => {
@@ -38,14 +56,7 @@ const AylikTab = ({ search, setSearch, year, setYear, jobTypeFilter, onFilterCha
     if (!year) return;
     setLoading(true);
     try {
-      const payload = {
-        Yil: year,
-        IsEmriTipleri: jobTypeFilter ? [Number(jobTypeFilter)] : [],
-        Gruplama: groupBy,
-        VeriTipi: metric,
-        Arama: search
-      };
-      const response = await AxiosInstance.post("GetDurusAylikPivot", payload);
+      const response = await AxiosInstance.post("GetDurusAylikPivot", istekGovdesi);
       if (response.status_code === 200) {
         setData(response.data);
       }
@@ -54,7 +65,27 @@ const AylikTab = ({ search, setSearch, year, setYear, jobTypeFilter, onFilterCha
     } finally {
       setLoading(false);
     }
-  }, [year, jobTypeFilter, groupBy, metric, search]);
+  }, [year, istekGovdesi]);
+
+  // "İndir": GetDurusAylikPivotExcel; sayisal `raw_data` varsa o yazilir (Excel'de toplanabilsin).
+  const indir = async () => {
+    setIndiriliyor(true);
+    try {
+      const yanit = await AxiosInstance.post("GetDurusAylikPivotExcel", istekGovdesi);
+      const satirlar = pivotSatirlari(yanit, "Baslik");
+      if (satirlar.length === 0) {
+        message.warning(t("durusTakibi.excel.veriYok"));
+        return;
+      }
+      const kolonlar = [{ baslik: t("durusTakibi.excel.baslik"), alan: "Baslik" }, ...months.map((ay) => ({ baslik: ay, alan: ay })), { baslik: t("toplam"), alan: "Toplam" }];
+      pivotuExceleAktar(satirlar, kolonlar, t("durusTakibi.excel.aylikDosya", { yil: year }));
+    } catch (error) {
+      console.error("Aylık pivot Excel'e aktarılamadı:", error);
+      message.error(t("hataOlustu"));
+    } finally {
+      setIndiriliyor(false);
+    }
+  };
 
   // Sadece fetchData değiştiğinde (yani bağımlılıklar değiştiğinde) tabloyu güncelle
   useEffect(() => { 
@@ -113,16 +144,9 @@ const AylikTab = ({ search, setSearch, year, setYear, jobTypeFilter, onFilterCha
   return (
     <Space direction="vertical" size="middle" style={{ display: 'flex', width: '100%' }}>
       <Card size="small">
+        {/* Arama ust cubuktadir (tum sekmelerde ortak). */}
         <Space wrap>
-          <Input 
-            placeholder="Arama..." 
-            prefix={<SearchOutlined />} 
-            value={search} 
-            onChange={e => setSearch(e.target.value)} 
-            onPressEnter={() => triggerCardUpdate(year)} // Enter'a basınca kartları da güncelle
-            style={{ width: 200 }} 
-          />
-          <Select 
+          <Select
             value={year} 
             onChange={handleYearChange} // Değişti
             style={{ width: 100 }}
@@ -152,7 +176,9 @@ const AylikTab = ({ search, setSearch, year, setYear, jobTypeFilter, onFilterCha
             <Option value="MALIYET">Maliyet</Option>
             <Option value="SAYI">Kayıt Sayısı</Option>
           </Select>
-          <Button icon={<DownloadOutlined />}>İndir</Button>
+          <Button icon={<DownloadOutlined />} loading={indiriliyor} onClick={indir}>
+            {t("indir")}
+          </Button>
         </Space>
       </Card>
       

@@ -2215,5 +2215,12 @@
   "altEkipmanVeritabani.secimiTemizle": "Seçimi temizle",
   "altEkipmanVeritabani.kayitBulunamadi": "Kayıt bulunamadı",
   "altEkipmanVeritabani.sayfaBilgisi": "{{toplam}} kayıt · Sayfa {{sayfa}} / {{toplamSayfa}}",
-  "altEkipmanVeritabani.sayfaBilgisiAgac": "{{toplam}} grup · Sayfa {{sayfa}} / {{toplamSayfa}}"
+  "altEkipmanVeritabani.sayfaBilgisiAgac": "{{toplam}} grup · Sayfa {{sayfa}} / {{toplamSayfa}}",
+  "durusTakibi.filtre.ekipmanTipi": "Ekipman Tipi",
+  "durusTakibi.filtre.durusNedenleri": "Duruş Nedenleri",
+  "durusTakibi.excel.veriYok": "Dışa aktarılacak kayıt bulunamadı",
+  "durusTakibi.excel.baslik": "Başlık",
+  "durusTakibi.excel.detayliDosya": "Duruş Takibi - Detaylı Liste",
+  "durusTakibi.excel.aylikDosya": "Duruş Takibi - Aylık {{yil}}",
+  "durusTakibi.excel.yillikDosya": "Duruş Takibi - Yıllık"
 }

@@ -48,6 +48,8 @@ const taslakOlustur = (deger) => {
  * "Sure" filtresi: dugmeye basinca acilan pencerede hazir sure (Son 7 / 30 / 90 Gun, Bu Ay, Bu Yil, Tumu) ya da
  * tarih araligi secilir. Deger `{ period, startDate, endDate }` bicimindedir: hazir surede `period` dolu, tarihler null;
  * ozel aralikta `period` null, tarihler dayjs. Degisiklik penceredeki "Uygula" ile `onChange`'e verilir.
+ * Ikinci arguman secimin tarih araligidir (`{ baslangic, bitis }`, "Tumu"de null): API'si `period` yerine tarih
+ * bekleyen ekranlar bunu kullanir.
  */
 export default function SureFiltresi({ value, onChange }) {
   const { t } = useTranslation();
@@ -74,7 +76,7 @@ export default function SureFiltresi({ value, onChange }) {
     const taslak = getValues();
     const secilenSure = eslesenSure(taslak);
     if (secilenSure) {
-      onChange({ period: secilenSure, startDate: null, endDate: null });
+      onChange({ period: secilenSure, startDate: null, endDate: null }, { baslangic: taslak.baslangic, bitis: taslak.bitis });
       setAcik(false);
       return;
     }
@@ -86,7 +88,7 @@ export default function SureFiltresi({ value, onChange }) {
       setError("bitis", { message: t("sureFiltresi.tarihSirasiHatasi") });
       return;
     }
-    onChange({ period: null, startDate: taslak.baslangic, endDate: taslak.bitis });
+    onChange({ period: null, startDate: taslak.baslangic, endDate: taslak.bitis }, { baslangic: taslak.baslangic, bitis: taslak.bitis });
     setAcik(false);
   };
 

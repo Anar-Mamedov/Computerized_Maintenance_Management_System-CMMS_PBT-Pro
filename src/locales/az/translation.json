@@ -1531,5 +1531,12 @@
   "altEkipmanVeritabani.secimiTemizle": "Seçimi təmizlə",
   "altEkipmanVeritabani.kayitBulunamadi": "Qeyd tapılmadı",
   "altEkipmanVeritabani.sayfaBilgisi": "{{toplam}} qeyd · Səhifə {{sayfa}} / {{toplamSayfa}}",
-  "altEkipmanVeritabani.sayfaBilgisiAgac": "{{toplam}} qrup · Səhifə {{sayfa}} / {{toplamSayfa}}"
+  "altEkipmanVeritabani.sayfaBilgisiAgac": "{{toplam}} qrup · Səhifə {{sayfa}} / {{toplamSayfa}}",
+  "durusTakibi.filtre.ekipmanTipi": "Avadanlıq Növü",
+  "durusTakibi.filtre.durusNedenleri": "Dayanma Səbəbləri",
+  "durusTakibi.excel.veriYok": "İxrac ediləcək qeyd tapılmadı",
+  "durusTakibi.excel.baslik": "Başlıq",
+  "durusTakibi.excel.detayliDosya": "Dayanma İzləmə - Ətraflı Siyahı",
+  "durusTakibi.excel.aylikDosya": "Dayanma İzləmə - Aylıq {{yil}}",
+  "durusTakibi.excel.yillikDosya": "Dayanma İzləmə - İllik"
 }

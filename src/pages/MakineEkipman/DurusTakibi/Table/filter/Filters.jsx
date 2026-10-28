@@ -3,7 +3,6 @@ import ConditionFilter from "./ConditionFilter";
 import LocationFilter from "./LocationFilter";
 import TypeFilter from "./TypeFilter";
 import CustomFilter from "./custom-filter/CustomFilter";
-import ZamanAraligi from "./ZamanAraligi";
 
 export default function Filters({ onChange }) {
   const [filters, setFilters] = React.useState({
@@ -34,7 +33,7 @@ export default function Filters({ onChange }) {
       {/*    setFilters((state) => ({ ...state, lokasyonlar: newFilters }))*/}
       {/*  }*/}
       {/*/>*/}
-      <ZamanAraligi />
+      {/* Eski "Tümü" zaman araligi secicisinin yerini ust cubuktaki Sure filtresi (OrtakFiltreler) aldi. */}
       <CustomFilter onSubmit={(newFilters) => setFilters((state) => ({ ...state, customfilter: newFilters }))} />
     </>
   );

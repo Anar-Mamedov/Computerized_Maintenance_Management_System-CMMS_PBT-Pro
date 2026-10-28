@@ -5,7 +5,8 @@ import AxiosInstance from "../../../../api/http";
 
 const { Option } = Select;
 
-const GrafikTab = ({ search, year, setYear, jobTypeFilter }) => {
+// `filtreler`: ust cubuktaki ortak filtreler (sure tarihleri, ekipman, ekipman tipi, lokasyon, durus nedeni).
+const GrafikTab = ({ search, year, setYear, jobTypeFilter, filtreler }) => {
   const [loading, setLoading] = useState(false);
   const [charts, setCharts] = useState({ line_chart: [], bar_chart: [], pie_chart: [] });
 
@@ -30,7 +31,8 @@ const GrafikTab = ({ search, year, setYear, jobTypeFilter }) => {
         IsEmriTipleri: jobTypeFilter ? [Number(jobTypeFilter)] : [],
         Gruplama: "NEDEN", 
         VeriTipi: "SURE",
-        Arama: search
+        Arama: search,
+        ...filtreler,
       };
       const response = await AxiosInstance.post("GetDurusGrafikData", payload);
       if (response.status_code === 200) {
@@ -41,7 +43,7 @@ const GrafikTab = ({ search, year, setYear, jobTypeFilter }) => {
     } finally {
       setLoading(false);
     }
-  }, [year, jobTypeFilter, search]);
+  }, [year, jobTypeFilter, search, filtreler]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 

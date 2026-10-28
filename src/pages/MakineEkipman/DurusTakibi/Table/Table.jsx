@@ -3,6 +3,9 @@ import ContextMenu from "../components/ContextMenu/ContextMenu";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import Filters from "./filter/Filters";
+import OrtakFiltreler from "./filter/OrtakFiltreler";
+import { durusListesiniExceleAktar } from "./durusExcel";
+import { SiMicrosoftexcel } from "react-icons/si";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, message, ConfigProvider, Row, Col, Card, Statistic } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
@@ -12,6 +15,7 @@ import { Resizable } from "react-resizable";
 import "./ResizeStyle.css";
 import AxiosInstance from "../../../../api/http";
 import { FormProvider, useForm } from "react-hook-form";
+import dayjs from "dayjs";
 import styled from "styled-components";
 import { t } from "i18next";
 import PropTypes from "prop-types";
@@ -45,6 +49,12 @@ const { Text } = Typography;
 
 /** "1088016 saat 10 dk" gibi metindeki sayilar dile gore ayraclarla yazilir: "1.088.016 saat 10 dk". */
 const sureMetni = (deger, dil) => String(deger).replace(/\d+/g, (sayi) => formatNumberWithSeparators(sayi, dil));
+
+/** Ortak filtrelerin (ekipman, ekipman tipi, lokasyon, durus nedeni) bos hali; API'ye her zaman dizi gider. */
+const BOS_ORTAK_FILTRELER = { makineIds: [], ekipmanTipIds: [], lokasyonIds: [], nedenIds: [] };
+
+/** `body.filters.ortak` icindeki secimler; liste, KPI, pivot ve grafik isteklerine ayni adlarla eklenir. */
+const ortakFiltreGovdesi = (filters) => ({ ...BOS_ORTAK_FILTRELER, ...(filters?.ortak || {}) });
 
 const getFirstStatValue = (values = []) =>
   values.find((value) => {
@@ -142,7 +152,8 @@ const DurusIstatistikKartlari = ({ body, searchTerm }) => {
         Kelime: searchTerm, // Arama kelimesini ekledik
         BaslangicTarih: body.filters?.baslangicTarih,
         BitisTarih: body.filters?.BitisTarih,
-        ...body.filters?.customfilter
+        ...body.filters?.customfilter,
+        ...ortakFiltreGovdesi(body.filters),
       };
 
       const response = await AxiosInstance.post("GetDurusIstatistik", payload);
@@ -329,7 +340,8 @@ DraggableRow.propTypes = {
 // Sütunların sürüklenebilir olmasını sağlayan component sonu
 
 const DurusTakibi = () => {
-  const formMethods = useForm();
+  // "Filtreler" cekmecesi tarihleri bu alanlardan okur; bos baslamazsa ilk acilista bugunun tarihini filtre sanir.
+  const formMethods = useForm({ defaultValues: { startDate: null, endDate: null } });
   const [activeTab, setActiveTab] = useState('detay');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [data, setData] = useState([]);
@@ -355,19 +367,42 @@ const DurusTakibi = () => {
   });
 
   const prevBodyRef = useRef(body);
+  const [excelHazirlaniyor, setExcelHazirlaniyor] = useState(false);
+
+  // Detayli liste ve Excel'i ayni govdeyle istenir: cekmece filtreleri (tarih dahil) + ortak filtreler + arama.
+  const listeGovdesi = useCallback(
+    () => ({
+      ...(body.filters?.customfilter || {}),
+      ...ortakFiltreGovdesi(body.filters),
+      Kelime: searchTerm,
+    }),
+    [body.filters, searchTerm]
+  );
+
+  // Pivot ve grafik sekmelerine giden ortak filtreler; Sure'nin tarihleri formdan okunur.
+  const [sureBaslangic, sureBitis] = formMethods.watch(["startDate", "endDate"]);
+  const baslangicMetni = sureBaslangic ? dayjs(sureBaslangic).format("YYYY-MM-DD") : null;
+  const bitisMetni = sureBitis ? dayjs(sureBitis).format("YYYY-MM-DD") : null;
+  const pivotFiltreleri = useMemo(
+    () => ({
+      ...ortakFiltreGovdesi(body.filters),
+      ...(baslangicMetni ? { baslangicTarih: baslangicMetni } : {}),
+      ...(bitisMetni ? { bitisTarih: bitisMetni } : {}),
+    }),
+    [body.filters, baslangicMetni, bitisMetni]
+  );
+
+  const ortakFiltreDegisti = useCallback((degisiklik) => {
+    setBody((onceki) => ({ ...onceki, filters: { ...onceki.filters, ortak: { ...ortakFiltreGovdesi(onceki.filters), ...degisiklik } } }));
+    setCurrentPage(1);
+  }, []);
 
   // API call - memoized with useCallback to prevent recreation on every render
   const fetchData = useCallback(
     async (page = 1, pageSize = 10) => {
       setLoading(true);
       try {
-        // Create customfilter object with search keyword
-        const customfilter = {
-          ...(body.filters?.customfilter || {}),
-          Kelime: searchTerm,
-        };
-
-        const response = await AxiosInstance.post(`GetMakineDurusList?pagingDeger=${page}&pageSize=${pageSize}`, customfilter);
+        const response = await AxiosInstance.post(`GetMakineDurusList?pagingDeger=${page}&pageSize=${pageSize}`, listeGovdesi());
 
         const total = response?.pagination?.total_records || 0;
         setTotalCount(total);
@@ -393,7 +428,7 @@ const DurusTakibi = () => {
         setLoading(false);
       }
     },
-    [body.filters, searchTerm]
+    [listeGovdesi]
   );
 
   // Combined useEffect for initial data fetch and body state changes
@@ -742,6 +777,25 @@ const DurusTakibi = () => {
   // Filtered columns
   const filteredColumns = mergedColumns.filter((col) => col.visible);
 
+  // "İndir": listedeki tum filtrelerle sayfalamasiz veri (GetMakineDurusListExcel), gorunen kolonlarla Excel'e yazilir.
+  const detayliListeyiIndir = async () => {
+    setExcelHazirlaniyor(true);
+    try {
+      const response = await AxiosInstance.post("GetMakineDurusListExcel", listeGovdesi());
+      const kayitlar = Array.isArray(response) ? response : Array.isArray(response?.data) ? response.data : [];
+      if (kayitlar.length === 0) {
+        message.warning(t("durusTakibi.excel.veriYok"));
+        return;
+      }
+      durusListesiniExceleAktar(kayitlar, filteredColumns, t, { tarihYaz: formatDate, saatYaz: formatTime }, t("durusTakibi.excel.detayliDosya"));
+    } catch (error) {
+      console.error("Duruş listesi Excel'e aktarılamadı:", error);
+      message.error(t("hataOlustu"));
+    } finally {
+      setExcelHazirlaniyor(false);
+    }
+  };
+
   // Handle drag and drop
   const handleDragEnd = (event) => {
     const { active, over } = event;
@@ -912,24 +966,26 @@ const DurusTakibi = () => {
                 width: "100%",
               }}
             >
-              {/* SOL GRUP: Sadece 'detay' sekmesinde görünür */}
+              {/* SOL GRUP: arama ve ortak filtreler tum sekmelerde; kolon ayari ve "Filtreler" cekmecesi yalnizca 'detay'da */}
               <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
                 {activeTab === 'detay' && (
-                  <>
-                    <StyledButton onClick={() => setIsModalVisible(true)}>
-                      <MenuOutlined />
-                    </StyledButton>
-                    <Input
-                      style={{ width: "250px" }}
-                      placeholder="Arama yap..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      onPressEnter={handleSearch}
-                      suffix={<SearchOutlined style={{ color: "#0091ff", cursor: 'pointer' }} onClick={handleSearch} />}
-                    />
-                    <Filters onChange={handleBodyChange} />
-                  </>
+                  <StyledButton onClick={() => setIsModalVisible(true)}>
+                    <MenuOutlined />
+                  </StyledButton>
                 )}
+                <Input
+                  style={{ width: "200px" }}
+                  placeholder="Arama yap..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onPressEnter={handleSearch}
+                  suffix={<SearchOutlined style={{ color: "#0091ff", cursor: 'pointer' }} onClick={handleSearch} />}
+                />
+                <OrtakFiltreler filtreler={ortakFiltreGovdesi(body.filters)} onChange={ortakFiltreDegisti} />
+                {/* Cekmece diger sekmelerde de bagli kalir: Sure tarihleri ona yazildigi icin liste ve KPI hep senkron olur. */}
+                <div style={{ display: activeTab === 'detay' ? 'contents' : 'none' }}>
+                  <Filters onChange={handleBodyChange} />
+                </div>
               </div>
 
               {/* SAĞ GRUP (Sekmeler her zaman, ContextMenu ve Ekle sadece 'detay'da) */}
@@ -951,6 +1007,9 @@ const DurusTakibi = () => {
                 
                 {activeTab === 'detay' && (
                   <>
+                    <StyledButton icon={<SiMicrosoftexcel />} loading={excelHazirlaniyor} onClick={detayliListeyiIndir}>
+                      {t("indir")}
+                    </StyledButton>
                     <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
                     <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
                   </>
@@ -981,32 +1040,33 @@ const DurusTakibi = () => {
                 )}
 
                 {activeTab === 'aylik' && (
-  <AylikTab 
-    search={searchTerm} 
-    setSearch={setSearchTerm}
+  <AylikTab
+    search={searchTerm}
     year={aylikYil}        // Aylık için özel state
     setYear={setAylikYil}   // Aylık için özel set
     jobTypeFilter={jobTypeFilter}
+    filtreler={pivotFiltreleri}
   />
 )}
 
                 {activeTab === 'yillik' && (
-                  <YillikTab 
-                    rows={data} 
-                    search={searchTerm} 
-                    setSearch={setSearchTerm}
-                    jobTypes={[]} 
+                  <YillikTab
+                    rows={data}
+                    search={searchTerm}
+                    jobTypes={[]}
                     jobTypeFilter=""
                     setJobTypeFilter={() => {}}
+                    filtreler={pivotFiltreleri}
                   />
                 )}
 
                 {activeTab === 'grafik' && (
-  <GrafikTab 
+  <GrafikTab
     search={searchTerm}
     year={grafikYil}       // Grafik için özel state
     setYear={setGrafikYil}  // Grafik için özel set
     jobTypeFilter={jobTypeFilter}
+    filtreler={pivotFiltreleri}
   />
 )}
               </div>

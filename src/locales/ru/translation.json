@@ -1527,5 +1527,12 @@
   "altEkipmanVeritabani.secimiTemizle": "Снять выбор",
   "altEkipmanVeritabani.kayitBulunamadi": "Записи не найдены",
   "altEkipmanVeritabani.sayfaBilgisi": "Записей: {{toplam}} · Страница {{sayfa}} / {{toplamSayfa}}",
-  "altEkipmanVeritabani.sayfaBilgisiAgac": "Групп: {{toplam}} · Страница {{sayfa}} / {{toplamSayfa}}"
+  "altEkipmanVeritabani.sayfaBilgisiAgac": "Групп: {{toplam}} · Страница {{sayfa}} / {{toplamSayfa}}",
+  "durusTakibi.filtre.ekipmanTipi": "Тип оборудования",
+  "durusTakibi.filtre.durusNedenleri": "Причины простоя",
+  "durusTakibi.excel.veriYok": "Нет записей для экспорта",
+  "durusTakibi.excel.baslik": "Заголовок",
+  "durusTakibi.excel.detayliDosya": "Учёт простоев - подробный список",
+  "durusTakibi.excel.aylikDosya": "Учёт простоев - по месяцам {{yil}}",
+  "durusTakibi.excel.yillikDosya": "Учёт простоев - по годам"
 }
