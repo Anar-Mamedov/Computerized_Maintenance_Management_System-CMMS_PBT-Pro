@@ -1538,5 +1538,7 @@
   "durusTakibi.excel.baslik": "Başlıq",
   "durusTakibi.excel.detayliDosya": "Dayanma İzləmə - Ətraflı Siyahı",
   "durusTakibi.excel.aylikDosya": "Dayanma İzləmə - Aylıq {{yil}}",
-  "durusTakibi.excel.yillikDosya": "Dayanma İzləmə - İllik"
+  "durusTakibi.excel.yillikDosya": "Dayanma İzləmə - İllik",
+  "topluLokasyon.yetkiYok": "Bu əməliyyatı etməyə icazəniz yoxdur.",
+  "topluLokasyon.guncellendi": "{{sayi}} avadanlığın lokasiyası yeniləndi."
 }

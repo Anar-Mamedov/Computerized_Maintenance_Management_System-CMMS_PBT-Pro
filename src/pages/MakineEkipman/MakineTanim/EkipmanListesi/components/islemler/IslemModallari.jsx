@@ -35,7 +35,7 @@ export default function IslemModallari({ aktifIslem, onKapat, onTamamlandi }) {
     case "tarihce":
       return <Tarihce selectedRows={satirlar} open onClose={onKapat} />;
     case "lokasyon":
-      return <TopluLokasyon open onClose={onKapat} onRefresh={onTamamlandi} />;
+      return <TopluLokasyon selectedRows={satirlar} open onClose={onKapat} onRefresh={onTamamlandi} />;
     default:
       return null;
   }

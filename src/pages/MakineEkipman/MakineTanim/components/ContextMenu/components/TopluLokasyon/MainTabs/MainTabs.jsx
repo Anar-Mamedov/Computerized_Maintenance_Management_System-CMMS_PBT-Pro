@@ -4,10 +4,10 @@ import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import dayjs from "dayjs";
 
-import AtolyeTablo from "./components/AtolyeTablo.jsx";
+import PropTypes from "prop-types";
+import ProjeTablo from "../../../../../../../../utils/components/ProjeTablo";
 
 import LokasyonTablo from "./components/LokasyonTablo.jsx";
-import NakilSekli from "../MainTabs/components/NakilSekli.jsx";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -58,7 +58,8 @@ const StyledTabs = styled(Tabs)`
 `;
 
 //styled components end
-export default function MainTabs() {
+// eskiLokasyonGoster: yalnizca tek ekipman secildiginde Eski Lokasyon satiri gosterilir (BULK_LOCATION_CHANGE_FRONTEND_GUIDE.md).
+export default function MainTabs({ eskiLokasyonGoster = true }) {
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const {
@@ -67,11 +68,6 @@ export default function MainTabs() {
     watch,
     formState: { errors },
   } = useFormContext();
-
-  const handleAtolyeMinusClick = () => {
-    setValue("atolyeTanim", "");
-    setValue("atolyeID", "");
-  };
 
   const handleLokasyonMinusClick = () => {
     setValue("lokasyonTanim", "");
@@ -243,42 +239,45 @@ export default function MainTabs() {
           />
         </div>
       </div>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          width: "100%",
-          maxWidth: "460px",
-          gap: "10px",
-          rowGap: "0px",
-          marginBottom: "10px",
-        }}
-      >
-        <Text style={{ fontSize: "14px" }}>Eski Lokasyon:</Text>
+      {/* Coklu secimde gizlenir: backend her ekipmanin kendi eski lokasyonunu kendisi bulur. */}
+      {eskiLokasyonGoster && (
         <div
           style={{
             display: "flex",
             flexWrap: "wrap",
             alignItems: "center",
-            maxWidth: "300px",
-            minWidth: "300px",
-            gap: "10px",
+            justifyContent: "space-between",
             width: "100%",
+            maxWidth: "460px",
+            gap: "10px",
+            rowGap: "0px",
+            marginBottom: "10px",
           }}
         >
-          <Controller
-            name="isTanimi"
-            control={control}
-            render={({ field }) => (
-              <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
-                <Input {...field} style={{ flex: 1 }} />
-              </div>
-            )}
-          />
+          <Text style={{ fontSize: "14px" }}>Eski Lokasyon:</Text>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              maxWidth: "300px",
+              minWidth: "300px",
+              gap: "10px",
+              width: "100%",
+            }}
+          >
+            <Controller
+              name="eskiLokasyon"
+              control={control}
+              render={({ field }) => (
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px", width: "100%" }}>
+                  <Input {...field} style={{ flex: 1 }} readOnly disabled />
+                </div>
+              )}
+            />
+          </div>
         </div>
-      </div>
+      )}
       <StyledDivBottomLine style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", width: "100%", maxWidth: "460px", marginBottom: "10px" }}>
         <Text style={{ fontSize: "14px", fontWeight: 600 }}>Yeni Lokasyon:</Text>
         <div>
@@ -331,69 +330,14 @@ export default function MainTabs() {
           {(errors.lokasyonTanim || errors.lokasyonID) && <div style={{ color: "red" }}> Alan Boş Bırakılamaz!</div>}
         </div>
       </StyledDivBottomLine>
-      <div style={{ width: "100%", maxWidth: "460px", marginBottom: "10px" }}>
-        <StyledDivBottomLine
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "flex-start",
-            justifyContent: "space-between",
-            width: "100%",
-          }}
-        >
-          <Text
-            style={{
-              fontSize: "14px",
-            }}
-          >
-            Nakil Şekli:
-          </Text>
-          <NakilSekli />
-        </StyledDivBottomLine>
-      </div>
+      {/* Nakil Sekli backend kod grubu belli olana kadar gizli (istekte nakilSekliKodId null gider). */}
 
       <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", marginBottom: "10px" }}>
         <StyledDivBottomLine style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", width: "100%", maxWidth: "460px" }}>
           <Text style={{ fontSize: "14px" }}>Transfer Edilecek Proje:</Text>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "300px",
-            }}
-          >
-            <Controller
-              name="atolyeTanim"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ width: "215px" }}
-                  disabled
-                />
-              )}
-            />
-            <Controller
-              name="atolyeID"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text" // Set the type to "text" for name input
-                  style={{ display: "none" }}
-                />
-              )}
-            />
-            <AtolyeTablo
-              onSubmit={(selectedData) => {
-                setValue("atolyeTanim", selectedData.subject);
-                setValue("atolyeID", selectedData.key);
-              }}
-            />
-            <Button onClick={handleAtolyeMinusClick}>-</Button>
+          {/* Eskiden atolye listesi aciliyordu; backend TB_PROJE_ID bekledigi icin global proje secici kullanilir (proje / projeID). */}
+          <div style={{ width: "300px" }}>
+            <ProjeTablo name1="proje" />
           </div>
         </StyledDivBottomLine>
       </div>
@@ -402,3 +346,7 @@ export default function MainTabs() {
     </div>
   );
 }
+
+MainTabs.propTypes = {
+  eskiLokasyonGoster: PropTypes.bool,
+};

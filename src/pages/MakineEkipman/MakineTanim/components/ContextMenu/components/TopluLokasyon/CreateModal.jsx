@@ -1,72 +1,105 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
-import { Button, Modal, Input, Typography, Tabs, message, Spin } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { Button, Modal, message } from "antd";
+import { useTranslation } from "react-i18next";
 import AxiosInstance from "../../../../../../../api/http";
-import { Controller, useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import MainTabs from "./MainTabs/MainTabs.jsx";
 import dayjs from "dayjs";
 
-const { Text, Link } = Typography;
-const { TextArea } = Input;
+const BOS_FORM = { tarih: null, saat: null, eskiLokasyon: "", eskiLokasyonID: null, lokasyonTanim: "", lokasyonID: "", proje: "", projeID: "", aciklama: "" };
 
-// open/onClose verilirse modal disaridan (Ekipman Listesi islem menusu) acilir ve kendi dugmesi gosterilmez.
-export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, secilenIsEmriID, open, onClose }) {
+// Yanit govdesindeki 401 (has_error + status_code 401) yetki eksigidir (EKIPMAN_TRANSFER = 1016).
+const yetkisizMi = (yanit) => yanit?.status_code === 401;
+
+/**
+ * Toplu / tekli lokasyon degisimi (BULK_LOCATION_CHANGE_FRONTEND_GUIDE.md). Secili ekipmanlar `selectedRows` ile gelir.
+ * Tek ekipmanda Eski Lokasyon gosterilir: once tablo satirindaki lokasyonla, ardindan Ekipman/TopluLokasyonBilgi yanitiyla
+ * doldurulur; coklu secimde gizlenir (backend her ekipmanin eski lokasyonunu kendisi bulur). Kayit Ekipman/TopluLokasyonGuncelle.
+ * open/onClose verilirse modal disaridan (Ekipman Listesi islem menusu) acilir ve kendi dugmesi gosterilmez.
+ */
+export default function CreateModal({ selectedRows = [], onRefresh, refreshTableData, open, onClose }) {
+  const { t } = useTranslation();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [kaydediliyor, setKaydediliyor] = useState(false);
   const kontrollu = open !== undefined;
-  const methods = useForm({
-    defaultValues: {
-      rolTanim: "",
-      aciklama: "",
-      // Add other default values here
-    },
-  });
+  const methods = useForm({ defaultValues: BOS_FORM });
+  const { setValue, reset, handleSubmit, getValues } = methods;
 
-  const { setValue, reset, handleSubmit, watch, control } = methods;
+  const makineIds = selectedRows.map((satir) => Number(satir.TB_MAKINE_ID ?? satir.key)).filter(Boolean);
+  const tekSecim = makineIds.length === 1;
+  const makineAnahtari = makineIds.join(",");
 
-  const formatDateWithDayjs = (dateString) => {
-    const formattedDate = dayjs(dateString);
-    return formattedDate.isValid() ? formattedDate.format("YYYY-MM-DD") : "";
-  };
+  const kapat = useCallback(() => {
+    setIsModalVisible(false);
+    onClose?.();
+  }, [onClose]);
 
-  const formatTimeWithDayjs = (timeObj) => {
-    const formattedTime = dayjs(timeObj);
-    return formattedTime.isValid() ? formattedTime.format("HH:mm:ss") : "";
-  };
+  // Pencere her acilista bugunun tarih/saatiyle ve (tek secimde) satirdaki lokasyonla kurulur; bilgi ucu yetkiyi denetler,
+  // sunucu tarih/saatini ve guncel eski lokasyonu verir. Uc yanit vermezse satirdaki degerler kalir.
+  const acilisiHazirla = useCallback(async () => {
+    const satir = selectedRows[0];
+    reset({
+      ...BOS_FORM,
+      tarih: dayjs(),
+      saat: dayjs(),
+      eskiLokasyon: tekSecim ? satir?.MKN_LOKASYON || "" : "",
+      eskiLokasyonID: tekSecim ? satir?.MKN_LOKASYON_ID ?? null : null,
+    });
 
-  // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi
+    try {
+      const yanit = await AxiosInstance.post("Ekipman/TopluLokasyonBilgi", { makineIds: makineAnahtari.split(",").map(Number) });
+      if (yetkisizMi(yanit)) {
+        message.error(t("topluLokasyon.yetkiYok"));
+        kapat();
+        return;
+      }
+      const bilgi = yanit?.data;
+      if (!bilgi) return;
+      if (bilgi.Tarih) setValue("tarih", dayjs(bilgi.Tarih));
+      if (bilgi.Tarih && bilgi.Saat) setValue("saat", dayjs(`${bilgi.Tarih} ${bilgi.Saat}`));
+      if (bilgi.ShowEskiLokasyon) {
+        setValue("eskiLokasyon", bilgi.EskiLokasyon || getValues("eskiLokasyon"));
+        setValue("eskiLokasyonID", bilgi.EskiLokasyonId ?? getValues("eskiLokasyonID"));
+      }
+      if (bilgi.ProjeId) {
+        setValue("proje", bilgi.ProjeTanim || "");
+        setValue("projeID", bilgi.ProjeId);
+      }
+    } catch (error) {
+      console.error("Toplu lokasyon bilgisi alınamadı:", error);
+    }
+  }, [getValues, kapat, makineAnahtari, reset, selectedRows, setValue, t, tekSecim]);
 
-  const onSubmited = (data) => {
-    const Body = {
-      ONY_TANIM: data.rolTanim,
-      ONY_ACIKLAMA: data.aciklama,
-      ONY_OLUSTURMA_TAR: dayjs().format("YYYY-MM-DD"),
-    };
-
-    AxiosInstance.post(`AddOnayTanim1231`, Body)
-      .then((response) => {
-        console.log("Data sent successfully:", response);
-
-        if (response.status_code === 200 || response.status_code === 201) {
-          message.success("Ekleme Başarılı.");
-          reset();
-          setIsModalVisible(false); // Sadece başarılı olursa modalı kapat
-          onClose?.();
-          onRefresh();
-        } else if (response.status_code === 401) {
-          message.error("Bu işlemi yapmaya yetkiniz bulunmamaktadır.");
-        } else {
-          message.error("Ekleme Başarısız.");
-        }
-      })
-      .catch((error) => {
-        // Handle errors here, e.g.:
-        console.error("Error sending data:", error);
-        message.error("Başarısız Olundu.");
+  const onSubmited = async (data) => {
+    setKaydediliyor(true);
+    try {
+      const yanit = await AxiosInstance.post("Ekipman/TopluLokasyonGuncelle", {
+        makineIds,
+        tarih: data.tarih ? dayjs(data.tarih).format("YYYY-MM-DD") : null,
+        saat: data.saat ? dayjs(data.saat).format("HH:mm") : null,
+        eskiLokasyonId: tekSecim ? Number(data.eskiLokasyonID) || null : null,
+        yeniLokasyonId: Number(data.lokasyonID),
+        nakilSekliKodId: null,
+        projeId: Number(data.projeID) || null,
+        aciklama: data.aciklama || "",
       });
 
-    console.log({ Body });
+      if (yetkisizMi(yanit)) {
+        message.error(t("topluLokasyon.yetkiYok"));
+      } else if (yanit && yanit.has_error === false) {
+        message.success(yanit.message || t("topluLokasyon.guncellendi", { sayi: yanit.guncellenen_adet ?? makineIds.length }));
+        kapat();
+        (onRefresh || refreshTableData)?.();
+      } else {
+        message.error(yanit?.message || yanit?.error || t("hataOlustu"));
+      }
+    } catch (error) {
+      console.error("Toplu lokasyon güncellenemedi:", error);
+      message.error(error?.response?.data?.message || t("hataOlustu"));
+    } finally {
+      setKaydediliyor(false);
+    }
   };
 
   const handleModalToggle = () => {
@@ -74,26 +107,22 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
       onClose?.();
       return;
     }
+    if (!isModalVisible) acilisiHazirla();
     setIsModalVisible((prev) => !prev);
-    if (!isModalVisible) {
-      reset();
-      // Set the current date when the component mounts
-      setValue("tarih", dayjs());
-      setValue("saat", dayjs());
-    }
   };
+
+  // Form yalnizca pencere acilirken kurulur. Ust bilesen her cizimde yeni onClose verebildigi icin hazirlama fonksiyonu
+  // ref'ten cagrilir; aksi halde kullanici yazarken form sifirlanirdi.
+  const acilisiHazirlaRef = useRef(acilisiHazirla);
+  useEffect(() => {
+    acilisiHazirlaRef.current = acilisiHazirla;
+  });
 
   useEffect(() => {
     if (!kontrollu) return;
     setIsModalVisible(open);
-    if (open) {
-      reset();
-      setValue("tarih", dayjs());
-      setValue("saat", dayjs());
-    }
-  }, [kontrollu, open, reset, setValue]);
-
-  // Aşğaıdaki form elemanlarını eklemek üçün API ye gönderilme işlemi sonu
+    if (open) acilisiHazirlaRef.current();
+  }, [kontrollu, open]);
 
   return (
     <FormProvider {...methods}>
@@ -106,16 +135,18 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
           </div>
         )}
 
-        <Modal width="800px" title="Toplu Lokasyon Değişimi" open={isModalVisible} onOk={methods.handleSubmit(onSubmited)} onCancel={handleModalToggle}>
-          {loading ? (
-            <Spin spinning={loading} size="large" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
-              {/* İçerik yüklenirken gösterilecek alan */}
-            </Spin>
-          ) : (
-            <form onSubmit={methods.handleSubmit(onSubmited)}>
-              <MainTabs />
-            </form>
-          )}
+        <Modal
+          width="800px"
+          title="Toplu Lokasyon Değişimi"
+          open={isModalVisible}
+          confirmLoading={kaydediliyor}
+          onOk={handleSubmit(onSubmited)}
+          onCancel={handleModalToggle}
+          destroyOnClose
+        >
+          <form onSubmit={handleSubmit(onSubmited)}>
+            <MainTabs eskiLokasyonGoster={tekSecim} />
+          </form>
         </Modal>
       </div>
     </FormProvider>
@@ -123,10 +154,11 @@ export default function CreateModal({ workshopSelectedId, onSubmit, onRefresh, s
 }
 
 CreateModal.propTypes = {
-  workshopSelectedId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  onSubmit: PropTypes.func,
+  /** Secili ekipman satirlari (TB_MAKINE_ID, tek secimde MKN_LOKASYON / MKN_LOKASYON_ID). */
+  selectedRows: PropTypes.arrayOf(PropTypes.object),
   onRefresh: PropTypes.func,
-  secilenIsEmriID: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  /** Eski ekipman tablosunun (hatirlatici modu) yenileme fonksiyonu; onRefresh yoksa kullanilir. */
+  refreshTableData: PropTypes.func,
   open: PropTypes.bool,
   onClose: PropTypes.func,
 };

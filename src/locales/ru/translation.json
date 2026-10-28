@@ -1534,5 +1534,7 @@
   "durusTakibi.excel.baslik": "Заголовок",
   "durusTakibi.excel.detayliDosya": "Учёт простоев - подробный список",
   "durusTakibi.excel.aylikDosya": "Учёт простоев - по месяцам {{yil}}",
-  "durusTakibi.excel.yillikDosya": "Учёт простоев - по годам"
+  "durusTakibi.excel.yillikDosya": "Учёт простоев - по годам",
+  "topluLokasyon.yetkiYok": "У вас нет прав на это действие.",
+  "topluLokasyon.guncellendi": "Локация обновлена: {{sayi}} ед."
 }
