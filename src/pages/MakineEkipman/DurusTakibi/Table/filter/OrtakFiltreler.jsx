@@ -30,7 +30,8 @@ export default function OrtakFiltreler({ filtreler, onChange }) {
   return (
     <>
       <div style={{ width: 190 }}>
-        <SureFiltresi value={sure} onChange={sureDegisti} />
+        {/* Bu ekranda "Süre" basligi yazilmaz; secim kutusu yalnizca secili degeri gosterir. */}
+        <SureFiltresi value={sure} onChange={sureDegisti} baslikGoster={false} />
       </div>
       <div style={{ width: 190 }}>
         <EkipmanFilterSelectbox value={filtreler.makineIds} onChange={(makineIds) => onChange({ makineIds })} />

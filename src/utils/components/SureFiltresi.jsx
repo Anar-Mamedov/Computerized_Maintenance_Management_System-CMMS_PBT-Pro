@@ -49,9 +49,9 @@ const taslakOlustur = (deger) => {
  * tarih araligi secilir. Deger `{ period, startDate, endDate }` bicimindedir: hazir surede `period` dolu, tarihler null;
  * ozel aralikta `period` null, tarihler dayjs. Degisiklik penceredeki "Uygula" ile `onChange`'e verilir.
  * Ikinci arguman secimin tarih araligidir (`{ baslangic, bitis }`, "Tumu"de null): API'si `period` yerine tarih
- * bekleyen ekranlar bunu kullanir.
+ * bekleyen ekranlar bunu kullanir. `baslikGoster` false ise dugmede yalnizca secili deger yazar ("Tumu").
  */
-export default function SureFiltresi({ value, onChange }) {
+export default function SureFiltresi({ value, onChange, baslikGoster = true }) {
   const { t } = useTranslation();
   const [acik, setAcik] = useState(false);
   const form = useForm({ defaultValues: taslakOlustur(value) });
@@ -135,8 +135,14 @@ export default function SureFiltresi({ value, onChange }) {
     <Popover trigger="click" placement="bottomLeft" open={acik} onOpenChange={acikDegisti} content={icerik} destroyTooltipOnHide>
       <Button style={{ width: "100%", justifyContent: "space-between" }}>
         <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          <strong>{t("sureFiltresi.sure")}</strong>
-          <span style={{ marginLeft: 6, opacity: 0.75 }}>{etiket}</span>
+          {baslikGoster ? (
+            <>
+              <strong>{t("sureFiltresi.sure")}</strong>
+              <span style={{ marginLeft: 6, opacity: 0.75 }}>{etiket}</span>
+            </>
+          ) : (
+            etiket
+          )}
         </span>
         <DownOutlined style={{ fontSize: 10, opacity: 0.6 }} />
       </Button>
@@ -151,4 +157,5 @@ SureFiltresi.propTypes = {
     endDate: PropTypes.object,
   }).isRequired,
   onChange: PropTypes.func.isRequired,
+  baslikGoster: PropTypes.bool,
 };
