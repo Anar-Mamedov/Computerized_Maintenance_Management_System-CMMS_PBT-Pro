@@ -46,6 +46,7 @@ import OnayTanimlari from "./pages/OnayIslemleri/OnayTanimlari/OnayTanimlari.jsx
 import Onaylayicilar from "./pages/OnayIslemleri/Onaylayicilar/Onaylayicilar.jsx";
 import EkipmanVeritabani from "./pages/MakineEkipman/EkipmanVeritabani/EkipmanVeritabani.jsx";
 import SayacGuncelleme from "./pages/MakineEkipman/SayacGuncelleme/SayacGuncelleme.jsx";
+import SayacHareketleri from "./pages/MakineEkipman/SayacHareketleri/SayacHareketleri.jsx";
 import DurusTakibi from "./pages/MakineEkipman/DurusTakibi/DurusTakibi.jsx";
 import IsTalebiKullanicilari from "./pages/YardimMasasi/IsTalebiKullanicilari/IsTalebiKullanicilari.jsx";
 import KullaniciTanimlari from "./pages/Yonetim/KullaniciTanimlari/KullaniciTanimlari.jsx";
@@ -273,6 +274,7 @@ export default function App() {
           <Route path="/ekipmanVeritabani" element={<EkipmanVeritabani />} />
           <Route path="/durusTakibi" element={<DurusTakibi />} />
           <Route path="/sayacGuncelleme" element={<SayacGuncelleme />} />
+          <Route path="/sayacHareketleri" element={<SayacHareketleri />} />
           <Route path="/ekipmanTransferi" element={<EkipmanTransferi />} />
           <Route path="/personelIzinleri" element={<PersonelIzinleri />} />
           <Route path="/personelNobetleri" element={<Hazirlaniyor />} />
@@ -372,7 +374,7 @@ const BaseLayout = () => {
   const layoutExcludedPaths = ["/isEmri1", "/makine"];
   const isLayoutExcluded = layoutExcludedPaths.includes(location.pathname);
   // Bu liste ekranlari kisa pencerede kendi icinde kayar (RULES.md kural 14); sarmalayici 360px'te kalirsa footer ekranin disina itilir.
-  const kendiIcindeKayanListeler = ["/makine", "/ekipmanTransferi"];
+  const kendiIcindeKayanListeler = ["/makine", "/ekipmanTransferi", "/sayacHareketleri"];
   const isKendiIcindeKayanListe = kendiIcindeKayanListeler.includes(location.pathname);
   const hasFixedDashboardHeader = location.pathname === "/omegaDash";
   // Dashboard ekraninda breadcrumb gosterilmez; bosalan alani icerik kaplar.

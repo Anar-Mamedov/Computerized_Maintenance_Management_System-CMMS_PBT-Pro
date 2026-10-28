@@ -41,6 +41,7 @@ export const rawItems = [
       getItem("Alt Ekipman Veritabanı", "ekipmanVeritabani", true, undefined, true, "KLL_WEB_EKIPMAN"),
       getItem("Duruş Takibi", "durusTakibi", true, undefined, true, "KLL_WEB_EKIPMAN"),
       getItem("Sayaç Güncellemeleri", "sayacGuncelleme", true, undefined, true, "KLL_WEB_SAYAC"),
+      getItem("Sayaç Hareketleri", "sayacHareketleri", true, undefined, true, "KLL_WEB_SAYAC"),
       getItem("Ekipman Transferi", "ekipmanTransferi", true, undefined, true),
       getItem("Amortisman Takibi", "amortisman", true, undefined, true),
     ],

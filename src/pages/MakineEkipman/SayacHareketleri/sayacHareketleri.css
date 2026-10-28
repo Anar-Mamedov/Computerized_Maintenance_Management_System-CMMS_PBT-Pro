@@ -1,0 +1,329 @@
+/*
+ * Sayac Hareketleri ekraninin stilleri. Modal body'ye portal edildigi icin tokenlar .sh-detay sinifinda da tanimlidir.
+ * Uygulamada html font-size 12px oldugu icin olculer rem degil piksel yazilir.
+ */
+.sayac-hareketleri,
+.sh-detay {
+  --sh-fg: #2b2c2f;
+  --sh-card: #ffffff;
+  --sh-muted: #6e7075;
+  --sh-subtle: #8e9196;
+  --sh-border: #e2e3e6;
+  --sh-accent: #f4f6f8;
+  --sh-success: #16a34a;
+  --sh-danger: #dc2626;
+  --sh-shadow: 0 1px 2px 0 rgba(28, 30, 36, 0.05);
+  color: var(--sh-fg);
+}
+
+/* ---------- Sayfa yerlesimi (RULES.md kural 14) ---------- */
+
+.sayac-hareketleri {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+/* Genis ekran: ust bolumler sabit, yalnizca tablo govdesi kayar; liste karti kalan yuksekligi doldurur. */
+.sayac-hareketleri--sabit > * {
+  flex-shrink: 0;
+}
+
+.sayac-hareketleri--sabit > .sh-liste-karti {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.sh-baslik h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.sh-baslik p {
+  margin: 2px 0 0;
+  font-size: 13px;
+}
+
+.sh-kart {
+  border: 1px solid var(--sh-border);
+  border-radius: 8px;
+  background: var(--sh-card);
+  box-shadow: var(--sh-shadow);
+}
+
+.sh-soluk {
+  color: var(--sh-subtle);
+}
+
+.sh-kalin {
+  font-weight: 600;
+}
+
+.sh-kucuk {
+  font-size: 11px;
+}
+
+/* ---------- Filtre cubugu ---------- */
+
+.sh-filtre-cubugu {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+.sh-filtre--arama {
+  min-width: 160px;
+  flex: 1 1 180px;
+}
+
+.sh-filtre--sure {
+  width: 180px;
+}
+
+.sh-filtre--secim {
+  width: 150px;
+}
+
+.sh-filtre-dugmeleri {
+  display: flex;
+  gap: 8px;
+}
+
+.sh-filtre-dugmeleri .ant-btn {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ---------- Sekmeler ve KPI ---------- */
+
+.sh-sekmeler .ant-tabs-nav {
+  margin: 0;
+}
+
+.sh-kpi-izgarasi {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.sh-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 16px;
+}
+
+.sh-kpi-baslik {
+  color: var(--sh-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.sh-kpi-deger {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.sh-kpi-deger--uyari {
+  color: var(--sh-danger);
+}
+
+.sh-kpi-aciklama {
+  font-size: 11px;
+}
+
+@media (max-width: 900px) {
+  .sh-kpi-izgarasi {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Tablolar ---------- */
+
+.sh-tablo .ant-table-thead > tr > th {
+  padding: 10px 12px !important;
+  background: #fafbfc !important;
+  color: var(--sh-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* Yalnizca veri satirlari: antd'nin gizli olcum satiri dolgu alirsa basligin altinda bosluk olusur. */
+.sh-tablo .ant-table-tbody > tr.ant-table-row > td {
+  padding: 8px 12px !important;
+  font-size: 13px;
+}
+
+.sh-tiklanir {
+  cursor: pointer;
+}
+
+.sh-iki-satir {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.sh-iki-satir > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sh-artis--pozitif {
+  color: var(--sh-success);
+}
+
+.sh-artis--negatif {
+  color: var(--sh-danger);
+}
+
+.sh-rozet {
+  margin-inline-end: 0;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 18px;
+}
+
+.sh-sayfalama {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--sh-border);
+}
+
+/* ---------- Karsilastirma ---------- */
+
+.sh-karsilastirma {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sh-bolum {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 16px;
+}
+
+/* Segment secici tasarimdaki gibi icerik genisliginde kalir (flex kolon onu varsayilan olarak uzatir). */
+.sh-bolum > .ant-segmented {
+  align-self: flex-start;
+}
+
+.sh-bolum-ust {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sh-bolum-ust p {
+  margin: 2px 0 0;
+}
+
+.sh-bolum-baslik {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.sh-tablo-basligi {
+  padding: 12px 16px;
+}
+
+.sh-karsilastirma-sayac {
+  width: 200px;
+}
+
+.sh-cubuklar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sh-cubuk-satiri {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr) 110px;
+  align-items: center;
+  gap: 16px;
+}
+
+.sh-cubuk-etiketi {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.sh-cubuk-etiketi > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sh-cubuk-zemini {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--sh-accent);
+}
+
+.sh-cubuk {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--sh-marka, #1e3a6e);
+}
+
+.sh-cubuk-degeri {
+  text-align: right;
+}
+
+/* ---------- Hareket detayi ---------- */
+
+.sh-detay {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 24px;
+  padding-top: 8px;
+}
+
+.sh-alan {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+  overflow-wrap: anywhere;
+}
+
+.sh-tam-satir {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+  .sh-cubuk-satiri {
+    grid-template-columns: 110px minmax(0, 1fr) 90px;
+    gap: 8px;
+  }
+
+  .sh-detay {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
