@@ -1548,5 +1548,6 @@
   "durusTakibi.excel.aylikDosya": "Dayanma İzləmə - Aylıq {{yil}}",
   "durusTakibi.excel.yillikDosya": "Dayanma İzləmə - İllik",
   "topluLokasyon.yetkiYok": "Bu əməliyyatı etməyə icazəniz yoxdur.",
-  "topluLokasyon.guncellendi": "{{sayi}} avadanlığın lokasiyası yeniləndi."
+  "topluLokasyon.guncellendi": "{{sayi}} avadanlığın lokasiyası yeniləndi.",
+  "personelCalismaPlani.detayBilgisi": "Ətraflı məlumat"
 }

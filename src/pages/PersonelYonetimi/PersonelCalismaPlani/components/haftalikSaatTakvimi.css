@@ -1,0 +1,116 @@
+/* Haftalik saatli takvim: baslik satiri ustte, saat sutunu solda sabit kalir; govde iki yonde kayar. */
+.hst {
+  display: grid;
+  height: calc(100vh - 330px);
+  min-height: 360px;
+  overflow: auto;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.hst-kose,
+.hst-gun-basligi {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.hst-kose {
+  left: 0;
+  z-index: 4;
+}
+
+.hst-gun-basligi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 4px;
+  border-left: 1px solid #f0f0f0;
+}
+
+.hst-gun-adi {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.hst-gun-tarihi {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.hst-saatler {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: #fafafa;
+}
+
+.hst-saat {
+  box-sizing: border-box;
+  padding: 2px 8px 0 0;
+  border-bottom: 1px solid #f0f0f0;
+  color: #8c8c8c;
+  font-size: 12px;
+  text-align: right;
+}
+
+.hst-gun {
+  position: relative;
+  border-left: 1px solid #f0f0f0;
+}
+
+/* Her saat duz cizgiyle, yarim saat noktali cizgiyle ayrilir. */
+.hst-saat-hucresi {
+  box-sizing: border-box;
+  border-bottom: 1px solid #f0f0f0;
+  background-image: linear-gradient(to right, #f0f0f0 50%, transparent 50%);
+  background-position: 0 50%;
+  background-repeat: repeat-x;
+  background-size: 6px 1px;
+}
+
+.hst-kayit {
+  position: absolute;
+  box-sizing: border-box;
+  padding: 1px 2px;
+}
+
+.hst-kayit-icerik {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 2px 6px;
+  border-left: 3px solid;
+  border-radius: 4px;
+  /* Renk tonu satir icinden gelir; beyaz zemin alttaki saat cizgilerini kapatir. */
+  background-color: #fff;
+  cursor: pointer;
+  font-size: 11px;
+  line-height: 16px;
+}
+
+/* Kisa kayitta ad ve saat kalir, yalnizca aciklama kesilir. */
+.hst-kayit-personel,
+.hst-kayit-saat {
+  flex-shrink: 0;
+}
+
+.hst-kayit-personel {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hst-kayit-saat {
+  color: #595959;
+}
+
+.hst-kayit-aciklama {
+  color: #595959;
+  white-space: pre-wrap;
+}

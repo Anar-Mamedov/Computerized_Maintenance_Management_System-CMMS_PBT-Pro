@@ -5,21 +5,27 @@ import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import Filters from "./filter/Filters";
+import HaftalikSaatTakvimi from "../components/HaftalikSaatTakvimi";
 import IsEmri from "../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer";
 import { useFormContext } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 import "dayjs/locale/tr";
 
 dayjs.locale("tr");
 const { Text } = Typography;
 
+// startOf("week") dile gore Pazar ya da Pazartesi doner; calisma haftasi her dilde Pazartesi baslar.
+const calismaHaftasiBasi = (tarih) => tarih.subtract((tarih.day() + 6) % 7, "day").startOf("day");
+
 const MainCalendar = () => {
+  const { t } = useTranslation();
   const { setValue } = useFormContext() || {};
   const [loading, setLoading] = useState(false);
   const [calendarData, setCalendarData] = useState([]);
   
   const [currentDate, setCurrentDate] = useState(dayjs()); 
-  const [calendarMode, setCalendarMode] = useState("Month");
+  const [calendarMode, setCalendarMode] = useState("Work Week");
 
   const [isGoToDateModalVisible, setIsGoToDateModalVisible] = useState(false);
   const [goToDateValue, setGoToDateValue] = useState(dayjs());
@@ -47,8 +53,8 @@ const MainCalendar = () => {
       start = currentDate.startOf("week");
       end = currentDate.endOf("week");
     } else if (calendarMode === "Work Week") {
-      start = currentDate.startOf("week").add(1, "day");
-      end = currentDate.startOf("week").add(5, "day");
+      start = calismaHaftasiBasi(currentDate);
+      end = start.add(4, "day").endOf("day");
     } else if (calendarMode === "Agenda") {
       start = currentDate.subtract(1, "month").startOf("month");
       end = currentDate.add(1, "month").endOf("month");
@@ -210,7 +216,7 @@ const MainCalendar = () => {
         targetDates.push(startOfWeek.add(i, "day"));
       }
     } else if (calendarMode === "Work Week") {
-      const startOfWeek = currentDate.startOf("week").add(1, "day");
+      const startOfWeek = calismaHaftasiBasi(currentDate);
       for (let i = 0; i < 5; i++) {
         targetDates.push(startOfWeek.add(i, "day"));
       }
@@ -245,13 +251,37 @@ const MainCalendar = () => {
       );
     }
 
+    // Haftalik gorunumler saat sutunlu takvimle cizilir; kayda tiklaninca diger gorunumlerdeki detay penceresi acilir.
+    if (calendarMode === "Week" || calendarMode === "Work Week") {
+      return (
+        <HaftalikSaatTakvimi
+          gunler={targetDates}
+          olaylar={calendarData}
+          olayRengi={(item) => getEventStatusConfig(item.IDK_DURUM).color}
+          renderOlay={(item, icerik) => (
+            <Popover
+              content={renderPopoverContent(item, getEventStatusConfig(item.IDK_DURUM))}
+              title={t("personelCalismaPlani.detayBilgisi")}
+              trigger="click"
+              open={visiblePopoverId === item.TB_ISEMRI_KAYNAK_ID}
+              onOpenChange={(visible) => {
+                setVisiblePopoverId(visible ? item.TB_ISEMRI_KAYNAK_ID : null);
+              }}
+            >
+              {icerik}
+            </Popover>
+          )}
+        />
+      );
+    }
+
     return (
       <Row gutter={[16, 16]}>
         {targetDates.map((dateItem) => {
           const events = getDailyEvents(dateItem);
           const isToday = dateItem.isSame(dayjs(), "day");
           return (
-            <Col span={calendarMode === "Day" ? 24 : 4} key={dateItem.format("DD-MM")} style={{ flexGrow: 1 }}>
+            <Col span={24} key={dateItem.format("DD-MM")} style={{ flexGrow: 1 }}>
               <Card
                 title={
                   <div style={{ textAlign: "center" }}>

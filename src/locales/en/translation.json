@@ -1630,5 +1630,6 @@
   "durusTakibi.excel.aylikDosya": "Downtime Tracking - Monthly {{yil}}",
   "durusTakibi.excel.yillikDosya": "Downtime Tracking - Yearly",
   "topluLokasyon.yetkiYok": "You are not authorized to perform this action.",
-  "topluLokasyon.guncellendi": "Location of {{sayi}} equipment updated."
+  "topluLokasyon.guncellendi": "Location of {{sayi}} equipment updated.",
+  "personelCalismaPlani.detayBilgisi": "Detail Information"
 }

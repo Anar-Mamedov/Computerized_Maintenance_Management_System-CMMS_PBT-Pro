@@ -2232,5 +2232,6 @@
   "durusTakibi.excel.aylikDosya": "Duruş Takibi - Aylık {{yil}}",
   "durusTakibi.excel.yillikDosya": "Duruş Takibi - Yıllık",
   "topluLokasyon.yetkiYok": "Bu işlemi yapmaya yetkiniz bulunmamaktadır.",
-  "topluLokasyon.guncellendi": "{{sayi}} ekipmanın lokasyonu güncellendi."
+  "topluLokasyon.guncellendi": "{{sayi}} ekipmanın lokasyonu güncellendi.",
+  "personelCalismaPlani.detayBilgisi": "Detay Bilgisi"
 }
