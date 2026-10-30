@@ -24,7 +24,7 @@ export default function EkipmanOzetiTablosu({ satirlar, yukleniyor, govdeKayar }
         align: "right",
         render: (_, satir) => <IkiSatir ust={<DegerBirim deger={satir.lastReadingValue} birim={satir.unit} />} alt={satir.lastReadingDateFormatted} />,
       },
-      { key: "degisim", title: baslik("sayacHareketleri.kolon.donemDegisimi"), width: 120, align: "right", render: (_, satir) => <Artis deger={satir.periodChange} /> },
+      { key: "degisim", title: baslik("sayacHareketleri.kolon.donemDegisimi"), width: 120, align: "right", render: (_, satir) => <Artis deger={satir.periodIncrement} /> },
       { key: "kayit", title: baslik("sayacHareketleri.kolon.kayitSayisi"), width: 100, align: "right", render: (_, satir) => sayiMetni(satir.readingCount, i18n.language) },
     ];
   }, [i18n.language, t]);

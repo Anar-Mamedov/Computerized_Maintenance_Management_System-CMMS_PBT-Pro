@@ -54,7 +54,6 @@ export default function SayacHareketleri() {
       {liste.sekme === "karsilastirma" ? (
         <Karsilastirma
           satirlar={liste.satirlar}
-          birim={liste.birim}
           yukleniyor={liste.yukleniyor}
           grupla={liste.grupla}
           onGruplaDegistir={liste.setGrupla}

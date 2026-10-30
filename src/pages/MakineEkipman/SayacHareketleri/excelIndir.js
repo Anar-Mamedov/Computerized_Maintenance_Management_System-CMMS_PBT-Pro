@@ -1,6 +1,7 @@
 import * as XLSX from "xlsx";
 import { t } from "i18next";
 import { getExcelVerisi } from "./sayacHareketleriService";
+import { camelCaseYap } from "../EkipmanVeritabani/AltEkipmanListesi/yardimcilar";
 
 /**
  * ExportExcel JSON satir donerse dosya bu kolonlarla kurulur: [baslik anahtari, alan]. Sayilar ham deger olarak
@@ -29,13 +30,13 @@ const SUTUNLAR = {
     ["sayacHareketleri.kolon.sonOkuma", "lastReadingValue"],
     ["sayacHareketleri.kolon.birim", "unit"],
     ["sayacHareketleri.kolon.sonOkumaTarihi", "lastReadingDateFormatted"],
-    ["sayacHareketleri.kolon.donemDegisimi", "periodChange"],
+    ["sayacHareketleri.kolon.donemDegisimi", "periodIncrement"],
     ["sayacHareketleri.kolon.kayitSayisi", "readingCount"],
   ],
   comparison: [
     ["sayacHareketleri.kolon.grup", "groupName"],
     ["sayacHareketleri.kolon.ekipmanSayisi", "equipmentCount"],
-    ["sayacHareketleri.kolon.toplamArtis", "totalIncrease"],
+    ["sayacHareketleri.kolon.toplamArtis", "totalIncrement"],
     ["sayacHareketleri.kolon.ekipmanBasinaOrtalama", "averagePerEquipment"],
   ],
 };
@@ -78,7 +79,8 @@ export async function exceleAktar({ govde, excelTab, dosyaAdi }) {
     return true;
   }
 
-  const json = JSON.parse(await yanit.text());
+  // Liste uclari gibi satir alanlari PascalCase gelebilir; SUTUNLAR camelCase okur.
+  const json = camelCaseYap(JSON.parse(await yanit.text()));
   if (json?.hasError) throw new Error(json.message || t("hataOlustu"));
   const kayitlar = satirlariBul(json);
   if (kayitlar.length === 0) return false;

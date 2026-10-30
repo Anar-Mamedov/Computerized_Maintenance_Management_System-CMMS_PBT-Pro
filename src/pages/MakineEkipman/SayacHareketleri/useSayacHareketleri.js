@@ -6,7 +6,7 @@ import { BOS_FILTRELER, VARSAYILAN_SAYFA_BOYUTU } from "./sabitler";
 
 const ISTEKLER = { hareketler: getHareketListesi, ozet: getEkipmanOzeti, karsilastirma: getKarsilastirma };
 const ID_ALANLARI = { hareketler: "readingId", ozet: "counterId", karsilastirma: "groupId" };
-const BOS_VERI = { sekme: null, satirlar: [], toplam: 0, birim: "" };
+const BOS_VERI = { sekme: null, satirlar: [], toplam: 0 };
 
 /** Sekmenin istek govdesi: ortak filtre + listelerde sayfalama, hareketlerde tarih sirasi, karsilastirmada gruplama. */
 export const sekmeGovdesi = ({ sekme, filtreler, sayfa, sayfaBoyutu, siralama, grupla, karsilastirmaSayacTipi }) => {
@@ -46,8 +46,8 @@ export default function useSayacHareketleri() {
     ISTEKLER[sekme](govde)
       .then((yanit) => {
         if (!guncelMi()) return;
-        // Liste uclari `items`, `totalCount`, `unit` ve `kpi` alanlarini yanitin en ustunde doner (`data` sarmali yok).
-        setVeri({ sekme, satirlar: anahtarEkle(yanit.items, ID_ALANLARI[sekme]), toplam: Number(yanit.totalCount) || 0, birim: yanit.unit || "" });
+        // Liste uclari `items`, `totalCount` ve `kpi` alanlarini yanitin en ustunde doner (`data` sarmali yok); birim satirlarda.
+        setVeri({ sekme, satirlar: anahtarEkle(yanit.items, ID_ALANLARI[sekme]), toplam: Number(yanit.totalCount) || 0 });
         if (yanit.kpi) setKpi(yanit.kpi);
       })
       .catch((hata) => {
@@ -103,7 +103,6 @@ export default function useSayacHareketleri() {
     karsilastirmaSayacTipi,
     satirlar: sekmeVerisi.satirlar,
     toplam: sekmeVerisi.toplam,
-    birim: sekmeVerisi.birim,
     kpi,
     yukleniyor,
     filtreleriUygula,

@@ -1,5 +1,6 @@
 import { t } from "i18next";
 import AxiosInstance from "../../../api/http";
+import { camelCaseYap } from "../EkipmanVeritabani/AltEkipmanListesi/yardimcilar";
 
 /**
  * Sayac Hareketleri uclari (COUNTER_MOVEMENT_FRONTEND_GUIDE.md). Filtreli uclar POST + JSON govde ile cagrilir.
@@ -15,8 +16,13 @@ import AxiosInstance from "../../../api/http";
 /** Backend mesajini (yanit govdesi ya da HTTP hata govdesi) kullaniciya gosterilecek metne cevirir. */
 export const hataMesaji = (hataVeyaYanit) => hataVeyaYanit?.response?.data?.message || hataVeyaYanit?.message || t("hataOlustu");
 
-/** `hasError` donen yanit hataya cevrilir; boylece cagiran tek bir catch ile ilgilenir. */
-const yanitiDenetle = (yanit) => {
+/**
+ * Canli yanitin ust alanlari camelCase (items, totalCount, kpi), icerikleri PascalCase (items[].ReadingId, kpi.TotalIncrement...);
+ * ekran camelCase okudugu icin yanit burada bir kez cevrilir. `hasError` donen yanit hataya cevrilir; boylece cagiran tek
+ * bir catch ile ilgilenir.
+ */
+const yanitiDenetle = (hamYanit) => {
+  const yanit = camelCaseYap(hamYanit);
   if (!yanit || yanit.hasError === true) throw yanit;
   return yanit;
 };

@@ -10,10 +10,11 @@ import { sayiMetni } from "../yardimcilar";
 
 /**
  * 3. sekme: secilen gruba (ekipman tipi / marka / lokasyon) gore ekipman basina ortalama sayac artisi.
- * Cubuk genisligi backend'in `progressPercentage` degeridir (en yuksek ortalama %100). Sag ustteki sayac tipi
- * secilmezse backend ust filtredeki sayac tiplerini kullanir.
+ * Cubuk genisligi backend'in `percentage` degeridir (en yuksek ortalama %100). Gruplar farkli birimde olabildigi icin
+ * (saat, m3...) birim her satirin `unit` alanindan okunur. Sag ustteki sayac tipi secilmezse backend ust filtredeki sayac
+ * tiplerini kullanir.
  */
-export default function Karsilastirma({ satirlar, birim, yukleniyor, grupla, onGruplaDegistir, onSayacTipiDegistir }) {
+export default function Karsilastirma({ satirlar, yukleniyor, grupla, onGruplaDegistir, onSayacTipiDegistir }) {
   const { t, i18n } = useTranslation();
   // Global KodIDSelectbox form alanina yazar; secim yalnizca bu kartta kullanildigi icin yerel form yeterli.
   const sayacTipiFormu = useForm({ defaultValues: { karsilastirmaSayacTipi: null, karsilastirmaSayacTipiID: null } });
@@ -23,16 +24,16 @@ export default function Karsilastirma({ satirlar, birim, yukleniyor, grupla, onG
     return [
       { key: "grup", title: baslik(`sayacHareketleri.grup.${grupla}`), dataIndex: "groupName", render: (deger) => <span className="sh-kalin">{deger}</span> },
       { key: "sayi", title: baslik("sayacHareketleri.kolon.ekipmanSayisi"), width: 160, align: "right", render: (_, satir) => sayiMetni(satir.equipmentCount, i18n.language) },
-      { key: "toplam", title: baslik("sayacHareketleri.kolon.toplamArtis"), width: 180, align: "right", render: (_, satir) => <DegerBirim deger={satir.totalIncrease} birim={birim} /> },
+      { key: "toplam", title: baslik("sayacHareketleri.kolon.toplamArtis"), width: 180, align: "right", render: (_, satir) => <DegerBirim deger={satir.totalIncrement} birim={satir.unit} /> },
       {
         key: "ortalama",
         title: baslik("sayacHareketleri.kolon.ekipmanBasinaOrtalama"),
         width: 220,
         align: "right",
-        render: (_, satir) => <DegerBirim deger={satir.averagePerEquipment} birim={birim} ondalik={1} />,
+        render: (_, satir) => <DegerBirim deger={satir.averagePerEquipment} birim={satir.unit} ondalik={1} />,
       },
     ];
-  }, [birim, grupla, i18n.language, t]);
+  }, [grupla, i18n.language, t]);
 
   return (
     <Spin spinning={yukleniyor}>
@@ -70,10 +71,10 @@ export default function Karsilastirma({ satirlar, birim, yukleniyor, grupla, onG
                     <span className="sh-soluk sh-kucuk">{t("sayacHareketleri.ekipmanSayili", { sayi: sayiMetni(satir.equipmentCount, i18n.language) })}</span>
                   </div>
                   <div className="sh-cubuk-zemini">
-                    <div className="sh-cubuk" style={{ width: `${Math.min(Math.max(Number(satir.progressPercentage) || 0, 0), 100)}%` }} />
+                    <div className="sh-cubuk" style={{ width: `${Math.min(Math.max(Number(satir.percentage) || 0, 0), 100)}%` }} />
                   </div>
                   <div className="sh-cubuk-degeri">
-                    <DegerBirim deger={satir.averagePerEquipment} birim={birim} ondalik={1} />
+                    <DegerBirim deger={satir.averagePerEquipment} birim={satir.unit} ondalik={1} />
                   </div>
                 </div>
               ))}
@@ -92,7 +93,6 @@ export default function Karsilastirma({ satirlar, birim, yukleniyor, grupla, onG
 
 Karsilastirma.propTypes = {
   satirlar: PropTypes.arrayOf(PropTypes.object).isRequired,
-  birim: PropTypes.string,
   yukleniyor: PropTypes.bool.isRequired,
   grupla: PropTypes.string.isRequired,
   onGruplaDegistir: PropTypes.func.isRequired,
