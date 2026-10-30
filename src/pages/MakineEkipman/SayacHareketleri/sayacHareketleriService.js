@@ -5,11 +5,11 @@ import AxiosInstance from "../../../api/http";
  * Sayac Hareketleri uclari (COUNTER_MOVEMENT_FRONTEND_GUIDE.md). Filtreli uclar POST + JSON govde ile cagrilir.
  *
  * @typedef {Object} SayacKpi
- * @property {number} totalCounterIncrease
- * @property {number} registeredEquipmentCount
- * @property {number} averageDailyWork
+ * @property {number} totalIncrement
+ * @property {number} activeEquipmentCount
+ * @property {number} averageDailyUsage
  * @property {number} missingReadingEquipmentCount
- * @property {string} displayUnit  Tek birim secildiyse "km" / "saat", aksi halde ""
+ * @property {string} unit  Tek birim secildiyse "km" / "h", aksi halde ""
  */
 
 /** Backend mesajini (yanit govdesi ya da HTTP hata govdesi) kullaniciya gosterilecek metne cevirir. */

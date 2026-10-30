@@ -17,9 +17,9 @@ export const KAYIT_KAYNAKLARI = { ENTEGRASYON: "entegrasyon", MOBİL: "mobil", M
 
 /** Ust KPI kartlari; `alan` yanittaki `kpi` nesnesinin alanidir. */
 export const KPI_KARTLARI = [
-  { alan: "totalCounterIncrease", baslikKey: "sayacHareketleri.kpi.toplam", aciklamaKey: "sayacHareketleri.kpi.toplamAciklama", birimli: true },
-  { alan: "registeredEquipmentCount", baslikKey: "sayacHareketleri.kpi.kayitliEkipman", aciklamaKey: "sayacHareketleri.kpi.kayitliEkipmanAciklama" },
-  { alan: "averageDailyWork", baslikKey: "sayacHareketleri.kpi.gunlukOrtalama", aciklamaKey: "sayacHareketleri.kpi.gunlukOrtalamaAciklama", birimli: true, ondalik: 1 },
+  { alan: "totalIncrement", baslikKey: "sayacHareketleri.kpi.toplam", aciklamaKey: "sayacHareketleri.kpi.toplamAciklama", birimli: true },
+  { alan: "activeEquipmentCount", baslikKey: "sayacHareketleri.kpi.kayitliEkipman", aciklamaKey: "sayacHareketleri.kpi.kayitliEkipmanAciklama" },
+  { alan: "averageDailyUsage", baslikKey: "sayacHareketleri.kpi.gunlukOrtalama", aciklamaKey: "sayacHareketleri.kpi.gunlukOrtalamaAciklama", birimli: true, ondalik: 1 },
   { alan: "missingReadingEquipmentCount", baslikKey: "sayacHareketleri.kpi.eksikKayit", aciklamaKey: "sayacHareketleri.kpi.eksikKayitAciklama", uyari: true },
 ];
 

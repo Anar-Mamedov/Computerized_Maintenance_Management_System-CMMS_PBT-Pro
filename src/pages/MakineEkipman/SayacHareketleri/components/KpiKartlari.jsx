@@ -5,7 +5,7 @@ import { KPI_KARTLARI } from "../sabitler";
 import { sayiMetni } from "../yardimcilar";
 
 /**
- * Acik sekmenin yanitindaki `kpi` nesnesinden beslenen dort kart. Tek birim secildiyse (`displayUnit`) toplam ve
+ * Acik sekmenin yanitindaki `kpi` nesnesinden beslenen dort kart. Tek birim secildiyse (`unit`) toplam ve
  * gunluk ortalama birimiyle yazilir; sayac kaydi eksik ekipman varsa sayi kirmizi gosterilir.
  */
 export default function KpiKartlari({ kpi }) {
@@ -15,7 +15,7 @@ export default function KpiKartlari({ kpi }) {
     <div className="sh-kpi-izgarasi">
       {KPI_KARTLARI.map(({ alan, baslikKey, aciklamaKey, birimli, ondalik, uyari }) => {
         const deger = kpi?.[alan];
-        const birim = birimli && kpi?.displayUnit ? ` ${kpi.displayUnit}` : "";
+        const birim = birimli && kpi?.unit ? ` ${kpi.unit}` : "";
         const kirmizi = uyari && Number(deger) > 0;
         return (
           <div key={alan} className="sh-kart sh-kpi">
@@ -31,10 +31,10 @@ export default function KpiKartlari({ kpi }) {
 
 KpiKartlari.propTypes = {
   kpi: PropTypes.shape({
-    totalCounterIncrease: PropTypes.number,
-    registeredEquipmentCount: PropTypes.number,
-    averageDailyWork: PropTypes.number,
+    totalIncrement: PropTypes.number,
+    activeEquipmentCount: PropTypes.number,
+    averageDailyUsage: PropTypes.number,
     missingReadingEquipmentCount: PropTypes.number,
-    displayUnit: PropTypes.string,
+    unit: PropTypes.string,
   }),
 };

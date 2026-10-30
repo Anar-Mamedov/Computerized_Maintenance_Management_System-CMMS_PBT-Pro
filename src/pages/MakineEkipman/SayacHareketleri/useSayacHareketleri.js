@@ -46,9 +46,9 @@ export default function useSayacHareketleri() {
     ISTEKLER[sekme](govde)
       .then((yanit) => {
         if (!guncelMi()) return;
-        const data = yanit.data ?? {};
-        setVeri({ sekme, satirlar: anahtarEkle(data.items, ID_ALANLARI[sekme]), toplam: Number(data.totalCount) || 0, birim: data.unit || "" });
-        if (data.kpi) setKpi(data.kpi);
+        // Liste uclari `items`, `totalCount`, `unit` ve `kpi` alanlarini yanitin en ustunde doner (`data` sarmali yok).
+        setVeri({ sekme, satirlar: anahtarEkle(yanit.items, ID_ALANLARI[sekme]), toplam: Number(yanit.totalCount) || 0, birim: yanit.unit || "" });
+        if (yanit.kpi) setKpi(yanit.kpi);
       })
       .catch((hata) => {
         if (!guncelMi()) return;
