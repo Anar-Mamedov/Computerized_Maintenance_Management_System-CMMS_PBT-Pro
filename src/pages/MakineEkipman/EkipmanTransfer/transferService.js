@@ -1,5 +1,6 @@
 import { t } from "i18next";
 import AxiosInstance from "../../../api/http";
+import { camelCaseYap } from "../EkipmanVeritabani/AltEkipmanListesi/yardimcilar";
 
 /**
  * Ekipman Transferi uclari (EQUIPMENT_TRANSFER_FRONTEND_GUIDE.md).
@@ -30,8 +31,12 @@ export const basariliMi = (yanit) => Boolean(yanit) && yanit.hasError !== true;
 /** Backend mesajini (yanit govdesi ya da HTTP hata govdesi) kullaniciya gosterilecek metne cevirir. */
 export const hataMesaji = (hataVeyaYanit) => hataVeyaYanit?.response?.data?.message || hataVeyaYanit?.message || t("hataOlustu");
 
-/** Basarisiz yaniti hataya cevirir; boylece cagiran tek bir catch ile ilgilenir. */
-const yanitiDenetle = (yanit) => {
+/**
+ * Canli API alanlari PascalCase donuyor (data.TransferNo, Equipments, AllowedActions.CanEdit...); ekran camelCase okudugu
+ * icin yanit burada bir kez cevrilir. Basarisiz yanit hataya cevrilir; boylece cagiran tek bir catch ile ilgilenir.
+ */
+const yanitiDenetle = (hamYanit) => {
+  const yanit = camelCaseYap(hamYanit);
   if (!basariliMi(yanit)) throw yanit;
   return yanit;
 };

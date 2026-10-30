@@ -1,14 +1,9 @@
 import { useEffect, useState } from "react";
 import { message } from "antd";
 import { getTransfer, hataMesaji } from "./transferService";
-import { camelCaseYap } from "../EkipmanVeritabani/AltEkipmanListesi/yardimcilar";
 
-/**
- * React render icin ekipman satirlarina istemci anahtari eklenir; API'ye her zaman `equipmentId` gider.
- * Canli API alanlari PascalCase (EquipmentId, EquipmentCode) donuyor; ekran camelCase okudugu icin satirlar once cevrilir.
- */
-export const ekipmanSatirlariniHazirla = (liste) =>
-  camelCaseYap(Array.isArray(liste) ? liste : []).map((satir, index) => ({ ...satir, clientKey: `${satir.equipmentId ?? "ekipman"}-${index}` }));
+/** React render icin ekipman satirlarina istemci anahtari eklenir; API'ye her zaman `equipmentId` gider. */
+export const ekipmanSatirlariniHazirla = (liste) => (Array.isArray(liste) ? liste : []).map((satir, index) => ({ ...satir, clientKey: `${satir.equipmentId ?? "ekipman"}-${index}` }));
 
 /** Pencere acikken fisin detayini (GetById) yukler; kapaninca birakir. */
 export default function useTransferDetayi(transferId, acik) {
