@@ -3,9 +3,9 @@ import PropTypes from "prop-types";
 import { Empty, Table } from "antd";
 import { useTranslation } from "react-i18next";
 import { LuArrowDown, LuArrowUp, LuCheck, LuChevronsUpDown, LuX } from "react-icons/lu";
-import BoyutlanabilirBaslik from "./BoyutlanabilirBaslik";
 import { BakimRozeti, DurumRozeti, LokasyonBilgisi } from "./Rozetler";
 import SatirIslemMenusu from "./islemler/SatirIslemMenusu";
+import BoyutlanabilirBaslik from "../../../../../utils/components/KolonAyarlari/BoyutlanabilirBaslik";
 import useAutoTableScroll, { TABLE_FILL_INNER } from "../../../../Dashboard1/components/useAutoTableScroll";
 import { formatNumberWithSeparators } from "../../../../../utils/numberLocale";
 

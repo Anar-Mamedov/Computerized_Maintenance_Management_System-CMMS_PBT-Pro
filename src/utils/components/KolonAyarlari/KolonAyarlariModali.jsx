@@ -6,18 +6,15 @@ import { DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors } from
 import { SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useTranslation } from "react-i18next";
-import { KOLONLAR } from "../constants";
 
 const { Text } = Typography;
 
-const VARSAYILAN_SIRA = Object.fromEntries(KOLONLAR.map((kolon, index) => [kolon.key, index]));
-
-// Olculer eski tablodaki "Sütunları Yönet" penceresiyle ayni.
+// Olculer eski tablolardaki "Sütunları Yönet" penceresiyle ayni.
 const PANEL_STILI = { width: "46%", border: "1px solid #8080806e", borderRadius: "8px", padding: "10px" };
 const PANEL_BASLIGI_STILI = { marginBottom: "20px", borderBottom: "1px solid #80808051", padding: "8px 8px 12px 8px" };
 const LISTE_STILI = { height: "400px", overflow: "auto" };
 
-/** Siralama listesinde tutamactan surulen satir (eski tablodaki DraggableRow). */
+/** Siralama listesinde tutamactan surulen satir. */
 function SuruklenebilirSatir({ id, metin }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const stil = {
@@ -46,14 +43,14 @@ SuruklenebilirSatir.propTypes = {
 };
 
 /**
- * Eski tablodaki "Sütunları Yönet" penceresi: solda tum kolonlarin goster/gizle listesi (varsayilan sirada),
- * sagda gorunur kolonlarin surukle-birak sirasi. Degisiklikler aninda tabloya yansir ve tarayicida saklanir.
+ * "Sütunları Yönet" penceresi (`useKolonAyarlari` ile kullanilir): solda tum kolonlarin goster/gizle listesi
+ * (`varsayilanSira` ile), sagda gorunur kolonlarin surukle-birak sirasi. Degisiklikler aninda tabloya yansir.
  */
-export default function KolonAyarlari({ acik, kolonlar, onGorunurlukDegistir, onSiraDegistir, onSifirla, onKapat }) {
+export default function KolonAyarlariModali({ acik, kolonlar, varsayilanSira, onGorunurlukDegistir, onSiraDegistir, onSifirla, onKapat }) {
   const { t } = useTranslation();
   const sensorler = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }));
 
-  const varsayilanSirada = [...kolonlar].sort((a, b) => VARSAYILAN_SIRA[a.key] - VARSAYILAN_SIRA[b.key]);
+  const varsayilanSirada = [...kolonlar].sort((a, b) => varsayilanSira.indexOf(a.key) - varsayilanSira.indexOf(b.key));
   const gorunurKolonlar = kolonlar.filter((kolon) => kolon.gorunur);
 
   const suruklemeBitti = ({ active, over }) => {
@@ -103,7 +100,7 @@ export default function KolonAyarlari({ acik, kolonlar, onGorunurlukDegistir, on
   );
 }
 
-KolonAyarlari.propTypes = {
+KolonAyarlariModali.propTypes = {
   acik: PropTypes.bool.isRequired,
   kolonlar: PropTypes.arrayOf(
     PropTypes.shape({
@@ -112,6 +109,8 @@ KolonAyarlari.propTypes = {
       gorunur: PropTypes.bool.isRequired,
     })
   ).isRequired,
+  /** Goster/gizle listesinin sirasi (kolon anahtarlari, varsayilan sira). */
+  varsayilanSira: PropTypes.arrayOf(PropTypes.string).isRequired,
   onGorunurlukDegistir: PropTypes.func.isRequired,
   onSiraDegistir: PropTypes.func.isRequired,
   onSifirla: PropTypes.func.isRequired,

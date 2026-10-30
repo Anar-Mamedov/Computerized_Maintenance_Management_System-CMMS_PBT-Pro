@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { message } from "antd";
 import useDebounce from "../../../../hooks/useDebounce";
-import { getAltEkipmanListesi, hataMesaji } from "./altEkipmanService";
+import { getAltEkipmanListesi, getTumAltEkipmanlar, hataMesaji } from "./altEkipmanService";
 import { agacSatirlari, camelCaseYap, listeSatirlari } from "./yardimcilar";
 import { BOS_FILTRELER, SIRALAMA_ALANI, VARSAYILAN_SAYFA_BOYUTU } from "./sabitler";
 
@@ -113,6 +113,9 @@ export default function useAltEkipmanListesi() {
 
   const yenile = useCallback(() => setYenilemeSayaci((sayac) => sayac + 1), []);
 
+  /** Excel icin ekrandaki filtrelere ve sekmeye uyan tum kayitlar (sayfadan bagimsiz, duz liste). */
+  const tumKayitlariGetir = useCallback(() => getTumAltEkipmanlar(govde).then(camelCaseYap), [govde]);
+
   // Gorunum degisirken onceki gorunumun satirlari yeni kolonlarla cizilmez.
   const gorunumVerisi = veri.gorunum === gorunum ? veri : BOS_VERI;
 
@@ -134,5 +137,6 @@ export default function useAltEkipmanListesi() {
     sayfaDegistir,
     siralamayiDegistir,
     yenile,
+    tumKayitlariGetir,
   };
 }

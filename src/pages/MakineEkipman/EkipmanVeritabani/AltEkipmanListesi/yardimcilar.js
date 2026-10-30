@@ -1,3 +1,5 @@
+import { BAGLANTI_ROZETLERI } from "./sabitler";
+
 /**
  * Ornek yanitta alan adlari PascalCase (Code, MachineId), sayfalama alanlari camelCase (totalCount); iki bicim de
  * gelebilecegi icin yanit bir kez camelCase'e cevrilir ve ekran yalnizca camelCase okur.
@@ -10,8 +12,15 @@ export const camelCaseYap = (deger) => {
   return deger;
 };
 
-/** Liste satirlari: React render / secim icin istemci anahtari; API'ye ve modallara her zaman `id` gider. */
-export const listeSatirlari = (items) => (Array.isArray(items) ? items : []).map((satir, index) => ({ ...satir, clientKey: `${satir.id ?? "satir"}-${index}` }));
+/**
+ * Liste satirlari: React render / secim icin istemci anahtari; API'ye ve modallara her zaman `id` gider. Liste modunda da
+ * her kayitta bos `children: []` gelir; antd Table bunu agac verisi sayip ilk kolona ac/kapa dugmesi koydugu icin atilir.
+ */
+export const listeSatirlari = (items) =>
+  (Array.isArray(items) ? items : []).map((satir, index) => ({ ...satir, children: undefined, clientKey: `${satir.id ?? "satir"}-${index}` }));
+
+/** Baglanti durumu metni (rozet ve Excel); bilinmeyen kodda backend metni. */
+export const baglantiMetni = (kod, metin, t) => (BAGLANTI_ROZETLERI[kod] ? t(BAGLANTI_ROZETLERI[kod].labelKey) : metin || "");
 
 /**
  * Agac satirlari: makine gruplari kok satirdir (`grup: true`), altlarinda ekipmanlar sinirsiz derinlikte durur.

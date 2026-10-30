@@ -21,7 +21,7 @@ const ayniDizi = (a, b) => a.length === b.length && a.every((deger, index) => de
  * Arama ve global filtre secicileri (degisince hemen uygulanir), "Filtreler" ile acilan ek alan (bagli oldugu makine)
  * ve baglanti durumuna gore hizli sekmeler. Depo ve lokasyon secicileri forma yazdigi icin degerleri izlenir.
  */
-export default function FiltreCubugu({ filtreler, onFiltreDegistir, onSifirla, kpi, baglanti, onBaglantiDegistir }) {
+export default function FiltreCubugu({ filtreler, onFiltreDegistir, onSifirla, kpi, baglanti, onBaglantiDegistir, sayfaMenusu }) {
   const { t, i18n } = useTranslation();
   const form = useForm({ defaultValues: BOS_FORM });
   const { reset, watch } = form;
@@ -46,6 +46,7 @@ export default function FiltreCubugu({ filtreler, onFiltreDegistir, onSifirla, k
     <FormProvider {...form}>
       <div className="ae-kart ae-filtre-karti">
         <div className="ae-filtre-cubugu">
+          {sayfaMenusu}
           <div className="ae-filtre ae-filtre--arama">
             <Input
               allowClear
@@ -120,4 +121,6 @@ FiltreCubugu.propTypes = {
   kpi: PropTypes.object,
   baglanti: PropTypes.string.isRequired,
   onBaglantiDegistir: PropTypes.func.isRequired,
+  /** Aramanin solundaki sayfa menusu (Excel, Sütunları Yönet). */
+  sayfaMenusu: PropTypes.node,
 };

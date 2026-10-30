@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Resizable } from "react-resizable";
 
-// Eski tablodaki (MakineTanim/Table) tutamacla ayni: hucrenin sag %20'si, komsu kolona 5px tasar.
+// Eski tablolardaki tutamacla ayni: hucrenin sag %20'si, komsu kolona 5px tasar.
 const TUTAMAC_STILI = {
   position: "absolute",
   bottom: 0,
@@ -23,9 +23,12 @@ const SURUKLEME_AYARLARI = { enableUserSelectHack: false };
 // Surukleme sirasinda fare komsu basliklarin metnini secmesin.
 const metinSeciminiEngelle = (event) => event.preventDefault();
 
-/** Kenarindan surukleyerek genisligi degisen tablo basligi. Genislik verilmeyen hucreler (secim kolonu) duz kalir. */
+/**
+ * Kenarindan surukleyerek genisligi degisen tablo basligi; Table `components.header.cell` olarak verilir, kolonun
+ * `onHeaderCell`'i `width` ve `onResize` dondurur. Genislik verilmeyen hucreler (secim kolonu gibi) duz kalir.
+ */
 export default function BoyutlanabilirBaslik({ onResize, width, ...thProps }) {
-  if (!width) {
+  if (!width || !onResize) {
     return <th {...thProps} />;
   }
 

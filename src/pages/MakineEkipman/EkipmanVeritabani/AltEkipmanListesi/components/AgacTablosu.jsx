@@ -4,17 +4,22 @@ import { useTranslation } from "react-i18next";
 import { LuCog, LuMoreVertical, LuPackage } from "react-icons/lu";
 import KayanTablo from "./KayanTablo";
 import IslemMenusu from "./IslemMenusu";
-import { BaglantiRozeti, DurumRozeti } from "./Rozetler";
+import KolonHucresi from "./KolonHucresi";
+import BoyutlanabilirBaslik from "../../../../../utils/components/KolonAyarlari/BoyutlanabilirBaslik";
 import { formatNumberWithSeparators } from "../../../../../utils/numberLocale";
 
-const ASGARI_GENISLIK = 1000;
+const TABLO_BILESENLERI = { header: { cell: BoyutlanabilirBaslik } };
 const GRUP_GIZLI_SECIM = { disabled: true, style: { display: "none" } };
+const SECIM_KOLONU_GENISLIGI = 40;
+const EKIPMAN_KOLONU_GENISLIGI = 340;
+const ISLEM_KOLONU_GENISLIGI = 56;
 
 /**
  * Agac gorunumu: her makine bir grup satiridir, altinda alt ekipmanlar sinirsiz derinlikte acilir; en altta
  * "STOK / BAGIMSIZ" grubu durur. Gruplar ilk yuklemede acik gelir; grup satirlari secilemez ve islem menusu yoktur.
+ * Ilk kolon (kod + tanim) sabittir; digerleri liste ile ayni kolon ayarlarindan gelir (`agacta: false` olanlar haric).
  */
-export default function AgacTablosu({ satirlar, yukleniyor, govdeKayar, seciliAnahtarlar, onSecimDegistir, onDetay, onIslem }) {
+export default function AgacTablosu({ satirlar, yukleniyor, govdeKayar, gorunurKolonlar, onGenislikDegistir, seciliAnahtarlar, onSecimDegistir, onDetay, onIslem }) {
   const { t, i18n } = useTranslation();
   const [acikAnahtarlar, setAcikAnahtarlar] = useState([]);
 
@@ -22,21 +27,17 @@ export default function AgacTablosu({ satirlar, yukleniyor, govdeKayar, seciliAn
     setAcikAnahtarlar(satirlar.map((grup) => grup.clientKey));
   }, [satirlar]);
 
+  const agacKolonlari = useMemo(() => gorunurKolonlar.filter((kolon) => kolon.agacta !== false), [gorunurKolonlar]);
+
   const kolonlar = useMemo(() => {
-    const baslik = (anahtar) => t(anahtar).toLocaleUpperCase(i18n.language);
+    const baslik = (metin) => metin.toLocaleUpperCase(i18n.language);
     const sayi = (deger) => formatNumberWithSeparators(deger ?? 0, i18n.language);
-    // Grup satirinda yalnizca ilk kolon dolu; digerleri bos kalir.
-    const ekipmanHucresi = (render) => (_, satir) => (satir.grup ? null : render(satir));
-    const metin = (deger) => (
-      <span className="ae-tasan" title={deger || undefined}>
-        {deger || "–"}
-      </span>
-    );
 
     return [
       {
         key: "ekipman",
-        title: baslik("altEkipmanVeritabani.kolon.ekipmanNoTanim"),
+        title: baslik(t("altEkipmanVeritabani.kolon.ekipmanNoTanim")),
+        width: EKIPMAN_KOLONU_GENISLIGI,
         render: (_, satir) =>
           satir.grup ? (
             <div className="ae-grup">
@@ -58,33 +59,33 @@ export default function AgacTablosu({ satirlar, yukleniyor, govdeKayar, seciliAn
             </span>
           ),
       },
-      { key: "serial", title: baslik("altEkipmanVeritabani.kolon.seriNo"), width: 110, render: ekipmanHucresi((satir) => metin(satir.serialNo)) },
-      { key: "type", title: baslik("altEkipmanVeritabani.kolon.ekipmanTipi"), width: 120, render: ekipmanHucresi((satir) => metin(satir.equipmentType)) },
-      { key: "location", title: baslik("altEkipmanVeritabani.kolon.konumDepo"), width: 130, render: ekipmanHucresi((satir) => metin(satir.locationOrWarehouse)) },
-      {
-        key: "connection",
-        title: baslik("altEkipmanVeritabani.kolon.baglantiDurumu"),
-        width: 130,
-        render: ekipmanHucresi((satir) => <BaglantiRozeti kod={satir.connectionStatusCode} metin={satir.connectionStatus} />),
-      },
-      { key: "status", title: baslik("altEkipmanVeritabani.kolon.ekipmanDurumu"), width: 105, render: ekipmanHucresi((satir) => <DurumRozeti metin={satir.equipmentStatus} />) },
-      { key: "brand", title: baslik("marka"), width: 95, render: ekipmanHucresi((satir) => metin(satir.brand)) },
+      // Grup satirinda yalnizca ilk kolon dolu; digerleri bos kalir.
+      ...agacKolonlari.map((kolon) => ({
+        key: kolon.key,
+        title: baslik(kolon.baslik),
+        width: kolon.genislik,
+        render: (_, satir) => (satir.grup ? null : <KolonHucresi kolon={kolon} satir={satir} onDetay={onDetay} />),
+        onHeaderCell: () => ({ width: kolon.genislik, onResize: (_, { size }) => onGenislikDegistir(kolon.key, size.width) }),
+      })),
       {
         key: "islem",
-        title: baslik("altEkipmanVeritabani.kolon.islem"),
-        width: 56,
+        title: baslik(t("altEkipmanVeritabani.kolon.islem")),
+        width: ISLEM_KOLONU_GENISLIGI,
         align: "center",
         fixed: "right",
-        render: ekipmanHucresi((satir) => (
-          <IslemMenusu kayit={satir} onIslem={onIslem}>
-            <button type="button" className="ae-ikon-btn" aria-label={t("altEkipmanVeritabani.kolon.islem")}>
-              <LuMoreVertical size={16} />
-            </button>
-          </IslemMenusu>
-        )),
+        render: (_, satir) =>
+          satir.grup ? null : (
+            <IslemMenusu kayit={satir} onIslem={onIslem}>
+              <button type="button" className="ae-ikon-btn" aria-label={t("altEkipmanVeritabani.kolon.islem")}>
+                <LuMoreVertical size={16} />
+              </button>
+            </IslemMenusu>
+          ),
       },
     ];
-  }, [i18n.language, onDetay, onIslem, t]);
+  }, [agacKolonlari, i18n.language, onDetay, onGenislikDegistir, onIslem, t]);
+
+  const tabloGenisligi = agacKolonlari.reduce((toplam, kolon) => toplam + kolon.genislik, SECIM_KOLONU_GENISLIGI + EKIPMAN_KOLONU_GENISLIGI + ISLEM_KOLONU_GENISLIGI);
 
   return (
     <KayanTablo
@@ -92,11 +93,12 @@ export default function AgacTablosu({ satirlar, yukleniyor, govdeKayar, seciliAn
       satirlar={satirlar}
       yukleniyor={yukleniyor}
       govdeKayar={govdeKayar}
-      asgariGenislik={ASGARI_GENISLIK}
+      asgariGenislik={tabloGenisligi}
+      components={TABLO_BILESENLERI}
       rowClassName={(satir) => (satir.grup ? "ae-grup-satiri" : "")}
       expandable={{ expandedRowKeys: acikAnahtarlar, onExpandedRowsChange: setAcikAnahtarlar, indentSize: 22 }}
       rowSelection={{
-        columnWidth: 40,
+        columnWidth: SECIM_KOLONU_GENISLIGI,
         checkStrictly: true,
         selectedRowKeys: seciliAnahtarlar,
         onChange: onSecimDegistir,
@@ -110,6 +112,10 @@ AgacTablosu.propTypes = {
   satirlar: PropTypes.arrayOf(PropTypes.object).isRequired,
   yukleniyor: PropTypes.bool.isRequired,
   govdeKayar: PropTypes.bool.isRequired,
+  gorunurKolonlar: PropTypes.arrayOf(
+    PropTypes.shape({ key: PropTypes.string.isRequired, baslik: PropTypes.string.isRequired, genislik: PropTypes.number.isRequired, agacta: PropTypes.bool })
+  ).isRequired,
+  onGenislikDegistir: PropTypes.func.isRequired,
   seciliAnahtarlar: PropTypes.arrayOf(PropTypes.string).isRequired,
   onSecimDegistir: PropTypes.func.isRequired,
   onDetay: PropTypes.func.isRequired,

@@ -8,14 +8,14 @@ import AktifFiltreler from "./components/AktifFiltreler";
 import EkipmanTablosu from "./components/EkipmanTablosu";
 import EkipmanKartlari from "./components/EkipmanKartlari";
 import Sayfalama from "./components/Sayfalama";
-import KolonAyarlari from "./components/KolonAyarlari";
 import IslemModallari from "./components/islemler/IslemModallari";
 import EkipmanKarti from "./EkipmanKarti/EkipmanKarti";
 import QRCodeGenerator from "../../../../utils/components/QRCodeGenerator";
+import KolonAyarlariModali from "../../../../utils/components/KolonAyarlari/KolonAyarlariModali";
 import useEkipmanListesi from "./useEkipmanListesi";
 import useFiltreSecenekleri from "./useFiltreSecenekleri";
 import useTemaDegiskenleri from "./useTemaDegiskenleri";
-import useKolonAyarlari from "./useKolonAyarlari";
+import useEkipmanKolonlari from "./useEkipmanKolonlari";
 import { getEkipmanExcelListesi } from "./ekipmanService";
 import { ekipmanFormunuAc } from "./ekipmanFormu";
 import { excelGovdesiOlustur } from "./listeIstegi";
@@ -33,7 +33,7 @@ export default function EkipmanListesi() {
   const temaDegiskenleri = useTemaDegiskenleri();
   const liste = useEkipmanListesi();
   const { satirlar, filtreler, filtreleriGuncelle, yenile } = liste;
-  const kolonAyarlari = useKolonAyarlari(satirlar);
+  const kolonAyarlari = useEkipmanKolonlari(satirlar);
   // Genis ekranda ust bolum sabit kalir, yalnizca tablo govdesi kayar. Dar ekranda sabit ust bolum
   // dikey alanin cogunu kaplayacagi icin sayfanin tamami kayar.
   const ekranlar = Grid.useBreakpoint();
@@ -168,9 +168,10 @@ export default function EkipmanListesi() {
       </div>
 
       <GelismisFiltreler acik={gelismisAcik} onKapat={() => setGelismisAcik(false)} filtreler={filtreler} onFiltreDegistir={filtreleriGuncelle} />
-      <KolonAyarlari
+      <KolonAyarlariModali
         acik={kolonAyarlariAcik}
         kolonlar={kolonAyarlari.kolonlar}
+        varsayilanSira={kolonAyarlari.varsayilanSira}
         onGorunurlukDegistir={kolonAyarlari.gorunurlukDegistir}
         onSiraDegistir={kolonAyarlari.siraDegistir}
         onSifirla={kolonAyarlari.sifirla}

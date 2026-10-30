@@ -14,3 +14,17 @@ export const getAltEkipmanListesi = (govde) =>
     if (!yanit || yanit.hasError === true) throw yanit;
     return yanit;
   });
+
+/**
+ * Excel icin filtrelere uyan tum alt ekipmanlar (duz liste, ham yanit satirlari). Dokumanda disa aktarma ucu yok; once
+ * toplam kayit ogrenilir, sonra liste ucundan tek sayfada (sayfa boyutu = toplam) istenir.
+ */
+export const getTumAltEkipmanlar = async (govde) => {
+  const listeGovdesi = { ...govde, viewMode: "list", page: 1 };
+  const ilkYanit = await getAltEkipmanListesi({ ...listeGovdesi, pageSize: 1 });
+  const toplam = Number(ilkYanit.listData?.totalCount) || 0;
+  if (toplam === 0) return [];
+
+  const yanit = await getAltEkipmanListesi({ ...listeGovdesi, pageSize: toplam });
+  return yanit.listData?.items ?? [];
+};

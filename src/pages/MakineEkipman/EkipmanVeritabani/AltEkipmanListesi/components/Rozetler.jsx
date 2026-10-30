@@ -3,14 +3,14 @@ import PropTypes from "prop-types";
 import { Tag } from "antd";
 import { useTranslation } from "react-i18next";
 import { BAGLANTI_ROZETLERI, DURUM_RENKLERI } from "../sabitler";
+import { baglantiMetni } from "../yardimcilar";
 
 /** Baglanti durumu (Ekipmana Bagli / Stokta / Hurda); bilinmeyen kodda backend metni yazilir. */
 export function BaglantiRozeti({ kod, metin }) {
   const { t } = useTranslation();
-  const rozet = BAGLANTI_ROZETLERI[kod];
   return (
-    <Tag className="ae-rozet" color={rozet?.renk ?? "default"}>
-      {rozet ? t(rozet.labelKey) : metin || "–"}
+    <Tag className="ae-rozet" color={BAGLANTI_ROZETLERI[kod]?.renk ?? "default"}>
+      {baglantiMetni(kod, metin, t) || "–"}
     </Tag>
   );
 }

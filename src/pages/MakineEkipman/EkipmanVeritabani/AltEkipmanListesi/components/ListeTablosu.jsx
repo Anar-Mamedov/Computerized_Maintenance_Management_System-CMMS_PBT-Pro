@@ -4,54 +4,53 @@ import { useTranslation } from "react-i18next";
 import { LuMoreVertical } from "react-icons/lu";
 import KayanTablo from "./KayanTablo";
 import IslemMenusu from "./IslemMenusu";
-import { BaglantiRozeti, DurumRozeti } from "./Rozetler";
+import KolonHucresi from "./KolonHucresi";
+import BoyutlanabilirBaslik from "../../../../../utils/components/KolonAyarlari/BoyutlanabilirBaslik";
 
-// Tanim ve Bagli Oldugu Ekipman kolonlarina genislik verilmez; kartta kalan alani onlar paylasir.
-const ASGARI_GENISLIK = 1040;
+const TABLO_BILESENLERI = { header: { cell: BoyutlanabilirBaslik } };
+const SECIM_KOLONU_GENISLIGI = 40;
+const ISLEM_KOLONU_GENISLIGI = 48;
 
-/** Duz liste: her alt ekipman ve tam kirilim yolu (`parentPath`). Siralama yalnizca Ekipman No'ya gore (dokuman). */
-export default function ListeTablosu({ satirlar, yukleniyor, govdeKayar, seciliAnahtarlar, onSecimDegistir, siralama, onSirala, onDetay, onIslem }) {
+/**
+ * Duz liste: her alt ekipman ve tam kirilim yolu (`parentPath`). Kolonlar kolon ayarlarindaki sira ve genislikle
+ * cizilir, basliklarin sag kenari surulerek genislik degisir. Siralama yalnizca Ekipman No'ya gore (dokuman).
+ */
+export default function ListeTablosu({
+  satirlar,
+  yukleniyor,
+  govdeKayar,
+  gorunurKolonlar,
+  onGenislikDegistir,
+  seciliAnahtarlar,
+  onSecimDegistir,
+  siralama,
+  onSirala,
+  onDetay,
+  onIslem,
+}) {
   const { t, i18n } = useTranslation();
 
   const kolonlar = useMemo(() => {
     // CSS uppercase Turkce i/I harflerini bozdugu icin basliklar dile gore buyutulur.
-    const baslik = (anahtar) => t(anahtar).toLocaleUpperCase(i18n.language);
-    const metin = (deger) => (
-      <span className="ae-tasan" title={deger || undefined}>
-        {deger || "–"}
-      </span>
-    );
+    const baslik = (metin) => metin.toLocaleUpperCase(i18n.language);
+    const siralamaOzellikleri = (kolon) =>
+      kolon.key === "code" ? { sorter: true, sortOrder: siralama === "DESC" ? "descend" : "ascend", sortDirections: ["ascend", "descend", "ascend"] } : {};
+
     return [
-      {
-        key: "code",
-        title: baslik("altEkipmanVeritabani.kolon.ekipmanNo"),
-        width: 110,
-        sorter: true,
-        sortOrder: siralama === "DESC" ? "descend" : "ascend",
-        sortDirections: ["ascend", "descend", "ascend"],
-        render: (_, satir) => (
-          <button type="button" className="ae-link" onClick={() => onDetay(satir)}>
-            {satir.code}
-          </button>
-        ),
-      },
-      { key: "name", title: baslik("altEkipmanVeritabani.kolon.tanim"), render: (_, satir) => <span className="ae-kalin">{metin(satir.name)}</span> },
-      { key: "type", title: baslik("altEkipmanVeritabani.kolon.ekipmanTipi"), width: 100, render: (_, satir) => metin(satir.equipmentType) },
-      { key: "serial", title: baslik("altEkipmanVeritabani.kolon.seriNo"), width: 90, render: (_, satir) => metin(satir.serialNo) },
-      { key: "parent", title: baslik("altEkipmanVeritabani.kolon.bagliOlduguEkipman"), render: (_, satir) => metin(satir.parentPath) },
-      { key: "location", title: baslik("altEkipmanVeritabani.kolon.konumDepo"), width: 110, render: (_, satir) => metin(satir.locationOrWarehouse) },
-      {
-        key: "connection",
-        title: baslik("altEkipmanVeritabani.kolon.baglantiDurumu"),
-        width: 120,
-        render: (_, satir) => <BaglantiRozeti kod={satir.connectionStatusCode} metin={satir.connectionStatus} />,
-      },
-      { key: "status", title: baslik("altEkipmanVeritabani.kolon.ekipmanDurumu"), width: 105, render: (_, satir) => <DurumRozeti metin={satir.equipmentStatus} /> },
-      { key: "brand", title: baslik("marka"), width: 85, render: (_, satir) => metin(satir.brand) },
+      ...gorunurKolonlar.map((kolon, index) => ({
+        key: kolon.key,
+        title: baslik(kolon.baslik),
+        width: kolon.genislik,
+        // Yalnizca en bastaki Ekipman No sabitlenir; araya tasinmis sabit kolon yatay kaydirmayi bozar.
+        fixed: kolon.key === "code" && index === 0 ? "left" : undefined,
+        ...siralamaOzellikleri(kolon),
+        render: (_, satir) => <KolonHucresi kolon={kolon} satir={satir} onDetay={onDetay} />,
+        onHeaderCell: () => ({ width: kolon.genislik, onResize: (_, { size }) => onGenislikDegistir(kolon.key, size.width) }),
+      })),
       {
         key: "islem",
-        title: baslik("altEkipmanVeritabani.kolon.islem"),
-        width: 48,
+        title: baslik(t("altEkipmanVeritabani.kolon.islem")),
+        width: ISLEM_KOLONU_GENISLIGI,
         align: "center",
         fixed: "right",
         render: (_, satir) => (
@@ -63,7 +62,10 @@ export default function ListeTablosu({ satirlar, yukleniyor, govdeKayar, seciliA
         ),
       },
     ];
-  }, [i18n.language, onDetay, onIslem, siralama, t]);
+  }, [gorunurKolonlar, i18n.language, onDetay, onGenislikDegistir, onIslem, siralama, t]);
+
+  // Tablo en az kolonlarin toplami kadar genis olur (dar ekranda yatay kayar), genis ekranda karti doldurur.
+  const tabloGenisligi = gorunurKolonlar.reduce((toplam, kolon) => toplam + kolon.genislik, SECIM_KOLONU_GENISLIGI + ISLEM_KOLONU_GENISLIGI);
 
   return (
     <KayanTablo
@@ -71,8 +73,9 @@ export default function ListeTablosu({ satirlar, yukleniyor, govdeKayar, seciliA
       satirlar={satirlar}
       yukleniyor={yukleniyor}
       govdeKayar={govdeKayar}
-      asgariGenislik={ASGARI_GENISLIK}
-      rowSelection={{ columnWidth: 40, fixed: true, selectedRowKeys: seciliAnahtarlar, onChange: onSecimDegistir }}
+      asgariGenislik={tabloGenisligi}
+      components={TABLO_BILESENLERI}
+      rowSelection={{ columnWidth: SECIM_KOLONU_GENISLIGI, fixed: true, selectedRowKeys: seciliAnahtarlar, onChange: onSecimDegistir }}
       onChange={(_sayfalama, _filtreler, siralayici) => onSirala(siralayici?.order === "descend" ? "DESC" : "ASC")}
     />
   );
@@ -82,6 +85,8 @@ ListeTablosu.propTypes = {
   satirlar: PropTypes.arrayOf(PropTypes.object).isRequired,
   yukleniyor: PropTypes.bool.isRequired,
   govdeKayar: PropTypes.bool.isRequired,
+  gorunurKolonlar: PropTypes.arrayOf(PropTypes.shape({ key: PropTypes.string.isRequired, baslik: PropTypes.string.isRequired, genislik: PropTypes.number.isRequired })).isRequired,
+  onGenislikDegistir: PropTypes.func.isRequired,
   seciliAnahtarlar: PropTypes.arrayOf(PropTypes.string).isRequired,
   onSecimDegistir: PropTypes.func.isRequired,
   siralama: PropTypes.oneOf(["ASC", "DESC"]).isRequired,
