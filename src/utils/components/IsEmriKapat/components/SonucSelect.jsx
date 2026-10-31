@@ -1,13 +1,13 @@
 import React, { useState, createRef, useEffect } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import { Select, Typography, Divider, Spin, Button, Input, message, Space } from "antd";
-import AxiosInstance from "../../../../../../../../api/http";
+import AxiosInstance from "../../../../api/http";
 import { PlusOutlined } from "@ant-design/icons";
 
 const { Text, Link } = Typography;
 const { Option } = Select;
 
-export default function MakineDurumu({ disabled, fieldRequirements }) {
+export default function SonucSelect({ disabled, fieldRequirements }) {
   const {
     control,
     setValue,
@@ -27,7 +27,7 @@ export default function MakineDurumu({ disabled, fieldRequirements }) {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await AxiosInstance.get("KodList?grup=32505");
+      const response = await AxiosInstance.get("KodList?grup=32802");
       if (response && response) {
         setOptions(response);
       }
@@ -55,7 +55,7 @@ export default function MakineDurumu({ disabled, fieldRequirements }) {
       }
 
       setLoading(true);
-      AxiosInstance.post(`AddKodList?entity=${name}&grup=32505`)
+      AxiosInstance.post(`AddKodList?entity=${name}&grup=32802`)
         .then((response) => {
           if (response.status_code === 201) {
             // Assuming 'id' is directly in the response
@@ -104,12 +104,13 @@ export default function MakineDurumu({ disabled, fieldRequirements }) {
       {contextHolder}
       <div style={{ display: "flex", flexWrap: "wrap", width: "100%" }}>
         <Controller
-          name="makineDurumu"
+          name="sonuc"
           control={control}
+          rules={{ required: "Alan Boş Bırakılamaz!" }}
           render={({ field }) => (
             <Select
               {...field}
-              status={errors.makineDurumu ? "error" : ""}
+              status={errors.sonuc ? "error" : ""}
               disabled={disabled}
               key={selectKey}
               style={{ width: "100%" }}
@@ -154,8 +155,8 @@ export default function MakineDurumu({ disabled, fieldRequirements }) {
               onChange={(value) => {
                 // Seçilen değerin ID'sini NedeniID alanına set et
                 // `null` veya `undefined` değerlerini ele al
-                setValue("makineDurumu", value ?? null);
-                setValue("makineDurumuID", value ?? null);
+                setValue("sonuc", value ?? null);
+                setValue("sonucID", value ?? null);
                 field.onChange(value ?? null);
               }}
               value={field.value ?? null} // Eğer `field.value` `undefined` ise, `null` kullanarak `Select` bileşenine geçir
@@ -163,7 +164,7 @@ export default function MakineDurumu({ disabled, fieldRequirements }) {
           )}
         />
         <Controller
-          name="makineDurumuID"
+          name="sonucID"
           control={control}
           render={({ field }) => (
             <Input
@@ -173,7 +174,7 @@ export default function MakineDurumu({ disabled, fieldRequirements }) {
             />
           )}
         />
-        {errors.makineDurumu && <div style={{ color: "red", marginTop: "5px" }}>{errors.makineDurumu.message}</div>}
+        {errors.sonuc && <div style={{ color: "red", marginTop: "5px" }}>{errors.sonuc.message}</div>}
       </div>
     </div>
   );

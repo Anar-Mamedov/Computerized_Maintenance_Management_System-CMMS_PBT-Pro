@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Table,
   Button,
@@ -36,6 +36,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Resizable } from "react-resizable";
 import "./ResizeStyle.css";
 import AxiosInstance from "../../../../api/http";
+import AtolyeFilterSelectbox from "../../../../utils/components/AtolyeFilterSelectbox";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
@@ -162,6 +163,11 @@ const MainTable = () => {
   const [searchTimeout, setSearchTimeout] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
   const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
+  const [atolyeId, setAtolyeId] = useState();
+  // refreshTableData ilk render'daki fetchEquipmentData'yı tuttuğu için seçili atölye ref'ten okunur.
+  const atolyeIdRef = useRef();
+  // Atölye hızlı değiştirilirse yalnızca son isteğin yanıtı tabloya yazılır.
+  const sonIstekNo = useRef(0);
 
   // edit drawer için
   const [drawer, setDrawer] = useState({
@@ -423,10 +429,12 @@ const MainTable = () => {
   // ana tablo api isteği için kullanılan useEffect son
 
   const fetchEquipmentData = async () => {
+    const istekNo = ++sonIstekNo.current;
     try {
       setLoading(true);
       // API isteğinde keyword ve currentPage kullanılıyor
-      const response = await AxiosInstance.get(`Personel`);
+      const response = await AxiosInstance.get("Personel", { params: { atolyeId: atolyeIdRef.current } });
+      if (istekNo !== sonIstekNo.current) return;
       if (response) {
         // Gelen veriyi formatla ve state'e ata
         const formattedData = response.map((item) => ({
@@ -447,6 +455,7 @@ const MainTable = () => {
         setLoading(false);
       }
     } catch (error) {
+      if (istekNo !== sonIstekNo.current) return;
       console.error("Error in API request:", error);
       setLoading(false);
       if (navigator.onLine) {
@@ -531,6 +540,12 @@ const MainTable = () => {
     // Ancak, `fetchEquipmentData` içinde `body` ve `currentPage`'e bağlı olarak veri çekiliyorsa, bu değerlerin güncellenmesi yeterli olacaktır.
     // Bu nedenle, doğrudan `fetchEquipmentData` fonksiyonunu çağırmak yerine, bu değerlerin güncellenmesini bekleyebiliriz.
   }, []); // Bağımlılıkları kaldırdık, çünkü fonksiyon içindeki değerler zaten en güncel halleriyle kullanılıyor.
+
+  const handleAtolyeChange = (secilenAtolyeId) => {
+    atolyeIdRef.current = secilenAtolyeId;
+    setAtolyeId(secilenAtolyeId);
+    refreshTableData();
+  };
 
   // filtrelenmiş sütunları local storage'dan alıp state'e atıyoruz
   const [columns, setColumns] = useState(() => {
@@ -824,6 +839,9 @@ const MainTable = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             prefix={<SearchOutlined style={{ color: "#0091ff" }} />}
           />
+          <div style={{ width: "200px" }}>
+            <AtolyeFilterSelectbox tekli value={atolyeId} onChange={handleAtolyeChange} />
+          </div>
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
           <ContextMenu

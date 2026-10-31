@@ -42,10 +42,10 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       ureticiKodu: null,
       sinifTanim: null,
       sinifID: null,
-      MakineMarka: null,
-      MakineMarkaID: null,
-      MakineModel: null,
-      MakineModelID: null,
+      marka: null,
+      markaID: null,
+      model: null,
+      modelID: null,
       atolyeTanim: null,
       atolyeID: null,
       aktif: true,
@@ -142,10 +142,10 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
           setValue("ureticiKodu", item.STK_URETICI_KOD);
           setValue("sinifID", item.STK_SINIF_ID);
           setValue("sinifTanim", item.STK_SINIF);
-          setValue("MakineMarkaID", item.STK_MARKA_KOD_ID);
-          setValue("MakineMarka", item.STK_MARKA);
-          setValue("MakineModelID", item.STK_MODEL_KOD_ID);
-          setValue("MakineModel", item.STK_MODEL);
+          setValue("markaID", item.STK_MARKA_KOD_ID);
+          setValue("marka", item.STK_MARKA);
+          setValue("modelID", item.STK_MODEL_KOD_ID);
+          setValue("model", item.STK_MODEL);
           setValue("atolyeID", item.STK_ATOLYE_ID);
           setValue("atolyeTanim", item.STK_ATOLYE);
           setValue("aktif", item.STK_AKTIF);
@@ -247,8 +247,8 @@ export default function EditDrawer({ selectedRow, onDrawerClose, drawerVisible, 
       STK_BIRIM_KOD_ID: data.birimID,
       STK_URETICI_KOD: data.ureticiKodu,
       STK_SINIF_ID: data.sinifID,
-      STK_MARKA_KOD_ID: data.MakineMarkaID,
-      STK_MODEL_KOD_ID: data.MakineModelID,
+      STK_MARKA_KOD_ID: data.markaID,
+      STK_MODEL_KOD_ID: data.modelID,
       STK_ATOLYE_ID: data.atolyeID,
       STK_MODUL_NO: 1,
       STK_AKTIF: data.aktif,

@@ -10,6 +10,7 @@ import AxiosInstance from "../../../../api/http";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import Filters from "./filter/Filters";
+import { kayitliDurumlariOku } from "./filter/durumFiltresiDeposu";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import NotEkleModal from "../components/ContextMenu/components/NotEkleModal";
 import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
@@ -128,6 +129,8 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
   const dashboardParams = useDashboardFilterParams("/isEmri1");
   const hatirlaticiModu = Boolean(hatirlaticiGrupId && hatirlaticiSiraId);
   const { filters: dashboardFilters, isClose: dashboardIsClose } = hatirlaticiModu ? DASHBOARD_FILTRESIZ : dashboardParams;
+  // Kayitli Durum filtresi yalnizca liste dogrudan acildiginda uygulanir; dashboard ve hatirlatici kendi kayit kumesini gosterir.
+  const [baslangicDurumlar] = useState(() => (hatirlaticiModu || dashboardParams.active ? [] : kayitliDurumlariOku()));
   // State definitions...
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { setValue } = useFormContext();
@@ -1279,9 +1282,10 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
 
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
+  // Ilk istek de kayitli durumla gider; aksi halde filtresiz ilk yanit sonradan gelip filtreli listeyi ezebilir.
   const [body, setBody] = useState({
     keyword: "",
-    filters: {},
+    filters: { durumlar: baslangicDurumlar },
   });
 
   // ana tablo api isteği için kullanılan useEffect
@@ -2094,6 +2098,7 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
             onChange={handleBodyChange}
             baslangicLokasyonIds={dashboardFilters.lokasyonlar}
             baslangicIdFiltreleri={cekmeceBaslangici}
+            baslangicDurumlar={baslangicDurumlar}
           />
           {/* <TeknisyenSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <AtolyeSubmit selectedRows={selectedRows} refreshTableData={refreshTableData} /> */}

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Button, Popover, Typography } from "antd";
-import { MoreOutlined } from "@ant-design/icons";
+import { MoreOutlined, StopOutlined } from "@ant-design/icons";
 import Sil from "./components/Sil";
-import Kapat from "./components/Kapat/Kapat";
+import IsEmriKapat from "../../../../../utils/components/IsEmriKapat/IsEmriKapat";
+import MenuItem from "./components/MenuItem";
 import TarihceTablo from "./components/TarihceTablo";
 import Form from "./components/Form/Form";
 import Ac from "./components/Ac";
@@ -91,7 +92,16 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck,
             {showAtolyeTransferi && <AtolyeTransferi selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
             {showNotEkle && <NotEkle selectedRows={selectedRows} refreshTableData={refreshTableData} hidePopover={hidePopover} />}
             {showKapat && (
-              <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} hidePopover={hidePopover} onOpenControlList={onOpenControlList} />
+              <IsEmriKapat
+                selectedRows={selectedRows}
+                refreshTableData={refreshTableData}
+                kapatDisabled={kapatDisabled}
+                hidePopover={hidePopover}
+                onOpenControlList={onOpenControlList}
+                renderTetikleyici={(ac) => (
+                  <MenuItem danger icon={<StopOutlined />} title="Seçili İş Emirlerini Kapat" description="Seçili kaydı tamamlandı olarak kapat." onClick={ac} />
+                )}
+              />
             )}
           </>
         )}

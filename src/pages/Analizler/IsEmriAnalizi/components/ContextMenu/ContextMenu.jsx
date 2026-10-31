@@ -3,7 +3,7 @@ import { Button, Popover, Typography } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
 import Sil from "./components/Sil";
 import Iptal from "./components/Iptal/Iptal";
-import Kapat from "./components/Kapat/Kapat";
+import IsEmriKapat from "../../../../../utils/components/IsEmriKapat/IsEmriKapat";
 import Parametreler from "./components/Parametreler/Parametreler";
 import TarihceTablo from "./components/TarihceTablo";
 import Form from "./components/Form/Form";
@@ -27,6 +27,11 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
   const isDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 4);
   const iptalDisabled = selectedRows.some((row) => row.IST_DURUM_ID === 3 || row.IST_DURUM_ID === 2 || row.IST_DURUM_ID === 4 || row.IST_DURUM_ID === 5);
   const kapatDisabled = selectedRows.some((row) => row.KAPALI === true);
+  const kapatTetikleyici = (ac) => (
+    <Button style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }} type="link" danger onClick={ac}>
+      Seçili İş Emirlerini Kapat
+    </Button>
+  );
 
   const content = (
     <div>
@@ -49,9 +54,11 @@ export default function ContextMenu({ selectedRows, refreshTableData, onayCheck 
 
       {selectedRows.length >= 1 &&
         (onayCheck && onayCheck.ONY_AKTIF == 1 && onayCheck.ONY_MANUEL == 0 ? (
-          selectedRows.every((row) => row.ISM_ONAY_DURUM === 2) && <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />
+          selectedRows.every((row) => row.ISM_ONAY_DURUM === 2) && (
+            <IsEmriKapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} renderTetikleyici={kapatTetikleyici} />
+          )
         ) : (
-          <Kapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} />
+          <IsEmriKapat selectedRows={selectedRows} refreshTableData={refreshTableData} kapatDisabled={kapatDisabled} renderTetikleyici={kapatTetikleyici} />
         ))}
 
       {onayCheck &&

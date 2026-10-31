@@ -3,7 +3,7 @@ import { Input, Typography } from "antd";
 import styled from "styled-components";
 import { useFormContext, Controller } from "react-hook-form";
 import { t } from "i18next";
-import KodIDSelectbox from "../../../../../../../../utils/components/KodIDSelectbox";
+import KodIDSelectbox from "../../KodIDSelectbox";
 
 const { TextArea } = Input;
 const { Text } = Typography;

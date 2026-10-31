@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button, Input, Modal, Table } from "antd";
 import AxiosInstance from "../../../../../../../../../../../api/http";
+import AtolyeFilterSelectbox from "../../../../../../../../../../../utils/components/AtolyeFilterSelectbox";
 
 // Türkçe karakterleri İngilizce karşılıkları ile değiştiren fonksiyon
 const normalizeText = (text) => {
@@ -28,7 +29,11 @@ export default function PersonelTablo({ workshopSelectedId, selectedPersoneller 
   const [loading, setLoading] = useState(false);
 
   const [searchTerm1, setSearchTerm1] = useState("");
-  const [filteredData1, setFilteredData1] = useState([]);
+  const [atolyeId, setAtolyeId] = useState();
+  // Atölye filtresi değişince seçili personeller listeden çıkabilir; seçim sonucunu kurmak için görülen tüm kayıtlar tutulur.
+  const gorulenPersoneller = useRef(new Map());
+  // Atölye hızlı değiştirilirse yalnızca son isteğin yanıtı listeye yazılır.
+  const sonIstekNo = useRef(0);
 
   const columns = [
     {
@@ -76,10 +81,12 @@ export default function PersonelTablo({ workshopSelectedId, selectedPersoneller 
     },
   ];
 
-  const fetch = useCallback(() => {
+  const fetch = useCallback((secilenAtolyeId) => {
+    const istekNo = ++sonIstekNo.current;
     setLoading(true);
-    AxiosInstance.get(`Personel`)
+    AxiosInstance.get("Personel", { params: { atolyeId: secilenAtolyeId } })
       .then((response) => {
+        if (istekNo !== sonIstekNo.current) return;
         const fetchedData = response.map((item) => ({
           key: item.TB_PERSONEL_ID,
           code: item.PRS_PERSONEL_KOD,
@@ -89,9 +96,12 @@ export default function PersonelTablo({ workshopSelectedId, selectedPersoneller 
           fifthcolumn: item.PRS_DEPARTMAN,
           sixthcolumn: item.PRS_LOKASYON,
         }));
+        fetchedData.forEach((item) => gorulenPersoneller.current.set(String(item.key), item));
         setData(fetchedData);
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (istekNo === sonIstekNo.current) setLoading(false);
+      });
   }, []);
 
   const getInitialSelectedRowKeys = useCallback(() => {
@@ -107,13 +117,21 @@ export default function PersonelTablo({ workshopSelectedId, selectedPersoneller 
     if (!isModalVisible) {
       fetch();
       setSearchTerm1("");
-      setFilteredData1([]);
+      setAtolyeId(undefined);
       setSelectedRowKeys(getInitialSelectedRowKeys());
     }
   };
 
+  const handleAtolyeChange = (secilenAtolyeId) => {
+    setAtolyeId(secilenAtolyeId);
+    fetch(secilenAtolyeId);
+  };
+
   const handleModalOk = () => {
-    const dataByKey = new Map(data.map((item) => [String(item.key), item]));
+    const dataByKey = new Map(gorulenPersoneller.current);
+    selectedPersoneller.forEach((personel) => {
+      if (!dataByKey.has(String(personel.key))) dataByKey.set(String(personel.key), personel);
+    });
     const selectedData = selectedRowKeys.map((key) => dataByKey.get(String(key))).filter(Boolean);
 
     if (selectedData.length > 0) {
@@ -130,25 +148,17 @@ export default function PersonelTablo({ workshopSelectedId, selectedPersoneller 
     setSelectedRowKeys(selectedKeys);
   };
 
-  // Arama işlevselliği için handleSearch fonksiyonları
+  // Arama, atölyeye göre yeniden çekilen listeye de uygulansın diye veriden türetilir.
+  const filteredData1 = useMemo(() => {
+    if (!searchTerm1) return data;
+    const normalizedSearchTerm = normalizeText(searchTerm1).toLowerCase();
+    return data.filter((item) =>
+      Object.keys(item).some((key) => item[key] && normalizeText(item[key].toString()).toLowerCase().includes(normalizedSearchTerm))
+    );
+  }, [data, searchTerm1]);
+
   const handleSearch1 = (e) => {
-    const value = e.target.value;
-    setSearchTerm1(value);
-    const normalizedSearchTerm = normalizeText(value);
-    if (value) {
-      const filtered = data.filter((item) =>
-        Object.keys(item).some(
-          (key) =>
-            item[key] &&
-            normalizeText(item[key].toString())
-              .toLowerCase()
-              .includes(normalizedSearchTerm.toLowerCase())
-        )
-      );
-      setFilteredData1(filtered);
-    } else {
-      setFilteredData1(data);
-    }
+    setSearchTerm1(e.target.value);
   };
 
   return (
@@ -162,12 +172,12 @@ export default function PersonelTablo({ workshopSelectedId, selectedPersoneller 
         onOk={handleModalOk}
         onCancel={handleModalToggle}
       >
-        <Input
-          placeholder="Arama..."
-          value={searchTerm1}
-          onChange={handleSearch1}
-          style={{ width: "300px", marginBottom: "15px" }}
-        />
+        <div style={{ display: "flex", gap: "10px", marginBottom: "15px" }}>
+          <Input placeholder="Arama..." value={searchTerm1} onChange={handleSearch1} style={{ width: "300px" }} />
+          <div style={{ width: "220px" }}>
+            <AtolyeFilterSelectbox tekli value={atolyeId} onChange={handleAtolyeChange} />
+          </div>
+        </div>
         <Table
           rowSelection={{
             type: "checkbox",
@@ -176,9 +186,7 @@ export default function PersonelTablo({ workshopSelectedId, selectedPersoneller 
             preserveSelectedRowKeys: true,
           }}
           columns={columns}
-          dataSource={
-            filteredData1.length > 0 || searchTerm1 ? filteredData1 : data
-          }
+          dataSource={filteredData1}
           loading={loading}
           scroll={{
             // x: "auto",

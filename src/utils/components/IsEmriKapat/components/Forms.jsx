@@ -55,7 +55,7 @@ const StyledDivMedia = styled.div`
   }
 `;
 
-export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
+export default function Forms({ isModalOpen, selectedRows, iptalDisabled, tarihlerDolu = false }) {
   const [localeDateFormat, setLocaleDateFormat] = useState("DD/MM/YYYY"); // Varsayılan format
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm"); // Default time format
   const [baslamaZamaniEditPermission, setBaslamaZamaniEditPermission] = useState(false);
@@ -222,11 +222,11 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
               <Controller
                 name="baslamaTarihi"
                 control={control}
-                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                rules={{ required: tarihlerDolu ? false : "Alan Boş Bırakılamaz!" }}
                 render={({ field, fieldState: { error } }) => (
                   <DatePicker
                     {...field}
-                    disabled={!baslamaZamaniEditPermission}
+                    disabled={!baslamaZamaniEditPermission || tarihlerDolu}
                     status={errors.baslamaTarihi ? "error" : ""}
                     // disabled={!isDisabled}
                     style={{ width: "180px" }}
@@ -238,11 +238,11 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
               <Controller
                 name="baslamaSaati"
                 control={control}
-                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                rules={{ required: tarihlerDolu ? false : "Alan Boş Bırakılamaz!" }}
                 render={({ field, fieldState: { error } }) => (
                   <TimePicker
                     {...field}
-                    disabled={!baslamaZamaniEditPermission}
+                    disabled={!baslamaZamaniEditPermission || tarihlerDolu}
                     changeOnScroll
                     needConfirm={false}
                     status={errors.baslamaSaati ? "error" : ""}
@@ -283,11 +283,11 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
               <Controller
                 name="bitisTarihi"
                 control={control}
-                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                rules={{ required: tarihlerDolu ? false : "Alan Boş Bırakılamaz!" }}
                 render={({ field, fieldState: { error } }) => (
                   <DatePicker
                     {...field}
-                    disabled={!bitisZamaniEditPermission}
+                    disabled={!bitisZamaniEditPermission || tarihlerDolu}
                     status={errors.bitisTarihi ? "error" : ""}
                     // disabled={!isDisabled}
                     style={{ width: "180px" }}
@@ -299,11 +299,11 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
               <Controller
                 name="bitisSaati"
                 control={control}
-                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                rules={{ required: tarihlerDolu ? false : "Alan Boş Bırakılamaz!" }}
                 render={({ field, fieldState: { error } }) => (
                   <TimePicker
                     {...field}
-                    disabled={!bitisZamaniEditPermission}
+                    disabled={!bitisZamaniEditPermission || tarihlerDolu}
                     changeOnScroll
                     needConfirm={false}
                     status={errors.bitisSaati ? "error" : ""}
@@ -340,12 +340,13 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
               <Controller
                 name="calismaSaat"
                 control={control}
-                rules={{ required: "Alan Boş Bırakılamaz!" }}
+                rules={{ required: tarihlerDolu ? false : "Alan Boş Bırakılamaz!" }}
                 render={({ field }) => (
                   <InputNumber
                     {...field}
                     min={0}
                     // max={24}
+                    disabled={tarihlerDolu}
                     status={errors.calismaSuresi ? "error" : ""}
                     style={{ width: "145px" }}
                   />
@@ -354,8 +355,8 @@ export default function Forms({ isModalOpen, selectedRows, iptalDisabled }) {
               <Controller
                 name="calismaDakika"
                 control={control}
-                rules={{ required: "Alan Boş Bırakılamaz!" }}
-                render={({ field }) => <InputNumber {...field} min={0} max={59} status={errors.calismaDakika ? "error" : ""} style={{ width: "145px" }} />}
+                rules={{ required: tarihlerDolu ? false : "Alan Boş Bırakılamaz!" }}
+                render={({ field }) => <InputNumber {...field} min={0} max={59} disabled={tarihlerDolu} status={errors.calismaDakika ? "error" : ""} style={{ width: "145px" }} />}
               />
               {errors.calismaDakika && <div style={{ color: "red", marginTop: "5px" }}>{errors.calismaDakika.message}</div>}
             </div>

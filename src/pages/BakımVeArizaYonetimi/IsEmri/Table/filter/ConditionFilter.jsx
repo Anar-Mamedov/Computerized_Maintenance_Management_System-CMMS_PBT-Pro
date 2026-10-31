@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Select, Button, Popover } from "antd";
 import AxiosInstance from "../../../../../api/http";
+import { durumlariKaydet } from "./durumFiltresiDeposu";
 
 const { Option } = Select;
 
-const ConditionFilter = ({ onSubmit }) => {
+const ConditionFilter = ({ onSubmit, baslangicDurumlar = [] }) => {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);
   // selectedValues artık seçilen TB_KOD_ID değerlerini saklayacak
-  const [selectedValues, setSelectedValues] = useState([]);
+  const [selectedValues, setSelectedValues] = useState(baslangicDurumlar);
 
   const handleChange = (selectedOptionValues) => {
     setSelectedValues(selectedOptionValues);
@@ -32,11 +33,13 @@ const ConditionFilter = ({ onSubmit }) => {
   }, [open]);
 
   const handleSubmit = () => {
+    durumlariKaydet(selectedValues);
     onSubmit([...selectedValues]);
     setOpen(false);
   };
 
   const handleCancelClick = () => {
+    durumlariKaydet([]);
     setSelectedValues([]);
     setOpen(false);
     onSubmit([]);

@@ -21,11 +21,11 @@ const customFiltreyiAyikla = (drawerFiltreleri) => {
   };
 };
 
-export default function Filters({ onChange, baslangicLokasyonIds, baslangicIdFiltreleri }) {
+export default function Filters({ onChange, baslangicLokasyonIds, baslangicIdFiltreleri, baslangicDurumlar = [] }) {
   const [filters, setFilters] = React.useState({
     lokasyonlar: {},
     isemritipleri: {},
-    durumlar: {},
+    durumlar: baslangicDurumlar,
     customfilter: {},
   });
 
@@ -41,6 +41,7 @@ export default function Filters({ onChange, baslangicLokasyonIds, baslangicIdFil
         }
       />
       <ConditionFilter
+        baslangicDurumlar={baslangicDurumlar}
         onSubmit={(newFilters) =>
           setFilters((state) => ({ ...state, durumlar: newFilters }))
         }

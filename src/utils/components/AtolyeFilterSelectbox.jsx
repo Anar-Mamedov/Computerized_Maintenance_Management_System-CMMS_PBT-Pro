@@ -7,8 +7,9 @@ import AxiosInstance from "../../api/http";
 /**
  * Atölye filtresi. Liste API'leri atölyeyi ID dizisi olarak beklediği için
  * seçim `TB_ATOLYE_ID` üzerinden tutulur. Atölye listesi küçük olduğundan tek seferde çekilir.
+ * `tekli` verilirse tek atölye seçilir; değer dizi yerine tek `TB_ATOLYE_ID` (ya da undefined) olur.
  */
-export default function AtolyeFilterSelectbox({ value, onChange }) {
+export default function AtolyeFilterSelectbox({ value, onChange, tekli = false }) {
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -42,10 +43,10 @@ export default function AtolyeFilterSelectbox({ value, onChange }) {
 
   return (
     <Select
-      mode="multiple"
+      mode={tekli ? undefined : "multiple"}
       style={{ width: "100%" }}
       placeholder={t("atolye")}
-      value={value || []}
+      value={tekli ? value : value || []}
       onChange={onChange}
       options={options}
       loading={loading}
@@ -58,6 +59,7 @@ export default function AtolyeFilterSelectbox({ value, onChange }) {
 }
 
 AtolyeFilterSelectbox.propTypes = {
-  value: PropTypes.array,
+  value: PropTypes.oneOfType([PropTypes.array, PropTypes.number]),
   onChange: PropTypes.func.isRequired,
+  tekli: PropTypes.bool,
 };

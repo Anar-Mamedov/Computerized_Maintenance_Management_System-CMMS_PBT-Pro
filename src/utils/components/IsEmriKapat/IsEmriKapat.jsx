@@ -1,17 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, message, Typography, Alert } from "antd";
+import PropTypes from "prop-types";
+import { Button, Modal, message, Alert } from "antd";
 import Forms from "./components/Forms";
-import { Controller, useForm, FormProvider } from "react-hook-form";
-import AxiosInstance from "../../../../../../../api/http";
+import { useForm, FormProvider } from "react-hook-form";
+import AxiosInstance from "../../../api/http";
 import dayjs from "dayjs";
+import { t } from "i18next";
 
-const { Text } = Typography;
-
-export default function Iptal({ selectedRows, refreshTableData, kapatDisabled }) {
+/**
+ * Seçili iş emirlerini kapatma: kontrol istekleri, kapatma modalı ve IsEmriKapat isteği.
+ * Menüdeki düğme ekrana göre değiştiği için `renderTetikleyici(ac)` ile ekrandan gelir; `ac` modal akışını başlatır.
+ * `onOpenControlList` verilirse tamamlanmamış kontrol listesi uyarısı gösterilir.
+ */
+export default function IsEmriKapat({ selectedRows, refreshTableData, kapatDisabled, hidePopover, onOpenControlList, renderTetikleyici }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [errorMessageShow, setErrorMessageShow] = useState(false);
+  const [controlWarningModalOpen, setControlWarningModalOpen] = useState(false);
+  const [pendingCloseCheckResult, setPendingCloseCheckResult] = useState(null);
+  // Coklu kapatmada secili tum is emirlerinin baslama/bitis zamanlari doluysa bu alanlar ekranda istenmez.
+  const [tarihlerDolu, setTarihlerDolu] = useState(false);
   const methods = useForm({
     defaultValues: {
       baslamaTarihi: null,
@@ -28,41 +37,25 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
       makineDurumu: null,
       makineDurumuID: "",
       aciklama: "",
+      kokNeden: null,
+      kokNedenID: "",
+      yapilanIslem: "",
+      tekrariOnleyiciFaaliyet: "",
 
       // Add other default values here
     },
   });
-  const { setValue, reset, handleSubmit } = methods;
+  const { setValue, reset } = methods;
 
   useEffect(() => {
     if (isModalOpen && selectedRows.length === 1) {
       const row = selectedRows[0]; // Assuming you want to use the first selected row
 
-      setValue(
-        "baslamaTarihi",
-        row.BASLAMA_TARIH ? (dayjs(row.BASLAMA_TARIH).isValid() ? dayjs(row.BASLAMA_TARIH) : null) : null
-      );
-      setValue(
-        "baslamaSaati",
-        row.BASLAMA_SAAT
-          ? dayjs(row.BASLAMA_SAAT.trim(), "HH:mm").isValid()
-            ? dayjs(row.BASLAMA_SAAT.trim(), "HH:mm")
-            : null
-          : null
-      );
+      setValue("baslamaTarihi", row.BASLAMA_TARIH ? (dayjs(row.BASLAMA_TARIH).isValid() ? dayjs(row.BASLAMA_TARIH) : null) : null);
+      setValue("baslamaSaati", row.BASLAMA_SAAT ? (dayjs(row.BASLAMA_SAAT.trim(), "HH:mm").isValid() ? dayjs(row.BASLAMA_SAAT.trim(), "HH:mm") : null) : null);
 
-      setValue(
-        "bitisTarihi",
-        row.ISM_BITIS_TARIH ? (dayjs(row.ISM_BITIS_TARIH).isValid() ? dayjs(row.ISM_BITIS_TARIH) : null) : null
-      );
-      setValue(
-        "bitisSaati",
-        row.ISM_BITIS_SAAT
-          ? dayjs(row.ISM_BITIS_SAAT.trim(), "HH:mm").isValid()
-            ? dayjs(row.ISM_BITIS_SAAT.trim(), "HH:mm")
-            : null
-          : null
-      );
+      setValue("bitisTarihi", row.ISM_BITIS_TARIH ? (dayjs(row.ISM_BITIS_TARIH).isValid() ? dayjs(row.ISM_BITIS_TARIH) : null) : null);
+      setValue("bitisSaati", row.ISM_BITIS_SAAT ? (dayjs(row.ISM_BITIS_SAAT.trim(), "HH:mm").isValid() ? dayjs(row.ISM_BITIS_SAAT.trim(), "HH:mm") : null) : null);
 
       // Set other values here
     }
@@ -103,6 +96,56 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
     15: "Nedeni",
     16: "Referans No",
     17: "Makine Durumu",
+  };
+
+  const buildCloseValidationError = (response) => {
+    let errorMsg = "";
+    if (response.TextArray && response.TextArray.length > 0) {
+      errorMsg += `${response.TextArray.join(",\n")}, `;
+    }
+    if (response.Idlist && response.Idlist.length > 0) {
+      const words = response.Idlist.map((id) => idToWordMap[id] || "Bilinmeyen ID");
+      errorMsg += `${words.join(",\n")}, `;
+    }
+    if (response.IsmIsNotPersonelTimeSet === true) {
+      errorMsg += `Ekli Personele Süre Atanmamış`;
+    }
+    return errorMsg;
+  };
+
+  const openCloseModalWithCheckResult = (response) => {
+    if (response.Durum === false) {
+      setErrorMessageShow(true);
+      setErrorMessage(buildCloseValidationError(response));
+      setDisabled(true);
+    } else if (response.Durum === true) {
+      setErrorMessageShow(false);
+      setDisabled(false);
+      reset();
+    } else {
+      message.error("İşlem Başarısız.");
+      return;
+    }
+
+    setIsModalOpen(true);
+  };
+
+  const handleGoToControlList = () => {
+    setControlWarningModalOpen(false);
+    setPendingCloseCheckResult(null);
+    hidePopover?.();
+    onOpenControlList?.(selectedRows[0]);
+  };
+
+  const handleContinueCloseDespiteControl = () => {
+    if (!pendingCloseCheckResult) {
+      setControlWarningModalOpen(false);
+      return;
+    }
+
+    setControlWarningModalOpen(false);
+    openCloseModalWithCheckResult(pendingCloseCheckResult);
+    setPendingCloseCheckResult(null);
   };
 
   const onSubmited = (data) => {
@@ -211,7 +254,7 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
           console.log("Data sent successfully:", response);
 
           if (response.status_code === 200 || response.status_code === 201) {
-            message.success("Ekleme Başarılı.");
+            message.success("İşlem Başarılı.");
             reset();
             setIsModalOpen(false); // Sadece başarılı olursa modalı kapat
             refreshTableData();
@@ -237,39 +280,26 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
   };
 
   const handleModalToggle = () => {
-    if (!isModalOpen) {
-      reset();
+    if (isModalOpen) {
+      setIsModalOpen(false);
+      return;
     }
+
+    reset();
+    setTarihlerDolu(false);
+
     if (selectedRows.length === 1) {
       AxiosInstance.get(`CheckIsmFieldsForClose?isEmriId=${selectedRows[0].key}`)
         .then((response) => {
           console.log("Data sent successfully:", response);
 
-          if (response.Durum === false) {
-            setErrorMessageShow(true);
-            let errorMsg = "";
-            if (response.TextArray && response.TextArray.length > 0) {
-              errorMsg += `${response.TextArray.join(",\n")}, `;
-            }
-            if (response.Idlist && response.Idlist.length > 0) {
-              const words = response.Idlist.map((id) => idToWordMap[id] || "Bilinmeyen ID");
-              errorMsg += `${words.join(",\n")}, `;
-            }
-            if (response.IsmIsNotPersonelTimeSet === true) {
-              errorMsg += ``;
-            }
-            setErrorMessage(errorMsg);
-            setDisabled(true);
-          } else if (response.Durum === true) {
-            setErrorMessageShow(false);
-            setDisabled(false);
-            if (!isModalOpen) {
-              reset();
-            }
-          } else {
-            message.error("İşlem Başarısız.");
+          if (response.KontrolDurum === true && onOpenControlList) {
+            setPendingCloseCheckResult(response);
+            setControlWarningModalOpen(true);
+            return;
           }
-          setIsModalOpen((prev) => !prev);
+
+          openCloseModalWithCheckResult(response);
         })
         .catch((error) => {
           // Handle errors here, e.g.:
@@ -283,9 +313,24 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
           }
         });
     } else if (selectedRows.length > 1) {
-      setErrorMessageShow(false);
-      setDisabled(false);
-      setIsModalOpen((prev) => !prev);
+      AxiosInstance.post(
+        "CheckIsmDatesForMultiClose",
+        selectedRows.map((row) => row.key)
+      )
+        .then((response) => {
+          setTarihlerDolu(response?.TarihlerDolu === true);
+          setErrorMessageShow(false);
+          setDisabled(false);
+          setIsModalOpen(true);
+        })
+        .catch((error) => {
+          console.error("Error sending data:", error);
+          if (navigator.onLine) {
+            message.error("Hata Mesajı: " + error.message);
+          } else {
+            message.error("Internet Bağlantısı Mevcut Değil.");
+          }
+        });
     }
   };
 
@@ -299,13 +344,7 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
   return (
     <FormProvider {...methods}>
       <div style={buttonStyle}>
-        <Button
-          style={{ display: "flex", padding: "0px 0px", alignItems: "center", justifyContent: "flex-start" }}
-          type="link"
-          danger
-          onClick={handleModalToggle}>
-          Seçili İş Emirlerini Kapat
-        </Button>
+        {renderTetikleyici(handleModalToggle)}
         <Modal
           key="modal"
           title={modalTitle}
@@ -338,9 +377,10 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
                 </Button>
               </div>
             </div>,
-          ]}>
+          ]}
+        >
           <form onSubmit={methods.handleSubmit(onSubmited)}>
-            <Forms isModalOpen={isModalOpen} selectedRows={selectedRows} />
+            <Forms isModalOpen={isModalOpen} selectedRows={selectedRows} tarihlerDolu={tarihlerDolu} />
             {/* <Text>{errorMessage}</Text> */}
             {/* <Alert
               style={{ fontWeight: 500, color: "red", marginTop: "10px", marginBottom: "10px" }}
@@ -351,7 +391,34 @@ export default function Iptal({ selectedRows, refreshTableData, kapatDisabled })
             /> */}
           </form>
         </Modal>
+        <Modal
+          title={t("isEmriKapatma.kontrolUyariBaslik")}
+          centered
+          zIndex={2200}
+          open={controlWarningModalOpen}
+          closable={false}
+          maskClosable={false}
+          footer={[
+            <Button key="control-list" onClick={handleGoToControlList}>
+              {t("isEmriKapatma.kontroleGit")}
+            </Button>,
+            <Button key="continue-close" danger type="primary" onClick={handleContinueCloseDespiteControl}>
+              {t("isEmriKapatma.yineDeKapat")}
+            </Button>,
+          ]}
+        >
+          <Alert message={t("isEmriKapatma.tamamlanmamisKontrolUyari")} type="warning" showIcon />
+        </Modal>
       </div>
     </FormProvider>
   );
 }
+
+IsEmriKapat.propTypes = {
+  selectedRows: PropTypes.array.isRequired,
+  refreshTableData: PropTypes.func.isRequired,
+  kapatDisabled: PropTypes.bool,
+  hidePopover: PropTypes.func,
+  onOpenControlList: PropTypes.func,
+  renderTetikleyici: PropTypes.func.isRequired,
+};
