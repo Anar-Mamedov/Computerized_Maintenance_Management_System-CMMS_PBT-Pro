@@ -322,7 +322,7 @@ export default function Barkodlar({ selectedRowID }) {
     let hasError = false;
     for (const row of selectedRows) {
       try {
-        const response = await AxiosInstance.get(`DeleteStokBarkod?barkodID=${row.barkodId}`);
+        const response = await AxiosInstance.post(`DeleteStokBarkod?barkodID=${row.barkodId}`);
         if (![200, 201, 202].includes(response.status_code)) {
           hasError = true;
         }
