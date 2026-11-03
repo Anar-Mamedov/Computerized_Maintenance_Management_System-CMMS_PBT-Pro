@@ -19,6 +19,7 @@ import { useFormContext } from "react-hook-form";
 import { SiMicrosoftexcel } from "react-icons/si";
 import * as XLSX from "xlsx";
 import i18n, { t } from "i18next";
+import { filtrelerAyni } from "../../../../utils/filtreKarsilastirma";
 
 const { Text } = Typography;
 
@@ -308,6 +309,8 @@ const MainTable = () => {
   const isFetchingMoreRef = useRef(false);
   const tableWrapperRef = useRef(null);
   const loadedRowKeysRef = useRef(new Set());
+  // Her liste isteğine artan numara verilir; yalnızca en son isteğin yanıtı ekrana yazılır.
+  const listRequestIdRef = useRef(0);
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
   const [onayCheck, setOnayCheck] = useState({ ONY_AKTIF: 0, ONY_MANUEL: 0 });
@@ -776,6 +779,7 @@ const MainTable = () => {
     const { keyword = "", filters = {} } = requestBody || {};
     const targetPage = page || 1;
     const targetSize = size || pageSize;
+    const requestId = ++listRequestIdRef.current;
 
     if (!append) {
       loadedRowKeysRef.current = new Set();
@@ -810,6 +814,8 @@ const MainTable = () => {
     try {
       startLoading();
       const response = await AxiosInstance.post(`GetIsEmriAnaliz?parametre=${keyword}&pagingDeger=${targetPage}&pageSize=${targetSize}${sortParam}`, filters);
+      // Arada yeni bir liste isteği başladıysa bu yanıt eskidir; yeni isteğin sonucunu ezmemeli.
+      if (requestId !== listRequestIdRef.current) return;
 
       if (!response) {
         console.error("API response is not in expected format");
@@ -860,6 +866,7 @@ const MainTable = () => {
         setHasMoreData(dedupedData.length === targetSize);
       }
     } catch (error) {
+      if (requestId !== listRequestIdRef.current) return;
       console.error("Error in API request:", error);
       if (navigator.onLine) {
         message.error("Hata Mesajı: " + error.message);
@@ -867,17 +874,23 @@ const MainTable = () => {
         message.error("Internet Bağlantısı Mevcut Değil.");
       }
     } finally {
-      stopLoading();
+      // Eski bir sayfa (append) isteği kendi "daha fazla yükleniyor" durumunu kapatır; tam liste yüklemesini yalnızca son istek kapatır.
+      if (append || requestId === listRequestIdRef.current) {
+        stopLoading();
+      }
     }
   };
 
   // filtreleme işlemi için kullanılan useEffect
+  // Son uygulanan arama/filtreler. Filtre bileşenleri açılışta boş değerlerini farklı şekillerde gönderir;
+  // boş alanlar yok sayıldığında değer aynıysa liste yeniden çekilmez, sayfa da sıfırlanmaz.
+  const appliedBodyRef = useRef(body);
+
   const handleBodyChange = useCallback(
     (type, newBody) => {
-      setBody((state) => ({
-        ...state,
-        [type]: newBody,
-      }));
+      if (filtrelerAyni(appliedBodyRef.current[type], newBody)) return;
+      appliedBodyRef.current = { ...appliedBodyRef.current, [type]: newBody };
+      setBody(appliedBodyRef.current);
       setCurrentPage(1); // Filtreleme yapıldığında sayfa numarasını 1'e ayarla
       if (isScrollPageEnabled) {
         setData([]);

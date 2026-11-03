@@ -80,13 +80,14 @@ export default function CustomFilter({ onSubmit, baslangicIdFiltreleri }) {
   const startDateSelected = watch("startDate");
   const endDateSelected = watch("endDate");
 
+  // İlk render'da değer undefined gelir; dayjs(undefined) bugünü döndürdüğü için o da boş sayılır.
   useEffect(() => {
-    if (startDateSelected === null) {
+    if (!startDateSelected) {
       setStartDate(null);
     } else {
       setStartDate(dayjs(startDateSelected));
     }
-    if (endDateSelected === null) {
+    if (!endDateSelected) {
       setEndDate(null);
     } else {
       setEndDate(dayjs(endDateSelected));

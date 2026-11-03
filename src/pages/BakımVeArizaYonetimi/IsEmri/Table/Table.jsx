@@ -21,6 +21,7 @@ import { t } from "i18next";
 import dayjs from "dayjs";
 import { formatNumberWithSeparators } from "../../../../utils/numberLocale";
 import { mergeDashboardFilters, useDashboardFilterParams } from "../../../../utils/dashboardFilterParams";
+import { filtrelerAyni } from "../../../../utils/filtreKarsilastirma";
 
 const { Text } = Typography;
 const EXCEL_FILE_NAME = "Bakım İş Emirleri.xlsx";
@@ -165,6 +166,8 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
   const isFetchingMoreRef = useRef(false);
   const tableWrapperRef = useRef(null);
   const loadedRowKeysRef = useRef(new Set());
+  // Her liste isteğine artan numara verilir; yalnızca en son isteğin yanıtı ekrana yazılır.
+  const listRequestIdRef = useRef(0);
   const [columnSearchTerm, setColumnSearchTerm] = useState("");
   const [arizaActive, setArizaActive] = useState(() => {
     if (dashboardFilters.prosedurtipleri?.includes(1)) return true;
@@ -1350,6 +1353,7 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
     const targetPage = page || 1;
     const targetSize = size || pageSize;
     const { requestFilters, isCloseQuery } = splitCloseFilterFromRequest(filters);
+    const requestId = ++listRequestIdRef.current;
 
     if (!append) {
       loadedRowKeysRef.current = new Set();
@@ -1386,6 +1390,8 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
         `getIsEmriFullList?parametre=${keyword}&pagingDeger=${targetPage}&pageSize=${targetSize}${sortParam}${isCloseQuery}`,
         requestFilters
       );
+      // Arada yeni bir liste isteği başladıysa bu yanıt eskidir; yeni isteğin sonucunu ezmemeli.
+      if (requestId !== listRequestIdRef.current) return;
       if (response) {
         if (response.status_code === 401) {
           message.error(t("buSayfayaErisimYetkinizBulunmamaktadir"));
@@ -1441,6 +1447,7 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
         setHasMoreData(false);
       }
     } catch (error) {
+      if (requestId !== listRequestIdRef.current) return;
       console.error("Error in API request:", error);
       if (navigator.onLine) {
         message.error("Hata Mesajı: " + error.message);
@@ -1448,14 +1455,18 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
         message.error("Internet Bağlantısı Mevcut Değil.");
       }
     } finally {
-      stopLoading();
+      // Eski bir sayfa (append) isteği kendi "daha fazla yükleniyor" durumunu kapatır; tam liste yüklemesini yalnızca son istek kapatır.
+      if (append || requestId === listRequestIdRef.current) {
+        stopLoading();
+      }
     }
   };
 
   // filtreleme işlemi için kullanılan useEffect
   const handleBodyChange = useCallback((type, newBody) => {
     setBody((state) => {
-      if (JSON.stringify(state[type]) === JSON.stringify(newBody)) {
+      // Filtre bileşenleri açılışta boş değerlerini farklı şekillerde gönderir; bunlar liste isteğini tekrarlatmamalı.
+      if (filtrelerAyni(state[type], newBody)) {
         return state;
       }
       setCurrentPage(1);
