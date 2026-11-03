@@ -2139,7 +2139,7 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
                     showSizeChanger: true,
                     pageSizeOptions: ["10", "20", "50", "100"],
                     position: ["bottomRight"],
-                    onChange: handleTableChange,
+                    // Sayfa değişimi de tablonun onChange'inden gelir; burada ayrıca verilirse sıralama sıfırlanır.
                     showTotal: (total) => `Toplam ${total}`,
                     showQuickJumper: true,
                   }
