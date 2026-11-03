@@ -9,6 +9,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Resizable } from "react-resizable";
 import "./ResizeStyle.css";
 import AxiosInstance from "../../api/http.jsx";
+import useSunucuSayfalama from "../../hooks/useSunucuSayfalama.js";
 import { FormProvider, useForm } from "react-hook-form";
 import styled from "styled-components";
 // PropTypes import removed; not used in this file
@@ -149,9 +150,10 @@ const LastikEnvanteri = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false); // Set initial loading state to false
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0); // Total data count
-  const [pageSize, setPageSize] = useState(10); // Page size
+  const { sayfalamaSorgusu, tabloDegisti, ilkSayfayaDon, sayfalamaAyarlari } = useSunucuSayfalama();
+  // Arama ve filtreler ara butonu / Enter ile uygulanır; liste bu uygulanan değerlerle çekilir
+  const [aramaIstegi, setAramaIstegi] = useState({ parameter: "", filters: {} });
   const [localeDateFormat, setLocaleDateFormat] = useState("MM/DD/YYYY");
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm");
   const [drawer, setDrawer] = useState({
@@ -207,65 +209,39 @@ const LastikEnvanteri = () => {
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   }
 
-  // API Data Fetching with diff and setPointId
-  const fetchData = async (diff, targetPage) => {
+  // Sayfa, sayfa boyutu ve sıralama İş Emri listesindeki gibi sunucuya gönderilir
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      let currentSetPointId = 0;
-
-      if (diff > 0) {
-        // Moving forward
-        currentSetPointId = data[data.length - 1]?.siraNo || 0;
-      } else if (diff < 0) {
-        // Moving backward
-        currentSetPointId = data[0]?.siraNo || 0;
-      } else {
-        currentSetPointId = 0;
-      }
-
-      // Determine what to send for customfilters
-      const requestBody = body?.filters || {};
-
-      const response = await AxiosInstance.post(`TyreInventory/GetTyreInventoryList?diff=${diff}&setPointId=${currentSetPointId}&parameter=${searchTerm}`, requestBody);
+      const response = await AxiosInstance.post(
+        `TyreInventory/GetTyreInventoryList?parameter=${encodeURIComponent(aramaIstegi.parameter)}&${sayfalamaSorgusu}`,
+        aramaIstegi.filters
+      );
 
       // Handle the new response format with page, recordCount, and list properties
-      const total = response.data.recordCount;
-      setTotalCount(total);
-      setCurrentPage(targetPage);
-
-      const newData = response.data.list.map((item) => ({
-        ...item,
-        key: item.siraNo, // Using siraNo as the key since it appears to be unique
-      }));
-
-      if (newData.length > 0) {
-        setData(newData);
-      } else {
-        // message.warning(t("kayitBulunamadi"));
-        setData([]);
-      }
+      setTotalCount(response.data.recordCount);
+      setData(
+        response.data.list.map((item) => ({
+          ...item,
+          key: item.siraNo, // Using siraNo as the key since it appears to be unique
+        }))
+      );
     } catch (error) {
       console.error("Error fetching data:", error);
       message.error(t("hataOlustu"));
     } finally {
       setLoading(false);
     }
-  };
+  }, [aramaIstegi, sayfalamaSorgusu]);
 
-  // Sayfa açılışında ilk veriyi çek
   useEffect(() => {
-    fetchData(0, 1);
-  }, []);
+    fetchData();
+  }, [fetchData]);
 
   // Search handling
-  // Define handleSearch function
   const handleSearch = () => {
-    fetchData(0, 1);
-  };
-
-  const handleTableChange = (page) => {
-    const diff = page - currentPage;
-    fetchData(diff, page);
+    setAramaIstegi({ parameter: searchTerm, filters: body.filters || {} });
+    ilkSayfayaDon();
   };
 
   const onSelectChange = (newSelectedRowKeys) => {
@@ -287,8 +263,8 @@ const LastikEnvanteri = () => {
 
   const refreshTableData = useCallback(() => {
     setSelectedRowKeys([]);
-    fetchData(0, 1);
-  }, []);
+    fetchData();
+  }, [fetchData]);
 
   // Columns definition (adjust as needed)
   const initialColumns = [
@@ -300,11 +276,7 @@ const LastikEnvanteri = () => {
       ellipsis: true,
       visible: true,
       render: (text, record) => <a onClick={() => openUpdateModal(record)}>{text}</a>,
-      sorter: (a, b) => {
-        if (a.seriNo === null) return -1;
-        if (b.seriNo === null) return 1;
-        return a.seriNo.localeCompare(b.seriNo);
-      },
+      sorter: true,
     },
 
     {
@@ -314,11 +286,7 @@ const LastikEnvanteri = () => {
       width: 120,
       ellipsis: true,
       visible: true,
-      sorter: (a, b) => {
-        if (a.plaka === null) return -1;
-        if (b.plaka === null) return 1;
-        return a.plaka.localeCompare(b.plaka);
-      },
+      sorter: true,
     },
 
     {
@@ -328,11 +296,7 @@ const LastikEnvanteri = () => {
       width: 140,
       ellipsis: true,
       visible: true,
-      sorter: (a, b) => {
-        if (a.lastikMarka === null) return -1;
-        if (b.lastikMarka === null) return 1;
-        return a.lastikMarka.localeCompare(b.lastikMarka);
-      },
+      sorter: true,
     },
 
     {
@@ -342,11 +306,7 @@ const LastikEnvanteri = () => {
       width: 252,
       ellipsis: true,
       visible: true,
-      sorter: (a, b) => {
-        if (a.lastikModel === null) return -1;
-        if (b.lastikModel === null) return 1;
-        return a.lastikModel.localeCompare(b.lastikModel);
-      },
+      sorter: true,
     },
 
     {
@@ -356,11 +316,7 @@ const LastikEnvanteri = () => {
       width: 120,
       ellipsis: true,
       visible: true,
-      sorter: (a, b) => {
-        if (a.tip === null) return -1;
-        if (b.tip === null) return 1;
-        return a.tip.localeCompare(b.tip);
-      },
+      sorter: true,
     },
 
     {
@@ -370,11 +326,7 @@ const LastikEnvanteri = () => {
       width: 120,
       ellipsis: true,
       visible: true,
-      sorter: (a, b) => {
-        if (a.ebat === null) return -1;
-        if (b.ebat === null) return 1;
-        return a.ebat.localeCompare(b.ebat);
-      },
+      sorter: true,
     },
 
     {
@@ -440,7 +392,6 @@ const LastikEnvanteri = () => {
           </div>
         );
       },
-      sorter: (a, b) => calculateTireUsagePercentage(a) - calculateTireUsagePercentage(b),
     },
 
     {
@@ -451,11 +402,7 @@ const LastikEnvanteri = () => {
       ellipsis: true,
       visible: true,
       render: (text) => (text ? t(text) : ""),
-      sorter: (a, b) => {
-        if (a.aksPozisyon === null) return -1;
-        if (b.aksPozisyon === null) return 1;
-        return a.aksPozisyon.localeCompare(b.aksPozisyon);
-      },
+      sorter: true,
     },
 
     {
@@ -466,11 +413,7 @@ const LastikEnvanteri = () => {
       ellipsis: true,
       visible: true,
       render: (text) => (text ? t(text) : ""),
-      sorter: (a, b) => {
-        if (a.pozisyonNo === null) return -1;
-        if (b.pozisyonNo === null) return 1;
-        return a.pozisyonNo.localeCompare(b.pozisyonNo);
-      },
+      sorter: true,
     },
 
     {
@@ -480,7 +423,7 @@ const LastikEnvanteri = () => {
       width: 120,
       ellipsis: true,
       visible: true,
-      sorter: (a, b) => a.takildigiKm - b.takildigiKm,
+      sorter: true,
     },
 
     {
@@ -491,11 +434,7 @@ const LastikEnvanteri = () => {
       ellipsis: true,
       visible: true,
       render: (text) => (text ? formatDate(text) : ""),
-      sorter: (a, b) => {
-        if (!a.takilmaTarih) return -1;
-        if (!b.takilmaTarih) return 1;
-        return new Date(a.takilmaTarih) - new Date(b.takilmaTarih);
-      },
+      sorter: true,
     },
 
     {
@@ -505,7 +444,7 @@ const LastikEnvanteri = () => {
       width: 120,
       ellipsis: true,
       visible: true,
-      sorter: (a, b) => a.tahminiOmurKm - b.tahminiOmurKm,
+      sorter: true,
     },
   ];
 
@@ -883,7 +822,6 @@ const LastikEnvanteri = () => {
         [type]: newBody,
       };
     });
-    setCurrentPage(1);
   }, []);
   // filtreleme işlemi için kullanılan useEffect son
 
@@ -1075,15 +1013,8 @@ const LastikEnvanteri = () => {
                 rowSelection={rowSelection}
                 columns={filteredColumns}
                 dataSource={data}
-                pagination={{
-                  current: currentPage,
-                  total: totalCount,
-                  pageSize: 10,
-                  showTotal: (total, range) => `${t("toplam")} ${total}`,
-                  showSizeChanger: false,
-                  showQuickJumper: true,
-                  onChange: handleTableChange,
-                }}
+                pagination={sayfalamaAyarlari(totalCount)}
+                onChange={tabloDegisti}
                 scroll={{ y: "calc(100vh - 335px)" }}
               />
             </Spin>

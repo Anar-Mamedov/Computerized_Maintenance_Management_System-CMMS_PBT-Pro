@@ -7,6 +7,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Resizable } from "react-resizable";
 import "./ResizeStyle.css";
 import AxiosInstance from "../api/http";
+import useSunucuSayfalama from "../hooks/useSunucuSayfalama.js";
 import { useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import ContextMenu from "./components/ContextMenu/ContextMenu";
@@ -118,9 +119,10 @@ const Yakit = () => {
   const [loading, setLoading] = useState(false); // Set initial loading state to false
   const [searchTerm, setSearchTerm] = useState("");
   const [searchTimeout, setSearchTimeout] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0); // Total data count
-  const [pageSize, setPageSize] = useState(10); // Page size
+  const { sayfalamaSorgusu, tabloDegisti, ilkSayfayaDon, sayfalamaAyarlari } = useSunucuSayfalama();
+  // Arama ara butonu / Enter ile uygulanır; liste bu uygulanan değerle çekilir
+  const [aramaIstegi, setAramaIstegi] = useState({ parameter: "" });
   const [drawer, setDrawer] = useState({
     visible: false,
     data: null,
@@ -129,60 +131,35 @@ const Yakit = () => {
 
   const [selectedRows, setSelectedRows] = useState([]);
 
-  // API Data Fetching with diff and setPointId
-  const fetchData = async (diff, targetPage) => {
+  // Sayfa, sayfa boyutu ve sıralama İş Emri listesindeki gibi sunucuya gönderilir
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      let currentSetPointId = 0;
+      const response = await AxiosInstance.get(`Tyre/GetTyreList?parameter=${encodeURIComponent(aramaIstegi.parameter)}&${sayfalamaSorgusu}`);
 
-      if (diff > 0) {
-        // Moving forward
-        currentSetPointId = data[data.length - 1]?.siraNo || 0;
-      } else if (diff < 0) {
-        // Moving backward
-        currentSetPointId = data[0]?.siraNo || 0;
-      } else {
-        currentSetPointId = 0;
-      }
-
-      const response = await AxiosInstance.get(`Tyre/GetTyreList?diff=${diff}&setPointId=${currentSetPointId}&parameter=${searchTerm}`);
-
-      const total = response.data.recordCount;
-      setTotalCount(total);
-      setCurrentPage(targetPage);
-
-      const newData = response.data.list.map((item) => ({
-        ...item,
-        key: item.siraNo, // Assign key directly from siraNo
-      }));
-
-      if (newData.length > 0) {
-        setData(newData);
-      } else {
-        // message.warning("No data found.");
-        setData([]);
-      }
+      setTotalCount(response.data.recordCount);
+      setData(
+        response.data.list.map((item) => ({
+          ...item,
+          key: item.siraNo, // Assign key directly from siraNo
+        }))
+      );
     } catch (error) {
       console.error("Error fetching data:", error);
-      message.error("An error occurred while fetching data.");
+      message.error(t("hataOlustu"));
     } finally {
       setLoading(false);
     }
-  };
+  }, [aramaIstegi, sayfalamaSorgusu]);
 
   useEffect(() => {
-    fetchData(0, 1);
-  }, []);
+    fetchData();
+  }, [fetchData]);
 
   // Search handling
-  // Define handleSearch function
   const handleSearch = () => {
-    fetchData(0, 1);
-  };
-
-  const handleTableChange = (page) => {
-    const diff = page - currentPage;
-    fetchData(diff, page);
+    setAramaIstegi({ parameter: searchTerm });
+    ilkSayfayaDon();
   };
 
   const onSelectChange = (newSelectedRowKeys) => {
@@ -206,8 +183,8 @@ const Yakit = () => {
   const refreshTableData = useCallback(() => {
     setSelectedRowKeys([]);
     setSelectedRows([]);
-    fetchData(0, 1);
-  }, []);
+    fetchData();
+  }, [fetchData]);
 
   // Columns definition (adjust as needed)
   const initialColumns = [
@@ -219,11 +196,7 @@ const Yakit = () => {
       ellipsis: true,
       visible: true,
       render: (text, record) => <a onClick={() => onRowClick(record)}>{text}</a>,
-      sorter: (a, b) => {
-        if (a.tanim === null) return -1;
-        if (b.tanim === null) return 1;
-        return a.tanim.localeCompare(b.tanim);
-      },
+      sorter: true,
     },
 
     {
@@ -234,11 +207,7 @@ const Yakit = () => {
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
 
-      sorter: (a, b) => {
-        if (a.marka === null) return -1;
-        if (b.marka === null) return 1;
-        return a.marka.localeCompare(b.marka);
-      },
+      sorter: true,
     },
     {
       title: t("model"),
@@ -248,11 +217,7 @@ const Yakit = () => {
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
 
-      sorter: (a, b) => {
-        if (a.model === null) return -1;
-        if (b.model === null) return 1;
-        return a.model.localeCompare(b.model);
-      },
+      sorter: true,
     },
 
     {
@@ -263,11 +228,7 @@ const Yakit = () => {
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
 
-      sorter: (a, b) => {
-        if (a.tip === null) return -1;
-        if (b.tip === null) return 1;
-        return a.tip - b.tip;
-      },
+      sorter: true,
     },
 
     {
@@ -278,11 +239,7 @@ const Yakit = () => {
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
 
-      sorter: (a, b) => {
-        if (a.ebat === null) return -1;
-        if (b.ebat === null) return 1;
-        return a.ebat - b.ebat;
-      },
+      sorter: true,
     },
 
     {
@@ -293,11 +250,7 @@ const Yakit = () => {
       ellipsis: true,
       visible: true, // Varsayılan olarak açık
 
-      sorter: (a, b) => {
-        if (a.aciklama === null) return -1;
-        if (b.aciklama === null) return 1;
-        return a.aciklama - b.aciklama;
-      },
+      sorter: true,
     },
 
     {
@@ -308,11 +261,7 @@ const Yakit = () => {
       ellipsis: true,
       visible: false, // Varsayılan olarak açık
 
-      sorter: (a, b) => {
-        if (a.firma === null) return -1;
-        if (b.firma === null) return 1;
-        return a.firma - b.firma;
-      },
+      sorter: true,
     },
 
     {
@@ -323,11 +272,7 @@ const Yakit = () => {
       ellipsis: true,
       visible: false, // Varsayılan olarak açık
 
-      sorter: (a, b) => {
-        if (a.lastikOmru === null) return -1;
-        if (b.lastikOmru === null) return 1;
-        return a.lastikOmru - b.lastikOmru;
-      },
+      sorter: true,
     },
 
     {
@@ -338,11 +283,7 @@ const Yakit = () => {
       ellipsis: true,
       visible: false, // Varsayılan olarak açık
 
-      sorter: (a, b) => {
-        if (a.basinc === null) return -1;
-        if (b.basinc === null) return 1;
-        return a.basinc.localeCompare(b.basinc);
-      },
+      sorter: true,
     },
 
     {
@@ -353,11 +294,7 @@ const Yakit = () => {
       ellipsis: true,
       visible: false, // Varsayılan olarak açık
 
-      sorter: (a, b) => {
-        if (a.disDerinlik === null) return -1;
-        if (b.disDerinlik === null) return 1;
-        return a.disDerinlik.localeCompare(b.disDerinlik);
-      },
+      sorter: true,
     },
 
     {
@@ -368,11 +305,7 @@ const Yakit = () => {
       ellipsis: true,
       visible: false, // Varsayılan olarak açık
 
-      sorter: (a, b) => {
-        if (a.fiyat === null) return -1;
-        if (b.fiyat === null) return 1;
-        return a.fiyat.localeCompare(b.fiyat);
-      },
+      sorter: true,
     },
 
     // Add other columns as needed
@@ -714,14 +647,8 @@ const Yakit = () => {
             rowSelection={rowSelection}
             columns={filteredColumns}
             dataSource={data}
-            pagination={{
-              current: currentPage,
-              total: totalCount,
-              pageSize: 10,
-              showSizeChanger: false,
-              showQuickJumper: true,
-              onChange: handleTableChange,
-            }}
+            pagination={sayfalamaAyarlari(totalCount)}
+            onChange={tabloDegisti}
             scroll={{ y: "calc(100vh - 335px)" }}
           />
         </Spin>

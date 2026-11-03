@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useRef } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import ContextMenu from "../components/ContextMenu/ContextMenu.jsx";
 import CreateDrawer from "../Insert/CreateDrawer.jsx";
@@ -13,6 +13,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Resizable } from "react-resizable";
 import "./ResizeStyle.css";
 import AxiosInstance from "../../api/http.jsx";
+import useSunucuSayfalama from "../../hooks/useSunucuSayfalama.js";
 import { FormProvider, useForm } from "react-hook-form";
 import styled from "styled-components";
 import dayjs from "dayjs";
@@ -150,9 +151,10 @@ const Ceza = () => {
   const [loading, setLoading] = useState(false); // Set initial loading state to false
   const [searchTerm, setSearchTerm] = useState("");
   const [searchTimeout, setSearchTimeout] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0); // Total data count
-  const [pageSize, setPageSize] = useState(10); // Page size
+  const { sayfalamaSorgusu, tabloDegisti, ilkSayfayaDon, sayfalamaAyarlari } = useSunucuSayfalama();
+  // Arama ve filtreler ara butonu / Enter ile uygulanır; liste bu uygulanan değerlerle çekilir
+  const [aramaIstegi, setAramaIstegi] = useState({ parameter: "", customfilter: {} });
   const [localeDateFormat, setLocaleDateFormat] = useState("MM/DD/YYYY");
   const [localeTimeFormat, setLocaleTimeFormat] = useState("HH:mm");
   const [drawer, setDrawer] = useState({
@@ -208,124 +210,42 @@ const Ceza = () => {
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   }
 
-  // API Data Fetching with diff and setPointId
-  const lastRequestRef = useRef(null);
-
-  const fetchData = async (diff, targetPage, options = {}) => {
+  // Sayfa, sayfa boyutu ve sıralama İş Emri listesindeki gibi sunucuya gönderilir
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const { overrideAnchorId, customfilterOverride, parameterOverride } = options;
-      let currentSetPointId = 0;
-
-      if (diff > 0) {
-        // Moving forward
-        currentSetPointId = overrideAnchorId ?? (data[data.length - 1]?.aracId || 0);
-      } else if (diff < 0) {
-        // Moving backward
-        currentSetPointId = overrideAnchorId ?? (data[0]?.aracId || 0);
-      } else {
-        currentSetPointId = 0;
-      }
-
-      // Determine what to send for customfilters
-
-      // Cache the exact request so we can replay it later for refreshes
-      const effectiveCustomfilter = customfilterOverride ?? (body.filters?.customfilter || {});
-      const effectiveParameter = parameterOverride ?? searchTerm;
-
-      lastRequestRef.current = {
-        diff,
-        setPointId: currentSetPointId,
-        page: targetPage,
-        parameter: effectiveParameter,
-        customfilter: effectiveCustomfilter,
-      };
-
       const response = await AxiosInstance.post(
-        `TyreOperation/GetTyreOperations?diff=${diff}&setPointId=${currentSetPointId}&parameter=${effectiveParameter}`,
-        effectiveCustomfilter
+        `TyreOperation/GetTyreOperations?parameter=${encodeURIComponent(aramaIstegi.parameter)}&${sayfalamaSorgusu}`,
+        aramaIstegi.customfilter
       );
 
-      const total = response.data.vehicleCount;
-      setTotalCount(total);
-      setCurrentPage(targetPage);
-
-      const newData = response.data.vehicleList.map((item) => ({
-        ...item,
-        key: item.aracId, // Assign key directly from aracId
-      }));
-
-      if (newData.length > 0) {
-        setData(newData);
-      } else {
-        // message.warning(t("kayitBulunamadi"));
-        setData([]);
-      }
-
-      // No additional anchor bookkeeping needed; we replay the exact last request on refresh
+      setTotalCount(response.data.vehicleCount);
+      setData(
+        response.data.vehicleList.map((item) => ({
+          ...item,
+          key: item.aracId, // Assign key directly from aracId
+        }))
+      );
     } catch (error) {
       console.error("Error fetching data:", error);
       message.error(t("hataOlustu"));
     } finally {
       setLoading(false);
     }
-  };
-
-  const fetchDataExact = async () => {
-    const last = lastRequestRef.current;
-    if (!last) {
-      return fetchData(0, 1);
-    }
-    const { diff, setPointId, page, parameter, customfilter } = last;
-    setLoading(true);
-    try {
-      const response = await AxiosInstance.post(`TyreOperation/GetTyreOperations?diff=${diff}&setPointId=${setPointId}&parameter=${parameter}`, customfilter || {});
-
-      const total = response.data.vehicleCount;
-      setTotalCount(total);
-      setCurrentPage(page);
-
-      const newData = response.data.vehicleList.map((item) => ({
-        ...item,
-        key: item.aracId,
-      }));
-
-      if (newData.length > 0) {
-        setData(newData);
-      } else {
-        // message.warning(t("kayitBulunamadi"));
-        setData([]);
-      }
-    } catch (error) {
-      console.error("Error fetching data (exact):", error);
-      message.error(t("hataOlustu"));
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [aramaIstegi, sayfalamaSorgusu]);
 
   useEffect(() => {
-    fetchData(0, 1);
-  }, []);
-
-  // Filtre değişiminde otomatik istek atmayalım; sadece manuel tetiklemelerde istek atılacak
-  useEffect(() => {
-    if (body !== prevBodyRef.current) {
-      prevBodyRef.current = body;
-    }
-  }, [body]);
-
-  const prevBodyRef = useRef(body);
+    fetchData();
+  }, [fetchData]);
 
   // Search handling
-  // Define handleSearch function
+  // Filtre çekmecesi uygulandığında yeni customfilter options ile gelir
   const handleSearch = (options = {}) => {
-    fetchData(0, 1, options);
-  };
-
-  const handleTableChange = (page) => {
-    const diff = page - currentPage;
-    fetchData(diff, page);
+    setAramaIstegi({
+      parameter: searchTerm,
+      customfilter: options.customfilterOverride ?? (body.filters?.customfilter || {}),
+    });
+    ilkSayfayaDon();
   };
 
   const onSelectChange = (newSelectedRowKeys) => {
@@ -349,8 +269,8 @@ const Ceza = () => {
   const refreshTableData = useCallback(() => {
     setSelectedRowKeys([]);
     setSelectedRows([]);
-    fetchDataExact();
-  }, []);
+    fetchData();
+  }, [fetchData]);
 
   // Columns definition (adjust as needed)
   const initialColumns = [
@@ -362,11 +282,7 @@ const Ceza = () => {
       ellipsis: true,
       visible: true,
       render: (text, record) => <a onClick={() => onRowClick(record)}>{text}</a>,
-      sorter: (a, b) => {
-        if (a.plaka === null) return -1;
-        if (b.plaka === null) return 1;
-        return a.plaka.localeCompare(b.plaka);
-      },
+      sorter: true,
     },
     {
       title: t("aksYapisi"),
@@ -376,11 +292,7 @@ const Ceza = () => {
       ellipsis: true,
       visible: true,
       render: (text, record) => <a onClick={() => onRowClick(record)}>{text}</a>,
-      sorter: (a, b) => {
-        if (a.aksTanim === null) return -1;
-        if (b.aksTanim === null) return 1;
-        return a.aksTanim.localeCompare(b.aksTanim);
-      },
+      sorter: true,
     },
 
     {
@@ -390,11 +302,7 @@ const Ceza = () => {
       width: 120,
       ellipsis: true,
       visible: true,
-      sorter: (a, b) => {
-        if (a.lastikSayisi === null) return -1;
-        if (b.lastikSayisi === null) return 1;
-        return Number(a.lastikSayisi) - Number(b.lastikSayisi);
-      },
+      sorter: true,
     },
 
     {
@@ -405,11 +313,7 @@ const Ceza = () => {
       ellipsis: true,
       visible: true,
 
-      sorter: (a, b) => {
-        if (a.aracTip === null) return -1;
-        if (b.aracTip === null) return 1;
-        return a.aracTip.localeCompare(b.aracTip);
-      },
+      sorter: true,
     },
 
     {
@@ -419,11 +323,7 @@ const Ceza = () => {
       width: 120,
       ellipsis: true,
       visible: true,
-      sorter: (a, b) => {
-        if (a.marka === null) return -1;
-        if (b.marka === null) return 1;
-        return a.marka.localeCompare(b.marka);
-      },
+      sorter: true,
     },
 
     {
@@ -433,11 +333,7 @@ const Ceza = () => {
       width: 250,
       ellipsis: true,
       visible: true,
-      sorter: (a, b) => {
-        if (a.model === null) return -1;
-        if (b.model === null) return 1;
-        return a.model.localeCompare(b.model);
-      },
+      sorter: true,
     },
 
     {
@@ -447,11 +343,7 @@ const Ceza = () => {
       width: 120,
       ellipsis: true,
       visible: true,
-      sorter: (a, b) => {
-        if (a.lokasyon === null) return -1;
-        if (b.lokasyon === null) return 1;
-        return a.lokasyon.localeCompare(b.lokasyon);
-      },
+      sorter: true,
     },
 
     {
@@ -461,11 +353,7 @@ const Ceza = () => {
       width: 120,
       ellipsis: true,
       visible: true,
-      sorter: (a, b) => {
-        if (a.grup === null) return -1;
-        if (b.grup === null) return 1;
-        return a.grup.localeCompare(b.grup);
-      },
+      sorter: true,
     },
 
     {
@@ -475,11 +363,7 @@ const Ceza = () => {
       width: 120,
       ellipsis: true,
       visible: true,
-      sorter: (a, b) => {
-        if (a.departman === null) return -1;
-        if (b.departman === null) return 1;
-        return a.departman.localeCompare(b.departman);
-      },
+      sorter: true,
     },
 
     {
@@ -490,7 +374,7 @@ const Ceza = () => {
       ellipsis: true,
       visible: true,
       render: (text) => (text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />),
-      sorter: (a, b) => (a.aktif === b.aktif ? 0 : a.aktif ? -1 : 1),
+      sorter: true,
     },
   ];
 
@@ -717,7 +601,6 @@ const Ceza = () => {
         [type]: newBody,
       };
     });
-    setCurrentPage(1);
   }, []);
   // filtreleme işlemi için kullanılan useEffect son
 
@@ -870,15 +753,8 @@ const Ceza = () => {
                 rowSelection={rowSelection}
                 columns={filteredColumns}
                 dataSource={data}
-                pagination={{
-                  current: currentPage,
-                  total: totalCount,
-                  pageSize: 10,
-                  showTotal: (total, range) => `${t("toplam")} ${total}`,
-                  showSizeChanger: false,
-                  showQuickJumper: true,
-                  onChange: handleTableChange,
-                }}
+                pagination={sayfalamaAyarlari(totalCount)}
+                onChange={tabloDegisti}
                 scroll={{ y: "calc(100vh - 335px)" }}
               />
             </Spin>
