@@ -67,12 +67,13 @@ export default function CustomFilter({ onSubmit }) {
       return;
     }
 
-    if (startDateSelected === null) {
+    // İlk render'da değer undefined gelir; dayjs(undefined) bugünü döndürdüğü için o da boş sayılır.
+    if (!startDateSelected) {
       setStartDate(null);
     } else {
       setStartDate(dayjs(startDateSelected));
     }
-    if (endDateSelected === null) {
+    if (!endDateSelected) {
       setEndDate(null);
     } else {
       setEndDate(dayjs(endDateSelected));
