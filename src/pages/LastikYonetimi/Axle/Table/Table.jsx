@@ -638,7 +638,6 @@ const Ceza = () => {
               display: "flex",
               flexWrap: "wrap",
               justifyContent: "space-between",
-              marginBottom: "15px",
               gap: "10px",
               padding: "15px",
               borderRadius: "8px 8px 8px 8px",
