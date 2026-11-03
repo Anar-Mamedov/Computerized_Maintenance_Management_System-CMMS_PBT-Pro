@@ -1543,7 +1543,7 @@ const MainTable = () => {
                       showSizeChanger: true,
                       pageSizeOptions: ["10", "20", "50", "100"],
                       position: ["bottomRight"],
-                      onChange: handleTableChange,
+                      // Sayfa değişimi de tablonun onChange'inden gelir; burada ayrıca verilirse sıralama sıfırlanır.
                       showTotal: (total, range) => `Toplam ${total}`, // Burada 'total' parametresi doğru kayıt sayısını yansıtacaktır
                       showQuickJumper: true,
                     }
