@@ -63,7 +63,8 @@ const UpdateModal = ({ updateModal, setUpdateModal, setStatus, id, selectedRow, 
     };
 
     UpdateLastikService(body).then((res) => {
-      if (res.data.statusCode === 202) {
+      const { statusCode } = res.data;
+      if (statusCode === 200 || statusCode === 201 || statusCode === 202) {
         onDrawerClose();
         onRefresh();
         reset(defaultValues);

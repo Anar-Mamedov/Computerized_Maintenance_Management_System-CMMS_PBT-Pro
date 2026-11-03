@@ -262,7 +262,8 @@ export default function LastikYeriDegistir({ aracId, axleList, positionList, sho
 
       const response = await AxiosInstance.post("TyreOperation/UpdateTyresPositions", changedTires);
 
-      if (response.data.statusCode === 202) {
+      const { statusCode } = response.data;
+      if (statusCode === 200 || statusCode === 201 || statusCode === 202) {
         message.success(t("lastikYeriDegistirmeBasarili"));
         if (refreshList) {
           await refreshList();
