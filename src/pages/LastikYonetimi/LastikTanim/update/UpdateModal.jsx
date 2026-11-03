@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import PropTypes from "prop-types";
 import { t } from "i18next";
-import { Button, Divider, Input, InputNumber, Modal } from "antd";
+import { Button, Divider, Input, Modal } from "antd";
 import { GetLastikByIdService, UpdateLastikService } from "../../api/services/lastiktanim_services";
 import LastikMarka from "../../components/LastikMarka";
 import LastikModel from "../../components/LastikModel";
 import KodIDSelectbox from "../../../../utils/components/KodIDSelectbox";
+import NumberInput from "../../../../utils/components/NumberInput";
 import { KOD_GRUPLARI } from "../../constants";
 import FirmaUnvani from "../../components/form/FirmaUnvani";
 import TextArea from "antd/es/input/TextArea";
@@ -93,7 +94,7 @@ const UpdateModal = ({ updateModal, setUpdateModal, setStatus, id, selectedRow, 
     <Modal title={t("lastikTanimGuncelle")} open={drawerVisible} onCancel={() => onDrawerClose()} maskClosable={false} footer={footer} width={1200}>
       <FormProvider {...methods}>
         <form>
-          <div className="grid gap-1">
+          <div className="grid grid-cols-12 gap-1">
             <div className="col-span-12">
               <h2 className="">{t("genelBilgiler")}</h2>
             </div>
@@ -130,26 +131,26 @@ const UpdateModal = ({ updateModal, setUpdateModal, setStatus, id, selectedRow, 
             <div className="col-span-4">
               <div className="flex flex-col gap-1">
                 <label>{t("disDerinligi")}</label>
-                <Controller name="disDerinlik" control={control} render={({ field }) => <InputNumber {...field} className="w-full" onChange={(e) => field.onChange(e)} />} />
+                <NumberInput name1="disDerinlik" />
               </div>
             </div>
             <div className="col-span-4">
               <div className="flex flex-col gap-1">
                 <label>{t("basinc")}</label>
-                <Controller name="basinc" control={control} render={({ field }) => <InputNumber {...field} className="w-full" onChange={(e) => field.onChange(e)} />} />
+                <NumberInput name1="basinc" />
               </div>
             </div>
             <div className="col-span-4">
               <div className="flex flex-col gap-1">
                 <label>{t("lastikOmru")}</label>
-                <Controller name="lastikOmru" control={control} render={({ field }) => <InputNumber {...field} className="w-full" onChange={(e) => field.onChange(e)} />} />
+                <NumberInput name1="lastikOmru" />
               </div>
             </div>
           </div>
           <div className="m-20">
             <Divider />
           </div>
-          <div className="grid gap-1">
+          <div className="grid grid-cols-12 gap-1">
             <div className="col-span-12">
               <h2 className="">{t("satinalmaBilgiler")}</h2>
             </div>
@@ -162,7 +163,7 @@ const UpdateModal = ({ updateModal, setUpdateModal, setStatus, id, selectedRow, 
             <div className="col-span-4">
               <div className="flex flex-col gap-1">
                 <label>{t("fiyat")}</label>
-                <Controller name="fiyat" control={control} render={({ field }) => <InputNumber {...field} className="w-full" onChange={(e) => field.onChange(e)} />} />
+                <NumberInput name1="fiyat" />
               </div>
             </div>
           </div>
