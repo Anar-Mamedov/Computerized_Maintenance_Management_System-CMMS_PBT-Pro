@@ -3,7 +3,8 @@ import { Typography, message, InputNumber, Input, DatePicker, Button, Modal } fr
 import PropTypes from "prop-types";
 import AxleListSelect from "./AxleListSelect";
 import PositionListSelect from "./PositionListSelect";
-import KodIDSelectbox from "../../../../../components/KodIDSelectbox";
+import KodIDSelectbox from "../../../../../../../utils/components/KodIDSelectbox";
+import { KOD_GRUPLARI } from "../../../../../constants";
 import LastikMarka from "../../../../../components/LastikMarka";
 import LastikModel from "../../../../../components/LastikModel";
 import NumberInput from "../../../../../components/form/inputs/NumberInput";
@@ -401,14 +402,14 @@ export default function LastikTak({
                   <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "350px" }}>
                     <Text>{t("ebat")}</Text>
                     <div style={{ width: "250px" }}>
-                      <KodIDSelectbox name1="lastikEbat" isRequired={false} kodID="702" />
+                      <KodIDSelectbox name1="lastikEbat" isRequired={false} kodID={KOD_GRUPLARI.lastikEbati} />
                     </div>
                   </div>
 
                   <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "350px" }}>
                     <Text>{t("tip")}</Text>
                     <div style={{ width: "250px" }}>
-                      <KodIDSelectbox name1="lastikTip" isRequired={false} kodID="705" />
+                      <KodIDSelectbox name1="lastikTip" isRequired={false} kodID={KOD_GRUPLARI.lastikTipi} />
                     </div>
                   </div>
 

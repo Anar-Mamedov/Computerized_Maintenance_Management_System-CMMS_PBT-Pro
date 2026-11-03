@@ -3,7 +3,8 @@ import PropTypes from "prop-types";
 import { Typography, message, InputNumber, Input, DatePicker, Button, Modal, Checkbox } from "antd";
 import AxleListSelect from "./AxleListSelect";
 import PositionListSelect from "./PositionListSelect";
-import KodIDSelectbox from "../../../../../components/KodIDSelectbox";
+import KodIDSelectbox from "../../../../../../../utils/components/KodIDSelectbox";
+import { KOD_GRUPLARI } from "../../../../../constants";
 import StoksuzLastikTablo from "../../../../../components/StoksuzLastikTablo";
 import AxiosInstance from "../../../../../api/http";
 import LastikMarka from "../../../../../components/LastikMarka";
@@ -471,14 +472,14 @@ export default function LastikTak({ aracId, wheelInfo, axleList, positionList, s
                   <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "350px" }}>
                     <Text>{t("ebat")}</Text>
                     <div style={{ width: "250px" }}>
-                      <KodIDSelectbox name1="lastikEbat" isRequired={false} kodID="702" />
+                      <KodIDSelectbox name1="lastikEbat" isRequired={false} kodID={KOD_GRUPLARI.lastikEbati} />
                     </div>
                   </div>
 
                   <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "350px" }}>
                     <Text>{t("tip")}</Text>
                     <div style={{ width: "250px" }}>
-                      <KodIDSelectbox name1="lastikTip" isRequired={false} kodID="705" />
+                      <KodIDSelectbox name1="lastikTip" isRequired={false} kodID={KOD_GRUPLARI.lastikTipi} />
                     </div>
                   </div>
                 </div>

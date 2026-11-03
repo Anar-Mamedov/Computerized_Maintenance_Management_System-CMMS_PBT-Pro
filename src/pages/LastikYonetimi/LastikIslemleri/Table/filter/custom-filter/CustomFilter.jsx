@@ -5,6 +5,7 @@ import styled from "styled-components";
 import { t } from "i18next";
 import KodFilterSelectbox from "../../../../../../utils/components/KodFilterSelectbox";
 import EkipmanFilterSelectbox from "../../../../../../utils/components/EkipmanFilterSelectbox";
+import { KOD_GRUPLARI } from "../../../../constants";
 import "./style.css";
 
 const { Text } = Typography;
@@ -27,10 +28,6 @@ const CloseButton = styled.div`
   cursor: pointer;
 `;
 
-// Liste API'si araçları PBT ekipmanı olarak süzer: araç tipi "ARAÇ TİPLERİ", grup ekipman kategorisi kod listesindendir.
-const ARAC_TIP_KOD_GRUBU = 35008;
-const GRUP_KOD_GRUBU = 32502;
-
 const FILTER_OPTIONS = [
   { value: "AracTipIds", label: t("aracTip") },
   { value: "GrupIds", label: t("grup") },
@@ -38,12 +35,13 @@ const FILTER_OPTIONS = [
 ];
 
 // Seçilen filtre türünün değerleri global seçicilerle seçilir; değerler PBT ID'leridir (TB_KOD_ID, TB_MAKINE_ID).
+// Liste API'si araçları PBT ekipmanı olarak süzer.
 const filtreDegerSecici = (filterKey, value, onChange) => {
   switch (filterKey) {
     case "AracTipIds":
-      return <KodFilterSelectbox kodGrubu={ARAC_TIP_KOD_GRUBU} placeholder={t("aracTip")} value={value} onChange={onChange} />;
+      return <KodFilterSelectbox kodGrubu={KOD_GRUPLARI.aracTipi} placeholder={t("aracTip")} value={value} onChange={onChange} />;
     case "GrupIds":
-      return <KodFilterSelectbox kodGrubu={GRUP_KOD_GRUBU} placeholder={t("grup")} value={value} onChange={onChange} />;
+      return <KodFilterSelectbox kodGrubu={KOD_GRUPLARI.ekipmanKategorisi} placeholder={t("grup")} value={value} onChange={onChange} />;
     case "AracIds":
       return <EkipmanFilterSelectbox value={value} onChange={onChange} />;
     default:

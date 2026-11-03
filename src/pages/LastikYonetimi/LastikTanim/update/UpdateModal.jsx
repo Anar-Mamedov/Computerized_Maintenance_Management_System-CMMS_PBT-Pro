@@ -6,8 +6,8 @@ import { Button, Divider, Input, InputNumber, Modal } from "antd";
 import { GetLastikByIdService, UpdateLastikService } from "../../api/services/lastiktanim_services";
 import LastikMarka from "../../components/LastikMarka";
 import LastikModel from "../../components/LastikModel";
-import Ebat from "../../components/form/Ebat";
-import LastikTipi from "../../components/form/LastikTipi";
+import KodIDSelectbox from "../../../../utils/components/KodIDSelectbox";
+import { KOD_GRUPLARI } from "../../constants";
 import FirmaUnvani from "../../components/form/FirmaUnvani";
 import TextArea from "antd/es/input/TextArea";
 
@@ -27,7 +27,7 @@ const UpdateModal = ({ updateModal, setUpdateModal, setStatus, id, selectedRow, 
         setValue("basinc", res.data.basinc);
         setValue("disDerinlik", res.data.disDerinlik);
         setValue("ebat", res.data.ebat);
-        setValue("ebatKodId", res.data.ebatKodId);
+        setValue("ebatID", res.data.ebatKodId);
         setValue("unvan", res.data.firma);
         setValue("firmaId", res.data.firmaId);
         setValue("fiyat", res.data.fiyat);
@@ -40,7 +40,7 @@ const UpdateModal = ({ updateModal, setUpdateModal, setStatus, id, selectedRow, 
         }, 100);
         setValue("tanim", res.data.tanim);
         setValue("tip", res.data.tip);
-        setValue("tipKodId", res.data.tipKodId);
+        setValue("tipID", res.data.tipKodId);
         setLastikId(res.data.siraNo);
       });
     }
@@ -53,8 +53,8 @@ const UpdateModal = ({ updateModal, setUpdateModal, setStatus, id, selectedRow, 
       aciklama: values.aciklama,
       markaId: values.markaID || -1,
       modelId: values.modelID || -1,
-      tipKodId: values.tipKodId || -1,
-      ebatKodId: values.ebatKodId || -1,
+      tipKodId: values.tipID || -1,
+      ebatKodId: values.ebatID || -1,
       lastikOmru: values.lastikOmru || 0,
       basinc: values.basinc || 0,
       disDerinlik: values.disDerinlik || 0,
@@ -117,13 +117,13 @@ const UpdateModal = ({ updateModal, setUpdateModal, setStatus, id, selectedRow, 
             <div className="col-span-4">
               <div className="flex flex-col gap-1">
                 <label>{t("ebat")}</label>
-                <Controller name="ebatKodId" control={control} render={({ field }) => <Ebat field={field} />} />
+                <KodIDSelectbox name1="ebat" kodID={KOD_GRUPLARI.lastikEbati} isRequired={false} />
               </div>
             </div>
             <div className="col-span-4">
               <div className="flex flex-col gap-1">
                 <label>{t("tip")}</label>
-                <Controller name="tipKodId" control={control} render={({ field }) => <LastikTipi field={field} />} />
+                <KodIDSelectbox name1="tip" kodID={KOD_GRUPLARI.lastikTipi} isRequired={false} />
               </div>
             </div>
             <div className="col-span-4">

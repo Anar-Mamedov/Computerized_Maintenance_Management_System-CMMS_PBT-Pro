@@ -6,8 +6,8 @@ import { t } from "i18next";
 import { AddIsLastikService } from "../../api/services/lastiktanim_services";
 import LastikMarka from "../../components/LastikMarka";
 import LastikModel from "../../components/LastikModel";
-import Ebat from "../../components/form/Ebat";
-import LastikTipi from "../../components/form/LastikTipi";
+import KodIDSelectbox from "../../../../utils/components/KodIDSelectbox";
+import { KOD_GRUPLARI } from "../../constants";
 import FirmaUnvani from "../../components/form/FirmaUnvani";
 import TextArea from "antd/es/input/TextArea";
 
@@ -23,8 +23,10 @@ const AddModal = ({ setStatus, onRefresh }) => {
     model: null,
     modelID: null,
     modelLabel: null,
-    tipKodId: null,
-    ebatKodId: null,
+    tip: null,
+    tipID: null,
+    ebat: null,
+    ebatID: null,
     lastikOmru: null,
     basinc: null,
     disDerinlik: null,
@@ -59,8 +61,8 @@ const AddModal = ({ setStatus, onRefresh }) => {
       aciklama: values.aciklama,
       markaId: values.markaID || -1,
       modelId: values.modelID || -1,
-      tipKodId: values.tipKodId || -1,
-      ebatKodId: values.ebatKodId || -1,
+      tipKodId: values.tipID || -1,
+      ebatKodId: values.ebatID || -1,
       lastikOmru: values.lastikOmru || 0,
       basinc: values.basinc || 0,
       disDerinlik: values.disDerinlik || 0,
@@ -148,23 +150,13 @@ const AddModal = ({ setStatus, onRefresh }) => {
                   <label>
                     {t("ebat")} <span style={{ color: "red" }}>*</span>
                   </label>
-                  <Controller
-                    name="ebatKodId"
-                    control={control}
-                    rules={{ required: t("alanBosBirakilamaz") }}
-                    render={({ field, fieldState: { error } }) => (
-                      <>
-                        <Ebat field={field} />
-                        {error && <div style={{ color: "red", marginTop: "5px" }}>{error.message}</div>}
-                      </>
-                    )}
-                  />
+                  <KodIDSelectbox name1="ebat" kodID={KOD_GRUPLARI.lastikEbati} isRequired={true} />
                 </div>
               </div>
               <div className="col-span-4">
                 <div className="flex flex-col gap-1">
                   <label>{t("tip")}</label>
-                  <Controller name="tipKodId" control={control} render={({ field }) => <LastikTipi field={field} />} />
+                  <KodIDSelectbox name1="tip" kodID={KOD_GRUPLARI.lastikTipi} isRequired={false} />
                 </div>
               </div>
               <div className="col-span-4">
