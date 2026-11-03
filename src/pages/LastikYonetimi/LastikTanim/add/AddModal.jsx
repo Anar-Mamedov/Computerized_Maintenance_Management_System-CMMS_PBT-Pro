@@ -94,8 +94,8 @@ const AddModal = ({ setStatus, onRefresh }) => {
 
   return (
     <>
-      <Button className="btn primary-btn" onClick={handleOpenModal}>
-        <PlusOutlined /> {t("ekle")}
+      <Button type="primary" icon={<PlusOutlined />} onClick={handleOpenModal}>
+        {t("ekle")}
       </Button>
       <Modal title={t("yeniLastikGirisi")} open={openModal} onCancel={handleCloseModal} maskClosable={false} footer={footer} width={960}>
         <FormProvider {...methods}>
