@@ -5,10 +5,14 @@ import PropTypes from "prop-types";
 // import TypeFilter from "./TypeFilter";
 // import CustomFilter from "./custom-filter/CustomFilter";
 // import ZamanAraligi from "./ZamanAraligi";
-import KodIDSelectbox from "../../../components/KodIDSelectbox";
+import KodFilterSelectbox from "../../../../../utils/components/KodFilterSelectbox";
 import LastikMarka from "../../../components/LastikMarka";
 import LastikModel from "../../../components/LastikModel";
 import { t } from "i18next";
+
+// PBT kod listesi grupları: LASTİK TİPLERİ ve LASTİK EBATLARI
+const LASTIK_TIP_KOD_GRUBU = 35500;
+const LASTIK_EBAT_KOD_GRUBU = 35501;
 
 export default function Filters({ onChange }) {
   const [markaIds, setMarkaIds] = React.useState([]);
@@ -51,8 +55,12 @@ export default function Filters({ onChange }) {
           lastikMarkaId={markaIds}
           multiSelect={true}
         />
-        <KodIDSelectbox name1={"tip"} isRequired={false} onChange={setTipIds} placeholder={t("tip")} dropdownWidth="300px" inputWidth="150px" multiSelect={true} kodID="705" />
-        <KodIDSelectbox name1={"ebat"} isRequired={false} onChange={setEbatIds} placeholder={t("ebat")} dropdownWidth="300px" inputWidth="150px" multiSelect={true} kodID="702" />
+        <div style={{ width: "150px", flexShrink: 0 }}>
+          <KodFilterSelectbox kodGrubu={LASTIK_TIP_KOD_GRUBU} placeholder={t("tip")} value={tipIds} onChange={setTipIds} />
+        </div>
+        <div style={{ width: "150px", flexShrink: 0 }}>
+          <KodFilterSelectbox kodGrubu={LASTIK_EBAT_KOD_GRUBU} placeholder={t("ebat")} value={ebatIds} onChange={setEbatIds} />
+        </div>
         {/*<TypeFilter*/}
         {/*  onSubmit={(newFilters) =>*/}
         {/*    setFilters((state) => ({ ...state, isemritipleri: newFilters }))*/}

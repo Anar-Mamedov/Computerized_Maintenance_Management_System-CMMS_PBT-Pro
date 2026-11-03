@@ -2,8 +2,9 @@ import { CloseOutlined, FilterOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Col, Drawer, Row, Typography, Select, Space } from "antd";
 import React, { useState } from "react";
 import styled from "styled-components";
-import { CodeControlService, CustomCodeControlService } from "../../../../api/services/select_services";
 import { t } from "i18next";
+import KodFilterSelectbox from "../../../../../../utils/components/KodFilterSelectbox";
+import EkipmanFilterSelectbox from "../../../../../../utils/components/EkipmanFilterSelectbox";
 import "./style.css";
 
 const { Text } = Typography;
@@ -26,22 +27,27 @@ const CloseButton = styled.div`
   cursor: pointer;
 `;
 
+// Liste API'si araçları PBT ekipmanı olarak süzer: araç tipi "ARAÇ TİPLERİ", grup ekipman kategorisi kod listesindendir.
+const ARAC_TIP_KOD_GRUBU = 35008;
+const GRUP_KOD_GRUBU = 32502;
+
 const FILTER_OPTIONS = [
   { value: "AracTipIds", label: t("aracTip") },
   { value: "GrupIds", label: t("grup") },
-  { value: "AracIds", label: t("plaka") },
+  { value: "AracIds", label: t("ekipman") },
 ];
 
-const fetchFilterData = async (filterKey) => {
+// Seçilen filtre türünün değerleri global seçicilerle seçilir; değerler PBT ID'leridir (TB_KOD_ID, TB_MAKINE_ID).
+const filtreDegerSecici = (filterKey, value, onChange) => {
   switch (filterKey) {
     case "AracTipIds":
-      return CodeControlService(100).then((res) => res.data.map((item) => ({ value: item.siraNo, label: item.codeText })));
+      return <KodFilterSelectbox kodGrubu={ARAC_TIP_KOD_GRUBU} placeholder={t("aracTip")} value={value} onChange={onChange} />;
     case "GrupIds":
-      return CodeControlService(101).then((res) => res.data.map((item) => ({ value: item.siraNo, label: item.codeText })));
+      return <KodFilterSelectbox kodGrubu={GRUP_KOD_GRUBU} placeholder={t("grup")} value={value} onChange={onChange} />;
     case "AracIds":
-      return CustomCodeControlService("Vehicle/GetVehiclePlates").then((res) => res.data.map((item) => ({ value: item.aracId, label: item.plaka })));
+      return <EkipmanFilterSelectbox value={value} onChange={onChange} />;
     default:
-      return [];
+      return null;
   }
 };
 
@@ -52,20 +58,12 @@ export default function CustomFilter({ onSubmit }) {
   const [filtersExist, setFiltersExist] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState({});
   const [selectedValues, setSelectedValues] = useState({});
-  const [filterOptionsData, setFilterOptionsData] = useState({});
 
   const isFilterApplied = newObjectsAdded || filtersExist;
 
   const handleFilterTypeChange = (value, rowId) => {
     setSelectedFilters((prev) => ({ ...prev, [rowId]: value }));
     setSelectedValues((prev) => ({ ...prev, [rowId]: [] }));
-    setFilterOptionsData((prev) => ({ ...prev, [rowId]: [] }));
-
-    if (value) {
-      fetchFilterData(value).then((options) => {
-        setFilterOptionsData((prev) => ({ ...prev, [rowId]: options }));
-      });
-    }
   };
 
   const handleValueChange = (values, rowId) => {
@@ -106,11 +104,6 @@ export default function CustomFilter({ onSubmit }) {
       return updated;
     });
     setSelectedValues((prev) => {
-      const updated = { ...prev };
-      delete updated[rowId];
-      return updated;
-    });
-    setFilterOptionsData((prev) => {
       const updated = { ...prev };
       delete updated[rowId];
       return updated;
@@ -207,20 +200,7 @@ export default function CustomFilter({ onSubmit }) {
                   filterOption={(input, option) => (option?.label || "").toLowerCase().includes(input.toLowerCase())}
                   options={getAvailableOptions(row.id)}
                 />
-                {selectedFilters[row.id] && (
-                  <Select
-                    mode="multiple"
-                    style={{ width: "100%" }}
-                    showSearch
-                    allowClear
-                    placeholder={t("secimYap")}
-                    optionFilterProp="label"
-                    onChange={(values) => handleValueChange(values, row.id)}
-                    value={selectedValues[row.id] || []}
-                    filterOption={(input, option) => (option?.label || "").toLowerCase().includes(input.toLowerCase())}
-                    options={filterOptionsData[row.id] || []}
-                  />
-                )}
+                {selectedFilters[row.id] && filtreDegerSecici(selectedFilters[row.id], selectedValues[row.id] || [], (values) => handleValueChange(values, row.id))}
               </Col>
             </Col>
           </Row>
