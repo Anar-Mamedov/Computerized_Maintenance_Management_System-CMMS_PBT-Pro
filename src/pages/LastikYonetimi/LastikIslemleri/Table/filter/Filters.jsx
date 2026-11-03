@@ -48,10 +48,17 @@ export default function Filters({ onChange, onApply }) {
         />
       </div>
       <div style={{ width: "150px" }}>
-        <MarkaFilterSelectbox value={markaIds} onChange={setMarkaIds} />
+        <MarkaFilterSelectbox
+          value={markaIds}
+          onChange={(secilenMarkalar) => {
+            setMarkaIds(secilenMarkalar);
+            // Model marka seçilmeden seçilemez; marka kalmayınca model seçimi de boşalır.
+            if (secilenMarkalar.length === 0) setModelIds([]);
+          }}
+        />
       </div>
       <div style={{ width: "150px" }}>
-        <ModelFilterSelectbox value={modelIds} onChange={setModelIds} markaIds={markaIds} />
+        <ModelFilterSelectbox value={modelIds} onChange={setModelIds} markaIds={markaIds} disabled={markaIds.length === 0} />
       </div>
 
       {/*<TypeFilter*/}

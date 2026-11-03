@@ -9,7 +9,7 @@ import AxiosInstance from "../../api/http";
  * seçim `TB_MODEL_ID` üzerinden tutulur. `markaId=0` tüm markaların modellerini döndürür.
  * `markaIds` verilirse yalnızca o markaların modelleri listelenir (boşsa `markaId=0`).
  */
-export default function ModelFilterSelectbox({ value, onChange, markaIds }) {
+export default function ModelFilterSelectbox({ value, onChange, markaIds, disabled = false }) {
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   // Seçenekleri yüklenmiş marka seçimi; seçimden düşen modeller ancak yeni liste gelince ayıklanır.
@@ -67,6 +67,7 @@ export default function ModelFilterSelectbox({ value, onChange, markaIds }) {
       onChange={onChange}
       options={options}
       loading={loading}
+      disabled={disabled}
       optionFilterProp="label"
       allowClear
       showSearch
@@ -79,4 +80,5 @@ ModelFilterSelectbox.propTypes = {
   value: PropTypes.array,
   onChange: PropTypes.func.isRequired,
   markaIds: PropTypes.array,
+  disabled: PropTypes.bool,
 };
