@@ -15,6 +15,13 @@ function buildHierarchy(items, parent = null, subParent = null) {
         // Bu bir parent (örn: Yönetim, Bakım Yönetimi)
         buildHierarchyInto(map, item.children, item.labelText, null);
       }
+    } else if (item.key) {
+      // Alt grubu olmayan üst seviye sayfa (örn: Haritalar); üst grup kırıntısı yok
+      map[item.key] = {
+        parent: null,
+        subParent: null,
+        label: item.labelText,
+      };
     }
   });
   return map;
@@ -51,10 +58,12 @@ const Breadcrumbs = () => {
   const hierarchy = menuHierarchy[pathKey];
 
   if (hierarchy) {
-    items.push({
-      key: "parent",
-      title: hierarchy.parent,
-    });
+    if (hierarchy.parent) {
+      items.push({
+        key: "parent",
+        title: hierarchy.parent,
+      });
+    }
 
     if (hierarchy.subParent) {
       items.push({
