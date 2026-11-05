@@ -90,6 +90,7 @@ import LastikIslemleri from "./pages/LastikYonetimi/LastikIslemleri/LastikIsleml
 import LastikEnvanteri from "./pages/LastikYonetimi/LastikEnvanteri/LastikEnvanteri.jsx";
 import LastikTanim from "./pages/LastikYonetimi/LastikTanim/LastikTanim.jsx";
 import Axle from "./pages/LastikYonetimi/Axle/Axle.jsx";
+import Haritalar from "./pages/Haritalar/Haritalar.jsx";
 import AxiosInstance from "./api/http";
 
 // Malzemeler
@@ -113,7 +114,7 @@ const { Header, Content, Footer, Sider } = Layout;
 import { rawItems } from "./menuItems";
 
 // Bu modüller yalnızca yetki açıkça true ise gösterilir (false veya null/undefined ise gizlenir).
-const STRICT_MODULE_PERMISSION_KEYS = ["KLL_WEB_LASTIK_MODUL"];
+const STRICT_MODULE_PERMISSION_KEYS = ["KLL_WEB_LASTIK_MODUL", "KLL_WEB_HARITA_MODUL"];
 
 function filterItems(items, loginData, token) {
   // Token yoksa, hiçbir filtreleme yapmadan tüm öğeleri döndür
@@ -340,6 +341,8 @@ export default function App() {
           <Route path="/isEmriAnaliz" element={<IsEmriAnaliz />} />
           <Route path="/ekipmanAnaliz" element={<EkipmanAnaliz />} />
           <Route path="/arizaAnaliz" element={<ArizaAnaliz />} />
+          {/* Menü KLL_WEB_HARITA_MODUL true ise görünür; rota backend hazırlanırken test için açık (PBT-31). */}
+          <Route path="/haritalar" element={<Haritalar />} />
           {loginData?.KLL_WEB_LASTIK_MODUL === true && (
             <>
               <Route path="/lastikIslemleri" element={<LastikIslemleri />} />

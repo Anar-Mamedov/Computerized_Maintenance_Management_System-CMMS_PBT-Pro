@@ -12,6 +12,7 @@ import {
   FireOutlined,
   CalculatorOutlined,
   CarOutlined,
+  EnvironmentOutlined,
 } from "@ant-design/icons";
 
 function getItem(labelText, key, icon, children, isClickable = true, modulePermissionKey = null) {
@@ -174,6 +175,7 @@ export const rawItems = [
     ],
     false
   ),
+  getItem("Haritalar", "haritalar", <EnvironmentOutlined />, undefined, true, "KLL_WEB_HARITA_MODUL"),
   getItem("Rapor & Formlar", "rapor&formlar", <FileTextOutlined />, [getItem("Rapor Yönetimi", "raporYonetimi", true, undefined, true, "KLL_WEB_RAPOR")], false),
   getItem(
     "Yönetim",
