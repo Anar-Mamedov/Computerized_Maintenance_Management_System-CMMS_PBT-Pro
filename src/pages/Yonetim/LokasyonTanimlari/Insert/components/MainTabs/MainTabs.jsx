@@ -20,7 +20,6 @@ import LokasyonPersonelTablo from "./components/LokasyonPersonelTablo";
 import LokasyonDepoTablo from "./components/LokasyonDepoTablo";
 import styled from "styled-components";
 import LokasyonTablo from "./components/LokasyonTablo";
-import GoogleMaps from "./components/GoogleMaps.jsx";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -473,7 +472,6 @@ export default function MainTabs() {
           />
         </StyledDiv>
       </StyledDivBottomLine>
-      <GoogleMaps />
     </div>
   );
 }
