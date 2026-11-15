@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, Table, Space, message, Input, Switch, Popconfirm, Popover, Typography, QRCode, Spin } from "antd";
+import { Button, Modal, Table, Space, message, Input, Switch, Popconfirm, Popover, Typography, Spin } from "antd";
 import { PlusOutlined, MoreOutlined, DeleteOutlined, QrcodeOutlined, QuestionCircleOutlined, PrinterOutlined } from "@ant-design/icons";
 import { useForm, FormProvider, Controller } from "react-hook-form";
 import AxiosInstance from "../../../../../../api/http.jsx";
@@ -17,6 +17,8 @@ const BARKOD_TIPI = "EAN13";
 const KONTROL_BITI = true;
 /** Malzeme Barkod Etiketi raporunun GetReportUrl `formId` degeri; backend'de sabittir, `idNo` malzemenin stok ID'sidir. */
 const MALZEME_BARKOD_ETIKETI_FORM_ID = 9;
+/** Malzeme Barkod Etiketi QR raporunun GetReportUrl `formId` degeri; backend'de sabittir, `idNo` malzemenin stok ID'sidir. */
+const MALZEME_BARKOD_ETIKETI_QR_FORM_ID = 130;
 const getBarkodListPayload = (response) => {
   if (Array.isArray(response)) {
     return response;
@@ -165,28 +167,7 @@ function BarkodModal({ open, barkodId, stokId, onClose, onRefresh }) {
   );
 }
 
-function BarkodEtiketModal({ open, loading, barkod, onClose }) {
-  const barkodNo = barkod?.STB_BARKODNO ?? "";
-  const barkodTipi = barkod?.STB_TIP ?? "";
-
-  return (
-    <Modal width={420} centered title={t("barkodEtiketiQr")} open={open} onCancel={onClose} footer={null}>
-      {loading ? (
-        <div style={{ display: "flex", justifyContent: "center", padding: "24px 0" }}>
-          <Spin size="large" />
-        </div>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
-          <QRCode value={barkodNo || " "} size={200} />
-          <Text>{`${t("barkodNo")}: ${barkodNo || "-"}`}</Text>
-          {barkodTipi ? <Text type="secondary">{`${t("barkodTipi")}: ${barkodTipi}`}</Text> : null}
-        </div>
-      )}
-    </Modal>
-  );
-}
-
-function BarkodContextMenu({ selectedRows, onDelete, onLabel, onReportLabel }) {
+function BarkodContextMenu({ selectedRows, onDelete, onQrReportLabel, onReportLabel }) {
   const [visible, setVisible] = useState(false);
   const selectionCount = selectedRows.length;
 
@@ -195,8 +176,8 @@ function BarkodContextMenu({ selectedRows, onDelete, onLabel, onReportLabel }) {
     setVisible(false);
   };
 
-  const handleLabel = () => {
-    onLabel();
+  const handleQrReportLabel = () => {
+    onQrReportLabel();
     setVisible(false);
   };
 
@@ -220,7 +201,7 @@ function BarkodContextMenu({ selectedRows, onDelete, onLabel, onReportLabel }) {
             {t("sil")}
           </Button>
         </Popconfirm>
-        <Button type="link" icon={<QrcodeOutlined />} style={{ paddingLeft: 0 }} onClick={handleLabel}>
+        <Button type="link" icon={<QrcodeOutlined />} style={{ paddingLeft: 0 }} onClick={handleQrReportLabel}>
           {t("barkodEtiketiQr")}
         </Button>
         <Button type="link" icon={<PrinterOutlined />} style={{ paddingLeft: 0 }} onClick={handleReportLabel}>
@@ -257,7 +238,6 @@ export default function Barkodlar({ selectedRowID }) {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [modalState, setModalState] = useState({ open: false, barkodId: null });
-  const [etiketState, setEtiketState] = useState({ open: false, loading: false, barkod: null });
 
   const fetchBarkodList = async () => {
     if (!selectedRowID) {
@@ -340,28 +320,8 @@ export default function Barkodlar({ selectedRowID }) {
     handleRefresh();
   };
 
-  const handleLabel = async () => {
-    if (selectedRows.length !== 1) {
-      message.warning(t("tekBarkodSeciniz"));
-      return;
-    }
-
-    const barkodId = selectedRows[0].barkodId;
-    setEtiketState({ open: true, loading: true, barkod: null });
-
-    try {
-      const response = await AxiosInstance.get(`GetStokBarkodById?barkodID=${barkodId}`);
-      setEtiketState({ open: true, loading: false, barkod: getBarkodDetailPayload(response) });
-    } catch (error) {
-      console.error("Barkod etiketi alınırken hata oluştu:", error);
-      const fallbackBarkod = selectedRows[0]?.barkodNo;
-      if (fallbackBarkod) {
-        setEtiketState({ open: true, loading: false, barkod: { STB_BARKODNO: fallbackBarkod } });
-      } else {
-        message.error(t("islemBasarisiz"));
-        setEtiketState({ open: false, loading: false, barkod: null });
-      }
-    }
+  const handleQrReportLabel = () => {
+    raporuYeniSekmedeAc(MALZEME_BARKOD_ETIKETI_QR_FORM_ID, selectedRowID);
   };
 
   const handleReportLabel = () => {
@@ -397,7 +357,7 @@ export default function Barkodlar({ selectedRowID }) {
   return (
     <div>
       <div style={{ display: "flex", gap: "10px", alignItems: "center", justifyContent: "flex-end", marginBottom: "10px" }}>
-        <BarkodContextMenu selectedRows={selectedRows} onDelete={handleDelete} onLabel={handleLabel} onReportLabel={handleReportLabel} />
+        <BarkodContextMenu selectedRows={selectedRows} onDelete={handleDelete} onQrReportLabel={handleQrReportLabel} onReportLabel={handleReportLabel} />
         <Button type="primary" onClick={handleOpenCreate} icon={<PlusOutlined />}>
           {t("yeniBarkod")}
         </Button>
@@ -420,7 +380,6 @@ export default function Barkodlar({ selectedRowID }) {
         }}
       />
       <BarkodModal open={modalState.open} barkodId={modalState.barkodId} stokId={selectedRowID} onClose={() => setModalState({ open: false, barkodId: null })} onRefresh={handleRefresh} />
-      <BarkodEtiketModal open={etiketState.open} loading={etiketState.loading} barkod={etiketState.barkod} onClose={() => setEtiketState({ open: false, loading: false, barkod: null })} />
     </div>
   );
 }
