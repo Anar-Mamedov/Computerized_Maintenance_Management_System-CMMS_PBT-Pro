@@ -50,23 +50,65 @@ export const kaydetMakineSayac = (govde) => AxiosInstance.post("MakineSayacGunce
 
 /* ---------- Alt ekipmanlar ---------- */
 
-/** parentID: ust kayit (makine ya da ust ekipman) ID'si. */
-export const getAltEkipmanlar = (parentId) => AxiosInstance.post("GetEkipmanVeritabaniListe", { parentID: parentId, ItemIndex: 3, DepoId: -1, Parametre: "" });
+/**
+ * Makinenin tum alt ekipman agaci tek duz listede (gruplar, ekipmanlar ve malzemeler).
+ * Yanit: { list: [{ ID, PARENT_ID, TIP: "GRUP" | "EKIPMAN" | "MALZEME", ... }] }; PARENT_ID 0 ise kayit makineye baglidir.
+ */
+export const getMakineAltEkipmanAgaci = (makineId) => AxiosInstance.get("GetEkipmanMakineListWeb", { params: { MakineID: makineId, parametre: "" } });
 
 /** Yanit: { list: [], kayit_sayisi } */
 export const getBostaEkipmanlar = ({ parametre = "", sayfa = 1, sayfaBoyutu = 10 }) =>
   AxiosInstance.get("GetEkipmanListBosta", { params: { parametre, pagingDeger: sayfa, pageSize: sayfaBoyutu } });
 
-export const ekleAltEkipman = (makineId, ekipmanIdleri) => AxiosInstance.post("AddMakineEkipman", { EKP_MAKINE_ID: makineId, TB_EKIPMAN_ID: ekipmanIdleri });
+/** hedefId: ekipmanlarin baglanacagi grup ya da ust ekipman (tipini backend bulur); null ise makine kokune baglanir. */
+export const ekleAltEkipman = (makineId, ekipmanIdleri, hedefId) =>
+  AxiosInstance.post("AddMakineEkipman", { EKP_MAKINE_ID: makineId, TB_EKIPMAN_ID: ekipmanIdleri, HEDEF_ID: hedefId });
 
-/** Govde: { EkipmanID, UstEkipmanID, DepoID, IslemTipi: "STOK" | "HURDA", Aciklama } (dokumanda: EkipmanCikart). */
+/** Yeni alt ekipman icin otomatik kod (yanit: kod metni). */
+export const getYeniEkipmanKodu = () => AxiosInstance.get("ModulKoduGetir", { params: { modulKodu: "EKP_KOD" } });
+
+/** Stoksuz yeni alt ekipman karti acar ve monte eder. Govde: EkipmanWeb; EKP_REF_ID hedef grup / ust ekipman, makine kokunde null. */
+export const ekleYeniAltEkipman = (govde) => AxiosInstance.post("AddEkipman", govde);
+
+/*
+ * Grup ve malzeme uclari backend'in Alt Ekipmanlar entegrasyon rehberine gore yazildi. UpdateEkipmanGrup, DeleteEkipmanGrup,
+ * UpdateEkipmanMalzeme ve DeleteEkipmanMalzeme 2026-11-15'te demo swagger'inda henuz yoktu.
+ */
+
+/** Govde: { MakineId, GrupKodu, GrupTanimi, UstGrupId }; GrupKodu bossa backend kod uretir, UstGrupId makine kokunde null. */
+export const ekleEkipmanGrubu = (govde) => AxiosInstance.post("AddEkipmanGrup", govde);
+
+/** Govde: { TB_EKIPMAN_ID, GrupKodu, GrupTanimi } */
+export const guncelleEkipmanGrubu = (govde) => AxiosInstance.post("UpdateEkipmanGrup", govde);
+
+/** Altinda ekipman ya da malzeme olan grup silinmez; backend 400 ve aciklama mesaji doner. */
+export const silEkipmanGrubu = (grupId) => AxiosInstance.post("DeleteEkipmanGrup", null, { params: { id: grupId } });
+
+/** Govde: { RefId, MakineId, StokId, StokTanim, Miktar, FigureNo, Aciklama } (+ hedefe gore EkipmanId / GrupId / RefGrup). */
+export const ekleEkipmanMalzemesi = (govde) => AxiosInstance.post("AddEkipmanMalzeme", govde);
+
+/** Govde: { TB_EKIPMAN_MALZEME_ID, StokTanim, Miktar, FigureNo, Aciklama } */
+export const guncelleEkipmanMalzemesi = (govde) => AxiosInstance.post("UpdateEkipmanMalzeme", govde);
+
+export const silEkipmanMalzemesi = (malzemeId) => AxiosInstance.post("DeleteEkipmanMalzeme", null, { params: { id: malzemeId } });
+
+/** Malzemeyi stok kartiyla iliskilendirmek icin stok listesi (Malzeme Tanimlari ekraniyla ayni uc). Yanit: { Data: [], TotalCount } */
+export const getStoklar = ({ parametre = "", sayfa = 1, sayfaBoyutu = 10 }) =>
+  AxiosInstance.get("Stok", { params: { modulNo: 1, pagingDeger: sayfa, pageSize: sayfaBoyutu, prm: parametre, isAktif: 1 } });
+
+/** Ekipman cikartilirken (hedef STOK) secilecek depolar. */
+export const getDepolar = () => AxiosInstance.get("GetDepolar");
+
+/**
+ * Govde: { TB_EKIPMAN_ID, HEDEF_TUR: "STOK" | "HURDA", HEDEF_DEPO_ID, ACIKLAMA }. Ekipmanin altindaki alt ekipmanlar da
+ * birlikte makineden sokulur ve hareket tarihcesine yazilir.
+ */
 export const cikartAltEkipman = (govde) => AxiosInstance.post("ekipmancikart", govde);
 
-/** Dokumanda: GetEkipmanDolasimTarihce */
-export const getEkipmanDolasimTarihcesi = (ekipmanId) => AxiosInstance.get("GetEkipmanDolasimTarihcesi", { params: { ekipmanId } });
+/** Yanit: { ekipman (kunye), tarihce / list } */
+export const getEkipmanDolasimTarihcesi = (ekipmanId) => AxiosInstance.get("GetEkipmanDolasimTarihce", { params: { ekipmanId } });
 
-/** Dokumanda: GetEkipmanRevizyonTarihce */
-export const getEkipmanRevizyonTarihcesi = (ekipmanId) => AxiosInstance.get("GetEkipmanRevizyonTarihcesi", { params: { ekipmanId } });
+export const getEkipmanRevizyonTarihcesi = (ekipmanId) => AxiosInstance.get("GetEkipmanRevizyonTarihce", { params: { ekipmanId } });
 
 /** Govde: EkipmanRevizyonDto (EkipmanId, RevizyonNo, Tarih, Saat, Konu, ReferansNo, CalismaSuresi, Maliyet, DurumKodId, PersonelId, Aciklama...) */
 export const ekleEkipmanRevizyon = (govde) => AxiosInstance.post("AddEkipmanRevizyon", govde);

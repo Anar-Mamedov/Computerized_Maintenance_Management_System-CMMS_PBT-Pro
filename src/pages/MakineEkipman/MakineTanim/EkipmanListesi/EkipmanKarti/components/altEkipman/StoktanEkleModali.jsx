@@ -6,10 +6,12 @@ import { LuSearch } from "react-icons/lu";
 import KartModali from "../ortak/KartModali";
 import KartTablosu from "../ortak/KartTablosu";
 import ModalDugmeleri from "../ortak/ModalDugmeleri";
+import HedefBilgisi from "./HedefBilgisi";
 import useDebounce from "../../../../../../../hooks/useDebounce";
 import { basariliMi } from "../../../ekipmanService";
 import { ekleAltEkipman, getBostaEkipmanlar, hataMesaji, listeyiAl, yanitHatasi } from "../../ekipmanKartiService";
 import { anahtarEkle, bosIse, buyukHarf, sayiMetni } from "../../yardimcilar";
+import { hedefTipi } from "./altEkipmanYardimcilari";
 
 const SAYFA_BOYUTU = 10;
 
@@ -24,8 +26,11 @@ const KOLONLAR = [
   { alan: "EKP_DEPO", baslikKey: "ekipmanKarti.altEkipman.kolon.depo", genislik: 130 },
 ];
 
-/** Stoktan Ekle: makineye takilmamis (bosta) ekipmanlardan coklu secim yapilip makineye eklenir. Secim sayfalar arasinda korunur. */
-export default function StoktanEkleModali({ makineId, onKapat, onEklendi }) {
+/**
+ * Stoktan Ekle: makineye takilmamis (bosta) ekipmanlardan coklu secim yapilip `hedef`e (secili grup / ekipman ya da makine)
+ * baglanir. Secim sayfalar arasinda korunur.
+ */
+export default function StoktanEkleModali({ makineId, hedef, onKapat, onEklendi }) {
   const { t, i18n } = useTranslation();
   const [arama, setArama] = useState("");
   const gecikmeliArama = useDebounce(arama, 400);
@@ -96,7 +101,7 @@ export default function StoktanEkleModali({ makineId, onKapat, onEklendi }) {
   const kaydet = async () => {
     setKaydediliyor(true);
     try {
-      const yanit = await ekleAltEkipman(makineId, seciliIdler);
+      const yanit = await ekleAltEkipman(makineId, seciliIdler, hedef.id);
       if (!basariliMi(yanit)) {
         message.error(yanitHatasi(yanit, t));
         return;
@@ -130,6 +135,7 @@ export default function StoktanEkleModali({ makineId, onKapat, onEklendi }) {
       }
     >
       <div className="space-y-3">
+        <HedefBilgisi hedef={hedef} />
         <div className="w-full sm:w-80">
           <Input
             allowClear
@@ -158,6 +164,8 @@ export default function StoktanEkleModali({ makineId, onKapat, onEklendi }) {
 
 StoktanEkleModali.propTypes = {
   makineId: PropTypes.number.isRequired,
+  /** Secilen ekipmanlarin baglanacagi yer (id null ise makine kokune). */
+  hedef: hedefTipi.isRequired,
   onKapat: PropTypes.func.isRequired,
   /** Ekleme basarili olunca (mesaj gosterildikten sonra) cagrilir. */
   onEklendi: PropTypes.func.isRequired,

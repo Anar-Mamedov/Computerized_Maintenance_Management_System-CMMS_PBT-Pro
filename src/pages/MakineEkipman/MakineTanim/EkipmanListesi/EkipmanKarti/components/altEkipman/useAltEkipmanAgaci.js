@@ -1,68 +1,39 @@
-import { useRef, useState } from "react";
-import { message } from "antd";
-import { useTranslation } from "react-i18next";
-import { getAltEkipmanlar, hataMesaji, listeyiAl } from "../../ekipmanKartiService";
-import { anahtarEkle } from "../../yardimcilar";
+import { useState } from "react";
+
+const listedeDegistir = (liste, anahtar) => (liste.includes(anahtar) ? liste.filter((oge) => oge !== anahtar) : [...liste, anahtar]);
 
 /**
- * Alt ekipman agacinin durumu (anahtarlar TB_EKIPMAN_ID):
- * - acikIdler / cocuklar: satirin cocuklari ilk acilista cekilir ve bellekte tutulur.
- * - seciliKayitlar: { [id]: { kayit, ustEkipmanId } }; kok seviyede ustEkipmanId 0'dir (ust = makine).
- * `sifirla` hepsini temizler; o andaki cocuk istekleri yok sayilir.
+ * Alt ekipman agacinin ekran durumu; anahtarlar dugum anahtaridir (tip + ID, bkz. agaciKur).
+ * - acikAnahtarlar: alt kirilimi acik satirlar. Agac tek istekte geldigi icin acmak istek atmaz.
+ * - kapaliBolumler: kapatilmis bolumler; bolumler varsayilan olarak aciktir. Kok grubun bolum anahtari grubun anahtaridir.
+ * - seciliAnahtar: tek secili dugum. Islem menusu ve "Ekle" ona gore calisir (yeni kayit secili grup / ekipmanin altina).
  */
 export default function useAltEkipmanAgaci() {
-  const { t } = useTranslation();
-  const [acikIdler, setAcikIdler] = useState([]);
-  const [cocuklar, setCocuklar] = useState({});
-  const [yuklenenIdler, setYuklenenIdler] = useState([]);
-  const [seciliKayitlar, setSeciliKayitlar] = useState({});
-  const nesilRef = useRef(0);
+  const [acikAnahtarlar, setAcikAnahtarlar] = useState([]);
+  const [kapaliBolumler, setKapaliBolumler] = useState([]);
+  const [seciliAnahtar, setSeciliAnahtar] = useState(null);
 
-  const kapat = (id) => setAcikIdler((onceki) => onceki.filter((acikId) => acikId !== id));
-
-  const acKapat = async (kayit) => {
-    const id = kayit.TB_EKIPMAN_ID;
-    if (acikIdler.includes(id)) {
-      kapat(id);
-      return;
-    }
-
-    setAcikIdler((onceki) => [...onceki, id]);
-    if (cocuklar[id] || yuklenenIdler.includes(id)) return;
-
-    const nesil = nesilRef.current;
-    setYuklenenIdler((onceki) => [...onceki, id]);
-    try {
-      const yanit = await getAltEkipmanlar(id);
-      if (nesil !== nesilRef.current) return;
-      setCocuklar((onceki) => ({ ...onceki, [id]: anahtarEkle(listeyiAl(yanit), "TB_EKIPMAN_ID") }));
-    } catch (hata) {
-      if (nesil !== nesilRef.current) return;
-      console.error("Alt ekipmanin alt kayitlari alinamadi:", hata);
-      message.error(hataMesaji(hata, t("ekipmanKarti.listeAlinamadi")));
-      kapat(id);
-    } finally {
-      if (nesil === nesilRef.current) setYuklenenIdler((onceki) => onceki.filter((yuklenenId) => yuklenenId !== id));
-    }
+  return {
+    acikAnahtarlar,
+    kapaliBolumler,
+    seciliAnahtar,
+    acKapat: (anahtar) => setAcikAnahtarlar((onceki) => listedeDegistir(onceki, anahtar)),
+    bolumuAcKapat: (anahtar) => setKapaliBolumler((onceki) => listedeDegistir(onceki, anahtar)),
+    /** Dugumu (satir ya da kok grup bolumu) acar; ör. altina kayit eklenince yeni kayit gorunsun diye. */
+    ac: (anahtar) => {
+      setAcikAnahtarlar((onceki) => (onceki.includes(anahtar) ? onceki : [...onceki, anahtar]));
+      setKapaliBolumler((onceki) => onceki.filter((kapali) => kapali !== anahtar));
+    },
+    /** Dugumu secer; null secimi kaldirir. */
+    sec: setSeciliAnahtar,
+    secimiDegistir: (anahtar) => setSeciliAnahtar((onceki) => (onceki === anahtar ? null : anahtar)),
+    hepsiniAc: (dugumAnahtarlari) => {
+      setKapaliBolumler([]);
+      setAcikAnahtarlar(dugumAnahtarlari);
+    },
+    hepsiniKapat: (bolumAnahtarlari) => {
+      setKapaliBolumler(bolumAnahtarlari);
+      setAcikAnahtarlar([]);
+    },
   };
-
-  const secimiDegistir = (kayit, ustEkipmanId) => {
-    const id = kayit.TB_EKIPMAN_ID;
-    setSeciliKayitlar((onceki) => {
-      const yeni = { ...onceki };
-      if (yeni[id]) delete yeni[id];
-      else yeni[id] = { kayit, ustEkipmanId };
-      return yeni;
-    });
-  };
-
-  const sifirla = () => {
-    nesilRef.current += 1;
-    setAcikIdler([]);
-    setCocuklar({});
-    setYuklenenIdler([]);
-    setSeciliKayitlar({});
-  };
-
-  return { acikIdler, cocuklar, yuklenenIdler, seciliKayitlar, acKapat, secimiDegistir, sifirla };
 }

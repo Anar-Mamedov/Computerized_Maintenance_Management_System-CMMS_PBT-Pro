@@ -33,6 +33,9 @@ const GOVDE_STILI = { padding: 0, display: "flex", flexDirection: "column", back
 // Yeni ekipmanda henuz GetMakineById kaydi yoktur; sekmeler bos kayitla cizilir.
 const YENI_KAYIT = {};
 
+// Sekme basligindaki kayit sayisi: liste kendi sayisini veriyorsa o (ör. alt ekipmanlarda gruplar sayilmaz), yoksa kayit adedi.
+const listeSayisi = (liste) => (liste.yukleniyor ? undefined : (liste.sayi ?? liste.kayitlar.length));
+
 /**
  * Ekipman Sicil Karti (tasarim: pbt-core.lovable.app). Ekipman listesinde bir kayda tiklaninca acilir.
  * Genel, detay, finansal, yakit, ozel alan, not ve ruhsat alanlari tek formdadir; "Guncelle" UpdateMakine'ye
@@ -125,7 +128,7 @@ export default function EkipmanKarti({ makineId, acik, onKapat, onKaydedildi }) 
   const sekmeler = SEKMELER.filter((sekme) => (!sekme.kosul || kosullar[sekme.kosul]) && !(yeniKayit && sekme.kayitGerekli)).map((sekme) => ({
     key: sekme.key,
     etiket: t(sekme.etiketKey),
-    sayi: sekme.sayi && !sekmeVerileri[sekme.sayi].yukleniyor ? sekmeVerileri[sekme.sayi].kayitlar.length : undefined,
+    sayi: sekme.sayi ? listeSayisi(sekmeVerileri[sekme.sayi]) : undefined,
   }));
   const aktifSekmeGorunur = sekmeler.some((sekme) => sekme.key === aktifSekme);
 
