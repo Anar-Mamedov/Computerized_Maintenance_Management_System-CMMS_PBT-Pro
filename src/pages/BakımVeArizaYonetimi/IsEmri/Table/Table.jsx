@@ -730,6 +730,16 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
     },
 
     {
+      title: t("sonuc"),
+      dataIndex: "ISM_SONUC",
+      key: "ISM_SONUC",
+      width: 250,
+      ellipsis: true,
+      sorter: true,
+      visible: true,
+    },
+
+    {
       title: "Makine Tanımı",
       dataIndex: "MAKINE_TANIMI",
       key: "MAKINE_TANIMI",

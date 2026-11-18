@@ -1699,5 +1699,6 @@
   "haritalar.parkAltBaslik": "Ignition off / waiting",
   "haritalar.cihazNo": "Device No",
   "haritalar.hiz": "Speed",
-  "haritalar.adres": "Address"
+  "haritalar.adres": "Address",
+  "sonuc": "Result"
 }
