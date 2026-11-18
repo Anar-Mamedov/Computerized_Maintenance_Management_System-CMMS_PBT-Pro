@@ -6,4 +6,5 @@ export const KOD_GRUPLARI = {
   lastikEbati: 35501, // LASTİK EBATLARI
   aracTipi: 35008, // ARAÇ TİPLERİ (lastik listesindeki "Araç Tipi")
   ekipmanKategorisi: 32502, // ekipman kategorisi (lastik listesindeki "Grup")
+  aksTipi: 892, // AKS TİPLERİ (aks tanımındaki "Tip")
 };

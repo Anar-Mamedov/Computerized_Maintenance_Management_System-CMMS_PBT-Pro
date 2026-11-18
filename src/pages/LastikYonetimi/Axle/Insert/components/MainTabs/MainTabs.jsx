@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Drawer, Typography, Button, Input, Select, DatePicker, TimePicker, Row, Col, Checkbox, InputNumber, Radio, Divider } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { Controller, useFormContext } from "react-hook-form";
-import KodIDSelectbox from "../../../../components/KodIDSelectbox";
+import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
+import { KOD_GRUPLARI } from "../../../../constants";
 import AxleIslevi from "../../../../components/AxleIslevi";
 import styled from "styled-components";
 import dayjs from "dayjs";
@@ -226,7 +227,7 @@ export default function MainTabs({ modalOpen }) {
               flexDirection: "column",
             }}
           >
-            <KodIDSelectbox name1="tip" isRequired={false} kodID="892" />
+            <KodIDSelectbox name1="tip" isRequired={false} kodID={KOD_GRUPLARI.aksTipi} />
           </div>
         </div>
 
