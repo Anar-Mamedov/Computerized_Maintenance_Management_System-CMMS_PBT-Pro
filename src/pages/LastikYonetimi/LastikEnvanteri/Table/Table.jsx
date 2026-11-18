@@ -290,6 +290,16 @@ const LastikEnvanteri = () => {
     },
 
     {
+      title: t("ekipmanKodu"),
+      dataIndex: "mknKod",
+      key: "mknKod",
+      width: 150,
+      ellipsis: true,
+      visible: true,
+      sorter: true,
+    },
+
+    {
       title: t("lastikMarka"),
       dataIndex: "lastikMarka",
       key: "lastikMarka",

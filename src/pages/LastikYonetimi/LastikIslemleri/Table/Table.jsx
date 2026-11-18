@@ -285,6 +285,15 @@ const Ceza = () => {
       sorter: true,
     },
     {
+      title: t("ekipmanKodu"),
+      dataIndex: "mknKod",
+      key: "mknKod",
+      width: 150,
+      ellipsis: true,
+      visible: true,
+      sorter: true,
+    },
+    {
       title: t("aksYapisi"),
       dataIndex: "aksTanim",
       key: "aksTanim",
