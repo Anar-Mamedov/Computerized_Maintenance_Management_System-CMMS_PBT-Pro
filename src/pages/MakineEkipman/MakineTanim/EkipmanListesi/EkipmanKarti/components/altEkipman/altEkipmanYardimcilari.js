@@ -22,23 +22,26 @@ const backendIdsi = (kayit, tip) => Number(tip === DUGUM.MALZEME ? (kayit.TB_EKI
 
 /**
  * GetEkipmanMakineListWeb'in duz listesinden agac kurar ve kok dugumleri doner.
- * Dugum: { ...kayit, tip, id (backend ID), ustId (PARENT_ID, makineye bagliysa 0), anahtar, cocuklar }.
+ * Dugum: { ...kayit, tip, id (backend ID), ustId (PARENT_ID, makineye bagliysa 0), anahtar, cocuklar, anaEkipman }.
  * Malzeme ID'leri ayri tablodan gelir ve ekipman ID'leriyle cakisabilir; bu yuzden anahtar tip + ID'dir ve yalnizca
  * grup / ekipman ust dugum olabilir. Ust dugumu listede bulunmayan kayitlar koke konur.
+ * Ana ekipman: makineye ya da bir gruba dogrudan bagli ekipman (ustu ekipman olmayan); agacta kalin gosterilir.
  */
 export const agaciKur = (kayitlar) => {
   const dugumler = kayitlar.map((kayit) => {
     const tip = kayitTipi(kayit);
     const id = backendIdsi(kayit, tip);
-    return { ...kayit, tip, id, ustId: Number(kayit.PARENT_ID) || 0, anahtar: `${tip}-${id}`, cocuklar: [] };
+    return { ...kayit, tip, id, ustId: Number(kayit.PARENT_ID) || 0, anahtar: `${tip}-${id}`, cocuklar: [], anaEkipman: false };
   });
   const ustler = new Map(dugumler.filter((dugum) => dugum.tip !== DUGUM.MALZEME).map((dugum) => [dugum.id, dugum]));
   const kokler = [];
 
   dugumler.forEach((dugum) => {
     const ust = ustler.get(dugum.ustId);
-    if (ust && ust !== dugum) ust.cocuklar.push(dugum);
-    else kokler.push(dugum);
+    const kokte = !ust || ust === dugum;
+    dugum.anaEkipman = dugum.tip === DUGUM.EKIPMAN && (kokte || ust.tip === DUGUM.GRUP);
+    if (kokte) kokler.push(dugum);
+    else ust.cocuklar.push(dugum);
   });
   return kokler;
 };
@@ -79,6 +82,7 @@ export const dugumTipi = PropTypes.shape({
   ustId: PropTypes.number.isRequired,
   anahtar: PropTypes.string.isRequired,
   cocuklar: PropTypes.array.isRequired,
+  anaEkipman: PropTypes.bool.isRequired,
 });
 
 /** Yeni kaydin baglanacagi yer: secili grup / ekipman ya da makine (id null). */

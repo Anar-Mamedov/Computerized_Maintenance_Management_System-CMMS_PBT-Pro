@@ -7,6 +7,7 @@ import IslemMenusu from "./IslemMenusu";
 import KolonHucresi from "./KolonHucresi";
 import BoyutlanabilirBaslik from "../../../../../utils/components/KolonAyarlari/BoyutlanabilirBaslik";
 import { formatNumberWithSeparators } from "../../../../../utils/numberLocale";
+import { anaEkipmanMi } from "../yardimcilar";
 
 const TABLO_BILESENLERI = { header: { cell: BoyutlanabilirBaslik } };
 const GRUP_GIZLI_SECIM = { disabled: true, style: { display: "none" } };
@@ -50,11 +51,11 @@ export default function AgacTablosu({ satirlar, yukleniyor, govdeKayar, gorunurK
               </div>
             </div>
           ) : (
-            <span className="ae-tasan">
+            <span className={`ae-tasan ae-agac-ekipman ${anaEkipmanMi(satir) ? "ae-agac-ekipman--ana" : ""}`}>
               <button type="button" className="ae-link" onClick={() => onDetay(satir)}>
                 {satir.code}
               </button>{" "}
-              <span className="ae-kalin">{satir.name}</span>
+              {satir.name}
               {satir.childCount > 0 && <span className="ae-soluk"> ({sayi(satir.childCount)})</span>}
             </span>
           ),

@@ -41,7 +41,7 @@ export default function AgacSatiri({ dugum, seviye, agac, menuOgeleriniAl }) {
           {satirIsareti(cocukluMu, acik)}
           <div className="flex min-w-0 items-center gap-2 text-sm">
             <DugumIkonu tip={dugum.tip} />
-            <span className="min-w-0 truncate" title={etiket}>
+            <span className={`min-w-0 truncate ${dugum.anaEkipman ? "font-semibold" : ""}`} title={etiket}>
               {kod ? <span className="ek-kart-soluk">({kod})</span> : null} {dugumAdi(dugum)}
             </span>
             {miktarVar && (

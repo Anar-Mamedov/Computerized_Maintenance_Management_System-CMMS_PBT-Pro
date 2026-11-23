@@ -40,6 +40,9 @@ export const agacSatirlari = (groups) =>
     return { ...grup, grup: true, clientKey: grupAnahtari, children: cocuklar.length ? cocuklar : undefined };
   });
 
+/** Ana ekipman: grubun (makine ya da STOK / BAGIMSIZ) dogrudan altindaki ekipman satiri; agacta kalin gosterilir. */
+export const anaEkipmanMi = (satir) => !satir.grup && satir.parentId === 0;
+
 /** Agacta secilen anahtarlarin satirlari (gruplar secilemez). */
 export const agactanBul = (satirlar, anahtarlar) => {
   const bulunanlar = [];

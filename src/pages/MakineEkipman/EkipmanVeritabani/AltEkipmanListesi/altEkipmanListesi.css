@@ -79,6 +79,18 @@
   cursor: pointer;
 }
 
+/* Agac gorunumunde ekipman kodu + tanimi: ana ekipman (grubun dogrudan alti) kalin, alt ekipmanlar normal agirlikta. */
+.ae-agac-ekipman,
+.ae-agac-ekipman .ae-link,
+.ae-agac-ekipman .ae-soluk {
+  font-weight: 400;
+}
+
+.ae-agac-ekipman--ana,
+.ae-agac-ekipman--ana .ae-link {
+  font-weight: 600;
+}
+
 .ae-link:hover {
   text-decoration: underline;
 }
