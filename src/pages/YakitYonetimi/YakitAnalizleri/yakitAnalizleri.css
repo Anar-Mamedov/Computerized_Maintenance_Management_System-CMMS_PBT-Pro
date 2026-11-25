@@ -1,0 +1,290 @@
+/*
+ * Yakit Analizleri ekraninin tasarim tokenlari (omega-fuel-insight tasarimi).
+ * Marka rengi (--ek-brand) uygulama temasindan inline verilir (useTemaDegiskenleri); Omega'da turuncu, PBT'de mavi.
+ * Modallar body'ye portal edildigi icin tokenlar .ya-tokenlar sinifinda tanimlidir (modal wrapClassName).
+ */
+.ya-tokenlar {
+  --ya-fg: #1f2329;
+  --ya-card: #ffffff;
+  --ya-muted: #6e7075;
+  --ya-border: #e7e8eb;
+  --ya-accent: #f4f6f8;
+  --ya-shadow: 0 1px 3px 0 rgba(28, 30, 36, 0.06);
+  /*
+   * Uygulamada html font-size 12px (1rem = 12px, src/index.css). Tasarim 16px tabanli oldugu icin bu ekranda
+   * kullanilan Tailwind olculeri (p-5, gap-4, mt-1...) piksele sabitlenir; aksi halde %25 kucuk cizilir.
+   */
+  --spacing: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  color: var(--ya-fg);
+}
+
+.yakit-analizleri {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.ya-kart {
+  background: var(--ya-card);
+  border: 1px solid var(--ya-border);
+  border-radius: 10px;
+  box-shadow: var(--ya-shadow);
+}
+
+.ya-kart-eylemi {
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--ek-brand);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ya-kart-eylemi:hover {
+  text-decoration: underline;
+}
+
+.ya-kpi-ikon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+}
+
+.ya-kpi-ikon--mavi {
+  background: #e8f0fb;
+  color: #3f6fb5;
+}
+
+.ya-kpi-ikon--turuncu {
+  background: #fdf0e3;
+  color: #c96a1b;
+}
+
+.ya-kpi-ikon--yesil {
+  background: #e5f4ea;
+  color: #2f7d4f;
+}
+
+.ya-kpi-ikon--mor {
+  background: #efedfa;
+  color: #6a5cc0;
+}
+
+.ya-rozet {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ya-rozet--basari {
+  background: #e3f4e9;
+  color: #2f7d4f;
+}
+
+.ya-rozet--uyari {
+  background: #fff1dc;
+  color: #b46a00;
+}
+
+.ya-rozet--tehlike {
+  background: #fde7e5;
+  color: #c2413a;
+}
+
+.ya-rozet--bilgi {
+  background: #e3effb;
+  color: #2d6fb7;
+}
+
+.ya-rozet--notr {
+  background: #eff0f2;
+  color: #55585e;
+}
+
+.ya-rozet--mor {
+  background: #efedfa;
+  color: #5d4fb3;
+}
+
+/* Tank ve lokasyon cubuklari. */
+.ya-ilerleme {
+  overflow: hidden;
+  height: 8px;
+  border-radius: 999px;
+  background: #eef0f3;
+}
+
+.ya-ilerleme-dolgu {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--ek-brand);
+}
+
+.ya-ilerleme-dolgu--critical {
+  background: #c2413a;
+}
+
+.ya-ilerleme-dolgu--normal {
+  background: var(--ek-brand);
+}
+
+.ya-ilerleme-dolgu--high {
+  background: #2f7d4f;
+}
+
+.ya-basit-tablo {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.ya-basit-tablo th {
+  padding: 8px 20px;
+  border-top: 1px solid var(--ya-border);
+  border-bottom: 1px solid var(--ya-border);
+  color: var(--ya-muted);
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.ya-basit-tablo td {
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--ya-border);
+}
+
+.ya-basit-tablo tr:last-child td {
+  border-bottom: none;
+}
+
+.ya-basit-tablo .text-right {
+  text-align: right;
+}
+
+.ya-uyari {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ya-uyari:hover:not(:disabled) {
+  background: var(--ya-accent);
+}
+
+.ya-uyari:disabled {
+  cursor: default;
+}
+
+.ya-nokta {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 999px;
+}
+
+.ya-nokta--tehlike {
+  background: #c2413a;
+}
+
+.ya-nokta--uyari {
+  background: #d9822b;
+}
+
+.ya-nokta--bilgi {
+  background: #3f6fb5;
+}
+
+.ya-nokta--notr {
+  background: #9a9da3;
+}
+
+/* Detayli tablo: hazir gorunum cipleri, ekipman gorseli, personel bas harfleri. */
+.ya-cip {
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--ya-border);
+  border-radius: 999px;
+  background: var(--ya-accent);
+  color: var(--ya-fg);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.ya-cip--aktif {
+  border-color: var(--ek-brand);
+  background: var(--ek-brand);
+  color: #ffffff;
+}
+
+.ya-gorsel {
+  display: inline-flex;
+  overflow: hidden;
+  width: 44px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ya-border);
+  border-radius: 6px;
+  background: var(--ya-accent);
+}
+
+.ya-avatar {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #efedfa;
+  color: #5d4fb3;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ya-detay-tablo .ant-table-thead > tr > th,
+.ya-modal-tablo .ant-table-thead > tr > th {
+  background: var(--ya-card) !important;
+  color: var(--ya-muted);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.ya-detay-tablo .ant-table-tbody > tr.ant-table-row > td,
+.ya-modal-tablo .ant-table-tbody > tr.ant-table-row > td {
+  font-size: 12px;
+}
+
+.ya-toplam-satiri > td {
+  background: var(--ya-accent);
+  font-weight: 700;
+}

@@ -64,6 +64,8 @@ import YakitGirisleri from "./pages/YakitYonetimi/YakitGirisleri/YakitGirisleri.
 import YakitStoklari from "./pages/YakitYonetimi/YakitStoklari/YakitStoklari.jsx";
 import YakitHareketleri from "./pages/YakitYonetimi/YakitHareketleri/YakitHareketleri.jsx";
 import HizliYakitGirisi from "./pages/YakitYonetimi/HizliYakitGirisi/HizliYakitGirisi.jsx";
+import YakitAnalizleri from "./pages/YakitYonetimi/YakitAnalizleri/YakitAnalizleri.jsx";
+import YakitStokIslemleri from "./pages/YakitYonetimi/YakitStokIslemleri/YakitStokIslemleri.jsx";
 import YoneticiDashboard from "./pages/YonetimDashboard/Dashboard.jsx";
 import MakinePuantaj from "./pages/MakineEkipman/MakinePuantaj/MakinePuantaj.jsx";
 import AylikMakinePuantaj from "./pages/MakineEkipman/MakinePuantaj/MakinePuantajAylik.jsx";
@@ -331,6 +333,8 @@ export default function App() {
           <Route path="/yakitGirisleri" element={<YakitGirisleri />} />
           <Route path="/yakitHareketleri" element={<YakitHareketleri />} />
           <Route path="/hizliYakitGirisi" element={<HizliYakitGirisi />} />
+          <Route path="/yakitAnalizleri" element={<YakitAnalizleri />} />
+          <Route path="/yakitStokIslemleri" element={<YakitStokIslemleri />} />
           <Route path="/yakitTuketimiAnalizi" element={<YakitTuketimiAnalizi />} />
           <Route path="/projeTanimlari2" element={<ProjeTanimlari2 />} />
           <Route path="/projeYonetimiListe" element={<ProjeYonetimListe />} />
@@ -377,7 +381,7 @@ const BaseLayout = () => {
   const layoutExcludedPaths = ["/isEmri1", "/makine"];
   const isLayoutExcluded = layoutExcludedPaths.includes(location.pathname);
   // Bu liste ekranlari kisa pencerede kendi icinde kayar (RULES.md kural 14); sarmalayici 360px'te kalirsa footer ekranin disina itilir.
-  const kendiIcindeKayanListeler = ["/makine", "/ekipmanTransferi", "/sayacHareketleri", "/ekipmanVeritabani"];
+  const kendiIcindeKayanListeler = ["/makine", "/ekipmanTransferi", "/sayacHareketleri", "/ekipmanVeritabani", "/yakitAnalizleri", "/yakitStokIslemleri"];
   const isKendiIcindeKayanListe = kendiIcindeKayanListeler.includes(location.pathname);
   const hasFixedDashboardHeader = location.pathname === "/omegaDash";
   // Dashboard ekraninda breadcrumb gosterilmez; bosalan alani icerik kaplar.

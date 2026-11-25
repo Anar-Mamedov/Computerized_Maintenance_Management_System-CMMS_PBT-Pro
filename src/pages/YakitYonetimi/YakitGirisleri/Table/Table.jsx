@@ -14,6 +14,7 @@ import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
 import Filters from "./filter/Filters";
 import YakitIslemleri from "./YakitIslemleri/YakitIslemleri";
 import { useFormContext } from "react-hook-form";
+import { useLocation } from "react-router-dom";
 import { SiMicrosoftexcel } from "react-icons/si";
 import * as XLSX from "xlsx";
 import { t } from "i18next";
@@ -139,11 +140,14 @@ const MainTable = () => {
   const [cardsData, setCardsData] = useState({});
   const [yakitModalVisible, setYakitModalVisible] = useState(false);
 
+  // Yakit Analizleri'ndeki "yuksek tuketim" uyarisindan gelindiyse liste o ekipmanla filtrelenir (EkipmanIds).
+  const gelenEkipmanIds = useLocation().state?.EkipmanIds;
   const [body, setBody] = useState({
     Arama: "",
     KaynakTipi: "TUMU",
     BaslangicTarihi: null,
     BitisTarihi: null,
+    ...(Array.isArray(gelenEkipmanIds) && gelenEkipmanIds.length > 0 ? { EkipmanIds: gelenEkipmanIds } : {}),
   });
 
   const cardItems = useMemo(() => [

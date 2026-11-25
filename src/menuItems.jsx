@@ -123,8 +123,10 @@ export const rawItems = [
     "yakitYonetimi",
     <FireOutlined />,
     [
+      getItem("Yakıt Analizleri", "yakitAnalizleri", true),
       getItem("Yakıt Tanımları", "yakitTanimlari", true),
       getItem("Yakıt Depoları / Tanklar", "yakitStoklari", true),
+      getItem("Yakıt Stok İşlemleri", "yakitStokIslemleri", true),
       getItem("Yakıt İşlemleri", "yakitGirisleri", true),
       getItem("Yakıt Hareketleri", "yakitHareketleri", true),
       getItem("Hızlı Yakıt İşlemleri", "hizliYakitGirisi", true),

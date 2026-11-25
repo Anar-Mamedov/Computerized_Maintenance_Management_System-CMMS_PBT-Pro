@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState, useMemo, useRef } from "react";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Progress, message, Card, Row, Col, Space, Popconfirm, Tag, Popover, Drawer, Select } from "antd";
-import { HolderOutlined, SearchOutlined, MenuOutlined, EditOutlined, DeleteOutlined, DownloadOutlined, UploadOutlined, ArrowsAltOutlined } from "@ant-design/icons";
+import { HolderOutlined, SearchOutlined, MenuOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { DndContext, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -12,8 +12,8 @@ import EditDrawer from "../Update/EditDrawer";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
 import EditDrawer1 from "../../../YardimMasasi/IsTalepleri/Update/EditDrawer";
 import Filters from "./filter/Filters";
-import YakitIslemleri from "./YakitIslemleri/YakitIslemleri";
 import { useFormContext } from "react-hook-form";
+import { useLocation, useNavigate } from "react-router-dom";
 import { SiMicrosoftexcel } from "react-icons/si";
 import * as XLSX from "xlsx";
 import { t } from "i18next";
@@ -133,12 +133,21 @@ const MainTable = () => {
   const [editDrawer1Visible, setEditDrawer1Visible] = useState(false);
   const [editDrawer1Data, setEditDrawer1Data] = useState(null);
   const [drawer, setDrawer] = useState({ visible: false, data: null });
+  const location = useLocation();
+  const navigate = useNavigate();
+  const gelenDepoId = location.state?.DepoId;
+
+  // Yakit Analizleri'ndeki "kritik tank" uyarisindan gelindiyse o tankin detayi acilir (RefId = TB_DEPO_ID).
+  // Durum bir kez kullanilip temizlenir; sayfa yenilenince cekmece yeniden acilmaz.
+  useEffect(() => {
+    if (!gelenDepoId) return;
+    setDrawer({ visible: true, data: { TB_DEPO_ID: gelenDepoId } });
+    navigate(location.pathname, { replace: true, state: null });
+  }, [gelenDepoId, location.pathname, navigate]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [xlsxLoading, setXlsxLoading] = useState(false);
   const [status, setStatus] = useState(-1);
   const [cardsData, setCardsData] = useState({});
-  const [yakitIslemleriModalVisible, setYakitIslemleriModalVisible] = useState(false);
-  const [activeTab, setActiveTab] = useState("1");
 
   const [body, setBody] = useState({
     LokasyonIds: [],
@@ -969,41 +978,6 @@ const MainTable = () => {
           <Button style={{ display: "flex", alignItems: "center" }} onClick={handleDownloadXLSX} loading={xlsxLoading} icon={<SiMicrosoftexcel />}>
             İndir
           </Button>
-  <Button 
-    type="primary"
-    icon={<DownloadOutlined />}
-    style={{ display: "flex", alignItems: "center", backgroundColor: "#ff6d28", borderColor: "#ff6d28" }}
-    onClick={() => {
-      setActiveTab("1"); // Giriş Sekmesi
-      setYakitIslemleriModalVisible(true);
-    }}
-  >
-    Giriş
-  </Button>
-  
-  <Button 
-    type="primary"
-    icon={<UploadOutlined />}
-    style={{ display: "flex", alignItems: "center", backgroundColor: "#ff6d28", borderColor: "#ff6d28" }}
-    onClick={() => {
-      setActiveTab("2"); // Çıkış Sekmesi
-      setYakitIslemleriModalVisible(true);
-    }}
-  >
-    Çıkış
-  </Button>
-  
-  <Button 
-    type="primary"
-    icon={<ArrowsAltOutlined />}
-    style={{ display: "flex", alignItems: "center", backgroundColor: "#ff6d28", borderColor: "#ff6d28" }}
-    onClick={() => {
-      setActiveTab("3"); // Transfer Sekmesi
-      setYakitIslemleriModalVisible(true);
-    }}
-  >
-    Transfer
-  </Button>
   <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
   <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
 </div>
@@ -1036,13 +1010,6 @@ const MainTable = () => {
         onDrawerClose={() => setDrawer({ ...drawer, visible: false })} 
         drawerVisible={drawer.visible} 
         onRefresh={refreshTableData} 
-      />
-      <YakitIslemleri
-        visible={yakitIslemleriModalVisible} 
-        onClose={() => setYakitIslemleriModalVisible(false)}
-        defaultTab={activeTab} // Yeni eklediğimiz prop
-        onRefresh={refreshTableData}
-        selectedRows={selectedRows}
       />
 
       {editDrawer1Visible && (

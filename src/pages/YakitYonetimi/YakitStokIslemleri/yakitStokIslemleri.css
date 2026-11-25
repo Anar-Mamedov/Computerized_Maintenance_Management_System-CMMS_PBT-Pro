@@ -1,0 +1,153 @@
+/*
+ * Yakit Stok Islemleri ekraninin tasarim tokenlari (screenshot-perfect-pixel tasarimi).
+ * Marka rengi (--ek-brand) uygulama temasindan inline verilir (useTemaDegiskenleri); Omega'da turuncu, PBT'de mavi.
+ * Modal ve acilir menuler body'ye portal edildigi icin tokenlar .ys-tokenlar sinifinda da tanimlidir (modal wrapClassName).
+ */
+.ys-tokenlar {
+  --ys-fg: #1f2329;
+  --ys-card: #ffffff;
+  --ys-muted: #6e7075;
+  --ys-border: #e2e3e6;
+  --ys-accent: #f4f6f8;
+  --ys-success: #2f7d4f;
+  --ys-success-soft: #e3f4e9;
+  --ys-danger: #c2413a;
+  --ys-danger-soft: #fde7e5;
+  --ys-info: #2d6fb7;
+  --ys-info-soft: #e3effb;
+  --ys-warning: #b46a00;
+  --ys-warning-soft: #fff1dc;
+  --ys-action-green: #3f8f4f;
+  --ys-shadow: 0 1px 2px 0 rgba(28, 30, 36, 0.05);
+  /*
+   * Uygulamada html font-size 12px (1rem = 12px, src/index.css). Tasarim 16px tabanli oldugu icin bu ekranda
+   * kullanilan Tailwind olculeri (p-4, gap-3, mt-1...) piksele sabitlenir; aksi halde %25 kucuk cizilir.
+   */
+  --spacing: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+}
+
+.yakit-stok-islemleri {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--ys-fg);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* Kaydirma cubugu veri gelince belirip genisligi degistirmesin; aksi halde tablo olculeri bozulur. */
+  scrollbar-gutter: stable;
+}
+
+/* Genis ekran: KPI ve arac cubugu sabit, liste karti kalan yuksekligi doldurur ve yalnizca tablo govdesi kayar. */
+.yakit-stok-islemleri--sabit > * {
+  flex-shrink: 0;
+}
+
+.yakit-stok-islemleri--sabit > .ys-liste-karti {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.ys-kart {
+  background: var(--ys-card);
+  border: 1px solid var(--ys-border);
+  border-radius: 8px;
+  box-shadow: var(--ys-shadow);
+}
+
+.ys-kpi-ikon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+}
+
+.ys-kpi-ikon--giris {
+  background: var(--ys-success-soft);
+  color: var(--ys-success);
+}
+
+.ys-kpi-ikon--cikis {
+  background: var(--ys-danger-soft);
+  color: var(--ys-danger);
+}
+
+.ys-kpi-ikon--transfer {
+  background: var(--ys-info-soft);
+  color: var(--ys-info);
+}
+
+.ys-kpi-ikon--stok {
+  background: var(--ys-warning-soft);
+  color: var(--ys-warning);
+}
+
+/* Yesil ⋮ dugmesi: secili kayitlarin islemleri (Sil). */
+.ys-islem-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: var(--ys-action-green);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.ys-islem-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ys-rozet {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ys-rozet--giris {
+  background: var(--ys-success-soft);
+  color: var(--ys-success);
+}
+
+.ys-rozet--cikis {
+  background: var(--ys-danger-soft);
+  color: var(--ys-danger);
+}
+
+.ys-rozet--transfer {
+  background: var(--ys-info-soft);
+  color: var(--ys-info);
+}
+
+.ys-tablo .ant-table-thead > tr > th {
+  background: var(--ys-card) !important;
+  color: var(--ys-fg);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Yalnizca veri satirlari: antd'nin gizli olcum satiri dolgu alirsa basligin altinda bosluk olusur. */
+.ys-tablo .ant-table-tbody > tr.ant-table-row > td {
+  font-size: 12px;
+}
+
+.ys-etiket {
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ys-fg);
+}
