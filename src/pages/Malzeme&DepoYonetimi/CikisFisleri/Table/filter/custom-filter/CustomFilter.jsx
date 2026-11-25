@@ -8,11 +8,12 @@ import dayjs from "dayjs";
 import "dayjs/locale/tr"; // For Turkish locale
 import weekOfYear from "dayjs/plugin/weekOfYear";
 import advancedFormat from "dayjs/plugin/advancedFormat";
+import { t } from "i18next";
 import StatusSelect from "./components/StatusSelect";
 import KodIDSelectbox from "../../../../../../utils/components/KodIDSelectbox";
-import FirmaSelectBox from "../../../../../../utils/components/FirmaTablo";
-import DepoSelectBox from "../../../../../../utils/components/DepoSelectBox";
-// import PlakaSelectbox from "../../../../../../components/PlakaSelectbox";
+import FirmaTablo from "../../../../../../utils/components/FirmaTablo";
+import DepoTablo from "../../../../../../utils/components/DepoTablo";
+import MakineTablo from "../../../../../../utils/components/Machina/MakineTablo";
 
 dayjs.extend(weekOfYear);
 dayjs.extend(advancedFormat);
@@ -44,6 +45,7 @@ export default function CustomFilter({ onSubmit }) {
     control,
     watch,
     setValue,
+    getValues,
     formState: { errors },
   } = useFormContext();
   const [open, setOpen] = useState(false);
@@ -98,6 +100,9 @@ export default function CustomFilter({ onSubmit }) {
       ...prevSelectedValues,
       [rowId]: value,
     }));
+    // Alan değişince önceki seçimin ID'si yeni alana gönderilmesin
+    setValue(`input-${rowId}`, undefined);
+    setValue(`input-${rowId}ID`, undefined);
   };
 
   const showDrawer = () => {
@@ -108,53 +113,48 @@ export default function CustomFilter({ onSubmit }) {
     setOpen(false);
   };
 
-  const handleSubmit = () => {
-    // Combine selected values, input values for each row, and date range
-    const filterData = rows.reduce((acc, row) => {
+  // GetMalzemeFis gövdesi (swagger: MalzemeFisRequest). Firma, işlem tipi, depo ve makine ID ile süzülür;
+  // ID'yi satırdaki global seçici form alanına (`input-<satır>ID`) yazar.
+  const filtreVerisiOlustur = (satirlar) => {
+    const filterData = satirlar.reduce((acc, row) => {
       const selectedValue = selectedValues[row.id] || "";
       const inputValue = inputValues[`input-${row.id}`] || "";
-      const inputIDValue = inputValues[`input-${row.id}ID`] || "";
+      const secilenId = getValues(`input-${row.id}ID`);
 
-      if (selectedValue && inputValue) {
-        if (selectedValue === "durum") {
-          acc[selectedValue] = Number(inputValue); // Convert status to number
-        } else if (selectedValue === "islemTipKodId") {
-          // Only for islemTipKodId use the ID value
-          acc[selectedValue] = inputIDValue;
-        } else if (selectedValue === "firmaId" || selectedValue === "girisDepoId" || selectedValue === "aracId") {
-          // Keep original behavior for these fields
-          acc[selectedValue] = inputValue;
-        } else {
-          acc[selectedValue] = inputValue;
-        }
+      if (selectedValue === "durum" && inputValue) {
+        acc[selectedValue] = Number(inputValue); // Convert status to number
+      } else if (selectedValue && secilenId) {
+        acc[selectedValue] = Number(secilenId);
       }
       return acc;
     }, {});
 
-    // Add date range to the filterData object if dates are selected
     if (startDate) {
-      filterData.baslangicTarih = startDate.format("YYYY-MM-DD");
+      filterData.Tarih1 = startDate.format("YYYY-MM-DD");
     }
     if (endDate) {
-      filterData.bitisTarih = endDate.format("YYYY-MM-DD");
+      filterData.Tarih2 = endDate.format("YYYY-MM-DD");
     }
+    return filterData;
+  };
 
-    console.log(filterData);
-    // You can now submit or process the filterData object as needed.
-    onSubmit(filterData);
+  const handleSubmit = () => {
+    onSubmit(filtreVerisiOlustur(rows));
     setOpen(false);
   };
 
   const handleCancelClick = (rowId) => {
+    const kalanSatirlar = rows.filter((row) => row.id !== rowId);
     setFilters({});
-    setRows((prevRows) => prevRows.filter((row) => row.id !== rowId));
+    setRows(kalanSatirlar);
 
-    const filtersRemaining = rows.length > 1;
+    const filtersRemaining = kalanSatirlar.length > 0;
     setFiltersExist(filtersRemaining);
     if (!filtersRemaining) {
       setNewObjectsAdded(false);
     }
-    onSubmit("");
+    // Kalan satırlar ve tarih aralığı uygulanmaya devam eder
+    onSubmit(filtreVerisiOlustur(kalanSatirlar));
   };
 
   const handleInputChange = (e, rowId) => {
@@ -195,16 +195,6 @@ export default function CustomFilter({ onSubmit }) {
 
   const onSearch = (value) => {
     console.log("search:", value);
-  };
-
-  const handleKodIDSelectChange = (text, id, rowId) => {
-    // Update both the display value and the ID value
-    // text = display text (label), id = the actual numeric ID value
-    setInputValues((prevInputValues) => ({
-      ...prevInputValues,
-      [`input-${rowId}`]: text,
-      [`input-${rowId}ID`]: id,
-    }));
   };
 
   return (
@@ -294,20 +284,20 @@ export default function CustomFilter({ onSubmit }) {
                   filterOption={(input, option) => (option?.label || "").toLowerCase().includes(input.toLowerCase())}
                   options={[
                     {
-                      value: "firmaId",
-                      label: "Firma",
+                      value: "FirmaID",
+                      label: t("firma"),
                     },
                     {
-                      value: "islemTipKodId",
-                      label: "İşlem Tipi",
+                      value: "islemTipKodID",
+                      label: t("islemTipi"),
                     },
                     {
-                      value: "girisDepoId",
-                      label: "Depo",
+                      value: "depoID",
+                      label: t("cikisDeposu"),
                     },
                     {
-                      value: "aracId",
-                      label: "Arac",
+                      value: "MakineID",
+                      label: t("makine"),
                     },
                   ]}
                 />
@@ -316,30 +306,14 @@ export default function CustomFilter({ onSubmit }) {
                   name={`input-${row.id}`}
                   value={inputValues[`input-${row.id}`] || ""}
                   onChange={(e) => handleInputChange(e, row.id)}
-                  style={{
-                    display:
-                      selectedValues[row.id] === "durum" ||
-                      selectedValues[row.id] === "islemTipKodId" ||
-                      selectedValues[row.id] === "girisDepoId" ||
-                      selectedValues[row.id] === "aracId" ||
-                      selectedValues[row.id] === "firmaId"
-                        ? "none"
-                        : "block",
-                  }}
+                  style={{ display: selectedValues[row.id] ? "none" : "block" }}
                 />
                 {selectedValues[row.id] === "durum" && <StatusSelect value={inputValues[`input-${row.id}`]} onChange={(value) => handleStatusChange(value, row.id)} />}
-                {selectedValues[row.id] === "islemTipKodId" && (
-                  <KodIDSelectbox name1={`input-${row.id}`} kodID={302} isRequired={false} onChange={(value, id) => handleKodIDSelectChange(value, id, row.id)} />
-                )}
-                {selectedValues[row.id] === "firmaId" && (
-                  <FirmaSelectBox name1={`input-${row.id}`} isRequired={false} onChange={(label, value) => handleKodIDSelectChange(label, value, row.id)} />
-                )}
-                {selectedValues[row.id] === "girisDepoId" && (
-                  <DepoSelectBox name1={`input-${row.id}`} kodID={"MALZEME"} isRequired={false} onChange={(value, label) => handleKodIDSelectChange(value, label, row.id)} />
-                )}
-                {/* {selectedValues[row.id] === "aracId" && (
-                  <PlakaSelectbox name1={`input-${row.id}`} isRequired={false} onChange={(label, value) => handleKodIDSelectChange(label, value, row.id)} />
-                )} */}
+                {/* Fiş formundaki işlem tipi ile aynı kod grubu */}
+                {selectedValues[row.id] === "islemTipKodID" && <KodIDSelectbox name1={`input-${row.id}`} kodID={13006} isRequired={false} />}
+                {selectedValues[row.id] === "FirmaID" && <FirmaTablo firmaFieldName={`input-${row.id}`} firmaIdFieldName={`input-${row.id}ID`} />}
+                {selectedValues[row.id] === "depoID" && <DepoTablo name1={`input-${row.id}`} isRequired={false} />}
+                {selectedValues[row.id] === "MakineID" && <MakineTablo makineFieldName={`input-${row.id}`} makineIdFieldName={`input-${row.id}ID`} />}
               </Col>
             </Col>
           </Row>
