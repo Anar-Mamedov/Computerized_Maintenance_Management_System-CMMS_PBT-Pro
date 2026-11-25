@@ -1294,9 +1294,19 @@ const MainTable = () => {
       // İndirme işlemi başlıyor
       setXlsxLoading(true);
 
-      // API'den verileri çekiyoruz
+      // Bu ekranın Excel ucu: listedeki arama, sıralama ve filtre gövdesiyle (sayfalama olmadan) tüm kayıtlar.
       const { keyword = "", filters = {} } = body || {};
-      const response = await AxiosInstance.post(`GetIsEmriFullListExcel?parametre=${keyword}`, filters);
+      const excelSiralamaYonu = sortField && sortOrder ? (sortOrder === "ascend" ? "ASC" : "DESC") : "";
+      const excelSiralamaAlani = excelSiralamaYonu ? sortField : "";
+      const response = await AxiosInstance.post(
+        `GetIsEmriAnalizExcel?parametre=${encodeURIComponent(keyword)}&sortField=${excelSiralamaAlani}&sortOrder=${excelSiralamaYonu}`,
+        filters
+      );
+      if (!Array.isArray(response)) {
+        message.error(response?.status || t("hataOlustu"));
+        setXlsxLoading(false);
+        return;
+      }
       if (response) {
         // Verileri işliyoruz
         const xlsxData = response.map((row) => {
