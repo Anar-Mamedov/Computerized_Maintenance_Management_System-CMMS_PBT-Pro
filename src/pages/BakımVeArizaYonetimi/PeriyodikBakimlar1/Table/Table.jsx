@@ -20,6 +20,9 @@ import { t } from "i18next";
 
 const { Text } = Typography;
 
+// antd sıralama yönünün GetPBakimTanimList sortOrder karşılığı.
+const SIRALAMA_YONU = { ascend: "ASC", descend: "DESC" };
+
 // Sütunların boyutlarını ayarlamak için kullanılan component
 
 const ResizableTitle = (props) => {
@@ -114,6 +117,9 @@ const MainTable = () => {
   const [ekranFiltreleri, setEkranFiltreleri] = useState({});
   // 1 aktif, 0 pasif, -1 tümü (GetPBakimTanimList isAktif; gönderilmezse backend yalnız aktifleri döndürür).
   const [isAktif, setIsAktif] = useState(1);
+  // Sunucu sıralaması: kolonun dataIndex'i ve ASC / DESC; sıralama yoksa boş.
+  const [sortField, setSortField] = useState("");
+  const [sortOrder, setSortOrder] = useState("");
 
   // Filtre cekmecesinde secilebilecek alanlar: GetPBakimTanimList'in lokasyonIds / atolyeIds parametreleri
   // (tarih araligi cekmecede sabittir).
@@ -156,8 +162,10 @@ const MainTable = () => {
 
     ekle("lokasyonIds", virgullu(ekranFiltreleri.lokasyonlar));
     ekle("atolyeIds", virgullu(ekranFiltreleri.atolyeler));
+    ekle("sortField", sortField);
+    ekle("sortOrder", sortOrder);
     return parametreler.toString();
-  }, [ekranFiltreleri, debouncedSearchTerm, isAktif]);
+  }, [ekranFiltreleri, debouncedSearchTerm, isAktif, sortField, sortOrder]);
   const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
 
   // edit drawer için
@@ -230,7 +238,7 @@ const MainTable = () => {
       }),
       align: "center",
       render: (text) => <div style={{ textAlign: "center" }}>{text ? <CheckOutlined style={{ color: "green" }} /> : <CloseOutlined style={{ color: "red" }} />}</div>,
-      sorter: (a, b) => (a.PBK_AKTIF === b.PBK_AKTIF ? 0 : a.PBK_AKTIF ? -1 : 1),
+      sorter: true,
     },
     {
       title: "Periyodik Bakım Kodu",
@@ -240,12 +248,7 @@ const MainTable = () => {
       ellipsis: true,
       visible: true,
       render: (text) => <a>{text}</a>,
-      sorter: (a, b) => {
-        if (a.PBK_KOD === b.PBK_KOD) return 0;
-        if (a.PBK_KOD === null || a.PBK_KOD === undefined) return -1;
-        if (b.PBK_KOD === null || b.PBK_KOD === undefined) return 1;
-        return a.PBK_KOD.localeCompare(b.PBK_KOD);
-      },
+      sorter: true,
     },
     {
       title: "Makine Sayısı",
@@ -260,7 +263,7 @@ const MainTable = () => {
         },
       }),
       render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
-      sorter: (a, b) => a.MAKINE_SAYI - b.MAKINE_SAYI,
+      sorter: true,
     },
     {
       title: "Periyodik Bakım Tanımı",
@@ -274,12 +277,7 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) => {
-        if (a.PBK_TANIM === b.PBK_TANIM) return 0;
-        if (a.PBK_TANIM === null || a.PBK_TANIM === undefined) return -1;
-        if (b.PBK_TANIM === null || b.PBK_TANIM === undefined) return 1;
-        return a.PBK_TANIM.localeCompare(b.PBK_TANIM);
-      },
+      sorter: true,
     },
 
     {
@@ -294,12 +292,7 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) => {
-        if (a.PBK_TIP === b.PBK_TIP) return 0;
-        if (a.PBK_TIP === null || a.PBK_TIP === undefined) return -1;
-        if (b.PBK_TIP === null || b.PBK_TIP === undefined) return 1;
-        return a.PBK_TIP.localeCompare(b.PBK_TIP);
-      },
+      sorter: true,
     },
     {
       title: "Periyodik Bakım Grup",
@@ -313,12 +306,7 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) => {
-        if (a.PBK_GRUP === b.PBK_GRUP) return 0;
-        if (a.PBK_GRUP === null || a.PBK_GRUP === undefined) return -1;
-        if (b.PBK_GRUP === null || b.PBK_GRUP === undefined) return 1;
-        return a.PBK_GRUP.localeCompare(b.PBK_GRUP);
-      },
+      sorter: true,
     },
     {
       title: "Atölye",
@@ -332,12 +320,7 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) => {
-        if (a.PBK_ATOLYE === b.PBK_ATOLYE) return 0;
-        if (a.PBK_ATOLYE === null || a.PBK_ATOLYE === undefined) return -1;
-        if (b.PBK_ATOLYE === null || b.PBK_ATOLYE === undefined) return 1;
-        return a.PBK_ATOLYE.localeCompare(b.PBK_ATOLYE);
-      },
+      sorter: true,
     },
     {
       title: "Lokasyon",
@@ -352,12 +335,7 @@ const MainTable = () => {
         },
       }),
       render: (text) => <div style={{ textAlign: "left" }}>{text}</div>,
-      sorter: (a, b) => {
-        if (a.PBK_LOKASYON === b.PBK_LOKASYON) return 0;
-        if (a.PBK_LOKASYON === null || a.PBK_LOKASYON === undefined) return -1;
-        if (b.PBK_LOKASYON === null || b.PBK_LOKASYON === undefined) return 1;
-        return a.PBK_LOKASYON.localeCompare(b.PBK_LOKASYON);
-      },
+      sorter: true,
     },
     {
       title: "Öncelik",
@@ -371,12 +349,7 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) => {
-        if (a.PBK_ONCELIK === b.PBK_ONCELIK) return 0;
-        if (a.PBK_ONCELIK === null || a.PBK_ONCELIK === undefined) return -1;
-        if (b.PBK_ONCELIK === null || b.PBK_ONCELIK === undefined) return 1;
-        return a.PBK_ONCELIK.localeCompare(b.PBK_ONCELIK);
-      },
+      sorter: true,
     },
     {
       title: "Talimat",
@@ -390,12 +363,7 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) => {
-        if (a.PBK_TALIMAT === b.PBK_TALIMAT) return 0;
-        if (a.PBK_TALIMAT === null || a.PBK_TALIMAT === undefined) return -1;
-        if (b.PBK_TALIMAT === null || b.PBK_TALIMAT === undefined) return 1;
-        return a.PBK_TALIMAT.localeCompare(b.PBK_TALIMAT);
-      },
+      sorter: true,
     },
     {
       title: "İş Süresi (dk.)",
@@ -410,7 +378,7 @@ const MainTable = () => {
         },
       }),
       render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
-      sorter: (a, b) => a.PBK_CALISMA_SURE - b.PBK_CALISMA_SURE,
+      sorter: true,
     },
     {
       title: "Duruş Süresi (dk.)",
@@ -425,7 +393,7 @@ const MainTable = () => {
         },
       }),
       render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
-      sorter: (a, b) => a.PBK_DURUS_SURE - b.PBK_DURUS_SURE,
+      sorter: true,
     },
     {
       title: "Personel Sayısı (kişi)",
@@ -440,7 +408,7 @@ const MainTable = () => {
         },
       }),
       render: (text) => <div style={{ textAlign: "right" }}>{text}</div>,
-      sorter: (a, b) => a.PBK_PERSONEL_SAYI - b.PBK_PERSONEL_SAYI,
+      sorter: true,
     },
     {
       title: "Özel Alan 1",
@@ -454,12 +422,7 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) => {
-        if (a.PBK_OZEL_ALAN_1 === b.PBK_OZEL_ALAN_1) return 0;
-        if (a.PBK_OZEL_ALAN_1 === null || a.PBK_OZEL_ALAN_1 === undefined) return -1;
-        if (b.PBK_OZEL_ALAN_1 === null || b.PBK_OZEL_ALAN_1 === undefined) return 1;
-        return a.PBK_OZEL_ALAN_1.localeCompare(b.PBK_OZEL_ALAN_1);
-      },
+      sorter: true,
     },
     {
       title: "Özel Alan 2",
@@ -473,12 +436,7 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) => {
-        if (a.PBK_OZEL_ALAN_2 === b.PBK_OZEL_ALAN_2) return 0;
-        if (a.PBK_OZEL_ALAN_2 === null || a.PBK_OZEL_ALAN_2 === undefined) return -1;
-        if (b.PBK_OZEL_ALAN_2 === null || b.PBK_OZEL_ALAN_2 === undefined) return 1;
-        return a.PBK_OZEL_ALAN_2.localeCompare(b.PBK_OZEL_ALAN_2);
-      },
+      sorter: true,
     },
     {
       title: "Özel Alan 3",
@@ -492,12 +450,7 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) => {
-        if (a.PBK_OZEL_ALAN_3 === b.PBK_OZEL_ALAN_3) return 0;
-        if (a.PBK_OZEL_ALAN_3 === null || a.PBK_OZEL_ALAN_3 === undefined) return -1;
-        if (b.PBK_OZEL_ALAN_3 === null || b.PBK_OZEL_ALAN_3 === undefined) return 1;
-        return a.PBK_OZEL_ALAN_3.localeCompare(b.PBK_OZEL_ALAN_3);
-      },
+      sorter: true,
     },
     {
       title: "Özel Alan 4",
@@ -511,12 +464,7 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) => {
-        if (a.PBK_OZEL_ALAN_4 === b.PBK_OZEL_ALAN_4) return 0;
-        if (a.PBK_OZEL_ALAN_4 === null || a.PBK_OZEL_ALAN_4 === undefined) return -1;
-        if (b.PBK_OZEL_ALAN_4 === null || b.PBK_OZEL_ALAN_4 === undefined) return 1;
-        return a.PBK_OZEL_ALAN_4.localeCompare(b.PBK_OZEL_ALAN_4);
-      },
+      sorter: true,
     },
     {
       title: "Özel Alan 5",
@@ -530,12 +478,7 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) => {
-        if (a.PBK_OZEL_ALAN_5 === b.PBK_OZEL_ALAN_5) return 0;
-        if (a.PBK_OZEL_ALAN_5 === null || a.PBK_OZEL_ALAN_5 === undefined) return -1;
-        if (b.PBK_OZEL_ALAN_5 === null || b.PBK_OZEL_ALAN_5 === undefined) return 1;
-        return a.PBK_OZEL_ALAN_5.localeCompare(b.PBK_OZEL_ALAN_5);
-      },
+      sorter: true,
     },
     {
       title: "Özel Alan 6",
@@ -549,12 +492,7 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) => {
-        if (a.PBK_OZEL_ALAN_6 === b.PBK_OZEL_ALAN_6) return 0;
-        if (a.PBK_OZEL_ALAN_6 === null || a.PBK_OZEL_ALAN_6 === undefined) return -1;
-        if (b.PBK_OZEL_ALAN_6 === null || b.PBK_OZEL_ALAN_6 === undefined) return 1;
-        return a.PBK_OZEL_ALAN_6.localeCompare(b.PBK_OZEL_ALAN_6);
-      },
+      sorter: true,
     },
     {
       title: "Özel Alan 7",
@@ -568,12 +506,7 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) => {
-        if (a.PBK_OZEL_ALAN_7 === b.PBK_OZEL_ALAN_7) return 0;
-        if (a.PBK_OZEL_ALAN_7 === null || a.PBK_OZEL_ALAN_7 === undefined) return -1;
-        if (b.PBK_OZEL_ALAN_7 === null || b.PBK_OZEL_ALAN_7 === undefined) return 1;
-        return a.PBK_OZEL_ALAN_7.localeCompare(b.PBK_OZEL_ALAN_7);
-      },
+      sorter: true,
     },
     {
       title: "Özel Alan 8",
@@ -587,12 +520,7 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) => {
-        if (a.PBK_OZEL_ALAN_8 === b.PBK_OZEL_ALAN_8) return 0;
-        if (a.PBK_OZEL_ALAN_8 === null || a.PBK_OZEL_ALAN_8 === undefined) return -1;
-        if (b.PBK_OZEL_ALAN_8 === null || b.PBK_OZEL_ALAN_8 === undefined) return 1;
-        return a.PBK_OZEL_ALAN_8.localeCompare(b.PBK_OZEL_ALAN_8);
-      },
+      sorter: true,
     },
     {
       title: "Özel Alan 9",
@@ -606,12 +534,7 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) => {
-        if (a.PBK_OZEL_ALAN_9 === b.PBK_OZEL_ALAN_9) return 0;
-        if (a.PBK_OZEL_ALAN_9 === null || a.PBK_OZEL_ALAN_9 === undefined) return -1;
-        if (b.PBK_OZEL_ALAN_9 === null || b.PBK_OZEL_ALAN_9 === undefined) return 1;
-        return a.PBK_OZEL_ALAN_9.localeCompare(b.PBK_OZEL_ALAN_9);
-      },
+      sorter: true,
     },
     {
       title: "Özel Alan 10",
@@ -625,12 +548,7 @@ const MainTable = () => {
           event.stopPropagation();
         },
       }),
-      sorter: (a, b) => {
-        if (a.PBK_OZEL_ALAN_10 === b.PBK_OZEL_ALAN_10) return 0;
-        if (a.PBK_OZEL_ALAN_10 === null || a.PBK_OZEL_ALAN_10 === undefined) return -1;
-        if (b.PBK_OZEL_ALAN_10 === null || b.PBK_OZEL_ALAN_10 === undefined) return 1;
-        return a.PBK_OZEL_ALAN_10.localeCompare(b.PBK_OZEL_ALAN_10);
-      },
+      sorter: true,
     },
     // Diğer kolonlarınız...
   ];
@@ -712,7 +630,7 @@ const MainTable = () => {
     fetchEquipmentData(currentPage, pageSize);
   }, [sorguParametreleri, currentPage, pageSize, refreshKey]);
 
-  // Filtre, aktiflik veya arama değişince daralan sonuç kümesinde eski sayfada kalınmasın.
+  // Filtre, aktiflik, arama veya sıralama değişince daralan sonuç kümesinde eski sayfada kalınmasın.
   useEffect(() => {
     setCurrentPage(1);
   }, [sorguParametreleri]);
@@ -751,7 +669,7 @@ const MainTable = () => {
     try {
       setLoading(true);
 
-      // Liste her zaman tanim ucundan gelir; filtre, aktiflik, arama ve sayfalama sunucuda uygulanir.
+      // Liste her zaman tanim ucundan gelir; filtre, aktiflik, arama, siralama ve sayfalama sunucuda uygulanir.
       const rawResponse = await AxiosInstance.get(`GetPBakimTanimList?pagingDeger=${page}&pageSize=${size}&${sorguParametreleri}`);
       if (!guncelMi()) return;
       const list = extractPBakimList(rawResponse);
@@ -808,6 +726,14 @@ const MainTable = () => {
         setDrawer({ visible: true, data: record });
       },
     };
+  };
+
+  // Sıralama sunucuda yapılır; sayfalama da sunucuda olduğu için istemci sıralaması yalnız açık sayfayı sıralardı.
+  const handleTableChange = (_pagination, _filters, sorter, extra) => {
+    if (extra?.action !== "sort") return;
+    const yon = SIRALAMA_YONU[sorter?.order] || "";
+    setSortField(yon ? sorter.field : "");
+    setSortOrder(yon);
   };
 
   const refreshTableData = useCallback(() => {
@@ -1099,6 +1025,7 @@ const MainTable = () => {
             },
           }}
           onRow={onRowClick}
+          onChange={handleTableChange}
           scroll={{ y: "calc(100vh - 370px)" }}
         />
       </Spin>
