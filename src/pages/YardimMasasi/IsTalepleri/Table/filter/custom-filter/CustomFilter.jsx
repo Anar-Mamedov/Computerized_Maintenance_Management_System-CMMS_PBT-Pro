@@ -2,7 +2,9 @@ import { CloseOutlined, FilterOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Col, Drawer, Row, Typography, Select, Space, Input, DatePicker } from "antd";
 import LokasyonTablo from "../../../../../../utils/components/LokasyonTablo";
 import EkipmanFilterSelectbox from "../../../../../../utils/components/EkipmanFilterSelectbox";
+import IsTalepKullaniciFilterSelectbox from "../../../../../../utils/components/IsTalepKullaniciFilterSelectbox";
 import React, { useEffect, useState } from "react";
+import { t } from "i18next";
 import styled from "styled-components";
 import "./style.css";
 import { Controller, useFormContext } from "react-hook-form";
@@ -22,6 +24,10 @@ const { Text, Link } = Typography;
 // kok seviyedeki `lokasyonlar` / `makineler` alanlarina tasinir.
 const LOKASYON_ALANI = "lokasyonlar";
 const EKIPMAN_ALANI = "makineler";
+// İlgili kişi (iş takip eden) de ID ile süzülür; seçilen TB_IS_TALEBI_KULLANICI_ID'ler customfilters içinde
+// bu anahtarla dizi olarak gider (backend dokümanında önerilen biçim).
+const ILGILI_KISI_ALANI = "tlp.IST_IS_TAKIPCISI_ID";
+const ID_BAZLI_ALANLAR = [LOKASYON_ALANI, EKIPMAN_ALANI, ILGILI_KISI_ALANI];
 
 const StyledCloseOutlined = styled(CloseOutlined)`
   svg {
@@ -97,6 +103,8 @@ export default function CustomFilter({ onSubmit, baslangicLokasyonIds, baslangic
       ...prevSelectedValues,
       [rowId]: value,
     }));
+    // Alan değişince önceki alanın ID'leri (ör. lokasyon ID'leri) yeni alana taşınmasın; değer kutusu boş açılır.
+    setIdValues((state) => ({ ...state, [rowId]: [] }));
   };
 
   const showDrawer = () => {
@@ -112,8 +120,8 @@ export default function CustomFilter({ onSubmit, baslangicLokasyonIds, baslangic
     const filterData = rows.reduce((acc, row) => {
       const selectedValue = selectedValues[row.id] || "";
 
-      // Lokasyon/ekipman satirlari ID dizisi uretir; ayni alanda birden fazla satir varsa birlestirilir.
-      if (selectedValue === LOKASYON_ALANI || selectedValue === EKIPMAN_ALANI) {
+      // Lokasyon/ekipman/ilgili kisi satirlari ID dizisi uretir; ayni alanda birden fazla satir varsa birlestirilir.
+      if (ID_BAZLI_ALANLAR.includes(selectedValue)) {
         const ids = idValues[row.id] || [];
         if (ids.length) {
           acc[selectedValue] = [...new Set([...(acc[selectedValue] || []), ...ids])];
@@ -331,6 +339,10 @@ export default function CustomFilter({ onSubmit, baslangicLokasyonIds, baslangic
                       label: "Ekipman",
                     },
                     {
+                      value: ILGILI_KISI_ALANI,
+                      label: t("ilgiliKisi"),
+                    },
+                    {
                       value: "kod_tip.KOD_TANIM",
                       label: "Talep Tipi",
                     },
@@ -358,6 +370,13 @@ export default function CustomFilter({ onSubmit, baslangicLokasyonIds, baslangic
                 ) : selectedValues[row.id] === EKIPMAN_ALANI ? (
                   // Ekipman dashboard'daki gibi aranabilir selectbox; secim TB_MAKINE_ID uzerinden tutulur.
                   <EkipmanFilterSelectbox value={idValues[row.id] || []} onChange={(ids) => setIdValues((state) => ({ ...state, [row.id]: ids }))} />
+                ) : selectedValues[row.id] === ILGILI_KISI_ALANI ? (
+                  // Kişiler GetIsTalepKullaniciList'ten gelir; seçim TB_IS_TALEBI_KULLANICI_ID üzerinden tutulur.
+                  <IsTalepKullaniciFilterSelectbox
+                    placeholder={t("ilgiliKisi")}
+                    value={idValues[row.id] || []}
+                    onChange={(ids) => setIdValues((state) => ({ ...state, [row.id]: ids }))}
+                  />
                 ) : (
                   <Input
                     placeholder="Arama Yap"
