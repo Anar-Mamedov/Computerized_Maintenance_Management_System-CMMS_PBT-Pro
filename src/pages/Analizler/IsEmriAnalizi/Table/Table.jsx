@@ -10,7 +10,7 @@ import AxiosInstance from "../../../../api/http";
 /* import CreateDrawer from "../Insert/CreateDrawer"; */
 import EditDrawer from "../../../BakımVeArizaYonetimi/IsEmri/Update/EditDrawer";
 import Filters from "./filter/Filters";
-import ContextMenu from "../components/ContextMenu/ContextMenu";
+import ContextMenu from "../../../BakımVeArizaYonetimi/IsEmri/components/ContextMenu/ContextMenu";
 import Aylik from "./Aylik";
 import Yillik from "./Yillik";
 import { buildInitialColumns } from "./tableColumns.jsx";
@@ -185,6 +185,21 @@ const normalizeSummaryResponse = (apiResponse, operations) => {
   return normalized;
 };
 
+// İş Emri ekranının işlem menüsü GetIsEmriFullList satır alanlarını bekler; GetIsEmriAnaliz aynı bilgileri
+// farklı adlarla (çoğu ISM_ önekli) döndürür. Menüye verilen satırlar bu adlara eşlenir, key (TB_ISEMRI_ID) aynen kalır.
+const isEmriMenuSatiri = (row) => ({
+  ...row,
+  ISEMRI_NO: row.ISM_ISEMRI_NO,
+  KAPALI: Boolean(row.ISM_KAPATILDI),
+  KONU: row.ISM_KONU,
+  MAKINE_KODU: row.MKN_KOD,
+  MAKINE_TANIMI: row.MKN_TANIM,
+  ATOLYE: row.ISM_ATOLYE,
+  PERSONEL_ADI: row.ISM_PERSONEL_TANIM,
+  BASLAMA_TARIH: row.ISM_BASLAMA_TARIH,
+  BASLAMA_SAAT: row.ISM_BASLAMA_SAAT,
+});
+
 // Function to extract text from React elements
 import { isValidElement } from "react";
 
@@ -317,8 +332,10 @@ const MainTable = () => {
   const [drawer, setDrawer] = useState({
     visible: false,
     data: null,
+    initialSecondTabKey: null,
   });
   const [selectedRows, setSelectedRows] = useState([]);
+  const menuSatirlari = useMemo(() => selectedRows.map(isEmriMenuSatiri), [selectedRows]);
   const [activeTab, setActiveTab] = useState("detay");
   const [xlsxLoading, setXlsxLoading] = useState(false);
   const [sortField, setSortField] = useState(null);
@@ -681,8 +698,14 @@ const MainTable = () => {
   // tarihleri kullanıcının local ayarlarına bakarak formatlayıp ekrana o şekilde yazdırmak için sonu
 
   const onRowClick = (record) => {
-    setDrawer({ visible: true, data: record });
+    setDrawer({ visible: true, data: record, initialSecondTabKey: null });
   };
+
+  // Kapatmada eksik kontrol listesi uyarısından iş emrinin kontrol listesi sekmesi açılır (İş Emri ekranındaki gibi).
+  const handleOpenControlList = useCallback((row) => {
+    if (!row?.key) return;
+    setDrawer({ visible: true, data: row, initialSecondTabKey: "2" });
+  }, []);
 
   const handleIsTalepCellClick = (record, event) => {
     event.stopPropagation();
@@ -1541,9 +1564,12 @@ const MainTable = () => {
             >
               <MenuOutlined />
             </Button>
-            <Button style={{ display: "flex", alignItems: "center" }} onClick={handleDownloadXLSX} loading={xlsxLoading} icon={<SiMicrosoftexcel />}>
-              İndir
-            </Button>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <Button style={{ display: "flex", alignItems: "center" }} onClick={handleDownloadXLSX} loading={xlsxLoading} icon={<SiMicrosoftexcel />}>
+                İndir
+              </Button>
+              <ContextMenu selectedRows={menuSatirlari} refreshTableData={refreshTableData} onayCheck={onayCheck} onOpenControlList={handleOpenControlList} />
+            </div>
           </div>
 
           <div ref={tableWrapperRef}>
@@ -1606,7 +1632,13 @@ const MainTable = () => {
       )}
       {activeTab === "aylik" && <Aylik body={body} />}
       {activeTab === "yillik" && <Yillik body={body} />}
-      <EditDrawer selectedRow={drawer.data} onDrawerClose={() => setDrawer({ visible: false, data: null })} drawerVisible={drawer.visible} onRefresh={refreshTableData} />
+      <EditDrawer
+        selectedRow={drawer.data}
+        onDrawerClose={() => setDrawer({ visible: false, data: null, initialSecondTabKey: null })}
+        drawerVisible={drawer.visible}
+        onRefresh={refreshTableData}
+        initialSecondTabKey={drawer.initialSecondTabKey}
+      />
       {/* {editDrawer1Visible && (
         <EditDrawer1
           selectedRow={editDrawer1Data}
