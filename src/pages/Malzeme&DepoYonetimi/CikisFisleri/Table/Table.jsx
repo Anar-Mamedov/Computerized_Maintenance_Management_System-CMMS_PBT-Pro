@@ -4,6 +4,7 @@ import ContextMenu from "../components/ContextMenu/ContextMenu";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import Filters from "./filter/Filters";
+import MalzemeFisExcelButonu from "../../ortak/MalzemeFisExcelButonu";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { Table, Button, Modal, Checkbox, Input, Spin, Typography, Tag, message, Tooltip, Progress, ConfigProvider } from "antd";
 import { HolderOutlined, SearchOutlined, MenuOutlined, HomeOutlined, ArrowDownOutlined, ArrowUpOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
@@ -168,19 +169,22 @@ const CikisFisleri = () => {
 
   const prevBodyRef = useRef(body);
 
+  // GetMalzemeFis gövdesi (filtreler + FisTip + Kelime). Excel düğmesi de aynı gövdeyi sayfalamasız uca gönderir.
+  const listeGovdesi = useMemo(
+    () => ({
+      ...(body.filters?.customfilter || {}),
+      FisTip: "C",
+      Kelime: searchTerm,
+    }),
+    [body.filters, searchTerm]
+  );
+
   // API call - memoized with useCallback to prevent recreation on every render
   const fetchData = useCallback(
     async (page = 1, pageSize = 10) => {
       setLoading(true);
       try {
-        // Create customfilter object with FisTip and Kelime
-        const customfilter = {
-          ...(body.filters?.customfilter || {}),
-          FisTip: "C",
-          Kelime: searchTerm,
-        };
-
-        const response = await AxiosInstance.post(`GetMalzemeFis?pagingDeger=${page}&pageSize=${pageSize}`, customfilter);
+        const response = await AxiosInstance.post(`GetMalzemeFis?pagingDeger=${page}&pageSize=${pageSize}`, listeGovdesi);
 
         const total = response.kayit_sayisi;
         setTotalCount(total);
@@ -205,7 +209,7 @@ const CikisFisleri = () => {
         setLoading(false);
       }
     },
-    [body.filters, searchTerm]
+    [listeGovdesi]
   );
 
   // Combined useEffect for initial data fetch and body state changes
@@ -809,6 +813,7 @@ const CikisFisleri = () => {
                 {/* Other toolbar components */}
               </div>
               <div style={{ display: "flex", gap: "10px" }}>
+                <MalzemeFisExcelButonu govde={listeGovdesi} kolonlar={filteredColumns} dosyaAdi="malzeme_cikis_fisleri" />
                 <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
                 <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
               </div>
