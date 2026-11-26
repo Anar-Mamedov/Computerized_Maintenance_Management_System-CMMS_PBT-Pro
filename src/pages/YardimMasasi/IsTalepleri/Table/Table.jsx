@@ -724,7 +724,7 @@ const MainTable = ({ hatirlaticiGrupId, hatirlaticiSiraId }) => {
           event.stopPropagation();
         },
       }),
-      visible: false,
+      visible: true,
       sorter: true,
     },
     {
