@@ -10,6 +10,7 @@ import AxiosInstance from "../../../../api/http";
 import { useDashboardFilterParams } from "../../../../utils/dashboardFilterParams";
 import FiltreCekmecesi from "../../../../utils/components/FiltreCekmecesi";
 import AktifPasifHepsiSelect from "../../../../utils/components/AktifPasifHepsiSelect";
+import PeriyodikBakimExcelButonu from "./PeriyodikBakimExcelButonu";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
@@ -151,7 +152,7 @@ const MainTable = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // GetPBakimTanimList sorgu parametreleri (sayfalama hariç). Çoklu ID'ler virgülle ayrılır,
+  // GetPBakimTanimList ve Excel ucunun ortak sorgu parametreleri (sayfalama hariç). Çoklu ID'ler virgülle ayrılır,
   // boş filtreler gönderilmez.
   const sorguParametreleri = useMemo(() => {
     const virgullu = (ids) => (Array.isArray(ids) ? ids.join(",") : "");
@@ -1000,6 +1001,7 @@ const MainTable = () => {
           <AktifPasifHepsiSelect value={isAktif} onChange={setIsAktif} />
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
+          <PeriyodikBakimExcelButonu sorguParametreleri={sorguParametreleri} kolonlar={filteredColumns} />
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
           <CreateDrawer selectedLokasyonId={selectedRowKeys[0]} onRefresh={refreshTableData} />
         </div>
