@@ -112,35 +112,12 @@ const MainTable = () => {
   // Cekmeceden gelen filtreler; dashboard degerleri bunlara baslangic degeri olarak yerlesir.
   const [ekranFiltreleri, setEkranFiltreleri] = useState({});
 
-  // Filtreli liste ucu yalnizca gercekten bir filtre varken kullanilir.
-  const aktifFiltreler = useMemo(() => {
-    const birlesik = { ...ekranFiltreleri };
-    Object.keys(birlesik).forEach((anahtar) => {
-      const deger = birlesik[anahtar];
-      const bos = deger === null || deger === undefined || deger === "" || (Array.isArray(deger) && !deger.length) || (typeof deger === "object" && !Array.isArray(deger) && !Object.keys(deger).length);
-      if (bos) delete birlesik[anahtar];
-    });
-    return birlesik;
-  }, [ekranFiltreleri]);
-
-
-  // Filtre cekmecesinde secilebilecek alanlar (tarih araligi cekmecede sabittir).
+  // Filtre cekmecesinde secilebilecek alanlar: GetPBakimTanimList'in lokasyonIds / atolyeIds parametreleri
+  // (tarih araligi cekmecede sabittir).
   const filtreAlanlari = useMemo(
     () => [
-      {
-        value: "durum",
-        label: t("durum"),
-        tip: "select",
-        secenekler: [
-          { value: "geciken", label: t("geciken") },
-          { value: "bugun", label: t("bugun") },
-          { value: "buHafta", label: t("buHafta") },
-          { value: "buAy", label: t("buAy") },
-        ],
-      },
       { value: "lokasyonlar", label: t("lokasyon"), tip: "lokasyon" },
       { value: "atolyeler", label: t("atolye"), tip: "atolye" },
-      { value: "makineler", label: t("ekipman"), tip: "ekipman" },
     ],
     []
   );
@@ -148,10 +125,8 @@ const MainTable = () => {
   // Dashboard'dan gelenler cekmecenin baslangic degerleri olur.
   const cekmeceBaslangici = useMemo(
     () => ({
-      durum: dashboardFilters.durum,
       lokasyonlar: dashboardFilters.lokasyonlar,
       atolyeler: dashboardFilters.atolyeler,
-      makineler: dashboardFilters.makineler,
     }),
     [dashboardFilters]
   );
@@ -166,6 +141,20 @@ const MainTable = () => {
   const [totalDataCount, setTotalDataCount] = useState(0);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
+
+  // GetPBakimTanimList sorgu parametreleri (sayfalama hariç). Çoklu ID'ler virgülle ayrılır,
+  // boş filtreler gönderilmez.
+  const sorguParametreleri = useMemo(() => {
+    const virgullu = (ids) => (Array.isArray(ids) ? ids.join(",") : "");
+    const parametreler = new URLSearchParams({ parametre: debouncedSearchTerm });
+    const ekle = (ad, deger) => {
+      if (deger) parametreler.append(ad, deger);
+    };
+
+    ekle("lokasyonIds", virgullu(ekranFiltreleri.lokasyonlar));
+    ekle("atolyeIds", virgullu(ekranFiltreleri.atolyeler));
+    return parametreler.toString();
+  }, [ekranFiltreleri, debouncedSearchTerm]);
   const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
 
   // edit drawer için
@@ -718,22 +707,22 @@ const MainTable = () => {
 
   useEffect(() => {
     fetchEquipmentData(currentPage, pageSize);
-  }, [aktifFiltreler, currentPage, pageSize, debouncedSearchTerm, refreshKey]);
+  }, [sorguParametreleri, currentPage, pageSize, refreshKey]);
 
-  // Dashboard filtresi degisince daralan sonuc kumesinde eski sayfada kalinmasin.
+  // Filtre veya arama değişince daralan sonuç kümesinde eski sayfada kalınmasın.
   useEffect(() => {
     setCurrentPage(1);
-  }, [aktifFiltreler]);
+  }, [sorguParametreleri]);
 
   // ana tablo api isteği için kullanılan useEffect son
 
-  // GetPBakimTanimList / GetPBakimFullList'in liste ve toplam alanlari backend surumune gore degisebildigi icin
+  // GetPBakimTanimList'in liste ve toplam alanlari backend surumune gore degisebildigi icin
   // bilinen alan adlari sirayla denenir.
   const extractPBakimList = (response) => {
     if (Array.isArray(response)) return response;
     if (!response || typeof response !== "object") return [];
 
-    const knownListKeys = ["list", "periyodik_bakim_listesi", "pbakim_listesi", "periyodikBakimList", "Data"];
+    const knownListKeys = ["p_bakim_listesi", "list", "periyodik_bakim_listesi", "pbakim_listesi", "periyodikBakimList", "Data"];
     const matchedKey = knownListKeys.find((key) => Array.isArray(response[key]));
 
     return matchedKey ? response[matchedKey] : [];
@@ -748,8 +737,7 @@ const MainTable = () => {
     return matchedKey ? Number(response[matchedKey]) : fallback;
   };
 
-  // Iki farkli uc farkli surede donebildigi icin (ör. dashboard'dan gelince once filtresiz GET, sonra filtreli POST)
-  // yalnizca en son istegin yaniti ekrana islenir.
+  // Arka arkaya atilan istekler farkli surede donebildigi icin yalnizca en son istegin yaniti ekrana islenir.
   const istekSirasiRef = useRef(0);
 
   const fetchEquipmentData = async (page = currentPage, size = pageSize) => {
@@ -760,12 +748,8 @@ const MainTable = () => {
     try {
       setLoading(true);
 
-      // Filtre yokken liste tanim ucundan (GET GetPBakimTanimList) gelir. Filtre cekmecesi veya dashboard filtresi
-      // aktifken filtreleri govdede alan GetPBakimFullList kullanilir. Arama ve sayfalama her iki ucta da sunucuda uygulanir.
-      const filtreVar = Object.keys(aktifFiltreler).length > 0;
-      const rawResponse = filtreVar
-        ? await AxiosInstance.post(`GetPBakimFullList?pagingDeger=${page}&pageSize=${size}&parametre=${debouncedSearchTerm}`, aktifFiltreler)
-        : await AxiosInstance.get(`GetPBakimTanimList?pagingDeger=${page}&pageSize=${size}&parametre=${debouncedSearchTerm}`);
+      // Liste her zaman tanim ucundan gelir; filtre, arama ve sayfalama sunucuda uygulanir.
+      const rawResponse = await AxiosInstance.get(`GetPBakimTanimList?pagingDeger=${page}&pageSize=${size}&${sorguParametreleri}`);
       if (!guncelMi()) return;
       const list = extractPBakimList(rawResponse);
 
