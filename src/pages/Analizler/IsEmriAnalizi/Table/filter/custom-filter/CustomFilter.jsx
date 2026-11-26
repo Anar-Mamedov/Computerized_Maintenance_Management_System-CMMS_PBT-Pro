@@ -14,7 +14,9 @@ import ProsedurNedeni from "../../../../../../utils/components/ProsedurNedeni";
 import PersonelSelectbox from "../../../../../../utils/components/PersonelSelectbox";
 import AtolyeSelectbox from "../../../../../../utils/components/AtolyeSelectbox";
 import MasrafMerkeziSelectbox from "../../../../../../utils/components/MasrafMerkeziSelectbox";
+import EkipmanFilterSelectbox from "../../../../../../utils/components/EkipmanFilterSelectbox";
 import AxiosInstance from "../../../../../../api/http";
+import { t } from "i18next";
 
 dayjs.extend(weekOfYear);
 dayjs.extend(advancedFormat);
@@ -62,6 +64,10 @@ const TIME_FIELDS = new Set([
   "ism.ISM_BITIS_SAAT",
   "ism.ISM_KAPANMA_YDK_SAAT",
 ]);
+
+// Makine metinle değil ID ile süzülür: seçilen TB_MAKINE_ID'ler customfilter'da bu anahtarla dizi olarak gider,
+// GetIsEmriAnaliz bunu ism.ISM_MAKINE_ID IN (...) olarak uygular.
+const MAKINE_ALANI = "ism.ISM_MAKINE_ID";
 
 const getSelectboxFieldName = (rowId, fieldKey) => `filter-${rowId}-${fieldKey.replace(/[^a-zA-Z0-9]/g, "_")}`;
 
@@ -170,6 +176,8 @@ export default function CustomFilter({ onSubmit }) {
 
   // Create a state variable to store selected values for each row
   const [selectedValues, setSelectedValues] = useState({});
+  // Makine satırları serbest metin yerine ID dizisi tutar.
+  const [idValues, setIdValues] = useState({});
 
   // Tarih seçimi yapıldığında veya filtreler eklenip kaldırıldığında düğmenin stilini değiştirmek için bir durum
   const isFilterApplied = newObjectsAdded || filtersExist || startDate || endDate;
@@ -181,6 +189,13 @@ export default function CustomFilter({ onSubmit }) {
 
   const clearDynamicField = (rowId, fieldKey) => {
     if (!fieldKey) return;
+    if (fieldKey === MAKINE_ALANI) {
+      setIdValues((prev) => {
+        const updated = { ...prev };
+        delete updated[rowId];
+        return updated;
+      });
+    }
     if (isSelectboxField(fieldKey) || isCustomComponentField(fieldKey)) {
       const fieldName = getSelectboxFieldName(rowId, fieldKey);
       setValue(fieldName, null);
@@ -255,6 +270,15 @@ export default function CustomFilter({ onSubmit }) {
     const filterData = rows.reduce((acc, row) => {
       const selectedValue = selectedValues[row.id] || "";
       let inputValue = "";
+
+      // Aynı alan birden fazla satırda seçildiyse ID'ler birleştirilir.
+      if (selectedValue === MAKINE_ALANI) {
+        const ids = idValues[row.id] || [];
+        if (ids.length) {
+          acc[MAKINE_ALANI] = [...new Set([...(acc[MAKINE_ALANI] || []), ...ids])];
+        }
+        return acc;
+      }
 
       if (isSelectboxField(selectedValue) || isCustomComponentField(selectedValue)) {
         const fieldName = getSelectboxFieldName(row.id, selectedValue);
@@ -522,12 +546,8 @@ export default function CustomFilter({ onSubmit }) {
                       label: "İş Süresi",
                     },
                     {
-                      value: "mkn.MKN_KOD",
-                      label: "Makine Kodu",
-                    },
-                    {
-                      value: "mkn.MKN_TANIM",
-                      label: "Makine Tanımı",
+                      value: MAKINE_ALANI,
+                      label: t("makine"),
                     },
                     // {
                     //   value: "MAKINE_PLAKA",
@@ -703,7 +723,9 @@ export default function CustomFilter({ onSubmit }) {
                     },
                   ]}
                 />
-                {isCustomComponentField(selectedValues[row.id]) ? (
+                {selectedValues[row.id] === MAKINE_ALANI ? (
+                  <EkipmanFilterSelectbox value={idValues[row.id] || []} onChange={(ids) => setIdValues((prev) => ({ ...prev, [row.id]: ids }))} />
+                ) : isCustomComponentField(selectedValues[row.id]) ? (
                   renderCustomComponent(row.id, selectedValues[row.id])
                 ) : isSelectboxField(selectedValues[row.id]) ? (
                   <KodIDSelectbox
