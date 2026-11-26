@@ -9,6 +9,7 @@ import "./ResizeStyle.css";
 import AxiosInstance from "../../../../api/http";
 import { useDashboardFilterParams } from "../../../../utils/dashboardFilterParams";
 import FiltreCekmecesi from "../../../../utils/components/FiltreCekmecesi";
+import AktifPasifHepsiSelect from "../../../../utils/components/AktifPasifHepsiSelect";
 import CreateDrawer from "../Insert/CreateDrawer";
 import EditDrawer from "../Update/EditDrawer";
 import ContextMenu from "../components/ContextMenu/ContextMenu";
@@ -111,6 +112,8 @@ const MainTable = () => {
   const { filters: dashboardFilters } = useDashboardFilterParams("/periyodikBakimlar");
   // Cekmeceden gelen filtreler; dashboard degerleri bunlara baslangic degeri olarak yerlesir.
   const [ekranFiltreleri, setEkranFiltreleri] = useState({});
+  // 1 aktif, 0 pasif, -1 tümü (GetPBakimTanimList isAktif; gönderilmezse backend yalnız aktifleri döndürür).
+  const [isAktif, setIsAktif] = useState(1);
 
   // Filtre cekmecesinde secilebilecek alanlar: GetPBakimTanimList'in lokasyonIds / atolyeIds parametreleri
   // (tarih araligi cekmecede sabittir).
@@ -146,7 +149,7 @@ const MainTable = () => {
   // boş filtreler gönderilmez.
   const sorguParametreleri = useMemo(() => {
     const virgullu = (ids) => (Array.isArray(ids) ? ids.join(",") : "");
-    const parametreler = new URLSearchParams({ parametre: debouncedSearchTerm });
+    const parametreler = new URLSearchParams({ parametre: debouncedSearchTerm, isAktif: String(isAktif) });
     const ekle = (ad, deger) => {
       if (deger) parametreler.append(ad, deger);
     };
@@ -154,7 +157,7 @@ const MainTable = () => {
     ekle("lokasyonIds", virgullu(ekranFiltreleri.lokasyonlar));
     ekle("atolyeIds", virgullu(ekranFiltreleri.atolyeler));
     return parametreler.toString();
-  }, [ekranFiltreleri, debouncedSearchTerm]);
+  }, [ekranFiltreleri, debouncedSearchTerm, isAktif]);
   const [label, setLabel] = useState("Yükleniyor..."); // Başlangıç değeri özel alanlar için
 
   // edit drawer için
@@ -709,7 +712,7 @@ const MainTable = () => {
     fetchEquipmentData(currentPage, pageSize);
   }, [sorguParametreleri, currentPage, pageSize, refreshKey]);
 
-  // Filtre veya arama değişince daralan sonuç kümesinde eski sayfada kalınmasın.
+  // Filtre, aktiflik veya arama değişince daralan sonuç kümesinde eski sayfada kalınmasın.
   useEffect(() => {
     setCurrentPage(1);
   }, [sorguParametreleri]);
@@ -748,7 +751,7 @@ const MainTable = () => {
     try {
       setLoading(true);
 
-      // Liste her zaman tanim ucundan gelir; filtre, arama ve sayfalama sunucuda uygulanir.
+      // Liste her zaman tanim ucundan gelir; filtre, aktiflik, arama ve sayfalama sunucuda uygulanir.
       const rawResponse = await AxiosInstance.get(`GetPBakimTanimList?pagingDeger=${page}&pageSize=${size}&${sorguParametreleri}`);
       if (!guncelMi()) return;
       const list = extractPBakimList(rawResponse);
@@ -1068,6 +1071,7 @@ const MainTable = () => {
           />
           {/* Filtre çekmecesi her ekranda arama kutusunun yanında, solda hizalı durur. */}
           <FiltreCekmecesi alanlar={filtreAlanlari} tarihAraligiGoster={false} baslangicFiltreleri={cekmeceBaslangici} onSubmit={setEkranFiltreleri} />
+          <AktifPasifHepsiSelect value={isAktif} onChange={setIsAktif} />
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
           <ContextMenu selectedRows={selectedRows} refreshTableData={refreshTableData} />
