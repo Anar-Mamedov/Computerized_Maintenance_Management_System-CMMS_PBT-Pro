@@ -97,6 +97,8 @@ export const rawItems = [
       getItem("Malzeme Girişleri", "malzemeGirisFisi", true, undefined, true, "KLL_WEB_MALGIRIS"),
       getItem("Malzeme Çıkışları", "malzemeCikisFisi", true, undefined, true, "KLL_WEB_MALCIKIS"),
       getItem("Malzeme Transferleri", "malzemeTransferFisi", true, undefined, true, "KLL_WEB_TRANSFER"),
+      // Satınalma menüsünden taşındı; satınalma modülü kapalı olan müşteride önceki gibi gizli kalır
+      getItem("Malzeme Talepleri", "malzemeTalepleri", true, undefined, true, "KLL_WEB_SATINALMA_MODUL"),
     ],
     false
   ),
@@ -119,7 +121,6 @@ export const rawItems = [
     <ShoppingCartOutlined />,
     [
       getItem("Satınalma Yönetici Paneli", "satinalmaDashboard", true),
-      getItem("Malzeme Talepleri", "malzemeTalepleri", true),
       getItem("Satınalma Siparişleri", "satinalmaSiparisleri", true),
       getItem("Fiyat Teklifleri", "fiyatTeklifleri", true),
       getItem("Tedarikçi Firmalar", "tedarikciFirmalar", true),
