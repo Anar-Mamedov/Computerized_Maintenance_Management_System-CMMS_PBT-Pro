@@ -27,6 +27,15 @@ function getItem(labelText, key, icon, children, isClickable = true, modulePermi
   };
 }
 
+// Alt menüdeki öğe gruplarını ayırır. antd koyu menüde ayraç rengini açık temadan aldığı için görünmez kalıyor;
+// renk ve boşluk burada verilir. Çizgi tam genişlik değil, sağdan ve soldan 16px içeride durur.
+function getDivider() {
+  return {
+    type: "divider",
+    style: { margin: "24px 16px 12px", borderColor: "rgba(255, 255, 255, 0.15)" },
+  };
+}
+
 // Domain kontrolü menü için
 const menuHostname = window.location.hostname;
 const isOmegaMenu = menuHostname === "omegaerp.net" || menuHostname === "www.omegaerp.net";
@@ -82,12 +91,12 @@ export const rawItems = [
     "malzeme&depo",
     <InboxOutlined />,
     [
-      getItem("Malzeme Tanımıları", "malzemeTanimi", true, undefined, true, "KLL_WEB_MALZEME"),
+      getItem("Malzeme Tanımları", "malzemeTanimi", true, undefined, true, "KLL_WEB_MALZEME"),
       getItem("Malzeme Depoları", "malzemeDepolari", true, undefined, true, "KLL_WEB_MALDEPO"),
+      getDivider(),
       getItem("Malzeme Girişleri", "malzemeGirisFisi", true, undefined, true, "KLL_WEB_MALGIRIS"),
       getItem("Malzeme Çıkışları", "malzemeCikisFisi", true, undefined, true, "KLL_WEB_MALCIKIS"),
       getItem("Malzeme Transferleri", "malzemeTransferFisi", true, undefined, true, "KLL_WEB_TRANSFER"),
-      getItem("Stok Sayımları", "stokSayimlariFisListe", true),
     ],
     false
   ),
