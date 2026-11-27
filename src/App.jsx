@@ -583,10 +583,14 @@ const BaseLayout = () => {
 
 // const items = filterItems(rawItems); // moved to inside MenuWrapper
 
+// menuItems.jsx'teki getItem'ın eklediği, Ant Design Menu'nün tanımadığı alanlar; Menu'ye giderse DOM'a yazılır ve React uyarı verir
+const MENU_CONFIG_FIELDS = ["isClickable", "labelText", "modulePermissionKey"];
+
 // Ant Design Menu için gereksiz propları temizleyen fonksiyon
 function cleanItemsForMenu(items) {
   return items.map((item) => {
-    const { isClickable, labelText, ...cleanItem } = item;
+    const cleanItem = { ...item };
+    MENU_CONFIG_FIELDS.forEach((field) => delete cleanItem[field]);
     if (cleanItem.children) {
       cleanItem.children = cleanItemsForMenu(cleanItem.children);
     }
