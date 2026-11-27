@@ -118,6 +118,22 @@ import { rawItems } from "./menuItems";
 // Bu modüller yalnızca yetki açıkça true ise gösterilir (false veya null/undefined ise gizlenir).
 const STRICT_MODULE_PERMISSION_KEYS = ["KLL_WEB_LASTIK_MODUL", "KLL_WEB_HARITA_MODUL"];
 
+// Yetki filtresi bir gruptaki öğelerin hepsini gizleyince ayraç başta, sonda ya da başka bir ayraçla yan yana kalır; bunlar atılır.
+function removeOrphanDividers(items) {
+  const result = [];
+  items.forEach((item) => {
+    const previous = result[result.length - 1];
+    if (item.type === "divider" && (!previous || previous.type === "divider")) {
+      return;
+    }
+    result.push(item);
+  });
+  if (result[result.length - 1]?.type === "divider") {
+    result.pop();
+  }
+  return result;
+}
+
 function filterItems(items, loginData, token) {
   // Token yoksa, hiçbir filtreleme yapmadan tüm öğeleri döndür
   if (!token) {
@@ -144,10 +160,12 @@ function filterItems(items, loginData, token) {
       }
 
       const filteredChildren = item.children
-        ? filterItems(item.children, loginData, token).filter((child) => {
-            const permissionKeyToUse = child.modulePermissionKey || child.key;
-            return loginData[permissionKeyToUse] !== false;
-          })
+        ? removeOrphanDividers(
+            filterItems(item.children, loginData, token).filter((child) => {
+              const permissionKeyToUse = child.modulePermissionKey || child.key;
+              return loginData[permissionKeyToUse] !== false;
+            })
+          )
         : [];
       return {
         ...item,
